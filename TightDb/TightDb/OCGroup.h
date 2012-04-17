@@ -21,7 +21,7 @@
 -(BOOL)hasTable:(NSString *)name;
 
 // Table stuff ???? TODO
--(OCToplevelTable *)getTable:(NSString *)name;
+-(id)getTable:(NSString *)name withClass:(Class)obj;
 
 // Serialization
 -(void)write:(NSString *)filePath;

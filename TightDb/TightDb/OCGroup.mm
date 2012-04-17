@@ -11,7 +11,8 @@
 #import "OCTable.h"
 
 @interface OCTable()
--(id)initWithTopLevelTable:(TopLevelTable *)table;
+-(id)initWithBlock:(TopLevelTableInitBlock)block;
+-(void)setTable:(TopLevelTable*)table;
 @end
 
 
@@ -77,8 +78,11 @@
     return _group->WriteToMem(*len);
 }
 
--(OCTopLevelTable *)getTable:(NSString *)name
+-(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)obj
 {
-    return [[OCTopLevelTable alloc] initWithTopLevelTable:&_group->GetTable([name UTF8String])];
+    return [[obj alloc] initWithBlock:^(OCTable *table) {
+        [table setTable:&_group->GetTable([name UTF8String])];
+    }];
+//    return [[OCTopLevelTable alloc] initWithTopLevelTable:&_group->GetTable([name UTF8String])];
 }
 @end

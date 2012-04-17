@@ -13,6 +13,16 @@ TDB_TABLE_2(TestTableGroup,
 			String,     First,
 			Int,        Second)
 
+TDB_TABLE_4(MyTable,
+            String, Name,
+            Int,    Age,
+            Bool,   Hired,
+            Int,	 Spare)
+
+TDB_TABLE_2(MyTable2,
+            Bool,   Hired,
+            Int,    Age)
+
 @interface MACTestGroup : SenTestCase
 
 @end
