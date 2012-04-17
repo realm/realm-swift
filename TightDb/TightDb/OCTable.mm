@@ -412,6 +412,7 @@
 }
 -(void)insertString:(size_t)columndId ndx:(size_t)ndx value:(NSString *)value
 {
+    NSLog(@"Insert: %lu - %lu, %@", columndId, ndx, value);
     _table->InsertString(columndId, ndx, [value UTF8String]);
 }
 -(void)insertBinary:(size_t)columndId ndx:(size_t)ndx value:(void *)value len:(size_t)len
@@ -473,6 +474,7 @@
 
 -(size_t)registerColumn:(ColumnType)type name:(NSString *)name
 {
+    NSLog(@"*******Register: %@", name);
     return _table->RegisterColumn(type, [name UTF8String]);
 }
 -(size_t)find:(size_t)columnId value:(int64_t)value

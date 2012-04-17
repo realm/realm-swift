@@ -177,6 +177,7 @@
 @end
 
 
+typedef void(^TopLevelTableInitBlock)(OCTable *table);
 
 
 
