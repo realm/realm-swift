@@ -294,11 +294,67 @@
 
 @end
 
-#pragma mark - Table
+#pragma mark - Pre-Table
 
 @interface OCTable()
 @property(nonatomic) TopLevelTable *table;
+-(Table *)getTable;
 @end
+
+#pragma mark - OCTableView
+
+@interface OCTableView()
+@property (nonatomic) TableView *tableView;
+@end
+@implementation OCTableView
+@synthesize tableView = _tableView;
+
+
++(OCTableView *)tableViewWithTable:(OCTable *)table
+{
+    OCTableView *tableView = [[OCTableView alloc] init];
+    tableView.tableView = new TableView(*[table getTable]);
+    return tableView;
+}
+
+-(void)dealloc
+{
+#ifdef DEBUG
+    NSLog(@"OCTableView dealloc");
+#endif
+    delete _tableView;
+}
+
+-(size_t)getSize
+{
+    return _tableView->GetSize();
+}
+-(BOOL)isEmpty
+{
+    return _tableView->IsEmpty();
+}
+-(int64_t)get:(size_t)columnId ndx:(size_t)ndx
+{
+    return _tableView->Get(columnId, ndx);
+}
+-(BOOL)getBool:(size_t)columnId ndx:(size_t)ndx
+{
+    return _tableView->GetBool(columnId, ndx);
+}
+-(time_t)getDate:(size_t)columnId ndx:(size_t)ndx
+{
+    return _tableView->GetDate(columnId, ndx);
+}
+-(NSString *)getString:(size_t)columnId ndx:(size_t)ndx
+{
+    return [NSString stringWithUTF8String:_tableView->GetString(columnId, ndx)];
+}
+@end
+
+
+
+#pragma mark - Table
+
 @implementation OCTable
 @synthesize table = _table;
 
@@ -309,6 +365,11 @@
         _table = new TopLevelTable();
     }
     return self;
+}
+
+-(Table *)getTable
+{
+    return _table;
 }
 
 // Very private method.
@@ -494,6 +555,12 @@
     return _table->FindDate(columnId, value);
 }
 
+-(OCTableView *)findAll:(OCTableView *)view column:(size_t)columnId value:(int64_t)value
+{
+    _table->FindAll(*view.tableView, columnId, value);
+    return view;
+}
+
 -(BOOL)hasIndex:(size_t)columnId
 {
     return _table->HasIndex(columnId);
@@ -551,6 +618,12 @@
 -(size_t)findPos:(int64_t)value
 {
     return 0; // TODO - [[self.table getColumn:self.column] findPos:value];
+}
+
+-(OCTableView *)findAll:(int64_t)value
+{
+    OCTableView *view = [OCTableView tableViewWithTable:self.table];
+    return [self.table findAll:view column:self.column value:value];
 }
 @end
 
