@@ -7,9 +7,16 @@
 //
 #import <Foundation/Foundation.h>
 #include "TightDb.h"
-
-M_TABLE_DEF_2(NSString*,funny,int,fun2);
+TDB_TABLE_2(TestTableGroup,
+			String,     First,
+			Int,        Second)
 
 #define TIGHT_IMPL
 #include "TightDb.h"
-M_TABLE_DEF_2(NSString*,funny,int,fun2);
+
+TDB_TABLE_2(TestTableGroup,
+			String,     First,
+			Int,        Second)
+
+
+

@@ -296,18 +296,31 @@
 
 #pragma mark - Table
 
+@interface OCTable()
+@property(nonatomic) TopLevelTable *table;
+@end
 @implementation OCTable
-{
-    Table *_table;
-}
+@synthesize table = _table;
+
 -(id)init
 {
     self = [super init];
     if (self) {
-        _table = new Table();
+        _table = new TopLevelTable();
     }
     return self;
 }
+
+// Very private method.
+-(id)initWithTopLevelTable:(TopLevelTable *)table
+{
+    self = [super init];
+    if (self) {
+        self.table = table;
+    }
+    return self;
+}
+
 -(void)dealloc
 {
 #ifdef DEBUG
@@ -490,6 +503,79 @@
 -(void)optimize
 {
     _table->Optimize();
+}
+
+@end
+
+
+@implementation OCTopLevelTable
+
+-(void)updateFromSpec:(size_t)ref_specSet
+{
+    self.table->UpdateFromSpec(ref_specSet);
+}
+
+-(size_t)getRef
+{
+    return self.table->GetRef();
+}
+
+@end
+
+
+
+#pragma mark - OCColumnProxy
+
+@implementation OCColumnProxy
+@synthesize table = _table, column = _column;
+-(id)initWithTable:(OCTable *)table column:(size_t)column
+{
+    self = [super init];
+    if (self) {
+        _table = table;
+        _column = column;
+    }
+    return self;
+}
+@end
+
+@implementation OCColumnProxyInt
+
+-(size_t)find:(int64_t)value
+{
+    return [self.table find:self.column value:value];
+}
+
+-(size_t)findPos:(int64_t)value
+{
+    return 0; // TODO - [[self.table getColumn:self.column] findPos:value];
+}
+@end
+
+
+@implementation OCColumnProxyBool
+
+-(size_t)find:(BOOL)value
+{
+    return [self.table findBool:self.column value:value];    
+}
+
+@end
+
+@implementation OCColumnProxyDate
+
+-(size_t)find:(time_t)value
+{
+    return [self.table findDate:self.column value:value];
+}
+
+@end
+
+@implementation OCColumnProxyString
+
+-(size_t)find:(NSString *)value
+{
+    return [self.table findString:self.column value:value];
 }
 
 @end
