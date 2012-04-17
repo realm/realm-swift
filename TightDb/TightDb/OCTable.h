@@ -9,7 +9,15 @@
 #import <Foundation/Foundation.h>
 #include "ColumnType.h"
 
+#define tdbOCTypeInt int64_t
+#define tdbOCTypeBool BOOL
+#define tdbOCTypeString NSString*
+#define tdbOCTypeMixed OCMixed*
 
+#define COLTYPEInt COLUMN_TYPE_INT
+#define COLTYPEBool COLUMN_TYPE_BOOL
+#define COLTYPEString COLUMN_TYPE_STRING
+#define COLTYPEDate COLUMN_TYPE_DATE
 
 @interface OCMemRef : NSObject
 -(id)initWithPointer:(void *)p ref:(size_t)r;
@@ -135,4 +143,41 @@
 // TODO ????? - Maybe NSData ???
 
 @end
-    
+
+
+@interface OCTopLevelTable : OCTable
+// refs ??? TODO
+
+-(void)updateFromSpec:(size_t)ref_specSet;
+-(size_t)getRef;
+@end
+
+
+
+
+@interface OCColumnProxy : NSObject
+@property(nonatomic, strong) OCTable *table;
+@property(nonatomic) size_t column;
+-(id)initWithTable:(OCTable *)table column:(size_t)column;
+@end
+
+@interface OCColumnProxyInt : OCColumnProxy
+-(size_t)find:(int64_t)value;
+-(size_t)findPos:(int64_t)value;
+// TODO - Table view
+@end
+@interface OCColumnProxyBool : OCColumnProxy
+-(size_t)find:(BOOL)value;
+@end
+@interface OCColumnProxyDate : OCColumnProxy
+-(size_t)find:(time_t) value;
+@end
+@interface OCColumnProxyString : OCColumnProxy
+-(size_t)find:(NSString*)value;
+@end
+
+
+
+
+
+
