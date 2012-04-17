@@ -106,6 +106,9 @@
 }
 -(void)dealloc
 {
+#ifdef DEBUG
+    NSLog(@"OCDate dealloc");
+#endif
     delete _date;
 }
 @end
@@ -282,6 +285,9 @@
 }
 -(void)dealloc
 {
+#ifdef DEBUG
+    NSLog(@"OCSpec dealloc");
+#endif
     delete _spec;
 }
 
@@ -304,6 +310,9 @@
 }
 -(void)dealloc
 {
+#ifdef DEBUG
+    NSLog(@"OCTable dealloc");
+#endif
     delete _table;
 }
 

@@ -27,12 +27,6 @@
 
 - (void)testExample
 {
-    OCTable *table = [[OCTable alloc] init];
-    NSLog(@"Table: %@", table);
-    STAssertNotNil(table, @"OCTable is nil");
-    
-    OCMixed *mixed = [OCMixed mixedWithBool:YES];
-    STAssertTrue([mixed getBool],@"Not true");
 }
 
 @end
