@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E9083948153D832D0065A8C3 /* libtightdb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9ED3DBE153D4AE300EC1460 /* libtightdb.a */; };
 		E9ED3DBF153D4AE300EC1460 /* libtightdb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9ED3DBE153D4AE300EC1460 /* libtightdb.a */; };
 		E9ED3DC3153D514F00EC1460 /* OCTable.h in Headers */ = {isa = PBXBuildFile; fileRef = E9ED3DC1153D514F00EC1460 /* OCTable.h */; };
 		E9ED3DC4153D514F00EC1460 /* OCTable.mm in Sources */ = {isa = PBXBuildFile; fileRef = E9ED3DC2153D514F00EC1460 /* OCTable.mm */; };
@@ -87,6 +88,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E9ED3DCE153D7F9100EC1460 /* Cocoa.framework in Frameworks */,
+				E9083948153D832D0065A8C3 /* libtightdb.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -502,6 +504,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MacTightDb/MacTightDb-Prefix.pch";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../native/lib\"",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -522,6 +528,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MacTightDb/MacTightDb-Prefix.pch";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../native/lib\"",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -532,14 +542,21 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MacTightDb/MacTightDb-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				INFOPLIST_FILE = "MacTightDbTests/MacTightDbTests-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../native/lib\"",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = octest;
@@ -550,14 +567,21 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MacTightDb/MacTightDb-Prefix.pch";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				INFOPLIST_FILE = "MacTightDbTests/MacTightDbTests-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../native/lib\"",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = octest;
@@ -692,6 +716,7 @@
 				E9ED3DEF153D7F9100EC1460 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E9ED3DF0153D7F9100EC1460 /* Build configuration list for PBXNativeTarget "MacTightDbTests" */ = {
 			isa = XCConfigurationList;
@@ -700,6 +725,7 @@
 				E9ED3DF2153D7F9100EC1460 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E9FFD24D153C774C00719326 /* Build configuration list for PBXProject "TightDb" */ = {
 			isa = XCConfigurationList;
