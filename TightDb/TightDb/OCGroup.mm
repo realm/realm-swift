@@ -49,7 +49,7 @@
 #ifdef DEBUG
     NSLog(@"Group dealloc");
 #endif
-    delete _group;
+//TODO - Resets    delete _group;
 }
 
 
