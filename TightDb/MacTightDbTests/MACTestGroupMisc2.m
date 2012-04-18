@@ -55,66 +55,63 @@ TDB_TABLE_2(MyTable2,
     row = [table.Name find:@"Mary"];		
     NSLog(@"Mary: %zu", row);
     STAssertEquals(row, (size_t)1,@"Mary should have been there");
-    /*
-    OCTableView *view = [table.Age findAll:21];
-    size_t cnt = [view getSize];  				// cnt = 2
-    STAssertEquals(cnt, 2,@"Should be two rows in view");
+
+//    OCTableView *view = [table.Age findAll:21];
+    size_t cnt;
+//    size_t cnt = [view getSize];  				// cnt = 2
+//    STAssertEquals(cnt, 2,@"Should be two rows in view");
      
      //------------------------------------------------------
      
-     MyTable2 table2;
+    MyTable2 *table2 = [[MyTable2 alloc] init];
      
-     // Add some rows
-     table2.Add(true, 20);
-     table2.Add(false, 21);
-     table2.Add(true, 21);
-     table2.Add(false, 43);
-     table2.Add(true, 54);
+    // Add some rows
+    [table2 add:YES col2:20];
+    [table2 add:NO col2:21];
+    [table2 add:YES col2:22];
+    [table2 add:NO col2:43];
+    [table2 add:YES col2:54];
      
-     // Create query (current employees between 20 and 30 years old)
-     Query q = table2.GetQuery().hired.Equal(true).age.Between(20, 30);
-     
-     // Get number of matching entries
-     cout << q.Count(table2);                                         // => 2
-     assert(q.Count(table2)==2);
+    // Create query (current employees between 20 and 30 years old)
+    OCQuery *q = [[[table2 getQuery].Hired equal:YES].Age between:20 to:30];
+
+    // Get number of matching entries
+    NSLog(@"Query count: %zu", [q count:table2]);
+    STAssertEquals([q count:table2], (size_t)2,@"Expected 2 rows in query");
      
      // Get the average age
-     double avg = q.Avg(table2, 1, &cnt);
-     cout << avg;						                               // => 20,5
+    double avg = [q avg:table2 column:1 resultCount:&cnt];
+    NSLog(@"Average: %f", avg);
+    STAssertEquals(avg, 20.5,@"Expected 20.5 average");
      
      // Execute the query and return a table (view)
-     TableView res = q.FindAll(table2);
-     for (size_t i = 0; i < res.GetSize(); i++) {
-     cout << i << ": " << " is " << res.Get(1, i) << " years old." << endl;
+    OCTableView *res = [q findAll:table2];
+     for (size_t i = 0; i < [res getSize]; i++) {
+         NSLog(@"%zu: is %lld years old",i , [res get:1 ndx:i]);
      }
      
      //------------------------------------------------------
      
      // Write to disk
-     group.Write("employees.tightdb");
+    [group write:@"employees.tightdb"];
      
      // Load a group from disk (and print contents)
-     Group fromDisk("employees.tightdb");
-     MyTable& diskTable = fromDisk.GetTable<MyTable>("employees");
-     for (size_t i = 0; i < diskTable.GetSize(); i++) {
-     cout << i << ": " << diskTable[i].name << endl;
+    OCGroup *fromDisk = [OCGroup groupWithFilename:@"employees.tightdb"];
+    MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class]];
+     for (size_t i = 0; i < [diskTable getSize]; i++) {
+         NSLog(@"%zu: %@", i, diskTable.Name);
      }
      
      // Write same group to memory buffer
      size_t len;
-     const char* const buffer = group.WriteToMem(len);
+    const char* const buffer = [group writeToMem:&len];
      
      // Load a group from memory (and print contents)
-     Group fromMem(buffer, len);
-     MyTable& memTable = fromMem.GetTable<MyTable>("employees");
-     for (size_t i = 0; i < memTable.GetSize(); i++) {
-     cout << i << ": " << memTable[i].name << endl;
+    OCGroup *fromMem = [OCGroup groupWithBuffer:buffer len:len];
+    MyTable *memTable = [fromMem getTable:@"employees" withClass:[MyTable class]];
+     for (size_t i = 0; i < [memTable getSize]; i++) {
+         NSLog(@"%zu: %@", i, memTable.Name);
      }
-     */
-    
-    // Clean
-    group = nil;
-    table = nil;
 }
 
 @end

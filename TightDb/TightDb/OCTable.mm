@@ -282,6 +282,7 @@
 -(size_t)write:(id)obj pos:(size_t)pos
 {
     // Possibly not possible.....TODO.
+    return 0;
 }
 -(void)dealloc
 {
@@ -314,6 +315,13 @@
 {
     OCTableView *tableView = [[OCTableView alloc] init];
     tableView.tableView = new TableView(*[table getTable]);
+    return tableView;
+}
+
++(OCTableView *)tableViewWithTableView:(TableView)table
+{
+    OCTableView *tableView = [[OCTableView alloc] init];
+    tableView.tableView = new TableView(table);
     return tableView;
 }
 

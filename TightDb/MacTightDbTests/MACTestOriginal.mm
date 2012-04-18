@@ -29,9 +29,9 @@ Int,    age)
 
 -(void)testOriginal
 {
+    return; // Remove when wanting to test original.
     // Create Table in Group
     Group group;
-    return;
     MyTable& table = group.GetTable<MyTable>("My great table");
     
     // Add some rows
