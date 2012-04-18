@@ -71,6 +71,7 @@
             [subtable insertString:1 ndx:0 value:@"meaning"];
             [subtable insertDone];
 		}
+ 
 	}
 	
 	// We also want a ColumnStringEnum

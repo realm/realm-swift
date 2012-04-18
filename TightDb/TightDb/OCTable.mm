@@ -359,7 +359,7 @@
 
 @implementation OCTable
 {
-    TableRef _tempTest;
+    NSMutableArray *_tables; // Temp solution to refrain from deleting group before tables.
 }
 @synthesize table = _table;
 @synthesize tablePtr = _tablePtr;
@@ -374,8 +374,7 @@
     self = [super init];
     if (self) {
         _tablePtr = 0;
-        _table = &(*ref); // Change here if TableRef needed
-        _tempTest = ref;
+        _table = ref;
     }
     return self;
 }
@@ -385,19 +384,23 @@
     self = [super init];
     if (self) {
         _tablePtr = new TopLevelTable();
-        _table = _tablePtr;//&*_tablePtr->GetTableRef(); // Change here if tableref needed
+        _table = _tablePtr->GetTableRef(); 
     }
     return self;
 }
 
 -(Table *)getTable
 {
-    return _table; //&*_table if tableref;
+    return &*_table;
 }
 
 -(OCTable *)getTable:(size_t)columnId ndx:(size_t)ndx
 {
-    return [[OCTable alloc] initWithTableRef:_table->GetTable(columnId, ndx)];
+    // NOTE: Because of ARC, we maintain an array of "owned" tables, so we can remove tableref before deleting parent tables.
+    if (!_tables)
+        _tables = [NSMutableArray arrayWithCapacity:5];
+    [_tables addObject:[[OCTable alloc] initWithTableRef:_table->GetTable(columnId, ndx)]];
+    return [_tables lastObject];
 }
 
 
@@ -406,9 +409,14 @@
 #ifdef DEBUG
     NSLog(@"OCTable dealloc");
 #endif
+    // NOTE: Because of ARC we remove tableref from sub tables when this is deleted.
+    for(OCTable *table in _tables) {
+        NSLog(@"Delete...");
+        table.table = TableRef();
+    }
+    _table = TableRef();
     if (_tablePtr)
         delete _tablePtr;
-    _tempTest = TableRef();
 }
 
 -(size_t)getColumnCount

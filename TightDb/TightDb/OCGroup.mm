@@ -47,13 +47,10 @@
 #ifdef DEBUG
     NSLog(@"Group dealloc");
 #endif
+    // NOTE: Because of ARC we remove tableref from sub tables when this is deleted.
     for(OCTable *table in _tables) {
-        if (table.tablePtr) {
-            NSLog(@"Delete...");
-            delete table.tablePtr;
-        }
-        table.tablePtr = 0;
-        table.table = 0;
+        NSLog(@"Delete...");
+        table.table = TableRef();
     }
     _tables = nil;
     delete _group;
@@ -87,11 +84,12 @@
 
 -(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)obj
 {
+    // NOTE: Because of ARC, we maintain an array of "owned" tables, so we can remove tableref before deleting parent tables.
     if (!_tables)
         _tables = [NSMutableArray arrayWithCapacity:5];
     [_tables addObject:[[obj alloc] initWithBlock:^(OCTable *table) {
         [table setTablePtr:&_group->GetTable([name UTF8String])];
-        [table setTable:table.tablePtr /*->GetTableRef()*/];
+        [table setTable:table.tablePtr->GetTableRef()];
     }]];
     return [_tables lastObject];
 }
