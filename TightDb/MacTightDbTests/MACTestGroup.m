@@ -59,11 +59,12 @@ TDB_TABLE_2(TestTableGroup,
     if ([t getSize] != 0)
         STFail(@"Should have been empty");
 	// Modify table
-    [t add:@"Test" col2:YES];
+    [t add:@"Test" Second:YES];
     NSLog(@"Size: %lu", [t getSize]);
     
     if ([t getSize] != 1)
         STFail(@"Should have been one row");
+    t = nil;
  
 }
 

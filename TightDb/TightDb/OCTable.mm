@@ -9,7 +9,7 @@
 #import "OCTable.h"
 #import "Table.h"
 #import "alloc.h"
-
+#import "OCTablePriv.h"
 
 #pragma mark - Allocater
 @implementation OCMemRef
@@ -226,22 +226,23 @@
 @interface OCSpec()
 @property (nonatomic) Spec *spec;
 +(OCSpec *)specWithAllocator:(Allocator&)allocator ref:(size_t)ref parent:(ArrayParent*)parent pndx:(size_t)pndx;
-+(OCSpec *)specWithSpec:(Spec&)other;
++(OCSpec *)specWithSpec:(Spec*)other;
 @end
 @implementation OCSpec
 @synthesize spec = _spec;
 
 
+// Dummy method - not used. allocators can probably not be overwritten with OC
 +(OCSpec *)specWithAllocator:(Allocator &)allocator ref:(size_t)ref parent:(ArrayParent *)parent pndx:(size_t)pndx
 {
     OCSpec *spec = [[OCSpec alloc] init];
-    spec.spec = new Spec(allocator, ref, parent, pndx);
+//    spec.spec = new Spec(allocator, ref, parent, pndx);
     return spec;
 }
-+(OCSpec *)specWithSpec:(Spec &)other
++(OCSpec *)specWithSpec:(Spec *)other
 {
     OCSpec *spec = [[OCSpec alloc] init];
-    spec.spec = new Spec(other);
+    spec.spec = new Spec(*other);
     return spec;    
 }
 
@@ -252,12 +253,12 @@
 -(OCSpec *)addColumnTable:(NSString *)name
 {
     Spec tmp = _spec->AddColumnTable([name UTF8String]);
-    return [OCSpec specWithSpec:tmp];
+    return [OCSpec specWithSpec:&tmp];
 }
 -(OCSpec *)getSpec:(size_t)columndId
 {
     Spec tmp = _spec->GetSpec(columndId);
-    return [OCSpec specWithSpec:tmp];
+    return [OCSpec specWithSpec:&tmp];
 }
 -(size_t)getColumnCount
 {
@@ -295,12 +296,6 @@
 
 @end
 
-#pragma mark - Pre-Table
-
-@interface OCTable()
-@property(nonatomic) TopLevelTable *table;
--(Table *)getTable;
-@end
 
 #pragma mark - OCTableView
 
@@ -360,42 +355,60 @@
 @end
 
 
-
 #pragma mark - Table
 
 @implementation OCTable
+{
+    TableRef _tempTest;
+}
 @synthesize table = _table;
+@synthesize tablePtr = _tablePtr;
+
+-(id)initWithBlock:(TopLevelTableInitBlock)block
+{
+    // Dummy - should be defined in tightdb.h
+    return nil;
+}
+-(id)initWithTableRef:(TableRef)ref
+{
+    self = [super init];
+    if (self) {
+        _tablePtr = 0;
+        _table = &(*ref); // Change here if TableRef needed
+        _tempTest = ref;
+    }
+    return self;
+}
 
 -(id)init
 {
     self = [super init];
     if (self) {
-        _table = new TopLevelTable();
+        _tablePtr = new TopLevelTable();
+        _table = _tablePtr;//&*_tablePtr->GetTableRef(); // Change here if tableref needed
     }
     return self;
 }
 
 -(Table *)getTable
 {
-    return _table;
+    return _table; //&*_table if tableref;
 }
 
-// Very private method.
--(id)initWithTopLevelTable:(TopLevelTable *)table
+-(OCTable *)getTable:(size_t)columnId ndx:(size_t)ndx
 {
-    self = [super init];
-    if (self) {
-        self.table = table;
-    }
-    return self;
+    return [[OCTable alloc] initWithTableRef:_table->GetTable(columnId, ndx)];
 }
+
 
 -(void)dealloc
 {
 #ifdef DEBUG
     NSLog(@"OCTable dealloc");
 #endif
-    delete _table;
+    if (_tablePtr)
+        delete _tablePtr;
+    _tempTest = TableRef();
 }
 
 -(size_t)getColumnCount
@@ -417,7 +430,7 @@
 -(OCSpec *)getSpec
 {
     Spec tmp = _table->GetSpec();
-    return [OCSpec specWithSpec:tmp];
+    return [OCSpec specWithSpec:&tmp];
 }
 -(BOOL)isEmpty
 {
@@ -481,7 +494,6 @@
 }
 -(void)insertString:(size_t)columndId ndx:(size_t)ndx value:(NSString *)value
 {
-    NSLog(@"Insert: %lu - %lu, %@", columndId, ndx, value);
     _table->InsertString(columndId, ndx, [value UTF8String]);
 }
 -(void)insertBinary:(size_t)columndId ndx:(size_t)ndx value:(void *)value len:(size_t)len
@@ -543,7 +555,6 @@
 
 -(size_t)registerColumn:(ColumnType)type name:(NSString *)name
 {
-    NSLog(@"*******Register: %@", name);
     return _table->RegisterColumn(type, [name UTF8String]);
 }
 -(size_t)find:(size_t)columnId value:(int64_t)value
@@ -581,7 +592,12 @@
 {
     _table->Optimize();
 }
-
+#ifdef _DEBUG
+-(void)verify
+{
+    _table->Verify();
+}
+#endif
 @end
 
 
@@ -589,12 +605,12 @@
 
 -(void)updateFromSpec:(size_t)ref_specSet
 {
-    self.table->UpdateFromSpec(ref_specSet);
+    static_cast<TopLevelTable *>(&*self.table)->UpdateFromSpec(ref_specSet);
 }
 
 -(size_t)getRef
 {
-    return self.table->GetRef();
+    return static_cast<TopLevelTable *>(&*self.table)->GetRef();
 }
 
 @end

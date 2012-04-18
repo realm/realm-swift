@@ -9,14 +9,8 @@
 #import "OCQuery.h"
 #include "query/QueryInterface.h"
 #import "OCTable.h"
+#import "OCTablePriv.h"
 
-
-#pragma mark - Table secrets
-
-@interface OCTable()
-@property(nonatomic) TopLevelTable *table;
--(Table *)getTable;
-@end
 
 #pragma mark - OCTableView secrets
 

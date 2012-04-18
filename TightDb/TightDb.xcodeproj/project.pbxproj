@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E9060CEA153EF00D00481151 /* MACTestOriginal2.mm in Sources */ = {isa = PBXBuildFile; fileRef = E9060CE9153EF00D00481151 /* MACTestOriginal2.mm */; };
+		E9060CEB153EF21400481151 /* MACTestTableDeleteAll.m in Sources */ = {isa = PBXBuildFile; fileRef = E9EA989E153EC40500552F22 /* MACTestTableDeleteAll.m */; };
 		E9083948153D832D0065A8C3 /* libtightdb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9ED3DBE153D4AE300EC1460 /* libtightdb.a */; };
 		E908394D153D87E00065A8C3 /* MACtestTable.m in Sources */ = {isa = PBXBuildFile; fileRef = E908394C153D87E00065A8C3 /* MACtestTable.m */; };
 		E9083950153D8D260065A8C3 /* OCGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = E908394E153D8D260065A8C3 /* OCGroup.h */; };
@@ -19,6 +21,7 @@
 		E908395F153DE27A0065A8C3 /* OCQuery.mm in Sources */ = {isa = PBXBuildFile; fileRef = E908395D153DE27A0065A8C3 /* OCQuery.mm */; };
 		E9BFFBD9153EA37200035C64 /* OCQuery.mm in Sources */ = {isa = PBXBuildFile; fileRef = E908395D153DE27A0065A8C3 /* OCQuery.mm */; };
 		E9BFFBDA153EA37600035C64 /* OCQuery.mm in Sources */ = {isa = PBXBuildFile; fileRef = E908395D153DE27A0065A8C3 /* OCQuery.mm */; };
+		E9EA98A1153EE16700552F22 /* OCTablePriv.h in Headers */ = {isa = PBXBuildFile; fileRef = E9EA98A0153EE16700552F22 /* OCTablePriv.h */; };
 		E9ED3DBF153D4AE300EC1460 /* libtightdb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9ED3DBE153D4AE300EC1460 /* libtightdb.a */; };
 		E9ED3DC3153D514F00EC1460 /* OCTable.h in Headers */ = {isa = PBXBuildFile; fileRef = E9ED3DC1153D514F00EC1460 /* OCTable.h */; };
 		E9ED3DC4153D514F00EC1460 /* OCTable.mm in Sources */ = {isa = PBXBuildFile; fileRef = E9ED3DC2153D514F00EC1460 /* OCTable.mm */; };
@@ -61,6 +64,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E9060CE8153EF00D00481151 /* MACTestOriginal2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MACTestOriginal2.h; sourceTree = "<group>"; };
+		E9060CE9153EF00D00481151 /* MACTestOriginal2.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MACTestOriginal2.mm; sourceTree = "<group>"; };
 		E908394B153D87E00065A8C3 /* MACtestTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MACtestTable.h; sourceTree = "<group>"; };
 		E908394C153D87E00065A8C3 /* MACtestTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MACtestTable.m; sourceTree = "<group>"; };
 		E908394E153D8D260065A8C3 /* OCGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCGroup.h; sourceTree = "<group>"; };
@@ -73,6 +78,9 @@
 		E908395A153DD8F10065A8C3 /* MACTestOriginal.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MACTestOriginal.mm; sourceTree = "<group>"; };
 		E908395C153DE27A0065A8C3 /* OCQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCQuery.h; sourceTree = "<group>"; };
 		E908395D153DE27A0065A8C3 /* OCQuery.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OCQuery.mm; sourceTree = "<group>"; };
+		E9EA989D153EC40500552F22 /* MACTestTableDeleteAll.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MACTestTableDeleteAll.h; sourceTree = "<group>"; };
+		E9EA989E153EC40500552F22 /* MACTestTableDeleteAll.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MACTestTableDeleteAll.m; sourceTree = "<group>"; };
+		E9EA98A0153EE16700552F22 /* OCTablePriv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCTablePriv.h; sourceTree = "<group>"; };
 		E9ED3DBE153D4AE300EC1460 /* libtightdb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtightdb.a; path = ../../tightdb_objc/native/lib/libtightdb.a; sourceTree = "<group>"; };
 		E9ED3DC1153D514F00EC1460 /* OCTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OCTable.h; sourceTree = "<group>"; };
 		E9ED3DC2153D514F00EC1460 /* OCTable.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OCTable.mm; sourceTree = "<group>"; };
@@ -191,6 +199,10 @@
 				E9083957153DBB010065A8C3 /* MACTestGroupMisc2.m */,
 				E9083959153DD8F10065A8C3 /* MACTestOriginal.h */,
 				E908395A153DD8F10065A8C3 /* MACTestOriginal.mm */,
+				E9EA989D153EC40500552F22 /* MACTestTableDeleteAll.h */,
+				E9EA989E153EC40500552F22 /* MACTestTableDeleteAll.m */,
+				E9060CE8153EF00D00481151 /* MACTestOriginal2.h */,
+				E9060CE9153EF00D00481151 /* MACTestOriginal2.mm */,
 			);
 			path = MacTightDbTests;
 			sourceTree = "<group>";
@@ -248,6 +260,7 @@
 				E9FFD259153C774C00719326 /* Supporting Files */,
 				E9ED3DC1153D514F00EC1460 /* OCTable.h */,
 				E9ED3DC2153D514F00EC1460 /* OCTable.mm */,
+				E9EA98A0153EE16700552F22 /* OCTablePriv.h */,
 				E908394E153D8D260065A8C3 /* OCGroup.h */,
 				E908394F153D8D260065A8C3 /* OCGroup.mm */,
 				E908395C153DE27A0065A8C3 /* OCQuery.h */,
@@ -302,6 +315,7 @@
 				E9ED3DC3153D514F00EC1460 /* OCTable.h in Headers */,
 				E9083950153D8D260065A8C3 /* OCGroup.h in Headers */,
 				E908395E153DE27A0065A8C3 /* OCQuery.h in Headers */,
+				E9EA98A1153EE16700552F22 /* OCTablePriv.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -480,6 +494,8 @@
 				E9083958153DBB010065A8C3 /* MACTestGroupMisc2.m in Sources */,
 				E908395B153DD8F10065A8C3 /* MACTestOriginal.mm in Sources */,
 				E9BFFBD9153EA37200035C64 /* OCQuery.mm in Sources */,
+				E9060CEA153EF00D00481151 /* MACTestOriginal2.mm in Sources */,
+				E9060CEB153EF21400481151 /* MACTestTableDeleteAll.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -599,7 +615,7 @@
 				GCC_PREFIX_HEADER = "MacTightDb/MacTightDb-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
-					"$(inherited)",
+					"_DEBUG=1",
 				);
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;

@@ -38,11 +38,11 @@ TDB_TABLE_2(MyTable2,
 	MyTable *table = [group getTable:@"My great table" withClass:[MyTable class]];
     
     // Add some rows
-    [table add:@"John" col2:20 col3:YES col4:0];
-    [table add:@"Mary" col2:21 col3:NO col4:0];
-    [table add:@"Lars" col2:21 col3:YES col4:0];
-    [table add:@"Phil" col2:43 col3:NO col4:0];
-    [table add:@"Anni" col2:54 col3:YES col4:0];
+    [table add:@"John" Age:20 Hired:YES Spare:0];
+    [table add:@"Mary" Age:21 Hired:NO Spare:0];
+    [table add:@"Lars" Age:21 Hired:YES Spare:0];
+    [table add:@"Phil" Age:43 Hired:NO Spare:0];
+    [table add:@"Anni" Age:54 Hired:YES Spare:0];
     
     NSLog(@"MyTable Size: %lu", [table getSize]);
     
@@ -56,21 +56,20 @@ TDB_TABLE_2(MyTable2,
     NSLog(@"Mary: %zu", row);
     STAssertEquals(row, (size_t)1,@"Mary should have been there");
 
-//    OCTableView *view = [table.Age findAll:21];
-    size_t cnt;
-//    size_t cnt = [view getSize];  				// cnt = 2
-//    STAssertEquals(cnt, 2,@"Should be two rows in view");
+    OCTableView *view = [table.Age findAll:21];
+    size_t cnt = [view getSize];  				// cnt = 2
+    STAssertEquals(cnt, (size_t)2,@"Should be two rows in view");
      
      //------------------------------------------------------
      
     MyTable2 *table2 = [[MyTable2 alloc] init];
      
     // Add some rows
-    [table2 add:YES col2:20];
-    [table2 add:NO col2:21];
-    [table2 add:YES col2:22];
-    [table2 add:NO col2:43];
-    [table2 add:YES col2:54];
+    [table2 add:YES Age:20];
+    [table2 add:NO Age:21];
+    [table2 add:YES Age:22];
+    [table2 add:NO Age:43];
+    [table2 add:YES Age:54];
      
     // Create query (current employees between 20 and 30 years old)
     OCQuery *q = [[[table2 getQuery].Hired equal:YES].Age between:20 to:30];
@@ -98,6 +97,7 @@ TDB_TABLE_2(MyTable2,
      // Load a group from disk (and print contents)
     OCGroup *fromDisk = [OCGroup groupWithFilename:@"employees.tightdb"];
     MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class]];
+    NSLog(@"Disktable size: %zu", [diskTable getSize]);
      for (size_t i = 0; i < [diskTable getSize]; i++) {
          NSLog(@"%zu: %@", i, diskTable.Name);
      }
