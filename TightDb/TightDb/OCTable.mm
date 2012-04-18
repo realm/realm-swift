@@ -328,7 +328,7 @@
     delete _tableView;
 }
 
--(size_t)getSize
+-(size_t)count
 {
     return _tableView->GetSize();
 }
@@ -444,7 +444,7 @@
 {
     return _table->IsEmpty();
 }
--(size_t)getSize
+-(size_t)count
 {
     return _table->GetSize();
 }
