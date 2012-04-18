@@ -13,9 +13,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E9FFD252153C774C00719326"
-               BuildableName = "libTightDb.a"
-               BlueprintName = "TightDb"
+               BlueprintIdentifier = "E9060CFD153F0E8200481151"
+               BuildableName = "Tightdb.app"
+               BlueprintName = "Tightdb"
                ReferencedContainer = "container:TightDb.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -27,17 +27,16 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E9FFD262153C774C00719326"
-               BuildableName = "TightDbTests.octest"
-               BlueprintName = "TightDbTests"
-               ReferencedContainer = "container:TightDb.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "E9060CFD153F0E8200481151"
+            BuildableName = "Tightdb.app"
+            BlueprintName = "Tightdb"
+            ReferencedContainer = "container:TightDb.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -48,6 +47,15 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "E9060CFD153F0E8200481151"
+            BuildableName = "Tightdb.app"
+            BlueprintName = "Tightdb"
+            ReferencedContainer = "container:TightDb.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -57,6 +65,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "E9060CFD153F0E8200481151"
+            BuildableName = "Tightdb.app"
+            BlueprintName = "Tightdb"
+            ReferencedContainer = "container:TightDb.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

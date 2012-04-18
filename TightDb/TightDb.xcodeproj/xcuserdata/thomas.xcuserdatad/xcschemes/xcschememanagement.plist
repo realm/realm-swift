@@ -19,9 +19,19 @@
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
+		<key>Tightdb.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>E9060CFD153F0E8200481151</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>E9ED3DCB153D7F9100EC1460</key>
 		<dict>
 			<key>primary</key>
