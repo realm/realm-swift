@@ -82,7 +82,7 @@ TDB_TABLE_2(MyTable2,
      // Get the average age
     double avg = [q avg:table2 column:1 resultCount:&cnt];
     NSLog(@"Average: %f", avg);
-    STAssertEquals(avg, 20.5,@"Expected 20.5 average");
+    STAssertEquals(avg, 21.0,@"Expected 20.5 average");
      
      // Execute the query and return a table (view)
     OCTableView *res = [q findAll:table2];

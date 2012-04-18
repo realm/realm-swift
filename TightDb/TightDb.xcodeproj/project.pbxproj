@@ -549,6 +549,10 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MacTightDb/MacTightDb-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"_DEBUG=1",
+				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -593,6 +597,10 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MacTightDb/MacTightDb-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				INFOPLIST_FILE = "MacTightDbTests/MacTightDbTests-Info.plist";
