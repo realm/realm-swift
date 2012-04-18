@@ -143,10 +143,10 @@ public: \
 \
 private: \
 	friend class Group; \
-	TableName(const TableName &) {} \
 	TableName(Allocator& alloc, size_t ref, Parent *parent, size_t ndx_in_parent): \
-		TopLevelTable(alloc, ref, parent, ndx_in_parent) {}; \
-	TableName& operator=(const TableName &) {return *this;} \
+		TopLevelTable(alloc, ref, parent, ndx_in_parent) {} \
+	TableName(const TableName &); /* Disable */ \
+	TableName& operator=(const TableName &); /* Disable */ \
 };
 
 
@@ -285,10 +285,10 @@ public: \
 \
 private: \
 	friend class Group; \
-	TableName(const TableName &) {} \
 	TableName(Allocator& alloc, size_t ref, Parent *parent, size_t ndx_in_parent): \
-		TopLevelTable(alloc, ref, parent, ndx_in_parent) {}; \
-	TableName& operator=(const TableName &) {return *this;} \
+		TopLevelTable(alloc, ref, parent, ndx_in_parent) {} \
+	TableName(const TableName &); /* Disable */ \
+	TableName& operator=(const TableName &); /* Disable */ \
 };
 
 
@@ -440,10 +440,10 @@ public: \
 \
 private: \
 	friend class Group; \
-	TableName(const TableName &) {} \
 	TableName(Allocator& alloc, size_t ref, Parent *parent, size_t ndx_in_parent): \
-		TopLevelTable(alloc, ref, parent, ndx_in_parent) {}; \
-	TableName& operator=(const TableName &) {return *this;} \
+		TopLevelTable(alloc, ref, parent, ndx_in_parent) {} \
+	TableName(const TableName &); /* Disable */ \
+	TableName& operator=(const TableName &); /* Disable */ \
 };
 
 
@@ -608,10 +608,10 @@ public: \
 \
 private: \
 	friend class Group; \
-	TableName(const TableName &) {} \
 	TableName(Allocator& alloc, size_t ref, Parent *parent, size_t ndx_in_parent): \
-		TopLevelTable(alloc, ref, parent, ndx_in_parent) {}; \
-	TableName& operator=(const TableName &) {return *this;} \
+		TopLevelTable(alloc, ref, parent, ndx_in_parent) {} \
+	TableName(const TableName &); /* Disable */ \
+	TableName& operator=(const TableName &); /* Disable */ \
 };
 
 
@@ -789,10 +789,10 @@ public: \
 \
 private: \
 	friend class Group; \
-	TableName(const TableName &) {} \
 	TableName(Allocator& alloc, size_t ref, Parent *parent, size_t ndx_in_parent): \
-		TopLevelTable(alloc, ref, parent, ndx_in_parent) {}; \
-	TableName& operator=(const TableName &) {return *this;} \
+		TopLevelTable(alloc, ref, parent, ndx_in_parent) {} \
+	TableName(const TableName &); /* Disable */ \
+	TableName& operator=(const TableName &); /* Disable */ \
 };
 
 
@@ -983,10 +983,10 @@ public: \
 \
 private: \
 	friend class Group; \
-	TableName(const TableName &) {} \
 	TableName(Allocator& alloc, size_t ref, Parent *parent, size_t ndx_in_parent): \
-		TopLevelTable(alloc, ref, parent, ndx_in_parent) {}; \
-	TableName& operator=(const TableName &) {return *this;} \
+		TopLevelTable(alloc, ref, parent, ndx_in_parent) {} \
+	TableName(const TableName &); /* Disable */ \
+	TableName& operator=(const TableName &); /* Disable */ \
 };
 
 
@@ -1190,10 +1190,10 @@ public: \
 \
 private: \
 	friend class Group; \
-	TableName(const TableName &) {} \
 	TableName(Allocator& alloc, size_t ref, Parent *parent, size_t ndx_in_parent): \
-		TopLevelTable(alloc, ref, parent, ndx_in_parent) {}; \
-	TableName& operator=(const TableName &) {return *this;} \
+		TopLevelTable(alloc, ref, parent, ndx_in_parent) {} \
+	TableName(const TableName &); /* Disable */ \
+	TableName& operator=(const TableName &); /* Disable */ \
 };
 
 
@@ -1410,10 +1410,10 @@ public: \
 \
 private: \
 	friend class Group; \
-	TableName(const TableName &) {} \
 	TableName(Allocator& alloc, size_t ref, Parent *parent, size_t ndx_in_parent): \
-		TopLevelTable(alloc, ref, parent, ndx_in_parent) {}; \
-	TableName& operator=(const TableName &) {return *this;} \
+		TopLevelTable(alloc, ref, parent, ndx_in_parent) {} \
+	TableName(const TableName &); /* Disable */ \
+	TableName& operator=(const TableName &); /* Disable */ \
 };
 
 #endif //__TIGHTDB_H__

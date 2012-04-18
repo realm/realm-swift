@@ -199,6 +199,8 @@ public:
 	}
 
 	void FindAll(Table& table, TableView& tv, size_t start = 0, size_t end = (size_t)-1, size_t limit = (size_t)-1) {
+		Init(table);
+		
 		size_t r  = start - 1;
 		if(end == (size_t)-1)
 			end = table.GetSize();
@@ -214,48 +216,22 @@ public:
 			return;
 		} 
 		else {
+			const size_t table_size = table.GetSize();
+			
 			// Use single threading
 			for(;;) {
-				r = first[0]->Find(r + 1, table.GetSize(), table);
-				if(r == table.GetSize() || tv.GetSize() == limit)
+				r = first[0]->Find(r + 1, table_size);
+				if (r == table_size || tv.GetSize() == limit)
 					break;
 				tv.GetRefColumn().Add(r);
 			}
 		}
 	}
 
-	size_t Find(const Table& table, size_t start = 0, size_t end = (size_t)-1) const {
-		if (end == (size_t)-1) end = table.GetSize();
-		if (start == end) return (size_t)-1;
-
-		size_t r;
-		if (first[0] != 0)
-			r = first[0]->Find(start, end, table);
-		else
-			r = start; // user built an empty query; return any first
-
-		if (r == table.GetSize())
-			return (size_t)-1;
-		else
-			return r;
-	}
-
-	// todo, not sure if start, end and limit could be useful for delete.
-	size_t Delete(Table& table, size_t start = 0, size_t end = (size_t)-1, size_t limit = (size_t)-1) const {
-		size_t r = start - 1;
-		size_t results = 0;
-		for(;;) {
-			r = Find(table, r + 1 - results, end);
-			if(r == (size_t)-1 || r == table.GetSize() || results == limit)
-				break;
-			results++;
-			table.DeleteRow(r);
-		}
-		return results;
-	}
-
-
-	int64_t Sum(const Table& table, size_t column, size_t *resultcount, size_t start = 0, size_t end = (size_t)-1, size_t limit = (size_t)-1) const {
+	int64_t Sum(const Table& table, size_t column, size_t *resultcount, size_t start = 0, size_t end = (size_t)-1, 
+		size_t limit = (size_t)-1) const {
+		Init(table);
+		
 		size_t r = start - 1;
 		size_t results = 0;
 		int64_t sum = 0;
@@ -264,7 +240,7 @@ public:
 		const size_t table_size = table.GetSize();
 
 		for (;;) {
-			r = Find(table, r + 1, end);
+			r = FindInternal(table, r + 1, end);
 			if (r == (size_t)-1 || r == table_size || results == limit)
 				break;
 			++results;
@@ -276,13 +252,16 @@ public:
 		return sum;
 	}
 
-	int64_t Max(const Table& table, size_t column, size_t *resultcount, size_t start = 0, size_t end = (size_t)-1, size_t limit = (size_t)-1) const {
+	int64_t Max(const Table& table, size_t column, size_t *resultcount, size_t start = 0, size_t end = (size_t)-1, 
+		size_t limit = (size_t)-1) const {
+		Init(table);
+		
 		size_t r = start - 1;
 		size_t results = 0;
 		int64_t max = 0;
 
 		for (;;) {
-			r = Find(table, r + 1, end);
+			r = FindInternal(table, r + 1, end);
 			if (r == (size_t)-1 || r == table.GetSize() || results == limit)
 				break;
 			const int64_t g = table.Get(column, r);
@@ -297,12 +276,14 @@ public:
 	}
 
 	int64_t Min(const Table& table, size_t column, size_t *resultcount, size_t start = 0, size_t end = (size_t)-1, size_t limit = (size_t)-1) const {
+		Init(table);
+		
 		size_t r = start - 1;
 		size_t results = 0;
 		int64_t min = 0;
 		
 		for (;;) {
-			r = Find(table, r + 1, end);
+			r = FindInternal(table, r + 1, end);
 			if (r == (size_t)-1 || r == table.GetSize() || results == limit)
 				break;
 			const int64_t g = table.Get(column, r);
@@ -316,11 +297,13 @@ public:
 	}
 
 	size_t Count(const Table& table, size_t start = 0, size_t end = (size_t)-1, size_t limit = (size_t)-1) const {
+		Init(table);
+		
 		size_t r = start - 1;
 		size_t results = 0;
 		
 		for(;;) {
-			r = Find(table, r + 1, end);
+			r = FindInternal(table, r + 1, end);
 			if (r == (size_t)-1 || r == table.GetSize() || results == limit)
 				break;
 			++results;
@@ -329,6 +312,8 @@ public:
 	}
 
 	double Avg(const Table& table, size_t column, size_t *resultcount, size_t start = 0, size_t end = (size_t)-1, size_t limit = (size_t)-1) const {
+		Init(table);
+		
 		size_t resultcount2;
 
 		const int64_t sum = Sum(table, column, &resultcount2, start, end, limit);
@@ -338,70 +323,26 @@ public:
 			*resultcount = resultcount2;
 		return avg;
 	}
-
-	static bool comp(const std::pair<size_t, size_t>& a, const std::pair<size_t, size_t>& b) {
-		return a.first < b.first;
-	}
-
-	static void *query_thread(void *arg) {
-		thread_state *ts = (thread_state *)arg;
-
-		std::vector<size_t> res;
-		std::vector<std::pair<size_t, size_t> > chunks;
-
-		for(;;) {
-			// Main waiting loop that waits for a query to start
-			pthread_mutex_lock(&ts->jobs_mutex);
-			while(ts->next_job == ts->end_job)
-				 pthread_cond_wait(&ts->jobs_cond, &ts->jobs_mutex);
-			pthread_mutex_unlock(&ts->jobs_mutex);
-
-			for(;;) {
-				// Pick a job
-				pthread_mutex_lock(&ts->jobs_mutex);
-				if(ts->next_job == ts->end_job)
-					break;
-				const size_t chunk = MIN(ts->end_job - ts->next_job, THREAD_CHUNK_SIZE);
-				const size_t mine = ts->next_job;
-				ts->next_job += chunk;
-				size_t r = mine - 1;
-				const size_t end = mine + chunk;
-
-				pthread_mutex_unlock(&ts->jobs_mutex);
-
-				// Execute job
-				for(;;) {
-					r = ts->node->Find(r + 1, end, *ts->table);
-					if(r == end)
-						break;
-					res.push_back(r);
-				}
-
-				// Append result in common queue shared by all threads.
-				pthread_mutex_lock(&ts->result_mutex);
-				ts->done_job += chunk;
-				if(res.size() > 0) {
-					ts->chunks.push_back(std::pair<size_t, size_t>(mine, ts->results.size()));
-					ts->count += res.size();
-					for(size_t i = 0; i < res.size(); i++) {
-						ts->results.push_back(res[i]);
-					}	
-					res.clear();
-				}
-				pthread_mutex_unlock(&ts->result_mutex);
-
-				// Signal main thread that we might have compleeted
-				pthread_mutex_lock(&ts->completed_mutex);
-				pthread_cond_signal(&ts->completed_cond);
-				pthread_mutex_unlock(&ts->completed_mutex);
-
-			}
-		}		
-		return 0;
+	
+	// todo, not sure if start, end and limit could be useful for delete.
+	size_t Delete(Table& table, size_t start = 0, size_t end = (size_t)-1, size_t limit = (size_t)-1) const {
+		size_t r = start - 1;
+		size_t results = 0;
+		Init(table);
+		
+		for (;;) {
+			r = FindInternal(table, r + 1 - results, end);
+			if (r == (size_t)-1 || r == table.GetSize() || results == limit)
+				break;
+			++results;
+			table.DeleteRow(r);
+		}
+		return results;
 	}
 
 	void FindAllMulti(Table& table, TableView& tv, size_t start = 0, size_t end = (size_t)-1) {
 		// Initialization
+		Init(table);
 		ts.next_job = start;
 		ts.end_job = end;
 		ts.done_job = 0;
@@ -422,17 +363,17 @@ public:
 
 		// Sort search results because user expects ascending order
 		std::sort (ts.chunks.begin(), ts.chunks.end(), &Query::comp);
-		for(size_t i = 0; i < ts.chunks.size(); i++) {
-			size_t from = ts.chunks[i].first;
-			size_t upto = (i == ts.chunks.size() - 1) ? (size_t)-1 : ts.chunks[i + 1].first;
+		for (size_t i = 0; i < ts.chunks.size(); ++i) {
+			const size_t from = ts.chunks[i].first;
+			const size_t upto = (i == ts.chunks.size() - 1) ? (size_t)-1 : ts.chunks[i + 1].first;
 			size_t first = ts.chunks[i].second;
+			
 			while(first < ts.results.size() && ts.results[first] < upto && ts.results[first] >= from) {
 				tv.GetRefColumn().Add(ts.results[first]);
-				first++;
+				++first;
 			}
 		}
 	}
-
 
 	int SetThreads(unsigned int threadcount) {
 #if defined(_WIN32) || defined(__WIN32__) || defined(_WIN64)
@@ -446,10 +387,10 @@ public:
 
 		pthread_mutex_lock(&ts.jobs_mutex);
 
-		for(size_t i = 0; i < m_threadcount; i++)
+		for (size_t i = 0; i < m_threadcount; ++i)
 			pthread_detach(threads[i]);
 
-		for(size_t i = 0; i < threadcount; i++) {
+		for (size_t i = 0; i < threadcount; ++i) {
 			int r = pthread_create(&threads[i], NULL, query_thread, (void*)&ts);
 			if(r != 0)
 				assert(false); //todo
@@ -460,23 +401,6 @@ public:
 	}
 
 	std::string error_code;
-	pthread_t threads[MAX_THREADS];
-
-	struct thread_state {
-		pthread_mutex_t result_mutex;
-		pthread_cond_t completed_cond;
-		pthread_mutex_t completed_mutex;
-		pthread_mutex_t jobs_mutex;
-		pthread_cond_t jobs_cond;
-		size_t next_job;
-		size_t end_job;
-		size_t done_job;
-		size_t count;
-		ParentNode *node;
-		Table *table;
-		std::vector<size_t> results;
-		std::vector<std::pair<size_t, size_t> > chunks;
-	} ts;
 
 	std::string Verify(void) {
 		if(first.size() == 0)
@@ -494,6 +418,29 @@ public:
 protected:
 	friend class XQueryAccessorInt;
 	friend class XQueryAccessorString;
+	
+	void Init(const Table& table) const {
+		if (first[0] != NULL) {
+			ParentNode* top = (ParentNode*)first[0];
+			top->Init(table);
+		}
+	}
+	
+	size_t FindInternal(const Table& table, size_t start = 0, size_t end = (size_t)-1) const {
+		if (end == (size_t)-1) end = table.GetSize();
+		if (start == end) return (size_t)-1;
+		
+		size_t r;
+		if (first[0] != 0)
+			r = first[0]->Find(start, end);
+		else
+			r = start; // user built an empty query; return any first
+		
+		if (r == table.GetSize())
+			return (size_t)-1;
+		else
+			return r;
+	}
 
 	void UpdatePointers(ParentNode *p, ParentNode **newnode) {
 		if(first[first.size()-1] == 0)
@@ -504,6 +451,84 @@ protected:
 
 		update[update.size()-1] = newnode;
 	}
+	
+	static bool comp(const std::pair<size_t, size_t>& a, const std::pair<size_t, size_t>& b) {
+		return a.first < b.first;
+	}
+	
+	static void *query_thread(void *arg) {
+		thread_state *ts = (thread_state *)arg;
+		
+		std::vector<size_t> res;
+		std::vector<std::pair<size_t, size_t> > chunks;
+		
+		for(;;) {
+			// Main waiting loop that waits for a query to start
+			pthread_mutex_lock(&ts->jobs_mutex);
+			while(ts->next_job == ts->end_job)
+				pthread_cond_wait(&ts->jobs_cond, &ts->jobs_mutex);
+			pthread_mutex_unlock(&ts->jobs_mutex);
+			
+			for(;;) {
+				// Pick a job
+				pthread_mutex_lock(&ts->jobs_mutex);
+				if(ts->next_job == ts->end_job)
+					break;
+				const size_t chunk = MIN(ts->end_job - ts->next_job, THREAD_CHUNK_SIZE);
+				const size_t mine = ts->next_job;
+				ts->next_job += chunk;
+				size_t r = mine - 1;
+				const size_t end = mine + chunk;
+				
+				pthread_mutex_unlock(&ts->jobs_mutex);
+				
+				// Execute job
+				for(;;) {
+					r = ts->node->Find(r + 1, end);
+					if(r == end)
+						break;
+					res.push_back(r);
+				}
+				
+				// Append result in common queue shared by all threads.
+				pthread_mutex_lock(&ts->result_mutex);
+				ts->done_job += chunk;
+				if(res.size() > 0) {
+					ts->chunks.push_back(std::pair<size_t, size_t>(mine, ts->results.size()));
+					ts->count += res.size();
+					for(size_t i = 0; i < res.size(); i++) {
+						ts->results.push_back(res[i]);
+					}	
+					res.clear();
+				}
+				pthread_mutex_unlock(&ts->result_mutex);
+				
+				// Signal main thread that we might have compleeted
+				pthread_mutex_lock(&ts->completed_mutex);
+				pthread_cond_signal(&ts->completed_cond);
+				pthread_mutex_unlock(&ts->completed_mutex);
+				
+			}
+		}		
+		return 0;
+	}
+	
+	struct thread_state {
+		pthread_mutex_t result_mutex;
+		pthread_cond_t completed_cond;
+		pthread_mutex_t completed_mutex;
+		pthread_mutex_t jobs_mutex;
+		pthread_cond_t jobs_cond;
+		size_t next_job;
+		size_t end_job;
+		size_t done_job;
+		size_t count;
+		ParentNode *node;
+		Table *table;
+		std::vector<size_t> results;
+		std::vector<std::pair<size_t, size_t> > chunks;
+	} ts;
+	pthread_t threads[MAX_THREADS];
 
 	mutable std::vector<ParentNode *>first;
 	std::vector<ParentNode **>update;
