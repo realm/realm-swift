@@ -71,7 +71,7 @@
 
 @interface OCTable : NSObject
 // TODO - TableRef methods ?????????
-
+-(OCTable *)getTable:(size_t)columnId ndx:(size_t)ndx;
 //Column meta info
 -(size_t)getColumnCount;
 -(NSString *)getColumnName:(size_t)ndx;
@@ -144,6 +144,9 @@
 // Conversion
 // TODO ????? - Maybe NSData ???
 
+#ifdef _DEBUG
+-(void)verify;
+#endif
 @end
 
 

@@ -9,18 +9,16 @@
 #import "OCGroup.h"
 #import "Group.h"
 #import "OCTable.h"
-
-@interface OCTable()
--(id)initWithBlock:(TopLevelTableInitBlock)block;
--(void)setTable:(TopLevelTable*)table;
-@end
-
+#import "OCTablePriv.h"
 
 
 @interface OCGroup()
 @property(nonatomic) Group *group;
 @end
 @implementation OCGroup
+{
+    NSMutableArray *_tables; // Temp solution to refrain from deleting group before tables.
+}
 @synthesize group = _group;
 
 +(OCGroup *)group
@@ -49,7 +47,16 @@
 #ifdef DEBUG
     NSLog(@"Group dealloc");
 #endif
-//TODO - Resets    delete _group;
+    for(OCTable *table in _tables) {
+        if (table.tablePtr) {
+            NSLog(@"Delete...");
+            delete table.tablePtr;
+        }
+        table.tablePtr = 0;
+        table.table = 0;
+    }
+    _tables = nil;
+    delete _group;
 }
 
 
@@ -80,9 +87,12 @@
 
 -(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)obj
 {
-    return [[obj alloc] initWithBlock:^(OCTable *table) {
-        [table setTable:&_group->GetTable([name UTF8String])];
-    }];
-//    return [[OCTopLevelTable alloc] initWithTopLevelTable:&_group->GetTable([name UTF8String])];
+    if (!_tables)
+        _tables = [NSMutableArray arrayWithCapacity:5];
+    [_tables addObject:[[obj alloc] initWithBlock:^(OCTable *table) {
+        [table setTablePtr:&_group->GetTable([name UTF8String])];
+        [table setTable:table.tablePtr /*->GetTableRef()*/];
+    }]];
+    return [_tables lastObject];
 }
 @end

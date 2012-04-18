@@ -129,14 +129,14 @@ return self; \
     } \
     return self; \
 } \
--(void)add:(tdbOCType##CType1)CName1 col2:(tdbOCType##CType2)CName2 \
+-(void)add:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 \
 { \
     const size_t ndx = [self getSize]; \
     [self insert##CType1:0 ndx:ndx value:CName1]; \
     [self insert##CType2:1 ndx:ndx value:CName2]; \
     [self insertDone]; \
 } \
--(void)insert:(size_t)ndx col1:(tdbOCType##CType1)CName1 col2:(tdbOCType##CType2)CName2 \
+-(void)insert:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 \
 { \
     [self insert##CType1:0 ndx:ndx value:CName1]; \
     [self insert##CType2:1 ndx:ndx value:CName2]; \
@@ -173,7 +173,7 @@ _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
 } \
 return self; \
 } \
--(void)add:(tdbOCType##CType1)CName1 col2:(tdbOCType##CType2)CName2 col3:(tdbOCType##CType3)CName3 col4:(tdbOCType##CType4)CName4 \
+-(void)add:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 \
 { \
 const size_t ndx = [self getSize]; \
 [self insert##CType1:0 ndx:ndx value:CName1]; \
@@ -182,7 +182,7 @@ const size_t ndx = [self getSize]; \
 [self insert##CType4:3 ndx:ndx value:CName4]; \
 [self insertDone]; \
 } \
--(void)insert:(size_t)ndx col1:(tdbOCType##CType1)CName1 col2:(tdbOCType##CType2)CName2 col3:(tdbOCType##CType3)CName3 col4:(tdbOCType##CType4)CName4 \
+-(void)insert:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 \
 { \
 [self insert##CType1:0 ndx:ndx value:CName1]; \
 [self insert##CType2:1 ndx:ndx value:CName2]; \
@@ -228,8 +228,8 @@ const size_t ndx = [self getSize]; \
 @interface TableName : OCTopLevelTable \
 @property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
 @property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
--(void)add:(tdbOCType##CType1)CName1 col2:(tdbOCType##CType2)CName2; \
--(void)insert:(size_t)ndx col1:(tdbOCType##CType1)CName1 col2:(tdbOCType##CType2)CName2; \
+-(void)add:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2; \
+-(void)insert:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2; \
 -(TableName##_##Query *)getQuery; \
 @end 
 
@@ -240,8 +240,8 @@ const size_t ndx = [self getSize]; \
 @property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
 @property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
 @property(nonatomic, strong) OCColumnProxy##CType4 *CName4; \
--(void)add:(tdbOCType##CType1)CName1 col2:(tdbOCType##CType2)CName2 col3:(tdbOCType##CType3)CName3 col4:(tdbOCType##CType4)CName4; \
--(void)insert:(size_t)ndx col1:(tdbOCType##CType1)CName1 col2:(tdbOCType##CType2)CName2 col3:(tdbOCType##CType3)CName3 col4:(tdbOCType##CType4)CName4; \
+-(void)add:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4; \
+-(void)insert:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4; \
 @end 
 
 

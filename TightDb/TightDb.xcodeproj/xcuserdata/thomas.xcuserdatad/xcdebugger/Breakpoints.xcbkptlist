@@ -7,26 +7,37 @@
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "TightDb/OCTable.mm"
-         timestampString = "356426737.688924"
+         filePath = "TightDb/OCGroup.mm"
+         timestampString = "356448376.062464"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "547"
-         endingLineNumber = "547"
-         landmarkName = "-registerColumn:name:"
+         startingLineNumber = "101"
+         endingLineNumber = "101">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "TightDb/OCTable.mm"
+         timestampString = "356447337.593311"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "395"
+         endingLineNumber = "395"
+         landmarkName = "-getTable"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
-         filePath = "TightDb/OCGroup.mm"
-         timestampString = "356364782.928035"
+         filePath = "TightDb/OCTable.mm"
+         timestampString = "356447337.593311"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "83"
-         endingLineNumber = "83"
-         landmarkName = "-getTable:withClass:"
+         startingLineNumber = "377"
+         endingLineNumber = "377"
+         landmarkName = "-initWithTableRef:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>
