@@ -20,7 +20,7 @@
 -(NSString *)getTableName:(size_t)table_ndx;
 -(BOOL)hasTable:(NSString *)name;
 
-// Table stuff ???? TODO
+// Table stuff 
 -(id)getTable:(NSString *)name withClass:(Class)obj;
 
 // Serialization
