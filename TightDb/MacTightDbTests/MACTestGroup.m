@@ -56,13 +56,13 @@ TDB_TABLE_2(TestTableGroup,
     NSLog(@"Columns: %zu", [t getColumnCount]);
     if ([t getColumnCount] != 2)
         STFail(@"Should have been 2 columns");
-    if ([t getSize] != 0)
+    if ([t count] != 0)
         STFail(@"Should have been empty");
 	// Modify table
-    [t add:@"Test" Second:YES];
-    NSLog(@"Size: %lu", [t getSize]);
+    [t addFirst:@"Test" Second:YES];
+    NSLog(@"Size: %lu", [t count]);
     
-    if ([t getSize] != 1)
+    if ([t count] != 1)
         STFail(@"Should have been one row");
     t = nil;
  

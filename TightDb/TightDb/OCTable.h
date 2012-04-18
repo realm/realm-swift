@@ -79,7 +79,7 @@
 -(ColumnType)getColumnType:(size_t)ndx;
 -(OCSpec *)getSpec;
 -(BOOL)isEmpty;
--(size_t)getSize;
+-(size_t)count;
 -(size_t)addRow;
 -(void)clear;
 -(void)deleteRow:(size_t)ndx;
@@ -161,7 +161,7 @@
 @interface OCTableView : NSObject
 +(OCTableView *)tableViewWithTable:(OCTable *)table;
 
--(size_t)getSize;
+-(size_t)count;
 -(BOOL)isEmpty;
 -(int64_t)get:(size_t)columnId ndx:(size_t)ndx;
 -(BOOL)getBool:(size_t)columnId ndx:(size_t)ndx;

@@ -81,14 +81,14 @@
     [table deleteRow:14];
     [table deleteRow:0];
     [table deleteRow:5];
-    STAssertEquals([table getSize], (size_t)12, @"Size should have been 12");
+    STAssertEquals([table count], (size_t)12, @"Size should have been 12");
 #ifdef _DEBUG
     [table verify];
 #endif //_DEBUG
 	
 	// Test Clear
     [table clear];
-    STAssertEquals([table getSize], (size_t)0, @"Size should have been zero");
+    STAssertEquals([table count], (size_t)0, @"Size should have been zero");
 	
 #ifdef _DEBUG
     [table verify];

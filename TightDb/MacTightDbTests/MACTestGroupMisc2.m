@@ -38,13 +38,13 @@ TDB_TABLE_2(MyTable2,
 	MyTable *table = [group getTable:@"My great table" withClass:[MyTable class]];
     
     // Add some rows
-    [table add:@"John" Age:20 Hired:YES Spare:0];
-    [table add:@"Mary" Age:21 Hired:NO Spare:0];
-    [table add:@"Lars" Age:21 Hired:YES Spare:0];
-    [table add:@"Phil" Age:43 Hired:NO Spare:0];
-    [table add:@"Anni" Age:54 Hired:YES Spare:0];
+    [table addName:@"John" Age:20 Hired:YES Spare:0];
+    [table addName:@"Mary" Age:21 Hired:NO Spare:0];
+    [table addName:@"Lars" Age:21 Hired:YES Spare:0];
+    [table addName:@"Phil" Age:43 Hired:NO Spare:0];
+    [table addName:@"Anni" Age:54 Hired:YES Spare:0];
     
-    NSLog(@"MyTable Size: %lu", [table getSize]);
+    NSLog(@"MyTable Size: %lu", [table count]);
     
     //------------------------------------------------------
     
@@ -57,7 +57,7 @@ TDB_TABLE_2(MyTable2,
     STAssertEquals(row, (size_t)1,@"Mary should have been there");
 
     OCTableView *view = [table.Age findAll:21];
-    size_t cnt = [view getSize];  				// cnt = 2
+    size_t cnt = [view count];  				// cnt = 2
     STAssertEquals(cnt, (size_t)2,@"Should be two rows in view");
      
      //------------------------------------------------------
@@ -65,11 +65,11 @@ TDB_TABLE_2(MyTable2,
     MyTable2 *table2 = [[MyTable2 alloc] init];
      
     // Add some rows
-    [table2 add:YES Age:20];
-    [table2 add:NO Age:21];
-    [table2 add:YES Age:22];
-    [table2 add:NO Age:43];
-    [table2 add:YES Age:54];
+    [table2 addHired:YES Age:20];
+    [table2 addHired:NO Age:21];
+    [table2 addHired:YES Age:22];
+    [table2 addHired:NO Age:43];
+    [table2 addHired:YES Age:54];
      
     // Create query (current employees between 20 and 30 years old)
     OCQuery *q = [[[table2 getQuery].Hired equal:YES].Age between:20 to:30];
@@ -85,7 +85,7 @@ TDB_TABLE_2(MyTable2,
      
      // Execute the query and return a table (view)
     OCTableView *res = [q findAll:table2];
-     for (size_t i = 0; i < [res getSize]; i++) {
+     for (size_t i = 0; i < [res count]; i++) {
          NSLog(@"%zu: is %lld years old",i , [res get:1 ndx:i]);
      }
      
@@ -97,8 +97,8 @@ TDB_TABLE_2(MyTable2,
      // Load a group from disk (and print contents)
     OCGroup *fromDisk = [OCGroup groupWithFilename:@"employees.tightdb"];
     MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class]];
-    NSLog(@"Disktable size: %zu", [diskTable getSize]);
-     for (size_t i = 0; i < [diskTable getSize]; i++) {
+    NSLog(@"Disktable size: %zu", [diskTable count]);
+     for (size_t i = 0; i < [diskTable count]; i++) {
          NSLog(@"%zu: %@", i, diskTable.Name);
      }
      
@@ -109,7 +109,7 @@ TDB_TABLE_2(MyTable2,
      // Load a group from memory (and print contents)
     OCGroup *fromMem = [OCGroup groupWithBuffer:buffer len:len];
     MyTable *memTable = [fromMem getTable:@"employees" withClass:[MyTable class]];
-     for (size_t i = 0; i < [memTable getSize]; i++) {
+     for (size_t i = 0; i < [memTable count]; i++) {
          NSLog(@"%zu: %@", i, memTable.Name);
      }
 }
