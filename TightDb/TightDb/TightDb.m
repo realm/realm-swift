@@ -1,10 +1,8 @@
 //
 //  TightDb.m
-//  TightDb
+//  TightDB
 //
-//  Created by Thomas Andersen on 16/04/12.
-//  Copyright (c) 2012 InvulgoSoft. All rights reserved.
-//
+
 #import <Foundation/Foundation.h>
 #include "TightDb.h"
 TDB_TABLE_2(TestTableGroup,

@@ -1,9 +1,6 @@
 //
 //  MACTestTableDeleteAll.h
-//  TightDb
-//
-//  Created by Thomas Andersen on 18/04/12.
-//  Copyright (c) 2012 InvulgoSoft. All rights reserved.
+//  TightDB
 //
 
 #import <SenTestingKit/SenTestingKit.h>

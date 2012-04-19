@@ -1,9 +1,6 @@
 //
 //  TightDb.h
-//  TightDb
-//
-//  Created by Thomas Andersen on 16/04/12.
-//  Copyright (c) 2012 InvulgoSoft. All rights reserved.
+//  TightDB
 //
 
 #import "OCTable.h"
@@ -24,9 +21,9 @@
     } \
     return self; \
 } \
--(TableName##_##Query *)leftParan \
+-(TableName##_##Query *)group \
 { \
-    [super leftParan]; \
+    [super group]; \
     return self; \
 } \
 -(TableName##_##Query *)or \
@@ -34,9 +31,9 @@
     [super or]; \
     return self; \
 } \
--(TableName##_##Query *)rightParan \
+-(TableName##_##Query *)endgroup \
 { \
-    [super rightParan]; \
+    [super endgroup]; \
     return self; \
 } \
 -(TableName##_##Query *)subtable:(size_t)column \
@@ -219,9 +216,9 @@ const size_t ndx = [self count]; \
 @interface TableName##_##Query : OCQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CType1 *CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CType2 *CName2; \
--(TableName##_##Query *)leftParan; \
+-(TableName##_##Query *)group; \
 -(TableName##_##Query *)or; \
--(TableName##_##Query *)rightParan; \
+-(TableName##_##Query *)endgroup; \
 -(TableName##_##Query *)subtable:(size_t)column; \
 -(TableName##_##Query *)parent; \
 @end \
