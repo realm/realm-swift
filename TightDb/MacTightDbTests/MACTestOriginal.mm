@@ -1,20 +1,17 @@
 //
 //  MACTestOriginal.m
-//  TightDb
+//  TightDB
 //
-//  Created by Thomas Andersen on 17/04/12.
-//  Copyright (c) 2012 InvulgoSoft. All rights reserved.
+// 
+//  Demo code for short tutorial using C++ interface to TightDB
 //
+
 
 #import "MACTestOriginal.h"
 #include "../../native/include/Group.h"
 #include "../../native/include/tightdb.h"
 
 @implementation MACTestOriginal
-
-//
-// Demo code for short tutorial:
-//
 
 TDB_TABLE_4(MyTable,
             String, name,
@@ -23,8 +20,8 @@ TDB_TABLE_4(MyTable,
             Int,	 spare)
 
 TDB_TABLE_2(MyTable2,
-Bool,   hired,
-Int,    age)
+			Bool,   hired,
+			Int,    age)
 
 
 -(void)testOriginal
@@ -43,7 +40,7 @@ Int,    age)
     //------------------------------------------------------
     
     size_t row; 
-    row = table.name.Find("Philip");		    	// row = (size_t)-1
+    row = table.name.Find("Philip");		    // row = (size_t)-1
     assert(row == (size_t)-1);
     row = table.name.Find("Mary");		
     assert(row == 1);
@@ -67,12 +64,12 @@ Int,    age)
     Query q = table2.GetQuery().hired.Equal(true).age.Between(20, 30);
     
     // Get number of matching entries
-    cout << q.Count(table2);                                         // => 2
+    cout << q.Count(table2);					// => 2
     assert(q.Count(table2)==2);
     
     // Get the average age
     double avg = q.Avg(table2, 1, &cnt);
-    cout << avg;						                               // => 20,5
+    cout << avg;						        // => 20,5
     
     // Execute the query and return a table (view)
     TableView res = q.FindAll(table2);

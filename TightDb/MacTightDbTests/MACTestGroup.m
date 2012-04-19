@@ -1,9 +1,8 @@
 //
 //  MACTestGroup.m
-//  TightDb
+//  TightDB
 //
-//  Created by Thomas Andersen on 17/04/12.
-//  Copyright (c) 2012 InvulgoSoft. All rights reserved.
+//  Test save/load on disk of a group with one table
 //
 
 #import "MACTestGroup.h"
@@ -26,17 +25,17 @@ TDB_TABLE_2(TestTableGroup,
 {
     [super setUp];
     
-//    _group = [OCGroup group];
-  //  NSLog(@"Group: %@", _group);
-    //STAssertNotNil(_group, @"OCGroup is nil");
+	// _group = [OCGroup group];
+	// NSLog(@"Group: %@", _group);
+    // STAssertNotNil(_group, @"OCGroup is nil");
 }
 
 - (void)tearDown
 {
     // Tear-down code here.
     
-//    [super tearDown];
-  //  _group = nil;
+	//  [super tearDown];
+	//  _group = nil;
 }
 
 - (void)testGroup
@@ -53,22 +52,23 @@ TDB_TABLE_2(TestTableGroup,
 	// Create new table in group
 	TestTableGroup *t = (TestTableGroup *)[fromDisk getTable:@"test" withClass:[TestTableGroup class]];
     
+	// Verify
     NSLog(@"Columns: %zu", [t getColumnCount]);
     if ([t getColumnCount] != 2)
         STFail(@"Should have been 2 columns");
     if ([t count] != 0)
         STFail(@"Should have been empty");
+	
 	// Modify table
     [t addFirst:@"Test" Second:YES];
     NSLog(@"Size: %lu", [t count]);
     
+	// Verify
     if ([t count] != 1)
         STFail(@"Should have been one row");
-    t = nil;
- 
+    
+	t = nil;
 }
-
-
 
 @end
 

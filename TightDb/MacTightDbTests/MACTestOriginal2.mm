@@ -1,9 +1,9 @@
 //
-//  MACTestOriginal2.m
-//  TightDb
+//  MACTestOriginal2.mm
+//  TightDB
 //
-//  Created by Thomas Andersen on 18/04/12.
-//  Copyright (c) 2012 InvulgoSoft. All rights reserved.
+// 
+//  Test code for all coulumn types and subtables using C++ interface to TightDB
 //
 
 #import "MACTestOriginal2.h"
@@ -17,7 +17,7 @@
 
 -(void)testOriginalTable
 {
-// Create table with all column types
+	// Create table with all column types
 	TopLevelTable table;
 	Spec s = table.GetSpec();
 	s.AddColumn(COLUMN_TYPE_INT,    "int");

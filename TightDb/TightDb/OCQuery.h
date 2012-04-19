@@ -1,9 +1,6 @@
 //
 //  OCQuery.h
-//  TightDb
-//
-//  Created by Thomas Andersen on 17/04/12.
-//  Copyright (c) 2012 InvulgoSoft. All rights reserved.
+//  TightDB
 //
 
 #import <Foundation/Foundation.h>
@@ -16,9 +13,9 @@
 
 @interface OCQuery : NSObject
 
--(void)leftParan;
+-(void)group;
 -(void)or;
--(void)rightParan;
+-(void)endgroup;
 -(void)subtable:(size_t)column;
 -(void)parent;
 -(size_t)count:(OCTable *)table;

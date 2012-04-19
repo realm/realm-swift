@@ -1,9 +1,9 @@
 //
 //  MACTestGroupMisc2.m
-//  TightDb
+//  TightDB
 //
-//  Created by Thomas Andersen on 17/04/12.
-//  Copyright (c) 2012 InvulgoSoft. All rights reserved.
+//
+// Demo code for short tutorial using Objective-C interface
 //
 
 #import "MACTestGroupMisc2.h"
@@ -14,22 +14,16 @@
 #include "TightDb.h"
 
 TDB_TABLE_4(MyTable,
-String, Name,
-Int,    Age,
-Bool,   Hired,
-Int,	 Spare)
+			String, Name,
+			Int,    Age,
+			Bool,   Hired,
+			Int,	Spare)
 
 TDB_TABLE_2(MyTable2,
             Bool,   Hired,
             Int,    Age)
 
 @implementation MACTestGroupMisc2
-
-
-//
-// Demo code for short tutorial:
-//
-
 
 - (void)testGroup_Misc2
 {
@@ -57,10 +51,10 @@ TDB_TABLE_2(MyTable2,
     STAssertEquals(row, (size_t)1,@"Mary should have been there");
 
     OCTableView *view = [table.Age findAll:21];
-    size_t cnt = [view count];  				// cnt = 2
+    size_t cnt = [view count];  					// cnt = 2
     STAssertEquals(cnt, (size_t)2,@"Should be two rows in view");
      
-     //------------------------------------------------------
+    //------------------------------------------------------
      
     MyTable2 *table2 = [[MyTable2 alloc] init];
      
@@ -83,35 +77,35 @@ TDB_TABLE_2(MyTable2,
     NSLog(@"Average: %f", avg);
     STAssertEquals(avg, 21.0,@"Expected 20.5 average");
      
-     // Execute the query and return a table (view)
+    // Execute the query and return a table (view)
     OCTableView *res = [q findAll:table2];
-     for (size_t i = 0; i < [res count]; i++) {
-         NSLog(@"%zu: is %lld years old",i , [res get:1 ndx:i]);
-     }
+    for (size_t i = 0; i < [res count]; i++) {
+        NSLog(@"%zu: is %lld years old",i , [res get:1 ndx:i]);
+    }
      
-     //------------------------------------------------------
+    //------------------------------------------------------
      
-     // Write to disk
+    // Write to disk
     [group write:@"employees.tightdb"];
      
-     // Load a group from disk (and print contents)
+    // Load a group from disk (and print contents)
     OCGroup *fromDisk = [OCGroup groupWithFilename:@"employees.tightdb"];
     MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class]];
     NSLog(@"Disktable size: %zu", [diskTable count]);
-     for (size_t i = 0; i < [diskTable count]; i++) {
-         NSLog(@"%zu: %@", i, diskTable.Name);
-     }
+    for (size_t i = 0; i < [diskTable count]; i++) {
+        NSLog(@"%zu: %@", i, diskTable.Name);
+    }
      
-     // Write same group to memory buffer
-     size_t len;
+    // Write same group to memory buffer
+    size_t len;
     const char* const buffer = [group writeToMem:&len];
      
-     // Load a group from memory (and print contents)
+    // Load a group from memory (and print contents)
     OCGroup *fromMem = [OCGroup groupWithBuffer:buffer len:len];
     MyTable *memTable = [fromMem getTable:@"employees" withClass:[MyTable class]];
-     for (size_t i = 0; i < [memTable count]; i++) {
-         NSLog(@"%zu: %@", i, memTable.Name);
-     }
+    for (size_t i = 0; i < [memTable count]; i++) {
+        NSLog(@"%zu: %@", i, memTable.Name);
+    }
 }
 
 @end
