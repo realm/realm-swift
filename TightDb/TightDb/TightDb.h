@@ -1443,7 +1443,11 @@
 @property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
 @property(nonatomic, strong) OCColumnProxy##CType4 *CName4; \
 -(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4; \
+<<<<<<< HEAD
 -(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4; \
+@end 
+=======
+-(void)insert##CName1:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4; \
 -(TableName##_##Query *)getQuery; \
 @end
 
@@ -1489,6 +1493,7 @@
 -(void)insert##CName1:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5; \
 -(TableName##_##Query *)getQuery; \
 @end
+>>>>>>> 780bfeee49c50e083b347262dd8c73323d0ce6ed
 
 #undef TDB_TABLE_6
 #define TDB_TABLE_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
