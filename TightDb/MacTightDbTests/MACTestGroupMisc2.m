@@ -72,7 +72,7 @@ TDB_TABLE_2(MyTable2,
     NSLog(@"Query count: %zu", [q count:table2]);
     STAssertEquals([q count:table2], (size_t)2,@"Expected 2 rows in query");
      
-     // Get the average age
+     // Get the average age - currently only a low-level interface!
     double avg = [q avg:table2 column:1 resultCount:&cnt];
     NSLog(@"Average: %f", avg);
     STAssertEquals(avg, 21.0,@"Expected 20.5 average");
@@ -80,6 +80,7 @@ TDB_TABLE_2(MyTable2,
     // Execute the query and return a table (view)
     OCTableView *res = [q findAll:table2];
     for (size_t i = 0; i < [res count]; i++) {
+		// cursor missing. Only low-level interface!
         NSLog(@"%zu: is %lld years old",i , [res get:1 ndx:i]);
     }
      
@@ -93,6 +94,7 @@ TDB_TABLE_2(MyTable2,
     MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class]];
     NSLog(@"Disktable size: %zu", [diskTable count]);
     for (size_t i = 0; i < [diskTable count]; i++) {
+		// ??? cursor
         NSLog(@"%zu: %@", i, diskTable.Name);
     }
      
@@ -104,7 +106,8 @@ TDB_TABLE_2(MyTable2,
     OCGroup *fromMem = [OCGroup groupWithBuffer:buffer len:len];
     MyTable *memTable = [fromMem getTable:@"employees" withClass:[MyTable class]];
     for (size_t i = 0; i < [memTable count]; i++) {
-        NSLog(@"%zu: %@", i, memTable.Name);
+        // ??? cursor
+		NSLog(@"%zu: %@", i, memTable.Name);
     }
 }
 
