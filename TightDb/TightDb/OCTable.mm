@@ -233,7 +233,7 @@
 +(OCSpec *)specWithAllocator:(Allocator &)allocator ref:(size_t)ref parent:(ArrayParent *)parent pndx:(size_t)pndx
 {
     OCSpec *spec = [[OCSpec alloc] init];
-//    spec.spec = new Spec(allocator, ref, parent, pndx);
+//  TODO???  spec.spec = new Spec(allocator, ref, parent, pndx);
     return spec;
 }
 +(OCSpec *)specWithSpec:(Spec *)other
