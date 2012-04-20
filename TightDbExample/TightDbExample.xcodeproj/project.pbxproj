@@ -266,7 +266,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../Deliv\"",
-					"\"$(SRCROOT)/../native/lib\"",
+					"\"$(SRCROOT)/../native/lib/Debug-iphoneos\"",
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -284,7 +284,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../Deliv\"",
-					"\"$(SRCROOT)/../native/lib\"",
+					"\"$(SRCROOT)/../native/lib/Release-iphoneos\"",
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
