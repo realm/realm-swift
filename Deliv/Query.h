@@ -12,15 +12,15 @@
 
 
 @interface Query : NSObject
-
+-(id)initWithTable:(Table *)table;
 -(void)group;
 -(void)or;
 -(void)endgroup;
 -(void)subtable:(size_t)column;
 -(void)parent;
--(size_t)count:(Table *)table;
--(double)avg:(Table *)table column:(size_t)columndId resultCount:(size_t*)resultCount;
--(TableView *)findAll:(Table *)table;
+-(size_t)count;
+-(double)avgOnColumn:(size_t)columndId;
+-(TableView *)findAll;
 @end
 
 #pragma mark - OCXQueryAccessorInt
@@ -32,6 +32,7 @@
 -(Query *)greater:(int64_t)value;
 -(Query *)less:(int64_t)value;
 -(Query *)between:(int64_t)from to:(int64_t)to;
+-(double)avg;
 @end
 
 #pragma mark - OCXQueryAccessorBool

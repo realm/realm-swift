@@ -167,7 +167,7 @@ The above code instantiates a TightDB table with 3 typed columns called:
 You can also insert rows at specific positions:
 </p>
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
-<pre class="prettyprint" lang-cpp="">[people insertAtIndex:2 Name:&quot;Frank&quot; Age:34 Hired:YES];
+<pre class="prettyprint" lang-cpp="">[people insertAtIndex:2 Name:@"Frank&quot; Age:34 Hired:YES];
 </pre>
 </div>
 <p>
@@ -252,7 +252,7 @@ row = [people.Name find:@"Mary"];		    // row = 1
 </div>
 <p>To find all values, the <tt>findAll</tt> method is used:</p>
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
-<pre class="prettyprint" lang-cpp="">TableView view = [people.Age findAll:21];   
+<pre class="prettyprint" lang-cpp="">TableView *view = [people.Age findAll:21];   
 size_t cnt = [view count];  			// cnt = 2</pre>
 </div>
     <p>&nbsp;</p>
@@ -269,20 +269,21 @@ So let's say you need to find all current employees who are between 20 and 30 ye
 
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
 <pre class="prettyprint" lang-cpp="">// Create query (current employees between 20 and 30 years old)
-Query q = [[[people getQuery].Hired equal:YES]            // Implicit AND
-                             .Age between:20 to:30];
+Query *q = [[[people getQuery].Hired equal:YES]            // Implicit AND
+                              .Age between:20 to:30];
 
 // Get number of matching entries
 size_t cnt = [q count];                                   // =&gt; 2
 
 // Get the average age (currently only a low-level interface)
-double avg = [q avg:people column:1 resultCount:&amp;cnt];     // =&gt; 26 
+double avg = [q.Age avg];
 
 // Execute the query and return a table (view)
-TableView res = [table findAll];
+TableView *res = [q findAll];
 for (size_t i = 0; i < [res count]; ++i) {
-    NSLog(@"%zu: %@ is %d years old", i, [people objectAtIndex:i].Name, 
-    [people objectAtIndex:i]Age);
+    NSLog(@"%zu: %@ is %d years old", i, 
+        [people objectAtIndex:i].Name, 
+        [people objectAtIndex:i].Age);
 }
 </pre>
 </div>
@@ -304,7 +305,7 @@ You can group tables and do very fast serialization to and from files and memory
  
 // Create Table in Group
 Group *group = [Group group];
-PeopleTable *table = [group getTable@&quot;employees"
+PeopleTable *table = [group getTable:@"employees"
                             withClass:[PeopleTable class]];
  
 // Add some rows
@@ -315,7 +316,7 @@ PeopleTable *table = [group getTable@&quot;employees"
 [people addName:@"Anni&quot; Age:54 Hired:YES];
 	
 // Write to disk
-[group write:@&quot;employees.tightdb&quot;];
+[group write:@"employees.tightdb"];
 	
 // Load a group from disk (and print contents)
 Group *fromDisk = [Group groupWithFilename:@"employees.tightdb"];
@@ -323,7 +324,7 @@ PeopleTable *diskTable = [fromDisk getTable:@"employees"
 				    withClass:[PeopleTable class]];
 NSLog(@"Disktable size: %zu", [diskTable count]);
 for (size_t i = 0; i < [diskTable count]; i++) {
-   MyTable_Cursor *cursor = [diskTable atIndex:i];
+   MyTable_Cursor *cursor = [diskTable objectAtIndex:i];
    NSLog(@"%zu: %@", i, [cursor Name]);             // using std. method
 }
 
@@ -336,7 +337,7 @@ Group *fromMem = [Group groupWithBuffer: buffer len:len];
 PeopleTable *memTable = [fromMem getTable:@"employees" 
  			          withClass:[PeopleTable class]];
 for (size_t i = 0; i < [memTable count]; i++) {
-    MyTable_Cursor *cursor = [memTable atIndex:i];
+    PeopleTable_Cursor *cursor = [memTable objectAtIndex:i];
     NSLog(@"%zu: %@", i, cursor.Name);              // using dot-syntax
 }
 </pre>
