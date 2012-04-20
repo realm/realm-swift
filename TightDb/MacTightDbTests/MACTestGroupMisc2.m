@@ -10,16 +10,13 @@
 #import "OCGroup.h"
 #import "OCTable.h"
 
-#define TIGHT_IMPL
-#include "TightDb.h"
-
-TDB_TABLE_4(MyTable,
+TDB_TABLE_IMPL_4(MyTable,
 			String, Name,
 			Int,    Age,
 			Bool,   Hired,
 			Int,	Spare)
 
-TDB_TABLE_2(MyTable2,
+TDB_TABLE_IMPL_2(MyTable2,
             Bool,   Hired,
             Int,    Age)
 
@@ -97,7 +94,7 @@ TDB_TABLE_2(MyTable2,
 //    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
     NSLog(@"Disktable size: %zu", [diskTable count]);
     for (size_t i = 0; i < [diskTable count]; i++) {
-        MyTable_Cursor *cursor = [diskTable atIndex:i];
+        MyTable_Cursor *cursor = [diskTable objectAtIndex:i];
         NSLog(@"%zu: %@", i, [cursor Name]);
         NSLog(@"%zu: %@", i, cursor.Name);
         NSLog(@"%zu: %@", i, [diskTable getString:0 ndx:i]);
