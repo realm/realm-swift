@@ -1,0 +1,1772 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<link href="css.css" rel="stylesheet" type="text/css">
+		<link href="main.css" media="screen" rel="stylesheet" type="text/css">
+
+	<!--[if lt IE 8]>
+		<link rel="stylesheet" type="text/css" href="/stylesheets/ie7.css" />
+	<![endif]-->
+
+
+	<link href="prettify.css" type="text/css" rel="stylesheet" />
+	<script type="text/javascript" src="prettify.js"></script>
+
+		<script type="text/javascript">
+var App = {};
+		</script>
+		<script src="main.js" type="text/javascript">
+</script>
+		<title>TightDB Objective-C Reference</title>
+
+
+		<style type="text/css">
+        
+        strong, b {
+        font-weight: bolder;
+        }
+        
+        dl {
+        display: block;
+        -webkit-margin-before: 1em;
+        -webkit-margin-after: 1em;
+        -webkit-margin-start: 0px;
+        -webkit-margin-end: 0px;
+        }
+        
+        dd {
+        display: block;
+        -webkit-margin-start: 40px;
+        }
+        
+        dt {
+        display: block;
+        }
+        
+        pre, xmp, plaintext, listing {
+        font-family: monospace;
+        white-space: pre;
+        }
+        
+        p {
+        display: block;
+        -webkit-margin-before: 1em;
+        -webkit-margin-after: 1em;
+        -webkit-margin-start: 0px;
+        -webkit-margin-end: 0px;
+        }
+
+		.main {
+		color: #0067AB;
+		font-family: 'Open Sans','Helvetica Neue',Helvetica;
+		}
+
+		h1, h2, h3, h4, h5 {
+		color: #0067AB;
+		font-family: 'Open Sans','Helvetica Neue',Helvetica;
+		}
+
+		.p_docs h1 h2 h3 h4 {
+		margin-bottom: 25px;
+		-moz-border-radius: 3px;
+		-webkit-border-radius: 3px;
+		-o-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-khtml-border-radius: 3px;
+		border-radius: 3px;
+		margin-top: 35px;
+		border-bottom: 1px solid #CBE3F3;
+		background: #E0EEF8;
+		padding: 10px;
+		color: #0067AB;
+		font-size: 22px;
+		}
+
+		.code {
+		background: #E0EEF8;
+		border: 1px solid #B6D7EF;
+		padding: 15px;
+		font-size: 13px;
+		line-height: 19px;
+		font-family: "Monaco","Courier New",Courier;
+		margin-bottom: 25px;
+		}
+
+		.header {
+		background: #E0EEF8;
+		border: 1px solid #E0EEF8;
+		padding: 5px;
+		font-size: 13px;
+		line-height: 3px;
+		font-family: "Monaco","Courier New",Courier;
+		margin-bottom: 25px;
+		color: #0067AB;
+		}
+		
+	.eks {
+	    border: 1px solid #CBE3F3;
+	    border-radius: 5px 5px 5px 5px;
+	    font-size: 14px;
+	    padding: 15px;
+	}
+
+		</style>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-23135871-1']);
+      _gaq.push(['_setDomainName', '.tightdb.com']);
+        _gaq.push(['_trackPageview']);
+
+  (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+              var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                })();
+
+</script>
+
+
+	</head>
+		<body class="p_docs p_docs_ios_guide" onload="prettyPrint()">
+
+
+		<div>
+		<a href="../index.html"><img src=logo200.png></a>
+		</div>
+
+		<div class="main" style="width: 800px; margin: 0px auto -1px;">
+
+
+
+
+		<div class="container">
+			<div class="right_col_container">
+				<div class="right_col">
+					<div class="box">
+						<ul>
+							<li data-section="table" class="major">
+								<strong class="first"><a class="" href="#table">Table Class</a></strong>
+								<ul style="display: block;">
+									<li><a href="#table-constructor">constructor</a></li>
+									<li><a href="#bracket">square brackets</a></li>
+									<li><a href="#table-is_empty">is_empty()</a></li>
+									<li><a href="#table-count">count()</a></li>
+									<li><a href="#table-clear">clear()</a></li>
+									<li><a href="#table-find">find()</a></li>
+									<li><a href="#table-find_all">find_all()</a></li>
+									<li><a href="#table-sum">sum()</a></li>
+									<li><a href="#table-min">min()</a></li>
+									<li><a href="#table-max">max()</a></li>
+									<li><a href="#table-optimize">optimize()</a></li>
+									<li><a href="#table-to_json">to_json()</a></li>
+                                    <li><a href="#table-query">query()</a></li>
+<!--
+									<li><a href="#table-get_column_count">get_column_count()</a></li>
+-->
+								</ul>
+							</li>
+							<li data-section="tablequery" class="major">
+								<strong class="first"><a class="" href="#tablequery">TableQuery Class</a></strong>                            
+									                                                                
+                                <ul style="display: block;">
+								    <li><a href="#tablequery-group">group()</a></li>
+									<li><a href="#tablequery-endgroup">endGroup()</a></li>
+									<li><a href="#tablequery-or">or()</a></li>
+									<li><a href="#tablequery-do">do()</a></li>
+									<li><a href="#tablequery-count">count()</a></li>
+									<li><a href="#tablequery-sum">sum()</a></li>
+									<li><a href="#tablequery-avg">avg()</a></li>
+									<li><a href="#tablequery-min">min()</a></li>
+									<li><a href="#tablequery-max">max()</a></li>
+                                </ul>
+                            </li>
+
+                            <li data-section="tableview" class="major">
+                                <strong class="first"><a class="" href="#tableview">TableView Class</a></strong>
+                                <ul style="display: block;">
+                                   <li><a href="#tableview-get_source_rowid">get_source_rowid()</a></li>
+                                   <li><a href="#tableview-clear">clear()</a></li>
+                                   <li><a href="#tableview-unset">unset()</a></li>
+                                </ul>
+                            </li>
+
+							<li data-section="group" class="major">
+								<strong class="first"><a class="" href="#group">Group Class</a></strong>
+								<ul style="display: block;">
+									<li><a href="#group-constructor">constructor</a></li>
+									<li><a href="#group-create_table">create_table()</a></li>
+									<li><a href="#group-has_table">has_table()</a></li>
+									<li><a href="#group-get_table">get_table()</a></li>
+									<li><a href="#group-write_to_file">write_to_file()</a></li>
+									<li><a href="#group-write_to_mem">write_to_mem()</a></li>
+<!--
+									<li><a href="#group-has_table">has_table()</a></li>
+-->
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="left_col">
+				
+				<h1>TightDB Objective-C Reference</h1>
+
+                <a href="#" name="table" id="table"></a>
+                <a href="#" class="section section_minor" name="table_anchor" id="table_anchor"></a>
+                <h2>Table Class</h2>
+                <p>
+                The Table class allows you to efficiently work with data in terms of rows and columns.
+                </p>
+                <p>
+				<table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
+				<tbody><tr bgcolor="#CCCCFF" class="TableHeadingColor">
+				<th align="left" colspan="2"><font size="+2">
+				<b>Constructor Summary</b></font></th>
+				</tr>
+				<tr bgcolor="white" class="TableRowColor">
+				<td><code><b><a href="#table-constructor">Table</a></b>()</code>
+
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Instantiates a TightDB table</td>
+				</tr>
+				</tbody></table>
+
+				</p>
+				</p>
+
+				<table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
+				<tbody><tr bgcolor="#CCCCFF" class="TableHeadingColor">
+				<th align="left" colspan="2"><font size="+2">
+				<b>Method Summary</b></font></th>
+				</tr>
+<!--
+                <tr bgcolor="white" class="TableRowColor">
+				<th align="left" colspan="2"><findont size="-1">
+				<b>Sub...</b></font></th>
+				</tr>
+-->
+
+                <tr bgcolor="white" class="TableRowColor">
+				<td align="right" valign="top" width="1%"><font size="-1">
+				<code></code></font></td>
+				<td><code><b><a href="">square bracket notation</a></b></code>
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get and set individual values</td>
+				</tr>
+
+				<tr bgcolor="white" class="TableRowColor">
+				<td align="right" valign="top" width="1%"><font size="-1">
+				<code>&nbsp;bool</code></font></td>
+				<td><code><b><a href="#table-is_empty">is_empty</a></b>()</code>
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Check if a table is empty</td>
+				</tr>
+				
+				<tr bgcolor="white" class="TableRowColor">
+				<td align="right" valign="top" width="1%"><font size="-1">
+				<code>&nbsp;int</code></font></td>
+				<td><code><b><a href="#table-count">count</a></b>()</code>
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the number of rows in a table</td>
+				</tr>
+				
+				<tr bgcolor="white" class="TableRowColor">
+				<td align="right" valign="top" width="1%"><font size="-1">
+				<code>&nbsp;void</code></font></td>
+				<td><code><b><a href="#table-clear">clear</a></b>()</code>
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Delete all rows</td>
+				</tr>
+				
+                <tr bgcolor="white" class="TableRowColor">
+				<td align="right" valign="top" width="1%"><font size="-1">
+				<code>&nbsp;mixed</code></font></td>
+				<td><code><b><a href="#table-find">find</a></b>()</code>
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Find values in a specific column</td>
+				</tr>
+				
+				<tr bgcolor="white" class="TableRowColor">
+				<td align="right" valign="top" width="1%"><font size="-1">
+				<code>&nbsp;<a href="#tableview">TableView</a></code></font></td>
+				<td><code><b><a href="#table-find_all">find_all</a></b>()</code>
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Find all matching values in a specific column</td>
+				</tr>
+				
+				<tr bgcolor="white" class="TableRowColor">
+				<td align="right" valign="top" width="1%"><font size="-1">
+				<code>&nbsp;int</code></font></td>
+				<td><code><b><a href="#table-sum">sum</a></b>()</code>
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sum the values in an integer column</td>
+				</tr>
+				
+				<tr bgcolor="white" class="TableRowColor">
+				<td align="right" valign="top" width="1%"><font size="-1">
+				<code>&nbsp;int</code> or <code>&nbsp;DateTime</code></font></td>
+				<td><code><b><a href="#table-min">min</a></b>()</code>
+				<br>
+				    Get the lowest value in an integer column</td>
+				</tr>
+				
+				<tr bgcolor="white" class="TableRowColor">
+				<td align="right" valign="top" width="1%"><font size="-1">
+				<code>&nbsp;int</code> or <code>&nbsp;DateTime</code></font></td>
+				<td><code><b><a href="#table-max">max</a></b>()</code>
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the highest value in an integer column</td>
+				</tr>
+				
+<!--
+				<tr bgcolor="white" class="TableRowColor">
+				<td align="right" valign="top" width="1%"><font size="-1">
+				<code>&nbsp;int</code></font></td>
+				<td><code><b><a href="">get_column_count</a></b>()</code>
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the number of columns in a table</td>
+				</tr>
+-->
+
+                                <tr bgcolor="white" class="TableRowColor">
+                                <td align="right" valign="top" width="1%"><font size="-1">
+                                <code>&nbsp;<a href="#tablequery">TableQuery</a></code></fint></td>
+                                <td><code><b><a href="#table-query">query</a></b>()</code>
+                                <br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a query</td>
+                                </tr>
+
+                                <tr bgcolor="white" class="TableRowColor">
+                                <td align="right" valign="top" width="1%"><font size="-1">
+                                <code>&nbsp;void</code></font></td>
+                                <td><code><b><a href="#table-optimize">optimize</a></b>()</code>
+                                <br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Optimize table</td>
+                                </tr>
+
+                                <tr bgcolor="white" class="TableRowColor">
+                                <td align="right" valign="top" width="1%"><font size="-1">
+                                <code>&nbsp;string</code></font></td>
+                                <td><code><b><a href="#table-to_json">to_json</a></b>()</code>
+                                <br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Convert table to JSON</td>
+                                </tr>
+
+				</tbody></table>
+                <br>
+                
+                <h3>Constructor Detail</h3>
+
+                <a href="#" name="table-constructor" id="table-constructor"></a>
+				<a href="#" class="section section_major" name="table-constructor_anchor" id="table-constructor_anchor"></a>
+				<h4>constructor</h4>
+                <dl><dd>
+	                <p><div class="eks">
+	                <pre class="prettyprint" lang-php style="font-size: 16px">new <b>Table</b>(array $schema)</pre>
+	                </div>
+	                </p>
+                	Instantiates a TightDB table.
+                	<p>
+	                Note: Only tables which are part of a <a href="#group">group</a> can be serialized to memory or disk.
+                	</p>
+                	<dl>
+                		<dt><b>Parameters:</b></dt>
+                		<dd>
+	                        <p>
+	                        The table constructor accepts an associative array as argument, where keys are the column names, and values are the column types.
+	                        </p>
+	                        <b>Valid column types:</b>
+	                        <p>
+	                        <pre class="prettyprint" lang-php>
+"string": column of strings.
+"int":    column of integers.
+"bool":   column of booleans.
+"date":   column of dates.
+"binary": column of binary data
+"mixed":  column of mixed (heterogeneous) types
+array():  column of sub-tables.
+	                        </pre>
+                             </p>
+                        </dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Returns:</b></dt>
+                		<dd>
+	                        <p>
+		                    Table object
+                            </p>
+                        </dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Example:</b></dt>
+                		<dd>
+							<pre class="prettyprint" lang-php>
+
+// Create a new table with 4 typed columns
+// (where the last one contains sub-tables, which themselves have 2 columns)
+$table = new Table(array("name"   => "string",
+                         "age"    => "int",
+                         "hired"  => "bool",
+                         "phones" => array("desc"   => "string",
+                                           "number" => "string")));
+
+// Add a single row
+$table[] = array("Jim", 34, true, array(array("mobile", "432-424-3242"),
+                                        array("work",   "342-432-4234")));
+							</pre>
+                         </dd>
+                	</dl>
+                </dd></dl>
+
+                <h3>Method Detail</h3>
+
+                                <a href="#" name="bracket" id="bracket"></a>
+				                <a href="#" class="section section_major" name="bracket_anchor" id="bracket_anchor"></a>
+				                <h4>Square Bracket Notation</h4>
+				                <dl><dd>
+				                	<p>
+				                	The square bracket notation can be used for accessing and manipulating elements in a table. As PHP arrays, Tightdb tables have zero based index.
+				                	</p>
+					                <h5><b>Adding new rows:</b></h5>
+						                <p><div class="eks">
+						                <pre class="prettyprint" lang-php style="font-size: 16px">$table[] = array $values</pre>
+						            </div>
+					                <p>New rows can be added at the end of the table by assigning to it with an empty pair of brackets.</p>
+				                	<dl>
+				                		<dd><b>Example:</b>
+									<pre class="prettyprint" lang-php>
+
+// Add new rows to the table
+$table[] = array("name" => "James", "age" => 20, "hired" => true, "phones" = array());
+$table[] = array("John", 20, true, null); // (terse version)
+
+// Adding a row to a sub-table
+$table[5]->phones[] = array("school", "434-423-2432") ;
+									</pre>
+				                     </dd>
+				            	</dl>
+				                    <h5><b>Setting rows:</b></h5>
+						                <p><div class="eks">
+						                <pre class="prettyprint" lang-php style="font-size: 16px">$table[$row_id] = array $values</pre>
+						            </div>
+					                <p>The bracket syntax with an index can be used to update an entire row.</p>
+				                	<dl>
+				                		<dd><b>Example:</b>
+									<pre class="prettyprint" lang-php>
+
+// Updating an entire row
+$table[4] = array("Eric", 50, true, null);
+									</pre>
+				                     </dd>
+				            	</dl>
+					                <h5><b>Getting values:</b></h5>
+						                <p><div class="eks">
+						                <pre class="prettyprint" lang-php style="font-size: 16px">mixed $table[$row_id]->column_name</pre>
+						            </div>
+					                <p>To access the individual rows of our table, we can use the brackets syntax with an index. This gives us direct access to the values in the row.</p>
+				                	<dl>
+				               		<dd><b>Example:</b>
+									<pre class="prettyprint" lang-php>
+
+// Get value
+echo $table[5]->name;
+
+// Get value, counting from the back
+echo $table[-1]->name;
+
+// You can also access sub-tables directly
+echo $table[-1]->phones[0]->number;
+									</pre>
+				                     </dd>
+				            	</dl>
+					                <h5><b>Setting values:</b></h5>
+						                <p><div class="eks">
+						                <pre class="prettyprint" lang-php style="font-size: 16px">$table[$row_id]->column_name = $value</pre>
+						            </div>
+					                <p>The brackets syntax with a index can also be used for updating specific values in the table.</p>
+				                	<dl>
+				                    <dd><b>Example:</b>
+									<pre class="prettyprint" lang-php>
+
+// Changing values
+$table[5]->age = 43;
+									</pre>
+				                     </dd>
+				            	</dl>
+					                <h5><b>Deleting rows:</b></h5>
+						                <p><div class="eks">
+						                <pre class="prettyprint" lang-php style="font-size: 16px">unset($table[$row_id]);</pre>
+						            </div>
+					                <p>A row specified by its index can be deleted using the <code>unset</code> function</p>
+				                	<dl>
+				                    <dd><b>Example:</b>
+									<pre class="prettyprint" lang-php>
+
+// Delete a row
+unset($table[2]);
+									</pre>
+				                     </dd>
+				            	</dl>
+				          </dd></dl>
+
+				<a href="#" name="table-is_empty" id="table-is_empty"></a>
+				<a href="#" class="section section_minor" name="table-is_empty_anchor" id="table-is_empty_anchor"></a>
+				<h4>is_empty()</h4>
+
+                <p><div class="eks">
+                <pre class="prettyprint" lang-php style="font-size: 16px">bool Table::<b>is_empty</b>()</pre>
+            </div>
+            </p>
+                <dl><dd>
+                	<p>
+                	Check if a table is empty
+                	</p>
+                	<dl>
+                		<dt><b>Parameters:</b></dt>
+                		<dd><p>None</p></dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Returns:</b></dt>
+                		<dd><p><code>true</code> or <code>false</code></p></dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Example:</b></dt>
+                		<dd>
+							<pre class="prettyprint" lang-php>
+
+$empty = $table->is_empty();
+							</pre>
+                         </dd>
+                	</dl>
+                </dd></dl>
+
+				<a href="#" name="table-count" id="table-count"></a>
+				<a href="#" class="section section_major" name="table-count_anchor" id="table-count_anchor"></a>
+				<h4>count()</h4>
+                <p><div class="eks">
+                <pre class="prettyprint" lang-php style="font-size: 16px">int Table::<b>count</b>()</pre>
+            </div>
+            </p>
+                <dl><dd>
+                	<p>
+                	Get the number of rows in a table
+                	</p>
+                	<dl>
+                		<dt><b>Parameters:</b></dt>
+                		<dd><p>None</p></dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Returns:</b></dt>
+                		<dd><p><code>int</code>: Number of rows in the table</p></dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Example:</b></dt>
+                		<dd>
+							<pre class="prettyprint" lang-php>
+
+$count = $table->count();
+							</pre>
+                         </dd>
+                	</dl>
+                </dd></dl>
+
+                <a href="#" name="table-clear" id="table-clear"></a>
+				<a href="#" class="section section_major" name="table-clear_anchor" id="table-clear_anchor"></a>
+				<h4>clear()</h4>
+                <p><div class="eks">
+                <pre class="prettyprint" lang-php style="font-size: 16px">Table::<b>clear</b>()</pre>
+                </div>
+                </p>
+                <dl><dd>
+                	<p>
+                	Delete all rows in a table.
+                	</p>
+                	<dl>
+                		<dt><b>Parameters:</b></dt>
+                		<dd><p>None</p></dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Example:</b></dt>
+                		<dd>
+							<pre class="prettyprint"  lang-php>
+
+$table->clear();
+							</pre>
+	                    </dd>
+                	</dl>
+                </dd></dl>
+
+                <a href="#" name="table-find" id="table-find"></a>
+				<a href="#" class="section section_major" name="table-find_anchor" id="table-find_anchor"></a>
+				<h4>find()</h4>
+                <p><div class="eks">
+                <pre class="prettyprint" lang-php style="font-size: 16px">mixed Table::<b>find</b>(string $column_name, mixed $value)</pre>
+                </div>
+                </p>
+                <dl><dd>
+                	<p>
+                	Find values in a specific column
+                	</p>
+                	<dl>
+                		<dt><b>Parameters:</b></dt>
+                		<dd><p>
+	                    <code>$column_name:</code> Name of the column,<br>
+	                    <code>$value:</code> Value to search for.
+	                    </p></dd>
+                	</dl>
+                    <dl>
+                		<dt><b>Returns:</b></dt>
+                		<dd><p>index of matching row, or <code>null</code> if not found.</p></dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Example:</b></dt>
+                		<dd>
+							<pre class="prettyprint"  lang-php>
+
+$result = $table->find();
+							</pre>
+	                    </dd>
+                	</dl>
+                </dd></dl>
+
+                <a href="#" name="table-find_all" id="table-find"></a>
+				<a href="#" class="section section_major" name="table-find_all_anchor" id="table-find_all_anchor"></a>
+				<h4>find_all()</h4>
+                <p><div class="eks">
+                <pre class="prettyprint" lang-php style="font-size: 16px">TableView Table::<b>find_all</b>(string $column_name, mixed $value)</pre>
+                </div>
+                </p>
+                <dl><dd>
+                	<p>
+                	Find all matching values in a specific column. 
+                	</p>
+                	<dl>
+                		<dt><b>Parameters:</b></dt>
+                		<dd><p>
+	                    <code>$column_name:</code> Name of the column,<br>
+	                    <code>$value:</code> Value to search for.
+	                    </p></dd>
+                	</dl>
+                    <dl>
+                		<dt><b>Returns:</b></dt>
+                		<dd><p><code>TableView</code>: A virtual table containing the matching rows. You can interact with the <a href="#tableview">TableView</a> just as a regular table, and all changes to it will propagate to the original table.</p></dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Example:</b></dt>
+                		<dd>
+							<pre class="prettyprint"  lang-php>
+								
+// Find all entries with age == 19
+$view = $t2->find_all("age", 19);
+
+// Print number of matches
+echo "  found ".$view->count()." matches:\n";
+
+// Print all matches (with indexes)
+foreach ($view as $ndx => $row) {
+	echo "    ".$ndx.": ".$row->name."\n";
+}
+
+// Calculate the sum of the matching ages
+echo "  total age: ".$view->sum("age")."\n";
+
+// Change the value - will propagate to the table $t2
+$view[0]->age++;
+							</pre>
+	                    </dd>
+                	</dl>
+                </dd></dl>
+
+                <a href="#" name="table-sum" id="table-sum"></a>
+				<a href="#" class="section section_major" name="table-sum_anchor" id="table-sum_anchor"></a>
+				<h4>sum()</h4>
+                <p><div class="eks">
+                <pre class="prettyprint" lang-php style="font-size: 16px">int Table::<b>sum</b>(string $column_name)</pre>
+            </div>
+            </p>
+                <dl><dd>
+                	<p>
+                	Sum the values in an integer column.
+                	</p>
+                	<dl>
+                		<dt><b>Parameters:</b></dt>
+                		<dd><p><code>$column_name</code>: Name of target column (must be an integer column).</p></dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Returns:</b></dt>
+                		<dd><p><code>int</code>: Sum of all values in column.</p></dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Example:</b></dt>
+                		<dd>
+							<pre class="prettyprint" lang-php>
+
+$average_age = $table->sum("age") / $table->count();
+							</pre>
+                         </dd>
+                	</dl>
+                </dd></dl>
+
+				 <a href="#" name="table-min" id="table-min"></a>
+					<a href="#" class="section section_major" name="table-min_anchor" id="table-min_anchor"></a>
+					<h4>min()</h4>
+	                <p><div class="eks">
+	                <pre class="prettyprint" lang-php style="font-size: 16px">mixed Table::<b>min</b>(string $column_name)</pre>
+	            </div>
+	            </p>
+	                <dl><dd>
+	                	<p>
+	                	Get the lowest value in an integer or date column.
+	                	</p>
+	                	<dl>
+	                		<dt><b>Parameters:</b></dt>
+	                		<dd><p><code>$column_name</code>: Name of target column (must be an integer or date column).</p></dd>
+	                	</dl>
+	                	<dl>
+	                		<dt><b>Returns:</b></dt>
+	                		<dd><p><code>int</code> or <code>DateTime</code>: Lowest value in column (zero if empty).</p></dd>
+	                	</dl>
+	                	<dl>
+	                		<dt><b>Example:</b></dt>
+	                		<dd>
+								<pre class="prettyprint" lang-php>
+
+$lowest_age = $table->min("age");
+								</pre>
+	                         </dd>
+	                	</dl>
+	                </dd></dl>
+	
+	            	<a href="#" name="table-max" id="table-max"></a>
+						<a href="#" class="section section_major" name="table-max_anchor" id="table-max_anchor"></a>
+						<h4>max()</h4>
+		                <p><div class="eks">
+		                <pre class="prettyprint" lang-php style="font-size: 16px">mixed Table::<b>max</b>(string $column_name)</pre>
+		            </div>
+		            </p>
+		                <dl><dd>
+		                	<p>
+		                	Get the highest value in an integer or date column.
+		                	</p>
+		                	<dl>
+		                		<dt><b>Parameters:</b></dt>
+		                		<dd><p><code>$column_name</code>: Name of target column (must be an integer or date column).</p></dd>
+		                	</dl>
+		                	<dl>
+		                		<dt><b>Returns:</b></dt>
+		                		<dd><p><code>int</code> or <code>DateTime</code>: Highest value in column (zero if empty).</p></dd>
+		                	</dl>
+		                	<dl>
+		                		<dt><b>Example:</b></dt>
+		                		<dd>
+									<pre class="prettyprint" lang-php>
+
+$highest_age = $table->max("age");
+									</pre>
+		                         </dd>
+		                	</dl>
+		                </dd></dl>
+
+
+
+		
+		         		<a href="#" name="table-optimize" id="table-optimize"></a>
+						<a href="#" class="section section_major" name="table-optimize_anchor" id="table-optimize_anchor"></a>
+						<h4>optimize()</h4>
+		                <p><div class="eks">
+		                <pre class="prettyprint" lang-php style="font-size: 16px">Table::<b>optimize</b>()</pre>
+		                </div>
+		                </p>
+		                <dl><dd>
+		                	<p>
+		                	Optimize the internal representation of the table. Can be called after unserialization of a big data set. Will be obsolete in the near future!
+		                	</p>
+		                	<dl>
+		                		<dt><b>Parameters:</b></dt>
+		                		<dd><p>None</p></dd>
+		                	</dl>
+                            <dl>
+                                <dt><b>Returns:</b></dt>
+                                <dd><p>None</p></dd>
+                            </dl>
+		                	<dl>
+		                		<dt><b>Example:</b></dt>
+		                		<dd>
+									<pre class="prettyprint"  lang-php>
+
+$table->optimize();
+									</pre>
+			                    </dd>
+		                	</dl>
+		                </dd></dl>
+
+
+                                <a href="#" name="table-to_json" id="table-to_json"></a>
+                                <a href="#" class="section section_major" name="table-to_json_anchor" id="table-to_json_anchor"></a>
+                                <h4>to_json()</h4>
+                                <p><div class="eks">
+                                <pre class="prettyprint" lang-php style="font-size: 16px">string Table::<b>to_json</b>()</pre>
+                                </div>
+                                </p>
+                                <dl><dd>
+                                <p>
+                                Convert a tightdb table to JSON
+                                </p>
+                                <dl>
+                                    <dt><b>Parameters:</b></dt>
+                                    <dd><p>None</p></dd>
+                                </dl>
+                                <dl>
+                                    <dt><b>Returns:</b></dt>
+                                    <dd><p>String containing JSON</p></dd>
+                                </dl>
+                                <dl>
+                                    <dt><b>Example:</b></dt>
+                                    <dd>
+                                      <pre class="prettyprint"  lang-php>
+
+$json_out = $table->to_json();
+                                      </pre>
+                                    </dd>
+                                </dl>
+                                </dd></dl>
+
+                                <a href="#" name="table-query" id="table-query"></a>
+                                <a href="#" class="section section_major" name="table-query_anchor" id="table-query_anchor"></a>
+
+
+                                <h3>query()</h3>
+                                <p><div class="eks">
+                                    <pre class="prettyprint" lang-php style="font-size: 16px">TableQuery Table::<b>query</b>()</pre>
+                                  </div>
+                                </p>
+                                <dl><dd>
+                                    <p>
+                                      Create a query object for a table. See the <a class="" href="#tablequery">TableQuery Class</a> for further details.
+                                    </p>
+                                    <dl>
+                                      <dt><b>Parameters:</b></dt>
+                                      <dd><p>N/A</p></dd>
+                                    </dl>
+                                    <dl>
+                                      <dt><b>Returns:</b></dt>
+                                      <dd><p><code>TableQuery</code>: Query object</p></dd>
+                                    </dl>
+                                  </dl>
+
+
+	
+<!--
+				<a href="#" name="table-get_column_count" id="table-get_column_count"></a>
+				<a href="#" class="section section_major" name="table-get_column_count_anchor" id="table-get_column_count_anchor"></a>
+				<h4>get_column_count()</h4>
+                <p><div class="eks">
+                <pre class="prettyprint" lang-php style="font-size: 16px">int Table::<b>get_column_count</b>()</pre>
+            </div>
+            </p>
+                <dl><dd>
+                	<p>
+                	Get the number of columns in a table.
+                	</p>
+                	<dl>
+                		<dt><b>Parameters:</b></dt>
+                		<dd><p>None</p></dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Returns:</b></dt>
+                		<dd><p>Returns the number of columns as an <code>int</code></p></dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Example:</b></dt>
+                		<dd>
+							<pre class="prettyprint" lang-php>
+
+$column_count = $table->get_column_count();
+							</pre>
+                         </dd>
+                	</dl>
+                </dd></dl>
+-->
+
+
+                <a href="#" name="tablequery" id="tablequery"></a>
+                <a href="#" class="section section_minor" name="tablequery_anchor" id="tablequery_anchor"></a>
+                <h2>TableQuery Class</h2>
+                <p>
+                <code>TableQuery</code> objects are used to build-up queries.
+                </p>
+
+				<table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
+				<tbody><tr bgcolor="#CCCCFF" class="TableHeadingColor">
+				<th align="left" colspan="2"><font size="+2">
+				<b>Constructor Summary</b></font></th>
+				</tr>
+				<tr bgcolor="white" class="TableRowColor">
+				<td><code><b><a href="#tablequery">TableQuery</a></b> Table::query()</code>
+
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TableQuery class.</td>
+				</tr>
+				</tbody></table>
+
+                <a href="#" name="table-query" id="table-query"></a>
+                <a href="#" class="section section_major" name="table-query_anchor" id="table-query_anchor"></a>
+                <h3>query()</h3>
+                <p><div class="eks">
+                    <pre class="prettyprint" lang-php style="font-size: 16px">TableQuery Table::<b>query</b>()</pre>
+                  </div>
+                </p>
+                <dl><dd>
+                    <p>
+                      Create a query object for a table.
+                    </p>
+                    <dl>
+                      <dt><b>Parameters:</b></dt>
+                      <dd><p>N/A</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Returns:</b></dt>
+                      <dd><p><code>TableQuery</code>: Query object</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Query interface:</b></dt>
+                      <dd><p>Query objects are created by and associated with table objects. Query is build using a <a href="http://en.wikipedia.org/wiki/Fluent_interface">fluent interface</a> (method invocations can be daisy chained). Conditions are by default folded using logical-and. Query objects can be reused, and queries can be repeatly executed by the <tt>do()</tt> method (resembles the prepare/execute pattern in SQL clients).<p> The table shows the declared methods on TableQuery objects. All methods except <tt>do()</tt> returns the query object itself:</p></dd>
+                      <dd><p><table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
+                        	<tbody><tr bgcolor="#CCCCFF" class="TableHeadingColor">
+                              <th>Method</th><th>Alias</th><th>Description</th></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>equals</b>(string $column_name, mixed $value)</tt><td><tt>eq</tt></td><td>equal to</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>notEquals</b>(string $column_name, mixed $value)</tt></td><td><tt>neq</tt></td><td>not equal to</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>lessThan</b>(string $column_name, mixed $value)</tt></td><td><tt>lt</tt></td><td>less than</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>lessThanOrEqual</b>(string $column_name, mixed $value)</tt></td><td><tt>lte</tt></td><td>less than or equal to</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>greaterThan</b>(string $column_name, mixed $value)</tt></td><td><tt>gt</tt></td><td>greater than</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>greaterThanOrEqual</b>(string $column_name, mixed $value)</tt></td><td><tt>gte</tt></td><td>greater than or equal to</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>between</b>(string $column_name, mixed $value_1, mixed $value_2)</tt></td><td>N/A</td><td>belongs to interval (between <code>$value_1</code> and <code>$value_2</code></td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>contains</b>(string $column_name, string $substr)</tt></td><td>N/A</td><td>substring search</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>startsWith</b>(string $column_name, string $substr)</tt></td><td>N/A</td><td>substring match at the begining of the attribute</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>endsWith</b>(string $column_name, string $substr)</tt></td><td>N/A</td><td>substring match at the end at the attribute</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>group</b>()</tt></td><td>N/A</td><td><a href="#tablequery-group">begin</a> condition group ("left" parenthesis)</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>endGroup</b>()</tt></td><td>N/A</td><td><a href="#tablequery-endgroup">end</a> condition group ("right" parenthesis)</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>or</b>()</tt></td><td>N/A</td><td><a href="#tablequery-or">logical-or</a></td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>do</b>()</tt></td><td>N/A</td><td><a href="#tablequery-do">execute</a> a query</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt>int <b>count</b>()</tt></td><td>N/A</td><td><a href="#tablequery-count">count</a> the number of rows</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt>int <b>sum</b>(string $column_name)</tt></td><td>N/A</td><td><a href="#tablequery-sum">sum</a> the values of a specific column</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt>mixed <b>avg</b>(string $column_name)</tt></td><td>N/A</td><td>calculate the <a href="#tablequery-average">average</a> of a specific column</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt>mixed <b>min</b>(string $column_name)</tt></td><td>N/A</td><td>find <a href="#tablequery-min">min</a>inal value of a specific attribute</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt>mixed <b>max</b>(string $column_name)</tt></td><td>N/A</td><td>find <a href="#tablequery-max">max</a>imal value of a specific attribute</td></tr>
+                            </tbody>
+                          </table>
+                      </p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Examples:</b></dt>
+                      <dd>
+                        <pre class="prettyprint" lang-php>
+// Run a few queries
+$view1 = $table->query()->eq("age", 19)->do();
+$view2 = $table->query()->contains("name", "ill")->do();
+
+// Build query and run it later
+$query = $table->query()->gt("age", 19);
+$view3 = $query->do();
+
+// Re-run query after change
+$table[10]->age = 50;   // update age
+$view4 = $query->do();  // $view3 and $view4 are different result set
+                        </pre>
+                      </dd>
+                    </dl>
+                </dd></dl>
+
+                <a href="#" name="tablequery-group" id="tablequery-group"></a>
+                <a href="#" class="section section_major" name="tablequery-group_anchor" id="tablequery-group_anchor"></a>
+                <h4>group()</h4>
+                <p><div class="eks">
+                    <pre class="prettyprint" lang-php style="font-size: 16px">TableQuery TableQuery::<b>group</b>()</pre>
+                  </div>
+                </p>
+                <dl><dd>
+                    <p>
+                      Group conditions ("left" parenthesis). Group of conditions can be nested and they are conceptually a parenthesis (PHP does not allow overloading <tt>()</tt> as an operator or method).
+                    </p>
+                    <dl>
+                      <dt><b>Parameters:</b></dt>
+                      <dd><p>N/A</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Returns:</b></dt>
+                      <dd><p><b>TableQuery</b>: Table query object</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Example:</b></dt>
+                      <dd>
+                        <pre class="prettyprint" lang-php>
+$view = $table->query()->group()
+                           ->eq("age", 19)
+                           ->or()
+                           ->eq("age", 20)
+                       ->endGroup()
+                       ->do();
+                        </pre>
+                      </dd>
+                    </dl>
+                </dd></dl>
+
+                <a href="#" name="tablequery-endgroup" id="tablequery-endgroup"></a>
+                <a href="#" class="section section_major" name="tablequery-endgroup_anchor" id="tablequery-endgroup_anchor"></a>
+                <h4>endGroup()</h4>
+                <p><div class="eks">
+                    <pre class="prettyprint" lang-php style="font-size: 16px">TableQuery TableQuery::<b>endGroup</b>()</pre>
+                  </div>
+                </p>
+                <dl><dd>
+                    <p>
+                      Group conditions ("right" parenthesis).
+                    </p>
+                    <dl>
+                      <dt><b>Parameters:</b></dt>
+                      <dd><p>N/A</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Returns:</b></dt>
+                      <dd><p><b>TableQuery</b>: Table query object</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Example:</b></dt>
+                      <dd>
+                        <pre class="prettyprint" lang-php>
+$view = $table->query()->group()
+                           ->eq("age", 19)
+                           ->or()
+                           ->eq("age", 20)
+                       ->endGroup()
+                       ->do();
+                        </pre>
+                      </dd>
+                    </dl>
+                </dd></dl>
+
+                <a href="#" name="tablequery-or" id="tablequery-or"></a>
+                <a href="#" class="section section_major" name="tablequery-or_anchor" id="tablequery-or_anchor"></a>
+                <h4>or()</h4>
+                <p><div class="eks">
+                    <pre class="prettyprint" lang-php style="font-size: 16px">TableQuery TableQuery::<b>or</b>()</pre>
+                  </div>
+                </p>
+                <dl><dd>
+                    <p>
+                      Logical-or.
+                    </p>
+                    <dl>
+                      <dt><b>Parameters:</b></dt>
+                      <dd><p>N/A</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Returns:</b></dt>
+                      <dd><p><b>TableQuery</b>: Table query object</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Example:</b></dt>
+                      <dd>
+                        <pre class="prettyprint" lang-php>
+$view = $table->query()->group()
+                           ->eq("age", 19)
+                           ->or()
+                           ->eq("age", 20)
+                       ->endGroup()
+                       ->do();
+                        </pre>
+                      </dd>
+                    </dl>
+                </dd></dl>
+                
+                <a href="#" name="tablequery-do" id="table-do"></a>
+                <a href="#" class="section section_major" name="tablequery-do_anchor" id="tablequery-do_anchor"></a>
+                <h4>do()</h4>
+                <p><div class="eks">
+                    <pre class="prettyprint" lang-php style="font-size: 16px">TableView TableQuery::<b>do</b>()</pre>
+                  </div>
+                </p>
+                <dl><dd>
+                    <p>
+                      Execute a query. See the <a class="" href="#tableview">TableView Class</a> for further details.
+                    </p>
+                    <dl>
+                      <dt><b>Parameters:</b></dt>
+                      <dd><p>N/A</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Returns:</b></dt>
+                      <dd><p><b>TableView</b>: Table view</p></dd>
+                    </dl>
+                    <dt><b>Example:</b></dt>
+                  <dd>
+                    <pre class="prettyprint" lang-php>
+$query = $table->query()->eq("age", 19);
+$view = $query->do();
+                    </pre>
+                  </dd>
+                </dl>
+               </dd></dl>
+
+
+                <a href="#" name="tablequery-count" id="tablequery-count"></a>
+                <a href="#" class="section section_major" name="tablequery-count_anchor" id="tablequery-count_anchor"></a>
+                <h4>count()</h4>
+                <p><div class="eks">
+                    <pre class="prettyprint" lang-php style="font-size: 16px">int TableQuery::<b>count</b>()</pre>
+                  </div>
+                </p>
+                <dl><dd>
+                    <p>
+                      Returns the number of rows.
+                    </p>
+                    <dl>
+                      <dt><b>Parameters:</b></dt>
+                      <dd><p>N/A</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Returns:</b></dt>
+                      <dd><p><b>int</b>: number of rows</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Example:</b></dt>
+                      <dd>
+                        <pre class="prettyprint" lang-php>
+$view = $table->query()->group()
+                           ->eq("age", 19)
+                           ->or()
+                           ->eq("age", 20)
+                       ->endGroup()
+                       ->count();
+                        </pre>
+                      </dd>
+                    </dl>
+                </dd></dl>
+
+
+                <a href="#" name="tablequery-sum" id="tablequery-sum"></a>
+                <a href="#" class="section section_major" name="tablequery-sum_anchor" id="tablequery-sum_anchor"></a>
+                <h4>sum()</h4>
+                <p><div class="eks">
+                    <pre class="prettyprint" lang-php style="font-size: 16px">int TableQuery::<b>sum</b>(string $column_name)</pre>
+                  </div>
+                </p>
+                <dl><dd>
+                    <p>
+                      Calculates the sum.
+                    </p>
+                    <dl>
+                      <dt><b>Parameters:</b></dt>
+                      <dd><p><b>string $coloum_name</b>: the name of the column</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Returns:</b></dt>
+                      <dd><p><b>int</b>: the sum</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Example:</b></dt>
+                      <dd>
+                        <pre class="prettyprint" lang-php>
+$view = $table->query()->group()
+                           ->eq("age", 19)
+                           ->or()
+                           ->eq("age", 20)
+                       ->endGroup()
+                       ->sum("weight");
+                        </pre>
+                      </dd>
+                    </dl>
+                </dd></dl>
+
+                <a href="#" name="tablequery-avg" id="tablequery-avg"></a>
+                <a href="#" class="section section_major" name="tablequery-avg_anchor" id="tablequery-avg_anchor"></a>
+                <h4>avg()</h4>
+                <p><div class="eks">
+                    <pre class="prettyprint" lang-php style="font-size: 16px">mixed TableQuery::<b>avg</b>(string $column_name)</pre>
+                  </div>
+                </p>
+                <dl><dd>
+                    <p>
+                      Calculates the average
+                    </p>
+                    <dl>
+                      <dt><b>Parameters:</b></dt>
+                      <dd><p><b>string $column_name</b>: the column name</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Returns:</b></dt>
+                      <dd><p><b>mixed</b>: the average</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Example:</b></dt>
+                      <dd>
+                        <pre class="prettyprint" lang-php>
+$view = $table->query()->group()
+                           ->eq("age", 19)
+                           ->or()
+                           ->eq("age", 20)
+                       ->endGroup()
+                       ->avg("weight");
+                        </pre>
+                      </dd>
+                    </dl>
+                </dd></dl>
+
+                <a href="#" name="tablequery-max" id="tablequery-max"></a>
+                <a href="#" class="section section_major" name="tablequery-max_anchor" id="tablequery-max_anchor"></a>
+                <h4>max()</h4>
+                <p><div class="eks">
+                    <pre class="prettyprint" lang-php style="font-size: 16px">mixed TableQuery::<b>max</b>(string $column_name)</pre>
+                  </div>
+                </p>
+                <dl><dd>
+                    <p>
+                      The maximum value of a column
+                    </p>
+                    <dl>
+                      <dt><b>Parameters:</b></dt>
+                      <dd><p><b>string $column_name</b>: the column name</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Returns:</b></dt>
+                      <dd><p><b>mixed</b>: the miximal value</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Example:</b></dt>
+                      <dd>
+                        <pre class="prettyprint" lang-php>
+$view = $table->query()->group()
+                           ->eq("age", 19)
+                           ->or()
+                           ->eq("age", 20)
+                       ->endGroup()
+                       ->max("weight");
+                        </pre>
+                      </dd>
+                    </dl>
+                </dd></dl>
+
+                <a href="#" name="tablequery-min" id="tablequery-min"></a>
+                <a href="#" class="section section_major" name="tablequery-min_anchor" id="tablequery-min_anchor"></a>
+                <h4>min()</h4>
+                <p><div class="eks">
+                    <pre class="prettyprint" lang-php style="font-size: 16px">mixed TableQuery::<b>min</b>(string $column_name)</pre>
+                  </div>
+                </p>
+                <dl><dd>
+                    <p>
+                      The maximal value of a column
+                    </p>
+                    <dl>
+                      <dt><b>Parameters:</b></dt>
+                      <dd><p><b>string $column_name</b>: the column name</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Returns:</b></dt>
+                      <dd><p><b>mixed</b>: the minimal value</p></dd>
+                    </dl>
+                    <dl>
+                      <dt><b>Example:</b></dt>
+                      <dd>
+                        <pre class="prettyprint" lang-php>
+$view = $table->query()->group()
+                           ->eq("age", 19)
+                           ->or()
+                           ->eq("age", 20)
+                       ->endGroup()
+                       ->min("weight");
+                        </pre>
+                      </dd>
+                    </dl>
+                </dd></dl>
+
+
+                <a href="#" name="tableview" id="tableview"></a>
+                <a href="#" class="section section_minor" name="tableview_anchor" id="tableview_anchor"></a>
+                <h2>TableView Class</h2>
+                <p>
+                The <code>TableQuery::do()</code> returns a <code>TableView</code> object. You can interact with the TableView just as a regular table, and all changes to it will propagate to the original <a href="#table">table</a>.
+                </p>
+
+				<table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
+				<tbody><tr bgcolor="#CCCCFF" class="TableHeadingColor">
+				<th align="left" colspan="2"><font size="+2">
+				<b>Constructor Summary</b></font></th>
+				</tr>
+				<tr bgcolor="white" class="TableRowColor">
+				<td><code><b><a href="#tableview">TableView</a></b> TableQuery::do()</code>
+
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TableView class.</td>
+				</tr>
+				</tbody></table>
+
+                <table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
+                <tbody><tr bgcolor="#CCCCFF" class="TableHeadingColor">
+                <th align="left" colspan="2"><font size="+2">
+                <b>Method Summary</b></font></th>
+                </tr>
+                
+                <tr bgcolor="white" class="TableRowColor">
+                <td align="right" valign="top" width="1%"><font size="-1">
+                <code>&nbsp;void</code></font></td>
+                <td><code><b><a href="#tableview-get_source_rowid">get_source_rowid</a></b>()</code>
+                <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the row number in source table</td>
+                </tr>
+
+                <tr bgcolor="white" class="TableRowColor">
+                <td align="right" valign="top" width="1%"><font size="-1">
+                <code>&nbsp;void</code></font></td>
+                <td><code><b><a href="#tableview-clear">clear</a></b>()</code>
+                <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Remove all rows</td>
+                </tr>
+
+                <tr bgcolor="white" class="TableRowColor">
+                <td align="right" valign="top" width="1%"><font size="-1">
+                <code>&nbsp;void</code></font></td>
+                <td><code><b><a href="#tableview-unset">unset</a></b>($row)</code>
+                <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Remove one row</td>
+                </tr>
+                </tbody></table>
+                <br>
+
+           			<a href="#" name="tableview-get_source_rowid" id="tableview-get_source_rowid"></a>
+					<a href="#" class="section section_minor" name="tableview-get_source_rowid_anchor" id="tableview-get_source_rowid_anchor"></a>
+					<h4>get_source_rowid()</h4>
+	                <p><div class="eks">
+	                <pre class="prettyprint" lang-php style="font-size: 16px">int TableView::<b>get_source_rowid</b>(int $index)</pre>
+	            </div>
+	            </p>
+	                <dl><dd>
+	                	<p>
+	                		Get the row index for the source table
+	                	</p>
+	                	<dl>
+	                		<dt><b>Parameters:</b></dt>
+	                		<dd><p><code>int $index</code>: Row number in the table view</p></dd>
+	                	</dl>
+	                	<dl>
+	                		<dt><b>Returns:</b></dt>
+	                		<dd><p><code>int</code> the row number in the source table.</p></dd>
+	                	</dl>
+	                	<dl>
+	                		<dt><b>Example:</b></dt>
+	                		<dd>
+								<pre class="prettyprint" lang-php>
+
+$view = $table->query()->eq("name", "Jimmy")->do();
+echo $view->get_source_rowid(5);
+
+								</pre>
+	                         </dd>
+	                	</dl>
+	                </dd></dl>
+
+
+           			<a href="#" name="tableview-clear" id="tableview-clear"></a>
+					<a href="#" class="section section_minor" name="tableview-clear_anchor" id="tableview-clear_anchor"></a>
+					<h4>clear()</h4>
+	                <p><div class="eks">
+	                <pre class="prettyprint" lang-php style="font-size: 16px">TableView::<b>clear</b>()</pre>
+	            </div>
+	            </p>
+	                <dl><dd>
+	                	<p>
+	                		Remove all rows in a table view - and the corresponding rows in the source table.
+	                	</p>
+	                	<dl>
+	                		<dt><b>Parameters:</b></dt>
+	                		<dd><p>N/A</p></dd>
+	                	</dl>
+	                	<dl>
+	                		<dt><b>Returns:</b></dt>
+	                		<dd><p>N/A</p></dd>
+	                	</dl>
+	                	<dl>
+	                		<dt><b>Example:</b></dt>
+	                		<dd>
+								<pre class="prettyprint" lang-php>
+
+$view = $table->query()->eq("name", "Jimmy")->clear();
+
+								</pre>
+	                         </dd>
+	                	</dl>
+	                </dd></dl>
+
+           			<a href="#" name="tableview-unset" id="tableview-unset"></a>
+					<a href="#" class="section section_minor" name="tableview-unset_anchor" id="tableview-unset_anchor"></a>
+					<h4>unset()</h4>
+	                <p><div class="eks">
+	                <pre class="prettyprint" lang-php style="font-size: 16px"><b>unset</b>($row)</pre>
+	            </div>
+	            </p>
+	                <dl><dd>
+	                	<p>
+	                		Remove a specific row from the table view and in the corresponding source table.
+	                	</p>
+	                	<dl>
+	                		<dt><b>Parameters:</b></dt>
+	                		<dd><p><code>mixed $row</code>: The row</p></dd>
+	                	</dl>
+	                	<dl>
+	                		<dt><b>Returns:</b></dt>
+	                		<dd><p>N/A</p></dd>
+	                	</dl>
+	                	<dl>
+	                		<dt><b>Example:</b></dt>
+	                		<dd>
+								<pre class="prettyprint" lang-php>
+
+$view = $table->query()->eq("name", "Jimmy")->do();
+unset($view[5]);
+
+								</pre>
+	                         </dd>
+	                	</dl>
+	                </dd></dl>
+
+                <a href="#" name="group" id="group"></a>
+                <a href="#" class="section section_minor" name="group_anchor" id="group_anchor"></a>
+                <h2>Group Class</h2>
+                <p>
+                The <code>Group</code> is a container for <a href="#table">tables</a> and it allows the tables to be serialized to disk and memory.
+                </p>
+				<table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
+				<tbody><tr bgcolor="#CCCCFF" class="TableHeadingColor">
+				<th align="left" colspan="2"><font size="+2">
+				<b>Constructor Summary</b></font></th>
+				</tr>
+				<tr bgcolor="white" class="TableRowColor">
+				<td><code><b><a href="#group">Group</a></b>()</code>
+
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Group class.</td>
+				</tr>
+				</tbody></table>
+
+				</p>
+				</p>
+
+                <table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
+                <tbody><tr bgcolor="#CCCCFF" class="TableHeadingColor">
+                <th align="left" colspan="2"><font size="+2">
+                <b>Method Summary</b></font></th>
+                </tr>
+                
+                <tr bgcolor="white" class="TableRowColor">
+                <td align="right" valign="top" width="1%"><font size="-1">
+                <code>&nbsp;void</code></font></td>
+                <td><code><b><a href="#group-create_table">create_table</a></b>()</code>
+                <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a table</td>
+                </tr>
+
+                <tr bgcolor="white" class="TableRowColor">
+                <td align="right" valign="top" width="1%"><font size="-1">
+                <code>&nbsp;void</code></font></td>
+                <td><code><b><a href="#group-has_table">has_table</a></b>()</code>
+                <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Check if group has a specific named table</td>
+                </tr>
+                
+                <tr bgcolor="white" class="TableRowColor">
+                <td align="right" valign="top" width="1%"><font size="-1">
+                <code>&nbsp;void</code></font></td>
+                <td><code><b><a href="#group-get_table">get_table</a></b>()</code>
+                <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get a specific table</td>
+                </tr>
+                
+                <tr bgcolor="white" class="TableRowColor">
+                <td align="right" valign="top" width="1%"><font size="-1">
+                <code>&nbsp;void</code></font></td>
+                <td><code><b><a href="#group-write_to_file">write_to_file</a></b>()</code>
+                <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Write table group to disk</td>
+                </tr>
+                
+                <tr bgcolor="white" class="TableRowColor">
+                <td align="right" valign="top" width="1%"><font size="-1">
+                <code>&nbsp;string</code></font></td>
+                <td><code><b><a href="#group-write_to_mem">write_to_mem</a></b>()</code>
+                <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Write table group to memory buffer</td>
+                </tr>
+<!--
+                <tr bgcolor="white" class="TableRowColor">
+                <td align="right" valign="top" width="1%"><font size="-1">
+                <code>&nbsp;bool</code></font></td>
+                <td><code><b><a href="">has_table</a></b>()</code>
+                <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Checks if group contains a table</td>
+                </tr>
+-->                
+                </tbody></table>
+                <br>
+                
+                <h3>Constructor Detail</h3>
+
+                <a href="#" name="group-constructor" id="group-constructor"></a>
+				<a href="#" class="section section_minor" name="group-constructor_anchor" id="group-constructor_anchor"></a>
+				<h4>constructor</h4>
+                <p><div class="eks">
+                <pre class="prettyprint" lang-php style="font-size: 16px">new <b>Group</b>()
+new <b>Group</b>(string $source, string $filename_or_buffer)</pre>
+            </div>
+            </p>
+                <dl><dd>
+                	<p>
+                	Creates a table group.
+                	</p>
+                	<dl>
+                		<dt><b>Parameters:</b></dt>
+                		<dd>
+	                    <p>No arguments: Creates a new group.</p>
+	                
+	                    <p><code>$source</code>: <code>"file"</code> (named file on disk) or <code>"memory"</code> (volatile buffer)</p>
+	                    <p><code>$filename_or_buffer</code>: If source is <code>"file"</code>, this should be the path to the file. If <code>"memory"</code> it should be a string containing the serialized group.</p>
+	                    </dd>
+                	</dl>
+                    <dl>
+                        <dt><b>Returns:</b></dt>
+                        <dd>A group object</dd>
+                    </dl>
+                	<dl>
+                		<dt><b>Example:</b></dt>
+                		<dd>
+							<pre class="prettyprint" lang-php>
+
+// Create new (empty) Group
+$group = new Group();
+
+// Load a group from disk
+$group_from_file = new Group("file", "emplyees.tables");
+
+// Load a group from memory
+$group_from_mem = new Group("memory", $buffer);
+							</pre>
+                         </dd>
+                	</dl>
+                </dd></dl>
+
+                <h3>Method Detail</h3>
+
+				<a href="#" name="group-create_table" id="group-create_table"></a>
+				<a href="#" class="section section_minor" name="group-create_table_anchor" id="group-create_table_anchor"></a>
+				<h4>create_table()</h4>
+                <p><div class="eks">
+                <pre class="prettyprint" lang-php style="font-size: 16px">Table Group::<b>create_table</b>(string table_name, array $schema)</pre>
+            </div>
+            </p>
+                <dl><dd>
+                	<p>
+                		...
+                	</p>
+                	<dl>
+                        <p>
+                		<dt><b>Parameters:</b></dt>
+                		<dd>
+	                    <code>String table_name</code>: Name of the table<br>
+	                    <code>array($key => $value)</code>: Associative array, where <code>$key</code> is the column name and <code>$value</code> is the column type (see <a href="#table-constructor">Table constructor</a> for details).
+                        </p>
+                        <p>
+                        <b>Valid column types:</b>
+                        </p>
+	                    <p>
+	                      <pre class="prettyprint" lang-php>
+"string": column of strings.
+"int":    column of integers.
+"bool":   column of booleans.
+"date":   columb of DateTime objects.
+array():  column of sub-tables.
+	                      </pre>
+                        </p>
+	                    </dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Example:</b></dt>
+                		<dd>
+							<pre class="prettyprint" lang-php>
+
+$table = $group->create_table("employees", array("name"  => "string",
+                                                 "age"   => "int",
+                                                 "hired" => "bool"));
+							</pre>
+                         </dd>
+                	</dl>
+                </dd></dl>
+
+           			<a href="#" name="group-has_table" id="group-has_table"></a>
+					<a href="#" class="section section_minor" name="group-has_table_anchor" id="group-has_table_anchor"></a>
+					<h4>has_table()</h4>
+	                <p><div class="eks">
+	                <pre class="prettyprint" lang-php style="font-size: 16px">bool Group::<b>has_table</b>(string $table_name)</pre>
+	            </div>
+	            </p>
+	                <dl><dd>
+	                	<p>
+	                		Check if group contains a specific named table.
+	                	</p>
+	                	<dl>
+	                		<dt><b>Parameters:</b></dt>
+	                		<dd><p><code>string $table_name</code>: Name of the table you wish to look for</p></dd>
+	                	</dl>
+	                	<dl>
+	                		<dt><b>Returns:</b></dt>
+	                		<dd><p><code>true</code> if the table exits, otherwise <code>false</code>.</p></dd>
+	                	</dl>
+	                	<dl>
+	                		<dt><b>Example:</b></dt>
+	                		<dd>
+								<pre class="prettyprint" lang-php>
+
+if ($group->has_table("employees")) {
+	echo "table found";
+}
+								</pre>
+	                         </dd>
+	                	</dl>
+	                </dd></dl>
+		
+
+				<a href="#" name="group-get_table" id="group-get_table"></a>
+				<a href="#" class="section section_minor" name="group-get_table_anchor" id="group-get_table_anchor"></a>
+				<h4>get_table()</h4>
+                <p><div class="eks">
+                <pre class="prettyprint" lang-php style="font-size: 16px">Table Group::<b>get_table</b>(string $table_name)</pre>
+            </div>
+            </p>
+                <dl><dd>
+                	<p>
+                		Load a specific table from a group.
+                	</p>
+                	<dl>
+                		<dt><b>Parameters:</b></dt>
+                		<dd><p><code>string $table_name</code>: Load table named <code>$table_name</code> from the group</p></dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Return:</b></dt>
+                		<dd><p>A table object</p></dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Example:</b></dt>
+                		<dd>
+							<pre class="prettyprint" lang-php>
+
+$employees_mem = $group_from_mem->get_table("employees");
+							</pre>
+                         </dd>
+                	</dl>
+                </dd></dl>
+
+				<a href="#" name="group-write_to_file" id="group-write_to_file"></a>
+				<a href="#" class="section section_minor" name="group-write_to_file_anchor" id="group-write_to_file_anchor"></a>
+
+				<h4>write_to_file()</h4>
+                <p><div class="eks">
+                <pre class="prettyprint" lang-php style="font-size: 16px">Group::<b>write_to_file</b>(string $filename)</pre>
+            </div>
+            </p>
+                <dl><dd>
+                	<p>
+                	Write table group to disk.
+                	</p>
+                	<dl>
+                		<dt><b>Parameters:</b></dt>
+                		<dd><p><code>string $filename</code>: Filename of data file</p></dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Returns:</b></dt>
+                		<dd><p>void</p></dd>
+                	</dl>
+                	<dl>
+                		<dt><p><b>Example:</b></p></dt>
+                		<dd>
+							<pre class="prettyprint" lang-php>
+
+// Write to disk
+$group->write_to_file("emplyees.tables");
+							</pre>
+                         </dd>
+                	</dl>
+                </dd></dl>
+
+				<a href="#" name="group-write_to_mem" id="group-write_to_mem"></a>
+				<a href="#" class="section section_minor" name="group-write_to_mem_anchor" id="group-write_to_mem_anchor"></a>
+				<h4>write_to_mem()</h4>
+                <p><div class="eks">
+                <pre class="prettyprint" lang-php style="font-size: 16px">string Group::<b>write_to_mem</b>()</pre>
+            </div>
+            </p>
+                <dl><dd>
+                	<p>
+                	Write table group to memory buffer.
+                	</p>
+                	<dl>
+                		<dt><b>Parameters:</b></dt>
+                		<dd><p>None</p></dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Returns:</b></dt>
+                		<dd><p>string containing group in serialized form (this is binary data).</p></dd>
+                	</dl>
+                	<dl>
+                		<dt><p><b>Example:</b></p></dt>
+                		<dd>
+							<pre class="prettyprint" lang-php>
+// Write same group to memory buffer
+$buffer = $group->write_to_mem();
+							</pre>
+                         </dd>
+                	</dl>
+                </dd></dl>
+			</div>
+			
+			
+			<script type="text/javascript">
+			$(document).ready(function() {
+			new App.Views.Docs({ el: $("body"), accordian: true });
+			});
+
+			$(".toggled-code").each(function (index) {
+			$(".code-container .code-section:first-child", this).show();
+			$(".toggles .toggle-item:first-child", this).addClass("selected");
+
+			$(".toggles .toggle-item a", this).click(function () {
+			$(this).parent().siblings().removeClass("selected");
+			$(this).parent().addClass("selected");
+
+			var code_sections = $(this).parent().parent().parent().find(".code-container .code-section");
+			code_sections.hide();
+
+			var my_index = $(this).parent().index();
+			$(code_sections[my_index]).show();
+
+			return false;
+			});
+			});
+			$(".question_tip").click(function(e) {
+			return false;
+			});
+
+			// Initialize backbone history
+			if(Backbone.history) Backbone.history.start();
+
+			// Disable all buttons on click
+			$('form').submit(function(e) {
+			$(this).find("button").attr("disabled", "disabled").addClass("disabled");
+			});
+
+			</script>
+		</div>
+	</body>
+</html>
+
