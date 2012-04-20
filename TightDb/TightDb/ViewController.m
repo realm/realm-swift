@@ -10,13 +10,6 @@ TDB_TABLE_2(TestTableGroup,
 			String,     First,
 			Int,        Second)
 
-#define TIGHT_IMPL
-#include "TightDb.h"
-
-TDB_TABLE_2(TestTableGroup,
-			String,     First,
-			Int,        Second)
-
 
 
 
