@@ -223,7 +223,7 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 { \\
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \\
 } \\
--(TableName##_Cursor *)back \\
+-(TableName##_Cursor *)lastObject \\
 { \\
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \\
 } \\
@@ -296,7 +296,7 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1}%slurp
 -(TableName##_##Query *)getQuery; \\
 -(TableName##_Cursor *)add; \\
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \\
--(TableName##_Cursor *)back; \\
+-(TableName##_Cursor *)lastObject; \\
 @end
 
 #undef TDB_TABLE_${num_cols}

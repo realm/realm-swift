@@ -173,7 +173,7 @@
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)back \
+-(TableName##_Cursor *)lastObject \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -366,7 +366,7 @@
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)back \
+-(TableName##_Cursor *)lastObject \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -580,7 +580,7 @@
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)back \
+-(TableName##_Cursor *)lastObject \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -815,7 +815,7 @@
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)back \
+-(TableName##_Cursor *)lastObject \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -1071,7 +1071,7 @@
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)back \
+-(TableName##_Cursor *)lastObject \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -1348,7 +1348,7 @@
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)back \
+-(TableName##_Cursor *)lastObject \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -1646,7 +1646,7 @@
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)back \
+-(TableName##_Cursor *)lastObject \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -1965,7 +1965,7 @@
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)back \
+-(TableName##_Cursor *)lastObject \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -2012,7 +2012,7 @@
 -(TableName##_##Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)back; \
+-(TableName##_Cursor *)lastObject; \
 @end
 
 #undef TDB_TABLE_1
@@ -2066,7 +2066,7 @@ TDB_TABLE_IMPL_1(TableName    ,CType1, CName1    )
 -(TableName##_##Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)back; \
+-(TableName##_Cursor *)lastObject; \
 @end
 
 #undef TDB_TABLE_2
@@ -2125,7 +2125,7 @@ TDB_TABLE_IMPL_2(TableName    ,CType1, CName1    ,CType2, CName2    )
 -(TableName##_##Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)back; \
+-(TableName##_Cursor *)lastObject; \
 @end
 
 #undef TDB_TABLE_3
@@ -2189,7 +2189,7 @@ TDB_TABLE_IMPL_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 -(TableName##_##Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)back; \
+-(TableName##_Cursor *)lastObject; \
 @end
 
 #undef TDB_TABLE_4
@@ -2258,7 +2258,7 @@ TDB_TABLE_IMPL_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 -(TableName##_##Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)back; \
+-(TableName##_Cursor *)lastObject; \
 @end
 
 #undef TDB_TABLE_5
@@ -2332,7 +2332,7 @@ TDB_TABLE_IMPL_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 -(TableName##_##Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)back; \
+-(TableName##_Cursor *)lastObject; \
 @end
 
 #undef TDB_TABLE_6
@@ -2411,7 +2411,7 @@ TDB_TABLE_IMPL_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 -(TableName##_##Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)back; \
+-(TableName##_Cursor *)lastObject; \
 @end
 
 #undef TDB_TABLE_7
@@ -2495,7 +2495,7 @@ TDB_TABLE_IMPL_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 -(TableName##_##Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)back; \
+-(TableName##_Cursor *)lastObject; \
 @end
 
 #undef TDB_TABLE_8
