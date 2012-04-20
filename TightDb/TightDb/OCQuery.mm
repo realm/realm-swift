@@ -4,22 +4,22 @@
 //
 
 #import "OCQuery.h"
-#include "query/QueryInterface.h"
 #import "OCTable.h"
 #import "OCTablePriv.h"
+#include "TightDb/query/QueryInterface.h"
 
 
 #pragma mark - OCTableView secrets
 
 @interface OCTableView()
-+(OCTableView *)tableViewWithTableView:(TableView)table;
++(OCTableView *)tableViewWithTableView:(tightdb::TableView)table;
 @end
 
 #pragma mark - OCQuery
 
 @implementation OCQuery
 {
-    Query *_query;
+    tightdb::Query *_query;
 }
 
 
@@ -27,12 +27,12 @@
 {
     self = [super init];
     if (self) {
-        _query = new Query();
+        _query = new tightdb::Query();
     }
     return self;
 }
 
--(Query *)getQuery
+-(tightdb::Query *)getQuery
 {
     return _query;
 }
@@ -77,9 +77,9 @@
 
 #pragma mark - OCXQueryAccessorInt
 
-class XQueryAccessorIntOC : public XQueryAccessorInt {
+class XQueryAccessorIntOC : public tightdb::XQueryAccessorInt {
 public:
-XQueryAccessorIntOC(size_t columnId, Query *query) : XQueryAccessorInt(columnId)
+    XQueryAccessorIntOC(size_t columnId, tightdb::Query *query) : XQueryAccessorInt(columnId)
 {
     m_query = query;
 }
@@ -132,9 +132,9 @@ XQueryAccessorIntOC(size_t columnId, Query *query) : XQueryAccessorInt(columnId)
 
 #pragma mark - OCXQueryAccessorBool
 
-class XQueryAccessorBoolOC : public XQueryAccessorBool {
+class XQueryAccessorBoolOC : public tightdb::XQueryAccessorBool {
 public:
-XQueryAccessorBoolOC(size_t columnId, Query *query) : XQueryAccessorBool(columnId)
+XQueryAccessorBoolOC(size_t columnId, tightdb::Query *query) : XQueryAccessorBool(columnId)
 {
     m_query = query;
 }
@@ -163,9 +163,9 @@ XQueryAccessorBoolOC(size_t columnId, Query *query) : XQueryAccessorBool(columnI
 
 #pragma mark - OCXQueryAccessorString
 
-class XQueryAccessorStringOC : public XQueryAccessorString {
+class XQueryAccessorStringOC : public tightdb::XQueryAccessorString {
 public:
-XQueryAccessorStringOC(size_t columnId, Query *query) : XQueryAccessorString(columnId)
+XQueryAccessorStringOC(size_t columnId, tightdb::Query *query) : XQueryAccessorString(columnId)
 {
     m_query = query;
 }

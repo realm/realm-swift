@@ -4,13 +4,13 @@
 //
 
 #import "OCGroup.h"
-#import "Group.h"
 #import "OCTable.h"
 #import "OCTablePriv.h"
+#import "TightDb/Group.h"
 
 
 @interface OCGroup()
-@property(nonatomic) Group *group;
+@property(nonatomic) tightdb::Group *group;
 @end
 @implementation OCGroup
 {
@@ -21,21 +21,21 @@
 +(OCGroup *)group
 {
     OCGroup *group = [[OCGroup alloc] init];
-    group.group = new Group();
+    group.group = new tightdb::Group();
     return group;    
 }
 
 +(OCGroup *)groupWithFilename:(NSString *)filename
 {
     OCGroup *group = [[OCGroup alloc] init];
-    group.group = new Group([filename UTF8String]);
+    group.group = new tightdb::Group([filename UTF8String]);
     return group;
 }
 
 +(OCGroup *)groupWithBuffer:(const char *)buffer len:(size_t)len
 {
     OCGroup *group = [[OCGroup alloc] init];
-    group.group = new Group(buffer,len);
+    group.group = new tightdb::Group(buffer,len);
     return group;
 }
 
