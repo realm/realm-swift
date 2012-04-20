@@ -4,7 +4,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import "Table.h"
 
 #pragma mark - Private Table interface
 
