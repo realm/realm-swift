@@ -22,9 +22,9 @@
 		E93DBAAB1541A2C40098E26C /* Query.h in Headers */ = {isa = PBXBuildFile; fileRef = E93DBAA41541A2C40098E26C /* Query.h */; };
 		E93DBAAC1541A2C40098E26C /* Table.h in Headers */ = {isa = PBXBuildFile; fileRef = E93DBAA51541A2C40098E26C /* Table.h */; };
 		E93DBAAD1541A2C40098E26C /* TightDb.h in Headers */ = {isa = PBXBuildFile; fileRef = E93DBAA81541A2C40098E26C /* TightDb.h */; };
-		E94A8BF81541DAC200B174B5 /* libtightdb_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94A8BF71541DAC200B174B5 /* libtightdb_ios.a */; };
-		E94A8BFA1541DAEE00B174B5 /* libtightdb_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94A8BF71541DAC200B174B5 /* libtightdb_ios.a */; };
 		E94A8C031541EF9700B174B5 /* MACTestTutorial.m in Sources */ = {isa = PBXBuildFile; fileRef = E94A8C021541EF9700B174B5 /* MACTestTutorial.m */; };
+		E94A8C081541F7FC00B174B5 /* libtightdb_debug_all.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94A8C071541F7FC00B174B5 /* libtightdb_debug_all.a */; };
+		E94A8C091541F81E00B174B5 /* libtightdb_debug_all.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94A8C071541F7FC00B174B5 /* libtightdb_debug_all.a */; };
 		E99E8DAE154155300048E3D8 /* Cursor.mm in Sources */ = {isa = PBXBuildFile; fileRef = E99E8DAC154155300048E3D8 /* Cursor.mm */; };
 		E99E8DB0154158510048E3D8 /* Cursor.mm in Sources */ = {isa = PBXBuildFile; fileRef = E99E8DAC154155300048E3D8 /* Cursor.mm */; };
 		E9BFFBDA153EA37600035C64 /* Query.mm in Sources */ = {isa = PBXBuildFile; fileRef = E908395D153DE27A0065A8C3 /* Query.mm */; };
@@ -84,6 +84,7 @@
 		E94A8BF71541DAC200B174B5 /* libtightdb_ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtightdb_ios.a; path = "../native/lib/Debug-iphonesimulator/libtightdb_ios.a"; sourceTree = "<group>"; };
 		E94A8C011541EF9700B174B5 /* MACTestTutorial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MACTestTutorial.h; sourceTree = "<group>"; };
 		E94A8C021541EF9700B174B5 /* MACTestTutorial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MACTestTutorial.m; sourceTree = "<group>"; };
+		E94A8C071541F7FC00B174B5 /* libtightdb_debug_all.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtightdb_debug_all.a; path = ../native/lib/libtightdb_debug_all.a; sourceTree = "<group>"; };
 		E99E8DAC154155300048E3D8 /* Cursor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Cursor.mm; sourceTree = "<group>"; };
 		E9D58B781541A5DF009150B1 /* libTightDbOC.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTightDbOC.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9D58B7C1541A5DF009150B1 /* TightDbOC-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TightDbOC-Prefix.pch"; sourceTree = "<group>"; };
@@ -119,7 +120,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E94A8BFA1541DAEE00B174B5 /* libtightdb_ios.a in Frameworks */,
+				E94A8C091541F81E00B174B5 /* libtightdb_debug_all.a in Frameworks */,
 				E9D58B791541A5DF009150B1 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -147,7 +148,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E94A8BF81541DAC200B174B5 /* libtightdb_ios.a in Frameworks */,
+				E94A8C081541F7FC00B174B5 /* libtightdb_debug_all.a in Frameworks */,
 				E9FFD257153C774C00719326 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -249,6 +250,7 @@
 		E9FFD248153C774C00719326 = {
 			isa = PBXGroup;
 			children = (
+				E94A8C071541F7FC00B174B5 /* libtightdb_debug_all.a */,
 				E94A8BF71541DAC200B174B5 /* libtightdb_ios.a */,
 				E9D58B8D1541BA5D009150B1 /* libtightdb.a */,
 				E9FFD258153C774C00719326 /* TightDb */,
@@ -557,6 +559,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../native/lib/Debug-iphoneos\"",
 					"\"$(SRCROOT)/../native/lib/Debug-iphonesimulator\"",
+					"\"$(SRCROOT)/../native/lib\"",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -574,6 +577,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../native/lib/Release-iphoneos\"",
 					"\"$(SRCROOT)/../native/lib/Debug-iphonesimulator\"",
+					"\"$(SRCROOT)/../native/lib\"",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
