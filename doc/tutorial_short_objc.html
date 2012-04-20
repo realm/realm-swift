@@ -185,14 +185,14 @@ To access the individual rows of our table, we use the <tt>objectAtIndex</tt> me
 </p>
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
 <pre class="prettyprint" lang-cpp=""> // Getting values directly
- const char* name = [table objectAtIndex:5].Name;   // =&gt; 'Anni'
+ NSString* name = [people objectAtIndex:5].Name;    // =&gt; 'Anni'
  // Using a cursor 
- PeopleTable_Cursor myRow = [table objectAtIndex:5];
+ PeopleTable_Cursor *myRow = [people objectAtIndex:5];
  int64_t age = myRow.Age;                           // =&gt; 54
  BOOL hired  = myRow.Hired;                         // =&gt; true
 
  // Setting values
- [[table objectAtIndex:5] setAge:43];               // Getting younger
+ [[people objectAtIndex:5] setAge:43];              // Getting younger
  // or with dot-syntax:
  myRow.Age += 1;                                    // Happy birthday!
 </pre>
@@ -201,7 +201,7 @@ To access the individual rows of our table, we use the <tt>objectAtIndex</tt> me
     To get the last row, the <tt>lastObject</tt> method can be used:
 </p>
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
-<pre class="prettyprint" lang-cpp=""> const char* name = [people lastObject].Name;       // =&gt; "Anni"
+<pre class="prettyprint" lang-cpp=""> NSString* = [people lastObject].Name;              // =&gt; "Anni"
 </pre>
 </div>
 <p>
@@ -223,7 +223,7 @@ size_t cnt = [people count];                        // cnt = 5
     Iterating over the rows can be done as follows:
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
 <pre class="prettyprint" lang-cpp="">for (size_t i = 0; i &lt; [people count]; ++i) {
-    PeopleTable_Cursor row = [people objectAtIndex:i];
+    PeopleTable_Cursor *row = [people objectAtIndex:i];
     NSLog(@&quot;%s is %lld years old&quot;, row.Name, row.Age);
 }
 </pre>
@@ -253,7 +253,7 @@ row = [people.Name find:@"Mary"];		    // row = 1
 <p>To find all values, the <tt>findAll</tt> method is used:</p>
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
 <pre class="prettyprint" lang-cpp="">TableView *view = [people.Age findAll:21];   
-size_t cnt = [view count];  			// cnt = 2</pre>
+size_t cnt = [view count];  			    // cnt = 2</pre>
 </div>
     <p>&nbsp;</p>
     <h2>Queries</h2>
@@ -269,8 +269,8 @@ So let's say you need to find all current employees who are between 20 and 30 ye
 
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
 <pre class="prettyprint" lang-cpp="">// Create query (current employees between 20 and 30 years old)
-Query *q = [[[people getQuery].Hired equal:YES]            // Implicit AND
-                              .Age between:20 to:30];
+PeopleTable_Query *q = [[[people getQuery].Hired equal:YES]  
+                                          .Age between:20 to:30];
 
 // Get number of matching entries
 size_t cnt = [q count];                                   // =&gt; 2
@@ -281,7 +281,7 @@ double avg = [q.Age avg];
 // Execute the query and return a table (view)
 TableView *res = [q findAll];
 for (size_t i = 0; i < [res count]; ++i) {
-    NSLog(@"%zu: %@ is %d years old", i, 
+    NSLog(@"%zu: %@ is %lld years old", i, 
         [people objectAtIndex:i].Name, 
         [people objectAtIndex:i].Age);
 }
@@ -305,8 +305,8 @@ You can group tables and do very fast serialization to and from files and memory
  
 // Create Table in Group
 Group *group = [Group group];
-PeopleTable *table = [group getTable:@"employees"
-                            withClass:[PeopleTable class]];
+PeopleTable *people = [group getTable:@"employees"
+                             withClass:[PeopleTable class]];
  
 // Add some rows
 [people addName:@"John&quot; Age:20 Hired:YES];
