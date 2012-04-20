@@ -29,20 +29,20 @@ TDB_TABLE_IMPL_2(PeopleTable2,
 
 	Group *group = [Group group];
 	// Create new table in group
-	PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class]];
+	PeopleTable *people = [group getTable:@"employees" withClass:[PeopleTable class]];
     
     // Add some rows
-    [people addName:@"John" Age:20 Hired:YES Spare:0];
-    [people addName:@"Mary" Age:21 Hired:NO Spare:0];
-    [people addName:@"Lars" Age:22 Hired:YES Spare:0];
-    [people addName:@"Phil" Age:43 Hired:NO Spare:0];
-    [people addName:@"Anni" Age:54 Hired:YES Spare:0];
+    [people addName:@"John" Age:20 Hired:YES];
+    [people addName:@"Mary" Age:21 Hired:NO];
+    [people addName:@"Lars" Age:21 Hired:YES];
+    [people addName:@"Phil" Age:43 Hired:NO];
+    [people addName:@"Anni" Age:54 Hired:YES];
     
 	// Insert at specific position
 	[people insertAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
 
 	// Getting the size of the table
-    NSLog(@"PeopleTable Size: %lu - is %s.    [6 - not empty]", [people count], 
+    NSLog(@"PeopleTable Size: %lu - is %@.    [6 - not empty]", [people count], 
 		[people isEmpty] ? @"empty" : @"not empty");
 
 	//------------------------------------------------------
@@ -50,21 +50,21 @@ TDB_TABLE_IMPL_2(PeopleTable2,
 	//------------------------------------------------------
 
 	// Getting values 
-	const char* name = [table objectAtIndex:5].Name;   // => 'Anni'
+	NSString * name = [people objectAtIndex:5].Name;   // => 'Anni'
 	// Using a cursor 
-	PeopleTable_Cursor myRow = [table objectAtIndex:5];
+	PeopleTable_Cursor *myRow = [people objectAtIndex:5];
 	int64_t age = myRow.Age;                           // => 54
 	BOOL hired  = myRow.Hired;                         // => true
 
 	// Setting values
-	[[table objectAtIndex:5] setAge:43];               // Getting younger
+	[[people objectAtIndex:5] setAge:43];               // Getting younger
 	// or with dot-syntax:
 	myRow.Age += 1;                                    // Happy birthday!
-	NSLog(@"%s age is now %lu.   [44]", myRow.Name, myRow.Age);
+	NSLog(@"%@ age is now %lld.   [44]", myRow.Name, myRow.Age);
 
 	// Get last row
-	const char* lastname = [people lastObject].Name;       // => "Anni"
-	NSLog(@"Last name is %s.   [Anni]", lastname);
+	NSString *lastname = [people lastObject].Name;       // => "Anni"
+	NSLog(@"Last name is %@.   [Anni]", lastname);
 
 	// Change a row - not implemented yet
 	// [people setAtIndex:4 Name:"Eric" Age:50 Hired:YES];
@@ -72,12 +72,12 @@ TDB_TABLE_IMPL_2(PeopleTable2,
 	// Delete row
 	[people deleteRow:2];                                          
 	NSLog(@"%lu rows after delete.  [5]", [people count]);  // 5
-	STAssertEquals([people count], 5,@"rows should be 5");
+	STAssertEquals([people count], (size_t)5,@"rows should be 5");
 
 	// Iterating over rows:
 	for (size_t i = 0; i < [people count]; ++i) {
-		PeopleTable_Cursor row = [people objectAtIndex:i];
-		NSLog(@"%s is %lld years old.", row.Name, row.Age);
+		PeopleTable_Cursor *row = [people objectAtIndex:i];
+		NSLog(@"%@ is %lld years old.", row.Name, row.Age);
 	}
 
     //------------------------------------------------------
@@ -102,7 +102,7 @@ TDB_TABLE_IMPL_2(PeopleTable2,
     //------------------------------------------------------
      
     // Create query (current employees between 20 and 30 years old)
-	Query *q = [[[people getQuery].Hired equal:YES]            // Implicit AND
+	PeopleTable_Query *q = [[[people getQuery].Hired equal:YES]            // Implicit AND
 								  .Age between:20 to:30];
 
     // Get number of matching entries
@@ -111,13 +111,13 @@ TDB_TABLE_IMPL_2(PeopleTable2,
      
     // Get the average age - currently only a low-level interface!
     double avg = [q.Age avg];		
-    NSLog(@"Average: %f    [21]", avg);
-    STAssertEquals(avg, 21.0,@"Expected 21 average");
+    NSLog(@"Average: %f    [20.5]", avg);
+    STAssertEquals(avg, 20.5,@"Expected 20.5 average");
      
 	// Execute the query and return a table (view)
 	TableView *res = [q findAll];
 	for (size_t i = 0; i < [res count]; ++i) {
-		NSLog(@"%zu: %@ is %d years old", i, 
+		NSLog(@"%zu: %@ is %lld years old", i, 
 			[people objectAtIndex:i].Name, 
 			[people objectAtIndex:i].Age);
 	}
@@ -149,7 +149,7 @@ TDB_TABLE_IMPL_2(PeopleTable2,
      
     // Load a group from memory (and print contents)
     Group *fromMem = [Group groupWithBuffer:buffer len:len];
-    PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[MyTable class]];
+    PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class]];
     for (size_t i = 0; i < [memTable count]; i++) {
         PeopleTable_Cursor *cursor = [memTable objectAtIndex:i];
 		NSLog(@"%zu: %@", i, cursor.Name);
