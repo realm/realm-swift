@@ -1,23 +1,23 @@
 //
-//  OCCursor.h
+//  Cursor.h
 //  TightDb
 
 #import <Foundation/Foundation.h>
 
-@class OCTable;
+@class Table;
 @class OCMixed;
 
-#pragma mark - OCCursorBase
+#pragma mark - CursorBase
 
-@interface OCCursorBase : NSObject
--(id)initWithTable:(OCTable *)table ndx:(size_t)ndx;
+@interface CursorBase : NSObject
+-(id)initWithTable:(Table *)table ndx:(size_t)ndx;
 @end
 
 
 #pragma mark - OCAccessor
 
 @interface OCAccessor : NSObject
--(id)initWithCursor:(OCCursorBase *)cursor columnId:(size_t)columnId;
+-(id)initWithCursor:(CursorBase *)cursor columnId:(size_t)columnId;
 -(int64_t)getInt;
 -(void)setInt:(int64_t)value;
 -(BOOL)getBool;

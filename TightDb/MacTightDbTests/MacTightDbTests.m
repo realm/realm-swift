@@ -4,7 +4,7 @@
 //
 
 #import "MacTightDbTests.h"
-#import "OCTable.h"
+#import "Table.h"
 
 @implementation MacTightDbTests
 

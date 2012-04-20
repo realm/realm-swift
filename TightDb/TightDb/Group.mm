@@ -1,40 +1,40 @@
 //
-//  OCGroup.m
+//  Group.m
 //  TightDB
 //
 
-#import "OCGroup.h"
-#import "OCTable.h"
-#import "OCTablePriv.h"
 #import "TightDb/Group.h"
+#import "Group.h"
+#import "Table.h"
+#import "TablePriv.h"
 
 
-@interface OCGroup()
+@interface Group()
 @property(nonatomic) tightdb::Group *group;
 @end
-@implementation OCGroup
+@implementation Group
 {
     NSMutableArray *_tables; // Temp solution to refrain from deleting group before tables.
 }
 @synthesize group = _group;
 
-+(OCGroup *)group
++(Group *)group
 {
-    OCGroup *group = [[OCGroup alloc] init];
+    Group *group = [[Group alloc] init];
     group.group = new tightdb::Group();
     return group;    
 }
 
-+(OCGroup *)groupWithFilename:(NSString *)filename
++(Group *)groupWithFilename:(NSString *)filename
 {
-    OCGroup *group = [[OCGroup alloc] init];
+    Group *group = [[Group alloc] init];
     group.group = new tightdb::Group([filename UTF8String]);
     return group;
 }
 
-+(OCGroup *)groupWithBuffer:(const char *)buffer len:(size_t)len
++(Group *)groupWithBuffer:(const char *)buffer len:(size_t)len
 {
-    OCGroup *group = [[OCGroup alloc] init];
+    Group *group = [[Group alloc] init];
     group.group = new tightdb::Group(buffer,len);
     return group;
 }
@@ -45,7 +45,7 @@
     NSLog(@"Group dealloc");
 #endif
     // NOTE: Because of ARC we remove tableref from sub tables when this is deleted.
-/*    for(OCTable *table in _tables) {
+/*    for(Table *table in _tables) {
         NSLog(@"Delete...");
         table.table = TableRef();
     }
@@ -81,7 +81,7 @@
 
 -(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)obj
 {
-    return [[obj alloc] initWithBlock:^(OCTable *table) {
+    return [[obj alloc] initWithBlock:^(Table *table) {
         [table setTablePtr:nil];
         [table setTable:_group->GetTable([name UTF8String]).GetTableRef()];
         [table setParent:self];

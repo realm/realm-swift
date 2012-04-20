@@ -1,14 +1,13 @@
 //
-//  OCTablePriv.h
+//  TablePriv.h
 //  TightDB
 //
 
 #import <Foundation/Foundation.h>
-#import "TightDb/Table.h"
 
 #pragma mark - Private Table interface
 
-@interface OCTable()
+@interface Table()
 @property(nonatomic) tightdb::TableRef table; 
 @property(nonatomic) tightdb::Table *tablePtr;
 -(tightdb::Table *)getTable;
