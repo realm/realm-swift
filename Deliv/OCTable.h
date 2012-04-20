@@ -16,6 +16,9 @@
 #define COLTYPEString COLUMN_TYPE_STRING
 #define COLTYPEDate COLUMN_TYPE_DATE
 
+@class OCTable;
+typedef void(^TopLevelTableInitBlock)(OCTable *table);
+
 @interface OCMemRef : NSObject
 -(id)initWithPointer:(void *)p ref:(size_t)r;
 -(void *)getPointer;
@@ -149,7 +152,7 @@
 
 @interface OCTopLevelTable : OCTable
 // refs ??? TODO
-
+-(id)initWithBlock:(TopLevelTableInitBlock)block;
 -(void)updateFromSpec:(size_t)ref_specSet;
 -(size_t)getRef;
 @end
@@ -164,6 +167,10 @@
 -(BOOL)getBool:(size_t)columnId ndx:(size_t)ndx;
 -(time_t)getDate:(size_t)columnId ndx:(size_t)ndx;
 -(NSString *)getString:(size_t)columnId ndx:(size_t)ndx;
+// Deleting
+-(void)delete:(size_t)ndx;
+-(void)clear;
+
 @end
 
 
@@ -189,7 +196,6 @@
 @end
 
 
-typedef void(^TopLevelTableInitBlock)(OCTable *table);
 
 
 

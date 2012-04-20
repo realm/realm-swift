@@ -349,6 +349,14 @@
 {
     return [NSString stringWithUTF8String:_tableView->GetString(columnId, ndx)];
 }
+-(void)delete:(size_t)ndx
+{
+    _tableView->Delete(ndx);
+}
+-(void)clear
+{
+    _tableView->Clear();
+}
 @end
 
 
@@ -364,8 +372,11 @@
 
 -(id)initWithBlock:(TopLevelTableInitBlock)block
 {
-    // Dummy - should be defined in tightdb.h
-    return nil;
+    self = [super init];
+    if (self) {    
+        if (block) block(self);
+    }
+    return self;
 }
 -(id)initWithTableRef:(TableRef)ref
 {

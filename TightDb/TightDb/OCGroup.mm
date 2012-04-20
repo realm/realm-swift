@@ -81,15 +81,11 @@
 
 -(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)obj
 {
-    // NOTE: Because of ARC, we maintain an array of "owned" tables, so we can remove tableref before deleting parent tables.
-/*    if (!_tables)
-        _tables = [NSMutableArray arrayWithCapacity:5];
- */
-    /*[_tables addObject:*/ return [[obj alloc] initWithBlock:^(OCTable *table) {
-        [table setTablePtr:&_group->GetTable([name UTF8String])];
-        [table setTable:table.tablePtr->GetTableRef()];
+    return [[obj alloc] initWithBlock:^(OCTable *table) {
+        [table setTablePtr:nil];
+        [table setTable:_group->GetTable([name UTF8String]).GetTableRef()];
         [table setParent:self];
-    }]/*]*/;
+    }];
     return [_tables lastObject];
 }
 @end
