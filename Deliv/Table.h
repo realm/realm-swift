@@ -17,6 +17,7 @@
 #define COLTYPEDate COLUMN_TYPE_DATE
 
 @class Table;
+@class OCTopLevelTable;
 typedef void(^TopLevelTableInitBlock)(Table *table);
 
 @interface OCMemRef : NSObject
