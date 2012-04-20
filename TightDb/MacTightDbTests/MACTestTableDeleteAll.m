@@ -4,7 +4,7 @@
 //
 
 #import "MACTestTableDeleteAll.h"
-#import "OCTable.h"
+#import "Table.h"
 
 @implementation MACTestTableDeleteAll
 
@@ -63,7 +63,7 @@
 		
 		// Add sub-tables
 		if (i == 2) {
-            OCTable *subtable = [table getTable:8 ndx:i];
+            Table *subtable = [table getTable:8 ndx:i];
             [subtable insertInt:0 ndx:0 value:42];
             [subtable insertString:1 ndx:0 value:@"meaning"];
             [subtable insertDone];

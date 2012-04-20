@@ -3,9 +3,9 @@
 //  TightDB
 //
 
-#import "OCTable.h"
-#import "OCQuery.h"
-#import "OCCursor.h"
+#import "Table.h"
+#import "Query.h"
+#import "Cursor.h"
 
 #undef TDB_TABLE_IMPL_1
 #define TDB_TABLE_IMPL_1(TableName, CType1, CName1) \
@@ -13,7 +13,7 @@
     { \
         OCAccessor *_##CName1; \
     } \
-    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \
+    -(id)initWithTable:(Table *)table ndx:(size_t)ndx; \
     { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -186,7 +186,7 @@
         OCAccessor *_##CName1; \
         OCAccessor *_##CName2; \
     } \
-    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \
+    -(id)initWithTable:(Table *)table ndx:(size_t)ndx; \
     { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -380,7 +380,7 @@
         OCAccessor *_##CName2; \
         OCAccessor *_##CName3; \
     } \
-    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \
+    -(id)initWithTable:(Table *)table ndx:(size_t)ndx; \
     { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -595,7 +595,7 @@
         OCAccessor *_##CName3; \
         OCAccessor *_##CName4; \
     } \
-    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \
+    -(id)initWithTable:(Table *)table ndx:(size_t)ndx; \
     { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -831,7 +831,7 @@
         OCAccessor *_##CName4; \
         OCAccessor *_##CName5; \
     } \
-    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \
+    -(id)initWithTable:(Table *)table ndx:(size_t)ndx; \
     { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -1088,7 +1088,7 @@
         OCAccessor *_##CName5; \
         OCAccessor *_##CName6; \
     } \
-    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \
+    -(id)initWithTable:(Table *)table ndx:(size_t)ndx; \
     { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -1366,7 +1366,7 @@
         OCAccessor *_##CName6; \
         OCAccessor *_##CName7; \
     } \
-    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \
+    -(id)initWithTable:(Table *)table ndx:(size_t)ndx; \
     { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -1665,7 +1665,7 @@
         OCAccessor *_##CName7; \
         OCAccessor *_##CName8; \
     } \
-    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \
+    -(id)initWithTable:(Table *)table ndx:(size_t)ndx; \
     { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -1974,7 +1974,7 @@
 
 #undef TDB_TABLE_DEF_1
 #define TDB_TABLE_DEF_1(TableName, CType1, CName1) \
-@interface TableName##_Cursor : OCCursorBase \
+@interface TableName##_Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     -(tdbOCType##CType1)CName1; \
     -(void)set##CName1:(tdbOCType##CType1)value; \
@@ -1997,7 +1997,7 @@
 -(TableName##_##Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 -(TableName##_##Query *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 @end \
-@interface TableName##_##Query : OCQuery \
+@interface TableName##_##Query : Query \
 @property(nonatomic, strong) TableName##QueryAccessor##CType1 *CName1; \
 -(TableName##_##Query *)group; \
 -(TableName##_##Query *)or; \
@@ -2023,7 +2023,7 @@ TDB_TABLE_IMPL_1(TableName    ,CType1, CName1    )
 
 #undef TDB_TABLE_DEF_2
 #define TDB_TABLE_DEF_2(TableName, CType1, CName1, CType2, CName2) \
-@interface TableName##_Cursor : OCCursorBase \
+@interface TableName##_Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
     -(tdbOCType##CType1)CName1; \
@@ -2049,7 +2049,7 @@ TDB_TABLE_IMPL_1(TableName    ,CType1, CName1    )
 -(TableName##_##Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 -(TableName##_##Query *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 @end \
-@interface TableName##_##Query : OCQuery \
+@interface TableName##_##Query : Query \
 @property(nonatomic, strong) TableName##QueryAccessor##CType1 *CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CType2 *CName2; \
 -(TableName##_##Query *)group; \
@@ -2077,7 +2077,7 @@ TDB_TABLE_IMPL_2(TableName    ,CType1, CName1    ,CType2, CName2    )
 
 #undef TDB_TABLE_DEF_3
 #define TDB_TABLE_DEF_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
-@interface TableName##_Cursor : OCCursorBase \
+@interface TableName##_Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
     @property tdbOCType##CType3 CName3; \
@@ -2106,7 +2106,7 @@ TDB_TABLE_IMPL_2(TableName    ,CType1, CName1    ,CType2, CName2    )
 -(TableName##_##Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 -(TableName##_##Query *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 @end \
-@interface TableName##_##Query : OCQuery \
+@interface TableName##_##Query : Query \
 @property(nonatomic, strong) TableName##QueryAccessor##CType1 *CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CType2 *CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CType3 *CName3; \
@@ -2136,7 +2136,7 @@ TDB_TABLE_IMPL_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 
 #undef TDB_TABLE_DEF_4
 #define TDB_TABLE_DEF_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
-@interface TableName##_Cursor : OCCursorBase \
+@interface TableName##_Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
     @property tdbOCType##CType3 CName3; \
@@ -2168,7 +2168,7 @@ TDB_TABLE_IMPL_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 -(TableName##_##Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 -(TableName##_##Query *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 @end \
-@interface TableName##_##Query : OCQuery \
+@interface TableName##_##Query : Query \
 @property(nonatomic, strong) TableName##QueryAccessor##CType1 *CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CType2 *CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CType3 *CName3; \
@@ -2200,7 +2200,7 @@ TDB_TABLE_IMPL_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 
 #undef TDB_TABLE_DEF_5
 #define TDB_TABLE_DEF_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
-@interface TableName##_Cursor : OCCursorBase \
+@interface TableName##_Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
     @property tdbOCType##CType3 CName3; \
@@ -2235,7 +2235,7 @@ TDB_TABLE_IMPL_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 -(TableName##_##Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 -(TableName##_##Query *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 @end \
-@interface TableName##_##Query : OCQuery \
+@interface TableName##_##Query : Query \
 @property(nonatomic, strong) TableName##QueryAccessor##CType1 *CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CType2 *CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CType3 *CName3; \
@@ -2269,7 +2269,7 @@ TDB_TABLE_IMPL_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 
 #undef TDB_TABLE_DEF_6
 #define TDB_TABLE_DEF_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
-@interface TableName##_Cursor : OCCursorBase \
+@interface TableName##_Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
     @property tdbOCType##CType3 CName3; \
@@ -2307,7 +2307,7 @@ TDB_TABLE_IMPL_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 -(TableName##_##Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 -(TableName##_##Query *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 @end \
-@interface TableName##_##Query : OCQuery \
+@interface TableName##_##Query : Query \
 @property(nonatomic, strong) TableName##QueryAccessor##CType1 *CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CType2 *CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CType3 *CName3; \
@@ -2343,7 +2343,7 @@ TDB_TABLE_IMPL_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 
 #undef TDB_TABLE_DEF_7
 #define TDB_TABLE_DEF_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
-@interface TableName##_Cursor : OCCursorBase \
+@interface TableName##_Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
     @property tdbOCType##CType3 CName3; \
@@ -2384,7 +2384,7 @@ TDB_TABLE_IMPL_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 -(TableName##_##Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 -(TableName##_##Query *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 @end \
-@interface TableName##_##Query : OCQuery \
+@interface TableName##_##Query : Query \
 @property(nonatomic, strong) TableName##QueryAccessor##CType1 *CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CType2 *CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CType3 *CName3; \
@@ -2422,7 +2422,7 @@ TDB_TABLE_IMPL_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 
 #undef TDB_TABLE_DEF_8
 #define TDB_TABLE_DEF_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
-@interface TableName##_Cursor : OCCursorBase \
+@interface TableName##_Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
     @property tdbOCType##CType3 CName3; \
@@ -2466,7 +2466,7 @@ TDB_TABLE_IMPL_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 -(TableName##_##Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 -(TableName##_##Query *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 @end \
-@interface TableName##_##Query : OCQuery \
+@interface TableName##_##Query : Query \
 @property(nonatomic, strong) TableName##QueryAccessor##CType1 *CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CType2 *CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CType3 *CName3; \

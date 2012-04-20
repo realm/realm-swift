@@ -1,12 +1,12 @@
 //
-//  OCTable.mm
+//  Table.mm
 //  TightDB
 //
 
-#import "OCTable.h"
 #include "TightDb/Table.h"
 #include "alloc.h"
-#import "OCTablePriv.h"
+#import "Table.h"
+#import "TablePriv.h"
 
 #pragma mark - Allocater
 @implementation OCMemRef
@@ -294,25 +294,25 @@
 @end
 
 
-#pragma mark - OCTableView
+#pragma mark - TableView
 
-@interface OCTableView()
+@interface TableView()
 @property (nonatomic) tightdb::TableView *tableView;
 @end
-@implementation OCTableView
+@implementation TableView
 @synthesize tableView = _tableView;
 
 
-+(OCTableView *)tableViewWithTable:(OCTable *)table
++(TableView *)tableViewWithTable:(Table *)table
 {
-    OCTableView *tableView = [[OCTableView alloc] init];
+    TableView *tableView = [[TableView alloc] init];
     tableView.tableView = new tightdb::TableView(*[table getTable]);
     return tableView;
 }
 
-+(OCTableView *)tableViewWithTableView:(tightdb::TableView)table
++(TableView *)tableViewWithTableView:(tightdb::TableView)table
 {
-    OCTableView *tableView = [[OCTableView alloc] init];
+    TableView *tableView = [[TableView alloc] init];
     tableView.tableView = new tightdb::TableView(table);
     return tableView;
 }
@@ -320,7 +320,7 @@
 -(void)dealloc
 {
 #ifdef DEBUG
-    NSLog(@"OCTableView dealloc");
+    NSLog(@"TableView dealloc");
 #endif
     delete _tableView;
 }
@@ -362,7 +362,7 @@
 
 #pragma mark - Table
 
-@implementation OCTable
+@implementation Table
 {
 //    NSMutableArray *_tables; // Temp solution to refrain from deleting group before tables.
     id _parent;
@@ -408,14 +408,14 @@
     _parent = parent;
 }
 
--(OCTable *)getTable:(size_t)columnId ndx:(size_t)ndx
+-(Table *)getTable:(size_t)columnId ndx:(size_t)ndx
 {
     // NOTE: Because of ARC, we maintain an array of "owned" tables, so we can remove tableref before deleting parent tables.
 /*    if (!_tables)
         _tables = [NSMutableArray arrayWithCapacity:5];
-    [_tables addObject:[[OCTable alloc] initWithTableRef:_table->GetTable(columnId, ndx)]];
+    [_tables addObject:[[Table alloc] initWithTableRef:_table->GetTable(columnId, ndx)]];
     return [_tables lastObject];*/
-    OCTable *table = [[OCTable alloc] initWithTableRef:_table->GetTable(columnId, ndx)];
+    Table *table = [[Table alloc] initWithTableRef:_table->GetTable(columnId, ndx)];
     [table setParent:self];
     return table;
 }
@@ -424,10 +424,10 @@
 -(void)dealloc
 {
 #ifdef DEBUG
-    NSLog(@"OCTable dealloc");
+    NSLog(@"Table dealloc");
 #endif
     // NOTE: Because of ARC we remove tableref from sub tables when this is deleted.
-/*    for(OCTable *table in _tables) {
+/*    for(Table *table in _tables) {
         NSLog(@"Delete...");
         table.table = TableRef();
     }*/
@@ -600,7 +600,7 @@
     return _table->FindDate(columnId, value);
 }
 
--(OCTableView *)findAll:(OCTableView *)view column:(size_t)columnId value:(int64_t)value
+-(TableView *)findAll:(TableView *)view column:(size_t)columnId value:(int64_t)value
 {
     _table->FindAll(*view.tableView, columnId, value);
     return view;
@@ -647,7 +647,7 @@
 
 @implementation OCColumnProxy
 @synthesize table = _table, column = _column;
--(id)initWithTable:(OCTable *)table column:(size_t)column
+-(id)initWithTable:(Table *)table column:(size_t)column
 {
     self = [super init];
     if (self) {
@@ -670,9 +670,9 @@
     return 0; // TODO - [[self.table getColumn:self.column] findPos:value];
 }
 
--(OCTableView *)findAll:(int64_t)value
+-(TableView *)findAll:(int64_t)value
 {
-    OCTableView *view = [OCTableView tableViewWithTable:self.table];
+    TableView *view = [TableView tableViewWithTable:self.table];
     return [self.table findAll:view column:self.column value:value];
 }
 @end

@@ -4,7 +4,7 @@
 //
 
 #import "ViewController.h"
-#import "OCGroup.h"
+#import "Group.h"
 #include "TightDb.h"
 TDB_TABLE_2(TestTableGroup,
 			String,     First,
@@ -58,11 +58,11 @@ TDB_TABLE_2(TestTableGroup,
 - (void)testGroup
 {
     // Create empty group and serialize to disk
-    OCGroup *toDisk = [OCGroup group];
+    Group *toDisk = [Group group];
     [toDisk write:[self pathForDataFile:@"table_test.tbl"]];
     
 	// Load the group
-    OCGroup *fromDisk = [OCGroup groupWithFilename:[self pathForDataFile:@"table_test.tbl"]];
+    Group *fromDisk = [Group groupWithFilename:[self pathForDataFile:@"table_test.tbl"]];
     if (![fromDisk isValid])
         return;
     
@@ -139,7 +139,7 @@ TDB_TABLE_2(TestTableGroup,
 		
 		// Add sub-tables
 		if (i == 2) {
-            OCTable *subtable = [table getTable:8 ndx:i];
+            Table *subtable = [table getTable:8 ndx:i];
             [subtable insertInt:0 ndx:0 value:42];
             [subtable insertString:1 ndx:0 value:@"meaning"];
             [subtable insertDone];

@@ -1,23 +1,23 @@
 //
-//  OCCursor.mm
+//  Cursor.mm
 //  TightDb
 
-#import "OCCursor.h"
-#import "OCTable.h"
-#import "OCTablePriv.h"
 #import "TightDb/Table.h"
+#import "Cursor.h"
+#import "Table.h"
+#import "TablePriv.h"
 
-#pragma mark - OCCursorBase
+#pragma mark - CursorBase
 
-@interface OCCursorBase()
-@property (nonatomic, strong) OCTable *table;
+@interface CursorBase()
+@property (nonatomic, strong) Table *table;
 @property (nonatomic) size_t ndx;
 @end
-@implementation OCCursorBase
+@implementation CursorBase
 @synthesize table = _table;
 @synthesize ndx = _ndx;
 
--(id)initWithTable:(OCTable *)table ndx:(size_t)ndx
+-(id)initWithTable:(Table *)table ndx:(size_t)ndx
 {
     self = [super init];
     if (self) {
@@ -32,11 +32,11 @@
 
 @implementation OCAccessor
 {
-    OCCursorBase *_cursor;
+    CursorBase *_cursor;
     size_t _columnId;
 }
 
--(id)initWithCursor:(OCCursorBase *)cursor columnId:(size_t)columnId
+-(id)initWithCursor:(CursorBase *)cursor columnId:(size_t)columnId
 {
     self = [super init];
     if (self) {

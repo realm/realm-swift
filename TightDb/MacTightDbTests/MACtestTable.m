@@ -6,21 +6,21 @@
 //
 
 #import "MACtestTable.h"
-#import "OCTable.h"
+#import "Table.h"
 
 
 @implementation MACtestTable
 {
-    OCTable *_table;
+    Table *_table;
 }
 
 - (void)setUp
 {
     [super setUp];
     
-    _table = [[OCTable alloc] init];
+    _table = [[Table alloc] init];
     NSLog(@"Table: %@", _table);
-    STAssertNotNil(_table, @"OCTable is nil");
+    STAssertNotNil(_table, @"Table is nil");
 }
 
 - (void)tearDown

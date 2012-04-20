@@ -1,5 +1,5 @@
 //
-//  OCTable.h
+//  Table.h
 //  TightDB
 //
 
@@ -16,8 +16,8 @@
 #define COLTYPEString COLUMN_TYPE_STRING
 #define COLTYPEDate COLUMN_TYPE_DATE
 
-@class OCTable;
-typedef void(^TopLevelTableInitBlock)(OCTable *table);
+@class Table;
+typedef void(^TopLevelTableInitBlock)(Table *table);
 
 @interface OCMemRef : NSObject
 -(id)initWithPointer:(void *)p ref:(size_t)r;
@@ -67,11 +67,11 @@ typedef void(^TopLevelTableInitBlock)(OCTable *table);
 -(size_t)write:(id)obj pos:(size_t)pos;
 @end
 
-@class OCTableView;
+@class TableView;
 
-@interface OCTable : NSObject
+@interface Table : NSObject
 // TODO - TableRef methods ?????????
--(OCTable *)getTable:(size_t)columnId ndx:(size_t)ndx;
+-(Table *)getTable:(size_t)columnId ndx:(size_t)ndx;
 //Column meta info
 -(size_t)getColumnCount;
 -(NSString *)getColumnName:(size_t)ndx;
@@ -132,7 +132,7 @@ typedef void(^TopLevelTableInitBlock)(OCTable *table);
 -(size_t)findDate:(size_t)columnId value:(time_t)value;
 
 // TODO - Table view stuff
--(OCTableView *)findAll:(OCTableView *)view column:(size_t)columnId value:(int64_t)value;
+-(TableView *)findAll:(TableView *)view column:(size_t)columnId value:(int64_t)value;
 
 // Indexing
 -(BOOL)hasIndex:(size_t)columnId;
@@ -150,7 +150,7 @@ typedef void(^TopLevelTableInitBlock)(OCTable *table);
 @end
 
 
-@interface OCTopLevelTable : OCTable
+@interface OCTopLevelTable : Table
 // refs ??? TODO
 -(id)initWithBlock:(TopLevelTableInitBlock)block;
 -(void)updateFromSpec:(size_t)ref_specSet;
@@ -158,8 +158,8 @@ typedef void(^TopLevelTableInitBlock)(OCTable *table);
 @end
 
 
-@interface OCTableView : NSObject
-+(OCTableView *)tableViewWithTable:(OCTable *)table;
+@interface TableView : NSObject
++(TableView *)tableViewWithTable:(Table *)table;
 
 -(size_t)count;
 -(BOOL)isEmpty;
@@ -175,15 +175,15 @@ typedef void(^TopLevelTableInitBlock)(OCTable *table);
 
 
 @interface OCColumnProxy : NSObject
-@property(nonatomic, strong) OCTable *table;
+@property(nonatomic, strong) Table *table;
 @property(nonatomic) size_t column;
--(id)initWithTable:(OCTable *)table column:(size_t)column;
+-(id)initWithTable:(Table *)table column:(size_t)column;
 @end
 
 @interface OCColumnProxyInt : OCColumnProxy
 -(size_t)find:(int64_t)value;
 -(size_t)findPos:(int64_t)value;
--(OCTableView *)findAll:(int64_t)value;
+-(TableView *)findAll:(int64_t)value;
 @end
 @interface OCColumnProxyBool : OCColumnProxy
 -(size_t)find:(BOOL)value;

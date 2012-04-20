@@ -11,9 +11,9 @@ directiveStartToken = %
 //  TightDB
 //
 
-#import "OCTable.h"
-#import "OCQuery.h"
-#import "OCCursor.h"
+#import "Table.h"
+#import "Query.h"
+#import "Cursor.h"
 
 %for $i in range($max_cols)
 %set $num_cols = $i + 1
@@ -29,7 +29,7 @@ directiveStartToken = %
         OCAccessor *_##CName${j+1}; \\
     %end for
     } \\
-    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \\
+    -(id)initWithTable:(Table *)table ndx:(size_t)ndx; \\
     { \\
     self = [super initWithTable:table ndx:ndx]; \\
     if (self) { \\
@@ -239,7 +239,7 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 , CType${j+1}, CName${j+1}%slurp
 %end for
 ) \\
-@interface TableName##_Cursor : OCCursorBase \\
+@interface TableName##_Cursor : CursorBase \\
     %for $j in range($num_cols)
     @property tdbOCType##CType${j+1} CName${j+1}; \\
     %end for
@@ -266,7 +266,7 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 -(TableName##_##Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive; \\
 -(TableName##_##Query *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive; \\
 @end \\
-@interface TableName##_##Query : OCQuery \\
+@interface TableName##_##Query : Query \\
 %for $j in range($num_cols)
 @property(nonatomic, strong) TableName##QueryAccessor##CType${j+1} *CName${j+1}; \\
 %end for
