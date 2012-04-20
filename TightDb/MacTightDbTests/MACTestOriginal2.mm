@@ -13,6 +13,7 @@
 #include <iostream>
 #include <sstream>
 
+using namespace tightdb;
 @implementation MACTestOriginal2
 
 -(void)testOriginalTable

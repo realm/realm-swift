@@ -11,6 +11,8 @@
 #include "../../native/include/Group.h"
 #include "../../native/include/tightdb.h"
 
+using namespace tightdb;
+
 @implementation MACTestOriginal
 
 TDB_TABLE_4(MyTable,

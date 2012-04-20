@@ -4,13 +4,13 @@
 //
 
 #import "OCGroup.h"
-#import "Group.h"
 #import "OCTable.h"
 #import "OCTablePriv.h"
+#import "TightDb/Group.h"
 
 
 @interface OCGroup()
-@property(nonatomic) Group *group;
+@property(nonatomic) tightdb::Group *group;
 @end
 @implementation OCGroup
 {
@@ -21,21 +21,21 @@
 +(OCGroup *)group
 {
     OCGroup *group = [[OCGroup alloc] init];
-    group.group = new Group();
+    group.group = new tightdb::Group();
     return group;    
 }
 
 +(OCGroup *)groupWithFilename:(NSString *)filename
 {
     OCGroup *group = [[OCGroup alloc] init];
-    group.group = new Group([filename UTF8String]);
+    group.group = new tightdb::Group([filename UTF8String]);
     return group;
 }
 
 +(OCGroup *)groupWithBuffer:(const char *)buffer len:(size_t)len
 {
     OCGroup *group = [[OCGroup alloc] init];
-    group.group = new Group(buffer,len);
+    group.group = new tightdb::Group(buffer,len);
     return group;
 }
 
@@ -81,15 +81,11 @@
 
 -(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)obj
 {
-    // NOTE: Because of ARC, we maintain an array of "owned" tables, so we can remove tableref before deleting parent tables.
-/*    if (!_tables)
-        _tables = [NSMutableArray arrayWithCapacity:5];
- */
-    /*[_tables addObject:*/ return [[obj alloc] initWithBlock:^(OCTable *table) {
-        [table setTablePtr:&_group->GetTable([name UTF8String])];
-        [table setTable:table.tablePtr->GetTableRef()];
+    return [[obj alloc] initWithBlock:^(OCTable *table) {
+        [table setTablePtr:nil];
+        [table setTable:_group->GetTable([name UTF8String]).GetTableRef()];
         [table setParent:self];
-    }]/*]*/;
+    }];
     return [_tables lastObject];
 }
 @end
