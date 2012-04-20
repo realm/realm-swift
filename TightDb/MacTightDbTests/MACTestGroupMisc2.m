@@ -7,8 +7,8 @@
 //
 
 #import "MACTestGroupMisc2.h"
-#import "OCGroup.h"
-#import "OCTable.h"
+#import "Group.h"
+#import "Table.h"
 
 TDB_TABLE_IMPL_4(MyTable,
 			String, Name,
@@ -24,7 +24,7 @@ TDB_TABLE_IMPL_2(MyTable2,
 
 - (void)testGroup_Misc2
 {
-    OCGroup *group = [OCGroup group];
+    Group *group = [Group group];
 	// Create new table in group
 	MyTable *table = [group getTable:@"employees" withClass:[MyTable class]];
     
@@ -47,7 +47,7 @@ TDB_TABLE_IMPL_2(MyTable2,
     NSLog(@"Mary: %zu", row);
     STAssertEquals(row, (size_t)1,@"Mary should have been there");
 
-    OCTableView *view = [table.Age findAll:21];
+    TableView *view = [table.Age findAll:21];
     size_t cnt = [view count];  					// cnt = 2
     STAssertEquals(cnt, (size_t)2,@"Should be two rows in view");
      
@@ -63,7 +63,7 @@ TDB_TABLE_IMPL_2(MyTable2,
     [table2 addHired:YES Age:54];
      
     // Create query (current employees between 20 and 30 years old)
-    OCQuery *q = [[[table2 getQuery].Hired equal:YES].Age between:20 to:30];
+    Query *q = [[[table2 getQuery].Hired equal:YES].Age between:20 to:30];
 
     // Get number of matching entries
     NSLog(@"Query count: %zu", [q count:table2]);
@@ -75,7 +75,7 @@ TDB_TABLE_IMPL_2(MyTable2,
     STAssertEquals(avg, 21.0,@"Expected 20.5 average");
      
     // Execute the query and return a table (view)
-    OCTableView *res = [q findAll:table2];
+    TableView *res = [q findAll:table2];
     for (size_t i = 0; i < [res count]; i++) {
 		// cursor missing. Only low-level interface!
         NSLog(@"%zu: is %lld years old",i , [res get:1 ndx:i]);
@@ -87,10 +87,10 @@ TDB_TABLE_IMPL_2(MyTable2,
     [group write:@"employees.tightdb"];
      
     // Load a group from disk (and print contents)
-    OCGroup *fromDisk = [OCGroup groupWithFilename:@"employees.tightdb"];
+    Group *fromDisk = [Group groupWithFilename:@"employees.tightdb"];
     MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class]];
     
-//    [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
+    [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
 //    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
     NSLog(@"Disktable size: %zu", [diskTable count]);
     for (size_t i = 0; i < [diskTable count]; i++) {
@@ -105,7 +105,7 @@ TDB_TABLE_IMPL_2(MyTable2,
     const char* const buffer = [group writeToMem:&len];
      
     // Load a group from memory (and print contents)
-    OCGroup *fromMem = [OCGroup groupWithBuffer:buffer len:len];
+    Group *fromMem = [Group groupWithBuffer:buffer len:len];
     MyTable *memTable = [fromMem getTable:@"employees" withClass:[MyTable class]];
     for (size_t i = 0; i < [memTable count]; i++) {
         // ??? cursor
