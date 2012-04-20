@@ -7,9 +7,8 @@
 #import "OCQuery.h"
 #import "OCCursor.h"
 
-#ifdef TIGHT_IMPL
-#undef TDB_TABLE_1
-#define TDB_TABLE_1(TableName, CType1, CName1) \
+#undef TDB_TABLE_IMPL_1
+#define TDB_TABLE_IMPL_1(TableName, CType1, CName1) \
 @implementation TableName##_Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -160,7 +159,7 @@
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
 } \
--(TableName##_Cursor *)atIndex:(size_t)ndx \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
@@ -170,8 +169,8 @@
 } \
 @end
 
-#undef TDB_TABLE_2
-#define TDB_TABLE_2(TableName, CType1, CName1, CType2, CName2) \
+#undef TDB_TABLE_IMPL_2
+#define TDB_TABLE_IMPL_2(TableName, CType1, CName1, CType2, CName2) \
 @implementation TableName##_Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -341,7 +340,7 @@
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
 } \
--(TableName##_Cursor *)atIndex:(size_t)ndx \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
@@ -351,8 +350,8 @@
 } \
 @end
 
-#undef TDB_TABLE_3
-#define TDB_TABLE_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
+#undef TDB_TABLE_IMPL_3
+#define TDB_TABLE_IMPL_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
 @implementation TableName##_Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -541,7 +540,7 @@
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
 } \
--(TableName##_Cursor *)atIndex:(size_t)ndx \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
@@ -551,8 +550,8 @@
 } \
 @end
 
-#undef TDB_TABLE_4
-#define TDB_TABLE_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
+#undef TDB_TABLE_IMPL_4
+#define TDB_TABLE_IMPL_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
 @implementation TableName##_Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -760,7 +759,7 @@
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
 } \
--(TableName##_Cursor *)atIndex:(size_t)ndx \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
@@ -770,8 +769,8 @@
 } \
 @end
 
-#undef TDB_TABLE_5
-#define TDB_TABLE_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
+#undef TDB_TABLE_IMPL_5
+#define TDB_TABLE_IMPL_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
 @implementation TableName##_Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -998,7 +997,7 @@
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
 } \
--(TableName##_Cursor *)atIndex:(size_t)ndx \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
@@ -1008,8 +1007,8 @@
 } \
 @end
 
-#undef TDB_TABLE_6
-#define TDB_TABLE_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
+#undef TDB_TABLE_IMPL_6
+#define TDB_TABLE_IMPL_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
 @implementation TableName##_Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -1255,7 +1254,7 @@
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
 } \
--(TableName##_Cursor *)atIndex:(size_t)ndx \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
@@ -1265,8 +1264,8 @@
 } \
 @end
 
-#undef TDB_TABLE_7
-#define TDB_TABLE_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
+#undef TDB_TABLE_IMPL_7
+#define TDB_TABLE_IMPL_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
 @implementation TableName##_Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -1531,7 +1530,7 @@
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
 } \
--(TableName##_Cursor *)atIndex:(size_t)ndx \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
@@ -1541,8 +1540,8 @@
 } \
 @end
 
-#undef TDB_TABLE_8
-#define TDB_TABLE_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
+#undef TDB_TABLE_IMPL_8
+#define TDB_TABLE_IMPL_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
 @implementation TableName##_Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -1826,7 +1825,7 @@
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
 } \
--(TableName##_Cursor *)atIndex:(size_t)ndx \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
@@ -1837,11 +1836,8 @@
 @end
 
 
-#else
-
-
-#undef TDB_TABLE_1
-#define TDB_TABLE_1(TableName, CType1, CName1) \
+#undef TDB_TABLE_DEF_1
+#define TDB_TABLE_DEF_1(TableName, CType1, CName1) \
 @interface TableName##_Cursor : OCCursorBase \
     @property tdbOCType##CType1 CName1; \
     -(tdbOCType##CType1)CName1; \
@@ -1879,12 +1875,18 @@
 -(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1; \
 -(TableName##_##Query *)getQuery; \
 -(TableName##_Cursor *)add; \
--(TableName##_Cursor *)atIndex:(size_t)ndx; \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)back; \
 @end
 
-#undef TDB_TABLE_2
-#define TDB_TABLE_2(TableName, CType1, CName1, CType2, CName2) \
+#undef TDB_TABLE_1
+#define TDB_TABLE_1(TableName    , CType1, CName1    ) \
+TDB_TABLE_DEF_1(TableName    ,CType1, CName1    ) \
+TDB_TABLE_IMPL_1(TableName    ,CType1, CName1    )
+    
+
+#undef TDB_TABLE_DEF_2
+#define TDB_TABLE_DEF_2(TableName, CType1, CName1, CType2, CName2) \
 @interface TableName##_Cursor : OCCursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -1927,12 +1929,18 @@
 -(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2; \
 -(TableName##_##Query *)getQuery; \
 -(TableName##_Cursor *)add; \
--(TableName##_Cursor *)atIndex:(size_t)ndx; \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)back; \
 @end
 
-#undef TDB_TABLE_3
-#define TDB_TABLE_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
+#undef TDB_TABLE_2
+#define TDB_TABLE_2(TableName    , CType1, CName1    , CType2, CName2    ) \
+TDB_TABLE_DEF_2(TableName    ,CType1, CName1    ,CType2, CName2    ) \
+TDB_TABLE_IMPL_2(TableName    ,CType1, CName1    ,CType2, CName2    )
+    
+
+#undef TDB_TABLE_DEF_3
+#define TDB_TABLE_DEF_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
 @interface TableName##_Cursor : OCCursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -1980,12 +1988,18 @@
 -(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3; \
 -(TableName##_##Query *)getQuery; \
 -(TableName##_Cursor *)add; \
--(TableName##_Cursor *)atIndex:(size_t)ndx; \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)back; \
 @end
 
-#undef TDB_TABLE_4
-#define TDB_TABLE_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
+#undef TDB_TABLE_3
+#define TDB_TABLE_3(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    ) \
+TDB_TABLE_DEF_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ) \
+TDB_TABLE_IMPL_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    )
+    
+
+#undef TDB_TABLE_DEF_4
+#define TDB_TABLE_DEF_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
 @interface TableName##_Cursor : OCCursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -2038,12 +2052,18 @@
 -(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4; \
 -(TableName##_##Query *)getQuery; \
 -(TableName##_Cursor *)add; \
--(TableName##_Cursor *)atIndex:(size_t)ndx; \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)back; \
 @end
 
-#undef TDB_TABLE_5
-#define TDB_TABLE_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
+#undef TDB_TABLE_4
+#define TDB_TABLE_4(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    ) \
+TDB_TABLE_DEF_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ) \
+TDB_TABLE_IMPL_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    )
+    
+
+#undef TDB_TABLE_DEF_5
+#define TDB_TABLE_DEF_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
 @interface TableName##_Cursor : OCCursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -2101,12 +2121,18 @@
 -(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5; \
 -(TableName##_##Query *)getQuery; \
 -(TableName##_Cursor *)add; \
--(TableName##_Cursor *)atIndex:(size_t)ndx; \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)back; \
 @end
 
-#undef TDB_TABLE_6
-#define TDB_TABLE_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
+#undef TDB_TABLE_5
+#define TDB_TABLE_5(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    ) \
+TDB_TABLE_DEF_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ) \
+TDB_TABLE_IMPL_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    )
+    
+
+#undef TDB_TABLE_DEF_6
+#define TDB_TABLE_DEF_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
 @interface TableName##_Cursor : OCCursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -2169,12 +2195,18 @@
 -(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6; \
 -(TableName##_##Query *)getQuery; \
 -(TableName##_Cursor *)add; \
--(TableName##_Cursor *)atIndex:(size_t)ndx; \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)back; \
 @end
 
-#undef TDB_TABLE_7
-#define TDB_TABLE_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
+#undef TDB_TABLE_6
+#define TDB_TABLE_6(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    ) \
+TDB_TABLE_DEF_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ) \
+TDB_TABLE_IMPL_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    )
+    
+
+#undef TDB_TABLE_DEF_7
+#define TDB_TABLE_DEF_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
 @interface TableName##_Cursor : OCCursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -2242,12 +2274,18 @@
 -(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7; \
 -(TableName##_##Query *)getQuery; \
 -(TableName##_Cursor *)add; \
--(TableName##_Cursor *)atIndex:(size_t)ndx; \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)back; \
 @end
 
-#undef TDB_TABLE_8
-#define TDB_TABLE_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
+#undef TDB_TABLE_7
+#define TDB_TABLE_7(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    ) \
+TDB_TABLE_DEF_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ) \
+TDB_TABLE_IMPL_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    )
+    
+
+#undef TDB_TABLE_DEF_8
+#define TDB_TABLE_DEF_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
 @interface TableName##_Cursor : OCCursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -2320,9 +2358,14 @@
 -(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8; \
 -(TableName##_##Query *)getQuery; \
 -(TableName##_Cursor *)add; \
--(TableName##_Cursor *)atIndex:(size_t)ndx; \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)back; \
 @end
 
+#undef TDB_TABLE_8
+#define TDB_TABLE_8(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    ) \
+TDB_TABLE_DEF_8(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ) \
+TDB_TABLE_IMPL_8(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    )
+    
 
-#endif
+

@@ -15,11 +15,10 @@ directiveStartToken = %
 #import "OCQuery.h"
 #import "OCCursor.h"
 
-#ifdef TIGHT_IMPL
 %for $i in range($max_cols)
 %set $num_cols = $i + 1
-#undef TDB_TABLE_${num_cols}
-#define TDB_TABLE_${num_cols}(TableName%slurp
+#undef TDB_TABLE_IMPL_${num_cols}
+#define TDB_TABLE_IMPL_${num_cols}(TableName%slurp
 %for $j in range($num_cols)
 , CType${j+1}, CName${j+1}%slurp
 %end for
@@ -206,7 +205,7 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 { \\
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \\
 } \\
--(TableName##_Cursor *)atIndex:(size_t)ndx \\
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \\
 { \\
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \\
 } \\
@@ -218,13 +217,10 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 
 %end for
 
-#else
-
-
 %for $i in range($max_cols)
 %set $num_cols = $i + 1
-#undef TDB_TABLE_${num_cols}
-#define TDB_TABLE_${num_cols}(TableName%slurp
+#undef TDB_TABLE_DEF_${num_cols}
+#define TDB_TABLE_DEF_${num_cols}(TableName%slurp
 %for $j in range($num_cols)
 , CType${j+1}, CName${j+1}%slurp
 %end for
@@ -285,13 +281,30 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1}%slurp
 ; \\
 -(TableName##_##Query *)getQuery; \\
 -(TableName##_Cursor *)add; \\
--(TableName##_Cursor *)atIndex:(size_t)ndx; \\
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \\
 -(TableName##_Cursor *)back; \\
 @end
 
+#undef TDB_TABLE_${num_cols}
+#define TDB_TABLE_${num_cols}(TableName%slurp
+    %for $j in range($num_cols)
+    , CType${j+1}, CName${j+1}%slurp
+    %end for
+    ) \\
+TDB_TABLE_DEF_${num_cols}(TableName%slurp
+    %for $j in range($num_cols)
+    ,CType${j+1}, CName${j+1}%slurp
+    %end for
+    ) \\
+TDB_TABLE_IMPL_${num_cols}(TableName%slurp
+    %for $j in range($num_cols)
+    ,CType${j+1}, CName${j+1}%slurp
+    %end for
+    )
+    
+
 %end for
 
-#endif
 """
 
 args = sys.argv[1:]
