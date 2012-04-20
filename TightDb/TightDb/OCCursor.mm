@@ -5,7 +5,7 @@
 #import "OCCursor.h"
 #import "OCTable.h"
 #import "OCTablePriv.h"
-#import "Table.h"
+#import "TightDb/Table.h"
 
 #pragma mark - OCCursorBase
 

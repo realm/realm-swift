@@ -4,20 +4,20 @@
 //
 
 #import "OCTable.h"
-#include "Table.h"
+#include "TightDb/Table.h"
 #include "alloc.h"
 #import "OCTablePriv.h"
 
 #pragma mark - Allocater
 @implementation OCMemRef
 {
-    MemRef *_memref;
+    tightdb::MemRef *_memref;
 }
 -(id)initWithPointer:(void *)p ref:(size_t)r
 {
     self = [super init];
     if (self) {
-        _memref = new MemRef(p,r);
+        _memref = new tightdb::MemRef(p,r);
     }
     return self;
 }
@@ -25,7 +25,7 @@
 {
     self = [super init];
     if (self) {
-        _memref = new MemRef();
+        _memref = new tightdb::MemRef();
     }
     return self;    
 }
@@ -45,24 +45,24 @@
 
 @implementation OCAllocator
 {
-    Allocator *_allocator;
+    tightdb::Allocator *_allocator;
 }
 -(id)init
 {
     self = [super init];
     if (self) {
-        _allocator = new Allocator();
+        _allocator = new tightdb::Allocator();
     }
     return self;
 }
 -(OCMemRef *)alloc:(size_t)size
 {
-    MemRef ref = _allocator->Alloc(size);
+    tightdb::MemRef ref = _allocator->Alloc(size);
     return [[OCMemRef alloc] initWithPointer:ref.pointer ref:ref.ref];
 }
 -(OCMemRef *)reAlloc:(size_t)r pointer:(void *)p size:(size_t)size
 {
-    MemRef ref = _allocator->ReAlloc(r, p, size);
+    tightdb::MemRef ref = _allocator->ReAlloc(r, p, size);
     return [[OCMemRef alloc] initWithPointer:ref.pointer ref:ref.ref];    
 }
 -(void)free:(size_t)ref pointer:(void *)p
@@ -87,13 +87,13 @@
 #pragma mark - Date
 @implementation OCDate
 {
-    Date *_date;
+    tightdb::Date *_date;
 }
 -(id)initWithDate:(time_t)d
 {
     self = [super init];
     if (self) {
-        _date = new Date(d);
+        _date = new tightdb::Date(d);
     }
     return self;
 }
@@ -112,17 +112,17 @@
 
 #pragma mark - Mixed
 @interface OCMixed()
-@property (nonatomic) Mixed *mixed;
-+(OCMixed *)mixedWithMixed:(Mixed&)other;
+@property (nonatomic) tightdb::Mixed *mixed;
++(OCMixed *)mixedWithMixed:(tightdb::Mixed&)other;
 @end
 @implementation OCMixed
 @synthesize mixed = _mixed;
 
-+(OCMixed *)mixedWithMixed:(Mixed&)other
++(OCMixed *)mixedWithMixed:(tightdb::Mixed&)other
 {
     OCMixed *mixed = [[OCMixed alloc] init];
     
-    mixed.mixed = new Mixed(other);
+    mixed.mixed = new tightdb::Mixed(other);
     
     return mixed;    
 }
@@ -130,7 +130,7 @@
 {
     OCMixed *mixed = [[OCMixed alloc] init];
     
-    mixed.mixed = new Mixed(type);
+    mixed.mixed = new tightdb::Mixed(type);
     
     return mixed;
 }
@@ -139,7 +139,7 @@
 {
     OCMixed *mixed = [[OCMixed alloc] init];
     
-    mixed.mixed = new Mixed((bool)value);
+    mixed.mixed = new tightdb::Mixed((bool)value);
     
     return mixed;    
 }
@@ -148,7 +148,7 @@
 {
     OCMixed *mixed = [[OCMixed alloc] init];
     
-    mixed.mixed = new Mixed(new Date([date getDate]));
+    mixed.mixed = new tightdb::Mixed(new tightdb::Date([date getDate]));
     
     return mixed;        
 }
@@ -157,7 +157,7 @@
 {
     OCMixed *mixed = [[OCMixed alloc] init];
     
-    mixed.mixed = new Mixed(value);
+    mixed.mixed = new tightdb::Mixed(value);
     
     return mixed;            
 }
@@ -166,7 +166,7 @@
 {
     OCMixed *mixed = [[OCMixed alloc] init];
     
-    mixed.mixed = new Mixed([string UTF8String]);
+    mixed.mixed = new tightdb::Mixed([string UTF8String]);
     
     return mixed;            
 }
@@ -175,7 +175,7 @@
 {
     OCMixed *mixed = [[OCMixed alloc] init];
     
-    mixed.mixed = new Mixed(data);
+    mixed.mixed = new tightdb::Mixed(data);
     
     return mixed;            
 }
@@ -184,7 +184,7 @@
 {
     OCMixed *mixed = [[OCMixed alloc] init];
     
-    mixed.mixed = new Mixed(value, length);
+    mixed.mixed = new tightdb::Mixed(value, length);
     
     return mixed;            
 }
@@ -221,25 +221,25 @@
 #pragma mark - Spec
 
 @interface OCSpec()
-@property (nonatomic) Spec *spec;
-+(OCSpec *)specWithAllocator:(Allocator&)allocator ref:(size_t)ref parent:(ArrayParent*)parent pndx:(size_t)pndx;
-+(OCSpec *)specWithSpec:(Spec*)other;
+@property (nonatomic) tightdb::Spec *spec;
++(OCSpec *)specWithAllocator:(tightdb::Allocator&)allocator ref:(size_t)ref parent:(tightdb::ArrayParent*)parent pndx:(size_t)pndx;
++(OCSpec *)specWithSpec:(tightdb::Spec*)other;
 @end
 @implementation OCSpec
 @synthesize spec = _spec;
 
 
 // Dummy method - not used. allocators can probably not be overwritten with OC
-+(OCSpec *)specWithAllocator:(Allocator &)allocator ref:(size_t)ref parent:(ArrayParent *)parent pndx:(size_t)pndx
++(OCSpec *)specWithAllocator:(tightdb::Allocator &)allocator ref:(size_t)ref parent:(tightdb::ArrayParent *)parent pndx:(size_t)pndx
 {
     OCSpec *spec = [[OCSpec alloc] init];
 //  TODO???  spec.spec = new Spec(allocator, ref, parent, pndx);
     return spec;
 }
-+(OCSpec *)specWithSpec:(Spec *)other
++(OCSpec *)specWithSpec:(tightdb::Spec *)other
 {
     OCSpec *spec = [[OCSpec alloc] init];
-    spec.spec = new Spec(*other);
+    spec.spec = new tightdb::Spec(*other);
     return spec;    
 }
 
@@ -249,12 +249,12 @@
 }
 -(OCSpec *)addColumnTable:(NSString *)name
 {
-    Spec tmp = _spec->AddColumnTable([name UTF8String]);
+    tightdb::Spec tmp = _spec->AddColumnTable([name UTF8String]);
     return [OCSpec specWithSpec:&tmp];
 }
 -(OCSpec *)getSpec:(size_t)columndId
 {
-    Spec tmp = _spec->GetSpec(columndId);
+    tightdb::Spec tmp = _spec->GetSpec(columndId);
     return [OCSpec specWithSpec:&tmp];
 }
 -(size_t)getColumnCount
@@ -297,7 +297,7 @@
 #pragma mark - OCTableView
 
 @interface OCTableView()
-@property (nonatomic) TableView *tableView;
+@property (nonatomic) tightdb::TableView *tableView;
 @end
 @implementation OCTableView
 @synthesize tableView = _tableView;
@@ -306,14 +306,14 @@
 +(OCTableView *)tableViewWithTable:(OCTable *)table
 {
     OCTableView *tableView = [[OCTableView alloc] init];
-    tableView.tableView = new TableView(*[table getTable]);
+    tableView.tableView = new tightdb::TableView(*[table getTable]);
     return tableView;
 }
 
-+(OCTableView *)tableViewWithTableView:(TableView)table
++(OCTableView *)tableViewWithTableView:(tightdb::TableView)table
 {
     OCTableView *tableView = [[OCTableView alloc] init];
-    tableView.tableView = new TableView(table);
+    tableView.tableView = new tightdb::TableView(table);
     return tableView;
 }
 
@@ -378,7 +378,7 @@
     }
     return self;
 }
--(id)initWithTableRef:(TableRef)ref
+-(id)initWithTableRef:(tightdb::TableRef)ref
 {
     self = [super init];
     if (self) {
@@ -392,13 +392,13 @@
 {
     self = [super init];
     if (self) {
-        _tablePtr = new TopLevelTable();
+        _tablePtr = new tightdb::TopLevelTable();
         _table = _tablePtr->GetTableRef(); 
     }
     return self;
 }
 
--(Table *)getTable
+-(tightdb::Table *)getTable
 {
     return &*_table;
 }
@@ -431,7 +431,7 @@
         NSLog(@"Delete...");
         table.table = TableRef();
     }*/
-    _table = TableRef();
+    _table = tightdb::TableRef();
     if (_tablePtr)
         delete _tablePtr;
     _parent = nil;
@@ -455,7 +455,7 @@
 }
 -(OCSpec *)getSpec
 {
-    Spec tmp = _table->GetSpec();
+    tightdb::Spec tmp = _table->GetSpec();
     return [OCSpec specWithSpec:&tmp];
 }
 -(BOOL)isEmpty
@@ -563,7 +563,7 @@
 }
 -(OCMixed *)getMixed:(size_t)columnId ndx:(size_t)ndx
 {
-    Mixed tmp = _table->GetMixed(columnId, ndx);
+    tightdb::Mixed tmp = _table->GetMixed(columnId, ndx);
     return [OCMixed mixedWithMixed:tmp];
 }
 -(ColumnType)getMixedType:(size_t)columnId ndx:(size_t)ndx
@@ -631,12 +631,12 @@
 
 -(void)updateFromSpec:(size_t)ref_specSet
 {
-    static_cast<TopLevelTable *>(&*self.table)->UpdateFromSpec(ref_specSet);
+    static_cast<tightdb::TopLevelTable *>(&*self.table)->UpdateFromSpec(ref_specSet);
 }
 
 -(size_t)getRef
 {
-    return static_cast<TopLevelTable *>(&*self.table)->GetRef();
+    return static_cast<tightdb::TopLevelTable *>(&*self.table)->GetRef();
 }
 
 @end

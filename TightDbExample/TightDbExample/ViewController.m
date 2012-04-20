@@ -26,6 +26,17 @@ Int,    Age)
 @implementation ViewController
 
 
+- (NSString *) pathForDataFile:(NSString *)filename {
+    NSArray*	documentDir = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString*	path = nil;
+ 	
+    if (documentDir) {
+        path = [documentDir objectAtIndex:0];    
+    }
+ 	
+    return [NSString stringWithFormat:@"%@/%@", path, filename];
+}
+
 #pragma mark - View code
 - (void)viewDidLoad
 {
@@ -108,10 +119,10 @@ Int,    Age)
     //------------------------------------------------------
     
     // Write to disk
-    [group write:@"employees.tightdb"];
+    [group write:[self pathForDataFile:@"employees.tightdb"]];
     
     // Load a group from disk (and print contents)
-    OCGroup *fromDisk = [OCGroup groupWithFilename:@"employees.tightdb"];
+    OCGroup *fromDisk = [OCGroup groupWithFilename:[self pathForDataFile:@"employees.tightdb"]];
     MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class]];
     
     //    [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
