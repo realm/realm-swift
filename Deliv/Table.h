@@ -72,6 +72,7 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 @interface Table : NSObject
 // TODO - TableRef methods ?????????
 -(Table *)getTable:(size_t)columnId ndx:(size_t)ndx;
+-(OCTopLevelTable *)getTopLevelTable:(size_t)columnId ndx:(size_t)ndx;
 //Column meta info
 -(size_t)getColumnCount;
 -(NSString *)getColumnName:(size_t)ndx;

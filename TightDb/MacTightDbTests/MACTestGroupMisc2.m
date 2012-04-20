@@ -171,4 +171,58 @@ TDB_TABLE_2(QueryTable,
     }
 }
 
+/*
+ * Tables can contain other tables, however this is not yet supported
+ * by the high level API. The following illustrates how to do it
+ * through the low level API.
+ */
+- (void)testSubtables
+{
+    Group *group = [Group group];
+    OCTopLevelTable *table = [group getTable:@"table" withClass:[OCTopLevelTable class]];
+
+    // Specify the table schema
+    {
+        OCSpec *s = [table getSpec];
+        [s addColumn:COLUMN_TYPE_INT name:@"int"];
+        {
+            OCSpec *sub = [s addColumnTable:@"tab"];
+            [sub addColumn:COLUMN_TYPE_INT name:@"int"];
+        }
+        [s addColumn:COLUMN_TYPE_MIXED name:@"mix"];
+        [table updateFromSpec:[s getRef]];
+    }
+
+    int COL_TABLE_INT = 0;
+    int COL_TABLE_TAB = 1;
+    int COL_TABLE_MIX = 2;
+    int COL_SUBTABLE_INT = 0;
+
+    // Add a row to the top level table
+    [table addRow];
+    [table set:COL_TABLE_INT ndx:0 value:700];
+
+    // Add two rows to the subtable
+    Table *subtable = [table getTable:COL_TABLE_TAB ndx:0];
+    [subtable addRow];
+    [subtable set:COL_SUBTABLE_INT ndx:0 value:800];
+    [subtable addRow];
+    [subtable set:COL_SUBTABLE_INT ndx:1 value:801];
+
+    // Make the mixed values column contain another subtable
+    [table setMixed:COL_TABLE_MIX ndx:0 value: [OCMixed mixedWithType:COLUMN_TYPE_TABLE]];
+
+    // Specify its schema
+    OCTopLevelTable *subtable2 = [table getTopLevelTable:COL_TABLE_MIX ndx:0];
+    {
+        OCSpec *s = [subtable2 getSpec];
+        [s addColumn:COLUMN_TYPE_INT name:@"int"];
+        [subtable2 updateFromSpec:[s getRef]];
+    }
+
+    // Add a row to it
+    [subtable2 addRow];
+    [subtable set:COL_SUBTABLE_INT ndx:0 value:900];
+}
+
 @end
