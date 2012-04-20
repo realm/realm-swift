@@ -8,23 +8,23 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "TightDb/OCGroup.mm"
-         timestampString = "356450240.30032"
+         timestampString = "356619234.460972"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "99"
-         endingLineNumber = "99">
+         startingLineNumber = "101"
+         endingLineNumber = "101">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "TightDb/OCTable.mm"
-         timestampString = "356449933.307691"
+         timestampString = "356619234.460972"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "394"
-         endingLineNumber = "394"
-         landmarkName = "-getTable"
+         startingLineNumber = "400"
+         endingLineNumber = "400"
+         landmarkName = "-getTable:ndx:"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -32,11 +32,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "TightDb/OCTable.mm"
-         timestampString = "356449933.307691"
+         timestampString = "356619234.460972"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "377"
-         endingLineNumber = "377"
+         startingLineNumber = "378"
+         endingLineNumber = "378"
          landmarkName = "-initWithTableRef:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -45,13 +45,37 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "MacTightDbTests/MACTestGroup.m"
-         timestampString = "356452252.382598"
+         timestampString = "356621510.25011"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "49"
-         endingLineNumber = "49"
+         startingLineNumber = "46"
+         endingLineNumber = "46"
          landmarkName = "-testGroup"
          landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "MacTightDbTests/MACTestGroupMisc2.h"
+         timestampString = "356617967.001519"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "21"
+         endingLineNumber = "21"
+         landmarkName = "@interface MACTestGroupMisc2"
+         landmarkType = "2">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "TightDb/TightDb.h"
+         timestampString = "356621238.038033"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "15"
+         endingLineNumber = "15">
       </FileBreakpoint>
    </FileBreakpoints>
 </Bucket>

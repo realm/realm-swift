@@ -5,34 +5,31 @@
 
 #import <Foundation/Foundation.h>
 #include "TightDb.h"
-TDB_TABLE_2(TestTableGroup,
+TDB_TABLE_DEF_2(TestTableGroup,
 			String,     First,
 			Int,        Second)
 
-TDB_TABLE_4(MyTable,
+TDB_TABLE_DEF_4(MyTable,
 String, Name,
 Int,    Age,
 Bool,   Hired,
 Int,	 Spare)
 
-TDB_TABLE_2(MyTable2,
+TDB_TABLE_DEF_2(MyTable2,
             Bool,   Hired,
             Int,    Age)
 
-#define TIGHT_IMPL
-#include "TightDb.h"
-
-TDB_TABLE_2(TestTableGroup,
+TDB_TABLE_IMPL_2(TestTableGroup,
 			String,     First,
 			Int,        Second)
 
-TDB_TABLE_4(MyTable,
+TDB_TABLE_IMPL_4(MyTable,
             String, Name,
             Int,    Age,
             Bool,   Hired,
             Int,	 Spare)
 
-TDB_TABLE_2(MyTable2,
+TDB_TABLE_IMPL_2(MyTable2,
 Bool,   Hired,
 Int,    Age)
 

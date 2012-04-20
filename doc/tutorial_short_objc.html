@@ -98,13 +98,11 @@ color: #0067AB;
 <h1>TightDB Objective-C Interface</h1>
 
 <p>
-    &nbsp;</p>
-    <p>
-        This introduction to TightDB will introduce you very briefly to commonly used 
-        features of TightDB. Please refer to the full reference manual for further 
-        details.
+This introduction to TightDB will introduce you very briefly to commonly used 
+features of TightDB. Please refer to the full reference manual for further 
+details.
 </p>
-    <p>
+<p>
 TightDB is a very fast embedded database that integrates transparently 
 into your
 language and gives you the full benefits of a database, but with a much 
@@ -113,8 +111,8 @@ structures. It is also much more flexible and has a friendly and easy to
  use interface.
 </p>
 <p>
-    TightDB datastructures is reprecented by tables with typed and untyped columns. 
-    A column in a table can be any of the following column types:
+TightDB data structures are represented by tables with typed and untyped columns. 
+A column in a table can be any of the following column types:
 </p>
 <ul>
 <li>Integers</li>
@@ -126,7 +124,7 @@ structures. It is also much more flexible and has a friendly and easy to
 <li>Mixed (any of the above, i.e. untyped)</li>
 </ul> 
 <p>
-    More datatypes will be added in the near future. Check our
+More datatypes will be added in the near future. Check our
 website <a href="http://www.tightdb.com/">www.tightdb.com</a> for updates.
 </p>
 <h2>Creating tables</h2>
@@ -135,16 +133,17 @@ First let's create a table named &#8216;PeopleTable&#8217; with 3 columns:
 </p>
 
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
-<pre class="prettyprint" lang-cpp=""> // Define table
- TDB_TABLE_3(PeopleTable,
-     String, Name,
-     Int,    Age,
-     Bool,   Hired)
+<pre class="prettyprint" lang-cpp="">// Define table
+TDB_TABLE_3(PeopleTable,
+    String, Name,
+    Int,    Age,
+    Bool,   Hired)
 
- - (void)func {
-     PeopleTable people;
-     ...
- }
+// Use it in a function
+- (void)func {
+    PeopleTable people;
+    ...
+}
 </pre>
 </div>
 <p>
@@ -163,20 +162,20 @@ The above code instantiates a TightDB table with 3 typed columns called:
 </pre>
 </div>
 <p>
-    We now have 5 rows in our table.&nbsp; >
+    We now have 5 rows in our table.
 <p>
-You You can also insert rows at specific positions:
+You can also insert rows at specific positions:
 </p>
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
 <pre class="prettyprint" lang-cpp="">[people insertAtIndex:2 Name:&quot;Frank&quot; Age:34 Hired:YES];
 </pre>
 </div>
 <p>
-To get the size of our table we can use the <tt>count</tt> method or the convinience method 
+To get the size of our table we can use the <tt>count</tt> method or the convenience method 
     <tt>isEmpty</tt>:
 </p>
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
-<pre class="prettyprint" lang-cpp=""> size_t cnt = [people count];                               // cnt = 6
+<pre class="prettyprint" lang-cpp="">size_t cnt = [people count];                               // cnt = 6
 BOOL empty = [people isEmpty];     			   // empty = NO
 </pre>
 </div>
@@ -215,14 +214,14 @@ Replacing an entire row will be supported in the very near future:
     Deleting a specific row can be done with the <tt>deleteRow</tt> method, and deleting all rows with the 
     <tt>clear</tt> method.</p>
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
-<pre class="prettyprint" lang-cpp=""> [people deleteRow:2];                                          
+<pre class="prettyprint" lang-cpp="">[people deleteRow:2];                                          
 size_t cnt = [people count];                        // cnt = 5
 </pre>
 </div>
 <p>
     Iterating over the rows can be done as follows:
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
-<pre class="prettyprint" lang-cpp=""> for for (size_t i = 0; i &lt; [people count]; ++i) {
+<pre class="prettyprint" lang-cpp="">for (size_t i = 0; i &lt; [people count]; ++i) {
     // Cursor row = [people atIndex:i];
     // Currently only lowlevel access is implemented:
     // NSLog(@&quot;%s is %lld years old&quot;, [people getString:0 ndx:i],
@@ -235,7 +234,7 @@ Which will output the following:
 
 
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
-<pre> John is 20 years old.
+<pre>John is 20 years old.
 Mary is 21 years old.
 Lars is 21 years old.
 Eric is 50 years old.
@@ -248,20 +247,20 @@ To find values in a specific column, we use the find</tt> method with a
 column name and a search value:
 </p>
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
-<pre class="prettyprint" lang-cpp=""> siz size_t row; 
+<pre class="prettyprint" lang-cpp="">size_t row; 
 row = [people.Name find:@"Philip"];		    	// row = (size_t)-1
 row = [people.Name find:@"Mary"];		 	// row = 1
 </pre>
 </div>
 <p>To find all values, the <tt>findAll</tt> method is used:</p>
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
-<pre class="prettyprint" lang-cpp=""> OCTableView view = [people.Age findAll:21];   
+<pre class="prettyprint" lang-cpp="">OCTableView view = [people.Age findAll:21];   
 size_t cnt = [view count];  				// cnt = 2</pre>
 </div>
     <p>&nbsp;</p>
-    <h2>Queries
+    <h2>Queries</h2>
 <p>
-SomeSometimes you may need to do more advanced queries on tables. You can do this using the 
+Sometimes you may need to do more advanced queries on tables. You can do this using the 
     <tt>getQuery</tt> method, which returns a new query object with properties for each column in the table (in this case 
     <tt>Name</tt>, <tt>Age</tt> and <tt>Hired</tt>).
  Each property is an object with methods for comparisons depending on 
@@ -271,22 +270,22 @@ type. All comparison methods return the query object itself, so they can
 So let's say you need to find all current employees who are between 20 and 30 years old:
 
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
-<pre class="prettyprint" lang-cpp=""> //  // Create query (current employees between 20 and 30 years old)
+<pre class="prettyprint" lang-cpp="">// Create query (current employees between 20 and 30 years old)
 OCQuery q = [[[people getQuery].Hired equal:YES]            // Implicit AND
                                .Age between:20 to:30];
 
 // Get number of matching entries
-size_t cnt = [q count];                                	    // =&gt; 2
+size_t cnt = [q count];                                     // =&gt; 2
 
 // Get the average age (currently only a low-level interface???)
-double avg = [q avg:people column:1 resultCount:&amp;cnt];                                       // =&gt; 26 
+double avg = [q avg:people column:1 resultCount:&amp;cnt];     // =&gt; 26 
 
- // Execute the query and return a table (view)
- TableView res = [table findAll];
- for (size_t i = 0; i < [res count]; ++i) {
-    // ?? cout << i << ": " << res[i].name << " is " 
-    //     << res[i].age << " years old." << endl;
- }
+// Execute the query and return a table (view)
+PeopleTableView res = [table findAll];
+for (size_t i = 0; i < [res count]; ++i) {
+   //PeopleTableViewRow row = [res rowAtIndex: i];
+   //NSLog(@"%zu: %@ is %d years old", i, row.Name, row.Age); // ???
+}
 </pre>
 </div>
 <p>
@@ -301,7 +300,7 @@ Note that the result is a live virtual view, that allow you to directly access a
 You can group tables and do very fast serialization to and from files and memory buffers.
 </p>
 <div class="code" style="width: 600px; margin: 0px auto -1px; padding: 10px;">
-<pre class="prettyprint" lang-cpp=""> TDB_TABLE_3(PeopleTable,
+<pre class="prettyprint" lang-cpp="">TDB_TABLE_3(PeopleTable,
  	    String, Name,
  	    Int,    Age,
 	    Bool,   Hired)
@@ -318,28 +317,28 @@ PeopleTable *table = [group getTable@&quot;My great table"
 [people addName:@"Phil&quot; Age:43 Hired:NO];
 [people addName:@"Anni&quot; Age:54 Hired:YES];
 	
- // Write to disk
- [group write:@&quot;employees.tightdb&quot;];
+// Write to disk
+[group write:@&quot;employees.tightdb&quot;];
 	
- // Load a group from disk (and print contents)
- OCGroup *fromDisk = [OCGroup groupWithFilename:@"employees.tightdb"];
- PeopleTable *diskTable = [fromDisk getTable:@"employees" 
- 				    withClass:[PeopleTable class]];
- NSLog(@"Disktable size: %zu", [diskTable count]);
- for (size_t i = 0; i < [diskTable count]; i++) {
-    // ??? cursor
-    NSLog(@"%zu: %@", i, diskTable.Name); // ???
- }
+// Load a group from disk (and print contents)
+OCGroup *fromDisk = [OCGroup groupWithFilename:@"employees.tightdb"];
+PeopleTable *diskTable = [fromDisk getTable:@"employees" 
+				    withClass:[PeopleTable class]];
+NSLog(@"Disktable size: %zu", [diskTable count]);
+for (size_t i = 0; i < [diskTable count]; i++) {
+   // ??? cursor
+   NSLog(@"%zu: %@", i, diskTable.Name); // ???
+}
 
- // Write same group to memory buffer
- size_t len;
- const char* const buffer = [group writeToMem:&amp;len];
+// Write same group to memory buffer
+size_t len;
+const char* const buffer = [group writeToMem:&amp;len];
 
- // Load a group from memory (and print contents)
- OCGroup *fromMem = [OCGroup groupWithBuffer: buffer len:len];
- PeopleTable *memTable = [fromMem getTable:@"employees" 
+// Load a group from memory (and print contents)
+OCGroup *fromMem = [OCGroup groupWithBuffer: buffer len:len];
+PeopleTable *memTable = [fromMem getTable:@"employees" 
  			          withClass:[PeopleTable class]];
- for (size_t i = 0; i < [memTable count]; i++)
+for (size_t i = 0; i < [memTable count]; i++)
     ???NSLog(@&quot;%zu: %@&quot;, i, memTable.Name);</pre>
 </div>
 <p>
