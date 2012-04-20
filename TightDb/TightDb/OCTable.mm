@@ -4,8 +4,8 @@
 //
 
 #import "OCTable.h"
-#import "Table.h"
-#import "alloc.h"
+#include "Table.h"
+#include "alloc.h"
 #import "OCTablePriv.h"
 
 #pragma mark - Allocater
@@ -356,7 +356,8 @@
 
 @implementation OCTable
 {
-    NSMutableArray *_tables; // Temp solution to refrain from deleting group before tables.
+//    NSMutableArray *_tables; // Temp solution to refrain from deleting group before tables.
+    id _parent;
 }
 @synthesize table = _table;
 @synthesize tablePtr = _tablePtr;
@@ -391,13 +392,21 @@
     return &*_table;
 }
 
+-(void)setParent:(id)parent
+{
+    _parent = parent;
+}
+
 -(OCTable *)getTable:(size_t)columnId ndx:(size_t)ndx
 {
     // NOTE: Because of ARC, we maintain an array of "owned" tables, so we can remove tableref before deleting parent tables.
-    if (!_tables)
+/*    if (!_tables)
         _tables = [NSMutableArray arrayWithCapacity:5];
     [_tables addObject:[[OCTable alloc] initWithTableRef:_table->GetTable(columnId, ndx)]];
-    return [_tables lastObject];
+    return [_tables lastObject];*/
+    OCTable *table = [[OCTable alloc] initWithTableRef:_table->GetTable(columnId, ndx)];
+    [table setParent:self];
+    return table;
 }
 
 
@@ -407,13 +416,14 @@
     NSLog(@"OCTable dealloc");
 #endif
     // NOTE: Because of ARC we remove tableref from sub tables when this is deleted.
-    for(OCTable *table in _tables) {
+/*    for(OCTable *table in _tables) {
         NSLog(@"Delete...");
         table.table = TableRef();
-    }
+    }*/
     _table = TableRef();
     if (_tablePtr)
         delete _tablePtr;
+    _parent = nil;
 }
 
 -(size_t)getColumnCount

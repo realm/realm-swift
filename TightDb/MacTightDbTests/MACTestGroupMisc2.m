@@ -29,7 +29,7 @@ TDB_TABLE_2(MyTable2,
 {
     OCGroup *group = [OCGroup group];
 	// Create new table in group
-	MyTable *table = [group getTable:@"My great table" withClass:[MyTable class]];
+	MyTable *table = [group getTable:@"employees" withClass:[MyTable class]];
     
     // Add some rows
     [table addName:@"John" Age:20 Hired:YES Spare:0];
@@ -92,10 +92,15 @@ TDB_TABLE_2(MyTable2,
     // Load a group from disk (and print contents)
     OCGroup *fromDisk = [OCGroup groupWithFilename:@"employees.tightdb"];
     MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class]];
+    
+//    [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
+//    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
     NSLog(@"Disktable size: %zu", [diskTable count]);
     for (size_t i = 0; i < [diskTable count]; i++) {
-		// ??? cursor
-        NSLog(@"%zu: %@", i, diskTable.Name);
+        MyTable_Cursor *cursor = [diskTable atIndex:i];
+        NSLog(@"%zu: %@", i, [cursor Name]);
+        NSLog(@"%zu: %@", i, cursor.Name);
+        NSLog(@"%zu: %@", i, [diskTable getString:0 ndx:i]);
     }
      
     // Write same group to memory buffer
