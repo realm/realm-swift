@@ -5,10 +5,31 @@
 
 #import "OCTable.h"
 #import "OCQuery.h"
+#import "OCCursor.h"
 
-#ifdef TIGHT_IMPL
-#undef TDB_TABLE_1
-#define TDB_TABLE_1(TableName, CType1, CName1) \
+#undef TDB_TABLE_IMPL_1
+#define TDB_TABLE_IMPL_1(TableName, CType1, CName1) \
+@implementation TableName##_Cursor \
+    { \
+        OCAccessor *_##CName1; \
+    } \
+    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \
+    { \
+    self = [super initWithTable:table ndx:ndx]; \
+    if (self) { \
+    _##CName1 = [[OCAccessor alloc] initWithCursor:self columnId:0]; \
+    } \
+    return self; \
+    } \
+    -(tdbOCType##CType1)CName1 \
+    { \
+        return [_##CName1 get##CType1]; \
+    } \
+    -(void)set##CName1:(tdbOCType##CType1)value \
+    { \
+    [_##CName1 set##CType1:value]; \
+    } \
+@end \
 @implementation TableName##_##Query \
 @synthesize CName1 = _CName1; \
 -(id)init \
@@ -125,7 +146,7 @@
     [self insert##CType1:0 ndx:ndx value:CName1]; \
     [self insertDone]; \
 } \
--(void)insert##CName1:(size_t)ndx CName1:(tdbOCType##CType1)CName1 \
+-(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 \
 { \
     [self insert##CType1:0 ndx:ndx value:CName1]; \
     [self insertDone]; \
@@ -134,10 +155,53 @@
 { \
     return [[TableName##_##Query alloc] init]; \
 } \
+-(TableName##_Cursor *)add \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+} \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
+} \
+-(TableName##_Cursor *)back \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
+} \
 @end
 
-#undef TDB_TABLE_2
-#define TDB_TABLE_2(TableName, CType1, CName1, CType2, CName2) \
+#undef TDB_TABLE_IMPL_2
+#define TDB_TABLE_IMPL_2(TableName, CType1, CName1, CType2, CName2) \
+@implementation TableName##_Cursor \
+    { \
+        OCAccessor *_##CName1; \
+        OCAccessor *_##CName2; \
+    } \
+    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \
+    { \
+    self = [super initWithTable:table ndx:ndx]; \
+    if (self) { \
+    _##CName1 = [[OCAccessor alloc] initWithCursor:self columnId:0]; \
+    _##CName2 = [[OCAccessor alloc] initWithCursor:self columnId:1]; \
+    } \
+    return self; \
+    } \
+    -(tdbOCType##CType1)CName1 \
+    { \
+        return [_##CName1 get##CType1]; \
+    } \
+    -(void)set##CName1:(tdbOCType##CType1)value \
+    { \
+    [_##CName1 set##CType1:value]; \
+    } \
+    -(tdbOCType##CType2)CName2 \
+    { \
+        return [_##CName2 get##CType2]; \
+    } \
+    -(void)set##CName2:(tdbOCType##CType2)value \
+    { \
+    [_##CName2 set##CType2:value]; \
+    } \
+@end \
 @implementation TableName##_##Query \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -272,10 +336,63 @@
 { \
     return [[TableName##_##Query alloc] init]; \
 } \
+-(TableName##_Cursor *)add \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+} \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
+} \
+-(TableName##_Cursor *)back \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
+} \
 @end
 
-#undef TDB_TABLE_3
-#define TDB_TABLE_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
+#undef TDB_TABLE_IMPL_3
+#define TDB_TABLE_IMPL_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
+@implementation TableName##_Cursor \
+    { \
+        OCAccessor *_##CName1; \
+        OCAccessor *_##CName2; \
+        OCAccessor *_##CName3; \
+    } \
+    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \
+    { \
+    self = [super initWithTable:table ndx:ndx]; \
+    if (self) { \
+    _##CName1 = [[OCAccessor alloc] initWithCursor:self columnId:0]; \
+    _##CName2 = [[OCAccessor alloc] initWithCursor:self columnId:1]; \
+    _##CName3 = [[OCAccessor alloc] initWithCursor:self columnId:2]; \
+    } \
+    return self; \
+    } \
+    -(tdbOCType##CType1)CName1 \
+    { \
+        return [_##CName1 get##CType1]; \
+    } \
+    -(void)set##CName1:(tdbOCType##CType1)value \
+    { \
+    [_##CName1 set##CType1:value]; \
+    } \
+    -(tdbOCType##CType2)CName2 \
+    { \
+        return [_##CName2 get##CType2]; \
+    } \
+    -(void)set##CName2:(tdbOCType##CType2)value \
+    { \
+    [_##CName2 set##CType2:value]; \
+    } \
+    -(tdbOCType##CType3)CName3 \
+    { \
+        return [_##CName3 get##CType3]; \
+    } \
+    -(void)set##CName3:(tdbOCType##CType3)value \
+    { \
+    [_##CName3 set##CType3:value]; \
+    } \
+@end \
 @implementation TableName##_##Query \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -408,7 +525,7 @@
     [self insert##CType3:2 ndx:ndx value:CName3]; \
     [self insertDone]; \
 } \
--(void)insert##CName1:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 \
+-(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 \
 { \
     [self insert##CType1:0 ndx:ndx value:CName1]; \
     [self insert##CType2:1 ndx:ndx value:CName2]; \
@@ -419,10 +536,73 @@
 { \
     return [[TableName##_##Query alloc] init]; \
 } \
+-(TableName##_Cursor *)add \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+} \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
+} \
+-(TableName##_Cursor *)back \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
+} \
 @end
 
-#undef TDB_TABLE_4
-#define TDB_TABLE_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
+#undef TDB_TABLE_IMPL_4
+#define TDB_TABLE_IMPL_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
+@implementation TableName##_Cursor \
+    { \
+        OCAccessor *_##CName1; \
+        OCAccessor *_##CName2; \
+        OCAccessor *_##CName3; \
+        OCAccessor *_##CName4; \
+    } \
+    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \
+    { \
+    self = [super initWithTable:table ndx:ndx]; \
+    if (self) { \
+    _##CName1 = [[OCAccessor alloc] initWithCursor:self columnId:0]; \
+    _##CName2 = [[OCAccessor alloc] initWithCursor:self columnId:1]; \
+    _##CName3 = [[OCAccessor alloc] initWithCursor:self columnId:2]; \
+    _##CName4 = [[OCAccessor alloc] initWithCursor:self columnId:3]; \
+    } \
+    return self; \
+    } \
+    -(tdbOCType##CType1)CName1 \
+    { \
+        return [_##CName1 get##CType1]; \
+    } \
+    -(void)set##CName1:(tdbOCType##CType1)value \
+    { \
+    [_##CName1 set##CType1:value]; \
+    } \
+    -(tdbOCType##CType2)CName2 \
+    { \
+        return [_##CName2 get##CType2]; \
+    } \
+    -(void)set##CName2:(tdbOCType##CType2)value \
+    { \
+    [_##CName2 set##CType2:value]; \
+    } \
+    -(tdbOCType##CType3)CName3 \
+    { \
+        return [_##CName3 get##CType3]; \
+    } \
+    -(void)set##CName3:(tdbOCType##CType3)value \
+    { \
+    [_##CName3 set##CType3:value]; \
+    } \
+    -(tdbOCType##CType4)CName4 \
+    { \
+        return [_##CName4 get##CType4]; \
+    } \
+    -(void)set##CName4:(tdbOCType##CType4)value \
+    { \
+    [_##CName4 set##CType4:value]; \
+    } \
+@end \
 @implementation TableName##_##Query \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -563,7 +743,7 @@
     [self insert##CType4:3 ndx:ndx value:CName4]; \
     [self insertDone]; \
 } \
--(void)insert##CName1:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 \
+-(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 \
 { \
     [self insert##CType1:0 ndx:ndx value:CName1]; \
     [self insert##CType2:1 ndx:ndx value:CName2]; \
@@ -575,10 +755,83 @@
 { \
     return [[TableName##_##Query alloc] init]; \
 } \
+-(TableName##_Cursor *)add \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+} \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
+} \
+-(TableName##_Cursor *)back \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
+} \
 @end
 
-#undef TDB_TABLE_5
-#define TDB_TABLE_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
+#undef TDB_TABLE_IMPL_5
+#define TDB_TABLE_IMPL_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
+@implementation TableName##_Cursor \
+    { \
+        OCAccessor *_##CName1; \
+        OCAccessor *_##CName2; \
+        OCAccessor *_##CName3; \
+        OCAccessor *_##CName4; \
+        OCAccessor *_##CName5; \
+    } \
+    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \
+    { \
+    self = [super initWithTable:table ndx:ndx]; \
+    if (self) { \
+    _##CName1 = [[OCAccessor alloc] initWithCursor:self columnId:0]; \
+    _##CName2 = [[OCAccessor alloc] initWithCursor:self columnId:1]; \
+    _##CName3 = [[OCAccessor alloc] initWithCursor:self columnId:2]; \
+    _##CName4 = [[OCAccessor alloc] initWithCursor:self columnId:3]; \
+    _##CName5 = [[OCAccessor alloc] initWithCursor:self columnId:4]; \
+    } \
+    return self; \
+    } \
+    -(tdbOCType##CType1)CName1 \
+    { \
+        return [_##CName1 get##CType1]; \
+    } \
+    -(void)set##CName1:(tdbOCType##CType1)value \
+    { \
+    [_##CName1 set##CType1:value]; \
+    } \
+    -(tdbOCType##CType2)CName2 \
+    { \
+        return [_##CName2 get##CType2]; \
+    } \
+    -(void)set##CName2:(tdbOCType##CType2)value \
+    { \
+    [_##CName2 set##CType2:value]; \
+    } \
+    -(tdbOCType##CType3)CName3 \
+    { \
+        return [_##CName3 get##CType3]; \
+    } \
+    -(void)set##CName3:(tdbOCType##CType3)value \
+    { \
+    [_##CName3 set##CType3:value]; \
+    } \
+    -(tdbOCType##CType4)CName4 \
+    { \
+        return [_##CName4 get##CType4]; \
+    } \
+    -(void)set##CName4:(tdbOCType##CType4)value \
+    { \
+    [_##CName4 set##CType4:value]; \
+    } \
+    -(tdbOCType##CType5)CName5 \
+    { \
+        return [_##CName5 get##CType5]; \
+    } \
+    -(void)set##CName5:(tdbOCType##CType5)value \
+    { \
+    [_##CName5 set##CType5:value]; \
+    } \
+@end \
 @implementation TableName##_##Query \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -727,7 +980,7 @@
     [self insert##CType5:4 ndx:ndx value:CName5]; \
     [self insertDone]; \
 } \
--(void)insert##CName1:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 \
+-(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 \
 { \
     [self insert##CType1:0 ndx:ndx value:CName1]; \
     [self insert##CType2:1 ndx:ndx value:CName2]; \
@@ -740,10 +993,93 @@
 { \
     return [[TableName##_##Query alloc] init]; \
 } \
+-(TableName##_Cursor *)add \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+} \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
+} \
+-(TableName##_Cursor *)back \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
+} \
 @end
 
-#undef TDB_TABLE_6
-#define TDB_TABLE_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
+#undef TDB_TABLE_IMPL_6
+#define TDB_TABLE_IMPL_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
+@implementation TableName##_Cursor \
+    { \
+        OCAccessor *_##CName1; \
+        OCAccessor *_##CName2; \
+        OCAccessor *_##CName3; \
+        OCAccessor *_##CName4; \
+        OCAccessor *_##CName5; \
+        OCAccessor *_##CName6; \
+    } \
+    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \
+    { \
+    self = [super initWithTable:table ndx:ndx]; \
+    if (self) { \
+    _##CName1 = [[OCAccessor alloc] initWithCursor:self columnId:0]; \
+    _##CName2 = [[OCAccessor alloc] initWithCursor:self columnId:1]; \
+    _##CName3 = [[OCAccessor alloc] initWithCursor:self columnId:2]; \
+    _##CName4 = [[OCAccessor alloc] initWithCursor:self columnId:3]; \
+    _##CName5 = [[OCAccessor alloc] initWithCursor:self columnId:4]; \
+    _##CName6 = [[OCAccessor alloc] initWithCursor:self columnId:5]; \
+    } \
+    return self; \
+    } \
+    -(tdbOCType##CType1)CName1 \
+    { \
+        return [_##CName1 get##CType1]; \
+    } \
+    -(void)set##CName1:(tdbOCType##CType1)value \
+    { \
+    [_##CName1 set##CType1:value]; \
+    } \
+    -(tdbOCType##CType2)CName2 \
+    { \
+        return [_##CName2 get##CType2]; \
+    } \
+    -(void)set##CName2:(tdbOCType##CType2)value \
+    { \
+    [_##CName2 set##CType2:value]; \
+    } \
+    -(tdbOCType##CType3)CName3 \
+    { \
+        return [_##CName3 get##CType3]; \
+    } \
+    -(void)set##CName3:(tdbOCType##CType3)value \
+    { \
+    [_##CName3 set##CType3:value]; \
+    } \
+    -(tdbOCType##CType4)CName4 \
+    { \
+        return [_##CName4 get##CType4]; \
+    } \
+    -(void)set##CName4:(tdbOCType##CType4)value \
+    { \
+    [_##CName4 set##CType4:value]; \
+    } \
+    -(tdbOCType##CType5)CName5 \
+    { \
+        return [_##CName5 get##CType5]; \
+    } \
+    -(void)set##CName5:(tdbOCType##CType5)value \
+    { \
+    [_##CName5 set##CType5:value]; \
+    } \
+    -(tdbOCType##CType6)CName6 \
+    { \
+        return [_##CName6 get##CType6]; \
+    } \
+    -(void)set##CName6:(tdbOCType##CType6)value \
+    { \
+    [_##CName6 set##CType6:value]; \
+    } \
+@end \
 @implementation TableName##_##Query \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -900,7 +1236,7 @@
     [self insert##CType6:5 ndx:ndx value:CName6]; \
     [self insertDone]; \
 } \
--(void)insert##CName1:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 \
+-(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 \
 { \
     [self insert##CType1:0 ndx:ndx value:CName1]; \
     [self insert##CType2:1 ndx:ndx value:CName2]; \
@@ -914,10 +1250,103 @@
 { \
     return [[TableName##_##Query alloc] init]; \
 } \
+-(TableName##_Cursor *)add \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+} \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
+} \
+-(TableName##_Cursor *)back \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
+} \
 @end
 
-#undef TDB_TABLE_7
-#define TDB_TABLE_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
+#undef TDB_TABLE_IMPL_7
+#define TDB_TABLE_IMPL_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
+@implementation TableName##_Cursor \
+    { \
+        OCAccessor *_##CName1; \
+        OCAccessor *_##CName2; \
+        OCAccessor *_##CName3; \
+        OCAccessor *_##CName4; \
+        OCAccessor *_##CName5; \
+        OCAccessor *_##CName6; \
+        OCAccessor *_##CName7; \
+    } \
+    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \
+    { \
+    self = [super initWithTable:table ndx:ndx]; \
+    if (self) { \
+    _##CName1 = [[OCAccessor alloc] initWithCursor:self columnId:0]; \
+    _##CName2 = [[OCAccessor alloc] initWithCursor:self columnId:1]; \
+    _##CName3 = [[OCAccessor alloc] initWithCursor:self columnId:2]; \
+    _##CName4 = [[OCAccessor alloc] initWithCursor:self columnId:3]; \
+    _##CName5 = [[OCAccessor alloc] initWithCursor:self columnId:4]; \
+    _##CName6 = [[OCAccessor alloc] initWithCursor:self columnId:5]; \
+    _##CName7 = [[OCAccessor alloc] initWithCursor:self columnId:6]; \
+    } \
+    return self; \
+    } \
+    -(tdbOCType##CType1)CName1 \
+    { \
+        return [_##CName1 get##CType1]; \
+    } \
+    -(void)set##CName1:(tdbOCType##CType1)value \
+    { \
+    [_##CName1 set##CType1:value]; \
+    } \
+    -(tdbOCType##CType2)CName2 \
+    { \
+        return [_##CName2 get##CType2]; \
+    } \
+    -(void)set##CName2:(tdbOCType##CType2)value \
+    { \
+    [_##CName2 set##CType2:value]; \
+    } \
+    -(tdbOCType##CType3)CName3 \
+    { \
+        return [_##CName3 get##CType3]; \
+    } \
+    -(void)set##CName3:(tdbOCType##CType3)value \
+    { \
+    [_##CName3 set##CType3:value]; \
+    } \
+    -(tdbOCType##CType4)CName4 \
+    { \
+        return [_##CName4 get##CType4]; \
+    } \
+    -(void)set##CName4:(tdbOCType##CType4)value \
+    { \
+    [_##CName4 set##CType4:value]; \
+    } \
+    -(tdbOCType##CType5)CName5 \
+    { \
+        return [_##CName5 get##CType5]; \
+    } \
+    -(void)set##CName5:(tdbOCType##CType5)value \
+    { \
+    [_##CName5 set##CType5:value]; \
+    } \
+    -(tdbOCType##CType6)CName6 \
+    { \
+        return [_##CName6 get##CType6]; \
+    } \
+    -(void)set##CName6:(tdbOCType##CType6)value \
+    { \
+    [_##CName6 set##CType6:value]; \
+    } \
+    -(tdbOCType##CType7)CName7 \
+    { \
+        return [_##CName7 get##CType7]; \
+    } \
+    -(void)set##CName7:(tdbOCType##CType7)value \
+    { \
+    [_##CName7 set##CType7:value]; \
+    } \
+@end \
 @implementation TableName##_##Query \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -1082,7 +1511,7 @@
     [self insert##CType7:6 ndx:ndx value:CName7]; \
     [self insertDone]; \
 } \
--(void)insert##CName1:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 \
+-(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 \
 { \
     [self insert##CType1:0 ndx:ndx value:CName1]; \
     [self insert##CType2:1 ndx:ndx value:CName2]; \
@@ -1097,10 +1526,113 @@
 { \
     return [[TableName##_##Query alloc] init]; \
 } \
+-(TableName##_Cursor *)add \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+} \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
+} \
+-(TableName##_Cursor *)back \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
+} \
 @end
 
-#undef TDB_TABLE_8
-#define TDB_TABLE_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
+#undef TDB_TABLE_IMPL_8
+#define TDB_TABLE_IMPL_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
+@implementation TableName##_Cursor \
+    { \
+        OCAccessor *_##CName1; \
+        OCAccessor *_##CName2; \
+        OCAccessor *_##CName3; \
+        OCAccessor *_##CName4; \
+        OCAccessor *_##CName5; \
+        OCAccessor *_##CName6; \
+        OCAccessor *_##CName7; \
+        OCAccessor *_##CName8; \
+    } \
+    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \
+    { \
+    self = [super initWithTable:table ndx:ndx]; \
+    if (self) { \
+    _##CName1 = [[OCAccessor alloc] initWithCursor:self columnId:0]; \
+    _##CName2 = [[OCAccessor alloc] initWithCursor:self columnId:1]; \
+    _##CName3 = [[OCAccessor alloc] initWithCursor:self columnId:2]; \
+    _##CName4 = [[OCAccessor alloc] initWithCursor:self columnId:3]; \
+    _##CName5 = [[OCAccessor alloc] initWithCursor:self columnId:4]; \
+    _##CName6 = [[OCAccessor alloc] initWithCursor:self columnId:5]; \
+    _##CName7 = [[OCAccessor alloc] initWithCursor:self columnId:6]; \
+    _##CName8 = [[OCAccessor alloc] initWithCursor:self columnId:7]; \
+    } \
+    return self; \
+    } \
+    -(tdbOCType##CType1)CName1 \
+    { \
+        return [_##CName1 get##CType1]; \
+    } \
+    -(void)set##CName1:(tdbOCType##CType1)value \
+    { \
+    [_##CName1 set##CType1:value]; \
+    } \
+    -(tdbOCType##CType2)CName2 \
+    { \
+        return [_##CName2 get##CType2]; \
+    } \
+    -(void)set##CName2:(tdbOCType##CType2)value \
+    { \
+    [_##CName2 set##CType2:value]; \
+    } \
+    -(tdbOCType##CType3)CName3 \
+    { \
+        return [_##CName3 get##CType3]; \
+    } \
+    -(void)set##CName3:(tdbOCType##CType3)value \
+    { \
+    [_##CName3 set##CType3:value]; \
+    } \
+    -(tdbOCType##CType4)CName4 \
+    { \
+        return [_##CName4 get##CType4]; \
+    } \
+    -(void)set##CName4:(tdbOCType##CType4)value \
+    { \
+    [_##CName4 set##CType4:value]; \
+    } \
+    -(tdbOCType##CType5)CName5 \
+    { \
+        return [_##CName5 get##CType5]; \
+    } \
+    -(void)set##CName5:(tdbOCType##CType5)value \
+    { \
+    [_##CName5 set##CType5:value]; \
+    } \
+    -(tdbOCType##CType6)CName6 \
+    { \
+        return [_##CName6 get##CType6]; \
+    } \
+    -(void)set##CName6:(tdbOCType##CType6)value \
+    { \
+    [_##CName6 set##CType6:value]; \
+    } \
+    -(tdbOCType##CType7)CName7 \
+    { \
+        return [_##CName7 get##CType7]; \
+    } \
+    -(void)set##CName7:(tdbOCType##CType7)value \
+    { \
+    [_##CName7 set##CType7:value]; \
+    } \
+    -(tdbOCType##CType8)CName8 \
+    { \
+        return [_##CName8 get##CType8]; \
+    } \
+    -(void)set##CName8:(tdbOCType##CType8)value \
+    { \
+    [_##CName8 set##CType8:value]; \
+    } \
+@end \
 @implementation TableName##_##Query \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -1273,7 +1805,7 @@
     [self insert##CType8:7 ndx:ndx value:CName8]; \
     [self insertDone]; \
 } \
--(void)insert##CName1:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 \
+-(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 \
 { \
     [self insert##CType1:0 ndx:ndx value:CName1]; \
     [self insert##CType2:1 ndx:ndx value:CName2]; \
@@ -1289,14 +1821,28 @@
 { \
     return [[TableName##_##Query alloc] init]; \
 } \
+-(TableName##_Cursor *)add \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+} \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
+} \
+-(TableName##_Cursor *)back \
+{ \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
+} \
 @end
 
 
-#else
-
-
-#undef TDB_TABLE_1
-#define TDB_TABLE_1(TableName, CType1, CName1) \
+#undef TDB_TABLE_DEF_1
+#define TDB_TABLE_DEF_1(TableName, CType1, CName1) \
+@interface TableName##_Cursor : OCCursorBase \
+    @property tdbOCType##CType1 CName1; \
+    -(tdbOCType##CType1)CName1; \
+    -(void)set##CName1:(tdbOCType##CType1)value; \
+@end \
 @class TableName##_##Query; \
 @interface TableName##QueryAccessorInt : OCXQueryAccessorInt \
 -(TableName##_##Query *)equal:(size_t)value; \
@@ -1326,12 +1872,29 @@
 @interface TableName : OCTopLevelTable \
 @property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
 -(void)add##CName1:(tdbOCType##CType1)CName1; \
--(void)insert##CName1:(size_t)ndx CName1:(tdbOCType##CType1)CName1; \
+-(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1; \
 -(TableName##_##Query *)getQuery; \
+-(TableName##_Cursor *)add; \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)back; \
 @end
 
-#undef TDB_TABLE_2
-#define TDB_TABLE_2(TableName, CType1, CName1, CType2, CName2) \
+#undef TDB_TABLE_1
+#define TDB_TABLE_1(TableName    , CType1, CName1    ) \
+TDB_TABLE_DEF_1(TableName    ,CType1, CName1    ) \
+TDB_TABLE_IMPL_1(TableName    ,CType1, CName1    )
+    
+
+#undef TDB_TABLE_DEF_2
+#define TDB_TABLE_DEF_2(TableName, CType1, CName1, CType2, CName2) \
+@interface TableName##_Cursor : OCCursorBase \
+    @property tdbOCType##CType1 CName1; \
+    @property tdbOCType##CType2 CName2; \
+    -(tdbOCType##CType1)CName1; \
+    -(void)set##CName1:(tdbOCType##CType1)value; \
+    -(tdbOCType##CType2)CName2; \
+    -(void)set##CName2:(tdbOCType##CType2)value; \
+@end \
 @class TableName##_##Query; \
 @interface TableName##QueryAccessorInt : OCXQueryAccessorInt \
 -(TableName##_##Query *)equal:(size_t)value; \
@@ -1365,10 +1928,30 @@
 -(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2; \
 -(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2; \
 -(TableName##_##Query *)getQuery; \
+-(TableName##_Cursor *)add; \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)back; \
 @end
 
-#undef TDB_TABLE_3
-#define TDB_TABLE_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
+#undef TDB_TABLE_2
+#define TDB_TABLE_2(TableName    , CType1, CName1    , CType2, CName2    ) \
+TDB_TABLE_DEF_2(TableName    ,CType1, CName1    ,CType2, CName2    ) \
+TDB_TABLE_IMPL_2(TableName    ,CType1, CName1    ,CType2, CName2    )
+    
+
+#undef TDB_TABLE_DEF_3
+#define TDB_TABLE_DEF_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
+@interface TableName##_Cursor : OCCursorBase \
+    @property tdbOCType##CType1 CName1; \
+    @property tdbOCType##CType2 CName2; \
+    @property tdbOCType##CType3 CName3; \
+    -(tdbOCType##CType1)CName1; \
+    -(void)set##CName1:(tdbOCType##CType1)value; \
+    -(tdbOCType##CType2)CName2; \
+    -(void)set##CName2:(tdbOCType##CType2)value; \
+    -(tdbOCType##CType3)CName3; \
+    -(void)set##CName3:(tdbOCType##CType3)value; \
+@end \
 @class TableName##_##Query; \
 @interface TableName##QueryAccessorInt : OCXQueryAccessorInt \
 -(TableName##_##Query *)equal:(size_t)value; \
@@ -1402,12 +1985,35 @@
 @property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
 @property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
 -(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3; \
--(void)insert##CName1:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3; \
+-(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3; \
 -(TableName##_##Query *)getQuery; \
+-(TableName##_Cursor *)add; \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)back; \
 @end
 
-#undef TDB_TABLE_4
-#define TDB_TABLE_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
+#undef TDB_TABLE_3
+#define TDB_TABLE_3(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    ) \
+TDB_TABLE_DEF_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ) \
+TDB_TABLE_IMPL_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    )
+    
+
+#undef TDB_TABLE_DEF_4
+#define TDB_TABLE_DEF_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
+@interface TableName##_Cursor : OCCursorBase \
+    @property tdbOCType##CType1 CName1; \
+    @property tdbOCType##CType2 CName2; \
+    @property tdbOCType##CType3 CName3; \
+    @property tdbOCType##CType4 CName4; \
+    -(tdbOCType##CType1)CName1; \
+    -(void)set##CName1:(tdbOCType##CType1)value; \
+    -(tdbOCType##CType2)CName2; \
+    -(void)set##CName2:(tdbOCType##CType2)value; \
+    -(tdbOCType##CType3)CName3; \
+    -(void)set##CName3:(tdbOCType##CType3)value; \
+    -(tdbOCType##CType4)CName4; \
+    -(void)set##CName4:(tdbOCType##CType4)value; \
+@end \
 @class TableName##_##Query; \
 @interface TableName##QueryAccessorInt : OCXQueryAccessorInt \
 -(TableName##_##Query *)equal:(size_t)value; \
@@ -1443,16 +2049,38 @@
 @property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
 @property(nonatomic, strong) OCColumnProxy##CType4 *CName4; \
 -(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4; \
-<<<<<<< HEAD
 -(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4; \
-@end 
-=======
--(void)insert##CName1:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4; \
 -(TableName##_##Query *)getQuery; \
+-(TableName##_Cursor *)add; \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)back; \
 @end
 
-#undef TDB_TABLE_5
-#define TDB_TABLE_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
+#undef TDB_TABLE_4
+#define TDB_TABLE_4(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    ) \
+TDB_TABLE_DEF_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ) \
+TDB_TABLE_IMPL_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    )
+    
+
+#undef TDB_TABLE_DEF_5
+#define TDB_TABLE_DEF_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
+@interface TableName##_Cursor : OCCursorBase \
+    @property tdbOCType##CType1 CName1; \
+    @property tdbOCType##CType2 CName2; \
+    @property tdbOCType##CType3 CName3; \
+    @property tdbOCType##CType4 CName4; \
+    @property tdbOCType##CType5 CName5; \
+    -(tdbOCType##CType1)CName1; \
+    -(void)set##CName1:(tdbOCType##CType1)value; \
+    -(tdbOCType##CType2)CName2; \
+    -(void)set##CName2:(tdbOCType##CType2)value; \
+    -(tdbOCType##CType3)CName3; \
+    -(void)set##CName3:(tdbOCType##CType3)value; \
+    -(tdbOCType##CType4)CName4; \
+    -(void)set##CName4:(tdbOCType##CType4)value; \
+    -(tdbOCType##CType5)CName5; \
+    -(void)set##CName5:(tdbOCType##CType5)value; \
+@end \
 @class TableName##_##Query; \
 @interface TableName##QueryAccessorInt : OCXQueryAccessorInt \
 -(TableName##_##Query *)equal:(size_t)value; \
@@ -1490,13 +2118,41 @@
 @property(nonatomic, strong) OCColumnProxy##CType4 *CName4; \
 @property(nonatomic, strong) OCColumnProxy##CType5 *CName5; \
 -(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5; \
--(void)insert##CName1:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5; \
+-(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5; \
 -(TableName##_##Query *)getQuery; \
+-(TableName##_Cursor *)add; \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)back; \
 @end
->>>>>>> 780bfeee49c50e083b347262dd8c73323d0ce6ed
 
-#undef TDB_TABLE_6
-#define TDB_TABLE_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
+#undef TDB_TABLE_5
+#define TDB_TABLE_5(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    ) \
+TDB_TABLE_DEF_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ) \
+TDB_TABLE_IMPL_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    )
+    
+
+#undef TDB_TABLE_DEF_6
+#define TDB_TABLE_DEF_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
+@interface TableName##_Cursor : OCCursorBase \
+    @property tdbOCType##CType1 CName1; \
+    @property tdbOCType##CType2 CName2; \
+    @property tdbOCType##CType3 CName3; \
+    @property tdbOCType##CType4 CName4; \
+    @property tdbOCType##CType5 CName5; \
+    @property tdbOCType##CType6 CName6; \
+    -(tdbOCType##CType1)CName1; \
+    -(void)set##CName1:(tdbOCType##CType1)value; \
+    -(tdbOCType##CType2)CName2; \
+    -(void)set##CName2:(tdbOCType##CType2)value; \
+    -(tdbOCType##CType3)CName3; \
+    -(void)set##CName3:(tdbOCType##CType3)value; \
+    -(tdbOCType##CType4)CName4; \
+    -(void)set##CName4:(tdbOCType##CType4)value; \
+    -(tdbOCType##CType5)CName5; \
+    -(void)set##CName5:(tdbOCType##CType5)value; \
+    -(tdbOCType##CType6)CName6; \
+    -(void)set##CName6:(tdbOCType##CType6)value; \
+@end \
 @class TableName##_##Query; \
 @interface TableName##QueryAccessorInt : OCXQueryAccessorInt \
 -(TableName##_##Query *)equal:(size_t)value; \
@@ -1536,12 +2192,44 @@
 @property(nonatomic, strong) OCColumnProxy##CType5 *CName5; \
 @property(nonatomic, strong) OCColumnProxy##CType6 *CName6; \
 -(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6; \
--(void)insert##CName1:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6; \
+-(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6; \
 -(TableName##_##Query *)getQuery; \
+-(TableName##_Cursor *)add; \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)back; \
 @end
 
-#undef TDB_TABLE_7
-#define TDB_TABLE_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
+#undef TDB_TABLE_6
+#define TDB_TABLE_6(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    ) \
+TDB_TABLE_DEF_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ) \
+TDB_TABLE_IMPL_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    )
+    
+
+#undef TDB_TABLE_DEF_7
+#define TDB_TABLE_DEF_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
+@interface TableName##_Cursor : OCCursorBase \
+    @property tdbOCType##CType1 CName1; \
+    @property tdbOCType##CType2 CName2; \
+    @property tdbOCType##CType3 CName3; \
+    @property tdbOCType##CType4 CName4; \
+    @property tdbOCType##CType5 CName5; \
+    @property tdbOCType##CType6 CName6; \
+    @property tdbOCType##CType7 CName7; \
+    -(tdbOCType##CType1)CName1; \
+    -(void)set##CName1:(tdbOCType##CType1)value; \
+    -(tdbOCType##CType2)CName2; \
+    -(void)set##CName2:(tdbOCType##CType2)value; \
+    -(tdbOCType##CType3)CName3; \
+    -(void)set##CName3:(tdbOCType##CType3)value; \
+    -(tdbOCType##CType4)CName4; \
+    -(void)set##CName4:(tdbOCType##CType4)value; \
+    -(tdbOCType##CType5)CName5; \
+    -(void)set##CName5:(tdbOCType##CType5)value; \
+    -(tdbOCType##CType6)CName6; \
+    -(void)set##CName6:(tdbOCType##CType6)value; \
+    -(tdbOCType##CType7)CName7; \
+    -(void)set##CName7:(tdbOCType##CType7)value; \
+@end \
 @class TableName##_##Query; \
 @interface TableName##QueryAccessorInt : OCXQueryAccessorInt \
 -(TableName##_##Query *)equal:(size_t)value; \
@@ -1583,12 +2271,47 @@
 @property(nonatomic, strong) OCColumnProxy##CType6 *CName6; \
 @property(nonatomic, strong) OCColumnProxy##CType7 *CName7; \
 -(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7; \
--(void)insert##CName1:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7; \
+-(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7; \
 -(TableName##_##Query *)getQuery; \
+-(TableName##_Cursor *)add; \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)back; \
 @end
 
-#undef TDB_TABLE_8
-#define TDB_TABLE_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
+#undef TDB_TABLE_7
+#define TDB_TABLE_7(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    ) \
+TDB_TABLE_DEF_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ) \
+TDB_TABLE_IMPL_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    )
+    
+
+#undef TDB_TABLE_DEF_8
+#define TDB_TABLE_DEF_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
+@interface TableName##_Cursor : OCCursorBase \
+    @property tdbOCType##CType1 CName1; \
+    @property tdbOCType##CType2 CName2; \
+    @property tdbOCType##CType3 CName3; \
+    @property tdbOCType##CType4 CName4; \
+    @property tdbOCType##CType5 CName5; \
+    @property tdbOCType##CType6 CName6; \
+    @property tdbOCType##CType7 CName7; \
+    @property tdbOCType##CType8 CName8; \
+    -(tdbOCType##CType1)CName1; \
+    -(void)set##CName1:(tdbOCType##CType1)value; \
+    -(tdbOCType##CType2)CName2; \
+    -(void)set##CName2:(tdbOCType##CType2)value; \
+    -(tdbOCType##CType3)CName3; \
+    -(void)set##CName3:(tdbOCType##CType3)value; \
+    -(tdbOCType##CType4)CName4; \
+    -(void)set##CName4:(tdbOCType##CType4)value; \
+    -(tdbOCType##CType5)CName5; \
+    -(void)set##CName5:(tdbOCType##CType5)value; \
+    -(tdbOCType##CType6)CName6; \
+    -(void)set##CName6:(tdbOCType##CType6)value; \
+    -(tdbOCType##CType7)CName7; \
+    -(void)set##CName7:(tdbOCType##CType7)value; \
+    -(tdbOCType##CType8)CName8; \
+    -(void)set##CName8:(tdbOCType##CType8)value; \
+@end \
 @class TableName##_##Query; \
 @interface TableName##QueryAccessorInt : OCXQueryAccessorInt \
 -(TableName##_##Query *)equal:(size_t)value; \
@@ -1632,9 +2355,17 @@
 @property(nonatomic, strong) OCColumnProxy##CType7 *CName7; \
 @property(nonatomic, strong) OCColumnProxy##CType8 *CName8; \
 -(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8; \
--(void)insert##CName1:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8; \
+-(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8; \
 -(TableName##_##Query *)getQuery; \
+-(TableName##_Cursor *)add; \
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)back; \
 @end
 
+#undef TDB_TABLE_8
+#define TDB_TABLE_8(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    ) \
+TDB_TABLE_DEF_8(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ) \
+TDB_TABLE_IMPL_8(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    )
+    
 
-#endif
+

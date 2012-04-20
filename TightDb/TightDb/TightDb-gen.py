@@ -13,16 +13,43 @@ directiveStartToken = %
 
 #import "OCTable.h"
 #import "OCQuery.h"
+#import "OCCursor.h"
 
-#ifdef TIGHT_IMPL
 %for $i in range($max_cols)
 %set $num_cols = $i + 1
-#undef TDB_TABLE_${num_cols}
-#define TDB_TABLE_${num_cols}(TableName%slurp
+#undef TDB_TABLE_IMPL_${num_cols}
+#define TDB_TABLE_IMPL_${num_cols}(TableName%slurp
 %for $j in range($num_cols)
 , CType${j+1}, CName${j+1}%slurp
 %end for
 ) \\
+@implementation TableName##_Cursor \\
+    { \\
+    %for $j in range($num_cols)
+        OCAccessor *_##CName${j+1}; \\
+    %end for
+    } \\
+    -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx; \\
+    { \\
+    self = [super initWithTable:table ndx:ndx]; \\
+    if (self) { \\
+    %for $j in range($num_cols)        
+    _##CName${j+1} = [[OCAccessor alloc] initWithCursor:self columnId:${j}]; \\
+    %end for        
+    } \\
+    return self; \\
+    } \\
+%for $j in range($num_cols)
+    -(tdbOCType##CType${j+1})CName${j+1} \\
+    { \\
+        return [_##CName${j+1} get##CType${j+1}]; \\
+    } \\
+    -(void)set##CName${j+1}:(tdbOCType##CType${j+1})value \\
+    { \\
+    [_##CName${j+1} set##CType${j+1}:value]; \\
+    } \\
+%end for
+@end \\
 @implementation TableName##_##Query \\
 %for $j in range($num_cols)
 @synthesize CName${j+1} = _CName${j+1}; \\
@@ -159,7 +186,7 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 %end for
     [self insertDone]; \\
 } \\
--(void)insert##CName1:(size_t)ndx %slurp
+-(void)insertAtIndex:(size_t)ndx %slurp
 %for $j in range($num_cols)
 CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 %end for
@@ -174,21 +201,39 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 { \\
     return [[TableName##_##Query alloc] init]; \\
 } \\
+-(TableName##_Cursor *)add \\
+{ \\
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \\
+} \\
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx \\
+{ \\
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \\
+} \\
+-(TableName##_Cursor *)back \\
+{ \\
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \\
+} \\
 @end
 
 %end for
 
-#else
-
-
 %for $i in range($max_cols)
 %set $num_cols = $i + 1
-#undef TDB_TABLE_${num_cols}
-#define TDB_TABLE_${num_cols}(TableName%slurp
+#undef TDB_TABLE_DEF_${num_cols}
+#define TDB_TABLE_DEF_${num_cols}(TableName%slurp
 %for $j in range($num_cols)
 , CType${j+1}, CName${j+1}%slurp
 %end for
 ) \\
+@interface TableName##_Cursor : OCCursorBase \\
+    %for $j in range($num_cols)
+    @property tdbOCType##CType${j+1} CName${j+1}; \\
+    %end for
+    %for $j in range($num_cols)
+    -(tdbOCType##CType${j+1})CName${j+1}; \\
+    -(void)set##CName${j+1}:(tdbOCType##CType${j+1})value; \\
+    %end for
+@end \\
 @class TableName##_##Query; \\
 @interface TableName##QueryAccessorInt : OCXQueryAccessorInt \\
 -(TableName##_##Query *)equal:(size_t)value; \\
@@ -229,17 +274,37 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 CName${j+1}:(tdbOCType##CType${j+1})CName${j+1}%slurp
 %end for
 ; \\
--(void)insert##CName1:(size_t)ndx%slurp
+-(void)insertAtIndex:(size_t)ndx%slurp
 %for $j in range($num_cols)
  CName${j+1}:(tdbOCType##CType${j+1})CName${j+1}%slurp
 %end for
 ; \\
 -(TableName##_##Query *)getQuery; \\
+-(TableName##_Cursor *)add; \\
+-(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \\
+-(TableName##_Cursor *)back; \\
 @end
+
+#undef TDB_TABLE_${num_cols}
+#define TDB_TABLE_${num_cols}(TableName%slurp
+    %for $j in range($num_cols)
+    , CType${j+1}, CName${j+1}%slurp
+    %end for
+    ) \\
+TDB_TABLE_DEF_${num_cols}(TableName%slurp
+    %for $j in range($num_cols)
+    ,CType${j+1}, CName${j+1}%slurp
+    %end for
+    ) \\
+TDB_TABLE_IMPL_${num_cols}(TableName%slurp
+    %for $j in range($num_cols)
+    ,CType${j+1}, CName${j+1}%slurp
+    %end for
+    )
+    
 
 %end for
 
-#endif
 """
 
 args = sys.argv[1:]
