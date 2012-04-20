@@ -17,10 +17,9 @@
 #pragma mark - OCAccessor
 
 @interface OCAccessor : NSObject
--(void)createWithCursor:(OCCursorBase *)cursor columnId:(size_t)columndId;
-
--(int64_t)get;
--(void)set:(int64_t)value;
+-(id)initWithCursor:(OCCursorBase *)cursor columnId:(size_t)columnId;
+-(int64_t)getInt;
+-(void)setInt:(int64_t)value;
 -(BOOL)getBool;
 -(void)setBool:(BOOL)value;
 -(time_t)getDate;
@@ -30,6 +29,3 @@
 -(OCMixed *)getMixed;
 -(void)setMixed:(OCMixed *)value;
 @end
-
-
-    
