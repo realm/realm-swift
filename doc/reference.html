@@ -151,23 +151,28 @@ var App = {};
 								<strong class="first"><a class="" href="#table">Table Class</a></strong>
 								<ul style="display: block;">
 									<li><a href="#table-constructor">constructor</a></li>
-									<li><a href="#bracket">square brackets</a></li>
+                                    <li><a href="#table-objectAtIndex">objectAtIndex</a></li>
+                                    <li><a href="#table-lastObject">lastObject</a></li>
 									<li><a href="#table-is_empty">isEmpty</a></li>
 									<li><a href="#table-count">count</a></li>
 									<li><a href="#table-clear">clear</a></li>
 									<li><a href="#table-find">find</a></li>
 									<li><a href="#table-find_all">findAll</a></li>
-                                    <li><a href="#table-Add">Add</a></li>
+                                    <li><a href="#table-Add">add</a></li>
                                     <li><a href="#table-setAtIndex">setAtIndex</a></li>
                                     <li><a href="#table-deleteRow">deleteRow</a></li>
 									<li><a href="#table-optimize">optimize</a></li>
                                     <li><a href="#table-query">query</a></li>
 								</ul>
 							</li>
+
+                            <li data-section="tablecursor" class="major">
+							  <strong class="first"><a class="" href="#tablecursor">Cursor Class</a></strong>                                <ul style="display: block;">
+                              </ul>
+                            </li>
+
 							<li data-section="tablequery" class="major">
-								<strong class="first"><a class="" href="#tablequery">Query Class</a></strong>                            
-									                                                                
-                                <ul style="display: block;">
+								<strong class="first"><a class="" href="#tablequery">Query Class</a></strong>                                <ul style="display: block;">
 								    <li><a href="#tablequery-group">group</a></li>
 									<li><a href="#tablequery-endgroup">endgroup</a></li>
 									<li><a href="#tablequery-or">or</a></li>
@@ -237,29 +242,47 @@ var App = {};
 				<b>Method Summary</b></font></th>
 				</tr>
 
-                <tr bgcolor="white" class="TableRowColor">
+
+				<tr bgcolor="white" class="TableRowColor">
 				<td align="right" valign="top" width="1%"><font size="-1">
-				<code></code></font></td>
-				<td><code><b><a href="">square bracket notation</a></b></code>
+				<code>&nbsp;BOOL</code></font></td>
+				<td><code><b><a href="#table-is_empty">isEmpty</a></b></code>
 				<br>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get and set individual values</td>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Check if a table is empty</td>
 				</tr>
 
 				<tr bgcolor="white" class="TableRowColor">
 				<td align="right" valign="top" width="1%"><font size="-1">
-				<code>&nbsp;bool</code></font></td>
-				<td><code><b><a href="#table-is_empty">isEmpty</a></b>()</code>
+				<code>&nbsp;<i>Table_</i>_Cursor</code></font></td>
+				<td><code><b><a href="#table-objectAtIndex">objectAtIndex</a></b></code>
 				<br>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Check if a table is empty</td>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get a row as object</td>
+				</tr>
+
+				<tr bgcolor="white" class="TableRowColor">
+				<td align="right" valign="top" width="1%"><font size="-1">
+				<code>&nbsp;<i>Table_</i>_Cursor</code></font></td>
+				<td><code><b><a href="#table-objectAtIndex">lastObject</a></b></code>
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get last row as object</td>
 				</tr>
 				
 				<tr bgcolor="white" class="TableRowColor">
 				<td align="right" valign="top" width="1%"><font size="-1">
 				<code>&nbsp;int</code></font></td>
-				<td><code><b><a href="#table-count">count</a></b>()</code>
+				<td><code><b><a href="#table-count">count</a></b></code>
 				<br>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the number of rows in a table</td>
 				</tr>
+
+				<tr bgcolor="white" class="TableRowColor">
+				<td align="right" valign="top" width="1%"><font size="-1">
+				<code>&nbsp;int</code></font></td>
+				<td><code><b><a href="#table-setAtIndex">setAtIndex</a></b></code>
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Update an entire row</td>
+				</tr>
+
 				
 				<tr bgcolor="white" class="TableRowColor">
 				<td align="right" valign="top" width="1%"><font size="-1">
@@ -271,7 +294,7 @@ var App = {};
 				
                 <tr bgcolor="white" class="TableRowColor">
 				<td align="right" valign="top" width="1%"><font size="-1">
-				<code>&nbsp;mixed</code></font></td>
+				<code>&nbsp;size_t</code></font></td>
 				<td><code><b><a href="#table-find">find</a></b>()</code>
 				<br>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Find values in a specific column</td>
@@ -280,14 +303,14 @@ var App = {};
 				<tr bgcolor="white" class="TableRowColor">
 				<td align="right" valign="top" width="1%"><font size="-1">
 				<code>&nbsp;<a href="#tableview">TableView</a></code></font></td>
-				<td><code><b><a href="#table-find_all">find_all</a></b>()</code>
+				<td><code><b><a href="#table-find_all">findAll</a></b>()</code>
 				<br>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Find all matching values in a specific column</td>
 				</tr>
 				
 				<tr bgcolor="white" class="TableRowColor">
 				<td align="right" valign="top" width="1%"><font size="-1">
-				<code>&nbsp;int</code></font></td>
+				<code>&nbsp;int64_t</code></font></td>
 				<td><code><b><a href="#table-sum">sum</a></b>()</code>
 				<br>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sum the values in an integer column</td>
@@ -295,7 +318,7 @@ var App = {};
 				
 				<tr bgcolor="white" class="TableRowColor">
 				<td align="right" valign="top" width="1%"><font size="-1">
-				<code>&nbsp;int</code> or <code>&nbsp;DateTime</code></font></td>
+				<code>&nbsp;int64_t</code> or <code>time_t</code></font></td>
 				<td><code><b><a href="#table-min">min</a></b>()</code>
 				<br>
 				    Get the lowest value in an integer column</td>
@@ -303,35 +326,27 @@ var App = {};
 				
 				<tr bgcolor="white" class="TableRowColor">
 				<td align="right" valign="top" width="1%"><font size="-1">
-				<code>&nbsp;int</code> or <code>&nbsp;DateTime</code></font></td>
+				<code>&nbsp;int64_t</code> or <code>&nbsp;time_t</code></font></td>
 				<td><code><b><a href="#table-max">max</a></b>()</code>
 				<br>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the highest value in an integer column</td>
 				</tr>
-				
-                                <tr bgcolor="white" class="TableRowColor">
-                                <td align="right" valign="top" width="1%"><font size="-1">
-                                <code>&nbsp;<a href="#tablequery">TableQuery</a></code></fint></td>
-                                <td><code><b><a href="#table-query">query</a></b>()</code>
-                                <br>
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a query</td>
-                                </tr>
 
-                                <tr bgcolor="white" class="TableRowColor">
-                                <td align="right" valign="top" width="1%"><font size="-1">
-                                <code>&nbsp;void</code></font></td>
-                                <td><code><b><a href="#table-optimize">optimize</a></b>()</code>
-                                <br>
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Optimize table</td>
-                                </tr>
+				<tr bgcolor="white" class="TableRowColor">
+                <td align="right" valign="top" width="1%"><font size="-1">
+                <code>&nbsp;<a href="#tablequery">Query</a></code></fint></td>
+                <td><code><b><a href="#table-query">query</a></b>()</code>
+                <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a query</td>
+                </tr>
 
-                                <tr bgcolor="white" class="TableRowColor">
-                                <td align="right" valign="top" width="1%"><font size="-1">
-                                <code>&nbsp;string</code></font></td>
-                                <td><code><b><a href="#table-to_json">to_json</a></b>()</code>
-                                <br>
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Convert table to JSON</td>
-                                </tr>
+                <tr bgcolor="white" class="TableRowColor">
+                <td align="right" valign="top" width="1%"><font size="-1">
+                <code>&nbsp;void</code></font></td>
+                <td><code><b><a href="#table-optimize">optimize</a></b>()</code>
+                <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Optimize table</td>
+                </tr>
 
 				</tbody></table>
                 <br>
@@ -343,7 +358,7 @@ var App = {};
 				<h4>constructor</h4>
                 <dl><dd>
 	                <p><div class="eks">
-	                <pre class="prettyprint" lang-cpp style="font-size: 16px">new <b>Table</b>(array $schema)</pre>
+	                <pre class="prettyprint" lang-cpp style="font-size: 16px"><b>Table</b></pre>
 	                </div>
 	                </p>
                 	Allocates and instantiates a TightDB table.
@@ -351,7 +366,7 @@ var App = {};
 	                Note: Only tables which are part of a <a href="#group">group</a> can be serialized to memory or disk.
                 	</p>
                     <p>
-                      Note: Tables should be allocated and instantiated using the <code>TDB_TABLE_x</code> macros.
+                      Note: Tables should be allocated and instantiated using the <code>TDB_TABLE_<i>x</i></code> macros.
                     </p>
                 	<dl>
                 		<dt><b>Parameters:</b></dt>
@@ -373,8 +388,10 @@ var App = {};
                 		<dt><b>Example:</b></dt>
                 		<dd>
 							<pre class="prettyprint" lang-cpp>
-Table *_table;
-_table = [[Table alloc] init];
+TDB_TABLE_3(PeopleTable,
+ 	    String, Name,
+ 	    Int,    Age,
+	    Bool,   Hired);
 							</pre>
                          </dd>
                 	</dl>
@@ -382,46 +399,36 @@ _table = [[Table alloc] init];
 
                 <h3>Method Detail</h3>
 
-                <!--  -->
-                                <a href="#" name="bracket" id="bracket"></a>
-				                <a href="#" class="section section_major" name="bracket_anchor" id="bracket_anchor"></a>
-				                <h4>Square Bracket Notation</h4>
-				                <dl><dd>
-				                	<p>
-				                	The square bracket notation can be used for accessing and updating elements in a table. TightDB tables have zero based index.
-				                	</p>
+				<a href="#" name="table-objectAtIndex" id="table-objectAtIndex"></a>
+				<a href="#" class="section section_minor" name="table-objectAtIndex_anchor" id="table-objectAtIndex_anchor"></a>
+				<h4>objectAtIndex:</h4>
 
-					                <h5><b>Getting values:</b></h5>
-						                <p><div class="eks">
-						                <pre class="prettyprint" lang-cpp style="font-size: 16px">table[row_id].column_name</pre>
-						            </div>
-					                <p>To access the individual rows of our table, we can use the brackets syntax with an index. This gives us direct access to the values in the row.</p>
-				                	<dl>
-				               		<dd><b>Example:</b>
-									<pre class="prettyprint" lang-cpp>
- const char* name = table[5].name;
- int age          = table[5].age;
- bool hired       = table[5].hired; 
-									</pre>
-				                     </dd>
-				            	</dl>
-					                <h5><b>Updating values:</b></h5>
-						                <p><div class="eks">
-						                <pre class="prettyprint" lang-cpp style="font-size: 16px">table[row_id].column_name = value</pre>
-						            </div>
-					                <p>The brackets syntax with a index can also be used for updating specific values in the table.</p>
-				                	<dl>
-				                    <dd><b>Example:</b>
-									<pre class="prettyprint" lang-cpp>
-table[5].age = 43;
-table[5].age += 1;
+                <p><div class="eks">
+                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(<i>Table_</i>Cursor) <b>objectAtIndex</b>:(size_t)index</pre>
+            </div>
+            </p>
+                <dl><dd>
+                	<p>
+                      Get the row at specific index as object
+                	</p>
+                	<dl>
+                		<dt><b>Parameters:</b></dt>
+                		<dd><code>index</code>: the index</dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Returns:</b></dt>
+                		<dd><p>a row as object</p></dd>
+                	</dl>
+                	<dl>
+                		<dt><b>Example:</b></dt>
+                		<dd>
+							<pre class="prettyprint" lang-cpp>
+people_Cursor pc = [people objectAtIndex:42];
+							</pre>
+                         </dd>
+                	</dl>
+                </dd></dl>
 
-									</pre>
-				                     </dd>
-				            	</dl>
-				          </dd></dl>
-
-                <!---  --->
 				<a href="#" name="table-is_empty" id="table-is_empty"></a>
 				<a href="#" class="section section_minor" name="table-is_empty_anchor" id="table-is_empty_anchor"></a>
 				<h4>isEmpty</h4>
@@ -455,9 +462,9 @@ BOOL empty = [people isEmpty];
                 <!--  -->
 				<a href="#" name="table-count" id="table-count"></a>
 				<a href="#" class="section section_major" name="table-count_anchor" id="table-count_anchor"></a>
-				<h4>count()</h4>
+				<h4>count</h4>
                 <p><div class="eks">
-                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(int) <b>count</b></pre>
+                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(size_t) <b>count</b></pre>
             </div>
             </p>
                 <dl><dd>
@@ -470,7 +477,7 @@ BOOL empty = [people isEmpty];
                 	</dl>
                 	<dl>
                 		<dt><b>Returns:</b></dt>
-                		<dd><p><code>int</code>: Number of rows in the table</p></dd>
+                		<dd><p><code>size_t</code>: Number of rows in the table</p></dd>
                 	</dl>
                 	<dl>
                 		<dt><b>Example:</b></dt>
@@ -483,17 +490,16 @@ size_t cnt = [people count];
                 </dd></dl>
 
 
-                <!--  -->
-				<a href="#" name="table-back" id="table-back"></a>
-				<a href="#" class="section section_major" name="table-back_anchor" id="table-back_anchor"></a>
-				<h4>back</h4>
+				<a href="#" name="table-lastObject" id="table-lastObject"></a>
+				<a href="#" class="section section_major" name="table-lastObject_anchor" id="table-lastObject_anchor"></a>
+				<h4>lastObject</h4>
                 <p><div class="eks">
-                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(???) <b>back</b></pre>
+                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(<i>Table_</i>Cursor) <b>lastObject</b></pre>
             </div>
             </p>
                 <dl><dd>
                 	<p>
-                	Get the last row in a table.
+                	Get the last row in a table as object.
                 	</p>
                 	<dl>
                 		<dt><b>Parameters:</b></dt>
@@ -501,24 +507,24 @@ size_t cnt = [people count];
                 	</dl>
                 	<dl>
                 		<dt><b>Returns:</b></dt>
-                		<dd><p><code>???</code>: Last row in the table</p></dd>
+                		<dd><p><code><i>Table_</i>Cursor</code>: Last row in the table</p></dd>
                 	</dl>
                 	<dl>
                 		<dt><b>Example:</b></dt>
                 		<dd>
 							<pre class="prettyprint" lang-cpp>
-??? = [people back];
+people_cursor = [people lastObject];
 							</pre>
                          </dd>
                 	</dl>
                 </dd></dl>
+
                 
-                <!--  -->
 				<a href="#" name="table-setAtIndex" id="table-setAtIndex"></a>
 				<a href="#" class="section section_major" name="table-setAtIndex_anchor" id="table-setAtIndex_anchor"></a>
-				<h4>back</h4>
+				<h4>setAtIndex</h4>
                 <p><div class="eks">
-                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(void) <b>setAtIndex</b></pre>
+                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(void) <b>setAtIndex</b>:(size_t)index</pre>
             </div>
             </p>
                 <dl><dd>
@@ -527,7 +533,7 @@ size_t cnt = [people count];
                 	</p>
                 	<dl>
                 		<dt><b>Parameters:</b></dt>
-                        <dd><p><code>setAtIndex</code>: the row index<br />
+                        <dd><p><code>index</code>: the row index<br />
                 		  column names and values</p></dd>
                 	</dl>
                 	<dl>
@@ -544,7 +550,6 @@ size_t cnt = [people count];
                 	</dl>
                 </dd></dl>
 
-                <!---  --->
                 <a href="#" name="table-clear" id="table-clear"></a>
 				<a href="#" class="section section_major" name="table-clear_anchor" id="table-clear_anchor"></a>
 				<h4>clear</h4>
@@ -575,7 +580,7 @@ size_t cnt = [people count];
 				<a href="#" class="section section_major" name="table-deleteRow_anchor" id="table-deleteRow_anchor"></a>	
    			<h4>deleteRow</h4>
                 <p><div class="eks">
-                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(void) <b>deleteRow</b></pre>
+                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(void) <b>deleteRow</b>(size_t)index</pre>
                 </div>
                 </p>
                 <dl><dd>
@@ -584,7 +589,7 @@ size_t cnt = [people count];
                 	</p>
                 	<dl>
                 		<dt><b>Parameters:</b></dt>
-                		<dd><p><code>deleteRow</code>: row index</p></dd>
+                		<dd><p><code>index</code>: row index</p></dd>
                 	</dl>
                 	<dl>
                 		<dt><b>Example:</b></dt>
@@ -597,13 +602,12 @@ size_t cnt = [people count];
                 </dd></dl>
 
 
-                <!---  --->
                 <a href="#" name="table-Add" id="table-Add"></a>
 				<a href="#" class="section section_major" name="table-Add_anchor" id="table-Add_anchor"></a>	
 
-				<h4>Add</h4>
+				<h4>add</h4>
                 <p><div class="eks">
-                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(void) <b>Add</b></pre>
+                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(void) <b>add</b></pre>
                 </div>
                 </p>
                 <dl><dd>
@@ -627,12 +631,11 @@ size_t cnt = [people count];
                 </dd></dl>
 
 
-                <!---  --->
                 <a href="#" name="table-find" id="table-find"></a>
 				<a href="#" class="section section_major" name="table-find_anchor" id="table-find_anchor"></a>
 				<h4>find</h4>
                 <p><div class="eks">
-                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(int) <b>find</b>(char * name, mixed value)</pre>
+                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(size_t) <b>find</b>(NSString *|int64_t|time_t|BOOL)value</pre>
                 </div>
                 </p>
                 <dl><dd>
@@ -642,8 +645,7 @@ size_t cnt = [people count];
                 	<dl>
                 		<dt><b>Parameters:</b></dt>
                 		<dd><p>
-	                    <code>name:</code> Name of the column,<br>
-	                    <code>value:</code> Value to search for.
+	                    <code>value</code>: Value to search for.
 	                    </p></dd>
                 	</dl>
                     <dl>
@@ -660,12 +662,11 @@ row = [people.Name find:@"Philip"];
                 	</dl>
                 </dd></dl>
 
-                <!--- Obj: OK --->
                 <a href="#" name="table-find_all" id="table-find"></a>
 				<a href="#" class="section section_major" name="table-find_all_anchor" id="table-find_all_anchor"></a>
 				<h4>findAll</h4>
                 <p><div class="eks">
-                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(TableView) <b>findAll</b>(string name, mixed value)</pre>
+                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(TableView) <b>findAll</b>(NSString *|int64_t|time_t|BOOL)value</pre>
                 </div>
                 </p>
                 <dl><dd>
@@ -675,8 +676,7 @@ row = [people.Name find:@"Philip"];
                 	<dl>
                 		<dt><b>Parameters:</b></dt>
                 		<dd><p>
-	                    <code>name:</code> Name of the column,<br>
-	                    <code>value:</code> Value to search for.
+	                    <code>value</code>: Value to search for.
 	                    </p></dd>
                 	</dl>
                     <dl>
@@ -688,19 +688,18 @@ row = [people.Name find:@"Philip"];
                 		<dd>
 							<pre class="prettyprint"  lang-cpp>
 // Find all entries with age == 19
-TableView view = [t2.age findAll:19];
+TableView view = [t2.Age findAll:19];
 							</pre>
 	                    </dd>
                 	</dl>
                 </dd></dl>
 
 
-                <!--- ObjC: --->
                 <a href="#" name="table-sum" id="table-sum"></a>
 				<a href="#" class="section section_major" name="table-sum_anchor" id="table-sum_anchor"></a>
 				<h4>sum</h4>
                 <p><div class="eks">
-                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(int) <b>sum</b></pre>
+                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(int64_t) <b>sum</b></pre>
             </div>
             </p>
                 <dl><dd>
@@ -709,18 +708,17 @@ TableView view = [t2.age findAll:19];
                 	</p>
                 	<dl>
                 		<dt><b>Parameters:</b></dt>
-                		<dd><p><code>$column_name</code>: Name of target column (must be an integer column).</p></dd>
+                		<dd><p>None</p></dd>
                 	</dl>
                 	<dl>
                 		<dt><b>Returns:</b></dt>
-                		<dd><p><code>int</code>: Sum of all values in column.</p></dd>
+                		<dd><p><code>int64_t</code>: Sum of all values in column.</p></dd>
                 	</dl>
                 	<dl>
                 		<dt><b>Example:</b></dt>
                 		<dd>
 							<pre class="prettyprint" lang-cpp>
-
-$average_age = $table->sum("age") / $table->count();
+int64_t total_age = [table.Age sum];
 							</pre>
                          </dd>
                 	</dl>
@@ -728,9 +726,9 @@ $average_age = $table->sum("age") / $table->count();
 
 				 <a href="#" name="table-min" id="table-min"></a>
 					<a href="#" class="section section_major" name="table-min_anchor" id="table-min_anchor"></a>
-					<h4>min()</h4>
+					<h4>min</h4>
 	                <p><div class="eks">
-	                <pre class="prettyprint" lang-cpp style="font-size: 16px">mixed Table::<b>min</b>(string $column_name)</pre>
+	                <pre class="prettyprint" lang-cpp style="font-size: 16px">time_t | int64_t <b>min</b></pre>
 	            </div>
 	            </p>
 	                <dl><dd>
@@ -739,18 +737,18 @@ $average_age = $table->sum("age") / $table->count();
 	                	</p>
 	                	<dl>
 	                		<dt><b>Parameters:</b></dt>
-	                		<dd><p><code>$column_name</code>: Name of target column (must be an integer or date column).</p></dd>
+	                		<dd><p>None</p></dd>
 	                	</dl>
 	                	<dl>
 	                		<dt><b>Returns:</b></dt>
-	                		<dd><p><code>int</code> or <code>DateTime</code>: Lowest value in column (zero if empty).</p></dd>
+	                		<dd><p><code>int</code> or <code>time_t</code>: Lowest value in column (zero if empty).</p></dd>
 	                	</dl>
 	                	<dl>
 	                		<dt><b>Example:</b></dt>
 	                		<dd>
 								<pre class="prettyprint" lang-cpp>
 
-$lowest_age = $table->min("age");
+int64_t youngest = [table.Age min];
 								</pre>
 	                         </dd>
 	                	</dl>
@@ -758,9 +756,9 @@ $lowest_age = $table->min("age");
 	
 	            	<a href="#" name="table-max" id="table-max"></a>
 						<a href="#" class="section section_major" name="table-max_anchor" id="table-max_anchor"></a>
-						<h4>max()</h4>
+						<h4>max</h4>
 		                <p><div class="eks">
-		                <pre class="prettyprint" lang-cpp style="font-size: 16px">mixed Table::<b>max</b>(string $column_name)</pre>
+		                <pre class="prettyprint" lang-cpp style="font-size: 16px">size_t | time_t <b>max</b></pre>
 		            </div>
 		            </p>
 		                <dl><dd>
@@ -769,18 +767,18 @@ $lowest_age = $table->min("age");
 		                	</p>
 		                	<dl>
 		                		<dt><b>Parameters:</b></dt>
-		                		<dd><p><code>$column_name</code>: Name of target column (must be an integer or date column).</p></dd>
+		                		<dd><p>None</p></dd>
 		                	</dl>
 		                	<dl>
 		                		<dt><b>Returns:</b></dt>
-		                		<dd><p><code>int</code> or <code>DateTime</code>: Highest value in column (zero if empty).</p></dd>
+		                		<dd><p><code>int64_t</code> or <code>time_t</code>: Highest value in column (zero if empty).</p></dd>
 		                	</dl>
 		                	<dl>
 		                		<dt><b>Example:</b></dt>
 		                		<dd>
 									<pre class="prettyprint" lang-cpp>
 
-$highest_age = $table->max("age");
+int64_t oldest = [table.Age max];
 									</pre>
 		                         </dd>
 		                	</dl>
@@ -788,7 +786,6 @@ $highest_age = $table->max("age");
 
 
 
-		                <!---  --->
 		         		<a href="#" name="table-optimize" id="table-optimize"></a>
 						<a href="#" class="section section_major" name="table-optimize_anchor" id="table-optimize_anchor"></a>
 						<h4>optimize</h4>
@@ -819,41 +816,12 @@ $highest_age = $table->max("age");
 		                </dd></dl>
 
 
-                                <a href="#" name="table-to_json" id="table-to_json"></a>
-                                <a href="#" class="section section_major" name="table-to_json_anchor" id="table-to_json_anchor"></a>
-                                <h4>to_json()</h4>
-                                <p><div class="eks">
-                                <pre class="prettyprint" lang-cpp style="font-size: 16px">string Table::<b>to_json</b>()</pre>
-                                </div>
-                                </p>
-                                <dl><dd>
-                                <p>
-                                Convert a tightdb table to JSON
-                                </p>
-                                <dl>
-                                    <dt><b>Parameters:</b></dt>
-                                    <dd><p>None</p></dd>
-                                </dl>
-                                <dl>
-                                    <dt><b>Returns:</b></dt>
-                                    <dd><p>String containing JSON</p></dd>
-                                </dl>
-                                <dl>
-                                    <dt><b>Example:</b></dt>
-                                    <dd>
-                                      <pre class="prettyprint"  lang-cpp>
 
-$json_out = $table->to_json();
-                                      </pre>
-                                    </dd>
-                                </dl>
-                                </dd></dl>
-
-                                <a href="#" name="table-query" id="table-query"></a>
-                                <a href="#" class="section section_major" name="table-query_anchor" id="table-query_anchor"></a>
+		         		<a href="#" name="table-query" id="table-query"></a>
+						<a href="#" class="section section_major" name="table-query_anchor" id="table-query_anchor"></a>
 
 
-                                <h3>query()</h3>
+                                <h4>query</h4>
                                 <p><div class="eks">
                                     <pre class="prettyprint" lang-cpp style="font-size: 16px">TableQuery Table::<b>query</b>()</pre>
                                   </div>
@@ -873,7 +841,38 @@ $json_out = $table->to_json();
                                   </dl>
 
 
-	
+
+                <a href="#" name="tablecursor" id="tablecursor"></a>
+                <a href="#" class="section section_minor" name="tablecursor_anchor" id="tablecursor_anchor"></a>
+                <h2>Cursor Class</h2>
+                <p>
+                <code>Cursor</code> objects are used to represent rows as objects.
+                </p>
+
+				<table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
+				<tbody><tr bgcolor="#CCCCFF" class="TableHeadingColor">
+				<th align="left" colspan="2"><font size="+2">
+				<b>Constructor Summary</b></font></th>
+				</tr>
+				<tr bgcolor="white" class="TableRowColor">
+				<td><code><b><a href="#tablecursor">Cursor</a></b> cursor</code>
+
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cursor class.</td>
+				</tr>
+				</tbody></table>
+
+                <h3>Usage</h3>
+                <p>
+                  Rows are represented as objects, and columns can be retrieved and updated by using the <tt>.</tt> operator.
+                </p>
+
+                <p><b>Example:</b></p>
+      			<pre class="prettyprint"  lang-cpp>
+people_cursor pc = [people lastObject]; // pc is a cursor object
+pc.Name = "Hans"; // the name is updated
+                </pre>
+                	
 
 
                 <a href="#" name="tablequery" id="tablequery"></a>
@@ -913,7 +912,7 @@ $json_out = $table->to_json();
                     </dl>
                     <dl>
                       <dt><b>Returns:</b></dt>
-                      <dd><p><code>TableQuery</code>: Query object</p></dd>
+                      <dd><p><code>Query</code>: Query object</p></dd>
                     </dl>
                     <dl>
                       <dt><b>Query interface:</b></dt>
@@ -938,8 +937,7 @@ $json_out = $table->to_json();
                               <tr bgcolor="white" class="TableRowColor"><td><tt><b>notEqual</b>:(int64_t value)</tt></td><td>not equal to</td></tr>
                               <tr bgcolor="white" class="TableRowColor"><td><tt><b>greater</b>:(int64_t value)</tt></td><td>greater than</td></tr>
                               <tr bgcolor="white" class="TableRowColor"><td><tt><b>less</b>:(int64_t value)</tt></td><td>less than</td></tr>
-                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>between</b>:(int64_t value)</tt></td><td>belongs to interval (lower limit)</td></tr>
-                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>to</b>:(int64_t value)</tt></td><td>belongs to interval (upper limit)</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>between</b>:(int64_t value_1) <b>to</b>:(int64_t value_2)</tt></td><td>belongs to interval between <tt>value_1</tt> and <tt>value_2</tt></td></tr>
                               <tr bgcolor="white" class="TableRowColor"><td><tt>int64_t <b>sum</b></tt></td><td>calculate the sum the values of a specific column</td></tr>
                               <tr bgcolor="white" class="TableRowColor"><td><tt>int64_t <b>avg</b></tt></td><td>calculate the average of a specific column</td></tr>
                               <tr bgcolor="white" class="TableRowColor"><td><tt>int64_t <b>min</b></tt></td><td>find mininal value of a specific attribute</td></tr>
@@ -953,11 +951,11 @@ $json_out = $table->to_json();
                       <dd><p><table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
                         	<tbody><tr bgcolor="#CCCCFF" class="TableHeadingColor">
                               <th>Method</th><th>Description</th></tr>
-                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>equal</b>:(NSString *value, BOOL caseSensitive)</tt><td>equal to</td></tr>
-                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>notEqual</b>:(NSString *value, BOOL caseSensitive)</tt></td><td>not equal to</td></tr>
-                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>contains</b>:(NSString *value, BOOL caseSensitive)</tt></td><td>substring search</td></tr>
-                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>startsWith</b>:(NSString *value, BOOL caseSensitive)</tt></td><td>substring match at the begining of the attribute</td></tr>
-                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>endsWith</b>:(NSString *value, BOOL caseSensitive)</tt></td><td>substring match at the end at the attribute</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>equal</b>:(NSString *)value:(BOOL) caseSensitive</tt><td>equal to</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>notEqual</b>:(NSString *)value:(BOOL) caseSensitive</tt></td><td>not equal to</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>contains</b>:(NSString *)value:(BOOL) caseSensitive</tt></td><td>substring search</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>startsWith</b>:(NSString *)value:(BOOL) caseSensitive</tt></td><td>substring match at the begining of the attribute</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>endsWith</b>:(NSString *)value:(BOOL) caseSensitive</tt></td><td>substring match at the end at the attribute</td></tr>
                             </tbody>
                           </table>
                       </p></dd>
@@ -1327,8 +1325,25 @@ $view = $table->query()->group()
 
                 <tr bgcolor="white" class="TableRowColor">
                 <td align="right" valign="top" width="1%"><font size="-1">
+                <code>&nbsp;BOOL</code></font></td>
+                <td><code><b><a href="#tableview-isEmpty">isEmpty</a></b></code>
+                <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Check if view is empty</td>
+                </tr>
+
+                <tr bgcolor="white" class="TableRowColor">
+                <td align="right" valign="top" width="1%"><font size="-1">
+                <code>&nbsp;size_t</code></font></td>
+                <td><code><b><a href="#tableview-count">count</a></b></code>
+                <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the number of rows</td>
+                </tr>
+
+
+                <tr bgcolor="white" class="TableRowColor">
+                <td align="right" valign="top" width="1%"><font size="-1">
                 <code>&nbsp;void</code></font></td>
-                <td><code><b><a href="#tableview-unset">unset</a></b>($row)</code>
+                <td><code><b><a href="#tableview-unset">deleteRow</a></b></code>
                 <br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Remove one row</td>
                 </tr>
@@ -1340,7 +1355,7 @@ $view = $table->query()->group()
 					<a href="#" class="section section_minor" name="tableview-clear_anchor" id="tableview-clear_anchor"></a>
 					<h4>clear</h4>
 	                <p><div class="eks">
-	                <pre class="prettyprint" lang-cpp style="font-size: 16px"><b>clear</b></pre>
+	                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(void) <b>clear</b></pre>
 	            </div>
 	            </p>
 	                <dl><dd>
@@ -1349,17 +1364,18 @@ $view = $table->query()->group()
 	                	</p>
 	                	<dl>
 	                		<dt><b>Parameters:</b></dt>
-	                		<dd><p>N/A</p></dd>
+	                		<dd><p>None</p></dd>
 	                	</dl>
 	                	<dl>
 	                		<dt><b>Returns:</b></dt>
-	                		<dd><p>N/A</p></dd>
+	                		<dd><p>None</p></dd>
 	                	</dl>
 	                	<dl>
 	                		<dt><b>Example:</b></dt>
 	                		<dd>
 								<pre class="prettyprint" lang-cpp>
-$view = $table->query()->eq("name", "Jimmy")->clear();
+TableView view = [t.Age findAll:19];
+[view clear];
 								</pre>
 	                         </dd>
 	                	</dl>
@@ -1369,7 +1385,7 @@ $view = $table->query()->eq("name", "Jimmy")->clear();
 					<a href="#" class="section section_minor" name="tableview-deleterow_anchor" id="tableview-deleterow_anchor"></a>
 					<h4>deleteRow</h4>
 	                <p><div class="eks">
-	                <pre class="prettyprint" lang-cpp style="font-size: 16px"><b>deleteRow</b></pre>
+	                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(void) <b>deleteRow</b>:(size_t)index</pre>
 	            </div>
 	            </p>
 	                <dl><dd>
@@ -1378,7 +1394,7 @@ $view = $table->query()->eq("name", "Jimmy")->clear();
 	                	</p>
 	                	<dl>
 	                		<dt><b>Parameters:</b></dt>
-	                		<dd><p><code>deleteRow</code>: index to the row</p></dd>
+	                		<dd><p><code>index</code>: index to the row</p></dd>
 	                	</dl>
 	                	<dl>
 	                		<dt><b>Returns:</b></dt>
@@ -1402,7 +1418,7 @@ unset($view[5]);
 					<a href="#" class="section section_minor" name="tableview-isempty_anchor" id="tableview-isempty_anchor"></a>
 					<h4>isEmpty</h4>
 	                <p><div class="eks">
-	                <pre class="prettyprint" lang-cpp style="font-size: 16px"><b>isEmpty</b></pre>
+	                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(BOOL) <b>isEmpty</b></pre>
 	            </div>
 	            </p>
 	                <dl><dd>
@@ -1435,7 +1451,7 @@ unset($view[5]);
 					<a href="#" class="section section_minor" name="tableview-count_anchor" id="tableview-count_anchor"></a>
 					<h4>count</h4>
 	                <p><div class="eks">
-	                <pre class="prettyprint" lang-cpp style="font-size: 16px"><b>count</b></pre>
+	                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(size_t) <b>count</b></pre>
 	            </div>
 	            </p>
 	                <dl><dd>
@@ -1502,24 +1518,17 @@ unset($view[5]);
 
                 <tr bgcolor="white" class="TableRowColor">
                 <td align="right" valign="top" width="1%"><font size="-1">
-                <code>&nbsp;void</code></font></td>
-                <td><code><b><a href="#group-has_table">has_table</a></b>()</code>
+                <code>&nbsp;BOOL</code></font></td>
+                <td><code><b><a href="#group-has_table">hasTable</a></b>()</code>
                 <br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Check if group has a specific named table</td>
                 </tr>
                 
-                <tr bgcolor="white" class="TableRowColor">
-                <td align="right" valign="top" width="1%"><font size="-1">
-                <code>&nbsp;void</code></font></td>
-                <td><code><b><a href="#group-get_table">get_table</a></b>()</code>
-                <br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get a specific table</td>
-                </tr>
                 
                 <tr bgcolor="white" class="TableRowColor">
                 <td align="right" valign="top" width="1%"><font size="-1">
                 <code>&nbsp;void</code></font></td>
-                <td><code><b><a href="#group-write_to_file">write_to_file</a></b>()</code>
+                <td><code><b><a href="#group-write_to_file">write</a></b>()</code>
                 <br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Write table group to disk</td>
                 </tr>
@@ -1527,19 +1536,10 @@ unset($view[5]);
                 <tr bgcolor="white" class="TableRowColor">
                 <td align="right" valign="top" width="1%"><font size="-1">
                 <code>&nbsp;string</code></font></td>
-                <td><code><b><a href="#group-write_to_mem">write_to_mem</a></b>()</code>
+                <td><code><b><a href="#group-write_to_mem">writeToMem</a></b>()</code>
                 <br>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Write table group to memory buffer</td>
                 </tr>
-<!--
-                <tr bgcolor="white" class="TableRowColor">
-                <td align="right" valign="top" width="1%"><font size="-1">
-                <code>&nbsp;bool</code></font></td>
-                <td><code><b><a href="">has_table</a></b>()</code>
-                <br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Checks if group contains a table</td>
-                </tr>
--->                
                 </tbody></table>
                 <br>
                 
@@ -1594,7 +1594,7 @@ Group *group_from_mem = [Group groupWithBuffer:buffer len:len];
 					<a href="#" class="section section_minor" name="group-has_table_anchor" id="group-has_table_anchor"></a>
 					<h4>hasTable()</h4>
 	                <p><div class="eks">
-	                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(BOOL) <b>hasTable</b>:NSstring *)table_name)</pre>
+	                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(BOOL) <b>hasTable</b>:(NSstring *)table_name</pre>
 	            </div>
 	            </p>
 	                <dl><dd>
@@ -1603,7 +1603,7 @@ Group *group_from_mem = [Group groupWithBuffer:buffer len:len];
 	                	</p>
 	                	<dl>
 	                		<dt><b>Parameters:</b></dt>
-	                		<dd><p><code>NSstring *table_name</code>: Name of the table you wish to look for</p></dd>
+	                		<dd><p><code>NSString *table_name</code>: Name of the table you wish to look for</p></dd>
 	                	</dl>
 	                	<dl>
 	                		<dt><b>Returns:</b></dt>
@@ -1624,9 +1624,9 @@ if ([group hasTable:@"my great table"]) {
 
 				<a href="#" name="group-get_table" id="group-get_table"></a>
 				<a href="#" class="section section_minor" name="group-get_table_anchor" id="group-get_table_anchor"></a>
-				<h4>getTable</h4>
+				<h4>getTable:withClass</h4>
                 <p><div class="eks">
-                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(Table) <b>getTable</b>(string getTable withClass Table)</pre>
+                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(Table) <b>getTable</b>(NSString *getTable withClass Table)</pre>
             </div>
             </p>
                 <dl><dd>
@@ -1635,7 +1635,7 @@ if ([group hasTable:@"my great table"]) {
                 	</p>
                 	<dl>
                 		<dt><b>Parameters:</b></dt>
-                		<dd><p><code>string getTable</code>: create table named <code>getTable</code> from the group<br />
+                		<dd><p><code>NSString *getTable</code>: create table named <code>getTable</code> from the group<br />
                             <code>withClass</code>: schema</p>
                         </dd>
                 	</dl>
@@ -1650,7 +1650,7 @@ if ([group hasTable:@"my great table"]) {
 TDB_TABLE_3(PeopleTable,
  	    String, Name,
  	    Int,    Age,
-	    Bool,   Hired)
+	    Bool,   Hired);
  
 // Create Table in Group
 Group *group = [Group group];
@@ -1666,7 +1666,7 @@ PeopleTable *table = [group getTable@"My great table"
 
 				<h4>write</h4>
                 <p><div class="eks">
-                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(void) <b>write</b>(string)</pre>
+                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(void) <b>write</b>(NSString *filename)</pre>
             </div>
             </p>
                 <dl><dd>
@@ -1675,7 +1675,7 @@ PeopleTable *table = [group getTable@"My great table"
                 	</p>
                 	<dl>
                 		<dt><b>Parameters:</b></dt>
-                		<dd><p><code>string write</code>: Filename of data file</p></dd>
+                		<dd><p><code>NSString *filename</code>: Filename of data file</p></dd>
                 	</dl>
                 	<dl>
                 		<dt><b>Returns:</b></dt>
@@ -1696,9 +1696,9 @@ PeopleTable *table = [group getTable@"My great table"
 
 				<a href="#" name="group-write_to_mem" id="group-write_to_mem"></a>
 				<a href="#" class="section section_minor" name="group-write_to_mem_anchor" id="group-write_to_mem_anchor"></a>
-				<h4>writeToMem()</h4>
+				<h4>writeToMem:len</h4>
                 <p><div class="eks">
-                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(string)<b>writeToMem</b></pre>
+                <pre class="prettyprint" lang-cpp style="font-size: 16px">-(char *)<b>writeToMem</b>:(size_t *len)</pre>
             </div>
             </p>
                 <dl><dd>
@@ -1707,7 +1707,7 @@ PeopleTable *table = [group getTable@"My great table"
                 	</p>
                 	<dl>
                 		<dt><b>Parameters:</b></dt>
-                		<dd><p>writeToMem</p>: pointer to integer</dd>
+                		<dd><p>len</p>: number of bytes written</dd>
                 	</dl>
                 	<dl>
                 		<dt><b>Returns:</b></dt>
