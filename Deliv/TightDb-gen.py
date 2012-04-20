@@ -147,9 +147,23 @@ directiveStartToken = %
 \\
 -(id)initWithBlock:(TopLevelTableInitBlock)block \\
 { \\
-    self = [super init]; \\
+    self = [super initWithBlock:block]; \\
     if (self) { \\
-        if (block) block(self); \\
+	if ([self getColumnCount] == 0) { \\
+%for $j in range($num_cols)
+        [self registerColumn:COLTYPE##CType${j+1} name:[NSString stringWithUTF8String:#CName${j+1}]]; \\
+%end for
+        } \\
+%for $j in range($num_cols)
+        _##CName${j+1} = [[OCColumnProxy##CType${j+1} alloc] initWithTable:self column:${j}]; \\
+%end for
+    } \\
+    return self; \\
+} \\
+-(id)initCreateWithBlock:(TopLevelTableInitBlock)block \\
+{ \\
+    self = [super initWithBlock:block]; \\
+    if (self) { \\
 %for $j in range($num_cols)
         [self registerColumn:COLTYPE##CType${j+1} name:[NSString stringWithUTF8String:#CName${j+1}]]; \\
 %end for

@@ -13,5 +13,4 @@
 @property(nonatomic) Table *tablePtr;
 -(Table *)getTable;
 -(void)setParent:(id)parent; // Workaround for ARC release problem.
--(id)initWithBlock:(TopLevelTableInitBlock)block; // This interface is only defined on the Tightdb macro defined tables.
 @end

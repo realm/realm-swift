@@ -121,9 +121,19 @@
 \
 -(id)initWithBlock:(TopLevelTableInitBlock)block \
 { \
-    self = [super init]; \
+    self = [super initWithBlock:block]; \
     if (self) { \
-        if (block) block(self); \
+	if ([self getColumnCount] == 0) { \
+        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+        } \
+        _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
+    } \
+    return self; \
+} \
+-(id)initCreateWithBlock:(TopLevelTableInitBlock)block \
+{ \
+    self = [super initWithBlock:block]; \
+    if (self) { \
         [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
 \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
@@ -296,9 +306,21 @@
 \
 -(id)initWithBlock:(TopLevelTableInitBlock)block \
 { \
-    self = [super init]; \
+    self = [super initWithBlock:block]; \
     if (self) { \
-        if (block) block(self); \
+	if ([self getColumnCount] == 0) { \
+        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+        } \
+        _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
+        _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
+    } \
+    return self; \
+} \
+-(id)initCreateWithBlock:(TopLevelTableInitBlock)block \
+{ \
+    self = [super initWithBlock:block]; \
+    if (self) { \
         [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
         [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
 \
@@ -490,9 +512,23 @@
 \
 -(id)initWithBlock:(TopLevelTableInitBlock)block \
 { \
-    self = [super init]; \
+    self = [super initWithBlock:block]; \
     if (self) { \
-        if (block) block(self); \
+	if ([self getColumnCount] == 0) { \
+        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+        } \
+        _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
+        _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
+        _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
+    } \
+    return self; \
+} \
+-(id)initCreateWithBlock:(TopLevelTableInitBlock)block \
+{ \
+    self = [super initWithBlock:block]; \
+    if (self) { \
         [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
         [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
         [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
@@ -703,9 +739,25 @@
 \
 -(id)initWithBlock:(TopLevelTableInitBlock)block \
 { \
-    self = [super init]; \
+    self = [super initWithBlock:block]; \
     if (self) { \
-        if (block) block(self); \
+	if ([self getColumnCount] == 0) { \
+        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+        } \
+        _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
+        _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
+        _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
+        _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
+    } \
+    return self; \
+} \
+-(id)initCreateWithBlock:(TopLevelTableInitBlock)block \
+{ \
+    self = [super initWithBlock:block]; \
+    if (self) { \
         [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
         [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
         [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
@@ -935,9 +987,27 @@
 \
 -(id)initWithBlock:(TopLevelTableInitBlock)block \
 { \
-    self = [super init]; \
+    self = [super initWithBlock:block]; \
     if (self) { \
-        if (block) block(self); \
+	if ([self getColumnCount] == 0) { \
+        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+        [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
+        } \
+        _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
+        _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
+        _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
+        _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
+        _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
+    } \
+    return self; \
+} \
+-(id)initCreateWithBlock:(TopLevelTableInitBlock)block \
+{ \
+    self = [super initWithBlock:block]; \
+    if (self) { \
         [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
         [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
         [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
@@ -1186,9 +1256,29 @@
 \
 -(id)initWithBlock:(TopLevelTableInitBlock)block \
 { \
-    self = [super init]; \
+    self = [super initWithBlock:block]; \
     if (self) { \
-        if (block) block(self); \
+	if ([self getColumnCount] == 0) { \
+        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+        [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
+        [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
+        } \
+        _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
+        _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
+        _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
+        _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
+        _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
+        _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
+    } \
+    return self; \
+} \
+-(id)initCreateWithBlock:(TopLevelTableInitBlock)block \
+{ \
+    self = [super initWithBlock:block]; \
+    if (self) { \
         [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
         [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
         [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
@@ -1456,9 +1546,31 @@
 \
 -(id)initWithBlock:(TopLevelTableInitBlock)block \
 { \
-    self = [super init]; \
+    self = [super initWithBlock:block]; \
     if (self) { \
-        if (block) block(self); \
+	if ([self getColumnCount] == 0) { \
+        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+        [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
+        [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
+        [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
+        } \
+        _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
+        _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
+        _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
+        _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
+        _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
+        _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
+        _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
+    } \
+    return self; \
+} \
+-(id)initCreateWithBlock:(TopLevelTableInitBlock)block \
+{ \
+    self = [super initWithBlock:block]; \
+    if (self) { \
         [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
         [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
         [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
@@ -1745,9 +1857,33 @@
 \
 -(id)initWithBlock:(TopLevelTableInitBlock)block \
 { \
-    self = [super init]; \
+    self = [super initWithBlock:block]; \
     if (self) { \
-        if (block) block(self); \
+	if ([self getColumnCount] == 0) { \
+        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+        [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
+        [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
+        [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
+        [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
+        } \
+        _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
+        _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
+        _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
+        _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
+        _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
+        _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
+        _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
+        _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
+    } \
+    return self; \
+} \
+-(id)initCreateWithBlock:(TopLevelTableInitBlock)block \
+{ \
+    self = [super initWithBlock:block]; \
+    if (self) { \
         [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
         [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
         [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
