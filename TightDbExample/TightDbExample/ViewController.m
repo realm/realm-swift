@@ -141,8 +141,8 @@ Int,    Age)
     Group *fromDisk = [Group groupWithFilename:[self pathForDataFile:@"employees.tightdb"]];
     MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class]];
     
-    //    [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
-    //    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
+    [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
+    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
     NSLog(@"Disktable size: %zu", [diskTable count]);
     for (size_t i = 0; i < [diskTable count]; i++) {
         MyTable_Cursor *cursor = [diskTable objectAtIndex:i];

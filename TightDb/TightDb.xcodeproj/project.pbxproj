@@ -11,19 +11,7 @@
 		E9060CEB153EF21400481151 /* MACTestTableDeleteAll.m in Sources */ = {isa = PBXBuildFile; fileRef = E9EA989E153EC40500552F22 /* MACTestTableDeleteAll.m */; };
 		E9060CEF153F052400481151 /* TablePriv.h in Headers */ = {isa = PBXBuildFile; fileRef = E9EA98A0153EE16700552F22 /* TablePriv.h */; };
 		E9060CF1153F052400481151 /* Group.mm in Sources */ = {isa = PBXBuildFile; fileRef = E908394F153D8D260065A8C3 /* Group.mm */; };
-		E9060CF6153F059300481151 /* MACTestGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = E9083953153D90C20065A8C3 /* MACTestGroup.m */; };
 		E9060CF9153F0D4C00481151 /* libtightdb_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9060CEC153F04E600481151 /* libtightdb_ios.a */; };
-		E9060D00153F0E8200481151 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9FFD266153C774C00719326 /* UIKit.framework */; };
-		E9060D01153F0E8200481151 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9FFD256153C774C00719326 /* Foundation.framework */; };
-		E9060D03153F0E8200481151 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9060D02153F0E8200481151 /* CoreGraphics.framework */; };
-		E9060D09153F0E8200481151 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E9060D07153F0E8200481151 /* InfoPlist.strings */; };
-		E9060D0B153F0E8200481151 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E9060D0A153F0E8200481151 /* main.m */; };
-		E9060D0F153F0E8200481151 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E9060D0E153F0E8200481151 /* AppDelegate.m */; };
-		E9060D12153F0E8200481151 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E9060D11153F0E8200481151 /* ViewController.m */; };
-		E9060D15153F0E8200481151 /* ViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9060D13153F0E8200481151 /* ViewController_iPhone.xib */; };
-		E9060D18153F0E8200481151 /* ViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = E9060D16153F0E8200481151 /* ViewController_iPad.xib */; };
-		E9060D1E153F0F9D00481151 /* libTightDb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9FFD253153C774C00719326 /* libTightDb.a */; };
-		E9060D1F153F0FC600481151 /* libtightdb_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9060CEC153F04E600481151 /* libtightdb_ios.a */; };
 		E908394D153D87E00065A8C3 /* MACtestTable.m in Sources */ = {isa = PBXBuildFile; fileRef = E908394C153D87E00065A8C3 /* MACtestTable.m */; };
 		E9083951153D8D260065A8C3 /* Group.mm in Sources */ = {isa = PBXBuildFile; fileRef = E908394F153D8D260065A8C3 /* Group.mm */; };
 		E9083954153D90C20065A8C3 /* MACTestGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = E9083953153D90C20065A8C3 /* MACTestGroup.m */; };
@@ -49,7 +37,6 @@
 		E9EA98A1153EE16700552F22 /* TablePriv.h in Headers */ = {isa = PBXBuildFile; fileRef = E9EA98A0153EE16700552F22 /* TablePriv.h */; };
 		E9ED3DC4153D514F00EC1460 /* Table.mm in Sources */ = {isa = PBXBuildFile; fileRef = E9ED3DC2153D514F00EC1460 /* Table.mm */; };
 		E9ED3DCE153D7F9100EC1460 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9ED3DCD153D7F9100EC1460 /* Cocoa.framework */; };
-		E9ED3DD8153D7F9100EC1460 /* MacTightDb.m in Sources */ = {isa = PBXBuildFile; fileRef = E9ED3DD7153D7F9100EC1460 /* MacTightDb.m */; };
 		E9ED3DDF153D7F9100EC1460 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9FFD264153C774C00719326 /* SenTestingKit.framework */; };
 		E9ED3DE0153D7F9100EC1460 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9ED3DCD153D7F9100EC1460 /* Cocoa.framework */; };
 		E9ED3DE3153D7F9100EC1460 /* libMacTightDb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9ED3DCC153D7F9100EC1460 /* libMacTightDb.a */; };
@@ -58,22 +45,10 @@
 		E9ED3DF3153D801E00EC1460 /* TightDb.m in Sources */ = {isa = PBXBuildFile; fileRef = E9FFD284153C7E8600719326 /* TightDb.m */; };
 		E9ED3DF4153D802400EC1460 /* Table.mm in Sources */ = {isa = PBXBuildFile; fileRef = E9ED3DC2153D514F00EC1460 /* Table.mm */; };
 		E9FFD257153C774C00719326 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9FFD256153C774C00719326 /* Foundation.framework */; };
-		E9FFD265153C774C00719326 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9FFD264153C774C00719326 /* SenTestingKit.framework */; };
-		E9FFD267153C774C00719326 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9FFD266153C774C00719326 /* UIKit.framework */; };
-		E9FFD268153C774C00719326 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9FFD256153C774C00719326 /* Foundation.framework */; };
-		E9FFD26B153C774C00719326 /* libTightDb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9FFD253153C774C00719326 /* libTightDb.a */; };
-		E9FFD271153C774C00719326 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E9FFD26F153C774C00719326 /* InfoPlist.strings */; };
 		E9FFD285153C7E8600719326 /* TightDb.m in Sources */ = {isa = PBXBuildFile; fileRef = E9FFD284153C7E8600719326 /* TightDb.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		E9060D1C153F0E9500481151 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E9FFD24A153C774C00719326 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E9FFD252153C774C00719326;
-			remoteInfo = TightDb;
-		};
 		E9ED3DE1153D7F9100EC1460 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E9FFD24A153C774C00719326 /* Project object */;
@@ -81,31 +56,13 @@
 			remoteGlobalIDString = E9ED3DCB153D7F9100EC1460;
 			remoteInfo = MacTightDb;
 		};
-		E9FFD269153C774C00719326 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E9FFD24A153C774C00719326 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E9FFD252153C774C00719326;
-			remoteInfo = TightDb;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		E9060CE8153EF00D00481151 /* MACTestOriginal2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MACTestOriginal2.h; sourceTree = "<group>"; };
 		E9060CE9153EF00D00481151 /* MACTestOriginal2.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MACTestOriginal2.mm; sourceTree = "<group>"; };
 		E9060CEC153F04E600481151 /* libtightdb_ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtightdb_ios.a; path = ../native/lib/libtightdb_ios.a; sourceTree = "<group>"; };
-		E9060CFE153F0E8200481151 /* Tightdb.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tightdb.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9060D02153F0E8200481151 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		E9060D06153F0E8200481151 /* Tightdb-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tightdb-Info.plist"; sourceTree = "<group>"; };
-		E9060D08153F0E8200481151 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		E9060D0A153F0E8200481151 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		E9060D0C153F0E8200481151 /* Tightdb-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tightdb-Prefix.pch"; sourceTree = "<group>"; };
-		E9060D0D153F0E8200481151 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		E9060D0E153F0E8200481151 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		E9060D10153F0E8200481151 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		E9060D11153F0E8200481151 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		E9060D14153F0E8200481151 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPhone.xib; sourceTree = "<group>"; };
-		E9060D17153F0E8200481151 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPad.xib; sourceTree = "<group>"; };
 		E908394B153D87E00065A8C3 /* MACtestTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MACtestTable.h; sourceTree = "<group>"; };
 		E908394C153D87E00065A8C3 /* MACtestTable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MACtestTable.m; sourceTree = "<group>"; };
 		E908394F153D8D260065A8C3 /* Group.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Group.mm; sourceTree = "<group>"; };
@@ -140,8 +97,6 @@
 		E9ED3DD1153D7F9100EC1460 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		E9ED3DD2153D7F9100EC1460 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		E9ED3DD5153D7F9100EC1460 /* MacTightDb-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MacTightDb-Prefix.pch"; sourceTree = "<group>"; };
-		E9ED3DD6153D7F9100EC1460 /* MacTightDb.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MacTightDb.h; sourceTree = "<group>"; };
-		E9ED3DD7153D7F9100EC1460 /* MacTightDb.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MacTightDb.m; sourceTree = "<group>"; };
 		E9ED3DDE153D7F9100EC1460 /* MacTightDbTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MacTightDbTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9ED3DE6153D7F9100EC1460 /* MacTightDbTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MacTightDbTests-Info.plist"; sourceTree = "<group>"; };
 		E9ED3DE8153D7F9100EC1460 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -150,27 +105,12 @@
 		E9FFD253153C774C00719326 /* libTightDb.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTightDb.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9FFD256153C774C00719326 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		E9FFD25A153C774C00719326 /* TightDb-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TightDb-Prefix.pch"; sourceTree = "<group>"; };
-		E9FFD263153C774C00719326 /* TightDbTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TightDbTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9FFD264153C774C00719326 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		E9FFD266153C774C00719326 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		E9FFD26E153C774C00719326 /* TightDbTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TightDbTests-Info.plist"; sourceTree = "<group>"; };
-		E9FFD270153C774C00719326 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E9FFD284153C7E8600719326 /* TightDb.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TightDb.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		E9060CFB153F0E8200481151 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E9060D1F153F0FC600481151 /* libtightdb_ios.a in Frameworks */,
-				E9060D1E153F0F9D00481151 /* libTightDb.a in Frameworks */,
-				E9060D00153F0E8200481151 /* UIKit.framework in Frameworks */,
-				E9060D01153F0E8200481151 /* Foundation.framework in Frameworks */,
-				E9060D03153F0E8200481151 /* CoreGraphics.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		E9D58B751541A5DF009150B1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -208,45 +148,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E9FFD25F153C774C00719326 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E9FFD265153C774C00719326 /* SenTestingKit.framework in Frameworks */,
-				E9FFD267153C774C00719326 /* UIKit.framework in Frameworks */,
-				E9FFD268153C774C00719326 /* Foundation.framework in Frameworks */,
-				E9FFD26B153C774C00719326 /* libTightDb.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		E9060D04153F0E8200481151 /* Tightdb */ = {
-			isa = PBXGroup;
-			children = (
-				E9060D0D153F0E8200481151 /* AppDelegate.h */,
-				E9060D0E153F0E8200481151 /* AppDelegate.m */,
-				E9060D10153F0E8200481151 /* ViewController.h */,
-				E9060D11153F0E8200481151 /* ViewController.m */,
-				E9060D13153F0E8200481151 /* ViewController_iPhone.xib */,
-				E9060D16153F0E8200481151 /* ViewController_iPad.xib */,
-				E9060D05153F0E8200481151 /* Supporting Files */,
-			);
-			path = Tightdb;
-			sourceTree = "<group>";
-		};
-		E9060D05153F0E8200481151 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				E9060D06153F0E8200481151 /* Tightdb-Info.plist */,
-				E9060D07153F0E8200481151 /* InfoPlist.strings */,
-				E9060D0A153F0E8200481151 /* main.m */,
-				E9060D0C153F0E8200481151 /* Tightdb-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 		E93DBAA11541A29E0098E26C /* TightDbOCIncludes */ = {
 			isa = PBXGroup;
 			children = (
@@ -292,8 +196,6 @@
 		E9ED3DD3153D7F9100EC1460 /* MacTightDb */ = {
 			isa = PBXGroup;
 			children = (
-				E9ED3DD6153D7F9100EC1460 /* MacTightDb.h */,
-				E9ED3DD7153D7F9100EC1460 /* MacTightDb.m */,
 				E9ED3DD4153D7F9100EC1460 /* Supporting Files */,
 			);
 			path = MacTightDb;
@@ -343,10 +245,8 @@
 			children = (
 				E9D58B8D1541BA5D009150B1 /* libtightdb.a */,
 				E9FFD258153C774C00719326 /* TightDb */,
-				E9FFD26C153C774C00719326 /* TightDbTests */,
 				E9ED3DD3153D7F9100EC1460 /* MacTightDb */,
 				E9ED3DE4153D7F9100EC1460 /* MacTightDbTests */,
-				E9060D04153F0E8200481151 /* Tightdb */,
 				E9D58B7A1541A5DF009150B1 /* TightDbOC */,
 				E9FFD255153C774C00719326 /* Frameworks */,
 				E9FFD254153C774C00719326 /* Products */,
@@ -357,10 +257,8 @@
 			isa = PBXGroup;
 			children = (
 				E9FFD253153C774C00719326 /* libTightDb.a */,
-				E9FFD263153C774C00719326 /* TightDbTests.octest */,
 				E9ED3DCC153D7F9100EC1460 /* libMacTightDb.a */,
 				E9ED3DDE153D7F9100EC1460 /* MacTightDbTests.octest */,
-				E9060CFE153F0E8200481151 /* Tightdb.app */,
 				E9D58B781541A5DF009150B1 /* libTightDbOC.a */,
 			);
 			name = Products;
@@ -404,23 +302,6 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		E9FFD26C153C774C00719326 /* TightDbTests */ = {
-			isa = PBXGroup;
-			children = (
-				E9FFD26D153C774C00719326 /* Supporting Files */,
-			);
-			path = TightDbTests;
-			sourceTree = "<group>";
-		};
-		E9FFD26D153C774C00719326 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				E9FFD26E153C774C00719326 /* TightDbTests-Info.plist */,
-				E9FFD26F153C774C00719326 /* InfoPlist.strings */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -455,24 +336,6 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		E9060CFD153F0E8200481151 /* Tightdb */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = E9060D19153F0E8200481151 /* Build configuration list for PBXNativeTarget "Tightdb" */;
-			buildPhases = (
-				E9060CFA153F0E8200481151 /* Sources */,
-				E9060CFB153F0E8200481151 /* Frameworks */,
-				E9060CFC153F0E8200481151 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				E9060D1D153F0E9500481151 /* PBXTargetDependency */,
-			);
-			name = Tightdb;
-			productName = Tightdb;
-			productReference = E9060CFE153F0E8200481151 /* Tightdb.app */;
-			productType = "com.apple.product-type.application";
-		};
 		E9D58B771541A5DF009150B1 /* TightDbOC */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E9D58B821541A5DF009150B1 /* Build configuration list for PBXNativeTarget "TightDbOC" */;
@@ -543,25 +406,6 @@
 			productReference = E9FFD253153C774C00719326 /* libTightDb.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		E9FFD262153C774C00719326 /* TightDbTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = E9FFD27A153C774C00719326 /* Build configuration list for PBXNativeTarget "TightDbTests" */;
-			buildPhases = (
-				E9FFD25E153C774C00719326 /* Sources */,
-				E9FFD25F153C774C00719326 /* Frameworks */,
-				E9FFD260153C774C00719326 /* Resources */,
-				E9FFD261153C774C00719326 /* ShellScript */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				E9FFD26A153C774C00719326 /* PBXTargetDependency */,
-			);
-			name = TightDbTests;
-			productName = TightDbTests;
-			productReference = E9FFD263153C774C00719326 /* TightDbTests.octest */;
-			productType = "com.apple.product-type.bundle";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -584,39 +428,19 @@
 			projectRoot = "";
 			targets = (
 				E9FFD252153C774C00719326 /* TightDb */,
-				E9FFD262153C774C00719326 /* TightDbTests */,
 				E9ED3DCB153D7F9100EC1460 /* MacTightDb */,
 				E9ED3DDD153D7F9100EC1460 /* MacTightDbTests */,
-				E9060CFD153F0E8200481151 /* Tightdb */,
 				E9D58B771541A5DF009150B1 /* TightDbOC */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		E9060CFC153F0E8200481151 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E9060D09153F0E8200481151 /* InfoPlist.strings in Resources */,
-				E9060D15153F0E8200481151 /* ViewController_iPhone.xib in Resources */,
-				E9060D18153F0E8200481151 /* ViewController_iPad.xib in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		E9ED3DDB153D7F9100EC1460 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				E9ED3DE9153D7F9100EC1460 /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E9FFD260153C774C00719326 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E9FFD271153C774C00719326 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -636,32 +460,9 @@
 			shellPath = /bin/sh;
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
 		};
-		E9FFD261153C774C00719326 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		E9060CFA153F0E8200481151 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E9060D0B153F0E8200481151 /* main.m in Sources */,
-				E9060D0F153F0E8200481151 /* AppDelegate.m in Sources */,
-				E9060D12153F0E8200481151 /* ViewController.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		E9D58B741541A5DF009150B1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -678,7 +479,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E9ED3DD8153D7F9100EC1460 /* MacTightDb.m in Sources */,
 				E9ED3DF3153D801E00EC1460 /* TightDb.m in Sources */,
 				E9ED3DF4153D802400EC1460 /* Table.mm in Sources */,
 				E9BFFBDA153EA37600035C64 /* Query.mm in Sources */,
@@ -713,59 +513,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		E9FFD25E153C774C00719326 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E9060CF6153F059300481151 /* MACTestGroup.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		E9060D1D153F0E9500481151 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E9FFD252153C774C00719326 /* TightDb */;
-			targetProxy = E9060D1C153F0E9500481151 /* PBXContainerItemProxy */;
-		};
 		E9ED3DE2153D7F9100EC1460 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E9ED3DCB153D7F9100EC1460 /* MacTightDb */;
 			targetProxy = E9ED3DE1153D7F9100EC1460 /* PBXContainerItemProxy */;
 		};
-		E9FFD26A153C774C00719326 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E9FFD252153C774C00719326 /* TightDb */;
-			targetProxy = E9FFD269153C774C00719326 /* PBXContainerItemProxy */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		E9060D07153F0E8200481151 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				E9060D08153F0E8200481151 /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		E9060D13153F0E8200481151 /* ViewController_iPhone.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				E9060D14153F0E8200481151 /* en */,
-			);
-			name = ViewController_iPhone.xib;
-			sourceTree = "<group>";
-		};
-		E9060D16153F0E8200481151 /* ViewController_iPad.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				E9060D17153F0E8200481151 /* en */,
-			);
-			name = ViewController_iPad.xib;
-			sourceTree = "<group>";
-		};
 		E9ED3DE7153D7F9100EC1460 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -774,66 +532,9 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		E9FFD26F153C774C00719326 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				E9FFD270153C774C00719326 /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		E9060D1A153F0E8200481151 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Tightdb/Tightdb-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "Tightdb/Tightdb-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../native/lib\"",
-				);
-				OTHER_LDFLAGS = "-lstdc++";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				WRAPPER_EXTENSION = app;
-			};
-			name = Debug;
-		};
-		E9060D1B153F0E8200481151 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Tightdb/Tightdb-Prefix.pch";
-				INFOPLIST_FILE = "Tightdb/Tightdb-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../native/lib\"",
-				);
-				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
-				OTHER_LDFLAGS = "-lstdc++";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				WRAPPER_EXTENSION = app;
-			};
-			name = Release;
-		};
 		E9D58B801541A5DF009150B1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1052,63 +753,9 @@
 			};
 			name = Release;
 		};
-		E9FFD27B153C774C00719326 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TightDb/TightDb-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = $inherited;
-				HEADER_SEARCH_PATHS = ../../tightdb_objc/native/include;
-				INFOPLIST_FILE = "TightDbTests/TightDbTests-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../tightdb_objc/native/lib\"",
-				);
-				OTHER_LDFLAGS = "-lstdc++";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				USER_HEADER_SEARCH_PATHS = ../tightdb_objc/native/include;
-				WRAPPER_EXTENSION = octest;
-			};
-			name = Debug;
-		};
-		E9FFD27C153C774C00719326 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TightDb/TightDb-Prefix.pch";
-				HEADER_SEARCH_PATHS = ../../tightdb_objc/native/include;
-				INFOPLIST_FILE = "TightDbTests/TightDbTests-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../tightdb_objc/native/lib\"",
-				);
-				OTHER_LDFLAGS = "-lstdc++";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				USER_HEADER_SEARCH_PATHS = ../tightdb_objc/native/include;
-				WRAPPER_EXTENSION = octest;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E9060D19153F0E8200481151 /* Build configuration list for PBXNativeTarget "Tightdb" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E9060D1A153F0E8200481151 /* Debug */,
-				E9060D1B153F0E8200481151 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		E9D58B821541A5DF009150B1 /* Build configuration list for PBXNativeTarget "TightDbOC" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1116,6 +763,7 @@
 				E9D58B811541A5DF009150B1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E9ED3DED153D7F9100EC1460 /* Build configuration list for PBXNativeTarget "MacTightDb" */ = {
 			isa = XCConfigurationList;
@@ -1149,15 +797,6 @@
 			buildConfigurations = (
 				E9FFD278153C774C00719326 /* Debug */,
 				E9FFD279153C774C00719326 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		E9FFD27A153C774C00719326 /* Build configuration list for PBXNativeTarget "TightDbTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E9FFD27B153C774C00719326 /* Debug */,
-				E9FFD27C153C774C00719326 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
