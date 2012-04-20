@@ -6,7 +6,7 @@
 //
 
 #import "MACTestGroup.h"
-#import "OCGroup.h"
+#import "Group.h"
 
 TDB_TABLE_2(TestTableGroup,
 			String,     First,
@@ -15,16 +15,16 @@ TDB_TABLE_2(TestTableGroup,
 
 @implementation MACTestGroup
 {
-    OCGroup *_group;
+    Group *_group;
 }
 
 - (void)setUp
 {
     [super setUp];
     
-	// _group = [OCGroup group];
+	// _group = [Group group];
 	// NSLog(@"Group: %@", _group);
-    // STAssertNotNil(_group, @"OCGroup is nil");
+    // STAssertNotNil(_group, @"Group is nil");
 }
 
 - (void)tearDown
@@ -38,11 +38,11 @@ TDB_TABLE_2(TestTableGroup,
 - (void)testGroup
 {
     // Create empty group and serialize to disk
-    OCGroup *toDisk = [OCGroup group];
+    Group *toDisk = [Group group];
     [toDisk write:@"table_test.tbl"];
 
 	// Load the group
-    OCGroup *fromDisk = [OCGroup groupWithFilename:@"table_test.tbl"];
+    Group *fromDisk = [Group groupWithFilename:@"table_test.tbl"];
     if (![fromDisk isValid])
         STFail(@"From disk not valid");
     
