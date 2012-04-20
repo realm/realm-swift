@@ -420,6 +420,13 @@
     return table;
 }
 
+-(OCTopLevelTable *)getTopLevelTable:(size_t)columnId ndx:(size_t)ndx
+{
+    OCTopLevelTable *table = [[OCTopLevelTable alloc] initWithTableRef:_table->GetTopLevelTable(columnId, ndx)];
+    [table setParent:self];
+    return table;
+}
+
 
 -(void)dealloc
 {
@@ -629,6 +636,11 @@
 // TODO - Dummy version of initWithBlock missing ...
 @implementation OCTopLevelTable
 
+-(id)initWithTableRef:(tightdb::TableRef)ref
+{
+    self = [super initWithTableRef:ref];
+    return self;
+}
 -(void)updateFromSpec:(size_t)ref_specSet
 {
     static_cast<tightdb::TopLevelTable *>(&*self.table)->UpdateFromSpec(ref_specSet);
