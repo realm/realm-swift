@@ -4,8 +4,8 @@
 //
 
 #import "ViewController.h"
-#import "OCGroup.h"
-#import "OCTable.h"
+#import "Group.h"
+#import "Table.h"
 #import "TightDb.h"
 
 TDB_TABLE_4(MyTable,
@@ -59,7 +59,7 @@ Int,    Age)
 
 - (void)testGroup
 {
-    OCGroup *group = [OCGroup group];
+    Group *group = [Group group];
     // Create new table in group
     MyTable *table = [group getTable:@"employees" withClass:[MyTable class]];
     
@@ -82,7 +82,7 @@ Int,    Age)
     NSLog(@"Mary: %zu", row);
   //  STAssertEquals(row, (size_t)1,@"Mary should have been there");
     
-    OCTableView *view = [table.Age findAll:21];
+    TableView *view = [table.Age findAll:21];
     size_t cnt = [view count];  					// cnt = 2
     //STAssertEquals(cnt, (size_t)2,@"Should be two rows in view");
     
@@ -98,7 +98,7 @@ Int,    Age)
     [table2 addHired:YES Age:54];
     
     // Create query (current employees between 20 and 30 years old)
-    OCQuery *q = [[[table2 getQuery].Hired equal:YES].Age between:20 to:30];
+    Query *q = [[[table2 getQuery].Hired equal:YES].Age between:20 to:30];
     
     // Get number of matching entries
     NSLog(@"Query count: %zu", [q count:table2]);
@@ -110,7 +110,7 @@ Int,    Age)
     //STAssertEquals(avg, 21.0,@"Expected 20.5 average");
     
     // Execute the query and return a table (view)
-    OCTableView *res = [q findAll:table2];
+    TableView *res = [q findAll:table2];
     for (size_t i = 0; i < [res count]; i++) {
         // cursor missing. Only low-level interface!
         NSLog(@"%zu: is %lld years old",i , [res get:1 ndx:i]);
@@ -122,7 +122,7 @@ Int,    Age)
     [group write:[self pathForDataFile:@"employees.tightdb"]];
     
     // Load a group from disk (and print contents)
-    OCGroup *fromDisk = [OCGroup groupWithFilename:[self pathForDataFile:@"employees.tightdb"]];
+    Group *fromDisk = [Group groupWithFilename:[self pathForDataFile:@"employees.tightdb"]];
     MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class]];
     
     //    [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
@@ -140,7 +140,7 @@ Int,    Age)
     const char* const buffer = [group writeToMem:&len];
     
     // Load a group from memory (and print contents)
-    OCGroup *fromMem = [OCGroup groupWithBuffer:buffer len:len];
+    Group *fromMem = [Group groupWithBuffer:buffer len:len];
     MyTable *memTable = [fromMem getTable:@"employees" withClass:[MyTable class]];
     for (size_t i = 0; i < [memTable count]; i++) {
         // ??? cursor
