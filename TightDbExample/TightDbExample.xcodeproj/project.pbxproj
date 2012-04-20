@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E94A8C0B1541F97100B174B5 /* libTightDbOC_debug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94A8C0A1541F97100B174B5 /* libTightDbOC_debug.a */; };
+		E94A8C0F1541FDB000B174B5 /* libTightDbOC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94A8C0E1541FDB000B174B5 /* libTightDbOC.a */; };
 		E9D58B4F1541A375009150B1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B4E1541A375009150B1 /* UIKit.framework */; };
 		E9D58B511541A375009150B1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B501541A375009150B1 /* Foundation.framework */; };
 		E9D58B531541A375009150B1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B521541A375009150B1 /* CoreGraphics.framework */; };
@@ -20,7 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		E94A8C0A1541F97100B174B5 /* libTightDbOC_debug.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTightDbOC_debug.a; path = ../Deliv/libTightDbOC_debug.a; sourceTree = "<group>"; };
+		E94A8C0E1541FDB000B174B5 /* libTightDbOC.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTightDbOC.a; path = ../Deliv/Debug/libTightDbOC.a; sourceTree = "<group>"; };
 		E9D58B4A1541A375009150B1 /* TightDbExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TightDbExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9D58B4E1541A375009150B1 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		E9D58B501541A375009150B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -35,7 +35,6 @@
 		E9D58B611541A375009150B1 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		E9D58B641541A375009150B1 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPhone.xib; sourceTree = "<group>"; };
 		E9D58B671541A375009150B1 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPad.xib; sourceTree = "<group>"; };
-		E9D58B841541AB0C009150B1 /* libTightDbOC.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTightDbOC.a; path = ../Deliv/libTightDbOC.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,7 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E94A8C0B1541F97100B174B5 /* libTightDbOC_debug.a in Frameworks */,
+				E94A8C0F1541FDB000B174B5 /* libTightDbOC.a in Frameworks */,
 				E9D58B4F1541A375009150B1 /* UIKit.framework in Frameworks */,
 				E9D58B511541A375009150B1 /* Foundation.framework in Frameworks */,
 				E9D58B531541A375009150B1 /* CoreGraphics.framework in Frameworks */,
@@ -56,8 +55,7 @@
 		E9D58B3F1541A374009150B1 = {
 			isa = PBXGroup;
 			children = (
-				E94A8C0A1541F97100B174B5 /* libTightDbOC_debug.a */,
-				E9D58B841541AB0C009150B1 /* libTightDbOC.a */,
+				E94A8C0E1541FDB000B174B5 /* libTightDbOC.a */,
 				E9D58B541541A375009150B1 /* TightDbExample */,
 				E9D58B4D1541A375009150B1 /* Frameworks */,
 				E9D58B4B1541A375009150B1 /* Products */,
@@ -261,13 +259,7 @@
 				GCC_PREFIX_HEADER = "TightDbExample/TightDbExample-Prefix.pch";
 				HEADER_SEARCH_PATHS = ../Deliv;
 				INFOPLIST_FILE = "TightDbExample/TightDbExample-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../Deliv/Debug-iphonesimulator\"",
-					"\"$(SRCROOT)/../native/lib/Debug-iphonesimulator\"",
-					"\"$(SRCROOT)/../native/lib\"",
-					"\"$(SRCROOT)/../Deliv\"",
-				);
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../Deliv/Debug\"";
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -281,12 +273,7 @@
 				GCC_PREFIX_HEADER = "TightDbExample/TightDbExample-Prefix.pch";
 				HEADER_SEARCH_PATHS = ../Deliv;
 				INFOPLIST_FILE = "TightDbExample/TightDbExample-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../Deliv\"",
-					"\"$(SRCROOT)/../native/lib/Debug-iphonesimulator\"",
-					"\"$(SRCROOT)/../native/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../Deliv/Release\"";
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
