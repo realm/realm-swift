@@ -459,7 +459,6 @@ BOOL empty = [people isEmpty];
                 	</dl>
                 </dd></dl>
 
-                <!--  -->
 				<a href="#" name="table-count" id="table-count"></a>
 				<a href="#" class="section section_major" name="table-count_anchor" id="table-count_anchor"></a>
 				<h4>count</h4>
@@ -575,7 +574,6 @@ people_cursor = [people lastObject];
                 	</dl>
                 </dd></dl>
 
-                <!---  --->
                 <a href="#" name="table-deleteRow" id="table-deleteRow"></a>
 				<a href="#" class="section section_major" name="table-deleteRow_anchor" id="table-deleteRow_anchor"></a>	
    			<h4>deleteRow</h4>
@@ -823,7 +821,7 @@ int64_t oldest = [table.Age max];
 
                                 <h4>query</h4>
                                 <p><div class="eks">
-                                    <pre class="prettyprint" lang-cpp style="font-size: 16px">TableQuery Table::<b>query</b>()</pre>
+                                    <pre class="prettyprint" lang-cpp style="font-size: 16px">Query <b>query</b></pre>
                                   </div>
                                 </p>
                                 <dl><dd>
@@ -836,7 +834,7 @@ int64_t oldest = [table.Age max];
                                     </dl>
                                     <dl>
                                       <dt><b>Returns:</b></dt>
-                                      <dd><p><code>TableQuery</code>: Query object</p></dd>
+                                      <dd><p><code>Query</code>: Query object</p></dd>
                                     </dl>
                                   </dl>
 
@@ -897,7 +895,7 @@ pc.Name = "Hans"; // the name is updated
 
                 <a href="#" name="table-query" id="table-query"></a>
                 <a href="#" class="section section_major" name="table-query_anchor" id="table-query_anchor"></a>
-                <h3>query()</h3>
+                <h3>query</h3>
                 <p><div class="eks">
                     <pre class="prettyprint" lang-cpp style="font-size: 16px">TableQuery Table::<b>query</b>()</pre>
                   </div>
@@ -939,7 +937,7 @@ pc.Name = "Hans"; // the name is updated
                               <tr bgcolor="white" class="TableRowColor"><td><tt><b>less</b>:(int64_t value)</tt></td><td>less than</td></tr>
                               <tr bgcolor="white" class="TableRowColor"><td><tt><b>between</b>:(int64_t value_1) <b>to</b>:(int64_t value_2)</tt></td><td>belongs to interval between <tt>value_1</tt> and <tt>value_2</tt></td></tr>
                               <tr bgcolor="white" class="TableRowColor"><td><tt>int64_t <b>sum</b></tt></td><td>calculate the sum the values of a specific column</td></tr>
-                              <tr bgcolor="white" class="TableRowColor"><td><tt>int64_t <b>avg</b></tt></td><td>calculate the average of a specific column</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt>double <b>avg</b></tt></td><td>calculate the average of a specific column</td></tr>
                               <tr bgcolor="white" class="TableRowColor"><td><tt>int64_t <b>min</b></tt></td><td>find mininal value of a specific attribute</td></tr>
                               <tr bgcolor="white" class="TableRowColor"><td><tt>int64_t <b>max</b></tt></td><td>find the maximal value of a specific attribute</td></tr>
                             </tbody>
@@ -1007,6 +1005,7 @@ Query q = [[[people getQuery].Hired equal:YES]
                     <dl>
                       <dt><b>Example:</b></dt>
                       <dd>
+<!---
                         <pre class="prettyprint" lang-cpp>
 $view = $table->query()->group()
                            ->eq("age", 19)
@@ -1015,6 +1014,7 @@ $view = $table->query()->group()
                        ->endGroup()
                        ->do();
                         </pre>
+--->
                       </dd>
                     </dl>
                 </dd></dl>
@@ -1041,6 +1041,7 @@ $view = $table->query()->group()
                     <dl>
                       <dt><b>Example:</b></dt>
                       <dd>
+<!---
                         <pre class="prettyprint" lang-cpp>
 $view = $table->query()->group()
                            ->eq("age", 19)
@@ -1049,6 +1050,7 @@ $view = $table->query()->group()
                        ->endGroup()
                        ->do();
                         </pre>
+--->
                       </dd>
                     </dl>
                 </dd></dl>
@@ -1075,6 +1077,7 @@ $view = $table->query()->group()
                     <dl>
                       <dt><b>Example:</b></dt>
                       <dd>
+<!---
                         <pre class="prettyprint" lang-cpp>
 $view = $table->query()->group()
                            ->eq("age", 19)
@@ -1083,6 +1086,7 @@ $view = $table->query()->group()
                        ->endGroup()
                        ->do();
                         </pre>
+--->
                       </dd>
                     </dl>
                 </dd></dl>
@@ -1108,10 +1112,12 @@ $view = $table->query()->group()
                     </dl>
                     <dt><b>Example:</b></dt>
                   <dd>
+<!---
                     <pre class="prettyprint" lang-cpp>
 $query = $table->query()->eq("age", 19);
 $view = $query->do();
                     </pre>
+--->
                   </dd>
                 </dl>
                </dd></dl>
@@ -1139,6 +1145,7 @@ $view = $query->do();
                     <dl>
                       <dt><b>Example:</b></dt>
                       <dd>
+<!---
                         <pre class="prettyprint" lang-cpp>
 $view = $table->query()->group()
                            ->eq("age", 19)
@@ -1147,6 +1154,7 @@ $view = $table->query()->group()
                        ->endGroup()
                        ->count();
                         </pre>
+--->
                       </dd>
                     </dl>
                 </dd></dl>
@@ -1174,6 +1182,7 @@ $view = $table->query()->group()
                     <dl>
                       <dt><b>Example:</b></dt>
                       <dd>
+<!---
                         <pre class="prettyprint" lang-cpp>
 $view = $table->query()->group()
                            ->eq("age", 19)
@@ -1182,6 +1191,7 @@ $view = $table->query()->group()
                        ->endGroup()
                        ->sum("weight");
                         </pre>
+--->
                       </dd>
                     </dl>
                 </dd></dl>
@@ -1190,7 +1200,7 @@ $view = $table->query()->group()
                 <a href="#" class="section section_major" name="tablequery-avg_anchor" id="tablequery-avg_anchor"></a>
                 <h4>avg</h4>
                 <p><div class="eks">
-                    <pre class="prettyprint" lang-cpp style="font-size: 16px">-(int64_t) <b>avg</b></pre>
+                    <pre class="prettyprint" lang-cpp style="font-size: 16px">-(double) <b>avg</b></pre>
                   </div>
                 </p>
                 <dl><dd>
@@ -1203,11 +1213,12 @@ $view = $table->query()->group()
                     </dl>
                     <dl>
                       <dt><b>Returns:</b></dt>
-                      <dd><p><b>int64_t</b>: the average</p></dd>
+                      <dd><p><b>double</b>: the average</p></dd>
                     </dl>
                     <dl>
                       <dt><b>Example:</b></dt>
                       <dd>
+<!---
                         <pre class="prettyprint" lang-cpp>
 $view = $table->query()->group()
                            ->eq("age", 19)
@@ -1216,6 +1227,7 @@ $view = $table->query()->group()
                        ->endGroup()
                        ->avg("weight");
                         </pre>
+--->
                       </dd>
                     </dl>
                 </dd></dl>
@@ -1242,6 +1254,7 @@ $view = $table->query()->group()
                     <dl>
                       <dt><b>Example:</b></dt>
                       <dd>
+<!---
                         <pre class="prettyprint" lang-cpp>
 $view = $table->query()->group()
                            ->eq("age", 19)
@@ -1250,6 +1263,7 @@ $view = $table->query()->group()
                        ->endGroup()
                        ->max("weight");
                         </pre>
+--->
                       </dd>
                     </dl>
                 </dd></dl>
@@ -1276,6 +1290,7 @@ $view = $table->query()->group()
                     <dl>
                       <dt><b>Example:</b></dt>
                       <dd>
+<!---
                         <pre class="prettyprint" lang-cpp>
 $view = $table->query()->group()
                            ->eq("age", 19)
@@ -1284,6 +1299,7 @@ $view = $table->query()->group()
                        ->endGroup()
                        ->min("weight");
                         </pre>
+--->
                       </dd>
                     </dl>
                 </dd></dl>
@@ -1403,12 +1419,14 @@ TableView view = [t.Age findAll:19];
 	                	<dl>
 	                		<dt><b>Example:</b></dt>
 	                		<dd>
+<!---
 								<pre class="prettyprint" lang-cpp>
 
 $view = $table->query()->eq("name", "Jimmy")->do();
 unset($view[5]);
 
 								</pre>
+--->
 	                         </dd>
 	                	</dl>
 	                </dd></dl>
@@ -1436,12 +1454,14 @@ unset($view[5]);
 	                	<dl>
 	                		<dt><b>Example:</b></dt>
 	                		<dd>
+<!---
 								<pre class="prettyprint" lang-cpp>
 
 $view = $table->query()->eq("name", "Jimmy")->do();
 unset($view[5]);
 
 								</pre>
+--->
 	                         </dd>
 	                	</dl>
 	                </dd></dl>
@@ -1469,12 +1489,14 @@ unset($view[5]);
 	                	<dl>
 	                		<dt><b>Example:</b></dt>
 	                		<dd>
+<!---
 								<pre class="prettyprint" lang-cpp>
 
 $view = $table->query()->eq("name", "Jimmy")->do();
 unset($view[5]);
 
 								</pre>
+--->
 	                         </dd>
 	                	</dl>
 	                </dd></dl>
