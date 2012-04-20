@@ -63,19 +63,19 @@ TDB_TABLE_IMPL_2(MyTable2,
     [table2 addHired:YES Age:54];
      
     // Create query (current employees between 20 and 30 years old)
-    Query *q = [[[table2 getQuery].Hired equal:YES].Age between:20 to:30];
+    MyTable2_Query *q = [[[table2 getQuery].Hired equal:YES].Age between:20 to:30];
 
     // Get number of matching entries
-    NSLog(@"Query count: %zu", [q count:table2]);
-    STAssertEquals([q count:table2], (size_t)2,@"Expected 2 rows in query");
+    NSLog(@"Query count: %zu", [q count]);
+    STAssertEquals([q count], (size_t)2,@"Expected 2 rows in query");
      
      // Get the average age - currently only a low-level interface!
-    double avg = [q avg:table2 column:1 resultCount:&cnt];
+    double avg = [q.Age avg];
     NSLog(@"Average: %f", avg);
     STAssertEquals(avg, 21.0,@"Expected 20.5 average");
      
     // Execute the query and return a table (view)
-    TableView *res = [q findAll:table2];
+    TableView *res = [q findAll];
     for (size_t i = 0; i < [res count]; i++) {
 		// cursor missing. Only low-level interface!
         NSLog(@"%zu: is %lld years old",i , [res get:1 ndx:i]);

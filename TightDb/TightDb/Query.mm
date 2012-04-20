@@ -20,13 +20,15 @@
 @implementation Query
 {
     tightdb::Query *_query;
+    Table *_table;
 }
 
 
--(id)init
+-(id)initWithTable:(Table *)table
 {
     self = [super init];
     if (self) {
+        _table = table;
         _query = new tightdb::Query();
     }
     return self;
@@ -58,19 +60,20 @@
     _query->Parent();
 }
 
--(size_t)count:(Table *)table
+-(size_t)count
 {
-    return _query->Count(*[table getTable]);
+    return _query->Count(*[_table getTable]);
 }
 
--(double)avg:(Table *)table column:(size_t)columndId resultCount:(size_t *)resultCount
+-(double)avgOnColumn:(size_t)columndId
 {
-    return _query->Avg(*[table getTable], columndId, resultCount);
+    size_t resultCount;
+    return _query->Avg(*[_table getTable], columndId, &resultCount);
 }
 
--(TableView *)findAll:(Table *)table
+-(TableView *)findAll
 {
-    return [TableView tableViewWithTableView:_query->FindAll(*[table getTable])];
+    return [TableView tableViewWithTableView:_query->FindAll(*[_table getTable])];
 }
 @end
 
@@ -80,9 +83,10 @@
 class XQueryAccessorIntOC : public tightdb::XQueryAccessorInt {
 public:
     XQueryAccessorIntOC(size_t columnId, tightdb::Query *query) : XQueryAccessorInt(columnId)
-{
+{    
     m_query = query;
 }
+    size_t getCol() const { return m_column_id;};
 };
 
 @implementation OCXQueryAccessorInt
@@ -99,6 +103,11 @@ public:
     }
     return self;
 }
+-(double)avg
+{
+    return [_query avgOnColumn:_accessor->getCol()];
+}
+
 -(Query *)equal:(int64_t)value
 {
     _accessor->Equal(value);

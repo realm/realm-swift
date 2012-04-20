@@ -32,9 +32,9 @@
 @end \
 @implementation TableName##_##Query \
 @synthesize CName1 = _CName1; \
--(id)init \
+-(id)initWithTable:(Table *)table \
 { \
-    self = [super init]; \
+    self = [super initWithTable:table]; \
     if (self) { \
         _CName1 = [[TableName##QueryAccessor##CType1 alloc] initWithColumn:0 query:self]; \
     } \
@@ -163,7 +163,7 @@
 } \
 -(TableName##_##Query *)getQuery \
 { \
-    return [[TableName##_##Query alloc] init]; \
+    return [[TableName##_##Query alloc] initWithTable:self]; \
 } \
 -(TableName##_Cursor *)add \
 { \
@@ -215,9 +215,9 @@
 @implementation TableName##_##Query \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
--(id)init \
+-(id)initWithTable:(Table *)table \
 { \
-    self = [super init]; \
+    self = [super initWithTable:table]; \
     if (self) { \
         _CName1 = [[TableName##QueryAccessor##CType1 alloc] initWithColumn:0 query:self]; \
         _CName2 = [[TableName##QueryAccessor##CType2 alloc] initWithColumn:1 query:self]; \
@@ -356,7 +356,7 @@
 } \
 -(TableName##_##Query *)getQuery \
 { \
-    return [[TableName##_##Query alloc] init]; \
+    return [[TableName##_##Query alloc] initWithTable:self]; \
 } \
 -(TableName##_Cursor *)add \
 { \
@@ -419,9 +419,9 @@
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
 @synthesize CName3 = _CName3; \
--(id)init \
+-(id)initWithTable:(Table *)table \
 { \
-    self = [super init]; \
+    self = [super initWithTable:table]; \
     if (self) { \
         _CName1 = [[TableName##QueryAccessor##CType1 alloc] initWithColumn:0 query:self]; \
         _CName2 = [[TableName##QueryAccessor##CType2 alloc] initWithColumn:1 query:self]; \
@@ -570,7 +570,7 @@
 } \
 -(TableName##_##Query *)getQuery \
 { \
-    return [[TableName##_##Query alloc] init]; \
+    return [[TableName##_##Query alloc] initWithTable:self]; \
 } \
 -(TableName##_Cursor *)add \
 { \
@@ -644,9 +644,9 @@
 @synthesize CName2 = _CName2; \
 @synthesize CName3 = _CName3; \
 @synthesize CName4 = _CName4; \
--(id)init \
+-(id)initWithTable:(Table *)table \
 { \
-    self = [super init]; \
+    self = [super initWithTable:table]; \
     if (self) { \
         _CName1 = [[TableName##QueryAccessor##CType1 alloc] initWithColumn:0 query:self]; \
         _CName2 = [[TableName##QueryAccessor##CType2 alloc] initWithColumn:1 query:self]; \
@@ -805,7 +805,7 @@
 } \
 -(TableName##_##Query *)getQuery \
 { \
-    return [[TableName##_##Query alloc] init]; \
+    return [[TableName##_##Query alloc] initWithTable:self]; \
 } \
 -(TableName##_Cursor *)add \
 { \
@@ -890,9 +890,9 @@
 @synthesize CName3 = _CName3; \
 @synthesize CName4 = _CName4; \
 @synthesize CName5 = _CName5; \
--(id)init \
+-(id)initWithTable:(Table *)table \
 { \
-    self = [super init]; \
+    self = [super initWithTable:table]; \
     if (self) { \
         _CName1 = [[TableName##QueryAccessor##CType1 alloc] initWithColumn:0 query:self]; \
         _CName2 = [[TableName##QueryAccessor##CType2 alloc] initWithColumn:1 query:self]; \
@@ -1061,7 +1061,7 @@
 } \
 -(TableName##_##Query *)getQuery \
 { \
-    return [[TableName##_##Query alloc] init]; \
+    return [[TableName##_##Query alloc] initWithTable:self]; \
 } \
 -(TableName##_Cursor *)add \
 { \
@@ -1157,9 +1157,9 @@
 @synthesize CName4 = _CName4; \
 @synthesize CName5 = _CName5; \
 @synthesize CName6 = _CName6; \
--(id)init \
+-(id)initWithTable:(Table *)table \
 { \
-    self = [super init]; \
+    self = [super initWithTable:table]; \
     if (self) { \
         _CName1 = [[TableName##QueryAccessor##CType1 alloc] initWithColumn:0 query:self]; \
         _CName2 = [[TableName##QueryAccessor##CType2 alloc] initWithColumn:1 query:self]; \
@@ -1338,7 +1338,7 @@
 } \
 -(TableName##_##Query *)getQuery \
 { \
-    return [[TableName##_##Query alloc] init]; \
+    return [[TableName##_##Query alloc] initWithTable:self]; \
 } \
 -(TableName##_Cursor *)add \
 { \
@@ -1445,9 +1445,9 @@
 @synthesize CName5 = _CName5; \
 @synthesize CName6 = _CName6; \
 @synthesize CName7 = _CName7; \
--(id)init \
+-(id)initWithTable:(Table *)table \
 { \
-    self = [super init]; \
+    self = [super initWithTable:table]; \
     if (self) { \
         _CName1 = [[TableName##QueryAccessor##CType1 alloc] initWithColumn:0 query:self]; \
         _CName2 = [[TableName##QueryAccessor##CType2 alloc] initWithColumn:1 query:self]; \
@@ -1636,7 +1636,7 @@
 } \
 -(TableName##_##Query *)getQuery \
 { \
-    return [[TableName##_##Query alloc] init]; \
+    return [[TableName##_##Query alloc] initWithTable:self]; \
 } \
 -(TableName##_Cursor *)add \
 { \
@@ -1754,9 +1754,9 @@
 @synthesize CName6 = _CName6; \
 @synthesize CName7 = _CName7; \
 @synthesize CName8 = _CName8; \
--(id)init \
+-(id)initWithTable:(Table *)table \
 { \
-    self = [super init]; \
+    self = [super initWithTable:table]; \
     if (self) { \
         _CName1 = [[TableName##QueryAccessor##CType1 alloc] initWithColumn:0 query:self]; \
         _CName2 = [[TableName##QueryAccessor##CType2 alloc] initWithColumn:1 query:self]; \
@@ -1955,7 +1955,7 @@
 } \
 -(TableName##_##Query *)getQuery \
 { \
-    return [[TableName##_##Query alloc] init]; \
+    return [[TableName##_##Query alloc] initWithTable:self]; \
 } \
 -(TableName##_Cursor *)add \
 { \

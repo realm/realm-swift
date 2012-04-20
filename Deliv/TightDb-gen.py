@@ -54,9 +54,9 @@ directiveStartToken = %
 %for $j in range($num_cols)
 @synthesize CName${j+1} = _CName${j+1}; \\
 %end for
--(id)init \\
+-(id)initWithTable:(Table *)table \\
 { \\
-    self = [super init]; \\
+    self = [super initWithTable:table]; \\
     if (self) { \\
 %for $j in range($num_cols)
         _CName${j+1} = [[TableName##QueryAccessor##CType${j+1} alloc] initWithColumn:${j} query:self]; \\
@@ -213,7 +213,7 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 } \\
 -(TableName##_##Query *)getQuery \\
 { \\
-    return [[TableName##_##Query alloc] init]; \\
+    return [[TableName##_##Query alloc] initWithTable:self]; \\
 } \\
 -(TableName##_Cursor *)add \\
 { \\
