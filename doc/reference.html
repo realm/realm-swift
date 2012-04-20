@@ -914,7 +914,7 @@ pc.Name = "Hans"; // the name is updated
                     </dl>
                     <dl>
                       <dt><b>Query interface:</b></dt>
-                      <dd><p>Query objects are created by and associated with table objects. Query is build using a <a href="http://en.wikipedia.org/wiki/Fluent_interface">fluent interface</a> (method invocations can be daisy chained). Conditions are by default folded using logical-and. Query objects can be reused, and queries can be repeatly executed by the <tt>do()</tt> method (resembles the prepare/execute pattern in SQL clients).<p> The table shows the declared methods on TableQuery objects.</p></dd>
+                      <dd><p>Query objects are created by and associated with table objects. Query is build using a <a href="http://en.wikipedia.org/wiki/Fluent_interface">fluent interface</a> (method invocations can be daisy chained). Conditions are by default folded using logical-and. Query objects can be reused, and queries can be repeatly executed by the <tt>findAll()</tt> method (resembles the prepare/execute pattern in SQL clients).<p> The table shows the declared methods on TableQuery objects.</p></dd>
 
                       <dd><p>For boolean columns:</p></dd>
                       <dd><p><table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
@@ -965,7 +965,7 @@ pc.Name = "Hans"; // the name is updated
                               <tr bgcolor="white" class="TableRowColor"><td><tt><b>group</b>()</tt></td><td><a href="#tablequery-group">begin</a> condition group ("left" parenthesis)</td></tr>
                               <tr bgcolor="white" class="TableRowColor"><td><tt><b>endgroup</b>()</tt></td><td><a href="#tablequery-endgroup">end</a> condition group ("right" parenthesis)</td></tr>
                               <tr bgcolor="white" class="TableRowColor"><td><tt><b>or</b>()</tt></td><td><a href="#tablequery-or">logical-or</a></td></tr>
-                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>do</b>()</tt></td><td><a href="#tablequery-do">execute</a> a query</td></tr>
+                              <tr bgcolor="white" class="TableRowColor"><td><tt><b>findAll</b>()</tt></td><td><a href="#tablequery-do">execute</a> a query</td></tr>
                               <tr bgcolor="white" class="TableRowColor"><td><tt>int <b>count</b>()</tt></td><td><a href="#tablequery-count">count</a> the number of rows</td></tr>
                             </tbody>
                           </table>
@@ -1012,7 +1012,7 @@ $view = $table->query()->group()
                            ->or()
                            ->eq("age", 20)
                        ->endGroup()
-                       ->do();
+                       ->findAll();
                         </pre>
 --->
                       </dd>
@@ -1048,7 +1048,7 @@ $view = $table->query()->group()
                            ->or()
                            ->eq("age", 20)
                        ->endGroup()
-                       ->do();
+                       ->findAll();
                         </pre>
 --->
                       </dd>
@@ -1084,7 +1084,7 @@ $view = $table->query()->group()
                            ->or()
                            ->eq("age", 20)
                        ->endGroup()
-                       ->do();
+                       ->findAll();
                         </pre>
 --->
                       </dd>
@@ -1095,7 +1095,7 @@ $view = $table->query()->group()
                 <a href="#" class="section section_major" name="tablequery-do_anchor" id="tablequery-do_anchor"></a>
                 <h4>do</h4>
                 <p><div class="eks">
-                    <pre class="prettyprint" lang-cpp style="font-size: 16px">-(TableView) <b>do</b></pre>
+                    <pre class="prettyprint" lang-cpp style="font-size: 16px">-(TableView) <b>findAll</b></pre>
                   </div>
                 </p>
                 <dl><dd>
@@ -1115,7 +1115,7 @@ $view = $table->query()->group()
 <!---
                     <pre class="prettyprint" lang-cpp>
 $query = $table->query()->eq("age", 19);
-$view = $query->do();
+$view = $query->findAll();
                     </pre>
 --->
                   </dd>
@@ -1309,7 +1309,7 @@ $view = $table->query()->group()
                 <a href="#" class="section section_minor" name="tableview_anchor" id="tableview_anchor"></a>
                 <h2>TableView Class</h2>
                 <p>
-                The <code>do</code> in the <code>Query</code> class returns a <code>TableView</code> object. You can interact with the TableView just as a regular table, and all changes to it will propagate to the original <a href="#table">table</a>.
+                The <code>findAll</code> in the <code>Query</code> class returns a <code>TableView</code> object. You can interact with the TableView just as a regular table, and all changes to it will propagate to the original <a href="#table">table</a>.
                 </p>
 
 				<table border="1" width="100%" cellpadding="3" cellspacing="0" summary="">
@@ -1318,7 +1318,7 @@ $view = $table->query()->group()
 				<b>Constructor Summary</b></font></th>
 				</tr>
 				<tr bgcolor="white" class="TableRowColor">
-				<td><code><b><a href="#tableview">TableView</a></b> Query::do()</code>
+				<td><code><b><a href="#tableview">TableView</a></b> Query::findAll()</code>
 
 				<br>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TableView class.</td>
@@ -1422,7 +1422,7 @@ TableView view = [t.Age findAll:19];
 <!---
 								<pre class="prettyprint" lang-cpp>
 
-$view = $table->query()->eq("name", "Jimmy")->do();
+$view = $table->query()->eq("name", "Jimmy")->findAll();
 unset($view[5]);
 
 								</pre>
@@ -1457,7 +1457,7 @@ unset($view[5]);
 <!---
 								<pre class="prettyprint" lang-cpp>
 
-$view = $table->query()->eq("name", "Jimmy")->do();
+$view = $table->query()->eq("name", "Jimmy")->findAll();
 unset($view[5]);
 
 								</pre>
@@ -1492,7 +1492,7 @@ unset($view[5]);
 <!---
 								<pre class="prettyprint" lang-cpp>
 
-$view = $table->query()->eq("name", "Jimmy")->do();
+$view = $table->query()->eq("name", "Jimmy")->findAll();
 unset($view[5]);
 
 								</pre>
