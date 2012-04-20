@@ -1,0 +1,10 @@
+Deliv contains all needed headerfiles for customer.
+
+Customer build
+other linker flags: -lstdc++
+include path: Deliv
+
+
+
+Naming of database fields: Must start with capital letter.
+

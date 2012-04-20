@@ -7,8 +7,8 @@
 //
 
 #import "MACTestOriginal2.h"
-#include "../../native/include/Group.h"
-#include "../../native/include/tightdb.h"
+#include "TightDb/Group.h"
+#include "TightDb/tightdb.h"
 #include <string>
 #include <iostream>
 #include <sstream>

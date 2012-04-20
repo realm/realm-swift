@@ -24,7 +24,10 @@ Int,    Age)
 @end
 
 @implementation ViewController
-
+{
+    float y;
+}
+#define LineHeight 31
 
 - (NSString *) pathForDataFile:(NSString *)filename {
     NSArray*	documentDir = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -41,7 +44,20 @@ Int,    Age)
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    self.view = [[UIScrollView alloc] initWithFrame:self.view.bounds];
+    y = 0;
 	[self testGroup];
+}
+
+-(void)Eval:(BOOL)good msg:(NSString *)msg
+{
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, y, self.view.bounds.size.width, LineHeight)];
+    label.text = [NSString stringWithFormat:@"%@ - %@", good?@"OK":@"Fail", msg];
+    if (!good)
+        label.backgroundColor = [UIColor redColor];
+    [self.view addSubview:label];
+    y += LineHeight;
+    ((UIScrollView *)self.view).contentSize = CGSizeMake(self.view.bounds.size.width, y);
 }
 
 
@@ -77,14 +93,14 @@ Int,    Age)
     size_t row; 
     row = [table.Name find:@"Philip"];		    	// row = (size_t)-1
     NSLog(@"Philip: %zu", row);
-//    STAssertEquals(row, (size_t)-1,@"Philip should not be there");
+    [self Eval:row==-1 msg:@"Philip should not be there"];
     row = [table.Name find:@"Mary"];		
     NSLog(@"Mary: %zu", row);
-  //  STAssertEquals(row, (size_t)1,@"Mary should have been there");
+    [self Eval:row==1 msg:@"Mary should have been there"];
     
     TableView *view = [table.Age findAll:21];
     size_t cnt = [view count];  					// cnt = 2
-    //STAssertEquals(cnt, (size_t)2,@"Should be two rows in view");
+    [self Eval:cnt == 2 msg:@"Should be two rows in view"];
     
     //------------------------------------------------------
     
@@ -102,12 +118,12 @@ Int,    Age)
     
     // Get number of matching entries
     NSLog(@"Query count: %zu", [q count:table2]);
-    //STAssertEquals([q count:table2], (size_t)2,@"Expected 2 rows in query");
+    [self Eval:[q count:table2] == 2 msg:@"Expected 2 rows in query"];
     
     // Get the average age - currently only a low-level interface!
     double avg = [q avg:table2 column:1 resultCount:&cnt];
     NSLog(@"Average: %f", avg);
-    //STAssertEquals(avg, 21.0,@"Expected 20.5 average");
+    [self Eval:avg == 21.0 msg:@"Expected 20.5 average"];
     
     // Execute the query and return a table (view)
     TableView *res = [q findAll:table2];
