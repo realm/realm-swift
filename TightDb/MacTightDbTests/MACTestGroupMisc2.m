@@ -213,15 +213,15 @@ TDB_TABLE_2(QueryTable,
     [table setMixed:COL_TABLE_MIX ndx:0 value: [OCMixed mixedWithType:COLUMN_TYPE_TABLE]];
 
     // Specify its schema
-    OCTopLevelTable *subtable2 = [table getTopLevelTable:COL_TABLE_MIX ndx:0];
+/*    OCTopLevelTable *subtable2 = [table getTopLevelTable:COL_TABLE_MIX ndx:0];
     {
         OCSpec *s = [subtable2 getSpec];
         [s addColumn:COLUMN_TYPE_INT name:@"int"];
         [subtable2 updateFromSpec:[s getRef]];
     }
-
     // Add a row to it
     [subtable2 addRow];
+    */
     [subtable set:COL_SUBTABLE_INT ndx:0 value:900];
 }
 
