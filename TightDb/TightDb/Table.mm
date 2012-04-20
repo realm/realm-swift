@@ -4,7 +4,7 @@
 //
 
 #include "TightDb/Table.h"
-#include "alloc.h"
+#include "TightDb/alloc.h"
 #import "Table.h"
 #import "TablePriv.h"
 
@@ -626,7 +626,7 @@
 #endif
 @end
 
-
+// TODO - Dummy version of initWithBlock missing ...
 @implementation OCTopLevelTable
 
 -(void)updateFromSpec:(size_t)ref_specSet
