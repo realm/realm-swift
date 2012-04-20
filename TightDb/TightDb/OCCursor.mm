@@ -12,12 +12,10 @@
 @interface OCCursorBase()
 @property (nonatomic, strong) OCTable *table;
 @property (nonatomic) size_t ndx;
-@property (nonatomic) CursorBase *cursor;
 @end
 @implementation OCCursorBase
 @synthesize table = _table;
 @synthesize ndx = _ndx;
-@synthesize cursor = _cursor;
 
 -(id)initWithTable:(OCTable *)table ndx:(size_t)ndx
 {
@@ -25,17 +23,9 @@
     if (self) {
         _table = table;
         _ndx = ndx;
-        NSLog(@"Table: %@ - %zu", _table, _ndx);
-        _cursor = new CursorBase(*[table getTable], ndx); // TODO - remove
     }
     return self;
 }
-
--(void)dealloc
-{
-    delete _cursor;
-}
-
 @end
 
 #pragma mark - OCAccessor
