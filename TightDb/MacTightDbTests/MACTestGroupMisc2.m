@@ -113,4 +113,61 @@ TDB_TABLE_IMPL_2(MyTable2,
     }
 }
 
+
+TDB_TABLE_2(QueryTable,
+	Int, First,
+	String, Second)
+
+- (void)testQuery
+{
+    OCGroup *group = [OCGroup group];
+    QueryTable *table = [group getTable:@"Query table" withClass:[QueryTable class]];
+
+    // Add some rows
+    [table addFirst:2 Second:@"a"];
+    [table addFirst:4 Second:@"a"];
+    [table addFirst:5 Second:@"b"];
+    [table addFirst:8 Second:@"The quick brown fox"];
+
+    {
+        QueryTable_Query *q = [[table getQuery].First between:3 to:7]; // Between
+        STAssertEquals(2,   [q count]);
+        STAssertEquals(9,   [q.First sum]); // Sum
+        STAssertEquals(4.5, [q.First avg]); // Average
+        STAssertEquals(4,   [q.First min]); // Minimum
+        STAssertEquals(5,   [q.First max]); // Maximum
+    }
+    {
+        QueryTable_Query *q = [[table getQuery].Second contains:@"quick"]; // String contains
+        STAssertEquals(1, [q count]);
+    }
+    {
+        QueryTable_Query *q = [[table getQuery].Second beginsWith:@"The"]; // String prefix
+        STAssertEquals(1, [q count]);
+    }
+    {
+        QueryTable_Query *q = [[table getQuery].Second endsWith:@"The"]; // String suffix
+        STAssertEquals(1, [q count]);
+    }
+    {
+        QueryTable_Query *q = [[[table getQuery].Second notEqual:@"a"].Second notEqual:@"b"]; // And
+        STAssertEquals(1, [q count]);
+    }
+    {
+        QueryTable_Query *q = [[[[table getQuery].Second notEqual:@"a"] or].Second notEqual:@"b"]; // Or
+        STAssertEquals(3, [q count]);
+    }
+    {
+        QueryTable_Query *q = [[[[[[[table getQuery].Second equal:@"a"] group].First less:3] or].First greater:5] endgroup]; // Parentheses
+        STAssertEquals(1, [q count]);
+    }
+    {
+        QueryTable_Query *q = [[[[[table getQuery].Second equal:@"a"].First less:3] or].First greater:5]; // No parenthesis
+        STAssertEquals(2, [q count]);
+        QueryTable_View *tv = [q findAll];
+        STAssertEquals(2, [tv count]);
+        STAssertEquals(8, [tv objectAtIndex:1].First);
+    }
+}
+
 @end
