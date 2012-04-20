@@ -8,8 +8,8 @@
 
 
 #import "MACTestOriginal.h"
-#include "../../native/include/Group.h"
-#include "../../native/include/tightdb.h"
+#include "TightDb/Group.h"
+#include "TightDb/tightdb.h"
 
 using namespace tightdb;
 

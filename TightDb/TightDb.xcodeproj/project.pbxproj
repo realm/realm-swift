@@ -846,7 +846,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../native/lib\"",
+					"\"$(SRCROOT)/../native/lib/Debug-iphoneos\"",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -862,7 +862,7 @@
 				GCC_PREFIX_HEADER = "TightDbOC/TightDbOC-Prefix.pch";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/../native/lib\"",
+					"\"$(SRCROOT)/../native/lib/Release-iphoneos\"",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
