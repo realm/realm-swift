@@ -55,6 +55,8 @@ TDB_TABLE_IMPL_2(PeopleTable2,
 	PeopleTable_Cursor *myRow = [people objectAtIndex:5];
 	int64_t age = myRow.Age;                           // => 54
 	BOOL hired  = myRow.Hired;                         // => true
+	NSLog(@"%@ is %lld years old.", name, age);
+	if (hired) NSLog(@"is hired.");
 
 	// Setting values
 	[[people objectAtIndex:5] setAge:43];               // Getting younger

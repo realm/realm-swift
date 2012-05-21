@@ -3,12 +3,12 @@
 //  TightDB
 //
 // 
-//  Test code for all coulumn types and subtables using C++ interface to TightDB
+//  Test code for all column types and subtables using C++ interface to TightDB
 //
 
 #import "MACTestOriginal2.h"
-#include "TightDb/Group.h"
-#include "TightDb/tightdb.h"
+#include "group.hpp"
+#include "tightdb.hpp"
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -19,79 +19,79 @@ using namespace tightdb;
 -(void)testOriginalTable
 {
 	// Create table with all column types
-	TopLevelTable table;
-	Spec s = table.GetSpec();
-	s.AddColumn(COLUMN_TYPE_INT,    "int");
-	s.AddColumn(COLUMN_TYPE_BOOL,   "bool");
-	s.AddColumn(COLUMN_TYPE_DATE,   "date");
-	s.AddColumn(COLUMN_TYPE_STRING, "string");
-	s.AddColumn(COLUMN_TYPE_STRING, "string_long");
-	s.AddColumn(COLUMN_TYPE_STRING, "string_enum"); // becomes ColumnStringEnum
-	s.AddColumn(COLUMN_TYPE_BINARY, "binary");
-	s.AddColumn(COLUMN_TYPE_MIXED,  "mixed");
-	Spec sub = s.AddColumnTable(    "tables");
-	sub.AddColumn(COLUMN_TYPE_INT,    "sub_first");
-	sub.AddColumn(COLUMN_TYPE_STRING, "sub_second");
-	table.UpdateFromSpec(s.GetRef());
+	Table table;
+	Spec& s = table.get_spec();
+	s.add_column(COLUMN_TYPE_INT,    "int");
+	s.add_column(COLUMN_TYPE_BOOL,   "bool");
+	s.add_column(COLUMN_TYPE_DATE,   "date");
+	s.add_column(COLUMN_TYPE_STRING, "string");
+	s.add_column(COLUMN_TYPE_STRING, "string_long");
+	s.add_column(COLUMN_TYPE_STRING, "string_enum"); // becomes ColumnStringEnum
+	s.add_column(COLUMN_TYPE_BINARY, "binary");
+	s.add_column(COLUMN_TYPE_MIXED,  "mixed");
+	Spec sub = s.add_subtable_column("tables");
+	sub.add_column(COLUMN_TYPE_INT,     "sub_first");
+	sub.add_column(COLUMN_TYPE_STRING,  "sub_second");
+	table.update_from_spec();
 	
 	// Add some rows
 	for (size_t i = 0; i < 15; ++i) {
-		table.InsertInt(0, i, i);
-		table.InsertBool(1, i, (i % 2 ? true : false));
-		table.InsertDate(2, i, 12345);
+		table.insert_int(0, i, i);
+		table.insert_int(1, i, (i % 2 ? true : false));
+		table.insert_date(2, i, 12345);
 		
 		std::stringstream ss;
 		ss << "string" << i;
-		table.InsertString(3, i, ss.str().c_str());
+		table.insert_string(3, i, ss.str().c_str());
 		
 		ss << " very long string.........";
-		table.InsertString(4, i, ss.str().c_str());
+		table.insert_string(4, i, ss.str().c_str());
 		
 		switch (i % 3) {
 			case 0:
-				table.InsertString(5, i, "test1");
+				table.insert_string(5, i, "test1");
 				break;
 			case 1:
-				table.InsertString(5, i, "test2");
+				table.insert_string(5, i, "test2");
 				break;
 			case 2:
-				table.InsertString(5, i, "test3");
+				table.insert_string(5, i, "test3");
 				break;
 		}
 		
-		table.InsertBinary(6, i, "binary", 7);
+		table.insert_binary(6, i, "binary", 7);
 		
 		switch (i % 3) {
 			case 0:
-				table.InsertMixed(7, i, false);
+				table.insert_mixed(7, i, false);
 				break;
 			case 1:
-				table.InsertMixed(7, i, (int64_t)i);
+				table.insert_mixed(7, i, (int64_t)i);
 				break;
 			case 2:
-				table.InsertMixed(7, i, "string");
+				table.insert_mixed(7, i, "string");
 				break;
 		}
 		
-		table.InsertTable(8, i);
-		table.InsertDone();
+		table.insert_table(8, i);
+		table.insert_done();
 		
 		// Add sub-tables
 		if (i == 2) {
-			TableRef subtable = table.GetTable(8, i);
-			subtable->InsertInt(0, 0, 42);
-			subtable->InsertString(1, 0, "meaning");
-			subtable->InsertDone();
+			TableRef subtable = table.get_subtable(8, i);
+			subtable->insert_int(0, 0, 42);
+			subtable->insert_string(1, 0, "meaning");
+			subtable->insert_done();
 		}
 	}
 	
 	// We also want a ColumnStringEnum
-	table.Optimize();
+	table.optimize();
 	
 	// Test Deletes
-	table.DeleteRow(14);
-	table.DeleteRow(0);
-	table.DeleteRow(5);
+	table.remove(14);
+	table.remove(0);
+	table.remove(5);
 	
 	//CHECK_EQUAL(12, table.GetSize());
 	
@@ -100,7 +100,7 @@ using namespace tightdb;
 #endif //_DEBUG
 	
 	// Test Clear
-	table.Clear();
+	table.clear();
 	//CHECK_EQUAL(0, table.GetSize());
 	
 #ifdef _DEBUG

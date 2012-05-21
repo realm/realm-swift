@@ -24,7 +24,7 @@
     OCSpec *sub = [s addColumnTable:@"tables"];
     [sub addColumn:COLUMN_TYPE_INT name:@"sub_first"];
     [sub addColumn:COLUMN_TYPE_STRING name:@"sub_second"];
-    [table updateFromSpec:[s getRef]];
+    [table updateFromSpec];
 	
 	// Add some rows
 	for (size_t i = 0; i < 15; ++i) {

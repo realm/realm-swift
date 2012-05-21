@@ -3,8 +3,9 @@
 //  TightDB
 //
 
-#include "TightDb/Table.h"
-#include "TightDb/alloc.h"
+#include "table.hpp"
+#include "../src/table_view.hpp"
+//#include "TightDb/alloc.hpp"
 #import "Table.h"
 #import "TablePriv.h"
 
@@ -99,7 +100,7 @@
 }
 -(time_t)getDate
 {
-    return _date->GetDate();
+    return _date->get_date();
 }
 -(void)dealloc
 {
@@ -191,30 +192,30 @@
 
 -(ColumnType)getType
 {
-    return _mixed->GetType();
+    return _mixed->get_type();
 }
 -(int64_t)getInt
 {
-    return _mixed->GetInt();
+    return _mixed->get_int();
 }
 -(BOOL)getBool
 {
-    return _mixed->GetBool();
+    return _mixed->get_bool();
 }
 
 -(OCDate *)getDate
 {
-    return [[OCDate alloc] initWithDate:_mixed->GetDate()];
+    return [[OCDate alloc] initWithDate:_mixed->get_date()];
 }
 
 -(NSString *)getString
 {
-    return [NSString stringWithUTF8String:_mixed->GetString()];
+    return [NSString stringWithUTF8String:_mixed->get_string()];
 }
 
 -(BinaryData)getBinary
 {
-    return _mixed->GetBinary();
+    return _mixed->get_binary();
 }
 @end
 
@@ -222,11 +223,13 @@
 
 @interface OCSpec()
 @property (nonatomic) tightdb::Spec *spec;
+@property (nonatomic) BOOL isOwned;
 +(OCSpec *)specWithAllocator:(tightdb::Allocator&)allocator ref:(size_t)ref parent:(tightdb::ArrayParent*)parent pndx:(size_t)pndx;
-+(OCSpec *)specWithSpec:(tightdb::Spec*)other;
++(OCSpec *)specWithSpec:(tightdb::Spec*)other isOwned:(BOOL)isOwned;
 @end
 @implementation OCSpec
 @synthesize spec = _spec;
+@synthesize isOwned = _isOwned;
 
 
 // Dummy method - not used. allocators can probably not be overwritten with OC
@@ -236,46 +239,49 @@
 //  TODO???  spec.spec = new Spec(allocator, ref, parent, pndx);
     return spec;
 }
-+(OCSpec *)specWithSpec:(tightdb::Spec *)other
++(OCSpec *)specWithSpec:(tightdb::Spec *)other isOwned:(BOOL)isOwned
 {
     OCSpec *spec = [[OCSpec alloc] init];
-    spec.spec = new tightdb::Spec(*other);
+    if (isOwned) {
+        spec.spec = new tightdb::Spec(*other);
+        spec.isOwned = TRUE;
+    }
+    else {
+        spec.spec = other;
+        spec.isOwned = FALSE;
+    }
     return spec;    
 }
 
 -(void)addColumn:(ColumnType)type name:(NSString *)name
 {
-    _spec->AddColumn(type, [name UTF8String]);
+    _spec->add_column(type, [name UTF8String]);
 }
 -(OCSpec *)addColumnTable:(NSString *)name
 {
-    tightdb::Spec tmp = _spec->AddColumnTable([name UTF8String]);
-    return [OCSpec specWithSpec:&tmp];
+    tightdb::Spec tmp = _spec->add_subtable_column([name UTF8String]);
+    return [OCSpec specWithSpec:&tmp isOwned:TRUE];
 }
 -(OCSpec *)getSpec:(size_t)columndId
 {
-    tightdb::Spec tmp = _spec->GetSpec(columndId);
-    return [OCSpec specWithSpec:&tmp];
+    tightdb::Spec tmp = _spec->get_subspec(columndId);
+    return [OCSpec specWithSpec:&tmp isOwned:TRUE];
 }
 -(size_t)getColumnCount
 {
-    return _spec->GetColumnCount();
+    return _spec->get_column_count();
 }
 -(ColumnType)getColumnType:(size_t)ndx
 {
-    return _spec->GetColumnType(ndx);
+    return _spec->get_column_type(ndx);
 }
 -(NSString *)getColumnName:(size_t)ndx
 {
-    return [NSString stringWithUTF8String:_spec->GetColumnName(ndx)];
+    return [NSString stringWithUTF8String:_spec->get_column_name(ndx)];
 }
 -(size_t)getColumnIndex:(NSString *)name
 {
-    return _spec->GetColumnIndex([name UTF8String]);
-}
--(size_t)getRef
-{
-    return _spec->GetRef();
+    return _spec->get_column_index([name UTF8String]);
 }
 -(size_t)write:(id)obj pos:(size_t)pos
 {
@@ -287,7 +293,7 @@
 #ifdef DEBUG
     NSLog(@"OCSpec dealloc");
 #endif
-    delete _spec;
+    if (_isOwned) delete _spec;
 }
 
 
@@ -306,7 +312,7 @@
 +(TableView *)tableViewWithTable:(Table *)table
 {
     TableView *tableView = [[TableView alloc] init];
-    tableView.tableView = new tightdb::TableView(*[table getTable]);
+    tableView.tableView = new tightdb::TableView(); // not longer needs table at construction
     return tableView;
 }
 
@@ -327,35 +333,35 @@
 
 -(size_t)count
 {
-    return _tableView->GetSize();
+    return _tableView->size();
 }
 -(BOOL)isEmpty
 {
-    return _tableView->IsEmpty();
+    return _tableView->is_empty();
 }
 -(int64_t)get:(size_t)columnId ndx:(size_t)ndx
 {
-    return _tableView->Get(columnId, ndx);
+    return _tableView->get_int(columnId, ndx);
 }
 -(BOOL)getBool:(size_t)columnId ndx:(size_t)ndx
 {
-    return _tableView->GetBool(columnId, ndx);
+    return _tableView->get_bool(columnId, ndx);
 }
 -(time_t)getDate:(size_t)columnId ndx:(size_t)ndx
 {
-    return _tableView->GetDate(columnId, ndx);
+    return _tableView->get_date(columnId, ndx);
 }
 -(NSString *)getString:(size_t)columnId ndx:(size_t)ndx
 {
-    return [NSString stringWithUTF8String:_tableView->GetString(columnId, ndx)];
+    return [NSString stringWithUTF8String:_tableView->get_string(columnId, ndx)];
 }
 -(void)delete:(size_t)ndx
 {
-    _tableView->Delete(ndx);
+    _tableView->remove(ndx);
 }
 -(void)clear
 {
-    _tableView->Clear();
+    _tableView->clear();
 }
 @end
 
@@ -392,8 +398,8 @@
 {
     self = [super init];
     if (self) {
-        _tablePtr = new tightdb::TopLevelTable();
-        _table = _tablePtr->GetTableRef(); 
+        _tablePtr = new tightdb::Table();
+        _table = _tablePtr->get_table_ref(); 
     }
     return self;
 }
@@ -415,14 +421,14 @@
         _tables = [NSMutableArray arrayWithCapacity:5];
     [_tables addObject:[[Table alloc] initWithTableRef:_table->GetTable(columnId, ndx)]];
     return [_tables lastObject];*/
-    Table *table = [[Table alloc] initWithTableRef:_table->GetTable(columnId, ndx)];
+    Table *table = [[Table alloc] initWithTableRef:_table->get_subtable(columnId, ndx)];
     [table setParent:self];
     return table;
 }
 
 -(OCTopLevelTable *)getTopLevelTable:(size_t)columnId ndx:(size_t)ndx
 {
-    OCTopLevelTable *table = [[OCTopLevelTable alloc] initWithTableRef:_table->GetTopLevelTable(columnId, ndx)];
+    OCTopLevelTable *table = [[OCTopLevelTable alloc] initWithTableRef:_table->get_subtable(columnId, ndx)];
     [table setParent:self];
     return table;
 }
@@ -446,184 +452,184 @@
 
 -(size_t)getColumnCount
 {
-    return _table->GetColumnCount();
+    return _table->get_column_count();
 }
 -(NSString *)getColumnName:(size_t)ndx
 {
-    return [NSString stringWithUTF8String:_table->GetColumnName(ndx)];
+    return [NSString stringWithUTF8String:_table->get_column_name(ndx)];
 }
 -(size_t)getColumnIndex:(NSString *)name
 {
-    return _table->GetColumnIndex([name UTF8String]);
+    return _table->get_column_index([name UTF8String]);
 }
 -(ColumnType)getColumnType:(size_t)ndx
 {
-    return _table->GetColumnType(ndx);
+    return _table->get_column_type(ndx);
 }
 -(OCSpec *)getSpec
 {
-    tightdb::Spec tmp = _table->GetSpec();
-    return [OCSpec specWithSpec:&tmp];
+    tightdb::Spec& spec = _table->get_spec();
+    return [OCSpec specWithSpec:&spec isOwned:FALSE];
 }
 -(BOOL)isEmpty
 {
-    return _table->IsEmpty();
+    return _table->is_empty();
 }
 -(size_t)count
 {
-    return _table->GetSize();
+    return _table->size();
 }
 -(size_t)addRow
 {
-    return _table->AddRow();
+    return _table->add_empty_row();
 }
 -(void)clear
 {
-    _table->Clear();
+    _table->clear();
 }
 -(void)deleteRow:(size_t)ndx
 {
-    _table->DeleteRow(ndx);
+    _table->remove(ndx);
 }
 -(void)popBack
 {
-    _table->PopBack();
+    _table->remove_last();
 }
 -(int64_t)get:(size_t)columnId ndx:(size_t)ndx
 {
-    return _table->Get(columnId, ndx);
+    return _table->get_int(columnId, ndx);
 }
 -(void)set:(size_t)columnId ndx:(size_t)ndx value:(int64_t)value
 {
-    _table->Set(columnId, ndx, value);
+    _table->set_int(columnId, ndx, value);
 }
 -(BOOL)getBool:(size_t)columndId ndx:(size_t)ndx
 {
-    return _table->GetBool(columndId, ndx);
+    return _table->get_bool(columndId, ndx);
 }
 -(void)setBool:(size_t)columndId ndx:(size_t)ndx value:(BOOL)value
 {
-    _table->SetBool(columndId, ndx, value);
+    _table->set_bool(columndId, ndx, value);
 }
 -(time_t)getDate:(size_t)columndId ndx:(size_t)ndx
 {
-    return _table->GetDate(columndId, ndx);
+    return _table->get_date(columndId, ndx);
 }
 -(void)setDate:(size_t)columndId ndx:(size_t)ndx value:(time_t)value
 {
-    _table->SetDate(columndId, ndx, value);
+    _table->set_date(columndId, ndx, value);
 }
 -(void)insertInt:(size_t)columndId ndx:(size_t)ndx value:(int64_t)value
 {
-    _table->InsertInt(columndId, ndx, value);
+    _table->insert_int(columndId, ndx, value);
 }
 -(void)insertBool:(size_t)columndId ndx:(size_t)ndx value:(BOOL)value
 {
-    _table->InsertBool(columndId, ndx, value);
+    _table->insert_bool(columndId, ndx, value);
 }
 -(void)insertDate:(size_t)columndId ndx:(size_t)ndx value:(time_t)value
 {
-    _table->InsertDate(columndId, ndx, value);
+    _table->insert_date(columndId, ndx, value);
 }
 -(void)insertString:(size_t)columndId ndx:(size_t)ndx value:(NSString *)value
 {
-    _table->InsertString(columndId, ndx, [value UTF8String]);
+    _table->insert_string(columndId, ndx, [value UTF8String]);
 }
 -(void)insertBinary:(size_t)columndId ndx:(size_t)ndx value:(void *)value len:(size_t)len
 {
-    _table->InsertBinary(columndId, ndx, value, len);
+    _table->insert_binary(columndId, ndx, (const char*)value, len);
 }
 -(void)insertDone
 {
-    _table->InsertDone();
+    _table->insert_done();
 }
 
 -(NSString *)getString:(size_t)columndId ndx:(size_t)ndx
 {
-    return [NSString stringWithUTF8String:_table->GetString(columndId, ndx)];
+    return [NSString stringWithUTF8String:_table->get_string(columndId, ndx)];
 }
 -(void)setString:(size_t)columndId ndx:(size_t)ndx value:(NSString *)value
 {
-    _table->SetString(columndId, ndx, [value UTF8String]);
+    _table->set_string(columndId, ndx, [value UTF8String]);
 }
 
 -(BinaryData)getBinary:(size_t)columndId ndx:(size_t)ndx
 {
-    return _table->GetBinary(columndId, ndx);
+    return _table->get_binary(columndId, ndx);
 }
 -(void)setBinary:(size_t)columndId ndx:(size_t)ndx value:(void *)value len:(size_t)len
 {
-    _table->SetBinary(columndId, ndx, value, len);
+    _table->set_binary(columndId, ndx, (const char*)value, len);
 }
 
 -(size_t)getTableSize:(size_t)columnId ndx:(size_t)ndx
 {
-    return _table->GetTableSize(columnId, ndx);
+    return _table->get_subtable_size(columnId, ndx);
 }
 -(void)insertTable:(size_t)columnId ndx:(size_t)ndx
 {
-    _table->InsertTable(columnId, ndx);
+    _table->insert_table(columnId, ndx);
 }
 -(void)clearTable:(size_t)columnId ndx:(size_t)ndx
 {
-    _table->ClearTable(columnId, ndx);
+    _table->clear_subtable(columnId, ndx);
 }
 -(OCMixed *)getMixed:(size_t)columnId ndx:(size_t)ndx
 {
-    tightdb::Mixed tmp = _table->GetMixed(columnId, ndx);
+    tightdb::Mixed tmp = _table->get_mixed(columnId, ndx);
     return [OCMixed mixedWithMixed:tmp];
 }
 -(ColumnType)getMixedType:(size_t)columnId ndx:(size_t)ndx
 {
-    return _table->GetMixedType(columnId, ndx);
+    return _table->get_mixed_type(columnId, ndx);
 }
 -(void)insertMixed:(size_t)columnId ndx:(size_t)ndx value:(OCMixed *)value
 {
-    _table->InsertMixed(columnId, ndx, value);
+    _table->insert_mixed(columnId, ndx, value);
 }
 -(void)setMixed:(size_t)columnId ndx:(size_t)ndx value:(OCMixed *)value
 {
-    _table->SetMixed(columnId, ndx, value);
+    _table->set_mixed(columnId, ndx, value);
 }
 
 -(size_t)registerColumn:(ColumnType)type name:(NSString *)name
 {
-    return _table->RegisterColumn(type, [name UTF8String]);
+    return _table->add_column(type, [name UTF8String]);
 }
 -(size_t)find:(size_t)columnId value:(int64_t)value
 {
-    return _table->Find(columnId, value);
+    return _table->find_first_int(columnId, value);
 }
 -(size_t)findBool:(size_t)columnId value:(BOOL)value
 {
-    return _table->FindBool(columnId, value);
+    return _table->find_first_bool(columnId, value);
 }
 -(size_t)findString:(size_t)columnId value:(NSString *)value
 {
-    return _table->FindString(columnId, [value UTF8String]);
+    return _table->find_first_string(columnId, [value UTF8String]);
 }
 -(size_t)findDate:(size_t)columnId value:(time_t)value
 {
-    return _table->FindDate(columnId, value);
+    return _table->find_first_date(columnId, value);
 }
 
 -(TableView *)findAll:(TableView *)view column:(size_t)columnId value:(int64_t)value
 {
-    _table->FindAll(*view.tableView, columnId, value);
+    *view.tableView = _table->find_all_int(columnId, value);
     return view;
 }
 
 -(BOOL)hasIndex:(size_t)columnId
 {
-    return _table->HasIndex(columnId);
+    return _table->has_index(columnId);
 }
 -(void)setIndex:(size_t)columnId
 {
-    _table->SetIndex(columnId);
+    _table->set_index(columnId);
 }
 -(void)optimize
 {
-    _table->Optimize();
+    _table->optimize();
 }
 #ifdef _DEBUG
 -(void)verify
@@ -641,15 +647,11 @@
     self = [super initWithTableRef:ref];
     return self;
 }
--(void)updateFromSpec:(size_t)ref_specSet
+-(void)updateFromSpec
 {
-    static_cast<tightdb::TopLevelTable *>(&*self.table)->UpdateFromSpec(ref_specSet);
+    static_cast<tightdb::Table *>(&*self.table)->update_from_spec();
 }
 
--(size_t)getRef
-{
-    return static_cast<tightdb::TopLevelTable *>(&*self.table)->GetRef();
-}
 
 @end
 
