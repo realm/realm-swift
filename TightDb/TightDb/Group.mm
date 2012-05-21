@@ -3,7 +3,7 @@
 //  TightDB
 //
 
-#import "TightDb/Group.h"
+#import "group.hpp"
 #import "Group.h"
 #import "Table.h"
 #import "TablePriv.h"
@@ -56,34 +56,34 @@
 
 -(BOOL)isValid
 {
-    return _group->IsValid();
+    return _group->is_valid();
 }
 -(size_t)getTableCount
 {
-    return _group->GetTableCount();
+    return _group->get_table_count();
 }
 -(NSString *)getTableName:(size_t)table_ndx
 {
-    return [NSString stringWithUTF8String:_group->GetTableName(table_ndx)];
+    return [NSString stringWithUTF8String:_group->get_table_name(table_ndx)];
 }
 -(BOOL)hasTable:(NSString *)name
 {
-    return _group->HasTable([name UTF8String]);
+    return _group->has_table([name UTF8String]);
 }
 -(void)write:(NSString *)filePath
 {
-    _group->Write([filePath UTF8String]);
+    _group->write([filePath UTF8String]);
 }
 -(char*)writeToMem:(size_t*)len
 {
-    return _group->WriteToMem(*len);
+    return _group->write_to_mem(*len);
 }
 
 -(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)obj
 {
     return [[obj alloc] initWithBlock:^(Table *table) {
         [table setTablePtr:nil];
-        [table setTable:_group->GetTable([name UTF8String]).GetTableRef()];
+        [table setTable:_group->get_table([name UTF8String])];
         [table setParent:self];
     }];
     return [_tables lastObject];

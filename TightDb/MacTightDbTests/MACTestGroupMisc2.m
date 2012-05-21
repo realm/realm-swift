@@ -190,7 +190,7 @@ TDB_TABLE_2(QueryTable,
             [sub addColumn:COLUMN_TYPE_INT name:@"int"];
         }
         [s addColumn:COLUMN_TYPE_MIXED name:@"mix"];
-        [table updateFromSpec:[s getRef]];
+        [table updateFromSpec];
     }
 
     int COL_TABLE_INT = 0;

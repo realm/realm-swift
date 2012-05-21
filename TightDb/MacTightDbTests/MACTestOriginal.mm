@@ -8,47 +8,47 @@
 
 
 #import "MACTestOriginal.h"
-#include "TightDb/Group.h"
-#include "TightDb/tightdb.h"
+#include "group.hpp"
+#include "tightdb.hpp"
 
 using namespace tightdb;
 
 @implementation MACTestOriginal
 
-TDB_TABLE_4(MyTable,
-            String, name,
-            Int,    age,
-            Bool,   hired,
-            Int,	 spare)
+TIGHTDB_TABLE_4(MyTable,
+            name,  String,
+            age,   Int,
+            hired, Bool,
+            spare, Int)
 
-TDB_TABLE_2(MyTable2,
-			Bool,   hired,
-			Int,    age)
+TIGHTDB_TABLE_2(MyTable2,
+			hired, Bool,
+			age, Int)
 
 
 -(void)testOriginal
 {
     // Create Table in Group
     Group group;
-    MyTable& table = group.GetTable<MyTable>("My great table");
+    MyTable::Ref table = group.get_table<MyTable>("My great table");
     
     // Add some rows
-    table.Add("John", 20, true, 0);
-    table.Add("Mary", 21, false, 0);
-    table.Add("Lars", 21, true, 0);
-    table.Add("Phil", 43, false, 0);
-    table.Add("Anni", 54, true, 0);
+    table->add("John", 20, true, 0);
+    table->add("Mary", 21, false, 0);
+    table->add("Lars", 21, true, 0);
+    table->add("Phil", 43, false, 0);
+    table->add("Anni", 54, true, 0);
     
     //------------------------------------------------------
     
     size_t row; 
-    row = table.name.Find("Philip");		    // row = (size_t)-1
+    row = table->cols().name.find_first("Philip");		    // row = (size_t)-1
     assert(row == (size_t)-1);
-    row = table.name.Find("Mary");		
+    row = table->cols().name.find_first("Mary");
     assert(row == 1);
     
-    TableView view = table.age.FindAll(21);   
-    size_t cnt = view.GetSize();  				// cnt = 2
+    MyTable::View view = table->cols().age.find_all(21);
+    const size_t cnt = view.size();  				// cnt = 2
     assert(cnt==2);
     
     //------------------------------------------------------
@@ -56,50 +56,50 @@ TDB_TABLE_2(MyTable2,
     MyTable2 table2;
     
     // Add some rows
-    table2.Add(true, 20);
-    table2.Add(false, 21);
-    table2.Add(true, 21);
-    table2.Add(false, 43);
-    table2.Add(true, 54);
+    table2.add(true, 20);
+    table2.add(false, 21);
+    table2.add(true, 21);
+    table2.add(false, 43);
+    table2.add(true, 54);
     
 	// Create query (current employees between 20 and 30 years old)
-    Query q = table2.GetQuery().hired.Equal(true).age.Between(20, 30);
+    MyTable2::Query q = table2.where().hired.equal(true).age.between(20, 30);
     
     // Get number of matching entries
-    cout << q.Count(table2);					// => 2
-    assert(q.Count(table2)==2);
+    std::cout << q.count(table2);					// => 2
+    assert(q.count(table2) == 2);
     
     // Get the average age
-    double avg = q.Avg(table2, 1, &cnt);
-    cout << avg;						        // => 20,5
+    double avg = q.age.average(table2);
+    std::cout << avg;						        // => 20,5
     
     // Execute the query and return a table (view)
-    TableView res = q.FindAll(table2);
-    for (size_t i = 0; i < res.GetSize(); i++) {
-		cout << i << ": " << " is " << res.Get(1, i) << " years old." << endl;
+    MyTable2::View res = q.find_all(table2);
+    for (size_t i = 0; i < res.size(); ++i) {
+        std::cout << i << ": " << " is " << res[i].age << " years old." << std::endl;
     }
     
     //------------------------------------------------------
     
     // Write to disk
-    group.Write("employees.tightdb");
+    group.write("employees.tightdb");
 	
     // Load a group from disk (and print contents)
     Group fromDisk("employees.tightdb");
-    MyTable& diskTable = fromDisk.GetTable<MyTable>("employees");
-    for (size_t i = 0; i < diskTable.GetSize(); i++) {
-		cout << i << ": " << diskTable[i].name << endl;
+    MyTable::Ref diskTable = fromDisk.get_table<MyTable>("employees");
+    for (size_t i = 0; i < diskTable->size(); ++i) {
+        std::cout << i << ": " << diskTable[i].name << std::endl;
     }
     
     // Write same group to memory buffer
     size_t len;
-    const char* const buffer = group.WriteToMem(len);
+    const char* const buffer = group.write_to_mem(len);
     
     // Load a group from memory (and print contents)
     Group fromMem(buffer, len);
-    MyTable& memTable = fromMem.GetTable<MyTable>("employees");
-    for (size_t i = 0; i < memTable.GetSize(); i++) {
-		cout << i << ": " << memTable[i].name << endl;
+    MyTable::Ref memTable = fromMem.get_table<MyTable>("employees");
+    for (size_t i = 0; i < memTable->size(); ++i) {
+        std::cout << i << ": " << memTable[i].name << std::endl;
     }
 }
 @end

@@ -3,7 +3,7 @@
 //  TightDB
 //
 
-#include "TightDb/query/QueryInterface.h"
+#include "../src/query.hpp"
 #import "Query.h"
 #import "Table.h"
 #import "TablePriv.h"
@@ -41,7 +41,7 @@
 
 -(void)group
 {
-    _query->LeftParan();
+    _query->group();
 }
 -(void)or
 {
@@ -49,174 +49,149 @@
 }
 -(void)endgroup
 {
-    _query->RightParan();
+    _query->end_group();
 }
 -(void)subtable:(size_t)column
 {
-    _query->Subtable(column);
+    _query->subtable(column);
 }
 -(void)parent
 {
-    _query->Parent();
+    _query->parent();
 }
 
 -(size_t)count
 {
-    return _query->Count(*[_table getTable]);
+    return _query->count(*[_table getTable]);
 }
 
 -(double)avgOnColumn:(size_t)columndId
 {
     size_t resultCount;
-    return _query->Avg(*[_table getTable], columndId, &resultCount);
+    return _query->average(*[_table getTable], columndId, &resultCount);
 }
 
 -(TableView *)findAll
 {
-    return [TableView tableViewWithTableView:_query->FindAll(*[_table getTable])];
+    return [TableView tableViewWithTableView:_query->find_all(*[_table getTable])];
 }
 @end
 
 
 #pragma mark - OCXQueryAccessorInt
 
-class XQueryAccessorIntOC : public tightdb::XQueryAccessorInt {
-public:
-    XQueryAccessorIntOC(size_t columnId, tightdb::Query *query) : XQueryAccessorInt(columnId)
-{    
-    m_query = query;
-}
-    size_t getCol() const { return m_column_id;};
-};
-
 @implementation OCXQueryAccessorInt
 {
     Query *_query;
-    XQueryAccessorIntOC *_accessor;
+    size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(Query *)query
 {
     self = [super init];
     if (self) {
         _query = query;
-        _accessor = new XQueryAccessorIntOC(columnId, [_query getQuery]);
+        _column_ndx = columnId;
     }
     return self;
 }
 -(double)avg
 {
-    return [_query avgOnColumn:_accessor->getCol()];
+    return [_query avgOnColumn:_column_ndx];
 }
 
 -(Query *)equal:(int64_t)value
 {
-    _accessor->Equal(value);
+    [_query getQuery]->equal(_column_ndx, value);
     return _query;
 }
 
 -(Query *)notEqual:(int64_t)value
 {
-    _accessor->NotEqual(value);
+    [_query getQuery]->not_equal(_column_ndx, value);
     return _query;
 }
 
 -(Query *)greater:(int64_t)value
 {
-    _accessor->Greater(value);
+    [_query getQuery]->greater(_column_ndx, value);
     return _query;
 }
 
 -(Query *)less:(int64_t)value
 {
-    _accessor->Less(value);
+    [_query getQuery]->less(_column_ndx, value);
     return _query;
 }
 
 -(Query *)between:(int64_t)from to:(int64_t)to
 {
-    _accessor->Between(from, to);
+    [_query getQuery]->between(_column_ndx, from, to);
     return _query;
 }
 @end
 
 #pragma mark - OCXQueryAccessorBool
 
-class XQueryAccessorBoolOC : public tightdb::XQueryAccessorBool {
-public:
-XQueryAccessorBoolOC(size_t columnId, tightdb::Query *query) : XQueryAccessorBool(columnId)
-{
-    m_query = query;
-}
-};
-
 @implementation OCXQueryAccessorBool
 {
     Query *_query;
-    XQueryAccessorBoolOC *_accessor;
+    size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(Query *)query
 {
     self = [super init];
     if (self) {
         _query = query;
-        _accessor = new XQueryAccessorBoolOC(columnId, [_query getQuery]);
+        _column_ndx = columnId;
     }
     return self;
 }
 -(Query *)equal:(BOOL)value
 {
-    _accessor->Equal(value);
+    [_query getQuery]->equal(_column_ndx, (bool)value);
     return _query;
 }
 @end
 
 #pragma mark - OCXQueryAccessorString
 
-class XQueryAccessorStringOC : public tightdb::XQueryAccessorString {
-public:
-XQueryAccessorStringOC(size_t columnId, tightdb::Query *query) : XQueryAccessorString(columnId)
-{
-    m_query = query;
-}
-};
-
 @implementation OCXQueryAccessorString
 {
     Query *_query;
-    XQueryAccessorStringOC *_accessor;
+    size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(Query *)query
 {
     self = [super init];
     if (self) {
         _query = query;
-        _accessor = new XQueryAccessorStringOC(columnId, [_query getQuery]);
+        _column_ndx = columnId;
     }
     return self;
 }
 -(Query *)equal:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
-    _accessor->Equal([value UTF8String], caseSensitive);
+    [_query getQuery]->equal(_column_ndx, [value UTF8String], caseSensitive);
     return _query;
 }
 -(Query *)notEqual:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
-    _accessor->NotEqual([value UTF8String], caseSensitive);
+    [_query getQuery]->not_equal(_column_ndx, [value UTF8String], caseSensitive);
     return _query;
 }
 -(Query *)beginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
-    _accessor->BeginsWith([value UTF8String], caseSensitive);
+    [_query getQuery]->begins_with(_column_ndx, [value UTF8String], caseSensitive);
     return _query;
 }
 -(Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
-    _accessor->EndsWith([value UTF8String], caseSensitive);
+    [_query getQuery]->ends_with(_column_ndx, [value UTF8String], caseSensitive);
     return _query;
 }
 -(Query *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
-    _accessor->Contains([value UTF8String], caseSensitive);
+    [_query getQuery]->contains(_column_ndx, [value UTF8String], caseSensitive);
     return _query;
 }
 @end

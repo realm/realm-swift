@@ -64,7 +64,6 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 -(ColumnType)getColumnType:(size_t)ndx;
 -(NSString *)getColumnName:(size_t)ndx;
 -(size_t)getColumnIndex:(NSString *)name;
--(size_t)getRef;
 -(size_t)write:(id)obj pos:(size_t)pos;
 @end
 
@@ -155,8 +154,7 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 @interface OCTopLevelTable : Table
 // refs ??? TODO
 -(id)initWithBlock:(TopLevelTableInitBlock)block;
--(void)updateFromSpec:(size_t)ref_specSet;
--(size_t)getRef;
+-(void)updateFromSpec;
 @end
 
 
