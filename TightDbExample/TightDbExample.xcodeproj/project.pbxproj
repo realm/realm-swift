@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		41584FB9156D248D00DB2995 /* libtightdb_all.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 41584FB8156D248D00DB2995 /* libtightdb_all.a */; };
 		E94A8C0F1541FDB000B174B5 /* libTightDbOC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94A8C0E1541FDB000B174B5 /* libTightDbOC.a */; };
 		E9D58B4F1541A375009150B1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B4E1541A375009150B1 /* UIKit.framework */; };
 		E9D58B511541A375009150B1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B501541A375009150B1 /* Foundation.framework */; };
@@ -20,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		41584FB8156D248D00DB2995 /* libtightdb_all.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtightdb_all.a; path = ../native/lib/Debug/libtightdb_all.a; sourceTree = "<group>"; };
 		E94A8C0E1541FDB000B174B5 /* libTightDbOC.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTightDbOC.a; path = ../Deliv/Debug/libTightDbOC.a; sourceTree = "<group>"; };
 		E9D58B4A1541A375009150B1 /* TightDbExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TightDbExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9D58B4E1541A375009150B1 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -42,6 +44,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				41584FB9156D248D00DB2995 /* libtightdb_all.a in Frameworks */,
 				E94A8C0F1541FDB000B174B5 /* libTightDbOC.a in Frameworks */,
 				E9D58B4F1541A375009150B1 /* UIKit.framework in Frameworks */,
 				E9D58B511541A375009150B1 /* Foundation.framework in Frameworks */,
@@ -55,6 +58,7 @@
 		E9D58B3F1541A374009150B1 = {
 			isa = PBXGroup;
 			children = (
+				41584FB8156D248D00DB2995 /* libtightdb_all.a */,
 				E94A8C0E1541FDB000B174B5 /* libTightDbOC.a */,
 				E9D58B541541A375009150B1 /* TightDbExample */,
 				E9D58B4D1541A375009150B1 /* Frameworks */,
@@ -259,7 +263,10 @@
 				GCC_PREFIX_HEADER = "TightDbExample/TightDbExample-Prefix.pch";
 				HEADER_SEARCH_PATHS = ../Deliv;
 				INFOPLIST_FILE = "TightDbExample/TightDbExample-Info.plist";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../Deliv/Debug\"";
+				LIBRARY_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../Deliv/Debug\"",
+					"\"$(SRCROOT)/../native/lib/Debug\"",
+				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -273,7 +280,10 @@
 				GCC_PREFIX_HEADER = "TightDbExample/TightDbExample-Prefix.pch";
 				HEADER_SEARCH_PATHS = ../Deliv;
 				INFOPLIST_FILE = "TightDbExample/TightDbExample-Info.plist";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../Deliv/Release\"";
+				LIBRARY_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../Deliv/Release\"",
+					"\"$(SRCROOT)/../native/lib/Debug\"",
+				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
