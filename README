@@ -4,7 +4,12 @@ Customer build
 other linker flags: -lstdc++
 include path: Deliv
 
+In Deliv:
+After copying dirs.
 
+lipo ../Debug-iphoneos/libTightDbOC.a ../Debug-iphonesimulator/libTightDbOC.a -create -output libTightDbOC.a 
+
+then delete dirs.
 
 Naming of database fields: Must start with capital letter.
 

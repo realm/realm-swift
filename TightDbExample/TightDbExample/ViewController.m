@@ -162,6 +162,14 @@ Int,    Age)
         // ??? cursor
         NSLog(@"%zu: %@", i, memTable.Name);
     }
+    
+    // 1: Iterate over table
+	for (MyTable2_Cursor *row in table2) {
+        [self Eval:YES msg:@"Enumerator running"];
+
+		NSLog(@"%i is %lld years old.", row.Hired, row.Age);
+	}
+
 }
 
 

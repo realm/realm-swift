@@ -23,7 +23,7 @@ directiveStartToken = %
 , CType${j+1}, CName${j+1}%slurp
 %end for
 ) \\
-@implementation TableName##_Cursor \\
+@implementation TableName##_##Cursor \\
     { \\
     %for $j in range($num_cols)
         OCAccessor *_##CName${j+1}; \\
@@ -101,14 +101,16 @@ directiveStartToken = %
     state->extra[0] = (long)[self findNext:-1]; \\
     state->state = 1; \\
     state->itemsPtr = stackbuf; \\
-    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:state->extra[0]]; \\
+    TableName##_##Cursor *tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:state->extra[0]]; \\
+    *stackbuf = tmpCursor; \\
     } \\
     int ndx = state->extra[0]; \\
     if(ndx==-1) { \\
+        *stackbuf = nil; \\
+        state->itemsPtr = nil; \\
         return 0; \\
     } \\
-    [((TableName##_Cursor *)*stackbuf) setNdx:ndx]; \\
-    NSLog(@"Cursor: %@ - ndx: %i", *stackbuf, ndx); \\
+    [((TableName##_##Cursor *)*stackbuf) setNdx:ndx]; \\
     state->extra[0] = [self findNext:ndx]; \\
     return 1; \\
     } \\
@@ -238,17 +240,17 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 { \\
     return [[TableName##_##Query alloc] initWithTable:self]; \\
 } \\
--(TableName##_Cursor *)add \\
+-(TableName##_##Cursor *)add \\
 { \\
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \\
+    return [[TableName##_##Cursor alloc] initWithTable:self ndx:[self addRow]]; \\
 } \\
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \\
+-(TableName##_##Cursor *)objectAtIndex:(size_t)ndx \\
 { \\
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \\
+    return [[TableName##_##Cursor alloc] initWithTable:self ndx:ndx]; \\
 } \\
--(TableName##_Cursor *)lastObject \\
+-(TableName##_##Cursor *)lastObject \\
 { \\
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \\
+    return [[TableName##_##Cursor alloc] initWithTable:self ndx:[self count]-1]; \\
 } \\
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len \\
     { \\
@@ -258,36 +260,45 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
     state->extra[0] = (long)0; \\
     state->state = 1; \\
     state->itemsPtr = stackbuf; \\
-    *stackbuf = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \\
+    TableName##_##Cursor *tmpCursor = [[TableName##_##Cursor alloc] initWithTable:self ndx:0]; \\
+    *stackbuf = tmpCursor; \\
     } \\
     int ndx = state->extra[0]; \\
-    if(ndx>=[self count]) \\
+    if(ndx>=[self count]) { \\
+        *stackbuf = nil; \\
+        state->itemsPtr = nil; \\
         return 0; \\
-    [((TableName##_Cursor *)*stackbuf) setNdx:ndx]; \\
-    NSLog(@"Cursor: %@ - ndx: %i", *stackbuf, ndx); \\
+    } \\
+    [((TableName##_##Cursor *)*stackbuf) setNdx:ndx]; \\
     if(ndx<[self count]) \\
         state->extra[0] = ndx+1; \\
     return 1; \\
     } \\
 @end \\
 @implementation TableName##_##View \\
+    { \\
+        TableName##_##Cursor *tmpCursor; \\
+    } \\
     - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len \\
     { \\
     if(state->state == 0) \\
     { \\
     state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \\
     state->extra[0] = (long)0; \\
-    state->state = 1; \\
-    state->itemsPtr = stackbuf; \\
-    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \\
+    tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \\
+    *stackbuf = tmpCursor; \\
     } \\
-    int ndx = state->extra[0]; \\
-    if(ndx>=[self count]) \\
-    return 0; \\
-    [((TableName##_Cursor *)*stackbuf) setNdx:[self getSourceNdx:ndx]]; \\
-    NSLog(@"Cursor: %@ - ndx: %i", *stackbuf, ndx); \\
-    if(ndx<[self count]) \\
-    state->extra[0] = ndx+1; \\
+    if (state->state < [self count]) { \\
+        NSLog(@"Item: %zu", state->state); \\
+        [((TableName##_##Cursor *)*stackbuf) setNdx:[self getSourceNdx:state->state]]; \\
+        state->itemsPtr = stackbuf; \\
+        state->state++; \\
+    } else { \\
+        *stackbuf = nil; \\
+        state->itemsPtr = nil; \\
+        tmpCursor = nil; \\
+        return 0; \\
+    } \\
     return 1; \\
     } \\
 @end
@@ -302,7 +313,7 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 , CType${j+1}, CName${j+1}%slurp
 %end for
 ) \\
-@interface TableName##_Cursor : CursorBase \\
+@interface TableName##_##Cursor : CursorBase \\
     %for $j in range($num_cols)
     @property tdbOCType##CType${j+1} CName${j+1}; \\
     %end for
@@ -360,9 +371,9 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1}%slurp
 %end for
 ; \\
 -(TableName##_##Query *)getQuery; \\
--(TableName##_Cursor *)add; \\
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \\
--(TableName##_Cursor *)lastObject; \\
+-(TableName##_##Cursor *)add; \\
+-(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \\
+-(TableName##_##Cursor *)lastObject; \\
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \\
 @end \\
 @interface TableName##_##View : TableView \\
