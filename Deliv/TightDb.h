@@ -31,9 +31,6 @@
     } \
 @end \
 @implementation TableName##_##Query \
-    { \
-    TableName##_View *tmpEnumView; \
-    } \
 @synthesize CName1 = _CName1; \
 -(id)initWithTable:(Table *)table \
 { \
@@ -76,22 +73,19 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
-    state->extra[0] = (long)0; \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
+    state->extra[0] = (long)[self findNext:-1]; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
-    tmpEnumView = [self findAll]; \
-    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[tmpEnumView getTable] ndx:[tmpEnumView getSourceNdx:0]]; \
+    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:state->extra[0]]; \
     } \
     int ndx = state->extra[0]; \
-    if(ndx>=[self count]) { \
-        tmpEnumView = nil; \
+    if(ndx==-1) { \
         return 0; \
     } \
-    [((TableName##_Cursor *)*stackbuf) setNdx:[tmpEnumView getSourceNdx:ndx]]; \
+    [((TableName##_Cursor *)*stackbuf) setNdx:ndx]; \
     NSLog(@"Cursor: %@ - ndx: %i", *stackbuf, ndx); \
-    if(ndx<[self count]) \
-    state->extra[0] = ndx+1; \
+    state->extra[0] = [self findNext:ndx]; \
     return 1; \
     } \
 @end \
@@ -210,7 +204,7 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
     state->extra[0] = (long)0; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
@@ -231,7 +225,7 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
     state->extra[0] = (long)0; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
@@ -282,9 +276,6 @@
     } \
 @end \
 @implementation TableName##_##Query \
-    { \
-    TableName##_View *tmpEnumView; \
-    } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
 -(id)initWithTable:(Table *)table \
@@ -329,22 +320,19 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
-    state->extra[0] = (long)0; \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
+    state->extra[0] = (long)[self findNext:-1]; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
-    tmpEnumView = [self findAll]; \
-    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[tmpEnumView getTable] ndx:[tmpEnumView getSourceNdx:0]]; \
+    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:state->extra[0]]; \
     } \
     int ndx = state->extra[0]; \
-    if(ndx>=[self count]) { \
-        tmpEnumView = nil; \
+    if(ndx==-1) { \
         return 0; \
     } \
-    [((TableName##_Cursor *)*stackbuf) setNdx:[tmpEnumView getSourceNdx:ndx]]; \
+    [((TableName##_Cursor *)*stackbuf) setNdx:ndx]; \
     NSLog(@"Cursor: %@ - ndx: %i", *stackbuf, ndx); \
-    if(ndx<[self count]) \
-    state->extra[0] = ndx+1; \
+    state->extra[0] = [self findNext:ndx]; \
     return 1; \
     } \
 @end \
@@ -472,7 +460,7 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
     state->extra[0] = (long)0; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
@@ -493,7 +481,7 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
     state->extra[0] = (long)0; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
@@ -554,9 +542,6 @@
     } \
 @end \
 @implementation TableName##_##Query \
-    { \
-    TableName##_View *tmpEnumView; \
-    } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
 @synthesize CName3 = _CName3; \
@@ -603,22 +588,19 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
-    state->extra[0] = (long)0; \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
+    state->extra[0] = (long)[self findNext:-1]; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
-    tmpEnumView = [self findAll]; \
-    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[tmpEnumView getTable] ndx:[tmpEnumView getSourceNdx:0]]; \
+    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:state->extra[0]]; \
     } \
     int ndx = state->extra[0]; \
-    if(ndx>=[self count]) { \
-        tmpEnumView = nil; \
+    if(ndx==-1) { \
         return 0; \
     } \
-    [((TableName##_Cursor *)*stackbuf) setNdx:[tmpEnumView getSourceNdx:ndx]]; \
+    [((TableName##_Cursor *)*stackbuf) setNdx:ndx]; \
     NSLog(@"Cursor: %@ - ndx: %i", *stackbuf, ndx); \
-    if(ndx<[self count]) \
-    state->extra[0] = ndx+1; \
+    state->extra[0] = [self findNext:ndx]; \
     return 1; \
     } \
 @end \
@@ -755,7 +737,7 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
     state->extra[0] = (long)0; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
@@ -776,7 +758,7 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
     state->extra[0] = (long)0; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
@@ -847,9 +829,6 @@
     } \
 @end \
 @implementation TableName##_##Query \
-    { \
-    TableName##_View *tmpEnumView; \
-    } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
 @synthesize CName3 = _CName3; \
@@ -898,22 +877,19 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
-    state->extra[0] = (long)0; \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
+    state->extra[0] = (long)[self findNext:-1]; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
-    tmpEnumView = [self findAll]; \
-    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[tmpEnumView getTable] ndx:[tmpEnumView getSourceNdx:0]]; \
+    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:state->extra[0]]; \
     } \
     int ndx = state->extra[0]; \
-    if(ndx>=[self count]) { \
-        tmpEnumView = nil; \
+    if(ndx==-1) { \
         return 0; \
     } \
-    [((TableName##_Cursor *)*stackbuf) setNdx:[tmpEnumView getSourceNdx:ndx]]; \
+    [((TableName##_Cursor *)*stackbuf) setNdx:ndx]; \
     NSLog(@"Cursor: %@ - ndx: %i", *stackbuf, ndx); \
-    if(ndx<[self count]) \
-    state->extra[0] = ndx+1; \
+    state->extra[0] = [self findNext:ndx]; \
     return 1; \
     } \
 @end \
@@ -1059,7 +1035,7 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
     state->extra[0] = (long)0; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
@@ -1080,7 +1056,7 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
     state->extra[0] = (long)0; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
@@ -1161,9 +1137,6 @@
     } \
 @end \
 @implementation TableName##_##Query \
-    { \
-    TableName##_View *tmpEnumView; \
-    } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
 @synthesize CName3 = _CName3; \
@@ -1214,22 +1187,19 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
-    state->extra[0] = (long)0; \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
+    state->extra[0] = (long)[self findNext:-1]; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
-    tmpEnumView = [self findAll]; \
-    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[tmpEnumView getTable] ndx:[tmpEnumView getSourceNdx:0]]; \
+    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:state->extra[0]]; \
     } \
     int ndx = state->extra[0]; \
-    if(ndx>=[self count]) { \
-        tmpEnumView = nil; \
+    if(ndx==-1) { \
         return 0; \
     } \
-    [((TableName##_Cursor *)*stackbuf) setNdx:[tmpEnumView getSourceNdx:ndx]]; \
+    [((TableName##_Cursor *)*stackbuf) setNdx:ndx]; \
     NSLog(@"Cursor: %@ - ndx: %i", *stackbuf, ndx); \
-    if(ndx<[self count]) \
-    state->extra[0] = ndx+1; \
+    state->extra[0] = [self findNext:ndx]; \
     return 1; \
     } \
 @end \
@@ -1384,7 +1354,7 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
     state->extra[0] = (long)0; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
@@ -1405,7 +1375,7 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
     state->extra[0] = (long)0; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
@@ -1496,9 +1466,6 @@
     } \
 @end \
 @implementation TableName##_##Query \
-    { \
-    TableName##_View *tmpEnumView; \
-    } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
 @synthesize CName3 = _CName3; \
@@ -1551,22 +1518,19 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
-    state->extra[0] = (long)0; \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
+    state->extra[0] = (long)[self findNext:-1]; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
-    tmpEnumView = [self findAll]; \
-    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[tmpEnumView getTable] ndx:[tmpEnumView getSourceNdx:0]]; \
+    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:state->extra[0]]; \
     } \
     int ndx = state->extra[0]; \
-    if(ndx>=[self count]) { \
-        tmpEnumView = nil; \
+    if(ndx==-1) { \
         return 0; \
     } \
-    [((TableName##_Cursor *)*stackbuf) setNdx:[tmpEnumView getSourceNdx:ndx]]; \
+    [((TableName##_Cursor *)*stackbuf) setNdx:ndx]; \
     NSLog(@"Cursor: %@ - ndx: %i", *stackbuf, ndx); \
-    if(ndx<[self count]) \
-    state->extra[0] = ndx+1; \
+    state->extra[0] = [self findNext:ndx]; \
     return 1; \
     } \
 @end \
@@ -1730,7 +1694,7 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
     state->extra[0] = (long)0; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
@@ -1751,7 +1715,7 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
     state->extra[0] = (long)0; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
@@ -1852,9 +1816,6 @@
     } \
 @end \
 @implementation TableName##_##Query \
-    { \
-    TableName##_View *tmpEnumView; \
-    } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
 @synthesize CName3 = _CName3; \
@@ -1909,22 +1870,19 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
-    state->extra[0] = (long)0; \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
+    state->extra[0] = (long)[self findNext:-1]; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
-    tmpEnumView = [self findAll]; \
-    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[tmpEnumView getTable] ndx:[tmpEnumView getSourceNdx:0]]; \
+    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:state->extra[0]]; \
     } \
     int ndx = state->extra[0]; \
-    if(ndx>=[self count]) { \
-        tmpEnumView = nil; \
+    if(ndx==-1) { \
         return 0; \
     } \
-    [((TableName##_Cursor *)*stackbuf) setNdx:[tmpEnumView getSourceNdx:ndx]]; \
+    [((TableName##_Cursor *)*stackbuf) setNdx:ndx]; \
     NSLog(@"Cursor: %@ - ndx: %i", *stackbuf, ndx); \
-    if(ndx<[self count]) \
-    state->extra[0] = ndx+1; \
+    state->extra[0] = [self findNext:ndx]; \
     return 1; \
     } \
 @end \
@@ -2097,7 +2055,7 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
     state->extra[0] = (long)0; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
@@ -2118,7 +2076,7 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
     state->extra[0] = (long)0; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
@@ -2229,9 +2187,6 @@
     } \
 @end \
 @implementation TableName##_##Query \
-    { \
-    TableName##_View *tmpEnumView; \
-    } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
 @synthesize CName3 = _CName3; \
@@ -2288,22 +2243,19 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
-    state->extra[0] = (long)0; \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
+    state->extra[0] = (long)[self findNext:-1]; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
-    tmpEnumView = [self findAll]; \
-    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[tmpEnumView getTable] ndx:[tmpEnumView getSourceNdx:0]]; \
+    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:state->extra[0]]; \
     } \
     int ndx = state->extra[0]; \
-    if(ndx>=[self count]) { \
-        tmpEnumView = nil; \
+    if(ndx==-1) { \
         return 0; \
     } \
-    [((TableName##_Cursor *)*stackbuf) setNdx:[tmpEnumView getSourceNdx:ndx]]; \
+    [((TableName##_Cursor *)*stackbuf) setNdx:ndx]; \
     NSLog(@"Cursor: %@ - ndx: %i", *stackbuf, ndx); \
-    if(ndx<[self count]) \
-    state->extra[0] = ndx+1; \
+    state->extra[0] = [self findNext:ndx]; \
     return 1; \
     } \
 @end \
@@ -2485,7 +2437,7 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
     state->extra[0] = (long)0; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
@@ -2506,7 +2458,7 @@
     { \
     if(state->state == 0) \
     { \
-    state->mutationsPtr = objc_unretainedPointer(self); \
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \
     state->extra[0] = (long)0; \
     state->state = 1; \
     state->itemsPtr = stackbuf; \
@@ -2571,7 +2523,6 @@
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \
 @end \
 @interface TableName##_##View : TableView \
--(id)initWithTable:(Table *)table; \
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \
 @end
 
@@ -2633,7 +2584,6 @@ TDB_TABLE_IMPL_1(TableName    ,CType1, CName1    )
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \
 @end \
 @interface TableName##_##View : TableView \
--(id)initWithTable:(Table *)table; \
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \
 @end
 
@@ -2700,7 +2650,6 @@ TDB_TABLE_IMPL_2(TableName    ,CType1, CName1    ,CType2, CName2    )
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \
 @end \
 @interface TableName##_##View : TableView \
--(id)initWithTable:(Table *)table; \
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \
 @end
 
@@ -2772,7 +2721,6 @@ TDB_TABLE_IMPL_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \
 @end \
 @interface TableName##_##View : TableView \
--(id)initWithTable:(Table *)table; \
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \
 @end
 
@@ -2849,7 +2797,6 @@ TDB_TABLE_IMPL_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \
 @end \
 @interface TableName##_##View : TableView \
--(id)initWithTable:(Table *)table; \
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \
 @end
 
@@ -2931,7 +2878,6 @@ TDB_TABLE_IMPL_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \
 @end \
 @interface TableName##_##View : TableView \
--(id)initWithTable:(Table *)table; \
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \
 @end
 
@@ -3018,7 +2964,6 @@ TDB_TABLE_IMPL_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \
 @end \
 @interface TableName##_##View : TableView \
--(id)initWithTable:(Table *)table; \
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \
 @end
 
@@ -3110,7 +3055,6 @@ TDB_TABLE_IMPL_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \
 @end \
 @interface TableName##_##View : TableView \
--(id)initWithTable:(Table *)table; \
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \
 @end
 
