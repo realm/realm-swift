@@ -8,6 +8,9 @@
 //#include "TightDb/alloc.hpp"
 #import "Table.h"
 #import "TablePriv.h"
+#import "Query.h"
+#import "QueryPriv.h"
+
 
 #pragma mark - Allocater
 @implementation OCMemRef
@@ -306,8 +309,26 @@
 @property (nonatomic) tightdb::TableView *tableView;
 @end
 @implementation TableView
+{
+    Table *_table;
+}
 @synthesize tableView = _tableView;
 
+
+-(id)initFromQuery:(Query *)query
+{
+    self = [super init];
+    if (self) {
+        _table = [query getTable];
+        self.tableView = new tightdb::TableView([query getTableView]);
+    }
+    return self;    
+}
+
+-(Table *)getTable
+{
+    return _table;
+}
 
 +(TableView *)tableViewWithTable:(Table *)table
 {
@@ -362,6 +383,10 @@
 -(void)clear
 {
     _tableView->clear();
+}
+-(size_t)getSourceNdx:(size_t)ndx
+{
+    return _tableView->get_source_ndx(ndx);
 }
 @end
 
@@ -642,6 +667,11 @@
 // TODO - Dummy version of initWithBlock missing ...
 @implementation OCTopLevelTable
 
+-(id)initWithBlock:(TopLevelTableInitBlock)block
+{
+    // Dummy method - Will be overridden - sjhould just call super.
+    return [super initWithBlock:block];
+}
 -(id)initWithTableRef:(tightdb::TableRef)ref
 {
     self = [super initWithTableRef:ref];
@@ -650,6 +680,11 @@
 -(void)updateFromSpec
 {
     static_cast<tightdb::Table *>(&*self.table)->update_from_spec();
+}
+
+-(void)dealloc
+{
+    NSLog(@"OCTopLevelTable dealloc");
 }
 
 

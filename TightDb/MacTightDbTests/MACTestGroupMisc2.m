@@ -32,7 +32,7 @@ TDB_TABLE_2(QueryTable,
     Group *group = [Group group];
 	// Create new table in group
 	MyTable *table = [group getTable:@"employees" withClass:[MyTable class]];
-    
+    NSLog(@"Table: %@", table);
     // Add some rows
     [table addName:@"John" Age:20 Hired:YES Spare:0];
     [table addName:@"Mary" Age:21 Hired:NO Spare:0];
