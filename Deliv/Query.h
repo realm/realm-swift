@@ -21,6 +21,7 @@
 -(void)parent;
 -(size_t)count;
 -(double)avgOnColumn:(size_t)columndId;
+-(size_t)findNext:(size_t)last;
 @end
 
 #pragma mark - OCXQueryAccessorInt

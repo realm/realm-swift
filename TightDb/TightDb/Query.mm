@@ -80,6 +80,10 @@
 {
     return _query->find_all(*[_table getTable]);
 }
+-(size_t)findNext:(size_t)last
+{
+    return _query->find_next(*[_table getTable], last);
+}
 @end
 
 

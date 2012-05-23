@@ -51,9 +51,6 @@ directiveStartToken = %
 %end for
 @end \\
 @implementation TableName##_##Query \\
-    { \\
-    TableName##_View *tmpEnumView; \\
-    } \\
 %for $j in range($num_cols)
 @synthesize CName${j+1} = _CName${j+1}; \\
 %end for
@@ -100,22 +97,19 @@ directiveStartToken = %
     { \\
     if(state->state == 0) \\
     { \\
-    state->mutationsPtr = objc_unretainedPointer(self); \\
-    state->extra[0] = (long)0; \\
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \\
+    state->extra[0] = (long)[self findNext:-1]; \\
     state->state = 1; \\
     state->itemsPtr = stackbuf; \\
-    tmpEnumView = [self findAll]; \\
-    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[tmpEnumView getTable] ndx:[tmpEnumView getSourceNdx:0]]; \\
+    *stackbuf = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:state->extra[0]]; \\
     } \\
     int ndx = state->extra[0]; \\
-    if(ndx>=[self count]) { \\
-        tmpEnumView = nil; \\
+    if(ndx==-1) { \\
         return 0; \\
     } \\
-    [((TableName##_Cursor *)*stackbuf) setNdx:[tmpEnumView getSourceNdx:ndx]]; \\
+    [((TableName##_Cursor *)*stackbuf) setNdx:ndx]; \\
     NSLog(@"Cursor: %@ - ndx: %i", *stackbuf, ndx); \\
-    if(ndx<[self count]) \\
-    state->extra[0] = ndx+1; \\
+    state->extra[0] = [self findNext:ndx]; \\
     return 1; \\
     } \\
 @end \\
@@ -260,7 +254,7 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
     { \\
     if(state->state == 0) \\
     { \\
-    state->mutationsPtr = objc_unretainedPointer(self); \\
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \\
     state->extra[0] = (long)0; \\
     state->state = 1; \\
     state->itemsPtr = stackbuf; \\
@@ -281,7 +275,7 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
     { \\
     if(state->state == 0) \\
     { \\
-    state->mutationsPtr = objc_unretainedPointer(self); \\
+    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \\
     state->extra[0] = (long)0; \\
     state->state = 1; \\
     state->itemsPtr = stackbuf; \\
@@ -372,7 +366,6 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1}%slurp
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \\
 @end \\
 @interface TableName##_##View : TableView \\
--(id)initWithTable:(Table *)table; \\
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \\
 @end
 
