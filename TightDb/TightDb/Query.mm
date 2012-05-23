@@ -39,6 +39,11 @@
     return _query;
 }
 
+-(Table *)getTable
+{
+    return _table;
+}
+
 -(void)group
 {
     _query->group();
@@ -71,9 +76,9 @@
     return _query->average(*[_table getTable], columndId, &resultCount);
 }
 
--(TableView *)findAll
+-(tightdb::TableView)getTableView
 {
-    return [TableView tableViewWithTableView:_query->find_all(*[_table getTable])];
+    return _query->find_all(*[_table getTable]);
 }
 @end
 

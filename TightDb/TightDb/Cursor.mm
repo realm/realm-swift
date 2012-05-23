@@ -26,6 +26,16 @@
     }
     return self;
 }
+-(void)setNdx:(size_t)ndx
+{
+    _ndx = ndx;
+}
+//#ifdef DEBUG
+-(void)dealloc
+{
+    NSLog(@"CursorBase dealloc");
+}
+//#endif
 @end
 
 #pragma mark - OCAccessor

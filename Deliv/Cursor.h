@@ -11,6 +11,7 @@
 
 @interface CursorBase : NSObject
 -(id)initWithTable:(Table *)table ndx:(size_t)ndx;
+-(void)setNdx:(size_t)ndx;
 @end
 
 

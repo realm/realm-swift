@@ -13,6 +13,7 @@
 
 @interface Query : NSObject
 -(id)initWithTable:(Table *)table;
+-(Table *)getTable;
 -(void)group;
 -(void)or;
 -(void)endgroup;
@@ -20,7 +21,6 @@
 -(void)parent;
 -(size_t)count;
 -(double)avgOnColumn:(size_t)columndId;
--(TableView *)findAll;
 @end
 
 #pragma mark - OCXQueryAccessorInt

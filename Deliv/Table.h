@@ -157,8 +157,9 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 -(void)updateFromSpec;
 @end
 
-
+@class Query;
 @interface TableView : NSObject
+-(id)initFromQuery:(Query *)query;
 +(TableView *)tableViewWithTable:(Table *)table;
 
 -(size_t)count;
@@ -170,7 +171,8 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 // Deleting
 -(void)delete:(size_t)ndx;
 -(void)clear;
-
+-(Table *)getTable;
+-(size_t)getSourceNdx:(size_t)ndx;
 @end
 
 
