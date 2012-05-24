@@ -179,9 +179,10 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 
 
 @interface OCColumnProxy : NSObject
-@property(nonatomic, strong) Table *table;
+@property(nonatomic, weak) Table *table;
 @property(nonatomic) size_t column;
 -(id)initWithTable:(Table *)table column:(size_t)column;
+-(void)clear;
 @end
 
 @interface OCColumnProxyInt : OCColumnProxy

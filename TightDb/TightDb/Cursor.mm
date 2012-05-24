@@ -10,7 +10,7 @@
 #pragma mark - CursorBase
 
 @interface CursorBase()
-@property (nonatomic, strong) Table *table;
+@property (nonatomic, weak) Table *table;
 @property (nonatomic) size_t ndx;
 @end
 @implementation CursorBase
@@ -43,7 +43,7 @@
 
 @implementation OCAccessor
 {
-    CursorBase *_cursor;
+    __weak CursorBase *_cursor;
     size_t _columnId;
 }
 
@@ -57,11 +57,6 @@
     return self;
 }
 
-// To avoid cyclic reference, clear cursor on demand.
--(void)clear
-{
-    _cursor = nil;
-}
 
 -(int64_t)getInt
 {

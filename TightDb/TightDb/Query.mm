@@ -20,7 +20,7 @@
 @implementation Query
 {
     tightdb::Query *_query;
-    Table *_table;
+    __weak Table *_table;
 }
 
 

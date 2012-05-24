@@ -10,7 +10,7 @@
 @interface Table()
 @property(nonatomic) tightdb::TableRef table; 
 @property(nonatomic) tightdb::Table *tablePtr;
--(id)initWithTableRef:(tightdb::TableRef)ref;
+-(void)initRefs;
 -(tightdb::Table *)getTable;
 -(void)setParent:(id)parent; // Workaround for ARC release problem.
 @end
