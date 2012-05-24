@@ -73,7 +73,7 @@ using namespace tightdb;
 				break;
 		}
 		
-		table.insert_table(8, i);
+		table.insert_subtable(8, i);
 		table.insert_done();
 		
 		// Add sub-tables

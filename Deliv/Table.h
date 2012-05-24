@@ -16,6 +16,9 @@
 #define COLTYPEString COLUMN_TYPE_STRING
 #define COLTYPEDate COLUMN_TYPE_DATE
 
+@interface BinaryData : NSObject
+-(id)initWithData:(char *)ptr len:(size_t)len;
+@end
 @class Table;
 @class OCTopLevelTable;
 typedef void(^TopLevelTableInitBlock)(Table *table);
@@ -45,14 +48,14 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 +(OCMixed *)mixedWithDate:(OCDate *)date;
 +(OCMixed *)mixedWithInt64:(int64_t)value;
 +(OCMixed *)mixedWithString:(NSString *)string;
-+(OCMixed *)mixedWithBinary:(BinaryData)data;
++(OCMixed *)mixedWithBinary:(BinaryData *)data;
 +(OCMixed *)mixedWithData:(const char*)value length:(size_t)length;
 -(ColumnType)getType;
 -(int64_t)getInt;
 -(BOOL)getBool;
 -(OCDate *)getDate;
 -(NSString *)getString;
--(BinaryData)getBinary;
+-(BinaryData *)getBinary;
 @end
 
 
@@ -108,7 +111,7 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 -(void)setString:(size_t)columndId ndx:(size_t)ndx value:(NSString *)value;
 
 // Binary
--(BinaryData)getBinary:(size_t)columndId ndx:(size_t)ndx;
+-(BinaryData *)getBinary:(size_t)columndId ndx:(size_t)ndx;
 -(void)setBinary:(size_t)columndId ndx:(size_t)ndx value:(void *)value len:(size_t)len;
 
 // Subtables

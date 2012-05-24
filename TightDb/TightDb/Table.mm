@@ -12,6 +12,35 @@
 #import "QueryPriv.h"
 #import "Cursor.h"
 
+#pragma mark BinaryData
+
+@implementation BinaryData
+{
+    tightdb::BinaryData _data;
+}
+-(id)initWithData:(char *)ptr len:(size_t)len
+{
+    self = [super init];
+    if (self) {
+        _data.pointer = ptr;
+        _data.len = len;
+    }
+    return self;
+}
+-(id)initWithBinary:(tightdb::BinaryData)data
+{
+    self = [super init];
+    if (self) {
+        _data = data;
+    }
+    return self;    
+}
+-(tightdb::BinaryData)getBinary
+{
+    return _data;
+}
+@end
+
 #pragma mark - Allocater
 @implementation OCMemRef
 {
@@ -134,7 +163,7 @@
 {
     OCMixed *mixed = [[OCMixed alloc] init];
     
-    mixed.mixed = new tightdb::Mixed(type);
+    mixed.mixed = new tightdb::Mixed((tightdb::ColumnType)type);
     
     return mixed;
 }
@@ -175,11 +204,11 @@
     return mixed;            
 }
 
-+(OCMixed *)mixedWithBinary:(BinaryData)data
++(OCMixed *)mixedWithBinary:(BinaryData *)data
 {
     OCMixed *mixed = [[OCMixed alloc] init];
     
-    mixed.mixed = new tightdb::Mixed(data);
+    mixed.mixed = new tightdb::Mixed([data getBinary]);
     
     return mixed;            
 }
@@ -195,7 +224,7 @@
 
 -(ColumnType)getType
 {
-    return _mixed->get_type();
+    return (ColumnType)_mixed->get_type();
 }
 -(int64_t)getInt
 {
@@ -216,9 +245,9 @@
     return [NSString stringWithUTF8String:_mixed->get_string()];
 }
 
--(BinaryData)getBinary
+-(BinaryData *)getBinary
 {
-    return _mixed->get_binary();
+    return [[BinaryData alloc] initWithBinary:_mixed->get_binary()];    
 }
 @end
 
@@ -258,7 +287,7 @@
 
 -(void)addColumn:(ColumnType)type name:(NSString *)name
 {
-    _spec->add_column(type, [name UTF8String]);
+    _spec->add_column((tightdb::ColumnType)type, [name UTF8String]);
 }
 -(OCSpec *)addColumnTable:(NSString *)name
 {
@@ -276,7 +305,7 @@
 }
 -(ColumnType)getColumnType:(size_t)ndx
 {
-    return _spec->get_column_type(ndx);
+    return (ColumnType)_spec->get_column_type(ndx);
 }
 -(NSString *)getColumnName:(size_t)ndx
 {
@@ -516,7 +545,7 @@
 }
 -(ColumnType)getColumnType:(size_t)ndx
 {
-    return _table->get_column_type(ndx);
+    return (ColumnType)_table->get_column_type(ndx);
 }
 -(OCSpec *)getSpec
 {
@@ -605,9 +634,9 @@
     _table->set_string(columndId, ndx, [value UTF8String]);
 }
 
--(BinaryData)getBinary:(size_t)columndId ndx:(size_t)ndx
+-(BinaryData *)getBinary:(size_t)columndId ndx:(size_t)ndx
 {
-    return _table->get_binary(columndId, ndx);
+    return [[BinaryData alloc] initWithBinary:_table->get_binary(columndId, ndx)];
 }
 -(void)setBinary:(size_t)columndId ndx:(size_t)ndx value:(void *)value len:(size_t)len
 {
@@ -620,7 +649,7 @@
 }
 -(void)insertTable:(size_t)columnId ndx:(size_t)ndx
 {
-    _table->insert_table(columnId, ndx);
+    _table->insert_subtable(columnId, ndx);
 }
 -(void)clearTable:(size_t)columnId ndx:(size_t)ndx
 {
@@ -633,7 +662,7 @@
 }
 -(ColumnType)getMixedType:(size_t)columnId ndx:(size_t)ndx
 {
-    return _table->get_mixed_type(columnId, ndx);
+    return (ColumnType)_table->get_mixed_type(columnId, ndx);
 }
 -(void)insertMixed:(size_t)columnId ndx:(size_t)ndx value:(OCMixed *)value
 {
@@ -646,7 +675,7 @@
 
 -(size_t)registerColumn:(ColumnType)type name:(NSString *)name
 {
-    return _table->add_column(type, [name UTF8String]);
+    return _table->add_column((tightdb::ColumnType)type, [name UTF8String]);
 }
 -(size_t)find:(size_t)columnId value:(int64_t)value
 {
