@@ -30,12 +30,13 @@
 {
     _ndx = ndx;
 }
-//#ifdef DEBUG
 -(void)dealloc
 {
+#ifdef DEBUG
     NSLog(@"CursorBase dealloc");
+#endif
+    _table = nil;
 }
-//#endif
 @end
 
 #pragma mark - OCAccessor
@@ -54,6 +55,12 @@
         _columnId = columnId;
     }
     return self;
+}
+
+// To avoid cyclic reference, clear cursor on demand.
+-(void)clear
+{
+    _cursor = nil;
 }
 
 -(int64_t)getInt

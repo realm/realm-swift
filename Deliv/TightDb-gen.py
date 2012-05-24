@@ -39,6 +39,12 @@ directiveStartToken = %
     } \\
     return self; \\
     } \\
+    -(void)clear \\
+    { \\
+    %for $j in range($num_cols)
+    [_##CName${j+1} clear]; \\
+    %end for
+    } \\
 %for $j in range($num_cols)
     -(tdbOCType##CType${j+1})CName${j+1} \\
     { \\
@@ -51,6 +57,26 @@ directiveStartToken = %
 %end for
 @end \\
 @implementation TableName##_##Query \\
+    { \\
+    TableName##_##Cursor *tmpCursor; \\
+    } \\
+    -(long)getFastEnumStart \\
+    { \\
+       return [self findNext:-1]; \\
+    } \\
+    -(long)incrementFastEnum:(long)ndx \\
+    { \\
+        return [self findNext:ndx]; \\
+    } \\
+    -(CursorBase *)getCursor:(long)ndx \\
+    { \\
+    return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:ndx]; \\
+    } \\
+    -(void)dealloc \\
+    { \\
+    NSLog(@"Query dealloc"); \\
+    [tmpCursor clear]; \\
+    } \\
 %for $j in range($num_cols)
 @synthesize CName${j+1} = _CName${j+1}; \\
 %end for
@@ -92,27 +118,6 @@ directiveStartToken = %
 -(TableName##_##View *)findAll \\
     { \\
         return [[TableName##_##View alloc] initFromQuery:self]; \\
-    } \\
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len \\
-    { \\
-    if(state->state == 0) \\
-    { \\
-    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \\
-    state->extra[0] = (long)[self findNext:-1]; \\
-    state->state = 1; \\
-    state->itemsPtr = stackbuf; \\
-    TableName##_##Cursor *tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:state->extra[0]]; \\
-    *stackbuf = tmpCursor; \\
-    } \\
-    int ndx = state->extra[0]; \\
-    if(ndx==-1) { \\
-        *stackbuf = nil; \\
-        state->itemsPtr = nil; \\
-        return 0; \\
-    } \\
-    [((TableName##_##Cursor *)*stackbuf) setNdx:ndx]; \\
-    state->extra[0] = [self findNext:ndx]; \\
-    return 1; \\
     } \\
 @end \\
 @implementation TableName##QueryAccessorInt \\
@@ -166,6 +171,9 @@ directiveStartToken = %
 } \\
 @end \\
 @implementation TableName \\
+    { \\
+    TableName##_##Cursor *tmpCursor; \\
+    } \\
 %for $j in range($num_cols)
 @synthesize CName${j+1} = _##CName${j+1}; \\
 %end for
@@ -252,53 +260,31 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 { \\
     return [[TableName##_##Cursor alloc] initWithTable:self ndx:[self count]-1]; \\
 } \\
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len \\
+-(CursorBase *)getCursor \\
+{ \\
+    return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:self ndx:0]; \\
+} \\
+    -(void)dealloc \\
     { \\
-    if(state->state == 0) \\
-    { \\
-    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \\
-    state->extra[0] = (long)0; \\
-    state->state = 1; \\
-    state->itemsPtr = stackbuf; \\
-    TableName##_##Cursor *tmpCursor = [[TableName##_##Cursor alloc] initWithTable:self ndx:0]; \\
-    *stackbuf = tmpCursor; \\
-    } \\
-    int ndx = state->extra[0]; \\
-    if(ndx>=[self count]) { \\
-        *stackbuf = nil; \\
-        state->itemsPtr = nil; \\
-        return 0; \\
-    } \\
-    [((TableName##_##Cursor *)*stackbuf) setNdx:ndx]; \\
-    if(ndx<[self count]) \\
-        state->extra[0] = ndx+1; \\
-    return 1; \\
+    NSLog(@"Table dealloc"); \\
+    [tmpCursor clear]; \\
     } \\
 @end \\
 @implementation TableName##_##View \\
     { \\
         TableName##_##Cursor *tmpCursor; \\
     } \\
-    - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len \\
+    -(CursorBase *)getCursor \\
     { \\
-    if(state->state == 0) \\
+        return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \\
+    } \\
+    -(void)dealloc \\
     { \\
-    state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self); \\
-    state->extra[0] = (long)0; \\
-    tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \\
-    *stackbuf = tmpCursor; \\
+        [tmpCursor clear]; \\
     } \\
-    if (state->state < [self count]) { \\
-        [((TableName##_##Cursor *)*stackbuf) setNdx:[self getSourceNdx:state->state]]; \\
-        state->itemsPtr = stackbuf; \\
-        state->state++; \\
-    } else { \\
-        *stackbuf = nil; \\
-        state->itemsPtr = nil; \\
-        tmpCursor = nil; \\
-        return 0; \\
-    } \\
-    return 1; \\
+    -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx \\
+    { \\
+    return [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \\
     } \\
 @end
 
@@ -320,6 +306,7 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
     -(tdbOCType##CType${j+1})CName${j+1}; \\
     -(void)set##CName${j+1}:(tdbOCType##CType${j+1})value; \\
     %end for
+    -(void)clear; \\
 @end \\
 @class TableName##_##Query; \\
 @class TableName##_##View; \\
@@ -350,7 +337,6 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 -(TableName##_##Query *)subtable:(size_t)column; \\
 -(TableName##_##Query *)parent; \\
 -(TableName##_##View *)findAll; \\
--(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \\
 @end \\
 @interface TableName : OCTopLevelTable \\
 %for $j in range($num_cols)
@@ -373,10 +359,9 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1}%slurp
 -(TableName##_##Cursor *)add; \\
 -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \\
 -(TableName##_##Cursor *)lastObject; \\
--(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \\
 @end \\
 @interface TableName##_##View : TableView \\
--(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len; \\
+    -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \\
 @end
 
 #undef TDB_TABLE_${num_cols}

@@ -7,7 +7,7 @@
 #import "Query.h"
 #import "Table.h"
 #import "TablePriv.h"
-
+#import "Cursor.h"
 
 #pragma mark - TableView secrets
 
@@ -32,6 +32,55 @@
         _query = new tightdb::Query();
     }
     return self;
+}
+
+-(CursorBase *)getCursor:(long)ndx
+{
+    return nil; // Must be overridden in TightDb.h
+}
+
+-(long)getFastEnumStart
+{
+    return 0; // Must be overridden in TightDb.h
+}
+-(long)incrementFastEnum:(long)ndx
+{
+    return ndx; // Must be overridden in TightDb.h
+}
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len
+{
+    if(state->state == 0)
+    {
+        state->state = [self getFastEnumStart];
+        state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self);
+        CursorBase *tmp = [self getCursor:state->state];
+        *stackbuf = tmp;
+    }
+    if (state->state != -1) {
+        [((CursorBase *)*stackbuf) setNdx:state->state];
+        state->itemsPtr = stackbuf;
+        state->state = [self incrementFastEnum:state->state];
+    } else {
+        *stackbuf = nil;
+        state->itemsPtr = nil;
+        state->mutationsPtr = nil;
+        return 0;
+    }
+    return 1;
+}
+
+// Due to cyclic ARC problems. You have to clear manually. (Must be called from client code)
+-(void)clear
+{
+    _table = nil;
+}
+-(void)dealloc
+{
+#ifdef DEBUG
+    NSLog(@"Query dealloc");
+#endif
+    delete _query;
 }
 
 -(tightdb::Query *)getQuery

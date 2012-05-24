@@ -30,11 +30,28 @@ Int,    Age)
     Utils *_utils;
 }
 
+-(void)test
+{
+    Group *group = [Group group];
+    // Create new table in group
+    MyTable *table = [group getTable:@"employees" withClass:[MyTable class]];
+    
+    // Add some rows
+    [table addName:@"John" Age:20 Hired:YES Spare:0];
+    [table addName:@"Mary" Age:21 Hired:NO Spare:0];
+    [table addName:@"Lars" Age:21 Hired:YES Spare:0];
+    [table addName:@"Phil" Age:43 Hired:NO Spare:0];
+    [table addName:@"Anni" Age:54 Hired:YES Spare:0];
+
+    NSLog(@"Test ended");
+}
 
 #pragma mark - View code
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [self test];
+    return;
     self.view = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     _utils = [[Utils alloc] initWithView:(UIScrollView *)self.view];
 	[self testGroup];
@@ -43,13 +60,11 @@ Int,    Age)
         [perf testInsert];
         [perf testFetch];
         [perf testFetchSparse];
-        for(int i = 0;i<200;++i)
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                [perf testFetchAndIterate];
-            });
+        [perf testFetchAndIterate];
         [perf testUnqualifiedFetchAndIterate];
         [perf testWriteToDisk];
     });
+    
 }
 
 

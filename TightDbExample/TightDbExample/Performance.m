@@ -10,6 +10,7 @@
 #import "TightDb.h"
 #import "Group.h"
 #import "Utils.h"
+#import <sqlite3.h>
 
 TDB_TABLE_4(PerfTable,
             String, Name,
@@ -22,6 +23,7 @@ TDB_TABLE_4(PerfTable,
 {
     Utils *_utils;
     int _size;
+    sqlite3 *db;
 }
 
 -(id)initWithUtils:(Utils *)utils
@@ -29,12 +31,19 @@ TDB_TABLE_4(PerfTable,
     self = [super init];
     if (self) {
         _utils = utils;
-        _size = 1000;
+        _size = 100000;
     }
     return self;
 }
 
+-(void)dealloc
+{
+    sqlite3_close(db);
+    db = NULL;
+}
+
 - (void)testInsert {
+    
     Group *group = [Group group];
     // Create new table in group
     PerfTable *table = [group getTable:@"employees"withClass:[PerfTable class]];
@@ -55,6 +64,49 @@ TDB_TABLE_4(PerfTable,
 
     // Write to disk
     [group write:[_utils pathForDataFile:@"perfemployees.tightdb"]];
+    
+
+    NSTimeInterval sqlstart = [NSDate timeIntervalSinceReferenceDate];
+    char *zErrMsg = NULL;
+    db = NULL;
+    int rc = sqlite3_open(":memory:", &db);
+    sqlite3_exec(db, "create table t1 (name VARCHAR(100), age INTEGER, hired INTEGER, spare INTEGER);", NULL, NULL, &zErrMsg);
+    sqlite3_stmt *ppStmt = NULL;
+    sqlite3_prepare(db, "INSERT INTO t1 VALUES(?1, ?2, ?3, ?4);", -1, &ppStmt, NULL);
+    srand(1);
+    for (size_t i = 0; i < count; ++i) {
+        const int rand_age = 25 + (rand() % 4);
+        sqlite3_reset(ppStmt);
+        sqlite3_bind_text(ppStmt, 1, "Foo", -1, NULL);
+        sqlite3_bind_int(ppStmt, 2, rand_age);
+        sqlite3_bind_int(ppStmt, 3, 1); // true
+        sqlite3_bind_int(ppStmt, 4, 0);
+        
+        rc = sqlite3_step(ppStmt);
+        if (rc != SQLITE_DONE) {
+            fprintf(stderr, "SQL error: %s\n", sqlite3_errmsg(db));
+        }
+    }
+    // Put in last row for sparse queries
+    {
+        sqlite3_reset(ppStmt);
+        sqlite3_bind_text(ppStmt, 1, "Foo", -1, NULL);
+        sqlite3_bind_int(ppStmt, 2, 25);
+        sqlite3_bind_int(ppStmt, 3, 0); // false
+        sqlite3_bind_int(ppStmt, 4, 0);
+        
+        rc = sqlite3_step(ppStmt);
+        if (rc != SQLITE_DONE) {
+            fprintf(stderr, "SQL error: %s\n", sqlite3_errmsg(db));
+        }
+    }
+    sqlite3_finalize(ppStmt); // Cleanup
+    NSTimeInterval sqlstop = [NSDate timeIntervalSinceReferenceDate];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_utils Eval:YES msg:[NSString stringWithFormat:@"SQL Inserted %i records in %.2f s",_size, sqlstop-sqlstart]];
+    });
+
 }
 - (void)testFetch 
 {
@@ -75,7 +127,41 @@ TDB_TABLE_4(PerfTable,
     dispatch_async(dispatch_get_main_queue(), ^{
         [_utils Eval:YES msg:[NSString stringWithFormat:@"Read and query in %.2f s (%zu)", stop - start, [q count]]];    
     });
+    
+    double diff = [self sqlTestFetch] / (stop-start);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_utils Eval:YES msg:[NSString stringWithFormat:@"Diff: %.2f", diff]];    
+    });    
 }
+-(double)sqlTestFetch
+{
+    // Prepare query statement
+    char *zErrMsg = NULL;
+    sqlite3_stmt *qStmt = NULL;
+    int rc = sqlite3_prepare(db, "SELECT count(*) FROM t1 WHERE hired = 1 AND age >= 20 AND age <= 30;", -1, &qStmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "SQL error3: %s\n", sqlite3_errmsg(db));
+    }
+    
+    NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
+    
+    rc = sqlite3_step(qStmt);
+    if (rc != SQLITE_ROW) {
+        fprintf(stderr, "SQL error4: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }
+    const int result = sqlite3_column_int(qStmt, 0);
+    
+    NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_utils Eval:YES msg:[NSString stringWithFormat:@"SQL query in %.2f s (%zu)", stop - start, result]];    
+    });
+    
+    sqlite3_finalize(qStmt); // Cleanup
+    return stop-start;
+}
+
+
 - (void)testFetchSparse
 {
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
@@ -91,6 +177,40 @@ TDB_TABLE_4(PerfTable,
     dispatch_async(dispatch_get_main_queue(), ^{
         [_utils Eval:YES msg:[NSString stringWithFormat:@"Read and query sparse in %.2f s (%zu)", stop-start, [q count]]];    
     });
+    
+    double diff = [self sqlTestSparse] / (stop-start);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_utils Eval:YES msg:[NSString stringWithFormat:@"Diff: %.2f", diff]];    
+    });    
+
+}
+
+-(double)sqlTestSparse
+{
+    // Prepare query statement
+    char *zErrMsg = NULL;
+    sqlite3_stmt *qStmt = NULL;
+    int rc = sqlite3_prepare(db, "SELECT count(*) FROM t1 WHERE hired = 0 AND age >= 20 AND age <= 30;", -1, &qStmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "SQL error3: %s\n", sqlite3_errmsg(db));
+    }
+    
+    NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
+    
+    rc = sqlite3_step(qStmt);
+    if (rc != SQLITE_ROW) {
+        fprintf(stderr, "SQL error4: %s\n", zErrMsg);
+        sqlite3_free(zErrMsg);
+    }
+    const int result = sqlite3_column_int(qStmt, 0);
+    
+    NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_utils Eval:YES msg:[NSString stringWithFormat:@"SQL query sparse in %.2f s (%zu)", stop - start, result]];    
+    });
+    
+    sqlite3_finalize(qStmt); // Cleanup
+    return stop-start;
 }
 
 - (void)testFetchAndIterate 

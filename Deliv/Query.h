@@ -22,6 +22,8 @@
 -(size_t)count;
 -(double)avgOnColumn:(size_t)columndId;
 -(size_t)findNext:(size_t)last;
+-(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
+-(void)clear;
 @end
 
 #pragma mark - OCXQueryAccessorInt
