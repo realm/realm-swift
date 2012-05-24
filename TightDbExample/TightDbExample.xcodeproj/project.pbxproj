@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		410B4DCA156E0C8F0048E4C8 /* Performance.m in Sources */ = {isa = PBXBuildFile; fileRef = 410B4DC9156E0C8F0048E4C8 /* Performance.m */; };
+		410B4DCE156E10430048E4C8 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 410B4DCD156E10430048E4C8 /* Utils.m */; };
 		41584FB9156D248D00DB2995 /* libtightdb_all.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 41584FB8156D248D00DB2995 /* libtightdb_all.a */; };
 		E94A8C0F1541FDB000B174B5 /* libTightDbOC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94A8C0E1541FDB000B174B5 /* libTightDbOC.a */; };
 		E9D58B4F1541A375009150B1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B4E1541A375009150B1 /* UIKit.framework */; };
@@ -21,6 +23,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		410B4DC8156E0C8F0048E4C8 /* Performance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Performance.h; sourceTree = "<group>"; };
+		410B4DC9156E0C8F0048E4C8 /* Performance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Performance.m; sourceTree = "<group>"; };
+		410B4DCC156E10430048E4C8 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
+		410B4DCD156E10430048E4C8 /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
 		41584FB8156D248D00DB2995 /* libtightdb_all.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtightdb_all.a; path = ../native/lib/Debug/libtightdb_all.a; sourceTree = "<group>"; };
 		E94A8C0E1541FDB000B174B5 /* libTightDbOC.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTightDbOC.a; path = ../Deliv/Debug/libTightDbOC.a; sourceTree = "<group>"; };
 		E9D58B4A1541A375009150B1 /* TightDbExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TightDbExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,6 +100,10 @@
 				E9D58B631541A375009150B1 /* ViewController_iPhone.xib */,
 				E9D58B661541A375009150B1 /* ViewController_iPad.xib */,
 				E9D58B551541A375009150B1 /* Supporting Files */,
+				410B4DC8156E0C8F0048E4C8 /* Performance.h */,
+				410B4DC9156E0C8F0048E4C8 /* Performance.m */,
+				410B4DCC156E10430048E4C8 /* Utils.h */,
+				410B4DCD156E10430048E4C8 /* Utils.m */,
 			);
 			path = TightDbExample;
 			sourceTree = "<group>";
@@ -176,6 +186,8 @@
 				E9D58B5B1541A375009150B1 /* main.m in Sources */,
 				E9D58B5F1541A375009150B1 /* AppDelegate.m in Sources */,
 				E9D58B621541A375009150B1 /* ViewController.m in Sources */,
+				410B4DCA156E0C8F0048E4C8 /* Performance.m in Sources */,
+				410B4DCE156E10430048E4C8 /* Utils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

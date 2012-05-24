@@ -239,7 +239,6 @@
     *stackbuf = tmpCursor; \
     } \
     if (state->state < [self count]) { \
-        NSLog(@"Item: %zu", state->state); \
         [((TableName##_##Cursor *)*stackbuf) setNdx:[self getSourceNdx:state->state]]; \
         state->itemsPtr = stackbuf; \
         state->state++; \
@@ -506,7 +505,6 @@
     *stackbuf = tmpCursor; \
     } \
     if (state->state < [self count]) { \
-        NSLog(@"Item: %zu", state->state); \
         [((TableName##_##Cursor *)*stackbuf) setNdx:[self getSourceNdx:state->state]]; \
         state->itemsPtr = stackbuf; \
         state->state++; \
@@ -794,7 +792,6 @@
     *stackbuf = tmpCursor; \
     } \
     if (state->state < [self count]) { \
-        NSLog(@"Item: %zu", state->state); \
         [((TableName##_##Cursor *)*stackbuf) setNdx:[self getSourceNdx:state->state]]; \
         state->itemsPtr = stackbuf; \
         state->state++; \
@@ -1103,7 +1100,6 @@
     *stackbuf = tmpCursor; \
     } \
     if (state->state < [self count]) { \
-        NSLog(@"Item: %zu", state->state); \
         [((TableName##_##Cursor *)*stackbuf) setNdx:[self getSourceNdx:state->state]]; \
         state->itemsPtr = stackbuf; \
         state->state++; \
@@ -1433,7 +1429,6 @@
     *stackbuf = tmpCursor; \
     } \
     if (state->state < [self count]) { \
-        NSLog(@"Item: %zu", state->state); \
         [((TableName##_##Cursor *)*stackbuf) setNdx:[self getSourceNdx:state->state]]; \
         state->itemsPtr = stackbuf; \
         state->state++; \
@@ -1784,7 +1779,6 @@
     *stackbuf = tmpCursor; \
     } \
     if (state->state < [self count]) { \
-        NSLog(@"Item: %zu", state->state); \
         [((TableName##_##Cursor *)*stackbuf) setNdx:[self getSourceNdx:state->state]]; \
         state->itemsPtr = stackbuf; \
         state->state++; \
@@ -2156,7 +2150,6 @@
     *stackbuf = tmpCursor; \
     } \
     if (state->state < [self count]) { \
-        NSLog(@"Item: %zu", state->state); \
         [((TableName##_##Cursor *)*stackbuf) setNdx:[self getSourceNdx:state->state]]; \
         state->itemsPtr = stackbuf; \
         state->state++; \
@@ -2549,7 +2542,6 @@
     *stackbuf = tmpCursor; \
     } \
     if (state->state < [self count]) { \
-        NSLog(@"Item: %zu", state->state); \
         [((TableName##_##Cursor *)*stackbuf) setNdx:[self getSourceNdx:state->state]]; \
         state->itemsPtr = stackbuf; \
         state->state++; \
