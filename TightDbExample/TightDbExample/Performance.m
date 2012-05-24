@@ -48,7 +48,7 @@ TDB_TABLE_4(PerfTable,
     NSDictionary *fileAttributes = [NSFileManager.defaultManager attributesOfItemAtPath:file error:nil];
 	NSString *fileSize = [fileAttributes objectForKey:NSFileSize];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils Eval:YES msg:[NSString stringWithFormat:@"%@: %@", msg, fileSize]];
+        [_utils OutGroup:GROUP_SIZE msg:[NSString stringWithFormat:@"%@: %@", msg, fileSize]];
     });    
 }
 
@@ -69,7 +69,7 @@ TDB_TABLE_4(PerfTable,
     NSLog(@"Age verify: %lld", [table get:1 ndx:1000]);
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils Eval:YES msg:[NSString stringWithFormat:@"Inserted %i records in %.2f s",_size, stop-start]];
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Inserted %i records in %.2f s",_size, stop-start]];
     });
 
     // Write to disk
@@ -126,7 +126,7 @@ TDB_TABLE_4(PerfTable,
     NSTimeInterval sqlstop = [NSDate timeIntervalSinceReferenceDate];
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils Eval:YES msg:[NSString stringWithFormat:@"SQL Inserted %i records in %.2f s",_size, sqlstop-sqlstart]];
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"SQL Inserted %i records in %.2f s",_size, sqlstop-sqlstart]];
     });
     [self reportSizeForFile:[_utils pathForDataFile:@"perfemployees.sqlite"] msg:@"SQL Filesize"];
 
@@ -141,7 +141,7 @@ TDB_TABLE_4(PerfTable,
 
     if ([diskTable count] != _size+1) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [_utils Eval:NO msg:[NSString stringWithFormat:@"Size incorrect (%i) - (%zu)", _size, [diskTable count]]];    
+            [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Size incorrect (%i) - (%zu)", _size, [diskTable count]]];    
         });        
     }
     // Create query (current employees between 20 and 30 years old)
@@ -149,12 +149,12 @@ TDB_TABLE_4(PerfTable,
     NSLog(@"Query count: %zu", [q count]);
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils Eval:YES msg:[NSString stringWithFormat:@"Read and query in %.2f s (%zu)", stop - start, [q count]]];    
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Read and query in %.2f s (%zu)", stop - start, [q count]]];    
     });
     
     double diff = [self sqlTestFetch] / (stop-start);
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils Eval:YES msg:[NSString stringWithFormat:@"Diff: %.2f", diff]];    
+        [_utils OutGroup:GROUP_DIFF msg:[NSString stringWithFormat:@"testFetch %.2f faster than sqlTestFetch", diff]];    
     });    
 }
 -(double)sqlTestFetch
@@ -182,7 +182,7 @@ TDB_TABLE_4(PerfTable,
     db = NULL;
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils Eval:YES msg:[NSString stringWithFormat:@"SQL query in %.2f s (%zu)", stop - start, result]];    
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"SQL query in %.2f s (%zu)", stop - start, result]];    
     });
     
     return stop-start;
@@ -202,12 +202,12 @@ TDB_TABLE_4(PerfTable,
     
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils Eval:YES msg:[NSString stringWithFormat:@"Read and query sparse in %.2f s (%zu)", stop-start, [q count]]];    
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Read and query sparse in %.2f s (%zu)", stop-start, [q count]]];    
     });
     
     double diff = [self sqlTestSparse] / (stop-start);
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils Eval:YES msg:[NSString stringWithFormat:@"Diff: %.2f", diff]];    
+        [_utils OutGroup:GROUP_DIFF msg:[NSString stringWithFormat:@"testFetchSparse %.2f times faster than sqlTestFetchSparse", diff]];    
     });    
 
 }
@@ -238,7 +238,7 @@ TDB_TABLE_4(PerfTable,
     db = NULL;
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils Eval:YES msg:[NSString stringWithFormat:@"SQL query sparse in %.2f s (%zu)", stop - start, result]];    
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"SQL query sparse in %.2f s (%zu)", stop - start, result]];    
     });
     
     return stop-start;
@@ -264,7 +264,7 @@ TDB_TABLE_4(PerfTable,
     }
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils Eval:YES msg:[NSString stringWithFormat:@"Read and iterate in %.2f s", stop-start]];    
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Read and iterate in %.2f s", stop-start]];    
     });
 }
 
@@ -281,7 +281,7 @@ TDB_TABLE_4(PerfTable,
     }
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils Eval:YES msg:[NSString stringWithFormat:@"Read and Unq.iterate in %.2f s", stop-start]]; 
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Read and Unq.iterate in %.2f s", stop-start]]; 
     });
 }
 
@@ -296,7 +296,7 @@ TDB_TABLE_4(PerfTable,
 
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils Eval:YES msg:[NSString stringWithFormat:@"Write in %.2f s", stop-start]];    
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Write in %.2f s", stop-start]];    
     });
 
 }
