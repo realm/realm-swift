@@ -71,7 +71,7 @@
 }
 
 -(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)obj
-{    
+{ 
     __weak Group *weakSelf = self;
     __weak NSString *weakName = name;
     return [[obj alloc] initWithBlock:^(Table *table) {
@@ -83,6 +83,5 @@
             [table setParent:strongSelf];
         }
     }];
-
 }
 @end

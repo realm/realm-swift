@@ -29,5 +29,4 @@
 -(void)setString:(NSString *)value;
 -(OCMixed *)getMixed;
 -(void)setMixed:(OCMixed *)value;
--(void)clear;
 @end

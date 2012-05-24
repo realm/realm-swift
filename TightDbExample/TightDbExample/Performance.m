@@ -42,6 +42,16 @@ TDB_TABLE_4(PerfTable,
     db = NULL;
 }
 
+
+-(void)reportSizeForFile:(NSString *)file msg:(NSString *)msg
+{
+    NSDictionary *fileAttributes = [NSFileManager.defaultManager attributesOfItemAtPath:file error:nil];
+	NSString *fileSize = [fileAttributes objectForKey:NSFileSize];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_utils Eval:YES msg:[NSString stringWithFormat:@"%@: %@", msg, fileSize]];
+    });    
+}
+
 - (void)testInsert {
     
     Group *group = [Group group];
@@ -63,14 +73,23 @@ TDB_TABLE_4(PerfTable,
     });
 
     // Write to disk
+    [group write:[_utils pathForDataFile:@"bigperfemployees.tightdb"]];
+    [self reportSizeForFile:[_utils pathForDataFile:@"bigperfemployees.tightdb"] msg:@"Normal filesize"];
+    [table optimize];
     [group write:[_utils pathForDataFile:@"perfemployees.tightdb"]];
+    [self reportSizeForFile:[_utils pathForDataFile:@"perfemployees.tightdb"] msg:@"Optimized filesize"];
     
 
     NSTimeInterval sqlstart = [NSDate timeIntervalSinceReferenceDate];
     char *zErrMsg = NULL;
     db = NULL;
-    int rc = sqlite3_open(":memory:", &db);
+    [[NSFileManager defaultManager] removeItemAtPath:[_utils pathForDataFile:@"perfemployees.sqlite"] error:nil];
+
+    int rc = sqlite3_open([_utils pathForDataFile:@"perfemployees.sqlite"].UTF8String, &db);
+
+
     sqlite3_exec(db, "create table t1 (name VARCHAR(100), age INTEGER, hired INTEGER, spare INTEGER);", NULL, NULL, &zErrMsg);
+    sqlite3_exec(db, "begin transaction;", NULL, NULL, &zErrMsg);
     sqlite3_stmt *ppStmt = NULL;
     sqlite3_prepare(db, "INSERT INTO t1 VALUES(?1, ?2, ?3, ?4);", -1, &ppStmt, NULL);
     srand(1);
@@ -100,12 +119,17 @@ TDB_TABLE_4(PerfTable,
             fprintf(stderr, "SQL error: %s\n", sqlite3_errmsg(db));
         }
     }
+    sqlite3_exec(db, "commit;", NULL, NULL, &zErrMsg);
     sqlite3_finalize(ppStmt); // Cleanup
+    sqlite3_close(db);
+    db = NULL;
     NSTimeInterval sqlstop = [NSDate timeIntervalSinceReferenceDate];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [_utils Eval:YES msg:[NSString stringWithFormat:@"SQL Inserted %i records in %.2f s",_size, sqlstop-sqlstart]];
     });
+    [self reportSizeForFile:[_utils pathForDataFile:@"perfemployees.sqlite"] msg:@"SQL Filesize"];
+
 
 }
 - (void)testFetch 
@@ -135,15 +159,17 @@ TDB_TABLE_4(PerfTable,
 }
 -(double)sqlTestFetch
 {
+    NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
+    int rc = sqlite3_open([_utils pathForDataFile:@"perfemployees.sqlite"].UTF8String, &db);
+
     // Prepare query statement
     char *zErrMsg = NULL;
     sqlite3_stmt *qStmt = NULL;
-    int rc = sqlite3_prepare(db, "SELECT count(*) FROM t1 WHERE hired = 1 AND age >= 20 AND age <= 30;", -1, &qStmt, NULL);
+    rc = sqlite3_prepare(db, "SELECT count(*) FROM t1 WHERE hired = 1 AND age >= 20 AND age <= 30;", -1, &qStmt, NULL);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "SQL error3: %s\n", sqlite3_errmsg(db));
     }
     
-    NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
     
     rc = sqlite3_step(qStmt);
     if (rc != SQLITE_ROW) {
@@ -151,13 +177,14 @@ TDB_TABLE_4(PerfTable,
         sqlite3_free(zErrMsg);
     }
     const int result = sqlite3_column_int(qStmt, 0);
-    
+    sqlite3_finalize(qStmt); // Cleanup
+    sqlite3_close(db);
+    db = NULL;
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
         [_utils Eval:YES msg:[NSString stringWithFormat:@"SQL query in %.2f s (%zu)", stop - start, result]];    
     });
     
-    sqlite3_finalize(qStmt); // Cleanup
     return stop-start;
 }
 
@@ -187,15 +214,18 @@ TDB_TABLE_4(PerfTable,
 
 -(double)sqlTestSparse
 {
+    NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
+
+    int rc = sqlite3_open([_utils pathForDataFile:@"perfemployees.sqlite"].UTF8String, &db);
+
     // Prepare query statement
     char *zErrMsg = NULL;
     sqlite3_stmt *qStmt = NULL;
-    int rc = sqlite3_prepare(db, "SELECT count(*) FROM t1 WHERE hired = 0 AND age >= 20 AND age <= 30;", -1, &qStmt, NULL);
+    rc = sqlite3_prepare(db, "SELECT count(*) FROM t1 WHERE hired = 0 AND age >= 20 AND age <= 30;", -1, &qStmt, NULL);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "SQL error3: %s\n", sqlite3_errmsg(db));
     }
     
-    NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
     
     rc = sqlite3_step(qStmt);
     if (rc != SQLITE_ROW) {
@@ -203,13 +233,14 @@ TDB_TABLE_4(PerfTable,
         sqlite3_free(zErrMsg);
     }
     const int result = sqlite3_column_int(qStmt, 0);
-    
+    sqlite3_finalize(qStmt); // Cleanup
+    sqlite3_close(db);
+    db = NULL;
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
         [_utils Eval:YES msg:[NSString stringWithFormat:@"SQL query sparse in %.2f s (%zu)", stop - start, result]];    
     });
     
-    sqlite3_finalize(qStmt); // Cleanup
     return stop-start;
 }
 

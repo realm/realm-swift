@@ -30,28 +30,11 @@ Int,    Age)
     Utils *_utils;
 }
 
--(void)test
-{
-    Group *group = [Group group];
-    // Create new table in group
-    MyTable *table = [group getTable:@"employees" withClass:[MyTable class]];
-    
-    // Add some rows
-    [table addName:@"John" Age:20 Hired:YES Spare:0];
-    [table addName:@"Mary" Age:21 Hired:NO Spare:0];
-    [table addName:@"Lars" Age:21 Hired:YES Spare:0];
-    [table addName:@"Phil" Age:43 Hired:NO Spare:0];
-    [table addName:@"Anni" Age:54 Hired:YES Spare:0];
-
-    NSLog(@"Test ended");
-}
-
 #pragma mark - View code
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [self test];
-    return;
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     self.view = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     _utils = [[Utils alloc] initWithView:(UIScrollView *)self.view];
 	[self testGroup];
@@ -63,6 +46,7 @@ Int,    Age)
         [perf testFetchAndIterate];
         [perf testUnqualifiedFetchAndIterate];
         [perf testWriteToDisk];
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     });
     
 }
@@ -171,11 +155,27 @@ Int,    Age)
     }
     
     // 1: Iterate over table
-	for (MyTable2_Cursor *row in table2) {
+	for (MyTable_Cursor *row in diskTable) {
         [_utils Eval:YES msg:@"Enumerator running"];
-
-		NSLog(@"%i is %lld years old.", row.Hired, row.Age);
+		NSLog(@"%@ is %lld years old.", row.Name, row.Age);
 	}
+    
+    // Do a query, and get all matches as TableView
+	MyTable_View *v = [[[[diskTable getQuery].Hired equal:YES].Age between:20 to:30] findAll];
+    NSLog(@"View count: %zu", [v count]);
+	// 2: Iterate over the resulting TableView
+	for (MyTable_Cursor *row in v) {
+		NSLog(@"%@ is %lld years old.", row.Name, row.Age);
+	}
+    
+	// 3: Iterate over query (lazy)
+    
+    MyTable_Query *qe = [[diskTable getQuery].Age equal:21];
+    NSLog(@"Query lazy count: %zu", [qe count]);
+	for (MyTable_Cursor *row in qe) {
+		NSLog(@"%@ is %lld years old.", row.Name, row.Age);
+	}
+
 
 }
 

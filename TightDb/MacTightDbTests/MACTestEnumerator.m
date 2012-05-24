@@ -33,7 +33,7 @@ TDB_TABLE_2(EnumPeopleTable2,
     EnumPeopleTable *people = [group getTable:@"employees" withClass:[EnumPeopleTable class]];
 
     // Add some rows
-/*    [people addName:@"John" Age:20 Hired:YES];
+    [people addName:@"John" Age:20 Hired:YES];
     [people addName:@"Mary" Age:21 Hired:NO];
     [people addName:@"Lars" Age:21 Hired:YES];
     [people addName:@"Phil" Age:43 Hired:NO];
@@ -47,7 +47,7 @@ TDB_TABLE_2(EnumPeopleTable2,
 	for (EnumPeopleTable_Cursor *row in people) {
 		NSLog(@"%@ is %lld years old.", row.Name, row.Age);
 	}
-	
+
 	// Do a query, and get all matches as TableView
 	EnumPeopleTable_View *res = [[[[people getQuery].Hired equal:YES].Age between:20 to:30] findAll];
     NSLog(@"View count: %zu", [res count]);
@@ -55,7 +55,7 @@ TDB_TABLE_2(EnumPeopleTable2,
 	for (EnumPeopleTable_Cursor *row in res) {
 		NSLog(@"%@ is %lld years old.", row.Name, row.Age);
 	}
-	
+
 	// 3: Iterate over query (lazy)
 
  EnumPeopleTable_Query *q = [[people getQuery].Age equal:21];
@@ -63,7 +63,7 @@ TDB_TABLE_2(EnumPeopleTable2,
 	for (EnumPeopleTable_Cursor *row in q) {
 		NSLog(@"%@ is %lld years old.", row.Name, row.Age);
 	}
- */
+
 }
 
 @end

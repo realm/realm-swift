@@ -39,12 +39,6 @@ directiveStartToken = %
     } \\
     return self; \\
     } \\
-    -(void)clear \\
-    { \\
-    %for $j in range($num_cols)
-    [_##CName${j+1} clear]; \\
-    %end for
-    } \\
 %for $j in range($num_cols)
     -(tdbOCType##CType${j+1})CName${j+1} \\
     { \\
@@ -71,11 +65,6 @@ directiveStartToken = %
     -(CursorBase *)getCursor:(long)ndx \\
     { \\
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:ndx]; \\
-    } \\
-    -(void)dealloc \\
-    { \\
-    NSLog(@"Query dealloc"); \\
-    [tmpCursor clear]; \\
     } \\
 %for $j in range($num_cols)
 @synthesize CName${j+1} = _CName${j+1}; \\
@@ -264,11 +253,6 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 { \\
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:self ndx:0]; \\
 } \\
-    -(void)dealloc \\
-    { \\
-    NSLog(@"Table dealloc"); \\
-    [tmpCursor clear]; \\
-    } \\
 @end \\
 @implementation TableName##_##View \\
     { \\
@@ -277,10 +261,6 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
     -(CursorBase *)getCursor \\
     { \\
         return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \\
-    } \\
-    -(void)dealloc \\
-    { \\
-        [tmpCursor clear]; \\
     } \\
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx \\
     { \\
@@ -306,7 +286,6 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
     -(tdbOCType##CType${j+1})CName${j+1}; \\
     -(void)set##CName${j+1}:(tdbOCType##CType${j+1})value; \\
     %end for
-    -(void)clear; \\
 @end \\
 @class TableName##_##Query; \\
 @class TableName##_##View; \\

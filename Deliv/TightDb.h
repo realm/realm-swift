@@ -21,10 +21,6 @@
     } \
     return self; \
     } \
-    -(void)clear \
-    { \
-    [_##CName1 clear]; \
-    } \
     -(tdbOCType##CType1)CName1 \
     { \
         return [_##CName1 get##CType1]; \
@@ -49,11 +45,6 @@
     -(CursorBase *)getCursor:(long)ndx \
     { \
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:ndx]; \
-    } \
-    -(void)dealloc \
-    { \
-    NSLog(@"Query dealloc"); \
-    [tmpCursor clear]; \
     } \
 @synthesize CName1 = _CName1; \
 -(id)initWithTable:(Table *)table \
@@ -212,11 +203,6 @@
 { \
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:self ndx:0]; \
 } \
-    -(void)dealloc \
-    { \
-    NSLog(@"Table dealloc"); \
-    [tmpCursor clear]; \
-    } \
 @end \
 @implementation TableName##_##View \
     { \
@@ -225,10 +211,6 @@
     -(CursorBase *)getCursor \
     { \
         return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
-    } \
-    -(void)dealloc \
-    { \
-        [tmpCursor clear]; \
     } \
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx \
     { \
@@ -251,11 +233,6 @@
     _##CName2 = [[OCAccessor alloc] initWithCursor:self columnId:1]; \
     } \
     return self; \
-    } \
-    -(void)clear \
-    { \
-    [_##CName1 clear]; \
-    [_##CName2 clear]; \
     } \
     -(tdbOCType##CType1)CName1 \
     { \
@@ -289,11 +266,6 @@
     -(CursorBase *)getCursor:(long)ndx \
     { \
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:ndx]; \
-    } \
-    -(void)dealloc \
-    { \
-    NSLog(@"Query dealloc"); \
-    [tmpCursor clear]; \
     } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -463,11 +435,6 @@
 { \
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:self ndx:0]; \
 } \
-    -(void)dealloc \
-    { \
-    NSLog(@"Table dealloc"); \
-    [tmpCursor clear]; \
-    } \
 @end \
 @implementation TableName##_##View \
     { \
@@ -476,10 +443,6 @@
     -(CursorBase *)getCursor \
     { \
         return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
-    } \
-    -(void)dealloc \
-    { \
-        [tmpCursor clear]; \
     } \
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx \
     { \
@@ -504,12 +467,6 @@
     _##CName3 = [[OCAccessor alloc] initWithCursor:self columnId:2]; \
     } \
     return self; \
-    } \
-    -(void)clear \
-    { \
-    [_##CName1 clear]; \
-    [_##CName2 clear]; \
-    [_##CName3 clear]; \
     } \
     -(tdbOCType##CType1)CName1 \
     { \
@@ -551,11 +508,6 @@
     -(CursorBase *)getCursor:(long)ndx \
     { \
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:ndx]; \
-    } \
-    -(void)dealloc \
-    { \
-    NSLog(@"Query dealloc"); \
-    [tmpCursor clear]; \
     } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -736,11 +688,6 @@
 { \
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:self ndx:0]; \
 } \
-    -(void)dealloc \
-    { \
-    NSLog(@"Table dealloc"); \
-    [tmpCursor clear]; \
-    } \
 @end \
 @implementation TableName##_##View \
     { \
@@ -749,10 +696,6 @@
     -(CursorBase *)getCursor \
     { \
         return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
-    } \
-    -(void)dealloc \
-    { \
-        [tmpCursor clear]; \
     } \
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx \
     { \
@@ -779,13 +722,6 @@
     _##CName4 = [[OCAccessor alloc] initWithCursor:self columnId:3]; \
     } \
     return self; \
-    } \
-    -(void)clear \
-    { \
-    [_##CName1 clear]; \
-    [_##CName2 clear]; \
-    [_##CName3 clear]; \
-    [_##CName4 clear]; \
     } \
     -(tdbOCType##CType1)CName1 \
     { \
@@ -835,11 +771,6 @@
     -(CursorBase *)getCursor:(long)ndx \
     { \
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:ndx]; \
-    } \
-    -(void)dealloc \
-    { \
-    NSLog(@"Query dealloc"); \
-    [tmpCursor clear]; \
     } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -1031,11 +962,6 @@
 { \
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:self ndx:0]; \
 } \
-    -(void)dealloc \
-    { \
-    NSLog(@"Table dealloc"); \
-    [tmpCursor clear]; \
-    } \
 @end \
 @implementation TableName##_##View \
     { \
@@ -1044,10 +970,6 @@
     -(CursorBase *)getCursor \
     { \
         return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
-    } \
-    -(void)dealloc \
-    { \
-        [tmpCursor clear]; \
     } \
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx \
     { \
@@ -1076,14 +998,6 @@
     _##CName5 = [[OCAccessor alloc] initWithCursor:self columnId:4]; \
     } \
     return self; \
-    } \
-    -(void)clear \
-    { \
-    [_##CName1 clear]; \
-    [_##CName2 clear]; \
-    [_##CName3 clear]; \
-    [_##CName4 clear]; \
-    [_##CName5 clear]; \
     } \
     -(tdbOCType##CType1)CName1 \
     { \
@@ -1141,11 +1055,6 @@
     -(CursorBase *)getCursor:(long)ndx \
     { \
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:ndx]; \
-    } \
-    -(void)dealloc \
-    { \
-    NSLog(@"Query dealloc"); \
-    [tmpCursor clear]; \
     } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -1348,11 +1257,6 @@
 { \
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:self ndx:0]; \
 } \
-    -(void)dealloc \
-    { \
-    NSLog(@"Table dealloc"); \
-    [tmpCursor clear]; \
-    } \
 @end \
 @implementation TableName##_##View \
     { \
@@ -1361,10 +1265,6 @@
     -(CursorBase *)getCursor \
     { \
         return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
-    } \
-    -(void)dealloc \
-    { \
-        [tmpCursor clear]; \
     } \
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx \
     { \
@@ -1395,15 +1295,6 @@
     _##CName6 = [[OCAccessor alloc] initWithCursor:self columnId:5]; \
     } \
     return self; \
-    } \
-    -(void)clear \
-    { \
-    [_##CName1 clear]; \
-    [_##CName2 clear]; \
-    [_##CName3 clear]; \
-    [_##CName4 clear]; \
-    [_##CName5 clear]; \
-    [_##CName6 clear]; \
     } \
     -(tdbOCType##CType1)CName1 \
     { \
@@ -1469,11 +1360,6 @@
     -(CursorBase *)getCursor:(long)ndx \
     { \
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:ndx]; \
-    } \
-    -(void)dealloc \
-    { \
-    NSLog(@"Query dealloc"); \
-    [tmpCursor clear]; \
     } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -1687,11 +1573,6 @@
 { \
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:self ndx:0]; \
 } \
-    -(void)dealloc \
-    { \
-    NSLog(@"Table dealloc"); \
-    [tmpCursor clear]; \
-    } \
 @end \
 @implementation TableName##_##View \
     { \
@@ -1700,10 +1581,6 @@
     -(CursorBase *)getCursor \
     { \
         return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
-    } \
-    -(void)dealloc \
-    { \
-        [tmpCursor clear]; \
     } \
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx \
     { \
@@ -1736,16 +1613,6 @@
     _##CName7 = [[OCAccessor alloc] initWithCursor:self columnId:6]; \
     } \
     return self; \
-    } \
-    -(void)clear \
-    { \
-    [_##CName1 clear]; \
-    [_##CName2 clear]; \
-    [_##CName3 clear]; \
-    [_##CName4 clear]; \
-    [_##CName5 clear]; \
-    [_##CName6 clear]; \
-    [_##CName7 clear]; \
     } \
     -(tdbOCType##CType1)CName1 \
     { \
@@ -1819,11 +1686,6 @@
     -(CursorBase *)getCursor:(long)ndx \
     { \
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:ndx]; \
-    } \
-    -(void)dealloc \
-    { \
-    NSLog(@"Query dealloc"); \
-    [tmpCursor clear]; \
     } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -2048,11 +1910,6 @@
 { \
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:self ndx:0]; \
 } \
-    -(void)dealloc \
-    { \
-    NSLog(@"Table dealloc"); \
-    [tmpCursor clear]; \
-    } \
 @end \
 @implementation TableName##_##View \
     { \
@@ -2061,10 +1918,6 @@
     -(CursorBase *)getCursor \
     { \
         return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
-    } \
-    -(void)dealloc \
-    { \
-        [tmpCursor clear]; \
     } \
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx \
     { \
@@ -2099,17 +1952,6 @@
     _##CName8 = [[OCAccessor alloc] initWithCursor:self columnId:7]; \
     } \
     return self; \
-    } \
-    -(void)clear \
-    { \
-    [_##CName1 clear]; \
-    [_##CName2 clear]; \
-    [_##CName3 clear]; \
-    [_##CName4 clear]; \
-    [_##CName5 clear]; \
-    [_##CName6 clear]; \
-    [_##CName7 clear]; \
-    [_##CName8 clear]; \
     } \
     -(tdbOCType##CType1)CName1 \
     { \
@@ -2191,11 +2033,6 @@
     -(CursorBase *)getCursor:(long)ndx \
     { \
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:ndx]; \
-    } \
-    -(void)dealloc \
-    { \
-    NSLog(@"Query dealloc"); \
-    [tmpCursor clear]; \
     } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -2431,11 +2268,6 @@
 { \
     return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:self ndx:0]; \
 } \
-    -(void)dealloc \
-    { \
-    NSLog(@"Table dealloc"); \
-    [tmpCursor clear]; \
-    } \
 @end \
 @implementation TableName##_##View \
     { \
@@ -2444,10 +2276,6 @@
     -(CursorBase *)getCursor \
     { \
         return tmpCursor = [[TableName##_##Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
-    } \
-    -(void)dealloc \
-    { \
-        [tmpCursor clear]; \
     } \
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx \
     { \
@@ -2462,7 +2290,6 @@
     @property tdbOCType##CType1 CName1; \
     -(tdbOCType##CType1)CName1; \
     -(void)set##CName1:(tdbOCType##CType1)value; \
-    -(void)clear; \
 @end \
 @class TableName##_##Query; \
 @class TableName##_##View; \
@@ -2520,7 +2347,6 @@ TDB_TABLE_IMPL_1(TableName    ,CType1, CName1    )
     -(void)set##CName1:(tdbOCType##CType1)value; \
     -(tdbOCType##CType2)CName2; \
     -(void)set##CName2:(tdbOCType##CType2)value; \
-    -(void)clear; \
 @end \
 @class TableName##_##Query; \
 @class TableName##_##View; \
@@ -2583,7 +2409,6 @@ TDB_TABLE_IMPL_2(TableName    ,CType1, CName1    ,CType2, CName2    )
     -(void)set##CName2:(tdbOCType##CType2)value; \
     -(tdbOCType##CType3)CName3; \
     -(void)set##CName3:(tdbOCType##CType3)value; \
-    -(void)clear; \
 @end \
 @class TableName##_##Query; \
 @class TableName##_##View; \
@@ -2651,7 +2476,6 @@ TDB_TABLE_IMPL_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
     -(void)set##CName3:(tdbOCType##CType3)value; \
     -(tdbOCType##CType4)CName4; \
     -(void)set##CName4:(tdbOCType##CType4)value; \
-    -(void)clear; \
 @end \
 @class TableName##_##Query; \
 @class TableName##_##View; \
@@ -2724,7 +2548,6 @@ TDB_TABLE_IMPL_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
     -(void)set##CName4:(tdbOCType##CType4)value; \
     -(tdbOCType##CType5)CName5; \
     -(void)set##CName5:(tdbOCType##CType5)value; \
-    -(void)clear; \
 @end \
 @class TableName##_##Query; \
 @class TableName##_##View; \
@@ -2802,7 +2625,6 @@ TDB_TABLE_IMPL_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
     -(void)set##CName5:(tdbOCType##CType5)value; \
     -(tdbOCType##CType6)CName6; \
     -(void)set##CName6:(tdbOCType##CType6)value; \
-    -(void)clear; \
 @end \
 @class TableName##_##Query; \
 @class TableName##_##View; \
@@ -2885,7 +2707,6 @@ TDB_TABLE_IMPL_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
     -(void)set##CName6:(tdbOCType##CType6)value; \
     -(tdbOCType##CType7)CName7; \
     -(void)set##CName7:(tdbOCType##CType7)value; \
-    -(void)clear; \
 @end \
 @class TableName##_##Query; \
 @class TableName##_##View; \
@@ -2973,7 +2794,6 @@ TDB_TABLE_IMPL_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
     -(void)set##CName7:(tdbOCType##CType7)value; \
     -(tdbOCType##CType8)CName8; \
     -(void)set##CName8:(tdbOCType##CType8)value; \
-    -(void)clear; \
 @end \
 @class TableName##_##Query; \
 @class TableName##_##View; \

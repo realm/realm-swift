@@ -447,6 +447,10 @@
     return self;
 }
 
+-(void)initRefs
+{
+    // Dummy - Must be overridden in TightDB.h
+}
 -(id)init
 {
     self = [super init];
@@ -710,6 +714,10 @@
 {
     return nil; // Has to be overridden in TightDb.h
 }
+-(void)clearCursor
+{
+    // Dummy - must be overridden in TightDb.h
+}
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len
 {
@@ -727,6 +735,7 @@
         *stackbuf = nil;
         state->itemsPtr = nil;
         state->mutationsPtr = nil;
+        [self clearCursor];
         return 0;
     }
     return 1;
@@ -756,6 +765,10 @@
         _column = column;
     }
     return self;
+}
+-(void)clear 
+{
+    _table = nil;
 }
 @end
 
