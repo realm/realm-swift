@@ -289,7 +289,6 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
     *stackbuf = tmpCursor; \\
     } \\
     if (state->state < [self count]) { \\
-        NSLog(@"Item: %zu", state->state); \\
         [((TableName##_##Cursor *)*stackbuf) setNdx:[self getSourceNdx:state->state]]; \\
         state->itemsPtr = stackbuf; \\
         state->state++; \\

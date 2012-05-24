@@ -7,6 +7,8 @@
 #import "Group.h"
 #import "Table.h"
 #import "TightDb.h"
+#import "Utils.h"
+#import "Performance.h"
 
 TDB_TABLE_4(MyTable,
             String, Name,
@@ -25,39 +27,29 @@ Int,    Age)
 
 @implementation ViewController
 {
-    float y;
+    Utils *_utils;
 }
-#define LineHeight 31
 
-- (NSString *) pathForDataFile:(NSString *)filename {
-    NSArray*	documentDir = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString*	path = nil;
- 	
-    if (documentDir) {
-        path = [documentDir objectAtIndex:0];    
-    }
- 	
-    return [NSString stringWithFormat:@"%@/%@", path, filename];
-}
 
 #pragma mark - View code
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     self.view = [[UIScrollView alloc] initWithFrame:self.view.bounds];
-    y = 0;
+    _utils = [[Utils alloc] initWithView:(UIScrollView *)self.view];
 	[self testGroup];
-}
-
--(void)Eval:(BOOL)good msg:(NSString *)msg
-{
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, y, self.view.bounds.size.width, LineHeight)];
-    label.text = [NSString stringWithFormat:@"%@ - %@", good?@"OK":@"Fail", msg];
-    if (!good)
-        label.backgroundColor = [UIColor redColor];
-    [self.view addSubview:label];
-    y += LineHeight;
-    ((UIScrollView *)self.view).contentSize = CGSizeMake(self.view.bounds.size.width, y);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        Performance *perf = [[Performance alloc] initWithUtils:_utils];
+        [perf testInsert];
+        [perf testFetch];
+        [perf testFetchSparse];
+        for(int i = 0;i<200;++i)
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                [perf testFetchAndIterate];
+            });
+        [perf testUnqualifiedFetchAndIterate];
+        [perf testWriteToDisk];
+    });
 }
 
 
@@ -93,14 +85,14 @@ Int,    Age)
     size_t row; 
     row = [table.Name find:@"Philip"];		    	// row = (size_t)-1
     NSLog(@"Philip: %zu", row);
-    [self Eval:row==-1 msg:@"Philip should not be there"];
+    [_utils Eval:row==-1 msg:@"Philip should not be there"];
     row = [table.Name find:@"Mary"];		
     NSLog(@"Mary: %zu", row);
-    [self Eval:row==1 msg:@"Mary should have been there"];
+    [_utils Eval:row==1 msg:@"Mary should have been there"];
     
     TableView *view = [table.Age findAll:21];
     size_t cnt = [view count];  					// cnt = 2
-    [self Eval:cnt == 2 msg:@"Should be two rows in view"];
+    [_utils Eval:cnt == 2 msg:@"Should be two rows in view"];
     
     //------------------------------------------------------
     
@@ -118,12 +110,12 @@ Int,    Age)
     
     // Get number of matching entries
     NSLog(@"Query count: %zu", [q count]);
-    [self Eval:[q count] == 2 msg:@"Expected 2 rows in query"];
+    [_utils Eval:[q count] == 2 msg:@"Expected 2 rows in query"];
     
     // Get the average age - currently only a low-level interface!
     double avg = [q.Age avg];
     NSLog(@"Average: %f", avg);
-    [self Eval:avg == 21.0 msg:@"Expected 20.5 average"];
+    [_utils Eval:avg == 21.0 msg:@"Expected 20.5 average"];
     
     // Execute the query and return a table (view)
     TableView *res = [q findAll];
@@ -135,10 +127,10 @@ Int,    Age)
     //------------------------------------------------------
     
     // Write to disk
-    [group write:[self pathForDataFile:@"employees.tightdb"]];
+    [group write:[_utils pathForDataFile:@"employees.tightdb"]];
     
     // Load a group from disk (and print contents)
-    Group *fromDisk = [Group groupWithFilename:[self pathForDataFile:@"employees.tightdb"]];
+    Group *fromDisk = [Group groupWithFilename:[_utils pathForDataFile:@"employees.tightdb"]];
     MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class]];
     
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
@@ -165,7 +157,7 @@ Int,    Age)
     
     // 1: Iterate over table
 	for (MyTable2_Cursor *row in table2) {
-        [self Eval:YES msg:@"Enumerator running"];
+        [_utils Eval:YES msg:@"Enumerator running"];
 
 		NSLog(@"%i is %lld years old.", row.Hired, row.Age);
 	}
