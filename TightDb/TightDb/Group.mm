@@ -13,9 +13,6 @@
 @property(nonatomic) tightdb::Group *group;
 @end
 @implementation Group
-{
-    NSMutableArray *_tables; // Temp solution to refrain from deleting group before tables.
-}
 @synthesize group = _group;
 
 +(Group *)group
@@ -44,12 +41,6 @@
 #ifdef DEBUG
     NSLog(@"Group dealloc");
 #endif
-    // NOTE: Because of ARC we remove tableref from sub tables when this is deleted.
-/*    for(Table *table in _tables) {
-        NSLog(@"Delete...");
-        table.table = TableRef();
-    }
-    _tables = nil;*/
     delete _group;
 }
 
@@ -80,12 +71,18 @@
 }
 
 -(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)obj
-{
+{    
+    __weak Group *weakSelf = self;
+    __weak NSString *weakName = name;
     return [[obj alloc] initWithBlock:^(Table *table) {
-        [table setTablePtr:nil];
-        [table setTable:_group->get_table([name UTF8String])];
-        [table setParent:self];
+        Group *strongSelf = weakSelf;
+        NSString *strongName = weakName;
+        if (strongSelf) {
+            [table setTablePtr:nil];
+            [table setTable:_group->get_table([strongName UTF8String])];
+            [table setParent:strongSelf];
+        }
     }];
-    return [_tables lastObject];
+
 }
 @end

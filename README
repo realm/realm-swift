@@ -13,3 +13,23 @@ then delete dirs.
 
 Naming of database fields: Must start with capital letter.
 
+
+
+Building:
+
+Tightdb:
+1. Open tightdb project
+2. Build tightdb for mac in debug
+3. Build tightdb for mac in release
+3. Build tightdb_ios for simulator and ios target in debug
+4. Build tightdb_ios for simulator and ios target in release
+5. Copy Products dir to native/lib
+6. ./build.sh in native/lib
+
+TightDbOC:
+1. Open tightdboc project
+2. Build tightdboc for simulator and ios in debug
+3. Build tightdboc for simulator and ios in release
+4. Copy Products dir to native
+5. ./deliv.sh in native
+

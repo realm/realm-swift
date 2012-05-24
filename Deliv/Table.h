@@ -155,6 +155,7 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 // refs ??? TODO
 -(id)initWithBlock:(TopLevelTableInitBlock)block;
 -(void)updateFromSpec;
+-(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 @end
 
 @class Query;
@@ -173,6 +174,7 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 -(void)clear;
 -(Table *)getTable;
 -(size_t)getSourceNdx:(size_t)ndx;
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 @end
 
 

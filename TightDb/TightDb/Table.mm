@@ -10,7 +10,7 @@
 #import "TablePriv.h"
 #import "Query.h"
 #import "QueryPriv.h"
-
+#import "Cursor.h"
 
 #pragma mark - Allocater
 @implementation OCMemRef
@@ -349,6 +349,7 @@
 #ifdef DEBUG
     NSLog(@"TableView dealloc");
 #endif
+    _table = nil;
     delete _tableView;
 }
 
@@ -388,6 +389,33 @@
 {
     return _tableView->get_source_ndx(ndx);
 }
+
+-(CursorBase *)getCursor
+{
+    return nil; // Has to be overridden in TightDb.h
+}
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len
+{
+    if(state->state == 0)
+    {
+        state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self);
+        CursorBase *tmp = [self getCursor];
+        *stackbuf = tmp;
+    }
+    if (state->state < [self count]) {
+        [((CursorBase *)*stackbuf) setNdx:[self getSourceNdx:state->state]];
+        state->itemsPtr = stackbuf;
+        state->state++;
+    } else {
+        *stackbuf = nil;
+        state->itemsPtr = nil;
+        state->mutationsPtr = nil;
+        return 0;
+    }
+    return 1;
+}
+
 @end
 
 
@@ -395,7 +423,6 @@
 
 @implementation Table
 {
-//    NSMutableArray *_tables; // Temp solution to refrain from deleting group before tables.
     id _parent;
 }
 @synthesize table = _table;
@@ -404,8 +431,9 @@
 -(id)initWithBlock:(TopLevelTableInitBlock)block
 {
     self = [super init];
-    if (self) {    
-        if (block) block(self);
+    if (self) {   
+        __weak Table *weakSelf = self;
+        if (block) block(weakSelf);
     }
     return self;
 }
@@ -441,11 +469,6 @@
 
 -(Table *)getTable:(size_t)columnId ndx:(size_t)ndx
 {
-    // NOTE: Because of ARC, we maintain an array of "owned" tables, so we can remove tableref before deleting parent tables.
-/*    if (!_tables)
-        _tables = [NSMutableArray arrayWithCapacity:5];
-    [_tables addObject:[[Table alloc] initWithTableRef:_table->GetTable(columnId, ndx)]];
-    return [_tables lastObject];*/
     Table *table = [[Table alloc] initWithTableRef:_table->get_subtable(columnId, ndx)];
     [table setParent:self];
     return table;
@@ -682,11 +705,40 @@
     static_cast<tightdb::Table *>(&*self.table)->update_from_spec();
 }
 
+
+-(CursorBase *)getCursor
+{
+    return nil; // Has to be overridden in TightDb.h
+}
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len
+{
+    if(state->state == 0)
+    {
+        state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self);
+        CursorBase *tmp = [self getCursor];
+        *stackbuf = tmp;
+    }
+    if (state->state < [self count]) {
+        [((CursorBase *)*stackbuf) setNdx:state->state];
+        state->itemsPtr = stackbuf;
+        state->state++;
+    } else {
+        *stackbuf = nil;
+        state->itemsPtr = nil;
+        state->mutationsPtr = nil;
+        return 0;
+    }
+    return 1;
+}
+
+
+#ifdef DEBUG
 -(void)dealloc
 {
     NSLog(@"OCTopLevelTable dealloc");
 }
-
+#endif
 
 @end
 
