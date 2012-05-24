@@ -4,43 +4,33 @@
 #ifdef __cplusplus
 #include <cstdlib>
 enum ColumnType {
-	// Single ref
-	COLUMN_TYPE_INT,
-	COLUMN_TYPE_BOOL,
-	COLUMN_TYPE_STRING,
-	COLUMN_TYPE_DATE,
-	COLUMN_TYPE_BINARY,
-	COLUMN_TYPE_TABLE,
-	COLUMN_TYPE_MIXED,
+	// Single ref  // Make sure numbers match with tightdb columntype.
+	COLUMN_TYPE_INT = 0,
+	COLUMN_TYPE_BOOL = 1,
+	COLUMN_TYPE_STRING = 2,
+	COLUMN_TYPE_DATE = 3,
+	COLUMN_TYPE_BINARY = 4,
+	COLUMN_TYPE_TABLE = 5,
+	COLUMN_TYPE_MIXED = 6,
     
 	// Double refs
-	COLUMN_TYPE_STRING_ENUM
-};
-
-struct BinaryData {
-	const void* pointer;
-	size_t len;
+	COLUMN_TYPE_STRING_ENUM = 7
 };
 #else
 #include <stdlib.h>
 typedef enum  {
 	// Single ref
-	COLUMN_TYPE_INT,
-	COLUMN_TYPE_BOOL,
-	COLUMN_TYPE_STRING,
-	COLUMN_TYPE_DATE,
-	COLUMN_TYPE_BINARY,
-	COLUMN_TYPE_TABLE,
-	COLUMN_TYPE_MIXED,
+	COLUMN_TYPE_INT = 0,
+	COLUMN_TYPE_BOOL = 1,
+	COLUMN_TYPE_STRING = 2,
+	COLUMN_TYPE_DATE = 3,
+	COLUMN_TYPE_BINARY = 4,
+	COLUMN_TYPE_TABLE = 5,
+	COLUMN_TYPE_MIXED = 6,
     
 	// Double refs
-	COLUMN_TYPE_STRING_ENUM
+	COLUMN_TYPE_STRING_ENUM = 7
 } ColumnType;
-
-typedef struct  {
-	const void* pointer;
-	size_t len;
-} BinaryData;
 #endif
 
 
