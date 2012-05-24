@@ -320,7 +320,7 @@
     self = [super init];
     if (self) {
         _table = [query getTable];
-        self.tableView = new tightdb::TableView([query getTableView]);
+        self.tableView = new tightdb::TableView([query getTableView]); // TODO: Copy constructor is called here. (Move did not work).
     }
     return self;    
 }
