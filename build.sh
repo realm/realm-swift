@@ -46,6 +46,7 @@ case "$MODE" in
         git ls-files -z >"$TEMP_DIR/files" || exit 1
         tar czf "$TEMP_DIR/archive.tar.gz" --null -T "$TEMP_DIR/files" || exit 1
         (cd "$TARGET_DIR" && tar xzf "$TEMP_DIR/archive.tar.gz") || exit 1
+        exit 0
         ;;
 
     *)
