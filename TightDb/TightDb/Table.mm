@@ -3,9 +3,9 @@
 //  TightDB
 //
 
-#include "table.hpp"
-#include "../src/table_view.hpp"
-//#include "TightDb/alloc.hpp"
+#import <tightdb/table.hpp>
+#import <tightdb/table_view.hpp>
+//#import "TightDb/alloc.hpp"
 #import "Table.h"
 #import "TablePriv.h"
 #import "Query.h"
@@ -159,11 +159,11 @@
     
     return mixed;    
 }
-+(OCMixed *)mixedWithType:(ColumnType)type
++(OCMixed *)mixedWithTable
 {
     OCMixed *mixed = [[OCMixed alloc] init];
     
-    mixed.mixed = new tightdb::Mixed((tightdb::ColumnType)type);
+    mixed.mixed = new tightdb::Mixed(tightdb::Mixed::subtable_tag());
     
     return mixed;
 }
@@ -296,7 +296,7 @@
 }
 -(OCSpec *)getSpec:(size_t)columndId
 {
-    tightdb::Spec tmp = _spec->get_subspec(columndId);
+    tightdb::Spec tmp = _spec->get_subtable_spec(columndId);
     return [OCSpec specWithSpec:&tmp isOwned:TRUE];
 }
 -(size_t)getColumnCount

@@ -3,7 +3,7 @@
 //  TightDB
 //
 
-#include "../src/query.hpp"
+#import <tightdb/query.hpp>
 #import "Query.h"
 #import "Table.h"
 #import "TablePriv.h"
@@ -111,7 +111,7 @@
 }
 -(void)parent
 {
-    _query->parent();
+    _query->end_subtable();
 }
 
 -(size_t)count
