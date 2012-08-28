@@ -136,7 +136,7 @@
 }
 -(void)dealloc
 {
-#ifdef DEBUG
+#ifdef TIGHTDB_DEBUG
     NSLog(@"OCDate dealloc");
 #endif
     delete _date;
@@ -322,7 +322,7 @@
 }
 -(void)dealloc
 {
-#ifdef DEBUG
+#ifdef TIGHTDB_DEBUG
     NSLog(@"OCSpec dealloc");
 #endif
     if (_isOwned) delete _spec;
@@ -375,7 +375,7 @@
 
 -(void)dealloc
 {
-#ifdef DEBUG
+#ifdef TIGHTDB_DEBUG
     NSLog(@"TableView dealloc");
 #endif
     _table = nil;
@@ -517,7 +517,7 @@
 
 -(void)dealloc
 {
-#ifdef DEBUG
+#ifdef TIGHTDB_DEBUG
     NSLog(@"Table dealloc");
 #endif
     // NOTE: Because of ARC we remove tableref from sub tables when this is deleted.
@@ -712,7 +712,7 @@
 {
     _table->optimize();
 }
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 -(void)verify
 {
     _table->Verify();
@@ -771,7 +771,7 @@
 }
 
 
-#ifdef DEBUG
+#ifdef TIGHTDB_DEBUG
 -(void)dealloc
 {
     NSLog(@"OCTopLevelTable dealloc");

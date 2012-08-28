@@ -18,9 +18,9 @@ TEST(Table1) {
 	CHECK_EQUAL(0, table.Get(0, ndx));
 	CHECK_EQUAL(10, table.Get(1, ndx));
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	table.Verify();
-#endif //_DEBUG
+#endif
 }
 
 enum Days {
@@ -50,9 +50,9 @@ TEST(Table2) {
 	CHECK_EQUAL(true, r.third);
 	CHECK_EQUAL(Wed, r.fourth);
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	table.Verify();
-#endif //_DEBUG
+#endif
 }
 
 TEST(Table3) {
@@ -77,9 +77,9 @@ TEST(Table3) {
 	CHECK_EQUAL(3, table[0].first);
 	CHECK_EQUAL(3, table[99].first);
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	table.Verify();
-#endif //_DEBUG
+#endif
 }
 
 TDB_TABLE_2(TestTableEnum,
@@ -100,9 +100,9 @@ TEST(Table4) {
 	CHECK_EQUAL((size_t)1, table.second.Find("HelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHelloHello"));
 	CHECK_EQUAL((size_t)-1, table.second.Find("Foo"));
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	table.Verify();
-#endif //_DEBUG
+#endif
 }
 
 TEST(Table_Delete) {
@@ -124,9 +124,9 @@ TEST(Table_Delete) {
 	CHECK_EQUAL(7, table[5].second);
 	CHECK_EQUAL(8, table[6].second);
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	table.Verify();
-#endif //_DEBUG
+#endif
 
 	// Delete all items one at a time
 	for (size_t i = 0; i < 7; ++i) {
@@ -136,9 +136,9 @@ TEST(Table_Delete) {
 	CHECK(table.IsEmpty());
 	CHECK_EQUAL(0, table.GetSize());
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	table.Verify();
-#endif //_DEBUG
+#endif
 }
 
 TEST(Table_Delete_All_Types) {
@@ -219,17 +219,17 @@ TEST(Table_Delete_All_Types) {
 	
 	CHECK_EQUAL(12, table.GetSize());
 	
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	table.Verify();
-#endif //_DEBUG
+#endif
 	
 	// Test Clear
 	table.Clear();
 	CHECK_EQUAL(0, table.GetSize());
 	
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	table.Verify();
-#endif //_DEBUG
+#endif
 }
 
 TEST(Table_Find_Int) {
@@ -243,9 +243,9 @@ TEST(Table_Find_Int) {
 	CHECK_EQUAL((size_t)1000, table.second.Find(0));
 	CHECK_EQUAL((size_t)-1, table.second.Find(1001));
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	table.Verify();
-#endif //_DEBUG
+#endif
 }
 
 TEST(Table6) {
@@ -267,9 +267,9 @@ TEST(Table6) {
 	//size_t result2 = table.Range(10, 200).Find(TestQuery());
 	//CHECK_EQUAL((size_t)-1, result2);
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	table.Verify();
-#endif //_DEBUG
+#endif
 }
 
 
@@ -302,9 +302,9 @@ TEST(Table_FindAll_Int) {
 	CHECK_EQUAL(7, v.GetRef(3));
 	CHECK_EQUAL(9, v.GetRef(4));
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	table.Verify();
-#endif //_DEBUG
+#endif
 }
 
 TEST(Table_Index_Int) {
@@ -385,9 +385,9 @@ TEST(Table_Index_Int) {
 	CHECK_EQUAL(6, table.second.Find(30));
 	CHECK_EQUAL(7, table.second.Find(100));
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	table.Verify();
-#endif //_DEBUG
+#endif
 }
 
 TDB_TABLE_4(TestTableAE,
@@ -489,9 +489,9 @@ TEST(Table_SlabAlloc) {
 	table.DeleteRow(2);
 	table.DeleteRow(4);
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	table.Verify();
-#endif //_DEBUG
+#endif
 }
 
 #include "Group.h"
@@ -670,9 +670,9 @@ TEST(Table_Mixed) {
 	CHECK_EQUAL("John", subtable2->GetString(0, 0));
 	CHECK_EQUAL(40, subtable2->Get(1, 0));
 	delete subtable2;
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	table.Verify();
-#endif //_DEBUG
+#endif
 }
 
 TDB_TABLE_1(TestTableMX,

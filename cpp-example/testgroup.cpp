@@ -83,9 +83,9 @@ TEST(Group_Serialize1) {
 	table.Add("", 30, true, Wed);
 	table.Add("",  9, true, Wed);
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	toDisk.Verify();
-#endif //_DEBUG
+#endif
 
 	// Delete old file if there
 	remove("table_test.tbl");
@@ -101,7 +101,7 @@ TEST(Group_Serialize1) {
 	CHECK_EQUAL(4, t.GetColumnCount());
 	CHECK_EQUAL(10, t.GetSize());
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	// Verify that original values are there
 	CHECK(table.Compare(t));
 #endif
@@ -114,12 +114,12 @@ TEST(Group_Serialize1) {
 	table.DeleteRow(1);
 	t.DeleteRow(1);
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	// Verify that both changed correctly
 	CHECK(table.Compare(t));
 	toDisk.Verify();
 	fromDisk.Verify();
-#endif //_DEBUG
+#endif
 }
 
 TEST(Group_Read1) {
@@ -141,9 +141,9 @@ TEST(Group_Serialize2) {
 	table2.Add("hey",  0, true, Tue);
 	table2.Add("hello", 3232, false, Sun);
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	toDisk.Verify();
-#endif //_DEBUG
+#endif
 
 	// Delete old file if there
 	remove("table_test.tbl");
@@ -159,13 +159,13 @@ TEST(Group_Serialize2) {
 	(void)t2;
 	(void)t1;
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	// Verify that original values are there
 	CHECK(table1.Compare(t1));
 	CHECK(table2.Compare(t2));
 	toDisk.Verify();
 	fromDisk.Verify();
-#endif //_DEBUG
+#endif
 }
 
 TEST(Group_Serialize3) {
@@ -175,9 +175,9 @@ TEST(Group_Serialize3) {
 	table.Add("1 xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 1",  1, true, Wed);
 	table.Add("2 xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx 2", 15, true, Wed);
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	toDisk.Verify();
-#endif //_DEBUG
+#endif
 
 	// Delete old file if there
 	remove("table_test.tbl");
@@ -192,12 +192,12 @@ TEST(Group_Serialize3) {
 	(void)t;
 
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	// Verify that original values are there
 	CHECK(table.Compare(t));
 	toDisk.Verify();
 	fromDisk.Verify();
-#endif //_DEBUG}
+#endif
 }
 
 TEST(Group_Serialize_Men) {
@@ -215,9 +215,9 @@ TEST(Group_Serialize_Men) {
 	table.Add("", 30, true, Wed);
 	table.Add("",  9, true, Wed);
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	toMem.Verify();
-#endif //_DEBUG
+#endif
 
 	// Serialize to memory (we now own the buffer)
 	size_t len;
@@ -232,12 +232,12 @@ TEST(Group_Serialize_Men) {
 	CHECK_EQUAL(10, t.GetSize());
 
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	// Verify that original values are there
 	CHECK(table.Compare(t));
 	toMem.Verify();
 	fromMem.Verify();
-#endif //_DEBUG
+#endif
 }
 
 TEST(Group_Serialize_Optimized) {
@@ -255,9 +255,9 @@ TEST(Group_Serialize_Optimized) {
 
 	table.Optimize();
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	toMem.Verify();
-#endif //_DEBUG
+#endif
 
 	// Serialize to memory (we now own the buffer)
 	size_t len;
@@ -271,7 +271,7 @@ TEST(Group_Serialize_Optimized) {
 	CHECK_EQUAL(4, t.GetColumnCount());
 
 	// Verify that original values are there
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	CHECK(table.Compare(t));
 #endif
 
@@ -281,10 +281,10 @@ TEST(Group_Serialize_Optimized) {
 	const size_t res = table.first.Find("search_target");
 	CHECK_EQUAL(table.GetSize()-1, res);
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	toMem.Verify();
 	fromMem.Verify();
-#endif //_DEBUG
+#endif
 }
 
 TEST(Group_Serialize_All) {
@@ -551,7 +551,7 @@ TEST(Group_Subtable) {
 }
 
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 #ifdef TIGHTDB_TO_DOT
 
 #include <fstream>
@@ -658,5 +658,5 @@ TEST(Group_ToDot) {
 }
 
 #endif //TIGHTDB_TO_DOT
-#endif //_DEBUG
+#endif
 #endif

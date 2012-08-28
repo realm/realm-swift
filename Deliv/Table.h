@@ -148,7 +148,7 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 // Conversion
 // TODO ????? - Maybe NSData ???
 
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 -(void)verify;
 #endif
 @end

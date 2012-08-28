@@ -95,17 +95,17 @@ using namespace tightdb;
 	
 	//CHECK_EQUAL(12, table.GetSize());
 	
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	table.Verify();
-#endif //_DEBUG
+#endif
 	
 	// Test Clear
 	table.clear();
 	//CHECK_EQUAL(0, table.GetSize());
 	
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
 	table.Verify();
-#endif //_DEBUG
+#endif
 }
 
 
