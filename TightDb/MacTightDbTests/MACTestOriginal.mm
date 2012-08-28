@@ -8,8 +8,8 @@
 
 
 #import "MACTestOriginal.h"
-#include "group.hpp"
-#include "tightdb.hpp"
+#include <tightdb/group.hpp>
+#include <tightdb.hpp>
 
 using namespace tightdb;
 
@@ -42,12 +42,12 @@ TIGHTDB_TABLE_2(MyTable2,
     //------------------------------------------------------
     
     size_t row; 
-    row = table->cols().name.find_first("Philip");		    // row = (size_t)-1
+    row = table->column().name.find_first("Philip");		    // row = (size_t)-1
     assert(row == (size_t)-1);
-    row = table->cols().name.find_first("Mary");
+    row = table->column().name.find_first("Mary");
     assert(row == 1);
     
-    MyTable::View view = table->cols().age.find_all(21);
+    MyTable::View view = table->column().age.find_all(21);
     const size_t cnt = view.size();  				// cnt = 2
     assert(cnt==2);
     
