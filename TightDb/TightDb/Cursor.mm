@@ -2,7 +2,7 @@
 //  Cursor.mm
 //  TightDb
 
-#import "table.hpp"
+#import <tightdb/table.hpp>
 #import "Cursor.h"
 #import "Table.h"
 #import "TablePriv.h"

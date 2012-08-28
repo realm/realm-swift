@@ -210,7 +210,7 @@ TDB_TABLE_2(QueryTable,
     [subtable set:COL_SUBTABLE_INT ndx:1 value:801];
 
     // Make the mixed values column contain another subtable
-    [table setMixed:COL_TABLE_MIX ndx:0 value: [OCMixed mixedWithType:COLUMN_TYPE_TABLE]];
+    [table setMixed:COL_TABLE_MIX ndx:0 value: [OCMixed mixedWithTable]];
 
 /* Fails!!!
     // Specify its schema

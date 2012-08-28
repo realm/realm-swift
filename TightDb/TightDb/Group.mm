@@ -3,7 +3,7 @@
 //  TightDB
 //
 
-#import "group.hpp"
+#import <tightdb/group.hpp>
 #import "Group.h"
 #import "Table.h"
 #import "TablePriv.h"

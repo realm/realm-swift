@@ -43,7 +43,7 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 @end
 
 @interface OCMixed : NSObject
-+(OCMixed *)mixedWithType:(ColumnType)type;
++(OCMixed *)mixedWithTable;
 +(OCMixed *)mixedWithBool:(BOOL)value;
 +(OCMixed *)mixedWithDate:(OCDate *)date;
 +(OCMixed *)mixedWithInt64:(int64_t)value;
