@@ -32,7 +32,7 @@
 }
 -(void)dealloc
 {
-#ifdef DEBUG
+#ifdef TIGHTDB_DEBUG
     NSLog(@"CursorBase dealloc");
 #endif
     _table = nil;

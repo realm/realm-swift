@@ -38,7 +38,7 @@
 
 -(void)dealloc
 {
-#ifdef DEBUG
+#ifdef TIGHTDB_DEBUG
     NSLog(@"Group dealloc");
 #endif
     delete _group;

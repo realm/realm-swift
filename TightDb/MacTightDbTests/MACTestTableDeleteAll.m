@@ -79,17 +79,17 @@
     [table deleteRow:0];
     [table deleteRow:5];
     STAssertEquals([table count], (size_t)12, @"Size should have been 12");
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
     [table verify];
-#endif //_DEBUG
+#endif
 	
 	// Test Clear
     [table clear];
     STAssertEquals([table count], (size_t)0, @"Size should have been zero");
 	
-#ifdef _DEBUG
+#ifdef TIGHTDB_DEBUG
     [table verify];
-#endif //_DEBUG
+#endif
 }
 
 @end

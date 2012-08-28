@@ -13,6 +13,15 @@ clang -IDeliv -fobjc-arc TightDb/TightDb/Cursor.mm -c -o TightDb/TightDb/Cursor.
 clang -IDeliv -fobjc-arc TightDb/TightDb/Group.mm -c -o TightDb/TightDb/Group.o
 clang -IDeliv -fobjc-arc TightDb/TightDb/Query.mm -c -o TightDb/TightDb/Query.o
 clang -IDeliv -fobjc-arc TightDb/TightDb/Table.mm -c -o TightDb/TightDb/Table.o
+clang++ -shared TightDb/TightDb/*.o -framework Foundation -ltightdb -o tightdb_objc.so
+
+# Note: "SenTestingKit" is a part of the package "com.apple.pkg.XcodeMAS_iOSSDK_5_1"
+
+clang -F/Applications/Xcode.app/Contents/Developer/Library/Frameworks -IDeliv -fobjc-arc TightDb/MacTightDbTests/MACtestTable.m -c -o TightDb/MacTightDbTests/MACtestTable.o
+clang++ -shared TightDb/MacTightDbTests/*.o tightdb_objc.so -F/Applications/Xcode.app/Contents/Developer/Library/Frameworks -framework SenTestingKit -framework Foundation -o tightdb_objc_test_suite.so
+/Applications/Xcode.app/Contents/Developer/Tools/otest tightdb_objc_test_suite.so
+# PROBLEM: otest expects a bundle!?!?!?!
+
 
 # Compile (Linux):
 clang -fblocks `gnustep-config --objc-flags` -IDeliv -I/usr/lib/gcc/x86_64-linux-gnu/4.6/include TightDb/TightDb/Cursor.mm

@@ -77,7 +77,7 @@
 }
 -(void)dealloc
 {
-#ifdef DEBUG
+#ifdef TIGHTDB_DEBUG
     NSLog(@"Query dealloc");
 #endif
     delete _query;
