@@ -7,11 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		36DBF3F1156A815700CC12CC /* libtightdb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36DBF3F0156A815700CC12CC /* libtightdb.a */; };
 		41584F25156CBDD800DB2995 /* MACTestEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 41584F24156CBDD800DB2995 /* MACTestEnumerator.m */; };
 		41584F28156CF42800DB2995 /* QueryPriv.h in Headers */ = {isa = PBXBuildFile; fileRef = 41584F27156CF41500DB2995 /* QueryPriv.h */; };
 		41584F29156CF42A00DB2995 /* QueryPriv.h in Headers */ = {isa = PBXBuildFile; fileRef = 41584F27156CF41500DB2995 /* QueryPriv.h */; };
-		41584FB7156D23EF00DB2995 /* libtightdb_all.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94A8C0C1541FC0900B174B5 /* libtightdb_all.a */; };
 		E9060CEA153EF00D00481151 /* MACTestOriginal2.mm in Sources */ = {isa = PBXBuildFile; fileRef = E9060CE9153EF00D00481151 /* MACTestOriginal2.mm */; };
 		E9060CEB153EF21400481151 /* MACTestTableDeleteAll.m in Sources */ = {isa = PBXBuildFile; fileRef = E9EA989E153EC40500552F22 /* MACTestTableDeleteAll.m */; };
 		E9060CEF153F052400481151 /* TablePriv.h in Headers */ = {isa = PBXBuildFile; fileRef = E9EA98A0153EE16700552F22 /* TablePriv.h */; };
@@ -62,7 +60,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		36DBF3F0156A815700CC12CC /* libtightdb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtightdb.a; path = ../native/lib/Debug/libtightdb.a; sourceTree = "<group>"; };
 		41584F23156CBDD800DB2995 /* MACTestEnumerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MACTestEnumerator.h; sourceTree = "<group>"; };
 		41584F24156CBDD800DB2995 /* MACTestEnumerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MACTestEnumerator.m; sourceTree = "<group>"; };
 		41584F27156CF41500DB2995 /* QueryPriv.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QueryPriv.h; sourceTree = "<group>"; };
@@ -89,7 +86,6 @@
 		E93DBAA81541A2C40098E26C /* TightDb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TightDb.h; path = ../../Deliv/TightDb.h; sourceTree = "<group>"; };
 		E94A8C011541EF9700B174B5 /* MACTestTutorial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MACTestTutorial.h; sourceTree = "<group>"; };
 		E94A8C021541EF9700B174B5 /* MACTestTutorial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MACTestTutorial.m; sourceTree = "<group>"; };
-		E94A8C0C1541FC0900B174B5 /* libtightdb_all.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtightdb_all.a; path = ../native/lib/Debug/libtightdb_all.a; sourceTree = "<group>"; };
 		E99E8DAC154155300048E3D8 /* Cursor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Cursor.mm; sourceTree = "<group>"; };
 		E9D58B781541A5DF009150B1 /* libTightDbOC.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTightDbOC.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9D58B7C1541A5DF009150B1 /* TightDbOC-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TightDbOC-Prefix.pch"; sourceTree = "<group>"; };
@@ -124,7 +120,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				41584FB7156D23EF00DB2995 /* libtightdb_all.a in Frameworks */,
 				E9D58B791541A5DF009150B1 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -141,7 +136,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				36DBF3F1156A815700CC12CC /* libtightdb.a in Frameworks */,
 				E9ED3DDF153D7F9100EC1460 /* SenTestingKit.framework in Frameworks */,
 				E9ED3DE0153D7F9100EC1460 /* Cocoa.framework in Frameworks */,
 				E9ED3DE3153D7F9100EC1460 /* libMacTightDb.a in Frameworks */,
@@ -255,8 +249,6 @@
 		E9FFD248153C774C00719326 = {
 			isa = PBXGroup;
 			children = (
-				36DBF3F0156A815700CC12CC /* libtightdb.a */,
-				E94A8C0C1541FC0900B174B5 /* libtightdb_all.a */,
 				E9FFD258153C774C00719326 /* TightDb */,
 				E9ED3DD3153D7F9100EC1460 /* MacTightDb */,
 				E9ED3DE4153D7F9100EC1460 /* MacTightDbTests */,
@@ -603,20 +595,16 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MacTightDb/MacTightDb-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"TIGHTDB_DEBUG=1",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "TIGHTDB_DEBUG=1";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				HEADER_SEARCH_PATHS = /usr/local/include;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../native/lib\"",
-					"\"$(SRCROOT)/../native/lib/Debug\"",
-				);
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-ltightdb";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Debug;
 		};
@@ -634,14 +622,12 @@
 				GCC_PREFIX_HEADER = "MacTightDb/MacTightDb-Prefix.pch";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				HEADER_SEARCH_PATHS = /usr/local/include;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../native/lib\"",
-					"\"$(SRCROOT)/../native/lib/Release\"",
-				);
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				OTHER_LDFLAGS = "-ltightdb-dbg";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Release;
 		};
@@ -654,9 +640,7 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "MacTightDb/MacTightDb-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"TIGHTDB_DEBUG=1",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "TIGHTDB_DEBUG=1";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				HEADER_SEARCH_PATHS = /usr/local/include;
@@ -711,9 +695,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"TIGHTDB_DEBUG=1",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "TIGHTDB_DEBUG=1";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;

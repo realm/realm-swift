@@ -7,8 +7,8 @@
 //
 
 #import "MACTestOriginal2.h"
-#include "group.hpp"
-#include "tightdb.hpp"
+#include <tightdb/group.hpp>
+#include <tightdb.hpp>
 #include <string>
 #include <iostream>
 #include <sstream>
