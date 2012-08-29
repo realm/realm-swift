@@ -576,7 +576,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../native/lib/Release\"",
-					"\"$(SRCROOT)/../native/lib/Debug\"",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -675,7 +674,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../native/lib/Release\"",
-					"\"$(SRCROOT)/../native/lib/Debug\"",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_LDFLAGS = "-lstdc++";
@@ -752,7 +750,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../tightdb_objc/native/lib\"",
-					"\"$(SRCROOT)/../native/lib/Debug-iphonesimulator\"",
+					"\"$(SRCROOT)/../native/lib/Release-iphonesimulator\"",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
