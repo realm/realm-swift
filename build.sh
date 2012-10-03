@@ -1,3 +1,5 @@
+# NOTE: THIS SCRIPT IS SUPPOSED TO RUN IN A POSIX SHELL
+
 cd "$(dirname "$0")"
 TIGHTDB_OBJC_HOME="$(pwd)"
 
@@ -9,8 +11,7 @@ MODE="$1"
 case "$MODE" in
 
     "clean")
-        echo "Not yet implemented" 1>&2
-        exit 1
+        exit 0
         ;;
 
     "build")

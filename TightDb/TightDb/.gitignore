@@ -1,1 +1,11 @@
-*.o
+/*.o
+/*.d
+
+# Coverage data
+/*.gcno
+/*.gcda
+
+/libtightdb-objc-dbg.a
+/libtightdb-objc.a
+/libtightdb-objc.so
+
