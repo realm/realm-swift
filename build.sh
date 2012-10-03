@@ -7,27 +7,49 @@ MODE="$1"
 [ $# -gt 0 ] && shift
 
 
+# Setup OS specific stuff
+OS="$(uname)" || exit 1
+NUM_PROCESSORS=""
+if [ "$OS" = "Darwin" ]; then
+    if [ "$CC" = "" ] && which clang >/dev/null; then
+        export CC=clang
+    fi
+    NUM_PROCESSORS="$(sysctl -n hw.ncpu)" || exit 1
+else
+    if [ -r /proc/cpuinfo ]; then
+        NUM_PROCESSORS="$(cat /proc/cpuinfo | egrep 'processor[[:space:]]*:' | wc -l)" || exit 1
+    fi
+fi
+if [ "$NUM_PROCESSORS" ]; then
+    export MAKEFLAGS="-j$NUM_PROCESSORS"
+fi
+
+
 
 case "$MODE" in
 
     "clean")
+        make -C "TightDb/TightDb" clean
         exit 0
         ;;
 
     "build")
-        echo "Not yet implemented" 1>&2
-        exit 1
+        TIGHTDB_ENABLE_FAT_BINARIES="1" make -C "TightDb/TightDb" || exit 1
+        exit 0
         ;;
 
     "test")
-        echo "Not yet implemented" 1>&2
-        exit 1
+        make -C "TightDb/TightDb" test || exit 1
+        exit 0
         ;;
 
     "install")
         PREFIX="$1"
-        echo "Not yet implemented" 1>&2
-        exit 1
+        if [ -z "$PREFIX" ]; then
+            PREFIX="/usr/local"
+        fi
+        make -C "TightDb/TightDb" prefix="$PREFIX" install || exit 1
+        exit 0
         ;;
 
     "test-installed")
