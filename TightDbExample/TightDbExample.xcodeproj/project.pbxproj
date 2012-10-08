@@ -277,12 +277,9 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TightDbExample/TightDbExample-Prefix.pch";
-				HEADER_SEARCH_PATHS = ../Deliv;
+				HEADER_SEARCH_PATHS = include;
 				INFOPLIST_FILE = "TightDbExample/TightDbExample-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"\"$(SRCROOT)/../Deliv/Debug\"",
-					"\"$(SRCROOT)/../native/lib/Debug\"",
-				);
+				LIBRARY_SEARCH_PATHS = lib/Debug;
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -294,12 +291,9 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TightDbExample/TightDbExample-Prefix.pch";
-				HEADER_SEARCH_PATHS = ../Deliv;
+				HEADER_SEARCH_PATHS = include;
 				INFOPLIST_FILE = "TightDbExample/TightDbExample-Info.plist";
-				LIBRARY_SEARCH_PATHS = (
-					"\"$(SRCROOT)/../Deliv/Release\"",
-					"\"$(SRCROOT)/../native/lib/Debug\"",
-				);
+				LIBRARY_SEARCH_PATHS = lib/Release;
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;

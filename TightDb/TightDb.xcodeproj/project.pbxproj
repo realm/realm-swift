@@ -736,6 +736,7 @@
 					"\"$(SRCROOT)/../native/lib/Debug-iphonesimulator\"",
 				);
 				OTHER_LDFLAGS = "-ObjC";
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
@@ -753,6 +754,7 @@
 					"\"$(SRCROOT)/../native/lib/Release-iphonesimulator\"",
 				);
 				OTHER_LDFLAGS = "-ObjC";
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 			};
