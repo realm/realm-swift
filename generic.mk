@@ -337,9 +337,6 @@ LD_PROG_OPTIM     = $(LD) $(LDFLAGS_OPTIM) $(LDFLAGS_PTHREAD)
 LD_PROG_DEBUG     = $(LD) $(LDFLAGS_DEBUG) $(LDFLAGS_PTHREAD)
 LD_PROG_COVER     = $(LD) $(LDFLAGS_COVER) $(LDFLAGS_PTHREAD)
 
-# Apply local directory config
-CFLAGS_INCLUDE += $(ADD_CFLAGS_INCLUDE)
-
 
 
 SUFFIX_OBJ_STATIC_OPTIM = $(OBJ_DENOM_OPTIM).o
@@ -358,12 +355,12 @@ SUFFIX_PROG_OPTIM       = $(PROG_DENOM_OPTIM)
 SUFFIX_PROG_DEBUG       = $(PROG_DENOM_DEBUG)
 SUFFIX_PROG_COVER       = $(PROG_DENOM_COVER)
 
-FOLD_TARGET = $(subst .,_,$(subst -,_,$(1)))
+FOLD_TARGET = $(subst /,_,$(subst .,_,$(subst -,_,$(1))))
 GET_LIBRARY_NAME = $(patsubst %.a,%,$(1))
 GET_OBJECTS_FROM_SOURCES = $(patsubst %.c,%$(2),$(patsubst %.cpp,%$(2),$(patsubst %.m,%$(2),$(patsubst %.mm,%$(2),$(1)))))
 GET_OBJECTS_FOR_TARGET = $(call GET_OBJECTS_FROM_SOURCES,$($(call FOLD_TARGET,$(1))_SOURCES),$(2))
 GET_FLAGS = $($(if $(filter undefined,$(origin $(1)$(2))),$(1),$(1)$(2)))
-GET_CFLAGS_FOR_OBJECT = $(call GET_FLAGS,$(call FOLD_TARGET,$(1))_CFLAGS,$(2))
+GET_CFLAGS_FOR_OBJECT = $(foreach x,$(1) $(GMK_$(call FOLD_TARGET,$(1))_TARGETS),$(call GET_FLAGS,$(call FOLD_TARGET,$(x))_CFLAGS,$(2)))
 GET_LDFLAGS_FOR_TARGET = $(call GET_FLAGS,$(call FOLD_TARGET,$(1))_LDFLAGS,$(2))
 GET_DEPS_FOR_TARGET = $($(call FOLD_TARGET,$(1))_DEPS)
 
@@ -681,7 +678,7 @@ IS_NOINST_LIB_1 = $(and $(call IN_THIS_DIR,$(1)),$(call EQUALS,$(notdir $(1)),$(
 MAKE_NOINST_LIB_LIBDEPS   = $(strip noinst $(call MAKE_NOINST_LIB_LIBDEPS_1,$(1)) $(call MAKE_NOINST_LIB_LIBDEPS_2,$(1)))
 MAKE_NOINST_LIB_LIBDEPS_1 = $(foreach x,$($(call FOLD_TARGET,$(1))_LIBS),lib:$(x) $(call READ_LIB_LIBDEPS,$(x)))
 MAKE_NOINST_LIB_LIBDEPS_2 = $(call MAKE_NOINST_LIB_LIBDEPS_3,$(1)) $(call MAKE_NOINST_LIB_LIBDEPS_4,$(1)) $(call MAKE_NOINST_LIB_LIBDEPS_5,$(1))
-MAKE_NOINST_LIB_LIBDEPS_3 = $(foreach x,$(call GET_LDFLAGS_FOR_TARGET,$(1),),ldflag:$(x))
+MAKE_NOINST_LIB_LIBDEPS_3 = $(foreach x,$(call GET_LDFLAGS_FOR_TARGET,$(1),_OPTIM),ldflag:$(x))
 MAKE_NOINST_LIB_LIBDEPS_4 = $(foreach x,$(call GET_LDFLAGS_FOR_TARGET,$(1),_DEBUG),ldflag-dbg:$(x))
 MAKE_NOINST_LIB_LIBDEPS_5 = $(foreach x,$(call GET_LDFLAGS_FOR_TARGET,$(1),_COVER),ldflag-cov:$(x))
 
@@ -727,14 +724,14 @@ PATTERN_UNPACK_MAP_2 = $(filter $(1),$(2))
 # ARGS: qual_prog_name, objects, qualified_expanded_lib_refs, deps, link_cmd, ldflags
 define NOINST_PROG_RULE
 $(1): $(2) $(call FILTER_UNPACK,noinst:% inst:%,$(3)) $(4)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_RPATHS_FROM_LIB_REFS,$(3)) $(LDFLAGS) $(6)) -o $(1)
+	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_RPATHS_FROM_LIB_REFS,$(3)) $(LDFLAGS) $(6)) -o $@
 endef
 
 # ARGS: qual_prog_name, objects, qualified_expanded_lib_refs, deps, link_cmd, ldflags
 define INST_PROG_RULE
 ifeq ($(filter rpath:%,$(3)),)
 $(1): $(2) $(call FILTER_UNPACK,noinst:% inst:%,$(3)) $(4)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(LDFLAGS) $(6)) -o $(1)
+	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(LDFLAGS) $(6)) -o $@
 else
 $(1) $(1)-noinst: $(2) $(call FILTER_UNPACK,noinst:% inst:%,$(3)) $(4)
 	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(LDFLAGS) $(6)) -o $(1)
@@ -742,19 +739,25 @@ $(1) $(1)-noinst: $(2) $(call FILTER_UNPACK,noinst:% inst:%,$(3)) $(4)
 endif
 endef
 
+define RECORD_TARGETS_FOR_OBJECT
+GMK_$(call FOLD_TARGET,$(1))_TARGETS += $(2)
+$(EMPTY)
+endef
 
 # ARGS: unqual_prog_name, expanded_lib_refs, deps
 define NOINST_PROG_RULES
-$(call NOINST_PROG_RULE,$(1)$(SUFFIX_PROG_OPTIM),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_OPTIM)),$(call QUALIFY_LIB_REFS,$(2),_OPTIM),$(3),$(LD_PROG_OPTIM),$(call GET_LDFLAGS_FOR_TARGET,$(1),))
+$(call NOINST_PROG_RULE,$(1)$(SUFFIX_PROG_OPTIM),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_OPTIM)),$(call QUALIFY_LIB_REFS,$(2),_OPTIM),$(3),$(LD_PROG_OPTIM),$(call GET_LDFLAGS_FOR_TARGET,$(1),_OPTIM))
 $(call NOINST_PROG_RULE,$(1)$(SUFFIX_PROG_DEBUG),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_DEBUG)),$(call QUALIFY_LIB_REFS,$(2),_DEBUG),$(3),$(LD_PROG_DEBUG),$(call GET_LDFLAGS_FOR_TARGET,$(1),_DEBUG))
 $(call NOINST_PROG_RULE,$(1)$(SUFFIX_PROG_COVER),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_COVER)),$(call QUALIFY_LIB_REFS,$(2),_COVER),$(3),$(LD_PROG_COVER),$(call GET_LDFLAGS_FOR_TARGET,$(1),_COVER))
+$(foreach x,$(call GET_OBJECTS_FOR_TARGET,$(1),.o),$(call RECORD_TARGETS_FOR_OBJECT,$(x),$(1)))
 endef
 
 # ARGS: unqual_target, expanded_lib_refs, deps
 define INST_PROG_RULES
-$(call INST_PROG_RULE,$(1)$(SUFFIX_PROG_OPTIM),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_OPTIM)),$(call QUALIFY_LIB_REFS,$(2),_OPTIM),$(3),$(LD_PROG_OPTIM),$(call GET_LDFLAGS_FOR_TARGET,$(1),))
+$(call INST_PROG_RULE,$(1)$(SUFFIX_PROG_OPTIM),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_OPTIM)),$(call QUALIFY_LIB_REFS,$(2),_OPTIM),$(3),$(LD_PROG_OPTIM),$(call GET_LDFLAGS_FOR_TARGET,$(1),_OPTIM))
 $(call INST_PROG_RULE,$(1)$(SUFFIX_PROG_DEBUG),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_DEBUG)),$(call QUALIFY_LIB_REFS,$(2),_DEBUG),$(3),$(LD_PROG_DEBUG),$(call GET_LDFLAGS_FOR_TARGET,$(1),_DEBUG))
 $(call INST_PROG_RULE,$(1)$(SUFFIX_PROG_COVER),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_COVER)),$(call QUALIFY_LIB_REFS,$(2),_COVER),$(3),$(LD_PROG_COVER),$(call GET_LDFLAGS_FOR_TARGET,$(1),_COVER))
+$(foreach x,$(call GET_OBJECTS_FOR_TARGET,$(1),.o),$(call RECORD_TARGETS_FOR_OBJECT,$(x),$(1)))
 endef
 
 $(foreach x,$(NOINST_PROGRAMS) $(TEST_PROGRAMS),$(eval $(call NOINST_PROG_RULES,$(x),$(call EXPAND_LIB_REFS,$(x)),$(call GET_DEPS_FOR_TARGET,$(x)))))
@@ -775,14 +778,14 @@ endef
 # FIXME: Add '-Wl,-rpath' if linking against locally built and installed libraries, but it requires us to know the library installation directory. Or maybe it is better to set LD_RUN_PATH.
 define SHARED_LIBRARY_RULE
 $(1): $(2) $(call FILTER_UNPACK,inst:%,$(3)) $(4)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(LDFLAGS) $(6) $(call GET_SPECIAL_SHARED_LIB_OPTS,$(1))) -o $(1)
+	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(LDFLAGS) $(6) $(call GET_SPECIAL_SHARED_LIB_OPTS,$@)) -o $@
 endef
 
 .PHONY: update-libdeps-files
 
 define LIBDEPS_RULE
 $(1).libdeps: $(DEP_MAKEFILES)
-	echo $(2) >$(1).libdeps
+	echo $(2) >$@
 update-libdeps-files: $(1).libdeps
 endef
 
@@ -792,6 +795,7 @@ $(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_STATIC_OPTI
 $(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_STATIC_DEBUG),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_DEBUG)),$(3))
 $(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_STATIC_COVER),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_COVER)),$(3))
 $(call LIBDEPS_RULE,$(call GET_LIBRARY_NAME,$(1)),$(call MAKE_NOINST_LIB_LIBDEPS,$(1)))
+$(foreach x,$(call GET_OBJECTS_FOR_TARGET,$(1),.o),$(call RECORD_TARGETS_FOR_OBJECT,$(x),$(1)))
 endef
 
 # ARGS: unqual_lib_name, expanded_lib_refs, deps
@@ -799,10 +803,11 @@ define INST_LIB_RULES
 $(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_STATIC_OPTIM),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_OPTIM)),$(3))
 $(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_STATIC_DEBUG),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_DEBUG)),$(3))
 $(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_STATIC_COVER),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_COVER)),$(3))
-$(call SHARED_LIBRARY_RULE,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_SHARED_OPTIM),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_SHARED_OPTIM)),$(call QUALIFY_LIB_REFS,$(2),_OPTIM),$(3),$(LD_LIB_OPTIM),$(call GET_LDFLAGS_FOR_TARGET,$(1),))
+$(call SHARED_LIBRARY_RULE,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_SHARED_OPTIM),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_SHARED_OPTIM)),$(call QUALIFY_LIB_REFS,$(2),_OPTIM),$(3),$(LD_LIB_OPTIM),$(call GET_LDFLAGS_FOR_TARGET,$(1),_OPTIM))
 $(call SHARED_LIBRARY_RULE,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_SHARED_DEBUG),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_SHARED_DEBUG)),$(call QUALIFY_LIB_REFS,$(2),_DEBUG),$(3),$(LD_LIB_DEBUG),$(call GET_LDFLAGS_FOR_TARGET,$(1),_DEBUG))
 $(call SHARED_LIBRARY_RULE,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_SHARED_COVER),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_SHARED_COVER)),$(call QUALIFY_LIB_REFS,$(2),_COVER),$(3),$(LD_LIB_COVER),$(call GET_LDFLAGS_FOR_TARGET,$(1),_COVER))
 $(call LIBDEPS_RULE,$(call GET_LIBRARY_NAME,$(1)),$(call EXTRACT_INST_LIB_LIBDEPS,$(2)))
+$(foreach x,$(call GET_OBJECTS_FOR_TARGET,$(1),.o),$(call RECORD_TARGETS_FOR_OBJECT,$(x),$(1)))
 endef
 
 $(foreach x,$(NOINST_LIBRARIES),$(eval $(call NOINST_LIB_RULES,$(x),$(call GET_DEPS_FOR_TARGET,$(x)))))
@@ -823,16 +828,16 @@ $(foreach x,$(INST_LIBRARIES),$(eval $(call INST_LIB_RULES,$(x),$(call EXPAND_LI
 # COMPILING + AUTOMATIC DEPENDENCIES
 
 %$(SUFFIX_OBJ_STATIC_OPTIM): %.c
-	$(strip $(CC_STATIC_OPTIM) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CC_STATIC_OPTIM) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_OPTIM) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_STATIC_OPTIM): %.cpp
-	$(strip $(CXX_STATIC_OPTIM) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CXX_STATIC_OPTIM) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_OPTIM) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_OPTIM): %.c
-	$(strip $(CC_SHARED_OPTIM) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CC_SHARED_OPTIM) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_OPTIM) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_OPTIM): %.cpp
-	$(strip $(CXX_SHARED_OPTIM) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CXX_SHARED_OPTIM) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_OPTIM) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 
 %$(SUFFIX_OBJ_STATIC_DEBUG): %.c
@@ -863,16 +868,16 @@ $(foreach x,$(INST_LIBRARIES),$(eval $(call INST_LIB_RULES,$(x),$(call EXPAND_LI
 
 
 %$(SUFFIX_OBJ_STATIC_OPTIM): %.m
-	$(strip $(OCC_STATIC_OPTIM) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCC_STATIC_OPTIM) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_OPTIM) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_STATIC_OPTIM): %.mm
-	$(strip $(OCXX_STATIC_OPTIM) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCXX_STATIC_OPTIM) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_OPTIM) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_OPTIM): %.m
-	$(strip $(OCC_SHARED_OPTIM) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCC_SHARED_OPTIM) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_OPTIM) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_OPTIM): %.mm
-	$(strip $(OCXX_SHARED_OPTIM) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCXX_SHARED_OPTIM) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_OPTIM) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 
 %$(SUFFIX_OBJ_STATIC_DEBUG): %.m
