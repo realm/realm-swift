@@ -785,7 +785,7 @@ endef
 
 define LIBDEPS_RULE
 $(1).libdeps: $(DEP_MAKEFILES)
-	echo $(2) >$(1)
+	echo $(2) >$(1).libdeps
 update-libdeps-files: $(1).libdeps
 endef
 
