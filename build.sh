@@ -11,9 +11,6 @@ MODE="$1"
 OS="$(uname)" || exit 1
 NUM_PROCESSORS=""
 if [ "$OS" = "Darwin" ]; then
-    if [ "$CC" = "" ] && which clang >/dev/null; then
-        export CC=clang
-    fi
     NUM_PROCESSORS="$(sysctl -n hw.ncpu)" || exit 1
 else
     if [ -r /proc/cpuinfo ]; then
