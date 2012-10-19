@@ -1,11 +1,12 @@
 /*.o
 /*.d
+/*.libdeps
 
 # Coverage data
 /*.gcno
 /*.gcda
 
-/libtightdb-objc-dbg.a
-/libtightdb-objc.a
 /libtightdb-objc.so
-
+/libtightdb-objc.a
+/libtightdb-objc-dbg.so
+/libtightdb-objc-cov.so
