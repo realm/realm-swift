@@ -625,7 +625,7 @@ test-cover/local: $(TARGETS_TEST_COVER)
 	$(RM) *.gcda
 	$(foreach x,$(EXTRA_CLEAN_DIRS),$(RM) $(x)/*.gcda
 	)
-	$(foreach x,$(TARGETS_TEST_PROG_COVER),./$(x)
+	$(foreach x,$(TARGETS_TEST_PROG_COVER),-./$(x)
 	)
 endif
 test-cover/local: update-libdeps-files
