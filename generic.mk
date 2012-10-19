@@ -724,14 +724,14 @@ PATTERN_UNPACK_MAP_2 = $(filter $(1),$(2))
 # ARGS: qual_prog_name, objects, qualified_expanded_lib_refs, deps, link_cmd, ldflags
 define NOINST_PROG_RULE
 $(1): $(2) $(call FILTER_UNPACK,noinst:% inst:%,$(3)) $(4)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_RPATHS_FROM_LIB_REFS,$(3)) $(LDFLAGS) $(6)) -o $@
+	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_RPATHS_FROM_LIB_REFS,$(3)) $(LDFLAGS) $(6)) -o $(1)
 endef
 
 # ARGS: qual_prog_name, objects, qualified_expanded_lib_refs, deps, link_cmd, ldflags
 define INST_PROG_RULE
 ifeq ($(filter rpath:%,$(3)),)
 $(1): $(2) $(call FILTER_UNPACK,noinst:% inst:%,$(3)) $(4)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(LDFLAGS) $(6)) -o $@
+	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(LDFLAGS) $(6)) -o $(1)
 else
 $(1) $(1)-noinst: $(2) $(call FILTER_UNPACK,noinst:% inst:%,$(3)) $(4)
 	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(LDFLAGS) $(6)) -o $(1)
@@ -778,14 +778,14 @@ endef
 # FIXME: Add '-Wl,-rpath' if linking against locally built and installed libraries, but it requires us to know the library installation directory. Or maybe it is better to set LD_RUN_PATH.
 define SHARED_LIBRARY_RULE
 $(1): $(2) $(call FILTER_UNPACK,inst:%,$(3)) $(4)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(LDFLAGS) $(6) $(call GET_SPECIAL_SHARED_LIB_OPTS,$@)) -o $@
+	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(LDFLAGS) $(6) $(call GET_SPECIAL_SHARED_LIB_OPTS,$(1))) -o $(1)
 endef
 
 .PHONY: update-libdeps-files
 
 define LIBDEPS_RULE
 $(1).libdeps: $(DEP_MAKEFILES)
-	echo $(2) >$@
+	echo $(2) >$(1)
 update-libdeps-files: $(1).libdeps
 endef
 
