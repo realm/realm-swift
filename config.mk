@@ -12,7 +12,3 @@ CFLAGS_DEFAULT += -Wextra -ansi -pedantic -Wno-long-long
 # FIXME: '-fno-elide-constructors' currently causes TightDB to fail
 #CFLAGS_DEBUG   += -fno-elide-constructors
 CFLAGS_PTHREAD += -pthread
-
-CFLAGS_OPTIM += $(shell tightdb-config     --cflags)
-CFLAGS_DEBUG += $(shell tightdb-config-dbg --cflags)
-CFLAGS_COVER += $(shell tightdb-config-dbg --cflags)
