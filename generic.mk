@@ -1,5 +1,5 @@
 # Generic makefile that captures some of the ideas of GNU Automake,
-# especially in regard to naming targets.
+# especially with respect to naming targets.
 #
 # Author: Kristian Spangsege
 #
@@ -14,12 +14,11 @@
 #   make CFLAGS_PTHREAD=-pthread CFLAGS_AUTODEP=""
 #
 # If CFLAGS is specified in the environment or on the command line, it
-# will replace the value of CFLAGS_DEFAULT. Similarly with CXXFLAGS,
-# LDFLAGS, and ARFLAGS.
+# will replace the value of CFLAGS_GENERAL. Similarly with LDFLAGS and
+# ARFLAGS.
 #
 # If EXTRA_CFLAGS is specified on the command line, its contents will
-# be added to CFLAGS_DEFAULT (or to CFLAGS, if it is
-# specified). Similarly with CXXFLAGS and LDFLAGS.
+# be added to CFLAGS_GENERAL. Similarly with LDFLAGS.
 #
 # If CC, CXX, LD, or AR is specified in the environment or on the
 # command line, its value will be respected.
@@ -57,33 +56,45 @@
 # local Makefile.
 SOURCE_ROOT =
 
-CFLAGS_DEFAULT   =
-CXXFLAGS_DEFAULT = $(CFLAGS_DEFAULT)
-CFLAGS_OPTIM     =
-CFLAGS_DEBUG     =
-CFLAGS_COVER     =
-CFLAGS_SHARED    =
-CFLAGS_PTHREAD   =
-CFLAGS_INCLUDE   =
-CFLAGS_AUTODEP   =
-LDFLAGS_DEFAULT  =
-LDFLAGS_OPTIM    =
-LDFLAGS_DEBUG    =
-LDFLAGS_COVER    =
-LDFLAGS_SHARED   =
-LDFLAGS_PTHREAD  = $(CFLAGS_PTHREAD)
-ARFLAGS_DEFAULT  = csr
+CFLAGS_OPTIM          =
+CFLAGS_DEBUG          =
+CFLAGS_COVER          =
+CFLAGS_SHARED         =
+CFLAGS_PTHREAD        =
+CFLAGS_CXX            =
+CFLAGS_OBJC           =
+CFLAGS_GENERAL        =
+CFLAGS_ARCH           =
+CFLAGS_INCLUDE        =
+CFLAGS_AUTODEP        =
+LDFLAGS_OPTIM         = $(CFLAGS_OPTIM)
+LDFLAGS_DEBUG         = $(CFLAGS_DEBUG)
+LDFLAGS_COVER         = $(CFLAGS_COVER)
+LDFLAGS_SHARED        =
+LDFLAGS_PTHREAD       = $(CFLAGS_PTHREAD)
+LDFLAGS_GENERAL       =
+LDFLAGS_ARCH          = $(CFLAGS_ARCH)
+ARFLAGS_GENERAL       = csr
 
-OBJ_DENOM_SHARED = .pic
-OBJ_DENOM_OPTIM  =
-OBJ_DENOM_DEBUG  = .dbg
-OBJ_DENOM_COVER  = .cov
-LIB_DENOM_OPTIM  =
-LIB_DENOM_DEBUG  = -dbg
-LIB_DENOM_COVER  = -cov
-PROG_DENOM_OPTIM =
-PROG_DENOM_DEBUG = -dbg
-PROG_DENOM_COVER = -cov
+PROJECT_CFLAGS        =
+PROJECT_CFLAGS_OPTIM  =
+PROJECT_CFLAGS_DEBUG  =
+PROJECT_CFLAGS_COVER  =
+PROJECT_LDFLAGS       =
+PROJECT_LDFLAGS_OPTIM =
+PROJECT_LDFLAGS_DEBUG =
+PROJECT_LDFLAGS_COVER =
+
+OBJ_DENOM_SHARED      = .pic
+OBJ_DENOM_OPTIM       =
+OBJ_DENOM_DEBUG       = .dbg
+OBJ_DENOM_COVER       = .cov
+LIB_DENOM_OPTIM       =
+LIB_DENOM_DEBUG       = -dbg
+LIB_DENOM_COVER       = -cov
+PROG_DENOM_OPTIM      =
+PROG_DENOM_DEBUG      = -dbg
+PROG_DENOM_COVER      = -cov
 
 # When set to an empty value, 'make install' will also attempt to
 # build everything as if by 'make all'. Set this variable to a
@@ -208,11 +219,11 @@ endif
 endif
 CC_AND_CXX_ARE_GCC_LIKE = $(and $(call IS_GCC_LIKE,$(CC)),$(or $(call IS_GCC_LIKE,$(CXX)),$(call IS_GXX_LIKE,$(CXX))))
 ifneq ($(CC_AND_CXX_ARE_GCC_LIKE),)
-CFLAGS_DEFAULT = -Wall
 CFLAGS_OPTIM   = -O3
 CFLAGS_DEBUG   = -ggdb
 CFLAGS_COVER   = --coverage
 CFLAGS_SHARED  = -fPIC -DPIC
+CFLAGS_GENERAL = -Wall
 CFLAGS_AUTODEP = -MMD -MP
 endif
 
@@ -244,9 +255,6 @@ endif
 endif
 LD_IS_GCC_LIKE = $(or $(call IS_GCC_LIKE,$(LD)),$(call IS_GXX_LIKE,$(LD)))
 ifneq ($(LD_IS_GCC_LIKE),)
-LDFLAGS_OPTIM  = -O3
-LDFLAGS_DEBUG  = -ggdb
-LDFLAGS_COVER  = --coverage
 LDFLAGS_SHARED = -shared
 endif
 
@@ -257,7 +265,7 @@ CLANG_VERSION = $(shell $(LD) --version | grep -i 'clang version' | sed 's/.*cla
 CLANG_MAJOR = $(word 1,$(CLANG_VERSION))
 CLANG_MINOR = $(word 2,$(CLANG_VERSION))
 ifeq ($(shell echo $$(($(CLANG_MAJOR) < 3 || ($(CLANG_MAJOR) == 3 && $(CLANG_MINOR) < 2)))),1)
-LDFLAGS_DEFAULT += $(foreach x,$(subst :, ,$(LIBRARY_PATH)),-L$(x))
+LDFLAGS_LIBRARY_PATH = $(foreach x,$(subst :, ,$(LIBRARY_PATH)),-L$(x))
 endif
 endif
 
@@ -279,63 +287,57 @@ CONFIG_MK = $(ROOT)/config.mk
 
 # SETUP BUILD COMMANDS
 
-CFLAGS_SPECIFIED    = $(filter-out undefined default,$(origin CFLAGS))
-CXXFLAGS_SPECIFIED  = $(filter-out undefined default,$(origin CXXFLAGS))
-LDFLAGS_SPECIFIED   = $(filter-out undefined default,$(origin LDFLAGS))
-ARFLAGS_SPECIFIED   = $(filter-out undefined default,$(origin ARFLAGS))
-ifeq ($(CFLAGS_SPECIFIED),)
-CFLAGS = $(CFLAGS_DEFAULT)
+CFLAGS_SPECIFIED  = $(filter-out undefined default,$(origin CFLAGS))
+LDFLAGS_SPECIFIED = $(filter-out undefined default,$(origin LDFLAGS))
+ARFLAGS_SPECIFIED = $(filter-out undefined default,$(origin ARFLAGS))
+ifneq ($(CFLAGS_SPECIFIED),)
+CFLAGS_GENERAL = $(CFLAGS)
 endif
-ifeq ($(CXXFLAGS_SPECIFIED),)
-CXXFLAGS = $(CXXFLAGS_DEFAULT)
+ifneq ($(LDFLAGS_SPECIFIED),)
+PROJECT_GENERAL = $(LDFLAGS)
 endif
-ifeq ($(LDFLAGS_SPECIFIED),)
-LDFLAGS = $(LDFLAGS_DEFAULT)
+ifneq ($(ARFLAGS_SPECIFIED),)
+ARFLAGS_GENERAL = $(ARFLAGS)
 endif
-ifeq ($(ARFLAGS_SPECIFIED),)
-ARFLAGS = $(ARFLAGS_DEFAULT)
-endif
-EXTRA_CFLAGS   =
-EXTRA_CXXFLAGS = $(EXTRA_CFLAGS)
-EXTRA_LDFLAGS  =
-CFLAGS   := $(CFLAGS) $(EXTRA_CFLAGS)
-CXXFLAGS := $(CXXFLAGS) $(EXTRA_CXXFLAGS)
-LDFLAGS  := $(LDFLAGS) $(EXTRA_LDFLAGS)
+EXTRA_CFLAGS  =
+EXTRA_LDFLAGS =
+CFLAGS_GENERAL  += $(EXTRA_CFLAGS)
+LDFLAGS_GENERAL += $(EXTRA_LDFLAGS)
 
-CC_STATIC_OPTIM   = $(CC) $(CFLAGS_OPTIM) $(CFLAGS_PTHREAD)
-CC_SHARED_OPTIM   = $(CC) $(CFLAGS_OPTIM) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD)
-CC_STATIC_DEBUG   = $(CC) $(CFLAGS_DEBUG) $(CFLAGS_PTHREAD)
-CC_SHARED_DEBUG   = $(CC) $(CFLAGS_DEBUG) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD)
-CC_STATIC_COVER   = $(CC) $(CFLAGS_COVER) $(CFLAGS_PTHREAD)
-CC_SHARED_COVER   = $(CC) $(CFLAGS_COVER) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD)
+CC_STATIC_OPTIM   = $(CC) $(CFLAGS_OPTIM) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL)
+CC_SHARED_OPTIM   = $(CC) $(CFLAGS_OPTIM) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL)
+CC_STATIC_DEBUG   = $(CC) $(CFLAGS_DEBUG) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL)
+CC_SHARED_DEBUG   = $(CC) $(CFLAGS_DEBUG) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL)
+CC_STATIC_COVER   = $(CC) $(CFLAGS_COVER) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL)
+CC_SHARED_COVER   = $(CC) $(CFLAGS_COVER) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL)
 
-CXX_STATIC_OPTIM  = $(CXX) $(CFLAGS_OPTIM) $(CFLAGS_PTHREAD)
-CXX_SHARED_OPTIM  = $(CXX) $(CFLAGS_OPTIM) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD)
-CXX_STATIC_DEBUG  = $(CXX) $(CFLAGS_DEBUG) $(CFLAGS_PTHREAD)
-CXX_SHARED_DEBUG  = $(CXX) $(CFLAGS_DEBUG) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD)
-CXX_STATIC_COVER  = $(CXX) $(CFLAGS_COVER) $(CFLAGS_PTHREAD)
-CXX_SHARED_COVER  = $(CXX) $(CFLAGS_COVER) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD)
+CXX_STATIC_OPTIM  = $(CXX) $(CFLAGS_OPTIM) $(CFLAGS_PTHREAD) $(CFLAGS_CXX) $(CFLAGS_GENERAL)
+CXX_SHARED_OPTIM  = $(CXX) $(CFLAGS_OPTIM) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_CXX) $(CFLAGS_GENERAL)
+CXX_STATIC_DEBUG  = $(CXX) $(CFLAGS_DEBUG) $(CFLAGS_PTHREAD) $(CFLAGS_CXX) $(CFLAGS_GENERAL)
+CXX_SHARED_DEBUG  = $(CXX) $(CFLAGS_DEBUG) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_CXX) $(CFLAGS_GENERAL)
+CXX_STATIC_COVER  = $(CXX) $(CFLAGS_COVER) $(CFLAGS_PTHREAD) $(CFLAGS_CXX) $(CFLAGS_GENERAL)
+CXX_SHARED_COVER  = $(CXX) $(CFLAGS_COVER) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_CXX) $(CFLAGS_GENERAL)
 
-OCC_STATIC_OPTIM  = $(OCC) $(CFLAGS_OPTIM) $(CFLAGS_PTHREAD)
-OCC_SHARED_OPTIM  = $(OCC) $(CFLAGS_OPTIM) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD)
-OCC_STATIC_DEBUG  = $(OCC) $(CFLAGS_DEBUG) $(CFLAGS_PTHREAD)
-OCC_SHARED_DEBUG  = $(OCC) $(CFLAGS_DEBUG) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD)
-OCC_STATIC_COVER  = $(OCC) $(CFLAGS_COVER) $(CFLAGS_PTHREAD)
-OCC_SHARED_COVER  = $(OCC) $(CFLAGS_COVER) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD)
+OCC_STATIC_OPTIM  = $(OCC) $(CFLAGS_OPTIM) $(CFLAGS_PTHREAD) $(CFLAGS_OBJC) $(CFLAGS_GENERAL)
+OCC_SHARED_OPTIM  = $(OCC) $(CFLAGS_OPTIM) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_OBJC) $(CFLAGS_GENERAL)
+OCC_STATIC_DEBUG  = $(OCC) $(CFLAGS_DEBUG) $(CFLAGS_PTHREAD) $(CFLAGS_OBJC) $(CFLAGS_GENERAL)
+OCC_SHARED_DEBUG  = $(OCC) $(CFLAGS_DEBUG) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_OBJC) $(CFLAGS_GENERAL)
+OCC_STATIC_COVER  = $(OCC) $(CFLAGS_COVER) $(CFLAGS_PTHREAD) $(CFLAGS_OBJC) $(CFLAGS_GENERAL)
+OCC_SHARED_COVER  = $(OCC) $(CFLAGS_COVER) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_OBJC) $(CFLAGS_GENERAL)
 
-OCXX_STATIC_OPTIM = $(OCXX) $(CFLAGS_OPTIM) $(CFLAGS_PTHREAD)
-OCXX_SHARED_OPTIM = $(OCXX) $(CFLAGS_OPTIM) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD)
-OCXX_STATIC_DEBUG = $(OCXX) $(CFLAGS_DEBUG) $(CFLAGS_PTHREAD)
-OCXX_SHARED_DEBUG = $(OCXX) $(CFLAGS_DEBUG) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD)
-OCXX_STATIC_COVER = $(OCXX) $(CFLAGS_COVER) $(CFLAGS_PTHREAD)
-OCXX_SHARED_COVER = $(OCXX) $(CFLAGS_COVER) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD)
+OCXX_STATIC_OPTIM = $(OCXX) $(CFLAGS_OPTIM) $(CFLAGS_PTHREAD) $(CFLAGS_OBJC) $(CFLAGS_CXX) $(CFLAGS_GENERAL)
+OCXX_SHARED_OPTIM = $(OCXX) $(CFLAGS_OPTIM) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_OBJC) $(CFLAGS_CXX) $(CFLAGS_GENERAL)
+OCXX_STATIC_DEBUG = $(OCXX) $(CFLAGS_DEBUG) $(CFLAGS_PTHREAD) $(CFLAGS_OBJC) $(CFLAGS_CXX) $(CFLAGS_GENERAL)
+OCXX_SHARED_DEBUG = $(OCXX) $(CFLAGS_DEBUG) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_OBJC) $(CFLAGS_CXX) $(CFLAGS_GENERAL)
+OCXX_STATIC_COVER = $(OCXX) $(CFLAGS_COVER) $(CFLAGS_PTHREAD) $(CFLAGS_OBJC) $(CFLAGS_CXX) $(CFLAGS_GENERAL)
+OCXX_SHARED_COVER = $(OCXX) $(CFLAGS_COVER) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_OBJC) $(CFLAGS_CXX) $(CFLAGS_GENERAL)
 
-LD_LIB_OPTIM      = $(LD) $(LDFLAGS_SHARED) $(LDFLAGS_OPTIM) $(LDFLAGS_PTHREAD)
-LD_LIB_DEBUG      = $(LD) $(LDFLAGS_SHARED) $(LDFLAGS_DEBUG) $(LDFLAGS_PTHREAD)
-LD_LIB_COVER      = $(LD) $(LDFLAGS_SHARED) $(LDFLAGS_COVER) $(LDFLAGS_PTHREAD)
-LD_PROG_OPTIM     = $(LD) $(LDFLAGS_OPTIM) $(LDFLAGS_PTHREAD)
-LD_PROG_DEBUG     = $(LD) $(LDFLAGS_DEBUG) $(LDFLAGS_PTHREAD)
-LD_PROG_COVER     = $(LD) $(LDFLAGS_COVER) $(LDFLAGS_PTHREAD)
+LD_LIB_OPTIM      = $(LD) $(LDFLAGS_SHARED) $(LDFLAGS_OPTIM) $(LDFLAGS_PTHREAD) $(LDFLAGS_GENERAL)
+LD_LIB_DEBUG      = $(LD) $(LDFLAGS_SHARED) $(LDFLAGS_DEBUG) $(LDFLAGS_PTHREAD) $(LDFLAGS_GENERAL)
+LD_LIB_COVER      = $(LD) $(LDFLAGS_SHARED) $(LDFLAGS_COVER) $(LDFLAGS_PTHREAD) $(LDFLAGS_GENERAL)
+LD_PROG_OPTIM     = $(LD) $(LDFLAGS_OPTIM) $(LDFLAGS_PTHREAD) $(LDFLAGS_GENERAL)
+LD_PROG_DEBUG     = $(LD) $(LDFLAGS_DEBUG) $(LDFLAGS_PTHREAD) $(LDFLAGS_GENERAL)
+LD_PROG_COVER     = $(LD) $(LDFLAGS_COVER) $(LDFLAGS_PTHREAD) $(LDFLAGS_GENERAL)
 
 
 
@@ -359,9 +361,9 @@ FOLD_TARGET = $(subst /,_,$(subst .,_,$(subst -,_,$(1))))
 GET_LIBRARY_NAME = $(patsubst %.a,%,$(1))
 GET_OBJECTS_FROM_SOURCES = $(patsubst %.c,%$(2),$(patsubst %.cpp,%$(2),$(patsubst %.m,%$(2),$(patsubst %.mm,%$(2),$(1)))))
 GET_OBJECTS_FOR_TARGET = $(call GET_OBJECTS_FROM_SOURCES,$($(call FOLD_TARGET,$(1))_SOURCES),$(2))
-GET_FLAGS = $($(if $(filter undefined,$(origin $(1)$(2))),$(1),$(1)$(2)))
-GET_CFLAGS_FOR_OBJECT = $(foreach x,$(1) $(GMK_$(call FOLD_TARGET,$(1))_TARGETS),$(call GET_FLAGS,$(call FOLD_TARGET,$(x))_CFLAGS,$(2)))
-GET_LDFLAGS_FOR_TARGET = $(call GET_FLAGS,$(call FOLD_TARGET,$(1))_LDFLAGS,$(2))
+GET_FLAGS = $($(1)) $($(1)$(2))
+GET_CFLAGS_FOR_TARGET = $(foreach x,PROJECT DIR $(foreach y,$(GMK_$(call FOLD_TARGET,$(1))_TARGETS) $(1),$(call FOLD_TARGET,$(y))),$(call GET_FLAGS,$(x)_CFLAGS,$(2)))
+GET_LDFLAGS_FOR_TARGET = $(foreach x,PROJECT DIR $(call FOLD_TARGET,$(1)),$(call GET_FLAGS,$(x)_LDFLAGS,$(2)))
 GET_DEPS_FOR_TARGET = $($(call FOLD_TARGET,$(1))_DEPS)
 
 INC_FLAGS         = $(CFLAGS_INCLUDE)
@@ -724,18 +726,18 @@ PATTERN_UNPACK_MAP_2 = $(filter $(1),$(2))
 # ARGS: qual_prog_name, objects, qualified_expanded_lib_refs, deps, link_cmd, ldflags
 define NOINST_PROG_RULE
 $(1): $(2) $(call FILTER_UNPACK,noinst:% inst:%,$(3)) $(4)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_RPATHS_FROM_LIB_REFS,$(3)) $(LDFLAGS) $(6)) -o $(1)
+	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_RPATHS_FROM_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH) $(LDFLAGS_LIBRARY_PATH)) -o $(1)
 endef
 
 # ARGS: qual_prog_name, objects, qualified_expanded_lib_refs, deps, link_cmd, ldflags
 define INST_PROG_RULE
 ifeq ($(filter rpath:%,$(3)),)
 $(1): $(2) $(call FILTER_UNPACK,noinst:% inst:%,$(3)) $(4)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(LDFLAGS) $(6)) -o $(1)
+	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH) $(LDFLAGS_LIBRARY_PATH)) -o $(1)
 else
 $(1) $(1)-noinst: $(2) $(call FILTER_UNPACK,noinst:% inst:%,$(3)) $(4)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(LDFLAGS) $(6)) -o $(1)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_RPATHS_FROM_LIB_REFS,$(3)) $(LDFLAGS) $(6)) -o $(1)-noinst
+	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH) $(LDFLAGS_LIBRARY_PATH)) -o $(1)
+	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_RPATHS_FROM_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH) $(LDFLAGS_LIBRARY_PATH)) -o $(1)-noinst
 endif
 endef
 
@@ -770,7 +772,7 @@ $(foreach x,$(INST_PROGRAMS),$(eval $(call INST_PROG_RULES,$(x),$(call EXPAND_LI
 # ARGS: target, objects, deps
 define STATIC_LIBRARY_RULE
 $(1): $(2) $(3)
-	$(strip $(AR) $(ARFLAGS)) $(1) $(2)
+	$(strip $(AR) $(ARFLAGS_GENERAL)) $(1) $(2)
 endef
 
 # ARGS: qual_lib_name, objects, qualified_expanded_lib_refs, deps, link_cmd, ldflags
@@ -778,7 +780,7 @@ endef
 # FIXME: Add '-Wl,-rpath' if linking against locally built and installed libraries, but it requires us to know the library installation directory. Or maybe it is better to set LD_RUN_PATH.
 define SHARED_LIBRARY_RULE
 $(1): $(2) $(call FILTER_UNPACK,inst:%,$(3)) $(4)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(LDFLAGS) $(6) $(call GET_SPECIAL_SHARED_LIB_OPTS,$(1))) -o $(1)
+	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH) $(call GET_SPECIAL_SHARED_LIB_OPTS,$(1)) $(LDFLAGS_LIBRARY_PATH)) -o $(1)
 endef
 
 .PHONY: update-libdeps-files
@@ -828,82 +830,82 @@ $(foreach x,$(INST_LIBRARIES),$(eval $(call INST_LIB_RULES,$(x),$(call EXPAND_LI
 # COMPILING + AUTOMATIC DEPENDENCIES
 
 %$(SUFFIX_OBJ_STATIC_OPTIM): %.c
-	$(strip $(CC_STATIC_OPTIM) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_OPTIM) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CC_STATIC_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,_OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_STATIC_OPTIM): %.cpp
-	$(strip $(CXX_STATIC_OPTIM) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_OPTIM) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CXX_STATIC_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,_OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_OPTIM): %.c
-	$(strip $(CC_SHARED_OPTIM) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_OPTIM) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CC_SHARED_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,_OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_OPTIM): %.cpp
-	$(strip $(CXX_SHARED_OPTIM) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_OPTIM) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CXX_SHARED_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,_OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 
 %$(SUFFIX_OBJ_STATIC_DEBUG): %.c
-	$(strip $(CC_STATIC_DEBUG) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_DEBUG) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CC_STATIC_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,_DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_STATIC_DEBUG): %.cpp
-	$(strip $(CXX_STATIC_DEBUG) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_DEBUG) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CXX_STATIC_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,_DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_DEBUG): %.c
-	$(strip $(CC_SHARED_DEBUG) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_DEBUG) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CC_SHARED_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,_DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_DEBUG): %.cpp
-	$(strip $(CXX_SHARED_DEBUG) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_DEBUG) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CXX_SHARED_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,_DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 
 %$(SUFFIX_OBJ_STATIC_COVER): %.c
-	$(strip $(CC_STATIC_COVER) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_COVER) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
+	$(strip $(CC_STATIC_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,_COVER) $(CFLAGS_ARCH) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
 
 %$(SUFFIX_OBJ_STATIC_COVER): %.cpp
-	$(strip $(CXX_STATIC_COVER) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_COVER) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
+	$(strip $(CXX_STATIC_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,_COVER) $(CFLAGS_ARCH) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
 
 %$(SUFFIX_OBJ_SHARED_COVER): %.c
-	$(strip $(CC_SHARED_COVER) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_COVER) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
+	$(strip $(CC_SHARED_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,_COVER) $(CFLAGS_ARCH) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
 
 %$(SUFFIX_OBJ_SHARED_COVER): %.cpp
-	$(strip $(CXX_SHARED_COVER) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_COVER) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
+	$(strip $(CXX_SHARED_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,_COVER) $(CFLAGS_ARCH) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
 
 
 
 %$(SUFFIX_OBJ_STATIC_OPTIM): %.m
-	$(strip $(OCC_STATIC_OPTIM) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_OPTIM) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCC_STATIC_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,_OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_STATIC_OPTIM): %.mm
-	$(strip $(OCXX_STATIC_OPTIM) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_OPTIM) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCXX_STATIC_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,_OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_OPTIM): %.m
-	$(strip $(OCC_SHARED_OPTIM) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_OPTIM) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCC_SHARED_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,_OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_OPTIM): %.mm
-	$(strip $(OCXX_SHARED_OPTIM) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_OPTIM) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCXX_SHARED_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,_OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 
 %$(SUFFIX_OBJ_STATIC_DEBUG): %.m
-	$(strip $(OCC_STATIC_DEBUG) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_DEBUG) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCC_STATIC_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,_DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_STATIC_DEBUG): %.mm
-	$(strip $(OCXX_STATIC_DEBUG) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_DEBUG) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCXX_STATIC_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,_DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_DEBUG): %.m
-	$(strip $(OCC_SHARED_DEBUG) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_DEBUG) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCC_SHARED_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,_DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_DEBUG): %.mm
-	$(strip $(OCXX_SHARED_DEBUG) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_DEBUG) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCXX_SHARED_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,_DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 
 %$(SUFFIX_OBJ_STATIC_COVER): %.m
-	$(strip $(OCC_STATIC_COVER) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_COVER) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
+	$(strip $(OCC_STATIC_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,_COVER) $(CFLAGS_ARCH) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
 
 %$(SUFFIX_OBJ_STATIC_COVER): %.mm
-	$(strip $(OCXX_STATIC_COVER) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_COVER) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
+	$(strip $(OCXX_STATIC_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,_COVER) $(CFLAGS_ARCH) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
 
 %$(SUFFIX_OBJ_SHARED_COVER): %.m
-	$(strip $(OCC_SHARED_COVER) $(CFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_COVER) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
+	$(strip $(OCC_SHARED_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,_COVER) $(CFLAGS_ARCH) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
 
 %$(SUFFIX_OBJ_SHARED_COVER): %.mm
-	$(strip $(OCXX_SHARED_COVER) $(CXXFLAGS) $(call GET_CFLAGS_FOR_OBJECT,$*.o,_COVER) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
+	$(strip $(OCXX_SHARED_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,_COVER) $(CFLAGS_ARCH) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
 
 
 -include $(OBJECTS:.o=.d)
