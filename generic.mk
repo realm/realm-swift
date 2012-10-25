@@ -103,10 +103,22 @@ PROG_DENOM_COVER      = -cov
 NO_BUILD_ON_INSTALL =
 
 # When set to an empty value, 'make install' will not install the
+# static versions of the libraries mentioned in lib_LIBRARIES, and a
+# plain 'make' will not even build them. When set to a nonempty value,
+# the opposite is true.
+ENABLE_INSTALL_STATIC_LIBS =
+
+# When set to an empty value, 'make install' will not install the
+# debug versions of the libraries mentioned in lib_LIBRARIES, and a
+# plain 'make' will not even build them. When set to a nonempty value,
+# the opposite is true.
+ENABLE_INSTALL_DEBUG_LIBS =
+
+# When set to an empty value, 'make install' will not install the
 # debug versions of the programs mentioned in bin_PROGRAMS, and a
 # plain 'make' will not even build them. When set to a nonempty value,
 # the opposite is true.
-INSTALL_DEBUG_PROGS =
+ENABLE_INSTALL_DEBUG_PROGS =
 
 # Installation (GNU style)
 prefix          = /usr/local
@@ -406,15 +418,30 @@ TARGETS_TEST_PROG_OPTIM   = $(foreach x,$(TEST_PROGRAMS),$(x)$(SUFFIX_PROG_OPTIM
 TARGETS_TEST_PROG_DEBUG   = $(foreach x,$(TEST_PROGRAMS),$(x)$(SUFFIX_PROG_DEBUG))
 TARGETS_TEST_PROG_COVER   = $(foreach x,$(TEST_PROGRAMS),$(x)$(SUFFIX_PROG_COVER))
 
-ifeq ($(INSTALL_DEBUG_PROGS),)
-TARGETS_DEFAULT     = $(TARGETS_LIB_STATIC_OPTIM) $(TARGETS_LIB_SHARED_OPTIM) $(TARGETS_LIB_SHARED_DEBUG) $(TARGETS_NOINST_LIB_OPTIM) $(TARGETS_PROG_OPTIM) $(TARGETS_NOINST_PROG_OPTIM)
-else
-TARGETS_DEFAULT     = $(TARGETS_LIB_STATIC_OPTIM) $(TARGETS_LIB_SHARED_OPTIM) $(TARGETS_LIB_SHARED_DEBUG) $(TARGETS_NOINST_LIB_OPTIM) $(TARGETS_PROG_OPTIM) $(TARGETS_PROG_DEBUG) $(TARGETS_NOINST_PROG_OPTIM)
+TARGETS_DEFAULT     =
+ifneq ($(ENABLE_INSTALL_STATIC_LIBS),)
+TARGETS_DEFAULT    += $(TARGETS_LIB_STATIC_OPTIM)
 endif
+TARGETS_DEFAULT    += $(TARGETS_LIB_SHARED_OPTIM)
+ifneq ($(or $(ENABLE_INSTALL_DEBUG_LIBS),$(ENABLE_INSTALL_DEBUG_PROGS)),)
+TARGETS_DEFAULT    += $(TARGETS_LIB_SHARED_DEBUG)
+endif
+TARGETS_DEFAULT    += $(TARGETS_NOINST_LIB_OPTIM)
+ifneq ($(ENABLE_INSTALL_DEBUG_PROGS),)
+TARGETS_DEFAULT    += $(TARGETS_NOINST_LIB_DEBUG)
+endif
+TARGETS_DEFAULT    += $(TARGETS_PROG_OPTIM)
+ifneq ($(ENABLE_INSTALL_DEBUG_PROGS),)
+TARGETS_DEFAULT    += $(TARGETS_PROG_DEBUG)
+endif
+TARGETS_DEFAULT    += $(TARGETS_NOINST_PROG_OPTIM)
+
 TARGETS_MINIMAL     = $(TARGETS_LIB_SHARED_OPTIM) $(TARGETS_NOINST_LIB_OPTIM) $(TARGETS_PROG_OPTIM) $(TARGETS_NOINST_PROG_OPTIM)
 TARGETS_NODEBUG     = $(TARGETS_LIB_STATIC_OPTIM) $(TARGETS_LIB_SHARED_OPTIM) $(TARGETS_NOINST_LIB_OPTIM) $(TARGETS_PROG_OPTIM) $(TARGETS_NOINST_PROG_OPTIM)
 TARGETS_DEBUG       = $(TARGETS_LIB_SHARED_DEBUG) $(TARGETS_NOINST_LIB_DEBUG) $(TARGETS_PROG_DEBUG) $(TARGETS_NOINST_PROG_DEBUG)
 TARGETS_COVER       = $(TARGETS_LIB_SHARED_COVER) $(TARGETS_NOINST_LIB_COVER) $(TARGETS_PROG_COVER) $(TARGETS_NOINST_PROG_COVER)
+TARGETS_EVERYTHING  = $(TARGETS_LIB_STATIC_OPTIM) $(TARGETS_LIB_SHARED_OPTIM) $(TARGETS_LIB_SHARED_DEBUG) $(TARGETS_NOINST_LIB_OPTIM) $(TARGETS_NOINST_LIB_DEBUG)
+TARGETS_EVERYTHING += $(TARGETS_PROG_OPTIM) $(TARGETS_PROG_DEBUG) $(TARGETS_NOINST_PROG_OPTIM) $(TARGETS_NOINST_PROG_DEBUG) $(TARGETS_TEST_PROG_OPTIM) $(TARGETS_TEST_PROG_DEBUG)
 TARGETS_TEST        = $(TARGETS_LIB_SHARED_OPTIM) $(TARGETS_NOINST_LIB_OPTIM) $(TARGETS_TEST_PROG_OPTIM)
 TARGETS_TEST_DEBUG  = $(TARGETS_LIB_SHARED_DEBUG) $(TARGETS_NOINST_LIB_DEBUG) $(TARGETS_TEST_PROG_DEBUG)
 TARGETS_TEST_COVER  = $(TARGETS_LIB_SHARED_COVER) $(TARGETS_NOINST_LIB_COVER) $(TARGETS_TEST_PROG_COVER)
@@ -429,7 +456,7 @@ TARGETS_TEST_PROG   = $(TARGETS_TEST_PROG_OPTIM) $(TARGETS_TEST_PROG_DEBUG) $(TA
 TARGETS  = $(TARGETS_LIB_STATIC) $(TARGETS_LIB_SHARED) $(TARGETS_NOINST_LIB)
 TARGETS += $(foreach x,$(TARGETS_PROG),$(x) $(x)-noinst) $(TARGETS_NOINST_PROG) $(TARGETS_TEST_PROG)
 
-RECURSIVE_MODES = default minimal nodebug debug cover clean install uninstall test-norun test-debug-norun test test-debug test-cover memtest memtest-debug
+RECURSIVE_MODES = default minimal nodebug debug cover everything clean install uninstall test-norun test-debug-norun test test-debug test-cover memtest memtest-debug
 
 .PHONY: all
 all: default
@@ -439,6 +466,7 @@ minimal/local:    $(TARGETS_MINIMAL) update-libdeps-files
 nodebug/local:    $(TARGETS_NODEBUG) update-libdeps-files
 debug/local:      $(TARGETS_DEBUG) update-libdeps-files
 cover/local:      $(TARGETS_COVER) update-libdeps-files
+everything/local: $(TARGETS_EVERYTHING) update-libdeps-files
 test-norun:       $(TARGETS_TEST) update-libdeps-files
 test-debug-norun: $(TARGETS_TEST_DEBUG) update-libdeps-files
 
@@ -522,9 +550,15 @@ clean clean/after: $(patsubst %,subdir/%/clean,$(PASSIVE_SUBDIRS))
 
 ifeq ($(NO_BUILD_ON_INSTALL),)
 install/local: default/local
-install/libs: $(TARGETS_LIB_SHARED_OPTIM) $(TARGETS_LIB_STATIC_OPTIM) $(TARGETS_LIB_SHARED_DEBUG)
+ifneq ($(ENABLE_INSTALL_STATIC_LIBS),)
+install/libs: $(TARGETS_LIB_STATIC_OPTIM)
+endif
+install/libs: $(TARGETS_LIB_SHARED_OPTIM)
+ifneq ($(ENABLE_INSTALL_DEBUG_LIBS),)
+install/libs: $(TARGETS_LIB_SHARED_DEBUG)
+endif
 install/progs: $(TARGETS_PROG_OPTIM)
-ifneq ($(INSTALL_DEBUG_PROGS),)
+ifneq ($(ENABLE_INSTALL_DEBUG_PROGS),)
 install/progs: $(TARGETS_PROG_DEBUG)
 endif
 endif
@@ -557,13 +591,21 @@ INSTALL_RECIPE_PROG   = $(if $(2),$(INSTALL_PROGRAM) $(2) $(call GET_PROG_INSTAL
 UNINSTALL_RECIPE_LIB  = $(RM) $(call GET_LIB_INSTALL_DIR,$(1))/$(2)
 UNINSTALL_RECIPE_PROG = $(RM) $(call GET_PROG_INSTALL_DIR,$(1))/$(2)
 
-GET_INST_LIB_TARGETS  = $(foreach x,$($(1)_LIBRARIES),$(foreach y,$(SUFFIX_LIB_SHARED_OPTIM) $(SUFFIX_LIB_STATIC_OPTIM) $(SUFFIX_LIB_SHARED_DEBUG),$(call GET_LIBRARY_NAME,$(x))$(y)))
-
-ifeq ($(INSTALL_DEBUG_PROGS),)
-GET_INST_PROG_TARGETS = $(foreach x,$($(1)_PROGRAMS),$(x)$(SUFFIX_PROG_OPTIM))
-else
-GET_INST_PROG_TARGETS = $(foreach x,$($(1)_PROGRAMS),$(x)$(SUFFIX_PROG_OPTIM) $(x)$(SUFFIX_PROG_DEBUG))
+INST_LIB_SUFFICES   =
+ifneq ($(ENABLE_INSTALL_STATIC_LIBS),)
+INST_LIB_SUFFICES  += +$(SUFFIX_LIB_STATIC_OPTIM)
 endif
+INST_LIB_SUFFICES  += +$(SUFFIX_LIB_SHARED_OPTIM)
+ifneq ($(ENABLE_INSTALL_DEBUG_LIBS),)
+INST_LIB_SUFFICES  += +$(SUFFIX_LIB_SHARED_DEBUG)
+endif
+INST_PROG_SUFFICES  = +$(SUFFIX_PROG_OPTIM)
+ifneq ($(ENABLE_INSTALL_DEBUG_PROGS),)
+INST_PROG_SUFFICES += +$(SUFFIX_PROG_DEBUG)
+endif
+
+GET_INST_LIB_TARGETS  = $(foreach x,$($(1)_LIBRARIES),$(foreach y,$(INST_LIB_SUFFICES),$(call GET_LIBRARY_NAME,$(x))$(patsubst +%,%,$(y))))
+GET_INST_PROG_TARGETS = $(foreach x,$($(1)_PROGRAMS),$(foreach y,$(INST_PROG_SUFFICES),$(x)$(patsubst +%,%,$(y))))
 
 define INSTALL_RULES
 
@@ -644,7 +686,7 @@ $(eval $(TEST_RULES))
 
 # neither inst nor noinst libs can have noinst lib dependencies
 # noinst libs can have associated LDFLAGS
-# mynoinstlib.libdeps = noinst lib:../libfoo.a lib:libbar.a rpath:. rpath:../dir1 ldflag:-lhest ldflag:-L../dir2 ldflag-dbg:-lhest ldflag-dbg:-L../dir2 ldflag-cov:-lhest ldflag-cov:-L../dir2
+# mynoinstlib.libdeps = noinst lib:../libfoo.a lib:libbar.a rpath:. rpath:../dir1 ldflag-opt:-lhest ldflag-opt:-L../dir2 ldflag-dbg:-lhest ldflag-dbg:-L../dir2 ldflag-cov:-lhest ldflag-cov:-L../dir2
 # libmyinst.libdeps = rpath:../dir1 rpath:../dir2
 # rpaths in inst lib are the the paths of all installed libraries that it depends on (transitively closed)
 # rpaths in noinst lib are the union of the rpaths in .libdeps of all the installed libraries that it depends on (transitively closed)
@@ -654,7 +696,7 @@ $(eval $(TEST_RULES))
 # in lib dep expansion duplicates must be removed
 
 # Expand the contents of the target_LIBS variable for the specified target. The target should be either a program or an installed (i.e. a shared) library.
-# Output example for program: noinst:../foo/bar inst:../beta/libalpha lib:alpha dir:../beta rpath:/abs/path/beta ldflag:-ldelta ldflag-dbg:-ldelta ldflag-cov:-ldelta
+# Output example for program: noinst:../foo/bar inst:../beta/libalpha lib:alpha dir:../beta rpath:/abs/path/beta ldflag-opt:-ldelta ldflag-dbg:-ldelta ldflag-cov:-ldelta
 # Output example for installed library: inst:../beta/libalpha lib:alpha dir:../beta rpath:/abs/path/beta
 EXPAND_LIB_REFS   = $(call FOLD_LEFT,EXPAND_LIB_REFS_1,,$(strip $($(call FOLD_TARGET,$(1))_LIBS)))
 EXPAND_LIB_REFS_1 = $(call EXPAND_LIB_REFS_2,$(1),$(2),$(call READ_LIB_LIBDEPS,$(2)))
@@ -676,13 +718,13 @@ READ_LIB_LIBDEPS_3 = $(call PATH_DIFF,$(call MAKE_ABS_PATH,$(1),$(2)),.)
 IS_NOINST_LIB   = $(call FIND,IS_NOINST_LIB_1,$(NOINST_LIBRARIES),$(1))
 IS_NOINST_LIB_1 = $(and $(call IN_THIS_DIR,$(1)),$(call EQUALS,$(notdir $(1)),$(2)))
 
-# Example: noinst lib:../libfoo.a lib:libbar.a rpath:. rpath:../dir1 ldflag:-lhest ldflag:-L../dir2 ldflag-dbg:-lhest ldflag-dbg:-L../dir2 ldflag-cov:-lhest ldflag-cov:-L../dir2
+# Example: noinst lib:../libfoo.a lib:libbar.a rpath:. rpath:../dir1 ldflag-opt:-lhest ldflag-opt:-L../dir2 ldflag-dbg:-lhest ldflag-dbg:-L../dir2 ldflag-cov:-lhest ldflag-cov:-L../dir2
 MAKE_NOINST_LIB_LIBDEPS   = $(strip noinst $(call MAKE_NOINST_LIB_LIBDEPS_1,$(1)) $(call MAKE_NOINST_LIB_LIBDEPS_2,$(1)))
 MAKE_NOINST_LIB_LIBDEPS_1 = $(foreach x,$($(call FOLD_TARGET,$(1))_LIBS),lib:$(x) $(call READ_LIB_LIBDEPS,$(x)))
 MAKE_NOINST_LIB_LIBDEPS_2 = $(call MAKE_NOINST_LIB_LIBDEPS_3,$(1)) $(call MAKE_NOINST_LIB_LIBDEPS_4,$(1)) $(call MAKE_NOINST_LIB_LIBDEPS_5,$(1))
-MAKE_NOINST_LIB_LIBDEPS_3 = $(foreach x,$(call GET_LDFLAGS_FOR_TARGET,$(1),_OPTIM),ldflag:$(x))
-MAKE_NOINST_LIB_LIBDEPS_4 = $(foreach x,$(call GET_LDFLAGS_FOR_TARGET,$(1),_DEBUG),ldflag-dbg:$(x))
-MAKE_NOINST_LIB_LIBDEPS_5 = $(foreach x,$(call GET_LDFLAGS_FOR_TARGET,$(1),_COVER),ldflag-cov:$(x))
+MAKE_NOINST_LIB_LIBDEPS_3 = $(foreach x,$(call GET_FLAGS,$(call FOLD_TARGET,$(1))_LDFLAGS,_OPTIM),ldflag-opt:$(x))
+MAKE_NOINST_LIB_LIBDEPS_4 = $(foreach x,$(call GET_FLAGS,$(call FOLD_TARGET,$(1))_LDFLAGS,_DEBUG),ldflag-dbg:$(x))
+MAKE_NOINST_LIB_LIBDEPS_5 = $(foreach x,$(call GET_FLAGS,$(call FOLD_TARGET,$(1))_LDFLAGS,_COVER),ldflag-cov:$(x))
 
 # Example: rpath:../dir1 rpath:../dir2
 MAKE_INST_LIB_LIBDEPS = $(call EXTRACT_INST_LIB_LIBDEPS,$(call EXPAND_LIB_REFS,$(1)))
@@ -702,9 +744,9 @@ QUALIFY_LIB_REFS   = $(call SELECT_LDFLAGS$(2),$(call QUALIFY_LIB_REFS_1,$(1),$(
 QUALIFY_LIB_REFS_1 = $(call QUALIFY_LIB_REFS_2,$(1),$(SUFFIX_LIB_STATIC$(2)),$(SUFFIX_LIB_SHARED$(2)),$(LIB_DENOM$(2)))
 QUALIFY_LIB_REFS_2 = $(patsubst noinst:%,noinst:%$(2),$(patsubst inst:%,inst:%$(3),$(patsubst lib:%,lib:%$(4),$(1))))
 
-SELECT_LDFLAGS_OPTIM = $(filter-out ldflag-dbg:% ldflag-cov:%,$(1))
-SELECT_LDFLAGS_DEBUG = $(patsubst ldflag-dbg:%,ldflag:%,$(filter-out ldflag:% ldflag-cov:%,$(1)))
-SELECT_LDFLAGS_COVER = $(patsubst ldflag-cov:%,ldflag:%,$(filter-out ldflag:% ldflag-dbg:%,$(1)))
+SELECT_LDFLAGS_OPTIM = $(patsubst ldflag-opt:%,ldflag:%,$(filter-out ldflag-dbg:% ldflag-cov:%,$(1)))
+SELECT_LDFLAGS_DEBUG = $(patsubst ldflag-dbg:%,ldflag:%,$(filter-out ldflag-opt:% ldflag-cov:%,$(1)))
+SELECT_LDFLAGS_COVER = $(patsubst ldflag-cov:%,ldflag:%,$(filter-out ldflag-opt:% ldflag-dbg:%,$(1)))
 
 UNPACK_LIB_REFS = $(call FILTER_UNPACK,noinst:%,$(1)) $(call FILTER_PATSUBST,lib:%,-l%,$(1)) $(call FILTER_PATSUBST,dir:%,-L%,$(1)) $(call FILTER_UNPACK,ldflag:%,$(1))
 
