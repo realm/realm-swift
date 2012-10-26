@@ -32,7 +32,7 @@ case "$MODE" in
             for x in $PLATFORMS; do
                 make -C "TightDb/TightDb" BASE_DENOM="$x" clean || exit 1
             done
-            (cd "TightDb/TightDb" && rm -f "libtightdb-objc-ios.a" "libtightdb-objc-ios-dbg.a") || exit 1
+            make -C "TightDb/TightDb" BASE_DENOM="ios" clean || exit 1
         fi
         exit 0
         ;;
@@ -72,7 +72,7 @@ case "$MODE" in
                 LATEST="$(cat "$TEMP_DIR/$x/versions-sorted" | head -n 1)" || exit 1
                 (cd "$TEMP_DIR/$x" && ln "$LATEST" "sdk_root") || exit 1
                 if [ "$x" = "iPhoneSimulator" ]; then
-                ARCH="i386"
+                ARCH="x86_64"
                 else
                     TYPE="$(defaults read-type "$PLATFORM_HOME/Info" "DefaultProperties")" || exit 1
                     if [ "$TYPE" != "Type is dictionary" ]; then
@@ -89,12 +89,12 @@ case "$MODE" in
                 PLATFORM_HOME="$XCODE_HOME/Platforms/$x.platform"
                 SDK_ROOT="$(cat "$TEMP_DIR/$x/sdk_root")" || exit 1
                 ARCH="$(cat "$TEMP_DIR/$x/arch")" || exit 1
-                make -C "TightDb/TightDb" BASE_DENOM="$x" CFLAGS_ARCH="-arch $ARCH -isysroot $SDK_ROOT" "libtightdb-objc-$x.a" "libtightdb-objc-$x-dbg.a" || exit 1
-                cp "src/tightdb/libtightdb-objc-$x.a"     "$TEMP_DIR/$x/libtightdb-objc.a"     || exit 1
-                cp "src/tightdb/libtightdb-objc-$x-dbg.a" "$TEMP_DIR/$x/libtightdb-objc-dbg.a" || exit 1
+                make -C "TightDb/TightDb" TIGHTDB_CONFIG="tightdb-config-ios" BASE_DENOM="$x" CFLAGS_ARCH="-arch $ARCH -isysroot $SDK_ROOT" "libtightdb-objc-$x.a" "libtightdb-objc-$x-dbg.a" || exit 1
+                cp "TightDb/TightDb/libtightdb-objc-$x.a"     "$TEMP_DIR/$x/libtightdb-objc.a"     || exit 1
+                cp "TightDb/TightDb/libtightdb-objc-$x-dbg.a" "$TEMP_DIR/$x/libtightdb-objc-dbg.a" || exit 1
             done
-            lipo "$TEMP_DIR"/*/"libtightdb-objc.a"     -create -output "src/tightdb/libtightdb-objc-ios.a"     || exit 1
-            lipo "$TEMP_DIR"/*/"libtightdb-objc-dbg.a" -create -output "src/tightdb/libtightdb-objc-ios-dbg.a" || exit 1
+            lipo "$TEMP_DIR"/*/"libtightdb-objc.a"     -create -output "TightDb/TightDb/libtightdb-objc-ios.a"     || exit 1
+            lipo "$TEMP_DIR"/*/"libtightdb-objc-dbg.a" -create -output "TightDb/TightDb/libtightdb-objc-ios-dbg.a" || exit 1
         fi
         exit 0
         ;;
