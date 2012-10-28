@@ -6,7 +6,16 @@
 /*.gcno
 /*.gcda
 
-/libtightdb-objc.so
 /libtightdb-objc.a
+/libtightdb-objc.so
+/libtightdb-objc-dbg.a
 /libtightdb-objc-dbg.so
 /libtightdb-objc-cov.so
+
+/libtightdb-objc-iPhoneOS.a
+/libtightdb-objc-iPhoneOS-dbg.a
+/libtightdb-objc-iPhoneSimulator.a
+/libtightdb-objc-iPhoneSimulator-dbg.a
+
+/libtightdb-objc-ios.a
+/libtightdb-objc-ios-dbg.a

@@ -1,1 +1,10 @@
-*.o
+/*.o
+/*.d
+
+# Coverage data
+/*.gcno
+/*.gcda
+
+/unit-tests
+/unit-tests-dbg
+/unit-tests-cov

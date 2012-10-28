@@ -3,7 +3,7 @@ lib_LIBRARIES = libtightdb-objc.a
 TIGHTDB_CONFIG = tightdb-config
 
 libtightdb_objc_a_SOURCES       = Table.mm Cursor.mm Group.mm Query.mm
-libtightdb_objc_a_CFLAGS        = -fobjc-arc
+libtightdb_objc_a_CFLAGS        = -fobjc-arc -fobjc-abi-version=2
 libtightdb_objc_a_CFLAGS_OPTIM  = $(shell $(TIGHTDB_CONFIG)     --cflags) -I../../Deliv
 libtightdb_objc_a_CFLAGS_DEBUG  = $(shell $(TIGHTDB_CONFIG)-dbg --cflags) -I../../Deliv
 libtightdb_objc_a_CFLAGS_COVER  = $(shell $(TIGHTDB_CONFIG)-dbg --cflags) -I../../Deliv
