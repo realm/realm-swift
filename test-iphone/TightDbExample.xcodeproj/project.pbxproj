@@ -10,8 +10,6 @@
 		410B4DCA156E0C8F0048E4C8 /* Performance.m in Sources */ = {isa = PBXBuildFile; fileRef = 410B4DC9156E0C8F0048E4C8 /* Performance.m */; };
 		410B4DCE156E10430048E4C8 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 410B4DCD156E10430048E4C8 /* Utils.m */; };
 		410B4DD3156E59A30048E4C8 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 410B4DD2156E59A30048E4C8 /* libsqlite3.dylib */; };
-		41584FB9156D248D00DB2995 /* libtightdb_all.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 41584FB8156D248D00DB2995 /* libtightdb_all.a */; };
-		E94A8C0F1541FDB000B174B5 /* libTightDbOC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94A8C0E1541FDB000B174B5 /* libTightDbOC.a */; };
 		E9D58B4F1541A375009150B1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B4E1541A375009150B1 /* UIKit.framework */; };
 		E9D58B511541A375009150B1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B501541A375009150B1 /* Foundation.framework */; };
 		E9D58B531541A375009150B1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B521541A375009150B1 /* CoreGraphics.framework */; };
@@ -53,8 +51,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				410B4DD3156E59A30048E4C8 /* libsqlite3.dylib in Frameworks */,
-				41584FB9156D248D00DB2995 /* libtightdb_all.a in Frameworks */,
-				E94A8C0F1541FDB000B174B5 /* libTightDbOC.a in Frameworks */,
 				E9D58B4F1541A375009150B1 /* UIKit.framework in Frameworks */,
 				E9D58B511541A375009150B1 /* Foundation.framework in Frameworks */,
 				E9D58B531541A375009150B1 /* CoreGraphics.framework in Frameworks */,
@@ -236,10 +232,6 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"TIGHTDB_DEBUG=1",
-					"$(inherited)",
-				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -277,10 +269,13 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TightDbExample/TightDbExample-Prefix.pch";
-				HEADER_SEARCH_PATHS = include;
+				HEADER_SEARCH_PATHS = ../src;
 				INFOPLIST_FILE = "TightDbExample/TightDbExample-Info.plist";
-				LIBRARY_SEARCH_PATHS = lib/Debug;
-				OTHER_LDFLAGS = "-lstdc++";
+				LIBRARY_SEARCH_PATHS = ../src/tightdb/objc;
+				OTHER_LDFLAGS = (
+					"-lstdc++",
+					"-ltightdb-objc-ios-dbg",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -291,10 +286,13 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TightDbExample/TightDbExample-Prefix.pch";
-				HEADER_SEARCH_PATHS = include;
+				HEADER_SEARCH_PATHS = ../src;
 				INFOPLIST_FILE = "TightDbExample/TightDbExample-Info.plist";
-				LIBRARY_SEARCH_PATHS = lib/Release;
-				OTHER_LDFLAGS = "-lstdc++";
+				LIBRARY_SEARCH_PATHS = ../src/tightdb/objc;
+				OTHER_LDFLAGS = (
+					"-lstdc++",
+					"-ltightdb-objc-ios",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
