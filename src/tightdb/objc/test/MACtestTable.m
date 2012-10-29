@@ -5,8 +5,9 @@
 // Using lowlevel interface, test creation of creating two columns with two rows
 //
 
+#import <tightdb/objc/Table.h>
+
 #import "MACtestTable.h"
-#import "Table.h"
 
 
 @implementation MACtestTable

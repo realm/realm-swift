@@ -42,21 +42,21 @@ word_list_append()
 case "$MODE" in
 
     "clean")
-        make -C "TightDb" clean
+        make clean || exit 1
         if [ "$OS" = "Darwin" ]; then
             PLATFORMS="iPhoneOS iPhoneSimulator"
             for x in $PLATFORMS; do
-                make -C "TightDb/TightDb" BASE_DENOM="$x" clean || exit 1
+                make BASE_DENOM="$x" clean || exit 1
             done
-            make -C "TightDb/TightDb" BASE_DENOM="ios" clean || exit 1
+            make BASE_DENOM="ios" clean || exit 1
         fi
         exit 0
         ;;
 
     "build")
 # FIXME: Our language binding requires that Objective-C ARC is enabled, which, in turn, is only available on a 64-bit architecture, so for now we cannot build a "fat" version.
-#        TIGHTDB_ENABLE_FAT_BINARIES="1" make -C "TightDb" || exit 1
-        make -C "TightDb" || exit 1
+#        TIGHTDB_ENABLE_FAT_BINARIES="1" make || exit 1
+        make || exit 1
         if [ "$OS" = "Darwin" ]; then
             TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.build.XXXX)" || exit 1
             # Xcode provides the iPhoneOS SDK
@@ -107,9 +107,9 @@ case "$MODE" in
                 PLATFORM_HOME="$XCODE_HOME/Platforms/$x.platform"
                 SDK_ROOT="$(cat "$TEMP_DIR/$x/sdk_root")" || exit 1
                 ARCH="$(cat "$TEMP_DIR/$x/arch")" || exit 1
-                make -C "TightDb/TightDb" TIGHTDB_CONFIG="tightdb-config-ios" BASE_DENOM="$x" CFLAGS_ARCH="-arch $ARCH -isysroot $SDK_ROOT" "libtightdb-objc-$x.a" "libtightdb-objc-$x-dbg.a" || exit 1
-                cp "TightDb/TightDb/libtightdb-objc-$x.a"     "$TEMP_DIR/$x/libtightdb-objc.a"     || exit 1
-                cp "TightDb/TightDb/libtightdb-objc-$x-dbg.a" "$TEMP_DIR/$x/libtightdb-objc-dbg.a" || exit 1
+                make -C "src/tightdb/objc" TIGHTDB_CONFIG="tightdb-config-ios" BASE_DENOM="$x" CFLAGS_ARCH="-arch $ARCH -isysroot $SDK_ROOT" "libtightdb-objc-$x.a" "libtightdb-objc-$x-dbg.a" || exit 1
+                cp "src/tightdb/objc/libtightdb-objc-$x.a"     "$TEMP_DIR/$x/libtightdb-objc.a"     || exit 1
+                cp "src/tightdb/objc/libtightdb-objc-$x-dbg.a" "$TEMP_DIR/$x/libtightdb-objc-dbg.a" || exit 1
             done
             lipo "$TEMP_DIR"/*/"libtightdb-objc.a"     -create -output "$TEMP_DIR/libtightdb-objc-ios.a"     || exit 1
             lipo "$TEMP_DIR"/*/"libtightdb-objc-dbg.a" -create -output "$TEMP_DIR/libtightdb-objc-ios-dbg.a" || exit 1
@@ -117,17 +117,17 @@ case "$MODE" in
             for x in $(printf "%s\n" "$LIBRARY_PATH" | sed 's/:/ /g'); do
                 word_list_append LDFLAGS "-L$x" || exit 1
             done
-            libtool -static -o "TightDb/TightDb/libtightdb-objc-ios.a"     "$TEMP_DIR/libtightdb-objc-ios.a"     -ltightdb-ios     $LDFLAGS || exit 1
-            libtool -static -o "TightDb/TightDb/libtightdb-objc-ios-dbg.a" "$TEMP_DIR/libtightdb-objc-ios-dbg.a" -ltightdb-ios-dbg $LDFLAGS || exit 1
+            libtool -static -o "src/tightdb/objc/libtightdb-objc-ios.a"     "$TEMP_DIR/libtightdb-objc-ios.a"     -ltightdb-ios     $LDFLAGS || exit 1
+            libtool -static -o "src/tightdb/objc/libtightdb-objc-ios-dbg.a" "$TEMP_DIR/libtightdb-objc-ios-dbg.a" -ltightdb-ios-dbg $LDFLAGS || exit 1
         fi
         exit 0
         ;;
 
     "test")
-        make -C "TightDb" test-norun || exit 1
+        make test-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test.XXXX)" || exit 1
         mkdir -p "$TEMP_DIR/unit-tests.octest/Contents/MacOS" || exit 1
-        cp "TightDb/MacTightDbTests/unit-tests" "$TEMP_DIR/unit-tests.octest/Contents/MacOS/" || exit 1
+        cp "src/tightdb/objc/test/unit-tests" "$TEMP_DIR/unit-tests.octest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
         OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests.octest" || exit 1
         exit 0
@@ -138,7 +138,7 @@ case "$MODE" in
         if [ -z "$PREFIX" ]; then
             PREFIX="/usr/local"
         fi
-        make -C "TightDb" prefix="$PREFIX" install || exit 1
+        make prefix="$PREFIX" install || exit 1
         exit 0
         ;;
 
@@ -161,15 +161,14 @@ case "$MODE" in
 /build.sh
 /generic.mk
 /config.mk
-/Deliv
-/TightDb
-/TightDbExample
+/Makefile
+/src
+/test-installed
+/test-iphone
 /doc
 EOF
         cat >"$TEMP_DIR/exclude" <<EOF
 .gitignore
-/Deliv/Release
-/Deliv/Debug
 EOF
         grep -E -v '^(#.*)?$' "$TEMP_DIR/include" >"$TEMP_DIR/include2" || exit 1
         grep -E -v '^(#.*)?$' "$TEMP_DIR/exclude" >"$TEMP_DIR/exclude2" || exit 1
