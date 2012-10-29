@@ -6,11 +6,12 @@
 //  Copyright (c) 2012 InvulgoSoft. All rights reserved.
 //
 
-#import "Performance.h"
-#import "TightDb.h"
-#import "Group.h"
-#import "Utils.h"
 #import <sqlite3.h>
+#import <tightdb/objc/TightDb.h>
+#import <tightdb/objc/Group.h>
+
+#import "Performance.h"
+#import "Utils.h"
 
 TDB_TABLE_4(PerfTable,
             String, Name,
