@@ -3,9 +3,9 @@
 //  TightDB
 //
 
-#import "Table.h"
-#import "Query.h"
-#import "Cursor.h"
+#import <tightdb/objc/Table.h>
+#import <tightdb/objc/Query.h>
+#import <tightdb/objc/Cursor.h>
 
 #undef TDB_TABLE_IMPL_1
 #define TDB_TABLE_IMPL_1(TableName, CType1, CName1) \

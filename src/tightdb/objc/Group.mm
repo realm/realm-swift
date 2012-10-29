@@ -4,9 +4,10 @@
 //
 
 #import <tightdb/group.hpp>
-#import "Group.h"
-#import "Table.h"
-#import "TablePriv.h"
+
+#import <tightdb/objc/Group.h>
+#import <tightdb/objc/Table.h>
+#import <tightdb/objc/TablePriv.h>
 
 
 @interface Group()

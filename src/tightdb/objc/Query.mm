@@ -4,10 +4,11 @@
 //
 
 #import <tightdb/query.hpp>
-#import "Query.h"
-#import "Table.h"
-#import "TablePriv.h"
-#import "Cursor.h"
+
+#import <tightdb/objc/Query.h>
+#import <tightdb/objc/Table.h>
+#import <tightdb/objc/TablePriv.h>
+#import <tightdb/objc/Cursor.h>
 
 #pragma mark - TableView secrets
 
