@@ -144,7 +144,7 @@ case "$MODE" in
 
     "test-installed")
         PREFIX="$1"
-        echo "Not yet implemented" 1>&2
+        make test-installed || exit 1
         exit 1
         ;;
 
