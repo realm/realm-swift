@@ -127,7 +127,7 @@ case "$MODE" in
         make -C "TightDb" test-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test.XXXX)" || exit 1
         mkdir -p "$TEMP_DIR/unit-tests.octest/Contents/MacOS" || exit 1
-        (cd "$TEMP_DIR/unit-tests.octest/Contents/MacOS" && ln -s "$TIGHTDB_OBJC_HOME/TightDb/MacTightDbTests/unit-tests") || exit 1
+        cp "TightDb/MacTightDbTests/unit-tests" "$TEMP_DIR/unit-tests.octest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
         OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests.octest" || exit 1
         exit 0
