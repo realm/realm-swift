@@ -144,8 +144,8 @@ case "$MODE" in
 
     "test-installed")
         PREFIX="$1"
-        make test-installed || exit 1
-        exit 1
+        make -C "test-installed" test || exit 1
+        exit 0
         ;;
 
     "dist-copy")
