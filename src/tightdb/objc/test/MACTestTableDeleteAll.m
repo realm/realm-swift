@@ -3,8 +3,9 @@
 //  TightDB
 //
 
+#import <tightdb/objc/Table.h>
+
 #import "MACTestTableDeleteAll.h"
-#import "Table.h"
 
 @implementation MACTestTableDeleteAll
 

@@ -4,7 +4,8 @@
 //
 
 #import <SenTestingKit/SenTestingKit.h>
-#include "TightDb.h"
+
+#import <tightdb/objc/TightDb.h>
 
 TDB_TABLE_DEF_3(PeopleTable,
             String, Name,

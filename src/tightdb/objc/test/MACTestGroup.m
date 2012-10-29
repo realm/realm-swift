@@ -5,8 +5,9 @@
 //  Test save/load on disk of a group with one table
 //
 
+#import <tightdb/objc/Group.h>
+
 #import "MACTestGroup.h"
-#import "Group.h"
 
 TDB_TABLE_2(TestTableGroup,
 			String,     First,

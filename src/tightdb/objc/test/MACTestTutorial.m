@@ -6,9 +6,10 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
+#import <tightdb/objc/Group.h>
+#import <tightdb/objc/Table.h>
+
 #import "MACTestTutorial.h"
-#import "Group.h"
-#import "Table.h"
 
 TDB_TABLE_IMPL_3(PeopleTable,
 			String, Name,

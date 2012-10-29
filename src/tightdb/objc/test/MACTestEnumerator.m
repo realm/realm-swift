@@ -6,10 +6,11 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
+#import <tightdb/objc/TightDb.h>
+#import <tightdb/objc/Group.h>
+#import <tightdb/objc/Table.h>
+
 #import "MACTestEnumerator.h"
-#import "TightDb.h"
-#import "Group.h"
-#import "Table.h"
 
 
 TDB_TABLE_3(EnumPeopleTable,

@@ -3,8 +3,9 @@
 //  MacTightDbTests
 //
 
+#import <tightdb/objc/Table.h>
+
 #import "MacTightDbTests.h"
-#import "Table.h"
 
 @implementation MacTightDbTests
 
