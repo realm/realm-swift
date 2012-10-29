@@ -1,5 +1,5 @@
-#ifndef __TDB_COLUMNTYPE__
-#define __TDB_COLUMNTYPE__
+#ifndef TIGHTDB_OBJC_COLUMNTYPE_H
+#define TIGHTDB_OBJC_COLUMNTYPE_H
 
 // Make sure numbers match with <tightdb/column_type.hpp>
 
@@ -40,4 +40,4 @@ typedef enum  {
 #endif
 
 
-#endif //__TDB_COLUMNTYPE__
+#endif // TIGHTDB_OBJC_COLUMNTYPE_H

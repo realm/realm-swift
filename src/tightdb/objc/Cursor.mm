@@ -3,9 +3,10 @@
 //  TightDb
 
 #import <tightdb/table.hpp>
-#import "Cursor.h"
-#import "Table.h"
-#import "TablePriv.h"
+
+#import <tightdb/objc/Cursor.h>
+#import <tightdb/objc/Table.h>
+#import <tightdb/objc/TablePriv.h>
 
 #pragma mark - CursorBase
 

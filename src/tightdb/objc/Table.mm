@@ -5,12 +5,12 @@
 
 #import <tightdb/table.hpp>
 #import <tightdb/table_view.hpp>
-//#import "TightDb/alloc.hpp"
-#import "Table.h"
-#import "TablePriv.h"
-#import "Query.h"
-#import "QueryPriv.h"
-#import "Cursor.h"
+
+#import <tightdb/objc/Table.h>
+#import <tightdb/objc/TablePriv.h>
+#import <tightdb/objc/Query.h>
+#import <tightdb/objc/QueryPriv.h>
+#import <tightdb/objc/Cursor.h>
 
 #pragma mark BinaryData
 
@@ -33,7 +33,7 @@
     if (self) {
         _data = data;
     }
-    return self;    
+    return self;
 }
 -(tightdb::BinaryData)getBinary
 {
@@ -60,7 +60,7 @@
     if (self) {
         _memref = new tightdb::MemRef();
     }
-    return self;    
+    return self;
 }
 -(void *)getPointer
 {
@@ -96,7 +96,7 @@
 -(OCMemRef *)reAlloc:(size_t)r pointer:(void *)p size:(size_t)size
 {
     tightdb::MemRef ref = _allocator->ReAlloc(r, p, size);
-    return [[OCMemRef alloc] initWithPointer:ref.pointer ref:ref.ref];    
+    return [[OCMemRef alloc] initWithPointer:ref.pointer ref:ref.ref];
 }
 -(void)free:(size_t)ref pointer:(void *)p
 {
