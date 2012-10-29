@@ -86,7 +86,7 @@ case "$MODE" in
                     echo "Found no SDKs in '$PLATFORM_HOME'" 1>&2
                     exit 1
                 fi
-                sort -r -t . -k 1,1n -k 2,2n -k 3,3n -k 4,4n "$TEMP_DIR/$x/versions" >"$TEMP_DIR/$x/versions-sorted" || exit 1
+                sort -t . -k 1,1nr -k 2,2nr -k 3,3nr -k 4,4nr "$TEMP_DIR/$x/versions" >"$TEMP_DIR/$x/versions-sorted" || exit 1
                 LATEST="$(cat "$TEMP_DIR/$x/versions-sorted" | head -n 1)" || exit 1
                 (cd "$TEMP_DIR/$x" && ln "$LATEST" "sdk_root") || exit 1
                 if [ "$x" = "iPhoneSimulator" ]; then
@@ -144,7 +144,7 @@ case "$MODE" in
 
     "test-installed")
         PREFIX="$1"
-        echo "Not yet implemented" 1>&2
+        make test-installed || exit 1
         exit 1
         ;;
 
