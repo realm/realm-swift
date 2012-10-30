@@ -7,21 +7,6 @@ MODE="$1"
 [ $# -gt 0 ] && shift
 
 
-# Setup OS specific stuff
-OS="$(uname)" || exit 1
-NUM_PROCESSORS=""
-if [ "$OS" = "Darwin" ]; then
-    NUM_PROCESSORS="$(sysctl -n hw.ncpu)" || exit 1
-else
-    if [ -r /proc/cpuinfo ]; then
-        NUM_PROCESSORS="$(cat /proc/cpuinfo | grep -E 'processor[[:space:]]*:' | wc -l)" || exit 1
-    fi
-fi
-if [ "$NUM_PROCESSORS" ]; then
-    export MAKEFLAGS="-j$NUM_PROCESSORS"
-fi
-
-
 
 word_list_append()
 {
@@ -36,6 +21,38 @@ word_list_append()
     fi
     return 0
 }
+
+word_list_prepend()
+{
+    local list_name new_word list
+    list_name="$1"
+    new_word="$2"
+    list="$(eval "printf \"%s\\n\" \"\${$list_name}\"")" || return 1
+    if [ "$list" ]; then
+        eval "$list_name=\"\$new_word \$list\""
+    else
+        eval "$list_name=\"\$new_word\""
+    fi
+    return 0
+}
+
+
+
+# Setup OS specific stuff
+OS="$(uname)" || exit 1
+NUM_PROCESSORS=""
+if [ "$OS" = "Darwin" ]; then
+    NUM_PROCESSORS="$(sysctl -n hw.ncpu)" || exit 1
+    word_list_prepend MAKEFLAGS "-w" || exit 1
+else
+    if [ -r /proc/cpuinfo ]; then
+        NUM_PROCESSORS="$(cat /proc/cpuinfo | grep -E 'processor[[:space:]]*:' | wc -l)" || exit 1
+    fi
+fi
+if [ "$NUM_PROCESSORS" ]; then
+    word_list_prepend MAKEFLAGS "-j$NUM_PROCESSORS" || exit 1
+fi
+export MAKEFLAGS
 
 
 
