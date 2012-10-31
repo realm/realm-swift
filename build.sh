@@ -161,7 +161,8 @@ case "$MODE" in
 
     "test-installed")
         PREFIX="$1"
-        make -C "test-installed" test || exit 1
+        make -C "test-installed" clean || exit 1
+        make -C "test-installed" test  || exit 1
         exit 0
         ;;
 
