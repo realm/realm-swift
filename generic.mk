@@ -482,7 +482,7 @@ DEP_MAKEFILES = Makefile $(THIS_MAKEFILE)
 ifneq ($(wildcard $(CONFIG_MK)),)
 DEP_MAKEFILES += $(CONFIG_MK)
 endif
-$(OBJECTS) $(TARGETS): $(DEP_MAKEFILES)
+$(GENERATED_SOURCES) $(OBJECTS) $(TARGETS): $(DEP_MAKEFILES)
 $(OBJECTS): $(GENERATED_SOURCES)
 
 # Disable all suffix rules and some interfering implicit pattern rules

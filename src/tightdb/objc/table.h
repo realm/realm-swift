@@ -1,10 +1,11 @@
 //
-//  Table.h
+//  table.h
 //  TightDB
 //
 
 #import <Foundation/Foundation.h>
-#include "ColumnType.h"
+
+#include <tightdb/objc/column_type.h>
 
 #define tdbOCTypeInt int64_t
 #define tdbOCTypeBool BOOL
@@ -202,9 +203,3 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 @interface OCColumnProxyString : OCColumnProxy
 -(size_t)find:(NSString*)value;
 @end
-
-
-
-
-
-

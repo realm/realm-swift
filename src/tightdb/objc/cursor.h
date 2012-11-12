@@ -1,5 +1,5 @@
 //
-//  Cursor.h
+//  cursor.h
 //  TightDb
 
 #import <Foundation/Foundation.h>
