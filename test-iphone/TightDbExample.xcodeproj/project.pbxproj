@@ -265,9 +265,9 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TightDbExample/TightDbExample-Prefix.pch";
-				HEADER_SEARCH_PATHS = ../src;
+				HEADER_SEARCH_PATHS = include;
 				INFOPLIST_FILE = "TightDbExample/TightDbExample-Info.plist";
-				LIBRARY_SEARCH_PATHS = ../src/tightdb/objc;
+				LIBRARY_SEARCH_PATHS = lib;
 				OTHER_LDFLAGS = (
 					"-lstdc++",
 					"-ltightdb-objc-ios-dbg",
@@ -282,9 +282,9 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TightDbExample/TightDbExample-Prefix.pch";
-				HEADER_SEARCH_PATHS = ../src;
+				HEADER_SEARCH_PATHS = include;
 				INFOPLIST_FILE = "TightDbExample/TightDbExample-Info.plist";
-				LIBRARY_SEARCH_PATHS = ../src/tightdb/objc;
+				LIBRARY_SEARCH_PATHS = lib;
 				OTHER_LDFLAGS = (
 					"-lstdc++",
 					"-ltightdb-objc-ios",
