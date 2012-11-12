@@ -3,6 +3,8 @@
 //  TightDB
 //
 
+#import <tightdb/table.hpp>
+#import <tightdb/table_view.hpp>
 #import <tightdb/query.hpp>
 
 #import <tightdb/objc/Query.h>
@@ -30,7 +32,7 @@
     self = [super init];
     if (self) {
         _table = table;
-        _query = new tightdb::Query();
+        _query = new tightdb::Query([_table getTable]->where());
     }
     return self;
 }
@@ -117,22 +119,22 @@
 
 -(size_t)count
 {
-    return _query->count(*[_table getTable]);
+    return _query->count();
 }
 
 -(double)avgOnColumn:(size_t)columndId
 {
     size_t resultCount;
-    return _query->average(*[_table getTable], columndId, &resultCount);
+    return _query->average(columndId, &resultCount);
 }
 
 -(tightdb::TableView)getTableView
 {
-    return _query->find_all(*[_table getTable]);
+    return _query->find_all();
 }
 -(size_t)findNext:(size_t)last
 {
-    return _query->find_next(*[_table getTable], last);
+    return _query->find_next(last);
 }
 @end
 
