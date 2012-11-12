@@ -20,7 +20,7 @@
 {
     Group *group = [[Group alloc] init];
     group.group = new tightdb::Group();
-    return group;    
+    return group;
 }
 
 +(Group *)groupWithFilename:(NSString *)filename
@@ -72,7 +72,7 @@
 }
 
 -(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)obj
-{ 
+{
     __weak Group *weakSelf = self;
     __weak NSString *weakName = name;
     return [[obj alloc] initWithBlock:^(Table *table) {

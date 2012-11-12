@@ -154,72 +154,72 @@
 +(OCMixed *)mixedWithMixed:(tightdb::Mixed&)other
 {
     OCMixed *mixed = [[OCMixed alloc] init];
-    
+
     mixed.mixed = new tightdb::Mixed(other);
-    
-    return mixed;    
+
+    return mixed;
 }
 +(OCMixed *)mixedWithTable
 {
     OCMixed *mixed = [[OCMixed alloc] init];
-    
+
     mixed.mixed = new tightdb::Mixed(tightdb::Mixed::subtable_tag());
-    
+
     return mixed;
 }
 
 +(OCMixed *)mixedWithBool:(BOOL)value
 {
     OCMixed *mixed = [[OCMixed alloc] init];
-    
+
     mixed.mixed = new tightdb::Mixed((bool)value);
-    
-    return mixed;    
+
+    return mixed;
 }
 
 +(OCMixed *)mixedWithDate:(OCDate *)date
 {
     OCMixed *mixed = [[OCMixed alloc] init];
-    
+
     mixed.mixed = new tightdb::Mixed(new tightdb::Date([date getDate]));
-    
-    return mixed;        
+
+    return mixed;
 }
 
 +(OCMixed *)mixedWithInt64:(int64_t)value
 {
     OCMixed *mixed = [[OCMixed alloc] init];
-    
+
     mixed.mixed = new tightdb::Mixed(value);
-    
-    return mixed;            
+
+    return mixed;
 }
 
 +(OCMixed *)mixedWithString:(NSString *)string
 {
     OCMixed *mixed = [[OCMixed alloc] init];
-    
+
     mixed.mixed = new tightdb::Mixed([string UTF8String]);
-    
-    return mixed;            
+
+    return mixed;
 }
 
 +(OCMixed *)mixedWithBinary:(BinaryData *)data
 {
     OCMixed *mixed = [[OCMixed alloc] init];
-    
+
     mixed.mixed = new tightdb::Mixed([data getBinary]);
-    
-    return mixed;            
+
+    return mixed;
 }
 
 +(OCMixed *)mixedWithData:(const char*)value length:(size_t)length
 {
     OCMixed *mixed = [[OCMixed alloc] init];
-    
+
     mixed.mixed = new tightdb::Mixed(value, length);
-    
-    return mixed;            
+
+    return mixed;
 }
 
 -(ColumnType)getType
@@ -247,7 +247,7 @@
 
 -(BinaryData *)getBinary
 {
-    return [[BinaryData alloc] initWithBinary:_mixed->get_binary()];    
+    return [[BinaryData alloc] initWithBinary:_mixed->get_binary()];
 }
 @end
 
@@ -282,7 +282,7 @@
         spec.spec = other;
         spec.isOwned = FALSE;
     }
-    return spec;    
+    return spec;
 }
 
 -(void)addColumn:(ColumnType)type name:(NSString *)name
@@ -351,7 +351,7 @@
         _table = [query getTable];
         self.tableView = new tightdb::TableView([query getTableView]); // TODO: Copy constructor is called here. (Move did not work).
     }
-    return self;    
+    return self;
 }
 
 -(Table *)getTable
@@ -460,7 +460,7 @@
 -(id)initWithBlock:(TopLevelTableInitBlock)block
 {
     self = [super init];
-    if (self) {   
+    if (self) {
         __weak Table *weakSelf = self;
         if (block) block(weakSelf);
     }
@@ -485,7 +485,7 @@
     self = [super init];
     if (self) {
         _tablePtr = new tightdb::Table();
-        _table = _tablePtr->get_table_ref(); 
+        _table = _tablePtr->get_table_ref();
     }
     return self;
 }
@@ -795,7 +795,7 @@
     }
     return self;
 }
--(void)clear 
+-(void)clear
 {
     _table = nil;
 }
@@ -825,7 +825,7 @@
 
 -(size_t)find:(BOOL)value
 {
-    return [self.table findBool:self.column value:value];    
+    return [self.table findBool:self.column value:value];
 }
 
 @end
