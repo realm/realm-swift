@@ -15,14 +15,15 @@ The TightDB core library must have been installed.
     Install command line tools (via Xcode)
 
 
-Building and installing
------------------------
+Building, testing, and installing
+---------------------------------
 
     export PATH="$TIGHTDB_HOME/src/tightdb:$PATH"
     export CPATH="$TIGHTDB_HOME/src"
     export LIBRARY_PATH="$TIGHTDB_HOME/src/tightdb"
     sh build.sh clean
     sh build.sh build
+    sh build.sh test
     sudo sh build.sh install
     sh build.sh test-intalled
 
