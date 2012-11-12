@@ -24,7 +24,7 @@ libtightdb_objc_a_LDFLAGS_COVER = $(shell $(TIGHTDB_CONFIG)-dbg --libs)
 include ../../../generic.mk
 
 # Code generation
-$(TIGHTDB_H): tigthdb.h.sh tightdb.h.py
+$(TIGHTDB_H): tightdb.h.sh tightdb.h.py
 	$(SHELL) tightdb.h.sh $(TIGHTDB_H)
 
 uninstall/extra:
