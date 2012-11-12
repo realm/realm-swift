@@ -3,10 +3,12 @@
 //  TightDB
 //
 
+#import <SenTestingKit/SenTestingKit.h>
+
 #import <tightdb/objc/table.h>
 
-#import "MACTestTableDeleteAll.h"
-
+@interface MACTestTableDeleteAll : SenTestCase
+@end
 @implementation MACTestTableDeleteAll
 
 -(void)testTableDeleteAll

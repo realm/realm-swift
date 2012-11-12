@@ -5,11 +5,12 @@
 // Using lowlevel interface, test creation of creating two columns with two rows
 //
 
+#import <SenTestingKit/SenTestingKit.h>
+
 #import <tightdb/objc/table.h>
 
-#import "MACtestTable.h"
-
-
+@interface MACtestTable : SenTestCase
+@end
 @implementation MACtestTable
 {
     Table *_table;

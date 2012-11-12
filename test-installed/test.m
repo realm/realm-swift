@@ -1,5 +1,5 @@
-#import <tightdb/objc/Group.h>
-#import <tightdb/objc/TightDb.h>
+#import <tightdb/objc/group.h>
+#import <tightdb/objc/tightdb.h>
 
 TDB_TABLE_1(TestTable,
             Int, Value)

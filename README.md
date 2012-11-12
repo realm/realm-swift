@@ -27,9 +27,23 @@ Building, testing, and installing
     sudo sh build.sh install
     sh build.sh test-intalled
 
-Headers are installed in /usr/local/include/tightdb/objc/
+Headers are installed in:
 
-Libraries are installed in /usr/local/lib
+    /usr/local/include/tightdb/objc/
+
+The following libraries are installed:
+
+    /usr/local/lib/libtightdb-objc.dylib
+    /usr/local/lib/libtightdb-objc-dbg.dylib
+
+The following iPhone libraries are built, but not installed:
+
+    src/tightdb/objc/libtightdb-objc-ios.a
+    src/tightdb/objc/libtightdb-objc-ios-dbg.a
+
+The iPhone libraries can be tested via the Xcode project in:
+
+    test-iphone/
 
 
 Configuration
