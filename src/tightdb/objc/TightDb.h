@@ -145,7 +145,7 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
+    if ([self getColumnCount] == 0) { \
         [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
         } \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
@@ -369,7 +369,7 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
+    if ([self getColumnCount] == 0) { \
         [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
         [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
         } \
@@ -614,7 +614,7 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
+    if ([self getColumnCount] == 0) { \
         [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
         [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
         [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
@@ -880,7 +880,7 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
+    if ([self getColumnCount] == 0) { \
         [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
         [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
         [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
@@ -1167,7 +1167,7 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
+    if ([self getColumnCount] == 0) { \
         [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
         [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
         [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
@@ -1475,7 +1475,7 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
+    if ([self getColumnCount] == 0) { \
         [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
         [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
         [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
@@ -1804,7 +1804,7 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
+    if ([self getColumnCount] == 0) { \
         [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
         [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
         [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
@@ -2154,7 +2154,7 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
+    if ([self getColumnCount] == 0) { \
         [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
         [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
         [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
@@ -2336,7 +2336,7 @@
 #define TDB_TABLE_1(TableName    , CType1, CName1    ) \
 TDB_TABLE_DEF_1(TableName    ,CType1, CName1    ) \
 TDB_TABLE_IMPL_1(TableName    ,CType1, CName1    )
-    
+
 
 #undef TDB_TABLE_DEF_2
 #define TDB_TABLE_DEF_2(TableName, CType1, CName1, CType2, CName2) \
@@ -2395,7 +2395,7 @@ TDB_TABLE_IMPL_1(TableName    ,CType1, CName1    )
 #define TDB_TABLE_2(TableName    , CType1, CName1    , CType2, CName2    ) \
 TDB_TABLE_DEF_2(TableName    ,CType1, CName1    ,CType2, CName2    ) \
 TDB_TABLE_IMPL_2(TableName    ,CType1, CName1    ,CType2, CName2    )
-    
+
 
 #undef TDB_TABLE_DEF_3
 #define TDB_TABLE_DEF_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
@@ -2459,7 +2459,7 @@ TDB_TABLE_IMPL_2(TableName    ,CType1, CName1    ,CType2, CName2    )
 #define TDB_TABLE_3(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    ) \
 TDB_TABLE_DEF_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ) \
 TDB_TABLE_IMPL_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    )
-    
+
 
 #undef TDB_TABLE_DEF_4
 #define TDB_TABLE_DEF_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
@@ -2528,7 +2528,7 @@ TDB_TABLE_IMPL_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 #define TDB_TABLE_4(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    ) \
 TDB_TABLE_DEF_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ) \
 TDB_TABLE_IMPL_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    )
-    
+
 
 #undef TDB_TABLE_DEF_5
 #define TDB_TABLE_DEF_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
@@ -2602,7 +2602,7 @@ TDB_TABLE_IMPL_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 #define TDB_TABLE_5(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    ) \
 TDB_TABLE_DEF_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ) \
 TDB_TABLE_IMPL_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    )
-    
+
 
 #undef TDB_TABLE_DEF_6
 #define TDB_TABLE_DEF_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
@@ -2681,7 +2681,7 @@ TDB_TABLE_IMPL_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 #define TDB_TABLE_6(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    ) \
 TDB_TABLE_DEF_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ) \
 TDB_TABLE_IMPL_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    )
-    
+
 
 #undef TDB_TABLE_DEF_7
 #define TDB_TABLE_DEF_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
@@ -2765,7 +2765,7 @@ TDB_TABLE_IMPL_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 #define TDB_TABLE_7(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    ) \
 TDB_TABLE_DEF_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ) \
 TDB_TABLE_IMPL_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    )
-    
+
 
 #undef TDB_TABLE_DEF_8
 #define TDB_TABLE_DEF_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
@@ -2854,6 +2854,6 @@ TDB_TABLE_IMPL_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
 #define TDB_TABLE_8(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    ) \
 TDB_TABLE_DEF_8(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ) \
 TDB_TABLE_IMPL_8(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    )
-    
+
 
 

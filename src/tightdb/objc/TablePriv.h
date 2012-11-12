@@ -8,7 +8,7 @@
 #pragma mark - Private Table interface
 
 @interface Table()
-@property(nonatomic) tightdb::TableRef table; 
+@property(nonatomic) tightdb::TableRef table;
 @property(nonatomic) tightdb::Table *tablePtr;
 -(void)initRefs;
 -(tightdb::Table *)getTable;

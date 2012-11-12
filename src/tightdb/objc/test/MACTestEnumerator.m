@@ -14,9 +14,9 @@
 
 
 TDB_TABLE_3(EnumPeopleTable,
-			String, Name,
-			Int,    Age,
-			Bool,   Hired)
+            String, Name,
+            Int,    Age,
+            Bool,   Hired)
 
 TDB_TABLE_2(EnumPeopleTable2,
             Bool,   Hired,
@@ -28,7 +28,7 @@ TDB_TABLE_2(EnumPeopleTable2,
 {
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
-	//------------------------------------------------------
+    //------------------------------------------------------
     Group *group = [Group group];
     // Create new table in group
     EnumPeopleTable *people = [group getTable:@"employees" withClass:[EnumPeopleTable class]];
@@ -40,30 +40,30 @@ TDB_TABLE_2(EnumPeopleTable2,
     [people addName:@"Phil" Age:43 Hired:NO];
     [people addName:@"Anni" Age:54 Hired:YES];
 
-	//------------------------------------------------------
+    //------------------------------------------------------
     NSLog(@"--- Iterators ---");
-	//------------------------------------------------------
+    //------------------------------------------------------
 
-	// 1: Iterate over table
-	for (EnumPeopleTable_Cursor *row in people) {
-		NSLog(@"%@ is %lld years old.", row.Name, row.Age);
-	}
+    // 1: Iterate over table
+    for (EnumPeopleTable_Cursor *row in people) {
+        NSLog(@"%@ is %lld years old.", row.Name, row.Age);
+    }
 
-	// Do a query, and get all matches as TableView
-	EnumPeopleTable_View *res = [[[[people getQuery].Hired equal:YES].Age between:20 to:30] findAll];
+    // Do a query, and get all matches as TableView
+    EnumPeopleTable_View *res = [[[[people getQuery].Hired equal:YES].Age between:20 to:30] findAll];
     NSLog(@"View count: %zu", [res count]);
-	// 2: Iterate over the resulting TableView
-	for (EnumPeopleTable_Cursor *row in res) {
-		NSLog(@"%@ is %lld years old.", row.Name, row.Age);
-	}
+    // 2: Iterate over the resulting TableView
+    for (EnumPeopleTable_Cursor *row in res) {
+        NSLog(@"%@ is %lld years old.", row.Name, row.Age);
+    }
 
-	// 3: Iterate over query (lazy)
+    // 3: Iterate over query (lazy)
 
  EnumPeopleTable_Query *q = [[people getQuery].Age equal:21];
     NSLog(@"Query lazy count: %zu", [q count]);
-	for (EnumPeopleTable_Cursor *row in q) {
-		NSLog(@"%@ is %lld years old.", row.Name, row.Age);
-	}
+    for (EnumPeopleTable_Cursor *row in q) {
+        NSLog(@"%@ is %lld years old.", row.Name, row.Age);
+    }
 
 }
 
