@@ -7,13 +7,13 @@ commentStartToken = %%
 directiveStartToken = %
 #end compiler-settings
 //
-//  TightDb.h
+//  tightdb.h
 //  TightDB
 //
 
-#import "Table.h"
-#import "Query.h"
-#import "Cursor.h"
+#import <tightdb/objc/table.h>
+#import <tightdb/objc/query.h>
+#import <tightdb/objc/cursor.h>
 
 %for $i in range($max_cols)
 %set $num_cols = $i + 1

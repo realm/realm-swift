@@ -27,6 +27,10 @@ Building, testing, and installing
     sudo sh build.sh install
     sh build.sh test-intalled
 
+Headers are installed in /usr/local/include/tightdb/objc/
+
+Libraries are installed in /usr/local/lib
+
 
 Configuration
 -------------

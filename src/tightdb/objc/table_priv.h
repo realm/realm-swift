@@ -1,5 +1,5 @@
 //
-//  TablePriv.h
+//  table_priv.h
 //  TightDB
 //
 

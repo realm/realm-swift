@@ -1,5 +1,5 @@
 //
-//  QueryPriv.h
+//  query_priv.h
 //  TightDB
 //
 

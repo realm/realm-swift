@@ -1,5 +1,5 @@
 //
-//  Query.h
+//  query.h
 //  TightDB
 //
 

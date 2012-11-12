@@ -1,13 +1,13 @@
 //
-//  Group.m
+//  group.m
 //  TightDB
 //
 
 #import <tightdb/group.hpp>
 
-#import <tightdb/objc/Group.h>
-#import <tightdb/objc/Table.h>
-#import <tightdb/objc/TablePriv.h>
+#import <tightdb/objc/group.h>
+#import <tightdb/objc/table.h>
+#import <tightdb/objc/table_priv.h>
 
 
 @interface Group()

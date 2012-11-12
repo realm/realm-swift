@@ -6,8 +6,8 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
-#import <tightdb/objc/Group.h>
-#import <tightdb/objc/Table.h>
+#import <tightdb/objc/group.h>
+#import <tightdb/objc/table.h>
 
 #import "MACTestTutorial.h"
 

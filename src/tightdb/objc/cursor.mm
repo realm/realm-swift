@@ -1,12 +1,12 @@
 //
-//  Cursor.mm
+//  cursor.mm
 //  TightDb
 
 #import <tightdb/table.hpp>
 
-#import <tightdb/objc/Cursor.h>
-#import <tightdb/objc/Table.h>
-#import <tightdb/objc/TablePriv.h>
+#import <tightdb/objc/cursor.h>
+#import <tightdb/objc/table.h>
+#import <tightdb/objc/table_priv.h>
 
 #pragma mark - CursorBase
 

@@ -1,5 +1,5 @@
 //
-//  Group.h
+//  group.h
 //  TightDb
 
 #import <Foundation/Foundation.h>

@@ -1,5 +1,5 @@
 //
-//  Query.mm
+//  query.mm
 //  TightDB
 //
 
@@ -7,10 +7,10 @@
 #import <tightdb/table_view.hpp>
 #import <tightdb/query.hpp>
 
-#import <tightdb/objc/Query.h>
-#import <tightdb/objc/Table.h>
-#import <tightdb/objc/TablePriv.h>
-#import <tightdb/objc/Cursor.h>
+#import <tightdb/objc/query.h>
+#import <tightdb/objc/table.h>
+#import <tightdb/objc/table_priv.h>
+#import <tightdb/objc/cursor.h>
 
 #pragma mark - TableView secrets
 
