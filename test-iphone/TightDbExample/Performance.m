@@ -3,12 +3,11 @@
 //  TightDbExample
 //
 //  Created by Bjarne Christiansen on 5/24/12.
-//  Copyright (c) 2012 InvulgoSoft. All rights reserved.
 //
 
 #import <sqlite3.h>
-#import <tightdb/objc/TightDb.h>
-#import <tightdb/objc/Group.h>
+#import <tightdb/objc/tightdb.h>
+#import <tightdb/objc/group.h>
 
 #import "Performance.h"
 #import "Utils.h"

@@ -5,15 +5,17 @@
 //  Test save/load on disk of a group with one table
 //
 
-#import <tightdb/objc/group.h>
+#import <SenTestingKit/SenTestingKit.h>
 
-#import "MACTestGroup.h"
+#import <tightdb/objc/tightdb.h>
+#import <tightdb/objc/group.h>
 
 TDB_TABLE_2(TestTableGroup,
             String,     First,
             Int,        Second)
 
-
+@interface MACTestGroup : SenTestCase
+@end
 @implementation MACTestGroup
 {
     Group *_group;

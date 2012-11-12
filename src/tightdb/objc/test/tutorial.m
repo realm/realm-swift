@@ -2,14 +2,22 @@
 //  MACTestTutorial.m
 //  TightDB
 //
-//
 // Demo code for short tutorial using Objective-C interface
 //
 
-#import <tightdb/objc/group.h>
-#import <tightdb/objc/table.h>
+#import <SenTestingKit/SenTestingKit.h>
 
-#import "MACTestTutorial.h"
+#import <tightdb/objc/tightdb.h>
+#import <tightdb/objc/group.h>
+
+TDB_TABLE_DEF_3(PeopleTable,
+            String, Name,
+            Int,    Age,
+            Bool,   Hired)
+
+TDB_TABLE_DEF_2(PeopleTable2,
+            Bool,   Hired,
+            Int,    Age)
 
 TDB_TABLE_IMPL_3(PeopleTable,
             String, Name,
@@ -20,6 +28,8 @@ TDB_TABLE_IMPL_2(PeopleTable2,
             Bool,   Hired,
             Int,    Age)
 
+@interface MACTestTutorial : SenTestCase
+@end
 @implementation MACTestTutorial
 
 - (void)testTutorial

@@ -2,20 +2,29 @@
 //  MACTestGroupMisc2.m
 //  TightDB
 //
-//
 // Demo code for short tutorial using Objective-C interface
 //
 
-#import <tightdb/objc/group.h>
-#import <tightdb/objc/table.h>
+#import <SenTestingKit/SenTestingKit.h>
 
-#import "MACTestGroupMisc2.h"
+#import <tightdb/objc/tightdb.h>
+#import <tightdb/objc/group.h>
+
+TDB_TABLE_DEF_4(MyTable,
+            String, Name,
+            Int,    Age,
+            Bool,   Hired,
+            Int,    Spare)
+
+TDB_TABLE_DEF_2(MyTable2,
+            Bool,   Hired,
+            Int,    Age)
 
 TDB_TABLE_IMPL_4(MyTable,
             String, Name,
             Int,    Age,
             Bool,   Hired,
-            Int,	Spare)
+            Int,    Spare)
 
 TDB_TABLE_IMPL_2(MyTable2,
             Bool,   Hired,
@@ -25,7 +34,8 @@ TDB_TABLE_2(QueryTable,
             Int, First,
             String, Second)
 
-
+@interface MACTestGroupMisc2 : SenTestCase
+@end
 @implementation MACTestGroupMisc2
 
 - (void)testGroup_Misc2

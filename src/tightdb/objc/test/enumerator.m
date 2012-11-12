@@ -6,12 +6,11 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
-#import <tightdb/objc/tightDb.h>
+#import <SenTestingKit/SenTestingKit.h>
+
+#import <tightdb/objc/tightdb.h>
 #import <tightdb/objc/group.h>
 #import <tightdb/objc/table.h>
-
-#import "MACTestEnumerator.h"
-
 
 TDB_TABLE_3(EnumPeopleTable,
             String, Name,
@@ -22,6 +21,8 @@ TDB_TABLE_2(EnumPeopleTable2,
             Bool,   Hired,
             Int,    Age)
 
+@interface MACTestEnumerator : SenTestCase
+@end
 @implementation MACTestEnumerator
 
 - (void)testTutorial

@@ -265,7 +265,7 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TightDbExample/TightDbExample-Prefix.pch";
-				HEADER_SEARCH_PATHS = include;
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				INFOPLIST_FILE = "TightDbExample/TightDbExample-Info.plist";
 				LIBRARY_SEARCH_PATHS = lib;
 				OTHER_LDFLAGS = (
@@ -282,7 +282,7 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TightDbExample/TightDbExample-Prefix.pch";
-				HEADER_SEARCH_PATHS = include;
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				INFOPLIST_FILE = "TightDbExample/TightDbExample-Info.plist";
 				LIBRARY_SEARCH_PATHS = lib;
 				OTHER_LDFLAGS = (
