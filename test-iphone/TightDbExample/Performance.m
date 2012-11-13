@@ -46,18 +46,18 @@ TIGHTDB_TABLE_4(PerfTable,
 -(void)reportSizeForFile:(NSString *)file msg:(NSString *)msg
 {
     NSDictionary *fileAttributes = [NSFileManager.defaultManager attributesOfItemAtPath:file error:nil];
-	NSString *fileSize = [fileAttributes objectForKey:NSFileSize];
+    NSString *fileSize = [fileAttributes objectForKey:NSFileSize];
     dispatch_async(dispatch_get_main_queue(), ^{
         [_utils OutGroup:GROUP_SIZE msg:[NSString stringWithFormat:@"%@: %@", msg, fileSize]];
-    });    
+    });
 }
 
 - (void)testInsert {
-    
+
     Group *group = [Group group];
     // Create new table in group
     PerfTable *table = [group getTable:@"employees"withClass:[PerfTable class]];
-    
+
     // Add some rows
     NSUInteger count = _size;
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
@@ -78,7 +78,7 @@ TIGHTDB_TABLE_4(PerfTable,
     [table optimize];
     [group write:[_utils pathForDataFile:@"perfemployees.tightdb"]];
     [self reportSizeForFile:[_utils pathForDataFile:@"perfemployees.tightdb"] msg:@"Optimized filesize"];
-    
+
 
     NSTimeInterval sqlstart = [NSDate timeIntervalSinceReferenceDate];
     char *zErrMsg = NULL;
@@ -100,7 +100,7 @@ TIGHTDB_TABLE_4(PerfTable,
         sqlite3_bind_int(ppStmt, 2, rand_age);
         sqlite3_bind_int(ppStmt, 3, 1); // true
         sqlite3_bind_int(ppStmt, 4, 0);
-        
+
         rc = sqlite3_step(ppStmt);
         if (rc != SQLITE_DONE) {
             fprintf(stderr, "SQL error: %s\n", sqlite3_errmsg(db));
@@ -113,7 +113,7 @@ TIGHTDB_TABLE_4(PerfTable,
         sqlite3_bind_int(ppStmt, 2, 25);
         sqlite3_bind_int(ppStmt, 3, 0); // false
         sqlite3_bind_int(ppStmt, 4, 0);
-        
+
         rc = sqlite3_step(ppStmt);
         if (rc != SQLITE_DONE) {
             fprintf(stderr, "SQL error: %s\n", sqlite3_errmsg(db));
@@ -132,30 +132,30 @@ TIGHTDB_TABLE_4(PerfTable,
 
 
 }
-- (void)testFetch 
+- (void)testFetch
 {
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
-    
+
     Group *fromDisk = [Group groupWithFilename:[_utils pathForDataFile:@"perfemployees.tightdb"]];
     PerfTable *diskTable = [fromDisk getTable:@"employees" withClass:[PerfTable class]];
 
     if ([diskTable count] != _size+1) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Size incorrect (%i) - (%zu)", _size, [diskTable count]]];    
-        });        
+            [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Size incorrect (%i) - (%zu)", _size, [diskTable count]]];
+        });
     }
     // Create query (current employees between 20 and 30 years old)
     PerfTable_Query *q = [[[diskTable getQuery].Hired equal:YES].Age between:20 to:30];
     NSLog(@"Query count: %zu", [q count]);
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Read and query in %.2f s (%zu)", stop - start, [q count]]];    
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Read and query in %.2f s (%zu)", stop - start, [q count]]];
     });
-    
+
     double diff = [self sqlTestFetch] / (stop-start);
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils OutGroup:GROUP_DIFF msg:[NSString stringWithFormat:@"testFetch %.2f faster than sqlTestFetch", diff]];    
-    });    
+        [_utils OutGroup:GROUP_DIFF msg:[NSString stringWithFormat:@"testFetch %.2f faster than sqlTestFetch", diff]];
+    });
 }
 -(double)sqlTestFetch
 {
@@ -169,8 +169,8 @@ TIGHTDB_TABLE_4(PerfTable,
     if (rc != SQLITE_OK) {
         fprintf(stderr, "SQL error3: %s\n", sqlite3_errmsg(db));
     }
-    
-    
+
+
     rc = sqlite3_step(qStmt);
     if (rc != SQLITE_ROW) {
         fprintf(stderr, "SQL error4: %s\n", zErrMsg);
@@ -182,9 +182,9 @@ TIGHTDB_TABLE_4(PerfTable,
     db = NULL;
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"SQL query in %.2f s (%zu)", stop - start, result]];    
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"SQL query in %.2f s (%zu)", stop - start, result]];
     });
-    
+
     return stop-start;
 }
 
@@ -192,23 +192,23 @@ TIGHTDB_TABLE_4(PerfTable,
 - (void)testFetchSparse
 {
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
-    
+
     Group *fromDisk = [Group groupWithFilename:[_utils pathForDataFile:@"perfemployees.tightdb"]];
     PerfTable *diskTable = [fromDisk getTable:@"employees" withClass:[PerfTable class]];
-    
+
     // Create query (current employees between 20 and 30 years old)
     PerfTable_Query *q = [[diskTable getQuery].Age between:40 to:50];
     NSLog(@"Query count: %zu", [q count]);
-    
+
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Read and query sparse in %.2f s (%zu)", stop-start, [q count]]];    
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Read and query sparse in %.2f s (%zu)", stop-start, [q count]]];
     });
-    
+
     double diff = [self sqlTestSparse] / (stop-start);
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils OutGroup:GROUP_DIFF msg:[NSString stringWithFormat:@"testFetchSparse %.2f times faster than sqlTestFetchSparse", diff]];    
-    });    
+        [_utils OutGroup:GROUP_DIFF msg:[NSString stringWithFormat:@"testFetchSparse %.2f times faster than sqlTestFetchSparse", diff]];
+    });
 
 }
 
@@ -225,8 +225,8 @@ TIGHTDB_TABLE_4(PerfTable,
     if (rc != SQLITE_OK) {
         fprintf(stderr, "SQL error3: %s\n", sqlite3_errmsg(db));
     }
-    
-    
+
+
     rc = sqlite3_step(qStmt);
     if (rc != SQLITE_ROW) {
         fprintf(stderr, "SQL error4: %s\n", zErrMsg);
@@ -238,24 +238,24 @@ TIGHTDB_TABLE_4(PerfTable,
     db = NULL;
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"SQL query sparse in %.2f s (%zu)", stop - start, result]];    
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"SQL query sparse in %.2f s (%zu)", stop - start, result]];
     });
-    
+
     return stop-start;
 }
 
-- (void)testFetchAndIterate 
+- (void)testFetchAndIterate
 {
     int counter = 0;
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
-    
+
     Group *fromDisk = [Group groupWithFilename:[_utils pathForDataFile:@"perfemployees.tightdb"]];
     PerfTable *diskTable = [fromDisk getTable:@"employees" withClass:[PerfTable class]];
-    
-    
+
+
     // Create query (current employees between 20 and 30 years old)
     PerfTable_Query *q = [[[diskTable getQuery].Hired equal:YES].Age between:20 to:30];
-    
+
     PerfTable_View *res = [q findAll];
     int agesum = 0;
     for (PerfTable_Cursor *cur in res) {
@@ -264,14 +264,14 @@ TIGHTDB_TABLE_4(PerfTable,
     }
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Read and iterate in %.2f s", stop-start]];    
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Read and iterate in %.2f s", stop-start]];
     });
 }
 
 - (void)testUnqualifiedFetchAndIterate
 {
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
-    
+
     Group *fromDisk = [Group groupWithFilename:[_utils pathForDataFile:@"perfemployees.tightdb"]];
     PerfTable *diskTable = [fromDisk getTable:@"employees" withClass:[PerfTable class]];
 
@@ -281,14 +281,14 @@ TIGHTDB_TABLE_4(PerfTable,
     }
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Read and Unq.iterate in %.2f s", stop-start]]; 
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Read and Unq.iterate in %.2f s", stop-start]];
     });
 }
 
 - (void)testWriteToDisk
 {
     NSString *tightDBPath = [_utils pathForDataFile:@"testemployees.tightdb"];
-    
+
     Group *fromDisk = [Group groupWithFilename:[_utils pathForDataFile:@"perfemployees.tightdb"]];
 
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
@@ -296,7 +296,7 @@ TIGHTDB_TABLE_4(PerfTable,
 
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Write in %.2f s", stop-start]];    
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Write in %.2f s", stop-start]];
     });
 
 }
