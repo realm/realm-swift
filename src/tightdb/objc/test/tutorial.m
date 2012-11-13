@@ -1,5 +1,5 @@
 //
-//  MACTestTutorial.m
+//  tutorial.m
 //  TightDB
 //
 // Demo code for short tutorial using Objective-C interface
@@ -10,23 +10,23 @@
 #import <tightdb/objc/tightdb.h>
 #import <tightdb/objc/group.h>
 
-TDB_TABLE_DEF_3(PeopleTable,
-            String, Name,
-            Int,    Age,
-            Bool,   Hired)
+TIGHTDB_TABLE_DEF_3(PeopleTable,
+                    String, Name,
+                    Int,    Age,
+                    Bool,   Hired)
 
-TDB_TABLE_DEF_2(PeopleTable2,
-            Bool,   Hired,
-            Int,    Age)
+TIGHTDB_TABLE_DEF_2(PeopleTable2,
+                    Bool,   Hired,
+                    Int,    Age)
 
-TDB_TABLE_IMPL_3(PeopleTable,
-            String, Name,
-            Int,    Age,
-            Bool,   Hired)
+TIGHTDB_TABLE_IMPL_3(PeopleTable,
+                     String, Name,
+                     Int,    Age,
+                     Bool,   Hired)
 
-TDB_TABLE_IMPL_2(PeopleTable2,
-            Bool,   Hired,
-            Int,    Age)
+TIGHTDB_TABLE_IMPL_2(PeopleTable2,
+                     Bool,   Hired,
+                     Int,    Age)
 
 @interface MACTestTutorial : SenTestCase
 @end
@@ -98,16 +98,16 @@ TDB_TABLE_IMPL_2(PeopleTable2,
     //------------------------------------------------------
 
     size_t row;
-    row = [people.Name find:@"Philip"];		    	// row = (size_t)-1
+    row = [people.Name find:@"Philip"];    // row = (size_t)-1
     NSLog(@"Philip: %zu  [-1]", row);
     STAssertEquals(row, (size_t)-1,@"Philip should not be there");
 
-    row = [people.Name find:@"Mary"];		
+    row = [people.Name find:@"Mary"];
     NSLog(@"Mary: %zu", row);
     STAssertEquals(row, (size_t)1,@"Mary should have been there");
 
     TableView *view = [people.Age findAll:21];
-    size_t cnt = [view count];  					// cnt = 2
+    size_t cnt = [view count];             // cnt = 2
     STAssertEquals(cnt, (size_t)2,@"Should be two rows in view");
 
     //------------------------------------------------------
@@ -123,7 +123,7 @@ TDB_TABLE_IMPL_2(PeopleTable2,
     STAssertEquals([q count], (size_t)2,@"Expected 2 rows in query");
 
     // Get the average age - currently only a low-level interface!
-    double avg = [q.Age avg];		
+    double avg = [q.Age avg];
     NSLog(@"Average: %f    [20.5]", avg);
     STAssertEquals(avg, 20.5,@"Expected 20.5 average");
 

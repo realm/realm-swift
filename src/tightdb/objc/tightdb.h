@@ -7,8 +7,8 @@
 #import <tightdb/objc/query.h>
 #import <tightdb/objc/cursor.h>
 
-#undef TDB_TABLE_IMPL_1
-#define TDB_TABLE_IMPL_1(TableName, CType1, CName1) \
+#undef TIGHTDB_TABLE_IMPL_1
+#define TIGHTDB_TABLE_IMPL_1(TableName, CType1, CName1) \
 @implementation TableName##_##Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -145,8 +145,8 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
-        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+        if ([self getColumnCount] == 0) { \
+            [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
         } \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
     } \
@@ -218,8 +218,8 @@
     } \
 @end
 
-#undef TDB_TABLE_IMPL_2
-#define TDB_TABLE_IMPL_2(TableName, CType1, CName1, CType2, CName2) \
+#undef TIGHTDB_TABLE_IMPL_2
+#define TIGHTDB_TABLE_IMPL_2(TableName, CType1, CName1, CType2, CName2) \
 @implementation TableName##_##Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -369,9 +369,9 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
-        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
-        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+        if ([self getColumnCount] == 0) { \
+            [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+            [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
         } \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
         _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
@@ -450,8 +450,8 @@
     } \
 @end
 
-#undef TDB_TABLE_IMPL_3
-#define TDB_TABLE_IMPL_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
+#undef TIGHTDB_TABLE_IMPL_3
+#define TIGHTDB_TABLE_IMPL_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
 @implementation TableName##_##Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -614,10 +614,10 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
-        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
-        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
-        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+        if ([self getColumnCount] == 0) { \
+            [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+            [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+            [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
         } \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
         _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
@@ -703,8 +703,8 @@
     } \
 @end
 
-#undef TDB_TABLE_IMPL_4
-#define TDB_TABLE_IMPL_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
+#undef TIGHTDB_TABLE_IMPL_4
+#define TIGHTDB_TABLE_IMPL_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
 @implementation TableName##_##Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -880,11 +880,11 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
-        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
-        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
-        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
-        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+        if ([self getColumnCount] == 0) { \
+            [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+            [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+            [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+            [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
         } \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
         _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
@@ -977,8 +977,8 @@
     } \
 @end
 
-#undef TDB_TABLE_IMPL_5
-#define TDB_TABLE_IMPL_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
+#undef TIGHTDB_TABLE_IMPL_5
+#define TIGHTDB_TABLE_IMPL_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
 @implementation TableName##_##Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -1167,12 +1167,12 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
-        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
-        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
-        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
-        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
-        [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
+        if ([self getColumnCount] == 0) { \
+            [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+            [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+            [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+            [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+            [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
         } \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
         _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
@@ -1272,8 +1272,8 @@
     } \
 @end
 
-#undef TDB_TABLE_IMPL_6
-#define TDB_TABLE_IMPL_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
+#undef TIGHTDB_TABLE_IMPL_6
+#define TIGHTDB_TABLE_IMPL_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
 @implementation TableName##_##Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -1475,13 +1475,13 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
-        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
-        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
-        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
-        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
-        [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
-        [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
+        if ([self getColumnCount] == 0) { \
+            [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+            [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+            [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+            [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+            [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
+            [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
         } \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
         _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
@@ -1588,8 +1588,8 @@
     } \
 @end
 
-#undef TDB_TABLE_IMPL_7
-#define TDB_TABLE_IMPL_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
+#undef TIGHTDB_TABLE_IMPL_7
+#define TIGHTDB_TABLE_IMPL_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
 @implementation TableName##_##Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -1804,14 +1804,14 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
-        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
-        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
-        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
-        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
-        [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
-        [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
-        [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
+        if ([self getColumnCount] == 0) { \
+            [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+            [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+            [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+            [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+            [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
+            [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
+            [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
         } \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
         _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
@@ -1925,8 +1925,8 @@
     } \
 @end
 
-#undef TDB_TABLE_IMPL_8
-#define TDB_TABLE_IMPL_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
+#undef TIGHTDB_TABLE_IMPL_8
+#define TIGHTDB_TABLE_IMPL_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
 @implementation TableName##_##Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -2154,15 +2154,15 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
-        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
-        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
-        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
-        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
-        [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
-        [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
-        [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
-        [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
+        if ([self getColumnCount] == 0) { \
+            [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+            [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+            [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+            [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+            [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
+            [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
+            [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
+            [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
         } \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
         _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
@@ -2283,8 +2283,8 @@
     } \
 @end
 
-#undef TDB_TABLE_IMPL_9
-#define TDB_TABLE_IMPL_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9) \
+#undef TIGHTDB_TABLE_IMPL_9
+#define TIGHTDB_TABLE_IMPL_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9) \
 @implementation TableName##_##Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -2525,16 +2525,16 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
-        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
-        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
-        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
-        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
-        [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
-        [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
-        [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
-        [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
-        [self registerColumn:COLTYPE##CType9 name:[NSString stringWithUTF8String:#CName9]]; \
+        if ([self getColumnCount] == 0) { \
+            [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+            [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+            [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+            [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+            [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
+            [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
+            [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
+            [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
+            [self registerColumn:COLTYPE##CType9 name:[NSString stringWithUTF8String:#CName9]]; \
         } \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
         _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
@@ -2662,8 +2662,8 @@
     } \
 @end
 
-#undef TDB_TABLE_IMPL_10
-#define TDB_TABLE_IMPL_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10) \
+#undef TIGHTDB_TABLE_IMPL_10
+#define TIGHTDB_TABLE_IMPL_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10) \
 @implementation TableName##_##Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -2917,17 +2917,17 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
-        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
-        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
-        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
-        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
-        [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
-        [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
-        [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
-        [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
-        [self registerColumn:COLTYPE##CType9 name:[NSString stringWithUTF8String:#CName9]]; \
-        [self registerColumn:COLTYPE##CType10 name:[NSString stringWithUTF8String:#CName10]]; \
+        if ([self getColumnCount] == 0) { \
+            [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+            [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+            [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+            [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+            [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
+            [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
+            [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
+            [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
+            [self registerColumn:COLTYPE##CType9 name:[NSString stringWithUTF8String:#CName9]]; \
+            [self registerColumn:COLTYPE##CType10 name:[NSString stringWithUTF8String:#CName10]]; \
         } \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
         _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
@@ -3062,8 +3062,8 @@
     } \
 @end
 
-#undef TDB_TABLE_IMPL_11
-#define TDB_TABLE_IMPL_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11) \
+#undef TIGHTDB_TABLE_IMPL_11
+#define TIGHTDB_TABLE_IMPL_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11) \
 @implementation TableName##_##Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -3330,18 +3330,18 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
-        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
-        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
-        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
-        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
-        [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
-        [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
-        [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
-        [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
-        [self registerColumn:COLTYPE##CType9 name:[NSString stringWithUTF8String:#CName9]]; \
-        [self registerColumn:COLTYPE##CType10 name:[NSString stringWithUTF8String:#CName10]]; \
-        [self registerColumn:COLTYPE##CType11 name:[NSString stringWithUTF8String:#CName11]]; \
+        if ([self getColumnCount] == 0) { \
+            [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+            [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+            [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+            [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+            [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
+            [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
+            [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
+            [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
+            [self registerColumn:COLTYPE##CType9 name:[NSString stringWithUTF8String:#CName9]]; \
+            [self registerColumn:COLTYPE##CType10 name:[NSString stringWithUTF8String:#CName10]]; \
+            [self registerColumn:COLTYPE##CType11 name:[NSString stringWithUTF8String:#CName11]]; \
         } \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
         _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
@@ -3483,8 +3483,8 @@
     } \
 @end
 
-#undef TDB_TABLE_IMPL_12
-#define TDB_TABLE_IMPL_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12) \
+#undef TIGHTDB_TABLE_IMPL_12
+#define TIGHTDB_TABLE_IMPL_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12) \
 @implementation TableName##_##Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -3764,19 +3764,19 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
-        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
-        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
-        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
-        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
-        [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
-        [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
-        [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
-        [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
-        [self registerColumn:COLTYPE##CType9 name:[NSString stringWithUTF8String:#CName9]]; \
-        [self registerColumn:COLTYPE##CType10 name:[NSString stringWithUTF8String:#CName10]]; \
-        [self registerColumn:COLTYPE##CType11 name:[NSString stringWithUTF8String:#CName11]]; \
-        [self registerColumn:COLTYPE##CType12 name:[NSString stringWithUTF8String:#CName12]]; \
+        if ([self getColumnCount] == 0) { \
+            [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+            [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+            [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+            [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+            [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
+            [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
+            [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
+            [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
+            [self registerColumn:COLTYPE##CType9 name:[NSString stringWithUTF8String:#CName9]]; \
+            [self registerColumn:COLTYPE##CType10 name:[NSString stringWithUTF8String:#CName10]]; \
+            [self registerColumn:COLTYPE##CType11 name:[NSString stringWithUTF8String:#CName11]]; \
+            [self registerColumn:COLTYPE##CType12 name:[NSString stringWithUTF8String:#CName12]]; \
         } \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
         _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
@@ -3925,8 +3925,8 @@
     } \
 @end
 
-#undef TDB_TABLE_IMPL_13
-#define TDB_TABLE_IMPL_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13) \
+#undef TIGHTDB_TABLE_IMPL_13
+#define TIGHTDB_TABLE_IMPL_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13) \
 @implementation TableName##_##Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -4219,20 +4219,20 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
-        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
-        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
-        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
-        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
-        [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
-        [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
-        [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
-        [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
-        [self registerColumn:COLTYPE##CType9 name:[NSString stringWithUTF8String:#CName9]]; \
-        [self registerColumn:COLTYPE##CType10 name:[NSString stringWithUTF8String:#CName10]]; \
-        [self registerColumn:COLTYPE##CType11 name:[NSString stringWithUTF8String:#CName11]]; \
-        [self registerColumn:COLTYPE##CType12 name:[NSString stringWithUTF8String:#CName12]]; \
-        [self registerColumn:COLTYPE##CType13 name:[NSString stringWithUTF8String:#CName13]]; \
+        if ([self getColumnCount] == 0) { \
+            [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+            [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+            [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+            [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+            [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
+            [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
+            [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
+            [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
+            [self registerColumn:COLTYPE##CType9 name:[NSString stringWithUTF8String:#CName9]]; \
+            [self registerColumn:COLTYPE##CType10 name:[NSString stringWithUTF8String:#CName10]]; \
+            [self registerColumn:COLTYPE##CType11 name:[NSString stringWithUTF8String:#CName11]]; \
+            [self registerColumn:COLTYPE##CType12 name:[NSString stringWithUTF8String:#CName12]]; \
+            [self registerColumn:COLTYPE##CType13 name:[NSString stringWithUTF8String:#CName13]]; \
         } \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
         _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
@@ -4388,8 +4388,8 @@
     } \
 @end
 
-#undef TDB_TABLE_IMPL_14
-#define TDB_TABLE_IMPL_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14) \
+#undef TIGHTDB_TABLE_IMPL_14
+#define TIGHTDB_TABLE_IMPL_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14) \
 @implementation TableName##_##Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -4695,21 +4695,21 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
-        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
-        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
-        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
-        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
-        [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
-        [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
-        [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
-        [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
-        [self registerColumn:COLTYPE##CType9 name:[NSString stringWithUTF8String:#CName9]]; \
-        [self registerColumn:COLTYPE##CType10 name:[NSString stringWithUTF8String:#CName10]]; \
-        [self registerColumn:COLTYPE##CType11 name:[NSString stringWithUTF8String:#CName11]]; \
-        [self registerColumn:COLTYPE##CType12 name:[NSString stringWithUTF8String:#CName12]]; \
-        [self registerColumn:COLTYPE##CType13 name:[NSString stringWithUTF8String:#CName13]]; \
-        [self registerColumn:COLTYPE##CType14 name:[NSString stringWithUTF8String:#CName14]]; \
+        if ([self getColumnCount] == 0) { \
+            [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+            [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+            [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+            [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+            [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
+            [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
+            [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
+            [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
+            [self registerColumn:COLTYPE##CType9 name:[NSString stringWithUTF8String:#CName9]]; \
+            [self registerColumn:COLTYPE##CType10 name:[NSString stringWithUTF8String:#CName10]]; \
+            [self registerColumn:COLTYPE##CType11 name:[NSString stringWithUTF8String:#CName11]]; \
+            [self registerColumn:COLTYPE##CType12 name:[NSString stringWithUTF8String:#CName12]]; \
+            [self registerColumn:COLTYPE##CType13 name:[NSString stringWithUTF8String:#CName13]]; \
+            [self registerColumn:COLTYPE##CType14 name:[NSString stringWithUTF8String:#CName14]]; \
         } \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
         _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
@@ -4872,8 +4872,8 @@
     } \
 @end
 
-#undef TDB_TABLE_IMPL_15
-#define TDB_TABLE_IMPL_15(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14, CType15, CName15) \
+#undef TIGHTDB_TABLE_IMPL_15
+#define TIGHTDB_TABLE_IMPL_15(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14, CType15, CName15) \
 @implementation TableName##_##Cursor \
     { \
         OCAccessor *_##CName1; \
@@ -5192,22 +5192,22 @@
 { \
     self = [super initWithBlock:block]; \
     if (self) { \
-	if ([self getColumnCount] == 0) { \
-        [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
-        [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
-        [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
-        [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
-        [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
-        [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
-        [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
-        [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
-        [self registerColumn:COLTYPE##CType9 name:[NSString stringWithUTF8String:#CName9]]; \
-        [self registerColumn:COLTYPE##CType10 name:[NSString stringWithUTF8String:#CName10]]; \
-        [self registerColumn:COLTYPE##CType11 name:[NSString stringWithUTF8String:#CName11]]; \
-        [self registerColumn:COLTYPE##CType12 name:[NSString stringWithUTF8String:#CName12]]; \
-        [self registerColumn:COLTYPE##CType13 name:[NSString stringWithUTF8String:#CName13]]; \
-        [self registerColumn:COLTYPE##CType14 name:[NSString stringWithUTF8String:#CName14]]; \
-        [self registerColumn:COLTYPE##CType15 name:[NSString stringWithUTF8String:#CName15]]; \
+        if ([self getColumnCount] == 0) { \
+            [self registerColumn:COLTYPE##CType1 name:[NSString stringWithUTF8String:#CName1]]; \
+            [self registerColumn:COLTYPE##CType2 name:[NSString stringWithUTF8String:#CName2]]; \
+            [self registerColumn:COLTYPE##CType3 name:[NSString stringWithUTF8String:#CName3]]; \
+            [self registerColumn:COLTYPE##CType4 name:[NSString stringWithUTF8String:#CName4]]; \
+            [self registerColumn:COLTYPE##CType5 name:[NSString stringWithUTF8String:#CName5]]; \
+            [self registerColumn:COLTYPE##CType6 name:[NSString stringWithUTF8String:#CName6]]; \
+            [self registerColumn:COLTYPE##CType7 name:[NSString stringWithUTF8String:#CName7]]; \
+            [self registerColumn:COLTYPE##CType8 name:[NSString stringWithUTF8String:#CName8]]; \
+            [self registerColumn:COLTYPE##CType9 name:[NSString stringWithUTF8String:#CName9]]; \
+            [self registerColumn:COLTYPE##CType10 name:[NSString stringWithUTF8String:#CName10]]; \
+            [self registerColumn:COLTYPE##CType11 name:[NSString stringWithUTF8String:#CName11]]; \
+            [self registerColumn:COLTYPE##CType12 name:[NSString stringWithUTF8String:#CName12]]; \
+            [self registerColumn:COLTYPE##CType13 name:[NSString stringWithUTF8String:#CName13]]; \
+            [self registerColumn:COLTYPE##CType14 name:[NSString stringWithUTF8String:#CName14]]; \
+            [self registerColumn:COLTYPE##CType15 name:[NSString stringWithUTF8String:#CName15]]; \
         } \
         _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
         _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
@@ -5378,8 +5378,8 @@
 @end
 
 
-#undef TDB_TABLE_DEF_1
-#define TDB_TABLE_DEF_1(TableName, CType1, CName1) \
+#undef TIGHTDB_TABLE_DEF_1
+#define TIGHTDB_TABLE_DEF_1(TableName, CType1, CName1) \
 @interface TableName##_##Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     -(tdbOCType##CType1)CName1; \
@@ -5426,14 +5426,14 @@
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#undef TDB_TABLE_1
-#define TDB_TABLE_1(TableName    , CType1, CName1    ) \
-TDB_TABLE_DEF_1(TableName    ,CType1, CName1    ) \
-TDB_TABLE_IMPL_1(TableName    ,CType1, CName1    )
-    
+#undef TIGHTDB_TABLE_1
+#define TIGHTDB_TABLE_1(TableName    , CType1, CName1    ) \
+TIGHTDB_TABLE_DEF_1(TableName    ,CType1, CName1    ) \
+TIGHTDB_TABLE_IMPL_1(TableName    ,CType1, CName1    )
 
-#undef TDB_TABLE_DEF_2
-#define TDB_TABLE_DEF_2(TableName, CType1, CName1, CType2, CName2) \
+
+#undef TIGHTDB_TABLE_DEF_2
+#define TIGHTDB_TABLE_DEF_2(TableName, CType1, CName1, CType2, CName2) \
 @interface TableName##_##Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -5485,14 +5485,14 @@ TDB_TABLE_IMPL_1(TableName    ,CType1, CName1    )
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#undef TDB_TABLE_2
-#define TDB_TABLE_2(TableName    , CType1, CName1    , CType2, CName2    ) \
-TDB_TABLE_DEF_2(TableName    ,CType1, CName1    ,CType2, CName2    ) \
-TDB_TABLE_IMPL_2(TableName    ,CType1, CName1    ,CType2, CName2    )
-    
+#undef TIGHTDB_TABLE_2
+#define TIGHTDB_TABLE_2(TableName    , CType1, CName1    , CType2, CName2    ) \
+TIGHTDB_TABLE_DEF_2(TableName    ,CType1, CName1    ,CType2, CName2    ) \
+TIGHTDB_TABLE_IMPL_2(TableName    ,CType1, CName1    ,CType2, CName2    )
 
-#undef TDB_TABLE_DEF_3
-#define TDB_TABLE_DEF_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
+
+#undef TIGHTDB_TABLE_DEF_3
+#define TIGHTDB_TABLE_DEF_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
 @interface TableName##_##Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -5549,14 +5549,14 @@ TDB_TABLE_IMPL_2(TableName    ,CType1, CName1    ,CType2, CName2    )
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#undef TDB_TABLE_3
-#define TDB_TABLE_3(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    ) \
-TDB_TABLE_DEF_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ) \
-TDB_TABLE_IMPL_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    )
-    
+#undef TIGHTDB_TABLE_3
+#define TIGHTDB_TABLE_3(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    ) \
+TIGHTDB_TABLE_DEF_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ) \
+TIGHTDB_TABLE_IMPL_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    )
 
-#undef TDB_TABLE_DEF_4
-#define TDB_TABLE_DEF_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
+
+#undef TIGHTDB_TABLE_DEF_4
+#define TIGHTDB_TABLE_DEF_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
 @interface TableName##_##Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -5618,14 +5618,14 @@ TDB_TABLE_IMPL_3(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#undef TDB_TABLE_4
-#define TDB_TABLE_4(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    ) \
-TDB_TABLE_DEF_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ) \
-TDB_TABLE_IMPL_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    )
-    
+#undef TIGHTDB_TABLE_4
+#define TIGHTDB_TABLE_4(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    ) \
+TIGHTDB_TABLE_DEF_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ) \
+TIGHTDB_TABLE_IMPL_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    )
 
-#undef TDB_TABLE_DEF_5
-#define TDB_TABLE_DEF_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
+
+#undef TIGHTDB_TABLE_DEF_5
+#define TIGHTDB_TABLE_DEF_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
 @interface TableName##_##Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -5692,14 +5692,14 @@ TDB_TABLE_IMPL_4(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#undef TDB_TABLE_5
-#define TDB_TABLE_5(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    ) \
-TDB_TABLE_DEF_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ) \
-TDB_TABLE_IMPL_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    )
-    
+#undef TIGHTDB_TABLE_5
+#define TIGHTDB_TABLE_5(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    ) \
+TIGHTDB_TABLE_DEF_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ) \
+TIGHTDB_TABLE_IMPL_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    )
 
-#undef TDB_TABLE_DEF_6
-#define TDB_TABLE_DEF_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
+
+#undef TIGHTDB_TABLE_DEF_6
+#define TIGHTDB_TABLE_DEF_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
 @interface TableName##_##Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -5771,14 +5771,14 @@ TDB_TABLE_IMPL_5(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#undef TDB_TABLE_6
-#define TDB_TABLE_6(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    ) \
-TDB_TABLE_DEF_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ) \
-TDB_TABLE_IMPL_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    )
-    
+#undef TIGHTDB_TABLE_6
+#define TIGHTDB_TABLE_6(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    ) \
+TIGHTDB_TABLE_DEF_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ) \
+TIGHTDB_TABLE_IMPL_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    )
 
-#undef TDB_TABLE_DEF_7
-#define TDB_TABLE_DEF_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
+
+#undef TIGHTDB_TABLE_DEF_7
+#define TIGHTDB_TABLE_DEF_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
 @interface TableName##_##Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -5855,14 +5855,14 @@ TDB_TABLE_IMPL_6(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#undef TDB_TABLE_7
-#define TDB_TABLE_7(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    ) \
-TDB_TABLE_DEF_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ) \
-TDB_TABLE_IMPL_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    )
-    
+#undef TIGHTDB_TABLE_7
+#define TIGHTDB_TABLE_7(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    ) \
+TIGHTDB_TABLE_DEF_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ) \
+TIGHTDB_TABLE_IMPL_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    )
 
-#undef TDB_TABLE_DEF_8
-#define TDB_TABLE_DEF_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
+
+#undef TIGHTDB_TABLE_DEF_8
+#define TIGHTDB_TABLE_DEF_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
 @interface TableName##_##Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -5944,14 +5944,14 @@ TDB_TABLE_IMPL_7(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#undef TDB_TABLE_8
-#define TDB_TABLE_8(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    ) \
-TDB_TABLE_DEF_8(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ) \
-TDB_TABLE_IMPL_8(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    )
-    
+#undef TIGHTDB_TABLE_8
+#define TIGHTDB_TABLE_8(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    ) \
+TIGHTDB_TABLE_DEF_8(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ) \
+TIGHTDB_TABLE_IMPL_8(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    )
 
-#undef TDB_TABLE_DEF_9
-#define TDB_TABLE_DEF_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9) \
+
+#undef TIGHTDB_TABLE_DEF_9
+#define TIGHTDB_TABLE_DEF_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9) \
 @interface TableName##_##Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -6038,14 +6038,14 @@ TDB_TABLE_IMPL_8(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#undef TDB_TABLE_9
-#define TDB_TABLE_9(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    , CType9, CName9    ) \
-TDB_TABLE_DEF_9(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ) \
-TDB_TABLE_IMPL_9(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    )
-    
+#undef TIGHTDB_TABLE_9
+#define TIGHTDB_TABLE_9(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    , CType9, CName9    ) \
+TIGHTDB_TABLE_DEF_9(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ) \
+TIGHTDB_TABLE_IMPL_9(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    )
 
-#undef TDB_TABLE_DEF_10
-#define TDB_TABLE_DEF_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10) \
+
+#undef TIGHTDB_TABLE_DEF_10
+#define TIGHTDB_TABLE_DEF_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10) \
 @interface TableName##_##Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -6137,14 +6137,14 @@ TDB_TABLE_IMPL_9(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CNa
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#undef TDB_TABLE_10
-#define TDB_TABLE_10(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    , CType9, CName9    , CType10, CName10    ) \
-TDB_TABLE_DEF_10(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ) \
-TDB_TABLE_IMPL_10(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    )
-    
+#undef TIGHTDB_TABLE_10
+#define TIGHTDB_TABLE_10(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    , CType9, CName9    , CType10, CName10    ) \
+TIGHTDB_TABLE_DEF_10(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ) \
+TIGHTDB_TABLE_IMPL_10(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    )
 
-#undef TDB_TABLE_DEF_11
-#define TDB_TABLE_DEF_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11) \
+
+#undef TIGHTDB_TABLE_DEF_11
+#define TIGHTDB_TABLE_DEF_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11) \
 @interface TableName##_##Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -6241,14 +6241,14 @@ TDB_TABLE_IMPL_10(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CN
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#undef TDB_TABLE_11
-#define TDB_TABLE_11(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    , CType9, CName9    , CType10, CName10    , CType11, CName11    ) \
-TDB_TABLE_DEF_11(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ) \
-TDB_TABLE_IMPL_11(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    )
-    
+#undef TIGHTDB_TABLE_11
+#define TIGHTDB_TABLE_11(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    , CType9, CName9    , CType10, CName10    , CType11, CName11    ) \
+TIGHTDB_TABLE_DEF_11(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ) \
+TIGHTDB_TABLE_IMPL_11(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    )
 
-#undef TDB_TABLE_DEF_12
-#define TDB_TABLE_DEF_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12) \
+
+#undef TIGHTDB_TABLE_DEF_12
+#define TIGHTDB_TABLE_DEF_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12) \
 @interface TableName##_##Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -6350,14 +6350,14 @@ TDB_TABLE_IMPL_11(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CN
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#undef TDB_TABLE_12
-#define TDB_TABLE_12(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    , CType9, CName9    , CType10, CName10    , CType11, CName11    , CType12, CName12    ) \
-TDB_TABLE_DEF_12(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ,CType12, CName12    ) \
-TDB_TABLE_IMPL_12(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ,CType12, CName12    )
-    
+#undef TIGHTDB_TABLE_12
+#define TIGHTDB_TABLE_12(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    , CType9, CName9    , CType10, CName10    , CType11, CName11    , CType12, CName12    ) \
+TIGHTDB_TABLE_DEF_12(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ,CType12, CName12    ) \
+TIGHTDB_TABLE_IMPL_12(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ,CType12, CName12    )
 
-#undef TDB_TABLE_DEF_13
-#define TDB_TABLE_DEF_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13) \
+
+#undef TIGHTDB_TABLE_DEF_13
+#define TIGHTDB_TABLE_DEF_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13) \
 @interface TableName##_##Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -6464,14 +6464,14 @@ TDB_TABLE_IMPL_12(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CN
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#undef TDB_TABLE_13
-#define TDB_TABLE_13(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    , CType9, CName9    , CType10, CName10    , CType11, CName11    , CType12, CName12    , CType13, CName13    ) \
-TDB_TABLE_DEF_13(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ,CType12, CName12    ,CType13, CName13    ) \
-TDB_TABLE_IMPL_13(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ,CType12, CName12    ,CType13, CName13    )
-    
+#undef TIGHTDB_TABLE_13
+#define TIGHTDB_TABLE_13(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    , CType9, CName9    , CType10, CName10    , CType11, CName11    , CType12, CName12    , CType13, CName13    ) \
+TIGHTDB_TABLE_DEF_13(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ,CType12, CName12    ,CType13, CName13    ) \
+TIGHTDB_TABLE_IMPL_13(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ,CType12, CName12    ,CType13, CName13    )
 
-#undef TDB_TABLE_DEF_14
-#define TDB_TABLE_DEF_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14) \
+
+#undef TIGHTDB_TABLE_DEF_14
+#define TIGHTDB_TABLE_DEF_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14) \
 @interface TableName##_##Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -6583,14 +6583,14 @@ TDB_TABLE_IMPL_13(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CN
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#undef TDB_TABLE_14
-#define TDB_TABLE_14(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    , CType9, CName9    , CType10, CName10    , CType11, CName11    , CType12, CName12    , CType13, CName13    , CType14, CName14    ) \
-TDB_TABLE_DEF_14(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ,CType12, CName12    ,CType13, CName13    ,CType14, CName14    ) \
-TDB_TABLE_IMPL_14(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ,CType12, CName12    ,CType13, CName13    ,CType14, CName14    )
-    
+#undef TIGHTDB_TABLE_14
+#define TIGHTDB_TABLE_14(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    , CType9, CName9    , CType10, CName10    , CType11, CName11    , CType12, CName12    , CType13, CName13    , CType14, CName14    ) \
+TIGHTDB_TABLE_DEF_14(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ,CType12, CName12    ,CType13, CName13    ,CType14, CName14    ) \
+TIGHTDB_TABLE_IMPL_14(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ,CType12, CName12    ,CType13, CName13    ,CType14, CName14    )
 
-#undef TDB_TABLE_DEF_15
-#define TDB_TABLE_DEF_15(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14, CType15, CName15) \
+
+#undef TIGHTDB_TABLE_DEF_15
+#define TIGHTDB_TABLE_DEF_15(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14, CType15, CName15) \
 @interface TableName##_##Cursor : CursorBase \
     @property tdbOCType##CType1 CName1; \
     @property tdbOCType##CType2 CName2; \
@@ -6707,10 +6707,10 @@ TDB_TABLE_IMPL_14(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CN
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#undef TDB_TABLE_15
-#define TDB_TABLE_15(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    , CType9, CName9    , CType10, CName10    , CType11, CName11    , CType12, CName12    , CType13, CName13    , CType14, CName14    , CType15, CName15    ) \
-TDB_TABLE_DEF_15(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ,CType12, CName12    ,CType13, CName13    ,CType14, CName14    ,CType15, CName15    ) \
-TDB_TABLE_IMPL_15(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ,CType12, CName12    ,CType13, CName13    ,CType14, CName14    ,CType15, CName15    )
-    
+#undef TIGHTDB_TABLE_15
+#define TIGHTDB_TABLE_15(TableName    , CType1, CName1    , CType2, CName2    , CType3, CName3    , CType4, CName4    , CType5, CName5    , CType6, CName6    , CType7, CName7    , CType8, CName8    , CType9, CName9    , CType10, CName10    , CType11, CName11    , CType12, CName12    , CType13, CName13    , CType14, CName14    , CType15, CName15    ) \
+TIGHTDB_TABLE_DEF_15(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ,CType12, CName12    ,CType13, CName13    ,CType14, CName14    ,CType15, CName15    ) \
+TIGHTDB_TABLE_IMPL_15(TableName    ,CType1, CName1    ,CType2, CName2    ,CType3, CName3    ,CType4, CName4    ,CType5, CName5    ,CType6, CName6    ,CType7, CName7    ,CType8, CName8    ,CType9, CName9    ,CType10, CName10    ,CType11, CName11    ,CType12, CName12    ,CType13, CName13    ,CType14, CName14    ,CType15, CName15    )
+
 
 
