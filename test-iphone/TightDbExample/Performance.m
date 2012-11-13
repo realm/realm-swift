@@ -12,11 +12,11 @@
 #import "Performance.h"
 #import "Utils.h"
 
-TDB_TABLE_4(PerfTable,
-            String, Name,
-            Int,    Age,
-            Bool,   Hired,
-            Int,	Spare)
+TIGHTDB_TABLE_4(PerfTable,
+                String, Name,
+                Int,    Age,
+                Bool,   Hired,
+                Int,    Spare)
 
 
 @implementation Performance

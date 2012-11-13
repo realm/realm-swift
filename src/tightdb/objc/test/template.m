@@ -1,5 +1,5 @@
 //
-//  MacTightDbTests.m
+//  template.m
 //  MacTightDbTests
 //
 

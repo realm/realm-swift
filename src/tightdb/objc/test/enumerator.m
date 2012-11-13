@@ -1,5 +1,5 @@
 //
-//  MACTestTutorial.m
+//  enumerator.m
 //  TightDB
 //
 //
@@ -12,14 +12,14 @@
 #import <tightdb/objc/group.h>
 #import <tightdb/objc/table.h>
 
-TDB_TABLE_3(EnumPeopleTable,
-            String, Name,
-            Int,    Age,
-            Bool,   Hired)
+TIGHTDB_TABLE_3(EnumPeopleTable,
+                String, Name,
+                Int,    Age,
+                Bool,   Hired)
 
-TDB_TABLE_2(EnumPeopleTable2,
-            Bool,   Hired,
-            Int,    Age)
+TIGHTDB_TABLE_2(EnumPeopleTable2,
+                Bool,   Hired,
+                Int,    Age)
 
 @interface MACTestEnumerator : SenTestCase
 @end

@@ -1,5 +1,5 @@
 //
-//  MACTestGroupMisc2.m
+//  group_misc_2.m
 //  TightDB
 //
 // Demo code for short tutorial using Objective-C interface
@@ -10,29 +10,29 @@
 #import <tightdb/objc/tightdb.h>
 #import <tightdb/objc/group.h>
 
-TDB_TABLE_DEF_4(MyTable,
-            String, Name,
-            Int,    Age,
-            Bool,   Hired,
-            Int,    Spare)
+TIGHTDB_TABLE_DEF_4(MyTable,
+                    String, Name,
+                    Int,    Age,
+                    Bool,   Hired,
+                    Int,    Spare)
 
-TDB_TABLE_DEF_2(MyTable2,
-            Bool,   Hired,
-            Int,    Age)
+TIGHTDB_TABLE_DEF_2(MyTable2,
+                    Bool,   Hired,
+                    Int,    Age)
 
-TDB_TABLE_IMPL_4(MyTable,
-            String, Name,
-            Int,    Age,
-            Bool,   Hired,
-            Int,    Spare)
+TIGHTDB_TABLE_IMPL_4(MyTable,
+                     String, Name,
+                     Int,    Age,
+                     Bool,   Hired,
+                     Int,    Spare)
 
-TDB_TABLE_IMPL_2(MyTable2,
-            Bool,   Hired,
-            Int,    Age)
+TIGHTDB_TABLE_IMPL_2(MyTable2,
+                     Bool,   Hired,
+                     Int,    Age)
 
-TDB_TABLE_2(QueryTable,
-            Int, First,
-            String, Second)
+TIGHTDB_TABLE_2(QueryTable,
+                Int,    First,
+                String, Second)
 
 @interface MACTestGroupMisc2 : SenTestCase
 @end
@@ -56,15 +56,15 @@ TDB_TABLE_2(QueryTable,
     //------------------------------------------------------
 
     size_t row;
-    row = [table.Name find:@"Philip"];		    	// row = (size_t)-1
+    row = [table.Name find:@"Philip"];    // row = (size_t)-1
     NSLog(@"Philip: %zu", row);
     STAssertEquals(row, (size_t)-1,@"Philip should not be there");
-    row = [table.Name find:@"Mary"];		
+    row = [table.Name find:@"Mary"];
     NSLog(@"Mary: %zu", row);
     STAssertEquals(row, (size_t)1,@"Mary should have been there");
 
     TableView *view = [table.Age findAll:21];
-    size_t cnt = [view count];  					// cnt = 2
+    size_t cnt = [view count];            // cnt = 2
     STAssertEquals(cnt, (size_t)2,@"Should be two rows in view");
 
     //------------------------------------------------------

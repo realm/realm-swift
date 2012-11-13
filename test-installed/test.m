@@ -1,8 +1,8 @@
 #import <tightdb/objc/group.h>
 #import <tightdb/objc/tightdb.h>
 
-TDB_TABLE_1(TestTable,
-            Int, Value)
+TIGHTDB_TABLE_1(TestTable,
+                Int, Value)
 
 int main()
 {

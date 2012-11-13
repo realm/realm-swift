@@ -17,8 +17,8 @@ directiveStartToken = %
 
 %for $i in range($max_cols)
 %set $num_cols = $i + 1
-#undef TDB_TABLE_IMPL_${num_cols}
-#define TDB_TABLE_IMPL_${num_cols}(TableName%slurp
+#undef TIGHTDB_TABLE_IMPL_${num_cols}
+#define TIGHTDB_TABLE_IMPL_${num_cols}(TableName%slurp
 %for $j in range($num_cols)
 , CType${j+1}, CName${j+1}%slurp
 %end for
@@ -33,9 +33,9 @@ directiveStartToken = %
     { \\
     self = [super initWithTable:table ndx:ndx]; \\
     if (self) { \\
-    %for $j in range($num_cols)        
+    %for $j in range($num_cols)
     _##CName${j+1} = [[OCAccessor alloc] initWithCursor:self columnId:${j}]; \\
-    %end for        
+    %end for
     } \\
     return self; \\
     } \\
@@ -171,9 +171,9 @@ directiveStartToken = %
 { \\
     self = [super initWithBlock:block]; \\
     if (self) { \\
-	if ([self getColumnCount] == 0) { \\
+        if ([self getColumnCount] == 0) { \\
 %for $j in range($num_cols)
-        [self registerColumn:COLTYPE##CType${j+1} name:[NSString stringWithUTF8String:#CName${j+1}]]; \\
+            [self registerColumn:COLTYPE##CType${j+1} name:[NSString stringWithUTF8String:#CName${j+1}]]; \\
 %end for
         } \\
 %for $j in range($num_cols)
@@ -272,8 +272,8 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 
 %for $i in range($max_cols)
 %set $num_cols = $i + 1
-#undef TDB_TABLE_DEF_${num_cols}
-#define TDB_TABLE_DEF_${num_cols}(TableName%slurp
+#undef TIGHTDB_TABLE_DEF_${num_cols}
+#define TIGHTDB_TABLE_DEF_${num_cols}(TableName%slurp
 %for $j in range($num_cols)
 , CType${j+1}, CName${j+1}%slurp
 %end for
@@ -343,23 +343,23 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1}%slurp
     -(TableName##_##Cursor *)objectAtIndex:(size_t)ndx; \\
 @end
 
-#undef TDB_TABLE_${num_cols}
-#define TDB_TABLE_${num_cols}(TableName%slurp
+#undef TIGHTDB_TABLE_${num_cols}
+#define TIGHTDB_TABLE_${num_cols}(TableName%slurp
     %for $j in range($num_cols)
     , CType${j+1}, CName${j+1}%slurp
     %end for
     ) \\
-TDB_TABLE_DEF_${num_cols}(TableName%slurp
+TIGHTDB_TABLE_DEF_${num_cols}(TableName%slurp
     %for $j in range($num_cols)
     ,CType${j+1}, CName${j+1}%slurp
     %end for
     ) \\
-TDB_TABLE_IMPL_${num_cols}(TableName%slurp
+TIGHTDB_TABLE_IMPL_${num_cols}(TableName%slurp
     %for $j in range($num_cols)
     ,CType${j+1}, CName${j+1}%slurp
     %end for
     )
-    
+
 
 %end for
 
@@ -367,8 +367,8 @@ TDB_TABLE_IMPL_${num_cols}(TableName%slurp
 
 args = sys.argv[1:]
 if len(args) != 1:
-	sys.stderr.write("Please specify the maximum number of table columns\n")
-	sys.exit(1)
+    sys.stderr.write("Please specify the maximum number of table columns\n")
+    sys.exit(1)
 max_cols = int(args[0])
 t = Template(templateDef, searchList=[{'max_cols': max_cols}])
 sys.stdout.write(str(t))

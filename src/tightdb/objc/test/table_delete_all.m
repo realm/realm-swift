@@ -1,5 +1,5 @@
 //
-//  MACTestTableDeleteAll.m
+//  table_delete_all.m
 //  TightDB
 //
 

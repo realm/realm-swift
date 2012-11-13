@@ -11,21 +11,19 @@
 #import "Utils.h"
 #import "Performance.h"
 
-TDB_TABLE_4(MyTable,
-            String, Name,
-            Int,    Age,
-            Bool,   Hired,
-            Int,	Spare)
+TIGHTDB_TABLE_4(MyTable,
+                String, Name,
+                Int,    Age,
+                Bool,   Hired,
+                Int,    Spare)
 
-TDB_TABLE_2(MyTable2,
-Bool,   Hired,
-Int,    Age)
+TIGHTDB_TABLE_2(MyTable2,
+                Bool,   Hired,
+                Int,    Age)
 
 
 @interface ViewController ()
-
 @end
-
 @implementation ViewController
 {
     Utils *_utils;

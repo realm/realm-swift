@@ -1,5 +1,5 @@
 //
-//  MACtestTable.m
+//  table.m
 //  TightDB
 //
 // Using lowlevel interface, test creation of creating two columns with two rows
