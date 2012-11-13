@@ -36,13 +36,13 @@
 
 
 - (NSString *) pathForDataFile:(NSString *)filename {
-    NSArray*	documentDir = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString*	path = nil;
- 	
+    NSArray*    documentDir = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString*   path = nil;
+
     if (documentDir) {
-        path = [documentDir objectAtIndex:0];    
+        path = [documentDir objectAtIndex:0];
     }
- 	
+
     return [NSString stringWithFormat:@"%@/%@", path, filename];
 }
 
@@ -76,7 +76,7 @@
     label.text = msg;
     if (!good)
         label.backgroundColor = [UIColor redColor];
-    label.autoresizingMask = UIViewAutoresizingFlexibleWidth;    
+    label.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     view.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     [view addSubview:label];
     frame.size.width = _view.bounds.size.width;
