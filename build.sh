@@ -150,6 +150,26 @@ case "$MODE" in
         exit 0
         ;;
 
+    "memtest")
+        make test-norun || exit 1
+        TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test.XXXX)" || exit 1
+        mkdir -p "$TEMP_DIR/unit-tests.octest/Contents/MacOS" || exit 1
+        cp "src/tightdb/objc/test/unit-tests" "$TEMP_DIR/unit-tests.octest/Contents/MacOS/" || exit 1
+        XCODE_HOME="$(xcode-select --print-path)" || exit 1
+        OBJC_DISABLE_GC=YES valgrind --quiet --error-exitcode=1 --track-origins=yes --leak-check=yes --leak-resolution=low "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests.octest" || exit 1
+        exit 0
+        ;;
+
+    "debug")
+        make test-debug-norun || exit 1
+        TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test.XXXX)" || exit 1
+        mkdir -p "$TEMP_DIR/unit-tests.octest/Contents/MacOS" || exit 1
+        cp "src/tightdb/objc/test/unit-tests" "$TEMP_DIR/unit-tests.octest/Contents/MacOS/" || exit 1
+        XCODE_HOME="$(xcode-select --print-path)" || exit 1
+        OBJC_DISABLE_GC=YES gdb --args "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests.octest" || exit 1
+        exit 0
+        ;;
+
     "install")
         PREFIX="$1"
         if [ -z "$PREFIX" ]; then
@@ -204,6 +224,7 @@ EOF
         echo "Unspecified or bad mode '$MODE'" 1>&2
         echo "Available modes are: clean build test install test-installed" 1>&2
         echo "As well as: dist-copy" 1>&2
+        echo "As well as: memtest debug" 1>&2
         exit 1
         ;;
 
