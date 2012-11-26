@@ -8,6 +8,7 @@
 #import <sqlite3.h>
 #import <tightdb/objc/tightdb.h>
 #import <tightdb/objc/group.h>
+#import <tightdb/objc/group_shared.h>
 
 #import "Performance.h"
 #import "Utils.h"
@@ -182,7 +183,7 @@ TIGHTDB_TABLE_4(PerfTable,
     db = NULL;
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"SQL query in %.2f s (%zu)", stop - start, result]];
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"SQL query in %.2f s (%u)", stop - start, result]];
     });
 
     return stop-start;
@@ -238,7 +239,7 @@ TIGHTDB_TABLE_4(PerfTable,
     db = NULL;
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"SQL query sparse in %.2f s (%zu)", stop - start, result]];
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"SQL query sparse in %.2f s (%u)", stop - start, result]];
     });
 
     return stop-start;
@@ -300,6 +301,55 @@ TIGHTDB_TABLE_4(PerfTable,
     });
 
 }
+
+-(void)testReadTransaction
+{
+    NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
+    SharedGroup *fromDisk = [SharedGroup groupWithFilename:[_utils pathForDataFile:@"perfemployees.tightdb"]];
+    [fromDisk readTransaction:^(Group *group) {
+        PerfTable *diskTable = [group getTable:@"employees" withClass:[PerfTable class]];
+        
+        
+        // Create query (current employees between 20 and 30 years old)
+        PerfTable_Query *q = [[[diskTable getQuery].Hired equal:YES].Age between:20 to:30];
+        
+        PerfTable_View *res = [q findAll];
+        int agesum = 0;
+        for (PerfTable_Cursor *cur in res) {
+            agesum += cur.Age;
+        }
+    }];
+    
+    NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Transaction Read and iterate in %.2f s", stop-start]];
+    });    
+}
+
+
+-(void)testWriteTransaction
+{
+    NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
+    SharedGroup *fromDisk = [SharedGroup groupWithFilename:[_utils pathForDataFile:@"perfemployees.tightdb"]];
+    [fromDisk writeTransaction:^(Group *group) {
+        PerfTable *diskTable = [group getTable:@"employees" withClass:[PerfTable class]];
+        
+        // Add some rows
+        NSUInteger count = _size;
+        for (NSUInteger i = 0; i < count; i++) {
+            [diskTable addName:@"Foo" Age:25 + (int)(drand48() * 4) Hired:YES Spare:0];
+        }
+        [diskTable addName:@"Sparse" Age:41 Hired:NO Spare:2];
+
+        return YES; // Commit transaction
+    }];
+    
+    NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Transaction Write %.2f s", stop-start]];
+    });
+}
+
 
 
 @end

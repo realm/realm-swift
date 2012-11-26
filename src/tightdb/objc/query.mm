@@ -39,6 +39,7 @@
 
 -(CursorBase *)getCursor:(long)ndx
 {
+    (void)ndx;
     return nil; // Must be overridden in TightDb.h
 }
 
@@ -48,11 +49,13 @@
 }
 -(long)incrementFastEnum:(long)ndx
 {
+    (void)ndx;
     return ndx; // Must be overridden in TightDb.h
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len
 {
+    (void)len;
     if(state->state == 0)
     {
         state->state = [self getFastEnumStart];
@@ -60,7 +63,7 @@
         CursorBase *tmp = [self getCursor:state->state];
         *stackbuf = tmp;
     }
-    if (state->state != -1) {
+    if ((int)state->state != -1) {
         [((CursorBase *)*stackbuf) setNdx:state->state];
         state->itemsPtr = stackbuf;
         state->state = [self incrementFastEnum:state->state];
@@ -191,6 +194,7 @@
 }
 @end
 
+
 #pragma mark - OCXQueryAccessorBool
 
 @implementation OCXQueryAccessorBool
@@ -213,6 +217,26 @@
     return _query;
 }
 @end
+
+
+#pragma mark - OCXQueryAccessorDate
+
+@implementation OCXQueryAccessorDate
+{
+    Query *_query;
+    size_t _column_ndx;
+}
+-(id)initWithColumn:(size_t)columnId query:(Query *)query
+{
+    self = [super init];
+    if (self) {
+        _query = query;
+        _column_ndx = columnId;
+    }
+    return self;
+}
+@end
+
 
 #pragma mark - OCXQueryAccessorString
 
@@ -254,6 +278,44 @@
 {
     [_query getQuery]->contains(_column_ndx, [value UTF8String], caseSensitive);
     return _query;
+}
+@end
+
+
+#pragma mark - OCXQueryAccessorSubtable
+
+@implementation OCXQueryAccessorSubtable
+{
+    Query *_query;
+    size_t _column_ndx;
+}
+-(id)initWithColumn:(size_t)columnId query:(Query *)query
+{
+    self = [super init];
+    if (self) {
+        _query = query;
+        _column_ndx = columnId;
+    }
+    return self;
+}
+@end
+
+
+#pragma mark - OCXQueryAccessorMixed
+
+@implementation OCXQueryAccessorMixed
+{
+    Query *_query;
+    size_t _column_ndx;
+}
+-(id)initWithColumn:(size_t)columnId query:(Query *)query
+{
+    self = [super init];
+    if (self) {
+        _query = query;
+        _column_ndx = columnId;
+    }
+    return self;
 }
 @end
 

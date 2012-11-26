@@ -74,37 +74,34 @@
 -(void)setBool:(BOOL)value
 {
     [_cursor.table setBool:_columnId ndx:_cursor.ndx value:value];
-
 }
 -(time_t)getDate
 {
     return [_cursor.table getDate:_columnId ndx:_cursor.ndx];
-
 }
 -(void)setDate:(time_t)value
 {
     [_cursor.table setDate:_columnId ndx:_cursor.ndx value:value];
-
 }
 -(NSString *)getString
 {
     return [_cursor.table getString:_columnId ndx:_cursor.ndx];
-
 }
 -(void)setString:(NSString *)value
 {
     [_cursor.table setString:_columnId ndx:_cursor.ndx value:value];
-
+}
+-(id)getSubtable:(Class)obj
+{
+    return [_cursor.table getSubtable:_columnId ndx:_cursor.ndx withClass:obj];
 }
 -(OCMixed *)getMixed
 {
     return [_cursor.table getMixed:_columnId ndx:_cursor.ndx];
-
 }
 -(void)setMixed:(OCMixed *)value
 {
     [_cursor.table setMixed:_columnId ndx:_cursor.ndx value:value];
-
 }
 
 @end

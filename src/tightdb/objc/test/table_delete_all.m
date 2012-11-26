@@ -14,7 +14,7 @@
 -(void)testTableDeleteAll
 {
     // Create table with all column types
-    OCTopLevelTable *table = [[OCTopLevelTable alloc] init];
+    Table *table = [[Table alloc] init];
     OCSpec *s = [table getSpec];
     [s addColumn:COLUMN_TYPE_INT name:@"int"];
     [s addColumn:COLUMN_TYPE_BOOL name:@"bool"];
@@ -61,12 +61,12 @@
                 [table insertMixed:7 ndx:i value:[OCMixed mixedWithString:@"string"]];
                 break;
         }
-        [table insertTable:8 ndx:i];
+        [table insertSubtable:8 ndx:i];
         [table insertDone];
 
         // Add sub-tables
         if (i == 2) {
-            Table *subtable = [table getTable:8 ndx:i];
+            Table *subtable = [table getSubtable:8 ndx:i];
             [subtable insertInt:0 ndx:0 value:42];
             [subtable insertString:1 ndx:0 value:@"meaning"];
             [subtable insertDone];

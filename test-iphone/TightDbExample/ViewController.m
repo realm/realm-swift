@@ -45,6 +45,8 @@ TIGHTDB_TABLE_2(MyTable2,
         [perf testFetchAndIterate];
         [perf testUnqualifiedFetchAndIterate];
         [perf testWriteToDisk];
+        [perf testReadTransaction];
+        [perf testWriteTransaction];
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     });
 

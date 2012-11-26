@@ -1,7 +1,22 @@
-//
-//  table.h
-//  TightDB
-//
+/*************************************************************************
+ *
+ * TIGHTDB CONFIDENTIAL
+ * __________________
+ *
+ *  [2011] - [2012] TightDB Inc
+ *  All Rights Reserved.
+ *
+ * NOTICE:  All information contained herein is, and remains
+ * the property of TightDB Incorporated and its suppliers,
+ * if any.  The intellectual and technical concepts contained
+ * herein are proprietary to TightDB Incorporated
+ * and its suppliers and may be covered by U.S. and Foreign Patents,
+ * patents in process, and are protected by trade secret or copyright law.
+ * Dissemination of this information or reproduction of this material
+ * is strictly forbidden unless prior written permission is obtained
+ * from TightDB Incorporated.
+ *
+ **************************************************************************/
 
 #import <Foundation/Foundation.h>
 
@@ -16,13 +31,14 @@
 #define COLTYPEBool COLUMN_TYPE_BOOL
 #define COLTYPEString COLUMN_TYPE_STRING
 #define COLTYPEDate COLUMN_TYPE_DATE
+#define COLTYPEMixed COLUMN_TYPE_MIXED
+
+@class Table;
+@class TableView;
 
 @interface BinaryData : NSObject
 -(id)initWithData:(char *)ptr len:(size_t)len;
 @end
-@class Table;
-@class OCTopLevelTable;
-typedef void(^TopLevelTableInitBlock)(Table *table);
 
 @interface OCMemRef : NSObject
 -(id)initWithPointer:(void *)p ref:(size_t)r;
@@ -30,40 +46,37 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 -(size_t)getRef;
 @end
 
-@interface OCAllocator : NSObject
--(OCMemRef *)alloc:(size_t)size;
--(OCMemRef *)reAlloc:(size_t)ref pointer:(void *)p size:(size_t)size;
--(void)free:(size_t)ref pointer:(void *)p;
--(void*)translate:(size_t)ref;
--(BOOL)isReadOnly:(size_t)ref;
-@end
-
 @interface OCDate : NSObject
 -(id)initWithDate:(time_t)d;
 -(time_t)getDate;
+-(BOOL)isEqual:(OCDate *)other;
 @end
 
 @interface OCMixed : NSObject
-+(OCMixed *)mixedWithTable;
++(OCMixed *)mixedWithTable:(Table *)table;
 +(OCMixed *)mixedWithBool:(BOOL)value;
 +(OCMixed *)mixedWithDate:(OCDate *)date;
 +(OCMixed *)mixedWithInt64:(int64_t)value;
 +(OCMixed *)mixedWithString:(NSString *)string;
 +(OCMixed *)mixedWithBinary:(BinaryData *)data;
 +(OCMixed *)mixedWithData:(const char*)value length:(size_t)length;
+-(BOOL)isEqual:(OCMixed *)other;
 -(ColumnType)getType;
 -(int64_t)getInt;
 -(BOOL)getBool;
 -(OCDate *)getDate;
 -(NSString *)getString;
 -(BinaryData *)getBinary;
+-(Table *)getTable;
 @end
 
 
 @interface OCSpec : NSObject
--(void)addColumn:(ColumnType)type name:(NSString *)name;
+/// Returns NO on memory allocation error.
+-(BOOL)addColumn:(ColumnType)type name:(NSString *)name;
+/// Returns nil on memory allocation error.
 -(OCSpec *)addColumnTable:(NSString *)name;
--(OCSpec *)getSpec:(size_t)columndId;
+-(OCSpec *)getSpec:(size_t)columnId;
 -(size_t)getColumnCount;
 -(ColumnType)getColumnType:(size_t)ndx;
 -(NSString *)getColumnName:(size_t)ndx;
@@ -71,12 +84,43 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 -(size_t)write:(id)obj pos:(size_t)pos;
 @end
 
-@class TableView;
 
 @interface Table : NSObject
+-(void)updateFromSpec;
+-(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
+
 // TODO - TableRef methods ?????????
--(Table *)getTable:(size_t)columnId ndx:(size_t)ndx;
--(OCTopLevelTable *)getTopLevelTable:(size_t)columnId ndx:(size_t)ndx;
+
+//@{
+/// If the specified column is neither a subtable column, nor a mixed
+/// column, then these methods return nil. They also return nil for a
+/// mixed column, if the mixed value at the specified row is not a
+/// subtable. The second method also returns nil if the type of the
+/// subtable is not compatible with the specified table
+/// class. Finally, these methods return nil if they encounter a
+/// memory allocation error (out of memory).
+///
+/// The specified table class must be one that is declared by using
+/// one of the table macros TIGHTDB_TABLE_*.
+-(Table *)getSubtable:(size_t)columnId ndx:(size_t)ndx;
+-(id)getSubtable:(size_t)columnId ndx:(size_t)ndx withClass:(Class)obj;
+//@}
+
+/// This method will return NO if it encounters a memory allocation
+/// error (out of memory).
+///
+/// The specified table class must be one that is declared by using
+/// one of the table macros TIGHTDB_TABLE_*.
+-(BOOL)isClass:(Class)obj;
+
+/// If the type of this table is not compatible with the specified
+/// table class, then this method returns nil. It also returns nil if
+/// it encounters a memory allocation error (out of memory).
+///
+/// The specified table class must be one that is declared by using
+/// one of the table macros TIGHTDB_TABLE_*.
+-(id)castClass:(Class)obj;
+
 //Column meta info
 -(size_t)getColumnCount;
 -(NSString *)getColumnName:(size_t)ndx;
@@ -93,31 +137,31 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 // Adaptive ints.
 -(int64_t)get:(size_t)columnId ndx:(size_t)ndx;
 -(void)set:(size_t)columnId ndx:(size_t)ndx value:(int64_t)value;
--(BOOL)getBool:(size_t)columndId ndx:(size_t)ndx;
--(void)setBool:(size_t)columndId ndx:(size_t)ndx value:(BOOL)value;
--(time_t)getDate:(size_t)columndId ndx:(size_t)ndx;
--(void)setDate:(size_t)columndId ndx:(size_t)ndx value:(time_t)value;
+-(BOOL)getBool:(size_t)columnId ndx:(size_t)ndx;
+-(void)setBool:(size_t)columnId ndx:(size_t)ndx value:(BOOL)value;
+-(time_t)getDate:(size_t)columnId ndx:(size_t)ndx;
+-(void)setDate:(size_t)columnId ndx:(size_t)ndx value:(time_t)value;
 
 // NOTE: Low-level insert functions. Always insert in all columns at once
 // and call InsertDone after to avoid table getting un-balanced.
--(void)insertInt:(size_t)columndId ndx:(size_t)ndx value:(int64_t)value;
--(void)insertBool:(size_t)columndId ndx:(size_t)ndx value:(BOOL)value;
--(void)insertDate:(size_t)columndId ndx:(size_t)ndx value:(time_t)value;
--(void)insertString:(size_t)columndId ndx:(size_t)ndx value:(NSString *)value;
--(void)insertBinary:(size_t)columndId ndx:(size_t)ndx value:(void *)value len:(size_t)len;
+-(void)insertInt:(size_t)columnId ndx:(size_t)ndx value:(int64_t)value;
+-(void)insertBool:(size_t)columnId ndx:(size_t)ndx value:(BOOL)value;
+-(void)insertDate:(size_t)columnId ndx:(size_t)ndx value:(time_t)value;
+-(void)insertString:(size_t)columnId ndx:(size_t)ndx value:(NSString *)value;
+-(void)insertBinary:(size_t)columnId ndx:(size_t)ndx value:(void *)value len:(size_t)len;
 -(void)insertDone;
 
 // Strings
--(NSString *)getString:(size_t)columndId ndx:(size_t)ndx;
--(void)setString:(size_t)columndId ndx:(size_t)ndx value:(NSString *)value;
+-(NSString *)getString:(size_t)columnId ndx:(size_t)ndx;
+-(void)setString:(size_t)columnId ndx:(size_t)ndx value:(NSString *)value;
 
 // Binary
--(BinaryData *)getBinary:(size_t)columndId ndx:(size_t)ndx;
--(void)setBinary:(size_t)columndId ndx:(size_t)ndx value:(void *)value len:(size_t)len;
+-(BinaryData *)getBinary:(size_t)columnId ndx:(size_t)ndx;
+-(void)setBinary:(size_t)columnId ndx:(size_t)ndx value:(void *)value len:(size_t)len;
 
 // Subtables
 -(size_t)getTableSize:(size_t)columnId ndx:(size_t)ndx;
--(void)insertTable:(size_t)columnId ndx:(size_t)ndx;
+-(void)insertSubtable:(size_t)columnId ndx:(size_t)ndx;
 -(void)clearTable:(size_t)columnId ndx:(size_t)ndx;
 
 // Mixed
@@ -126,7 +170,7 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 -(void)insertMixed:(size_t)columnId ndx:(size_t)ndx value:(OCMixed *)value;
 -(void)setMixed:(size_t)columnId ndx:(size_t)ndx value:(OCMixed *)value;
 
--(size_t)registerColumn:(ColumnType)type name:(NSString *)name;
+-(size_t)addColumn:(ColumnType)type name:(NSString *)name;
 
 // TODO - Column stuff...
 
@@ -149,18 +193,22 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 // Conversion
 // TODO ????? - Maybe NSData ???
 
+// Aggregate functions
+-(size_t)countInt:(size_t)columnId target:(int64_t)target;
+-(size_t)countString:(size_t)columnId target:(NSString *)target;
+-(int64_t)sum:(size_t)columnId;
+-(int64_t)maximum:(size_t)columnId;
+-(int64_t)minimum:(size_t)columnId;
+-(double)average:(size_t)columnId;
+
 #ifdef TIGHTDB_DEBUG
 -(void)verify;
 #endif
+
+-(id)_initRaw;
+-(void)_insertSubtableCopy:(size_t)col_ndx row_ndx:(size_t)row_ndx subtable:(Table *)subtable;
 @end
 
-
-@interface OCTopLevelTable : Table
-// refs ??? TODO
--(id)initWithBlock:(TopLevelTableInitBlock)block;
--(void)updateFromSpec;
--(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
-@end
 
 @class Query;
 @interface TableView : NSObject
@@ -202,4 +250,7 @@ typedef void(^TopLevelTableInitBlock)(Table *table);
 @end
 @interface OCColumnProxyString : OCColumnProxy
 -(size_t)find:(NSString*)value;
+@end
+@interface OCColumnProxyMixed : OCColumnProxy
+-(size_t)find:(OCMixed*)value;
 @end
