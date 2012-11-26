@@ -58,7 +58,8 @@
 -(void)write:(NSString *)filePath;
 -(char*)writeToMem:(size_t*)len;
 
-// Conversion ??? TODO
+// Conversion
+// FIXME: Do we want to conversion methods? Maybe use NSData.
 
 @end
 
