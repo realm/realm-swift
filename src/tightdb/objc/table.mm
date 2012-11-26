@@ -206,7 +206,7 @@
             case COLUMN_TYPE_TABLE:
             case COLUMN_TYPE_STRING_ENUM:
             case COLUMN_TYPE_BINARY:
-                // TODO - Missing handling of some types.
+                // FIXME: Handle the remaining types.
                 break;
         }
     }
@@ -252,7 +252,6 @@
 @interface OCSpec()
 @property (nonatomic) tightdb::Spec *spec;
 @property (nonatomic) BOOL isOwned;
-+(OCSpec *)specWithAllocator:(tightdb::Allocator&)allocator ref:(size_t)ref parent:(tightdb::ArrayParent*)parent pndx:(size_t)pndx;
 +(OCSpec *)specWithSpec:(tightdb::Spec*)other isOwned:(BOOL)isOwned;
 @end
 @implementation OCSpec
@@ -260,17 +259,6 @@
 @synthesize isOwned = _isOwned;
 
 
-// Dummy method - not used. allocators can probably not be overwritten with OC
-+(OCSpec *)specWithAllocator:(tightdb::Allocator &)allocator ref:(size_t)ref parent:(tightdb::ArrayParent *)parent pndx:(size_t)pndx
-{
-    (void)allocator;
-    (void)ref;
-    (void)parent;
-    (void)pndx;
-    OCSpec *spec = [[OCSpec alloc] init];
-//  TODO???  spec.spec = new Spec(allocator, ref, parent, pndx);
-    return spec;
-}
 +(OCSpec *)specWithSpec:(tightdb::Spec *)other isOwned:(BOOL)isOwned
 {
     OCSpec *spec = [[OCSpec alloc] init];
@@ -323,13 +311,6 @@
 {
     return _spec->get_column_index([name UTF8String]);
 }
--(size_t)write:(id)obj pos:(size_t)pos
-{
-    (void)obj;
-    (void)pos;
-    // Possibly not possible.....TODO.
-    return 0;
-}
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
@@ -359,7 +340,7 @@
     self = [super init];
     if (self) {
         _table = [query getTable];
-        self.tableView = new tightdb::TableView([query getTableView]); // TODO: Copy constructor is called here. (Move did not work).
+        self.tableView = new tightdb::TableView([query getTableView]);
     }
     return self;
 }
@@ -795,14 +776,14 @@
     if (_readOnly)
         [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)columnId];
     _table->insert_mixed(columnId, ndx, value.mixed);
-    // TODO - Insert copy of subtable if type is table
+    // FIXME: Insert copy of subtable if type is table
 }
 -(void)setMixed:(size_t)columnId ndx:(size_t)ndx value:(OCMixed *)value
 {
     if (_readOnly)
         [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)columnId];
     _table->set_mixed(columnId, ndx, value.mixed);
-    // TODO - Insert copy of subtable if type is table
+    // FIXME: Insert copy of subtable if type is table
 }
 
 -(size_t)addColumn:(ColumnType)type name:(NSString *)name
@@ -916,12 +897,6 @@
     return [self.table find:self.column value:value];
 }
 
--(size_t)findPos:(int64_t)value
-{
-    (void)value;
-    return 0; // TODO - [[self.table getColumn:self.column] findPos:value];
-}
-
 -(TableView *)findAll:(int64_t)value
 {
     TableView *view = [TableView tableViewWithTable:self.table];
@@ -962,7 +937,7 @@
 -(size_t)find:(OCMixed *)value
 {
     (void)value;
-    return 0; // TODO - Implement when C++ interface has something
+    return 0; // FIXME: Implement when C++ interface has something
 }
 
 @end

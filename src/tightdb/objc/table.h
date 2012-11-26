@@ -81,15 +81,12 @@
 -(ColumnType)getColumnType:(size_t)ndx;
 -(NSString *)getColumnName:(size_t)ndx;
 -(size_t)getColumnIndex:(NSString *)name;
--(size_t)write:(id)obj pos:(size_t)pos;
 @end
 
 
 @interface Table : NSObject
 -(void)updateFromSpec;
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
-
-// TODO - TableRef methods ?????????
 
 //@{
 /// If the specified column is neither a subtable column, nor a mixed
@@ -172,16 +169,15 @@
 
 -(size_t)addColumn:(ColumnType)type name:(NSString *)name;
 
-// TODO - Column stuff...
-
 // Searching
 -(size_t)find:(size_t)columnId value:(int64_t)value;
 -(size_t)findBool:(size_t)columnId value:(BOOL)value;
 -(size_t)findString:(size_t)columnId value:(NSString *)value;
 -(size_t)findDate:(size_t)columnId value:(time_t)value;
 
-// TODO - Table view stuff
+// FIXME: Why does this one take a TableView as argument?
 -(TableView *)findAll:(TableView *)view column:(size_t)columnId value:(int64_t)value;
+// FIXME: Implement findAll for the rest of the column types.
 
 // Indexing
 -(BOOL)hasIndex:(size_t)columnId;
@@ -191,7 +187,7 @@
 -(void)optimize;
 
 // Conversion
-// TODO ????? - Maybe NSData ???
+// FIXME: Do we want to conversion methods? Maybe use NSData.
 
 // Aggregate functions
 -(size_t)countInt:(size_t)columnId target:(int64_t)target;
@@ -239,7 +235,6 @@
 
 @interface OCColumnProxyInt : OCColumnProxy
 -(size_t)find:(int64_t)value;
--(size_t)findPos:(int64_t)value;
 -(TableView *)findAll:(int64_t)value;
 @end
 @interface OCColumnProxyBool : OCColumnProxy
