@@ -18,4 +18,6 @@
 - (void)testUnqualifiedFetchAndIterate;
 - (void)testWriteToDisk;
 - (void)testFetchSparse;
+- (void)testReadTransaction;
+-(void)testWriteTransaction;
 @end

@@ -36,8 +36,8 @@
 - (void)testTable
 {
     // 1. Add two columns
-    [_table registerColumn:COLUMN_TYPE_INT name:@"first"];
-    [_table registerColumn:COLUMN_TYPE_INT name:@"second"];
+    [_table addColumn:COLUMN_TYPE_INT name:@"first"];
+    [_table addColumn:COLUMN_TYPE_INT name:@"second"];
 
     // Verify
     STAssertEquals(COLUMN_TYPE_INT, [_table getColumnType:0], @"First column not int");

@@ -13,4 +13,4 @@ endif
 # FIXME: '-fno-elide-constructors' currently causes TightDB to fail
 #CFLAGS_DEBUG   += -fno-elide-constructors
 CFLAGS_PTHREAD += -pthread
-CFLAGS_GENERAL += -Wextra -ansi -pedantic -Wno-long-long
+CFLAGS_GENERAL += -Wextra -ansi

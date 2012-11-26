@@ -39,6 +39,7 @@
 {
     return _data;
 }
+
 @end
 
 #pragma mark - Allocater
@@ -76,46 +77,6 @@
 }
 @end
 
-@implementation OCAllocator
-{
-    tightdb::Allocator *_allocator;
-}
--(id)init
-{
-    self = [super init];
-    if (self) {
-        _allocator = new tightdb::Allocator();
-    }
-    return self;
-}
--(OCMemRef *)alloc:(size_t)size
-{
-    tightdb::MemRef ref = _allocator->Alloc(size);
-    return [[OCMemRef alloc] initWithPointer:ref.pointer ref:ref.ref];
-}
--(OCMemRef *)reAlloc:(size_t)r pointer:(void *)p size:(size_t)size
-{
-    tightdb::MemRef ref = _allocator->ReAlloc(r, p, size);
-    return [[OCMemRef alloc] initWithPointer:ref.pointer ref:ref.ref];
-}
--(void)free:(size_t)ref pointer:(void *)p
-{
-    _allocator->Free(ref, p);
-}
--(void*)translate:(size_t)ref
-{
-    return _allocator->Translate(ref);
-}
--(BOOL)isReadOnly:(size_t)ref
-{
-    return NO;
-}
--(void)dealloc
-{
-    delete _allocator;
-}
-
-@end
 
 #pragma mark - Date
 @implementation OCDate
@@ -134,6 +95,11 @@
 {
     return _date->get_date();
 }
+-(BOOL)isEqual:(OCDate *)other
+{
+    return [self getDate] == [other getDate];
+}
+
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
@@ -145,26 +111,28 @@
 
 #pragma mark - Mixed
 @interface OCMixed()
-@property (nonatomic) tightdb::Mixed *mixed;
+@property (nonatomic) tightdb::Mixed mixed;
+@property (nonatomic, strong) Table *table;
 +(OCMixed *)mixedWithMixed:(tightdb::Mixed&)other;
 @end
 @implementation OCMixed
 @synthesize mixed = _mixed;
+@synthesize table = _table;
 
 +(OCMixed *)mixedWithMixed:(tightdb::Mixed&)other
 {
     OCMixed *mixed = [[OCMixed alloc] init];
 
-    mixed.mixed = new tightdb::Mixed(other);
+    mixed.mixed = other;
 
     return mixed;
 }
-+(OCMixed *)mixedWithTable
++(OCMixed *)mixedWithTable:(Table *)table
 {
     OCMixed *mixed = [[OCMixed alloc] init];
 
-    mixed.mixed = new tightdb::Mixed(tightdb::Mixed::subtable_tag());
-
+    mixed.mixed = tightdb::Mixed(tightdb::Mixed::subtable_tag());
+    mixed.table = table;
     return mixed;
 }
 
@@ -172,7 +140,7 @@
 {
     OCMixed *mixed = [[OCMixed alloc] init];
 
-    mixed.mixed = new tightdb::Mixed((bool)value);
+    mixed.mixed = tightdb::Mixed((bool)value);
 
     return mixed;
 }
@@ -181,7 +149,7 @@
 {
     OCMixed *mixed = [[OCMixed alloc] init];
 
-    mixed.mixed = new tightdb::Mixed(new tightdb::Date([date getDate]));
+    mixed.mixed = tightdb::Mixed(tightdb::Date([date getDate]));
 
     return mixed;
 }
@@ -190,7 +158,7 @@
 {
     OCMixed *mixed = [[OCMixed alloc] init];
 
-    mixed.mixed = new tightdb::Mixed(value);
+    mixed.mixed = tightdb::Mixed(value);
 
     return mixed;
 }
@@ -199,7 +167,7 @@
 {
     OCMixed *mixed = [[OCMixed alloc] init];
 
-    mixed.mixed = new tightdb::Mixed([string UTF8String]);
+    mixed.mixed = tightdb::Mixed((const char *)[string UTF8String]);
 
     return mixed;
 }
@@ -208,7 +176,7 @@
 {
     OCMixed *mixed = [[OCMixed alloc] init];
 
-    mixed.mixed = new tightdb::Mixed([data getBinary]);
+    mixed.mixed = tightdb::Mixed([data getBinary]);
 
     return mixed;
 }
@@ -217,37 +185,65 @@
 {
     OCMixed *mixed = [[OCMixed alloc] init];
 
-    mixed.mixed = new tightdb::Mixed(value, length);
+    mixed.mixed = tightdb::Mixed(value, length);
 
     return mixed;
 }
 
+-(BOOL)isEqual:(OCMixed *)other
+{
+    ColumnType type = [self getType];
+    if ( type == [other getType]) {
+        switch((int)type) {
+            case COLUMN_TYPE_INT:
+                return [self getInt] == [other getInt];
+            case COLUMN_TYPE_STRING:
+                return [[self getString] isEqual:[other getString]];
+            case COLUMN_TYPE_DATE:
+                return [[self getDate] isEqual:[other getDate]];
+            case COLUMN_TYPE_BOOL:
+                return [self getBool] == [other getBool];
+            case COLUMN_TYPE_TABLE:
+            case COLUMN_TYPE_STRING_ENUM:
+            case COLUMN_TYPE_BINARY:
+                // TODO - Missing handling of some types.
+                break;
+        }
+    }
+    return NO;
+}
+
 -(ColumnType)getType
 {
-    return (ColumnType)_mixed->get_type();
+    return (ColumnType)_mixed.get_type();
 }
 -(int64_t)getInt
 {
-    return _mixed->get_int();
+    return _mixed.get_int();
 }
 -(BOOL)getBool
 {
-    return _mixed->get_bool();
+    return _mixed.get_bool();
 }
 
 -(OCDate *)getDate
 {
-    return [[OCDate alloc] initWithDate:_mixed->get_date()];
+    return [[OCDate alloc] initWithDate:_mixed.get_date()];
 }
 
 -(NSString *)getString
 {
-    return [NSString stringWithUTF8String:_mixed->get_string()];
+    return [NSString stringWithUTF8String:_mixed.get_string()];
 }
 
 -(BinaryData *)getBinary
 {
-    return [[BinaryData alloc] initWithBinary:_mixed->get_binary()];
+    return [[BinaryData alloc] initWithBinary:_mixed.get_binary()];
+}
+
+-(Table *)getTable
+{
+    return _table;
 }
 @end
 
@@ -267,6 +263,10 @@
 // Dummy method - not used. allocators can probably not be overwritten with OC
 +(OCSpec *)specWithAllocator:(tightdb::Allocator &)allocator ref:(size_t)ref parent:(tightdb::ArrayParent *)parent pndx:(size_t)pndx
 {
+    (void)allocator;
+    (void)ref;
+    (void)parent;
+    (void)pndx;
     OCSpec *spec = [[OCSpec alloc] init];
 //  TODO???  spec.spec = new Spec(allocator, ref, parent, pndx);
     return spec;
@@ -285,20 +285,28 @@
     return spec;
 }
 
--(void)addColumn:(ColumnType)type name:(NSString *)name
+// FIXME: Provide a version of this method that takes a 'const char *'. This will simplify _addColumns of MyTable.
+// FIXME: Detect errors from core library
+-(BOOL)addColumn:(ColumnType)type name:(NSString *)name
 {
     _spec->add_column((tightdb::ColumnType)type, [name UTF8String]);
+    return YES;
 }
+
+// FIXME: Detect errors from core library
 -(OCSpec *)addColumnTable:(NSString *)name
 {
     tightdb::Spec tmp = _spec->add_subtable_column([name UTF8String]);
     return [OCSpec specWithSpec:&tmp isOwned:TRUE];
 }
--(OCSpec *)getSpec:(size_t)columndId
+
+// FIXME: Detect errors from core library
+-(OCSpec *)getSpec:(size_t)columnId
 {
-    tightdb::Spec tmp = _spec->get_subtable_spec(columndId);
+    tightdb::Spec tmp = _spec->get_subtable_spec(columnId);
     return [OCSpec specWithSpec:&tmp isOwned:TRUE];
 }
+
 -(size_t)getColumnCount
 {
     return _spec->get_column_count();
@@ -317,6 +325,8 @@
 }
 -(size_t)write:(id)obj pos:(size_t)pos
 {
+    (void)obj;
+    (void)pos;
     // Possibly not possible.....TODO.
     return 0;
 }
@@ -361,6 +371,7 @@
 
 +(TableView *)tableViewWithTable:(Table *)table
 {
+    (void)table;
     TableView *tableView = [[TableView alloc] init];
     tableView.tableView = new tightdb::TableView(); // not longer needs table at construction
     return tableView;
@@ -421,11 +432,12 @@
 
 -(CursorBase *)getCursor
 {
-    return nil; // Has to be overridden in TightDb.h
+    return nil; // Has to be overridden in tightdb.h
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len
 {
+    (void)len;
     if(state->state == 0)
     {
         state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self);
@@ -453,41 +465,68 @@
 @implementation Table
 {
     id _parent;
+    BOOL _readOnly;
 }
 @synthesize table = _table;
-@synthesize tablePtr = _tablePtr;
 
--(id)initWithBlock:(TopLevelTableInitBlock)block
-{
-    self = [super init];
-    if (self) {
-        __weak Table *weakSelf = self;
-        if (block) block(weakSelf);
-    }
-    return self;
-}
--(id)initWithTableRef:(tightdb::TableRef)ref
-{
-    self = [super init];
-    if (self) {
-        _tablePtr = 0;
-        _table = ref;
-    }
-    return self;
-}
-
--(void)initRefs
-{
-    // Dummy - Must be overridden in TightDB.h
-}
 -(id)init
 {
     self = [super init];
     if (self) {
-        _tablePtr = new tightdb::Table();
-        _table = _tablePtr->get_table_ref();
+        _readOnly = NO;
+        _table = tightdb::Table::create();
     }
     return self;
+}
+
+-(id)_initRaw
+{
+    self = [super init];
+    return self;
+}
+
+-(void)updateFromSpec
+{
+    static_cast<tightdb::Table *>(&*self.table)->update_from_spec();
+}
+
+-(BOOL)checkType:(BOOL)throwOnMismatch
+{
+    (void)throwOnMismatch;
+    return YES;
+    // Dummy - must be overridden in tightdb.h - Check if spec matches the macro definitions
+}
+
+-(CursorBase *)getCursor
+{
+    return nil; // Has to be overridden in tightdb.h
+}
+-(void)clearCursor
+{
+    // Dummy - must be overridden in tightdb.h
+}
+
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len
+{
+    (void)len;
+    if(state->state == 0)
+    {
+        state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self);
+        CursorBase *tmp = [self getCursor];
+        *stackbuf = tmp;
+    }
+    if (state->state < [self count]) {
+        [((CursorBase *)*stackbuf) setNdx:state->state];
+        state->itemsPtr = stackbuf;
+        state->state++;
+    } else {
+        *stackbuf = nil;
+        state->itemsPtr = nil;
+        state->mutationsPtr = nil;
+        [self clearCursor];
+        return 0;
+    }
+    return 1;
 }
 
 -(tightdb::Table *)getTable
@@ -500,34 +539,72 @@
     _parent = parent;
 }
 
--(Table *)getTable:(size_t)columnId ndx:(size_t)ndx
+-(void)setReadOnly:(BOOL)readOnly
 {
-    Table *table = [[Table alloc] initWithTableRef:_table->get_subtable(columnId, ndx)];
+    _readOnly = readOnly;
+}
+
+-(Table *)getSubtable:(size_t)columnId ndx:(size_t)ndx
+{
+    const tightdb::ColumnType t = _table->get_column_type(columnId);
+    if (t != tightdb::COLUMN_TYPE_TABLE && t != tightdb::COLUMN_TYPE_MIXED) return nil;
+    tightdb::TableRef r = _table->get_subtable(columnId, ndx);
+    if (!r) return nil;
+    Table *table = [[Table alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!table)) return nil;
+    [table setTable:move(r)];
     [table setParent:self];
+    [table setReadOnly:_readOnly];
     return table;
 }
 
--(OCTopLevelTable *)getTopLevelTable:(size_t)columnId ndx:(size_t)ndx
+// FIXME: Check that the specified class derives from Table.
+-(id)getSubtable:(size_t)columnId ndx:(size_t)ndx withClass:(__unsafe_unretained Class)classObj
 {
-    OCTopLevelTable *table = [[OCTopLevelTable alloc] initWithTableRef:_table->get_subtable(columnId, ndx)];
+    const tightdb::ColumnType t = _table->get_column_type(columnId);
+    if (t != tightdb::COLUMN_TYPE_TABLE && t != tightdb::COLUMN_TYPE_MIXED) return nil;
+    tightdb::TableRef r = _table->get_subtable(columnId, ndx);
+    if (!r) return nil;
+    Table *table = [[classObj alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!table)) return nil;
+    [table setTable:move(r)];
     [table setParent:self];
+    [table setReadOnly:_readOnly];
+    if (![table checkType:NO]) return nil;
     return table;
 }
 
+// FIXME: Check that the specified class derives from Table.
+-(BOOL)isClass:(__unsafe_unretained Class)classObj
+{
+    Table *table = [[classObj alloc] _initRaw];
+    if (TIGHTDB_LIKELY(table)) {
+        [table setTable:_table];
+        [table setParent:_parent];
+        [table setReadOnly:_readOnly];
+        if ([table checkType:NO]) return YES;
+    }
+    return NO;
+}
+
+// FIXME: Check that the specified class derives from Table.
+-(id)castClass:(__unsafe_unretained Class)classObj
+{
+    Table *table = [[classObj alloc] _initRaw];
+    if (TIGHTDB_LIKELY(table)) {
+        [table setTable:_table];
+        [table setParent:_parent];
+        [table setReadOnly:_readOnly];
+        if (![table checkType:NO]) return nil;
+    }
+    return table;
+}
 
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
     NSLog(@"Table dealloc");
 #endif
-    // NOTE: Because of ARC we remove tableref from sub tables when this is deleted.
-/*    for(Table *table in _tables) {
-        NSLog(@"Delete...");
-        table.table = TableRef();
-    }*/
-    _table = tightdb::TableRef();
-    if (_tablePtr)
-        delete _tablePtr;
     _parent = nil;
 }
 
@@ -562,18 +639,26 @@
 }
 -(size_t)addRow
 {
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to add row while read only"];
     return _table->add_empty_row();
 }
 -(void)clear
 {
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to clear while read only"];
     _table->clear();
 }
 -(void)deleteRow:(size_t)ndx
 {
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to delete row while read only ndx: %llu", (unsigned long long)ndx];
     _table->remove(ndx);
 }
 -(void)popBack
 {
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to pop back while read only"];
     _table->remove_last();
 }
 -(int64_t)get:(size_t)columnId ndx:(size_t)ndx
@@ -582,98 +667,145 @@
 }
 -(void)set:(size_t)columnId ndx:(size_t)ndx value:(int64_t)value
 {
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)columnId];
     _table->set_int(columnId, ndx, value);
 }
--(BOOL)getBool:(size_t)columndId ndx:(size_t)ndx
+-(BOOL)getBool:(size_t)columnId ndx:(size_t)ndx
 {
-    return _table->get_bool(columndId, ndx);
+    return _table->get_bool(columnId, ndx);
 }
--(void)setBool:(size_t)columndId ndx:(size_t)ndx value:(BOOL)value
+-(void)setBool:(size_t)columnId ndx:(size_t)ndx value:(BOOL)value
 {
-    _table->set_bool(columndId, ndx, value);
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)columnId];
+    _table->set_bool(columnId, ndx, value);
 }
--(time_t)getDate:(size_t)columndId ndx:(size_t)ndx
+-(time_t)getDate:(size_t)columnId ndx:(size_t)ndx
 {
-    return _table->get_date(columndId, ndx);
+    return _table->get_date(columnId, ndx);
 }
--(void)setDate:(size_t)columndId ndx:(size_t)ndx value:(time_t)value
+-(void)setDate:(size_t)columnId ndx:(size_t)ndx value:(time_t)value
 {
-    _table->set_date(columndId, ndx, value);
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)columnId];
+    _table->set_date(columnId, ndx, value);
 }
--(void)insertInt:(size_t)columndId ndx:(size_t)ndx value:(int64_t)value
+-(void)insertInt:(size_t)columnId ndx:(size_t)ndx value:(int64_t)value
 {
-    _table->insert_int(columndId, ndx, value);
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)columnId];
+    _table->insert_int(columnId, ndx, value);
 }
--(void)insertBool:(size_t)columndId ndx:(size_t)ndx value:(BOOL)value
+-(void)insertBool:(size_t)columnId ndx:(size_t)ndx value:(BOOL)value
 {
-    _table->insert_bool(columndId, ndx, value);
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)columnId];
+    _table->insert_bool(columnId, ndx, value);
 }
--(void)insertDate:(size_t)columndId ndx:(size_t)ndx value:(time_t)value
+-(void)insertDate:(size_t)columnId ndx:(size_t)ndx value:(time_t)value
 {
-    _table->insert_date(columndId, ndx, value);
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)columnId];
+    _table->insert_date(columnId, ndx, value);
 }
--(void)insertString:(size_t)columndId ndx:(size_t)ndx value:(NSString *)value
+-(void)insertString:(size_t)columnId ndx:(size_t)ndx value:(NSString *)value
 {
-    _table->insert_string(columndId, ndx, [value UTF8String]);
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)columnId];
+    _table->insert_string(columnId, ndx, [value UTF8String]);
 }
--(void)insertBinary:(size_t)columndId ndx:(size_t)ndx value:(void *)value len:(size_t)len
+-(void)insertBinary:(size_t)columnId ndx:(size_t)ndx value:(void *)value len:(size_t)len
 {
-    _table->insert_binary(columndId, ndx, (const char*)value, len);
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)columnId];
+    _table->insert_binary(columnId, ndx, (const char*)value, len);
 }
+
 -(void)insertDone
 {
     _table->insert_done();
 }
 
--(NSString *)getString:(size_t)columndId ndx:(size_t)ndx
+-(NSString *)getString:(size_t)columnId ndx:(size_t)ndx
 {
-    return [NSString stringWithUTF8String:_table->get_string(columndId, ndx)];
-}
--(void)setString:(size_t)columndId ndx:(size_t)ndx value:(NSString *)value
-{
-    _table->set_string(columndId, ndx, [value UTF8String]);
+    return [NSString stringWithUTF8String:_table->get_string(columnId, ndx)];
 }
 
--(BinaryData *)getBinary:(size_t)columndId ndx:(size_t)ndx
+-(void)setString:(size_t)columnId ndx:(size_t)ndx value:(NSString *)value
 {
-    return [[BinaryData alloc] initWithBinary:_table->get_binary(columndId, ndx)];
+    _table->set_string(columnId, ndx, [value UTF8String]);
 }
--(void)setBinary:(size_t)columndId ndx:(size_t)ndx value:(void *)value len:(size_t)len
+
+-(BinaryData *)getBinary:(size_t)columnId ndx:(size_t)ndx
 {
-    _table->set_binary(columndId, ndx, (const char*)value, len);
+    return [[BinaryData alloc] initWithBinary:_table->get_binary(columnId, ndx)];
+}
+
+-(void)setBinary:(size_t)columnId ndx:(size_t)ndx value:(void *)value len:(size_t)len
+{
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)columnId];
+    _table->set_binary(columnId, ndx, (const char*)value, len);
 }
 
 -(size_t)getTableSize:(size_t)columnId ndx:(size_t)ndx
 {
     return _table->get_subtable_size(columnId, ndx);
 }
--(void)insertTable:(size_t)columnId ndx:(size_t)ndx
+
+-(void)insertSubtable:(size_t)columnId ndx:(size_t)ndx
 {
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)columnId];
     _table->insert_subtable(columnId, ndx);
 }
+
+-(void)_insertSubtableCopy:(size_t)col_ndx row_ndx:(size_t)row_ndx subtable:(Table *)subtable
+{
+    [self insertSubtable:col_ndx ndx:row_ndx];
+    /* FIXME: Perform table copying here, but only if 'subtable' is not 'nil'. */
+    (void)subtable;
+}
+
 -(void)clearTable:(size_t)columnId ndx:(size_t)ndx
 {
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to clear while read only ColumnId: %llu", (unsigned long long)columnId];
     _table->clear_subtable(columnId, ndx);
 }
+
 -(OCMixed *)getMixed:(size_t)columnId ndx:(size_t)ndx
 {
     tightdb::Mixed tmp = _table->get_mixed(columnId, ndx);
-    return [OCMixed mixedWithMixed:tmp];
+    OCMixed *mixed = [OCMixed mixedWithMixed:tmp];
+    if ([mixed getType] == COLUMN_TYPE_TABLE) {
+        [mixed setTable:[self getSubtable:columnId ndx:ndx]];
+    }
+    return mixed;
 }
+
 -(ColumnType)getMixedType:(size_t)columnId ndx:(size_t)ndx
 {
     return (ColumnType)_table->get_mixed_type(columnId, ndx);
 }
+
 -(void)insertMixed:(size_t)columnId ndx:(size_t)ndx value:(OCMixed *)value
 {
-    _table->insert_mixed(columnId, ndx, value);
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)columnId];
+    _table->insert_mixed(columnId, ndx, value.mixed);
+    // TODO - Insert copy of subtable if type is table
 }
 -(void)setMixed:(size_t)columnId ndx:(size_t)ndx value:(OCMixed *)value
 {
-    _table->set_mixed(columnId, ndx, value);
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)columnId];
+    _table->set_mixed(columnId, ndx, value.mixed);
+    // TODO - Insert copy of subtable if type is table
 }
 
--(size_t)registerColumn:(ColumnType)type name:(NSString *)name
+-(size_t)addColumn:(ColumnType)type name:(NSString *)name
 {
     return _table->add_column((tightdb::ColumnType)type, [name UTF8String]);
 }
@@ -712,72 +844,48 @@
 {
     _table->optimize();
 }
+
+-(size_t)countInt:(size_t)columnId target:(int64_t)target
+{
+    return _table->count_int(columnId, target);
+}
+
+-(size_t)countString:(size_t)columnId target:(NSString *)target
+{
+    return _table->count_string(columnId, [target UTF8String]);
+}
+
+-(int64_t)sum:(size_t)columnId
+{
+    return _table->sum(columnId);
+}
+
+-(int64_t)maximum:(size_t)columnId
+{
+    return _table->maximum(columnId);
+}
+
+-(int64_t)minimum:(size_t)columnId
+{
+    return _table->minimum(columnId);
+}
+
+-(double)average:(size_t)columnId
+{
+    return _table->average(columnId);
+}
+
+-(BOOL)_addColumns
+{
+    return YES; // Must be overridden in typed table classes.
+}
+
 #ifdef TIGHTDB_DEBUG
 -(void)verify
 {
     _table->Verify();
 }
 #endif
-@end
-
-// TODO - Dummy version of initWithBlock missing ...
-@implementation OCTopLevelTable
-
--(id)initWithBlock:(TopLevelTableInitBlock)block
-{
-    // Dummy method - Will be overridden - sjhould just call super.
-    return [super initWithBlock:block];
-}
--(id)initWithTableRef:(tightdb::TableRef)ref
-{
-    self = [super initWithTableRef:ref];
-    return self;
-}
--(void)updateFromSpec
-{
-    static_cast<tightdb::Table *>(&*self.table)->update_from_spec();
-}
-
-
--(CursorBase *)getCursor
-{
-    return nil; // Has to be overridden in TightDb.h
-}
--(void)clearCursor
-{
-    // Dummy - must be overridden in TightDb.h
-}
-
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len
-{
-    if(state->state == 0)
-    {
-        state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self);
-        CursorBase *tmp = [self getCursor];
-        *stackbuf = tmp;
-    }
-    if (state->state < [self count]) {
-        [((CursorBase *)*stackbuf) setNdx:state->state];
-        state->itemsPtr = stackbuf;
-        state->state++;
-    } else {
-        *stackbuf = nil;
-        state->itemsPtr = nil;
-        state->mutationsPtr = nil;
-        [self clearCursor];
-        return 0;
-    }
-    return 1;
-}
-
-
-#ifdef TIGHTDB_DEBUG
--(void)dealloc
-{
-    NSLog(@"OCTopLevelTable dealloc");
-}
-#endif
-
 @end
 
 
@@ -810,6 +918,7 @@
 
 -(size_t)findPos:(int64_t)value
 {
+    (void)value;
     return 0; // TODO - [[self.table getColumn:self.column] findPos:value];
 }
 
@@ -847,3 +956,14 @@
 }
 
 @end
+
+@implementation OCColumnProxyMixed
+
+-(size_t)find:(OCMixed *)value
+{
+    (void)value;
+    return 0; // TODO - Implement when C++ interface has something
+}
+
+@end
+

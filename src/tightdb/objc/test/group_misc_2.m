@@ -40,10 +40,14 @@ TIGHTDB_TABLE_2(QueryTable,
 
 - (void)testGroup_Misc2
 {
+    size_t row;
     Group *group = [Group group];
+    NSLog(@"HasTable: %i", [group hasTable:@"employees" withClass:[MyTable class]] );
     // Create new table in group
     MyTable *table = [group getTable:@"employees" withClass:[MyTable class]];
     NSLog(@"Table: %@", table);
+    NSLog(@"HasTable: %i", [group hasTable:@"employees" withClass:[MyTable class]] );
+
     // Add some rows
     [table addName:@"John" Age:20 Hired:YES Spare:0];
     [table addName:@"Mary" Age:21 Hired:NO Spare:0];
@@ -55,7 +59,6 @@ TIGHTDB_TABLE_2(QueryTable,
 
     //------------------------------------------------------
 
-    size_t row;
     row = [table.Name find:@"Philip"];    // row = (size_t)-1
     NSLog(@"Philip: %zu", row);
     STAssertEquals(row, (size_t)-1,@"Philip should not be there");
@@ -127,6 +130,7 @@ TIGHTDB_TABLE_2(QueryTable,
         // ??? cursor
         NSLog(@"%zu: %@", i, memTable.Name);
     }
+    
 }
 
 
@@ -190,7 +194,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testSubtables
 {
     Group *group = [Group group];
-    OCTopLevelTable *table = [group getTable:@"table" withClass:[OCTopLevelTable class]];
+    Table *table = [group getTable:@"table" withClass:[Table class]];
 
     // Specify the table schema
     {
@@ -214,14 +218,14 @@ TIGHTDB_TABLE_2(QueryTable,
     [table set:COL_TABLE_INT ndx:0 value:700];
 
     // Add two rows to the subtable
-    Table *subtable = [table getTable:COL_TABLE_TAB ndx:0];
+    Table *subtable = [table getSubtable:COL_TABLE_TAB ndx:0];
     [subtable addRow];
     [subtable set:COL_SUBTABLE_INT ndx:0 value:800];
     [subtable addRow];
     [subtable set:COL_SUBTABLE_INT ndx:1 value:801];
 
     // Make the mixed values column contain another subtable
-    [table setMixed:COL_TABLE_MIX ndx:0 value: [OCMixed mixedWithTable]];
+    [table setMixed:COL_TABLE_MIX ndx:0 value: [OCMixed mixedWithTable:nil]];
 
 /* Fails!!!
     // Specify its schema

@@ -5,13 +5,13 @@ TIGHTDB_H = tightdb.h
 
 GENERATED_SOURCES = $(TIGHTDB_H)
 
-INST_HEADERS = column_type.h cursor.h group.h query.h table.h $(TIGHTDB_H)
+INST_HEADERS = column_type.h cursor.h group.h query.h table.h group_shared.h helper_macros.h $(TIGHTDB_H)
 
 lib_LIBRARIES = libtightdb-objc.a
 
 TIGHTDB_CONFIG = tightdb-config
 
-libtightdb_objc_a_SOURCES       = table.mm cursor.mm group.mm query.mm
+libtightdb_objc_a_SOURCES       = table.mm cursor.mm group.mm query.mm group_shared.mm
 libtightdb_objc_a_CFLAGS        = -fobjc-arc -fobjc-abi-version=2
 libtightdb_objc_a_CFLAGS_OPTIM  = $(shell $(TIGHTDB_CONFIG)     --cflags)
 libtightdb_objc_a_CFLAGS_DEBUG  = $(shell $(TIGHTDB_CONFIG)-dbg --cflags)

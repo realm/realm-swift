@@ -19,35 +19,15 @@
  **************************************************************************/
 
 #import <Foundation/Foundation.h>
+#import <tightdb/objc/group.h>
 
-@class Table;
-@class OCMixed;
+typedef void(^SharedGroupReadTransactionBlock)(Group *group);
+typedef BOOL(^SharedGroupWriteTransactionBlock)(Group *group);
 
-#pragma mark - CursorBase
+@interface SharedGroup : NSObject
++(SharedGroup *)groupWithFilename:(NSString *)filename;
 
-@interface CursorBase : NSObject
--(id)initWithTable:(Table *)table ndx:(size_t)ndx;
--(void)setNdx:(size_t)ndx;
-@end
+-(void)readTransaction:(SharedGroupReadTransactionBlock)block;
+-(void)writeTransaction:(SharedGroupWriteTransactionBlock)block;
 
-
-#pragma mark - OCAccessor
-
-/* FIXME: This class can be (and should be) eliminated by using a
-   macro switching trick for the individual column types on
-   TIGHTDB_CURSOR_PROPERTY macros similar to what is done for query
-   accessors. */
-@interface OCAccessor : NSObject
--(id)initWithCursor:(CursorBase *)cursor columnId:(size_t)columnId;
--(int64_t)getInt;
--(void)setInt:(int64_t)value;
--(BOOL)getBool;
--(void)setBool:(BOOL)value;
--(time_t)getDate;
--(void)setDate:(time_t)value;
--(NSString *)getString;
--(void)setString:(NSString *)value;
--(id)getSubtable:(Class)obj;
--(OCMixed *)getMixed;
--(void)setMixed:(OCMixed *)value;
 @end

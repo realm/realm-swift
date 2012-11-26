@@ -9,8 +9,9 @@
 
 @interface Table()
 @property(nonatomic) tightdb::TableRef table;
-@property(nonatomic) tightdb::Table *tablePtr;
--(void)initRefs;
 -(tightdb::Table *)getTable;
 -(void)setParent:(id)parent; // Workaround for ARC release problem.
+-(void)setReadOnly:(BOOL)readOnly;
+-(BOOL)checkType:(BOOL)throwOnMismatch;
+-(BOOL)_addColumns;
 @end
