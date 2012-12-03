@@ -22,28 +22,16 @@
 
 #include <tightdb/objc/column_type.h>
 
-#define tdbOCTypeInt int64_t
-#define tdbOCTypeBool BOOL
-#define tdbOCTypeString NSString*
-#define tdbOCTypeMixed OCMixed*
-
-#define COLTYPEInt COLUMN_TYPE_INT
-#define COLTYPEBool COLUMN_TYPE_BOOL
-#define COLTYPEString COLUMN_TYPE_STRING
-#define COLTYPEDate COLUMN_TYPE_DATE
-#define COLTYPEMixed COLUMN_TYPE_MIXED
-
 @class Table;
 @class TableView;
 
 @interface BinaryData : NSObject
--(id)initWithData:(char *)ptr len:(size_t)len;
-@end
+-(id)initWithData:(const char *)data len:(size_t)size;
+-(const char *)getData;
+-(size_t)getSize;
 
-@interface OCMemRef : NSObject
--(id)initWithPointer:(void *)p ref:(size_t)r;
--(void *)getPointer;
--(size_t)getRef;
+/// Compare the referenced binary data for equality.
+-(BOOL)isEqual:(BinaryData *)bin;
 @end
 
 @interface OCDate : NSObject
@@ -53,13 +41,13 @@
 @end
 
 @interface OCMixed : NSObject
-+(OCMixed *)mixedWithTable:(Table *)table;
 +(OCMixed *)mixedWithBool:(BOOL)value;
-+(OCMixed *)mixedWithDate:(OCDate *)date;
 +(OCMixed *)mixedWithInt64:(int64_t)value;
 +(OCMixed *)mixedWithString:(NSString *)string;
 +(OCMixed *)mixedWithBinary:(BinaryData *)data;
-+(OCMixed *)mixedWithData:(const char*)value length:(size_t)length;
++(OCMixed *)mixedWithBinary:(const char*)value length:(size_t)length;
++(OCMixed *)mixedWithDate:(OCDate *)date;
++(OCMixed *)mixedWithTable:(Table *)table;
 -(BOOL)isEqual:(OCMixed *)other;
 -(ColumnType)getType;
 -(int64_t)getInt;
@@ -141,11 +129,11 @@
 
 // NOTE: Low-level insert functions. Always insert in all columns at once
 // and call InsertDone after to avoid table getting un-balanced.
--(void)insertInt:(size_t)columnId ndx:(size_t)ndx value:(int64_t)value;
 -(void)insertBool:(size_t)columnId ndx:(size_t)ndx value:(BOOL)value;
--(void)insertDate:(size_t)columnId ndx:(size_t)ndx value:(time_t)value;
+-(void)insertInt:(size_t)columnId ndx:(size_t)ndx value:(int64_t)value;
 -(void)insertString:(size_t)columnId ndx:(size_t)ndx value:(NSString *)value;
 -(void)insertBinary:(size_t)columnId ndx:(size_t)ndx value:(void *)value len:(size_t)len;
+-(void)insertDate:(size_t)columnId ndx:(size_t)ndx value:(time_t)value;
 -(void)insertDone;
 
 // Strings
@@ -170,10 +158,12 @@
 -(size_t)addColumn:(ColumnType)type name:(NSString *)name;
 
 // Searching
--(size_t)find:(size_t)columnId value:(int64_t)value;
 -(size_t)findBool:(size_t)columnId value:(BOOL)value;
+-(size_t)findInt:(size_t)columnId value:(int64_t)value;
 -(size_t)findString:(size_t)columnId value:(NSString *)value;
+-(size_t)findBinary:(size_t)columnId value:(BinaryData *)value;
 -(size_t)findDate:(size_t)columnId value:(time_t)value;
+-(size_t)findMixed:(size_t)columnId value:(OCMixed *)value;
 
 // FIXME: Why does this one take a TableView as argument?
 -(TableView *)findAll:(TableView *)view column:(size_t)columnId value:(int64_t)value;
@@ -233,19 +223,22 @@
 -(void)clear;
 @end
 
-@interface OCColumnProxyInt : OCColumnProxy
+@interface OCColumnProxy_Bool : OCColumnProxy
+-(size_t)find:(BOOL)value;
+@end
+@interface OCColumnProxy_Int : OCColumnProxy
 -(size_t)find:(int64_t)value;
 -(TableView *)findAll:(int64_t)value;
 @end
-@interface OCColumnProxyBool : OCColumnProxy
--(size_t)find:(BOOL)value;
+@interface OCColumnProxy_String : OCColumnProxy
+-(size_t)find:(NSString *)value;
 @end
-@interface OCColumnProxyDate : OCColumnProxy
+@interface OCColumnProxy_Binary : OCColumnProxy
+-(size_t)find:(BinaryData *)value;
+@end
+@interface OCColumnProxy_Date : OCColumnProxy
 -(size_t)find:(time_t) value;
 @end
-@interface OCColumnProxyString : OCColumnProxy
--(size_t)find:(NSString*)value;
-@end
-@interface OCColumnProxyMixed : OCColumnProxy
--(size_t)find:(OCMixed*)value;
+@interface OCColumnProxy_Mixed : OCColumnProxy
+-(size_t)find:(OCMixed *)value;
 @end

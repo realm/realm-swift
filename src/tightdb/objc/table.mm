@@ -3,6 +3,8 @@
 //  TightDB
 //
 
+#import <cstring>
+
 #import <tightdb/table.hpp>
 #import <tightdb/table_view.hpp>
 
@@ -18,12 +20,12 @@
 {
     tightdb::BinaryData _data;
 }
--(id)initWithData:(char *)ptr len:(size_t)len
+-(id)initWithData:(const char *)data len:(size_t)size
 {
     self = [super init];
     if (self) {
-        _data.pointer = ptr;
-        _data.len = len;
+        _data.pointer = data;
+        _data.len = size;
     }
     return self;
 }
@@ -35,45 +37,21 @@
     }
     return self;
 }
+-(const char *)getData
+{
+    return _data.pointer;
+}
+-(size_t)getSize
+{
+    return _data.len;
+}
+-(BOOL)isEqual:(BinaryData *)bin
+{
+    return _data.compare_payload(bin->_data);
+}
 -(tightdb::BinaryData)getBinary
 {
     return _data;
-}
-
-@end
-
-#pragma mark - Allocater
-@implementation OCMemRef
-{
-    tightdb::MemRef *_memref;
-}
--(id)initWithPointer:(void *)p ref:(size_t)r
-{
-    self = [super init];
-    if (self) {
-        _memref = new tightdb::MemRef(p,r);
-    }
-    return self;
-}
--(id)init
-{
-    self = [super init];
-    if (self) {
-        _memref = new tightdb::MemRef();
-    }
-    return self;
-}
--(void *)getPointer
-{
-    return _memref->pointer;
-}
--(size_t)getRef
-{
-    return _memref->ref;
-}
--(void)dealloc
-{
-    delete _memref;
 }
 @end
 
@@ -181,7 +159,7 @@
     return mixed;
 }
 
-+(OCMixed *)mixedWithData:(const char*)value length:(size_t)length
++(OCMixed *)mixedWithBinary:(const char*)value length:(size_t)length
 {
     OCMixed *mixed = [[OCMixed alloc] init];
 
@@ -192,23 +170,25 @@
 
 -(BOOL)isEqual:(OCMixed *)other
 {
-    ColumnType type = [self getType];
-    if ( type == [other getType]) {
-        switch((int)type) {
-            case COLUMN_TYPE_INT:
-                return [self getInt] == [other getInt];
-            case COLUMN_TYPE_STRING:
-                return [[self getString] isEqual:[other getString]];
-            case COLUMN_TYPE_DATE:
-                return [[self getDate] isEqual:[other getDate]];
-            case COLUMN_TYPE_BOOL:
-                return [self getBool] == [other getBool];
-            case COLUMN_TYPE_TABLE:
-            case COLUMN_TYPE_STRING_ENUM:
-            case COLUMN_TYPE_BINARY:
-                // FIXME: Handle the remaining types.
-                break;
-        }
+    const tightdb::ColumnType type = _mixed.get_type();
+    if (type != other->_mixed.get_type()) return NO;
+    switch (type) {
+        case tightdb::COLUMN_TYPE_BOOL:
+            return _mixed.get_bool() == other->_mixed.get_bool();
+        case tightdb::COLUMN_TYPE_INT:
+            return _mixed.get_int() == other->_mixed.get_int();
+        case tightdb::COLUMN_TYPE_STRING:
+            return std::strcmp(_mixed.get_string(), other->_mixed.get_string()) == 0;
+        case tightdb::COLUMN_TYPE_BINARY:
+            return _mixed.get_binary().compare_payload(other->_mixed.get_binary());
+        case tightdb::COLUMN_TYPE_DATE:
+            return _mixed.get_date() == other->_mixed.get_date();
+        case tightdb::COLUMN_TYPE_TABLE:
+            return [_table getTable] == [other->_table getTable]; // Compare table contents
+            break;
+        default:
+            TIGHTDB_ASSERT(false);
+            break;
     }
     return NO;
 }
@@ -471,9 +451,8 @@
     static_cast<tightdb::Table *>(&*self.table)->update_from_spec();
 }
 
--(BOOL)checkType:(BOOL)throwOnMismatch
+-(BOOL)_checkType
 {
-    (void)throwOnMismatch;
     return YES;
     // Dummy - must be overridden in tightdb.h - Check if spec matches the macro definitions
 }
@@ -510,9 +489,9 @@
     return 1;
 }
 
--(tightdb::Table *)getTable
+-(tightdb::Table &)getTable
 {
-    return &*_table;
+    return *_table;
 }
 
 -(void)setParent:(id)parent
@@ -551,7 +530,7 @@
     [table setTable:move(r)];
     [table setParent:self];
     [table setReadOnly:_readOnly];
-    if (![table checkType:NO]) return nil;
+    if (![table _checkType]) return nil;
     return table;
 }
 
@@ -563,7 +542,7 @@
         [table setTable:_table];
         [table setParent:_parent];
         [table setReadOnly:_readOnly];
-        if ([table checkType:NO]) return YES;
+        if ([table _checkType]) return YES;
     }
     return NO;
 }
@@ -576,7 +555,7 @@
         [table setTable:_table];
         [table setParent:_parent];
         [table setReadOnly:_readOnly];
-        if (![table checkType:NO]) return nil;
+        if (![table _checkType]) return nil;
     }
     return table;
 }
@@ -790,21 +769,34 @@
 {
     return _table->add_column((tightdb::ColumnType)type, [name UTF8String]);
 }
--(size_t)find:(size_t)columnId value:(int64_t)value
-{
-    return _table->find_first_int(columnId, value);
-}
 -(size_t)findBool:(size_t)columnId value:(BOOL)value
 {
     return _table->find_first_bool(columnId, value);
+}
+-(size_t)findInt:(size_t)columnId value:(int64_t)value
+{
+    return _table->find_first_int(columnId, value);
 }
 -(size_t)findString:(size_t)columnId value:(NSString *)value
 {
     return _table->find_first_string(columnId, [value UTF8String]);
 }
+-(size_t)findBinary:(size_t)columnId value:(BinaryData *)value
+{
+    return _table->find_first_binary(columnId, [value getData], [value getSize]);
+}
 -(size_t)findDate:(size_t)columnId value:(time_t)value
 {
     return _table->find_first_date(columnId, value);
+}
+-(size_t)findMixed:(size_t)columnId value:(OCMixed *)value
+{
+    static_cast<void>(columnId);
+    static_cast<void>(value);
+    [NSException raise:@"NotImplemented" format:@"Not implemented"];
+    // FIXME: Implement this!
+    // return _table->find_first_mixed(columnId, value);
+    return 0;
 }
 
 -(TableView *)findAll:(TableView *)view column:(size_t)columnId value:(int64_t)value
@@ -890,13 +882,18 @@
 }
 @end
 
-@implementation OCColumnProxyInt
+@implementation OCColumnProxy_Bool
+-(size_t)find:(BOOL)value
+{
+    return [self.table findBool:self.column value:value];
+}
+@end
 
+@implementation OCColumnProxy_Int
 -(size_t)find:(int64_t)value
 {
-    return [self.table find:self.column value:value];
+    return [self.table findInt:self.column value:value];
 }
-
 -(TableView *)findAll:(int64_t)value
 {
     TableView *view = [TableView tableViewWithTable:self.table];
@@ -904,41 +901,31 @@
 }
 @end
 
-
-@implementation OCColumnProxyBool
-
--(size_t)find:(BOOL)value
-{
-    return [self.table findBool:self.column value:value];
-}
-
-@end
-
-@implementation OCColumnProxyDate
-
--(size_t)find:(time_t)value
-{
-    return [self.table findDate:self.column value:value];
-}
-
-@end
-
-@implementation OCColumnProxyString
-
+@implementation OCColumnProxy_String
 -(size_t)find:(NSString *)value
 {
     return [self.table findString:self.column value:value];
 }
-
 @end
 
-@implementation OCColumnProxyMixed
+@implementation OCColumnProxy_Binary
+-(size_t)find:(BinaryData *)value
+{
+    return [self.table findBinary:self.column value:value];
+}
+@end
 
+@implementation OCColumnProxy_Date
+-(size_t)find:(time_t)value
+{
+    return [self.table findDate:self.column value:value];
+}
+@end
+
+@implementation OCColumnProxy_Mixed
 -(size_t)find:(OCMixed *)value
 {
-    (void)value;
-    return 0; // FIXME: Implement when C++ interface has something
+    return [self.table findMixed:self.column value:value];
 }
-
 @end
 
