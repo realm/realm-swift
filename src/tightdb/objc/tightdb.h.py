@@ -60,24 +60,24 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName${j+1}, CType${j+1}) \\
 -(TableName##_Query *)parent; \\
 -(TableName##_View *)findAll; \\
 @end \\
-@interface OCColumnProxy##TableName : OCColumnProxy \\
+@interface OCColumnProxy_##TableName : OCColumnProxy \\
 -(size_t)find:(NSString*)value; \\
 @end \\
 @interface TableName : Table \\
 %for $j in range($num_cols)
-@property(nonatomic, strong) OCColumnProxy##CType${j+1} *CName${j+1}; \\
+@property(nonatomic, strong) OCColumnProxy_##CType${j+1} *CName${j+1}; \\
 %end for
 -(void)add##%slurp
 %for $j in range($num_cols)
 %if 0 < $j
 %echo ' '
 %end if
-CName${j+1}:(tdbOCType##CType${j+1})CName${j+1}%slurp
+CName${j+1}:(TIGHTDB_TYPE_##CType${j+1})CName${j+1}%slurp
 %end for
 ; \\
 -(void)insertAtIndex:(size_t)ndx%slurp
 %for $j in range($num_cols)
- CName${j+1}:(tdbOCType##CType${j+1})CName${j+1}%slurp
+ CName${j+1}:(TIGHTDB_TYPE_##CType${j+1})CName${j+1}%slurp
 %end for
 ; \\
 -(TableName##_Query *)getQuery; \\
@@ -85,10 +85,7 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1}%slurp
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \\
 -(TableName##_Cursor *)lastObject; \\
 @end \\
-typedef TableName* tdbOCType##TableName; \\
-enum { \\
-    COLTYPE##TableName = COLUMN_TYPE_TABLE \\
-}; \\
+typedef TableName* TIGHTDB_TYPE_##TableName; \\
 @interface TableName##_View : TableView \\
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \\
 @end
@@ -180,7 +177,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName${j+1}, CType${j+1}) \\
 %for $j in range($num_cols)
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName${j+1}, CType${j+1}) \\
 %end for
-@implementation OCColumnProxy##TableName \\
+@implementation OCColumnProxy_##TableName \\
 -(size_t)find:(NSString *)value \\
 { \\
     return [self.table findString:self.column value:value]; \\
@@ -199,7 +196,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName${j+1}, CType${j+1}) \\
     self = [super _initRaw]; \\
     if (!self) return nil; \\
 %for $j in range($num_cols)
-    _##CName${j+1} = [[OCColumnProxy##CType${j+1} alloc] initWithTable:self column:${j}]; \\
+    _##CName${j+1} = [[OCColumnProxy_##CType${j+1} alloc] initWithTable:self column:${j}]; \\
 %end for
     return self; \\
 } \\
@@ -210,13 +207,13 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName${j+1}, CType${j+1}) \\
     if (![self _addColumns]) return nil; \\
 \\
 %for $j in range($num_cols)
-    _##CName${j+1} = [[OCColumnProxy##CType${j+1} alloc] initWithTable:self column:${j}]; \\
+    _##CName${j+1} = [[OCColumnProxy_##CType${j+1} alloc] initWithTable:self column:${j}]; \\
 %end for
     return self; \\
 } \\
 -(void)add##%slurp
 %for $j in range($num_cols)
-CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
+CName${j+1}:(TIGHTDB_TYPE_##CType${j+1})CName${j+1} %slurp
 %end for
 \\
 { \\
@@ -228,7 +225,7 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 } \\
 -(void)insertAtIndex:(size_t)ndx %slurp
 %for $j in range($num_cols)
-CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
+CName${j+1}:(TIGHTDB_TYPE_##CType${j+1})CName${j+1} %slurp
 %end for
 \\
 { \\
@@ -257,23 +254,18 @@ CName${j+1}:(tdbOCType##CType${j+1})CName${j+1} %slurp
 { \\
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \\
 } \\
--(BOOL)checkType:(BOOL)throwOnMismatch \\
++(BOOL)_checkType:(OCSpec *)spec \\
+{ \\
+%for $j in range($num_cols)
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, ${j}, CName${j+1}, CType${j+1}) \\
+%end for
+    return YES; \\
+} \\
+-(BOOL)_checkType \\
 { \\
     OCSpec *spec = [self getSpec]; \\
-    %for $j in range($num_cols)
-    if ([spec getColumnType:${j}] != COLTYPE##CType${j+1}) { \\
-        if (throwOnMismatch) \\
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName${j+1}, [spec getColumnType:${j}], COLTYPE##CType${j+1}]; \\
-        else \\
-            return NO; \\
-    } \\
-    if (![[spec getColumnName:${j}] isEqualToString:@#CName${j+1}]) { \\
-        if (throwOnMismatch) \\
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName${j+1}, [spec getColumnName:${j}], @#CName${j+1}]; \\
-        else \\
-            return NO; \\
-    } \\
-    %end for
+    if (!spec) return NO; \\
+    if (![TableName _checkType:spec]) return NO; \\
     return YES; \\
 } \\
 +(BOOL)_addColumns:(OCSpec *)spec \\

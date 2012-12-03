@@ -127,7 +127,7 @@
         if (![table _addColumns]) return nil;
     }
     else {
-        if (![table checkType:NO]) return nil;
+        if (![table _checkType]) return nil;
     }
     return table;
 }

@@ -32,7 +32,7 @@
     self = [super init];
     if (self) {
         _table = table;
-        _query = new tightdb::Query([_table getTable]->where());
+        _query = new tightdb::Query([_table getTable].where());
     }
     return self;
 }

@@ -40,22 +40,19 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy##TableName : OCColumnProxy \
+@interface OCColumnProxy_##TableName : OCColumnProxy \
 -(size_t)find:(NSString*)value; \
 @end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
--(void)add##CName1:(tdbOCType##CType1)CName1; \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1; \
+@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1; \
 -(TableName##_Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* tdbOCType##TableName; \
-enum { \
-    COLTYPE##TableName = COLUMN_TYPE_TABLE \
-}; \
+typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -131,7 +128,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName1, CType1) \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
-@implementation OCColumnProxy##TableName \
+@implementation OCColumnProxy_##TableName \
 -(size_t)find:(NSString *)value \
 { \
     return [self.table findString:self.column value:value]; \
@@ -147,7 +144,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
     return self; \
 } \
 -(id)init \
@@ -156,16 +153,16 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
     return self; \
 } \
--(void)add##CName1:(tdbOCType##CType1)CName1 \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     [self insertDone]; \
@@ -190,21 +187,16 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
--(BOOL)checkType:(BOOL)throwOnMismatch \
++(BOOL)_checkType:(OCSpec *)spec \
+{ \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 0, CName1, CType1) \
+    return YES; \
+} \
+-(BOOL)_checkType \
 { \
     OCSpec *spec = [self getSpec]; \
-    if ([spec getColumnType:0] != COLTYPE##CType1) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName1, [spec getColumnType:0], COLTYPE##CType1]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:0] isEqualToString:@#CName1]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName1, [spec getColumnName:0], @#CName1]; \
-        else \
-            return NO; \
-    } \
+    if (!spec) return NO; \
+    if (![TableName _checkType:spec]) return NO; \
     return YES; \
 } \
 +(BOOL)_addColumns:(OCSpec *)spec \
@@ -259,23 +251,20 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy##TableName : OCColumnProxy \
+@interface OCColumnProxy_##TableName : OCColumnProxy \
 -(size_t)find:(NSString*)value; \
 @end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2; \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2; \
+@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
+@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2; \
 -(TableName##_Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* tdbOCType##TableName; \
-enum { \
-    COLTYPE##TableName = COLUMN_TYPE_TABLE \
-}; \
+typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -357,7 +346,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName2, CType2) \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
-@implementation OCColumnProxy##TableName \
+@implementation OCColumnProxy_##TableName \
 -(size_t)find:(NSString *)value \
 { \
     return [self.table findString:self.column value:value]; \
@@ -374,8 +363,8 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
     return self; \
 } \
 -(id)init \
@@ -384,18 +373,18 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
     return self; \
 } \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -421,33 +410,17 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
--(BOOL)checkType:(BOOL)throwOnMismatch \
++(BOOL)_checkType:(OCSpec *)spec \
+{ \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 0, CName1, CType1) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 1, CName2, CType2) \
+    return YES; \
+} \
+-(BOOL)_checkType \
 { \
     OCSpec *spec = [self getSpec]; \
-    if ([spec getColumnType:0] != COLTYPE##CType1) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName1, [spec getColumnType:0], COLTYPE##CType1]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:0] isEqualToString:@#CName1]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName1, [spec getColumnName:0], @#CName1]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:1] != COLTYPE##CType2) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName2, [spec getColumnType:1], COLTYPE##CType2]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:1] isEqualToString:@#CName2]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName2, [spec getColumnName:1], @#CName2]; \
-        else \
-            return NO; \
-    } \
+    if (!spec) return NO; \
+    if (![TableName _checkType:spec]) return NO; \
     return YES; \
 } \
 +(BOOL)_addColumns:(OCSpec *)spec \
@@ -506,24 +479,21 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy##TableName : OCColumnProxy \
+@interface OCColumnProxy_##TableName : OCColumnProxy \
 -(size_t)find:(NSString*)value; \
 @end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3; \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3; \
+@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
+@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
+@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3; \
 -(TableName##_Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* tdbOCType##TableName; \
-enum { \
-    COLTYPE##TableName = COLUMN_TYPE_TABLE \
-}; \
+typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -611,7 +581,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
-@implementation OCColumnProxy##TableName \
+@implementation OCColumnProxy_##TableName \
 -(size_t)find:(NSString *)value \
 { \
     return [self.table findString:self.column value:value]; \
@@ -629,9 +599,9 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
     return self; \
 } \
 -(id)init \
@@ -640,12 +610,12 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
     return self; \
 } \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -653,7 +623,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
     TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -680,45 +650,18 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
--(BOOL)checkType:(BOOL)throwOnMismatch \
++(BOOL)_checkType:(OCSpec *)spec \
+{ \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 0, CName1, CType1) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 1, CName2, CType2) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 2, CName3, CType3) \
+    return YES; \
+} \
+-(BOOL)_checkType \
 { \
     OCSpec *spec = [self getSpec]; \
-    if ([spec getColumnType:0] != COLTYPE##CType1) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName1, [spec getColumnType:0], COLTYPE##CType1]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:0] isEqualToString:@#CName1]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName1, [spec getColumnName:0], @#CName1]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:1] != COLTYPE##CType2) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName2, [spec getColumnType:1], COLTYPE##CType2]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:1] isEqualToString:@#CName2]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName2, [spec getColumnName:1], @#CName2]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:2] != COLTYPE##CType3) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName3, [spec getColumnType:2], COLTYPE##CType3]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:2] isEqualToString:@#CName3]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName3, [spec getColumnName:2], @#CName3]; \
-        else \
-            return NO; \
-    } \
+    if (!spec) return NO; \
+    if (![TableName _checkType:spec]) return NO; \
     return YES; \
 } \
 +(BOOL)_addColumns:(OCSpec *)spec \
@@ -781,25 +724,22 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy##TableName : OCColumnProxy \
+@interface OCColumnProxy_##TableName : OCColumnProxy \
 -(size_t)find:(NSString*)value; \
 @end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy##CType4 *CName4; \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4; \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4; \
+@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
+@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
+@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
+@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4; \
 -(TableName##_Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* tdbOCType##TableName; \
-enum { \
-    COLTYPE##TableName = COLUMN_TYPE_TABLE \
-}; \
+typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -893,7 +833,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
-@implementation OCColumnProxy##TableName \
+@implementation OCColumnProxy_##TableName \
 -(size_t)find:(NSString *)value \
 { \
     return [self.table findString:self.column value:value]; \
@@ -912,10 +852,10 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
     return self; \
 } \
 -(id)init \
@@ -924,13 +864,13 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
     return self; \
 } \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -939,7 +879,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
     TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -967,57 +907,19 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
--(BOOL)checkType:(BOOL)throwOnMismatch \
++(BOOL)_checkType:(OCSpec *)spec \
+{ \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 0, CName1, CType1) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 1, CName2, CType2) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 2, CName3, CType3) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 3, CName4, CType4) \
+    return YES; \
+} \
+-(BOOL)_checkType \
 { \
     OCSpec *spec = [self getSpec]; \
-    if ([spec getColumnType:0] != COLTYPE##CType1) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName1, [spec getColumnType:0], COLTYPE##CType1]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:0] isEqualToString:@#CName1]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName1, [spec getColumnName:0], @#CName1]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:1] != COLTYPE##CType2) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName2, [spec getColumnType:1], COLTYPE##CType2]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:1] isEqualToString:@#CName2]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName2, [spec getColumnName:1], @#CName2]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:2] != COLTYPE##CType3) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName3, [spec getColumnType:2], COLTYPE##CType3]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:2] isEqualToString:@#CName3]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName3, [spec getColumnName:2], @#CName3]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:3] != COLTYPE##CType4) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName4, [spec getColumnType:3], COLTYPE##CType4]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:3] isEqualToString:@#CName4]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName4, [spec getColumnName:3], @#CName4]; \
-        else \
-            return NO; \
-    } \
+    if (!spec) return NO; \
+    if (![TableName _checkType:spec]) return NO; \
     return YES; \
 } \
 +(BOOL)_addColumns:(OCSpec *)spec \
@@ -1084,26 +986,23 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy##TableName : OCColumnProxy \
+@interface OCColumnProxy_##TableName : OCColumnProxy \
 -(size_t)find:(NSString*)value; \
 @end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy##CType5 *CName5; \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5; \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5; \
+@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
+@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
+@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
+@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
+@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5; \
 -(TableName##_Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* tdbOCType##TableName; \
-enum { \
-    COLTYPE##TableName = COLUMN_TYPE_TABLE \
-}; \
+typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -1203,7 +1102,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
-@implementation OCColumnProxy##TableName \
+@implementation OCColumnProxy_##TableName \
 -(size_t)find:(NSString *)value \
 { \
     return [self.table findString:self.column value:value]; \
@@ -1223,11 +1122,11 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
     return self; \
 } \
 -(id)init \
@@ -1236,14 +1135,14 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
     return self; \
 } \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -1253,7 +1152,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
     TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -1282,69 +1181,20 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
--(BOOL)checkType:(BOOL)throwOnMismatch \
++(BOOL)_checkType:(OCSpec *)spec \
+{ \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 0, CName1, CType1) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 1, CName2, CType2) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 2, CName3, CType3) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 3, CName4, CType4) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 4, CName5, CType5) \
+    return YES; \
+} \
+-(BOOL)_checkType \
 { \
     OCSpec *spec = [self getSpec]; \
-    if ([spec getColumnType:0] != COLTYPE##CType1) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName1, [spec getColumnType:0], COLTYPE##CType1]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:0] isEqualToString:@#CName1]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName1, [spec getColumnName:0], @#CName1]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:1] != COLTYPE##CType2) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName2, [spec getColumnType:1], COLTYPE##CType2]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:1] isEqualToString:@#CName2]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName2, [spec getColumnName:1], @#CName2]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:2] != COLTYPE##CType3) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName3, [spec getColumnType:2], COLTYPE##CType3]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:2] isEqualToString:@#CName3]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName3, [spec getColumnName:2], @#CName3]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:3] != COLTYPE##CType4) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName4, [spec getColumnType:3], COLTYPE##CType4]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:3] isEqualToString:@#CName4]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName4, [spec getColumnName:3], @#CName4]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:4] != COLTYPE##CType5) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName5, [spec getColumnType:4], COLTYPE##CType5]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:4] isEqualToString:@#CName5]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName5, [spec getColumnName:4], @#CName5]; \
-        else \
-            return NO; \
-    } \
+    if (!spec) return NO; \
+    if (![TableName _checkType:spec]) return NO; \
     return YES; \
 } \
 +(BOOL)_addColumns:(OCSpec *)spec \
@@ -1415,27 +1265,24 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy##TableName : OCColumnProxy \
+@interface OCColumnProxy_##TableName : OCColumnProxy \
 -(size_t)find:(NSString*)value; \
 @end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy##CType6 *CName6; \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6; \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6; \
+@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
+@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
+@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
+@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
+@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
+@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6; \
 -(TableName##_Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* tdbOCType##TableName; \
-enum { \
-    COLTYPE##TableName = COLUMN_TYPE_TABLE \
-}; \
+typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -1541,7 +1388,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
-@implementation OCColumnProxy##TableName \
+@implementation OCColumnProxy_##TableName \
 -(size_t)find:(NSString *)value \
 { \
     return [self.table findString:self.column value:value]; \
@@ -1562,12 +1409,12 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
     return self; \
 } \
 -(id)init \
@@ -1576,15 +1423,15 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
     return self; \
 } \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -1595,7 +1442,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
     TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -1625,81 +1472,21 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
--(BOOL)checkType:(BOOL)throwOnMismatch \
++(BOOL)_checkType:(OCSpec *)spec \
+{ \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 0, CName1, CType1) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 1, CName2, CType2) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 2, CName3, CType3) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 3, CName4, CType4) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 4, CName5, CType5) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 5, CName6, CType6) \
+    return YES; \
+} \
+-(BOOL)_checkType \
 { \
     OCSpec *spec = [self getSpec]; \
-    if ([spec getColumnType:0] != COLTYPE##CType1) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName1, [spec getColumnType:0], COLTYPE##CType1]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:0] isEqualToString:@#CName1]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName1, [spec getColumnName:0], @#CName1]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:1] != COLTYPE##CType2) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName2, [spec getColumnType:1], COLTYPE##CType2]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:1] isEqualToString:@#CName2]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName2, [spec getColumnName:1], @#CName2]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:2] != COLTYPE##CType3) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName3, [spec getColumnType:2], COLTYPE##CType3]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:2] isEqualToString:@#CName3]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName3, [spec getColumnName:2], @#CName3]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:3] != COLTYPE##CType4) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName4, [spec getColumnType:3], COLTYPE##CType4]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:3] isEqualToString:@#CName4]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName4, [spec getColumnName:3], @#CName4]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:4] != COLTYPE##CType5) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName5, [spec getColumnType:4], COLTYPE##CType5]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:4] isEqualToString:@#CName5]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName5, [spec getColumnName:4], @#CName5]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:5] != COLTYPE##CType6) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName6, [spec getColumnType:5], COLTYPE##CType6]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:5] isEqualToString:@#CName6]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName6, [spec getColumnName:5], @#CName6]; \
-        else \
-            return NO; \
-    } \
+    if (!spec) return NO; \
+    if (![TableName _checkType:spec]) return NO; \
     return YES; \
 } \
 +(BOOL)_addColumns:(OCSpec *)spec \
@@ -1774,28 +1561,25 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy##TableName : OCColumnProxy \
+@interface OCColumnProxy_##TableName : OCColumnProxy \
 -(size_t)find:(NSString*)value; \
 @end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy##CType7 *CName7; \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7; \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7; \
+@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
+@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
+@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
+@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
+@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
+@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
+@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7; \
 -(TableName##_Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* tdbOCType##TableName; \
-enum { \
-    COLTYPE##TableName = COLUMN_TYPE_TABLE \
-}; \
+typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -1907,7 +1691,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
-@implementation OCColumnProxy##TableName \
+@implementation OCColumnProxy_##TableName \
 -(size_t)find:(NSString *)value \
 { \
     return [self.table findString:self.column value:value]; \
@@ -1929,13 +1713,13 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
     return self; \
 } \
 -(id)init \
@@ -1944,16 +1728,16 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
     return self; \
 } \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -1965,7 +1749,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
     TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -1996,93 +1780,22 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
--(BOOL)checkType:(BOOL)throwOnMismatch \
++(BOOL)_checkType:(OCSpec *)spec \
+{ \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 0, CName1, CType1) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 1, CName2, CType2) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 2, CName3, CType3) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 3, CName4, CType4) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 4, CName5, CType5) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 5, CName6, CType6) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 6, CName7, CType7) \
+    return YES; \
+} \
+-(BOOL)_checkType \
 { \
     OCSpec *spec = [self getSpec]; \
-    if ([spec getColumnType:0] != COLTYPE##CType1) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName1, [spec getColumnType:0], COLTYPE##CType1]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:0] isEqualToString:@#CName1]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName1, [spec getColumnName:0], @#CName1]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:1] != COLTYPE##CType2) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName2, [spec getColumnType:1], COLTYPE##CType2]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:1] isEqualToString:@#CName2]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName2, [spec getColumnName:1], @#CName2]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:2] != COLTYPE##CType3) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName3, [spec getColumnType:2], COLTYPE##CType3]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:2] isEqualToString:@#CName3]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName3, [spec getColumnName:2], @#CName3]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:3] != COLTYPE##CType4) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName4, [spec getColumnType:3], COLTYPE##CType4]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:3] isEqualToString:@#CName4]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName4, [spec getColumnName:3], @#CName4]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:4] != COLTYPE##CType5) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName5, [spec getColumnType:4], COLTYPE##CType5]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:4] isEqualToString:@#CName5]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName5, [spec getColumnName:4], @#CName5]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:5] != COLTYPE##CType6) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName6, [spec getColumnType:5], COLTYPE##CType6]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:5] isEqualToString:@#CName6]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName6, [spec getColumnName:5], @#CName6]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:6] != COLTYPE##CType7) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName7, [spec getColumnType:6], COLTYPE##CType7]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:6] isEqualToString:@#CName7]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName7, [spec getColumnName:6], @#CName7]; \
-        else \
-            return NO; \
-    } \
+    if (!spec) return NO; \
+    if (![TableName _checkType:spec]) return NO; \
     return YES; \
 } \
 +(BOOL)_addColumns:(OCSpec *)spec \
@@ -2161,29 +1874,26 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy##TableName : OCColumnProxy \
+@interface OCColumnProxy_##TableName : OCColumnProxy \
 -(size_t)find:(NSString*)value; \
 @end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy##CType7 *CName7; \
-@property(nonatomic, strong) OCColumnProxy##CType8 *CName8; \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8; \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8; \
+@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
+@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
+@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
+@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
+@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
+@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
+@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
+@property(nonatomic, strong) OCColumnProxy_##CType8 *CName8; \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8; \
 -(TableName##_Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* tdbOCType##TableName; \
-enum { \
-    COLTYPE##TableName = COLUMN_TYPE_TABLE \
-}; \
+typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -2301,7 +2011,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
-@implementation OCColumnProxy##TableName \
+@implementation OCColumnProxy_##TableName \
 -(size_t)find:(NSString *)value \
 { \
     return [self.table findString:self.column value:value]; \
@@ -2324,14 +2034,14 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
     return self; \
 } \
 -(id)init \
@@ -2340,17 +2050,17 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
     return self; \
 } \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -2363,7 +2073,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
     TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -2395,105 +2105,23 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
--(BOOL)checkType:(BOOL)throwOnMismatch \
++(BOOL)_checkType:(OCSpec *)spec \
+{ \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 0, CName1, CType1) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 1, CName2, CType2) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 2, CName3, CType3) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 3, CName4, CType4) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 4, CName5, CType5) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 5, CName6, CType6) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 6, CName7, CType7) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 7, CName8, CType8) \
+    return YES; \
+} \
+-(BOOL)_checkType \
 { \
     OCSpec *spec = [self getSpec]; \
-    if ([spec getColumnType:0] != COLTYPE##CType1) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName1, [spec getColumnType:0], COLTYPE##CType1]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:0] isEqualToString:@#CName1]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName1, [spec getColumnName:0], @#CName1]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:1] != COLTYPE##CType2) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName2, [spec getColumnType:1], COLTYPE##CType2]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:1] isEqualToString:@#CName2]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName2, [spec getColumnName:1], @#CName2]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:2] != COLTYPE##CType3) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName3, [spec getColumnType:2], COLTYPE##CType3]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:2] isEqualToString:@#CName3]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName3, [spec getColumnName:2], @#CName3]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:3] != COLTYPE##CType4) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName4, [spec getColumnType:3], COLTYPE##CType4]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:3] isEqualToString:@#CName4]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName4, [spec getColumnName:3], @#CName4]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:4] != COLTYPE##CType5) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName5, [spec getColumnType:4], COLTYPE##CType5]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:4] isEqualToString:@#CName5]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName5, [spec getColumnName:4], @#CName5]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:5] != COLTYPE##CType6) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName6, [spec getColumnType:5], COLTYPE##CType6]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:5] isEqualToString:@#CName6]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName6, [spec getColumnName:5], @#CName6]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:6] != COLTYPE##CType7) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName7, [spec getColumnType:6], COLTYPE##CType7]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:6] isEqualToString:@#CName7]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName7, [spec getColumnName:6], @#CName7]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:7] != COLTYPE##CType8) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName8, [spec getColumnType:7], COLTYPE##CType8]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:7] isEqualToString:@#CName8]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName8, [spec getColumnName:7], @#CName8]; \
-        else \
-            return NO; \
-    } \
+    if (!spec) return NO; \
+    if (![TableName _checkType:spec]) return NO; \
     return YES; \
 } \
 +(BOOL)_addColumns:(OCSpec *)spec \
@@ -2576,30 +2204,27 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy##TableName : OCColumnProxy \
+@interface OCColumnProxy_##TableName : OCColumnProxy \
 -(size_t)find:(NSString*)value; \
 @end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy##CType7 *CName7; \
-@property(nonatomic, strong) OCColumnProxy##CType8 *CName8; \
-@property(nonatomic, strong) OCColumnProxy##CType9 *CName9; \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9; \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9; \
+@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
+@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
+@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
+@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
+@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
+@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
+@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
+@property(nonatomic, strong) OCColumnProxy_##CType8 *CName8; \
+@property(nonatomic, strong) OCColumnProxy_##CType9 *CName9; \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9; \
 -(TableName##_Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* tdbOCType##TableName; \
-enum { \
-    COLTYPE##TableName = COLUMN_TYPE_TABLE \
-}; \
+typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -2723,7 +2348,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
-@implementation OCColumnProxy##TableName \
+@implementation OCColumnProxy_##TableName \
 -(size_t)find:(NSString *)value \
 { \
     return [self.table findString:self.column value:value]; \
@@ -2747,15 +2372,15 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy##CType9 alloc] initWithTable:self column:8]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
+    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
     return self; \
 } \
 -(id)init \
@@ -2764,18 +2389,18 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy##CType9 alloc] initWithTable:self column:8]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
+    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
     return self; \
 } \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -2789,7 +2414,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
     TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -2822,117 +2447,24 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
--(BOOL)checkType:(BOOL)throwOnMismatch \
++(BOOL)_checkType:(OCSpec *)spec \
+{ \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 0, CName1, CType1) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 1, CName2, CType2) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 2, CName3, CType3) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 3, CName4, CType4) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 4, CName5, CType5) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 5, CName6, CType6) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 6, CName7, CType7) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 7, CName8, CType8) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 8, CName9, CType9) \
+    return YES; \
+} \
+-(BOOL)_checkType \
 { \
     OCSpec *spec = [self getSpec]; \
-    if ([spec getColumnType:0] != COLTYPE##CType1) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName1, [spec getColumnType:0], COLTYPE##CType1]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:0] isEqualToString:@#CName1]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName1, [spec getColumnName:0], @#CName1]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:1] != COLTYPE##CType2) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName2, [spec getColumnType:1], COLTYPE##CType2]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:1] isEqualToString:@#CName2]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName2, [spec getColumnName:1], @#CName2]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:2] != COLTYPE##CType3) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName3, [spec getColumnType:2], COLTYPE##CType3]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:2] isEqualToString:@#CName3]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName3, [spec getColumnName:2], @#CName3]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:3] != COLTYPE##CType4) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName4, [spec getColumnType:3], COLTYPE##CType4]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:3] isEqualToString:@#CName4]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName4, [spec getColumnName:3], @#CName4]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:4] != COLTYPE##CType5) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName5, [spec getColumnType:4], COLTYPE##CType5]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:4] isEqualToString:@#CName5]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName5, [spec getColumnName:4], @#CName5]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:5] != COLTYPE##CType6) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName6, [spec getColumnType:5], COLTYPE##CType6]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:5] isEqualToString:@#CName6]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName6, [spec getColumnName:5], @#CName6]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:6] != COLTYPE##CType7) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName7, [spec getColumnType:6], COLTYPE##CType7]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:6] isEqualToString:@#CName7]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName7, [spec getColumnName:6], @#CName7]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:7] != COLTYPE##CType8) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName8, [spec getColumnType:7], COLTYPE##CType8]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:7] isEqualToString:@#CName8]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName8, [spec getColumnName:7], @#CName8]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:8] != COLTYPE##CType9) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName9, [spec getColumnType:8], COLTYPE##CType9]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:8] isEqualToString:@#CName9]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName9, [spec getColumnName:8], @#CName9]; \
-        else \
-            return NO; \
-    } \
+    if (!spec) return NO; \
+    if (![TableName _checkType:spec]) return NO; \
     return YES; \
 } \
 +(BOOL)_addColumns:(OCSpec *)spec \
@@ -3019,31 +2551,28 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy##TableName : OCColumnProxy \
+@interface OCColumnProxy_##TableName : OCColumnProxy \
 -(size_t)find:(NSString*)value; \
 @end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy##CType7 *CName7; \
-@property(nonatomic, strong) OCColumnProxy##CType8 *CName8; \
-@property(nonatomic, strong) OCColumnProxy##CType9 *CName9; \
-@property(nonatomic, strong) OCColumnProxy##CType10 *CName10; \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10; \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10; \
+@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
+@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
+@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
+@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
+@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
+@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
+@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
+@property(nonatomic, strong) OCColumnProxy_##CType8 *CName8; \
+@property(nonatomic, strong) OCColumnProxy_##CType9 *CName9; \
+@property(nonatomic, strong) OCColumnProxy_##CType10 *CName10; \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10; \
 -(TableName##_Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* tdbOCType##TableName; \
-enum { \
-    COLTYPE##TableName = COLUMN_TYPE_TABLE \
-}; \
+typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -3173,7 +2702,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
-@implementation OCColumnProxy##TableName \
+@implementation OCColumnProxy_##TableName \
 -(size_t)find:(NSString *)value \
 { \
     return [self.table findString:self.column value:value]; \
@@ -3198,16 +2727,16 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy##CType10 alloc] initWithTable:self column:9]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
+    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
+    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
     return self; \
 } \
 -(id)init \
@@ -3216,19 +2745,19 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy##CType10 alloc] initWithTable:self column:9]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
+    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
+    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
     return self; \
 } \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -3243,7 +2772,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
     TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -3277,129 +2806,25 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
--(BOOL)checkType:(BOOL)throwOnMismatch \
++(BOOL)_checkType:(OCSpec *)spec \
+{ \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 0, CName1, CType1) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 1, CName2, CType2) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 2, CName3, CType3) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 3, CName4, CType4) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 4, CName5, CType5) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 5, CName6, CType6) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 6, CName7, CType7) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 7, CName8, CType8) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 8, CName9, CType9) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 9, CName10, CType10) \
+    return YES; \
+} \
+-(BOOL)_checkType \
 { \
     OCSpec *spec = [self getSpec]; \
-    if ([spec getColumnType:0] != COLTYPE##CType1) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName1, [spec getColumnType:0], COLTYPE##CType1]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:0] isEqualToString:@#CName1]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName1, [spec getColumnName:0], @#CName1]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:1] != COLTYPE##CType2) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName2, [spec getColumnType:1], COLTYPE##CType2]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:1] isEqualToString:@#CName2]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName2, [spec getColumnName:1], @#CName2]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:2] != COLTYPE##CType3) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName3, [spec getColumnType:2], COLTYPE##CType3]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:2] isEqualToString:@#CName3]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName3, [spec getColumnName:2], @#CName3]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:3] != COLTYPE##CType4) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName4, [spec getColumnType:3], COLTYPE##CType4]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:3] isEqualToString:@#CName4]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName4, [spec getColumnName:3], @#CName4]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:4] != COLTYPE##CType5) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName5, [spec getColumnType:4], COLTYPE##CType5]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:4] isEqualToString:@#CName5]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName5, [spec getColumnName:4], @#CName5]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:5] != COLTYPE##CType6) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName6, [spec getColumnType:5], COLTYPE##CType6]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:5] isEqualToString:@#CName6]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName6, [spec getColumnName:5], @#CName6]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:6] != COLTYPE##CType7) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName7, [spec getColumnType:6], COLTYPE##CType7]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:6] isEqualToString:@#CName7]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName7, [spec getColumnName:6], @#CName7]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:7] != COLTYPE##CType8) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName8, [spec getColumnType:7], COLTYPE##CType8]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:7] isEqualToString:@#CName8]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName8, [spec getColumnName:7], @#CName8]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:8] != COLTYPE##CType9) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName9, [spec getColumnType:8], COLTYPE##CType9]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:8] isEqualToString:@#CName9]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName9, [spec getColumnName:8], @#CName9]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:9] != COLTYPE##CType10) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName10, [spec getColumnType:9], COLTYPE##CType10]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:9] isEqualToString:@#CName10]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName10, [spec getColumnName:9], @#CName10]; \
-        else \
-            return NO; \
-    } \
+    if (!spec) return NO; \
+    if (![TableName _checkType:spec]) return NO; \
     return YES; \
 } \
 +(BOOL)_addColumns:(OCSpec *)spec \
@@ -3490,32 +2915,29 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy##TableName : OCColumnProxy \
+@interface OCColumnProxy_##TableName : OCColumnProxy \
 -(size_t)find:(NSString*)value; \
 @end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy##CType7 *CName7; \
-@property(nonatomic, strong) OCColumnProxy##CType8 *CName8; \
-@property(nonatomic, strong) OCColumnProxy##CType9 *CName9; \
-@property(nonatomic, strong) OCColumnProxy##CType10 *CName10; \
-@property(nonatomic, strong) OCColumnProxy##CType11 *CName11; \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11; \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11; \
+@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
+@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
+@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
+@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
+@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
+@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
+@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
+@property(nonatomic, strong) OCColumnProxy_##CType8 *CName8; \
+@property(nonatomic, strong) OCColumnProxy_##CType9 *CName9; \
+@property(nonatomic, strong) OCColumnProxy_##CType10 *CName10; \
+@property(nonatomic, strong) OCColumnProxy_##CType11 *CName11; \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11; \
 -(TableName##_Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* tdbOCType##TableName; \
-enum { \
-    COLTYPE##TableName = COLUMN_TYPE_TABLE \
-}; \
+typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -3651,7 +3073,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
-@implementation OCColumnProxy##TableName \
+@implementation OCColumnProxy_##TableName \
 -(size_t)find:(NSString *)value \
 { \
     return [self.table findString:self.column value:value]; \
@@ -3677,17 +3099,17 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy##CType11 alloc] initWithTable:self column:10]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
+    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
+    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
+    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
     return self; \
 } \
 -(id)init \
@@ -3696,20 +3118,20 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy##CType11 alloc] initWithTable:self column:10]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
+    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
+    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
+    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
     return self; \
 } \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -3725,7 +3147,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
     TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -3760,141 +3182,26 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
--(BOOL)checkType:(BOOL)throwOnMismatch \
++(BOOL)_checkType:(OCSpec *)spec \
+{ \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 0, CName1, CType1) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 1, CName2, CType2) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 2, CName3, CType3) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 3, CName4, CType4) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 4, CName5, CType5) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 5, CName6, CType6) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 6, CName7, CType7) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 7, CName8, CType8) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 8, CName9, CType9) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 9, CName10, CType10) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 10, CName11, CType11) \
+    return YES; \
+} \
+-(BOOL)_checkType \
 { \
     OCSpec *spec = [self getSpec]; \
-    if ([spec getColumnType:0] != COLTYPE##CType1) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName1, [spec getColumnType:0], COLTYPE##CType1]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:0] isEqualToString:@#CName1]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName1, [spec getColumnName:0], @#CName1]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:1] != COLTYPE##CType2) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName2, [spec getColumnType:1], COLTYPE##CType2]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:1] isEqualToString:@#CName2]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName2, [spec getColumnName:1], @#CName2]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:2] != COLTYPE##CType3) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName3, [spec getColumnType:2], COLTYPE##CType3]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:2] isEqualToString:@#CName3]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName3, [spec getColumnName:2], @#CName3]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:3] != COLTYPE##CType4) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName4, [spec getColumnType:3], COLTYPE##CType4]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:3] isEqualToString:@#CName4]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName4, [spec getColumnName:3], @#CName4]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:4] != COLTYPE##CType5) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName5, [spec getColumnType:4], COLTYPE##CType5]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:4] isEqualToString:@#CName5]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName5, [spec getColumnName:4], @#CName5]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:5] != COLTYPE##CType6) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName6, [spec getColumnType:5], COLTYPE##CType6]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:5] isEqualToString:@#CName6]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName6, [spec getColumnName:5], @#CName6]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:6] != COLTYPE##CType7) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName7, [spec getColumnType:6], COLTYPE##CType7]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:6] isEqualToString:@#CName7]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName7, [spec getColumnName:6], @#CName7]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:7] != COLTYPE##CType8) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName8, [spec getColumnType:7], COLTYPE##CType8]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:7] isEqualToString:@#CName8]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName8, [spec getColumnName:7], @#CName8]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:8] != COLTYPE##CType9) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName9, [spec getColumnType:8], COLTYPE##CType9]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:8] isEqualToString:@#CName9]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName9, [spec getColumnName:8], @#CName9]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:9] != COLTYPE##CType10) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName10, [spec getColumnType:9], COLTYPE##CType10]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:9] isEqualToString:@#CName10]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName10, [spec getColumnName:9], @#CName10]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:10] != COLTYPE##CType11) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName11, [spec getColumnType:10], COLTYPE##CType11]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:10] isEqualToString:@#CName11]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName11, [spec getColumnName:10], @#CName11]; \
-        else \
-            return NO; \
-    } \
+    if (!spec) return NO; \
+    if (![TableName _checkType:spec]) return NO; \
     return YES; \
 } \
 +(BOOL)_addColumns:(OCSpec *)spec \
@@ -3989,33 +3296,30 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy##TableName : OCColumnProxy \
+@interface OCColumnProxy_##TableName : OCColumnProxy \
 -(size_t)find:(NSString*)value; \
 @end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy##CType7 *CName7; \
-@property(nonatomic, strong) OCColumnProxy##CType8 *CName8; \
-@property(nonatomic, strong) OCColumnProxy##CType9 *CName9; \
-@property(nonatomic, strong) OCColumnProxy##CType10 *CName10; \
-@property(nonatomic, strong) OCColumnProxy##CType11 *CName11; \
-@property(nonatomic, strong) OCColumnProxy##CType12 *CName12; \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 CName12:(tdbOCType##CType12)CName12; \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 CName12:(tdbOCType##CType12)CName12; \
+@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
+@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
+@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
+@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
+@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
+@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
+@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
+@property(nonatomic, strong) OCColumnProxy_##CType8 *CName8; \
+@property(nonatomic, strong) OCColumnProxy_##CType9 *CName9; \
+@property(nonatomic, strong) OCColumnProxy_##CType10 *CName10; \
+@property(nonatomic, strong) OCColumnProxy_##CType11 *CName11; \
+@property(nonatomic, strong) OCColumnProxy_##CType12 *CName12; \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12; \
 -(TableName##_Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* tdbOCType##TableName; \
-enum { \
-    COLTYPE##TableName = COLUMN_TYPE_TABLE \
-}; \
+typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -4157,7 +3461,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
-@implementation OCColumnProxy##TableName \
+@implementation OCColumnProxy_##TableName \
 -(size_t)find:(NSString *)value \
 { \
     return [self.table findString:self.column value:value]; \
@@ -4184,18 +3488,18 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy##CType11 alloc] initWithTable:self column:10]; \
-    _##CName12 = [[OCColumnProxy##CType12 alloc] initWithTable:self column:11]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
+    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
+    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
+    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
+    _##CName12 = [[OCColumnProxy_##CType12 alloc] initWithTable:self column:11]; \
     return self; \
 } \
 -(id)init \
@@ -4204,21 +3508,21 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy##CType11 alloc] initWithTable:self column:10]; \
-    _##CName12 = [[OCColumnProxy##CType12 alloc] initWithTable:self column:11]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
+    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
+    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
+    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
+    _##CName12 = [[OCColumnProxy_##CType12 alloc] initWithTable:self column:11]; \
     return self; \
 } \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 CName12:(tdbOCType##CType12)CName12 \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -4235,7 +3539,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
     TIGHTDB_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 CName12:(tdbOCType##CType12)CName12 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -4271,153 +3575,27 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
--(BOOL)checkType:(BOOL)throwOnMismatch \
++(BOOL)_checkType:(OCSpec *)spec \
+{ \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 0, CName1, CType1) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 1, CName2, CType2) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 2, CName3, CType3) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 3, CName4, CType4) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 4, CName5, CType5) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 5, CName6, CType6) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 6, CName7, CType7) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 7, CName8, CType8) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 8, CName9, CType9) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 9, CName10, CType10) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 10, CName11, CType11) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 11, CName12, CType12) \
+    return YES; \
+} \
+-(BOOL)_checkType \
 { \
     OCSpec *spec = [self getSpec]; \
-    if ([spec getColumnType:0] != COLTYPE##CType1) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName1, [spec getColumnType:0], COLTYPE##CType1]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:0] isEqualToString:@#CName1]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName1, [spec getColumnName:0], @#CName1]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:1] != COLTYPE##CType2) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName2, [spec getColumnType:1], COLTYPE##CType2]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:1] isEqualToString:@#CName2]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName2, [spec getColumnName:1], @#CName2]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:2] != COLTYPE##CType3) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName3, [spec getColumnType:2], COLTYPE##CType3]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:2] isEqualToString:@#CName3]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName3, [spec getColumnName:2], @#CName3]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:3] != COLTYPE##CType4) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName4, [spec getColumnType:3], COLTYPE##CType4]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:3] isEqualToString:@#CName4]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName4, [spec getColumnName:3], @#CName4]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:4] != COLTYPE##CType5) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName5, [spec getColumnType:4], COLTYPE##CType5]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:4] isEqualToString:@#CName5]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName5, [spec getColumnName:4], @#CName5]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:5] != COLTYPE##CType6) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName6, [spec getColumnType:5], COLTYPE##CType6]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:5] isEqualToString:@#CName6]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName6, [spec getColumnName:5], @#CName6]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:6] != COLTYPE##CType7) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName7, [spec getColumnType:6], COLTYPE##CType7]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:6] isEqualToString:@#CName7]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName7, [spec getColumnName:6], @#CName7]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:7] != COLTYPE##CType8) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName8, [spec getColumnType:7], COLTYPE##CType8]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:7] isEqualToString:@#CName8]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName8, [spec getColumnName:7], @#CName8]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:8] != COLTYPE##CType9) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName9, [spec getColumnType:8], COLTYPE##CType9]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:8] isEqualToString:@#CName9]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName9, [spec getColumnName:8], @#CName9]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:9] != COLTYPE##CType10) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName10, [spec getColumnType:9], COLTYPE##CType10]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:9] isEqualToString:@#CName10]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName10, [spec getColumnName:9], @#CName10]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:10] != COLTYPE##CType11) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName11, [spec getColumnType:10], COLTYPE##CType11]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:10] isEqualToString:@#CName11]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName11, [spec getColumnName:10], @#CName11]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:11] != COLTYPE##CType12) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName12, [spec getColumnType:11], COLTYPE##CType12]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:11] isEqualToString:@#CName12]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName12, [spec getColumnName:11], @#CName12]; \
-        else \
-            return NO; \
-    } \
+    if (!spec) return NO; \
+    if (![TableName _checkType:spec]) return NO; \
     return YES; \
 } \
 +(BOOL)_addColumns:(OCSpec *)spec \
@@ -4516,34 +3694,31 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy##TableName : OCColumnProxy \
+@interface OCColumnProxy_##TableName : OCColumnProxy \
 -(size_t)find:(NSString*)value; \
 @end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy##CType7 *CName7; \
-@property(nonatomic, strong) OCColumnProxy##CType8 *CName8; \
-@property(nonatomic, strong) OCColumnProxy##CType9 *CName9; \
-@property(nonatomic, strong) OCColumnProxy##CType10 *CName10; \
-@property(nonatomic, strong) OCColumnProxy##CType11 *CName11; \
-@property(nonatomic, strong) OCColumnProxy##CType12 *CName12; \
-@property(nonatomic, strong) OCColumnProxy##CType13 *CName13; \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 CName12:(tdbOCType##CType12)CName12 CName13:(tdbOCType##CType13)CName13; \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 CName12:(tdbOCType##CType12)CName12 CName13:(tdbOCType##CType13)CName13; \
+@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
+@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
+@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
+@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
+@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
+@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
+@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
+@property(nonatomic, strong) OCColumnProxy_##CType8 *CName8; \
+@property(nonatomic, strong) OCColumnProxy_##CType9 *CName9; \
+@property(nonatomic, strong) OCColumnProxy_##CType10 *CName10; \
+@property(nonatomic, strong) OCColumnProxy_##CType11 *CName11; \
+@property(nonatomic, strong) OCColumnProxy_##CType12 *CName12; \
+@property(nonatomic, strong) OCColumnProxy_##CType13 *CName13; \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13; \
 -(TableName##_Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* tdbOCType##TableName; \
-enum { \
-    COLTYPE##TableName = COLUMN_TYPE_TABLE \
-}; \
+typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -4691,7 +3866,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
-@implementation OCColumnProxy##TableName \
+@implementation OCColumnProxy_##TableName \
 -(size_t)find:(NSString *)value \
 { \
     return [self.table findString:self.column value:value]; \
@@ -4719,19 +3894,19 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy##CType11 alloc] initWithTable:self column:10]; \
-    _##CName12 = [[OCColumnProxy##CType12 alloc] initWithTable:self column:11]; \
-    _##CName13 = [[OCColumnProxy##CType13 alloc] initWithTable:self column:12]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
+    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
+    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
+    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
+    _##CName12 = [[OCColumnProxy_##CType12 alloc] initWithTable:self column:11]; \
+    _##CName13 = [[OCColumnProxy_##CType13 alloc] initWithTable:self column:12]; \
     return self; \
 } \
 -(id)init \
@@ -4740,22 +3915,22 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy##CType11 alloc] initWithTable:self column:10]; \
-    _##CName12 = [[OCColumnProxy##CType12 alloc] initWithTable:self column:11]; \
-    _##CName13 = [[OCColumnProxy##CType13 alloc] initWithTable:self column:12]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
+    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
+    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
+    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
+    _##CName12 = [[OCColumnProxy_##CType12 alloc] initWithTable:self column:11]; \
+    _##CName13 = [[OCColumnProxy_##CType13 alloc] initWithTable:self column:12]; \
     return self; \
 } \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 CName12:(tdbOCType##CType12)CName12 CName13:(tdbOCType##CType13)CName13 \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -4773,7 +3948,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
     TIGHTDB_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 CName12:(tdbOCType##CType12)CName12 CName13:(tdbOCType##CType13)CName13 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -4810,165 +3985,28 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
--(BOOL)checkType:(BOOL)throwOnMismatch \
++(BOOL)_checkType:(OCSpec *)spec \
+{ \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 0, CName1, CType1) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 1, CName2, CType2) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 2, CName3, CType3) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 3, CName4, CType4) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 4, CName5, CType5) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 5, CName6, CType6) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 6, CName7, CType7) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 7, CName8, CType8) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 8, CName9, CType9) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 9, CName10, CType10) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 10, CName11, CType11) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 11, CName12, CType12) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 12, CName13, CType13) \
+    return YES; \
+} \
+-(BOOL)_checkType \
 { \
     OCSpec *spec = [self getSpec]; \
-    if ([spec getColumnType:0] != COLTYPE##CType1) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName1, [spec getColumnType:0], COLTYPE##CType1]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:0] isEqualToString:@#CName1]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName1, [spec getColumnName:0], @#CName1]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:1] != COLTYPE##CType2) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName2, [spec getColumnType:1], COLTYPE##CType2]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:1] isEqualToString:@#CName2]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName2, [spec getColumnName:1], @#CName2]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:2] != COLTYPE##CType3) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName3, [spec getColumnType:2], COLTYPE##CType3]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:2] isEqualToString:@#CName3]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName3, [spec getColumnName:2], @#CName3]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:3] != COLTYPE##CType4) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName4, [spec getColumnType:3], COLTYPE##CType4]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:3] isEqualToString:@#CName4]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName4, [spec getColumnName:3], @#CName4]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:4] != COLTYPE##CType5) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName5, [spec getColumnType:4], COLTYPE##CType5]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:4] isEqualToString:@#CName5]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName5, [spec getColumnName:4], @#CName5]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:5] != COLTYPE##CType6) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName6, [spec getColumnType:5], COLTYPE##CType6]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:5] isEqualToString:@#CName6]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName6, [spec getColumnName:5], @#CName6]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:6] != COLTYPE##CType7) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName7, [spec getColumnType:6], COLTYPE##CType7]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:6] isEqualToString:@#CName7]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName7, [spec getColumnName:6], @#CName7]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:7] != COLTYPE##CType8) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName8, [spec getColumnType:7], COLTYPE##CType8]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:7] isEqualToString:@#CName8]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName8, [spec getColumnName:7], @#CName8]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:8] != COLTYPE##CType9) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName9, [spec getColumnType:8], COLTYPE##CType9]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:8] isEqualToString:@#CName9]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName9, [spec getColumnName:8], @#CName9]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:9] != COLTYPE##CType10) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName10, [spec getColumnType:9], COLTYPE##CType10]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:9] isEqualToString:@#CName10]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName10, [spec getColumnName:9], @#CName10]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:10] != COLTYPE##CType11) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName11, [spec getColumnType:10], COLTYPE##CType11]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:10] isEqualToString:@#CName11]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName11, [spec getColumnName:10], @#CName11]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:11] != COLTYPE##CType12) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName12, [spec getColumnType:11], COLTYPE##CType12]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:11] isEqualToString:@#CName12]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName12, [spec getColumnName:11], @#CName12]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:12] != COLTYPE##CType13) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName13, [spec getColumnType:12], COLTYPE##CType13]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:12] isEqualToString:@#CName13]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName13, [spec getColumnName:12], @#CName13]; \
-        else \
-            return NO; \
-    } \
+    if (!spec) return NO; \
+    if (![TableName _checkType:spec]) return NO; \
     return YES; \
 } \
 +(BOOL)_addColumns:(OCSpec *)spec \
@@ -5071,35 +4109,32 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName14, CType14) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy##TableName : OCColumnProxy \
+@interface OCColumnProxy_##TableName : OCColumnProxy \
 -(size_t)find:(NSString*)value; \
 @end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy##CType7 *CName7; \
-@property(nonatomic, strong) OCColumnProxy##CType8 *CName8; \
-@property(nonatomic, strong) OCColumnProxy##CType9 *CName9; \
-@property(nonatomic, strong) OCColumnProxy##CType10 *CName10; \
-@property(nonatomic, strong) OCColumnProxy##CType11 *CName11; \
-@property(nonatomic, strong) OCColumnProxy##CType12 *CName12; \
-@property(nonatomic, strong) OCColumnProxy##CType13 *CName13; \
-@property(nonatomic, strong) OCColumnProxy##CType14 *CName14; \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 CName12:(tdbOCType##CType12)CName12 CName13:(tdbOCType##CType13)CName13 CName14:(tdbOCType##CType14)CName14; \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 CName12:(tdbOCType##CType12)CName12 CName13:(tdbOCType##CType13)CName13 CName14:(tdbOCType##CType14)CName14; \
+@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
+@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
+@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
+@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
+@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
+@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
+@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
+@property(nonatomic, strong) OCColumnProxy_##CType8 *CName8; \
+@property(nonatomic, strong) OCColumnProxy_##CType9 *CName9; \
+@property(nonatomic, strong) OCColumnProxy_##CType10 *CName10; \
+@property(nonatomic, strong) OCColumnProxy_##CType11 *CName11; \
+@property(nonatomic, strong) OCColumnProxy_##CType12 *CName12; \
+@property(nonatomic, strong) OCColumnProxy_##CType13 *CName13; \
+@property(nonatomic, strong) OCColumnProxy_##CType14 *CName14; \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 CName14:(TIGHTDB_TYPE_##CType14)CName14; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 CName14:(TIGHTDB_TYPE_##CType14)CName14; \
 -(TableName##_Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* tdbOCType##TableName; \
-enum { \
-    COLTYPE##TableName = COLUMN_TYPE_TABLE \
-}; \
+typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -5253,7 +4288,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
-@implementation OCColumnProxy##TableName \
+@implementation OCColumnProxy_##TableName \
 -(size_t)find:(NSString *)value \
 { \
     return [self.table findString:self.column value:value]; \
@@ -5282,20 +4317,20 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy##CType11 alloc] initWithTable:self column:10]; \
-    _##CName12 = [[OCColumnProxy##CType12 alloc] initWithTable:self column:11]; \
-    _##CName13 = [[OCColumnProxy##CType13 alloc] initWithTable:self column:12]; \
-    _##CName14 = [[OCColumnProxy##CType14 alloc] initWithTable:self column:13]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
+    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
+    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
+    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
+    _##CName12 = [[OCColumnProxy_##CType12 alloc] initWithTable:self column:11]; \
+    _##CName13 = [[OCColumnProxy_##CType13 alloc] initWithTable:self column:12]; \
+    _##CName14 = [[OCColumnProxy_##CType14 alloc] initWithTable:self column:13]; \
     return self; \
 } \
 -(id)init \
@@ -5304,23 +4339,23 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy##CType11 alloc] initWithTable:self column:10]; \
-    _##CName12 = [[OCColumnProxy##CType12 alloc] initWithTable:self column:11]; \
-    _##CName13 = [[OCColumnProxy##CType13 alloc] initWithTable:self column:12]; \
-    _##CName14 = [[OCColumnProxy##CType14 alloc] initWithTable:self column:13]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
+    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
+    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
+    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
+    _##CName12 = [[OCColumnProxy_##CType12 alloc] initWithTable:self column:11]; \
+    _##CName13 = [[OCColumnProxy_##CType13 alloc] initWithTable:self column:12]; \
+    _##CName14 = [[OCColumnProxy_##CType14 alloc] initWithTable:self column:13]; \
     return self; \
 } \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 CName12:(tdbOCType##CType12)CName12 CName13:(tdbOCType##CType13)CName13 CName14:(tdbOCType##CType14)CName14 \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 CName14:(TIGHTDB_TYPE_##CType14)CName14 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -5339,7 +4374,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
     TIGHTDB_COLUMN_INSERT(self, 13, ndx, CName14, CType14); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 CName12:(tdbOCType##CType12)CName12 CName13:(tdbOCType##CType13)CName13 CName14:(tdbOCType##CType14)CName14 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 CName14:(TIGHTDB_TYPE_##CType14)CName14 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -5377,177 +4412,29 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
--(BOOL)checkType:(BOOL)throwOnMismatch \
++(BOOL)_checkType:(OCSpec *)spec \
+{ \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 0, CName1, CType1) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 1, CName2, CType2) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 2, CName3, CType3) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 3, CName4, CType4) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 4, CName5, CType5) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 5, CName6, CType6) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 6, CName7, CType7) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 7, CName8, CType8) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 8, CName9, CType9) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 9, CName10, CType10) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 10, CName11, CType11) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 11, CName12, CType12) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 12, CName13, CType13) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 13, CName14, CType14) \
+    return YES; \
+} \
+-(BOOL)_checkType \
 { \
     OCSpec *spec = [self getSpec]; \
-    if ([spec getColumnType:0] != COLTYPE##CType1) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName1, [spec getColumnType:0], COLTYPE##CType1]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:0] isEqualToString:@#CName1]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName1, [spec getColumnName:0], @#CName1]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:1] != COLTYPE##CType2) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName2, [spec getColumnType:1], COLTYPE##CType2]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:1] isEqualToString:@#CName2]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName2, [spec getColumnName:1], @#CName2]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:2] != COLTYPE##CType3) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName3, [spec getColumnType:2], COLTYPE##CType3]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:2] isEqualToString:@#CName3]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName3, [spec getColumnName:2], @#CName3]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:3] != COLTYPE##CType4) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName4, [spec getColumnType:3], COLTYPE##CType4]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:3] isEqualToString:@#CName4]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName4, [spec getColumnName:3], @#CName4]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:4] != COLTYPE##CType5) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName5, [spec getColumnType:4], COLTYPE##CType5]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:4] isEqualToString:@#CName5]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName5, [spec getColumnName:4], @#CName5]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:5] != COLTYPE##CType6) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName6, [spec getColumnType:5], COLTYPE##CType6]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:5] isEqualToString:@#CName6]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName6, [spec getColumnName:5], @#CName6]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:6] != COLTYPE##CType7) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName7, [spec getColumnType:6], COLTYPE##CType7]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:6] isEqualToString:@#CName7]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName7, [spec getColumnName:6], @#CName7]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:7] != COLTYPE##CType8) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName8, [spec getColumnType:7], COLTYPE##CType8]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:7] isEqualToString:@#CName8]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName8, [spec getColumnName:7], @#CName8]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:8] != COLTYPE##CType9) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName9, [spec getColumnType:8], COLTYPE##CType9]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:8] isEqualToString:@#CName9]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName9, [spec getColumnName:8], @#CName9]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:9] != COLTYPE##CType10) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName10, [spec getColumnType:9], COLTYPE##CType10]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:9] isEqualToString:@#CName10]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName10, [spec getColumnName:9], @#CName10]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:10] != COLTYPE##CType11) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName11, [spec getColumnType:10], COLTYPE##CType11]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:10] isEqualToString:@#CName11]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName11, [spec getColumnName:10], @#CName11]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:11] != COLTYPE##CType12) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName12, [spec getColumnType:11], COLTYPE##CType12]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:11] isEqualToString:@#CName12]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName12, [spec getColumnName:11], @#CName12]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:12] != COLTYPE##CType13) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName13, [spec getColumnType:12], COLTYPE##CType13]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:12] isEqualToString:@#CName13]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName13, [spec getColumnName:12], @#CName13]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:13] != COLTYPE##CType14) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName14, [spec getColumnType:13], COLTYPE##CType14]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:13] isEqualToString:@#CName14]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName14, [spec getColumnName:13], @#CName14]; \
-        else \
-            return NO; \
-    } \
+    if (!spec) return NO; \
+    if (![TableName _checkType:spec]) return NO; \
     return YES; \
 } \
 +(BOOL)_addColumns:(OCSpec *)spec \
@@ -5654,36 +4541,33 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName15, CType15) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy##TableName : OCColumnProxy \
+@interface OCColumnProxy_##TableName : OCColumnProxy \
 -(size_t)find:(NSString*)value; \
 @end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy##CType7 *CName7; \
-@property(nonatomic, strong) OCColumnProxy##CType8 *CName8; \
-@property(nonatomic, strong) OCColumnProxy##CType9 *CName9; \
-@property(nonatomic, strong) OCColumnProxy##CType10 *CName10; \
-@property(nonatomic, strong) OCColumnProxy##CType11 *CName11; \
-@property(nonatomic, strong) OCColumnProxy##CType12 *CName12; \
-@property(nonatomic, strong) OCColumnProxy##CType13 *CName13; \
-@property(nonatomic, strong) OCColumnProxy##CType14 *CName14; \
-@property(nonatomic, strong) OCColumnProxy##CType15 *CName15; \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 CName12:(tdbOCType##CType12)CName12 CName13:(tdbOCType##CType13)CName13 CName14:(tdbOCType##CType14)CName14 CName15:(tdbOCType##CType15)CName15; \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 CName12:(tdbOCType##CType12)CName12 CName13:(tdbOCType##CType13)CName13 CName14:(tdbOCType##CType14)CName14 CName15:(tdbOCType##CType15)CName15; \
+@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
+@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
+@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
+@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
+@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
+@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
+@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
+@property(nonatomic, strong) OCColumnProxy_##CType8 *CName8; \
+@property(nonatomic, strong) OCColumnProxy_##CType9 *CName9; \
+@property(nonatomic, strong) OCColumnProxy_##CType10 *CName10; \
+@property(nonatomic, strong) OCColumnProxy_##CType11 *CName11; \
+@property(nonatomic, strong) OCColumnProxy_##CType12 *CName12; \
+@property(nonatomic, strong) OCColumnProxy_##CType13 *CName13; \
+@property(nonatomic, strong) OCColumnProxy_##CType14 *CName14; \
+@property(nonatomic, strong) OCColumnProxy_##CType15 *CName15; \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 CName14:(TIGHTDB_TYPE_##CType14)CName14 CName15:(TIGHTDB_TYPE_##CType15)CName15; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 CName14:(TIGHTDB_TYPE_##CType14)CName14 CName15:(TIGHTDB_TYPE_##CType15)CName15; \
 -(TableName##_Query *)getQuery; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* tdbOCType##TableName; \
-enum { \
-    COLTYPE##TableName = COLUMN_TYPE_TABLE \
-}; \
+typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -5843,7 +4727,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName15, CType15) \
-@implementation OCColumnProxy##TableName \
+@implementation OCColumnProxy_##TableName \
 -(size_t)find:(NSString *)value \
 { \
     return [self.table findString:self.column value:value]; \
@@ -5873,21 +4757,21 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName15, CType15) \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy##CType11 alloc] initWithTable:self column:10]; \
-    _##CName12 = [[OCColumnProxy##CType12 alloc] initWithTable:self column:11]; \
-    _##CName13 = [[OCColumnProxy##CType13 alloc] initWithTable:self column:12]; \
-    _##CName14 = [[OCColumnProxy##CType14 alloc] initWithTable:self column:13]; \
-    _##CName15 = [[OCColumnProxy##CType15 alloc] initWithTable:self column:14]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
+    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
+    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
+    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
+    _##CName12 = [[OCColumnProxy_##CType12 alloc] initWithTable:self column:11]; \
+    _##CName13 = [[OCColumnProxy_##CType13 alloc] initWithTable:self column:12]; \
+    _##CName14 = [[OCColumnProxy_##CType14 alloc] initWithTable:self column:13]; \
+    _##CName15 = [[OCColumnProxy_##CType15 alloc] initWithTable:self column:14]; \
     return self; \
 } \
 -(id)init \
@@ -5896,24 +4780,24 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName15, CType15) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy##CType11 alloc] initWithTable:self column:10]; \
-    _##CName12 = [[OCColumnProxy##CType12 alloc] initWithTable:self column:11]; \
-    _##CName13 = [[OCColumnProxy##CType13 alloc] initWithTable:self column:12]; \
-    _##CName14 = [[OCColumnProxy##CType14 alloc] initWithTable:self column:13]; \
-    _##CName15 = [[OCColumnProxy##CType15 alloc] initWithTable:self column:14]; \
+    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
+    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
+    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
+    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
+    _##CName12 = [[OCColumnProxy_##CType12 alloc] initWithTable:self column:11]; \
+    _##CName13 = [[OCColumnProxy_##CType13 alloc] initWithTable:self column:12]; \
+    _##CName14 = [[OCColumnProxy_##CType14 alloc] initWithTable:self column:13]; \
+    _##CName15 = [[OCColumnProxy_##CType15 alloc] initWithTable:self column:14]; \
     return self; \
 } \
--(void)add##CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 CName12:(tdbOCType##CType12)CName12 CName13:(tdbOCType##CType13)CName13 CName14:(tdbOCType##CType14)CName14 CName15:(tdbOCType##CType15)CName15 \
+-(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 CName14:(TIGHTDB_TYPE_##CType14)CName14 CName15:(TIGHTDB_TYPE_##CType15)CName15 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -5933,7 +4817,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName15, CType15) \
     TIGHTDB_COLUMN_INSERT(self, 14, ndx, CName15, CType15); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(tdbOCType##CType1)CName1 CName2:(tdbOCType##CType2)CName2 CName3:(tdbOCType##CType3)CName3 CName4:(tdbOCType##CType4)CName4 CName5:(tdbOCType##CType5)CName5 CName6:(tdbOCType##CType6)CName6 CName7:(tdbOCType##CType7)CName7 CName8:(tdbOCType##CType8)CName8 CName9:(tdbOCType##CType9)CName9 CName10:(tdbOCType##CType10)CName10 CName11:(tdbOCType##CType11)CName11 CName12:(tdbOCType##CType12)CName12 CName13:(tdbOCType##CType13)CName13 CName14:(tdbOCType##CType14)CName14 CName15:(tdbOCType##CType15)CName15 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 CName14:(TIGHTDB_TYPE_##CType14)CName14 CName15:(TIGHTDB_TYPE_##CType15)CName15 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -5972,189 +4856,30 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName15, CType15) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
--(BOOL)checkType:(BOOL)throwOnMismatch \
++(BOOL)_checkType:(OCSpec *)spec \
+{ \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 0, CName1, CType1) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 1, CName2, CType2) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 2, CName3, CType3) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 3, CName4, CType4) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 4, CName5, CType5) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 5, CName6, CType6) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 6, CName7, CType7) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 7, CName8, CType8) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 8, CName9, CType9) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 9, CName10, CType10) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 10, CName11, CType11) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 11, CName12, CType12) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 12, CName13, CType13) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 13, CName14, CType14) \
+    TIGHTDB_CHECK_COLUMN_TYPE(spec, 14, CName15, CType15) \
+    return YES; \
+} \
+-(BOOL)_checkType \
 { \
     OCSpec *spec = [self getSpec]; \
-    if ([spec getColumnType:0] != COLTYPE##CType1) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName1, [spec getColumnType:0], COLTYPE##CType1]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:0] isEqualToString:@#CName1]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName1, [spec getColumnName:0], @#CName1]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:1] != COLTYPE##CType2) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName2, [spec getColumnType:1], COLTYPE##CType2]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:1] isEqualToString:@#CName2]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName2, [spec getColumnName:1], @#CName2]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:2] != COLTYPE##CType3) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName3, [spec getColumnType:2], COLTYPE##CType3]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:2] isEqualToString:@#CName3]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName3, [spec getColumnName:2], @#CName3]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:3] != COLTYPE##CType4) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName4, [spec getColumnType:3], COLTYPE##CType4]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:3] isEqualToString:@#CName4]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName4, [spec getColumnName:3], @#CName4]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:4] != COLTYPE##CType5) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName5, [spec getColumnType:4], COLTYPE##CType5]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:4] isEqualToString:@#CName5]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName5, [spec getColumnName:4], @#CName5]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:5] != COLTYPE##CType6) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName6, [spec getColumnType:5], COLTYPE##CType6]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:5] isEqualToString:@#CName6]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName6, [spec getColumnName:5], @#CName6]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:6] != COLTYPE##CType7) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName7, [spec getColumnType:6], COLTYPE##CType7]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:6] isEqualToString:@#CName7]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName7, [spec getColumnName:6], @#CName7]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:7] != COLTYPE##CType8) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName8, [spec getColumnType:7], COLTYPE##CType8]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:7] isEqualToString:@#CName8]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName8, [spec getColumnName:7], @#CName8]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:8] != COLTYPE##CType9) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName9, [spec getColumnType:8], COLTYPE##CType9]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:8] isEqualToString:@#CName9]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName9, [spec getColumnName:8], @#CName9]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:9] != COLTYPE##CType10) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName10, [spec getColumnType:9], COLTYPE##CType10]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:9] isEqualToString:@#CName10]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName10, [spec getColumnName:9], @#CName10]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:10] != COLTYPE##CType11) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName11, [spec getColumnType:10], COLTYPE##CType11]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:10] isEqualToString:@#CName11]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName11, [spec getColumnName:10], @#CName11]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:11] != COLTYPE##CType12) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName12, [spec getColumnType:11], COLTYPE##CType12]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:11] isEqualToString:@#CName12]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName12, [spec getColumnName:11], @#CName12]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:12] != COLTYPE##CType13) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName13, [spec getColumnType:12], COLTYPE##CType13]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:12] isEqualToString:@#CName13]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName13, [spec getColumnName:12], @#CName13]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:13] != COLTYPE##CType14) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName14, [spec getColumnType:13], COLTYPE##CType14]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:13] isEqualToString:@#CName14]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName14, [spec getColumnName:13], @#CName14]; \
-        else \
-            return NO; \
-    } \
-    if ([spec getColumnType:14] != COLTYPE##CType15) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Type check failed on column: %s (%i)!=(%i)", #CName15, [spec getColumnType:14], COLTYPE##CType15]; \
-        else \
-            return NO; \
-    } \
-    if (![[spec getColumnName:14] isEqualToString:@#CName15]) { \
-        if (throwOnMismatch) \
-            [NSException raise:@"Type check failed" format:@"Name check failed on column: %s (%@)!=(%@)", #CName15, [spec getColumnName:14], @#CName15]; \
-        else \
-            return NO; \
-    } \
+    if (!spec) return NO; \
+    if (![TableName _checkType:spec]) return NO; \
     return YES; \
 } \
 +(BOOL)_addColumns:(OCSpec *)spec \
