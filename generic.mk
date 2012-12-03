@@ -495,6 +495,7 @@ $(OBJECTS): $(GENERATED_SOURCES)
 
 # SUBDIRECTORIES
 
+# ARGS: subdir, mode, dep
 define SUBDIR_DEP_RULE
 ifeq ($(3),.)
 subdir/$(1)/$(2): $(2)/local
@@ -503,6 +504,7 @@ subdir/$(1)/$(2): subdir/$(3)/$(2)
 endif
 endef
 
+# ARGS: subdir, mode
 define SUBDIR_MODE_RULES
 .PHONY: subdir/$(1)/$(2)
 $$(foreach x,$$($$(call FOLD_TARGET,$(1))_DEPS),$$(eval $$(call SUBDIR_DEP_RULE,$(1),$(2),$$(x))))
