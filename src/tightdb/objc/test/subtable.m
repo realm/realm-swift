@@ -11,13 +11,13 @@
 #import <tightdb/objc/group.h>
 
 TIGHTDB_TABLE_2(TestTableSub,
-                String, Name,
-                Int,    Age)
+                Name, String,
+                Age,  Int)
 
 TIGHTDB_TABLE_3(TestTableMain,
-                String,       First,
-                TestTableSub, Sub,
-                Int,          Second)
+                First,  String,
+                Sub,    TestTableSub,
+                Second, Int)
 
 @interface MACTestSubtable : SenTestCase
 @end

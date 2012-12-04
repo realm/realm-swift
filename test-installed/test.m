@@ -2,7 +2,7 @@
 #import <tightdb/objc/tightdb.h>
 
 TIGHTDB_TABLE_1(TestTable,
-                Int, Value)
+                Value, Int)
 
 int main()
 {

@@ -11,8 +11,8 @@
 #import <tightdb/objc/group.h>
 
 TIGHTDB_TABLE_2(TestTableGroup,
-                String, First,
-                Int,    Second)
+                First,  String,
+                Second, Int)
 
 @interface MACTestGroup : SenTestCase
 @end

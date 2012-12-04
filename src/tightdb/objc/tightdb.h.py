@@ -36,7 +36,7 @@ directiveStartToken = %
 
 #define TIGHTDB_TABLE_DEF_${num_cols}(TableName%slurp
 %for $j in range($num_cols)
-, CType${j+1}, CName${j+1}%slurp
+, CName${j+1}, CType${j+1}%slurp
 %end for
 ) \\
 @interface TableName##_Cursor : CursorBase \\
@@ -92,7 +92,7 @@ typedef TableName* TIGHTDB_TYPE_##TableName; \\
 
 #define TIGHTDB_TABLE_IMPL_${num_cols}(TableName%slurp
 %for $j in range($num_cols)
-, CType${j+1}, CName${j+1}%slurp
+, CName${j+1}, CType${j+1}%slurp
 %end for
 ) \\
 @implementation TableName##_Cursor \\

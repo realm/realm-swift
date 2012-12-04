@@ -11,22 +11,22 @@
 #import <tightdb/objc/group.h>
 
 TIGHTDB_TABLE_DEF_3(PeopleTable,
-                    String, Name,
-                    Int,    Age,
-                    Bool,   Hired)
+                    Name,  String,
+                    Age,   Int,
+                    Hired, Bool)
 
 TIGHTDB_TABLE_DEF_2(PeopleTable2,
-                    Bool,   Hired,
-                    Int,    Age)
+                    Hired, Bool,
+                    Age,   Int)
 
 TIGHTDB_TABLE_IMPL_3(PeopleTable,
-                     String, Name,
-                     Int,    Age,
-                     Bool,   Hired)
+                     Name,  String,
+                     Age,   Int,
+                     Hired, Bool)
 
 TIGHTDB_TABLE_IMPL_2(PeopleTable2,
-                     Bool,   Hired,
-                     Int,    Age)
+                     Hired, Bool,
+                     Age,   Int)
 
 @interface MACTestTutorial : SenTestCase
 @end

@@ -14,10 +14,10 @@
 #import "Utils.h"
 
 TIGHTDB_TABLE_4(PerfTable,
-                String, Name,
-                Int,    Age,
-                Bool,   Hired,
-                Int,    Spare)
+                Name,  String,
+                Age,   Int,
+                Hired, Bool,
+                Spare, Int)
 
 
 @implementation Performance
