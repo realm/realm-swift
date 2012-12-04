@@ -17,7 +17,7 @@ TIGHTDB_TABLE_2(GetSubtable,
 
 TIGHTDB_TABLE_2(WrongNameTable,
                 HiredFor, Bool,
-                Ageing    Int)
+                Ageing,   Int)
 
 
 TIGHTDB_TABLE_2(WrongTypeTable,
