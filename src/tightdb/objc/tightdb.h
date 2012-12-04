@@ -24,7 +24,7 @@
 #import <tightdb/objc/helper_macros.h>
 
 
-#define TIGHTDB_TABLE_DEF_1(TableName, CType1, CName1) \
+#define TIGHTDB_TABLE_DEF_1(TableName, CName1, CType1) \
 @interface TableName##_Cursor : CursorBase \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 @end \
@@ -57,7 +57,7 @@ typedef TableName* TIGHTDB_TYPE_##TableName; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_1(TableName, CType1, CName1) \
+#define TIGHTDB_TABLE_IMPL_1(TableName, CName1, CType1) \
 @implementation TableName##_Cursor \
 { \
     OCAccessor *_##CName1; \
@@ -232,7 +232,7 @@ TIGHTDB_TABLE_DEF_1(TableName, CType1, CName1) \
 TIGHTDB_TABLE_IMPL_1(TableName, CType1, CName1)
 
 
-#define TIGHTDB_TABLE_DEF_2(TableName, CType1, CName1, CType2, CName2) \
+#define TIGHTDB_TABLE_DEF_2(TableName, CName1, CType1, CName2, CType2) \
 @interface TableName##_Cursor : CursorBase \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
@@ -269,7 +269,7 @@ typedef TableName* TIGHTDB_TYPE_##TableName; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_2(TableName, CType1, CName1, CType2, CName2) \
+#define TIGHTDB_TABLE_IMPL_2(TableName, CName1, CType1, CName2, CType2) \
 @implementation TableName##_Cursor \
 { \
     OCAccessor *_##CName1; \
@@ -457,7 +457,7 @@ TIGHTDB_TABLE_DEF_2(TableName, CType1, CName1, CType2, CName2) \
 TIGHTDB_TABLE_IMPL_2(TableName, CType1, CName1, CType2, CName2)
 
 
-#define TIGHTDB_TABLE_DEF_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
+#define TIGHTDB_TABLE_DEF_3(TableName, CName1, CType1, CName2, CType2, CName3, CType3) \
 @interface TableName##_Cursor : CursorBase \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
@@ -498,7 +498,7 @@ typedef TableName* TIGHTDB_TYPE_##TableName; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
+#define TIGHTDB_TABLE_IMPL_3(TableName, CName1, CType1, CName2, CType2, CName3, CType3) \
 @implementation TableName##_Cursor \
 { \
     OCAccessor *_##CName1; \
@@ -699,7 +699,7 @@ TIGHTDB_TABLE_DEF_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
 TIGHTDB_TABLE_IMPL_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3)
 
 
-#define TIGHTDB_TABLE_DEF_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
+#define TIGHTDB_TABLE_DEF_4(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4) \
 @interface TableName##_Cursor : CursorBase \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
@@ -744,7 +744,7 @@ typedef TableName* TIGHTDB_TYPE_##TableName; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
+#define TIGHTDB_TABLE_IMPL_4(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4) \
 @implementation TableName##_Cursor \
 { \
     OCAccessor *_##CName1; \
@@ -958,7 +958,7 @@ TIGHTDB_TABLE_DEF_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, C
 TIGHTDB_TABLE_IMPL_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4)
 
 
-#define TIGHTDB_TABLE_DEF_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
+#define TIGHTDB_TABLE_DEF_5(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5) \
 @interface TableName##_Cursor : CursorBase \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
@@ -1007,7 +1007,7 @@ typedef TableName* TIGHTDB_TYPE_##TableName; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
+#define TIGHTDB_TABLE_IMPL_5(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5) \
 @implementation TableName##_Cursor \
 { \
     OCAccessor *_##CName1; \
@@ -1234,7 +1234,7 @@ TIGHTDB_TABLE_DEF_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, C
 TIGHTDB_TABLE_IMPL_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5)
 
 
-#define TIGHTDB_TABLE_DEF_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
+#define TIGHTDB_TABLE_DEF_6(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6) \
 @interface TableName##_Cursor : CursorBase \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
@@ -1287,7 +1287,7 @@ typedef TableName* TIGHTDB_TYPE_##TableName; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
+#define TIGHTDB_TABLE_IMPL_6(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6) \
 @implementation TableName##_Cursor \
 { \
     OCAccessor *_##CName1; \
@@ -1527,7 +1527,7 @@ TIGHTDB_TABLE_DEF_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, C
 TIGHTDB_TABLE_IMPL_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6)
 
 
-#define TIGHTDB_TABLE_DEF_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
+#define TIGHTDB_TABLE_DEF_7(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7) \
 @interface TableName##_Cursor : CursorBase \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
@@ -1584,7 +1584,7 @@ typedef TableName* TIGHTDB_TYPE_##TableName; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
+#define TIGHTDB_TABLE_IMPL_7(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7) \
 @implementation TableName##_Cursor \
 { \
     OCAccessor *_##CName1; \
@@ -1837,7 +1837,7 @@ TIGHTDB_TABLE_DEF_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, C
 TIGHTDB_TABLE_IMPL_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7)
 
 
-#define TIGHTDB_TABLE_DEF_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
+#define TIGHTDB_TABLE_DEF_8(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8) \
 @interface TableName##_Cursor : CursorBase \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
@@ -1898,7 +1898,7 @@ typedef TableName* TIGHTDB_TYPE_##TableName; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
+#define TIGHTDB_TABLE_IMPL_8(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8) \
 @implementation TableName##_Cursor \
 { \
     OCAccessor *_##CName1; \
@@ -2164,7 +2164,7 @@ TIGHTDB_TABLE_DEF_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, C
 TIGHTDB_TABLE_IMPL_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8)
 
 
-#define TIGHTDB_TABLE_DEF_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9) \
+#define TIGHTDB_TABLE_DEF_9(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9) \
 @interface TableName##_Cursor : CursorBase \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
@@ -2229,7 +2229,7 @@ typedef TableName* TIGHTDB_TYPE_##TableName; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9) \
+#define TIGHTDB_TABLE_IMPL_9(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9) \
 @implementation TableName##_Cursor \
 { \
     OCAccessor *_##CName1; \
@@ -2508,7 +2508,7 @@ TIGHTDB_TABLE_DEF_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, C
 TIGHTDB_TABLE_IMPL_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9)
 
 
-#define TIGHTDB_TABLE_DEF_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10) \
+#define TIGHTDB_TABLE_DEF_10(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10) \
 @interface TableName##_Cursor : CursorBase \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
@@ -2577,7 +2577,7 @@ typedef TableName* TIGHTDB_TYPE_##TableName; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10) \
+#define TIGHTDB_TABLE_IMPL_10(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10) \
 @implementation TableName##_Cursor \
 { \
     OCAccessor *_##CName1; \
@@ -2869,7 +2869,7 @@ TIGHTDB_TABLE_DEF_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 TIGHTDB_TABLE_IMPL_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10)
 
 
-#define TIGHTDB_TABLE_DEF_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11) \
+#define TIGHTDB_TABLE_DEF_11(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11) \
 @interface TableName##_Cursor : CursorBase \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
@@ -2942,7 +2942,7 @@ typedef TableName* TIGHTDB_TYPE_##TableName; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11) \
+#define TIGHTDB_TABLE_IMPL_11(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11) \
 @implementation TableName##_Cursor \
 { \
     OCAccessor *_##CName1; \
@@ -3247,7 +3247,7 @@ TIGHTDB_TABLE_DEF_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 TIGHTDB_TABLE_IMPL_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11)
 
 
-#define TIGHTDB_TABLE_DEF_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12) \
+#define TIGHTDB_TABLE_DEF_12(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12) \
 @interface TableName##_Cursor : CursorBase \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
@@ -3324,7 +3324,7 @@ typedef TableName* TIGHTDB_TYPE_##TableName; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12) \
+#define TIGHTDB_TABLE_IMPL_12(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12) \
 @implementation TableName##_Cursor \
 { \
     OCAccessor *_##CName1; \
@@ -3642,7 +3642,7 @@ TIGHTDB_TABLE_DEF_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 TIGHTDB_TABLE_IMPL_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12)
 
 
-#define TIGHTDB_TABLE_DEF_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13) \
+#define TIGHTDB_TABLE_DEF_13(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13) \
 @interface TableName##_Cursor : CursorBase \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
@@ -3723,7 +3723,7 @@ typedef TableName* TIGHTDB_TYPE_##TableName; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13) \
+#define TIGHTDB_TABLE_IMPL_13(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13) \
 @implementation TableName##_Cursor \
 { \
     OCAccessor *_##CName1; \
@@ -4054,7 +4054,7 @@ TIGHTDB_TABLE_DEF_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 TIGHTDB_TABLE_IMPL_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13)
 
 
-#define TIGHTDB_TABLE_DEF_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14) \
+#define TIGHTDB_TABLE_DEF_14(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14) \
 @interface TableName##_Cursor : CursorBase \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
@@ -4139,7 +4139,7 @@ typedef TableName* TIGHTDB_TYPE_##TableName; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14) \
+#define TIGHTDB_TABLE_IMPL_14(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14) \
 @implementation TableName##_Cursor \
 { \
     OCAccessor *_##CName1; \
@@ -4483,7 +4483,7 @@ TIGHTDB_TABLE_DEF_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 TIGHTDB_TABLE_IMPL_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14)
 
 
-#define TIGHTDB_TABLE_DEF_15(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14, CType15, CName15) \
+#define TIGHTDB_TABLE_DEF_15(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14, CName15, CType15) \
 @interface TableName##_Cursor : CursorBase \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
@@ -4572,7 +4572,7 @@ typedef TableName* TIGHTDB_TYPE_##TableName; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_15(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14, CType15, CName15) \
+#define TIGHTDB_TABLE_IMPL_15(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14, CName15, CType15) \
 @implementation TableName##_Cursor \
 { \
     OCAccessor *_##CName1; \
