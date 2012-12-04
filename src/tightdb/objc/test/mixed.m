@@ -15,13 +15,13 @@
 #import <tightdb/objc/group_shared.h>
 
 TIGHTDB_TABLE_3(MixedTable,
-                    Bool,   Hired,
-                    Mixed, Other,
-                    Int,    Age)
+                Hired, Bool,
+                Other, Mixed,
+                Age,   Int)
 
 TIGHTDB_TABLE_2(SubMixedTable,
-                    Bool,   Hired,
-                    Int,    Age)
+                Hired, Bool,
+                Age,   Int)
 
 
 @interface MACTestMixed : SenTestCase

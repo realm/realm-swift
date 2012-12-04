@@ -12,14 +12,14 @@
 #import "Performance.h"
 
 TIGHTDB_TABLE_4(MyTable,
-                String, Name,
-                Int,    Age,
-                Bool,   Hired,
-                Int,    Spare)
+                Name,  String,
+                Age,   Int,
+                Hired, Bool,
+                Spare, Int)
 
 TIGHTDB_TABLE_2(MyTable2,
-                Bool,   Hired,
-                Int,    Age)
+                Hired, Bool,
+                Age,   Int)
 
 
 @interface ViewController ()

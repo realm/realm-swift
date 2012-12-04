@@ -12,17 +12,17 @@
 #import <tightdb/objc/group_shared.h>
 
 TIGHTDB_TABLE_2(GetSubtable,
-                Bool,   Hired,
-                Int,    Age)
+                Hired, Bool,
+                Age,   Int)
 
 TIGHTDB_TABLE_2(WrongNameTable,
-                Bool,   HiredFor,
-                Int,    Ageing)
+                HiredFor, Bool,
+                Ageing    Int)
 
 
 TIGHTDB_TABLE_2(WrongTypeTable,
-                Int,   Hired,
-                Bool,    Age)
+                Hired, Int,
+                Age,   Bool)
 
 
 @interface MACTestGetSubtable : SenTestCase

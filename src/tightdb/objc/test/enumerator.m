@@ -13,13 +13,13 @@
 #import <tightdb/objc/table.h>
 
 TIGHTDB_TABLE_3(EnumPeopleTable,
-                String, Name,
-                Int,    Age,
-                Bool,   Hired)
+                Name,  String,
+                Age,   Int,
+                Hired, Bool)
 
 TIGHTDB_TABLE_2(EnumPeopleTable2,
-                Bool,   Hired,
-                Int,    Age)
+                Hired, Bool,
+                Age,   Int)
 
 @interface MACTestEnumerator : SenTestCase
 @end

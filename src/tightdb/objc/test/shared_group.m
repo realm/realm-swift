@@ -12,13 +12,12 @@
 #import <tightdb/objc/group_shared.h>
 
 TIGHTDB_TABLE_DEF_2(SharedTable2,
-                    Bool,   Hired,
-                    Int,    Age)
-
+                    Hired, Bool,
+                    Age,   Int)
 
 TIGHTDB_TABLE_IMPL_2(SharedTable2,
-                     Bool,   Hired,
-                     Int,    Age)
+                     Hired, Bool,
+                     Age,   Int)
 
 
 @interface MACTestSharedGroup : SenTestCase

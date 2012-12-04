@@ -11,28 +11,28 @@
 #import <tightdb/objc/group.h>
 
 TIGHTDB_TABLE_DEF_4(MyTable,
-                    String, Name,
-                    Int,    Age,
-                    Bool,   Hired,
-                    Int,    Spare)
+                    Name,  String,
+                    Age,   Int,
+                    Hired, Bool,
+                    Spare, Int)
 
 TIGHTDB_TABLE_DEF_2(MyTable2,
-                    Bool,   Hired,
-                    Int,    Age)
+                    Hired, Bool,
+                    Age,   Int)
 
 TIGHTDB_TABLE_IMPL_4(MyTable,
-                     String, Name,
-                     Int,    Age,
-                     Bool,   Hired,
-                     Int,    Spare)
+                     Name,  String,
+                     Age,   Int,
+                     Hired, Bool,
+                     Spare, Int)
 
 TIGHTDB_TABLE_IMPL_2(MyTable2,
-                     Bool,   Hired,
-                     Int,    Age)
+                     Hired, Bool,
+                     Age,   Int)
 
 TIGHTDB_TABLE_2(QueryTable,
-                Int,    First,
-                String, Second)
+                First,  Int,
+                Second, String)
 
 @interface MACTestGroupMisc2 : SenTestCase
 @end
