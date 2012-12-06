@@ -130,7 +130,6 @@ TIGHTDB_TABLE_2(QueryTable,
         // ??? cursor
         NSLog(@"%zu: %@", i, memTable.Name);
     }
-    
 }
 
 
@@ -199,12 +198,12 @@ TIGHTDB_TABLE_2(QueryTable,
     // Specify the table schema
     {
         OCSpec *s = [table getSpec];
-        [s addColumn:COLUMN_TYPE_INT name:@"int"];
+        [s addColumn:TIGHTDB_COLUMN_TYPE_INT name:@"int"];
         {
             OCSpec *sub = [s addColumnTable:@"tab"];
-            [sub addColumn:COLUMN_TYPE_INT name:@"int"];
+            [sub addColumn:TIGHTDB_COLUMN_TYPE_INT name:@"int"];
         }
-        [s addColumn:COLUMN_TYPE_MIXED name:@"mix"];
+        [s addColumn:TIGHTDB_COLUMN_TYPE_MIXED name:@"mix"];
         [table updateFromSpec];
     }
 
@@ -232,7 +231,7 @@ TIGHTDB_TABLE_2(QueryTable,
     OCTopLevelTable *subtable2 = [table getTopLevelTable:COL_TABLE_MIX ndx:0];
     {
         OCSpec *s = [subtable2 getSpec];
-        [s addColumn:COLUMN_TYPE_INT name:@"int"];
+        [s addColumn:TIGHTDB_COLUMN_TYPE_INT name:@"int"];
         [subtable2 updateFromSpec:[s getRef]];
     }
     // Add a row to it

@@ -36,12 +36,12 @@
 - (void)testTable
 {
     // 1. Add two columns
-    [_table addColumn:COLUMN_TYPE_INT name:@"first"];
-    [_table addColumn:COLUMN_TYPE_INT name:@"second"];
+    [_table addColumn:TIGHTDB_COLUMN_TYPE_INT name:@"first"];
+    [_table addColumn:TIGHTDB_COLUMN_TYPE_INT name:@"second"];
 
     // Verify
-    STAssertEquals(COLUMN_TYPE_INT, [_table getColumnType:0], @"First column not int");
-    STAssertEquals(COLUMN_TYPE_INT, [_table getColumnType:1], @"Second column not int");
+    STAssertEquals(TIGHTDB_COLUMN_TYPE_INT, [_table getColumnType:0], @"First column not int");
+    STAssertEquals(TIGHTDB_COLUMN_TYPE_INT, [_table getColumnType:1], @"Second column not int");
     if (![[_table getColumnName:0] isEqualToString:@"first"])
         STFail(@"First not equal to first");
     if (![[_table getColumnName:1] isEqualToString:@"second"])

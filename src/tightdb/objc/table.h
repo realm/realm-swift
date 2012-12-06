@@ -49,7 +49,7 @@
 +(OCMixed *)mixedWithDate:(OCDate *)date;
 +(OCMixed *)mixedWithTable:(Table *)table;
 -(BOOL)isEqual:(OCMixed *)other;
--(ColumnType)getType;
+-(TightdbColumnType)getType;
 -(int64_t)getInt;
 -(BOOL)getBool;
 -(OCDate *)getDate;
@@ -61,12 +61,12 @@
 
 @interface OCSpec : NSObject
 /// Returns NO on memory allocation error.
--(BOOL)addColumn:(ColumnType)type name:(NSString *)name;
+-(BOOL)addColumn:(TightdbColumnType)type name:(NSString *)name;
 /// Returns nil on memory allocation error.
 -(OCSpec *)addColumnTable:(NSString *)name;
 -(OCSpec *)getSpec:(size_t)columnId;
 -(size_t)getColumnCount;
--(ColumnType)getColumnType:(size_t)ndx;
+-(TightdbColumnType)getColumnType:(size_t)ndx;
 -(NSString *)getColumnName:(size_t)ndx;
 -(size_t)getColumnIndex:(NSString *)name;
 @end
@@ -110,7 +110,7 @@
 -(size_t)getColumnCount;
 -(NSString *)getColumnName:(size_t)ndx;
 -(size_t)getColumnIndex:(NSString *)name;
--(ColumnType)getColumnType:(size_t)ndx;
+-(TightdbColumnType)getColumnType:(size_t)ndx;
 -(OCSpec *)getSpec;
 -(BOOL)isEmpty;
 -(size_t)count;
@@ -151,11 +151,11 @@
 
 // Mixed
 -(OCMixed *)getMixed:(size_t)columnId ndx:(size_t)ndx;
--(ColumnType)getMixedType:(size_t)columnId ndx:(size_t)ndx;
+-(TightdbColumnType)getMixedType:(size_t)columnId ndx:(size_t)ndx;
 -(void)insertMixed:(size_t)columnId ndx:(size_t)ndx value:(OCMixed *)value;
 -(void)setMixed:(size_t)columnId ndx:(size_t)ndx value:(OCMixed *)value;
 
--(size_t)addColumn:(ColumnType)type name:(NSString *)name;
+-(size_t)addColumn:(TightdbColumnType)type name:(NSString *)name;
 
 // Searching
 -(size_t)findBool:(size_t)columnId value:(BOOL)value;

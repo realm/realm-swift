@@ -41,12 +41,12 @@
 #define TIGHTDB_TYPE_Date      OCDate *
 #define TIGHTDB_TYPE_Mixed     OCMixed *
 
-#define TIGHTDB_TYPE_ID_Bool   COLUMN_TYPE_BOOL
-#define TIGHTDB_TYPE_ID_Int    COLUMN_TYPE_INT
-#define TIGHTDB_TYPE_ID_String COLUMN_TYPE_STRING
-#define TIGHTDB_TYPE_ID_Binary COLUMN_TYPE_BINARY
-#define TIGHTDB_TYPE_ID_Date   COLUMN_TYPE_DATE
-#define TIGHTDB_TYPE_ID_Mixed  COLUMN_TYPE_MIXED
+#define TIGHTDB_TYPE_ID_Bool   TIGHTDB_COLUMN_TYPE_BOOL
+#define TIGHTDB_TYPE_ID_Int    TIGHTDB_COLUMN_TYPE_INT
+#define TIGHTDB_TYPE_ID_String TIGHTDB_COLUMN_TYPE_STRING
+#define TIGHTDB_TYPE_ID_Binary TIGHTDB_COLUMN_TYPE_BINARY
+#define TIGHTDB_TYPE_ID_Date   TIGHTDB_COLUMN_TYPE_DATE
+#define TIGHTDB_TYPE_ID_Mixed  TIGHTDB_COLUMN_TYPE_MIXED
 
 
 
@@ -79,7 +79,7 @@
 #define TIGHTDB_CHECK_COLUMN_TYPE_3(is_subtable, spec, col, name, type) TIGHTDB_CHECK_COLUMN_TYPE_4_##is_subtable(spec, col, name, type)
 #define TIGHTDB_CHECK_COLUMN_TYPE_4_Y(spec, col, name, type)      \
 { \
-    if ([spec getColumnType:col] != COLUMN_TYPE_TABLE) return NO; \
+    if ([spec getColumnType:col] != TIGHTDB_COLUMN_TYPE_TABLE) return NO; \
     if (![[spec getColumnName:col] isEqualToString:@#name]) return NO; \
     OCSpec *subspec = [spec getSpec:col]; \
     if (!subspec) return NO; \
