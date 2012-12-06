@@ -30,3 +30,4 @@ $(TIGHTDB_H): tightdb.h.sh tightdb.h.py
 uninstall/extra:
 	$(RM) $(DESTDIR)$(includedir)/tightdb/objc/*.h
 	-rmdir $(DESTDIR)$(includedir)/tightdb/objc
+	-rmdir $(DESTDIR)$(includedir)/tightdb
