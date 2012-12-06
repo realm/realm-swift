@@ -16,12 +16,13 @@
 
 - (void)testColumnType
 {
-    STAssertEquals((int)COLUMN_TYPE_BOOL,   (int)tightdb::COLUMN_TYPE_BOOL,   @"Bool");
-    STAssertEquals((int)COLUMN_TYPE_INT,    (int)tightdb::COLUMN_TYPE_INT,    @"Int");
-    STAssertEquals((int)COLUMN_TYPE_STRING, (int)tightdb::COLUMN_TYPE_STRING, @"String");
-    STAssertEquals((int)COLUMN_TYPE_BINARY, (int)tightdb::COLUMN_TYPE_BINARY, @"Binary");
-    STAssertEquals((int)COLUMN_TYPE_TABLE,  (int)tightdb::COLUMN_TYPE_TABLE,  @"Table");
-    STAssertEquals((int)COLUMN_TYPE_MIXED,  (int)tightdb::COLUMN_TYPE_MIXED,  @"Mixed");
+    STAssertEquals((int)TIGHTDB_COLUMN_TYPE_BOOL,   (int)tightdb::COLUMN_TYPE_BOOL,   @"Bool");
+    STAssertEquals((int)TIGHTDB_COLUMN_TYPE_INT,    (int)tightdb::COLUMN_TYPE_INT,    @"Int");
+    STAssertEquals((int)TIGHTDB_COLUMN_TYPE_STRING, (int)tightdb::COLUMN_TYPE_STRING, @"String");
+    STAssertEquals((int)TIGHTDB_COLUMN_TYPE_BINARY, (int)tightdb::COLUMN_TYPE_BINARY, @"Binary");
+    STAssertEquals((int)TIGHTDB_COLUMN_TYPE_DATE,   (int)tightdb::COLUMN_TYPE_DATE,   @"Date");
+    STAssertEquals((int)TIGHTDB_COLUMN_TYPE_TABLE,  (int)tightdb::COLUMN_TYPE_TABLE,  @"Table");
+    STAssertEquals((int)TIGHTDB_COLUMN_TYPE_MIXED,  (int)tightdb::COLUMN_TYPE_MIXED,  @"Mixed");
 }
 
 @end

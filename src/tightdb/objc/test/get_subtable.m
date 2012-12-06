@@ -34,11 +34,11 @@ TIGHTDB_TABLE_2(WrongTypeTable,
     // Create table with all column types
     Table *table = [[Table alloc] init];
     OCSpec *s = [table getSpec];
-    [s addColumn:COLUMN_TYPE_BOOL name:@"Outer"];
-    [s addColumn:COLUMN_TYPE_INT name:@"Number"];
+    [s addColumn:TIGHTDB_COLUMN_TYPE_BOOL name:@"Outer"];
+    [s addColumn:TIGHTDB_COLUMN_TYPE_INT name:@"Number"];
     OCSpec *sub = [s addColumnTable:@"GetSubtable"];
-    [sub addColumn:COLUMN_TYPE_BOOL name:@"Hired"];
-    [sub addColumn:COLUMN_TYPE_INT name:@"Age"];
+    [sub addColumn:TIGHTDB_COLUMN_TYPE_BOOL name:@"Hired"];
+    [sub addColumn:TIGHTDB_COLUMN_TYPE_INT name:@"Age"];
     [table updateFromSpec];
 
     [table insertBool:0 ndx:0 value:NO];

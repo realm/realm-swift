@@ -180,13 +180,13 @@ TIGHTDB_TABLE_2(SubMixedTable,
         NSLog(@"%zu: %@", i, cursor.Other);
         NSLog(@"Type: %i", [cursor.Other getType] );
         sumType += [cursor.Other getType];
-        if ([cursor.Other getType] == COLUMN_TYPE_STRING)
+        if ([cursor.Other getType] == TIGHTDB_COLUMN_TYPE_STRING)
             NSLog(@"StringMixed: %@", [cursor.Other getString]);
-        else if ([cursor.Other getType] == COLUMN_TYPE_DATE) {
+        else if ([cursor.Other getType] == TIGHTDB_COLUMN_TYPE_DATE) {
             NSLog(@"DateMixed: %ld", [[cursor.Other getDate] getDate]);
             STAssertEquals(nowTime, [[cursor.Other getDate] getDate],@"Date should match what went in");
         }
-        else if ([cursor.Other getType] == COLUMN_TYPE_TABLE) {
+        else if ([cursor.Other getType] == TIGHTDB_COLUMN_TYPE_TABLE) {
             NSLog(@"TableMixed: %@", [cursor.Other getTable]);
         }
     }

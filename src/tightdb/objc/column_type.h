@@ -17,35 +17,28 @@
  * from TightDB Incorporated.
  *
  **************************************************************************/
+#ifndef TIGHTDB_OBJC_COLUMN_TYPE_H
+#define TIGHTDB_OBJC_COLUMN_TYPE_H
 
-#ifndef TIGHTDB_OBJC_COLUMNTYPE_H
-#define TIGHTDB_OBJC_COLUMNTYPE_H
+#include <stdlib.h>
+
+// FIXME: The namespace of all-upper-case names must be considered
+// reserved for macros. Consider renaming 'TIGHTDB_COLUMN_TYPE_INT' to
+// 'tightdb_type_Int', and so forth. That is, a qualifying prefix
+// followed by the enumeration name in CamelCase. This is a reasonably
+// common naming scheme for enumeration values. Note that I am also
+// suggesting that we drop 'column' from the names, since these types
+// a used much more generally than as just 'column types'.
 
 // Make sure numbers match those in <tightdb/column_type.hpp>
+typedef enum {
+    TIGHTDB_COLUMN_TYPE_BOOL   =  1,
+    TIGHTDB_COLUMN_TYPE_INT    =  0,
+    TIGHTDB_COLUMN_TYPE_STRING =  2,
+    TIGHTDB_COLUMN_TYPE_BINARY =  4,
+    TIGHTDB_COLUMN_TYPE_DATE   =  7,
+    TIGHTDB_COLUMN_TYPE_TABLE  =  5,
+    TIGHTDB_COLUMN_TYPE_MIXED  =  6,
+} TightdbColumnType;
 
-#ifdef __cplusplus
-#include <cstdlib>
-enum ColumnType {
-    COLUMN_TYPE_BOOL   =  1,
-    COLUMN_TYPE_INT    =  0,
-    COLUMN_TYPE_STRING =  2,
-    COLUMN_TYPE_BINARY =  4,
-    COLUMN_TYPE_DATE   =  7,
-    COLUMN_TYPE_TABLE  =  5,
-    COLUMN_TYPE_MIXED  =  6,
-};
-#else
-#include <stdlib.h>
-typedef enum  {
-    COLUMN_TYPE_BOOL   =  1,
-    COLUMN_TYPE_INT    =  0,
-    COLUMN_TYPE_STRING =  2,
-    COLUMN_TYPE_BINARY =  4,
-    COLUMN_TYPE_DATE   =  7,
-    COLUMN_TYPE_TABLE  =  5,
-    COLUMN_TYPE_MIXED  =  6,
-} ColumnType;
-#endif
-
-
-#endif // TIGHTDB_OBJC_COLUMNTYPE_H
+#endif // TIGHTDB_OBJC_COLUMN_TYPE_H

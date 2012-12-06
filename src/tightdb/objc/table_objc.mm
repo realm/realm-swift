@@ -193,9 +193,9 @@
     return NO;
 }
 
--(ColumnType)getType
+-(TightdbColumnType)getType
 {
-    return (ColumnType)_mixed.get_type();
+    return (TightdbColumnType)_mixed.get_type();
 }
 -(int64_t)getInt
 {
@@ -255,7 +255,7 @@
 
 // FIXME: Provide a version of this method that takes a 'const char *'. This will simplify _addColumns of MyTable.
 // FIXME: Detect errors from core library
--(BOOL)addColumn:(ColumnType)type name:(NSString *)name
+-(BOOL)addColumn:(TightdbColumnType)type name:(NSString *)name
 {
     _spec->add_column((tightdb::ColumnType)type, [name UTF8String]);
     return YES;
@@ -279,9 +279,9 @@
 {
     return _spec->get_column_count();
 }
--(ColumnType)getColumnType:(size_t)ndx
+-(TightdbColumnType)getColumnType:(size_t)ndx
 {
-    return (ColumnType)_spec->get_column_type(ndx);
+    return (TightdbColumnType)_spec->get_column_type(ndx);
 }
 -(NSString *)getColumnName:(size_t)ndx
 {
@@ -580,9 +580,9 @@
 {
     return _table->get_column_index([name UTF8String]);
 }
--(ColumnType)getColumnType:(size_t)ndx
+-(TightdbColumnType)getColumnType:(size_t)ndx
 {
-    return (ColumnType)_table->get_column_type(ndx);
+    return (TightdbColumnType)_table->get_column_type(ndx);
 }
 -(OCSpec *)getSpec
 {
@@ -739,15 +739,15 @@
 {
     tightdb::Mixed tmp = _table->get_mixed(columnId, ndx);
     OCMixed *mixed = [OCMixed mixedWithMixed:tmp];
-    if ([mixed getType] == COLUMN_TYPE_TABLE) {
+    if ([mixed getType] == TIGHTDB_COLUMN_TYPE_TABLE) {
         [mixed setTable:[self getSubtable:columnId ndx:ndx]];
     }
     return mixed;
 }
 
--(ColumnType)getMixedType:(size_t)columnId ndx:(size_t)ndx
+-(TightdbColumnType)getMixedType:(size_t)columnId ndx:(size_t)ndx
 {
-    return (ColumnType)_table->get_mixed_type(columnId, ndx);
+    return (TightdbColumnType)_table->get_mixed_type(columnId, ndx);
 }
 
 -(void)insertMixed:(size_t)columnId ndx:(size_t)ndx value:(OCMixed *)value
@@ -765,7 +765,7 @@
     // FIXME: Insert copy of subtable if type is table
 }
 
--(size_t)addColumn:(ColumnType)type name:(NSString *)name
+-(size_t)addColumn:(TightdbColumnType)type name:(NSString *)name
 {
     return _table->add_column((tightdb::ColumnType)type, [name UTF8String]);
 }
