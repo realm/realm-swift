@@ -44,10 +44,10 @@
     return group;
 }
 
-+(Group *)groupWithBuffer:(const char *)buffer len:(size_t)len
++(Group *)groupWithBuffer:(char *)buffer len:(size_t)len
 {
     Group *group = [[Group alloc] init];
-    group.group = new tightdb::Group(buffer,len);
+    group.group = new tightdb::Group(Group::from_mem_tag(), buffer, len);
     group.readOnly = NO;
     return group;
 }
