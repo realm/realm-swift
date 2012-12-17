@@ -47,7 +47,7 @@
 +(Group *)groupWithBuffer:(char *)buffer len:(size_t)len
 {
     Group *group = [[Group alloc] init];
-    group.group = new tightdb::Group(Group::from_mem_tag(), buffer, len);
+    group.group = new tightdb::Group(tightdb::Group::from_mem_tag(), buffer, len);
     group.readOnly = NO;
     return group;
 }
