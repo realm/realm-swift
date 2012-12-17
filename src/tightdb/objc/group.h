@@ -25,7 +25,7 @@
 
 @interface Group : NSObject
 +(Group *)groupWithFilename:(NSString *)filename;
-+(Group *)groupWithBuffer:(const char*)buffer len:(size_t)len;
++(Group *)groupWithBuffer:(char*)buffer len:(size_t)len;
 +(Group *)group;
 -(BOOL)isValid;
 
