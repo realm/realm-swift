@@ -163,7 +163,7 @@
 {
     OCMixed *mixed = [[OCMixed alloc] init];
 
-    mixed.mixed = tightdb::Mixed(value, length);
+    mixed.mixed = tightdb::Mixed(tightdb::BinaryData(value, length));
 
     return mixed;
 }
