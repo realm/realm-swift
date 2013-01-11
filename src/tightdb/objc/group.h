@@ -27,7 +27,6 @@
 +(Group *)groupWithFilename:(NSString *)filename;
 +(Group *)groupWithBuffer:(char*)buffer len:(size_t)len;
 +(Group *)group;
--(BOOL)isValid;
 
 -(size_t)getTableCount;
 -(NSString *)getTableName:(size_t)table_ndx;
