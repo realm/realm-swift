@@ -22,8 +22,8 @@
 +(Group *)group
 {
     Group *group = [[Group alloc] init];
-    group.group = new tightdb::Group();
-    group.readOnly = NO;
+    group.group = new tightdb::Group(); // FIXME: May throw
+    group._readOnly = NO;
     return group;
 }
 
@@ -39,16 +39,28 @@
 +(Group *)groupWithFilename:(NSString *)filename
 {
     Group *group = [[Group alloc] init];
-    group.group = new tightdb::Group([filename UTF8String]);
-    group.readOnly = NO;
+    try {
+        group.group = new tightdb::Group([filename UTF8String]);
+    }
+    catch (...) {
+        // FIXME: Somehow reveal the reason for this failure to the user
+        return nil;
+    }
+    group._readOnly = NO;
     return group;
 }
 
 +(Group *)groupWithBuffer:(char *)buffer len:(size_t)len
 {
     Group *group = [[Group alloc] init];
-    group.group = new tightdb::Group(tightdb::Group::from_mem_tag(), buffer, len);
-    group.readOnly = NO;
+    try {
+        group.group = new tightdb::Group(tightdb::Group::from_mem_tag(), buffer, len);
+    }
+    catch (...) {
+        // FIXME: Somehow reveal the reason for this failure to the user
+        return nil;
+    }
+    group._readOnly = NO;
     return group;
 }
 
@@ -66,10 +78,6 @@
 }
 
 
--(BOOL)isValid
-{
-    return _group->is_valid();
-}
 -(size_t)getTableCount
 {
     return _group->get_table_count();
@@ -81,11 +89,13 @@
 
 -(void)write:(NSString *)filePath
 {
-    _group->write([filePath UTF8String]);
+    _group->write([filePath UTF8String]); // FIXME: May throw
 }
 -(char*)writeToMem:(size_t*)len
 {
-    return _group->write_to_mem(*len);
+    Group::BufferSpec buffer = _group->write_to_mem(); // FIXME: May throw
+    len = buffer.m_size;
+    return buffer.m_data;
 }
 
 -(BOOL)hasTable:(NSString *)name

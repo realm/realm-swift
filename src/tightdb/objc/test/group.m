@@ -46,7 +46,7 @@ TIGHTDB_TABLE_2(TestTableGroup,
 
     // Load the group
     Group *fromDisk = [Group groupWithFilename:@"table_test.tbl"];
-    if (![fromDisk isValid])
+    if (!fromDisk)
         STFail(@"From disk not valid");
 
     // Create new table in group
