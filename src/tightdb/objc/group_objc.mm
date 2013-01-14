@@ -23,7 +23,7 @@
 {
     Group *group = [[Group alloc] init];
     group.group = new tightdb::Group(); // FIXME: May throw
-    group._readOnly = NO;
+    group.readOnly = NO;
     return group;
 }
 
@@ -46,7 +46,7 @@
         // FIXME: Somehow reveal the reason for this failure to the user
         return nil;
     }
-    group._readOnly = NO;
+    group.readOnly = NO;
     return group;
 }
 
@@ -54,13 +54,13 @@
 {
     Group *group = [[Group alloc] init];
     try {
-        group.group = new tightdb::Group(tightdb::Group::from_mem_tag(), buffer, len);
+        group.group = new tightdb::Group(tightdb::Group::BufferSpec(buffer, len));
     }
     catch (...) {
         // FIXME: Somehow reveal the reason for this failure to the user
         return nil;
     }
-    group._readOnly = NO;
+    group.readOnly = NO;
     return group;
 }
 
@@ -93,8 +93,8 @@
 }
 -(char*)writeToMem:(size_t*)len
 {
-    Group::BufferSpec buffer = _group->write_to_mem(); // FIXME: May throw
-    len = buffer.m_size;
+    tightdb::Group::BufferSpec buffer = _group->write_to_mem(); // FIXME: May throw
+    *len = buffer.m_size;
     return buffer.m_data;
 }
 
