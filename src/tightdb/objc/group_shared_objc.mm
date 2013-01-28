@@ -36,7 +36,7 @@
     }
     SharedGroup* shared_group2 = [[SharedGroup alloc] init];
     if (shared_group2) {
-      shared_group2._sharedGroup = shared_group;
+      shared_group2->_sharedGroup = shared_group;
     }
     return shared_group2;
 }
