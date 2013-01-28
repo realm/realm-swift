@@ -12,18 +12,32 @@
 
 @implementation SharedGroup
 {
-    tightdb::SharedGroup *_sharedGroup;
+    tightdb::SharedGroup* _sharedGroup;
 }
 
 #pragma mark - Init
 
 +(SharedGroup *)groupWithFilename:(NSString *)filename
 {
-    SharedGroup *group = [[SharedGroup alloc] init];
-    if (group) {
-        group->_sharedGroup = new tightdb::SharedGroup([filename UTF8String]);
+    tightdb::SharedGroup* shared_group;
+    try {
+        shared_group = new tightdb::SharedGroup([filename UTF8String]);
     }
-    return group;
+    catch (...) {
+        // FIXME: Diffrent exception types mean different things. More
+        // details must be made available. We should proably have
+        // special catches for at least these:
+        // tightdb::File::OpenError (and various derivatives),
+        // tightdb::ResourceAllocError, std::bad_alloc. In general,
+        // any core library function or operator that is not declared
+        // 'noexcept' must be considered as being able to throw
+        // anything derived from std::exception.
+        return nil;
+    }
+    SharedGroup* shared_group2 = [[SharedGroup alloc] init];
+    shared_group2.sharedGroup = shared_group;
+    shared_group2.readOnly = NO;
+    return shared_group2;
 }
 
 -(void)dealloc
@@ -37,7 +51,7 @@
 
 -(void)readTransaction:(SharedGroupReadTransactionBlock)block
 {
-    Group *group;
+    Group* group;
     @try {
         group = [Group groupTightdbGroup:(tightdb::Group *)&_sharedGroup->begin_read() readOnly:YES];
         block(group);
@@ -51,7 +65,7 @@
 
 -(void)writeTransaction:(SharedGroupWriteTransactionBlock)block
 {
-    Group *group;
+    Group* group;
     @try {
         group = [Group groupTightdbGroup:&_sharedGroup->begin_write() readOnly:NO];
         if (block(group))
@@ -66,9 +80,6 @@
         @throw exception;
     }
 }
-
-
-
 
 
 @end
