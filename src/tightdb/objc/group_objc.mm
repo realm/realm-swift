@@ -22,7 +22,7 @@
 +(Group *)group
 {
     Group *group = [[Group alloc] init];
-    group.group = new tightdb::Group(); // FIXME: May throw
+    group.group = new tightdb::Group(); // FIXME: Both new-operator and Group constructor may throw at least std::bad_alloc.
     group.readOnly = NO;
     return group;
 }
@@ -38,30 +38,48 @@
 
 +(Group *)groupWithFilename:(NSString *)filename
 {
-    Group *group = [[Group alloc] init];
+    tightdb::Group* group;
     try {
-        group.group = new tightdb::Group([filename UTF8String]);
+        group = new tightdb::Group([filename UTF8String]);
     }
     catch (...) {
-        // FIXME: Somehow reveal the reason for this failure to the user
+        // FIXME: Diffrent exception types mean different things. More
+        // details must be made available. We should proably have
+        // special catches for at least these:
+        // tightdb::File::OpenError (and various derivatives),
+        // tightdb::ResourceAllocError, std::bad_alloc. In general,
+        // any core library function or operator that is not declared
+        // 'noexcept' must be considered as being able to throw
+        // anything derived from std::exception.
         return nil;
     }
-    group.readOnly = NO;
-    return group;
+    Group* group2 = [[Group alloc] init];
+    group2.group = group;
+    group2.readOnly = NO;
+    return group2;
 }
 
 +(Group *)groupWithBuffer:(char *)buffer len:(size_t)len
 {
-    Group *group = [[Group alloc] init];
+    tightdb::Group* group;
     try {
-        group.group = new tightdb::Group(tightdb::Group::BufferSpec(buffer, len));
+        group = new tightdb::Group(tightdb::Group::BufferSpec(buffer, len));
     }
     catch (...) {
-        // FIXME: Somehow reveal the reason for this failure to the user
+        // FIXME: Diffrent exception types mean different things. More
+        // details must be made available. We should proably have
+        // special catches for at least these:
+        // tightdb::File::OpenError (and various derivatives),
+        // tightdb::ResourceAllocError, std::bad_alloc. In general,
+        // any core library function or operator that is not declared
+        // 'noexcept' must be considered as being able to throw
+        // anything derived from std::exception.
         return nil;
     }
-    group.readOnly = NO;
-    return group;
+    Group* group2 = [[Group alloc] init];
+    group2.group = group;
+    group2.readOnly = NO;
+    return group2;
 }
 
 -(void)clearGroup
@@ -89,11 +107,11 @@
 
 -(void)write:(NSString *)filePath
 {
-    _group->write([filePath UTF8String]); // FIXME: May throw
+    _group->write([filePath UTF8String]); // FIXME: May throw at least tightdb::File::OpenError (and various derivatives), tightdb::ResourceAllocError, and std::bad_alloc
 }
 -(char*)writeToMem:(size_t*)len
 {
-    tightdb::Group::BufferSpec buffer = _group->write_to_mem(); // FIXME: May throw
+    tightdb::Group::BufferSpec buffer = _group->write_to_mem(); // FIXME: May throw at least std::bad_alloc
     *len = buffer.m_size;
     return buffer.m_data;
 }
