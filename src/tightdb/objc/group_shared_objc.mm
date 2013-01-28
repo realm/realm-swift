@@ -35,8 +35,9 @@
         return nil;
     }
     SharedGroup* shared_group2 = [[SharedGroup alloc] init];
-    shared_group2.sharedGroup = shared_group;
-    shared_group2.readOnly = NO;
+    if (shared_group2) {
+      shared_group2._sharedGroup = shared_group;
+    }
     return shared_group2;
 }
 
