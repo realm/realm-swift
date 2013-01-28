@@ -54,8 +54,10 @@
         return nil;
     }
     Group* group2 = [[Group alloc] init];
-    group2.group = group;
-    group2.readOnly = NO;
+    if (group2) {
+      group2.group = group;
+      group2.readOnly = NO;
+    }
     return group2;
 }
 
