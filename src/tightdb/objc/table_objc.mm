@@ -435,7 +435,7 @@
     self = [super init];
     if (self) {
         _readOnly = NO;
-        _table = tightdb::Table::create();
+        _table = tightdb::Table::create(); // FIXME: May throw
     }
     return self;
 }
