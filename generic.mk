@@ -666,11 +666,11 @@ test-debug/local: $(TARGETS_TEST_DEBUG) update-libdeps-files
 	)
 
 memtest/local: $(TARGETS_TEST) update-libdeps-files
-	$(foreach x,$(TARGETS_TEST_PROG_OPTIM),valgrind --quiet --error-exitcode=1 --track-origins=yes --leak-check=yes --leak-resolution=low ./$(x) --no-error-exit-staus
+	$(foreach x,$(TARGETS_TEST_PROG_OPTIM),valgrind --quiet --error-exitcode=1 --track-origins=yes --leak-check=yes --leak-resolution=low ./$(x) --no-error-exitcode
 	)
 
 memtest-debug/local: $(TARGETS_TEST_DEBUG) update-libdeps-files
-	$(foreach x,$(TARGETS_TEST_PROG_DEBUG),valgrind --quiet --error-exitcode=1 --track-origins=yes --leak-check=yes --leak-resolution=low ./$(x) --no-error-exit-staus
+	$(foreach x,$(TARGETS_TEST_PROG_DEBUG),valgrind --quiet --error-exitcode=1 --track-origins=yes --leak-check=yes --leak-resolution=low ./$(x) --no-error-exitcode
 	)
 
 ifneq ($(strip $(TARGETS_TEST_COVER)),)
