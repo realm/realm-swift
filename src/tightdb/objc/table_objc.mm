@@ -173,29 +173,29 @@
     const tightdb::ColumnType type = _mixed.get_type();
     if (type != other->_mixed.get_type()) return NO;
     switch (type) {
-        case tightdb::COLUMN_TYPE_BOOL:
+        case tightdb::type_Bool:
             return _mixed.get_bool() == other->_mixed.get_bool();
-        case tightdb::COLUMN_TYPE_INT:
+        case tightdb::type_Int:
             return _mixed.get_int() == other->_mixed.get_int();
-        case tightdb::COLUMN_TYPE_STRING:
+        case tightdb::type_String:
             return std::strcmp(_mixed.get_string(), other->_mixed.get_string()) == 0;
-        case tightdb::COLUMN_TYPE_BINARY:
+        case tightdb::type_Binary:
             return _mixed.get_binary().compare_payload(other->_mixed.get_binary());
-        case tightdb::COLUMN_TYPE_DATE:
+        case tightdb::type_Date:
             return _mixed.get_date() == other->_mixed.get_date();
-        case tightdb::COLUMN_TYPE_TABLE:
+        case tightdb::type_Table:
             return [_table getTable] == [other->_table getTable]; // Compare table contents
             break;
-        default:
+        case tightdb::type_Mixed:
             TIGHTDB_ASSERT(false);
             break;
     }
     return NO;
 }
 
--(TightdbColumnType)getType
+-(TightdbDataType)getType
 {
-    return (TightdbColumnType)_mixed.get_type();
+    return (TightdbDataType)_mixed.get_type();
 }
 -(int64_t)getInt
 {
@@ -255,7 +255,7 @@
 
 // FIXME: Provide a version of this method that takes a 'const char *'. This will simplify _addColumns of MyTable.
 // FIXME: Detect errors from core library
--(BOOL)addColumn:(TightdbColumnType)type name:(NSString *)name
+-(BOOL)addColumn:(TightdbDataType)type name:(NSString *)name
 {
     _spec->add_column((tightdb::ColumnType)type, [name UTF8String]);
     return YES;
@@ -279,9 +279,9 @@
 {
     return _spec->get_column_count();
 }
--(TightdbColumnType)getColumnType:(size_t)ndx
+-(TightdbDataType)getColumnType:(size_t)ndx
 {
-    return (TightdbColumnType)_spec->get_column_type(ndx);
+    return (TightdbDataType)_spec->get_column_type(ndx);
 }
 -(NSString *)getColumnName:(size_t)ndx
 {
@@ -507,7 +507,7 @@
 -(Table *)getSubtable:(size_t)columnId ndx:(size_t)ndx
 {
     const tightdb::ColumnType t = _table->get_column_type(columnId);
-    if (t != tightdb::COLUMN_TYPE_TABLE && t != tightdb::COLUMN_TYPE_MIXED) return nil;
+    if (t != tightdb::type_Table && t != tightdb::type_Mixed) return nil;
     tightdb::TableRef r = _table->get_subtable(columnId, ndx);
     if (!r) return nil;
     Table *table = [[Table alloc] _initRaw];
@@ -522,7 +522,7 @@
 -(id)getSubtable:(size_t)columnId ndx:(size_t)ndx withClass:(__unsafe_unretained Class)classObj
 {
     const tightdb::ColumnType t = _table->get_column_type(columnId);
-    if (t != tightdb::COLUMN_TYPE_TABLE && t != tightdb::COLUMN_TYPE_MIXED) return nil;
+    if (t != tightdb::type_Table && t != tightdb::type_Mixed) return nil;
     tightdb::TableRef r = _table->get_subtable(columnId, ndx);
     if (!r) return nil;
     Table *table = [[classObj alloc] _initRaw];
@@ -580,9 +580,9 @@
 {
     return _table->get_column_index([name UTF8String]);
 }
--(TightdbColumnType)getColumnType:(size_t)ndx
+-(TightdbDataType)getColumnType:(size_t)ndx
 {
-    return (TightdbColumnType)_table->get_column_type(ndx);
+    return (TightdbDataType)_table->get_column_type(ndx);
 }
 -(OCSpec *)getSpec
 {
@@ -739,15 +739,15 @@
 {
     tightdb::Mixed tmp = _table->get_mixed(columnId, ndx);
     OCMixed *mixed = [OCMixed mixedWithMixed:tmp];
-    if ([mixed getType] == TIGHTDB_COLUMN_TYPE_TABLE) {
+    if ([mixed getType] == tightdb_Table) {
         [mixed setTable:[self getSubtable:columnId ndx:ndx]];
     }
     return mixed;
 }
 
--(TightdbColumnType)getMixedType:(size_t)columnId ndx:(size_t)ndx
+-(TightdbDataType)getMixedType:(size_t)columnId ndx:(size_t)ndx
 {
-    return (TightdbColumnType)_table->get_mixed_type(columnId, ndx);
+    return (TightdbDataType)_table->get_mixed_type(columnId, ndx);
 }
 
 -(void)insertMixed:(size_t)columnId ndx:(size_t)ndx value:(OCMixed *)value
@@ -765,7 +765,7 @@
     // FIXME: Insert copy of subtable if type is table
 }
 
--(size_t)addColumn:(TightdbColumnType)type name:(NSString *)name
+-(size_t)addColumn:(TightdbDataType)type name:(NSString *)name
 {
     return _table->add_column((tightdb::ColumnType)type, [name UTF8String]);
 }
