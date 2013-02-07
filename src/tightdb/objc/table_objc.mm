@@ -170,7 +170,7 @@
 
 -(BOOL)isEqual:(OCMixed *)other
 {
-    const tightdb::ColumnType type = _mixed.get_type();
+    const tightdb::DataType type = _mixed.get_type();
     if (type != other->_mixed.get_type()) return NO;
     switch (type) {
         case tightdb::type_Bool:
@@ -257,7 +257,7 @@
 // FIXME: Detect errors from core library
 -(BOOL)addColumn:(TightdbDataType)type name:(NSString *)name
 {
-    _spec->add_column((tightdb::ColumnType)type, [name UTF8String]);
+    _spec->add_column((tightdb::DataType)type, [name UTF8String]);
     return YES;
 }
 
@@ -506,7 +506,7 @@
 
 -(Table *)getSubtable:(size_t)columnId ndx:(size_t)ndx
 {
-    const tightdb::ColumnType t = _table->get_column_type(columnId);
+    const tightdb::DataType t = _table->get_column_type(columnId);
     if (t != tightdb::type_Table && t != tightdb::type_Mixed) return nil;
     tightdb::TableRef r = _table->get_subtable(columnId, ndx);
     if (!r) return nil;
@@ -521,7 +521,7 @@
 // FIXME: Check that the specified class derives from Table.
 -(id)getSubtable:(size_t)columnId ndx:(size_t)ndx withClass:(__unsafe_unretained Class)classObj
 {
-    const tightdb::ColumnType t = _table->get_column_type(columnId);
+    const tightdb::DataType t = _table->get_column_type(columnId);
     if (t != tightdb::type_Table && t != tightdb::type_Mixed) return nil;
     tightdb::TableRef r = _table->get_subtable(columnId, ndx);
     if (!r) return nil;
@@ -767,7 +767,7 @@
 
 -(size_t)addColumn:(TightdbDataType)type name:(NSString *)name
 {
-    return _table->add_column((tightdb::ColumnType)type, [name UTF8String]);
+    return _table->add_column((tightdb::DataType)type, [name UTF8String]);
 }
 -(size_t)findBool:(size_t)columnId value:(BOOL)value
 {
