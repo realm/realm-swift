@@ -16,17 +16,17 @@
     // Create table with all column types
     Table *table = [[Table alloc] init];
     OCSpec *s = [table getSpec];
-    [s addColumn:TIGHTDB_COLUMN_TYPE_INT name:@"int"];
-    [s addColumn:TIGHTDB_COLUMN_TYPE_BOOL name:@"bool"];
-    [s addColumn:TIGHTDB_COLUMN_TYPE_DATE name:@"date"];
-    [s addColumn:TIGHTDB_COLUMN_TYPE_STRING name:@"string"];
-    [s addColumn:TIGHTDB_COLUMN_TYPE_STRING name:@"string_long"];
-    [s addColumn:TIGHTDB_COLUMN_TYPE_STRING name:@"string_enum"];
-    [s addColumn:TIGHTDB_COLUMN_TYPE_BINARY name:@"binary"];
-    [s addColumn:TIGHTDB_COLUMN_TYPE_MIXED name:@"mixed"];
+    [s addColumn:tightdb_Int name:@"int"];
+    [s addColumn:tightdb_Bool name:@"bool"];
+    [s addColumn:tightdb_Date name:@"date"];
+    [s addColumn:tightdb_String name:@"string"];
+    [s addColumn:tightdb_String name:@"string_long"];
+    [s addColumn:tightdb_String name:@"string_enum"];
+    [s addColumn:tightdb_Binary name:@"binary"];
+    [s addColumn:tightdb_Mixed name:@"mixed"];
     OCSpec *sub = [s addColumnTable:@"tables"];
-    [sub addColumn:TIGHTDB_COLUMN_TYPE_INT name:@"sub_first"];
-    [sub addColumn:TIGHTDB_COLUMN_TYPE_STRING name:@"sub_second"];
+    [sub addColumn:tightdb_Int name:@"sub_first"];
+    [sub addColumn:tightdb_String name:@"sub_second"];
     [table updateFromSpec];
 
     // Add some rows

@@ -5,7 +5,7 @@ TIGHTDB_H = tightdb.h
 
 GENERATED_SOURCES = $(TIGHTDB_H)
 
-INST_HEADERS = column_type.h cursor.h group.h query.h table.h group_shared.h helper_macros.h $(TIGHTDB_H)
+INST_HEADERS = data_type.h cursor.h group.h query.h table.h group_shared.h helper_macros.h $(TIGHTDB_H)
 
 lib_LIBRARIES = libtightdb-objc.a
 
