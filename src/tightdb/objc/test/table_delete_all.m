@@ -49,7 +49,7 @@
                 break;
         }
 
-        [table insertBinary:6 ndx:i value:"binary" len:7];
+        [table insertBinary:6 ndx:i data:"binary" size:7];
         switch (i % 3) {
             case 0:
                 [table insertMixed:7 ndx:i value:[OCMixed mixedWithBool:NO]];

@@ -21,6 +21,7 @@
 #import <Foundation/Foundation.h>
 
 @class Table;
+@class BinaryData;
 @class OCMixed;
 
 #pragma mark - CursorBase
@@ -39,14 +40,21 @@
    accessors. */
 @interface OCAccessor : NSObject
 -(id)initWithCursor:(CursorBase *)cursor columnId:(size_t)columnId;
--(int64_t)getInt;
--(void)setInt:(int64_t)value;
 -(BOOL)getBool;
 -(void)setBool:(BOOL)value;
--(time_t)getDate;
--(void)setDate:(time_t)value;
+-(int64_t)getInt;
+-(void)setInt:(int64_t)value;
+-(float)getFloat;
+-(void)setFloat:(float)value;
+-(double)getDouble;
+-(void)setDouble:(double)value;
 -(NSString *)getString;
 -(void)setString:(NSString *)value;
+-(BinaryData *)getBinary;
+-(void)setBinary:(BinaryData *)value;
+-(void)setBinary:(const char *)data size:(size_t)size;
+-(time_t)getDate;
+-(void)setDate:(time_t)value;
 -(id)getSubtable:(Class)obj;
 -(OCMixed *)getMixed;
 -(void)setMixed:(OCMixed *)value;
