@@ -60,32 +60,28 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName${j+1}, CType${j+1}) \\
 -(TableName##_Query *)parent; \\
 -(TableName##_View *)findAll; \\
 @end \\
-@interface OCColumnProxy_##TableName : OCColumnProxy \\
--(size_t)find:(NSString*)value; \\
-@end \\
 @interface TableName : Table \\
 %for $j in range($num_cols)
-@property(nonatomic, strong) OCColumnProxy_##CType${j+1} *CName${j+1}; \\
+TIGHTDB_COLUMN_PROXY_DEF(CName${j+1}, CType${j+1}) \\
 %end for
 -(void)add##%slurp
 %for $j in range($num_cols)
 %if 0 < $j
 %echo ' '
 %end if
-CName${j+1}:(TIGHTDB_TYPE_##CType${j+1})CName${j+1}%slurp
+CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 %end for
 ; \\
 -(void)insertAtIndex:(size_t)ndx%slurp
 %for $j in range($num_cols)
- CName${j+1}:(TIGHTDB_TYPE_##CType${j+1})CName${j+1}%slurp
+ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 %end for
 ; \\
--(TableName##_Query *)getQuery; \\
+-(TableName##_Query *)where; \\
 -(TableName##_Cursor *)add; \\
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \\
 -(TableName##_Cursor *)lastObject; \\
 @end \\
-typedef TableName* TIGHTDB_TYPE_##TableName; \\
 @interface TableName##_View : TableView \\
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \\
 @end
@@ -177,18 +173,12 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName${j+1}, CType${j+1}) \\
 %for $j in range($num_cols)
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName${j+1}, CType${j+1}) \\
 %end for
-@implementation OCColumnProxy_##TableName \\
--(size_t)find:(NSString *)value \\
-{ \\
-    return [self.table findString:self.column value:value]; \\
-} \\
-@end \\
 @implementation TableName \\
 { \\
     TableName##_Cursor *tmpCursor; \\
 } \\
 %for $j in range($num_cols)
-@synthesize CName${j+1} = _##CName${j+1}; \\
+TIGHTDB_COLUMN_PROXY_IMPL(CName${j+1}, CType${j+1}) \\
 %end for
 \\
 -(id)_initRaw \\
@@ -196,7 +186,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName${j+1}, CType${j+1}) \\
     self = [super _initRaw]; \\
     if (!self) return nil; \\
 %for $j in range($num_cols)
-    _##CName${j+1} = [[OCColumnProxy_##CType${j+1} alloc] initWithTable:self column:${j}]; \\
+    TIGHTDB_COLUMN_PROXY_INIT(self, ${j}, CName${j+1}, CType${j+1}); \\
 %end for
     return self; \\
 } \\
@@ -207,13 +197,13 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName${j+1}, CType${j+1}) \\
     if (![self _addColumns]) return nil; \\
 \\
 %for $j in range($num_cols)
-    _##CName${j+1} = [[OCColumnProxy_##CType${j+1} alloc] initWithTable:self column:${j}]; \\
+    TIGHTDB_COLUMN_PROXY_INIT(self, ${j}, CName${j+1}, CType${j+1}); \\
 %end for
     return self; \\
 } \\
 -(void)add##%slurp
 %for $j in range($num_cols)
-CName${j+1}:(TIGHTDB_TYPE_##CType${j+1})CName${j+1} %slurp
+CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 %end for
 \\
 { \\
@@ -225,7 +215,7 @@ CName${j+1}:(TIGHTDB_TYPE_##CType${j+1})CName${j+1} %slurp
 } \\
 -(void)insertAtIndex:(size_t)ndx %slurp
 %for $j in range($num_cols)
-CName${j+1}:(TIGHTDB_TYPE_##CType${j+1})CName${j+1} %slurp
+CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 %end for
 \\
 { \\
@@ -234,7 +224,7 @@ CName${j+1}:(TIGHTDB_TYPE_##CType${j+1})CName${j+1} %slurp
 %end for
     [self insertDone]; \\
 } \\
--(TableName##_Query *)getQuery \\
+-(TableName##_Query *)where \\
 { \\
     return [[TableName##_Query alloc] initWithTable:self]; \\
 } \\

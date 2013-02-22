@@ -115,7 +115,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     //------------------------------------------------------
 
     // Create query (current employees between 20 and 30 years old)
-    PeopleTable_Query *q = [[[people getQuery].Hired equal:YES]            // Implicit AND
+    PeopleTable_Query *q = [[[people where].Hired equal:YES]            // Implicit AND
                                   .Age between:20 to:30];
 
     // Get number of matching entries
@@ -157,11 +157,11 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     }
 
     // Write same group to memory buffer
-    size_t len;
-    const char* const buffer = [group writeToMem:&len];
+    size_t size;
+    const char* const data = [group writeToMem:&size];
 
     // Load a group from memory (and print contents)
-    Group *fromMem = [Group groupWithBuffer:buffer len:len];
+    Group *fromMem = [Group groupWithBuffer:data size:size];
     PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class]];
     for (size_t i = 0; i < [memTable count]; i++) {
         PeopleTable_Cursor *cursor = [memTable objectAtIndex:i];
