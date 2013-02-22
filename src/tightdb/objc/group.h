@@ -25,7 +25,7 @@
 
 @interface Group : NSObject
 +(Group *)groupWithFilename:(NSString *)filename;
-+(Group *)groupWithBuffer:(char*)buffer len:(size_t)len;
++(Group *)groupWithBuffer:(const char*)data size:(size_t)size;
 +(Group *)group;
 
 -(size_t)getTableCount;
@@ -55,7 +55,7 @@
 
 // Serialization
 -(void)write:(NSString *)filePath;
--(char*)writeToMem:(size_t*)len;
+-(const char*)writeToMem:(size_t*)size;
 
 // Conversion
 // FIXME: Do we want to conversion methods? Maybe use NSData.
