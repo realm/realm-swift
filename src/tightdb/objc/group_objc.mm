@@ -100,7 +100,7 @@
 
 -(size_t)getTableCount
 {
-    return _group->get_table_count();
+    return _group->size();
 }
 -(NSString *)getTableName:(size_t)table_ndx
 {
