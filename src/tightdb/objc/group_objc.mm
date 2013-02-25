@@ -61,11 +61,11 @@
     return group2;
 }
 
-+(Group *)groupWithBuffer:(char *)buffer len:(size_t)len
++(Group *)groupWithBuffer:(const char *)data size:(size_t)size
 {
     tightdb::Group* group;
     try {
-        group = new tightdb::Group(tightdb::Group::BufferSpec(buffer, len));
+        group = new tightdb::Group(tightdb::Group::BufferSpec(data, size));
     }
     catch (...) {
         // FIXME: Diffrent exception types mean different things. More
@@ -111,10 +111,10 @@
 {
     _group->write([filePath UTF8String]); // FIXME: May throw at least tightdb::File::OpenError (and various derivatives), tightdb::ResourceAllocError, and std::bad_alloc
 }
--(char*)writeToMem:(size_t*)len
+-(const char*)writeToMem:(size_t*)size
 {
     tightdb::Group::BufferSpec buffer = _group->write_to_mem(); // FIXME: May throw at least std::bad_alloc
-    *len = buffer.m_size;
+    *size = buffer.m_size;
     return buffer.m_data;
 }
 

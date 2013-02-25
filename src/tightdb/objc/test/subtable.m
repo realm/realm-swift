@@ -10,13 +10,13 @@
 #import <tightdb/objc/tightdb.h>
 #import <tightdb/objc/group.h>
 
-TIGHTDB_TABLE_2(TestTableSub,
+TIGHTDB_TABLE_2(TestSubtableSub,
                 Name, String,
                 Age,  Int)
 
-TIGHTDB_TABLE_3(TestTableMain,
+TIGHTDB_TABLE_3(TestSubtableMain,
                 First,  String,
-                Sub,    TestTableSub,
+                Sub,    TestSubtableSub,
                 Second, Int)
 
 @interface MACTestSubtable : SenTestCase
@@ -45,15 +45,15 @@ TIGHTDB_TABLE_3(TestTableMain,
     Group *group = [Group group];
 
     /* Create new table in group */
-    TestTableMain *people = [group getTable:@"employees" withClass:[TestTableMain class]];
+    TestSubtableMain *people = [group getTable:@"employees" withClass:[TestSubtableMain class]];
 
     /* FIXME: Add support for specifying a subtable to the 'add'
        method. The subtable must then be copied into the parent
        table. */
     [people addFirst:@"first" Sub:nil Second:8];
 
-    TestTableMain_Cursor *cursor = [people objectAtIndex:0];
-    TestTableSub *subtable = cursor.Sub;
+    TestSubtableMain_Cursor *cursor = [people objectAtIndex:0];
+    TestSubtableSub *subtable = cursor.Sub;
     [subtable addName:@"name" Age:999];
 
     STAssertEquals([subtable objectAtIndex:0].Age, (int64_t)999, @"Age should be 999");

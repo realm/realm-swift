@@ -29,24 +29,58 @@
 #define TIGHTDB_IS_SUBTABLE_5_2       N
 #define TIGHTDB_IS_SUBTABLE_Int       x,x
 #define TIGHTDB_IS_SUBTABLE_Bool      x,x
-#define TIGHTDB_IS_SUBTABLE_Date      x,x
+#define TIGHTDB_IS_SUBTABLE_Float     x,x
+#define TIGHTDB_IS_SUBTABLE_Double    x,x
 #define TIGHTDB_IS_SUBTABLE_String    x,x
 #define TIGHTDB_IS_SUBTABLE_Binary    x,x
+#define TIGHTDB_IS_SUBTABLE_Date      x,x
 #define TIGHTDB_IS_SUBTABLE_Mixed     x,x
 
 #define TIGHTDB_TYPE_Bool      BOOL
 #define TIGHTDB_TYPE_Int       int64_t
+#define TIGHTDB_TYPE_Float     float
+#define TIGHTDB_TYPE_Double    double
 #define TIGHTDB_TYPE_String    NSString *
 #define TIGHTDB_TYPE_Binary    BinaryData *
-#define TIGHTDB_TYPE_Date      OCDate *
+#define TIGHTDB_TYPE_Date      time_t
 #define TIGHTDB_TYPE_Mixed     OCMixed *
 
 #define TIGHTDB_TYPE_ID_Bool   tightdb_Bool
 #define TIGHTDB_TYPE_ID_Int    tightdb_Int
+#define TIGHTDB_TYPE_ID_Float  tightdb_Float
+#define TIGHTDB_TYPE_ID_Double tightdb_Double
 #define TIGHTDB_TYPE_ID_String tightdb_String
 #define TIGHTDB_TYPE_ID_Binary tightdb_Binary
 #define TIGHTDB_TYPE_ID_Date   tightdb_Date
 #define TIGHTDB_TYPE_ID_Mixed  tightdb_Mixed
+
+
+
+// TIGHTDB_ARG_TYPE
+
+#define TIGHTDB_ARG_TYPE(type)                 TIGHTDB_ARG_TYPE_2(TIGHTDB_IS_SUBTABLE(type), type)
+#define TIGHTDB_ARG_TYPE_2(is_subtable, type)  TIGHTDB_ARG_TYPE_3(is_subtable, type)
+#define TIGHTDB_ARG_TYPE_3(is_subtable, type)  TIGHTDB_ARG_TYPE_4_##is_subtable(type)
+#define TIGHTDB_ARG_TYPE_4_Y(type)             type *
+#define TIGHTDB_ARG_TYPE_4_N(type)             TIGHTDB_TYPE_##type
+
+
+
+// TIGHTDB_COLUMN_PROXY
+
+#define TIGHTDB_COLUMN_PROXY_DEF(name, type)                 TIGHTDB_COLUMN_PROXY_DEF_2(TIGHTDB_IS_SUBTABLE(type), name, type)
+#define TIGHTDB_COLUMN_PROXY_DEF_2(is_subtable, name, type)  TIGHTDB_COLUMN_PROXY_DEF_3(is_subtable, name, type)
+#define TIGHTDB_COLUMN_PROXY_DEF_3(is_subtable, name, type)  TIGHTDB_COLUMN_PROXY_DEF_4_##is_subtable(name, type)
+#define TIGHTDB_COLUMN_PROXY_DEF_4_Y(name, type)             @property(nonatomic, strong) OCColumnProxy_Subtable *name;
+#define TIGHTDB_COLUMN_PROXY_DEF_4_N(name, type)             @property(nonatomic, strong) OCColumnProxy_##type *name;
+
+#define TIGHTDB_COLUMN_PROXY_IMPL(name, type)                @synthesize name = _##name;
+
+#define TIGHTDB_COLUMN_PROXY_INIT(table, col, name, type)                TIGHTDB_COLUMN_PROXY_INIT_2(TIGHTDB_IS_SUBTABLE(type), table, col, name, type)
+#define TIGHTDB_COLUMN_PROXY_INIT_2(is_subtable, table, col, name, type) TIGHTDB_COLUMN_PROXY_INIT_3(is_subtable, table, col, name, type)
+#define TIGHTDB_COLUMN_PROXY_INIT_3(is_subtable, table, col, name, type) TIGHTDB_COLUMN_PROXY_INIT_4_##is_subtable(table, col, name, type)
+#define TIGHTDB_COLUMN_PROXY_INIT_4_Y(table, col, name, type)            _##name = [[OCColumnProxy_Subtable alloc] initWithTable:table column:col]
+#define TIGHTDB_COLUMN_PROXY_INIT_4_N(table, col, name, type)            _##name = [[OCColumnProxy_##type alloc] initWithTable:table column:col]
 
 
 
@@ -81,7 +115,7 @@
 { \
     if ([spec getColumnType:col] != tightdb_Table) return NO; \
     if (![[spec getColumnName:col] isEqualToString:@#name]) return NO; \
-    OCSpec *subspec = [spec getSpec:col]; \
+    OCSpec *subspec = [spec getSubspec:col]; \
     if (!subspec) return NO; \
     if (![type _checkType:subspec]) return NO; \
 }
@@ -98,7 +132,7 @@
 #define TIGHTDB_COLUMN_INSERT(table, col, row, value, type)                TIGHTDB_COLUMN_INSERT_2(TIGHTDB_IS_SUBTABLE(type), table, col, row, value, type)
 #define TIGHTDB_COLUMN_INSERT_2(is_subtable, table, col, row, value, type) TIGHTDB_COLUMN_INSERT_3(is_subtable, table, col, row, value, type)
 #define TIGHTDB_COLUMN_INSERT_3(is_subtable, table, col, row, value, type) TIGHTDB_COLUMN_INSERT_4_##is_subtable(table, col, row, value, type)
-#define TIGHTDB_COLUMN_INSERT_4_Y(table, col, row, _value, type)           [table _insertSubtableCopy:col row_ndx:row subtable:_value]
+#define TIGHTDB_COLUMN_INSERT_4_Y(table, col, _row, value, type)           [table _insertSubtableCopy:col row:_row subtable:value]
 #define TIGHTDB_COLUMN_INSERT_4_N(table, col, row, _value, type)           [table insert##type:col ndx:row value:_value]
 
 
@@ -135,20 +169,14 @@
 
 
 #define TIGHTDB_CURSOR_PROPERTY_DEF_SUBTABLE(name, type) \
-@property type *name; \
+@property (readonly) type *name; \
 -(type *)name; \
--(void)set##name:(type *)value;
 
-/* FIXME: Must implement setter as a table copying operation. */
 #define TIGHTDB_CURSOR_PROPERTY_IMPL_SUBTABLE(name, type) \
 -(type *)name \
 { \
     return [_##name getSubtable:[type class]]; \
 } \
--(void)set##name:(type *)value \
-{ \
-    (void)value; \
-}
 
 
 
@@ -166,6 +194,7 @@
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_4_Y(table, col_name, col_type)            TIGHTDB_QUERY_ACCESSOR_IMPL_SUBTABLE(table, col_name, col_type)
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_4_N(table, col_name, col_type)            TIGHTDB_QUERY_ACCESSOR_IMPL_##col_type(table, col_name)
 
+
 // Boolean
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Bool(table, col_name) \
@@ -181,24 +210,27 @@
 } \
 @end
 
+
 // Integer
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Int(table, col_name) \
 @interface table##_QueryAccessor_##col_name : OCXQueryAccessorInt \
--(table##_Query *)equal:(size_t)value; \
--(table##_Query *)notEqual:(size_t)value; \
+-(table##_Query *)equal:(int64_t)value; \
+-(table##_Query *)notEqual:(int64_t)value; \
 -(table##_Query *)greater:(int64_t)value; \
+-(table##_Query *)greaterEqual:(int64_t)value; \
 -(table##_Query *)less:(int64_t)value; \
+-(table##_Query *)lessEqual:(int64_t)value; \
 -(table##_Query *)between:(int64_t)from to:(int64_t)to; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Int(table, col_name) \
 @implementation table##_QueryAccessor_##col_name \
--(table##_Query *)equal:(size_t)value \
+-(table##_Query *)equal:(int64_t)value \
 { \
     return (table##_Query *)[super equal:value]; \
 } \
--(table##_Query *)notEqual:(size_t)value \
+-(table##_Query *)notEqual:(int64_t)value \
 { \
     return (table##_Query *)[super notEqual:value]; \
 } \
@@ -206,15 +238,116 @@
 { \
     return (table##_Query *)[super greater:value]; \
 } \
+-(table##_Query *)greaterEqual:(int64_t)value \
+{ \
+    return (table##_Query *)[super greaterEqual:value]; \
+} \
 -(table##_Query *)less:(int64_t)value \
 { \
     return (table##_Query *)[super less:value]; \
+} \
+-(table##_Query *)lessEqual:(int64_t)value \
+{ \
+    return (table##_Query *)[super lessEqual:value]; \
 } \
 -(table##_Query *)between:(int64_t)from to:(int64_t)to \
 { \
     return (table##_Query *)[super between:from to:to]; \
 } \
 @end
+
+
+// Float
+
+#define TIGHTDB_QUERY_ACCESSOR_DEF_Float(table, col_name) \
+@interface table##_QueryAccessor_##col_name : OCXQueryAccessorFloat \
+-(table##_Query *)equal:(float)value; \
+-(table##_Query *)notEqual:(float)value; \
+-(table##_Query *)greater:(float)value; \
+-(table##_Query *)greaterEqual:(float)value; \
+-(table##_Query *)less:(float)value; \
+-(table##_Query *)lessEqual:(float)value; \
+-(table##_Query *)between:(float)from to:(float)to; \
+@end
+
+#define TIGHTDB_QUERY_ACCESSOR_IMPL_Float(table, col_name) \
+@implementation table##_QueryAccessor_##col_name \
+-(table##_Query *)equal:(float)value \
+{ \
+    return (table##_Query *)[super equal:value]; \
+} \
+-(table##_Query *)notEqual:(float)value \
+{ \
+    return (table##_Query *)[super notEqual:value]; \
+} \
+-(table##_Query *)greater:(float)value \
+{ \
+    return (table##_Query *)[super greater:value]; \
+} \
+-(table##_Query *)greaterEqual:(float)value \
+{ \
+    return (table##_Query *)[super greaterEqual:value]; \
+} \
+-(table##_Query *)less:(float)value \
+{ \
+    return (table##_Query *)[super less:value]; \
+} \
+-(table##_Query *)lessEqual:(float)value \
+{ \
+    return (table##_Query *)[super lessEqual:value]; \
+} \
+-(table##_Query *)between:(float)from to:(float)to \
+{ \
+    return (table##_Query *)[super between:from to:to]; \
+} \
+@end
+
+
+// Double
+
+#define TIGHTDB_QUERY_ACCESSOR_DEF_Double(table, col_name) \
+@interface table##_QueryAccessor_##col_name : OCXQueryAccessorDouble \
+-(table##_Query *)equal:(double)value; \
+-(table##_Query *)notEqual:(double)value; \
+-(table##_Query *)greater:(double)value; \
+-(table##_Query *)greaterEqual:(double)value; \
+-(table##_Query *)less:(double)value; \
+-(table##_Query *)lessEqual:(double)value; \
+-(table##_Query *)between:(double)from to:(double)to; \
+@end
+
+#define TIGHTDB_QUERY_ACCESSOR_IMPL_Double(table, col_name) \
+@implementation table##_QueryAccessor_##col_name \
+-(table##_Query *)equal:(double)value \
+{ \
+    return (table##_Query *)[super equal:value]; \
+} \
+-(table##_Query *)notEqual:(double)value \
+{ \
+    return (table##_Query *)[super notEqual:value]; \
+} \
+-(table##_Query *)greater:(double)value \
+{ \
+    return (table##_Query *)[super greater:value]; \
+} \
+-(table##_Query *)greaterEqual:(double)value \
+{ \
+    return (table##_Query *)[super greaterEqual:value]; \
+} \
+-(table##_Query *)less:(double)value \
+{ \
+    return (table##_Query *)[super less:value]; \
+} \
+-(table##_Query *)lessEqual:(double)value \
+{ \
+    return (table##_Query *)[super lessEqual:value]; \
+} \
+-(table##_Query *)between:(double)from to:(double)to \
+{ \
+    return (table##_Query *)[super between:from to:to]; \
+} \
+@end
+
 
 // String
 
@@ -251,6 +384,18 @@
 } \
 @end
 
+
+// Binary
+
+#define TIGHTDB_QUERY_ACCESSOR_DEF_Binary(table, col_name) \
+@interface table##_QueryAccessor_##col_name : OCXQueryAccessorBinary \
+@end
+
+#define TIGHTDB_QUERY_ACCESSOR_IMPL_Binary(table, col_name) \
+@implementation table##_QueryAccessor_##col_name \
+@end
+
+
 // Date
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Date(table, col_name) \
@@ -261,6 +406,7 @@
 @implementation table##_QueryAccessor_##col_name \
 @end
 
+
 // Subtable
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_SUBTABLE(table, col_name, col_type) \
@@ -270,6 +416,7 @@
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_SUBTABLE(table, col_name, col_type) \
 @implementation table##_QueryAccessor_##col_name \
 @end
+
 
 // Mixed
 
