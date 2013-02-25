@@ -58,17 +58,17 @@ TIGHTDB_TABLE_2(SubMixedTable,
 
     const char* str1 = "Hello";
     const char* str2 = "Goodbye";
-    OCMixed *mixedBinary1 = [OCMixed mixedWithBinary:str1 length:strlen(str1)];
-    OCMixed *mixedBinary2 = [OCMixed mixedWithBinary:str2 length:strlen(str2)];
-    OCMixed *mixedBinary3 = [OCMixed mixedWithBinary:str2 length:strlen(str2)];
+    OCMixed *mixedBinary1 = [OCMixed mixedWithBinary:str1 size:strlen(str1)];
+    OCMixed *mixedBinary2 = [OCMixed mixedWithBinary:str2 size:strlen(str2)];
+    OCMixed *mixedBinary3 = [OCMixed mixedWithBinary:str2 size:strlen(str2)];
     STAssertEquals([mixedBinary1 isEqual:mixedBinary1], YES, @"Same mixed should be equal (7)");
     STAssertEquals([mixedBinary2 isEqual:mixedBinary2], YES, @"Same mixed should be equal (8)");
     STAssertEquals([mixedBinary2 isEqual:mixedBinary3], YES, @"Mixed with same binary data should be equal");
     STAssertEquals([mixedBinary1 isEqual:mixedBinary2], NO,  @"Mixed with different binary data should be different");
 
-    OCMixed *mixedDate1 = [OCMixed mixedWithDate:[[OCDate alloc] initWithDate:nowTime]];
-    OCMixed *mixedDate2 = [OCMixed mixedWithDate:[[OCDate alloc] initWithDate:nowTime+1]];
-    OCMixed *mixedDate3 = [OCMixed mixedWithDate:[[OCDate alloc] initWithDate:nowTime+1]];
+    OCMixed *mixedDate1 = [OCMixed mixedWithDate:nowTime];
+    OCMixed *mixedDate2 = [OCMixed mixedWithDate:nowTime+1];
+    OCMixed *mixedDate3 = [OCMixed mixedWithDate:nowTime+1];
     STAssertEquals([mixedDate1 isEqual:mixedDate1], YES, @"Same mixed should be equal (9)");
     STAssertEquals([mixedDate2 isEqual:mixedDate2], YES, @"Same mixed should be equal (10)");
     STAssertEquals([mixedDate2 isEqual:mixedDate3], YES, @"Mixed with same timestamps should be equal");
@@ -130,18 +130,16 @@ TIGHTDB_TABLE_2(SubMixedTable,
 - (void)testMixed
 {
     time_t nowTime = [[NSDate date] timeIntervalSince1970];
-    
+
     SubMixedTable *tableSub = [[SubMixedTable alloc] init];
-    
+
     // Add some rows
     [tableSub addHired:YES Age:20];
     [tableSub addHired:NO Age:21];
     [tableSub addHired:YES Age:22];
     [tableSub addHired:NO Age:43];
     [tableSub addHired:YES Age:54];
-    
 
-    
     Group *group = [Group group];
     // Create new table in group
     MixedTable *table = [group getTable:@"MixedValues" withClass:[MixedTable class]];
@@ -153,15 +151,15 @@ TIGHTDB_TABLE_2(SubMixedTable,
     [table addHired:YES Other:[OCMixed mixedWithString:@"Joergen"] Age:53];
     [table addHired:YES Other:[OCMixed mixedWithString:@"Dave"] Age:54];
     [table addHired:YES Other:mixedTable Age:54];
-    OCMixed *mixedDate = [OCMixed mixedWithDate:[[OCDate alloc] initWithDate:nowTime]];
+    OCMixed *mixedDate = [OCMixed mixedWithDate:nowTime];
     [table addHired:YES Other:mixedDate Age:54];
-    
+
     // Test isequal
-    OCMixed *mixedDate2 = [OCMixed mixedWithDate:[[OCDate alloc] initWithDate:nowTime]];
-    OCMixed *mixedDate3 = [OCMixed mixedWithDate:[[OCDate alloc] initWithDate:nowTime+1]];
+    OCMixed *mixedDate2 = [OCMixed mixedWithDate:nowTime];
+    OCMixed *mixedDate3 = [OCMixed mixedWithDate:nowTime+1];
     STAssertEquals([mixedDate isEqual:mixedDate2], YES,@"Mixed dates should be equal");
     STAssertEquals([mixedDate isEqual:mixedDate3], NO,@"Mixed dates should not be equal");
-    
+
     // Test cast and isClass
     Table *unknownTable = [mixedTable getTable];
     NSLog(@"Is SubMixedTable type: %i", [unknownTable isClass:[SubMixedTable class]]);
@@ -170,9 +168,9 @@ TIGHTDB_TABLE_2(SubMixedTable,
     NSLog(@"TableSub Size: %lu", [tableSub count]);
     STAssertEquals([tableSub count], (size_t)5,@"Subtable should have 5 rows");
     NSLog(@"Count int: %lu", [table countInt:2 target:50]);
-    NSLog(@"Max: %lld", [table maximum:2]);
-    NSLog(@"Avg: %.2f", [table average:2]);
-    
+    NSLog(@"Max: %lld", [table maxInt:2]);
+    NSLog(@"Avg: %.2f", [table avgInt:2]);
+
     NSLog(@"MyTable Size: %lu", [table count]);
     int sumType = 0;
     for (size_t i = 0; i < [table count]; i++) {
@@ -183,8 +181,8 @@ TIGHTDB_TABLE_2(SubMixedTable,
         if ([cursor.Other getType] == tightdb_String)
             NSLog(@"StringMixed: %@", [cursor.Other getString]);
         else if ([cursor.Other getType] == tightdb_Date) {
-            NSLog(@"DateMixed: %ld", [[cursor.Other getDate] getDate]);
-            STAssertEquals(nowTime, [[cursor.Other getDate] getDate],@"Date should match what went in");
+            NSLog(@"DateMixed: %ld", [cursor.Other getDate]);
+            STAssertEquals(nowTime, [cursor.Other getDate],@"Date should match what went in");
         }
         else if ([cursor.Other getType] == tightdb_Table) {
             NSLog(@"TableMixed: %@", [cursor.Other getTable]);

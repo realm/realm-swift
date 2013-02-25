@@ -24,6 +24,8 @@
 typedef enum {
     tightdb_Bool   =  1,
     tightdb_Int    =  0,
+    tightdb_Float  =  9,
+    tightdb_Double = 10,
     tightdb_String =  2,
     tightdb_Binary =  4,
     tightdb_Date   =  7,

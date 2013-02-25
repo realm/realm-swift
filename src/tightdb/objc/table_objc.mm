@@ -7,6 +7,7 @@
 
 #import <tightdb/table.hpp>
 #import <tightdb/table_view.hpp>
+#import <tightdb/lang_bind_helper.hpp>
 
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/table_priv.h>
@@ -20,7 +21,7 @@
 {
     tightdb::BinaryData _data;
 }
--(id)initWithData:(const char *)data len:(size_t)size
+-(id)initWithData:(const char *)data size:(size_t)size
 {
     self = [super init];
     if (self) {
@@ -56,37 +57,6 @@
 @end
 
 
-#pragma mark - Date
-@implementation OCDate
-{
-    tightdb::Date *_date;
-}
--(id)initWithDate:(time_t)d
-{
-    self = [super init];
-    if (self) {
-        _date = new tightdb::Date(d);
-    }
-    return self;
-}
--(time_t)getDate
-{
-    return _date->get_date();
-}
--(BOOL)isEqual:(OCDate *)other
-{
-    return [self getDate] == [other getDate];
-}
-
--(void)dealloc
-{
-#ifdef TIGHTDB_DEBUG
-    NSLog(@"OCDate dealloc");
-#endif
-    delete _date;
-}
-@end
-
 #pragma mark - Mixed
 @interface OCMixed()
 @property (nonatomic) tightdb::Mixed mixed;
@@ -97,74 +67,74 @@
 @synthesize mixed = _mixed;
 @synthesize table = _table;
 
-+(OCMixed *)mixedWithMixed:(tightdb::Mixed&)other
-{
-    OCMixed *mixed = [[OCMixed alloc] init];
-
-    mixed.mixed = other;
-
-    return mixed;
-}
-+(OCMixed *)mixedWithTable:(Table *)table
-{
-    OCMixed *mixed = [[OCMixed alloc] init];
-
-    mixed.mixed = tightdb::Mixed(tightdb::Mixed::subtable_tag());
-    mixed.table = table;
-    return mixed;
-}
-
 +(OCMixed *)mixedWithBool:(BOOL)value
 {
     OCMixed *mixed = [[OCMixed alloc] init];
-
     mixed.mixed = tightdb::Mixed((bool)value);
-
-    return mixed;
-}
-
-+(OCMixed *)mixedWithDate:(OCDate *)date
-{
-    OCMixed *mixed = [[OCMixed alloc] init];
-
-    mixed.mixed = tightdb::Mixed(tightdb::Date([date getDate]));
-
     return mixed;
 }
 
 +(OCMixed *)mixedWithInt64:(int64_t)value
 {
     OCMixed *mixed = [[OCMixed alloc] init];
-
     mixed.mixed = tightdb::Mixed(value);
-
     return mixed;
 }
 
-+(OCMixed *)mixedWithString:(NSString *)string
++(OCMixed *)mixedWithFloat:(float)value
 {
     OCMixed *mixed = [[OCMixed alloc] init];
-
-    mixed.mixed = tightdb::Mixed((const char *)[string UTF8String]);
-
+    mixed.mixed = tightdb::Mixed(value);
     return mixed;
 }
 
-+(OCMixed *)mixedWithBinary:(BinaryData *)data
++(OCMixed *)mixedWithDouble:(double)value
 {
     OCMixed *mixed = [[OCMixed alloc] init];
-
-    mixed.mixed = tightdb::Mixed([data getBinary]);
-
+    mixed.mixed = tightdb::Mixed(value);
     return mixed;
 }
 
-+(OCMixed *)mixedWithBinary:(const char*)value length:(size_t)length
++(OCMixed *)mixedWithString:(NSString *)value
 {
     OCMixed *mixed = [[OCMixed alloc] init];
+    mixed.mixed = tightdb::Mixed((const char *)[value UTF8String]);
+    return mixed;
+}
 
-    mixed.mixed = tightdb::Mixed(tightdb::BinaryData(value, length));
++(OCMixed *)mixedWithBinary:(BinaryData *)value
+{
+    OCMixed *mixed = [[OCMixed alloc] init];
+    mixed.mixed = tightdb::Mixed([value getBinary]);
+    return mixed;
+}
 
++(OCMixed *)mixedWithBinary:(const char *)data size:(size_t)size
+{
+    OCMixed *mixed = [[OCMixed alloc] init];
+    mixed.mixed = tightdb::Mixed(tightdb::BinaryData(data, size));
+    return mixed;
+}
+
++(OCMixed *)mixedWithDate:(time_t)value
+{
+    OCMixed *mixed = [[OCMixed alloc] init];
+    mixed.mixed = tightdb::Mixed(tightdb::Date(value));
+    return mixed;
+}
+
++(OCMixed *)mixedWithTable:(Table *)value
+{
+    OCMixed *mixed = [[OCMixed alloc] init];
+    mixed.mixed = tightdb::Mixed(tightdb::Mixed::subtable_tag());
+    mixed.table = value;
+    return mixed;
+}
+
++(OCMixed *)mixedWithMixed:(tightdb::Mixed&)value
+{
+    OCMixed *mixed = [[OCMixed alloc] init];
+    mixed.mixed = value;
     return mixed;
 }
 
@@ -177,6 +147,10 @@
             return _mixed.get_bool() == other->_mixed.get_bool();
         case tightdb::type_Int:
             return _mixed.get_int() == other->_mixed.get_int();
+        case tightdb::type_Float:
+            return _mixed.get_float() == other->_mixed.get_float();
+        case tightdb::type_Double:
+            return _mixed.get_double() == other->_mixed.get_double();
         case tightdb::type_String:
             return std::strcmp(_mixed.get_string(), other->_mixed.get_string()) == 0;
         case tightdb::type_Binary:
@@ -185,7 +159,6 @@
             return _mixed.get_date() == other->_mixed.get_date();
         case tightdb::type_Table:
             return [_table getTable] == [other->_table getTable]; // Compare table contents
-            break;
         case tightdb::type_Mixed:
             TIGHTDB_ASSERT(false);
             break;
@@ -197,18 +170,25 @@
 {
     return (TightdbDataType)_mixed.get_type();
 }
--(int64_t)getInt
-{
-    return _mixed.get_int();
-}
+
 -(BOOL)getBool
 {
     return _mixed.get_bool();
 }
 
--(OCDate *)getDate
+-(int64_t)getInt
 {
-    return [[OCDate alloc] initWithDate:_mixed.get_date()];
+    return _mixed.get_int();
+}
+
+-(float)getFloat
+{
+    return _mixed.get_float();
+}
+
+-(double)getDouble
+{
+    return _mixed.get_double();
 }
 
 -(NSString *)getString
@@ -219,6 +199,11 @@
 -(BinaryData *)getBinary
 {
     return [[BinaryData alloc] initWithBinary:_mixed.get_binary()];
+}
+
+-(time_t)getDate
+{
+    return _mixed.get_date();
 }
 
 -(Table *)getTable
@@ -269,9 +254,9 @@
 }
 
 // FIXME: Detect errors from core library
--(OCSpec *)getSpec:(size_t)columnId
+-(OCSpec *)getSubspec:(size_t)col_ndx
 {
-    tightdb::Spec tmp = _spec->get_subtable_spec(columnId);
+    tightdb::Spec tmp = _spec->get_subtable_spec(col_ndx);
     return [OCSpec specWithSpec:&tmp isOwned:TRUE];
 }
 
@@ -362,21 +347,21 @@
 {
     return _tableView->is_empty();
 }
--(int64_t)get:(size_t)columnId ndx:(size_t)ndx
+-(int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return _tableView->get_int(columnId, ndx);
+    return _tableView->get_int(col_ndx, ndx);
 }
--(BOOL)getBool:(size_t)columnId ndx:(size_t)ndx
+-(BOOL)getBool:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return _tableView->get_bool(columnId, ndx);
+    return _tableView->get_bool(col_ndx, ndx);
 }
--(time_t)getDate:(size_t)columnId ndx:(size_t)ndx
+-(time_t)getDate:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return _tableView->get_date(columnId, ndx);
+    return _tableView->get_date(col_ndx, ndx);
 }
--(NSString *)getString:(size_t)columnId ndx:(size_t)ndx
+-(NSString *)getString:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return [NSString stringWithUTF8String:_tableView->get_string(columnId, ndx)];
+    return [NSString stringWithUTF8String:_tableView->get_string(col_ndx, ndx)];
 }
 -(void)delete:(size_t)ndx
 {
@@ -504,11 +489,16 @@
     _readOnly = readOnly;
 }
 
--(Table *)getSubtable:(size_t)columnId ndx:(size_t)ndx
+-(BOOL)isEqual:(Table *)other
 {
-    const tightdb::DataType t = _table->get_column_type(columnId);
+    return *_table == *other->_table;
+}
+
+-(Table *)getSubtable:(size_t)col_ndx ndx:(size_t)ndx
+{
+    const tightdb::DataType t = _table->get_column_type(col_ndx);
     if (t != tightdb::type_Table && t != tightdb::type_Mixed) return nil;
-    tightdb::TableRef r = _table->get_subtable(columnId, ndx);
+    tightdb::TableRef r = _table->get_subtable(col_ndx, ndx);
     if (!r) return nil;
     Table *table = [[Table alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table)) return nil;
@@ -519,11 +509,11 @@
 }
 
 // FIXME: Check that the specified class derives from Table.
--(id)getSubtable:(size_t)columnId ndx:(size_t)ndx withClass:(__unsafe_unretained Class)classObj
+-(id)getSubtable:(size_t)col_ndx ndx:(size_t)ndx withClass:(__unsafe_unretained Class)classObj
 {
-    const tightdb::DataType t = _table->get_column_type(columnId);
+    const tightdb::DataType t = _table->get_column_type(col_ndx);
     if (t != tightdb::type_Table && t != tightdb::type_Mixed) return nil;
-    tightdb::TableRef r = _table->get_subtable(columnId, ndx);
+    tightdb::TableRef r = _table->get_subtable(col_ndx, ndx);
     if (!r) return nil;
     Table *table = [[classObj alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table)) return nil;
@@ -621,65 +611,103 @@
         [NSException raise:@"Table is read only" format:@"Tried to pop back while read only"];
     _table->remove_last();
 }
--(int64_t)get:(size_t)columnId ndx:(size_t)ndx
+-(int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return _table->get_int(columnId, ndx);
+    return _table->get_int(col_ndx, ndx);
 }
--(void)set:(size_t)columnId ndx:(size_t)ndx value:(int64_t)value
+-(void)set:(size_t)col_ndx ndx:(size_t)ndx value:(int64_t)value
 {
     if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)columnId];
-    _table->set_int(columnId, ndx, value);
+        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->set_int(col_ndx, ndx, value);
 }
--(BOOL)getBool:(size_t)columnId ndx:(size_t)ndx
+-(BOOL)getBool:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return _table->get_bool(columnId, ndx);
+    return _table->get_bool(col_ndx, ndx);
 }
--(void)setBool:(size_t)columnId ndx:(size_t)ndx value:(BOOL)value
-{
-    if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)columnId];
-    _table->set_bool(columnId, ndx, value);
-}
--(time_t)getDate:(size_t)columnId ndx:(size_t)ndx
-{
-    return _table->get_date(columnId, ndx);
-}
--(void)setDate:(size_t)columnId ndx:(size_t)ndx value:(time_t)value
+-(void)setBool:(size_t)col_ndx ndx:(size_t)ndx value:(BOOL)value
 {
     if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)columnId];
-    _table->set_date(columnId, ndx, value);
+        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->set_bool(col_ndx, ndx, value);
 }
--(void)insertInt:(size_t)columnId ndx:(size_t)ndx value:(int64_t)value
+-(float)getFloat:(size_t)col_ndx ndx:(size_t)ndx
+{
+    return _table->get_float(col_ndx, ndx);
+}
+-(void)setFloat:(size_t)col_ndx ndx:(size_t)ndx value:(float)value
 {
     if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)columnId];
-    _table->insert_int(columnId, ndx, value);
+        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->set_float(col_ndx, ndx, value);
 }
--(void)insertBool:(size_t)columnId ndx:(size_t)ndx value:(BOOL)value
+-(double)getDouble:(size_t)col_ndx ndx:(size_t)ndx
+{
+    return _table->get_double(col_ndx, ndx);
+}
+-(void)setDouble:(size_t)col_ndx ndx:(size_t)ndx value:(double)value
 {
     if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)columnId];
-    _table->insert_bool(columnId, ndx, value);
+        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->set_double(col_ndx, ndx, value);
 }
--(void)insertDate:(size_t)columnId ndx:(size_t)ndx value:(time_t)value
+-(time_t)getDate:(size_t)col_ndx ndx:(size_t)ndx
+{
+    return _table->get_date(col_ndx, ndx);
+}
+-(void)setDate:(size_t)col_ndx ndx:(size_t)ndx value:(time_t)value
 {
     if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)columnId];
-    _table->insert_date(columnId, ndx, value);
+        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->set_date(col_ndx, ndx, value);
 }
--(void)insertString:(size_t)columnId ndx:(size_t)ndx value:(NSString *)value
+-(void)insertBool:(size_t)col_ndx ndx:(size_t)ndx value:(BOOL)value
 {
     if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)columnId];
-    _table->insert_string(columnId, ndx, [value UTF8String]);
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->insert_bool(col_ndx, ndx, value);
 }
--(void)insertBinary:(size_t)columnId ndx:(size_t)ndx value:(void *)value len:(size_t)len
+-(void)insertInt:(size_t)col_ndx ndx:(size_t)ndx value:(int64_t)value
 {
     if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)columnId];
-    _table->insert_binary(columnId, ndx, (const char*)value, len);
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->insert_int(col_ndx, ndx, value);
+}
+-(void)insertFloat:(size_t)col_ndx ndx:(size_t)ndx value:(float)value
+{
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->insert_float(col_ndx, ndx, value);
+}
+-(void)insertDouble:(size_t)col_ndx ndx:(size_t)ndx value:(double)value
+{
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->insert_double(col_ndx, ndx, value);
+}
+-(void)insertString:(size_t)col_ndx ndx:(size_t)ndx value:(NSString *)value
+{
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->insert_string(col_ndx, ndx, [value UTF8String]);
+}
+-(void)insertBinary:(size_t)col_ndx ndx:(size_t)ndx value:(BinaryData *)value
+{
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->insert_binary(col_ndx, ndx, [value getData], [value getSize]);
+}
+-(void)insertBinary:(size_t)col_ndx ndx:(size_t)ndx data:(const char *)data size:(size_t)size
+{
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->insert_binary(col_ndx, ndx, data, size);
+}
+-(void)insertDate:(size_t)col_ndx ndx:(size_t)ndx value:(time_t)value
+{
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->insert_date(col_ndx, ndx, value);
 }
 
 -(void)insertDone
@@ -687,165 +715,229 @@
     _table->insert_done();
 }
 
--(NSString *)getString:(size_t)columnId ndx:(size_t)ndx
+-(NSString *)getString:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return [NSString stringWithUTF8String:_table->get_string(columnId, ndx)];
+    return [NSString stringWithUTF8String:_table->get_string(col_ndx, ndx)];
 }
 
--(void)setString:(size_t)columnId ndx:(size_t)ndx value:(NSString *)value
+-(void)setString:(size_t)col_ndx ndx:(size_t)ndx value:(NSString *)value
 {
-    _table->set_string(columnId, ndx, [value UTF8String]);
+    _table->set_string(col_ndx, ndx, [value UTF8String]);
 }
 
--(BinaryData *)getBinary:(size_t)columnId ndx:(size_t)ndx
+-(BinaryData *)getBinary:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return [[BinaryData alloc] initWithBinary:_table->get_binary(columnId, ndx)];
+    return [[BinaryData alloc] initWithBinary:_table->get_binary(col_ndx, ndx)];
 }
 
--(void)setBinary:(size_t)columnId ndx:(size_t)ndx value:(void *)value len:(size_t)len
+-(void)setBinary:(size_t)col_ndx ndx:(size_t)ndx value:(BinaryData *)value
 {
     if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)columnId];
-    _table->set_binary(columnId, ndx, (const char*)value, len);
+        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->set_binary(col_ndx, ndx, [value getData], [value getSize]);
 }
 
--(size_t)getTableSize:(size_t)columnId ndx:(size_t)ndx
-{
-    return _table->get_subtable_size(columnId, ndx);
-}
-
--(void)insertSubtable:(size_t)columnId ndx:(size_t)ndx
+-(void)setBinary:(size_t)col_ndx ndx:(size_t)ndx data:(const char *)data size:(size_t)size
 {
     if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)columnId];
-    _table->insert_subtable(columnId, ndx);
+        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->set_binary(col_ndx, ndx, data, size);
 }
 
--(void)_insertSubtableCopy:(size_t)col_ndx row_ndx:(size_t)row_ndx subtable:(Table *)subtable
+-(size_t)getTableSize:(size_t)col_ndx ndx:(size_t)row_ndx
 {
-    [self insertSubtable:col_ndx ndx:row_ndx];
-    /* FIXME: Perform table copying here, but only if 'subtable' is not 'nil'. */
-    (void)subtable;
+    return _table->get_subtable_size(col_ndx, row_ndx);
 }
 
--(void)clearTable:(size_t)columnId ndx:(size_t)ndx
+-(void)insertSubtable:(size_t)col_ndx ndx:(size_t)row_ndx
 {
     if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to clear while read only ColumnId: %llu", (unsigned long long)columnId];
-    _table->clear_subtable(columnId, ndx);
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->insert_subtable(col_ndx, row_ndx);
 }
 
--(OCMixed *)getMixed:(size_t)columnId ndx:(size_t)ndx
+-(void)_insertSubtableCopy:(size_t)col_ndx row:(size_t)row_ndx subtable:(Table *)subtable
 {
-    tightdb::Mixed tmp = _table->get_mixed(columnId, ndx);
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    tightdb::LangBindHelper::insert_subtable(*_table, col_ndx, row_ndx, [subtable getTable]);
+}
+
+-(void)clearSubtable:(size_t)col_ndx ndx:(size_t)row_ndx
+{
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to clear while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    _table->clear_subtable(col_ndx, row_ndx);
+}
+
+-(OCMixed *)getMixed:(size_t)col_ndx ndx:(size_t)row_ndx
+{
+    tightdb::Mixed tmp = _table->get_mixed(col_ndx, row_ndx);
     OCMixed *mixed = [OCMixed mixedWithMixed:tmp];
     if ([mixed getType] == tightdb_Table) {
-        [mixed setTable:[self getSubtable:columnId ndx:ndx]];
+        [mixed setTable:[self getSubtable:col_ndx ndx:row_ndx]];
     }
     return mixed;
 }
 
--(TightdbDataType)getMixedType:(size_t)columnId ndx:(size_t)ndx
+-(TightdbDataType)getMixedType:(size_t)col_ndx ndx:(size_t)row_ndx
 {
-    return (TightdbDataType)_table->get_mixed_type(columnId, ndx);
+    return (TightdbDataType)_table->get_mixed_type(col_ndx, row_ndx);
 }
 
--(void)insertMixed:(size_t)columnId ndx:(size_t)ndx value:(OCMixed *)value
+-(void)insertMixed:(size_t)col_ndx ndx:(size_t)row_ndx value:(OCMixed *)value
 {
     if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)columnId];
-    _table->insert_mixed(columnId, ndx, value.mixed);
-    // FIXME: Insert copy of subtable if type is table
+        [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    if (value.mixed.get_type() == tightdb::type_Table && value.table) {
+        tightdb::LangBindHelper::insert_mixed_subtable(*_table, col_ndx, row_ndx,
+                                                       [value.table getTable]);
+    }
+    else {
+        _table->insert_mixed(col_ndx, row_ndx, value.mixed);
+    }
 }
--(void)setMixed:(size_t)columnId ndx:(size_t)ndx value:(OCMixed *)value
+-(void)setMixed:(size_t)col_ndx ndx:(size_t)row_ndx value:(OCMixed *)value
 {
     if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)columnId];
-    _table->set_mixed(columnId, ndx, value.mixed);
-    // FIXME: Insert copy of subtable if type is table
+        [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx];
+    if (value.mixed.get_type() == tightdb::type_Table && value.table) {
+        tightdb::LangBindHelper::set_mixed_subtable(*_table, col_ndx, row_ndx,
+                                                    [value.table getTable]);
+    }
+    else {
+        _table->set_mixed(col_ndx, row_ndx, value.mixed);
+    }
 }
 
 -(size_t)addColumn:(TightdbDataType)type name:(NSString *)name
 {
     return _table->add_column((tightdb::DataType)type, [name UTF8String]);
 }
--(size_t)findBool:(size_t)columnId value:(BOOL)value
+-(size_t)findBool:(size_t)col_ndx value:(BOOL)value
 {
-    return _table->find_first_bool(columnId, value);
+    return _table->find_first_bool(col_ndx, value);
 }
--(size_t)findInt:(size_t)columnId value:(int64_t)value
+-(size_t)findInt:(size_t)col_ndx value:(int64_t)value
 {
-    return _table->find_first_int(columnId, value);
+    return _table->find_first_int(col_ndx, value);
 }
--(size_t)findString:(size_t)columnId value:(NSString *)value
+-(size_t)findFloat:(size_t)col_ndx value:(float)value
 {
-    return _table->find_first_string(columnId, [value UTF8String]);
+    return _table->find_first_float(col_ndx, value);
 }
--(size_t)findBinary:(size_t)columnId value:(BinaryData *)value
+-(size_t)findDouble:(size_t)col_ndx value:(double)value
 {
-    return _table->find_first_binary(columnId, [value getData], [value getSize]);
+    return _table->find_first_double(col_ndx, value);
 }
--(size_t)findDate:(size_t)columnId value:(time_t)value
+-(size_t)findString:(size_t)col_ndx value:(NSString *)value
 {
-    return _table->find_first_date(columnId, value);
+    return _table->find_first_string(col_ndx, [value UTF8String]);
 }
--(size_t)findMixed:(size_t)columnId value:(OCMixed *)value
+-(size_t)findBinary:(size_t)col_ndx value:(BinaryData *)value
 {
-    static_cast<void>(columnId);
+    return _table->find_first_binary(col_ndx, [value getData], [value getSize]);
+}
+-(size_t)findDate:(size_t)col_ndx value:(time_t)value
+{
+    return _table->find_first_date(col_ndx, value);
+}
+-(size_t)findMixed:(size_t)col_ndx value:(OCMixed *)value
+{
+    static_cast<void>(col_ndx);
     static_cast<void>(value);
     [NSException raise:@"NotImplemented" format:@"Not implemented"];
     // FIXME: Implement this!
-    // return _table->find_first_mixed(columnId, value);
+    // return _table->find_first_mixed(col_ndx, value);
     return 0;
 }
 
--(TableView *)findAll:(TableView *)view column:(size_t)columnId value:(int64_t)value
+-(TableView *)findAll:(TableView *)view column:(size_t)col_ndx value:(int64_t)value
 {
-    *view.tableView = _table->find_all_int(columnId, value);
+    *view.tableView = _table->find_all_int(col_ndx, value);
     return view;
 }
 
--(BOOL)hasIndex:(size_t)columnId
+-(BOOL)hasIndex:(size_t)col_ndx
 {
-    return _table->has_index(columnId);
+    return _table->has_index(col_ndx);
 }
--(void)setIndex:(size_t)columnId
+-(void)setIndex:(size_t)col_ndx
 {
-    _table->set_index(columnId);
+    _table->set_index(col_ndx);
 }
 -(void)optimize
 {
     _table->optimize();
 }
 
--(size_t)countInt:(size_t)columnId target:(int64_t)target
+-(size_t)countInt:(size_t)col_ndx target:(int64_t)target
 {
-    return _table->count_int(columnId, target);
+    return _table->count_int(col_ndx, target);
+}
+-(size_t)countFloat:(size_t)col_ndx target:(float)target
+{
+    return _table->count_float(col_ndx, target);
+}
+-(size_t)countDouble:(size_t)col_ndx target:(double)target
+{
+    return _table->count_double(col_ndx, target);
+}
+-(size_t)countString:(size_t)col_ndx target:(NSString *)target
+{
+    return _table->count_string(col_ndx, [target UTF8String]);
 }
 
--(size_t)countString:(size_t)columnId target:(NSString *)target
+-(int64_t)sumInt:(size_t)col_ndx
 {
-    return _table->count_string(columnId, [target UTF8String]);
+    return _table->sum(col_ndx);
+}
+-(double)sumFloat:(size_t)col_ndx
+{
+    return _table->sum_float(col_ndx);
+}
+-(double)sumDouble:(size_t)col_ndx
+{
+    return _table->sum_double(col_ndx);
 }
 
--(int64_t)sum:(size_t)columnId
+-(int64_t)maxInt:(size_t)col_ndx
 {
-    return _table->sum(columnId);
+    return _table->maximum(col_ndx);
+}
+-(float)maxFloat:(size_t)col_ndx
+{
+    return _table->maximum_float(col_ndx);
+}
+-(double)maxDouble:(size_t)col_ndx
+{
+    return _table->maximum_double(col_ndx);
 }
 
--(int64_t)maximum:(size_t)columnId
+-(int64_t)minInt:(size_t)col_ndx
 {
-    return _table->maximum(columnId);
+    return _table->minimum(col_ndx);
+}
+-(float)minFloat:(size_t)col_ndx
+{
+    return _table->minimum_float(col_ndx);
+}
+-(double)minDouble:(size_t)col_ndx
+{
+    return _table->minimum_double(col_ndx);
 }
 
--(int64_t)minimum:(size_t)columnId
+-(double)avgInt:(size_t)col_ndx
 {
-    return _table->minimum(columnId);
+    return _table->average(col_ndx);
 }
-
--(double)average:(size_t)columnId
+-(double)avgFloat:(size_t)col_ndx
 {
-    return _table->average(columnId);
+    return _table->average_float(col_ndx);
+}
+-(double)avgDouble:(size_t)col_ndx
+{
+    return _table->average_double(col_ndx);
 }
 
 -(BOOL)_addColumns
@@ -899,6 +991,68 @@
     TableView *view = [TableView tableViewWithTable:self.table];
     return [self.table findAll:view column:self.column value:value];
 }
+-(int64_t)min
+{
+    return [self.table minInt:self.column];
+}
+-(int64_t)max
+{
+    return [self.table maxInt:self.column];
+}
+-(int64_t)sum
+{
+    return [self.table sumInt:self.column];
+}
+-(double)avg
+{
+    return [self.table avgInt:self.column];
+}
+@end
+
+@implementation OCColumnProxy_Float
+-(size_t)find:(float)value
+{
+    return [self.table findFloat:self.column value:value];
+}
+-(float)min
+{
+    return [self.table minFloat:self.column];
+}
+-(float)max
+{
+    return [self.table maxFloat:self.column];
+}
+-(double)sum
+{
+    return [self.table sumFloat:self.column];
+}
+-(double)avg
+{
+    return [self.table avgFloat:self.column];
+}
+@end
+
+@implementation OCColumnProxy_Double
+-(size_t)find:(double)value
+{
+    return [self.table findDouble:self.column value:value];
+}
+-(double)min
+{
+    return [self.table minDouble:self.column];
+}
+-(double)max
+{
+    return [self.table maxDouble:self.column];
+}
+-(double)sum
+{
+    return [self.table sumDouble:self.column];
+}
+-(double)avg
+{
+    return [self.table avgDouble:self.column];
+}
 @end
 
 @implementation OCColumnProxy_String
@@ -920,6 +1074,9 @@
 {
     return [self.table findDate:self.column value:value];
 }
+@end
+
+@implementation OCColumnProxy_Subtable
 @end
 
 @implementation OCColumnProxy_Mixed

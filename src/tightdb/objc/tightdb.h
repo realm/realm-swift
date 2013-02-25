@@ -40,19 +40,15 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy_##TableName : OCColumnProxy \
--(size_t)find:(NSString*)value; \
-@end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1; \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1; \
--(TableName##_Query *)getQuery; \
+TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1; \
+-(TableName##_Query *)where; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -128,23 +124,17 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName1, CType1) \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
-@implementation OCColumnProxy_##TableName \
--(size_t)find:(NSString *)value \
-{ \
-    return [self.table findString:self.column value:value]; \
-} \
-@end \
 @implementation TableName \
 { \
     TableName##_Cursor *tmpCursor; \
 } \
-@synthesize CName1 = _##CName1; \
+TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
     return self; \
 } \
 -(id)init \
@@ -153,21 +143,21 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     [self insertDone]; \
 } \
--(TableName##_Query *)getQuery \
+-(TableName##_Query *)where \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
@@ -251,20 +241,16 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy_##TableName : OCColumnProxy \
--(size_t)find:(NSString*)value; \
-@end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2; \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2; \
--(TableName##_Query *)getQuery; \
+TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2; \
+-(TableName##_Query *)where; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -346,25 +332,19 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName2, CType2) \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
-@implementation OCColumnProxy_##TableName \
--(size_t)find:(NSString *)value \
-{ \
-    return [self.table findString:self.column value:value]; \
-} \
-@end \
 @implementation TableName \
 { \
     TableName##_Cursor *tmpCursor; \
 } \
-@synthesize CName1 = _##CName1; \
-@synthesize CName2 = _##CName2; \
+TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
     return self; \
 } \
 -(id)init \
@@ -373,24 +353,24 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
     [self insertDone]; \
 } \
--(TableName##_Query *)getQuery \
+-(TableName##_Query *)where \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
@@ -479,21 +459,17 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy_##TableName : OCColumnProxy \
--(size_t)find:(NSString*)value; \
-@end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3; \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3; \
--(TableName##_Query *)getQuery; \
+TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3; \
+-(TableName##_Query *)where; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -581,27 +557,21 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
-@implementation OCColumnProxy_##TableName \
--(size_t)find:(NSString *)value \
-{ \
-    return [self.table findString:self.column value:value]; \
-} \
-@end \
 @implementation TableName \
 { \
     TableName##_Cursor *tmpCursor; \
 } \
-@synthesize CName1 = _##CName1; \
-@synthesize CName2 = _##CName2; \
-@synthesize CName3 = _##CName3; \
+TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
     return self; \
 } \
 -(id)init \
@@ -610,12 +580,12 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -623,14 +593,14 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
     TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
     TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
     [self insertDone]; \
 } \
--(TableName##_Query *)getQuery \
+-(TableName##_Query *)where \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
@@ -724,22 +694,18 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy_##TableName : OCColumnProxy \
--(size_t)find:(NSString*)value; \
-@end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4; \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4; \
--(TableName##_Query *)getQuery; \
+TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4; \
+-(TableName##_Query *)where; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -833,29 +799,23 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
-@implementation OCColumnProxy_##TableName \
--(size_t)find:(NSString *)value \
-{ \
-    return [self.table findString:self.column value:value]; \
-} \
-@end \
 @implementation TableName \
 { \
     TableName##_Cursor *tmpCursor; \
 } \
-@synthesize CName1 = _##CName1; \
-@synthesize CName2 = _##CName2; \
-@synthesize CName3 = _##CName3; \
-@synthesize CName4 = _##CName4; \
+TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
     return self; \
 } \
 -(id)init \
@@ -864,13 +824,13 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -879,7 +839,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
     TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -887,7 +847,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
     TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
     [self insertDone]; \
 } \
--(TableName##_Query *)getQuery \
+-(TableName##_Query *)where \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
@@ -986,23 +946,19 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy_##TableName : OCColumnProxy \
--(size_t)find:(NSString*)value; \
-@end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5; \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5; \
--(TableName##_Query *)getQuery; \
+TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5; \
+-(TableName##_Query *)where; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -1102,31 +1058,25 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
-@implementation OCColumnProxy_##TableName \
--(size_t)find:(NSString *)value \
-{ \
-    return [self.table findString:self.column value:value]; \
-} \
-@end \
 @implementation TableName \
 { \
     TableName##_Cursor *tmpCursor; \
 } \
-@synthesize CName1 = _##CName1; \
-@synthesize CName2 = _##CName2; \
-@synthesize CName3 = _##CName3; \
-@synthesize CName4 = _##CName4; \
-@synthesize CName5 = _##CName5; \
+TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
     return self; \
 } \
 -(id)init \
@@ -1135,14 +1085,14 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -1152,7 +1102,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
     TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -1161,7 +1111,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
     TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
     [self insertDone]; \
 } \
--(TableName##_Query *)getQuery \
+-(TableName##_Query *)where \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
@@ -1265,24 +1215,20 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy_##TableName : OCColumnProxy \
--(size_t)find:(NSString*)value; \
-@end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6; \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6; \
--(TableName##_Query *)getQuery; \
+TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6; \
+-(TableName##_Query *)where; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -1388,33 +1334,27 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
-@implementation OCColumnProxy_##TableName \
--(size_t)find:(NSString *)value \
-{ \
-    return [self.table findString:self.column value:value]; \
-} \
-@end \
 @implementation TableName \
 { \
     TableName##_Cursor *tmpCursor; \
 } \
-@synthesize CName1 = _##CName1; \
-@synthesize CName2 = _##CName2; \
-@synthesize CName3 = _##CName3; \
-@synthesize CName4 = _##CName4; \
-@synthesize CName5 = _##CName5; \
-@synthesize CName6 = _##CName6; \
+TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
     return self; \
 } \
 -(id)init \
@@ -1423,15 +1363,15 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -1442,7 +1382,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
     TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -1452,7 +1392,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
     TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
     [self insertDone]; \
 } \
--(TableName##_Query *)getQuery \
+-(TableName##_Query *)where \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
@@ -1561,25 +1501,21 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy_##TableName : OCColumnProxy \
--(size_t)find:(NSString*)value; \
-@end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7; \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7; \
--(TableName##_Query *)getQuery; \
+TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7; \
+-(TableName##_Query *)where; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -1691,35 +1627,29 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
-@implementation OCColumnProxy_##TableName \
--(size_t)find:(NSString *)value \
-{ \
-    return [self.table findString:self.column value:value]; \
-} \
-@end \
 @implementation TableName \
 { \
     TableName##_Cursor *tmpCursor; \
 } \
-@synthesize CName1 = _##CName1; \
-@synthesize CName2 = _##CName2; \
-@synthesize CName3 = _##CName3; \
-@synthesize CName4 = _##CName4; \
-@synthesize CName5 = _##CName5; \
-@synthesize CName6 = _##CName6; \
-@synthesize CName7 = _##CName7; \
+TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
     return self; \
 } \
 -(id)init \
@@ -1728,16 +1658,16 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -1749,7 +1679,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
     TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -1760,7 +1690,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
     TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
     [self insertDone]; \
 } \
--(TableName##_Query *)getQuery \
+-(TableName##_Query *)where \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
@@ -1874,26 +1804,22 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy_##TableName : OCColumnProxy \
--(size_t)find:(NSString*)value; \
-@end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
-@property(nonatomic, strong) OCColumnProxy_##CType8 *CName8; \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8; \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8; \
--(TableName##_Query *)getQuery; \
+TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
+TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8; \
+-(TableName##_Query *)where; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -2011,37 +1937,31 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
-@implementation OCColumnProxy_##TableName \
--(size_t)find:(NSString *)value \
-{ \
-    return [self.table findString:self.column value:value]; \
-} \
-@end \
 @implementation TableName \
 { \
     TableName##_Cursor *tmpCursor; \
 } \
-@synthesize CName1 = _##CName1; \
-@synthesize CName2 = _##CName2; \
-@synthesize CName3 = _##CName3; \
-@synthesize CName4 = _##CName4; \
-@synthesize CName5 = _##CName5; \
-@synthesize CName6 = _##CName6; \
-@synthesize CName7 = _##CName7; \
-@synthesize CName8 = _##CName8; \
+TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
     return self; \
 } \
 -(id)init \
@@ -2050,17 +1970,17 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -2073,7 +1993,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
     TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -2085,7 +2005,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
     TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
     [self insertDone]; \
 } \
--(TableName##_Query *)getQuery \
+-(TableName##_Query *)where \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
@@ -2204,27 +2124,23 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy_##TableName : OCColumnProxy \
--(size_t)find:(NSString*)value; \
-@end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
-@property(nonatomic, strong) OCColumnProxy_##CType8 *CName8; \
-@property(nonatomic, strong) OCColumnProxy_##CType9 *CName9; \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9; \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9; \
--(TableName##_Query *)getQuery; \
+TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
+TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
+TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9; \
+-(TableName##_Query *)where; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -2348,39 +2264,33 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
-@implementation OCColumnProxy_##TableName \
--(size_t)find:(NSString *)value \
-{ \
-    return [self.table findString:self.column value:value]; \
-} \
-@end \
 @implementation TableName \
 { \
     TableName##_Cursor *tmpCursor; \
 } \
-@synthesize CName1 = _##CName1; \
-@synthesize CName2 = _##CName2; \
-@synthesize CName3 = _##CName3; \
-@synthesize CName4 = _##CName4; \
-@synthesize CName5 = _##CName5; \
-@synthesize CName6 = _##CName6; \
-@synthesize CName7 = _##CName7; \
-@synthesize CName8 = _##CName8; \
-@synthesize CName9 = _##CName9; \
+TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
     return self; \
 } \
 -(id)init \
@@ -2389,18 +2299,18 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -2414,7 +2324,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
     TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -2427,7 +2337,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
     TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
     [self insertDone]; \
 } \
--(TableName##_Query *)getQuery \
+-(TableName##_Query *)where \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
@@ -2551,28 +2461,24 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy_##TableName : OCColumnProxy \
--(size_t)find:(NSString*)value; \
-@end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
-@property(nonatomic, strong) OCColumnProxy_##CType8 *CName8; \
-@property(nonatomic, strong) OCColumnProxy_##CType9 *CName9; \
-@property(nonatomic, strong) OCColumnProxy_##CType10 *CName10; \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10; \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10; \
--(TableName##_Query *)getQuery; \
+TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
+TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
+TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
+TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10; \
+-(TableName##_Query *)where; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -2702,41 +2608,35 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
-@implementation OCColumnProxy_##TableName \
--(size_t)find:(NSString *)value \
-{ \
-    return [self.table findString:self.column value:value]; \
-} \
-@end \
 @implementation TableName \
 { \
     TableName##_Cursor *tmpCursor; \
 } \
-@synthesize CName1 = _##CName1; \
-@synthesize CName2 = _##CName2; \
-@synthesize CName3 = _##CName3; \
-@synthesize CName4 = _##CName4; \
-@synthesize CName5 = _##CName5; \
-@synthesize CName6 = _##CName6; \
-@synthesize CName7 = _##CName7; \
-@synthesize CName8 = _##CName8; \
-@synthesize CName9 = _##CName9; \
-@synthesize CName10 = _##CName10; \
+TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
     return self; \
 } \
 -(id)init \
@@ -2745,19 +2645,19 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -2772,7 +2672,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
     TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -2786,7 +2686,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
     TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
     [self insertDone]; \
 } \
--(TableName##_Query *)getQuery \
+-(TableName##_Query *)where \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
@@ -2915,29 +2815,25 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy_##TableName : OCColumnProxy \
--(size_t)find:(NSString*)value; \
-@end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
-@property(nonatomic, strong) OCColumnProxy_##CType8 *CName8; \
-@property(nonatomic, strong) OCColumnProxy_##CType9 *CName9; \
-@property(nonatomic, strong) OCColumnProxy_##CType10 *CName10; \
-@property(nonatomic, strong) OCColumnProxy_##CType11 *CName11; \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11; \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11; \
--(TableName##_Query *)getQuery; \
+TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
+TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
+TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
+TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
+TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11; \
+-(TableName##_Query *)where; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -3073,43 +2969,37 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
-@implementation OCColumnProxy_##TableName \
--(size_t)find:(NSString *)value \
-{ \
-    return [self.table findString:self.column value:value]; \
-} \
-@end \
 @implementation TableName \
 { \
     TableName##_Cursor *tmpCursor; \
 } \
-@synthesize CName1 = _##CName1; \
-@synthesize CName2 = _##CName2; \
-@synthesize CName3 = _##CName3; \
-@synthesize CName4 = _##CName4; \
-@synthesize CName5 = _##CName5; \
-@synthesize CName6 = _##CName6; \
-@synthesize CName7 = _##CName7; \
-@synthesize CName8 = _##CName8; \
-@synthesize CName9 = _##CName9; \
-@synthesize CName10 = _##CName10; \
-@synthesize CName11 = _##CName11; \
+TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
     return self; \
 } \
 -(id)init \
@@ -3118,20 +3008,20 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -3147,7 +3037,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
     TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -3162,7 +3052,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
     TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
     [self insertDone]; \
 } \
--(TableName##_Query *)getQuery \
+-(TableName##_Query *)where \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
@@ -3296,30 +3186,26 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy_##TableName : OCColumnProxy \
--(size_t)find:(NSString*)value; \
-@end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
-@property(nonatomic, strong) OCColumnProxy_##CType8 *CName8; \
-@property(nonatomic, strong) OCColumnProxy_##CType9 *CName9; \
-@property(nonatomic, strong) OCColumnProxy_##CType10 *CName10; \
-@property(nonatomic, strong) OCColumnProxy_##CType11 *CName11; \
-@property(nonatomic, strong) OCColumnProxy_##CType12 *CName12; \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12; \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12; \
--(TableName##_Query *)getQuery; \
+TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
+TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
+TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
+TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
+TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
+TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12; \
+-(TableName##_Query *)where; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -3461,45 +3347,39 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
-@implementation OCColumnProxy_##TableName \
--(size_t)find:(NSString *)value \
-{ \
-    return [self.table findString:self.column value:value]; \
-} \
-@end \
 @implementation TableName \
 { \
     TableName##_Cursor *tmpCursor; \
 } \
-@synthesize CName1 = _##CName1; \
-@synthesize CName2 = _##CName2; \
-@synthesize CName3 = _##CName3; \
-@synthesize CName4 = _##CName4; \
-@synthesize CName5 = _##CName5; \
-@synthesize CName6 = _##CName6; \
-@synthesize CName7 = _##CName7; \
-@synthesize CName8 = _##CName8; \
-@synthesize CName9 = _##CName9; \
-@synthesize CName10 = _##CName10; \
-@synthesize CName11 = _##CName11; \
-@synthesize CName12 = _##CName12; \
+TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
-    _##CName12 = [[OCColumnProxy_##CType12 alloc] initWithTable:self column:11]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
     return self; \
 } \
 -(id)init \
@@ -3508,21 +3388,21 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
-    _##CName12 = [[OCColumnProxy_##CType12 alloc] initWithTable:self column:11]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -3539,7 +3419,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
     TIGHTDB_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -3555,7 +3435,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
     TIGHTDB_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
     [self insertDone]; \
 } \
--(TableName##_Query *)getQuery \
+-(TableName##_Query *)where \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
@@ -3694,31 +3574,27 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy_##TableName : OCColumnProxy \
--(size_t)find:(NSString*)value; \
-@end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
-@property(nonatomic, strong) OCColumnProxy_##CType8 *CName8; \
-@property(nonatomic, strong) OCColumnProxy_##CType9 *CName9; \
-@property(nonatomic, strong) OCColumnProxy_##CType10 *CName10; \
-@property(nonatomic, strong) OCColumnProxy_##CType11 *CName11; \
-@property(nonatomic, strong) OCColumnProxy_##CType12 *CName12; \
-@property(nonatomic, strong) OCColumnProxy_##CType13 *CName13; \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13; \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13; \
--(TableName##_Query *)getQuery; \
+TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
+TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
+TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
+TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
+TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
+TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
+TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13; \
+-(TableName##_Query *)where; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -3866,47 +3742,41 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
-@implementation OCColumnProxy_##TableName \
--(size_t)find:(NSString *)value \
-{ \
-    return [self.table findString:self.column value:value]; \
-} \
-@end \
 @implementation TableName \
 { \
     TableName##_Cursor *tmpCursor; \
 } \
-@synthesize CName1 = _##CName1; \
-@synthesize CName2 = _##CName2; \
-@synthesize CName3 = _##CName3; \
-@synthesize CName4 = _##CName4; \
-@synthesize CName5 = _##CName5; \
-@synthesize CName6 = _##CName6; \
-@synthesize CName7 = _##CName7; \
-@synthesize CName8 = _##CName8; \
-@synthesize CName9 = _##CName9; \
-@synthesize CName10 = _##CName10; \
-@synthesize CName11 = _##CName11; \
-@synthesize CName12 = _##CName12; \
-@synthesize CName13 = _##CName13; \
+TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
-    _##CName12 = [[OCColumnProxy_##CType12 alloc] initWithTable:self column:11]; \
-    _##CName13 = [[OCColumnProxy_##CType13 alloc] initWithTable:self column:12]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
     return self; \
 } \
 -(id)init \
@@ -3915,22 +3785,22 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
-    _##CName12 = [[OCColumnProxy_##CType12 alloc] initWithTable:self column:11]; \
-    _##CName13 = [[OCColumnProxy_##CType13 alloc] initWithTable:self column:12]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -3948,7 +3818,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
     TIGHTDB_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -3965,7 +3835,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
     TIGHTDB_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
     [self insertDone]; \
 } \
--(TableName##_Query *)getQuery \
+-(TableName##_Query *)where \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
@@ -4109,32 +3979,28 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName14, CType14) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy_##TableName : OCColumnProxy \
--(size_t)find:(NSString*)value; \
-@end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
-@property(nonatomic, strong) OCColumnProxy_##CType8 *CName8; \
-@property(nonatomic, strong) OCColumnProxy_##CType9 *CName9; \
-@property(nonatomic, strong) OCColumnProxy_##CType10 *CName10; \
-@property(nonatomic, strong) OCColumnProxy_##CType11 *CName11; \
-@property(nonatomic, strong) OCColumnProxy_##CType12 *CName12; \
-@property(nonatomic, strong) OCColumnProxy_##CType13 *CName13; \
-@property(nonatomic, strong) OCColumnProxy_##CType14 *CName14; \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 CName14:(TIGHTDB_TYPE_##CType14)CName14; \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 CName14:(TIGHTDB_TYPE_##CType14)CName14; \
--(TableName##_Query *)getQuery; \
+TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
+TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
+TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
+TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
+TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
+TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
+TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
+TIGHTDB_COLUMN_PROXY_DEF(CName14, CType14) \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14; \
+-(TableName##_Query *)where; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -4288,49 +4154,43 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
-@implementation OCColumnProxy_##TableName \
--(size_t)find:(NSString *)value \
-{ \
-    return [self.table findString:self.column value:value]; \
-} \
-@end \
 @implementation TableName \
 { \
     TableName##_Cursor *tmpCursor; \
 } \
-@synthesize CName1 = _##CName1; \
-@synthesize CName2 = _##CName2; \
-@synthesize CName3 = _##CName3; \
-@synthesize CName4 = _##CName4; \
-@synthesize CName5 = _##CName5; \
-@synthesize CName6 = _##CName6; \
-@synthesize CName7 = _##CName7; \
-@synthesize CName8 = _##CName8; \
-@synthesize CName9 = _##CName9; \
-@synthesize CName10 = _##CName10; \
-@synthesize CName11 = _##CName11; \
-@synthesize CName12 = _##CName12; \
-@synthesize CName13 = _##CName13; \
-@synthesize CName14 = _##CName14; \
+TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
-    _##CName12 = [[OCColumnProxy_##CType12 alloc] initWithTable:self column:11]; \
-    _##CName13 = [[OCColumnProxy_##CType13 alloc] initWithTable:self column:12]; \
-    _##CName14 = [[OCColumnProxy_##CType14 alloc] initWithTable:self column:13]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 13, CName14, CType14); \
     return self; \
 } \
 -(id)init \
@@ -4339,23 +4199,23 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
-    _##CName12 = [[OCColumnProxy_##CType12 alloc] initWithTable:self column:11]; \
-    _##CName13 = [[OCColumnProxy_##CType13 alloc] initWithTable:self column:12]; \
-    _##CName14 = [[OCColumnProxy_##CType14 alloc] initWithTable:self column:13]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 13, CName14, CType14); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 CName14:(TIGHTDB_TYPE_##CType14)CName14 \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -4374,7 +4234,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
     TIGHTDB_COLUMN_INSERT(self, 13, ndx, CName14, CType14); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 CName14:(TIGHTDB_TYPE_##CType14)CName14 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -4392,7 +4252,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
     TIGHTDB_COLUMN_INSERT(self, 13, ndx, CName14, CType14); \
     [self insertDone]; \
 } \
--(TableName##_Query *)getQuery \
+-(TableName##_Query *)where \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
@@ -4541,33 +4401,29 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName15, CType15) \
 -(TableName##_Query *)parent; \
 -(TableName##_View *)findAll; \
 @end \
-@interface OCColumnProxy_##TableName : OCColumnProxy \
--(size_t)find:(NSString*)value; \
-@end \
 @interface TableName : Table \
-@property(nonatomic, strong) OCColumnProxy_##CType1 *CName1; \
-@property(nonatomic, strong) OCColumnProxy_##CType2 *CName2; \
-@property(nonatomic, strong) OCColumnProxy_##CType3 *CName3; \
-@property(nonatomic, strong) OCColumnProxy_##CType4 *CName4; \
-@property(nonatomic, strong) OCColumnProxy_##CType5 *CName5; \
-@property(nonatomic, strong) OCColumnProxy_##CType6 *CName6; \
-@property(nonatomic, strong) OCColumnProxy_##CType7 *CName7; \
-@property(nonatomic, strong) OCColumnProxy_##CType8 *CName8; \
-@property(nonatomic, strong) OCColumnProxy_##CType9 *CName9; \
-@property(nonatomic, strong) OCColumnProxy_##CType10 *CName10; \
-@property(nonatomic, strong) OCColumnProxy_##CType11 *CName11; \
-@property(nonatomic, strong) OCColumnProxy_##CType12 *CName12; \
-@property(nonatomic, strong) OCColumnProxy_##CType13 *CName13; \
-@property(nonatomic, strong) OCColumnProxy_##CType14 *CName14; \
-@property(nonatomic, strong) OCColumnProxy_##CType15 *CName15; \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 CName14:(TIGHTDB_TYPE_##CType14)CName14 CName15:(TIGHTDB_TYPE_##CType15)CName15; \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 CName14:(TIGHTDB_TYPE_##CType14)CName14 CName15:(TIGHTDB_TYPE_##CType15)CName15; \
--(TableName##_Query *)getQuery; \
+TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
+TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
+TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
+TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
+TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
+TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
+TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
+TIGHTDB_COLUMN_PROXY_DEF(CName14, CType14) \
+TIGHTDB_COLUMN_PROXY_DEF(CName15, CType15) \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15; \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15; \
+-(TableName##_Query *)where; \
 -(TableName##_Cursor *)add; \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)lastObject; \
 @end \
-typedef TableName* TIGHTDB_TYPE_##TableName; \
 @interface TableName##_View : TableView \
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
 @end
@@ -4727,51 +4583,45 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName15, CType15) \
-@implementation OCColumnProxy_##TableName \
--(size_t)find:(NSString *)value \
-{ \
-    return [self.table findString:self.column value:value]; \
-} \
-@end \
 @implementation TableName \
 { \
     TableName##_Cursor *tmpCursor; \
 } \
-@synthesize CName1 = _##CName1; \
-@synthesize CName2 = _##CName2; \
-@synthesize CName3 = _##CName3; \
-@synthesize CName4 = _##CName4; \
-@synthesize CName5 = _##CName5; \
-@synthesize CName6 = _##CName6; \
-@synthesize CName7 = _##CName7; \
-@synthesize CName8 = _##CName8; \
-@synthesize CName9 = _##CName9; \
-@synthesize CName10 = _##CName10; \
-@synthesize CName11 = _##CName11; \
-@synthesize CName12 = _##CName12; \
-@synthesize CName13 = _##CName13; \
-@synthesize CName14 = _##CName14; \
-@synthesize CName15 = _##CName15; \
+TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
+TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) return nil; \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
-    _##CName12 = [[OCColumnProxy_##CType12 alloc] initWithTable:self column:11]; \
-    _##CName13 = [[OCColumnProxy_##CType13 alloc] initWithTable:self column:12]; \
-    _##CName14 = [[OCColumnProxy_##CType14 alloc] initWithTable:self column:13]; \
-    _##CName15 = [[OCColumnProxy_##CType15 alloc] initWithTable:self column:14]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 13, CName14, CType14); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 14, CName15, CType15); \
     return self; \
 } \
 -(id)init \
@@ -4780,24 +4630,24 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName15, CType15) \
     if (!self) return nil; \
     if (![self _addColumns]) return nil; \
 \
-    _##CName1 = [[OCColumnProxy_##CType1 alloc] initWithTable:self column:0]; \
-    _##CName2 = [[OCColumnProxy_##CType2 alloc] initWithTable:self column:1]; \
-    _##CName3 = [[OCColumnProxy_##CType3 alloc] initWithTable:self column:2]; \
-    _##CName4 = [[OCColumnProxy_##CType4 alloc] initWithTable:self column:3]; \
-    _##CName5 = [[OCColumnProxy_##CType5 alloc] initWithTable:self column:4]; \
-    _##CName6 = [[OCColumnProxy_##CType6 alloc] initWithTable:self column:5]; \
-    _##CName7 = [[OCColumnProxy_##CType7 alloc] initWithTable:self column:6]; \
-    _##CName8 = [[OCColumnProxy_##CType8 alloc] initWithTable:self column:7]; \
-    _##CName9 = [[OCColumnProxy_##CType9 alloc] initWithTable:self column:8]; \
-    _##CName10 = [[OCColumnProxy_##CType10 alloc] initWithTable:self column:9]; \
-    _##CName11 = [[OCColumnProxy_##CType11 alloc] initWithTable:self column:10]; \
-    _##CName12 = [[OCColumnProxy_##CType12 alloc] initWithTable:self column:11]; \
-    _##CName13 = [[OCColumnProxy_##CType13 alloc] initWithTable:self column:12]; \
-    _##CName14 = [[OCColumnProxy_##CType14 alloc] initWithTable:self column:13]; \
-    _##CName15 = [[OCColumnProxy_##CType15 alloc] initWithTable:self column:14]; \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 13, CName14, CType14); \
+    TIGHTDB_COLUMN_PROXY_INIT(self, 14, CName15, CType15); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 CName14:(TIGHTDB_TYPE_##CType14)CName14 CName15:(TIGHTDB_TYPE_##CType15)CName15 \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15 \
 { \
     const size_t ndx = [self count]; \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
@@ -4817,7 +4667,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName15, CType15) \
     TIGHTDB_COLUMN_INSERT(self, 14, ndx, CName15, CType15); \
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_TYPE_##CType1)CName1 CName2:(TIGHTDB_TYPE_##CType2)CName2 CName3:(TIGHTDB_TYPE_##CType3)CName3 CName4:(TIGHTDB_TYPE_##CType4)CName4 CName5:(TIGHTDB_TYPE_##CType5)CName5 CName6:(TIGHTDB_TYPE_##CType6)CName6 CName7:(TIGHTDB_TYPE_##CType7)CName7 CName8:(TIGHTDB_TYPE_##CType8)CName8 CName9:(TIGHTDB_TYPE_##CType9)CName9 CName10:(TIGHTDB_TYPE_##CType10)CName10 CName11:(TIGHTDB_TYPE_##CType11)CName11 CName12:(TIGHTDB_TYPE_##CType12)CName12 CName13:(TIGHTDB_TYPE_##CType13)CName13 CName14:(TIGHTDB_TYPE_##CType14)CName14 CName15:(TIGHTDB_TYPE_##CType15)CName15 \
+-(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15 \
 { \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
@@ -4836,7 +4686,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName15, CType15) \
     TIGHTDB_COLUMN_INSERT(self, 14, ndx, CName15, CType15); \
     [self insertDone]; \
 } \
--(TableName##_Query *)getQuery \
+-(TableName##_Query *)where \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \

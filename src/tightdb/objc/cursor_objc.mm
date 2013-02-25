@@ -59,14 +59,6 @@
 }
 
 
--(int64_t)getInt
-{
-    return [_cursor.table get:_columnId ndx:_cursor.ndx];
-}
--(void)setInt:(int64_t)value
-{
-    [_cursor.table set:_columnId ndx:_cursor.ndx value:value];
-}
 -(BOOL)getBool
 {
     return [_cursor.table getBool:_columnId ndx:_cursor.ndx];
@@ -75,14 +67,34 @@
 {
     [_cursor.table setBool:_columnId ndx:_cursor.ndx value:value];
 }
--(time_t)getDate
+
+-(int64_t)getInt
 {
-    return [_cursor.table getDate:_columnId ndx:_cursor.ndx];
+    return [_cursor.table get:_columnId ndx:_cursor.ndx];
 }
--(void)setDate:(time_t)value
+-(void)setInt:(int64_t)value
 {
-    [_cursor.table setDate:_columnId ndx:_cursor.ndx value:value];
+    [_cursor.table set:_columnId ndx:_cursor.ndx value:value];
 }
+
+-(float)getFloat
+{
+    return [_cursor.table getFloat:_columnId ndx:_cursor.ndx];
+}
+-(void)setFloat:(float)value
+{
+    [_cursor.table setFloat:_columnId ndx:_cursor.ndx value:value];
+}
+
+-(double)getDouble
+{
+    return [_cursor.table getDouble:_columnId ndx:_cursor.ndx];
+}
+-(void)setDouble:(double)value
+{
+    [_cursor.table setDouble:_columnId ndx:_cursor.ndx value:value];
+}
+
 -(NSString *)getString
 {
     return [_cursor.table getString:_columnId ndx:_cursor.ndx];
@@ -91,10 +103,34 @@
 {
     [_cursor.table setString:_columnId ndx:_cursor.ndx value:value];
 }
+
+-(BinaryData *)getBinary
+{
+    return [_cursor.table getBinary:_columnId ndx:_cursor.ndx];
+}
+-(void)setBinary:(BinaryData *)value
+{
+    [_cursor.table setBinary:_columnId ndx:_cursor.ndx value:value];
+}
+-(void)setBinary:(const char *)data size:(size_t)size
+{
+    [_cursor.table setBinary:_columnId ndx:_cursor.ndx data:data size:size];
+}
+
+-(time_t)getDate
+{
+    return [_cursor.table getDate:_columnId ndx:_cursor.ndx];
+}
+-(void)setDate:(time_t)value
+{
+    [_cursor.table setDate:_columnId ndx:_cursor.ndx value:value];
+}
+
 -(id)getSubtable:(Class)obj
 {
     return [_cursor.table getSubtable:_columnId ndx:_cursor.ndx withClass:obj];
 }
+
 -(OCMixed *)getMixed
 {
     return [_cursor.table getMixed:_columnId ndx:_cursor.ndx];
