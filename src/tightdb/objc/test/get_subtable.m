@@ -25,18 +25,18 @@ TIGHTDB_TABLE_2(WrongTypeTable,
                 Age,   Bool)
 
 
-@interface MACTestGetSubtable : SenTestCase
+@interface MACTestGetSubtable: SenTestCase
 @end
 @implementation MACTestGetSubtable
 
 - (void)testGetSubtable
 {
     // Create table with all column types
-    Table *table = [[Table alloc] init];
-    OCSpec *s = [table getSpec];
+    TightdbTable *table = [[TightdbTable alloc] init];
+    TightdbSpec *s = [table getSpec];
     [s addColumn:tightdb_Bool name:@"Outer"];
     [s addColumn:tightdb_Int name:@"Number"];
-    OCSpec *sub = [s addColumnTable:@"GetSubtable"];
+    TightdbSpec *sub = [s addColumnTable:@"GetSubtable"];
     [sub addColumn:tightdb_Bool name:@"Hired"];
     [sub addColumn:tightdb_Int name:@"Age"];
     [table updateFromSpec];
@@ -46,7 +46,7 @@ TIGHTDB_TABLE_2(WrongTypeTable,
     [table insertSubtable:2 ndx:0];
     [table insertDone];
 
-    Table *subtable = [table getSubtable:2 ndx:0];
+    TightdbTable *subtable = [table getSubtable:2 ndx:0];
     [subtable insertBool:0 ndx:0 value:YES];
     [subtable insertInt:1 ndx:0 value:42];
     [subtable insertDone];

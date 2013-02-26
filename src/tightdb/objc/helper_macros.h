@@ -41,9 +41,9 @@
 #define TIGHTDB_TYPE_Float     float
 #define TIGHTDB_TYPE_Double    double
 #define TIGHTDB_TYPE_String    NSString *
-#define TIGHTDB_TYPE_Binary    BinaryData *
+#define TIGHTDB_TYPE_Binary    TightdbBinary *
 #define TIGHTDB_TYPE_Date      time_t
-#define TIGHTDB_TYPE_Mixed     OCMixed *
+#define TIGHTDB_TYPE_Mixed     TightdbMixed *
 
 #define TIGHTDB_TYPE_ID_Bool   tightdb_Bool
 #define TIGHTDB_TYPE_ID_Int    tightdb_Int
@@ -71,16 +71,16 @@
 #define TIGHTDB_COLUMN_PROXY_DEF(name, type)                 TIGHTDB_COLUMN_PROXY_DEF_2(TIGHTDB_IS_SUBTABLE(type), name, type)
 #define TIGHTDB_COLUMN_PROXY_DEF_2(is_subtable, name, type)  TIGHTDB_COLUMN_PROXY_DEF_3(is_subtable, name, type)
 #define TIGHTDB_COLUMN_PROXY_DEF_3(is_subtable, name, type)  TIGHTDB_COLUMN_PROXY_DEF_4_##is_subtable(name, type)
-#define TIGHTDB_COLUMN_PROXY_DEF_4_Y(name, type)             @property(nonatomic, strong) OCColumnProxy_Subtable *name;
-#define TIGHTDB_COLUMN_PROXY_DEF_4_N(name, type)             @property(nonatomic, strong) OCColumnProxy_##type *name;
+#define TIGHTDB_COLUMN_PROXY_DEF_4_Y(name, type)             @property(nonatomic, strong) TightdbColumnProxy_Subtable *name;
+#define TIGHTDB_COLUMN_PROXY_DEF_4_N(name, type)             @property(nonatomic, strong) TightdbColumnProxy_##type *name;
 
 #define TIGHTDB_COLUMN_PROXY_IMPL(name, type)                @synthesize name = _##name;
 
 #define TIGHTDB_COLUMN_PROXY_INIT(table, col, name, type)                TIGHTDB_COLUMN_PROXY_INIT_2(TIGHTDB_IS_SUBTABLE(type), table, col, name, type)
 #define TIGHTDB_COLUMN_PROXY_INIT_2(is_subtable, table, col, name, type) TIGHTDB_COLUMN_PROXY_INIT_3(is_subtable, table, col, name, type)
 #define TIGHTDB_COLUMN_PROXY_INIT_3(is_subtable, table, col, name, type) TIGHTDB_COLUMN_PROXY_INIT_4_##is_subtable(table, col, name, type)
-#define TIGHTDB_COLUMN_PROXY_INIT_4_Y(table, col, name, type)            _##name = [[OCColumnProxy_Subtable alloc] initWithTable:table column:col]
-#define TIGHTDB_COLUMN_PROXY_INIT_4_N(table, col, name, type)            _##name = [[OCColumnProxy_##type alloc] initWithTable:table column:col]
+#define TIGHTDB_COLUMN_PROXY_INIT_4_Y(table, col, name, type)            _##name = [[TightdbColumnProxy_Subtable alloc] initWithTable:table column:col]
+#define TIGHTDB_COLUMN_PROXY_INIT_4_N(table, col, name, type)            _##name = [[TightdbColumnProxy_##type alloc] initWithTable:table column:col]
 
 
 
@@ -93,7 +93,7 @@
 { \
     NSString *name = [NSString stringWithUTF8String:#_name]; \
     if (!name) return NO; \
-    OCSpec *subspec = [spec addColumnTable:name]; \
+    TightdbSpec *subspec = [spec addColumnTable:name]; \
     if (!subspec) return NO; \
     if (![type _addColumns:subspec]) return NO; \
 }
@@ -115,7 +115,7 @@
 { \
     if ([spec getColumnType:col] != tightdb_Table) return NO; \
     if (![[spec getColumnName:col] isEqualToString:@#name]) return NO; \
-    OCSpec *subspec = [spec getSubspec:col]; \
+    TightdbSpec *subspec = [spec getSubspec:col]; \
     if (!subspec) return NO; \
     if (![type _checkType:subspec]) return NO; \
 }
@@ -198,7 +198,7 @@
 // Boolean
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Bool(table, col_name) \
-@interface table##_QueryAccessor_##col_name : OCXQueryAccessorBool \
+@interface table##_QueryAccessor_##col_name : TightdbQueryAccessorBool \
 -(table##_Query *)equal:(BOOL)value; \
 @end
 
@@ -214,7 +214,7 @@
 // Integer
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Int(table, col_name) \
-@interface table##_QueryAccessor_##col_name : OCXQueryAccessorInt \
+@interface table##_QueryAccessor_##col_name : TightdbQueryAccessorInt \
 -(table##_Query *)equal:(int64_t)value; \
 -(table##_Query *)notEqual:(int64_t)value; \
 -(table##_Query *)greater:(int64_t)value; \
@@ -260,7 +260,7 @@
 // Float
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Float(table, col_name) \
-@interface table##_QueryAccessor_##col_name : OCXQueryAccessorFloat \
+@interface table##_QueryAccessor_##col_name : TightdbQueryAccessorFloat \
 -(table##_Query *)equal:(float)value; \
 -(table##_Query *)notEqual:(float)value; \
 -(table##_Query *)greater:(float)value; \
@@ -306,7 +306,7 @@
 // Double
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Double(table, col_name) \
-@interface table##_QueryAccessor_##col_name : OCXQueryAccessorDouble \
+@interface table##_QueryAccessor_##col_name : TightdbQueryAccessorDouble \
 -(table##_Query *)equal:(double)value; \
 -(table##_Query *)notEqual:(double)value; \
 -(table##_Query *)greater:(double)value; \
@@ -352,7 +352,7 @@
 // String
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_String(table, col_name) \
-@interface table##_QueryAccessor_##col_name : OCXQueryAccessorString \
+@interface table##_QueryAccessor_##col_name : TightdbQueryAccessorString \
 -(table##_Query *)equal:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 -(table##_Query *)notEqual:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 -(table##_Query *)beginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
@@ -388,7 +388,7 @@
 // Binary
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Binary(table, col_name) \
-@interface table##_QueryAccessor_##col_name : OCXQueryAccessorBinary \
+@interface table##_QueryAccessor_##col_name : TightdbQueryAccessorBinary \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Binary(table, col_name) \
@@ -399,7 +399,7 @@
 // Date
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Date(table, col_name) \
-@interface table##_QueryAccessor_##col_name : OCXQueryAccessorDate \
+@interface table##_QueryAccessor_##col_name : TightdbQueryAccessorDate \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Date(table, col_name) \
@@ -410,7 +410,7 @@
 // Subtable
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_SUBTABLE(table, col_name, col_type) \
-@interface table##_QueryAccessor_##col_name : OCXQueryAccessorSubtable \
+@interface table##_QueryAccessor_##col_name : TightdbQueryAccessorSubtable \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_SUBTABLE(table, col_name, col_type) \
@@ -421,7 +421,7 @@
 // Mixed
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Mixed(table, col_name) \
-@interface table##_QueryAccessor_##col_name : OCXQueryAccessorMixed \
+@interface table##_QueryAccessor_##col_name : TightdbQueryAccessorMixed \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Mixed(table, col_name) \

@@ -11,32 +11,32 @@
 #import <tightdb/objc/table_priv.h>
 
 
-@interface Group()
+@interface TightdbGroup()
 @property(nonatomic) tightdb::Group *group;
 @property(nonatomic) BOOL readOnly;
 @end
-@implementation Group
+@implementation TightdbGroup
 @synthesize group = _group;
 @synthesize readOnly = _readOnly;
 
-+(Group *)group
++(TightdbGroup *)group
 {
-    Group *group = [[Group alloc] init];
+    TightdbGroup *group = [[TightdbGroup alloc] init];
     group.group = new tightdb::Group(); // FIXME: Both new-operator and Group constructor may throw at least std::bad_alloc.
     group.readOnly = NO;
     return group;
 }
 
 // Careful with this one - Remember that group will be deleted on dealloc.
-+(Group *)groupTightdbGroup:(tightdb::Group *)tightdbGroup readOnly:(BOOL)readOnly
++(TightdbGroup *)groupTightdbGroup:(tightdb::Group *)tightdbGroup readOnly:(BOOL)readOnly
 {
-    Group *group = [[Group alloc] init];
+    TightdbGroup *group = [[TightdbGroup alloc] init];
     group.group = tightdbGroup;
     group.readOnly = readOnly;
     return group;
 }
 
-+(Group *)groupWithFilename:(NSString *)filename
++(TightdbGroup *)groupWithFilename:(NSString *)filename
 {
     tightdb::Group* group;
     try {
@@ -53,7 +53,7 @@
         // anything derived from std::exception.
         return nil;
     }
-    Group* group2 = [[Group alloc] init];
+    TightdbGroup* group2 = [[TightdbGroup alloc] init];
     if (group2) {
       group2.group = group;
       group2.readOnly = NO;
@@ -61,7 +61,7 @@
     return group2;
 }
 
-+(Group *)groupWithBuffer:(const char *)data size:(size_t)size
++(TightdbGroup *)groupWithBuffer:(const char *)data size:(size_t)size
 {
     tightdb::Group* group;
     try {
@@ -78,7 +78,7 @@
         // anything derived from std::exception.
         return nil;
     }
-    Group* group2 = [[Group alloc] init];
+    TightdbGroup* group2 = [[TightdbGroup alloc] init];
     group2.group = group;
     group2.readOnly = NO;
     return group2;
@@ -92,7 +92,7 @@
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"Group dealloc");
+    NSLog(@"TightdbGroup dealloc");
 #endif
     delete _group;
 }
@@ -123,18 +123,18 @@
     return _group->has_table([name UTF8String]);
 }
 
-// FIXME: Avoid creating a table instance. It should be enough to create an OCSpec and then check that.
+// FIXME: Avoid creating a table instance. It should be enough to create an TightdbSpec and then check that.
 // FIXME: Check that the specified class derives from Table.
 -(BOOL)hasTable:(NSString *)name withClass:(__unsafe_unretained Class)classObj
 {
     if (!_group->has_table([name UTF8String])) return NO;
-    Table* table = [self getTable:name withClass:classObj];
+    TightdbTable* table = [self getTable:name withClass:classObj];
     return table != nil;
 }
 
 -(id)getTable:(NSString *)name
 {
-    Table *table = [[Table alloc] _initRaw];
+    TightdbTable *table = [[TightdbTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table)) return nil;
     [table setTable:_group->get_table([name UTF8String])];
     [table setParent:self];
@@ -145,7 +145,7 @@
 // FIXME: Check that the specified class derives from Table.
 -(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)classObj
 {
-    Table *table = [[classObj alloc] _initRaw];
+    TightdbTable *table = [[classObj alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table)) return nil;
     bool was_created;
     tightdb::TableRef r = tightdb::LangBindHelper::get_table_ptr(_group, [name UTF8String],

@@ -19,7 +19,7 @@ TIGHTDB_TABLE_3(TestSubtableMain,
                 Sub,    TestSubtableSub,
                 Second, Int)
 
-@interface MACTestSubtable : SenTestCase
+@interface MACTestSubtable: SenTestCase
 @end
 @implementation MACTestSubtable
 
@@ -42,7 +42,7 @@ TIGHTDB_TABLE_3(TestSubtableMain,
 
 - (void)testSubtable
 {
-    Group *group = [Group group];
+    TightdbGroup *group = [TightdbGroup group];
 
     /* Create new table in group */
     TestSubtableMain *people = [group getTable:@"employees" withClass:[TestSubtableMain class]];

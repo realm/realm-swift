@@ -7,7 +7,7 @@ TIGHTDB_TABLE_1(TestTable,
 int main()
 {
     @autoreleasepool {
-        Group *db = [Group group];
+        TightdbGroup *db = [TightdbGroup group];
         TestTable *t = (TestTable *)[db getTable:@"test" withClass:[TestTable class]];
         return t ? 0 : 1;
     }

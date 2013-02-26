@@ -20,26 +20,22 @@
 
 #import <Foundation/Foundation.h>
 
-@class Table;
-@class BinaryData;
-@class OCMixed;
+@class TightdbTable;
+@class TightdbBinary;
+@class TightdbMixed;
 
-#pragma mark - CursorBase
-
-@interface CursorBase : NSObject
--(id)initWithTable:(Table *)table ndx:(size_t)ndx;
+@interface TightdbCursor: NSObject
+-(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx;
 -(void)setNdx:(size_t)ndx;
 @end
 
-
-#pragma mark - OCAccessor
 
 /* FIXME: This class can be (and should be) eliminated by using a
    macro switching trick for the individual column types on
    TIGHTDB_CURSOR_PROPERTY macros similar to what is done for query
    accessors. */
-@interface OCAccessor : NSObject
--(id)initWithCursor:(CursorBase *)cursor columnId:(size_t)columnId;
+@interface TightdbAccessor: NSObject
+-(id)initWithCursor:(TightdbCursor *)cursor columnId:(size_t)columnId;
 -(BOOL)getBool;
 -(void)setBool:(BOOL)value;
 -(int64_t)getInt;
@@ -50,12 +46,12 @@
 -(void)setDouble:(double)value;
 -(NSString *)getString;
 -(void)setString:(NSString *)value;
--(BinaryData *)getBinary;
--(void)setBinary:(BinaryData *)value;
+-(TightdbBinary *)getBinary;
+-(void)setBinary:(TightdbBinary *)value;
 -(void)setBinary:(const char *)data size:(size_t)size;
 -(time_t)getDate;
 -(void)setDate:(time_t)value;
 -(id)getSubtable:(Class)obj;
--(OCMixed *)getMixed;
--(void)setMixed:(OCMixed *)value;
+-(TightdbMixed *)getMixed;
+-(void)setMixed:(TightdbMixed *)value;
 @end

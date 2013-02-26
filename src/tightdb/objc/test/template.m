@@ -1,13 +1,13 @@
 //
 //  template.m
-//  MacTightDbTests
+//  TightDb
 //
 
 #import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/table.h>
 
-@interface MacTightDbTests : SenTestCase
+@interface MacTightDbTests: SenTestCase
 @end
 @implementation MacTightDbTests
 

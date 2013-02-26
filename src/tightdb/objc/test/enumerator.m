@@ -2,7 +2,6 @@
 //  enumerator.m
 //  TightDB
 //
-//
 // Demo code for short tutorial using Objective-C interface
 //
 
@@ -21,7 +20,7 @@ TIGHTDB_TABLE_2(EnumPeopleTable2,
                 Hired, Bool,
                 Age,   Int)
 
-@interface MACTestEnumerator : SenTestCase
+@interface MACTestEnumerator: SenTestCase
 @end
 @implementation MACTestEnumerator
 
@@ -30,7 +29,7 @@ TIGHTDB_TABLE_2(EnumPeopleTable2,
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
-    Group *group = [Group group];
+    TightdbGroup *group = [TightdbGroup group];
     // Create new table in group
     EnumPeopleTable *people = [group getTable:@"employees" withClass:[EnumPeopleTable class]];
 

@@ -20,13 +20,13 @@
 
 #import <Foundation/Foundation.h>
 
-@class Table;
+@class TightdbTable;
 
 
-@interface Group : NSObject
-+(Group *)groupWithFilename:(NSString *)filename;
-+(Group *)groupWithBuffer:(const char*)data size:(size_t)size;
-+(Group *)group;
+@interface TightdbGroup: NSObject
++(TightdbGroup *)groupWithFilename:(NSString *)filename;
++(TightdbGroup *)groupWithBuffer:(const char*)data size:(size_t)size;
++(TightdbGroup *)group;
 
 -(size_t)getTableCount;
 -(NSString *)getTableName:(size_t)table_ndx;
@@ -42,7 +42,7 @@
 
 /// This method returns nil if it encounters a memory allocation error
 /// (out of memory).
--(Table *)getTable:(NSString *)name;
+-(TightdbTable *)getTable:(NSString *)name;
 
 /// This method returns nil if the group already contains a table with
 /// the specified name, but its type is incompatible with the
@@ -56,9 +56,5 @@
 // Serialization
 -(void)write:(NSString *)filePath;
 -(const char*)writeToMem:(size_t*)size;
-
-// Conversion
-// FIXME: Do we want to conversion methods? Maybe use NSData.
-
 @end
 

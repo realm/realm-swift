@@ -5,8 +5,6 @@
 
 #import <Foundation/Foundation.h>
 
-#pragma mark - Private Query interface
-
-@interface Query()
+@interface TightdbQuery()
 -(tightdb::TableView)getTableView;
 @end

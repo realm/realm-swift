@@ -8,17 +8,16 @@
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/table_priv.h>
 
-#pragma mark - CursorBase
 
-@interface CursorBase()
-@property (nonatomic, weak) Table *table;
+@interface TightdbCursor()
+@property (nonatomic, weak) TightdbTable *table;
 @property (nonatomic) size_t ndx;
 @end
-@implementation CursorBase
+@implementation TightdbCursor
 @synthesize table = _table;
 @synthesize ndx = _ndx;
 
--(id)initWithTable:(Table *)table ndx:(size_t)ndx
+-(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx
 {
     self = [super init];
     if (self) {
@@ -34,21 +33,20 @@
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"CursorBase dealloc");
+    NSLog(@"TightdbCursor dealloc");
 #endif
     _table = nil;
 }
 @end
 
-#pragma mark - OCAccessor
 
-@implementation OCAccessor
+@implementation TightdbAccessor
 {
-    __weak CursorBase *_cursor;
+    __weak TightdbCursor *_cursor;
     size_t _columnId;
 }
 
--(id)initWithCursor:(CursorBase *)cursor columnId:(size_t)columnId
+-(id)initWithCursor:(TightdbCursor *)cursor columnId:(size_t)columnId
 {
     self = [super init];
     if (self) {
@@ -104,11 +102,11 @@
     [_cursor.table setString:_columnId ndx:_cursor.ndx value:value];
 }
 
--(BinaryData *)getBinary
+-(TightdbBinary *)getBinary
 {
     return [_cursor.table getBinary:_columnId ndx:_cursor.ndx];
 }
--(void)setBinary:(BinaryData *)value
+-(void)setBinary:(TightdbBinary *)value
 {
     [_cursor.table setBinary:_columnId ndx:_cursor.ndx value:value];
 }
@@ -131,11 +129,11 @@
     return [_cursor.table getSubtable:_columnId ndx:_cursor.ndx withClass:obj];
 }
 
--(OCMixed *)getMixed
+-(TightdbMixed *)getMixed
 {
     return [_cursor.table getMixed:_columnId ndx:_cursor.ndx];
 }
--(void)setMixed:(OCMixed *)value
+-(void)setMixed:(TightdbMixed *)value
 {
     [_cursor.table setMixed:_columnId ndx:_cursor.ndx value:value];
 }
