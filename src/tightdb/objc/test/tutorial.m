@@ -28,7 +28,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
                      Hired, Bool,
                      Age,   Int)
 
-@interface MACTestTutorial : SenTestCase
+@interface MACTestTutorial: SenTestCase
 @end
 @implementation MACTestTutorial
 
@@ -38,7 +38,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    Group *group = [Group group];
+    TightdbGroup *group = [TightdbGroup group];
     // Create new table in group
     PeopleTable *people = [group getTable:@"employees" withClass:[PeopleTable class]];
 
@@ -106,7 +106,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"Mary: %zu", row);
     STAssertEquals(row, (size_t)1,@"Mary should have been there", nil);
 
-    TableView *view = [people.Age findAll:21];
+    TightdbView *view = [people.Age findAll:21];
     size_t cnt = [view count];             // cnt = 2
     STAssertEquals(cnt, (size_t)2,@"Should be two rows in view", nil);
 
@@ -128,7 +128,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     STAssertEquals(avg, 20.5,@"Expected 20.5 average", nil);
 
     // Execute the query and return a table (view)
-    TableView *res = [q findAll];
+    TightdbView *res = [q findAll];
     for (size_t i = 0; i < [res count]; ++i) {
         NSLog(@"%zu: %@ is %lld years old", i,
             [people objectAtIndex:i].Name,
@@ -143,7 +143,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     [group write:@"employees.tightdb"];
 
     // Load a group from disk (and print contents)
-    Group *fromDisk = [Group groupWithFilename:@"employees.tightdb"];
+    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:@"employees.tightdb"];
     PeopleTable *diskTable = [fromDisk getTable:@"employees" withClass:[PeopleTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES];
@@ -161,7 +161,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     const char* const data = [group writeToMem:&size];
 
     // Load a group from memory (and print contents)
-    Group *fromMem = [Group groupWithBuffer:data size:size];
+    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:data size:size];
     PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class]];
     for (size_t i = 0; i < [memTable count]; i++) {
         PeopleTable_Cursor *cursor = [memTable objectAtIndex:i];

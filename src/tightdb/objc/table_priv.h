@@ -5,10 +5,8 @@
 
 #import <Foundation/Foundation.h>
 
-#pragma mark - Private Table interface
 
-
-@interface Table()
+@interface TightdbTable()
 
 @property (nonatomic) tightdb::TableRef table;
 

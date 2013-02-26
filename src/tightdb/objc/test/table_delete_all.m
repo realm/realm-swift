@@ -7,15 +7,15 @@
 
 #import <tightdb/objc/table.h>
 
-@interface MACTestTableDeleteAll : SenTestCase
+@interface MACTestTableDeleteAll: SenTestCase
 @end
 @implementation MACTestTableDeleteAll
 
 -(void)testTableDeleteAll
 {
     // Create table with all column types
-    Table *table = [[Table alloc] init];
-    OCSpec *s = [table getSpec];
+    TightdbTable *table = [[TightdbTable alloc] init];
+    TightdbSpec *s = [table getSpec];
     [s addColumn:tightdb_Int name:@"int"];
     [s addColumn:tightdb_Bool name:@"bool"];
     [s addColumn:tightdb_Date name:@"date"];
@@ -24,7 +24,7 @@
     [s addColumn:tightdb_String name:@"string_enum"];
     [s addColumn:tightdb_Binary name:@"binary"];
     [s addColumn:tightdb_Mixed name:@"mixed"];
-    OCSpec *sub = [s addColumnTable:@"tables"];
+    TightdbSpec *sub = [s addColumnTable:@"tables"];
     [sub addColumn:tightdb_Int name:@"sub_first"];
     [sub addColumn:tightdb_String name:@"sub_second"];
     [table updateFromSpec];
@@ -52,13 +52,13 @@
         [table insertBinary:6 ndx:i data:"binary" size:7];
         switch (i % 3) {
             case 0:
-                [table insertMixed:7 ndx:i value:[OCMixed mixedWithBool:NO]];
+                [table insertMixed:7 ndx:i value:[TightdbMixed mixedWithBool:NO]];
                 break;
             case 1:
-                [table insertMixed:7 ndx:i value:[OCMixed mixedWithInt64:i]];
+                [table insertMixed:7 ndx:i value:[TightdbMixed mixedWithInt64:i]];
                 break;
             case 2:
-                [table insertMixed:7 ndx:i value:[OCMixed mixedWithString:@"string"]];
+                [table insertMixed:7 ndx:i value:[TightdbMixed mixedWithString:@"string"]];
                 break;
         }
         [table insertSubtable:8 ndx:i];
@@ -66,7 +66,7 @@
 
         // Add sub-tables
         if (i == 2) {
-            Table *subtable = [table getSubtable:8 ndx:i];
+            TightdbTable *subtable = [table getSubtable:8 ndx:i];
             [subtable insertInt:0 ndx:0 value:42];
             [subtable insertString:1 ndx:0 value:@"meaning"];
             [subtable insertDone];

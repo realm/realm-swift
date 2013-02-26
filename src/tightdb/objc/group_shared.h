@@ -21,13 +21,13 @@
 #import <Foundation/Foundation.h>
 #import <tightdb/objc/group.h>
 
-typedef void(^SharedGroupReadTransactionBlock)(Group *group);
-typedef BOOL(^SharedGroupWriteTransactionBlock)(Group *group);
+typedef void(^TightdbSharedGroupReadTransactionBlock)(TightdbGroup *group);
+typedef BOOL(^TightdbSharedGroupWriteTransactionBlock)(TightdbGroup *group);
 
-@interface SharedGroup : NSObject
-+(SharedGroup *)groupWithFilename:(NSString *)filename;
+@interface TightdbSharedGroup: NSObject
++(TightdbSharedGroup *)groupWithFilename:(NSString *)filename;
 
--(void)readTransaction:(SharedGroupReadTransactionBlock)block;
--(void)writeTransaction:(SharedGroupWriteTransactionBlock)block;
+-(void)readTransaction:(TightdbSharedGroupReadTransactionBlock)block;
+-(void)writeTransaction:(TightdbSharedGroupWriteTransactionBlock)block;
 
 @end

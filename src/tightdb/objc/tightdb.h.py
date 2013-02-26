@@ -39,7 +39,7 @@ directiveStartToken = %
 , CName${j+1}, CType${j+1}%slurp
 %end for
 ) \\
-@interface TableName##_Cursor : CursorBase \\
+@interface TableName##_Cursor: TightdbCursor \\
 %for $j in range($num_cols)
 TIGHTDB_CURSOR_PROPERTY_DEF(CName${j+1}, CType${j+1}) \\
 %end for
@@ -49,7 +49,7 @@ TIGHTDB_CURSOR_PROPERTY_DEF(CName${j+1}, CType${j+1}) \\
 %for $j in range($num_cols)
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName${j+1}, CType${j+1}) \\
 %end for
-@interface TableName##_Query : Query \\
+@interface TableName##_Query: TightdbQuery \\
 %for $j in range($num_cols)
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName${j+1} *CName${j+1}; \\
 %end for
@@ -60,7 +60,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName${j+1}, CType${j+1}) \\
 -(TableName##_Query *)parent; \\
 -(TableName##_View *)findAll; \\
 @end \\
-@interface TableName : Table \\
+@interface TableName: TightdbTable \\
 %for $j in range($num_cols)
 TIGHTDB_COLUMN_PROXY_DEF(CName${j+1}, CType${j+1}) \\
 %end for
@@ -82,7 +82,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \\
 -(TableName##_Cursor *)lastObject; \\
 @end \\
-@interface TableName##_View : TableView \\
+@interface TableName##_View: TightdbView \\
 -(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \\
 @end
 
@@ -94,15 +94,15 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 @implementation TableName##_Cursor \\
 { \\
 %for $j in range($num_cols)
-    OCAccessor *_##CName${j+1}; \\
+    TightdbAccessor *_##CName${j+1}; \\
 %end for
 } \\
--(id)initWithTable:(Table *)table ndx:(size_t)ndx \\
+-(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \\
 { \\
     self = [super initWithTable:table ndx:ndx]; \\
     if (self) { \\
 %for $j in range($num_cols)
-        _##CName${j+1} = [[OCAccessor alloc] initWithCursor:self columnId:${j}]; \\
+        _##CName${j+1} = [[TightdbAccessor alloc] initWithCursor:self columnId:${j}]; \\
 %end for
     } \\
     return self; \\
@@ -123,14 +123,14 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName${j+1}, CType${j+1}) \\
 { \\
     return [self findNext:ndx]; \\
 } \\
--(CursorBase *)getCursor:(long)ndx \\
+-(TightdbCursor *)getCursor:(long)ndx \\
 { \\
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:ndx]; \\
 } \\
 %for $j in range($num_cols)
 @synthesize CName${j+1} = _CName${j+1}; \\
 %end for
--(id)initWithTable:(Table *)table \\
+-(id)initWithTable:(TightdbTable *)table \\
 { \\
     self = [super initWithTable:table]; \\
     if (self) { \\
@@ -240,11 +240,11 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 { \\
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \\
 } \\
--(CursorBase *)getCursor \\
+-(TightdbCursor *)getCursor \\
 { \\
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \\
 } \\
-+(BOOL)_checkType:(OCSpec *)spec \\
++(BOOL)_checkType:(TightdbSpec *)spec \\
 { \\
 %for $j in range($num_cols)
     TIGHTDB_CHECK_COLUMN_TYPE(spec, ${j}, CName${j+1}, CType${j+1}) \\
@@ -253,12 +253,12 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 } \\
 -(BOOL)_checkType \\
 { \\
-    OCSpec *spec = [self getSpec]; \\
+    TightdbSpec *spec = [self getSpec]; \\
     if (!spec) return NO; \\
     if (![TableName _checkType:spec]) return NO; \\
     return YES; \\
 } \\
-+(BOOL)_addColumns:(OCSpec *)spec \\
++(BOOL)_addColumns:(TightdbSpec *)spec \\
 { \\
 %for $j in range($num_cols)
     TIGHTDB_ADD_COLUMN(spec, CName${j+1}, CType${j+1}) \\
@@ -267,7 +267,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 } \\
 -(BOOL)_addColumns \\
 { \\
-    OCSpec *spec = [self getSpec]; \\
+    TightdbSpec *spec = [self getSpec]; \\
     if (!spec) return NO; \\
     if (![TableName _addColumns:spec]) return NO; \\
     [self updateFromSpec]; \\
@@ -278,7 +278,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 { \\
     TableName##_Cursor *tmpCursor; \\
 } \\
--(CursorBase *)getCursor \\
+-(TightdbCursor *)getCursor \\
 { \\
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \\
 } \\

@@ -21,7 +21,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
                 TableCol,  TestQuerySub,
                 MixedCol,  Mixed)
 
-@interface MACtestQuery : SenTestCase
+@interface MACtestQuery: SenTestCase
 @end
 @implementation MACtestQuery
 
@@ -32,14 +32,14 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     STAssertNotNil(table, @"Table is nil");
 
     const char bin[4] = { 0, 1, 2, 3 };
-    BinaryData *bin1 = [[BinaryData alloc] initWithData:bin size:sizeof bin / 2];
-    BinaryData *bin2 = [[BinaryData alloc] initWithData:bin size:sizeof bin];
+    TightdbBinary *bin1 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin / 2];
+    TightdbBinary *bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
     time_t timeNow = [[NSDate date] timeIntervalSince1970];
 //    TestQuerySub *subtab1 = [[TestQuerySub alloc] init];
     TestQuerySub *subtab2 = [[TestQuerySub alloc] init];
     [subtab2 addAge:100];
-    OCMixed *mixInt1   = [OCMixed mixedWithInt64:1];
-    OCMixed *mixSubtab = [OCMixed mixedWithTable:subtab2];
+    TightdbMixed *mixInt1   = [TightdbMixed mixedWithInt64:1];
+    TightdbMixed *mixSubtab = [TightdbMixed mixedWithTable:subtab2];
 
     [table addBoolCol:NO   IntCol:54       FloatCol:0.7     DoubleCol:0.8       StringCol:@"foo"
             BinaryCol:bin1 DateCol:0       TableCol:nil     MixedCol:mixInt1];

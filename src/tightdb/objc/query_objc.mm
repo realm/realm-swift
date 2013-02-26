@@ -12,22 +12,20 @@
 #import <tightdb/objc/table_priv.h>
 #import <tightdb/objc/cursor.h>
 
-#pragma mark - TableView secrets
 
-@interface TableView()
-+(TableView *)tableViewWithTableView:(tightdb::TableView)table;
+@interface TightdbView()
++(TightdbView *)tableViewWithTableView:(tightdb::TableView)table;
 @end
 
-#pragma mark - Query
 
-@implementation Query
+@implementation TightdbQuery
 {
     tightdb::Query *_query;
-    __weak Table *_table;
+    __weak TightdbTable *_table;
 }
 
 
--(id)initWithTable:(Table *)table
+-(id)initWithTable:(TightdbTable *)table
 {
     self = [super init];
     if (self) {
@@ -37,7 +35,7 @@
     return self;
 }
 
--(CursorBase *)getCursor:(long)ndx
+-(TightdbCursor *)getCursor:(long)ndx
 {
     (void)ndx;
     return nil; // Must be overridden in TightDb.h
@@ -60,11 +58,11 @@
     {
         state->state = [self getFastEnumStart];
         state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self);
-        CursorBase *tmp = [self getCursor:state->state];
+        TightdbCursor *tmp = [self getCursor:state->state];
         *stackbuf = tmp;
     }
     if ((int)state->state != -1) {
-        [((CursorBase *)*stackbuf) setNdx:state->state];
+        [((TightdbCursor *)*stackbuf) setNdx:state->state];
         state->itemsPtr = stackbuf;
         state->state = [self incrementFastEnum:state->state];
     } else {
@@ -94,7 +92,7 @@
     return _query;
 }
 
--(Table *)getTable
+-(TightdbTable *)getTable
 {
     return _table;
 }
@@ -188,14 +186,12 @@
 @end
 
 
-#pragma mark - OCXQueryAccessorBool
-
-@implementation OCXQueryAccessorBool
+@implementation TightdbQueryAccessorBool
 {
-    Query *_query;
+    TightdbQuery *_query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(Query *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
 {
     self = [super init];
     if (self) {
@@ -204,7 +200,7 @@
     }
     return self;
 }
--(Query *)equal:(BOOL)value
+-(TightdbQuery *)equal:(BOOL)value
 {
     [_query getQuery]->equal(_column_ndx, (bool)value);
     return _query;
@@ -212,14 +208,12 @@
 @end
 
 
-#pragma mark - OCXQueryAccessorInt
-
-@implementation OCXQueryAccessorInt
+@implementation TightdbQueryAccessorInt
 {
-    Query *_query;
+    TightdbQuery *_query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(Query *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
 {
     self = [super init];
     if (self) {
@@ -229,43 +223,43 @@
     return self;
 }
 
--(Query *)equal:(int64_t)value
+-(TightdbQuery *)equal:(int64_t)value
 {
     [_query getQuery]->equal(_column_ndx, value);
     return _query;
 }
 
--(Query *)notEqual:(int64_t)value
+-(TightdbQuery *)notEqual:(int64_t)value
 {
     [_query getQuery]->not_equal(_column_ndx, value);
     return _query;
 }
 
--(Query *)greater:(int64_t)value
+-(TightdbQuery *)greater:(int64_t)value
 {
     [_query getQuery]->greater(_column_ndx, value);
     return _query;
 }
 
--(Query *)greaterEqual:(int64_t)value
+-(TightdbQuery *)greaterEqual:(int64_t)value
 {
     [_query getQuery]->greater_equal(_column_ndx, value);
     return _query;
 }
 
--(Query *)less:(int64_t)value
+-(TightdbQuery *)less:(int64_t)value
 {
     [_query getQuery]->less(_column_ndx, value);
     return _query;
 }
 
--(Query *)lessEqual:(int64_t)value
+-(TightdbQuery *)lessEqual:(int64_t)value
 {
     [_query getQuery]->less_equal(_column_ndx, value);
     return _query;
 }
 
--(Query *)between:(int64_t)from to:(int64_t)to
+-(TightdbQuery *)between:(int64_t)from to:(int64_t)to
 {
     [_query getQuery]->between(_column_ndx, from, to);
     return _query;
@@ -290,14 +284,12 @@
 @end
 
 
-#pragma mark - OCXQueryAccessorFloat
-
-@implementation OCXQueryAccessorFloat
+@implementation TightdbQueryAccessorFloat
 {
-    Query *_query;
+    TightdbQuery *_query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(Query *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
 {
     self = [super init];
     if (self) {
@@ -307,43 +299,43 @@
     return self;
 }
 
--(Query *)equal:(float)value
+-(TightdbQuery *)equal:(float)value
 {
     [_query getQuery]->equal(_column_ndx, value);
     return _query;
 }
 
--(Query *)notEqual:(float)value
+-(TightdbQuery *)notEqual:(float)value
 {
     [_query getQuery]->not_equal(_column_ndx, value);
     return _query;
 }
 
--(Query *)greater:(float)value
+-(TightdbQuery *)greater:(float)value
 {
     [_query getQuery]->greater(_column_ndx, value);
     return _query;
 }
 
--(Query *)greaterEqual:(float)value
+-(TightdbQuery *)greaterEqual:(float)value
 {
     [_query getQuery]->greater_equal(_column_ndx, value);
     return _query;
 }
 
--(Query *)less:(float)value
+-(TightdbQuery *)less:(float)value
 {
     [_query getQuery]->less(_column_ndx, value);
     return _query;
 }
 
--(Query *)lessEqual:(float)value
+-(TightdbQuery *)lessEqual:(float)value
 {
     [_query getQuery]->less_equal(_column_ndx, value);
     return _query;
 }
 
--(Query *)between:(float)from to:(float)to
+-(TightdbQuery *)between:(float)from to:(float)to
 {
     [_query getQuery]->between(_column_ndx, from, to);
     return _query;
@@ -368,14 +360,12 @@
 @end
 
 
-#pragma mark - OCXQueryAccessorDouble
-
-@implementation OCXQueryAccessorDouble
+@implementation TightdbQueryAccessorDouble
 {
-    Query *_query;
+    TightdbQuery *_query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(Query *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
 {
     self = [super init];
     if (self) {
@@ -385,43 +375,43 @@
     return self;
 }
 
--(Query *)equal:(double)value
+-(TightdbQuery *)equal:(double)value
 {
     [_query getQuery]->equal(_column_ndx, value);
     return _query;
 }
 
--(Query *)notEqual:(double)value
+-(TightdbQuery *)notEqual:(double)value
 {
     [_query getQuery]->not_equal(_column_ndx, value);
     return _query;
 }
 
--(Query *)greater:(double)value
+-(TightdbQuery *)greater:(double)value
 {
     [_query getQuery]->greater(_column_ndx, value);
     return _query;
 }
 
--(Query *)greaterEqual:(double)value
+-(TightdbQuery *)greaterEqual:(double)value
 {
     [_query getQuery]->greater_equal(_column_ndx, value);
     return _query;
 }
 
--(Query *)less:(double)value
+-(TightdbQuery *)less:(double)value
 {
     [_query getQuery]->less(_column_ndx, value);
     return _query;
 }
 
--(Query *)lessEqual:(double)value
+-(TightdbQuery *)lessEqual:(double)value
 {
     [_query getQuery]->less_equal(_column_ndx, value);
     return _query;
 }
 
--(Query *)between:(double)from to:(double)to
+-(TightdbQuery *)between:(double)from to:(double)to
 {
     [_query getQuery]->between(_column_ndx, from, to);
     return _query;
@@ -446,14 +436,12 @@
 @end
 
 
-#pragma mark - OCXQueryAccessorString
-
-@implementation OCXQueryAccessorString
+@implementation TightdbQueryAccessorString
 {
-    Query *_query;
+    TightdbQuery *_query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(Query *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
 {
     self = [super init];
     if (self) {
@@ -462,52 +450,52 @@
     }
     return self;
 }
--(Query *)equal:(NSString *)value
+-(TightdbQuery *)equal:(NSString *)value
 {
     [_query getQuery]->equal(_column_ndx, [value UTF8String]);
     return _query;
 }
--(Query *)equal:(NSString *)value caseSensitive:(BOOL)caseSensitive
+-(TightdbQuery *)equal:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
     [_query getQuery]->equal(_column_ndx, [value UTF8String], caseSensitive);
     return _query;
 }
--(Query *)notEqual:(NSString *)value
+-(TightdbQuery *)notEqual:(NSString *)value
 {
     [_query getQuery]->not_equal(_column_ndx, [value UTF8String]);
     return _query;
 }
--(Query *)notEqual:(NSString *)value caseSensitive:(BOOL)caseSensitive
+-(TightdbQuery *)notEqual:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
     [_query getQuery]->not_equal(_column_ndx, [value UTF8String], caseSensitive);
     return _query;
 }
--(Query *)beginsWith:(NSString *)value
+-(TightdbQuery *)beginsWith:(NSString *)value
 {
     [_query getQuery]->begins_with(_column_ndx, [value UTF8String]);
     return _query;
 }
--(Query *)beginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+-(TightdbQuery *)beginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
     [_query getQuery]->begins_with(_column_ndx, [value UTF8String], caseSensitive);
     return _query;
 }
--(Query *)endsWith:(NSString *)value
+-(TightdbQuery *)endsWith:(NSString *)value
 {
     [_query getQuery]->ends_with(_column_ndx, [value UTF8String]);
     return _query;
 }
--(Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+-(TightdbQuery *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
     [_query getQuery]->ends_with(_column_ndx, [value UTF8String], caseSensitive);
     return _query;
 }
--(Query *)contains:(NSString *)value
+-(TightdbQuery *)contains:(NSString *)value
 {
     [_query getQuery]->contains(_column_ndx, [value UTF8String]);
     return _query;
 }
--(Query *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive
+-(TightdbQuery *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
     [_query getQuery]->contains(_column_ndx, [value UTF8String], caseSensitive);
     return _query;
@@ -515,14 +503,12 @@
 @end
 
 
-#pragma mark - OCXQueryAccessorBinary
-
-@implementation OCXQueryAccessorBinary
+@implementation TightdbQueryAccessorBinary
 {
-    Query *_query;
+    TightdbQuery *_query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(Query *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
 {
     self = [super init];
     if (self) {
@@ -534,14 +520,12 @@
 @end
 
 
-#pragma mark - OCXQueryAccessorDate
-
-@implementation OCXQueryAccessorDate
+@implementation TightdbQueryAccessorDate
 {
-    Query *_query;
+    TightdbQuery *_query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(Query *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
 {
     self = [super init];
     if (self) {
@@ -550,37 +534,37 @@
     }
     return self;
 }
--(Query *)equal:(time_t)value
+-(TightdbQuery *)equal:(time_t)value
 {
     [_query getQuery]->equal_date(_column_ndx, value);
     return _query;
 }
--(Query *)notEqual:(time_t)value
+-(TightdbQuery *)notEqual:(time_t)value
 {
     [_query getQuery]->not_equal_date(_column_ndx, value);
     return _query;
 }
--(Query *)greater:(time_t)value
+-(TightdbQuery *)greater:(time_t)value
 {
     [_query getQuery]->greater_date(_column_ndx, value);
     return _query;
 }
--(Query *)greaterEqual:(time_t)value
+-(TightdbQuery *)greaterEqual:(time_t)value
 {
     [_query getQuery]->greater_equal_date(_column_ndx, value);
     return _query;
 }
--(Query *)less:(time_t)value
+-(TightdbQuery *)less:(time_t)value
 {
     [_query getQuery]->less_date(_column_ndx, value);
     return _query;
 }
--(Query *)lessEqual:(time_t)value
+-(TightdbQuery *)lessEqual:(time_t)value
 {
     [_query getQuery]->less_equal_date(_column_ndx, value);
     return _query;
 }
--(Query *)between:(time_t)from to:(time_t)to
+-(TightdbQuery *)between:(time_t)from to:(time_t)to
 {
     [_query getQuery]->between_date(_column_ndx, from, to);
     return _query;
@@ -588,14 +572,12 @@
 @end
 
 
-#pragma mark - OCXQueryAccessorSubtable
-
-@implementation OCXQueryAccessorSubtable
+@implementation TightdbQueryAccessorSubtable
 {
-    Query *_query;
+    TightdbQuery *_query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(Query *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
 {
     self = [super init];
     if (self) {
@@ -607,14 +589,12 @@
 @end
 
 
-#pragma mark - OCXQueryAccessorMixed
-
-@implementation OCXQueryAccessorMixed
+@implementation TightdbQueryAccessorMixed
 {
-    Query *_query;
+    TightdbQuery *_query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(Query *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
 {
     self = [super init];
     if (self) {

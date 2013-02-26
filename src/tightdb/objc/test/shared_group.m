@@ -20,13 +20,13 @@ TIGHTDB_TABLE_IMPL_2(SharedTable2,
                      Age,   Int)
 
 
-@interface MACTestSharedGroup : SenTestCase
+@interface MACTestSharedGroup: SenTestCase
 @end
 @implementation MACTestSharedGroup
 
 - (void)testSharedGroup
 {
-    Group *group = [Group group];
+    TightdbGroup *group = [TightdbGroup group];
     // Create new table in group
     SharedTable2 *table = [group getTable:@"employees" withClass:[SharedTable2 class]];
     NSLog(@"Table: %@", table);
@@ -35,17 +35,17 @@ TIGHTDB_TABLE_IMPL_2(SharedTable2,
     [table addHired:YES Age:52];
     [table addHired:YES Age:53];
     [table addHired:YES Age:54];
-    
+
     NSLog(@"MyTable Size: %lu", [table count]);
-    
-    
+
+
     // Write to disk
     [group write:@"employees.tightdb"];
-    
+
     // Read only shared group
-    SharedGroup *fromDisk = [SharedGroup groupWithFilename:@"employees.tightdb"];
+    TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:@"employees.tightdb"];
     @try {
-        [fromDisk readTransaction:^(Group *group) {
+        [fromDisk readTransaction:^(TightdbGroup *group) {
             SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable count]);
             for (size_t i = 0; i < [diskTable count]; i++) {
@@ -62,8 +62,8 @@ TIGHTDB_TABLE_IMPL_2(SharedTable2,
     }
 
     // Write shared group and commit
-//    SharedGroup *fromDisk = [SharedGroup groupWithFilename:@"employees.tightdb"];
-    [fromDisk writeTransaction:^(Group *group) {
+//    TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:@"employees.tightdb"];
+    [fromDisk writeTransaction:^(TightdbGroup *group) {
         SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
         NSLog(@"Disktable size: %zu", [diskTable count]);
         for (size_t i = 0; i < 50; i++) {
@@ -72,8 +72,8 @@ TIGHTDB_TABLE_IMPL_2(SharedTable2,
         return YES; // Commit
     }];
     // Write shared group and rollback
-//    SharedGroup *fromDisk = [SharedGroup groupWithFilename:@"employees.tightdb"];
-    [fromDisk writeTransaction:^(Group *group) {
+//    TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:@"employees.tightdb"];
+    [fromDisk writeTransaction:^(TightdbGroup *group) {
         SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
         NSLog(@"Disktable size: %zu", [diskTable count]);
         for (size_t i = 0; i < 50; i++) {
@@ -82,9 +82,9 @@ TIGHTDB_TABLE_IMPL_2(SharedTable2,
         return NO; // rollback
     }];
     // Write and fail with exception in block (Should rollback)
-//    SharedGroup *fromDisk = [SharedGroup groupWithFilename:@"employees.tightdb"];
+//    TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:@"employees.tightdb"];
     @try {
-        [fromDisk writeTransaction:^(Group *group) {
+        [fromDisk writeTransaction:^(TightdbGroup *group) {
             SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable count]);
             for (size_t i = 0; i < 50; i++) {
@@ -99,7 +99,7 @@ TIGHTDB_TABLE_IMPL_2(SharedTable2,
     }
     
     
-    [fromDisk readTransaction:^(Group *group) {
+    [fromDisk readTransaction:^(TightdbGroup *group) {
         SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
         NSLog(@"Disktable size: %zu", [diskTable count]);
     }];

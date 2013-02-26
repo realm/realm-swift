@@ -14,19 +14,19 @@ TIGHTDB_TABLE_2(TestTableGroup,
                 First,  String,
                 Second, Int)
 
-@interface MACTestGroup : SenTestCase
+@interface MACTestGroup: SenTestCase
 @end
 @implementation MACTestGroup
 {
-    Group *_group;
+    TightdbGroup *_group;
 }
 
 - (void)setUp
 {
     [super setUp];
 
-    // _group = [Group group];
-    // NSLog(@"Group: %@", _group);
+    // _group = [TightdbGroup group];
+    // NSLog(@"TightdbGroup: %@", _group);
     // STAssertNotNil(_group, @"Group is nil");
 }
 
@@ -41,11 +41,11 @@ TIGHTDB_TABLE_2(TestTableGroup,
 - (void)testGroup
 {
     // Create empty group and serialize to disk
-    Group *toDisk = [Group group];
+    TightdbGroup *toDisk = [TightdbGroup group];
     [toDisk write:@"table_test.tbl"];
 
     // Load the group
-    Group *fromDisk = [Group groupWithFilename:@"table_test.tbl"];
+    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:@"table_test.tbl"];
     if (!fromDisk)
         STFail(@"From disk not valid");
 

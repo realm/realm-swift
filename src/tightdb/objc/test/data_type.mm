@@ -7,10 +7,10 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-#import <tightdb/objc/data_type.h>
+#import <tightdb/objc/type.h>
 #import <tightdb/data_type.hpp>
 
-@interface TestDataType : SenTestCase
+@interface TestDataType: SenTestCase
 @end
 @implementation TestDataType
 

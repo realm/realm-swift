@@ -20,61 +20,64 @@
 
 #import <Foundation/Foundation.h>
 
-#include <tightdb/objc/data_type.h>
+#include <tightdb/objc/type.h>
 
-@class Table;
-@class TableView;
+@class TightdbTable;
+@class TightdbView;
+@class TightdbQuery;
 
-@interface BinaryData : NSObject
+
+@interface TightdbBinary: NSObject
 -(id)initWithData:(const char *)data size:(size_t)size;
 -(const char *)getData;
 -(size_t)getSize;
 
 /// Compare the referenced binary data for equality.
--(BOOL)isEqual:(BinaryData *)bin;
+-(BOOL)isEqual:(TightdbBinary *)bin;
 @end
 
-@interface OCMixed : NSObject
-+(OCMixed *)mixedWithBool:(BOOL)value;
-+(OCMixed *)mixedWithInt64:(int64_t)value;
-+(OCMixed *)mixedWithFloat:(float)value;
-+(OCMixed *)mixedWithDouble:(double)value;
-+(OCMixed *)mixedWithString:(NSString *)value;
-+(OCMixed *)mixedWithBinary:(BinaryData *)value;
-+(OCMixed *)mixedWithBinary:(const char *)data size:(size_t)size;
-+(OCMixed *)mixedWithDate:(time_t)value;
-+(OCMixed *)mixedWithTable:(Table *)value;
--(BOOL)isEqual:(OCMixed *)other;
--(TightdbDataType)getType;
+
+@interface TightdbMixed: NSObject
++(TightdbMixed *)mixedWithBool:(BOOL)value;
++(TightdbMixed *)mixedWithInt64:(int64_t)value;
++(TightdbMixed *)mixedWithFloat:(float)value;
++(TightdbMixed *)mixedWithDouble:(double)value;
++(TightdbMixed *)mixedWithString:(NSString *)value;
++(TightdbMixed *)mixedWithBinary:(TightdbBinary *)value;
++(TightdbMixed *)mixedWithBinary:(const char *)data size:(size_t)size;
++(TightdbMixed *)mixedWithDate:(time_t)value;
++(TightdbMixed *)mixedWithTable:(TightdbTable *)value;
+-(BOOL)isEqual:(TightdbMixed *)other;
+-(TightdbType)getType;
 -(BOOL)getBool;
 -(int64_t)getInt;
 -(float)getFloat;
 -(double)getDouble;
 -(NSString *)getString;
--(BinaryData *)getBinary;
+-(TightdbBinary *)getBinary;
 -(time_t)getDate;
--(Table *)getTable;
+-(TightdbTable *)getTable;
 @end
 
 
-@interface OCSpec : NSObject
+@interface TightdbSpec: NSObject
 /// Returns NO on memory allocation error.
--(BOOL)addColumn:(TightdbDataType)type name:(NSString *)name;
+-(BOOL)addColumn:(TightdbType)type name:(NSString *)name;
 /// Returns nil on memory allocation error.
--(OCSpec *)addColumnTable:(NSString *)name;
--(OCSpec *)getSubspec:(size_t)colNdx;
+-(TightdbSpec *)addColumnTable:(NSString *)name;
+-(TightdbSpec *)getSubspec:(size_t)colNdx;
 -(size_t)getColumnCount;
--(TightdbDataType)getColumnType:(size_t)colNdx;
+-(TightdbType)getColumnType:(size_t)colNdx;
 -(NSString *)getColumnName:(size_t)colNdx;
 -(size_t)getColumnIndex:(NSString *)name;
 @end
 
 
-@interface Table : NSObject
+@interface TightdbTable: NSObject
 -(void)updateFromSpec;
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
--(BOOL)isEqual:(Table *)other;
+-(BOOL)isEqual:(TightdbTable *)other;
 
 //@{
 /// If the specified column is neither a subtable column, nor a mixed
@@ -87,7 +90,7 @@
 ///
 /// The specified table class must be one that is declared by using
 /// one of the table macros TIGHTDB_TABLE_*.
--(Table *)getSubtable:(size_t)colNdx ndx:(size_t)ndx;
+-(TightdbTable *)getSubtable:(size_t)colNdx ndx:(size_t)ndx;
 -(id)getSubtable:(size_t)colNdx ndx:(size_t)ndx withClass:(Class)obj;
 //@}
 
@@ -110,8 +113,8 @@
 -(size_t)getColumnCount;
 -(NSString *)getColumnName:(size_t)ndx;
 -(size_t)getColumnIndex:(NSString *)name;
--(TightdbDataType)getColumnType:(size_t)ndx;
--(OCSpec *)getSpec;
+-(TightdbType)getColumnType:(size_t)ndx;
+-(TightdbSpec *)getSpec;
 -(BOOL)isEmpty;
 -(size_t)count;
 -(size_t)addRow;
@@ -138,7 +141,7 @@
 -(void)insertFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value;
 -(void)insertDouble:(size_t)colNdx ndx:(size_t)ndx value:(double)value;
 -(void)insertString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value;
--(void)insertBinary:(size_t)colNdx ndx:(size_t)ndx value:(BinaryData *)value;
+-(void)insertBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value;
 -(void)insertBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size;
 -(void)insertDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value;
 -(void)insertDone;
@@ -148,8 +151,8 @@
 -(void)setString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value;
 
 // Binary
--(BinaryData *)getBinary:(size_t)colNdx ndx:(size_t)ndx;
--(void)setBinary:(size_t)colNdx ndx:(size_t)ndx value:(BinaryData *)value;
+-(TightdbBinary *)getBinary:(size_t)colNdx ndx:(size_t)ndx;
+-(void)setBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value;
 -(void)setBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size;
 
 // Subtables
@@ -158,12 +161,12 @@
 -(void)clearSubtable:(size_t)colNdx ndx:(size_t)ndx;
 
 // Mixed
--(OCMixed *)getMixed:(size_t)colNdx ndx:(size_t)ndx;
--(TightdbDataType)getMixedType:(size_t)colNdx ndx:(size_t)ndx;
--(void)insertMixed:(size_t)colNdx ndx:(size_t)ndx value:(OCMixed *)value;
--(void)setMixed:(size_t)colNdx ndx:(size_t)ndx value:(OCMixed *)value;
+-(TightdbMixed *)getMixed:(size_t)colNdx ndx:(size_t)ndx;
+-(TightdbType)getMixedType:(size_t)colNdx ndx:(size_t)ndx;
+-(void)insertMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value;
+-(void)setMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value;
 
--(size_t)addColumn:(TightdbDataType)type name:(NSString *)name;
+-(size_t)addColumn:(TightdbType)type name:(NSString *)name;
 
 // Searching
 -(size_t)findBool:(size_t)colNdx value:(BOOL)value;
@@ -171,12 +174,12 @@
 -(size_t)findFloat:(size_t)colNdx value:(float)value;
 -(size_t)findDouble:(size_t)colNdx value:(double)value;
 -(size_t)findString:(size_t)colNdx value:(NSString *)value;
--(size_t)findBinary:(size_t)colNdx value:(BinaryData *)value;
+-(size_t)findBinary:(size_t)colNdx value:(TightdbBinary *)value;
 -(size_t)findDate:(size_t)colNdx value:(time_t)value;
--(size_t)findMixed:(size_t)colNdx value:(OCMixed *)value;
+-(size_t)findMixed:(size_t)colNdx value:(TightdbMixed *)value;
 
 // FIXME: Why does this one take a TableView as argument?
--(TableView *)findAll:(TableView *)view column:(size_t)colNdx value:(int64_t)value;
+-(TightdbView *)findAll:(TightdbView *)view column:(size_t)colNdx value:(int64_t)value;
 // FIXME: Implement findAll for the rest of the column types.
 
 // Indexing
@@ -213,14 +216,13 @@
 
 // Private
 -(id)_initRaw;
--(void)_insertSubtableCopy:(size_t)colNdx row:(size_t)rowNdx subtable:(Table *)subtable;
+-(void)_insertSubtableCopy:(size_t)colNdx row:(size_t)rowNdx subtable:(TightdbTable *)subtable;
 @end
 
 
-@class Query;
-@interface TableView : NSObject
--(id)initFromQuery:(Query *)query;
-+(TableView *)tableViewWithTable:(Table *)table;
+@interface TightdbView: NSObject
+-(id)initFromQuery:(TightdbQuery *)query;
++(TightdbView *)tableViewWithTable:(TightdbTable *)table;
 
 -(size_t)count;
 -(BOOL)isEmpty;
@@ -231,33 +233,33 @@
 // Deleting
 -(void)delete:(size_t)ndx;
 -(void)clear;
--(Table *)getTable;
+-(TightdbTable *)getTable;
 -(size_t)getSourceNdx:(size_t)ndx;
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 @end
 
 
-@interface OCColumnProxy : NSObject
-@property(nonatomic, weak) Table *table;
+@interface TightdbColumnProxy: NSObject
+@property(nonatomic, weak) TightdbTable *table;
 @property(nonatomic) size_t column;
--(id)initWithTable:(Table *)table column:(size_t)column;
+-(id)initWithTable:(TightdbTable *)table column:(size_t)column;
 -(void)clear;
 @end
 
-@interface OCColumnProxy_Bool : OCColumnProxy
+@interface TightdbColumnProxy_Bool: TightdbColumnProxy
 -(size_t)find:(BOOL)value;
 @end
 
-@interface OCColumnProxy_Int : OCColumnProxy
+@interface TightdbColumnProxy_Int: TightdbColumnProxy
 -(size_t)find:(int64_t)value;
--(TableView *)findAll:(int64_t)value;
+-(TightdbView *)findAll:(int64_t)value;
 -(int64_t)min;
 -(int64_t)max;
 -(int64_t)sum;
 -(double)avg;
 @end
 
-@interface OCColumnProxy_Float : OCColumnProxy
+@interface TightdbColumnProxy_Float: TightdbColumnProxy
 -(size_t)find:(float)value;
 -(float)min;
 -(float)max;
@@ -265,7 +267,7 @@
 -(double)avg;
 @end
 
-@interface OCColumnProxy_Double : OCColumnProxy
+@interface TightdbColumnProxy_Double: TightdbColumnProxy
 -(size_t)find:(double)value;
 -(double)min;
 -(double)max;
@@ -273,20 +275,21 @@
 -(double)avg;
 @end
 
-@interface OCColumnProxy_String : OCColumnProxy
+@interface TightdbColumnProxy_String: TightdbColumnProxy
 -(size_t)find:(NSString *)value;
 @end
 
-@interface OCColumnProxy_Binary : OCColumnProxy
--(size_t)find:(BinaryData *)value;
+@interface TightdbColumnProxy_Binary: TightdbColumnProxy
+-(size_t)find:(TightdbBinary *)value;
 @end
 
-@interface OCColumnProxy_Date : OCColumnProxy
--(size_t)find:(time_t) value;
-@end
-@interface OCColumnProxy_Subtable : OCColumnProxy
+@interface TightdbColumnProxy_Date: TightdbColumnProxy
+-(size_t)find:(time_t)value;
 @end
 
-@interface OCColumnProxy_Mixed : OCColumnProxy
--(size_t)find:(OCMixed *)value;
+@interface TightdbColumnProxy_Subtable: TightdbColumnProxy
+@end
+
+@interface TightdbColumnProxy_Mixed: TightdbColumnProxy
+-(size_t)find:(TightdbMixed *)value;
 @end

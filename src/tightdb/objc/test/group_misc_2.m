@@ -34,14 +34,14 @@ TIGHTDB_TABLE_2(QueryTable,
                 First,  Int,
                 Second, String)
 
-@interface MACTestGroupMisc2 : SenTestCase
+@interface MACTestGroupMisc2: SenTestCase
 @end
 @implementation MACTestGroupMisc2
 
 - (void)testGroup_Misc2
 {
     size_t row;
-    Group *group = [Group group];
+    TightdbGroup *group = [TightdbGroup group];
     NSLog(@"HasTable: %i", [group hasTable:@"employees" withClass:[MyTable class]] );
     // Create new table in group
     MyTable *table = [group getTable:@"employees" withClass:[MyTable class]];
@@ -66,7 +66,7 @@ TIGHTDB_TABLE_2(QueryTable,
     NSLog(@"Mary: %zu", row);
     STAssertEquals(row, (size_t)1,@"Mary should have been there");
 
-    TableView *view = [table.Age findAll:21];
+    TightdbView *view = [table.Age findAll:21];
     size_t cnt = [view count];            // cnt = 2
     STAssertEquals(cnt, (size_t)2,@"Should be two rows in view");
 
@@ -94,7 +94,7 @@ TIGHTDB_TABLE_2(QueryTable,
     STAssertEquals(avg, 21.0,@"Expected 20.5 average");
 
     // Execute the query and return a table (view)
-    TableView *res = [q findAll];
+    TightdbView *res = [q findAll];
     for (size_t i = 0; i < [res count]; i++) {
         // cursor missing. Only low-level interface!
         NSLog(@"%zu: is %lld years old",i , [res get:1 ndx:i]);
@@ -106,7 +106,7 @@ TIGHTDB_TABLE_2(QueryTable,
     [group write:@"employees.tightdb"];
 
     // Load a group from disk (and print contents)
-    Group *fromDisk = [Group groupWithFilename:@"employees.tightdb"];
+    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:@"employees.tightdb"];
     MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
@@ -124,7 +124,7 @@ TIGHTDB_TABLE_2(QueryTable,
     const char* data = [group writeToMem:&size];
 
     // Load a group from memory (and print contents)
-    Group *fromMem = [Group groupWithBuffer:data size:size];
+    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:data size:size];
     MyTable *memTable = [fromMem getTable:@"employees" withClass:[MyTable class]];
     for (size_t i = 0; i < [memTable count]; i++) {
         // ??? cursor
@@ -135,7 +135,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
 - (void)testQuery
 {
-    Group *group = [Group group];
+    TightdbGroup *group = [TightdbGroup group];
     QueryTable *table = [group getTable:@"Query table" withClass:[QueryTable class]];
 
     // Add some rows
@@ -179,7 +179,7 @@ TIGHTDB_TABLE_2(QueryTable,
     {
         QueryTable_Query *q = [[[[[table where].Second equal:@"a" caseSensitive:NO].First less:3] or].First greater:5]; // No parenthesis
         STAssertEquals((size_t)2, [q count], @"count != 2");
-        TableView *tv = [q findAll];
+        TightdbView *tv = [q findAll];
         STAssertEquals((size_t)2, [tv count], @"count != 2");
         STAssertEquals((int64_t)8, [tv get:0 ndx:1], @"First != 8");
     }
@@ -192,15 +192,15 @@ TIGHTDB_TABLE_2(QueryTable,
  */
 - (void)testSubtables
 {
-    Group *group = [Group group];
-    Table *table = [group getTable:@"table" withClass:[Table class]];
+    TightdbGroup *group = [TightdbGroup group];
+    TightdbTable *table = [group getTable:@"table" withClass:[TightdbTable class]];
 
     // Specify the table schema
     {
-        OCSpec *s = [table getSpec];
+        TightdbSpec *s = [table getSpec];
         [s addColumn:tightdb_Int name:@"int"];
         {
-            OCSpec *sub = [s addColumnTable:@"tab"];
+            TightdbSpec *sub = [s addColumnTable:@"tab"];
             [sub addColumn:tightdb_Int name:@"int"];
         }
         [s addColumn:tightdb_Mixed name:@"mix"];
@@ -217,20 +217,20 @@ TIGHTDB_TABLE_2(QueryTable,
     [table set:COL_TABLE_INT ndx:0 value:700];
 
     // Add two rows to the subtable
-    Table *subtable = [table getSubtable:COL_TABLE_TAB ndx:0];
+    TightdbTable *subtable = [table getSubtable:COL_TABLE_TAB ndx:0];
     [subtable addRow];
     [subtable set:COL_SUBTABLE_INT ndx:0 value:800];
     [subtable addRow];
     [subtable set:COL_SUBTABLE_INT ndx:1 value:801];
 
     // Make the mixed values column contain another subtable
-    [table setMixed:COL_TABLE_MIX ndx:0 value: [OCMixed mixedWithTable:nil]];
+    [table setMixed:COL_TABLE_MIX ndx:0 value: [TightdbMixed mixedWithTable:nil]];
 
 /* Fails!!!
     // Specify its schema
     OCTopLevelTable *subtable2 = [table getTopLevelTable:COL_TABLE_MIX ndx:0];
     {
-        OCSpec *s = [subtable2 getSpec];
+        TightdbSpec *s = [subtable2 getSpec];
         [s addColumn:tightdb_Int name:@"int"];
         [subtable2 updateFromSpec:[s getRef]];
     }

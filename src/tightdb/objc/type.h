@@ -17,8 +17,8 @@
  * from TightDB Incorporated.
  *
  **************************************************************************/
-#ifndef TIGHTDB_OBJC_DATA_TYPE_H
-#define TIGHTDB_OBJC_DATA_TYPE_H
+#ifndef TIGHTDB_OBJC_TYPE_H
+#define TIGHTDB_OBJC_TYPE_H
 
 // Make sure numbers match those in <tightdb/data_type.hpp>
 typedef enum {
@@ -31,6 +31,6 @@ typedef enum {
     tightdb_Date   =  7,
     tightdb_Table  =  5,
     tightdb_Mixed  =  6,
-} TightdbDataType;
+} TightdbType;
 
-#endif // TIGHTDB_OBJC_DATA_TYPE_H
+#endif // TIGHTDB_OBJC_TYPE_H
