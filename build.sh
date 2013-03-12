@@ -43,7 +43,6 @@ OS="$(uname)" || exit 1
 NUM_PROCESSORS=""
 if [ "$OS" = "Darwin" ]; then
     NUM_PROCESSORS="$(sysctl -n hw.ncpu)" || exit 1
-    word_list_prepend MAKEFLAGS "-w" || exit 1
 else
     if [ -r /proc/cpuinfo ]; then
         NUM_PROCESSORS="$(cat /proc/cpuinfo | grep -E 'processor[[:space:]]*:' | wc -l)" || exit 1
