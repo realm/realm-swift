@@ -590,10 +590,10 @@ $(foreach x,$($(call FOLD_TARGET,$(1))_DEPS),$(call SUBDIR_DEP_RULE,$(1),$(2),$(
 )
 ifeq ($(2),default)
 subdir/$(1)/$(2):
-	@$$(MAKE) -C $(1)
+	@$$(MAKE) -w -C $(1)
 else
 subdir/$(1)/$(2):
-	@$$(MAKE) -C $(1) $(2)
+	@$$(MAKE) -w -C $(1) $(2)
 endif
 endef
 
