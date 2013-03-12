@@ -21,6 +21,26 @@ libtightdb_objc_a_LDFLAGS_OPTIM = $(shell $(TIGHTDB_CONFIG)     --libs)
 libtightdb_objc_a_LDFLAGS_DEBUG = $(shell $(TIGHTDB_CONFIG)-dbg --libs)
 libtightdb_objc_a_LDFLAGS_COVER = $(shell $(TIGHTDB_CONFIG)-dbg --libs)
 
+# Format: CURRENT[:REVISION[:AGE]]
+#
+# At each new public release:
+#   If the interface has changed at all:
+#     Increment CURRENT and reset REVISION to zero
+#     Let COMPAT be the least number such that the new library can
+#       be used as a drop-in replacement for all previous releases
+#       whose CURRENT is greater than or equal to COMPAT
+#     If COMPAT + AGE < CURRENT:
+#       Increment AGE
+#     Else:
+#       Reset AGE to zero
+#   Else:
+#     Increment REVISION
+#
+# The meaning of this version string is identical to the one defined
+# by GNU Libtool. See also
+# http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning
+libtightdb_objc_a_VERSION = 0:0:0
+
 include ../../../generic.mk
 
 # Code generation
