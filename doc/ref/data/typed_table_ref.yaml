@@ -1,0 +1,73 @@
+#
+# Obj-C reference documentation for TypedTable class
+#
+
+ID         : class_typed_table
+TITLE      : Table (typed)
+SUMMARY    : *g_typed_table_summary             
+DESCR      : *g_typed_table_descr
+SEE        :
+EXAMPLES:
+- DESCR    :
+  CODE     : ex_cpp_typed_table_intro
+IGNORE     : []                   # List of method-ids to ignore
+
+CATEGORIES:
+- Definition:
+  METHODS:
+  - g_typed_table_macros:
+      NAMES    : TIGHTDB_TABLE_*
+      DESCR    : >
+                 This set of predefined macros is used to declare type safe table classes.
+                 It is possible to declare table classes with 1 to 15 columns.
+      SIGNATURE: |
+                 TIGHTDB_TABLE_*(ClassName,
+                                 ColumnName, ColumnType
+                                 ...)
+      SUMMARY  : Declare type safe table classes.
+      PARAMS:
+      - NAME   : "*"
+        TYPES  : text
+        DESCR  : "Number of columns in table (range: 1 to 15)."
+      - NAME   : ClassName
+        TYPES  : text
+        DESCR  : Name of the new class.
+      - NAME   : ColumnName
+        TYPES  : text
+        DESCR  : Name of column.
+      - NAME   : ColumnType
+        TYPES  : text
+        DESCR  : |
+                 Column type. Following types are available:
+                 <table>
+                 <thead>
+                 <tr><th>Name</th>              <th>Desc</th>         <th>C++ type</th></tr>
+                 </thead>
+                 <tbody>
+                 <tr><td>Int</td>               <td>Integer</td>      <td>(int64_t)</td></tr>
+                 <tr><td>Float</td>             <td>Floating-point</d><td>(float)</td></tr>
+                 <tr><td>Double</td>            <td>Floating-point</d><td>(double)</td></tr>
+                 <tr><td>Bool</td>              <td>Boolean</td>      <td>(bool)</td></tr>
+                 <tr><td>String </td>           <td>Text</td>         <td>(char*)</td></tr>
+                 <tr><td>Date</td>              <td>UTC datetime</td> <td>(time_t)</td></tr>
+                 <tr><td>Enum&lt;T&gt;</td>     <td>Enum</td>         <td>(T as enum type)</td></tr>
+                 <tr><td>Subtable&lt;T&gt;</td> <td>Sub-tables</td>   <td>(T as table class)</td></tr>
+                 <tr><td>Mixed</td>             <td>Dynamic</td>      <td>(contains any of the above)</td></tr>
+                 </tbody>
+                 </table>
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_table_macros
+        DESCR  :
+- State:
+  METHODS:
+  - g_typed_table_is_empty:
+      NAMES    : is_empty
+      DESCR    : *g_typed_table_is_empty_descr
+      SUMMARY  : *g_typed_table_is_empty_summary
+      CONST    : true
+      RETURN:
+        TYPES  : bool
+        DESCR  : *g_typed_table_true_false
+      EXAMPLES:
+      - CODE   :  ex_cpp_type_table_is_empty
+        DESCR  :

@@ -1,0 +1,410 @@
+#
+# C++ reference documentation for TableView class
+#
+
+ID         : class_typed_tableview
+TITLE      : TableView (typed)
+SUMMARY    : &g_typed_view_intro_summary
+             The TableView class.
+DESCR      : &g_typed_view_intro_descr
+             >
+             Queries and searches can return <code>TableView</code>
+             objects, which works as virtual tables containing just
+             the matched rows. You can interact with a
+             <code>TableView</code> just like a regular table.
+
+             A {@link class_typed_tableview} is implicitely linked to a
+             {@link class_typed_table}.  All changes to the view will
+             propagate to the original (or source) table. This includes
+             operations like updating values and deleting rows.
+
+             Notice that this does not imply that it will work the
+             opposite direction. Any change that adds or removes rows
+             in the original table will invalidate the view, and you
+             will have an inconsistent view of the table. This might
+             lead to a serious data corruption.
+
+             It is possible to create two or more views for the table as
+             long as you do not change the original table.
+SEE        :
+EXAMPLES   :
+- DESCR:
+  CODE: ex_cpp_typed_view_intro
+IGNORE     : []
+CATEGORIES :
+- State:
+  METHODS:
+  - g_typed_view_size:
+      NAMES    : size
+      SUMMARY  : *g_typed_table_size_summary
+      DESCR    : *g_typed_table_size_descr
+      CONST    : True
+      RETURN:
+        TYPES  : size_t
+        DESCR  : The number of rows.
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_view_size
+        DESCR  :
+  - g_typed_view_is_empty:
+      NAMES    : is_empty
+      SUMMARY  : &g_typed_view_is_empty_summary
+                 Is view empty.
+      DESCR    : &g_typed_view_is_empty_descr
+                 This method checks if the view is empty that is, it has zero rows.
+      CONST    : True
+      RETURN:
+        TYPES  : bool
+        DESCR  : <code>true</code> if empty, <code>false</code> otherwise.
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_view_is_empty
+        DESCR  :
+- View:
+  METHODS:
+  - g_typed_view_clear:
+      NAMES    : clear
+      SUMMARY  : *g_typed_table_clear_summary
+      DESCR    : &g_typed_view_clear_descr
+                 This method will remove all rows in a view.
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_view_clear
+        DESCR  :
+- Rows:
+  METHODS:
+  - g_typed_view_get_source_ndx:
+      NAMES    : get_source_ndx
+      SUMMARY  : &g_typed_view_get_source_ndx_summary
+                 Get source index.
+      DESCR    : &g_typed_view_get_source_ndx_descr
+                 This method will get the index of the row in the source table.
+      CONST    : True
+      PARAMS:
+      - NAME   : row_ndx
+        TYPES  : size_t
+        DESCR  : The row index in the view.
+      RETURN:
+        TYPES  : size_t
+        DESCR  : The row index in the table.
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_view_get_source_ndx
+        DESCR  :
+  - g_typed_view_remove_row:
+      NAMES    : remove
+      SUMMARY  : *g_typed_table_remove_row_summary
+      DESCR    : *g_typed_table_remove_row_descr
+      SIGNATURE: void remove(size_t row_ndx);
+      PARAMS:
+      - NAME   : row_ndx
+        TYPES  : size_t
+        DESCR  : Position of row to delete.
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_table_remove
+        DESCR  :
+  - g_typed_view_remove_last_row:
+      NAMES    : remove_last
+      SUMMARY  : *g_typed_table_remove_last_row_summary
+      DESCR    : *g_typed_table_remove_last_row_descr
+      SIGNATURE: void remove_last();
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_table_remove_last_row
+        DESCR  :
+- Values:
+  METHODS:
+  - g_typed_view_get_bool:
+  - g_typed_view_get_float:
+  - g_typed_view_get_double:
+  - g_typed_view_get_int:
+  - g_typed_view_get_date:
+  - g_typed_view_get_string:
+  - g_typed_view_get_binary:
+  - g_typed_view_get_mixed:
+  - g_typed_view_get_mixed_type:
+  - g_typed_view_get_subtable:
+  - g_typed_view_get_subtable_const:
+      NAMES    : get_*
+      SUMMARY  : Get value.
+      DESCR    : This method retrieves the value of a cell.
+      SIGNATURE: |
+                 bool          get_bool(size_t row_ndx) const;
+                 int64_t       get_int(size_t row_ndx) const;
+                 float         get_float(size_t row_ndx) const;
+                 double        get_double(size_t row_ndx) const;
+                 time_t        get_date(size_t row_ndx) const;
+                 const char*   get_string(size_t row_ndx) const;
+                 BinaryData    get_binary(size_t row_ndx) const;
+                 Mixed         get_mixed(size_t row_ndx) const;
+                 DataType      get_mixed_type(size_t row_ndx) const
+                 TableRef      get_subtable(size_t row_ndx);
+                 ConstTableRef get_subtable(size_t row_ndx) const;
+      CONST    : True
+      PARAMS:
+      - NAME   : row_ndx
+        TYPES  : size_t
+        DESCR  : The row index.
+      RETURN:
+        TYPES  : [bool, int64_t, float, double, time_t, const char*, BinaryData, Mixed, DataType, TableRef, ConstTableRef]
+        DESCR  : The value.
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_view_get_xxx
+        DESCR  :
+  - g_typed_view_set_bool:
+  - g_typed_view_set_int:
+  - g_typed_view_set_float:
+  - g_typed_view_set_double:
+  - g_typed_view_set_enum:
+  - g_typed_view_set_date:
+  - g_typed_view_set_string:
+  - g_typed_view_set_binary:
+  - g_typed_view_set_mixed:
+      NAMES    : set_*
+      SUMMARY  : Set value.
+      DESCR    : This method sets the value of a cell.
+      SIGNATURE: |
+                 void set_bool(size_t row_ndx, bool value);
+                 void set_int(size_t row_ndx, int64_t value);
+                 void set_float(size_t row_ndx, float value);
+                 void set_double(size_t row_ndx, double value);
+                 void set_enum(size_t row_ndx, EnumType value);
+                 void set_date(size_t row_ndx, time_t value);
+                 void set_string(size_t row_ndx, const char* value);
+                 void set_binary(size_t row_ndx, const char* value, size_t len);
+                 void set_mixed(size_t row_ndx, Mixed value);
+      PARAMS:
+      - NAME   : row_ndx
+        TYPES  : size_t
+        DESCR  : The row index.
+      - NAME   : value
+        TYPES  : [bool, int64_t, float, double, time_t, const char*, Mixed]
+        DESCR  : The value.
+      - NAME   : len
+        TYPES  : size_t
+        DESCR  : Size in bytes of binary value.
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_view_set_xxx
+        DESCR  :
+- Sub-tables:
+  METHODS:
+  - g_typed_view_get_subtable_size:
+      NAMES    : get_subtable_size
+      SUMMARY  : Get size of subtable.
+      DESCR    : This method gets the size (number of rows) of a subtable.
+      CONST    : true
+      PARAMS:
+      - NAME   : row_ndx
+        TYPES  : size_t
+        DESCR  : The row index.
+      RETURN:
+        TYPES  : size_t
+        DESCR  : Number of rows.
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_view_get_subtable
+        DESCR  :
+  - g_typed_view_clear_subtable:
+      NAMES    : clear_subtable
+      SUMMARY  : Remove rows in subtable.
+      DESCR    : This method removes all rows in a subtable.
+      PARAMS:
+      - NAME   : row_ndx
+        TYPES  : size_t
+        DESCR  : The row index.
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_view_clear_subtable
+        DESCR  :
+- Searching:
+  METHODS:
+  - g_typed_view_find_first_bool:
+  - g_typed_view_find_first_int:
+  - g_typed_view_find_first_float:
+  - g_typed_view_find_first_double:
+  - g_typed_view_find_first_date:
+  - g_typed_view_find_first_string:
+      NAMES    : find_first_*
+      SUMMARY  : Find first match row.
+      DESCR    : This method finds the first matching row.
+      SIGNATURE: |
+                 size_t find_first_int(int64_t value) const;
+                 size_t find_first_float(float value) const;
+                 size_t find_first_double(double value) const;
+                 size_t find_first_bool(bool value) const;
+                 size_t find_first_date(time_t value) const;
+                 size_t find_first_string(const char* value) const;
+      CONST    : True
+      PARAMS:
+      - NAME   : value
+        TYPES  : [bool, int64_t, time_t, const char*]
+        DESCR  : The value.
+      RETURN:
+        TYPES  : size_t
+        DESCR  : "The row index or <code>tightdb::not_found</code> (equal to <code>std::size_t(-1)</code>) if there is no match."
+      EXAMPLES:
+      - CODE   : ex_cpp_dyn_view_find_first_xxx
+        DESCR  :
+  - g_typed_view_find_all_bool:
+  - g_typed_view_find_all_int:
+  - g_typed_view_find_all_date:
+  - g_typed_view_find_all_float:
+  - g_typed_view_find_all_double:
+  - g_typed_view_find_all_string:
+  - g_typed_view_find_all_bool_const:
+  - g_typed_view_find_all_int_const:
+  - g_typed_view_find_all_float_const:
+  - g_typed_view_find_all_double_double:
+  - g_typed_view_find_all_date_const:
+  - g_typed_view_find_all_string_const:
+      NAMES    : find_all_*
+      SUMMARY  : Find all matching rows.
+      DESCR    : >
+                 This method finds all matching rows and returns a new {@link class_typed_tableview} object. Beware,
+                 changes to the returning view will propagate back to the source table but changes in the current
+                 view will not propagate forward.
+      SIGNATURE: |
+                 TableView      find_all_int(int64_t value);
+                 TableView      find_all_bool(bool value);
+                 TableView      find_all_float(float value);
+                 TableView      find_all_double(double value);
+                 TableView      find_all_date(time_t value);
+                 TableView      find_all_string(const char* value);
+
+                 ConstTableView find_all_int(int64_t value) const;
+                 ConstTableView find_all_bool(bool value) const;
+                 ConstTableView find_all_float(float value) const;
+                 ConstTableView find_all_double(double value) const;
+                 ConstTableView find_all_date(time_t value) const;
+                 ConstTableView find_all_string(const char* value) const;
+      PARAMS:
+      - NAME   : value
+        TYPES  : [bool, int64_t, float, double, time_t, const char*]
+        DESCR  : The value.
+      RETURN:
+        TYPES  : TableView
+        DESCR  : The view.
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_view_find_all_xxx
+        DESCR  :
+  - g_typed_view_sort:
+      NAMES    : sort
+      SUMMARY  : &g_typed_view_get_sorted_view_summary
+                 Sort the view.
+      DESCR    : &g_typed_view_get_sorted_view_desc
+                 This method will sort the rows by using values of a given column.
+      PARAMS:
+      - NAME   : ascending
+        TYPES  : bool
+        DESCR  : "If <code>true</code>, rows are sorted ascending. Default: <code>true</code>."
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_view_sort
+        DESCR  :
+- Aggregates:
+  METHODS:
+  - g_typed_view_sum:
+  - g_typed_view_sum_float:
+  - g_typed_view_sum_double:
+      NAMES    : [sum, sum_float, sum_double]
+      SUMMARY  : &g_typed_view_sum_summary
+                 Calculates the sum.
+      DESCR    : &g_typed_view_sum_descr
+                 Calculates the sum of a column.
+      CONST    : True
+      SIGNATURE: |
+                 int64_t sum() const;
+                 double  sum_float() const;
+                 double  sum_double() const;
+      RETURN:
+        TYPES  : [int64_t, float, double]
+        DESCR  : The sum.
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_view_sum
+        DESCR  :
+  - g_typed_view_maximum:
+  - g_typed_view_maximum_float:
+  - g_typed_view_maximum_double:
+      NAMES    : [maximum, maximum_float, maximum_double]
+      SUMMARY  : &g_typed_view_maximum_summary
+                 Find highest value.
+      DESCR    : &g_typed_view_maximum_descr
+                 Find the highest value.
+      CONST    : True
+      SIGNATURE: |
+                 int64_t maximum(size_t column_ndx) const;
+                 float   maximum_float() const;
+                 double  maximum_double() const;
+      RETURN:
+        TYPES  : [int64_t, float, double]
+        DESCR  : The maximum value.
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_view_maximum
+        DESCR  :
+  - g_typed_view_minimum:
+  - g_typed_view_minimum_float:
+  - g_typed_view_minimum_double:
+      NAMES    : [minimum, minimum_float, minimum_double]
+      SUMMARY  : &g_typed_view_minimum_summary
+                 Find lowest value.
+      DESCR    : &g_typed_view_minimum_descr
+                 Find the lowest value.
+      CONST    : True
+      SIGNATURE: |
+                 int64_t minimum() const;
+                 float   minimum_float() const;
+                 double  minimum_double() const;
+      RETURN:
+        TYPES  : [int64_t, float, double]
+        DESCR  : The minimum value.
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_view_minimum
+        DESCR  :
+  - g_typed_view_average:
+  - g_typed_view_average_float:
+  - g_typed_view_average_double:
+      NAMES    : [average, average_float, average_double]
+      SUMMARY  : &g_typed_view_average_summary
+                 Find lowest value.
+      DESCR    : &g_typed_view_average_descr
+                 Find the lowest value.
+      CONST    : True
+      SIGNATURE: |
+                 double average() const;
+                 double average_float() const;
+                 double average_double() const;
+      RETURN:
+        TYPES  : [int64_t, float, double]
+        DESCR  : The average value.
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_view_average
+        DESCR  :
+- Dump:
+  METHODS:
+  - g_typed_view_to_json:
+      NAMES    : to_json
+      SUMMARY  : &g_typed_view_to_json_summary
+                 Convert view to JSON.
+      DESCR    : &g_typed_view_to_json_descr
+                 The JavaScript Object Notation (<a
+                 href="http://json.org">JSON</a>) is useful for
+                 web/mobile applications and serialization. This
+                 method will convert a view and its columns and rows
+                 to a JSON compatible representation.
+      PARAMS:
+      - NAME   : out
+        TYPES  : std::ostream&
+        DESCR  : Output stream.
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_view_to_json
+        DESCR  :
+  - g_typed_view_to_string:
+      NAMES    : to_string
+      SUMMARY  : &g_typed_view_to_string_summary
+                 Convert view to a string.
+      DESCR    : &g_typed_view_to_string_descr
+                 This method will convert a view and its columns and rows to a format
+                 which is easily read by humans.
+      CONST    : true
+      PARAMS:
+      - NAME   : out
+        TYPES  : std::ostream&
+        DESCR  : Output stream.
+      - NAME   : limit
+        TYPES  : size_t
+        DESCR  : "The number of rows to convert. Default: 500."
+      EXAMPLES:
+      - CODE   : ex_cpp_typed_view_to_string
+        DESCR  :
