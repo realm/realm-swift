@@ -1,0 +1,274 @@
+#
+# C++ reference documentation for Shared Group class
+#
+
+ID         : class_shared_group
+TITLE      : SharedGroup
+SUMMARY    : &g_shared_group_summary
+             Sharing groups
+DESCR      : &g_shared_group_descr
+             >
+             Database files can be shared across running applications.
+
+             When two threads or processes want to access the same
+             database file, they must each create their own
+             instance of SharedGroup.
+
+             If the database file does not already exist, it will
+             be created. When multiple threads are involved, it is
+             safe to let the first thread, that gets to it, create
+             the file.
+
+             While at least one instance of SharedGroup exists for
+             a specific database file, a lock file will exist
+             too. The lock file will be placed in the same
+             directory as the database file, and its name is
+             derived by adding the suffix '.lock' to the name of
+             the database file.
+
+             Processes that share a database file must reside on
+             the same host.
+
+             Moreover, the class also provide a transactional
+             interface to TightDB. Transactions are divided into
+             read and write transactions. While read transactions
+             do not modify the table and thereby the group, write
+             transactions do. This division is important to remember
+             as derived objects (tables, views, etc.) are either
+             writable or not.
+SEE        :
+EXAMPLES:
+- DESCR    :
+  CODE     : ex_sharedgroup_intro
+IGNORE     : []
+CATEGORIES:
+- Constructor:
+  METHODS:
+  - g_shared_group_constructor:
+      NAMES    : SharedGroup
+      SUMMARY  : &g_shared_group_constructor_summary
+                 Create a shared group.
+      DESCR    : &g_shared_group_constructor_descr
+                 >
+                 Open a shared group (will be created if it does not already exist).
+
+                 By default the shared group will be fully durable, so that each commit writes its changes
+                 to disk in an atomic manner that guarantees that the file is always consistent.
+
+                 If your data is transient, and does not need to persist to disk (like for caching or
+                 shared state between processes). You can open the shared group in mem-only mode. Then the
+                 file will just be used for identification and backing and will be removed again when there
+                 are no more processes using it.
+
+                 Note that a shared group can only be opened in the mode it was created in.
+
+                 A SharedGroup may also be constructed in an unattached
+                 state (2). See open() and is_attached() for more on
+                 this.
+      SIGNATURE: >
+                 SharedGroup(const std::string& file, bool no_create = false, DurabilityLevel dlevel);
+                 SharedGroup(unattached_tag);
+      PARAMS:
+      - NAME   : file
+        TYPES  : const std::string&
+        DESCR  : Filesystem path of the TightDB database file to be opened.
+      - NAME   : no_create
+        TYPES  : bool
+        DESCR  : If set to <tt>true</tt>, File::NotFound will be thrown
+                 if the file does not already exist.
+      - NAME   : dlevel
+        TYPES  : DurabilityLevel
+        DESCR  : Durability Level (durability_Full or durability_MemOnly)
+      RETURN:
+        TYPES  : SharedGroup
+        DESCR  : A shared group.
+      THROWS:
+      - EXCEPT : File::OpenError
+        DESCR  : If the file could not be opened. If the reason
+                 corresponds to one of the exception types that are
+                 derived from File::OpenError, the derived exception
+                 type is thrown. Note that InvalidDatabase is among
+                 these derived exception types.
+      EXAMPLES:
+      - CODE   : ex_cpp_shared_group_constructor
+        DESCR  :
+- Utilities:
+  METHODS:
+  - g_shared_group_open:
+      NAMES    : open
+      SUMMARY  : &g_shared_group_open_summary
+                 Is this SharedGroup instance in its attached state?
+      DESCR    : &g_shared_group_open_descr
+                 Attach this SharedGroup instance to the specified
+                 database file.
+
+                 If the database file does not already exist, it will
+                 be created (unless <tt>no_create</tt> is set to
+                 true.) When multiple threads are involved, it is safe
+                 to let the first thread, that gets to it, create the
+                 file.
+
+                 While at least one instance of SharedGroup exists for
+                 a specific database file, a "lock" file will be
+                 present too. The lock file will be placed in the same
+                 directory as the database file, and its name will be
+                 derived by appending ".lock" to the name of the
+                 database file.
+
+                 When multiple SharedGroup instances refer to the same
+                 file, they must specify the same durability level,
+                 otherwise an exception will be thrown.
+
+                 Calling open() on a SharedGroup instance that is
+                 already in the attached state has undefined behavior.
+      PARAMS:
+      - NAME   : file
+        TYPES  : const std::string&
+        DESCR  : Filesystem path of the TightDB database file to be opened.
+      - NAME   : no_create
+        TYPES  : bool
+        DESCR  : If set to <tt>true</tt>, File::NotFound will be thrown
+                 if the file does not already exist.
+      - NAME   : dlevel
+        TYPES  : DurabilityLevel
+        DESCR  : Durability Level (durability_Full or durability_MemOnly)
+      THROWS:
+      - EXCEPT : File::OpenError
+        DESCR  : If the file could not be opened. If the reason
+                 corresponds to one of the exception types that are
+                 derived from File::OpenError, the derived exception
+                 type is thrown. Note that InvalidDatabase is among
+                 these derived exception types.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_shared_group_open
+  - g_shared_group_is_attached:
+      NAMES    : is_attached
+      SUMMARY  : &g_shared_group_is_attached_summary
+                 Is this SharedGroup instance in its attached state?
+      DESCR    : &g_shared_group_is_attached_descr
+                 A shared group may be created in the unattached
+                 state, and then later attached to a file with a call
+                 to one of the open() methods. Calling any method
+                 other than open(), is_attached(), and ~SharedGroup()
+                 on an unattached instance results in undefined
+                 behavior.
+      CONST    : true
+      RETURN:
+        TYPES  : bool
+        DESCR  : <code>true</code> if attached, <code>false</code> otherwise.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_shared_group_is_attached
+  - g_shared_group_has_changed:
+      NAMES    : has_changed
+      SUMMARY  : &g_shared_group_has_changed_summary
+                 Has shared group been changed since last transaction?
+      DESCR    : &g_shared_group_has_changed_descr
+                 >
+                 This method tests if the shared group has been modified (by another process),
+                 since the last transaction.
+
+                 It has very little overhead and does not affect other processes, so it is
+                 ok to call it at regular intervals (like in the idle handler of an application).
+      RETURN:
+        TYPES  : bool
+        DESCR  : <code>true</code> if it has changed, <code>false</code> otherwise.
+      EXAMPLES:
+      - CODE   : ex_cpp_shared_group_has_changed
+        DESCR  :
+- Write transactions:
+  METHODS:
+  - g_shared_group_begin_write:
+      NAMES    : begin_write
+      SUMMARY  : &g_shared_group_begin_write_summary
+                 Initiate a transaction.
+      DESCR    : &g_shared_group_begin_write_descr
+                 Begin writing to a shared group.
+      RETURN:
+        TYPES  : Group&
+        DESCR  : A group.
+      EXAMPLES:
+      - CODE   : ex_cpp_shared_group_begin_write
+        DESCR  :
+  - g_shared_group_begin_commit:
+      NAMES    : commit
+      SUMMARY  : &g_shared_group_commit_summary
+                 Commit a transaction.
+      DESCR    : &g_shared_group_commit_descr
+                 This method closes a transaction and changes are written to the group.
+      EXAMPLES:
+      - CODE   : ex_cpp_shared_group_commit
+        DESCR  :
+  - g_shared_group_rollback:
+      NAMES    : rollback
+      SUMMARY  : &g_shared_group_rollback_summary
+                 Rollback a transaction.
+      DESCR    : &g_shared_group_rollback_descr
+                 This method descards all changes.
+      EXAMPLES:
+      - CODE   : ex_cpp_shared_group_rollback
+        DESCR  :
+  - g_shared_group_interrupt_transact:
+      NAMES    : interrupt_transact
+      SUMMARY  : &g_shared_group_interrupt_transact_summary
+                 Interrupt any blocking call.
+      DESCR    : &g_shared_group_interrupt_transact_descr
+                 >
+                 This function may be called asynchronously to interrupt any
+                 blocking call that is part of a transaction in a replication
+                 setup. Only {@link g_shared_group_begin_write} and
+                 modifying function that are part
+                 of a write transaction can block. The transaction is
+                 interrupted only if such a call is blocked or would
+                 block. This function may be called from a different thread. It
+                 may not be called directly from a system signal handler. When
+                 a transaction is interrupted, the only valid member function
+                 to call is {@link g_shared_group_rollback}. If a client calls
+                 {@link g_shared_group_clear_interrupt_transact} after having
+                 called {@link g_shared_group_rollback}, it
+                 may then resume normal operation on this database/shared group.
+                 Currently,
+                 transaction interruption works by throwing an exception from
+                 one of the mentioned member functions that may block.
+      EXAMPLES:
+      - CODE   : ex_cpp_shared_group_interrupt_transact
+        DESCR  :
+  - g_shared_group_clear_interrupt_transact:
+      NAMES    : clear_interrupt_transact
+      SUMMARY  : &g_shared_group_clear_interrupt_transact_summary
+                 Clean up interrupted state.
+      DESCR    : &g_shared_group_clear_interrupt_transact_descr
+                 >
+                 This method clears the interrupted state of the shared group after rolling
+                 back a transaction. It is not an error to call this function
+                 in a situation where no interruption has occured.
+      SEE      : g_shared_group_interrupt_transact
+      EXAMPLES:
+      - CODE   : ex_cpp_shared_group_clear_interrupt_transact
+        DESCR  :
+- Read transactions:
+  METHODS:
+  - g_shared_group_begin_read:
+      NAMES    : begin_read
+      SUMMARY  : &g_shared_group_begin_read_summary
+                 Initiate reading.
+      DESCR    : &g_shared_group_begin_read_descr
+                 Begin reading from a shared group.
+      CONST    : True
+      RETURN:
+        TYPES  : Group&
+        DESCR  : A group.
+      EXAMPLES:
+      - CODE   : ex_cpp_shared_group_begin_read
+        DESCR  :
+  - g_shared_group_end_read:
+      NAMES    : end_read
+      SUMMARY  : &g_shared_group_end_read_summary
+                 Stop reading from a group.
+      DESCR    : &g_shared_group_end_read_descr
+                 This method stops reading from a shared group.
+      EXAMPLES:
+      - CODE   : ex_cpp_shared_group_end_read
+        DESCR  :
+
