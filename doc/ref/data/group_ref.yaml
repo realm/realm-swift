@@ -55,7 +55,7 @@ CATEGORIES:
 - Table:
   METHODS:
   - g_group_has_table:
-      NAMES    : has_table
+      NAMES    : hasTable
       SUMMARY  : *g_group_has_table_summary
       DESCR    : *g_group_has_table_descr
       SIGNATURE: (BOOL)hasTable:(NSString *)name withClass:(Class)obj;
@@ -73,7 +73,7 @@ CATEGORIES:
       - DESCR  :
         CODE   : ex_cpp_group_optional_table
   - g_group_get_table:
-      NAMES    : get_table
+      NAMES    : getTable
       SUMMARY  : *g_group_get_table_summary
       DESCR    : *g_group_get_table_descr
       SIGNATURE: |
@@ -114,7 +114,7 @@ CATEGORIES:
       - DESCR  :
         CODE   : ex_cpp_group_write_to_file
   - g_group_write_to_mem:
-      NAMES    : write_to_mem
+      NAMES    : writeToMem
       SUMMARY  : *g_group_write_to_mem_summary
       DESCR    : *g_group_write_to_mem_descr
       SIGNATURE: |
