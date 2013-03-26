@@ -1,39 +1,24 @@
 #
-# C++ reference documentation for Query class
+# Obj-C reference documentation for Query class
 #
+
+# NOTIMPLEMENTED binary data type missing
+# INCONSISTENCY greater vs greaterThan
 
 ID         : class_typed_query
 TITLE      : Query (typed)
-SUMMARY    : &g_typed_query_intro_summary
-             Query your TightDB table.
-DESCR      : &g_typed_query_intro_descr
-             >
-             Query objects are used to build up queries. A query is tied to a
-             {@link class_typed_table}. The typed query class is used in conjunction with
-             {@link class_typed_table}.
-
-             Conditions is added to a query through a
-             <a href="http://en.wikipedia.org/wiki/Fluent_interface">fluent interface</a>.
-             This means that the methods representing the conditions will return the
-             query object.
-
-             Conditions are split in two parts: the column name and a method for each
-             predicate. Conditions are folded with logical-and if not stated otherwise.
-
-             Once the query is ready, it is possible to reuse by multiple calls to
-             the action methods.
-             Moreover, it is possible extend the query with new conditions after applying an
-             action method and thereby implement a drill-down. It is important to stress that
-             no data is cached, and the new queries cannot benefit from previous queries.
-
-             Alternatively, a query can result in a {@link class_typed_tableview} which can be further
-             queried.
+SUMMARY    : *g_typed_query_intro_summary
+DESCR      : *g_typed_query_intro_descr
 SEE        :
 EXAMPLES   :
 - DESCR:
   CODE: ex_cpp_typed_query_intro
 IGNORE     : []
 CATEGORIES :
+
+
+
+
 - Conditions:
   METHODS:
   - g_typed_query_equals_boolean:
@@ -45,31 +30,22 @@ CATEGORIES :
   - g_typed_query_equals_binary:
       NAMES    : [ equal, equal_date, equal_binary ]
       SIGNATURE: |
-                 Query& equal(bool value);
-                 Query& equal(int64_t value);
-                 Query& equal(float value);
-                 Query& equal(double value);
-                 Query& equal(const char* value, bool case_sensitive=true);
-                 Query& equal_date(time_t value);
-                 Query& equal_binary(const char* data, size_t size);
-      SUMMARY  : &g_typed_query_equals_summary
-                 Equal to.
-      DESCR    : &g_typed_query_equals_descr
-                 Queries for column values equals to a certain value.
+                 (TightdbQuery *)equal:(BOOL)value
+                 (TightdbQuery *)equal:(int64_t)value
+                 (TightdbQuery *)equal:(float)value
+                 (TightdbQuery *)equal:(double)value
+                 (TightdbQuery *)equal:(NSString *)value
+                 (TightdbQuery *)equal:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 (TightdbQuery *)equal:(time_t)value
+      SUMMARY  : *g_typed_query_equals_summary
+      DESCR    : *g_typed_query_equals_descr
       PARAMS:
       - NAME   : value
         TYPES  : [bool, int64_t, float, double, const char*, time_t]
         DESCR  : The value.
-      - NAME   : case_sensitive
-        TYPES  : bool
-        DESCR  : &g_typed_query_case_sensitive_descr
-                 'String match can be performed case sensitive or not. Default: <code>true</code>.'
-      - NAME   : data
-        TYPES  : const char*
-        DESCR  : Pointer to a chunk of binary data.
-      - NAME   : size
-        TYPES  : size_t
-        DESCR  : Size of binary data chunk.
+      - NAME   : caseSensitive
+        TYPES  : BOOL
+        DESCR  : 'String match can be performed case sensitive or not. Default: <code>true</code>.'
       RETURN:
         TYPES  : Query&
         DESCR  : The query object.
@@ -83,19 +59,16 @@ CATEGORIES :
   - g_typed_query_notEquals_string:
   - g_typed_query_notEquals_date:
   - g_typed_query_notEquals_binary:
-      NAMES    : [ not_equal, not_equal, not_equal_binary ]
+      NAMES    : [ notEqual, not_equal, not_equal_binary ]
       SIGNATURE: |
-                 Query& not_equal(bool value);
-                 Query& not_equal(int64_t value);
-                 Query& not_equal(float value);
-                 Query& not_equal(double value);
-                 Query& not_equal(const char* value, bool case_sensitive=true);
-                 Query& not_equal_date(time_t value);
-                 Query& not_equal_binary(const char* data, size_t size);
-      SUMMARY  : &g_typed_query_notEquals_summary
-                 Not equal to.
-      DESCR    : &g_typed_query_notEquals_descr
-                 Queries for column values not equals to a certain value.
+                 (TightdbQuery *)notEqual:(int64_t)value
+                 (TightdbQuery *)notEqual:(float)value
+                 (TightdbQuery *)notEqual:(double)value
+                 (TightdbQuery *)notEqual:(NSString *)value
+                 (TightdbQuery *)notEqual:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 (TightdbQuery *)notEqual:(time_t)value
+      SUMMARY  : *g_typed_query_notEquals_summary
+      DESCR    : *g_typed_query_notEquals_descr
       PARAMS:
       - NAME   : value
         TYPES  : [bool, int64_t, float, double, const char*, time_t]
@@ -103,12 +76,6 @@ CATEGORIES :
       - NAME   : case_sensitive
         TYPES  : bool
         DESCR  : 'String match can be performed case sensitive or not. Default: <code>true</code>.'
-      - NAME   : data
-        TYPES  : const char*
-        DESCR  : Pointer to a chunk of binary data.
-      - NAME   : size
-        TYPES  : size_t
-        DESCR  : Size of binary data chunk.
       RETURN:
         TYPES  : Query&
         DESCR  : The query object.
@@ -121,14 +88,12 @@ CATEGORIES :
   - g_typed_query_greaterThan_date:
       NAMES    : [ greater, greater, greater, greater_date ]
       SIGNATURE: |
-                 Query& greater(int64_t value);
-                 Query& greater(float value);
-                 Query& greater(double value);
-                 Query& greater_date(time_t value);
-      SUMMARY  : &g_typed_query_greaterThan_summary
-                 Greater than.
-      DESCR    : &g_typed_query_greaterThan_descr
-                 Queries for column values greater than a certain value.
+                 (TightdbQuery *)greater:(int64_t)value
+                 (TightdbQuery *)greater:(float)value
+                 (TightdbQuery *)greater:(double)value
+                 (TightdbQuery *)greater:(time_t)value
+      SUMMARY  : *g_typed_query_greaterThan_summary
+      DESCR    : *g_typed_query_greaterThan_descr
       PARAMS:
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
@@ -143,14 +108,12 @@ CATEGORIES :
   - g_typed_query_greaterThanOrEqual_date:
       NAMES    : [ greater_equal, greater_equal_date ]
       SIGNATURE: |
-                 Query& greater_equal(int64_t value);
-                 Query& greater_equal(float value);
-                 Query& greater_equal(double value);
-                 Query& greater_equal_date(time_t value);
-      SUMMARY  : &g_typed_query_greaterThanOrEqual_summary
-                 Greater than or equal to.
-      DESCR    : &g_typed_query_greaterThanOrEqual_descr
-                 Queries for column values greater than or equal to a specified value.
+                 (TightdbQuery *)greaterEqual:(int64_t)value
+                 (TightdbQuery *)greaterEqual:(float)value
+                 (TightdbQuery *)greaterEqual:(double)value
+                 (TightdbQuery *)greaterEqual:(time_t)value
+      SUMMARY  : *g_typed_query_greaterThanOrEqual_summary
+      DESCR    : *g_typed_query_greaterThanOrEqual_descr
       PARAMS:
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
@@ -161,18 +124,21 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_cpp_typed_query_greaterThanOrEqual
+
+
+# OK UNTIL HERE
+
+
   - g_typed_query_lessThan:
   - g_typed_query_lessThan_date:
       NAMES    : [less, less_date]
       SIGNATURE: |
-                 Query& less(int64_t value);
-                 Query& less(float value);
-                 Query& less(double value);
-                 Query& less_date(time_t value);
-      SUMMARY  : &g_typed_query_lessThan_summary
-                 Less than.
-      DESCR    : &g_typed_query_lessThan_descr
-                 Queries for column values less than a specified value.
+                 (TightdbQuery *)less:(int64_t)value
+                 (TightdbQuery *)less:(float)value
+                 (TightdbQuery *)less:(double)value
+                 (TightdbQuery *)less:(time_t)value
+      SUMMARY  : *g_typed_query_lessThan_summary
+      DESCR    : *g_typed_query_lessThan_descr
       PARAMS:
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
@@ -185,16 +151,14 @@ CATEGORIES :
         CODE   : ex_cpp_typed_query_lessThan
   - g_typed_query_lessThanOrEqual:
   - g_typed_query_lessThanOrEqual_date:
-      NAMES    : [less_equal, less_equal_date]
+      NAMES    : [lessEqual, less_equal_date]
       SIGNATURE: |
-                 Query& less_equal(int64_t value);
-                 Query& less_equal(float value);
-                 Query& less_equal(double value);
-                 Query& less_equal_date(time_t value);
-      SUMMARY  : &g_typed_query_lessThanOrEqual_summary
-                 Less than or equal to.
-      DESCR    : &g_typed_query_lessThanOrEqual_descr
-                 Queries for column values less than or equal to a certain value.
+                 (TightdbQuery *)lessEqual:(int64_t)value
+                 (TightdbQuery *)lessEqual:(float)value
+                 (TightdbQuery *)lessEqual:(double)value
+                 (TightdbQuery *)lessEqual:(time_t)value
+      SUMMARY  : *g_typed_query_lessThanOrEqual_summary
+      DESCR    : *g_typed_query_lessThanOrEqual_descr
       PARAMS:
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
@@ -209,14 +173,12 @@ CATEGORIES :
   - g_typed_query_between_date:
       NAMES    : [between, between_date]
       SIGNATURE: |
-                 Query& between(int64_t from, int64_t to);
-                 Query& between(float from, float to);
-                 Query& between(double from, double to);
-                 Query& between_date(time_t from, time_t to);
-      DESCR    : &g_typed_query_between_descr
-                 Queries for column values in ranges.
-      SUMMARY  : &g_typed_query_between_summary
-                 Belongs to an interval.
+                 (TightdbQuery *)between:(int64_t)from to:(int64_t)to
+                 (TightdbQuery *)between:(float)from to:(float)to
+                 (TightdbQuery *)between:(double)from to:(double)to
+                 (TightdbQuery *)between:(time_t)from to:(time_t)to
+      DESCR    : *g_typed_query_between_descr
+      SUMMARY  : *g_typed_query_between_summary
       PARAMS:
       - NAME   : from
         TYPES  : [int64_t, float, double, time_t]
@@ -232,14 +194,12 @@ CATEGORIES :
         CODE   : ex_cpp_typed_query_between
   - g_typed_query_startsWith:
   - g_typed_query_startsWith_binary:
-      NAMES    : [begins_with, begins_with_binary]
+      NAMES    : [beginsWith, begins_with_binary]
       SIGNATURE: |
-                 Query& begins_with(const char* value, bool case_sensitive=true);
-                 Query& begins_with_binary(const char* data, size_t size);
-      DESCR    : &g_typed_query_startsWith_descr
-                 Queries for column values which begin with a certain prefix.
-      SUMMARY  : &g_typed_query_startsWith_summary
-                 Substring match at the begining of the attribute.
+                 (TightdbQuery *)beginsWith:(NSString *)value
+                 (TightdbQuery *)beginsWith:(NSString *)value caseSensitive:(BOOL)
+      DESCR    : *g_typed_query_startsWith_descr
+      SUMMARY  : *g_typed_query_startsWith_summary
       PARAMS:
       - NAME   : value
         TYPES  : const char*
@@ -247,12 +207,6 @@ CATEGORIES :
       - NAME   : case_sensitive
         TYPES  : bool
         DESCR  : *g_typed_query_case_sensitive_descr
-      - NAME   : data
-        TYPES  : const char*
-        DESCR  : Pointer to a chunk of binary data.
-      - NAME   : size
-        TYPES  : size_t
-        DESCR  : Size of binary data chunk.
       RETURN:
         TYPES  : Query&
         DESCR  : The query object.
@@ -261,14 +215,12 @@ CATEGORIES :
         CODE   : ex_cpp_typed_query_startsWith
   - g_typed_query_endsWith:
   - g_typed_query_endsWith_binary:
-      NAMES    : [ends_with, ends_with_binary]
+      NAMES    : [endsWith, ends_with_binary]
       SIGNATURE: |
-                 Query& ends_with(const char* value, bool case_sensitive=true);
-                 Query& ends_with_binary(const char* data, size_t size);
-      DESCR    : &g_typed_query_endsWith_descr
-                 Queries for column values which end with a certain suffix.
-      SUMMARY  : &g_typed_query_endsWith_summary
-                 Substring match at the end at the attribute.
+                 (TightdbQuery *)endsWith:(NSString *)value
+                 (TightdbQuery *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+      DESCR    : *g_typed_query_endsWith_descr
+      SUMMARY  : *g_typed_query_endsWith_summary
       PARAMS:
       - NAME   : value
         TYPES  : const char*
@@ -276,12 +228,6 @@ CATEGORIES :
       - NAME   : case_sensitive
         TYPES  : bool
         DESCR  : *g_typed_query_case_sensitive_descr
-      - NAME   : data
-        TYPES  : const char*
-        DESCR  : Pointer to a chunk of binary data.
-      - NAME   : size
-        TYPES  : size_t
-        DESCR  : Size of binary data chunk.
       RETURN:
         TYPES  : Query&
         DESCR  : The query object.
@@ -292,12 +238,10 @@ CATEGORIES :
   - g_typed_query_contains_binary:
       NAMES    : [contains, contains_binary]
       SIGNATURE: |
-                 Query& contains(const char* value, bool case_sensitive=true);
-                 Query& contains_binary(const char* data, size_t size);
-      DESCR    : &g_typed_query_contains_descr
-                 Queries for column values which contain a certian substring.
-      SUMMARY  : &g_typed_query_contains_summary
-                 Substring search.
+                 (TightdbQuery *)contains:(NSString *)value
+                 (TightdbQuery *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive
+      DESCR    : *g_typed_query_contains_descr
+      SUMMARY  : *g_typed_query_contains_summary
       PARAMS:
       - NAME   : value
         TYPES  : const char*
@@ -305,346 +249,9 @@ CATEGORIES :
       - NAME   : case_sensitive
         TYPES  : bool
         DESCR  : *g_typed_query_case_sensitive_descr
-      - NAME   : data
-        TYPES  : const char*
-        DESCR  : Pointer to a chunk of binary data.
-      - NAME   : size
-        TYPES  : size_t
-        DESCR  : Size of binary data chunk.
       RETURN:
         TYPES  : Query&
         DESCR  : The query object.
       EXAMPLES:
       - DESCR  :
         CODE   : ex_cpp_typed_query_contains
-- Combiners:
-  METHODS:
-  - g_typed_query_group:
-      NAMES    : group
-      DESCR    : &g_typed_query_group_descr
-                 >
-                 Group conditions ("left" parenthesis). Group of conditions can be nested and they are
-                 conceptually a parenthesis.
-      SUMMARY  : &g_typed_query_group_summary
-                 Start group ("left parenthesis").
-      RETURN:
-        TYPES  : Query
-        DESCR  : The query object.
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_typed_query_group
-  - g_typed_query_endGroup:
-      NAMES    : end_group
-      DESCR    : &g_typed_query_endGroup_descr
-                 Group conditions ("right" parenthesis).
-      SUMMARY  : &g_typed_query_endGroup_summary
-                 Stop group ("right parenthesis").
-      RETURN:
-        TYPES  : Query
-        DESCR  : The query object.
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_typed_query_group
-  - g_typed_query_or:
-      NAMES    : Or
-      DESCR    : &g_typed_query_or_descr
-                 Two conditions will be folded by logical-or.
-      SUMMARY  : &g_typed_query_or_summary
-                 Logical-or.
-      RETURN:
-        TYPES  : Query
-        DESCR  : The query object.
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_typed_query_or
-  - g_typed_query_subtable:
-      NAMES    : subtable
-      DESCR    : &g_typed_query_subtable_descr
-                 Query a subtable.
-      SUMMARY  : &g_typed_query_subtable_summary
-                 Query a subtable.
-      RETURN:
-        TYPES  : Query
-        DESCR  : The query object.
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_typed_query_subtable
-  - g_typed_query_endSubtable:
-      NAMES    : end_subtable
-      DESCR    : &g_typed_query_endSubtable_descr
-                 End of subtable query.
-      SUMMARY  : &g_typed_query_endSubtable_summary
-                 End of subtable query.
-      RETURN:
-        TYPES  : Query
-        DESCR  : The query object.
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_typed_query_subtable
-- Actions:
-  METHODS:
-  - g_typed_query_find_all_const:
-  - g_typed_query_find_all:
-      NAMES    : find_all
-      DESCR    : &g_typed_query_find_all_descr
-                 Execute a query. See the {@link class_dyn_tableview} class for further details.
-      SUMMARY  : &g_typed_query_find_all_summary
-                 Execute query.
-      SIGNATURE: |
-                 TableView      find_all(size_t start=0, size_t end=size_t(-1), size_t limit=size_t(-1));
-                 ConstTableView find_all(size_t start=0, size_t end=size_t(-1), size_t limit=size_t(-1));
-      PARAMS:
-      - NAME   : start
-        TYPES  : size_t
-        DESCR  : "Row to begin search. Default: 0."
-      - NAME   : end
-        TYPES  : size_t
-        DESCR  : "Row to stop search. Default: -1 (infinity)."
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
-      RETURN:
-        TYPES  : [TableView, ConstTableView]
-        DESCR  : The TableView object.
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_typed_query_findall
-  - g_typed_query_find_next:
-      NAMES    : find_next
-      DESCR    : &g_typed_query_find_next_descr
-                 Find next row.
-      SUMMARY  : &g_typed_query_find_next_summary
-                 Find next row.
-      PARAMS:
-      - NAME   : lastmatch
-        TYPES  : size_t
-        DESCR  : "Row to stop search. Default: -1 (infinity)."
-      RETURN:
-        TYPES  : size_t
-        DESCR  : Row number
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_typed_query_find_next
-  - g_typed_query_sum:
-  - g_typed_query_sum_float:
-  - g_typed_query_sum_double:
-      NAMES    : [sum, sum_float, sum_double]
-      DESCR    : &g_typed_query_sum_descr
-                 This method calculates the sum.
-      SUMMARY  : &g_typed_query_sum_summary
-                 Calculate sum.
-      CONST    : true
-      SIGNATURE: |
-                 int64_t sum(size_t column_ndx, size_t* resultcount, size_t start, size_t end, size_t limit) const;
-                 double sum_float(size_t column_ndx, size_t* resultcount, size_t start, size_t end, size_t limit) const;
-                 double sum_double(size_t column_ndx, size_t* resultcount, size_t start, size_t end, size_t limit) const;
-      PARAMS:
-      - NAME   : resultcount
-        DESCR  : The number of rows used to calculate the sum.
-        TYPES  : size_t*
-      - NAME   : start
-        TYPES  : size_t
-        DESCR  : "Row to begin search. Default: 0."
-      - NAME   : end
-        TYPES  : size_t
-        DESCR  : "Row to stop search. Default: -1 (infinity)."
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
-      RETURN:
-        TYPES  : [int64_t, float, double]
-        DESCR  : The sum.
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_typed_query_sum
-  - g_typed_query_size:
-      NAMES    : count
-      DESCR    : &g_typed_query_size_descr
-                 Find the number of matching rows.
-      SUMMARY  : &g_typed_query_size_summary
-                 Number of matching rows.
-      CONST    : true
-      PARAMS:
-      - NAME   : start
-        TYPES  : size_t
-        DESCR  : "Row to begin search. Default: 0."
-      - NAME   : end
-        TYPES  : size_t
-        DESCR  : "Row to stop search. Default: -1 (infinity)."
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
-      RETURN:
-        TYPES  : size_t
-        DESCR  : The number of rows.
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_typed_query_size
-  - g_typed_query_maximum_date:
-  - g_typed_query_maximum:
-  - g_typed_query_maximum_float:
-  - g_typed_query_maximum_double:
-      NAMES    : [maximum, maximum_float, maximum_double]
-      DESCR    : &g_typed_query_maximum_descr
-                 This method finds the highest value.
-      SUMMARY  : &g_typed_query_maximum_summary
-                 Highest value.
-      CONST    : true
-      SIGNATURE: |
-                 int64_t maximum(size_t* resultcount, size_t start, size_t end, size_t limit) const;
-                 float   maximum_float(size_t* resultcount, size_t start, size_t end, size_t limit) const;
-                 double  maximum_double(size_t* resultcount, size_t start, size_t end, size_t limit) const;
-      PARAMS:
-      - NAME   : resultcount
-        DESCR  : The number of rows used to find the highest value.
-        TYPES  : size_t*
-      - NAME   : start
-        TYPES  : size_t
-        DESCR  : "Row to begin search. Default: 0."
-      - NAME   : end
-        TYPES  : size_t
-        DESCR  : "Row to stop search. Default: -1 (infinity)."
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
-      RETURN:
-        TYPES  : [int64_t, float, double]
-        DESCR  : The highest value.
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_typed_query_maximum
-  - g_typed_query_minimum:
-  - g_typed_query_minimum_float:
-  - g_typed_query_minimum_double:
-      NAMES    : minimum
-      DESCR    : &g_typed_query_minimum_descr
-                 This method finds the lowest value.
-      SUMMARY  : &g_typed_query_minimum_summary
-                 Lowest value.
-      CONST    : true
-      SIGNATURE: |
-                 int64_t minimum(size_t* resultcount, size_t start, size_t end, size_t limit) const;
-                 float   minimum_float(size_t* resultcount, size_t start, size_t end, size_t limit) const;
-                 double  minimum_double(size_t* resultcount, size_t start, size_t end, size_t limit) const;
-      PARAMS:
-      - NAME   : resultcount
-        DESCR  : The number of rows used to find the value.
-        TYPES  : size_t*
-      - NAME   : start
-        TYPES  : size_t
-        DESCR  : "Row to begin search. Default: 0."
-      - NAME   : end
-        TYPES  : size_t
-        DESCR  : "Row to stop search. Default: -1 (infinity)."
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
-      RETURN:
-        TYPES  : [int64_t, float, double]
-        DESCR  : The lowest value.
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_typed_query_manimum
-  - g_typed_query_average:
-  - g_typed_query_average_float:
-  - g_typed_query_average_double:
-      NAMES    : average
-      SUMMARY  : &g_typed_query_average_summary
-                 Calcualtes the average.
-      DESCR    : &g_typed_query_average_descr
-                 This method calcualtes the average.
-      CONST    : true
-      SIGNATURE: |
-                 double  average(size_t* resultcount, size_t start, size_t end, size_t limit) const;
-                 double  average_float(size_t* resultcount, size_t start, size_t end, size_t limit) const;
-                 double  average_double(size_t* resultcount, size_t start, size_t end, size_t limit) const;
-      PARAMS:
-      - NAME   : resultcount
-        DESCR  : The number of rows used to calculate the average.
-        TYPES  : size_t*
-      - NAME   : start
-        TYPES  : size_t
-        DESCR  : "Row to begin search. Default: 0."
-      - NAME   : end
-        TYPES  : size_t
-        DESCR  : "Row to stop search. Default: -1 (infinity)."
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
-      RETURN:
-        TYPES  : double
-        DESCR  : The average.
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_typed_query_average
-  - g_typed_query_remove:
-      NAMES    : remove
-      DESCR    : &g_typed_query_remove_descr
-                 This method will remove all matching rows in the source table.
-      SUMMARY  : &g_typed_query_remove_summary
-                 Remove rows.
-      CONST    : true
-      PARAMS:
-      - NAME   : resultcount
-        DESCR  : The number of rows used to calculate the average.
-        TYPES  : size_t*
-      - NAME   : start
-        TYPES  : size_t
-        DESCR  : "Row to begin search. Default: 0."
-      - NAME   : end
-        TYPES  : size_t
-        DESCR  : "Row to stop search. Default: -1 (infinity)."
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
-      RETURN:
-        TYPES  : size_t
-        DESCR  : The number of rows removed.
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_typed_query_remove
-- Multithreaded:
-  METHODS:
-  - g_typed_query_find_all_multi:
-  - g_typed_query_find_all_const_multi:
-      NAMES    : find_all_multi
-      DESCR    : &g_typed_query_find_all_multi_descr
-                 Execute a query using (POSIX) threads. See the {@link class_dyn_tableview} class for further details.
-      SUMMARY  : &g_typed_query_find_all_multi_summary
-                 Execute query.
-      SIGNATURE: |
-                 TableView      find_all_multi(size_t start=0, size_t end=size_t(-1), size_t limit=size_t(-1));
-                 ConstTableView find_all_multi(size_t start=0, size_t end=size_t(-1), size_t limit=size_t(-1));
-
-      PARAMS:
-      - NAME   : start
-        TYPES  : size_t
-        DESCR  : "Row to begin search. Default: 0."
-      - NAME   : end
-        TYPES  : size_t
-        DESCR  : "Row to stop search. Default: -1 (infinity)."
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
-      RETURN:
-        TYPES  : [TableView, ConstTableView]
-        DESCR  : The TableView object.
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_typed_query_find_all_multi
-  - g_typed_query_set_threads:
-      NAMES    : set_threads
-      SUMMARY  : &g_typed_query_set_threads_summary
-                 Set the number of threads.
-      DESCR    : &g_typed_query_set_threads_descr
-                 Set the number of threads.
-      PARAMS:
-      - NAME   : threadcount
-        TYPES  : unsigned int
-        DESCR  : Number of threads.
-      RETURN:
-        DESCR  : Success or not
-        TYPES  : int
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_typed_query_find_all_multi

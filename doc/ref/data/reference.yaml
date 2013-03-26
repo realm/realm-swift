@@ -40,7 +40,7 @@ DESCR     : >
             and environments. For multi-threaded or multi-process applications, you can
             use the {@link class_shared_group}.
 
-IMPORT    : [reference, typed_table_ref, dyn_table_ref, dyn_query_ref, group_ref, typed_view_ref, dyn_view_ref, shared_group_ref]
+IMPORT    : [reference, typed_table_ref, dyn_table_ref, dyn_query_ref, group_ref, typed_view_ref, dyn_view_ref, shared_group_ref, typed_query_ref]
 IMPORTPATH: ../../tightdb/doc/ref_cpp/data
 
 
@@ -48,15 +48,15 @@ CATEGORIES:                       # list global class-id in order of appearence
 - Typed Table:                    # Category header name
    - typed_table                   # Global Class name. File: 'typed_table_ref.yaml'
 #  - typed_view
-#  - typed_query
-- Dynamic Table:
+   - typed_query
+#- Dynamic Table:
 #  - dyn_table
 #  - dyn_view
 #  - dyn_query
 - Collection:
   - group
 #  - shared_group
-- Helpers:
+#- Helpers:
 #  - mixed
 #  - cursor
 
