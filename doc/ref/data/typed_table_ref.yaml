@@ -168,7 +168,7 @@ CATEGORIES:
       NAMES    : remove
       SUMMARY  : *g_typed_table_remove_row_summary
       DESCR    : *g_typed_table_remove_row_descr
-      SIGNATURE: (void)delete:(size_t)ndx
+      SIGNATURE: (void)remove:(size_t)ndx
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
@@ -177,10 +177,10 @@ CATEGORIES:
       - CODE   : ex_cpp_typed_table_remove
         DESCR  :
   - g_typed_table_remove_last_row:
-      NAMES    : popBack
+      NAMES    : removeLast
       SUMMARY  : *g_typed_table_remove_last_row_summary
       DESCR    : *g_typed_table_remove_last_row_descr
-      SIGNATURE: (void)popBack
+      SIGNATURE: (void)removeLast
       EXAMPLES:
       - CODE   : ex_cpp_typed_table_remove_last_row
         DESCR  :
