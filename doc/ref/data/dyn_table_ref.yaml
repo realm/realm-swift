@@ -1,36 +1,11 @@
 #
-# C++ reference documentation for Table class
+# Obj-C reference documentation for Table class
 #
 
 ID         : class_dyn_table
 TITLE      : Table (dynamic)
-SUMMARY    : &g_dyn_table_intro_summary
-             TightDB table.
-DESCR      : &g_dyn_table_intro_descr
-             The Table class is the core class of the TightDB framework. It allows you
-             to efficiently work with data in terms of rows and columns. The value of
-             a cell (specific column, specific row) is compacted in order to keep the
-             overall memory consumption as little as possible. The internal data structure
-             is optimized so retrieving a particular row in a table is as fast as possible
-             (often faster than native data structures).
-
-             The dynamic table can be used when the structure of the data is not known a
-             priori. This situation is common if you recieve data for different sources, and
-             these sources changes often. You can say that a dynamic table resembles the
-             flexible data structures often found in dynamic languages like PHP and JavaScript.
-
-             You can add and remove columns at run time as your application requires it. When you
-             add a column, a type must be specified. The most common types including integers,
-             timestamps and strings are suppotted. It is possible to use a TightDB table class
-             as column type. This means that you can have tables of tables structure.
-
-             Moreover, TightDB introduces a column type called {@link class_mixed}. A value of the
-             Mixed type can be any supported value of TightDB. This implies - as the name
-             indicates - that you can mix the type of values in the the column. In one row the
-             value could be an integer, in another row the value could be a string or even a table.
-
-             It is possible to query a dynamic table using {@link class_dyn_query} objects. The result
-             set is often stored in a {@link class_dyn_tableview} object.
+SUMMARY    : *g_dyn_table_intro_summary
+DESCR      : *g_dyn_table_intro_descr
 SEE        :
 EXAMPLES   :
 - DESCR:
@@ -40,11 +15,10 @@ CATEGORIES :
 - State:
   METHODS:
   - g_dyn_table_size:
-      NAMES    : size
-      SUMMARY  : &g_dyn_table_size_summary
-                 Number of rows.
-      DESCR    : &g_dyn_table_size_descr
-                 This method gets the number of rows in a table.
+      NAMES    : count
+      SUMMARY  : *g_dyn_table_size_summary
+      DESCR    : *g_dyn_table_size_descr
+      SIGNATURE: (size_t)count
       CONST    : True
       RETURN:
         TYPES  : size_t
@@ -53,11 +27,10 @@ CATEGORIES :
       - CODE   : ex_cpp_dyn_table_size
         DESCR  :
   - g_dyn_table_is_empty:
-      NAMES    : is_empty
-      SUMMARY  : &g_dyn_table_is_empty_summary
-                 Is table empty?
-      DESCR    : &g_dyn_table_is_empty_descr
-                 This method checks if the table is empty that is, it has zero rows.
+      NAMES    : isEmpty
+      SUMMARY  : *g_dyn_table_is_empty_summary
+      DESCR    : *g_dyn_table_is_empty_descr
+      SIGNATURE: (BOOL)isEmpty
       CONST    : True
       RETURN:
         TYPES  : bool
@@ -66,12 +39,9 @@ CATEGORIES :
       - CODE   : ex_cpp_dyn_table_is_empty
         DESCR  :
   - g_dyn_table_is_valid:
-      NAMES    : is_valid
-      SUMMARY  : &g_dyn_table_is_valid_summary
-                 Is table valid/consistent?
-      DESCR    : &g_dyn_table_is_valid_descr
-                 This method will perform a number of consistency checks on a table and its
-                 columns.
+      NAMES    : isValid (not yet implemented)
+      SUMMARY  : *g_dyn_table_is_valid_summary
+      DESCR    : *g_dyn_table_is_valid_descr
       CONST    : true
       RETURN:
         TYPES  : bool
@@ -83,45 +53,28 @@ CATEGORIES :
   METHODS:
   - g_dyn_table_clear:
       NAMES    : clear
-      SUMMARY  : &g_dyn_table_clear_summary
-                 Remove all rows.
-      DESCR    : &g_dyn_table_clear_descr
-                 This method will remove all rows in a table.
+      SUMMARY  : *g_dyn_table_clear_summary
+      DESCR    : *g_dyn_table_clear_descr
+      SIGNATURE: (void)clear
       EXAMPLES:
       - CODE   : ex_cpp_dyn_table_clear
         DESCR  :
   - g_dyn_table_optimize:
       NAMES    : optimize
-      SUMMARY  : &g_dyn_table_optimize_summary
-                 Optimize a table.
-      DESCR    : &g_dyn_table_optimize_descr
-                 This method will optimize the internal data structures of a table.
-                 The result is that the table will consume less memory and queries might
-                 be faster.
-
-                 This should be called as soon as there is an representative amount of
-                 data in the table. The table will then reorganize itself into the most
-                 effective format.
-
-                 What is learned about the contents will be used in all future operations,
-                 so you only need to call optimize once.
+      SUMMARY  : *g_dyn_table_optimize_summary
+      DESCR    : *g_dyn_table_optimize_descr
+      SIGNATURE: (void)optimize
       EXAMPLES:
       - CODE   : ex_cpp_dyn_table_optimize
         DESCR  :
   - g_dyn_table_opertator==:
-      NAMES    : operator==
-      SUMMARY  : &g_dyn_table_operator_eq_summary
-                 Compare two tables.
-      DESCR    : &g_dyn_table_operator_eq_descr
-                 Compare two tables for equality. Two tables are equal if, and
-                 only if, they contain the same columns and rows in the same
-                 order, that is, for each value V of type T at column index C
-                 and row index R in one of the tables, there is a value of type
-                 T at column index C and row index R in the other table that
-                 is equal to V. This method returns true if two tables are identical.
+      NAMES    : isEqual
+      SUMMARY  : *g_dyn_table_operator_eq_summary
+      DESCR    : *g_dyn_table_operator_eq_descr
+      SIGNATURE: (BOOL)isEqual:(TightdbTable *)other
       CONST    : True
       PARAMS:
-      - NAME   : table
+      - NAME   : other
         TYPES  : const Table&
         DESCR  : The other table.
       RETURN:
@@ -130,36 +83,13 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_cpp_dyn_table_operator==
         DESCR  :
-  - g_dyn_table_opertator!=:
-      NAMES    : operator!=
-      SUMMARY  : &g_dyn_table_operator_neq_summary
-                 Compare two tables.
-      DESCR    : &g_dyn_table_operator_neq_descr
-                 Compare two tables for equality. Two tables are equal if, and
-                 only if, they contain the same columns and rows in the same
-                 order, that is, for each value V of type T at column index C
-                 and row index R in one of the tables, there is a value of type
-                 T at column index C and row index R in the other table that
-                 is equal to V. This method returns true if two tables are not identical.
-      CONST    : True
-      PARAMS:
-      - NAME   : table
-        TYPES  : const Table&
-        DESCR  : The other table.
-      RETURN:
-        TYPES  : bool
-        DESCR  : <code>true</code> if the two tables are not equal, <code>false</code> otherwise,
-      EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_operator!=
-        DESCR  :
 - Columns:
   METHODS:
   - g_dyn_table_get_column_count:
-      NAMES    : get_column_count
-      SUMMARY  : &g_dyn_table_get_column_count_summary
-                 Get the number of columns.
-      DESCR    : &g_dyn_table_get_column_count_descr
-                 This method retrieves the number of columns.
+      NAMES    : getColumnCount
+      SUMMARY  : *g_dyn_table_get_column_count_summary
+      DESCR    : *g_dyn_table_get_column_count_descr
+      SIGNATURE: (size_t)getColumnCount
       CONST    : True
       RETURN:
         TYPES  : size_t
@@ -168,14 +98,13 @@ CATEGORIES :
       - CODE   : ex_cpp_dyn_table_get_column_count
         DESCR  :
   - g_dyn_table_get_column_name:
-      NAMES    : get_column_name
-      SUMMARY  : &g_dyn_table_get_column_name_summary
-                 Get the name of a column.
-      DESCR    : &g_dyn_table_get_column_name_descr
-                 This method gets the name of a column using the column index.
+      NAMES    : getColumnName
+      SUMMARY  : *g_dyn_table_get_column_name_summary
+      DESCR    : *g_dyn_table_get_column_name_descr
+      SIGNATURE: (NSString *)getColumnName:(size_t)ndx
       CONST    : True
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : ndx
         TYPES  : size_t
         DESCR  : The column index.
       RETURN:
@@ -185,14 +114,13 @@ CATEGORIES :
       - CODE   : ex_cpp_dyn_table_get_column_name
         DESCR  :
   - g_dyn_table_get_column_index:
-      NAMES    : get_column_index
-      SUMMARY  : &g_dyn_table_get_column_index_summary
-                 Get the index of a column.
-      DESCR    : &g_dyn_table_get_column_index_descr
-                 This method gets the index of a column using the column name.
+      NAMES    : getColumnIndex
+      SUMMARY  : *g_dyn_table_get_column_index_summary
+      DESCR    : *g_dyn_table_get_column_index_descr
+      SIGNATURE: (size_t)getColumnIndex:(NSString *)name
       CONST    : True
       PARAMS:
-      - NAME   : column_name
+      - NAME   : name
         TYPES  : const char*
         DESCR  : The column name.
       RETURN:
@@ -202,27 +130,26 @@ CATEGORIES :
       - CODE   : ex_cpp_dyn_table_get_column_index
         DESCR  :
   - g_dyn_table_get_column_type:
-      NAMES    : get_column_type
-      SUMMARY  : &g_dyn_table_get_column_type_summary
-                 Get the type of a column.
-      DESCR    : &g_dyn_table_get_column_type_descr
-                 >
+      NAMES    : getColumnType
+      SUMMARY  : *g_dyn_table_get_column_type_summary
+      DESCR    : >
                  This method gets the type of a column using the column index. Currently,
                  the following types are supported:
                  <ul>
-                   <li><code>type_Bool</code></li>
-                   <li><code>type_Int</code></li>
-                   <li><code>type_Float</code></li>
-                   <li><code>type_Double</code></li>
-                   <li><code>type_String</code></li>
-                   <li><code>type_Binary</code></li>
-                   <li><code>type_Table</code></li>
-                   <li><code>type_Date</code></li>
-                   <li><code>type_Mixed</code></li>
+                   <li><code>tightdb_Bool</code></li>
+                   <li><code>tightdb_Int</code></li>
+                   <li><code>tightdb_Float</code></li>
+                   <li><code>tightdb_Double</code></li>
+                   <li><code>tightdb_String</code></li>
+                   <li><code>tightdb_Binary</code></li>
+                   <li><code>tightdb_Table</code></li>
+                   <li><code>tightdb_Date</code></li>
+                   <li><code>tightdb_Mixed</code></li>
                  </ul>
+      SIGNATURE: (TightdbType)getColumnType:(size_t)ndx
       CONST    : True
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : ndx
         TYPES  : size_t
         DESCR  : The column index.
       RETURN:
@@ -234,23 +161,18 @@ CATEGORIES :
 - Rows:
   METHODS:
   - g_dyn_table_add_empty_row:
-      NAMES    : add_empty_row
-      SUMMARY  : &g_dyn_table_add_empty_row_summary
-                 Add empty rows.
-      DESCR    : &g_dyn_table_add_empty_row_descr
-                 This method adds one or more empty rows at the end of the table.
-      SIGNATURE: |
-                 void add_empty_row(size_t num_rows = 1)
+      NAMES    : addRow
+      SUMMARY  : *g_dyn_table_add_empty_row_summary
+      DESCR    : *g_dyn_table_add_empty_row_descr
+      SIGNATURE: (size_t)addRow
       PARAMS:
       - NAME   : num_rows
         TYPES  : size_t
         DESCR  : "Number of rows to add (default: 1)."
   - g_dyn_table_insert_empty_row:
-      NAMES    : insert_empty_row
-      SUMMARY  : &g_dyn_table_insert_empty_row_summary
-                 Insert empty rows.
-      DESCR    : &g_dyn_table_insert_empty_row_descr
-                 This method inserts one or more empty rows at a given position.
+      NAMES    : insertRow (not yet implemented)
+      SUMMARY  : *g_dyn_table_insert_empty_row_summary
+      DESCR    : *g_dyn_table_insert_empty_row_descr
       SIGNATURE: |
                  void insert_empty_row(size_t row_ndx, size_t num_rows = 1)
       PARAMS:
@@ -268,34 +190,23 @@ CATEGORIES :
   - g_dyn_table_insert_binary:
   - g_dyn_table_insert_mixed:
   - g_dyn_table_insert_done:
-      NAMES    : insert_*
-      SUMMARY  : &g_dyn_table_insert_xxx_summary
-                 Insert a value.
-      DESCR    : &g_dyn_table_insert_xxx_descr
-                 >
-                 These methods are used to insert new rows in a table.
-
-                 <strong>WARNING</strong>: These methods support inserts with maximal performance.
-                 But they can easily corrupt the database if used incorrectly! When inserting
-                 a new row, you have to call the corresponding insert method for <em>every</em> column in the table
-                 and end the insert sequence by calling {@link g_dyn_table_insert_done insert_done()}.
-
-                 <code>insert_binary()</code> will copy the data provided.
-
+      NAMES    : insert*
+      SUMMARY  : *g_dyn_table_insert_xxx_summary
+      DESCR    : *g_dyn_table_insert_xxx_descr
       SIGNATURE: |
-                 void insert_bool(size_t column_ndx, size_t row_ndx, bool value)
-                 void insert_int(size_t column_ndx, size_t row_ndx, int64_t value)
-                 template<class E>void insert_enum(size_t column_ndx, size_t row_ndx, E value)
-                 void insert_float(size_t column_ndx, size_t row_ndx, float value)
-                 void insert_double(size_t column_ndx, size_t row_ndx, double value)
-                 void insert_date(size_t column_ndx, size_t row_ndx, time_t value)
-                 void insert_string(size_t column_ndx, size_t row_ndx, const char* value)
-                 void insert_binary(size_t column_ndx, size_t row_ndx, const char* value, size_t len)
-                 void insert_mixed(size_t column_ndx, size_t row_ndx, Mixed value)
-                 void insert_subtable(size_t column_ndx, size_t row_ndx)
-                 void insert_done()
+                 (void)insertBool:(size_t)col_ndx ndx:(size_t)ndx value:(BOOL)value
+                 (void)insertInt:(size_t)col_ndx ndx:(size_t)ndx value:(int64_t)value
+                 (void)insertFloat:(size_t)col_ndx ndx:(size_t)ndx value:(float)value
+                 (void)insertDouble:(size_t)col_ndx ndx:(size_t)ndx value:(double)value
+                 (void)insertDate:(size_t)col_ndx ndx:(size_t)ndx value:(time_t)value
+                 (void)insertString:(size_t)col_ndx ndx:(size_t)ndx value:(NSString *)value
+                 (void)insertBinary:(size_t)col_ndx ndx:(size_t)ndx value:(TightdbBinary *)value
+                 (void)insertBinary:(size_t)col_ndx ndx:(size_t)ndx data:(const char *)data size:(size_t)size
+                 (void)insertMixed:(size_t)col_ndx ndx:(size_t)row_ndx value:(TightdbMixed *)value
+                 (void)insertSubtable:(size_t)col_ndx ndx:(size_t)row_ndx
+                 (void)insertDone
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : col_ndx
         TYPES  : size_t
         DESCR  : The column index.
       - NAME   : row_ndx
@@ -304,7 +215,7 @@ CATEGORIES :
       - NAME   : value
         TYPES  : [bool, int64_t, float, double, time_t, const char*, Mixed]
         DESCR  : The value to insert.
-      - NAME   : len
+      - NAME   : size
         TYPES  : size_t
         DESCR  : Size in bytes of binary value.
       EXAMPLES:
@@ -314,10 +225,8 @@ CATEGORIES :
 
   - g_dyn_table_remove_row:
       NAMES    : remove
-      SUMMARY  : &g_dyn_table_remove_row_summary
-                 Delete row.
-      DESCR    : &g_dyn_table_remove_row_descr
-                 This method deletes a specific row.
+      SUMMARY  : *g_dyn_table_remove_row_summary
+      DESCR    : *g_dyn_table_remove_row_descr
       SIGNATURE: void remove(size_t row_ndx);
       PARAMS:
       - NAME   : row_ndx
@@ -328,10 +237,8 @@ CATEGORIES :
         DESCR  :
   - g_dyn_table_remove_last_row:
       NAMES    : remove_last
-      SUMMARY  : &g_dyn_table_remove_last_row_summary
-                 Delete last row.
-      DESCR    : &g_dyn_table_remove_last_row_descr
-                 This method deletes the last row. Calling it on an empty table is an error.
+      SUMMARY  : *g_dyn_table_remove_last_row_summary
+      DESCR    : *g_dyn_table_remove_last_row_descr
       SIGNATURE: void remove_last();
       EXAMPLES:
       - CODE   : ex_cpp_dyn_table_remove_last_row
@@ -348,10 +255,8 @@ CATEGORIES :
   - g_dyn_table_get_subtable:
   - g_dyn_table_get_subtable_const:
       NAMES    : get_*
-      SUMMARY  : &g_dyn_table_get_xxx_summary
-                 Get value.
-      DESCR    : &g_dyn_table_get_xxx_descr
-                 This method will retrieve the value of a cell (row/column).
+      SUMMARY  : *g_dyn_table_get_xxx_summary
+      DESCR    : *g_dyn_table_get_xxx_descr
       SIGNATURE: |
                  bool          get_bool(size_t column_ndx, size_t row_ndx) const;
                  int64_t       get_int(size_t column_ndx, size_t row_ndx) const;
@@ -387,10 +292,8 @@ CATEGORIES :
   - g_dyn_table_set_binary:
   - g_dyn_table_set_mixed:
       NAMES    : set_*
-      SUMMARY  : &g_dyn_table_set_xxx_summary
-                 Set value.
-      DESCR    : &g_dyn_table_set_xxx_descr
-                 This method will set the value of an existing cell (row/column).
+      SUMMARY  : *g_dyn_table_set_xxx_summary
+      DESCR    : *g_dyn_table_set_xxx_descr
       SIGNATURE: |
                  void set_bool(size_t column_ndx, size_t row_ndx, bool value);
                  void set_int(size_t column_ndx, size_t row_ndx, int64_t value);
@@ -421,11 +324,9 @@ CATEGORIES :
   METHODS:
   - g_dyn_table_get_subtable_size:
       NAMES    : get_subtable_size
-      SUMMARY  : &g_dyn_table_get_subtable_size_summary
-                 Get subtable
-      DESCR    : &g_dyn_table_get_subtable_size_descr
-                 The value of a cell can be a table. Such a value is referred to as
-                 a subtable. This method retrieves the number of rows of a subtable.
+      SUMMARY  : *g_dyn_table_get_subtable_size_summary
+      DESCR    : *g_dyn_table_get_subtable_size_descr
+      SIGNATURE:
       CONST    : true
       PARAMS:
       - NAME   : column_ndx
@@ -442,11 +343,9 @@ CATEGORIES :
         DESCR  :
   - g_dyn_table_clear_subtable:
       NAMES    : clear_subtable
-      SUMMARY  : &g_dyn_table_clear_subtable_summary
-                 Get subtable
-      DESCR    : &g_dyn_table_clear_subtable_descr
-                 The value of a cell can be a table. Such a value is referred to
-                 as a subtable. This method deletes all rows of such a subtable.
+      SUMMARY  : *g_dyn_table_clear_subtable_summary
+      DESCR    : *g_dyn_table_clear_subtable_descr
+      SIGNATURE:
       PARAMS:
       - NAME   : column_ndx
         TYPES  : size_t
@@ -461,11 +360,9 @@ CATEGORIES :
   METHODS:
   - g_dyn_table_set_index:
       NAMES    : set_index
-      SUMMARY  : &g_dyn_table_set_index_summary
-                 Add an index to a column.
-      DESCR    : &g_dyn_table_set_index_descr
-                 This method adds an index to a column, and queries will be faster but the table
-                 will require more memory.
+      SUMMARY  : *g_dyn_table_set_index_summary
+      DESCR    : *g_dyn_table_set_index_descr
+      SIGNATURE:
       PARAMS:
       - NAME   : column_ndx
         TYPES  : size_t
@@ -478,10 +375,9 @@ CATEGORIES :
         DESCR  :
   - g_dyn_table_has_index:
       NAMES    : has_index
-      SUMMARY  : &g_dyn_table_has_index_summary
-                 Is column indexed?
-      DESCR    : &g_dyn_table_has_index_descr
-                 This method checks if a specific column has an index.
+      SUMMARY  : *g_dyn_table_has_index_summary
+      DESCR    : *g_dyn_table_has_index_descr
+      SIGNATURE:
       CONST    : true
       PARAMS:
       - NAME   : column_ndx
@@ -497,13 +393,9 @@ CATEGORIES :
   METHODS:
   - g_dyn_table_lookup:
       NAMES    : lookup
-      SUMMARY  : &g_dyn_table_lookup_summary
-                 Lookup a value.
-      DESCR    : &g_dyn_table_lookup_descr
-                 This method will find the first row where the value of first column matches
-                 a given string value. Defining the first column as a string with unique values,
-                 it is possible to combine such a table with this method to emulate a hash
-                 array using TightDB.
+      SUMMARY  : *g_dyn_table_lookup_summary
+      DESCR    : *g_dyn_table_lookup_descr
+      SIGNATURE:
       CONST    : True
       PARAMS:
       - NAME   : value
@@ -591,11 +483,8 @@ CATEGORIES :
   - g_dyn_table_get_sorted_view:
   - g_dyn_table_get_sorted_view_const:
       NAMES    : get_sorted_view
-      SUMMARY  : &g_dyn_table_get_sorted_view_summary
-                 Sort the table.
-      DESCR    : &g_dyn_table_get_sorted_view_desc
-                 This method will sort the rows by using values of a given column.
-                 The rows are returned as a {@link class_dyn_tableview} object.
+      SUMMARY  : *g_dyn_table_get_sorted_view_summary
+      DESCR    : *g_dyn_table_get_sorted_view_desc
       SIGNATURE: |
                  TableView      get_sorted_view(size_t column_ndx, bool ascending=true);
                  ConstTableView get_sorted_view(size_t column_ndx, bool ascending=true) const;
@@ -605,8 +494,7 @@ CATEGORIES :
         DESCR  : The column index.
       - NAME   : ascending
         TYPES  : bool
-        DESCR  : &cpp_dyn_table_get_sorted_view_param
-                 "If <code>true</code>, rows are sorted ascending, otherwise descending. Default: <code>true</code>."
+        DESCR  : *cpp_dyn_table_get_sorted_view_param
       RETURN:
         TYPES  : TableView
         DESCR  : A view.
@@ -616,13 +504,8 @@ CATEGORIES :
   - g_dyn_table_distinct:
   - g_dyn_table_distinct_const:
       NAMES    : distinct
-      SUMMARY  : &g_dyn_table_distinct_summary
-                 Get distinct rows.
-      DESCR    : &g_dyn_table_distinct_desc
-                 >
-                 This method will return a view with distinct rows for a given column
-                 (first matching row for each unique value in column).
-                 The rows are returned as a {@link class_dyn_tableview} object.
+      SUMMARY  : *g_dyn_table_distinct_summary
+      DESCR    : *g_dyn_table_distinct_desc
       SIGNATURE: |
                  TableView      distinct(size_t column_ndx);
                  ConstTableView distinct(size_t column_ndx) const;
@@ -654,12 +537,9 @@ CATEGORIES :
   METHODS:
   - g_dyn_table_count_int:
       NAMES    : count_int
-      SUMMARY  : &g_dyn_table_count_summary
-                 Number of matching rows.
-      DESCR    : &g_dyn_table_count_descr
-                 This method gets the number of rows matching a value. It is useful
-                 to determine the number briefly compared to using a {@link class_dyn_query}
-                 object.
+      SUMMARY  : *g_dyn_table_count_summary
+      DESCR    : *g_dyn_table_count_descr
+      SIGNATURE:
       CONST    : True
       PARAMS:
       - NAME   : column_ndx
@@ -676,12 +556,8 @@ CATEGORIES :
         DESCR  :
   - g_dyn_table_count_string:
       NAMES    : count_string
-      SUMMARY  : &g_dyn_table_count_string_summary
-                 Number of matching rows.
-      DESCR    : &g_dyn_table_count_string_descr
-                 This method gets the number of rows matching a string value. It is useful
-                 to determine the number briefly compared to using a {@link class_dyn_query}
-                 object.
+      SUMMARY  : *g_dyn_table_count_string_summary
+      DESCR    : *g_dyn_table_count_string_descr
       CONST    : True
       PARAMS:
       - NAME   : column_ndx
@@ -700,10 +576,8 @@ CATEGORIES :
   - g_dyn_table_sum_float:
   - g_dyn_table_sum_double:
       NAMES    : [sum, sum_float, sum_double]
-      SUMMARY  : &g_dyn_table_sum_summary
-                 Calculates the sum.
-      DESCR    : &g_dyn_table_sum_descr
-                 This method calculates the sum of a specific column.
+      SUMMARY  : *g_dyn_table_sum_summary
+      DESCR    : *g_dyn_table_sum_descr
       SIGNATURE: |
                  int64_t sum(size_t column_ndx) const;
                  double  sum_float(size_t column_ndx) const;
@@ -723,10 +597,8 @@ CATEGORIES :
   - g_dyn_table_maximum_float:
   - g_dyn_table_maximum_double:
       NAMES    : [maximum, maximum_float, maximum_double]
-      SUMMARY  : &g_dyn_table_maximum_summary
-                 Find highest value.
-      DESCR    : &g_dyn_table_maximum_descr
-                 The method finds the highest value.
+      SUMMARY  : *g_dyn_table_maximum_summary
+      DESCR    : *g_dyn_table_maximum_descr
       SIGNATURE: |
                  int64_t maximum(size_t column_ndx) const;
                  float   maximum_float(size_t column_ndx) const;
@@ -746,10 +618,8 @@ CATEGORIES :
   - g_dyn_table_minimum_float:
   - g_dyn_table_minimum_double:
       NAMES    : [minimum, minimum_float, minimum_double]
-      SUMMARY  : &g_dyn_table_minimum_summary
-                 Find lowest value.
-      DESCR    : &g_dyn_table_minimum_descr
-                 The method finds the lowest value.
+      SUMMARY  : *g_dyn_table_minimum_summary
+      DESCR    : *g_dyn_table_minimum_descr
       CONST    : True
       SIGNATURE: |
                  int64_t minimum(size_t column_ndx) const;
@@ -769,10 +639,8 @@ CATEGORIES :
   - g_dyn_table_average_float:
   - g_dyn_table_average_double:
       NAMES    : [average, average_float, average_double]
-      SUMMARY  : &g_dyn_table_average_summary
-                 Calculates the average.
-      DESCR    : &g_dyn_table_average_descr
-                 This method calculates the average for a column.
+      SUMMARY  : *g_dyn_table_average_summary
+      DESCR    : *g_dyn_table_average_descr
       CONST    : True
       SIGNATURE: |
                  double  average(size_t column_ndx) const;
@@ -792,12 +660,8 @@ CATEGORIES :
   METHODS:
   - g_dyn_table_to_json:
       NAMES    : to_json
-      SUMMARY  : &g_dyn_table_to_json_summary
-                 Convert table to JSON.
-      DESCR    : &g_dyn_table_to_json_descr
-                 The JavaScript Object Notation (<a href="http://json.org">JSON</a>) is useful
-                 for web/mobile applications and serialization. This method will convert a table
-                 and its columns and rows to a JSON compatible representation.
+      SUMMARY  : *g_dyn_table_to_json_summary
+      DESCR    : *g_dyn_table_to_json_descr
       PARAMS:
       - NAME   : out
         TYPES  : std::ostream&
@@ -807,12 +671,8 @@ CATEGORIES :
         DESCR  :
   - g_dyn_table_to_string:
       NAMES    : to_string
-      SUMMARY  : &g_dyn_table_to_string_summary
-                 Convert table to a string.
-      DESCR    : &g_dyn_table_to_string_descr
-                 >
-                 This method will convert a table and its columns and rows to a format
-                 which is easily read by humans.
+      SUMMARY  : *g_dyn_table_to_string_summary
+      DESCR    : *g_dyn_table_to_string_descr
       CONST    : true
       PARAMS:
       - NAME   : out
@@ -826,12 +686,8 @@ CATEGORIES :
         DESCR  :
   - g_dyn_table_row_to_string:
       NAMES    : to_string
-      SUMMARY  : &g_dyn_table_row_to_string_summary
-                 Convert a row to a string.
-      DESCR    : &g_dyn_table_row_to_string_descr
-                 >
-                 This method will convert a row to a format
-                 which is easily read by humans.
+      SUMMARY  : *g_dyn_table_row_to_string_summary
+      DESCR    : *g_dyn_table_row_to_string_descr
       CONST    : true
       PARAMS:
       - NAME   : row_ndx

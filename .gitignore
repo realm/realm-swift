@@ -3,3 +3,6 @@
 # Test output
 /employees.tightdb
 /table_test.tbl
+
+
+/doc/ref/*.html
