@@ -107,7 +107,7 @@ CATEGORIES :
         CODE   : ex_cpp_typed_query_greaterThan
   - g_typed_query_greaterThanOrEqual:
   - g_typed_query_greaterThanOrEqual_date:
-      NAMES    : [ greater_equal, greater_equal_date ]
+      NAMES    : [greaterEqual, greater_equal_date ]
       SIGNATURE: |
                  .CName (TableName_Query *)greaterEqual:(int64_t)value
                  .CName (TableName_Query *)greaterEqual:(float)value
@@ -309,7 +309,7 @@ CATEGORIES :
       - DESCR  :
         CODE   : ex_cpp_typed_query_findall
   - g_typed_query_findNext:
-      NAMES    : find_next
+      NAMES    : findNext
       SIGNATURE: |
                  (size_t)findNext:(size_t)last
       DESCR    : *g_typed_query_find_next_descr

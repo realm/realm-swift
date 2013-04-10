@@ -1,31 +1,11 @@
 #
-# C++ reference documentation for TableView class
+# Obj-C reference documentation for TableView class
 #
 
 ID         : class_dyn_tableview
 TITLE      : TableView (dynamic)
-SUMMARY    : &g_dyn_view_intro_summary
-             The TableView class.
-DESCR      : &g_dyn_view_intro_descr
-             >
-             Queries and searches can return <code>TableView</code>
-             objects, which works as virtual tables containing just
-             the matched rows. You can interact with a
-             <code>TableView</code> just as a regular table.
-
-             A {@link class_dyn_tableview} is implicitely linked to a
-             {@link class_dyn_table}.  All changes to the view will
-             propagate to the original table. This includes operations
-             like updating values and deleting rows.
-
-             Notice that this does not imply that it will work the
-             opposite direction. Any change that adds or removes rows
-             in the original table will invalidate the view, and you
-             will have an inconsistent view of the table. This might
-             lead to a serious data corruption.
-
-             It is possible to create two views for the table as
-             long as you do not change the original table.
+SUMMARY    : *g_dyn_view_intro_summary
+DESCR      : *g_dyn_view_intro_descr
 SEE        :
 EXAMPLES   :
 - DESCR:
@@ -47,10 +27,8 @@ CATEGORIES :
         DESCR  :
   - g_dyn_view_is_empty:
       NAMES    : is_empty
-      SUMMARY  : &g_dyn_view_is_empty_summary
-                 Is view empty?
-      DESCR    : &g_dyn_view_is_empty_descr
-                 The method checks if the view is empty that is, it has zero rows.
+      SUMMARY  : *g_dyn_view_is_empty_summary
+      DESCR    : *g_dyn_view_is_empty_descr
       CONST    : True
       RETURN:
         TYPES  : bool
@@ -63,8 +41,7 @@ CATEGORIES :
   - g_dyn_view_clear:
       NAMES    : clear
       SUMMARY  : *g_dyn_table_clear_summary
-      DESCR    : &g_dyn_view_clear_descr
-                 This method will remove all rows in a view.
+      DESCR    : *g_dyn_view_clear_descr
       EXAMPLES:
       - CODE   : ex_cpp_dyn_view_clear
         DESCR  :
@@ -130,10 +107,8 @@ CATEGORIES :
   METHODS:
   - g_dyn_view_get_source_ndx:
       NAMES    : get_source_ndx
-      SUMMARY  : &g_dyn_view_get_source_ndx_summary
-                 Get source index.
-      DESCR    : &g_dyn_view_get_source_ndx_descr
-                 This method will get the index of the row in the source table.
+      SUMMARY  : *g_dyn_view_get_source_ndx_summary
+      DESCR    : *g_dyn_view_get_source_ndx_descr
       CONST    : True
       PARAMS:
       - NAME   : row_ndx
@@ -355,10 +330,8 @@ CATEGORIES :
         DESCR  :
   - g_dyn_view_sort:
       NAMES    : sort
-      SUMMARY  : &g_dyn_view_get_sorted_view_summary
-                 Sort the view.
-      DESCR    : &g_dyn_view_get_sorted_view_desc
-                 This method will sort the rows by using values of a given column.
+      SUMMARY  : *g_dyn_view_get_sorted_view_summary
+      DESCR    : *g_dyn_view_get_sorted_view_desc
       PARAMS:
       - NAME   : column_ndx
         TYPES  : size_t
@@ -375,10 +348,8 @@ CATEGORIES :
   - g_dyn_view_sum_float:
   - g_dyn_view_sum_double:
       NAMES    : [sum, sum_float, sum_double]
-      SUMMARY  : &g_dyn_view_sum_summary
-                 Calculates the sum.
-      DESCR    : &g_dyn_view_sum_descr
-                 Calculates the sum of a column.
+      SUMMARY  : *g_dyn_view_sum_summary
+      DESCR    : *g_dyn_view_sum_descr
       CONST    : True
       SIGNATURE: |
                  int64_t sum(size_t column_ndx) const;
@@ -398,10 +369,8 @@ CATEGORIES :
   - g_dyn_view_maximum_float:
   - g_dyn_view_maximum_double:
       NAMES    : [maximum, maximum_float, maximum_double]
-      SUMMARY  : &g_dyn_view_maximum_summary
-                 Find highest value.
-      DESCR    : &g_dyn_view_maximum_descr
-                 Find the highest value.
+      SUMMARY  : *g_dyn_view_maximum_summary
+      DESCR    : *g_dyn_view_maximum_descr
       CONST    : True
       SIGNATURE: |
                  int64_t maximum(size_t column_ndx) const;
@@ -421,10 +390,8 @@ CATEGORIES :
   - g_dyn_view_minimum_float:
   - g_dyn_view_minimum_double:
       NAMES    : [minimum, minimum_float, minimum_double]
-      SUMMARY  : &g_dyn_view_minimum_summary
-                 Find lowest value.
-      DESCR    : &g_dyn_view_minimum_descr
-                 Find the lowest value.
+      SUMMARY  : *g_dyn_view_minimum_summary
+      DESCR    : *g_dyn_view_minimum_descr
       CONST    : True
       SIGNATURE: |
                  int64_t minimum(size_t column_ndx) const;
@@ -445,12 +412,7 @@ CATEGORIES :
   - g_dyn_view_to_json:
       NAMES    : to_json
       SUMMARY  : *g_dyn_table_to_json_summary
-      DESCR    : &g_dyn_view_to_json_descr
-                 The JavaScript Object Notation (<a
-                 href="http://json.org">JSON</a>) is useful for
-                 web/mobile applications and serialization. This
-                 method will convert a view and its columns and rows
-                 to a JSON compatible representation.
+      DESCR    : *g_dyn_view_to_json_descr
       PARAMS:
       - NAME   : out
         TYPES  : std::ostream&
@@ -460,11 +422,8 @@ CATEGORIES :
         DESCR  :
   - g_dyn_view_to_string:
       NAMES    : to_string
-      SUMMARY  : &g_dyn_view_to_string_summary
-                 Convert view to a string.
-      DESCR    : &g_dyn_view_to_string_descr
-                 This method will convert a view and its columns and rows to a format
-                 which is easily read by humans.
+      SUMMARY  : *g_dyn_view_to_string_summary
+      DESCR    : *g_dyn_view_to_string_descr
       CONST    : true
       PARAMS:
       - NAME   : out
