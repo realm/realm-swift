@@ -119,7 +119,7 @@
 -(size_t)count;
 -(size_t)addRow;
 -(void)clear;
--(void)deleteRow:(size_t)ndx;
+-(void)remove:(size_t)ndx;
 -(void)popBack;
 
 // Adaptive ints.
@@ -230,8 +230,7 @@
 -(BOOL)getBool:(size_t)colNdx ndx:(size_t)ndx;
 -(time_t)getDate:(size_t)colNdx ndx:(size_t)ndx;
 -(NSString *)getString:(size_t)colNdx ndx:(size_t)ndx;
-// Deleting
--(void)delete:(size_t)ndx;
+-(void)remove:(size_t)ndx;
 -(void)clear;
 -(TightdbTable *)getTable;
 -(size_t)getSourceNdx:(size_t)ndx;
