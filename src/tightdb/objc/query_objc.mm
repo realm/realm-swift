@@ -127,6 +127,11 @@ using namespace std;
     return _query->count();
 }
 
+-(size_t)remove
+{
+    return _query->remove();
+}
+
 -(int64_t)minInt:(size_t)col_ndx
 {
     return _query->minimum(col_ndx);

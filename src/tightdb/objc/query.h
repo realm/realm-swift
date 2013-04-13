@@ -34,6 +34,7 @@
 -(void)subtable:(size_t)column;
 -(void)parent;
 -(size_t)count;
+-(size_t)remove;
 -(int64_t)minInt:(size_t)colNdx;
 -(float)minFloat:(size_t)colNdx;
 -(double)minDouble:(size_t)colNdx;
