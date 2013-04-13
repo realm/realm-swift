@@ -52,7 +52,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     STAssertEquals([[[table where].FloatCol  equal:0.7f]    count], (size_t)1, @"FloatCol equal");
     STAssertEquals([[[table where].DoubleCol equal:0.8]     count], (size_t)1, @"DoubleCol equal");
     STAssertEquals([[[table where].StringCol equal:@"foo"]  count], (size_t)1, @"StringCol equal");
-//    STAssertEquals([[[table where].BinaryCol equal:bin1]    count], (size_t)1, @"BinaryCol equal");
+    STAssertEquals([[[table where].BinaryCol equal:bin1]    count], (size_t)1, @"BinaryCol equal");
     STAssertEquals([[[table where].DateCol   equal:0]       count], (size_t)1, @"DateCol equal");
 //    STAssertEquals([[[table where].TableCol  equal:subtab1] count], (size_t)1, @"TableCol equal");
 //    STAssertEquals([[[table where].MixedCol  equal:mixInt1] count], (size_t)1, @"MixedCol equal");

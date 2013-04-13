@@ -20,6 +20,7 @@
 
 #import <Foundation/Foundation.h>
 
+@class TightdbBinary;
 @class TightdbTable;
 @class TightdbTableView;
 
@@ -121,6 +122,11 @@
 
 @interface TightdbQueryAccessorBinary: NSObject
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query;
+-(TightdbQuery *)equal:(TightdbBinary *)value;
+-(TightdbQuery *)notEqual:(TightdbBinary *)value;
+-(TightdbQuery *)beginsWith:(TightdbBinary *)value;
+-(TightdbQuery *)endsWith:(TightdbBinary *)value;
+-(TightdbQuery *)contains:(TightdbBinary *)value;
 @end
 
 

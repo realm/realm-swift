@@ -521,6 +521,31 @@ using namespace std;
     }
     return self;
 }
+-(TightdbQuery *)equal:(TightdbBinary *)value
+{
+    [_query getQuery]->equal(_column_ndx, [value getBinary]);
+    return _query;
+}
+-(TightdbQuery *)notEqual:(TightdbBinary *)value
+{
+    [_query getQuery]->not_equal(_column_ndx, [value getBinary]);
+    return _query;
+}
+-(TightdbQuery *)beginsWith:(TightdbBinary *)value
+{
+    [_query getQuery]->begins_with(_column_ndx, [value getBinary]);
+    return _query;
+}
+-(TightdbQuery *)endsWith:(TightdbBinary *)value
+{
+    [_query getQuery]->ends_with(_column_ndx, [value getBinary]);
+    return _query;
+}
+-(TightdbQuery *)contains:(TightdbBinary *)value
+{
+    [_query getQuery]->contains(_column_ndx, [value getBinary]);
+    return _query;
+}
 @end
 
 
