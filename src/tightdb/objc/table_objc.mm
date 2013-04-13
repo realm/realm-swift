@@ -359,7 +359,7 @@ using namespace std;
 {
     return to_objc_string(_tableView->get_string(col_ndx, ndx));
 }
--(void)delete:(size_t)ndx
+-(void)remove:(size_t)ndx
 {
     _tableView->remove(ndx);
 }
@@ -593,10 +593,10 @@ using namespace std;
         [NSException raise:@"Table is read only" format:@"Tried to clear while read only"];
     _table->clear();
 }
--(void)deleteRow:(size_t)ndx
+-(void)remove:(size_t)ndx
 {
     if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to delete row while read only ndx: %llu", (unsigned long long)ndx];
+        [NSException raise:@"Table is read only" format:@"Tried to remove row while read only ndx: %llu", (unsigned long long)ndx];
     _table->remove(ndx);
 }
 -(void)popBack
