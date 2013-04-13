@@ -3,14 +3,18 @@
 //  TightDB
 //
 
-#import <tightdb/table.hpp>
-#import <tightdb/table_view.hpp>
-#import <tightdb/query.hpp>
+#include <tightdb/table.hpp>
+#include <tightdb/table_view.hpp>
+#include <tightdb/query.hpp>
 
 #import <tightdb/objc/query.h>
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/table_priv.h>
 #import <tightdb/objc/cursor.h>
+
+#include <tightdb/objc/util.hpp>
+
+using namespace std;
 
 
 @interface TightdbView()
@@ -452,52 +456,52 @@
 }
 -(TightdbQuery *)equal:(NSString *)value
 {
-    [_query getQuery]->equal(_column_ndx, [value UTF8String]);
+    [_query getQuery]->equal(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
 -(TightdbQuery *)equal:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
-    [_query getQuery]->equal(_column_ndx, [value UTF8String], caseSensitive);
+    [_query getQuery]->equal(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
 -(TightdbQuery *)notEqual:(NSString *)value
 {
-    [_query getQuery]->not_equal(_column_ndx, [value UTF8String]);
+    [_query getQuery]->not_equal(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
 -(TightdbQuery *)notEqual:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
-    [_query getQuery]->not_equal(_column_ndx, [value UTF8String], caseSensitive);
+    [_query getQuery]->not_equal(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
 -(TightdbQuery *)beginsWith:(NSString *)value
 {
-    [_query getQuery]->begins_with(_column_ndx, [value UTF8String]);
+    [_query getQuery]->begins_with(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
 -(TightdbQuery *)beginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
-    [_query getQuery]->begins_with(_column_ndx, [value UTF8String], caseSensitive);
+    [_query getQuery]->begins_with(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
 -(TightdbQuery *)endsWith:(NSString *)value
 {
-    [_query getQuery]->ends_with(_column_ndx, [value UTF8String]);
+    [_query getQuery]->ends_with(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
 -(TightdbQuery *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
-    [_query getQuery]->ends_with(_column_ndx, [value UTF8String], caseSensitive);
+    [_query getQuery]->ends_with(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
 -(TightdbQuery *)contains:(NSString *)value
 {
-    [_query getQuery]->contains(_column_ndx, [value UTF8String]);
+    [_query getQuery]->contains(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
 -(TightdbQuery *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
-    [_query getQuery]->contains(_column_ndx, [value UTF8String], caseSensitive);
+    [_query getQuery]->contains(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
 @end

@@ -3,17 +3,20 @@
 //  TightDB
 //
 
-#import <cstring>
-
-#import <tightdb/table.hpp>
-#import <tightdb/table_view.hpp>
-#import <tightdb/lang_bind_helper.hpp>
+#include <tightdb/table.hpp>
+#include <tightdb/table_view.hpp>
+#include <tightdb/lang_bind_helper.hpp>
 
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/table_priv.h>
 #import <tightdb/objc/query.h>
 #import <tightdb/objc/query_priv.h>
 #import <tightdb/objc/cursor.h>
+
+#include <tightdb/objc/util.hpp>
+
+using namespace std;
+
 
 @implementation TightdbBinary
 {
@@ -23,8 +26,7 @@
 {
     self = [super init];
     if (self) {
-        _data.pointer = data;
-        _data.len = size;
+        _data = tightdb::BinaryData(data, size);
     }
     return self;
 }
@@ -38,15 +40,15 @@
 }
 -(const char *)getData
 {
-    return _data.pointer;
+    return _data.data();
 }
 -(size_t)getSize
 {
-    return _data.len;
+    return _data.size();
 }
 -(BOOL)isEqual:(TightdbBinary *)bin
 {
-    return _data.compare_payload(bin->_data);
+    return _data == bin->_data;
 }
 -(tightdb::BinaryData)getBinary
 {
@@ -95,7 +97,7 @@
 +(TightdbMixed *)mixedWithString:(NSString *)value
 {
     TightdbMixed *mixed = [[TightdbMixed alloc] init];
-    mixed.mixed = tightdb::Mixed((const char *)[value UTF8String]);
+    mixed.mixed = tightdb::Mixed(ObjcStringAccessor(value));
     return mixed;
 }
 
@@ -149,9 +151,9 @@
         case tightdb::type_Double:
             return _mixed.get_double() == other->_mixed.get_double();
         case tightdb::type_String:
-            return std::strcmp(_mixed.get_string(), other->_mixed.get_string()) == 0;
+            return _mixed.get_string() == other->_mixed.get_string();
         case tightdb::type_Binary:
-            return _mixed.get_binary().compare_payload(other->_mixed.get_binary());
+            return _mixed.get_binary() == other->_mixed.get_binary();
         case tightdb::type_Date:
             return _mixed.get_date() == other->_mixed.get_date();
         case tightdb::type_Table:
@@ -190,7 +192,7 @@
 
 -(NSString *)getString
 {
-    return [NSString stringWithUTF8String:_mixed.get_string()];
+    return to_objc_string(_mixed.get_string());
 }
 
 -(TightdbBinary *)getBinary
@@ -200,7 +202,7 @@
 
 -(time_t)getDate
 {
-    return _mixed.get_date();
+    return _mixed.get_date().get_date();
 }
 
 -(TightdbTable *)getTable
@@ -238,14 +240,14 @@
 // FIXME: Detect errors from core library
 -(BOOL)addColumn:(TightdbType)type name:(NSString *)name
 {
-    _spec->add_column((tightdb::DataType)type, [name UTF8String]);
+    _spec->add_column((tightdb::DataType)type, ObjcStringAccessor(name));
     return YES;
 }
 
 // FIXME: Detect errors from core library
 -(TightdbSpec *)addColumnTable:(NSString *)name
 {
-    tightdb::Spec tmp = _spec->add_subtable_column([name UTF8String]);
+    tightdb::Spec tmp = _spec->add_subtable_column(ObjcStringAccessor(name));
     return [TightdbSpec specWithSpec:&tmp isOwned:TRUE];
 }
 
@@ -266,11 +268,11 @@
 }
 -(NSString *)getColumnName:(size_t)ndx
 {
-    return [NSString stringWithUTF8String:_spec->get_column_name(ndx)];
+    return to_objc_string(_spec->get_column_name(ndx));
 }
 -(size_t)getColumnIndex:(NSString *)name
 {
-    return _spec->get_column_index([name UTF8String]);
+    return _spec->get_column_index(ObjcStringAccessor(name));
 }
 -(void)dealloc
 {
@@ -351,11 +353,11 @@
 }
 -(time_t)getDate:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return _tableView->get_date(col_ndx, ndx);
+    return _tableView->get_date(col_ndx, ndx).get_date();
 }
 -(NSString *)getString:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return [NSString stringWithUTF8String:_tableView->get_string(col_ndx, ndx)];
+    return to_objc_string(_tableView->get_string(col_ndx, ndx));
 }
 -(void)delete:(size_t)ndx
 {
@@ -556,11 +558,11 @@
 }
 -(NSString *)getColumnName:(size_t)ndx
 {
-    return [NSString stringWithUTF8String:_table->get_column_name(ndx)];
+    return to_objc_string(_table->get_column_name(ndx));
 }
 -(size_t)getColumnIndex:(NSString *)name
 {
-    return _table->get_column_index([name UTF8String]);
+    return _table->get_column_index(ObjcStringAccessor(name));
 }
 -(TightdbType)getColumnType:(size_t)ndx
 {
@@ -645,7 +647,7 @@
 }
 -(time_t)getDate:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return _table->get_date(col_ndx, ndx);
+    return _table->get_date(col_ndx, ndx).get_date();
 }
 -(void)setDate:(size_t)col_ndx ndx:(size_t)ndx value:(time_t)value
 {
@@ -681,19 +683,19 @@
 {
     if (_readOnly)
         [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx];
-    _table->insert_string(col_ndx, ndx, [value UTF8String]);
+    _table->insert_string(col_ndx, ndx, ObjcStringAccessor(value));
 }
 -(void)insertBinary:(size_t)col_ndx ndx:(size_t)ndx value:(TightdbBinary *)value
 {
     if (_readOnly)
         [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx];
-    _table->insert_binary(col_ndx, ndx, [value getData], [value getSize]);
+    _table->insert_binary(col_ndx, ndx, [value getBinary]);
 }
 -(void)insertBinary:(size_t)col_ndx ndx:(size_t)ndx data:(const char *)data size:(size_t)size
 {
     if (_readOnly)
         [NSException raise:@"Table is read only" format:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx];
-    _table->insert_binary(col_ndx, ndx, data, size);
+    _table->insert_binary(col_ndx, ndx, tightdb::BinaryData(data, size));
 }
 -(void)insertDate:(size_t)col_ndx ndx:(size_t)ndx value:(time_t)value
 {
@@ -709,12 +711,12 @@
 
 -(NSString *)getString:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return [NSString stringWithUTF8String:_table->get_string(col_ndx, ndx)];
+    return to_objc_string(_table->get_string(col_ndx, ndx));
 }
 
 -(void)setString:(size_t)col_ndx ndx:(size_t)ndx value:(NSString *)value
 {
-    _table->set_string(col_ndx, ndx, [value UTF8String]);
+    _table->set_string(col_ndx, ndx, ObjcStringAccessor(value));
 }
 
 -(TightdbBinary *)getBinary:(size_t)col_ndx ndx:(size_t)ndx
@@ -726,14 +728,14 @@
 {
     if (_readOnly)
         [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx];
-    _table->set_binary(col_ndx, ndx, [value getData], [value getSize]);
+    _table->set_binary(col_ndx, ndx, [value getBinary]);
 }
 
 -(void)setBinary:(size_t)col_ndx ndx:(size_t)ndx data:(const char *)data size:(size_t)size
 {
     if (_readOnly)
         [NSException raise:@"Table is read only" format:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx];
-    _table->set_binary(col_ndx, ndx, data, size);
+    _table->set_binary(col_ndx, ndx, tightdb::BinaryData(data, size));
 }
 
 -(size_t)getTableSize:(size_t)col_ndx ndx:(size_t)row_ndx
@@ -804,7 +806,7 @@
 
 -(size_t)addColumn:(TightdbType)type name:(NSString *)name
 {
-    return _table->add_column((tightdb::DataType)type, [name UTF8String]);
+    return _table->add_column(tightdb::DataType(type), ObjcStringAccessor(name));
 }
 -(size_t)findBool:(size_t)col_ndx value:(BOOL)value
 {
@@ -824,11 +826,11 @@
 }
 -(size_t)findString:(size_t)col_ndx value:(NSString *)value
 {
-    return _table->find_first_string(col_ndx, [value UTF8String]);
+    return _table->find_first_string(col_ndx, ObjcStringAccessor(value));
 }
 -(size_t)findBinary:(size_t)col_ndx value:(TightdbBinary *)value
 {
-    return _table->find_first_binary(col_ndx, [value getData], [value getSize]);
+    return _table->find_first_binary(col_ndx, [value getBinary]);
 }
 -(size_t)findDate:(size_t)col_ndx value:(time_t)value
 {
@@ -877,7 +879,7 @@
 }
 -(size_t)countString:(size_t)col_ndx target:(NSString *)target
 {
-    return _table->count_string(col_ndx, [target UTF8String]);
+    return _table->count_string(col_ndx, ObjcStringAccessor(target));
 }
 
 -(int64_t)sumInt:(size_t)col_ndx
