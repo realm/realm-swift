@@ -120,7 +120,7 @@
 -(size_t)addRow;
 -(void)clear;
 -(void)remove:(size_t)ndx;
--(void)popBack;
+-(void)removeLast;
 
 // Adaptive ints.
 -(int64_t)get:(size_t)colNdx ndx:(size_t)ndx;
