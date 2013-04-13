@@ -599,10 +599,10 @@ using namespace std;
         [NSException raise:@"Table is read only" format:@"Tried to remove row while read only ndx: %llu", (unsigned long long)ndx];
     _table->remove(ndx);
 }
--(void)popBack
+-(void)removeLast
 {
     if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to pop back while read only"];
+        [NSException raise:@"Table is read only" format:@"Tried to remove last while read only"];
     _table->remove_last();
 }
 -(int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
