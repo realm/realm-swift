@@ -1,5 +1,5 @@
 #
-# C++ reference documentation for Query class
+# Obj-C reference documentation for Query class
 #
 
 ## TODO: Describe limitations about using correct versions of the methods on the right column_types.
@@ -25,25 +25,25 @@ CATEGORIES :
   - g_dyn_query_equals_string:
   - g_dyn_query_equals_date:
   - g_dyn_query_equals_binary:
-      NAMES    : [ equal, equal_date, equal_binary ]
+      NAMES    : [ equal (not implemented for all types), equal_date, equal_binary ]
       SIGNATURE: |
-                 Query& equal(size_t column_ndx, bool value);
-                 Query& equal(size_t column_ndx, int64_t value);
-                 Query& equal(size_t column_ndx, float value);
-                 Query& equal(size_t column_ndx, double value);
-                 Query& equal(size_t column_ndx, const char* value, bool case_sensitive=true);
-                 Query& equal(size_t column_ndx, BinaryData value);
-                 Query& equal_date(size_t column_ndx, time_t value);
+                 (TightdbQuery *)equal:(BOOL)value
+                 (TightdbQuery *)equal:(int64_t)value
+                 (TightdbQuery *)equal:(float)value
+                 (TightdbQuery *)equal:(double)value
+                 (TightdbQuery *)equal:(NSString *)value
+                 (TightdbQuery *)equal:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 (TightdbQuery *)equal:(time_t)value
       SUMMARY  : *g_dyn_query_equals_summary
       DESCR    : *g_dyn_query_equals_descr
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : col_ndx
         TYPES  : size_t
         DESCR  : Column index.
       - NAME   : value
         TYPES  : [bool, int64_t, float, double, const char*, BinaryData, time_t]
         DESCR  : The value.
-      - NAME   : case_sensitive
+      - NAME   : caseSensitive
         TYPES  : bool
         DESCR  : *g_dyn_query_case_sensitive_descr
       RETURN:
@@ -57,13 +57,14 @@ CATEGORIES :
   - g_dyn_query_notEquals_string:
   - g_dyn_query_notEquals_date:
   - g_dyn_query_notEquals_binary:
-      NAMES    : [ not_equal, not_equal, not_equal_binary ]
+      NAMES    : [ notEqual (not implemented for all types), not_equal, not_equal_binary ]
       SIGNATURE: |
-                 Query& not_equal(size_t column_ndx, int64_t value);
-                 Query& not_equal(size_t column_ndx, float value);
-                 Query& not_equal(size_t column_ndx, double value);
-                 Query& not_equal(size_t column_ndx, const char* value, bool case_sensitive=true);
-                 Query& not_equal_date(size_t column_ndx, time_t value);
+                 (TightdbQuery *)notEqual:(int64_t)value
+                 (TightdbQuery *)notEqual:(float)value
+                 (TightdbQuery *)notEqual:(double)value
+                 (TightdbQuery *)notEqual:(NSString *)value
+                 (TightdbQuery *)notEqual:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 (TightdbQuery *)notEqual:(time_t)value
  #                Query& not_equal(size_t column_ndx, bool value);
  #                Query& not_equal_binary(size_t column_ndx, const char* data, size_t size);
       SUMMARY  : *g_dyn_query_notEquals_summary
@@ -88,14 +89,14 @@ CATEGORIES :
   - g_dyn_query_greaterThan_date:
       NAMES    : [ greater, greater_date ]
       SIGNATURE: |
-                 Query& greater(size_t column_ndx, int64_t value);
-                 Query& greater(size_t column_ndx, float value);
-                 Query& greater(size_t column_ndx, double value);
-                 Query& greater_date(size_t column_ndx, time_t value);
+                 (TightdbQuery *)greater:(int64_t)value
+                 (TightdbQuery *)greater:(float)value
+                 (TightdbQuery *)greater:(double)value
+                 (TightdbQuery *)greater:(time_t)value
       SUMMARY  : *g_dyn_query_greaterThan_summary
       DESCR    : *g_dyn_query_greaterThan_descr
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : col_ndx
         TYPES  : size_t
         DESCR  : Column index.
       - NAME   : value
@@ -109,16 +110,16 @@ CATEGORIES :
         CODE   : ex_cpp_dyn_query_greaterThan
   - g_dyn_query_greaterThanOrEqual:
   - g_dyn_query_greaterThanOrEqual_date:
-      NAMES    : [ greater_equal, greater_equal_date ]
+      NAMES    : [ greaterEqual, greater_equal_date ]
       SIGNATURE: |
-                 Query& greater_equal(size_t column_ndx, int64_t value);
-                 Query& greater_equal(size_t column_ndx, float value);
-                 Query& greater_equal(size_t column_ndx, double value);
-                 Query& greater_equal_date(size_t column_ndx, time_t value);
+                 (TightdbQuery *)greaterEqual:(int64_t)value
+                 (TightdbQuery *)greaterEqual:(float)value
+                 (TightdbQuery *)greaterEqual:(double)value
+                 (TightdbQuery *)greaterEqual:(time_t)value
       SUMMARY  : *g_dyn_query_greaterThanOrEqual_summary
       DESCR    : *g_dyn_query_greaterThanOrEqual_descr
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : col_ndx
         TYPES  : size_t
         DESCR  : Column index.
       - NAME   : value
@@ -134,14 +135,14 @@ CATEGORIES :
   - g_dyn_query_lessThan_date:
       NAMES    : [less, less_date]
       SIGNATURE: |
-                 Query& less(size_t column_ndx, int64_t value);
-                 Query& less(size_t column_ndx, float value);
-                 Query& less(size_t column_ndx, double value);
-                 Query& less_date(size_t column_ndx, time_t value);
+                 (TightdbQuery *)less:(int64_t)value
+                 (TightdbQuery *)less:(float)value
+                 (TightdbQuery *)less:(double)value
+                 (TightdbQuery *)less:(time_t)value
       SUMMARY  : *g_dyn_query_lessThan_summary
       DESCR    : *g_dyn_query_lessThan_descr
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : col_ndx
         TYPES  : size_t
         DESCR  : Column index.
       - NAME   : value
@@ -155,16 +156,16 @@ CATEGORIES :
         CODE   : ex_cpp_dyn_query_lessThan
   - g_dyn_query_lessThanOrEqual:
   - g_dyn_query_lessThanOrEqual_date:
-      NAMES    : [less_equal, less_equal_date]
+      NAMES    : [lessEqual, less_equal_date]
       SIGNATURE: |
-                 Query& less_equal(size_t column_ndx, int64_t value);
-                 Query& less_equal(size_t column_ndx, int64_t value);
-                 Query& less_equal(size_t column_ndx, int64_t value);
-                 Query& less_equal_date(size_t column_ndx, time_t value);
+                 (TightdbQuery *)lessEqual:(int64_t)value
+                 (TightdbQuery *)lessEqual:(float)value
+                 (TightdbQuery *)lessEqual:(double)value
+                 (TightdbQuery *)lessEqual:(time_t)value
       SUMMARY  : *g_dyn_query_lessThanOrEqual_summary
       DESCR    : *g_dyn_query_lessThanOrEqual_descr
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : col_ndx
         TYPES  : size_t
         DESCR  : Column index.
       - NAME   : value
@@ -180,14 +181,14 @@ CATEGORIES :
   - g_dyn_query_between_date:
       NAMES    : [between, between_date]
       SIGNATURE: |
-                 Query& between(size_t column_ndx, int64_t from, int64_t to);
-                 Query& between(size_t column_ndx, float from, float to);
-                 Query& between(size_t column_ndx, double from, double to);
-                 Query& between_date(size_t column_ndx, time_t from, time_t to);
+                 (TightdbQuery *)between:(int64_t)from to:(int64_t)to
+                 (TightdbQuery *)between:(float)from to:(float)to
+                 (TightdbQuery *)between:(double)from to:(double)to
+                 (TightdbQuery *)between:(time_t)from to:(time_t)to
       DESCR    : *g_dyn_query_between_descr
       SUMMARY  : *g_dyn_query_between_summary
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : col_ndx
         TYPES  : size_t
         DESCR  : Column index.
       - NAME   : from
@@ -204,20 +205,20 @@ CATEGORIES :
         CODE   : ex_cpp_dyn_query_between
   - g_dyn_query_startsWith:
 #  - g_dyn_query_startsWith_binary:
-      NAMES    : [begins_with] #, begins_with_binary]
+      NAMES    : [beginsWith] #, begins_with_binary]
       SIGNATURE: |
-                 Query& begins_with(size_t column_ndx, const char* value, bool case_sensitive=true);
-#                 Query& begins_with_binary(size_t column_ndx, const char* data, size_t size);
+                 (TightdbQuery *)beginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+#                (TightdbQuery *)beginsWith:(NSString *)value
       DESCR    : *g_dyn_query_startsWith_descr
       SUMMARY  : *g_dyn_query_startsWith_summary
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : col_ndx
         TYPES  : size_t
         DESCR  : Column index.
       - NAME   : value
         TYPES  : const char*
         DESCR  : The value.
-      - NAME   : case_sensitive
+      - NAME   : caseSensitive
         TYPES  : bool
         DESCR  : *g_dyn_query_case_sensitive_descr
       RETURN:
@@ -228,20 +229,20 @@ CATEGORIES :
         CODE   : ex_cpp_dyn_query_startsWith
   - g_dyn_query_endsWith:
 #  - g_dyn_query_endsWith_binary:
-      NAMES    : [ends_with] #, ends_with_binary]
+      NAMES    : [endsWith] #, ends_with_binary]
       SIGNATURE: |
-                 Query& ends_with(size_t column_ndx, const char* value, bool case_sensitive=true);
-#                 Query& ends_with_binary(size_t column_ndx, const char* data, size_t size);
+                 (TightdbQuery *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+#                (TightdbQuery *)endsWith:(NSString *)value
       DESCR    : *g_dyn_query_endsWith_descr
       SUMMARY  : *g_dyn_query_endsWith_summary
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : col_ndx
         TYPES  : size_t
         DESCR  : Column index.
       - NAME   : value
         TYPES  : const char*
         DESCR  : The value.
-      - NAME   : case_sensitive
+      - NAME   : caseSensitive
         TYPES  : bool
         DESCR  : *g_dyn_query_case_sensitive_descr
       RETURN:
@@ -254,18 +255,19 @@ CATEGORIES :
 #  - g_dyn_query_contains_binary:
       NAMES    : [contains] #, contains_binary]
       SIGNATURE: |
-                 Query& contains(size_t column_ndx, const char* value, bool case_sensitive=true);
+                 (TightdbQuery *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 (TightdbQuery *)contains:(NSString *)value
 #                 Query& contains_binary(size_t column_ndx, const char* data, size_t size);
       DESCR    : *g_dyn_query_contains_descr
       SUMMARY  : *g_dyn_query_contains_summary
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : col_ndx
         TYPES  : size_t
         DESCR  : Column index.
       - NAME   : value
         TYPES  : const char*
         DESCR  : The value
-      - NAME   : case_sensitive
+      - NAME   : caseSensitive
         TYPES  : bool
         DESCR  : *g_dyn_query_case_sensitive_descr
       RETURN:
