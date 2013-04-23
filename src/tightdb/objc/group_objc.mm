@@ -69,7 +69,7 @@ using namespace std;
 {
     tightdb::Group* group;
     try {
-        group = new tightdb::Group(tightdb::Group::BufferSpec(data, size));
+        group = new tightdb::Group(tightdb::BinaryData(data, size));
     }
     catch (...) {
         // FIXME: Diffrent exception types mean different things. More
@@ -117,9 +117,9 @@ using namespace std;
 }
 -(const char*)writeToMem:(size_t*)size
 {
-    tightdb::Group::BufferSpec buffer = _group->write_to_mem(); // FIXME: May throw at least std::bad_alloc
-    *size = buffer.m_size;
-    return buffer.m_data;
+    tightdb::BinaryData buffer = _group->write_to_mem(); // FIXME: May throw at least std::bad_alloc
+    *size = buffer.size();
+    return buffer.data();
 }
 
 -(BOOL)hasTable:(NSString *)name
