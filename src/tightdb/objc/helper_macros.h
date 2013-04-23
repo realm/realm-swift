@@ -389,10 +389,35 @@
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Binary(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorBinary \
+-(table##_Query *)equal:(TightdbBinary *)value; \
+-(table##_Query *)notEqual:(TightdbBinary *)value; \
+-(table##_Query *)beginsWith:(TightdbBinary *)value; \
+-(table##_Query *)endsWith:(TightdbBinary *)value; \
+-(table##_Query *)contains:(TightdbBinary *)value; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Binary(table, col_name) \
 @implementation table##_QueryAccessor_##col_name \
+-(table##_Query *)equal:(TightdbBinary *)value \
+{ \
+    return (table##_Query *)[super equal:value]; \
+} \
+-(table##_Query *)notEqual:(TightdbBinary *)value \
+{ \
+    return (table##_Query *)[super notEqual:value]; \
+} \
+-(table##_Query *)beginsWith:(TightdbBinary *)value \
+{ \
+    return (table##_Query *)[super beginsWith:value]; \
+} \
+-(table##_Query *)endsWith:(TightdbBinary *)value \
+{ \
+    return (table##_Query *)[super endsWith:value]; \
+} \
+-(table##_Query *)contains:(TightdbBinary *)value \
+{ \
+    return (table##_Query *)[super contains:value]; \
+} \
 @end
 
 

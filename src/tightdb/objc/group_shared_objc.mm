@@ -5,10 +5,15 @@
 //  Created by Tightdb on 11/14/12.
 //  Copyright (c) 2012 Tightdb. All rights reserved.
 //
-#import <tightdb/group_shared.hpp>
+#include <tightdb/group_shared.hpp>
 
 #import <tightdb/objc/group_shared.h>
 #import <tightdb/objc/group_priv.h>
+
+#include <tightdb/objc/util.hpp>
+
+using namespace std;
+
 
 @implementation TightdbSharedGroup
 {
@@ -19,7 +24,7 @@
 {
     tightdb::SharedGroup* shared_group;
     try {
-        shared_group = new tightdb::SharedGroup([filename UTF8String]);
+        shared_group = new tightdb::SharedGroup(tightdb::StringData(ObjcStringAccessor(filename)));
     }
     catch (...) {
         // FIXME: Diffrent exception types mean different things. More
