@@ -49,10 +49,10 @@ CATEGORIES:                       # list global class-id in order of appearence
 #   - typed_table                   # Global Class name. File: 'typed_table_ref.yaml'
 #   - typed_view
 #   - typed_query
-- Dynamic Table:
-   - dyn_table
-   - dyn_view
-   - dyn_query
+#- Dynamic Table:
+#   - dyn_table
+#   - dyn_view
+#   - dyn_query
 #- Collection:
 #  - group
 #  - shared_group
