@@ -6,6 +6,10 @@
 ## TODO: Detail what is allowed to pass in parameters (index within size() etc)
 ## TODO: Describe start, end index parameters in searches. end is not inclusive.
 
+## JJEPSEN: "or" a obj-c keyword?
+## JJEPSEN: count() does not take a column index as parameter (like in c++)
+## JJEPSEN: max, min not defined for time compare as in c++.
+
 ID         : class_dyn_query
 TITLE      : Query  (dynamic)
 SUMMARY    : *g_dyn_query_intro_summary
@@ -282,6 +286,7 @@ CATEGORIES :
       NAMES    : group
       DESCR    : *g_dyn_query_group_descr
       SUMMARY  : *g_dyn_query_group_summary
+      SIGNATURE: (void)group
       RETURN:
         TYPES  : Query
         DESCR  : The query object.
@@ -289,9 +294,10 @@ CATEGORIES :
       - DESCR  :
         CODE   : ex_cpp_dyn_query_group
   - g_dyn_query_endGroup:
-      NAMES    : end_group
+      NAMES    : endGroup
       DESCR    : *g_dyn_query_endGroup_descr
       SUMMARY  : *g_dyn_query_endGroup_summary
+      SIGNATURE: (void)endgroup
       RETURN:
         TYPES  : Query
         DESCR  : The query object.
@@ -299,9 +305,10 @@ CATEGORIES :
       - DESCR  :
         CODE   : ex_cpp_dyn_query_group
   - g_dyn_query_or:
-      NAMES    : Or
+      NAMES    : or
       DESCR    : *g_dyn_query_or_descr
       SUMMARY  : *g_dyn_query_or_summary
+      SIGNATURE: (void)or
       RETURN:
         TYPES  : Query
         DESCR  : The query object.
@@ -312,6 +319,7 @@ CATEGORIES :
       NAMES    : subtable
       DESCR    : *g_dyn_query_subtable_descr
       SUMMARY  : *g_dyn_query_subtable_summary
+      SIGNATURE: (void)subtable:(size_t)column
       PARAMS:
       - NAME   : column
         TYPES  : size_t
@@ -323,9 +331,10 @@ CATEGORIES :
       - DESCR  :
         CODE   : ex_cpp_dyn_query_subtable
   - g_dyn_query_endSubtable:
-      NAMES    : end_subtable
+      NAMES    : parent
       DESCR    : *g_dyn_query_endSubtable_descr
       SUMMARY  : *g_dyn_query_endSubtable_summary
+      SIGNATURE: (void)parent
       RETURN:
         TYPES  : Query
         DESCR  : The query object.
@@ -336,7 +345,7 @@ CATEGORIES :
   METHODS:
   - g_dyn_query_find_all_const:
   - g_dyn_query_find_all:
-      NAMES    : find_all
+      NAMES    : findAll (not yet implemented)
       DESCR    : *g_dyn_query_find_all_descr
       SUMMARY  : *g_dyn_query_find_all_summary
       SIGNATURE: |
@@ -359,7 +368,7 @@ CATEGORIES :
       - DESCR  :
         CODE   : ex_cpp_dyn_query_findall
   - g_dyn_query_find_next:
-      NAMES    : find_next
+      NAMES    : findNext (not yet implemented)
       DESCR    : *g_dyn_query_find_next_descr
       SUMMARY  : *g_dyn_query_find_next_summary
       PARAMS:
@@ -375,30 +384,18 @@ CATEGORIES :
   - g_dyn_query_sum:
   - g_dyn_query_sum_float:
   - g_dyn_query_sum_double:
-      NAMES    : [sum, sum_float, sum_double]
+      NAMES    : [sum*, sum_float, sum_double]
       DESCR    : *g_dyn_query_sum_descr
       SUMMARY  : *g_dyn_query_sum_summary
       CONST    : true
       SIGNATURE: |
-                 int64_t sum(size_t column_ndx, size_t* resultcount=NULL, size_t start=0, size_t end = size_t(-1), size_t limit=size_t(-1)) const;
-                 double sum_float(..same parameters as above..)
-                 double sum_double(..same parameters as above..)
+                 (int64_t)sumInt:(size_t)col_ndx
+                 (double)sumFloat:(size_t)col_ndx
+                 (double)sumDouble:(size_t)col_ndx
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : col_ndx
         DESCR  : Column index. The datatype of the column must match the function called. E.g. <code>sum_float()</code> can only be used on columns which contains floats.
         TYPES  : size_t
-      - NAME   : resultcount
-        DESCR  : The number of rows used to calculate the sum.
-        TYPES  : size_t*
-      - NAME   : start
-        TYPES  : size_t
-        DESCR  : "Row to begin search. Default: 0."
-      - NAME   : end
-        TYPES  : size_t
-        DESCR  : "Row to stop search. Default: -1 (infinity)."
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
       RETURN:
         TYPES  : [int64_t, float, double]
         DESCR  : The sum.
@@ -409,6 +406,7 @@ CATEGORIES :
       NAMES    : count
       DESCR    : *g_dyn_query_size_descr
       SUMMARY  : *g_dyn_query_size_summary
+      SIGNATURE: (size_t)count
       CONST    : true
       PARAMS:
       - NAME   : column
@@ -433,31 +431,19 @@ CATEGORIES :
   - g_dyn_query_maximum_double:
   - g_dyn_query_maximum_float:
   - g_dyn_query_maximum:
-      NAMES    : maximum
+      NAMES    : max*
       DESCR    : *g_dyn_query_maximum_descr
       SUMMARY  : *g_dyn_query_maximum_summary
       CONST    : true
       SIGNATURE: |
-                 int64_t maximum(size_t column_ndx, size_t* resultcount=NULL, size_t start=0, size_t end = size_t(-1), size_t limit=size_t(-1)) const;
-                 float   maximum_float(..parameters as above..)
-                 double  maximum_double(..parameters as above..)
-                 time_t  maximum_date(..parameters as above..)
+                 (int64_t)maxInt:(size_t)col_ndx
+                 (float)maxFloat:(size_t)col_ndx
+                 (double)maxDouble:(size_t)col_ndx
+
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : col_ndx
         DESCR  : Column index. The datatype of the column must match the function called. E.g. <code>maximum_float()</code> can only be used on columns which contains floats.
         TYPES  : size_t
-      - NAME   : resultcount
-        DESCR  : The number of rows used to find the highest value.
-        TYPES  : size_t*
-      - NAME   : start
-        TYPES  : size_t
-        DESCR  : "Row to begin search. Default: 0."
-      - NAME   : end
-        TYPES  : size_t
-        DESCR  : "Row to stop search. Default: -1 (infinity)."
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : "Maximum number of rows to search. Default: -1 (infinity)."
       RETURN:
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : The highest value.
@@ -468,31 +454,18 @@ CATEGORIES :
   - g_dyn_query_minimum_double:
   - g_dyn_query_minimum_float:
   - g_dyn_query_minimum:
-      NAMES    : minimum
+      NAMES    : min*
       DESCR    : *g_dyn_query_minimum_descr
       SUMMARY  : *g_dyn_query_minimum_summary
       CONST    : true
       SIGNATURE: |
-                 int64_t minimum(size_t column_ndx, size_t* resultcount=NULL, size_t start=0, size_t end = size_t(-1), size_t limit=size_t(-1)) const;
-                 float   minimum_float(..parameters as above..)
-                 double  minimum_double(..parameters as above..)
-                 time_t  minimum_date(..parameters as above..)
+                 (int64_t)minInt:(size_t)col_ndx
+                 (float)minFloat:(size_t)col_ndx
+                 (double)minDouble:(size_t)col_ndx
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : col_ndx
         DESCR  : Column index. The datatype of the column must match the function called. E.g. <code>minimum_float()</code> can only be used on columns which contains floats.
         TYPES  : size_t
-      - NAME   : resultcount
-        DESCR  : The number of rows used to find the lowest value.
-        TYPES  : size_t*
-      - NAME   : start
-        TYPES  : size_t
-        DESCR  : "Row to begin search. Default: 0."
-      - NAME   : end
-        TYPES  : size_t
-        DESCR  : "Row to stop search. Default: -1 (infinity)."
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
       RETURN:
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : The lowest value.
@@ -502,30 +475,18 @@ CATEGORIES :
   - g_dyn_query_average_double:
   - g_dyn_query_average_float:
   - g_dyn_query_average:
-      NAMES    : average
+      NAMES    : avg*
       SUMMARY  : *g_dyn_query_average_summary
       DESCR    : *g_dyn_query_average_descr
       CONST    : true
       SIGNATURE: |
-                 double average(size_t column_ndx, size_t* resultcount=NULL, size_t start=0, size_t end = size_t(-1), size_t limit=size_t(-1)) const;
-                 double average_float(..as above..)
-                 double average_double(..as above..)
+                 (double)avgInt:(size_t)col_ndx
+                 (double)avgFloat:(size_t)col_ndx
+                 (double)avgDouble:(size_t)col_ndx
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : col_ndx
         DESCR  : Column index. The datatype of the column must match the function called. E.g. <code>average_float()</code> can only be used on columns which contains floats.
         TYPES  : size_t
-      - NAME   : resultcount
-        DESCR  : The number of rows used to calculate the average. If zero, the return value is undefined.
-        TYPES  : size_t*
-      - NAME   : start
-        TYPES  : size_t
-        DESCR  : "Row to begin search. Default: 0."
-      - NAME   : end
-        TYPES  : size_t
-        DESCR  : "Row to stop search. Default: -1 (infinity)."
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
       RETURN:
         TYPES  : double
         DESCR  : The average.
@@ -533,7 +494,7 @@ CATEGORIES :
       - DESCR  :
         CODE   : ex_cpp_dyn_query_average
   - g_dyn_query_remove:
-      NAMES    : remove
+      NAMES    : remove (not yet implemented)
       DESCR    : *g_dyn_query_remove_descr
       SUMMARY  : *g_dyn_query_remove_summary
       CONST    : true
@@ -559,44 +520,3 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_cpp_dyn_query_remove
-- Multithreaded:
-  METHODS:
-  - g_dyn_query_find_all_multi:
-  - g_dyn_query_find_all_const_multi:
-      NAMES    : find_all_multi
-      DESCR    : *g_dyn_query_find_all_multi_descr
-      SUMMARY  : *g_dyn_query_find_all_multi_summary
-      SIGNATURE: |
-                 TableView      find_all_multi(Table& table, size_t start=0, size_t end=size_t(-1), size_t limit=size_t(-1));
-                 ConstTableView find_all_multi(const Table& table, size_t start=0, size_t end=size_t(-1), size_t limit=size_t(-1));
-
-      PARAMS:
-      - NAME   : start
-        TYPES  : size_t
-        DESCR  : "Row to begin search. Default: 0."
-      - NAME   : end
-        TYPES  : size_t
-        DESCR  : "Row to stop search. Default: -1 (infinity)."
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
-      RETURN:
-        TYPES  : [TableView, ConstTableView]
-        DESCR  : The TableView object.
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_dyn_query_find_all_multi
-  - g_dyn_query_set_threads:
-      NAMES    : set_threads
-      SUMMARY  : *g_dyn_query_set_threads_summary
-      DESCR    : *g_dyn_query_set_threads_descr
-      PARAMS:
-      - NAME   : threadcount
-        TYPES  : unsigned int
-        DESCR  : Number of threads.
-      RETURN:
-        DESCR  : <code>true</code> if succesfull, <code>false</code> otherwise.
-        TYPES  : int
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_cpp_dyn_query_find_all_multi
