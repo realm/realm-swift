@@ -8,12 +8,18 @@
 
 /libtightdb-objc.a
 /libtightdb-objc.so
+/libtightdb-objc.so.*
 /libtightdb-objc.dylib
+/libtightdb-objc.*.dylib
 /libtightdb-objc-dbg.a
 /libtightdb-objc-dbg.so
+/libtightdb-objc-dbg.so.*
 /libtightdb-objc-dbg.dylib
+/libtightdb-objc-dbg.*.dylib
 /libtightdb-objc-cov.so
+/libtightdb-objc-cov.so.*
 /libtightdb-objc-cov.dylib
+/libtightdb-objc-cov.*.dylib
 
 /libtightdb-objc-iPhoneOS.a
 /libtightdb-objc-iPhoneOS-dbg.a
