@@ -56,7 +56,7 @@
 # local Makefile.
 SOURCE_ROOT =
 
-CFLAGS_OPTIM          =
+CFLAGS_OPTIM          = -DNDEBUG
 CFLAGS_DEBUG          =
 CFLAGS_COVER          =
 CFLAGS_SHARED         =
@@ -68,9 +68,9 @@ CFLAGS_OBJC           =
 CFLAGS_ARCH           =
 CFLAGS_INCLUDE        =
 CFLAGS_AUTODEP        =
-LDFLAGS_OPTIM         = $(CFLAGS_OPTIM)
-LDFLAGS_DEBUG         = $(CFLAGS_DEBUG)
-LDFLAGS_COVER         = $(CFLAGS_COVER)
+LDFLAGS_OPTIM         = $(filter-out -D%,$(CFLAGS_OPTIM))
+LDFLAGS_DEBUG         = $(filter-out -D%,$(CFLAGS_DEBUG))
+LDFLAGS_COVER         = $(filter-out -D%,$(CFLAGS_COVER))
 LDFLAGS_SHARED        =
 LDFLAGS_PTHREAD       = $(CFLAGS_PTHREAD)
 LDFLAGS_GENERAL       =
@@ -286,7 +286,7 @@ endif
 endif
 CC_AND_CXX_ARE_GCC_LIKE = $(and $(call IS_GCC_LIKE,$(CC)),$(or $(call IS_GCC_LIKE,$(CXX)),$(call IS_GXX_LIKE,$(CXX))))
 ifneq ($(CC_AND_CXX_ARE_GCC_LIKE),)
-CFLAGS_OPTIM   = -O3
+CFLAGS_OPTIM   = -O3 -DNDEBUG
 CFLAGS_DEBUG   = -ggdb
 CFLAGS_COVER   = --coverage
 CFLAGS_SHARED  = -fPIC -DPIC
@@ -788,7 +788,11 @@ $(eval $(TEST_RULES))
 
 # LINKING PROGRAMS
 
-# FIXME: Add '-Wl,-rpath' if linking against locally built and installed libraries, but it requires us to know the library installation directory. Or maybe it is better to set LD_RUN_PATH.
+# FIXME: Add '-Wl,-rpath' if linking against locally built and
+# installed libraries. This will allow the programs to find the
+# installed libraries even if they are installed into a non-standard
+# location. But it requires us to know the library installation
+# directory. Or maybe it is better to set LD_RUN_PATH.
 
 # neither inst nor noinst libs can have noinst lib dependencies
 # noinst libs can have associated LDFLAGS
