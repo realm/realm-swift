@@ -30,7 +30,7 @@ using namespace std;
         // FIXME: Diffrent exception types mean different things. More
         // details must be made available. We should proably have
         // special catches for at least these:
-        // tightdb::File::OpenError (and various derivatives),
+        // tightdb::File::AccessError (and various derivatives),
         // tightdb::ResourceAllocError, std::bad_alloc. In general,
         // any core library function or operator that is not declared
         // 'noexcept' must be considered as being able to throw
