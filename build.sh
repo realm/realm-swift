@@ -158,6 +158,15 @@ case "$MODE" in
         exit 0
         ;;
 
+    "uninstall")
+        PREFIX="$1"
+        if [ -z "$PREFIX" ]; then
+            PREFIX="/usr/local"
+        fi
+        make prefix="$PREFIX" uninstall || exit 1
+        exit 0
+        ;;
+
     "test-installed")
         PREFIX="$1"
         make -C "test-installed" clean || exit 1
@@ -201,7 +210,7 @@ EOF
 
     *)
         echo "Unspecified or bad mode '$MODE'" 1>&2
-        echo "Available modes are: clean build test install test-installed" 1>&2
+        echo "Available modes are: clean build test install uninstall test-installed" 1>&2
         echo "As well as: dist-copy" 1>&2
         exit 1
         ;;
