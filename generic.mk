@@ -630,7 +630,8 @@ endef
 $(eval $(CLEANING_RULES))
 endif
 
-clean clean/after: $(patsubst %,subdir/%/clean,$(PASSIVE_SUBDIRS))
+AVAIL_PASSIVE_SUBDIRS = $(foreach x,$(PASSIVE_SUBDIRS),$(if $(realpath $(x)),$(x)))
+clean clean/after: $(patsubst %,subdir/%/clean,$(AVAIL_PASSIVE_SUBDIRS))
 
 
 
