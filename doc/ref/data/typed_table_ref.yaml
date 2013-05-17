@@ -193,7 +193,7 @@ CATEGORIES:
   - g_find_first_date:
   - g_find_first_string:
       NAMES    : find*
-      SUMMARY  : *g_find_first_xxx_summary
+      SUMMARY  : *g_typed_table_find_first_xxx_summary
       DESCR    : The method finds the first occurence of a given value in a column. <br> <br> This method is automatically made available by a macro taking as input the table definition {@link g_typed_table_macros}. The method can only be accessed through a property of the table object. The property <code>CName</code> represents the column to be searched. The type of <code>value</code> must correspond type of the column being accessed. Refer also to the example below.
       SIGNATURE: |
                  .CName (size_t)find: (CType*)value

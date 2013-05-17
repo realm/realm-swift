@@ -454,7 +454,7 @@ CATEGORIES :
   - g_find_all_float_const:
   - g_find_all_double_const:
       NAMES    : findAll* (not implemented for all types yet)
-      SUMMARY  : *g_find_all_xxx_summary
+      SUMMARY  : *g_dyn_table_find_all_xxx_summary
       DESCR    : >
                  The method finds all occurences of a given value in a specific column.
                  The rows are returned as a {@link class_dyn_tableview} object.

@@ -260,8 +260,8 @@ CATEGORIES :
   - g_dyn_view_find_first_date:
   - g_dyn_view_find_first_string:
       NAMES    : find* (not yet implemented)
-      SUMMARY  : *g_find_first_xxx_summary
-      DESCR    : *g_find_first_xxx_descr
+      SUMMARY  : *g_dyn_table_find_first_xxx_summary
+      DESCR    : *g_dyn_table_find_first_xxx_descr
       SIGNATURE: |
                  size_t find_first_int(size_t column_ndx, int64_t value) const;
                  size_t find_first_bool(size_t column_ndx, bool value) const;
@@ -296,8 +296,8 @@ CATEGORIES :
   - g_dyn_view_find_all_date_const:
   - g_dyn_view_find_all_string_const:
       NAMES    : findAll* (not yet implemented)
-      SUMMARY  : *g_find_all_xxx_summary
-      DESCR    : *g_find_all_xxx_descr
+      SUMMARY  : *g_dyn_table_find_all_xxx_summary
+      DESCR    : *g_dyn_table_find_all_xxx_descr
       SIGNATURE: |
                  TableView      find_all_int(size_t column_ndx, int64_t value);
                  TableView      find_all_bool(size_t column_ndx, bool value);
