@@ -1,21 +1,14 @@
 #
-# C++ reference documentation for Mixed class
+# Obj-C reference documentation for Mixed class
 #
+
+# JJEPSEN: C++ has single signature constructor, Obj-C has one for each type.
+# JJEPSEN: isEqual is not documented in C++ doc?
 
 ID         : class_mixed
 TITLE      : Mixed
-SUMMARY    : &g_mixed_summary
-             Flexible data type.
-DESCR      : &g_mixed_descr
-             The Mixed class is a light-weight implementation of a flexible type system. Once
-             a variable is given a value via a constructor, it is not possible to modify the
-             value. Any supported type of TightDB can be used with the Mixed class. The current
-             supported types are boolean, integer, timestamps, strings, binary data and
-             {@link class_dyn_table}.
-
-             Using the Mixed class resembles using a dynamic typed language. The flexibility
-             of mixing types has a cost as compacting data is harder and queries will generally
-             be slower.
+SUMMARY    : *g_mixed_summary
+DESCR      : *g_mixed_descr
 SEE        :
 EXAMPLES:
 - DESCR    :
@@ -25,25 +18,22 @@ CATEGORIES:
 - Constructors:
   METHODS:
   - g_mixed_constructor:
-      NAMES    : Mixed
-      SUMMARY  : &g_mixed_constructor_summary
-                 Create a Mixed variable.
-      DESCR    : &g_mixed_constructor_descr
-                 >
-                 Mixed typed variables are instances of the Mixed class. Mixed typed values add a high
-                 degree of flexibility to schemas.
+      NAMES    : Mixed*
+      SUMMARY  : *g_mixed_constructor_summary
+      DESCR    : *g_mixed_constructor_descr
       SIGNATURE: |
-                 Mixed(bool v)
-                 Mixed(int64_t v)
-                 Mixed(float v)
-                 Mixed(double v)
-                 Mixed(Date v)
-                 Mixed(const char* v)
-                 Mixed(BinaryData v)
-                 Mixed(subtable_tag)
+                 (TightdbMixed *)mixedWithBool:(BOOL)value
+                 (TightdbMixed *)mixedWithInt64:(int64_t)value
+                 (TightdbMixed *)mixedWithFloat:(float)value
+                 (TightdbMixed *)mixedWithDouble:(double)value
+                 (TightdbMixed *)mixedWithDate:(time_t)value
+                 (TightdbMixed *)mixedWithString:(NSString *)value
+                 (TightdbMixed *)mixedWithBinary:(TightdbBinary *)value
+                 (TightdbMixed *)mixedWithBinary:(const char *)data size:(size_t)size
+                 (TightdbMixed *)mixedWithTable:(TightdbTable *)value
       PARAMS:
       - NAME   : v
-        TYPES  : [bool, int64_t, float, double, Date, const char*, BinaryData]
+        TYPES  : [bool, int64_t, float, double, Date, NSString, TightdbBinary, const char*, TightdbTable]
         DESCR  : The value.
       EXAMPLES:
       - CODE   : ex_cpp_mixed_constructor
@@ -51,14 +41,13 @@ CATEGORIES:
 - Getters:
   METHODS:
   - g_mixed_get_type:
-      NAMES    : get_type
-      SUMMARY  : &g_mixed_get_type_summary
-                 Get the type.
-      DESCR    : &g_mixed_get_type_descr
-                 This method retrieves the real type of a Mixed variable.
+      NAMES    : getType
+      SUMMARY  : *g_mixed_get_type_summary
+      DESCR    : *g_mixed_get_type_descr
+      SIGNATURE: (TightdbType)getType
       CONST    : True
       RETURN:
-        TYPES  : DataType
+        TYPES  : TightdbType
         DESCR  : The type.
       EXAMPLES:
       - CODE   : ex_cpp_mixed_get_type
@@ -68,22 +57,21 @@ CATEGORIES:
   - g_mixed_get_date:
   - g_mixed_get_string:
   - g_mixed_get_binary:
-      NAMES    : get_*
-      SUMMARY  : &g_mixed_get_value_summary
-                 Get value of Mixed variable.
-      DESCR    : &g_mixed_get_value_descr
-                 The value of a Mixed typed variable is retrieved by this method.
+      NAMES    : get*
+      SUMMARY  : *g_mixed_get_value_summary
+      DESCR    : *g_mixed_get_value_descr
       SIGNATURE: |
-                 bool        get_bool()   const;
-                 int64_t     get_int()    const;
-                 std::time_t get_date()   const;
-                 float       get_float()  const;
-                 double      get_double() const;                 
-                 const char* get_string() const;
-                 BinaryData  get_binary() const;
+                 (BOOL)getBool
+                 (int64_t)getInt
+                 (time_t)getDate
+                 (float)getFloat
+                 (double)getDouble                 
+                 (NSString *)getString
+                 (TightdbBinary *)getBinary
+                 (TightdbTable *)getTable
       CONST    : True
       RETURN:
-        TYPES  : [bool, int64_t, float, double, time_t, const char*, BinaryData]
+        TYPES  : [bool, int64_t, float, double, time_t, NSString, TightdbBinary, TightdbTable]
         DESCR  : The value.
       EXAMPLES:
       - CODE   : ex_cpp_mixed_get_value
