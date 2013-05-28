@@ -177,6 +177,11 @@ case "$MODE" in
 
     "test-installed")
         PREFIX="$1"
+        if [ -z "$PREFIX" ]; then
+            PREFIX="/usr/local"
+        fi
+        LIBDIR="$(make prefix="$PREFIX" get-libdir)" || exit 1
+        export LD_RUN_PATH="$LIBDIR"
         make -C "test-installed" clean || exit 1
         make -C "test-installed" test  || exit 1
         exit 0
