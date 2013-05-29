@@ -125,6 +125,18 @@ ENABLE_INSTALL_DEBUG_LIBS =
 # the opposite is true.
 ENABLE_INSTALL_DEBUG_PROGS =
 
+# Use this if you want to install only a subset of what is usually
+# installed. For example, to produce a separate binary and development
+# package for a library product, you can run 'make install
+# INSTALL_FILTER=shared-libs' for the binary package and 'make install
+# INSTALL_FILTER=static-libs,progs,headers' for the development
+# package. This filter also affects 'uninstall', but note that
+# 'uninstall' makes no attempt to uninstall headers, instead it
+# invokes a custom target 'uninstall/extra' if 'extra' is included in
+# the filter. It is then up to the apllication to decide what actions
+# to take on 'uninstall/extra'.
+INSTALL_FILTER = shared-libs,static-libs,progs,headers,extra
+
 # Installation (GNU style)
 prefix          = /usr/local
 exec_prefix     = $(prefix)
@@ -316,6 +328,7 @@ OCC_AND_OCXX_ARE_GCC_LIKE = $(and $(call IS_GCC_LIKE,$(OCC)),$(or $(call IS_GCC_
 # SETUP A GCC-LIKE DEFAULT LINKER IF POSSIBLE
 
 ifneq ($(CC_AND_CXX_ARE_GCC_LIKE),)
+LD_SPECIFIED = $(filter-out undefined default,$(origin LD))
 ifeq ($(LD_SPECIFIED),)
 LD := $(CXX)
 endif
@@ -325,14 +338,16 @@ ifneq ($(LD_IS_GCC_LIKE),)
 LDFLAGS_SHARED = -shared
 endif
 
-# Workaround for CLANG < v3.2 ignoring LIBRARY_PATH
+# Work-around for CLANG < v3.2 ignoring LIBRARY_PATH
 LD_IS_CLANG = $(or $(call MATCH_CMD,clang,$(LD)),$(call MATCH_CMD,clang++,$(LD)))
 ifneq ($(LD_IS_CLANG),)
-CLANG_VERSION = $(shell $(LD) --version | grep -i 'clang version' | sed 's/.*clang version \([^ ][^ ]*\).*/\1/' | sed 's/[._-]/ /g')
+CLANG_VERSION = $(shell printf '\#ifdef __clang__\n\#if defined __clang_major__ && defined __clang_minor__\n__clang_major__ __clang_minor__\n\#else\n0 0\n\#endif\n\#endif' | $(LD) -E - | grep -v -e '^\#' -e '^$$')
+ifneq ($(CLANG_VERSION),)
 CLANG_MAJOR = $(word 1,$(CLANG_VERSION))
 CLANG_MINOR = $(word 2,$(CLANG_VERSION))
 ifeq ($(shell echo $$(($(CLANG_MAJOR) < 3 || ($(CLANG_MAJOR) == 3 && $(CLANG_MINOR) < 2)))),1)
 LDFLAGS_LIBRARY_PATH = $(foreach x,$(subst :, ,$(LIBRARY_PATH)),-L$(x))
+endif
 endif
 endif
 
@@ -638,17 +653,17 @@ clean clean/after: $(patsubst %,subdir/%/clean,$(AVAIL_PASSIVE_SUBDIRS))
 # INSTALL / UNINSTALL
 
 .PHONY: install/header/dir install/lib/dirs install/prog/dirs
-.PHONY: install/headers install/libs install/progs
-.PHONY: uninstall/libs uninstall/progs uninstall/extra
+.PHONY: install/headers install/static-libs install/shared-libs install/progs
+.PHONY: uninstall/static-libs uninstall/shared-libs uninstall/progs uninstall/extra
 
 ifeq ($(NO_BUILD_ON_INSTALL),)
 install/local: default/local
 ifneq ($(ENABLE_INSTALL_STATIC_LIBS),)
-install/libs: $(TARGETS_LIB_STATIC_OPTIM)
+install/static-libs: $(TARGETS_LIB_STATIC_OPTIM)
 endif
-install/libs: $(TARGETS_LIB_SHARED_OPTIM)
+install/shared-libs: $(TARGETS_LIB_SHARED_OPTIM)
 ifneq ($(ENABLE_INSTALL_DEBUG_LIBS),)
-install/libs: $(TARGETS_LIB_SHARED_DEBUG)
+install/shared-libs: $(TARGETS_LIB_SHARED_DEBUG)
 endif
 install/progs: $(TARGETS_PROG_OPTIM)
 ifneq ($(ENABLE_INSTALL_DEBUG_PROGS),)
@@ -656,8 +671,33 @@ install/progs: $(TARGETS_PROG_DEBUG)
 endif
 endif
 
-install/local: install/headers install/libs install/progs
-uninstall/after: uninstall/progs uninstall/libs uninstall/extra
+INSTALL_FILTER_2 = $(subst $(COMMA), ,$(INSTALL_FILTER))
+
+ifneq ($(filter headers,$(INSTALL_FILTER_2)),)
+install/local: install/headers
+endif
+ifneq ($(filter static-libs,$(INSTALL_FILTER_2)),)
+install/local: install/static-libs
+endif
+ifneq ($(filter shared-libs,$(INSTALL_FILTER_2)),)
+install/local: install/shared-libs
+endif
+ifneq ($(filter progs,$(INSTALL_FILTER_2)),)
+install/local: install/progs
+endif
+
+ifneq ($(filter progs,$(INSTALL_FILTER_2)),)
+uninstall/after: uninstall/progs
+endif
+ifneq ($(filter shared-libs,$(INSTALL_FILTER_2)),)
+uninstall/after: uninstall/shared-libs
+endif
+ifneq ($(filter static-libs,$(INSTALL_FILTER_2)),)
+uninstall/after: uninstall/static-libs
+endif
+ifneq ($(filter extra,$(INSTALL_FILTER_2)),)
+uninstall/after: uninstall/extra
+endif
 
 HEADER_INSTALL_DIR =
 ifneq ($(INST_HEADERS),)
@@ -731,12 +771,16 @@ install/header/dir:
 	$(INSTALL_DIR) $(HEADER_INSTALL_DIR)
 endif
 
-install/libs: install/lib/dirs
+install/static-libs: install/lib/dirs
 $(foreach x,lib $(EXTRA_INSTALL_PREFIXES),$(call INSTALL_RECIPE_LIBS,$(x),$(strip $(call GET_STATIC_LIB_INST_NAMES,$(x)))))
+
+install/shared-libs: install/lib/dirs
 $(foreach x,lib $(EXTRA_INSTALL_PREFIXES),$(foreach y,$($(x)_LIBRARIES),$(foreach z,$(INST_SHARED_LIB_SUFFICES),$(call INSTALL_RECIPE_LIB_SHARED,$(x),$(call GET_LIBRARY_NAME,$(y))$(patsubst +%,%,$(z)),$(call GET_VERSION_FOR_TARGET,$(y))))))
 
-uninstall/libs:
+uninstall/static-libs:
 $(foreach x,lib $(EXTRA_INSTALL_PREFIXES),$(call UNINSTALL_RECIPE_LIBS,$(x),$(strip $(call GET_STATIC_LIB_INST_NAMES,$(x)))))
+
+uninstall/shared-libs:
 $(foreach x,lib $(EXTRA_INSTALL_PREFIXES),$(foreach y,$($(x)_LIBRARIES),$(foreach z,$(INST_SHARED_LIB_SUFFICES),$(call UNINSTALL_RECIPE_LIB_SHARED,$(x),$(call GET_LIBRARY_NAME,$(y))$(patsubst +%,%,$(z)),$(call GET_VERSION_FOR_TARGET,$(y))))))
 
 install/progs: install/prog/dirs
