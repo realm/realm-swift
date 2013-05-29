@@ -66,6 +66,7 @@ case "$MODE" in
             done
             make BASE_DENOM="ios" clean || exit 1
         fi
+        echo "Done cleaning"
         exit 0
         ;;
 
@@ -144,6 +145,7 @@ case "$MODE" in
             libtool -static -o "src/tightdb/objc/libtightdb-objc-ios.a"     "$TEMP_DIR/libtightdb-objc-ios.a"     -ltightdb-ios     $LDFLAGS || exit 1
             libtool -static -o "src/tightdb/objc/libtightdb-objc-ios-dbg.a" "$TEMP_DIR/libtightdb-objc-ios-dbg.a" -ltightdb-ios-dbg $LDFLAGS || exit 1
         fi
+        echo "Done building"
         exit 0
         ;;
 
@@ -154,6 +156,7 @@ case "$MODE" in
         cp "src/tightdb/objc/test/unit-tests" "$TEMP_DIR/unit-tests.octest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
         OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests.octest" || exit 1
+        echo "Test passed"
         exit 0
         ;;
 
@@ -163,6 +166,7 @@ case "$MODE" in
             PREFIX="/usr/local"
         fi
         make prefix="$PREFIX" install || exit 1
+        echo "Done installing"
         exit 0
         ;;
 
@@ -172,6 +176,7 @@ case "$MODE" in
             PREFIX="/usr/local"
         fi
         make prefix="$PREFIX" uninstall || exit 1
+        echo "Done uninstalling"
         exit 0
         ;;
 
@@ -184,6 +189,7 @@ case "$MODE" in
         export LD_RUN_PATH="$LIBDIR"
         make -C "test-installed" clean || exit 1
         make -C "test-installed" test  || exit 1
+        echo "Test passed"
         exit 0
         ;;
 
