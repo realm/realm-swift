@@ -13,7 +13,7 @@ DESCR      : *g_typed_table_descr
 SEE        :
 EXAMPLES:
 - DESCR    :
-  CODE     : ex_cpp_typed_table_intro
+  CODE     : ex_objc_typed_table_intro
 IGNORE     : []                   # List of method-ids to ignore
 
 CATEGORIES:

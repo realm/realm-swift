@@ -17,3 +17,11 @@ Anni is 43 years old.
 </pre>
 </div>
 @@EndOverlay@@
+
+@@Overlay: execute_tutorial @@
+<pre>
+$ cd tightdb_objc
+$ make
+$ ./tutorial
+</pre>
+@@EndOverlay@@

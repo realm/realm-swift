@@ -15,7 +15,7 @@ DESCR      : *g_dyn_table_intro_descr
 SEE        :
 EXAMPLES   :
 - DESCR:
-  CODE     : ex_cpp_dyn_table_intro
+  CODE     : ex_obcj_dyn_table_intro
 IGNORE     : []                   # List of method-ids to ignore
 CATEGORIES :
 - State:
