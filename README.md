@@ -18,7 +18,6 @@ The TightDB core library must have been installed.
 Building, testing, and installing
 ---------------------------------
 
-    export PATH="$TIGHTDB_HOME/src/tightdb:$PATH"
     export CPATH="$TIGHTDB_HOME/src"
     export LIBRARY_PATH="$TIGHTDB_HOME/src/tightdb"
     sh build.sh clean

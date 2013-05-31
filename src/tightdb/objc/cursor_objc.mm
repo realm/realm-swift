@@ -2,11 +2,15 @@
 //  cursor.mm
 //  TightDb
 
-#import <tightdb/table.hpp>
+#include <tightdb/table.hpp>
 
 #import <tightdb/objc/cursor.h>
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/table_priv.h>
+
+#include <tightdb/objc/util.hpp>
+
+using namespace std;
 
 
 @interface TightdbCursor()

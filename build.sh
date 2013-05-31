@@ -66,6 +66,7 @@ case "$MODE" in
             done
             make BASE_DENOM="ios" clean || exit 1
         fi
+        echo "Done cleaning"
         exit 0
         ;;
 
@@ -74,6 +75,14 @@ case "$MODE" in
 #        TIGHTDB_ENABLE_FAT_BINARIES="1" make || exit 1
         make || exit 1
         if [ "$OS" = "Darwin" ]; then
+            # This section builds the following two static libraries:
+            #     src/tightdb/libtightdb-objc-ios.a
+            #     src/tightdb/libtightdb-objc-ios-dbg.a
+            # Each one contains both a version for iPhone and one for
+            # the iPhone simulator.
+            # Each contained version of each of the two libraries
+            # includes the TightDB core library and is therefore self
+            # contained.
             TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.build.XXXX)" || exit 1
             # Xcode provides the iPhoneOS SDK
             XCODE_HOME="$(xcode-select --print-path)" || exit 1
@@ -123,7 +132,7 @@ case "$MODE" in
                 PLATFORM_HOME="$XCODE_HOME/Platforms/$x.platform"
                 SDK_ROOT="$(cat "$TEMP_DIR/$x/sdk_root")" || exit 1
                 ARCH="$(cat "$TEMP_DIR/$x/arch")" || exit 1
-                make -C "src/tightdb/objc" TIGHTDB_CONFIG="tightdb-config-ios" BASE_DENOM="$x" CFLAGS_ARCH="-arch $ARCH -isysroot $SDK_ROOT" "libtightdb-objc-$x.a" "libtightdb-objc-$x-dbg.a" || exit 1
+                make -C "src/tightdb/objc" BASE_DENOM="$x" CFLAGS_ARCH="-arch $ARCH -isysroot $SDK_ROOT" "libtightdb-objc-$x.a" "libtightdb-objc-$x-dbg.a" || exit 1
                 cp "src/tightdb/objc/libtightdb-objc-$x.a"     "$TEMP_DIR/$x/libtightdb-objc.a"     || exit 1
                 cp "src/tightdb/objc/libtightdb-objc-$x-dbg.a" "$TEMP_DIR/$x/libtightdb-objc-dbg.a" || exit 1
             done
@@ -136,6 +145,7 @@ case "$MODE" in
             libtool -static -o "src/tightdb/objc/libtightdb-objc-ios.a"     "$TEMP_DIR/libtightdb-objc-ios.a"     -ltightdb-ios     $LDFLAGS || exit 1
             libtool -static -o "src/tightdb/objc/libtightdb-objc-ios-dbg.a" "$TEMP_DIR/libtightdb-objc-ios-dbg.a" -ltightdb-ios-dbg $LDFLAGS || exit 1
         fi
+        echo "Done building"
         exit 0
         ;;
 
@@ -146,6 +156,7 @@ case "$MODE" in
         cp "src/tightdb/objc/test/unit-tests" "$TEMP_DIR/unit-tests.octest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
         OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests.octest" || exit 1
+        echo "Test passed"
         exit 0
         ;;
 
@@ -155,13 +166,30 @@ case "$MODE" in
             PREFIX="/usr/local"
         fi
         make prefix="$PREFIX" install || exit 1
+        echo "Done installing"
+        exit 0
+        ;;
+
+    "uninstall")
+        PREFIX="$1"
+        if [ -z "$PREFIX" ]; then
+            PREFIX="/usr/local"
+        fi
+        make prefix="$PREFIX" uninstall || exit 1
+        echo "Done uninstalling"
         exit 0
         ;;
 
     "test-installed")
         PREFIX="$1"
+        if [ -z "$PREFIX" ]; then
+            PREFIX="/usr/local"
+        fi
+        LIBDIR="$(make prefix="$PREFIX" get-libdir)" || exit 1
+        export LD_RUN_PATH="$LIBDIR"
         make -C "test-installed" clean || exit 1
         make -C "test-installed" test  || exit 1
+        echo "Test passed"
         exit 0
         ;;
 
@@ -201,7 +229,7 @@ EOF
 
     *)
         echo "Unspecified or bad mode '$MODE'" 1>&2
-        echo "Available modes are: clean build test install test-installed" 1>&2
+        echo "Available modes are: clean build test install uninstall test-installed" 1>&2
         echo "As well as: dist-copy" 1>&2
         exit 1
         ;;
