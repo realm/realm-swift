@@ -12,8 +12,8 @@ SUMMARY    : *g_typed_query_intro_summary
 DESCR      : *g_typed_query_intro_descr
 SEE        :
 EXAMPLES   :
-- DESCR:
-  CODE: ex_cpp_typed_query_intro
+- DESCR    :
+  CODE     : ex_objc_typed_table_intro
 IGNORE     : []
 CATEGORIES :
 

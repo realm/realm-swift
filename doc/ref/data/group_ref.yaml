@@ -14,7 +14,7 @@ DESCR      : *g_group_descr
 SEE        :
 EXAMPLES:
 - DESCR    :
-  CODE     : #ex_objc_group_intro
+  CODE     : ex_objc_group_intro
 IGNORE     : []                   # List of method-ids to ignore
 CATEGORIES:
 - Constructor:
