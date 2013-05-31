@@ -6,11 +6,18 @@
 #import <Foundation/Foundation.h>
 
 
+@interface TightdbBinary()
+
+-(tightdb::BinaryData)getBinary;
+
+@end
+
+
 @interface TightdbTable()
 
 @property (nonatomic) tightdb::TableRef table;
 
--(tightdb::Table &)getTable;
+-(tightdb::Table&)getTable;
 
 -(void)setParent:(id)parent; // Workaround for ARC release problem.
 
