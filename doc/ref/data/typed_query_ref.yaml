@@ -1,0 +1,417 @@
+#
+# Obj-C reference documentation for Query class
+#
+
+# NOTIMPLEMENTED accessors for Binaray, Subtable
+# INCONSISTENCY greater vs greaterThan
+# UNCLEAR group description, findNext: the parameter name "last" was slightly confusing in same context as "next" as it was really the "stopAt" row.
+
+ID         : class_typed_query
+TITLE      : Query (typed)
+SUMMARY    : *g_typed_query_intro_summary
+DESCR      : *g_typed_query_intro_descr
+SEE        :
+EXAMPLES   :
+- DESCR:
+  CODE: ex_cpp_typed_query_intro
+IGNORE     : []
+CATEGORIES :
+
+
+
+
+- Conditions:
+  METHODS:
+  - g_typed_query_equals_boolean:
+  - g_typed_query_equals_integer:
+  - g_typed_query_equals_float:
+  - g_typed_query_equals_double:
+  - g_typed_query_equals_string:
+  - g_typed_query_equals_date:
+  - g_typed_query_equals_binary:
+      NAMES    : [ equal, equal_date, equal_binary ]
+      SIGNATURE: |
+                 .CName (TableName_Query *)equal:(BOOL)value
+                 .CName (TableName_Query *)equal:(int64_t)value
+                 .CName (TableName_Query *)equal:(float)value
+                 .CName (TableName_Query *)equal:(double)value
+                 .CName (TableName_Query *)equal:(NSString *)value
+                 .CName (TableName_Query *)equal:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 .CName (TableName_Query *)equal:(time_t)value
+      SUMMARY  : *g_typed_query_equals_summary
+      DESCR    : *g_typed_query_equals_descr
+      PARAMS:
+      - NAME   : value
+        TYPES  : [bool, int64_t, float, double, const char*, time_t]
+        DESCR  : The value.
+      - NAME   : caseSensitive
+        TYPES  : BOOL
+        DESCR  : 'String match can be performed case sensitive or not. Default: <code>true</code>.'
+      RETURN:
+        TYPES  : Query&
+        DESCR  : The class of the returned object is defined by a macro. The first part of the class name, specifically <code>TableName</code>, is replaced with the name of your typed table. 
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_equals
+  - g_typed_query_notEquals_boolean:
+  - g_typed_query_notEquals_integer:
+  - g_typed_query_notEquals_float:
+  - g_typed_query_notEquals_double:
+  - g_typed_query_notEquals_string:
+  - g_typed_query_notEquals_date:
+  - g_typed_query_notEquals_binary:
+      NAMES    : [ notEqual, not_equal, not_equal_binary ]
+      SIGNATURE: |
+                 .CName (TableName_Query *)notEqual:(int64_t)value
+                 .CName (TableName_Query *)notEqual:(float)value
+                 .CName (TableName_Query *)notEqual:(double)value
+                 .CName (TableName_Query *)notEqual:(NSString *)value
+                 .CName (TableName_Query *)notEqual:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 .CName (TableName_Query *)notEqual:(time_t)value
+      SUMMARY  : *g_typed_query_notEquals_summary
+      DESCR    : *g_typed_query_notEquals_descr
+      PARAMS:
+      - NAME   : value
+        TYPES  : [bool, int64_t, float, double, const char*, time_t]
+        DESCR  : The value.
+      - NAME   : case_sensitive
+        TYPES  : bool
+        DESCR  : 'String match can be performed case sensitive or not. Default: <code>true</code>.'
+      RETURN:
+        TYPES  : Query&
+        DESCR  : The class of the returned object is defined by a macro. The first part of the class name, specifically <code>TableName</code>, is replaced with the name of your typed table.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_notEquals
+  - g_typed_query_greaterThan:
+  - g_typed_query_greaterThan_float:
+  - g_typed_query_greaterThan_double:
+  - g_typed_query_greaterThan_date:
+      NAMES    : [ greater, greater, greater, greater_date ]
+      SIGNATURE: |
+                 .CName (TableName_Query *)greater:(int64_t)value
+                 .CName (TableName_Query *)greater:(float)value
+                 .CName (TableName_Query *)greater:(double)value
+                 .CName (TableName_Query *)greater:(time_t)value
+      SUMMARY  : *g_typed_query_greaterThan_summary
+      DESCR    : *g_typed_query_greaterThan_descr
+      PARAMS:
+      - NAME   : value
+        TYPES  : [int64_t, float, double, time_t]
+        DESCR  : The value.
+      RETURN:
+        TYPES  : Query&
+        DESCR  : The class of the returned object is defined by a macro. The first part of the class name, specifically <code>TableName</code>, is replaced with the name of your typed table.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_greaterThan
+  - g_typed_query_greaterThanOrEqual:
+  - g_typed_query_greaterThanOrEqual_date:
+      NAMES    : [greaterEqual, greater_equal_date ]
+      SIGNATURE: |
+                 .CName (TableName_Query *)greaterEqual:(int64_t)value
+                 .CName (TableName_Query *)greaterEqual:(float)value
+                 .CName (TableName_Query *)greaterEqual:(double)value
+                 .CName (TableName_Query *)greaterEqual:(time_t)value
+      SUMMARY  : *g_typed_query_greaterThanOrEqual_summary
+      DESCR    : *g_typed_query_greaterThanOrEqual_descr
+      PARAMS:
+      - NAME   : value
+        TYPES  : [int64_t, float, double, time_t]
+        DESCR  : The value.
+      RETURN:
+        TYPES  : Query&
+        DESCR  : The class of the returned object is defined by a macro. The first part of the class name, specifically <code>TableName</code>, is replaced with the name of your typed table.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_greaterThanOrEqual
+
+  - g_typed_query_lessThan:
+  - g_typed_query_lessThan_date:
+      NAMES    : [less, less_date]
+      SIGNATURE: |
+                 .CName (TableName_Query *)less:(int64_t)value
+                 .CName (TableName_Query *)less:(float)value
+                 .CName (TableName_Query *)less:(double)value
+                 .CName (TableName_Query *)less:(time_t)value
+      SUMMARY  : *g_typed_query_lessThan_summary
+      DESCR    : *g_typed_query_lessThan_descr
+      PARAMS:
+      - NAME   : value
+        TYPES  : [int64_t, float, double, time_t]
+        DESCR  : The value.
+      RETURN:
+        TYPES  : Query&
+        DESCR  : The class of the returned object is defined by a macro. The first part of the class name, specifically <code>TableName</code>, is replaced with the name of your typed table.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_lessThan
+  - g_typed_query_lessThanOrEqual:
+  - g_typed_query_lessThanOrEqual_date:
+      NAMES    : [lessEqual, less_equal_date]
+      SIGNATURE: |
+                 .CName (TableName_Query *)lessEqual:(int64_t)value
+                 .CName (TableName_Query *)lessEqual:(float)value
+                 .CName (TableName_Query *)lessEqual:(double)value
+                 .CName (TableName_Query *)lessEqual:(time_t)value
+      SUMMARY  : *g_typed_query_lessThanOrEqual_summary
+      DESCR    : *g_typed_query_lessThanOrEqual_descr
+      PARAMS:
+      - NAME   : value
+        TYPES  : [int64_t, float, double, time_t]
+        DESCR  : The value.
+      RETURN:
+        TYPES  : Query&
+        DESCR  : The class of the returned object is defined by a macro. The first part of the class name, specifically <code>TableName</code>, is replaced with the name of your typed table.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_lessThanOrEqual
+  - g_typed_query_between:
+  - g_typed_query_between_date:
+      NAMES    : [between, between_date]
+      SIGNATURE: |
+                 .CName (TableName_Query *)between:(int64_t)from to:(int64_t)to
+                 .CName (TableName_Query *)between:(float)from to:(float)to
+                 .CName (TableName_Query *)between:(double)from to:(double)to
+                 .CName (TableName_Query *)between:(time_t)from to:(time_t)to
+      DESCR    : *g_typed_query_between_descr
+      SUMMARY  : *g_typed_query_between_summary
+      PARAMS:
+      - NAME   : from
+        TYPES  : [int64_t, float, double, time_t]
+        DESCR  : Lower bound of range.
+      - NAME   : to
+        TYPES  : [int64_t, time_t]
+        DESCR  : Upper bound of range.
+      RETURN:
+        TYPES  : Query&
+        DESCR  : The class of the returned object is defined by a macro. The first part of the class name, specifically <code>TableName</code>, is replaced with the name of your typed table.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_between
+  - g_typed_query_startsWith:
+  - g_typed_query_startsWith_binary:
+      NAMES    : [beginsWith, begins_with_binary]
+      SIGNATURE: |
+                 .CName (TableName_Query *)beginsWith:(NSString *)value
+                 .CName (TableName_Query *)beginsWith:(NSString *)value caseSensitive:(BOOL)
+      DESCR    : *g_typed_query_startsWith_descr
+      SUMMARY  : *g_typed_query_startsWith_summary
+      PARAMS:
+      - NAME   : value
+        TYPES  : const char*
+        DESCR  : The value.
+      - NAME   : case_sensitive
+        TYPES  : bool
+        DESCR  : *g_typed_query_case_sensitive_descr
+      RETURN:
+        TYPES  : Query&
+        DESCR  : The class of the returned object is defined by a macro. The first part of the class name, specifically <code>TableName</code>, is replaced with the name of your typed table.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_startsWith
+  - g_typed_query_endsWith:
+  - g_typed_query_endsWith_binary:
+      NAMES    : [endsWith, ends_with_binary]
+      SIGNATURE: |
+                 .CName (TableName_Query *)endsWith:(NSString *)value
+                 .CName (TableName_Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+      DESCR    : *g_typed_query_endsWith_descr
+      SUMMARY  : *g_typed_query_endsWith_summary
+      PARAMS:
+      - NAME   : value
+        TYPES  : const char*
+        DESCR  : The value.
+      - NAME   : case_sensitive
+        TYPES  : bool
+        DESCR  : *g_typed_query_case_sensitive_descr
+      RETURN:
+        TYPES  : Query&
+        DESCR  : The class of the returned object is defined by a macro. The first part of the class name, specifically <code>TableName</code>, is replaced with the name of your typed table.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_endsWith
+  - g_typed_query_contains:
+  - g_typed_query_contains_binary:
+      NAMES    : [contains, contains_binary]
+      SIGNATURE: |
+                 .CName (TableName_Query *)contains:(NSString *)value
+                 .CName (TableName_Query *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive
+      DESCR    : *g_typed_query_contains_descr
+      SUMMARY  : *g_typed_query_contains_summary
+      PARAMS:
+      - NAME   : value
+        TYPES  : const char*
+        DESCR  : The value.
+      - NAME   : case_sensitive
+        TYPES  : bool
+        DESCR  : *g_typed_query_case_sensitive_descr
+      RETURN:
+        TYPES  : Query&
+        DESCR  : The class of the returned object is defined by a macro. The first part of the class name, specifically <code>TableName</code>, is replaced with the name of your typed table.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_contains
+
+- Combiners:
+  METHODS:
+  - g_typed_query_group:
+      NAMES    : group
+      SIGNATURE: |
+                 (TableName_Query *)group
+      DESCR    : *g_typed_query_group_descr
+      SUMMARY  : *g_typed_query_group_summary
+      RETURN:
+        TYPES  : Query
+        DESCR  : The class of the returned object is defined by a macro. The first part of the class name, specifically <code>TableName</code>, is replaced with the name of your typed table.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_group
+  - g_typed_query_endGroup:
+      NAMES    : endGroup
+      SIGNATURE: |
+                 (TableName_Query *)endgroup
+      DESCR    : *g_typed_query_endGroup_descr
+      SUMMARY  : *g_typed_query_endGroup_summary
+      RETURN:
+        TYPES  : Query
+        DESCR  : The class of the returned object is defined by a macro. The first part of the class name, specifically <code>TableName</code>, is replaced with the name of your typed table.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_group
+  - g_typed_query_or:
+      NAMES    : or
+      SIGNATURE: |
+                 (TableName_Query *)or
+      DESCR    : *g_typed_query_or_descr
+      SUMMARY  : *g_typed_query_or_summary
+      RETURN:
+        TYPES  : Query
+        DESCR  : The class of the returned object is defined by a macro. The first part of the class name, specifically <code>TableName</code>, is replaced with the name of your typed table.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_or
+
+
+- Actions:
+  METHODS:
+  - g_typed_query_find_all_const:
+  - g_typed_query_find_all:
+      NAMES    : findAll
+      DESCR    : *g_typed_query_find_all_descr
+      SUMMARY  : *g_typed_query_find_all_summary
+      SIGNATURE: |
+                 (TableName_View *)findAll
+      RETURN:
+        TYPES  : [TableView, ConstTableView]
+        DESCR  : The query result represented as a <code>TableName_View</code>. Note that part of the class name, specifically <code>TableName</code>, is replaced with the name of your specific table.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_findall
+  - g_typed_query_findNext:
+      NAMES    : findNext
+      SIGNATURE: |
+                 (size_t)findNext:(size_t)last
+      DESCR    : *g_typed_query_find_next_descr
+      SUMMARY  : *g_typed_query_find_next_summary
+      PARAMS:
+      - NAME   : last
+        TYPES  : size_t
+        DESCR  : "Row to stop search. Default: -1 (infinity)."
+      RETURN:
+        TYPES  : size_t
+        DESCR  : Row number
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_find_next
+  - g_typed_query_sum:
+  - g_typed_query_sum_float:
+  - g_typed_query_sum_double:
+      NAMES    : [sum, sum_float, sum_double]
+      DESCR    : *g_typed_query_sum_descr
+      SUMMARY  : *g_typed_query_sum_summary
+      CONST    : true
+      SIGNATURE: |
+                 .CName (int64_t)sum
+                 .CName (double)sum
+      RETURN:
+        TYPES  : [int64_t, double, double]
+        DESCR  : The sum of the values in the column <code>CName</code> (within the query result). The return type is <code>double</code> in case the column is typed as <code>float</code> or <code>double</code>.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_sum
+  - g_typed_query_size:
+      NAMES    : count
+      SIGNATURE: |
+                 (size_t)count
+      DESCR    : *g_typed_query_size_descr
+      SUMMARY  : *g_typed_query_size_summary
+      CONST    : true
+      RETURN:
+        TYPES  : size_t
+        DESCR  : The number of rows.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_size
+  - g_typed_query_maximum_date:
+  - g_typed_query_maximum:
+  - g_typed_query_maximum_float:
+  - g_typed_query_maximum_double:
+      NAMES    : [max, maximum_float, maximum_double]
+      DESCR    : *g_typed_query_maximum_descr
+      SUMMARY  : *g_typed_query_maximum_summary
+      CONST    : true
+      SIGNATURE: |
+                 .CName (int64_t)max
+                 .CName (double)max
+      RETURN:
+        TYPES  : [int64_t, float, double]
+        DESCR  : The highest value. The return type is <code>double</code> in case the column is typed as <code>float</code> or <code>double</code>.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_maximum
+  - g_typed_query_minimum:
+  - g_typed_query_minimum_float:
+  - g_typed_query_minimum_double:
+      NAMES    : min
+      DESCR    : *g_typed_query_minimum_descr
+      SUMMARY  : *g_typed_query_minimum_summary
+      CONST    : true
+      SIGNATURE: |
+                 .CName (int64_t)min
+                 .CName (double)min
+      RETURN:
+        TYPES  : [int64_t, float, double]
+        DESCR  : The lowest value. The return type is <code>double</code> in case the column is typed as <code>float</code> or <code>double</code>.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_manimum
+  - g_typed_query_average:
+  - g_typed_query_average_float:
+  - g_typed_query_average_double:
+      NAMES    : avg
+      SUMMARY  : *g_typed_query_average_summary
+      DESCR    : *g_typed_query_average_descr
+      CONST    : true
+      SIGNATURE: |
+                 .CName (int64_t)avg
+                 .CName (double)avg
+      RETURN:
+        TYPES  : double
+        DESCR  : The average.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_average
+  - g_typed_query_remove:
+      NAMES    : remove
+      SIGNATURE: |
+                 (size_t)remove
+      DESCR    : *g_typed_query_remove_descr
+      SUMMARY  : *g_typed_query_remove_summary
+      CONST    : true
+      RETURN:
+        TYPES  : size_t
+        DESCR  : The number of rows removed.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_query_remove

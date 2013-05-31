@@ -1,0 +1,66 @@
+#
+# Reference documentation data for language Java
+#
+ID        : objc
+TITLE     : 'Objective-C'
+DESCR     : >
+            The goal of TightDB is to provide a high performance
+            data storage for your applications. 
+
+            TightDB integrates seamless in Objective-C, making it
+            fast to learn and easy to use.  You can replace your traditional data
+            structures with TightDB. Whether it is a simple array of integers or a
+            complex structure, you interface to TightDB as easily as using a
+            standard array like container. But in addition you can
+            handle much more data in much less space, you get powerful query
+            possibilities in an intuitive language and the ability to share your data
+            across all supported languages and platforms.
+
+            The core of the framework is the class {@link class_table}. The
+            class is a representation of the
+            fundamental concept <strong>Table</strong>. You can use 
+            {@link class_table} in the situations where you know the table structure 
+            a priori or when the data structure changes dynamically through the run time
+            of the application.
+
+            Tables organize data in columns and rows and data is compacted for
+            low memory usage. The interface to the data resembles the native
+            data structures. Moreover, tables can have nested tables as data. Using subtables
+            and mixed types you can build arbitrarily complex data structures.
+
+            It is possible to query data using the {@link class_query} and 
+            class. Queries can be complex - involving
+            any number of columns and values. You can either apply aggregate functions to you
+            resulting data set or use the data set in your application as a
+            {@link class_tableview} object.
+
+            The {@link class_group} class lets you serialize tables to disk or memory. The
+            TightDB data format is consistent across operating systems, hardware platforms,
+            and programming languages. This implies that you can share data across applications
+            and environments. For multi-threaded or multi-process applications, you can
+            use the {@link class_shared_group}.
+
+IMPORT    : [reference, typed_table_ref, dyn_table_ref, dyn_query_ref, group_ref, typed_view_ref, dyn_view_ref, shared_group_ref, typed_query_ref, mixed_ref]
+IMPORTPATH: ../../tightdb/doc/ref_cpp/data
+
+
+CATEGORIES:                       # list global class-id in order of appearence
+- Typed Table:                    # Category header name
+  - typed_table                   # Global Class name. File: 'typed_table_ref.yaml'
+  - typed_view
+  - typed_query
+- Dynamic Table:
+  - dyn_table
+  - dyn_view
+  - dyn_query
+- Collection:
+  - group
+  - shared_group
+- Helpers:
+  - mixed
+#  - cursor
+
+EXAMPLES  : 
+- DESCR   : 
+  CODE    : #ex_cpp_intro           # id to example code
+
