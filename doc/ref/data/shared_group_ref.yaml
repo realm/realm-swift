@@ -1,0 +1,65 @@
+#
+# Obj-C reference documentation for Shared Group class
+#
+
+ID         : class_shared_group
+TITLE      : SharedGroup
+SUMMARY    : *g_shared_group_summary
+DESCR      : *g_shared_group_descr
+SEE        :
+EXAMPLES:
+- DESCR    :
+  CODE     : ex_sharedgroup_intro
+IGNORE     : []
+CATEGORIES:
+- Constructor:
+  METHODS:
+  - g_shared_group_constructor:
+      NAMES    : SharedGroup
+      SUMMARY  : *g_shared_group_constructor_summary
+      DESCR    : *g_shared_group_constructor_descr
+      SIGNATURE: (TightdbSharedGroup *)groupWithFilename:(NSString *)filename
+      PARAMS:
+      - NAME   : filename
+        TYPES  : const std::string&
+        DESCR  : Filesystem path of the TightDB database file to be opened.
+      RETURN:
+        TYPES  : SharedGroup
+        DESCR  : A shared group.
+      THROWS:
+      - EXCEPT : File::OpenError
+        DESCR  : If the file could not be opened. If the reason
+                 corresponds to one of the exception types that are
+                 derived from File::OpenError, the derived exception
+                 type is thrown. Note that InvalidDatabase is among
+                 these derived exception types.
+      EXAMPLES:
+      - CODE   : ex_cpp_shared_group_constructor
+        DESCR  :
+- Write transactions:
+  METHODS:
+  - g_shared_group_begin_write:
+      NAMES    : writeTransaction
+      SUMMARY  : *g_shared_group_begin_write_summary
+      DESCR    : *g_shared_group_begin_write_descr
+      SIGNATURE: (void)writeTransaction:(TightdbSharedGroupWriteTransactionBlock)block
+      RETURN:
+        TYPES  : TightdbSharedGroupReadTransactionBlock
+        DESCR  : A block of code.
+      EXAMPLES:
+      - CODE   : ex_cpp_shared_group_begin_write
+        DESCR  :
+- Read transactions:
+  METHODS:
+  - g_shared_group_begin_read:
+      NAMES    : readTransaction
+      SUMMARY  : *g_shared_group_begin_read_summary
+      DESCR    : *g_shared_group_begin_read_descr
+      SIGNATURE: (void)readTransaction:(TightdbSharedGroupReadTransactionBlock)block
+      CONST    : True
+      RETURN:
+        TYPES  : TightdbSharedGroupReadTransactionBlock
+        DESCR  : A block of code.
+      EXAMPLES:
+      - CODE   : ex_cpp_shared_group_begin_read
+        DESCR  :

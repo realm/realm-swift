@@ -1,0 +1,78 @@
+#
+# Obj-C reference documentation for Mixed class
+#
+
+# JJEPSEN: C++ has single signature constructor, Obj-C has one for each type.
+# JJEPSEN: isEqual is not documented in C++ doc?
+
+ID         : class_mixed
+TITLE      : Mixed
+SUMMARY    : *g_mixed_summary
+DESCR      : *g_mixed_descr
+SEE        :
+EXAMPLES:
+- DESCR    :
+  CODE     : ex_cpp_group_intro
+IGNORE     : []                   # List of method-ids to ignore
+CATEGORIES:
+- Constructors:
+  METHODS:
+  - g_mixed_constructor:
+      NAMES    : Mixed*
+      SUMMARY  : *g_mixed_constructor_summary
+      DESCR    : *g_mixed_constructor_descr
+      SIGNATURE: |
+                 (TightdbMixed *)mixedWithBool:(BOOL)value
+                 (TightdbMixed *)mixedWithInt64:(int64_t)value
+                 (TightdbMixed *)mixedWithFloat:(float)value
+                 (TightdbMixed *)mixedWithDouble:(double)value
+                 (TightdbMixed *)mixedWithDate:(time_t)value
+                 (TightdbMixed *)mixedWithString:(NSString *)value
+                 (TightdbMixed *)mixedWithBinary:(TightdbBinary *)value
+                 (TightdbMixed *)mixedWithBinary:(const char *)data size:(size_t)size
+                 (TightdbMixed *)mixedWithTable:(TightdbTable *)value
+      PARAMS:
+      - NAME   : v
+        TYPES  : [bool, int64_t, float, double, Date, NSString, TightdbBinary, const char*, TightdbTable]
+        DESCR  : The value.
+      EXAMPLES:
+      - CODE   : ex_cpp_mixed_constructor
+        DESCR  :
+- Getters:
+  METHODS:
+  - g_mixed_get_type:
+      NAMES    : getType
+      SUMMARY  : *g_mixed_get_type_summary
+      DESCR    : *g_mixed_get_type_descr
+      SIGNATURE: (TightdbType)getType
+      CONST    : True
+      RETURN:
+        TYPES  : TightdbType
+        DESCR  : The type.
+      EXAMPLES:
+      - CODE   : ex_cpp_mixed_get_type
+        DESCR  :
+  - g_mixed_get_bool:
+  - g_mixed_get_int:
+  - g_mixed_get_date:
+  - g_mixed_get_string:
+  - g_mixed_get_binary:
+      NAMES    : get*
+      SUMMARY  : *g_mixed_get_value_summary
+      DESCR    : *g_mixed_get_value_descr
+      SIGNATURE: |
+                 (BOOL)getBool
+                 (int64_t)getInt
+                 (time_t)getDate
+                 (float)getFloat
+                 (double)getDouble                 
+                 (NSString *)getString
+                 (TightdbBinary *)getBinary
+                 (TightdbTable *)getTable
+      CONST    : True
+      RETURN:
+        TYPES  : [bool, int64_t, float, double, time_t, NSString, TightdbBinary, TightdbTable]
+        DESCR  : The value.
+      EXAMPLES:
+      - CODE   : ex_cpp_mixed_get_value
+        DESCR  :
