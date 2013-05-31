@@ -12,7 +12,7 @@ SUMMARY    : *g_typed_table_summary
 DESCR      : *g_typed_table_descr
 SEE        :
 EXAMPLES:
-- DESCR    :
+- DESCR    : 
   CODE     : ex_objc_typed_table_intro
 IGNORE     : []                   # List of method-ids to ignore
 
