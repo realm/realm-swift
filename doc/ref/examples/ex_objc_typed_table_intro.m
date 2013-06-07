@@ -23,6 +23,11 @@ int main()
         [table addName:@"Joe" Age:17];
         [table addName:@"Jack" Age:22];
         
+        // Get the number of rows in the table.
+        
+        size_t size = [table count];
+        
+        
         
 
     }

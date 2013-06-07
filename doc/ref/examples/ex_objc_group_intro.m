@@ -13,7 +13,7 @@ int main()
     @autoreleasepool {
         
         // Creates a group and uses it to create a new table.
-
+        
         TightdbGroup *group = [TightdbGroup group];
         PeopleTable *table = [group getTable:@"people" withClass:[PeopleTable class]];
         
@@ -31,21 +31,21 @@ int main()
         
         [table addName:@"Sam" Age:17];
         
-        // To save this update to disk write the group to a different file.
-        // IMPORTANT: do not overwrite the old file this will corrupt the table.
-        // This issue will be resolved in TightDB build XX.
+        // IMPORTANT: do not overwrite the existing file!
         
         [group write:@"filename2.tightdb"];
         
-        // Retrieves a byte array from the group and uses it to create an
+        // Retrieves a in memory buffer from the group and uses it to create an
         // NSData object.
-        
+
         size_t size;
         const char *buffer = [group writeToMem:&size];
-        NSData *myData = [NSData dataWithBytes:buffer length:size];
         
-        // call free() here on buffer?
+        // Calling free(..) currently recommeded.
+        
+        free((char*)buffer);
         
     }
+
 }
 // @@EndExample@@
