@@ -165,7 +165,27 @@ case "$MODE" in
         if [ -z "$PREFIX" ]; then
             PREFIX="/usr/local"
         fi
-        make prefix="$PREFIX" install || exit 1
+        make install DESTDIR="$DESTDIR" prefix="$PREFIX" || exit 1
+        echo "Done installing"
+        exit 0
+        ;;
+
+    "install-shared")
+        PREFIX="$1"
+        if ! [ "$PREFIX" ]; then
+            PREFIX="/usr/local"
+        fi
+        make install DESTDIR="$DESTDIR" prefix="$PREFIX" INSTALL_FILTER=shared-libs || exit 1
+        echo "Done installing"
+        exit 0
+        ;;
+
+    "install-devel")
+        PREFIX="$1"
+        if ! [ "$PREFIX" ]; then
+            PREFIX="/usr/local"
+        fi
+        make install DESTDIR="$DESTDIR" prefix="$PREFIX" INSTALL_FILTER=static-libs,progs,headers || exit 1
         echo "Done installing"
         exit 0
         ;;
@@ -175,7 +195,27 @@ case "$MODE" in
         if [ -z "$PREFIX" ]; then
             PREFIX="/usr/local"
         fi
-        make prefix="$PREFIX" uninstall || exit 1
+        make uninstall prefix="$PREFIX" || exit 1
+        echo "Done uninstalling"
+        exit 0
+        ;;
+
+    "uninstall-shared")
+        PREFIX="$1"
+        if ! [ "$PREFIX" ]; then
+            PREFIX="/usr/local"
+        fi
+        make uninstall prefix="$PREFIX" INSTALL_FILTER=shared-libs || exit 1
+        echo "Done uninstalling"
+        exit 0
+        ;;
+
+    "uninstall-devel")
+        PREFIX="$1"
+        if ! [ "$PREFIX" ]; then
+            PREFIX="/usr/local"
+        fi
+        make uninstall prefix="$PREFIX" INSTALL_FILTER=static-libs,progs,extra || exit 1
         echo "Done uninstalling"
         exit 0
         ;;
@@ -230,7 +270,7 @@ EOF
     *)
         echo "Unspecified or bad mode '$MODE'" 1>&2
         echo "Available modes are: clean build test install uninstall test-installed" 1>&2
-        echo "As well as: dist-copy" 1>&2
+        echo "As well as: install-shared install-devel uninstall-shared uninstall-devel dist-copy" 1>&2
         exit 1
         ;;
 
