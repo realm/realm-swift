@@ -32,7 +32,7 @@ int main()
         [table addName:@"Sam" Age:17];
         
         // To save this update to disk write the group to a different file.
-        // WARNING: do not overwrite the old file this will corrupt the table.
+        // IMPORTANT: do not overwrite the old file this will corrupt the table.
         // This issue will be resolved in TightDB build XX.
         
         [group write:@"filename2.tightdb"];
@@ -42,9 +42,9 @@ int main()
         
         size_t size;
         const char *buffer = [group writeToMem:&size];
-        [NSData dataWithBytes:buffer length:size];
+        NSData *myData = [NSData dataWithBytes:buffer length:size];
         
-        // call free() here?
+        // call free() here on buffer?
         
     }
 }
