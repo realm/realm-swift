@@ -19,6 +19,7 @@ EXAMPLES   :
 - DESCR:
   CODE: ex_cpp_dyn_query_intro
 IGNORE     : []                   # List of method-ids to ignore
+
 CATEGORIES :
 - Conditions:
   METHODS:
@@ -29,7 +30,7 @@ CATEGORIES :
   - g_dyn_query_equals_string:
   - g_dyn_query_equals_date:
   - g_dyn_query_equals_binary:
-      NAMES    : [ equal (not implemented for all types), equal_date, equal_binary ]
+      NAMES    : [ equal, ]
       SIGNATURE: |
                  (TightdbQuery *)equal:(BOOL)value
                  (TightdbQuery *)equal:(int64_t)value
