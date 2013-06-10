@@ -16,8 +16,8 @@ EXAMPLES   :
 - DESCR:
   CODE: ex_objc_typed_query_intro
 IGNORE     : []
-CATEGORIES :
 
+CATEGORIES :
 - Conditions:
   METHODS:
   - g_typed_query_equals_bool:
@@ -26,9 +26,9 @@ CATEGORIES :
   - g_typed_query_equals_double:
   - g_typed_query_equals_string:
   - g_typed_query_equals_date:
-#  - g_typed_query_equals_binary:
+# TODO - g_typed_query_equals_binary:
       TITLE    : equal
-      NAMES    : [equal, equal, equal, equal, equal, equal, equal]
+      NAMES    : [equal, equal, equal, equal, equal, equal]
       SIGNATURE: |
                  .CName (TableName_Query *)equal:(BOOL)value
                  .CName (TableName_Query *)equal:(int64_t)value
@@ -45,8 +45,9 @@ CATEGORIES :
         DESCR  : *g_typed_query_value_descr
       - NAME   : caseSensitive
         TYPES  : BOOL
-        DESCR  : *g_typed_query_case_sensitive_descr
+        DESCR  : *g_typed_query_parm_case_sensitive_descr
       RETURN:
+        TYPES  : TableName_Query *
         TYPES  : TableName_Query *
         DESCR  : &g_typed_query_case_sensitive_descr_objc
                  >
@@ -57,15 +58,15 @@ CATEGORIES :
       - DESCR  :
         CODE   : ex_objc_typed_query_equals
         
-#  - g_typed_query_notEquals_bool:
+# todo? - g_typed_query_notEquals_bool:
   - g_typed_query_notEquals_int:
   - g_typed_query_notEquals_float:
   - g_typed_query_notEquals_double:
   - g_typed_query_notEquals_string:
+  - g_typed_query_notEquals_string_2:
   - g_typed_query_notEquals_date:
-  - g_typed_query_notEquals_binary:
-      NAMES    : [ not_equal, not_equal, not_equal, not_equal, 
-                   not_equal, not_equal, not_equal ]
+#TODO  - g_typed_query_notEquals_binary:
+      NAMES    : [ notEqual, notEqual, notEqual, notEqual, notEqual, notEqual]
       SIGNATURE: |
                  .CName (TableName_Query *)notEqual:(int64_t)value
                  .CName (TableName_Query *)notEqual:(float)value
@@ -209,7 +210,7 @@ CATEGORIES :
         
   - g_typed_query_startsWith_string:
   - g_typed_query_startsWith_string_2:
-"  - g_typed_query_startsWith_binary:
+  - g_typed_query_startsWith_binary:
       NAMES    : [beginsWith, beginsWith]
       SIGNATURE: |
                  .CName (TableName_Query *)beginsWith:(NSString *)value
@@ -222,7 +223,7 @@ CATEGORIES :
         DESCR  : *g_typed_query_value_descr
       - NAME   : caseSensitive
         TYPES  : BOOL
-        DESCR  : *g_typed_query_case_sensitive_descr
+        DESCR  : *g_typed_query_parm_case_sensitive_descr
       RETURN:
         TYPES  : TableName_Query *
         DESCR  : *g_typed_query_query_object_return_descr
@@ -245,7 +246,7 @@ CATEGORIES :
         DESCR  : *g_typed_query_value_descr
       - NAME   : caseSensitive
         TYPES  : BOOL
-        DESCR  : *g_typed_query_case_sensitive_descr
+        DESCR  : *g_typed_query_parm_case_sensitive_descr
       RETURN:
         TYPES  : TableName_Query *
         DESCR  : *g_typed_query_query_object_return_descr
@@ -268,7 +269,7 @@ CATEGORIES :
         DESCR  : *g_typed_query_value_descr
       - NAME   : caseSensitive
         TYPES  : BOOL
-        DESCR  : *g_typed_query_case_sensitive_descr
+        DESCR  : *g_typed_query_parm_case_sensitive_descr
       RETURN:
         TYPES  : TableName_Query *
         DESCR  : *g_typed_query_query_object_return_descr
@@ -313,7 +314,7 @@ CATEGORIES :
       - DESCR  :
         CODE   : ex_objc_typed_query_or
 
-- g_typed_query_find_all_const:
+# - g_typed_query_find_all_const:
 
 
 - Actions:
