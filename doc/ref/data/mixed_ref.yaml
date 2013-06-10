@@ -12,7 +12,7 @@ DESCR      : *g_mixed_descr
 SEE        :
 EXAMPLES:
 - DESCR    :
-  CODE     : ex_cpp_group_intro
+  CODE     : ex_objc_group_intro
 IGNORE     : []                   # List of method-ids to ignore
 CATEGORIES:
 - Constructors:
@@ -36,7 +36,7 @@ CATEGORIES:
         TYPES  : [bool, int64_t, float, double, Date, NSString, TightdbBinary, const char*, TightdbTable]
         DESCR  : The value.
       EXAMPLES:
-      - CODE   : ex_cpp_mixed_constructor
+      - CODE   : ex_objc_mixed_constructor
         DESCR  :
 - Getters:
   METHODS:
@@ -50,7 +50,7 @@ CATEGORIES:
         TYPES  : TightdbType
         DESCR  : The type.
       EXAMPLES:
-      - CODE   : ex_cpp_mixed_get_type
+      - CODE   : ex_objc_mixed_get_type
         DESCR  :
   - g_mixed_get_bool:
   - g_mixed_get_int:
@@ -74,5 +74,5 @@ CATEGORIES:
         TYPES  : [bool, int64_t, float, double, time_t, NSString, TightdbBinary, TightdbTable]
         DESCR  : The value.
       EXAMPLES:
-      - CODE   : ex_cpp_mixed_get_value
+      - CODE   : ex_objc_mixed_get_value
         DESCR  :

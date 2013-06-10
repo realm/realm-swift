@@ -115,7 +115,7 @@ CATEGORIES:
 # TODO?  - g_typed_table_columns:
 # NOT - g_typed_table_columns_const:
 
-  - g_typed_table_opertator==:
+  - g_typed_table_operator==:
       NAME     : isEqual
       SUMMARY  : *g_typed_table_operator_eq_summary
       DESCR    : *g_typed_table_operator_eq_descr
@@ -225,12 +225,12 @@ CATEGORIES:
   METHODS:
   # TODO: g_typed_table_lookup:
 
-  - g_type_table_find_first_bool:
-  - g_type_table_find_first_int:
-  - g_type_table_find_first_float:
-  - g_type_table_find_first_double:
-  - g_type_table_find_first_date:
-  - g_type_table_find_first_string:
+  - g_typed_table_find_first_bool:
+  - g_typed_table_find_first_int:
+  - g_typed_table_find_first_float:
+  - g_typed_table_find_first_double:
+  - g_typed_table_find_first_date:
+  - g_typed_table_find_first_string:
       NAMES    : [find, find, find, find, find, find]
       TITLE    : find
       SUMMARY  : *g_typed_table_find_first_xxx_summary

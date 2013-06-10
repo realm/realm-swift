@@ -1,5 +1,5 @@
 #
-# Reference documentation data for language Java
+# Reference documentation data for Objective-C language binding
 #
 ID        : objc
 TITLE     : 'Objective-C'
@@ -62,5 +62,7 @@ CATEGORIES:                       # list global class-id in order of appearence
 
 EXAMPLES  : 
 - DESCR   : 
-  CODE    : #ex_cpp_intro           # id to example code
+  CODE    : #ex_objc_intro           # id to example code
 
+## Checked:
+## dyn_table_ref

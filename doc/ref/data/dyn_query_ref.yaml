@@ -9,6 +9,10 @@
 ## JJEPSEN: "or" a obj-c keyword?
 ## JJEPSEN: count() does not take a column index as parameter (like in c++)
 ## JJEPSEN: max, min not defined for time compare as in c++.
+## !! Do we at all have a dynamic query interface? 
+## !! All the Conditions don't take a colIndex...
+## All the Combiners return (void) - don't they return TightdbQuery ? - check-&-fix
+
 
 ID         : class_dyn_query
 TITLE      : Query  (dynamic)
@@ -17,20 +21,22 @@ DESCR      : *g_dyn_query_intro_descr
 SEE        :
 EXAMPLES   :
 - DESCR:
-  CODE: ex_cpp_dyn_query_intro
+  CODE: ex_objc_dyn_query_intro
 IGNORE     : []                   # List of method-ids to ignore
 
 CATEGORIES :
 - Conditions:
   METHODS:
+  - g_dyn_query_equals_binary:
+      TODO     : soon
   - g_dyn_query_equals_boolean:
   - g_dyn_query_equals_integer:
   - g_dyn_query_equals_float:
   - g_dyn_query_equals_double:
   - g_dyn_query_equals_string:
+  - g_dyn_query_equals_string_2:
   - g_dyn_query_equals_date:
-  - g_dyn_query_equals_binary:
-      NAMES    : [ equal, ]
+      NAMES    : [ equal, equal, equal, equal, equal, equal, equal]
       SIGNATURE: |
                  (TightdbQuery *)equal:(BOOL)value
                  (TightdbQuery *)equal:(int64_t)value
@@ -44,25 +50,31 @@ CATEGORIES :
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
-        TYPES  : [bool, int64_t, float, double, const char*, BinaryData, time_t]
-        DESCR  : The value.
+        TYPES  : [BOOL, int64_t, float, double, NSString*, BinaryData, time_t]
+        DESCR  : *g_dyn_query_value_descr
       - NAME   : caseSensitive
-        TYPES  : bool
+        TYPES  : BOOL
         DESCR  : *g_dyn_query_case_sensitive_descr
       RETURN:
-        TYPES  : Query&
-        DESCR  : The query object.
+        TYPES  : TightdbQuery *
+        DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_equals
-#  - g_dyn_query_notEquals_boolean:
-  - g_dyn_query_notEquals_integer:
-  - g_dyn_query_notEquals_string:
-  - g_dyn_query_notEquals_date:
+        CODE   : ex_objc_dyn_query_equals
+
+  - g_dyn_query_notEquals_bool:
+      TODO     : soon
   - g_dyn_query_notEquals_binary:
-      NAMES    : [ notEqual (not implemented for all types), not_equal, not_equal_binary ]
+      TODO     : soon
+  - g_dyn_query_notEquals_integer:
+  - g_dyn_query_notEquals_float:
+  - g_dyn_query_notEquals_double:
+  - g_dyn_query_notEquals_string:
+  - g_dyn_query_notEquals_string_2:
+  - g_dyn_query_notEquals_date:
+      NAMES    : [ notEqual, notEqual, notEqual, notEqual, notEqual, notEqual ]
       SIGNATURE: |
                  (TightdbQuery *)notEqual:(int64_t)value
                  (TightdbQuery *)notEqual:(float)value
@@ -70,29 +82,33 @@ CATEGORIES :
                  (TightdbQuery *)notEqual:(NSString *)value
                  (TightdbQuery *)notEqual:(NSString *)value caseSensitive:(BOOL)caseSensitive
                  (TightdbQuery *)notEqual:(time_t)value
- #                Query& not_equal(size_t column_ndx, bool value);
- #                Query& not_equal_binary(size_t column_ndx, const char* data, size_t size);
+ #                TightdbQuery * not_equal(size_t column_ndx, bool value);
+ #                TightdbQuery * not_equal_binary(size_t column_ndx, NSString* data, size_t size);
       SUMMARY  : *g_dyn_query_notEquals_summary
       DESCR    : *g_dyn_query_notEquals_descr
       PARAMS:
       - NAME   : column_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
-        TYPES  : [bool, int64_t, float, double, const char*, time_t]
-        DESCR  : The value.
+        TYPES  : [BOOL, int64_t, float, double, NSString*, time_t]
+        DESCR  : *g_dyn_query_value_descr
       - NAME   : case_sensitive
-        TYPES  : bool
-        DESCR  : 'String match can be performed case sensitive or not. Default: <code>true</code>.'
+        TYPES  : BOOL
+        DESCR  : *g_dyn_query_case_sensitive_descr
       RETURN:
-        TYPES  : Query&
-        DESCR  : The query object.
+        TYPES  : TightdbQuery *
+        DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_notEquals
-  - g_dyn_query_greaterThan:
+        CODE   : ex_objc_dyn_query_notEquals
+
+  - g_dyn_query_greaterThan_integer:
+  - g_dyn_query_greaterThan_float:
+  - g_dyn_query_greaterThan_double:
   - g_dyn_query_greaterThan_date:
-      NAMES    : [ greater, greater_date ]
+      NAMES    : [ greater, greater, greater, greater ]
+#TODO: check greater_date? does time_t work as int64_t?
       SIGNATURE: |
                  (TightdbQuery *)greater:(int64_t)value
                  (TightdbQuery *)greater:(float)value
@@ -103,19 +119,22 @@ CATEGORIES :
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
-        DESCR  : The value.
+        DESCR  : *g_dyn_query_value_descr
       RETURN:
-        TYPES  : Query&
-        DESCR  : The query object.
+        TYPES  : TightdbQuery *
+        DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_greaterThan
-  - g_dyn_query_greaterThanOrEqual:
+        CODE   : ex_objc_dyn_query_greaterThan
+
+  - g_dyn_query_greaterThanOrEqual_integer:
+  - g_dyn_query_greaterThanOrEqual_float:
+  - g_dyn_query_greaterThanOrEqual_double:
   - g_dyn_query_greaterThanOrEqual_date:
-      NAMES    : [ greaterEqual, greater_equal_date ]
+      NAMES    : [ greaterEqual, greaterEqual, greaterEqual, greaterEqual]
       SIGNATURE: |
                  (TightdbQuery *)greaterEqual:(int64_t)value
                  (TightdbQuery *)greaterEqual:(float)value
@@ -126,19 +145,22 @@ CATEGORIES :
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
-        DESCR  : The value.
+        DESCR  : *g_dyn_query_value_descr
       RETURN:
-        TYPES  : Query&
-        DESCR  : The query object.
+        TYPES  : TightdbQuery *
+        DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_greaterThanOrEqual
-  - g_dyn_query_lessThan:
+        CODE   : ex_objc_dyn_query_greaterThanOrEqual
+        
+  - g_dyn_query_lessThan_integer:
+  - g_dyn_query_lessThan_float:
+  - g_dyn_query_lessThan_double:
   - g_dyn_query_lessThan_date:
-      NAMES    : [less, less_date]
+      NAMES    : [less, less, less, less]
       SIGNATURE: |
                  (TightdbQuery *)less:(int64_t)value
                  (TightdbQuery *)less:(float)value
@@ -149,19 +171,22 @@ CATEGORIES :
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
-        DESCR  : The value.
+        DESCR  : *g_dyn_query_value_descr
       RETURN:
-        TYPES  : Query&
-        DESCR  : The query object.
+        TYPES  : TightdbQuery *
+        DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_lessThan
-  - g_dyn_query_lessThanOrEqual:
+        CODE   : ex_objc_dyn_query_lessThan
+
+  - g_dyn_query_lessThanOrEqual_integer:
+  - g_dyn_query_lessThanOrEqual_float:
+  - g_dyn_query_lessThanOrEqual_double:
   - g_dyn_query_lessThanOrEqual_date:
-      NAMES    : [lessEqual, less_equal_date]
+      NAMES    : [lessEqual, lessEqual, lessEqual, lessEqual]
       SIGNATURE: |
                  (TightdbQuery *)lessEqual:(int64_t)value
                  (TightdbQuery *)lessEqual:(float)value
@@ -172,19 +197,22 @@ CATEGORIES :
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
-        DESCR  : The value.
+        DESCR  : *g_dyn_query_value_descr
       RETURN:
-        TYPES  : Query&
-        DESCR  : The query object.
+        TYPES  : TightdbQuery *
+        DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_lessThanOrEqual
-  - g_dyn_query_between:
+        CODE   : ex_objc_dyn_query_lessThanOrEqual
+        
+  - g_dyn_query_between_integer:
+  - g_dyn_query_between_float:
+  - g_dyn_query_between_double:
   - g_dyn_query_between_date:
-      NAMES    : [between, between_date]
+      NAMES    : [between, between, between, between_date]
       SIGNATURE: |
                  (TightdbQuery *)between:(int64_t)from to:(int64_t)to
                  (TightdbQuery *)between:(float)from to:(float)to
@@ -195,7 +223,7 @@ CATEGORIES :
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : from
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : Lower bound of range (inclusive).
@@ -203,14 +231,18 @@ CATEGORIES :
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : Upper bound of range (inclusive).
       RETURN:
-        TYPES  : Query&
-        DESCR  : The query object.
+        TYPES  : TightdbQuery *
+        DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_between
-  - g_dyn_query_startsWith:
-#  - g_dyn_query_startsWith_binary:
-      NAMES    : [beginsWith] #, begins_with_binary]
+        CODE   : ex_objc_dyn_query_between
+
+  - g_dyn_query_startsWith_binary:
+      TODO     : soon
+  - g_dyn_query_startsWith_string:
+      NAME     : beginsWith
+  - g_dyn_query_startsWith_string_2:
+      NAME     : beginsWith
       SIGNATURE: |
                  (TightdbQuery *)beginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
 #                (TightdbQuery *)beginsWith:(NSString *)value
@@ -219,22 +251,26 @@ CATEGORIES :
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
-        TYPES  : const char*
-        DESCR  : The value.
+        TYPES  : NSString*
+        DESCR  : *g_dyn_query_value_descr
       - NAME   : caseSensitive
-        TYPES  : bool
+        TYPES  : BOOL
         DESCR  : *g_dyn_query_case_sensitive_descr
       RETURN:
-        TYPES  : Query&
-        DESCR  : The query object.
+        TYPES  : TightdbQuery *
+        DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_startsWith
-  - g_dyn_query_endsWith:
-#  - g_dyn_query_endsWith_binary:
-      NAMES    : [endsWith] #, ends_with_binary]
+        CODE   : ex_objc_dyn_query_startsWith
+
+  - g_dyn_query_endsWith_binary:
+      TODO     : soon
+  - g_dyn_query_endsWith_string:
+      NAME     : endsWith
+  - g_dyn_query_endsWith_string_2:
+      NAME     : endsWith
       SIGNATURE: |
                  (TightdbQuery *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
 #                (TightdbQuery *)endsWith:(NSString *)value
@@ -243,44 +279,50 @@ CATEGORIES :
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
-        TYPES  : const char*
-        DESCR  : The value.
+        TYPES  : NSString*
+        DESCR  : *g_dyn_query_value_descr
       - NAME   : caseSensitive
-        TYPES  : bool
+        TYPES  : BOOL
         DESCR  : *g_dyn_query_case_sensitive_descr
       RETURN:
-        TYPES  : Query&
-        DESCR  : The query object.
+        TYPES  : TightdbQuery *
+        DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_endsWith
-  - g_dyn_query_contains:
-#  - g_dyn_query_contains_binary:
-      NAMES    : [contains] #, contains_binary]
+        CODE   : ex_objc_dyn_query_endsWith
+
+  - g_dyn_query_contains_binary:
+      TODO     : soon
+  - g_dyn_query_contains_string:
+      NAME     : contains  
+  - g_dyn_query_contains_string_2:
+      NAME     : contains
       SIGNATURE: |
                  (TightdbQuery *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive
                  (TightdbQuery *)contains:(NSString *)value
-#                 Query& contains_binary(size_t column_ndx, const char* data, size_t size);
+#                 TightdbQuery * contains_binary(size_t column_ndx, NSString* data, size_t size);
       DESCR    : *g_dyn_query_contains_descr
       SUMMARY  : *g_dyn_query_contains_summary
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
-        TYPES  : const char*
-        DESCR  : The value
+        TYPES  : NSString*
+        DESCR  : *g_dyn_query_value_descr
       - NAME   : caseSensitive
-        TYPES  : bool
+        TYPES  : BOOL
         DESCR  : *g_dyn_query_case_sensitive_descr
       RETURN:
-        TYPES  : Query&
-        DESCR  : The query object.
+        TYPES  : TightdbQuery *
+        DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_contains
+        CODE   : ex_objc_dyn_query_contains
+
+
 - Combiners:
   METHODS:
   - g_dyn_query_group:
@@ -290,10 +332,11 @@ CATEGORIES :
       SIGNATURE: (void)group
       RETURN:
         TYPES  : Query
-        DESCR  : The query object.
+        DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_group
+        CODE   : ex_objc_dyn_query_group
+
   - g_dyn_query_endGroup:
       NAMES    : endGroup
       DESCR    : *g_dyn_query_endGroup_descr
@@ -301,10 +344,11 @@ CATEGORIES :
       SIGNATURE: (void)endgroup
       RETURN:
         TYPES  : Query
-        DESCR  : The query object.
+        DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_group
+        CODE   : ex_objc_dyn_query_group
+
   - g_dyn_query_or:
       NAMES    : or
       DESCR    : *g_dyn_query_or_descr
@@ -312,10 +356,11 @@ CATEGORIES :
       SIGNATURE: (void)or
       RETURN:
         TYPES  : Query
-        DESCR  : The query object.
+        DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_or
+        CODE   : ex_objc_dyn_query_or
+
   - g_dyn_query_subtable:
       NAMES    : subtable
       DESCR    : *g_dyn_query_subtable_descr
@@ -324,13 +369,14 @@ CATEGORIES :
       PARAMS:
       - NAME   : column
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_query_column_index_descr
       RETURN:
         TYPES  : Query
-        DESCR  : The query object.
+        DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_subtable
+        CODE   : ex_objc_dyn_query_subtable
+ 
   - g_dyn_query_endSubtable:
       NAMES    : parent
       DESCR    : *g_dyn_query_endSubtable_descr
@@ -338,20 +384,26 @@ CATEGORIES :
       SIGNATURE: (void)parent
       RETURN:
         TYPES  : Query
-        DESCR  : The query object.
+        DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_subtable
+        CODE   : ex_objc_dyn_query_subtable
+
+
 - Actions:
   METHODS:
   - g_dyn_query_find_all_const:
+      IGNORE   : ""
   - g_dyn_query_find_all:
-      NAMES    : findAll (not yet implemented)
+      TODO     : later
+  - g_dyn_query_find_all_2:
+      TODO     : later
+      
+      NAMES    : findAll 
       DESCR    : *g_dyn_query_find_all_descr
       SUMMARY  : *g_dyn_query_find_all_summary
       SIGNATURE: |
                  TableView      find_all(size_t start=0, size_t end=size_t(-1), size_t limit=size_t(-1));
-                 ConstTableView find_all(size_t start=0, size_t end=size_t(-1), size_t limit=size_t(-1));
       PARAMS:
       - NAME   : start
         TYPES  : size_t
@@ -367,9 +419,12 @@ CATEGORIES :
         DESCR  : The TableView object.
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_findall
+        CODE   : ex_objc_dyn_query_findall
+
   - g_dyn_query_find_next:
-      NAMES    : findNext (not yet implemented)
+      TODO     : later
+
+      NAMES    : findNext 
       DESCR    : *g_dyn_query_find_next_descr
       SUMMARY  : *g_dyn_query_find_next_summary
       PARAMS:
@@ -381,14 +436,14 @@ CATEGORIES :
         DESCR  : Row number
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_find_next
-  - g_dyn_query_sum:
+        CODE   : ex_objc_dyn_query_find_next
+
+  - g_dyn_query_sum_int:
   - g_dyn_query_sum_float:
   - g_dyn_query_sum_double:
       NAMES    : [sum*, sum_float, sum_double]
       DESCR    : *g_dyn_query_sum_descr
       SUMMARY  : *g_dyn_query_sum_summary
-      CONST    : true
       SIGNATURE: |
                  (int64_t)sumInt:(size_t)col_ndx
                  (double)sumFloat:(size_t)col_ndx
@@ -402,16 +457,17 @@ CATEGORIES :
         DESCR  : The sum.
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_sum
-  - g_dyn_query_size:
-      NAMES    : count
+        CODE   : ex_objc_dyn_query_sum
+
+  - g_dyn_query_count:
+      NAME     : count
       DESCR    : *g_dyn_query_size_descr
       SUMMARY  : *g_dyn_query_size_summary
       SIGNATURE: (size_t)count
       CONST    : true
       PARAMS:
       - NAME   : column
-        DESCR  : Column index.
+        DESCR  : *g_dyn_query_column_index_descr
         TYPES  : size_t
       - NAME   : start
         TYPES  : size_t
@@ -427,11 +483,12 @@ CATEGORIES :
         DESCR  : The number of rows.
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_size
+        CODE   : ex_objc_dyn_query_size
+
   - g_dyn_query_maximum_date:
   - g_dyn_query_maximum_double:
   - g_dyn_query_maximum_float:
-  - g_dyn_query_maximum:
+  - g_dyn_query_maximum_int:
       NAMES    : max*
       DESCR    : *g_dyn_query_maximum_descr
       SUMMARY  : *g_dyn_query_maximum_summary
@@ -450,11 +507,11 @@ CATEGORIES :
         DESCR  : The highest value.
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_maximum
+        CODE   : ex_objc_dyn_query_maximum
   - g_dyn_query_minimum_date:
   - g_dyn_query_minimum_double:
   - g_dyn_query_minimum_float:
-  - g_dyn_query_minimum:
+  - g_dyn_query_minimum_int:
       NAMES    : min*
       DESCR    : *g_dyn_query_minimum_descr
       SUMMARY  : *g_dyn_query_minimum_summary
@@ -472,14 +529,14 @@ CATEGORIES :
         DESCR  : The lowest value.
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_minimum
-  - g_dyn_query_average_double:
+        CODE   : ex_objc_dyn_query_minimum
+
+  - g_dyn_query_average_int:
   - g_dyn_query_average_float:
-  - g_dyn_query_average:
+  - g_dyn_query_average_double:
       NAMES    : avg*
       SUMMARY  : *g_dyn_query_average_summary
       DESCR    : *g_dyn_query_average_descr
-      CONST    : true
       SIGNATURE: |
                  (double)avgInt:(size_t)col_ndx
                  (double)avgFloat:(size_t)col_ndx
@@ -493,15 +550,17 @@ CATEGORIES :
         DESCR  : The average.
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_average
+        CODE   : ex_objc_dyn_query_average
+
   - g_dyn_query_remove:
-      NAMES    : remove (not yet implemented)
+      TODO     : later
+      
+      NAMES    : remove 
       DESCR    : *g_dyn_query_remove_descr
       SUMMARY  : *g_dyn_query_remove_summary
-      CONST    : true
       PARAMS:
       - NAME   : column
-        DESCR  : Column index.
+        DESCR  : *g_dyn_query_column_index_descr
         TYPES  : size_t
       - NAME   : resultcount
         DESCR  : The number of rows used to calculate the average.
@@ -520,4 +579,4 @@ CATEGORIES :
         DESCR  : The number of rows removed.
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_query_remove
+        CODE   : ex_objc_dyn_query_remove
