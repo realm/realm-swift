@@ -17,11 +17,12 @@ EXAMPLES   :
 - DESCR:
   CODE: ex_cpp_typed_view_intro
 IGNORE     : []
+
 CATEGORIES :
 - State:
   METHODS:
   - g_typed_view_size:
-      NAMES    : count
+      NAME     : count
       SUMMARY  : *g_typed_table_size_summary
       DESCR    : *g_typed_table_size_descr
       SIGNATURE: (size_t)count
@@ -33,7 +34,7 @@ CATEGORIES :
       - CODE   : ex_cpp_typed_view_size
         DESCR  :
   - g_typed_view_is_empty:
-      NAMES    : isEmpty
+      NAME     : isEmpty
       SUMMARY  : *g_typed_view_is_empty_summary
       DESCR    : *g_typed_view_is_empty_descr
       SIGNATURE: (BOOL)isEmpty
@@ -47,7 +48,7 @@ CATEGORIES :
 - View:
   METHODS:
   - g_typed_view_clear:
-      NAMES    : clear
+      NAME     : clear
       SUMMARY  : *g_typed_table_clear_summary
       SIGNATURE: (void)clear
       DESCR    : *g_typed_view_clear_descr
@@ -57,7 +58,7 @@ CATEGORIES :
 - Rows:
   METHODS:
   - g_typed_view_get_source_ndx:
-      NAMES    : getSourceNdx
+      NAME     : getSourceNdx
       SUMMARY  : *g_typed_view_get_source_ndx_summary
       DESCR    : *g_typed_view_get_source_ndx_descr
       SIGNATURE: (size_t)getSourceNdx:(size_t)ndx
@@ -73,7 +74,7 @@ CATEGORIES :
       - CODE   : ex_cpp_typed_view_get_source_ndx
         DESCR  :
   - g_typed_view_remove_row:
-      NAMES    : remove
+      NAME     : remove
       SUMMARY  : *g_typed_table_remove_row_summary
       DESCR    : *g_typed_table_remove_row_descr
       SIGNATURE: (void)remove:(size_t)ndx
@@ -85,7 +86,7 @@ CATEGORIES :
       - CODE   : ex_cpp_typed_table_remove
         DESCR  :
   - g_typed_view_remove_last_row:
-      NAMES    : removeLast (not yet implemented)
+      NAME     : removeLast (not yet implemented)
       SUMMARY  : *g_typed_table_remove_last_row_summary
       DESCR    : *g_typed_table_remove_last_row_descr
       SIGNATURE: void remove_last();
@@ -95,7 +96,7 @@ CATEGORIES :
 - Sub-tables:
   METHODS:
   - g_typed_view_get_subtable_size:
-      NAMES    : getSubtableSize (not yet implemented)
+      NAME     : getSubtableSize (not yet implemented)
       SUMMARY  : Get size of subtable.
       DESCR    : This method gets the size (number of rows) of a subtable.
       CONST    : true
@@ -110,7 +111,7 @@ CATEGORIES :
       - CODE   : ex_cpp_typed_view_get_subtable
         DESCR  :
   - g_typed_view_clear_subtable:
-      NAMES    : clearSubtable (not yet implemented)
+      NAME     : clearSubtable (not yet implemented)
       SUMMARY  : Remove rows in subtable.
       DESCR    : This method removes all rows in a subtable.
       PARAMS:
@@ -134,7 +135,6 @@ CATEGORIES :
       NAME     : findFirstDate (not yet implemented)
   - g_typed_view_find_first_string:
       NAME     : findFirstString (not yet implemented)
-  - g_not_implemented:   
       TITLE    : findFirst* (not yet implemented)
       SUMMARY  : Find first match row.
       DESCR    : This method finds the first matching row.
@@ -199,7 +199,7 @@ CATEGORIES :
       - CODE   : ex_cpp_typed_view_find_all_xxx
         DESCR  :
   - g_typed_view_sort:
-      NAMES    : sort (not yet implemented)
+      NAME     : sort (not yet implemented)
       SUMMARY  : *g_typed_view_get_sorted_view_summary
       DESCR    : *g_typed_view_get_sorted_view_desc
       PARAMS:
@@ -279,10 +279,12 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_cpp_typed_view_average
         DESCR  :
+
+
 - Dump:
   METHODS:
   - g_typed_view_to_json:
-      NAMES    : toJSON (not yet implemented)
+      NAME     : toJSON (not yet implemented)
       SUMMARY  : *g_typed_view_to_json_summary
       DESCR    : *g_typed_view_to_json_descr
       PARAMS:
@@ -293,7 +295,7 @@ CATEGORIES :
       - CODE   : ex_cpp_typed_view_to_json
         DESCR  :
   - g_typed_view_to_string:
-      NAMES    : toString (not yet implemented)
+      NAME     : toString (not yet implemented)
       SUMMARY  : *g_typed_view_to_string_summary
       DESCR    : *g_typed_view_to_string_descr
       CONST    : true
