@@ -15,7 +15,7 @@ DESCR      : *g_typed_view_intro_descr
 SEE        :
 EXAMPLES   :
 - DESCR:
-  CODE: ex_cpp_typed_view_intro
+  CODE: ex_objc_typed_view_intro
 IGNORE     : []
 
 CATEGORIES :
@@ -31,7 +31,7 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : The number of rows.
       EXAMPLES:
-      - CODE   : ex_cpp_typed_view_size
+      - CODE   : ex_objc_typed_view_size
         DESCR  :
   - g_typed_view_is_empty:
       NAME     : isEmpty
@@ -43,7 +43,7 @@ CATEGORIES :
         TYPES  : bool
         DESCR  : <code>true</code> if empty, <code>false</code> otherwise.
       EXAMPLES:
-      - CODE   : ex_cpp_typed_view_is_empty
+      - CODE   : ex_objc_typed_view_is_empty
         DESCR  :
 - View:
   METHODS:
@@ -53,7 +53,7 @@ CATEGORIES :
       SIGNATURE: (void)clear
       DESCR    : *g_typed_view_clear_descr
       EXAMPLES:
-      - CODE   : ex_cpp_typed_view_clear
+      - CODE   : ex_objc_typed_view_clear
         DESCR  :
 - Rows:
   METHODS:
@@ -71,7 +71,7 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : The row index in the table.
       EXAMPLES:
-      - CODE   : ex_cpp_typed_view_get_source_ndx
+      - CODE   : ex_objc_typed_view_get_source_ndx
         DESCR  :
   - g_typed_view_remove_row:
       NAME     : remove
@@ -83,20 +83,27 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : Position of row to delete.
       EXAMPLES:
-      - CODE   : ex_cpp_typed_table_remove
+      - CODE   : ex_objc_typed_table_remove
         DESCR  :
+        
   - g_typed_view_remove_last_row:
-      NAME     : removeLast (not yet implemented)
+      TODO     : soon
+
+      NAME     : removeLast
       SUMMARY  : *g_typed_table_remove_last_row_summary
       DESCR    : *g_typed_table_remove_last_row_descr
       SIGNATURE: void remove_last();
       EXAMPLES:
-      - CODE   : ex_cpp_typed_table_remove_last_row
+      - CODE   : ex_objc_typed_table_remove_last_row
         DESCR  :
+        
+        
 - Sub-tables:
   METHODS:
   - g_typed_view_get_subtable_size:
-      NAME     : getSubtableSize (not yet implemented)
+      TODO     : soon
+
+      NAME     : getSubtableSize
       SUMMARY  : Get size of subtable.
       DESCR    : This method gets the size (number of rows) of a subtable.
       CONST    : true
@@ -108,10 +115,13 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : Number of rows.
       EXAMPLES:
-      - CODE   : ex_cpp_typed_view_get_subtable
+      - CODE   : ex_objc_typed_view_get_subtable
         DESCR  :
+        
   - g_typed_view_clear_subtable:
-      NAME     : clearSubtable (not yet implemented)
+      TODO     : soon
+
+      NAME     : clearSubtable
       SUMMARY  : Remove rows in subtable.
       DESCR    : This method removes all rows in a subtable.
       PARAMS:
@@ -119,23 +129,32 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : The row index.
       EXAMPLES:
-      - CODE   : ex_cpp_typed_view_clear_subtable
+      - CODE   : ex_objc_typed_view_clear_subtable
         DESCR  :
+
+
 - Searching:
   METHODS:
   - g_typed_view_find_first_bool:
-      NAME     : findFirstBool (not yet implemented)
+      TODO     : soon
+      NAME     : findFirstBool
   - g_typed_view_find_first_int:
-      NAME     : findFirstInt (not yet implemented)
+      TODO     : soon
+      NAME     : findFirstInt
   - g_typed_view_find_first_float:
-      NAME     : findFirstFloat (not yet implemented)
+      TODO     : soon
+      NAME     : findFirstFloat
   - g_typed_view_find_first_double:
-      NAME     : findFirstDouble (not yet implemented)
+      TODO     : soon
+      NAME     : findFirstDouble
   - g_typed_view_find_first_date:
-      NAME     : findFirstDate (not yet implemented)
+      TODO     : soon
+      NAME     : findFirstDate
   - g_typed_view_find_first_string:
-      NAME     : findFirstString (not yet implemented)
-      TITLE    : findFirst* (not yet implemented)
+      TODO     : soon
+
+      NAME     : findFirstString
+      TITLE    : findFirst*
       SUMMARY  : Find first match row.
       DESCR    : This method finds the first matching row.
       SIGNATURE: |
@@ -154,8 +173,9 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : "The row index or <code>tightdb::not_found</code> (equal to <code>std::size_t(-1)</code>) if there is no match."
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_find_first_xxx
+      - CODE   : ex_objc_dyn_view_find_first_xxx
         DESCR  :
+
   - g_typed_view_find_all_bool:
   - g_typed_view_find_all_int:
   - g_typed_view_find_all_date:
@@ -168,7 +188,9 @@ CATEGORIES :
   - g_typed_view_find_all_double_double:
   - g_typed_view_find_all_date_const:
   - g_typed_view_find_all_string_const:
-      NAMES    : findAll* (not yet implemented)
+      TODO     : soon
+
+      NAMES    : findAll*
       SUMMARY  : Find all matching rows.
       DESCR    : >
                  This method finds all matching rows and returns a new {@link class_typed_tableview} object. Beware,
@@ -196,10 +218,13 @@ CATEGORIES :
         TYPES  : TableView
         DESCR  : The view.
       EXAMPLES:
-      - CODE   : ex_cpp_typed_view_find_all_xxx
+      - CODE   : ex_objc_typed_view_find_all_xxx
         DESCR  :
+
   - g_typed_view_sort:
-      NAME     : sort (not yet implemented)
+      TODO     : soon
+
+      NAME     : sort
       SUMMARY  : *g_typed_view_get_sorted_view_summary
       DESCR    : *g_typed_view_get_sorted_view_desc
       PARAMS:
@@ -207,14 +232,17 @@ CATEGORIES :
         TYPES  : bool
         DESCR  : "If <code>true</code>, rows are sorted ascending. Default: <code>true</code>."
       EXAMPLES:
-      - CODE   : ex_cpp_typed_view_sort
+      - CODE   : ex_objc_typed_view_sort
         DESCR  :
+
 - Aggregates:
   METHODS:
   - g_typed_view_sum:
   - g_typed_view_sum_float:
   - g_typed_view_sum_double:
-      NAMES    : [sum (not yet implemented), sum_float, sum_double]
+      TODO     : soon
+
+      NAMES    : [sum, sum_float, sum_double]
       SUMMARY  : *g_typed_view_sum_summary
       DESCR    : *g_typed_view_sum_descr
       CONST    : True
@@ -226,12 +254,15 @@ CATEGORIES :
         TYPES  : [int64_t, float, double]
         DESCR  : The sum.
       EXAMPLES:
-      - CODE   : ex_cpp_typed_view_sum
+      - CODE   : ex_objc_typed_view_sum
         DESCR  :
+
   - g_typed_view_maximum:
   - g_typed_view_maximum_float:
   - g_typed_view_maximum_double:
-      NAMES    : [maximum (not yet implemented), maximum_float, maximum_double]
+      TODO     : soon
+
+      NAMES    : [maximum, maximum_float, maximum_double]
       SUMMARY  : *g_typed_view_maximum_summary
       DESCR    : *g_typed_view_maximum_descr
       CONST    : True
@@ -243,12 +274,15 @@ CATEGORIES :
         TYPES  : [int64_t, float, double]
         DESCR  : The maximum value.
       EXAMPLES:
-      - CODE   : ex_cpp_typed_view_maximum
+      - CODE   : ex_objc_typed_view_maximum
         DESCR  :
+
   - g_typed_view_minimum:
   - g_typed_view_minimum_float:
   - g_typed_view_minimum_double:
-      NAMES    : [minimum (not yet implemented), minimum_float, minimum_double]
+      TODO     : soon
+
+      NAMES    : [minimum, minimum_float, minimum_double]
       SUMMARY  : *g_typed_view_minimum_summary
       DESCR    : *g_typed_view_minimum_descr
       CONST    : True
@@ -260,12 +294,15 @@ CATEGORIES :
         TYPES  : [int64_t, float, double]
         DESCR  : The minimum value.
       EXAMPLES:
-      - CODE   : ex_cpp_typed_view_minimum
+      - CODE   : ex_objc_typed_view_minimum
         DESCR  :
+
   - g_typed_view_average:
   - g_typed_view_average_float:
   - g_typed_view_average_double:
-      NAMES    : [average (not yet implemented), average_float, average_double]
+      TODO     : soon
+
+      NAMES    : [average, average_float, average_double]
       SUMMARY  : *g_typed_view_average_summary
       DESCR    : *g_typed_view_average_descr
       CONST    : True
@@ -277,14 +314,16 @@ CATEGORIES :
         TYPES  : [int64_t, float, double]
         DESCR  : The average value.
       EXAMPLES:
-      - CODE   : ex_cpp_typed_view_average
+      - CODE   : ex_objc_typed_view_average
         DESCR  :
 
 
 - Dump:
   METHODS:
   - g_typed_view_to_json:
-      NAME     : toJSON (not yet implemented)
+      TODO     : soon
+
+      NAME     : toJSON
       SUMMARY  : *g_typed_view_to_json_summary
       DESCR    : *g_typed_view_to_json_descr
       PARAMS:
@@ -292,13 +331,15 @@ CATEGORIES :
         TYPES  : std::ostream&
         DESCR  : Output stream.
       EXAMPLES:
-      - CODE   : ex_cpp_typed_view_to_json
+      - CODE   : ex_objc_typed_view_to_json
         DESCR  :
+
   - g_typed_view_to_string:
-      NAME     : toString (not yet implemented)
+      TODO     : soon
+
+      NAME     : toString
       SUMMARY  : *g_typed_view_to_string_summary
       DESCR    : *g_typed_view_to_string_descr
-      CONST    : true
       PARAMS:
       - NAME   : out
         TYPES  : std::ostream&
@@ -307,5 +348,5 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : "The number of rows to convert. Default: 500."
       EXAMPLES:
-      - CODE   : ex_cpp_typed_view_to_string
+      - CODE   : ex_objc_typed_view_to_string
         DESCR  :

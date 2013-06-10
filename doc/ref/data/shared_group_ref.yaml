@@ -34,7 +34,7 @@ CATEGORIES:
                  type is thrown. Note that InvalidDatabase is among
                  these derived exception types.
       EXAMPLES:
-      - CODE   : ex_cpp_shared_group_constructor
+      - CODE   : ex_objc_shared_group_constructor
         DESCR  :
 - Write transactions:
   METHODS:
@@ -47,7 +47,7 @@ CATEGORIES:
         TYPES  : TightdbSharedGroupReadTransactionBlock
         DESCR  : A block of code.
       EXAMPLES:
-      - CODE   : ex_cpp_shared_group_begin_write
+      - CODE   : ex_objc_shared_group_begin_write
         DESCR  :
 - Read transactions:
   METHODS:
@@ -61,5 +61,5 @@ CATEGORIES:
         TYPES  : TightdbSharedGroupReadTransactionBlock
         DESCR  : A block of code.
       EXAMPLES:
-      - CODE   : ex_cpp_shared_group_begin_read
+      - CODE   : ex_objc_shared_group_begin_read
         DESCR  :
