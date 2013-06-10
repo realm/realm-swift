@@ -123,25 +123,32 @@ CATEGORIES :
 - Searching:
   METHODS:
   - g_typed_view_find_first_bool:
+      NAME     : findFirstBool (not yet implemented)
   - g_typed_view_find_first_int:
+      NAME     : findFirstInt (not yet implemented)
   - g_typed_view_find_first_float:
+      NAME     : findFirstFloat (not yet implemented)
   - g_typed_view_find_first_double:
+      NAME     : findFirstDouble (not yet implemented)
   - g_typed_view_find_first_date:
+      NAME     : findFirstDate (not yet implemented)
   - g_typed_view_find_first_string:
-      NAMES    : findNext* (not yet implemented)
+      NAME     : findFirstString (not yet implemented)
+  - g_not_implemented:   
+      TITLE    : findFirst* (not yet implemented)
       SUMMARY  : Find first match row.
       DESCR    : This method finds the first matching row.
       SIGNATURE: |
+                 size_t find_first_bool(bool value) const;
                  size_t find_first_int(int64_t value) const;
                  size_t find_first_float(float value) const;
                  size_t find_first_double(double value) const;
-                 size_t find_first_bool(bool value) const;
                  size_t find_first_date(time_t value) const;
                  size_t find_first_string(const char* value) const;
       CONST    : True
       PARAMS:
       - NAME   : value
-        TYPES  : [bool, int64_t, time_t, const char*]
+        TYPES  : [bool, int64_t, float, double, time_t, const char*]
         DESCR  : The value.
       RETURN:
         TYPES  : size_t
