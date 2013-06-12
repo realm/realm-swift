@@ -42,10 +42,10 @@ TIGHTDB_TABLE_2(TestTableGroup,
 {
     // Create empty group and serialize to disk
     TightdbGroup *toDisk = [TightdbGroup group];
-    [toDisk write:@"table_test.tbl"];
+    [toDisk write:@"table_test.tightdb"];
 
     // Load the group
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:@"table_test.tbl"];
+    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:@"table_test.tightdb"];
     if (!fromDisk)
         STFail(@"From disk not valid");
 

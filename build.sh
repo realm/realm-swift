@@ -55,9 +55,80 @@ export MAKEFLAGS
 
 
 
+require_config()
+{
+    cd "$TIGHTDB_OBJC_HOME" || return 1
+    if ! [ -e "config" ]; then
+        cat 1>&2 <<EOF
+ERROR: Found no configuration!
+You need to run 'sh build.sh config [PREFIX]'.
+EOF
+        return 1
+    fi
+    echo "Using existing configuration:"
+    cat "config" | sed 's/^/    /' || return 1
+}
+
+auto_configure()
+{
+    cd "$TIGHTDB_OBJC_HOME" || return 1
+    if [ -e "config" ]; then
+        require_config || return 1
+    else
+        echo "No configuration found. Running 'sh build.sh config'"
+        sh build.sh config || return 1
+    fi
+}
+
+get_config_param()
+{
+    local name line value
+    cd "$TIGHTDB_OBJC_HOME" || return 1
+    name="$1"
+    if ! [ -e "config" ]; then
+        cat 1>&2 <<EOF
+ERROR: Found no configuration!
+You need to run 'sh build.sh config [PREFIX]'.
+EOF
+        return 1
+    fi
+    if ! line="$(grep "^$name:" "config")"; then
+        echo "ERROR: Failed to read configuration parameter '$name'" 1>&2
+        return 1
+    fi
+    value="$(printf "%s\n" "$line" | cut -d: -f2)" || return 1
+    value="$(printf "%s\n" "$value" | sed 's/^ *//')" || return 1
+    printf "%s\n" "$value"
+}
+
+
+
 case "$MODE" in
 
+    "config")
+        install_prefix="$1"
+        if [ -z "$install_prefix" ]; then
+            install_prefix="/usr/local"
+        fi
+        install_libdir="$(make prefix="$install_prefix" get-libdir)" || exit 1
+
+        if [ "$OS" != "Darwin" ]; then
+            echo "ERROR: Currently, the Objective-C extension is only available on Mac OS X" 1>&2
+            exit 1
+        fi
+
+        cat >"config" <<EOF
+install-prefix: $install_prefix
+install-libdir: $install_libdir
+EOF
+        echo "New configuration:"
+        cat "config" | sed 's/^/    /' || exit 1
+        echo "Done configuring"
+        exit 0
+        ;;
+
     "clean")
+        auto_configure || exit 1
         make clean || exit 1
         if [ "$OS" = "Darwin" ]; then
             PLATFORMS="iPhoneOS iPhoneSimulator"
@@ -71,6 +142,7 @@ case "$MODE" in
         ;;
 
     "build")
+        auto_configure || exit 1
 # FIXME: Our language binding requires that Objective-C ARC is enabled, which, in turn, is only available on a 64-bit architecture, so for now we cannot build a "fat" version.
 #        TIGHTDB_ENABLE_FAT_BINARIES="1" make || exit 1
         make || exit 1
@@ -150,6 +222,7 @@ case "$MODE" in
         ;;
 
     "test")
+        require_config || exit 1
         make test-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test.XXXX)" || exit 1
         mkdir -p "$TEMP_DIR/unit-tests.octest/Contents/MacOS" || exit 1
@@ -161,72 +234,57 @@ case "$MODE" in
         ;;
 
     "install")
-        PREFIX="$1"
-        if [ -z "$PREFIX" ]; then
-            PREFIX="/usr/local"
-        fi
-        make install DESTDIR="$DESTDIR" prefix="$PREFIX" || exit 1
+        require_config || exit 1
+        install_prefix="$(get_config_param "install-prefix")" || exit 1
+        make install DESTDIR="$DESTDIR" prefix="$install_prefix" || exit 1
         echo "Done installing"
         exit 0
         ;;
 
     "install-shared")
-        PREFIX="$1"
-        if ! [ "$PREFIX" ]; then
-            PREFIX="/usr/local"
-        fi
-        make install DESTDIR="$DESTDIR" prefix="$PREFIX" INSTALL_FILTER=shared-libs || exit 1
+        require_config || exit 1
+        install_prefix="$(get_config_param "install-prefix")" || exit 1
+        make install DESTDIR="$DESTDIR" prefix="$install_prefix" INSTALL_FILTER=shared-libs || exit 1
         echo "Done installing"
         exit 0
         ;;
 
     "install-devel")
-        PREFIX="$1"
-        if ! [ "$PREFIX" ]; then
-            PREFIX="/usr/local"
-        fi
-        make install DESTDIR="$DESTDIR" prefix="$PREFIX" INSTALL_FILTER=static-libs,progs,headers || exit 1
+        require_config || exit 1
+        install_prefix="$(get_config_param "install-prefix")" || exit 1
+        make install DESTDIR="$DESTDIR" prefix="$install_prefix" INSTALL_FILTER=static-libs,progs,headers || exit 1
         echo "Done installing"
         exit 0
         ;;
 
     "uninstall")
-        PREFIX="$1"
-        if [ -z "$PREFIX" ]; then
-            PREFIX="/usr/local"
-        fi
-        make uninstall prefix="$PREFIX" || exit 1
+        require_config || exit 1
+        install_prefix="$(get_config_param "install-prefix")" || exit 1
+        make uninstall prefix="$install_prefix" || exit 1
         echo "Done uninstalling"
         exit 0
         ;;
 
     "uninstall-shared")
-        PREFIX="$1"
-        if ! [ "$PREFIX" ]; then
-            PREFIX="/usr/local"
-        fi
-        make uninstall prefix="$PREFIX" INSTALL_FILTER=shared-libs || exit 1
+        require_config || exit 1
+        install_prefix="$(get_config_param "install-prefix")" || exit 1
+        make uninstall prefix="$install_prefix" INSTALL_FILTER=shared-libs || exit 1
         echo "Done uninstalling"
         exit 0
         ;;
 
     "uninstall-devel")
-        PREFIX="$1"
-        if ! [ "$PREFIX" ]; then
-            PREFIX="/usr/local"
-        fi
-        make uninstall prefix="$PREFIX" INSTALL_FILTER=static-libs,progs,extra || exit 1
+        require_config || exit 1
+        install_prefix="$(get_config_param "install-prefix")" || exit 1
+        make uninstall prefix="$install_prefix" INSTALL_FILTER=static-libs,progs,extra || exit 1
         echo "Done uninstalling"
         exit 0
         ;;
 
     "test-installed")
-        PREFIX="$1"
-        if [ -z "$PREFIX" ]; then
-            PREFIX="/usr/local"
-        fi
-        LIBDIR="$(make prefix="$PREFIX" get-libdir)" || exit 1
-        export LD_RUN_PATH="$LIBDIR"
+        require_config || exit 1
+        install_libdir="$(get_config_param "install-libdir")" || exit 1
+        export LD_RUN_PATH="$install_libdir"
         make -C "test-installed" clean || exit 1
         make -C "test-installed" test  || exit 1
         echo "Test passed"
@@ -269,7 +327,7 @@ EOF
 
     *)
         echo "Unspecified or bad mode '$MODE'" 1>&2
-        echo "Available modes are: clean build test install uninstall test-installed" 1>&2
+        echo "Available modes are: config clean build test install uninstall test-installed" 1>&2
         echo "As well as: install-shared install-devel uninstall-shared uninstall-devel dist-copy" 1>&2
         exit 1
         ;;
