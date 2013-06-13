@@ -39,7 +39,10 @@ TIGHTDB_TABLE_IMPL_2(SharedTable2,
     NSLog(@"MyTable Size: %lu", [table count]);
 
 
+    NSFileManager *fm = [NSFileManager defaultManager];
+
     // Write to disk
+    [fm removeItemAtPath:@"employees.tightdb" error:NULL];
     [group write:@"employees.tightdb"];
 
     // Read only shared group
