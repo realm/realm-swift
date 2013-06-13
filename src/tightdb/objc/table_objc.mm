@@ -229,7 +229,7 @@ using namespace std;
 +(TightdbSpec *)specWithSpec:(tightdb::Spec *)spec readOnly:(BOOL)readOnly isOwned:(BOOL)isOwned
 {
     TightdbSpec *spec2 = [[TightdbSpec alloc] init];
-    spec2.readOnly = readOnly;
+    spec2->_readOnly = readOnly;
     if (isOwned) {
         spec2.spec    = new tightdb::Spec(*spec);
         spec2.isOwned = TRUE;
@@ -585,7 +585,7 @@ using namespace std;
 }
 -(TightdbSpec *)getSpec
 {
-    tightdb::Spec& spec = LangBindHelper::get_spec(*_table);
+    tightdb::Spec& spec = tightdb::LangBindHelper::get_spec(*_table);
     BOOL readOnly = _readOnly || _table->has_shared_spec();
     return [TightdbSpec specWithSpec:&spec readOnly:readOnly isOwned:FALSE];
 }
