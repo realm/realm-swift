@@ -1,8 +1,8 @@
 Objective-C
 ===========
 
-This README file explains how to build and install the Tightdb
-language binding for Objective-C. It assumes that the Tightdb core
+This README file explains how to build and install the TightDB
+language binding for Objective-C. It assumes that the TightDB core
 library has already been installed.
 
 
