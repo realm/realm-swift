@@ -233,6 +233,18 @@ EOF
         exit 0
         ;;
 
+    "test-debug")
+        require_config || exit 1
+        make test-debug-norun || exit 1
+        TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test-debug.XXXX)" || exit 1
+        mkdir -p "$TEMP_DIR/unit-tests.octest/Contents/MacOS" || exit 1
+        cp "src/tightdb/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests.octest/Contents/MacOS/" || exit 1
+        XCODE_HOME="$(xcode-select --print-path)" || exit 1
+        OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests.octest" || exit 1
+        echo "Test passed"
+        exit 0
+        ;;
+
     "install")
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
