@@ -245,6 +245,16 @@ EOF
         exit 0
         ;;
 
+    "test-gdb")
+        require_config || exit 1
+        make test-debug-norun || exit 1
+        TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test-gdb.XXXX)" || exit 1
+        mkdir -p "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS" || exit 1
+        cp "src/tightdb/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS/" || exit 1
+        XCODE_HOME="$(xcode-select --print-path)" || exit 1
+        OBJC_DISABLE_GC=YES gdb --args "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest"
+        ;;
+
     "install")
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
@@ -339,7 +349,7 @@ EOF
 
     *)
         echo "Unspecified or bad mode '$MODE'" 1>&2
-        echo "Available modes are: config clean build test install uninstall test-installed" 1>&2
+        echo "Available modes are: config clean build test test-debug test-gdb install uninstall test-installed" 1>&2
         echo "As well as: install-shared install-devel uninstall-shared uninstall-devel dist-copy" 1>&2
         exit 1
         ;;
