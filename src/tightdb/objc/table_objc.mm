@@ -610,7 +610,9 @@ using namespace std;
     // object by the language binding. Yes, this has huge implications
     // for the design of this API, and many things need to change.
     // For a start, see http://stackoverflow.com/a/4649234/1698548 and
-    // http://clang.llvm.org/docs/AutomaticReferenceCounting.html#exceptions.
+    // http://clang.llvm.org/docs/AutomaticReferenceCounting.html#exceptions. Here
+    // is a good example of how to do:
+    // https://developer.apple.com/library/mac/#documentation/cocoa/reference/foundation/Classes/NSFileManager_Class/Reference/Reference.html
     if (_readOnly)
         [NSException raise:@"Table is read only" format:@"Tried to add row while read only"];
     return _table->add_empty_row();
