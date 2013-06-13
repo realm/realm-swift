@@ -23,6 +23,8 @@ Building, testing, and installing
     sh build.sh clean
     sh build.sh build
     sh build.sh test
+    sh build.sh test-debug
+    sh build.sh test-gdb
     sudo sh build.sh install
     sh build.sh test-intalled
 
