@@ -54,6 +54,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     STAssertEquals([[[table where].StringCol equal:@"foo"]  count], (size_t)1, @"StringCol equal");
     STAssertEquals([[[table where].BinaryCol equal:bin1]    count], (size_t)1, @"BinaryCol equal");
     STAssertEquals([[[table where].DateCol   equal:0]       count], (size_t)1, @"DateCol equal");
+// These are not yet implemented
 //    STAssertEquals([[[table where].TableCol  equal:subtab1] count], (size_t)1, @"TableCol equal");
 //    STAssertEquals([[[table where].MixedCol  equal:mixInt1] count], (size_t)1, @"MixedCol equal");
 
@@ -73,6 +74,66 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     STAssertEquals([query.DoubleCol max], 0.8,         @"DoubleCol max");
     STAssertEquals([query.DoubleCol sum], 0.8,         @"DoubleCol sum");
     STAssertEquals([query.DoubleCol avg], 0.8,         @"DoubleCol avg");
+
+    // Check that all column conditions return query objects of the
+    // right type
+    [[[table where].BoolCol equal:NO].BoolCol equal:NO];
+
+    [[[table where].IntCol equal:0].BoolCol equal:NO];
+    [[[table where].IntCol notEqual:0].BoolCol equal:NO];
+    [[[table where].IntCol less:0].BoolCol equal:NO];
+    [[[table where].IntCol lessEqual:0].BoolCol equal:NO];
+    [[[table where].IntCol greater:0].BoolCol equal:NO];
+    [[[table where].IntCol greaterEqual:0].BoolCol equal:NO];
+    [[[table where].IntCol between:0 to:0].BoolCol equal:NO];
+
+    [[[table where].FloatCol equal:0].BoolCol equal:NO];
+    [[[table where].FloatCol notEqual:0].BoolCol equal:NO];
+    [[[table where].FloatCol less:0].BoolCol equal:NO];
+    [[[table where].FloatCol lessEqual:0].BoolCol equal:NO];
+    [[[table where].FloatCol greater:0].BoolCol equal:NO];
+    [[[table where].FloatCol greaterEqual:0].BoolCol equal:NO];
+    [[[table where].FloatCol between:0 to:0].BoolCol equal:NO];
+
+    [[[table where].DoubleCol equal:0].BoolCol equal:NO];
+    [[[table where].DoubleCol notEqual:0].BoolCol equal:NO];
+    [[[table where].DoubleCol less:0].BoolCol equal:NO];
+    [[[table where].DoubleCol lessEqual:0].BoolCol equal:NO];
+    [[[table where].DoubleCol greater:0].BoolCol equal:NO];
+    [[[table where].DoubleCol greaterEqual:0].BoolCol equal:NO];
+    [[[table where].DoubleCol between:0 to:0].BoolCol equal:NO];
+
+    [[[table where].StringCol equal:@""].BoolCol equal:NO];
+    [[[table where].StringCol equal:@"" caseSensitive:NO].BoolCol equal:NO];
+    [[[table where].StringCol notEqual:@""].BoolCol equal:NO];
+    [[[table where].StringCol notEqual:@"" caseSensitive:NO].BoolCol equal:NO];
+    [[[table where].StringCol beginsWith:@""].BoolCol equal:NO];
+    [[[table where].StringCol beginsWith:@"" caseSensitive:NO].BoolCol equal:NO];
+    [[[table where].StringCol endsWith:@""].BoolCol equal:NO];
+    [[[table where].StringCol endsWith:@"" caseSensitive:NO].BoolCol equal:NO];
+    [[[table where].StringCol contains:@""].BoolCol equal:NO];
+    [[[table where].StringCol contains:@"" caseSensitive:NO].BoolCol equal:NO];
+
+    [[[table where].BinaryCol equal:bin1].BoolCol equal:NO];
+    [[[table where].BinaryCol notEqual:bin1].BoolCol equal:NO];
+    [[[table where].BinaryCol beginsWith:bin1].BoolCol equal:NO];
+    [[[table where].BinaryCol endsWith:bin1].BoolCol equal:NO];
+    [[[table where].BinaryCol contains:bin1].BoolCol equal:NO];
+
+    [[[table where].DateCol equal:0].BoolCol equal:NO];
+    [[[table where].DateCol notEqual:0].BoolCol equal:NO];
+    [[[table where].DateCol less:0].BoolCol equal:NO];
+    [[[table where].DateCol lessEqual:0].BoolCol equal:NO];
+    [[[table where].DateCol greater:0].BoolCol equal:NO];
+    [[[table where].DateCol greaterEqual:0].BoolCol equal:NO];
+    [[[table where].DateCol between:0 to:0].BoolCol equal:NO];
+
+// These are not yet implemented
+//    [[[table where].TableCol equal:nil].BoolCol equal:NO];
+//    [[[table where].TableCol notEqual:nil].BoolCol equal:NO];
+
+//    [[[table where].MixedCol equal:mixInt1].BoolCol equal:NO];
+//    [[[table where].MixedCol notEqual:mixInt1].BoolCol equal:NO];
 }
 
 @end
