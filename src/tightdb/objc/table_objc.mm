@@ -587,6 +587,12 @@ using namespace std;
         [NSException raise:@"Table is read only" format:@"Tried to add row while read only"];
     return _table->add_empty_row();
 }
+-(size_t)addRows:(size_t)rowCount;
+{
+    if (_readOnly)
+        [NSException raise:@"Table is read only" format:@"Tried to add row while read only"];
+    return _table->add_empty_row(rowCount);
+}
 -(void)clear
 {
     if (_readOnly)
