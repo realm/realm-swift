@@ -1,4 +1,4 @@
-// @@Example: ex_objc_typed_table_intro @@
+// @@Example: ex_objc_table_typed_intro @@
 
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
@@ -22,14 +22,27 @@ int main()
         [table addName:@"Mary" Age:14];
         [table addName:@"Joe" Age:17];
         [table addName:@"Jack" Age:22];
+        [table addName:@"Sam" Age:34];
+        [table addName:@"Bob" Age:10];
         
         // Get the number of rows in the table.
         
-        size_t size = [table count];
+        NSLog(@"The size of the table is %zd", [table count]);
         
-        
-        
+        // Insert row at an index.
 
+        [table insertAtIndex:2 Name:@"Brian" Age:20];
+        
+        // Get first row matching an input column value. Notice the method
+        // is accessed on a specific column, not on the table.
+        
+        NSLog(@"Found match in row %zd", [table.Age find:20]);
+        
+        // Clear the table (remove all rows).
+        
+        [table clear];
+        NSLog(@"The size of the table is now %zd", [table count]);
+        
     }
 }
 
