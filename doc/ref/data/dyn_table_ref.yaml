@@ -17,129 +17,164 @@ EXAMPLES   :
 - DESCR:
   CODE     : ex_obcj_dyn_table_intro
 IGNORE     : []                   # List of method-ids to ignore
+
 CATEGORIES :
+
 - State:
   METHODS:
   - g_dyn_table_size:
-      NAMES    : count
+      NAME     : count
       SUMMARY  : *g_dyn_table_size_summary
       DESCR    : *g_dyn_table_size_descr
       SIGNATURE: (size_t)count
-      CONST    : True
       RETURN:
         TYPES  : size_t
-        DESCR  : The number of rows.
+        DESCR  : *g_dyn_table_size_summary
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_size
+      - CODE   : ex_objc_dyn_table_size
         DESCR  :
+
   - g_dyn_table_is_empty:
-      NAMES    : isEmpty
+      NAME     : isEmpty
       SUMMARY  : *g_dyn_table_is_empty_summary
       DESCR    : *g_dyn_table_is_empty_descr
       SIGNATURE: (BOOL)isEmpty
-      CONST    : True
       RETURN:
-        TYPES  : bool
-        DESCR  : <code>true</code> if empty, <code>false</code> otherwise.
+        TYPES  : BOOL
+        DESCR  : *g_dyn_table_is_empty_return_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_is_empty
+      - CODE   : ex_objc_dyn_table_is_empty
         DESCR  :
+
   - g_dyn_table_is_valid:
-      NAMES    : isValid (not yet implemented)
+      TODO     : soon
+
+      NAME     : isValid
       SUMMARY  : *g_dyn_table_is_valid_summary
       DESCR    : *g_dyn_table_is_valid_descr
-      CONST    : true
       RETURN:
-        TYPES  : bool
-        DESCR  : <code>true</code> if table is valid, <code>false</code> otherwise.
+        TYPES  : BOOL
+        DESCR  : *g_dyn_table_is_valid_return_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_is_valid
+      - CODE   : ex_objc_dyn_table_is_valid
         DESCR  :
+
+
 - Table:
   METHODS:
   - g_dyn_table_clear:
-      NAMES    : clear
+      NAME     : clear
       SUMMARY  : *g_dyn_table_clear_summary
       DESCR    : *g_dyn_table_clear_descr
       SIGNATURE: (void)clear
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_clear
+      - CODE   : ex_objc_dyn_table_clear
         DESCR  :
+
   - g_dyn_table_optimize:
-      NAMES    : optimize
+      NAME     : optimize
       SUMMARY  : *g_dyn_table_optimize_summary
       DESCR    : *g_dyn_table_optimize_descr
       SIGNATURE: (void)optimize
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_optimize
+      - CODE   : ex_objc_dyn_table_optimize
         DESCR  :
+
   - g_dyn_table_opertator==:
-      NAMES    : isEqual
+      NAME     : isEqual
       SUMMARY  : *g_dyn_table_operator_eq_summary
       DESCR    : *g_dyn_table_operator_eq_descr
       SIGNATURE: (BOOL)isEqual:(TightdbTable *)other
-      CONST    : True
       PARAMS:
       - NAME   : other
-        TYPES  : const Table&
-        DESCR  : The other table.
+        TYPES  : TightdbTable *
+        DESCR  : *g_dyn_table_operator_eq_table_descr
       RETURN:
-        TYPES  : bool
-        DESCR  : <code>true</code> if the two tables are equal, <code>false</code> otherwise,
+        TYPES  : BOOL
+        DESCR  : g_dyn_table_operator_eq_return_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_operator==
+      - CODE   : ex_objc_dyn_table_operator==
         DESCR  :
+
+  - g_dyn_table_opertator!=:
+      TODO     : soon    
+
+      NAME     : is???Equal
+      SUMMARY  : *g_dyn_table_operator_neq_summary
+      DESCR    : *g_dyn_table_operator_neq_descr
+      SIGNATURE: (BOOL)isEqual:(TightdbTable *)other
+      PARAMS:
+      - NAME   : other
+        TYPES  : TightdbTable *
+        DESCR  : *g_dyn_table_operator_eq_table_descr
+      RETURN:
+        TYPES  : BOOL
+        DESCR  : g_dyn_table_operator_eq_return_descr
+      EXAMPLES:
+      - CODE   : ex_objc_dyn_table_operator==
+        DESCR  :
+
+
 - Columns:
   METHODS:
+  - g_dyn_table_add_column:
+      TODO     : later
+  - g_dyn_table_remove_column:
+      TODO     : later
+  - g_dyn_table_rename_column:
+      TODO     : later
+
+  
   - g_dyn_table_get_column_count:
-      NAMES    : getColumnCount
+      NAME     : getColumnCount
       SUMMARY  : *g_dyn_table_get_column_count_summary
       DESCR    : *g_dyn_table_get_column_count_descr
       SIGNATURE: (size_t)getColumnCount
-      CONST    : True
       RETURN:
         TYPES  : size_t
-        DESCR  : The number of columns.
+        DESCR  : *g_dyn_table_get_column_count_return_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_get_column_count
+      - CODE   : ex_objc_dyn_table_get_column_count
         DESCR  :
+ 
   - g_dyn_table_get_column_name:
-      NAMES    : getColumnName
+      NAME     : getColumnName
       SUMMARY  : *g_dyn_table_get_column_name_summary
       DESCR    : *g_dyn_table_get_column_name_descr
       SIGNATURE: (NSString *)getColumnName:(size_t)ndx
-      CONST    : True
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
-        DESCR  : The column index.
+        DESCR  : *g_dyn_table_get_column_name_param1_descr
       RETURN:
-        TYPES  : const char*
-        DESCR  : The column name.
+        TYPES  : NSString *
+        DESCR  : *g_dyn_table_get_column_name_return_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_get_column_name
+      - CODE   : ex_objc_dyn_table_get_column_name
         DESCR  :
+
   - g_dyn_table_get_column_index:
-      NAMES    : getColumnIndex
+      NAME     : getColumnIndex
       SUMMARY  : *g_dyn_table_get_column_index_summary
       DESCR    : *g_dyn_table_get_column_index_descr
       SIGNATURE: (size_t)getColumnIndex:(NSString *)name
       CONST    : True
       PARAMS:
       - NAME   : name
-        TYPES  : const char*
-        DESCR  : The column name.
+        TYPES  : NSString *
+        DESCR  : *g_dyn_table_name_of_column_descr
       RETURN:
         TYPES  : size_t
-        DESCR  : The column index or <code>std::size_t(-1)</code> if there is no column with the specified name.
+        DESCR  : The column index or <code>size_t(-1)</code> if there is no column with the specified name.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_get_column_index
+      - CODE   : ex_objc_dyn_table_get_column_index
         DESCR  :
+ 
   - g_dyn_table_get_column_type:
-      NAMES    : getColumnType
+      NAME     : getColumnType
       SUMMARY  : *g_dyn_table_get_column_type_summary
       DESCR    : >
-                 This method gets the type of a column using the column index. Currently,
+                 This method returns the type of a column using the column index. Currently,
                  the following types are supported:
                  <ul>
                    <li><code>tightdb_Bool</code></li>
@@ -153,50 +188,69 @@ CATEGORIES :
                    <li><code>tightdb_Mixed</code></li>
                  </ul>
       SIGNATURE: (TightdbType)getColumnType:(size_t)ndx
-      CONST    : True
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
-        DESCR  : The column index.
+        DESCR  : g_dyn_table_get_column_type_parm1_descr
       RETURN:
         TYPES  : DataType
-        DESCR  : The column type.
+        DESCR  : *g_dyn_table_get_column_type_return1_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_get_column_type
+      - CODE   : ex_objc_dyn_table_get_column_type
         DESCR  :
+
+  - g_dyn_table_add_int:
+      TODO     : later
+
+
 - Rows:
   METHODS:
   - g_dyn_table_add_empty_row:
-      NAMES    : addRow
+      NAME     : addRow
       SUMMARY  : *g_dyn_table_add_empty_row_summary
       DESCR    : *g_dyn_table_add_empty_row_descr
       SIGNATURE: (size_t)addRow
       PARAMS:
       - NAME   : num_rows
         TYPES  : size_t
-        DESCR  : "Number of rows to add (default: 1)."
+        DESCR  : *g_dyn_table_add_empty_row_parm1_descr
+
   - g_dyn_table_insert_empty_row:
-      NAMES    : insertRow (not yet implemented)
+      TODO     : soon
+
+      NAME     : insertRow 
       SUMMARY  : *g_dyn_table_insert_empty_row_summary
       DESCR    : *g_dyn_table_insert_empty_row_descr
-      SIGNATURE: |
-                 void insert_empty_row(size_t row_ndx, size_t num_rows = 1)
+      SIGNATURE: void insert_empty_row(size_t row_ndx, size_t num_rows = 1)
       PARAMS:
       - NAME   : row_ndx
         TYPES  : size_t
-        DESCR  : Position to insert at.
+        DESCR  : *g_dyn_table_insert_empty_row_parm1_descr
       - NAME   : num_rows
         TYPES  : size_t
-        DESCR  : "Number of rows to insert (default: 1)."
+        DESCR  : *g_dyn_table_insert_empty_row_parm2_descr
+
+# TODO: Should this be supported at all?
   - g_dyn_table_insert_bool:
+      NAME     : insertBool
   - g_dyn_table_insert_int:
+      NAME     : insertInt
   - g_dyn_table_insert_enum:
+      INGORED  : "" 
   - g_dyn_table_insert_date:
+      NAME     : insertDate
   - g_dyn_table_insert_string:
+      NAME     : insertString
   - g_dyn_table_insert_binary:
+      NAME     : insertBinary
   - g_dyn_table_insert_mixed:
+      NAME     : insertMixed
+  - g_dyn_table_insert_subtable:
+      NAME     : insertSubtable
   - g_dyn_table_insert_done:
-      NAMES    : insert*
+      NAME     : insertDone
+
+      TITLE    : insert*
       SUMMARY  : *g_dyn_table_insert_xxx_summary
       DESCR    : *g_dyn_table_insert_xxx_descr
       SIGNATURE: |
@@ -211,64 +265,87 @@ CATEGORIES :
                  (void)insertMixed:(size_t)col_ndx ndx:(size_t)row_ndx value:(TightdbMixed *)value
                  (void)insertSubtable:(size_t)col_ndx ndx:(size_t)row_ndx
                  (void)insertDone
+#TODO: does insertBinary with direct char*/size exist?
       PARAMS:
       - NAME   : ndx, row_ndx
         TYPES  : size_t
-        DESCR  : The column index.
+        DESCR  : *g_dyn_table_insert_parm1_descr
       - NAME   : ndx
         TYPES  : size_t
-        DESCR  : The row index.
+        DESCR  : *g_dyn_table_insert_parm2_descr
       - NAME   : value
-        TYPES  : [bool, int64_t, float, double, time_t, const char*, Mixed]
-        DESCR  : The value to insert.
+        TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, TightdbBinary*, const char*, TightdbMixed*]
+        DESCR  : *g_dyn_table_insert_parm3_descr
+      - NAME   : data
+        TYPES  : const char *
+        DESCR  : &g_dyn_table_insert_xxx_parm4_descr
+                 Pointer to start of binary data.
       - NAME   : size
         TYPES  : size_t
-        DESCR  : Size in bytes of binary value.
+        DESCR  : &g_dyn_table_insert_xxx_parm5_descr
+                 Size in bytes of binary data.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_insert_xxx
+      - CODE   : ex_objc_dyn_table_insert_xxx
         DESCR  :
       SEE      : "For a safe way to insert rows, use {@link g_dyn_table_insert_empty_row}, and then set individual values in the columns."
 
   - g_dyn_table_remove_row:
-      NAMES    : remove
+      NAME     : remove
       SUMMARY  : *g_dyn_table_remove_row_summary
       DESCR    : *g_dyn_table_remove_row_descr
       SIGNATURE: (void)remove:(size_t)ndx
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
-        DESCR  : Position of the row to delete.
+        DESCR  : *g_dyn_table_remove_row_param1_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_remove
+      - CODE   : ex_objc_dyn_table_remove
         DESCR  :
-  - g_dyn_table_remove_last:
-      NAMES    : removeLast
+ 
+  - g_dyn_table_remove_last_row:
+      NAME     : removeLast
       SUMMARY  : *g_dyn_table_remove_last_row_summary
       DESCR    : *g_dyn_table_remove_last_row_descr
       SIGNATURE: (void)removeLast
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_remove_last_row
+      - CODE   : ex_objc_dyn_table_remove_last_row
         DESCR  :
+
 - Values:
   METHODS:
-  - g_dyn_table_get_bool:
-  - g_dyn_table_get_int:
-  - g_dyn_table_get_date:
-  - g_dyn_table_get_string:
-  - g_dyn_table_get_binary:
-  - g_dyn_table_get_mixed:
-  - g_dyn_table_get_mixed_type:
-  - g_dyn_table_get_subtable:
   - g_dyn_table_get_subtable_const:
-      NAMES    : get*
+      IGNORE   : ""
+  - g_dyn_table_get_bool:
+      NAME     : getBool
+  - g_dyn_table_get_int:
+      NAME     : get
+#TODO: rename to getInt
+  - g_dyn_table_get_float:
+      NAME     : getFloat
+  - g_dyn_table_get_double:
+      NAME     : getDouble
+  - g_dyn_table_get_date:
+      NAME     : getDate
+  - g_dyn_table_get_string:
+      NAME     : getString
+  - g_dyn_table_get_binary:
+      NAME     : getBinary
+  - g_dyn_table_get_mixed:
+      NAME     : getMixed
+  - g_dyn_table_get_mixed_type:
+      NAME     : getMixedType
+  - g_dyn_table_get_subtable:
+      NAME     : getSubtable
+
+      TITLE    : get*
       SUMMARY  : *g_dyn_table_get_xxx_summary
       DESCR    : *g_dyn_table_get_xxx_descr
       SIGNATURE: |
                  (BOOL)getBool:(size_t)col_ndx ndx:(size_t)ndx
                  (int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
-                 (time_t)getDate:(size_t)col_ndx ndx:(size_t)ndx
                  (float)getFloat:(size_t)col_ndx ndx:(size_t)ndx
                  (double)getDouble:(size_t)col_ndx ndx:(size_t)ndx
+                 (time_t)getDate:(size_t)col_ndx ndx:(size_t)ndx
                  (NSString *)getString:(size_t)col_ndx ndx:(size_t)ndx
                  (TightdbBinary *)getBinary:(size_t)col_ndx ndx:(size_t)ndx
                  (TightdbMixed *)getMixed:(size_t)col_ndx ndx:(size_t)row_ndx
@@ -276,28 +353,46 @@ CATEGORIES :
 
                  (TightdbTable *)getSubtable:(size_t)col_ndx ndx:(size_t)ndx
                  (id)getSubtable:(size_t)col_ndx ndx:(size_t)ndx withClass:(__unsafe_unretained Class)classObj
-      CONST    : True
+#TODO: What's the last method about?
+
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : The column index.
+        DESCR  : *g_dyn_table_get_xxx_parm1_descr
       - NAME   : row_ndx
         TYPES  : size_t
-        DESCR  : The row index.
+        DESCR  : *g_dyn_table_get_xxx_parm2_descr
       RETURN:
-        TYPES  : [bool, int64_t, float, double, time_t, NSString, TightdbBinary, TightdbMixed, TightdbType, TightdbTable]
-        DESCR  : The value.
+        TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, TightdbBinary*, 
+                  TightdbMixed*, TightdbType, TightdbTable*]
+        DESCR  : *g_dyn_table_get_xxx_return_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_get_xxx
+      - CODE   : ex_objc_dyn_table_get_xxx
         DESCR  :
+
   - g_dyn_table_set_bool:
+      NAME     : setBool
   - g_dyn_table_set_int:
+      NAME     : set
+#TODO: Rename to setInt
+  - g_dyn_table_set_float:
+      NAME     : setFloat
+  - g_dyn_table_set_double:
+      NAME     : setDouble
   - g_dyn_table_set_enum:
+      IGNORE   : ""
   - g_dyn_table_set_date:
+      NAME     : setDate
   - g_dyn_table_set_string:
+      NAME     : setString
   - g_dyn_table_set_binary:
+      NAME     : setBinary
+  - g_dyn_table_set_binary_2:
+      NAME     : setBinary
   - g_dyn_table_set_mixed:
-      NAMES    : set*
+      NAME     : setMixed
+
+      TITLE    : set*
       SUMMARY  : *g_dyn_table_set_xxx_summary
       DESCR    : *g_dyn_table_set_xxx_descr
       SIGNATURE: |
@@ -310,228 +405,281 @@ CATEGORIES :
                  (void)setBinary:(size_t)col_ndx ndx:(size_t)ndx value:(TightdbBinary *)value
                  (void)setBinary:(size_t)col_ndx ndx:(size_t)ndx data:(const char *)data size:(size_t)size
                  (void)setMixed:(size_t)col_ndx ndx:(size_t)row_ndx value:(TightdbMixed *)value
-
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : The column index.
+        DESCR  : *g_dyn_table_get_xxx_parm1_descr
       - NAME   : row_ndx
         TYPES  : size_t
-        DESCR  : The row index.
+        DESCR  : *g_dyn_table_get_xxx_parm2_descr
       - NAME   : value
-        TYPES  : [bool, int64_t, float, double, time_t, const char*, Mixed]
-        DESCR  : The value.
+        TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, TightdbBinary*, 
+                  const char*, size_t, TightdbMixed*]
+        DESCR  : *g_dyn_table_set_xxx_parm3_descr
+      - NAME   : data
+        TYPES  : const char *
+        DESCR  : *g_dyn_table_insert_xxx_parm4_descr
       - NAME   : size
         TYPES  : size_t
-        DESCR  : Size in bytes of binary value.
+        DESCR  : *g_dyn_table_insert_xxx_parm5_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_set_xxx
+      - CODE   : ex_objc_dyn_table_set_xxx
         DESCR  :
+
 - Sub-tables:
   METHODS:
   - g_dyn_table_get_subtable_size:
-      NAMES    : getTableSize
+      NAME     : getTableSize
       SUMMARY  : *g_dyn_table_get_subtable_size_summary
       DESCR    : *g_dyn_table_get_subtable_size_descr
       SIGNATURE: (size_t)getTableSize:(size_t)col_ndx ndx:(size_t)row_ndx
-      CONST    : true
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : The column index.
+        DESCR  : *g_dyn_table_get_xxx_parm1_descr
       - NAME   : row_ndx
         TYPES  : size_t
-        DESCR  : The row index.
+        DESCR  : *g_dyn_table_get_xxx_parm2_descr
       RETURN:
         TYPES  : size_t
-        DESCR  : Number of rows.
+        DESCR  : *g_dyn_table_get_subtable_size_return_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_get_subtable
+      - CODE   : ex_objc_dyn_table_get_subtable
         DESCR  :
+
   - g_dyn_table_clear_subtable:
-      NAMES    : clearSubtable
+      NAME     : clearSubtable
       SUMMARY  : *g_dyn_table_clear_subtable_summary
       DESCR    : *g_dyn_table_clear_subtable_descr
       SIGNATURE: (void)clearSubtable:(size_t)col_ndx ndx:(size_t)row_ndx
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : The column index.
+        DESCR  : *g_dyn_table_get_xxx_parm1_descr
       - NAME   : row_ndx
         TYPES  : size_t
-        DESCR  : The row index.
+        DESCR  : *g_dyn_table_get_xxx_parm2_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_clear_subtable
+      - CODE   : ex_objc_dyn_table_clear_subtable
         DESCR  :
+
+
 - Indexes:
   METHODS:
   - g_dyn_table_set_index:
-      NAMES    : setIndex
+      NAME     : setIndex
       SUMMARY  : *g_dyn_table_set_index_summary
       DESCR    : *g_dyn_table_set_index_descr
       SIGNATURE: (void)setIndex:(size_t)col_ndx
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_table_get_xxx_parm1_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_set_index
+      - CODE   : ex_objc_dyn_table_set_index
         DESCR  :
+        
   - g_dyn_table_has_index:
-      NAMES    : hasIndex
+      NAME     : hasIndex
       SUMMARY  : *g_dyn_table_has_index_summary
       DESCR    : *g_dyn_table_has_index_descr
       SIGNATURE: (BOOL)hasIndex:(size_t)col_ndx
-      CONST    : true
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_table_get_xxx_parm1_descr
       RETURN:
-        TYPES  : bool
-        DESCR  : <code>true</code> if column is indexed, <code>false</code> otherwise.
+        TYPES  : BOOL
+        DESCR  : *g_dyn_table_has_index_return_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_has_index
+      - CODE   : ex_objc_dyn_table_has_index
         DESCR  :
+        
+        
 - Searching:
   METHODS:
   - g_dyn_table_lookup:
-      NAMES    : lookup (not yet implemented)
+      TODO     : soon
+
+      NAME     : lookup
       SUMMARY  : *g_dyn_table_lookup_summary
       DESCR    : *g_dyn_table_lookup_descr
       SIGNATURE:
-      CONST    : True
       PARAMS:
       - NAME   : value
-        TYPES  : const char*
-        DESCR  : The value to search for.
+        TYPES  : NSString
+        DESCR  : *g_dyn_table_lookup_parm1_descr
       RETURN:
         TYPES  : size_t
         DESCR  : "The row index or <code>tightdb::not_found</code> (equal to <code>size_t(-1)</code>) if there is no match."
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_lookup
+      - CODE   : ex_objc_dyn_table_lookup
         DESCR  :
-  - g_find_first_bool:
-  - g_find_first_int:
-  - g_find_first_date:
-  - g_find_first_string:
-      NAMES    : find*
+
+  - g_dyn_table_find_first_bool:
+      NAME     : findBool
+  - g_dyn_table_find_first_int:
+      NAME     : findInt
+  - g_dyn_table_find_first_float:
+      NAME     : findFloat
+  - g_dyn_table_find_first_double:
+      NAME     : findDouble
+  - g_dyn_table_find_first_date:
+      NAME     : findDate
+  - g_dyn_table_find_first_string:
+      NAME     : findString
+  - g_dyn_table_find_first_binary:
+      NAME     : findBinary
+
+# TODO: change name to findFirst* ?
+
+      TITLE    : find*
       SUMMARY  : Find first matching row.
       DESCR    : The method finds the first occurence of a given value in a column.
       SIGNATURE: |
-                 (size_t)findInt:(size_t)col_ndx value:(int64_t)value
                  (size_t)findBool:(size_t)col_ndx value:(BOOL)value
-                 (size_t)findDate:(size_t)col_ndx value:(time_t)value
-                 (size_t)findString:(size_t)col_ndx value:(NSString *)value
+                 (size_t)findInt:(size_t)col_ndx value:(int64_t)value
                  (size_t)findFloat:(size_t)col_ndx value:(float)value
                  (size_t)findDouble:(size_t)col_ndx value:(double)value
+                 (size_t)findDate:(size_t)col_ndx value:(time_t)value
+                 (size_t)findString:(size_t)col_ndx value:(NSString *)value
                  (size_t)findBinary:(size_t)col_ndx value:(TightdbBinary *)value
-
-      CONST    : True
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : The column index.
+        DESCR  : *g_dyn_table_find_first_xxx_parm1_descr
       - NAME   : value
-        TYPES  : [bool, int64_t, float, double, time_t, const char*]
-        DESCR  : The value.
+        TYPES  : [BOOL, int64_t, float, double, time_t, const char*]
+        DESCR  : *g_dyn_table_find_first_xxx_parm2_descr
       RETURN:
         TYPES  : size_t
+#TODO: is that the same in objc?
         DESCR  : "The row index or <code>tightdb::not_found</code> (equal to <code>std::size_t(-1)</code>) if there is no match."
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_find_first_xxx
+      - CODE   : ex_objc_dyn_table_find_first_xxx
         DESCR  :
-  - g_find_all_bool:
-  - g_find_all_int:
-  - g_find_all_date:
-  - g_find_all_string:
-  - g_find_all_float:
-  - g_find_all_double:
-  - g_find_all_bool_const:
-  - g_find_all_int_const:
-  - g_find_all_date_const:
-  - g_find_all_string_const:
-  - g_find_all_float_const:
-  - g_find_all_double_const:
-      NAMES    : findAll* (not implemented for all types yet)
+
+  - g_dyn_table_find_all_bool_const:
+      IGNORE   : ""
+  - g_dyn_table_find_all_int_const:
+      IGNORE   : ""
+  - g_dyn_table_find_all_date_const:
+      IGNORE   : ""
+  - g_dyn_table_find_all_string_const:
+      IGNORE   : ""
+  - g_dyn_table_find_all_float_const:
+      IGNORE   : ""
+  - g_dyn_table_find_all_double_const:
+      IGNORE   : ""
+
+  - g_dyn_table_find_all_bool:
+      TODO     : soon
+  - g_dyn_table_find_all_date:
+      TODO     : soon
+  - g_dyn_table_find_all_string:
+      TODO     : soon
+  - g_dyn_table_find_all_float:
+      TODO     : soon
+  - g_dyn_table_find_all_double:
+      TODO     : soon
+  - g_dyn_table_find_all_int:
+      NAMES    : findAll
+      TITLE    : findAll*
       SUMMARY  : *g_dyn_table_find_all_xxx_summary
       DESCR    : >
                  The method finds all occurences of a given value in a specific column.
                  The rows are returned as a {@link class_dyn_tableview} object.
       SIGNATURE: |
                  (TightdbView *)findAll:(TightdbView *)view column:(size_t)col_ndx value:(int64_t)value
-
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : The column index.
+        DESCR  : *g_dyn_table_find_all_xxx_parm1_descr
       - NAME   : value
-        TYPES  : [bool, int64_t, float, double, time_t, const char*]
-        DESCR  : The value.
+        TYPES  : [BOOL, int64_t, float, double, time_t, NSString]
+        DESCR  : *g_dyn_table_find_all_xxx_parm2_descr
       RETURN:
-        TYPES  : TableView
-        DESCR  : The view.
+        TYPES  : TightdbView *
+        DESCR  : *g_dyn_table_find_all_xxx_return_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_find_all_xxx
+      - CODE   : ex_objc_dyn_table_find_all_xxx
         DESCR  :
-  - g_dyn_table_get_sorted_view:
+
+  - g_dyn_table_find_sorted_int:
+      TODO     : later
+
+
   - g_dyn_table_get_sorted_view_const:
-      NAMES    : getSortedView (not yet implemented)
+      IGNORE   : ""
+  - g_dyn_table_get_sorted_view:
+      TODO     : later
+
+      NAME     : getSortedView
       SUMMARY  : *g_dyn_table_get_sorted_view_summary
       DESCR    : *g_dyn_table_get_sorted_view_desc
-      SIGNATURE: |
-                 TableView      get_sorted_view(size_t column_ndx, bool ascending=true);
-                 ConstTableView get_sorted_view(size_t column_ndx, bool ascending=true) const;
+      SIGNATURE: TableView get_sorted_view(size_t column_ndx, bool ascending=true);
       PARAMS:
       - NAME   : column_ndx
         TYPES  : size_t
-        DESCR  : The column index.
+        DESCR  : *g_dyn_table_get_sorted_view_parm1_descr
       - NAME   : ascending
-        TYPES  : bool
-        DESCR  : *cpp_dyn_table_get_sorted_view_param
+        TYPES  : BOOL
+        DESCR  : *cpp_dyn_table_get_sorted_view_parm2_descr
       RETURN:
-        TYPES  : TableView
-        DESCR  : A view.
+        TYPES  : TightdbView *
+        DESCR  : *g_dyn_table_get_sorted_view_return_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_get_sorted_view
+      - CODE   : ex_objc_dyn_table_get_sorted_view
         DESCR  :
-  - g_dyn_table_distinct:
+
   - g_dyn_table_distinct_const:
-      NAMES    : distinct (not yet implemented)
+      IGNORE   : ""
+  - g_dyn_table_distinct:
+      TODO     : later
+
+      NAMES    : distinct
       SUMMARY  : *g_dyn_table_distinct_summary
       DESCR    : *g_dyn_table_distinct_desc
-      SIGNATURE: |
-                 TableView      distinct(size_t column_ndx);
-                 ConstTableView distinct(size_t column_ndx) const;
+      SIGNATURE: TableView distinct(size_t column_ndx);
       PARAMS:
       - NAME   : column_ndx
         TYPES  : size_t
-        DESCR  : The column index.
+        DESCR  : *g_dyn_table_distinct_parm1_desc
       RETURN:
         TYPES  : TableView
-        DESCR  : A view.
+        DESCR  : *g_dyn_table_distinct_return_desc
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_distinct
+      - CODE   : ex_objc_dyn_table_distinct
         DESCR  :
-  - g_dyn_table_where:
+
   - g_dyn_table_where_const:
-      NAMES    : [where (not yet implemented), where]
-      SIGNATURE: |
-                 Query       where()
-                 const Query where() const
-      SUMMARY  : Query table.
-      DESCR    : This method initiates a query. See {@link class_dyn_query}.
+      IGNORE   : ""
+  - g_dyn_table_where:
+      TODO     : later
+      
+      NAME     : where
+      SIGNATURE: Query where()
+      SUMMARY  : *g_dyn_table_where_summary
+      DESCR    : *g_dyn_table_where_descr
       RETURN:
-        TYPES  : [Query, const Query]
-        DESCR  : The query object.
+        TYPES  : Query
+        DESCR  : *g_dyn_table_where_return_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_dyn_table_where
+        CODE   : ex_objc_dyn_table_where
+
+
 - Aggregates:
   METHODS:
   - g_dyn_table_count_int:
+      NAME     : countInt
+  - g_dyn_table_count_float:
+      NAME     : countFloat
+  - g_dyn_table_count_double:
+      NAME     : countDouble
   - g_dyn_table_count_string:
-      NAMES    : count*
+      NAME     : countString
+      TITLE    : count*
       SUMMARY  : *g_dyn_table_count_summary
       DESCR    : *g_dyn_table_count_descr
       SIGNATURE: |
@@ -539,45 +687,47 @@ CATEGORIES :
                  (size_t)countFloat:(size_t)col_ndx target:(float)target
                  (size_t)countDouble:(size_t)col_ndx target:(double)target
                  (size_t)countString:(size_t)col_ndx target:(NSString *)target
-      CONST    : True
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_table_count_parm1_descr
       - NAME   : target
         TYPES  : int64_t
-        DESCR  : The value.
+        DESCR  : *g_dyn_table_count_parm2_descr
       RETURN:
         TYPES  : size_t
-        DESCR  : The number of rows.
+        DESCR  : *g_dyn_table_count_return_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_count
+      - CODE   : ex_objc_dyn_table_count
         DESCR  :
-  - g_dyn_table_sum:
+
+  - g_dyn_table_sum_int:
   - g_dyn_table_sum_float:
   - g_dyn_table_sum_double:
       NAMES    : [sumInt, sumFloat, sumDouble]
+      TITLE    : sum*
       SUMMARY  : *g_dyn_table_sum_summary
       DESCR    : *g_dyn_table_sum_descr
       SIGNATURE: |
                  (int64_t)sumInt:(size_t)col_ndx
                  (double)sumFloat:(size_t)col_ndx
                  (double)sumDouble:(size_t)col_ndx
-      CONST    : True
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_table_sum_parm1_descr
       RETURN:
         TYPES  : [int64_t, double]
-        DESCR  : The sum.
+        DESCR  : *g_dyn_table_sum_return_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_sum
+      - CODE   : ex_objc_dyn_table_sum
         DESCR  :
-  - g_dyn_table_maximum:
+
+  - g_dyn_table_maximum_int:
   - g_dyn_table_maximum_float:
   - g_dyn_table_maximum_double:
-      NAMES    : [max*, maxFloat, maximum_double]
+      NAMES    : [maxInt, maxFloat, maximumDouble]
+      TITLE    : max*
       SUMMARY  : *g_dyn_table_maximum_summary
       DESCR    : *g_dyn_table_maximum_descr
       SIGNATURE: |
@@ -593,15 +743,16 @@ CATEGORIES :
         TYPES  : [int64_t, float, double]
         DESCR  : The maximum value.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_maximum
+      - CODE   : ex_objc_dyn_table_maximum
         DESCR  :
-  - g_dyn_table_minimum:
+        
+  - g_dyn_table_minimum_int:
   - g_dyn_table_minimum_float:
   - g_dyn_table_minimum_double:
-      NAMES    : [min*, minimum_float, minimum_double]
+      NAMES    : [minInt, minimumFloat, minimumDouble]
+      TITLE    : min*
       SUMMARY  : *g_dyn_table_minimum_summary
       DESCR    : *g_dyn_table_minimum_descr
-      CONST    : True
       SIGNATURE: |
                  (int64_t)minInt:(size_t)col_ndx
                  (float)minFloat:(size_t)col_ndx
@@ -609,20 +760,20 @@ CATEGORIES :
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_table_maximum_parm1_descr
       RETURN:
         TYPES  : [int64_t, float, double]
-        DESCR  : The minimum value.
+        DESCR  : *g_dyn_table_minimum_return_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_minimum
+      - CODE   : ex_objc_dyn_table_minimum
         DESCR  :
-  - g_dyn_table_average:
+
+  - g_dyn_table_average_int:
   - g_dyn_table_average_float:
   - g_dyn_table_average_double:
-      NAMES    : [avg*, average_float, average_double]
+      NAMES    : [avgInt, averageFloat, averageDouble]
       SUMMARY  : *g_dyn_table_average_summary
       DESCR    : *g_dyn_table_average_descr
-      CONST    : True
       SIGNATURE: |
                  (double)avgInt:(size_t)col_ndx
                  (double)avgFloat:(size_t)col_ndx
@@ -630,17 +781,21 @@ CATEGORIES :
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_table_maximum_parm1_descr
       RETURN:
         TYPES  : double
-        DESCR  : The average
+        DESCR  : *g_dyn_table_average_return1_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_average
+      - CODE   : ex_objc_dyn_table_average
         DESCR  :
+        
+        
 - Dump:
   METHODS:
   - g_dyn_table_to_json:
-      NAMES    : toJSON (not yet implemented)
+      TODO     : later
+
+      NAMES    : toJSON
       SUMMARY  : *g_dyn_table_to_json_summary
       DESCR    : *g_dyn_table_to_json_descr
       PARAMS:
@@ -648,20 +803,25 @@ CATEGORIES :
         TYPES  : std::ostream&
         DESCR  : Output stream.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_to_json
+      - CODE   : ex_objc_dyn_table_to_json
         DESCR  :
+
   - g_dyn_table_to_string:
-      NAMES    : toString (not yet implemented)
+      TODO     : later
+
+      NAMES    : toString
       SUMMARY  : *g_dyn_table_to_string_summary
       DESCR    : *g_dyn_table_to_string_descr
-      CONST    : true
       PARAMS:
       - NAME   : out
         TYPES  : std::ostream&
         DESCR  : Output stream.
       - NAME   : limit
         TYPES  : size_t
-        DESCR  : "The number of rows to convert. Default: 500."
+        DESCR  : *g_dyn_table_to_string_parm2_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_to_string
+      - CODE   : ex_objc_dyn_table_to_string
         DESCR  :
+
+  - g_dyn_table_row_to_string:
+      TODO     : later

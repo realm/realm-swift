@@ -48,7 +48,7 @@ int main()
                 NSLog(@"Name: %@", [curser Name]);
             }
         }];
-        // @@EndExample@@
+        
         
     }
 

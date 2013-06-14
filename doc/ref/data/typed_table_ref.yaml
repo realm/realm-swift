@@ -2,7 +2,8 @@
 # Obj-C reference documentation for TypedTable class
 #
 
-#UNIMPLEMENTED columns(), front(), back(), insert_empty_row(), lookup(), findAll() via table Propery, get_sorted_view(), where(), distinct()
+#UNIMPLEMENTED columns(), front(), back(), insert_empty_row(), lookup(), findAll() 
+#              via table Propery, get_sorted_view(), where(), distinct()
 #INCONSISTENCY add.., addRow, vs. add_empty_row, and number of rows cannot be specified
 #INCONSISTENCY popBack(), find_first_* ->> find*   ("first" is omitted)
 
@@ -20,7 +21,7 @@ CATEGORIES:
 - Definition:
   METHODS:
   - g_typed_table_macros:
-      NAMES    : TIGHTDB_TABLE_*
+      NAME     : TIGHTDB_TABLE_*
       DESCR    : >
                  This set of predefined macros is used to declare type safe table classes.
                  It is possible to declare table classes with 1 to 15 columns.
@@ -41,6 +42,7 @@ CATEGORIES:
         DESCR  : Name of column.
       - NAME   : ColumnType
         TYPES  : text
+# TODO: Fix types
         DESCR  : |
                  Column type. Following types are available:
                  <table>
@@ -51,8 +53,8 @@ CATEGORIES:
                  <tr><td>Int</td>               <td>Integer</td>      <td>(int64_t)</td></tr>
                  <tr><td>Float</td>             <td>Floating-point</d><td>(float)</td></tr>
                  <tr><td>Double</td>            <td>Floating-point</d><td>(double)</td></tr>
-                 <tr><td>Bool</td>              <td>Boolean</td>      <td>(bool)</td></tr>
-                 <tr><td>String </td>           <td>Text</td>         <td>(char*)</td></tr>
+                 <tr><td>Bool</td>              <td>Boolean</td>      <td>(BOOL)</td></tr>
+                 <tr><td>String </td>           <td>Text</td>         <td>(NSString*)</td></tr>
                  <tr><td>Date</td>              <td>UTC datetime</td> <td>(time_t)</td></tr>
                  <tr><td>Enum&lt;T&gt;</td>     <td>Enum</td>         <td>(T as enum type)</td></tr>
                  <tr><td>Subtable&lt;T&gt;</td> <td>Sub-tables</td>   <td>(T as table class)</td></tr>
@@ -60,110 +62,142 @@ CATEGORIES:
                  </tbody>
                  </table>
       EXAMPLES:
-      - CODE   : ex_cpp_typed_table_macros
+      - CODE   : ex_objc_typed_table_macros
         DESCR  :
+        
 - State:
   METHODS:
   - g_typed_table_is_empty:
-      NAMES    : isEmpty
+      NAME     : isEmpty
       DESCR    : *g_typed_table_is_empty_descr
       SUMMARY  : *g_typed_table_is_empty_summary
-      SIGNATURE: |
-                 (BOOL)isEmpty;
-      CONST    : true
+      SIGNATURE: (BOOL)isEmpty;
       RETURN:
-        TYPES  : bool
+        TYPES  : BOOL
         DESCR  : *g_typed_table_true_false
       EXAMPLES:
-      - CODE   :  ex_cpp_type_table_is_empty
+      - CODE   :  ex_objc_type_table_is_empty
         DESCR  :
+
   - g_typed_table_size:
-      NAMES    : count
+      NAME     : count
       DESCR    : *g_typed_table_size_descr
       SUMMARY  : *g_typed_table_size_summary
-      SIGNATURE: |
-                 (size_t)count
+      SIGNATURE: (size_t)count
       RETURN:
         TYPES  : size_t
-        DESCR  : Number of rows in table.
+        DESCR  : *g_typed_table_size_return1_descr
       EXAMPLES:
-      - CODE   :  ex_cpp_type_table_size
+      - CODE   :  ex_objc_type_table_size
         DESCR  :
+
+
 - Table:
   METHODS:
   - g_typed_table_clear:
-      NAMES    : clear
+      NAME     : clear
       SUMMARY  : *g_typed_table_clear_summary
       DESCR    : *g_typed_table_clear_descr
-      SIGNATURE: |
-                 (void)clear;
+      SIGNATURE: (void)clear
       EXAMPLES:
-      - CODE   : ex_cpp_typed_table_clear
-        DESCR  : 
+      - CODE   : ex_objc_typed_table_clear
+        DESCR  :
+
   - g_typed_table_optimize:
-      NAMES    : optimize
+      NAME     : optimize
       SUMMARY  : *g_typed_table_optimize_summary
       DESCR    : *g_typed_table_optimize_descr
-      SIGNATURE: |
-                 (void)optimize
-  - g_dyn_table_opertator==:
-      NAMES    : isEqual
+      SIGNATURE: (void)optimize
+      EXAMPLES:
+      - CODE   : ex_objc_typed_table_clear
+        DESCR  :
+
+# TODO?  - g_typed_table_columns:
+# NOT - g_typed_table_columns_const:
+
+  - g_typed_table_operator==:
+      NAME     : isEqual
       SUMMARY  : *g_typed_table_operator_eq_summary
       DESCR    : *g_typed_table_operator_eq_descr
-      SIGNATURE: |
-                 (BOOL)isEqual:(TightdbTable *)other     
+      SIGNATURE: (BOOL)isEqual:(TightdbTable *)other     
       PARAMS:
       - NAME   : other
         TYPES  : TightdbTable
-        DESCR  : The other table.
+        DESCR  : *g_typed_table_operator_eq_parm1_descr
       RETURN:
-        TYPES  : bool
-        DESCR  : <code>true</code> if the two tables are equal, <code>false</code> otherwise.
+        TYPES  : BOOL
+        DESCR  : *g_typed_table_operator_eq_return_descr
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_operator==
+      - CODE   : ex_objc_typed_table_operator==
         DESCR  :
+
+# TODO? - g_typed_table_operator!=:
+
+# TODO: ColumnAccessor, RowAccessor ??
+
 - Rows:
   METHODS:
+# ??  - g_typed_table_operator_brackets:
+# ?? - g_typed_table_operator_brackets_const:
+
+# TODO:  - g_typed_table_front:
+# TODO: - g_typed_table_front:
+
+# TODO: g_typed_table_back
+# TODO: g_typed_table_back_const:
+
   - g_typed_table_add:
-      NAMES    : add*
-      SIGNATURE: |
-                 RowAccesor add(value, ...)
+      NAME     : add
+      SIGNATURE: RowAccesor add(value, ...)
       SUMMARY  : Add new row.
-      DESCR    : This method adds a new row to a typed table. <br> <br> The method is made available by a macro based on the table definition {@link g_typed_table_macros}. Note that the method name includes specific column names defined in the table definition. E.g. "CName1" will be replaced by the name of the first column in your table and so forth. Please refer to the example below.
-      SIGNATURE: |
-                 (void)addCName1:(CType1*)value1 CName2:(CType2*)value2 CName3:(CType3*)value3
+      DESCR    : |
+                 This method adds a new row to a typed table.
+                 
+                 The method is made available by a macro based on the table definition {@link g_typed_table_macros}. Note that the method name includes specific column names defined in the table definition. E.g. "CName1" will be replaced by the name of the first column in your table and so forth.
+                 Please refer to the example below.
+      SIGNATURE: (void)addCName1:(CType1*)value1 CName2:(CType2*)value2 CName3:(CType3*)value3
       PARAMS:
       - NAME   : "value1, value2, value3, &#133;"
         TYPES  : various
-        DESCR  : Values for all columns in the row.
+        DESCR  : *g_typed_table_values_for_all_columns_descr
       EXAMPLES:
-      - CODE   : ex_cpp_typed_table_add
+      - CODE   : ex_objc_typed_table_add
         DESCR  :
+
   - g_typed_table_add_empty_row:
-      NAMES    : addRow
-      SUMMARY  : This method will add one or more empty rows at the end of the table.
+      NAME     : addRow
+      SUMMARY  : >
+                 This method adds one empty row at the end of the table.
+                 Default values (e.g. 0 or "") will be inserted for all the columns in the row.
       DESCR    : Add an empty row.
-      SIGNATURE: |
-                 (size_t)addRow     
+      SIGNATURE: (size_t)addRow
       EXAMPLES:
-      - CODE   : ex_cpp_typed_table_add_empty_row
+      - CODE   : ex_objc_typed_table_add_empty_row
         DESCR  :
+
   - g_typed_table_insert:
-      NAMES    : insert*
-      SIGNATURE: |
-                 (void)insertAtIndex:(size_t)ndx CName1:(CType1*)value1 CName2:(CType2*)value2 CName3:(CType3*)value3
-      SUMMARY  : Insert a new row at a specified position.
-      DESCR    : This method adds a new row to a typed table at a specified position. <br> <br> This method is automatically made available by a macro taking as input the table definition {@link g_typed_table_macros}. Note that the method name includes specific column names defined in the table definition. E.g. "CName1" will be replaced by the name of the first column in your table and so forth. Please refer to the example below.
+      NAME     : insertAtIndex
+      SIGNATURE: (void)insertAtIndex:(size_t)ndx CName1:(CType1*)value1 CName2:(CType2*)value2 CName3:(CType3*)value3
+      SUMMARY  : *g_typed_table_insert_summary
+      DESCR    : |
+                 This method adds a new row to a typed table at a specified position.
+                 The types of the parameters must match the types of the columns in the table definition.
+                 The method is automatically made available by a macro taking as input the table definition {@link g_typed_table_macros}. Note that the method name includes specific column names defined in the table definition. E.g. "CName1" will be replaced by the name of the first column in your table and so forth.
+                 Please refer to the example below.
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
-        DESCR  : Insert position.
+        DESCR  : *g_typed_table_insert_position_descr
       - NAME   : "value1, value2, value3, &#133;"
         TYPES  : various
-        DESCR  : Values for all columns in the row.
+        DESCR  : *g_typed_table_values_for_all_columns_descr
+#TODO: Should it return a RowAccessor?
       EXAMPLES:
-      - CODE   : ex_cpp_typed_table_insert
+      - CODE   : ex_objc_typed_table_insert
         DESCR  :
+
+# TODO: g_typed_table_insert_empty_row
+
   - g_typed_table_remove_row:
       NAMES    : remove
       SUMMARY  : *g_typed_table_remove_row_summary
@@ -172,39 +206,69 @@ CATEGORIES:
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
-        DESCR  : Position of row to delete.
+        DESCR  : *g_typed_table_delete_position_descr
       EXAMPLES:
-      - CODE   : ex_cpp_typed_table_remove
+      - CODE   : ex_objc_typed_table_remove
         DESCR  :
+
   - g_typed_table_remove_last_row:
       NAMES    : removeLast
       SUMMARY  : *g_typed_table_remove_last_row_summary
       DESCR    : *g_typed_table_remove_last_row_descr
       SIGNATURE: (void)removeLast
       EXAMPLES:
-      - CODE   : ex_cpp_typed_table_remove_last_row
+      - CODE   : ex_objc_typed_table_remove_last_row
         DESCR  :
+
+
 - Searching:
   METHODS:
-  - g_find_first_bool:
-  - g_find_first_int:
-  - g_find_first_float:
-  - g_find_first_double:
-  - g_find_first_date:
-  - g_find_first_string:
-      NAMES    : find*
+  # TODO: g_typed_table_lookup:
+
+  - g_typed_table_find_first_bool:
+  - g_typed_table_find_first_int:
+  - g_typed_table_find_first_float:
+  - g_typed_table_find_first_double:
+  - g_typed_table_find_first_date:
+  - g_typed_table_find_first_string:
+      NAMES    : [find, find, find, find, find, find]
+      TITLE    : find
       SUMMARY  : *g_typed_table_find_first_xxx_summary
-      DESCR    : The method finds the first occurence of a given value in a column. <br> <br> This method is automatically made available by a macro taking as input the table definition {@link g_typed_table_macros}. The method can only be accessed through a property of the table object. The property <code>CName</code> represents the column to be searched. The type of <code>value</code> must correspond type of the column being accessed. Refer also to the example below.
-      SIGNATURE: |
-                 .CName (size_t)find: (CType*)value
-      CONST    : True
+      DESCR    : |
+                 The method finds the first occurence of a given value in a column.
+                 The method is automatically made available by a macro taking as input the table definition {@link g_typed_table_macros}. The method can only be accessed through a property of the table object. The property <code>CName</code> represents the column to be searched. The type of <code>value</code> must correspond type of the column being accessed. Refer also to the example below.
+      SIGNATURE: ".CName (size_t)find: (CType*)value"
       PARAMS:
       - NAME   : value
-        TYPES  : [bool, int64_t, float, double, time_t, const char*]
+        TYPES  : [BOOL, int64_t, float, double, time_t, NSString*]
         DESCR  : The value.
       RETURN:
         TYPES  : size_t
         DESCR  : "The row index or <code>tightdb::not_found</code> (equal to <code>size_t(-1)</code>) if there is no match."
       EXAMPLES:
-      - CODE   : ex_cpp_typed_table_find_first_xxx
+      - CODE   : ex_objc_typed_table_find_first_xxx
         DESCR  :
+
+# TODO: 
+#  - g_typed_table_find_all_bool:
+#  - g_typed_table_find_all_int:
+#  - g_typed_table_find_all_float:
+#  - g_typed_table_find_all_double:
+#  - g_typed_table_find_all_date:
+#  - g_typed_table_find_all_string:
+#  - g_typed_table_find_all_bool_const:
+#  - g_typed_table_find_all_float_const:
+#  - g_typed_table_find_all_double_const:
+#  - g_typed_table_find_all_int_const:
+#  - g_typed_table_find_all_date_const:
+#  - g_typed_table_find_all_string_const:
+
+#  - g_typed_table_get_sorted_view:
+#  - g_typed_table_get_sorted_view_const:
+
+#  - g_typed_table_distinct:
+#  - g_typed_table_distinct_const:
+
+#  - g_typed_table_where:
+#  - g_typed_table_where_const:
+

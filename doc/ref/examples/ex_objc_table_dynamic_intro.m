@@ -13,7 +13,10 @@ int main()
         
         // Creates a new table of the type defined above.
         
+        TightdbTable *table = [[TightdbTable alloc]init];
         
+        
+        table addColumn:Tightdb_Sub name:<#(NSString *)#>
         
         
     }
