@@ -362,21 +362,41 @@
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_String(table, col_name) \
 @implementation table##_QueryAccessor_##col_name \
+-(table##_Query *)equal:(NSString *)value \
+{ \
+    return (table##_Query *)[super equal:value]; \
+} \
 -(table##_Query *)equal:(NSString *)value caseSensitive:(BOOL)caseSensitive \
 { \
     return (table##_Query *)[super equal:value caseSensitive:caseSensitive]; \
+} \
+-(table##_Query *)notEqual:(NSString *)value \
+{ \
+    return (table##_Query *)[super notEqual:value]; \
 } \
 -(table##_Query *)notEqual:(NSString *)value caseSensitive:(BOOL)caseSensitive \
 { \
     return (table##_Query *)[super notEqual:value caseSensitive:caseSensitive]; \
 } \
+-(table##_Query *)beginsWith:(NSString *)value \
+{ \
+    return (table##_Query *)[super beginsWith:value]; \
+} \
 -(table##_Query *)beginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive \
 { \
     return (table##_Query *)[super beginsWith:value caseSensitive:caseSensitive]; \
 } \
+-(table##_Query *)endsWith:(NSString *)value \
+{ \
+    return (table##_Query *)[super endsWith:value]; \
+} \
 -(table##_Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive \
 { \
     return (table##_Query *)[super endsWith:value caseSensitive:caseSensitive]; \
+} \
+-(table##_Query *)contains:(NSString *)value \
+{ \
+    return (table##_Query *)[super contains:value]; \
 } \
 -(table##_Query *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive \
 { \
@@ -425,10 +445,45 @@
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Date(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorDate \
+-(table##_Query *)equal:(time_t)value; \
+-(table##_Query *)notEqual:(time_t)value; \
+-(table##_Query *)greater:(time_t)value; \
+-(table##_Query *)greaterEqual:(time_t)value; \
+-(table##_Query *)less:(time_t)value; \
+-(table##_Query *)lessEqual:(time_t)value; \
+-(table##_Query *)between:(time_t)from to:(time_t)to; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Date(table, col_name) \
 @implementation table##_QueryAccessor_##col_name \
+-(table##_Query *)equal:(time_t)value \
+{ \
+    return (table##_Query *)[super equal:value]; \
+} \
+-(table##_Query *)notEqual:(time_t)value \
+{ \
+    return (table##_Query *)[super notEqual:value]; \
+} \
+-(table##_Query *)greater:(time_t)value \
+{ \
+    return (table##_Query *)[super greater:value]; \
+} \
+-(table##_Query *)greaterEqual:(time_t)value \
+{ \
+    return (table##_Query *)[super greaterEqual:value]; \
+} \
+-(table##_Query *)less:(time_t)value \
+{ \
+    return (table##_Query *)[super less:value]; \
+} \
+-(table##_Query *)lessEqual:(time_t)value \
+{ \
+    return (table##_Query *)[super lessEqual:value]; \
+} \
+-(table##_Query *)between:(time_t)from to:(time_t)to \
+{ \
+    return (table##_Query *)[super between:from to:to]; \
+} \
 @end
 
 
