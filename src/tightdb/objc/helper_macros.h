@@ -353,10 +353,15 @@
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_String(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorString \
+-(table##_Query *)equal:(NSString *)value; \
 -(table##_Query *)equal:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
+-(table##_Query *)notEqual:(NSString *)value; \
 -(table##_Query *)notEqual:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
+-(table##_Query *)beginsWith:(NSString *)value; \
 -(table##_Query *)beginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
+-(table##_Query *)endsWith:(NSString *)value; \
 -(table##_Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
+-(table##_Query *)contains:(NSString *)value; \
 -(table##_Query *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 @end
 
