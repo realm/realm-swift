@@ -1,0 +1,81 @@
+<head>
+	<!-- put in: tightdb.css -->
+    <link rel="stylesheet" type="text/css" href="tightdb.css">
+    
+	<style type="text/css">
+	.pln{color:#000}@media screen{.str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun,.opn,.clo{color:#660}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec,.var{color:#606}.fun{color:red}}@media print,projection{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun,.opn,.clo{color:#440}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}pre.prettyprint{padding:2px;border:0px solid #888}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style-type:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}	
+
+	div.CodeExample { border: 2px solid #888; }
+    div.HideShowButton { color:blue;font-size:12px;text-decoration: underline}
+	</style>
+	
+	
+</head>
+
+<script src="http://www.tightdb.com/wp-content/themes/tightdb/js/google-code-prettify/prettify.js"></script>
+
+<body onload="prettyPrint();"
+
+
+<div  >
+<h2 >SharedGroup Class</h2>
+<p>Database files can be shared across running applications.</p>
+<p>When two threads or processes want to access the same database file, they must each create their own instance of SharedGroup.</p>
+<p>If the database file does not already exist, it will be created. When multiple threads are involved, it is safe to let the first thread, that gets to it, create the file.</p>
+<p>While at least one instance of SharedGroup exists for a specific database file, a lock file will exist too. The lock file will be placed in the same directory as the database file, and its name is derived by adding the suffix '.lock' to the name of the database file.</p>
+<p>Processes that share a database file must reside on the same host.</p>
+<p>Moreover, the class also provide a transactional interface to TightDB. Transactions are divided into read and write transactions. While read transactions do not modify the table and thereby the group, write transactions do. This division is important to remember as derived objects (tables, views, etc.) are either writable or not.</p></p>
+<div  >
+<table class="table table-bordered" border="1">
+<thead ><tr ><td colspan="2" ><h3 > Method Summary:</h3>
+</td colspan="2">
+</tr>
+</thead>
+<tbody ><tr ><td colspan="2" >Constructor</td colspan="2">
+</tr>
+<tr ><td ><code ><a  href="ref_objectivec_149_sharedgroup_sharedgroup.html">SharedGroup()</a></code></td>
+<td >Create a shared group.</td>
+</tr>
+<tr ><td colspan="2" >Write transactions</td colspan="2">
+</tr>
+<tr ><td ><code ><a  href="ref_objectivec_151_sharedgroup_writetransaction.html">writeTransaction()</a></code></td>
+<td >Initiate a transaction.</td>
+</tr>
+<tr ><td colspan="2" >Read transactions</td colspan="2">
+</tr>
+<tr ><td ><code ><a  href="ref_objectivec_153_sharedgroup_readtransaction.html">readTransaction()</a></code></td>
+<td >Initiate reading from a shared group.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div  >
+<h3 >Example:</h3>
+<dl >
+<div  class="Code">
+<span  style="display: inline;"><pre  class="prettyprint" lang-cpp  style="display:inline">Coming soon...</pre><br></span></div>
+</dl>
+</div>
+</div>
+</body>
+
+
+<script type="text/javascript">
+function hideshow(which, whichMsg) {
+  div = document.getElementById(whichMsg);
+  elements = document.getElementsByName(which);
+  for (i=0; i<elements.length; i++) {
+    e = elements[i];
+    if (e.style.display=="inline") {
+      e.style.display="none";
+      div.innerHTML = "Show less";
+    }
+    else {
+      e.style.display="inline";
+      div.innerHTML = "Show more";
+    }
+  }
+}
+</script>
+
+

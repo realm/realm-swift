@@ -1,0 +1,140 @@
+<head>
+	<!-- put in: tightdb.css -->
+    <link rel="stylesheet" type="text/css" href="tightdb.css">
+    
+	<style type="text/css">
+	.pln{color:#000}@media screen{.str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun,.opn,.clo{color:#660}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec,.var{color:#606}.fun{color:red}}@media print,projection{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun,.opn,.clo{color:#440}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}pre.prettyprint{padding:2px;border:0px solid #888}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style-type:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}	
+
+	div.CodeExample { border: 2px solid #888; }
+    div.HideShowButton { color:blue;font-size:12px;text-decoration: underline}
+	</style>
+	
+	
+</head>
+
+<script src="http://www.tightdb.com/wp-content/themes/tightdb/js/google-code-prettify/prettify.js"></script>
+
+<body onload="prettyPrint();"
+
+
+<div  >
+<h2 >Group Class</h2>
+<p>In order to store tables on disk or transfer tables over network, they must be serialized. The TightDB framework provides various methods including <a href="http://www.json.org">JSON</a> for single tables.</p>
+<p>The Group is a container for tables and it allows the tables to be serialized to disk and memory. The serialization format is highly optimized for TightDB tables, which implies that the consumed resources are low.</p>
+<p>A group can hold one or more tables. If a table is going to be serialized, you must create the table using the group. It is not possible to dynamically add a table to a group.</p>
+<p>Once a group has been serialized, it is possible to deserialize it using any supported programming language, at any supported operating system and at any supported hardware platform. This implies that the TightDB framework is true a polyglot framework where you can share data between applications.</p></p>
+<div  >
+<table class="table table-bordered" border="1">
+<thead ><tr ><td colspan="2" ><h3 > Method Summary:</h3>
+</td colspan="2">
+</tr>
+</thead>
+<tbody ><tr ><td colspan="2" >Constructor</td colspan="2">
+</tr>
+<tr ><td ><code ><a  href="ref_objectivec_140_group_group.html">Group()</a></code></td>
+<td >Creates a table group.</td>
+</tr>
+<tr ><td colspan="2" >Table</td colspan="2">
+</tr>
+<tr ><td ><code ><a  href="ref_objectivec_142_group_hastable.html">hasTable()</a></code></td>
+<td >Does group have table?</td>
+</tr>
+<tr ><td ><code ><a  href="ref_objectivec_143_group_gettable.html">getTable()</a></code></td>
+<td >Get a table.</td>
+</tr>
+<tr ><td colspan="2" >IO</td colspan="2">
+</tr>
+<tr ><td ><code ><a  href="ref_objectivec_145_group_write.html">write()</a></code></td>
+<td >Write this group of tables to a new file.</td>
+</tr>
+<tr ><td ><code ><a  href="ref_objectivec_146_group_writetomem.html">writeToMem()</a></code></td>
+<td >Write a group to an in-memory buffer.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div  >
+<h3 >Example:</h3>
+<dl >
+<div  class="Code">
+<span  style="display: inline;"><pre  class="prettyprint" lang-cpp  style="display:inline">
+#import &lt;tightdb/objc/group.h&gt;
+#import &lt;tightdb/objc/table.h&gt;
+#import &lt;tightdb/objc/tightdb.h&gt;
+
+TIGHTDB_TABLE_2(PeopleTable,
+                Name, String,
+                Age, Int)
+
+int main()
+{
+    @autoreleasepool {
+        
+        // Creates a group and uses it to create a new table.
+        
+        TightdbGroup *group = [TightdbGroup group];
+        PeopleTable *table = [group getTable:@"people" withClass:[PeopleTable class]];
+        
+        // Adds values to the table.
+        
+        [table addName:@"Mary" Age:14];
+        [table addName:@"Joe" Age:17];
+        
+        // Write the group (and the contained table) to a specified file.
+        
+        [group write:@"filename.tightdb"];
+        
+        // Adds another row to the table. Note the update is NOT persisted
+        // automatically.
+        
+        [table addName:@"Sam" Age:17];
+        
+        // IMPORTANT: do not overwrite the existing file!
+        
+        [group write:@"filename2.tightdb"];
+        
+        // Retrieves a in memory buffer from the group and uses it to create an
+        // NSData object.
+
+        size_t size;
+        const char *buffer = [group writeToMem:&size];
+        
+        // Calling free(..) currently recommeded.
+        
+        free((char*)buffer);
+        
+       
+        
+    }
+    
+}
+        
+
+
+
+</pre><br></span></div>
+</dl>
+</div>
+</div>
+</body>
+
+
+<script type="text/javascript">
+function hideshow(which, whichMsg) {
+  div = document.getElementById(whichMsg);
+  elements = document.getElementsByName(which);
+  for (i=0; i<elements.length; i++) {
+    e = elements[i];
+    if (e.style.display=="inline") {
+      e.style.display="none";
+      div.innerHTML = "Show less";
+    }
+    else {
+      e.style.display="inline";
+      div.innerHTML = "Show more";
+    }
+  }
+}
+</script>
+
+

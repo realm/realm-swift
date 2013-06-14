@@ -1,5 +1,5 @@
 #
-# Reference documentation data for language Java
+# Reference documentation data for Objective-C language binding
 #
 ID        : objc
 TITLE     : 'Objective-C'
@@ -46,7 +46,7 @@ IMPORTPATH: ../../tightdb/doc/ref_cpp/data
 
 CATEGORIES:                       # list global class-id in order of appearence
 - Typed Table:                    # Category header name
-  - typed_table                   # Global Class name. File: 'typed_table_ref.yaml'
+  - typed_table                   # Global Class name. File 'typed_table_ref.yaml'
   - typed_view
   - typed_query
 - Dynamic Table:
@@ -62,5 +62,7 @@ CATEGORIES:                       # list global class-id in order of appearence
 
 EXAMPLES  : 
 - DESCR   : 
-  CODE    : #ex_cpp_intro           # id to example code
+  CODE    : #ex_objc_intro           # id to example code
 
+## Checked:
+## dyn_table_ref

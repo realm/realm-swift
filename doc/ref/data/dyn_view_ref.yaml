@@ -9,63 +9,69 @@ DESCR      : *g_dyn_view_intro_descr
 SEE        :
 EXAMPLES   :
 - DESCR:
-  CODE: ex_cpp_dyn_view_intro
+  CODE: ex_objc_dyn_view_intro
 IGNORE     : []                   # List of method-ids to ignore
+
 CATEGORIES :
+
 - State:
   METHODS:
   - g_dyn_view_size:
-      NAMES    : count
+      NAME     : count
       SUMMARY  : *g_dyn_table_size_summary
       DESCR    : *g_dyn_table_size_descr
-      CONST    : True
       SIGNATURE: (size_t)count
       RETURN:
         TYPES  : size_t
         DESCR  : The number of rows.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_size
+      - CODE   : ex_objc_dyn_view_size
         DESCR  :
+
   - g_dyn_view_is_empty:
-      NAMES    : isEmpty
+      NAME     : isEmpty
       SUMMARY  : *g_dyn_view_is_empty_summary
       DESCR    : *g_dyn_view_is_empty_descr
       SIGNATURE: (BOOL)isEmpty
-      CONST    : True
       RETURN:
-        TYPES  : bool
+        TYPES  : BOOL
         DESCR  : <code>true</code> if empty, <code>false</code> otherwise.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_is_empty
+      - CODE   : ex_objc_dyn_view_is_empty
         DESCR  :
+
 - View:
   METHODS:
   - g_dyn_view_clear:
-      NAMES    : clear
+      NAME     : clear
       SUMMARY  : *g_dyn_table_clear_summary
       DESCR    : *g_dyn_view_clear_descr
       SIGNATURE: (void)clear
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_clear
+      - CODE   : ex_objc_dyn_view_clear
         DESCR  :
+
 - Columns:
   METHODS:
   - g_dyn_view_get_column_count:
-      NAMES    : getColumnCount (not yet implemented)
+      TODO     : soon
+
+      NAME     : getColumnCount 
       SUMMARY  : *g_dyn_table_get_column_count_summary
       DESCR    : *g_dyn_table_get_column_count_descr
-      CONST    : True
       RETURN:
         TYPES  : size_t
         DESCR  : The number of columns.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_get_column_count
+      - CODE   : ex_objc_dyn_view_get_column_count
         DESCR  :
+
   - g_dyn_view_get_column_name:
-      NAMES    : getColumnName (not yet implemented)
+      TODO     : later
+
+      NAME     : getColumnName
       SUMMARY  : *g_dyn_table_get_column_name_summary
       DESCR    : *g_dyn_table_get_column_name_descr
-      CONST    : True
       PARAMS:
       - NAME   : column_ndx
         TYPES  : size_t
@@ -74,13 +80,15 @@ CATEGORIES :
         TYPES  : const char*
         DESCR  : The column name.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_get_column_name
+      - CODE   : ex_objc_dyn_view_get_column_name
         DESCR  :
+
   - g_dyn_view_get_column_index:
-      NAMES    : getColumnIndex (not yet implemented)
+      TODO     : later
+
+      NAME     : getColumnIndex
       SUMMARY  : *g_dyn_table_get_column_index_summary
       DESCR    : *g_dyn_table_get_column_index_descr
-      CONST    : True
       PARAMS:
       - NAME   : column_name
         TYPES  : const char*
@@ -89,10 +97,13 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : The column index.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_get_column_index
+      - CODE   : ex_objc_dyn_view_get_column_index
         DESCR  :
+
   - g_dyn_view_get_column_type:
-      NAMES    : getColumnType (not yet implemented)
+      TODO     : later
+
+      NAME     : getColumnType
       SUMMARY  : *g_dyn_table_get_column_type_summary
       DESCR    : *g_dyn_table_get_column_type_descr
       CONST    : True
@@ -104,12 +115,14 @@ CATEGORIES :
         TYPES  : DataType
         DESCR  : The column type.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_get_column_type
+      - CODE   : ex_objc_dyn_view_get_column_type
         DESCR  :
+
+
 - Rows:
   METHODS:
   - g_dyn_view_get_source_ndx:
-      NAMES    : getSourceNdx
+      NAME     : getSourceNdx
       SUMMARY  : *g_dyn_view_get_source_ndx_summary
       DESCR    : *g_dyn_view_get_source_ndx_descr
       SIGNATURE: (size_t)getSourceNdx:(size_t)ndx
@@ -122,10 +135,11 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : The row index in the table.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_get_source_ndx
+      - CODE   : ex_objc_dyn_view_get_source_ndx
         DESCR  :
+
   - g_dyn_view_remove_row:
-      NAMES    : remove
+      NAME     : remove
       SUMMARY  : *g_dyn_table_remove_row_summary
       DESCR    : *g_dyn_table_remove_row_descr
       SIGNATURE: (void)remove:(size_t)ndx;
@@ -134,30 +148,44 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : Position of row to delete.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_remove
+      - CODE   : ex_objc_dyn_table_remove
         DESCR  :
+
   - g_dyn_view_remove_last_row:
-      NAMES    : removeLast
+      NAME     : removeLast
       SUMMARY  : *g_dyn_table_remove_last_row_summary
       DESCR    : *g_dyn_table_remove_last_row_descr
       SIGNATURE: (void)removeLast;
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_table_remove_last_row
+      - CODE   : ex_objc_dyn_table_remove_last_row
         DESCR  :
+
+
 - Values:
   METHODS:
-  - g_dyn_view_get_bool:
-  - g_dyn_view_get_int:
   - g_dyn_view_get_float:
+      TODO     : soon
   - g_dyn_view_get_double:
+      TODO     : soon
   - g_dyn_view_get_date:
+      NAME     : getDate
   - g_dyn_view_get_string:
+      NAME     : getString
   - g_dyn_view_get_binary:
+      TODO     : soon
   - g_dyn_view_get_mixed:
+      TODO     : soon
   - g_dyn_view_get_mixed_type:
-  - g_dyn_view_get_subtable:
+      TODO     : soon
   - g_dyn_view_get_subtable_const:
-      NAMES    : get* (not yet implemented for all types)
+      IGNORE   : ""
+  - g_dyn_view_get_subtable:
+      TODO     : soon
+  - g_dyn_view_get_bool:
+      NAME     : getBool
+  - g_dyn_view_get_int:
+      NAME     : get
+      TITLE    : get*
       SUMMARY  : *g_dyn_table_get_xxx_summary
       DESCR    : *g_dyn_table_get_xxx_descr
       SIGNATURE: |
@@ -174,21 +202,33 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : The row index.
       RETURN:
-        TYPES  : [bool, int64_t, float, double, time_t, const char*, BinaryData, Mixed, DataType, TableRef, ConstTableRef]
+        TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, BinaryData, Mixed, DataType, TableRef, ConstTableRef]
         DESCR  : The value.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_get_xxx
+      - CODE   : ex_objc_dyn_view_get_xxx
         DESCR  :
+
   - g_dyn_view_set_bool:
+      TODO     : soon
   - g_dyn_view_set_int:
+      TODO     : soon
   - g_dyn_view_set_float:
+      TODO     : soon
   - g_dyn_view_set_double:
+      TODO     : soon
   - g_dyn_view_set_enum:
+      TODO     : soon
   - g_dyn_view_set_date:
+      TODO     : soon
   - g_dyn_view_set_string:
+      TODO     : soon
   - g_dyn_view_set_binary:
+      TODO     : soon
   - g_dyn_view_set_mixed:
-      NAMES    : set* (not yet implemented)
+      TODO     : soon
+      NAME     : setMixed
+      
+      TITLE    : set*
       SUMMARY  : *g_dyn_table_set_xxx_summary
       DESCR    : *g_dyn_table_set_xxx_descr
       SIGNATURE: |
@@ -209,21 +249,23 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : The row index.
       - NAME   : value
-        TYPES  : [bool, int64_t, float, double, time_t, const char*, Mixed]
+        TYPES  : [BOOL, int64_t, float, double, time_t, const char*, Mixed]
         DESCR  : The value.
       - NAME   : len
         TYPES  : size_t
         DESCR  : Size in bytes of binary value.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_set_xxx
+      - CODE   : ex_objc_dyn_view_set_xxx
         DESCR  :
+
 - Sub-tables:
   METHODS:
   - g_dyn_view_get_subtable_size:
-      NAMES    : get_subtable_size (not yet implemented)
+      TODO     : later
+
+      NAME     : get_subtable_size
       SUMMARY  : *g_dyn_table_get_subtable_size_summary
       DESCR    : *g_dyn_table_get_subtable_size_descr
-      CONST    : true
       PARAMS:
       - NAME   : column_ndx
         TYPES  : size_t
@@ -235,10 +277,13 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : Number of rows.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_get_subtable
+      - CODE   : ex_objc_dyn_view_get_subtable
         DESCR  :
+
   - g_dyn_view_clear_subtable:
-      NAMES    : clear_subtable (not yet implemented)
+      TODO     : later
+
+      TITLE    : clear_subtable
       SUMMARY  : *g_dyn_table_clear_subtable_summary
       DESCR    : *g_dyn_table_clear_subtable_descr
       PARAMS:
@@ -249,17 +294,27 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : The row index.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_clear_subtable
+      - CODE   : ex_objc_dyn_view_clear_subtable
         DESCR  :
+
+
 - Searching:
   METHODS:
   - g_dyn_view_find_first_bool:
+      TODO     : soon
   - g_dyn_view_find_first_int:
+      TODO     : soon
   - g_dyn_view_find_first_float:
+      TODO     : soon
   - g_dyn_view_find_first_double:
+      TODO     : soon
   - g_dyn_view_find_first_date:
+      TODO     : soon
   - g_dyn_view_find_first_string:
-      NAMES    : find* (not yet implemented)
+      TODO     : soon
+      NAME     : findFirstString
+
+      TITLE    : find*
       SUMMARY  : *g_dyn_table_find_first_xxx_summary
       DESCR    : *g_dyn_table_find_first_xxx_descr
       SIGNATURE: |
@@ -275,27 +330,43 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : The column index.
       - NAME   : value
-        TYPES  : [bool, int64_t, float, double, time_t, const char*]
+        TYPES  : [BOOL, int64_t, float, double, time_t, const char*]
         DESCR  : The value.
       RETURN:
         TYPES  : size_t
         DESCR  : "The row index or <code>tightdb::not_found</code> (equal to <code>std::size_t(-1)</code>) if there is no match."
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_find_first_xxx
+      - CODE   : ex_objc_dyn_view_find_first_xxx
         DESCR  :
-  - g_dyn_view_find_all_bool:
-  - g_dyn_view_find_all_int:
-  - g_dyn_view_find_all_float:
-  - g_dyn_view_find_all_double:
-  - g_dyn_view_find_all_date:
-  - g_dyn_view_find_all_string:
+        
   - g_dyn_view_find_all_bool_const:
+      IGNORE   : ""
   - g_dyn_view_find_all_int_const:
+      IGNORE   : ""
   - g_dyn_view_find_all_float_const:
+      IGNORE   : ""
   - g_dyn_view_find_all_double_const:
+      IGNORE   : ""
   - g_dyn_view_find_all_date_const:
+      IGNORE   : ""
   - g_dyn_view_find_all_string_const:
-      NAMES    : findAll* (not yet implemented)
+      IGNORE   : ""
+
+  - g_dyn_view_find_all_bool:
+      NAME     : findAllBool
+  - g_dyn_view_find_all_int:
+      NAME     : findAllInt
+  - g_dyn_view_find_all_float:
+      NAME     : findAllFloat
+  - g_dyn_view_find_all_double:
+      NAME     : findAllDouble
+  - g_dyn_view_find_all_date:
+      NAME     : findAllDate
+  - g_dyn_view_find_all_string:
+      NAME     : findAllString
+      TODO     : soon
+
+      TITLE    : findAll*
       SUMMARY  : *g_dyn_table_find_all_xxx_summary
       DESCR    : *g_dyn_table_find_all_xxx_descr
       SIGNATURE: |
@@ -305,28 +376,24 @@ CATEGORIES :
                  TableView      find_all_string(size_t column_ndx, const char* value);
                  TableView      find_all_float(size_t column_ndx, float value);
                  TableView      find_all_double(size_t column_ndx, double value);
-
-                 ConstTableView find_all_int(size_t column_ndx, int64_t value) const;
-                 ConstTableView find_all_bool(size_t column_ndx, bool value) const;
-                 ConstTableView find_all_date(size_t column_ndx, time_t value) const;
-                 ConstTableView find_all_string(size_t column_ndx, const char* value) const;
-                 ConstTableView find_all_float(size_t column_ndx, float value) const;
-                 ConstTableView find_all_double(size_t column_ndx, double value) const;
       PARAMS:
       - NAME   : column_ndx
         TYPES  : size_t
         DESCR  : The column index.
       - NAME   : value
-        TYPES  : [bool, int64_t, float, double, time_t, const char*]
+        TYPES  : [BOOL, int64_t, float, double, time_t, const char*]
         DESCR  : The value.
       RETURN:
         TYPES  : [TableView, ConstTableView]
         DESCR  : The view.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_find_all_xxx
+      - CODE   : ex_objc_dyn_view_find_all_xxx
         DESCR  :
+
   - g_dyn_view_sort:
-      NAMES    : sort (not yet implemented)
+      TODO     : later
+
+      NAME     : sort
       SUMMARY  : *g_dyn_view_get_sorted_view_summary
       DESCR    : *g_dyn_view_get_sorted_view_desc
       PARAMS:
@@ -337,17 +404,22 @@ CATEGORIES :
         TYPES  : bool
         DESCR  : "If <code>true</code>, rows are sorted ascending. Default: <code>true</code>."
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_sort
+      - CODE   : ex_objc_dyn_view_sort
         DESCR  :
+
+
 - Aggregates:
   METHODS:
   - g_dyn_view_sum:
+      TODO     : later
   - g_dyn_view_sum_float:
+      TODO     : later
   - g_dyn_view_sum_double:
-      NAMES    : [sum (not yet implemented), sum_float, sum_double]
+      TODO     : later
+
+      NAMES    : [sum, sum_float, sum_double]
       SUMMARY  : *g_dyn_view_sum_summary
       DESCR    : *g_dyn_view_sum_descr
-      CONST    : True
       SIGNATURE: |
                  int64_t sum(size_t column_ndx) const;
                  double sum_float(size_t column_ndx) const;
@@ -360,12 +432,17 @@ CATEGORIES :
         TYPES  : [int64_t, float, double]
         DESCR  : The sum.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_sum
+      - CODE   : ex_objc_dyn_view_sum
         DESCR  :
+
   - g_dyn_view_maximum:
+      TODO     : later
   - g_dyn_view_maximum_float:
+      TODO     : later
   - g_dyn_view_maximum_double:
-      NAMES    : [max (not yet implemented), maximum_float, maximum_double]
+      TODO     : later
+
+      NAMES    : [maximum, maximum_float, maximum_double]
       SUMMARY  : *g_dyn_view_maximum_summary
       DESCR    : *g_dyn_view_maximum_descr
       CONST    : True
@@ -381,12 +458,17 @@ CATEGORIES :
         TYPES  : [int64_t, double]
         DESCR  : The maximum value.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_maximum
+      - CODE   : ex_objc_dyn_view_maximum
         DESCR  :
+
   - g_dyn_view_minimum:
+      TODO     : later
   - g_dyn_view_minimum_float:
+      TODO     : later
   - g_dyn_view_minimum_double:
-      NAMES    : [min (not yet implemented), minimum_float, minimum_double]
+      TODO     : later
+      
+      NAMES    : [minimum, minimum_float, minimum_double]
       SUMMARY  : *g_dyn_view_minimum_summary
       DESCR    : *g_dyn_view_minimum_descr
       CONST    : True
@@ -402,12 +484,16 @@ CATEGORIES :
         TYPES  : [int64_t, double]
         DESCR  : The minimum value.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_minimum
+      - CODE   : ex_objc_dyn_view_minimum
         DESCR  :
+
+
 - Dump:
   METHODS:
   - g_dyn_view_to_json:
-      NAMES    : to_json (not yet implemented)
+      TODO     : later
+
+      NAME     : to_json
       SUMMARY  : *g_dyn_table_to_json_summary
       DESCR    : *g_dyn_view_to_json_descr
       PARAMS:
@@ -415,13 +501,15 @@ CATEGORIES :
         TYPES  : std::ostream&
         DESCR  : Output stream.
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_to_json
+      - CODE   : ex_objc_dyn_view_to_json
         DESCR  :
+
   - g_dyn_view_to_string:
-      NAMES    : to_string (not yet implemented)
+      TODO     : later
+
+      NAME     : to_string
       SUMMARY  : *g_dyn_view_to_string_summary
       DESCR    : *g_dyn_view_to_string_descr
-      CONST    : true
       PARAMS:
       - NAME   : out
         TYPES  : std::ostream&
@@ -430,5 +518,5 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : "The number of rows to convert. Default: 500."
       EXAMPLES:
-      - CODE   : ex_cpp_dyn_view_to_string
+      - CODE   : ex_objc_dyn_view_to_string
         DESCR  :

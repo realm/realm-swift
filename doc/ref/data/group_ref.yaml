@@ -47,11 +47,11 @@ CATEGORIES:
         DESCR  : TBD
       EXAMPLES:
       - DESCR  :
-        CODE   : #ex_cpp_group_constructor_plain
+        CODE   : #ex_objc_group_constructor_plain
       - DESCR  :
-        CODE   : #ex_cpp_group_constructor_file
+        CODE   : #ex_objc_group_constructor_file
       - DESCR  :
-        CODE   : #ex_cpp_group_constructor_memory
+        CODE   : #ex_objc_group_constructor_memory
 - Table:
   METHODS:
   - g_group_has_table:
@@ -71,7 +71,7 @@ CATEGORIES:
         DESCR  : <code>true</code> if the table exits, otherwise <code>true</code>.
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_group_optional_table
+        CODE   : ex_objc_group_optional_table
   - g_group_get_table:
       NAMES    : getTable
       SUMMARY  : *g_group_get_table_summary
@@ -91,9 +91,9 @@ CATEGORIES:
         DESCR  : A table reference object.
       EXAMPLES:
       -  DESCR :
-         CODE  : ex_cpp_group_traverse
+         CODE  : ex_objc_group_traverse
       -  DESCR :
-         CODE  : ex_cpp_group_optional_table
+         CODE  : ex_objc_group_optional_table
       SEE      : "{@link g_group_has_table}"
 - IO:
   METHODS:
@@ -112,7 +112,7 @@ CATEGORIES:
         DESCR  : TBD
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_group_write_to_file
+        CODE   : ex_objc_group_write_to_file
   - g_group_write_to_mem:
       NAMES    : writeToMem
       SUMMARY  : *g_group_write_to_mem_summary
@@ -124,4 +124,4 @@ CATEGORIES:
         TYPES  : Group::BufferSpec
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_cpp_group_write_to_mem
+        CODE   : ex_objc_group_write_to_mem
