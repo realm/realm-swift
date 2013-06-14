@@ -2,7 +2,8 @@
 # Obj-C reference documentation for Query class
 #
 
-# NOTIMPLEMENTED accessors for Binaray, Subtable
+# NOTIMPLEMENTED accessors for Subtable
+# TODO: Accessors for Binary just added to API (by Kristian), now this file should be updated accordingly.
 # INCONSISTENCY greater vs greaterThan
 # UNCLEAR group description, findNext: the parameter name "last" was slightly confusing in same context as "next" as it was really the "stopAt" row.
 # TODO: describe which column-types the methods can be used on.
