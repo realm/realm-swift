@@ -399,7 +399,7 @@ CATEGORIES :
   - g_dyn_query_find_all_2:
       TODO     : later
       
-      NAMES    : findAll 
+      NAMES    : findAll
       DESCR    : *g_dyn_query_find_all_descr
       SUMMARY  : *g_dyn_query_find_all_summary
       SIGNATURE: |
