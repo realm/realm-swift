@@ -14,6 +14,10 @@ Objective-C/C++ compiler and GNU make. The Objective-C language
 binding is thoroughly tested with Clang. It is known to work with
 Clang 3.0 and newer.
 
+If you are going to modify the Objective-C language binding, you will
+need Cheetah for Python (http://www.cheetahtemplate.org). It is needed
+because some source files are generated.
+
 Currently, the Objective-C binding is availble only on Mac OS X (and
 iPhone). The following is a suggestion of how to install the
 prerequisites on Mac OS X 10.7 and 10.8:
@@ -28,6 +32,14 @@ have Xcode installed, and, if so, what version it is:
 
 Make sure you also install "Command line tools" found under the
 preferences pane "Downloads" in Xcode.
+
+Download the latest version of Python Cheetah
+(https://pypi.python.org/packages/source/C/Cheetah/Cheetah-2.4.4.tar.gz),
+then:
+
+    tar xf Cheetah-2.4.4.tar.gz
+    cd Cheetah-2.4.4/
+    sudo python setup.py install
 
 
 Building, testing, and installing
