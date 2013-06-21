@@ -102,7 +102,10 @@ TIGHTDB_TABLE_2(QueryTable,
 
     //------------------------------------------------------
 
+    NSFileManager *fm = [NSFileManager defaultManager];
+
     // Write to disk
+    [fm removeItemAtPath:@"employees.tightdb" error:NULL];
     [group write:@"employees.tightdb"];
 
     // Load a group from disk (and print contents)

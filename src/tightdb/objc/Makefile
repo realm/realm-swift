@@ -43,8 +43,12 @@ libtightdb_objc_a_VERSION = 1:0:0
 include ../../../generic.mk
 
 # Code generation
+ifeq ($(DISABLE_CHEETAH_CODE_GEN),)
 $(TIGHTDB_H): tightdb.h.sh tightdb.h.py
 	$(SHELL) tightdb.h.sh $(TIGHTDB_H)
+endif
+
+# Code generation
 
 uninstall/extra:
 	$(RM) $(DESTDIR)$(includedir)/tightdb/objc/*.h
