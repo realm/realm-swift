@@ -9,8 +9,25 @@ library has already been installed.
 Prerequisites
 -------------
 
-On OS X 10.7 and 10.8 you need Xcode. You also need the command line
-tools, which can be installed via Xcode.
+You need the standard set of build tools. This includes an
+Objective-C/C++ compiler and GNU make. The Objective-C language
+binding is thoroughly tested with Clang. It is known to work with
+Clang 3.0 and newer.
+
+Currently, the Objective-C binding is availble only on Mac OS X (and
+iPhone). The following is a suggestion of how to install the
+prerequisites on Mac OS X 10.7 and 10.8:
+
+Clang comes with Xcode, so install Xcode if it is not already
+installed. If you have a version that preceeds 4.2, we recommend that
+you upgrade. This will ensure that the Clang version is at least
+3.0. Run the following command in the command prompt to see if you
+have Xcode installed, and, if so, what version it is:
+
+    xcodebuild -version
+
+Make sure you also install "Command line tools" found under the
+preferences pane "Downloads" in Xcode.
 
 
 Building, testing, and installing
