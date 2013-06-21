@@ -19,6 +19,7 @@ using namespace std;
 @property(nonatomic) tightdb::Group *group;
 @property(nonatomic) BOOL readOnly;
 @end
+
 @implementation TightdbGroup
 @synthesize group = _group;
 @synthesize readOnly = _readOnly;
