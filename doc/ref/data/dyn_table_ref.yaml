@@ -91,7 +91,7 @@ CATEGORIES :
         DESCR  : *g_dyn_table_operator_eq_table_descr
       RETURN:
         TYPES  : BOOL
-        DESCR  : g_dyn_table_operator_eq_return_descr
+        DESCR  : *g_dyn_table_operator_eq_return_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_operator==
         DESCR  :
@@ -109,7 +109,7 @@ CATEGORIES :
         DESCR  : *g_dyn_table_operator_eq_table_descr
       RETURN:
         TYPES  : BOOL
-        DESCR  : g_dyn_table_operator_eq_return_descr
+        DESCR  : *g_dyn_table_operator_eq_return_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_operator==
         DESCR  :
@@ -158,7 +158,6 @@ CATEGORIES :
       SUMMARY  : *g_dyn_table_get_column_index_summary
       DESCR    : *g_dyn_table_get_column_index_descr
       SIGNATURE: (size_t)getColumnIndex:(NSString *)name
-      CONST    : True
       PARAMS:
       - NAME   : name
         TYPES  : NSString *
