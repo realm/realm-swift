@@ -1,8 +1,11 @@
 *~
 .DS_Store
-# Test output
-/employees.tightdb
-/table_test.tbl
 
+# sh build.sh config
+/config
+
+# sh build.sh test
+/employees.tightdb
+/table_test.tightdb
 
 /doc/ref/*.html

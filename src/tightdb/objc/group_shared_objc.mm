@@ -1,10 +1,3 @@
-//
-//  group_shared.mm
-//  Tightdb_objc
-//
-//  Created by Tightdb on 11/14/12.
-//  Copyright (c) 2012 Tightdb. All rights reserved.
-//
 #include <tightdb/group_shared.hpp>
 
 #import <tightdb/objc/group_shared.h>
