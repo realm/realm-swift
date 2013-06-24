@@ -130,10 +130,10 @@ CATEGORIES :
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
-        DESCR  : The row index in the view
+        DESCR  : *g_dyn_view_get_source_ndx_parm1_descr
       RETURN:
         TYPES  : size_t
-        DESCR  : The row index in the table.
+        DESCR  : *g_dyn_view_get_source_ndx_return1_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_get_source_ndx
         DESCR  :
@@ -146,7 +146,7 @@ CATEGORIES :
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
-        DESCR  : Position of row to delete.
+        DESCR  : *g_dyn_view_remove_row_parm1_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_remove
         DESCR  :
@@ -324,7 +324,6 @@ CATEGORIES :
                  size_t find_first_double(size_t column_ndx, double value) const;
                  size_t find_first_date(size_t column_ndx, time_t value) const;
                  size_t find_first_string(size_t column_ndx, const char* value) const;
-      CONST    : True
       PARAMS:
       - NAME   : column_ndx
         TYPES  : size_t
@@ -365,7 +364,6 @@ CATEGORIES :
   - g_dyn_view_find_all_string:
       NAME     : findAllString
       TODO     : soon
-
       TITLE    : findAll*
       SUMMARY  : *g_dyn_table_find_all_xxx_summary
       DESCR    : *g_dyn_table_find_all_xxx_descr
