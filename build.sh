@@ -96,7 +96,7 @@ EOF
         echo "ERROR: Failed to read configuration parameter '$name'" 1>&2
         return 1
     fi
-    value="$(printf "%s\n" "$line" | cut -d: -f2)" || return 1
+    value="$(printf "%s\n" "$line" | cut -d: -f2-)" || return 1
     value="$(printf "%s\n" "$value" | sed 's/^ *//')" || return 1
     printf "%s\n" "$value"
 }
