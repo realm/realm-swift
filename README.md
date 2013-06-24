@@ -16,7 +16,7 @@ Clang 3.0 and newer.
 
 If you are going to modify the Objective-C language binding, you will
 need Cheetah for Python (http://www.cheetahtemplate.org). It is needed
-because some source files are generated.
+because some source files are generated from Cheetah templates.
 
 Currently, the Objective-C binding is availble only on Mac OS X (and
 iPhone). The following is a suggestion of how to install the
