@@ -1,11 +1,9 @@
 SUBDIRS = test
 test_DEPS = .
 
-TIGHTDB_H = tightdb.h
+GENERATED_SOURCES = tightdb.h
 
-GENERATED_SOURCES = $(TIGHTDB_H)
-
-INST_HEADERS = type.h cursor.h group.h query.h table.h group_shared.h helper_macros.h $(TIGHTDB_H)
+INST_HEADERS = type.h cursor.h group.h query.h table.h group_shared.h helper_macros.h tightdb.h
 
 lib_LIBRARIES = libtightdb-objc.a
 
@@ -44,8 +42,8 @@ include ../../../generic.mk
 
 # Code generation
 ifeq ($(DISABLE_CHEETAH_CODE_GEN),)
-$(TIGHTDB_H): tightdb.h.sh tightdb.h.py
-	$(SHELL) tightdb.h.sh $(TIGHTDB_H)
+tightdb.h: tightdb.h.cheetah
+	$(SHELL) cheetah.sh $< $@
 endif
 
 # Code generation
