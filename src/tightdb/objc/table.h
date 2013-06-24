@@ -118,6 +118,7 @@
 -(BOOL)isEmpty;
 -(size_t)count;
 -(size_t)addRow;
+-(size_t)addRows:(size_t)rowCount;
 -(void)clear;
 -(void)remove:(size_t)ndx;
 -(void)removeLast;
