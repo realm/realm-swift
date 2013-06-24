@@ -14,15 +14,18 @@ DESCR      : *g_group_descr
 SEE        :
 EXAMPLES:
 - DESCR    :
-  CODE     : #ex_objc_group_intro
+  CODE     : ex_objc_group_intro
 IGNORE     : []                   # List of method-ids to ignore
 CATEGORIES:
 - Constructor:
   METHODS:
   - g_group_constructor_plain:
+      NAME     : group
   - g_group_constructor_file:
+      NAME     : groupWithFilename
   - g_group_constructor_memory:
-      NAMES    : Group
+      NAME     : groupWithBuffer
+      TITLE    : group*
       DESCR    : *g_group_constructor_descr
       SUMMARY  : *g_group_constructor_summary
       SIGNATURE: |
@@ -31,17 +34,17 @@ CATEGORIES:
                  (TightdbGroup *)group;
       PARAMS:
       - NAME   : filename
-        TYPES  : const std::string&
-        DESCR  : Filesystem path of the TightDB database file to be opened.
+        TYPES  : NSString
+        DESCR  : *g_group_constructor_memory_parm1_descr
       - NAME   : data
-        TYPES  : Group::BufferSpec
-        DESCR  : A pointer to an in-memory binary encoded representation of a group.
+        TYPES  : const char*
+        DESCR  : *g_group_constructor_memory_parm3_descr
       - NAME   : size
         TYPES  : Group::BufferSpec
         DESCR  : Size of the binary which <code>data</code> points at.
       RETURN:
-        TYPES  : Group
-        DESCR  : A - possibly empty - group.
+        TYPES  : TightdbGroup
+        DESCR  : *g_group_constructor_memory_return1_descr
       THROWS:
       - EXCEPT : TBD
         DESCR  : TBD
@@ -55,21 +58,21 @@ CATEGORIES:
 - Table:
   METHODS:
   - g_group_has_table:
-      NAMES    : hasTable
+      NAME     : hasTable
       SUMMARY  : *g_group_has_table_summary
       DESCR    : *g_group_has_table_descr
       SIGNATURE: (BOOL)hasTable:(NSString *)name withClass:(Class)obj;
       PARAMS:
       - NAME   : name
-        TYPES  : NSString
-        DESCR  : Name of the table you wish to look for.
+        TYPES  : NSString *
+        DESCR  : *g_group_has_table_parm1_descr
       - NAME   : obj
         TYPES  : Class
         DESCR  : Class type for compatibility test.
       RETURN:
-        TYPES  : bool
-        DESCR  : <code>true</code> if the table exits, otherwise <code>true</code>.
-      EXAMPLES:
+        TYPES  : BOOL
+        DESCR  : <code>YES</code> if the table exits, otherwise <code>NO</code>.
+      EXAMPLES :
       - DESCR  :
         CODE   : ex_objc_group_optional_table
   - g_group_get_table:
@@ -82,13 +85,13 @@ CATEGORIES:
       PARAMS:
       - NAME   : name
         TYPES  : NSString
-        DESCR  : Name of the table you wish to look for.
+        DESCR  : *g_group_get_table_parm1_descr
       - NAME   : obj
         TYPES  : Class
-        DESCR  : Specifies a static type for the returned table accessor.
+        DESCR  : *g_group_get_table_parm2_descr
       RETURN:
-        TYPES  : [TableRef, ConstTableRef]
-        DESCR  : A table reference object.
+        TYPES  : TightdbTable *
+        DESCR  : *g_group_get_table_return1_descr
       EXAMPLES:
       -  DESCR :
          CODE  : ex_objc_group_traverse
@@ -105,8 +108,8 @@ CATEGORIES:
                  (void)write:(NSString *)filePath;
       PARAMS:
       - NAME   : filePath
-        TYPES  : const std::string&
-        DESCR  : A filesystem path.
+        TYPES  : NSString *
+        DESCR  : *g_group_write_to_file_parm1_descr
       THROWS:
       - EXCEPT : TBD
         DESCR  : TBD
@@ -121,7 +124,7 @@ CATEGORIES:
                  (const char*)writeToMem:(size_t*)size;
       RETURN:
         DESCR  : The allocated buffer. You will have to call free() when you are done with it.
-        TYPES  : Group::BufferSpec
+        TYPES  : const char*
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_group_write_to_mem
