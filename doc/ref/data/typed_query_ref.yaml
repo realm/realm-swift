@@ -202,10 +202,10 @@ CATEGORIES :
       PARAMS:
       - NAME   : from
         TYPES  : [int64_t, float, double, time_t]
-        DESCR  : Lower bound of range.
+        DESCR  : *g_typed_query_between_parm1_descr
       - NAME   : to
         TYPES  : [int64_t, time_t]
-        DESCR  : Upper bound of range.
+        DESCR  : *g_typed_query_between_parm2_descr
       RETURN:
         TYPES  : TableName_Query *
         DESCR  : *g_typed_query_query_object_return_descr
@@ -226,7 +226,7 @@ CATEGORIES :
       SUMMARY  : *g_typed_query_startsWith_summary
       PARAMS:
       - NAME   : value
-        TYPES  : NSString*
+        TYPES  : NSString *
         DESCR  : *g_typed_query_value_descr
       - NAME   : caseSensitive
         TYPES  : BOOL
@@ -251,7 +251,7 @@ CATEGORIES :
       SUMMARY  : *g_typed_query_endsWith_summary
       PARAMS:
       - NAME   : value
-        TYPES  : NSString*
+        TYPES  : NSString *
         DESCR  : *g_typed_query_value_descr
       - NAME   : caseSensitive
         TYPES  : BOOL
@@ -388,10 +388,7 @@ CATEGORIES :
                  .CName (double)sum
       RETURN:
         TYPES  : [int64_t, double, double]
-        DESCR  : >
-                 The sum of the values in the column <code>CName</code> (within the query result). 
-                 The return type is <code>double</code> in case the column is typed as 
-                 <code>float</code> or <code>double</code>.
+        DESCR  : *g_typed_query_sum_return_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_sum
@@ -432,7 +429,7 @@ CATEGORIES :
                  .CName (double)max
       RETURN:
         TYPES  : [int64_t, float, double]
-        DESCR  : The highest value in the column <code>CName</code>.
+        DESCR  : *g_typed_query_maximum_return1_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_maximum
@@ -461,7 +458,7 @@ CATEGORIES :
                  .CName (double)min
       RETURN:
         TYPES  : [int64_t, float, double]
-        DESCR  : The lowest value in the column <code>CName</code>.
+        DESCR  : *g_typed_query_minimum_return1_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_manimum
@@ -483,7 +480,7 @@ CATEGORIES :
       SIGNATURE: .CName (double)avg
       RETURN:
         TYPES  : double
-        DESCR  : The average of all values in the column <code>CName</code>.
+        DESCR  : *g_typed_query_average_return1_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_average
@@ -496,7 +493,7 @@ CATEGORIES :
       SUMMARY  : *g_typed_query_remove_summary
       RETURN:
         TYPES  : size_t
-        DESCR  : The number of rows removed.
+        DESCR  : *g_typed_query_remove_return1_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_remove

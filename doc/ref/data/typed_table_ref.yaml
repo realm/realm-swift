@@ -33,13 +33,13 @@ CATEGORIES:
       PARAMS:
       - NAME   : "*"
         TYPES  : text
-        DESCR  : "Number of columns in table (range: 1 to 15)."
+        DESCR  : *g_typed_table_macros_parm1_descr
       - NAME   : ClassName
         TYPES  : text
-        DESCR  : Name of the new class.
+        DESCR  : *g_typed_table_macros_parm2_descr
       - NAME   : ColumnName
         TYPES  : text
-        DESCR  : Name of column.
+        DESCR  : *g_typed_table_macros_parm3_descr
       - NAME   : ColumnType
         TYPES  : text
 # TODO: Fix types
@@ -56,11 +56,14 @@ CATEGORIES:
                  <tr><td>Bool</td>              <td>Boolean</td>      <td>(BOOL)</td></tr>
                  <tr><td>String </td>           <td>Text</td>         <td>(NSString*)</td></tr>
                  <tr><td>Date</td>              <td>UTC datetime</td> <td>(time_t)</td></tr>
-                 <tr><td>Enum&lt;T&gt;</td>     <td>Enum</td>         <td>(T as enum type)</td></tr>
-                 <tr><td>Subtable&lt;T&gt;</td> <td>Sub-tables</td>   <td>(T as table class)</td></tr>
                  <tr><td>Mixed</td>             <td>Dynamic</td>      <td>(contains any of the above)</td></tr>
                  </tbody>
                  </table>
+
+#                Not supported yet:
+#                <tr><td>Enum&lt;T&gt;</td>     <td>Enum</td>         <td>(T as enum type)</td></tr>
+#                <tr><td>Subtable&lt;T&gt;</td> <td>Sub-tables</td>   <td>(T as table class)</td></tr>
+
       EXAMPLES:
       - CODE   : ex_objc_typed_table_macros
         DESCR  :
@@ -122,7 +125,7 @@ CATEGORIES:
       SIGNATURE: (BOOL)isEqual:(TightdbTable *)other     
       PARAMS:
       - NAME   : other
-        TYPES  : TightdbTable
+        TYPES  : TightdbTable *
         DESCR  : *g_typed_table_operator_eq_parm1_descr
       RETURN:
         TYPES  : BOOL
@@ -240,11 +243,11 @@ CATEGORIES:
       SIGNATURE: ".CName (size_t)find: (CType*)value"
       PARAMS:
       - NAME   : value
-        TYPES  : [BOOL, int64_t, float, double, time_t, NSString*]
-        DESCR  : The value.
+        TYPES  : [BOOL, int64_t, float, double, time_t, NSString *]
+        DESCR  : *g_typed_table_lookup_parm1_descr
       RETURN:
         TYPES  : size_t
-        DESCR  : "The row index or <code>tightdb::not_found</code> (equal to <code>size_t(-1)</code>) if there is no match."
+        DESCR  : "The row index or <code>TBD</code> (equal to <code>size_t(-1)</code>) if there is no match."
       EXAMPLES:
       - CODE   : ex_objc_typed_table_find_first_xxx
         DESCR  :

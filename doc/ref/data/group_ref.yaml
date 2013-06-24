@@ -64,7 +64,7 @@ CATEGORIES:
       SIGNATURE: (BOOL)hasTable:(NSString *)name withClass:(Class)obj;
       PARAMS:
       - NAME   : name
-        TYPES  : NSString
+        TYPES  : NSString *
         DESCR  : *g_group_has_table_parm1_descr
       - NAME   : obj
         TYPES  : Class
@@ -90,7 +90,7 @@ CATEGORIES:
         TYPES  : Class
         DESCR  : *g_group_get_table_parm2_descr
       RETURN:
-        TYPES  : TightdbTable
+        TYPES  : TightdbTable *
         DESCR  : *g_group_get_table_return1_descr
       EXAMPLES:
       -  DESCR :
@@ -108,7 +108,7 @@ CATEGORIES:
                  (void)write:(NSString *)filePath;
       PARAMS:
       - NAME   : filePath
-        TYPES  : NSString
+        TYPES  : NSString *
         DESCR  : *g_group_write_to_file_parm1_descr
       THROWS:
       - EXCEPT : TBD
