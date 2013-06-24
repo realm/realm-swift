@@ -26,10 +26,9 @@ CATEGORIES :
       SUMMARY  : *g_typed_table_size_summary
       DESCR    : *g_typed_table_size_descr
       SIGNATURE: (size_t)count
-      CONST    : True
       RETURN:
         TYPES  : size_t
-        DESCR  : The number of rows.
+        DESCR  : *g_typed_view_size_return1_descr
       EXAMPLES:
       - CODE   : ex_objc_typed_view_size
         DESCR  :
@@ -38,10 +37,9 @@ CATEGORIES :
       SUMMARY  : *g_typed_view_is_empty_summary
       DESCR    : *g_typed_view_is_empty_descr
       SIGNATURE: (BOOL)isEmpty
-      CONST    : True
       RETURN:
-        TYPES  : bool
-        DESCR  : <code>true</code> if empty, <code>false</code> otherwise.
+        TYPES  : BOOL
+        DESCR  : <code>YES</code> if empty, <code>NO</code> otherwise.
       EXAMPLES:
       - CODE   : ex_objc_typed_view_is_empty
         DESCR  :
@@ -62,14 +60,13 @@ CATEGORIES :
       SUMMARY  : *g_typed_view_get_source_ndx_summary
       DESCR    : *g_typed_view_get_source_ndx_descr
       SIGNATURE: (size_t)getSourceNdx:(size_t)ndx
-      CONST    : True
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
-        DESCR  : The row index in the view.
+        DESCR  : *g_typed_view_parameter_row_position_descr
       RETURN:
         TYPES  : size_t
-        DESCR  : The row index in the table.
+        DESCR  : *g_typed_view_return_row_position_descr
       EXAMPLES:
       - CODE   : ex_objc_typed_view_get_source_ndx
         DESCR  :
@@ -81,7 +78,7 @@ CATEGORIES :
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
-        DESCR  : Position of row to delete.
+        DESCR  : *g_typed_view_parameter_row_position_descr
       EXAMPLES:
       - CODE   : ex_objc_typed_table_remove
         DESCR  :
@@ -104,16 +101,15 @@ CATEGORIES :
       TODO     : soon
 
       NAME     : getSubtableSize
-      SUMMARY  : Get size of subtable.
-      DESCR    : This method gets the size (number of rows) of a subtable.
-      CONST    : true
+      SUMMARY  : *g_typed_view_get_subtable_size_summary
+      DESCR    : *g_typed_view_get_subtable_size_descr
       PARAMS:
       - NAME   : row_ndx
         TYPES  : size_t
-        DESCR  : The row index.
+        DESCR  : *g_typed_view_parameter_row_position_descr
       RETURN:
         TYPES  : size_t
-        DESCR  : Number of rows.
+        DESCR  : *g_typed_view_size_return1_descr
       EXAMPLES:
       - CODE   : ex_objc_typed_view_get_subtable
         DESCR  :
