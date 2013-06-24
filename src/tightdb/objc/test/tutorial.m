@@ -139,7 +139,10 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"--- Serialization ---");
     //------------------------------------------------------
 
+    NSFileManager *fm = [NSFileManager defaultManager];
+
     // Write the group to disk
+    [fm removeItemAtPath:@"employees.tightdb" error:NULL];
     [group write:@"employees.tightdb"];
 
     // Load a group from disk (and print contents)

@@ -40,12 +40,15 @@ TIGHTDB_TABLE_2(TestTableGroup,
 
 - (void)testGroup
 {
+    NSFileManager *fm = [NSFileManager defaultManager];
+
     // Create empty group and serialize to disk
     TightdbGroup *toDisk = [TightdbGroup group];
-    [toDisk write:@"table_test.tbl"];
+    [fm removeItemAtPath:@"table_test.tightdb" error:NULL];
+    [toDisk write:@"table_test.tightdb"];
 
     // Load the group
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:@"table_test.tbl"];
+    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:@"table_test.tightdb"];
     if (!fromDisk)
         STFail(@"From disk not valid");
 
