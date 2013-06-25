@@ -42,8 +42,8 @@ int main()
         // Print the table contents.
         
         for(int row = 0; row<[table count]; row++) {
-            NSLog(@"Name: %@",[table getString:0 ndx:row]);
-            NSLog(@"Age: %lld",[table get:1 ndx:row]);
+            NSLog(@"Name: %@",[table getString:NAME ndx:row]);
+            NSLog(@"Age: %lld",[table get:AGE ndx:row]);
         }
     }
 }
