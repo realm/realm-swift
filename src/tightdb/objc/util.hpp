@@ -46,6 +46,17 @@ private:
     std::size_t m_size;
 };
 
+enum TightDbErr {
+    TDBErrOk = 0,
+    TDBErrFail = 1
+};
+
+inline NSError *makeTightDbError(NSString *domain, TightDbErr code, NSString *desc)
+{
+    NSMutableDictionary* details = [NSMutableDictionary dictionary];
+    [details setValue:desc forKey:NSLocalizedDescriptionKey];
+    return [NSError errorWithDomain:domain code:code userInfo:details];
+}
 
 inline NSString* to_objc_string(tightdb::StringData s)
 {

@@ -6,6 +6,8 @@
 
 # sh build.sh test
 /employees.tightdb
+/people.tightdb
+/peopleErr.tightdb
 /table_test.tightdb
 
 /doc/ref/html/*.html
