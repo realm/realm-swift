@@ -41,13 +41,21 @@ using namespace std;
     return group;
 }
 
+
 +(TightdbGroup *)groupWithFilename:(NSString *)filename
+{
+    return [self groupWithFilename:filename error:nil];
+}
+
++(TightdbGroup *)groupWithFilename:(NSString *)filename error:(NSError **)error
 {
     tightdb::Group* group;
     try {
         group = new tightdb::Group(tightdb::StringData(ObjcStringAccessor(filename)));
     }
     catch (...) {
+        if (error)
+            *error = makeTightDbError(@"com.tightdb.group", TDBErrFail, @"Open file failure");
         // FIXME: Diffrent exception types mean different things. More
         // details must be made available. We should proably have
         // special catches for at least these:

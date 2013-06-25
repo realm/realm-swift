@@ -5,7 +5,12 @@
 /config
 
 # sh build.sh test
-/employees.tightdb
-/table_test.tightdb
+employees.tightdb
+people.tightdb
+peopleErr.tightdb
+table_test.tightdb
 
 /doc/ref/html/*.html
+
+# XCode
+xcuserdata

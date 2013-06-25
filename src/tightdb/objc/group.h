@@ -25,6 +25,7 @@
 
 @interface TightdbGroup: NSObject
 +(TightdbGroup *)groupWithFilename:(NSString *)filename;
++(TightdbGroup *)groupWithFilename:(NSString *)filename error:(NSError **)error;
 +(TightdbGroup *)groupWithBuffer:(const char*)data size:(size_t)size;
 +(TightdbGroup *)group;
 
