@@ -652,10 +652,8 @@ CATEGORIES :
   - g_dyn_table_where_const:
       IGNORE   : ""
   - g_dyn_table_where:
-      TODO     : later
-      
       NAME     : where
-      SIGNATURE: Query where()
+      SIGNATURE: (TightdbQuery *) where
       SUMMARY  : *g_dyn_table_where_summary
       DESCR    : *g_dyn_table_where_descr
       RETURN:

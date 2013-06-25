@@ -136,4 +136,72 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 //    [[[table where].MixedCol notEqual:mixInt1].BoolCol equal:NO];
 }
 
+#define BOOL_COL 0
+#define INT_COL 1
+#define FLOAT_COL 2
+#define DOUBLE_COL 3
+#define STRING_COL 4
+#define BINARY_COL 5
+#define DATE_COL 6
+#define MIXED_COL 7
+
+- (void) testDynamic 
+{
+  
+        TightdbTable *table = [[TightdbTable alloc]init];
+  
+        [table addColumn:tightdb_Bool name:@"BoolCol"];
+        [table addColumn:tightdb_Int name:@"IntCol"];
+        [table addColumn:tightdb_Float name:@"FloatCol"];
+        [table addColumn:tightdb_Double name:@"DoubleCol"];
+        [table addColumn:tightdb_String name:@"StringCol"];
+        [table addColumn:tightdb_Binary name:@"BinaryCol"];
+        [table addColumn:tightdb_Date name:@"DateCol"];
+        [table addColumn:tightdb_Mixed name:@"MixedCol"];
+        // TODO: add Enum<T> and Subtable<T> when possible.      
+ 
+        const char bin[4] = { 0, 1, 2, 3 };
+        time_t timeNow = [[NSDate date] timeIntervalSince1970];
+        TightdbMixed *mixInt1   = [TightdbMixed mixedWithInt64:1];
+        TightdbMixed *mixString   = [TightdbMixed mixedWithString:@"foo"];
+        TightdbBinary *bin1 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin / 2];
+        TightdbBinary *bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
+        
+        [table addRows:2];
+
+        [table setBool:BOOL_COL ndx:0 value:YES];
+        [table setBool:BOOL_COL ndx:1 value:NO];
+
+        [table set:INT_COL ndx:0 value:0];
+        [table set:INT_COL ndx:1 value:860];
+
+        [table setFloat:FLOAT_COL ndx:0 value:0];
+        [table setFloat:FLOAT_COL ndx:1 value:5.6];
+
+        [table setDouble:DOUBLE_COL ndx:0 value:0];
+        [table setDouble:DOUBLE_COL ndx:1 value:5.6];
+
+        [table setString:STRING_COL ndx:0 value:@""];
+        [table setString:STRING_COL ndx:1 value:@"foo"];
+
+        [table setBinary:BINARY_COL ndx:0 value:bin1];
+        [table setBinary:BINARY_COL ndx:1 value:bin2];
+
+        [table setDate:DATE_COL ndx:0 value:0];
+        [table setDate:DATE_COL ndx:1 value:timeNow];
+
+        [table setMixed:MIXED_COL ndx:0 value:mixInt1];
+        [table setMixed:MIXED_COL ndx:1 value:mixString];
+
+        // Test correct values are returned.
+
+        STAssertEquals([[table where] sumInt:INT_COL], (int64_t)860, @"IntCol max");
+
+        // Test that currect query retult size returned.
+
+        STAssertEquals([[[table where] betweenInt:859 to:861 colNdx:INT_COL] count], (size_t)1, @"betweenInt");
+        STAssertEquals([[[table where] betweenFloat:5.5 to:5.7 colNdx:FLOAT_COL] count], (size_t)1, @"betweenInt");
+        STAssertEquals([[[table where] betweenDouble:5.5 to:5.7 colNdx:DOUBLE_COL] count], (size_t)1, @"betweenInt");
+}
+
 @end
