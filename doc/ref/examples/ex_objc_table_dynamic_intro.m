@@ -3,8 +3,8 @@
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
 
- 
-
+#define NAME 0
+#define AGE 1
 
 int main()
 {
@@ -25,19 +25,19 @@ int main()
         
         // Set column 0 (Name:String) at row 0 (we only have one row).
         
-        [table setString:0 ndx:0 value:@"Sam"];
-        [table setString:0 ndx:1 value:@"Paul"];
-        [table setString:0 ndx:2 value:@"Jack"];
-        [table setString:0 ndx:3 value:@"Simon"];
-        [table setString:0 ndx:4 value:@"Brian"];
+        [table setString:NAME ndx:0 value:@"Sam"];
+        [table setString:NAME ndx:1 value:@"Paul"];
+        [table setString:NAME ndx:2 value:@"Jack"];
+        [table setString:NAME ndx:3 value:@"Simon"];
+        [table setString:NAME ndx:4 value:@"Brian"];
         
         // Set column 1 (Age:Int) at row 0 (we only have one row).
         
-        [table set:1 ndx:0 value:1];
-        [table set:1 ndx:1 value:2];
-        [table set:1 ndx:2 value:3];
-        [table set:1 ndx:3 value:4];
-        [table set:1 ndx:4 value:5];
+        [table set:AGE ndx:0 value:1];
+        [table set:AGE ndx:1 value:2];
+        [table set:AGE ndx:2 value:3];
+        [table set:AGE ndx:3 value:4];
+        [table set:AGE ndx:4 value:5];
         
         // Print the table contents.
         
