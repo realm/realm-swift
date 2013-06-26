@@ -1,11 +1,15 @@
 # NOTE: THIS SCRIPT IS SUPPOSED TO RUN IN A POSIX SHELL
 
+ORIG_CWD="$(pwd)"
 cd "$(dirname "$0")"
 TIGHTDB_OBJC_HOME="$(pwd)"
 
 MODE="$1"
 [ $# -gt 0 ] && shift
 
+
+IPHONE_PLATFORMS="iPhoneOS iPhoneSimulator"
+IPHONE_DIR="iphone-lib"
 
 
 word_list_append()
@@ -36,6 +40,20 @@ word_list_prepend()
     return 0
 }
 
+path_list_prepend()
+{
+    local list_name new_path list
+    list_name="$1"
+    new_path="$2"
+    list="$(eval "printf \"%s\\n\" \"\${$list_name}\"")" || return 1
+    if [ "$list" ]; then
+        eval "$list_name=\"\$new_path:\$list\""
+    else
+        eval "$list_name=\"\$new_path\""
+    fi
+    return 0
+}
+
 
 
 # Setup OS specific stuff
@@ -53,6 +71,46 @@ if [ "$NUM_PROCESSORS" ]; then
 fi
 export MAKEFLAGS
 
+
+find_iphone_sdk()
+{
+    local platform_home sdks version path x version2 sorted highest ambiguous
+    platform_home="$1"
+    sdks="$platform_home/Developer/SDKs"
+    version=""
+    dir=""
+    ambiguous=""
+    cd "$sdks" || return 1
+    for x in *; do
+        settings="$sdks/$x/SDKSettings"
+        version2="$(defaults read "$sdks/$x/SDKSettings" Version)" || return 1
+        if ! printf "%s\n" "$version2" | grep -q '^[0-9][0-9]*\(\.[0-9][0-9]*\)\{0,3\}$'; then
+            echo "Uninterpretable 'Version' '$version2' in '$settings'" 1>&2
+            return 1
+        fi
+        if [ "$version" ]; then
+            sorted="$(printf "%s\n%s\n" "$version" "$version2" | sort -t . -k 1,1nr -k 2,2nr -k 3,3nr -k 4,4nr)" || return 1
+            highest="$(printf "%s\n" "$sorted" | head -n 1)" || return 1
+            if [ "$highest" = "$version2" ]; then
+                if [ "$highest" = "$version" ]; then
+                    ambiguous="1"
+                else
+                    version="$version2"
+                    dir="$x"
+                    ambiguous=""
+                fi
+            fi
+        else
+            version="$version2"
+            dir="$x"
+        fi
+    done
+    if [ "$ambiguous" ]; then
+        echo "Ambiguous highest SDK version '$version' in '$sdks'" 1>&2
+        return 1
+    fi
+    printf "%s\n" "$dir"
+}
 
 
 require_config()
@@ -117,9 +175,70 @@ case "$MODE" in
             exit 1
         fi
 
+        xcode_home="none"
+        if [ "$OS" = "Darwin" ]; then
+            if path="$(xcode-select --print-path 2>/dev/null)"; then
+                xcode_home="$path"
+            fi
+        fi
+
+        iphone_sdks=""
+        iphone_sdks_avail="no"
+        if [ "$xcode_home" != "none" ]; then
+            # Xcode provides the iPhoneOS SDK
+            iphone_sdks_avail="yes"
+            for x in $IPHONE_PLATFORMS; do
+                platform_home="$xcode_home/Platforms/$x.platform"
+                if ! [ -e "$platform_home/Info.plist" ]; then
+                    echo "Failed to find '$platform_home/Info.plist'"
+                    iphone_sdks_avail="no"
+                else
+                    sdk="$(find_iphone_sdk "$platform_home")" || exit 1
+                    if [ -z "$sdk" ]; then
+                        echo "Found no SDKs in '$platform_home'"
+                        iphone_sdks_avail="no"
+                    else
+                        if [ "$x" = "iPhoneSimulator" ]; then
+                            arch="i386"
+                        else
+                            type="$(defaults read-type "$platform_home/Info" "DefaultProperties")" || exit 1
+                            if [ "$type" != "Type is dictionary" ]; then
+                                echo "Unexpected type of value of key 'DefaultProperties' in '$platform_home/Info.plist'" 1>&2
+                                exit 1
+                            fi
+                            temp_dir="$(mktemp -d "/tmp/tmp.XXXXXXXXXX")" || exit 1
+                            chunk="$temp_dir/chunk.plist"
+                            defaults read "$platform_home/Info" "DefaultProperties" >"$chunk" || exit 1
+                            arch="$(defaults read "$chunk" NATIVE_ARCH)" || exit 1
+                            rm -f "$chunk" || exit 1
+                            rmdir "$temp_dir" || exit 1
+                        fi
+                        word_list_append "iphone_sdks" "$x:$sdk:$arch" || exit 1
+                    fi
+                fi
+            done
+        fi
+
+        iphone_core_lib="none"
+        if [ "$TIGHTDB_IPHONE_CORE_LIB" ]; then
+            iphone_core_lib="$TIGHTDB_IPHONE_CORE_LIB"
+            if ! printf "%s\n" "$iphone_core_lib" | grep -q '^/'; then
+                iphone_core_lib="$ORIG_CWD/$iphone_core_lib"
+            fi
+        elif [ -e "../tightdb/build.sh" ]; then
+            path="$(cd "../tightdb" || return 1; pwd)" || exit 1
+            iphone_core_lib="$path/$IPHONE_DIR"
+        else
+            echo "Could not find home of TightDB core library built for iPhone!"
+        fi
+
         cat >"config" <<EOF
-install-prefix: $install_prefix
-install-libdir: $install_libdir
+install-prefix:    $install_prefix
+install-libdir:    $install_libdir
+xcode-home:        $xcode_home
+iphone-sdks:       ${iphone_sdks:-none}
+iphone-sdks-avail: $iphone_sdks_avail
+iphone-core-lib:   $iphone_core_lib
 EOF
         echo "New configuration:"
         cat "config" | sed 's/^/    /' || exit 1
@@ -131,11 +250,16 @@ EOF
         auto_configure || exit 1
         make clean || exit 1
         if [ "$OS" = "Darwin" ]; then
-            PLATFORMS="iPhoneOS iPhoneSimulator"
-            for x in $PLATFORMS; do
+            for x in $IPHONE_PLATFORMS; do
                 make BASE_DENOM="$x" clean || exit 1
             done
             make BASE_DENOM="ios" clean || exit 1
+            if [ -e "$IPHONE_DIR" ]; then
+                echo "Removing '$IPHONE_DIR'"
+                rm -fr "$IPHONE_DIR/include" || exit 1
+                rm -f "$IPHONE_DIR/libtightdb-objc-ios.a" "$IPHONE_DIR/libtightdb-objc-ios-dbg.a" || exit 1
+                rmdir "$IPHONE_DIR" || exit 1
+            fi
         fi
         echo "Done cleaning"
         exit 0
@@ -146,77 +270,53 @@ EOF
 # FIXME: Our language binding requires that Objective-C ARC is enabled, which, in turn, is only available on a 64-bit architecture, so for now we cannot build a "fat" version.
 #        TIGHTDB_ENABLE_FAT_BINARIES="1" make || exit 1
         make || exit 1
-        if [ "$OS" = "Darwin" ]; then
-            # This section builds the following two static libraries:
-            #     src/tightdb/libtightdb-objc-ios.a
-            #     src/tightdb/libtightdb-objc-ios-dbg.a
-            # Each one contains both a version for iPhone and one for
-            # the iPhone simulator.
-            # Each contained version of each of the two libraries
-            # includes the TightDB core library and is therefore self
-            # contained.
-            TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.build.XXXX)" || exit 1
-            # Xcode provides the iPhoneOS SDK
-            XCODE_HOME="$(xcode-select --print-path)" || exit 1
-            PLATFORMS="iPhoneOS iPhoneSimulator"
-            for x in $PLATFORMS; do
-                PLATFORM_HOME="$XCODE_HOME/Platforms/$x.platform"
-                if ! [ -e "$PLATFORM_HOME/Info.plist" ]; then
-                    echo "Failed to find '$PLATFORM_HOME/Info.plist'" 1>&2
-                    exit 1
-                fi
-                mkdir "$TEMP_DIR/$x" || exit 1
-                for y in "$PLATFORM_HOME/Developer/SDKs"/*; do
-                    VERSION="$(defaults read "$y/SDKSettings" Version)" || exit 1
-                    if ! printf "%s\n" "$VERSION" | grep -q '^[0-9][0-9]*\(\.[0-9][0-9]*\)\{0,3\}$'; then
-                        echo "Uninterpretable version '$VERSION' in '$y'" 1>&2
-                        exit 1
-                    fi
-                    if [ -e "$TEMP_DIR/$x/$VERSION" ]; then
-                        echo "Ambiguous version '$VERSION' in '$y'" 1>&2
-                        exit 1
-                    fi
-                    printf "%s\n" "$y" >"$TEMP_DIR/$x/$VERSION"
-                    printf "%s\n" "$VERSION" >>"$TEMP_DIR/$x/versions"
-                done
-                if ! [ -e "$TEMP_DIR/$x/versions" ]; then
-                    echo "Found no SDKs in '$PLATFORM_HOME'" 1>&2
-                    exit 1
-                fi
-                sort -t . -k 1,1nr -k 2,2nr -k 3,3nr -k 4,4nr "$TEMP_DIR/$x/versions" >"$TEMP_DIR/$x/versions-sorted" || exit 1
-                LATEST="$(cat "$TEMP_DIR/$x/versions-sorted" | head -n 1)" || exit 1
-                (cd "$TEMP_DIR/$x" && ln "$LATEST" "sdk_root") || exit 1
-                if [ "$x" = "iPhoneSimulator" ]; then
-                    ARCH="i386"
-                else
-                    TYPE="$(defaults read-type "$PLATFORM_HOME/Info" "DefaultProperties")" || exit 1
-                    if [ "$TYPE" != "Type is dictionary" ]; then
-                        echo "Unexpected type of value of key 'DefaultProperties' in '$PLATFORM_HOME/Info.plist'" 1>&2
-                        exit 1
-                    fi
-                    CHUNK="$(defaults read "$PLATFORM_HOME/Info" "DefaultProperties")" || exit 1
-                    defaults write "$TEMP_DIR/$x/chunk" "$CHUNK" || exit 1
-                    ARCH="$(defaults read "$TEMP_DIR/$x/chunk" NATIVE_ARCH)" || exit 1
-                fi
-                printf "%s\n" "$ARCH" >"$TEMP_DIR/$x/arch"
-            done
-            for x in $PLATFORMS; do
-                PLATFORM_HOME="$XCODE_HOME/Platforms/$x.platform"
-                SDK_ROOT="$(cat "$TEMP_DIR/$x/sdk_root")" || exit 1
-                ARCH="$(cat "$TEMP_DIR/$x/arch")" || exit 1
-                make -C "src/tightdb/objc" BASE_DENOM="$x" CFLAGS_ARCH="-arch $ARCH -isysroot $SDK_ROOT" "libtightdb-objc-$x.a" "libtightdb-objc-$x-dbg.a" || exit 1
-                cp "src/tightdb/objc/libtightdb-objc-$x.a"     "$TEMP_DIR/$x/libtightdb-objc.a"     || exit 1
-                cp "src/tightdb/objc/libtightdb-objc-$x-dbg.a" "$TEMP_DIR/$x/libtightdb-objc-dbg.a" || exit 1
-            done
-            lipo "$TEMP_DIR"/*/"libtightdb-objc.a"     -create -output "$TEMP_DIR/libtightdb-objc-ios.a"     || exit 1
-            lipo "$TEMP_DIR"/*/"libtightdb-objc-dbg.a" -create -output "$TEMP_DIR/libtightdb-objc-ios-dbg.a" || exit 1
-            LDFLAGS=""
-            for x in $(printf "%s\n" "$LIBRARY_PATH" | sed 's/:/ /g'); do
-                word_list_append LDFLAGS "-L$x" || exit 1
-            done
-            libtool -static -o "src/tightdb/objc/libtightdb-objc-ios.a"     "$TEMP_DIR/libtightdb-objc-ios.a"     -ltightdb-ios     $LDFLAGS || exit 1
-            libtool -static -o "src/tightdb/objc/libtightdb-objc-ios-dbg.a" "$TEMP_DIR/libtightdb-objc-ios-dbg.a" -ltightdb-ios-dbg $LDFLAGS || exit 1
+        echo "Done building"
+        exit 0
+        ;;
+
+    "build-iphone")
+        auto_configure || exit 1
+        iphone_sdks_avail="$(get_config_param "iphone-sdks-avail")" || exit 1
+        if [ "$iphone_sdks_avail" != "yes" ]; then
+            echo "ERROR: iPhone SDKs were not found during configuration!" 1>&2
+            exit 1
         fi
+        iphone_core_lib="$(get_config_param "iphone-core-lib")" || exit 1
+        if [ "$iphone_core_lib" = "none" ]; then
+            echo "ERROR: TightDB core library for iPhone was not found during configuration!" 1>&2
+            exit 1
+        fi
+        if ! [ -e "$iphone_core_lib/libtightdb-ios.a" ]; then
+            echo "ERROR: TightDB core library for iPhone is not available in '$iphone_core_lib'!" 1>&2
+            exit 1
+        fi
+        temp_dir="$(mktemp -d /tmp/tightdb.objc.build-iphone.XXXX)" || exit 1
+        xcode_home="$(get_config_param "xcode-home")" || exit 1
+        iphone_sdks="$(get_config_param "iphone-sdks")" || exit 1
+        iphone_include="$iphone_core_lib/include"
+        path_list_prepend "PATH" "$iphone_core_lib" || exit 1
+        export PATH
+        for x in $iphone_sdks; do
+            platform="$(printf "%s\n" "$x" | cut -d: -f1)" || exit 1
+            sdk="$(printf "%s\n" "$x" | cut -d: -f2)" || exit 1
+            arch="$(printf "%s\n" "$x" | cut -d: -f3)" || exit 1
+            sdk_root="$xcode_home/Platforms/$platform.platform/Developer/SDKs/$sdk"
+            make -C "src/tightdb/objc" BASE_DENOM="$platform" CFLAGS_ARCH="-arch $arch -isysroot $sdk_root -I$iphone_include" "libtightdb-objc-$platform.a" "libtightdb-objc-$platform-dbg.a" || exit 1
+            mkdir "$temp_dir/$platform" || exit 1
+            cp "src/tightdb/objc/libtightdb-objc-$platform.a"     "$temp_dir/$platform/libtightdb-objc.a"     || exit 1
+            cp "src/tightdb/objc/libtightdb-objc-$platform-dbg.a" "$temp_dir/$platform/libtightdb-objc-dbg.a" || exit 1
+        done
+        mkdir -p "$IPHONE_DIR" || exit 1
+        echo "Creating '$IPHONE_DIR/libtightdb-objc-ios.a'"
+        lipo "$temp_dir"/*/"libtightdb-objc.a" -create -output "$temp_dir/libtightdb-objc-ios.a" || exit 1
+        libtool -static -o "$IPHONE_DIR/libtightdb-objc-ios.a" "$temp_dir/libtightdb-objc-ios.a" $(tightdb-config --libs) -L"$iphone_core_lib" || exit 1
+        echo "Creating '$IPHONE_DIR/libtightdb-objc-ios-dbg.a'"
+        lipo "$temp_dir"/*/"libtightdb-objc-dbg.a" -create -output "$temp_dir/libtightdb-objc-ios-dbg.a" || exit 1
+        libtool -static -o "$IPHONE_DIR/libtightdb-objc-ios-dbg.a" "$temp_dir/libtightdb-objc-ios-dbg.a" $(tightdb-config-dbg --libs) -L"$iphone_core_lib" || exit 1
+        echo "Copying headers to '$IPHONE_DIR/include'"
+        mkdir -p "$IPHONE_DIR/include/tightdb/objc" || exit 1
+        inst_headers="$(cd src/tightdb/objc && make get-inst-headers)" || exit 1
+        (cd "src/tightdb/objc" && cp $inst_headers "$TIGHTDB_OBJC_HOME/$IPHONE_DIR/include/tightdb/objc/") || exit 1
         echo "Done building"
         exit 0
         ;;
@@ -349,7 +449,7 @@ EOF
 
     *)
         echo "Unspecified or bad mode '$MODE'" 1>&2
-        echo "Available modes are: config clean build test test-debug test-gdb install uninstall test-installed" 1>&2
+        echo "Available modes are: config clean build build-iphone test test-debug test-gdb install uninstall test-installed" 1>&2
         echo "As well as: install-shared install-devel uninstall-shared uninstall-devel dist-copy" 1>&2
         exit 1
         ;;

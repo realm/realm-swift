@@ -52,3 +52,8 @@ uninstall/extra:
 	$(RM) $(DESTDIR)$(includedir)/tightdb/objc/*.h
 	-rmdir $(DESTDIR)$(includedir)/tightdb/objc
 	-rmdir $(DESTDIR)$(includedir)/tightdb
+
+# Used by ../../../build.sh
+.PHONY: get-inst-headers
+get-inst-headers:
+	@echo $(INST_HEADERS)
