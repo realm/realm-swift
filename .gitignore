@@ -9,3 +9,8 @@
 /table_test.tightdb
 
 /doc/ref/*.html
+
+# sh build.sh build-iphone
+/iphone-lib/include
+/iphone-lib/libtightdb-objc-ios.a
+/iphone-lib/libtightdb-objc-ios-dbg.a
