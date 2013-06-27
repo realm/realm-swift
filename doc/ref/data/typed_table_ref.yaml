@@ -252,6 +252,21 @@ CATEGORIES:
       - CODE   : ex_objc_typed_table_find_first_xxx
         DESCR  :
 
+  - g_typed_table_where:
+  
+      NAMES    : where
+      SIGNATURE: (TableName_Query *)where;
+      SUMMARY  : *g_typed_table_where_summery
+      DESCR    : This method initiates a query. See {@link class_typed_query}.
+      RETURN:
+        TYPES  : TableName_Query
+        DESCR  : The query object. Note that <code>TableName</code> is replaced with the name of your specific table.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_table_where
+
+# - g_typed_table_where_const:
+
 # TODO: 
 #  - g_typed_table_find_all_bool:
 #  - g_typed_table_find_all_int:
@@ -272,6 +287,8 @@ CATEGORIES:
 #  - g_typed_table_distinct:
 #  - g_typed_table_distinct_const:
 
-#  - g_typed_table_where:
-#  - g_typed_table_where_const:
+
+
+
+
 

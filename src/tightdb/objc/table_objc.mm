@@ -17,7 +17,6 @@
 
 using namespace std;
 
-
 @implementation TightdbBinary
 {
     tightdb::BinaryData _data;
@@ -617,8 +616,11 @@ using namespace std;
         [NSException raise:@"Table is read only" format:@"Tried to add row while read only"];
     return _table->add_empty_row();
 }
--(size_t)addRows:(size_t)rowCount;
+-(size_t)addRows:(size_t)rowCount
 {
+    // FIXME: In Objective-C, exceptions are only a debugging
+    // device. They must not be used for error handling in
+    // general. See the note in [TightdbTable addRow].
     if (_readOnly)
         [NSException raise:@"Table is read only" format:@"Tried to add row while read only"];
     return _table->add_empty_row(rowCount);
@@ -1232,7 +1234,13 @@ using namespace std;
     *view.tableView = _table->find_all_int(col_ndx, value);
     return view;
 }
-
+-(TightdbQuery *)where
+{
+    // FIXME: In Objective-C, exceptions are only a debugging
+    // device. They must not be used for error handling in
+    // general. See the note in [TightdbTable addRow].
+    return [[TightdbQuery alloc] initWithTable:self];
+}
 -(BOOL)hasIndex:(size_t)col_ndx
 {
     return _table->has_index(col_ndx);

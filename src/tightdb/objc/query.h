@@ -49,6 +49,10 @@
 -(double)avgDouble:(size_t)colNdx;
 -(size_t)findNext:(size_t)last;
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
+// Conditions
+-(TightdbQuery *)betweenInt:(int64_t)from to:(int64_t)to colNdx:(size_t)colNdx;
+-(TightdbQuery *)betweenFloat:(float)from to:(float)to colNdx:(size_t)colNdx;
+-(TightdbQuery *)betweenDouble:(double)from to:(double)to colNdx:(size_t)colNdx;
 @end
 
 

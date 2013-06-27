@@ -192,6 +192,21 @@ using namespace std;
 {
     return _query->find_next(last);
 }
+-(TightdbQuery *)betweenInt:(int64_t)from to:(int64_t)to colNdx:(size_t)colNdx
+{
+    _query->between(colNdx, from, to);
+    return self;
+}
+-(TightdbQuery *)betweenFloat:(float)from to:(float)to colNdx:(size_t)colNdx
+{
+    _query->between(colNdx, from, to);
+    return self;
+}
+-(TightdbQuery *)betweenDouble:(double)from to:(double)to colNdx:(size_t)colNdx
+{
+    _query->between(colNdx, from, to);
+    return self;
+}
 @end
 
 
