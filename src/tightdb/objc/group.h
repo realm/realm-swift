@@ -25,9 +25,9 @@
 
 @interface TightdbGroup: NSObject
 +(TightdbGroup *)groupWithFilename:(NSString *)filename;
-+(TightdbGroup *)groupWithFilename:(NSString *)filename error:(NSError **)error;
++(TightdbGroup *)groupWithFilename:(NSString *)filename error:(NSError *__autoreleasing *)error;
 +(TightdbGroup *)groupWithBuffer:(const char*)data size:(size_t)size;
-+(TightdbGroup *)groupWithBuffer:(const char*)data size:(size_t)size error:(NSError **)error;
++(TightdbGroup *)groupWithBuffer:(const char*)data size:(size_t)size error:(NSError *__autoreleasing *)error;
 +(TightdbGroup *)group;
 
 -(size_t)getTableCount;
@@ -56,7 +56,9 @@
 -(id)getTable:(NSString *)name withClass:(Class)obj;
 
 // Serialization
--(void)write:(NSString *)filePath;
+-(BOOL)write:(NSString *)filePath;
+-(BOOL)write:(NSString *)filePath error:(NSError *__autoreleasing *)error;
 -(const char*)writeToMem:(size_t*)size;
+-(const char*)writeToMem:(size_t*)size error:(NSError *__autoreleasing *)error;
 @end
 

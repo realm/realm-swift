@@ -71,7 +71,7 @@ using namespace std;
     return [self groupWithBuffer:data size:size error:nil];
 }
 
-+(TightdbGroup *)groupWithBuffer:(const char *)data size:(size_t)size error:(NSError **)error
++(TightdbGroup *)groupWithBuffer:(const char *)data size:(size_t)size error:(NSError *__autoreleasing *)error
 {
     tightdb::Group* group;
     try {
@@ -111,15 +111,50 @@ using namespace std;
     return to_objc_string(_group->get_table_name(table_ndx));
 }
 
--(void)write:(NSString *)filePath
+-(BOOL)write:(NSString *)filePath
 {
-    _group->write(tightdb::StringData(ObjcStringAccessor(filePath))); // FIXME: May throw at least tightdb::File::AccessError (and various derivatives), tightdb::ResourceAllocError, and std::bad_alloc
+    return [self write:filePath error:nil];
 }
+
+-(BOOL)write:(NSString *)filePath error:(NSError *__autoreleasing *)error
+{
+    try {
+        _group->write(tightdb::StringData(ObjcStringAccessor(filePath)));
+    }
+    catch(tightdb::File::AccessError &ex) {
+        if (error)
+            *error = make_tightdb_error(@"com.tightdb.group", tdb_err_FileAccess, [NSString stringWithUTF8String:ex.what()]);
+        return NO;
+    }
+    catch(tightdb::ResourceAllocError &ex) {
+        if (error)
+            *error = make_tightdb_error(@"com.tightdb.group", tdb_err_Resource, [NSString stringWithUTF8String:ex.what()]);
+        return NO;
+    }
+    catch (std::exception &ex) {
+        if (error)
+            *error = make_tightdb_error(@"com.tightdb.group", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
+        return NO;
+    }
+    return YES;
+}
+
 -(const char*)writeToMem:(size_t*)size
 {
-    tightdb::BinaryData buffer = _group->write_to_mem(); // FIXME: May throw at least std::bad_alloc
-    *size = buffer.size();
-    return buffer.data();
+    return [self writeToMem:size error:nil];
+}
+
+-(const char*)writeToMem:(size_t*)size error:(NSError *__autoreleasing *)error
+{
+    try {
+        tightdb::BinaryData buffer = _group->write_to_mem();
+        *size = buffer.size();
+        return buffer.data();
+    } catch(std::exception &ex) {
+        if (error)
+            *error = make_tightdb_error(@"com.tightdb.group", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
+        return nil;
+    }
 }
 
 -(BOOL)hasTable:(NSString *)name

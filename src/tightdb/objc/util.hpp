@@ -50,6 +50,8 @@ enum TightdbErr {
     tdb_err_Ok = 0,
     tdb_err_Fail = 1,
     tdb_err_FailRdOnly = 2,
+    tdb_err_FileAccess = 3,
+    tdb_err_Resource = 4,
 };
 
 inline NSError *make_tightdb_error(NSString *domain, TightdbErr code, NSString *desc)

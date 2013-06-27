@@ -77,7 +77,11 @@ TIGHTDB_TABLE_IMPL_3(PeopleErrTable,
 
     // Write the group to disk
     [fm removeItemAtPath:@"peopleErr.tightdb" error:NULL];
-    [group write:@"peopleErr.tightdb"];
+    error = nil;
+    if (![group write:@"peopleErr.tightdb" error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"No error expected");        
+    }
 
     //------------------------------------------------------
     NSLog(@"--- Changing permissions ---");
