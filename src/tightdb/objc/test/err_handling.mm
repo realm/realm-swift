@@ -30,6 +30,8 @@ TIGHTDB_TABLE_IMPL_3(PeopleErrTable,
 
 - (void)testErrHandling
 {
+    NSError *error = nil;
+
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
@@ -39,11 +41,30 @@ TIGHTDB_TABLE_IMPL_3(PeopleErrTable,
     PeopleErrTable *people = [group getTable:@"employees" withClass:[PeopleErrTable class]];
 
     // Add some rows
-    [people addName:@"John" Age:20 Hired:YES];
-    [people addName:@"Mary" Age:21 Hired:NO];
-    [people addName:@"Lars" Age:21 Hired:YES];
-    [people addName:@"Phil" Age:43 Hired:NO];
-    [people addName:@"Anni" Age:54 Hired:YES];
+    error = nil;
+    if (![people addName:@"John" Age:20 Hired:YES error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"This should have worked");
+    }
+    error = nil;
+    if (![people addName:@"Mary" Age:21 Hired:NO error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"This should have worked");
+    }
+    if (![people addName:@"Lars" Age:21 Hired:YES error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"This should have worked");
+    }
+    error = nil;
+    if (![people addName:@"Phil" Age:43 Hired:NO error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"This should have worked");
+    }
+    error = nil;
+    if (![people addName:@"Anni" Age:54 Hired:YES error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"This should have worked");
+    }
 
     // Insert at specific position
     [people insertAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
@@ -65,7 +86,7 @@ TIGHTDB_TABLE_IMPL_3(PeopleErrTable,
     NSMutableDictionary *attributes = [NSMutableDictionary dictionaryWithCapacity:1];
     [attributes setValue:[NSNumber numberWithShort:0444] forKey:NSFilePosixPermissions];
 
-    NSError *error = nil;
+    error = nil;
     [fm setAttributes:attributes ofItemAtPath:@"peopleErr.tightdb" error:&error];
     if (error) {
         STFail(@"Failed to set readonly attributes");
@@ -110,7 +131,12 @@ TIGHTDB_TABLE_IMPL_3(PeopleErrTable,
 
     NSLog(@"Disktable size: %zu", [diskTable count]);
 
-    [diskTable addName:@"Anni" Age:54 Hired:YES];
+    error = nil;
+    if (![diskTable addName:@"Anni" Age:54 Hired:YES error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+    } else {
+        STFail(@"addName to readonly should have failed.");        
+    }
 
     NSLog(@"Disktable size: %zu", [diskTable count]);
 }

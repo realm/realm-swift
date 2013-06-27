@@ -65,67 +65,115 @@ using namespace std;
 {
     return [_cursor.table getBool:_columnId ndx:_cursor.ndx];
 }
--(void)setBool:(BOOL)value
+
+-(BOOL)setBool:(BOOL)value
 {
-    [_cursor.table setBool:_columnId ndx:_cursor.ndx value:value];
+    return [self setBool:value error:nil];
+}
+
+-(BOOL)setBool:(BOOL)value error:(NSError *__autoreleasing *)error
+{
+    return [_cursor.table setBool:_columnId ndx:_cursor.ndx value:value error:error];
 }
 
 -(int64_t)getInt
 {
     return [_cursor.table get:_columnId ndx:_cursor.ndx];
 }
--(void)setInt:(int64_t)value
+
+-(BOOL)setInt:(int64_t)value
 {
-    [_cursor.table set:_columnId ndx:_cursor.ndx value:value];
+    return [self setInt:value error:nil];
+}
+
+-(BOOL)setInt:(int64_t)value error:(NSError *__autoreleasing *)error
+{
+    return [_cursor.table set:_columnId ndx:_cursor.ndx value:value error:error];
 }
 
 -(float)getFloat
 {
     return [_cursor.table getFloat:_columnId ndx:_cursor.ndx];
 }
--(void)setFloat:(float)value
+
+-(BOOL)setFloat:(float)value
 {
-    [_cursor.table setFloat:_columnId ndx:_cursor.ndx value:value];
+    return [self setFloat:value error:nil];
+}
+
+-(BOOL)setFloat:(float)value error:(NSError *__autoreleasing *)error
+{
+    return [_cursor.table setFloat:_columnId ndx:_cursor.ndx value:value error:error];
 }
 
 -(double)getDouble
 {
     return [_cursor.table getDouble:_columnId ndx:_cursor.ndx];
 }
--(void)setDouble:(double)value
+
+-(BOOL)setDouble:(double)value
 {
-    [_cursor.table setDouble:_columnId ndx:_cursor.ndx value:value];
+    return [self setDouble:value error:nil];
+}
+
+-(BOOL)setDouble:(double)value error:(NSError *__autoreleasing *)error
+{
+    return [_cursor.table setDouble:_columnId ndx:_cursor.ndx value:value error:error];
 }
 
 -(NSString *)getString
 {
     return [_cursor.table getString:_columnId ndx:_cursor.ndx];
 }
--(void)setString:(NSString *)value
+
+-(BOOL)setString:(NSString *)value
 {
-    [_cursor.table setString:_columnId ndx:_cursor.ndx value:value];
+    return [self setString:value error:nil];
+}
+
+-(BOOL)setString:(NSString *)value error:(NSError *__autoreleasing *)error
+{
+    return [_cursor.table setString:_columnId ndx:_cursor.ndx value:value error:error];
 }
 
 -(TightdbBinary *)getBinary
 {
     return [_cursor.table getBinary:_columnId ndx:_cursor.ndx];
 }
--(void)setBinary:(TightdbBinary *)value
+
+-(BOOL)setBinary:(TightdbBinary *)value
 {
-    [_cursor.table setBinary:_columnId ndx:_cursor.ndx value:value];
+    return [self setBinary:value error:nil];
 }
--(void)setBinary:(const char *)data size:(size_t)size
+
+-(BOOL)setBinary:(TightdbBinary *)value error:(NSError *__autoreleasing *)error
 {
-    [_cursor.table setBinary:_columnId ndx:_cursor.ndx data:data size:size];
+    return [_cursor.table setBinary:_columnId ndx:_cursor.ndx value:value error:error];
+}
+
+-(BOOL)setBinary:(const char *)data size:(size_t)size
+{
+    return [self setBinary:data size:size error:nil];
+}
+
+-(BOOL)setBinary:(const char *)data size:(size_t)size error:(NSError *__autoreleasing *)error
+{
+    return [_cursor.table setBinary:_columnId ndx:_cursor.ndx data:data size:size error:error];
 }
 
 -(time_t)getDate
 {
     return [_cursor.table getDate:_columnId ndx:_cursor.ndx];
 }
--(void)setDate:(time_t)value
+
+-(BOOL)setDate:(time_t)value
 {
-    [_cursor.table setDate:_columnId ndx:_cursor.ndx value:value];
+    return [self setDate:value error:nil];
+}
+
+-(BOOL)setDate:(time_t)value error:(NSError *__autoreleasing *)error
+{
+    return [_cursor.table setDate:_columnId ndx:_cursor.ndx value:value error:error];
 }
 
 -(id)getSubtable:(Class)obj
@@ -137,9 +185,15 @@ using namespace std;
 {
     return [_cursor.table getMixed:_columnId ndx:_cursor.ndx];
 }
--(void)setMixed:(TightdbMixed *)value
+
+-(BOOL)setMixed:(TightdbMixed *)value
 {
-    [_cursor.table setMixed:_columnId ndx:_cursor.ndx value:value];
+    return [self setMixed:value error:nil];
+}
+
+-(BOOL)setMixed:(TightdbMixed *)value error:(NSError *__autoreleasing *)error
+{
+    return [_cursor.table setMixed:_columnId ndx:_cursor.ndx value:value error:error];
 }
 
 @end
