@@ -48,7 +48,8 @@ private:
 
 enum TightdbErr {
     tdb_err_Ok = 0,
-    tdb_err_Fail = 1
+    tdb_err_Fail = 1,
+    tdb_err_FailRdOnly = 2,
 };
 
 inline NSError *make_tightdb_error(NSString *domain, TightdbErr code, NSString *desc)

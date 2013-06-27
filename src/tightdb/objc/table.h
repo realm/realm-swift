@@ -125,47 +125,67 @@
 
 // Adaptive ints.
 -(int64_t)get:(size_t)colNdx ndx:(size_t)ndx;
--(void)set:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;
+-(BOOL)set:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;
+-(BOOL)set:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value error:(NSError *__autoreleasing *)error;
 -(BOOL)getBool:(size_t)colNdx ndx:(size_t)ndx;
--(void)setBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value;
+-(BOOL)setBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value;
+-(BOOL)setBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value error:(NSError *__autoreleasing *)error;
 -(float)getFloat:(size_t)colNdx ndx:(size_t)ndx;
--(void)setFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value;
+-(BOOL)setFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value;
+-(BOOL)setFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value error:(NSError *__autoreleasing *)error;
 -(double)getDouble:(size_t)colNdx ndx:(size_t)ndx;
--(void)setDouble:(size_t)colNdx ndx:(size_t)ndx value:(double)value;
+-(BOOL)setDouble:(size_t)colNdx ndx:(size_t)ndx value:(double)value;
+-(BOOL)setDouble:(size_t)colNdx ndx:(size_t)ndx value:(double)value error:(NSError *__autoreleasing *)error;
 -(time_t)getDate:(size_t)colNdx ndx:(size_t)ndx;
--(void)setDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value;
+-(BOOL)setDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value;
+-(BOOL)setDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value error:(NSError *__autoreleasing *)error;
 
 // NOTE: Low-level insert functions. Always insert in all columns at once
 // and call InsertDone after to avoid table getting un-balanced.
--(void)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value;
--(void)insertInt:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;
--(void)insertFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value;
--(void)insertDouble:(size_t)colNdx ndx:(size_t)ndx value:(double)value;
--(void)insertString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value;
--(void)insertBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value;
--(void)insertBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size;
--(void)insertDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value;
--(void)insertDone;
+-(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value;
+-(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value error:(NSError *__autoreleasing *)error;
+-(BOOL)insertInt:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;
+-(BOOL)insertInt:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value error:(NSError *__autoreleasing *)error;
+-(BOOL)insertFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value;
+-(BOOL)insertFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value error:(NSError *__autoreleasing *)error;
+-(BOOL)insertDouble:(size_t)colNdx ndx:(size_t)ndx value:(double)value;
+-(BOOL)insertDouble:(size_t)colNdx ndx:(size_t)ndx value:(double)value error:(NSError *__autoreleasing *)error;
+-(BOOL)insertString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value;
+-(BOOL)insertString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value error:(NSError *__autoreleasing *)error;
+-(BOOL)insertBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value;
+-(BOOL)insertBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value error:(NSError *__autoreleasing *)error;
+-(BOOL)insertBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size;
+-(BOOL)insertBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size error:(NSError *__autoreleasing *)error;
+-(BOOL)insertDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value;
+-(BOOL)insertDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value error:(NSError *__autoreleasing *)error;
+-(BOOL)insertDone;
+-(BOOL)insertDoneWithError:(NSError *__autoreleasing *)error;
 
 // Strings
 -(NSString *)getString:(size_t)colNdx ndx:(size_t)ndx;
--(void)setString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value;
+-(BOOL)setString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value;
+-(BOOL)setString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value error:(NSError *__autoreleasing *)error;
 
 // Binary
 -(TightdbBinary *)getBinary:(size_t)colNdx ndx:(size_t)ndx;
--(void)setBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value;
--(void)setBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size;
+-(BOOL)setBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value;
+-(BOOL)setBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value error:(NSError *__autoreleasing *)error;
+-(BOOL)setBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size;
+-(BOOL)setBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size error:(NSError *__autoreleasing *)error;
 
 // Subtables
 -(size_t)getTableSize:(size_t)colNdx ndx:(size_t)ndx;
--(void)insertSubtable:(size_t)colNdx ndx:(size_t)ndx;
+-(BOOL)insertSubtable:(size_t)colNdx ndx:(size_t)ndx;
+-(BOOL)insertSubtable:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(void)clearSubtable:(size_t)colNdx ndx:(size_t)ndx;
 
 // Mixed
 -(TightdbMixed *)getMixed:(size_t)colNdx ndx:(size_t)ndx;
 -(TightdbType)getMixedType:(size_t)colNdx ndx:(size_t)ndx;
--(void)insertMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value;
--(void)setMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value;
+-(BOOL)insertMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value;
+-(BOOL)insertMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value error:(NSError *__autoreleasing *)error;
+-(BOOL)setMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value;
+-(BOOL)setMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value error:(NSError *__autoreleasing *)error;
 
 -(size_t)addColumn:(TightdbType)type name:(NSString *)name;
 
@@ -217,7 +237,8 @@
 
 // Private
 -(id)_initRaw;
--(void)_insertSubtableCopy:(size_t)colNdx row:(size_t)rowNdx subtable:(TightdbTable *)subtable;
+-(BOOL)_insertSubtableCopy:(size_t)colNdx row:(size_t)rowNdx subtable:(TightdbTable *)subtable;
+-(BOOL)_insertSubtableCopy:(size_t)colNdx row:(size_t)rowNdx subtable:(TightdbTable *)subtable error:(NSError *__autoreleasing *)error;
 @end
 
 

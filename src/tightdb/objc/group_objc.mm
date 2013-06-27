@@ -68,19 +68,18 @@ using namespace std;
 
 +(TightdbGroup *)groupWithBuffer:(const char *)data size:(size_t)size
 {
+    return [self groupWithBuffer:data size:size error:nil];
+}
+
++(TightdbGroup *)groupWithBuffer:(const char *)data size:(size_t)size error:(NSError **)error
+{
     tightdb::Group* group;
     try {
         group = new tightdb::Group(tightdb::BinaryData(data, size));
     }
-    catch (...) {
-        // FIXME: Diffrent exception types mean different things. More
-        // details must be made available. We should proably have
-        // special catches for at least these:
-        // tightdb::File::AccessError (and various derivatives),
-        // tightdb::ResourceAllocError, std::bad_alloc. In general,
-        // any core library function or operator that is not declared
-        // 'noexcept' must be considered as being able to throw
-        // anything derived from std::exception.
+    catch (std::exception &ex) {
+        if (error)
+            *error = make_tightdb_error(@"com.tightdb.group", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
         return nil;
     }
     TightdbGroup* group2 = [[TightdbGroup alloc] init];

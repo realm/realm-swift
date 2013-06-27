@@ -27,6 +27,7 @@
 +(TightdbGroup *)groupWithFilename:(NSString *)filename;
 +(TightdbGroup *)groupWithFilename:(NSString *)filename error:(NSError **)error;
 +(TightdbGroup *)groupWithBuffer:(const char*)data size:(size_t)size;
++(TightdbGroup *)groupWithBuffer:(const char*)data size:(size_t)size error:(NSError **)error;
 +(TightdbGroup *)group;
 
 -(size_t)getTableCount;
