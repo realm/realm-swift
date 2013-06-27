@@ -53,17 +53,9 @@ using namespace std;
     try {
         group = new tightdb::Group(tightdb::StringData(ObjcStringAccessor(filename)));
     }
-    catch (...) {
+    catch (std::exception &ex) {
         if (error)
-            *error = makeTightDbError(@"com.tightdb.group", TDBErrFail, @"Open file failure");
-        // FIXME: Diffrent exception types mean different things. More
-        // details must be made available. We should proably have
-        // special catches for at least these:
-        // tightdb::File::AccessError (and various derivatives),
-        // tightdb::ResourceAllocError, std::bad_alloc. In general,
-        // any core library function or operator that is not declared
-        // 'noexcept' must be considered as being able to throw
-        // anything derived from std::exception.
+            *error = make_tightdb_error(@"com.tightdb.group", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
         return nil;
     }
     TightdbGroup* group2 = [[TightdbGroup alloc] init];

@@ -46,12 +46,12 @@ private:
     std::size_t m_size;
 };
 
-enum TightDbErr {
-    TDBErrOk = 0,
-    TDBErrFail = 1
+enum TightdbErr {
+    tdb_err_Ok = 0,
+    tdb_err_Fail = 1
 };
 
-inline NSError *makeTightDbError(NSString *domain, TightDbErr code, NSString *desc)
+inline NSError *make_tightdb_error(NSString *domain, TightdbErr code, NSString *desc)
 {
     NSMutableDictionary* details = [NSMutableDictionary dictionary];
     [details setValue:desc forKey:NSLocalizedDescriptionKey];
