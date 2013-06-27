@@ -198,6 +198,7 @@
 -(size_t)findBinary:(size_t)colNdx value:(TightdbBinary *)value;
 -(size_t)findDate:(size_t)colNdx value:(time_t)value;
 -(size_t)findMixed:(size_t)colNdx value:(TightdbMixed *)value;
+-(TightdbQuery *)where;
 
 // FIXME: Why does this one take a TableView as argument?
 -(TightdbView *)findAll:(TightdbView *)view column:(size_t)colNdx value:(int64_t)value;
