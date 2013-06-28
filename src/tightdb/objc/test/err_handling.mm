@@ -145,4 +145,197 @@ TIGHTDB_TABLE_IMPL_3(PeopleErrTable,
     NSLog(@"Disktable size: %zu", [diskTable count]);
 }
 
+-(void)testErrorInsert
+{
+    NSError *error;
+    
+    // Create table with all column types
+    TightdbTable *table = [[TightdbTable alloc] init];
+    TightdbSpec *s = [table getSpec];
+    if (![s addColumn:tightdb_Int name:@"int" error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"addColumn failed.");
+    }
+    if (![s addColumn:tightdb_Bool name:@"bool" error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"addColumn failed.");
+    }
+
+    if (![s addColumn:tightdb_Date name:@"date" error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"addColumn failed.");
+    }
+    if (![s addColumn:tightdb_String name:@"string" error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"addColumn failed.");
+    }
+    if (![s addColumn:tightdb_String name:@"string_long" error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"addColumn failed.");
+    }
+    if (![s addColumn:tightdb_String name:@"string_enum" error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"addColumn failed.");
+    }
+    if (![s addColumn:tightdb_Binary name:@"binary" error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"addColumn failed.");
+    }
+    if (![s addColumn:tightdb_Mixed name:@"mixed" error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"addColumn failed.");
+    }
+    TightdbSpec *sub;
+    if (!(sub = [s addColumnTable:@"tables" error:&error])) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"addColumn failed.");
+    }
+    if (![sub addColumn:tightdb_Int name:@"sub_first" error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"addColumn failed.");
+    }
+    if (![sub addColumn:tightdb_String name:@"sub_second" error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"addColumn failed.");
+    }
+    if (![table updateFromSpecWithError:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"UpdateFromSpec failed.");        
+    }
+    
+    // Add some rows
+    for (size_t i = 0; i < 15; ++i) {
+        if (![table insertInt:0 ndx:i value:i error:&error]) {
+            NSLog(@"%@", [error localizedDescription]);
+            STFail(@"Insert failed.");
+        }
+        if (![table insertBool:1 ndx:i value:(i % 2 ? YES : NO) error:&error]) {
+            NSLog(@"%@", [error localizedDescription]);
+            STFail(@"Insert failed.");
+        }
+        if (![table insertDate:2 ndx:i value:12345 error:&error]) {
+            NSLog(@"%@", [error localizedDescription]);
+            STFail(@"Insert failed.");
+        }
+        if (![table insertString:3 ndx:i value:[NSString stringWithFormat:@"string %zu", i] error:&error]) {
+            NSLog(@"%@", [error localizedDescription]);
+            STFail(@"Insert failed.");
+        }
+        if (![table insertString:4 ndx:i value:@" Very long string.............." error:&error]) {
+            NSLog(@"%@", [error localizedDescription]);
+            STFail(@"Insert failed.");
+        }
+        
+        switch (i % 3) {
+            case 0:
+                if (![table insertString:5 ndx:i value:@"test1" error:&error]) {
+                    NSLog(@"%@", [error localizedDescription]);
+                    STFail(@"Insert failed.");
+                }
+                break;
+            case 1:
+                if (![table insertString:5 ndx:i value:@"test2" error:&error]) {
+                    NSLog(@"%@", [error localizedDescription]);
+                    STFail(@"Insert failed.");
+                }
+                break;
+            case 2:
+                if (![table insertString:5 ndx:i value:@"test3" error:&error]) {
+                    NSLog(@"%@", [error localizedDescription]);
+                    STFail(@"Insert failed.");
+                }
+                break;
+        }
+        
+        if (![table insertBinary:6 ndx:i data:"binary" size:7 error:&error]) {
+            NSLog(@"%@", [error localizedDescription]);
+            STFail(@"Insert failed.");
+        }
+        switch (i % 3) {
+            case 0:
+                if (![table insertMixed:7 ndx:i value:[TightdbMixed mixedWithBool:NO] error:&error]) {
+                    NSLog(@"%@", [error localizedDescription]);
+                    STFail(@"Insert failed.");
+                }
+                break;
+            case 1:
+                if (![table insertMixed:7 ndx:i value:[TightdbMixed mixedWithInt64:i] error:&error]) {
+                    NSLog(@"%@", [error localizedDescription]);
+                    STFail(@"Insert failed.");
+                }
+                break;
+            case 2:
+                if (![table insertMixed:7 ndx:i value:[TightdbMixed mixedWithString:@"string"] error:&error]) {
+                    NSLog(@"%@", [error localizedDescription]);
+                    STFail(@"Insert failed.");
+                }
+                break;
+        }
+        if (![table insertSubtable:8 ndx:i error:&error]) {
+            NSLog(@"%@", [error localizedDescription]);
+            STFail(@"Insert failed.");
+        }
+        
+        if (![table insertDoneWithError:&error]) {
+            NSLog(@"%@", [error localizedDescription]);
+            STFail(@"InsertDone failed.");
+        }
+        
+        // Add sub-tables
+        if (i == 2) {
+            TightdbTable *subtable = [table getSubtable:8 ndx:i];
+            if (![subtable insertInt:0 ndx:0 value:42 error:&error]) {
+                NSLog(@"%@", [error localizedDescription]);
+                STFail(@"Insert failed.");
+            }
+            if (![subtable insertString:1 ndx:0 value:@"meaning" error:&error]) {
+                NSLog(@"%@", [error localizedDescription]);
+                STFail(@"Insert failed.");
+            }
+            if (![subtable insertDoneWithError:&error]) {
+                NSLog(@"%@", [error localizedDescription]);
+                STFail(@"InsertDone failed.");
+            }
+        }
+        
+    }
+    
+    // We also want a ColumnStringEnum
+    if (![table optimize]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"Insert failed.");
+    }
+    
+    // Test Deletes
+    if (![table remove:14 error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"Remove failed.");
+    }
+    if (![table remove:0 error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"Remove failed.");
+    }
+    if (![table remove:5 error:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"Remove failed.");
+    }
+    
+    STAssertEquals([table count], (size_t)12, @"Size should have been 12");
+#ifdef TIGHTDB_DEBUG
+    [table verify];
+#endif
+    
+    // Test Clear
+    if (![table clearWithError:&error]) {
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"Clear failed.");
+    }
+    STAssertEquals([table count], (size_t)0, @"Size should have been zero");
+    
+#ifdef TIGHTDB_DEBUG
+    [table verify];
+#endif
+}
+
+
 @end
