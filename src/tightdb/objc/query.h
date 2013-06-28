@@ -27,6 +27,7 @@
 
 @interface TightdbQuery: NSObject
 -(id)initWithTable:(TightdbTable *)table;
+-(id)initWithTable:(TightdbTable *)table error:(NSError *__autoreleasing *)error;
 -(TightdbTable *)getTable;
 -(void)group;
 -(void)or;

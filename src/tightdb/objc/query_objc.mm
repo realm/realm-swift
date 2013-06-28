@@ -6,6 +6,7 @@
 #include <tightdb/table.hpp>
 #include <tightdb/table_view.hpp>
 #include <tightdb/query.hpp>
+#include <tightdb/lang_bind_helper.hpp>
 
 #import <tightdb/objc/query.h>
 #import <tightdb/objc/table.h>
@@ -28,13 +29,19 @@ using namespace std;
     __weak TightdbTable *_table;
 }
 
-
 -(id)initWithTable:(TightdbTable *)table
+{
+    return [self initWithTable:table error:nil];
+}
+
+-(id)initWithTable:(TightdbTable *)table error:(NSError *__autoreleasing *)error
 {
     self = [super init];
     if (self) {
         _table = table;
-        _query = new tightdb::Query([_table getTable].where());
+        TIGHTDB_EXCEPTION_ERRHANDLER(
+                                     _query = new tightdb::Query([_table getTable].where());
+                                     , @"com.tightdb.query", nil);
     }
     return self;
 }

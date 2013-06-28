@@ -214,7 +214,7 @@ using namespace std;
 @interface TightdbSpec()
 @property (nonatomic) tightdb::Spec *spec;
 @property (nonatomic) BOOL isOwned;
-+(TightdbSpec *)specWithSpec:(tightdb::Spec*)spec readOnly:(BOOL)readOnly isOwned:(BOOL)isOwned;
++(TightdbSpec *)specWithSpec:(tightdb::Spec*)spec readOnly:(BOOL)readOnly isOwned:(BOOL)isOwned error:(NSError *__autoreleasing *)error;
 @end
 
 @implementation TightdbSpec
@@ -225,12 +225,14 @@ using namespace std;
 @synthesize isOwned = _isOwned;
 
 
-+(TightdbSpec *)specWithSpec:(tightdb::Spec *)spec readOnly:(BOOL)readOnly isOwned:(BOOL)isOwned
++(TightdbSpec *)specWithSpec:(tightdb::Spec *)spec readOnly:(BOOL)readOnly isOwned:(BOOL)isOwned error:(NSError *__autoreleasing *)error
 {
     TightdbSpec *spec2 = [[TightdbSpec alloc] init];
     spec2->_readOnly = readOnly;
     if (isOwned) {
-        spec2.spec    = new tightdb::Spec(*spec);
+        TIGHTDB_EXCEPTION_ERRHANDLER(
+                                     spec2.spec    = new tightdb::Spec(*spec);
+                                     , @"com.tightdb.spec", nil);
         spec2.isOwned = TRUE;
     }
     else {
@@ -244,32 +246,51 @@ using namespace std;
 // FIXME: Detect errors from core library
 -(BOOL)addColumn:(TightdbType)type name:(NSString *)name
 {
-    // FIXME: In Objective-C, exceptions are only a debugging
-    // device. They must not be used for error handling in
-    // general. See the note in [TightdbTable addRow].
-    if (_readOnly)
-        [NSException raise:@"Spec is read only" format:@"Tried to add column while read only"];
-    _spec->add_column(tightdb::DataType(type), ObjcStringAccessor(name));
+    return [self addColumn:type name:name error:nil];
+}
+
+-(BOOL)addColumn:(TightdbType)type name:(NSString *)name error:(NSError *__autoreleasing *)error
+{
+    if (_readOnly) {
+        if (error)
+            *error = make_tightdb_error(@"com.tightdb.spec", tdb_err_FailRdOnly, @"Tried to add column while read only");
+        return NO;
+    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _spec->add_column(tightdb::DataType(type), ObjcStringAccessor(name));
+                                 , @"com.tightdb.spec", NO);
     return YES;
 }
 
-// FIXME: Detect errors from core library
 -(TightdbSpec *)addColumnTable:(NSString *)name
 {
-    // FIXME: In Objective-C, exceptions are only a debugging
-    // device. They must not be used for error handling in
-    // general. See the note in [TightdbTable addRow].
-    if (_readOnly)
-        [NSException raise:@"Spec is read only" format:@"Tried to add column while read only"];
-    tightdb::Spec tmp = _spec->add_subtable_column(ObjcStringAccessor(name));
-    return [TightdbSpec specWithSpec:&tmp readOnly:FALSE isOwned:TRUE];
+    return [self addColumnTable:name error:nil];
 }
 
-// FIXME: Detect errors from core library
+-(TightdbSpec *)addColumnTable:(NSString *)name error:(NSError *__autoreleasing *)error
+{
+    if (_readOnly) {
+        if (error)
+            *error = make_tightdb_error(@"com.tightdb.spec", tdb_err_FailRdOnly, @"Tried to add column while read only");
+        return nil;
+    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 tightdb::Spec tmp = _spec->add_subtable_column(ObjcStringAccessor(name));
+                                 return [TightdbSpec specWithSpec:&tmp readOnly:FALSE isOwned:TRUE error:error];
+                                 , @"com.tightdb.spec", nil);
+}
+
 -(TightdbSpec *)getSubspec:(size_t)col_ndx
 {
-    tightdb::Spec subspec = _spec->get_subtable_spec(col_ndx);
-    return [TightdbSpec specWithSpec:&subspec readOnly:_readOnly isOwned:TRUE];
+    return [self getSubspec:col_ndx error:nil];
+}
+
+-(TightdbSpec *)getSubspec:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+{
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 tightdb::Spec subspec = _spec->get_subtable_spec(col_ndx);
+                                 return [TightdbSpec specWithSpec:&subspec readOnly:_readOnly isOwned:TRUE error:error];
+                                 , @"com.tightdb.spec", nil);
 }
 
 -(size_t)getColumnCount
@@ -439,9 +460,16 @@ using namespace std;
     return self;
 }
 
--(void)updateFromSpec
+-(BOOL)updateFromSpec
 {
-    static_cast<tightdb::Table *>(&*self.table)->update_from_spec();
+    return [self updateFromSpecWithError:nil];
+}
+-(BOOL)updateFromSpecWithError:(NSError *__autoreleasing *)error
+{
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 static_cast<tightdb::Table *>(&*self.table)->update_from_spec();
+                                 , @"com.tightdb.table", NO);
+    return YES;
 }
 
 -(BOOL)_checkType
@@ -582,11 +610,16 @@ using namespace std;
 {
     return (TightdbType)_table->get_column_type(ndx);
 }
+
 -(TightdbSpec *)getSpec
+{
+    return [self getSpecWithError:nil];
+}
+-(TightdbSpec *)getSpecWithError:(NSError *__autoreleasing *)error
 {
     tightdb::Spec& spec = tightdb::LangBindHelper::get_spec(*_table);
     BOOL readOnly = _readOnly || _table->has_shared_spec();
-    return [TightdbSpec specWithSpec:&spec readOnly:readOnly isOwned:FALSE];
+    return [TightdbSpec specWithSpec:&spec readOnly:readOnly isOwned:FALSE error:error];
 }
 -(BOOL)isEmpty
 {
@@ -596,61 +629,91 @@ using namespace std;
 {
     return _table->size();
 }
+
 -(size_t)addRow
 {
-    // FIXME: In Objective-C, exceptions are only a debugging
-    // device. They must not be used for error handling in
-    // general. The problem with exceptions in Objective-C is that
-    // they do not safely unwind the stack. Error handling in
-    // Objective-C for void methods, should be done by returning a
-    // bool, and taking an extra Error object argument. From the
-    // applications point of view, if the method returns false,
-    // information about the error is made available in the Error
-    // object by the language binding. Yes, this has huge implications
-    // for the design of this API, and many things need to change.
-    // For a start, see http://stackoverflow.com/a/4649234/1698548 and
-    // http://clang.llvm.org/docs/AutomaticReferenceCounting.html#exceptions. Here
-    // is a good example of how to do:
-    // https://developer.apple.com/library/mac/#documentation/cocoa/reference/foundation/Classes/NSFileManager_Class/Reference/Reference.html
-    if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to add row while read only"];
-    return _table->add_empty_row();
+    return [self addRowWithError:nil];
 }
+-(size_t)addRowWithError:(NSError *__autoreleasing *)error
+{
+    if (_readOnly) {
+        if (error)
+            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, @"Tried to add row while readonly.");
+        return NO;
+    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 return _table->add_empty_row();
+                                 , @"com.tightdb.table", 0);
+}
+
 -(size_t)addRows:(size_t)rowCount
 {
-    // FIXME: In Objective-C, exceptions are only a debugging
-    // device. They must not be used for error handling in
-    // general. See the note in [TightdbTable addRow].
-    if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to add row while read only"];
-    return _table->add_empty_row(rowCount);
+    return [self addRows:rowCount error:nil];
 }
--(void)clear
+
+-(size_t)addRows:(size_t)rowCount error:(NSError *__autoreleasing *)error
 {
-    // FIXME: In Objective-C, exceptions are only a debugging
-    // device. They must not be used for error handling in
-    // general. See the note in [TightdbTable addRow].
-    if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to clear while read only"];
-    _table->clear();
+    if (_readOnly) {
+        if (error)
+            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, @"Tried to add row while readonly.");
+        return NO;
+    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 return _table->add_empty_row(rowCount);
+                                 , @"com.tightdb.table", 0);
 }
--(void)remove:(size_t)ndx
+
+-(BOOL)clear
 {
-    // FIXME: In Objective-C, exceptions are only a debugging
-    // device. They must not be used for error handling in
-    // general. See the note in [TightdbTable addRow].
-    if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to remove row while read only ndx: %llu", (unsigned long long)ndx];
-    _table->remove(ndx);
+    return [self clearWithError:nil];
 }
--(void)removeLast
+-(BOOL)clearWithError:(NSError *__autoreleasing *)error
 {
-    // FIXME: In Objective-C, exceptions are only a debugging
-    // device. They must not be used for error handling in
-    // general. See the note in [TightdbTable addRow].
-    if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to remove last while read only"];
-    _table->remove_last();
+    if (_readOnly) {
+        if (error)
+            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, @"Tried to clear while readonly.");
+        return NO;
+    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->clear();
+                                 , @"com.tightdb.table", NO);
+    return YES;
+}
+
+-(BOOL)remove:(size_t)ndx
+{
+    return [self remove:ndx error:nil];
+}
+
+-(BOOL)remove:(size_t)ndx error:(NSError *__autoreleasing *)error
+{
+    if (_readOnly) {
+        if (error)
+            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to remove row while read only ndx: %llu", (unsigned long long)ndx]);
+        return NO;
+    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->remove(ndx);
+                                 , @"com.tightdb.table", NO);
+    return YES;
+}
+
+-(BOOL)removeLast
+{
+    return [self removeLastWithError:nil];
+}
+
+-(BOOL)removeLastWithError:(NSError *__autoreleasing *)error
+{
+    if (_readOnly) {
+        if (error)
+            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, @"Tried to remove last while readonly.");
+        return NO;
+    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->remove_last();
+                                 , @"com.tightdb.table", NO);
+    return YES;
 }
 -(int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
 {
@@ -1030,14 +1093,21 @@ using namespace std;
     return YES;
 }
 
--(void)clearSubtable:(size_t)col_ndx ndx:(size_t)row_ndx
+-(BOOL)clearSubtable:(size_t)col_ndx ndx:(size_t)row_ndx
 {
-    // FIXME: In Objective-C, exceptions are only a debugging
-    // device. They must not be used for error handling in
-    // general. See the note in [TightdbTable addRow].
-    if (_readOnly)
-        [NSException raise:@"Table is read only" format:@"Tried to clear while read only ColumnId: %llu", (unsigned long long)col_ndx];
-    _table->clear_subtable(col_ndx, row_ndx);
+    return [self clearSubtable:col_ndx ndx:row_ndx error:nil];
+}
+-(BOOL)clearSubtable:(size_t)col_ndx ndx:(size_t)row_ndx error:(NSError *__autoreleasing *)error
+{
+    if (_readOnly) {
+        if (error)
+            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to clear while read only ColumnId: %llu", (unsigned long long)col_ndx]);
+        return NO;
+    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->clear_subtable(col_ndx, row_ndx);
+                                 , @"com.tightdb.table", NO);
+    return YES;
 }
 
 -(TightdbMixed *)getMixed:(size_t)col_ndx ndx:(size_t)row_ndx
@@ -1105,8 +1175,16 @@ using namespace std;
 
 -(size_t)addColumn:(TightdbType)type name:(NSString *)name
 {
-    return _table->add_column(tightdb::DataType(type), ObjcStringAccessor(name));
+    return [self addColumn:type name:name error:nil];
 }
+
+-(size_t)addColumn:(TightdbType)type name:(NSString *)name error:(NSError *__autoreleasing *)error
+{
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 return _table->add_column(tightdb::DataType(type), ObjcStringAccessor(name));
+                                 , @"com.tightdb.table", 0);
+}
+
 -(size_t)findBool:(size_t)col_ndx value:(BOOL)value
 {
     return _table->find_first_bool(col_ndx, value);
@@ -1150,12 +1228,15 @@ using namespace std;
     *view.tableView = _table->find_all_int(col_ndx, value);
     return view;
 }
+
 -(TightdbQuery *)where
 {
-    // FIXME: In Objective-C, exceptions are only a debugging
-    // device. They must not be used for error handling in
-    // general. See the note in [TightdbTable addRow].
-    return [[TightdbQuery alloc] initWithTable:self];
+    return [self whereWithError:nil];
+}
+
+-(TightdbQuery *)whereWithError:(NSError *__autoreleasing *)error
+{
+    return [[TightdbQuery alloc] initWithTable:self error:error];
 }
 -(BOOL)hasIndex:(size_t)col_ndx
 {
@@ -1165,9 +1246,18 @@ using namespace std;
 {
     _table->set_index(col_ndx);
 }
--(void)optimize
+
+-(BOOL)optimize
 {
-    _table->optimize();
+    return [self optimizeWithError:nil];
+}
+
+-(BOOL)optimizeWithError:(NSError *__autoreleasing *)error
+{
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->optimize();
+                                 , @"com.tightdb.table", NO);
+    return YES;
 }
 
 -(size_t)countInt:(size_t)col_ndx target:(int64_t)target

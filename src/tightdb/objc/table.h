@@ -63,9 +63,12 @@
 @interface TightdbSpec: NSObject
 /// Returns NO on memory allocation error.
 -(BOOL)addColumn:(TightdbType)type name:(NSString *)name;
+-(BOOL)addColumn:(TightdbType)type name:(NSString *)name error:(NSError *__autoreleasing *)error;
 /// Returns nil on memory allocation error.
 -(TightdbSpec *)addColumnTable:(NSString *)name;
+-(TightdbSpec *)addColumnTable:(NSString *)name error:(NSError *__autoreleasing *)error;
 -(TightdbSpec *)getSubspec:(size_t)colNdx;
+-(TightdbSpec *)getSubspec:(size_t)colNdx error:(NSError *__autoreleasing *)error;
 -(size_t)getColumnCount;
 -(TightdbType)getColumnType:(size_t)colNdx;
 -(NSString *)getColumnName:(size_t)colNdx;
@@ -74,7 +77,8 @@
 
 
 @interface TightdbTable: NSObject
--(void)updateFromSpec;
+-(BOOL)updateFromSpec;
+-(BOOL)updateFromSpecWithError:(NSError *__autoreleasing *)error;
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
 -(BOOL)isEqual:(TightdbTable *)other;
@@ -115,13 +119,19 @@
 -(size_t)getColumnIndex:(NSString *)name;
 -(TightdbType)getColumnType:(size_t)ndx;
 -(TightdbSpec *)getSpec;
+-(TightdbSpec *)getSpecWithError:(NSError *__autoreleasing *)error;
 -(BOOL)isEmpty;
 -(size_t)count;
 -(size_t)addRow;
+-(size_t)addRowWithError:(NSError *__autoreleasing *)error;
 -(size_t)addRows:(size_t)rowCount;
--(void)clear;
--(void)remove:(size_t)ndx;
--(void)removeLast;
+-(size_t)addRows:(size_t)rowCount error:(NSError *__autoreleasing *)error;
+-(BOOL)clear;
+-(BOOL)clearWithError:(NSError *__autoreleasing *)error;
+-(BOOL)remove:(size_t)ndx;
+-(BOOL)remove:(size_t)ndx error:(NSError *__autoreleasing *)error;
+-(BOOL)removeLast;
+-(BOOL)removeLastWithError:(NSError *__autoreleasing *)error;
 
 // Adaptive ints.
 -(int64_t)get:(size_t)colNdx ndx:(size_t)ndx;
@@ -177,7 +187,8 @@
 -(size_t)getTableSize:(size_t)colNdx ndx:(size_t)ndx;
 -(BOOL)insertSubtable:(size_t)colNdx ndx:(size_t)ndx;
 -(BOOL)insertSubtable:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
--(void)clearSubtable:(size_t)colNdx ndx:(size_t)ndx;
+-(BOOL)clearSubtable:(size_t)colNdx ndx:(size_t)ndx;
+-(BOOL)clearSubtable:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
 
 // Mixed
 -(TightdbMixed *)getMixed:(size_t)colNdx ndx:(size_t)ndx;
@@ -188,6 +199,7 @@
 -(BOOL)setMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value error:(NSError *__autoreleasing *)error;
 
 -(size_t)addColumn:(TightdbType)type name:(NSString *)name;
+-(size_t)addColumn:(TightdbType)type name:(NSString *)name error:(NSError *__autoreleasing *)error;
 
 // Searching
 -(size_t)findBool:(size_t)colNdx value:(BOOL)value;
@@ -199,6 +211,7 @@
 -(size_t)findDate:(size_t)colNdx value:(time_t)value;
 -(size_t)findMixed:(size_t)colNdx value:(TightdbMixed *)value;
 -(TightdbQuery *)where;
+-(TightdbQuery *)whereWithError:(NSError *__autoreleasing *)error;
 
 // FIXME: Why does this one take a TableView as argument?
 -(TightdbView *)findAll:(TightdbView *)view column:(size_t)colNdx value:(int64_t)value;
@@ -209,7 +222,8 @@
 -(void)setIndex:(size_t)colNdx;
 
 // Optimizing
--(void)optimize;
+-(BOOL)optimize;
+-(BOOL)optimizeWithError:(NSError *__autoreleasing *)error;
 
 // Conversion
 // FIXME: Do we want to conversion methods? Maybe use NSData.
