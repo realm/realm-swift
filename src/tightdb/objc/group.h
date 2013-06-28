@@ -29,6 +29,7 @@
 +(TightdbGroup *)groupWithBuffer:(const char*)data size:(size_t)size;
 +(TightdbGroup *)groupWithBuffer:(const char*)data size:(size_t)size error:(NSError *__autoreleasing *)error;
 +(TightdbGroup *)group;
++(TightdbGroup *)groupWithError:(NSError *__autoreleasing *)error;
 
 -(size_t)getTableCount;
 -(NSString *)getTableName:(size_t)table_ndx;
@@ -45,6 +46,7 @@
 /// This method returns nil if it encounters a memory allocation error
 /// (out of memory).
 -(TightdbTable *)getTable:(NSString *)name;
+-(TightdbTable *)getTable:(NSString *)name error:(NSError *__autoreleasing *)error;
 
 /// This method returns nil if the group already contains a table with
 /// the specified name, but its type is incompatible with the
@@ -54,6 +56,7 @@
 /// The specified table class must be one that is declared by using
 /// one of the table macros TIGHTDB_TABLE_*.
 -(id)getTable:(NSString *)name withClass:(Class)obj;
+-(id)getTable:(NSString *)name withClass:(Class)obj error:(NSError *__autoreleasing *)error;
 
 // Serialization
 -(BOOL)write:(NSString *)filePath;

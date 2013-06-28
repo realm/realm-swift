@@ -669,13 +669,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->set_int(col_ndx, ndx, value);
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->set_int(col_ndx, ndx, value);
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -696,13 +692,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->set_bool(col_ndx, ndx, value);
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->set_bool(col_ndx, ndx, value);
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -723,13 +715,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->set_float(col_ndx, ndx, value);
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->set_float(col_ndx, ndx, value);
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -750,13 +738,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->set_double(col_ndx, ndx, value);
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->set_double(col_ndx, ndx, value);
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -777,13 +761,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->set_date(col_ndx, ndx, value);
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->set_date(col_ndx, ndx, value);
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -799,13 +779,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->insert_bool(col_ndx, ndx, value);
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->insert_bool(col_ndx, ndx, value);
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -822,13 +798,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->insert_int(col_ndx, ndx, value);
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->insert_int(col_ndx, ndx, value);
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -844,13 +816,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->insert_float(col_ndx, ndx, value);
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->insert_float(col_ndx, ndx, value);
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -866,13 +834,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->insert_double(col_ndx, ndx, value);
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->insert_double(col_ndx, ndx, value);
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -888,13 +852,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->insert_string(col_ndx, ndx, ObjcStringAccessor(value));
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->insert_string(col_ndx, ndx, ObjcStringAccessor(value));
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -910,13 +870,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->insert_binary(col_ndx, ndx, [value getBinary]);
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->insert_binary(col_ndx, ndx, [value getBinary]);
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -932,13 +888,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->insert_binary(col_ndx, ndx, tightdb::BinaryData(data, size));
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->insert_binary(col_ndx, ndx, tightdb::BinaryData(data, size));
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -954,13 +906,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->insert_date(col_ndx, ndx, value);
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->insert_date(col_ndx, ndx, value);
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -971,13 +919,9 @@ using namespace std;
 
 -(BOOL)insertDoneWithError:(NSError *__autoreleasing *)error
 {
-    try {
-        _table->insert_done();
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->insert_done();
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -997,13 +941,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->set_string(col_ndx, ndx, ObjcStringAccessor(value));
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->set_string(col_ndx, ndx, ObjcStringAccessor(value));
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -1024,13 +964,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->set_binary(col_ndx, ndx, [value getBinary]);
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->set_binary(col_ndx, ndx, [value getBinary]);
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -1046,13 +982,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->set_binary(col_ndx, ndx, tightdb::BinaryData(data, size));
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->set_binary(col_ndx, ndx, tightdb::BinaryData(data, size));
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -1073,13 +1005,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        _table->insert_subtable(col_ndx, row_ndx);
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->insert_subtable(col_ndx, row_ndx);
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -1096,13 +1024,9 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        tightdb::LangBindHelper::insert_subtable(*_table, col_ndx, row_ndx, [subtable getTable]);
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 tightdb::LangBindHelper::insert_subtable(*_table, col_ndx, row_ndx, [subtable getTable]);
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -1143,19 +1067,15 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        if (value.mixed.get_type() == tightdb::type_Table && value.table) {
-            tightdb::LangBindHelper::insert_mixed_subtable(*_table, col_ndx, row_ndx,
-                                                           [value.table getTable]);
-        }
-        else {
-            _table->insert_mixed(col_ndx, row_ndx, value.mixed);
-        }
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 if (value.mixed.get_type() == tightdb::type_Table && value.table) {
+                                     tightdb::LangBindHelper::insert_mixed_subtable(*_table, col_ndx, row_ndx,
+                                                                                    [value.table getTable]);
+                                 }
+                                 else {
+                                     _table->insert_mixed(col_ndx, row_ndx, value.mixed);
+                                 }
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 
@@ -1171,19 +1091,15 @@ using namespace std;
             *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    try {
-        if (value.mixed.get_type() == tightdb::type_Table && value.table) {
-            tightdb::LangBindHelper::set_mixed_subtable(*_table, col_ndx, row_ndx,
-                                                        [value.table getTable]);
-        }
-        else {
-            _table->set_mixed(col_ndx, row_ndx, value.mixed);
-        }
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 if (value.mixed.get_type() == tightdb::type_Table && value.table) {
+                                     tightdb::LangBindHelper::set_mixed_subtable(*_table, col_ndx, row_ndx,
+                                                                                 [value.table getTable]);
+                                 }
+                                 else {
+                                     _table->set_mixed(col_ndx, row_ndx, value.mixed);
+                                 }
+                                 , @"com.tightdb.table", NO);
     return YES;
 }
 

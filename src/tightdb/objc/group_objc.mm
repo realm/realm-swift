@@ -26,8 +26,15 @@ using namespace std;
 
 +(TightdbGroup *)group
 {
+    return [self groupWithError:nil];
+}
+
++(TightdbGroup *)groupWithError:(NSError *__autoreleasing *)error
+{
     TightdbGroup *group = [[TightdbGroup alloc] init];
-    group.group = new tightdb::Group(); // FIXME: Both new-operator and Group constructor may throw at least std::bad_alloc.
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 group.group = new tightdb::Group();
+                                 , @"com.tightdb.group", nil);
     group.readOnly = NO;
     return group;
 }
@@ -50,14 +57,9 @@ using namespace std;
 +(TightdbGroup *)groupWithFilename:(NSString *)filename error:(NSError **)error
 {
     tightdb::Group* group;
-    try {
-        group = new tightdb::Group(tightdb::StringData(ObjcStringAccessor(filename)));
-    }
-    catch (std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.group", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return nil;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 group = new tightdb::Group(tightdb::StringData(ObjcStringAccessor(filename)));
+                                 , @"com.tightdb.group", nil);
     TightdbGroup* group2 = [[TightdbGroup alloc] init];
     if (group2) {
       group2.group = group;
@@ -74,14 +76,9 @@ using namespace std;
 +(TightdbGroup *)groupWithBuffer:(const char *)data size:(size_t)size error:(NSError *__autoreleasing *)error
 {
     tightdb::Group* group;
-    try {
-        group = new tightdb::Group(tightdb::BinaryData(data, size));
-    }
-    catch (std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.group", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return nil;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 group = new tightdb::Group(tightdb::BinaryData(data, size));
+                                 , @"com.tightdb.group", nil);
     TightdbGroup* group2 = [[TightdbGroup alloc] init];
     group2.group = group;
     group2.readOnly = NO;
@@ -118,24 +115,9 @@ using namespace std;
 
 -(BOOL)write:(NSString *)filePath error:(NSError *__autoreleasing *)error
 {
-    try {
-        _group->write(tightdb::StringData(ObjcStringAccessor(filePath)));
-    }
-    catch(tightdb::File::AccessError &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.group", tdb_err_FileAccess, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
-    catch(tightdb::ResourceAllocError &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.group", tdb_err_Resource, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
-    catch (std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.group", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _group->write(tightdb::StringData(ObjcStringAccessor(filePath)));
+                                 , @"com.tightdb.group", NO);
     return YES;
 }
 
@@ -146,15 +128,11 @@ using namespace std;
 
 -(const char*)writeToMem:(size_t*)size error:(NSError *__autoreleasing *)error
 {
-    try {
-        tightdb::BinaryData buffer = _group->write_to_mem();
-        *size = buffer.size();
-        return buffer.data();
-    } catch(std::exception &ex) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.group", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
-        return nil;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 tightdb::BinaryData buffer = _group->write_to_mem();
+                                 *size = buffer.size();
+                                 return buffer.data();
+                                 , @"com.tightdb.group", nil);
 }
 
 -(BOOL)hasTable:(NSString *)name
@@ -174,23 +152,36 @@ using namespace std;
 
 -(id)getTable:(NSString *)name
 {
+    return [self getTable:name error:nil];
+}
+
+-(id)getTable:(NSString *)name error:(NSError *__autoreleasing *)error
+{
     TightdbTable *table = [[TightdbTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table)) return nil;
-    [table setTable:_group->get_table(ObjcStringAccessor(name))];
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 [table setTable:_group->get_table(ObjcStringAccessor(name))];
+                                 , @"com.tightdb.group", nil);
     [table setParent:self];
     [table setReadOnly:_readOnly];
     return table;
 }
 
-// FIXME: Check that the specified class derives from Table.
 -(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)classObj
+{
+    return [self getTable:name withClass:classObj error:nil];
+}
+// FIXME: Check that the specified class derives from Table.
+-(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)classObj error:(NSError *__autoreleasing *)error
 {
     TightdbTable *table = [[classObj alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table)) return nil;
     bool was_created;
-    tightdb::TableRef r = tightdb::LangBindHelper::get_table_ptr(_group, ObjcStringAccessor(name),
-                                                                 was_created)->get_table_ref();
-    [table setTable:move(r)];
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 tightdb::TableRef r = tightdb::LangBindHelper::get_table_ptr(_group, ObjcStringAccessor(name),
+                                                                                              was_created)->get_table_ref();
+                                 [table setTable:move(r)];
+                                 , @"com.tightdb.group", nil);
     [table setParent:self];
     [table setReadOnly:_readOnly];
     if (was_created) {
