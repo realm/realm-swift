@@ -61,6 +61,24 @@ inline NSError *make_tightdb_error(NSString *domain, TightdbErr code, NSString *
     return [NSError errorWithDomain:domain code:code userInfo:details];
 }
 
+#define TIGHTDB_EXCEPTION_ERRHANDLER(action, domain, failReturnValue) try { action }  \
+catch(tightdb::File::AccessError &ex) { \
+    if (error) \
+        *error = make_tightdb_error(domain, tdb_err_FileAccess, [NSString stringWithUTF8String:ex.what()]); \
+        return failReturnValue; \
+} \
+catch(tightdb::ResourceAllocError &ex) { \
+    if (error) \
+        *error = make_tightdb_error(domain, tdb_err_Resource, [NSString stringWithUTF8String:ex.what()]); \
+        return failReturnValue; \
+} \
+catch (std::exception &ex) { \
+    if (error) \
+        *error = make_tightdb_error(domain, tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]); \
+        return failReturnValue; \
+}
+
+
 inline NSString* to_objc_string(tightdb::StringData s)
 {
     using namespace std;
