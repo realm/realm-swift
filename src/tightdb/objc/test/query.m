@@ -47,33 +47,33 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [table addBoolCol:YES  IntCol:506      FloatCol:7.7     DoubleCol:8.8       StringCol:@"banach"
             BinaryCol:bin2 DateCol:timeNow TableCol:subtab2 MixedCol:mixSubtab];
 
-    STAssertEquals([[[table where].BoolCol   equal:NO]      count], (size_t)1, @"BoolCol equal");
-    STAssertEquals([[[table where].IntCol    equal:54]      count], (size_t)1, @"IntCol equal");
-    STAssertEquals([[[table where].FloatCol  equal:0.7f]    count], (size_t)1, @"FloatCol equal");
-    STAssertEquals([[[table where].DoubleCol equal:0.8]     count], (size_t)1, @"DoubleCol equal");
-    STAssertEquals([[[table where].StringCol equal:@"foo"]  count], (size_t)1, @"StringCol equal");
-    STAssertEquals([[[table where].BinaryCol equal:bin1]    count], (size_t)1, @"BinaryCol equal");
-    STAssertEquals([[[table where].DateCol   equal:0]       count], (size_t)1, @"DateCol equal");
+    STAssertEquals([[[[table where].BoolCol   equal:NO]      count] unsignedLongValue], (size_t)1, @"BoolCol equal");
+    STAssertEquals([[[[table where].IntCol    equal:54]      count] unsignedLongValue], (size_t)1, @"IntCol equal");
+    STAssertEquals([[[[table where].FloatCol  equal:0.7f]    count] unsignedLongValue], (size_t)1, @"FloatCol equal");
+    STAssertEquals([[[[table where].DoubleCol equal:0.8]     count] unsignedLongValue], (size_t)1, @"DoubleCol equal");
+    STAssertEquals([[[[table where].StringCol equal:@"foo"]  count] unsignedLongValue], (size_t)1, @"StringCol equal");
+    STAssertEquals([[[[table where].BinaryCol equal:bin1]    count] unsignedLongValue], (size_t)1, @"BinaryCol equal");
+    STAssertEquals([[[[table where].DateCol   equal:0]       count] unsignedLongValue], (size_t)1, @"DateCol equal");
 // These are not yet implemented
 //    STAssertEquals([[[table where].TableCol  equal:subtab1] count], (size_t)1, @"TableCol equal");
 //    STAssertEquals([[[table where].MixedCol  equal:mixInt1] count], (size_t)1, @"MixedCol equal");
 
     TestQueryAllTypes_Query *query = [[table where].BoolCol   equal:NO];
 
-    STAssertEquals([query.IntCol min], (int64_t)54,    @"IntCol min");
-    STAssertEquals([query.IntCol max], (int64_t)54,    @"IntCol max");
-    STAssertEquals([query.IntCol sum], (int64_t)54,    @"IntCol sum");
-    STAssertEquals([query.IntCol avg], 54.0,           @"IntCol avg");
+    STAssertEquals([[query.IntCol min] longLongValue], (int64_t)54,    @"IntCol min");
+    STAssertEquals([[query.IntCol max] longLongValue], (int64_t)54,    @"IntCol max");
+    STAssertEquals([[query.IntCol sum] longLongValue], (int64_t)54,    @"IntCol sum");
+    STAssertEquals([[query.IntCol avg] doubleValue], 54.0,           @"IntCol avg");
 
-    STAssertEquals([query.FloatCol min], 0.7f,         @"FloatCol min");
-    STAssertEquals([query.FloatCol max], 0.7f,         @"FloatCol max");
-    STAssertEquals([query.FloatCol sum], (double)0.7f, @"FloatCol sum");
-    STAssertEquals([query.FloatCol avg], (double)0.7f, @"FloatCol avg");
+    STAssertEquals([[query.FloatCol min] floatValue], 0.7f,         @"FloatCol min");
+    STAssertEquals([[query.FloatCol max] floatValue], 0.7f,         @"FloatCol max");
+    STAssertEquals([[query.FloatCol sum] floatValue], 0.7f, @"FloatCol sum");
+    STAssertEquals([[query.FloatCol avg] doubleValue], (double)0.7f, @"FloatCol avg");
 
-    STAssertEquals([query.DoubleCol min], 0.8,         @"DoubleCol min");
-    STAssertEquals([query.DoubleCol max], 0.8,         @"DoubleCol max");
-    STAssertEquals([query.DoubleCol sum], 0.8,         @"DoubleCol sum");
-    STAssertEquals([query.DoubleCol avg], 0.8,         @"DoubleCol avg");
+    STAssertEquals([[query.DoubleCol min] doubleValue], 0.8,         @"DoubleCol min");
+    STAssertEquals([[query.DoubleCol max] doubleValue], 0.8,         @"DoubleCol max");
+    STAssertEquals([[query.DoubleCol sum] doubleValue], 0.8,         @"DoubleCol sum");
+    STAssertEquals([[query.DoubleCol avg] doubleValue], 0.8,         @"DoubleCol avg");
 
     // Check that all column conditions return query objects of the
     // right type
@@ -195,13 +195,13 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
         // Test correct values are returned.
 
-        STAssertEquals([[table where] sumInt:INT_COL], (int64_t)860, @"IntCol max");
+        STAssertEquals([[[table where] sumInt:INT_COL] longLongValue], (int64_t)860, @"IntCol max");
 
         // Test that currect query retult size returned.
 
-        STAssertEquals([[[table where] betweenInt:859 to:861 colNdx:INT_COL] count], (size_t)1, @"betweenInt");
-        STAssertEquals([[[table where] betweenFloat:5.5 to:5.7 colNdx:FLOAT_COL] count], (size_t)1, @"betweenInt");
-        STAssertEquals([[[table where] betweenDouble:5.5 to:5.7 colNdx:DOUBLE_COL] count], (size_t)1, @"betweenInt");
+        STAssertEquals([[[[table where] betweenInt:859 to:861 colNdx:INT_COL] count] unsignedLongValue], (size_t)1, @"betweenInt");
+        STAssertEquals([[[[table where] betweenFloat:5.5 to:5.7 colNdx:FLOAT_COL] count] unsignedLongValue], (size_t)1, @"betweenInt");
+        STAssertEquals([[[[table where] betweenDouble:5.5 to:5.7 colNdx:DOUBLE_COL] count] unsignedLongValue], (size_t)1, @"betweenInt");
 }
 
 @end
