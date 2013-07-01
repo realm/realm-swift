@@ -12,6 +12,9 @@
 
 using namespace std;
 
+#ifdef TIGHTDB_DEBUG
+int TightdbCursorAllocateCount = 0;
+#endif
 
 @interface TightdbCursor()
 @property (nonatomic, weak) TightdbTable *table;
@@ -25,6 +28,10 @@ using namespace std;
 {
     self = [super init];
     if (self) {
+#ifdef TIGHTDB_DEBUG
+        NSLog(@"TightdbCursor init");
+        ++TightdbCursorAllocateCount;
+#endif
         _table = table;
         _ndx = ndx;
     }
@@ -38,6 +45,7 @@ using namespace std;
 {
 #ifdef TIGHTDB_DEBUG
     NSLog(@"TightdbCursor dealloc");
+    --TightdbCursorAllocateCount;
 #endif
     _table = nil;
 }

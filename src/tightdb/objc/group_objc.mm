@@ -14,6 +14,9 @@
 
 using namespace std;
 
+#ifdef TIGHTDB_DEBUG
+int TightdbGroupAllocateCount = 0;
+#endif
 
 @interface TightdbGroup()
 @property(nonatomic) tightdb::Group *group;
@@ -36,6 +39,9 @@ using namespace std;
                                  group.group = new tightdb::Group();
                                  , @"com.tightdb.group", return nil);
     group.readOnly = NO;
+#ifdef TIGHTDB_DEBUG
+    ++TightdbGroupAllocateCount;
+#endif
     return group;
 }
 
@@ -45,6 +51,9 @@ using namespace std;
     TightdbGroup *group = [[TightdbGroup alloc] init];
     group.group = tightdbGroup;
     group.readOnly = readOnly;
+#ifdef TIGHTDB_DEBUG
+    ++TightdbGroupAllocateCount;
+#endif
     return group;
 }
 
@@ -65,6 +74,9 @@ using namespace std;
       group2.group = group;
       group2.readOnly = NO;
     }
+#ifdef TIGHTDB_DEBUG
+    ++TightdbGroupAllocateCount;
+#endif
     return group2;
 }
 
@@ -82,6 +94,9 @@ using namespace std;
     TightdbGroup* group2 = [[TightdbGroup alloc] init];
     group2.group = group;
     group2.readOnly = NO;
+#ifdef TIGHTDB_DEBUG
+    ++TightdbGroupAllocateCount;
+#endif
     return group2;
 }
 
@@ -94,6 +109,7 @@ using namespace std;
 {
 #ifdef TIGHTDB_DEBUG
     NSLog(@"TightdbGroup dealloc");
+    --TightdbGroupAllocateCount;
 #endif
     delete _group;
 }

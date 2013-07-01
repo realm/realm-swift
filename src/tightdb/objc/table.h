@@ -77,6 +77,7 @@
 
 
 @interface TightdbTable: NSObject
+-(id)initWithError:(NSError *__autoreleasing *)error;
 -(BOOL)updateFromSpec;
 -(BOOL)updateFromSpecWithError:(NSError *__autoreleasing *)error;
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;

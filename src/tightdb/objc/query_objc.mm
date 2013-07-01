@@ -17,6 +17,10 @@
 
 using namespace std;
 
+#ifdef TIGHTDB_DEBUG
+int TightdbQueryAllocateCount = 0;
+#endif
+
 
 @interface TightdbView()
 +(TightdbView *)tableViewWithTableView:(tightdb::TableView)table;
@@ -50,6 +54,10 @@ using namespace std;
         TIGHTDB_EXCEPTION_ERRHANDLER(
                                      _query = new tightdb::Query([_table getTable].where());
                                      , @"com.tightdb.query", return nil);
+#ifdef TIGHTDB_DEBUG
+        NSLog(@"TightdbQuery init");
+        ++TightdbQueryAllocateCount;
+#endif
     }
     return self;
 }
@@ -102,6 +110,7 @@ using namespace std;
 {
 #ifdef TIGHTDB_DEBUG
     NSLog(@"Query dealloc");
+    --TightdbQueryAllocateCount;
 #endif
     delete _query;
 }
@@ -560,7 +569,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorBool
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
@@ -582,7 +591,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorInt
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
@@ -689,7 +698,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorFloat
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
@@ -782,7 +791,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorDouble
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
@@ -875,7 +884,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorString
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
@@ -942,7 +951,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorBinary
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
@@ -984,7 +993,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorDate
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
@@ -1036,7 +1045,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorSubtable
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
@@ -1053,7 +1062,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorMixed
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query

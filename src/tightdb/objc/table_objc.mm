@@ -210,6 +210,9 @@ using namespace std;
 }
 @end
 
+#ifdef TIGHTDB_DEBUG
+int TightdbSpecAllocateCount = 0;
+#endif
 
 @interface TightdbSpec()
 @property (nonatomic) tightdb::Spec *spec;
@@ -239,6 +242,9 @@ using namespace std;
         spec2.spec     = spec;
         spec2.isOwned  = FALSE;
     }
+#ifdef TIGHTDB_DEBUG
+    ++TightdbSpecAllocateCount;
+#endif
     return spec2;
 }
 
@@ -313,6 +319,7 @@ using namespace std;
 {
 #ifdef TIGHTDB_DEBUG
     NSLog(@"TightdbSpec dealloc");
+    --TightdbSpecAllocateCount;
 #endif
     if (_isOwned) delete _spec;
 }
@@ -321,12 +328,16 @@ using namespace std;
 @end
 
 
+#ifdef TIGHTDB_DEBUG
+int TightdbViewAllocateCount = 0;
+#endif
+
 @interface TightdbView()
 @property (nonatomic) tightdb::TableView *tableView;
 @end
 @implementation TightdbView
 {
-    TightdbTable *_table;
+    __weak TightdbTable *_table;
 }
 @synthesize tableView = _tableView;
 
@@ -337,6 +348,9 @@ using namespace std;
     if (self) {
         _table = [query getTable];
         self.tableView = new tightdb::TableView([query getTableView]);
+#ifdef TIGHTDB_DEBUG
+        ++TightdbViewAllocateCount;
+#endif
     }
     return self;
 }
@@ -351,6 +365,10 @@ using namespace std;
     (void)table;
     TightdbView *tableView = [[TightdbView alloc] init];
     tableView.tableView = new tightdb::TableView(); // not longer needs table at construction
+#ifdef TIGHTDB_DEBUG
+    if (tableView)
+        ++TightdbViewAllocateCount;
+#endif
     return tableView;
 }
 
@@ -358,6 +376,10 @@ using namespace std;
 {
     TightdbView *tableView = [[TightdbView alloc] init];
     tableView.tableView = new tightdb::TableView(table);
+#ifdef TIGHTDB_DEBUG
+    if (tableView)
+        ++TightdbViewAllocateCount;
+#endif
     return tableView;
 }
 
@@ -365,6 +387,7 @@ using namespace std;
 {
 #ifdef TIGHTDB_DEBUG
     NSLog(@"TightdbView dealloc");
+    --TightdbViewAllocateCount;
 #endif
     _table = nil;
     delete _tableView;
@@ -437,6 +460,10 @@ using namespace std;
 @end
 
 
+#ifdef TIGHTDB_DEBUG
+int TightdbTableAllocateCount = 0;
+#endif
+
 @implementation TightdbTable
 {
     id _parent;
@@ -446,10 +473,20 @@ using namespace std;
 
 -(id)init
 {
+    return [self initWithError:nil];
+}
+
+-(id)initWithError:(NSError *__autoreleasing *)error
+{
     self = [super init];
     if (self) {
         _readOnly = NO;
-        _table = tightdb::Table::create(); // FIXME: May throw
+        TIGHTDB_EXCEPTION_ERRHANDLER(
+                                     _table = tightdb::Table::create();
+                                     , @"com.tightdb.table", return nil);
+#ifdef TIGHTDB_DEBUG
+        ++TightdbTableAllocateCount;
+#endif
     }
     return self;
 }
@@ -457,6 +494,11 @@ using namespace std;
 -(id)_initRaw
 {
     self = [super init];
+#ifdef TIGHTDB_DEBUG
+    if (self) {
+        ++TightdbTableAllocateCount;
+    }
+#endif
     return self;
 }
 
@@ -590,6 +632,7 @@ using namespace std;
 {
 #ifdef TIGHTDB_DEBUG
     NSLog(@"TightdbTable dealloc");
+    --TightdbTableAllocateCount;
 #endif
     _parent = nil;
 }

@@ -97,6 +97,7 @@
 		E91890F2177B71E400653D7A /* table.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = table.m; path = ../../src/tightdb/objc/test/table.m; sourceTree = "<group>"; };
 		E91890F3177B71E400653D7A /* template.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = template.m; path = ../../src/tightdb/objc/test/template.m; sourceTree = "<group>"; };
 		E91890F4177B71E400653D7A /* tutorial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = tutorial.m; path = ../../src/tightdb/objc/test/tutorial.m; sourceTree = "<group>"; };
+		E9F2A7B11781FAB600292661 /* TestHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestHelper.h; path = ../../src/tightdb/objc/test/TestHelper.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -196,6 +197,7 @@
 		E91890B4177B677900653D7A /* TightDbObjcDynTests */ = {
 			isa = PBXGroup;
 			children = (
+				E9F2A7B11781FAB600292661 /* TestHelper.h */,
 				E91890E7177B71E400653D7A /* data_type.mm */,
 				E91890E8177B71E400653D7A /* enumerator.m */,
 				E91890E9177B71E400653D7A /* err_handling.mm */,
