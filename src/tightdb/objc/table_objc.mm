@@ -232,7 +232,7 @@ using namespace std;
     if (isOwned) {
         TIGHTDB_EXCEPTION_ERRHANDLER(
                                      spec2.spec    = new tightdb::Spec(*spec);
-                                     , @"com.tightdb.spec", nil);
+                                     , @"com.tightdb.spec", return nil);
         spec2.isOwned = TRUE;
     }
     else {
@@ -258,7 +258,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _spec->add_column(tightdb::DataType(type), ObjcStringAccessor(name));
-                                 , @"com.tightdb.spec", NO);
+                                 , @"com.tightdb.spec", return NO);
     return YES;
 }
 
@@ -277,7 +277,7 @@ using namespace std;
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  tightdb::Spec tmp = _spec->add_subtable_column(ObjcStringAccessor(name));
                                  return [TightdbSpec specWithSpec:&tmp readOnly:FALSE isOwned:TRUE error:error];
-                                 , @"com.tightdb.spec", nil);
+                                 , @"com.tightdb.spec", return nil);
 }
 
 -(TightdbSpec *)getSubspec:(size_t)col_ndx
@@ -290,7 +290,7 @@ using namespace std;
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  tightdb::Spec subspec = _spec->get_subtable_spec(col_ndx);
                                  return [TightdbSpec specWithSpec:&subspec readOnly:_readOnly isOwned:TRUE error:error];
-                                 , @"com.tightdb.spec", nil);
+                                 , @"com.tightdb.spec", return nil);
 }
 
 -(size_t)getColumnCount
@@ -468,7 +468,7 @@ using namespace std;
 {
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  static_cast<tightdb::Table *>(&*self.table)->update_from_spec();
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -643,7 +643,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return _table->add_empty_row();
-                                 , @"com.tightdb.table", 0);
+                                 , @"com.tightdb.table", return 0);
 }
 
 -(size_t)addRows:(size_t)rowCount
@@ -660,7 +660,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return _table->add_empty_row(rowCount);
-                                 , @"com.tightdb.table", 0);
+                                 , @"com.tightdb.table", return 0);
 }
 
 -(BOOL)clear
@@ -676,7 +676,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->clear();
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -694,7 +694,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->remove(ndx);
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -712,7 +712,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->remove_last();
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 -(int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
@@ -734,7 +734,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->set_int(col_ndx, ndx, value);
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -757,7 +757,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->set_bool(col_ndx, ndx, value);
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -780,7 +780,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->set_float(col_ndx, ndx, value);
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -803,7 +803,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->set_double(col_ndx, ndx, value);
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -826,7 +826,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->set_date(col_ndx, ndx, value);
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -844,7 +844,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->insert_bool(col_ndx, ndx, value);
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -863,7 +863,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->insert_int(col_ndx, ndx, value);
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -881,7 +881,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->insert_float(col_ndx, ndx, value);
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -899,7 +899,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->insert_double(col_ndx, ndx, value);
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -917,7 +917,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->insert_string(col_ndx, ndx, ObjcStringAccessor(value));
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -935,7 +935,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->insert_binary(col_ndx, ndx, [value getBinary]);
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -953,7 +953,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->insert_binary(col_ndx, ndx, tightdb::BinaryData(data, size));
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -971,7 +971,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->insert_date(col_ndx, ndx, value);
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -984,7 +984,7 @@ using namespace std;
 {
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->insert_done();
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -1006,7 +1006,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->set_string(col_ndx, ndx, ObjcStringAccessor(value));
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -1029,7 +1029,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->set_binary(col_ndx, ndx, [value getBinary]);
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -1047,7 +1047,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->set_binary(col_ndx, ndx, tightdb::BinaryData(data, size));
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -1070,7 +1070,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->insert_subtable(col_ndx, row_ndx);
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -1089,7 +1089,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  tightdb::LangBindHelper::insert_subtable(*_table, col_ndx, row_ndx, [subtable getTable]);
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -1106,7 +1106,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->clear_subtable(col_ndx, row_ndx);
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -1145,7 +1145,7 @@ using namespace std;
                                  else {
                                      _table->insert_mixed(col_ndx, row_ndx, value.mixed);
                                  }
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -1169,7 +1169,7 @@ using namespace std;
                                  else {
                                      _table->set_mixed(col_ndx, row_ndx, value.mixed);
                                  }
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 
@@ -1182,7 +1182,7 @@ using namespace std;
 {
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return _table->add_column(tightdb::DataType(type), ObjcStringAccessor(name));
-                                 , @"com.tightdb.table", 0);
+                                 , @"com.tightdb.table", return 0);
 }
 
 -(size_t)findBool:(size_t)col_ndx value:(BOOL)value
@@ -1256,7 +1256,7 @@ using namespace std;
 {
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _table->optimize();
-                                 , @"com.tightdb.table", NO);
+                                 , @"com.tightdb.table", return NO);
     return YES;
 }
 

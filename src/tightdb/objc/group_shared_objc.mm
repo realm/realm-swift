@@ -15,21 +15,17 @@ using namespace std;
 
 +(TightdbSharedGroup *)groupWithFilename:(NSString *)filename
 {
+    return [self groupWithFilename:filename error:nil];
+}
+
++(TightdbSharedGroup *)groupWithFilename:(NSString *)filename error:(NSError *__autoreleasing *)error
+{
     tightdb::SharedGroup* shared_group;
-    try {
-        shared_group = new tightdb::SharedGroup(tightdb::StringData(ObjcStringAccessor(filename)));
-    }
-    catch (...) {
-        // FIXME: Diffrent exception types mean different things. More
-        // details must be made available. We should proably have
-        // special catches for at least these:
-        // tightdb::File::AccessError (and various derivatives),
-        // tightdb::ResourceAllocError, std::bad_alloc. In general,
-        // any core library function or operator that is not declared
-        // 'noexcept' must be considered as being able to throw
-        // anything derived from std::exception.
-        return nil;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 shared_group = new tightdb::SharedGroup(tightdb::StringData(ObjcStringAccessor(filename)));
+                                 , @"com.tightdb.sharedgroup",
+                                 return nil;
+                                 );
     TightdbSharedGroup* shared_group2 = [[TightdbSharedGroup alloc] init];
     if (shared_group2) {
       shared_group2->_sharedGroup = shared_group;
@@ -43,39 +39,46 @@ using namespace std;
     _sharedGroup = 0;
 }
 
-
--(void)readTransaction:(TightdbSharedGroupReadTransactionBlock)block
+-(BOOL)readTransaction:(TightdbSharedGroupReadTransactionBlock)block
+{
+    return [self readTransaction:block error:nil];
+}
+-(BOOL)readTransaction:(TightdbSharedGroupReadTransactionBlock)block error:(NSError *__autoreleasing *)error
 {
     TightdbGroup* group;
-    @try {
-        group = [TightdbGroup groupTightdbGroup:(tightdb::Group *)&_sharedGroup->begin_read() readOnly:YES];
-        block(group);
-    }
-    @catch (NSException *exception) {
-        @throw exception;
-    }
-    @finally {
-        _sharedGroup->end_read();
-        [group clearGroup];
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 group = [TightdbGroup groupTightdbGroup:(tightdb::Group *)&_sharedGroup->begin_read() readOnly:YES];
+                                 block(group);
+                                 _sharedGroup->end_read();
+                                 [group clearGroup];
+                                 , @"com.tightdb.sharedgroup",
+                                 _sharedGroup->end_read();
+                                 [group clearGroup];
+                                 return NO;
+                                 );
+    return YES;
 }
 
--(void)writeTransaction:(TightdbSharedGroupWriteTransactionBlock)block
+-(BOOL)writeTransaction:(TightdbSharedGroupWriteTransactionBlock)block
+{
+    return [self writeTransaction:block error:nil];
+}
+-(BOOL)writeTransaction:(TightdbSharedGroupWriteTransactionBlock)block error:(NSError *__autoreleasing *)error
 {
     TightdbGroup* group;
-    @try {
-        group = [TightdbGroup groupTightdbGroup:&_sharedGroup->begin_write() readOnly:NO];
-        if (block(group))
-            _sharedGroup->commit();
-        else
-            _sharedGroup->rollback();
-        [group clearGroup];
-    }
-    @catch (NSException *exception) {
-        _sharedGroup->rollback();
-        [group clearGroup];
-        @throw exception;
-    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 group = [TightdbGroup groupTightdbGroup:&_sharedGroup->begin_write() readOnly:NO];
+                                 if (block(group))
+                                 _sharedGroup->commit();
+                                 else
+                                 _sharedGroup->rollback();
+                                 [group clearGroup];
+                                 , @"com.tightdb.sharedgroup",
+                                 _sharedGroup->rollback();
+                                 [group clearGroup];
+                                 return NO;
+                                 );
+    return YES;
 }
 
 

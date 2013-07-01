@@ -49,7 +49,7 @@ using namespace std;
         _table = table;
         TIGHTDB_EXCEPTION_ERRHANDLER(
                                      _query = new tightdb::Query([_table getTable].where());
-                                     , @"com.tightdb.query", nil);
+                                     , @"com.tightdb.query", return nil);
     }
     return self;
 }
@@ -120,21 +120,21 @@ using namespace std;
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                  _query->group();
-                                 , @"com.tightdb.query", self, &_error);
+                                 , @"com.tightdb.query", return self, &_error);
     return self;
 }
 -(TightdbQuery *)or
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                     _query->Or();
-                                    , @"com.tightdb.query", self, &_error);
+                                    , @"com.tightdb.query", return self, &_error);
     return self;
 }
 -(TightdbQuery *)endgroup
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                     _query->end_group();
-                                    , @"com.tightdb.query", self, &_error);
+                                    , @"com.tightdb.query", return self, &_error);
     return self;
 }
 -(void)subtable:(size_t)column
@@ -161,7 +161,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return [NSNumber TIGHTDB_OBJC_SIZE_T_NUMBER_IN:_query->count()];
-                                 , @"com.tightdb.query", nil);
+                                 , @"com.tightdb.query", return nil);
 }
 
 -(NSNumber *)remove
@@ -180,7 +180,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return [NSNumber TIGHTDB_OBJC_SIZE_T_NUMBER_IN:_query->remove()];
-                                 , @"com.tightdb.query", nil);
+                                 , @"com.tightdb.query", return nil);
 }
 
 -(NSNumber *)minInt:(size_t)col_ndx
@@ -198,7 +198,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return [NSNumber numberWithLongLong:_query->minimum(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+                                 , @"com.tightdb.query", return nil);
 }
 
 -(NSNumber *)minFloat:(size_t)col_ndx
@@ -216,7 +216,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return [NSNumber numberWithFloat:_query->minimum_float(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+                                 , @"com.tightdb.query", return nil);
 }
 
 -(NSNumber *)minDouble:(size_t)col_ndx
@@ -234,7 +234,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return [NSNumber numberWithDouble:_query->minimum_double(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+                                 , @"com.tightdb.query", return nil);
 }
 
 -(NSNumber *)maxInt:(size_t)col_ndx
@@ -252,7 +252,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return [NSNumber numberWithLongLong:_query->maximum(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+                                 , @"com.tightdb.query", return nil);
 }
 -(NSNumber *)maxFloat:(size_t)col_ndx
 {
@@ -269,7 +269,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return [NSNumber numberWithFloat:_query->maximum_float(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+                                 , @"com.tightdb.query", return nil);
 }
 
 -(NSNumber *)maxDouble:(size_t)col_ndx
@@ -287,7 +287,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return [NSNumber numberWithDouble:_query->maximum_double(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+                                 , @"com.tightdb.query", return nil);
 }
 
 -(NSNumber *)sumInt:(size_t)col_ndx
@@ -305,7 +305,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return [NSNumber numberWithLongLong:_query->sum(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+                                 , @"com.tightdb.query", return nil);
 }
 
 -(NSNumber *)sumFloat:(size_t)col_ndx
@@ -323,7 +323,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return [NSNumber numberWithFloat:_query->sum_float(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+                                 , @"com.tightdb.query", return nil);
 }
 
 -(NSNumber *)sumDouble:(size_t)col_ndx
@@ -341,7 +341,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return [NSNumber numberWithDouble:_query->sum_double(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+                                 , @"com.tightdb.query", return nil);
 }
 
 -(NSNumber *)avgInt:(size_t)col_ndx
@@ -359,7 +359,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return [NSNumber numberWithDouble:_query->average(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+                                 , @"com.tightdb.query", return nil);
 }
 -(NSNumber *)avgFloat:(size_t)col_ndx
 {
@@ -376,7 +376,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return [NSNumber numberWithDouble:_query->average_float(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+                                 , @"com.tightdb.query", return nil);
 }
 
 -(NSNumber *)avgDouble:(size_t)col_ndx
@@ -394,7 +394,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return [NSNumber numberWithDouble:_query->average_double(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+                                 , @"com.tightdb.query", return nil);
 }
 
 -(tightdb::TableView)getTableView
@@ -417,7 +417,7 @@ using namespace std;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return _query->find_next(last);
-                                 , @"com.tightdb.query", size_t(-1));
+                                 , @"com.tightdb.query", return size_t(-1));
 }
 -(TightdbQuery *)betweenInt:(int64_t)from to:(int64_t)to colNdx:(size_t)colNdx
 {
@@ -478,7 +478,7 @@ using namespace std;
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                     [_query getQuery]->equal(_column_ndx, value);
-                                    , @"com.tightdb.queryaccessor", _query, &_query->_error);
+                                    , @"com.tightdb.queryaccessor", return _query, &_query->_error);
     return _query;
 }
 
@@ -486,7 +486,7 @@ using namespace std;
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                     [_query getQuery]->not_equal(_column_ndx, value);
-                                    , @"com.tightdb.queryaccessor", _query, &_query->_error);
+                                    , @"com.tightdb.queryaccessor", return _query, &_query->_error);
     return _query;
 }
 
@@ -494,7 +494,7 @@ using namespace std;
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                     [_query getQuery]->greater(_column_ndx, value);
-                                    , @"com.tightdb.queryaccessor", _query, &_query->_error);
+                                    , @"com.tightdb.queryaccessor", return _query, &_query->_error);
     return _query;
 }
 
@@ -502,7 +502,7 @@ using namespace std;
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                     [_query getQuery]->greater_equal(_column_ndx, value);
-                                    , @"com.tightdb.queryaccessor", _query, &_query->_error);
+                                    , @"com.tightdb.queryaccessor", return _query, &_query->_error);
     return _query;
 }
 
@@ -510,7 +510,7 @@ using namespace std;
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                     [_query getQuery]->less(_column_ndx, value);
-                                    , @"com.tightdb.queryaccessor", _query, &_query->_error);
+                                    , @"com.tightdb.queryaccessor", return _query, &_query->_error);
     return _query;
 }
 
@@ -518,7 +518,7 @@ using namespace std;
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                     [_query getQuery]->less_equal(_column_ndx, value);
-                                    , @"com.tightdb.queryaccessor", _query, &_query->_error);
+                                    , @"com.tightdb.queryaccessor", return _query, &_query->_error);
     return _query;
 }
 
@@ -526,7 +526,7 @@ using namespace std;
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                     [_query getQuery]->between(_column_ndx, from, to);
-                                    , @"com.tightdb.queryaccessor", _query, &_query->_error);
+                                    , @"com.tightdb.queryaccessor", return _query, &_query->_error);
     return _query;
 }
 

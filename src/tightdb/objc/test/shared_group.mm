@@ -1,5 +1,5 @@
 //
-//  shared_group.m
+//  shared_group.mm
 //  TightDB
 //
 // Demo code for short tutorial using Objective-C interface
@@ -10,6 +10,8 @@
 #import <tightdb/objc/tightdb.h>
 #import <tightdb/objc/group.h>
 #import <tightdb/objc/group_shared.h>
+#include <tightdb/table.hpp>
+#import <tightdb/objc/table_priv.h>
 
 TIGHTDB_TABLE_DEF_2(SharedTable2,
                     Hired, Bool,
@@ -47,10 +49,9 @@ TIGHTDB_TABLE_IMPL_2(SharedTable2,
 
     // Read only shared group
     TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:@"employees.tightdb"];
-    @try {
         [fromDisk readTransaction:^(TightdbGroup *group) {
             SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
-            NSLog(@"Disktable size: %zu", [diskTable count]);
+            STAssertEquals(size_t(4), [diskTable count], @"There should be 4 rows");
             for (size_t i = 0; i < [diskTable count]; i++) {
                 SharedTable2_Cursor *cursor = [diskTable objectAtIndex:i];
                 NSLog(@"%zu: %lld", i, [cursor Age]);
@@ -59,52 +60,47 @@ TIGHTDB_TABLE_IMPL_2(SharedTable2,
             }
             [diskTable addHired:YES Age:54];
         }];
-    }
-    @catch (NSException *exception) {
-        NSLog(@"Exception caught: %@", exception);
-    }
 
     // Write shared group and commit
 //    TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:@"employees.tightdb"];
     [fromDisk writeTransaction:^(TightdbGroup *group) {
         SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
-        NSLog(@"Disktable size: %zu", [diskTable count]);
+        STAssertEquals(size_t(4), [diskTable count], @"There should be 4 rows");
         for (size_t i = 0; i < 50; i++) {
             [diskTable addHired:YES Age:i];
         }
         return YES; // Commit
-    }];
+    } error:nil];
     // Write shared group and rollback
 //    TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:@"employees.tightdb"];
     [fromDisk writeTransaction:^(TightdbGroup *group) {
         SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
-        NSLog(@"Disktable size: %zu", [diskTable count]);
+        STAssertEquals(size_t(54), [diskTable count], @"There should be 54 rows");
         for (size_t i = 0; i < 50; i++) {
             [diskTable addHired:YES Age:i];
         }
         return NO; // rollback
     }];
-    // Write and fail with exception in block (Should rollback)
+    // Write and fail with exception in block (Should rollback) - Note: Cannot simulate exception, so doing readonly instead
 //    TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:@"employees.tightdb"];
-    @try {
+    __block int addCount = 0;
         [fromDisk writeTransaction:^(TightdbGroup *group) {
             SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
-            NSLog(@"Disktable size: %zu", [diskTable count]);
+            // Fake readonly.
+            NSLog(@"Fake readonly - should trigger an error");
+            [((TightdbTable *)diskTable) setReadOnly:true];
+            STAssertEquals(size_t(54), [diskTable count], @"There should be 54 rows");
             for (size_t i = 0; i < 50; i++) {
-                [diskTable addHired:YES Age:i];
+                if ([diskTable addHired:YES Age:i])
+                    ++addCount;
             }
-            [NSException raise:@"Test exception" format:@"Program went ballistic"];
             return YES; // commit
         }];
-    }
-    @catch (NSException *exception) {
-        NSLog(@"Exception caught: %@", exception);
-    }
-    
+    STAssertEquals(0, addCount, @"No rows should be added");
     
     [fromDisk readTransaction:^(TightdbGroup *group) {
         SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
-        NSLog(@"Disktable size: %zu", [diskTable count]);
+        STAssertEquals(size_t(54), [diskTable count], @"There should be 54 rows");
     }];
 
 }

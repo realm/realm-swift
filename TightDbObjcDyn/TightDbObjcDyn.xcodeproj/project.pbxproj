@@ -37,7 +37,7 @@
 		E91890FA177B71E400653D7A /* group.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890EC177B71E400653D7A /* group.m */; };
 		E91890FB177B71E400653D7A /* mixed.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890ED177B71E400653D7A /* mixed.m */; };
 		E91890FC177B71E400653D7A /* query.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890EE177B71E400653D7A /* query.m */; };
-		E91890FD177B71E400653D7A /* shared_group.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890EF177B71E400653D7A /* shared_group.m */; };
+		E91890FD177B71E400653D7A /* shared_group.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890EF177B71E400653D7A /* shared_group.mm */; };
 		E91890FE177B71E400653D7A /* subtable.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F0177B71E400653D7A /* subtable.m */; };
 		E91890FF177B71E400653D7A /* table_delete_all.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F1177B71E400653D7A /* table_delete_all.m */; };
 		E9189100177B71E400653D7A /* table.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F2177B71E400653D7A /* table.m */; };
@@ -91,7 +91,7 @@
 		E91890EC177B71E400653D7A /* group.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = group.m; path = ../../src/tightdb/objc/test/group.m; sourceTree = "<group>"; };
 		E91890ED177B71E400653D7A /* mixed.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = mixed.m; path = ../../src/tightdb/objc/test/mixed.m; sourceTree = "<group>"; };
 		E91890EE177B71E400653D7A /* query.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = query.m; path = ../../src/tightdb/objc/test/query.m; sourceTree = "<group>"; };
-		E91890EF177B71E400653D7A /* shared_group.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = shared_group.m; path = ../../src/tightdb/objc/test/shared_group.m; sourceTree = "<group>"; };
+		E91890EF177B71E400653D7A /* shared_group.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = shared_group.mm; path = ../../src/tightdb/objc/test/shared_group.mm; sourceTree = "<group>"; };
 		E91890F0177B71E400653D7A /* subtable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = subtable.m; path = ../../src/tightdb/objc/test/subtable.m; sourceTree = "<group>"; };
 		E91890F1177B71E400653D7A /* table_delete_all.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = table_delete_all.m; path = ../../src/tightdb/objc/test/table_delete_all.m; sourceTree = "<group>"; };
 		E91890F2177B71E400653D7A /* table.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = table.m; path = ../../src/tightdb/objc/test/table.m; sourceTree = "<group>"; };
@@ -204,7 +204,7 @@
 				E91890EC177B71E400653D7A /* group.m */,
 				E91890ED177B71E400653D7A /* mixed.m */,
 				E91890EE177B71E400653D7A /* query.m */,
-				E91890EF177B71E400653D7A /* shared_group.m */,
+				E91890EF177B71E400653D7A /* shared_group.mm */,
 				E91890F0177B71E400653D7A /* subtable.m */,
 				E91890F1177B71E400653D7A /* table_delete_all.m */,
 				E91890F2177B71E400653D7A /* table.m */,
@@ -364,7 +364,7 @@
 				E91890FA177B71E400653D7A /* group.m in Sources */,
 				E91890FB177B71E400653D7A /* mixed.m in Sources */,
 				E91890FC177B71E400653D7A /* query.m in Sources */,
-				E91890FD177B71E400653D7A /* shared_group.m in Sources */,
+				E91890FD177B71E400653D7A /* shared_group.mm in Sources */,
 				E91890FE177B71E400653D7A /* subtable.m in Sources */,
 				E91890FF177B71E400653D7A /* table_delete_all.m in Sources */,
 				E9189100177B71E400653D7A /* table.m in Sources */,

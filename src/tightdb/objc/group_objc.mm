@@ -34,7 +34,7 @@ using namespace std;
     TightdbGroup *group = [[TightdbGroup alloc] init];
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  group.group = new tightdb::Group();
-                                 , @"com.tightdb.group", nil);
+                                 , @"com.tightdb.group", return nil);
     group.readOnly = NO;
     return group;
 }
@@ -59,7 +59,7 @@ using namespace std;
     tightdb::Group* group;
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  group = new tightdb::Group(tightdb::StringData(ObjcStringAccessor(filename)));
-                                 , @"com.tightdb.group", nil);
+                                 , @"com.tightdb.group", return nil);
     TightdbGroup* group2 = [[TightdbGroup alloc] init];
     if (group2) {
       group2.group = group;
@@ -78,7 +78,7 @@ using namespace std;
     tightdb::Group* group;
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  group = new tightdb::Group(tightdb::BinaryData(data, size));
-                                 , @"com.tightdb.group", nil);
+                                 , @"com.tightdb.group", return nil);
     TightdbGroup* group2 = [[TightdbGroup alloc] init];
     group2.group = group;
     group2.readOnly = NO;
@@ -117,7 +117,7 @@ using namespace std;
 {
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  _group->write(tightdb::StringData(ObjcStringAccessor(filePath)));
-                                 , @"com.tightdb.group", NO);
+                                 , @"com.tightdb.group", return NO);
     return YES;
 }
 
@@ -132,7 +132,7 @@ using namespace std;
                                  tightdb::BinaryData buffer = _group->write_to_mem();
                                  *size = buffer.size();
                                  return buffer.data();
-                                 , @"com.tightdb.group", nil);
+                                 , @"com.tightdb.group", return nil);
 }
 
 -(BOOL)hasTable:(NSString *)name
@@ -161,7 +161,7 @@ using namespace std;
     if (TIGHTDB_UNLIKELY(!table)) return nil;
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  [table setTable:_group->get_table(ObjcStringAccessor(name))];
-                                 , @"com.tightdb.group", nil);
+                                 , @"com.tightdb.group", return nil);
     [table setParent:self];
     [table setReadOnly:_readOnly];
     return table;
@@ -181,7 +181,7 @@ using namespace std;
                                  tightdb::TableRef r = tightdb::LangBindHelper::get_table_ptr(_group, ObjcStringAccessor(name),
                                                                                               was_created)->get_table_ref();
                                  [table setTable:move(r)];
-                                 , @"com.tightdb.group", nil);
+                                 , @"com.tightdb.group", return nil);
     [table setParent:self];
     [table setReadOnly:_readOnly];
     if (was_created) {

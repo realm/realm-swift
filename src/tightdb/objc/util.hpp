@@ -64,22 +64,22 @@ inline NSError *make_tightdb_error(NSString *domain, TightdbErr code, NSString *
 #define TIGHTDB_OBJC_SIZE_T_NUMBER_IN numberWithUnsignedLong
 #define TIGHTDB_OBJC_SIZE_T_NUMBER_OUT unsignedLongValue
 
-#define TIGHTDB_EXCEPTION_ERRHANDLER(action, domain, failReturnValue) TIGHTDB_EXCEPTION_ERRHANDLER_EX(action, domain, failReturnValue, error)
-#define TIGHTDB_EXCEPTION_ERRHANDLER_EX(action, domain, failReturnValue, errVar) try { action }  \
+#define TIGHTDB_EXCEPTION_ERRHANDLER(action, domain, failAction) TIGHTDB_EXCEPTION_ERRHANDLER_EX(action, domain, failAction, error)
+#define TIGHTDB_EXCEPTION_ERRHANDLER_EX(action, domain, failAction, errVar) try { action }  \
 catch(tightdb::File::AccessError &ex) { \
     if (errVar) \
         *errVar = make_tightdb_error(domain, tdb_err_FileAccess, [NSString stringWithUTF8String:ex.what()]); \
-        return failReturnValue; \
+        failAction; \
 } \
 catch(tightdb::ResourceAllocError &ex) { \
     if (errVar) \
         *errVar = make_tightdb_error(domain, tdb_err_Resource, [NSString stringWithUTF8String:ex.what()]); \
-        return failReturnValue; \
+        failAction; \
 } \
 catch (std::exception &ex) { \
     if (errVar) \
         *errVar = make_tightdb_error(domain, tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]); \
-        return failReturnValue; \
+        failAction; \
 }
 
 
