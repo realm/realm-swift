@@ -60,7 +60,7 @@ TIGHTDB_TABLE_2(EnumPeopleTable2,
     // 3: Iterate over query (lazy)
 
  EnumPeopleTable_Query *q = [[people where].Age equal:21];
-    NSLog(@"Query lazy count: %zu", [q count]);
+    NSLog(@"Query lazy count: %zu", [[q count] unsignedLongValue] );
     for (EnumPeopleTable_Cursor *row in q) {
         NSLog(@"(Enum3) %@ is %lld years old.", row.Name, row.Age);
         if (row.Name == nil)

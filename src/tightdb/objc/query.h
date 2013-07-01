@@ -27,27 +27,43 @@
 
 @interface TightdbQuery: NSObject
 -(id)initWithTable:(TightdbTable *)table;
+-(id)initWithTable:(TightdbTable *)table error:(NSError *__autoreleasing *)error;
 -(TightdbTable *)getTable;
--(void)group;
--(void)or;
--(void)endgroup;
+-(TightdbQuery *)group;
+-(TightdbQuery *)or;
+-(TightdbQuery *)endgroup;
 -(void)subtable:(size_t)column;
 -(void)parent;
--(size_t)count;
--(size_t)remove;
--(int64_t)minInt:(size_t)colNdx;
--(float)minFloat:(size_t)colNdx;
--(double)minDouble:(size_t)colNdx;
--(int64_t)maxInt:(size_t)colNdx;
--(float)maxFloat:(size_t)colNdx;
--(double)maxDouble:(size_t)colNdx;
--(int64_t)sumInt:(size_t)colNdx;
--(double)sumFloat:(size_t)colNdx;
--(double)sumDouble:(size_t)colNdx;
--(double)avgInt:(size_t)colNdx;
--(double)avgFloat:(size_t)colNdx;
--(double)avgDouble:(size_t)colNdx;
+-(NSNumber *)count;
+-(NSNumber *)countWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)remove;
+-(NSNumber *)removeWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)minInt:(size_t)colNdx;
+-(NSNumber *)minInt:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)minFloat:(size_t)colNdx;
+-(NSNumber *)minFloat:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)minDouble:(size_t)colNdx;
+-(NSNumber *)minDouble:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)maxInt:(size_t)colNdx;
+-(NSNumber *)maxInt:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)maxFloat:(size_t)colNdx;
+-(NSNumber *)maxFloat:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)maxDouble:(size_t)colNdx;
+-(NSNumber *)maxDouble:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)sumInt:(size_t)colNdx;
+-(NSNumber *)sumInt:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)sumFloat:(size_t)colNdx;
+-(NSNumber *)sumFloat:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)sumDouble:(size_t)colNdx;
+-(NSNumber *)sumDouble:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)avgInt:(size_t)colNdx;
+-(NSNumber *)avgInt:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)avgFloat:(size_t)colNdx;
+-(NSNumber *)avgFloat:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)avgDouble:(size_t)colNdx;
+-(NSNumber *)avgDouble:(size_t)colNdx error:(NSError *__autoreleasing *)error;
 -(size_t)findNext:(size_t)last;
+-(size_t)findNext:(size_t)last error:(NSError *__autoreleasing *)error;
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 // Conditions
 -(TightdbQuery *)betweenInt:(int64_t)from to:(int64_t)to colNdx:(size_t)colNdx;
@@ -99,10 +115,14 @@
 -(TightdbQuery *)less:(int64_t)value;
 -(TightdbQuery *)lessEqual:(int64_t)value;
 -(TightdbQuery *)between:(int64_t)from to:(int64_t)to;
--(int64_t)min;
--(int64_t)max;
--(int64_t)sum;
--(double)avg;
+-(NSNumber *)min;
+-(NSNumber *)minWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)max;
+-(NSNumber *)maxWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)sum;
+-(NSNumber *)sumWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)avg;
+-(NSNumber *)avgWithError:(NSError *__autoreleasing *)error;
 @end
 
 
@@ -115,10 +135,14 @@
 -(TightdbQuery *)less:(float)value;
 -(TightdbQuery *)lessEqual:(float)value;
 -(TightdbQuery *)between:(float)from to:(float)to;
--(float)min;
--(float)max;
--(double)sum;
--(double)avg;
+-(NSNumber *)min;
+-(NSNumber *)minWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)max;
+-(NSNumber *)maxWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)sum;
+-(NSNumber *)sumWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)avg;
+-(NSNumber *)avgWithError:(NSError *__autoreleasing *)error;
 @end
 
 
@@ -131,10 +155,14 @@
 -(TightdbQuery *)less:(double)value;
 -(TightdbQuery *)lessEqual:(double)value;
 -(TightdbQuery *)between:(double)from to:(double)to;
--(double)min;
--(double)max;
--(double)sum;
--(double)avg;
+-(NSNumber *)min;
+-(NSNumber *)minWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)max;
+-(NSNumber *)maxWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)sum;
+-(NSNumber *)sumWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)avg;
+-(NSNumber *)avgWithError:(NSError *__autoreleasing *)error;
 @end
 
 
