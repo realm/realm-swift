@@ -63,9 +63,12 @@
 @interface TightdbSpec: NSObject
 /// Returns NO on memory allocation error.
 -(BOOL)addColumn:(TightdbType)type name:(NSString *)name;
+-(BOOL)addColumn:(TightdbType)type name:(NSString *)name error:(NSError *__autoreleasing *)error;
 /// Returns nil on memory allocation error.
 -(TightdbSpec *)addColumnTable:(NSString *)name;
+-(TightdbSpec *)addColumnTable:(NSString *)name error:(NSError *__autoreleasing *)error;
 -(TightdbSpec *)getSubspec:(size_t)colNdx;
+-(TightdbSpec *)getSubspec:(size_t)colNdx error:(NSError *__autoreleasing *)error;
 -(size_t)getColumnCount;
 -(TightdbType)getColumnType:(size_t)colNdx;
 -(NSString *)getColumnName:(size_t)colNdx;
@@ -74,7 +77,8 @@
 
 
 @interface TightdbTable: NSObject
--(void)updateFromSpec;
+-(BOOL)updateFromSpec;
+-(BOOL)updateFromSpecWithError:(NSError *__autoreleasing *)error;
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
 -(BOOL)isEqual:(TightdbTable *)other;
@@ -115,59 +119,87 @@
 -(size_t)getColumnIndex:(NSString *)name;
 -(TightdbType)getColumnType:(size_t)ndx;
 -(TightdbSpec *)getSpec;
+-(TightdbSpec *)getSpecWithError:(NSError *__autoreleasing *)error;
 -(BOOL)isEmpty;
 -(size_t)count;
 -(size_t)addRow;
+-(size_t)addRowWithError:(NSError *__autoreleasing *)error;
 -(size_t)addRows:(size_t)rowCount;
--(void)clear;
--(void)remove:(size_t)ndx;
--(void)removeLast;
+-(size_t)addRows:(size_t)rowCount error:(NSError *__autoreleasing *)error;
+-(BOOL)clear;
+-(BOOL)clearWithError:(NSError *__autoreleasing *)error;
+-(BOOL)remove:(size_t)ndx;
+-(BOOL)remove:(size_t)ndx error:(NSError *__autoreleasing *)error;
+-(BOOL)removeLast;
+-(BOOL)removeLastWithError:(NSError *__autoreleasing *)error;
 
 // Adaptive ints.
 -(int64_t)get:(size_t)colNdx ndx:(size_t)ndx;
--(void)set:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;
+-(BOOL)set:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;
+-(BOOL)set:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value error:(NSError *__autoreleasing *)error;
 -(BOOL)getBool:(size_t)colNdx ndx:(size_t)ndx;
--(void)setBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value;
+-(BOOL)setBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value;
+-(BOOL)setBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value error:(NSError *__autoreleasing *)error;
 -(float)getFloat:(size_t)colNdx ndx:(size_t)ndx;
--(void)setFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value;
+-(BOOL)setFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value;
+-(BOOL)setFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value error:(NSError *__autoreleasing *)error;
 -(double)getDouble:(size_t)colNdx ndx:(size_t)ndx;
--(void)setDouble:(size_t)colNdx ndx:(size_t)ndx value:(double)value;
+-(BOOL)setDouble:(size_t)colNdx ndx:(size_t)ndx value:(double)value;
+-(BOOL)setDouble:(size_t)colNdx ndx:(size_t)ndx value:(double)value error:(NSError *__autoreleasing *)error;
 -(time_t)getDate:(size_t)colNdx ndx:(size_t)ndx;
--(void)setDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value;
+-(BOOL)setDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value;
+-(BOOL)setDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value error:(NSError *__autoreleasing *)error;
 
 // NOTE: Low-level insert functions. Always insert in all columns at once
 // and call InsertDone after to avoid table getting un-balanced.
--(void)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value;
--(void)insertInt:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;
--(void)insertFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value;
--(void)insertDouble:(size_t)colNdx ndx:(size_t)ndx value:(double)value;
--(void)insertString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value;
--(void)insertBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value;
--(void)insertBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size;
--(void)insertDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value;
--(void)insertDone;
+-(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value;
+-(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value error:(NSError *__autoreleasing *)error;
+-(BOOL)insertInt:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;
+-(BOOL)insertInt:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value error:(NSError *__autoreleasing *)error;
+-(BOOL)insertFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value;
+-(BOOL)insertFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value error:(NSError *__autoreleasing *)error;
+-(BOOL)insertDouble:(size_t)colNdx ndx:(size_t)ndx value:(double)value;
+-(BOOL)insertDouble:(size_t)colNdx ndx:(size_t)ndx value:(double)value error:(NSError *__autoreleasing *)error;
+-(BOOL)insertString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value;
+-(BOOL)insertString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value error:(NSError *__autoreleasing *)error;
+-(BOOL)insertBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value;
+-(BOOL)insertBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value error:(NSError *__autoreleasing *)error;
+-(BOOL)insertBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size;
+-(BOOL)insertBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size error:(NSError *__autoreleasing *)error;
+-(BOOL)insertDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value;
+-(BOOL)insertDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value error:(NSError *__autoreleasing *)error;
+-(BOOL)insertDone;
+-(BOOL)insertDoneWithError:(NSError *__autoreleasing *)error;
 
 // Strings
 -(NSString *)getString:(size_t)colNdx ndx:(size_t)ndx;
--(void)setString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value;
+-(BOOL)setString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value;
+-(BOOL)setString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value error:(NSError *__autoreleasing *)error;
 
 // Binary
 -(TightdbBinary *)getBinary:(size_t)colNdx ndx:(size_t)ndx;
--(void)setBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value;
--(void)setBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size;
+-(BOOL)setBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value;
+-(BOOL)setBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value error:(NSError *__autoreleasing *)error;
+-(BOOL)setBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size;
+-(BOOL)setBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size error:(NSError *__autoreleasing *)error;
 
 // Subtables
 -(size_t)getTableSize:(size_t)colNdx ndx:(size_t)ndx;
--(void)insertSubtable:(size_t)colNdx ndx:(size_t)ndx;
--(void)clearSubtable:(size_t)colNdx ndx:(size_t)ndx;
+-(BOOL)insertSubtable:(size_t)colNdx ndx:(size_t)ndx;
+-(BOOL)insertSubtable:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
+-(BOOL)clearSubtable:(size_t)colNdx ndx:(size_t)ndx;
+-(BOOL)clearSubtable:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
 
 // Mixed
 -(TightdbMixed *)getMixed:(size_t)colNdx ndx:(size_t)ndx;
 -(TightdbType)getMixedType:(size_t)colNdx ndx:(size_t)ndx;
--(void)insertMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value;
--(void)setMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value;
+-(BOOL)insertMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value;
+-(BOOL)insertMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value error:(NSError *__autoreleasing *)error;
+-(BOOL)setMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value;
+-(BOOL)setMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value error:(NSError *__autoreleasing *)error;
 
 -(size_t)addColumn:(TightdbType)type name:(NSString *)name;
+-(size_t)addColumn:(TightdbType)type name:(NSString *)name error:(NSError *__autoreleasing *)error;
 
 // Searching
 -(size_t)findBool:(size_t)colNdx value:(BOOL)value;
@@ -179,6 +211,7 @@
 -(size_t)findDate:(size_t)colNdx value:(time_t)value;
 -(size_t)findMixed:(size_t)colNdx value:(TightdbMixed *)value;
 -(TightdbQuery *)where;
+-(TightdbQuery *)whereWithError:(NSError *__autoreleasing *)error;
 
 // FIXME: Why does this one take a TableView as argument?
 -(TightdbView *)findAll:(TightdbView *)view column:(size_t)colNdx value:(int64_t)value;
@@ -189,7 +222,8 @@
 -(void)setIndex:(size_t)colNdx;
 
 // Optimizing
--(void)optimize;
+-(BOOL)optimize;
+-(BOOL)optimizeWithError:(NSError *__autoreleasing *)error;
 
 // Conversion
 // FIXME: Do we want to conversion methods? Maybe use NSData.
@@ -218,7 +252,8 @@
 
 // Private
 -(id)_initRaw;
--(void)_insertSubtableCopy:(size_t)colNdx row:(size_t)rowNdx subtable:(TightdbTable *)subtable;
+-(BOOL)_insertSubtableCopy:(size_t)colNdx row:(size_t)rowNdx subtable:(TightdbTable *)subtable;
+-(BOOL)_insertSubtableCopy:(size_t)colNdx row:(size_t)rowNdx subtable:(TightdbTable *)subtable error:(NSError *__autoreleasing *)error;
 @end
 
 
