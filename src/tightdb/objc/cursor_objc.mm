@@ -13,7 +13,7 @@
 using namespace std;
 
 #ifdef TIGHTDB_DEBUG
-int TightdbCursorAllocateCount = 0;
+_Atomic(int) TightdbCursorAllocateCount = 0;
 #endif
 
 @interface TightdbCursor()

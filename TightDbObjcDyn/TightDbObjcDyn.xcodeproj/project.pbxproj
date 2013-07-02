@@ -43,6 +43,7 @@
 		E9189100177B71E400653D7A /* table.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F2177B71E400653D7A /* table.m */; };
 		E9189101177B71E400653D7A /* template.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F3177B71E400653D7A /* template.m */; };
 		E9189102177B71E400653D7A /* tutorial.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F4177B71E400653D7A /* tutorial.m */; };
+		E94EA3E117831986001AE3DA /* threads.m in Sources */ = {isa = PBXBuildFile; fileRef = E94EA3E017831986001AE3DA /* threads.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,6 +98,7 @@
 		E91890F2177B71E400653D7A /* table.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = table.m; path = ../../src/tightdb/objc/test/table.m; sourceTree = "<group>"; };
 		E91890F3177B71E400653D7A /* template.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = template.m; path = ../../src/tightdb/objc/test/template.m; sourceTree = "<group>"; };
 		E91890F4177B71E400653D7A /* tutorial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = tutorial.m; path = ../../src/tightdb/objc/test/tutorial.m; sourceTree = "<group>"; };
+		E94EA3E017831986001AE3DA /* threads.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = threads.m; path = ../../src/tightdb/objc/test/threads.m; sourceTree = "<group>"; };
 		E9F2A7B11781FAB600292661 /* TestHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestHelper.h; path = ../../src/tightdb/objc/test/TestHelper.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -197,7 +199,6 @@
 		E91890B4177B677900653D7A /* TightDbObjcDynTests */ = {
 			isa = PBXGroup;
 			children = (
-				E9F2A7B11781FAB600292661 /* TestHelper.h */,
 				E91890E7177B71E400653D7A /* data_type.mm */,
 				E91890E8177B71E400653D7A /* enumerator.m */,
 				E91890E9177B71E400653D7A /* err_handling.mm */,
@@ -210,8 +211,10 @@
 				E91890F0177B71E400653D7A /* subtable.m */,
 				E91890F1177B71E400653D7A /* table_delete_all.m */,
 				E91890F2177B71E400653D7A /* table.m */,
-				E91890F3177B71E400653D7A /* template.m */,
 				E91890F4177B71E400653D7A /* tutorial.m */,
+				E9F2A7B11781FAB600292661 /* TestHelper.h */,
+				E91890F3177B71E400653D7A /* template.m */,
+				E94EA3E017831986001AE3DA /* threads.m */,
 				E91890B5177B677900653D7A /* Supporting Files */,
 			);
 			path = TightDbObjcDynTests;
@@ -372,6 +375,7 @@
 				E9189100177B71E400653D7A /* table.m in Sources */,
 				E9189101177B71E400653D7A /* template.m in Sources */,
 				E9189102177B71E400653D7A /* tutorial.m in Sources */,
+				E94EA3E117831986001AE3DA /* threads.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

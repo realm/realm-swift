@@ -15,18 +15,22 @@ extern int TightdbGroupAllocateCount;
 extern int TightdbGroupSharedAllocateCount;
 extern int TightdbSpecAllocateCount;
 extern int TightdbTableAllocateCount;
+extern int TightdbBinaryAllocateCount;
+extern int TightdbMixedAllocateCount;
 #endif
 
 
 #ifdef TIGHTDB_DEBUG
-#define TEST_CHECK_ALLOC  STAssertEquals(0, TightdbQueryAllocateCount, @"Zero TightdbQuery allocated"); \
-STAssertEquals(0, TightdbViewAllocateCount, @"Zero TightdbView allocated"); \
-STAssertEquals(0, TightdbCursorAllocateCount, @"Zero TightdbCursor allocated"); \
-STAssertEquals(0, TightdbColumnProxyAllocateCount, @"Zero TightdbColumnProxy allocated"); \
-STAssertEquals(0, TightdbGroupAllocateCount, @"Zero TightdbGroup allocated"); \
-STAssertEquals(0, TightdbGroupSharedAllocateCount, @"Zero TightdbGroupShared allocated"); \
-STAssertEquals(0, TightdbSpecAllocateCount, @"Zero TightdbSpec allocated"); \
-STAssertEquals(0, TightdbTableAllocateCount, @"Zero TightdbTable allocated");
+#define TEST_CHECK_ALLOC  STAssertEquals(TightdbQueryAllocateCount, 0, @"Zero TightdbQuery allocated"); \
+STAssertEquals(TightdbViewAllocateCount, 0, @"Zero TightdbView allocated"); \
+STAssertEquals(TightdbCursorAllocateCount, 0, @"Zero TightdbCursor allocated"); \
+STAssertEquals(TightdbColumnProxyAllocateCount, 0, @"Zero TightdbColumnProxy allocated"); \
+STAssertEquals(TightdbGroupAllocateCount, 0, @"Zero TightdbGroup allocated"); \
+STAssertEquals(TightdbGroupSharedAllocateCount, 0, @"Zero TightdbGroupShared allocated"); \
+STAssertEquals(TightdbSpecAllocateCount, 0, @"Zero TightdbSpec allocated"); \
+STAssertEquals(TightdbBinaryAllocateCount, 0, @"Zero TightdbBinary allocated"); \
+STAssertEquals(TightdbMixedAllocateCount, 0, @"Zero TightdbMixed allocated"); \
+STAssertEquals(TightdbTableAllocateCount, 0, @"Zero TightdbTable allocated");
 #else
 #define TEST_CHECK_ALLOC
 #endif

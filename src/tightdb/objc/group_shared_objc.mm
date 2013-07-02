@@ -8,7 +8,7 @@
 using namespace std;
 
 #ifdef TIGHTDB_DEBUG
-int TightdbGroupSharedAllocateCount = 0;
+_Atomic(int) TightdbGroupSharedAllocateCount = 0;
 #endif
 
 

@@ -15,7 +15,7 @@
 using namespace std;
 
 #ifdef TIGHTDB_DEBUG
-int TightdbGroupAllocateCount = 0;
+_Atomic(int) TightdbGroupAllocateCount = 0;
 #endif
 
 @interface TightdbGroup()

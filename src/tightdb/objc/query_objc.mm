@@ -18,7 +18,7 @@
 using namespace std;
 
 #ifdef TIGHTDB_DEBUG
-int TightdbQueryAllocateCount = 0;
+_Atomic(int) TightdbQueryAllocateCount = 0;
 #endif
 
 

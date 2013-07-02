@@ -17,6 +17,11 @@
 
 using namespace std;
 
+
+#ifdef TIGHTDB_DEBUG
+_Atomic(int) TightdbBinaryAllocateCount = 0;
+#endif
+
 @implementation TightdbBinary
 {
     tightdb::BinaryData _data;
@@ -26,6 +31,9 @@ using namespace std;
     self = [super init];
     if (self) {
         _data = tightdb::BinaryData(data, size);
+#ifdef TIGHTDB_DEBUG
+        ++TightdbBinaryAllocateCount;
+#endif
     }
     return self;
 }
@@ -34,6 +42,9 @@ using namespace std;
     self = [super init];
     if (self) {
         _data = data;
+#ifdef TIGHTDB_DEBUG
+        ++TightdbBinaryAllocateCount;
+#endif
     }
     return self;
 }
@@ -53,8 +64,17 @@ using namespace std;
 {
     return _data;
 }
+-(void)dealloc
+{
+#ifdef TIGHTDB_DEBUG
+    --TightdbBinaryAllocateCount;
+#endif
+}
 @end
 
+#ifdef TIGHTDB_DEBUG
+_Atomic(int) TightdbMixedAllocateCount = 0;
+#endif
 
 @interface TightdbMixed()
 @property (nonatomic) tightdb::Mixed mixed;
@@ -64,6 +84,23 @@ using namespace std;
 @implementation TightdbMixed
 @synthesize mixed = _mixed;
 @synthesize table = _table;
+
+-(id)init
+{
+    self = [super init];
+    if (self) {
+#ifdef TIGHTDB_DEBUG
+        ++TightdbMixedAllocateCount;
+#endif
+    }
+    return self;
+}
+-(void)dealloc
+{
+#ifdef TIGHTDB_DEBUG
+    --TightdbMixedAllocateCount;
+#endif
+}
 
 +(TightdbMixed *)mixedWithBool:(BOOL)value
 {
@@ -211,7 +248,7 @@ using namespace std;
 @end
 
 #ifdef TIGHTDB_DEBUG
-int TightdbSpecAllocateCount = 0;
+_Atomic(int) TightdbSpecAllocateCount = 0;
 #endif
 
 @interface TightdbSpec()
@@ -329,7 +366,7 @@ int TightdbSpecAllocateCount = 0;
 
 
 #ifdef TIGHTDB_DEBUG
-int TightdbViewAllocateCount = 0;
+_Atomic(int) TightdbViewAllocateCount = 0;
 #endif
 
 @interface TightdbView()
@@ -461,7 +498,7 @@ int TightdbViewAllocateCount = 0;
 
 
 #ifdef TIGHTDB_DEBUG
-int TightdbTableAllocateCount = 0;
+_Atomic(int) TightdbTableAllocateCount = 0;
 #endif
 
 @implementation TightdbTable
@@ -486,6 +523,7 @@ int TightdbTableAllocateCount = 0;
                                      , @"com.tightdb.table", return nil);
 #ifdef TIGHTDB_DEBUG
         ++TightdbTableAllocateCount;
+        NSLog(@"TightdbTable init");
 #endif
     }
     return self;
@@ -1387,7 +1425,7 @@ int TightdbTableAllocateCount = 0;
 
 
 #ifdef TIGHTDB_DEBUG
-int TightdbColumnProxyAllocateCount = 0;
+_Atomic(int) TightdbColumnProxyAllocateCount = 0;
 #endif
 
 @implementation TightdbColumnProxy
