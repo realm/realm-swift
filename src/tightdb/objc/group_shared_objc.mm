@@ -7,6 +7,10 @@
 
 using namespace std;
 
+#ifdef TIGHTDB_DEBUG
+int TightdbGroupSharedAllocateCount = 0;
+#endif
+
 
 @implementation TightdbSharedGroup
 {
@@ -30,11 +34,17 @@ using namespace std;
     if (shared_group2) {
       shared_group2->_sharedGroup = shared_group;
     }
+#ifdef TIGHTDB_DEBUG
+    ++TightdbGroupSharedAllocateCount;
+#endif
     return shared_group2;
 }
 
 -(void)dealloc
 {
+#ifdef TIGHTDB_DEBUG
+    --TightdbGroupSharedAllocateCount;
+#endif
     delete _sharedGroup;
     _sharedGroup = 0;
 }

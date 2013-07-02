@@ -7,6 +7,8 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
+#import "TestHelper.h"
+
 #import <tightdb/objc/tightdb.h>
 #import <tightdb/objc/group.h>
 #import <tightdb/objc/table.h>
@@ -37,14 +39,6 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
                 DateCol,   Date,
                 TableCol,  TestQueryErrSub,
                 MixedCol,  Mixed)
-
-#ifdef TIGHTDB_DEBUG
-extern int TightdbViewAllocateCount;
-extern int TightdbCursorAllocateCount;
-extern int TightdbGroupAllocateCount;
-extern int TightdbSpecAllocateCount;
-extern int TightdbTableAllocateCount;
-#endif
 
 @interface MACTestErrHandling: SenTestCase
 @end
@@ -167,13 +161,7 @@ extern int TightdbTableAllocateCount;
         
         NSLog(@"Disktable size: %zu", [diskTable count]);
     }
-#ifdef TIGHTDB_DEBUG
-    STAssertEquals(0, TightdbViewAllocateCount, @"Zero TightdbView allocated");
-    STAssertEquals(0, TightdbCursorAllocateCount, @"Zero TightdbCursor allocated");
-    STAssertEquals(0, TightdbGroupAllocateCount, @"Zero TightdbGroup allocated");
-    STAssertEquals(0, TightdbSpecAllocateCount, @"Zero TightdbSpec allocated");
-    STAssertEquals(0, TightdbTableAllocateCount, @"Zero TightdbTable allocated");
-#endif
+    TEST_CHECK_ALLOC;
 }
 
 -(void)testErrorInsert
@@ -368,13 +356,7 @@ extern int TightdbTableAllocateCount;
         [table verify];
 #endif
     }
-#ifdef TIGHTDB_DEBUG
-    STAssertEquals(0, TightdbViewAllocateCount, @"Zero TightdbView allocated");
-    STAssertEquals(0, TightdbCursorAllocateCount, @"Zero TightdbCursor allocated");
-    STAssertEquals(0, TightdbGroupAllocateCount, @"Zero TightdbGroup allocated");
-    STAssertEquals(0, TightdbSpecAllocateCount, @"Zero TightdbSpec allocated");
-    STAssertEquals(0, TightdbTableAllocateCount, @"Zero TightdbTable allocated");
-#endif
+    TEST_CHECK_ALLOC;
 }
 
 
@@ -494,13 +476,7 @@ extern int TightdbTableAllocateCount;
         //    [[[table where].MixedCol equal:mixInt1].BoolCol equal:NO];
         //    [[[table where].MixedCol notEqual:mixInt1].BoolCol equal:NO];
     }
-#ifdef TIGHTDB_DEBUG
-    STAssertEquals(0, TightdbViewAllocateCount, @"Zero TightdbView allocated");
-    STAssertEquals(0, TightdbCursorAllocateCount, @"Zero TightdbCursor allocated");
-    STAssertEquals(0, TightdbGroupAllocateCount, @"Zero TightdbGroup allocated");
-    STAssertEquals(0, TightdbSpecAllocateCount, @"Zero TightdbSpec allocated");
-    STAssertEquals(0, TightdbTableAllocateCount, @"Zero TightdbTable allocated");
-#endif
+    TEST_CHECK_ALLOC;
 }
 
 

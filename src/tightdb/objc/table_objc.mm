@@ -1386,6 +1386,10 @@ int TightdbTableAllocateCount = 0;
 @end
 
 
+#ifdef TIGHTDB_DEBUG
+int TightdbColumnProxyAllocateCount = 0;
+#endif
+
 @implementation TightdbColumnProxy
 @synthesize table = _table, column = _column;
 -(id)initWithTable:(TightdbTable *)table column:(size_t)column
@@ -1394,6 +1398,9 @@ int TightdbTableAllocateCount = 0;
     if (self) {
         _table = table;
         _column = column;
+#ifdef TIGHTDB_DEBUG
+        ++TightdbColumnProxyAllocateCount;
+#endif
     }
     return self;
 }
@@ -1401,6 +1408,15 @@ int TightdbTableAllocateCount = 0;
 {
     _table = nil;
 }
+
+-(void)dealloc
+{
+#ifdef TIGHTDB_DEBUG
+    NSLog(@"TightdbColumnProxy dealloc");
+    --TightdbColumnProxyAllocateCount;
+#endif
+}
+
 @end
 
 @implementation TightdbColumnProxy_Bool

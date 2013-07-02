@@ -10,7 +10,9 @@
 extern int TightdbQueryAllocateCount;
 extern int TightdbViewAllocateCount;
 extern int TightdbCursorAllocateCount;
+extern int TightdbColumnProxyAllocateCount;
 extern int TightdbGroupAllocateCount;
+extern int TightdbGroupSharedAllocateCount;
 extern int TightdbSpecAllocateCount;
 extern int TightdbTableAllocateCount;
 #endif
@@ -20,7 +22,9 @@ extern int TightdbTableAllocateCount;
 #define TEST_CHECK_ALLOC  STAssertEquals(0, TightdbQueryAllocateCount, @"Zero TightdbQuery allocated"); \
 STAssertEquals(0, TightdbViewAllocateCount, @"Zero TightdbView allocated"); \
 STAssertEquals(0, TightdbCursorAllocateCount, @"Zero TightdbCursor allocated"); \
+STAssertEquals(0, TightdbColumnProxyAllocateCount, @"Zero TightdbColumnProxy allocated"); \
 STAssertEquals(0, TightdbGroupAllocateCount, @"Zero TightdbGroup allocated"); \
+STAssertEquals(0, TightdbGroupSharedAllocateCount, @"Zero TightdbGroupShared allocated"); \
 STAssertEquals(0, TightdbSpecAllocateCount, @"Zero TightdbSpec allocated"); \
 STAssertEquals(0, TightdbTableAllocateCount, @"Zero TightdbTable allocated");
 #else

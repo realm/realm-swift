@@ -4,6 +4,8 @@
 //
 
 #import <SenTestingKit/SenTestingKit.h>
+#import "TestHelper.h"
+
 
 #import <tightdb/objc/table.h>
 
@@ -27,6 +29,10 @@
 
 - (void)testExample
 {
+    @autoreleasepool {
+        
+    }
+    TEST_CHECK_ALLOC;
 }
 
 @end

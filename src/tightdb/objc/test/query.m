@@ -5,6 +5,8 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
+#import "TestHelper.h"
+
 #import <tightdb/objc/tightdb.h>
 
 TIGHTDB_TABLE_1(TestQuerySub,
@@ -27,6 +29,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
 - (void)testQuery
 {
+    @autoreleasepool {
     TestQueryAllTypes *table = [[TestQueryAllTypes alloc] init];
     NSLog(@"Table: %@", table);
     STAssertNotNil(table, @"Table is nil");
@@ -134,6 +137,8 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
 //    [[[table where].MixedCol equal:mixInt1].BoolCol equal:NO];
 //    [[[table where].MixedCol notEqual:mixInt1].BoolCol equal:NO];
+    }
+    TEST_CHECK_ALLOC;
 }
 
 #define BOOL_COL 0
@@ -147,7 +152,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
 - (void) testDynamic 
 {
-  
+    @autoreleasepool {
         TightdbTable *table = [[TightdbTable alloc]init];
   
         [table addColumn:tightdb_Bool name:@"BoolCol"];
@@ -229,7 +234,8 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         STAssertEquals([[[table where] greaterEqualDate:timeNow colNdx:DATE_COL] count], [NSNumber numberWithLongLong:1], @"notEqualDate");
 
         STAssertEquals([[[table where] sumInt:INT_COL] longLongValue], (int64_t)860, @"IntCol max");
-
+    }
+    TEST_CHECK_ALLOC;
 }
 
 @end

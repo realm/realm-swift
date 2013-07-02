@@ -7,6 +7,8 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
+#import "TestHelper.h"
+
 #import <tightdb/objc/tightdb.h>
 #import <tightdb/objc/group.h>
 
@@ -28,14 +30,6 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
                      Hired, Bool,
                      Age,   Int)
 
-
-#ifdef TIGHTDB_DEBUG
-extern int TightdbViewAllocateCount;
-extern int TightdbCursorAllocateCount;
-extern int TightdbGroupAllocateCount;
-extern int TightdbSpecAllocateCount;
-extern int TightdbTableAllocateCount;
-#endif
 
 @interface MACTestTutorial: SenTestCase
 @end
@@ -185,13 +179,7 @@ extern int TightdbTableAllocateCount;
             NSLog(@"%zu: %@", i, cursor.Name);
         }
     }
-#ifdef TIGHTDB_DEBUG
-    STAssertEquals(0, TightdbViewAllocateCount, @"Zero TightdbView allocated");
-    STAssertEquals(0, TightdbCursorAllocateCount, @"Zero TightdbCursor allocated");
-    STAssertEquals(0, TightdbGroupAllocateCount, @"Zero TightdbGroup allocated");
-    STAssertEquals(0, TightdbSpecAllocateCount, @"Zero TightdbSpec allocated");
-    STAssertEquals(0, TightdbTableAllocateCount, @"Zero TightdbTable allocated");
-#endif
+    TEST_CHECK_ALLOC;
     
 }
 
