@@ -74,7 +74,14 @@
 #define TIGHTDB_COLUMN_PROXY_DEF_4_Y(name, type)             @property(nonatomic, strong) TightdbColumnProxy_Subtable *name;
 #define TIGHTDB_COLUMN_PROXY_DEF_4_N(name, type)             @property(nonatomic, strong) TightdbColumnProxy_##type *name;
 
-#define TIGHTDB_COLUMN_PROXY_IMPL(name, type)                @synthesize name = _##name;
+//#define TIGHTDB_COLUMN_PROXY_IMPL(name, type)                @synthesize name = _##name;
+
+#define TIGHTDB_COLUMN_PROXY_IMPL(name, type)                 TIGHTDB_COLUMN_PROXY_IMPL_2(TIGHTDB_IS_SUBTABLE(type), name, type)
+#define TIGHTDB_COLUMN_PROXY_IMPL_2(is_subtable, name, type)  TIGHTDB_COLUMN_PROXY_IMPL_3(is_subtable, name, type)
+#define TIGHTDB_COLUMN_PROXY_IMPL_3(is_subtable, name, type)  TIGHTDB_COLUMN_PROXY_IMPL_4_##is_subtable(name, type)
+#define TIGHTDB_COLUMN_PROXY_IMPL_4_Y(name, type)             -(TightdbColumnProxy_Subtable *)name { return _##name; }
+#define TIGHTDB_COLUMN_PROXY_IMPL_4_N(name, type)             -(TightdbColumnProxy_##type *)name { return _##name; }
+
 
 #define TIGHTDB_COLUMN_PROXY_INIT(table, col, name, type)                TIGHTDB_COLUMN_PROXY_INIT_2(TIGHTDB_IS_SUBTABLE(type), table, col, name, type)
 #define TIGHTDB_COLUMN_PROXY_INIT_2(is_subtable, table, col, name, type) TIGHTDB_COLUMN_PROXY_INIT_3(is_subtable, table, col, name, type)
@@ -161,7 +168,7 @@
 
 
 #define TIGHTDB_CURSOR_PROPERTY_DEF_SIMPLE(name, type) \
-@property TIGHTDB_TYPE_##type name; \
+@property (nonatomic) TIGHTDB_TYPE_##type name; \
 -(TIGHTDB_TYPE_##type)name; \
 -(void)set##name:(TIGHTDB_TYPE_##type)value; \
 -(BOOL)set##name:(TIGHTDB_TYPE_##type)value error:(NSError *__autoreleasing *)error;
@@ -169,26 +176,25 @@
 #define TIGHTDB_CURSOR_PROPERTY_IMPL_SIMPLE(name, type) \
 -(TIGHTDB_TYPE_##type)name \
 { \
-    return [_##name get##type]; \
+    return [_acc_##name get##type]; \
 } \
 -(void)set##name:(TIGHTDB_TYPE_##type)value \
 { \
-    [_##name set##type:value]; \
+    [_acc_##name set##type:value]; \
 } \
 -(BOOL)set##name:(TIGHTDB_TYPE_##type)value error:(NSError *__autoreleasing *)error \
 { \
-    return [_##name set##type:value error:error]; \
+    return [_acc_##name set##type:value error:error]; \
 }
 
 
 #define TIGHTDB_CURSOR_PROPERTY_DEF_SUBTABLE(name, type) \
-@property (readonly) type *name; \
--(type *)name; \
+@property (nonatomic, readonly) type *name; \
 
 #define TIGHTDB_CURSOR_PROPERTY_IMPL_SUBTABLE(name, type) \
 -(type *)name \
 { \
-    return [_##name getSubtable:[type class]]; \
+    return [_acc_##name getSubtable:[type class]]; \
 } \
 
 

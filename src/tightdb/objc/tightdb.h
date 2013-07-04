@@ -57,13 +57,13 @@ TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 #define TIGHTDB_TABLE_IMPL_1(TableName, CName1, CType1) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor *_##CName1; \
+    TightdbAccessor *_acc_##CName1; \
 } \
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
+        _acc_##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
     } \
     return self; \
 } \
@@ -264,15 +264,15 @@ TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 #define TIGHTDB_TABLE_IMPL_2(TableName, CName1, CType1, CName2, CType2) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor *_##CName1; \
-    TightdbAccessor *_##CName2; \
+    TightdbAccessor *_acc_##CName1; \
+    TightdbAccessor *_acc_##CName2; \
 } \
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
+        _acc_##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
+        _acc_##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
     } \
     return self; \
 } \
@@ -488,17 +488,17 @@ TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
 #define TIGHTDB_TABLE_IMPL_3(TableName, CName1, CType1, CName2, CType2, CName3, CType3) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor *_##CName1; \
-    TightdbAccessor *_##CName2; \
-    TightdbAccessor *_##CName3; \
+    TightdbAccessor *_acc_##CName1; \
+    TightdbAccessor *_acc_##CName2; \
+    TightdbAccessor *_acc_##CName3; \
 } \
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
+        _acc_##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
+        _acc_##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
+        _acc_##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
     } \
     return self; \
 } \
@@ -729,19 +729,19 @@ TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
 #define TIGHTDB_TABLE_IMPL_4(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor *_##CName1; \
-    TightdbAccessor *_##CName2; \
-    TightdbAccessor *_##CName3; \
-    TightdbAccessor *_##CName4; \
+    TightdbAccessor *_acc_##CName1; \
+    TightdbAccessor *_acc_##CName2; \
+    TightdbAccessor *_acc_##CName3; \
+    TightdbAccessor *_acc_##CName4; \
 } \
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
+        _acc_##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
+        _acc_##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
+        _acc_##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
+        _acc_##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
     } \
     return self; \
 } \
@@ -987,21 +987,21 @@ TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
 #define TIGHTDB_TABLE_IMPL_5(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor *_##CName1; \
-    TightdbAccessor *_##CName2; \
-    TightdbAccessor *_##CName3; \
-    TightdbAccessor *_##CName4; \
-    TightdbAccessor *_##CName5; \
+    TightdbAccessor *_acc_##CName1; \
+    TightdbAccessor *_acc_##CName2; \
+    TightdbAccessor *_acc_##CName3; \
+    TightdbAccessor *_acc_##CName4; \
+    TightdbAccessor *_acc_##CName5; \
 } \
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
+        _acc_##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
+        _acc_##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
+        _acc_##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
+        _acc_##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
+        _acc_##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
     } \
     return self; \
 } \
@@ -1262,23 +1262,23 @@ TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
 #define TIGHTDB_TABLE_IMPL_6(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor *_##CName1; \
-    TightdbAccessor *_##CName2; \
-    TightdbAccessor *_##CName3; \
-    TightdbAccessor *_##CName4; \
-    TightdbAccessor *_##CName5; \
-    TightdbAccessor *_##CName6; \
+    TightdbAccessor *_acc_##CName1; \
+    TightdbAccessor *_acc_##CName2; \
+    TightdbAccessor *_acc_##CName3; \
+    TightdbAccessor *_acc_##CName4; \
+    TightdbAccessor *_acc_##CName5; \
+    TightdbAccessor *_acc_##CName6; \
 } \
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
+        _acc_##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
+        _acc_##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
+        _acc_##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
+        _acc_##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
+        _acc_##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
+        _acc_##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
     } \
     return self; \
 } \
@@ -1554,25 +1554,25 @@ TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
 #define TIGHTDB_TABLE_IMPL_7(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor *_##CName1; \
-    TightdbAccessor *_##CName2; \
-    TightdbAccessor *_##CName3; \
-    TightdbAccessor *_##CName4; \
-    TightdbAccessor *_##CName5; \
-    TightdbAccessor *_##CName6; \
-    TightdbAccessor *_##CName7; \
+    TightdbAccessor *_acc_##CName1; \
+    TightdbAccessor *_acc_##CName2; \
+    TightdbAccessor *_acc_##CName3; \
+    TightdbAccessor *_acc_##CName4; \
+    TightdbAccessor *_acc_##CName5; \
+    TightdbAccessor *_acc_##CName6; \
+    TightdbAccessor *_acc_##CName7; \
 } \
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
+        _acc_##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
+        _acc_##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
+        _acc_##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
+        _acc_##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
+        _acc_##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
+        _acc_##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
+        _acc_##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
     } \
     return self; \
 } \
@@ -1863,27 +1863,27 @@ TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
 #define TIGHTDB_TABLE_IMPL_8(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor *_##CName1; \
-    TightdbAccessor *_##CName2; \
-    TightdbAccessor *_##CName3; \
-    TightdbAccessor *_##CName4; \
-    TightdbAccessor *_##CName5; \
-    TightdbAccessor *_##CName6; \
-    TightdbAccessor *_##CName7; \
-    TightdbAccessor *_##CName8; \
+    TightdbAccessor *_acc_##CName1; \
+    TightdbAccessor *_acc_##CName2; \
+    TightdbAccessor *_acc_##CName3; \
+    TightdbAccessor *_acc_##CName4; \
+    TightdbAccessor *_acc_##CName5; \
+    TightdbAccessor *_acc_##CName6; \
+    TightdbAccessor *_acc_##CName7; \
+    TightdbAccessor *_acc_##CName8; \
 } \
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
-        _##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
+        _acc_##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
+        _acc_##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
+        _acc_##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
+        _acc_##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
+        _acc_##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
+        _acc_##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
+        _acc_##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
+        _acc_##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
     } \
     return self; \
 } \
@@ -2189,29 +2189,29 @@ TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
 #define TIGHTDB_TABLE_IMPL_9(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor *_##CName1; \
-    TightdbAccessor *_##CName2; \
-    TightdbAccessor *_##CName3; \
-    TightdbAccessor *_##CName4; \
-    TightdbAccessor *_##CName5; \
-    TightdbAccessor *_##CName6; \
-    TightdbAccessor *_##CName7; \
-    TightdbAccessor *_##CName8; \
-    TightdbAccessor *_##CName9; \
+    TightdbAccessor *_acc_##CName1; \
+    TightdbAccessor *_acc_##CName2; \
+    TightdbAccessor *_acc_##CName3; \
+    TightdbAccessor *_acc_##CName4; \
+    TightdbAccessor *_acc_##CName5; \
+    TightdbAccessor *_acc_##CName6; \
+    TightdbAccessor *_acc_##CName7; \
+    TightdbAccessor *_acc_##CName8; \
+    TightdbAccessor *_acc_##CName9; \
 } \
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
-        _##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
-        _##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
+        _acc_##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
+        _acc_##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
+        _acc_##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
+        _acc_##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
+        _acc_##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
+        _acc_##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
+        _acc_##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
+        _acc_##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
+        _acc_##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
     } \
     return self; \
 } \
@@ -2532,31 +2532,31 @@ TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
 #define TIGHTDB_TABLE_IMPL_10(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor *_##CName1; \
-    TightdbAccessor *_##CName2; \
-    TightdbAccessor *_##CName3; \
-    TightdbAccessor *_##CName4; \
-    TightdbAccessor *_##CName5; \
-    TightdbAccessor *_##CName6; \
-    TightdbAccessor *_##CName7; \
-    TightdbAccessor *_##CName8; \
-    TightdbAccessor *_##CName9; \
-    TightdbAccessor *_##CName10; \
+    TightdbAccessor *_acc_##CName1; \
+    TightdbAccessor *_acc_##CName2; \
+    TightdbAccessor *_acc_##CName3; \
+    TightdbAccessor *_acc_##CName4; \
+    TightdbAccessor *_acc_##CName5; \
+    TightdbAccessor *_acc_##CName6; \
+    TightdbAccessor *_acc_##CName7; \
+    TightdbAccessor *_acc_##CName8; \
+    TightdbAccessor *_acc_##CName9; \
+    TightdbAccessor *_acc_##CName10; \
 } \
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
-        _##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
-        _##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
-        _##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
+        _acc_##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
+        _acc_##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
+        _acc_##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
+        _acc_##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
+        _acc_##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
+        _acc_##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
+        _acc_##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
+        _acc_##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
+        _acc_##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
+        _acc_##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
     } \
     return self; \
 } \
@@ -2892,33 +2892,33 @@ TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
 #define TIGHTDB_TABLE_IMPL_11(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor *_##CName1; \
-    TightdbAccessor *_##CName2; \
-    TightdbAccessor *_##CName3; \
-    TightdbAccessor *_##CName4; \
-    TightdbAccessor *_##CName5; \
-    TightdbAccessor *_##CName6; \
-    TightdbAccessor *_##CName7; \
-    TightdbAccessor *_##CName8; \
-    TightdbAccessor *_##CName9; \
-    TightdbAccessor *_##CName10; \
-    TightdbAccessor *_##CName11; \
+    TightdbAccessor *_acc_##CName1; \
+    TightdbAccessor *_acc_##CName2; \
+    TightdbAccessor *_acc_##CName3; \
+    TightdbAccessor *_acc_##CName4; \
+    TightdbAccessor *_acc_##CName5; \
+    TightdbAccessor *_acc_##CName6; \
+    TightdbAccessor *_acc_##CName7; \
+    TightdbAccessor *_acc_##CName8; \
+    TightdbAccessor *_acc_##CName9; \
+    TightdbAccessor *_acc_##CName10; \
+    TightdbAccessor *_acc_##CName11; \
 } \
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
-        _##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
-        _##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
-        _##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
-        _##CName11 = [[TightdbAccessor alloc] initWithCursor:self columnId:10]; \
+        _acc_##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
+        _acc_##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
+        _acc_##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
+        _acc_##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
+        _acc_##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
+        _acc_##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
+        _acc_##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
+        _acc_##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
+        _acc_##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
+        _acc_##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
+        _acc_##CName11 = [[TightdbAccessor alloc] initWithCursor:self columnId:10]; \
     } \
     return self; \
 } \
@@ -3269,35 +3269,35 @@ TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
 #define TIGHTDB_TABLE_IMPL_12(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor *_##CName1; \
-    TightdbAccessor *_##CName2; \
-    TightdbAccessor *_##CName3; \
-    TightdbAccessor *_##CName4; \
-    TightdbAccessor *_##CName5; \
-    TightdbAccessor *_##CName6; \
-    TightdbAccessor *_##CName7; \
-    TightdbAccessor *_##CName8; \
-    TightdbAccessor *_##CName9; \
-    TightdbAccessor *_##CName10; \
-    TightdbAccessor *_##CName11; \
-    TightdbAccessor *_##CName12; \
+    TightdbAccessor *_acc_##CName1; \
+    TightdbAccessor *_acc_##CName2; \
+    TightdbAccessor *_acc_##CName3; \
+    TightdbAccessor *_acc_##CName4; \
+    TightdbAccessor *_acc_##CName5; \
+    TightdbAccessor *_acc_##CName6; \
+    TightdbAccessor *_acc_##CName7; \
+    TightdbAccessor *_acc_##CName8; \
+    TightdbAccessor *_acc_##CName9; \
+    TightdbAccessor *_acc_##CName10; \
+    TightdbAccessor *_acc_##CName11; \
+    TightdbAccessor *_acc_##CName12; \
 } \
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
-        _##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
-        _##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
-        _##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
-        _##CName11 = [[TightdbAccessor alloc] initWithCursor:self columnId:10]; \
-        _##CName12 = [[TightdbAccessor alloc] initWithCursor:self columnId:11]; \
+        _acc_##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
+        _acc_##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
+        _acc_##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
+        _acc_##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
+        _acc_##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
+        _acc_##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
+        _acc_##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
+        _acc_##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
+        _acc_##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
+        _acc_##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
+        _acc_##CName11 = [[TightdbAccessor alloc] initWithCursor:self columnId:10]; \
+        _acc_##CName12 = [[TightdbAccessor alloc] initWithCursor:self columnId:11]; \
     } \
     return self; \
 } \
@@ -3663,37 +3663,37 @@ TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
 #define TIGHTDB_TABLE_IMPL_13(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor *_##CName1; \
-    TightdbAccessor *_##CName2; \
-    TightdbAccessor *_##CName3; \
-    TightdbAccessor *_##CName4; \
-    TightdbAccessor *_##CName5; \
-    TightdbAccessor *_##CName6; \
-    TightdbAccessor *_##CName7; \
-    TightdbAccessor *_##CName8; \
-    TightdbAccessor *_##CName9; \
-    TightdbAccessor *_##CName10; \
-    TightdbAccessor *_##CName11; \
-    TightdbAccessor *_##CName12; \
-    TightdbAccessor *_##CName13; \
+    TightdbAccessor *_acc_##CName1; \
+    TightdbAccessor *_acc_##CName2; \
+    TightdbAccessor *_acc_##CName3; \
+    TightdbAccessor *_acc_##CName4; \
+    TightdbAccessor *_acc_##CName5; \
+    TightdbAccessor *_acc_##CName6; \
+    TightdbAccessor *_acc_##CName7; \
+    TightdbAccessor *_acc_##CName8; \
+    TightdbAccessor *_acc_##CName9; \
+    TightdbAccessor *_acc_##CName10; \
+    TightdbAccessor *_acc_##CName11; \
+    TightdbAccessor *_acc_##CName12; \
+    TightdbAccessor *_acc_##CName13; \
 } \
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
-        _##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
-        _##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
-        _##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
-        _##CName11 = [[TightdbAccessor alloc] initWithCursor:self columnId:10]; \
-        _##CName12 = [[TightdbAccessor alloc] initWithCursor:self columnId:11]; \
-        _##CName13 = [[TightdbAccessor alloc] initWithCursor:self columnId:12]; \
+        _acc_##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
+        _acc_##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
+        _acc_##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
+        _acc_##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
+        _acc_##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
+        _acc_##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
+        _acc_##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
+        _acc_##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
+        _acc_##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
+        _acc_##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
+        _acc_##CName11 = [[TightdbAccessor alloc] initWithCursor:self columnId:10]; \
+        _acc_##CName12 = [[TightdbAccessor alloc] initWithCursor:self columnId:11]; \
+        _acc_##CName13 = [[TightdbAccessor alloc] initWithCursor:self columnId:12]; \
     } \
     return self; \
 } \
@@ -4074,39 +4074,39 @@ TIGHTDB_COLUMN_PROXY_DEF(CName14, CType14) \
 #define TIGHTDB_TABLE_IMPL_14(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor *_##CName1; \
-    TightdbAccessor *_##CName2; \
-    TightdbAccessor *_##CName3; \
-    TightdbAccessor *_##CName4; \
-    TightdbAccessor *_##CName5; \
-    TightdbAccessor *_##CName6; \
-    TightdbAccessor *_##CName7; \
-    TightdbAccessor *_##CName8; \
-    TightdbAccessor *_##CName9; \
-    TightdbAccessor *_##CName10; \
-    TightdbAccessor *_##CName11; \
-    TightdbAccessor *_##CName12; \
-    TightdbAccessor *_##CName13; \
-    TightdbAccessor *_##CName14; \
+    TightdbAccessor *_acc_##CName1; \
+    TightdbAccessor *_acc_##CName2; \
+    TightdbAccessor *_acc_##CName3; \
+    TightdbAccessor *_acc_##CName4; \
+    TightdbAccessor *_acc_##CName5; \
+    TightdbAccessor *_acc_##CName6; \
+    TightdbAccessor *_acc_##CName7; \
+    TightdbAccessor *_acc_##CName8; \
+    TightdbAccessor *_acc_##CName9; \
+    TightdbAccessor *_acc_##CName10; \
+    TightdbAccessor *_acc_##CName11; \
+    TightdbAccessor *_acc_##CName12; \
+    TightdbAccessor *_acc_##CName13; \
+    TightdbAccessor *_acc_##CName14; \
 } \
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
-        _##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
-        _##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
-        _##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
-        _##CName11 = [[TightdbAccessor alloc] initWithCursor:self columnId:10]; \
-        _##CName12 = [[TightdbAccessor alloc] initWithCursor:self columnId:11]; \
-        _##CName13 = [[TightdbAccessor alloc] initWithCursor:self columnId:12]; \
-        _##CName14 = [[TightdbAccessor alloc] initWithCursor:self columnId:13]; \
+        _acc_##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
+        _acc_##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
+        _acc_##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
+        _acc_##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
+        _acc_##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
+        _acc_##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
+        _acc_##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
+        _acc_##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
+        _acc_##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
+        _acc_##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
+        _acc_##CName11 = [[TightdbAccessor alloc] initWithCursor:self columnId:10]; \
+        _acc_##CName12 = [[TightdbAccessor alloc] initWithCursor:self columnId:11]; \
+        _acc_##CName13 = [[TightdbAccessor alloc] initWithCursor:self columnId:12]; \
+        _acc_##CName14 = [[TightdbAccessor alloc] initWithCursor:self columnId:13]; \
     } \
     return self; \
 } \
@@ -4502,41 +4502,41 @@ TIGHTDB_COLUMN_PROXY_DEF(CName15, CType15) \
 #define TIGHTDB_TABLE_IMPL_15(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14, CName15, CType15) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor *_##CName1; \
-    TightdbAccessor *_##CName2; \
-    TightdbAccessor *_##CName3; \
-    TightdbAccessor *_##CName4; \
-    TightdbAccessor *_##CName5; \
-    TightdbAccessor *_##CName6; \
-    TightdbAccessor *_##CName7; \
-    TightdbAccessor *_##CName8; \
-    TightdbAccessor *_##CName9; \
-    TightdbAccessor *_##CName10; \
-    TightdbAccessor *_##CName11; \
-    TightdbAccessor *_##CName12; \
-    TightdbAccessor *_##CName13; \
-    TightdbAccessor *_##CName14; \
-    TightdbAccessor *_##CName15; \
+    TightdbAccessor *_acc_##CName1; \
+    TightdbAccessor *_acc_##CName2; \
+    TightdbAccessor *_acc_##CName3; \
+    TightdbAccessor *_acc_##CName4; \
+    TightdbAccessor *_acc_##CName5; \
+    TightdbAccessor *_acc_##CName6; \
+    TightdbAccessor *_acc_##CName7; \
+    TightdbAccessor *_acc_##CName8; \
+    TightdbAccessor *_acc_##CName9; \
+    TightdbAccessor *_acc_##CName10; \
+    TightdbAccessor *_acc_##CName11; \
+    TightdbAccessor *_acc_##CName12; \
+    TightdbAccessor *_acc_##CName13; \
+    TightdbAccessor *_acc_##CName14; \
+    TightdbAccessor *_acc_##CName15; \
 } \
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
-        _##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
-        _##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
-        _##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
-        _##CName11 = [[TightdbAccessor alloc] initWithCursor:self columnId:10]; \
-        _##CName12 = [[TightdbAccessor alloc] initWithCursor:self columnId:11]; \
-        _##CName13 = [[TightdbAccessor alloc] initWithCursor:self columnId:12]; \
-        _##CName14 = [[TightdbAccessor alloc] initWithCursor:self columnId:13]; \
-        _##CName15 = [[TightdbAccessor alloc] initWithCursor:self columnId:14]; \
+        _acc_##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
+        _acc_##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
+        _acc_##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
+        _acc_##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
+        _acc_##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
+        _acc_##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
+        _acc_##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
+        _acc_##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
+        _acc_##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
+        _acc_##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
+        _acc_##CName11 = [[TightdbAccessor alloc] initWithCursor:self columnId:10]; \
+        _acc_##CName12 = [[TightdbAccessor alloc] initWithCursor:self columnId:11]; \
+        _acc_##CName13 = [[TightdbAccessor alloc] initWithCursor:self columnId:12]; \
+        _acc_##CName14 = [[TightdbAccessor alloc] initWithCursor:self columnId:13]; \
+        _acc_##CName15 = [[TightdbAccessor alloc] initWithCursor:self columnId:14]; \
     } \
     return self; \
 } \

@@ -102,7 +102,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 @implementation TableName##_Cursor \\
 { \\
 %for $j in range($num_cols)
-    TightdbAccessor *_##CName${j+1}; \\
+    TightdbAccessor *_acc_##CName${j+1}; \\
 %end for
 } \\
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx \\
@@ -110,7 +110,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
     self = [super initWithTable:table ndx:ndx]; \\
     if (self) { \\
 %for $j in range($num_cols)
-        _##CName${j+1} = [[TightdbAccessor alloc] initWithCursor:self columnId:${j}]; \\
+        _acc_##CName${j+1} = [[TightdbAccessor alloc] initWithCursor:self columnId:${j}]; \\
 %end for
     } \\
     return self; \\

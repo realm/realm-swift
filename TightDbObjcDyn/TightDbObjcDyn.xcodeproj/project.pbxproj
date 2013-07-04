@@ -7,6 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E9106BC61785E31400113590 /* data_type.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890E7177B71E400653D7A /* data_type.mm */; };
+		E9106BC71785E31400113590 /* enumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890E8177B71E400653D7A /* enumerator.m */; };
+		E9106BC81785E31400113590 /* err_handling.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890E9177B71E400653D7A /* err_handling.mm */; };
+		E9106BC91785E31400113590 /* get_subtable.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890EA177B71E400653D7A /* get_subtable.m */; };
+		E9106BCA1785E31400113590 /* group_misc_2.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890EB177B71E400653D7A /* group_misc_2.m */; };
+		E9106BCB1785E31400113590 /* group.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890EC177B71E400653D7A /* group.m */; };
+		E9106BCC1785E31400113590 /* mixed.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890ED177B71E400653D7A /* mixed.m */; };
+		E9106BCD1785E31400113590 /* shared_group.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890EF177B71E400653D7A /* shared_group.mm */; };
+		E9106BCE1785E31400113590 /* subtable.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F0177B71E400653D7A /* subtable.m */; };
+		E9106BCF1785E31400113590 /* table_delete_all.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F1177B71E400653D7A /* table_delete_all.m */; };
+		E9106BD01785E31400113590 /* table.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F2177B71E400653D7A /* table.m */; };
+		E9106BD11785E31400113590 /* tutorial.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F4177B71E400653D7A /* tutorial.m */; };
+		E9106BD21785E31400113590 /* threads.m in Sources */ = {isa = PBXBuildFile; fileRef = E94EA3E017831986001AE3DA /* threads.m */; };
 		E918909D177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		E91890AF177B677900653D7A /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E91890AE177B677900653D7A /* SenTestingKit.framework */; };
 		E91890B0177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
@@ -29,21 +42,7 @@
 		E91890E4177B67AB00653D7A /* tightdb.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D3177B67AB00653D7A /* tightdb.h */; };
 		E91890E5177B67AB00653D7A /* type.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D4177B67AB00653D7A /* type.h */; };
 		E91890E6177B67AB00653D7A /* util.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E91890D5177B67AB00653D7A /* util.hpp */; };
-		E91890F5177B71E400653D7A /* data_type.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890E7177B71E400653D7A /* data_type.mm */; };
-		E91890F6177B71E400653D7A /* enumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890E8177B71E400653D7A /* enumerator.m */; };
-		E91890F7177B71E400653D7A /* err_handling.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890E9177B71E400653D7A /* err_handling.mm */; };
-		E91890F8177B71E400653D7A /* get_subtable.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890EA177B71E400653D7A /* get_subtable.m */; };
-		E91890F9177B71E400653D7A /* group_misc_2.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890EB177B71E400653D7A /* group_misc_2.m */; };
-		E91890FA177B71E400653D7A /* group.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890EC177B71E400653D7A /* group.m */; };
-		E91890FB177B71E400653D7A /* mixed.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890ED177B71E400653D7A /* mixed.m */; };
 		E91890FC177B71E400653D7A /* query.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890EE177B71E400653D7A /* query.m */; };
-		E91890FD177B71E400653D7A /* shared_group.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890EF177B71E400653D7A /* shared_group.mm */; };
-		E91890FE177B71E400653D7A /* subtable.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F0177B71E400653D7A /* subtable.m */; };
-		E91890FF177B71E400653D7A /* table_delete_all.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F1177B71E400653D7A /* table_delete_all.m */; };
-		E9189100177B71E400653D7A /* table.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F2177B71E400653D7A /* table.m */; };
-		E9189101177B71E400653D7A /* template.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F3177B71E400653D7A /* template.m */; };
-		E9189102177B71E400653D7A /* tutorial.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F4177B71E400653D7A /* tutorial.m */; };
-		E94EA3E117831986001AE3DA /* threads.m in Sources */ = {isa = PBXBuildFile; fileRef = E94EA3E017831986001AE3DA /* threads.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -361,21 +360,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E91890F5177B71E400653D7A /* data_type.mm in Sources */,
-				E91890F6177B71E400653D7A /* enumerator.m in Sources */,
-				E91890F7177B71E400653D7A /* err_handling.mm in Sources */,
-				E91890F8177B71E400653D7A /* get_subtable.m in Sources */,
-				E91890F9177B71E400653D7A /* group_misc_2.m in Sources */,
-				E91890FA177B71E400653D7A /* group.m in Sources */,
-				E91890FB177B71E400653D7A /* mixed.m in Sources */,
 				E91890FC177B71E400653D7A /* query.m in Sources */,
-				E91890FD177B71E400653D7A /* shared_group.mm in Sources */,
-				E91890FE177B71E400653D7A /* subtable.m in Sources */,
-				E91890FF177B71E400653D7A /* table_delete_all.m in Sources */,
-				E9189100177B71E400653D7A /* table.m in Sources */,
-				E9189101177B71E400653D7A /* template.m in Sources */,
-				E9189102177B71E400653D7A /* tutorial.m in Sources */,
-				E94EA3E117831986001AE3DA /* threads.m in Sources */,
+				E9106BC61785E31400113590 /* data_type.mm in Sources */,
+				E9106BC71785E31400113590 /* enumerator.m in Sources */,
+				E9106BC81785E31400113590 /* err_handling.mm in Sources */,
+				E9106BC91785E31400113590 /* get_subtable.m in Sources */,
+				E9106BCA1785E31400113590 /* group_misc_2.m in Sources */,
+				E9106BCB1785E31400113590 /* group.m in Sources */,
+				E9106BCC1785E31400113590 /* mixed.m in Sources */,
+				E9106BCD1785E31400113590 /* shared_group.mm in Sources */,
+				E9106BCE1785E31400113590 /* subtable.m in Sources */,
+				E9106BCF1785E31400113590 /* table_delete_all.m in Sources */,
+				E9106BD01785E31400113590 /* table.m in Sources */,
+				E9106BD11785E31400113590 /* tutorial.m in Sources */,
+				E9106BD21785E31400113590 /* threads.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
