@@ -4,8 +4,11 @@
 ID        : objc
 TITLE     : 'Objective-C'
 DESCR     : >
+            <b>The Objective C interface is under heavy reorganization, and this reference
+            documentation might be out-of-date.</b>
+
             The goal of TightDB is to provide a high performance
-            data storage for your applications. 
+            data storage for your applications.
 
             TightDB integrates seamless in Objective-C, making it
             fast to learn and easy to use.  You can replace your traditional data
@@ -18,8 +21,8 @@ DESCR     : >
 
             The core of the framework is the class {@link class_table}. The
             class is a representation of the
-            fundamental concept <strong>Table</strong>. You can use 
-            {@link class_table} in the situations where you know the table structure 
+            fundamental concept <strong>Table</strong>. You can use
+            {@link class_table} in the situations where you know the table structure
             a priori or when the data structure changes dynamically through the run time
             of the application.
 
@@ -28,7 +31,7 @@ DESCR     : >
             data structures. Moreover, tables can have nested tables as data. Using subtables
             and mixed types you can build arbitrarily complex data structures.
 
-            It is possible to query data using the {@link class_query} and 
+            It is possible to query data using the {@link class_query} and
             class. Queries can be complex - involving
             any number of columns and values. You can either apply aggregate functions to you
             resulting data set or use the data set in your application as a
@@ -60,8 +63,8 @@ CATEGORIES:                       # list global class-id in order of appearence
   - mixed
 #  - cursor
 
-EXAMPLES  : 
-- DESCR   : 
+EXAMPLES  :
+- DESCR   :
   CODE    : #ex_objc_intro           # id to example code
 
 ## Checked:
