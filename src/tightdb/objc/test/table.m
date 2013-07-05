@@ -52,9 +52,9 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
         [_table set:1 ndx:ndx value:10];
         
         // Verify
-        if ([_table get:0 ndx:ndx] != 0)
+        if ([[_table get:0 ndx:ndx] longLongValue] != 0)
             STFail(@"First not zero");
-        if ([_table get:1 ndx:ndx] != 10)
+        if ([[_table get:1 ndx:ndx] longLongValue] != 10)
             STFail(@"Second not 10");
     }
     TEST_CHECK_ALLOC;
@@ -130,6 +130,46 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
         STAssertEquals([table.DoubleCol max], 8.8,                      @"DoubleCol max");
         STAssertEquals([table.DoubleCol sum], 0.8 + 8.8,                @"DoubleCol sum");
         STAssertEquals([table.DoubleCol avg], (0.8 + 8.8) / 2,          @"DoubleCol avg");
+    }
+    TEST_CHECK_ALLOC;
+}
+
+- (void)testTableInsertMultiple
+{
+    @autoreleasepool {
+        NSError *error;
+        TightdbTable *_table = [[TightdbTable alloc] initWithError:&error];
+        NSLog(@"Table: %@", _table);
+        STAssertNotNil(_table, @"Table is nil");
+        
+        // Create columns
+        [_table addColumn:tightdb_Bool name:@"boolCol" error:&error];
+        [_table addColumn:tightdb_Int name:@"intCol" error:&error];
+        [_table addColumn:tightdb_Float name:@"floatCol" error:&error];
+        [_table addColumn:tightdb_Double name:@"doubleCol" error:&error];
+        [_table addColumn:tightdb_String name:@"stringCol" error:&error];
+        
+        // Insert values.
+        for(int i=0;i<100;++i) {
+            if (![_table insertRowAtIndex:0 error:&error, YES, 10+i, 88.44f+(float)i, 909.99+ (double)i, [NSString stringWithFormat:@"Hello kitty: %d", i]]) {
+                NSLog(@"%@", [error localizedDescription]);
+                STFail(@"Insert row failed");
+            }
+        }
+        
+        for(int i=99, row = 0;i>=0;--i, ++row) {
+            STAssertEquals([[_table getBool:0 ndx:row] boolValue], YES, @"Column 1 bool = YES");
+            STAssertEquals([[_table get:1 ndx:row] longLongValue], (int64_t)10+i, @"Column 2 int = 10");
+            STAssertEquals([[_table getFloat:2 ndx:row] floatValue], 88.44f+(float)i, @"Column 3 float = 88.44");
+            STAssertEquals([[_table getDouble:3 ndx:row] doubleValue], 909.99+(double)i, @"Column 4 double = 909.99");
+            NSString *str = [NSString stringWithFormat:@"Hello kitty: %d", i];
+            STAssertEqualObjects([_table getString:4 ndx:row], str, @"Column 5 string = Hello kitty");
+        }
+        
+        // Test out of bounds:
+        STAssertEquals([[_table getBool:0 ndx:100] boolValue], NO, @"Row 100 out of bounds");
+        STAssertEquals([[_table getBool:5 ndx:0] boolValue], NO, @"Column 5 out of bounds");
+        
     }
     TEST_CHECK_ALLOC;
 }

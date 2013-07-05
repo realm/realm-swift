@@ -37,18 +37,23 @@
 @interface TightdbAccessor: NSObject
 -(id)initWithCursor:(TightdbCursor *)cursor columnId:(size_t)columnId;
 -(BOOL)getBool;
+-(NSNumber *)getBoolWithError:(NSError *__autoreleasing *)error;
 -(BOOL)setBool:(BOOL)value;
 -(BOOL)setBool:(BOOL)value error:(NSError *__autoreleasing *)error;
 -(int64_t)getInt;
+-(NSNumber *)getIntWithError:(NSError *__autoreleasing *)error;
 -(BOOL)setInt:(int64_t)value;
 -(BOOL)setInt:(int64_t)value error:(NSError *__autoreleasing *)error;
 -(float)getFloat;
+-(NSNumber *)getFloatWithError:(NSError *__autoreleasing *)error;
 -(BOOL)setFloat:(float)value;
 -(BOOL)setFloat:(float)value error:(NSError *__autoreleasing *)error;
 -(double)getDouble;
+-(NSNumber *)getDoubleWithError:(NSError *__autoreleasing *)error;
 -(BOOL)setDouble:(double)value;
 -(BOOL)setDouble:(double)value error:(NSError *__autoreleasing *)error;
 -(NSString *)getString;
+-(NSString *)getStringWithError:(NSError *__autoreleasing *)error;
 -(BOOL)setString:(NSString *)value;
 -(BOOL)setString:(NSString *)value error:(NSError *__autoreleasing *)error;
 -(TightdbBinary *)getBinary;
@@ -57,10 +62,12 @@
 -(BOOL)setBinary:(const char *)data size:(size_t)size;
 -(BOOL)setBinary:(const char *)data size:(size_t)size error:(NSError *__autoreleasing *)error;
 -(time_t)getDate;
+-(NSNumber *)getDateWithError:(NSError *__autoreleasing *)error;
 -(BOOL)setDate:(time_t)value;
 -(BOOL)setDate:(time_t)value error:(NSError *__autoreleasing *)error;
 -(id)getSubtable:(Class)obj;
 -(TightdbMixed *)getMixed;
+-(TightdbMixed *)getMixedWithError:(NSError *__autoreleasing *)error;
 -(BOOL)setMixed:(TightdbMixed *)value;
 -(BOOL)setMixed:(TightdbMixed *)value error:(NSError *__autoreleasing *)error;
 @end

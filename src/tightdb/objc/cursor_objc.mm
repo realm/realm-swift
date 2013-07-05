@@ -68,10 +68,13 @@ _Atomic(int) TightdbCursorAllocateCount = 0;
     return self;
 }
 
-
 -(BOOL)getBool
 {
-    return [_cursor.table getBool:_columnId ndx:_cursor.ndx];
+    return [[self getBoolWithError:nil] boolValue];
+}
+-(NSNumber *)getBoolWithError:(NSError *__autoreleasing *)error
+{
+    return [_cursor.table getBool:_columnId ndx:_cursor.ndx error:error];
 }
 
 -(BOOL)setBool:(BOOL)value
@@ -86,7 +89,11 @@ _Atomic(int) TightdbCursorAllocateCount = 0;
 
 -(int64_t)getInt
 {
-    return [_cursor.table get:_columnId ndx:_cursor.ndx];
+    return [[self getIntWithError:nil] longLongValue];
+}
+-(NSNumber *)getIntWithError:(NSError *__autoreleasing *)error
+{
+    return [_cursor.table get:_columnId ndx:_cursor.ndx error:error];
 }
 
 -(BOOL)setInt:(int64_t)value
@@ -101,7 +108,11 @@ _Atomic(int) TightdbCursorAllocateCount = 0;
 
 -(float)getFloat
 {
-    return [_cursor.table getFloat:_columnId ndx:_cursor.ndx];
+    return [[self getFloatWithError:nil] floatValue];
+}
+-(NSNumber *)getFloatWithError:(NSError *__autoreleasing *)error
+{
+    return [_cursor.table getFloat:_columnId ndx:_cursor.ndx error:error];
 }
 
 -(BOOL)setFloat:(float)value
@@ -116,7 +127,11 @@ _Atomic(int) TightdbCursorAllocateCount = 0;
 
 -(double)getDouble
 {
-    return [_cursor.table getDouble:_columnId ndx:_cursor.ndx];
+    return [[self getDoubleWithError:nil] doubleValue];
+}
+-(NSNumber *)getDoubleWithError:(NSError *__autoreleasing *)error
+{
+    return [_cursor.table getDouble:_columnId ndx:_cursor.ndx error:error];
 }
 
 -(BOOL)setDouble:(double)value
@@ -131,7 +146,11 @@ _Atomic(int) TightdbCursorAllocateCount = 0;
 
 -(NSString *)getString
 {
-    return [_cursor.table getString:_columnId ndx:_cursor.ndx];
+    return [self getStringWithError:nil];
+}
+-(NSString *)getStringWithError:(NSError *__autoreleasing *)error
+{
+    return [_cursor.table getString:_columnId ndx:_cursor.ndx error:error];
 }
 
 -(BOOL)setString:(NSString *)value
@@ -171,7 +190,11 @@ _Atomic(int) TightdbCursorAllocateCount = 0;
 
 -(time_t)getDate
 {
-    return [_cursor.table getDate:_columnId ndx:_cursor.ndx];
+    return [[self getDateWithError:nil] longLongValue];
+}
+-(NSNumber *)getDateWithError:(NSError *__autoreleasing *)error
+{
+    return [_cursor.table getDate:_columnId ndx:_cursor.ndx error:error];
 }
 
 -(BOOL)setDate:(time_t)value
@@ -191,7 +214,11 @@ _Atomic(int) TightdbCursorAllocateCount = 0;
 
 -(TightdbMixed *)getMixed
 {
-    return [_cursor.table getMixed:_columnId ndx:_cursor.ndx];
+    return [self getMixedWithError:nil];
+}
+-(TightdbMixed *)getMixedWithError:(NSError *__autoreleasing *)error
+{
+    return [_cursor.table getMixed:_columnId ndx:_cursor.ndx error:error];
 }
 
 -(BOOL)setMixed:(TightdbMixed *)value

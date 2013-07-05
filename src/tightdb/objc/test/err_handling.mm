@@ -363,6 +363,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 - (void)testQueryErrHandling
 {
     @autoreleasepool {
+        NSError *error;
         TestQueryErrAllTypes *table = [[TestQueryErrAllTypes alloc] init];
         NSLog(@"Table: %@", table);
         STAssertNotNil(table, @"Table is nil");
@@ -373,7 +374,13 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
         time_t timeNow = [[NSDate date] timeIntervalSince1970];
         //    TestQueryErrSub *subtab1 = [[TestQueryErrSub alloc] init];
         TestQueryErrSub *subtab2 = [[TestQueryErrSub alloc] init];
+        if (![subtab2 insertRowAtIndex:0 error:&error, 50]) {
+            NSLog(@"%@", [error localizedDescription]);
+            STFail(@"Insert failed.");
+        }
         [subtab2 addAge:100];
+        STAssertEquals([subtab2 count], size_t(2), @"subtab2 should contain 2 rows");
+        
         TightdbMixed *mixInt1   = [TightdbMixed mixedWithInt64:1];
         TightdbMixed *mixSubtab = [TightdbMixed mixedWithTable:subtab2];
         

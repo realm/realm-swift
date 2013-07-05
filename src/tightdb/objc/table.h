@@ -96,6 +96,7 @@
 /// The specified table class must be one that is declared by using
 /// one of the table macros TIGHTDB_TABLE_*.
 -(TightdbTable *)getSubtable:(size_t)colNdx ndx:(size_t)ndx;
+-(TightdbTable *)getSubtable:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(id)getSubtable:(size_t)colNdx ndx:(size_t)ndx withClass:(Class)obj;
 //@}
 
@@ -135,21 +136,28 @@
 -(BOOL)removeLastWithError:(NSError *__autoreleasing *)error;
 
 // Adaptive ints.
--(int64_t)get:(size_t)colNdx ndx:(size_t)ndx;
+-(NSNumber *)get:(size_t)colNdx ndx:(size_t)ndx;
+-(NSNumber *)get:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(BOOL)set:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;
 -(BOOL)set:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value error:(NSError *__autoreleasing *)error;
--(BOOL)getBool:(size_t)colNdx ndx:(size_t)ndx;
+-(NSNumber *)getBool:(size_t)colNdx ndx:(size_t)ndx;
+-(NSNumber *)getBool:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(BOOL)setBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value;
 -(BOOL)setBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value error:(NSError *__autoreleasing *)error;
--(float)getFloat:(size_t)colNdx ndx:(size_t)ndx;
+-(NSNumber *)getFloat:(size_t)colNdx ndx:(size_t)ndx;
+-(NSNumber *)getFloat:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(BOOL)setFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value;
 -(BOOL)setFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value error:(NSError *__autoreleasing *)error;
--(double)getDouble:(size_t)colNdx ndx:(size_t)ndx;
+-(NSNumber *)getDouble:(size_t)colNdx ndx:(size_t)ndx;
+-(NSNumber *)getDouble:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(BOOL)setDouble:(size_t)colNdx ndx:(size_t)ndx value:(double)value;
 -(BOOL)setDouble:(size_t)colNdx ndx:(size_t)ndx value:(double)value error:(NSError *__autoreleasing *)error;
--(time_t)getDate:(size_t)colNdx ndx:(size_t)ndx;
+-(NSNumber *)getDate:(size_t)colNdx ndx:(size_t)ndx;
+-(NSNumber *)getDate:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(BOOL)setDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value;
 -(BOOL)setDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value error:(NSError *__autoreleasing *)error;
+-(NSArray *)getRowAtIndex:(size_t)ndx;
+-(NSArray *)getRowAtIndex:(size_t)ndx error:(NSError *__autoreleasing *)error;
 
 // NOTE: Low-level insert functions. Always insert in all columns at once
 // and call InsertDone after to avoid table getting un-balanced.
@@ -169,16 +177,20 @@
 -(BOOL)insertBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size error:(NSError *__autoreleasing *)error;
 -(BOOL)insertDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value;
 -(BOOL)insertDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value error:(NSError *__autoreleasing *)error;
+-(BOOL)insertRowAtIndex:(size_t)ndx, ...;
+-(BOOL)insertRowAtIndex:(size_t)ndx error:(NSError *__autoreleasing *)error,...;
 -(BOOL)insertDone;
 -(BOOL)insertDoneWithError:(NSError *__autoreleasing *)error;
 
 // Strings
 -(NSString *)getString:(size_t)colNdx ndx:(size_t)ndx;
+-(NSString *)getString:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(BOOL)setString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value;
 -(BOOL)setString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value error:(NSError *__autoreleasing *)error;
 
 // Binary
 -(TightdbBinary *)getBinary:(size_t)colNdx ndx:(size_t)ndx;
+-(TightdbBinary *)getBinary:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(BOOL)setBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value;
 -(BOOL)setBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value error:(NSError *__autoreleasing *)error;
 -(BOOL)setBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size;
@@ -193,6 +205,7 @@
 
 // Mixed
 -(TightdbMixed *)getMixed:(size_t)colNdx ndx:(size_t)ndx;
+-(TightdbMixed *)getMixed:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(TightdbType)getMixedType:(size_t)colNdx ndx:(size_t)ndx;
 -(BOOL)insertMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value;
 -(BOOL)insertMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value error:(NSError *__autoreleasing *)error;

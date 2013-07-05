@@ -612,16 +612,23 @@ _Atomic(int) TightdbTableAllocateCount = 0;
 
 -(TightdbTable *)getSubtable:(size_t)col_ndx ndx:(size_t)ndx
 {
-    const tightdb::DataType t = _table->get_column_type(col_ndx);
-    if (t != tightdb::type_Table && t != tightdb::type_Mixed) return nil;
-    tightdb::TableRef r = _table->get_subtable(col_ndx, ndx);
-    if (!r) return nil;
-    TightdbTable *table = [[TightdbTable alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table)) return nil;
-    [table setTable:move(r)];
-    [table setParent:self];
-    [table setReadOnly:_readOnly];
-    return table;
+    return [self getSubtable:col_ndx ndx:ndx error:nil];
+}
+-(TightdbTable *)getSubtable:(size_t)col_ndx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error
+{
+    TIGHTDB_TABLEBOUNDS_ERRHANDLER(col_ndx, ndx, error, return nil);
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 const tightdb::DataType t = _table->get_column_type(col_ndx);
+                                 if (t != tightdb::type_Table && t != tightdb::type_Mixed) return nil;
+                                 tightdb::TableRef r = _table->get_subtable(col_ndx, ndx);
+                                 if (!r) return nil;
+                                 TightdbTable *table = [[TightdbTable alloc] _initRaw];
+                                 if (TIGHTDB_UNLIKELY(!table)) return nil;
+                                 [table setTable:move(r)];
+                                 [table setParent:self];
+                                 [table setReadOnly:_readOnly];
+                                 return table;
+                                 , @"com.tightdb.table", return nil);
 }
 
 // FIXME: Check that the specified class derives from TightdbTable.
@@ -796,9 +803,16 @@ _Atomic(int) TightdbTableAllocateCount = 0;
                                  , @"com.tightdb.table", return NO);
     return YES;
 }
--(int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
+-(NSNumber *)get:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return _table->get_int(col_ndx, ndx);
+    return [self get:col_ndx ndx:ndx error:nil];
+}
+-(NSNumber *)get:(size_t)col_ndx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error
+{
+    TIGHTDB_TABLEBOUNDS_ERRHANDLER(col_ndx, ndx, error, return nil);
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 return [NSNumber numberWithLongLong:_table->get_int(col_ndx, ndx)];
+                                 , @"com.tightdb.table", return nil);
 }
 
 -(BOOL)set:(size_t)col_ndx ndx:(size_t)ndx value:(int64_t)value
@@ -819,9 +833,16 @@ _Atomic(int) TightdbTableAllocateCount = 0;
     return YES;
 }
 
--(BOOL)getBool:(size_t)col_ndx ndx:(size_t)ndx
+-(NSNumber *)getBool:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return _table->get_bool(col_ndx, ndx);
+    return [self getBool:col_ndx ndx:ndx error:nil];
+}
+-(NSNumber *)getBool:(size_t)col_ndx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error
+{
+    TIGHTDB_TABLEBOUNDS_ERRHANDLER(col_ndx, ndx, error, return nil);
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 return [NSNumber numberWithBool:_table->get_bool(col_ndx, ndx)];
+                                 , @"com.tightdb.table", return nil);
 }
 
 -(BOOL)setBool:(size_t)col_ndx ndx:(size_t)ndx value:(BOOL)value
@@ -842,9 +863,16 @@ _Atomic(int) TightdbTableAllocateCount = 0;
     return YES;
 }
 
--(float)getFloat:(size_t)col_ndx ndx:(size_t)ndx
+-(NSNumber *)getFloat:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return _table->get_float(col_ndx, ndx);
+    return [self getFloat:col_ndx ndx:ndx error:nil];
+}
+-(NSNumber *)getFloat:(size_t)col_ndx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error
+{
+    TIGHTDB_TABLEBOUNDS_ERRHANDLER(col_ndx, ndx, error, return nil);
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 return [NSNumber numberWithFloat:_table->get_float(col_ndx, ndx)];
+                                 , @"com.tightdb.table", return nil);
 }
 
 -(BOOL)setFloat:(size_t)col_ndx ndx:(size_t)ndx value:(float)value
@@ -865,9 +893,16 @@ _Atomic(int) TightdbTableAllocateCount = 0;
     return YES;
 }
 
--(double)getDouble:(size_t)col_ndx ndx:(size_t)ndx
+-(NSNumber *)getDouble:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return _table->get_double(col_ndx, ndx);
+    return [self getDouble:col_ndx ndx:ndx error:nil];
+}
+-(NSNumber *)getDouble:(size_t)col_ndx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error
+{
+    TIGHTDB_TABLEBOUNDS_ERRHANDLER(col_ndx, ndx, error, return nil);
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 return [NSNumber numberWithDouble:_table->get_double(col_ndx, ndx)];
+                                 , @"com.tightdb.table", return nil);
 }
 
 -(BOOL)setDouble:(size_t)col_ndx ndx:(size_t)ndx value:(double)value
@@ -888,9 +923,16 @@ _Atomic(int) TightdbTableAllocateCount = 0;
     return YES;
 }
 
--(time_t)getDate:(size_t)col_ndx ndx:(size_t)ndx
+-(NSNumber *)getDate:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return _table->get_date(col_ndx, ndx).get_date();
+    return [self getDate:col_ndx ndx:ndx error:nil];
+}
+-(NSNumber *)getDate:(size_t)col_ndx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error
+{
+    TIGHTDB_TABLEBOUNDS_ERRHANDLER(col_ndx, ndx, error, return nil);
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 return [NSNumber numberWithLong:_table->get_date(col_ndx, ndx).get_date()];
+                                 , @"com.tightdb.table", return nil);
 }
 
 -(BOOL)setDate:(size_t)col_ndx ndx:(size_t)ndx value:(time_t)value
@@ -909,6 +951,57 @@ _Atomic(int) TightdbTableAllocateCount = 0;
                                  _table->set_date(col_ndx, ndx, value);
                                  , @"com.tightdb.table", return NO);
     return YES;
+}
+
+
+
+-(NSArray *)getRowAtIndex:(size_t)ndx
+{
+    return [self getRowAtIndex:ndx error:nil];
+}
+
+-(NSArray *)getRowAtIndex:(size_t)ndx error:(NSError *__autoreleasing *)error
+{
+    size_t count = [self getColumnCount];
+    NSMutableArray *row = [NSMutableArray arrayWithCapacity:count];
+    for (size_t i = 0; i < count; ++i) {
+        TightdbType type = [self getColumnType:i];
+        id value;
+        switch (type) {
+            case tightdb_Int:
+                value = [self get:i ndx:ndx error:error];
+                break;
+            case tightdb_Float:
+                value = [self getFloat:i ndx:ndx error:error];
+                break;
+            case tightdb_Double:
+                value = [self getDouble:i ndx:ndx error:error];
+                break;
+            case tightdb_String:
+                value = [self getString:i ndx:ndx error:error];
+                break;
+            case tightdb_Bool:
+                value = [self getBool:i ndx:ndx error:error];
+                break;
+            case tightdb_Binary:
+                value = [self getBinary:i ndx:ndx error:error];
+                break;
+            case tightdb_Date:
+                value = [self getDate:i ndx:ndx error:error];
+                break;
+            case tightdb_Mixed:
+                value = [self getMixed:i ndx:ndx error:error];
+                break;
+            case tightdb_Table:
+                value = [self getSubtable:i ndx:ndx error:error];
+                break;
+                
+        }
+        if (!value)
+            return nil;
+        [row addObject:value];
+    }
+    return row;
 }
 
 -(BOOL)insertBool:(size_t)col_ndx ndx:(size_t)ndx value:(BOOL)value
@@ -1056,6 +1149,91 @@ _Atomic(int) TightdbTableAllocateCount = 0;
     return YES;
 }
 
+-(BOOL)insertRowAtIndex:(size_t)ndx, ...
+{
+    va_list args;
+    va_start(args, ndx);
+    BOOL result = [self insertRowAtIndex:ndx error:nil, args];
+    va_end(args);
+    return result;
+}
+
+-(BOOL)insertRowAtIndex:(size_t)ndx error:(NSError *__autoreleasing *)error, ...
+{
+    if (ndx>[self count]) {
+        if (error)
+            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Bounds, [NSString stringWithFormat:@"Insert index: %zd greater than number of rows: %zd", ndx, [self count]]);
+        return NO;
+    }
+    va_list args;
+    va_start(args, error);
+    size_t count = [self getColumnCount];
+    for (size_t i = 0; i < count; ++i) {
+        BOOL result = NO;
+        TightdbType type = [self getColumnType:i];
+        switch (type) {
+            case tightdb_Int:
+            {
+                int64_t value = va_arg(args, int64_t);
+                result = [self insertInt:i ndx:ndx value:value error:error];
+                break;
+            }
+            case tightdb_Float:
+            {
+                float value = va_arg(args, double);
+                result = [self insertFloat:i ndx:ndx value:value error:error];
+                break;
+            }
+            case tightdb_Double:
+            {
+                double value = va_arg(args, double);
+                result = [self insertDouble:i ndx:ndx value:value error:error];
+                break;
+            }
+            case tightdb_String:
+            {
+                NSString *value = va_arg(args, NSString *);
+                result = [self insertString:i ndx:ndx value:value error:error];
+                break;
+            }
+            case tightdb_Bool:
+            {
+                BOOL value = va_arg(args, int);
+                result = [self insertBool:i ndx:ndx value:value error:error];
+                break;
+            }
+            case tightdb_Binary:
+            {
+                TightdbBinary *value = va_arg(args, TightdbBinary *);
+                result = [self insertBinary:i ndx:ndx value:value error:error];
+                break;
+            }
+            case tightdb_Date:
+            {
+                time_t value = va_arg(args, time_t);
+                result = [self insertDate:i ndx:ndx value:value error:error];
+                break;
+            }
+            case tightdb_Mixed:
+            {
+                TightdbMixed *value = va_arg(args, TightdbMixed *);
+                result = [self insertMixed:i ndx:ndx value:value error:error];
+                break;
+            }
+            case tightdb_Table:
+            {
+                if (error)
+                    *error = make_tightdb_error(@"com.tightdb.table", tdb_err_Bounds, @"Subtable not supported in insert row");
+                return NO;
+            }
+        }
+        if (!result)
+            return NO;
+    }
+    
+    return [self insertDoneWithError:error];
+}
+
 -(BOOL)insertDone
 {
     return [self insertDoneWithError:nil];
@@ -1071,7 +1249,14 @@ _Atomic(int) TightdbTableAllocateCount = 0;
 
 -(NSString *)getString:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return to_objc_string(_table->get_string(col_ndx, ndx));
+    return [self getString:col_ndx ndx:ndx error:nil];
+}
+-(NSString *)getString:(size_t)col_ndx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error
+{
+    TIGHTDB_TABLEBOUNDS_ERRHANDLER(col_ndx, ndx, error, return nil);
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 return to_objc_string(_table->get_string(col_ndx, ndx));
+                                 , @"com.tightdb.table", return nil);
 }
 
 -(BOOL)setString:(size_t)col_ndx ndx:(size_t)ndx value:(NSString *)value
@@ -1091,9 +1276,17 @@ _Atomic(int) TightdbTableAllocateCount = 0;
     return YES;
 }
 
+
 -(TightdbBinary *)getBinary:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return [[TightdbBinary alloc] initWithBinary:_table->get_binary(col_ndx, ndx)];
+    return [self getBinary:col_ndx ndx:ndx error:nil];
+}
+-(TightdbBinary *)getBinary:(size_t)col_ndx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error
+{
+    TIGHTDB_TABLEBOUNDS_ERRHANDLER(col_ndx, ndx, error, return nil);
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 return [[TightdbBinary alloc] initWithBinary:_table->get_binary(col_ndx, ndx)];
+                                 , @"com.tightdb.table", return nil);
 }
 
 -(BOOL)setBinary:(size_t)col_ndx ndx:(size_t)ndx value:(TightdbBinary *)value
@@ -1191,14 +1384,21 @@ _Atomic(int) TightdbTableAllocateCount = 0;
     return YES;
 }
 
--(TightdbMixed *)getMixed:(size_t)col_ndx ndx:(size_t)row_ndx
+-(TightdbMixed *)getMixed:(size_t)col_ndx ndx:(size_t)ndx
 {
-    tightdb::Mixed tmp = _table->get_mixed(col_ndx, row_ndx);
-    TightdbMixed *mixed = [TightdbMixed mixedWithMixed:tmp];
-    if ([mixed getType] == tightdb_Table) {
-        [mixed setTable:[self getSubtable:col_ndx ndx:row_ndx]];
-    }
-    return mixed;
+    return [self getMixed:col_ndx ndx:ndx error:nil];
+}
+-(TightdbMixed *)getMixed:(size_t)col_ndx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error
+{
+    TIGHTDB_TABLEBOUNDS_ERRHANDLER(col_ndx, ndx, error, return nil);
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 tightdb::Mixed tmp = _table->get_mixed(col_ndx, ndx);
+                                 TightdbMixed *mixed = [TightdbMixed mixedWithMixed:tmp];
+                                 if ([mixed getType] == tightdb_Table) {
+                                     [mixed setTable:[self getSubtable:col_ndx ndx:ndx error:error]];
+                                 }
+                                 return mixed;
+                                 , @"com.tightdb.table", return nil);
 }
 
 -(TightdbType)getMixedType:(size_t)col_ndx ndx:(size_t)row_ndx

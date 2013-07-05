@@ -52,6 +52,7 @@ enum TightdbErr {
     tdb_err_FailRdOnly = 2,
     tdb_err_FileAccess = 3,
     tdb_err_Resource = 4,
+    tdb_err_Bounds = 5,
 };
 
 inline NSError *make_tightdb_error(NSString *domain, TightdbErr code, NSString *desc)
@@ -80,6 +81,13 @@ catch (std::exception &ex) { \
     if (errVar) \
         *errVar = make_tightdb_error(domain, tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]); \
         failAction; \
+}
+
+#define TIGHTDB_TABLEBOUNDS_ERRHANDLER(column, row, errVar, failAction) \
+if (column >= [self getColumnCount] || row >= [self count]) { \
+    if (errVar) \
+        *errVar = make_tightdb_error(@"com.tightdb.table", tdb_err_Bounds, [NSString stringWithFormat:@"Out of bounds: %zd, %zd", column, row]); \
+    failAction; \
 }
 
 
