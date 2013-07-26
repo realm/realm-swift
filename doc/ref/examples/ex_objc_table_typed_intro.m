@@ -10,8 +10,8 @@
 // Defines a new table with two columns Name and Age. 
 
 TIGHTDB_TABLE_2(PeopleTable,
-                name, String,
-                age, Int)
+                Name, String,
+                Age, Int)
 
 
 
@@ -25,16 +25,12 @@ int main()
         
         // Adds rows to the table.
         
-        [table addName:@"Mary" age:99];
-        //[table addName:@"Joe" Age:17];
-        //[table addName:@"Jack" Age:22];
-        //[table addName:@"Sam" Age:34];
-        //[table addName:@"Bob" Age:10];
-        
-        PeopleTable_Cursor *c = [table add];
-        [c setName:@"Kristian"];
-        [c setage:100];
-        
+        [table addName:@"Mary" Age:99];
+        [table addName:@"Joe" Age:17];
+        [table addName:@"Jack" Age:22];
+        [table addName:@"Sam" Age:34];
+        [table addName:@"Bob" Age:10];
+                
         // Get the number of rows in the table.
         
         NSLog(@"The size of the table is %zd", [table count]);
@@ -46,7 +42,7 @@ int main()
         // Get first row matching an input column value. Notice the method
         // is accessed on a specific column, not on the table.
         
-        NSLog(@"Found match in row %zd", [table.age find:100]);
+        NSLog(@"Found match in row %zd", [table.Age find:22]);
         
         // Clear the table (remove all rows).
         
