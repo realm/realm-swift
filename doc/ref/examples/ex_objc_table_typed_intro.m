@@ -14,7 +14,6 @@ TIGHTDB_TABLE_2(PeopleTable,
                 Age, Int)
 
 
-
 int main()
 {
     @autoreleasepool {
@@ -30,7 +29,8 @@ int main()
         [table addName:@"Jack" Age:22];
         [table addName:@"Sam" Age:34];
         [table addName:@"Bob" Age:10];
-                
+        
+        
         // Get the number of rows in the table.
         
         NSLog(@"The size of the table is %zd", [table count]);
