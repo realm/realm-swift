@@ -12,7 +12,7 @@ int main()
         
         // Creates a new table dynamically.
         
-        TightdbTable *table = [[TightdbTable alloc]init];
+        TightdbTable *table = [[TightdbTable alloc] init];
         
         // Add columns 0 (Name) and 1 (Age).
         
@@ -39,9 +39,10 @@ int main()
         [table set:AGE ndx:3 value:4];
         [table set:AGE ndx:4 value:5];
         
-        int64_t result = [[[table where] betweenInt:0 to:3 colNdx:AGE] sumInt:AGE];
+        NSNumber *result = [[[table where] column:AGE isBetweenInt:0 and:4] count];
 
-        NSLog(@"%lli", result);
+        
+        NSLog(@"%i", [result intValue]);
         
         
         

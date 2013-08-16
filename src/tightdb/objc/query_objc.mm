@@ -419,140 +419,223 @@ using namespace std;
                                  return _query->find_next(last);
                                  , @"com.tightdb.query", size_t(-1));
 }
--(TightdbQuery *)betweenInt:(int64_t)from to:(int64_t)to colNdx:(size_t)colNdx
+
+
+// Conditions:
+
+
+-(TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and:(int64_t)to
 {
     _query->between(colNdx, from, to);
     return self;
 }
--(TightdbQuery *)betweenFloat:(float)from to:(float)to colNdx:(size_t)colNdx
+
+-(TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and:(float)to
 {
     _query->between(colNdx, from, to);
     return self;
 }
--(TightdbQuery *)betweenDouble:(double)from to:(double)to colNdx:(size_t)colNdx
+
+-(TightdbQuery *)column:(size_t)colNdx isBetweenDouble:(double)from and:(double)to
 {
     _query->between(colNdx, from, to);
     return self;
 }
--(TightdbQuery *)equalBool:(bool)value colNdx:(size_t)colNdx 
+
+-(TightdbQuery *)column:(size_t)colNdx isEqualToBool:(bool)value
 {
     _query->equal(colNdx, value);
     return self;
 }
--(TightdbQuery *)equalInt:(int64_t)value colNdx:(size_t)colNdx 
+
+-(TightdbQuery *)column:(size_t)colNdx isEqualToInt:(int64_t)value
 {
     _query->equal(colNdx, value);
     return self;
 }
--(TightdbQuery *)equalFloat:(float)value colNdx:(size_t)colNdx 
+
+-(TightdbQuery *)column:(size_t)colNdx isEqualToFloat:(float)value 
 {
     _query->equal(colNdx, value);
     return self;
 }
--(TightdbQuery *)equalDouble:(double)value colNdx:(size_t)colNdx
+
+-(TightdbQuery *)column:(size_t)colNdx isEqualToDouble:(double)value
 {
     _query->equal(colNdx, value);
     return self;
 }
--(TightdbQuery *)equalString:(NSString *)value colNdx:(size_t)colNdx
+
+-(TightdbQuery *)column:(size_t)colNdx isEqualToString:(NSString *)value
 {
     _query->equal(colNdx, ObjcStringAccessor(value));
     return self;
 }
--(TightdbQuery *)equalString:(NSString *)value colNdx:(size_t)colNdx caseSensitive:(bool)caseSensitive
+
+-(TightdbQuery *)column:(size_t)colNdx isEqualToString:(NSString *)value caseSensitive:(bool)caseSensitive
 {
     _query->equal(colNdx, ObjcStringAccessor(value), caseSensitive);
     return self;
 }
--(TightdbQuery *)equalDate:(time_t)value colNdx:(size_t)colNdx
+
+-(TightdbQuery *)column:(size_t)colNdx isEqualToDate:(time_t)value
 {
     _query->equal_date(colNdx, value);
     return self;
 }
--(TightdbQuery *)equalBinary:(TightdbBinary *)value colNdx:(size_t)colNdx
+
+-(TightdbQuery *)column:(size_t)colNdx isEqualToBinary:(TightdbBinary *)value
 {
     _query->equal(colNdx, [value getBinary]);
     return self;
 }
 
+-(TightdbQuery *)column:(size_t)colNdx isNotEqualToInt:(int64_t)value
+{
+    _query->not_equal(colNdx, value);
+    return self;
+}
 
--(TightdbQuery *)notEqualInt:(int64_t)value colNdx:(size_t)colNdx 
+-(TightdbQuery *)column:(size_t)colNdx isNotEqualToFloat:(float)value 
 {
     _query->not_equal(colNdx, value);
     return self;
 }
--(TightdbQuery *)notEqualFloat:(float)value colNdx:(size_t)colNdx 
+
+-(TightdbQuery *)column:(size_t)colNdx isNotEqualToDouble:(double)value
 {
     _query->not_equal(colNdx, value);
     return self;
 }
--(TightdbQuery *)notEqualDouble:(double)value colNdx:(size_t)colNdx
-{
-    _query->not_equal(colNdx, value);
-    return self;
-}
--(TightdbQuery *)notEqualString:(NSString *)value colNdx:(size_t)colNdx
+
+-(TightdbQuery *)column:(size_t)colNdx isNotEqualToString:(NSString *)value
 {
     _query->not_equal(colNdx, ObjcStringAccessor(value));
     return self;
 }
--(TightdbQuery *)notEqualString:(NSString *)value colNdx:(size_t)colNdx caseSensitive:(bool)caseSensitive
+
+-(TightdbQuery *)column:(size_t)colNdx isNotEqualToString:(NSString *)value caseSensitive:(bool)caseSensitive
 {
     _query->not_equal(colNdx, ObjcStringAccessor(value), caseSensitive);
     return self;
 }
--(TightdbQuery *)notEqualDate:(time_t)value colNdx:(size_t)colNdx
+
+-(TightdbQuery *)column:(size_t)colNdx isNotEqualToDate:(time_t)value
 {
     _query->not_equal_date(colNdx, value);
     return self;
 }
--(TightdbQuery *)notEqualBinary:(TightdbBinary *)value colNdx:(size_t)colNdx
+
+-(TightdbQuery *)column:(size_t)colNdx isNotEqualToBinary:(TightdbBinary *)value
 {
     _query->not_equal(colNdx, [value getBinary]);
     return self;
 }
 
--(TightdbQuery *)greaterInt:(int64_t)value colNdx:(size_t)colNdx 
+-(TightdbQuery *)column:(size_t)colNdx isGreaterThanInt:(int64_t)value 
 {
     _query->greater(colNdx, value);
     return self;
 }
--(TightdbQuery *)greaterFloat:(float)value colNdx:(size_t)colNdx 
+
+-(TightdbQuery *)column:(size_t)colNdx isGreaterThanFloat:(float)value
 {
     _query->greater(colNdx, value);
     return self;
 }
--(TightdbQuery *)greaterDouble:(double)value colNdx:(size_t)colNdx
+
+-(TightdbQuery *)column:(size_t)colNdx isGreaterThanDouble:(double)value
 {
     _query->greater(colNdx, value);
     return self;
 }
--(TightdbQuery *)greaterDate:(time_t)value colNdx:(size_t)colNdx
+
+-(TightdbQuery *)column:(size_t)colNdx isGreaterThanDate:(time_t)value
 {
     _query->greater_date(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)greaterEqualInt:(int64_t)value colNdx:(size_t)colNdx 
+-(TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToInt:(int64_t)value
 {
     _query->greater_equal(colNdx, value);
     return self;
 }
--(TightdbQuery *)greaterEqualFloat:(float)value colNdx:(size_t)colNdx 
+
+-(TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToFloat:(float)value 
 {
     _query->greater_equal(colNdx, value);
     return self;
 }
--(TightdbQuery *)greaterEqualDouble:(double)value colNdx:(size_t)colNdx
+
+-(TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToDouble:(double)value
 {
     _query->greater_equal(colNdx, value);
     return self;
 }
--(TightdbQuery *)greaterEqualDate:(time_t)value colNdx:(size_t)colNdx
+
+-(TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToDate:(time_t)value
 {
     _query->greater_equal_date(colNdx, value);
     return self;
 }
+
+-(TightdbQuery *)column:(size_t)colNdx isLessThanInt:(int64_t)value 
+{
+    _query->less(colNdx, value);
+    return self;
+}
+
+-(TightdbQuery *)column:(size_t)colNdx isLessThanFloat:(float)value
+{
+    _query->less(colNdx, value);
+    return self;
+}
+
+-(TightdbQuery *)column:(size_t)colNdx isLessThanDouble:(double)value
+{
+    _query->less(colNdx, value);
+    return self;
+}
+
+-(TightdbQuery *)column:(size_t)colNdx isLessThanDate:(time_t)value
+{
+    _query->less_date(colNdx, value);
+    return self;
+}
+
+-(TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToInt:(int64_t)value
+{
+    _query->less_equal(colNdx, value);
+    return self;
+}
+
+-(TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToFloat:(float)value 
+{
+    _query->less_equal(colNdx, value);
+    return self;
+}
+
+-(TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToDouble:(double)value
+{
+    _query->less_equal(colNdx, value);
+    return self;
+}
+
+-(TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToDate:(time_t)value
+{
+    _query->less_equal_date(colNdx, value);
+    return self;
+}
+
+
+
+
+
+
+
+
+
 
 
 @end
