@@ -1,5 +1,5 @@
-Signature Specification
-=======================
+Objective-C API review
+======================
 
 This document contains a review of the current implementation and proposes changes. In general the current implementation is to the left and the proposal is to the right, except if there is no current implementation, then only the proposal is written (and to the left).
 
