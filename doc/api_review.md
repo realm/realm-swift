@@ -47,7 +47,7 @@ The implemention of the query accessors to be changed according to memo1, to sup
 
 Naming of condutions could be improved:
 
-    -(table##_Query *)equal:(int64_t)value;                                            (isEqualTo:)
+    -(table##_Query *)equal:(int64_t)value;                                        (isEqualTo:)
 
 
 
@@ -56,11 +56,11 @@ Dymanic Query
 
 Naming of actions could be improved as below:
 
-    -(NSNumber *)sumFloat:(size_t)colNdx;                                               (sumInFloatColumn:(size_t)colNdx)
+    -(NSNumber *)sumFloat:(size_t)colNdx;                                          (sumInFloatColumn:(size_t)colNdx)
 
 Naming of conditions could be improved as below:
 
-    -(TightdbQuery *)equalBool:(bool)value colNdx:(size_t)colNdx;                      (column:isEqualToBool:)
+    -(TightdbQuery *)equalBool:(bool)value colNdx:(size_t)colNdx;                  (column:isEqualToBool:)
 
 
 The "with" comment (from Alexander)
@@ -70,10 +70,36 @@ Suggested (here, concrete syntax):
 
     [table addColumnWithType:tightdb_String andName:@"Name"];
 
-Comment from Alenader was that signatures with "With" should occur only when there are corrosponding method(s) without "With", and since we have no addColumn method without arguments, we don't comply with that suggested rule: 
+Comment from Alenxander was that signatures with "With" should occur only when there are corrosponding method(s) without "With", and since we have no addColumn method without arguments, we don't comply with that suggested rule: 
 
 There are many examples in Apples API where the rule does not apply, for instance in NSArray:
 
     firstObjectCommonWithArray:
 
 I propose we allow this notation?
+
+
+Summary of tasks:
+-----------------
+
+Difficulty 1 (hardest, relatively speaking)
+- Support for referencing columns by name in Dynamic API (for instance, when adding columns).
+- Support for curser in Dymanic API (add and insert returns a curser).
+- Add missing methods in Typed API (there are not so many missing here).
+- Update signature naming in Typed API (sligtly more difficult due to nested macros). 
+
+Difficulty 2: 
+- Add missing methods, many of them in dynamic query.
+- Update signature naming in Dynamic API.
+
+
+
+
+
+
+
+
+
+
+
+
