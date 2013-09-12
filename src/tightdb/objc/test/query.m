@@ -198,6 +198,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         STAssertEquals([[[table where] column:INT_COL isBetweenInt:859 and:861] count], [NSNumber numberWithLongLong:1], @"betweenInt");
         STAssertEquals([[[table where] column:FLOAT_COL isBetweenFloat:5.5 and:5.7] count], [NSNumber numberWithLongLong:1], @"betweenFloat");
         STAssertEquals([[[table where] column:DOUBLE_COL isBetweenDouble:5.5 and:5.7] count], [NSNumber numberWithLongLong:1], @"betweenDouble");
+        STAssertEquals([[[table where] column:DATE_COL isBetweenDate:1 and:timeNow] count], [NSNumber numberWithLongLong:1], @"betweenDate");
 
         STAssertEquals([[[table where] column:BOOL_COL isEqualToBool:YES] count], [NSNumber numberWithLongLong:1], @"isEqualToBool");
         STAssertEquals([[[table where] column:INT_COL isEqualToInt:860] count], [NSNumber numberWithLongLong:1], @"isEqualToInt");
@@ -237,6 +238,8 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         STAssertEquals([[[table where] column:FLOAT_COL isLessThanOrEqualToFloat:5.6] count], [NSNumber numberWithLongLong:2], @"isLessThanOrEqualToFloat");
         STAssertEquals([[[table where] column:DOUBLE_COL isLessThanOrEqualToDouble:5.6] count], [NSNumber numberWithLongLong:2], @"isLessThanOrEqualToDouble");
         STAssertEquals([[[table where] column:DATE_COL isLessThanOrEqualToDate:timeNow] count], [NSNumber numberWithLongLong:2], @"isLessThanOrEqualToDate");
+
+        STAssertEquals([[[table where] column:INT_COL isBetweenInt:859 and:861] findNext:-1], (size_t) 1, @"findNext");
 
         STAssertEquals([[[table where] sumInt:INT_COL] longLongValue], (int64_t)860, @"IntCol max");
 

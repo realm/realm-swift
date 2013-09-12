@@ -28,35 +28,45 @@ CATEGORIES :
 - Conditions:
   METHODS:
   - g_dyn_query_equals_binary:
-      TODO     : soon
+#      TODO     : soon
+      NAME     : "column:isEqualToBinary:"
   - g_dyn_query_equals_boolean:
-      TODO     : soon
+#      TODO     : soon
+      NAME     : "column:isEqualToBoolean:"
   - g_dyn_query_equals_integer:
-      TODO     : soon
+#      TODO     : soon
+      NAME     : "column:isEqualToInteger:"
   - g_dyn_query_equals_float:
-      TODO     : soon
+#      TODO     : soon
+      NAME     : "column:isEqualToFloat:"
   - g_dyn_query_equals_double:
-      TODO     : soon
+#      TODO     : soon
+      NAME     : "column:isEqualToDouble:"
   - g_dyn_query_equals_string:
-      TODO     : soon
+#      TODO     : soon
+      NAME     : "column:isEqualToString:"
   - g_dyn_query_equals_string_2:
-      TODO     : soon
+#      TODO     : soon
+      NAME     : "column:isEqualToString:caseSensitive:"
   - g_dyn_query_equals_date:
+      NAME     : "column:isEqualToDate:"
+      TITLE    : "isEqualTo"
 # Not yet implemented in API
-      TODO     : soon
-      NAMES    : [ equal, equal, equal, equal, equal, equal, equal]
+#      TODO     : soon
+#      NAMES    : [ equal, equal, equal, equal, equal, equal, equal]
       SIGNATURE: |
-                 (TightdbQuery *)equal:(BOOL)value
-                 (TightdbQuery *)equal:(int64_t)value
-                 (TightdbQuery *)equal:(float)value
-                 (TightdbQuery *)equal:(double)value
-                 (TightdbQuery *)equal:(NSString *)value
-                 (TightdbQuery *)equal:(NSString *)value caseSensitive:(BOOL)caseSensitive
-                 (TightdbQuery *)equal:(time_t)value
+                 - (TightdbQuery *)column:(size_t)colNdx isEqualToBool:(bool)value
+                 - (TightdbQuery *)column:(size_t)colNdx isEqualToInt:(int64_t)value
+                 - (TightdbQuery *)column:(size_t)colNdx isEqualToFloat:(float)value
+                 - (TightdbQuery *)column:(size_t)colNdx isEqualToDouble:(double)value
+                 - (TightdbQuery *)column:(size_t)colNdx isEqualToString:(NSString *)value
+                 - (TightdbQuery *)column:(size_t)colNdx isEqualToString:(NSString *)value caseSensitive:(bool)caseSensitive
+                 - (TightdbQuery *)column:(size_t)colNdx isEqualToDate:(time_t)value
+                 - (TightdbQuery *)column:(size_t)colNdx isEqualToBinary:(TightdbBinary *)value                 
       SUMMARY  : *g_dyn_query_equals_summary
       DESCR    : *g_dyn_query_equals_descr
       PARAMS:
-      - NAME   : col_ndx
+      - NAME   : colNdx
         TYPES  : size_t
         DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
@@ -73,36 +83,36 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_equals
 
   - g_dyn_query_notEquals_bool:
-      TODO     : soon
+      NAME     : "column:isNotEqualToBoolean:"
   - g_dyn_query_notEquals_binary:
-      TODO     : soon
+      NAME     : "column:isNotEqualToBinary:"
   - g_dyn_query_notEquals_integer:
-      TODO     : soon
+      NAME     : "column:isNotEqualToInteger:"
   - g_dyn_query_notEquals_float:
-      TODO     : soon
+      NAME     : "column:isNotEqualToFloat:"
   - g_dyn_query_notEquals_double:
-      TODO     : soon
+      NAME     : "column:isNotEqualToDouble:"
   - g_dyn_query_notEquals_string:
-      TODO     : soon
+      NAME     : "column:isNotEqualToString"
   - g_dyn_query_notEquals_string_2:
-      TODO     : soon
+      NAME     : "column:isNotEqualToString:caseSensitive:"
   - g_dyn_query_notEquals_date:
 # Not yet implemented in API
-      TODO     : soon
-      NAMES    : [ notEqual, notEqual, notEqual, notEqual, notEqual, notEqual ]
+      NAME     : "column:isNotEqualToDate:"
+      TITLE    : "isNotEqualTo"
+#      NAMES    : [ notEqual, notEqual, notEqual, notEqual, notEqual, notEqual ]
       SIGNATURE: |
-                 (TightdbQuery *)notEqual:(int64_t)value
-                 (TightdbQuery *)notEqual:(float)value
-                 (TightdbQuery *)notEqual:(double)value
-                 (TightdbQuery *)notEqual:(NSString *)value
-                 (TightdbQuery *)notEqual:(NSString *)value caseSensitive:(BOOL)caseSensitive
-                 (TightdbQuery *)notEqual:(time_t)value
- #                TightdbQuery * not_equal(size_t column_ndx, bool value);
- #                TightdbQuery * not_equal_binary(size_t column_ndx, NSString* data, size_t size);
+                 - (TightdbQuery *)column:(size_t)colNdx isNotEqualToInt:(int64_t)value
+                 - (TightdbQuery *)column:(size_t)colNdx isNotEqualToFloat:(float)value
+                 - (TightdbQuery *)column:(size_t)colNdx isNotEqualToDouble:(double)value
+                 - (TightdbQuery *)column:(size_t)colNdx isNotEqualToString:(NSString *)value
+                 - (TightdbQuery *)column:(size_t)colNdx isNotEqualToString:(NSString *)value caseSensitive:(bool)caseSensitive
+                 - (TightdbQuery *)column:(size_t)colNdx isNotEqualToDate:(time_t)value
+                 - (TightdbQuery *)column:(size_t)colNdx isNotEqualToBinary:(TightdbBinary *)value
       SUMMARY  : *g_dyn_query_notEquals_summary
       DESCR    : *g_dyn_query_notEquals_descr
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : colNdx
         TYPES  : size_t
         DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
@@ -119,25 +129,25 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_notEquals
 
   - g_dyn_query_greaterThan_integer:
-      TODO     : soon
+      NAME     : "column:isGreaterThanInt:"
   - g_dyn_query_greaterThan_float:
-      TODO     : soon
+      NAME     : "column:isGreaterThanFloat:"
   - g_dyn_query_greaterThan_double:
-      TODO     : soon
+      NAME     : "column:isGreaterThanDouble:"
   - g_dyn_query_greaterThan_date:
 # Not yet implemented in API
-      TODO     : soon
-      NAMES    : [ greater, greater, greater, greater ]
+      NAME     : "column:isGreaterThanDate:"
+      TITLE    : "isGreaterThan"
 #TODO: check greater_date? does time_t work as int64_t?
       SIGNATURE: |
-                 (TightdbQuery *)greater:(int64_t)value
-                 (TightdbQuery *)greater:(float)value
-                 (TightdbQuery *)greater:(double)value
-                 (TightdbQuery *)greater:(time_t)value
+                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanInt:(int64_t)value
+                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanFloat:(float)value
+                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanDouble:(double)value
+                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanDate:(time_t)value
       SUMMARY  : *g_dyn_query_greaterThan_summary
       DESCR    : *g_dyn_query_greaterThan_descr
       PARAMS:
-      - NAME   : col_ndx
+      - NAME   : colNdx
         TYPES  : size_t
         DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
@@ -151,23 +161,23 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_greaterThan
 
   - g_dyn_query_greaterThanOrEqual_integer:
-      TODO     : soon
+      NAME     : "column:isGreaterThanOrEqualToInt:"
   - g_dyn_query_greaterThanOrEqual_float:
-      TODO     : soon
+      NAME     : "column:isGreaterThanOrEqualToFlaot:"
   - g_dyn_query_greaterThanOrEqual_double:
-      TODO     : soon
+      NAME     : "column:isGreaterThanOrEqualToDouble:"
   - g_dyn_query_greaterThanOrEqual_date:
-      TODO     : soon
-      NAMES    : [ greaterEqual, greaterEqual, greaterEqual, greaterEqual]
+      NAME     : "column:isGreaterThanOrEqualToDate:"
+      TITLE    : "isGreaterThanOrEqualTo"
       SIGNATURE: |
-                 (TightdbQuery *)greaterEqual:(int64_t)value
-                 (TightdbQuery *)greaterEqual:(float)value
-                 (TightdbQuery *)greaterEqual:(double)value
-                 (TightdbQuery *)greaterEqual:(time_t)value
+                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToInt:(int64_t)value
+                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToFloat:(float)value
+                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToDouble:(double)value
+                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToDate:(time_t)value
       SUMMARY  : *g_dyn_query_greaterThanOrEqual_summary
       DESCR    : *g_dyn_query_greaterThanOrEqual_descr
       PARAMS:
-      - NAME   : col_ndx
+      - NAME   : colNdx
         TYPES  : size_t
         DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
@@ -181,23 +191,23 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_greaterThanOrEqual
         
   - g_dyn_query_lessThan_integer:
-      TODO     : soon
+      NAME     : "column:isLessThanInt:"
   - g_dyn_query_lessThan_float:
-      TODO     : soon
+      NAME     : "column:isLessThanFloat:"
   - g_dyn_query_lessThan_double:
-      TODO     : soon
+      NAME     : "column:isLessThanDouble:"
   - g_dyn_query_lessThan_date:
-      TODO     : soon
-      NAMES    : [less, less, less, less]
+      NAME     : "column:isLessThanDate:"
+      TITLE    : "isLessThan"
       SIGNATURE: |
-                 (TightdbQuery *)less:(int64_t)value
-                 (TightdbQuery *)less:(float)value
-                 (TightdbQuery *)less:(double)value
-                 (TightdbQuery *)less:(time_t)value
+                 - (TightdbQuery *)column:(size_t)colNdx isLessThanInt:(int64_t)value
+                 - (TightdbQuery *)column:(size_t)colNdx isLessThanFloat:(float)value
+                 - (TightdbQuery *)column:(size_t)colNdx isLessThanDouble:(double)value
+                 - (TightdbQuery *)column:(size_t)colNdx isLessThanDate:(time_t)value
       SUMMARY  : *g_dyn_query_lessThan_summary
       DESCR    : *g_dyn_query_lessThan_descr
       PARAMS:
-      - NAME   : col_ndx
+      - NAME   : colNdx
         TYPES  : size_t
         DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
@@ -211,23 +221,23 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_lessThan
 
   - g_dyn_query_lessThanOrEqual_integer:
-      TODO     : soon
+      NAME     : "column:isLessThanOrEqualToInt:"
   - g_dyn_query_lessThanOrEqual_float:
-      TODO     : soon
+      NAME     : "column:isLessThanOrEqualToFloat:"
   - g_dyn_query_lessThanOrEqual_double:
-      TODO     : soon
+      NAME     : "column:isLessThanOrEqualToDouble:"
   - g_dyn_query_lessThanOrEqual_date:
-      TODO     : soon
-      NAMES    : [lessEqual, lessEqual, lessEqual, lessEqual]
+      NAME     : "column:isLessThanOrEqualToDate:"
+      TITLE    : "isLessThanOrEqualTo"
       SIGNATURE: |
-                 (TightdbQuery *)lessEqual:(int64_t)value
-                 (TightdbQuery *)lessEqual:(float)value
-                 (TightdbQuery *)lessEqual:(double)value
-                 (TightdbQuery *)lessEqual:(time_t)value
+                 - (TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToInt:(int64_t)value
+                 - (TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToFloat:(float)value
+                 - (TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToDouble:(double)value
+                 - (TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToDate:(time_t)value
       SUMMARY  : *g_dyn_query_lessThanOrEqual_summary
       DESCR    : *g_dyn_query_lessThanOrEqual_descr
       PARAMS:
-      - NAME   : col_ndx
+      - NAME   : colNdx
         TYPES  : size_t
         DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
@@ -241,23 +251,23 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_lessThanOrEqual
         
   - g_dyn_query_between_integer:
-      TODO     : soon
+      NAME     : "column:isBetweenInt:"
   - g_dyn_query_between_float:
-      TODO     : soon
+      NAME     : "column:isBetweenFloat:"
   - g_dyn_query_between_double:
-      TODO     : soon
+      NAME     : "column:isBetweenDouble:"
   - g_dyn_query_between_date:
-      TODO     : soon
-      NAMES    : [between, between, between, between_date]
+      NAME     : "column:isBetweenDate:"
+      TITLE    : "isBetween"
       SIGNATURE: |
-                 (TightdbQuery *)between:(int64_t)from to:(int64_t)to
-                 (TightdbQuery *)between:(float)from to:(float)to
-                 (TightdbQuery *)between:(double)from to:(double)to
-                 (TightdbQuery *)between:(time_t)from to:(time_t)to
+                 - (TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and:(int64_t)to
+                 - (TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and:(float)to
+                 - (TightdbQuery *)column:(size_t)colNdx isBetweenDouble:(double)from and:(double)to
+                 - (TightdbQuery *)column:(size_t)colNdx isBetweenDate:(time_t)from and:(time_t)to
       DESCR    : *g_dyn_query_between_descr
       SUMMARY  : *g_dyn_query_between_summary
       PARAMS:
-      - NAME   : col_ndx
+      - NAME   : colNdx
         TYPES  : size_t
         DESCR  : *g_dyn_query_column_index_descr
       - NAME   : from
