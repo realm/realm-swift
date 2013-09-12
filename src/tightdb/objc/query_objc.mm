@@ -442,6 +442,12 @@ using namespace std;
     return self;
 }
 
+-(TightdbQuery *)column:(size_t)colNdx isBetweenDate:(time_t)from and:(time_t)to
+{
+    _query->between_date(colNdx, from, to);
+    return self;
+}  
+
 -(TightdbQuery *)column:(size_t)colNdx isEqualToBool:(bool)value
 {
     _query->equal(colNdx, value);

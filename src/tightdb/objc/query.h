@@ -71,6 +71,7 @@
 -(TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and:(int64_t)to;	
 -(TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and:(float)to;	
 -(TightdbQuery *)column:(size_t)colNdx isBetweenDouble:(double)from and:(double)to;	
+-(TightdbQuery *)column:(size_t)colNdx isBetweenDate:(time_t)from and:(time_t)to;	
 
 -(TightdbQuery *)column:(size_t)colNdx isEqualToBool:(bool)value;
 -(TightdbQuery *)column:(size_t)colNdx isEqualToInt:(int64_t)value;
