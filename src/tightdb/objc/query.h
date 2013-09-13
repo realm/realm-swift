@@ -40,6 +40,11 @@
 -(NSNumber *)removeWithError:(NSError *__autoreleasing *)error;
 -(NSNumber *)minInt:(size_t)colNdx;
 -(NSNumber *)minInt:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+
+// Started naming convention updateting here, more will follow. Kept old methods for now.
+-(NSNumber *)minimumIntOfColumn:(size_t)colNdx;
+-(NSNumber *)minimumIntOfColumn:(size_t)colNdx withError:(NSError *__autoreleasing *)error;
+
 -(NSNumber *)minFloat:(size_t)colNdx;
 -(NSNumber *)minFloat:(size_t)colNdx error:(NSError *__autoreleasing *)error;
 -(NSNumber *)minDouble:(size_t)colNdx;
