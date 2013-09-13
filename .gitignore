@@ -11,6 +11,7 @@ peopleErr.tightdb
 table_test.tightdb
 
 /doc/ref/html/*.html
+/doc/ref/html/*.css
 
 # XCode
 xcuserdata
