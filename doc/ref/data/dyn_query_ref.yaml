@@ -476,8 +476,10 @@ CATEGORIES :
       NAMES    : findNext 
       DESCR    : *g_dyn_query_find_next_descr
       SUMMARY  : *g_dyn_query_find_next_summary
+      SIGNATURE: |
+                 - (size_t)findNext:(size_t)lastMatch
       PARAMS:
-      - NAME   : lastmatch
+      - NAME   : lastMatch
         TYPES  : size_t
         DESCR  : *g_dyn_query_find_next_parm1_descr
       RETURN:

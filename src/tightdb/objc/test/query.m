@@ -241,6 +241,8 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
         STAssertEquals([[[table where] column:INT_COL isBetweenInt:859 and:861] findNext:-1], (size_t) 1, @"findNext");
 
+        STAssertEquals([[[table where] minimumIntOfColumn:INT_COL] longLongValue], (int64_t)0, @"minimunIntOfColumn");
+
         STAssertEquals([[[table where] sumInt:INT_COL] longLongValue], (int64_t)860, @"IntCol max");
 
 }

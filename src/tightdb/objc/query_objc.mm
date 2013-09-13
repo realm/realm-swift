@@ -201,6 +201,26 @@ using namespace std;
                                  , @"com.tightdb.query", nil);
 }
 
+-(NSNumber *)minimumIntOfColumn:(size_t)colNdx
+{
+    return [self minInt:colNdx error:nil];
+}
+
+
+-(NSNumber *)minimumIntOfColumn:(size_t)colNdx withError:(NSError *__autoreleasing *)error
+{
+     if (_error) {
+        if (error) {
+            *error = _error;
+            _error = nil;
+        }
+        return nil;
+    }
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 return [NSNumber numberWithLongLong:_query->minimum(colNdx)];
+                                 , @"com.tightdb.query", nil);
+}
+
 -(NSNumber *)minFloat:(size_t)col_ndx
 {
     return [self minFloat:col_ndx error:nil];
