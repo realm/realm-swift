@@ -16,7 +16,7 @@ Clang 3.0 and newer.
 
 If you are going to modify the Objective-C language binding, you will
 need Cheetah for Python (http://www.cheetahtemplate.org). It is needed
-because some source files are generated.
+because some source files are generated from Cheetah templates.
 
 Currently, the Objective-C binding is availble only on Mac OS X (and
 iPhone). The following is a suggestion of how to install the
@@ -45,9 +45,6 @@ then:
 Building, testing, and installing
 ---------------------------------
 
-    export CPATH="$TIGHTDB_HOME/src"
-    export LIBRARY_PATH="$TIGHTDB_HOME/src/tightdb"
-
     sh build.sh config
     sh build.sh clean
     sh build.sh build
@@ -66,12 +63,41 @@ The following libraries are installed:
     /usr/local/lib/libtightdb-objc.dylib
     /usr/local/lib/libtightdb-objc-dbg.dylib
 
-The following iPhone libraries are built, but not installed:
 
-    src/tightdb/objc/libtightdb-objc-ios.a
-    src/tightdb/objc/libtightdb-objc-ios-dbg.a
+Building for iPhone
+-------------------
 
-The iPhone libraries can be tested via the Xcode project in:
+On Mac OS X it is possible to build a version of the Objective-C
+language binding for iOS (the iPhone OS). It requires that the
+iPhoneOS and iPhoneSimulator SDKs for Xcode are installed.
+
+It also requires that a prebuilt version of the core library for iOS
+is available. By default, the configuration step will look for it in
+`../tightdb/iphone_lib`. If this is not the correct location of it,
+set the environment variable TIGHTDB_IPHONE_CORE_LIB to the correct
+path before invoking the configuration step.
+
+Run the following command to build the Objective-C language binding
+for iPhone:
+
+    sh build.sh build-iphone
+
+This produces the following files and directories:
+
+    iphone-lib/include/
+    iphone-lib/libtightdb-objc-ios.a
+    iphone-lib/libtightdb-objc-ios-dbg.a
+
+The `include` directory holds a copy of the header files, which are
+identical to the ones installed by `sh build.sh install`. There are
+two versions of the static library, one that is compiled with
+optimization, and one that is compiled for debugging. Each one
+contains code compiled for both iPhone and for the iPhone
+simulator. Each one also includes the TightDB core library and is
+therefore self contained.
+
+After building, the iPhone version of the Objective-C language binding
+can be tested via the Xcode project in:
 
     test-iphone/
 

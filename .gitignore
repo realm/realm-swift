@@ -10,8 +10,16 @@ people.tightdb
 peopleErr.tightdb
 table_test.tightdb
 
+
 /doc/ref/html/*.html
 /doc/ref/html/*.css
 
 # XCode
 xcuserdata
+
+
+# sh build.sh build-iphone
+/iphone-lib/include
+/iphone-lib/libtightdb-objc-ios.a
+/iphone-lib/libtightdb-objc-ios-dbg.a
+
