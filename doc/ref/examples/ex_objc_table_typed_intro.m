@@ -30,7 +30,6 @@ int main()
         [table addName:@"Sam" Age:34];
         [table addName:@"Bob" Age:10];
         
-        
         // Get the number of rows in the table.
         
         NSLog(@"The size of the table is %zd", [table count]);
@@ -49,8 +48,7 @@ int main()
         [table clear];
         NSLog(@"The size of the table is now %zd", [table count]);
         
-
-
+        
     }
     
 }
