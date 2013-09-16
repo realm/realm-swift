@@ -22,7 +22,10 @@
 
 @class TightdbBinary;
 @class TightdbTable;
-@class TightdbTableView;
+@class TightdbTableView; // jjepsen: this must be an error?
+
+// jjepsen: please review this
+@class TightdbView;
 
 
 @interface TightdbQuery: NSObject
@@ -41,7 +44,7 @@
 -(NSNumber *)minInt:(size_t)colNdx;
 -(NSNumber *)minInt:(size_t)colNdx error:(NSError *__autoreleasing *)error;
 
-// Started naming convention updateting here, more will follow. Kept old methods for now.
+// jjepsen: started naming convention updateting here, more will follow. Kept old methods for now.
 -(NSNumber *)minimumIntOfColumn:(size_t)colNdx;
 -(NSNumber *)minimumIntOfColumn:(size_t)colNdx withError:(NSError *__autoreleasing *)error;
 
@@ -69,6 +72,10 @@
 -(NSNumber *)avgDouble:(size_t)colNdx error:(NSError *__autoreleasing *)error;
 -(size_t)findNext:(size_t)last;
 -(size_t)findNext:(size_t)last error:(NSError *__autoreleasing *)error;
+
+// jjepsen: please review this.
+-(TightdbView *)findAll;
+
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
 // Conditions:

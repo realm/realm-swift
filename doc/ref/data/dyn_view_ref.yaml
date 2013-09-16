@@ -9,7 +9,7 @@ DESCR      : *g_dyn_view_intro_descr
 SEE        :
 EXAMPLES   :
 - DESCR:
-  CODE: ex_objc_dyn_view_intro
+  CODE     : ex_objc_tableview_dynamic_intro
 IGNORE     : []                   # List of method-ids to ignore
 
 CATEGORIES :

@@ -1,4 +1,4 @@
-// @@Example: ex_objc_query_dynamic_intro @@
+// @@Example: ex_objc_tableview_dynamic_intro @@
 
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
@@ -46,7 +46,7 @@ int main()
         // Set up a query to search for employees.
         
         TightdbQuery *q =  [[[table where] column: AGE   isBetweenInt:0 and:60]
-                                           column: HIRED isEqualToBool:YES];
+                            column: HIRED isEqualToBool:YES];
         
         // Execute the query.
         
@@ -58,7 +58,6 @@ int main()
             NSLog(@"name: %@",[view getString:NAME ndx:i]);
             
         }
-
     }
 }
 

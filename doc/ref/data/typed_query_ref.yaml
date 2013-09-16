@@ -15,7 +15,7 @@ DESCR      : *g_typed_query_intro_descr
 SEE        :
 EXAMPLES:
 - DESCR    :
-  CODE     : ex_objc_typed_query_intro
+  CODE     : ex_objc_query_typed_intro
 IGNORE     : []
 
 CATEGORIES :
@@ -30,7 +30,7 @@ CATEGORIES :
   - g_typed_query_equals_string:
   - g_typed_query_equals_string_2:
   - g_typed_query_equals_date:
-      TITLE    : equal
+      TITLE    : "*equal"
       NAMES    : [equal, equal, equal, equal, equal, equal, equal]
       SIGNATURE: |
                  .CName (TableName_Query *)equal:(BOOL)value
@@ -72,6 +72,7 @@ CATEGORIES :
   - g_typed_query_notEquals_string_2:
   - g_typed_query_notEquals_date:
       NAMES    : [ notEqual, notEqual, notEqual, notEqual, notEqual, notEqual]
+      TITLE    : "*notEqual"
       SIGNATURE: |
                  .CName (TableName_Query *)notEqual:(int64_t)value
                  .CName (TableName_Query *)notEqual:(float)value
@@ -100,6 +101,7 @@ CATEGORIES :
   - g_typed_query_greaterThan_double:
   - g_typed_query_greaterThan_date:
       NAMES    : [ greater, greater, greater, greater ]
+      TITLE    : "*greater"
       SIGNATURE: |
                  .CName (TableName_Query *)greater:(int64_t)value
                  .CName (TableName_Query *)greater:(float)value
@@ -123,6 +125,7 @@ CATEGORIES :
   - g_typed_query_greaterThanOrEqual_double:
   - g_typed_query_greaterThanOrEqual_date:
       NAMES    : [greaterEqual, greaterEqual, greaterEqual, greaterEqual]
+      TITLE    : "*greaterEqual"
       SIGNATURE: |
                  .CName (TableName_Query *)greaterEqual:(int64_t)value
                  .CName (TableName_Query *)greaterEqual:(float)value
@@ -146,6 +149,7 @@ CATEGORIES :
   - g_typed_query_lessThan_double:
   - g_typed_query_lessThan_date:
       NAMES    : [less, less, less, less]
+      TITLE    : "*less"
       SIGNATURE: |
                  .CName (TableName_Query *)less:(int64_t)value
                  .CName (TableName_Query *)less:(float)value
@@ -169,6 +173,7 @@ CATEGORIES :
   - g_typed_query_lessThanOrEqual_double:
   - g_typed_query_lessThanOrEqual_date:
       NAMES    : [lessEqual, lessEqual, lessEqual, lessEqual]
+      TITLE    : "*lessEqual"
       SIGNATURE: |
                  .CName (TableName_Query *)lessEqual:(int64_t)value
                  .CName (TableName_Query *)lessEqual:(float)value
@@ -192,6 +197,7 @@ CATEGORIES :
   - g_typed_query_between_double:
   - g_typed_query_between_date:
       NAMES    : [between, between, between, between]
+      TITLE    : "*between"
       SIGNATURE: |
                  .CName (TableName_Query *)between:(int64_t)from to:(int64_t)to
                  .CName (TableName_Query *)between:(float)from to:(float)to
@@ -219,6 +225,7 @@ CATEGORIES :
       NAME     : beginsWith
   - g_typed_query_startsWith_string_2:
       NAME     : beginsWith
+      TITLE    : "*beginsWith"
       SIGNATURE: |
                  .CName (TableName_Query *)beginsWith:(NSString *)value
                  .CName (TableName_Query *)beginsWith:(NSString *)value caseSensitive:(BOOL)
@@ -244,6 +251,7 @@ CATEGORIES :
       NAME     : endsWith
   - g_typed_query_endsWith_string_2:
       NAME     : endsWith
+      TITLE    : "*endsWith"
       SIGNATURE: |
                  .CName (TableName_Query *)endsWith:(NSString *)value
                  .CName (TableName_Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
@@ -268,6 +276,7 @@ CATEGORIES :
   - g_typed_query_contains_string:
   - g_typed_query_contains_string_2:
       NAMES    : [contains, contains]
+      TITLE    : "*contains"
       SIGNATURE: |
                  .CName (TableName_Query *)contains:(NSString *)value
                  .CName (TableName_Query *)contains:(NSString *)value caseSensitive:(BOOL)
@@ -381,6 +390,7 @@ CATEGORIES :
       NAME     : sum
   - g_typed_query_sum_double_2:
       NAME     : sum
+      TITLE    : "*sum"
       DESCR    : *g_typed_query_sum_descr
       SUMMARY  : *g_typed_query_sum_summary
       SIGNATURE: |
@@ -421,6 +431,7 @@ CATEGORIES :
       NAME     : max
   - g_typed_query_maximum_double_2:
       NAME     : max
+      TITLE    : "*max"
       DESCR    : *g_typed_query_maximum_descr
       SUMMARY  : *g_typed_query_maximum_summary
       SIGNATURE: |
@@ -450,6 +461,7 @@ CATEGORIES :
       NAME     : min
   - g_typed_query_minimum_double_2:
       NAME     : min
+      TITLE    : "*min"
       DESCR    : *g_typed_query_minimum_descr
       SUMMARY  : *g_typed_query_minimum_summary
       SIGNATURE: |
@@ -475,6 +487,7 @@ CATEGORIES :
       NAME     : avg
   - g_typed_query_average_double_2:
       NAME     : avg
+      TITLE    : "*avg"
       SUMMARY  : *g_typed_query_average_summary
       DESCR    : *g_typed_query_average_descr
       SIGNATURE: .CName (double)avg
