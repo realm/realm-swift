@@ -11,7 +11,7 @@ ID         : class_typed_table
 TITLE      : Table (typed)
 SUMMARY    : *g_typed_table_summary             
 DESCR      : *g_typed_table_descr
-SEE        :
+SEE        :                
 EXAMPLES:
 - DESCR    : 
   CODE     : ex_objc_table_typed_intro
@@ -152,7 +152,8 @@ CATEGORIES:
   - g_typed_table_object_at_index:
       NAME     : objectAtIndex
       SUMMARY  : Returns a typed curser at a specified row number.
-      DESCR    : TBD.
+      DESCR    : &g_typed_table_object_at_index_descr
+                 Use the curser to get or set the row values.
       SIGNATURE: "- (TableName_Cursor *)objectAtIndex:(size_t)ndx"
       PARAMS:
       - NAME   : ndx
@@ -165,7 +166,7 @@ CATEGORIES:
   - g_typed_table_last_object:
       NAME     : lastObject
       SUMMARY  : Returns a typed curser at highest row number.
-      DESCR    : TBD.
+      DESCR    : *g_typed_table_object_at_index_descr
       SIGNATURE: "- (TableName_Cursor *)lastObject"
       RETURN:
         TYPES  : TableName_Curser
