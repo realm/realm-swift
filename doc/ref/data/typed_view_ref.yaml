@@ -15,7 +15,7 @@ DESCR      : *g_typed_view_intro_descr
 SEE        :
 EXAMPLES:
 - DESCR    :
-  CODE     : ex_objc_typed_view_intro
+  CODE     : ex_objc_tableview_typed_intro
 IGNORE     : []
 
 CATEGORIES :
@@ -55,6 +55,19 @@ CATEGORIES :
         DESCR  :
 - Rows:
   METHODS:
+  - g_typed_view_object_at_index:
+      NAME     : objectAtIndex
+      SUMMARY  : Returns a typed curser at a specified row number.
+      DESCR    : TBD.
+      SIGNATURE: "- (TableName_Cursor *)objectAtIndex:(size_t)ndx"
+      PARAMS:
+      - NAME   : ndx
+        TYPES  : size_t
+        DESCR  : The row number.
+      RETURN:
+        TYPES  : TableName_Curser
+        DESCR  : The curser object. Note that <code>TableName</code> is replaced with the name of your specific table.
+
   - g_typed_view_get_source_ndx:
       NAME     : getSourceNdx
       SUMMARY  : *g_typed_view_get_source_ndx_summary

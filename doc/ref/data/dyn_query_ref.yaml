@@ -21,7 +21,7 @@ DESCR      : *g_dyn_query_intro_descr
 SEE        :
 EXAMPLES   :
 - DESCR:
-  CODE: ex_objc_dyn_query_intro
+  CODE     : ex_objc_query_dynamic_intro
 IGNORE     : []                   # List of method-ids to ignore
 
 CATEGORIES :
@@ -446,25 +446,25 @@ CATEGORIES :
   METHODS:
   - g_dyn_query_find_all_const:
       IGNORE   : ""
-  - g_dyn_query_find_all:
-      TODO     : later
   - g_dyn_query_find_all_2:
-      TODO     : later 
-      NAMES    : findAll
+      TODO     : later
+  - g_dyn_query_find_all:
+      NAME     : findAll
+      TITLE    : findAll
       DESCR    : *g_dyn_query_find_all_descr
       SUMMARY  : *g_dyn_query_find_all_summary
       SIGNATURE: |
-                 TableView      find_all(size_t start=0, size_t end=size_t(-1), size_t limit=size_t(-1));
-      PARAMS:
-      - NAME   : start
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_find_all_parm1_descr
-      - NAME   : end
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_find_all_parm2_descr
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_find_all_parm3_descr
+                 - (TableView *)findAll;
+#      PARAMS:
+#      - NAME   : start
+#        TYPES  : size_t
+#        DESCR  : *g_dyn_query_find_all_parm1_descr
+#      - NAME   : end
+#        TYPES  : size_t
+#        DESCR  : *g_dyn_query_find_all_parm2_descr
+#      - NAME   : limit
+#        TYPES  : size_t
+#        DESCR  : *g_dyn_query_find_all_parm3_descr
       RETURN:
         TYPES  : TableView *
         DESCR  : *g_dyn_query_find_all_return_desc

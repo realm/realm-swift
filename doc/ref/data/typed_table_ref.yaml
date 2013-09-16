@@ -14,7 +14,7 @@ DESCR      : *g_typed_table_descr
 SEE        :
 EXAMPLES:
 - DESCR    : 
-  CODE     : ex_objc_typed_table_intro
+  CODE     : ex_objc_table_typed_intro
 IGNORE     : []                   # List of method-ids to ignore
 
 CATEGORIES:
@@ -149,8 +149,8 @@ CATEGORIES:
 # TODO: g_typed_table_back
 # TODO: g_typed_table_back_const:
 
-  - g_typed_table_cursor_at_index:
-      NAME     : curserAtIndex
+  - g_typed_table_object_at_index:
+      NAME     : objectAtIndex
       SUMMARY  : Returns a typed curser at a specified row number.
       DESCR    : TBD.
       SIGNATURE: "- (TableName_Cursor *)objectAtIndex:(size_t)ndx"
@@ -159,13 +159,22 @@ CATEGORIES:
         TYPES  : size_t
         DESCR  : The row number.
       RETURN:
-        TYPES  : TableName
+        TYPES  : TableName_Curser
+        DESCR  : The curser object. Note that <code>TableName</code> is replaced with the name of your specific table.
+
+  - g_typed_table_last_object:
+      NAME     : lastObject
+      SUMMARY  : Returns a typed curser at highest row number.
+      DESCR    : TBD.
+      SIGNATURE: "- (TableName_Cursor *)lastObject"
+      RETURN:
+        TYPES  : TableName_Curser
         DESCR  : The curser object. Note that <code>TableName</code> is replaced with the name of your specific table.
 
   - g_typed_table_add:
-      NAME     : add
+      NAME     : "add..."
       SIGNATURE: RowAccesor add(value, ...)
-      SUMMARY  : Add new row.
+      SUMMARY  : Adds new row containing the specified values.
       DESCR    : |
                  This method adds a new row to a typed table.
                  
@@ -181,18 +190,21 @@ CATEGORIES:
         DESCR  :
 
   - g_typed_table_add_empty_row:
-      NAME     : addRow
+      NAME     : add # should be renamed to addRow to override addRow in dynamic API
       SUMMARY  : >
                  This method adds one empty row at the end of the table.
                  Default values (e.g. 0 or "") will be inserted for all the columns in the row.
-      DESCR    : Add an empty row.
-      SIGNATURE: (size_t)addRow
+      DESCR    : Add an empty row and returns a curser. You can use the curser to set the values.
+      SIGNATURE: -(TableName_Cursor *)add;
+      RETURN:
+        TYPES  : TableName_Curser *
+        DESCR  : Returns a typed curser. Note that <code>TableName</code> is replaced with the name of your typed table.
       EXAMPLES:
       - CODE   : ex_objc_typed_table_add_empty_row
         DESCR  :
 
   - g_typed_table_insert:
-      NAME     : insertAtIndex
+      NAME     : insertAtIndex...
       SIGNATURE: (void)insertAtIndex:(size_t)ndx CName1:(CType1*)value1 CName2:(CType2*)value2 CName3:(CType3*)value3
       SUMMARY  : *g_typed_table_insert_summary
       DESCR    : |
@@ -247,7 +259,7 @@ CATEGORIES:
   - g_typed_table_find_first_date:
   - g_typed_table_find_first_string:
       NAMES    : [find, find, find, find, find, find]
-      TITLE    : find
+      TITLE    : "*find"
       SUMMARY  : *g_typed_table_find_first_xxx_summary
       DESCR    : |
                  The method finds the first occurence of a given value in a column.

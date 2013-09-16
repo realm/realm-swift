@@ -1,8 +1,6 @@
 // @@Example: ex_objc_table_typed_intro @@
 
 
-
-
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
 
@@ -36,7 +34,7 @@ int main()
         
         // Insert row at an index.
 
-        //[table insertAtIndex:2 Name:@"Brian" age:20];
+        [table insertAtIndex:2 Name:@"Brian" Age:20];
         
         // Get first row matching an input column value. Notice the method
         // is accessed on a specific column, not on the table.
@@ -48,6 +46,7 @@ int main()
         [table clear];
         NSLog(@"The size of the table is now %zd", [table count]);
         
+
         
     }
     

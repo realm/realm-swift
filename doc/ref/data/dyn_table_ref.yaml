@@ -15,7 +15,7 @@ DESCR      : *g_dyn_table_intro_descr
 SEE        :
 EXAMPLES   :
 - DESCR:
-  CODE     : ex_obcj_dyn_table_intro
+  CODE     : ex_objc_table_dynamic_intro
 IGNORE     : []                   # List of method-ids to ignore
 
 CATEGORIES :
@@ -580,6 +580,7 @@ CATEGORIES :
   - g_dyn_table_find_all_double:
       TODO     : soon
   - g_dyn_table_find_all_int:
+      TODO     : soon # See FIXME in the code.
       NAMES    : findAll
       TITLE    : findAll*
       SUMMARY  : *g_dyn_table_find_all_xxx_summary
@@ -767,6 +768,7 @@ CATEGORIES :
   - g_dyn_table_average_float:
   - g_dyn_table_average_double:
       NAMES    : [avgInt, averageFloat, averageDouble]
+      TITLE    : "avg*"
       SUMMARY  : *g_dyn_table_average_summary
       DESCR    : *g_dyn_table_average_descr
       SIGNATURE: |

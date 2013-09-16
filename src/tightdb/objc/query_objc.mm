@@ -422,6 +422,14 @@ using namespace std;
     return _query->find_all();
 }
 
+
+-(TightdbView *)findAll {
+
+    // jjepsen: please review this.
+    return [[TightdbView alloc] initFromQuery:self];
+}
+
+
 -(size_t)findNext:(size_t)last
 {
     return [self findNext:last error:nil];
