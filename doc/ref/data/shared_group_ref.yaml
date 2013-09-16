@@ -9,7 +9,7 @@ DESCR      : *g_shared_group_descr
 SEE        :
 EXAMPLES:
 - DESCR    :
-  CODE     : ex_sharedgroup_intro
+  CODE     : ex_objc_sharedgroup_intro
 IGNORE     : []
 CATEGORIES:
 - Constructor:
