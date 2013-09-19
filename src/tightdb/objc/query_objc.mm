@@ -452,25 +452,25 @@ using namespace std;
 // Conditions:
 
 
--(TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and:(int64_t)to
+-(TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and_:(int64_t)to
 {
     _query->between(colNdx, from, to);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and:(float)to
+-(TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and_:(float)to
 {
     _query->between(colNdx, from, to);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isBetweenDouble:(double)from and:(double)to
+-(TightdbQuery *)column:(size_t)colNdx isBetweenDouble:(double)from and_:(double)to
 {
     _query->between(colNdx, from, to);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isBetweenDate:(time_t)from and:(time_t)to
+-(TightdbQuery *)column:(size_t)colNdx isBetweenDate:(time_t)from and_:(time_t)to
 {
     _query->between_date(colNdx, from, to);
     return self;
@@ -689,7 +689,7 @@ using namespace std;
     }
     return self;
 }
--(TightdbQuery *)equal:(BOOL)value
+-(TightdbQuery *)columnIsEqualTo:(BOOL)value
 {
     [_query getQuery]->equal(_column_ndx, (bool)value);
     return _query;
@@ -712,7 +712,7 @@ using namespace std;
     return self;
 }
 
--(TightdbQuery *)equal:(int64_t)value
+-(TightdbQuery *)columnIsEqualTo:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                     [_query getQuery]->equal(_column_ndx, value);
@@ -720,7 +720,7 @@ using namespace std;
     return _query;
 }
 
--(TightdbQuery *)notEqual:(int64_t)value
+-(TightdbQuery *)columnIsNotEqualTo:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                     [_query getQuery]->not_equal(_column_ndx, value);
@@ -728,7 +728,7 @@ using namespace std;
     return _query;
 }
 
--(TightdbQuery *)greater:(int64_t)value
+-(TightdbQuery *)columnIsGreaterThan:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                     [_query getQuery]->greater(_column_ndx, value);
@@ -736,7 +736,7 @@ using namespace std;
     return _query;
 }
 
--(TightdbQuery *)greaterEqual:(int64_t)value
+-(TightdbQuery *)columnIsGreaterThanOrEqualTo:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                     [_query getQuery]->greater_equal(_column_ndx, value);
@@ -744,7 +744,7 @@ using namespace std;
     return _query;
 }
 
--(TightdbQuery *)less:(int64_t)value
+-(TightdbQuery *)columnIsLessThan:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                     [_query getQuery]->less(_column_ndx, value);
@@ -752,7 +752,7 @@ using namespace std;
     return _query;
 }
 
--(TightdbQuery *)lessEqual:(int64_t)value
+-(TightdbQuery *)columnIsLessThanOrEqualTo:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                     [_query getQuery]->less_equal(_column_ndx, value);
@@ -760,7 +760,7 @@ using namespace std;
     return _query;
 }
 
--(TightdbQuery *)between:(int64_t)from to:(int64_t)to
+-(TightdbQuery *)columnIsBetween:(int64_t)from and_:(int64_t)to
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
                                     [_query getQuery]->between(_column_ndx, from, to);
@@ -819,43 +819,43 @@ using namespace std;
     return self;
 }
 
--(TightdbQuery *)equal:(float)value
+-(TightdbQuery *)columnIsEqualTo:(float)value
 {
     [_query getQuery]->equal(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)notEqual:(float)value
+-(TightdbQuery *)columnIsNotEqualTo:(float)value
 {
     [_query getQuery]->not_equal(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)greater:(float)value
+-(TightdbQuery *)columnIsGreaterThan:(float)value
 {
     [_query getQuery]->greater(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)greaterEqual:(float)value
+-(TightdbQuery *)columnIsGreaterThanOrEqualTo:(float)value
 {
     [_query getQuery]->greater_equal(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)less:(float)value
+-(TightdbQuery *)columnIsLessThan:(float)value
 {
     [_query getQuery]->less(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)lessEqual:(float)value
+-(TightdbQuery *)columnIsLessThanOrEqualTo:(float)value
 {
     [_query getQuery]->less_equal(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)between:(float)from to:(float)to
+-(TightdbQuery *)columnIsBetween:(float)from and_:(float)to
 {
     [_query getQuery]->between(_column_ndx, from, to);
     return _query;
@@ -912,43 +912,43 @@ using namespace std;
     return self;
 }
 
--(TightdbQuery *)equal:(double)value
+-(TightdbQuery *)columnIsEqualTo:(double)value
 {
     [_query getQuery]->equal(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)notEqual:(double)value
+-(TightdbQuery *)columnIsNotEqualTo:(double)value
 {
     [_query getQuery]->not_equal(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)greater:(double)value
+-(TightdbQuery *)columnIsGreaterThan:(double)value
 {
     [_query getQuery]->greater(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)greaterEqual:(double)value
+-(TightdbQuery *)columnIsGreaterThanOrEqualTo:(double)value
 {
     [_query getQuery]->greater_equal(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)less:(double)value
+-(TightdbQuery *)columnIsLessThan:(double)value
 {
     [_query getQuery]->less(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)lessEqual:(double)value
+-(TightdbQuery *)columnIsLessThanOrEqualTo:(double)value
 {
     [_query getQuery]->less_equal(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)between:(double)from to:(double)to
+-(TightdbQuery *)columnIsBetween:(double)from and_:(double)to
 {
     [_query getQuery]->between(_column_ndx, from, to);
     return _query;
@@ -1004,52 +1004,52 @@ using namespace std;
     }
     return self;
 }
--(TightdbQuery *)equal:(NSString *)value
+-(TightdbQuery *)columnIsEqualTo:(NSString *)value
 {
     [_query getQuery]->equal(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
--(TightdbQuery *)equal:(NSString *)value caseSensitive:(BOOL)caseSensitive
+-(TightdbQuery *)columnIsEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
     [_query getQuery]->equal(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
--(TightdbQuery *)notEqual:(NSString *)value
+-(TightdbQuery *)columnIsNotEqualTo:(NSString *)value
 {
     [_query getQuery]->not_equal(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
--(TightdbQuery *)notEqual:(NSString *)value caseSensitive:(BOOL)caseSensitive
+-(TightdbQuery *)columnIsNotEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
     [_query getQuery]->not_equal(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
--(TightdbQuery *)beginsWith:(NSString *)value
+-(TightdbQuery *)columnBeginsWith:(NSString *)value
 {
     [_query getQuery]->begins_with(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
--(TightdbQuery *)beginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+-(TightdbQuery *)columnBeginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
     [_query getQuery]->begins_with(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
--(TightdbQuery *)endsWith:(NSString *)value
+-(TightdbQuery *)columnEndsWith:(NSString *)value
 {
     [_query getQuery]->ends_with(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
--(TightdbQuery *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+-(TightdbQuery *)columnEndsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
     [_query getQuery]->ends_with(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
--(TightdbQuery *)contains:(NSString *)value
+-(TightdbQuery *)columnContains:(NSString *)value
 {
     [_query getQuery]->contains(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
--(TightdbQuery *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive
+-(TightdbQuery *)columnContains:(NSString *)value caseSensitive:(BOOL)caseSensitive
 {
     [_query getQuery]->contains(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
@@ -1071,27 +1071,27 @@ using namespace std;
     }
     return self;
 }
--(TightdbQuery *)equal:(TightdbBinary *)value
+-(TightdbQuery *)columnIsEqualTo:(TightdbBinary *)value
 {
     [_query getQuery]->equal(_column_ndx, [value getBinary]);
     return _query;
 }
--(TightdbQuery *)notEqual:(TightdbBinary *)value
+-(TightdbQuery *)columnIsNotEqualTo:(TightdbBinary *)value
 {
     [_query getQuery]->not_equal(_column_ndx, [value getBinary]);
     return _query;
 }
--(TightdbQuery *)beginsWith:(TightdbBinary *)value
+-(TightdbQuery *)columnBeginsWith:(TightdbBinary *)value
 {
     [_query getQuery]->begins_with(_column_ndx, [value getBinary]);
     return _query;
 }
--(TightdbQuery *)endsWith:(TightdbBinary *)value
+-(TightdbQuery *)columnEndsWith:(TightdbBinary *)value
 {
     [_query getQuery]->ends_with(_column_ndx, [value getBinary]);
     return _query;
 }
--(TightdbQuery *)contains:(TightdbBinary *)value
+-(TightdbQuery *)columnContains:(TightdbBinary *)value
 {
     [_query getQuery]->contains(_column_ndx, [value getBinary]);
     return _query;
@@ -1113,37 +1113,37 @@ using namespace std;
     }
     return self;
 }
--(TightdbQuery *)equal:(time_t)value
+-(TightdbQuery *)columnIsEqualTo:(time_t)value
 {
     [_query getQuery]->equal_date(_column_ndx, value);
     return _query;
 }
--(TightdbQuery *)notEqual:(time_t)value
+-(TightdbQuery *)columnIsNotEqualTo:(time_t)value
 {
     [_query getQuery]->not_equal_date(_column_ndx, value);
     return _query;
 }
--(TightdbQuery *)greater:(time_t)value
+-(TightdbQuery *)columnIsGreaterThan:(time_t)value
 {
     [_query getQuery]->greater_date(_column_ndx, value);
     return _query;
 }
--(TightdbQuery *)greaterEqual:(time_t)value
+-(TightdbQuery *)columnIsGreaterThanOrEqualTo:(time_t)value
 {
     [_query getQuery]->greater_equal_date(_column_ndx, value);
     return _query;
 }
--(TightdbQuery *)less:(time_t)value
+-(TightdbQuery *)columnIsLessThan:(time_t)value
 {
     [_query getQuery]->less_date(_column_ndx, value);
     return _query;
 }
--(TightdbQuery *)lessEqual:(time_t)value
+-(TightdbQuery *)columnIsLessThanOrEqualTo:(time_t)value
 {
     [_query getQuery]->less_equal_date(_column_ndx, value);
     return _query;
 }
--(TightdbQuery *)between:(time_t)from to:(time_t)to
+-(TightdbQuery *)columnIsBetween:(time_t)from and_:(time_t)to
 {
     [_query getQuery]->between_date(_column_ndx, from, to);
     return _query;

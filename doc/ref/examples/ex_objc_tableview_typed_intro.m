@@ -27,7 +27,7 @@ int main()
         
         // Place the result of a query in a table view.
         
-        PeopleTable_View *tableView = [[[table where].Age greater:20] findAll];
+        PeopleTable_View *tableView = [[[table where].Age columnIsGreaterThan:20] findAll];
         
         // Itereator over the result in the table view.
         

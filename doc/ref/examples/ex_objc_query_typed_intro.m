@@ -27,12 +27,13 @@ int main()
 
         // Create a query.
         
-        PeopleTable_Query *query = [[[[[[table where] Age] greater:20] or] Name] equal:@"Bob"];
+        PeopleTable_Query *query = [[[[table where].Age columnIsGreaterThan:20] or].Name columnIsEqualTo:@"Bob"];
+        
         
         for (PeopleTable_Cursor *curser in query) {
             NSLog(@"Person matching query: %@", [curser Name]);
         }
- 
+        
     }
 }
 

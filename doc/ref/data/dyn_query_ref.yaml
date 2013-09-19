@@ -50,7 +50,7 @@ CATEGORIES :
       NAME     : "column:isEqualToString:caseSensitive:"
   - g_dyn_query_equals_date:
       NAME     : "column:isEqualToDate:"
-      TITLE    : "isEqualTo"
+      TITLE    : "column:isEqualTo"
 # Not yet implemented in API
 #      TODO     : soon
 #      NAMES    : [ equal, equal, equal, equal, equal, equal, equal]
@@ -99,7 +99,7 @@ CATEGORIES :
   - g_dyn_query_notEquals_date:
 # Not yet implemented in API
       NAME     : "column:isNotEqualToDate:"
-      TITLE    : "isNotEqualTo"
+      TITLE    : "column:isNotEqualTo"
 #      NAMES    : [ notEqual, notEqual, notEqual, notEqual, notEqual, notEqual ]
       SIGNATURE: |
                  - (TightdbQuery *)column:(size_t)colNdx isNotEqualToInt:(int64_t)value
@@ -137,7 +137,7 @@ CATEGORIES :
   - g_dyn_query_greaterThan_date:
 # Not yet implemented in API
       NAME     : "column:isGreaterThanDate:"
-      TITLE    : "isGreaterThan"
+      TITLE    : "column:isGreaterThan"
 #TODO: check greater_date? does time_t work as int64_t?
       SIGNATURE: |
                  - (TightdbQuery *)column:(size_t)colNdx isGreaterThanInt:(int64_t)value
@@ -168,7 +168,7 @@ CATEGORIES :
       NAME     : "column:isGreaterThanOrEqualToDouble:"
   - g_dyn_query_greaterThanOrEqual_date:
       NAME     : "column:isGreaterThanOrEqualToDate:"
-      TITLE    : "isGreaterThanOrEqualTo"
+      TITLE    : "column:isGreaterThanOrEqualTo"
       SIGNATURE: |
                  - (TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToInt:(int64_t)value
                  - (TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToFloat:(float)value
@@ -198,7 +198,7 @@ CATEGORIES :
       NAME     : "column:isLessThanDouble:"
   - g_dyn_query_lessThan_date:
       NAME     : "column:isLessThanDate:"
-      TITLE    : "isLessThan"
+      TITLE    : "column:isLessThan"
       SIGNATURE: |
                  - (TightdbQuery *)column:(size_t)colNdx isLessThanInt:(int64_t)value
                  - (TightdbQuery *)column:(size_t)colNdx isLessThanFloat:(float)value
@@ -228,7 +228,7 @@ CATEGORIES :
       NAME     : "column:isLessThanOrEqualToDouble:"
   - g_dyn_query_lessThanOrEqual_date:
       NAME     : "column:isLessThanOrEqualToDate:"
-      TITLE    : "isLessThanOrEqualTo"
+      TITLE    : "column:isLessThanOrEqualTo"
       SIGNATURE: |
                  - (TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToInt:(int64_t)value
                  - (TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToFloat:(float)value
@@ -258,7 +258,7 @@ CATEGORIES :
       NAME     : "column:isBetweenDouble:"
   - g_dyn_query_between_date:
       NAME     : "column:isBetweenDate:"
-      TITLE    : "isBetween"
+      TITLE    : "column:isBetween"
       SIGNATURE: |
                  - (TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and:(int64_t)to
                  - (TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and:(float)to

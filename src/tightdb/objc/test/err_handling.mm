@@ -1,9 +1,13 @@
+
+
+
 //
 //  err_handling.m
 //  TightDB
 //
 // Demo code for short tutorial using Objective-C interface
 //
+
 
 #import <SenTestingKit/SenTestingKit.h>
 
@@ -39,9 +43,14 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
                 MixedCol,  Mixed)
 
 
+
 @interface MACTestErrHandling: SenTestCase
 @end
 @implementation MACTestErrHandling
+
+
+
+
 
 - (void)testErrHandling
 {
@@ -160,8 +169,12 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     NSLog(@"Disktable size: %zu", [diskTable count]);
 }
 
+
+
+
 -(void)testErrorInsert
 {
+
     NSError *error;
     
     // Create table with all column types
@@ -313,6 +326,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
             }
         }
         
+
     }
     
     // We also want a ColumnStringEnum
@@ -375,18 +389,18 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     [table addBoolCol:YES  IntCol:506      FloatCol:7.7     DoubleCol:8.8       StringCol:@"banach"
             BinaryCol:bin2 DateCol:timeNow TableCol:subtab2 MixedCol:mixSubtab];
     
-    STAssertEquals([[[[table where].BoolCol   equal:NO]      count] unsignedLongValue], (size_t)1, @"BoolCol equal");
-    STAssertEquals([[[[table where].IntCol    equal:54]      count] unsignedLongValue], (size_t)1, @"IntCol equal");
-    STAssertEquals([[[[table where].FloatCol  equal:0.7f]    count] unsignedLongValue], (size_t)1, @"FloatCol equal");
-    STAssertEquals([[[[table where].DoubleCol equal:0.8]     count] unsignedLongValue], (size_t)1, @"DoubleCol equal");
-    STAssertEquals([[[[table where].StringCol equal:@"foo"]  count] unsignedLongValue], (size_t)1, @"StringCol equal");
-    STAssertEquals([[[[table where].BinaryCol equal:bin1]    count] unsignedLongValue], (size_t)1, @"BinaryCol equal");
-    STAssertEquals([[[[table where].DateCol   equal:0]       count] unsignedLongValue], (size_t)1, @"DateCol equal");
+    STAssertEquals([[[[table where].BoolCol   columnIsEqualTo:NO]      count] unsignedLongValue], (size_t)1, @"BoolCol equal");
+    STAssertEquals([[[[table where].IntCol    columnIsEqualTo:54]      count] unsignedLongValue], (size_t)1, @"IntCol equal");
+    STAssertEquals([[[[table where].FloatCol  columnIsEqualTo:0.7f]    count] unsignedLongValue], (size_t)1, @"FloatCol equal");
+    STAssertEquals([[[[table where].DoubleCol columnIsEqualTo:0.8]     count] unsignedLongValue], (size_t)1, @"DoubleCol equal");
+    STAssertEquals([[[[table where].StringCol columnIsEqualTo:@"foo"]  count] unsignedLongValue], (size_t)1, @"StringCol equal");
+    STAssertEquals([[[[table where].BinaryCol columnIsEqualTo:bin1]    count] unsignedLongValue], (size_t)1, @"BinaryCol equal");
+    STAssertEquals([[[[table where].DateCol   columnIsEqualTo:0]       count] unsignedLongValue], (size_t)1, @"DateCol equal");
     // These are not yet implemented
-    //    STAssertEquals([[[table where].TableCol  equal:subtab1] count], (size_t)1, @"TableCol equal");
-    //    STAssertEquals([[[table where].MixedCol  equal:mixInt1] count], (size_t)1, @"MixedCol equal");
+    //    STAssertEquals([[[table where].TableCol  columnIsEqualTo:subtab1] count], (size_t)1, @"TableCol equal");
+    //    STAssertEquals([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (size_t)1, @"MixedCol equal");
     
-    TestQueryErrAllTypes_Query *query = [[table where].BoolCol   equal:NO];
+    TestQueryErrAllTypes_Query *query = [[table where].BoolCol   columnIsEqualTo:NO];
     
     STAssertEquals([[query.IntCol min] longLongValue], (int64_t)54,    @"IntCol min");
     STAssertEquals([[query.IntCol max] longLongValue], (int64_t)54,    @"IntCol max");
@@ -405,70 +419,72 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     
     // Check that all column conditions return query objects of the
     // right type
-    [[[table where].BoolCol equal:NO].BoolCol equal:NO];
+    [[[table where].BoolCol columnIsEqualTo:NO].BoolCol columnIsEqualTo:NO];
     
-    [[[table where].IntCol equal:0].BoolCol equal:NO];
-    [[[table where].IntCol notEqual:0].BoolCol equal:NO];
-    [[[table where].IntCol less:0].BoolCol equal:NO];
-    [[[table where].IntCol lessEqual:0].BoolCol equal:NO];
-    [[[table where].IntCol greater:0].BoolCol equal:NO];
-    [[[table where].IntCol greaterEqual:0].BoolCol equal:NO];
-    [[[table where].IntCol between:0 to:0].BoolCol equal:NO];
+    [[[table where].IntCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].IntCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].IntCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].IntCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].IntCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].IntCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].IntCol columnIsBetween:0 and_:0].BoolCol columnIsEqualTo:NO];
     
-    [[[table where].FloatCol equal:0].BoolCol equal:NO];
-    [[[table where].FloatCol notEqual:0].BoolCol equal:NO];
-    [[[table where].FloatCol less:0].BoolCol equal:NO];
-    [[[table where].FloatCol lessEqual:0].BoolCol equal:NO];
-    [[[table where].FloatCol greater:0].BoolCol equal:NO];
-    [[[table where].FloatCol greaterEqual:0].BoolCol equal:NO];
-    [[[table where].FloatCol between:0 to:0].BoolCol equal:NO];
+    [[[table where].FloatCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].FloatCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].FloatCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].FloatCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].FloatCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].FloatCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].FloatCol columnIsBetween:0 and_:0].BoolCol columnIsEqualTo:NO];
     
-    [[[table where].DoubleCol equal:0].BoolCol equal:NO];
-    [[[table where].DoubleCol notEqual:0].BoolCol equal:NO];
-    [[[table where].DoubleCol less:0].BoolCol equal:NO];
-    [[[table where].DoubleCol lessEqual:0].BoolCol equal:NO];
-    [[[table where].DoubleCol greater:0].BoolCol equal:NO];
-    [[[table where].DoubleCol greaterEqual:0].BoolCol equal:NO];
-    [[[table where].DoubleCol between:0 to:0].BoolCol equal:NO];
+    [[[table where].DoubleCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].DoubleCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].DoubleCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].DoubleCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].DoubleCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].DoubleCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].DoubleCol columnIsBetween:0 and_:0].BoolCol columnIsEqualTo:NO];
     
-    [[[table where].StringCol equal:@""].BoolCol equal:NO];
-    [[[table where].StringCol equal:@"" caseSensitive:NO].BoolCol equal:NO];
-    [[[table where].StringCol notEqual:@""].BoolCol equal:NO];
-    [[[table where].StringCol notEqual:@"" caseSensitive:NO].BoolCol equal:NO];
-    [[[table where].StringCol beginsWith:@""].BoolCol equal:NO];
-    [[[table where].StringCol beginsWith:@"" caseSensitive:NO].BoolCol equal:NO];
-    [[[table where].StringCol endsWith:@""].BoolCol equal:NO];
-    [[[table where].StringCol endsWith:@"" caseSensitive:NO].BoolCol equal:NO];
-    [[[table where].StringCol contains:@""].BoolCol equal:NO];
-    [[[table where].StringCol contains:@"" caseSensitive:NO].BoolCol equal:NO];
+    [[[table where].StringCol columnIsEqualTo:@""].BoolCol columnIsEqualTo:NO];
+    [[[table where].StringCol columnIsEqualTo:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
+    [[[table where].StringCol columnIsNotEqualTo:@""].BoolCol columnIsEqualTo:NO];
+    [[[table where].StringCol columnIsNotEqualTo:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
+    [[[table where].StringCol columnBeginsWith:@""].BoolCol columnIsEqualTo:NO];
+    [[[table where].StringCol columnBeginsWith:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
+    [[[table where].StringCol columnEndsWith:@""].BoolCol columnIsEqualTo:NO];
+    [[[table where].StringCol columnEndsWith:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
+    [[[table where].StringCol columnContains:@""].BoolCol columnIsEqualTo:NO];
+    [[[table where].StringCol columnContains:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
     
-    [[[table where].BinaryCol equal:bin1].BoolCol equal:NO];
-    [[[table where].BinaryCol notEqual:bin1].BoolCol equal:NO];
-    [[[table where].BinaryCol beginsWith:bin1].BoolCol equal:NO];
-    [[[table where].BinaryCol endsWith:bin1].BoolCol equal:NO];
-    [[[table where].BinaryCol contains:bin1].BoolCol equal:NO];
+    [[[table where].BinaryCol columnIsEqualTo:bin1].BoolCol columnIsEqualTo:NO];
+    [[[table where].BinaryCol columnIsNotEqualTo:bin1].BoolCol columnIsEqualTo:NO];
+    [[[table where].BinaryCol columnBeginsWith:bin1].BoolCol columnIsEqualTo:NO];
+    [[[table where].BinaryCol columnEndsWith:bin1].BoolCol columnIsEqualTo:NO];
+    [[[table where].BinaryCol columnContains:bin1].BoolCol columnIsEqualTo:NO];
     
-    TestQueryErrAllTypes_View *view = [[[[table where].DateCol equal:0].BoolCol equal:NO] findAll];
+    TestQueryErrAllTypes_View *view = [[[[table where].DateCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO] findAll];
     for (size_t i = 0; i < [view count]; i++) {
         NSLog(@"%zu: %c", i, [[view objectAtIndex:i] BoolCol]);
     }
 
     
-    [[[table where].DateCol notEqual:0].BoolCol equal:NO];
-    [[[table where].DateCol less:0].BoolCol equal:NO];
-    [[[table where].DateCol lessEqual:0].BoolCol equal:NO];
-    [[[table where].DateCol greater:0].BoolCol equal:NO];
-    [[[table where].DateCol greaterEqual:0].BoolCol equal:NO];
-    [[[table where].DateCol between:0 to:0].BoolCol equal:NO];
+    [[[table where].DateCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].DateCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].DateCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].DateCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].DateCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].DateCol columnIsBetween:0 and_:0].BoolCol columnIsEqualTo:NO];
     
     // These are not yet implemented
-    //    [[[table where].TableCol equal:nil].BoolCol equal:NO];
-    //    [[[table where].TableCol notEqual:nil].BoolCol equal:NO];
+    //    [[[table where].TableCol columnIsEqualTo:nil].BoolCol columnIsEqualTo:NO];
+    //    [[[table where].TableCol columnIsNotEqualTo:nil].BoolCol columnIsEqualTo:NO];
     
-    //    [[[table where].MixedCol equal:mixInt1].BoolCol equal:NO];
-    //    [[[table where].MixedCol notEqual:mixInt1].BoolCol equal:NO];
+    //    [[[table where].MixedCol columnIsEqualTo:mixInt1].BoolCol columnIsEqualTo:NO];
+    //    [[[table where].MixedCol columnIsNotEqualTo:mixInt1].BoolCol columnIsEqualTo:NO];
 }
 
 
 
 @end
+
+

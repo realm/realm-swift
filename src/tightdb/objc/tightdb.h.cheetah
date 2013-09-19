@@ -76,7 +76,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName${j+1}, CType${j+1}) \
 %for $j in range($num_cols)
 TIGHTDB_COLUMN_PROXY_DEF(CName${j+1}, CType${j+1}) \
 %end for
--(void)add##%slurp
+-(BOOL)add##%slurp
 %for $j in range($num_cols)
 %if 0 < $j
 %echo ' '
@@ -84,6 +84,14 @@ TIGHTDB_COLUMN_PROXY_DEF(CName${j+1}, CType${j+1}) \
 CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 %end for
 ; \
+-(BOOL)add##%slurp
+%for $j in range($num_cols)
+%if 0 < $j
+%echo ' '
+%end if
+CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
+%end for
+ error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx%slurp
 %for $j in range($num_cols)
  CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
@@ -213,17 +221,29 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName${j+1}, CType${j+1}) \
 %end for
     return self; \
 } \
--(void)add##%slurp
+-(BOOL)add##%slurp
 %for $j in range($num_cols)
 CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 %end for
 \
 { \
+    return [self add##%slurp
+%for $j in range($num_cols)
+CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
+%end for
+error:nil]; \
+} \
+-(BOOL)add##%slurp
+%for $j in range($num_cols)
+CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
+%end for
+error:(NSError **)error\
+{ \
     const size_t ndx = [self count]; \
 %for $j in range($num_cols)
-    TIGHTDB_COLUMN_INSERT(self, ${j}, ndx, CName${j+1}, CType${j+1}); \
+    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, ${j}, ndx, CName${j+1}, CType${j+1}, error)) return NO; \
 %end for
-    [self insertDone]; \
+    return [self insertDoneWithError:error]; \
 } \
 -(void)insertAtIndex:(size_t)ndx %slurp
 %for $j in range($num_cols)
