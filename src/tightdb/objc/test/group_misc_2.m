@@ -82,7 +82,7 @@ TIGHTDB_TABLE_2(QueryTable,
     [table2 addHired:YES Age:54];
 
     // Create query (current employees between 20 and 30 years old)
-    MyTable2_Query *q = [[[table2 where].Hired equal:YES].Age between:20 to:30];
+    MyTable2_Query *q = [[[table2 where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30];
 
     // Get number of matching entries
     NSLog(@"Query count: %zu", [[q count] unsignedLongValue]);
@@ -148,7 +148,7 @@ TIGHTDB_TABLE_2(QueryTable,
     [table addFirst:8 Second:@"The quick brown fox"];
 
     {
-        QueryTable_Query *q = [[table where].First between:3 to:7]; // Between
+        QueryTable_Query *q = [[table where].First columnIsBetween:3 and_:7]; // Between
         STAssertEquals((size_t)2,   [[q count] unsignedLongValue], @"count != 2");
 //        STAssertEquals(9,   [q.First sum]); // Sum
         STAssertEquals(4.5, [[q.First avg] doubleValue], @"Avg!=4.5"); // Average
@@ -156,31 +156,31 @@ TIGHTDB_TABLE_2(QueryTable,
 //        STAssertEquals(5,   [q.First max]); // Maximum
     }
     {
-        QueryTable_Query *q = [[table where].Second contains:@"quick" caseSensitive:NO]; // String contains
+        QueryTable_Query *q = [[table where].Second columnContains:@"quick" caseSensitive:NO]; // String contains
         STAssertEquals((size_t)1, [[q count] unsignedLongValue], @"count != 1");
     }
     {
-        QueryTable_Query *q = [[table where].Second beginsWith:@"The" caseSensitive:NO]; // String prefix
+        QueryTable_Query *q = [[table where].Second columnBeginsWith:@"The" caseSensitive:NO]; // String prefix
         STAssertEquals((size_t)1, [[q count] unsignedLongValue], @"count != 1");
     }
     {
-        QueryTable_Query *q = [[table where].Second endsWith:@"The" caseSensitive:NO]; // String suffix
+        QueryTable_Query *q = [[table where].Second columnEndsWith:@"The" caseSensitive:NO]; // String suffix
         STAssertEquals((size_t)0, [[q count] unsignedLongValue], @"count != 1");
     }
     {
-        QueryTable_Query *q = [[[table where].Second notEqual:@"a" caseSensitive:NO].Second notEqual:@"b" caseSensitive:NO]; // And
+        QueryTable_Query *q = [[[table where].Second columnIsNotEqualTo:@"a" caseSensitive:NO].Second columnIsNotEqualTo:@"b" caseSensitive:NO]; // And
         STAssertEquals((size_t)1, [[q count] unsignedLongValue], @"count != 1");
     }
     {
-        QueryTable_Query *q = [[[[table where].Second notEqual:@"a" caseSensitive:NO] or].Second notEqual:@"b" caseSensitive:NO]; // Or
+        QueryTable_Query *q = [[[[table where].Second columnIsNotEqualTo:@"a" caseSensitive:NO] or].Second columnIsNotEqualTo:@"b" caseSensitive:NO]; // Or
         STAssertEquals((size_t)4, [[q count] unsignedLongValue], @"count != 1");
     }
     {
-        QueryTable_Query *q = [[[[[[[table where].Second equal:@"a" caseSensitive:NO] group].First less:3] or].First greater:5] endgroup]; // Parentheses
+        QueryTable_Query *q = [[[[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO] group].First columnIsLessThan:3] or].First columnIsGreaterThan:5] endgroup]; // Parentheses
         STAssertEquals((size_t)1, [[q count] unsignedLongValue], @"count != 1");
     }
     {
-        QueryTable_Query *q = [[[[[table where].Second equal:@"a" caseSensitive:NO].First less:3] or].First greater:5]; // No parenthesis
+        QueryTable_Query *q = [[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO].First columnIsLessThan:3] or].First columnIsGreaterThan:5]; // No parenthesis
         STAssertEquals((size_t)2, [[q count] unsignedLongValue], @"count != 2");
         TightdbView *tv = [q findAll];
         STAssertEquals((size_t)2, [tv count], @"count != 2");

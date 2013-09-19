@@ -78,15 +78,15 @@ void tableFunc() {
     
     // @@Example: advanced_search @@
     // Create query (current employees between 20 and 30 years old)
-    PeopleTable_Query *q = [[[people where].Hired equal:YES]
-                            .Age between:20 to:30];
+    PeopleTable_Query *q = [[[people where].Hired columnIsEqualTo:YES]
+                            .Age columnIsBetween:20 and_:30];
 
     
     // Get number of matching entries
     size_t cnt3 = [q count];                            // =&gt; 2
     
     // Get the average age (currently only a low-level interface)
-    double avg = [q.Age avg];
+    NSNumber *avg = [q.Age avg];
     
     // Execute the query and return a table (view)
     PeopleTable_View *res = [q findAll];

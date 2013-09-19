@@ -80,10 +80,10 @@
 
 // Conditions:
 
--(TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and:(int64_t)to;	
--(TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and:(float)to;	
--(TightdbQuery *)column:(size_t)colNdx isBetweenDouble:(double)from and:(double)to;	
--(TightdbQuery *)column:(size_t)colNdx isBetweenDate:(time_t)from and:(time_t)to;	
+-(TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and_:(int64_t)to;	
+-(TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and_:(float)to;	
+-(TightdbQuery *)column:(size_t)colNdx isBetweenDouble:(double)from and_:(double)to;	
+-(TightdbQuery *)column:(size_t)colNdx isBetweenDate:(time_t)from and_:(time_t)to;	
 
 -(TightdbQuery *)column:(size_t)colNdx isEqualToBool:(bool)value;
 -(TightdbQuery *)column:(size_t)colNdx isEqualToInt:(int64_t)value;
@@ -128,19 +128,19 @@
 
 @interface TightdbQueryAccessorBool: NSObject
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query;
--(TightdbQuery *)equal:(BOOL)value;
+-(TightdbQuery *)columnIsEqualTo:(BOOL)value;
 @end
 
 
 @interface TightdbQueryAccessorInt: NSObject
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query;
--(TightdbQuery *)equal:(int64_t)value;
--(TightdbQuery *)notEqual:(int64_t)value;
--(TightdbQuery *)greater:(int64_t)value;
--(TightdbQuery *)greaterEqual:(int64_t)value;
--(TightdbQuery *)less:(int64_t)value;
--(TightdbQuery *)lessEqual:(int64_t)value;
--(TightdbQuery *)between:(int64_t)from to:(int64_t)to;
+-(TightdbQuery *)columnIsEqualTo:(int64_t)value;
+-(TightdbQuery *)columnIsNotEqualTo:(int64_t)value;
+-(TightdbQuery *)columnIsGreaterThan:(int64_t)value;
+-(TightdbQuery *)columnIsGreaterThanOrEqualTo:(int64_t)value;
+-(TightdbQuery *)columnIsLessThan:(int64_t)value;
+-(TightdbQuery *)columnIsLessThanOrEqualTo:(int64_t)value;
+-(TightdbQuery *)columnIsBetween:(int64_t)from and_:(int64_t)to;
 -(NSNumber *)min;
 -(NSNumber *)minWithError:(NSError *__autoreleasing *)error;
 -(NSNumber *)max;
@@ -154,13 +154,13 @@
 
 @interface TightdbQueryAccessorFloat: NSObject
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query;
--(TightdbQuery *)equal:(float)value;
--(TightdbQuery *)notEqual:(float)value;
--(TightdbQuery *)greater:(float)value;
--(TightdbQuery *)greaterEqual:(float)value;
--(TightdbQuery *)less:(float)value;
--(TightdbQuery *)lessEqual:(float)value;
--(TightdbQuery *)between:(float)from to:(float)to;
+-(TightdbQuery *)columnIsEqualTo:(float)value;
+-(TightdbQuery *)columnIsNotEqualTo:(float)value;
+-(TightdbQuery *)columnIsGreaterThan:(float)value;
+-(TightdbQuery *)columnIsGreaterThanOrEqualTo:(float)value;
+-(TightdbQuery *)columnIsLessThan:(float)value;
+-(TightdbQuery *)columnIsLessThanOrEqualTo:(float)value;
+-(TightdbQuery *)columnIsBetween:(float)from and_:(float)to;
 -(NSNumber *)min;
 -(NSNumber *)minWithError:(NSError *__autoreleasing *)error;
 -(NSNumber *)max;
@@ -174,13 +174,13 @@
 
 @interface TightdbQueryAccessorDouble: NSObject
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query;
--(TightdbQuery *)equal:(double)value;
--(TightdbQuery *)notEqual:(double)value;
--(TightdbQuery *)greater:(double)value;
--(TightdbQuery *)greaterEqual:(double)value;
--(TightdbQuery *)less:(double)value;
--(TightdbQuery *)lessEqual:(double)value;
--(TightdbQuery *)between:(double)from to:(double)to;
+-(TightdbQuery *)columnIsEqualTo:(double)value;
+-(TightdbQuery *)columnIsNotEqualTo:(double)value;
+-(TightdbQuery *)columnIsGreaterThan:(double)value;
+-(TightdbQuery *)columnIsGreaterThanOrEqualTo:(double)value;
+-(TightdbQuery *)columnIsLessThan:(double)value;
+-(TightdbQuery *)columnIsLessThanOrEqualTo:(double)value;
+-(TightdbQuery *)columnIsBetween:(double)from and_:(double)to;
 -(NSNumber *)min;
 -(NSNumber *)minWithError:(NSError *__autoreleasing *)error;
 -(NSNumber *)max;
@@ -194,38 +194,38 @@
 
 @interface TightdbQueryAccessorString: NSObject
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query;
--(TightdbQuery *)equal:(NSString *)value;
--(TightdbQuery *)equal:(NSString *)value caseSensitive:(BOOL)caseSensitive;
--(TightdbQuery *)notEqual:(NSString *)value;
--(TightdbQuery *)notEqual:(NSString *)value caseSensitive:(BOOL)caseSensitive;
--(TightdbQuery *)beginsWith:(NSString *)value;
--(TightdbQuery *)beginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive;
--(TightdbQuery *)endsWith:(NSString *)value;
--(TightdbQuery *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive;
--(TightdbQuery *)contains:(NSString *)value;
--(TightdbQuery *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive;
+-(TightdbQuery *)columnIsEqualTo:(NSString *)value;
+-(TightdbQuery *)columnIsEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive;
+-(TightdbQuery *)columnIsNotEqualTo:(NSString *)value;
+-(TightdbQuery *)columnIsNotEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive;
+-(TightdbQuery *)columnBeginsWith:(NSString *)value;
+-(TightdbQuery *)columnBeginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive;
+-(TightdbQuery *)columnEndsWith:(NSString *)value;
+-(TightdbQuery *)columnEndsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive;
+-(TightdbQuery *)columnContains:(NSString *)value;
+-(TightdbQuery *)columnContains:(NSString *)value caseSensitive:(BOOL)caseSensitive;
 @end
 
 
 @interface TightdbQueryAccessorBinary: NSObject
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query;
--(TightdbQuery *)equal:(TightdbBinary *)value;
--(TightdbQuery *)notEqual:(TightdbBinary *)value;
--(TightdbQuery *)beginsWith:(TightdbBinary *)value;
--(TightdbQuery *)endsWith:(TightdbBinary *)value;
--(TightdbQuery *)contains:(TightdbBinary *)value;
+-(TightdbQuery *)columnIsEqualTo:(TightdbBinary *)value;
+-(TightdbQuery *)columnIsNotEqualTo:(TightdbBinary *)value;
+-(TightdbQuery *)columnBeginsWith:(TightdbBinary *)value;
+-(TightdbQuery *)columnEndsWith:(TightdbBinary *)value;
+-(TightdbQuery *)columnContains:(TightdbBinary *)value;
 @end
 
 
 @interface TightdbQueryAccessorDate: NSObject
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query;
--(TightdbQuery *)equal:(time_t)value;
--(TightdbQuery *)notEqual:(time_t)value;
--(TightdbQuery *)greater:(time_t)value;
--(TightdbQuery *)greaterEqual:(time_t)value;
--(TightdbQuery *)less:(time_t)value;
--(TightdbQuery *)lessEqual:(time_t)value;
--(TightdbQuery *)between:(time_t)from to:(time_t)to;
+-(TightdbQuery *)columnIsEqualTo:(time_t)value;
+-(TightdbQuery *)columnIsNotEqualTo:(time_t)value;
+-(TightdbQuery *)columnIsGreaterThan:(time_t)value;
+-(TightdbQuery *)columnIsGreaterThanOrEqualTo:(time_t)value;
+-(TightdbQuery *)columnIsLessThan:(time_t)value;
+-(TightdbQuery *)columnIsLessThanOrEqualTo:(time_t)value;
+-(TightdbQuery *)columnIsBetween:(time_t)from and_:(time_t)to;
 @end
 
 

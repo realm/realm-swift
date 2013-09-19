@@ -45,7 +45,7 @@ int main()
         
         // Set up a query to search for employees.
         
-        TightdbQuery *q =  [[[table where] column: AGE   isBetweenInt:0 and:60]
+        TightdbQuery *q =  [[[table where] column: AGE   isBetweenInt:0 and_:60]
                             column: HIRED isEqualToBool:YES];
         
         // Execute the query.
