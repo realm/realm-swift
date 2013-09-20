@@ -98,12 +98,12 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 %end for
 ; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_${num_cols}(TableName%slurp
@@ -260,15 +260,15 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -314,7 +314,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \

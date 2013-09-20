@@ -464,7 +464,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     
     TestQueryErrAllTypes_View *view = [[[[table where].DateCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO] findAll];
     for (size_t i = 0; i < [view count]; i++) {
-        NSLog(@"%zu: %c", i, [[view objectAtIndex:i] BoolCol]);
+        NSLog(@"%zu: %c", i, [[view cursorAtIndex:i] BoolCol]);
     }
 
     
