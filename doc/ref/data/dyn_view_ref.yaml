@@ -105,7 +105,20 @@ CATEGORIES :
 
       NAME     : getColumnType
       SUMMARY  : *g_dyn_table_get_column_type_summary
-      DESCR    : *g_dyn_table_get_column_type_descr
+      DESCR    :
+      - TEXT   : *g_dyn_table_get_column_type_descr1
+      - TEXT   : >
+                 <ul>
+                   <li><code>tightdb_Bool</code></li>
+                   <li><code>tightdb_Int</code></li>
+                   <li><code>tightdb_Float</code></li>
+                   <li><code>tightdb_Double</code></li>
+                   <li><code>tightdb_String</code></li>
+                   <li><code>tightdb_Binary</code></li>
+                   <li><code>tightdb_Table</code></li>
+                   <li><code>tightdb_Date</code></li>
+                   <li><code>tightdb_Mixed</code></li>
+                 </ul>
       CONST    : True
       PARAMS:
       - NAME   : column_ndx
