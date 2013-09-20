@@ -50,13 +50,13 @@ CATEGORIES :
       TODO     : soon
 
       NAME     : isValid
-      SUMMARY  : *g_dyn_table_is_valid_summary
-      DESCR    : *g_dyn_table_is_valid_descr
+      SUMMARY  : *g_dyn_table_is_attached_summary
+      DESCR    : *g_dyn_table_is_attached_descr
       RETURN:
         TYPES  : BOOL
-        DESCR  : *g_dyn_table_is_valid_return_descr
+        DESCR  : *g_dyn_table_is_attached_return_descr
       EXAMPLES:
-      - CODE   : ex_objc_dyn_table_is_valid
+      - CODE   : ex_objc_dyn_table_is_attached
         DESCR  :
 
 
