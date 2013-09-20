@@ -173,7 +173,8 @@ CATEGORIES:
         DESCR  : The cursor object. Note that <code>TableName</code> is replaced with the name of your specific table.
 
   - g_typed_table_add:
-      NAME     : "add*"
+      TODO     : OBSOLETE
+      NAME     : "add* {obsolete}"
       SIGNATURE: RowAccesor add(value, ...)
       SUMMARY  : Adds new row containing the specified values.
       DESCR    : |
@@ -191,21 +192,38 @@ CATEGORIES:
         DESCR  :
 
   - g_typed_table_add_empty_row:
-      NAME     : add # should be renamed to addRow to override addRow in dynamic API
-      SUMMARY  : >
+      NAME     : addRow # should be renamed to addRow to override addRow in dynamic API
+      SUMMARY  : Adds an empty row and returns a cursor. You can use the cursor to get or set the values.
+      DESCR    : >
                  This method adds one empty row at the end of the table.
                  Default values (e.g. 0 or "") will be inserted for all the columns in the row.
-      DESCR    : Add an empty row and returns a curser. You can use the curser to set the values.
-      SIGNATURE: -(TableName_Cursor *)add;
+      SIGNATURE: -(TableName_Cursor *)addRow;
       RETURN:
-        TYPES  : TableName_Curser *
-        DESCR  : Returns a typed curser. Note that <code>TableName</code> is replaced with the name of your typed table.
+        TYPES  : TableName_Cursor *
+        DESCR  : Returns a typed cursor. Note that <code>TableName</code> is replaced with the name of your typed table.
       EXAMPLES:
       - CODE   : ex_objc_typed_table_add_empty_row
         DESCR  :
 
+  - g_typed_table_insert_row_at_index:
+      NAME     : insertRow
+      SIGNATURE: -(TableName_Cursor *)insertRow:(size_t)ndx
+      SUMMARY  : Inserts an empty row and returns a cursor. You can use the cursor to get or set the values.
+      DESCR    : >
+                 This method inserts one empty row at the specified index. Default values (e.g. 0 or "") will be 
+                 inserted for all the columns in the row. All existing rows at and above the specified index
+                 will have their index increased by one. 
+      PARAMS:
+      - NAME   : ndx
+        TYPES  : size_t
+        DESCR  : *g_typed_table_insert_position_descr
+      RETURN:
+        TYPES  : TableName_Cursor *
+        DESCR  : Returns a typed cursor. Note that <code>TableName</code> is replaced with the name of your typed table.
+
   - g_typed_table_insert:
-      NAME     : insertAtIndex*
+      TODO     : OBSOLETE
+      NAME     : "insertAtIndex* {obsolete}"
       SIGNATURE: (void)insertAtIndex:(size_t)ndx CName1:(CType1*)value1 CName2:(CType2*)value2 CName3:(CType3*)value3
       SUMMARY  : *g_typed_table_insert_summary
       DESCR    : |

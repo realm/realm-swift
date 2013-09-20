@@ -663,6 +663,25 @@ using namespace std;
                                  , @"com.tightdb.table", 0);
 }
 
+-(BOOL)insertRow:(size_t)ndx 
+{   
+    return [self insertRow:ndx error:nil];
+}
+
+-(BOOL)insertRow:(size_t)ndx error:(NSError *__autoreleasing *)error
+{
+    if (_readOnly) {
+        if (error)
+            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, @"Tried to insert row while readonly.");
+        return NO;
+    }
+
+    TIGHTDB_EXCEPTION_ERRHANDLER(
+                                 _table->insert_empty_row(ndx);
+                                 , @"com.tightdb.table", 0);
+    return YES;
+}
+
 -(BOOL)clear
 {
     return [self clearWithError:nil];
