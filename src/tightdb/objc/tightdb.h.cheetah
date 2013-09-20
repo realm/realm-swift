@@ -101,6 +101,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 -(TableName##_Cursor *)addRow; \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)cursorAtLastIndex; \
+-(TableName##_Cursor *)insertRow:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
@@ -271,6 +272,11 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 -(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
+} \
+-(TableName##_Cursor *)insertRow:(size_t)ndx \
+{ \
+    [super insertRow:ndx]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \
 { \

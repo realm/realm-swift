@@ -133,6 +133,9 @@
 -(BOOL)removeLast;
 -(BOOL)removeLastWithError:(NSError *__autoreleasing *)error;
 
+-(BOOL)insertRow:(size_t)ndx;
+-(BOOL)insertRow:(size_t)ndx error:(NSError *__autoreleasing *)error;
+
 // Adaptive ints.
 -(int64_t)get:(size_t)colNdx ndx:(size_t)ndx;
 -(BOOL)set:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;

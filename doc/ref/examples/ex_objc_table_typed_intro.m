@@ -20,29 +20,6 @@ int main()
 
         PeopleTable *table = [[PeopleTable alloc] init];
         
-        // Adds rows to the table.
-        
-        //[table addName:@"Mary" Age:99];  // this method will be made obsolete.
-        //[table addName:@"Joe" Age:17];   // this method will be made obsolete.
-        //[table addName:@"Jack" Age:22];  // this method will be made obsolete.
-        //[table addName:@"Sam" Age:34];   // this method will be made obsolete.
-        //[table addName:@"Bob" Age:10];   // this method will be made obsolete.
-        
-        // Get the number of rows in the table.
-        
-        //NSLog(@"The size of the table is %zd", [table count]);
-        
-        // Insert row at an index.
-
-        //[table insertAtIndex:2 Name:@"Brian" Age:20];   // this method will be made obsolete.
-        
-        // Get first row matching an input column value. Notice the method
-        // is accessed on a specific column, not on the table.
-        
-        // NSLog(@"Found match in row %zd", [table.Age find:22]);
-        
-        // Populate the table using a typed curser.
-        
         PeopleTable_Cursor *curser = [table addRow];
         curser.Name = @"Brian"; curser.Age = 10;
         
@@ -56,11 +33,18 @@ int main()
             
         }
         
+        NSLog(@"Let's insert a new row");
         
-
-        
-    }
+        curser = [table insertRow:1];
+        curser.Name = @"Sam"; curser.Age = 30;
     
+        for (PeopleTable_Cursor *ite in table) {
+            NSLog(@"Name: %@ Age: %lli", ite.Name, ite.Age);
+        
+        }
+    
+    
+    }
 }
  
 
