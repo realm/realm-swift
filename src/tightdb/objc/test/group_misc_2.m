@@ -116,7 +116,7 @@ TIGHTDB_TABLE_2(QueryTable,
 //    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
     NSLog(@"Disktable size: %zu", [diskTable count]);
     for (size_t i = 0; i < [diskTable count]; i++) {
-        MyTable_Cursor *cursor = [diskTable objectAtIndex:i];
+        MyTable_Cursor *cursor = [diskTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, [cursor Name]);
         NSLog(@"%zu: %@", i, cursor.Name);
         NSLog(@"%zu: %@", i, [diskTable getString:0 ndx:i]);

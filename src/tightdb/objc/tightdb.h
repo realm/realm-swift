@@ -56,12 +56,12 @@ TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 -(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_1(TableName, CName1, CType1) \
@@ -176,15 +176,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -226,7 +226,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \
@@ -263,12 +263,12 @@ TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 -(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_2(TableName, CName1, CType1, CName2, CType2) \
@@ -394,15 +394,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -446,7 +446,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \
@@ -487,12 +487,12 @@ TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
 -(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_3(TableName, CName1, CType1, CName2, CType2, CName3, CType3) \
@@ -629,15 +629,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -683,7 +683,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \
@@ -728,12 +728,12 @@ TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
 -(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_4(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4) \
@@ -881,15 +881,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -937,7 +937,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \
@@ -986,12 +986,12 @@ TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
 -(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_5(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5) \
@@ -1150,15 +1150,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -1208,7 +1208,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \
@@ -1261,12 +1261,12 @@ TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
 -(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_6(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6) \
@@ -1436,15 +1436,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -1496,7 +1496,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \
@@ -1553,12 +1553,12 @@ TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
 -(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_7(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7) \
@@ -1739,15 +1739,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -1801,7 +1801,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \
@@ -1862,12 +1862,12 @@ TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
 -(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_8(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8) \
@@ -2059,15 +2059,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -2123,7 +2123,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \
@@ -2188,12 +2188,12 @@ TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
 -(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_9(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9) \
@@ -2396,15 +2396,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -2462,7 +2462,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \
@@ -2531,12 +2531,12 @@ TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
 -(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_10(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10) \
@@ -2750,15 +2750,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -2818,7 +2818,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \
@@ -2891,12 +2891,12 @@ TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
 -(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_11(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11) \
@@ -3121,15 +3121,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -3191,7 +3191,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \
@@ -3268,12 +3268,12 @@ TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
 -(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_12(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12) \
@@ -3509,15 +3509,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -3581,7 +3581,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \
@@ -3662,12 +3662,12 @@ TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
 -(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_13(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13) \
@@ -3914,15 +3914,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -3988,7 +3988,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \
@@ -4073,12 +4073,12 @@ TIGHTDB_COLUMN_PROXY_DEF(CName14, CType14) \
 -(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_14(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14) \
@@ -4336,15 +4336,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -4412,7 +4412,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \
@@ -4501,12 +4501,12 @@ TIGHTDB_COLUMN_PROXY_DEF(CName15, CType15) \
 -(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15 error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_15(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14, CName15, CType15) \
@@ -4775,15 +4775,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
@@ -4853,7 +4853,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \

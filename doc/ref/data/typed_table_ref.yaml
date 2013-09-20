@@ -149,31 +149,31 @@ CATEGORIES:
 # TODO: g_typed_table_back
 # TODO: g_typed_table_back_const:
 
-  - g_typed_table_object_at_index:
-      NAME     : objectAtIndex
-      SUMMARY  : Returns a typed curser at a specified row number.
-      DESCR    : &g_typed_table_object_at_index_descr
+  - g_typed_table_cursor_at_index:
+      NAME     : cursorAtIndex
+      SUMMARY  : Returns a typed cursor at a specified row number.
+      DESCR    : &g_typed_table_cursor_at_index_descr
                  Use the curser to get or set the row values.
-      SIGNATURE: "- (TableName_Cursor *)objectAtIndex:(size_t)ndx"
+      SIGNATURE: "- (TableName_Cursor *)cursorAtIndex:(size_t)ndx"
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
         DESCR  : The row number.
       RETURN:
-        TYPES  : TableName_Curser
-        DESCR  : The curser object. Note that <code>TableName</code> is replaced with the name of your specific table.
+        TYPES  : TableName_Cursor *
+        DESCR  : The cursor object. Note that <code>TableName</code> is replaced with the name of your specific table.
 
-  - g_typed_table_last_object:
-      NAME     : lastObject
+  - g_typed_table_cursor_at_last_index:
+      NAME     : cursorAtLastIndex
       SUMMARY  : Returns a typed curser at highest row number.
-      DESCR    : *g_typed_table_object_at_index_descr
-      SIGNATURE: "- (TableName_Cursor *)lastObject"
+      DESCR    : *g_typed_table_cursor_at_index_descr
+      SIGNATURE: "- (TableName_Cursor *)cursorAtLastIndex"
       RETURN:
-        TYPES  : TableName_Curser
-        DESCR  : The curser object. Note that <code>TableName</code> is replaced with the name of your specific table.
+        TYPES  : TableName_Cursor *
+        DESCR  : The cursor object. Note that <code>TableName</code> is replaced with the name of your specific table.
 
   - g_typed_table_add:
-      NAME     : "add..."
+      NAME     : "add*"
       SIGNATURE: RowAccesor add(value, ...)
       SUMMARY  : Adds new row containing the specified values.
       DESCR    : |
@@ -205,7 +205,7 @@ CATEGORIES:
         DESCR  :
 
   - g_typed_table_insert:
-      NAME     : insertAtIndex...
+      NAME     : insertAtIndex*
       SIGNATURE: (void)insertAtIndex:(size_t)ndx CName1:(CType1*)value1 CName2:(CType2*)value2 CName3:(CType3*)value3
       SUMMARY  : *g_typed_table_insert_summary
       DESCR    : |

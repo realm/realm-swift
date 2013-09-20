@@ -88,8 +88,8 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     [table addBoolCol:YES  IntCol:506      FloatCol:7.7     DoubleCol:8.8       StringCol:@"banach"
             BinaryCol:bin2 DateCol:timeNow TableCol:subtab2 MixedCol:mixSubtab];
 
-    TestTableAllTypes_Cursor *row1 = [table objectAtIndex:0];
-    TestTableAllTypes_Cursor *row2 = [table objectAtIndex:1];
+    TestTableAllTypes_Cursor *row1 = [table cursorAtIndex:0];
+    TestTableAllTypes_Cursor *row2 = [table cursorAtIndex:1];
 
     STAssertEquals(row1.BoolCol, NO,                 @"row1.BoolCol");
     STAssertEquals(row2.BoolCol, YES,                @"row2.BoolCol");

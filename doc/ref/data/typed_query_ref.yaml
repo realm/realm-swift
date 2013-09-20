@@ -197,7 +197,7 @@ CATEGORIES :
   - g_typed_query_between_double:
   - g_typed_query_between_date:
       NAMES    : ["columnIsBetween:and_:", "columnIsBetween:and_:", "columnIsBetween:and_:", "columnIsBetween:and_:"]
-      TITLE    : "*columnIsBetween:and_:"
+      TITLE    : "*columnIsBetween"
       SIGNATURE: |
                  .CName (TableName_Query *)columnIsBetween:(int64_t)from and_:(int64_t)to
                  .CName (TableName_Query *)columnIsBetween:(float)from and_:(float)to
