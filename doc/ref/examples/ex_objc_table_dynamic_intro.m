@@ -39,8 +39,6 @@ int main()
         [table set:AGE ndx:3 value:4];
         [table set:AGE ndx:4 value:5];
         
-        
-        
         // Print the table contents.
         
         for(int row = 0; row<[table count]; row++) {
