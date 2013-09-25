@@ -38,13 +38,48 @@ int main()
         [table set:AGE ndx:2 value:3];
         [table set:AGE ndx:3 value:4];
         [table set:AGE ndx:4 value:5];
+    
+        // Insert using a cursor.
+
+        TightdbCursor *c;
+
+        c = [table addRowWithCursor];
         
-        // Print the table contents.
+            [c setInt:34 inColumn:AGE];
+            [c setString:@"Steve" inColumn:NAME];
         
-        for(int row = 0; row<[table count]; row++) {
-            NSLog(@"Name: %@",[table getString:NAME ndx:row]);
-            NSLog(@"Age: %lld",[table get:AGE ndx:row]);
+        c = [table addRowWithCursor];
+        
+            [c setInt:100 inColumn:AGE];
+            [c setString:@"Nick" inColumn:NAME];
+        
+        c = [table insertRowWithCursor:3];
+        
+            [c setInt:21 inColumn:AGE];
+            [c setString:@"Hello I'm INSERTED" inColumn:NAME];
+
+        for (TightdbCursor *ite in table) {
+            
+            NSLog(@"Name: %@ Age: %lld", [ite getStringInColumn:NAME], [ite getIntInColumn:AGE]);
+        
         }
+        
+        NSLog(@"--------");
+        
+        c = [table cursorAtIndex:3];
+        
+            [c setString:@"Now I'm UPDATED" inColumn:NAME];
+        
+        c = [table cursorAtLastIndex];
+        
+            [c setString:@"I'm UPDATED" inColumn:NAME];
+        
+        for (TightdbCursor *ite in table) {
+            
+            NSLog(@"Name: %@ Age: %lld", [ite getStringInColumn:NAME], [ite getIntInColumn:AGE]);
+            
+        }
+        
     }
 }
 

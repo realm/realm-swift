@@ -46,7 +46,7 @@ int main()
         // Set up a query to search for employees.
         
         TightdbQuery *q =  [[[table where] column: AGE   isBetweenInt:0 and_:60]
-                            column: HIRED isEqualToBool:YES];
+                                           column: HIRED isEqualToBool:YES];
         
         // Execute the query.
         
@@ -56,9 +56,18 @@ int main()
         
         for (int i = 0; i < [view count]; i++) {
             NSLog(@"name: %@",[view getString:NAME ndx:i]);
-            
         }
+        
+        for (TightdbCursor *ite in view) {
+            NSLog(@"name: %@",[ite getStringInColumn:NAME]);
+        }
+
+        // Take a curser at index one in the view.
+        // Note: the index of this row is different in the underlaying table.
+
+        TightdbCursor *c = [view cursorAtIndex:0];
+        NSLog(@"name: %@",[c getStringInColumn:NAME]);
+
     }
 }
-
 // @@EndExample@@

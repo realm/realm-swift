@@ -25,6 +25,7 @@
 @class TightdbTable;
 @class TightdbView;
 @class TightdbQuery;
+@class TightdbCursor;
 
 
 @interface TightdbBinary: NSObject
@@ -76,7 +77,7 @@
 @end
 
 
-@interface TightdbTable: NSObject
+@interface TightdbTable: NSObject <NSFastEnumeration>
 -(BOOL)updateFromSpec;
 -(BOOL)updateFromSpecWithError:(NSError *__autoreleasing *)error;
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
@@ -122,6 +123,7 @@
 -(TightdbSpec *)getSpecWithError:(NSError *__autoreleasing *)error;
 -(BOOL)isEmpty;
 -(size_t)count;
+-(TightdbCursor *)addRowWithCursor;
 -(size_t)addRow;
 -(size_t)addRowWithError:(NSError *__autoreleasing *)error;
 -(size_t)addRows:(size_t)rowCount;
@@ -132,6 +134,12 @@
 -(BOOL)remove:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(BOOL)removeLast;
 -(BOOL)removeLastWithError:(NSError *__autoreleasing *)error;
+
+
+-(TightdbCursor *)cursorAtIndex:(size_t)ndx;
+-(TightdbCursor *)cursorAtLastIndex;
+
+-(TightdbCursor *)insertRowWithCursor:(size_t)ndx;
 
 -(BOOL)insertRow:(size_t)ndx;
 -(BOOL)insertRow:(size_t)ndx error:(NSError *__autoreleasing *)error;
@@ -260,9 +268,11 @@
 @end
 
 
-@interface TightdbView: NSObject
+@interface TightdbView: NSObject <NSFastEnumeration>
 -(id)initFromQuery:(TightdbQuery *)query;
 +(TightdbView *)tableViewWithTable:(TightdbTable *)table;
+
+-(TightdbCursor *)cursorAtIndex:(size_t)ndx;
 
 -(size_t)count;
 -(BOOL)isEmpty;

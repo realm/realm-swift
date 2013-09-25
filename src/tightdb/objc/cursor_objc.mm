@@ -41,6 +41,112 @@ using namespace std;
 #endif
     _table = nil;
 }
+
+-(int64_t)getIntInColumn:(size_t)colNdx
+{
+    return [_table get:colNdx ndx:_ndx];
+}
+
+-(NSString *)getStringInColumn:(size_t)colNdx
+{
+    return [_table getString:colNdx ndx:_ndx];
+}
+
+-(BOOL)getBoolInColumn:(size_t)colNdx
+{
+    return [_table getBool:colNdx ndx:_ndx];
+}
+
+-(float)getFloatInColumn:(size_t)colNdx
+{
+    return [_table getFloat:colNdx ndx:_ndx];
+}
+
+-(double)getDoubleInColumn:(size_t)colNdx
+{
+    return [_table getDouble:colNdx ndx:_ndx];
+}
+
+-(TightdbBinary *)getBinaryInColumn:(size_t)colNdx
+{
+    return [_table getBinary:colNdx ndx:_ndx];
+}
+
+-(TightdbMixed *)getMixedInColumn:(size_t)colNdx
+{
+    return [_table getMixed:colNdx ndx:_ndx];
+}
+
+-(BOOL)setInt:(int64_t)value inColumn:(size_t)colNdx
+{
+    return [self setInt:value inColumn:colNdx error:nil];
+}
+
+-(BOOL)setInt:(int64_t)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error 
+{
+    return [_table set:colNdx ndx:_ndx value:value error:error];
+}
+
+-(BOOL)setString:(NSString *)value inColumn:(size_t)colNdx
+{
+    return [self setString:value inColumn:colNdx error:nil];
+}
+
+-(BOOL)setString:(NSString *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error 
+{
+    return [_table setString:colNdx ndx:_ndx value:value error:error];
+}
+
+-(BOOL)setBool:(BOOL)value inColumn:(size_t)colNdx
+{
+    return [self setBool:value inColumn:colNdx error:nil];
+}
+
+-(BOOL)setBool:(BOOL)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error 
+{
+    return [_table setBool:colNdx ndx:_ndx value:value error:error];
+}
+
+-(BOOL)setFloat:(float)value inColumn:(size_t)colNdx
+{
+    return [self setFloat:value inColumn:colNdx error:nil];
+}
+
+-(BOOL)setFloat:(float)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error 
+{
+    return [_table setFloat:colNdx ndx:_ndx value:value error:error];
+}
+
+-(BOOL)setDouble:(double)value inColumn:(size_t)colNdx
+{
+    return [self setDouble:value inColumn:colNdx error:nil];
+}
+
+-(BOOL)setDouble:(double)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error 
+{
+    return [_table setDouble:colNdx ndx:_ndx value:value error:error];
+}
+
+-(BOOL)setBinary:(TightdbBinary *)value inColumn:(size_t)colNdx
+{
+    return [self setBinary:value inColumn:colNdx error:nil];
+}
+
+-(BOOL)setBinary:(TightdbBinary *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error 
+{
+    return [_table setBinary:colNdx ndx:_ndx value:value error:error];
+}
+
+-(BOOL)setMixed:(TightdbMixed *)value inColumn:(size_t)colNdx
+{
+    return [self setMixed:value inColumn:colNdx error:nil];
+}
+
+-(BOOL)setMixed:(TightdbMixed *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error 
+{
+    return [_table setMixed:colNdx ndx:_ndx value:value error:error];
+}
+
 @end
 
 

@@ -327,6 +327,7 @@ using namespace std;
 @implementation TightdbView
 {
     TightdbTable *_table;
+    TightdbCursor *tmpCursor;
 }
 @synthesize tableView = _tableView;
 
@@ -340,6 +341,7 @@ using namespace std;
     }
     return self;
 }
+
 
 -(TightdbTable *)getTable
 {
@@ -368,6 +370,11 @@ using namespace std;
 #endif
     _table = nil;
     delete _tableView;
+}
+
+-(TightdbCursor *)cursorAtIndex:(size_t)ndx 
+{
+    return [[TightdbCursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; 
 }
 
 -(size_t)count
@@ -409,7 +416,7 @@ using namespace std;
 
 -(TightdbCursor *)getCursor
 {
-    return nil; // Has to be overridden in tightdb.h
+    return tmpCursor = [[TightdbCursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len
@@ -441,6 +448,8 @@ using namespace std;
 {
     id _parent;
     BOOL _readOnly;
+
+    TightdbCursor *tmpCursor;
 }
 @synthesize table = _table;
 
@@ -480,11 +489,17 @@ using namespace std;
 
 -(TightdbCursor *)getCursor
 {
-    return nil; // Has to be overridden in tightdb.h
+    // TODO: Explain tmpCurser. It was introduced by Thomas. Never used directly in the code.
+    //       If omitted, iteration will only work the first time. The cuase is not known at the time of writing.
+
+    return tmpCursor = [[TightdbCursor alloc] initWithTable:self ndx:0];
 }
 -(void)clearCursor
 {
     // Dummy - must be overridden in tightdb.h
+
+    // TODO: This method was never overridden in tightdh.h. Presumably above comment is made by Thomas.
+    //       Clarify if we need the method.
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len
@@ -630,6 +645,11 @@ using namespace std;
     return _table->size();
 }
 
+-(TightdbCursor *)addRowWithCursor
+{
+    return [[TightdbCursor alloc] initWithTable:self ndx:[self addRow]];
+}
+
 -(size_t)addRow
 {
     return [self addRowWithError:nil];
@@ -661,6 +681,22 @@ using namespace std;
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return _table->add_empty_row(rowCount);
                                  , @"com.tightdb.table", 0);
+}
+
+-(TightdbCursor *)cursorAtIndex:(size_t)ndx 
+{
+    return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
+}
+
+-(TightdbCursor *)cursorAtLastIndex 
+{
+    return [[TightdbCursor alloc] initWithTable:self ndx:[self count]-1];
+}
+
+-(TightdbCursor *)insertRowWithCursor:(size_t)ndx
+{
+    [self insertRow:ndx];
+    return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
 }
 
 -(BOOL)insertRow:(size_t)ndx 

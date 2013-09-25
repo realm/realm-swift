@@ -55,10 +55,13 @@ int main()
         // Print the names.
         
         for (int i = 0; i < [view count]; i++) {
+            
             NSLog(@"name: %@",[view getString:NAME ndx:i]);
             
         }
-
+        
+        NSLog(@"--------");
+        
     }
 }
 
