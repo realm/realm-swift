@@ -35,6 +35,8 @@ using namespace std;
 {
     tightdb::Query *_query;
     __weak TightdbTable *_table;
+
+    TightdbCursor *tmpCursor;
 }
 
 -(id)initWithTable:(TightdbTable *)table
@@ -56,18 +58,18 @@ using namespace std;
 
 -(TightdbCursor *)getCursor:(long)ndx
 {
-    (void)ndx;
-    return nil; // Must be overridden in TightDb.h
+
+    return tmpCursor = [[TightdbCursor alloc] initWithTable:[self getTable] ndx:ndx];
 }
 
 -(long)getFastEnumStart
 {
-    return 0; // Must be overridden in TightDb.h
+    return [self findNext:-1];
 }
+
 -(long)incrementFastEnum:(long)ndx
 {
-    (void)ndx;
-    return ndx; // Must be overridden in TightDb.h
+    return [self findNext:ndx];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len

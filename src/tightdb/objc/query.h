@@ -28,7 +28,7 @@
 @class TightdbView;
 
 
-@interface TightdbQuery: NSObject
+@interface TightdbQuery: NSObject <NSFastEnumeration>
 -(id)initWithTable:(TightdbTable *)table;
 -(id)initWithTable:(TightdbTable *)table error:(NSError *__autoreleasing *)error;
 -(TightdbTable *)getTable;

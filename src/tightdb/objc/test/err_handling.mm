@@ -130,7 +130,8 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
     } else {
-        STFail(@"Since file cannot be opened, we should have gotten an error here.");
+        // This is no longer an error, becuase read/write mode is no longer required per default.
+        // STFail(@"Since file cannot be opened, we should have gotten an error here.");
     }
 
     //------------------------------------------------------

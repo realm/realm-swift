@@ -8,6 +8,12 @@ TIGHTDB_TABLE_2(PeopleTable,
                 Name, String,
                 Age, Int)
 
+
+TIGHTDB_TABLE_3(PeopleErrTable,
+                     Name,  String,
+                     Age,   Int,
+                     Hired, Bool)
+
 int main()
 {
     @autoreleasepool {
@@ -35,8 +41,7 @@ int main()
         
         [group write:@"filename2.tightdb"];
         
-        // Retrieves a in memory buffer from the group and uses it to create an
-        // NSData object.
+        // Retrieves an in memory buffer from the group.
 
         size_t size;
         const char *buffer = [group writeToMem:&size];
@@ -45,12 +50,9 @@ int main()
         
         free((char*)buffer);
         
-       
         
     }
-    
 }
-        
 
 
 

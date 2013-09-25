@@ -27,6 +27,30 @@
 @interface TightdbCursor: NSObject
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx;
 -(void)setNdx:(size_t)ndx;
+
+-(BOOL)setInt:(int64_t)value inColumn:(size_t)colNdx;
+-(BOOL)setInt:(int64_t)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(BOOL)setString:(NSString *)value inColumn:(size_t)colNdx;
+-(BOOL)setString:(NSString *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(BOOL)setBool:(BOOL)value inColumn:(size_t)colNdx;
+-(BOOL)setBool:(BOOL)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(BOOL)setFloat:(float)value inColumn:(size_t)colNdx;
+-(BOOL)setFloat:(float)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(BOOL)setDouble:(double)value inColumn:(size_t)colNdx;
+-(BOOL)setDouble:(double)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(BOOL)setBinary:(TightdbBinary *)value inColumn:(size_t)colNdx;
+-(BOOL)setBinary:(TightdbBinary *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(BOOL)setMixed:(TightdbMixed *)value inColumn:(size_t)colNdx;
+-(BOOL)setMixed:(TightdbMixed *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+
+-(int64_t)getIntInColumn:(size_t)colNdx;
+-(NSString *)getStringInColumn:(size_t)colNdx;
+-(BOOL)getBoolInColumn:(size_t)colNdx;
+-(float)getFloatInColumn:(size_t)colNdx;
+-(double)getDoubleInColumn:(size_t)colNdx;
+-(TightdbBinary *)getBinaryInColumn:(size_t)colNdx;
+-(TightdbMixed *)getMixedInColumn:(size_t)colNdx;
+
 @end
 
 

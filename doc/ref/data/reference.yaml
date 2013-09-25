@@ -3,6 +3,12 @@
 #
 ID        : objc
 TITLE     : 'Objective-C'
+STATUS:
+  CODE    : Experimental
+  DESCR   : >
+            The Objective-C interface provides most of the functionality found in the
+            core (C++) library. But the interface has not been tested as thoroughly
+            as the core library, and it should be used with caution.
 DESCR     : >
             The goal of TightDB is to provide a high performance
             data storage for your applications. 
