@@ -105,7 +105,7 @@ CATEGORIES :
 
       NAME     : getColumnType
       SUMMARY  : *g_dyn_table_get_column_type_summary
-      DESCR    : *g_dyn_table_get_column_type_descr
+      DESCR    : Gets the column type. #*g_dyn_table_get_column_type_descr
       CONST    : True
       PARAMS:
       - NAME   : column_ndx
