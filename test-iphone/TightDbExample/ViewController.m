@@ -106,16 +106,18 @@ TIGHTDB_TABLE_2(MyTable2,
     [table2 addHired:YES Age:54];
 
     // Create query (current employees between 20 and 30 years old)
-    MyTable2_Query *q = [[[table2 where].Hired equal:YES].Age between:20 to:30];
+    MyTable2_Query *q = [[[table2 where].Hired columnIsEqualTo:YES]
+                                        .Age   columnIsBetween:20 and_:30];
 
     // Get number of matching entries
-    NSLog(@"Query count: %zu", [q count]);
-    [_utils Eval:[q count] == 2 msg:@"Expected 2 rows in query"];
+    NSLog(@"Query count: %@", [q count]);
+    [_utils Eval:[[q count] intValue] == 2 msg:@"Expected 2 rows in query"];
 
+    
     // Get the average age - currently only a low-level interface!
-    double avg = [q.Age avg];
-    NSLog(@"Average: %f", avg);
-    [_utils Eval:avg == 21.0 msg:@"Expected 20.5 average"];
+    NSNumber *avg = [q.Age avg];
+    NSLog(@"Average: %i", [avg intValue]);
+    [_utils Eval:[avg intValue]== 21.0 msg:@"Expected 20.5 average"];
 
     // Execute the query and return a table (view)
     TightdbView *res = [q findAll];
@@ -137,7 +139,7 @@ TIGHTDB_TABLE_2(MyTable2,
     [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
     NSLog(@"Disktable size: %zu", [diskTable count]);
     for (size_t i = 0; i < [diskTable count]; i++) {
-        MyTable_Cursor *cursor = [diskTable objectAtIndex:i];
+        MyTable_Cursor *cursor = [diskTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, [cursor Name]);
         NSLog(@"%zu: %@", i, cursor.Name);
         NSLog(@"%zu: %@", i, [diskTable getString:0 ndx:i]);
@@ -162,7 +164,7 @@ TIGHTDB_TABLE_2(MyTable2,
     }
 
     // Do a query, and get all matches as TableView
-    MyTable_View *v = [[[[diskTable where].Hired equal:YES].Age between:20 to:30] findAll];
+    MyTable_View *v = [[[[diskTable where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30] findAll];
     NSLog(@"View count: %zu", [v count]);
     // 2: Iterate over the resulting TableView
     for (MyTable_Cursor *row in v) {
@@ -171,12 +173,11 @@ TIGHTDB_TABLE_2(MyTable2,
 
     // 3: Iterate over query (lazy)
 
-    MyTable_Query *qe = [[diskTable where].Age equal:21];
-    NSLog(@"Query lazy count: %zu", [qe count]);
+    MyTable_Query *qe = [[diskTable where].Age columnIsEqualTo:21];
+    NSLog(@"Query lazy count: %u", [[qe count] intValue]);
     for (MyTable_Cursor *row in qe) {
         NSLog(@"%@ is %lld years old.", row.Name, row.Age);
     }
-
 
 }
 
