@@ -55,7 +55,7 @@ CATEGORIES :
         TYPES  : BOOL
         DESCR  : *g_dyn_table_is_attached_return_descr
       EXAMPLES:
-      - CODE   : ex_objc_dyn_table_is_valid
+      - CODE   : ex_objc_dyn_table_is_attached
         DESCR  :
 
 
@@ -170,9 +170,9 @@ CATEGORIES :
   - g_dyn_table_get_column_type:
       NAME     : getColumnType
       SUMMARY  : *g_dyn_table_get_column_type_summary
-      DESCR    : >
-                 This method returns the type of a column using the column index. Currently,
-                 the following types are supported:
+      DESCR    :
+      - TEXT   : *g_dyn_table_get_column_type_descr1
+      - TEXT   : >
                  <ul>
                    <li><code>tightdb_Bool</code></li>
                    <li><code>tightdb_Int</code></li>
