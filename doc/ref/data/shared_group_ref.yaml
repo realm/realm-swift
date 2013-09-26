@@ -22,7 +22,7 @@ CATEGORIES:
       PARAMS:
       - NAME   : filename
         TYPES  : NSString
-        DESCR  : *g_shared_group_constructor_parm1_descr
+        DESCR  : TBD #*g_shared_group_constructor_parm1_descr
       RETURN:
         TYPES  : TightdbSharedGroup
         DESCR  : *g_shared_group_constructor_return1_descr
