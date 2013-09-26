@@ -1,0 +1,556 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E918909D177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
+		E91890AF177B677900653D7A /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E91890AE177B677900653D7A /* SenTestingKit.framework */; };
+		E91890B0177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
+		E91890B3177B677900653D7A /* TightDbObjcDyn.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E9189099177B677900653D7A /* TightDbObjcDyn.dylib */; };
+		E91890B9177B677900653D7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E91890B7177B677900653D7A /* InfoPlist.strings */; };
+		E91890D6177B67AB00653D7A /* cursor_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C5177B67AB00653D7A /* cursor_objc.mm */; };
+		E91890D7177B67AB00653D7A /* cursor.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890C6177B67AB00653D7A /* cursor.h */; };
+		E91890D8177B67AB00653D7A /* group_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C7177B67AB00653D7A /* group_objc.mm */; };
+		E91890D9177B67AB00653D7A /* group_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890C8177B67AB00653D7A /* group_priv.h */; };
+		E91890DA177B67AB00653D7A /* group_shared_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C9177B67AB00653D7A /* group_shared_objc.mm */; };
+		E91890DB177B67AB00653D7A /* group_shared.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CA177B67AB00653D7A /* group_shared.h */; };
+		E91890DC177B67AB00653D7A /* group.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CB177B67AB00653D7A /* group.h */; };
+		E91890DD177B67AB00653D7A /* helper_macros.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CC177B67AB00653D7A /* helper_macros.h */; };
+		E91890DE177B67AB00653D7A /* query_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890CD177B67AB00653D7A /* query_objc.mm */; };
+		E91890DF177B67AB00653D7A /* query_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CE177B67AB00653D7A /* query_priv.h */; };
+		E91890E0177B67AB00653D7A /* query.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CF177B67AB00653D7A /* query.h */; };
+		E91890E1177B67AB00653D7A /* table_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890D0177B67AB00653D7A /* table_objc.mm */; };
+		E91890E2177B67AB00653D7A /* table_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D1177B67AB00653D7A /* table_priv.h */; };
+		E91890E3177B67AB00653D7A /* table.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D2177B67AB00653D7A /* table.h */; };
+		E91890E4177B67AB00653D7A /* tightdb.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D3177B67AB00653D7A /* tightdb.h */; };
+		E91890E5177B67AB00653D7A /* type.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D4177B67AB00653D7A /* type.h */; };
+		E91890E6177B67AB00653D7A /* util.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E91890D5177B67AB00653D7A /* util.hpp */; };
+		E91890F5177B71E400653D7A /* data_type.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890E7177B71E400653D7A /* data_type.mm */; };
+		E91890F6177B71E400653D7A /* enumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890E8177B71E400653D7A /* enumerator.m */; };
+		E91890F7177B71E400653D7A /* err_handling.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890E9177B71E400653D7A /* err_handling.mm */; };
+		E91890F8177B71E400653D7A /* get_subtable.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890EA177B71E400653D7A /* get_subtable.m */; };
+		E91890F9177B71E400653D7A /* group_misc_2.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890EB177B71E400653D7A /* group_misc_2.m */; };
+		E91890FA177B71E400653D7A /* group.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890EC177B71E400653D7A /* group.m */; };
+		E91890FB177B71E400653D7A /* mixed.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890ED177B71E400653D7A /* mixed.m */; };
+		E91890FC177B71E400653D7A /* query.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890EE177B71E400653D7A /* query.m */; };
+		E91890FD177B71E400653D7A /* shared_group.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890EF177B71E400653D7A /* shared_group.m */; };
+		E91890FE177B71E400653D7A /* subtable.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F0177B71E400653D7A /* subtable.m */; };
+		E91890FF177B71E400653D7A /* table_delete_all.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F1177B71E400653D7A /* table_delete_all.m */; };
+		E9189100177B71E400653D7A /* table.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F2177B71E400653D7A /* table.m */; };
+		E9189101177B71E400653D7A /* template.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F3177B71E400653D7A /* template.m */; };
+		E9189102177B71E400653D7A /* tutorial.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F4177B71E400653D7A /* tutorial.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E91890B1177B677900653D7A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E9189091177B677900653D7A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E9189098177B677900653D7A;
+			remoteInfo = TightDbObjcDyn;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		E9189099177B677900653D7A /* TightDbObjcDyn.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = TightDbObjcDyn.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		E918909C177B677900653D7A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		E918909F177B677900653D7A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		E91890A0177B677900653D7A /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		E91890A1177B677900653D7A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		E91890A4177B677900653D7A /* TightDbObjcDyn-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TightDbObjcDyn-Prefix.pch"; sourceTree = "<group>"; };
+		E91890AD177B677900653D7A /* TightDbObjcDynTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TightDbObjcDynTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E91890AE177B677900653D7A /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		E91890B6177B677900653D7A /* TightDbObjcDynTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TightDbObjcDynTests-Info.plist"; sourceTree = "<group>"; };
+		E91890B8177B677900653D7A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		E91890C5177B67AB00653D7A /* cursor_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = cursor_objc.mm; path = ../../src/tightdb/objc/cursor_objc.mm; sourceTree = "<group>"; };
+		E91890C6177B67AB00653D7A /* cursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursor.h; path = ../../src/tightdb/objc/cursor.h; sourceTree = "<group>"; };
+		E91890C7177B67AB00653D7A /* group_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = group_objc.mm; path = ../../src/tightdb/objc/group_objc.mm; sourceTree = "<group>"; };
+		E91890C8177B67AB00653D7A /* group_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = group_priv.h; path = ../../src/tightdb/objc/group_priv.h; sourceTree = "<group>"; };
+		E91890C9177B67AB00653D7A /* group_shared_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = group_shared_objc.mm; path = ../../src/tightdb/objc/group_shared_objc.mm; sourceTree = "<group>"; };
+		E91890CA177B67AB00653D7A /* group_shared.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = group_shared.h; path = ../../src/tightdb/objc/group_shared.h; sourceTree = "<group>"; };
+		E91890CB177B67AB00653D7A /* group.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = group.h; path = ../../src/tightdb/objc/group.h; sourceTree = "<group>"; };
+		E91890CC177B67AB00653D7A /* helper_macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = helper_macros.h; path = ../../src/tightdb/objc/helper_macros.h; sourceTree = "<group>"; };
+		E91890CD177B67AB00653D7A /* query_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = query_objc.mm; path = ../../src/tightdb/objc/query_objc.mm; sourceTree = "<group>"; };
+		E91890CE177B67AB00653D7A /* query_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = query_priv.h; path = ../../src/tightdb/objc/query_priv.h; sourceTree = "<group>"; };
+		E91890CF177B67AB00653D7A /* query.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = query.h; path = ../../src/tightdb/objc/query.h; sourceTree = "<group>"; };
+		E91890D0177B67AB00653D7A /* table_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = table_objc.mm; path = ../../src/tightdb/objc/table_objc.mm; sourceTree = "<group>"; };
+		E91890D1177B67AB00653D7A /* table_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = table_priv.h; path = ../../src/tightdb/objc/table_priv.h; sourceTree = "<group>"; };
+		E91890D2177B67AB00653D7A /* table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = table.h; path = ../../src/tightdb/objc/table.h; sourceTree = "<group>"; };
+		E91890D3177B67AB00653D7A /* tightdb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tightdb.h; path = ../../src/tightdb/objc/tightdb.h; sourceTree = "<group>"; };
+		E91890D4177B67AB00653D7A /* type.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = type.h; path = ../../src/tightdb/objc/type.h; sourceTree = "<group>"; };
+		E91890D5177B67AB00653D7A /* util.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = util.hpp; path = ../../src/tightdb/objc/util.hpp; sourceTree = "<group>"; };
+		E91890E7177B71E400653D7A /* data_type.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = data_type.mm; path = ../../src/tightdb/objc/test/data_type.mm; sourceTree = "<group>"; };
+		E91890E8177B71E400653D7A /* enumerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = enumerator.m; path = ../../src/tightdb/objc/test/enumerator.m; sourceTree = "<group>"; };
+		E91890E9177B71E400653D7A /* err_handling.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = err_handling.mm; path = ../../src/tightdb/objc/test/err_handling.mm; sourceTree = "<group>"; };
+		E91890EA177B71E400653D7A /* get_subtable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = get_subtable.m; path = ../../src/tightdb/objc/test/get_subtable.m; sourceTree = "<group>"; };
+		E91890EB177B71E400653D7A /* group_misc_2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = group_misc_2.m; path = ../../src/tightdb/objc/test/group_misc_2.m; sourceTree = "<group>"; };
+		E91890EC177B71E400653D7A /* group.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = group.m; path = ../../src/tightdb/objc/test/group.m; sourceTree = "<group>"; };
+		E91890ED177B71E400653D7A /* mixed.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = mixed.m; path = ../../src/tightdb/objc/test/mixed.m; sourceTree = "<group>"; };
+		E91890EE177B71E400653D7A /* query.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = query.m; path = ../../src/tightdb/objc/test/query.m; sourceTree = "<group>"; };
+		E91890EF177B71E400653D7A /* shared_group.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = shared_group.m; path = ../../src/tightdb/objc/test/shared_group.m; sourceTree = "<group>"; };
+		E91890F0177B71E400653D7A /* subtable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = subtable.m; path = ../../src/tightdb/objc/test/subtable.m; sourceTree = "<group>"; };
+		E91890F1177B71E400653D7A /* table_delete_all.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = table_delete_all.m; path = ../../src/tightdb/objc/test/table_delete_all.m; sourceTree = "<group>"; };
+		E91890F2177B71E400653D7A /* table.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = table.m; path = ../../src/tightdb/objc/test/table.m; sourceTree = "<group>"; };
+		E91890F3177B71E400653D7A /* template.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = template.m; path = ../../src/tightdb/objc/test/template.m; sourceTree = "<group>"; };
+		E91890F4177B71E400653D7A /* tutorial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = tutorial.m; path = ../../src/tightdb/objc/test/tutorial.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E9189096177B677900653D7A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E918909D177B677900653D7A /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E91890A9177B677900653D7A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E91890AF177B677900653D7A /* SenTestingKit.framework in Frameworks */,
+				E91890B0177B677900653D7A /* Cocoa.framework in Frameworks */,
+				E91890B3177B677900653D7A /* TightDbObjcDyn.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E9189090177B677900653D7A = {
+			isa = PBXGroup;
+			children = (
+				E91890A2177B677900653D7A /* TightDbObjcDyn */,
+				E91890B4177B677900653D7A /* TightDbObjcDynTests */,
+				E918909B177B677900653D7A /* Frameworks */,
+				E918909A177B677900653D7A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E918909A177B677900653D7A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E9189099177B677900653D7A /* TightDbObjcDyn.dylib */,
+				E91890AD177B677900653D7A /* TightDbObjcDynTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E918909B177B677900653D7A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E918909C177B677900653D7A /* Cocoa.framework */,
+				E91890AE177B677900653D7A /* SenTestingKit.framework */,
+				E918909E177B677900653D7A /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E918909E177B677900653D7A /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E918909F177B677900653D7A /* AppKit.framework */,
+				E91890A0177B677900653D7A /* CoreData.framework */,
+				E91890A1177B677900653D7A /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		E91890A2177B677900653D7A /* TightDbObjcDyn */ = {
+			isa = PBXGroup;
+			children = (
+				E91890C5177B67AB00653D7A /* cursor_objc.mm */,
+				E91890C6177B67AB00653D7A /* cursor.h */,
+				E91890C7177B67AB00653D7A /* group_objc.mm */,
+				E91890C8177B67AB00653D7A /* group_priv.h */,
+				E91890C9177B67AB00653D7A /* group_shared_objc.mm */,
+				E91890CA177B67AB00653D7A /* group_shared.h */,
+				E91890CB177B67AB00653D7A /* group.h */,
+				E91890CC177B67AB00653D7A /* helper_macros.h */,
+				E91890CD177B67AB00653D7A /* query_objc.mm */,
+				E91890CE177B67AB00653D7A /* query_priv.h */,
+				E91890CF177B67AB00653D7A /* query.h */,
+				E91890D0177B67AB00653D7A /* table_objc.mm */,
+				E91890D1177B67AB00653D7A /* table_priv.h */,
+				E91890D2177B67AB00653D7A /* table.h */,
+				E91890D3177B67AB00653D7A /* tightdb.h */,
+				E91890D4177B67AB00653D7A /* type.h */,
+				E91890D5177B67AB00653D7A /* util.hpp */,
+				E91890A3177B677900653D7A /* Supporting Files */,
+			);
+			path = TightDbObjcDyn;
+			sourceTree = "<group>";
+		};
+		E91890A3177B677900653D7A /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				E91890A4177B677900653D7A /* TightDbObjcDyn-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		E91890B4177B677900653D7A /* TightDbObjcDynTests */ = {
+			isa = PBXGroup;
+			children = (
+				E91890E7177B71E400653D7A /* data_type.mm */,
+				E91890E8177B71E400653D7A /* enumerator.m */,
+				E91890E9177B71E400653D7A /* err_handling.mm */,
+				E91890EA177B71E400653D7A /* get_subtable.m */,
+				E91890EB177B71E400653D7A /* group_misc_2.m */,
+				E91890EC177B71E400653D7A /* group.m */,
+				E91890ED177B71E400653D7A /* mixed.m */,
+				E91890EE177B71E400653D7A /* query.m */,
+				E91890EF177B71E400653D7A /* shared_group.m */,
+				E91890F0177B71E400653D7A /* subtable.m */,
+				E91890F1177B71E400653D7A /* table_delete_all.m */,
+				E91890F2177B71E400653D7A /* table.m */,
+				E91890F3177B71E400653D7A /* template.m */,
+				E91890F4177B71E400653D7A /* tutorial.m */,
+				E91890B5177B677900653D7A /* Supporting Files */,
+			);
+			path = TightDbObjcDynTests;
+			sourceTree = "<group>";
+		};
+		E91890B5177B677900653D7A /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				E91890B6177B677900653D7A /* TightDbObjcDynTests-Info.plist */,
+				E91890B7177B677900653D7A /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		E9189097177B677900653D7A /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E91890D7177B67AB00653D7A /* cursor.h in Headers */,
+				E91890D9177B67AB00653D7A /* group_priv.h in Headers */,
+				E91890DB177B67AB00653D7A /* group_shared.h in Headers */,
+				E91890DC177B67AB00653D7A /* group.h in Headers */,
+				E91890DD177B67AB00653D7A /* helper_macros.h in Headers */,
+				E91890DF177B67AB00653D7A /* query_priv.h in Headers */,
+				E91890E0177B67AB00653D7A /* query.h in Headers */,
+				E91890E2177B67AB00653D7A /* table_priv.h in Headers */,
+				E91890E3177B67AB00653D7A /* table.h in Headers */,
+				E91890E4177B67AB00653D7A /* tightdb.h in Headers */,
+				E91890E5177B67AB00653D7A /* type.h in Headers */,
+				E91890E6177B67AB00653D7A /* util.hpp in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		E9189098177B677900653D7A /* TightDbObjcDyn */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E91890BF177B677900653D7A /* Build configuration list for PBXNativeTarget "TightDbObjcDyn" */;
+			buildPhases = (
+				E9189095177B677900653D7A /* Sources */,
+				E9189096177B677900653D7A /* Frameworks */,
+				E9189097177B677900653D7A /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TightDbObjcDyn;
+			productName = TightDbObjcDyn;
+			productReference = E9189099177B677900653D7A /* TightDbObjcDyn.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+		E91890AC177B677900653D7A /* TightDbObjcDynTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E91890C2177B677900653D7A /* Build configuration list for PBXNativeTarget "TightDbObjcDynTests" */;
+			buildPhases = (
+				E91890A8177B677900653D7A /* Sources */,
+				E91890A9177B677900653D7A /* Frameworks */,
+				E91890AA177B677900653D7A /* Resources */,
+				E91890AB177B677900653D7A /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E91890B2177B677900653D7A /* PBXTargetDependency */,
+			);
+			name = TightDbObjcDynTests;
+			productName = TightDbObjcDynTests;
+			productReference = E91890AD177B677900653D7A /* TightDbObjcDynTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E9189091177B677900653D7A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0460;
+				ORGANIZATIONNAME = "Thomas Andersen";
+			};
+			buildConfigurationList = E9189094177B677900653D7A /* Build configuration list for PBXProject "TightDbObjcDyn" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = E9189090177B677900653D7A;
+			productRefGroup = E918909A177B677900653D7A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E9189098177B677900653D7A /* TightDbObjcDyn */,
+				E91890AC177B677900653D7A /* TightDbObjcDynTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E91890AA177B677900653D7A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E91890B9177B677900653D7A /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		E91890AB177B677900653D7A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E9189095177B677900653D7A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E91890D6177B67AB00653D7A /* cursor_objc.mm in Sources */,
+				E91890D8177B67AB00653D7A /* group_objc.mm in Sources */,
+				E91890DA177B67AB00653D7A /* group_shared_objc.mm in Sources */,
+				E91890DE177B67AB00653D7A /* query_objc.mm in Sources */,
+				E91890E1177B67AB00653D7A /* table_objc.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E91890A8177B677900653D7A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E91890F5177B71E400653D7A /* data_type.mm in Sources */,
+				E91890F6177B71E400653D7A /* enumerator.m in Sources */,
+				E91890F7177B71E400653D7A /* err_handling.mm in Sources */,
+				E91890F8177B71E400653D7A /* get_subtable.m in Sources */,
+				E91890F9177B71E400653D7A /* group_misc_2.m in Sources */,
+				E91890FA177B71E400653D7A /* group.m in Sources */,
+				E91890FB177B71E400653D7A /* mixed.m in Sources */,
+				E91890FC177B71E400653D7A /* query.m in Sources */,
+				E91890FD177B71E400653D7A /* shared_group.m in Sources */,
+				E91890FE177B71E400653D7A /* subtable.m in Sources */,
+				E91890FF177B71E400653D7A /* table_delete_all.m in Sources */,
+				E9189100177B71E400653D7A /* table.m in Sources */,
+				E9189101177B71E400653D7A /* template.m in Sources */,
+				E9189102177B71E400653D7A /* tutorial.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E91890B2177B677900653D7A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E9189098177B677900653D7A /* TightDbObjcDyn */;
+			targetProxy = E91890B1177B677900653D7A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		E91890B7177B677900653D7A /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E91890B8177B677900653D7A /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		E91890BD177B677900653D7A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libstdc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"TIGHTDB_MAX_LIST_SIZE=4",
+					"DEBUG=1",
+					TIGHTDB_DEBUG,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../src,
+					/usr/local/include,
+				);
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-ltightdb-dbg";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		E91890BE177B677900653D7A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libstdc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = "TIGHTDB_MAX_LIST_SIZE=4";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../src,
+					/usr/local/include,
+				);
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				OTHER_LDFLAGS = "-ltightdb";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		E91890C0177B677900653D7A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TightDbObjcDyn/TightDbObjcDyn-Prefix.pch";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		E91890C1177B677900653D7A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = "";
+				DYLIB_CURRENT_VERSION = "";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TightDbObjcDyn/TightDbObjcDyn-Prefix.pch";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		E91890C3177B677900653D7A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TightDbObjcDyn/TightDbObjcDyn-Prefix.pch";
+				INFOPLIST_FILE = "TightDbObjcDynTests/TightDbObjcDynTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		E91890C4177B677900653D7A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TightDbObjcDyn/TightDbObjcDyn-Prefix.pch";
+				INFOPLIST_FILE = "TightDbObjcDynTests/TightDbObjcDynTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E9189094177B677900653D7A /* Build configuration list for PBXProject "TightDbObjcDyn" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E91890BD177B677900653D7A /* Debug */,
+				E91890BE177B677900653D7A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E91890BF177B677900653D7A /* Build configuration list for PBXNativeTarget "TightDbObjcDyn" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E91890C0177B677900653D7A /* Debug */,
+				E91890C1177B677900653D7A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E91890C2177B677900653D7A /* Build configuration list for PBXNativeTarget "TightDbObjcDynTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E91890C3177B677900653D7A /* Debug */,
+				E91890C4177B677900653D7A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E9189091177B677900653D7A /* Project object */;
+}

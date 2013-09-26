@@ -15,10 +15,29 @@ EXAMPLES:
   CODE     : ex_objc_group_intro
 IGNORE     : []                   # List of method-ids to ignore
 CATEGORIES:
+
+
 - Constructors:
   METHODS:
-  - g_mixed_constructor:
-      NAMES    : Mixed*
+  - g_mixed_constructor_bool:
+      NAME     : mixedWithBool
+  - g_mixed_constructor_int:
+      NAME     : mixedWithInt
+  - g_mixed_constructor_float:
+      NAME     : mixedWithFloat
+  - g_mixed_constructor_double:
+      NAME     : mixedWithDouble
+  - g_mixed_constructor_date:
+      NAME     : mixedWithDate
+  - g_mixed_constructor_string:
+      NAME     : mixedWithString
+  - g_mixed_constructor_binary:
+      NAME     : mixedWithBinary
+  - g_mixed_constructor_binary_2:
+      NAME     : mixedWithBinary
+  - g_mixed_constructor_table:
+      NAME     : mixedWithTable
+      TITLE    : mixed*
       SUMMARY  : *g_mixed_constructor_summary
       DESCR    : *g_mixed_constructor_descr
       SIGNATURE: |
@@ -33,11 +52,14 @@ CATEGORIES:
                  (TightdbMixed *)mixedWithTable:(TightdbTable *)value
       PARAMS:
       - NAME   : v
-        TYPES  : [bool, int64_t, float, double, Date, NSString, TightdbBinary, const char*, TightdbTable]
-        DESCR  : The value.
+        TYPES  : [BOOL, int64_t, float, double, Date, NSString, 
+                  TightdbBinary, const char*, TightdbTable]
+        DESCR  : *g_mixed_constructor_parm1_descr
       EXAMPLES:
       - CODE   : ex_objc_mixed_constructor
         DESCR  :
+
+
 - Getters:
   METHODS:
   - g_mixed_get_type:
@@ -45,19 +67,29 @@ CATEGORIES:
       SUMMARY  : *g_mixed_get_type_summary
       DESCR    : *g_mixed_get_type_descr
       SIGNATURE: (TightdbType)getType
-      CONST    : True
       RETURN:
         TYPES  : TightdbType
-        DESCR  : The type.
+        DESCR  : *g_mixed_get_type_return1_descr
       EXAMPLES:
       - CODE   : ex_objc_mixed_get_type
         DESCR  :
+
+
   - g_mixed_get_bool:
+      NAME     : getBool
   - g_mixed_get_int:
+      NAME     : getInt
+  - g_mixed_get_float:
+      NAME     : getFloat
+  - g_mixed_get_double:
+      NAME     : getDouble      
   - g_mixed_get_date:
+      NAME     : getDate
   - g_mixed_get_string:
+      NAME     : getString
   - g_mixed_get_binary:
-      NAMES    : get*
+      NAME     : getBinary
+      TITLE    : get*
       SUMMARY  : *g_mixed_get_value_summary
       DESCR    : *g_mixed_get_value_descr
       SIGNATURE: |
@@ -71,8 +103,9 @@ CATEGORIES:
                  (TightdbTable *)getTable
       CONST    : True
       RETURN:
-        TYPES  : [bool, int64_t, float, double, time_t, NSString, TightdbBinary, TightdbTable]
-        DESCR  : The value.
+        TYPES  : [BOOL, int64_t, float, double, time_t, NSString, 
+                  TightdbBinary, TightdbTable]
+        DESCR  : *g_mixed_get_return1_descr
       EXAMPLES:
       - CODE   : ex_objc_mixed_get_value
         DESCR  :

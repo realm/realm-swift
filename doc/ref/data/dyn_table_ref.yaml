@@ -15,7 +15,7 @@ DESCR      : *g_dyn_table_intro_descr
 SEE        :
 EXAMPLES   :
 - DESCR:
-  CODE     : ex_obcj_dyn_table_intro
+  CODE     : ex_objc_table_dynamic_intro
 IGNORE     : []                   # List of method-ids to ignore
 
 CATEGORIES :
@@ -48,7 +48,6 @@ CATEGORIES :
 
   - g_dyn_table_is_valid:
       TODO     : soon
-
       NAME     : isValid
       SUMMARY  : *g_dyn_table_is_attached_summary
       DESCR    : *g_dyn_table_is_attached_descr
@@ -91,14 +90,13 @@ CATEGORIES :
         DESCR  : *g_dyn_table_operator_eq_table_descr
       RETURN:
         TYPES  : BOOL
-        DESCR  : g_dyn_table_operator_eq_return_descr
+        DESCR  : *g_dyn_table_operator_eq_return_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_operator==
         DESCR  :
 
   - g_dyn_table_opertator!=:
       TODO     : soon    
-
       NAME     : is???Equal
       SUMMARY  : *g_dyn_table_operator_neq_summary
       DESCR    : *g_dyn_table_operator_neq_descr
@@ -109,7 +107,7 @@ CATEGORIES :
         DESCR  : *g_dyn_table_operator_eq_table_descr
       RETURN:
         TYPES  : BOOL
-        DESCR  : g_dyn_table_operator_eq_return_descr
+        DESCR  : *g_dyn_table_operator_eq_return_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_operator==
         DESCR  :
@@ -158,7 +156,6 @@ CATEGORIES :
       SUMMARY  : *g_dyn_table_get_column_index_summary
       DESCR    : *g_dyn_table_get_column_index_descr
       SIGNATURE: (size_t)getColumnIndex:(NSString *)name
-      CONST    : True
       PARAMS:
       - NAME   : name
         TYPES  : NSString *
@@ -507,7 +504,7 @@ CATEGORIES :
       SIGNATURE:
       PARAMS:
       - NAME   : value
-        TYPES  : NSString
+        TYPES  : NSString *
         DESCR  : *g_dyn_table_lookup_parm1_descr
       RETURN:
         TYPES  : size_t
@@ -549,7 +546,7 @@ CATEGORIES :
         TYPES  : size_t
         DESCR  : *g_dyn_table_find_first_xxx_parm1_descr
       - NAME   : value
-        TYPES  : [BOOL, int64_t, float, double, time_t, const char*]
+        TYPES  : [BOOL, int64_t, float, double, time_t, NSString, const char*]
         DESCR  : *g_dyn_table_find_first_xxx_parm2_descr
       RETURN:
         TYPES  : size_t
@@ -583,6 +580,7 @@ CATEGORIES :
   - g_dyn_table_find_all_double:
       TODO     : soon
   - g_dyn_table_find_all_int:
+      TODO     : soon # See FIXME in the code.
       NAMES    : findAll
       TITLE    : findAll*
       SUMMARY  : *g_dyn_table_find_all_xxx_summary
@@ -655,10 +653,8 @@ CATEGORIES :
   - g_dyn_table_where_const:
       IGNORE   : ""
   - g_dyn_table_where:
-      TODO     : later
-      
       NAME     : where
-      SIGNATURE: Query where()
+      SIGNATURE: (TightdbQuery *) where
       SUMMARY  : *g_dyn_table_where_summary
       DESCR    : *g_dyn_table_where_descr
       RETURN:
@@ -738,10 +734,10 @@ CATEGORIES :
       PARAMS:
       - NAME   : col_ndx
         TYPES  : size_t
-        DESCR  : Column index.
+        DESCR  : *g_dyn_table_maximum_parm1_descr
       RETURN:
         TYPES  : [int64_t, float, double]
-        DESCR  : The maximum value.
+        DESCR  : *g_dyn_table_maximum_return_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_maximum
         DESCR  :
@@ -772,6 +768,7 @@ CATEGORIES :
   - g_dyn_table_average_float:
   - g_dyn_table_average_double:
       NAMES    : [avgInt, averageFloat, averageDouble]
+      TITLE    : "avg*"
       SUMMARY  : *g_dyn_table_average_summary
       DESCR    : *g_dyn_table_average_descr
       SIGNATURE: |
