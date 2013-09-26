@@ -2,7 +2,12 @@ source="$1"
 target="$2"
 
 if which cheetah >/dev/null 2>&1; then
-    cheetah fill --stdout "$source" >"$target" || exit 1
+    temp_dir="$(mktemp -d "/tmp/cheetah.XXXXXXXXXX")" || exit 1
+    temp_file="$temp_dir/file"
+    cheetah fill --stdout "$source" >"$temp_file" || exit 1
+    cat "$temp_file" >"$target" || exit 1
+    rm "$temp_file" || exit 1
+    rmdir "$temp_dir" || exit 1
     exit 0
 fi
 
