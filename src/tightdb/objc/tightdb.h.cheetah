@@ -76,7 +76,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName${j+1}, CType${j+1}) \
 %for $j in range($num_cols)
 TIGHTDB_COLUMN_PROXY_DEF(CName${j+1}, CType${j+1}) \
 %end for
--(void)add##%slurp
+-(BOOL)add##%slurp
 %for $j in range($num_cols)
 %if 0 < $j
 %echo ' '
@@ -84,18 +84,27 @@ TIGHTDB_COLUMN_PROXY_DEF(CName${j+1}, CType${j+1}) \
 CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 %end for
 ; \
+-(BOOL)add##%slurp
+%for $j in range($num_cols)
+%if 0 < $j
+%echo ' '
+%end if
+CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
+%end for
+ error:(NSError **)error; \
 -(void)insertAtIndex:(size_t)ndx%slurp
 %for $j in range($num_cols)
  CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 %end for
 ; \
 -(TableName##_Query *)where; \
--(TableName##_Cursor *)add; \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
--(TableName##_Cursor *)lastObject; \
+-(TableName##_Cursor *)addRow; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtLastIndex; \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx; \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_${num_cols}(TableName%slurp
@@ -213,17 +222,29 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName${j+1}, CType${j+1}) \
 %end for
     return self; \
 } \
--(void)add##%slurp
+-(BOOL)add##%slurp
 %for $j in range($num_cols)
 CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 %end for
 \
 { \
+    return [self add##%slurp
+%for $j in range($num_cols)
+CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
+%end for
+error:nil]; \
+} \
+-(BOOL)add##%slurp
+%for $j in range($num_cols)
+CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
+%end for
+error:(NSError **)error\
+{ \
     const size_t ndx = [self count]; \
 %for $j in range($num_cols)
-    TIGHTDB_COLUMN_INSERT(self, ${j}, ndx, CName${j+1}, CType${j+1}); \
+    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, ${j}, ndx, CName${j+1}, CType${j+1}, error)) return NO; \
 %end for
-    [self insertDone]; \
+    return [self insertDoneWithError:error]; \
 } \
 -(void)insertAtIndex:(size_t)ndx %slurp
 %for $j in range($num_cols)
@@ -240,17 +261,22 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor *)add \
+-(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[self addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor *)lastObject \
+-(TableName##_Cursor *)cursorAtLastIndex \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
+} \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx \
+{ \
+    [super insertRowAtIndex:ndx]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \
 { \
@@ -294,7 +320,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
 } \
--(TableName##_Cursor *)objectAtIndex:(size_t)ndx \
+-(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
     return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
 } \

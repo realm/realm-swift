@@ -146,11 +146,11 @@ TIGHTDB_TABLE_4(PerfTable,
         });
     }
     // Create query (current employees between 20 and 30 years old)
-    PerfTable_Query *q = [[[diskTable where].Hired equal:YES].Age between:20 to:30];
-    NSLog(@"Query count: %zu", [q count]);
+    PerfTable_Query *q = [[[diskTable where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30];
+    NSLog(@"Query count: %@", [q count]);
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Read and query in %.2f s (%zu)", stop - start, [q count]]];
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Read and query in %.2f s (%@)", stop - start, [q count]]];
     });
 
     double diff = [self sqlTestFetch] / (stop-start);
@@ -198,12 +198,12 @@ TIGHTDB_TABLE_4(PerfTable,
     PerfTable *diskTable = [fromDisk getTable:@"employees" withClass:[PerfTable class]];
 
     // Create query (current employees between 20 and 30 years old)
-    PerfTable_Query *q = [[diskTable where].Age between:40 to:50];
-    NSLog(@"Query count: %zu", [q count]);
+    PerfTable_Query *q = [[diskTable where].Age columnIsBetween:40 and_:50];
+    NSLog(@"Query count: %@", [q count]);
 
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Read and query sparse in %.2f s (%zu)", stop-start, [q count]]];
+        [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Read and query sparse in %.2f s (%@)", stop-start, [q count]]];
     });
 
     double diff = [self sqlTestSparse] / (stop-start);
@@ -255,7 +255,7 @@ TIGHTDB_TABLE_4(PerfTable,
 
 
     // Create query (current employees between 20 and 30 years old)
-    PerfTable_Query *q = [[[diskTable where].Hired equal:YES].Age between:20 to:30];
+    PerfTable_Query *q = [[[diskTable where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30];
 
     PerfTable_View *res = [q findAll];
     int agesum = 0;
@@ -310,7 +310,7 @@ TIGHTDB_TABLE_4(PerfTable,
         PerfTable *diskTable = [group getTable:@"employees" withClass:[PerfTable class]];
 
         // Create query (current employees between 20 and 30 years old)
-        PerfTable_Query *q = [[[diskTable where].Hired equal:YES].Age between:20 to:30];
+        PerfTable_Query *q = [[[diskTable where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30];
 
         PerfTable_View *res = [q findAll];
         int agesum = 0;
