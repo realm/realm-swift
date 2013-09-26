@@ -36,7 +36,7 @@ libtightdb_objc_a_LDFLAGS_COVER = $(shell tightdb-config-dbg --libs)
 # The meaning of this version string is identical to the one defined
 # by GNU Libtool. See also
 # http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning
-libtightdb_objc_a_VERSION = 1:0:0
+libtightdb_objc_a_VERSION = 2:0:0
 
 include ../../../generic.mk
 
