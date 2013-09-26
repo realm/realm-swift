@@ -32,7 +32,7 @@ int main()
             NSLog(@"Name: %@ Age: %lli", ite.Name, ite.Age);
         }
         
-        NSLog(@"Let's insert a new row");
+        NSLog(@"Insert a new row");
         
         cursor = [table insertRow:1];
         cursor.Name = @"Sam"; cursor.Age = 30;
@@ -42,6 +42,7 @@ int main()
             NSLog(@"Name: %@ Age: %lli", ite.Name, ite.Age);
         }
     
+        
     
     }
 }

@@ -34,11 +34,11 @@ TIGHTDB_TABLE_2(WrongTypeTable,
     // Create table with all column types
     TightdbTable *table = [[TightdbTable alloc] init];
     TightdbSpec *s = [table getSpec];
-    [s addColumn:tightdb_Bool name:@"Outer"];
-    [s addColumn:tightdb_Int name:@"Number"];
+    [s addColumnWithType:tightdb_Bool andName:@"Outer"];
+    [s addColumnWithType:tightdb_Int andName:@"Number"];
     TightdbSpec *sub = [s addColumnTable:@"GetSubtable"];
-    [sub addColumn:tightdb_Bool name:@"Hired"];
-    [sub addColumn:tightdb_Int name:@"Age"];
+    [sub addColumnWithType:tightdb_Bool andName:@"Hired"];
+    [sub addColumnWithType:tightdb_Int andName:@"Age"];
     [table updateFromSpec];
 
     [table insertBool:0 ndx:0 value:NO];

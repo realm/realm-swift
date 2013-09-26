@@ -201,12 +201,12 @@ TIGHTDB_TABLE_2(QueryTable,
     // Specify the table schema
     {
         TightdbSpec *s = [table getSpec];
-        [s addColumn:tightdb_Int name:@"int"];
+        [s addColumnWithType:tightdb_Int andName:@"int"];
         {
             TightdbSpec *sub = [s addColumnTable:@"tab"];
-            [sub addColumn:tightdb_Int name:@"int"];
+            [sub addColumnWithType:tightdb_Int andName:@"int"];
         }
-        [s addColumn:tightdb_Mixed name:@"mix"];
+        [s addColumnWithType:tightdb_Mixed andName:@"mix"];
         [table updateFromSpec];
     }
 
@@ -234,7 +234,7 @@ TIGHTDB_TABLE_2(QueryTable,
     OCTopLevelTable *subtable2 = [table getTopLevelTable:COL_TABLE_MIX ndx:0];
     {
         TightdbSpec *s = [subtable2 getSpec];
-        [s addColumn:tightdb_Int name:@"int"];
+        [s addColumnWithType:tightdb_Int andName:@"int"];
         [subtable2 updateFromSpec:[s getRef]];
     }
     // Add a row to it
