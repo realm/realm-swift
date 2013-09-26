@@ -27,6 +27,31 @@
 @interface TightdbCursor: NSObject
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx;
 -(void)setNdx:(size_t)ndx;
+-(size_t)index;
+
+-(BOOL)setInt:(int64_t)value inColumn:(size_t)colNdx;
+-(BOOL)setInt:(int64_t)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(BOOL)setString:(NSString *)value inColumn:(size_t)colNdx;
+-(BOOL)setString:(NSString *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(BOOL)setBool:(BOOL)value inColumn:(size_t)colNdx;
+-(BOOL)setBool:(BOOL)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(BOOL)setFloat:(float)value inColumn:(size_t)colNdx;
+-(BOOL)setFloat:(float)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(BOOL)setDouble:(double)value inColumn:(size_t)colNdx;
+-(BOOL)setDouble:(double)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(BOOL)setBinary:(TightdbBinary *)value inColumn:(size_t)colNdx;
+-(BOOL)setBinary:(TightdbBinary *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(BOOL)setMixed:(TightdbMixed *)value inColumn:(size_t)colNdx;
+-(BOOL)setMixed:(TightdbMixed *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+
+-(int64_t)getIntInColumn:(size_t)colNdx;
+-(NSString *)getStringInColumn:(size_t)colNdx;
+-(BOOL)getBoolInColumn:(size_t)colNdx;
+-(float)getFloatInColumn:(size_t)colNdx;
+-(double)getDoubleInColumn:(size_t)colNdx;
+-(TightdbBinary *)getBinaryInColumn:(size_t)colNdx;
+-(TightdbMixed *)getMixedInColumn:(size_t)colNdx;
+
 @end
 
 
@@ -37,21 +62,30 @@
 @interface TightdbAccessor: NSObject
 -(id)initWithCursor:(TightdbCursor *)cursor columnId:(size_t)columnId;
 -(BOOL)getBool;
--(void)setBool:(BOOL)value;
+-(BOOL)setBool:(BOOL)value;
+-(BOOL)setBool:(BOOL)value error:(NSError *__autoreleasing *)error;
 -(int64_t)getInt;
--(void)setInt:(int64_t)value;
+-(BOOL)setInt:(int64_t)value;
+-(BOOL)setInt:(int64_t)value error:(NSError *__autoreleasing *)error;
 -(float)getFloat;
--(void)setFloat:(float)value;
+-(BOOL)setFloat:(float)value;
+-(BOOL)setFloat:(float)value error:(NSError *__autoreleasing *)error;
 -(double)getDouble;
--(void)setDouble:(double)value;
+-(BOOL)setDouble:(double)value;
+-(BOOL)setDouble:(double)value error:(NSError *__autoreleasing *)error;
 -(NSString *)getString;
--(void)setString:(NSString *)value;
+-(BOOL)setString:(NSString *)value;
+-(BOOL)setString:(NSString *)value error:(NSError *__autoreleasing *)error;
 -(TightdbBinary *)getBinary;
--(void)setBinary:(TightdbBinary *)value;
--(void)setBinary:(const char *)data size:(size_t)size;
+-(BOOL)setBinary:(TightdbBinary *)value;
+-(BOOL)setBinary:(TightdbBinary *)value error:(NSError *__autoreleasing *)error;
+-(BOOL)setBinary:(const char *)data size:(size_t)size;
+-(BOOL)setBinary:(const char *)data size:(size_t)size error:(NSError *__autoreleasing *)error;
 -(time_t)getDate;
--(void)setDate:(time_t)value;
+-(BOOL)setDate:(time_t)value;
+-(BOOL)setDate:(time_t)value error:(NSError *__autoreleasing *)error;
 -(id)getSubtable:(Class)obj;
 -(TightdbMixed *)getMixed;
--(void)setMixed:(TightdbMixed *)value;
+-(BOOL)setMixed:(TightdbMixed *)value;
+-(BOOL)setMixed:(TightdbMixed *)value error:(NSError *__autoreleasing *)error;
 @end

@@ -52,7 +52,7 @@ TIGHTDB_TABLE_IMPL_2(SharedTable2,
             SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable count]);
             for (size_t i = 0; i < [diskTable count]; i++) {
-                SharedTable2_Cursor *cursor = [diskTable objectAtIndex:i];
+                SharedTable2_Cursor *cursor = [diskTable cursorAtIndex:i];
                 NSLog(@"%zu: %lld", i, [cursor Age]);
                 NSLog(@"%zu: %lld", i, cursor.Age);
                 NSLog(@"%zu: %i", i, [diskTable getBool:0 ndx:i]);
