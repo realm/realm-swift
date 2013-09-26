@@ -167,7 +167,8 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         TightdbBinary *bin1 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin / 2];
         TightdbBinary *bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
         
-        [table addRows:2];
+        // TODO: Rewrite test for cursor based add.
+        [table _addRows:2];
 
         [table setBool:BOOL_COL ndx:0 value:YES];
         [table setBool:BOOL_COL ndx:1 value:NO];

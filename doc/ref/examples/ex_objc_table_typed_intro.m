@@ -34,7 +34,7 @@ int main()
         
         NSLog(@"Insert a new row");
         
-        cursor = [table insertRow:1];
+        cursor = [table insertRowAtIndex:1];
         cursor.Name = @"Sam"; cursor.Age = 30;
     
     

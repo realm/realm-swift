@@ -44,15 +44,24 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
         STFail(@"Second not equal to second");
 
     // 2. Add a row with data
-    const size_t ndx = [_table addRow];
-    [_table set:0 ndx:ndx value:0];
-    [_table set:1 ndx:ndx value:10];
+    
+    //const size_t ndx = [_table addRow];
+    //[_table set:0 ndx:ndx value:0];
+    //[_table set:1 ndx:ndx value:10];
+
+    TightdbCursor *cursor = [_table addRow];
+    size_t ndx = [cursor index];
+    [cursor setInt:0 inColumn:0];
+    [cursor setInt:10 inColumn:1];
+
 
     // Verify
     if ([_table get:0 ndx:ndx] != 0)
         STFail(@"First not zero");
     if ([_table get:1 ndx:ndx] != 10)
         STFail(@"Second not 10");
+
+
 }
 
 - (void)testDataTypes
