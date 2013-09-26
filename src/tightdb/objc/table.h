@@ -123,11 +123,15 @@
 -(TightdbSpec *)getSpecWithError:(NSError *__autoreleasing *)error;
 -(BOOL)isEmpty;
 -(size_t)count;
--(TightdbCursor *)addRowWithCursor;
--(size_t)addRow;
--(size_t)addRowWithError:(NSError *__autoreleasing *)error;
--(size_t)addRows:(size_t)rowCount;
--(size_t)addRows:(size_t)rowCount error:(NSError *__autoreleasing *)error;
+-(TightdbCursor *)addRow;
+
+// Only curser based add should be public. This is just a temporaray way to hide the methods.
+// TODO: Move to class extension.
+-(size_t)_addRow;
+-(size_t)_addRowWithError:(NSError *__autoreleasing *)error;
+-(size_t)_addRows:(size_t)rowCount;
+-(size_t)_addRows:(size_t)rowCount error:(NSError *__autoreleasing *)error;
+
 -(BOOL)clear;
 -(BOOL)clearWithError:(NSError *__autoreleasing *)error;
 -(BOOL)remove:(size_t)ndx;
@@ -138,7 +142,7 @@
 -(TightdbCursor *)cursorAtIndex:(size_t)ndx;
 -(TightdbCursor *)cursorAtLastIndex;
 
--(TightdbCursor *)insertRowWithCursor:(size_t)ndx;
+-(TightdbCursor *)insertRowAtIndex:(size_t)ndx;
 
 -(BOOL)insertRow:(size_t)ndx;
 -(BOOL)insertRow:(size_t)ndx error:(NSError *__autoreleasing *)error;

@@ -59,7 +59,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 -(TableName##_Cursor *)addRow; \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)cursorAtLastIndex; \
--(TableName##_Cursor *)insertRow:(size_t)ndx; \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
@@ -179,7 +179,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 } \
 -(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
@@ -189,9 +189,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
--(TableName##_Cursor *)insertRow:(size_t)ndx \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx \
 { \
-    [super insertRow:ndx]; \
+    [super insertRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \
@@ -272,7 +272,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 -(TableName##_Cursor *)addRow; \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)cursorAtLastIndex; \
--(TableName##_Cursor *)insertRow:(size_t)ndx; \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
@@ -403,7 +403,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 } \
 -(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
@@ -413,9 +413,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
--(TableName##_Cursor *)insertRow:(size_t)ndx \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx \
 { \
-    [super insertRow:ndx]; \
+    [super insertRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \
@@ -502,7 +502,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
 -(TableName##_Cursor *)addRow; \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)cursorAtLastIndex; \
--(TableName##_Cursor *)insertRow:(size_t)ndx; \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
@@ -644,7 +644,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 } \
 -(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
@@ -654,9 +654,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
--(TableName##_Cursor *)insertRow:(size_t)ndx \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx \
 { \
-    [super insertRow:ndx]; \
+    [super insertRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \
@@ -749,7 +749,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
 -(TableName##_Cursor *)addRow; \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)cursorAtLastIndex; \
--(TableName##_Cursor *)insertRow:(size_t)ndx; \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
@@ -902,7 +902,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 } \
 -(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
@@ -912,9 +912,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
--(TableName##_Cursor *)insertRow:(size_t)ndx \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx \
 { \
-    [super insertRow:ndx]; \
+    [super insertRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \
@@ -1013,7 +1013,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
 -(TableName##_Cursor *)addRow; \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)cursorAtLastIndex; \
--(TableName##_Cursor *)insertRow:(size_t)ndx; \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
@@ -1177,7 +1177,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 } \
 -(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
@@ -1187,9 +1187,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
--(TableName##_Cursor *)insertRow:(size_t)ndx \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx \
 { \
-    [super insertRow:ndx]; \
+    [super insertRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \
@@ -1294,7 +1294,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
 -(TableName##_Cursor *)addRow; \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)cursorAtLastIndex; \
--(TableName##_Cursor *)insertRow:(size_t)ndx; \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
@@ -1469,7 +1469,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 } \
 -(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
@@ -1479,9 +1479,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
--(TableName##_Cursor *)insertRow:(size_t)ndx \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx \
 { \
-    [super insertRow:ndx]; \
+    [super insertRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \
@@ -1592,7 +1592,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
 -(TableName##_Cursor *)addRow; \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)cursorAtLastIndex; \
--(TableName##_Cursor *)insertRow:(size_t)ndx; \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
@@ -1778,7 +1778,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 } \
 -(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
@@ -1788,9 +1788,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
--(TableName##_Cursor *)insertRow:(size_t)ndx \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx \
 { \
-    [super insertRow:ndx]; \
+    [super insertRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \
@@ -1907,7 +1907,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
 -(TableName##_Cursor *)addRow; \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)cursorAtLastIndex; \
--(TableName##_Cursor *)insertRow:(size_t)ndx; \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
@@ -2104,7 +2104,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 } \
 -(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
@@ -2114,9 +2114,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
--(TableName##_Cursor *)insertRow:(size_t)ndx \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx \
 { \
-    [super insertRow:ndx]; \
+    [super insertRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \
@@ -2239,7 +2239,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
 -(TableName##_Cursor *)addRow; \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)cursorAtLastIndex; \
--(TableName##_Cursor *)insertRow:(size_t)ndx; \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
@@ -2447,7 +2447,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 } \
 -(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
@@ -2457,9 +2457,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
--(TableName##_Cursor *)insertRow:(size_t)ndx \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx \
 { \
-    [super insertRow:ndx]; \
+    [super insertRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \
@@ -2588,7 +2588,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
 -(TableName##_Cursor *)addRow; \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)cursorAtLastIndex; \
--(TableName##_Cursor *)insertRow:(size_t)ndx; \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
@@ -2807,7 +2807,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 } \
 -(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
@@ -2817,9 +2817,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
--(TableName##_Cursor *)insertRow:(size_t)ndx \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx \
 { \
-    [super insertRow:ndx]; \
+    [super insertRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \
@@ -2954,7 +2954,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
 -(TableName##_Cursor *)addRow; \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)cursorAtLastIndex; \
--(TableName##_Cursor *)insertRow:(size_t)ndx; \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
@@ -3184,7 +3184,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 } \
 -(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
@@ -3194,9 +3194,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
--(TableName##_Cursor *)insertRow:(size_t)ndx \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx \
 { \
-    [super insertRow:ndx]; \
+    [super insertRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \
@@ -3337,7 +3337,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
 -(TableName##_Cursor *)addRow; \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)cursorAtLastIndex; \
--(TableName##_Cursor *)insertRow:(size_t)ndx; \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
@@ -3578,7 +3578,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 } \
 -(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
@@ -3588,9 +3588,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
--(TableName##_Cursor *)insertRow:(size_t)ndx \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx \
 { \
-    [super insertRow:ndx]; \
+    [super insertRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \
@@ -3737,7 +3737,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
 -(TableName##_Cursor *)addRow; \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)cursorAtLastIndex; \
--(TableName##_Cursor *)insertRow:(size_t)ndx; \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
@@ -3989,7 +3989,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 } \
 -(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
@@ -3999,9 +3999,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
--(TableName##_Cursor *)insertRow:(size_t)ndx \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx \
 { \
-    [super insertRow:ndx]; \
+    [super insertRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \
@@ -4154,7 +4154,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName14, CType14) \
 -(TableName##_Cursor *)addRow; \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)cursorAtLastIndex; \
--(TableName##_Cursor *)insertRow:(size_t)ndx; \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
@@ -4417,7 +4417,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 } \
 -(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
@@ -4427,9 +4427,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
--(TableName##_Cursor *)insertRow:(size_t)ndx \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx \
 { \
-    [super insertRow:ndx]; \
+    [super insertRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \
@@ -4588,7 +4588,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName15, CType15) \
 -(TableName##_Cursor *)addRow; \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor *)cursorAtLastIndex; \
--(TableName##_Cursor *)insertRow:(size_t)ndx; \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx; \
 @end \
 @interface TableName##_View: TightdbView \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx; \
@@ -4862,7 +4862,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 } \
 -(TableName##_Cursor *)addRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
@@ -4872,9 +4872,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[self count]-1]; \
 } \
--(TableName##_Cursor *)insertRow:(size_t)ndx \
+-(TableName##_Cursor *)insertRowAtIndex:(size_t)ndx \
 { \
-    [super insertRow:ndx]; \
+    [super insertRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TightdbCursor *)getCursor \

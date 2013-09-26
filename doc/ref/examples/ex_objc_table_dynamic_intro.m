@@ -3,8 +3,7 @@
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
 
-//#define NAME 0
-//#define AGE 1
+
 
 int main()
 {
@@ -23,48 +22,51 @@ int main()
         
         // Row 0
         
-        cursor = [table addRowWithCursor];
+        cursor = [table addRow];
+        
         [cursor setInt:23 inColumn:AGE];
         [cursor setString:@"Joe" inColumn:NAME];
         
         // Row 1
         
-        cursor = [table addRowWithCursor];
+        cursor = [table addRow];
+        
         [cursor setInt:32 inColumn:AGE];
         [cursor setString:@"Simon" inColumn:NAME];
 
         // Row 2
         
-        cursor = [table addRowWithCursor];
+        cursor = [table addRow];
+        
         [cursor setInt:12 inColumn:AGE];
         [cursor setString:@"Steve" inColumn:NAME];
         
         // Row 3
         
-        cursor = [table addRowWithCursor];
+        cursor = [table addRow];
+        
         [cursor setInt:100 inColumn:AGE];
         [cursor setString:@"Nick" inColumn:NAME];
         
         // Print using a cursor.
         
-        for (TightdbCursor *ite in table) {
+        for (TightdbCursor *ite in table) 
             NSLog(@"Name: %@ Age: %lld", [ite getStringInColumn:NAME], [ite getIntInColumn:AGE]);
-        }
+        
         
         // Insert a row and print.
         
-        cursor = [table insertRowWithCursor:3];
+        cursor = [table insertRowAtIndex:2];
         [cursor setInt:21 inColumn:AGE];
         [cursor setString:@"Hello I'm INSERTED" inColumn:NAME];
         
         
         NSLog(@"--------");
         
-        for (TightdbCursor *ite in table) {
-            
+        for (TightdbCursor *ite in table) 
             NSLog(@"Name: %@ Age: %lld", [ite getStringInColumn:NAME], [ite getIntInColumn:AGE]);
             
-        }
+        
         
         // Update a few rows and print again.
         
@@ -76,11 +78,9 @@ int main()
         
         NSLog(@"--------");
         
-        for (TightdbCursor *ite in table) {
-            
+        for (TightdbCursor *ite in table) 
             NSLog(@"Name: %@ Age: %lld", [ite getStringInColumn:NAME], [ite getIntInColumn:AGE]);
-            
-        }
+        
         
     }
 }

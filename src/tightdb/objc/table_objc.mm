@@ -625,7 +625,6 @@ using namespace std;
 {
     return (TightdbType)_table->get_column_type(ndx);
 }
-
 -(TightdbSpec *)getSpec
 {
     return [self getSpecWithError:nil];
@@ -645,16 +644,16 @@ using namespace std;
     return _table->size();
 }
 
--(TightdbCursor *)addRowWithCursor
+-(TightdbCursor *)addRow
 {
-    return [[TightdbCursor alloc] initWithTable:self ndx:[self addRow]];
+    return [[TightdbCursor alloc] initWithTable:self ndx:[self _addRow]];
 }
 
--(size_t)addRow
+-(size_t)_addRow
 {
-    return [self addRowWithError:nil];
+    return [self _addRowWithError:nil];
 }
--(size_t)addRowWithError:(NSError *__autoreleasing *)error
+-(size_t)_addRowWithError:(NSError *__autoreleasing *)error
 {
     if (_readOnly) {
         if (error)
@@ -666,12 +665,12 @@ using namespace std;
                                  , @"com.tightdb.table", 0);
 }
 
--(size_t)addRows:(size_t)rowCount
+-(size_t)_addRows:(size_t)rowCount
 {
-    return [self addRows:rowCount error:nil];
+    return [self _addRows:rowCount error:nil];
 }
 
--(size_t)addRows:(size_t)rowCount error:(NSError *__autoreleasing *)error
+-(size_t)_addRows:(size_t)rowCount error:(NSError *__autoreleasing *)error
 {
     if (_readOnly) {
         if (error)
@@ -693,7 +692,7 @@ using namespace std;
     return [[TightdbCursor alloc] initWithTable:self ndx:[self count]-1];
 }
 
--(TightdbCursor *)insertRowWithCursor:(size_t)ndx
+-(TightdbCursor *)insertRowAtIndex:(size_t)ndx
 {
     [self insertRow:ndx];
     return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
