@@ -101,7 +101,7 @@
 { \
     NSString *name = [NSString stringWithUTF8String:#_name]; \
     if (!name) return NO; \
-    if (![spec addColumn:TIGHTDB_TYPE_ID_##type name:name]) return NO; \
+    if (![spec addColumnWithType:TIGHTDB_TYPE_ID_##type andName:name]) return NO; \
 }
 
 
@@ -135,6 +135,14 @@
 #define TIGHTDB_COLUMN_INSERT_4_Y(table, col, _row, value, type)           [table _insertSubtableCopy:col row:_row subtable:value]
 #define TIGHTDB_COLUMN_INSERT_4_N(table, col, row, _value, type)           [table insert##type:col ndx:row value:_value]
 
+// TIGHTDB_COLUMN_INSERT_ERROR
+
+#define TIGHTDB_COLUMN_INSERT_ERROR(table, col, row, value, type, error)                TIGHTDB_COLUMN_INSERT_ERROR_2(TIGHTDB_IS_SUBTABLE(type), table, col, row, value, type, error)
+#define TIGHTDB_COLUMN_INSERT_ERROR_2(is_subtable, table, col, row, value, type, error) TIGHTDB_COLUMN_INSERT_ERROR_3(is_subtable, table, col, row, value, type, error)
+#define TIGHTDB_COLUMN_INSERT_ERROR_3(is_subtable, table, col, row, value, type, error) TIGHTDB_COLUMN_INSERT_ERROR_4_##is_subtable(table, col, row, value, type, error)
+#define TIGHTDB_COLUMN_INSERT_ERROR_4_Y(table, col, _row, value, type, error)           [table _insertSubtableCopy:col row:_row subtable:value error:error]
+#define TIGHTDB_COLUMN_INSERT_ERROR_4_N(table, col, row, _value, type, error)           [table insert##type:col ndx:row value:_value error:error]
+
 
 
 // TIGHTDB_CURSOR_PROPERTY
@@ -155,7 +163,8 @@
 #define TIGHTDB_CURSOR_PROPERTY_DEF_SIMPLE(name, type) \
 @property TIGHTDB_TYPE_##type name; \
 -(TIGHTDB_TYPE_##type)name; \
--(void)set##name:(TIGHTDB_TYPE_##type)value;
+-(void)set##name:(TIGHTDB_TYPE_##type)value; \
+-(BOOL)set##name:(TIGHTDB_TYPE_##type)value error:(NSError *__autoreleasing *)error;
 
 #define TIGHTDB_CURSOR_PROPERTY_IMPL_SIMPLE(name, type) \
 -(TIGHTDB_TYPE_##type)name \
@@ -165,6 +174,10 @@
 -(void)set##name:(TIGHTDB_TYPE_##type)value \
 { \
     [_##name set##type:value]; \
+} \
+-(BOOL)set##name:(TIGHTDB_TYPE_##type)value error:(NSError *__autoreleasing *)error \
+{ \
+    return [_##name set##type:value error:error]; \
 }
 
 
@@ -199,14 +212,14 @@
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Bool(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorBool \
--(table##_Query *)equal:(BOOL)value; \
+-(table##_Query *)columnIsEqualTo:(BOOL)value; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Bool(table, col_name) \
 @implementation table##_QueryAccessor_##col_name \
--(table##_Query *)equal:(BOOL)value \
+-(table##_Query *)columnIsEqualTo:(BOOL)value \
 { \
-    return (table##_Query *)[super equal:value]; \
+    return (table##_Query *)[super columnIsEqualTo:value]; \
 } \
 @end
 
@@ -215,44 +228,44 @@
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Int(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorInt \
--(table##_Query *)equal:(int64_t)value; \
--(table##_Query *)notEqual:(int64_t)value; \
--(table##_Query *)greater:(int64_t)value; \
--(table##_Query *)greaterEqual:(int64_t)value; \
--(table##_Query *)less:(int64_t)value; \
--(table##_Query *)lessEqual:(int64_t)value; \
--(table##_Query *)between:(int64_t)from to:(int64_t)to; \
+-(table##_Query *)columnIsEqualTo:(int64_t)value; \
+-(table##_Query *)columnIsNotEqualTo:(int64_t)value; \
+-(table##_Query *)columnIsGreaterThan:(int64_t)value; \
+-(table##_Query *)columnIsGreaterThanOrEqualTo:(int64_t)value; \
+-(table##_Query *)columnIsLessThan:(int64_t)value; \
+-(table##_Query *)columnIsLessThanOrEqualTo:(int64_t)value; \
+-(table##_Query *)columnIsBetween:(int64_t)from and_:(int64_t)to; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Int(table, col_name) \
 @implementation table##_QueryAccessor_##col_name \
--(table##_Query *)equal:(int64_t)value \
+-(table##_Query *)columnIsEqualTo:(int64_t)value \
 { \
-    return (table##_Query *)[super equal:value]; \
+    return (table##_Query *)[super columnIsEqualTo:value]; \
 } \
--(table##_Query *)notEqual:(int64_t)value \
+-(table##_Query *)columnIsNotEqualTo:(int64_t)value \
 { \
-    return (table##_Query *)[super notEqual:value]; \
+    return (table##_Query *)[super columnIsNotEqualTo:value]; \
 } \
--(table##_Query *)greater:(int64_t)value \
+-(table##_Query *)columnIsGreaterThan:(int64_t)value \
 { \
-    return (table##_Query *)[super greater:value]; \
+    return (table##_Query *)[super columnIsGreaterThan:value]; \
 } \
--(table##_Query *)greaterEqual:(int64_t)value \
+-(table##_Query *)columnIsGreaterThanOrEqualTo:(int64_t)value \
 { \
-    return (table##_Query *)[super greaterEqual:value]; \
+    return (table##_Query *)[super columnIsGreaterThanOrEqualTo:value]; \
 } \
--(table##_Query *)less:(int64_t)value \
+-(table##_Query *)columnIsLessThan:(int64_t)value \
 { \
-    return (table##_Query *)[super less:value]; \
+    return (table##_Query *)[super columnIsLessThan:value]; \
 } \
--(table##_Query *)lessEqual:(int64_t)value \
+-(table##_Query *)columnIsLessThanOrEqualTo:(int64_t)value \
 { \
-    return (table##_Query *)[super lessEqual:value]; \
+    return (table##_Query *)[super columnIsLessThanOrEqualTo:value]; \
 } \
--(table##_Query *)between:(int64_t)from to:(int64_t)to \
+-(table##_Query *)columnIsBetween:(int64_t)from and_:(int64_t)to \
 { \
-    return (table##_Query *)[super between:from to:to]; \
+    return (table##_Query *)[super columnIsBetween:from and_:to]; \
 } \
 @end
 
@@ -261,44 +274,44 @@
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Float(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorFloat \
--(table##_Query *)equal:(float)value; \
--(table##_Query *)notEqual:(float)value; \
--(table##_Query *)greater:(float)value; \
--(table##_Query *)greaterEqual:(float)value; \
--(table##_Query *)less:(float)value; \
--(table##_Query *)lessEqual:(float)value; \
--(table##_Query *)between:(float)from to:(float)to; \
+-(table##_Query *)columnIsEqualTo:(float)value; \
+-(table##_Query *)columnIsNotEqualTo:(float)value; \
+-(table##_Query *)columnIsGreaterThan:(float)value; \
+-(table##_Query *)columnIsGreaterThanOrEqualTo:(float)value; \
+-(table##_Query *)columnIsLessThan:(float)value; \
+-(table##_Query *)columnIsLessThanOrEqualTo:(float)value; \
+-(table##_Query *)columnIsBetween:(float)from and_:(float)to; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Float(table, col_name) \
 @implementation table##_QueryAccessor_##col_name \
--(table##_Query *)equal:(float)value \
+-(table##_Query *)columnIsEqualTo:(float)value \
 { \
-    return (table##_Query *)[super equal:value]; \
+    return (table##_Query *)[super columnIsEqualTo:value]; \
 } \
--(table##_Query *)notEqual:(float)value \
+-(table##_Query *)columnIsNotEqualTo:(float)value \
 { \
-    return (table##_Query *)[super notEqual:value]; \
+    return (table##_Query *)[super columnIsNotEqualTo:value]; \
 } \
--(table##_Query *)greater:(float)value \
+-(table##_Query *)columnIsGreaterThan:(float)value \
 { \
-    return (table##_Query *)[super greater:value]; \
+    return (table##_Query *)[super columnIsGreaterThan:value]; \
 } \
--(table##_Query *)greaterEqual:(float)value \
+-(table##_Query *)columnIsGreaterThanOrEqualTo:(float)value \
 { \
-    return (table##_Query *)[super greaterEqual:value]; \
+    return (table##_Query *)[super columnIsGreaterThanOrEqualTo:value]; \
 } \
--(table##_Query *)less:(float)value \
+-(table##_Query *)columnIsLessThan:(float)value \
 { \
-    return (table##_Query *)[super less:value]; \
+    return (table##_Query *)[super columnIsLessThan:value]; \
 } \
--(table##_Query *)lessEqual:(float)value \
+-(table##_Query *)columnIsLessThanOrEqualTo:(float)value \
 { \
-    return (table##_Query *)[super lessEqual:value]; \
+    return (table##_Query *)[super columnIsLessThanOrEqualTo:value]; \
 } \
--(table##_Query *)between:(float)from to:(float)to \
+-(table##_Query *)columnIsBetween:(float)from and_:(float)to \
 { \
-    return (table##_Query *)[super between:from to:to]; \
+    return (table##_Query *)[super columnIsBetween:from and_:to]; \
 } \
 @end
 
@@ -307,44 +320,44 @@
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Double(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorDouble \
--(table##_Query *)equal:(double)value; \
--(table##_Query *)notEqual:(double)value; \
--(table##_Query *)greater:(double)value; \
--(table##_Query *)greaterEqual:(double)value; \
--(table##_Query *)less:(double)value; \
--(table##_Query *)lessEqual:(double)value; \
--(table##_Query *)between:(double)from to:(double)to; \
+-(table##_Query *)columnIsEqualTo:(double)value; \
+-(table##_Query *)columnIsNotEqualTo:(double)value; \
+-(table##_Query *)columnIsGreaterThan:(double)value; \
+-(table##_Query *)columnIsGreaterThanOrEqualTo:(double)value; \
+-(table##_Query *)columnIsLessThan:(double)value; \
+-(table##_Query *)columnIsLessThanOrEqualTo:(double)value; \
+-(table##_Query *)columnIsBetween:(double)from and_:(double)to; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Double(table, col_name) \
 @implementation table##_QueryAccessor_##col_name \
--(table##_Query *)equal:(double)value \
+-(table##_Query *)columnIsEqualTo:(double)value \
 { \
-    return (table##_Query *)[super equal:value]; \
+    return (table##_Query *)[super columnIsEqualTo:value]; \
 } \
--(table##_Query *)notEqual:(double)value \
+-(table##_Query *)columnIsNotEqualTo:(double)value \
 { \
-    return (table##_Query *)[super notEqual:value]; \
+    return (table##_Query *)[super columnIsNotEqualTo:value]; \
 } \
--(table##_Query *)greater:(double)value \
+-(table##_Query *)columnIsGreaterThan:(double)value \
 { \
-    return (table##_Query *)[super greater:value]; \
+    return (table##_Query *)[super columnIsGreaterThan:value]; \
 } \
--(table##_Query *)greaterEqual:(double)value \
+-(table##_Query *)columnIsGreaterThanOrEqualTo:(double)value \
 { \
-    return (table##_Query *)[super greaterEqual:value]; \
+    return (table##_Query *)[super columnIsGreaterThanOrEqualTo:value]; \
 } \
--(table##_Query *)less:(double)value \
+-(table##_Query *)columnIsLessThan:(double)value \
 { \
-    return (table##_Query *)[super less:value]; \
+    return (table##_Query *)[super columnIsLessThan:value]; \
 } \
--(table##_Query *)lessEqual:(double)value \
+-(table##_Query *)columnIsLessThanOrEqualTo:(double)value \
 { \
-    return (table##_Query *)[super lessEqual:value]; \
+    return (table##_Query *)[super columnIsLessThanOrEqualTo:value]; \
 } \
--(table##_Query *)between:(double)from to:(double)to \
+-(table##_Query *)columnIsBetween:(double)from and_:(double)to \
 { \
-    return (table##_Query *)[super between:from to:to]; \
+    return (table##_Query *)[super columnIsBetween:from and_:to]; \
 } \
 @end
 
@@ -353,59 +366,59 @@
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_String(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorString \
--(table##_Query *)equal:(NSString *)value; \
--(table##_Query *)equal:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
--(table##_Query *)notEqual:(NSString *)value; \
--(table##_Query *)notEqual:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
--(table##_Query *)beginsWith:(NSString *)value; \
--(table##_Query *)beginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
--(table##_Query *)endsWith:(NSString *)value; \
--(table##_Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
--(table##_Query *)contains:(NSString *)value; \
--(table##_Query *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
+-(table##_Query *)columnIsEqualTo:(NSString *)value; \
+-(table##_Query *)columnIsEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
+-(table##_Query *)columnIsNotEqualTo:(NSString *)value; \
+-(table##_Query *)columnIsNotEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
+-(table##_Query *)columnBeginsWith:(NSString *)value; \
+-(table##_Query *)columnBeginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
+-(table##_Query *)columnEndsWith:(NSString *)value; \
+-(table##_Query *)columnEndsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
+-(table##_Query *)columnContains:(NSString *)value; \
+-(table##_Query *)columnContains:(NSString *)value caseSensitive:(BOOL)caseSensitive; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_String(table, col_name) \
 @implementation table##_QueryAccessor_##col_name \
--(table##_Query *)equal:(NSString *)value \
+-(table##_Query *)columnIsEqualTo:(NSString *)value \
 { \
-    return (table##_Query *)[super equal:value]; \
+    return (table##_Query *)[super columnIsEqualTo:value]; \
 } \
--(table##_Query *)equal:(NSString *)value caseSensitive:(BOOL)caseSensitive \
+-(table##_Query *)columnIsEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive \
 { \
-    return (table##_Query *)[super equal:value caseSensitive:caseSensitive]; \
+    return (table##_Query *)[super columnIsEqualTo:value caseSensitive:caseSensitive]; \
 } \
--(table##_Query *)notEqual:(NSString *)value \
+-(table##_Query *)columnIsNotEqualTo:(NSString *)value \
 { \
-    return (table##_Query *)[super notEqual:value]; \
+    return (table##_Query *)[super columnIsNotEqualTo:value]; \
 } \
--(table##_Query *)notEqual:(NSString *)value caseSensitive:(BOOL)caseSensitive \
+-(table##_Query *)columnIsNotEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive \
 { \
-    return (table##_Query *)[super notEqual:value caseSensitive:caseSensitive]; \
+    return (table##_Query *)[super columnIsNotEqualTo:value caseSensitive:caseSensitive]; \
 } \
--(table##_Query *)beginsWith:(NSString *)value \
+-(table##_Query *)columnBeginsWith:(NSString *)value \
 { \
-    return (table##_Query *)[super beginsWith:value]; \
+    return (table##_Query *)[super columnBeginsWith:value]; \
 } \
--(table##_Query *)beginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive \
+-(table##_Query *)columnBeginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive \
 { \
-    return (table##_Query *)[super beginsWith:value caseSensitive:caseSensitive]; \
+    return (table##_Query *)[super columnBeginsWith:value caseSensitive:caseSensitive]; \
 } \
--(table##_Query *)endsWith:(NSString *)value \
+-(table##_Query *)columnEndsWith:(NSString *)value \
 { \
-    return (table##_Query *)[super endsWith:value]; \
+    return (table##_Query *)[super columnEndsWith:value]; \
 } \
--(table##_Query *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive \
+-(table##_Query *)columnEndsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive \
 { \
-    return (table##_Query *)[super endsWith:value caseSensitive:caseSensitive]; \
+    return (table##_Query *)[super columnEndsWith:value caseSensitive:caseSensitive]; \
 } \
--(table##_Query *)contains:(NSString *)value \
+-(table##_Query *)columnContains:(NSString *)value \
 { \
-    return (table##_Query *)[super contains:value]; \
+    return (table##_Query *)[super columnContains:value]; \
 } \
--(table##_Query *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive \
+-(table##_Query *)columnContains:(NSString *)value caseSensitive:(BOOL)caseSensitive \
 { \
-    return (table##_Query *)[super contains:value caseSensitive:caseSensitive]; \
+    return (table##_Query *)[super columnContains:value caseSensitive:caseSensitive]; \
 } \
 @end
 
@@ -414,34 +427,34 @@
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Binary(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorBinary \
--(table##_Query *)equal:(TightdbBinary *)value; \
--(table##_Query *)notEqual:(TightdbBinary *)value; \
--(table##_Query *)beginsWith:(TightdbBinary *)value; \
--(table##_Query *)endsWith:(TightdbBinary *)value; \
--(table##_Query *)contains:(TightdbBinary *)value; \
+-(table##_Query *)columnIsEqualTo:(TightdbBinary *)value; \
+-(table##_Query *)columnIsNotEqualTo:(TightdbBinary *)value; \
+-(table##_Query *)columnBeginsWith:(TightdbBinary *)value; \
+-(table##_Query *)columnEndsWith:(TightdbBinary *)value; \
+-(table##_Query *)columnContains:(TightdbBinary *)value; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Binary(table, col_name) \
 @implementation table##_QueryAccessor_##col_name \
--(table##_Query *)equal:(TightdbBinary *)value \
+-(table##_Query *)columnIsEqualTo:(TightdbBinary *)value \
 { \
-    return (table##_Query *)[super equal:value]; \
+    return (table##_Query *)[super columnIsEqualTo:value]; \
 } \
--(table##_Query *)notEqual:(TightdbBinary *)value \
+-(table##_Query *)columnIsNotEqualTo:(TightdbBinary *)value \
 { \
-    return (table##_Query *)[super notEqual:value]; \
+    return (table##_Query *)[super columnIsNotEqualTo:value]; \
 } \
--(table##_Query *)beginsWith:(TightdbBinary *)value \
+-(table##_Query *)columnBeginsWith:(TightdbBinary *)value \
 { \
-    return (table##_Query *)[super beginsWith:value]; \
+    return (table##_Query *)[super columnBeginsWith:value]; \
 } \
--(table##_Query *)endsWith:(TightdbBinary *)value \
+-(table##_Query *)columnEndsWith:(TightdbBinary *)value \
 { \
-    return (table##_Query *)[super endsWith:value]; \
+    return (table##_Query *)[super columnEndsWith:value]; \
 } \
--(table##_Query *)contains:(TightdbBinary *)value \
+-(table##_Query *)columnContains:(TightdbBinary *)value \
 { \
-    return (table##_Query *)[super contains:value]; \
+    return (table##_Query *)[super columnContains:value]; \
 } \
 @end
 
@@ -450,44 +463,44 @@
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Date(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorDate \
--(table##_Query *)equal:(time_t)value; \
--(table##_Query *)notEqual:(time_t)value; \
--(table##_Query *)greater:(time_t)value; \
--(table##_Query *)greaterEqual:(time_t)value; \
--(table##_Query *)less:(time_t)value; \
--(table##_Query *)lessEqual:(time_t)value; \
--(table##_Query *)between:(time_t)from to:(time_t)to; \
+-(table##_Query *)columnIsEqualTo:(time_t)value; \
+-(table##_Query *)columnIsNotEqualTo:(time_t)value; \
+-(table##_Query *)columnIsGreaterThan:(time_t)value; \
+-(table##_Query *)columnIsGreaterThanOrEqualTo:(time_t)value; \
+-(table##_Query *)columnIsLessThan:(time_t)value; \
+-(table##_Query *)columnIsLessThanOrEqualTo:(time_t)value; \
+-(table##_Query *)columnIsBetween:(time_t)from and_:(time_t)to; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Date(table, col_name) \
 @implementation table##_QueryAccessor_##col_name \
--(table##_Query *)equal:(time_t)value \
+-(table##_Query *)columnIsEqualTo:(time_t)value \
 { \
-    return (table##_Query *)[super equal:value]; \
+    return (table##_Query *)[super columnIsEqualTo:value]; \
 } \
--(table##_Query *)notEqual:(time_t)value \
+-(table##_Query *)columnIsNotEqualTo:(time_t)value \
 { \
-    return (table##_Query *)[super notEqual:value]; \
+    return (table##_Query *)[super columnIsNotEqualTo:value]; \
 } \
--(table##_Query *)greater:(time_t)value \
+-(table##_Query *)columnIsGreaterThan:(time_t)value \
 { \
-    return (table##_Query *)[super greater:value]; \
+    return (table##_Query *)[super columnIsGreaterThan:value]; \
 } \
--(table##_Query *)greaterEqual:(time_t)value \
+-(table##_Query *)columnIsGreaterThanOrEqualTo:(time_t)value \
 { \
-    return (table##_Query *)[super greaterEqual:value]; \
+    return (table##_Query *)[super columnIsGreaterThanOrEqualTo:value]; \
 } \
--(table##_Query *)less:(time_t)value \
+-(table##_Query *)columnIsLessThan:(time_t)value \
 { \
-    return (table##_Query *)[super less:value]; \
+    return (table##_Query *)[super columnIsLessThan:value]; \
 } \
--(table##_Query *)lessEqual:(time_t)value \
+-(table##_Query *)columnIsLessThanOrEqualTo:(time_t)value \
 { \
-    return (table##_Query *)[super lessEqual:value]; \
+    return (table##_Query *)[super columnIsLessThanOrEqualTo:value]; \
 } \
--(table##_Query *)between:(time_t)from to:(time_t)to \
+-(table##_Query *)columnIsBetween:(time_t)from and_:(time_t)to \
 { \
-    return (table##_Query *)[super between:from to:to]; \
+    return (table##_Query *)[super columnIsBetween:from and_:to]; \
 } \
 @end
 

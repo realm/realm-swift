@@ -9,33 +9,31 @@ DESCR      : *g_shared_group_descr
 SEE        :
 EXAMPLES:
 - DESCR    :
-  CODE     : ex_sharedgroup_intro
+  CODE     : ex_objc_sharedgroup_intro
 IGNORE     : []
 CATEGORIES:
 - Constructor:
   METHODS:
   - g_shared_group_constructor:
-      NAMES    : SharedGroup
+      NAME     : SharedGroup
       SUMMARY  : *g_shared_group_constructor_summary
       DESCR    : *g_shared_group_constructor_descr
       SIGNATURE: (TightdbSharedGroup *)groupWithFilename:(NSString *)filename
       PARAMS:
       - NAME   : filename
-        TYPES  : const std::string&
-        DESCR  : Filesystem path of the TightDB database file to be opened.
+        TYPES  : NSString
+        DESCR  : TBD #*g_shared_group_constructor_parm1_descr
       RETURN:
-        TYPES  : SharedGroup
-        DESCR  : A shared group.
+        TYPES  : TightdbSharedGroup
+        DESCR  : *g_shared_group_constructor_return1_descr
       THROWS:
-      - EXCEPT : File::OpenError
-        DESCR  : If the file could not be opened. If the reason
-                 corresponds to one of the exception types that are
-                 derived from File::OpenError, the derived exception
-                 type is thrown. Note that InvalidDatabase is among
-                 these derived exception types.
+      - EXCEPT : TBD
+        DESCR  : TBD
       EXAMPLES:
       - CODE   : ex_objc_shared_group_constructor
         DESCR  :
+
+
 - Write transactions:
   METHODS:
   - g_shared_group_begin_write:
@@ -49,6 +47,8 @@ CATEGORIES:
       EXAMPLES:
       - CODE   : ex_objc_shared_group_begin_write
         DESCR  :
+
+
 - Read transactions:
   METHODS:
   - g_shared_group_begin_read:
