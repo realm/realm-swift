@@ -63,8 +63,8 @@
 
 @interface TightdbSpec: NSObject
 /// Returns NO on memory allocation error.
--(BOOL)addColumn:(TightdbType)type name:(NSString *)name;
--(BOOL)addColumn:(TightdbType)type name:(NSString *)name error:(NSError *__autoreleasing *)error;
+-(BOOL)addColumnWithType:(TightdbType)type andName:(NSString *)name;
+-(BOOL)addColumnWithType:(TightdbType)type andName:(NSString *)name error:(NSError *__autoreleasing *)error;
 /// Returns nil on memory allocation error.
 -(TightdbSpec *)addColumnTable:(NSString *)name;
 -(TightdbSpec *)addColumnTable:(NSString *)name error:(NSError *__autoreleasing *)error;
@@ -134,7 +134,6 @@
 -(BOOL)remove:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(BOOL)removeLast;
 -(BOOL)removeLastWithError:(NSError *__autoreleasing *)error;
-
 
 -(TightdbCursor *)cursorAtIndex:(size_t)ndx;
 -(TightdbCursor *)cursorAtLastIndex;
@@ -209,8 +208,8 @@
 -(BOOL)setMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value;
 -(BOOL)setMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value error:(NSError *__autoreleasing *)error;
 
--(size_t)addColumn:(TightdbType)type name:(NSString *)name;
--(size_t)addColumn:(TightdbType)type name:(NSString *)name error:(NSError *__autoreleasing *)error;
+-(size_t)addColumnWithType:(TightdbType)type andName:(NSString *)name;
+-(size_t)addColumnWithType:(TightdbType)type andName:(NSString *)name error:(NSError *__autoreleasing *)error;
 
 // Searching
 -(size_t)findBool:(size_t)colNdx value:(BOOL)value;

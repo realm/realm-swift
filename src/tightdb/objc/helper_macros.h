@@ -101,7 +101,7 @@
 { \
     NSString *name = [NSString stringWithUTF8String:#_name]; \
     if (!name) return NO; \
-    if (![spec addColumn:TIGHTDB_TYPE_ID_##type name:name]) return NO; \
+    if (![spec addColumnWithType:TIGHTDB_TYPE_ID_##type andName:name]) return NO; \
 }
 
 

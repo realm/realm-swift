@@ -32,8 +32,8 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     STAssertNotNil(_table, @"Table is nil");
 
     // 1. Add two columns
-    [_table addColumn:tightdb_Int name:@"first"];
-    [_table addColumn:tightdb_Int name:@"second"];
+    [_table addColumnWithType:tightdb_Int andName:@"first"];
+    [_table addColumnWithType:tightdb_Int andName:@"second"];
 
     // Verify
     STAssertEquals(tightdb_Int, [_table getColumnType:0], @"First column not int");

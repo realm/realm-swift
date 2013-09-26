@@ -244,12 +244,12 @@ using namespace std;
 
 // FIXME: Provide a version of this method that takes a 'const char *'. This will simplify _addColumns of MyTable.
 // FIXME: Detect errors from core library
--(BOOL)addColumn:(TightdbType)type name:(NSString *)name
+-(BOOL)addColumnWithType:(TightdbType)type andName:(NSString *)name
 {
-    return [self addColumn:type name:name error:nil];
+    return [self addColumnWithType:type andName:name error:nil];
 }
 
--(BOOL)addColumn:(TightdbType)type name:(NSString *)name error:(NSError *__autoreleasing *)error
+-(BOOL)addColumnWithType:(TightdbType)type andName:(NSString *)name error:(NSError *__autoreleasing *)error
 {
     if (_readOnly) {
         if (error)
@@ -1228,12 +1228,12 @@ using namespace std;
     return YES;
 }
 
--(size_t)addColumn:(TightdbType)type name:(NSString *)name
+-(size_t)addColumnWithType:(TightdbType)type andName:(NSString *)name
 {
-    return [self addColumn:type name:name error:nil];
+    return [self addColumnWithType:type andName:name error:nil];
 }
 
--(size_t)addColumn:(TightdbType)type name:(NSString *)name error:(NSError *__autoreleasing *)error
+-(size_t)addColumnWithType:(TightdbType)type andName:(NSString *)name error:(NSError *__autoreleasing *)error
 {
     TIGHTDB_EXCEPTION_ERRHANDLER(
                                  return _table->add_column(tightdb::DataType(type), ObjcStringAccessor(name));

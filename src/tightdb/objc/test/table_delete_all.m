@@ -16,17 +16,17 @@
     // Create table with all column types
     TightdbTable *table = [[TightdbTable alloc] init];
     TightdbSpec *s = [table getSpec];
-    [s addColumn:tightdb_Int name:@"int"];
-    [s addColumn:tightdb_Bool name:@"bool"];
-    [s addColumn:tightdb_Date name:@"date"];
-    [s addColumn:tightdb_String name:@"string"];
-    [s addColumn:tightdb_String name:@"string_long"];
-    [s addColumn:tightdb_String name:@"string_enum"];
-    [s addColumn:tightdb_Binary name:@"binary"];
-    [s addColumn:tightdb_Mixed name:@"mixed"];
+    [s addColumnWithType:tightdb_Int andName:@"int"];
+    [s addColumnWithType:tightdb_Bool andName:@"bool"];
+    [s addColumnWithType:tightdb_Date andName:@"date"];
+    [s addColumnWithType:tightdb_String andName:@"string"];
+    [s addColumnWithType:tightdb_String andName:@"string_long"];
+    [s addColumnWithType:tightdb_String andName:@"string_enum"];
+    [s addColumnWithType:tightdb_Binary andName:@"binary"];
+    [s addColumnWithType:tightdb_Mixed andName:@"mixed"];
     TightdbSpec *sub = [s addColumnTable:@"tables"];
-    [sub addColumn:tightdb_Int name:@"sub_first"];
-    [sub addColumn:tightdb_String name:@"sub_second"];
+    [sub addColumnWithType:tightdb_Int andName:@"sub_first"];
+    [sub addColumnWithType:tightdb_String andName:@"sub_second"];
     [table updateFromSpec];
 
     // Add some rows

@@ -150,14 +150,14 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
   
         TightdbTable *table = [[TightdbTable alloc]init];
   
-        [table addColumn:tightdb_Bool name:@"BoolCol"];
-        [table addColumn:tightdb_Int name:@"IntCol"];
-        [table addColumn:tightdb_Float name:@"FloatCol"];
-        [table addColumn:tightdb_Double name:@"DoubleCol"];
-        [table addColumn:tightdb_String name:@"StringCol"];
-        [table addColumn:tightdb_Binary name:@"BinaryCol"];
-        [table addColumn:tightdb_Date name:@"DateCol"];
-        [table addColumn:tightdb_Mixed name:@"MixedCol"];
+        [table addColumnWithType:tightdb_Bool andName:@"BoolCol"];
+        [table addColumnWithType:tightdb_Int andName:@"IntCol"];
+        [table addColumnWithType:tightdb_Float andName:@"FloatCol"];
+        [table addColumnWithType:tightdb_Double andName:@"DoubleCol"];
+        [table addColumnWithType:tightdb_String andName:@"StringCol"];
+        [table addColumnWithType:tightdb_Binary andName:@"BinaryCol"];
+        [table addColumnWithType:tightdb_Date andName:@"DateCol"];
+        [table addColumnWithType:tightdb_Mixed andName:@"MixedCol"];
         // TODO: add Enum<T> and Subtable<T> when possible.      
  
         const char bin[4] = { 0, 1, 2, 3 };
