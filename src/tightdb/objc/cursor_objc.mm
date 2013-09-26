@@ -30,6 +30,10 @@ using namespace std;
     }
     return self;
 }
+-(size_t)index
+{
+    return _ndx;
+}
 -(void)setNdx:(size_t)ndx
 {
     _ndx = ndx;

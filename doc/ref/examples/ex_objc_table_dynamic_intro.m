@@ -12,7 +12,7 @@ int main()
         
         // Create a new table dynamically.
         
-        TightdbTable *table = [[TightdbTable alloc]init];
+        TightdbTable *table = [[TightdbTable alloc] init];
         
         size_t const NAME = [table addColumnWithType:tightdb_String andName:@"Name"];
         size_t const AGE = [table addColumnWithType:tightdb_Int andName:@"Age"];
@@ -21,40 +21,41 @@ int main()
         
         TightdbCursor *cursor;
         
-        cursor = [table addRowWithCursor];
-        
-            [cursor setInt:23 inColumn:AGE];
-            [cursor setString:@"Joe" inColumn:NAME];
+        // Row 0
         
         cursor = [table addRowWithCursor];
+        [cursor setInt:23 inColumn:AGE];
+        [cursor setString:@"Joe" inColumn:NAME];
         
-            [cursor setInt:32 inColumn:AGE];
-            [cursor setString:@"Simon" inColumn:NAME];
+        // Row 1
+        
+        cursor = [table addRowWithCursor];
+        [cursor setInt:32 inColumn:AGE];
+        [cursor setString:@"Simon" inColumn:NAME];
 
-        cursor = [table addRowWithCursor];
-        
-            [cursor setInt:12 inColumn:AGE];
-            [cursor setString:@"Steve" inColumn:NAME];
+        // Row 2
         
         cursor = [table addRowWithCursor];
+        [cursor setInt:12 inColumn:AGE];
+        [cursor setString:@"Steve" inColumn:NAME];
         
-            [cursor setInt:100 inColumn:AGE];
-            [cursor setString:@"Nick" inColumn:NAME];
+        // Row 3
+        
+        cursor = [table addRowWithCursor];
+        [cursor setInt:100 inColumn:AGE];
+        [cursor setString:@"Nick" inColumn:NAME];
         
         // Print using a cursor.
         
         for (TightdbCursor *ite in table) {
-            
             NSLog(@"Name: %@ Age: %lld", [ite getStringInColumn:NAME], [ite getIntInColumn:AGE]);
-        
         }
         
         // Insert a row and print.
         
         cursor = [table insertRowWithCursor:3];
-        
-            [cursor setInt:21 inColumn:AGE];
-            [cursor setString:@"Hello I'm INSERTED" inColumn:NAME];
+        [cursor setInt:21 inColumn:AGE];
+        [cursor setString:@"Hello I'm INSERTED" inColumn:NAME];
         
         
         NSLog(@"--------");
@@ -68,12 +69,10 @@ int main()
         // Update a few rows and print again.
         
         cursor = [table cursorAtIndex:2];
-        
-            [cursor setString:@"Now I'm UPDATED" inColumn:NAME];
+        [cursor setString:@"Now I'm UPDATED" inColumn:NAME];
         
         cursor = [table cursorAtLastIndex];
-        
-            [cursor setString:@"I'm UPDATED" inColumn:NAME];
+        [cursor setString:@"I'm UPDATED" inColumn:NAME];
         
         NSLog(@"--------");
         

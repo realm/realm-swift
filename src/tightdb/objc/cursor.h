@@ -27,6 +27,7 @@
 @interface TightdbCursor: NSObject
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx;
 -(void)setNdx:(size_t)ndx;
+-(size_t)index;
 
 -(BOOL)setInt:(int64_t)value inColumn:(size_t)colNdx;
 -(BOOL)setInt:(int64_t)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
