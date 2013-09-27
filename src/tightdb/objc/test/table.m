@@ -138,20 +138,20 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     STAssertTrue([row1.MixedCol isEqual:mixInt1],    @"row1.MixedCol");
     STAssertTrue([row2.MixedCol isEqual:mixSubtab],  @"row2.MixedCol");
 
-    STAssertEquals([table.IntCol min], (int64_t)54,                 @"IntCol min");
-    STAssertEquals([table.IntCol max], (int64_t)506,                @"IntCol max");
+    STAssertEquals([table.IntCol minimum], (int64_t)54,                 @"IntCol min");
+    STAssertEquals([table.IntCol maximum], (int64_t)506,                @"IntCol max");
     STAssertEquals([table.IntCol sum], (int64_t)560,                @"IntCol sum");
-    STAssertEquals([table.IntCol avg], 280.0,                       @"IntCol avg");
+    STAssertEquals([table.IntCol average], 280.0,                       @"IntCol avg");
 
-    STAssertEquals([table.FloatCol min], 0.7f,                      @"FloatCol min");
-    STAssertEquals([table.FloatCol max], 7.7f,                      @"FloatCol max");
+    STAssertEquals([table.FloatCol minimum], 0.7f,                      @"FloatCol min");
+    STAssertEquals([table.FloatCol maximum], 7.7f,                      @"FloatCol max");
     STAssertEquals([table.FloatCol sum], (double)0.7f + 7.7f,       @"FloatCol sum");
-    STAssertEquals([table.FloatCol avg], ((double)0.7f + 7.7f) / 2, @"FloatCol avg");
+    STAssertEquals([table.FloatCol average], ((double)0.7f + 7.7f) / 2, @"FloatCol avg");
 
-    STAssertEquals([table.DoubleCol min], 0.8,                      @"DoubleCol min");
-    STAssertEquals([table.DoubleCol max], 8.8,                      @"DoubleCol max");
+    STAssertEquals([table.DoubleCol minimum], 0.8,                      @"DoubleCol min");
+    STAssertEquals([table.DoubleCol maximum], 8.8,                      @"DoubleCol max");
     STAssertEquals([table.DoubleCol sum], 0.8 + 8.8,                @"DoubleCol sum");
-    STAssertEquals([table.DoubleCol avg], (0.8 + 8.8) / 2,          @"DoubleCol avg");
+    STAssertEquals([table.DoubleCol average], (0.8 + 8.8) / 2,          @"DoubleCol avg");
 }
 
 @end

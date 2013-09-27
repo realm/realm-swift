@@ -243,22 +243,22 @@
 // FIXME: Do we want to conversion methods? Maybe use NSData.
 
 // Aggregate functions
--(size_t)countInt:(size_t)colNdx target:(int64_t)target;
--(size_t)countFloat:(size_t)colNdx target:(float)target;
--(size_t)countDouble:(size_t)colNdx target:(double)target;
--(size_t)countString:(size_t)colNdx target:(NSString *)target;
--(int64_t)sumInt:(size_t)colNdx;
--(double)sumFloat:(size_t)colNdx;
--(double)sumDouble:(size_t)colNdx;
--(int64_t)maxInt:(size_t)colNdx;
--(float)maxFloat:(size_t)colNdx;
--(double)maxDouble:(size_t)colNdx;
--(int64_t)minInt:(size_t)colNdx;
--(float)minFloat:(size_t)colNdx;
--(double)minDouble:(size_t)colNdx;
--(double)avgInt:(size_t)colNdx;
--(double)avgFloat:(size_t)colNdx;
--(double)avgDouble:(size_t)colNDx;
+-(size_t)countWithIntColumn:(size_t)colNdx andValue:(int64_t)target;
+-(size_t)countWithFloatColumn:(size_t)colNdx andValue:(float)target;
+-(size_t)countWithDoubleColumn:(size_t)colNdx andValue:(double)target;
+-(size_t)countWithStringColumn:(size_t)colNdx andValue:(NSString *)target;
+-(int64_t)sumWithIntColumn:(size_t)colNdx;
+-(double)sumWithFloatColumn:(size_t)colNdx;
+-(double)sumWithDoubleColumn:(size_t)colNdx;
+-(int64_t)maximumWithIntColumn:(size_t)colNdx;
+-(float)maximumWithFloatColumn:(size_t)colNdx;
+-(double)maximumWithDoubleColumn:(size_t)colNdx;
+-(int64_t)minimumWithIntColumn:(size_t)colNdx;
+-(float)minimumWithFloatColumn:(size_t)colNdx;
+-(double)minimumWithDoubleColumn:(size_t)colNdx;
+-(double)averageWithIntColumn:(size_t)colNdx;
+-(double)averageWithFloatColumn:(size_t)colNdx;
+-(double)averageWithDoubleColumn:(size_t)colNDx;
 
 #ifdef TIGHTDB_DEBUG
 -(void)verify;
@@ -305,26 +305,26 @@
 @interface TightdbColumnProxy_Int: TightdbColumnProxy
 -(size_t)find:(int64_t)value;
 -(TightdbView *)findAll:(int64_t)value;
--(int64_t)min;
--(int64_t)max;
+-(int64_t)minimum;
+-(int64_t)maximum;
 -(int64_t)sum;
--(double)avg;
+-(double)average;
 @end
 
 @interface TightdbColumnProxy_Float: TightdbColumnProxy
 -(size_t)find:(float)value;
--(float)min;
--(float)max;
+-(float)minimum;
+-(float)maximum;
 -(double)sum;
--(double)avg;
+-(double)average;
 @end
 
 @interface TightdbColumnProxy_Double: TightdbColumnProxy
 -(size_t)find:(double)value;
--(double)min;
--(double)max;
+-(double)minimum;
+-(double)maximum;
 -(double)sum;
--(double)avg;
+-(double)average;
 @end
 
 @interface TightdbColumnProxy_String: TightdbColumnProxy

@@ -12,6 +12,7 @@
 
 using namespace std;
 
+// TODO: Concept for cursor invalidation (when table updates).
 
 @interface TightdbCursor()
 @property (nonatomic, weak) TightdbTable *table;
@@ -23,6 +24,9 @@ using namespace std;
 
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx
 {
+    if (ndx >= [table count]) 
+        return nil;
+
     self = [super init];
     if (self) {
         _table = table;
