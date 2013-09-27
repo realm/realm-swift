@@ -127,7 +127,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     STAssertEquals([[q count] unsignedLongValue] , (size_t)2,@"Expected 2 rows in query", nil);
 
     // Get the average age - currently only a low-level interface!
-    double avg = [[q.Age avg] doubleValue];
+    double avg = [[q.Age average] doubleValue];
     NSLog(@"Average: %f    [20.5]", avg);
     STAssertEquals(avg, 20.5,@"Expected 20.5 average", nil);
 

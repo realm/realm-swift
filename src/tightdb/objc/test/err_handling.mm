@@ -403,20 +403,20 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     
     TestQueryErrAllTypes_Query *query = [[table where].BoolCol   columnIsEqualTo:NO];
     
-    STAssertEquals([[query.IntCol min] longLongValue], (int64_t)54,    @"IntCol min");
-    STAssertEquals([[query.IntCol max] longLongValue], (int64_t)54,    @"IntCol max");
+    STAssertEquals([[query.IntCol minimum] longLongValue], (int64_t)54,    @"IntCol min");
+    STAssertEquals([[query.IntCol maximum] longLongValue], (int64_t)54,    @"IntCol max");
     STAssertEquals([[query.IntCol sum] longLongValue], (int64_t)54,    @"IntCol sum");
-    STAssertEquals([[query.IntCol avg] doubleValue], 54.0,           @"IntCol avg");
+    STAssertEquals([[query.IntCol average] doubleValue], 54.0,           @"IntCol avg");
     
-    STAssertEquals([[query.FloatCol min] floatValue], 0.7f,         @"FloatCol min");
-    STAssertEquals([[query.FloatCol max] floatValue], 0.7f,         @"FloatCol max");
+    STAssertEquals([[query.FloatCol minimum] floatValue], 0.7f,         @"FloatCol min");
+    STAssertEquals([[query.FloatCol maximum] floatValue], 0.7f,         @"FloatCol max");
     STAssertEquals([[query.FloatCol sum] floatValue], 0.7f, @"FloatCol sum");
-    STAssertEquals([[query.FloatCol avg] doubleValue], (double)0.7f, @"FloatCol avg");
+    STAssertEquals([[query.FloatCol average] doubleValue], (double)0.7f, @"FloatCol avg");
     
-    STAssertEquals([[query.DoubleCol min] doubleValue], 0.8,         @"DoubleCol min");
-    STAssertEquals([[query.DoubleCol max] doubleValue], 0.8,         @"DoubleCol max");
+    STAssertEquals([[query.DoubleCol minimum] doubleValue], 0.8,         @"DoubleCol min");
+    STAssertEquals([[query.DoubleCol maximum] doubleValue], 0.8,         @"DoubleCol max");
     STAssertEquals([[query.DoubleCol sum] doubleValue], 0.8,         @"DoubleCol sum");
-    STAssertEquals([[query.DoubleCol avg] doubleValue], 0.8,         @"DoubleCol avg");
+    STAssertEquals([[query.DoubleCol average] doubleValue], 0.8,         @"DoubleCol avg");
     
     // Check that all column conditions return query objects of the
     // right type

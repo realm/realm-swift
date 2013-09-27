@@ -38,24 +38,24 @@ void tableFunc() {
     
     // @@Example: accessing_rows @@
     // Getting values directly
-    NSString* name = [people objectAtIndex:5].Name;    // =&gt; 'Anni'
+    NSString* name = [people cursorAtIndex:5].Name;    // =&gt; 'Anni'
     // Using a cursor
-    PeopleTable_Cursor *myRow = [people objectAtIndex:5];
+    PeopleTable_Cursor *myRow = [people cursorAtIndex:5];
     int64_t age = myRow.Age;                           // =&gt; 54
     BOOL hired  = myRow.Hired;                         // =&gt; true
     
     // Setting values
-    [[people objectAtIndex:5] setAge:43];              // Getting younger
+    [[people cursorAtIndex:5] setAge:43];              // Getting younger
     // or with dot-syntax:
     myRow.Age += 1;                                    // Happy birthday!
     // @@EndExample@@
     
     // @@Example: last_row @@
-    NSString *last = [people lastObject].Name;         // =&gt; "Anni"
+    NSString *last = [people cursorAtLastIndex].Name;         // =&gt; "Anni"
     // @@EndExample@@
     
     // @@Example: updating_entire_row @@
-    // (not yet implemented) [people setAtIndex:4 Name:"Eric" Age:50 Hired:YES];
+    // (TODO: a curser should be used here) [people setAtIndex:4 Name:"Eric" Age:50 Hired:YES];
     // @EndExample@@
     
     // @@Example: deleting_row @@
@@ -65,7 +65,7 @@ void tableFunc() {
     
     // @@Example: iteration @@
     for (size_t i = 0; i < [people count]; ++i) {
-        PeopleTable_Cursor *row = [people objectAtIndex:i];
+        PeopleTable_Cursor *row = [people cursorAtIndex:i];
         NSLog(@"%@ is %lld years old", row.Name, row.Age);
     }
     // @@EndExample@@
@@ -81,19 +81,18 @@ void tableFunc() {
     PeopleTable_Query *q = [[[people where].Hired columnIsEqualTo:YES]
                             .Age columnIsBetween:20 and_:30];
 
-    
     // Get number of matching entries
     size_t cnt3 = [q count];                            // =&gt; 2
     
     // Get the average age (currently only a low-level interface)
-    NSNumber *avg = [q.Age avg];
+    NSNumber *avg = [q.Age average];
     
     // Execute the query and return a table (view)
     PeopleTable_View *res = [q findAll];
     for (size_t i = 0; i < [res count]; ++i) {
         NSLog(@"%zu: %@ is %lld years old", i,
-              [people objectAtIndex:i].Name,
-              [people objectAtIndex:i].Age);
+              [people cursorAtIndex:i].Name,
+              [people cursorAtIndex:i].Age);
     }
     // @@EndExample@@
 
@@ -125,7 +124,7 @@ void groupFunc() {
     
     NSLog(@"Disktable size: %zu", [diskTable count]);
     for (size_t i = 0; i < [diskTable count]; i++) {
-        PeopleTable_Cursor *cursor = [diskTable objectAtIndex:i];
+        PeopleTable_Cursor *cursor = [diskTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, [cursor Name]);           // using std. method
     }
     
@@ -138,7 +137,7 @@ void groupFunc() {
     PeopleTable *memTable = [fromMem getTable:@"employees"
                                       withClass:[PeopleTable class]];
     for (size_t i = 0; i < [memTable count]; i++) {
-        PeopleTable_Cursor *cursor = [memTable objectAtIndex:i];
+        PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, cursor.Name);            // using dot-syntax
     }
     // @@EndExample@@

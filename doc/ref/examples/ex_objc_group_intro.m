@@ -46,7 +46,9 @@ int main()
         size_t size;
         const char *buffer = [group writeToMem:&size];
         
-        // Calling free(..) currently recommeded.
+        // Calling free(..) is required here.
+        // An alternative using NSData (and ARC) will be provided
+        // in a future release.
         
         free((char*)buffer);
         
