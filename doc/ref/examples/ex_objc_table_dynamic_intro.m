@@ -67,7 +67,6 @@ int main()
             NSLog(@"Name: %@ Age: %lld", [ite getStringInColumn:NAME], [ite getIntInColumn:AGE]);
             
         
-        
         // Update a few rows and print again.
         
         cursor = [table cursorAtIndex:2];
@@ -80,6 +79,12 @@ int main()
         
         for (TightdbCursor *ite in table) 
             NSLog(@"Name: %@ Age: %lld", [ite getStringInColumn:NAME], [ite getIntInColumn:AGE]);
+        
+        // Index not existing.
+        
+        TightdbCursor *c2 = [table cursorAtIndex:[table count]];
+        if (c2 != nil)
+            NSLog(@"Should not get here.");
         
         
     }

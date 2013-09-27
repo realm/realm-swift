@@ -374,6 +374,12 @@ using namespace std;
 
 -(TightdbCursor *)cursorAtIndex:(size_t)ndx 
 {
+    // The cursor constructor checks the index is in bounds. However, getSourceNdx should 
+    // not be called with illegal index.
+
+    if (ndx >= [self count]) 
+        return nil;
+    
     return [[TightdbCursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; 
 }
 
@@ -684,6 +690,8 @@ using namespace std;
 
 -(TightdbCursor *)cursorAtIndex:(size_t)ndx 
 {
+    // initWithTable checks for illegal index.   
+
     return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
 }
 
@@ -1314,71 +1322,71 @@ using namespace std;
     return YES;
 }
 
--(size_t)countInt:(size_t)col_ndx target:(int64_t)target
+-(size_t)countWithIntColumn:(size_t)col_ndx andValue:(int64_t)target
 {
     return _table->count_int(col_ndx, target);
 }
--(size_t)countFloat:(size_t)col_ndx target:(float)target
+-(size_t)countWithFloatColumn:(size_t)col_ndx andValue:(float)target
 {
     return _table->count_float(col_ndx, target);
 }
--(size_t)countDouble:(size_t)col_ndx target:(double)target
+-(size_t)countWithDoubleColumn:(size_t)col_ndx andValue:(double)target
 {
     return _table->count_double(col_ndx, target);
 }
--(size_t)countString:(size_t)col_ndx target:(NSString *)target
+-(size_t)countWithStringColumn:(size_t)col_ndx andValue:(NSString *)target
 {
     return _table->count_string(col_ndx, ObjcStringAccessor(target));
 }
 
--(int64_t)sumInt:(size_t)col_ndx
+-(int64_t)sumWithIntColumn:(size_t)col_ndx
 {
     return _table->sum(col_ndx);
 }
--(double)sumFloat:(size_t)col_ndx
+-(double)sumWithFloatColumn:(size_t)col_ndx
 {
     return _table->sum_float(col_ndx);
 }
--(double)sumDouble:(size_t)col_ndx
+-(double)sumWithDoubleColumn:(size_t)col_ndx
 {
     return _table->sum_double(col_ndx);
 }
 
--(int64_t)maxInt:(size_t)col_ndx
+-(int64_t)maximumWithIntColumn:(size_t)col_ndx
 {
     return _table->maximum(col_ndx);
 }
--(float)maxFloat:(size_t)col_ndx
+-(float)maximumWithFloatColumn:(size_t)col_ndx
 {
     return _table->maximum_float(col_ndx);
 }
--(double)maxDouble:(size_t)col_ndx
+-(double)maximumWithDoubleColumn:(size_t)col_ndx
 {
     return _table->maximum_double(col_ndx);
 }
 
--(int64_t)minInt:(size_t)col_ndx
+-(int64_t)minimumWithIntColumn:(size_t)col_ndx
 {
     return _table->minimum(col_ndx);
 }
--(float)minFloat:(size_t)col_ndx
+-(float)minimumWithFloatColumn:(size_t)col_ndx
 {
     return _table->minimum_float(col_ndx);
 }
--(double)minDouble:(size_t)col_ndx
+-(double)minimumWithDoubleColumn:(size_t)col_ndx
 {
     return _table->minimum_double(col_ndx);
 }
 
--(double)avgInt:(size_t)col_ndx
+-(double)averageWithIntColumn:(size_t)col_ndx
 {
     return _table->average(col_ndx);
 }
--(double)avgFloat:(size_t)col_ndx
+-(double)averageWithFloatColumn:(size_t)col_ndx
 {
     return _table->average_float(col_ndx);
 }
--(double)avgDouble:(size_t)col_ndx
+-(double)averageWithDoubleColumn:(size_t)col_ndx
 {
     return _table->average_double(col_ndx);
 }
@@ -1431,21 +1439,21 @@ using namespace std;
     TightdbView *view = [TightdbView tableViewWithTable:self.table];
     return [self.table findAll:view column:self.column value:value];
 }
--(int64_t)min
+-(int64_t)minimum
 {
-    return [self.table minInt:self.column];
+    return [self.table minimumWithIntColumn:self.column];
 }
--(int64_t)max
+-(int64_t)maximum
 {
-    return [self.table maxInt:self.column];
+    return [self.table maximumWithIntColumn:self.column];
 }
 -(int64_t)sum
 {
-    return [self.table sumInt:self.column];
+    return [self.table sumWithIntColumn:self.column];
 }
--(double)avg
+-(double)average
 {
-    return [self.table avgInt:self.column];
+    return [self.table averageWithIntColumn:self.column];
 }
 @end
 
@@ -1454,21 +1462,21 @@ using namespace std;
 {
     return [self.table findFloat:self.column value:value];
 }
--(float)min
+-(float)minimum
 {
-    return [self.table minFloat:self.column];
+    return [self.table minimumWithFloatColumn:self.column];
 }
--(float)max
+-(float)maximum
 {
-    return [self.table maxFloat:self.column];
+    return [self.table maximumWithFloatColumn:self.column];
 }
 -(double)sum
 {
-    return [self.table sumFloat:self.column];
+    return [self.table sumWithFloatColumn:self.column];
 }
--(double)avg
+-(double)average
 {
-    return [self.table avgFloat:self.column];
+    return [self.table averageWithFloatColumn:self.column];
 }
 @end
 
@@ -1477,21 +1485,21 @@ using namespace std;
 {
     return [self.table findDouble:self.column value:value];
 }
--(double)min
+-(double)minimum
 {
-    return [self.table minDouble:self.column];
+    return [self.table minimumWithDoubleColumn:self.column];
 }
--(double)max
+-(double)maximum
 {
-    return [self.table maxDouble:self.column];
+    return [self.table maximumWithDoubleColumn:self.column];
 }
 -(double)sum
 {
-    return [self.table sumDouble:self.column];
+    return [self.table sumWithDoubleColumn:self.column];
 }
--(double)avg
+-(double)average
 {
-    return [self.table avgDouble:self.column];
+    return [self.table averageWithDoubleColumn:self.column];
 }
 @end
 

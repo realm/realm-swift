@@ -185,11 +185,11 @@ using namespace std;
                                  , @"com.tightdb.query", nil);
 }
 
--(NSNumber *)minInt:(size_t)col_ndx
+-(NSNumber *)minimumWithIntColumn:(size_t)col_ndx
 {
-    return [self minInt:col_ndx error:nil];
+    return [self minimumWithIntColumn:col_ndx error:nil];
 }
--(NSNumber *)minInt:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber *)minimumWithIntColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
 {
     if (_error) {
         if (error) {
@@ -203,31 +203,11 @@ using namespace std;
                                  , @"com.tightdb.query", nil);
 }
 
--(NSNumber *)minimumIntOfColumn:(size_t)colNdx
+-(NSNumber *)minimumWithFloatColumn:(size_t)col_ndx
 {
-    return [self minInt:colNdx error:nil];
+    return [self minimumWithFloatColumn:col_ndx error:nil];
 }
-
-
--(NSNumber *)minimumIntOfColumn:(size_t)colNdx withError:(NSError *__autoreleasing *)error
-{
-     if (_error) {
-        if (error) {
-            *error = _error;
-            _error = nil;
-        }
-        return nil;
-    }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithLongLong:_query->minimum(colNdx)];
-                                 , @"com.tightdb.query", nil);
-}
-
--(NSNumber *)minFloat:(size_t)col_ndx
-{
-    return [self minFloat:col_ndx error:nil];
-}
--(NSNumber *)minFloat:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber *)minimumWithFloatColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
 {
     if (_error) {
         if (error) {
@@ -241,11 +221,11 @@ using namespace std;
                                  , @"com.tightdb.query", nil);
 }
 
--(NSNumber *)minDouble:(size_t)col_ndx
+-(NSNumber *)minimumWithDoubleColumn:(size_t)col_ndx
 {
-    return [self minDouble:col_ndx error:nil];
+    return [self minimumWithDoubleColumn:col_ndx error:nil];
 }
--(NSNumber *)minDouble:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber *)minimumWithDoubleColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
 {
     if (_error) {
         if (error) {
@@ -259,11 +239,11 @@ using namespace std;
                                  , @"com.tightdb.query", nil);
 }
 
--(NSNumber *)maxInt:(size_t)col_ndx
+-(NSNumber *)maximumWithIntColumn:(size_t)col_ndx
 {
-    return [self maxInt:col_ndx error:nil];
+    return [self maximumWithIntColumn:col_ndx error:nil];
 }
--(NSNumber *)maxInt:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber *)maximumWithIntColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
 {
     if (_error) {
         if (error) {
@@ -276,11 +256,11 @@ using namespace std;
                                  return [NSNumber numberWithLongLong:_query->maximum(col_ndx)];
                                  , @"com.tightdb.query", nil);
 }
--(NSNumber *)maxFloat:(size_t)col_ndx
+-(NSNumber *)maximumWithFloatColumn:(size_t)col_ndx
 {
-    return [self maxFloat:col_ndx error:nil];
+    return [self maximumWithFloatColumn:col_ndx error:nil];
 }
--(NSNumber *)maxFloat:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber *)maximumWithFloatColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
 {
     if (_error) {
         if (error) {
@@ -294,11 +274,11 @@ using namespace std;
                                  , @"com.tightdb.query", nil);
 }
 
--(NSNumber *)maxDouble:(size_t)col_ndx
+-(NSNumber *)maximumWithDoubleColumn:(size_t)col_ndx
 {
-    return [self maxDouble:col_ndx error:nil];
+    return [self maximumWithDoubleColumn:col_ndx error:nil];
 }
--(NSNumber *)maxDouble:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber *)maximumWithDoubleColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
 {
     if (_error) {
         if (error) {
@@ -312,11 +292,11 @@ using namespace std;
                                  , @"com.tightdb.query", nil);
 }
 
--(NSNumber *)sumInt:(size_t)col_ndx
+-(NSNumber *)sumWithIntColumn:(size_t)col_ndx
 {
-    return [self sumInt:col_ndx error:nil];
+    return [self sumWithIntColumn:col_ndx error:nil];
 }
--(NSNumber *)sumInt:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber *)sumWithIntColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
 {
     if (_error) {
         if (error) {
@@ -330,11 +310,11 @@ using namespace std;
                                  , @"com.tightdb.query", nil);
 }
 
--(NSNumber *)sumFloat:(size_t)col_ndx
+-(NSNumber *)sumWithFloatColumn:(size_t)col_ndx
 {
-    return [self sumFloat:col_ndx error:nil];
+    return [self sumWithFloatColumn:col_ndx error:nil];
 }
--(NSNumber *)sumFloat:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber *)sumWithFloatColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
 {
     if (_error) {
         if (error) {
@@ -348,11 +328,11 @@ using namespace std;
                                  , @"com.tightdb.query", nil);
 }
 
--(NSNumber *)sumDouble:(size_t)col_ndx
+-(NSNumber *)sumWithDoubleColumn:(size_t)col_ndx
 {
-    return [self sumDouble:col_ndx error:nil];
+    return [self sumWithDoubleColumn:col_ndx error:nil];
 }
--(NSNumber *)sumDouble:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber *)sumWithDoubleColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
 {
     if (_error) {
         if (error) {
@@ -366,11 +346,11 @@ using namespace std;
                                  , @"com.tightdb.query", nil);
 }
 
--(NSNumber *)avgInt:(size_t)col_ndx
+-(NSNumber *)averageWithIntColumn:(size_t)col_ndx
 {
-    return [self avgInt:col_ndx error:nil];
+    return [self averageWithIntColumn:col_ndx error:nil];
 }
--(NSNumber *)avgInt:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber *)averageWithIntColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
 {
     if (_error) {
         if (error) {
@@ -383,11 +363,11 @@ using namespace std;
                                  return [NSNumber numberWithDouble:_query->average(col_ndx)];
                                  , @"com.tightdb.query", nil);
 }
--(NSNumber *)avgFloat:(size_t)col_ndx
+-(NSNumber *)averageWithFloatColumn:(size_t)col_ndx
 {
-    return [self avgFloat:col_ndx error:nil];
+    return [self averageWithFloatColumn:col_ndx error:nil];
 }
--(NSNumber *)avgFloat:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber *)averageWithFloatColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
 {
     if (_error) {
         if (error) {
@@ -401,11 +381,12 @@ using namespace std;
                                  , @"com.tightdb.query", nil);
 }
 
--(NSNumber *)avgDouble:(size_t)col_ndx
+-(NSNumber *)averageWithDoubleColumn:(size_t)col_ndx
 {
-    return [self avgDouble:col_ndx error:nil];
+    return [self averageWithDoubleColumn:col_ndx error:nil];
 }
--(NSNumber *)avgDouble:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+
+-(NSNumber *)averageWithDoubleColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
 {
     if (_error) {
         if (error) {
@@ -770,21 +751,21 @@ using namespace std;
     return _query;
 }
 
--(NSNumber *)min
+-(NSNumber *)minimum
 {
-    return [self minWithError:nil];
+    return [self minimumWithError:nil];
 }
--(NSNumber *)minWithError:(NSError *__autoreleasing *)error
+-(NSNumber *)minimumWithError:(NSError *__autoreleasing *)error
 {
-    return [_query minInt:_column_ndx error:error];
+    return [_query minimumWithIntColumn:_column_ndx error:error];
 }
--(NSNumber *)max
+-(NSNumber *)maximum
 {
-    return [self maxWithError:nil];
+    return [self maximumWithError:nil];
 }
--(NSNumber *)maxWithError:(NSError *__autoreleasing *)error
+-(NSNumber *)maximumWithError:(NSError *__autoreleasing *)error
 {
-    return [_query maxInt:_column_ndx error:error];
+    return [_query maximumWithIntColumn:_column_ndx error:error];
 }
 
 -(NSNumber *)sum
@@ -793,15 +774,15 @@ using namespace std;
 }
 -(NSNumber *)sumWithError:(NSError *__autoreleasing *)error
 {
-    return [_query sumInt:_column_ndx error:error];
+    return [_query sumWithIntColumn:_column_ndx error:error];
 }
--(NSNumber *)avg
+-(NSNumber *)average
 {
-    return [self avgWithError:nil];
+    return [self averageWithError:nil];
 }
--(NSNumber *)avgWithError:(NSError *__autoreleasing *)error
+-(NSNumber *)averageWithError:(NSError *__autoreleasing *)error
 {
-    return [_query avgInt:_column_ndx error:error];
+    return [_query averageWithIntColumn:_column_ndx error:error];
 }
 @end
 
@@ -863,21 +844,21 @@ using namespace std;
     return _query;
 }
 
--(NSNumber *)min
+-(NSNumber *)minimum
 {
-    return [self minWithError:nil];
+    return [self minimumWithError:nil];
 }
--(NSNumber *)minWithError:(NSError *__autoreleasing *)error
+-(NSNumber *)minimumWithError:(NSError *__autoreleasing *)error
 {
-    return [_query minFloat:_column_ndx error:error];
+    return [_query minimumWithFloatColumn:_column_ndx error:error];
 }
--(NSNumber *)max
+-(NSNumber *)maximum
 {
-    return [self maxWithError:nil];
+    return [self maximumWithError:nil];
 }
--(NSNumber *)maxWithError:(NSError *__autoreleasing *)error
+-(NSNumber *)maximumWithError:(NSError *__autoreleasing *)error
 {
-    return [_query maxFloat:_column_ndx error:error];
+    return [_query maximumWithFloatColumn:_column_ndx error:error];
 }
 
 -(NSNumber *)sum
@@ -886,15 +867,15 @@ using namespace std;
 }
 -(NSNumber *)sumWithError:(NSError *__autoreleasing *)error
 {
-    return [_query sumFloat:_column_ndx error:error];
+    return [_query sumWithFloatColumn:_column_ndx error:error];
 }
--(NSNumber *)avg
+-(NSNumber *)average
 {
-    return [self avgWithError:nil];
+    return [self averageWithError:nil];
 }
--(NSNumber *)avgWithError:(NSError *__autoreleasing *)error
+-(NSNumber *)averageWithError:(NSError *__autoreleasing *)error
 {
-    return [_query avgFloat:_column_ndx error:error];
+    return [_query averageWithFloatColumn:_column_ndx error:error];
 }
 @end
 
@@ -956,21 +937,21 @@ using namespace std;
     return _query;
 }
 
--(NSNumber *)min
+-(NSNumber *)minimum
 {
-    return [self minWithError:nil];
+    return [self minimumWithError:nil];
 }
--(NSNumber *)minWithError:(NSError *__autoreleasing *)error
+-(NSNumber *)minimumWithError:(NSError *__autoreleasing *)error
 {
-    return [_query minDouble:_column_ndx error:error];
+    return [_query minimumWithDoubleColumn:_column_ndx error:error];
 }
--(NSNumber *)max
+-(NSNumber *)maximum
 {
-    return [self maxWithError:nil];
+    return [self maximumWithError:nil];
 }
--(NSNumber *)maxWithError:(NSError *__autoreleasing *)error
+-(NSNumber *)maximumWithError:(NSError *__autoreleasing *)error
 {
-    return [_query maxDouble:_column_ndx error:error];
+    return [_query maximumWithDoubleColumn:_column_ndx error:error];
 }
 
 -(NSNumber *)sum
@@ -979,15 +960,15 @@ using namespace std;
 }
 -(NSNumber *)sumWithError:(NSError *__autoreleasing *)error
 {
-    return [_query sumDouble:_column_ndx error:error];
+    return [_query sumWithDoubleColumn:_column_ndx error:error];
 }
--(NSNumber *)avg
+-(NSNumber *)average
 {
-    return [self avgWithError:nil];
+    return [self averageWithError:nil];
 }
--(NSNumber *)avgWithError:(NSError *__autoreleasing *)error
+-(NSNumber *)averageWithError:(NSError *__autoreleasing *)error
 {
-    return [_query avgDouble:_column_ndx error:error];
+    return [_query averageWithDoubleColumn:_column_ndx error:error];
 }
 @end
 

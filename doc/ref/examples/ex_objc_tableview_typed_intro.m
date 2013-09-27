@@ -19,16 +19,21 @@ int main()
         
         // Adds rows to the table.
         
-        [table addName:@"Mary" Age:14];
-        [table addName:@"Joe" Age:17];
-        [table addName:@"Jack" Age:22];
-        [table addName:@"Sam" Age:34];
-        [table addName:@"Bob" Age:10];
+        PeopleTable_Cursor *cursor = [table addRow];
+        cursor.Name = @"Brian";
+        cursor.Age = 10;
+        
+        cursor = [table addRow];
+        cursor.Name = @"Sofie";
+        cursor.Age = 40;
+        
+        cursor = [table addRow];
+        cursor.Name = @"Sam";
+        cursor.Age = 76;
         
         // Place the result of a query in a table view.
         
         PeopleTable_View *tableView = [[[table where].Age columnIsGreaterThan:20] findAll];
-        
         
         // Itereator over the result in the table view.
         
