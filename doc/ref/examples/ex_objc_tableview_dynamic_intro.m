@@ -3,9 +3,6 @@
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
 
-#define NAME 0
-#define AGE 1
-#define HIRED 2
 
 int main()
 {
@@ -15,37 +12,53 @@ int main()
         
         TightdbTable *table = [[TightdbTable alloc] init];
         
-        // Add some colomns.
+        // Add some colomns (obsolete style, see typed table example).
         
-        [table addColumn:tightdb_String name:@"Name"];
-        [table addColumn:tightdb_Int name:@"Age"];
-        [table addColumn:tightdb_Bool name:@"Hired"];
+        size_t const NAME = [table addColumnWithType:tightdb_String andName:@"Name"];
+        size_t const AGE = [table addColumnWithType:tightdb_Int andName:@"Age"];
+        size_t const HIRED = [table addColumnWithType:tightdb_Bool andName:@"Hired"];
         
         // Add some people.
         
-        [table addRows:5];
+        // Add rows and values.
         
-        [table setString:NAME ndx:0 value:@"Sam"];
-        [table setString:NAME ndx:1 value:@"Paul"];
-        [table setString:NAME ndx:2 value:@"Jack"];
-        [table setString:NAME ndx:3 value:@"Simon"];
-        [table setString:NAME ndx:4 value:@"Brian"];
+        TightdbCursor *cursor;
         
-        [table set:AGE ndx:0 value:10];
-        [table set:AGE ndx:1 value:20];
-        [table set:AGE ndx:2 value:30];
-        [table set:AGE ndx:3 value:45];
-        [table set:AGE ndx:4 value:56];
+        // Row 0
         
-        [table set:HIRED ndx:0 value:YES];
-        [table set:HIRED ndx:1 value:NO];
-        [table set:HIRED ndx:2 value:NO];
-        [table set:HIRED ndx:3 value:YES];
-        [table set:HIRED ndx:4 value:NO];
+        cursor = [table addRow];
+        
+        [cursor setInt:23 inColumn:AGE];
+        [cursor setString:@"Joe" inColumn:NAME];
+        [cursor setBool:YES inColumn:HIRED];
+        
+        // Row 1
+        
+        cursor = [table addRow];
+        
+        [cursor setInt:32 inColumn:AGE];
+        [cursor setString:@"Simon" inColumn:NAME];
+        [cursor setBool:YES inColumn:HIRED];
+        
+        // Row 2
+        
+        cursor = [table addRow];
+        
+        [cursor setInt:12 inColumn:AGE];
+        [cursor setString:@"Steve" inColumn:NAME];
+        [cursor setBool:NO inColumn:HIRED];
+        
+        // Row 3
+        
+        cursor = [table addRow];
+        
+        [cursor setInt:59 inColumn:AGE];
+        [cursor setString:@"Nick" inColumn:NAME];
+        [cursor setBool:YES inColumn:HIRED];
         
         // Set up a query to search for employees.
         
-        TightdbQuery *q =  [[[table where] column: AGE   isBetweenInt:0 and_:60]
+        TightdbQuery *q =  [[[table where] column: AGE   isBetweenInt:30 and_:60]
                                            column: HIRED isEqualToBool:YES];
         
         // Execute the query.
@@ -53,21 +66,25 @@ int main()
         TightdbView *view = [q findAll];
         
         // Print the names.
-        
-        for (int i = 0; i < [view count]; i++) {
-            NSLog(@"name: %@",[view getString:NAME ndx:i]);
-        }
-        
+
         for (TightdbCursor *ite in view) {
-            NSLog(@"name: %@",[ite getStringInColumn:NAME]);
+            NSLog(@"With iterator.......name: %@",[ite getStringInColumn:NAME]);
         }
 
         // Take a curser at index one in the view.
         // Note: the index of this row is different in the underlaying table.
 
-        TightdbCursor *c = [view cursorAtIndex:0];
-        NSLog(@"name: %@",[c getStringInColumn:NAME]);
+        TightdbCursor *c = [view cursorAtIndex:1];
+        if (c != nil)
+            NSLog(@"With fixed index....name: %@",[c getStringInColumn:NAME]);
 
+        
+        // Index out-of-bounds index.
+        
+        TightdbCursor *c2 = [view cursorAtIndex:[view count]];
+        if (c2 != nil)
+            NSLog(@"Should not get here.");
+        
     }
 }
 // @@EndExample@@

@@ -41,35 +41,30 @@
 -(NSNumber *)countWithError:(NSError *__autoreleasing *)error;
 -(NSNumber *)remove;
 -(NSNumber *)removeWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)minInt:(size_t)colNdx;
--(NSNumber *)minInt:(size_t)colNdx error:(NSError *__autoreleasing *)error;
-
-// jjepsen: started naming convention updateting here, more will follow. Kept old methods for now.
--(NSNumber *)minimumIntOfColumn:(size_t)colNdx;
--(NSNumber *)minimumIntOfColumn:(size_t)colNdx withError:(NSError *__autoreleasing *)error;
-
--(NSNumber *)minFloat:(size_t)colNdx;
--(NSNumber *)minFloat:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(NSNumber *)minDouble:(size_t)colNdx;
--(NSNumber *)minDouble:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(NSNumber *)maxInt:(size_t)colNdx;
--(NSNumber *)maxInt:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(NSNumber *)maxFloat:(size_t)colNdx;
--(NSNumber *)maxFloat:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(NSNumber *)maxDouble:(size_t)colNdx;
--(NSNumber *)maxDouble:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(NSNumber *)sumInt:(size_t)colNdx;
--(NSNumber *)sumInt:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(NSNumber *)sumFloat:(size_t)colNdx;
--(NSNumber *)sumFloat:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(NSNumber *)sumDouble:(size_t)colNdx;
--(NSNumber *)sumDouble:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(NSNumber *)avgInt:(size_t)colNdx;
--(NSNumber *)avgInt:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(NSNumber *)avgFloat:(size_t)colNdx;
--(NSNumber *)avgFloat:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(NSNumber *)avgDouble:(size_t)colNdx;
--(NSNumber *)avgDouble:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)minimumWithIntColumn:(size_t)colNdx;
+-(NSNumber *)minimumWithIntColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)minimumWithFloatColumn:(size_t)colNdx;
+-(NSNumber *)minimumWithFloatColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)minimumWithDoubleColumn:(size_t)colNdx;
+-(NSNumber *)minimumWithDoubleColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)maximumWithIntColumn:(size_t)colNdx;
+-(NSNumber *)maximumWithIntColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)maximumWithFloatColumn:(size_t)colNdx;
+-(NSNumber *)maximumWithFloatColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)maximumWithDoubleColumn:(size_t)colNdx;
+-(NSNumber *)maximumWithDoubleColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)sumWithIntColumn:(size_t)colNdx;
+-(NSNumber *)sumWithIntColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)sumWithFloatColumn:(size_t)colNdx;
+-(NSNumber *)sumWithFloatColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)sumWithDoubleColumn:(size_t)colNdx;
+-(NSNumber *)sumWithDoubleColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)averageWithIntColumn:(size_t)colNdx;
+-(NSNumber *)averageWithIntColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)averageWithFloatColumn:(size_t)colNdx;
+-(NSNumber *)averageWithFloatColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(NSNumber *)averageWithDoubleColumn:(size_t)colNdx;
+-(NSNumber *)averageWithDoubleColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
 -(size_t)findNext:(size_t)last;
 -(size_t)findNext:(size_t)last error:(NSError *__autoreleasing *)error;
 
@@ -141,14 +136,14 @@
 -(TightdbQuery *)columnIsLessThan:(int64_t)value;
 -(TightdbQuery *)columnIsLessThanOrEqualTo:(int64_t)value;
 -(TightdbQuery *)columnIsBetween:(int64_t)from and_:(int64_t)to;
--(NSNumber *)min;
--(NSNumber *)minWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)max;
--(NSNumber *)maxWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)minimum;
+-(NSNumber *)minimumWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)maximum;
+-(NSNumber *)maximumWithError:(NSError *__autoreleasing *)error;
 -(NSNumber *)sum;
 -(NSNumber *)sumWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)avg;
--(NSNumber *)avgWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)average;
+-(NSNumber *)averageWithError:(NSError *__autoreleasing *)error;
 @end
 
 
@@ -161,14 +156,14 @@
 -(TightdbQuery *)columnIsLessThan:(float)value;
 -(TightdbQuery *)columnIsLessThanOrEqualTo:(float)value;
 -(TightdbQuery *)columnIsBetween:(float)from and_:(float)to;
--(NSNumber *)min;
--(NSNumber *)minWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)max;
--(NSNumber *)maxWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)minimum;
+-(NSNumber *)minimumWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)maximum;
+-(NSNumber *)maximumWithError:(NSError *__autoreleasing *)error;
 -(NSNumber *)sum;
 -(NSNumber *)sumWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)avg;
--(NSNumber *)avgWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)average;
+-(NSNumber *)averageWithError:(NSError *__autoreleasing *)error;
 @end
 
 
@@ -181,14 +176,14 @@
 -(TightdbQuery *)columnIsLessThan:(double)value;
 -(TightdbQuery *)columnIsLessThanOrEqualTo:(double)value;
 -(TightdbQuery *)columnIsBetween:(double)from and_:(double)to;
--(NSNumber *)min;
--(NSNumber *)minWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)max;
--(NSNumber *)maxWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)minimum;
+-(NSNumber *)minimumWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)maximum;
+-(NSNumber *)maximumWithError:(NSError *__autoreleasing *)error;
 -(NSNumber *)sum;
 -(NSNumber *)sumWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)avg;
--(NSNumber *)avgWithError:(NSError *__autoreleasing *)error;
+-(NSNumber *)average;
+-(NSNumber *)averageWithError:(NSError *__autoreleasing *)error;
 @end
 
 

@@ -167,9 +167,9 @@ TIGHTDB_TABLE_2(SubMixedTable,
     tableSub = [unknownTable castClass:[SubMixedTable class]];
     NSLog(@"TableSub Size: %lu", [tableSub count]);
     STAssertEquals([tableSub count], (size_t)5,@"Subtable should have 5 rows");
-    NSLog(@"Count int: %lu", [table countInt:2 target:50]);
-    NSLog(@"Max: %lld", [table maxInt:2]);
-    NSLog(@"Avg: %.2f", [table avgInt:2]);
+    NSLog(@"Count int: %lu", [table countWithIntColumn:2 andValue:50]);
+    NSLog(@"Max: %lld", [table maximumWithIntColumn:2]);
+    NSLog(@"Avg: %.2f", [table averageWithIntColumn:2]);
 
     NSLog(@"MyTable Size: %lu", [table count]);
     int sumType = 0;
