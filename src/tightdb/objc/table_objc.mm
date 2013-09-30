@@ -117,7 +117,7 @@ using namespace std;
 +(TightdbMixed *)mixedWithDate:(time_t)value
 {
     TightdbMixed *mixed = [[TightdbMixed alloc] init];
-    mixed.mixed = tightdb::Mixed(tightdb::Date(value));
+    mixed.mixed = tightdb::Mixed(tightdb::DateTime(value));
     return mixed;
 }
 
@@ -153,8 +153,8 @@ using namespace std;
             return _mixed.get_string() == other->_mixed.get_string();
         case tightdb::type_Binary:
             return _mixed.get_binary() == other->_mixed.get_binary();
-        case tightdb::type_Date:
-            return _mixed.get_date() == other->_mixed.get_date();
+        case tightdb::type_DateTime:
+            return _mixed.get_datetime() == other->_mixed.get_datetime();
         case tightdb::type_Table:
             return [_table getTable] == [other->_table getTable]; // Compare table contents
         case tightdb::type_Mixed:
@@ -201,7 +201,7 @@ using namespace std;
 
 -(time_t)getDate
 {
-    return _mixed.get_date().get_date();
+    return _mixed.get_datetime().get_datetime();
 }
 
 -(TightdbTable *)getTable
@@ -401,7 +401,7 @@ using namespace std;
 }
 -(time_t)getDate:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return _tableView->get_date(col_ndx, ndx).get_date();
+    return _tableView->get_datetime(col_ndx, ndx).get_datetime();
 }
 -(NSString *)getString:(size_t)col_ndx ndx:(size_t)ndx
 {
@@ -868,7 +868,7 @@ using namespace std;
 
 -(time_t)getDate:(size_t)col_ndx ndx:(size_t)ndx
 {
-    return _table->get_date(col_ndx, ndx).get_date();
+    return _table->get_datetime(col_ndx, ndx).get_datetime();
 }
 
 -(BOOL)setDate:(size_t)col_ndx ndx:(size_t)ndx value:(time_t)value
@@ -884,7 +884,7 @@ using namespace std;
         return NO;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 _table->set_date(col_ndx, ndx, value);
+                                 _table->set_datetime(col_ndx, ndx, value);
                                  , @"com.tightdb.table", NO);
     return YES;
 }
@@ -1029,7 +1029,7 @@ using namespace std;
         return NO;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 _table->insert_date(col_ndx, ndx, value);
+                                 _table->insert_datetime(col_ndx, ndx, value);
                                  , @"com.tightdb.table", NO);
     return YES;
 }
@@ -1270,7 +1270,7 @@ using namespace std;
 }
 -(size_t)findDate:(size_t)col_ndx value:(time_t)value
 {
-    return _table->find_first_date(col_ndx, value);
+    return _table->find_first_datetime(col_ndx, value);
 }
 -(size_t)findMixed:(size_t)col_ndx value:(TightdbMixed *)value
 {
@@ -1338,7 +1338,7 @@ using namespace std;
 
 -(int64_t)sumWithIntColumn:(size_t)col_ndx
 {
-    return _table->sum(col_ndx);
+    return _table->sum_int(col_ndx);
 }
 -(double)sumWithFloatColumn:(size_t)col_ndx
 {
@@ -1351,7 +1351,7 @@ using namespace std;
 
 -(int64_t)maximumWithIntColumn:(size_t)col_ndx
 {
-    return _table->maximum(col_ndx);
+    return _table->maximum_int(col_ndx);
 }
 -(float)maximumWithFloatColumn:(size_t)col_ndx
 {
@@ -1364,7 +1364,7 @@ using namespace std;
 
 -(int64_t)minimumWithIntColumn:(size_t)col_ndx
 {
-    return _table->minimum(col_ndx);
+    return _table->minimum_int(col_ndx);
 }
 -(float)minimumWithFloatColumn:(size_t)col_ndx
 {
@@ -1377,7 +1377,7 @@ using namespace std;
 
 -(double)averageWithIntColumn:(size_t)col_ndx
 {
-    return _table->average(col_ndx);
+    return _table->average_int(col_ndx);
 }
 -(double)averageWithFloatColumn:(size_t)col_ndx
 {

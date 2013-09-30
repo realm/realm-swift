@@ -199,7 +199,7 @@ using namespace std;
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithLongLong:_query->minimum(col_ndx)];
+                                 return [NSNumber numberWithLongLong:_query->minimum_int(col_ndx)];
                                  , @"com.tightdb.query", nil);
 }
 
@@ -253,7 +253,7 @@ using namespace std;
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithLongLong:_query->maximum(col_ndx)];
+                                 return [NSNumber numberWithLongLong:_query->maximum_int(col_ndx)];
                                  , @"com.tightdb.query", nil);
 }
 -(NSNumber *)maximumWithFloatColumn:(size_t)col_ndx
@@ -306,7 +306,7 @@ using namespace std;
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithLongLong:_query->sum(col_ndx)];
+                                 return [NSNumber numberWithLongLong:_query->sum_int(col_ndx)];
                                  , @"com.tightdb.query", nil);
 }
 
@@ -360,7 +360,7 @@ using namespace std;
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithDouble:_query->average(col_ndx)];
+                                 return [NSNumber numberWithDouble:_query->average_int(col_ndx)];
                                  , @"com.tightdb.query", nil);
 }
 -(NSNumber *)averageWithFloatColumn:(size_t)col_ndx
@@ -455,7 +455,7 @@ using namespace std;
 
 -(TightdbQuery *)column:(size_t)colNdx isBetweenDate:(time_t)from and_:(time_t)to
 {
-    _query->between_date(colNdx, from, to);
+    _query->between_datetime(colNdx, from, to);
     return self;
 }  
 
@@ -497,7 +497,7 @@ using namespace std;
 
 -(TightdbQuery *)column:(size_t)colNdx isEqualToDate:(time_t)value
 {
-    _query->equal_date(colNdx, value);
+    _query->equal_datetime(colNdx, value);
     return self;
 }
 
@@ -539,7 +539,7 @@ using namespace std;
 
 -(TightdbQuery *)column:(size_t)colNdx isNotEqualToDate:(time_t)value
 {
-    _query->not_equal_date(colNdx, value);
+    _query->not_equal_datetime(colNdx, value);
     return self;
 }
 
@@ -569,7 +569,7 @@ using namespace std;
 
 -(TightdbQuery *)column:(size_t)colNdx isGreaterThanDate:(time_t)value
 {
-    _query->greater_date(colNdx, value);
+    _query->greater_datetime(colNdx, value);
     return self;
 }
 
@@ -593,7 +593,7 @@ using namespace std;
 
 -(TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToDate:(time_t)value
 {
-    _query->greater_equal_date(colNdx, value);
+    _query->greater_equal_datetime(colNdx, value);
     return self;
 }
 
@@ -617,7 +617,7 @@ using namespace std;
 
 -(TightdbQuery *)column:(size_t)colNdx isLessThanDate:(time_t)value
 {
-    _query->less_date(colNdx, value);
+    _query->less_datetime(colNdx, value);
     return self;
 }
 
@@ -641,7 +641,7 @@ using namespace std;
 
 -(TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToDate:(time_t)value
 {
-    _query->less_equal_date(colNdx, value);
+    _query->less_equal_datetime(colNdx, value);
     return self;
 }
 
@@ -1098,37 +1098,37 @@ using namespace std;
 }
 -(TightdbQuery *)columnIsEqualTo:(time_t)value
 {
-    [_query getQuery]->equal_date(_column_ndx, value);
+    [_query getQuery]->equal_datetime(_column_ndx, value);
     return _query;
 }
 -(TightdbQuery *)columnIsNotEqualTo:(time_t)value
 {
-    [_query getQuery]->not_equal_date(_column_ndx, value);
+    [_query getQuery]->not_equal_datetime(_column_ndx, value);
     return _query;
 }
 -(TightdbQuery *)columnIsGreaterThan:(time_t)value
 {
-    [_query getQuery]->greater_date(_column_ndx, value);
+    [_query getQuery]->greater_datetime(_column_ndx, value);
     return _query;
 }
 -(TightdbQuery *)columnIsGreaterThanOrEqualTo:(time_t)value
 {
-    [_query getQuery]->greater_equal_date(_column_ndx, value);
+    [_query getQuery]->greater_equal_datetime(_column_ndx, value);
     return _query;
 }
 -(TightdbQuery *)columnIsLessThan:(time_t)value
 {
-    [_query getQuery]->less_date(_column_ndx, value);
+    [_query getQuery]->less_datetime(_column_ndx, value);
     return _query;
 }
 -(TightdbQuery *)columnIsLessThanOrEqualTo:(time_t)value
 {
-    [_query getQuery]->less_equal_date(_column_ndx, value);
+    [_query getQuery]->less_equal_datetime(_column_ndx, value);
     return _query;
 }
 -(TightdbQuery *)columnIsBetween:(time_t)from and_:(time_t)to
 {
-    [_query getQuery]->between_date(_column_ndx, from, to);
+    [_query getQuery]->between_datetime(_column_ndx, from, to);
     return _query;
 }
 @end
