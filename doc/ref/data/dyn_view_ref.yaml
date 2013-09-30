@@ -134,11 +134,23 @@ CATEGORIES :
 
 - Rows:
   METHODS:
+  - g_dyn_view_cursor_at_index:
+      NAME     : cursorAtIndex
+      SUMMARY  : Returns a cursor at a specified row number.
+      DESCR    : *objc_typed_table_cursor_at_index_descr
+      SIGNATURE: "- (TightdbCursor *)cursorAtIndex:(size_t)ndx"
+      PARAMS:
+      - NAME   : ndx
+        TYPES  : size_t
+        DESCR  : The row number.
+      RETURN:
+        TYPES  : TightdbCursor *
+        DESCR  : The cursor.
   - g_dyn_view_get_source_ndx:
-      NAME     : getSourceNdx
+      NAME     : getSourceIndex
       SUMMARY  : *g_dyn_view_get_source_ndx_summary
       DESCR    : *g_dyn_view_get_source_ndx_descr
-      SIGNATURE: (size_t)getSourceNdx:(size_t)ndx
+      SIGNATURE: (size_t)getSourceIndex:(size_t)ndx
       CONST    : True
       PARAMS:
       - NAME   : ndx
@@ -152,10 +164,10 @@ CATEGORIES :
         DESCR  :
 
   - g_dyn_view_remove_row:
-      NAME     : remove
+      NAME     : removeRowAtIndex
       SUMMARY  : *g_dyn_table_remove_row_summary
       DESCR    : *g_dyn_table_remove_row_descr
-      SIGNATURE: (void)remove:(size_t)ndx;
+      SIGNATURE: (void)removeRowAtIndex:(size_t)ndx;
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
@@ -165,61 +177,61 @@ CATEGORIES :
         DESCR  :
 
   - g_dyn_view_remove_last_row:
-      NAME     : removeLast
+      NAME     : removeLastRow
       SUMMARY  : *g_dyn_table_remove_last_row_summary
       DESCR    : *g_dyn_table_remove_last_row_descr
-      SIGNATURE: (void)removeLast;
+      SIGNATURE: (void)removeLastRow;
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_remove_last_row
         DESCR  :
 
 
-- Values:
-  METHODS:
-  - g_dyn_view_get_float:
-      TODO     : soon
-  - g_dyn_view_get_double:
-      TODO     : soon
-  - g_dyn_view_get_date:
-      NAME     : getDate
-  - g_dyn_view_get_string:
-      NAME     : getString
-  - g_dyn_view_get_binary:
-      TODO     : soon
-  - g_dyn_view_get_mixed:
-      TODO     : soon
-  - g_dyn_view_get_mixed_type:
-      TODO     : soon
-  - g_dyn_view_get_subtable_const:
-      IGNORE   : ""
-  - g_dyn_view_get_subtable:
-      TODO     : soon
-  - g_dyn_view_get_bool:
-      NAME     : getBool
-  - g_dyn_view_get_int:
-      NAME     : get
-      TITLE    : get*
-      SUMMARY  : *g_dyn_table_get_xxx_summary
-      DESCR    : *g_dyn_table_get_xxx_descr
-      SIGNATURE: |
-                 (BOOL)getBool:(size_t)col_ndx ndx:(size_t)ndx
-                 (int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
-                 (time_t)getDate:(size_t)col_ndx ndx:(size_t)ndx
-                 (NSString *)getString:(size_t)col_ndx ndx:(size_t)ndx
-      CONST    : True
-      PARAMS:
-      - NAME   : column_ndx
-        TYPES  : size_t
-        DESCR  : The column index.
-      - NAME   : row_ndx
-        TYPES  : size_t
-        DESCR  : The row index.
-      RETURN:
-        TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, BinaryData, Mixed, DataType, TableRef, ConstTableRef]
-        DESCR  : The value.
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_view_get_xxx
-        DESCR  :
+#- Values:
+#  METHODS:
+#  - g_dyn_view_get_float:
+#      TODO     : soon
+#  - g_dyn_view_get_double:
+#      TODO     : soon
+#  - g_dyn_view_get_date:
+#      NAME     : getDate
+#  - g_dyn_view_get_string:
+#      NAME     : getString
+#  - g_dyn_view_get_binary:
+#      TODO     : soon
+#  - g_dyn_view_get_mixed:
+#      TODO     : soon
+#  - g_dyn_view_get_mixed_type:
+#      TODO     : soon
+#  - g_dyn_view_get_subtable_const:
+#      IGNORE   : ""
+#  - g_dyn_view_get_subtable:
+#      TODO     : soon
+#  - g_dyn_view_get_bool:
+#      NAME     : getBool
+#  - g_dyn_view_get_int:
+#      NAME     : get
+#      TITLE    : get*
+#      SUMMARY  : *g_dyn_table_get_xxx_summary
+#      DESCR    : *g_dyn_table_get_xxx_descr
+#      SIGNATURE: |
+#                 (BOOL)getBool:(size_t)col_ndx ndx:(size_t)ndx
+#                 (int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
+#                 (time_t)getDate:(size_t)col_ndx ndx:(size_t)ndx
+#                 (NSString *)getString:(size_t)col_ndx ndx:(size_t)ndx
+#      CONST    : True
+#      PARAMS:
+#      - NAME   : column_ndx
+#        TYPES  : size_t
+#        DESCR  : The column index.
+#      - NAME   : row_ndx
+#        TYPES  : size_t
+#        DESCR  : The row index.
+#      RETURN:
+#        TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, BinaryData, Mixed, DataType, TableRef, ConstTableRef]
+#        DESCR  : The value.
+#      EXAMPLES:
+#      - CODE   : ex_objc_dyn_view_get_xxx
+#        DESCR  :
 
   - g_dyn_view_set_bool:
       TODO     : soon

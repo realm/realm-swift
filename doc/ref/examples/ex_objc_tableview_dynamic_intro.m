@@ -14,8 +14,8 @@ int main()
         
         // Add some colomns (obsolete style, see typed table example).
         
-        size_t const NAME = [table addColumnWithType:tightdb_String andName:@"Name"];
-        size_t const AGE = [table addColumnWithType:tightdb_Int andName:@"Age"];
+        size_t const NAME  = [table addColumnWithType:tightdb_String andName:@"Name"];
+        size_t const AGE   = [table addColumnWithType:tightdb_Int andName:@"Age"];
         size_t const HIRED = [table addColumnWithType:tightdb_Bool andName:@"Hired"];
         
         // Add some people.
@@ -84,8 +84,6 @@ int main()
         TightdbCursor *c2 = [view cursorAtIndex:[view count]];
         if (c2 != nil)
             NSLog(@"Should not get here.");
-        
-
         
     }
 }
