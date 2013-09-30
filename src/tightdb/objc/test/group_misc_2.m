@@ -82,14 +82,14 @@ TIGHTDB_TABLE_2(QueryTable,
     [table2 addHired:YES Age:54];
 
     // Create query (current employees between 20 and 30 years old)
-    MyTable2_Query *q = [[[table2 where].Hired equal:YES].Age between:20 to:30];
+    MyTable2_Query *q = [[[table2 where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30];
 
     // Get number of matching entries
-    NSLog(@"Query count: %zu", [q count]);
-    STAssertEquals([q count], (size_t)2,@"Expected 2 rows in query");
+    NSLog(@"Query count: %zu", [[q count] unsignedLongValue]);
+    STAssertEquals([[q count] unsignedLongValue], (size_t)2,@"Expected 2 rows in query");
 
      // Get the average age - currently only a low-level interface!
-    double avg = [q.Age avg];
+    double avg = [[q.Age average] doubleValue];
     NSLog(@"Average: %f", avg);
     STAssertEquals(avg, 21.0,@"Expected 20.5 average");
 
@@ -116,7 +116,7 @@ TIGHTDB_TABLE_2(QueryTable,
 //    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
     NSLog(@"Disktable size: %zu", [diskTable count]);
     for (size_t i = 0; i < [diskTable count]; i++) {
-        MyTable_Cursor *cursor = [diskTable objectAtIndex:i];
+        MyTable_Cursor *cursor = [diskTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, [cursor Name]);
         NSLog(@"%zu: %@", i, cursor.Name);
         NSLog(@"%zu: %@", i, [diskTable getString:0 ndx:i]);
@@ -148,40 +148,40 @@ TIGHTDB_TABLE_2(QueryTable,
     [table addFirst:8 Second:@"The quick brown fox"];
 
     {
-        QueryTable_Query *q = [[table where].First between:3 to:7]; // Between
-        STAssertEquals((size_t)2,   [q count], @"count != 2");
+        QueryTable_Query *q = [[table where].First columnIsBetween:3 and_:7]; // Between
+        STAssertEquals((size_t)2,   [[q count] unsignedLongValue], @"count != 2");
 //        STAssertEquals(9,   [q.First sum]); // Sum
-        STAssertEquals(4.5, [q.First avg], @"Avg!=4.5"); // Average
+        STAssertEquals(4.5, [[q.First average] doubleValue], @"Avg!=4.5"); // Average
 //        STAssertEquals(4,   [q.First min]); // Minimum
 //        STAssertEquals(5,   [q.First max]); // Maximum
     }
     {
-        QueryTable_Query *q = [[table where].Second contains:@"quick" caseSensitive:NO]; // String contains
-        STAssertEquals((size_t)1, [q count], @"count != 1");
+        QueryTable_Query *q = [[table where].Second columnContains:@"quick" caseSensitive:NO]; // String contains
+        STAssertEquals((size_t)1, [[q count] unsignedLongValue], @"count != 1");
     }
     {
-        QueryTable_Query *q = [[table where].Second beginsWith:@"The" caseSensitive:NO]; // String prefix
-        STAssertEquals((size_t)1, [q count], @"count != 1");
+        QueryTable_Query *q = [[table where].Second columnBeginsWith:@"The" caseSensitive:NO]; // String prefix
+        STAssertEquals((size_t)1, [[q count] unsignedLongValue], @"count != 1");
     }
     {
-        QueryTable_Query *q = [[table where].Second endsWith:@"The" caseSensitive:NO]; // String suffix
-        STAssertEquals((size_t)0, [q count], @"count != 1");
+        QueryTable_Query *q = [[table where].Second columnEndsWith:@"The" caseSensitive:NO]; // String suffix
+        STAssertEquals((size_t)0, [[q count] unsignedLongValue], @"count != 1");
     }
     {
-        QueryTable_Query *q = [[[table where].Second notEqual:@"a" caseSensitive:NO].Second notEqual:@"b" caseSensitive:NO]; // And
-        STAssertEquals((size_t)1, [q count], @"count != 1");
+        QueryTable_Query *q = [[[table where].Second columnIsNotEqualTo:@"a" caseSensitive:NO].Second columnIsNotEqualTo:@"b" caseSensitive:NO]; // And
+        STAssertEquals((size_t)1, [[q count] unsignedLongValue], @"count != 1");
     }
     {
-        QueryTable_Query *q = [[[[table where].Second notEqual:@"a" caseSensitive:NO] or].Second notEqual:@"b" caseSensitive:NO]; // Or
-        STAssertEquals((size_t)4, [q count], @"count != 1");
+        QueryTable_Query *q = [[[[table where].Second columnIsNotEqualTo:@"a" caseSensitive:NO] or].Second columnIsNotEqualTo:@"b" caseSensitive:NO]; // Or
+        STAssertEquals((size_t)4, [[q count] unsignedLongValue], @"count != 1");
     }
     {
-        QueryTable_Query *q = [[[[[[[table where].Second equal:@"a" caseSensitive:NO] group].First less:3] or].First greater:5] endgroup]; // Parentheses
-        STAssertEquals((size_t)1, [q count], @"count != 1");
+        QueryTable_Query *q = [[[[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO] group].First columnIsLessThan:3] or].First columnIsGreaterThan:5] endgroup]; // Parentheses
+        STAssertEquals((size_t)1, [[q count] unsignedLongValue], @"count != 1");
     }
     {
-        QueryTable_Query *q = [[[[[table where].Second equal:@"a" caseSensitive:NO].First less:3] or].First greater:5]; // No parenthesis
-        STAssertEquals((size_t)2, [q count], @"count != 2");
+        QueryTable_Query *q = [[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO].First columnIsLessThan:3] or].First columnIsGreaterThan:5]; // No parenthesis
+        STAssertEquals((size_t)2, [[q count] unsignedLongValue], @"count != 2");
         TightdbView *tv = [q findAll];
         STAssertEquals((size_t)2, [tv count], @"count != 2");
         STAssertEquals((int64_t)8, [tv get:0 ndx:1], @"First != 8");
@@ -201,12 +201,12 @@ TIGHTDB_TABLE_2(QueryTable,
     // Specify the table schema
     {
         TightdbSpec *s = [table getSpec];
-        [s addColumn:tightdb_Int name:@"int"];
+        [s addColumnWithType:tightdb_Int andName:@"int"];
         {
             TightdbSpec *sub = [s addColumnTable:@"tab"];
-            [sub addColumn:tightdb_Int name:@"int"];
+            [sub addColumnWithType:tightdb_Int andName:@"int"];
         }
-        [s addColumn:tightdb_Mixed name:@"mix"];
+        [s addColumnWithType:tightdb_Mixed andName:@"mix"];
         [table updateFromSpec];
     }
 
@@ -234,7 +234,7 @@ TIGHTDB_TABLE_2(QueryTable,
     OCTopLevelTable *subtable2 = [table getTopLevelTable:COL_TABLE_MIX ndx:0];
     {
         TightdbSpec *s = [subtable2 getSpec];
-        [s addColumn:tightdb_Int name:@"int"];
+        [s addColumnWithType:tightdb_Int andName:@"int"];
         [subtable2 updateFromSpec:[s getRef]];
     }
     // Add a row to it

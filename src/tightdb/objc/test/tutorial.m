@@ -61,22 +61,26 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     //------------------------------------------------------
 
     // Getting values
-    NSString * name = [people objectAtIndex:5].Name;   // => 'Anni'
+    NSString * name = [people cursorAtIndex:5].Name;   // => 'Anni'
     // Using a cursor
-    PeopleTable_Cursor *myRow = [people objectAtIndex:5];
+    PeopleTable_Cursor *myRow = [people cursorAtIndex:5];
     int64_t age = myRow.Age;                           // => 54
     BOOL hired  = myRow.Hired;                         // => true
     NSLog(@"%@ is %lld years old.", name, age);
     if (hired) NSLog(@"is hired.");
 
     // Setting values
-    [[people objectAtIndex:5] setAge:43];               // Getting younger
+    NSError *error;
+    if (![[people cursorAtIndex:5] setAge:43 error:&error]) {               // Getting younger
+        NSLog(@"%@", [error localizedDescription]);
+        STFail(@"This action should not fail");
+    }
     // or with dot-syntax:
     myRow.Age += 1;                                    // Happy birthday!
     NSLog(@"%@ age is now %lld.   [44]", myRow.Name, myRow.Age);
 
     // Get last row
-    NSString *lastname = [people lastObject].Name;       // => "Anni"
+    NSString *lastname = [people cursorAtLastIndex].Name;       // => "Anni"
     NSLog(@"Last name is %@.   [Anni]", lastname);
 
     // Change a row - not implemented yet
@@ -89,7 +93,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
 
     // Iterating over rows:
     for (size_t i = 0; i < [people count]; ++i) {
-        PeopleTable_Cursor *row = [people objectAtIndex:i];
+        PeopleTable_Cursor *row = [people cursorAtIndex:i];
         NSLog(@"(Rows) %@ is %lld years old.", row.Name, row.Age);
     }
 
@@ -115,15 +119,15 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     //------------------------------------------------------
 
     // Create query (current employees between 20 and 30 years old)
-    PeopleTable_Query *q = [[[people where].Hired equal:YES]            // Implicit AND
-                                  .Age between:20 to:30];
+    PeopleTable_Query *q = [[[people where].Hired columnIsEqualTo:YES]            // Implicit AND
+                                  .Age columnIsBetween:20 and_:30];
 
     // Get number of matching entries
-    NSLog(@"Query count: %zu", [q count]);
-    STAssertEquals([q count], (size_t)2,@"Expected 2 rows in query", nil);
+    NSLog(@"Query count: %@", [q count]);
+    STAssertEquals([[q count] unsignedLongValue] , (size_t)2,@"Expected 2 rows in query", nil);
 
     // Get the average age - currently only a low-level interface!
-    double avg = [q.Age avg];
+    double avg = [[q.Age average] doubleValue];
     NSLog(@"Average: %f    [20.5]", avg);
     STAssertEquals(avg, 20.5,@"Expected 20.5 average", nil);
 
@@ -131,8 +135,8 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     TightdbView *res = [q findAll];
     for (size_t i = 0; i < [res count]; ++i) {
         NSLog(@"%zu: %@ is %lld years old", i,
-            [people objectAtIndex:i].Name,
-            [people objectAtIndex:i].Age);
+            [people cursorAtIndex:i].Name,
+            [people cursorAtIndex:i].Age);
     }
 
     //------------------------------------------------------
@@ -154,7 +158,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"Disktable size: %zu", [diskTable count]);
 
     for (size_t i = 0; i < [diskTable count]; i++) {
-        PeopleTable_Cursor *cursor = [diskTable objectAtIndex:i];
+        PeopleTable_Cursor *cursor = [diskTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, [cursor Name]);
         NSLog(@"%zu: %@", i, cursor.Name);
     }
@@ -167,7 +171,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:data size:size];
     PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class]];
     for (size_t i = 0; i < [memTable count]; i++) {
-        PeopleTable_Cursor *cursor = [memTable objectAtIndex:i];
+        PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, cursor.Name);
     }
 }
