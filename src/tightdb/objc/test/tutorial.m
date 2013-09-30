@@ -87,7 +87,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     // [people setAtIndex:4 Name:"Eric" Age:50 Hired:YES];
 
     // Delete row
-    [people remove:2];
+    [people removeRowAtIndex:2];
     NSLog(@"%lu rows after remove.  [5]", [people count]);  // 5
     STAssertEquals([people count], (size_t)5,@"rows should be 5");
 

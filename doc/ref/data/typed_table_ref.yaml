@@ -247,10 +247,10 @@ CATEGORIES:
 # TODO: g_typed_table_insert_empty_row
 
   - g_typed_table_remove_row:
-      NAMES    : remove
+      NAMES    : removeRowAtIndex
       SUMMARY  : *g_typed_table_remove_row_summary
       DESCR    : *g_typed_table_remove_row_descr
-      SIGNATURE: (void)remove:(size_t)ndx
+      SIGNATURE: (void)removeRowAtIndex:(size_t)ndx
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
@@ -260,10 +260,10 @@ CATEGORIES:
         DESCR  :
 
   - g_typed_table_remove_last_row:
-      NAMES    : removeLast
+      NAMES    : removeLastRow
       SUMMARY  : *g_typed_table_remove_last_row_summary
       DESCR    : *g_typed_table_remove_last_row_descr
-      SIGNATURE: (void)removeLast
+      SIGNATURE: (void)removeLastRow
       EXAMPLES:
       - CODE   : ex_objc_typed_table_remove_last_row
         DESCR  :
@@ -272,32 +272,31 @@ CATEGORIES:
   METHODS:
   # TODO: g_typed_table_lookup:
 
-  - g_typed_table_find_first_bool:
-  - g_typed_table_find_first_int:
-  - g_typed_table_find_first_float:
-  - g_typed_table_find_first_double:
-  - g_typed_table_find_first_date:
-  - g_typed_table_find_first_string:
-      NAMES    : [find, find, find, find, find, find]
-      TITLE    : "*find"
-      SUMMARY  : *g_typed_table_find_first_xxx_summary
-      DESCR    : |
-                 The method finds the first occurence of a given value in a column.
-                 The method is automatically made available by a macro taking as input the table definition {@link g_typed_table_macros}. The method can only be accessed through a property of the table object. The property <code>CName</code> represents the column to be searched. The type of <code>value</code> must correspond type of the column being accessed. Refer also to the example below.
-      SIGNATURE: ".CName (size_t)find: (CType*)value"
-      PARAMS:
-      - NAME   : value
-        TYPES  : [BOOL, int64_t, float, double, time_t, NSString *]
-        DESCR  : *g_typed_table_lookup_parm1_descr
-      RETURN:
-        TYPES  : size_t
-        DESCR  : "The row index or <code>TBD</code> (equal to <code>size_t(-1)</code>) if there is no match."
-      EXAMPLES:
-      - CODE   : ex_objc_typed_table_find_first_xxx
-        DESCR  :
+  #- g_typed_table_find_first_bool:
+  #- g_typed_table_find_first_int:
+  #- g_typed_table_find_first_float:
+  #- g_typed_table_find_first_double:
+  #- g_typed_table_find_first_date:
+  #- g_typed_table_find_first_string:
+  #    NAMES    : [find, find, find, find, find, find]
+  #    TITLE    : "*find"
+  #    SUMMARY  : *g_typed_table_find_first_xxx_summary
+  #    DESCR    : |
+  #               The method finds the first occurence of a given value in a column.
+  #               The method is automatically made available by a macro taking as input the table definition {@link g_typed_table_macros}. The method can only be accessed through a property of the table object. The property <code>CName</code> represents the column to be searched. The type of <code>value</code> must correspond type of the column being accessed. Refer also to the example below.
+  #    SIGNATURE: ".CName (size_t)find: (CType*)value"
+  #    PARAMS:
+  #    - NAME   : value
+  #      TYPES  : [BOOL, int64_t, float, double, time_t, NSString *]
+  #      DESCR  : *g_typed_table_lookup_parm1_descr
+  #    RETURN:
+  #      TYPES  : size_t
+  #      DESCR  : "The row index or <code>TBD</code> (equal to <code>size_t(-1)</code>) if there is no match."
+  #    EXAMPLES:
+  #    - CODE   : ex_objc_typed_table_find_first_xxx
+  #      DESCR  :
 
   - g_typed_table_where:
-  
       NAMES    : where
       SIGNATURE: (TableName_Query *)where;
       SUMMARY  : *g_typed_table_where_summery
@@ -309,6 +308,115 @@ CATEGORIES:
       - DESCR  :
         CODE   : ex_cpp_typed_table_where
 
+- Aggregates:
+  METHODS:
+  - g_typed_table_sum:
+      TODO: soon (+ start, end, limit)
+  - g_typed_table_sum_float:
+      TODO: soon (+ start, end, limit)
+  - g_typed_table_sum_double:
+      TODO: soon (+ start, end, limit)
+  - g_typed_table_sum_2:
+      NAME     : sum
+  - g_typed_table_sum_float_2:
+      NAME     : sum
+  - g_typed_table_sum_double_2:
+      NAME     : sum
+      TITLE    : "*sum"
+      DESCR    : *g_typed_query_sum_descr
+      SUMMARY  : *g_typed_query_sum_summary
+      SIGNATURE: |
+                 .CName (int64_t)sum
+                 .CName (double)sum
+      RETURN:
+        TYPES  : [int64_t, double, double]
+        DESCR  : *g_typed_query_sum_return_descr
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_objc_table_query_sum
+
+  - g_typed_table_maximum:
+      TODO: soon (+ start, end, limit)
+  - g_typed_table_maximum_float:
+      TODO: soon (+ start, end, limit)
+  - g_typed_table_maximum_double:
+      TODO: soon (+ start, end, limit)
+  - g_typed_table_maximum_date:
+      TODO: soon (+ start, end, limit)
+  - g_typed_table_maximum_date:
+      TODO: soon
+  - g_typed_table_maximum_2:
+      NAME     : max
+  - g_typed_table_maximum_float_2:
+      NAME     : max
+  - g_typed_table_maximum_double_2:
+      NAME     : max
+      TITLE    : "*maximum"
+      DESCR    : *g_typed_query_maximum_descr
+      SUMMARY  : *g_typed_query_maximum_summary
+      SIGNATURE: |
+                 .CName (int64_t)maximum
+                 .CName (float)maximum
+                 .CName (double)maximum
+      RETURN:
+        TYPES  : [int64_t, float, double]
+        DESCR  : *g_typed_query_maximum_return1_descr
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_objc_typed_query_maximum
+ 
+  - g_typed_table_minimum:
+      TODO: soon (+ start, end, limit)
+  - g_typed_table_minimum_float:
+      TODO: soon (+ start, end, limit)
+  - g_typed_table_minimum_double:
+      TODO: soon (+ start, end, limit)
+  - g_typed_table_minimum_date:
+      TODO: soon (+ start, end, limit)
+  - g_typed_table_minimum_date:
+      TODO: soon
+  - g_typed_table_minimum_2:
+      NAME     : min
+  - g_typed_table_minimum_float_2:
+      NAME     : min
+  - g_typed_table_minimum_double_2:
+      NAME     : min
+      TITLE    : "*minimum"
+      DESCR    : *g_typed_query_minimum_descr
+      SUMMARY  : *g_typed_query_minimum_summary
+      SIGNATURE: |
+                 .CName (int64_t)minimum
+                 .CName (float)minimum
+                 .CName (double)minimum
+      RETURN:
+        TYPES  : [int64_t, float, double]
+        DESCR  : *g_typed_query_minimum_return1_descr
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_objc_typed_query_manimum
+        
+  - g_typed_table_average:
+      TODO: soon (+ start, end, limit)
+  - g_typed_table_average_float:
+      TODO: soon (+ start, end, limit)
+  - g_typed_table_average_double:
+      TODO: soon (+ start, end, limit)
+  - g_typed_table_average_2:
+      NAME     : avg
+  - g_typed_table_average_float_2:
+      NAME     : avg
+  - g_typed_table_average_double_2:
+      NAME     : avg
+      TITLE    : "*average"
+      SUMMARY  : *g_typed_query_average_summary
+      DESCR    : *g_typed_query_average_descr
+      SIGNATURE: .CName (double)average
+      RETURN:
+        TYPES  : double
+        DESCR  : *g_typed_query_average_return1_descr
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_objc_typed_query_average
 # - g_typed_table_where_const:
 
 # TODO: 

@@ -415,7 +415,7 @@ using namespace std;
 {
     _tableView->clear();
 }
--(size_t)getSourceNdx:(size_t)ndx
+-(size_t)getSourceIndex:(size_t)ndx
 {
     return _tableView->get_source_ndx(ndx);
 }
@@ -741,7 +741,7 @@ using namespace std;
 
 -(BOOL)removeRowAtIndex:(size_t)ndx
 {
-    return [self remove:ndx error:nil];
+    return [self removeRowAtIndex:ndx error:nil];
 }
 
 -(BOOL)removeRowAtIndex:(size_t)ndx error:(NSError *__autoreleasing *)error
@@ -759,7 +759,7 @@ using namespace std;
 
 -(BOOL)removeLastRow
 {
-    return [self removeLastWithError:nil];
+    return [self removeLastRowWithError:nil];
 }
 
 -(BOOL)removeLastRowWithError:(NSError *__autoreleasing *)error

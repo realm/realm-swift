@@ -59,7 +59,7 @@ void tableFunc() {
     // @EndExample@@
     
     // @@Example: deleting_row @@
-    [people removeRowAtIndex:2];
+    [people remove:2];
     size_t cnt2 = [people count];                      // cnt = 5
     // @@EndExample@@
     
