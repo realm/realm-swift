@@ -115,7 +115,7 @@ TIGHTDB_TABLE_2(MyTable2,
 
     
     // Get the average age - currently only a low-level interface!
-    NSNumber *avg = [q.Age avg];
+    NSNumber *avg = [q.Age average];
     NSLog(@"Average: %i", [avg intValue]);
     [_utils Eval:[avg intValue]== 21.0 msg:@"Expected 20.5 average"];
 
@@ -128,6 +128,9 @@ TIGHTDB_TABLE_2(MyTable2,
 
     //------------------------------------------------------
 
+    NSFileManager *manager = [NSFileManager defaultManager];
+    [manager removeItemAtPath:[_utils pathForDataFile:@"employees.tightdb"] error:nil];
+    
     // Write to disk
     [group write:[_utils pathForDataFile:@"employees.tightdb"]];
 
