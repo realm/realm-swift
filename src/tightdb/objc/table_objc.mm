@@ -374,13 +374,13 @@ using namespace std;
 
 -(TightdbCursor *)cursorAtIndex:(size_t)ndx 
 {
-    // The cursor constructor checks the index is in bounds. However, getSourceNdx should 
+    // The cursor constructor checks the index is in bounds. However, getSourceIndex should 
     // not be called with illegal index.
 
     if (ndx >= [self count]) 
         return nil;
     
-    return [[TightdbCursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; 
+    return [[TightdbCursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; 
 }
 
 -(size_t)count
@@ -407,7 +407,7 @@ using namespace std;
 {
     return to_objc_string(_tableView->get_string(col_ndx, ndx));
 }
--(void)remove:(size_t)ndx
+-(void)removeRowAtIndex:(size_t)ndx
 {
     _tableView->remove(ndx);
 }
@@ -422,7 +422,7 @@ using namespace std;
 
 -(TightdbCursor *)getCursor
 {
-    return tmpCursor = [[TightdbCursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]];
+    return tmpCursor = [[TightdbCursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len
@@ -434,7 +434,7 @@ using namespace std;
         *stackbuf = tmp;
     }
     if (state->state < [self count]) {
-        [((TightdbCursor *)*stackbuf) setNdx:[self getSourceNdx:state->state]];
+        [((TightdbCursor *)*stackbuf) setNdx:[self getSourceIndex:state->state]];
         state->itemsPtr = stackbuf;
         state->state++;
     }
@@ -495,9 +495,6 @@ using namespace std;
 
 -(TightdbCursor *)getCursor
 {
-    // TODO: Explain tmpCurser. It was introduced by Thomas. Never used directly in the code.
-    //       If omitted, iteration will only work the first time. The cuase is not known at the time of writing.
-
     return tmpCursor = [[TightdbCursor alloc] initWithTable:self ndx:0];
 }
 -(void)clearCursor
@@ -742,12 +739,12 @@ using namespace std;
     return YES;
 }
 
--(BOOL)remove:(size_t)ndx
+-(BOOL)removeRowAtIndex:(size_t)ndx
 {
     return [self remove:ndx error:nil];
 }
 
--(BOOL)remove:(size_t)ndx error:(NSError *__autoreleasing *)error
+-(BOOL)removeRowAtIndex:(size_t)ndx error:(NSError *__autoreleasing *)error
 {
     if (_readOnly) {
         if (error)
@@ -760,12 +757,12 @@ using namespace std;
     return YES;
 }
 
--(BOOL)removeLast
+-(BOOL)removeLastRow
 {
     return [self removeLastWithError:nil];
 }
 
--(BOOL)removeLastWithError:(NSError *__autoreleasing *)error
+-(BOOL)removeLastRowWithError:(NSError *__autoreleasing *)error
 {
     if (_readOnly) {
         if (error)
