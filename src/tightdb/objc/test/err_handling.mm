@@ -337,15 +337,15 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     }
     
     // Test Deletes
-    if (![table remove:14 error:&error]) {
+    if (![table removeRowAtIndex:14 error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"Remove failed.");
     }
-    if (![table remove:0 error:&error]) {
+    if (![table removeRowAtIndex:0 error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"Remove failed.");
     }
-    if (![table remove:5 error:&error]) {
+    if (![table removeRowAtIndex:5 error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"Remove failed.");
     }

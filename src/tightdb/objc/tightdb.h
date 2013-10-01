@@ -230,11 +230,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 } \
 -(TightdbCursor *)getCursor \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
+    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
+    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; \
 } \
 @end
 
@@ -456,11 +456,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 } \
 -(TightdbCursor *)getCursor \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
+    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
+    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; \
 } \
 @end
 
@@ -699,11 +699,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 } \
 -(TightdbCursor *)getCursor \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
+    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
+    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; \
 } \
 @end
 
@@ -959,11 +959,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 } \
 -(TightdbCursor *)getCursor \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
+    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
+    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; \
 } \
 @end
 
@@ -1236,11 +1236,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 } \
 -(TightdbCursor *)getCursor \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
+    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
+    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; \
 } \
 @end
 
@@ -1530,11 +1530,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 } \
 -(TightdbCursor *)getCursor \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
+    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
+    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; \
 } \
 @end
 
@@ -1841,11 +1841,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 } \
 -(TightdbCursor *)getCursor \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
+    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
+    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; \
 } \
 @end
 
@@ -2169,11 +2169,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 } \
 -(TightdbCursor *)getCursor \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
+    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
+    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; \
 } \
 @end
 
@@ -2514,11 +2514,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 } \
 -(TightdbCursor *)getCursor \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
+    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
+    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; \
 } \
 @end
 
@@ -2876,11 +2876,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 } \
 -(TightdbCursor *)getCursor \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
+    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
+    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; \
 } \
 @end
 
@@ -3255,11 +3255,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 } \
 -(TightdbCursor *)getCursor \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
+    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
+    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; \
 } \
 @end
 
@@ -3651,11 +3651,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 } \
 -(TightdbCursor *)getCursor \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
+    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
+    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; \
 } \
 @end
 
@@ -4064,11 +4064,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 } \
 -(TightdbCursor *)getCursor \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
+    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
+    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; \
 } \
 @end
 
@@ -4494,11 +4494,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 } \
 -(TightdbCursor *)getCursor \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
+    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
+    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; \
 } \
 @end
 
@@ -4941,11 +4941,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 } \
 -(TightdbCursor *)getCursor \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
+    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
+    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; \
 } \
 @end
 

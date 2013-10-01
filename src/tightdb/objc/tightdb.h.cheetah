@@ -318,11 +318,11 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 } \
 -(TightdbCursor *)getCursor \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:0]]; \
+    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:0]]; \
 } \
 -(TableName##_Cursor *)cursorAtIndex:(size_t)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceNdx:ndx]]; \
+    return [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; \
 } \
 @end
 
