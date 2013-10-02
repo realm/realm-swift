@@ -138,11 +138,11 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName${j+1}, CType${j+1}) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self findNext:-1]; \
+    return [self find:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
-    return [self findNext:ndx]; \
+    return [self find:ndx]; \
 } \
 -(TightdbCursor *)getCursor:(long)ndx \
 { \
