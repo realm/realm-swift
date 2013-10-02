@@ -240,7 +240,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         STAssertEquals([[[table where] column:DOUBLE_COL isLessThanOrEqualToDouble:5.6] count], [NSNumber numberWithLongLong:2], @"isLessThanOrEqualToDouble");
         STAssertEquals([[[table where] column:DATE_COL isLessThanOrEqualToDate:timeNow] count], [NSNumber numberWithLongLong:2], @"isLessThanOrEqualToDate");
 
-        STAssertEquals([[[table where] column:INT_COL isBetweenInt:859 and_:861] findNext:-1], (size_t) 1, @"findNext");
+        STAssertEquals([[[table where] column:INT_COL isBetweenInt:859 and_:861] findNext:0], (size_t) 1, @"findNext");
         
         STAssertEquals([[[[table where] column:INT_COL isBetweenInt:859 and_:861] findAll] class], [TightdbView class], @"findAll");
 
