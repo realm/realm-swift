@@ -86,7 +86,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName1, CType1) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self find:-1]; \
+    return [self find:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
@@ -302,7 +302,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName2, CType2) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self find:-1]; \
+    return [self find:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
@@ -535,7 +535,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName3, CType3) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self find:-1]; \
+    return [self find:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
@@ -785,7 +785,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName4, CType4) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self find:-1]; \
+    return [self find:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
@@ -1052,7 +1052,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName5, CType5) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self find:-1]; \
+    return [self find:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
@@ -1336,7 +1336,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName6, CType6) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self find:-1]; \
+    return [self find:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
@@ -1637,7 +1637,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName7, CType7) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self find:-1]; \
+    return [self find:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
@@ -1955,7 +1955,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName8, CType8) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self find:-1]; \
+    return [self find:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
@@ -2290,7 +2290,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName9, CType9) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self find:-1]; \
+    return [self find:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
@@ -2642,7 +2642,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName10, CType10) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self find:-1]; \
+    return [self find:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
@@ -3011,7 +3011,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName11, CType11) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self find:-1]; \
+    return [self find:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
@@ -3397,7 +3397,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName12, CType12) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self find:-1]; \
+    return [self find:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
@@ -3800,7 +3800,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName13, CType13) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self find:-1]; \
+    return [self find:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
@@ -4220,7 +4220,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName14, CType14) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self find:-1]; \
+    return [self find:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
@@ -4657,7 +4657,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName15, CType15) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self find:-1]; \
+    return [self find:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
