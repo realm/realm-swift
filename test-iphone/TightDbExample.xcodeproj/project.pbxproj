@@ -41,7 +41,6 @@
 		E9D58B611541A375009150B1 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		E9D58B641541A375009150B1 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPhone.xib; sourceTree = "<group>"; };
 		E9D58B671541A375009150B1 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPad.xib; sourceTree = "<group>"; };
-		FEF1C0B116538A2A00A9F612 /* libtightdb-objc-ios-dbg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libtightdb-objc-ios-dbg.a"; path = "../src/tightdb/objc/libtightdb-objc-ios-dbg.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,7 +61,6 @@
 		E9D58B3F1541A374009150B1 = {
 			isa = PBXGroup;
 			children = (
-				FEF1C0B116538A2A00A9F612 /* libtightdb-objc-ios-dbg.a */,
 				410B4DD2156E59A30048E4C8 /* libsqlite3.dylib */,
 				E9D58B541541A375009150B1 /* TightDbExample */,
 				E9D58B4D1541A375009150B1 /* Frameworks */,

@@ -361,22 +361,22 @@ CATEGORIES :
       - DESCR  :
         CODE   : ex_objc_typed_query_findall
         
-  - g_typed_query_find_next:
-      NAMES    : findNext
+  - g_typed_query_find:
+      NAMES    : find
       SIGNATURE: |
-                 (size_t)findNext:(size_t)last
-      DESCR    : *g_typed_query_find_next_descr
-      SUMMARY  : *g_typed_query_find_next_summary
+                 (size_t)find:(size_t)last
+      DESCR    : *g_typed_query_find_descr
+      SUMMARY  : *g_typed_query_find_summary
       PARAMS:
       - NAME   : last
         TYPES  : size_t
-        DESCR  : *g_typed_query_find_next_parm_lastmatch_descr
+        DESCR  : *g_typed_query_find_parm_lastmatch_descr
       RETURN:
         TYPES  : size_t
-        DESCR  : *g_typed_query_find_next_return_descr
+        DESCR  : *g_typed_query_find_return_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_objc_typed_query_find_next
+        CODE   : ex_objc_typed_query_find
         
 
         

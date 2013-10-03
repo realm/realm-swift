@@ -64,12 +64,12 @@ using namespace std;
 
 -(long)getFastEnumStart
 {
-    return [self findNext:-1];
+    return [self find:0];
 }
 
 -(long)incrementFastEnum:(long)ndx
 {
-    return [self findNext:ndx];
+    return [self find:ndx];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len
@@ -413,11 +413,11 @@ using namespace std;
 }
 
 
--(size_t)findNext:(size_t)last
+-(size_t)find:(size_t)last
 {
-    return [self findNext:last error:nil];
+    return [self find:last error:nil];
 }
--(size_t)findNext:(size_t)last error:(NSError *__autoreleasing *)error
+-(size_t)find:(size_t)last error:(NSError *__autoreleasing *)error
 {
     if (_error) {
         if (error) {
@@ -427,7 +427,7 @@ using namespace std;
         return size_t(-1);
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return _query->find_next(last);
+                                 return _query->find(last);
                                  , @"com.tightdb.query", size_t(-1));
 }
 
