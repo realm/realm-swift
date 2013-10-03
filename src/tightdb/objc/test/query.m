@@ -250,4 +250,28 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
 }
 
+
+- (void)testFind
+{
+	TightdbTable *table = [[TightdbTable alloc]init];
+	[table addColumnWithType:tightdb_Int andName:@"IntCol"];
+	[table _addRows:6];
+	[table set:0 ndx:0 value:10];
+	[table set:0 ndx:1 value:42];
+	[table set:0 ndx:2 value:27];
+	[table set:0 ndx:3 value:31];
+	[table set:0 ndx:4 value:8];
+	[table set:0 ndx:5 value:39];
+
+	STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:0], (size_t)2, @"find");
+	STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:3], (size_t)3, @"find");
+	STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:4], (size_t)5, @"find");
+	STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:6], (size_t)-1, @"find");
+	STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:3], (size_t)3, @"find");
+	STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (size_t)-1, @"find");
+}
+
+ 
+
+
 @end
