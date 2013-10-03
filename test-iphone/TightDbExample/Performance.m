@@ -74,9 +74,11 @@ TIGHTDB_TABLE_4(PerfTable,
     });
 
     // Write to disk
+    [[NSFileManager defaultManager] removeItemAtPath:[_utils pathForDataFile:@"bigperfemployees.tightdb"] error:nil];
     [group write:[_utils pathForDataFile:@"bigperfemployees.tightdb"]];
     [self reportSizeForFile:[_utils pathForDataFile:@"bigperfemployees.tightdb"] msg:@"Normal filesize"];
     [table optimize];
+    [[NSFileManager defaultManager] removeItemAtPath:[_utils pathForDataFile:@"perfemployees.tightdb"] error:nil];
     [group write:[_utils pathForDataFile:@"perfemployees.tightdb"]];
     [self reportSizeForFile:[_utils pathForDataFile:@"perfemployees.tightdb"] msg:@"Optimized filesize"];
 
@@ -293,6 +295,7 @@ TIGHTDB_TABLE_4(PerfTable,
     TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:[_utils pathForDataFile:@"perfemployees.tightdb"]];
 
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
+    [[NSFileManager defaultManager] removeItemAtPath:tightDBPath error:nil];
     [fromDisk write:tightDBPath];
 
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
