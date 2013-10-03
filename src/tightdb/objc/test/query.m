@@ -268,6 +268,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 	STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:4], (size_t)5, @"find");
 	STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:6], (size_t)-1, @"find");
 	STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:3], (size_t)3, @"find");
+	STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (size_t)-1, @"find");
 }
 
  
