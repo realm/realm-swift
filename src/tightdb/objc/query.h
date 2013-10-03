@@ -65,8 +65,8 @@
 -(NSNumber *)averageWithFloatColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
 -(NSNumber *)averageWithDoubleColumn:(size_t)colNdx;
 -(NSNumber *)averageWithDoubleColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(size_t)findNext:(size_t)last;
--(size_t)findNext:(size_t)last error:(NSError *__autoreleasing *)error;
+-(size_t)find:(size_t)last;
+-(size_t)find:(size_t)last error:(NSError *__autoreleasing *)error;
 
 // jjepsen: please review this.
 -(TightdbView *)findAll;
