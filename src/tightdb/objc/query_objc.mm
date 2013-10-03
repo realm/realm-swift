@@ -85,7 +85,7 @@ using namespace std;
     if ((int)state->state != -1) {
         [((TightdbCursor *)*stackbuf) setNdx:state->state];
         state->itemsPtr = stackbuf;
-        state->state = [self incrementFastEnum:state->state];
+        state->state = [self incrementFastEnum:state->state+1];
     } else {
         *stackbuf = nil;
         state->itemsPtr = nil;
