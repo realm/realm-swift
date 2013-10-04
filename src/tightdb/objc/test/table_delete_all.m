@@ -78,9 +78,9 @@
     [table optimize];
 
     // Test Deletes
-    [table remove:14];
-    [table remove:0];
-    [table remove:5];
+    [table removeRowAtIndex:14];
+    [table removeRowAtIndex:0];
+    [table removeRowAtIndex:5];
     STAssertEquals([table count], (size_t)12, @"Size should have been 12");
 #ifdef TIGHTDB_DEBUG
     [table verify];
