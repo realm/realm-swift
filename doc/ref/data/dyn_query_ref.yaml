@@ -29,28 +29,28 @@ CATEGORIES :
   METHODS:
   - g_dyn_query_equals_binary:
 #      TODO     : soon
-      NAME     : "column:isEqualToBinary:"
+      NAME     : "isEqualToBinary:"
   - g_dyn_query_equals_boolean:
 #      TODO     : soon
-      NAME     : "column:isEqualToBoolean:"
+      NAME     : "isEqualToBoolean:"
   - g_dyn_query_equals_integer:
 #      TODO     : soon
-      NAME     : "column:isEqualToInteger:"
+      NAME     : "isEqualToInteger:"
   - g_dyn_query_equals_float:
 #      TODO     : soon
-      NAME     : "column:isEqualToFloat:"
+      NAME     : "isEqualToFloat:"
   - g_dyn_query_equals_double:
 #      TODO     : soon
-      NAME     : "column:isEqualToDouble:"
+      NAME     : "isEqualToDouble:"
   - g_dyn_query_equals_string:
 #      TODO     : soon
-      NAME     : "column:isEqualToString:"
+      NAME     : "isEqualToString:"
   - g_dyn_query_equals_string_2:
 #      TODO     : soon
-      NAME     : "column:isEqualToString:caseSensitive:"
+      NAME     : "isEqualToString:caseSensitive:"
   - g_dyn_query_equals_date:
-      NAME     : "column:isEqualToDate:"
-      TITLE    : "column:isEqualTo"
+      NAME     : "isEqualToDate:"
+      TITLE    : "isEqualTo"
 # Not yet implemented in API
 #      TODO     : soon
 #      NAMES    : [ equal, equal, equal, equal, equal, equal, equal]
@@ -83,23 +83,23 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_equals
 
   - g_dyn_query_notEquals_bool:
-      NAME     : "column:isNotEqualToBoolean:"
+      NAME     : "isNotEqualToBoolean:"
   - g_dyn_query_notEquals_binary:
-      NAME     : "column:isNotEqualToBinary:"
+      NAME     : "isNotEqualToBinary:"
   - g_dyn_query_notEquals_integer:
-      NAME     : "column:isNotEqualToInteger:"
+      NAME     : "isNotEqualToInteger:"
   - g_dyn_query_notEquals_float:
-      NAME     : "column:isNotEqualToFloat:"
+      NAME     : "isNotEqualToFloat:"
   - g_dyn_query_notEquals_double:
-      NAME     : "column:isNotEqualToDouble:"
+      NAME     : "isNotEqualToDouble:"
   - g_dyn_query_notEquals_string:
-      NAME     : "column:isNotEqualToString"
+      NAME     : "isNotEqualToString"
   - g_dyn_query_notEquals_string_2:
-      NAME     : "column:isNotEqualToString:caseSensitive:"
+      NAME     : "sNotEqualToString:caseSensitive:"
   - g_dyn_query_notEquals_date:
 # Not yet implemented in API
-      NAME     : "column:isNotEqualToDate:"
-      TITLE    : "column:isNotEqualTo"
+      NAME     : "isNotEqualToDate:"
+      TITLE    : "isNotEqualTo"
 #      NAMES    : [ notEqual, notEqual, notEqual, notEqual, notEqual, notEqual ]
       SIGNATURE: |
                  - (TightdbQuery *)column:(size_t)colNdx isNotEqualToInt:(int64_t)value
@@ -129,15 +129,15 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_notEquals
 
   - g_dyn_query_greaterThan_integer:
-      NAME     : "column:isGreaterThanInt:"
+      NAME     : "isGreaterThanInt:"
   - g_dyn_query_greaterThan_float:
-      NAME     : "column:isGreaterThanFloat:"
+      NAME     : "isGreaterThanFloat:"
   - g_dyn_query_greaterThan_double:
-      NAME     : "column:isGreaterThanDouble:"
+      NAME     : "isGreaterThanDouble:"
   - g_dyn_query_greaterThan_date:
 # Not yet implemented in API
-      NAME     : "column:isGreaterThanDate:"
-      TITLE    : "column:isGreaterThan"
+      NAME     : "isGreaterThanDate:"
+      TITLE    : "isGreaterThan"
 #TODO: check greater_date? does time_t work as int64_t?
       SIGNATURE: |
                  - (TightdbQuery *)column:(size_t)colNdx isGreaterThanInt:(int64_t)value
@@ -161,14 +161,14 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_greaterThan
 
   - g_dyn_query_greaterThanOrEqual_integer:
-      NAME     : "column:isGreaterThanOrEqualToInt:"
+      NAME     : "isGreaterThanOrEqualToInt:"
   - g_dyn_query_greaterThanOrEqual_float:
-      NAME     : "column:isGreaterThanOrEqualToFlaot:"
+      NAME     : "isGreaterThanOrEqualToFlaot:"
   - g_dyn_query_greaterThanOrEqual_double:
-      NAME     : "column:isGreaterThanOrEqualToDouble:"
+      NAME     : "isGreaterThanOrEqualToDouble:"
   - g_dyn_query_greaterThanOrEqual_date:
-      NAME     : "column:isGreaterThanOrEqualToDate:"
-      TITLE    : "column:isGreaterThanOrEqualTo"
+      NAME     : "isGreaterThanOrEqualToDate:"
+      TITLE    : "isGreaterThanOrEqualTo"
       SIGNATURE: |
                  - (TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToInt:(int64_t)value
                  - (TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToFloat:(float)value
@@ -191,14 +191,14 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_greaterThanOrEqual
         
   - g_dyn_query_lessThan_integer:
-      NAME     : "column:isLessThanInt:"
+      NAME     : "isLessThanInt:"
   - g_dyn_query_lessThan_float:
-      NAME     : "column:isLessThanFloat:"
+      NAME     : "isLessThanFloat:"
   - g_dyn_query_lessThan_double:
-      NAME     : "column:isLessThanDouble:"
+      NAME     : "isLessThanDouble:"
   - g_dyn_query_lessThan_date:
-      NAME     : "column:isLessThanDate:"
-      TITLE    : "column:isLessThan"
+      NAME     : "isLessThanDate:"
+      TITLE    : "isLessThan"
       SIGNATURE: |
                  - (TightdbQuery *)column:(size_t)colNdx isLessThanInt:(int64_t)value
                  - (TightdbQuery *)column:(size_t)colNdx isLessThanFloat:(float)value
@@ -221,14 +221,14 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_lessThan
 
   - g_dyn_query_lessThanOrEqual_integer:
-      NAME     : "column:isLessThanOrEqualToInt:"
+      NAME     : "isLessThanOrEqualToInt:"
   - g_dyn_query_lessThanOrEqual_float:
-      NAME     : "column:isLessThanOrEqualToFloat:"
+      NAME     : "isLessThanOrEqualToFloat:"
   - g_dyn_query_lessThanOrEqual_double:
-      NAME     : "column:isLessThanOrEqualToDouble:"
+      NAME     : "isLessThanOrEqualToDouble:"
   - g_dyn_query_lessThanOrEqual_date:
-      NAME     : "column:isLessThanOrEqualToDate:"
-      TITLE    : "column:isLessThanOrEqualTo"
+      NAME     : "isLessThanOrEqualToDate"
+      TITLE    : "isLessThanOrEqualTo"
       SIGNATURE: |
                  - (TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToInt:(int64_t)value
                  - (TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToFloat:(float)value
@@ -251,14 +251,14 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_lessThanOrEqual
         
   - g_dyn_query_between_integer:
-      NAME     : "column:isBetweenInt:"
+      NAME     : "isBetweenInt:"
   - g_dyn_query_between_float:
-      NAME     : "column:isBetweenFloat:"
+      NAME     : "isBetweenFloat:"
   - g_dyn_query_between_double:
-      NAME     : "column:isBetweenDouble:"
+      NAME     : "isBetweenDouble:"
   - g_dyn_query_between_date:
-      NAME     : "column:isBetweenDate:"
-      TITLE    : "column:isBetween"
+      NAME     : "isBetweenDate:"
+      TITLE    : "isBetween"
       SIGNATURE: |
                  - (TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and:(int64_t)to
                  - (TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and:(float)to
@@ -489,30 +489,6 @@ CATEGORIES :
       - DESCR  :
         CODE   : ex_objc_dyn_query_find
 
-  - g_dyn_query_sum_int:
-      NAME     : sumInt
-  - g_dyn_query_sum_float:
-      NAME     : sumFloat
-  - g_dyn_query_sum_double:
-      NAME     : sumDouble
-      TITLE    : sum*
-      DESCR    : *g_dyn_query_sum_descr
-      SUMMARY  : *g_dyn_query_sum_summary
-      SIGNATURE: |
-                 (int64_t)sumInt:(size_t)col_ndx
-                 (double)sumFloat:(size_t)col_ndx
-                 (double)sumDouble:(size_t)col_ndx
-      PARAMS:
-      - NAME   : col_ndx
-        DESCR  : Column index. The datatype of the column must match the function called. E.g. <code>sumFloat()</code> can only be used on columns which contains floats.
-        TYPES  : size_t
-      RETURN:
-        TYPES  : [int64_t, double]
-        DESCR  : *g_dyn_query_sum_return_descr
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_objc_dyn_query_sum
-
   - g_dyn_query_count:
       NAME     : count
       DESCR    : *g_dyn_query_size_descr
@@ -539,6 +515,29 @@ CATEGORIES :
       - DESCR  :
         CODE   : ex_objc_dyn_query_size
 
+  - g_dyn_query_sum_int:
+      NAME     : sumInt
+  - g_dyn_query_sum_float:
+      NAME     : sumFloat
+  - g_dyn_query_sum_double:
+      NAME     : sumDouble
+      TITLE    : sumWith*Column
+      DESCR    : *g_dyn_query_sum_descr
+      SUMMARY  : *g_dyn_query_sum_summary
+      SIGNATURE: |
+                 (int64_t)sumWithIntColumn:(size_t)colNdx
+                 (double)sumWithFloatColumn:(size_t)colNdx
+                 (double)sumWithDoubleColumn:(size_t)colNdx
+      PARAMS:
+      - NAME   : colNdx
+        DESCR  : Column index. The datatype of the column must match the function called.
+        TYPES  : size_t
+      RETURN:
+        TYPES  : [int64_t, double]
+        DESCR  : *g_dyn_query_sum_return_descr
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_objc_dyn_query_sum
 
   - g_dyn_query_maximum_double:
       NAME     : maxDouble
@@ -549,16 +548,16 @@ CATEGORIES :
       NAME     : maxDate
   - g_dyn_query_maximum_int:
       NAME     : maxInt
-      TITLE    : max*
+      TITLE    : maximumWith*Column
       DESCR    : *g_dyn_query_maximum_descr
       SUMMARY  : *g_dyn_query_maximum_summary
       SIGNATURE: |
-                 (int64_t)maxInt:(size_t)col_ndx
-                 (float)maxFloat:(size_t)col_ndx
-                 (double)maxDouble:(size_t)col_ndx
+                 (int64_t)maximumWithIntColumn:(size_t)colNdx
+                 (float)maximumWithFloatColumn:(size_t)colNdx
+                 (double)maximumWithDoubleColumn:(size_t)colNdx
       PARAMS:
-      - NAME   : col_ndx
-        DESCR  : Column index. The datatype of the column must match the function called. E.g. <code>maxFloat()</code> can only be used on columns which contains floats.
+      - NAME   : colNdx
+        DESCR  : Column index. The datatype of the column must match the function called. 
         TYPES  : size_t
       RETURN:
         TYPES  : [int64_t, float, double, time_t]
@@ -576,15 +575,15 @@ CATEGORIES :
       NAME     : minFloat
   - g_dyn_query_minimum_int:
       NAME     : minInt
-      TITLE    : min*
+      TITLE    : minimumWith*Column
       DESCR    : *g_dyn_query_minimum_descr
       SUMMARY  : *g_dyn_query_minimum_summary
       SIGNATURE: |
-                 (int64_t)minInt:(size_t)col_ndx
-                 (float)minFloat:(size_t)col_ndx
-                 (double)minDouble:(size_t)col_ndx
+                 (int64_t)minWithIntColumn:(size_t)colNdx
+                 (float)minWithFloatColumn:(size_t)colNdx
+                 (double)minWithDoubleColumn:(size_t)colNdx
       PARAMS:
-      - NAME   : col_ndx
+      - NAME   : colNdx
         DESCR  : Column index. The datatype of the column must match the function called. E.g. <code>minFloat()</code> can only be used on columns which contains floats.
         TYPES  : size_t
       RETURN:
@@ -600,16 +599,16 @@ CATEGORIES :
       NAME     : avgFloat
   - g_dyn_query_average_double:
       NAME     : avgDouble
-      TITLE    : avg*
+      TITLE    : averageWith*Column
       SUMMARY  : *g_dyn_query_average_summary
       DESCR    : *g_dyn_query_average_descr
       SIGNATURE: |
-                 (double)avgInt:(size_t)col_ndx
-                 (double)avgFloat:(size_t)col_ndx
-                 (double)avgDouble:(size_t)col_ndx
+                 (double)averageWithIntColumn:(size_t)colNdx
+                 (double)averageWithFloatColumn:(size_t)colNdx
+                 (double)averageWithDoubleColumn:(size_t)colNdx
       PARAMS:
-      - NAME   : col_ndx
-        DESCR  : Column index. The datatype of the column must match the function called. E.g. <code>average_float()</code> can only be used on columns which contains floats.
+      - NAME   : colNdx
+        DESCR  : Column index. The datatype of the column must match the function called.
         TYPES  : size_t
       RETURN:
         TYPES  : double
@@ -622,7 +621,7 @@ CATEGORIES :
       NAMES    : remove 
       DESCR    : *g_dyn_query_remove_descr
       SUMMARY  : *g_dyn_query_remove_summary
-      SIGNATURE: (size_t)remove
+      SIGNATURE: (NSNumber *)remove
 #      PARAMS:
 #      - NAME   : column
 #        DESCR  : *g_dyn_query_column_index_descr
@@ -640,7 +639,7 @@ CATEGORIES :
 #        TYPES  : size_t
 #        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSNumber *
         DESCR  : *g_dyn_query_remove_return_descr
       EXAMPLES:
       - DESCR  :
