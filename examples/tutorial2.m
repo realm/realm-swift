@@ -20,46 +20,15 @@ void tableFunc() {
     // @@EndExample@@
     
     // @@Example: insert_rows @@
-    
-    PeopleTable_Cursor *cursor;
-    
-    // Row 1
-    cursor = [people addRow];
-    cursor.Name  = @"John";
-    cursor.Age   = 21;
-    cursor.Hired = YES;
-    
-    // Row 2
-    cursor = [people addRow];
-    cursor.Name  = @"Mary";
-    cursor.Age   = 76;
-    cursor.Hired = NO;
-    
-    // Row 3
-    cursor = [people addRow];
-    cursor.Name  = @"Lars";
-    cursor.Age   = 22;
-    cursor.Hired = YES;
-    
-    // Row 4
-    cursor = [people addRow];
-    cursor.Name  = @"Phil";
-    cursor.Age   = 43;
-    cursor.Hired = NO;
-    
-    // Row 5
-    cursor = [people addRow];
-    cursor.Name  = @"Anni";
-    cursor.Age   = 54;
-    cursor.Hired = YES;
+    [people addName:@"John" Age:20 Hired:YES];
+    [people addName:@"Mary" Age:21 Hired:NO];
+    [people addName:@"Lars" Age:21 Hired:YES];
+    [people addName:@"Phil" Age:43 Hired:NO];
+    [people addName:@"Anni" Age:54 Hired:YES];
     // @@EndExample@@
     
     // @@Example: insert_at_index @@
-    cursor = [people insertRowAtIndex:2];
-    cursor.Name = @"Frank";
-    cursor.Age = 34;
-    cursor.Hired = YES;
-    
+    [people insertAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
     // @@EndExample@@
     
     // @@Example: number_of_rows @@
@@ -90,7 +59,7 @@ void tableFunc() {
     // @EndExample@@
     
     // @@Example: deleting_row @@
-    [people removeRowAtIndex:2];
+    [people remove:2];
     size_t cnt2 = [people count];                      // cnt = 5
     // @@EndExample@@
     
@@ -110,7 +79,7 @@ void tableFunc() {
     // @@Example: advanced_search @@
     // Create query (current employees between 20 and 30 years old)
     PeopleTable_Query *q = [[[people where].Hired columnIsEqualTo:YES]
-                                           .Age   columnIsBetween:20 and_:30];
+                            .Age columnIsBetween:20 and_:30];
 
     // Get number of matching entries
     size_t cnt3 = [q count];                            // =&gt; 2
@@ -125,11 +94,6 @@ void tableFunc() {
               [people cursorAtIndex:i].Name,
               [people cursorAtIndex:i].Age);
     }
-    
-    // Alternatively with fast emunaration
-    for (PeopleTable_Cursor *c in res)
-        NSLog(@"%@ is %lld years old", c.Name, c.Age);
-    
     // @@EndExample@@
 
 }
@@ -140,52 +104,23 @@ void groupFunc() {
     // @@Example: serialisation @@
     // Create Table in Group
     TightdbGroup *group = [TightdbGroup group];
-    PeopleTable *people = [group getTable:@"employees" withClass:[PeopleTable class]];
+    PeopleTable *people = [group getTable:@"employees"
+                                  withClass:[PeopleTable class]];
     
     // Add some rows
-    PeopleTable_Cursor *cursor;
-    
-    // Row 1
-    cursor = [people addRow];
-    cursor.Name  = @"John";
-    cursor.Age   = 21;
-    cursor.Hired = YES;
-    
-    // Row 2
-    cursor = [people addRow];
-    cursor.Name  = @"Mary";
-    cursor.Age   = 21;
-    cursor.Hired = NO;
-    
-    // Row 3
-    cursor = [people addRow];
-    cursor.Name  = @"Lars";
-    cursor.Age   = 21;
-    cursor.Hired = YES;
-    
-    // Row 4
-    cursor = [people addRow];
-    cursor.Name  = @"Phil";
-    cursor.Age   = 43;
-    cursor.Hired = NO;
-    
-    // Row 5
-    cursor = [people addRow];
-    cursor.Name  = @"Anni";
-    cursor.Age   = 54;
-    cursor.Hired = YES;
-    
-    // Delete any old file by same name
-    // IMPORTANT: write will fail if the file exists.
-    NSFileManager *manager = [NSFileManager defaultManager];
-    [manager removeItemAtPath:@"employees.tightdb" error:nil];
+    [people addName:@"John" Age:20 Hired:YES];
+    [people addName:@"Mary" Age:21 Hired:NO];
+    [people addName:@"Lars" Age:21 Hired:YES];
+    [people addName:@"Phil" Age:43 Hired:NO];
+    [people addName:@"Anni" Age:54 Hired:YES];
     
     // Write to disk
     [group write:@"employees.tightdb"];
     
     // Load a group from disk (and print contents)
     TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:@"employees.tightdb"];
-    PeopleTable *diskTable = [fromDisk getTable:@"employees" withClass:[PeopleTable class]];
+    PeopleTable *diskTable = [fromDisk getTable:@"employees"
+                                        withClass:[PeopleTable class]];
     
     NSLog(@"Disktable size: %zu", [diskTable count]);
     for (size_t i = 0; i < [diskTable count]; i++) {
@@ -199,18 +134,17 @@ void groupFunc() {
     
     // Load a group from memory (and print contents)
     TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:buffer size:len];
-    PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class]];
-    
+    PeopleTable *memTable = [fromMem getTable:@"employees"
+                                      withClass:[PeopleTable class]];
     for (size_t i = 0; i < [memTable count]; i++) {
         PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, cursor.Name);            // using dot-syntax
     }
-    
     // @@EndExample@@
 
     
 }
-
+   
 
 void sharedGroupFunc() {
     
