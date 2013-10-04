@@ -270,7 +270,7 @@
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../iphone-lib\"";
 				OTHER_LDFLAGS = (
 					"-lstdc++",
-					"-ltightdb-objc-ios",
+					"-ltightdb-objc-ios-dbg",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
