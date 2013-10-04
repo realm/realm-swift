@@ -35,7 +35,7 @@ int main()
         
         PeopleTable_View *tableView = [[[table where].Age columnIsGreaterThan:20] findAll];
         
-        // Itereator over the result in the table view.
+        // Itereato over the result in the table view.
         
         for (PeopleTable_Cursor *curser in tableView) {
             NSLog(@"This person is over the age of 20: %@", [curser Name]);

@@ -134,10 +134,10 @@
 
 -(BOOL)clear;
 -(BOOL)clearWithError:(NSError *__autoreleasing *)error;
--(BOOL)remove:(size_t)ndx;
--(BOOL)remove:(size_t)ndx error:(NSError *__autoreleasing *)error;
--(BOOL)removeLast;
--(BOOL)removeLastWithError:(NSError *__autoreleasing *)error;
+-(BOOL)removeRowAtIndex:(size_t)ndx;
+-(BOOL)removeRowAtIndex:(size_t)ndx error:(NSError *__autoreleasing *)error;
+-(BOOL)removeLastRow;
+-(BOOL)removeLastRowWithError:(NSError *__autoreleasing *)error;
 
 -(TightdbCursor *)cursorAtIndex:(size_t)ndx;
 -(TightdbCursor *)cursorAtLastIndex;
@@ -283,10 +283,10 @@
 -(BOOL)getBool:(size_t)colNdx ndx:(size_t)ndx;
 -(time_t)getDate:(size_t)colNdx ndx:(size_t)ndx;
 -(NSString *)getString:(size_t)colNdx ndx:(size_t)ndx;
--(void)remove:(size_t)ndx;
+-(void)removeRowAtIndex:(size_t)ndx;
 -(void)clear;
 -(TightdbTable *)getTable;
--(size_t)getSourceNdx:(size_t)ndx;
+-(size_t)getSourceIndex:(size_t)ndx;
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 @end
 

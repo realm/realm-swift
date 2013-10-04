@@ -378,6 +378,20 @@ CATEGORIES :
       - DESCR  :
         CODE   : ex_objc_typed_query_find
         
+
+        
+  - g_typed_query_size:
+      NAMES    : count
+      SIGNATURE: (size_t)count
+      DESCR    : *g_typed_query_size_descr
+      SUMMARY  : *g_typed_query_size_summary
+      RETURN:
+        TYPES  : size_t
+        DESCR  : *g_typed_query_size_return1_descr
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_objc_typed_query_size
+      
   - g_typed_query_sum:
       TODO: soon (+ start, end, limit)
   - g_typed_query_sum_float:
@@ -403,18 +417,6 @@ CATEGORIES :
       - DESCR  :
         CODE   : ex_objc_typed_query_sum
         
-  - g_typed_query_size:
-      NAMES    : count
-      SIGNATURE: (size_t)count
-      DESCR    : *g_typed_query_size_descr
-      SUMMARY  : *g_typed_query_size_summary
-      RETURN:
-        TYPES  : size_t
-        DESCR  : *g_typed_query_size_return1_descr
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_objc_typed_query_size
-        
   - g_typed_query_maximum:
       TODO: soon (+ start, end, limit)
   - g_typed_query_maximum_float:
@@ -431,13 +433,13 @@ CATEGORIES :
       NAME     : max
   - g_typed_query_maximum_double_2:
       NAME     : max
-      TITLE    : "*max"
+      TITLE    : "*maximum"
       DESCR    : *g_typed_query_maximum_descr
       SUMMARY  : *g_typed_query_maximum_summary
       SIGNATURE: |
-                 .CName (int64_t)max
-                 .CName (float)max
-                 .CName (double)max
+                 .CName (int64_t)maximum
+                 .CName (float)maximum
+                 .CName (double)maximum
       RETURN:
         TYPES  : [int64_t, float, double]
         DESCR  : *g_typed_query_maximum_return1_descr
@@ -461,13 +463,13 @@ CATEGORIES :
       NAME     : min
   - g_typed_query_minimum_double_2:
       NAME     : min
-      TITLE    : "*min"
+      TITLE    : "*minimum"
       DESCR    : *g_typed_query_minimum_descr
       SUMMARY  : *g_typed_query_minimum_summary
       SIGNATURE: |
-                 .CName (int64_t)min
-                 .CName (float)min
-                 .CName (double)min
+                 .CName (int64_t)minimum
+                 .CName (float)minimum
+                 .CName (double)minimum
       RETURN:
         TYPES  : [int64_t, float, double]
         DESCR  : *g_typed_query_minimum_return1_descr
@@ -487,10 +489,10 @@ CATEGORIES :
       NAME     : avg
   - g_typed_query_average_double_2:
       NAME     : avg
-      TITLE    : "*avg"
+      TITLE    : "*average"
       SUMMARY  : *g_typed_query_average_summary
       DESCR    : *g_typed_query_average_descr
-      SIGNATURE: .CName (double)avg
+      SIGNATURE: .CName (double)average
       RETURN:
         TYPES  : double
         DESCR  : *g_typed_query_average_return1_descr
@@ -501,11 +503,11 @@ CATEGORIES :
   - g_typed_query_remove:
       NAMES    : remove
       SIGNATURE: |
-                 (size_t)remove
+                 (NSNumber *)remove
       DESCR    : *g_typed_query_remove_descr
       SUMMARY  : *g_typed_query_remove_summary
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSNumber *
         DESCR  : *g_typed_query_remove_return1_descr
       EXAMPLES:
       - DESCR  :
