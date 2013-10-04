@@ -30,28 +30,34 @@ int main()
         
         // Write the group (and the contained table) to a specified file.
         
+        [[NSFileManager defaultManager] removeItemAtPath:@"filename.tightdb" error:nil];
         [group write:@"filename.tightdb"];
         
         // Adds another row to the table. Note the update is NOT persisted
-        // automatically.
+        // automatically (delete the old file and use write again).
         
         [table addName:@"Sam" Age:17];
         
-        // IMPORTANT: do not overwrite the existing file!
-        
-        [group write:@"filename2.tightdb"];
+        [[NSFileManager defaultManager] removeItemAtPath:@"filename.tightdb" error:nil];
+        [group write:@"filename.tightdb"];
         
         // Retrieves an in memory buffer from the group.
 
         size_t size;
         const char *buffer = [group writeToMem:&size];
         
-        // Calling free(..) is required here.
-        // An alternative using NSData (and ARC) will be provided
-        // in a future release.
+        TightdbGroup *groupFromMemory = [TightdbGroup groupWithBuffer:buffer size:size];
+        PeopleTable *tableFromMemery = [groupFromMemory getTable:@"people" withClass:[PeopleTable class] error:nil];
         
-        free((char*)buffer);
+        for (PeopleTable_Cursor *cursor in tableFromMemery)
+        {
+            NSLog(@"Name: %@", cursor.Name);
+        }
         
+        // Caution: Calling free(..) on the "buffer" is sometimes required to avoid leakage. However,
+        // the group that retrieves data from memeory takes responsibilty for the memory allocation in this example.
+        
+        // free((char*)buffer); // not needed in this particular situation.
         
     }
 }
