@@ -484,7 +484,7 @@ CATEGORIES :
         DESCR  : *g_dyn_query_find_parm1_descr
       RETURN:
         TYPES  : size_t
-        DESCR  : *g_dyn_query_find
+        DESCR  : *g_dyn_query_find_return_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_find
