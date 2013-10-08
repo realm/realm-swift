@@ -155,15 +155,17 @@ TIGHTDB_TABLE_2(MyTable2,
     // Load a group from memory (and print contents)
     TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:data size:size];
     MyTable *memTable = [fromMem getTable:@"employees" withClass:[MyTable class]];
-    for (size_t i = 0; i < [memTable count]; i++) {
-        // ??? cursor
-        NSLog(@"%zu: %@", i, memTable.Name);
+    
+    for (MyTable_Cursor *row in memTable)
+    {
+        NSLog(@"From mem: %@ is %lld years old.", row.Name, row.Age);
     }
 
     // 1: Iterate over table
-    for (MyTable_Cursor *row in diskTable) {
+    for (MyTable_Cursor *row in diskTable)
+    {
         [_utils Eval:YES msg:@"Enumerator running"];
-        NSLog(@"%@ is %lld years old.", row.Name, row.Age);
+        NSLog(@"From disk: %@ is %lld years old.", row.Name, row.Age);
     }
 
     // Do a query, and get all matches as TableView
