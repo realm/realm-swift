@@ -178,9 +178,7 @@ using namespace std;
     if (TIGHTDB_UNLIKELY(!table)) return nil;
     bool was_created;
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 tightdb::TableRef r = tightdb::LangBindHelper::get_table_ptr(_group, ObjcStringAccessor(name),
-                                                                                              was_created)->get_table_ref();
-                                 [table setTable:move(r)];
+                                 [table setTable:_group->get_table(ObjcStringAccessor(name), was_created)];
                                  , @"com.tightdb.group", nil);
     [table setParent:self];
     [table setReadOnly:_readOnly];
