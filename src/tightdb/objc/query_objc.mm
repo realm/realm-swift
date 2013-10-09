@@ -660,7 +660,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorBool
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
@@ -682,7 +682,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorInt
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
@@ -789,7 +789,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorFloat
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
@@ -882,7 +882,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorDouble
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
@@ -975,7 +975,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorString
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
@@ -1042,7 +1042,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorBinary
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
@@ -1084,7 +1084,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorDate
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
@@ -1136,7 +1136,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorSubtable
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
@@ -1153,7 +1153,7 @@ using namespace std;
 
 @implementation TightdbQueryAccessorMixed
 {
-    TightdbQuery *_query;
+    __weak TightdbQuery *_query;
     size_t _column_ndx;
 }
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
