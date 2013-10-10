@@ -559,78 +559,80 @@ CATEGORIES :
 
 # TODO: change name to findFirst* ?
 
-      TITLE    : find*
-      SUMMARY  : Find first matching row.
-      DESCR    : The method finds the first occurence of a given value in a column.
-      SIGNATURE: |
-                 (size_t)findBool:(size_t)col_ndx value:(BOOL)value
-                 (size_t)findInt:(size_t)col_ndx value:(int64_t)value
-                 (size_t)findFloat:(size_t)col_ndx value:(float)value
-                 (size_t)findDouble:(size_t)col_ndx value:(double)value
-                 (size_t)findDate:(size_t)col_ndx value:(time_t)value
-                 (size_t)findString:(size_t)col_ndx value:(NSString *)value
-                 (size_t)findBinary:(size_t)col_ndx value:(TightdbBinary *)value
-      PARAMS:
-      - NAME   : col_ndx
-        TYPES  : size_t
-        DESCR  : *g_dyn_table_find_first_xxx_parm1_descr
-      - NAME   : value
-        TYPES  : [BOOL, int64_t, float, double, time_t, NSString, const char*]
-        DESCR  : *g_dyn_table_find_first_xxx_parm2_descr
-      RETURN:
-        TYPES  : size_t
+# jjepsen: might be redundant (use a query?)
+#      TITLE    : find*
+#      SUMMARY  : Find first matching row.
+#      DESCR    : The method finds the first occurence of a given value in a column.
+#      SIGNATURE: |
+#                 (size_t)findBool:(size_t)col_ndx value:(BOOL)value
+#                 (size_t)findInt:(size_t)col_ndx value:(int64_t)value
+#                 (size_t)findFloat:(size_t)col_ndx value:(float)value
+#                 (size_t)findDouble:(size_t)col_ndx value:(double)value
+#                 (size_t)findDate:(size_t)col_ndx value:(time_t)value
+#                 (size_t)findString:(size_t)col_ndx value:(NSString *)value
+#                 (size_t)findBinary:(size_t)col_ndx value:(TightdbBinary *)value
+#      PARAMS:
+#      - NAME   : col_ndx
+#        TYPES  : size_t
+#        DESCR  : *g_dyn_table_find_first_xxx_parm1_descr
+#      - NAME   : value
+#        TYPES  : [BOOL, int64_t, float, double, time_t, NSString, const char*]
+#        DESCR  : *g_dyn_table_find_first_xxx_parm2_descr
+#      RETURN:
+#        TYPES  : size_t
 #TODO: is that the same in objc?
-        DESCR  : "The row index or <code>tightdb::not_found</code> (equal to <code>std::size_t(-1)</code>) if there is no match."
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_find_first_xxx
-        DESCR  :
+#        DESCR  : "The row index or <code>tightdb::not_found</code> (equal to <code>std::size_t(-1)</code>) if there is no match."
+#      EXAMPLES:
+#      - CODE   : ex_objc_dyn_table_find_first_xxx
+#       DESCR  :
 
-  - g_dyn_table_find_all_bool_const:
-      IGNORE   : ""
-  - g_dyn_table_find_all_int_const:
-      IGNORE   : ""
-  - g_dyn_table_find_all_date_const:
-      IGNORE   : ""
-  - g_dyn_table_find_all_string_const:
-      IGNORE   : ""
-  - g_dyn_table_find_all_float_const:
-      IGNORE   : ""
-  - g_dyn_table_find_all_double_const:
-      IGNORE   : ""
+#  - g_dyn_table_find_all_bool_const:
+#      IGNORE   : ""
+#  - g_dyn_table_find_all_int_const:
+#      IGNORE   : ""
+#  - g_dyn_table_find_all_date_const:
+#      IGNORE   : ""
+#  - g_dyn_table_find_all_string_const:
+#      IGNORE   : ""
+#  - g_dyn_table_find_all_float_const:
+#      IGNORE   : ""
+#  - g_dyn_table_find_all_double_const:
+#      IGNORE   : ""
 
-  - g_dyn_table_find_all_bool:
-      TODO     : soon
-  - g_dyn_table_find_all_date:
-      TODO     : soon
-  - g_dyn_table_find_all_string:
-      TODO     : soon
-  - g_dyn_table_find_all_float:
-      TODO     : soon
-  - g_dyn_table_find_all_double:
-      TODO     : soon
-  - g_dyn_table_find_all_int:
-      TODO     : soon # See FIXME in the code.
-      NAMES    : findAll
-      TITLE    : findAll*
-      SUMMARY  : *g_dyn_table_find_all_xxx_summary
-      DESCR    : >
-                 The method finds all occurences of a given value in a specific column.
-                 The rows are returned as a {@link class_dyn_tableview} object.
-      SIGNATURE: |
-                 (TightdbView *)findAll:(TightdbView *)view column:(size_t)col_ndx value:(int64_t)value
-      PARAMS:
-      - NAME   : col_ndx
-        TYPES  : size_t
-        DESCR  : *g_dyn_table_find_all_xxx_parm1_descr
-      - NAME   : value
-        TYPES  : [BOOL, int64_t, float, double, time_t, NSString]
-        DESCR  : *g_dyn_table_find_all_xxx_parm2_descr
-      RETURN:
-        TYPES  : TightdbView *
-        DESCR  : *g_dyn_table_find_all_xxx_return_descr
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_find_all_xxx
-        DESCR  :
+ # jjepsen: might be redundant, removing from docs, but still included in binding.
+ # - g_dyn_table_find_all_bool:
+ #     TODO     : soon
+ # - g_dyn_table_find_all_date:
+ #     TODO     : soon
+ # - g_dyn_table_find_all_string:
+ #     TODO     : soon
+ # - g_dyn_table_find_all_float:
+ #     TODO     : soon
+ # - g_dyn_table_find_all_double:
+ #     TODO     : soon
+ # - g_dyn_table_find_all_int:
+ #     TODO     : soon # See FIXME in the code.
+ #     NAMES    : findAll
+ #     TITLE    : findAll*
+ #     SUMMARY  : *g_dyn_table_find_all_xxx_summary
+ #     DESCR    : >
+ #                The method finds all occurences of a given value in a specific column.
+ #                The rows are returned as a {@link class_dyn_tableview} object.
+ #     SIGNATURE: |
+ #                (TightdbView *)findAll:(TightdbView *)view column:(size_t)col_ndx value:(int64_t)value
+ #     PARAMS:
+ #     - NAME   : col_ndx
+ #       TYPES  : size_t
+ #       DESCR  : *g_dyn_table_find_all_xxx_parm1_descr
+ #     - NAME   : value
+ #       TYPES  : [BOOL, int64_t, float, double, time_t, NSString]
+ #       DESCR  : *g_dyn_table_find_all_xxx_parm2_descr
+ #     RETURN:
+ #       TYPES  : TightdbView *
+ #       DESCR  : *g_dyn_table_find_all_xxx_return_descr
+ #     EXAMPLES:
+ #     - CODE   : ex_objc_dyn_table_find_all_xxx
+ #       DESCR  :
 
   - g_dyn_table_find_sorted_int:
       TODO     : later
