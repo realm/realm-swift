@@ -203,6 +203,7 @@
 -(BOOL)insertSubtable:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(BOOL)clearSubtable:(size_t)colNdx ndx:(size_t)ndx;
 -(BOOL)clearSubtable:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
+-(BOOL)setSubtable:(size_t)col_ndx ndx:(size_t)ndx withTable:(TightdbTable *)subtable;
 
 // Mixed
 -(TightdbMixed *)getMixed:(size_t)colNdx ndx:(size_t)ndx;
