@@ -548,10 +548,24 @@ using namespace std;
     return *_table == *other->_table;
 }
 
+-(BOOL)setSubtable:(size_t)col_ndx ndx:(size_t)ndx withTable:(TightdbTable *)subtable
+{
+    // TODO: Use core method for checking the equality of two table specs. Even in the typed interface
+    // the user might add columns (_checkType for typed and spec against spec for dynamic).
+    
+    const tightdb::DataType t = _table->get_column_type(col_ndx);
+    if (t == tightdb::type_Table) {
+        // TODO: Handle any exeptions from core lib.
+        _table->set_subtable(col_ndx, ndx, &subtable.getTable); 
+        return YES; 
+    } else
+        return NO;
+}
+
 -(TightdbTable *)getSubtable:(size_t)col_ndx ndx:(size_t)ndx
 {
     const tightdb::DataType t = _table->get_column_type(col_ndx);
-    if (t != tightdb::type_Table && t != tightdb::type_Mixed) return nil;
+    if (t != tightdb::type_Table) return nil;
     tightdb::TableRef r = _table->get_subtable(col_ndx, ndx);
     if (!r) return nil;
     TightdbTable *table = [[TightdbTable alloc] _initRaw];
@@ -566,7 +580,7 @@ using namespace std;
 -(id)getSubtable:(size_t)col_ndx ndx:(size_t)ndx withClass:(__unsafe_unretained Class)classObj
 {
     const tightdb::DataType t = _table->get_column_type(col_ndx);
-    if (t != tightdb::type_Table && t != tightdb::type_Mixed) return nil;
+    if (t != tightdb::type_Table) return nil;
     tightdb::TableRef r = _table->get_subtable(col_ndx, ndx);
     if (!r) return nil;
     TightdbTable *table = [[classObj alloc] _initRaw];
@@ -1174,7 +1188,16 @@ using namespace std;
     tightdb::Mixed tmp = _table->get_mixed(col_ndx, row_ndx);
     TightdbMixed *mixed = [TightdbMixed mixedWithMixed:tmp];
     if ([mixed getType] == tightdb_Table) {
-        [mixed setTable:[self getSubtable:col_ndx ndx:row_ndx]];
+        tightdb::TableRef r = _table->get_subtable(col_ndx, row_ndx);
+        if (!r) return nil;
+        TightdbTable *table = [[TightdbTable alloc] _initRaw];
+        if (TIGHTDB_UNLIKELY(!table)) return nil;
+        [table setTable:move(r)];
+        [table setParent:self];
+        [table setReadOnly:_readOnly];
+        if (![table _checkType]) return nil;
+
+        [mixed setTable:table];
     }
     return mixed;
 }
