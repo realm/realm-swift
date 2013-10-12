@@ -182,7 +182,7 @@
 
 
 #define TIGHTDB_CURSOR_PROPERTY_DEF_SUBTABLE(name, type) \
-@property (readonly) type *name; \
+@property type *name; \
 -(type *)name; \
 
 #define TIGHTDB_CURSOR_PROPERTY_IMPL_SUBTABLE(name, type) \
@@ -190,8 +190,10 @@
 { \
     return [_##name getSubtable:[type class]]; \
 } \
-
-
+-(void)set##name:(type *)subtable \
+{ \
+    [_##name setSubtable:subtable]; \
+} \
 
 // TIGHTDB_QUERY_ACCESSOR
 
