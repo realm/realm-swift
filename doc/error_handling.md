@@ -1,6 +1,10 @@
 Obj-C Error Management Patterns
 ===============================
 
+0) No error handling
+--------------------
+    -(void)doSomething;
+
 1a) Pass-back with optional error paramater
 -------------------------------------------
     -(BOOL)doSomething;
@@ -9,7 +13,9 @@ Obj-C Error Management Patterns
     -(NSObject *)doSomethingWithError(NSError **);
 
 GOOD FOR: Follows the conventional error handling pattern in Obj-C.
+
 BAD FOR: All methods which can fail (most) must be duplicated.
+
 BAD FOR: Not compatible with assignment such as..
 
 	cursor.Name = @"Jack";   // can't check the return value
@@ -21,7 +27,7 @@ BAD FOR: Not compatible with assignment such as..
 
 GOOD FOR: When we want to force the client to handle errors.
     
-    (TightdbGroup *)groupWithFilename:(NSString *)filename error:(NSError **)error;
+    (TightdbGroup *)groupWithFilename:(NSString *)filename error:(NSError *__autoreleasing *)error;
     -(BOOL)write:(NSString *)filePath error:(NSError *__autoreleasing *)error;
 
 1c) Pass-back without error paramater
@@ -43,11 +49,15 @@ Table keep internal error state. Clients can ask for status ad-hoc.
 	@end
 
 GOOD FOR: Avoids duplicate methods.
+
 GOOD FOR: Supports assignments in typed API (see "=" example above).
+
 GOOD FOR: Groups could refuse to persist tables that have failed.
 
 BAD FOR: Delayed feedback. May be difficult to recover (if needed).
+
 BAD FOR: Requires more proactive client code.
+
 BAD FOR: This is custom made, may have implications we can't see now.
 
 
