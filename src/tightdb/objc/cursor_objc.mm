@@ -75,6 +75,11 @@ using namespace std;
     return [_table getDouble:colNdx ndx:_ndx];
 }
 
+-(time_t)getDateInColumn:(size_t)colNdx
+{
+    return [_table getDate:colNdx ndx:_ndx];
+}
+
 -(TightdbBinary *)getBinaryInColumn:(size_t)colNdx
 {
     return [_table getBinary:colNdx ndx:_ndx];
@@ -84,6 +89,12 @@ using namespace std;
 {
     return [_table getMixed:colNdx ndx:_ndx];
 }
+
+-(TightdbTable *)getTableInColumn:(size_t)colNdx
+{
+    return [_table getSubtable:colNdx ndx:_ndx];
+}
+
 
 -(BOOL)setInt:(int64_t)value inColumn:(size_t)colNdx
 {
@@ -135,6 +146,11 @@ using namespace std;
     return [_table setDouble:colNdx ndx:_ndx value:value error:error];
 }
 
+-(BOOL)setDate:(time_t)value inColumn:(size_t)colNdx
+{
+    return [_table setDate:colNdx ndx:_ndx value:value];
+}
+
 -(BOOL)setBinary:(TightdbBinary *)value inColumn:(size_t)colNdx
 {
     return [self setBinary:value inColumn:colNdx error:nil];
@@ -154,6 +170,11 @@ using namespace std;
 {
     return [_table setMixed:colNdx ndx:_ndx value:value error:error];
 }
+
+-(BOOL)setTable:(TightdbTable *)value inColumn:(size_t)colNdx
+{
+    return [_table setSubtable:colNdx ndx:_ndx withTable:value];
+} 
 
 @end
 
@@ -293,6 +314,11 @@ using namespace std;
 -(id)getSubtable:(Class)obj
 {
     return [_cursor.table getSubtable:_columnId ndx:_cursor.ndx withClass:obj];
+}
+
+-(BOOL)setSubtable:(TightdbTable *)subtable
+{
+    return [_cursor.table setSubtable:_columnId ndx:_cursor.ndx withTable:subtable];
 }
 
 -(TightdbMixed *)getMixed
