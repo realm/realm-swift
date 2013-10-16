@@ -39,18 +39,22 @@
 -(BOOL)setFloat:(float)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
 -(BOOL)setDouble:(double)value inColumn:(size_t)colNdx;
 -(BOOL)setDouble:(double)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(BOOL)setDate:(time_t)value inColumn:(size_t)colNdx;
 -(BOOL)setBinary:(TightdbBinary *)value inColumn:(size_t)colNdx;
 -(BOOL)setBinary:(TightdbBinary *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
 -(BOOL)setMixed:(TightdbMixed *)value inColumn:(size_t)colNdx;
 -(BOOL)setMixed:(TightdbMixed *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(BOOL)setTable:(TightdbTable *)value inColumn:(size_t)colNdx;
 
 -(int64_t)getIntInColumn:(size_t)colNdx;
 -(NSString *)getStringInColumn:(size_t)colNdx;
 -(BOOL)getBoolInColumn:(size_t)colNdx;
 -(float)getFloatInColumn:(size_t)colNdx;
 -(double)getDoubleInColumn:(size_t)colNdx;
+-(time_t)getDateInColumn:(size_t)colNdx;
 -(TightdbBinary *)getBinaryInColumn:(size_t)colNdx;
 -(TightdbMixed *)getMixedInColumn:(size_t)colNdx;
+-(TightdbTable *)getTableInColumn:(size_t)colNdx;
 
 @end
 
@@ -84,6 +88,7 @@
 -(time_t)getDate;
 -(BOOL)setDate:(time_t)value;
 -(BOOL)setDate:(time_t)value error:(NSError *__autoreleasing *)error;
+-(BOOL)setSubtable:(TightdbTable *)subtable;
 -(id)getSubtable:(Class)obj;
 -(TightdbMixed *)getMixed;
 -(BOOL)setMixed:(TightdbMixed *)value;
