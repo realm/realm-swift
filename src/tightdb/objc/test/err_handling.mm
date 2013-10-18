@@ -64,31 +64,16 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     // Create new table in group
     PeopleErrTable *people = [group getTable:@"employees" withClass:[PeopleErrTable class]];
 
+    // No longer supports errors, the tes may be redundant
     // Add some rows
-    error = nil;
-    if (![people addName:@"John" Age:20 Hired:YES error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-        STFail(@"This should have worked");
-    }
-    error = nil;
-    if (![people addName:@"Mary" Age:21 Hired:NO error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-        STFail(@"This should have worked");
-    }
-    if (![people addName:@"Lars" Age:21 Hired:YES error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-        STFail(@"This should have worked");
-    }
-    error = nil;
-    if (![people addName:@"Phil" Age:43 Hired:NO error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-        STFail(@"This should have worked");
-    }
-    error = nil;
-    if (![people addName:@"Anni" Age:54 Hired:YES error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-        STFail(@"This should have worked");
-    }
+
+    [people addName:@"John" Age:20 Hired:YES];
+    [people addName:@"Mary" Age:21 Hired:NO];
+    [people addName:@"Lars" Age:21 Hired:YES];
+    [people addName:@"Phil" Age:43 Hired:NO];
+    [people addName:@"Anni" Age:54 Hired:YES];
+
+    
 
     // Insert at specific position
     [people insertAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
@@ -160,12 +145,13 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     NSLog(@"Disktable size: %zu", [diskTable count]);
 
+    /* No longer support for errors here
     error = nil;
     if (![diskTable addName:@"Anni" Age:54 Hired:YES error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
     } else {
         STFail(@"addName to readonly should have failed.");        
-    }
+    }*/
 
     NSLog(@"Disktable size: %zu", [diskTable count]);
 }

@@ -69,12 +69,9 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"%@ is %lld years old.", name, age);
     if (hired) NSLog(@"is hired.");
 
-    // Setting values
-    NSError *error;
-    if (![[people cursorAtIndex:5] setAge:43 error:&error]) {               // Getting younger
-        NSLog(@"%@", [error localizedDescription]);
-        STFail(@"This action should not fail");
-    }
+    // Setting values  (note: setter access will be made obsolete, use dot notation)
+    [[people cursorAtIndex:5] setAge:43];  // Getting younger
+    
     // or with dot-syntax:
     myRow.Age += 1;                                    // Happy birthday!
     NSLog(@"%@ age is now %lld.   [44]", myRow.Name, myRow.Age);

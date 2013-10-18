@@ -85,9 +85,10 @@ int main()
         TightdbCursor *c2 = [table cursorAtIndex:[table count]];
         if (c2 != nil)
             NSLog(@"Should not get here.");
-    
         
+        [table setInt:100 inColumn:NAME atRow:0];
     }
+    
 }
 
 // @@EndExample@@

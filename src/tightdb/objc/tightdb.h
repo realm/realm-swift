@@ -52,8 +52,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 @end \
 @interface TableName: TightdbTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1; \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 error:(NSError **)error; \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1; \
 -(TableName##_Query *)where; \
 -(TableName##_Cursor *)addRow; \
@@ -158,15 +157,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
     TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
     return self; \
 } \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 \
-{ \
-    return [self add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 error:nil]; \
-} \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 error:(NSError **)error\
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 \
 { \
     const size_t ndx = [self count]; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 0, ndx, CName1, CType1, error)) return NO; \
-    return [self insertDoneWithError:error]; \
+    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    [self insertDone]; \
 } \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 \
 { \
@@ -265,8 +260,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 @interface TableName: TightdbTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2; \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 error:(NSError **)error; \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2; \
 -(TableName##_Query *)where; \
 -(TableName##_Cursor *)addRow; \
@@ -380,16 +374,12 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
     TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
     return self; \
 } \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 \
-{ \
-    return [self add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 error:nil]; \
-} \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 error:(NSError **)error\
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 \
 { \
     const size_t ndx = [self count]; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 0, ndx, CName1, CType1, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 1, ndx, CName2, CType2, error)) return NO; \
-    return [self insertDoneWithError:error]; \
+    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    [self insertDone]; \
 } \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 \
 { \
@@ -495,8 +485,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3; \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 error:(NSError **)error; \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3; \
 -(TableName##_Query *)where; \
 -(TableName##_Cursor *)addRow; \
@@ -619,17 +608,13 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
     TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
     return self; \
 } \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 \
-{ \
-    return [self add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 error:nil]; \
-} \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 error:(NSError **)error\
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 \
 { \
     const size_t ndx = [self count]; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 0, ndx, CName1, CType1, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 1, ndx, CName2, CType2, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 2, ndx, CName3, CType3, error)) return NO; \
-    return [self insertDoneWithError:error]; \
+    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    [self insertDone]; \
 } \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 \
 { \
@@ -742,8 +727,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
 TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4; \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 error:(NSError **)error; \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4; \
 -(TableName##_Query *)where; \
 -(TableName##_Cursor *)addRow; \
@@ -875,18 +859,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
     TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
     return self; \
 } \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 \
-{ \
-    return [self add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 error:nil]; \
-} \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 error:(NSError **)error\
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 \
 { \
     const size_t ndx = [self count]; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 0, ndx, CName1, CType1, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 1, ndx, CName2, CType2, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 2, ndx, CName3, CType3, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 3, ndx, CName4, CType4, error)) return NO; \
-    return [self insertDoneWithError:error]; \
+    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    [self insertDone]; \
 } \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 \
 { \
@@ -1006,8 +986,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
 TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
 TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5; \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 error:(NSError **)error; \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5; \
 -(TableName##_Query *)where; \
 -(TableName##_Cursor *)addRow; \
@@ -1148,19 +1127,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
     TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
     return self; \
 } \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 \
-{ \
-    return [self add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 error:nil]; \
-} \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 error:(NSError **)error\
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 \
 { \
     const size_t ndx = [self count]; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 0, ndx, CName1, CType1, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 1, ndx, CName2, CType2, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 2, ndx, CName3, CType3, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 3, ndx, CName4, CType4, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 4, ndx, CName5, CType5, error)) return NO; \
-    return [self insertDoneWithError:error]; \
+    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    [self insertDone]; \
 } \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 \
 { \
@@ -1287,8 +1262,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
 TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
 TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
 TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6; \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 error:(NSError **)error; \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6; \
 -(TableName##_Query *)where; \
 -(TableName##_Cursor *)addRow; \
@@ -1438,20 +1412,16 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
     TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
     return self; \
 } \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 \
-{ \
-    return [self add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 error:nil]; \
-} \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 error:(NSError **)error\
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 \
 { \
     const size_t ndx = [self count]; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 0, ndx, CName1, CType1, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 1, ndx, CName2, CType2, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 2, ndx, CName3, CType3, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 3, ndx, CName4, CType4, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 4, ndx, CName5, CType5, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 5, ndx, CName6, CType6, error)) return NO; \
-    return [self insertDoneWithError:error]; \
+    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    [self insertDone]; \
 } \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 \
 { \
@@ -1585,8 +1555,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
 TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
 TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
 TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7; \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 error:(NSError **)error; \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7; \
 -(TableName##_Query *)where; \
 -(TableName##_Cursor *)addRow; \
@@ -1745,21 +1714,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
     TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
     return self; \
 } \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 \
-{ \
-    return [self add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 error:nil]; \
-} \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 error:(NSError **)error\
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 \
 { \
     const size_t ndx = [self count]; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 0, ndx, CName1, CType1, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 1, ndx, CName2, CType2, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 2, ndx, CName3, CType3, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 3, ndx, CName4, CType4, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 4, ndx, CName5, CType5, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 5, ndx, CName6, CType6, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 6, ndx, CName7, CType7, error)) return NO; \
-    return [self insertDoneWithError:error]; \
+    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    [self insertDone]; \
 } \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 \
 { \
@@ -1900,8 +1865,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
 TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
 TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
 TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8; \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 error:(NSError **)error; \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8; \
 -(TableName##_Query *)where; \
 -(TableName##_Cursor *)addRow; \
@@ -2069,22 +2033,18 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
     TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
     return self; \
 } \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 \
-{ \
-    return [self add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 error:nil]; \
-} \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 error:(NSError **)error\
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 \
 { \
     const size_t ndx = [self count]; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 0, ndx, CName1, CType1, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 1, ndx, CName2, CType2, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 2, ndx, CName3, CType3, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 3, ndx, CName4, CType4, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 4, ndx, CName5, CType5, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 5, ndx, CName6, CType6, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 6, ndx, CName7, CType7, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 7, ndx, CName8, CType8, error)) return NO; \
-    return [self insertDoneWithError:error]; \
+    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    [self insertDone]; \
 } \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 \
 { \
@@ -2232,8 +2192,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
 TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
 TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
 TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9; \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 error:(NSError **)error; \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9; \
 -(TableName##_Query *)where; \
 -(TableName##_Cursor *)addRow; \
@@ -2410,23 +2369,19 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
     TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
     return self; \
 } \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 \
-{ \
-    return [self add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 error:nil]; \
-} \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 error:(NSError **)error\
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 \
 { \
     const size_t ndx = [self count]; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 0, ndx, CName1, CType1, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 1, ndx, CName2, CType2, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 2, ndx, CName3, CType3, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 3, ndx, CName4, CType4, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 4, ndx, CName5, CType5, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 5, ndx, CName6, CType6, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 6, ndx, CName7, CType7, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 7, ndx, CName8, CType8, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 8, ndx, CName9, CType9, error)) return NO; \
-    return [self insertDoneWithError:error]; \
+    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    [self insertDone]; \
 } \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 \
 { \
@@ -2581,8 +2536,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
 TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
 TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
 TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10; \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 error:(NSError **)error; \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10; \
 -(TableName##_Query *)where; \
 -(TableName##_Cursor *)addRow; \
@@ -2768,24 +2722,20 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
     TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
     return self; \
 } \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 \
-{ \
-    return [self add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 error:nil]; \
-} \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 error:(NSError **)error\
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 \
 { \
     const size_t ndx = [self count]; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 0, ndx, CName1, CType1, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 1, ndx, CName2, CType2, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 2, ndx, CName3, CType3, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 3, ndx, CName4, CType4, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 4, ndx, CName5, CType5, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 5, ndx, CName6, CType6, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 6, ndx, CName7, CType7, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 7, ndx, CName8, CType8, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 8, ndx, CName9, CType9, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 9, ndx, CName10, CType10, error)) return NO; \
-    return [self insertDoneWithError:error]; \
+    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    [self insertDone]; \
 } \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 \
 { \
@@ -2947,8 +2897,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
 TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
 TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
 TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11; \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 error:(NSError **)error; \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11; \
 -(TableName##_Query *)where; \
 -(TableName##_Cursor *)addRow; \
@@ -3143,25 +3092,21 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
     TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
     return self; \
 } \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 \
-{ \
-    return [self add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 error:nil]; \
-} \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 error:(NSError **)error\
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 \
 { \
     const size_t ndx = [self count]; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 0, ndx, CName1, CType1, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 1, ndx, CName2, CType2, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 2, ndx, CName3, CType3, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 3, ndx, CName4, CType4, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 4, ndx, CName5, CType5, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 5, ndx, CName6, CType6, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 6, ndx, CName7, CType7, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 7, ndx, CName8, CType8, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 8, ndx, CName9, CType9, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 9, ndx, CName10, CType10, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 10, ndx, CName11, CType11, error)) return NO; \
-    return [self insertDoneWithError:error]; \
+    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
+    [self insertDone]; \
 } \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 \
 { \
@@ -3330,8 +3275,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
 TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
 TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
 TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12; \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 error:(NSError **)error; \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12; \
 -(TableName##_Query *)where; \
 -(TableName##_Cursor *)addRow; \
@@ -3535,26 +3479,22 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
     TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
     return self; \
 } \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 \
-{ \
-    return [self add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 error:nil]; \
-} \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 error:(NSError **)error\
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 \
 { \
     const size_t ndx = [self count]; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 0, ndx, CName1, CType1, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 1, ndx, CName2, CType2, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 2, ndx, CName3, CType3, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 3, ndx, CName4, CType4, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 4, ndx, CName5, CType5, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 5, ndx, CName6, CType6, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 6, ndx, CName7, CType7, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 7, ndx, CName8, CType8, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 8, ndx, CName9, CType9, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 9, ndx, CName10, CType10, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 10, ndx, CName11, CType11, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 11, ndx, CName12, CType12, error)) return NO; \
-    return [self insertDoneWithError:error]; \
+    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
+    TIGHTDB_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
+    [self insertDone]; \
 } \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 \
 { \
@@ -3730,8 +3670,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
 TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
 TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
 TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13; \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 error:(NSError **)error; \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13; \
 -(TableName##_Query *)where; \
 -(TableName##_Cursor *)addRow; \
@@ -3944,27 +3883,23 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
     TIGHTDB_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
     return self; \
 } \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 \
-{ \
-    return [self add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 error:nil]; \
-} \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 error:(NSError **)error\
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 \
 { \
     const size_t ndx = [self count]; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 0, ndx, CName1, CType1, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 1, ndx, CName2, CType2, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 2, ndx, CName3, CType3, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 3, ndx, CName4, CType4, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 4, ndx, CName5, CType5, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 5, ndx, CName6, CType6, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 6, ndx, CName7, CType7, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 7, ndx, CName8, CType8, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 8, ndx, CName9, CType9, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 9, ndx, CName10, CType10, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 10, ndx, CName11, CType11, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 11, ndx, CName12, CType12, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 12, ndx, CName13, CType13, error)) return NO; \
-    return [self insertDoneWithError:error]; \
+    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
+    TIGHTDB_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
+    TIGHTDB_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
+    [self insertDone]; \
 } \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 \
 { \
@@ -4147,8 +4082,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
 TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
 TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
 TIGHTDB_COLUMN_PROXY_DEF(CName14, CType14) \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14; \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 error:(NSError **)error; \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14; \
 -(TableName##_Query *)where; \
 -(TableName##_Cursor *)addRow; \
@@ -4370,28 +4304,24 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
     TIGHTDB_COLUMN_PROXY_INIT(self, 13, CName14, CType14); \
     return self; \
 } \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 \
-{ \
-    return [self add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 error:nil]; \
-} \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 error:(NSError **)error\
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 \
 { \
     const size_t ndx = [self count]; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 0, ndx, CName1, CType1, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 1, ndx, CName2, CType2, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 2, ndx, CName3, CType3, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 3, ndx, CName4, CType4, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 4, ndx, CName5, CType5, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 5, ndx, CName6, CType6, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 6, ndx, CName7, CType7, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 7, ndx, CName8, CType8, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 8, ndx, CName9, CType9, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 9, ndx, CName10, CType10, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 10, ndx, CName11, CType11, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 11, ndx, CName12, CType12, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 12, ndx, CName13, CType13, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 13, ndx, CName14, CType14, error)) return NO; \
-    return [self insertDoneWithError:error]; \
+    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
+    TIGHTDB_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
+    TIGHTDB_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
+    TIGHTDB_COLUMN_INSERT(self, 13, ndx, CName14, CType14); \
+    [self insertDone]; \
 } \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 \
 { \
@@ -4581,8 +4511,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
 TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
 TIGHTDB_COLUMN_PROXY_DEF(CName14, CType14) \
 TIGHTDB_COLUMN_PROXY_DEF(CName15, CType15) \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15; \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15 error:(NSError **)error; \
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15; \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15; \
 -(TableName##_Query *)where; \
 -(TableName##_Cursor *)addRow; \
@@ -4813,29 +4742,25 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
     TIGHTDB_COLUMN_PROXY_INIT(self, 14, CName15, CType15); \
     return self; \
 } \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15 \
-{ \
-    return [self add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15 error:nil]; \
-} \
--(BOOL)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15 error:(NSError **)error\
+-(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15 \
 { \
     const size_t ndx = [self count]; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 0, ndx, CName1, CType1, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 1, ndx, CName2, CType2, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 2, ndx, CName3, CType3, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 3, ndx, CName4, CType4, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 4, ndx, CName5, CType5, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 5, ndx, CName6, CType6, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 6, ndx, CName7, CType7, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 7, ndx, CName8, CType8, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 8, ndx, CName9, CType9, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 9, ndx, CName10, CType10, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 10, ndx, CName11, CType11, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 11, ndx, CName12, CType12, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 12, ndx, CName13, CType13, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 13, ndx, CName14, CType14, error)) return NO; \
-    if (!TIGHTDB_COLUMN_INSERT_ERROR(self, 14, ndx, CName15, CType15, error)) return NO; \
-    return [self insertDoneWithError:error]; \
+    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
+    TIGHTDB_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
+    TIGHTDB_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
+    TIGHTDB_COLUMN_INSERT(self, 13, ndx, CName14, CType14); \
+    TIGHTDB_COLUMN_INSERT(self, 14, ndx, CName15, CType15); \
+    [self insertDone]; \
 } \
 -(void)insertAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15 \
 { \

@@ -82,6 +82,39 @@ catch (std::exception &ex) { \
         return failReturnValue; \
 }
 
+#define TIGHTDB_EXCEPTION_HANDLER_SETTERS(action, datatype) \
+if (_readOnly) { \
+    NSException *exception = [NSException exceptionWithName:@"tightdb:table_is_read_only" \
+                                          reason:@"You tried to modify a table in read only mode" \
+                                          userInfo:nil]; \
+    [exception raise]; \
+} \
+if (col_ndx >= [self getColumnCount]) { \
+    NSException *exception = [NSException exceptionWithName:@"tightdb:column_index_out_of_bounds" \
+                                          reason:@"The specified column index is not within the table bounds" \
+                                          userInfo:nil]; \
+    [exception raise]; \
+} \
+if ([self getColumnType:col_ndx] != datatype) { \
+    NSException *exception = [NSException exceptionWithName:@"tightdb:illegal_type" \
+                                          reason:@"The supplied type is not compatible with the column type" \
+                                          userInfo:nil]; \
+    [exception raise]; \
+} \
+if (row_ndx >= [self count]) { \
+    NSException *exception = [NSException exceptionWithName:@"tightdb:row_index_out_of_bounds" \
+                                          reason:@"The specified row index is not within the table bounds" \
+                                          userInfo:nil]; \
+    [exception raise]; \
+} \
+try {action} \
+catch(std::exception &ex) { \
+    NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception" \
+                                          reason:[NSString stringWithUTF8String:ex.what()] \
+                                          userInfo:nil]; \
+    [exception raise]; \
+}
+
 
 inline NSString* to_objc_string(tightdb::StringData s)
 {
