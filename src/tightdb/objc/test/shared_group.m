@@ -11,13 +11,17 @@
 #import <tightdb/objc/group.h>
 #import <tightdb/objc/group_shared.h>
 
-TIGHTDB_TABLE_DEF_2(SharedTable2,
+/*TIGHTDB_TABLE_DEF_2(SharedTable2,
                     Hired, Bool,
                     Age,   Int)
 
 TIGHTDB_TABLE_IMPL_2(SharedTable2,
                      Hired, Bool,
-                     Age,   Int)
+                     Age,   Int)*/
+
+TIGHTDB_TABLE_2(SharedTable2,
+                Hired, Bool,
+                Age,   Int)
 
 
 @interface MACTestSharedGroup: SenTestCase
@@ -55,9 +59,11 @@ TIGHTDB_TABLE_IMPL_2(SharedTable2,
                 SharedTable2_Cursor *cursor = [diskTable cursorAtIndex:i];
                 NSLog(@"%zu: %lld", i, [cursor Age]);
                 NSLog(@"%zu: %lld", i, cursor.Age);
-                NSLog(@"%zu: %i", i, [diskTable getBool:0 ndx:i]);
+                NSLog(@"%zu: %i", i, [diskTable getBoolInColumn:0 atRow:i]);
             }
+            NSLog(@"About to write to a read only table, size=%zu", [diskTable count]);
             [diskTable addHired:YES Age:54];
+            NSLog(@"Did just write to a read only table, size=%zu", [diskTable count]);
         }];
     }
     @catch (NSException *exception) {

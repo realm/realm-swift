@@ -52,47 +52,47 @@ using namespace std;
 
 -(int64_t)getIntInColumn:(size_t)colNdx
 {
-    return [_table get:colNdx ndx:_ndx];
+    return [_table getIntInColumn:colNdx atRow:_ndx];
 }
 
 -(NSString *)getStringInColumn:(size_t)colNdx
 {
-    return [_table getString:colNdx ndx:_ndx];
+    return [_table getStringInColumn:colNdx atRow:_ndx];
 }
 
 -(BOOL)getBoolInColumn:(size_t)colNdx
 {
-    return [_table getBool:colNdx ndx:_ndx];
+    return [_table getBoolInColumn:colNdx atRow:_ndx];
 }
 
 -(float)getFloatInColumn:(size_t)colNdx
 {
-    return [_table getFloat:colNdx ndx:_ndx];
+    return [_table getFloatInColumn:colNdx atRow:_ndx];
 }
 
 -(double)getDoubleInColumn:(size_t)colNdx
 {
-    return [_table getDouble:colNdx ndx:_ndx];
+    return [_table getDoubleInColumn:colNdx atRow:_ndx];
 }
 
 -(time_t)getDateInColumn:(size_t)colNdx
 {
-    return [_table getDate:colNdx ndx:_ndx];
+    return [_table getDateInColumn:colNdx atRow:_ndx];
 }
 
 -(TightdbBinary *)getBinaryInColumn:(size_t)colNdx
 {
-    return [_table getBinary:colNdx ndx:_ndx];
+    return [_table getBinaryInColumn:colNdx atRow:_ndx];
 }
 
 -(TightdbMixed *)getMixedInColumn:(size_t)colNdx
 {
-    return [_table getMixed:colNdx ndx:_ndx];
+    return [_table getMixedInColumn:colNdx atRow:_ndx];
 }
 
 -(TightdbTable *)getTableInColumn:(size_t)colNdx
 {
-    return [_table getSubtable:colNdx ndx:_ndx];
+    return [_table getTableInColumn:colNdx atRow:_ndx];
 }
 
 -(void)setInt:(int64_t)value inColumn:(size_t)colNdx
@@ -161,7 +161,7 @@ using namespace std;
 
 -(BOOL)getBool
 {
-    return [_cursor.table getBool:_columnId ndx:_cursor.ndx];
+    return [_cursor.table getBoolInColumn:_columnId atRow:_cursor.ndx];
 }
 
 -(void)setBool:(BOOL)value
@@ -171,7 +171,7 @@ using namespace std;
 
 -(int64_t)getInt
 {
-    return [_cursor.table get:_columnId ndx:_cursor.ndx];
+    return [_cursor.table getIntInColumn:_columnId atRow:_cursor.ndx];
 }
 
 -(void)setInt:(int64_t)value
@@ -181,7 +181,7 @@ using namespace std;
 
 -(float)getFloat
 {
-    return [_cursor.table getFloat:_columnId ndx:_cursor.ndx];
+    return [_cursor.table getFloatInColumn:_columnId atRow:_cursor.ndx];
 }
 
 -(void)setFloat:(float)value
@@ -191,7 +191,7 @@ using namespace std;
 
 -(double)getDouble
 {
-    return [_cursor.table getDouble:_columnId ndx:_cursor.ndx];
+    return [_cursor.table getDoubleInColumn:_columnId atRow:_cursor.ndx];
 }
 
 -(void)setDouble:(double)value
@@ -201,7 +201,7 @@ using namespace std;
 
 -(NSString *)getString
 {
-    return [_cursor.table getString:_columnId ndx:_cursor.ndx];
+    return [_cursor.table getStringInColumn:_columnId atRow:_cursor.ndx];
 }
 
 -(void)setString:(NSString *)value
@@ -211,7 +211,7 @@ using namespace std;
 
 -(TightdbBinary *)getBinary
 {
-    return [_cursor.table getBinary:_columnId ndx:_cursor.ndx];
+    return [_cursor.table getBinaryInColumn:_columnId atRow:_cursor.ndx];
 }
 
 -(void)setBinary:(TightdbBinary *)value
@@ -226,7 +226,7 @@ using namespace std;
 
 -(time_t)getDate
 {
-    return [_cursor.table getDate:_columnId ndx:_cursor.ndx];
+    return [_cursor.table getDateInColumn:_columnId atRow:_cursor.ndx];
 }
 
 -(void)setDate:(time_t)value
@@ -236,7 +236,7 @@ using namespace std;
 
 -(id)getSubtable:(Class)obj
 {
-    return [_cursor.table getSubtable:_columnId ndx:_cursor.ndx withClass:obj];
+    return [_cursor.table getTableInColumn:_columnId atRow:_cursor.ndx withClass:obj];
 }
 
 -(void)setSubtable:(TightdbTable *)value
@@ -246,7 +246,7 @@ using namespace std;
 
 -(TightdbMixed *)getMixed
 {
-    return [_cursor.table getMixed:_columnId ndx:_cursor.ndx];
+    return [_cursor.table getMixedInColumn:_columnId atRow:_cursor.ndx];
 }
 
 -(void)setMixed:(TightdbMixed *)value

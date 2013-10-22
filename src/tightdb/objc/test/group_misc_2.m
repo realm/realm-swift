@@ -119,7 +119,7 @@ TIGHTDB_TABLE_2(QueryTable,
         MyTable_Cursor *cursor = [diskTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, [cursor Name]);
         NSLog(@"%zu: %@", i, cursor.Name);
-        NSLog(@"%zu: %@", i, [diskTable getString:0 ndx:i]);
+        NSLog(@"%zu: %@", i, [diskTable getStringInColumn:0 atRow:i]);
     }
 
     // Write same group to memory buffer
@@ -221,7 +221,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Add two rows to the subtable
     
-    TightdbTable *subtable = [table getSubtable:COL_TABLE_TAB ndx:0];
+    TightdbTable *subtable = [table getTableInColumn:COL_TABLE_TAB atRow:0];
 
     [subtable addRow];
 
