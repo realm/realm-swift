@@ -61,9 +61,24 @@ TIGHTDB_TABLE_2(SharedTable2,
                 NSLog(@"%zu: %lld", i, cursor.Age);
                 NSLog(@"%zu: %i", i, [diskTable getBoolInColumn:0 atRow:i]);
             }
-            NSLog(@"About to write to a read only table, size=%zu", [diskTable count]);
-            [diskTable addHired:YES Age:54];
-            NSLog(@"Did just write to a read only table, size=%zu", [diskTable count]);
+            // Outdated test: This test attempts to write to a read only table (see below). With error
+            // handling "v1.0" (done by Thomas) the method calls insert methods which returns
+            // NO in case of read only situation and performs a NO-OP. As a result, the clint code was
+            // never informed that the operation failed unless he activly cheked the return value,
+            // which is not done by this test. With error handling "v2.0" the general idea is that writing
+            // to a read only table is a program error (in the client code) which must be dealt with
+            // before shipping the product to the end user. Therefore we throw a read only 
+            // exception from setters when they are called on read only tables. The client program
+            // crashes with an informative exception in the console. If this principle still applies
+            // within transaction is to be agreed. If it does, read only exceptions are categorized as
+            // a result of mis-use of the API, even in transaction blocks, and the clint program should 
+            // experience an exception (after the transaction is properly closed). On the other hand,
+            // expected problems, such as file access should be handled using NSError objects.
+            //
+            // [diskTable addHired:YES Age:54];
+
+
+
         }];
     }
     @catch (NSException *exception) {

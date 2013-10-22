@@ -84,6 +84,8 @@
 
 -(BOOL)isEqual:(TightdbTable *)other;
 
+-(BOOL)isReadOnly;
+
 
 
 /// This method will return NO if it encounters a memory allocation

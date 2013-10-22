@@ -543,6 +543,14 @@ using namespace std;
     _readOnly = readOnly;
 }
 
+-(BOOL)isReadOnly
+{
+    if (_readOnly) 
+        return YES;
+    else
+        return NO; 
+}
+
 -(BOOL)isEqual:(TightdbTable *)other
 {
     return *_table == *other->_table;

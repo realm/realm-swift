@@ -48,16 +48,13 @@ using namespace std;
 {
     TightdbGroup* group;
     @try {
-        NSLog(@"Attempting read transaction");
         group = [TightdbGroup groupTightdbGroup:(tightdb::Group *)&_sharedGroup->begin_read() readOnly:YES];
         block(group);
     }
     @catch (NSException *exception) {
-        NSLog(@"Catching exception in block");
         @throw exception;
     }
     @finally {
-        NSLog(@"Executing finally");
         _sharedGroup->end_read();
         [group clearGroup];
     }
