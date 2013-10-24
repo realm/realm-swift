@@ -44,7 +44,7 @@ using namespace std;
 }
 
 
--(void)readTransaction:(TightdbSharedGroupReadTransactionBlock)block
+/*-(void)readTransaction:(TightdbSharedGroupReadTransactionBlock)block
 {
     TightdbGroup* group;
     @try {
@@ -58,9 +58,103 @@ using namespace std;
         _sharedGroup->end_read();
         [group clearGroup];
     }
+}*/
+
+-(void)readTransaction:(TightdbSharedGroupReadTransactionBlock)block
+{
+    TightdbGroup *group;
+
+    try {
+        group = [TightdbGroup groupTightdbGroup:(tightdb::Group *)&_sharedGroup->begin_read() readOnly:YES];
+    }
+    catch (std::exception &ex) {
+        // File related problems are not expected after the shared group is created. The file content
+        // was already memory mapped when the shared group was created. If begin read_trows, a severe 
+        // problem has occcured (such as out of memory).
+        _sharedGroup->end_read();
+        [group clearGroup];
+        NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                              reason:[NSString stringWithUTF8String:ex.what()]
+                                              userInfo:nil];
+        [exception raise];
+    }
+
+    @try {
+        // Assuming a block only throws NSException. No TightDB Obj-C methods used in the block
+        // should throw anything but NSException or derivatives. Note: if the client calls other libraries
+        // throwing other kinds of exceptions they will leak back to the client code, if he does not
+        // catch them within the block.
+        block(group);
+    }
+    @catch (NSException *exception) {
+        @throw exception;
+    }
+    @finally {
+        _sharedGroup->end_read();
+        [group clearGroup];
+    }
 }
 
--(void)writeTransaction:(TightdbSharedGroupWriteTransactionBlock)block
+
+-(BOOL)writeTransaction(TightdbSharedGroupWriteTransactionBlock)block error:(NSError **error)
+{
+    TightdbGroup *group;
+    try {
+        group = [TightdbGroup groupTightdbGroup:&_sharedGroup->begin_write() readOnly:NO];
+        
+    } catch (std::exception &ex) {
+        // As in read transactions, file related problems are not expected after the shared group
+        // is created. Therefore, we currently convert and re-throw all core exceptions as NSExceptions.
+
+        // TODO: In the future, more specific exceptions such as network issues (w. replication)
+        // may be caught and reported as an NSError.
+
+        _sharedGroup->end_read();
+        [group clearGroup];
+        NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                              reason:[NSString stringWithUTF8String:ex.what()]
+                                              userInfo:nil];
+        [exception raise];
+    }
+
+    @try {
+        BOOL confirmation = block(group);
+
+        if (confirmation) {
+
+
+            // Required to avoid leaking core exceptions.
+            try {
+                _sharedGroup->commit();
+            } catch (std::exception &ex) {
+                NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                      reason:[NSString stringWithUTF8String:ex.what()]
+                                                      userInfo:nil];
+                [exception raise];
+            }
+
+
+            [group clearGroup];
+            return YES;
+
+        } else {
+            *error = [NSError errorWithDomain:@"TBD";
+                                         code:@"Commit was cancelled by client code"
+                                     userInfo:@"TBD"];
+
+            _sharedGroup->rollback();
+            [group clearGroup];
+            return NO;
+        }
+    }
+    @catch (NSException *exception) {
+        _sharedGroup->rollback();
+        [group clearGroup];
+        @throw exception;
+    }
+}
+
+/*-(void)writeTransaction:(TightdbSharedGroupWriteTransactionBlock)block
 {
     TightdbGroup* group;
     @try {
@@ -76,7 +170,7 @@ using namespace std;
         [group clearGroup];
         @throw exception;
     }
-}
+}*/
 
 
 @end
