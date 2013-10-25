@@ -13,6 +13,7 @@ using namespace std;
     tightdb::SharedGroup* _sharedGroup;
 }
 
+// TODO: rename me to sharedGroupWithFilename
 +(TightdbSharedGroup *)groupWithFilename:(NSString *)filename
 {
     tightdb::SharedGroup* shared_group;
@@ -43,7 +44,6 @@ using namespace std;
     _sharedGroup = 0;
 }
 
-
 /*-(void)readTransaction:(TightdbSharedGroupReadTransactionBlock)block
 {
     TightdbGroup* group;
@@ -63,27 +63,14 @@ using namespace std;
 -(void)readTransaction:(TightdbSharedGroupReadTransactionBlock)block
 {
     TightdbGroup *group;
-
-    try {
-        group = [TightdbGroup groupTightdbGroup:(tightdb::Group *)&_sharedGroup->begin_read() readOnly:YES];
-    }
-    catch (std::exception &ex) {
-        // File related problems are not expected after the shared group is created. The file content
-        // was already memory mapped when the shared group was created. If begin read_trows, a severe 
-        // problem has occcured (such as out of memory).
-        _sharedGroup->end_read();
-        [group clearGroup];
-        NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                              reason:[NSString stringWithUTF8String:ex.what()]
-                                              userInfo:nil];
-        [exception raise];
-    }
-
+        
     @try {
+        // Expects that groupTightdbGroup coverts any core exceptions to NSExceptions.
         // Assuming a block only throws NSException. No TightDB Obj-C methods used in the block
         // should throw anything but NSException or derivatives. Note: if the client calls other libraries
         // throwing other kinds of exceptions they will leak back to the client code, if he does not
         // catch them within the block.
+        group = [TightdbGroup groupTightdbGroup:(tightdb::Group *)&_sharedGroup->begin_read() readOnly:YES];
         block(group);
     }
     @catch (NSException *exception) {
@@ -96,34 +83,19 @@ using namespace std;
 }
 
 
--(BOOL)writeTransaction(TightdbSharedGroupWriteTransactionBlock)block error:(NSError **error)
+-(BOOL)writeTransaction:(TightdbSharedGroupWriteTransactionBlock)block withError:(NSError **)error
 {
     TightdbGroup *group;
-    try {
-        group = [TightdbGroup groupTightdbGroup:&_sharedGroup->begin_write() readOnly:NO];
-        
-    } catch (std::exception &ex) {
-        // As in read transactions, file related problems are not expected after the shared group
-        // is created. Therefore, we currently convert and re-throw all core exceptions as NSExceptions.
-
-        // TODO: In the future, more specific exceptions such as network issues (w. replication)
-        // may be caught and reported as an NSError.
-
-        _sharedGroup->end_read();
-        [group clearGroup];
-        NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                              reason:[NSString stringWithUTF8String:ex.what()]
-                                              userInfo:nil];
-        [exception raise];
-    }
-
+ 
     @try {
+        // TODO: catch c++
+        group = [TightdbGroup groupTightdbGroup:&_sharedGroup->begin_write() readOnly:NO];
         BOOL confirmation = block(group);
-
+        
         if (confirmation) {
 
 
-            // Required to avoid leaking core exceptions.
+            // Required to avoid leaking of core exceptions.
             try {
                 _sharedGroup->commit();
             } catch (std::exception &ex) {
@@ -138,9 +110,7 @@ using namespace std;
             return YES;
 
         } else {
-            *error = [NSError errorWithDomain:@"TBD";
-                                         code:@"Commit was cancelled by client code"
-                                     userInfo:@"TBD"];
+            *error = [[NSError alloc] initWithDomain:NSPOSIXErrorDomain code:0 userInfo:nil];
 
             _sharedGroup->rollback();
             [group clearGroup];

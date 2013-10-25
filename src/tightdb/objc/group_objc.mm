@@ -24,6 +24,8 @@ using namespace std;
 @synthesize group = _group;
 @synthesize readOnly = _readOnly;
 
+// TODO: Error handling to be updated according to new strategy (NSExceptions when approporate)
+
 +(TightdbGroup *)group
 {
     return [self groupWithError:nil];
@@ -47,7 +49,6 @@ using namespace std;
     group.readOnly = readOnly;
     return group;
 }
-
 
 +(TightdbGroup *)groupWithFilename:(NSString *)filename
 {

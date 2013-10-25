@@ -61,32 +61,23 @@ TIGHTDB_TABLE_2(SharedTable2,
                 NSLog(@"%zu: %lld", i, cursor.Age);
                 NSLog(@"%zu: %i", i, [diskTable getBoolInColumn:0 atRow:i]);
             }
-            // Outdated test: This test attempts to write to a read only table (see below). With error
-            // handling "v1.0" (done by Thomas) the method calls insert methods which returns
-            // NO in case of read only situation and performs a NO-OP. As a result, the clint code was
-            // never informed that the operation failed unless he activly cheked the return value,
-            // which is not done by this test. With error handling "v2.0" the general idea is that writing
-            // to a read only table is a program error (in the client code) which must be dealt with
-            // before shipping the product to the end user. Therefore we throw a read only 
-            // exception from setters when they are called on read only tables. The client program
-            // crashes with an informative exception in the console. If this principle still applies
-            // within transaction is to be agreed. If it does, read only exceptions are categorized as
-            // a result of mis-use of the API, even in transaction blocks, and the clint program should 
-            // experience an exception (after the transaction is properly closed). On the other hand,
-            // expected problems, such as file access should be handled using NSError objects.
-            //
-            // [diskTable addHired:YES Age:54];
+
+            NSLog(@"BOOL = %@\n", ([diskTable isReadOnly] ? @"YES" : @"NO"));
+            [diskTable addHired:YES Age:54];
 
 
-
+            [diskTable addRow];
+            NSLog(@"Disktable size now: %zu", [diskTable count]);
         }];
     }
     @catch (NSException *exception) {
-        NSLog(@"Exception caught: %@", exception);
+        NSLog(@"Exception caught 1: %@", exception);
     }
 
     // Write shared group and commit
-//    TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:@"employees.tightdb"];
+    ///TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:@"employees.tightdb"];
+
+    NSError* error = nil;
     [fromDisk writeTransaction:^(TightdbGroup *group) {
         SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
         NSLog(@"Disktable size: %zu", [diskTable count]);
@@ -94,7 +85,9 @@ TIGHTDB_TABLE_2(SharedTable2,
             [diskTable addHired:YES Age:i];
         }
         return YES; // Commit
-    }];
+    
+    } withError:&error];
+    
     // Write shared group and rollback
 //    TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:@"employees.tightdb"];
     [fromDisk writeTransaction:^(TightdbGroup *group) {
@@ -104,7 +97,9 @@ TIGHTDB_TABLE_2(SharedTable2,
             [diskTable addHired:YES Age:i];
         }
         return NO; // rollback
-    }];
+        
+    } withError:&error];
+    
     // Write and fail with exception in block (Should rollback)
 //    TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:@"employees.tightdb"];
     @try {
@@ -116,7 +111,7 @@ TIGHTDB_TABLE_2(SharedTable2,
             }
             [NSException raise:@"Test exception" format:@"Program went ballistic"];
             return YES; // commit
-        }];
+        } withError:&error];
     }
     @catch (NSException *exception) {
         NSLog(@"Exception caught: %@", exception);

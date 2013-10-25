@@ -890,7 +890,6 @@ using namespace std;
     return _table->get_float(colNdx, ndx);
 }
 
-
 -(double)getDoubleInColumn:(size_t)colNdx atRow:(size_t)ndx
 {
     return _table->get_double(colNdx, ndx);
