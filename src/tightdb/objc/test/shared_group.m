@@ -30,6 +30,10 @@ TIGHTDB_TABLE_2(SharedTable2,
 
 - (void)testSharedGroup
 {
+
+    // TODO: Update test to include more ASSERTS
+
+
     TightdbGroup *group = [TightdbGroup group];
     // Create new table in group
     SharedTable2 *table = [group getTable:@"employees" withClass:[SharedTable2 class]];
@@ -47,12 +51,13 @@ TIGHTDB_TABLE_2(SharedTable2,
 
     // Write to disk
     [fm removeItemAtPath:@"employees.tightdb" error:NULL];
+    [fm removeItemAtPath:@"employees.tightdb.lock" error:NULL];
     [group write:@"employees.tightdb"];
 
     // Read only shared group
-    TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:@"employees.tightdb"];
-    @try {
-        [fromDisk readTransaction:^(TightdbGroup *group) {
+    TightdbSharedGroup *fromDisk = [TightdbSharedGroup sharedGroupWithFilename:@"employees.tightdb" withError:nil];
+
+        [fromDisk readTransactionWithBlock:^(TightdbGroup *group) {
             SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable count]);
             for (size_t i = 0; i < [diskTable count]; i++) {
@@ -61,24 +66,10 @@ TIGHTDB_TABLE_2(SharedTable2,
                 NSLog(@"%zu: %lld", i, cursor.Age);
                 NSLog(@"%zu: %i", i, [diskTable getBoolInColumn:0 atRow:i]);
             }
-
-            NSLog(@"BOOL = %@\n", ([diskTable isReadOnly] ? @"YES" : @"NO"));
-            [diskTable addHired:YES Age:54];
-
-
-            [diskTable addRow];
-            NSLog(@"Disktable size now: %zu", [diskTable count]);
         }];
-    }
-    @catch (NSException *exception) {
-        NSLog(@"Exception caught 1: %@", exception);
-    }
+    
 
-    // Write shared group and commit
-    ///TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:@"employees.tightdb"];
-
-    NSError* error = nil;
-    [fromDisk writeTransaction:^(TightdbGroup *group) {
+    [fromDisk writeTransactionWithError:nil withBlock:^(TightdbGroup *group) {
         SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
         NSLog(@"Disktable size: %zu", [diskTable count]);
         for (size_t i = 0; i < 50; i++) {
@@ -86,11 +77,10 @@ TIGHTDB_TABLE_2(SharedTable2,
         }
         return YES; // Commit
     
-    } withError:&error];
+    }];
     
-    // Write shared group and rollback
-//    TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:@"employees.tightdb"];
-    [fromDisk writeTransaction:^(TightdbGroup *group) {
+
+    [fromDisk writeTransactionWithError:nil withBlock:^(TightdbGroup *group) {
         SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
         NSLog(@"Disktable size: %zu", [diskTable count]);
         for (size_t i = 0; i < 50; i++) {
@@ -98,27 +88,20 @@ TIGHTDB_TABLE_2(SharedTable2,
         }
         return NO; // rollback
         
-    } withError:&error];
+    }];
     
-    // Write and fail with exception in block (Should rollback)
-//    TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:@"employees.tightdb"];
-    @try {
-        [fromDisk writeTransaction:^(TightdbGroup *group) {
+
+    [fromDisk writeTransactionWithError:nil withBlock:^(TightdbGroup *group) {
             SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable count]);
             for (size_t i = 0; i < 50; i++) {
                 [diskTable addHired:YES Age:i];
             }
-            [NSException raise:@"Test exception" format:@"Program went ballistic"];
             return YES; // commit
-        } withError:&error];
-    }
-    @catch (NSException *exception) {
-        NSLog(@"Exception caught: %@", exception);
-    }
+    }];
     
-    
-    [fromDisk readTransaction:^(TightdbGroup *group) {
+ 
+    [fromDisk readTransactionWithBlock:^(TightdbGroup *group) {
         SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
         NSLog(@"Disktable size: %zu", [diskTable count]);
     }];

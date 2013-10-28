@@ -459,6 +459,8 @@ using namespace std;
 }
 @synthesize table = _table;
 
+
+
 -(id)init
 {
     self = [super init];
@@ -650,36 +652,51 @@ using namespace std;
 }
 
 -(size_t)_addRow
-{
-    return [self _addRowWithError:nil];
-}
--(size_t)_addRowWithError:(NSError *__autoreleasing *)error
-{
-    if (_readOnly) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, @"Tried to add row while readonly.");
-        return NO;
+{ 
+    if(_readOnly) {
+        NSException *exception = [NSException exceptionWithName:@"tightdb:table_is_read_only" 
+                                                         reason:@"You tried to modify a table in read only mode" 
+                                                       userInfo:[NSMutableDictionary dictionary]]; 
+        [exception raise];
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return _table->add_empty_row();
-                                 , @"com.tightdb.table", 0);
+
+    size_t index;
+    try {
+        index = _table->add_empty_row();
+    }
+    catch(std::exception &ex) {
+        NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                         reason:[NSString stringWithUTF8String:ex.what()]
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
+
+    return index;
 }
+
 
 -(size_t)_addRows:(size_t)rowCount
 {
-    return [self _addRows:rowCount error:nil];
-}
-
--(size_t)_addRows:(size_t)rowCount error:(NSError *__autoreleasing *)error
-{
-    if (_readOnly) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, @"Tried to add row while readonly.");
-        return NO;
+    if(_readOnly) {
+        NSException *exception = [NSException exceptionWithName:@"tightdb:table_is_read_only" 
+                                                         reason:@"You tried to modify a table in read only mode" 
+                                                       userInfo:[NSMutableDictionary dictionary]]; 
+        [exception raise];
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return _table->add_empty_row(rowCount);
-                                 , @"com.tightdb.table", 0);
+
+    size_t index;
+    try {
+        index = _table->add_empty_row(rowCount);
+    }
+
+    catch(std::exception &ex) {
+        NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                         reason:[NSString stringWithUTF8String:ex.what()]
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
+
+    return index;
 }
 
 -(TightdbCursor *)cursorAtIndex:(size_t)ndx 
@@ -1210,30 +1227,6 @@ using namespace std;
                                  , @"com.tightdb.table", NO);
     return YES;
 }
-
-/*-(BOOL)setMixed:(size_t)col_ndx ndx:(size_t)row_ndx value:(TightdbMixed *)value
-{
-    return [self setMixed:col_ndx ndx:row_ndx value:value error:nil];
-}
-
--(BOOL)setMixed:(size_t)col_ndx ndx:(size_t)row_ndx value:(TightdbMixed *)value error:(NSError *__autoreleasing *)error
-{
-    if (_readOnly) {
-        if (error)
-            *error = make_tightdb_error(@"com.tightdb.table", tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
-        return NO;
-    }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 if (value.mixed.get_type() == tightdb::type_Table && value.table) {
-                                     tightdb::LangBindHelper::set_mixed_subtable(*_table, col_ndx, row_ndx,
-                                                                                 [value.table getTable]);
-                                 }
-                                 else {
-                                     _table->set_mixed(col_ndx, row_ndx, value.mixed);
-                                 }
-                                 , @"com.tightdb.table", NO);
-    return YES;
-}*/
 
 -(size_t)addColumnWithType:(TightdbType)type andName:(NSString *)name
 {

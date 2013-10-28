@@ -78,6 +78,10 @@
 
 
 @interface TightdbTable: NSObject <NSFastEnumeration>
+
+
+
+
 -(BOOL)updateFromSpec;
 -(BOOL)updateFromSpecWithError:(NSError *__autoreleasing *)error;
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
@@ -117,9 +121,7 @@
 // Only curser based add should be public. This is just a temporaray way to hide the methods.
 // TODO: Move to class extension.
 -(size_t)_addRow;
--(size_t)_addRowWithError:(NSError *__autoreleasing *)error;
 -(size_t)_addRows:(size_t)rowCount;
--(size_t)_addRows:(size_t)rowCount error:(NSError *__autoreleasing *)error;
 
 -(BOOL)clear;
 -(BOOL)clearWithError:(NSError *__autoreleasing *)error;
