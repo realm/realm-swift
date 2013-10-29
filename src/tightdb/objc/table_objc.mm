@@ -653,6 +653,8 @@ using namespace std;
 
 -(size_t)_addRow
 { 
+    // TODO: Use a macro or er function for error handling
+
     if(_readOnly) {
         NSException *exception = [NSException exceptionWithName:@"tightdb:table_is_read_only" 
                                                          reason:@"You tried to modify a table in read only mode" 
@@ -677,6 +679,8 @@ using namespace std;
 
 -(size_t)_addRows:(size_t)rowCount
 {
+    // TODO: Use a macro or er function for error handling
+
     if(_readOnly) {
         NSException *exception = [NSException exceptionWithName:@"tightdb:table_is_read_only" 
                                                          reason:@"You tried to modify a table in read only mode" 

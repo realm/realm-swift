@@ -143,11 +143,11 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSFileManager *fm = [NSFileManager defaultManager];
 
     // Write the group to disk
-    [fm removeItemAtPath:@"employees.tightdb" error:NULL];
-    [group write:@"employees.tightdb"];
+    [fm removeItemAtPath:@"employees.tightdb" error:nil];
+    [group writeToFile:@"employees.tightdb" withError:nil];
 
     // Load a group from disk (and print contents)
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:@"employees.tightdb"];
+    TightdbGroup *fromDisk = [TightdbGroup groupWithFile:@"employees.tightdb" withError:nil];
     PeopleTable *diskTable = [fromDisk getTable:@"employees" withClass:[PeopleTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES];
@@ -162,10 +162,10 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
 
     // Write same group to memory buffer
     size_t size;
-    const char* const data = [group writeToMem:&size];
+    const char* const data = [group writeToBufferOfSize:&size];
 
     // Load a group from memory (and print contents)
-    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:data size:size];
+    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:data ofSize:size withError:nil];
     PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class]];
     for (size_t i = 0; i < [memTable count]; i++) {
         PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];

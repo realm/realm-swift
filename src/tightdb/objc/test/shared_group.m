@@ -11,14 +11,6 @@
 #import <tightdb/objc/group.h>
 #import <tightdb/objc/group_shared.h>
 
-/*TIGHTDB_TABLE_DEF_2(SharedTable2,
-                    Hired, Bool,
-                    Age,   Int)
-
-TIGHTDB_TABLE_IMPL_2(SharedTable2,
-                     Hired, Bool,
-                     Age,   Int)*/
-
 TIGHTDB_TABLE_2(SharedTable2,
                 Hired, Bool,
                 Age,   Int)
@@ -50,9 +42,9 @@ TIGHTDB_TABLE_2(SharedTable2,
     NSFileManager *fm = [NSFileManager defaultManager];
 
     // Write to disk
-    [fm removeItemAtPath:@"employees.tightdb" error:NULL];
-    [fm removeItemAtPath:@"employees.tightdb.lock" error:NULL];
-    [group write:@"employees.tightdb"];
+    [fm removeItemAtPath:@"employees.tightdb" error:nil];
+    [fm removeItemAtPath:@"employees.tightdb.lock" error:nil];
+    [group writeToFile:@"employees.tightdb" withError:nil];
 
     // Read only shared group
     TightdbSharedGroup *fromDisk = [TightdbSharedGroup sharedGroupWithFilename:@"employees.tightdb" withError:nil];

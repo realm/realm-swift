@@ -56,7 +56,8 @@ enum TightdbErr {
     tdb_err_File_Exists = 5, 
     tdb_err_File_NotFound = 6,
     tdb_err_Resource = 7,
-    tdb_err_Rollback = 8
+    tdb_err_Rollback = 8,
+    tdb_err_InvalidDatabase = 9
 };
 
 // Still used in the new error strategy.

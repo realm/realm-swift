@@ -19,7 +19,7 @@ using namespace std;
     try {
         shared_group = new tightdb::SharedGroup(tightdb::StringData(ObjcStringAccessor(filename)));
     }
-    // Specific exceptions first, general exceptions last.
+    // TODO: capture this in a macro or function, group constructor uses the same pattern.
     catch (tightdb::File::PermissionDenied &ex) {
         if(error) // allow nil as the error argument
             *error = make_tightdb_error(@"com.tightdb.sharedgroup", tdb_err_File_PermissionDenied, [NSString stringWithUTF8String:ex.what()]);
