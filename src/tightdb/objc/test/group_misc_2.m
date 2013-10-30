@@ -216,17 +216,17 @@ TIGHTDB_TABLE_2(QueryTable,
     int COL_SUBTABLE_INT = 0;
 
     // Add a row to the top level table
-    [table addRow];
+    [table addEmptyRow];
     [table setInt:700 inColumn:COL_TABLE_INT atRow:0];
 
     // Add two rows to the subtable
     
     TightdbTable *subtable = [table getTableInColumn:COL_TABLE_TAB atRow:0];
 
-    [subtable addRow];
+    [subtable addEmptyRow];
 
     [subtable setInt:800 inColumn:COL_SUBTABLE_INT atRow:0];
-    [subtable addRow];
+    [subtable addEmptyRow];
     [subtable setInt:801 inColumn:COL_SUBTABLE_INT atRow:1];
 
     // Make the mixed values column contain another subtable
