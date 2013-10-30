@@ -1,8 +1,6 @@
 SUBDIRS = test
 test_DEPS = .
 
-GENERATED_SOURCES = tightdb.h
-
 INST_HEADERS = type.h cursor.h group.h query.h table.h group_shared.h helper_macros.h tightdb.h
 
 lib_LIBRARIES = libtightdb-objc.a
@@ -38,15 +36,17 @@ libtightdb_objc_a_LDFLAGS_COVER = $(shell tightdb-config-dbg --libs)
 # http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning
 libtightdb_objc_a_VERSION = 2:0:0
 
+ifeq ($(DISABLE_CHEETAH_CODE_GEN),)
+GENERATED_SOURCES += tightdb.h
+endif
+
 include ../../../generic.mk
 
 # Code generation
 ifeq ($(DISABLE_CHEETAH_CODE_GEN),)
-tightdb.h: tightdb.h.cheetah
+tightdb.h: tightdb.h.cheetah cheetah.sh
 	$(SHELL) cheetah.sh $< $@
 endif
-
-# Code generation
 
 uninstall/extra:
 	$(RM) $(DESTDIR)$(includedir)/tightdb/objc/*.h
