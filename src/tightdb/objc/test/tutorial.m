@@ -40,7 +40,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
 
     TightdbGroup *group = [TightdbGroup group];
     // Create new table in group
-    PeopleTable *people = [group getTable:@"employees" withClass:[PeopleTable class]];
+    PeopleTable *people = [group getTable:@"employees" withClass:[PeopleTable class] error:nil];
 
     // Add some rows
     [people addName:@"John" Age:20 Hired:YES];
@@ -148,7 +148,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
 
     // Load a group from disk (and print contents)
     TightdbGroup *fromDisk = [TightdbGroup groupWithFile:@"employees.tightdb" withError:nil];
-    PeopleTable *diskTable = [fromDisk getTable:@"employees" withClass:[PeopleTable class]];
+    PeopleTable *diskTable = [fromDisk getTable:@"employees" withClass:[PeopleTable class] error:nil];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES];
 
@@ -166,7 +166,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
 
     // Load a group from memory (and print contents)
     TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:data ofSize:size withError:nil];
-    PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class]];
+    PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class] error:nil];
     for (size_t i = 0; i < [memTable count]; i++) {
         PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, cursor.Name);

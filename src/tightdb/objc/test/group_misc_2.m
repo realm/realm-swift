@@ -44,7 +44,7 @@ TIGHTDB_TABLE_2(QueryTable,
     TightdbGroup *group = [TightdbGroup group];
     NSLog(@"HasTable: %i", [group hasTable:@"employees" withClass:[MyTable class]] );
     // Create new table in group
-    MyTable *table = [group getTable:@"employees" withClass:[MyTable class]];
+    MyTable *table = [group getTable:@"employees" withClass:[MyTable class] error:nil];
     NSLog(@"Table: %@", table);
     NSLog(@"HasTable: %i", [group hasTable:@"employees" withClass:[MyTable class]] );
 
@@ -110,7 +110,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Load a group from disk (and print contents)
     TightdbGroup *fromDisk = [TightdbGroup groupWithFile:@"employees.tightdb" withError:nil];
-    MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class]];
+    MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class] error:nil];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
 //    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
@@ -128,7 +128,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Load a group from memory (and print contents)
     TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:data ofSize:size withError:nil];
-    MyTable *memTable = [fromMem getTable:@"employees" withClass:[MyTable class]];
+    MyTable *memTable = [fromMem getTable:@"employees" withClass:[MyTable class] error:nil];
     for (size_t i = 0; i < [memTable count]; i++) {
         // ??? cursor
         NSLog(@"%zu: %@", i, memTable.Name);
@@ -139,7 +139,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testQuery
 {
     TightdbGroup *group = [TightdbGroup group];
-    QueryTable *table = [group getTable:@"Query table" withClass:[QueryTable class]];
+    QueryTable *table = [group getTable:@"Query table" withClass:[QueryTable class] error:nil];
 
     // Add some rows
     [table addFirst:2 Second:@"a"];
@@ -196,7 +196,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testSubtables
 {
     TightdbGroup *group = [TightdbGroup group];
-    TightdbTable *table = [group getTable:@"table" withClass:[TightdbTable class]];
+    TightdbTable *table = [group getTable:@"table" withClass:[TightdbTable class] error:nil];
 
     // Specify the table schema
     {

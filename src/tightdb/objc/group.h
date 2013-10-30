@@ -44,7 +44,6 @@
 
 /// This method returns nil if it encounters a memory allocation error
 /// (out of memory).
--(TightdbTable *)getTable:(NSString *)name;
 -(TightdbTable *)getTable:(NSString *)name error:(NSError *__autoreleasing *)error;
 
 /// This method returns nil if the group already contains a table with
@@ -54,7 +53,7 @@
 ///
 /// The specified table class must be one that is declared by using
 /// one of the table macros TIGHTDB_TABLE_*.
--(id)getTable:(NSString *)name withClass:(Class)obj;
+//-(id)getTable:(NSString *)name withClass:(Class)obj;
 -(id)getTable:(NSString *)name withClass:(Class)obj error:(NSError *__autoreleasing *)error;
 
 // Serialization

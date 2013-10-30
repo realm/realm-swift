@@ -90,7 +90,7 @@ int main()
             for (PeopleTable_Cursor *curser in table) {
                 NSLog(@"Name: %@", [curser Name]);
             }
-            
+         
         }];
 
     }

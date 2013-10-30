@@ -57,7 +57,8 @@ enum TightdbErr {
     tdb_err_File_NotFound = 6,
     tdb_err_Resource = 7,
     tdb_err_Rollback = 8,
-    tdb_err_InvalidDatabase = 9
+    tdb_err_InvalidDatabase = 9,
+    tdb_err_TableNotFound = 10
 };
 
 // Still used in the new error strategy.
@@ -125,7 +126,7 @@ catch(std::exception &ex) { \
     [exception raise]; \
 }
 
-#define TIGHTDBEXCEPTION_HANDLER_CORE_EXCEPTION(action) \
+#define TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(action) \
 try {action} \
 catch(std::exception &ex) { \
     NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception" \

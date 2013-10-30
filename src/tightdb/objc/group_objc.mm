@@ -206,12 +206,11 @@ using namespace std;
 
 -(BOOL)hasTable:(NSString *)name
 {
-
     BOOL returnValue = NO;
     
-    TIGHTDBEXCEPTION_HANDLER_CORE_EXCEPTION (
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION (
                                                 returnValue = _group->has_table(ObjcStringAccessor(name));
-                                            )
+                                             )
 
     return returnValue;
 }
@@ -221,16 +220,41 @@ using namespace std;
 // FIXME: Find a way to avoid having to transcode the table name twice
 -(BOOL)hasTable:(NSString *)name withClass:(__unsafe_unretained Class)classObj
 {
-    if (!_group->has_table(ObjcStringAccessor(name))) return NO;
-    TightdbTable* table = [self getTable:name withClass:classObj];
-    return table != nil;
+    BOOL returnValue;
+
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION (
+                                                if (!_group->has_table(ObjcStringAccessor(name))) return NO;
+                                                TightdbTable* table = [self getTable:name withClass:classObj error:nil];
+                                                returnValue = table != nil;
+                                             )
+    return returnValue;
 }
 
--(id)getTable:(NSString *)name
+-(id)getTable:(NSString *)name error:(NSError **)error
 {
-    return [self getTable:name error:nil];
-}
+    if(_readOnly) {
+        // A group is readonly when it has been extracted from a shared group in a read transaction.
+        // In this case, getTable should return nil for non-existing tables.
+        if (![self hasTable:name]) {
+            if(error) // allow nil as the error argument
+                *error = make_tightdb_error(@"com.tightdb.group", tdb_err_TableNotFound, @"The table was not found. Cannot create the table in read only mode.");
+            return nil;
+        }
+            
+    }
 
+    // If the group is NOT read only, non-existing tables will be created. 
+    TightdbTable *table = [[TightdbTable alloc] _initRaw];
+
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION (
+                                                [table setTable:_group->get_table(ObjcStringAccessor(name))];
+                                             )
+    [table setParent:self];
+    [table setReadOnly:_readOnly];
+    
+    return table;
+}
+/*
 -(id)getTable:(NSString *)name error:(NSError *__autoreleasing *)error
 {
     TightdbTable *table = [[TightdbTable alloc] _initRaw];
@@ -241,21 +265,34 @@ using namespace std;
     [table setParent:self];
     [table setReadOnly:_readOnly];
     return table;
-}
+}*/
 
--(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)classObj
+/*-(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)classObj
 {
     return [self getTable:name withClass:classObj error:nil];
-}
+}*/
 // FIXME: Check that the specified class derives from Table.
 -(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)classObj error:(NSError *__autoreleasing *)error
 {
+
+    if(_readOnly) {
+        // A group is readonly when it has been extracted from a shared group in a read transaction.
+        // In this case, getTable should return nil for non-existing tables.
+        if (![self hasTable:name]) {
+            if(error) // allow nil as the error argument
+                *error = make_tightdb_error(@"com.tightdb.group", tdb_err_TableNotFound, @"The table was not found. Cannot create the table in read only mode.");
+            return nil;
+        }
+            
+    }
+
     TightdbTable *table = [[classObj alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table)) return nil;
     bool was_created;
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 [table setTable:_group->get_table(ObjcStringAccessor(name), was_created)];
-                                 , @"com.tightdb.group", nil);
+    
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION (
+                                                [table setTable:_group->get_table(ObjcStringAccessor(name), was_created)];
+                                            )
+
     [table setParent:self];
     [table setReadOnly:_readOnly];
     if (was_created) {
