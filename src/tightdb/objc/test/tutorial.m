@@ -50,7 +50,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     [people addName:@"Anni" Age:54 Hired:YES];
 
     // Insert at specific position
-    [people insertAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
+    [people insertRowAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
 
     // Getting the size of the table
     NSLog(@"PeopleTable Size: %lu - is %@.    [6 - not empty]", [people count],

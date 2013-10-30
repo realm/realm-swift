@@ -76,7 +76,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     
 
     // Insert at specific position
-    [people insertAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
+    [people insertRowAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
 
     // Getting the size of the table
     NSLog(@"PeopleErrTable Size: %lu - is %@.    [6 - not empty]", [people count],
