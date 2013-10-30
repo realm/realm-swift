@@ -34,7 +34,7 @@ int main()
         // Creates a query expression to filter on age. Note that the
         // quiry is defined but not executed here.
         
-        PeopleTable_Query *query = [[table where].Age between:13 to:19];
+        PeopleTable_Query *query = [[table where].Age columnIsBetween:13 and_:19];
         
         // Accesses query result directly on the quiry object. The quiry is
         // executed once.
@@ -48,7 +48,7 @@ int main()
         for (PeopleTable_Cursor *curser in query)
             NSLog(@"Name: %lld", [curser Age]);
         
-        // To avoid repeating the same quiry, the result may be stored in
+        // To avoid repeating the same query, the result may be stored in
         // a table view for multiple access. The following code executes the
         // query once and saves the result in a table view.
         

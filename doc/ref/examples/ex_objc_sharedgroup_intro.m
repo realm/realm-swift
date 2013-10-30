@@ -4,7 +4,6 @@
 #import <tightdb/objc/group_shared.h>
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
-#import "TestJesper.h"
 
 
 TIGHTDB_TABLE_3(PeopleTable,
@@ -37,7 +36,7 @@ int main()
         NSError *error = nil;
         BOOL success;
         
-        success = [shared writeTransaction:^(TightdbGroup *group) {
+        success = [shared writeTransactionWithError:&error withBlock:^(TightdbGroup *group) {
             
             // Write transactions with the shared group are possible via the provided variable binding named group.
             
@@ -52,14 +51,14 @@ int main()
             NSLog(@"Commit!");
             return YES; // Commit
             
-        } withError:&error];
+        } ];
         
         if(!success)
             NSLog(@"Error : %@", [error localizedDescription]);
         
         // A write transaction (with rollback).
 
-       success = [shared writeTransaction:^(TightdbGroup *group) {
+       success = [shared writeTransactionWithError:&error withBlock:^(TightdbGroup *group) {
             
             // Write transactions with the shared group are possible via the provided variable binding named group.
            
@@ -74,7 +73,7 @@ int main()
            NSLog(@"Commit!");
            return YES; // Commit
 
-        } withError:&error];
+       }];
         
         if(!success)
             NSLog(@"Error : %@", [error localizedDescription]);
@@ -82,7 +81,7 @@ int main()
 
         // A read transaction
         
-        [shared readTransaction:^(TightdbGroup *group) {
+        [shared readTransactionWithBlock:^(TightdbGroup *group) {
             
             // Read transactions with the shared group are possible via the provided variable binding named group.
             
