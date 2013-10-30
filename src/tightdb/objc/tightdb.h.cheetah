@@ -84,7 +84,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName${j+1}, CType${j+1}) \
 CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 %end for
 ; \
--(void)insertAtIndex:(size_t)ndx%slurp
+-(void)addOrInsertRowAtIndex:(size_t)ndx%slurp
 %for $j in range($num_cols)
  CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 %end for
@@ -226,7 +226,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 %end for
     [self insertDone]; \
 } \
--(void)insertAtIndex:(size_t)ndx %slurp
+-(void)addOrInsertRowAtIndex:(size_t)ndx %slurp
 %for $j in range($num_cols)
 CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 %end for

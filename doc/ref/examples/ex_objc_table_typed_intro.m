@@ -27,6 +27,12 @@ int main()
         cursor = [table addRow];
         cursor.Name = @"Sofie";
         cursor.Age = 40;
+        
+
+        
+        [table addOrInsertRowAtIndex:[table count]
+                                Name:@"Jesper"
+                                 Age:200];
       
         NSLog(@"The size of the table is now %zd", [table count]);
         
@@ -50,7 +56,6 @@ int main()
         TightdbCursor *c3 = [table cursorAtIndex:[table count]];
         if (c3 != nil)
             NSLog(@"Should not get here.");
-        
     }
 }
  
