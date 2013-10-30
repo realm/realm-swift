@@ -28,12 +28,10 @@ int main()
         cursor.Name = @"Sofie";
         cursor.Age = 40;
         
-
-        
         [table addOrInsertRowAtIndex:[table count]
                                 Name:@"Jesper"
                                  Age:200];
-      
+        
         NSLog(@"The size of the table is now %zd", [table count]);
         
         for (PeopleTable_Cursor *ite in table) {

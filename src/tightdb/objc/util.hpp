@@ -125,6 +125,14 @@ catch(std::exception &ex) { \
     [exception raise]; \
 }
 
+#define TIGHTDBEXCEPTION_HANDLER_CORE_EXCEPTION(action) \
+try {action} \
+catch(std::exception &ex) { \
+    NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception" \
+                                          reason:[NSString stringWithUTF8String:ex.what()] \
+                                          userInfo:[NSMutableDictionary dictionary]]; \
+    [exception raise]; \
+}
 
 inline NSString* to_objc_string(tightdb::StringData s)
 {

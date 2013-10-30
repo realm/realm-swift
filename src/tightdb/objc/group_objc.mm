@@ -178,10 +178,12 @@ using namespace std;
 
 -(const char*)writeToBufferOfSize:(size_t*)size // size is an output paramater
 {
+    const char* returnValue = nil;
+
     try {
         tightdb::BinaryData buffer = _group->write_to_mem();
         *size = buffer.size();
-        return buffer.data();
+        returnValue = buffer.data();
     }
     catch (std::exception &ex) {
         NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
@@ -190,7 +192,7 @@ using namespace std;
         [exception raise];
     }
 
-    return nil;
+    return returnValue;
 }
 
 /*-(const char*)writeToMem:(size_t*)size error:(NSError *__autoreleasing *)error
@@ -204,7 +206,14 @@ using namespace std;
 
 -(BOOL)hasTable:(NSString *)name
 {
-    return _group->has_table(ObjcStringAccessor(name));
+
+    BOOL returnValue = NO;
+    
+    TIGHTDBEXCEPTION_HANDLER_CORE_EXCEPTION (
+                                                returnValue = _group->has_table(ObjcStringAccessor(name));
+                                            )
+
+    return returnValue;
 }
 
 // FIXME: Avoid creating a table instance. It should be enough to create an TightdbSpec and then check that.
