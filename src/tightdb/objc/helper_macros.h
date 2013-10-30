@@ -137,11 +137,12 @@
 
 // TIGHTDB_COLUMN_INSERT_ERROR
 
-#define TIGHTDB_COLUMN_INSERT_ERROR(table, col, row, value, type, error)                TIGHTDB_COLUMN_INSERT_ERROR_2(TIGHTDB_IS_SUBTABLE(type), table, col, row, value, type, error)
-#define TIGHTDB_COLUMN_INSERT_ERROR_2(is_subtable, table, col, row, value, type, error) TIGHTDB_COLUMN_INSERT_ERROR_3(is_subtable, table, col, row, value, type, error)
-#define TIGHTDB_COLUMN_INSERT_ERROR_3(is_subtable, table, col, row, value, type, error) TIGHTDB_COLUMN_INSERT_ERROR_4_##is_subtable(table, col, row, value, type, error)
-#define TIGHTDB_COLUMN_INSERT_ERROR_4_Y(table, col, _row, value, type, error)           [table _insertSubtableCopy:col row:_row subtable:value error:error]
-#define TIGHTDB_COLUMN_INSERT_ERROR_4_N(table, col, row, _value, type, error)           [table insert##type:col ndx:row value:_value error:error]
+// FIXME: the ...INSERT_ERROR defines are no longer needed and may be removed
+//#define TIGHTDB_COLUMN_INSERT_ERROR(table, col, row, value, type, error)                TIGHTDB_COLUMN_INSERT_ERROR_2(TIGHTDB_IS_SUBTABLE(type), table, col, row, value, type, error)
+//#define TIGHTDB_COLUMN_INSERT_ERROR_2(is_subtable, table, col, row, value, type, error) TIGHTDB_COLUMN_INSERT_ERROR_3(is_subtable, table, col, row, value, type, error)
+//#define TIGHTDB_COLUMN_INSERT_ERROR_3(is_subtable, table, col, row, value, type, error) TIGHTDB_COLUMN_INSERT_ERROR_4_##is_subtable(table, col, row, value, type, error)
+//#define TIGHTDB_COLUMN_INSERT_ERROR_4_Y(table, col, _row, value, type, error)           [table _insertSubtableCopy:col row:_row subtable:value error:error]
+//#define TIGHTDB_COLUMN_INSERT_ERROR_4_N(table, col, row, _value, type, error)           [table insert##type:col ndx:row value:_value error:error]
 
 
 
@@ -163,8 +164,7 @@
 #define TIGHTDB_CURSOR_PROPERTY_DEF_SIMPLE(name, type) \
 @property TIGHTDB_TYPE_##type name; \
 -(TIGHTDB_TYPE_##type)name; \
--(void)set##name:(TIGHTDB_TYPE_##type)value; \
--(BOOL)set##name:(TIGHTDB_TYPE_##type)value error:(NSError *__autoreleasing *)error;
+-(void)set##name:(TIGHTDB_TYPE_##type)value;
 
 #define TIGHTDB_CURSOR_PROPERTY_IMPL_SIMPLE(name, type) \
 -(TIGHTDB_TYPE_##type)name \
@@ -174,12 +174,7 @@
 -(void)set##name:(TIGHTDB_TYPE_##type)value \
 { \
     [_##name set##type:value]; \
-} \
--(BOOL)set##name:(TIGHTDB_TYPE_##type)value error:(NSError *__autoreleasing *)error \
-{ \
-    return [_##name set##type:value error:error]; \
 }
-
 
 #define TIGHTDB_CURSOR_PROPERTY_DEF_SUBTABLE(name, type) \
 @property type *name; \

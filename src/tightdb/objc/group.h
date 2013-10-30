@@ -24,12 +24,11 @@
 
 
 @interface TightdbGroup: NSObject
-+(TightdbGroup *)groupWithFilename:(NSString *)filename;
-+(TightdbGroup *)groupWithFilename:(NSString *)filename error:(NSError *__autoreleasing *)error;
-+(TightdbGroup *)groupWithBuffer:(const char*)data size:(size_t)size;
-+(TightdbGroup *)groupWithBuffer:(const char*)data size:(size_t)size error:(NSError *__autoreleasing *)error;
+//+(TightdbGroup *)groupWithFilename:(NSString *)filename;
++(TightdbGroup *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
++(TightdbGroup *)groupWithBuffer:(const char*)data ofSize:(size_t)size withError:(NSError *__autoreleasing *)error;
 +(TightdbGroup *)group;
-+(TightdbGroup *)groupWithError:(NSError *__autoreleasing *)error;
+//+(TightdbGroup *)groupWithError:(NSError *__autoreleasing *)error;
 
 -(size_t)getTableCount;
 -(NSString *)getTableName:(size_t)table_ndx;
@@ -59,9 +58,8 @@
 -(id)getTable:(NSString *)name withClass:(Class)obj error:(NSError *__autoreleasing *)error;
 
 // Serialization
--(BOOL)write:(NSString *)filePath;
--(BOOL)write:(NSString *)filePath error:(NSError *__autoreleasing *)error;
--(const char*)writeToMem:(size_t*)size;
--(const char*)writeToMem:(size_t*)size error:(NSError *__autoreleasing *)error;
+-(BOOL)writeToFile:(NSString *)filePath withError:(NSError *__autoreleasing *)error;
+-(const char*)writeToBufferOfSize:(size_t*)size; // size is an output parameter
+//-(const char*)writeToMem:(size_t*)size error:(NSError *__autoreleasing *)error;
 @end
 

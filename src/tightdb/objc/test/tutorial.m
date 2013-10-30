@@ -69,12 +69,9 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"%@ is %lld years old.", name, age);
     if (hired) NSLog(@"is hired.");
 
-    // Setting values
-    NSError *error;
-    if (![[people cursorAtIndex:5] setAge:43 error:&error]) {               // Getting younger
-        NSLog(@"%@", [error localizedDescription]);
-        STFail(@"This action should not fail");
-    }
+    // Setting values  (note: setter access will be made obsolete, use dot notation)
+    [[people cursorAtIndex:5] setAge:43];  // Getting younger
+    
     // or with dot-syntax:
     myRow.Age += 1;                                    // Happy birthday!
     NSLog(@"%@ age is now %lld.   [44]", myRow.Name, myRow.Age);
@@ -146,11 +143,11 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSFileManager *fm = [NSFileManager defaultManager];
 
     // Write the group to disk
-    [fm removeItemAtPath:@"employees.tightdb" error:NULL];
-    [group write:@"employees.tightdb"];
+    [fm removeItemAtPath:@"employees.tightdb" error:nil];
+    [group writeToFile:@"employees.tightdb" withError:nil];
 
     // Load a group from disk (and print contents)
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:@"employees.tightdb"];
+    TightdbGroup *fromDisk = [TightdbGroup groupWithFile:@"employees.tightdb" withError:nil];
     PeopleTable *diskTable = [fromDisk getTable:@"employees" withClass:[PeopleTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES];
@@ -165,10 +162,10 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
 
     // Write same group to memory buffer
     size_t size;
-    const char* const data = [group writeToMem:&size];
+    const char* const data = [group writeToBufferOfSize:&size];
 
     // Load a group from memory (and print contents)
-    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:data size:size];
+    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:data ofSize:size withError:nil];
     PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class]];
     for (size_t i = 0; i < [memTable count]; i++) {
         PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];

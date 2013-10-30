@@ -25,9 +25,9 @@ typedef void(^TightdbSharedGroupReadTransactionBlock)(TightdbGroup *group);
 typedef BOOL(^TightdbSharedGroupWriteTransactionBlock)(TightdbGroup *group);
 
 @interface TightdbSharedGroup: NSObject
-+(TightdbSharedGroup *)groupWithFilename:(NSString *)filename;
++(TightdbSharedGroup *)sharedGroupWithFilename:(NSString *)filename withError:(NSError **)error;
 
--(void)readTransaction:(TightdbSharedGroupReadTransactionBlock)block;
--(void)writeTransaction:(TightdbSharedGroupWriteTransactionBlock)block;
+-(void)readTransactionWithBlock:(TightdbSharedGroupReadTransactionBlock)block;
+-(BOOL)writeTransactionWithError:(NSError **)error withBlock:(TightdbSharedGroupWriteTransactionBlock)block;
 
 @end

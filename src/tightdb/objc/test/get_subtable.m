@@ -46,18 +46,18 @@ TIGHTDB_TABLE_2(WrongTypeTable,
     [table insertSubtable:2 ndx:0];
     [table insertDone];
 
-    TightdbTable *subtable = [table getSubtable:2 ndx:0];
+    TightdbTable *subtable = [table getTableInColumn:2 atRow:0];
     [subtable insertBool:0 ndx:0 value:YES];
     [subtable insertInt:1 ndx:0 value:42];
     [subtable insertDone];
 
-    GetSubtable *testTable = [table getSubtable:2 ndx:0 withClass:[GetSubtable class]];
+    GetSubtable *testTable = [table getTableInColumn:2 atRow:0 withClass:[GetSubtable class]];
     GetSubtable_Cursor *cursor = [testTable cursorAtIndex:0];
     NSLog(@"Age in subtable: %lld", cursor.Age);
     STAssertEquals(cursor.Age, (int64_t)42, @"Sub table row should be 42");
 
-    STAssertNil([table getSubtable:2 ndx:0 withClass:[WrongNameTable class]], @"should return nil because wrong name");
-    STAssertNil([table getSubtable:2 ndx:0 withClass:[WrongTypeTable class]], @"should return nil because wrong type");
+    STAssertNil([table getTableInColumn:2 atRow:0 withClass:[WrongNameTable class]], @"should return nil because wrong name");
+    STAssertNil([table getTableInColumn:2 atRow:0 withClass:[WrongTypeTable class]], @"should return nil because wrong type");
 }
 
 

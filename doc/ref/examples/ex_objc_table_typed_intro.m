@@ -51,7 +51,6 @@ int main()
         if (c3 != nil)
             NSLog(@"Should not get here.");
         
-        
     }
 }
  

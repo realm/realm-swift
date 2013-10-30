@@ -105,11 +105,11 @@ TIGHTDB_TABLE_2(QueryTable,
     NSFileManager *fm = [NSFileManager defaultManager];
 
     // Write to disk
-    [fm removeItemAtPath:@"employees.tightdb" error:NULL];
-    [group write:@"employees.tightdb"];
+    [fm removeItemAtPath:@"employees.tightdb" error:nil];
+    [group writeToFile:@"employees.tightdb" withError:nil];
 
     // Load a group from disk (and print contents)
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:@"employees.tightdb"];
+    TightdbGroup *fromDisk = [TightdbGroup groupWithFile:@"employees.tightdb" withError:nil];
     MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
@@ -119,15 +119,15 @@ TIGHTDB_TABLE_2(QueryTable,
         MyTable_Cursor *cursor = [diskTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, [cursor Name]);
         NSLog(@"%zu: %@", i, cursor.Name);
-        NSLog(@"%zu: %@", i, [diskTable getString:0 ndx:i]);
+        NSLog(@"%zu: %@", i, [diskTable getStringInColumn:0 atRow:i]);
     }
 
     // Write same group to memory buffer
     size_t size;
-    const char* data = [group writeToMem:&size];
+    const char* data = [group writeToBufferOfSize:&size];
 
     // Load a group from memory (and print contents)
-    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:data size:size];
+    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:data ofSize:size withError:nil];
     MyTable *memTable = [fromMem getTable:@"employees" withClass:[MyTable class]];
     for (size_t i = 0; i < [memTable count]; i++) {
         // ??? cursor
@@ -217,17 +217,20 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Add a row to the top level table
     [table addRow];
-    [table set:COL_TABLE_INT ndx:0 value:700];
+    [table setInt:700 inColumn:COL_TABLE_INT atRow:0];
 
     // Add two rows to the subtable
-    TightdbTable *subtable = [table getSubtable:COL_TABLE_TAB ndx:0];
+    
+    TightdbTable *subtable = [table getTableInColumn:COL_TABLE_TAB atRow:0];
+
     [subtable addRow];
-    [subtable set:COL_SUBTABLE_INT ndx:0 value:800];
+
+    [subtable setInt:800 inColumn:COL_SUBTABLE_INT atRow:0];
     [subtable addRow];
-    [subtable set:COL_SUBTABLE_INT ndx:1 value:801];
+    [subtable setInt:801 inColumn:COL_SUBTABLE_INT atRow:1];
 
     // Make the mixed values column contain another subtable
-    [table setMixed:COL_TABLE_MIX ndx:0 value: [TightdbMixed mixedWithTable:nil]];
+    [table setMixed:[TightdbMixed mixedWithTable:nil] inColumn:COL_TABLE_MIX atRow:0];
 
 /* Fails!!!
     // Specify its schema
