@@ -28,7 +28,7 @@ int main()
         cursor.Name = @"Sofie";
         cursor.Age = 40;
         
-        [table addOrInsertRowAtIndex:[table count]
+        [table insertRowAtIndex:[table count]
                                 Name:@"Jesper"
                                  Age:200];
         
