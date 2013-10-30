@@ -86,7 +86,6 @@ int main()
         if (c2 != nil)
             NSLog(@"Should not get here.");
         
-        [table setInt:100 inColumn:NAME atRow:0];
     }
     
 }
