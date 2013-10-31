@@ -225,7 +225,7 @@ CATEGORIES :
         DESCR  : The cursor.
 
   - g_dyn_table_add_empty_row:
-      NAME     : addRow
+      NAME     : addEmptyRow
       SUMMARY  : *objc_typed_table_add_empty_row_summary
       DESCR    : *objc_typed_table_add_empty_row_descr
       SIGNATURE: -(TightdbCursor *)addRow

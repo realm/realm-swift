@@ -1,0 +1,3 @@
+30-October-2013:
+================
+! addRow() renamed to addEmptyRow()

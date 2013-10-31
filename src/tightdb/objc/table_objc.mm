@@ -646,12 +646,12 @@ using namespace std;
     return _table->size();
 }
 
--(TightdbCursor *)addRow
+-(TightdbCursor *)addEmptyRow
 {
-    return [[TightdbCursor alloc] initWithTable:self ndx:[self _addRow]];
+    return [[TightdbCursor alloc] initWithTable:self ndx:[self _addEmptyRow]];
 }
 
--(size_t)_addRow
+-(size_t)_addEmptyRow
 { 
     // TODO: Use a macro or er function for error handling
 
@@ -677,7 +677,7 @@ using namespace std;
 }
 
 
--(size_t)_addRows:(size_t)rowCount
+-(size_t)_addEmptyRows:(size_t)rowCount
 {
     // TODO: Use a macro or er function for error handling
 
@@ -717,16 +717,16 @@ using namespace std;
 
 -(TightdbCursor *)insertRowAtIndex:(size_t)ndx
 {
-    [self insertRow:ndx];
+    [self insertEmptyRow:ndx];
     return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
 }
 
--(BOOL)insertRow:(size_t)ndx 
+-(BOOL)insertEmptyRow:(size_t)ndx
 {   
-    return [self insertRow:ndx error:nil];
+    return [self insertEmptyRow:ndx error:nil];
 }
 
--(BOOL)insertRow:(size_t)ndx error:(NSError *__autoreleasing *)error
+-(BOOL)insertEmptyRow:(size_t)ndx error:(NSError *__autoreleasing *)error
 {
     if (_readOnly) {
         if (error)

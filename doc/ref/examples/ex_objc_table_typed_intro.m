@@ -20,15 +20,15 @@ int main()
 
         PeopleTable *table = [[PeopleTable alloc] init];
         
-        PeopleTable_Cursor *cursor = [table addRow];
+        PeopleTable_Cursor *cursor = [table addEmptyRow];
         cursor.Name = @"Brian";
         cursor.Age = 10;
         
-        cursor = [table addRow];
+        cursor = [table addEmptyRow];
         cursor.Name = @"Sofie";
         cursor.Age = 40;
         
-        [table addOrInsertRowAtIndex:[table count]
+        [table insertRowAtIndex:[table count]
                                 Name:@"Jesper"
                                  Age:200];
         

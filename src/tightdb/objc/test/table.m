@@ -49,7 +49,7 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     //[_table set:0 ndx:ndx value:0];
     //[_table set:1 ndx:ndx value:10];
 
-    TightdbCursor *cursor = [_table addRow];
+    TightdbCursor *cursor = [_table addEmptyRow];
     size_t ndx = [cursor index];
     [cursor setInt:0 inColumn:0];
     [cursor setInt:10 inColumn:1];
@@ -94,12 +94,12 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
 
     TestTableAllTypes_Cursor *c;
 
-    c = [table addRow];
+    c = [table addEmptyRow];
 
         c.BoolCol   = NO   ; c.IntCol  = 54 ; c.FloatCol = 0.7     ; c.DoubleCol = 0.8     ; c.StringCol = @"foo";
         c.BinaryCol = bin1 ; c.DateCol = 0  ; c.TableCol = subtab1     ; c.MixedCol  = mixInt1 ;
 
-    c = [table addRow];
+    c = [table addEmptyRow];
 
         c.BoolCol   = YES  ; c.IntCol  = 506     ; c.FloatCol = 7.7         ; c.DoubleCol = 8.8       ; c.StringCol = @"banach";
         c.BinaryCol = bin2 ; c.DateCol = timeNow ; c.TableCol = subtab2     ; c.MixedCol  = mixSubtab ;
@@ -193,12 +193,12 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     
     
     
-    cursor = [subtab1 addRow];
+    cursor = [subtab1 addEmptyRow];
     [cursor setInt:200 inColumn:0];
     
     
     
-    cursor = [subtab2 addRow];
+    cursor = [subtab2 addEmptyRow];
     [cursor setInt:100 inColumn:0];
     
     
@@ -210,7 +210,7 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     
     
     
-    c = [table addRow];
+    c = [table addEmptyRow];
     
     
     
@@ -224,7 +224,7 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     [c setTable:   subtab1   inColumn:TableCol];
     [c setMixed:   mixInt1   inColumn:MixedCol];
 
-    c = [table addRow];
+    c = [table addEmptyRow];
     
     [c setBool:    YES       inColumn:BoolCol];
     [c setInt:     506       inColumn:IntCol];
