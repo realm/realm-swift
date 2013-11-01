@@ -361,7 +361,7 @@ EOF
     "install")
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
-        make install DESTDIR="$DESTDIR" prefix="$install_prefix" || exit 1
+        make install-only DESTDIR="$DESTDIR" prefix="$install_prefix" || exit 1
         echo "Done installing"
         exit 0
         ;;
@@ -369,7 +369,7 @@ EOF
     "install-shared")
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
-        make install DESTDIR="$DESTDIR" prefix="$install_prefix" INSTALL_FILTER=shared-libs || exit 1
+        make install-only DESTDIR="$DESTDIR" prefix="$install_prefix" INSTALL_FILTER=shared-libs || exit 1
         echo "Done installing"
         exit 0
         ;;
@@ -377,7 +377,7 @@ EOF
     "install-devel")
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
-        make install DESTDIR="$DESTDIR" prefix="$install_prefix" INSTALL_FILTER=static-libs,progs,headers || exit 1
+        make install-only DESTDIR="$DESTDIR" prefix="$install_prefix" INSTALL_FILTER=static-libs,progs,headers || exit 1
         echo "Done installing"
         exit 0
         ;;
