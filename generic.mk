@@ -231,9 +231,10 @@
 #   myprog_CFLAGS = -Wno-long-long
 #   myprog_LDFLAGS = -lparser
 #
-# Compiler flags can also be specified for individual source files:
+# Compiler flags can also be specified for individual object files,
+# for example, to add flags just to the compilation of `foo.o`:
 #
-#   foo_cpp_CFLAGS = -I/opt/parser-1.5/include
+#   foo_o_CFLAGS = -I/opt/parser-1.5/include
 #
 # Compiler and linker flags can be specified for all targets in a
 # directory (the directory containing the Makefile) as follows:
@@ -255,9 +256,9 @@
 # Debug and coverage analysis modes
 # ---------------------------------
 #
-#   foo_cpp_CFLAGS_OPTIM
-#   foo_cpp_CFLAGS_DEBUG
-#   foo_cpp_CFLAGS_COVER
+#   foo_o_CFLAGS_OPTIM
+#   foo_o_CFLAGS_DEBUG
+#   foo_o_CFLAGS_COVER
 #
 #
 # Library versioning
