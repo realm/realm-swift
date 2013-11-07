@@ -367,7 +367,7 @@ EOF
         exit 0
         ;;
 
-    "install-shared")
+    "install-prod")
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
         $MAKE install-only DESTDIR="$DESTDIR" prefix="$install_prefix" INSTALL_FILTER=shared-libs || exit 1
@@ -391,7 +391,7 @@ EOF
         exit 0
         ;;
 
-    "uninstall-shared")
+    "uninstall-prod")
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
         $MAKE uninstall prefix="$install_prefix" INSTALL_FILTER=shared-libs || exit 1
@@ -457,7 +457,7 @@ EOF
     *)
         echo "Unspecified or bad mode '$MODE'" 1>&2
         echo "Available modes are: config clean build build-iphone test test-debug test-gdb install uninstall test-installed" 1>&2
-        echo "As well as: install-shared install-devel uninstall-shared uninstall-devel dist-copy" 1>&2
+        echo "As well as: install-prod install-devel uninstall-prod uninstall-devel dist-copy" 1>&2
         exit 1
         ;;
 
