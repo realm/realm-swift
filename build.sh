@@ -58,6 +58,7 @@ path_list_prepend()
 
 # Setup OS specific stuff
 OS="$(uname)" || exit 1
+MAKE="make"
 NUM_PROCESSORS=""
 if [ "$OS" = "Darwin" ]; then
     NUM_PROCESSORS="$(sysctl -n hw.ncpu)" || exit 1
@@ -171,7 +172,7 @@ case "$MODE" in
         if [ -z "$install_prefix" ]; then
             install_prefix="/usr/local"
         fi
-        install_libdir="$(make prefix="$install_prefix" get-libdir)" || exit 1
+        install_libdir="$($MAKE --no-print-directory prefix="$install_prefix" get-libdir)" || exit 1
 
         if [ "$OS" != "Darwin" ]; then
             echo "ERROR: Currently, the Objective-C extension is only available on Mac OS X" 1>&2
@@ -251,12 +252,12 @@ EOF
 
     "clean")
         auto_configure || exit 1
-        make clean || exit 1
+        $MAKE clean || exit 1
         if [ "$OS" = "Darwin" ]; then
             for x in $IPHONE_PLATFORMS; do
-                make BASE_DENOM="$x" clean || exit 1
+                $MAKE BASE_DENOM="$x" clean || exit 1
             done
-            make BASE_DENOM="ios" clean || exit 1
+            $MAKE BASE_DENOM="ios" clean || exit 1
             if [ -e "$IPHONE_DIR" ]; then
                 echo "Removing '$IPHONE_DIR'"
                 rm -fr "$IPHONE_DIR/include" || exit 1
@@ -271,8 +272,8 @@ EOF
     "build")
         auto_configure || exit 1
 # FIXME: Our language binding requires that Objective-C ARC is enabled, which, in turn, is only available on a 64-bit architecture, so for now we cannot build a "fat" version.
-#        TIGHTDB_ENABLE_FAT_BINARIES="1" make || exit 1
-        make || exit 1
+#        TIGHTDB_ENABLE_FAT_BINARIES="1" $MAKE || exit 1
+        $MAKE || exit 1
         echo "Done building"
         exit 0
         ;;
@@ -304,7 +305,7 @@ EOF
             sdk="$(printf "%s\n" "$x" | cut -d: -f2)" || exit 1
             arch="$(printf "%s\n" "$x" | cut -d: -f3)" || exit 1
             sdk_root="$xcode_home/Platforms/$platform.platform/Developer/SDKs/$sdk"
-            make -C "src/tightdb/objc" BASE_DENOM="$platform" CFLAGS_ARCH="-arch $arch -isysroot $sdk_root -I$iphone_include" "libtightdb-objc-$platform.a" "libtightdb-objc-$platform-dbg.a" || exit 1
+            $MAKE -C "src/tightdb/objc" BASE_DENOM="$platform" CFLAGS_ARCH="-arch $arch -isysroot $sdk_root -I$iphone_include" "libtightdb-objc-$platform.a" "libtightdb-objc-$platform-dbg.a" || exit 1
             mkdir "$temp_dir/$platform" || exit 1
             cp "src/tightdb/objc/libtightdb-objc-$platform.a"     "$temp_dir/$platform/libtightdb-objc.a"     || exit 1
             cp "src/tightdb/objc/libtightdb-objc-$platform-dbg.a" "$temp_dir/$platform/libtightdb-objc-dbg.a" || exit 1
@@ -318,7 +319,7 @@ EOF
         libtool -static -o "$IPHONE_DIR/libtightdb-objc-ios-dbg.a" "$temp_dir/libtightdb-objc-ios-dbg.a" $(tightdb-config-dbg --libs) -L"$iphone_core_lib" || exit 1
         echo "Copying headers to '$IPHONE_DIR/include'"
         mkdir -p "$IPHONE_DIR/include/tightdb/objc" || exit 1
-        inst_headers="$(cd src/tightdb/objc && make get-inst-headers)" || exit 1
+        inst_headers="$(cd src/tightdb/objc && $MAKE --no-print-directory get-inst-headers)" || exit 1
         (cd "src/tightdb/objc" && cp $inst_headers "$TIGHTDB_OBJC_HOME/$IPHONE_DIR/include/tightdb/objc/") || exit 1
         echo "Done building"
         exit 0
@@ -326,7 +327,7 @@ EOF
 
     "test")
         require_config || exit 1
-        make test-norun || exit 1
+        $MAKE test-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test.XXXX)" || exit 1
         mkdir -p "$TEMP_DIR/unit-tests.octest/Contents/MacOS" || exit 1
         cp "src/tightdb/objc/test/unit-tests" "$TEMP_DIR/unit-tests.octest/Contents/MacOS/" || exit 1
@@ -338,7 +339,7 @@ EOF
 
     "test-debug")
         require_config || exit 1
-        make test-debug-norun || exit 1
+        $MAKE test-debug-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test-debug.XXXX)" || exit 1
         mkdir -p "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS" || exit 1
         cp "src/tightdb/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS/" || exit 1
@@ -350,7 +351,7 @@ EOF
 
     "test-gdb")
         require_config || exit 1
-        make test-debug-norun || exit 1
+        $MAKE test-debug-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test-gdb.XXXX)" || exit 1
         mkdir -p "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS" || exit 1
         cp "src/tightdb/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS/" || exit 1
@@ -361,7 +362,7 @@ EOF
     "install")
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
-        make install-only DESTDIR="$DESTDIR" prefix="$install_prefix" || exit 1
+        $MAKE install-only DESTDIR="$DESTDIR" prefix="$install_prefix" || exit 1
         echo "Done installing"
         exit 0
         ;;
@@ -369,7 +370,7 @@ EOF
     "install-shared")
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
-        make install-only DESTDIR="$DESTDIR" prefix="$install_prefix" INSTALL_FILTER=shared-libs || exit 1
+        $MAKE install-only DESTDIR="$DESTDIR" prefix="$install_prefix" INSTALL_FILTER=shared-libs || exit 1
         echo "Done installing"
         exit 0
         ;;
@@ -377,7 +378,7 @@ EOF
     "install-devel")
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
-        make install-only DESTDIR="$DESTDIR" prefix="$install_prefix" INSTALL_FILTER=static-libs,progs,headers || exit 1
+        $MAKE install-only DESTDIR="$DESTDIR" prefix="$install_prefix" INSTALL_FILTER=static-libs,progs,headers || exit 1
         echo "Done installing"
         exit 0
         ;;
@@ -385,7 +386,7 @@ EOF
     "uninstall")
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
-        make uninstall prefix="$install_prefix" || exit 1
+        $MAKE uninstall prefix="$install_prefix" || exit 1
         echo "Done uninstalling"
         exit 0
         ;;
@@ -393,7 +394,7 @@ EOF
     "uninstall-shared")
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
-        make uninstall prefix="$install_prefix" INSTALL_FILTER=shared-libs || exit 1
+        $MAKE uninstall prefix="$install_prefix" INSTALL_FILTER=shared-libs || exit 1
         echo "Done uninstalling"
         exit 0
         ;;
@@ -401,7 +402,7 @@ EOF
     "uninstall-devel")
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
-        make uninstall prefix="$install_prefix" INSTALL_FILTER=static-libs,progs,extra || exit 1
+        $MAKE uninstall prefix="$install_prefix" INSTALL_FILTER=static-libs,progs,extra || exit 1
         echo "Done uninstalling"
         exit 0
         ;;
@@ -410,8 +411,8 @@ EOF
         require_config || exit 1
         install_libdir="$(get_config_param "install-libdir")" || exit 1
         export LD_RUN_PATH="$install_libdir"
-        make -C "test-installed" clean || exit 1
-        make -C "test-installed" test  || exit 1
+        $MAKE -C "test-installed" clean || exit 1
+        $MAKE -C "test-installed" test  || exit 1
         echo "Test passed"
         exit 0
         ;;
