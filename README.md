@@ -20,18 +20,24 @@ because some source files are generated from Cheetah templates.
 
 Currently, the Objective-C binding is availble only on Mac OS X (and
 iPhone). The following is a suggestion of how to install the
-prerequisites on Mac OS X 10.7 and 10.8:
+prerequisites on Mac OS X 10.7, 10.8, and 10.9:
 
-Clang comes with Xcode, so install Xcode if it is not already
-installed. If you have a version that preceeds 4.2, we recommend that
-you upgrade. This will ensure that the Clang version is at least
-3.0. Run the following command in the command prompt to see if you
-have Xcode installed, and, if so, what version it is:
+The build procedure uses Clang as the C/C++ compiler by default. It
+needs at least Clang 3.0 which comes with Xcode 4.2. On OS X 10.9
+(Mavericks) we recommend at least Xcode 5.0, since in some cases when
+a previous version of OS X is upgraded to 10.9, you will be left with
+a malfunctioning set of command line tools (in particular the `lipo`
+command), and this is most easily fixed by upgrading to Xcode 5. Run
+the following command in the command prompt to see if you have Xcode
+installed, and, if so, what version it is:
 
     xcodebuild -version
 
-Make sure you also install "Command line tools" found under the
-preferences pane "Downloads" in Xcode.
+If you have Xcode 5 or later, you will already have the required
+command line tools installed. In Xcode 4, however, the "Command line
+tools" is an optional Xcode add-on that you must install. You can find
+it under the "Downloads" pane of the "Preferences" dialog in the Xcode
+4 menu.
 
 Download the latest version of Python Cheetah
 (https://pypi.python.org/packages/source/C/Cheetah/Cheetah-2.4.4.tar.gz),
