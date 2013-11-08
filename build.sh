@@ -1,8 +1,8 @@
 # NOTE: THIS SCRIPT IS SUPPOSED TO RUN IN A POSIX SHELL
 
 # load command functions
-if [ -f ../tightdb/common_funcs.sh ]; then
-    . ../tightdb/common_funcs.sh
+if [ common_funcs.sh ]; then
+    . ./common_funcs.sh
 else
     echo "Cannot load common functions."
     exit 1
