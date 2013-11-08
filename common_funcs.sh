@@ -6,7 +6,7 @@ tightdb_abort()
     local message1, message2
     message1="$1"
     if [ -z "$2" ]; then
-        message2=$2
+        message2="$1"
     else
         message2="$2"
     fi
