@@ -366,6 +366,16 @@ EOF
         OBJC_DISABLE_GC=YES gdb --args "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest"
         ;;
 
+    "install-report")
+        has_installed=0
+        install_libdir="$(get_config_param "install-libdir")"
+        find $install_libdir -name '*tightdb*' | while read f; do
+            has_installed=1
+            echo "  $f"
+        done
+        exit $has_installed
+        ;;
+
     "install")
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
