@@ -1,17 +1,19 @@
 # NOTE: THIS SCRIPT IS SUPPOSED TO RUN IN A POSIX SHELL
 
-# load command functions
-if [ common_funcs.sh ]; then
-    . ./common_funcs.sh
-else
-    echo "Cannot load common functions."
-    exit 1
-fi
 
 
 ORIG_CWD="$(pwd)"
 cd "$(dirname "$0")"
 TIGHTDB_OBJC_HOME="$(pwd)"
+
+# load command functions
+if [ common_funcs.sh ]; then
+    . $TIGHTDB_OBJC_HOME/common_funcs.sh
+else
+    echo "Cannot load common functions."
+    exit 1
+fi
+
 
 MODE="$1"
 [ $# -gt 0 ] && shift
