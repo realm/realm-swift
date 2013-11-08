@@ -1,5 +1,14 @@
 # NOTE: THIS SCRIPT IS SUPPOSED TO RUN IN A POSIX SHELL
 
+# load command functions
+if [ -f ../tightdb/common_funcs.sh ]; then
+    . ../tightdb/common_funcs.sh
+else
+    echo "Cannot load common functions."
+    exit 1
+fi
+
+
 ORIG_CWD="$(pwd)"
 cd "$(dirname "$0")"
 TIGHTDB_OBJC_HOME="$(pwd)"
@@ -194,12 +203,12 @@ case "$MODE" in
             for x in $IPHONE_PLATFORMS; do
                 platform_home="$xcode_home/Platforms/$x.platform"
                 if ! [ -e "$platform_home/Info.plist" ]; then
-                    echo "Failed to find '$platform_home/Info.plist'"
+                    tightdb_echo "Failed to find '$platform_home/Info.plist'"
                     iphone_sdks_avail="no"
                 else
                     sdk="$(find_iphone_sdk "$platform_home")" || exit 1
                     if [ -z "$sdk" ]; then
-                        echo "Found no SDKs in '$platform_home'"
+                        tightdb_echo "Found no SDKs in '$platform_home'"
                         iphone_sdks_avail="no"
                     else
                         if [ "$x" = "iPhoneSimulator" ]; then
@@ -207,8 +216,7 @@ case "$MODE" in
                         else
                             type="$(defaults read-type "$platform_home/Info" "DefaultProperties")" || exit 1
                             if [ "$type" != "Type is dictionary" ]; then
-                                echo "Unexpected type of value of key 'DefaultProperties' in '$platform_home/Info.plist'" 1>&2
-                                exit 1
+                                tightdb_abort "Unexpected type of value of key 'DefaultProperties' in '$platform_home/Info.plist'" 
                             fi
                             temp_dir="$(mktemp -d "/tmp/tmp.XXXXXXXXXX")" || exit 1
                             chunk="$temp_dir/chunk.plist"
@@ -233,7 +241,7 @@ case "$MODE" in
             path="$(cd "../tightdb" || return 1; pwd)" || exit 1
             iphone_core_lib="$path/$IPHONE_DIR"
         else
-            echo "Could not find home of TightDB core library built for iPhone!"
+            tightdb_echo "Could not find home of TightDB core library built for iPhone!"
         fi
 
         cat >"config" <<EOF
@@ -244,9 +252,11 @@ iphone-sdks:       ${iphone_sdks:-none}
 iphone-sdks-avail: $iphone_sdks_avail
 iphone-core-lib:   $iphone_core_lib
 EOF
-        echo "New configuration:"
-        cat "config" | sed 's/^/    /' || exit 1
-        echo "Done configuring"
+        if [ -z "$INTERACTIVE" ]; then
+            echo "New configuration:"
+            cat "config" | sed 's/^/    /' || exit 1
+            echo "Done configuring"
+        fi
         exit 0
         ;;
 
@@ -274,7 +284,7 @@ EOF
 # FIXME: Our language binding requires that Objective-C ARC is enabled, which, in turn, is only available on a 64-bit architecture, so for now we cannot build a "fat" version.
 #        TIGHTDB_ENABLE_FAT_BINARIES="1" $MAKE || exit 1
         $MAKE || exit 1
-        echo "Done building"
+        tightdb_echo "Done building"
         exit 0
         ;;
 
@@ -282,17 +292,14 @@ EOF
         auto_configure || exit 1
         iphone_sdks_avail="$(get_config_param "iphone-sdks-avail")" || exit 1
         if [ "$iphone_sdks_avail" != "yes" ]; then
-            echo "ERROR: iPhone SDKs were not found during configuration!" 1>&2
-            exit 1
+            tightdb_abort "ERROR: iPhone SDKs were not found during configuration!"
         fi
         iphone_core_lib="$(get_config_param "iphone-core-lib")" || exit 1
         if [ "$iphone_core_lib" = "none" ]; then
-            echo "ERROR: TightDB core library for iPhone was not found during configuration!" 1>&2
-            exit 1
+            tightdb_abort "ERROR: TightDB core library for iPhone was not found during configuration!"
         fi
         if ! [ -e "$iphone_core_lib/libtightdb-ios.a" ]; then
-            echo "ERROR: TightDB core library for iPhone is not available in '$iphone_core_lib'!" 1>&2
-            exit 1
+            tightdb_abort "ERROR: TightDB core library for iPhone is not available in '$iphone_core_lib'!"
         fi
         temp_dir="$(mktemp -d /tmp/tightdb.objc.build-iphone.XXXX)" || exit 1
         xcode_home="$(get_config_param "xcode-home")" || exit 1
@@ -311,17 +318,17 @@ EOF
             cp "src/tightdb/objc/libtightdb-objc-$platform-dbg.a" "$temp_dir/$platform/libtightdb-objc-dbg.a" || exit 1
         done
         mkdir -p "$IPHONE_DIR" || exit 1
-        echo "Creating '$IPHONE_DIR/libtightdb-objc-ios.a'"
+        tightdb_echo "Creating '$IPHONE_DIR/libtightdb-objc-ios.a'"
         lipo "$temp_dir"/*/"libtightdb-objc.a" -create -output "$temp_dir/libtightdb-objc-ios.a" || exit 1
         libtool -static -o "$IPHONE_DIR/libtightdb-objc-ios.a" "$temp_dir/libtightdb-objc-ios.a" $(tightdb-config --libs) -L"$iphone_core_lib" || exit 1
-        echo "Creating '$IPHONE_DIR/libtightdb-objc-ios-dbg.a'"
+        tightdb_echo "Creating '$IPHONE_DIR/libtightdb-objc-ios-dbg.a'"
         lipo "$temp_dir"/*/"libtightdb-objc-dbg.a" -create -output "$temp_dir/libtightdb-objc-ios-dbg.a" || exit 1
         libtool -static -o "$IPHONE_DIR/libtightdb-objc-ios-dbg.a" "$temp_dir/libtightdb-objc-ios-dbg.a" $(tightdb-config-dbg --libs) -L"$iphone_core_lib" || exit 1
-        echo "Copying headers to '$IPHONE_DIR/include'"
+        tightdb_echo "Copying headers to '$IPHONE_DIR/include'"
         mkdir -p "$IPHONE_DIR/include/tightdb/objc" || exit 1
         inst_headers="$(cd src/tightdb/objc && $MAKE --no-print-directory get-inst-headers)" || exit 1
         (cd "src/tightdb/objc" && cp $inst_headers "$TIGHTDB_OBJC_HOME/$IPHONE_DIR/include/tightdb/objc/") || exit 1
-        echo "Done building"
+        tightdb_echo "Done building"
         exit 0
         ;;
 
@@ -363,7 +370,7 @@ EOF
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
         $MAKE install-only DESTDIR="$DESTDIR" prefix="$install_prefix" || exit 1
-        echo "Done installing"
+        tightdb_echo "Done installing"
         exit 0
         ;;
 
@@ -371,7 +378,7 @@ EOF
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
         $MAKE install-only DESTDIR="$DESTDIR" prefix="$install_prefix" INSTALL_FILTER=shared-libs || exit 1
-        echo "Done installing"
+        tightdb_echo "Done installing"
         exit 0
         ;;
 
@@ -379,7 +386,7 @@ EOF
         require_config || exit 1
         install_prefix="$(get_config_param "install-prefix")" || exit 1
         $MAKE install-only DESTDIR="$DESTDIR" prefix="$install_prefix" INSTALL_FILTER=static-libs,progs,headers || exit 1
-        echo "Done installing"
+        tigtdb_echo "Done installing"
         exit 0
         ;;
 
