@@ -445,6 +445,7 @@ EOF
         cat >"$TEMP_DIR/include" <<EOF
 /README.md
 /build.sh
+/common_funcs.sh
 /generic.mk
 /config.mk
 /Makefile
