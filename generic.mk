@@ -804,19 +804,19 @@ endif
 
 PRIMARY_PREFIXES = bin sbin lib libexec $(EXTRA_PRIMARY_PREFIXES)
 
-bin_INSTALL_DIR     = $(DESTDIR)$(bindir)
-sbin_INSTALL_DIR    = $(DESTDIR)$(sbindir)
-lib_INSTALL_DIR     = $(DESTDIR)$(libdir)
-libexec_INSTALL_DIR = $(DESTDIR)$(libexecdir)
+bin_INSTALL_DIR     = $(bindir)
+sbin_INSTALL_DIR    = $(sbindir)
+lib_INSTALL_DIR     = $(libdir)
+libexec_INSTALL_DIR = $(libexecdir)
+
+# ARGS: primary_prefix
+GET_INSTALL_DIR = $(if $(strip $($(1)_INSTALL_DIR)),$(DESTDIR)$(strip $($(1)_INSTALL_DIR)),$(error No INSTALL_DIR defined for primary prefix '$(1)'))
 
 # ARGS: primary_prefix, install_dir
 define RECORD_LIB_INSTALL_DIR
 $(foreach x,$($(1)_LIBRARIES),GMK_$(call FOLD_TARGET,$(x))_INSTALL_DIR = $(2)
 )
 endef
-
-# ARGS: primary_prefix
-GET_INSTALL_DIR = $(if $(strip $($(1)_INSTALL_DIR)),$(strip $($(1)_INSTALL_DIR)),$(error No INSTALL_DIR defined for primary prefix '$(1)'))
 
 define RECORD_LIB_INSTALL_DIRS
 $(foreach x,$(PRIMARY_PREFIXES),$(call RECORD_LIB_INSTALL_DIR,$(x),$(call GET_INSTALL_DIR,$(x)))
