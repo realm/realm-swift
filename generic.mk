@@ -692,6 +692,9 @@ endif
 
 # LOAD PROJECT SPECIFIC CONFIGURATION
 
+EXTRA_CFLAGS  =
+EXTRA_LDFLAGS =
+
 CC_CXX_AND_LD_ARE = $(call CC_CXX_AND_LD_ARE_1,$(1),$(call MAP_CC_TO_CXX,$(1)))
 CC_CXX_AND_LD_ARE_1 = $(and $(call MATCH_CMD,$(1),$(CC)),$(strip $(foreach x,$(1) $(2),$(call MATCH_CMD,$(x),$(CXX)))),$(strip $(foreach x,$(1) $(2),$(call MATCH_CMD,$(x),$(LD)))))
 CC_CXX_AND_LD_ARE_GCC_LIKE = $(strip $(foreach x,$(GCC_LIKE_COMPILERS),$(call CC_CXX_AND_LD_ARE,$(x))))
@@ -725,8 +728,6 @@ endif
 ifneq ($(ARFLAGS_SPECIFIED),)
 ARFLAGS_GENERAL = $(ARFLAGS)
 endif
-EXTRA_CFLAGS  =
-EXTRA_LDFLAGS =
 CFLAGS_GENERAL  += $(EXTRA_CFLAGS)
 LDFLAGS_GENERAL += $(EXTRA_LDFLAGS)
 
