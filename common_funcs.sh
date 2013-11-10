@@ -1,28 +1,28 @@
 # common functions for build.sh and similar tools
 
-# Second parameter is optional
+# Second argument is optional
 tightdb_abort()
 {
-    local message1, message2
-    message1="$1"
-    if [ -z "$2" ]; then
-        message2="$1"
-    else
-        message2="$2"
-    fi
-    if [ -z "$INTERACTIVE" ]; then
-        echo "$message1" 1>&2
-        exit 1
-    else
-        echo "$message2"
+    local message message2
+    message="$1"
+    message2="$2"
+    if [ "$INTERACTIVE" ]; then
+        if ! [ "$message2" ]; then
+            message2="$message"
+        fi
+        printf "%s\n" "$message2"
         exit 0
-    fi 
+    fi
+
+    echo "$message" 1>&2
+    exit 1
 }
 
 tightdb_echo()
 {
-    local message="$1"
-    if [ -z "$INTERACTIVE" ]; then
-        echo "$message"
+    local message
+    message="$1"
+    if ! [ "$INTERACTIVE" ]; then
+        printf "%s\n" "$message"
     fi
 }
