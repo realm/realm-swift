@@ -8,14 +8,8 @@ lib_LIBRARIES = libtightdb-objc.a
 libtightdb_objc_a_SOURCES = table_objc.mm cursor_objc.mm group_objc.mm query_objc.mm \
 group_shared_objc.mm
 
-libtightdb_objc_a_CFLAGS        = -fobjc-arc -fobjc-abi-version=2
-libtightdb_objc_a_CFLAGS_OPTIM  = $(TIGHTDB_CFLAGS)
-libtightdb_objc_a_CFLAGS_DEBUG  = $(TIGHTDB_CFLAGS_DBG)
-libtightdb_objc_a_CFLAGS_COVER  = $(TIGHTDB_CFLAGS_DBG)
-libtightdb_objc_a_LDFLAGS       = -fobjc-link-runtime -framework Cocoa
-libtightdb_objc_a_LDFLAGS_OPTIM = $(TIGHTDB_LDFLAGS)
-libtightdb_objc_a_LDFLAGS_DEBUG = $(TIGHTDB_LDFLAGS_DBG)
-libtightdb_objc_a_LDFLAGS_COVER = $(TIGHTDB_LDFLAGS_DBG)
+libtightdb_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2
+libtightdb_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
 
 # Format: CURRENT[:REVISION[:AGE]]
 #

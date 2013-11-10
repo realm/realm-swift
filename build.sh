@@ -490,8 +490,10 @@ EOF
 
     "test-installed")
         require_config || exit 1
+        install_includedir="$(get_config_param "INSTALL_INCLUDEDIR")" || exit 1
         install_libdir="$(get_config_param "INSTALL_LIBDIR")" || exit 1
-        export LD_RUN_PATH="$install_libdir"
+        export TIGHTDB_OBJC_INCLUDEDIR="$install_includedir"
+        export TIGHTDB_OBJC_LIBDIR="$install_libdir"
         $MAKE -C "test-installed" clean || exit 1
         $MAKE -C "test-installed" test  || exit 1
         echo "Test passed"
@@ -510,8 +512,6 @@ EOF
 /README.md
 /build.sh
 /common_funcs.sh
-/generic.mk
-/config.mk
 /Makefile
 /src
 /test-installed
