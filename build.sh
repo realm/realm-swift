@@ -446,6 +446,18 @@ EOF
         exit $has_installed
         ;;
 
+    "show-install")
+        temp_dir="$(mktemp -d /tmp/tightdb.objc.show-install.XXXX)" || exit 1
+        mkdir "$temp_dir/fake-root" || exit 1
+        DESTDIR="$temp_dir/fake-root" sh build.sh install >/dev/null || exit 1
+        (cd "$temp_dir/fake-root" && find * \! -type d >"$temp_dir/list") || exit 1
+        sed 's|^|/|' <"$temp_dir/list" || exit 1
+        rm -fr "$temp_dir/fake-root" || exit 1
+        rm "$temp_dir/list" || exit 1
+        rmdir "$temp_dir" || exit 1
+        exit 0
+        ;;
+
     "install")
         require_config || exit 1
         $MAKE install-only DESTDIR="$DESTDIR" || exit 1
@@ -538,7 +550,7 @@ EOF
 
     *)
         echo "Unspecified or bad mode '$MODE'" 1>&2
-        echo "Available modes are: config clean build build-iphone test test-debug test-gdb install uninstall test-installed" 1>&2
+        echo "Available modes are: config clean build build-iphone test test-debug test-gdb show-install install uninstall test-installed" 1>&2
         echo "As well as: install-prod install-devel uninstall-prod uninstall-devel dist-copy" 1>&2
         exit 1
         ;;
