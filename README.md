@@ -68,7 +68,7 @@ The following libraries are installed:
     /usr/local/lib/libtightdb-objc.dylib
     /usr/local/lib/libtightdb-objc-dbg.dylib
 
-Here is the complete set of build-related commands:
+Here is a more complete set of build-related commands:
 
     sh build.sh config
     sh build.sh clean
