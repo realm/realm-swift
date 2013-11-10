@@ -1,3 +1,3 @@
 SUBDIRS = tightdb
 
-include ../generic.mk
+include generic.mk

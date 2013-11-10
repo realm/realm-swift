@@ -1,10 +1,10 @@
 # NOTE: THIS SCRIPT IS SUPPOSED TO RUN IN A POSIX SHELL
 
 
+ORIG_CWD="$(pwd)" || exit 1
+cd "$(dirname "$0")" || exit 1
+TIGHTDB_OBJC_HOME="$(pwd)" || exit 1
 
-ORIG_CWD="$(pwd)"
-cd "$(dirname "$0")"
-TIGHTDB_OBJC_HOME="$(pwd)"
 
 # load command functions
 if [ common_funcs.sh ]; then
@@ -74,14 +74,14 @@ NUM_PROCESSORS=""
 if [ "$OS" = "Darwin" ]; then
     NUM_PROCESSORS="$(sysctl -n hw.ncpu)" || exit 1
 else
-    if [ -r /proc/cpuinfo ]; then
+    if [ -r "/proc/cpuinfo" ]; then
         NUM_PROCESSORS="$(cat /proc/cpuinfo | grep -E 'processor[[:space:]]*:' | wc -l)" || exit 1
     fi
 fi
 if [ "$NUM_PROCESSORS" ]; then
     word_list_prepend MAKEFLAGS "-j$NUM_PROCESSORS" || exit 1
+    export MAKEFLAGS
 fi
-export MAKEFLAGS
 
 
 find_iphone_sdk()
@@ -125,27 +125,29 @@ find_iphone_sdk()
 }
 
 
+CONFIG_MK="src/config-dyn.mk"
+
 require_config()
 {
     cd "$TIGHTDB_OBJC_HOME" || return 1
-    if ! [ -e "config" ]; then
+    if ! [ -e "$CONFIG_MK" ]; then
         cat 1>&2 <<EOF
 ERROR: Found no configuration!
 You need to run 'sh build.sh config [PREFIX]'.
 EOF
         return 1
     fi
-    echo "Using existing configuration:"
-    cat "config" | sed 's/^/    /' || return 1
+    echo "Using existing configuration in $CONFIG_MK:"
+    cat "$CONFIG_MK" | sed 's/^/    /' || return 1
 }
 
 auto_configure()
 {
     cd "$TIGHTDB_OBJC_HOME" || return 1
-    if [ -e "config" ]; then
+    if [ -e "$CONFIG_MK" ]; then
         require_config || return 1
     else
-        echo "No configuration found. Running 'sh build.sh config'"
+        echo "No configuration found. Running 'sh build.sh config' for you."
         sh build.sh config || return 1
     fi
 }
@@ -153,23 +155,23 @@ auto_configure()
 get_config_param()
 {
     local name line value
-    cd "$TIGHTDB_OBJC_HOME" || return 1
     name="$1"
-    if ! [ -e "config" ]; then
+    cd "$TIGHTDB_OBJC_HOME" || return 1
+    if ! [ -e "$CONFIG_MK" ]; then
         cat 1>&2 <<EOF
 ERROR: Found no configuration!
 You need to run 'sh build.sh config [PREFIX]'.
 EOF
         return 1
     fi
-    if ! line="$(grep "^$name:" "config")"; then
+    if ! line="$(grep "^$name *=" "$CONFIG_MK")"; then
         cat 1>&2 <<EOF
 ERROR: Failed to read configuration parameter '$name'.
 Maybe you need to rerun 'sh build.sh config [PREFIX]'.
 EOF
         return 1
     fi
-    value="$(printf "%s\n" "$line" | cut -d: -f2-)" || return 1
+    value="$(printf "%s\n" "$line" | cut -d= -f2-)" || return 1
     value="$(printf "%s\n" "$value" | sed 's/^ *//')" || return 1
     printf "%s\n" "$value"
 }
@@ -180,16 +182,72 @@ case "$MODE" in
 
     "config")
         install_prefix="$1"
-        if [ -z "$install_prefix" ]; then
+        if ! [ "$install_prefix" ]; then
             install_prefix="/usr/local"
         fi
-        install_libdir="$($MAKE --no-print-directory prefix="$install_prefix" get-libdir)" || exit 1
 
+        # See
+        # http://www.gc3.uzh.ch/blog/Compile_a_Objective-C_application_on_Ubuntu___40__Hobbes_instance__41__
+        # for a possible way of getting it to work on Linux when
+        # compiling with Clang.
         if [ "$OS" != "Darwin" ]; then
             echo "ERROR: Currently, the Objective-C extension is only available on Mac OS X" 1>&2
             exit 1
         fi
 
+        install_exec_prefix="$(NO_CONFIG_DYN_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-exec-prefix)" || exit 1
+        install_includedir="$(NO_CONFIG_DYN_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-includedir)" || exit 1
+        install_bindir="$(NO_CONFIG_DYN_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-bindir)" || exit 1
+        install_libdir="$(NO_CONFIG_DYN_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libdir)" || exit 1
+        install_libexecdir="$(NO_CONFIG_DYN_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libexecdir)" || exit 1
+
+        # Find TightDB
+        if [ -z "$TIGHTDB_CONFIG" ]; then
+            TIGHTDB_CONFIG="tightdb-config"
+        fi
+        if printf "%s\n" "$TIGHTDB_CONFIG" | grep -q '^/'; then
+            if ! [ -x "$TIGHTDB_CONFIG" ]; then
+                tightdb_abort "ERROR: TightDB config-program '$TIGHTDB_CONFIG' does not exist" "Cannot find '$TIGHTDB_CONFIG' - skipping"
+            fi
+            tightdb_config_cmd="$TIGHTDB_CONFIG"
+        elif ! tightdb_config_cmd="$(which "$TIGHTDB_CONFIG" 2>/dev/null)"; then
+            tightdb_abort "ERROR: TightDB config-program '$TIGHTDB_CONFIG' not found in PATH" "Cannot find '$TIGHTDB_CONFIG' - skipping"
+        fi
+        tightdb_config_dbg_cmd="$tightdb_config_cmd-dbg"
+        if ! [ -x "$tightdb_config_dbg_cmd" ]; then
+            tightdb_abort "ERROR: TightDB config-program '$tightdb_config_dbg_cmd' not found" "Cannot find '$tightdb_config_dbg_cmd' - skipping"
+        fi
+        tightdb_version="$($tightdb_config_cmd --version)" || exit 1
+
+        tightdb_cflags="$($tightdb_config_cmd --cflags)"         || exit 1
+        tightdb_cflags_dbg="$($tightdb_config_dbg_cmd --cflags)" || exit 1
+        tightdb_ldflags="$($tightdb_config_cmd --libs)"          || exit 1
+        tightdb_ldflags_dbg="$($tightdb_config_dbg_cmd --libs)"  || exit 1
+
+        tightdb_includedir="$($tightdb_config_cmd --includedir)" || exit 1
+        tightdb_libdir="$($tightdb_config_cmd --libdir)"         || exit 1
+        tightdb_rpath="$tightdb_libdir"
+
+        # `TIGHTDB_DIST_INCLUDEDIR` and `TIGHTDB_DIST_LIBDIR` are set
+        # when configuration occurs in the context of a distribution
+        # package.
+        if [ "$TIGHTDB_DIST_INCLUDEDIR" ] && [ "$TIGHTDB_DIST_LIBDIR" ]; then
+            tightdb_includedir="$TIGHTDB_DIST_INCLUDEDIR"
+            tightdb_libdir="$TIGHTDB_DIST_LIBDIR"
+        else
+            tightdb_includedir="$($tightdb_config_cmd --includedir)" || exit 1
+            tightdb_libdir="$($tightdb_config_cmd --libdir)"         || exit 1
+        fi
+        tightdb_rpath="$($tightdb_config_cmd --libdir)" || exit 1
+
+        cflags="-I$tightdb_includedir"
+        ldflags="-L$tightdb_libdir -Wl,-rpath,$tightdb_rpath"
+        word_list_prepend "tightdb_cflags"      "$cflags"  || exit 1
+        word_list_prepend "tightdb_cflags_dbg"  "$cflags"  || exit 1
+        word_list_prepend "tightdb_ldflags"     "$ldflags" || exit 1
+        word_list_prepend "tightdb_ldflags_dbg" "$ldflags" || exit 1
+
+        # Find Xcode
         xcode_home="none"
         if [ "$OS" = "Darwin" ]; then
             if path="$(xcode-select --print-path 2>/dev/null)"; then
@@ -209,7 +267,7 @@ case "$MODE" in
                     iphone_sdks_avail="no"
                 else
                     sdk="$(find_iphone_sdk "$platform_home")" || exit 1
-                    if [ -z "$sdk" ]; then
+                    if ! [ "$sdk" ]; then
                         tightdb_echo "Found no SDKs in '$platform_home'"
                         iphone_sdks_avail="no"
                     else
@@ -218,7 +276,7 @@ case "$MODE" in
                         else
                             type="$(defaults read-type "$platform_home/Info" "DefaultProperties")" || exit 1
                             if [ "$type" != "Type is dictionary" ]; then
-                                tightdb_abort "Unexpected type of value of key 'DefaultProperties' in '$platform_home/Info.plist'" 
+                                tightdb_abort "Unexpected type of value of key 'DefaultProperties' in '$platform_home/Info.plist'"
                             fi
                             temp_dir="$(mktemp -d "/tmp/tmp.XXXXXXXXXX")" || exit 1
                             chunk="$temp_dir/chunk.plist"
@@ -243,20 +301,30 @@ case "$MODE" in
             path="$(cd "../tightdb" || return 1; pwd)" || exit 1
             iphone_core_lib="$path/$IPHONE_DIR"
         else
-            tightdb_echo "Could not find home of TightDB core library built for iPhone!"
+            tightdb_echo "Could not find home of TightDB core library built for iPhone"
         fi
 
-        cat >"config" <<EOF
-install-prefix:    $install_prefix
-install-libdir:    $install_libdir
-xcode-home:        $xcode_home
-iphone-sdks:       ${iphone_sdks:-none}
-iphone-sdks-avail: $iphone_sdks_avail
-iphone-core-lib:   $iphone_core_lib
+        cat >"$CONFIG_MK" <<EOF
+INSTALL_PREFIX      = $install_prefix
+INSTALL_EXEC_PREFIX = $install_exec_prefix
+INSTALL_INCLUDEDIR  = $install_includedir
+INSTALL_BINDIR      = $install_bindir
+INSTALL_LIBDIR      = $install_libdir
+INSTALL_LIBEXECDIR  = $install_libexecdir
+TIGHTDB_CONFIG      = $tightdb_config_cmd
+TIGHTDB_VERSION     = $tightdb_version
+TIGHTDB_CFLAGS      = $tightdb_cflags
+TIGHTDB_CFLAGS_DBG  = $tightdb_cflags_dbg
+TIGHTDB_LDFLAGS     = $tightdb_ldflags
+TIGHTDB_LDFLAGS_DBG = $tightdb_ldflags_dbg
+XCODE_HOME          = $xcode_home
+IPHONE_SDKS         = ${iphone_sdks:-none}
+IPHONE_SDKS_AVAIL   = $iphone_sdks_avail
+IPHONE_CORE_LIB     = $iphone_core_lib
 EOF
-        if [ -z "$INTERACTIVE" ]; then
-            echo "New configuration:"
-            cat "config" | sed 's/^/    /' || exit 1
+        if ! [ "$INTERACTIVE" ]; then
+            echo "New configuration in $CONFIG_MK:"
+            cat "$CONFIG_MK" | sed 's/^/    /' || exit 1
             echo "Done configuring"
         fi
         exit 0
@@ -292,11 +360,11 @@ EOF
 
     "build-iphone")
         auto_configure || exit 1
-        iphone_sdks_avail="$(get_config_param "iphone-sdks-avail")" || exit 1
+        iphone_sdks_avail="$(get_config_param "IPHONE_SDKS_AVAIL")" || exit 1
         if [ "$iphone_sdks_avail" != "yes" ]; then
             tightdb_abort "ERROR: iPhone SDKs were not found during configuration!"
         fi
-        iphone_core_lib="$(get_config_param "iphone-core-lib")" || exit 1
+        iphone_core_lib="$(get_config_param "IPHONE_CORE_LIB")" || exit 1
         if [ "$iphone_core_lib" = "none" ]; then
             tightdb_abort "ERROR: TightDB core library for iPhone was not found during configuration!"
         fi
@@ -304,8 +372,8 @@ EOF
             tightdb_abort "ERROR: TightDB core library for iPhone is not available in '$iphone_core_lib'!"
         fi
         temp_dir="$(mktemp -d /tmp/tightdb.objc.build-iphone.XXXX)" || exit 1
-        xcode_home="$(get_config_param "xcode-home")" || exit 1
-        iphone_sdks="$(get_config_param "iphone-sdks")" || exit 1
+        xcode_home="$(get_config_param "XCODE_HOME")" || exit 1
+        iphone_sdks="$(get_config_param "IPHONE_SDKS")" || exit 1
         iphone_include="$iphone_core_lib/include"
         path_list_prepend "PATH" "$iphone_core_lib" || exit 1
         export PATH
@@ -370,7 +438,7 @@ EOF
 
     "install-report")
         has_installed=0
-        install_libdir="$(get_config_param "install-libdir")"
+        install_libdir="$(get_config_param "INSTALL_LIBDIR")"
         find $install_libdir -name '*tightdb*' | while read f; do
             has_installed=1
             echo "  $f"
@@ -380,55 +448,49 @@ EOF
 
     "install")
         require_config || exit 1
-        install_prefix="$(get_config_param "install-prefix")" || exit 1
-        $MAKE install-only DESTDIR="$DESTDIR" prefix="$install_prefix" || exit 1
+        $MAKE install-only DESTDIR="$DESTDIR" || exit 1
         tightdb_echo "Done installing"
         exit 0
         ;;
 
     "install-prod")
         require_config || exit 1
-        install_prefix="$(get_config_param "install-prefix")" || exit 1
-        $MAKE install-only DESTDIR="$DESTDIR" prefix="$install_prefix" INSTALL_FILTER=shared-libs || exit 1
+        $MAKE install-only DESTDIR="$DESTDIR" INSTALL_FILTER=shared-libs || exit 1
         tightdb_echo "Done installing"
         exit 0
         ;;
 
     "install-devel")
         require_config || exit 1
-        install_prefix="$(get_config_param "install-prefix")" || exit 1
-        $MAKE install-only DESTDIR="$DESTDIR" prefix="$install_prefix" INSTALL_FILTER=static-libs,progs,headers || exit 1
+        $MAKE install-only DESTDIR="$DESTDIR" INSTALL_FILTER=static-libs,progs,headers || exit 1
         tigtdb_echo "Done installing"
         exit 0
         ;;
 
     "uninstall")
         require_config || exit 1
-        install_prefix="$(get_config_param "install-prefix")" || exit 1
-        $MAKE uninstall prefix="$install_prefix" || exit 1
+        $MAKE uninstall || exit 1
         echo "Done uninstalling"
         exit 0
         ;;
 
     "uninstall-prod")
         require_config || exit 1
-        install_prefix="$(get_config_param "install-prefix")" || exit 1
-        $MAKE uninstall prefix="$install_prefix" INSTALL_FILTER=shared-libs || exit 1
+        $MAKE uninstall INSTALL_FILTER=shared-libs || exit 1
         echo "Done uninstalling"
         exit 0
         ;;
 
     "uninstall-devel")
         require_config || exit 1
-        install_prefix="$(get_config_param "install-prefix")" || exit 1
-        $MAKE uninstall prefix="$install_prefix" INSTALL_FILTER=static-libs,progs,extra || exit 1
+        $MAKE uninstall INSTALL_FILTER=static-libs,progs,extra || exit 1
         echo "Done uninstalling"
         exit 0
         ;;
 
     "test-installed")
         require_config || exit 1
-        install_libdir="$(get_config_param "install-libdir")" || exit 1
+        install_libdir="$(get_config_param "INSTALL_LIBDIR")" || exit 1
         export LD_RUN_PATH="$install_libdir"
         $MAKE -C "test-installed" clean || exit 1
         $MAKE -C "test-installed" test  || exit 1
