@@ -370,7 +370,7 @@ CATEGORIES :
       PARAMS:
       - NAME   : last
         TYPES  : size_t
-        DESCR  : *g_typed_query_find_parm_lastmatch_descr
+        DESCR  : *g_typed_query_find_parm_1_descr
       RETURN:
         TYPES  : size_t
         DESCR  : *g_typed_query_find_return_descr

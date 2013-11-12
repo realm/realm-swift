@@ -1,3 +1,3 @@
 SUBDIRS = objc
 
-include ../../generic.mk
+include ../generic.mk

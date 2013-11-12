@@ -467,7 +467,7 @@ CATEGORIES :
 #        DESCR  : *g_dyn_query_find_all_parm3_descr
       RETURN:
         TYPES  : TableView *
-        DESCR  : *g_dyn_query_find_all_return_desc
+        DESCR  : *g_dyn_query_find_all_return_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_findall

@@ -48,17 +48,16 @@ then:
     sudo python setup.py install
 
 
-Building, testing, and installing
----------------------------------
+
+Configure, build, install
+-------------------------
+
+Run the following commands to configure, build, and install the
+language binding:
 
     sh build.sh config
-    sh build.sh clean
     sh build.sh build
-    sh build.sh test
-    sh build.sh test-debug
-    sh build.sh test-gdb
     sudo sh build.sh install
-    sh build.sh test-intalled
 
 Headers are installed in:
 
@@ -68,6 +67,19 @@ The following libraries are installed:
 
     /usr/local/lib/libtightdb-objc.dylib
     /usr/local/lib/libtightdb-objc-dbg.dylib
+
+Here is a more complete set of build-related commands:
+
+    sh build.sh config
+    sh build.sh clean
+    sh build.sh build
+    sh build.sh test
+    sh build.sh test-debug
+    sh build.sh show-install
+    sudo sh build.sh install
+    sh build.sh test-intalled
+    sudo sh build.sh uninstall
+
 
 
 Building for iPhone
@@ -108,6 +120,7 @@ can be tested via the Xcode project in:
     test-iphone/
 
 
+
 Configuration
 -------------
 
@@ -124,6 +137,7 @@ set the environment variable `CC` before calling `sh build.sh build`,
 as in the following example:
 
     CC=clang sh build.sh build
+
 
 
 Notes

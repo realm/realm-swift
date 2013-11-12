@@ -673,24 +673,12 @@ ifneq ($(LD_IS_GCC_LIKE),)
 LDFLAGS_SHARED = -shared
 endif
 
-LDFLAGS_LIBRARY_PATH =
-
-# Work-around for CLANG < v3.2 ignoring LIBRARY_PATH
-LD_IS_CLANG = $(or $(call MATCH_CMD,clang,$(LD)),$(call MATCH_CMD,clang++,$(LD)))
-ifneq ($(LD_IS_CLANG),)
-CLANG_VERSION := $(shell printf '\#ifdef __clang__\n\#if defined __clang_major__ && defined __clang_minor__\n__clang_major__ __clang_minor__\n\#else\n0 0\n\#endif\n\#endif' | $(LD) -E - | grep -v -e '^\#' -e '^$$')
-ifneq ($(CLANG_VERSION),)
-CLANG_MAJOR = $(word 1,$(CLANG_VERSION))
-CLANG_MINOR = $(word 2,$(CLANG_VERSION))
-ifeq ($(shell echo $$(($(CLANG_MAJOR) < 3 || ($(CLANG_MAJOR) == 3 && $(CLANG_MINOR) < 2)))),1)
-LDFLAGS_LIBRARY_PATH = $(foreach x,$(subst :,$(SPACE),$(LIBRARY_PATH)),-L$(x))
-endif
-endif
-endif
-
 
 
 # LOAD PROJECT SPECIFIC CONFIGURATION
+
+EXTRA_CFLAGS  =
+EXTRA_LDFLAGS =
 
 CC_CXX_AND_LD_ARE = $(call CC_CXX_AND_LD_ARE_1,$(1),$(call MAP_CC_TO_CXX,$(1)))
 CC_CXX_AND_LD_ARE_1 = $(and $(call MATCH_CMD,$(1),$(CC)),$(strip $(foreach x,$(1) $(2),$(call MATCH_CMD,$(x),$(CXX)))),$(strip $(foreach x,$(1) $(2),$(call MATCH_CMD,$(x),$(LD)))))
@@ -725,8 +713,6 @@ endif
 ifneq ($(ARFLAGS_SPECIFIED),)
 ARFLAGS_GENERAL = $(ARFLAGS)
 endif
-EXTRA_CFLAGS  =
-EXTRA_LDFLAGS =
 CFLAGS_GENERAL  += $(EXTRA_CFLAGS)
 LDFLAGS_GENERAL += $(EXTRA_LDFLAGS)
 
@@ -804,19 +790,19 @@ endif
 
 PRIMARY_PREFIXES = bin sbin lib libexec $(EXTRA_PRIMARY_PREFIXES)
 
-bin_INSTALL_DIR     = $(DESTDIR)$(bindir)
-sbin_INSTALL_DIR    = $(DESTDIR)$(sbindir)
-lib_INSTALL_DIR     = $(DESTDIR)$(libdir)
-libexec_INSTALL_DIR = $(DESTDIR)$(libexecdir)
+bin_INSTALL_DIR     = $(bindir)
+sbin_INSTALL_DIR    = $(sbindir)
+lib_INSTALL_DIR     = $(libdir)
+libexec_INSTALL_DIR = $(libexecdir)
+
+# ARGS: primary_prefix
+GET_INSTALL_DIR = $(if $(strip $($(1)_INSTALL_DIR)),$(DESTDIR)$(strip $($(1)_INSTALL_DIR)),$(error No INSTALL_DIR defined for primary prefix '$(1)'))
 
 # ARGS: primary_prefix, install_dir
 define RECORD_LIB_INSTALL_DIR
 $(foreach x,$($(1)_LIBRARIES),GMK_$(call FOLD_TARGET,$(x))_INSTALL_DIR = $(2)
 )
 endef
-
-# ARGS: primary_prefix
-GET_INSTALL_DIR = $(if $(strip $($(1)_INSTALL_DIR)),$(strip $($(1)_INSTALL_DIR)),$(error No INSTALL_DIR defined for primary prefix '$(1)'))
 
 define RECORD_LIB_INSTALL_DIRS
 $(foreach x,$(PRIMARY_PREFIXES),$(call RECORD_LIB_INSTALL_DIR,$(x),$(call GET_INSTALL_DIR,$(x)))
@@ -1336,18 +1322,18 @@ GET_NOINST_RPATHS_FROM_LIB_REFS = $(foreach x,$(call FILTER_UNPACK,noinst-rpath:
 # ARGS: qual_prog_name, objects, qual_expanded_target_libs, deps, link_cmd, ldflags
 define NOINST_PROG_RULE
 $(1): $(2) $(call FILTER_UNPACK,noinst:% inst:% libdeps:%,$(3)) $(4)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_NOINST_RPATHS_FROM_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH) $(LDFLAGS_LIBRARY_PATH)) -o $(1)
+	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_NOINST_RPATHS_FROM_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH)) -o $(1)
 endef
 
 # ARGS: qual_prog_name, objects, qual_expanded_target_libs, deps, link_cmd, ldflags
 define INST_PROG_RULE
 ifeq ($(filter noinst-rpath:%,$(3)),)
 $(1): $(2) $(call FILTER_UNPACK,noinst:% inst:% libdeps:%,$(3)) $(4)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_RPATHS_FROM_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH) $(LDFLAGS_LIBRARY_PATH)) -o $(1)
+	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_RPATHS_FROM_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH)) -o $(1)
 else
 $(1) $(1)-noinst: $(2) $(call FILTER_UNPACK,noinst:% inst:% libdeps:%,$(3)) $(4)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_RPATHS_FROM_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH) $(LDFLAGS_LIBRARY_PATH)) -o $(1)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_NOINST_RPATHS_FROM_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH) $(LDFLAGS_LIBRARY_PATH)) -o $(1)-noinst
+	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_RPATHS_FROM_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH)) -o $(1)
+	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_NOINST_RPATHS_FROM_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH)) -o $(1)-noinst
 endif
 endef
 
@@ -1461,7 +1447,7 @@ $(1): $(2) $(3)
 endef
 
 # ARGS: qual_lib_name, objects, qual_expanded_target_libs, extra_deps, link_cmd, ldflags, lib_version
-SHARED_LIBRARY_RULE_HELPER = $(call SHARED_LIBRARY_RULE,$(1),$(2) $(call FILTER_UNPACK,inst:% libdeps:%,$(3)) $(4),$(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH) $(LDFLAGS_LIBRARY_PATH),$(7))
+SHARED_LIBRARY_RULE_HELPER = $(call SHARED_LIBRARY_RULE,$(1),$(2) $(call FILTER_UNPACK,inst:% libdeps:%,$(3)) $(4),$(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH),$(7))
 
 # ARGS: qual_lib_name, deps, cmd, version
 SHARED_LIBRARY_RULE = $(SHARED_LIBRARY_RULE_DEFAULT)
