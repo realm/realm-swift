@@ -657,7 +657,7 @@ CATEGORIES :
         DESCR  : *g_dyn_table_get_sorted_view_parm1_descr
       - NAME   : ascending
         TYPES  : BOOL
-        DESCR  : *cpp_dyn_table_get_sorted_view_parm2_descr
+        DESCR  : *g_dyn_table_get_sorted_view_parm2_descr
       RETURN:
         TYPES  : TightdbView *
         DESCR  : *g_dyn_table_get_sorted_view_return_descr
