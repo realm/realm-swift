@@ -132,6 +132,15 @@ following command before building and installing:
 Here, `PREFIX` is the installation prefix. If it is not specified, it
 defaults to `/usr/local`.
 
+By default, the configuration step uses `which tightdb-config` to
+locate the installation of the TightDB core library. If this is not
+appropriate, because you have multiple versions of the TightDB core
+library installed, or `tightdb-config` is not available in your
+`PATH`, set the environment variable `TIGHTDB_CONFIG` before calling
+`sh build.sh config`. For example:
+
+    TIGHTDB_CONFIG=/opt/tightdb-v0.1.2/bin/tightdb-config build.sh config
+
 To use a nondefault compiler, or a compiler in a nondefault location,
 set the environment variable `CC` before calling `sh build.sh build`,
 as in the following example:
