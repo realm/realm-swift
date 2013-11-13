@@ -1,4 +1,4 @@
-Setting up a project
+Running the tutorial
 ====================
 
 
