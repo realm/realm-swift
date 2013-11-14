@@ -15,9 +15,8 @@ table_test.tightdb
 /doc/ref/html/*.css
 
 # XCode
-xcuserdata
+xcuserdata/
 project.xcworkspace
-xcuserdata
 
 
 # sh build.sh build-iphone
