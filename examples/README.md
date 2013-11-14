@@ -2,12 +2,11 @@ Running the tutorial
 ====================
 
 
-Examples
+Tutorial
 ========
 Within this folder you find an Xcode project named TightdbTutorial.xcodeproj.
-This contain a source file name tutorial.m
-Go to this file and press Run
-
-        ant
+The project includes tutorial.m.
+This file contains the source code for the tutorial. 
+To run the tutorial, press Run
 
 See our website for more documentation.
