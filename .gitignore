@@ -26,7 +26,5 @@ project.xcworkspace
 
 # for running the example tutorial
 examples/tutorial.d
-
 examples/tutorial.o
-
-examples/unit-tests
+examples/tutorial
