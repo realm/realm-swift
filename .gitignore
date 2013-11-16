@@ -2,7 +2,7 @@
 .DS_Store
 
 # sh build.sh config
-/src/config-dyn.mk
+/src/config.mk
 
 # sh build.sh test
 employees.tightdb

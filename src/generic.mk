@@ -279,7 +279,7 @@
 # In a project that consists of multiple subprojects (each one in its
 # own subdirectory and with its own `Makefile`,) compiler and linker
 # flags can be specified for all targets in the project by setting
-# `PROJECT_CFLAGS` and `PROJECT_LDFLAGS` in `config.mk`:
+# `PROJECT_CFLAGS` and `PROJECT_LDFLAGS` in `project.mk`:
 #
 #   PROJECT_CFLAGS = ...
 #   PROJECT_LDFLAGS = ...
@@ -332,7 +332,7 @@
 # -----------------------
 #
 # All variables listed in the section CONFIG VARIABLES are available
-# for modification in config.mk, and they may also be overridden on
+# for modification in `project.mk`, and they may also be overridden on
 # the command line. For example, to enable PTHREADS and disable
 # automatic dependency tracking, you could do this:
 #
@@ -351,17 +351,17 @@
 # NOTE: When you change the configuration specified via the
 # environment or the command line from one invocation of make to the
 # next, you should always start with a 'make clean'. MAKE does this
-# automatically when you change config.mk.
+# automatically when you change `project.mk`.
 #
 # A function CC_CXX_AND_LD_ARE is made available to check for a
-# specific compiler in config.mk. For example:
+# specific compiler in `project.mk`. For example:
 #
 #   ifneq ($(call CC_CXX_AND_LD_ARE,clang),)
 #   # Clang specific stuff
 #   endif
 #
 # Likewise, a variable CC_CXX_AND_LD_ARE_GCC_LIKE is made available to
-# check for any GCC like compiler in config.mk (gcc, llvm-gcc,
+# check for any GCC like compiler in `project.mk` (gcc, llvm-gcc,
 # clang). For example:
 #
 #   ifneq ($(CC_CXX_AND_LD_ARE_GCC_LIKE),)
@@ -686,12 +686,12 @@ CC_CXX_AND_LD_ARE_GCC_LIKE = $(strip $(foreach x,$(GCC_LIKE_COMPILERS),$(call CC
 
 GENERIC_MK := $(lastword $(MAKEFILE_LIST))
 GENERIC_MK_DIR = $(abspath $(patsubst %/,%,$(dir $(GENERIC_MK))))
-CONFIG_MK = $(call MAKE_REL_PATH,$(GENERIC_MK_DIR)/config.mk)
+PROJECT_MK = $(call MAKE_REL_PATH,$(GENERIC_MK_DIR)/project.mk)
 DEP_MAKEFILES = Makefile $(GENERIC_MK)
-ifneq ($(wildcard $(CONFIG_MK)),)
-DEP_MAKEFILES += $(CONFIG_MK)
+ifneq ($(wildcard $(PROJECT_MK)),)
+DEP_MAKEFILES += $(PROJECT_MK)
 endif
--include $(CONFIG_MK)
+-include $(PROJECT_MK)
 
 ifneq ($(SOURCE_ROOT),)
 ABS_SOURCE_ROOT = $(abspath $(GENERIC_MK_DIR)/$(SOURCE_ROOT))
