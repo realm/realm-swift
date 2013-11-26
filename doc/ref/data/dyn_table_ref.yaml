@@ -721,7 +721,9 @@ CATEGORIES :
       PARAMS:
       - NAME   : colNdx
         TYPES  : size_t
-        DESCR  : *g_dyn_table_count_parm1_descr
+        DESCR  :
+        - TEXT : *g_dyn_table_count_parm1_descr0
+        - TEXT : *g_dyn_table_count_parm1_descr1
       - NAME   : target
         TYPES  : int64_t
         DESCR  : *g_dyn_table_count_parm2_descr
