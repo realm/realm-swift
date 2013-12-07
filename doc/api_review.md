@@ -34,7 +34,7 @@ Add row should return a curser instead of an index for consistency with the type
     -(BOOL)remove:(size_t)ndx;                                                     (removeRowAtIndex:)
     
 Insert row is missing (edit: appears to be added in ErrorBranch, returning BOOL).
-	
+    
     -(TightdbCurser *)insertRowAtIndex:    
     -(int64_t)sumInt:(size_t)colNdx;                                               (sumOfIntColumn:)
 

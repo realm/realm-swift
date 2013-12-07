@@ -103,8 +103,8 @@ void tableFunc() {
     
     // @@Example: simple_seach @@
     size_t row;
-    row = [people.Name find:@"Philip"];	                // (size_t)-1. Not found
-    row = [people.Name find:@"Mary"];	                  // row = 1
+    row = [people.Name find:@"Philip"];                 // (size_t)-1. Not found
+    row = [people.Name find:@"Mary"];                     // row = 1
     // @@EndExample@@
     
     // @@Example: advanced_search @@
