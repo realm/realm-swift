@@ -57,7 +57,7 @@ CATEGORIES :
   METHODS:
   - g_typed_view_object_at_index:
       NAME     : cursorAtIndex
-      SUMMARY  : Returns a typed cursor at a specified row number. 
+      SUMMARY  : Returns a typed cursor at a specified row number.
       DESCR    : &objc_typed_table_cursor_at_index_descr
                  The cursor is initialized using the table view index. Internally the cursor uses the source table index.
       SIGNATURE: "- (TableName_Cursor *)cursorAtIndex:(size_t)ndx"
@@ -96,7 +96,7 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_objc_typed_table_remove
         DESCR  :
-        
+
   - g_typed_view_remove_last_row:
       TODO     : soon
 
@@ -107,8 +107,8 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_objc_typed_table_remove_last_row
         DESCR  :
-        
-        
+
+
 - Sub-tables:
   METHODS:
   - g_typed_view_get_subtable_size:
@@ -127,7 +127,7 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_objc_typed_view_get_subtable
         DESCR  :
-        
+
   - g_typed_view_clear_subtable:
       TODO     : soon
 

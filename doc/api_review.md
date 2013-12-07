@@ -32,10 +32,10 @@ Add row should return a curser instead of an index for consistency with the type
 
     -(size_t)addRow;                                                               ((TightdbCurser*)addRow)
     -(BOOL)remove:(size_t)ndx;                                                     (removeRowAtIndex:)
-    
+
 Insert row is missing (edit: appears to be added in ErrorBranch, returning BOOL).
-    
-    -(TightdbCurser *)insertRowAtIndex:    
+
+    -(TightdbCurser *)insertRowAtIndex:
     -(int64_t)sumInt:(size_t)colNdx;                                               (sumOfIntColumn:)
 
 Typed Query
@@ -68,7 +68,7 @@ Suggested (here, concrete syntax):
 
     [table addColumnWithType:tightdb_String andName:@"Name"];
 
-Comment from Alexander was that signatures with "With" should occur only when there are corrosponding method(s) without "With", and since we have no addColumn method without arguments, we don't comply with that suggested rule: 
+Comment from Alexander was that signatures with "With" should occur only when there are corrosponding method(s) without "With", and since we have no addColumn method without arguments, we don't comply with that suggested rule:
 
 There are many examples in Apples API where the rule does not apply, for instance in NSArray:
 
@@ -87,9 +87,9 @@ Difficulty 1 (hardest, relatively speaking):
 
 Difficulty 2:
 - Add missing methods in Typed API (there are not so many missing here).
-- Update signature naming in Typed API (sligtly more difficult due to nested macros). 
+- Update signature naming in Typed API (sligtly more difficult due to nested macros).
 
-Difficulty 3: 
+Difficulty 3:
 - Add missing methods, many of them in dynamic query.
 - Update signature naming in Dynamic API.
 

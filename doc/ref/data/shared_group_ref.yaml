@@ -17,7 +17,7 @@ CATEGORIES:
   - g_shared_group_constructor:
       NAME     : SharedGroup
       SUMMARY  : *g_shared_group_constructor_summary
-      DESCR    : 
+      DESCR    :
       - TEXT   : *g_shared_group_constructor_descr
       - TEXT   : *g_shared_group_durability_modes
       SIGNATURE: (TightdbSharedGroup *)groupWithFilename:(NSString *)filename

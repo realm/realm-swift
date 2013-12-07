@@ -104,7 +104,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     error = nil;
     if (![group write:@"peopleErr.tightdb" error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
-        STFail(@"No error expected");        
+        STFail(@"No error expected");
     }
 
     //------------------------------------------------------
@@ -154,7 +154,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     }
 
     PeopleErrTable *diskTable = [fromDisk getTable:@"employees" withClass:[PeopleErrTable class]];
-    
+
     // Fake readonly.
     [((TightdbTable *)diskTable) setReadOnly:true];
 
@@ -164,7 +164,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     if (![diskTable addName:@"Anni" Age:54 Hired:YES error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
     } else {
-        STFail(@"addName to readonly should have failed.");        
+        STFail(@"addName to readonly should have failed.");
     }
 
     NSLog(@"Disktable size: %zu", [diskTable count]);
@@ -177,7 +177,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 {
 
     NSError *error;
-    
+
     // Create table with all column types
     TightdbTable *table = [[TightdbTable alloc] init];
     TightdbSpec *s = [table getSpec];
@@ -229,9 +229,9 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     }
     if (![table updateFromSpecWithError:&error]) {
         NSLog(@"%@", [error localizedDescription]);
-        STFail(@"UpdateFromSpec failed.");        
+        STFail(@"UpdateFromSpec failed.");
     }
-    
+
     // Add some rows
     for (size_t i = 0; i < 15; ++i) {
         if (![table insertInt:0 ndx:i value:i error:&error]) {
@@ -254,7 +254,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
-        
+
         switch (i % 3) {
             case 0:
                 if (![table insertString:5 ndx:i value:@"test1" error:&error]) {
@@ -275,7 +275,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
                 }
                 break;
         }
-        
+
         if (![table insertBinary:6 ndx:i data:"binary" size:7 error:&error]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
@@ -304,12 +304,12 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
-        
+
         if (![table insertDoneWithError:&error]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"InsertDone failed.");
         }
-        
+
         // Add sub-tables
         if (i == 2) {
             TightdbTable *subtable = [table getSubtable:8 ndx:i];
@@ -326,16 +326,16 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
                 STFail(@"InsertDone failed.");
             }
         }
-        
+
 
     }
-    
+
     // We also want a ColumnStringEnum
     if (![table optimize]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"Insert failed.");
     }
-    
+
     // Test Deletes
     if (![table removeRowAtIndex:14 error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
@@ -349,19 +349,19 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"Remove failed.");
     }
-    
+
     STAssertEquals([table count], (size_t)12, @"Size should have been 12");
 #ifdef TIGHTDB_DEBUG
     [table verify];
 #endif
-    
+
     // Test Clear
     if (![table clearWithError:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"Clear failed.");
     }
     STAssertEquals([table count], (size_t)0, @"Size should have been zero");
-    
+
 #ifdef TIGHTDB_DEBUG
     [table verify];
 #endif
@@ -373,7 +373,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     TestQueryErrAllTypes *table = [[TestQueryErrAllTypes alloc] init];
     NSLog(@"Table: %@", table);
     STAssertNotNil(table, @"Table is nil");
-    
+
     const char bin[4] = { 0, 1, 2, 3 };
     TightdbBinary *bin1 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin / 2];
     TightdbBinary *bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
@@ -383,13 +383,13 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     [subtab2 addAge:100];
     TightdbMixed *mixInt1   = [TightdbMixed mixedWithInt64:1];
     TightdbMixed *mixSubtab = [TightdbMixed mixedWithTable:subtab2];
-    
+
     [table addBoolCol:NO   IntCol:54       FloatCol:0.7     DoubleCol:0.8       StringCol:@"foo"
             BinaryCol:bin1 DateCol:0       TableCol:nil     MixedCol:mixInt1];
-    
+
     [table addBoolCol:YES  IntCol:506      FloatCol:7.7     DoubleCol:8.8       StringCol:@"banach"
             BinaryCol:bin2 DateCol:timeNow TableCol:subtab2 MixedCol:mixSubtab];
-    
+
     STAssertEquals([[[[table where].BoolCol   columnIsEqualTo:NO]      count] unsignedLongValue], (size_t)1, @"BoolCol equal");
     STAssertEquals([[[[table where].IntCol    columnIsEqualTo:54]      count] unsignedLongValue], (size_t)1, @"IntCol equal");
     STAssertEquals([[[[table where].FloatCol  columnIsEqualTo:0.7f]    count] unsignedLongValue], (size_t)1, @"FloatCol equal");
@@ -400,28 +400,28 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     // These are not yet implemented
     //    STAssertEquals([[[table where].TableCol  columnIsEqualTo:subtab1] count], (size_t)1, @"TableCol equal");
     //    STAssertEquals([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (size_t)1, @"MixedCol equal");
-    
+
     TestQueryErrAllTypes_Query *query = [[table where].BoolCol   columnIsEqualTo:NO];
-    
+
     STAssertEquals([[query.IntCol minimum] longLongValue], (int64_t)54,    @"IntCol min");
     STAssertEquals([[query.IntCol maximum] longLongValue], (int64_t)54,    @"IntCol max");
     STAssertEquals([[query.IntCol sum] longLongValue], (int64_t)54,    @"IntCol sum");
     STAssertEquals([[query.IntCol average] doubleValue], 54.0,           @"IntCol avg");
-    
+
     STAssertEquals([[query.FloatCol minimum] floatValue], 0.7f,         @"FloatCol min");
     STAssertEquals([[query.FloatCol maximum] floatValue], 0.7f,         @"FloatCol max");
     STAssertEquals([[query.FloatCol sum] floatValue], 0.7f, @"FloatCol sum");
     STAssertEquals([[query.FloatCol average] doubleValue], (double)0.7f, @"FloatCol avg");
-    
+
     STAssertEquals([[query.DoubleCol minimum] doubleValue], 0.8,         @"DoubleCol min");
     STAssertEquals([[query.DoubleCol maximum] doubleValue], 0.8,         @"DoubleCol max");
     STAssertEquals([[query.DoubleCol sum] doubleValue], 0.8,         @"DoubleCol sum");
     STAssertEquals([[query.DoubleCol average] doubleValue], 0.8,         @"DoubleCol avg");
-    
+
     // Check that all column conditions return query objects of the
     // right type
     [[[table where].BoolCol columnIsEqualTo:NO].BoolCol columnIsEqualTo:NO];
-    
+
     [[[table where].IntCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].IntCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].IntCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
@@ -429,7 +429,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     [[[table where].IntCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
     [[[table where].IntCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].IntCol columnIsBetween:0 and_:0].BoolCol columnIsEqualTo:NO];
-    
+
     [[[table where].FloatCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].FloatCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].FloatCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
@@ -437,7 +437,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     [[[table where].FloatCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
     [[[table where].FloatCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].FloatCol columnIsBetween:0 and_:0].BoolCol columnIsEqualTo:NO];
-    
+
     [[[table where].DoubleCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DoubleCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DoubleCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
@@ -445,7 +445,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     [[[table where].DoubleCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DoubleCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DoubleCol columnIsBetween:0 and_:0].BoolCol columnIsEqualTo:NO];
-    
+
     [[[table where].StringCol columnIsEqualTo:@""].BoolCol columnIsEqualTo:NO];
     [[[table where].StringCol columnIsEqualTo:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
     [[[table where].StringCol columnIsNotEqualTo:@""].BoolCol columnIsEqualTo:NO];
@@ -456,30 +456,30 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     [[[table where].StringCol columnEndsWith:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
     [[[table where].StringCol columnContains:@""].BoolCol columnIsEqualTo:NO];
     [[[table where].StringCol columnContains:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
-    
+
     [[[table where].BinaryCol columnIsEqualTo:bin1].BoolCol columnIsEqualTo:NO];
     [[[table where].BinaryCol columnIsNotEqualTo:bin1].BoolCol columnIsEqualTo:NO];
     [[[table where].BinaryCol columnBeginsWith:bin1].BoolCol columnIsEqualTo:NO];
     [[[table where].BinaryCol columnEndsWith:bin1].BoolCol columnIsEqualTo:NO];
     [[[table where].BinaryCol columnContains:bin1].BoolCol columnIsEqualTo:NO];
-    
+
     TestQueryErrAllTypes_View *view = [[[[table where].DateCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO] findAll];
     for (size_t i = 0; i < [view count]; i++) {
         NSLog(@"%zu: %c", i, [[view cursorAtIndex:i] BoolCol]);
     }
 
-    
+
     [[[table where].DateCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DateCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DateCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DateCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DateCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DateCol columnIsBetween:0 and_:0].BoolCol columnIsEqualTo:NO];
-    
+
     // These are not yet implemented
     //    [[[table where].TableCol columnIsEqualTo:nil].BoolCol columnIsEqualTo:NO];
     //    [[[table where].TableCol columnIsNotEqualTo:nil].BoolCol columnIsEqualTo:NO];
-    
+
     //    [[[table where].MixedCol columnIsEqualTo:mixInt1].BoolCol columnIsEqualTo:NO];
     //    [[[table where].MixedCol columnIsNotEqualTo:mixInt1].BoolCol columnIsEqualTo:NO];
 }
