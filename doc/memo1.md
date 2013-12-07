@@ -15,7 +15,7 @@ Examples #1 (adding a row and setting multiple values with a single setter):
 
     Table: Name, String
            Age,  Int
-		
+        
     [table addName:@”Bob” Age:10];
 
     Table: name, String
@@ -34,12 +34,12 @@ Examples #2 (using property getters/setters):
 ---------------------------------------------
 
     Table: name, String
-           age,	 Int
- 	
-    Curser *c = [table add];   	// adds a row and returns the curser for it
-    [c setAge]		            // synthesized setter
-    [c setage]		            // custom setter
-	  	 
+           age,  Int
+    
+    Curser *c = [table add];    // adds a row and returns the curser for it
+    [c setAge]                  // synthesized setter
+    [c setage]                  // custom setter
+         
 Problem #2: At the time of writing we generate a custom setter setage, which accesses the database. On top of that setAge is automatically synthesized and does not access the database – only the property named age (not wanted).
 
 Problem #3: We can disable the synthesised setter, but we cannot create a custom setter with capital A in the name.

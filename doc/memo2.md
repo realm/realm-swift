@@ -14,8 +14,8 @@ In this case the method name is defined by the selector. The selector created fr
 Calling methods (sending messages to objects)
 ---------------------------------------------
 
-	[object addedMethod];                              // works ONLY with ARC disabled
-	[object performSelector:@selector(addedMethod)];   // works with our without ARC
+    [object addedMethod];                              // works ONLY with ARC disabled
+    [object performSelector:@selector(addedMethod)];   // works with our without ARC
 
 
 Conclusion
