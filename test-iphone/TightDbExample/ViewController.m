@@ -113,7 +113,7 @@ TIGHTDB_TABLE_2(MyTable2,
     NSLog(@"Query count: %@", [q count]);
     [_utils Eval:[[q count] intValue] == 2 msg:@"Expected 2 rows in query"];
 
-    
+
     // Get the average age - currently only a low-level interface!
     NSNumber *avg = [q.Age average];
     NSLog(@"Average: %i", [avg intValue]);
@@ -130,7 +130,7 @@ TIGHTDB_TABLE_2(MyTable2,
 
     NSFileManager *manager = [NSFileManager defaultManager];
     [manager removeItemAtPath:[_utils pathForDataFile:@"employees.tightdb"] error:nil];
-    
+
     // Write to disk
     [group write:[_utils pathForDataFile:@"employees.tightdb"]];
 
@@ -155,7 +155,7 @@ TIGHTDB_TABLE_2(MyTable2,
     // Load a group from memory (and print contents)
     TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:data size:size];
     MyTable *memTable = [fromMem getTable:@"employees" withClass:[MyTable class]];
-    
+
     for (MyTable_Cursor *row in memTable)
     {
         NSLog(@"From mem: %@ is %lld years old.", row.Name, row.Age);

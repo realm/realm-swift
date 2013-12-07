@@ -24,7 +24,7 @@ using namespace std;
 
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx
 {
-    if (ndx >= [table count]) 
+    if (ndx >= [table count])
         return nil;
 
     self = [super init];
@@ -101,7 +101,7 @@ using namespace std;
     return [self setInt:value inColumn:colNdx error:nil];
 }
 
--(BOOL)setInt:(int64_t)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error 
+-(BOOL)setInt:(int64_t)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error
 {
     return [_table set:colNdx ndx:_ndx value:value error:error];
 }
@@ -111,7 +111,7 @@ using namespace std;
     return [self setString:value inColumn:colNdx error:nil];
 }
 
--(BOOL)setString:(NSString *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error 
+-(BOOL)setString:(NSString *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error
 {
     return [_table setString:colNdx ndx:_ndx value:value error:error];
 }
@@ -121,7 +121,7 @@ using namespace std;
     return [self setBool:value inColumn:colNdx error:nil];
 }
 
--(BOOL)setBool:(BOOL)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error 
+-(BOOL)setBool:(BOOL)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error
 {
     return [_table setBool:colNdx ndx:_ndx value:value error:error];
 }
@@ -131,7 +131,7 @@ using namespace std;
     return [self setFloat:value inColumn:colNdx error:nil];
 }
 
--(BOOL)setFloat:(float)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error 
+-(BOOL)setFloat:(float)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error
 {
     return [_table setFloat:colNdx ndx:_ndx value:value error:error];
 }
@@ -141,7 +141,7 @@ using namespace std;
     return [self setDouble:value inColumn:colNdx error:nil];
 }
 
--(BOOL)setDouble:(double)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error 
+-(BOOL)setDouble:(double)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error
 {
     return [_table setDouble:colNdx ndx:_ndx value:value error:error];
 }
@@ -156,7 +156,7 @@ using namespace std;
     return [self setBinary:value inColumn:colNdx error:nil];
 }
 
--(BOOL)setBinary:(TightdbBinary *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error 
+-(BOOL)setBinary:(TightdbBinary *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error
 {
     return [_table setBinary:colNdx ndx:_ndx value:value error:error];
 }
@@ -166,7 +166,7 @@ using namespace std;
     return [self setMixed:value inColumn:colNdx error:nil];
 }
 
--(BOOL)setMixed:(TightdbMixed *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error 
+-(BOOL)setMixed:(TightdbMixed *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error
 {
     return [_table setMixed:colNdx ndx:_ndx value:value error:error];
 }
@@ -174,7 +174,7 @@ using namespace std;
 -(BOOL)setTable:(TightdbTable *)value inColumn:(size_t)colNdx
 {
     return [_table setSubtable:colNdx ndx:_ndx withTable:value];
-} 
+}
 
 @end
 

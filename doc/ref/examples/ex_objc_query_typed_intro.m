@@ -3,8 +3,8 @@
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
 
-// Defines a new table with two columns Name and Age. 
- 
+// Defines a new table with two columns Name and Age.
+
 TIGHTDB_TABLE_2(PeopleTable,
                 Name, String,
                 Age, Int);
@@ -12,13 +12,13 @@ TIGHTDB_TABLE_2(PeopleTable,
 int main()
 {
     @autoreleasepool {
-        
+
         // Creates a new table of the type defined above.
 
         PeopleTable *table = [[PeopleTable alloc] init];
-        
+
         // Adds rows to the table.
-        
+
         [table addName:@"Brian" Age:14];
         [table addName:@"Joe" Age:17];
         [table addName:@"Jack" Age:22];
@@ -26,15 +26,15 @@ int main()
         [table addName:@"Bob" Age:10];
 
         // Create a query.
-        
+
         PeopleTable_Query *query = [[[[table where].Age columnIsGreaterThan:20] or].Name columnIsEqualTo:@"Bob"];
-    
+
         // Iterate over the query result.
-        
+
         for (PeopleTable_Cursor *curser in query) {
             NSLog(@"Person matching query: %@", [curser Name]);
         }
-        
+
     }
 }
 

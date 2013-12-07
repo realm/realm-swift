@@ -145,11 +145,11 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 #define DATE_COL 6
 #define MIXED_COL 7
 
-- (void) testDynamic 
+- (void) testDynamic
 {
-  
+
         TightdbTable *table = [[TightdbTable alloc]init];
-  
+
         [table addColumnWithType:tightdb_Bool andName:@"BoolCol"];
         [table addColumnWithType:tightdb_Int andName:@"IntCol"];
         [table addColumnWithType:tightdb_Float andName:@"FloatCol"];
@@ -158,15 +158,15 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         [table addColumnWithType:tightdb_Binary andName:@"BinaryCol"];
         [table addColumnWithType:tightdb_Date andName:@"DateCol"];
         [table addColumnWithType:tightdb_Mixed andName:@"MixedCol"];
-        // TODO: add Enum<T> and Subtable<T> when possible.      
- 
+        // TODO: add Enum<T> and Subtable<T> when possible.
+
         const char bin[4] = { 0, 1, 2, 3 };
         time_t timeNow = [[NSDate date] timeIntervalSince1970];
         TightdbMixed *mixInt1   = [TightdbMixed mixedWithInt64:1];
         TightdbMixed *mixString   = [TightdbMixed mixedWithString:@"foo"];
         TightdbBinary *bin1 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin / 2];
         TightdbBinary *bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
-        
+
         // TODO: Rewrite test for cursor based add.
         [table _addRows:2];
 
@@ -224,7 +224,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         STAssertEquals([[[table where] column:FLOAT_COL isGreaterThanFloat:5.5] count], [NSNumber numberWithLongLong:1], @"isGreaterThanFloat");
         STAssertEquals([[[table where] column:DOUBLE_COL isGreaterThanDouble:5.5] count], [NSNumber numberWithLongLong:1], @"isGreaterThanDouble");
         STAssertEquals([[[table where] column:DATE_COL isGreaterThanDate:0] count], [NSNumber numberWithLongLong:1], @"isGreaterThanDate");
-        
+
         STAssertEquals([[[table where] column:INT_COL isGreaterThanOrEqualToInt:860] count], [NSNumber numberWithLongLong:1], @"isGreaterThanInt");
         STAssertEquals([[[table where] column:FLOAT_COL isGreaterThanOrEqualToFloat:5.6] count], [NSNumber numberWithLongLong:1], @"isGreaterThanFloat");
         STAssertEquals([[[table where] column:DOUBLE_COL isGreaterThanOrEqualToDouble:5.6] count], [NSNumber numberWithLongLong:1], @"isGreaterThanDouble");
@@ -234,14 +234,14 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         STAssertEquals([[[table where] column:FLOAT_COL isLessThanFloat:5.6] count], [NSNumber numberWithLongLong:1], @"isLessThanFloat");
         STAssertEquals([[[table where] column:DOUBLE_COL isLessThanDouble:5.6] count], [NSNumber numberWithLongLong:1], @"isLessThanDouble");
         STAssertEquals([[[table where] column:DATE_COL isLessThanDate:timeNow] count], [NSNumber numberWithLongLong:1], @"isLessThanDate");
-        
+
         STAssertEquals([[[table where] column:INT_COL isLessThanOrEqualToInt:860] count], [NSNumber numberWithLongLong:2], @"isLessThanOrEqualToInt");
         STAssertEquals([[[table where] column:FLOAT_COL isLessThanOrEqualToFloat:5.6] count], [NSNumber numberWithLongLong:2], @"isLessThanOrEqualToFloat");
         STAssertEquals([[[table where] column:DOUBLE_COL isLessThanOrEqualToDouble:5.6] count], [NSNumber numberWithLongLong:2], @"isLessThanOrEqualToDouble");
         STAssertEquals([[[table where] column:DATE_COL isLessThanOrEqualToDate:timeNow] count], [NSNumber numberWithLongLong:2], @"isLessThanOrEqualToDate");
 
         STAssertEquals([[[table where] column:INT_COL isBetweenInt:859 and_:861] find:0], (size_t) 1, @"find");
-        
+
         STAssertEquals([[[[table where] column:INT_COL isBetweenInt:859 and_:861] findAll] class], [TightdbView class], @"findAll");
 
         STAssertEquals([[[table where] minimumWithIntColumn:INT_COL] longLongValue], (int64_t)0, @"minimunIntOfColumn");
@@ -272,7 +272,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (size_t)-1, @"find");
 }
 
- 
+
 
 
 @end
