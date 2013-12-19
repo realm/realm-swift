@@ -1,4 +1,5 @@
 SUBDIRS = src
+PASSIVE_SUBDIRS = examples
 
 include src/generic.mk
 

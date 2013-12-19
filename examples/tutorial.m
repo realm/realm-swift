@@ -250,7 +250,7 @@ void sharedGroupFunc() {
     // @@EndExample@@
 }
 
-int main()
+int main(int argc, const char * argv[])
 {
     @autoreleasepool {
         tableFunc();
