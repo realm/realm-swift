@@ -15,7 +15,8 @@ table_test.tightdb
 /doc/ref/html/*.css
 
 # XCode
-xcuserdata
+xcuserdata/
+project.xcworkspace
 
 
 # sh build.sh build-iphone
@@ -23,3 +24,7 @@ xcuserdata
 /iphone-lib/libtightdb-objc-ios.a
 /iphone-lib/libtightdb-objc-ios-dbg.a
 
+# for running the example tutorial
+examples/tutorial.d
+examples/tutorial.o
+examples/tutorial
