@@ -125,7 +125,7 @@ find_iphone_sdk()
 }
 
 
-CONFIG_MK="src/config-dyn.mk"
+CONFIG_MK="src/config.mk"
 
 require_config()
 {
@@ -195,11 +195,11 @@ case "$MODE" in
             exit 1
         fi
 
-        install_exec_prefix="$(NO_CONFIG_DYN_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-exec-prefix)" || exit 1
-        install_includedir="$(NO_CONFIG_DYN_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-includedir)" || exit 1
-        install_bindir="$(NO_CONFIG_DYN_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-bindir)" || exit 1
-        install_libdir="$(NO_CONFIG_DYN_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libdir)" || exit 1
-        install_libexecdir="$(NO_CONFIG_DYN_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libexecdir)" || exit 1
+        install_exec_prefix="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-exec-prefix)" || exit 1
+        install_includedir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-includedir)" || exit 1
+        install_bindir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-bindir)" || exit 1
+        install_libdir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libdir)" || exit 1
+        install_libexecdir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libexecdir)" || exit 1
 
         # Find TightDB
         if [ -z "$TIGHTDB_CONFIG" ]; then

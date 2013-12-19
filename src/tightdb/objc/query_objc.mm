@@ -47,7 +47,7 @@ using namespace std;
 -(id)initWithTable:(TightdbTable *)table error:(NSError *__autoreleasing *)error
 {
     self = [super init];
-    if (self) {        
+    if (self) {
         _table = table;
         TIGHTDB_EXCEPTION_ERRHANDLER(
                                      _query = new tightdb::Query([_table getTable].where());
@@ -457,7 +457,7 @@ using namespace std;
 {
     _query->between_datetime(colNdx, from, to);
     return self;
-}  
+}
 
 -(TightdbQuery *)column:(size_t)colNdx isEqualToBool:(bool)value
 {
@@ -471,7 +471,7 @@ using namespace std;
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isEqualToFloat:(float)value 
+-(TightdbQuery *)column:(size_t)colNdx isEqualToFloat:(float)value
 {
     _query->equal(colNdx, value);
     return self;
@@ -513,7 +513,7 @@ using namespace std;
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isNotEqualToFloat:(float)value 
+-(TightdbQuery *)column:(size_t)colNdx isNotEqualToFloat:(float)value
 {
     _query->not_equal(colNdx, value);
     return self;
@@ -549,7 +549,7 @@ using namespace std;
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanInt:(int64_t)value 
+-(TightdbQuery *)column:(size_t)colNdx isGreaterThanInt:(int64_t)value
 {
     _query->greater(colNdx, value);
     return self;
@@ -579,7 +579,7 @@ using namespace std;
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToFloat:(float)value 
+-(TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToFloat:(float)value
 {
     _query->greater_equal(colNdx, value);
     return self;
@@ -597,7 +597,7 @@ using namespace std;
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isLessThanInt:(int64_t)value 
+-(TightdbQuery *)column:(size_t)colNdx isLessThanInt:(int64_t)value
 {
     _query->less(colNdx, value);
     return self;
@@ -627,7 +627,7 @@ using namespace std;
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToFloat:(float)value 
+-(TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToFloat:(float)value
 {
     _query->less_equal(colNdx, value);
     return self;

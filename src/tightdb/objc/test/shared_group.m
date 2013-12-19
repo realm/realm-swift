@@ -100,8 +100,8 @@ TIGHTDB_TABLE_IMPL_2(SharedTable2,
     @catch (NSException *exception) {
         NSLog(@"Exception caught: %@", exception);
     }
-    
-    
+
+
     [fromDisk readTransaction:^(TightdbGroup *group) {
         SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class]];
         NSLog(@"Disktable size: %zu", [diskTable count]);

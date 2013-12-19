@@ -1,7 +1,7 @@
 Objective-C Typed API: Capitalizaiton in signature names
 ========================================================
 
-This document describes issues and solutions related signature naming in the typed Objective-C interface. The overall challenge is that classes are defined with macros, which cannot modify case (capitalization) in the column names the user supplies in the table definition. 
+This document describes issues and solutions related signature naming in the typed Objective-C interface. The overall challenge is that classes are defined with macros, which cannot modify case (capitalization) in the column names the user supplies in the table definition.
 
 Background
 ----------
@@ -15,7 +15,7 @@ Examples #1 (adding a row and setting multiple values with a single setter):
 
     Table: Name, String
            Age,  Int
-		
+
     [table addName:@”Bob” Age:10];
 
     Table: name, String
@@ -27,28 +27,28 @@ Problem #1: The latter signature should in Objective-C notation have been “add
 
 Decision #1: Due to above problem, we decided to avoid prefixes before column names. It apparently has the direct consequence that we cannot create methods, which sets multiple values at once and where the first parameter is a column (how should the signature be named?).
 
-Decision #2:  Based on decision #1 we decided to only use (overridden) property getters/setters for accessing and only set one property at the time. 
+Decision #2:  Based on decision #1 we decided to only use (overridden) property getters/setters for accessing and only set one property at the time.
 
 
 Examples #2 (using property getters/setters):
 ---------------------------------------------
 
     Table: name, String
-           age,	 Int
- 	
-    Curser *c = [table add];   	// adds a row and returns the curser for it
-    [c setAge]		            // synthesized setter
-    [c setage]		            // custom setter
-	  	 
+           age,  Int
+
+    Curser *c = [table add];    // adds a row and returns the curser for it
+    [c setAge]                  // synthesized setter
+    [c setage]                  // custom setter
+
 Problem #2: At the time of writing we generate a custom setter setage, which accesses the database. On top of that setAge is automatically synthesized and does not access the database – only the property named age (not wanted).
 
 Problem #3: We can disable the synthesised setter, but we cannot create a custom setter with capital A in the name.
 
-Decision #3: Only allow dot notation. Example code below. The getter and setter methods have names, which are so weird that they will never be called directly – only via the property. 
+Decision #3: Only allow dot notation. Example code below. The getter and setter methods have names, which are so weird that they will never be called directly – only via the property.
 
     @property (getter = _private_age, setter = _private_setage:) NSString *age;
 
-    -(NSString*)_private_age { 
+    -(NSString*)_private_age {
         return @"Getting a value from the database";
     }
 

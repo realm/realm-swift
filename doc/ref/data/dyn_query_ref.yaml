@@ -9,7 +9,7 @@
 ## JJEPSEN: "or" a obj-c keyword?
 ## JJEPSEN: count() does not take a column index as parameter (like in c++)
 ## JJEPSEN: max, min not defined for time compare as in c++.
-## !! Do we at all have a dynamic query interface? 
+## !! Do we at all have a dynamic query interface?
 ## !! All the Conditions don't take a colIndex...
 ## All the Combiners return (void) - don't they return TightdbQuery ? - check-&-fix
 
@@ -62,7 +62,7 @@ CATEGORIES :
                  - (TightdbQuery *)column:(size_t)colNdx isEqualToString:(NSString *)value
                  - (TightdbQuery *)column:(size_t)colNdx isEqualToString:(NSString *)value caseSensitive:(bool)caseSensitive
                  - (TightdbQuery *)column:(size_t)colNdx isEqualToDate:(time_t)value
-                 - (TightdbQuery *)column:(size_t)colNdx isEqualToBinary:(TightdbBinary *)value                 
+                 - (TightdbQuery *)column:(size_t)colNdx isEqualToBinary:(TightdbBinary *)value
       SUMMARY  : *g_dyn_query_equals_summary
       DESCR    : *g_dyn_query_equals_descr
       PARAMS:
@@ -189,7 +189,7 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_greaterThanOrEqual
-        
+
   - g_dyn_query_lessThan_integer:
       NAME     : "isLessThanInt:"
   - g_dyn_query_lessThan_float:
@@ -249,7 +249,7 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_lessThanOrEqual
-        
+
   - g_dyn_query_between_integer:
       NAME     : "isBetweenInt:"
   - g_dyn_query_between_float:
@@ -346,7 +346,7 @@ CATEGORIES :
   - g_dyn_query_contains_binary:
       TODO     : soon
   - g_dyn_query_contains_string:
-      NAME     : contains  
+      NAME     : contains
       TODO     : soon
   - g_dyn_query_contains_string_2:
       TODO     : soon
@@ -428,7 +428,7 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_subtable
- 
+
   - g_dyn_query_endSubtable:
       NAMES    : parent
       DESCR    : *g_dyn_query_endSubtable_descr
@@ -473,7 +473,7 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_findall
 
   - g_dyn_query_find:
-      NAMES    : find 
+      NAMES    : find
       DESCR    : *g_dyn_query_find_descr
       SUMMARY  : *g_dyn_query_find_summary
       SIGNATURE: |
@@ -557,7 +557,7 @@ CATEGORIES :
                  (double)maximumWithDoubleColumn:(size_t)colNdx
       PARAMS:
       - NAME   : colNdx
-        DESCR  : Column index. The datatype of the column must match the function called. 
+        DESCR  : Column index. The datatype of the column must match the function called.
         TYPES  : size_t
       RETURN:
         TYPES  : [int64_t, float, double, time_t]
@@ -618,7 +618,7 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_average
 
   - g_dyn_query_remove:
-      NAMES    : remove 
+      NAMES    : remove
       DESCR    : *g_dyn_query_remove_descr
       SUMMARY  : *g_dyn_query_remove_summary
       SIGNATURE: (NSNumber *)remove

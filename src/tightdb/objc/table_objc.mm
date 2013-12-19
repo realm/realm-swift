@@ -372,15 +372,15 @@ using namespace std;
     delete _tableView;
 }
 
--(TightdbCursor *)cursorAtIndex:(size_t)ndx 
+-(TightdbCursor *)cursorAtIndex:(size_t)ndx
 {
-    // The cursor constructor checks the index is in bounds. However, getSourceIndex should 
+    // The cursor constructor checks the index is in bounds. However, getSourceIndex should
     // not be called with illegal index.
 
-    if (ndx >= [self count]) 
+    if (ndx >= [self count])
         return nil;
-    
-    return [[TightdbCursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]]; 
+
+    return [[TightdbCursor alloc] initWithTable:[self getTable] ndx:[self getSourceIndex:ndx]];
 }
 
 -(size_t)count
@@ -552,12 +552,12 @@ using namespace std;
 {
     // TODO: Use core method for checking the equality of two table specs. Even in the typed interface
     // the user might add columns (_checkType for typed and spec against spec for dynamic).
-    
+
     const tightdb::DataType t = _table->get_column_type(col_ndx);
     if (t == tightdb::type_Table) {
         // TODO: Handle any exeptions from core lib.
-        _table->set_subtable(col_ndx, ndx, &subtable.getTable); 
-        return YES; 
+        _table->set_subtable(col_ndx, ndx, &subtable.getTable);
+        return YES;
     } else
         return NO;
 }
@@ -699,14 +699,14 @@ using namespace std;
                                  , @"com.tightdb.table", 0);
 }
 
--(TightdbCursor *)cursorAtIndex:(size_t)ndx 
+-(TightdbCursor *)cursorAtIndex:(size_t)ndx
 {
-    // initWithTable checks for illegal index.   
+    // initWithTable checks for illegal index.
 
     return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
 }
 
--(TightdbCursor *)cursorAtLastIndex 
+-(TightdbCursor *)cursorAtLastIndex
 {
     return [[TightdbCursor alloc] initWithTable:self ndx:[self count]-1];
 }
@@ -717,8 +717,8 @@ using namespace std;
     return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
 }
 
--(BOOL)insertRow:(size_t)ndx 
-{   
+-(BOOL)insertRow:(size_t)ndx
+{
     return [self insertRow:ndx error:nil];
 }
 
