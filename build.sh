@@ -436,6 +436,11 @@ EOF
         OBJC_DISABLE_GC=YES gdb --args "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest"
         ;;
 
+    "test-examples")
+        require_config || exit 1
+        $MAKE test  -C "examples" || exit 1
+        ;;
+
     "install-report")
         has_installed=0
         install_libdir="$(get_config_param "INSTALL_LIBDIR")"
