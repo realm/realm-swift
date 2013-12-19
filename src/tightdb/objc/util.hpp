@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <stdexcept>
 
-#include <tightdb/safe_int_ops.hpp>
+#include <tightdb/util/safe_int_ops.hpp>
 #include <tightdb/string_data.hpp>
 
 struct ObjcStringAccessor {
@@ -19,7 +19,8 @@ struct ObjcStringAccessor {
         }
         else {
             size_t max_size;
-            if (int_cast_with_overflow_detect([s maximumLengthOfBytesUsingEncoding:NSUTF8StringEncoding], max_size)) throw runtime_error("String size overflow");
+            if (util::int_cast_with_overflow_detect([s maximumLengthOfBytesUsingEncoding:NSUTF8StringEncoding], max_size))
+                throw runtime_error("String size overflow");
             char* data = new char[max_size];
             NSUInteger used;
             NSRange range = NSMakeRange(0, size);
@@ -66,7 +67,7 @@ inline NSError *make_tightdb_error(NSString *domain, TightdbErr code, NSString *
 
 #define TIGHTDB_EXCEPTION_ERRHANDLER(action, domain, failReturnValue) TIGHTDB_EXCEPTION_ERRHANDLER_EX(action, domain, failReturnValue, error)
 #define TIGHTDB_EXCEPTION_ERRHANDLER_EX(action, domain, failReturnValue, errVar) try { action }  \
-catch(tightdb::File::AccessError &ex) { \
+catch(tightdb::util::File::AccessError &ex) { \
     if (errVar) \
         *errVar = make_tightdb_error(domain, tdb_err_FileAccess, [NSString stringWithUTF8String:ex.what()]); \
         return failReturnValue; \
@@ -89,7 +90,8 @@ inline NSString* to_objc_string(tightdb::StringData s)
     using namespace tightdb;
     const char* data = s.data();
     NSUInteger size;
-    if (int_cast_with_overflow_detect(s.size(), size)) throw runtime_error("String size overflow");
+    if (util::int_cast_with_overflow_detect(s.size(), size))
+        throw runtime_error("String size overflow");
     return [[NSString alloc] initWithBytes:data length:size encoding:NSUTF8StringEncoding];
 }
 

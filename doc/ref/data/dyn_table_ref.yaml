@@ -100,7 +100,7 @@ CATEGORIES :
         DESCR  :
 
   - g_dyn_table_opertator!=:
-      TODO     : soon    
+      TODO     : soon
       NAME     : is???Equal
       SUMMARY  : *g_dyn_table_operator_neq_summary
       DESCR    : *g_dyn_table_operator_neq_descr
@@ -126,7 +126,7 @@ CATEGORIES :
   - g_dyn_table_rename_column:
       TODO     : later
 
-  
+
   - g_dyn_table_get_column_count:
       NAME     : getColumnCount
       SUMMARY  : *g_dyn_table_get_column_count_summary
@@ -138,7 +138,7 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_get_column_count
         DESCR  :
- 
+
   - g_dyn_table_get_column_name:
       NAME     : getColumnName
       SUMMARY  : *g_dyn_table_get_column_name_summary
@@ -238,7 +238,7 @@ CATEGORIES :
         DESCR  : Returns a dynamic cursor at the added row.
 
   - g_dyn_table_insert_empty_row:
-      NAME     : insertRowAtIndex 
+      NAME     : insertRowAtIndex
       SUMMARY  : *g_dyn_table_insert_empty_row_summary
       DESCR    : *g_dyn_table_insert_empty_row_descr
       SIGNATURE: -(TightdbCursor *)insertRowAtIndex:(size_t)ndx
@@ -257,7 +257,7 @@ CATEGORIES :
 #  - g_dyn_table_insert_int:
 #      NAME     : insertInt
 #  - g_dyn_table_insert_enum:
-#      INGORED  : "" 
+#      INGORED  : ""
 #  - g_dyn_table_insert_date:
 #      NAME     : insertDate
 #  - g_dyn_table_insert_string:
@@ -322,7 +322,7 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_remove
         DESCR  :
- 
+
   - g_dyn_table_remove_last_row:
       NAME     : removeLastRow
       SUMMARY  : *g_dyn_table_remove_last_row_summary
@@ -393,7 +393,7 @@ CATEGORIES :
       #  TYPES  : size_t
       #  DESCR  : *g_dyn_table_get_xxx_parm2_descr
       #RETURN:
-      #  TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, TightdbBinary*, 
+      #  TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, TightdbBinary*,
       #            TightdbMixed*, TightdbType, TightdbTable*]
       #  DESCR  : *g_dyn_table_get_xxx_return_descr
       #EXAMPLES:
@@ -443,7 +443,7 @@ CATEGORIES :
  #       TYPES  : size_t
  #       DESCR  : *g_dyn_table_get_xxx_parm2_descr
  #     - NAME   : value
- #       TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, TightdbBinary*, 
+ #       TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, TightdbBinary*,
  #                 const char*, size_t, TightdbMixed*]
  #       DESCR  : *g_dyn_table_set_xxx_parm3_descr
  #     - NAME   : data
@@ -508,7 +508,7 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_set_index
         DESCR  :
-        
+
   - g_dyn_table_has_index:
       NAME     : hasIndex
       SUMMARY  : *g_dyn_table_has_index_summary
@@ -524,8 +524,8 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_has_index
         DESCR  :
-        
-        
+
+
 - Searching:
   METHODS:
   - g_dyn_table_lookup:
@@ -721,7 +721,9 @@ CATEGORIES :
       PARAMS:
       - NAME   : colNdx
         TYPES  : size_t
-        DESCR  : *g_dyn_table_count_parm1_descr
+        DESCR  :
+        - TEXT : *g_dyn_table_count_parm1_descr0
+        - TEXT : *g_dyn_table_count_parm1_descr1
       - NAME   : target
         TYPES  : int64_t
         DESCR  : *g_dyn_table_count_parm2_descr
@@ -776,7 +778,7 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_maximum
         DESCR  :
-        
+
   - g_dyn_table_minimum_int:
   - g_dyn_table_minimum_float:
   - g_dyn_table_minimum_double:
@@ -820,8 +822,8 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_average
         DESCR  :
-        
-        
+
+
 - Dump:
   METHODS:
   - g_dyn_table_to_json:
