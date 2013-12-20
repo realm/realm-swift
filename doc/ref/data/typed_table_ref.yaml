@@ -299,7 +299,7 @@ CATEGORIES:
   - g_typed_table_where:
       NAMES    : where
       SIGNATURE: (TableName_Query *)where;
-      SUMMARY  : *g_typed_table_where_summery
+      SUMMARY  : *g_typed_table_where_summary
       DESCR    : This method initiates a query. See {@link class_typed_query}.
       RETURN:
         TYPES  : TableName_Query
