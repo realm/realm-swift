@@ -66,7 +66,7 @@ TIGHTDB_TABLE_2(QueryTable,
     NSLog(@"Mary: %zu", row);
     STAssertEquals(row, (size_t)1,@"Mary should have been there");
 
-    TightdbView* view = [table.Age findAll:21];
+    MyTable_View *view = [[[table where].Age columnIsEqualTo:21] findAll];
     size_t cnt = [view count];            // cnt = 2
     STAssertEquals(cnt, (size_t)2,@"Should be two rows in view");
 

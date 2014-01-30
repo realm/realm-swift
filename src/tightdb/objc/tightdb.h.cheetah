@@ -188,7 +188,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName${j+1}, CType${j+1}) \
 } \
 -(TableName##_View*)findAll \
 { \
-    return [[TableName##_View alloc] initFromQuery:self]; \
+    return [[TableName##_View alloc] _initWithQuery:self]; \
 } \
 @end \
 %for $j in range($num_cols)

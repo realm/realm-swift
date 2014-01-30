@@ -132,7 +132,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName1, CType1) \
 } \
 -(TableName##_View*)findAll \
 { \
-    return [[TableName##_View alloc] initFromQuery:self]; \
+    return [[TableName##_View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -357,7 +357,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName2, CType2) \
 } \
 -(TableName##_View*)findAll \
 { \
-    return [[TableName##_View alloc] initFromQuery:self]; \
+    return [[TableName##_View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -600,7 +600,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName3, CType3) \
 } \
 -(TableName##_View*)findAll \
 { \
-    return [[TableName##_View alloc] initFromQuery:self]; \
+    return [[TableName##_View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -861,7 +861,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName4, CType4) \
 } \
 -(TableName##_View*)findAll \
 { \
-    return [[TableName##_View alloc] initFromQuery:self]; \
+    return [[TableName##_View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -1140,7 +1140,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName5, CType5) \
 } \
 -(TableName##_View*)findAll \
 { \
-    return [[TableName##_View alloc] initFromQuery:self]; \
+    return [[TableName##_View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -1437,7 +1437,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName6, CType6) \
 } \
 -(TableName##_View*)findAll \
 { \
-    return [[TableName##_View alloc] initFromQuery:self]; \
+    return [[TableName##_View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -1752,7 +1752,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName7, CType7) \
 } \
 -(TableName##_View*)findAll \
 { \
-    return [[TableName##_View alloc] initFromQuery:self]; \
+    return [[TableName##_View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -2085,7 +2085,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName8, CType8) \
 } \
 -(TableName##_View*)findAll \
 { \
-    return [[TableName##_View alloc] initFromQuery:self]; \
+    return [[TableName##_View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -2436,7 +2436,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName9, CType9) \
 } \
 -(TableName##_View*)findAll \
 { \
-    return [[TableName##_View alloc] initFromQuery:self]; \
+    return [[TableName##_View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -2805,7 +2805,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName10, CType10) \
 } \
 -(TableName##_View*)findAll \
 { \
-    return [[TableName##_View alloc] initFromQuery:self]; \
+    return [[TableName##_View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -3192,7 +3192,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName11, CType11) \
 } \
 -(TableName##_View*)findAll \
 { \
-    return [[TableName##_View alloc] initFromQuery:self]; \
+    return [[TableName##_View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -3597,7 +3597,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName12, CType12) \
 } \
 -(TableName##_View*)findAll \
 { \
-    return [[TableName##_View alloc] initFromQuery:self]; \
+    return [[TableName##_View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -4020,7 +4020,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName13, CType13) \
 } \
 -(TableName##_View*)findAll \
 { \
-    return [[TableName##_View alloc] initFromQuery:self]; \
+    return [[TableName##_View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -4461,7 +4461,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName14, CType14) \
 } \
 -(TableName##_View*)findAll \
 { \
-    return [[TableName##_View alloc] initFromQuery:self]; \
+    return [[TableName##_View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -4920,7 +4920,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName15, CType15) \
 } \
 -(TableName##_View*)findAll \
 { \
-    return [[TableName##_View alloc] initFromQuery:self]; \
+    return [[TableName##_View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
