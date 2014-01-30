@@ -110,7 +110,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"Mary: %zu", row);
     STAssertEquals(row, (size_t)1,@"Mary should have been there", nil);
 
-    TightdbView *view = [people.Age findAll:21];
+    PeopleTable_View *view = [[[people where].Age columnIsEqualTo:21] findAll];
     size_t cnt = [view count];             // cnt = 2
     STAssertEquals(cnt, (size_t)2,@"Should be two rows in view", nil);
 

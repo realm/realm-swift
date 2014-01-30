@@ -8,16 +8,21 @@
 
 @interface TightdbBinary()
 
--(tightdb::BinaryData)getBinary;
+-(tightdb::BinaryData)getNativeBinary;
 
 @end
 
+@interface TightdbView()
+
++(TightdbView*)viewWithTable:(TightdbTable*)table andNativeView:(const tightdb::TableView&)view;
+
+@end
 
 @interface TightdbTable()
 
-@property (nonatomic) tightdb::TableRef table;
+-(tightdb::Table&)getNativeTable;
 
--(tightdb::Table&)getTable;
+-(void)setNativeTable:(tightdb::Table*)table;
 
 -(void)setParent:(id)parent; // Workaround for ARC release problem.
 
