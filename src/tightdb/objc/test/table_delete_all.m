@@ -14,20 +14,19 @@
 -(void)testTableDeleteAll
 {
     // Create table with all column types
-    TightdbTable *table = [[TightdbTable alloc] init];
-    TightdbSpec *s = [table getSpec];
-    [s addColumnWithType:tightdb_Int andName:@"int"];
-    [s addColumnWithType:tightdb_Bool andName:@"bool"];
-    [s addColumnWithType:tightdb_Date andName:@"date"];
-    [s addColumnWithType:tightdb_String andName:@"string"];
-    [s addColumnWithType:tightdb_String andName:@"string_long"];
-    [s addColumnWithType:tightdb_String andName:@"string_enum"];
-    [s addColumnWithType:tightdb_Binary andName:@"binary"];
-    [s addColumnWithType:tightdb_Mixed andName:@"mixed"];
-    TightdbSpec *sub = [s addColumnTable:@"tables"];
-    [sub addColumnWithType:tightdb_Int andName:@"sub_first"];
-    [sub addColumnWithType:tightdb_String andName:@"sub_second"];
-    [table updateFromSpec];
+    TightdbTable* table = [[TightdbTable alloc] init];
+    TightdbDescriptor* desc = [table getDescriptor];
+    [desc addColumnWithType:tightdb_Int andName:@"int"];
+    [desc addColumnWithType:tightdb_Bool andName:@"bool"];
+    [desc addColumnWithType:tightdb_Date andName:@"date"];
+    [desc addColumnWithType:tightdb_String andName:@"string"];
+    [desc addColumnWithType:tightdb_String andName:@"string_long"];
+    [desc addColumnWithType:tightdb_String andName:@"string_enum"];
+    [desc addColumnWithType:tightdb_Binary andName:@"binary"];
+    [desc addColumnWithType:tightdb_Mixed andName:@"mixed"];
+    TightdbDescriptor* subdesc = [desc addColumnTable:@"tables"];
+    [subdesc addColumnWithType:tightdb_Int andName:@"sub_first"];
+    [subdesc addColumnWithType:tightdb_String andName:@"sub_second"];
 
     // Add some rows
     for (size_t i = 0; i < 15; ++i) {
@@ -66,7 +65,7 @@
 
         // Add sub-tables
         if (i == 2) {
-            TightdbTable *subtable = [table getSubtable:8 ndx:i];
+            TightdbTable* subtable = [table getSubtable:8 ndx:i];
             [subtable insertInt:0 ndx:0 value:42];
             [subtable insertString:1 ndx:0 value:@"meaning"];
             [subtable insertDone];
