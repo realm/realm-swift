@@ -61,15 +61,15 @@
 @end
 
 
-@interface TightdbSpec: NSObject
+@interface TightdbDescriptor: NSObject
 /// Returns NO on memory allocation error.
 -(BOOL)addColumnWithType:(TightdbType)type andName:(NSString *)name;
 -(BOOL)addColumnWithType:(TightdbType)type andName:(NSString *)name error:(NSError *__autoreleasing *)error;
 /// Returns nil on memory allocation error.
--(TightdbSpec *)addColumnTable:(NSString *)name;
--(TightdbSpec *)addColumnTable:(NSString *)name error:(NSError *__autoreleasing *)error;
--(TightdbSpec *)getSubspec:(size_t)colNdx;
--(TightdbSpec *)getSubspec:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(TightdbDescriptor *)addColumnTable:(NSString *)name;
+-(TightdbDescriptor *)addColumnTable:(NSString *)name error:(NSError *__autoreleasing *)error;
+-(TightdbDescriptor *)getSubdescriptor:(size_t)colNdx;
+-(TightdbDescriptor *)getSubdescriptor:(size_t)colNdx error:(NSError *__autoreleasing *)error;
 -(size_t)getColumnCount;
 -(TightdbType)getColumnType:(size_t)colNdx;
 -(NSString *)getColumnName:(size_t)colNdx;
@@ -78,8 +78,6 @@
 
 
 @interface TightdbTable: NSObject <NSFastEnumeration>
--(BOOL)updateFromSpec;
--(BOOL)updateFromSpecWithError:(NSError *__autoreleasing *)error;
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
 -(BOOL)isEqual:(TightdbTable *)other;
@@ -119,8 +117,8 @@
 -(NSString *)getColumnName:(size_t)ndx;
 -(size_t)getColumnIndex:(NSString *)name;
 -(TightdbType)getColumnType:(size_t)ndx;
--(TightdbSpec *)getSpec;
--(TightdbSpec *)getSpecWithError:(NSError *__autoreleasing *)error;
+-(TightdbDescriptor *)getDescriptor;
+-(TightdbDescriptor *)getDescriptorWithError:(NSError *__autoreleasing *)error;
 -(BOOL)isEmpty;
 -(size_t)count;
 -(TightdbCursor *)addRow;
