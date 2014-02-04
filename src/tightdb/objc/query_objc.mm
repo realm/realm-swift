@@ -3,10 +3,12 @@
 //  TightDB
 //
 
+#include <tightdb/util/unique_ptr.hpp>
+#include <tightdb/util/file.hpp>
+#include <tightdb/exceptions.hpp>
 #include <tightdb/table.hpp>
 #include <tightdb/table_view.hpp>
 #include <tightdb/query.hpp>
-#include <tightdb/lang_bind_helper.hpp>
 
 #import <tightdb/objc/query.h>
 #import <tightdb/objc/table.h>
@@ -18,48 +20,43 @@
 using namespace std;
 
 
-@interface TightdbView()
-+(TightdbView *)tableViewWithTableView:(tightdb::TableView)table;
-@end
-
-
 @interface TightdbQuery()
 {
     @public
-    NSError *_error; // To enable the flow of multiple stacked queries, any error is kept until the last step.
+    NSError* m_error; // To enable the flow of multiple stacked queries, any error is kept until the last step.
 }
 @end
 
 
 @implementation TightdbQuery
 {
-    tightdb::Query *_query;
-    __weak TightdbTable *_table;
+    tightdb::util::UniquePtr<tightdb::Query> m_query;
+    __weak TightdbTable* m_table;
 
-    TightdbCursor *tmpCursor;
+    TightdbCursor* m_tmp_cursor;
 }
 
--(id)initWithTable:(TightdbTable *)table
+-(id)initWithTable:(TightdbTable*)table
 {
     return [self initWithTable:table error:nil];
 }
 
--(id)initWithTable:(TightdbTable *)table error:(NSError *__autoreleasing *)error
+-(id)initWithTable:(TightdbTable*)table error:(NSError* __autoreleasing*)error
 {
     self = [super init];
     if (self) {
-        _table = table;
+        m_table = table;
         TIGHTDB_EXCEPTION_ERRHANDLER(
-                                     _query = new tightdb::Query([_table getTable].where());
-                                     , @"com.tightdb.query", nil);
+            m_query.reset(new tightdb::Query([table getNativeTable].where()));,
+            nil);
     }
     return self;
 }
 
--(TightdbCursor *)getCursor:(long)ndx
+-(TightdbCursor*)getCursor:(long)ndx
 {
 
-    return tmpCursor = [[TightdbCursor alloc] initWithTable:[self getTable] ndx:ndx];
+    return m_tmp_cursor = [[TightdbCursor alloc] initWithTable:[self getTable] ndx:ndx];
 }
 
 -(long)getFastEnumStart
@@ -72,18 +69,18 @@ using namespace std;
     return [self find:ndx];
 }
 
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState*)state objects:(id __unsafe_unretained*)stackbuf count:(NSUInteger)len
 {
     (void)len;
     if(state->state == 0)
     {
         state->state = [self getFastEnumStart];
-        state->mutationsPtr = (unsigned long *)objc_unretainedPointer(self);
-        TightdbCursor *tmp = [self getCursor:state->state];
+        state->mutationsPtr = (unsigned long*)objc_unretainedPointer(self);
+        TightdbCursor* tmp = [self getCursor:state->state];
         *stackbuf = tmp;
     }
     if ((int)state->state != -1) {
-        [((TightdbCursor *)*stackbuf) setNdx:state->state];
+        [((TightdbCursor*)*stackbuf) setNdx:state->state];
         state->itemsPtr = stackbuf;
         state->state = [self incrementFastEnum:state->state+1];
     } else {
@@ -95,553 +92,532 @@ using namespace std;
     return 1;
 }
 
-// Due to cyclic ARC problems. You have to clear manually. (Must be called from client code)
--(void)clear
-{
-    _table = nil;
-}
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"Query dealloc");
+    NSLog(@"TightdbQuery dealloc");
 #endif
-    delete _query;
 }
 
--(tightdb::Query *)getQuery
+-(tightdb::Query&)getNativeQuery
 {
-    return _query;
+    return *m_query;
 }
 
--(TightdbTable *)getTable
+-(TightdbTable*)getTable
 {
-    return _table;
+    return m_table;
 }
 
--(TightdbQuery *)group
+-(TightdbQuery*)group
 {
-    TIGHTDB_EXCEPTION_ERRHANDLER_EX(
-                                 _query->group();
-                                 , @"com.tightdb.query", self, &_error);
+    TIGHTDB_EXCEPTION_ERRHANDLER_EX(m_query->group();, self, &m_error);
     return self;
 }
--(TightdbQuery *)or
+-(TightdbQuery*)or
 {
-    TIGHTDB_EXCEPTION_ERRHANDLER_EX(
-                                    _query->Or();
-                                    , @"com.tightdb.query", self, &_error);
+    TIGHTDB_EXCEPTION_ERRHANDLER_EX(m_query->Or();, self, &m_error);
     return self;
 }
--(TightdbQuery *)endgroup
+-(TightdbQuery*)endgroup
 {
-    TIGHTDB_EXCEPTION_ERRHANDLER_EX(
-                                    _query->end_group();
-                                    , @"com.tightdb.query", self, &_error);
+    TIGHTDB_EXCEPTION_ERRHANDLER_EX(m_query->end_group();, self, &m_error);
     return self;
 }
 -(void)subtable:(size_t)column
 {
-    _query->subtable(column);
+    m_query->subtable(column);
 }
 -(void)parent
 {
-    _query->end_subtable();
+    m_query->end_subtable();
 }
 
--(NSNumber *)count
+-(NSNumber*)count
 {
     return [self countWithError:nil];
 }
--(NSNumber *)countWithError:(NSError *__autoreleasing *)error
+-(NSNumber*)countWithError:(NSError* __autoreleasing*)error
 {
-    if (_error) {
+    if (m_error) {
         if (error) {
-            *error = _error;
-            _error = nil;
+            *error = m_error;
+            m_error = nil;
         }
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber TIGHTDB_OBJC_SIZE_T_NUMBER_IN:_query->count()];
-                                 , @"com.tightdb.query", nil);
+        return [NSNumber TIGHTDB_OBJC_SIZE_T_NUMBER_IN:m_query->count()];,
+        nil);
 }
 
--(NSNumber *)remove
+-(NSNumber*)remove
 {
     return [self removeWithError:nil];
 }
 
--(NSNumber *)removeWithError:(NSError *__autoreleasing *)error
+-(NSNumber*)removeWithError:(NSError* __autoreleasing*)error
 {
-    if (_error) {
+    if (m_error) {
         if (error) {
-            *error = _error;
-            _error = nil;
+            *error = m_error;
+            m_error = nil;
         }
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber TIGHTDB_OBJC_SIZE_T_NUMBER_IN:_query->remove()];
-                                 , @"com.tightdb.query", nil);
+        return [NSNumber TIGHTDB_OBJC_SIZE_T_NUMBER_IN:m_query->remove()];,
+        nil);
 }
 
--(NSNumber *)minimumWithIntColumn:(size_t)col_ndx
+-(NSNumber*)minimumWithIntColumn:(size_t)col_ndx
 {
     return [self minimumWithIntColumn:col_ndx error:nil];
 }
--(NSNumber *)minimumWithIntColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber*)minimumWithIntColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
 {
-    if (_error) {
+    if (m_error) {
         if (error) {
-            *error = _error;
-            _error = nil;
+            *error = m_error;
+            m_error = nil;
         }
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithLongLong:_query->minimum_int(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+        return [NSNumber numberWithLongLong:m_query->minimum_int(col_ndx)];,
+        nil);
 }
 
--(NSNumber *)minimumWithFloatColumn:(size_t)col_ndx
+-(NSNumber*)minimumWithFloatColumn:(size_t)col_ndx
 {
     return [self minimumWithFloatColumn:col_ndx error:nil];
 }
--(NSNumber *)minimumWithFloatColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber*)minimumWithFloatColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
 {
-    if (_error) {
+    if (m_error) {
         if (error) {
-            *error = _error;
-            _error = nil;
+            *error = m_error;
+            m_error = nil;
         }
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithFloat:_query->minimum_float(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+        return [NSNumber numberWithFloat:m_query->minimum_float(col_ndx)];,
+        nil);
 }
 
--(NSNumber *)minimumWithDoubleColumn:(size_t)col_ndx
+-(NSNumber*)minimumWithDoubleColumn:(size_t)col_ndx
 {
     return [self minimumWithDoubleColumn:col_ndx error:nil];
 }
--(NSNumber *)minimumWithDoubleColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber*)minimumWithDoubleColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
 {
-    if (_error) {
+    if (m_error) {
         if (error) {
-            *error = _error;
-            _error = nil;
+            *error = m_error;
+            m_error = nil;
         }
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithDouble:_query->minimum_double(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+        return [NSNumber numberWithDouble:m_query->minimum_double(col_ndx)];,
+        nil);
 }
 
--(NSNumber *)maximumWithIntColumn:(size_t)col_ndx
+-(NSNumber*)maximumWithIntColumn:(size_t)col_ndx
 {
     return [self maximumWithIntColumn:col_ndx error:nil];
 }
--(NSNumber *)maximumWithIntColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber*)maximumWithIntColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
 {
-    if (_error) {
+    if (m_error) {
         if (error) {
-            *error = _error;
-            _error = nil;
+            *error = m_error;
+            m_error = nil;
         }
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithLongLong:_query->maximum_int(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+        return [NSNumber numberWithLongLong:m_query->maximum_int(col_ndx)];,
+        nil);
 }
--(NSNumber *)maximumWithFloatColumn:(size_t)col_ndx
+-(NSNumber*)maximumWithFloatColumn:(size_t)col_ndx
 {
     return [self maximumWithFloatColumn:col_ndx error:nil];
 }
--(NSNumber *)maximumWithFloatColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber*)maximumWithFloatColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
 {
-    if (_error) {
+    if (m_error) {
         if (error) {
-            *error = _error;
-            _error = nil;
+            *error = m_error;
+            m_error = nil;
         }
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithFloat:_query->maximum_float(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+        return [NSNumber numberWithFloat:m_query->maximum_float(col_ndx)];,
+        nil);
 }
 
--(NSNumber *)maximumWithDoubleColumn:(size_t)col_ndx
+-(NSNumber*)maximumWithDoubleColumn:(size_t)col_ndx
 {
     return [self maximumWithDoubleColumn:col_ndx error:nil];
 }
--(NSNumber *)maximumWithDoubleColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber*)maximumWithDoubleColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
 {
-    if (_error) {
+    if (m_error) {
         if (error) {
-            *error = _error;
-            _error = nil;
+            *error = m_error;
+            m_error = nil;
         }
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithDouble:_query->maximum_double(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+        return [NSNumber numberWithDouble:m_query->maximum_double(col_ndx)];,
+        nil);
 }
 
--(NSNumber *)sumWithIntColumn:(size_t)col_ndx
+-(NSNumber*)sumWithIntColumn:(size_t)col_ndx
 {
     return [self sumWithIntColumn:col_ndx error:nil];
 }
--(NSNumber *)sumWithIntColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber*)sumWithIntColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
 {
-    if (_error) {
+    if (m_error) {
         if (error) {
-            *error = _error;
-            _error = nil;
+            *error = m_error;
+            m_error = nil;
         }
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithLongLong:_query->sum_int(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+        return [NSNumber numberWithLongLong:m_query->sum_int(col_ndx)];,
+        nil);
 }
 
--(NSNumber *)sumWithFloatColumn:(size_t)col_ndx
+-(NSNumber*)sumWithFloatColumn:(size_t)col_ndx
 {
     return [self sumWithFloatColumn:col_ndx error:nil];
 }
--(NSNumber *)sumWithFloatColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber*)sumWithFloatColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
 {
-    if (_error) {
+    if (m_error) {
         if (error) {
-            *error = _error;
-            _error = nil;
+            *error = m_error;
+            m_error = nil;
         }
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithFloat:_query->sum_float(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+        return [NSNumber numberWithFloat:m_query->sum_float(col_ndx)];,
+        nil);
 }
 
--(NSNumber *)sumWithDoubleColumn:(size_t)col_ndx
+-(NSNumber*)sumWithDoubleColumn:(size_t)col_ndx
 {
     return [self sumWithDoubleColumn:col_ndx error:nil];
 }
--(NSNumber *)sumWithDoubleColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber*)sumWithDoubleColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
 {
-    if (_error) {
+    if (m_error) {
         if (error) {
-            *error = _error;
-            _error = nil;
+            *error = m_error;
+            m_error = nil;
         }
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithDouble:_query->sum_double(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+        return [NSNumber numberWithDouble:m_query->sum_double(col_ndx)];,
+        nil);
 }
 
--(NSNumber *)averageWithIntColumn:(size_t)col_ndx
+-(NSNumber*)averageWithIntColumn:(size_t)col_ndx
 {
     return [self averageWithIntColumn:col_ndx error:nil];
 }
--(NSNumber *)averageWithIntColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber*)averageWithIntColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
 {
-    if (_error) {
+    if (m_error) {
         if (error) {
-            *error = _error;
-            _error = nil;
+            *error = m_error;
+            m_error = nil;
         }
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithDouble:_query->average_int(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+        return [NSNumber numberWithDouble:m_query->average_int(col_ndx)];,
+        nil);
 }
--(NSNumber *)averageWithFloatColumn:(size_t)col_ndx
+-(NSNumber*)averageWithFloatColumn:(size_t)col_ndx
 {
     return [self averageWithFloatColumn:col_ndx error:nil];
 }
--(NSNumber *)averageWithFloatColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber*)averageWithFloatColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
 {
-    if (_error) {
+    if (m_error) {
         if (error) {
-            *error = _error;
-            _error = nil;
+            *error = m_error;
+            m_error = nil;
         }
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithDouble:_query->average_float(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+        return [NSNumber numberWithDouble:m_query->average_float(col_ndx)];,
+        nil);
 }
 
--(NSNumber *)averageWithDoubleColumn:(size_t)col_ndx
+-(NSNumber*)averageWithDoubleColumn:(size_t)col_ndx
 {
     return [self averageWithDoubleColumn:col_ndx error:nil];
 }
 
--(NSNumber *)averageWithDoubleColumn:(size_t)col_ndx error:(NSError *__autoreleasing *)error
+-(NSNumber*)averageWithDoubleColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
 {
-    if (_error) {
+    if (m_error) {
         if (error) {
-            *error = _error;
-            _error = nil;
+            *error = m_error;
+            m_error = nil;
         }
         return nil;
     }
     TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return [NSNumber numberWithDouble:_query->average_double(col_ndx)];
-                                 , @"com.tightdb.query", nil);
+        return [NSNumber numberWithDouble:m_query->average_double(col_ndx)];,
+        nil);
 }
 
--(tightdb::TableView)getTableView
+-(TightdbView*)findAll
 {
-    return _query->find_all();
+    tightdb::TableView view = m_query->find_all();
+    return [TightdbView viewWithTable:m_table andNativeView:view];
 }
-
-
--(TightdbView *)findAll {
-
-    // jjepsen: please review this.
-    return [[TightdbView alloc] initFromQuery:self];
-}
-
 
 -(size_t)find:(size_t)last
 {
     return [self find:last error:nil];
 }
--(size_t)find:(size_t)last error:(NSError *__autoreleasing *)error
+-(size_t)find:(size_t)last error:(NSError* __autoreleasing*)error
 {
-    if (_error) {
+    if (m_error) {
         if (error) {
-            *error = _error;
-            _error = nil;
+            *error = m_error;
+            m_error = nil;
         }
         return size_t(-1);
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 return _query->find(last);
-                                 , @"com.tightdb.query", size_t(-1));
+    TIGHTDB_EXCEPTION_ERRHANDLER(return m_query->find(last);, size_t(-1));
 }
 
 
 // Conditions:
 
 
--(TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and_:(int64_t)to
+-(TightdbQuery*)column:(size_t)colNdx isBetweenInt:(int64_t)from and_:(int64_t)to
 {
-    _query->between(colNdx, from, to);
+    m_query->between(colNdx, from, to);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and_:(float)to
+-(TightdbQuery*)column:(size_t)colNdx isBetweenFloat:(float)from and_:(float)to
 {
-    _query->between(colNdx, from, to);
+    m_query->between(colNdx, from, to);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isBetweenDouble:(double)from and_:(double)to
+-(TightdbQuery*)column:(size_t)colNdx isBetweenDouble:(double)from and_:(double)to
 {
-    _query->between(colNdx, from, to);
+    m_query->between(colNdx, from, to);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isBetweenDate:(time_t)from and_:(time_t)to
+-(TightdbQuery*)column:(size_t)colNdx isBetweenDate:(time_t)from and_:(time_t)to
 {
-    _query->between_datetime(colNdx, from, to);
+    m_query->between_datetime(colNdx, from, to);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isEqualToBool:(bool)value
+-(TightdbQuery*)column:(size_t)colNdx isEqualToBool:(bool)value
 {
-    _query->equal(colNdx, value);
+    m_query->equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isEqualToInt:(int64_t)value
+-(TightdbQuery*)column:(size_t)colNdx isEqualToInt:(int64_t)value
 {
-    _query->equal(colNdx, value);
+    m_query->equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isEqualToFloat:(float)value
+-(TightdbQuery*)column:(size_t)colNdx isEqualToFloat:(float)value
 {
-    _query->equal(colNdx, value);
+    m_query->equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isEqualToDouble:(double)value
+-(TightdbQuery*)column:(size_t)colNdx isEqualToDouble:(double)value
 {
-    _query->equal(colNdx, value);
+    m_query->equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isEqualToString:(NSString *)value
+-(TightdbQuery*)column:(size_t)colNdx isEqualToString:(NSString*)value
 {
-    _query->equal(colNdx, ObjcStringAccessor(value));
+    m_query->equal(colNdx, ObjcStringAccessor(value));
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isEqualToString:(NSString *)value caseSensitive:(bool)caseSensitive
+-(TightdbQuery*)column:(size_t)colNdx isEqualToString:(NSString*)value caseSensitive:(bool)caseSensitive
 {
-    _query->equal(colNdx, ObjcStringAccessor(value), caseSensitive);
+    m_query->equal(colNdx, ObjcStringAccessor(value), caseSensitive);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isEqualToDate:(time_t)value
+-(TightdbQuery*)column:(size_t)colNdx isEqualToDate:(time_t)value
 {
-    _query->equal_datetime(colNdx, value);
+    m_query->equal_datetime(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isEqualToBinary:(TightdbBinary *)value
+-(TightdbQuery*)column:(size_t)colNdx isEqualToBinary:(TightdbBinary*)value
 {
-    _query->equal(colNdx, [value getBinary]);
+    m_query->equal(colNdx, [value getNativeBinary]);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isNotEqualToInt:(int64_t)value
+-(TightdbQuery*)column:(size_t)colNdx isNotEqualToInt:(int64_t)value
 {
-    _query->not_equal(colNdx, value);
+    m_query->not_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isNotEqualToFloat:(float)value
+-(TightdbQuery*)column:(size_t)colNdx isNotEqualToFloat:(float)value
 {
-    _query->not_equal(colNdx, value);
+    m_query->not_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isNotEqualToDouble:(double)value
+-(TightdbQuery*)column:(size_t)colNdx isNotEqualToDouble:(double)value
 {
-    _query->not_equal(colNdx, value);
+    m_query->not_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isNotEqualToString:(NSString *)value
+-(TightdbQuery*)column:(size_t)colNdx isNotEqualToString:(NSString*)value
 {
-    _query->not_equal(colNdx, ObjcStringAccessor(value));
+    m_query->not_equal(colNdx, ObjcStringAccessor(value));
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isNotEqualToString:(NSString *)value caseSensitive:(bool)caseSensitive
+-(TightdbQuery*)column:(size_t)colNdx isNotEqualToString:(NSString*)value caseSensitive:(bool)caseSensitive
 {
-    _query->not_equal(colNdx, ObjcStringAccessor(value), caseSensitive);
+    m_query->not_equal(colNdx, ObjcStringAccessor(value), caseSensitive);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isNotEqualToDate:(time_t)value
+-(TightdbQuery*)column:(size_t)colNdx isNotEqualToDate:(time_t)value
 {
-    _query->not_equal_datetime(colNdx, value);
+    m_query->not_equal_datetime(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isNotEqualToBinary:(TightdbBinary *)value
+-(TightdbQuery*)column:(size_t)colNdx isNotEqualToBinary:(TightdbBinary*)value
 {
-    _query->not_equal(colNdx, [value getBinary]);
+    m_query->not_equal(colNdx, [value getNativeBinary]);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanInt:(int64_t)value
+-(TightdbQuery*)column:(size_t)colNdx isGreaterThanInt:(int64_t)value
 {
-    _query->greater(colNdx, value);
+    m_query->greater(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanFloat:(float)value
+-(TightdbQuery*)column:(size_t)colNdx isGreaterThanFloat:(float)value
 {
-    _query->greater(colNdx, value);
+    m_query->greater(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanDouble:(double)value
+-(TightdbQuery*)column:(size_t)colNdx isGreaterThanDouble:(double)value
 {
-    _query->greater(colNdx, value);
+    m_query->greater(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanDate:(time_t)value
+-(TightdbQuery*)column:(size_t)colNdx isGreaterThanDate:(time_t)value
 {
-    _query->greater_datetime(colNdx, value);
+    m_query->greater_datetime(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToInt:(int64_t)value
+-(TightdbQuery*)column:(size_t)colNdx isGreaterThanOrEqualToInt:(int64_t)value
 {
-    _query->greater_equal(colNdx, value);
+    m_query->greater_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToFloat:(float)value
+-(TightdbQuery*)column:(size_t)colNdx isGreaterThanOrEqualToFloat:(float)value
 {
-    _query->greater_equal(colNdx, value);
+    m_query->greater_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToDouble:(double)value
+-(TightdbQuery*)column:(size_t)colNdx isGreaterThanOrEqualToDouble:(double)value
 {
-    _query->greater_equal(colNdx, value);
+    m_query->greater_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToDate:(time_t)value
+-(TightdbQuery*)column:(size_t)colNdx isGreaterThanOrEqualToDate:(time_t)value
 {
-    _query->greater_equal_datetime(colNdx, value);
+    m_query->greater_equal_datetime(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isLessThanInt:(int64_t)value
+-(TightdbQuery*)column:(size_t)colNdx isLessThanInt:(int64_t)value
 {
-    _query->less(colNdx, value);
+    m_query->less(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isLessThanFloat:(float)value
+-(TightdbQuery*)column:(size_t)colNdx isLessThanFloat:(float)value
 {
-    _query->less(colNdx, value);
+    m_query->less(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isLessThanDouble:(double)value
+-(TightdbQuery*)column:(size_t)colNdx isLessThanDouble:(double)value
 {
-    _query->less(colNdx, value);
+    m_query->less(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isLessThanDate:(time_t)value
+-(TightdbQuery*)column:(size_t)colNdx isLessThanDate:(time_t)value
 {
-    _query->less_datetime(colNdx, value);
+    m_query->less_datetime(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToInt:(int64_t)value
+-(TightdbQuery*)column:(size_t)colNdx isLessThanOrEqualToInt:(int64_t)value
 {
-    _query->less_equal(colNdx, value);
+    m_query->less_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToFloat:(float)value
+-(TightdbQuery*)column:(size_t)colNdx isLessThanOrEqualToFloat:(float)value
 {
-    _query->less_equal(colNdx, value);
+    m_query->less_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToDouble:(double)value
+-(TightdbQuery*)column:(size_t)colNdx isLessThanOrEqualToDouble:(double)value
 {
-    _query->less_equal(colNdx, value);
+    m_query->less_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToDate:(time_t)value
+-(TightdbQuery*)column:(size_t)colNdx isLessThanOrEqualToDate:(time_t)value
 {
-    _query->less_equal_datetime(colNdx, value);
+    m_query->less_equal_datetime(colNdx, value);
     return self;
 }
 
@@ -660,10 +636,10 @@ using namespace std;
 
 @implementation TightdbQueryAccessorBool
 {
-    __weak TightdbQuery *_query;
+    __weak TightdbQuery* _query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
@@ -672,9 +648,9 @@ using namespace std;
     }
     return self;
 }
--(TightdbQuery *)columnIsEqualTo:(BOOL)value
+-(TightdbQuery*)columnIsEqualTo:(BOOL)value
 {
-    [_query getQuery]->equal(_column_ndx, (bool)value);
+    [_query getNativeQuery].equal(_column_ndx, bool(value));
     return _query;
 }
 @end
@@ -682,10 +658,10 @@ using namespace std;
 
 @implementation TightdbQueryAccessorInt
 {
-    __weak TightdbQuery *_query;
+    __weak TightdbQuery* _query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
@@ -695,92 +671,92 @@ using namespace std;
     return self;
 }
 
--(TightdbQuery *)columnIsEqualTo:(int64_t)value
+-(TightdbQuery*)columnIsEqualTo:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
-                                    [_query getQuery]->equal(_column_ndx, value);
-                                    , @"com.tightdb.queryaccessor", _query, &_query->_error);
+        [_query getNativeQuery].equal(_column_ndx, value);,
+        _query, &_query->m_error);
     return _query;
 }
 
--(TightdbQuery *)columnIsNotEqualTo:(int64_t)value
+-(TightdbQuery*)columnIsNotEqualTo:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
-                                    [_query getQuery]->not_equal(_column_ndx, value);
-                                    , @"com.tightdb.queryaccessor", _query, &_query->_error);
+        [_query getNativeQuery].not_equal(_column_ndx, value);,
+        _query, &_query->m_error);
     return _query;
 }
 
--(TightdbQuery *)columnIsGreaterThan:(int64_t)value
+-(TightdbQuery*)columnIsGreaterThan:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
-                                    [_query getQuery]->greater(_column_ndx, value);
-                                    , @"com.tightdb.queryaccessor", _query, &_query->_error);
+        [_query getNativeQuery].greater(_column_ndx, value);,
+        _query, &_query->m_error);
     return _query;
 }
 
--(TightdbQuery *)columnIsGreaterThanOrEqualTo:(int64_t)value
+-(TightdbQuery*)columnIsGreaterThanOrEqualTo:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
-                                    [_query getQuery]->greater_equal(_column_ndx, value);
-                                    , @"com.tightdb.queryaccessor", _query, &_query->_error);
+        [_query getNativeQuery].greater_equal(_column_ndx, value);,
+        _query, &_query->m_error);
     return _query;
 }
 
--(TightdbQuery *)columnIsLessThan:(int64_t)value
+-(TightdbQuery*)columnIsLessThan:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
-                                    [_query getQuery]->less(_column_ndx, value);
-                                    , @"com.tightdb.queryaccessor", _query, &_query->_error);
+        [_query getNativeQuery].less(_column_ndx, value);,
+        _query, &_query->m_error);
     return _query;
 }
 
--(TightdbQuery *)columnIsLessThanOrEqualTo:(int64_t)value
+-(TightdbQuery*)columnIsLessThanOrEqualTo:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
-                                    [_query getQuery]->less_equal(_column_ndx, value);
-                                    , @"com.tightdb.queryaccessor", _query, &_query->_error);
+        [_query getNativeQuery].less_equal(_column_ndx, value);,
+        _query, &_query->m_error);
     return _query;
 }
 
--(TightdbQuery *)columnIsBetween:(int64_t)from and_:(int64_t)to
+-(TightdbQuery*)columnIsBetween:(int64_t)from and_:(int64_t)to
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
-                                    [_query getQuery]->between(_column_ndx, from, to);
-                                    , @"com.tightdb.queryaccessor", _query, &_query->_error);
+        [_query getNativeQuery].between(_column_ndx, from, to);,
+        _query, &_query->m_error);
     return _query;
 }
 
--(NSNumber *)minimum
+-(NSNumber*)minimum
 {
     return [self minimumWithError:nil];
 }
--(NSNumber *)minimumWithError:(NSError *__autoreleasing *)error
+-(NSNumber*)minimumWithError:(NSError* __autoreleasing*)error
 {
     return [_query minimumWithIntColumn:_column_ndx error:error];
 }
--(NSNumber *)maximum
+-(NSNumber*)maximum
 {
     return [self maximumWithError:nil];
 }
--(NSNumber *)maximumWithError:(NSError *__autoreleasing *)error
+-(NSNumber*)maximumWithError:(NSError* __autoreleasing*)error
 {
     return [_query maximumWithIntColumn:_column_ndx error:error];
 }
 
--(NSNumber *)sum
+-(NSNumber*)sum
 {
     return [self sumWithError:nil];
 }
--(NSNumber *)sumWithError:(NSError *__autoreleasing *)error
+-(NSNumber*)sumWithError:(NSError* __autoreleasing*)error
 {
     return [_query sumWithIntColumn:_column_ndx error:error];
 }
--(NSNumber *)average
+-(NSNumber*)average
 {
     return [self averageWithError:nil];
 }
--(NSNumber *)averageWithError:(NSError *__autoreleasing *)error
+-(NSNumber*)averageWithError:(NSError* __autoreleasing*)error
 {
     return [_query averageWithIntColumn:_column_ndx error:error];
 }
@@ -789,10 +765,10 @@ using namespace std;
 
 @implementation TightdbQueryAccessorFloat
 {
-    __weak TightdbQuery *_query;
+    __weak TightdbQuery* _query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
@@ -802,78 +778,78 @@ using namespace std;
     return self;
 }
 
--(TightdbQuery *)columnIsEqualTo:(float)value
+-(TightdbQuery*)columnIsEqualTo:(float)value
 {
-    [_query getQuery]->equal(_column_ndx, value);
+    [_query getNativeQuery].equal(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)columnIsNotEqualTo:(float)value
+-(TightdbQuery*)columnIsNotEqualTo:(float)value
 {
-    [_query getQuery]->not_equal(_column_ndx, value);
+    [_query getNativeQuery].not_equal(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)columnIsGreaterThan:(float)value
+-(TightdbQuery*)columnIsGreaterThan:(float)value
 {
-    [_query getQuery]->greater(_column_ndx, value);
+    [_query getNativeQuery].greater(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)columnIsGreaterThanOrEqualTo:(float)value
+-(TightdbQuery*)columnIsGreaterThanOrEqualTo:(float)value
 {
-    [_query getQuery]->greater_equal(_column_ndx, value);
+    [_query getNativeQuery].greater_equal(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)columnIsLessThan:(float)value
+-(TightdbQuery*)columnIsLessThan:(float)value
 {
-    [_query getQuery]->less(_column_ndx, value);
+    [_query getNativeQuery].less(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)columnIsLessThanOrEqualTo:(float)value
+-(TightdbQuery*)columnIsLessThanOrEqualTo:(float)value
 {
-    [_query getQuery]->less_equal(_column_ndx, value);
+    [_query getNativeQuery].less_equal(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)columnIsBetween:(float)from and_:(float)to
+-(TightdbQuery*)columnIsBetween:(float)from and_:(float)to
 {
-    [_query getQuery]->between(_column_ndx, from, to);
+    [_query getNativeQuery].between(_column_ndx, from, to);
     return _query;
 }
 
--(NSNumber *)minimum
+-(NSNumber*)minimum
 {
     return [self minimumWithError:nil];
 }
--(NSNumber *)minimumWithError:(NSError *__autoreleasing *)error
+-(NSNumber*)minimumWithError:(NSError* __autoreleasing*)error
 {
     return [_query minimumWithFloatColumn:_column_ndx error:error];
 }
--(NSNumber *)maximum
+-(NSNumber*)maximum
 {
     return [self maximumWithError:nil];
 }
--(NSNumber *)maximumWithError:(NSError *__autoreleasing *)error
+-(NSNumber*)maximumWithError:(NSError* __autoreleasing*)error
 {
     return [_query maximumWithFloatColumn:_column_ndx error:error];
 }
 
--(NSNumber *)sum
+-(NSNumber*)sum
 {
     return [self sumWithError:nil];
 }
--(NSNumber *)sumWithError:(NSError *__autoreleasing *)error
+-(NSNumber*)sumWithError:(NSError* __autoreleasing*)error
 {
     return [_query sumWithFloatColumn:_column_ndx error:error];
 }
--(NSNumber *)average
+-(NSNumber*)average
 {
     return [self averageWithError:nil];
 }
--(NSNumber *)averageWithError:(NSError *__autoreleasing *)error
+-(NSNumber*)averageWithError:(NSError* __autoreleasing*)error
 {
     return [_query averageWithFloatColumn:_column_ndx error:error];
 }
@@ -882,10 +858,10 @@ using namespace std;
 
 @implementation TightdbQueryAccessorDouble
 {
-    __weak TightdbQuery *_query;
+    __weak TightdbQuery* _query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
@@ -895,78 +871,78 @@ using namespace std;
     return self;
 }
 
--(TightdbQuery *)columnIsEqualTo:(double)value
+-(TightdbQuery*)columnIsEqualTo:(double)value
 {
-    [_query getQuery]->equal(_column_ndx, value);
+    [_query getNativeQuery].equal(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)columnIsNotEqualTo:(double)value
+-(TightdbQuery*)columnIsNotEqualTo:(double)value
 {
-    [_query getQuery]->not_equal(_column_ndx, value);
+    [_query getNativeQuery].not_equal(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)columnIsGreaterThan:(double)value
+-(TightdbQuery*)columnIsGreaterThan:(double)value
 {
-    [_query getQuery]->greater(_column_ndx, value);
+    [_query getNativeQuery].greater(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)columnIsGreaterThanOrEqualTo:(double)value
+-(TightdbQuery*)columnIsGreaterThanOrEqualTo:(double)value
 {
-    [_query getQuery]->greater_equal(_column_ndx, value);
+    [_query getNativeQuery].greater_equal(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)columnIsLessThan:(double)value
+-(TightdbQuery*)columnIsLessThan:(double)value
 {
-    [_query getQuery]->less(_column_ndx, value);
+    [_query getNativeQuery].less(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)columnIsLessThanOrEqualTo:(double)value
+-(TightdbQuery*)columnIsLessThanOrEqualTo:(double)value
 {
-    [_query getQuery]->less_equal(_column_ndx, value);
+    [_query getNativeQuery].less_equal(_column_ndx, value);
     return _query;
 }
 
--(TightdbQuery *)columnIsBetween:(double)from and_:(double)to
+-(TightdbQuery*)columnIsBetween:(double)from and_:(double)to
 {
-    [_query getQuery]->between(_column_ndx, from, to);
+    [_query getNativeQuery].between(_column_ndx, from, to);
     return _query;
 }
 
--(NSNumber *)minimum
+-(NSNumber*)minimum
 {
     return [self minimumWithError:nil];
 }
--(NSNumber *)minimumWithError:(NSError *__autoreleasing *)error
+-(NSNumber*)minimumWithError:(NSError* __autoreleasing*)error
 {
     return [_query minimumWithDoubleColumn:_column_ndx error:error];
 }
--(NSNumber *)maximum
+-(NSNumber*)maximum
 {
     return [self maximumWithError:nil];
 }
--(NSNumber *)maximumWithError:(NSError *__autoreleasing *)error
+-(NSNumber*)maximumWithError:(NSError* __autoreleasing*)error
 {
     return [_query maximumWithDoubleColumn:_column_ndx error:error];
 }
 
--(NSNumber *)sum
+-(NSNumber*)sum
 {
     return [self sumWithError:nil];
 }
--(NSNumber *)sumWithError:(NSError *__autoreleasing *)error
+-(NSNumber*)sumWithError:(NSError* __autoreleasing*)error
 {
     return [_query sumWithDoubleColumn:_column_ndx error:error];
 }
--(NSNumber *)average
+-(NSNumber*)average
 {
     return [self averageWithError:nil];
 }
--(NSNumber *)averageWithError:(NSError *__autoreleasing *)error
+-(NSNumber*)averageWithError:(NSError* __autoreleasing*)error
 {
     return [_query averageWithDoubleColumn:_column_ndx error:error];
 }
@@ -975,10 +951,10 @@ using namespace std;
 
 @implementation TightdbQueryAccessorString
 {
-    __weak TightdbQuery *_query;
+    __weak TightdbQuery* _query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
@@ -987,54 +963,54 @@ using namespace std;
     }
     return self;
 }
--(TightdbQuery *)columnIsEqualTo:(NSString *)value
+-(TightdbQuery*)columnIsEqualTo:(NSString*)value
 {
-    [_query getQuery]->equal(_column_ndx, ObjcStringAccessor(value));
+    [_query getNativeQuery].equal(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
--(TightdbQuery *)columnIsEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive
+-(TightdbQuery*)columnIsEqualTo:(NSString*)value caseSensitive:(BOOL)caseSensitive
 {
-    [_query getQuery]->equal(_column_ndx, ObjcStringAccessor(value), caseSensitive);
+    [_query getNativeQuery].equal(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
--(TightdbQuery *)columnIsNotEqualTo:(NSString *)value
+-(TightdbQuery*)columnIsNotEqualTo:(NSString*)value
 {
-    [_query getQuery]->not_equal(_column_ndx, ObjcStringAccessor(value));
+    [_query getNativeQuery].not_equal(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
--(TightdbQuery *)columnIsNotEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive
+-(TightdbQuery*)columnIsNotEqualTo:(NSString*)value caseSensitive:(BOOL)caseSensitive
 {
-    [_query getQuery]->not_equal(_column_ndx, ObjcStringAccessor(value), caseSensitive);
+    [_query getNativeQuery].not_equal(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
--(TightdbQuery *)columnBeginsWith:(NSString *)value
+-(TightdbQuery*)columnBeginsWith:(NSString*)value
 {
-    [_query getQuery]->begins_with(_column_ndx, ObjcStringAccessor(value));
+    [_query getNativeQuery].begins_with(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
--(TightdbQuery *)columnBeginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+-(TightdbQuery*)columnBeginsWith:(NSString*)value caseSensitive:(BOOL)caseSensitive
 {
-    [_query getQuery]->begins_with(_column_ndx, ObjcStringAccessor(value), caseSensitive);
+    [_query getNativeQuery].begins_with(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
--(TightdbQuery *)columnEndsWith:(NSString *)value
+-(TightdbQuery*)columnEndsWith:(NSString*)value
 {
-    [_query getQuery]->ends_with(_column_ndx, ObjcStringAccessor(value));
+    [_query getNativeQuery].ends_with(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
--(TightdbQuery *)columnEndsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+-(TightdbQuery*)columnEndsWith:(NSString*)value caseSensitive:(BOOL)caseSensitive
 {
-    [_query getQuery]->ends_with(_column_ndx, ObjcStringAccessor(value), caseSensitive);
+    [_query getNativeQuery].ends_with(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
--(TightdbQuery *)columnContains:(NSString *)value
+-(TightdbQuery*)columnContains:(NSString*)value
 {
-    [_query getQuery]->contains(_column_ndx, ObjcStringAccessor(value));
+    [_query getNativeQuery].contains(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
--(TightdbQuery *)columnContains:(NSString *)value caseSensitive:(BOOL)caseSensitive
+-(TightdbQuery*)columnContains:(NSString*)value caseSensitive:(BOOL)caseSensitive
 {
-    [_query getQuery]->contains(_column_ndx, ObjcStringAccessor(value), caseSensitive);
+    [_query getNativeQuery].contains(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
 @end
@@ -1042,10 +1018,10 @@ using namespace std;
 
 @implementation TightdbQueryAccessorBinary
 {
-    __weak TightdbQuery *_query;
+    __weak TightdbQuery* _query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
@@ -1054,29 +1030,29 @@ using namespace std;
     }
     return self;
 }
--(TightdbQuery *)columnIsEqualTo:(TightdbBinary *)value
+-(TightdbQuery*)columnIsEqualTo:(TightdbBinary*)value
 {
-    [_query getQuery]->equal(_column_ndx, [value getBinary]);
+    [_query getNativeQuery].equal(_column_ndx, [value getNativeBinary]);
     return _query;
 }
--(TightdbQuery *)columnIsNotEqualTo:(TightdbBinary *)value
+-(TightdbQuery*)columnIsNotEqualTo:(TightdbBinary*)value
 {
-    [_query getQuery]->not_equal(_column_ndx, [value getBinary]);
+    [_query getNativeQuery].not_equal(_column_ndx, [value getNativeBinary]);
     return _query;
 }
--(TightdbQuery *)columnBeginsWith:(TightdbBinary *)value
+-(TightdbQuery*)columnBeginsWith:(TightdbBinary*)value
 {
-    [_query getQuery]->begins_with(_column_ndx, [value getBinary]);
+    [_query getNativeQuery].begins_with(_column_ndx, [value getNativeBinary]);
     return _query;
 }
--(TightdbQuery *)columnEndsWith:(TightdbBinary *)value
+-(TightdbQuery*)columnEndsWith:(TightdbBinary*)value
 {
-    [_query getQuery]->ends_with(_column_ndx, [value getBinary]);
+    [_query getNativeQuery].ends_with(_column_ndx, [value getNativeBinary]);
     return _query;
 }
--(TightdbQuery *)columnContains:(TightdbBinary *)value
+-(TightdbQuery*)columnContains:(TightdbBinary*)value
 {
-    [_query getQuery]->contains(_column_ndx, [value getBinary]);
+    [_query getNativeQuery].contains(_column_ndx, [value getNativeBinary]);
     return _query;
 }
 @end
@@ -1084,10 +1060,10 @@ using namespace std;
 
 @implementation TightdbQueryAccessorDate
 {
-    __weak TightdbQuery *_query;
+    __weak TightdbQuery* _query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
@@ -1096,39 +1072,39 @@ using namespace std;
     }
     return self;
 }
--(TightdbQuery *)columnIsEqualTo:(time_t)value
+-(TightdbQuery*)columnIsEqualTo:(time_t)value
 {
-    [_query getQuery]->equal_datetime(_column_ndx, value);
+    [_query getNativeQuery].equal_datetime(_column_ndx, value);
     return _query;
 }
--(TightdbQuery *)columnIsNotEqualTo:(time_t)value
+-(TightdbQuery*)columnIsNotEqualTo:(time_t)value
 {
-    [_query getQuery]->not_equal_datetime(_column_ndx, value);
+    [_query getNativeQuery].not_equal_datetime(_column_ndx, value);
     return _query;
 }
--(TightdbQuery *)columnIsGreaterThan:(time_t)value
+-(TightdbQuery*)columnIsGreaterThan:(time_t)value
 {
-    [_query getQuery]->greater_datetime(_column_ndx, value);
+    [_query getNativeQuery].greater_datetime(_column_ndx, value);
     return _query;
 }
--(TightdbQuery *)columnIsGreaterThanOrEqualTo:(time_t)value
+-(TightdbQuery*)columnIsGreaterThanOrEqualTo:(time_t)value
 {
-    [_query getQuery]->greater_equal_datetime(_column_ndx, value);
+    [_query getNativeQuery].greater_equal_datetime(_column_ndx, value);
     return _query;
 }
--(TightdbQuery *)columnIsLessThan:(time_t)value
+-(TightdbQuery*)columnIsLessThan:(time_t)value
 {
-    [_query getQuery]->less_datetime(_column_ndx, value);
+    [_query getNativeQuery].less_datetime(_column_ndx, value);
     return _query;
 }
--(TightdbQuery *)columnIsLessThanOrEqualTo:(time_t)value
+-(TightdbQuery*)columnIsLessThanOrEqualTo:(time_t)value
 {
-    [_query getQuery]->less_equal_datetime(_column_ndx, value);
+    [_query getNativeQuery].less_equal_datetime(_column_ndx, value);
     return _query;
 }
--(TightdbQuery *)columnIsBetween:(time_t)from and_:(time_t)to
+-(TightdbQuery*)columnIsBetween:(time_t)from and_:(time_t)to
 {
-    [_query getQuery]->between_datetime(_column_ndx, from, to);
+    [_query getNativeQuery].between_datetime(_column_ndx, from, to);
     return _query;
 }
 @end
@@ -1136,10 +1112,10 @@ using namespace std;
 
 @implementation TightdbQueryAccessorSubtable
 {
-    __weak TightdbQuery *_query;
+    __weak TightdbQuery* _query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
@@ -1153,10 +1129,10 @@ using namespace std;
 
 @implementation TightdbQueryAccessorMixed
 {
-    __weak TightdbQuery *_query;
+    __weak TightdbQuery* _query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query
+-(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {

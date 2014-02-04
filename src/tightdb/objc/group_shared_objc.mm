@@ -1,3 +1,4 @@
+#include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/group_shared.hpp>
 
 #import <tightdb/objc/group_shared.h>
@@ -10,14 +11,16 @@ using namespace std;
 
 @implementation TightdbSharedGroup
 {
-    tightdb::SharedGroup* _sharedGroup;
+    tightdb::util::UniquePtr<tightdb::SharedGroup> m_shared_group;
 }
 
-+(TightdbSharedGroup *)groupWithFilename:(NSString *)filename
++(TightdbSharedGroup*)groupWithFilename:(NSString*)filename
 {
-    tightdb::SharedGroup* shared_group;
+    TightdbSharedGroup* shared_group = [[TightdbSharedGroup alloc] init];
+    if (!shared_group)
+        return nil;
     try {
-        shared_group = new tightdb::SharedGroup(tightdb::StringData(ObjcStringAccessor(filename)));
+        shared_group->m_shared_group.reset(new tightdb::SharedGroup(tightdb::StringData(ObjcStringAccessor(filename))));
     }
     catch (...) {
         // FIXME: Diffrent exception types mean different things. More
@@ -30,50 +33,46 @@ using namespace std;
         // anything derived from std::exception.
         return nil;
     }
-    TightdbSharedGroup* shared_group2 = [[TightdbSharedGroup alloc] init];
-    if (shared_group2) {
-      shared_group2->_sharedGroup = shared_group;
-    }
-    return shared_group2;
+    return shared_group;
 }
 
 -(void)dealloc
 {
-    delete _sharedGroup;
-    _sharedGroup = 0;
+#ifdef TIGHTDB_DEBUG
+    NSLog(@"TightdbSharedGroup dealloc");
+#endif
 }
 
 
 -(void)readTransaction:(TightdbSharedGroupReadTransactionBlock)block
 {
-    TightdbGroup* group;
     @try {
-        group = [TightdbGroup groupTightdbGroup:(tightdb::Group *)&_sharedGroup->begin_read() readOnly:YES];
-        block(group);
+        const tightdb::Group& group = m_shared_group->begin_read();
+        TightdbGroup* group_2 = [TightdbGroup groupWithNativeGroup:const_cast<tightdb::Group*>(&group) isOwned:NO readOnly:YES];
+        block(group_2);
     }
-    @catch (NSException *exception) {
+    @catch (NSException* exception) {
         @throw exception;
     }
     @finally {
-        _sharedGroup->end_read();
-        [group clearGroup];
+        m_shared_group->end_read();
     }
 }
 
 -(void)writeTransaction:(TightdbSharedGroupWriteTransactionBlock)block
 {
-    TightdbGroup* group;
     @try {
-        group = [TightdbGroup groupTightdbGroup:&_sharedGroup->begin_write() readOnly:NO];
-        if (block(group))
-            _sharedGroup->commit();
-        else
-            _sharedGroup->rollback();
-        [group clearGroup];
+        tightdb::Group& group = m_shared_group->begin_write();
+        TightdbGroup* group_2 = [TightdbGroup groupWithNativeGroup:&group isOwned:NO readOnly:NO];
+        if (block(group_2)) {
+            m_shared_group->commit();
+        }
+        else {
+            m_shared_group->rollback();
+        }
     }
-    @catch (NSException *exception) {
-        _sharedGroup->rollback();
-        [group clearGroup];
+    @catch (NSException* exception) {
+        m_shared_group->rollback();
         @throw exception;
     }
 }
