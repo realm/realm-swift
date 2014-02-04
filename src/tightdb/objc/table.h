@@ -61,15 +61,15 @@
 @end
 
 
-@interface TightdbSpec: NSObject
+@interface TightdbDescriptor: NSObject
 /// Returns NO on memory allocation error.
 -(BOOL)addColumnWithType:(TightdbType)type andName:(NSString *)name;
 -(BOOL)addColumnWithType:(TightdbType)type andName:(NSString *)name error:(NSError *__autoreleasing *)error;
 /// Returns nil on memory allocation error.
--(TightdbSpec *)addColumnTable:(NSString *)name;
--(TightdbSpec *)addColumnTable:(NSString *)name error:(NSError *__autoreleasing *)error;
--(TightdbSpec *)getSubspec:(size_t)colNdx;
--(TightdbSpec *)getSubspec:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(TightdbDescriptor *)addColumnTable:(NSString *)name;
+-(TightdbDescriptor *)addColumnTable:(NSString *)name error:(NSError *__autoreleasing *)error;
+-(TightdbDescriptor *)getSubdescriptor:(size_t)colNdx;
+-(TightdbDescriptor *)getSubdescriptor:(size_t)colNdx error:(NSError *__autoreleasing *)error;
 -(size_t)getColumnCount;
 -(TightdbType)getColumnType:(size_t)colNdx;
 -(NSString *)getColumnName:(size_t)colNdx;
@@ -78,8 +78,6 @@
 
 
 @interface TightdbTable: NSObject <NSFastEnumeration>
--(BOOL)updateFromSpec;
--(BOOL)updateFromSpecWithError:(NSError *__autoreleasing *)error;
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
 -(BOOL)isEqual:(TightdbTable *)other;
@@ -119,8 +117,8 @@
 -(NSString *)getColumnName:(size_t)ndx;
 -(size_t)getColumnIndex:(NSString *)name;
 -(TightdbType)getColumnType:(size_t)ndx;
--(TightdbSpec *)getSpec;
--(TightdbSpec *)getSpecWithError:(NSError *__autoreleasing *)error;
+-(TightdbDescriptor *)getDescriptor;
+-(TightdbDescriptor *)getDescriptorWithError:(NSError *__autoreleasing *)error;
 -(BOOL)isEmpty;
 -(size_t)count;
 -(TightdbCursor *)addRow;
@@ -148,6 +146,7 @@
 -(BOOL)insertRow:(size_t)ndx error:(NSError *__autoreleasing *)error;
 
 // Adaptive ints.
+// FIXME: Should be getInt:(int64_t)value inColumn:(size_t)colNdx andRow:(size_t)rowNdx;
 -(int64_t)get:(size_t)colNdx ndx:(size_t)ndx;
 -(BOOL)set:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;
 -(BOOL)set:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value error:(NSError *__autoreleasing *)error;
@@ -166,6 +165,7 @@
 
 // NOTE: Low-level insert functions. Always insert in all columns at once
 // and call InsertDone after to avoid table getting un-balanced.
+// FIXME: Should be insertBool:(BOOL)value inColumn:(size_t)colNdx andRow:(size_t)rowNdx;
 -(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value;
 -(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value error:(NSError *__autoreleasing *)error;
 -(BOOL)insertInt:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;
@@ -217,6 +217,7 @@
 -(size_t)addColumnWithType:(TightdbType)type andName:(NSString *)name error:(NSError *__autoreleasing *)error;
 
 // Searching
+// FIXME: Should be findBool:(BOOL)value inColumn:(size_t)colNdx;
 -(size_t)findBool:(size_t)colNdx value:(BOOL)value;
 -(size_t)findInt:(size_t)colNdx value:(int64_t)value;
 -(size_t)findFloat:(size_t)colNdx value:(float)value;
@@ -225,12 +226,21 @@
 -(size_t)findBinary:(size_t)colNdx value:(TightdbBinary *)value;
 -(size_t)findDate:(size_t)colNdx value:(time_t)value;
 -(size_t)findMixed:(size_t)colNdx value:(TightdbMixed *)value;
+
+// FIXME: The naming scheme used here is superior to the one used in
+// most of the other methods in this class. As time allows, this
+// scheme must be migrated to all those other methods.
+-(TightdbView *)findAllBool:(BOOL)value              inColumn:(size_t)colNdx;
+-(TightdbView *)findAllInt:(int64_t)value            inColumn:(size_t)colNdx;
+-(TightdbView *)findAllFloat:(float)value            inColumn:(size_t)colNdx;
+-(TightdbView *)findAllDouble:(double)value          inColumn:(size_t)colNdx;
+-(TightdbView *)findAllString:(NSString *)value      inColumn:(size_t)colNdx;
+-(TightdbView *)findAllBinary:(TightdbBinary *)value inColumn:(size_t)colNdx;
+-(TightdbView *)findAllDate:(time_t)value            inColumn:(size_t)colNdx;
+-(TightdbView *)findAllMixed:(TightdbMixed *)value   inColumn:(size_t)colNdx;
+
 -(TightdbQuery *)where;
 -(TightdbQuery *)whereWithError:(NSError *__autoreleasing *)error;
-
-// FIXME: Why does this one take a TableView as argument?
--(TightdbView *)findAll:(TightdbView *)view column:(size_t)colNdx value:(int64_t)value;
-// FIXME: Implement findAll for the rest of the column types.
 
 // Indexing
 -(BOOL)hasIndex:(size_t)colNdx;
@@ -244,6 +254,7 @@
 // FIXME: Do we want to conversion methods? Maybe use NSData.
 
 // Aggregate functions
+// FIXME: Should be countInt:(int64_t)value inColumn:(size_t)colNdx;
 -(size_t)countWithIntColumn:(size_t)colNdx andValue:(int64_t)target;
 -(size_t)countWithFloatColumn:(size_t)colNdx andValue:(float)target;
 -(size_t)countWithDoubleColumn:(size_t)colNdx andValue:(double)target;
@@ -273,9 +284,6 @@
 
 
 @interface TightdbView: NSObject <NSFastEnumeration>
--(id)initFromQuery:(TightdbQuery *)query;
-+(TightdbView *)tableViewWithTable:(TightdbTable *)table;
-
 -(TightdbCursor *)cursorAtIndex:(size_t)ndx;
 
 -(size_t)count;
@@ -289,6 +297,9 @@
 -(TightdbTable *)getTable;
 -(size_t)getSourceIndex:(size_t)ndx;
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
+
+// Private
+-(id)_initWithQuery:(TightdbQuery *)query;
 @end
 
 
@@ -305,7 +316,6 @@
 
 @interface TightdbColumnProxy_Int: TightdbColumnProxy
 -(size_t)find:(int64_t)value;
--(TightdbView *)findAll:(int64_t)value;
 -(int64_t)minimum;
 -(int64_t)maximum;
 -(int64_t)sum;

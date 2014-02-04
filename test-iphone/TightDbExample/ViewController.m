@@ -90,7 +90,7 @@ TIGHTDB_TABLE_2(MyTable2,
     NSLog(@"Mary: %zu", row);
     [_utils Eval:row==1 msg:@"Mary should have been there"];
 
-    TightdbView *view = [table.Age findAll:21];
+    MyTable_View *view = [[[table where].Age columnIsEqualTo:21] findAll];
     size_t cnt = [view count];                      // cnt = 2
     [_utils Eval:cnt == 2 msg:@"Should be two rows in view"];
 

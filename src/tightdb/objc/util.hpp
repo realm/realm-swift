@@ -55,31 +55,31 @@ enum TightdbErr {
     tdb_err_Resource = 4,
 };
 
-inline NSError *make_tightdb_error(NSString *domain, TightdbErr code, NSString *desc)
+inline NSError* make_tightdb_error(TightdbErr code, NSString *desc)
 {
     NSMutableDictionary* details = [NSMutableDictionary dictionary];
     [details setValue:desc forKey:NSLocalizedDescriptionKey];
-    return [NSError errorWithDomain:domain code:code userInfo:details];
+    return [NSError errorWithDomain:@"com.tightdb" code:code userInfo:details];
 }
 
 #define TIGHTDB_OBJC_SIZE_T_NUMBER_IN numberWithUnsignedLong
 #define TIGHTDB_OBJC_SIZE_T_NUMBER_OUT unsignedLongValue
 
-#define TIGHTDB_EXCEPTION_ERRHANDLER(action, domain, failReturnValue) TIGHTDB_EXCEPTION_ERRHANDLER_EX(action, domain, failReturnValue, error)
-#define TIGHTDB_EXCEPTION_ERRHANDLER_EX(action, domain, failReturnValue, errVar) try { action }  \
+#define TIGHTDB_EXCEPTION_ERRHANDLER(action, failReturnValue) TIGHTDB_EXCEPTION_ERRHANDLER_EX(action, failReturnValue, error)
+#define TIGHTDB_EXCEPTION_ERRHANDLER_EX(action, failReturnValue, errVar) try { action }  \
 catch(tightdb::util::File::AccessError &ex) { \
     if (errVar) \
-        *errVar = make_tightdb_error(domain, tdb_err_FileAccess, [NSString stringWithUTF8String:ex.what()]); \
+        *errVar = make_tightdb_error(tdb_err_FileAccess, [NSString stringWithUTF8String:ex.what()]); \
         return failReturnValue; \
 } \
 catch(tightdb::ResourceAllocError &ex) { \
     if (errVar) \
-        *errVar = make_tightdb_error(domain, tdb_err_Resource, [NSString stringWithUTF8String:ex.what()]); \
+        *errVar = make_tightdb_error(tdb_err_Resource, [NSString stringWithUTF8String:ex.what()]); \
         return failReturnValue; \
 } \
 catch (std::exception &ex) { \
     if (errVar) \
-        *errVar = make_tightdb_error(domain, tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]); \
+        *errVar = make_tightdb_error(tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]); \
         return failReturnValue; \
 }
 
