@@ -108,8 +108,8 @@ CATEGORIES:
 
   - g_typed_table_optimize:
       NAME     : optimize
-      SUMMARY  : *g_typed_table_optimize_summary
-      DESCR    : *g_typed_table_optimize_descr
+      SUMMARY  : *g_table_optimize_summary
+      DESCR    : *g_table_optimize_descr
       SIGNATURE: (void)optimize
       EXAMPLES:
       - CODE   : ex_objc_typed_table_clear
