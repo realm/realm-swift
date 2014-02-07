@@ -76,8 +76,8 @@ CATEGORIES :
 
   - g_dyn_table_optimize:
       NAME     : optimize
-      SUMMARY  : *g_dyn_table_optimize_summary
-      DESCR    : *g_dyn_table_optimize_descr
+      SUMMARY  : *g_table_optimize_summary
+      DESCR    : *g_table_optimize_descr
       SIGNATURE: (void)optimize
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_optimize
