@@ -276,10 +276,6 @@
 					"-lc++",
 					"-ltightdb-objc-ios-dbg",
 				);
-				"OTHER_LDFLAGS[arch=*]" = (
-					"-lc++",
-					"-ltightdb-objc-ios-dbg",
-				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -294,10 +290,6 @@
 				INFOPLIST_FILE = "TightDbExample/TightDbExample-Info.plist";
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../iphone-lib\"";
 				OTHER_LDFLAGS = (
-					"-lstdc++",
-					"-ltightdb-objc-ios",
-				);
-				"OTHER_LDFLAGS[arch=*]" = (
 					"-lc++",
 					"-ltightdb-objc-ios",
 				);
