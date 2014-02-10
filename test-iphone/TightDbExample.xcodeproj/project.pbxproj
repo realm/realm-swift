@@ -10,6 +10,7 @@
 		410B4DCA156E0C8F0048E4C8 /* Performance.m in Sources */ = {isa = PBXBuildFile; fileRef = 410B4DC9156E0C8F0048E4C8 /* Performance.m */; };
 		410B4DCE156E10430048E4C8 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 410B4DCD156E10430048E4C8 /* Utils.m */; };
 		410B4DD3156E59A30048E4C8 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 410B4DD2156E59A30048E4C8 /* libsqlite3.dylib */; };
+		4D49F55818A912CD0071DDC1 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D49F55718A912CD0071DDC1 /* Default-568h@2x.png */; };
 		E9D58B4F1541A375009150B1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B4E1541A375009150B1 /* UIKit.framework */; };
 		E9D58B511541A375009150B1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B501541A375009150B1 /* Foundation.framework */; };
 		E9D58B531541A375009150B1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B521541A375009150B1 /* CoreGraphics.framework */; };
@@ -27,6 +28,7 @@
 		410B4DCC156E10430048E4C8 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 		410B4DCD156E10430048E4C8 /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
 		410B4DD2156E59A30048E4C8 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
+		4D49F55718A912CD0071DDC1 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		E9D58B4A1541A375009150B1 /* TightDbExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TightDbExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9D58B4E1541A375009150B1 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		E9D58B501541A375009150B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -61,6 +63,7 @@
 		E9D58B3F1541A374009150B1 = {
 			isa = PBXGroup;
 			children = (
+				4D49F55718A912CD0071DDC1 /* Default-568h@2x.png */,
 				410B4DD2156E59A30048E4C8 /* libsqlite3.dylib */,
 				E9D58B541541A375009150B1 /* TightDbExample */,
 				E9D58B4D1541A375009150B1 /* Frameworks */,
@@ -167,6 +170,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E9D58B591541A375009150B1 /* InfoPlist.strings in Resources */,
+				4D49F55818A912CD0071DDC1 /* Default-568h@2x.png in Resources */,
 				E9D58B651541A375009150B1 /* ViewController_iPhone.xib in Resources */,
 				E9D58B681541A375009150B1 /* ViewController_iPad.xib in Resources */,
 			);
@@ -269,7 +273,11 @@
 				INFOPLIST_FILE = "TightDbExample/TightDbExample-Info.plist";
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../iphone-lib\"";
 				OTHER_LDFLAGS = (
-					"-lstdc++",
+					"-lc++",
+					"-ltightdb-objc-ios-dbg",
+				);
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lc++",
 					"-ltightdb-objc-ios-dbg",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -287,6 +295,10 @@
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../iphone-lib\"";
 				OTHER_LDFLAGS = (
 					"-lstdc++",
+					"-ltightdb-objc-ios",
+				);
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lc++",
 					"-ltightdb-objc-ios",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
