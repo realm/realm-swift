@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		4D0AEB5818214C9C00CA4A2D /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D0AEB5718214C9C00CA4A2D /* CoreFoundation.framework */; };
 		4D0AEBA118214FD000CA4A2D /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D0AEBA018214FD000CA4A2D /* SenTestingKit.framework */; };
-		4D0AEBA718215DD500CA4A2D /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D0AEB5718214C9C00CA4A2D /* CoreFoundation.framework */; };
-		4D0AEBB118215E1500CA4A2D /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D0AEBA018214FD000CA4A2D /* SenTestingKit.framework */; };
 		4D54F7E018AA756D002AD81E /* cursor_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4D54F7AB18AA756D002AD81E /* cursor_objc.mm */; };
 		4D54F7E118AA756D002AD81E /* group_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4D54F7AD18AA756D002AD81E /* group_objc.mm */; };
 		4D54F7E218AA756D002AD81E /* group_shared_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4D54F7B018AA756D002AD81E /* group_shared_objc.mm */; };
@@ -33,20 +31,10 @@
 		4D54F7F718AA756D002AD81E /* table_delete_all.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D54F7D918AA756D002AD81E /* table_delete_all.m */; };
 		4D54F7F818AA756D002AD81E /* template.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D54F7DA18AA756D002AD81E /* template.m */; };
 		4D54F7F918AA756D002AD81E /* tutorial.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D54F7DB18AA756D002AD81E /* tutorial.m */; };
-		4D54F80018AA762B002AD81E /* tutorial.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D54F7DB18AA756D002AD81E /* tutorial.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		4D0AEB5218214C9C00CA4A2D /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-		4D0AEBA418215DD500CA4A2D /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -61,7 +49,6 @@
 		4D0AEB5418214C9C00CA4A2D /* TightDbObjcBinding */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TightDbObjcBinding; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D0AEB5718214C9C00CA4A2D /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		4D0AEBA018214FD000CA4A2D /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
-		4D0AEBA618215DD500CA4A2D /* Test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Test; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D54F7A818AA756D002AD81E /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		4D54F7A918AA756D002AD81E /* cheetah.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = cheetah.sh; sourceTree = "<group>"; };
 		4D54F7AA18AA756D002AD81E /* cursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cursor.h; sourceTree = "<group>"; };
@@ -112,15 +99,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4D0AEBA318215DD500CA4A2D /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4D0AEBB118215E1500CA4A2D /* SenTestingKit.framework in Frameworks */,
-				4D0AEBA718215DD500CA4A2D /* CoreFoundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -138,7 +116,6 @@
 			isa = PBXGroup;
 			children = (
 				4D0AEB5418214C9C00CA4A2D /* TightDbObjcBinding */,
-				4D0AEBA618215DD500CA4A2D /* Test */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -226,23 +203,6 @@
 			productReference = 4D0AEB5418214C9C00CA4A2D /* TightDbObjcBinding */;
 			productType = "com.apple.product-type.tool";
 		};
-		4D0AEBA518215DD500CA4A2D /* Test */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4D0AEBAD18215DD500CA4A2D /* Build configuration list for PBXNativeTarget "Test" */;
-			buildPhases = (
-				4D0AEBA218215DD500CA4A2D /* Sources */,
-				4D0AEBA318215DD500CA4A2D /* Frameworks */,
-				4D0AEBA418215DD500CA4A2D /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = Test;
-			productName = Test;
-			productReference = 4D0AEBA618215DD500CA4A2D /* Test */;
-			productType = "com.apple.product-type.tool";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -265,7 +225,6 @@
 			projectRoot = "";
 			targets = (
 				4D0AEB5318214C9C00CA4A2D /* TightDbObjcBinding */,
-				4D0AEBA518215DD500CA4A2D /* Test */,
 			);
 		};
 /* End PBXProject section */
@@ -297,14 +256,6 @@
 				4D54F7F418AA756D002AD81E /* shared_group.m in Sources */,
 				4D54F7F118AA756D002AD81E /* Makefile in Sources */,
 				4D54F7E218AA756D002AD81E /* group_shared_objc.mm in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		4D0AEBA218215DD500CA4A2D /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				4D54F80018AA762B002AD81E /* tutorial.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -417,46 +368,6 @@
 			};
 			name = Release;
 		};
-		4D0AEBAE18215DD500CA4A2D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					/usr/local/include,
-				);
-				"LIBRARY_SEARCH_PATHS[arch=*]" = /usr/local/lib;
-				"OTHER_LDFLAGS[arch=*]" = "-ltightdb-objc-dbg";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		4D0AEBAF18215DD500CA4A2D /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					/usr/local/include,
-				);
-				"LIBRARY_SEARCH_PATHS[arch=*]" = /usr/local/lib;
-				"OTHER_LDFLAGS[arch=*]" = "-ltightdb-objc";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -474,15 +385,6 @@
 			buildConfigurations = (
 				4D0AEB6118214C9C00CA4A2D /* Debug */,
 				4D0AEB6218214C9C00CA4A2D /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4D0AEBAD18215DD500CA4A2D /* Build configuration list for PBXNativeTarget "Test" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4D0AEBAE18215DD500CA4A2D /* Debug */,
-				4D0AEBAF18215DD500CA4A2D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
