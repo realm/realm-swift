@@ -34,5 +34,5 @@ examples/tutorial
 tightdb-ios.zip
 
 # mini tutorial
-tutorial/iPhoneMiniTutorial/Tightdb.framework/Headers/*
+tutorial/iPhoneMiniTutorial/Tightdb.framework/*
 tutorial/iPhoneMiniTutorial/Tightdb.framework
