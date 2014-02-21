@@ -119,7 +119,12 @@ can be tested via the Xcode project in:
 
     test-iphone/
 
+To ease the development using Xcode, you can generate a framework using
+the command:
 
+    sh build.sh ios-framework
+
+The framework is stored in the `tightdb-ios.zip` file.
 
 Configuration
 -------------
