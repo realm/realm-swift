@@ -126,6 +126,31 @@ CATEGORIES :
   - g_dyn_table_rename_column:
       TODO     : later
 
+  - g_dyn_table_add_column:
+      NAME     : addColumn
+      SUMMARY  : *g_dyn_table_add_column_summary
+      DESCR    : 
+      - TEXT   : *g_dyn_table_add_column_descr
+      - TEXT   : >
+                Currently, the following types are supported:
+                 <ul>
+                   <li><code>tightdb_Bool</code></li>
+                   <li><code>tightdb_Int</code></li>
+                   <li><code>tightdb_Float</code></li>
+                   <li><code>tightdb_Double</code></li>
+                   <li><code>tightdb_String</code></li>
+                   <li><code>tightdb_Binary</code></li>
+                   <li><code>tightdb_Table</code></li>
+                   <li><code>tightdb_Date</code></li>
+                   <li><code>tightdb_Mixed</code></li>
+                 </ul>
+      SIGNATURE: (size_t)getColumnCount
+      RETURN:
+        TYPES  : size_t
+        DESCR  : *g_dyn_table_add_column_return_descr
+      EXAMPLES:
+      - CODE   : ex_objc_dyn_table_add_column
+        DESCR  :
 
   - g_dyn_table_get_column_count:
       NAME     : getColumnCount
