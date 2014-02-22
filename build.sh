@@ -404,6 +404,24 @@ EOF
         exit 0
         ;;
 
+    "ios-framework")
+        if [ "$OS" != "Darwin" ]; then
+	    echo "Framework for iOS can only be generated under Mac OS X"
+	    exit 0
+	fi
+	FRAMEWORK=Tightdb.framework
+	rm -rf "$FRAMEWORK" Tightdb-ios.zip || exit 1
+	mkdir -p "$FRAMEWORK/Headers" || exit 1
+	cp iphone-lib/libtightdb-objc-ios.a "$FRAMEWORK/Tightdb" || exit 1
+	cp iphone-lib/include/tightdb/objc/*.h "$FRAMEWORK/Headers" || exit 1
+	(cd "$FRAMEWORK/Headers" && mv tightdb.h Tightdb.h) || exit 1
+	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/import <tightdb\/objc\/\(.*\)>/import "\1"/g' {} \; || exit 1
+	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/include <tightdb\/objc\/\(.*\)>/include "\1"/g' {} \; || exit 1
+	zip -r -q tightdb-ios.zip $FRAMEWORK || exit 1
+	echo "Framwork for iOS can be found in tightdb-ios.zip"
+	exit 0
+	;;
+
     "test")
         require_config || exit 1
         $MAKE test-norun || exit 1
@@ -559,6 +577,7 @@ EOF
         echo "Unspecified or bad mode '$MODE'" 1>&2
         echo "Available modes are: config clean build build-iphone test test-debug test-gdb show-install install uninstall test-installed" 1>&2
         echo "As well as: install-prod install-devel uninstall-prod uninstall-devel dist-copy" 1>&2
+	echo "As wall as: ios-framework"
         exit 1
         ;;
 
