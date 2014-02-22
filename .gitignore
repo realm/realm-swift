@@ -28,3 +28,7 @@ project.xcworkspace
 examples/tutorial.d
 examples/tutorial.o
 examples/tutorial
+
+# sh build.sh ios-framework
+/Tightdb.framework
+tightdb-ios.zip
