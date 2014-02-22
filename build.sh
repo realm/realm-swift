@@ -303,6 +303,8 @@ case "$MODE" in
         else
             tightdb_echo "Could not find home of TightDB core library built for iPhone"
         fi
+	
+	touch "$CONFIG_MK" || { echo "Can't overwrite $CONFIG_MK." ; exit 1 ; }
 
         cat >"$CONFIG_MK" <<EOF
 INSTALL_PREFIX      = $install_prefix
