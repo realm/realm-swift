@@ -102,7 +102,7 @@ catch (std::exception& ex) { \
 
 // This macro is part of the new error strategy, specifically for table value setters.
 #define TIGHTDB_EXCEPTION_HANDLER_SETTERS(action, datatype) \
-if (_readOnly) { \
+if (m_read_only) { \
     NSException* exception = [NSException exceptionWithName:@"tightdb:table_is_read_only" \
                                           reason:@"You tried to modify an immutable table" \
                                           userInfo:[NSMutableDictionary dictionary]]; \
