@@ -3,8 +3,71 @@
 #
 # Author: Kristian Spangsege
 #
+# Version: 1.0.1
+#
 # This makefile requires GNU Make. It has been tested with version
 # 3.81, and it is known to work well on both Linux and OS X.
+#
+#
+# Major goals
+# -----------
+#
+# clean ........ Delete targets and other files that are produced
+#                while building.
+#
+# build (default) Build convenience libraries (`noinst_LIBRARIES`)
+#                plus everything that `install-only` wants to install
+#                (when disregarding `INSTALL_FILTER`). If necessary,
+#                the convenience libraries will also be built in
+#                'debug' mode.
+#
+# install ...... Same as `build` followed by `install-only`.
+#
+# uninstall .... Uninstall everything that `install` would install.
+#
+# install-only . Installs `HEADERS`, `LIBRARIES`, `PROGRAMS`, and
+#                `DEV_PROGRAMS`. Whether static libraries and/or
+#                'debug' mode versions are also installed depends on
+#                various configuration parameters. Note that
+#                `INSTALL_FILTER` can be used to select a subset of
+#                the above.
+#
+# ### Selective building
+#
+# release ...... Builds `LIBRARIES`, `noinst_LIBRARIES`, `PROGRAMS`,
+#                `DEV_PROGRAMS`, and `noinst_PROGRAMS` in 'release'
+#                mode.
+#
+# nodebug ...... Builds everything that `release` does, plus static
+#                versions installable libraries (`LIBRARIES`) in
+#                'release' mode.
+#
+# debug ........ Builds everything that `release` does, but in 'debug'
+#                mode.
+#
+# cover ........ Builds everything that `release` does, but in 'code
+#                coverage' mode.
+#
+# everything ... Builds `LIBRARIES`, `noinst_LIBRARIES`,
+#                `check_LIBRARIES`, `PROGRAMS`, `DEV_PROGRAMS`, and
+#                `noinst_PROGRAMS` in both 'release' and 'debug' mode.
+#
+# ### Testing
+#
+# check ......... Build `LIBRARIES`, `noinst_LIBRARIES`,
+#                 `check_LIBRARIES`, `PROGRAMS`, and `check_PROGRAMS`
+#                 in 'release' mode, then run all `check_PROGRAMS`.
+#
+# check-debug ... Same as `check`, but in 'debug' mode.
+#
+# check-cover ... Same as `check`, but in 'code coverage' mode.
+#
+# memcheck, memcheck-debug Same as `check` and `check-debug`
+#                 respectively, but runs each program under Valgrind.
+#
+# check-norun, check-debug-norun, check-cover-norun Same as `check`,
+#                 `check-debug`, and `check-cover` respectively, but
+#                 stop after building.
 #
 #
 # Building installable programs and libraries
@@ -30,9 +93,9 @@
 #
 # Here is how to build a library:
 #
+#   include_HEADERS = foo.hpp
 #   lib_LIBRARIES = libfoo.a
 #   libfoo_a_SOURCES = libfoo.cpp
-#   INST_HEADERS = foo.hpp
 #
 # Again, the `lib` prefix in `lib_LIBRARIES` means that your library
 # will be installed in the directory specified by the `libdir`
@@ -58,12 +121,12 @@
 #
 # Installed libraries are generally accompanied by one or more headers
 # to be included by applications that use the library. Such headers
-# must be listed in the `INST_HEADERS` variable. Headers are installed
-# in `/usr/local/include` by default, but this can be changed by
-# setting the `prefix` or `includedir` variable. Note also that
-# headers can be installed in a subdirectory of `/usr/local/include`
-# or even into a multi-level hierarchy of subdirectories (see the
-# 'Subdirectories' section for more on this).
+# must be listed in the `include_HEADERS` variable. Headers are
+# installed in `/usr/local/include` by default, but this can be
+# changed by setting the `prefix` or `includedir` variable. Note also
+# that headers can be installed in a subdirectory of
+# `/usr/local/include` or even into a multi-level hierarchy of
+# subdirectories (see the 'Subdirectories' section for more on this).
 #
 # To build more than one program, or more than one library, simply
 # list all of them in `bin_PROGRAMS` or `lib_LIBRARIES`. For
@@ -87,29 +150,32 @@
 #   lib_LIBRARIES = libfoo.a libbar.a
 #   libbar_a_LIBS = libfoo.a
 #
-# The installation directory for programs and libraries is determined
-# by the primary prefix being used. Note that `PROGRAMS` and
-# `LIBRARIES` are primaries, and that `bin` is a primary prefix in
-# `bin_PROGRAMS`, for example. The following primary prefixes are
-# supported directly by `generic.mk`:
+# The installation directory for programs, libraries, and headers is
+# determined by the primary prefix being used. Note that `PROGRAMS`,
+# `LIBRARIES`, and `HEADERS` are primaries, and that `bin` is a
+# primary prefix in `bin_PROGRAMS`, for example. The following primary
+# prefixes are supported directly by `generic.mk`:
 #
-#   Prefix    Variable     Default value
-#   ------------------------------------------------------------------
-#   bin       bindir       $(exec_prefix)/bin     (/usr/local/bin)
-#   sbin      sbindir      $(exec_prefix)/sbin    (/usr/local/sbin)
-#   lib       libdir       $(exec_prefix)/lib (*) (/usr/local/lib)
-#   libexec   libexecdir   $(exec_prefix)/libexec (/usr/local/libexec)
+#   Prefix     Variable    Installation directory  Default value
+#   ----------------------------------------------------------------------------
+#   bin        bindir      $(exec_prefix)/bin      (/usr/local/bin)
+#   sbin       sbindir     $(exec_prefix)/sbin     (/usr/local/sbin)
+#   lib        libdir      $(exec_prefix)/lib      (/usr/local/lib)         (*1)
+#   libexec    libexecdir  $(exec_prefix)/libexec  (/usr/local/libexec)
+#   include    includedir  $(prefix)/include       (/usr/local/include)
+#   subinclude includedir  $(prefix)/include/...   (/usr/local/include/...) (*2)
 #
-#   (*) The actual default value depends on the platform.
+#   (*1) The actual default value depends on the platform.
+#   (*2) Only available when `INCLUDE_ROOT` is specified.
 #
-# You can also install a program or a library into a non-default
-# directory by defining a custom primary prefix. This is usefull when
-# you want (for other purposes) to maintain the default values of the
-# standard prefixes. Here is an example:
+# You can also install a program, a library, or a header into a
+# non-default directory by defining a custom primary prefix. This is
+# usefull when you want (for other purposes) to maintain the default
+# values of the standard prefixes. Here is an example:
 #
-#   EXTRA_PRIMARY_PREFIXES = lib_home
-#   lib_home_INSTALL_DIR = /usr/lib/mydeamon/bin
-#   lib_home_PROGRAMS = mydaemon
+#   EXTRA_PRIMARY_PREFIXES = libhome
+#   libhomedir = /usr/lib/mydeamon/bin
+#   libhome_PROGRAMS = mydaemon
 #
 # When doing 'filtered installs' (using `make install
 # INSTALL_FILTER=...`) there is a distinction between two categories
@@ -138,9 +204,9 @@
 # A convenience library is one that is not installed, but gets linked
 # statically into programs that are built as part of the same
 # project. Convenience libraries are created by using the special
-# primary prefix `NOINST`, for example:
+# primary prefix `noinst`, for example:
 #
-#   NOINST_LIBRARIES = util.a
+#   noinst_LIBRARIES = util.a
 #   bin_PROGRAMS = foo
 #   foo_SOURCES = foo.cpp
 #   foo_LIBS = util.a
@@ -171,26 +237,75 @@
 # installed libraries.
 #
 #
-# Programs that should not be installed
-# -------------------------------------
+# Installed programs
+# ------------------
+#
+# If a program, that is supposed to be installed, is linked against a
+# locally built shared library, then `generic.mk` will pass the
+# appropriate `-rpath` option to the program linker, such that the
+# dynamic linker can find the library in its installed
+# location. Unfortunately this does not enable the program to find the
+# locally built library, and therefore it will generally not be
+# possible to execute the program until after the library is
+# installed.
+#
+# To work around this problem, `generic.mk` will create an extra
+# version of the program, where it sets the `RPATH` in such a way that
+# the (yet to be installed) library can be found. The name of the
+# extra version is constructed by appending `-noinst` to the name of
+# the regular version. The extra 'noinst' version is created only for
+# testing purposes, and it will not be included during
+# installation. It should be noted that the extra 'noinst' version is
+# created only for programs that are linked against locally built,
+# shared libraries.
+#
+# The extra 'noinst' versions of installed programs, as well as test
+# programs and programs declared using the special primary prefix
+# `noinst`, are all configured with relative `RPATH`s. This means that
+# they will continue to work even when the project is relocated to a
+# different directory, as long as the internal directory structure
+# remains the same.
+#
+# Note that the standard installation procedure, that places targets
+# in system directories according to category (`/usr/local/bin`,
+# `/usr/local/lib`, ...), does not in general preserve the relative
+# paths between targets with respect to how they occur in your project
+# directory. Further more, the standard installation procedure is
+# based upon the idea that the final installed location of targets is
+# specified and fixed at build time.
+#
+# As a special option, `generic.mk` can be asked to completely disable
+# its support for installation, and instead link all programs as if
+# they had been declared as 'noinst' programs in the first place. This
+# mode also disables the creation of the extra 'noinst' versions (as
+# they would be redundant), and it will disable shared library
+# versioning, that is, it will build each library as if no version was
+# specified for it (see 'Library versioning' below). This mode is
+# enabled by setting the environment variable `ENABLE_NOINST_BUILD` to
+# a non-empty value. Be sure to do a `make clean` when you switch
+# between 'noinst' and regular mode.
+#
+#
+# Programs that are not installed
+# -------------------------------
 #
 # Sometimes it is desirable to build a program that is not supposed to
 # be installed when running `make install`. One reason could be that
 # the program is used only for testing. Such programs are created by
-# using the special primary prefix `NOINST`, for example:
+# using the special primary prefix `noinst`, for example:
 #
-#   NOINST_PROGRAMS = performance
+#   noinst_PROGRAMS = performance
 #
 # There is another related category of programs called 'test programs'
 # that are both built and executed when running `make test`. These
-# programs are created by using the `TEST` primary prefix, and are
+# programs are created by using the `check` primary prefix, and are
 # also not installed:
 #
-#   TEST_PROGRAMS = test_foo test_bar
+#   check_PROGRAMS = test_foo test_bar
 #
 # It is also possible to create a convenience library that is built
 # only when 'test programs' are built. List libraries of this kind in
-# `TEST_LIBRARIES`.
+# `check_LIBRARIES`.
 #
 #
 # Subdirectories
@@ -202,12 +317,7 @@
 # `Makefile`, refer to the source files using relative paths as
 # follows:
 #
-#   EXTRA_CLEAN_DIRS = foo bar
 #   myprog_SOURCES = foo/alpha.cpp bar/beta.cpp
-#
-# Mentioning the involved subdirectories in `EXTRA_CLEAN_DIRS` is
-# necessary and tells `generic.mk` to remove temporary files in those
-# directories during `make clean`.
 #
 # The alternative is to use multiple `Makefile`s. This requires one or
 # more subdirectories each one with an extra subordinate
@@ -246,7 +356,7 @@
 #     include generic.mk
 #
 #   util/Makefile:
-#     NOINST_LIBRARIES = util.a
+#     noinst_LIBRARIES = util.a
 #     util_a_SOURCES = ...
 #     include ../generic.mk
 #
@@ -333,10 +443,10 @@
 #
 # All variables listed in the section CONFIG VARIABLES are available
 # for modification in `project.mk`, and they may also be overridden on
-# the command line. For example, to enable PTHREADS and disable
+# the command line. For example, to enable POSIX Threads and disable
 # automatic dependency tracking, you could do this:
 #
-#   make CFLAGS_PTHREAD=-pthread CFLAGS_AUTODEP=""
+#   make CFLAGS_PTHREADS=-pthreads CFLAGS_AUTODEP=""
 #
 # If CFLAGS is specified in the environment or on the command line, it
 # will replace the value of CFLAGS_GENERAL. Similarly with LDFLAGS and
@@ -367,25 +477,47 @@
 #   ifneq ($(CC_CXX_AND_LD_ARE_GCC_LIKE),)
 #   # GCC specific stuff
 #   endif
+#
+#
+# Technicalities
+# --------------
+#
+# Project local files and directories mentioned in variables passed to
+# `generic.mk` as part of specifying target, source, or subdirectory
+# paths, must consist entirely of letters, digits, `_`, `-`, and `.`
+# (all from the ASCII character set). In particular, spaces are not
+# allowed. When variable names are constructed from paths, `/`, `-`,
+# and `.` are folded to `_`.
+#
+# The same restriction applies to all installation directories
+# (`bindir`, `libdir` `includedir`, etc.).
+#
+# On the other hand, the value of `DESTDIR` may contain any graphical
+# characters from the ASCII character set as well as SPACE and TAB.
+#
+# Except when you are building in 'code coverage' mode, the absolute
+# path to the root of your project may contain any graphical
+# characters from ASCII as well as SPACE and TAB. However, when you
+# are building in 'code coverage' mode, your project root path must
+# adhere to the same restrictions that apply to project local target
+# paths passed to `generic.mk`.
 
 
 
 # CONFIG VARIABLES
 
-# Relative path to root of source tree. If specified, a corresponding
-# include option (`-I`) is added to the compiler command
-# line. Specifying it, also permits installation of headers. Headers
-# will be installed under the same relative path as they have with
-# respect to the directory specified here. Headers are marked for
-# installation by adding them to the `INST_HEADERS` variable in the
-# local `Makefile`.
-SOURCE_ROOT =
+# The relative path to the root of the include tree. If specified, a
+# corresponding include option (`-I`) is added to the compiler command
+# line for all object file targets in the project, and the primary
+# prefix `subinclude` becomes available in Makefiles contained inside
+# the specified directory.
+INCLUDE_ROOT =
 
 CFLAGS_OPTIM          = -DNDEBUG
 CFLAGS_DEBUG          =
 CFLAGS_COVER          =
 CFLAGS_SHARED         =
-CFLAGS_PTHREAD        =
+CFLAGS_PTHREADS       =
 CFLAGS_GENERAL        =
 CFLAGS_C              =
 CFLAGS_CXX            =
@@ -397,7 +529,7 @@ LDFLAGS_OPTIM         = $(filter-out -D%,$(CFLAGS_OPTIM))
 LDFLAGS_DEBUG         = $(filter-out -D%,$(CFLAGS_DEBUG))
 LDFLAGS_COVER         = $(filter-out -D%,$(CFLAGS_COVER))
 LDFLAGS_SHARED        =
-LDFLAGS_PTHREAD       = $(CFLAGS_PTHREAD)
+LDFLAGS_PTHREADS      = $(CFLAGS_PTHREADS)
 LDFLAGS_GENERAL       =
 LDFLAGS_ARCH          = $(CFLAGS_ARCH)
 ARFLAGS_GENERAL       = csr
@@ -414,6 +546,10 @@ PROJECT_LDFLAGS_COVER =
 LIB_SUFFIX_STATIC     = .a
 LIB_SUFFIX_SHARED     = .so
 LIB_SUFFIX_LIBDEPS    = .libdeps
+
+ifneq ($(filter undefined environment,$(origin PROG_SUFFIX)),)
+PROG_SUFFIX           =
+endif
 
 BASE_DENOM            =
 OBJ_DENOM_SHARED      = .pic
@@ -450,75 +586,145 @@ ENABLE_INSTALL_DEBUG_PROGS =
 # package for a library product, you can run 'make install
 # INSTALL_FILTER=shared-libs,progs' for the binary package and 'make
 # install INSTALL_FILTER=static-libs,dev-progs,headers' for the
-# development package. This filter also affects 'uninstall', but note
-# that 'uninstall' makes no attempt to uninstall headers, instead it
-# invokes a custom target 'uninstall/extra' if 'extra' is included in
-# the filter. It is then up to the application to decide what actions
-# to take on 'uninstall/extra'.
-INSTALL_FILTER = shared-libs,static-libs,progs,dev-progs,headers,extra
+# development package. This filter affects uninstallation the same way
+# it affects installation.
+INSTALL_FILTER = shared-libs,static-libs,progs,dev-progs,headers
 
 # Installation (GNU style)
 prefix          = /usr/local
 exec_prefix     = $(prefix)
-includedir      = $(prefix)/include
 bindir          = $(exec_prefix)/bin
 sbindir         = $(exec_prefix)/sbin
 libdir          = $(if $(USE_LIB64),$(exec_prefix)/lib64,$(exec_prefix)/lib)
 libexecdir      = $(exec_prefix)/libexec
+includedir      = $(prefix)/include
 INSTALL         = install
 INSTALL_DIR     = $(INSTALL) -d
 INSTALL_DATA    = $(INSTALL) -m 644
 INSTALL_LIBRARY = $(INSTALL) -m 644
 INSTALL_PROGRAM = $(INSTALL)
 
+VALGRIND = valgrind --quiet --track-origins=yes --leak-check=yes --leak-resolution=low
+
 # Alternative filesystem root for installation
 DESTDIR =
 
 
 
-# UTILITY FUNCTIONS
+# UTILITY CONSTANTS AND FUNCTIONS
 
-EMPTY =
-SPACE = $(EMPTY) $(EMPTY)
-COMMA = ,
-EQUALS = $(if $(word 2,$(sort $(1) $(2))),,$(1))
+EMPTY :=
+SPACE := $(EMPTY) $(EMPTY)
+COMMA := ,
+APOSTROPHE := $(patsubst "%",%,"'")
+
+define NEWLINE
+$(EMPTY)
+$(EMPTY)
+endef
+
+define TAB
+	$(EMPTY)
+endef
+
+NL_TAB := $(NEWLINE)$(TAB)
+
+IDENTITY = $(1)
+
+IS_EQUAL_TO = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
+
+IS_PREFIX_OF = $(findstring .$(call IS_PREFIX_OF_1,$(1)),.$(call IS_PREFIX_OF_1,$(2)))
+IS_PREFIX_OF_1 = $(subst .,:d:,$(subst :,:c:,$(1)))
+
 COND_PREPEND = $(if $(2),$(1)$(2))
-COND_APPEND = $(if $(1),$(1)$(2))
-# ARGS: predicate, list, optional_arg
+COND_APPEND  = $(if $(1),$(1)$(2))
+
+LIST_CONCAT  = $(if $(and $(1),$(2)),$(1) $(2),$(1)$(2))
+LIST_REVERSE = $(if $(1),$(call LIST_CONCAT,$(call LIST_REVERSE,$(wordlist 2,$(words $(1)),$(1))),$(firstword $(1))))
+
+# ARGS: predicate, list, optional_predicate_arg
+STABLE_PARTITION = $(call STABLE_PARTITION_1,$(1),$(strip $(2)),$(3))
+STABLE_PARTITION_1 = $(if $(2),$(call STABLE_PARTITION_2,$(1),$(wordlist 2,$(words $(2)),$(2)),$(3),$(4),$(5),$(word 1,$(2))),$(strip $(4) $(5)))
+STABLE_PARTITION_2 = $(if $(call $(1),$(6),$(3)),$(call STABLE_PARTITION_1,$(1),$(2),$(3),$(4) $(6),$(5)),$(call STABLE_PARTITION_1,$(1),$(2),$(3),$(4),$(5) $(6)))
+
+# ARGS: predicate, list, optional_predicate_arg
 # Expands to first matching entry
 FIND = $(call FIND_1,$(1),$(strip $(2)),$(3))
 FIND_1 = $(if $(2),$(call FIND_2,$(1),$(2),$(3),$(word 1,$(2))))
 FIND_2 = $(if $(call $(1),$(4),$(3)),$(4),$(call FIND_1,$(1),$(wordlist 2,$(words $(2)),$(2)),$(3)))
+
 # ARGS: func, init_accum, list
 FOLD_LEFT = $(call FOLD_LEFT_1,$(1),$(2),$(strip $(3)))
 FOLD_LEFT_1 = $(if $(3),$(call FOLD_LEFT_1,$(1),$(call $(1),$(2),$(word 1,$(3))),$(wordlist 2,$(words $(3)),$(3))),$(2))
+
+# ARGS: list_1, list_2
 UNION = $(call FOLD_LEFT,UNION_1,$(1),$(2))
-UNION_1 = $(if $(call FIND,EQUALS,$(1),$(2)),$(1),$(1) $(2))
+UNION_1 = $(if $(call FIND,IS_EQUAL_TO,$(1),$(2)),$(1),$(if $(1),$(1) $(2),$(2)))
+
+# ARGS: list
+REMOVE_DUPES = $(call UNION,,$(1))
+
+# ARGS: predicate, list, optional_predicate_arg
+FILTER = $(call FILTER_1,$(1),$(strip $(2)),$(3))
+FILTER_1 = $(if $(2),$(call FILTER_1,$(1),$(wordlist 2,$(words $(2)),$(2)),$(3),$(call LIST_CONCAT,$(4),$(if $(call $(1),$(word 1,$(2)),$(3)),$(word 1,$(2))))),$(4))
+
+# ARGS: list
+REMOVE_PREFIXES = $(call FILTER,REMOVE_PREFIXES_1,$(1),$(1))
+REMOVE_PREFIXES_1 = $(if $(call FIND,REMOVE_PREFIXES_2,$(2),$(1)),,x)
+REMOVE_PREFIXES_2 = $(if $(call IS_EQUAL_TO,$(2),$(1)),,$(call IS_PREFIX_OF,$(2),$(1)))
+
+HIDE_SPACE   = $(subst $(TAB),:t:,$(subst $(SPACE),:s:,$(subst :,:c:,$(1))))
+UNHIDE_SPACE = $(subst :c:,:,$(subst :s:,$(SPACE),$(subst :t:,$(TAB),$(1))))
+
 # If `a` and `b` are relative or absolute paths (without a final
 # slash), and `b` points to a directory, then PATH_DIFF(a,b) expands
 # to the relative path from `b` to `a`. If abspath(a) and abspath(b)
 # are the same path, then PATH_DIFF(a,b) expands to the empty string.
-PATH_DIFF = $(call PATH_DIFF_1,$(subst /,$(SPACE),$(abspath $(1))),$(subst /,$(SPACE),$(abspath $(2))))
-PATH_DIFF_1 = $(if $(and $(1),$(2),$(call EQUALS,$(word 1,$(1)),$(word 1,$(2)))),$(call PATH_DIFF_1,$(wordlist 2,$(words $(1)),$(1)),$(wordlist 2,$(words $(2)),$(2))),$(subst $(SPACE),/,$(strip $(patsubst %,..,$(2)) $(1))))
-# If `p` is already an absolute path, then MAKE_ABS_PATH(p,base)
-# expands to `p`. Otherwise it exands to abspath(base/p). If `base` is
-# unspecified, it defaults to `.`.
-MAKE_ABS_PATH = $(if $(filter /%,$(1)),$(1),$(abspath $(or $(2),.)/$(1)))
+PATH_DIFF = $(call PATH_DIFF_2,$(call PATH_DIFF_1,$(1)),$(call PATH_DIFF_1,$(2)))
+PATH_DIFF_1 = $(subst /,$(SPACE),$(abspath $(call HIDE_SPACE,$(if $(filter /%,$(1)),$(1),$(abspath .)/$(1)))))
+PATH_DIFF_2 = $(if $(and $(1),$(2),$(call IS_EQUAL_TO,$(word 1,$(1)),$(word 1,$(2)))),$(call PATH_DIFF_2,$(wordlist 2,$(words $(1)),$(1)),$(wordlist 2,$(words $(2)),$(2))),$(call UNHIDE_SPACE,$(subst $(SPACE),/,$(strip $(patsubst %,..,$(2)) $(1)))))
+
+# If `p` is already an absolute path, or if `optional_abs_base` is not
+# specified, then `MAKE_ABS_PATH(p, optional_abs_base)` expands to
+# `abspath(p)`. Otherwise, `optional_abs_base` must be an absolute
+# path, and this function expands to
+# `abspath(optional_abs_base+'/'+p)`. As opposed to the built-in
+# function `abspath()`, this function properly handles paths that
+# contain spaces.
+MAKE_ABS_PATH = $(call UNHIDE_SPACE,$(abspath $(call HIDE_SPACE,$(if $(filter /%,$(1)),$(1),$(or $(2),$(abspath .))/$(1)))))
+
 # If `p` and `base` are paths, then MAKE_REL_PATH(p,base) expands to
 # the relative path from abspath(base) to abspath(p). If the two paths
 # are equal, it expands to `.`. If `base` is unspecified, it defaults
 # to `.`.
 MAKE_REL_PATH = $(or $(call PATH_DIFF,$(1),$(or $(2),.)),.)
-IN_THIS_DIR = $(call EQUALS,$(realpath $(dir $(1))),$(realpath ./))
+
+IS_SAME_PATH_AS = $(call IS_EQUAL_TO,$(call CANON_PATH_HIDE_SPACE,$(1)),$(call CANON_PATH_HIDE_SPACE,$(2)))
+IS_PATH_CONTAINED_IN = $(call IS_PREFIX_OF,$(call CANON_PATH_HIDE_SPACE,$(2))/,$(call CANON_PATH_HIDE_SPACE,$(1)))
+CANON_PATH_HIDE_SPACE = $(abspath $(call HIDE_SPACE,$(patsubst %/,%,$(if $(filter /%,$(1)),$(1),$(abspath .)/$(1)))))
+
+# Only a `*` is recognized, and at most one is allowed per component
+# of the wildcard path. Matching is guaranteed to fail if any
+# component of the wildcard path has more than one star and the
+# non-wildcard path has no stars in it.
+#
+# ARGS: wildcard_path, path
+WILDCARD_PATH_MATCH = $(and $(call WILDCARD_PATH_MATCH_1,$(dir $(1)),$(dir $(2))),$(filter $(subst *,%,$(subst %,\%,$(notdir $(1)))),$(notdir $(2))))
+WILDCARD_PATH_MATCH_1 = $(if $(filter-out / ./,$(1) $(2)),$(if $(filter / ./,$(1) $(2)),,$(call WILDCARD_PATH_MATCH,$(patsubst %/,%,$(1)),$(patsubst %/,%,$(2)))),$(filter // ././,$(1)$(2)))
+
+# ARGS: wildcard_paths, paths
+WILDCARD_PATHS_FILTER_OUT = $(foreach x,$(2),$(if $(strip $(foreach y,$(1),$(call WILDCARD_PATH_MATCH,$(y),$(x)))),,$(x)))
+
+# Escape space, tab, and the following 21 characters using backslashes: !"#$&'()*;<>?[\]`{|}~
+SHELL_ESCAPE = $(shell printf '%s\n' '$(call SHELL_ESCAPE_1,$(1))' | sed $(SHELL_ESCAPE_2))
+SHELL_ESCAPE_1 = $(subst $(APOSTROPHE),$(APOSTROPHE)\$(APOSTROPHE)$(APOSTROPHE),$(1))
+SHELL_ESCAPE_2 = 's/\([]$(TAB)$(SPACE)!"\#$$&'\''()*;<>?[\`{|}~]\)/\\\1/g'
+
 HAVE_CMD = $(shell which $(1))
 MATCH_CMD = $(filter $(1) $(1)-%,$(notdir $(2)))
 MAP_CMD = $(if $(call MATCH_CMD,$(1),$(3)),$(if $(findstring /,$(3)),$(dir $(3)))$(patsubst $(1)%,$(2)%,$(notdir $(3))))
-CAT_OPT_FILE = $(and $(wildcard $(1)),$(shell cat $(1)))
 
-define NEW_RECIPE
-$(EMPTY)
-	$(EMPTY)
-endef
+CAT_OPT_FILE = $(shell cat $(1) 2>/dev/null)
 
 # Library for non-negative integer arithmetic.
 #
@@ -685,25 +891,25 @@ CC_CXX_AND_LD_ARE_1 = $(and $(call MATCH_CMD,$(1),$(CC)),$(strip $(foreach x,$(1
 CC_CXX_AND_LD_ARE_GCC_LIKE = $(strip $(foreach x,$(GCC_LIKE_COMPILERS),$(call CC_CXX_AND_LD_ARE,$(x))))
 
 GENERIC_MK := $(lastword $(MAKEFILE_LIST))
-GENERIC_MK_DIR = $(abspath $(patsubst %/,%,$(dir $(GENERIC_MK))))
-PROJECT_MK = $(call MAKE_REL_PATH,$(GENERIC_MK_DIR)/project.mk)
-DEP_MAKEFILES = Makefile $(GENERIC_MK)
+GENERIC_MK_DIR := $(patsubst %/,%,$(dir $(GENERIC_MK)))
+PROJECT_MK := $(GENERIC_MK_DIR)/project.mk
+DEP_MAKEFILES := Makefile $(GENERIC_MK)
 ifneq ($(wildcard $(PROJECT_MK)),)
 DEP_MAKEFILES += $(PROJECT_MK)
+include $(PROJECT_MK)
 endif
--include $(PROJECT_MK)
 
-ifneq ($(SOURCE_ROOT),)
-ABS_SOURCE_ROOT = $(abspath $(GENERIC_MK_DIR)/$(SOURCE_ROOT))
-REL_SOURCE_ROOT = $(call MAKE_REL_PATH,$(ABS_SOURCE_ROOT))
+ifneq ($(INCLUDE_ROOT),)
+REL_INCLUDE_ROOT := $(call MAKE_REL_PATH,$(dir $(GENERIC_MK))/$(INCLUDE_ROOT))
 endif
+
 
 
 # SETUP BUILD COMMANDS
 
-CFLAGS_SPECIFIED  = $(filter-out undefined default,$(origin CFLAGS))
-LDFLAGS_SPECIFIED = $(filter-out undefined default,$(origin LDFLAGS))
-ARFLAGS_SPECIFIED = $(filter-out undefined default,$(origin ARFLAGS))
+CFLAGS_SPECIFIED  := $(filter-out undefined default,$(origin CFLAGS))
+LDFLAGS_SPECIFIED := $(filter-out undefined default,$(origin LDFLAGS))
+ARFLAGS_SPECIFIED := $(filter-out undefined default,$(origin ARFLAGS))
 ifneq ($(CFLAGS_SPECIFIED),)
 CFLAGS_GENERAL = $(CFLAGS)
 endif
@@ -716,217 +922,222 @@ endif
 CFLAGS_GENERAL  += $(EXTRA_CFLAGS)
 LDFLAGS_GENERAL += $(EXTRA_LDFLAGS)
 
-CC_STATIC_OPTIM   = $(CC) $(CFLAGS_OPTIM) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_C)
-CC_SHARED_OPTIM   = $(CC) $(CFLAGS_OPTIM) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_C)
-CC_STATIC_DEBUG   = $(CC) $(CFLAGS_DEBUG) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_C)
-CC_SHARED_DEBUG   = $(CC) $(CFLAGS_DEBUG) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_C)
-CC_STATIC_COVER   = $(CC) $(CFLAGS_COVER) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_C)
-CC_SHARED_COVER   = $(CC) $(CFLAGS_COVER) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_C)
+CC_STATIC_OPTIM   = $(CC) $(CFLAGS_OPTIM) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_C)
+CC_SHARED_OPTIM   = $(CC) $(CFLAGS_OPTIM) $(CFLAGS_SHARED) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_C)
+CC_STATIC_DEBUG   = $(CC) $(CFLAGS_DEBUG) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_C)
+CC_SHARED_DEBUG   = $(CC) $(CFLAGS_DEBUG) $(CFLAGS_SHARED) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_C)
+CC_STATIC_COVER   = $(CC) $(CFLAGS_COVER) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_C)
+CC_SHARED_COVER   = $(CC) $(CFLAGS_COVER) $(CFLAGS_SHARED) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_C)
 
-CXX_STATIC_OPTIM  = $(CXX) $(CFLAGS_OPTIM) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_CXX)
-CXX_SHARED_OPTIM  = $(CXX) $(CFLAGS_OPTIM) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_CXX)
-CXX_STATIC_DEBUG  = $(CXX) $(CFLAGS_DEBUG) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_CXX)
-CXX_SHARED_DEBUG  = $(CXX) $(CFLAGS_DEBUG) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_CXX)
-CXX_STATIC_COVER  = $(CXX) $(CFLAGS_COVER) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_CXX)
-CXX_SHARED_COVER  = $(CXX) $(CFLAGS_COVER) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_CXX)
+CXX_STATIC_OPTIM  = $(CXX) $(CFLAGS_OPTIM) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_CXX)
+CXX_SHARED_OPTIM  = $(CXX) $(CFLAGS_OPTIM) $(CFLAGS_SHARED) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_CXX)
+CXX_STATIC_DEBUG  = $(CXX) $(CFLAGS_DEBUG) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_CXX)
+CXX_SHARED_DEBUG  = $(CXX) $(CFLAGS_DEBUG) $(CFLAGS_SHARED) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_CXX)
+CXX_STATIC_COVER  = $(CXX) $(CFLAGS_COVER) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_CXX)
+CXX_SHARED_COVER  = $(CXX) $(CFLAGS_COVER) $(CFLAGS_SHARED) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_CXX)
 
-OCC_STATIC_OPTIM  = $(OCC) $(CFLAGS_OPTIM) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_C) $(CFLAGS_OBJC)
-OCC_SHARED_OPTIM  = $(OCC) $(CFLAGS_OPTIM) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_C) $(CFLAGS_OBJC)
-OCC_STATIC_DEBUG  = $(OCC) $(CFLAGS_DEBUG) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_C) $(CFLAGS_OBJC)
-OCC_SHARED_DEBUG  = $(OCC) $(CFLAGS_DEBUG) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_C) $(CFLAGS_OBJC)
-OCC_STATIC_COVER  = $(OCC) $(CFLAGS_COVER) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_C) $(CFLAGS_OBJC)
-OCC_SHARED_COVER  = $(OCC) $(CFLAGS_COVER) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_C) $(CFLAGS_OBJC)
+OCC_STATIC_OPTIM  = $(OCC) $(CFLAGS_OPTIM) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_C) $(CFLAGS_OBJC)
+OCC_SHARED_OPTIM  = $(OCC) $(CFLAGS_OPTIM) $(CFLAGS_SHARED) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_C) $(CFLAGS_OBJC)
+OCC_STATIC_DEBUG  = $(OCC) $(CFLAGS_DEBUG) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_C) $(CFLAGS_OBJC)
+OCC_SHARED_DEBUG  = $(OCC) $(CFLAGS_DEBUG) $(CFLAGS_SHARED) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_C) $(CFLAGS_OBJC)
+OCC_STATIC_COVER  = $(OCC) $(CFLAGS_COVER) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_C) $(CFLAGS_OBJC)
+OCC_SHARED_COVER  = $(OCC) $(CFLAGS_COVER) $(CFLAGS_SHARED) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_C) $(CFLAGS_OBJC)
 
-OCXX_STATIC_OPTIM = $(OCXX) $(CFLAGS_OPTIM) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_OBJC) $(CFLAGS_CXX)
-OCXX_SHARED_OPTIM = $(OCXX) $(CFLAGS_OPTIM) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_OBJC) $(CFLAGS_CXX)
-OCXX_STATIC_DEBUG = $(OCXX) $(CFLAGS_DEBUG) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_OBJC) $(CFLAGS_CXX)
-OCXX_SHARED_DEBUG = $(OCXX) $(CFLAGS_DEBUG) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_OBJC) $(CFLAGS_CXX)
-OCXX_STATIC_COVER = $(OCXX) $(CFLAGS_COVER) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_OBJC) $(CFLAGS_CXX)
-OCXX_SHARED_COVER = $(OCXX) $(CFLAGS_COVER) $(CFLAGS_SHARED) $(CFLAGS_PTHREAD) $(CFLAGS_GENERAL) $(CFLAGS_OBJC) $(CFLAGS_CXX)
+OCXX_STATIC_OPTIM = $(OCXX) $(CFLAGS_OPTIM) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_OBJC) $(CFLAGS_CXX)
+OCXX_SHARED_OPTIM = $(OCXX) $(CFLAGS_OPTIM) $(CFLAGS_SHARED) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_OBJC) $(CFLAGS_CXX)
+OCXX_STATIC_DEBUG = $(OCXX) $(CFLAGS_DEBUG) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_OBJC) $(CFLAGS_CXX)
+OCXX_SHARED_DEBUG = $(OCXX) $(CFLAGS_DEBUG) $(CFLAGS_SHARED) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_OBJC) $(CFLAGS_CXX)
+OCXX_STATIC_COVER = $(OCXX) $(CFLAGS_COVER) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_OBJC) $(CFLAGS_CXX)
+OCXX_SHARED_COVER = $(OCXX) $(CFLAGS_COVER) $(CFLAGS_SHARED) $(CFLAGS_PTHREADS) $(CFLAGS_GENERAL) $(CFLAGS_OBJC) $(CFLAGS_CXX)
 
-LD_LIB_OPTIM      = $(LD) $(LDFLAGS_SHARED) $(LDFLAGS_OPTIM) $(LDFLAGS_PTHREAD) $(LDFLAGS_GENERAL)
-LD_LIB_DEBUG      = $(LD) $(LDFLAGS_SHARED) $(LDFLAGS_DEBUG) $(LDFLAGS_PTHREAD) $(LDFLAGS_GENERAL)
-LD_LIB_COVER      = $(LD) $(LDFLAGS_SHARED) $(LDFLAGS_COVER) $(LDFLAGS_PTHREAD) $(LDFLAGS_GENERAL)
-LD_PROG_OPTIM     = $(LD) $(LDFLAGS_OPTIM) $(LDFLAGS_PTHREAD) $(LDFLAGS_GENERAL)
-LD_PROG_DEBUG     = $(LD) $(LDFLAGS_DEBUG) $(LDFLAGS_PTHREAD) $(LDFLAGS_GENERAL)
-LD_PROG_COVER     = $(LD) $(LDFLAGS_COVER) $(LDFLAGS_PTHREAD) $(LDFLAGS_GENERAL)
+LD_LIB_OPTIM      = $(LD) $(LDFLAGS_SHARED) $(LDFLAGS_OPTIM) $(LDFLAGS_PTHREADS) $(LDFLAGS_GENERAL)
+LD_LIB_DEBUG      = $(LD) $(LDFLAGS_SHARED) $(LDFLAGS_DEBUG) $(LDFLAGS_PTHREADS) $(LDFLAGS_GENERAL)
+LD_LIB_COVER      = $(LD) $(LDFLAGS_SHARED) $(LDFLAGS_COVER) $(LDFLAGS_PTHREADS) $(LDFLAGS_GENERAL)
+LD_PROG_OPTIM     = $(LD) $(LDFLAGS_OPTIM) $(LDFLAGS_PTHREADS) $(LDFLAGS_GENERAL)
+LD_PROG_DEBUG     = $(LD) $(LDFLAGS_DEBUG) $(LDFLAGS_PTHREADS) $(LDFLAGS_GENERAL)
+LD_PROG_COVER     = $(LD) $(LDFLAGS_COVER) $(LDFLAGS_PTHREADS) $(LDFLAGS_GENERAL)
 
 
 
-BASE_DENOM_2            = $(if $(BASE_DENOM),-$(BASE_DENOM))
-SUFFIX_OBJ_STATIC_OPTIM = $(BASE_DENOM_2)$(OBJ_DENOM_OPTIM).o
-SUFFIX_OBJ_SHARED_OPTIM = $(BASE_DENOM_2)$(OBJ_DENOM_OPTIM)$(OBJ_DENOM_SHARED).o
-SUFFIX_OBJ_STATIC_DEBUG = $(BASE_DENOM_2)$(OBJ_DENOM_DEBUG).o
-SUFFIX_OBJ_SHARED_DEBUG = $(BASE_DENOM_2)$(OBJ_DENOM_DEBUG)$(OBJ_DENOM_SHARED).o
-SUFFIX_OBJ_STATIC_COVER = $(BASE_DENOM_2)$(OBJ_DENOM_COVER).o
-SUFFIX_OBJ_SHARED_COVER = $(BASE_DENOM_2)$(OBJ_DENOM_COVER)$(OBJ_DENOM_SHARED).o
-SUFFIX_LIB_STATIC_OPTIM = $(BASE_DENOM_2)$(LIB_DENOM_OPTIM)$(LIB_SUFFIX_STATIC)
-SUFFIX_LIB_SHARED_OPTIM = $(BASE_DENOM_2)$(LIB_DENOM_OPTIM)$(LIB_SUFFIX_SHARED)
-SUFFIX_LIB_STATIC_DEBUG = $(BASE_DENOM_2)$(LIB_DENOM_DEBUG)$(LIB_SUFFIX_STATIC)
-SUFFIX_LIB_SHARED_DEBUG = $(BASE_DENOM_2)$(LIB_DENOM_DEBUG)$(LIB_SUFFIX_SHARED)
-SUFFIX_LIB_STATIC_COVER = $(BASE_DENOM_2)$(LIB_DENOM_COVER)$(LIB_SUFFIX_STATIC)
-SUFFIX_LIB_SHARED_COVER = $(BASE_DENOM_2)$(LIB_DENOM_COVER)$(LIB_SUFFIX_SHARED)
-SUFFIX_PROG_OPTIM       = $(BASE_DENOM_2)$(PROG_DENOM_OPTIM)
-SUFFIX_PROG_DEBUG       = $(BASE_DENOM_2)$(PROG_DENOM_DEBUG)
-SUFFIX_PROG_COVER       = $(BASE_DENOM_2)$(PROG_DENOM_COVER)
+BASE_DENOM_2            := $(if $(BASE_DENOM),-$(BASE_DENOM))
+SUFFIX_OBJ_STATIC_OPTIM := $(BASE_DENOM_2)$(OBJ_DENOM_OPTIM).o
+SUFFIX_OBJ_SHARED_OPTIM := $(BASE_DENOM_2)$(OBJ_DENOM_OPTIM)$(OBJ_DENOM_SHARED).o
+SUFFIX_OBJ_STATIC_DEBUG := $(BASE_DENOM_2)$(OBJ_DENOM_DEBUG).o
+SUFFIX_OBJ_SHARED_DEBUG := $(BASE_DENOM_2)$(OBJ_DENOM_DEBUG)$(OBJ_DENOM_SHARED).o
+SUFFIX_OBJ_STATIC_COVER := $(BASE_DENOM_2)$(OBJ_DENOM_COVER).o
+SUFFIX_OBJ_SHARED_COVER := $(BASE_DENOM_2)$(OBJ_DENOM_COVER)$(OBJ_DENOM_SHARED).o
+SUFFIX_LIB_STATIC_OPTIM := $(BASE_DENOM_2)$(LIB_DENOM_OPTIM)$(LIB_SUFFIX_STATIC)
+SUFFIX_LIB_SHARED_OPTIM := $(BASE_DENOM_2)$(LIB_DENOM_OPTIM)$(LIB_SUFFIX_SHARED)
+SUFFIX_LIB_STATIC_DEBUG := $(BASE_DENOM_2)$(LIB_DENOM_DEBUG)$(LIB_SUFFIX_STATIC)
+SUFFIX_LIB_SHARED_DEBUG := $(BASE_DENOM_2)$(LIB_DENOM_DEBUG)$(LIB_SUFFIX_SHARED)
+SUFFIX_LIB_STATIC_COVER := $(BASE_DENOM_2)$(LIB_DENOM_COVER)$(LIB_SUFFIX_STATIC)
+SUFFIX_LIB_SHARED_COVER := $(BASE_DENOM_2)$(LIB_DENOM_COVER)$(LIB_SUFFIX_SHARED)
+SUFFIX_PROG_OPTIM       := $(BASE_DENOM_2)$(PROG_DENOM_OPTIM)$(PROG_SUFFIX)
+SUFFIX_PROG_DEBUG       := $(BASE_DENOM_2)$(PROG_DENOM_DEBUG)$(PROG_SUFFIX)
+SUFFIX_PROG_COVER       := $(BASE_DENOM_2)$(PROG_DENOM_COVER)$(PROG_SUFFIX)
 
-GET_FLAGS = $($(1)) $($(1)$(2))
+GET_FLAGS = $($(1)) $($(1)_$(2))
 FOLD_TARGET = $(subst /,_,$(subst .,_,$(subst -,_,$(1))))
-GET_LIBRARY_NAME = $(patsubst %.a,%,$(1))
-GET_OBJECTS_FROM_SOURCES = $(patsubst %.c,%$(2),$(patsubst %.cpp,%$(2),$(patsubst %.m,%$(2),$(patsubst %.mm,%$(2),$(1)))))
-GET_OBJECTS_FOR_TARGET   = $(call GET_OBJECTS_FROM_SOURCES,$($(call FOLD_TARGET,$(1))_SOURCES),$(2))
-GET_CFLAGS_FOR_TARGET    = $(foreach x,PROJECT DIR $(foreach y,$(GMK_$(call FOLD_TARGET,$(1))_TARGETS) $(1),$(call FOLD_TARGET,$(y))),$(call GET_FLAGS,$(x)_CFLAGS,$(2)))
+GET_LIBRARY_STEM         = $(patsubst %.a,%,$(1))
+GET_OBJECTS_FOR_TARGET   = $(addsuffix $(2),$(basename $($(call FOLD_TARGET,$(1))_SOURCES)))
 GET_LDFLAGS_FOR_TARGET   = $(foreach x,PROJECT DIR $(call FOLD_TARGET,$(1)),$(call GET_FLAGS,$(x)_LDFLAGS,$(2)))
 GET_DEPS_FOR_TARGET      = $($(call FOLD_TARGET,$(1))_DEPS)
-GET_VERSION_FOR_TARGET   = $(call GET_VERSION_FOR_TARGET_2,$(strip $($(call FOLD_TARGET,$(1))_VERSION)))
-GET_VERSION_FOR_TARGET_2 = $(if $(1),$(wordlist 1,3,$(subst :, ,$(1):0:0)))
+GET_LIBRARY_VERSION      = $(call GET_LIBRARY_VERSION_2,$(strip $($(call FOLD_TARGET,$(1))_VERSION)))
+GET_LIBRARY_VERSION_2    = $(if $(1),$(wordlist 1,3,$(subst :, ,$(1):0:0)))
 
-INC_FLAGS         = $(CFLAGS_INCLUDE)
-INC_FLAGS_ABS     = $(CFLAGS_INCLUDE)
-ifneq ($(SOURCE_ROOT),)
-INC_FLAGS        += -I$(REL_SOURCE_ROOT)
-INC_FLAGS_ABS    += -I$(ABS_SOURCE_ROOT)
+INC_FLAGS := $(CFLAGS_INCLUDE)
+INC_FLAGS_COVER = $(CFLAGS_INCLUDE)
+ifneq ($(REL_INCLUDE_ROOT),)
+INC_FLAGS += -I$(REL_INCLUDE_ROOT)
+INC_FLAGS_COVER += -I$(call MAKE_ABS_PATH,$(REL_INCLUDE_ROOT))
 endif
 
-PRIMARY_PREFIXES = bin sbin lib libexec $(EXTRA_PRIMARY_PREFIXES)
+PRIMARIES := HEADERS LIBRARIES PROGRAMS
+PRIMARY_PREFIXES := bin sbin lib libexec include
+INCLUDE_SUBDIR :=
 
-bin_INSTALL_DIR     = $(bindir)
-sbin_INSTALL_DIR    = $(sbindir)
-lib_INSTALL_DIR     = $(libdir)
-libexec_INSTALL_DIR = $(libexecdir)
+USING_SUBINCLUDE := $(strip $(foreach x,$(PRIMARIES) $(PRIMARIES)_EXTRA_UNINSTALL,$(subinclude_$(x))$(nobase_subinclude_$(x))))
+ifneq ($(USING_SUBINCLUDE),)
+ifeq ($(REL_INCLUDE_ROOT),)
+$(error Cannot determine installation directory for `subinclude` when `INCLUDE_ROOT` is unspecified)
+endif
+INSIDE_INCLUDE_ROOT := $(or $(call IS_SAME_PATH_AS,.,$(REL_INCLUDE_ROOT)),$(call IS_PATH_CONTAINED_IN,.,$(REL_INCLUDE_ROOT)))
+ifeq ($(INSIDE_INCLUDE_ROOT),)
+$(error Cannot determine installation directory for `subinclude` from outside `INCLUDE_ROOT`)
+endif
+PRIMARY_PREFIXES += subinclude
+INCLUDE_SUBDIR := $(call PATH_DIFF,.,$(REL_INCLUDE_ROOT))
+endif
+
+PRIMARY_PREFIXES += $(EXTRA_PRIMARY_PREFIXES)
 
 # ARGS: primary_prefix
-GET_INSTALL_DIR = $(if $(strip $($(1)_INSTALL_DIR)),$(DESTDIR)$(strip $($(1)_INSTALL_DIR)),$(error No INSTALL_DIR defined for primary prefix '$(1)'))
+GET_INSTALL_DIR = $(if $(filter subinclude,$(1)),$(call GET_ROOT_INSTALL_DIR,include)$(call COND_PREPEND,/,$(INCLUDE_SUBDIR)),$(call GET_ROOT_INSTALL_DIR,$(1)))
+GET_ROOT_INSTALL_DIR = $(if $($(1)dir),$(patsubst %/,%,$($(1)dir)),$(error Variable `$(1)dir` was not specified))
+
+# ARGS: folded_lib_target, install_dir
+define RECORD_LIB_INSTALL_DIR
+GMK_INSTALL_DIR_$(1) = $(2)
+endef
 
 # ARGS: primary_prefix, install_dir
-define RECORD_LIB_INSTALL_DIR
-$(foreach x,$($(1)_LIBRARIES),GMK_$(call FOLD_TARGET,$(x))_INSTALL_DIR = $(2)
-)
-endef
+RECORD_LIB_INSTALL_DIRS = \
+$(foreach x,$($(1)_LIBRARIES),$(eval $(call RECORD_LIB_INSTALL_DIR,$(call FOLD_TARGET,$(x)),$(2))))\
+$(foreach x,$(nobase_$(1)_LIBRARIES),$(eval $(call RECORD_LIB_INSTALL_DIR,$(call FOLD_TARGET,$(x)),$(patsubst %/,%,$(dir $(2)/$(x))))))
 
-define RECORD_LIB_INSTALL_DIRS
-$(foreach x,$(PRIMARY_PREFIXES),$(call RECORD_LIB_INSTALL_DIR,$(x),$(call GET_INSTALL_DIR,$(x)))
-)
-endef
+$(foreach x,$(PRIMARY_PREFIXES),$(call RECORD_LIB_INSTALL_DIRS,$(x),$(call GET_INSTALL_DIR,$(x))))
 
-$(eval $(RECORD_LIB_INSTALL_DIRS))
+# ARGS: installable_lib_target
+GET_INSTALL_DIR_FOR_LIB_TARGET = $(value GMK_INSTALL_DIR_$(call FOLD_TARGET,$(1)))
 
-# ARGS: installable_target
-GET_INSTALL_DIR_FOR_TARGET = $(GMK_$(call FOLD_TARGET,$(1))_INSTALL_DIR)
+INST_PROGRAMS  := $(strip $(foreach x,$(PRIMARY_PREFIXES),$($(x)_PROGRAMS)  $(nobase_$(x)_PROGRAMS)))
+INST_LIBRARIES := $(strip $(foreach x,$(PRIMARY_PREFIXES),$($(x)_LIBRARIES) $(nobase_$(x)_LIBRARIES)))
 
-INST_LIBRARIES = $(strip $(foreach x,$(PRIMARY_PREFIXES),$($(x)_LIBRARIES)))
-INST_PROGRAMS  = $(strip $(foreach x,$(PRIMARY_PREFIXES),$($(x)_PROGRAMS)))
+LIBRARIES := $(INST_LIBRARIES) $(noinst_LIBRARIES) $(check_LIBRARIES)
+PROGRAMS  := $(INST_PROGRAMS) $(DEV_PROGRAMS) $(noinst_PROGRAMS) $(check_PROGRAMS)
 
-LIBRARIES = $(INST_LIBRARIES) $(NOINST_LIBRARIES) $(TEST_LIBRARIES)
-PROGRAMS  = $(INST_PROGRAMS) $(DEV_PROGRAMS) $(NOINST_PROGRAMS) $(TEST_PROGRAMS)
+SOURCE_DIRS := $(patsubst ././,./,$(patsubst %,./%,$(call REMOVE_DUPES,$(dir $(foreach x,$(LIBRARIES) $(PROGRAMS),$($(call FOLD_TARGET,$(x))_SOURCES))))))
 
-OBJECTS_STATIC_OPTIM = $(foreach x,$(LIBRARIES) $(PROGRAMS),$(call GET_OBJECTS_FOR_TARGET,$(x),$(SUFFIX_OBJ_STATIC_OPTIM)))
-OBJECTS_SHARED_OPTIM = $(foreach x,$(LIBRARIES),$(call GET_OBJECTS_FOR_TARGET,$(x),$(SUFFIX_OBJ_SHARED_OPTIM)))
-OBJECTS_STATIC_DEBUG = $(foreach x,$(LIBRARIES) $(PROGRAMS),$(call GET_OBJECTS_FOR_TARGET,$(x),$(SUFFIX_OBJ_STATIC_DEBUG)))
-OBJECTS_SHARED_DEBUG = $(foreach x,$(LIBRARIES),$(call GET_OBJECTS_FOR_TARGET,$(x),$(SUFFIX_OBJ_SHARED_DEBUG)))
-OBJECTS_STATIC_COVER = $(foreach x,$(LIBRARIES) $(PROGRAMS),$(call GET_OBJECTS_FOR_TARGET,$(x),$(SUFFIX_OBJ_STATIC_COVER)))
-OBJECTS_SHARED_COVER = $(foreach x,$(LIBRARIES),$(call GET_OBJECTS_FOR_TARGET,$(x),$(SUFFIX_OBJ_SHARED_COVER)))
-OBJECTS = $(sort $(OBJECTS_STATIC_OPTIM) $(OBJECTS_SHARED_OPTIM) $(OBJECTS_STATIC_DEBUG) $(OBJECTS_SHARED_DEBUG) $(OBJECTS_STATIC_COVER) $(OBJECTS_SHARED_COVER))
+OBJECTS_STATIC_OPTIM := $(foreach x,$(LIBRARIES) $(PROGRAMS),$(call GET_OBJECTS_FOR_TARGET,$(x),$(SUFFIX_OBJ_STATIC_OPTIM)))
+OBJECTS_SHARED_OPTIM := $(foreach x,$(LIBRARIES),$(call GET_OBJECTS_FOR_TARGET,$(x),$(SUFFIX_OBJ_SHARED_OPTIM)))
+OBJECTS_STATIC_DEBUG := $(foreach x,$(LIBRARIES) $(PROGRAMS),$(call GET_OBJECTS_FOR_TARGET,$(x),$(SUFFIX_OBJ_STATIC_DEBUG)))
+OBJECTS_SHARED_DEBUG := $(foreach x,$(LIBRARIES),$(call GET_OBJECTS_FOR_TARGET,$(x),$(SUFFIX_OBJ_SHARED_DEBUG)))
+OBJECTS_STATIC_COVER := $(foreach x,$(LIBRARIES) $(PROGRAMS),$(call GET_OBJECTS_FOR_TARGET,$(x),$(SUFFIX_OBJ_STATIC_COVER)))
+OBJECTS_SHARED_COVER := $(foreach x,$(LIBRARIES),$(call GET_OBJECTS_FOR_TARGET,$(x),$(SUFFIX_OBJ_SHARED_COVER)))
+OBJECTS := $(sort $(OBJECTS_STATIC_OPTIM) $(OBJECTS_SHARED_OPTIM) $(OBJECTS_STATIC_DEBUG) $(OBJECTS_SHARED_DEBUG) $(OBJECTS_STATIC_COVER) $(OBJECTS_SHARED_COVER))
 
-TARGETS_LIB_STATIC_OPTIM   = $(foreach x,$(INST_LIBRARIES),$(call GET_LIBRARY_NAME,$(x))$(SUFFIX_LIB_STATIC_OPTIM))
-TARGETS_LIB_SHARED_OPTIM   = $(foreach x,$(INST_LIBRARIES),$(call GET_LIBRARY_NAME,$(x))$(SUFFIX_LIB_SHARED_OPTIM))
-TARGETS_LIB_STATIC_DEBUG   = $(foreach x,$(INST_LIBRARIES),$(call GET_LIBRARY_NAME,$(x))$(SUFFIX_LIB_STATIC_DEBUG))
-TARGETS_LIB_SHARED_DEBUG   = $(foreach x,$(INST_LIBRARIES),$(call GET_LIBRARY_NAME,$(x))$(SUFFIX_LIB_SHARED_DEBUG))
-TARGETS_LIB_STATIC_COVER   = $(foreach x,$(INST_LIBRARIES),$(call GET_LIBRARY_NAME,$(x))$(SUFFIX_LIB_STATIC_COVER))
-TARGETS_LIB_SHARED_COVER   = $(foreach x,$(INST_LIBRARIES),$(call GET_LIBRARY_NAME,$(x))$(SUFFIX_LIB_SHARED_COVER))
-TARGETS_INST_LIB_LIBDEPS   = $(foreach x,$(INST_LIBRARIES),$(call GET_LIBRARY_NAME,$(x))$(LIB_SUFFIX_LIBDEPS))
-TARGETS_NOINST_LIB_OPTIM   = $(foreach x,$(NOINST_LIBRARIES),$(call GET_LIBRARY_NAME,$(x))$(SUFFIX_LIB_STATIC_OPTIM))
-TARGETS_NOINST_LIB_DEBUG   = $(foreach x,$(NOINST_LIBRARIES),$(call GET_LIBRARY_NAME,$(x))$(SUFFIX_LIB_STATIC_DEBUG))
-TARGETS_NOINST_LIB_COVER   = $(foreach x,$(NOINST_LIBRARIES),$(call GET_LIBRARY_NAME,$(x))$(SUFFIX_LIB_STATIC_COVER))
-TARGETS_NOINST_LIB_LIBDEPS = $(foreach x,$(NOINST_LIBRARIES),$(call GET_LIBRARY_NAME,$(x))$(LIB_SUFFIX_LIBDEPS))
-TARGETS_TEST_LIB_OPTIM     = $(foreach x,$(TEST_LIBRARIES),$(call GET_LIBRARY_NAME,$(x))$(SUFFIX_LIB_STATIC_OPTIM))
-TARGETS_TEST_LIB_DEBUG     = $(foreach x,$(TEST_LIBRARIES),$(call GET_LIBRARY_NAME,$(x))$(SUFFIX_LIB_STATIC_DEBUG))
-TARGETS_TEST_LIB_COVER     = $(foreach x,$(TEST_LIBRARIES),$(call GET_LIBRARY_NAME,$(x))$(SUFFIX_LIB_STATIC_COVER))
-TARGETS_TEST_LIB_LIBDEPS   = $(foreach x,$(TEST_LIBRARIES),$(call GET_LIBRARY_NAME,$(x))$(LIB_SUFFIX_LIBDEPS))
-TARGETS_PROG_OPTIM         = $(foreach x,$(INST_PROGRAMS),$(x)$(SUFFIX_PROG_OPTIM))
-TARGETS_PROG_DEBUG         = $(foreach x,$(INST_PROGRAMS),$(x)$(SUFFIX_PROG_DEBUG))
-TARGETS_PROG_COVER         = $(foreach x,$(INST_PROGRAMS),$(x)$(SUFFIX_PROG_COVER))
-TARGETS_DEV_PROG_OPTIM     = $(foreach x,$(DEV_PROGRAMS),$(x)$(SUFFIX_PROG_OPTIM))
-TARGETS_DEV_PROG_DEBUG     = $(foreach x,$(DEV_PROGRAMS),$(x)$(SUFFIX_PROG_DEBUG))
-TARGETS_NOINST_PROG_OPTIM  = $(foreach x,$(NOINST_PROGRAMS),$(x)$(SUFFIX_PROG_OPTIM))
-TARGETS_NOINST_PROG_DEBUG  = $(foreach x,$(NOINST_PROGRAMS),$(x)$(SUFFIX_PROG_DEBUG))
-TARGETS_NOINST_PROG_COVER  = $(foreach x,$(NOINST_PROGRAMS),$(x)$(SUFFIX_PROG_COVER))
-TARGETS_TEST_PROG_OPTIM    = $(foreach x,$(TEST_PROGRAMS),$(x)$(SUFFIX_PROG_OPTIM))
-TARGETS_TEST_PROG_DEBUG    = $(foreach x,$(TEST_PROGRAMS),$(x)$(SUFFIX_PROG_DEBUG))
-TARGETS_TEST_PROG_COVER    = $(foreach x,$(TEST_PROGRAMS),$(x)$(SUFFIX_PROG_COVER))
+TARGETS_LIB_STATIC_OPTIM   := $(foreach x,$(INST_LIBRARIES),$(call GET_LIBRARY_STEM,$(x))$(SUFFIX_LIB_STATIC_OPTIM))
+TARGETS_LIB_SHARED_OPTIM   := $(foreach x,$(INST_LIBRARIES),$(call GET_LIBRARY_STEM,$(x))$(SUFFIX_LIB_SHARED_OPTIM))
+TARGETS_LIB_STATIC_DEBUG   := $(foreach x,$(INST_LIBRARIES),$(call GET_LIBRARY_STEM,$(x))$(SUFFIX_LIB_STATIC_DEBUG))
+TARGETS_LIB_SHARED_DEBUG   := $(foreach x,$(INST_LIBRARIES),$(call GET_LIBRARY_STEM,$(x))$(SUFFIX_LIB_SHARED_DEBUG))
+TARGETS_LIB_STATIC_COVER   := $(foreach x,$(INST_LIBRARIES),$(call GET_LIBRARY_STEM,$(x))$(SUFFIX_LIB_STATIC_COVER))
+TARGETS_LIB_SHARED_COVER   := $(foreach x,$(INST_LIBRARIES),$(call GET_LIBRARY_STEM,$(x))$(SUFFIX_LIB_SHARED_COVER))
+TARGETS_INST_LIB_LIBDEPS   := $(foreach x,$(INST_LIBRARIES),$(call GET_LIBRARY_STEM,$(x))$(LIB_SUFFIX_LIBDEPS))
+TARGETS_NOINST_LIB_OPTIM   := $(foreach x,$(noinst_LIBRARIES),$(call GET_LIBRARY_STEM,$(x))$(SUFFIX_LIB_STATIC_OPTIM))
+TARGETS_NOINST_LIB_DEBUG   := $(foreach x,$(noinst_LIBRARIES),$(call GET_LIBRARY_STEM,$(x))$(SUFFIX_LIB_STATIC_DEBUG))
+TARGETS_NOINST_LIB_COVER   := $(foreach x,$(noinst_LIBRARIES),$(call GET_LIBRARY_STEM,$(x))$(SUFFIX_LIB_STATIC_COVER))
+TARGETS_NOINST_LIB_LIBDEPS := $(foreach x,$(noinst_LIBRARIES),$(call GET_LIBRARY_STEM,$(x))$(LIB_SUFFIX_LIBDEPS))
+TARGETS_CHECK_LIB_OPTIM     := $(foreach x,$(check_LIBRARIES),$(call GET_LIBRARY_STEM,$(x))$(SUFFIX_LIB_STATIC_OPTIM))
+TARGETS_CHECK_LIB_DEBUG     := $(foreach x,$(check_LIBRARIES),$(call GET_LIBRARY_STEM,$(x))$(SUFFIX_LIB_STATIC_DEBUG))
+TARGETS_CHECK_LIB_COVER     := $(foreach x,$(check_LIBRARIES),$(call GET_LIBRARY_STEM,$(x))$(SUFFIX_LIB_STATIC_COVER))
+TARGETS_CHECK_LIB_LIBDEPS   := $(foreach x,$(check_LIBRARIES),$(call GET_LIBRARY_STEM,$(x))$(LIB_SUFFIX_LIBDEPS))
+TARGETS_PROG_OPTIM         := $(foreach x,$(INST_PROGRAMS),$(x)$(SUFFIX_PROG_OPTIM))
+TARGETS_PROG_DEBUG         := $(foreach x,$(INST_PROGRAMS),$(x)$(SUFFIX_PROG_DEBUG))
+TARGETS_PROG_COVER         := $(foreach x,$(INST_PROGRAMS),$(x)$(SUFFIX_PROG_COVER))
+TARGETS_DEV_PROG_OPTIM     := $(foreach x,$(DEV_PROGRAMS),$(x)$(SUFFIX_PROG_OPTIM))
+TARGETS_DEV_PROG_DEBUG     := $(foreach x,$(DEV_PROGRAMS),$(x)$(SUFFIX_PROG_DEBUG))
+TARGETS_NOINST_PROG_OPTIM  := $(foreach x,$(noinst_PROGRAMS),$(x)$(SUFFIX_PROG_OPTIM))
+TARGETS_NOINST_PROG_DEBUG  := $(foreach x,$(noinst_PROGRAMS),$(x)$(SUFFIX_PROG_DEBUG))
+TARGETS_NOINST_PROG_COVER  := $(foreach x,$(noinst_PROGRAMS),$(x)$(SUFFIX_PROG_COVER))
+TARGETS_CHECK_PROG_OPTIM    := $(foreach x,$(check_PROGRAMS),$(x)$(SUFFIX_PROG_OPTIM))
+TARGETS_CHECK_PROG_DEBUG    := $(foreach x,$(check_PROGRAMS),$(x)$(SUFFIX_PROG_DEBUG))
+TARGETS_CHECK_PROG_COVER    := $(foreach x,$(check_PROGRAMS),$(x)$(SUFFIX_PROG_COVER))
 
-TARGETS_DEFAULT     =
+TARGETS_BUILD :=
 ifneq ($(ENABLE_INSTALL_STATIC_LIBS),)
-TARGETS_DEFAULT    += $(TARGETS_LIB_STATIC_OPTIM)
+TARGETS_BUILD += $(TARGETS_LIB_STATIC_OPTIM)
 endif
-TARGETS_DEFAULT    += $(TARGETS_LIB_SHARED_OPTIM)
+TARGETS_BUILD += $(TARGETS_LIB_SHARED_OPTIM)
 ifneq ($(or $(ENABLE_INSTALL_DEBUG_LIBS),$(ENABLE_INSTALL_DEBUG_PROGS)),)
-TARGETS_DEFAULT    += $(TARGETS_LIB_SHARED_DEBUG)
+TARGETS_BUILD += $(TARGETS_LIB_SHARED_DEBUG)
 endif
-TARGETS_DEFAULT    += $(TARGETS_INST_LIB_LIBDEPS)
-TARGETS_DEFAULT    += $(TARGETS_NOINST_LIB_OPTIM)
+TARGETS_BUILD += $(TARGETS_INST_LIB_LIBDEPS)
+TARGETS_BUILD += $(TARGETS_NOINST_LIB_OPTIM)
 ifneq ($(ENABLE_INSTALL_DEBUG_PROGS),)
-TARGETS_DEFAULT    += $(TARGETS_NOINST_LIB_DEBUG)
+TARGETS_BUILD += $(TARGETS_NOINST_LIB_DEBUG)
 endif
-TARGETS_DEFAULT    += $(TARGETS_NOINST_LIB_LIBDEPS)
-TARGETS_DEFAULT    += $(TARGETS_PROG_OPTIM)
+TARGETS_BUILD += $(TARGETS_NOINST_LIB_LIBDEPS)
+TARGETS_BUILD += $(TARGETS_PROG_OPTIM)
 ifneq ($(ENABLE_INSTALL_DEBUG_PROGS),)
-TARGETS_DEFAULT    += $(TARGETS_PROG_DEBUG)
+TARGETS_BUILD += $(TARGETS_PROG_DEBUG)
 endif
-TARGETS_DEFAULT    += $(TARGETS_DEV_PROG_OPTIM) $(TARGETS_DEV_PROG_DEBUG) $(TARGETS_NOINST_PROG_OPTIM)
+TARGETS_BUILD += $(TARGETS_DEV_PROG_OPTIM) $(TARGETS_DEV_PROG_DEBUG) $(TARGETS_NOINST_PROG_OPTIM)
 
-TARGETS_MINIMAL     = $(TARGETS_LIB_SHARED_OPTIM) $(TARGETS_INST_LIB_LIBDEPS)
-TARGETS_MINIMAL    += $(TARGETS_NOINST_LIB_OPTIM) $(TARGETS_NOINST_LIB_LIBDEPS)
-TARGETS_MINIMAL    += $(TARGETS_PROG_OPTIM) $(TARGETS_DEV_PROG_OPTIM) $(TARGETS_NOINST_PROG_OPTIM)
-TARGETS_NODEBUG     = $(TARGETS_LIB_STATIC_OPTIM) $(TARGETS_LIB_SHARED_OPTIM) $(TARGETS_INST_LIB_LIBDEPS)
-TARGETS_NODEBUG    += $(TARGETS_NOINST_LIB_OPTIM) $(TARGETS_NOINST_LIB_LIBDEPS)
-TARGETS_NODEBUG    += $(TARGETS_PROG_OPTIM) $(TARGETS_DEV_PROG_OPTIM) $(TARGETS_NOINST_PROG_OPTIM)
-TARGETS_DEBUG       = $(TARGETS_LIB_SHARED_DEBUG) $(TARGETS_INST_LIB_LIBDEPS)
-TARGETS_DEBUG      += $(TARGETS_NOINST_LIB_DEBUG) $(TARGETS_NOINST_LIB_LIBDEPS)
-TARGETS_DEBUG      += $(TARGETS_PROG_DEBUG) $(TARGETS_DEV_PROG_DEBUG) $(TARGETS_NOINST_PROG_DEBUG)
-TARGETS_COVER       = $(TARGETS_LIB_SHARED_COVER) $(TARGETS_INST_LIB_LIBDEPS)
-TARGETS_COVER      += $(TARGETS_NOINST_LIB_COVER) $(TARGETS_NOINST_LIB_LIBDEPS)
-TARGETS_COVER      += $(TARGETS_PROG_COVER) $(TARGETS_NOINST_PROG_COVER)
-TARGETS_TEST        = $(TARGETS_LIB_SHARED_OPTIM) $(TARGETS_INST_LIB_LIBDEPS)
-TARGETS_TEST       += $(TARGETS_NOINST_LIB_OPTIM) $(TARGETS_NOINST_LIB_LIBDEPS)
-TARGETS_TEST       += $(TARGETS_TEST_LIB_OPTIM) $(TARGETS_TEST_LIB_LIBDEPS)
-TARGETS_TEST       += $(TARGETS_PROG_OPTIM) $(TARGETS_TEST_PROG_OPTIM)
-TARGETS_TEST_DEBUG  = $(TARGETS_LIB_SHARED_DEBUG) $(TARGETS_INST_LIB_LIBDEPS)
-TARGETS_TEST_DEBUG += $(TARGETS_NOINST_LIB_DEBUG) $(TARGETS_NOINST_LIB_LIBDEPS)
-TARGETS_TEST_DEBUG += $(TARGETS_TEST_LIB_DEBUG) $(TARGETS_TEST_LIB_LIBDEPS)
-TARGETS_TEST_DEBUG += $(TARGETS_PROG_DEBUG) $(TARGETS_TEST_PROG_DEBUG)
-TARGETS_TEST_COVER  = $(TARGETS_LIB_SHARED_COVER) $(TARGETS_INST_LIB_LIBDEPS)
-TARGETS_TEST_COVER += $(TARGETS_NOINST_LIB_COVER) $(TARGETS_NOINST_LIB_LIBDEPS)
-TARGETS_TEST_COVER += $(TARGETS_TEST_LIB_COVER) $(TARGETS_TEST_LIB_LIBDEPS)
-TARGETS_TEST_COVER += $(TARGETS_PROG_COVER) $(TARGETS_TEST_PROG_COVER)
+TARGETS_RELEASE     := $(TARGETS_LIB_SHARED_OPTIM) $(TARGETS_INST_LIB_LIBDEPS)
+TARGETS_RELEASE     += $(TARGETS_NOINST_LIB_OPTIM) $(TARGETS_NOINST_LIB_LIBDEPS)
+TARGETS_RELEASE     += $(TARGETS_PROG_OPTIM) $(TARGETS_DEV_PROG_OPTIM) $(TARGETS_NOINST_PROG_OPTIM)
+TARGETS_NODEBUG     := $(TARGETS_LIB_STATIC_OPTIM) $(TARGETS_LIB_SHARED_OPTIM) $(TARGETS_INST_LIB_LIBDEPS)
+TARGETS_NODEBUG     += $(TARGETS_NOINST_LIB_OPTIM) $(TARGETS_NOINST_LIB_LIBDEPS)
+TARGETS_NODEBUG     += $(TARGETS_PROG_OPTIM) $(TARGETS_DEV_PROG_OPTIM) $(TARGETS_NOINST_PROG_OPTIM)
+TARGETS_DEBUG       := $(TARGETS_LIB_SHARED_DEBUG) $(TARGETS_INST_LIB_LIBDEPS)
+TARGETS_DEBUG       += $(TARGETS_NOINST_LIB_DEBUG) $(TARGETS_NOINST_LIB_LIBDEPS)
+TARGETS_DEBUG       += $(TARGETS_PROG_DEBUG) $(TARGETS_DEV_PROG_DEBUG) $(TARGETS_NOINST_PROG_DEBUG)
+TARGETS_COVER       := $(TARGETS_LIB_SHARED_COVER) $(TARGETS_INST_LIB_LIBDEPS)
+TARGETS_COVER       += $(TARGETS_NOINST_LIB_COVER) $(TARGETS_NOINST_LIB_LIBDEPS)
+TARGETS_COVER       += $(TARGETS_PROG_COVER) $(TARGETS_NOINST_PROG_COVER)
+TARGETS_CHECK       := $(TARGETS_LIB_SHARED_OPTIM) $(TARGETS_INST_LIB_LIBDEPS)
+TARGETS_CHECK       += $(TARGETS_NOINST_LIB_OPTIM) $(TARGETS_NOINST_LIB_LIBDEPS)
+TARGETS_CHECK       += $(TARGETS_CHECK_LIB_OPTIM) $(TARGETS_CHECK_LIB_LIBDEPS)
+TARGETS_CHECK       += $(TARGETS_PROG_OPTIM) $(TARGETS_CHECK_PROG_OPTIM)
+TARGETS_CHECK_DEBUG := $(TARGETS_LIB_SHARED_DEBUG) $(TARGETS_INST_LIB_LIBDEPS)
+TARGETS_CHECK_DEBUG += $(TARGETS_NOINST_LIB_DEBUG) $(TARGETS_NOINST_LIB_LIBDEPS)
+TARGETS_CHECK_DEBUG += $(TARGETS_CHECK_LIB_DEBUG) $(TARGETS_CHECK_LIB_LIBDEPS)
+TARGETS_CHECK_DEBUG += $(TARGETS_PROG_DEBUG) $(TARGETS_CHECK_PROG_DEBUG)
+TARGETS_CHECK_COVER := $(TARGETS_LIB_SHARED_COVER) $(TARGETS_INST_LIB_LIBDEPS)
+TARGETS_CHECK_COVER += $(TARGETS_NOINST_LIB_COVER) $(TARGETS_NOINST_LIB_LIBDEPS)
+TARGETS_CHECK_COVER += $(TARGETS_CHECK_LIB_COVER) $(TARGETS_CHECK_LIB_LIBDEPS)
+TARGETS_CHECK_COVER += $(TARGETS_PROG_COVER) $(TARGETS_CHECK_PROG_COVER)
 
-TARGETS_EVERYTHING  = $(TARGETS_LIB_STATIC_OPTIM) $(TARGETS_LIB_SHARED_OPTIM)
+TARGETS_EVERYTHING := $(TARGETS_LIB_STATIC_OPTIM) $(TARGETS_LIB_SHARED_OPTIM)
 TARGETS_EVERYTHING += $(TARGETS_LIB_SHARED_DEBUG) $(TARGETS_INST_LIB_LIBDEPS)
 TARGETS_EVERYTHING += $(TARGETS_NOINST_LIB_OPTIM) $(TARGETS_NOINST_LIB_DEBUG) $(TARGETS_NOINST_LIB_LIBDEPS)
-TARGETS_EVERYTHING += $(TARGETS_TEST_LIB_OPTIM) $(TARGETS_TEST_LIB_DEBUG) $(TARGETS_TEST_LIB_LIBDEPS)
+TARGETS_EVERYTHING += $(TARGETS_CHECK_LIB_OPTIM) $(TARGETS_CHECK_LIB_DEBUG) $(TARGETS_CHECK_LIB_LIBDEPS)
 TARGETS_EVERYTHING += $(TARGETS_PROG_OPTIM) $(TARGETS_PROG_DEBUG)
 TARGETS_EVERYTHING += $(TARGETS_DEV_PROG_OPTIM) $(TARGETS_DEV_PROG_DEBUG)
 TARGETS_EVERYTHING += $(TARGETS_NOINST_PROG_OPTIM) $(TARGETS_NOINST_PROG_DEBUG)
-TARGETS_EVERYTHING += $(TARGETS_TEST_PROG_OPTIM) $(TARGETS_TEST_PROG_DEBUG)
+TARGETS_EVERYTHING += $(TARGETS_CHECK_PROG_OPTIM) $(TARGETS_CHECK_PROG_DEBUG)
 
-TARGETS_LIB_STATIC  = $(TARGETS_LIB_STATIC_OPTIM) $(TARGETS_LIB_STATIC_DEBUG) $(TARGETS_LIB_STATIC_COVER)
-TARGETS_LIB_SHARED  = $(TARGETS_LIB_SHARED_OPTIM) $(TARGETS_LIB_SHARED_DEBUG) $(TARGETS_LIB_SHARED_COVER)
-TARGETS_NOINST_LIB  = $(TARGETS_NOINST_LIB_OPTIM) $(TARGETS_NOINST_LIB_DEBUG) $(TARGETS_NOINST_LIB_COVER)
-TARGETS_TEST_LIB    = $(TARGETS_TEST_LIB_OPTIM) $(TARGETS_TEST_LIB_DEBUG) $(TARGETS_TEST_LIB_COVER)
-TARGETS_PROG        = $(TARGETS_PROG_OPTIM) $(TARGETS_PROG_DEBUG) $(TARGETS_PROG_COVER)
-TARGETS_DEV_PROG    = $(TARGETS_DEV_PROG_OPTIM) $(TARGETS_DEV_PROG_DEBUG)
-TARGETS_NOINST_PROG = $(TARGETS_NOINST_PROG_OPTIM) $(TARGETS_NOINST_PROG_DEBUG) $(TARGETS_NOINST_PROG_COVER)
-TARGETS_TEST_PROG   = $(TARGETS_TEST_PROG_OPTIM) $(TARGETS_TEST_PROG_DEBUG) $(TARGETS_TEST_PROG_COVER)
-TARGETS_PROG_ALL    = $(foreach x,$(TARGETS_PROG) $(TARGETS_DEV_PROG),$(x) $(x)-noinst) $(TARGETS_NOINST_PROG) $(TARGETS_TEST_PROG)
+TARGETS_LIB_STATIC  := $(TARGETS_LIB_STATIC_OPTIM) $(TARGETS_LIB_STATIC_DEBUG) $(TARGETS_LIB_STATIC_COVER)
+TARGETS_LIB_SHARED  := $(TARGETS_LIB_SHARED_OPTIM) $(TARGETS_LIB_SHARED_DEBUG) $(TARGETS_LIB_SHARED_COVER)
+TARGETS_NOINST_LIB  := $(TARGETS_NOINST_LIB_OPTIM) $(TARGETS_NOINST_LIB_DEBUG) $(TARGETS_NOINST_LIB_COVER)
+TARGETS_CHECK_LIB   := $(TARGETS_CHECK_LIB_OPTIM) $(TARGETS_CHECK_LIB_DEBUG) $(TARGETS_CHECK_LIB_COVER)
+TARGETS_PROG        := $(TARGETS_PROG_OPTIM) $(TARGETS_PROG_DEBUG) $(TARGETS_PROG_COVER)
+TARGETS_DEV_PROG    := $(TARGETS_DEV_PROG_OPTIM) $(TARGETS_DEV_PROG_DEBUG)
+TARGETS_NOINST_PROG := $(TARGETS_NOINST_PROG_OPTIM) $(TARGETS_NOINST_PROG_DEBUG) $(TARGETS_NOINST_PROG_COVER)
+TARGETS_CHECK_PROG  := $(TARGETS_CHECK_PROG_OPTIM) $(TARGETS_CHECK_PROG_DEBUG) $(TARGETS_CHECK_PROG_COVER)
+TARGETS_PROG_ALL    := $(foreach x,$(TARGETS_PROG) $(TARGETS_DEV_PROG),$(x) $(x)-noinst) $(TARGETS_NOINST_PROG) $(TARGETS_CHECK_PROG)
 
-TARGETS_LIB_SHARED_ALIASES   = $(foreach x,$(INST_LIBRARIES),$(foreach y,OPTIM DEBUG COVER,$(call TARGETS_LIB_SHARED_ALIASES_2,$(x),$(SUFFIX_LIB_SHARED_$(y)))))
-TARGETS_LIB_SHARED_ALIASES_2 = $(call GET_SHARED_LIB_ALIASES,$(call GET_LIBRARY_NAME,$(1))$(2),$(call GET_VERSION_FOR_TARGET,$(1)))
-
-TARGETS  = $(TARGETS_LIB_STATIC) $(TARGETS_LIB_SHARED_ALIASES) $(TARGETS_INST_LIB_LIBDEPS)
-TARGETS += $(TARGETS_NOINST_LIB) $(TARGETS_NOINST_LIB_LIBDEPS)
-TARGETS += $(TARGETS_TEST_LIB) $(TARGETS_TEST_LIB_LIBDEPS) $(TARGETS_PROG_ALL)
-
-# ARGS: qual_name, version
+# ARGS: real_local_path, version
 GET_SHARED_LIB_ALIASES = $(1)
 
 ifeq ($(OS),Linux)
@@ -950,19 +1161,30 @@ MAP_SHARED_LIB_VERSION_3 = $(patsubst %.dylib,%,$(1)).$(2).dylib $(3) $(3).$(4)
 
 endif
 
-RECURSIVE_MODES = default minimal nodebug debug cover everything clean install-only uninstall test-norun test-debug-norun test test-debug test-cover memtest memtest-debug
+TARGETS_LIB_SHARED_ALIASES = $(foreach x,$(INST_LIBRARIES),$(foreach y,OPTIM DEBUG COVER,$(call TARGETS_LIB_SHARED_ALIASES_1,$(x),$(SUFFIX_LIB_SHARED_$(y)))))
+TARGETS_LIB_SHARED_ALIASES_1 = $(call GET_SHARED_LIB_ALIASES,$(call GET_LIBRARY_STEM,$(1))$(2),$(call GET_LIBRARY_VERSION,$(1)))
+
+TARGETS := $(TARGETS_LIB_STATIC) $(TARGETS_LIB_SHARED_ALIASES) $(TARGETS_INST_LIB_LIBDEPS)
+TARGETS += $(TARGETS_NOINST_LIB) $(TARGETS_NOINST_LIB_LIBDEPS)
+TARGETS += $(TARGETS_CHECK_LIB) $(TARGETS_CHECK_LIB_LIBDEPS) $(TARGETS_PROG_ALL)
+
+RECURSIVE_GOALS = build release nodebug debug cover everything clean install-only uninstall \
+check-norun check-debug-norun check-cover-norun check check-debug check-cover memcheck memcheck-debug
+
+.DEFAULT_GOAL :=
 
 .PHONY: all
-all: default
+all: build
 
-default/local:          $(TARGETS_DEFAULT)
-minimal/local:          $(TARGETS_MINIMAL)
-nodebug/local:          $(TARGETS_NODEBUG)
-debug/local:            $(TARGETS_DEBUG)
-cover/local:            $(TARGETS_COVER)
-everything/local:       $(TARGETS_EVERYTHING)
-test-norun/local:       $(TARGETS_TEST)
-test-debug-norun/local: $(TARGETS_TEST_DEBUG)
+build/local:             $(TARGETS_BUILD)
+release/local:           $(TARGETS_RELEASE)
+nodebug/local:           $(TARGETS_NODEBUG)
+debug/local:             $(TARGETS_DEBUG)
+cover/local:             $(TARGETS_COVER)
+everything/local:        $(TARGETS_EVERYTHING)
+check-norun/local:       $(TARGETS_CHECK)
+check-debug-norun/local: $(TARGETS_CHECK_DEBUG)
+check-cover-norun/local: $(TARGETS_CHECK_COVER)
 
 
 # Update everything if any makefile or any generated source has changed
@@ -977,54 +1199,13 @@ $(OBJECTS): $(GENERATED_SOURCES)
 
 
 
-# SUBDIRECTORIES
+# SUBPROJECTS
 
-# ARGS: mode, dep
-define LOCAL_DIR_DEP_RULE
-$(1)/this-dir: $(1)/subdir/$(2)
-endef
-
-# ARGS: subdir, mode, dep
-define SUBDIR_DEP_RULE
-ifeq ($(3),.)
-$(2)/subdir/$(1): $(2)/this-dir
-else
-$(2)/subdir/$(1): $(2)/subdir/$(3)
-endif
-endef
-
-# ARGS: mode
-GET_LOCAL_DIR_DEPS = $(if $(filter clean install-only,$(1)),,$(if $(filter uninstall,$(1)),$(SUBDIRS),$(DIR_DEPS)))
-
-# ARGS: subdir, mode
-GET_SUBDIR_DEPS = $(if $(filter clean uninstall,$(2)),,$(if $(filter install-only,$(2)),.,$($(call FOLD_TARGET,$(1))_DEPS)))
-
-# ARGS: subdir, mode
-define SUBDIR_MODE_RULES
-.PHONY: $(2)/subdir/$(1)
-$(foreach x,$(call GET_SUBDIR_DEPS,$(1),$(2)),$(call SUBDIR_DEP_RULE,$(1),$(2),$(x))
-)
-ifeq ($(2),default)
-$(2)/subdir/$(1):
-	@$$(MAKE) -w -C $(1)
-else
-$(2)/subdir/$(1):
-	@$$(MAKE) -w -C $(1) $(2)
-endif
-endef
-
-AVAIL_PASSIVE_SUBDIRS = $(foreach x,$(PASSIVE_SUBDIRS),$(if $(realpath $(x)),$(x)))
-
-# ARGS: mode
-GET_SUBDIRS_FOR_MODE = $(if $(filter clean,$(1)),$(SUBDIRS) $(AVAIL_PASSIVE_SUBDIRS),$(SUBDIRS))
-
-# ARGS: mode
-define RECURSIVE_MODE_RULES
+# ARGS: recursive_goal, subdirs_for_goal, subdir_deps_for_this_dir
+define RECURSIVE_GOAL_RULES
 .PHONY: $(1) $(1)/this-dir $(1)/local
-$(foreach x,$(call GET_LOCAL_DIR_DEPS,$(1)),$(call LOCAL_DIR_DEP_RULE,$(1),$(x))
-)
-$(1): $(1)/this-dir $(patsubst %,$(1)/subdir/%,$(call GET_SUBDIRS_FOR_MODE,$(1)))
-ifeq ($(strip $(call GET_LOCAL_DIR_DEPS,$(1))),)
+$(1): $(1)/this-dir $(patsubst %,$(1)/subdir/%,$(2))
+ifeq ($(strip $(3)),)
 $(1)/this-dir: $(1)/local
 else
 $(1)/this-dir:
@@ -1032,27 +1213,66 @@ $(1)/this-dir:
 endif
 endef
 
-define SUBDIR_RULES
-$(foreach x,$(SUBDIRS) $(PASSIVE_SUBDIRS),$(foreach y,$(RECURSIVE_MODES),$(call SUBDIR_MODE_RULES,$(x),$(y))
-))
-$(foreach x,$(RECURSIVE_MODES),$(call RECURSIVE_MODE_RULES,$(x))
-)
+# ARGS: recursive_goal, subdir_dep_for_this_dir
+define SUBDIR_DEP_FOR_THIS_DIR_RULE
+$(1)/this-dir: $(1)/subdir/$(2)
 endef
 
-$(eval $(SUBDIR_RULES))
+# ARGS: recursive_goal, subdir
+define RECURSIVE_GOAL_SUBDIR_RULES
+.PHONY: $(1)/subdir/$(2)
+ifeq ($(1),build)
+$(1)/subdir/$(2):
+	@$$(MAKE) -w -C $(2)
+else
+$(1)/subdir/$(2):
+	@$$(MAKE) -w -C $(2) $(1)
+endif
+endef
+
+# ARGS: recursive_goal, subdir, dep
+define SUBDIR_DEP_RULE
+ifeq ($(3),.)
+$(1)/subdir/$(2): $(1)/this-dir
+else
+$(1)/subdir/$(2): $(1)/subdir/$(3)
+endif
+endef
+
+AVAIL_PASSIVE_SUBDIRS := $(foreach x,$(PASSIVE_SUBDIRS),$(if $(realpath $(x)),$(x)))
+
+# ARGS: recursive_goal
+GET_SUBDIRS_FOR_RECURSIVE_GOAL = $(if $(filter clean,$(1)),$(SUBDIRS) $(AVAIL_PASSIVE_SUBDIRS),$(SUBDIRS))
+
+# ARGS: recursive_goal
+GET_SUBDIR_DEPS_FOR_THIS_DIR = $(if $(filter clean install-only,$(1)),,$(if $(filter uninstall,$(1)),$(SUBDIRS),$(DIR_DEPS)))
+
+# ARGS: recursive_goal, subdir
+GET_SUBDIR_DEPS = $(if $(filter clean uninstall,$(1)),,$(if $(filter install-only,$(1)),.,$($(call FOLD_TARGET,$(2))_DEPS)))
+
+# ARGS: recursive_goal, subdir, deps
+EVAL_RECURSIVE_GOAL_SUBDIR_RULES = \
+$(eval $(call RECURSIVE_GOAL_SUBDIR_RULES,$(1),$(2)))\
+$(foreach x,$(call GET_SUBDIR_DEPS,$(1),$(2)),$(eval $(call SUBDIR_DEP_RULE,$(1),$(2),$(x))))
+
+# ARGS: recursive_goal, subdir_deps_for_this_dir
+EVAL_RECURSIVE_GOAL_RULES = \
+$(eval $(call RECURSIVE_GOAL_RULES,$(1),$(call GET_SUBDIRS_FOR_RECURSIVE_GOAL,$(1)),$(2)))\
+$(foreach x,$(2),$(eval $(call SUBDIR_DEP_FOR_THIS_DIR_RULE,$(1),$(x))))\
+$(foreach x,$(SUBDIRS) $(PASSIVE_SUBDIRS),$(call EVAL_RECURSIVE_GOAL_SUBDIR_RULES,$(1),$(x)))
+
+$(foreach x,$(RECURSIVE_GOALS),$(call EVAL_RECURSIVE_GOAL_RULES,$(x),$(call GET_SUBDIR_DEPS_FOR_THIS_DIR,$(x))))
 
 
 
 # CLEANING
 
-ifneq ($(strip $(TARGETS)),)
+GET_CLEAN_FILES = $(strip $(call WILDCARD_PATHS_FILTER_OUT,$(EXTRA_CLEAN),$(foreach x,$(SOURCE_DIRS),$(foreach y,*.d *.o *.gcno *.gcda,$(patsubst ./%,%,$(x))$(y))) $(TARGETS)) $(EXTRA_CLEAN))
+
+ifneq ($(word 1,$(or $(SOURCE_DIRS),$(TARGETS),$(EXTRA_CLEAN))),)
 define CLEANING_RULES
-
-.PHONY: clean/extra
-clean/local: clean/extra
-	$(RM) $(strip *.d *.o *.gcno *.gcda $(TARGETS))
-$(foreach x,$(EXTRA_CLEAN_DIRS),$(NEW_RECIPE)$(RM) $(x)/*.d $(x)/*.o $(x)/*.gcno $(x)/*.gcda)
-
+clean/local:
+	$$(RM) $$(call GET_CLEAN_FILES)
 endef
 $(eval $(CLEANING_RULES))
 endif
@@ -1062,180 +1282,180 @@ endif
 # INSTALL / UNINSTALL
 
 .PHONY: install
-install: default
+install: build
 	@$(MAKE) install-only
 
-.PHONY: install-header-dir install-lib-dirs install-prog-dirs
-.PHONY: install-headers install-static-libs install-shared-libs install-progs install-dev-progs
-.PHONY: uninstall-static-libs uninstall-shared-libs uninstall-progs uninstall-dev-progs uninstall/extra
+HAS_STAR = $(call HAS_STAR_1,$(subst *,x$(SPACE)x,$(subst $(SPACE),x,$(1))))
+HAS_STAR_1 = $(wordlist 2,$(words $(1)),$(1))
 
-INSTALL_FILTER_2 = $(subst $(COMMA),$(SPACE),$(INSTALL_FILTER))
+CHECK_WILDCARD = $(if $(call HAS_STAR,$(word 1,$(subst /,$(SPACE),$(1)))),$(error For your safety, uninstallation wildcards are not allowed to appear at the root level of the target installation directory [$(1)]))
+CHECK_WILDCARDS = $(foreach x,$(PRIMARIES),$(foreach y,$(notdir $($(1)_$(x)_EXTRA_UNINSTALL)) $(nobase_$(1)_$(x)_EXTRA_UNINSTALL),$(call CHECK_WILDCARD,$(2)$(y))))
+$(foreach x,$(PRIMARY_PREFIXES),$(call CHECK_WILDCARDS,$(x),$(if $(filter subinclude,$(x)),$(call COND_APPEND,$(INCLUDE_SUBDIR),/))))
 
-ifneq ($(filter headers,$(INSTALL_FILTER_2)),)
-install-only/local: install-headers
-endif
-ifneq ($(filter static-libs,$(INSTALL_FILTER_2)),)
-install-only/local: install-static-libs
-endif
-ifneq ($(filter shared-libs,$(INSTALL_FILTER_2)),)
-install-only/local: install-shared-libs
-endif
-ifneq ($(filter progs,$(INSTALL_FILTER_2)),)
-install-only/local: install-progs
-endif
-ifneq ($(filter dev-progs,$(INSTALL_FILTER_2)),)
-install-only/local: install-dev-progs
-endif
+DESTDIR_2 := $(call SHELL_ESCAPE,$(call UNHIDE_SPACE,$(patsubst %/,%,$(call HIDE_SPACE,$(value DESTDIR)))))
 
-ifneq ($(filter dev-progs,$(INSTALL_FILTER_2)),)
-uninstall/local: uninstall-dev-progs
-endif
-ifneq ($(filter progs,$(INSTALL_FILTER_2)),)
-uninstall/local: uninstall-progs
-endif
-ifneq ($(filter shared-libs,$(INSTALL_FILTER_2)),)
-uninstall/local: uninstall-shared-libs
-endif
-ifneq ($(filter static-libs,$(INSTALL_FILTER_2)),)
-uninstall/local: uninstall-static-libs
-endif
-ifneq ($(filter extra,$(INSTALL_FILTER_2)),)
-uninstall/local: uninstall/extra
-endif
+# ARGS: install_dir, real_local_paths
+INSTALL_RECIPE_FILES   = $(NL_TAB)$$(INSTALL_DATA) $(2) $$(DESTDIR_2)$(1)
+UNINSTALL_RECIPE_FILES = $(NL_TAB)$$(RM) $(foreach x,$(2),$$(DESTDIR_2)$(1)/$(x))
 
-HEADER_INSTALL_DIR =
-ifneq ($(INST_HEADERS),)
-ifeq ($(SOURCE_ROOT),)
-$(warning Cannot install headers without a value for SOURCE_ROOT)
-else
-HEADER_REL_PATH = $(call PATH_DIFF,.,$(ABS_SOURCE_ROOT))
-INSIDE_SOURCE = $(call EQUALS,$(ABS_SOURCE_ROOT)$(call COND_PREPEND,/,$(HEADER_REL_PATH)),$(abspath .))
-ifeq ($(INSIDE_SOURCE),)
-$(warning Cannot install headers outside SOURCE_ROOT)
-else
-HEADER_INSTALL_DIR = $(DESTDIR)$(includedir)$(call COND_PREPEND,/,$(HEADER_REL_PATH))
-endif
-endif
-endif
+# ARGS: install_dir, real_local_paths
+INSTALL_RECIPE_LIBS = $(NL_TAB)$$(INSTALL_LIBRARY) $(2) $$(DESTDIR_2)$(1)
 
-INSTALL_RECIPE_DIRS    = $(if $(1),$(NEW_RECIPE)$(INSTALL_DIR) $(1))
-INSTALL_RECIPE_LIBS    = $(if $(2),$(NEW_RECIPE)$(INSTALL_LIBRARY) $(2) $(call GET_INSTALL_DIR,$(1)))
-INSTALL_RECIPE_PROGS   = $(if $(2),$(NEW_RECIPE)$(INSTALL_PROGRAM) $(2) $(call GET_INSTALL_DIR,$(1)))
-UNINSTALL_RECIPE_LIBS  = $(if $(2),$(NEW_RECIPE)$(RM) $(foreach x,$(2),$(call GET_INSTALL_DIR,$(1))/$(x)))
-UNINSTALL_RECIPE_PROGS = $(if $(2),$(NEW_RECIPE)$(RM) $(foreach x,$(2),$(call GET_INSTALL_DIR,$(1))/$(x)))
+# ARGS: real_local_path, version
+INSTALL_FILES_VERSIONED_LIB = $(1)
 
-# ARGS: install_prefix, qual_name, version
-INSTALL_RECIPE_LIB_SHARED   = $(INSTALL_RECIPE_LIBS)
-UNINSTALL_RECIPE_LIB_SHARED = $(UNINSTALL_RECIPE_LIBS)
+# ARGS: install_dir, real_local_path, version
+INSTALL_RECIPE_VERSIONED_LIB = $(INSTALL_RECIPE_LIBS)
 
 ifeq ($(OS),Linux)
-INSTALL_RECIPE_LIB_SHARED     = $(if $(3),$(call INSTALL_RECIPE_LIB_SHARED_2,$(1),$(2),$(call MAP_SHARED_LIB_VERSION,$(3))),$(INSTALL_RECIPE_LIBS))
-INSTALL_RECIPE_LIB_SHARED_2   = $(call INSTALL_RECIPE_LIB_SHARED_3,$(1),$(2),$(2).$(word 1,$(3)),$(2).$(word 2,$(3)))
-INSTALL_RECIPE_LIB_SHARED_3   = $(call INSTALL_RECIPE_LIBS,$(1),$(4))$(NEW_RECIPE)cd $(call GET_INSTALL_DIR,$(1)) && ln -s -f $(4) $(3) && ln -s -f $(3) $(2)
-UNINSTALL_RECIPE_LIB_SHARED   = $(if $(3),$(call UNINSTALL_RECIPE_LIB_SHARED_2,$(1),$(2),$(call MAP_SHARED_LIB_VERSION,$(3))),$(UNINSTALL_RECIPE_LIBS))
-UNINSTALL_RECIPE_LIB_SHARED_2 = $(call UNINSTALL_RECIPE_LIB_SHARED_3,$(1),$(2),$(2).$(word 1,$(3)),$(2).$(word 2,$(3)))
-UNINSTALL_RECIPE_LIB_SHARED_3 = $(call UNINSTALL_RECIPE_LIBS,$(1),$(2) $(3) $(4))
+INSTALL_FILES_VERSIONED_LIB    = $(if $(2),$(call INSTALL_FILES_VERSIONED_LIB_1,$(1),$(call MAP_SHARED_LIB_VERSION,$(2))),$(1))
+INSTALL_FILES_VERSIONED_LIB_1  = $(1) $(1).$(word 1,$(2)) $(1).$(word 2,$(2))
+INSTALL_RECIPE_VERSIONED_LIB   = $(if $(3),$(call INSTALL_RECIPE_VERSIONED_LIB_1,$(1),$(2),$(call MAP_SHARED_LIB_VERSION,$(3))),$(INSTALL_RECIPE_LIBS))
+INSTALL_RECIPE_VERSIONED_LIB_1 = $(call INSTALL_RECIPE_VERSIONED_LIB_2,$(1),$(2),$(2).$(word 1,$(3)),$(2).$(word 2,$(3)))
+INSTALL_RECIPE_VERSIONED_LIB_2 = $(call INSTALL_RECIPE_LIBS,$(1),$(4))$(NL_TAB)cd $$(DESTDIR_2)$(1) && ln -s -f $(notdir $(4)) $(notdir $(3)) && ln -s -f $(notdir $(3)) $(notdir $(2))
 endif
 
 ifeq ($(OS),Darwin)
-INSTALL_RECIPE_LIB_SHARED     = $(if $(3),$(call INSTALL_RECIPE_LIB_SHARED_2,$(1),$(2),$(word 1,$(call MAP_SHARED_LIB_VERSION,$(2),$(3)))),$(INSTALL_RECIPE_LIBS))
-INSTALL_RECIPE_LIB_SHARED_2   = $(call INSTALL_RECIPE_LIBS,$(1),$(3))$(NEW_RECIPE)cd $(call GET_INSTALL_DIR,$(1)) && ln -s -f $(3) $(2)
-UNINSTALL_RECIPE_LIB_SHARED   = $(if $(3),$(call UNINSTALL_RECIPE_LIB_SHARED_2,$(1),$(2),$(word 1,$(call MAP_SHARED_LIB_VERSION,$(2),$(3)))),$(UNINSTALL_RECIPE_LIBS))
-UNINSTALL_RECIPE_LIB_SHARED_2 = $(call UNINSTALL_RECIPE_LIBS,$(1),$(2) $(3))
+INSTALL_FILES_VERSIONED_LIB    = $(if $(2),$(1) $(word 1,$(call MAP_SHARED_LIB_VERSION,$(1),$(2))),$(1))
+INSTALL_RECIPE_VERSIONED_LIB   = $(if $(3),$(call INSTALL_RECIPE_VERSIONED_LIB_1,$(1),$(2),$(word 1,$(call MAP_SHARED_LIB_VERSION,$(2),$(3)))),$(INSTALL_RECIPE_LIBS))
+INSTALL_RECIPE_VERSIONED_LIB_1 = $(call INSTALL_RECIPE_LIBS,$(1),$(3))$(NL_TAB)cd $$(DESTDIR_2)$(1) && ln -s -f $(notdir $(3)) $(notdir $(2))
 endif
 
-INST_STATIC_LIB_SUFFICES   =
-INST_SHARED_LIB_SUFFICES   =
+INST_STATIC_LIB_SUFFICES :=
+INST_SHARED_LIB_SUFFICES :=
+INST_PROG_SUFFICES :=
 ifneq ($(ENABLE_INSTALL_STATIC_LIBS),)
-INST_STATIC_LIB_SUFFICES  += +$(SUFFIX_LIB_STATIC_OPTIM)
+INST_STATIC_LIB_SUFFICES += +$(SUFFIX_LIB_STATIC_OPTIM)
 endif
-INST_SHARED_LIB_SUFFICES  += +$(SUFFIX_LIB_SHARED_OPTIM)
+INST_SHARED_LIB_SUFFICES += +$(SUFFIX_LIB_SHARED_OPTIM)
 ifneq ($(ENABLE_INSTALL_DEBUG_LIBS),)
-INST_SHARED_LIB_SUFFICES  += +$(SUFFIX_LIB_SHARED_DEBUG)
+INST_SHARED_LIB_SUFFICES += +$(SUFFIX_LIB_SHARED_DEBUG)
 endif
-INST_PROG_SUFFICES  = +$(SUFFIX_PROG_OPTIM)
+INST_PROG_SUFFICES += +$(SUFFIX_PROG_OPTIM)
 ifneq ($(ENABLE_INSTALL_DEBUG_PROGS),)
 INST_PROG_SUFFICES += +$(SUFFIX_PROG_DEBUG)
 endif
 
-# ARGS: install_prefix
-GET_STATIC_LIB_INST_NAMES = $(foreach x,$($(1)_LIBRARIES),$(foreach y,$(INST_STATIC_LIB_SUFFICES),$(call GET_LIBRARY_NAME,$(x))$(patsubst +%,%,$(y))))
-GET_PROG_INST_NAMES       = $(foreach x,$($(1)_PROGRAMS),$(foreach y,$(INST_PROG_SUFFICES),$(x)$(patsubst +%,%,$(y))))
+# ARGS: abstract_targets
+INSTALL_FILES_STATIC_LIBS = $(foreach x,$(1),$(foreach y,$(INST_STATIC_LIB_SUFFICES),$(call GET_LIBRARY_STEM,$(x))$(patsubst +%,%,$(y))))
+INSTALL_FILES_SHARED_LIBS = $(foreach x,$(1),$(foreach y,$(INST_SHARED_LIB_SUFFICES),$(call INSTALL_FILES_VERSIONED_LIB,$(call GET_LIBRARY_STEM,$(x))$(patsubst +%,%,$(y)),$(call GET_LIBRARY_VERSION,$(x)))))
+INSTALL_FILES_PROGRAMS    = $(foreach x,$(1),$(foreach y,$(INST_PROG_SUFFICES),$(x)$(patsubst +%,%,$(y))))
+
+# ARGS: install_dir, abstract_targets
+INSTALL_RECIPE_STATIC_LIBS = $(call INSTALL_RECIPE_LIBS,$(1),$(call INSTALL_FILES_STATIC_LIBS,$(2)))
+INSTALL_RECIPE_SHARED_LIBS = $(foreach x,$(2),$(foreach y,$(INST_SHARED_LIB_SUFFICES),$(call INSTALL_RECIPE_VERSIONED_LIB,$(1),$(call GET_LIBRARY_STEM,$(x))$(patsubst +%,%,$(y)),$(call GET_LIBRARY_VERSION,$(x)))$(NEWLINE)))
+INSTALL_RECIPE_PROGRAMS    = $(NL_TAB)$$(INSTALL_PROGRAM) $(call INSTALL_FILES_PROGRAMS,$(2)) $$(DESTDIR_2)$(1)
+
+# ARGS: primary, is_for_uninstall
+GET_INSTALL_DIRS = $(foreach x,$(PRIMARY_PREFIXES),$(if $(filter subinclude,$(x)),$(call GET_INSTALL_DIRS_1,$(call GET_ROOT_INSTALL_DIR,include),$(call COND_APPEND,$(INCLUDE_SUBDIR),/),$(x),$(1),$(2)),$(call GET_INSTALL_DIRS_1,$(call GET_ROOT_INSTALL_DIR,$(x)),,$(x),$(1),$(2))))
+
+# ARGS: root_install_dir, opt_include_subdir_slash, primary_prefix, primary, is_for_uninstall
+GET_INSTALL_DIRS_1 = $(call GET_INSTALL_DIRS_2,$(1),$(2),$(notdir $($(3)_$(4))) $(nobase_$(3)_$(4)),$(5))
+
+# ARGS: root_install_dir, opt_include_subdir_slash, nobase_targets, is_for_uninstall
+GET_INSTALL_DIRS_2 = $(foreach x,$(call REMOVE_DUPES,$(patsubst %/,%,$(dir $(addprefix $(2),$(3))))),$(if $(filter .,$(x)),$(if $(4),,$(1)),$(foreach y,$(call SUBDIR_PARENT_EXPAND,$(x)),$(1)/$(y))))
+
+SUBDIR_PARENT_EXPAND = $(if $(filter-out ./,$(dir $(1))),$(call SUBDIR_PARENT_EXPAND,$(patsubst %/,%,$(dir $(1)))) $(1),$(1))
+
+# ARGS: primary, get_recipes
+GET_INSTALL_RECIPES = $(foreach x,$(PRIMARY_PREFIXES),$(call GET_INSTALL_RECIPES_1,$(2),$(call GET_INSTALL_DIR,$(x)),$(strip $($(x)_$(1))),$(nobase_$(x)_$(1))))
+
+# ARGS: get_recipes, install_dir, abstract_targets, nobase_targets
+GET_INSTALL_RECIPES_1 = $(if $(3),$(call $(1),$(2),$(3))$(NEWLINE)) $(foreach x,$(call REMOVE_DUPES,$(dir $(4))),$(call $(1),$(2)$(patsubst %/,/%,$(filter-out ./,$(x))),$(strip $(foreach y,$(4),$(if $(call IS_EQUAL_TO,$(dir $(y)),$(x)),$(y)))))$(NEWLINE))
+
+# ARGS: primary, get_files
+GET_UNINSTALL_RECIPES = $(foreach x,$(PRIMARY_PREFIXES),$(call GET_UNINSTALL_RECIPES_1,$(call GET_INSTALL_DIR,$(x)),$(2),$($(x)_$(1)),$(nobase_$(x)_$(1)),$(call REMOVE_DUPES,$(notdir $($(x)_$(1)_EXTRA_UNINSTALL)) $(nobase_$(x)_$(1)_EXTRA_UNINSTALL))))
+
+# ARGS: install_dir, get_files, abstract_targets, nobase_targets, extra_uninstall
+GET_UNINSTALL_RECIPES_1 = $(call GET_UNINSTALL_RECIPES_2,$(1),$(strip $(call WILDCARD_PATHS_FILTER_OUT,$(5),$(notdir $(call $(2),$(3))) $(call $(2),$(4))) $(5)))
+
+# ARGS: install_dir, uninstall_paths
+GET_UNINSTALL_RECIPES_2 = $(if $(2), $(call UNINSTALL_RECIPE_FILES,$(1),$(2))$(NEWLINE))
+
+INSTALL_DIRS :=
+UNINSTALL_DIRS :=
+EXTRA_UNINSTALL_DIRS :=
+INSTALL_RECIPES :=
+UNINSTALL_RECIPES :=
+
+INSTALL_FILTER_2 := $(subst $(COMMA),$(SPACE),$(INSTALL_FILTER))
+
+ifneq ($(filter headers,$(INSTALL_FILTER_2)),)
+INSTALL_DIRS += $(call GET_INSTALL_DIRS,HEADERS)
+UNINSTALL_DIRS += $(call GET_INSTALL_DIRS,HEADERS,x)
+EXTRA_UNINSTALL_DIRS += $(call GET_INSTALL_DIRS,HEADERS_EXTRA_UNINSTALL,x)
+INSTALL_RECIPES += $(call GET_INSTALL_RECIPES,HEADERS,INSTALL_RECIPE_FILES)$(NEWLINE)
+UNINSTALL_RECIPES += $(call GET_UNINSTALL_RECIPES,HEADERS,IDENTITY)$(NEWLINE)
+endif
+ifneq ($(filter static-libs,$(INSTALL_FILTER_2)),)
+INSTALL_DIRS += $(call GET_INSTALL_DIRS,LIBRARIES)
+UNINSTALL_DIRS += $(call GET_INSTALL_DIRS,LIBRARIES,x)
+EXTRA_UNINSTALL_DIRS += $(call GET_INSTALL_DIRS,LIBRARIES_EXTRA_UNINSTALL,x)
+INSTALL_RECIPES += $(call GET_INSTALL_RECIPES,LIBRARIES,INSTALL_RECIPE_STATIC_LIBS)$(NEWLINE)
+UNINSTALL_RECIPES += $(call GET_UNINSTALL_RECIPES,LIBRARIES,INSTALL_FILES_STATIC_LIBS)$(NEWLINE)
+endif
+ifneq ($(filter shared-libs,$(INSTALL_FILTER_2)),)
+INSTALL_DIRS += $(call GET_INSTALL_DIRS,LIBRARIES)
+UNINSTALL_DIRS += $(call GET_INSTALL_DIRS,LIBRARIES,x)
+EXTRA_UNINSTALL_DIRS += $(call GET_INSTALL_DIRS,LIBRARIES_EXTRA_UNINSTALL,x)
+INSTALL_RECIPES += $(call GET_INSTALL_RECIPES,LIBRARIES,INSTALL_RECIPE_SHARED_LIBS)$(NEWLINE)
+UNINSTALL_RECIPES += $(call GET_UNINSTALL_RECIPES,LIBRARIES,INSTALL_FILES_SHARED_LIBS)$(NEWLINE)
+endif
+ifneq ($(filter progs,$(INSTALL_FILTER_2)),)
+INSTALL_DIRS += $(call GET_INSTALL_DIRS,PROGRAMS)
+UNINSTALL_DIRS += $(call GET_INSTALL_DIRS,PROGRAMS,x)
+EXTRA_UNINSTALL_DIRS += $(call GET_INSTALL_DIRS,PROGRAMS_EXTRA_UNINSTALL,x)
+INSTALL_RECIPES += $(call GET_INSTALL_RECIPES,PROGRAMS,INSTALL_RECIPE_PROGRAMS)$(NEWLINE)
+UNINSTALL_RECIPES += $(call GET_UNINSTALL_RECIPES,PROGRAMS,INSTALL_FILES_PROGRAMS)$(NEWLINE)
+endif
+ifneq ($(and $(filter dev-progs,$(INSTALL_FILTER_2)),$(strip $(DEV_PROGRAMS))),)
+INSTALL_DIRS += $(call GET_ROOT_INSTALL_DIR,bin)
+INSTALL_RECIPES += $(call INSTALL_RECIPE_PROGRAMS,$(call GET_ROOT_INSTALL_DIR,bin),$(DEV_PROGRAMS))$(NEWLINE)
+UNINSTALL_RECIPES += $(call UNINSTALL_RECIPE_FILES,$(call GET_ROOT_INSTALL_DIR,bin),$(call INSTALL_FILES_PROGRAMS,$(DEV_PROGRAMS)))$(NEWLINE)
+endif
+
+# ARGS: paths, extra_paths
+FILTER_UNINSTALL_DIRS = $(call FOLD_LEFT,FILTER_UNINSTALL_DIRS_1,$(1) $(2),$(2))
+FILTER_UNINSTALL_DIRS_1 = $(call REMOVE_DUPES,$(foreach x,$(1),$(if $(call WILDCARD_PATH_MATCH,$(2),$(x)),$(2),$(x))))
+
+INSTALL_DIR_RECIPES   := $(if $(strip $(INSTALL_DIRS)),$(NL_TAB)$$(INSTALL_DIR) $(foreach x,$(call REMOVE_PREFIXES,$(patsubst %,%/,$(call REMOVE_DUPES,$(INSTALL_DIRS)))),$$(DESTDIR_2)$(x))$(NEWLINE))
+UNINSTALL_DIR_RECIPES := $(foreach x,$(call LIST_REVERSE,$(call FILTER_UNINSTALL_DIRS,$(call REMOVE_DUPES,$(UNINSTALL_DIRS)),$(call REMOVE_DUPES,$(EXTRA_UNINSTALL_DIRS)))),$(NL_TAB)-rmdir $$(DESTDIR_2)$(x)/$(NEWLINE))
 
 define INSTALL_RULES
-
-ifneq ($(HEADER_INSTALL_DIR),)
-install-headers: install-header-dir
-	$(INSTALL_DATA) $(INST_HEADERS) $(HEADER_INSTALL_DIR)
-install-header-dir:
-	$(INSTALL_DIR) $(HEADER_INSTALL_DIR)
-endif
-
-install-static-libs: install-lib-dirs
-$(foreach x,$(PRIMARY_PREFIXES),$(call INSTALL_RECIPE_LIBS,$(x),$(strip $(call GET_STATIC_LIB_INST_NAMES,$(x)))))
-
-install-shared-libs: install-lib-dirs
-$(foreach x,$(PRIMARY_PREFIXES),$(foreach y,$($(x)_LIBRARIES),$(foreach z,$(INST_SHARED_LIB_SUFFICES),$(call INSTALL_RECIPE_LIB_SHARED,$(x),$(call GET_LIBRARY_NAME,$(y))$(patsubst +%,%,$(z)),$(call GET_VERSION_FOR_TARGET,$(y))))))
-
-uninstall-static-libs:
-$(foreach x,$(PRIMARY_PREFIXES),$(call UNINSTALL_RECIPE_LIBS,$(x),$(strip $(call GET_STATIC_LIB_INST_NAMES,$(x)))))
-
-uninstall-shared-libs:
-$(foreach x,$(PRIMARY_PREFIXES),$(foreach y,$($(x)_LIBRARIES),$(foreach z,$(INST_SHARED_LIB_SUFFICES),$(call UNINSTALL_RECIPE_LIB_SHARED,$(x),$(call GET_LIBRARY_NAME,$(y))$(patsubst +%,%,$(z)),$(call GET_VERSION_FOR_TARGET,$(y))))))
-
-install-progs: install-prog-dirs
-$(foreach x,$(PRIMARY_PREFIXES),$(call INSTALL_RECIPE_PROGS,$(x),$(strip $(call GET_PROG_INST_NAMES,$(x)))))
-
-uninstall-progs:
-$(foreach x,$(PRIMARY_PREFIXES),$(call UNINSTALL_RECIPE_PROGS,$(x),$(strip $(call GET_PROG_INST_NAMES,$(x)))))
-
-install-dev-progs: install-dev-prog-dirs
-$(call INSTALL_RECIPE_PROGS,bin,$(strip $(TARGETS_DEV_PROG_OPTIM) $(TARGETS_DEV_PROG_DEBUG)))
-
-uninstall-dev-progs:
-$(call UNINSTALL_RECIPE_PROGS,bin,$(strip $(TARGETS_DEV_PROG_OPTIM) $(TARGETS_DEV_PROG_DEBUG)))
-
-install-lib-dirs:
-$(call INSTALL_RECIPE_DIRS,$(strip $(foreach x,$(PRIMARY_PREFIXES),$(if $($(x)_LIBRARIES),$(call GET_INSTALL_DIR,$(x))))))
-
-install-prog-dirs:
-$(call INSTALL_RECIPE_DIRS,$(strip $(foreach x,$(PRIMARY_PREFIXES),$(if $($(x)_PROGRAMS),$(call GET_INSTALL_DIR,$(x))))))
-
-install-dev-prog-dirs:
-$(call INSTALL_RECIPE_DIRS,$(strip $(if $(DEV_PROGRAMS),$(call GET_INSTALL_DIR,bin))))
-
+install-only/local:$(INSTALL_DIR_RECIPES)$(INSTALL_RECIPES)
+uninstall/local:$(UNINSTALL_RECIPES)$(UNINSTALL_DIR_RECIPES)
 endef
 
+ifeq ($(ENABLE_NOINST_BUILD),)
 $(eval $(INSTALL_RULES))
+endif
 
 
+# TESTING (A.K.A CHECKING)
 
-# TESTING
+define CHECK_RULES
 
-define TEST_RULES
+check/local: $(TARGETS_CHECK)
+$(foreach x,$(TARGETS_CHECK_PROG_OPTIM),$(NL_TAB)./$(x)$(NEWLINE))
 
-test/local: $(TARGETS_TEST)
-$(foreach x,$(TARGETS_TEST_PROG_OPTIM),$(NEW_RECIPE)./$(x))
+check-debug/local: $(TARGETS_CHECK_DEBUG)
+$(foreach x,$(TARGETS_CHECK_PROG_DEBUG),$(NL_TAB)./$(x)$(NEWLINE))
 
-test-debug/local: $(TARGETS_TEST_DEBUG)
-$(foreach x,$(TARGETS_TEST_PROG_DEBUG),$(NEW_RECIPE)./$(x))
+memcheck/local: $(TARGETS_CHECK)
+$(foreach x,$(TARGETS_CHECK_PROG_OPTIM),$(NL_TAB)$$(VALGRIND) --error-exitcode=1 ./$(x) --no-error-exitcode$(NEWLINE))
 
-memtest/local: $(TARGETS_TEST)
-$(foreach x,$(TARGETS_TEST_PROG_OPTIM),$(NEW_RECIPE)valgrind --quiet --error-exitcode=1 --track-origins=yes --leak-check=yes --leak-resolution=low ./$(x) --no-error-exitcode)
+memcheck-debug/local: $(TARGETS_CHECK_DEBUG)
+$(foreach x,$(TARGETS_CHECK_PROG_DEBUG),$(NL_TAB)$$(VALGRIND) --error-exitcode=1 ./$(x) --no-error-exitcode$(NEWLINE))
 
-memtest-debug/local: $(TARGETS_TEST_DEBUG)
-$(foreach x,$(TARGETS_TEST_PROG_DEBUG),$(NEW_RECIPE)valgrind --quiet --error-exitcode=1 --track-origins=yes --leak-check=yes --leak-resolution=low ./$(x) --no-error-exitcode)
-
-ifneq ($(strip $(TARGETS_TEST_COVER)),)
-test-cover/local: $(TARGETS_TEST_COVER)
-	$(RM) *.gcda
-$(foreach x,$(EXTRA_CLEAN_DIRS),$(NEW_RECIPE)$(RM) $(x)/*.gcda)
-$(foreach x,$(TARGETS_TEST_PROG_COVER),$(NEW_RECIPE)-./$(x))
+ifneq ($(strip $(or $(SOURCE_DIRS),$(TARGETS_CHECK_COVER))),)
+check-cover/local: $(TARGETS_CHECK_COVER)
+$(if $(SOURCE_DIRS),$(NL_TAB)$$(RM) $(foreach x,$(SOURCE_DIRS),$(patsubst ./%,%,$(x))*.gcda))
+$(foreach x,$(TARGETS_CHECK_PROG_COVER),$(NL_TAB)-./$(x)$(NEWLINE))
 endif
 
 endef
 
-$(eval $(TEST_RULES))
+$(eval $(CHECK_RULES))
 
 
 
@@ -1255,111 +1475,153 @@ PATTERN_UNPACK_MAP   = $(foreach x,$(3),$(call PATTERN_UNPACK_MAP_1,$(1),$(call 
 PATTERN_UNPACK_MAP_1 = $(if $(2),$(patsubst %,$(2),$(call $(1),$(patsubst $(2),%,$(3)),$(4))),$(3))
 PATTERN_UNPACK_MAP_2 = $(filter $(1),$(2))
 
-# Expand the contents of the target_LIBS variable for the specified
-# target. The target must either be a program or an installed library.
-# ARGS: prog_target
-EXPAND_PROG_LIBS = $(call FOLD_LEFT,EXPAND_LIB_DEP,,$(strip $($(call FOLD_TARGET,$(1))_LIBS)))
-# ARGS: inst_lib_target
-EXPAND_INST_LIB_LIBS = $(call FOLD_LEFT,EXPAND_LIB_DEP,rpath:$(call GET_INSTALL_DIR_FOR_TARGET,$(1)) noinst-rpath:.,$(strip $($(call FOLD_TARGET,$(1))_LIBS)))
+MANGLE_LIBREF = $(subst /,_s,$(subst .,_d,$(subst -,_e,$(subst _,_u,$(1)))))
 
-# ARGS: accum, dependency_lib
-EXPAND_LIB_DEP = $(call EXPAND_LIB_DEP_2,$(1),$(call GET_LIBRARY_NAME,$(2)),$(call READ_LIB_LIBDEPS,$(2)))
-# ARGS: accum, dependency_lib, contents_of_libdeps_for_dependency_lib
-EXPAND_LIB_DEP_2 = $(if $(filter noinst,$(3)),$(call EXPAND_NOINST_LIB_REF,$(1),$(2),$(3)),$(call EXPAND_INST_LIB_REF,$(1),$(2),$(3)))
-EXPAND_NOINST_LIB_REF = $(call EXPAND_LIB_DEP_3,$(1),noinst:$(2) libdeps:$(2)$(LIB_SUFFIX_LIBDEPS) $(filter-out noinst,$(3)))
-EXPAND_INST_LIB_REF   = $(call EXPAND_LIB_DEP_3,$(1),lib:$(2).a libdeps:$(2)$(LIB_SUFFIX_LIBDEPS) $(3))
-# ARGS: accum, partially_expanded_libdeps
-EXPAND_LIB_DEP_3 = $(call UNION,$(1),$(call PATTERN_UNPACK_MAP,MAKE_ABS_PATH,noinst-rpath:%,$(call EXPAND_LIB_DEP_4,$(2))))
+# Expand the contents of the `target_LIBS` variable for the specified
+# target. The target must either be a program or an installed
+# library. Relative paths in the output will be expressed relative to
+# the directory holding the local `Makefile`.
+#
+# Output for each convenience library `x/y/libfoo.a`:
+#
+#     noinst:x/y/libfoo libdeps:x/y/libfoo.libdeps
+#     ldflag-opt:flag... ldflag-dbg:flag... ldflag-cov:flag...
+#
+# For each installed library `x/y/libfoo.a` referenced directly or in
+# two steps via a convenience library:
+#
+#     inst:x/y/libfoo libdeps:x/y/libfoo.libdeps dir:x/y lib:foo
+#
+# For each installed library `x/y/libfoo.a` referenced directly or
+# indirectly in any number of steps, and installed as
+# `/foo/bar/libfoo.so`:
+#
+#     rpath:/foo/bar rpath-noinst:x/y
+#
+# ARGS: abstract_target
+EXPAND_INST_LIB_LIBREFS = $(call EXPAND_LIBREFS,$(1),rpath:$(call GET_INSTALL_DIR_FOR_LIB_TARGET,$(1)) rpath-noinst:$(patsubst %/,%,$(dir $(1))))
+# ARGS: abstract_target, initial_elems
+EXPAND_LIBREFS = $(call REMOVE_DUPES,$(2) $(foreach x,$($(call FOLD_TARGET,$(1))_LIBS),$(call EXPAND_LIBREF,$(x))))
+# ARGS: libref
+EXPAND_LIBREF = $(call EXPAND_LIBREF_1,$(1),$(call MANGLE_LIBREF,$(1)))
+EXPAND_LIBREF_1 = $(if $(GMK_CELR_$(2)),,$(eval GMK_ELR_$(2) := $$(call EXPAND_LIBREF_2,$(1))$(NEWLINE)GMK_CELR_$(2) = x))$(GMK_ELR_$(2))
+EXPAND_LIBREF_2 = $(call EXPAND_LIBREF_3,$(call GET_LIBRARY_STEM,$(x)),$(call READ_LIBDEPS,$(x)))
+# ARGS: libref_stem, libref_libdeps_contents
+EXPAND_LIBREF_3 = $(if $(filter noinst,$(2)),$(call EXPAND_LIBREF_NOINST,$(1),$(2)),$(call EXPAND_LIBREF_INST,$(1),$(2)))
+EXPAND_LIBREF_NOINST = $(call EXPAND_LIBREF_4,noinst:$(1) libdeps:$(1)$(LIB_SUFFIX_LIBDEPS) $(filter-out noinst,$(2)))
+EXPAND_LIBREF_INST   = $(call EXPAND_LIBREF_4,lib:$(1).a libdeps:$(1)$(LIB_SUFFIX_LIBDEPS) $(2))
 # ARGS: partially_expanded_libdeps
-EXPAND_LIB_DEP_4 = $(foreach x,$(1),$(if $(filter lib:%,$(x)),$(call EXPAND_LIB_DEP_5,$(call GET_LIBRARY_NAME,$(patsubst lib:%,%,$(x)))),$(x)))
-# ARGS: library_reference_without_suffix
-EXPAND_LIB_DEP_5 = $(call EXPAND_LIB_DEP_6,$(notdir $(1)),$(patsubst %/,%,$(dir $(1))))
-# ARGS: nondir_part_of_library_reference, dir_part
-EXPAND_LIB_DEP_6 = inst:$(2)/$(1) $(patsubst lib%,lib:%,$(1)) dir:$(2)
+EXPAND_LIBREF_4 = $(foreach x,$(1),$(if $(filter lib:%,$(x)),$(call EXPAND_LIBREF_5,$(call GET_LIBRARY_STEM,$(patsubst lib:%,%,$(x)))),$(x)))
+# ARGS: nested_libref_stem
+EXPAND_LIBREF_5 = $(call EXPAND_LIBREF_6,$(1),$(dir $(1)),$(notdir $(1)))
+# ARGS: nested_libref_stem, dir_part, nondir_part
+EXPAND_LIBREF_6 = inst:$(1) dir:$(patsubst %/,%,$(2)) $(patsubst lib%,lib:%,$(3))
 
-# Read the contents of the .libdeps file for the specified library and translate relative paths.
-# For libraries in the local directory, the contents needs to be computed "on the fly" because the file may not be up to date.
-READ_LIB_LIBDEPS   = $(if $(call IN_THIS_DIR,$(1)),$(call READ_LIB_LIBDEPS_1,$(notdir $(1))),$(call READ_LIB_LIBDEPS_2,$(1)))
-READ_LIB_LIBDEPS_1 = $(if $(call IS_NOINST_LIB,$(1)),$(call MAKE_NOINST_LIB_LIBDEPS,$(1)),$(call MAKE_INST_LIB_LIBDEPS,$(1)))
-READ_LIB_LIBDEPS_2 = $(call PATTERN_UNPACK_MAP,READ_LIB_LIBDEPS_3,lib:% noinst-rpath:%,$(call CAT_OPT_FILE,$(call GET_LIBRARY_NAME,$(1))$(LIB_SUFFIX_LIBDEPS)),$(1))
-READ_LIB_LIBDEPS_3 = $(call MAKE_REL_PATH,$(dir $(2))$(1))
+# Read the contents of the `.libdeps` file for the specified library
+# and translate relative paths such that they are expressed relative
+# to the directory holding the local `Makefile`. For referenced
+# libraries defined in the local `Makefile`, the contents needs to be
+# computed "on the fly" because the `.libdeps` file may not yet be up
+# to date.
+#
+# ARGS: abstract_libref
+READ_LIBDEPS   = $(if $(call IS_LOCAL_NOINST_LIB,$(1)),$(call MAKE_NOINST_LIBDEPS,$(1)),$(if $(call IS_LOCAL_INST_LIB,$(1)),$(call MAKE_INST_LIBDEPS,$(1)),$(call READ_LIBDEPS_1,$(1))))
+READ_LIBDEPS_1 = $(call PATTERN_UNPACK_MAP,READ_LIBDEPS_2,lib:% rpath-noinst:%,$(call CAT_OPT_FILE,$(call GET_LIBRARY_STEM,$(1))$(LIB_SUFFIX_LIBDEPS)),$(dir $(1)))
+READ_LIBDEPS_2 = $(call MAKE_REL_PATH,$(2)$(1))
+# Is the specified library one that is defined in the local Makefile?
+IS_LOCAL_INST_LIB   = $(call FIND,IS_SAME_PATH_AS,$(INST_LIBRARIES),$(1))
+IS_LOCAL_NOINST_LIB = $(call FIND,IS_SAME_PATH_AS,$(noinst_LIBRARIES) $(check_LIBRARIES),$(1))
 
-IS_NOINST_LIB   = $(call FIND,IS_NOINST_LIB_1,$(NOINST_LIBRARIES) $(TEST_LIBRARIES),$(1))
-IS_NOINST_LIB_1 = $(and $(call IN_THIS_DIR,$(1)),$(call EQUALS,$(notdir $(1)),$(2)))
+# Quote elements for shell and translate relative paths such that they
+# become relative to the specified target directory. It is assumed
+# that the relative paths are currently relative to the current
+# working directory.
+#
+# ARGS: libdeps_contents, target_dir
+EXPORT_LIBDEPS = $(foreach x,$(call PATTERN_UNPACK_MAP,EXPORT_LIBDEPS_1,lib:% rpath-noinst:%,$(1),$(2)),$(call SHELL_ESCAPE,$(x)))
+EXPORT_LIBDEPS_1 = $(call MAKE_REL_PATH,$(1),$(2))
 
-# ARGS: noinst_lib_target
-MAKE_NOINST_LIB_LIBDEPS   = $(strip noinst $(call MAKE_NOINST_LIB_LIBDEPS_1,$(1)) $(call MAKE_NOINST_LIB_LIBDEPS_2,$(1)))
-MAKE_NOINST_LIB_LIBDEPS_1 = $(foreach x,$($(call FOLD_TARGET,$(1))_LIBS),lib:$(x) $(call READ_LIB_LIBDEPS,$(x)))
-MAKE_NOINST_LIB_LIBDEPS_2 = $(call MAKE_NOINST_LIB_LIBDEPS_3,$(1)) $(call MAKE_NOINST_LIB_LIBDEPS_4,$(1)) $(call MAKE_NOINST_LIB_LIBDEPS_5,$(1))
-MAKE_NOINST_LIB_LIBDEPS_3 = $(foreach x,$(call GET_FLAGS,$(call FOLD_TARGET,$(1))_LDFLAGS,_OPTIM),ldflag-opt:$(x))
-MAKE_NOINST_LIB_LIBDEPS_4 = $(foreach x,$(call GET_FLAGS,$(call FOLD_TARGET,$(1))_LDFLAGS,_DEBUG),ldflag-dbg:$(x))
-MAKE_NOINST_LIB_LIBDEPS_5 = $(foreach x,$(call GET_FLAGS,$(call FOLD_TARGET,$(1))_LDFLAGS,_COVER),ldflag-cov:$(x))
+# Compute what is almost the contents to be placed in the `.libdeps`
+# file for the specified library. The only thing that sets it apart
+# from what must ultimately be placed in the file, is that all
+# relative paths in the output of this function will be expressed
+# relative to the directory holding the local `Makefile`, and not
+# relative to the directory holding the `.libdeps` file (in case they
+# differ).
+#
+# ARGS: abstract_target
+MAKE_INST_LIBDEPS     = $(call EXTRACT_INST_LIB_LIBDEPS,$(call EXPAND_INST_LIB_LIBREFS,$(1)))
+MAKE_NOINST_LIBDEPS   = $(strip noinst $(call MAKE_NOINST_LIBDEPS_1,$(1)) $(call MAKE_NOINST_LIBDEPS_2,$(1)))
+MAKE_NOINST_LIBDEPS_1 = $(foreach x,$($(call FOLD_TARGET,$(1))_LIBS),lib:$(x) $(call READ_LIBDEPS,$(x)))
+MAKE_NOINST_LIBDEPS_2 = $(call MAKE_NOINST_LIBDEPS_3,$(1)) $(call MAKE_NOINST_LIBDEPS_4,$(1)) $(call MAKE_NOINST_LIBDEPS_5,$(1))
+MAKE_NOINST_LIBDEPS_3 = $(foreach x,$(call GET_FLAGS,$(call FOLD_TARGET,$(1))_LDFLAGS,OPTIM),ldflag-opt:$(x))
+MAKE_NOINST_LIBDEPS_4 = $(foreach x,$(call GET_FLAGS,$(call FOLD_TARGET,$(1))_LDFLAGS,DEBUG),ldflag-dbg:$(x))
+MAKE_NOINST_LIBDEPS_5 = $(foreach x,$(call GET_FLAGS,$(call FOLD_TARGET,$(1))_LDFLAGS,COVER),ldflag-cov:$(x))
 
-# ARGS: inst_lib_target
-MAKE_INST_LIB_LIBDEPS = $(call EXTRACT_INST_LIB_LIBDEPS,$(call EXPAND_INST_LIB_LIBS,$(1)))
+# ARGS: expanded_librefs
+EXTRACT_INST_LIB_LIBDEPS = $(filter rpath:% rpath-noinst:%,$(1))
 
-# Pick out rpath:% and noinst-rpath:% entries and transform the paths
-# of the noinst-rpaths:% entries such that they are expressed relative
-# to the directory holding the executing Makefile.
-# ARGS: expanded_target_libs
-EXTRACT_INST_LIB_LIBDEPS = $(call PATTERN_UNPACK_MAP,MAKE_REL_PATH,noinst-rpath:%,$(filter rpath:% noinst-rpath:%,$(1)))
-
-# ARGS: expanded_target_libs, qual_type
-QUALIFY_LIB_REFS   = $(call SELECT_LDFLAGS$(2),$(call QUALIFY_LIB_REFS_1,$(1),$(2)))
-QUALIFY_LIB_REFS_1 = $(call QUALIFY_LIB_REFS_2,$(1),$(SUFFIX_LIB_STATIC$(2)),$(SUFFIX_LIB_SHARED$(2)),$(BASE_DENOM_2)$(LIB_DENOM$(2)))
-QUALIFY_LIB_REFS_2 = $(patsubst noinst:%,noinst:%$(2),$(patsubst inst:%,inst:%$(3),$(patsubst lib:%,lib:%$(4),$(1))))
-
+# Add library name qualification, and select the appropriate set of
+# linker flags for the specified compilation mode.
+#
+# ARGS: expanded_librefs, compile_mode
+FINALIZE_EXPANDED_LIBREFS   = $(call SELECT_LDFLAGS_$(2),$(call QUALIFY_LIBREFS,$(1),$(2)))
+QUALIFY_LIBREFS = $(call QUALIFY_LIBREFS_1,$(1),$(SUFFIX_LIB_STATIC_$(2)),$(SUFFIX_LIB_SHARED_$(2)),$(BASE_DENOM_2)$(LIB_DENOM_$(2)))
+QUALIFY_LIBREFS_1 = $(patsubst noinst:%,noinst:%$(2),$(patsubst inst:%,inst:%$(3),$(patsubst lib:%,lib:%$(4),$(1))))
 SELECT_LDFLAGS_OPTIM = $(patsubst ldflag-opt:%,ldflag:%,$(filter-out ldflag-dbg:% ldflag-cov:%,$(1)))
 SELECT_LDFLAGS_DEBUG = $(patsubst ldflag-dbg:%,ldflag:%,$(filter-out ldflag-opt:% ldflag-cov:%,$(1)))
 SELECT_LDFLAGS_COVER = $(patsubst ldflag-cov:%,ldflag:%,$(filter-out ldflag-opt:% ldflag-dbg:%,$(1)))
 
-UNPACK_LIB_REFS = $(call FILTER_UNPACK,noinst:%,$(1)) $(call FILTER_PATSUBST,lib:%,-l%,$(1)) $(call FILTER_PATSUBST,dir:%,-L%,$(1)) $(call FILTER_UNPACK,ldflag:%,$(1))
+# ARGS: abstract_target
+GET_LIBREFS_DEP_INFO = $(call GET_LIBREFS_DEP_INFO_1,$(foreach x,$($(call FOLD_TARGET,$(1))_LIBS),$(call EXPAND_LIBREF,$(x))))
+GET_LIBREFS_DEP_INFO_1 = $(filter noinst:% inst:% libdeps:%,$(1)) $(if $(filter rpath-noinst:%,$(1)),noinst_rpath)
 
-# ARGS: expanded_target_libs
-GET_RPATHS_FROM_LIB_REFS = $(foreach x,$(call FILTER_UNPACK,rpath:%,$(1)),-Wl,-rpath,$(x))
-GET_NOINST_RPATHS_FROM_LIB_REFS = $(foreach x,$(call FILTER_UNPACK,noinst-rpath:%,$(1)),-Wl,-rpath,$(x))
+# ARGS: librefs_dep_info, compile_mode
+FINALIZE_LIBREFS_DEP_INFO = $(call FILTER_UNPACK,noinst:% inst:% libdeps:%,$(call QUALIFY_LIBREFS,$(1),$(2)))
 
-# ARGS: qual_prog_name, objects, qual_expanded_target_libs, deps, link_cmd, ldflags
-define NOINST_PROG_RULE
-$(1): $(2) $(call FILTER_UNPACK,noinst:% inst:% libdeps:%,$(3)) $(4)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_NOINST_RPATHS_FROM_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH)) -o $(1)
+# ARGS: finalized_expanded_librefs
+LDFLAGS_FROM_LIBREFS = $(call FILTER_PATSUBST,noinst:%,%,$(1)) $(call FILTER_PATSUBST,lib:%,-l%,$(1)) $(call FILTER_PATSUBST,dir:%,-L%,$(1)) $(call FILTER_PATSUBST,ldflag:%,%,$(1))
+RPATHS_FROM_LIBREFS = $(NOINST_RPATHS_FROM_LIBREFS)
+ifeq ($(ENABLE_NOINST_BUILD),)
+RPATHS_FROM_LIBREFS = $(foreach x,$(call FILTER_PATSUBST,rpath:%,%,$(1)),-Wl,-rpath,$(x))
+endif
+NOINST_RPATHS_FROM_LIBREFS = $(foreach x,$(call FILTER_PATSUBST,rpath-noinst:%,%,$(1)),-Wl,-rpath,\$$ORIGIN$(if $(call IS_EQUAL_TO,$(x),.),,/$(x)))
+ifeq ($(OS),Darwin)
+NOINST_RPATHS_FROM_LIBREFS = $(foreach x,$(call FILTER_PATSUBST,rpath-noinst:%,%,$(1)),-Wl,-rpath,@loader_path/$(x))
+endif
+
+# ARGS: target, objects, abstract_target, compile_mode
+NOINST_PROG_RECIPE = $(call NOINST_PROG_RECIPE_1,$(1),$(2),$(3),$(4),$(call FINALIZE_EXPANDED_LIBREFS,$(call EXPAND_LIBREFS,$(3)),$(4)))
+NOINST_PROG_RECIPE_1 = $(call LIST_CONCAT,$(strip $(LD_PROG_$(4)) $(2) $(call LDFLAGS_FROM_LIBREFS,$(5)) $(call GET_LDFLAGS_FOR_TARGET,$(3),$(4)) $(LDFLAGS_ARCH)),$(call NOINST_RPATHS_FROM_LIBREFS,$(5))) -o $(1)
+
+INST_PROG_RECIPE = $(call INST_PROG_RECIPE_1,$(1),$(2),$(3),$(4),$(call FINALIZE_EXPANDED_LIBREFS,$(call EXPAND_LIBREFS,$(3)),$(4)))
+INST_PROG_RECIPE_1 = $(strip $(LD_PROG_$(4)) $(2) $(call LDFLAGS_FROM_LIBREFS,$(5)) $(call GET_LDFLAGS_FOR_TARGET,$(3),$(4)) $(LDFLAGS_ARCH) $(call RPATHS_FROM_LIBREFS,$(5))) -o $(1)
+
+# ARGS: target, objects, deps, abstract_target, compile_mode, has_noinst_rpaths
+define NOINST_PROG_RULES
+$(1): $(2) $(3)
+	$$(call NOINST_PROG_RECIPE,$(1),$(2),$(4),$(5))
 endef
-
-# ARGS: qual_prog_name, objects, qual_expanded_target_libs, deps, link_cmd, ldflags
-define INST_PROG_RULE
-ifeq ($(filter noinst-rpath:%,$(3)),)
-$(1): $(2) $(call FILTER_UNPACK,noinst:% inst:% libdeps:%,$(3)) $(4)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_RPATHS_FROM_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH)) -o $(1)
+define INST_PROG_RULES
+ifeq ($(if $(ENABLE_NOINST_BUILD),,$(6)),)
+$(1): $(2) $(3)
+	$$(call INST_PROG_RECIPE,$(1),$(2),$(4),$(5))
 else
-$(1) $(1)-noinst: $(2) $(call FILTER_UNPACK,noinst:% inst:% libdeps:%,$(3)) $(4)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_RPATHS_FROM_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH)) -o $(1)
-	$(strip $(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(call GET_NOINST_RPATHS_FROM_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH)) -o $(1)-noinst
+$(1) $(1)-noinst: $(2) $(3)
+	$$(call INST_PROG_RECIPE,$(1),$(2),$(4),$(5))
+	$$(call NOINST_PROG_RECIPE,$(1)-noinst,$(2),$(4),$(5))
 endif
 endef
 
-define RECORD_TARGETS_FOR_OBJECT
-GMK_$(call FOLD_TARGET,$(1))_TARGETS += $(2)
-$(EMPTY)
-endef
+# ARGS: abstract_target, abstract_objects, librefs_dep_info, extra_deps, compile_mode, prog_type
+EVAL_PROG_RULES_3 = $(eval $(call $(6)_PROG_RULES,$(1)$(SUFFIX_PROG_$(5)),$(patsubst %.o,%$(SUFFIX_OBJ_STATIC_$(5)),$(2)),$(call FINALIZE_LIBREFS_DEP_INFO,$(3),$(5)) $(call GET_DEPS_FOR_TARGET,$(1)),$(1),$(5),$(filter noinst_rpath,$(3))))
 
-# ARGS: unqual_prog_name, expanded_target_libs, deps
-define NOINST_PROG_RULES
-$(call NOINST_PROG_RULE,$(1)$(SUFFIX_PROG_OPTIM),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_OPTIM)),$(call QUALIFY_LIB_REFS,$(2),_OPTIM),$(3),$(LD_PROG_OPTIM),$(call GET_LDFLAGS_FOR_TARGET,$(1),_OPTIM))
-$(call NOINST_PROG_RULE,$(1)$(SUFFIX_PROG_DEBUG),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_DEBUG)),$(call QUALIFY_LIB_REFS,$(2),_DEBUG),$(3),$(LD_PROG_DEBUG),$(call GET_LDFLAGS_FOR_TARGET,$(1),_DEBUG))
-$(call NOINST_PROG_RULE,$(1)$(SUFFIX_PROG_COVER),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_COVER)),$(call QUALIFY_LIB_REFS,$(2),_COVER),$(3),$(LD_PROG_COVER),$(call GET_LDFLAGS_FOR_TARGET,$(1),_COVER))
-$(foreach x,$(call GET_OBJECTS_FOR_TARGET,$(1),.o),$(call RECORD_TARGETS_FOR_OBJECT,$(x),$(1)))
-endef
+EVAL_PROG_RULES_2 = $(foreach x,OPTIM DEBUG COVER,$(call EVAL_PROG_RULES_3,$(1),$(2),$(3),$(4),$(x),$(5)))
 
-# ARGS: unqual_target, expanded_target_libs, deps
-define INST_PROG_RULES
-$(call INST_PROG_RULE,$(1)$(SUFFIX_PROG_OPTIM),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_OPTIM)),$(call QUALIFY_LIB_REFS,$(2),_OPTIM),$(3),$(LD_PROG_OPTIM),$(call GET_LDFLAGS_FOR_TARGET,$(1),_OPTIM))
-$(call INST_PROG_RULE,$(1)$(SUFFIX_PROG_DEBUG),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_DEBUG)),$(call QUALIFY_LIB_REFS,$(2),_DEBUG),$(3),$(LD_PROG_DEBUG),$(call GET_LDFLAGS_FOR_TARGET,$(1),_DEBUG))
-$(call INST_PROG_RULE,$(1)$(SUFFIX_PROG_COVER),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_COVER)),$(call QUALIFY_LIB_REFS,$(2),_COVER),$(3),$(LD_PROG_COVER),$(call GET_LDFLAGS_FOR_TARGET,$(1),_COVER))
-$(foreach x,$(call GET_OBJECTS_FOR_TARGET,$(1),.o),$(call RECORD_TARGETS_FOR_OBJECT,$(x),$(1)))
-endef
+EVAL_PROG_RULES_1 = $(call EVAL_PROG_RULES_2,$(1),$(call GET_OBJECTS_FOR_TARGET,$(1),.o),$(call GET_LIBREFS_DEP_INFO,$(1)),$(call GET_DEPS_FOR_TARGET,$(1)),$(2))
 
-$(foreach x,$(NOINST_PROGRAMS) $(TEST_PROGRAMS),$(eval $(call NOINST_PROG_RULES,$(x),$(call EXPAND_PROG_LIBS,$(x)),$(call GET_DEPS_FOR_TARGET,$(x)))))
-$(foreach x,$(INST_PROGRAMS) $(DEV_PROGRAMS),$(eval $(call INST_PROG_RULES,$(x),$(call EXPAND_PROG_LIBS,$(x)),$(call GET_DEPS_FOR_TARGET,$(x)))))
+$(foreach x,$(noinst_PROGRAMS) $(check_PROGRAMS),$(call EVAL_PROG_RULES_1,$(x),NOINST))
+$(foreach x,$(INST_PROGRAMS) $(DEV_PROGRAMS),$(call EVAL_PROG_RULES_1,$(x),INST))
 
 
 
@@ -1375,7 +1637,7 @@ $(foreach x,$(INST_PROGRAMS) $(DEV_PROGRAMS),$(eval $(call INST_PROG_RULES,$(x),
 # If `libinst.a` is an installed library, then `libinst.libdeps`
 # contains a number of `rpath:` and `noninst-rpath:` entries. The
 # `rpath:` entries are used in `-rpath` flags when linking installed
-# programs against `libinst.a`. The `noinst-rpath:` entries are
+# programs against `libinst.a`. The `rpath-noinst:` entries are
 # similar, but they are used when linking programs that are not
 # installed (i.e., those that can be executed before `libinst.a` is
 # installed). While the paths specified by the `rpath:` entries are
@@ -1383,12 +1645,12 @@ $(foreach x,$(INST_PROGRAMS) $(DEV_PROGRAMS),$(eval $(call INST_PROG_RULES,$(x),
 # always relative to the directory containing the 'libdeps' file.
 #
 # First of all, `libinst.libdeps` contains an `rpath:` and a
-# `noinst-rpath:` entry for itself. For instance:
+# `rpath-noinst:` entry for itself. For instance:
 #
-#   rpath:/usr/local/lib noinst-rpath:.
+#     rpath:/usr/local/lib rpath-noinst:.
 #
 # Further more, `libinst.libdeps` contains an `rpath:` and a
-# `noinst-rpath:` entry for each installed library `libxxx.a`, that
+# `rpath-noinst:` entry for each installed library `libxxx.a`, that
 # `libinst.a` depends on, and which is also part of this project,
 # unless those entries would lead to duplicates. This is true even
 # when `libxxx.a` is an indirect dependency of `libinst.a`
@@ -1399,40 +1661,43 @@ $(foreach x,$(INST_PROGRAMS) $(DEV_PROGRAMS),$(eval $(call INST_PROG_RULES,$(x),
 # subdirectories `inst`, `xxx`, and `yyy` respectively, and all are
 # installed in `/usr/local/lib`, then `libinst.libdeps` will contain
 #
-#   rpath:/usr/local/lib noinst-rpath:. noinst-rpath:../xxx
-#   noinst-rpath:../yyy
+#     rpath:/usr/local/lib rpath-noinst:. rpath-noinst:../xxx
+#     rpath-noinst:../yyy
 #
 # Had they all been located in the same directory, `libinst.libdeps`
 # would instead contain
 #
-#   rpath:/usr/local/lib noinst-rpath:.
+#     rpath:/usr/local/lib rpath-noinst:.
 #
 #
 # If `libconv.a` is a convenience library (not installed), then
 # `libconv.libdeps` contains a `noinst` entry that identifies it as a
-# convenience library to `Makefile`s in other subdirectories. Apart
-# from that, it contains a `lib:` entry for each installed
-# project-local library that `libconv.a` directly depends on, and it
-# contains the union of the contents of the 'libdeps' files associated
-# with each of those `lib:` entries with relative paths transformed as
-# necessary. For example, if `libconv.a` depends on `libinst.a`, and
-# `libconv.a` is located in the root directory of the project, and the
-# installed libraries are located in distinct subdirectories as
-# described in an example above, then `libconv.libdeps` will contain
+# convenience library from the point of view of `Makefile`s in other
+# subdirectories. Apart from that, it contains a `lib:` entry for each
+# installed project-local library that `libconv.a` directly depends
+# on, and it contains the union of the contents of the 'libdeps' files
+# associated with each of those `lib:` entries with relative paths
+# transformed as necessary. Aa with `noninst-rpath:`, the paths
+# specified by the `lib:` entries are always relative to the directory
+# containing the 'libdeps' file. For example, if `libconv.a` depends
+# on `libinst.a`, and `libconv.a` is located in the root directory of
+# the project, and the installed libraries are located in distinct
+# subdirectories as described in an example above, then
+# `libconv.libdeps` will contain
 #
-#   noinst lib:inst/libinst.a rpath:/usr/local/lib noinst-rpath:inst
-#   noinst-rpath:xxx noinst-rpath:yyy
+#     noinst lib:inst/libinst.a rpath:/usr/local/lib rpath-noinst:inst
+#     rpath-noinst:xxx rpath-noinst:yyy
 #
-# Note how the relative paths in the `noinst-rpath:` entries have been
+# Note how the relative paths in the `rpath-noinst:` entries have been
 # transformed such that they are now relative to the root directory.
 #
 # When extra linker flags are attached to a convenience library, those
 # flags will also be carried in the 'libdeps' file. For example,
 # `libconv.libdeps` might contain
 #
-#   ldflag-opt:-lmagic ldflag-opt:-L/opt/magic/lib
-#   ldflag-dbg:-lmagic ldflag-dbg:-L/opt/magic-debug/lib
-#   ldflag-cov:-lmagic ldflag-cov:-L/opt/magic-debug/lib
+#     ldflag-opt:-lmagic ldflag-opt:-L/opt/magic/lib
+#     ldflag-dbg:-lmagic ldflag-dbg:-L/opt/magic-debug/lib
+#     ldflag-cov:-lmagic ldflag-cov:-L/opt/magic-debug/lib
 #
 # The `ldflag-opt:` entries are used when compiling in optimized
 # (default) mode, while the `ldflag-dbg:` and the `ldflag-cov:`
@@ -1442,18 +1707,18 @@ $(foreach x,$(INST_PROGRAMS) $(DEV_PROGRAMS),$(eval $(call INST_PROG_RULES,$(x),
 # ARGS: target, objects, extra_deps
 define STATIC_LIBRARY_RULE
 $(1): $(2) $(3)
-	$(RM) $(1)
-	$(strip $(AR) $(ARFLAGS_GENERAL) $(1) $(2))
+	$$(RM) $(1)
+	$$(strip $$(AR) $$(ARFLAGS_GENERAL) $(1) $(2))
 endef
 
-# ARGS: qual_lib_name, objects, qual_expanded_target_libs, extra_deps, link_cmd, ldflags, lib_version
-SHARED_LIBRARY_RULE_HELPER = $(call SHARED_LIBRARY_RULE,$(1),$(2) $(call FILTER_UNPACK,inst:% libdeps:%,$(3)) $(4),$(5) $(2) $(call UNPACK_LIB_REFS,$(3)) $(6) $(LDFLAGS_ARCH),$(7))
+# ARGS: real_local_path, objects, finalized_expanded_librefs, extra_deps, link_cmd, ldflags, lib_version
+SHARED_LIBRARY_RULE_HELPER = $(call SHARED_LIBRARY_RULE,$(1),$(2) $(call FILTER_UNPACK,inst:% libdeps:%,$(3)) $(4),$(5) $(2) $(call LDFLAGS_FROM_LIBREFS,$(3)) $(6) $$(LDFLAGS_ARCH),$(if $(ENABLE_NOINST_BUILD),,$(7)))
 
 # ARGS: qual_lib_name, deps, cmd, version
 SHARED_LIBRARY_RULE = $(SHARED_LIBRARY_RULE_DEFAULT)
 define SHARED_LIBRARY_RULE_DEFAULT
 $(1): $(2)
-	$(strip $(3) -o $(1))
+	$$(strip $(3)) -o $(1)
 endef
 
 ifeq ($(OS),Linux)
@@ -1467,9 +1732,9 @@ SHARED_LIBRARY_RULE_VER = $(call SHARED_LIBRARY_RULE_VER_2,$(1),$(2),$(3),$(word
 # ARGS: qual_lib_name, deps, cmd, major_version, full_version
 define SHARED_LIBRARY_RULE_VER_2
 $(1) $(1).$(4) $(1).$(5): $(2)
-	$(strip $(3) -Wl,-soname,$(1).$(4) -o $(1).$(5))
-	ln -s -f $(1).$(5) $(1).$(4)
-	ln -s -f $(1).$(4) $(1)
+	$$(strip $(3) -Wl,-soname,$(notdir $(1).$(4))) -o $(1).$(5)
+	ln -s -f $(notdir $(1).$(5)) $(1).$(4)
+	ln -s -f $(notdir $(1).$(4)) $(1)
 endef
 
 endif
@@ -1487,41 +1752,43 @@ SHARED_LIBRARY_RULE_VER = $(call SHARED_LIBRARY_RULE_VER_2,$(1),$(2),$(3),$(word
 # ARGS: qual_lib_name, deps, cmd, qual_lib_name_with_version, compatibility_version, current_version
 define SHARED_LIBRARY_RULE_VER_2
 $(1) $(4): $(2)
-	$(strip $(3) -install_name @rpath/$(4) -compatibility_version $(5) -current_version $(6) -o $(4))
-	ln -s -f $(4) $(1)
+	$$(strip $(3) -install_name @rpath/$(notdir $(4)) -compatibility_version $(5) -current_version $(6)) -o $(4)
+	ln -s -f $(notdir $(4)) $(1)
 endef
 
 endif
 
-# ARGS: lib_name, contents, deps
+# ARGS: target_stem_path, contents, deps
 define LIBDEPS_RULE
-$(1)$(LIB_SUFFIX_LIBDEPS): $(3) $(DEP_MAKEFILES)
-	echo $(2) >$(1)$(LIB_SUFFIX_LIBDEPS)
+$(1)$$(LIB_SUFFIX_LIBDEPS): $(3) $$(DEP_MAKEFILES)
+	echo $$(call EXPORT_LIBDEPS,$(2),$(dir $(1))) >$(1)$$(LIB_SUFFIX_LIBDEPS)
 endef
 
-# ARGS: unqual_lib_name, extra_deps
+# ARGS: abstract_target, extra_deps
 define NOINST_LIB_RULES
-$(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_STATIC_OPTIM),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_OPTIM)),$(3))
-$(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_STATIC_DEBUG),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_DEBUG)),$(3))
-$(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_STATIC_COVER),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_COVER)),$(3))
-$(call LIBDEPS_RULE,$(call GET_LIBRARY_NAME,$(1)),$(call MAKE_NOINST_LIB_LIBDEPS,$(1)),$(foreach x,$($(call FOLD_TARGET,$(1))_LIBS),$(call GET_LIBRARY_NAME,$(x))$(LIB_SUFFIX_LIBDEPS)))
-$(foreach x,$(call GET_OBJECTS_FOR_TARGET,$(1),.o),$(call RECORD_TARGETS_FOR_OBJECT,$(x),$(1)))
+$(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_STEM,$(1))$(SUFFIX_LIB_STATIC_OPTIM),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_OPTIM)),$(3))
+$(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_STEM,$(1))$(SUFFIX_LIB_STATIC_DEBUG),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_DEBUG)),$(3))
+$(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_STEM,$(1))$(SUFFIX_LIB_STATIC_COVER),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_COVER)),$(3))
+$(call LIBDEPS_RULE,$(call GET_LIBRARY_STEM,$(1)),$(call MAKE_NOINST_LIBDEPS,$(1)),$(foreach x,$($(call FOLD_TARGET,$(1))_LIBS),$(call GET_LIBRARY_STEM,$(x))$(LIB_SUFFIX_LIBDEPS)))
 endef
 
-# ARGS: unqual_lib_name, expanded_target_libs, extra_deps
+# ARGS: abstract_target, expanded_librefs, extra_deps
 define INST_LIB_RULES
-$(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_STATIC_OPTIM),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_OPTIM)),$(3))
-$(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_STATIC_DEBUG),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_DEBUG)),$(3))
-$(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_STATIC_COVER),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_COVER)),$(3))
-$(call SHARED_LIBRARY_RULE_HELPER,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_SHARED_OPTIM),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_SHARED_OPTIM)),$(call QUALIFY_LIB_REFS,$(2),_OPTIM),$(3),$(LD_LIB_OPTIM),$(call GET_LDFLAGS_FOR_TARGET,$(1),_OPTIM),$(call GET_VERSION_FOR_TARGET,$(1)))
-$(call SHARED_LIBRARY_RULE_HELPER,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_SHARED_DEBUG),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_SHARED_DEBUG)),$(call QUALIFY_LIB_REFS,$(2),_DEBUG),$(3),$(LD_LIB_DEBUG),$(call GET_LDFLAGS_FOR_TARGET,$(1),_DEBUG),$(call GET_VERSION_FOR_TARGET,$(1)))
-$(call SHARED_LIBRARY_RULE_HELPER,$(call GET_LIBRARY_NAME,$(1))$(SUFFIX_LIB_SHARED_COVER),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_SHARED_COVER)),$(call QUALIFY_LIB_REFS,$(2),_COVER),$(3),$(LD_LIB_COVER),$(call GET_LDFLAGS_FOR_TARGET,$(1),_COVER),$(call GET_VERSION_FOR_TARGET,$(1)))
-$(call LIBDEPS_RULE,$(call GET_LIBRARY_NAME,$(1)),$(call EXTRACT_INST_LIB_LIBDEPS,$(2)),$(call FILTER_UNPACK,libdeps:%,$(2)))
-$(foreach x,$(call GET_OBJECTS_FOR_TARGET,$(1),.o),$(call RECORD_TARGETS_FOR_OBJECT,$(x),$(1)))
+$(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_STEM,$(1))$(SUFFIX_LIB_STATIC_OPTIM),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_OPTIM)),$(3))
+$(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_STEM,$(1))$(SUFFIX_LIB_STATIC_DEBUG),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_DEBUG)),$(3))
+$(call STATIC_LIBRARY_RULE,$(call GET_LIBRARY_STEM,$(1))$(SUFFIX_LIB_STATIC_COVER),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_STATIC_COVER)),$(3))
+$(call SHARED_LIBRARY_RULE_HELPER,$(call GET_LIBRARY_STEM,$(1))$(SUFFIX_LIB_SHARED_OPTIM),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_SHARED_OPTIM)),$(call FINALIZE_EXPANDED_LIBREFS,$(2),OPTIM),$(3),$$(LD_LIB_OPTIM),$(call GET_LDFLAGS_FOR_TARGET,$(1),OPTIM),$(call GET_LIBRARY_VERSION,$(1)))
+$(call SHARED_LIBRARY_RULE_HELPER,$(call GET_LIBRARY_STEM,$(1))$(SUFFIX_LIB_SHARED_DEBUG),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_SHARED_DEBUG)),$(call FINALIZE_EXPANDED_LIBREFS,$(2),DEBUG),$(3),$$(LD_LIB_DEBUG),$(call GET_LDFLAGS_FOR_TARGET,$(1),DEBUG),$(call GET_LIBRARY_VERSION,$(1)))
+$(call SHARED_LIBRARY_RULE_HELPER,$(call GET_LIBRARY_STEM,$(1))$(SUFFIX_LIB_SHARED_COVER),$(call GET_OBJECTS_FOR_TARGET,$(1),$(SUFFIX_OBJ_SHARED_COVER)),$(call FINALIZE_EXPANDED_LIBREFS,$(2),COVER),$(3),$$(LD_LIB_COVER),$(call GET_LDFLAGS_FOR_TARGET,$(1),COVER),$(call GET_LIBRARY_VERSION,$(1)))
+$(call LIBDEPS_RULE,$(call GET_LIBRARY_STEM,$(1)),$(call EXTRACT_INST_LIB_LIBDEPS,$(2)),$(call FILTER_PATSUBST,libdeps:%,%,$(2)))
 endef
 
-$(foreach x,$(NOINST_LIBRARIES) $(TEST_LIBRARIES),$(eval $(call NOINST_LIB_RULES,$(x),$(call GET_DEPS_FOR_TARGET,$(x)))))
-$(foreach x,$(INST_LIBRARIES),$(eval $(call INST_LIB_RULES,$(x),$(call EXPAND_INST_LIB_LIBS,$(x)),$(call GET_DEPS_FOR_TARGET,$(x)))))
+define LIBRARY_RULES
+$(foreach x,$(noinst_LIBRARIES) $(check_LIBRARIES),$(NEWLINE)$(call NOINST_LIB_RULES,$(x),$(call GET_DEPS_FOR_TARGET,$(x)))$(NEWLINE))
+$(foreach x,$(INST_LIBRARIES),$(NEWLINE)$(call INST_LIB_RULES,$(x),$(call EXPAND_INST_LIB_LIBREFS,$(x)),$(call GET_DEPS_FOR_TARGET,$(x)))$(NEWLINE))
+endef
+
+$(eval $(LIBRARY_RULES))
 
 
 
@@ -1537,83 +1804,87 @@ $(foreach x,$(INST_LIBRARIES),$(eval $(call INST_LIB_RULES,$(x),$(call EXPAND_IN
 
 # COMPILING + AUTOMATIC DEPENDENCIES
 
+$(foreach x,$(LIBRARIES) $(PROGRAMS),$(foreach y,$(call GET_OBJECTS_FOR_TARGET,$(x),.o),$(eval GMK_TARGETS_$(call FOLD_TARGET,$(y)) += $(x))))
+
+GET_CFLAGS_FOR_TARGET = $(foreach x,PROJECT DIR $(foreach y,$(GMK_TARGETS_$(call FOLD_TARGET,$(1))) $(1),$(call FOLD_TARGET,$(y))),$(call GET_FLAGS,$(x)_CFLAGS,$(2)))
+
 %$(SUFFIX_OBJ_STATIC_OPTIM): %.c
-	$(strip $(CC_STATIC_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,_OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CC_STATIC_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_STATIC_OPTIM): %.cpp
-	$(strip $(CXX_STATIC_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,_OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CXX_STATIC_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_OPTIM): %.c
-	$(strip $(CC_SHARED_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,_OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CC_SHARED_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_OPTIM): %.cpp
-	$(strip $(CXX_SHARED_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,_OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CXX_SHARED_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 
 %$(SUFFIX_OBJ_STATIC_DEBUG): %.c
-	$(strip $(CC_STATIC_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,_DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CC_STATIC_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_STATIC_DEBUG): %.cpp
-	$(strip $(CXX_STATIC_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,_DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CXX_STATIC_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_DEBUG): %.c
-	$(strip $(CC_SHARED_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,_DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CC_SHARED_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_DEBUG): %.cpp
-	$(strip $(CXX_SHARED_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,_DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(CXX_SHARED_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 
 %$(SUFFIX_OBJ_STATIC_COVER): %.c
-	$(strip $(CC_STATIC_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,_COVER) $(CFLAGS_ARCH) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
+	$(strip $(CC_STATIC_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,COVER) $(CFLAGS_ARCH) $(INC_FLAGS_COVER) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
 
 %$(SUFFIX_OBJ_STATIC_COVER): %.cpp
-	$(strip $(CXX_STATIC_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,_COVER) $(CFLAGS_ARCH) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
+	$(strip $(CXX_STATIC_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,COVER) $(CFLAGS_ARCH) $(INC_FLAGS_COVER) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
 
 %$(SUFFIX_OBJ_SHARED_COVER): %.c
-	$(strip $(CC_SHARED_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,_COVER) $(CFLAGS_ARCH) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
+	$(strip $(CC_SHARED_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,COVER) $(CFLAGS_ARCH) $(INC_FLAGS_COVER) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
 
 %$(SUFFIX_OBJ_SHARED_COVER): %.cpp
-	$(strip $(CXX_SHARED_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,_COVER) $(CFLAGS_ARCH) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
+	$(strip $(CXX_SHARED_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,COVER) $(CFLAGS_ARCH) $(INC_FLAGS_COVER) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
 
 
 
 %$(SUFFIX_OBJ_STATIC_OPTIM): %.m
-	$(strip $(OCC_STATIC_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,_OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCC_STATIC_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_STATIC_OPTIM): %.mm
-	$(strip $(OCXX_STATIC_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,_OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCXX_STATIC_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_OPTIM): %.m
-	$(strip $(OCC_SHARED_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,_OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCC_SHARED_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_OPTIM): %.mm
-	$(strip $(OCXX_SHARED_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,_OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCXX_SHARED_OPTIM) $(call GET_CFLAGS_FOR_TARGET,$*.o,OPTIM) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 
 %$(SUFFIX_OBJ_STATIC_DEBUG): %.m
-	$(strip $(OCC_STATIC_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,_DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCC_STATIC_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_STATIC_DEBUG): %.mm
-	$(strip $(OCXX_STATIC_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,_DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCXX_STATIC_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_DEBUG): %.m
-	$(strip $(OCC_SHARED_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,_DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCC_SHARED_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 %$(SUFFIX_OBJ_SHARED_DEBUG): %.mm
-	$(strip $(OCXX_SHARED_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,_DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
+	$(strip $(OCXX_SHARED_DEBUG) $(call GET_CFLAGS_FOR_TARGET,$*.o,DEBUG) $(CFLAGS_ARCH) $(INC_FLAGS) $(CFLAGS_AUTODEP)) -c $< -o $@
 
 
 %$(SUFFIX_OBJ_STATIC_COVER): %.m
-	$(strip $(OCC_STATIC_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,_COVER) $(CFLAGS_ARCH) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
+	$(strip $(OCC_STATIC_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,COVER) $(CFLAGS_ARCH) $(INC_FLAGS_COVER) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
 
 %$(SUFFIX_OBJ_STATIC_COVER): %.mm
-	$(strip $(OCXX_STATIC_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,_COVER) $(CFLAGS_ARCH) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
+	$(strip $(OCXX_STATIC_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,COVER) $(CFLAGS_ARCH) $(INC_FLAGS_COVER) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
 
 %$(SUFFIX_OBJ_SHARED_COVER): %.m
-	$(strip $(OCC_SHARED_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,_COVER) $(CFLAGS_ARCH) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
+	$(strip $(OCC_SHARED_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,COVER) $(CFLAGS_ARCH) $(INC_FLAGS_COVER) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
 
 %$(SUFFIX_OBJ_SHARED_COVER): %.mm
-	$(strip $(OCXX_SHARED_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,_COVER) $(CFLAGS_ARCH) $(INC_FLAGS_ABS) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
+	$(strip $(OCXX_SHARED_COVER) $(call GET_CFLAGS_FOR_TARGET,$*.o,COVER) $(CFLAGS_ARCH) $(INC_FLAGS_COVER) $(CFLAGS_AUTODEP)) -c $(abspath $<) -o $(abspath $@)
 
 
 -include $(OBJECTS:.o=.d)
