@@ -123,11 +123,10 @@ TIGHTDB_TABLE_2(QueryTable,
     }
 
     // Write same group to memory buffer
-    size_t size;
-    const char* data = [group writeToBufferOfSize:&size];
+    TightdbBinary* buffer = [group writeToBuffer];
 
     // Load a group from memory (and print contents)
-    TightdbGroup* fromMem = [TightdbGroup groupWithBuffer:data ofSize:size withError:nil];
+    TightdbGroup* fromMem = [TightdbGroup groupWithBuffer:buffer withError:nil];
     MyTable* memTable = [fromMem getTable:@"employees" withClass:[MyTable class] error:nil];
     for (size_t i = 0; i < [memTable count]; i++) {
         // ??? cursor

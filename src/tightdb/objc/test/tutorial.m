@@ -161,11 +161,10 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     }
 
     // Write same group to memory buffer
-    size_t size;
-    const char* const data = [group writeToBufferOfSize:&size];
+    TightdbBinary* buffer = [group writeToBuffer];
 
     // Load a group from memory (and print contents)
-    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:data ofSize:size withError:nil];
+    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:buffer withError:nil];
     PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class] error:nil];
     for (size_t i = 0; i < [memTable count]; i++) {
         PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];

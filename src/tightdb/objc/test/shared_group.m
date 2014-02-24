@@ -47,7 +47,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [group writeToFile:@"employees.tightdb" withError:nil];
 
     // Read only shared group
-    TightdbSharedGroup* fromDisk = [TightdbSharedGroup sharedGroupWithFilename:@"employees.tightdb" withError:nil];
+    TightdbSharedGroup* fromDisk = [TightdbSharedGroup sharedGroupWithFile:@"employees.tightdb" withError:nil];
 
     [fromDisk readTransactionWithBlock:^(TightdbGroup* group) {
             SharedTable2* diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
