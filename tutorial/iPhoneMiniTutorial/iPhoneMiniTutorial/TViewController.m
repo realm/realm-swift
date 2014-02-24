@@ -14,19 +14,11 @@
     // Create a free-standing table
     TightdbTable *table = [[TightdbTable alloc] init];
     
-    // Add columns to the table if not already there
-    if ([table getColumnCount] == 0) {
-        [table addColumnWithType:tightdb_String andName:@"Name"];
-        [table addColumnWithType:tightdb_Int andName:@"Age"];
-        [table addColumnWithType:tightdb_Bool andName:@"Hired"];
-    }
-    
-    // Get the column indexes of the added columns
-    size_t const NAME = [table getColumnIndex:@"Name"];
-    size_t const AGE = [table getColumnIndex:@"Age"];
-    size_t const HIRED = [table getColumnIndex:@"Hired"];
+    // Add columns to the table
+    size_t const NAME = [table addColumnWithType:tightdb_String andName:@"Name"];
+    size_t const AGE = [table addColumnWithType:tightdb_Int andName:@"Age"];
+    size_t const HIRED = [table addColumnWithType:tightdb_Bool andName:@"Hired"];
   
-    
     // Add new row to the table and set values
     TightdbCursor *cursor0 = [table addRow];
     [cursor0 setString:@"Jill" inColumn:NAME];
@@ -38,7 +30,6 @@
     [cursor1 setString:@"Mary" inColumn:NAME];
     [cursor1 setInt: 40 inColumn:AGE];
     [cursor1 setBool:NO inColumn:HIRED];
-    
     
     // Change value in row
     [cursor1 setBool:YES inColumn:HIRED];
