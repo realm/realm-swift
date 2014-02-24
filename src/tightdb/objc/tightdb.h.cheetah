@@ -42,6 +42,7 @@ directiveStartToken = %
 #import <tightdb/objc/query.h>
 #import <tightdb/objc/cursor.h>
 #import <tightdb/objc/helper_macros.h>
+#import <tightdb/objc/group_shared.h>
 %for $i in range($max_cols)
 %set $num_cols = $i + 1
 
