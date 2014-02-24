@@ -20,8 +20,8 @@ int main()
 
         // Creates a group and uses it to create a new table.
 
-        TightdbGroup *group = [TightdbGroup group];
-        PeopleTable *table = [group getTable:@"people" withClass:[PeopleTable class]];
+        TightdbGroup* group = [TightdbGroup group];
+        PeopleTable* table = [group getTable:@"people" withClass:[PeopleTable class]];
 
         // Adds values to the table.
 
@@ -43,15 +43,13 @@ int main()
 
         // Retrieves an in memory buffer from the group.
 
-        size_t size;
-        const char *buffer = [group writeToBufferOfSize:&size];
+        TightdbBinary* buffer = [group writeToBuffer];
 
         // Creates a group from an im memory buffer
-        TightdbGroup *groupFromMemory = [TightdbGroup groupWithBuffer:buffer ofSize:size withError:nil];
-        PeopleTable *tableFromMemery = [groupFromMemory getTable:@"people" withClass:[PeopleTable class] error:nil];
+        TightdbGroup* groupFromMemory = [TightdbGroup groupWithBuffer:buffer withError:nil];
+        PeopleTable* tableFromMemery = [groupFromMemory getTable:@"people" withClass:[PeopleTable class] error:nil];
 
-        for (PeopleTable_Cursor *cursor in tableFromMemery)
-        {
+        for (PeopleTable_Cursor* cursor in tableFromMemery) {
             NSLog(@"Name: %@", cursor.Name);
         }
 

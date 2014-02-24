@@ -91,7 +91,7 @@ using namespace std;
 }
 
 
-+(TightdbGroup *)groupWithBuffer:(TightdbBinary*)buffer withError:(NSError **)error
++(TightdbGroup*)groupWithBuffer:(TightdbBinary*)buffer withError:(NSError**)error
 {
     TightdbGroup* group = [[TightdbGroup alloc] init];
     if (!group)
@@ -138,7 +138,7 @@ using namespace std;
 }
 
 
--(BOOL)writeToFile:(NSString *)path withError:(NSError *__autoreleasing *)error
+-(BOOL)writeToFile:(NSString*)path withError:(NSError* __autoreleasing*)error
 {
     try {
         m_group->write(tightdb::StringData(ObjcStringAccessor(path)));
@@ -147,25 +147,25 @@ using namespace std;
         // Except, here, we return no instead of nil.
     catch (tightdb::File::PermissionDenied& ex) {
         if (error) // allow nil as the error argument
-            *error = make_tightdb_error(@"com.tightdb.sharedgroup", tdb_err_File_PermissionDenied, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_tightdb_error(tdb_err_File_PermissionDenied, [NSString stringWithUTF8String:ex.what()]);
         return NO;
 
     }
     catch (tightdb::File::Exists& ex) {
         if (error) // allow nil as the error argument
-            *error = make_tightdb_error(@"com.tightdb.sharedgroup", tdb_err_File_Exists, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_tightdb_error(tdb_err_File_Exists, [NSString stringWithUTF8String:ex.what()]);
         return NO;
 
     }
     catch (tightdb::File::AccessError& ex) {
         if (error) // allow nil as the error argument
-            *error = make_tightdb_error(@"com.tightdb.sharedgroup", tdb_err_File_AccessError, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_tightdb_error(tdb_err_File_AccessError, [NSString stringWithUTF8String:ex.what()]);
         return NO;
 
     }
     catch (std::exception& ex) {
         if (error) // allow nil as the error argument
-            *error = make_tightdb_error(@"com.tightdb.sharedgroup", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_tightdb_error(tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
         return NO;
     }
     return YES;

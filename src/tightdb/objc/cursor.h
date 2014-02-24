@@ -70,8 +70,6 @@
 -(void)setString:(NSString *)value;
 -(TightdbBinary *)getBinary;
 -(void)setBinary:(TightdbBinary *)value;
-// FIXME: see comment in implementation
-// -(BOOL)setBinary:(const char *)data size:(size_t)size;
 -(time_t)getDate;
 -(void)setDate:(time_t)value;
 -(void)setSubtable:(TightdbTable *)value;

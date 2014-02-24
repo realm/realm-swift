@@ -173,6 +173,7 @@
 
 // FIXME: Remove this option from binding. Use insertRowAtIndex and a cursor.
 
+// FIXME: Should be insertBool:(BOOL)value inColumn:(size_t)colNdx atRow:(size_t)rowNdx;
 -(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value;
 -(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value error:(NSError *__autoreleasing *)error;
 -(BOOL)insertInt:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;
@@ -199,7 +200,6 @@
 -(BOOL)insertSubtable:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(BOOL)clearSubtable:(size_t)colNdx ndx:(size_t)ndx;
 -(BOOL)clearSubtable:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
-//-(BOOL)setSubtable:(size_t)col_ndx ndx:(size_t)ndx withTable:(TightdbTable *)subtable;
 
 // Mixed
 
