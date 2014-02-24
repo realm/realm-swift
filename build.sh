@@ -303,6 +303,8 @@ case "$MODE" in
         else
             tightdb_echo "Could not find home of TightDB core library built for iPhone"
         fi
+	
+	touch "$CONFIG_MK" || { echo "Can't overwrite $CONFIG_MK." ; exit 1 ; }
 
         cat >"$CONFIG_MK" <<EOF
 INSTALL_PREFIX      = $install_prefix
@@ -407,13 +409,15 @@ EOF
 	    echo "Framework for iOS can only be generated under Mac OS X"
 	    exit 0
 	fi
-	rm -rf "Tightdb.framework" Tightdb-ios.zip || exit 1
-	mkdir -p "Tightdb.framework/Headers" || exit 1
-	cp iphone-lib/libtightdb-objc-ios.a Tightdb.framework/Tightdb || exit 1
-	cp iphone-lib/include/tightdb/objc/*.h Tightdb.framework/Headers || exit 1
-	find Tightdb.framework/Headers -name '*.h' -exec sed -i '' -e 's/import <tightdb\/objc\/\(.*\)>/import "\1"/g' {} \; || exit 1
-	find Tightdb.framework/Headers -name '*.h' -exec sed -i '' -e 's/include <tightdb\/objc\/\(.*\)>/include "\1"/g' {} \; || exit 1
-	zip -r -q tightdb-ios.zip Tightdb.framework || exit 1
+	FRAMEWORK=Tightdb.framework
+	rm -rf "$FRAMEWORK" Tightdb-ios.zip || exit 1
+	mkdir -p "$FRAMEWORK/Headers" || exit 1
+	cp iphone-lib/libtightdb-objc-ios.a "$FRAMEWORK/Tightdb" || exit 1
+	cp iphone-lib/include/tightdb/objc/*.h "$FRAMEWORK/Headers" || exit 1
+	(cd "$FRAMEWORK/Headers" && mv tightdb.h Tightdb.h) || exit 1
+	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/import <tightdb\/objc\/\(.*\)>/import "\1"/g' {} \; || exit 1
+	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/include <tightdb\/objc\/\(.*\)>/include "\1"/g' {} \; || exit 1
+	zip -r -q tightdb-ios.zip $FRAMEWORK || exit 1
 	echo "Framwork for iOS can be found in tightdb-ios.zip"
 	exit 0
 	;;
