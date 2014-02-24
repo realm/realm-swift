@@ -144,7 +144,7 @@ CATEGORIES :
                    <li><code>tightdb_Date</code></li>
                    <li><code>tightdb_Mixed</code></li>
                  </ul>
-      SIGNATURE: (size_t)getColumnCount
+      SIGNATURE: (size_t)addColumn
       RETURN:
         TYPES  : size_t
         DESCR  : *g_dyn_table_add_column_return_descr
