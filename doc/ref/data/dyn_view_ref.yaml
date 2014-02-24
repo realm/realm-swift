@@ -56,7 +56,7 @@ CATEGORIES :
   - g_dyn_view_get_column_count:
       TODO     : soon
 
-      NAME     : getColumnCount 
+      NAME     : getColumnCount
       SUMMARY  : *g_dyn_table_get_column_count_summary
       DESCR    : *g_dyn_table_get_column_count_descr
       RETURN:
@@ -252,7 +252,7 @@ CATEGORIES :
   - g_dyn_view_set_mixed:
       TODO     : soon
       NAME     : setMixed
-      
+
       TITLE    : set*
       SUMMARY  : *g_dyn_table_set_xxx_summary
       DESCR    : *g_dyn_table_set_xxx_descr
@@ -362,7 +362,7 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_find_first_xxx
         DESCR  :
-        
+
   - g_dyn_view_find_all_bool_const:
       IGNORE   : ""
   - g_dyn_view_find_all_int_const:
@@ -490,7 +490,7 @@ CATEGORIES :
       TODO     : later
   - g_dyn_view_minimum_double:
       TODO     : later
-      
+
       NAMES    : [minimum, minimum_float, minimum_double]
       SUMMARY  : *g_dyn_view_minimum_summary
       DESCR    : *g_dyn_view_minimum_descr

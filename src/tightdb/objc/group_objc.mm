@@ -15,291 +15,257 @@
 using namespace std;
 
 
-@interface TightdbGroup()
-@property(nonatomic) tightdb::Group *group;
-@property(nonatomic) BOOL readOnly;
-@end
-
 @implementation TightdbGroup
-@synthesize group = _group;
-@synthesize readOnly = _readOnly;
-
-
-
-+(TightdbGroup *)group
 {
-    TightdbGroup *group = [[TightdbGroup alloc] init];
-    
+    tightdb::Group* m_group;
+    BOOL m_is_owned;
+    BOOL m_read_only;
+}
+
+
++(TightdbGroup*)group
+{
+    TightdbGroup* group = [[TightdbGroup alloc] init];
     try {
-        group.group = new tightdb::Group();
-    } catch (std::exception &ex) {
+        group->m_group = new tightdb::Group;
+    }
+    catch (std::exception& ex) {
         NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
                                                          reason:[NSString stringWithUTF8String:ex.what()]
                                                        userInfo:[NSMutableDictionary dictionary]];  // IMPORTANT: cannot not be nil !!
         [exception raise];
     }
-    group.readOnly = NO;
+    group->m_is_owned  = YES;
+    group->m_read_only = NO;
     return group;
 }
 
+
 // Private.
 // Careful with this one - Remember that group will be deleted on dealloc.
-+(TightdbGroup *)groupTightdbGroup:(tightdb::Group *)tightdbGroup readOnly:(BOOL)readOnly
++(TightdbGroup*)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only
 {
-    TightdbGroup *group = [[TightdbGroup alloc] init];
-    group.group = tightdbGroup;
-    group.readOnly = readOnly;
-    return group;
+    TightdbGroup* group_2 = [[TightdbGroup alloc] init];
+    group_2->m_group = group;
+    group_2->m_is_owned  = is_owned;
+    group_2->m_read_only = read_only;
+    return group_2;
 }
 
 
 +(TightdbGroup *)groupWithFile:(NSString *)filename withError:(NSError **)error
 {
-    tightdb::Group* coreGroup;
-
+    TightdbGroup* group = [[TightdbGroup alloc] init];
+    if (!group)
+        return nil;
     try {
-        coreGroup = new tightdb::Group(tightdb::StringData(ObjcStringAccessor(filename)));
+        group->m_group = new tightdb::Group(tightdb::StringData(ObjcStringAccessor(filename)));
     }
     // TODO: capture this in a macro or function, shared group constructor uses the same pattern.
-    catch (tightdb::File::PermissionDenied &ex) {
-        if(error) // allow nil as the error argument
+    catch (tightdb::File::PermissionDenied& ex) {
+        if (error) // allow nil as the error argument
             *error = make_tightdb_error(@"com.tightdb.sharedgroup", tdb_err_File_PermissionDenied, [NSString stringWithUTF8String:ex.what()]);
         return nil;
 
     }
-    catch (tightdb::File::Exists &ex) {
+    catch (tightdb::File::Exists& ex) {
         if(error) // allow nil as the error argument
             *error = make_tightdb_error(@"com.tightdb.sharedgroup", tdb_err_File_Exists, [NSString stringWithUTF8String:ex.what()]);
         return nil;
 
     }
-    catch (tightdb::File::AccessError &ex) {
-        if(error) // allow nil as the error argument
+    catch (tightdb::File::AccessError& ex) {
+        if (error) // allow nil as the error argument
             *error = make_tightdb_error(@"com.tightdb.sharedgroup", tdb_err_File_AccessError, [NSString stringWithUTF8String:ex.what()]);
         return nil;
 
     }
-    catch (std::exception &ex) {
-        if(error) // allow nil as the error argument
+    catch (std::exception& ex) {
+        if (error) // allow nil as the error argument
             *error = make_tightdb_error(@"com.tightdb.sharedgroup", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
         return nil;
     }
-    TightdbGroup* group = [[TightdbGroup alloc] init];
-    if (group) {  // we are not consistent regarding this additional check
-      group.group = coreGroup;
-      group.readOnly = NO;
-    }
+    group->m_is_owned  = YES;
+    group->m_read_only = NO;
     return group;
 }
 
-+(TightdbGroup *)groupWithBuffer:(const char *)data ofSize:(size_t)size withError:(NSError **)error
-{
-    tightdb::Group* coreGroup;
 
++(TightdbGroup *)groupWithBuffer:(TightdbBinary*)buffer withError:(NSError **)error
+{
+    TightdbGroup* group = [[TightdbGroup alloc] init];
+    if (!group)
+        return nil;
     try {
-        coreGroup = new tightdb::Group(tightdb::BinaryData(data, size));
-    } 
-    catch (tightdb::InvalidDatabase &ex) {
-        if(error) // allow nil as the error argument
+        const tightdb::BinaryData& buffer_2 = [buffer getNativeBinary];
+        bool take_ownership = true;
+        group->m_group = new tightdb::Group(buffer_2, take_ownership);
+    }
+    catch (tightdb::InvalidDatabase& ex) {
+        if (error) // allow nil as the error argument
             *error = make_tightdb_error(@"com.tightdb.sharedgroup", tdb_err_InvalidDatabase, [NSString stringWithUTF8String:ex.what()]);
         return nil;
-    } 
-    catch (std::exception &ex) {
+    }
+    catch (std::exception& ex) {
         NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
                                                          reason:[NSString stringWithUTF8String:ex.what()]
                                                        userInfo:[NSMutableDictionary dictionary]];  // IMPORTANT: cannot not be nil !!
         [exception raise];
     }
-
-    TightdbGroup* group = [[TightdbGroup alloc] init];
-    if(group) {
-        group.group = coreGroup;
-        group.readOnly = NO;
-    }
+    group->m_is_owned  = YES;
+    group->m_read_only = NO;
     return group;
 }
 
--(void)clearGroup
-{
-    _group = 0;
-}
 
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
     NSLog(@"TightdbGroup dealloc");
 #endif
-    delete _group;
+    if (m_is_owned)
+        delete m_group;
 }
 
 
 -(size_t)getTableCount
 {
-    return _group->size();
+    return m_group->size();
 }
--(NSString *)getTableName:(size_t)table_ndx
+-(NSString*)getTableName:(size_t)table_ndx
 {
-    return to_objc_string(_group->get_table_name(table_ndx));
+    return to_objc_string(m_group->get_table_name(table_ndx));
 }
 
--(BOOL)writeToFile:(NSString *)filePath withError:(NSError *__autoreleasing *)error
+
+-(BOOL)writeToFile:(NSString *)path withError:(NSError *__autoreleasing *)error
 {
     try {
-        _group->write(tightdb::StringData(ObjcStringAccessor(filePath)));
+        m_group->write(tightdb::StringData(ObjcStringAccessor(path)));
     }
         // TODO: capture this in a macro or function, shared group constructor uses the same pattern.
         // Except, here, we return no instead of nil.
-    catch (tightdb::File::PermissionDenied &ex) {
-        if(error) // allow nil as the error argument
+    catch (tightdb::File::PermissionDenied& ex) {
+        if (error) // allow nil as the error argument
             *error = make_tightdb_error(@"com.tightdb.sharedgroup", tdb_err_File_PermissionDenied, [NSString stringWithUTF8String:ex.what()]);
         return NO;
 
     }
-    catch (tightdb::File::Exists &ex) {
-        if(error) // allow nil as the error argument
+    catch (tightdb::File::Exists& ex) {
+        if (error) // allow nil as the error argument
             *error = make_tightdb_error(@"com.tightdb.sharedgroup", tdb_err_File_Exists, [NSString stringWithUTF8String:ex.what()]);
         return NO;
 
     }
-    catch (tightdb::File::AccessError &ex) {
-        if(error) // allow nil as the error argument
+    catch (tightdb::File::AccessError& ex) {
+        if (error) // allow nil as the error argument
             *error = make_tightdb_error(@"com.tightdb.sharedgroup", tdb_err_File_AccessError, [NSString stringWithUTF8String:ex.what()]);
         return NO;
 
     }
-    catch (std::exception &ex) {
-        if(error) // allow nil as the error argument
+    catch (std::exception& ex) {
+        if (error) // allow nil as the error argument
             *error = make_tightdb_error(@"com.tightdb.sharedgroup", tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
         return NO;
     }
-
     return YES;
 }
 
--(const char*)writeToBufferOfSize:(size_t*)size // size is an output paramater
-{
-    const char* returnValue = nil;
 
+-(TightdbBinary*)writeToBuffer
+{
+    TightdbBinary* buffer = [[TightdbBinary alloc] init];
+    if (!buffer)
+        return nil;
     try {
-        tightdb::BinaryData buffer = _group->write_to_mem();
-        *size = buffer.size();
-        returnValue = buffer.data();
+        [buffer getNativeBinary] = m_group->write_to_mem();
     }
-    catch (std::exception &ex) {
+    catch (std::exception& ex) {
         NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
                                                          reason:[NSString stringWithUTF8String:ex.what()]
                                                        userInfo:[NSMutableDictionary dictionary]];  // IMPORTANT: cannot not be nil !!
         [exception raise];
     }
-
-    return returnValue;
+    return buffer;
 }
 
-/*-(const char*)writeToMem:(size_t*)size error:(NSError *__autoreleasing *)error
-{
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 tightdb::BinaryData buffer = _group->write_to_mem();
-                                 *size = buffer.size();
-                                 return buffer.data();
-                                 , @"com.tightdb.group", nil);
-}*/
 
--(BOOL)hasTable:(NSString *)name
+-(BOOL)hasTable:(NSString*)name
 {
-    BOOL returnValue = NO;
-    
-    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION (
-                                                returnValue = _group->has_table(ObjcStringAccessor(name));
-                                             )
-
-    return returnValue;
+    return m_group->has_table(ObjcStringAccessor(name));
 }
 
-// FIXME: Avoid creating a table instance. It should be enough to create an TightdbSpec and then check that.
+// FIXME: Avoid creating a table instance. It should be enough to create an TightdbDescriptor and then check that.
 // FIXME: Check that the specified class derives from Table.
 // FIXME: Find a way to avoid having to transcode the table name twice
--(BOOL)hasTable:(NSString *)name withClass:(__unsafe_unretained Class)classObj
+-(BOOL)hasTable:(NSString*)name withClass:(__unsafe_unretained Class)class_obj
 {
-    BOOL returnValue;
-
-    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION (
-                                                if (!_group->has_table(ObjcStringAccessor(name))) return NO;
-                                                TightdbTable* table = [self getTable:name withClass:classObj error:nil];
-                                                returnValue = table != nil;
-                                             )
-    return returnValue;
+    if (!m_group->has_table(ObjcStringAccessor(name)))
+        return NO;
+    TightdbTable* table = [self getTable:name withClass:class_obj];
+    return table != nil;
 }
 
--(id)getTable:(NSString *)name error:(NSError **)error
+-(id)getTable:(NSString*)name error:(NSError**)error
 {
-    if(_readOnly) {
+    // FIXME: Read-only errors should probably be handled by throwing
+    // an exception. That is what is done in other places in this
+    // binding, and it also seems like the right thing to do. This
+    // method should also not take an error argument.
+    if (m_read_only) {
         // A group is readonly when it has been extracted from a shared group in a read transaction.
         // In this case, getTable should return nil for non-existing tables.
         if (![self hasTable:name]) {
-            if(error) // allow nil as the error argument
-                *error = make_tightdb_error(@"com.tightdb.group", tdb_err_TableNotFound, @"The table was not found. Cannot create the table in read only mode.");
+            if (error) // allow nil as the error argument
+                *error = make_tightdb_error(tdb_err_TableNotFound, @"The table was not found. Cannot create the table in read only mode.");
             return nil;
         }
-            
     }
 
-    // If the group is NOT read only, non-existing tables will be created. 
-    TightdbTable *table = [[TightdbTable alloc] _initRaw];
-
-    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION (
-                                                [table setTable:_group->get_table(ObjcStringAccessor(name))];
-                                             )
+    TightdbTable* table = [[TightdbTable alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!table))
+        return nil;
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
+        tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name));
+        [table setNativeTable:table_2.get()];)
     [table setParent:self];
-    [table setReadOnly:_readOnly];
-    
+    [table setReadOnly:m_read_only];
     return table;
 }
-/*
--(id)getTable:(NSString *)name error:(NSError *__autoreleasing *)error
-{
-    TightdbTable *table = [[TightdbTable alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table)) return nil;
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-                                 [table setTable:_group->get_table(ObjcStringAccessor(name))];
-                                 , @"com.tightdb.group", nil);
-    [table setParent:self];
-    [table setReadOnly:_readOnly];
-    return table;
-}*/
 
-/*-(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)classObj
-{
-    return [self getTable:name withClass:classObj error:nil];
-}*/
 // FIXME: Check that the specified class derives from Table.
--(id)getTable:(NSString *)name withClass:(__unsafe_unretained Class)classObj error:(NSError *__autoreleasing *)error
+-(id)getTable:(NSString*)name withClass:(__unsafe_unretained Class)class_obj error:(NSError* __autoreleasing*)error
 {
-
-    if(_readOnly) {
+    // FIXME: Read-only errors should probably be handled by throwing
+    // an exception. That is what is done in other places in this
+    // binding, and it also seems like the right thing to do. This
+    // method should also not take an error argument.
+    if (m_read_only) {
         // A group is readonly when it has been extracted from a shared group in a read transaction.
         // In this case, getTable should return nil for non-existing tables.
         if (![self hasTable:name]) {
-            if(error) // allow nil as the error argument
-                *error = make_tightdb_error(@"com.tightdb.group", tdb_err_TableNotFound, @"The table was not found. Cannot create the table in read only mode.");
+            if (error) // allow nil as the error argument
+                *error = make_tightdb_error(tdb_err_TableNotFound, @"The table was not found. Cannot create the table in read only mode.");
             return nil;
         }
-            
     }
 
-    TightdbTable *table = [[classObj alloc] _initRaw];
+    TightdbTable* table = [[class_obj alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!table))
+        return nil;
     bool was_created;
-    
-    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION (
-                                                [table setTable:_group->get_table(ObjcStringAccessor(name), was_created)];
-                                            )
-
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
+        tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name), was_created);
+        [table setNativeTable:table_2.get()];)
     [table setParent:self];
-    [table setReadOnly:_readOnly];
+    [table setReadOnly:m_read_only];
     if (was_created) {
-        if (![table _addColumns]) return nil;
+        if (![table _addColumns])
+            return nil;
     }
     else {
-        if (![table _checkType]) return nil;
+        if (![table _checkType])
+            return nil;
     }
     return table;
 }

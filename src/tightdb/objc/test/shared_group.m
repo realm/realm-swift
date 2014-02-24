@@ -26,7 +26,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     // TODO: Update test to include more ASSERTS
 
 
-    TightdbGroup *group = [TightdbGroup group];
+    TightdbGroup* group = [TightdbGroup group];
     // Create new table in group
     SharedTable2 *table = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
     NSLog(@"Table: %@", table);
@@ -39,7 +39,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     NSLog(@"MyTable Size: %lu", [table count]);
 
 
-    NSFileManager *fm = [NSFileManager defaultManager];
+    NSFileManager* fm = [NSFileManager defaultManager];
 
     // Write to disk
     [fm removeItemAtPath:@"employees.tightdb" error:nil];
@@ -47,10 +47,10 @@ TIGHTDB_TABLE_2(SharedTable2,
     [group writeToFile:@"employees.tightdb" withError:nil];
 
     // Read only shared group
-    TightdbSharedGroup *fromDisk = [TightdbSharedGroup sharedGroupWithFilename:@"employees.tightdb" withError:nil];
+    TightdbSharedGroup* fromDisk = [TightdbSharedGroup sharedGroupWithFilename:@"employees.tightdb" withError:nil];
 
-        [fromDisk readTransactionWithBlock:^(TightdbGroup *group) {
-            SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
+    [fromDisk readTransactionWithBlock:^(TightdbGroup* group) {
+            SharedTable2* diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
             NSLog(@"Disktable size: %zu", [diskTable count]);
             for (size_t i = 0; i < [diskTable count]; i++) {
                 SharedTable2_Cursor *cursor = [diskTable cursorAtIndex:i];
@@ -59,47 +59,42 @@ TIGHTDB_TABLE_2(SharedTable2,
                 NSLog(@"%zu: %i", i, [diskTable getBoolInColumn:0 atRow:i]);
             }
         }];
-    
 
-    [fromDisk writeTransactionWithError:nil withBlock:^(TightdbGroup *group) {
-        SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
-        NSLog(@"Disktable size: %zu", [diskTable count]);
-        for (size_t i = 0; i < 50; i++) {
-            [diskTable addHired:YES Age:i];
-        }
-        return YES; // Commit
-    
-    }];
-    
 
-    [fromDisk writeTransactionWithError:nil withBlock:^(TightdbGroup *group) {
-        SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
-        NSLog(@"Disktable size: %zu", [diskTable count]);
-        for (size_t i = 0; i < 50; i++) {
-            [diskTable addHired:YES Age:i];
-        }
-        return NO; // rollback
-        
-    }];
-    
+    [fromDisk writeTransactionWithError:nil withBlock:^(TightdbGroup* group) {
+            SharedTable2* diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
+            NSLog(@"Disktable size: %zu", [diskTable count]);
+            for (size_t i = 0; i < 50; i++) {
+                [diskTable addHired:YES Age:i];
+            }
+            return YES; // Commit
+        }];
 
-    [fromDisk writeTransactionWithError:nil withBlock:^(TightdbGroup *group) {
-            SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
+
+    [fromDisk writeTransactionWithError:nil withBlock:^(TightdbGroup* group) {
+            SharedTable2* diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
+            NSLog(@"Disktable size: %zu", [diskTable count]);
+            for (size_t i = 0; i < 50; i++) {
+                [diskTable addHired:YES Age:i];
+            }
+            return NO; // rollback
+        }];
+
+
+    [fromDisk writeTransactionWithError:nil withBlock:^(TightdbGroup* group) {
+            SharedTable2* diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
             NSLog(@"Disktable size: %zu", [diskTable count]);
             for (size_t i = 0; i < 50; i++) {
                 [diskTable addHired:YES Age:i];
             }
             return YES; // commit
-    }];
-    
- 
-    [fromDisk readTransactionWithBlock:^(TightdbGroup *group) {
-        SharedTable2 *diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
-        NSLog(@"Disktable size: %zu", [diskTable count]);
-    }];
+        }];
 
+    [fromDisk readTransactionWithBlock:^(TightdbGroup* group) {
+            SharedTable2* diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
+            NSLog(@"Disktable size: %zu", [diskTable count]);
+        }];
 }
-
 
 @end
 

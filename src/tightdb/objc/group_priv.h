@@ -7,6 +7,7 @@
 
 
 @interface TightdbGroup()
-+(TightdbGroup *)groupTightdbGroup:(tightdb::Group *)tightdbGroup readOnly:(BOOL)readOnly;
--(void)clearGroup;
+
++(TightdbGroup*)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only;
+
 @end

@@ -2,18 +2,18 @@
 # Obj-C reference documentation for TypedTable class
 #
 
-#UNIMPLEMENTED columns(), front(), back(), insert_empty_row(), lookup(), findAll() 
+#UNIMPLEMENTED columns(), front(), back(), insert_empty_row(), lookup(), findAll()
 #              via table Propery, get_sorted_view(), where(), distinct()
 #INCONSISTENCY add.., addRow, vs. add_empty_row, and number of rows cannot be specified
 #INCONSISTENCY popBack(), find_first_* ->> find*   ("first" is omitted)
 
 ID         : class_typed_table
 TITLE      : Table (typed)
-SUMMARY    : *g_typed_table_summary             
+SUMMARY    : *g_typed_table_summary
 DESCR      : *g_typed_table_descr
-SEE        :                
+SEE        :
 EXAMPLES:
-- DESCR    : 
+- DESCR    :
   CODE     : ex_objc_table_typed_intro
 IGNORE     : []                   # List of method-ids to ignore
 
@@ -67,7 +67,7 @@ CATEGORIES:
       EXAMPLES:
       - CODE   : ex_objc_typed_table_macros
         DESCR  :
-        
+
 - State:
   METHODS:
   - g_typed_table_is_empty:
@@ -108,8 +108,8 @@ CATEGORIES:
 
   - g_typed_table_optimize:
       NAME     : optimize
-      SUMMARY  : *g_typed_table_optimize_summary
-      DESCR    : *g_typed_table_optimize_descr
+      SUMMARY  : *g_table_optimize_summary
+      DESCR    : *g_table_optimize_descr
       SIGNATURE: (void)optimize
       EXAMPLES:
       - CODE   : ex_objc_typed_table_clear
@@ -122,7 +122,7 @@ CATEGORIES:
       NAME     : isEqual
       SUMMARY  : *g_typed_table_operator_eq_summary
       DESCR    : *g_typed_table_operator_eq_descr
-      SIGNATURE: (BOOL)isEqual:(TightdbTable *)other     
+      SIGNATURE: (BOOL)isEqual:(TightdbTable *)other
       PARAMS:
       - NAME   : other
         TYPES  : TightdbTable *
@@ -179,7 +179,7 @@ CATEGORIES:
       SUMMARY  : Adds new row containing the specified values.
       DESCR    : |
                  This method adds a new row to a typed table.
-                 
+
                  The method is made available by a macro based on the table definition {@link g_typed_table_macros}. Note that the method name includes specific column names defined in the table definition. E.g. "CName1" will be replaced by the name of the first column in your table and so forth.
                  Please refer to the example below.
       SIGNATURE: (void)addCName1:(CType1*)value1 CName2:(CType2*)value2 CName3:(CType3*)value3
@@ -192,7 +192,7 @@ CATEGORIES:
         DESCR  :
 
   - g_typed_table_add_empty_row:
-      NAME     : addRow 
+      NAME     : addRow
       SUMMARY  : &objc_typed_table_add_empty_row_summary
                  Adds an empty row and returns a cursor. You can use the cursor to get or set the values.
       DESCR    : &objc_typed_table_add_empty_row_descr
@@ -211,9 +211,9 @@ CATEGORIES:
       SIGNATURE: -(TableName_Cursor *)insertRowAtIndex:(size_t)ndx
       SUMMARY  : Inserts an empty row and returns a cursor. You can use the cursor to get or set the values.
       DESCR    : >
-                 This method inserts one empty row at the specified index. Default values (e.g. 0 or "") will be 
+                 This method inserts one empty row at the specified index. Default values (e.g. 0 or "") will be
                  inserted for all the columns in the row. All existing rows at and above the specified index
-                 will have their index increased by one. 
+                 will have their index increased by one.
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
@@ -299,7 +299,7 @@ CATEGORIES:
   - g_typed_table_where:
       NAMES    : where
       SIGNATURE: (TableName_Query *)where;
-      SUMMARY  : *g_typed_table_where_summery
+      SUMMARY  : *g_typed_table_where_summary
       DESCR    : This method initiates a query. See {@link class_typed_query}.
       RETURN:
         TYPES  : TableName_Query
@@ -364,7 +364,7 @@ CATEGORIES:
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_maximum
- 
+
   - g_typed_table_minimum:
       TODO: soon (+ start, end, limit)
   - g_typed_table_minimum_float:
@@ -394,7 +394,7 @@ CATEGORIES:
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_manimum
-        
+
   - g_typed_table_average:
       TODO: soon (+ start, end, limit)
   - g_typed_table_average_float:
@@ -419,7 +419,7 @@ CATEGORIES:
         CODE   : ex_objc_typed_query_average
 # - g_typed_table_where_const:
 
-# TODO: 
+# TODO:
 #  - g_typed_table_find_all_bool:
 #  - g_typed_table_find_all_int:
 #  - g_typed_table_find_all_float:

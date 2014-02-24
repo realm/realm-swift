@@ -24,11 +24,16 @@
 
 
 @interface TightdbGroup: NSObject
-//+(TightdbGroup *)groupWithFilename:(NSString *)filename;
+
 +(TightdbGroup *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
-+(TightdbGroup *)groupWithBuffer:(const char*)data ofSize:(size_t)size withError:(NSError *__autoreleasing *)error;
+
+/// You pass the ownership of the specified buffer to the group. The
+/// buffer will eventually be freed using the C function free(), so
+/// the buffer you pass, must have been allocated using C function
+/// malloc().
++(TightdbGroup *)groupWithBuffer:(TightdbBinary *)buffer withError:(NSError *__autoreleasing *)error;
+
 +(TightdbGroup *)group;
-//+(TightdbGroup *)groupWithError:(NSError *__autoreleasing *)error;
 
 -(size_t)getTableCount;
 -(NSString *)getTableName:(size_t)table_ndx;
@@ -53,12 +58,16 @@
 ///
 /// The specified table class must be one that is declared by using
 /// one of the table macros TIGHTDB_TABLE_*.
-//-(id)getTable:(NSString *)name withClass:(Class)obj;
 -(id)getTable:(NSString *)name withClass:(Class)obj error:(NSError *__autoreleasing *)error;
 
 // Serialization
 -(BOOL)writeToFile:(NSString *)filePath withError:(NSError *__autoreleasing *)error;
--(const char*)writeToBufferOfSize:(size_t*)size; // size is an output parameter
-//-(const char*)writeToMem:(size_t*)size error:(NSError *__autoreleasing *)error;
+
+/// The ownership of the returned buffer is transferred to the
+/// caller. The buffer will have been allocated using C function
+/// malloc(), and it is the responsibility of the caller that C
+/// function free() is eventually called to free the buffer.
+-(TightdbBinary *)writeToBuffer;
+
 @end
 

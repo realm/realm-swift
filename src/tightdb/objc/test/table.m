@@ -27,7 +27,7 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
 
 - (void)testTable
 {
-    TightdbTable *_table = [[TightdbTable alloc] init];
+    TightdbTable* _table = [[TightdbTable alloc] init];
     NSLog(@"Table: %@", _table);
     STAssertNotNil(_table, @"Table is nil");
 
@@ -44,12 +44,12 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
         STFail(@"Second not equal to second");
 
     // 2. Add a row with data
-    
+
     //const size_t ndx = [_table addRow];
     //[_table set:0 ndx:ndx value:0];
     //[_table set:1 ndx:ndx value:10];
 
-    TightdbCursor *cursor = [_table addRow];
+    TightdbCursor* cursor = [_table addRow];
     size_t ndx = [cursor index];
     [cursor setInt:0 inColumn:0];
     [cursor setInt:10 inColumn:1];
@@ -66,7 +66,7 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
 
 - (void)testDataTypes_Typed
 {
-    TestTableAllTypes *table = [[TestTableAllTypes alloc] init];
+    TestTableAllTypes* table = [[TestTableAllTypes alloc] init];
     NSLog(@"Table: %@", table);
     STAssertNotNil(table, @"Table is nil");
 
@@ -82,17 +82,17 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     STAssertEquals(tightdb_Mixed,  [table getColumnType:8], @"Ninth column not mixed");
 
     const char bin[4] = { 0, 1, 2, 3 };
-    TightdbBinary *bin1 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin / 2];
-    TightdbBinary *bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
+    TightdbBinary* bin1 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin / 2];
+    TightdbBinary* bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
     time_t timeNow = [[NSDate date] timeIntervalSince1970];
-    TestTableSub *subtab1 = [[TestTableSub alloc] init];
-    TestTableSub *subtab2 = [[TestTableSub alloc] init];
+    TestTableSub* subtab1 = [[TestTableSub alloc] init];
+    TestTableSub* subtab2 = [[TestTableSub alloc] init];
     [subtab1 addAge:200];
     [subtab2 addAge:100];
-    TightdbMixed *mixInt1   = [TightdbMixed mixedWithInt64:1];
-    TightdbMixed *mixSubtab = [TightdbMixed mixedWithTable:subtab2];
+    TightdbMixed* mixInt1   = [TightdbMixed mixedWithInt64:1];
+    TightdbMixed* mixSubtab = [TightdbMixed mixedWithTable:subtab2];
 
-    TestTableAllTypes_Cursor *c;
+    TestTableAllTypes_Cursor* c;
 
     c = [table addRow];
 
@@ -104,8 +104,8 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
         c.BoolCol   = YES  ; c.IntCol  = 506     ; c.FloatCol = 7.7         ; c.DoubleCol = 8.8       ; c.StringCol = @"banach";
         c.BinaryCol = bin2 ; c.DateCol = timeNow ; c.TableCol = subtab2     ; c.MixedCol  = mixSubtab ;
 
-    TestTableAllTypes_Cursor *row1 = [table cursorAtIndex:0];
-    TestTableAllTypes_Cursor *row2 = [table cursorAtIndex:1];
+    TestTableAllTypes_Cursor* row1 = [table cursorAtIndex:0];
+    TestTableAllTypes_Cursor* row2 = [table cursorAtIndex:1];
 
     STAssertEquals(row1.BoolCol, NO,                 @"row1.BoolCol");
     STAssertEquals(row2.BoolCol, YES,                @"row2.BoolCol");
@@ -141,28 +141,27 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     STAssertEquals([table.DoubleCol sum], 0.8 + 8.8,                @"DoubleCol sum");
     STAssertEquals([table.DoubleCol average], (0.8 + 8.8) / 2,          @"DoubleCol avg");
 }
+
 - (void)testDataTypes_Dynamic
 {
-    
-    TightdbTable *table = [[TightdbTable alloc] init];
+    TightdbTable* table = [[TightdbTable alloc] init];
     NSLog(@"Table: %@", table);
     STAssertNotNil(table, @"Table is nil");
-    
-    TightdbSpec *spec = [table getSpec];
-    
-    [spec addColumnWithType:tightdb_Bool   andName:@"BoolCol"];    const size_t BoolCol = 0;
-    [spec addColumnWithType:tightdb_Int    andName:@"IntCol"];     const size_t IntCol = 1;
-    [spec addColumnWithType:tightdb_Float  andName:@"FloatCol"];   const size_t FloatCol = 2;
-    [spec addColumnWithType:tightdb_Double andName:@"DoubleCol"];  const size_t DoubleCol = 3;
-    [spec addColumnWithType:tightdb_String andName:@"StringCol"];  const size_t StringCol = 4;
-    [spec addColumnWithType:tightdb_Binary andName:@"BinaryCol"];  const size_t BinaryCol = 5;
-    [spec addColumnWithType:tightdb_Date   andName:@"DateCol"];    const size_t DateCol = 6;
-    TightdbSpec *specTableCol = [spec addColumnTable:@"TableCol"]; const size_t TableCol = 7;
-    [spec addColumnWithType:tightdb_Mixed  andName:@"MixedCol"];   const size_t MixedCol = 8;
 
-    [specTableCol addColumnWithType:tightdb_Int andName:@"TableCol_IntCol"];
-    [table updateFromSpec];
-    
+    TightdbDescriptor* desc = [table getDescriptor];
+
+    [desc addColumnWithType:tightdb_Bool   andName:@"BoolCol"];    const size_t BoolCol = 0;
+    [desc addColumnWithType:tightdb_Int    andName:@"IntCol"];     const size_t IntCol = 1;
+    [desc addColumnWithType:tightdb_Float  andName:@"FloatCol"];   const size_t FloatCol = 2;
+    [desc addColumnWithType:tightdb_Double andName:@"DoubleCol"];  const size_t DoubleCol = 3;
+    [desc addColumnWithType:tightdb_String andName:@"StringCol"];  const size_t StringCol = 4;
+    [desc addColumnWithType:tightdb_Binary andName:@"BinaryCol"];  const size_t BinaryCol = 5;
+    [desc addColumnWithType:tightdb_Date   andName:@"DateCol"];    const size_t DateCol = 6;
+    TightdbDescriptor* subdesc = [desc addColumnTable:@"TableCol"]; const size_t TableCol = 7;
+    [desc addColumnWithType:tightdb_Mixed  andName:@"MixedCol"];   const size_t MixedCol = 8;
+
+    [subdesc addColumnWithType:tightdb_Int andName:@"TableCol_IntCol"];
+
     // Verify column types
     STAssertEquals(tightdb_Bool,   [table getColumnType:0], @"First column not bool");
     STAssertEquals(tightdb_Int,    [table getColumnType:1], @"Second column not int");
@@ -174,46 +173,46 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     STAssertEquals(tightdb_Table,  [table getColumnType:7], @"Eighth column not table");
     STAssertEquals(tightdb_Mixed,  [table getColumnType:8], @"Ninth column not mixed");
 
-    
+
     const char bin[4] = { 0, 1, 2, 3 };
-    TightdbBinary *bin1 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin / 2];
-    TightdbBinary *bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
+    TightdbBinary* bin1 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin / 2];
+    TightdbBinary* bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
     time_t timeNow = [[NSDate date] timeIntervalSince1970];
-    
-    
-    
-    TightdbTable *subtab1 = [[TightdbTable alloc] init];
+
+
+
+    TightdbTable* subtab1 = [[TightdbTable alloc] init];
     [subtab1 addColumnWithType:tightdb_Int andName:@"TableCol_IntCol"];
-    
-    TightdbTable *subtab2 = [[TightdbTable alloc] init];
+
+    TightdbTable* subtab2 = [[TightdbTable alloc] init];
     [subtab2 addColumnWithType:tightdb_Int andName:@"TableCol_IntCol"];
 
-    
-    TightdbCursor *cursor;
-    
-    
-    
+
+    TightdbCursor* cursor;
+
+
+
     cursor = [subtab1 addRow];
     [cursor setInt:200 inColumn:0];
-    
-    
-    
+
+
+
     cursor = [subtab2 addRow];
     [cursor setInt:100 inColumn:0];
-    
-    
-    
-    TightdbMixed *mixInt1   = [TightdbMixed mixedWithInt64:1];
-    TightdbMixed *mixSubtab = [TightdbMixed mixedWithTable:subtab2];
 
-    TightdbCursor *c;
-    
-    
-    
+
+
+    TightdbMixed* mixInt1   = [TightdbMixed mixedWithInt64:1];
+    TightdbMixed* mixSubtab = [TightdbMixed mixedWithTable:subtab2];
+
+    TightdbCursor* c;
+
+
+
     c = [table addRow];
-    
-    
-    
+
+
+
     [c setBool:    NO        inColumn:BoolCol];
     [c setInt:     54        inColumn:IntCol];
     [c setFloat:   0.7       inColumn:FloatCol];
@@ -225,7 +224,7 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     [c setMixed:   mixInt1   inColumn:MixedCol];
 
     c = [table addRow];
-    
+
     [c setBool:    YES       inColumn:BoolCol];
     [c setInt:     506       inColumn:IntCol];
     [c setFloat:   7.7       inColumn:FloatCol];
@@ -235,9 +234,9 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     [c setDate:    timeNow   inColumn:DateCol];
     [c setTable:   subtab2   inColumn:TableCol];
     [c setMixed:   mixSubtab inColumn:MixedCol];
-    
-    TightdbCursor *row1 = [table cursorAtIndex:0];
-    TightdbCursor *row2 = [table cursorAtIndex:1];
+
+    TightdbCursor* row1 = [table cursorAtIndex:0];
+    TightdbCursor* row2 = [table cursorAtIndex:1];
 
     STAssertEquals([row1 getBoolInColumn:BoolCol], NO, @"row1.BoolCol");
     STAssertEquals([row2 getBoolInColumn:BoolCol], YES,                @"row2.BoolCol");
@@ -272,8 +271,8 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     STAssertEquals([table maximumWithDoubleColumn:DoubleCol], 8.8,                      @"DoubleCol max");
     STAssertEquals([table sumWithDoubleColumn:DoubleCol], 0.8 + 8.8,                @"DoubleCol sum");
     STAssertEquals([table averageWithDoubleColumn:DoubleCol], (0.8 + 8.8) / 2,          @"DoubleCol avg");
-     
-     
+
+
 }
 
 @end

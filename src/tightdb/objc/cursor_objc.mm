@@ -24,7 +24,7 @@ using namespace std;
 
 -(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx
 {
-    if (ndx >= [table count]) 
+    if (ndx >= [table count])
         return nil;
 
     self = [super init];
@@ -60,6 +60,11 @@ using namespace std;
     return [_table getStringInColumn:colNdx atRow:_ndx];
 }
 
+-(TightdbBinary *)getBinaryInColumn:(size_t)colNdx
+{
+    return [_table getBinaryInColumn:colNdx atRow:_ndx];
+}
+
 -(BOOL)getBoolInColumn:(size_t)colNdx
 {
     return [_table getBoolInColumn:colNdx atRow:_ndx];
@@ -80,9 +85,9 @@ using namespace std;
     return [_table getDateInColumn:colNdx atRow:_ndx];
 }
 
--(TightdbBinary *)getBinaryInColumn:(size_t)colNdx
+-(TightdbTable *)getTableInColumn:(size_t)colNdx
 {
-    return [_table getBinaryInColumn:colNdx atRow:_ndx];
+    return [_table getTableInColumn:colNdx atRow:_ndx];
 }
 
 -(TightdbMixed *)getMixedInColumn:(size_t)colNdx
@@ -90,55 +95,50 @@ using namespace std;
     return [_table getMixedInColumn:colNdx atRow:_ndx];
 }
 
--(TightdbTable *)getTableInColumn:(size_t)colNdx
-{
-    return [_table getTableInColumn:colNdx atRow:_ndx];
-}
-
 -(void)setInt:(int64_t)value inColumn:(size_t)colNdx
 {
-    [_table setInt:value inColumn:colNdx atRow:_ndx]; 
+    [_table setInt:value inColumn:colNdx atRow:_ndx];
 }
 
 -(void)setString:(NSString *)value inColumn:(size_t)colNdx
 {
-    [_table setString:value inColumn:colNdx atRow:_ndx]; 
-}
-
--(void)setBool:(BOOL)value inColumn:(size_t)colNdx
-{
-    [_table setBool:value inColumn:colNdx atRow:_ndx]; 
-}
-
--(void)setFloat:(float)value inColumn:(size_t)colNdx
-{
-    [_table setFloat:value inColumn:colNdx atRow:_ndx]; 
-}
-
--(void)setDouble:(double)value inColumn:(size_t)colNdx
-{
-    [_table setDouble:value inColumn:colNdx atRow:_ndx]; 
-}
-
--(void)setDate:(time_t)value inColumn:(size_t)colNdx
-{
-    [_table setDate:value inColumn:colNdx atRow:_ndx]; 
+    [_table setString:value inColumn:colNdx atRow:_ndx];
 }
 
 -(void)setBinary:(TightdbBinary *)value inColumn:(size_t)colNdx
 {
-    [_table setBinary:value inColumn:colNdx atRow:_ndx]; 
+    [_table setBinary:value inColumn:colNdx atRow:_ndx];
 }
 
--(void)setMixed:(TightdbMixed *)value inColumn:(size_t)colNdx
+-(void)setBool:(BOOL)value inColumn:(size_t)colNdx
 {
-    [_table setMixed:value inColumn:colNdx atRow:_ndx]; 
+    [_table setBool:value inColumn:colNdx atRow:_ndx];
+}
+
+-(void)setFloat:(float)value inColumn:(size_t)colNdx
+{
+    [_table setFloat:value inColumn:colNdx atRow:_ndx];
+}
+
+-(void)setDouble:(double)value inColumn:(size_t)colNdx
+{
+    [_table setDouble:value inColumn:colNdx atRow:_ndx];
+}
+
+-(void)setDate:(time_t)value inColumn:(size_t)colNdx
+{
+    [_table setDate:value inColumn:colNdx atRow:_ndx];
 }
 
 -(void)setTable:(TightdbTable *)value inColumn:(size_t)colNdx
 {
-    [_table setTable:value inColumn:colNdx atRow:_ndx]; 
-} 
+    [_table setTable:value inColumn:colNdx atRow:_ndx];
+}
+
+-(void)setMixed:(TightdbMixed *)value inColumn:(size_t)colNdx
+{
+    [_table setMixed:value inColumn:colNdx atRow:_ndx];
+}
 
 @end
 
