@@ -26,7 +26,7 @@
     [delegate.sharedGroup writeTransaction:^(TightdbGroup *tnx) {
         
         // Write transactions with the shared group are possible via the provided variable binding named group.
-        NSLog(@"Inside transaction!");
+        NSLog(@"Inside read transaction!");
         
         TightdbTable *todoTable = [tnx getTable:@"todos"];
         
@@ -58,10 +58,14 @@
         TightdbTable *todoTable = [tnx getTable:@"todos"];
         
         self.todoCountLabel.text = [NSString stringWithFormat:@"Number of todos: %zu", [todoTable count]];
+        
+        NSString *todoString = @"";
 
         for (size_t r=0;r<[todoTable count];r++) {
-            self.todos.text = [[self.todos.text stringByAppendingString:[todoTable getString:0 ndx:r]] stringByAppendingString:@"\n"];
+            todoString = [[todoString stringByAppendingString:[todoTable getString:0 ndx:r]] stringByAppendingString:@"\n"];
         }
+        
+        self.todos.text = todoString;
         
     }];
 }

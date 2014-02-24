@@ -21,41 +21,45 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view.
     
-    
+    // Auto select input field when modal is shown
+    [self.todoName becomeFirstResponder];
 }
 
+// Close modal when user presses Cancel button
 - (IBAction)cancelButtonPress:(id)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
+
+// Add todo to db, when user presses Add button
 - (IBAction)addTodoPress:(id)sender {
     
     NSString *todo = self.todoName.text;
+    
+    // Only add to db if todoName has been entered
+    if(todo.length > 0) {
+        TAppDelegate* delegate = (TAppDelegate*)[[UIApplication sharedApplication]delegate];
+            
+        [delegate.sharedGroup writeTransaction:^(TightdbGroup *tnx) {
+                
+            TightdbTable *todoTable = [tnx getTable:@"todos"];
+                
+            TightdbCursor *row = [todoTable addRow];
+            [row setString:self.todoName.text inColumn:0];
+                
+            return YES; // Commit
+        }];
+      
+        // Close modal
+        [self dismissViewControllerAnimated:YES completion:nil];
         
-        if(todo.length > 0) {
-            TAppDelegate* delegate = (TAppDelegate*)[[UIApplication sharedApplication]delegate];
-            
-            [delegate.sharedGroup writeTransaction:^(TightdbGroup *tnx) {
-                
-                // Write transactions with the shared group are possible via the provided variable binding named group.
-                NSLog(@"Inside transaction!");
-                
-                TightdbTable *todoTable = [tnx getTable:@"todos"];
-                
-                TightdbCursor *row = [todoTable addRow];
-                [row setString:self.todoName.text inColumn:0];
-                        
-                
-                return YES; // Commit
-            }];
-            
-            [self dismissViewControllerAnimated:YES completion:nil];
-            
-            [self.parentViewController viewWillAppear:YES ];
-        } else {
-            self.alertLabel.text = @"Enter todo";
-        }
+        // Make parent reload the todos from the db
+        [self.parentViewController viewWillAppear:YES ];
+        
+    } else {
+        // If no name has been entered, show an error alert
+        self.alertLabel.text = @"Enter name for todo";
+    }
 }
 
 
