@@ -1,4 +1,4 @@
-TEST_PROGRAMS = unit-tests
+check_PROGRAMS = unit-tests
 
 unit_tests_SOURCES = \
 data_type.mm table.m group.m group_misc_2.m table_delete_all.m tutorial.m enumerator.m \
