@@ -738,18 +738,112 @@ using namespace std;
 }
 
 
--(void)setInt:(int64_t)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx
+-(BOOL)getBoolInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
-    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
-        m_table->set_int(col_ndx, row_ndx, value);,
-        tightdb_Int);
+    return m_table->get_bool(col_ndx, row_ndx);
 }
+
+-(int64_t)getIntInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
+{
+    return m_table->get_int(col_ndx, row_ndx);
+}
+
+-(float)getFloatInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
+{
+    return m_table->get_float(col_ndx, row_ndx);
+}
+
+-(double)getDoubleInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
+{
+    return m_table->get_double(col_ndx, row_ndx);
+}
+
+-(NSString*)getStringInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
+{
+    return to_objc_string(m_table->get_string(col_ndx, row_ndx));
+}
+
+-(TightdbBinary*)getBinaryInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
+{
+    return [[TightdbBinary alloc] initWithBinary:m_table->get_binary(col_ndx, row_ndx)];
+}
+
+-(time_t)getDateInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
+{
+    return m_table->get_datetime(col_ndx, row_ndx).get_datetime();
+}
+
+-(TightdbTable*)getTableInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
+{
+    tightdb::DataType type = m_table->get_column_type(col_ndx);
+    if (type != tightdb::type_Table)
+        return nil;
+    tightdb::TableRef table = m_table->get_subtable(col_ndx, row_ndx);
+    if (!table)
+        return nil;
+    TightdbTable* table_2 = [[TightdbTable alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!table_2))
+        return nil;
+    [table_2 setNativeTable:table.get()];
+    [table_2 setParent:self];
+    [table_2 setReadOnly:m_read_only];
+    return table_2;
+}
+
+// FIXME: Check that the specified class derives from TightdbTable.
+-(id)getTableInColumn:(size_t)col_ndx atRow:(size_t)row_ndx withClass:(__unsafe_unretained Class)class_obj
+{
+    tightdb::DataType type = m_table->get_column_type(col_ndx);
+    if (type != tightdb::type_Table)
+        return nil;
+    tightdb::TableRef table = m_table->get_subtable(col_ndx, row_ndx);
+    if (!table)
+        return nil;
+    TightdbTable* table_2 = [[class_obj alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!table))
+        return nil;
+    [table_2 setNativeTable:table.get()];
+    [table_2 setParent:self];
+    [table_2 setReadOnly:m_read_only];
+    if (![table_2 _checkType])
+        return nil;
+    return table_2;
+}
+
+-(TightdbMixed*)getMixedInColumn:(size_t)col_ndx ndx:(size_t)row_ndx
+{
+    tightdb::Mixed mixed = m_table->get_mixed(col_ndx, row_ndx);
+    if (mixed.get_type() != tightdb::type_Table)
+        return [TightdbMixed mixedWithNativeMixed:mixed];
+
+    tightdb::TableRef table = m_table->get_subtable(col_ndx, row_ndx);
+    if (!table)
+        return nil;
+    TightdbTable* table_2 = [[TightdbTable alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!table_2))
+        return nil;
+    [table_2 setNativeTable:table.get()];
+    [table_2 setParent:self];
+    [table_2 setReadOnly:m_read_only];
+    if (![table_2 _checkType])
+        return nil;
+
+    return [TightdbMixed mixedWithTable:table_2];
+}
+
 
 -(void)setBool:(BOOL)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_bool(col_ndx, row_ndx, value);,
         tightdb_Bool);
+}
+
+-(void)setInt:(int64_t)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx
+{
+    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+        m_table->set_int(col_ndx, row_ndx, value);,
+        tightdb_Int);
 }
 
 -(void)setFloat:(float)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx
@@ -810,99 +904,6 @@ using namespace std;
             m_table->set_mixed(col_ndx, row_ndx, mixed);
         },
         tightdb_Mixed);
-}
-
--(BOOL)getBoolInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
-{
-    return m_table->get_bool(col_ndx, row_ndx);
-}
-
--(int64_t)getIntInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
-{
-    return m_table->get_int(col_ndx, row_ndx);
-}
-
--(float)getFloatInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
-{
-    return m_table->get_float(col_ndx, row_ndx);
-}
-
--(double)getDoubleInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
-{
-    return m_table->get_double(col_ndx, row_ndx);
-}
-
--(time_t)getDateInColumn:(size_t)colNdx atRow:(size_t)ndx
-{
-    return _table->get_datetime(colNdx, ndx).get_datetime();
-}
-
--(NSString*)getStringInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
-{
-    return to_objc_string(m_table->get_string(col_ndx, row_ndx));
-}
-
--(TightdbBinary*)getBinaryInColumn:(size_t)colNdx atRow:(size_t)ndx
-{
-    return [[TightdbBinary alloc] initWithBinary:m_table->get_binary(col_ndx, row_ndx)];
-}
-
--(TightdbTable*)getTableInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
-{
-    tightdb::DataType type = m_table->get_column_type(col_ndx);
-    if (type != tightdb::type_Table)
-        return nil;
-    tightdb::TableRef table = m_table->get_subtable(col_ndx, row_ndx);
-    if (!table)
-        return nil;
-    TightdbTable* table_2 = [[TightdbTable alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table_2))
-        return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    return table_2;
-}
-
-// FIXME: Check that the specified class derives from TightdbTable.
--(id)getTableInColumn:(size_t)col_ndx atRow:(size_t)row_ndx withClass:(__unsafe_unretained Class)class_obj
-{
-    tightdb::DataType type = _table->get_column_type(col_ndx);
-    if (type != tightdb::type_Table)
-        return nil;
-    tightdb::TableRef table = m_table->get_subtable(col_ndx, row_ndx);
-    if (!table)
-        return nil;
-    TightdbTable* table_2 = [[classObj alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table))
-        return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    if (![table_2 _checkType])
-        return nil;
-    return table_2;
-}
-
--(TightdbMixed*)getMixedInColumn:(size_t)col_ndx ndx:(size_t)row_ndx
-{
-    tightdb::Mixed mixed = m_table->get_mixed(col_ndx, row_ndx);
-    if (mixed.get_type() != tightdb::type_Table)
-        return [TightdbMixed mixedWithNativeMixed:mixed];
-
-    tightdb::TableRef table = m_table->get_subtable(col_ndx, row_ndx);
-    if (!table)
-        return nil;
-    TightdbTable* table_2 = [[TightdbTable alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table_2))
-        return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    if (![table_2 _checkType])
-        return nil;
-
-    return [TightdbMixed mixedWithTable:table_2];
 }
 
 
