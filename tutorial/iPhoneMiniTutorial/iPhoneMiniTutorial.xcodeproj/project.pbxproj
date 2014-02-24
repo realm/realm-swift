@@ -22,8 +22,8 @@
 		4D54FC6E18B77D56002AD81E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC4D18B77D56002AD81E /* UIKit.framework */; };
 		4D54FC7618B77D56002AD81E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D54FC7418B77D56002AD81E /* InfoPlist.strings */; };
 		4D54FC7818B77D56002AD81E /* iPhoneMiniTutorialTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D54FC7718B77D56002AD81E /* iPhoneMiniTutorialTests.m */; };
-		4D54FC8218B77E0E002AD81E /* Tightdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC8118B77E0E002AD81E /* Tightdb.framework */; };
 		4D54FC8418B77E1E002AD81E /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC8318B77E1E002AD81E /* libstdc++.dylib */; };
+		4DFB5DE018BB544500A8CC9E /* Tightdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DFB5DDF18BB544500A8CC9E /* Tightdb.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,8 +57,8 @@
 		4D54FC7318B77D56002AD81E /* iPhoneMiniTutorialTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iPhoneMiniTutorialTests-Info.plist"; sourceTree = "<group>"; };
 		4D54FC7518B77D56002AD81E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4D54FC7718B77D56002AD81E /* iPhoneMiniTutorialTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iPhoneMiniTutorialTests.m; sourceTree = "<group>"; };
-		4D54FC8118B77E0E002AD81E /* Tightdb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Tightdb.framework; sourceTree = "<group>"; };
 		4D54FC8318B77E1E002AD81E /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
+		4DFB5DDF18BB544500A8CC9E /* Tightdb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Tightdb.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,9 +68,9 @@
 			files = (
 				4D54FC8418B77E1E002AD81E /* libstdc++.dylib in Frameworks */,
 				4D54FC4C18B77D56002AD81E /* CoreGraphics.framework in Frameworks */,
+				4DFB5DE018BB544500A8CC9E /* Tightdb.framework in Frameworks */,
 				4D54FC4E18B77D56002AD81E /* UIKit.framework in Frameworks */,
 				4D54FC4A18B77D56002AD81E /* Foundation.framework in Frameworks */,
-				4D54FC8218B77E0E002AD81E /* Tightdb.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -109,8 +109,8 @@
 		4D54FC4818B77D56002AD81E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4DFB5DDF18BB544500A8CC9E /* Tightdb.framework */,
 				4D54FC8318B77E1E002AD81E /* libstdc++.dylib */,
-				4D54FC8118B77E0E002AD81E /* Tightdb.framework */,
 				4D54FC4918B77D56002AD81E /* Foundation.framework */,
 				4D54FC4B18B77D56002AD81E /* CoreGraphics.framework */,
 				4D54FC4D18B77D56002AD81E /* UIKit.framework */,
@@ -491,6 +491,7 @@
 				4D54FC7D18B77D56002AD81E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4D54FC7E18B77D56002AD81E /* Build configuration list for PBXNativeTarget "iPhoneMiniTutorialTests" */ = {
 			isa = XCConfigurationList;
@@ -499,6 +500,7 @@
 				4D54FC8018B77D56002AD81E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
