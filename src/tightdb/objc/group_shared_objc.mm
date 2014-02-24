@@ -23,19 +23,19 @@ using namespace std;
         shared_group->m_shared_group.reset(new tightdb::SharedGroup(tightdb::StringData(ObjcStringAccessor(path))));
     }
     // TODO: capture this in a macro or function, group constructor uses the same pattern.
-    catch (tightdb::File::PermissionDenied& ex) {
+    catch (tightdb::util::File::PermissionDenied& ex) {
         if (error) // allow nil as the error argument
             *error = make_tightdb_error(tdb_err_File_PermissionDenied, [NSString stringWithUTF8String:ex.what()]);
         return nil;
 
     }
-    catch (tightdb::File::Exists& ex) {
+    catch (tightdb::util::File::Exists& ex) {
         if (error) // allow nil as the error argument
             *error = make_tightdb_error(tdb_err_File_Exists, [NSString stringWithUTF8String:ex.what()]);
         return nil;
 
     }
-    catch (tightdb::File::AccessError& ex) {
+    catch (tightdb::util::File::AccessError& ex) {
         if (error) // allow nil as the error argument
             *error = make_tightdb_error(tdb_err_File_AccessError, [NSString stringWithUTF8String:ex.what()]);
         return nil;
