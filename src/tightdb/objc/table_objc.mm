@@ -810,7 +810,7 @@ using namespace std;
     return table_2;
 }
 
--(TightdbMixed*)getMixedInColumn:(size_t)col_ndx ndx:(size_t)row_ndx
+-(TightdbMixed*)getMixedInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
     tightdb::Mixed mixed = m_table->get_mixed(col_ndx, row_ndx);
     if (mixed.get_type() != tightdb::type_Table)
