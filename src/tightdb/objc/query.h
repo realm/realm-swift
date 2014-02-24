@@ -123,6 +123,9 @@
 
 @interface TightdbQueryAccessorBool: NSObject
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query;
+/* FIXME: Rename columnIsEqualTo to isEqualTo and likewise for all
+ * predicates in all the other column proxies
+ * below. E.g. columnIsBetween:and_: -> isBetween:and_: */
 -(TightdbQuery *)columnIsEqualTo:(BOOL)value;
 @end
 
