@@ -469,10 +469,8 @@ EOF
         cp "src/tightdb/objc/test/unit-tests-cov" "$TEMP_DIR/unit-tests-cov.octest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
         DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-cov.octest" || exit 1
-        echo "Generating 'binding-coverage.xml'.."
-        gcovr --filter='.*/tightdb_objc/src/.*' -x > binding-coverage.xml
-        echo "Generating 'core-coverage.xml'.."
-        gcovr --filter='.*/include/tightdb/.*' -x > core-coverage.xml
+        echo "Generating 'gcovr.xml'.."
+        gcovr --filter='.*/tightdb_objc/src/.*' --xml > gcovr.xml
         echo "Test passed."
         exit 0
         ;;
