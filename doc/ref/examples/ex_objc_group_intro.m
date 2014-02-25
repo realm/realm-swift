@@ -1,4 +1,4 @@
-// @@Example: ex_objc_group_intro @@
+/* @@Example: ex_objc_group_intro @@ */
 
 #import <tightdb/objc/group.h>
 #import <tightdb/objc/table.h>
@@ -18,30 +18,30 @@ int main()
 {
     @autoreleasepool {
 
-        // Creates a group and uses it to create a new table.
+        /* Creates a group and uses it to create a new table. */
 
         TightdbGroup* group = [TightdbGroup group];
         PeopleTable* table = [group getTable:@"people" withClass:[PeopleTable class]];
 
-        // Adds values to the table.
+        /* Adds values to the table. */
 
         [table addName:@"Mary" Age:14];
         [table addName:@"Joe" Age:17];
 
-        // Write the group (and the contained table) to a specified file.
+        /* Write the group (and the contained table) to a specified file. */
 
         [[NSFileManager defaultManager] removeItemAtPath:@"filename.tightdb" error:nil];
         [group writeToFile:@"filename.tightdb" withError:nil];
 
-        // Adds another row to the table. Note the update is NOT persisted
-        // automatically (delete the old file and use write again).
+        /* Adds another row to the table. Note the update is NOT persisted
+           automatically (delete the old file and use write again). */
 
         [table addName:@"Sam" Age:17];
 
         [[NSFileManager defaultManager] removeItemAtPath:@"filename.tightdb" error:nil];
         [group writeToFile:@"filename.tightdb" withError:nil];
 
-        // Retrieves an in memory buffer from the group.
+        /* Retrieves an in memory buffer from the group. */
 
         TightdbBinary* buffer = [group writeToBuffer];
 
@@ -53,14 +53,13 @@ int main()
             NSLog(@"Name: %@", cursor.Name);
         }
 
-        // Caution: Calling free(..) on the "buffer" is sometimes required to avoid leakage. However,
-        // the group that retrieves data from memeory takes responsibilty for the memory allocation in this example.
+        /* Caution: Calling free(..) on the "buffer" is sometimes required to avoid leakage. However,
+           the group that retrieves data from memeory takes responsibilty for the memory allocation in this example. */
 
-        // free((char*)buffer); // not needed in this particular situation.
-
+        /* free((char*)buffer); */ /* not needed in this particular situation. */
     }
 }
 
 
 
-// @@EndExample@@
+/* @@EndExample@@ */

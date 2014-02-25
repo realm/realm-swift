@@ -1,9 +1,9 @@
-// @@Example: ex_objc_tableview_typed_intro @@
+/* @@Example: ex_objc_tableview_typed_intro @@ */
 
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
 
-// Defines a new table with two columns Name and Age.
+/* Defines a new table with two columns Name and Age. */
 
 TIGHTDB_TABLE_2(PeopleTable,
                 Name, String,
@@ -13,11 +13,11 @@ int main()
 {
     @autoreleasepool {
 
-        // Creates a new table of the type defined above.
+        /* Creates a new table of the type defined above. */
 
         PeopleTable *table = [[PeopleTable alloc] init];
 
-        // Adds rows to the table.
+        /* Adds rows to the table. */
 
         PeopleTable_Cursor *cursor = [table addRow];
         cursor.Name = @"Brian";
@@ -31,11 +31,11 @@ int main()
         cursor.Name = @"Sam";
         cursor.Age = 76;
 
-        // Place the result of a query in a table view.
+        /* Place the result of a query in a table view. */
 
         PeopleTable_View *tableView = [[[table where].Age columnIsGreaterThan:20] findAll];
 
-        // Itereato over the result in the table view.
+        /* Itereato over the result in the table view. */
 
         for (PeopleTable_Cursor *curser in tableView) {
             NSLog(@"This person is over the age of 20: %@", [curser Name]);
@@ -46,4 +46,4 @@ int main()
     }
 }
 
-// @@EndExample@@
+/* @@EndExample@@ */

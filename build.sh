@@ -423,7 +423,7 @@ EOF
 	;;
 
     "test")
-        require_config || exit 1
+        auto_configure || exit 1
         $MAKE check-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test.XXXX)" || exit 1
         mkdir -p "$TEMP_DIR/unit-tests.octest/Contents/MacOS" || exit 1
@@ -435,7 +435,7 @@ EOF
         ;;
 
     "test-debug")
-        require_config || exit 1
+        auto_configure || exit 1
         $MAKE check-debug-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test-debug.XXXX)" || exit 1
         mkdir -p "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS" || exit 1
@@ -447,7 +447,7 @@ EOF
         ;;
 
     "test-gdb")
-        require_config || exit 1
+        auto_configure || exit 1
         $MAKE check-debug-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test-gdb.XXXX)" || exit 1
         mkdir -p "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS" || exit 1
@@ -456,9 +456,14 @@ EOF
         DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" OBJC_DISABLE_GC=YES gdb --args "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest"
         ;;
 
+    "check-doc-examples")
+        auto_configure || exit 1
+        $MAKE check-doc-examples || exit 1
+        ;;
+
     "test-examples")
-        require_config || exit 1
-        $MAKE test  -C "examples" || exit 1
+        auto_configure || exit 1
+        $MAKE test -C "examples" || exit 1
         ;;
 
     "install-report")

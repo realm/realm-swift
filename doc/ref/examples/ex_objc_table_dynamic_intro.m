@@ -1,4 +1,4 @@
-// @@Example: ex_objc_table_dynamic_intro @@
+/* @@Example: ex_objc_table_dynamic_intro @@ */
 
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
@@ -9,52 +9,52 @@ int main()
 {
     @autoreleasepool {
 
-        // Create a new table dynamically.
+        /* Create a new table dynamically. */
 
         TightdbTable *table = [[TightdbTable alloc] init];
 
         size_t const NAME = [table addColumnWithType:tightdb_String andName:@"Name"];
         size_t const AGE = [table addColumnWithType:tightdb_Int andName:@"Age"];
 
-        // Add rows and values.
+        /* Add rows and values. */
 
         TightdbCursor *cursor;
 
-        // Row 0
+        /* Row 0 */
 
         cursor = [table addRow];
 
         [cursor setInt:23 inColumn:AGE];
         [cursor setString:@"Joe" inColumn:NAME];
 
-        // Row 1
+        /* Row 1 */
 
         cursor = [table addRow];
 
         [cursor setInt:32 inColumn:AGE];
         [cursor setString:@"Simon" inColumn:NAME];
 
-        // Row 2
+        /* Row 2 */
 
         cursor = [table addRow];
 
         [cursor setInt:12 inColumn:AGE];
         [cursor setString:@"Steve" inColumn:NAME];
 
-        // Row 3
+        /* Row 3 */
 
         cursor = [table addRow];
 
         [cursor setInt:100 inColumn:AGE];
         [cursor setString:@"Nick" inColumn:NAME];
 
-        // Print using a cursor.
+        /* Print using a cursor. */
 
         for (TightdbCursor *ite in table)
             NSLog(@"Name: %@ Age: %lld", [ite getStringInColumn:NAME], [ite getIntInColumn:AGE]);
 
 
-        // Insert a row and print.
+        /* Insert a row and print. */
 
         cursor = [table insertRowAtIndex:2];
         [cursor setInt:21 inColumn:AGE];
@@ -67,7 +67,7 @@ int main()
             NSLog(@"Name: %@ Age: %lld", [ite getStringInColumn:NAME], [ite getIntInColumn:AGE]);
 
 
-        // Update a few rows and print again.
+        /* Update a few rows and print again. */
 
         cursor = [table cursorAtIndex:2];
         [cursor setString:@"Now I'm UPDATED" inColumn:NAME];
@@ -80,7 +80,7 @@ int main()
         for (TightdbCursor *ite in table)
             NSLog(@"Name: %@ Age: %lld", [ite getStringInColumn:NAME], [ite getIntInColumn:AGE]);
 
-        // Index not existing.
+        /* Index not existing. */
 
         TightdbCursor *c2 = [table cursorAtIndex:[table count]];
         if (c2 != nil)
@@ -88,4 +88,4 @@ int main()
     }
 }
 
-// @@EndExample@@
+/* @@EndExample@@ */
