@@ -36,9 +36,12 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
                 TableCol,  TestTableSub,
                 MixedCol,  Mixed)
 
-@interface MACtestTable: SenTestCase
+@interface MACTestTable: SenTestCase
+  // Intentionally left blank.
+  // No new public instance methods need be defined.
 @end
-@implementation MACtestTable
+
+@implementation MACTestTable
 
 - (void)testTable
 {
