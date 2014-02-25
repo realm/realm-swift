@@ -8,6 +8,8 @@
 
 #import "TViewController.h"
 #import "TAppDelegate.h"
+#import <Tightdb/Tightdb.h>
+#import <Tightdb/group_shared.h>
 
 @interface TViewController ()
 
@@ -23,19 +25,19 @@
     
     TAppDelegate* delegate = (TAppDelegate*)[[UIApplication sharedApplication]delegate];
     
-    [delegate.sharedGroup writeTransaction:^(TightdbGroup *tnx) {
+    [delegate.sharedGroup writeWithBlock:^(TightdbGroup *tnx) {
         
         // Write transactions with the shared group are possible via the provided variable binding named group.
         NSLog(@"Inside read transaction!");
         
-        TightdbTable *todoTable = [tnx getTable:@"todos"];
+        TightdbTable *todoTable = [tnx getTable:@"todos" error:nil];
         
         if([todoTable getColumnCount] == 0) {
             [todoTable addColumnWithType:tightdb_String andName:@"todoName"];
         }
         
         return YES; // Commit
-    }];
+    } withError:nil];
     
     [self updateTodoCountLabel];
 
@@ -53,16 +55,16 @@
 {
     TAppDelegate* delegate = (TAppDelegate*)[[UIApplication sharedApplication]delegate];
     
-    [delegate.sharedGroup readTransaction:^(TightdbGroup *tnx) {
+    [delegate.sharedGroup readWithBlock:^(TightdbGroup *tnx) {
        
-        TightdbTable *todoTable = [tnx getTable:@"todos"];
+        TightdbTable *todoTable = [tnx getTable:@"todos" error:nil];
         
         self.todoCountLabel.text = [NSString stringWithFormat:@"Number of todos: %zu", [todoTable count]];
         
         NSString *todoString = @"";
 
         for (size_t r=0;r<[todoTable count];r++) {
-            todoString = [[todoString stringByAppendingString:[todoTable getString:0 ndx:r]] stringByAppendingString:@"\n"];
+            todoString = [[todoString stringByAppendingString:[todoTable getStringInColumn:0 atRow:r]] stringByAppendingString:@"\n"];
         }
         
         self.todos.text = todoString;

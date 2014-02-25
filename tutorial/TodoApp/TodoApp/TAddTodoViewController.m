@@ -9,6 +9,8 @@
 #import "TAddTodoViewController.h"
 #import "TAppDelegate.h"
 #import "TViewController.h"
+#import <Tightdb/Tightdb.h>
+#import <Tightdb/group_shared.h>
 
 
 @interface TAddTodoViewController ()
@@ -41,21 +43,23 @@
         
         TAppDelegate* delegate = (TAppDelegate*)[[UIApplication sharedApplication]delegate];
             
-        [delegate.sharedGroup writeTransaction:^(TightdbGroup *tnx) {
+        bool success = [delegate.sharedGroup writeWithBlock:^(TightdbGroup *tnx) {
                 
-            TightdbTable *todoTable = [tnx getTable:@"todos"];
+            TightdbTable *todoTable = [tnx getTable:@"todos" error:nil];
                 
             TightdbCursor *row = [todoTable addRow];
             [row setString:self.todoName.text inColumn:0];
                 
             return YES; // Commit
-        }];
-      
-        // Close modal
-        [self dismissViewControllerAnimated:YES completion:nil];
+        } withError:nil];
         
-        // Make parent reload the todos from the db
-        [self.parentViewController viewWillAppear:YES ];
+        if (success) {
+            // Close modal
+            [self dismissViewControllerAnimated:YES completion:nil];
+            
+            // Make parent reload the todos from the db
+            [self.parentViewController viewWillAppear:YES ];
+        }
         
     } else {
         // If no name has been entered, show an error alert

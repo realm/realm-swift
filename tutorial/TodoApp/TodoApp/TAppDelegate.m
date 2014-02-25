@@ -7,6 +7,8 @@
 //
 
 #import "TAppDelegate.h"
+#import <Tightdb/Tightdb.h>
+#import <Tightdb/group_shared.h>
 
 @implementation TAppDelegate
 
@@ -14,7 +16,7 @@
 {
     // Override point for customization after application launch.
     
-    self.sharedGroup = [TightdbSharedGroup groupWithFilename:[self pathForDataFile:@"todos.tightdb"]];
+    self.sharedGroup = [TightdbSharedGroup sharedGroupWithFile:[self pathForDataFile:@"todos.tightdb"] withError:nil];
     
     return YES;
 }
