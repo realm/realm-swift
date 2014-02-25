@@ -37,8 +37,8 @@ libtightdb_objc_a_VERSION = 2:0:0
 
 # Code generation
 ifeq ($(DISABLE_CHEETAH_CODE_GEN),)
-GENERATED_SOURCES += tightdb.h
-tightdb.h: tightdb.h.cheetah cheetah.sh
+GENERATED_SOURCES += table_macros.h
+table_macros.h: table_macros.h.cheetah cheetah.sh
 	$(SHELL) cheetah.sh $< $@
 endif
 
