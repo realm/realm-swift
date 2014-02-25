@@ -44,7 +44,7 @@ TIGHTDB_TABLE_2(QueryTable,
     TightdbGroup* group = [TightdbGroup group];
     NSLog(@"HasTable: %i", [group hasTable:@"employees" withClass:[MyTable class]] );
     // Create new table in group
-    MyTable* table = [group getTable:@"employees" withClass:[MyTable class]];
+    MyTable* table = [group getTable:@"employees" withClass:[MyTable class] error:nil];
     NSLog(@"Table: %@", table);
     NSLog(@"HasTable: %i", [group hasTable:@"employees" withClass:[MyTable class]] );
 
@@ -105,12 +105,12 @@ TIGHTDB_TABLE_2(QueryTable,
     NSFileManager* fm = [NSFileManager defaultManager];
 
     // Write to disk
-    [fm removeItemAtPath:@"employees.tightdb" error:NULL];
-    [group write:@"employees.tightdb"];
+    [fm removeItemAtPath:@"employees.tightdb" error:nil];
+    [group writeToFile:@"employees.tightdb" withError:nil];
 
     // Load a group from disk (and print contents)
-    TightdbGroup* fromDisk = [TightdbGroup groupWithFilename:@"employees.tightdb"];
-    MyTable* diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class]];
+    TightdbGroup* fromDisk = [TightdbGroup groupWithFile:@"employees.tightdb" withError:nil];
+    MyTable* diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class] error:nil];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
 //    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
@@ -119,16 +119,15 @@ TIGHTDB_TABLE_2(QueryTable,
         MyTable_Cursor* cursor = [diskTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, [cursor Name]);
         NSLog(@"%zu: %@", i, cursor.Name);
-        NSLog(@"%zu: %@", i, [diskTable getString:0 ndx:i]);
+        NSLog(@"%zu: %@", i, [diskTable getStringInColumn:0 atRow:i]);
     }
 
     // Write same group to memory buffer
-    size_t size;
-    const char* data = [group writeToMem:&size];
+    TightdbBinary* buffer = [group writeToBuffer];
 
     // Load a group from memory (and print contents)
-    TightdbGroup* fromMem = [TightdbGroup groupWithBuffer:data size:size];
-    MyTable* memTable = [fromMem getTable:@"employees" withClass:[MyTable class]];
+    TightdbGroup* fromMem = [TightdbGroup groupWithBuffer:buffer withError:nil];
+    MyTable* memTable = [fromMem getTable:@"employees" withClass:[MyTable class] error:nil];
     for (size_t i = 0; i < [memTable count]; i++) {
         // ??? cursor
         NSLog(@"%zu: %@", i, memTable.Name);
@@ -139,7 +138,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testQuery
 {
     TightdbGroup* group = [TightdbGroup group];
-    QueryTable* table = [group getTable:@"Query table" withClass:[QueryTable class]];
+    QueryTable* table = [group getTable:@"Query table" withClass:[QueryTable class] error:nil];
 
     // Add some rows
     [table addFirst:2 Second:@"a"];
@@ -196,7 +195,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testSubtables
 {
     TightdbGroup* group = [TightdbGroup group];
-    TightdbTable* table = [group getTable:@"table" withClass:[TightdbTable class]];
+    TightdbTable* table = [group getTable:@"table" withClass:[TightdbTable class] error:nil];
 
     // Specify the table type
     {
@@ -216,17 +215,18 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Add a row to the top level table
     [table addRow];
-    [table set:COL_TABLE_INT ndx:0 value:700];
+    [table setInt:700 inColumn:COL_TABLE_INT atRow:0];
 
     // Add two rows to the subtable
-    TightdbTable* subtable = [table getSubtable:COL_TABLE_TAB ndx:0];
+    TightdbTable* subtable = [table getTableInColumn:COL_TABLE_TAB atRow:0];
     [subtable addRow];
-    [subtable set:COL_SUBTABLE_INT ndx:0 value:800];
+
+    [subtable setInt:800 inColumn:COL_SUBTABLE_INT atRow:0];
     [subtable addRow];
-    [subtable set:COL_SUBTABLE_INT ndx:1 value:801];
+    [subtable setInt:801 inColumn:COL_SUBTABLE_INT atRow:1];
 
     // Make the mixed values column contain another subtable
-    [table setMixed:COL_TABLE_MIX ndx:0 value: [TightdbMixed mixedWithTable:nil]];
+    [table setMixed:[TightdbMixed mixedWithTable:nil] inColumn:COL_TABLE_MIX atRow:0];
 
 /* Fails!!!
     // Specify its type

@@ -14,23 +14,36 @@ using namespace std;
     tightdb::util::UniquePtr<tightdb::SharedGroup> m_shared_group;
 }
 
-+(TightdbSharedGroup*)groupWithFilename:(NSString*)filename
++(TightdbSharedGroup*)sharedGroupWithFile:(NSString*)path withError:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
 {
     TightdbSharedGroup* shared_group = [[TightdbSharedGroup alloc] init];
     if (!shared_group)
         return nil;
     try {
-        shared_group->m_shared_group.reset(new tightdb::SharedGroup(tightdb::StringData(ObjcStringAccessor(filename))));
+        shared_group->m_shared_group.reset(new tightdb::SharedGroup(tightdb::StringData(ObjcStringAccessor(path))));
     }
-    catch (...) {
-        // FIXME: Diffrent exception types mean different things. More
-        // details must be made available. We should proably have
-        // special catches for at least these:
-        // tightdb::File::AccessError (and various derivatives),
-        // tightdb::ResourceAllocError, std::bad_alloc. In general,
-        // any core library function or operator that is not declared
-        // 'noexcept' must be considered as being able to throw
-        // anything derived from std::exception.
+    // TODO: capture this in a macro or function, group constructor uses the same pattern.
+    catch (tightdb::util::File::PermissionDenied& ex) {
+        if (error) // allow nil as the error argument
+            *error = make_tightdb_error(tdb_err_File_PermissionDenied, [NSString stringWithUTF8String:ex.what()]);
+        return nil;
+
+    }
+    catch (tightdb::util::File::Exists& ex) {
+        if (error) // allow nil as the error argument
+            *error = make_tightdb_error(tdb_err_File_Exists, [NSString stringWithUTF8String:ex.what()]);
+        return nil;
+
+    }
+    catch (tightdb::util::File::AccessError& ex) {
+        if (error) // allow nil as the error argument
+            *error = make_tightdb_error(tdb_err_File_AccessError, [NSString stringWithUTF8String:ex.what()]);
+        return nil;
+
+    }
+    catch (std::exception& ex) {
+        if (error) // allow nil as the error argument
+            *error = make_tightdb_error(tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
         return nil;
     }
     return shared_group;
@@ -43,39 +56,85 @@ using namespace std;
 #endif
 }
 
-
--(void)readTransaction:(TightdbSharedGroupReadTransactionBlock)block
+-(void)readWithBlock:(TightdbReadBlock)block
 {
-    @try {
-        const tightdb::Group& group = m_shared_group->begin_read();
-        TightdbGroup* group_2 = [TightdbGroup groupWithNativeGroup:const_cast<tightdb::Group*>(&group) isOwned:NO readOnly:YES];
-        block(group_2);
+    const tightdb::Group* group;
+    try {
+        group = &m_shared_group->begin_read();
     }
-    @catch (NSException* exception) {
-        @throw exception;
+    catch (std::exception& ex) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                         reason:[NSString stringWithUTF8String:ex.what()]
+                                                       userInfo:[NSMutableDictionary dictionary]];  // IMPORTANT: cannot not be nil !!
+        [exception raise];
+    }
+
+    @try {
+        // No TightDB Obj-C methods used in the block
+        // should throw anything but NSException or derivatives. Note: if the client calls other libraries
+        // throwing other kinds of exceptions they will leak back to the client code, if he does not
+        // catch them within the block.
+        TightdbGroup* group_2 = [TightdbGroup groupWithNativeGroup:const_cast<tightdb::Group*>(group) isOwned:NO readOnly:YES];
+        block(group_2);
+
     }
     @finally {
         m_shared_group->end_read();
     }
 }
 
--(void)writeTransaction:(TightdbSharedGroupWriteTransactionBlock)block
+
+-(BOOL)writeWithBlock:(TightdbWriteBlock)block withError:(NSError**)error
 {
+    tightdb::Group* group;
+    try {
+        group = &m_shared_group->begin_write();
+    }
+    catch (std::exception& ex) {
+        // File access errors are treated as exceptions here since they should not occur after the shared
+        // group has already beenn successfully opened on the file and memeory mapped. The shared group constructor handles
+        // the excepted error related to file access.
+        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                         reason:[NSString stringWithUTF8String:ex.what()]
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
+
+    BOOL confirmation = NO;
     @try {
-        tightdb::Group& group = m_shared_group->begin_write();
-        TightdbGroup* group_2 = [TightdbGroup groupWithNativeGroup:&group isOwned:NO readOnly:NO];
-        if (block(group_2)) {
-            m_shared_group->commit();
-        }
-        else {
-            m_shared_group->rollback();
-        }
+        TightdbGroup* group_2 = [TightdbGroup groupWithNativeGroup:group isOwned:NO readOnly:NO];
+        confirmation = block(group_2);
     }
     @catch (NSException* exception) {
         m_shared_group->rollback();
-        @throw exception;
+        @throw;
     }
-}
 
+    if (confirmation) {
+        // Required to avoid leaking of core exceptions.
+        try {
+            m_shared_group->commit();
+        }
+        catch (std::exception& ex) {
+            NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                             reason:@""
+                                                           userInfo:[NSMutableDictionary dictionary]];
+            [exception raise];
+        }
+        return YES;
+    }
+
+    // As of now the only kind of error is when the block decides to rollback.
+    // In the future, other kinds may be relevant (network error etc)..
+    // It could be discussed if rollback is an error at all. But, if the method is
+    // returning NO it makes sense the user can check the error an see that it
+    // was caused by a decision of the block to roll back.
+
+    if (error) // allow nil as the error argument
+        *error = make_tightdb_error(tdb_err_Rollback, @"The block code requested a rollback");
+
+    m_shared_group->rollback();
+    return NO;
+}
 
 @end

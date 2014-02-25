@@ -1,11 +1,10 @@
-// @@Example: ex_objc_table_typed_intro @@
-
+/* @@Example: ex_objc_table_typed_intro @@ */
 
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
 
 
-// Defines a new table with two columns Name and Age.
+/* Defines a new table with two columns Name and Age. */
 
 TIGHTDB_TABLE_2(PeopleTable,
                 Name, String,
@@ -16,7 +15,7 @@ int main()
 {
     @autoreleasepool {
 
-        // Creates a new table of the type defined above.
+        /* Creates a new table of the type defined above. */
 
         PeopleTable *table = [[PeopleTable alloc] init];
 
@@ -27,6 +26,15 @@ int main()
         cursor = [table addRow];
         cursor.Name = @"Sofie";
         cursor.Age = 40;
+
+/*
+        [table addOrInsertRowAtIndex:[table count]
+                                Name:@"Jesper"
+                                 Age:200];
+*/
+        cursor = [table addRow];
+        cursor.Name = @"Jesper";
+        cursor.Age = 200;
 
         NSLog(@"The size of the table is now %zd", [table count]);
 
@@ -50,12 +58,7 @@ int main()
         TightdbCursor *c3 = [table cursorAtIndex:[table count]];
         if (c3 != nil)
             NSLog(@"Should not get here.");
-
-
     }
 }
 
-
-
-
-// @@EndExample@@
+/* @@EndExample@@ */
