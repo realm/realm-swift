@@ -20,8 +20,8 @@ int main()
 
         /* Creates a group and uses it to create a new table. */
 
-        TightdbGroup *group = [TightdbGroup group];
-        PeopleTable *table = [group getTable:@"people" withClass:[PeopleTable class]];
+        TightdbGroup* group = [TightdbGroup group];
+        PeopleTable* table = [group getTable:@"people" withClass:[PeopleTable class] error:nil];
 
         /* Adds values to the table. */
 
@@ -31,7 +31,7 @@ int main()
         /* Write the group (and the contained table) to a specified file. */
 
         [[NSFileManager defaultManager] removeItemAtPath:@"filename.tightdb" error:nil];
-        [group write:@"filename.tightdb"];
+        [group writeToFile:@"filename.tightdb" withError:nil];
 
         /* Adds another row to the table. Note the update is NOT persisted
            automatically (delete the old file and use write again). */
@@ -39,18 +39,17 @@ int main()
         [table addName:@"Sam" Age:17];
 
         [[NSFileManager defaultManager] removeItemAtPath:@"filename.tightdb" error:nil];
-        [group write:@"filename.tightdb"];
+        [group writeToFile:@"filename.tightdb" withError:nil];
 
         /* Retrieves an in memory buffer from the group. */
 
-        size_t size;
-        const char *buffer = [group writeToMem:&size];
+        TightdbBinary* buffer = [group writeToBuffer];
 
-        TightdbGroup *groupFromMemory = [TightdbGroup groupWithBuffer:buffer size:size];
-        PeopleTable *tableFromMemery = [groupFromMemory getTable:@"people" withClass:[PeopleTable class] error:nil];
+        /* Creates a group from an im memory buffer */
+        TightdbGroup* groupFromMemory = [TightdbGroup groupWithBuffer:buffer withError:nil];
+        PeopleTable* tableFromMemery = [groupFromMemory getTable:@"people" withClass:[PeopleTable class] error:nil];
 
-        for (PeopleTable_Cursor *cursor in tableFromMemery)
-        {
+        for (PeopleTable_Cursor* cursor in tableFromMemery) {
             NSLog(@"Name: %@", cursor.Name);
         }
 
