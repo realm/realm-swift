@@ -7,7 +7,6 @@
 
 #import <sqlite3.h>
 #import <Tightdb/Tightdb.h>
-#import <Tightdb/group_shared.h>
 
 #import "Performance.h"
 #import "Utils.h"

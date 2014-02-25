@@ -4,7 +4,6 @@
 //
 
 #import <Tightdb/Tightdb.h>
-#import <Tightdb/group_shared.h>
 
 #import "ViewController.h"
 #import "Utils.h"
