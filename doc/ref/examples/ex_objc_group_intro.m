@@ -21,7 +21,7 @@ int main()
         /* Creates a group and uses it to create a new table. */
 
         TightdbGroup* group = [TightdbGroup group];
-        PeopleTable* table = [group getTable:@"people" withClass:[PeopleTable class]];
+        PeopleTable* table = [group getTable:@"people" withClass:[PeopleTable class] error:nil];
 
         /* Adds values to the table. */
 
@@ -45,7 +45,7 @@ int main()
 
         TightdbBinary* buffer = [group writeToBuffer];
 
-        // Creates a group from an im memory buffer
+        /* Creates a group from an im memory buffer */
         TightdbGroup* groupFromMemory = [TightdbGroup groupWithBuffer:buffer withError:nil];
         PeopleTable* tableFromMemery = [groupFromMemory getTable:@"people" withClass:[PeopleTable class] error:nil];
 

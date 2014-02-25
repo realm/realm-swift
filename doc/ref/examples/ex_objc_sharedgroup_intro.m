@@ -24,7 +24,7 @@ int main()
         [fm removeItemAtPath:@"sharedgrouptest.tightdb" error:nil];
         [fm removeItemAtPath:@"sharedgrouptest.tightdb.lock" error:nil];
 
-        TightdbSharedGroup *shared = [TightdbSharedGroup sharedGroupWithFilename:@"sharedgrouptest.tightdb" withError:nil];
+        TightdbSharedGroup *shared = [TightdbSharedGroup sharedGroupWithFile:@"sharedgrouptest.tightdb" withError:nil];
         if (!shared) {
             NSLog(@"Error");
         }
@@ -41,7 +41,7 @@ int main()
 
             /* Write transactions with the shared group are possible via the provided variable binding named group. */
 
-            PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class]];
+            PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class] error:nil];
 
             if ([table count] > 0) {
                 NSLog(@"Not empty!");
@@ -62,7 +62,7 @@ int main()
 
             /* Write transactions with the shared group are possible via the provided variable binding named group. */
 
-           PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class]];
+           PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class] error:nil];
 
            if ([table count] > 0) {
                NSLog(@"Roll back!");
@@ -84,7 +84,7 @@ int main()
 
             /* Read transactions with the shared group are possible via the provided variable binding named group. */
 
-            PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class]];
+            PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class] error:nil];
 
             for (PeopleTable_Cursor *curser in table) {
                 NSLog(@"Name: %@", [curser Name]);
