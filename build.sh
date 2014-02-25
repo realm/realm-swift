@@ -595,10 +595,13 @@ EOF
         ;;
 
     *)
-        echo "Unspecified or bad mode '$MODE'" 1>&2
-        echo "Available modes are: config clean build build-iphone test test-debug test-gdb show-install install uninstall test-installed" 1>&2
-        echo "As well as: install-prod install-devel uninstall-prod uninstall-devel dist-copy" 1>&2
-	echo "As wall as: ios-framework"
+        cat << EOF
+Unspecified or bad mode '$MODE'.
+Available modes are:
+  config clean build build-iphone test test-debug test-gdb test-cover
+  show-install install uninstall test-installed install-prod install-devel
+  uninstall-prod uninstall-devel dist-copy ios-framework
+EOF
         exit 1
         ;;
 
