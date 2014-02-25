@@ -32,6 +32,5 @@ examples/tutorial
 # sh build.sh ios-framework
 /Tightdb.framework
 tightdb-ios.zip
-tutorial/iPhoneMiniTutorial/Tightdb.framework/Headers/*
-tutorial/iPhoneMiniTutorial/Tightdb.framework/Tightdb
+
 

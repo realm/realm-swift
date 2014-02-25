@@ -32,7 +32,6 @@
 #import <tightdb/objc/query.h>
 #import <tightdb/objc/cursor.h>
 #import <tightdb/objc/helper_macros.h>
-#import <tightdb/objc/group_shared.h>
 
 
 #define TIGHTDB_TABLE_DEF_1(TableName, CName1, CType1) \
