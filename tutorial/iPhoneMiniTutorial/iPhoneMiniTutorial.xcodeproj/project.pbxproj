@@ -23,7 +23,7 @@
 		4D54FC7618B77D56002AD81E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D54FC7418B77D56002AD81E /* InfoPlist.strings */; };
 		4D54FC7818B77D56002AD81E /* iPhoneMiniTutorialTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D54FC7718B77D56002AD81E /* iPhoneMiniTutorialTests.m */; };
 		4D54FC8418B77E1E002AD81E /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC8318B77E1E002AD81E /* libstdc++.dylib */; };
-		4DFB5DE018BB544500A8CC9E /* Tightdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DFB5DDF18BB544500A8CC9E /* Tightdb.framework */; };
+		4D7995A618BCD9FB009EB0C0 /* Tightdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D7995A518BCD9FB009EB0C0 /* Tightdb.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,7 +58,7 @@
 		4D54FC7518B77D56002AD81E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4D54FC7718B77D56002AD81E /* iPhoneMiniTutorialTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iPhoneMiniTutorialTests.m; sourceTree = "<group>"; };
 		4D54FC8318B77E1E002AD81E /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
-		4DFB5DDF18BB544500A8CC9E /* Tightdb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Tightdb.framework; sourceTree = "<group>"; };
+		4D7995A518BCD9FB009EB0C0 /* Tightdb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Tightdb.framework; path = ../../Tightdb.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,7 +68,7 @@
 			files = (
 				4D54FC8418B77E1E002AD81E /* libstdc++.dylib in Frameworks */,
 				4D54FC4C18B77D56002AD81E /* CoreGraphics.framework in Frameworks */,
-				4DFB5DE018BB544500A8CC9E /* Tightdb.framework in Frameworks */,
+				4D7995A618BCD9FB009EB0C0 /* Tightdb.framework in Frameworks */,
 				4D54FC4E18B77D56002AD81E /* UIKit.framework in Frameworks */,
 				4D54FC4A18B77D56002AD81E /* Foundation.framework in Frameworks */,
 			);
@@ -109,7 +109,7 @@
 		4D54FC4818B77D56002AD81E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				4DFB5DDF18BB544500A8CC9E /* Tightdb.framework */,
+				4D7995A518BCD9FB009EB0C0 /* Tightdb.framework */,
 				4D54FC8318B77E1E002AD81E /* libstdc++.dylib */,
 				4D54FC4918B77D56002AD81E /* Foundation.framework */,
 				4D54FC4B18B77D56002AD81E /* CoreGraphics.framework */,
@@ -326,7 +326,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -356,9 +356,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 armv7";
 			};
 			name = Debug;
 		};
@@ -366,7 +367,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -393,6 +394,7 @@
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = "arm64 armv7";
 			};
 			name = Release;
 		};
@@ -403,7 +405,8 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/mk/git/git/tightdb_objc/tutorial/iPhoneMiniTutorial,
+					../,
+					../../,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "iPhoneMiniTutorial/iPhoneMiniTutorial-Prefix.pch";
@@ -420,7 +423,8 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/mk/git/git/tightdb_objc/tutorial/iPhoneMiniTutorial,
+					../,
+					../../,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "iPhoneMiniTutorial/iPhoneMiniTutorial-Prefix.pch";
