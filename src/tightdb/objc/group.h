@@ -28,10 +28,12 @@
 
 +(TightdbGroup *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
 
-/// You pass the ownership of the specified buffer to the group. The
-/// buffer will eventually be freed using the C function free(), so
-/// the buffer you pass, must have been allocated using C function
-/// malloc().
+/**
+ * You pass the ownership of the specified buffer to the group. The
+ * buffer will eventually be freed using the C function free(), so
+ * the buffer you pass, must have been allocated using C function
+ * malloc().
+ */
 +(TightdbGroup *)groupWithBuffer:(TightdbBinary *)buffer withError:(NSError *__autoreleasing *)error;
 
 +(TightdbGroup *)group;
