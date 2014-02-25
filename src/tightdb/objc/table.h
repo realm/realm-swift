@@ -141,16 +141,6 @@
 -(BOOL)insertRow:(size_t)ndx;
 -(BOOL)insertRow:(size_t)ndx error:(NSError *__autoreleasing *)error;
 
--(void)setInt:(int64_t)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setBool:(BOOL)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setFloat:(float)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setDouble:(double)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setDate:(time_t)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setString:(NSString *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setBinary:(TightdbBinary *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setMixed:(TightdbMixed *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setTable:(TightdbTable *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
-
 -(BOOL)getBoolInColumn:(size_t)colNdx atRow:(size_t)ndx;
 -(int64_t)getIntInColumn:(size_t)colNdx atRow:(size_t)ndx;
 -(float)getFloatInColumn:(size_t)colNdx atRow:(size_t)ndx;
@@ -158,34 +148,27 @@
 -(time_t)getDateInColumn:(size_t)colNdx atRow:(size_t)ndx;
 -(NSString *)getStringInColumn:(size_t)colNdx atRow:(size_t)ndx;
 -(TightdbBinary *)getBinaryInColumn:(size_t)colNdx atRow:(size_t)ndx;
+-(TightdbTable *)getTableInColumn:(size_t)colNdx atRow:(size_t)ndx;
+-(id)getTableInColumn:(size_t)colNdx atRow:(size_t)ndx withClass:(Class)obj;
 -(TightdbMixed *)getMixedInColumn:(size_t)colNdx atRow:(size_t)ndx;
 
-/**
- * @{
- *
- * If the specified column is neither a subtable column, nor a mixed
- * column, then these methods return nil. They also return nil for a
- * mixed column, if the mixed value at the specified row is not a
- * subtable. The second method also returns nil if the type of the
- * subtable is not compatible with the specified table
- * class. Finally, these methods return nil if they encounter a
- * memory allocation error (out of memory).
- *
- * The specified table class must be one that is declared by using
- * one of the table macros TIGHTDB_TABLE_*.
- */
--(TightdbTable *)getTableInColumn:(size_t)colNdx atRow:(size_t)ndx;
+-(void)setInt:(int64_t)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
+-(void)setBool:(BOOL)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
+-(void)setFloat:(float)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
+-(void)setDouble:(double)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
+-(void)setDate:(time_t)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
+-(void)setString:(NSString *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
+-(void)setBinary:(TightdbBinary *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
+-(void)setTable:(TightdbTable *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
+-(void)setMixed:(TightdbMixed *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
 
-/* This method is only used in the typed interface. */
--(id)getTableInColumn:(size_t)colNdx atRow:(size_t)ndx withClass:(Class)obj;
-/** @} */
 
-/* NOTE: Low-level insert functions. Always insert in all columns at once
- * and call InsertDone after to avoid table getting un-balanced. */
-
-/* FIXME: Remove this option from binding. Use insertRowAtIndex and a cursor. */
-
-/* FIXME: Should be insertBool:(BOOL)value inColumn:(size_t)colNdx atRow:(size_t)rowNdx; */
+/* FIXME: It has been decided that the insert methods must not be a
+ * part of the public Obj-C API. All row insertion must happen by
+ * inserting a complete rows. This must occur either by calling
+ * `addRow` and then setting each column value afterwards, or possibly
+ * by calling a method that takes all column values as arguments at
+ * once. */
 -(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value;
 -(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value error:(NSError *__autoreleasing *)error;
 -(BOOL)insertInt:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;
