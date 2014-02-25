@@ -1,6 +1,5 @@
 /* @@Example: ex_objc_table_typed_intro @@ */
 
-
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
 
@@ -28,6 +27,10 @@ int main()
         cursor.Name = @"Sofie";
         cursor.Age = 40;
 
+        [table addOrInsertRowAtIndex:[table count]
+                                Name:@"Jesper"
+                                 Age:200];
+
         NSLog(@"The size of the table is now %zd", [table count]);
 
         for (PeopleTable_Cursor *ite in table) {
@@ -50,12 +53,7 @@ int main()
         TightdbCursor *c3 = [table cursorAtIndex:[table count]];
         if (c3 != nil)
             NSLog(@"Should not get here.");
-
-
     }
 }
-
-
-
 
 /* @@EndExample@@ */
