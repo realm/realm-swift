@@ -33,7 +33,9 @@
 -(const char *)getData;
 -(size_t)getSize;
 
-/// Compare the referenced binary data for equality.
+/**
+ * Compare the referenced binary data for equality.
+ */
 -(BOOL)isEqual:(TightdbBinary *)bin;
 @end
 
@@ -62,10 +64,14 @@
 
 
 @interface TightdbDescriptor: NSObject
-/// Returns NO on memory allocation error.
+/**
+ * Returns NO on memory allocation error.
+ */
 -(BOOL)addColumnWithType:(TightdbType)type andName:(NSString *)name;
 -(BOOL)addColumnWithType:(TightdbType)type andName:(NSString *)name error:(NSError *__autoreleasing *)error;
-/// Returns nil on memory allocation error.
+/**
+ * Returns nil on memory allocation error.
+ */
 -(TightdbDescriptor *)addColumnTable:(NSString *)name;
 -(TightdbDescriptor *)addColumnTable:(NSString *)name error:(NSError *__autoreleasing *)error;
 -(TightdbDescriptor *)getSubdescriptor:(size_t)colNdx;
@@ -82,37 +88,44 @@
 
 -(BOOL)isEqual:(TightdbTable *)other;
 
-//@{
-/// If the specified column is neither a subtable column, nor a mixed
-/// column, then these methods return nil. They also return nil for a
-/// mixed column, if the mixed value at the specified row is not a
-/// subtable. The second method also returns nil if the type of the
-/// subtable is not compatible with the specified table
-/// class. Finally, these methods return nil if they encounter a
-/// memory allocation error (out of memory).
-///
-/// The specified table class must be one that is declared by using
-/// one of the table macros TIGHTDB_TABLE_*.
+/**
+ * @{
+ *
+ * If the specified column is neither a subtable column, nor a mixed
+ * column, then these methods return nil. They also return nil for a
+ * mixed column, if the mixed value at the specified row is not a
+ * subtable. The second method also returns nil if the type of the
+ * subtable is not compatible with the specified table
+ * class. Finally, these methods return nil if they encounter a
+ * memory allocation error (out of memory).
+ *
+ * The specified table class must be one that is declared by using
+ * one of the table macros TIGHTDB_TABLE_*.
+ */
 -(TightdbTable *)getSubtable:(size_t)colNdx ndx:(size_t)ndx;
 -(id)getSubtable:(size_t)colNdx ndx:(size_t)ndx withClass:(Class)obj;
-//@}
+/** @} */
 
-/// This method will return NO if it encounters a memory allocation
-/// error (out of memory).
-///
-/// The specified table class must be one that is declared by using
-/// one of the table macros TIGHTDB_TABLE_*.
+/**
+ * This method will return NO if it encounters a memory allocation
+ * error (out of memory).
+ *
+ * The specified table class must be one that is declared by using
+ * one of the table macros TIGHTDB_TABLE_*.
+ */
 -(BOOL)isClass:(Class)obj;
 
-/// If the type of this table is not compatible with the specified
-/// table class, then this method returns nil. It also returns nil if
-/// it encounters a memory allocation error (out of memory).
-///
-/// The specified table class must be one that is declared by using
-/// one of the table macros TIGHTDB_TABLE_*.
+/**
+ * If the type of this table is not compatible with the specified
+ * table class, then this method returns nil. It also returns nil if
+ * it encounters a memory allocation error (out of memory).
+ *
+ * The specified table class must be one that is declared by using
+ * one of the table macros TIGHTDB_TABLE_*.
+ */
 -(id)castClass:(Class)obj;
 
-//Column meta info
+/* Column meta info */
 -(size_t)getColumnCount;
 -(NSString *)getColumnName:(size_t)ndx;
 -(size_t)getColumnIndex:(NSString *)name;
@@ -123,8 +136,8 @@
 -(size_t)count;
 -(TightdbCursor *)addRow;
 
-// Only curser based add should be public. This is just a temporaray way to hide the methods.
-// TODO: Move to class extension.
+/* Only curser based add should be public. This is just a temporaray way to hide the methods. */
+/* TODO: Move to class extension. */
 -(size_t)_addRow;
 -(size_t)_addRowWithError:(NSError *__autoreleasing *)error;
 -(size_t)_addRows:(size_t)rowCount;
@@ -145,8 +158,8 @@
 -(BOOL)insertRow:(size_t)ndx;
 -(BOOL)insertRow:(size_t)ndx error:(NSError *__autoreleasing *)error;
 
-// Adaptive ints.
-// FIXME: Should be getInt:(int64_t)value inColumn:(size_t)colNdx andRow:(size_t)rowNdx;
+/* Adaptive ints. */
+/* FIXME: Should be getInt:(int64_t)value inColumn:(size_t)colNdx andRow:(size_t)rowNdx; */
 -(int64_t)get:(size_t)colNdx ndx:(size_t)ndx;
 -(BOOL)set:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;
 -(BOOL)set:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value error:(NSError *__autoreleasing *)error;
@@ -163,9 +176,9 @@
 -(BOOL)setDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value;
 -(BOOL)setDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value error:(NSError *__autoreleasing *)error;
 
-// NOTE: Low-level insert functions. Always insert in all columns at once
-// and call InsertDone after to avoid table getting un-balanced.
-// FIXME: Should be insertBool:(BOOL)value inColumn:(size_t)colNdx andRow:(size_t)rowNdx;
+/* NOTE: Low-level insert functions. Always insert in all columns at once
+   and call InsertDone after to avoid table getting un-balanced. */
+/* FIXME: Should be insertBool:(BOOL)value inColumn:(size_t)colNdx andRow:(size_t)rowNdx; */
 -(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value;
 -(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value error:(NSError *__autoreleasing *)error;
 -(BOOL)insertInt:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;
@@ -185,19 +198,19 @@
 -(BOOL)insertDone;
 -(BOOL)insertDoneWithError:(NSError *__autoreleasing *)error;
 
-// Strings
+/* Strings */
 -(NSString *)getString:(size_t)colNdx ndx:(size_t)ndx;
 -(BOOL)setString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value;
 -(BOOL)setString:(size_t)colNdx ndx:(size_t)ndx value:(NSString *)value error:(NSError *__autoreleasing *)error;
 
-// Binary
+/* Binary */
 -(TightdbBinary *)getBinary:(size_t)colNdx ndx:(size_t)ndx;
 -(BOOL)setBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value;
 -(BOOL)setBinary:(size_t)colNdx ndx:(size_t)ndx value:(TightdbBinary *)value error:(NSError *__autoreleasing *)error;
 -(BOOL)setBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size;
 -(BOOL)setBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size error:(NSError *__autoreleasing *)error;
 
-// Subtables
+/* Subtables */
 -(size_t)getTableSize:(size_t)colNdx ndx:(size_t)ndx;
 -(BOOL)insertSubtable:(size_t)colNdx ndx:(size_t)ndx;
 -(BOOL)insertSubtable:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
@@ -205,7 +218,7 @@
 -(BOOL)clearSubtable:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(BOOL)setSubtable:(size_t)col_ndx ndx:(size_t)ndx withTable:(TightdbTable *)subtable;
 
-// Mixed
+/* Mixed */
 -(TightdbMixed *)getMixed:(size_t)colNdx ndx:(size_t)ndx;
 -(TightdbType)getMixedType:(size_t)colNdx ndx:(size_t)ndx;
 -(BOOL)insertMixed:(size_t)colNdx ndx:(size_t)ndx value:(TightdbMixed *)value;
@@ -216,8 +229,8 @@
 -(size_t)addColumnWithType:(TightdbType)type andName:(NSString *)name;
 -(size_t)addColumnWithType:(TightdbType)type andName:(NSString *)name error:(NSError *__autoreleasing *)error;
 
-// Searching
-// FIXME: Should be findBool:(BOOL)value inColumn:(size_t)colNdx;
+/* Searching */
+/* FIXME: Should be findBool:(BOOL)value inColumn:(size_t)colNdx; */
 -(size_t)findBool:(size_t)colNdx value:(BOOL)value;
 -(size_t)findInt:(size_t)colNdx value:(int64_t)value;
 -(size_t)findFloat:(size_t)colNdx value:(float)value;
@@ -227,9 +240,9 @@
 -(size_t)findDate:(size_t)colNdx value:(time_t)value;
 -(size_t)findMixed:(size_t)colNdx value:(TightdbMixed *)value;
 
-// FIXME: The naming scheme used here is superior to the one used in
-// most of the other methods in this class. As time allows, this
-// scheme must be migrated to all those other methods.
+/* FIXME: The naming scheme used here is superior to the one used in
+   most of the other methods in this class. As time allows, this
+   scheme must be migrated to all those other methods. */
 -(TightdbView *)findAllBool:(BOOL)value              inColumn:(size_t)colNdx;
 -(TightdbView *)findAllInt:(int64_t)value            inColumn:(size_t)colNdx;
 -(TightdbView *)findAllFloat:(float)value            inColumn:(size_t)colNdx;
@@ -242,19 +255,19 @@
 -(TightdbQuery *)where;
 -(TightdbQuery *)whereWithError:(NSError *__autoreleasing *)error;
 
-// Indexing
+/* Indexing */
 -(BOOL)hasIndex:(size_t)colNdx;
 -(void)setIndex:(size_t)colNdx;
 
-// Optimizing
+/* Optimizing */
 -(BOOL)optimize;
 -(BOOL)optimizeWithError:(NSError *__autoreleasing *)error;
 
-// Conversion
-// FIXME: Do we want to conversion methods? Maybe use NSData.
+/* Conversion */
+/* FIXME: Do we want to conversion methods? Maybe use NSData. */
 
-// Aggregate functions
-// FIXME: Should be countInt:(int64_t)value inColumn:(size_t)colNdx;
+/* Aggregate functions */
+/* FIXME: Should be countInt:(int64_t)value inColumn:(size_t)colNdx; */
 -(size_t)countWithIntColumn:(size_t)colNdx andValue:(int64_t)target;
 -(size_t)countWithFloatColumn:(size_t)colNdx andValue:(float)target;
 -(size_t)countWithDoubleColumn:(size_t)colNdx andValue:(double)target;
@@ -276,7 +289,7 @@
 -(void)verify;
 #endif
 
-// Private
+/* Private */
 -(id)_initRaw;
 -(BOOL)_insertSubtableCopy:(size_t)colNdx row:(size_t)rowNdx subtable:(TightdbTable *)subtable;
 -(BOOL)_insertSubtableCopy:(size_t)colNdx row:(size_t)rowNdx subtable:(TightdbTable *)subtable error:(NSError *__autoreleasing *)error;
@@ -298,7 +311,7 @@
 -(size_t)getSourceIndex:(size_t)ndx;
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
-// Private
+/* Private */
 -(id)_initWithQuery:(TightdbQuery *)query;
 @end
 
