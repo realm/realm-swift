@@ -1,8 +1,8 @@
-TEST_PROGRAMS = unit-tests
+check_PROGRAMS = unit-tests
 
 unit_tests_SOURCES = \
 data_type.mm table.m group.m group_misc_2.m table_delete_all.m tutorial.m enumerator.m \
-get_subtable.m subtable.m mixed.m query.m shared_group.m err_handling.mm functional.m
+get_subtable.m subtable.m mixed.m query.m err_handling.mm functional.m shared_group.m
 
 #unit_tests_SOURCES = functional.m
 

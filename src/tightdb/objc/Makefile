@@ -1,7 +1,9 @@
 SUBDIRS = test
 test_DEPS = .
 
-INST_HEADERS = type.h cursor.h group.h query.h table.h group_shared.h helper_macros.h tightdb.h
+nobase_subinclude_HEADERS = type.h cursor.h group.h query.h table.h group_shared.h helper_macros.h tightdb.h
+
+nobase_subinclude_HEADERS_EXTRA_UNINSTALL = *.h
 
 lib_LIBRARIES = libtightdb-objc.a
 
@@ -32,24 +34,19 @@ libtightdb_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
 # http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning
 libtightdb_objc_a_VERSION = 2:0:0
 
-ifeq ($(DISABLE_CHEETAH_CODE_GEN),)
-GENERATED_SOURCES += tightdb.h
-endif
-
-include ../../generic.mk
 
 # Code generation
 ifeq ($(DISABLE_CHEETAH_CODE_GEN),)
+GENERATED_SOURCES += tightdb.h
 tightdb.h: tightdb.h.cheetah cheetah.sh
 	$(SHELL) cheetah.sh $< $@
 endif
 
-uninstall/extra:
-	$(RM) $(DESTDIR)$(includedir)/tightdb/objc/*.h
-	-rmdir $(DESTDIR)$(includedir)/tightdb/objc
-	-rmdir $(DESTDIR)$(includedir)/tightdb
 
 # Used by ../../../build.sh
 .PHONY: get-inst-headers
 get-inst-headers:
-	@echo $(INST_HEADERS)
+	@echo $(nobase_subinclude_HEADERS)
+
+
+include ../../generic.mk
