@@ -48,7 +48,7 @@ int main()
         for (PeopleTable_Cursor *curser in query)
             NSLog(@"Name: %lld", [curser Age]);
 
-        /* To avoid repeating the same quiry, the result may be stored in
+        /* To avoid repeating the same query, the result may be stored in
          * a table view for multiple access. The following code executes the
          * query once and saves the result in a table view. */
 
