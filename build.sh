@@ -461,6 +461,22 @@ EOF
         $MAKE check-doc-examples || exit 1
         ;;
 
+    "test-cover")
+        auto_configure || exit 1
+        $MAKE check-cover-norun || exit 1
+        TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.check-cover.XXXX)" || exit 1
+        mkdir -p "$TEMP_DIR/unit-tests-cov.octest/Contents/MacOS" || exit 1
+        cp "src/tightdb/objc/test/unit-tests-cov" "$TEMP_DIR/unit-tests-cov.octest/Contents/MacOS/" || exit 1
+        XCODE_HOME="$(xcode-select --print-path)" || exit 1
+        DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-cov.octest" || exit 1
+        echo "Generating binding coverage.."
+        gcovr --filter='.*/tightdb_objc/src/.*' -x > binding-coverage.xml
+        echo "Generating core coverage.."
+        gcovr --filter='.*/include/tightdb/.*' -x > core-coverage.xml
+        echo "Test passed."
+        exit 0
+        ;;
+
     "test-examples")
         auto_configure || exit 1
         $MAKE test -C "examples" || exit 1
