@@ -28,8 +28,9 @@ typedef BOOL(^TightdbSharedGroupWriteTransactionBlock)(TightdbGroup *group);
 @interface TightdbSharedGroup: NSObject
 +(TightdbSharedGroup *)sharedGroupWithFile:(NSString *)path withError:(NSError **)error;
 
-/* FIXME: How about renaming `readTransactionWithBlock` to `readWithBlock`? */
+/* FIXME: How about renaming `readTransactionWithBlock:` to `readWithBlock:`? */
 -(void)readTransactionWithBlock:(TightdbSharedGroupReadTransactionBlock)block;
+/* FIXME: How about renaming `writeTransactionWithError:withBlock:` to `writeWithBlock:andError:`? */
 -(BOOL)writeTransactionWithError:(NSError **)error withBlock:(TightdbSharedGroupWriteTransactionBlock)block;
 
 @end
