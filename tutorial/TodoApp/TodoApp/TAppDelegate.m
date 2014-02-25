@@ -8,7 +8,6 @@
 
 #import "TAppDelegate.h"
 #import <Tightdb/Tightdb.h>
-#import <Tightdb/group_shared.h>
 
 @implementation TAppDelegate
 

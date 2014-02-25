@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 #import <Tightdb/Tightdb.h>
-#import <Tightdb/group_shared.h>
 
 @interface TAppDelegate : UIResponder <UIApplicationDelegate>
 

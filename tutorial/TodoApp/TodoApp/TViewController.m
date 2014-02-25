@@ -9,7 +9,6 @@
 #import "TViewController.h"
 #import "TAppDelegate.h"
 #import <Tightdb/Tightdb.h>
-#import <Tightdb/group_shared.h>
 
 @interface TViewController ()
 

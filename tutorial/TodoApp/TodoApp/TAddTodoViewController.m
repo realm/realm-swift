@@ -10,7 +10,6 @@
 #import "TAppDelegate.h"
 #import "TViewController.h"
 #import <Tightdb/Tightdb.h>
-#import <Tightdb/group_shared.h>
 
 
 @interface TAddTodoViewController ()
