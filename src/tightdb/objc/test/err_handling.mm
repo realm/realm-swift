@@ -62,36 +62,21 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     TightdbGroup* group = [TightdbGroup group];
     // Create new table in group
-    PeopleErrTable* people = [group getTable:@"employees" withClass:[PeopleErrTable class]];
+    PeopleErrTable* people = [group getTable:@"employees" withClass:[PeopleErrTable class] error:nil];
 
+    // No longer supports errors, the tes may be redundant
     // Add some rows
-    error = nil;
-    if (![people addName:@"John" Age:20 Hired:YES error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-        STFail(@"This should have worked");
-    }
-    error = nil;
-    if (![people addName:@"Mary" Age:21 Hired:NO error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-        STFail(@"This should have worked");
-    }
-    if (![people addName:@"Lars" Age:21 Hired:YES error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-        STFail(@"This should have worked");
-    }
-    error = nil;
-    if (![people addName:@"Phil" Age:43 Hired:NO error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-        STFail(@"This should have worked");
-    }
-    error = nil;
-    if (![people addName:@"Anni" Age:54 Hired:YES error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-        STFail(@"This should have worked");
-    }
+
+    [people addName:@"John" Age:20 Hired:YES];
+    [people addName:@"Mary" Age:21 Hired:NO];
+    [people addName:@"Lars" Age:21 Hired:YES];
+    [people addName:@"Phil" Age:43 Hired:NO];
+    [people addName:@"Anni" Age:54 Hired:YES];
+
+
 
     // Insert at specific position
-    [people insertAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
+    [people insertRowAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
 
     // Getting the size of the table
     NSLog(@"PeopleErrTable Size: %lu - is %@.    [6 - not empty]", [people count],
@@ -102,7 +87,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     // Write the group to disk
     [fm removeItemAtPath:@"peopleErr.tightdb" error:NULL];
     error = nil;
-    if (![group write:@"peopleErr.tightdb" error:&error]) {
+    if (![group writeToFile:@"peopleErr.tightdb" withError:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"No error expected");
     }
@@ -126,10 +111,11 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     // Load a group from disk (and try to update, even though it is readonly)
     error = nil;
-    TightdbGroup* fromDisk = [TightdbGroup groupWithFilename:@"peopleErr.tightdb" error:&error];
+    TightdbGroup* fromDisk = [TightdbGroup groupWithFile:@"peopleErr.tightdb" withError:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
-    } else {
+    }
+    else {
         // This is no longer an error, becuase read/write mode is no longer required per default.
         // STFail(@"Since file cannot be opened, we should have gotten an error here.");
     }
@@ -147,25 +133,26 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     }
 
     error = nil;
-    fromDisk = [TightdbGroup groupWithFilename:@"peopleErr.tightdb" error:&error];
+    fromDisk = [TightdbGroup groupWithFile:@"peopleErr.tightdb" withError:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"File should have been possible to open");
     }
 
-    PeopleErrTable* diskTable = [fromDisk getTable:@"employees" withClass:[PeopleErrTable class]];
+    PeopleErrTable* diskTable = [fromDisk getTable:@"employees" withClass:[PeopleErrTable class] error:nil];
 
     // Fake readonly.
     [((TightdbTable*)diskTable) setReadOnly:true];
 
     NSLog(@"Disktable size: %zu", [diskTable count]);
 
+    /* No longer support for errors here
     error = nil;
     if (![diskTable addName:@"Anni" Age:54 Hired:YES error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
     } else {
         STFail(@"addName to readonly should have failed.");
-    }
+    }*/
 
     NSLog(@"Disktable size: %zu", [diskTable count]);
 }
@@ -308,7 +295,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
         // Add sub-tables
         if (i == 2) {
-            TightdbTable* subtable = [table getSubtable:8 ndx:i];
+            TightdbTable* subtable = [table getTableInColumn:8 atRow:i];
             if (![subtable insertInt:0 ndx:0 value:42 error:&error]) {
                 NSLog(@"%@", [error localizedDescription]);
                 STFail(@"Insert failed.");
