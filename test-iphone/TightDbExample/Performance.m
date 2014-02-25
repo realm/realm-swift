@@ -67,7 +67,7 @@ TIGHTDB_TABLE_4(PerfTable,
     }
     [table addName:@"Sparse" Age:41 Hired:NO Spare:2];
 
-    NSLog(@"Age verify: %lld", [table getIntInColumn:1000 atRow:1]);
+    NSLog(@"Age verify: %lld", [table getIntInColumn:1 atRow:1000]);
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
         [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Inserted %i records in %.2f s",_size, stop-start]];
