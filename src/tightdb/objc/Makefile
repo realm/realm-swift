@@ -46,7 +46,7 @@ endif
 # Used by ../../../build.sh
 .PHONY: get-inst-headers
 get-inst-headers:
-	@echo $(subinclude_HEADERS)
+	@echo $(nobase_subinclude_HEADERS)
 
 
 include ../../generic.mk
