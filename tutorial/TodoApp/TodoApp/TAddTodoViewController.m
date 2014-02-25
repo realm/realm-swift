@@ -38,6 +38,7 @@
     
     // Only add to db if todoName has been entered
     if(todo.length > 0) {
+        
         TAppDelegate* delegate = (TAppDelegate*)[[UIApplication sharedApplication]delegate];
             
         [delegate.sharedGroup writeTransaction:^(TightdbGroup *tnx) {

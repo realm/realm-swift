@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D302E8418BCA4DF0086A628 /* Tightdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D302E8318BCA4DF0086A628 /* Tightdb.framework */; };
 		4D54FC9218B7913B002AD81E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC9118B7913B002AD81E /* Foundation.framework */; };
 		4D54FC9418B7913B002AD81E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC9318B7913B002AD81E /* CoreGraphics.framework */; };
 		4D54FC9618B7913B002AD81E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC9518B7913B002AD81E /* UIKit.framework */; };
@@ -22,7 +23,6 @@
 		4D54FCB618B7913B002AD81E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC9518B7913B002AD81E /* UIKit.framework */; };
 		4D54FCBE18B7913B002AD81E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D54FCBC18B7913B002AD81E /* InfoPlist.strings */; };
 		4D54FCC018B7913B002AD81E /* TodoAppTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D54FCBF18B7913B002AD81E /* TodoAppTests.m */; };
-		4D54FCCA18B791D3002AD81E /* Tightdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FCC918B791D3002AD81E /* Tightdb.framework */; };
 		4D54FCCC18B791DD002AD81E /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FCCB18B791DD002AD81E /* libstdc++.dylib */; };
 		4D54FCCF18B79224002AD81E /* TAddTodoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D54FCCE18B79224002AD81E /* TAddTodoViewController.m */; };
 /* End PBXBuildFile section */
@@ -38,6 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4D302E8318BCA4DF0086A628 /* Tightdb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Tightdb.framework; path = ../../Tightdb.framework; sourceTree = "<group>"; };
 		4D54FC8E18B7913B002AD81E /* TodoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TodoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D54FC9118B7913B002AD81E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4D54FC9318B7913B002AD81E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -58,7 +59,6 @@
 		4D54FCBB18B7913B002AD81E /* TodoAppTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TodoAppTests-Info.plist"; sourceTree = "<group>"; };
 		4D54FCBD18B7913B002AD81E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4D54FCBF18B7913B002AD81E /* TodoAppTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TodoAppTests.m; sourceTree = "<group>"; };
-		4D54FCC918B791D3002AD81E /* Tightdb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Tightdb.framework; sourceTree = "<group>"; };
 		4D54FCCB18B791DD002AD81E /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
 		4D54FCCD18B79224002AD81E /* TAddTodoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAddTodoViewController.h; sourceTree = "<group>"; };
 		4D54FCCE18B79224002AD81E /* TAddTodoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAddTodoViewController.m; sourceTree = "<group>"; };
@@ -71,9 +71,9 @@
 			files = (
 				4D54FCCC18B791DD002AD81E /* libstdc++.dylib in Frameworks */,
 				4D54FC9418B7913B002AD81E /* CoreGraphics.framework in Frameworks */,
+				4D302E8418BCA4DF0086A628 /* Tightdb.framework in Frameworks */,
 				4D54FC9618B7913B002AD81E /* UIKit.framework in Frameworks */,
 				4D54FC9218B7913B002AD81E /* Foundation.framework in Frameworks */,
-				4D54FCCA18B791D3002AD81E /* Tightdb.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,8 +112,8 @@
 		4D54FC9018B7913B002AD81E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4D302E8318BCA4DF0086A628 /* Tightdb.framework */,
 				4D54FCCB18B791DD002AD81E /* libstdc++.dylib */,
-				4D54FCC918B791D3002AD81E /* Tightdb.framework */,
 				4D54FC9118B7913B002AD81E /* Foundation.framework */,
 				4D54FC9318B7913B002AD81E /* CoreGraphics.framework */,
 				4D54FC9518B7913B002AD81E /* UIKit.framework */,
@@ -362,7 +362,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -405,17 +405,22 @@
 		4D54FCC418B7913B002AD81E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/mk/git/git/tightdb_objc/tutorial/TodoApp,
+					/Users/mk/git/git/tightdb_objc,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TodoApp/TodoApp-Prefix.pch";
 				INFOPLIST_FILE = "TodoApp/TodoApp-Info.plist";
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 1;
+				VALID_ARCHS = "arm64 armv7 armv7s";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -423,17 +428,22 @@
 		4D54FCC518B7913B002AD81E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/mk/git/git/tightdb_objc/tutorial/TodoApp,
+					/Users/mk/git/git/tightdb_objc,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TodoApp/TodoApp-Prefix.pch";
 				INFOPLIST_FILE = "TodoApp/TodoApp-Info.plist";
+				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 1;
+				VALID_ARCHS = "arm64 armv7 armv7s";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -499,6 +509,7 @@
 				4D54FCC518B7913B002AD81E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4D54FCC618B7913B002AD81E /* Build configuration list for PBXNativeTarget "TodoAppTests" */ = {
 			isa = XCConfigurationList;
@@ -507,6 +518,7 @@
 				4D54FCC818B7913B002AD81E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
