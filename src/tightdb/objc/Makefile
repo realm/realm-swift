@@ -1,7 +1,7 @@
 SUBDIRS = test
 test_DEPS = .
 
-nobase_subinclude_HEADERS = type.h cursor.h group.h query.h table.h group_shared.h helper_macros.h tightdb.h
+nobase_subinclude_HEADERS = type.h cursor.h group.h query.h table.h group_shared.h helper_macros.h table_macros.h tightdb.h
 
 nobase_subinclude_HEADERS_EXTRA_UNINSTALL = *.h
 
