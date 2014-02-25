@@ -27,9 +27,14 @@ int main()
         cursor.Name = @"Sofie";
         cursor.Age = 40;
 
+/*
         [table addOrInsertRowAtIndex:[table count]
                                 Name:@"Jesper"
                                  Age:200];
+*/
+        cursor = [table addRow];
+        cursor.Name = @"Jesper";
+        cursor.Age = 200;
 
         NSLog(@"The size of the table is now %zd", [table count]);
 
