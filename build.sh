@@ -303,8 +303,8 @@ case "$MODE" in
         else
             tightdb_echo "Could not find home of TightDB core library built for iPhone"
         fi
-	
-	touch "$CONFIG_MK" || { echo "Can't overwrite $CONFIG_MK." ; exit 1 ; }
+
+	touch "$CONFIG_MK" || { echo "Can't overwrite $CONFIG_MK."; exit 1; }
 
         cat >"$CONFIG_MK" <<EOF
 INSTALL_PREFIX      = $install_prefix
@@ -423,42 +423,61 @@ EOF
 	;;
 
     "test")
-        require_config || exit 1
-        $MAKE test-norun || exit 1
+        auto_configure || exit 1
+        $MAKE check-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test.XXXX)" || exit 1
         mkdir -p "$TEMP_DIR/unit-tests.octest/Contents/MacOS" || exit 1
         cp "src/tightdb/objc/test/unit-tests" "$TEMP_DIR/unit-tests.octest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests.octest" || exit 1
+        DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests.octest" || exit 1
         echo "Test passed"
         exit 0
         ;;
 
     "test-debug")
-        require_config || exit 1
-        $MAKE test-debug-norun || exit 1
+        auto_configure || exit 1
+        $MAKE check-debug-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test-debug.XXXX)" || exit 1
         mkdir -p "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS" || exit 1
         cp "src/tightdb/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest" || exit 1
+        DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest" || exit 1
         echo "Test passed"
         exit 0
         ;;
 
     "test-gdb")
-        require_config || exit 1
-        $MAKE test-debug-norun || exit 1
+        auto_configure || exit 1
+        $MAKE check-debug-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test-gdb.XXXX)" || exit 1
         mkdir -p "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS" || exit 1
         cp "src/tightdb/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        OBJC_DISABLE_GC=YES gdb --args "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest"
+        DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" OBJC_DISABLE_GC=YES gdb --args "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest"
+        ;;
+
+    "check-doc-examples")
+        auto_configure || exit 1
+        $MAKE check-doc-examples || exit 1
+        ;;
+
+    "test-cover")
+        auto_configure || exit 1
+        $MAKE check-cover-norun || exit 1
+        TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.check-cover.XXXX)" || exit 1
+        mkdir -p "$TEMP_DIR/unit-tests-cov.octest/Contents/MacOS" || exit 1
+        cp "src/tightdb/objc/test/unit-tests-cov" "$TEMP_DIR/unit-tests-cov.octest/Contents/MacOS/" || exit 1
+        XCODE_HOME="$(xcode-select --print-path)" || exit 1
+        DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-cov.octest" || exit 1
+        echo "Generating 'gcovr.xml'.."
+        gcovr -f '.*/tightdb_objc/src/.*' -e '.*/test/.*' -x > gcovr.xml
+        echo "Test passed."
+        exit 0
         ;;
 
     "test-examples")
-        require_config || exit 1
-        $MAKE test  -C "examples" || exit 1
+        auto_configure || exit 1
+        $MAKE test -C "examples" || exit 1
         ;;
 
     "install-report")
@@ -492,14 +511,14 @@ EOF
 
     "install-prod")
         require_config || exit 1
-        $MAKE install-only DESTDIR="$DESTDIR" INSTALL_FILTER=shared-libs || exit 1
+        $MAKE install-only DESTDIR="$DESTDIR" INSTALL_FILTER="shared-libs,progs" || exit 1
         tightdb_echo "Done installing"
         exit 0
         ;;
 
     "install-devel")
         require_config || exit 1
-        $MAKE install-only DESTDIR="$DESTDIR" INSTALL_FILTER=static-libs,progs,headers || exit 1
+        $MAKE install-only DESTDIR="$DESTDIR" INSTALL_FILTER="static-libs,dev-progs,headers" || exit 1
         tigtdb_echo "Done installing"
         exit 0
         ;;
@@ -513,14 +532,14 @@ EOF
 
     "uninstall-prod")
         require_config || exit 1
-        $MAKE uninstall INSTALL_FILTER=shared-libs || exit 1
+        $MAKE uninstall INSTALL_FILTER="shared-libs,progs" || exit 1
         echo "Done uninstalling"
         exit 0
         ;;
 
     "uninstall-devel")
         require_config || exit 1
-        $MAKE uninstall INSTALL_FILTER=static-libs,progs,extra || exit 1
+        $MAKE uninstall INSTALL_FILTER="static-libs,dev-progs,headers" || exit 1
         echo "Done uninstalling"
         exit 0
         ;;
@@ -532,7 +551,7 @@ EOF
         export TIGHTDB_OBJC_INCLUDEDIR="$install_includedir"
         export TIGHTDB_OBJC_LIBDIR="$install_libdir"
         $MAKE -C "test-installed" clean || exit 1
-        $MAKE -C "test-installed" test  || exit 1
+        $MAKE -C "test-installed" check  || exit 1
         echo "Test passed"
         exit 0
         ;;
@@ -574,10 +593,13 @@ EOF
         ;;
 
     *)
-        echo "Unspecified or bad mode '$MODE'" 1>&2
-        echo "Available modes are: config clean build build-iphone test test-debug test-gdb show-install install uninstall test-installed" 1>&2
-        echo "As well as: install-prod install-devel uninstall-prod uninstall-devel dist-copy" 1>&2
-	echo "As wall as: ios-framework"
+        cat << EOF
+Unspecified or bad mode '$MODE'.
+Available modes are:
+  config clean build build-iphone test test-debug test-gdb test-cover
+  show-install install uninstall test-installed install-prod install-devel
+  uninstall-prod uninstall-devel dist-copy ios-framework
+EOF
         exit 1
         ;;
 
