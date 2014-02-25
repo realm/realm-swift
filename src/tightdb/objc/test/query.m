@@ -167,32 +167,32 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         TightdbBinary *bin1 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin / 2];
         TightdbBinary *bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
 
-        // TODO: Rewrite test for cursor based add.
+        // Using private method just for the sake of testing the setters below.
         [table _addRows:2];
 
-        [table setBool:BOOL_COL ndx:0 value:YES];
-        [table setBool:BOOL_COL ndx:1 value:NO];
+        [table setBool:YES inColumn:BOOL_COL atRow:0];
+        [table setBool:NO inColumn:BOOL_COL atRow:1];
 
-        [table set:INT_COL ndx:0 value:0];
-        [table set:INT_COL ndx:1 value:860];
+        [table setInt:0 inColumn:INT_COL atRow:0];
+        [table setInt:860 inColumn:INT_COL atRow:1];
 
-        [table setFloat:FLOAT_COL ndx:0 value:0];
-        [table setFloat:FLOAT_COL ndx:1 value:5.6];
+        [table setFloat:0 inColumn:FLOAT_COL atRow:0];
+        [table setFloat:5.6 inColumn:FLOAT_COL atRow:1];
 
-        [table setDouble:DOUBLE_COL ndx:0 value:0];
-        [table setDouble:DOUBLE_COL ndx:1 value:5.6];
+        [table setDouble:0 inColumn:DOUBLE_COL atRow:0];
+        [table setDouble:5.6 inColumn:DOUBLE_COL atRow:1];
 
-        [table setString:STRING_COL ndx:0 value:@""];
-        [table setString:STRING_COL ndx:1 value:@"foo"];
+        [table setString:@"" inColumn:STRING_COL atRow:0];
+        [table setString:@"foo" inColumn:STRING_COL atRow:1];
 
-        [table setBinary:BINARY_COL ndx:0 value:bin1];
-        [table setBinary:BINARY_COL ndx:1 value:bin2];
+        [table setBinary:bin1 inColumn:BINARY_COL atRow:0];
+        [table setBinary:bin2 inColumn:BINARY_COL atRow:1];
 
-        [table setDate:DATE_COL ndx:0 value:0];
-        [table setDate:DATE_COL ndx:1 value:timeNow];
+        [table setDate:0 inColumn:DATE_COL atRow:0];
+        [table setDate:timeNow inColumn:DATE_COL atRow:1];
 
-        [table setMixed:MIXED_COL ndx:0 value:mixInt1];
-        [table setMixed:MIXED_COL ndx:1 value:mixString];
+        [table setMixed:mixInt1 inColumn:MIXED_COL atRow:0];
+        [table setMixed:mixString inColumn:MIXED_COL atRow:1];
 
         // Conditions (note that count is invoked to get the number of matches)
 
@@ -253,21 +253,22 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
 - (void)testFind
 {
-    TightdbTable *table = [[TightdbTable alloc]init];
+    TightdbTable* table = [[TightdbTable alloc]init];
     [table addColumnWithType:tightdb_Int andName:@"IntCol"];
     [table _addRows:6];
-    [table set:0 ndx:0 value:10];
-    [table set:0 ndx:1 value:42];
-    [table set:0 ndx:2 value:27];
-    [table set:0 ndx:3 value:31];
-    [table set:0 ndx:4 value:8];
-    [table set:0 ndx:5 value:39];
 
-    STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:0], (size_t)2, @"find");
-    STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:3], (size_t)3, @"find");
-    STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:4], (size_t)5, @"find");
+    [table setInt:10 inColumn:0 atRow:0];
+    [table setInt:42 inColumn:0 atRow:1];
+    [table setInt:27 inColumn:0 atRow:2];
+    [table setInt:31 inColumn:0 atRow:3];
+    [table setInt:8  inColumn:0 atRow:4];
+    [table setInt:39 inColumn:0 atRow:5];
+
+    STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:0], (size_t)2,  @"find");
+    STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:3], (size_t)3,  @"find");
+    STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:4], (size_t)5,  @"find");
     STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:6], (size_t)-1, @"find");
-    STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:3], (size_t)3, @"find");
+    STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:3], (size_t)3,  @"find");
     // jjepsen: disabled this test, perhaps it's not relevant after query sematics update.
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (size_t)-1, @"find");
 }

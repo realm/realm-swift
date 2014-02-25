@@ -47,43 +47,6 @@ private:
     std::size_t m_size;
 };
 
-enum TightdbErr {
-    tdb_err_Ok = 0,
-    tdb_err_Fail = 1,
-    tdb_err_FailRdOnly = 2,
-    tdb_err_FileAccess = 3,
-    tdb_err_Resource = 4,
-};
-
-inline NSError* make_tightdb_error(TightdbErr code, NSString *desc)
-{
-    NSMutableDictionary* details = [NSMutableDictionary dictionary];
-    [details setValue:desc forKey:NSLocalizedDescriptionKey];
-    return [NSError errorWithDomain:@"com.tightdb" code:code userInfo:details];
-}
-
-#define TIGHTDB_OBJC_SIZE_T_NUMBER_IN numberWithUnsignedLong
-#define TIGHTDB_OBJC_SIZE_T_NUMBER_OUT unsignedLongValue
-
-#define TIGHTDB_EXCEPTION_ERRHANDLER(action, failReturnValue) TIGHTDB_EXCEPTION_ERRHANDLER_EX(action, failReturnValue, error)
-#define TIGHTDB_EXCEPTION_ERRHANDLER_EX(action, failReturnValue, errVar) try { action }  \
-catch(tightdb::util::File::AccessError &ex) { \
-    if (errVar) \
-        *errVar = make_tightdb_error(tdb_err_FileAccess, [NSString stringWithUTF8String:ex.what()]); \
-        return failReturnValue; \
-} \
-catch(tightdb::ResourceAllocError &ex) { \
-    if (errVar) \
-        *errVar = make_tightdb_error(tdb_err_Resource, [NSString stringWithUTF8String:ex.what()]); \
-        return failReturnValue; \
-} \
-catch (std::exception &ex) { \
-    if (errVar) \
-        *errVar = make_tightdb_error(tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]); \
-        return failReturnValue; \
-}
-
-
 inline NSString* to_objc_string(tightdb::StringData s)
 {
     using namespace std;
@@ -93,6 +56,91 @@ inline NSString* to_objc_string(tightdb::StringData s)
     if (util::int_cast_with_overflow_detect(s.size(), size))
         throw runtime_error("String size overflow");
     return [[NSString alloc] initWithBytes:data length:size encoding:NSUTF8StringEncoding];
+}
+
+
+// Still used in the new error strategy. Perhaps it should be public?
+enum TightdbErr {
+    tdb_err_Ok                    = 0,
+    tdb_err_Fail                  = 1,
+    tdb_err_FailRdOnly            = 2,
+    tdb_err_File_AccessError      = 3,
+    tdb_err_File_PermissionDenied = 4,
+    tdb_err_File_Exists           = 5,
+    tdb_err_File_NotFound         = 6,
+    tdb_err_Rollback              = 7,
+    tdb_err_InvalidDatabase       = 8,
+    tdb_err_TableNotFound         = 9
+};
+
+inline NSError* make_tightdb_error(TightdbErr code, NSString* desc)
+{
+    NSMutableDictionary* details = [NSMutableDictionary dictionary];
+    [details setValue:desc forKey:NSLocalizedDescriptionKey];
+    return [NSError errorWithDomain:@"com.tightdb" code:code userInfo:details];
+}
+
+#define TIGHTDB_OBJC_SIZE_T_NUMBER_IN numberWithUnsignedLong
+#define TIGHTDB_OBJC_SIZE_T_NUMBER_OUT unsignedLongValue
+
+#define TIGHTDB_EXCEPTION_ERRHANDLER(action, fail_return_value) \
+TIGHTDB_EXCEPTION_ERRHANDLER_EX(action, fail_return_value, error)
+
+// This is the old macro, which should be phased out.
+#define TIGHTDB_EXCEPTION_ERRHANDLER_EX(action, fail_return_value, err_var) \
+try { action } \
+catch (tightdb::util::File::AccessError& ex) { \
+    if (err_var) \
+        *err_var = make_tightdb_error(tdb_err_File_AccessError, [NSString stringWithUTF8String:ex.what()]); \
+        return fail_return_value; \
+} \
+catch (std::exception& ex) { \
+    if (err_var) \
+        *err_var = make_tightdb_error(tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]); \
+        return fail_return_value; \
+}
+
+// This macro is part of the new error strategy, specifically for table value setters.
+#define TIGHTDB_EXCEPTION_HANDLER_SETTERS(action, datatype) \
+if (m_read_only) { \
+    NSException* exception = [NSException exceptionWithName:@"tightdb:table_is_read_only" \
+                                          reason:@"You tried to modify an immutable table" \
+                                          userInfo:[NSMutableDictionary dictionary]]; \
+    [exception raise]; \
+} \
+if (col_ndx >= [self getColumnCount]) { \
+    NSException* exception = [NSException exceptionWithName:@"tightdb:column_index_out_of_bounds" \
+                                          reason:@"The specified column index is not within the table bounds" \
+                                          userInfo:[NSMutableDictionary dictionary]]; \
+    [exception raise]; \
+} \
+if ([self getColumnType:col_ndx] != datatype) { \
+    NSException* exception = [NSException exceptionWithName:@"tightdb:illegal_type" \
+                                          reason:@"The supplied type is not compatible with the column type" \
+                                          userInfo:[NSMutableDictionary dictionary]]; \
+    [exception raise]; \
+} \
+if (row_ndx >= [self count]) { \
+    NSException* exception = [NSException exceptionWithName:@"tightdb:row_index_out_of_bounds" \
+                                          reason:@"The specified row index is not within the table bounds" \
+                                          userInfo:[NSMutableDictionary dictionary]]; \
+    [exception raise]; \
+} \
+try { action } \
+catch(std::exception& ex) { \
+    NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception" \
+                                          reason:[NSString stringWithUTF8String:ex.what()] \
+                                          userInfo:[NSMutableDictionary dictionary]]; \
+    [exception raise]; \
+}
+
+#define TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(action) \
+try { action } \
+catch(std::exception& ex) { \
+    NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception" \
+                                          reason:[NSString stringWithUTF8String:ex.what()] \
+                                          userInfo:[NSMutableDictionary dictionary]]; \
+    [exception raise]; \
 }
 
 #endif // TIGHTDB_OBJC_UTIL_HPP
