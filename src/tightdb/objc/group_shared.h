@@ -21,16 +21,13 @@
 #import <Foundation/Foundation.h>
 #import <tightdb/objc/group.h>
 
-/* FIXME: How about renaming `TightdbSharedGroupReadTransactionBlock` to `TightdbReadBlock`? */
-typedef void(^TightdbSharedGroupReadTransactionBlock)(TightdbGroup *group);
-typedef BOOL(^TightdbSharedGroupWriteTransactionBlock)(TightdbGroup *group);
+typedef void(^TightdbReadBlock)(TightdbGroup *group);
+typedef BOOL(^TightdbWriteBlock)(TightdbGroup *group);
 
 @interface TightdbSharedGroup: NSObject
 +(TightdbSharedGroup *)sharedGroupWithFile:(NSString *)path withError:(NSError **)error;
 
-/* FIXME: How about renaming `readTransactionWithBlock:` to `readWithBlock:`? */
--(void)readTransactionWithBlock:(TightdbSharedGroupReadTransactionBlock)block;
-/* FIXME: How about renaming `writeTransactionWithError:withBlock:` to `writeWithBlock:andError:`? */
--(BOOL)writeTransactionWithError:(NSError **)error withBlock:(TightdbSharedGroupWriteTransactionBlock)block;
+-(void)readWithBlock:(TightdbReadBlock)block;
+-(BOOL)writeWithBlock:(TightdbWriteBlock)block withError:(NSError **)error;
 
 @end

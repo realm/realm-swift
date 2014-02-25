@@ -309,7 +309,7 @@ TIGHTDB_TABLE_4(PerfTable,
 {
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
     TightdbSharedGroup *fromDisk = [TightdbSharedGroup sharedGroupWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
-    [fromDisk readTransactionWithBlock:^(TightdbGroup *group) {
+    [fromDisk readWithBlock:^(TightdbGroup *group) {
         PerfTable *diskTable = [group getTable:@"employees" withClass:[PerfTable class] error:nil];
 
         // Create query (current employees between 20 and 30 years old)
@@ -333,7 +333,7 @@ TIGHTDB_TABLE_4(PerfTable,
 {
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
     TightdbSharedGroup *fromDisk = [TightdbSharedGroup sharedGroupWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
-    [fromDisk writeTransactionWithError:nil withBlock:^(TightdbGroup *group) {
+    [fromDisk writeWithBlock:^(TightdbGroup *group) {
         PerfTable *diskTable = [group getTable:@"employees" withClass:[PerfTable class] error:nil];
 
         // Add some rows
@@ -344,7 +344,7 @@ TIGHTDB_TABLE_4(PerfTable,
         [diskTable addName:@"Sparse" Age:41 Hired:NO Spare:2];
 
         return YES; // Commit transaction
-    }];
+    } withError:nil];
 
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
