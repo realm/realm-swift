@@ -6,9 +6,8 @@
 //
 
 #import <sqlite3.h>
-#import <tightdb/objc/tightdb.h>
-#import <tightdb/objc/group.h>
-#import <tightdb/objc/group_shared.h>
+#import <Tightdb/Tightdb.h>
+#import <Tightdb/group_shared.h>
 
 #import "Performance.h"
 #import "Utils.h"
