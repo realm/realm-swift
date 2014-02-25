@@ -51,7 +51,7 @@ using namespace std;
 {
     return m_data == bin->m_data;
 }
--(tightdb::BinaryData)getNativeBinary
+-(tightdb::BinaryData&)getNativeBinary
 {
     return m_data;
 }
@@ -457,6 +457,8 @@ using namespace std;
     TightdbCursor* m_tmp_cursor;
 }
 
+
+
 -(id)init
 {
     self = [super init];
@@ -535,60 +537,14 @@ using namespace std;
     m_read_only = read_only;
 }
 
+-(BOOL)isReadOnly
+{
+    return m_read_only;
+}
+
 -(BOOL)isEqual:(TightdbTable*)other
 {
     return *m_table == *other->m_table;
-}
-
--(BOOL)setSubtable:(size_t)col_ndx ndx:(size_t)ndx withTable:(TightdbTable*)subtable
-{
-    // TODO: Use core method for checking the equality of two table specs. Even in the typed interface
-    // the user might add columns (_checkType for typed and spec against spec for dynamic).
-
-    tightdb::DataType t = m_table->get_column_type(col_ndx);
-    if (t == tightdb::type_Table) {
-        // TODO: Handle any exeptions from core lib.
-        m_table->set_subtable(col_ndx, ndx, &subtable.getNativeTable);
-        return YES;
-    }
-    return NO;
-}
-
--(TightdbTable*)getSubtable:(size_t)col_ndx ndx:(size_t)ndx
-{
-    tightdb::DataType type = m_table->get_column_type(col_ndx);
-    if (type != tightdb::type_Table)
-        return nil;
-    tightdb::TableRef table = m_table->get_subtable(col_ndx, ndx);
-    if (!table)
-        return nil;
-    TightdbTable* table_2 = [[TightdbTable alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table_2))
-        return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    return table_2;
-}
-
-// FIXME: Check that the specified class derives from TightdbTable.
--(id)getSubtable:(size_t)col_ndx ndx:(size_t)ndx withClass:(__unsafe_unretained Class)class_obj
-{
-    tightdb::DataType type = m_table->get_column_type(col_ndx);
-    if (type != tightdb::type_Table)
-        return nil;
-    tightdb::TableRef table = m_table->get_subtable(col_ndx, ndx);
-    if (!table)
-        return nil;
-    TightdbTable* table_2 = [[class_obj alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table_2))
-        return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    if (![table_2 _checkType])
-        return nil;
-    return table_2;
 }
 
 // FIXME: Check that the specified class derives from TightdbTable.
@@ -667,34 +623,37 @@ using namespace std;
     return [[TightdbCursor alloc] initWithTable:self ndx:[self _addRow]];
 }
 
+
 -(size_t)_addRow
 {
-    return [self _addRowWithError:nil];
-}
--(size_t)_addRowWithError:(NSError* __autoreleasing*)error
-{
-    if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, @"Tried to add row while read-only.");
-        return NO;
-    }
-    TIGHTDB_EXCEPTION_ERRHANDLER(return m_table->add_empty_row();, 0);
+    return [self _addRows:1];
 }
 
 -(size_t)_addRows:(size_t)num_rows
 {
-    return [self _addRows:num_rows error:nil];
+    // TODO: Use a macro or a function for error handling
+
+    if(m_read_only) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:table_is_read_only"
+                                                         reason:@"You tried to modify a table in read only mode"
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
+
+    size_t index;
+    try {
+        index = m_table->add_empty_row(num_rows);
+    }
+    catch(std::exception& ex) {
+        NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                         reason:[NSString stringWithUTF8String:ex.what()]
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
+
+    return index;
 }
 
--(size_t)_addRows:(size_t)num_rows error:(NSError* __autoreleasing*)error
-{
-    if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, @"Tried to add row while read-only.");
-        return NO;
-    }
-    TIGHTDB_EXCEPTION_ERRHANDLER(return m_table->add_empty_row(num_rows);, 0);
-}
 
 -(TightdbCursor*)cursorAtIndex:(size_t)ndx
 {
@@ -777,110 +736,176 @@ using namespace std;
     TIGHTDB_EXCEPTION_ERRHANDLER(m_table->remove_last();, NO);
     return YES;
 }
--(int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
+
+
+-(BOOL)getBoolInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
-    return m_table->get_int(col_ndx, ndx);
+    return m_table->get_bool(col_ndx, row_ndx);
 }
 
--(BOOL)set:(size_t)col_ndx ndx:(size_t)ndx value:(int64_t)value
+-(int64_t)getIntInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
-    return [self set:col_ndx ndx:ndx value:value error:nil];
+    return m_table->get_int(col_ndx, row_ndx);
 }
 
--(BOOL)set:(size_t)col_ndx ndx:(size_t)ndx value:(int64_t)value error:(NSError* __autoreleasing*)error
+-(float)getFloatInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
-    if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
-        return NO;
-    }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->set_int(col_ndx, ndx, value);, NO);
-    return YES;
+    return m_table->get_float(col_ndx, row_ndx);
 }
 
--(BOOL)getBool:(size_t)col_ndx ndx:(size_t)ndx
+-(double)getDoubleInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
-    return m_table->get_bool(col_ndx, ndx);
+    return m_table->get_double(col_ndx, row_ndx);
 }
 
--(BOOL)setBool:(size_t)col_ndx ndx:(size_t)ndx value:(BOOL)value
+-(NSString*)getStringInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
-    return [self setBool:col_ndx ndx:ndx value:value error:nil];
+    return to_objc_string(m_table->get_string(col_ndx, row_ndx));
 }
 
--(BOOL)setBool:(size_t)col_ndx ndx:(size_t)ndx value:(BOOL)value error:(NSError* __autoreleasing*)error
+-(TightdbBinary*)getBinaryInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
-    if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
-        return NO;
-    }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->set_bool(col_ndx, ndx, value);, NO);
-    return YES;
+    return [[TightdbBinary alloc] initWithBinary:m_table->get_binary(col_ndx, row_ndx)];
 }
 
--(float)getFloat:(size_t)col_ndx ndx:(size_t)ndx
+-(time_t)getDateInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
-    return m_table->get_float(col_ndx, ndx);
+    return m_table->get_datetime(col_ndx, row_ndx).get_datetime();
 }
 
--(BOOL)setFloat:(size_t)col_ndx ndx:(size_t)ndx value:(float)value
+-(TightdbTable*)getTableInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
-    return [self setFloat:col_ndx ndx:ndx value:value error:nil];
+    tightdb::DataType type = m_table->get_column_type(col_ndx);
+    if (type != tightdb::type_Table)
+        return nil;
+    tightdb::TableRef table = m_table->get_subtable(col_ndx, row_ndx);
+    if (!table)
+        return nil;
+    TightdbTable* table_2 = [[TightdbTable alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!table_2))
+        return nil;
+    [table_2 setNativeTable:table.get()];
+    [table_2 setParent:self];
+    [table_2 setReadOnly:m_read_only];
+    return table_2;
 }
 
--(BOOL)setFloat:(size_t)col_ndx ndx:(size_t)ndx value:(float)value error:(NSError* __autoreleasing*)error
+// FIXME: Check that the specified class derives from TightdbTable.
+-(id)getTableInColumn:(size_t)col_ndx atRow:(size_t)row_ndx withClass:(__unsafe_unretained Class)class_obj
 {
-    if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
-        return NO;
-    }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->set_float(col_ndx, ndx, value);, NO);
-    return YES;
+    tightdb::DataType type = m_table->get_column_type(col_ndx);
+    if (type != tightdb::type_Table)
+        return nil;
+    tightdb::TableRef table = m_table->get_subtable(col_ndx, row_ndx);
+    if (!table)
+        return nil;
+    TightdbTable* table_2 = [[class_obj alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!table))
+        return nil;
+    [table_2 setNativeTable:table.get()];
+    [table_2 setParent:self];
+    [table_2 setReadOnly:m_read_only];
+    if (![table_2 _checkType])
+        return nil;
+    return table_2;
 }
 
--(double)getDouble:(size_t)col_ndx ndx:(size_t)ndx
+-(TightdbMixed*)getMixedInColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
-    return m_table->get_double(col_ndx, ndx);
+    tightdb::Mixed mixed = m_table->get_mixed(col_ndx, row_ndx);
+    if (mixed.get_type() != tightdb::type_Table)
+        return [TightdbMixed mixedWithNativeMixed:mixed];
+
+    tightdb::TableRef table = m_table->get_subtable(col_ndx, row_ndx);
+    if (!table)
+        return nil;
+    TightdbTable* table_2 = [[TightdbTable alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!table_2))
+        return nil;
+    [table_2 setNativeTable:table.get()];
+    [table_2 setParent:self];
+    [table_2 setReadOnly:m_read_only];
+    if (![table_2 _checkType])
+        return nil;
+
+    return [TightdbMixed mixedWithTable:table_2];
 }
 
--(BOOL)setDouble:(size_t)col_ndx ndx:(size_t)ndx value:(double)value
+
+-(void)setBool:(BOOL)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
-    return [self setDouble:col_ndx ndx:ndx value:value error:nil];
+    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+        m_table->set_bool(col_ndx, row_ndx, value);,
+        tightdb_Bool);
 }
 
--(BOOL)setDouble:(size_t)col_ndx ndx:(size_t)ndx value:(double)value error:(NSError* __autoreleasing*)error
+-(void)setInt:(int64_t)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
-    if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
-        return NO;
-    }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->set_double(col_ndx, ndx, value);, NO);
-    return YES;
+    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+        m_table->set_int(col_ndx, row_ndx, value);,
+        tightdb_Int);
 }
 
--(time_t)getDate:(size_t)col_ndx ndx:(size_t)ndx
+-(void)setFloat:(float)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
-    return m_table->get_datetime(col_ndx, ndx).get_datetime();
+    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+        m_table->set_float(col_ndx, row_ndx, value);,
+        tightdb_Float);
 }
 
--(BOOL)setDate:(size_t)col_ndx ndx:(size_t)ndx value:(time_t)value
+-(void)setDouble:(double)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
-    return [self setDate:col_ndx ndx:ndx value:value error:nil];
+    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+        m_table->set_double(col_ndx, row_ndx, value);,
+        tightdb_Double);
 }
 
--(BOOL)setDate:(size_t)col_ndx ndx:(size_t)ndx value:(time_t)value error:(NSError* __autoreleasing*)error
+-(void)setString:(NSString*)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx
 {
-    if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
-        return NO;
-    }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->set_datetime(col_ndx, ndx, value);, NO);
-    return YES;
+    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+        m_table->set_string(col_ndx, row_ndx, ObjcStringAccessor(value));,
+        tightdb_String);
 }
+
+-(void)setBinary:(TightdbBinary*)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx
+{
+    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+        m_table->set_binary(col_ndx, row_ndx, [value getNativeBinary]);,
+        tightdb_Binary);
+}
+
+-(void)setDate:(time_t)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx
+{
+    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+        m_table->set_datetime(col_ndx, row_ndx, value);,
+        tightdb_Date);
+}
+
+-(void)setTable:(TightdbTable*)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx
+{
+    // TODO: Use core method for checking the equality of two table specs. Even in the typed interface
+    // the user might add columns (_checkType for typed and spec against spec for dynamic).
+
+    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+        m_table->set_subtable(col_ndx, row_ndx, &[value getNativeTable]);,
+        tightdb_Table);
+}
+
+-(void)setMixed:(TightdbMixed*)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx
+{
+    const tightdb::Mixed& mixed = [value getNativeMixed];
+    TightdbTable* subtable = mixed.get_type() == tightdb::type_Table ? [value getTable] : nil;
+    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+        if (subtable) {
+            tightdb::LangBindHelper::set_mixed_subtable(*m_table, col_ndx, row_ndx,
+                                                        [subtable getNativeTable]);
+        }
+        else {
+            m_table->set_mixed(col_ndx, row_ndx, mixed);
+        },
+        tightdb_Mixed);
+}
+
 
 -(BOOL)insertBool:(size_t)col_ndx ndx:(size_t)ndx value:(BOOL)value
 {
@@ -889,6 +914,10 @@ using namespace std;
 
 -(BOOL)insertBool:(size_t)col_ndx ndx:(size_t)ndx value:(BOOL)value error:(NSError* __autoreleasing*)error
 {
+    // FIXME: Read-only errors should probably be handled by throwing
+    // an exception. That is what is done in other places in this
+    // binding, and it also seems like the right thing to do. This
+    // method should also not take an error argument.
     if (m_read_only) {
         if (error)
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
@@ -906,6 +935,10 @@ using namespace std;
 
 -(BOOL)insertInt:(size_t)col_ndx ndx:(size_t)ndx value:(int64_t)value error:(NSError* __autoreleasing*)error
 {
+    // FIXME: Read-only errors should probably be handled by throwing
+    // an exception. That is what is done in other places in this
+    // binding, and it also seems like the right thing to do. This
+    // method should also not take an error argument.
     if (m_read_only) {
         if (error)
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
@@ -922,6 +955,10 @@ using namespace std;
 
 -(BOOL)insertFloat:(size_t)col_ndx ndx:(size_t)ndx value:(float)value error:(NSError* __autoreleasing*)error
 {
+    // FIXME: Read-only errors should probably be handled by throwing
+    // an exception. That is what is done in other places in this
+    // binding, and it also seems like the right thing to do. This
+    // method should also not take an error argument.
     if (m_read_only) {
         if (error)
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
@@ -938,6 +975,10 @@ using namespace std;
 
 -(BOOL)insertDouble:(size_t)col_ndx ndx:(size_t)ndx value:(double)value error:(NSError* __autoreleasing*)error
 {
+    // FIXME: Read-only errors should probably be handled by throwing
+    // an exception. That is what is done in other places in this
+    // binding, and it also seems like the right thing to do. This
+    // method should also not take an error argument.
     if (m_read_only) {
         if (error)
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
@@ -954,6 +995,10 @@ using namespace std;
 
 -(BOOL)insertString:(size_t)col_ndx ndx:(size_t)ndx value:(NSString*)value error:(NSError* __autoreleasing*)error
 {
+    // FIXME: Read-only errors should probably be handled by throwing
+    // an exception. That is what is done in other places in this
+    // binding, and it also seems like the right thing to do. This
+    // method should also not take an error argument.
     if (m_read_only) {
         if (error)
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
@@ -972,6 +1017,10 @@ using namespace std;
 
 -(BOOL)insertBinary:(size_t)col_ndx ndx:(size_t)ndx value:(TightdbBinary*)value error:(NSError* __autoreleasing*)error
 {
+    // FIXME: Read-only errors should probably be handled by throwing
+    // an exception. That is what is done in other places in this
+    // binding, and it also seems like the right thing to do. This
+    // method should also not take an error argument.
     if (m_read_only) {
         if (error)
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
@@ -990,6 +1039,10 @@ using namespace std;
 
 -(BOOL)insertBinary:(size_t)col_ndx ndx:(size_t)ndx data:(const char*)data size:(size_t)size error:(NSError* __autoreleasing*)error
 {
+    // FIXME: Read-only errors should probably be handled by throwing
+    // an exception. That is what is done in other places in this
+    // binding, and it also seems like the right thing to do. This
+    // method should also not take an error argument.
     if (m_read_only) {
         if (error)
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
@@ -1008,6 +1061,10 @@ using namespace std;
 
 -(BOOL)insertDate:(size_t)col_ndx ndx:(size_t)ndx value:(time_t)value error:(NSError* __autoreleasing*)error
 {
+    // FIXME: Read-only errors should probably be handled by throwing
+    // an exception. That is what is done in other places in this
+    // binding, and it also seems like the right thing to do. This
+    // method should also not take an error argument.
     if (m_read_only) {
         if (error)
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
@@ -1024,72 +1081,11 @@ using namespace std;
 
 -(BOOL)insertDoneWithError:(NSError* __autoreleasing*)error
 {
+    // FIXME: This method should probably not take an error argument.
     TIGHTDB_EXCEPTION_ERRHANDLER(m_table->insert_done();, NO);
     return YES;
 }
 
--(NSString*)getString:(size_t)col_ndx ndx:(size_t)ndx
-{
-    return to_objc_string(m_table->get_string(col_ndx, ndx));
-}
-
--(BOOL)setString:(size_t)col_ndx ndx:(size_t)ndx value:(NSString*)value
-{
-    return [self setString:col_ndx ndx:ndx value:value error:nil];
-}
--(BOOL)setString:(size_t)col_ndx ndx:(size_t)ndx value:(NSString*)value error:(NSError* __autoreleasing*)error
-{
-    if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
-        return NO;
-    }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-        m_table->set_string(col_ndx, ndx, ObjcStringAccessor(value));,
-        NO);
-    return YES;
-}
-
--(TightdbBinary*)getBinary:(size_t)col_ndx ndx:(size_t)ndx
-{
-    return [[TightdbBinary alloc] initWithBinary:m_table->get_binary(col_ndx, ndx)];
-}
-
--(BOOL)setBinary:(size_t)col_ndx ndx:(size_t)ndx value:(TightdbBinary*)value
-{
-    return [self setBinary:col_ndx ndx:ndx value:value error:nil];
-}
-
--(BOOL)setBinary:(size_t)col_ndx ndx:(size_t)ndx value:(TightdbBinary*)value error:(NSError* __autoreleasing*)error
-{
-    if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
-        return NO;
-    }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-        m_table->set_binary(col_ndx, ndx, [value getNativeBinary]);,
-        NO);
-    return YES;
-}
-
--(BOOL)setBinary:(size_t)col_ndx ndx:(size_t)ndx data:(const char*)data size:(size_t)size
-{
-    return [self setBinary:col_ndx ndx:ndx data:data size:size error:nil];
-}
-
--(BOOL)setBinary:(size_t)col_ndx ndx:(size_t)ndx data:(const char*)data size:(size_t)size error:(NSError* __autoreleasing*)error
-{
-    if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
-        return NO;
-    }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-        m_table->set_binary(col_ndx, ndx, tightdb::BinaryData(data, size));,
-        NO);
-    return YES;
-}
 
 -(size_t)getTableSize:(size_t)col_ndx ndx:(size_t)row_ndx
 {
@@ -1103,6 +1099,10 @@ using namespace std;
 
 -(BOOL)insertSubtable:(size_t)col_ndx ndx:(size_t)row_ndx error:(NSError* __autoreleasing*)error
 {
+    // FIXME: Read-only errors should probably be handled by throwing
+    // an exception. That is what is done in other places in this
+    // binding, and it also seems like the right thing to do. This
+    // method should also not take an error argument.
     if (m_read_only) {
         if (error)
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
@@ -1120,6 +1120,10 @@ using namespace std;
 
 -(BOOL)_insertSubtableCopy:(size_t)col_ndx row:(size_t)row_ndx subtable:(TightdbTable*)subtable error:(NSError* __autoreleasing*)error
 {
+    // FIXME: Read-only errors should probably be handled by throwing
+    // an exception. That is what is done in other places in this
+    // binding, and it also seems like the right thing to do. This
+    // method should also not take an error argument.
     if (m_read_only) {
         if (error)
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
@@ -1137,6 +1141,10 @@ using namespace std;
 }
 -(BOOL)clearSubtable:(size_t)col_ndx ndx:(size_t)row_ndx error:(NSError* __autoreleasing*)error
 {
+    // FIXME: Read-only errors should probably be handled by throwing
+    // an exception. That is what is done in other places in this
+    // binding, and it also seems like the right thing to do. This
+    // method should also not take an error argument.
     if (m_read_only) {
         if (error)
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to clear while read only ColumnId: %llu", (unsigned long long)col_ndx]);
@@ -1146,27 +1154,6 @@ using namespace std;
     return YES;
 }
 
--(TightdbMixed*)getMixed:(size_t)col_ndx ndx:(size_t)row_ndx
-{
-    tightdb::Mixed mixed = m_table->get_mixed(col_ndx, row_ndx);
-    if (mixed.get_type() != tightdb::type_Table) {
-        return [TightdbMixed mixedWithNativeMixed:mixed];
-    }
-
-    tightdb::TableRef table = m_table->get_subtable(col_ndx, row_ndx);
-    if (!table)
-        return nil;
-    TightdbTable* table_2 = [[TightdbTable alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table_2))
-        return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    if (![table_2 _checkType])
-        return nil;
-
-    return [TightdbMixed mixedWithTable:table_2];
-}
 
 -(TightdbType)getMixedType:(size_t)col_ndx ndx:(size_t)row_ndx
 {
@@ -1199,31 +1186,6 @@ using namespace std;
     return YES;
 }
 
--(BOOL)setMixed:(size_t)col_ndx ndx:(size_t)row_ndx value:(TightdbMixed*)value
-{
-    return [self setMixed:col_ndx ndx:row_ndx value:value error:nil];
-}
-
--(BOOL)setMixed:(size_t)col_ndx ndx:(size_t)row_ndx value:(TightdbMixed*)value error:(NSError* __autoreleasing*)error
-{
-    if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to set while read only ColumnId: %llu", (unsigned long long)col_ndx]);
-        return NO;
-    }
-    const tightdb::Mixed& mixed = [value getNativeMixed];
-    TightdbTable* subtable = mixed.get_type() == tightdb::type_Table ? [value getTable] : nil;
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-        if (subtable) {
-            tightdb::LangBindHelper::set_mixed_subtable(*m_table, col_ndx, row_ndx,
-                                                        [subtable getNativeTable]);
-        }
-        else {
-            m_table->set_mixed(col_ndx, row_ndx, mixed);
-        },
-        NO);
-    return YES;
-}
 
 -(size_t)addColumnWithType:(TightdbType)type andName:(NSString*)name
 {
@@ -1236,6 +1198,7 @@ using namespace std;
         return m_table->add_column(tightdb::DataType(type), ObjcStringAccessor(name));,
         0);
 }
+
 
 -(size_t)findBool:(size_t)col_ndx value:(BOOL)value
 {

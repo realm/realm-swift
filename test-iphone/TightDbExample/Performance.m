@@ -57,7 +57,7 @@ TIGHTDB_TABLE_4(PerfTable,
 
     TightdbGroup *group = [TightdbGroup group];
     // Create new table in group
-    PerfTable *table = [group getTable:@"employees"withClass:[PerfTable class]];
+    PerfTable *table = [group getTable:@"employees"withClass:[PerfTable class] error:nil];
 
     // Add some rows
     NSUInteger count = _size;
@@ -67,7 +67,7 @@ TIGHTDB_TABLE_4(PerfTable,
     }
     [table addName:@"Sparse" Age:41 Hired:NO Spare:2];
 
-    NSLog(@"Age verify: %lld", [table get:1 ndx:1000]);
+    NSLog(@"Age verify: %lld", [table getIntInColumn:1 atRow:1000]);
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
         [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@"Inserted %i records in %.2f s",_size, stop-start]];
@@ -75,11 +75,11 @@ TIGHTDB_TABLE_4(PerfTable,
 
     // Write to disk
     [[NSFileManager defaultManager] removeItemAtPath:[_utils pathForDataFile:@"bigperfemployees.tightdb"] error:nil];
-    [group write:[_utils pathForDataFile:@"bigperfemployees.tightdb"]];
+    [group writeToFile:[_utils pathForDataFile:@"bigperfemployees.tightdb"] withError:nil];
     [self reportSizeForFile:[_utils pathForDataFile:@"bigperfemployees.tightdb"] msg:@"Normal filesize"];
     [table optimize];
     [[NSFileManager defaultManager] removeItemAtPath:[_utils pathForDataFile:@"perfemployees.tightdb"] error:nil];
-    [group write:[_utils pathForDataFile:@"perfemployees.tightdb"]];
+    [group writeToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
     [self reportSizeForFile:[_utils pathForDataFile:@"perfemployees.tightdb"] msg:@"Optimized filesize"];
 
 
@@ -139,8 +139,8 @@ TIGHTDB_TABLE_4(PerfTable,
 {
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:[_utils pathForDataFile:@"perfemployees.tightdb"]];
-    PerfTable *diskTable = [fromDisk getTable:@"employees" withClass:[PerfTable class]];
+    TightdbGroup *fromDisk = [TightdbGroup groupWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"]withError:nil];
+    PerfTable *diskTable = [fromDisk getTable:@"employees" withClass:[PerfTable class] error:nil];
 
     if ([diskTable count] != _size+1) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -196,8 +196,8 @@ TIGHTDB_TABLE_4(PerfTable,
 {
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:[_utils pathForDataFile:@"perfemployees.tightdb"]];
-    PerfTable *diskTable = [fromDisk getTable:@"employees" withClass:[PerfTable class]];
+    TightdbGroup *fromDisk = [TightdbGroup groupWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"]withError:nil];
+    PerfTable *diskTable = [fromDisk getTable:@"employees" withClass:[PerfTable class] error:nil];
 
     // Create query (current employees between 20 and 30 years old)
     PerfTable_Query *q = [[diskTable where].Age columnIsBetween:40 and_:50];
@@ -252,8 +252,8 @@ TIGHTDB_TABLE_4(PerfTable,
     int counter = 0;
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:[_utils pathForDataFile:@"perfemployees.tightdb"]];
-    PerfTable *diskTable = [fromDisk getTable:@"employees" withClass:[PerfTable class]];
+    TightdbGroup *fromDisk = [TightdbGroup groupWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"]withError:nil];
+    PerfTable *diskTable = [fromDisk getTable:@"employees" withClass:[PerfTable class] error:nil];
 
 
     // Create query (current employees between 20 and 30 years old)
@@ -275,8 +275,8 @@ TIGHTDB_TABLE_4(PerfTable,
 {
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:[_utils pathForDataFile:@"perfemployees.tightdb"]];
-    PerfTable *diskTable = [fromDisk getTable:@"employees" withClass:[PerfTable class]];
+    TightdbGroup *fromDisk = [TightdbGroup groupWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"]withError:nil];
+    PerfTable *diskTable = [fromDisk getTable:@"employees" withClass:[PerfTable class] error:nil];
 
     int agesum = 0;
     for (PerfTable_Cursor *cur in diskTable) {
@@ -292,11 +292,11 @@ TIGHTDB_TABLE_4(PerfTable,
 {
     NSString *tightDBPath = [_utils pathForDataFile:@"testemployees.tightdb"];
 
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:[_utils pathForDataFile:@"perfemployees.tightdb"]];
+    TightdbGroup *fromDisk = [TightdbGroup groupWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"]withError:nil];
 
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
     [[NSFileManager defaultManager] removeItemAtPath:tightDBPath error:nil];
-    [fromDisk write:tightDBPath];
+    [fromDisk writeToFile:tightDBPath withError:nil];
 
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -308,9 +308,9 @@ TIGHTDB_TABLE_4(PerfTable,
 -(void)testReadTransaction
 {
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
-    TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:[_utils pathForDataFile:@"perfemployees.tightdb"]];
-    [fromDisk readTransaction:^(TightdbGroup *group) {
-        PerfTable *diskTable = [group getTable:@"employees" withClass:[PerfTable class]];
+    TightdbSharedGroup *fromDisk = [TightdbSharedGroup sharedGroupWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
+    [fromDisk readWithBlock:^(TightdbGroup *group) {
+        PerfTable *diskTable = [group getTable:@"employees" withClass:[PerfTable class] error:nil];
 
         // Create query (current employees between 20 and 30 years old)
         PerfTable_Query *q = [[[diskTable where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30];
@@ -332,9 +332,9 @@ TIGHTDB_TABLE_4(PerfTable,
 -(void)testWriteTransaction
 {
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
-    TightdbSharedGroup *fromDisk = [TightdbSharedGroup groupWithFilename:[_utils pathForDataFile:@"perfemployees.tightdb"]];
-    [fromDisk writeTransaction:^(TightdbGroup *group) {
-        PerfTable *diskTable = [group getTable:@"employees" withClass:[PerfTable class]];
+    TightdbSharedGroup *fromDisk = [TightdbSharedGroup sharedGroupWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
+    [fromDisk writeWithBlock:^(TightdbGroup *group) {
+        PerfTable *diskTable = [group getTable:@"employees" withClass:[PerfTable class] error:nil];
 
         // Add some rows
         NSUInteger count = _size;
@@ -344,7 +344,7 @@ TIGHTDB_TABLE_4(PerfTable,
         [diskTable addName:@"Sparse" Age:41 Hired:NO Spare:2];
 
         return YES; // Commit transaction
-    }];
+    } withError:nil];
 
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{

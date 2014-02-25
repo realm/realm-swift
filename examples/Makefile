@@ -1,7 +1,6 @@
-TEST_PROGRAMS = tutorial
+check_PROGRAMS = tutorial
 
-tutorial_SOURCES = \
-tutorial.m 
+tutorial_SOURCES = tutorial.m
 
 tutorial_CFLAGS  = -Wno-comment -fobjc-arc -fobjc-abi-version=2
 tutorial_LDFLAGS = -fobjc-link-runtime
