@@ -20,7 +20,7 @@
 #ifndef TIGHTDB_OBJC_TYPE_H
 #define TIGHTDB_OBJC_TYPE_H
 
-// Make sure numbers match those in <tightdb/data_type.hpp>
+/* Make sure numbers match those in <tightdb/data_type.hpp> */
 typedef enum {
     tightdb_Bool   =  1,
     tightdb_Int    =  0,
@@ -33,4 +33,4 @@ typedef enum {
     tightdb_Mixed  =  6,
 } TightdbType;
 
-#endif // TIGHTDB_OBJC_TYPE_H
+#endif /* TIGHTDB_OBJC_TYPE_H */

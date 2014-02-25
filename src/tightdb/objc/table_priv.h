@@ -8,7 +8,7 @@
 
 @interface TightdbBinary()
 
--(tightdb::BinaryData)getNativeBinary;
+-(tightdb::BinaryData&)getNativeBinary;
 
 @end
 
