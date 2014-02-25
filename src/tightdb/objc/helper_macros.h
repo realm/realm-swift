@@ -56,7 +56,7 @@
 
 
 
-// TIGHTDB_ARG_TYPE
+/* TIGHTDB_ARG_TYPE */
 
 #define TIGHTDB_ARG_TYPE(type)                 TIGHTDB_ARG_TYPE_2(TIGHTDB_IS_SUBTABLE(type), type)
 #define TIGHTDB_ARG_TYPE_2(is_subtable, type)  TIGHTDB_ARG_TYPE_3(is_subtable, type)
@@ -66,7 +66,7 @@
 
 
 
-// TIGHTDB_COLUMN_PROXY
+/* TIGHTDB_COLUMN_PROXY */
 
 #define TIGHTDB_COLUMN_PROXY_DEF(name, type)                 TIGHTDB_COLUMN_PROXY_DEF_2(TIGHTDB_IS_SUBTABLE(type), name, type)
 #define TIGHTDB_COLUMN_PROXY_DEF_2(is_subtable, name, type)  TIGHTDB_COLUMN_PROXY_DEF_3(is_subtable, name, type)
@@ -84,7 +84,7 @@
 
 
 
-// TIGHTDB_ADD_COLUMN
+/* TIGHTDB_ADD_COLUMN */
 
 #define TIGHTDB_ADD_COLUMN(desc, name, type)                TIGHTDB_ADD_COLUMN_2(TIGHTDB_IS_SUBTABLE(type), desc, name, type)
 #define TIGHTDB_ADD_COLUMN_2(is_subtable, desc, name, type) TIGHTDB_ADD_COLUMN_3(is_subtable, desc, name, type)
@@ -111,7 +111,7 @@
 
 
 
-// TIGHTDB_CHECK_COLUMN_TYPE
+/* TIGHTDB_CHECK_COLUMN_TYPE */
 
 #define TIGHTDB_CHECK_COLUMN_TYPE(desc, col, name, type)                TIGHTDB_CHECK_COLUMN_TYPE_2(TIGHTDB_IS_SUBTABLE(type), desc, col, name, type)
 #define TIGHTDB_CHECK_COLUMN_TYPE_2(is_subtable, desc, col, name, type) TIGHTDB_CHECK_COLUMN_TYPE_3(is_subtable, desc, col, name, type)
@@ -138,7 +138,7 @@
 
 
 
-// TIGHTDB_COLUMN_INSERT
+/* TIGHTDB_COLUMN_INSERT */
 
 #define TIGHTDB_COLUMN_INSERT(table, col, row, value, type)                TIGHTDB_COLUMN_INSERT_2(TIGHTDB_IS_SUBTABLE(type), table, col, row, value, type)
 #define TIGHTDB_COLUMN_INSERT_2(is_subtable, table, col, row, value, type) TIGHTDB_COLUMN_INSERT_3(is_subtable, table, col, row, value, type)
@@ -146,17 +146,9 @@
 #define TIGHTDB_COLUMN_INSERT_4_Y(table, col, _row, value, type)           [table _insertSubtableCopy:col row:_row subtable:value]
 #define TIGHTDB_COLUMN_INSERT_4_N(table, col, row, _value, type)           [table insert##type:col ndx:row value:_value]
 
-// TIGHTDB_COLUMN_INSERT_ERROR
-
-#define TIGHTDB_COLUMN_INSERT_ERROR(table, col, row, value, type, error)                TIGHTDB_COLUMN_INSERT_ERROR_2(TIGHTDB_IS_SUBTABLE(type), table, col, row, value, type, error)
-#define TIGHTDB_COLUMN_INSERT_ERROR_2(is_subtable, table, col, row, value, type, error) TIGHTDB_COLUMN_INSERT_ERROR_3(is_subtable, table, col, row, value, type, error)
-#define TIGHTDB_COLUMN_INSERT_ERROR_3(is_subtable, table, col, row, value, type, error) TIGHTDB_COLUMN_INSERT_ERROR_4_##is_subtable(table, col, row, value, type, error)
-#define TIGHTDB_COLUMN_INSERT_ERROR_4_Y(table, col, _row, value, type, error)           [table _insertSubtableCopy:col row:_row subtable:value error:error]
-#define TIGHTDB_COLUMN_INSERT_ERROR_4_N(table, col, row, _value, type, error)           [table insert##type:col ndx:row value:_value error:error]
 
 
-
-// TIGHTDB_CURSOR_PROPERTY
+/* TIGHTDB_CURSOR_PROPERTY */
 
 #define TIGHTDB_CURSOR_PROPERTY_DEF(name, type)                 TIGHTDB_CURSOR_PROPERTY_DEF_2(TIGHTDB_IS_SUBTABLE(type), name, type)
 #define TIGHTDB_CURSOR_PROPERTY_DEF_2(is_subtable, name, type)  TIGHTDB_CURSOR_PROPERTY_DEF_3(is_subtable, name, type)
@@ -174,8 +166,7 @@
 #define TIGHTDB_CURSOR_PROPERTY_DEF_SIMPLE(name, type) \
 @property TIGHTDB_TYPE_##type name; \
 -(TIGHTDB_TYPE_##type)name; \
--(void)set##name:(TIGHTDB_TYPE_##type)value; \
--(BOOL)set##name:(TIGHTDB_TYPE_##type)value error:(NSError* __autoreleasing*)error;
+-(void)set##name:(TIGHTDB_TYPE_##type)value;
 
 #define TIGHTDB_CURSOR_PROPERTY_IMPL_SIMPLE(name, type) \
 -(TIGHTDB_TYPE_##type)name \
@@ -185,12 +176,7 @@
 -(void)set##name:(TIGHTDB_TYPE_##type)value \
 { \
     [_##name set##type:value]; \
-} \
--(BOOL)set##name:(TIGHTDB_TYPE_##type)value error:(NSError* __autoreleasing*)error \
-{ \
-    return [_##name set##type:value error:error]; \
 }
-
 
 #define TIGHTDB_CURSOR_PROPERTY_DEF_SUBTABLE(name, type) \
 @property type* name; \
@@ -206,7 +192,7 @@
     [_##name setSubtable:subtable]; \
 } \
 
-// TIGHTDB_QUERY_ACCESSOR
+/* TIGHTDB_QUERY_ACCESSOR */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF(table, col_name, col_type)                 TIGHTDB_QUERY_ACCESSOR_DEF_2(TIGHTDB_IS_SUBTABLE(col_type), table, col_name, col_type)
 #define TIGHTDB_QUERY_ACCESSOR_DEF_2(is_subtable, table, col_name, col_type)  TIGHTDB_QUERY_ACCESSOR_DEF_3(is_subtable, table, col_name, col_type)
@@ -221,7 +207,7 @@
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_4_N(table, col_name, col_type)            TIGHTDB_QUERY_ACCESSOR_IMPL_##col_type(table, col_name)
 
 
-// Boolean
+/* Boolean */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Bool(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorBool \
@@ -237,7 +223,7 @@
 @end
 
 
-// Integer
+/* Integer */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Int(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorInt \
@@ -283,7 +269,7 @@
 @end
 
 
-// Float
+/* Float */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Float(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorFloat \
@@ -329,7 +315,7 @@
 @end
 
 
-// Double
+/* Double */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Double(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorDouble \
@@ -375,7 +361,7 @@
 @end
 
 
-// String
+/* String */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_String(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorString \
@@ -436,7 +422,7 @@
 @end
 
 
-// Binary
+/* Binary */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Binary(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorBinary \
@@ -472,7 +458,7 @@
 @end
 
 
-// Date
+/* Date */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Date(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorDate \
@@ -518,7 +504,7 @@
 @end
 
 
-// Subtable
+/* Subtable */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_SUBTABLE(table, col_name, col_type) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorSubtable \
@@ -529,7 +515,7 @@
 @end
 
 
-// Mixed
+/* Mixed */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Mixed(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TightdbQueryAccessorMixed \

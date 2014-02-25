@@ -1,4 +1,4 @@
-TEST_PROGRAMS = test-installed
+check_PROGRAMS = test-installed
 
 test_installed_SOURCES = test.mm
 test_installed_CFLAGS  = -fobjc-arc -fobjc-abi-version=2
