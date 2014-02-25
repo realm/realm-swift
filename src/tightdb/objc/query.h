@@ -22,9 +22,9 @@
 
 @class TightdbBinary;
 @class TightdbTable;
-@class TightdbTableView; // jjepsen: this must be an error?
+@class TightdbTableView; /* jjepsen: this must be an error? */
 
-// jjepsen: please review this
+/* jjepsen: please review this */
 @class TightdbView;
 
 
@@ -68,12 +68,12 @@
 -(size_t)find:(size_t)last;
 -(size_t)find:(size_t)last error:(NSError *__autoreleasing *)error;
 
-// jjepsen: please review this.
+/* jjepsen: please review this. */
 -(TightdbView *)findAll;
 
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
-// Conditions:
+/* Conditions: */
 
 -(TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and_:(int64_t)to;
 -(TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and_:(float)to;

@@ -1,11 +1,11 @@
-// @@Example: ex_objc_table_typed_intro @@
+/* @@Example: ex_objc_table_typed_intro @@ */
 
 
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
 
 
-// Defines a new table with two columns Name and Age.
+/* Defines a new table with two columns Name and Age. */
 
 TIGHTDB_TABLE_2(PeopleTable,
                 Name, String,
@@ -16,7 +16,7 @@ int main()
 {
     @autoreleasepool {
 
-        // Creates a new table of the type defined above.
+        /* Creates a new table of the type defined above. */
 
         PeopleTable *table = [[PeopleTable alloc] init];
 
@@ -58,4 +58,4 @@ int main()
 
 
 
-// @@EndExample@@
+/* @@EndExample@@ */

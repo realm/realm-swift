@@ -1,4 +1,4 @@
-// @@Example: ex_objc_sharedgroup_intro @@
+/* @@Example: ex_objc_sharedgroup_intro @@ */
 
 #import <tightdb/objc/group.h>
 #import <tightdb/objc/group_shared.h>
@@ -14,33 +14,33 @@ int main()
 {
     @autoreleasepool {
 
-        // Creates a group and uses it to create a new table.
+        /* Creates a group and uses it to create a new table. */
 
         TightdbSharedGroup *shared = [TightdbSharedGroup groupWithFilename:@"sharedgroup.tightdb"];
 
-        // A write transaction (with rollback if not first writer to employees table).
+        /* A write transaction (with rollback if not first writer to employees table). */
 
         [shared writeTransaction:^(TightdbGroup *group) {
 
-            // Write transactions with the shared group are possible via the provided variable binding named group.
+            /* Write transactions with the shared group are possible via the provided variable binding named group. */
 
             PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class]];
             if ([table count] > 0) {
                 NSLog(@"Not empty!");
-                return NO; // Rollback
+                return NO; /* Rollback */
             }
 
             [table addName:@"Bill" Age:53 Hired:YES];
             NSLog(@"Row added!");
-            return YES; // Commit
+            return YES; /* Commit */
 
         }];
 
-        // A read transaction
+        /* A read transaction */
 
         [shared readTransaction:^(TightdbGroup *group) {
 
-            // Read transactions with the shared group are possible via the provided variable binding named group.
+            /* Read transactions with the shared group are possible via the provided variable binding named group. */
 
             PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class]];
 
@@ -53,4 +53,4 @@ int main()
     }
 
 }
-// @@EndExample@@
+/* @@EndExample@@ */

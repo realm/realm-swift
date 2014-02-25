@@ -1,4 +1,4 @@
-// @@Example: ex_objc_query_dynamic_intro @@
+/* @@Example: ex_objc_query_dynamic_intro @@ */
 
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
@@ -8,9 +8,9 @@
 int main()
 {
     @autoreleasepool {
-        // TODO: Update example to the cursor.
+        /* TODO: Update example to the cursor. */
 
-        // Creates a new table dynamically.
+        /* Creates a new table dynamically. */
 
         TightdbTable *table = [[TightdbTable alloc] init];
 
@@ -18,13 +18,13 @@ int main()
         size_t const AGE = [table addColumnWithType:tightdb_Int andName:@"Age"];
         size_t const HIRED = [table addColumnWithType:tightdb_Bool andName:@"Hired"];
 
-        // Add some people.
+        /* Add some people. */
 
-        // Add rows and values.
+        /* Add rows and values. */
 
         TightdbCursor *cursor;
 
-        // Row 0
+        /* Row 0 */
 
         cursor = [table addRow];
 
@@ -32,7 +32,7 @@ int main()
         [cursor setString:@"Joe" inColumn:NAME];
         [cursor setBool:YES inColumn:HIRED];
 
-        // Row 1
+        /* Row 1 */
 
         cursor = [table addRow];
 
@@ -40,7 +40,7 @@ int main()
         [cursor setString:@"Simon" inColumn:NAME];
         [cursor setBool:YES inColumn:HIRED];
 
-        // Row 2
+        /* Row 2 */
 
         cursor = [table addRow];
 
@@ -48,7 +48,7 @@ int main()
         [cursor setString:@"Steve" inColumn:NAME];
         [cursor setBool:NO inColumn:HIRED];
 
-        // Row 3
+        /* Row 3 */
 
         cursor = [table addRow];
 
@@ -56,16 +56,16 @@ int main()
         [cursor setString:@"Nick" inColumn:NAME];
         [cursor setBool:YES inColumn:HIRED];
 
-        // Set up a query to search for employees.
+        /* Set up a query to search for employees. */
 
         TightdbQuery *q =  [[[table where] column: AGE   isBetweenInt:0 and_:60]
                                            column: HIRED isEqualToBool:YES];
 
-        // Execute the query.
+        /* Execute the query. */
 
         TightdbView *view = [q findAll];
 
-        // Print the names.
+        /* Print the names. */
 
         for (TightdbCursor *c in view) {
 
@@ -79,4 +79,4 @@ int main()
     }
 }
 
-// @@EndExample@@
+/* @@EndExample@@ */
