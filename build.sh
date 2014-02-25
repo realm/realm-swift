@@ -470,7 +470,7 @@ EOF
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
         DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-cov.octest" || exit 1
         echo "Generating 'gcovr.xml'.."
-        gcovr --filter='.*/tightdb_objc/src/.*' --xml > gcovr.xml
+        gcovr -f '.*/tightdb_objc/src/.*' -e '.*/test/.*' -x > gcovr.xml
         echo "Test passed."
         exit 0
         ;;
