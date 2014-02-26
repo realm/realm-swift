@@ -69,7 +69,7 @@ TIGHTDB_TABLE_2(MyTable2,
 {
     TightdbGroup *group = [TightdbGroup group];
     // Create new table in group
-    MyTable *table = [group getTable:@"employees" withClass:[MyTable class]];
+    MyTable *table = [group getTable:@"employees" withClass:[MyTable class] error:nil];
 
     // Add some rows
     [table addName:@"John" Age:20 Hired:YES Spare:0];
@@ -132,29 +132,28 @@ TIGHTDB_TABLE_2(MyTable2,
     [manager removeItemAtPath:[_utils pathForDataFile:@"employees.tightdb"] error:nil];
 
     // Write to disk
-    [group write:[_utils pathForDataFile:@"employees.tightdb"]];
+    [group writeToFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
 
     // Load a group from disk (and print contents)
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:[_utils pathForDataFile:@"employees.tightdb"]];
-    MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class]];
+    TightdbGroup *fromDisk = [TightdbGroup groupWithFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
+    MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class] error:nil];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
-    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
+    [diskTable insertRowAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
     NSLog(@"Disktable size: %zu", [diskTable count]);
     for (size_t i = 0; i < [diskTable count]; i++) {
         MyTable_Cursor *cursor = [diskTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, [cursor Name]);
         NSLog(@"%zu: %@", i, cursor.Name);
-        NSLog(@"%zu: %@", i, [diskTable getString:0 ndx:i]);
+        NSLog(@"%zu: %@", i, [diskTable getStringInColumn:0 atRow:i]);
     }
 
     // Write same group to memory buffer
-    size_t size;
-    const char* data = [group writeToMem:&size];
+    TightdbBinary* buffer = [group writeToBuffer];
 
     // Load a group from memory (and print contents)
-    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:data size:size];
-    MyTable *memTable = [fromMem getTable:@"employees" withClass:[MyTable class]];
+    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:buffer withError:nil];
+    MyTable *memTable = [fromMem getTable:@"employees" withClass:[MyTable class] error:nil];
 
     for (MyTable_Cursor *row in memTable)
     {
