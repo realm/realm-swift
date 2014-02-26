@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D79966018BDFC3E009EB0C0 /* table_macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D79965F18BDFC3E009EB0C0 /* table_macros.h */; };
 		E918909D177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		E91890AF177B677900653D7A /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E91890AE177B677900653D7A /* SenTestingKit.framework */; };
 		E91890B0177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
@@ -56,6 +57,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4D79965F18BDFC3E009EB0C0 /* table_macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = table_macros.h; path = ../../src/tightdb/objc/table_macros.h; sourceTree = "<group>"; };
 		E9189099177B677900653D7A /* TightDbObjcDyn.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = TightDbObjcDyn.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		E918909C177B677900653D7A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		E918909F177B677900653D7A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -163,6 +165,7 @@
 		E91890A2177B677900653D7A /* TightDbObjcDyn */ = {
 			isa = PBXGroup;
 			children = (
+				4D79965F18BDFC3E009EB0C0 /* table_macros.h */,
 				E91890C5177B67AB00653D7A /* cursor_objc.mm */,
 				E91890C6177B67AB00653D7A /* cursor.h */,
 				E91890C7177B67AB00653D7A /* group_objc.mm */,
@@ -236,6 +239,7 @@
 				E91890DB177B67AB00653D7A /* group_shared.h in Headers */,
 				E91890DC177B67AB00653D7A /* group.h in Headers */,
 				E91890DD177B67AB00653D7A /* helper_macros.h in Headers */,
+				4D79966018BDFC3E009EB0C0 /* table_macros.h in Headers */,
 				E91890DF177B67AB00653D7A /* query_priv.h in Headers */,
 				E91890E0177B67AB00653D7A /* query.h in Headers */,
 				E91890E2177B67AB00653D7A /* table_priv.h in Headers */,
