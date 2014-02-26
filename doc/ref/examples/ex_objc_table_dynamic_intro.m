@@ -85,8 +85,6 @@ int main()
         TightdbCursor *c2 = [table cursorAtIndex:[table count]];
         if (c2 != nil)
             NSLog(@"Should not get here.");
-
-
     }
 }
 

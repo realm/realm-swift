@@ -74,9 +74,9 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
 
 
     // Verify
-    if ([_table get:0 ndx:ndx] != 0)
+    if ([_table getIntInColumn:0 atRow:ndx] != 0)
         STFail(@"First not zero");
-    if ([_table get:1 ndx:ndx] != 10)
+    if ([_table getIntInColumn:1 atRow:ndx] != 10)
         STFail(@"Second not 10");
 
 
