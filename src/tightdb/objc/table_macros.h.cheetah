@@ -90,7 +90,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 %end for
 ; \
 -(TableName##_Query*)where; \
--(TableName##_Cursor*)addRow; \
+-(TableName##_Cursor*)addEmptyRow; \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertRowAtIndex:(size_t)ndx; \
@@ -244,9 +244,9 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor*)addRow \
+-(TableName##_Cursor*)addEmptyRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addRow]]; \
+    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addEmptyRow]]; \
 } \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx \
 { \

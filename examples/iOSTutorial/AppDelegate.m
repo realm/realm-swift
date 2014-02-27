@@ -1,7 +1,5 @@
-#import <tightdb/objc/group.h>
-#import <tightdb/objc/group_shared.h>
-#import <tightdb/objc/table.h>
-#import <tightdb/objc/tightdb.h>
+#import "AppDelegate.h"
+#import <Tightdb/Tightdb.h>
 
 
 // @@Example: create_table @@
@@ -24,31 +22,31 @@ void tableFunc() {
     PeopleTable_Cursor *cursor;
 
     // Row 1
-    cursor = [people addRow];
+    cursor = [people addEmptyRow];
     cursor.Name  = @"John";
     cursor.Age   = 21;
     cursor.Hired = YES;
 
     // Row 2
-    cursor = [people addRow];
+    cursor = [people addEmptyRow];
     cursor.Name  = @"Mary";
     cursor.Age   = 76;
     cursor.Hired = NO;
 
     // Row 3
-    cursor = [people addRow];
+    cursor = [people addEmptyRow];
     cursor.Name  = @"Lars";
     cursor.Age   = 22;
     cursor.Hired = YES;
 
     // Row 4
-    cursor = [people addRow];
+    cursor = [people addEmptyRow];
     cursor.Name  = @"Phil";
     cursor.Age   = 43;
     cursor.Hired = NO;
 
     // Row 5
-    cursor = [people addRow];
+    cursor = [people addEmptyRow];
     cursor.Name  = @"Anni";
     cursor.Age   = 54;
     cursor.Hired = YES;
@@ -140,37 +138,37 @@ void groupFunc() {
     // @@Example: serialisation @@
     // Create Table in Group
     TightdbGroup *group = [TightdbGroup group];
-    PeopleTable *people = [group getTable:@"employees" withClass:[PeopleTable class]];
+    PeopleTable *people = [group getTable:@"employees" withClass:[PeopleTable class] error:nil];
 
     // Add some rows
     PeopleTable_Cursor *cursor;
 
     // Row 1
-    cursor = [people addRow];
+    cursor = [people addEmptyRow];
     cursor.Name  = @"John";
     cursor.Age   = 21;
     cursor.Hired = YES;
 
     // Row 2
-    cursor = [people addRow];
+    cursor = [people addEmptyRow];
     cursor.Name  = @"Mary";
     cursor.Age   = 21;
     cursor.Hired = NO;
 
     // Row 3
-    cursor = [people addRow];
+    cursor = [people addEmptyRow];
     cursor.Name  = @"Lars";
     cursor.Age   = 21;
     cursor.Hired = YES;
 
     // Row 4
-    cursor = [people addRow];
+    cursor = [people addEmptyRow];
     cursor.Name  = @"Phil";
     cursor.Age   = 43;
     cursor.Hired = NO;
 
     // Row 5
-    cursor = [people addRow];
+    cursor = [people addEmptyRow];
     cursor.Name  = @"Anni";
     cursor.Age   = 54;
     cursor.Hired = YES;
@@ -181,11 +179,11 @@ void groupFunc() {
     [manager removeItemAtPath:@"employees.tightdb" error:nil];
 
     // Write to disk
-    [group write:@"employees.tightdb"];
+    [group writeToFile:@"employees.tightdb" withError:nil];
 
     // Load a group from disk (and print contents)
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:@"employees.tightdb"];
-    PeopleTable *diskTable = [fromDisk getTable:@"employees" withClass:[PeopleTable class]];
+    TightdbGroup *fromDisk = [TightdbGroup groupWithFile:@"employees.tightdb" withError:nil];
+    PeopleTable *diskTable = [fromDisk getTable:@"employees" withClass:[PeopleTable class] error:nil];
 
     NSLog(@"Disktable size: %zu", [diskTable count]);
     for (size_t i = 0; i < [diskTable count]; i++) {
@@ -194,36 +192,34 @@ void groupFunc() {
     }
 
     // Write same group to memory buffer
-    size_t len;
-    const char* buffer = [group writeToMem:&len];
+    TightdbBinary *buffer = [group writeToBuffer];
 
     // Load a group from memory (and print contents)
-    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:buffer size:len];
-    PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class]];
+    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:buffer withError:nil];
+    PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class] error:nil];
 
     for (size_t i = 0; i < [memTable count]; i++) {
-        PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];
-        NSLog(@"%zu: %@", i, cursor.Name);            // using dot-syntax
-    }
+    PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];
+    NSLog(@"%zu: %@", i, cursor.Name);            // using dot-syntax
+}
 
     // @@EndExample@@
 
 
 }
 
-
 void sharedGroupFunc() {
 
     // @@Example: transaction @@
-    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup groupWithFilename:@"people.tightdb"];
+    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup sharedGroupWithFile:@"people.tightdb" withError:nil];
 
     // A write transaction (with rollback if not first writer to employees table).
 
-    [sharedGroup writeTransaction:^(TightdbGroup *group) {
+    [sharedGroup writeWithBlock:^(TightdbGroup *group) {
 
         // Write transactions with the shared group are possible via the provided variable binding named group.
 
-        PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class]];
+        PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class] error:nil];
         if ([table count] > 0) {
             NSLog(@"Not empty!");
             return NO; // Rollback
@@ -233,15 +229,15 @@ void sharedGroupFunc() {
         NSLog(@"Row added!");
         return YES; // Commit
 
-    }];
+    } withError:nil];
 
     // A read transaction
 
-    [sharedGroup readTransaction:^(TightdbGroup *group) {
+    [sharedGroup readWithBlock:^(TightdbGroup *group) {
 
         // Read transactions with the shared group are possible via the provided variable binding named group.
 
-        PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class]];
+        PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class] error:nil];
 
         for (PeopleTable_Cursor *curser in table) {
             NSLog(@"Name: %@", [curser Name]);
@@ -250,11 +246,15 @@ void sharedGroupFunc() {
     // @@EndExample@@
 }
 
-int main(int argc, const char * argv[])
+@implementation AppDelegate
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    @autoreleasepool {
-        tableFunc();
-        groupFunc();
-        sharedGroupFunc();
-    }
+
+    tableFunc();
+    groupFunc();
+    sharedGroupFunc();
+    return YES;
 }
+
+@end
