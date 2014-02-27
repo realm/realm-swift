@@ -3,7 +3,7 @@
  * TIGHTDB CONFIDENTIAL
  * __________________
  *
- *  [2011] - [2012] TightDB Inc
+ *  [2011] - [2014] TightDB Inc
  *  All Rights Reserved.
  *
  * NOTICE:  All information contained herein is, and remains
@@ -18,10 +18,15 @@
  *
  **************************************************************************/
 
-#import <tightdb/objc/table.h>
-#import <tightdb/objc/query.h>
-#import <tightdb/objc/cursor.h>
-#import <tightdb/objc/helper_macros.h>
-#import <tightdb/objc/table_macros.h>
-#import <tightdb/objc/group_shared.h>
-#import <tightdb/objc/version.h>
+#import <Foundation/Foundation.h>
+
+const int Tightdb_Version_Major = 0;
+const int Tightdb_Version_Minor = 1;
+const int Tightdb_Version_Patch = 6;
+
+@interface TightdbVersion: NSObject
+-(id)init;
++(const int)getMajor;
++(const int)getMinor;
++(const int)getPatch;
+@end
