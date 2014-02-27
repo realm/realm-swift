@@ -168,7 +168,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         TightdbBinary *bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
 
         // Using private method just for the sake of testing the setters below.
-        [table _addRows:2];
+        [table _addEmptyRows:2];
 
         [table setBool:YES inColumn:BOOL_COL atRow:0];
         [table setBool:NO inColumn:BOOL_COL atRow:1];
@@ -255,7 +255,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 {
     TightdbTable* table = [[TightdbTable alloc]init];
     [table addColumnWithType:tightdb_Int andName:@"IntCol"];
-    [table _addRows:6];
+    [table _addEmptyRows:6];
 
     [table setInt:10 inColumn:0 atRow:0];
     [table setInt:42 inColumn:0 atRow:1];

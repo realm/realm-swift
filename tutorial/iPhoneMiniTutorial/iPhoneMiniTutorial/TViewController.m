@@ -20,13 +20,13 @@
     size_t const HIRED = [table addColumnWithType:tightdb_Bool andName:@"Hired"];
   
     // Add new row to the table and set values
-    TightdbCursor *cursor0 = [table addRow];
+    TightdbCursor *cursor0 = [table addEmptyRow];
     [cursor0 setString:@"Jill" inColumn:NAME];
     [cursor0 setInt: 21 inColumn:AGE];
     [cursor0 setBool:YES inColumn:HIRED];
     
     // Add one more row and set values
-    TightdbCursor *cursor1 = [table addRow];
+    TightdbCursor *cursor1 = [table addEmptyRow];
     [cursor1 setString:@"Mary" inColumn:NAME];
     [cursor1 setInt: 40 inColumn:AGE];
     [cursor1 setBool:NO inColumn:HIRED];

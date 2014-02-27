@@ -119,12 +119,12 @@
 -(TightdbDescriptor *)getDescriptorWithError:(NSError *__autoreleasing *)error;
 -(BOOL)isEmpty;
 -(size_t)count;
--(TightdbCursor *)addRow;
+-(TightdbCursor *)addEmptyRow;
 
 /* Only curser based add should be public. This is just a temporaray way to hide the methods. */
 /* TODO: Move to class extension. */
--(size_t)_addRow;
--(size_t)_addRows:(size_t)rowCount;
+-(size_t)_addEmptyRow;
+-(size_t)_addEmptyRows:(size_t)rowCount;
 
 -(BOOL)clear;
 -(BOOL)clearWithError:(NSError *__autoreleasing *)error;
@@ -166,7 +166,7 @@
 /* FIXME: It has been decided that the insert methods must not be a
  * part of the public Obj-C API. All row insertion must happen by
  * inserting a complete rows. This must occur either by calling
- * `addRow` and then setting each column value afterwards, or possibly
+ * `addEmptyRow` and then setting each column value afterwards, or possibly
  * by calling a method that takes all column values as arguments at
  * once. */
 -(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value;
