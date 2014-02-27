@@ -1,6 +1,7 @@
 2014-02-27
 ==========
 * Adding a simple class for version numbering.
+* Adding get-version and set-version targets to build.sh.
 
 2013-11-08
 ==========
