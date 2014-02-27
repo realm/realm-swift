@@ -73,12 +73,12 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
 
     TestTableAllTypes_Cursor* c;
 
-    c = [table addRow];
+    c = [table addEmptyRow];
 
         c.BoolCol   = NO   ; c.IntCol  = 54 ; c.FloatCol = 0.7     ; c.DoubleCol = 0.8     ; c.StringCol = @"foo";
         c.BinaryCol = bin1 ; c.DateCol = 0  ; c.TableCol = subtab1     ; c.MixedCol  = mixInt1 ;
 
-    c = [table addRow];
+    c = [table addEmptyRow];
 
         c.BoolCol   = YES  ; c.IntCol  = 506     ; c.FloatCol = 7.7         ; c.DoubleCol = 8.8       ; c.StringCol = @"banach";
         c.BinaryCol = bin2 ; c.DateCol = timeNow ; c.TableCol = subtab2     ; c.MixedCol  = mixSubtab ;
