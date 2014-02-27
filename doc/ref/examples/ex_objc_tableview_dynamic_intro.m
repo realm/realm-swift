@@ -26,7 +26,7 @@ int main()
 
         /* Row 0 */
 
-        cursor = [table addRow];
+        cursor = [table addEmptyRow];
 
         [cursor setInt:23 inColumn:AGE];
         [cursor setString:@"Joe" inColumn:NAME];
@@ -34,7 +34,7 @@ int main()
 
         /* Row 1 */
 
-        cursor = [table addRow];
+        cursor = [table addEmptyRow];
 
         [cursor setInt:32 inColumn:AGE];
         [cursor setString:@"Simon" inColumn:NAME];
@@ -42,7 +42,7 @@ int main()
 
         /* Row 2 */
 
-        cursor = [table addRow];
+        cursor = [table addEmptyRow];
 
         [cursor setInt:12 inColumn:AGE];
         [cursor setString:@"Steve" inColumn:NAME];
@@ -50,7 +50,7 @@ int main()
 
         /* Row 3 */
 
-        cursor = [table addRow];
+        cursor = [table addEmptyRow];
 
         [cursor setInt:59 inColumn:AGE];
         [cursor setString:@"Nick" inColumn:NAME];

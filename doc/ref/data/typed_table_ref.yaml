@@ -4,7 +4,7 @@
 
 #UNIMPLEMENTED columns(), front(), back(), insert_empty_row(), lookup(), findAll()
 #              via table Propery, get_sorted_view(), where(), distinct()
-#INCONSISTENCY add.., addRow, vs. add_empty_row, and number of rows cannot be specified
+#INCONSISTENCY add.., number of rows cannot be specified
 #INCONSISTENCY popBack(), find_first_* ->> find*   ("first" is omitted)
 
 ID         : class_typed_table
@@ -192,13 +192,13 @@ CATEGORIES:
         DESCR  :
 
   - g_typed_table_add_empty_row:
-      NAME     : addRow
+      NAME     : addEmptyRow
       SUMMARY  : &objc_typed_table_add_empty_row_summary
                  Adds an empty row and returns a cursor. You can use the cursor to get or set the values.
       DESCR    : &objc_typed_table_add_empty_row_descr
                  This method adds one empty row at the end of the table.
                  Default values (e.g. 0 or "") will be inserted for all the columns in the row.
-      SIGNATURE: -(TableName_Cursor *)addRow;
+      SIGNATURE: -(TableName_Cursor *)addEmptyRow;
       RETURN:
         TYPES  : TableName_Cursor *
         DESCR  : Returns a typed cursor at the added row. Note that <code>TableName</code> is replaced with the name of your typed table.
