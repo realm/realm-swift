@@ -192,17 +192,16 @@ void groupFunc() {
     }
     
     // Write same group to memory buffer
-    /*size_t len;
-     const char* buffer = [group writeToBuffer];
+    TightdbBinary *buffer = [group writeToBuffer];
      
-     // Load a group from memory (and print contents)
-     TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:buffer withError:nil];
-     PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class] error:nil];
-     
-     for (size_t i = 0; i < [memTable count]; i++) {
-     PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];
-     NSLog(@"%zu: %@", i, cursor.Name);            // using dot-syntax
-     }*/
+    // Load a group from memory (and print contents)
+    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:buffer withError:nil];
+    PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class] error:nil];
+    
+    for (size_t i = 0; i < [memTable count]; i++) {
+    PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];
+    NSLog(@"%zu: %@", i, cursor.Name);            // using dot-syntax
+     }
     
     
     // @@EndExample@@
