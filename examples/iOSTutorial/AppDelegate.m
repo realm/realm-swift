@@ -108,7 +108,7 @@ void tableFunc() {
     // @@Example: advanced_search @@
     // Create query (current employees between 20 and 30 years old)
     PeopleTable_Query *q = [[[people where].Hired columnIsEqualTo:YES]
-                            .Age   columnIsBetween:20 and_:30];
+                                           .Age   columnIsBetween:20 and_:30];
 
     // Get number of matching entries
     size_t cnt3 = [q count];                            // =&gt; 2
