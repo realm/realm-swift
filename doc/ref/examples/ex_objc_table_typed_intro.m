@@ -19,11 +19,11 @@ int main()
 
         PeopleTable *table = [[PeopleTable alloc] init];
 
-        PeopleTable_Cursor *cursor = [table addRow];
+        PeopleTable_Cursor *cursor = [table addEmptyRow];
         cursor.Name = @"Brian";
         cursor.Age = 10;
 
-        cursor = [table addRow];
+        cursor = [table addEmptyRow];
         cursor.Name = @"Sofie";
         cursor.Age = 40;
 
@@ -32,7 +32,7 @@ int main()
                                 Name:@"Jesper"
                                  Age:200];
 */
-        cursor = [table addRow];
+        cursor = [table addEmptyRow];
         cursor.Name = @"Jesper";
         cursor.Age = 200;
 
