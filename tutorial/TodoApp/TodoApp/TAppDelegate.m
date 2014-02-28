@@ -19,7 +19,7 @@
         
         if([todoTable getColumnCount] == 0) {
             [todoTable addColumnWithType:tightdb_String andName:@"todoName"];
-            [todoTable addColumnWithType:tightdb_Bool andName:@"completed"];
+            [todoTable addColumnWithType:tightdb_Bool   andName:@"completed"];
         }
         
         return YES; // Commit
