@@ -288,7 +288,7 @@ case "$MODE" in
                         if [ "$x" = "iPhoneSimulator" ]; then
                             archs="i386:x86_64"
                         elif [  "$x" = "iPhoneOS" ]; then
-                            archs="armv6"
+                            archs="armv7"
                             if [ "$arm64_supported" ]; then
                                 archs="$archs:arm64"
                             fi
