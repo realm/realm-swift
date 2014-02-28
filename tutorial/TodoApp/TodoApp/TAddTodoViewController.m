@@ -8,7 +8,6 @@
 
 #import "TAddTodoViewController.h"
 #import "TAppDelegate.h"
-#import "TViewController.h"
 #import <Tightdb/Tightdb.h>
 
 
@@ -46,7 +45,7 @@
                 
             TightdbTable *todoTable = [tnx getTable:@"todos" error:nil];
                 
-            TightdbCursor *row = [todoTable addRow];
+            TightdbCursor *row = [todoTable addEmptyRow];
             [row setString:self.todoName.text inColumn:0];
                 
             return YES; // Commit

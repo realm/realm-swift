@@ -15,7 +15,6 @@
 		4D54FCA218B7913B002AD81E /* TAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D54FCA118B7913B002AD81E /* TAppDelegate.m */; };
 		4D54FCA518B7913B002AD81E /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D54FCA318B7913B002AD81E /* Main_iPhone.storyboard */; };
 		4D54FCA818B7913B002AD81E /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D54FCA618B7913B002AD81E /* Main_iPad.storyboard */; };
-		4D54FCAB18B7913B002AD81E /* TViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D54FCAA18B7913B002AD81E /* TViewController.m */; };
 		4D54FCAD18B7913B002AD81E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D54FCAC18B7913B002AD81E /* Images.xcassets */; };
 		4D54FCB418B7913B002AD81E /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FCB318B7913B002AD81E /* XCTest.framework */; };
 		4D54FCB518B7913B002AD81E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC9118B7913B002AD81E /* Foundation.framework */; };
@@ -25,6 +24,7 @@
 		4D54FCCC18B791DD002AD81E /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FCCB18B791DD002AD81E /* libstdc++.dylib */; };
 		4D54FCCF18B79224002AD81E /* TAddTodoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D54FCCE18B79224002AD81E /* TAddTodoViewController.m */; };
 		4D7995AA18BCE351009EB0C0 /* Tightdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D7995A918BCE351009EB0C0 /* Tightdb.framework */; };
+		4DB1DFD518C096E7005A7234 /* TTodoTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DFD418C096E7005A7234 /* TTodoTableViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,8 +50,6 @@
 		4D54FCA118B7913B002AD81E /* TAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TAppDelegate.m; sourceTree = "<group>"; };
 		4D54FCA418B7913B002AD81E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
 		4D54FCA718B7913B002AD81E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
-		4D54FCA918B7913B002AD81E /* TViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TViewController.h; sourceTree = "<group>"; };
-		4D54FCAA18B7913B002AD81E /* TViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TViewController.m; sourceTree = "<group>"; };
 		4D54FCAC18B7913B002AD81E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		4D54FCB218B7913B002AD81E /* TodoAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TodoAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D54FCB318B7913B002AD81E /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -62,6 +60,8 @@
 		4D54FCCD18B79224002AD81E /* TAddTodoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TAddTodoViewController.h; sourceTree = "<group>"; };
 		4D54FCCE18B79224002AD81E /* TAddTodoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TAddTodoViewController.m; sourceTree = "<group>"; };
 		4D7995A918BCE351009EB0C0 /* Tightdb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Tightdb.framework; path = ../../Tightdb.framework; sourceTree = "<group>"; };
+		4DB1DFD318C096E7005A7234 /* TTodoTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTodoTableViewController.h; sourceTree = "<group>"; };
+		4DB1DFD418C096E7005A7234 /* TTodoTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTodoTableViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,11 +128,11 @@
 				4D54FCA018B7913B002AD81E /* TAppDelegate.h */,
 				4D54FCA118B7913B002AD81E /* TAppDelegate.m */,
 				4D54FCA318B7913B002AD81E /* Main_iPhone.storyboard */,
+				4DB1DFD318C096E7005A7234 /* TTodoTableViewController.h */,
+				4DB1DFD418C096E7005A7234 /* TTodoTableViewController.m */,
 				4D54FCCD18B79224002AD81E /* TAddTodoViewController.h */,
 				4D54FCCE18B79224002AD81E /* TAddTodoViewController.m */,
 				4D54FCA618B7913B002AD81E /* Main_iPad.storyboard */,
-				4D54FCA918B7913B002AD81E /* TViewController.h */,
-				4D54FCAA18B7913B002AD81E /* TViewController.m */,
 				4D54FCAC18B7913B002AD81E /* Images.xcassets */,
 				4D54FC9818B7913B002AD81E /* Supporting Files */,
 			);
@@ -270,7 +270,7 @@
 				4D54FC9E18B7913B002AD81E /* main.m in Sources */,
 				4D54FCCF18B79224002AD81E /* TAddTodoViewController.m in Sources */,
 				4D54FCA218B7913B002AD81E /* TAppDelegate.m in Sources */,
-				4D54FCAB18B7913B002AD81E /* TViewController.m in Sources */,
+				4DB1DFD518C096E7005A7234 /* TTodoTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
