@@ -286,11 +286,11 @@ case "$MODE" in
                         iphone_sdks_avail="no"
                     else
                         if [ "$x" = "iPhoneSimulator" ]; then
-                            archs="i386:x86_64"
+                            archs="i386,x86_64"
                         elif [  "$x" = "iPhoneOS" ]; then
-                            archs="armv7"
+                            archs="armv7,armv7s"
                             if [ "$arm64_supported" ]; then
-                                archs="$archs:arm64"
+                                archs="$archs,arm64"
                             fi
                         else
                             continue
@@ -392,7 +392,7 @@ EOF
         for x in $iphone_sdks; do
             platform="$(printf "%s\n" "$x" | cut -d: -f1)" || exit 1
             sdk="$(printf "%s\n" "$x" | cut -d: -f2)" || exit 1
-            archs="$(printf "%s\n" "$x" | cut -d: -f3- | sed 's/:/ /g')" || exit 1
+            archs="$(printf "%s\n" "$x" | cut -d: -f3 | sed 's/,/ /g')" || exit 1
             cflags_arch=""
             for y in $archs; do
                 word_list_append "cflags_arch" "-arch $y" || exit 1
