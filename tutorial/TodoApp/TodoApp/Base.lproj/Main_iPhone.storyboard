@@ -95,18 +95,12 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="KYk-Np-bR8">
-                        <barButtonItem key="rightBarButtonItem" title="add todo" id="yec-QY-Kll">
+                        <barButtonItem key="rightBarButtonItem" title="Add todo" id="yec-QY-Kll">
                             <connections>
                                 <segue destination="t1e-Pe-f2e" kind="modal" id="B3R-gc-f4f"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
-                    <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="hzC-tM-YY3">
-                        <autoresizingMask key="autoresizingMask"/>
-                        <connections>
-                            <action selector="refresh:" destination="zDj-7N-wt1" eventType="valueChanged" id="1KH-1q-3H6"/>
-                        </connections>
-                    </refreshControl>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qkN-Oa-KZZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
