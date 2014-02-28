@@ -82,15 +82,6 @@
     [self.refreshControl endRefreshing];
 }
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath   *)indexPath
 {
@@ -117,8 +108,6 @@
     }
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-
-
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -149,10 +138,6 @@
     } withError:nil];
     
     [self setEditing:NO animated:NO];
-    
-    //[self.tableView setEditing:NO animated:YES];
-    //self.navigationItem.leftBarButtonItem = nil;
-    
 }
 
 
@@ -186,11 +171,9 @@
     return completed;
 }
 
-
 -(NSInteger) todoCount
 
 {
-    
     __block NSInteger rows = 0;
     TAppDelegate* delegate = (TAppDelegate*)[[UIApplication sharedApplication]delegate];
     
@@ -206,7 +189,6 @@
     
     return rows;
 }
-
 
 
 @end
