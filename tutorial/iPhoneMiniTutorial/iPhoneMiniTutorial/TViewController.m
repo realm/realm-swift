@@ -11,7 +11,7 @@
 {
     [super viewDidLoad];
     
-    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup sharedGroupWithFile:[self pathForDataFile:@"MyDatabase.db"] withError:nil];
+    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup sharedGroupWithFile:@"MyDatabase.db" withError:nil];
     
     [sharedGroup writeWithBlock:^(TightdbGroup *group) {
         
@@ -19,9 +19,9 @@
         TightdbTable *table = [group getTable:@"myTable" error:nil];
         
         // Add columns to the table
-        size_t const NAME = [table addColumnWithType:tightdb_String andName:@"Name"];
-        size_t const AGE = [table addColumnWithType:tightdb_Int andName:@"Age"];
-        size_t const HIRED = [table addColumnWithType:tightdb_Bool andName:@"Hired"];
+        int const NAME = [table addColumnWithType:tightdb_String andName:@"Name"];
+        int const AGE = [table addColumnWithType:tightdb_Int andName:@"Age"];
+        int const HIRED = [table addColumnWithType:tightdb_Bool andName:@"Hired"];
         
         // Add new row to the table and set values
         TightdbCursor *cursor0 = [table addEmptyRow];
@@ -51,12 +51,5 @@
     
     }
 
-
-
-- (NSString *) pathForDataFile:(NSString *)filename {
-    NSArray *pathArray = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [pathArray objectAtIndex:0];
-    return [documentsDirectory stringByAppendingPathComponent:filename];
-}
 
 @end
