@@ -65,7 +65,23 @@
     if ([_table getIntInColumn:1 atRow:ndx] != 10)
         STFail(@"Second not 10");
 
+    // Add row using object literate
+    TightdbTable* _table2 = [[TightdbTable alloc] init];
+    [_table2 addColumnWithType:tightdb_Int andName:@"first"];
+    if (![_table2 appendRow:@[ @1 ]])
+        STFail(@"appendRow 1");
+    if ([_table2 count] != 1)
+        STFail(@"Excepted 1 row");
+    if ([_table2 appendRow:@[@"Hello"]])
+        STFail(@"appendRow 2");
 
+    TightdbTable* _table3 = [[TightdbTable alloc] init];
+    [_table3 addColumnWithType:tightdb_Int andName:@"first"];
+    [_table3 addColumnWithType:tightdb_String andName:@"second"];
+    if (![_table3 appendRow:@[@1, @"Hello"]])
+        STFail(@"appendRow 1");
+    if ([_table3 appendRow:@[@1, @2]])
+        STFail(@"appendRow 2");
 }
 
 - (void)testDataTypes_Dynamic
