@@ -676,7 +676,6 @@ using namespace std;
     return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
 }
 
-/* FIXME: No error handling version */
 -(BOOL)appendRow:(NSArray*)data
 {
     tightdb::Table& table = *m_table;

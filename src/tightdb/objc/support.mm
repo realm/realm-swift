@@ -101,6 +101,12 @@ BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
         case type_Int:
             table.insert_int(col_ndx, row_ndx, int64_t([obj longValue]));
             break;
+        case type_Float:
+            table.insert_float(col_ndx, row_ndx, float([obj floatValue]));
+            break;
+        case type_Double:
+            table.insert_double(col_ndx, row_ndx, double([obj doubleValue]));
+            break;
         case type_String: 
             {
                 StringData sd([obj UTF8String]);
