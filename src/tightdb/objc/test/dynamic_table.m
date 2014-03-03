@@ -69,19 +69,36 @@
     TightdbTable* _table2 = [[TightdbTable alloc] init];
     [_table2 addColumnWithType:tightdb_Int andName:@"first"];
     if (![_table2 appendRow:@[ @1 ]])
-        STFail(@"appendRow 1");
+        STFail(@"Impossible!");
     if ([_table2 count] != 1)
         STFail(@"Excepted 1 row");
+    if (![_table2 appendRow:@[ @2 ]])
+        STFail(@"Impossible!");
+    if ([_table2 count] != 2)
+        STFail(@"Excepted 2 rows");
+    if ([_table2 getIntInColumn:0 atRow:0] != 1)
+        STFail(@"Value 1 excepted");
+    if ([_table2 getIntInColumn:0 atRow:1] != 2)
+        STFail(@"Value 2 excepted");
     if ([_table2 appendRow:@[@"Hello"]])
-        STFail(@"appendRow 2");
+        STFail(@"Wrong type");
+    if ([_table2 appendRow:@[@1, @"Hello"]])
+        STFail(@"Wrong number of columns");
 
     TightdbTable* _table3 = [[TightdbTable alloc] init];
     [_table3 addColumnWithType:tightdb_Int andName:@"first"];
     [_table3 addColumnWithType:tightdb_String andName:@"second"];
     if (![_table3 appendRow:@[@1, @"Hello"]])
         STFail(@"appendRow 1");
+    if ([_table3 count] != 1)
+        STFail(@"1 row expected");
+    if ([_table3 getIntInColumn:0 atRow:0] != 1)
+        STFail(@"Value 1 excepted");
+    if (![[_table3 getStringInColumn:1 atRow:0] isEqualToString:@"Hello"])
+        STFail(@"Value 'Hello' excepted");
     if ([_table3 appendRow:@[@1, @2]])
         STFail(@"appendRow 2");
+   
 }
 
 - (void)testDataTypes_Dynamic
