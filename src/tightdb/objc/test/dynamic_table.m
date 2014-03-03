@@ -58,13 +58,12 @@
     [cursor setInt:0 inColumn:0];
     [cursor setInt:10 inColumn:1];
 
-
     // Verify
     if ([_table getIntInColumn:0 atRow:ndx] != 0)
         STFail(@"First not zero");
     if ([_table getIntInColumn:1 atRow:ndx] != 10)
         STFail(@"Second not 10");
-
+ 
     // Add row using object literate
     TightdbTable* _table2 = [[TightdbTable alloc] init];
     [_table2 addColumnWithType:tightdb_Int andName:@"first"];
@@ -98,6 +97,21 @@
         STFail(@"Value 'Hello' excepted");
     if ([_table3 appendRow:@[@1, @2]])
         STFail(@"appendRow 2");
+
+    TightdbTable* _table4 = [[TightdbTable alloc] init];
+    [_table4 addColumnWithType:tightdb_Double andName:@"first"];
+    if (![_table4 appendRow:@[@3.14]])
+        STFail(@"Cannot insert 'float'");
+    if ([_table4 count] != 1)
+        STFail(@"1 row excepted");
+
+    TightdbTable* _table5 = [[TightdbTable alloc] init];
+    [_table5 addColumnWithType:tightdb_Float andName:@"first"];
+    if (![_table5 appendRow:@[@3.14F]])  /* F == float */
+        STFail(@"Cannot insert 'float'");
+    if ([_table5 count] != 1)
+        STFail(@"1 row excepted");
+
    
 }
 
