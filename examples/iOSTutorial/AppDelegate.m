@@ -132,82 +132,6 @@ void tableFunc() {
 
 }
 
-
-void groupFunc() {
-
-    // @@Example: serialisation @@
-    // Create Table in Group
-    TightdbGroup *group = [TightdbGroup group];
-    PeopleTable *people = [group getTable:@"employees" withClass:[PeopleTable class] error:nil];
-
-    // Add some rows
-    PeopleTable_Cursor *cursor;
-
-    // Row 1
-    cursor = [people addEmptyRow];
-    cursor.Name  = @"John";
-    cursor.Age   = 21;
-    cursor.Hired = YES;
-
-    // Row 2
-    cursor = [people addEmptyRow];
-    cursor.Name  = @"Mary";
-    cursor.Age   = 21;
-    cursor.Hired = NO;
-
-    // Row 3
-    cursor = [people addEmptyRow];
-    cursor.Name  = @"Lars";
-    cursor.Age   = 21;
-    cursor.Hired = YES;
-
-    // Row 4
-    cursor = [people addEmptyRow];
-    cursor.Name  = @"Phil";
-    cursor.Age   = 43;
-    cursor.Hired = NO;
-
-    // Row 5
-    cursor = [people addEmptyRow];
-    cursor.Name  = @"Anni";
-    cursor.Age   = 54;
-    cursor.Hired = YES;
-
-    // Delete any old file by same name
-    // IMPORTANT: write will fail if the file exists.
-    NSFileManager *manager = [NSFileManager defaultManager];
-    [manager removeItemAtPath:@"employees.tightdb" error:nil];
-
-    // Write to disk
-    [group writeToFile:@"employees.tightdb" withError:nil];
-
-    // Load a group from disk (and print contents)
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFile:@"employees.tightdb" withError:nil];
-    PeopleTable *diskTable = [fromDisk getTable:@"employees" withClass:[PeopleTable class] error:nil];
-
-    NSLog(@"Disktable size: %zu", [diskTable count]);
-    for (size_t i = 0; i < [diskTable count]; i++) {
-        PeopleTable_Cursor *cursor = [diskTable cursorAtIndex:i];
-        NSLog(@"%zu: %@", i, [cursor Name]);           // using std. method
-    }
-
-    // Write same group to memory buffer
-    TightdbBinary *buffer = [group writeToBuffer];
-
-    // Load a group from memory (and print contents)
-    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:buffer withError:nil];
-    PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class] error:nil];
-
-    for (size_t i = 0; i < [memTable count]; i++) {
-    PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];
-    NSLog(@"%zu: %@", i, cursor.Name);            // using dot-syntax
-}
-
-    // @@EndExample@@
-
-
-}
-
 void sharedGroupFunc() {
 
     // @@Example: transaction @@
@@ -251,14 +175,33 @@ void sharedGroupFunc() {
     // @@EndExample@@
 }
 
+void groupFunc() {
+
+    // @@Example: serialisation @@
+    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup sharedGroupWithFile:@"people.tightdb"
+                                                              withError:nil];
+
+    // Within a single read transaction we can write a copy of the entire db to a new file.
+    // This is usefull both for backups and for transfering datasets to other machines.
+    [sharedGroup readWithBlock:^(TightdbGroup *group) {
+        // Write entire db to disk (in a new file)
+        [group writeToFile:@"people_backup.tightdb" withError:nil];
+    }];
+    // @@EndExample@@
+}
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    /* We want to clear out old state before running tutorial */
+    NSFileManager *manager = [NSFileManager defaultManager];
+    [manager removeItemAtPath:@"people.tightdb" error:nil];
+    [manager removeItemAtPath:@"people_backup.tightdb" error:nil];
 
     tableFunc();
-    groupFunc();
     sharedGroupFunc();
+    groupFunc();
     return YES;
 }
 
