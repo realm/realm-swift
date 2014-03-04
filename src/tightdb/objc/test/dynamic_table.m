@@ -119,7 +119,14 @@
     if ([_table6 count] != 1)
         STFail(@"1 row excepted");
 
-   
+    const char bin[4] = { 0, 1, 2, 3 };
+    TightdbBinary* bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
+    TightdbTable* _table7 = [[TightdbTable alloc] init];
+    [_table7 addColumnWithType:tightdb_Binary andName:@"first"];
+    if (![_table7 appendRow:@[bin2]])
+        STFail(@"Cannot insert 'binary'");
+    if ([_table7 count] != 1)
+        STFail(@"1 row excepted");
 }
 
 - (void)testDataTypes_Dynamic
