@@ -9,6 +9,7 @@ BOOL verify_row(const Descriptor& descr, NSArray * data)
     NSEnumerator *enumerator = [data objectEnumerator];
     id obj;
 
+    /* type encodings: http://nshipster.com/type-encodings/ */
     size_t col_ndx = 0;
     while (obj = [enumerator nextObject]) {
         DataType type = descr.get_column_type(col_ndx);
@@ -23,6 +24,22 @@ BOOL verify_row(const Descriptor& descr, NSArray * data)
                 const char dt = data_type[0];
                 if (dt != 'B')
                     return NO;
+            }
+            break;
+        case type_DateTime:
+            if ([obj isKindOfClass:[NSNumber class]]) {
+                const char * data_type = [obj objCType];
+                const char dt = data_type[0];
+                /* time_t is an integer */
+                if (dt == 'i' || dt == 's' || dt == 'l' || dt == 'q' ||
+                    dt == 'I' || dt == 'S' || dt == 'L' || dt == 'Q')
+                    break;
+                else {
+                    return NO;
+                }
+            }
+            else {
+                return NO;
             }
             break;
         case type_Int:
@@ -97,6 +114,9 @@ BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
         switch (type) {
         case type_Bool:
             table.insert_bool(col_ndx, row_ndx, bool([obj boolValue]));
+            break;
+        case type_DateTime:
+            table.insert_datetime(col_ndx, row_ndx, time_t([obj longValue]));
             break;
         case type_Int:
             table.insert_int(col_ndx, row_ndx, int64_t([obj longValue]));
