@@ -37,9 +37,9 @@
 -(TightdbQuery *)endgroup;
 -(void)subtable:(size_t)column;
 -(void)parent;
--(NSNumber *)count;
+-(NSNumber *)count; // countNumberOfRows
 -(NSNumber *)countWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)remove;
+-(NSNumber *)remove; // removeRow
 -(NSNumber *)removeWithError:(NSError *__autoreleasing *)error;
 -(NSNumber *)minimumWithIntColumn:(size_t)colNdx;
 -(NSNumber *)minimumWithIntColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
@@ -75,21 +75,21 @@
 
 /* Conditions: */
 
--(TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and_:(int64_t)to;
--(TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and_:(float)to;
+-(TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and_:(int64_t)to; // intValuesIncolumn: column areBetween: from and: to
+-(TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and_:(float)to; // floatValuesInColumn: column areBetween: from and: to
 -(TightdbQuery *)column:(size_t)colNdx isBetweenDouble:(double)from and_:(double)to;
 -(TightdbQuery *)column:(size_t)colNdx isBetweenDate:(time_t)from and_:(time_t)to;
 
--(TightdbQuery *)column:(size_t)colNdx isEqualToBool:(bool)value;
--(TightdbQuery *)column:(size_t)colNdx isEqualToInt:(int64_t)value;
+-(TightdbQuery *)column:(size_t)colNdx isEqualToBool:(bool)value; // boolValuesInColumn: column areEqualTo: aBool
+-(TightdbQuery *)column:(size_t)colNdx isEqualToInt:(int64_t)value; // intValuesInColumn: column areEqualTo: anInt
 -(TightdbQuery *)column:(size_t)colNdx isEqualToFloat:(float)value;
 -(TightdbQuery *)column:(size_t)colNdx isEqualToDouble:(double)value;
 -(TightdbQuery *)column:(size_t)colNdx isEqualToString:(NSString *)value;
--(TightdbQuery *)column:(size_t)colNdx isEqualToString:(NSString *)value caseSensitive:(bool)caseSensitive;
+-(TightdbQuery *)column:(size_t)colNdx isEqualToString:(NSString *)value caseSensitive:(bool)caseSensitive; // stringValuesInColumn: column areEquaTo: aString withSameCase
 -(TightdbQuery *)column:(size_t)colNdx isEqualToDate:(time_t)value;
 -(TightdbQuery *)column:(size_t)colNdx isEqualToBinary:(TightdbBinary *)value;
 
--(TightdbQuery *)column:(size_t)colNdx isNotEqualToInt:(int64_t)value;
+-(TightdbQuery *)column:(size_t)colNdx isNotEqualToInt:(int64_t)value; // intValuesInColumn: column areNotEqualTo: anInt
 -(TightdbQuery *)column:(size_t)colNdx isNotEqualToFloat:(float)value;
 -(TightdbQuery *)column:(size_t)colNdx isNotEqualToDouble:(double)value;
 -(TightdbQuery *)column:(size_t)colNdx isNotEqualToString:(NSString *)value;
@@ -97,7 +97,7 @@
 -(TightdbQuery *)column:(size_t)colNdx isNotEqualToDate:(time_t)value;
 -(TightdbQuery *)column:(size_t)colNdx isNotEqualToBinary:(TightdbBinary *)value;
 
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanInt:(int64_t)value;
+-(TightdbQuery *)column:(size_t)colNdx isGreaterThanInt:(int64_t)value; // intValuesInColumn: column areGreaterThan: anInt
 -(TightdbQuery *)column:(size_t)colNdx isGreaterThanFloat:(float)value;
 -(TightdbQuery *)column:(size_t)colNdx isGreaterThanDouble:(double)value;
 -(TightdbQuery *)column:(size_t)colNdx isGreaterThanDate:(time_t)value;
@@ -132,14 +132,14 @@
 
 @interface TightdbQueryAccessorInt: NSObject
 -(id)initWithColumn:(size_t)columnId query:(TightdbQuery *)query;
--(TightdbQuery *)columnIsEqualTo:(int64_t)value;
+-(TightdbQuery *)columnIsEqualTo:(int64_t)value; // intValuesAreEqualTo: anInt
 -(TightdbQuery *)columnIsNotEqualTo:(int64_t)value;
 -(TightdbQuery *)columnIsGreaterThan:(int64_t)value;
 -(TightdbQuery *)columnIsGreaterThanOrEqualTo:(int64_t)value;
 -(TightdbQuery *)columnIsLessThan:(int64_t)value;
 -(TightdbQuery *)columnIsLessThanOrEqualTo:(int64_t)value;
 -(TightdbQuery *)columnIsBetween:(int64_t)from and_:(int64_t)to;
--(NSNumber *)minimum;
+-(NSNumber *)minimum; // calcMinimum
 -(NSNumber *)minimumWithError:(NSError *__autoreleasing *)error;
 -(NSNumber *)maximum;
 -(NSNumber *)maximumWithError:(NSError *__autoreleasing *)error;

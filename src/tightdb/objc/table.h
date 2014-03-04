@@ -128,7 +128,7 @@
 
 -(BOOL)clear; //clearRows
 -(BOOL)clearWithError:(NSError *__autoreleasing *)error; //Hm, should throw exception
--(BOOL)removeRowAtIndex:(size_t)ndx;
+-(BOOL)removeRowAtIndex:(size_t)ndx; // removeRow: row
 -(BOOL)removeRowAtIndex:(size_t)ndx error:(NSError *__autoreleasing *)error; //Hm, should throw exception
 -(BOOL)removeLastRow;
 -(BOOL)removeLastRowWithError:(NSError *__autoreleasing *)error; //Hm, should throw exception
@@ -232,7 +232,7 @@
 -(TightdbQuery *)whereWithError:(NSError *__autoreleasing *)error;
 
 /* Indexing */
--(BOOL)hasIndex:(size_t)colNdx; // isIndexSetInColumn: column
+-(BOOL)hasIndex:(size_t)colNdx; // isIndexSetInColumn: column // columHasIndex: column
 -(void)setIndex:(size_t)colNdx; // setIndexInColumn: column
 
 /* Optimizing */
@@ -275,16 +275,16 @@
 @interface TightdbView: NSObject <NSFastEnumeration>
 -(TightdbCursor *)cursorAtIndex:(size_t)ndx;
 
--(size_t)count;
+-(size_t)count; // countRows
 -(BOOL)isEmpty;
--(int64_t)get:(size_t)colNdx ndx:(size_t)ndx;
--(BOOL)getBool:(size_t)colNdx ndx:(size_t)ndx;
+-(int64_t)get:(size_t)colNdx ndx:(size_t)ndx; // intValueInColumn: column andRow: row
+-(BOOL)getBool:(size_t)colNdx ndx:(size_t)ndx; // same
 -(time_t)getDate:(size_t)colNdx ndx:(size_t)ndx;
 -(NSString *)getString:(size_t)colNdx ndx:(size_t)ndx;
--(void)removeRowAtIndex:(size_t)ndx;
--(void)clear;
--(TightdbTable *)getTable;
--(size_t)getSourceIndex:(size_t)ndx;
+-(void)removeRowAtIndex:(size_t)ndx; // removeRow: row
+-(void)clear; // clearRows
+-(TightdbTable *)getTable; // sourceTable
+-(size_t)getSourceIndex:(size_t)ndx; // rowIndexInSourceTableForRow: row
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
 /* Private */
