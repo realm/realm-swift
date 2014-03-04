@@ -2,6 +2,8 @@
 
 #include <tightdb/descriptor.hpp>
 
+#import "table.h"
+
 using namespace tightdb;
 
 BOOL verify_row(const Descriptor& descr, NSArray * data)
@@ -87,6 +89,10 @@ BOOL verify_row(const Descriptor& descr, NSArray * data)
             else
                 return NO;
             break; /* FIXME: remove */
+        case type_Binary:
+            if (![obj isKindOfClass:[TightdbBinary class]])
+                return NO;
+            break;
         case type_Mixed:
             break; /* everything goes */
         /* FIXME: type_Binary, type_Date, type_Table */
@@ -131,6 +137,13 @@ BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
             {
                 StringData sd([obj UTF8String]);
                 table.insert_string(col_ndx, row_ndx, sd);
+            }
+            break;
+        case type_Binary:
+            {
+                TightdbBinary *bin = (TightdbBinary *)obj;
+                BinaryData bd([obj getData], [obj getSize]);
+                table.insert_binary(col_ndx, row_ndx, bd);
             }
             break;
         }
