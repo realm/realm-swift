@@ -211,34 +211,39 @@ void groupFunc() {
 void sharedGroupFunc() {
 
     // @@Example: transaction @@
-    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup sharedGroupWithFile:@"people.tightdb" withError:nil];
+    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup sharedGroupWithFile:@"people.tightdb"
+                                                          withError:nil];
 
-    // A write transaction (with rollback if not first writer to employees table).
-
+    // Start a write transaction
     [sharedGroup writeWithBlock:^(TightdbGroup *group) {
 
-        // Write transactions with the shared group are possible via the provided variable binding named group.
+        // Get a specific table from the group
+        PeopleTable *table = [group getTable:  @"employees"
+                                    withClass: [PeopleTable class]
+                                    error:     nil];
 
-        PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class] error:nil];
+        // Rollback if the table is not empty
         if ([table count] > 0) {
             NSLog(@"Not empty!");
             return NO; // Rollback
         }
 
+        // Otherwise add a row
         [table addName:@"Bill" Age:53 Hired:YES];
         NSLog(@"Row added!");
         return YES; // Commit
 
     } withError:nil];
 
-    // A read transaction
-
+    // Start a read transaction
     [sharedGroup readWithBlock:^(TightdbGroup *group) {
 
-        // Read transactions with the shared group are possible via the provided variable binding named group.
+        // Get the table
+        PeopleTable *table = [group getTable:  @"employees"
+                                    withClass: [PeopleTable class]
+                                    error:     nil];
 
-        PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class] error:nil];
-
+        // Interate over all rows in table
         for (PeopleTable_Cursor *curser in table) {
             NSLog(@"Name: %@", [curser Name]);
         }
