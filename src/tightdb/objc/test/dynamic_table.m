@@ -100,8 +100,8 @@
 
     TightdbTable* _table4 = [[TightdbTable alloc] init];
     [_table4 addColumnWithType:tightdb_Double andName:@"first"];
-    if (![_table4 appendRow:@[@3.14]])
-        STFail(@"Cannot insert 'float'");
+    if (![_table4 appendRow:@[@3.14]])  /* double is default */
+        STFail(@"Cannot insert 'double'");
     if ([_table4 count] != 1)
         STFail(@"1 row excepted");
 
@@ -110,6 +110,13 @@
     if (![_table5 appendRow:@[@3.14F]])  /* F == float */
         STFail(@"Cannot insert 'float'");
     if ([_table5 count] != 1)
+        STFail(@"1 row excepted");
+
+    TightdbTable* _table6 = [[TightdbTable alloc] init];
+    [_table6 addColumnWithType:tightdb_Date andName:@"first"];
+    if (![_table6 appendRow:@[@1000000000]])  /* 2001-09-09 01:46:40 */
+        STFail(@"Cannot insert 'time_t'");
+    if ([_table6 count] != 1)
         STFail(@"1 row excepted");
 
    
