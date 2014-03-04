@@ -3,9 +3,7 @@
 //  TightDbExample
 //
 
-#import <tightdb/objc/group.h>
-#import <tightdb/objc/table.h>
-#import <tightdb/objc/tightdb.h>
+#import <Tightdb/Tightdb.h>
 
 #import "ViewController.h"
 #import "Utils.h"

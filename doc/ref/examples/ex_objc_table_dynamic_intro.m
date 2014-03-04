@@ -22,28 +22,28 @@ int main()
 
         /* Row 0 */
 
-        cursor = [table addRow];
+        cursor = [table addEmptyRow];
 
         [cursor setInt:23 inColumn:AGE];
         [cursor setString:@"Joe" inColumn:NAME];
 
         /* Row 1 */
 
-        cursor = [table addRow];
+        cursor = [table addEmptyRow];
 
         [cursor setInt:32 inColumn:AGE];
         [cursor setString:@"Simon" inColumn:NAME];
 
         /* Row 2 */
 
-        cursor = [table addRow];
+        cursor = [table addEmptyRow];
 
         [cursor setInt:12 inColumn:AGE];
         [cursor setString:@"Steve" inColumn:NAME];
 
         /* Row 3 */
 
-        cursor = [table addRow];
+        cursor = [table addEmptyRow];
 
         [cursor setInt:100 inColumn:AGE];
         [cursor setString:@"Nick" inColumn:NAME];
