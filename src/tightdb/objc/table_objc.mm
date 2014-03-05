@@ -401,13 +401,20 @@ using namespace std;
     TightdbType columnType = [self getColumnType:columnIndex];
     
     if(columnType != tightdb_Int && columnType != tightdb_Bool && columnType != tightdb_Date) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:sort_on_column_with_type_not_supported" \
-                                                         reason:@"Sort is currently only supported on Integer, Boolean and Date columns." \
-                                                       userInfo:[NSMutableDictionary dictionary]]; \
+        NSException* exception = [NSException exceptionWithName:@"tightdb:sort_on_column_with_type_not_supported"
+                                                         reason:@"Sort is currently only supported on Integer, Boolean and Date columns."
+                                                       userInfo:[NSMutableDictionary dictionary]];
         [exception raise];
     }
     
-    m_view->sort(columnIndex, order == 0);
+    try {
+        m_view->sort(columnIndex, order == 0);
+    } catch(std::exception& ex) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                         reason:[NSString stringWithUTF8String:ex.what()]
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
 }
 -(int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
 {
