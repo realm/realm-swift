@@ -19,15 +19,15 @@ int main()
 
         /* Adds rows to the table. */
 
-        PeopleTable_Cursor *cursor = [table addRow];
+        PeopleTable_Cursor *cursor = [table addEmptyRow];
         cursor.Name = @"Brian";
         cursor.Age = 10;
 
-        cursor = [table addRow];
+        cursor = [table addEmptyRow];
         cursor.Name = @"Sofie";
         cursor.Age = 40;
 
-        cursor = [table addRow];
+        cursor = [table addEmptyRow];
         cursor.Name = @"Sam";
         cursor.Age = 76;
 

@@ -621,18 +621,18 @@ using namespace std;
     return m_table->size();
 }
 
--(TightdbCursor*)addRow
+-(TightdbCursor*)addEmptyRow
 {
-    return [[TightdbCursor alloc] initWithTable:self ndx:[self _addRow]];
+    return [[TightdbCursor alloc] initWithTable:self ndx:[self _addEmptyRow]];
 }
 
 
--(size_t)_addRow
+-(size_t)_addEmptyRow
 {
-    return [self _addRows:1];
+    return [self _addEmptyRows:1];
 }
 
--(size_t)_addRows:(size_t)num_rows
+-(size_t)_addEmptyRows:(size_t)num_rows
 {
     // TODO: Use a macro or a function for error handling
 

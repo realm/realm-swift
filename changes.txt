@@ -1,3 +1,7 @@
+2014-02-27
+==========
+! BREAKING CHANGE: addRow renamed to addEmptyRow
+
 2013-11-08
 ==========
 * Adding support for one-line installer (suppressing output and don't die too hard).
