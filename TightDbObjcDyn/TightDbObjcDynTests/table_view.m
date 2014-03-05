@@ -41,6 +41,11 @@
     [super tearDown];
 }
 
+-(void)getColumnCount
+{
+    
+}
+
 - (void)testColumnTypesOnView
 {
     TightdbTable *t = [[TightdbTable alloc] init];
@@ -68,6 +73,10 @@
     STAssertTrue([v getColumnType:mixedCol]     == tightdb_Mixed, @"Column types matches");
     STAssertTrue([v getColumnType:stringCol]    == tightdb_String, @"Column types matches");
     STAssertTrue([v getColumnType:tableCol]     == tightdb_Table, @"Column types matches");
+    
+    STAssertThrows([v getColumnType:[v getColumnCount] + 1], @"Out of bounds");
+    STAssertThrows([v getColumnType:100], @"Out of bounds");
+    STAssertThrows([v getColumnType:-1], @"Out of bounds");
 }
 
 - (void)testSortOnViewIntColumn

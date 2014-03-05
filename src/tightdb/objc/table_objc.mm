@@ -388,8 +388,14 @@ using namespace std;
 {
     return m_view->is_empty();
 }
+-(size_t)getColumnCount
+{
+    return m_view->get_column_count();
+}
+
 -(TightdbType)getColumnType:(size_t)colNdx
 {
+    TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colNdx);
     return TightdbType(m_view->get_column_type(colNdx));
 }
 -(void) sortColumnWithIndex: (size_t)columnIndex
