@@ -2,6 +2,7 @@
 ==========
 + tableview now supports sort on column with column type bool, date and int
 + tableview has method for checking the column type of a specified column
++ tableview has method for getting the number of columns
 
 2014-02-27
 ==========
