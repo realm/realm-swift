@@ -1,7 +1,5 @@
-#import <tightdb/objc/group.h>
-#import <tightdb/objc/group_shared.h>
-#import <tightdb/objc/table.h>
-#import <tightdb/objc/tightdb.h>
+#import "AppDelegate.h"
+#import <Tightdb/Tightdb.h>
 
 
 // @@Example: create_table @@
@@ -24,31 +22,31 @@ void tableFunc() {
     PeopleTable_Cursor *cursor;
 
     // Row 1
-    cursor = [people addRow];
+    cursor = [people addEmptyRow];
     cursor.Name  = @"John";
     cursor.Age   = 21;
     cursor.Hired = YES;
 
     // Row 2
-    cursor = [people addRow];
+    cursor = [people addEmptyRow];
     cursor.Name  = @"Mary";
     cursor.Age   = 76;
     cursor.Hired = NO;
 
     // Row 3
-    cursor = [people addRow];
+    cursor = [people addEmptyRow];
     cursor.Name  = @"Lars";
     cursor.Age   = 22;
     cursor.Hired = YES;
 
     // Row 4
-    cursor = [people addRow];
+    cursor = [people addEmptyRow];
     cursor.Name  = @"Phil";
     cursor.Age   = 43;
     cursor.Hired = NO;
 
     // Row 5
-    cursor = [people addRow];
+    cursor = [people addEmptyRow];
     cursor.Name  = @"Anni";
     cursor.Age   = 54;
     cursor.Hired = YES;
@@ -134,115 +132,42 @@ void tableFunc() {
 
 }
 
-
-void groupFunc() {
-
-    // @@Example: serialisation @@
-    // Create Table in Group
-    TightdbGroup *group = [TightdbGroup group];
-    PeopleTable *people = [group getTable:@"employees" withClass:[PeopleTable class]];
-
-    // Add some rows
-    PeopleTable_Cursor *cursor;
-
-    // Row 1
-    cursor = [people addRow];
-    cursor.Name  = @"John";
-    cursor.Age   = 21;
-    cursor.Hired = YES;
-
-    // Row 2
-    cursor = [people addRow];
-    cursor.Name  = @"Mary";
-    cursor.Age   = 21;
-    cursor.Hired = NO;
-
-    // Row 3
-    cursor = [people addRow];
-    cursor.Name  = @"Lars";
-    cursor.Age   = 21;
-    cursor.Hired = YES;
-
-    // Row 4
-    cursor = [people addRow];
-    cursor.Name  = @"Phil";
-    cursor.Age   = 43;
-    cursor.Hired = NO;
-
-    // Row 5
-    cursor = [people addRow];
-    cursor.Name  = @"Anni";
-    cursor.Age   = 54;
-    cursor.Hired = YES;
-
-    // Delete any old file by same name
-    // IMPORTANT: write will fail if the file exists.
-    NSFileManager *manager = [NSFileManager defaultManager];
-    [manager removeItemAtPath:@"employees.tightdb" error:nil];
-
-    // Write to disk
-    [group write:@"employees.tightdb"];
-
-    // Load a group from disk (and print contents)
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:@"employees.tightdb"];
-    PeopleTable *diskTable = [fromDisk getTable:@"employees" withClass:[PeopleTable class]];
-
-    NSLog(@"Disktable size: %zu", [diskTable count]);
-    for (size_t i = 0; i < [diskTable count]; i++) {
-        PeopleTable_Cursor *cursor = [diskTable cursorAtIndex:i];
-        NSLog(@"%zu: %@", i, [cursor Name]);           // using std. method
-    }
-
-    // Write same group to memory buffer
-    size_t len;
-    const char* buffer = [group writeToMem:&len];
-
-    // Load a group from memory (and print contents)
-    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:buffer size:len];
-    PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class]];
-
-    for (size_t i = 0; i < [memTable count]; i++) {
-        PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];
-        NSLog(@"%zu: %@", i, cursor.Name);            // using dot-syntax
-    }
-
-    // @@EndExample@@
-
-
-}
-
-
 void sharedGroupFunc() {
 
     // @@Example: transaction @@
-    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup groupWithFilename:@"people.tightdb"];
+    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup sharedGroupWithFile:@"people.tightdb"
+                                                          withError:nil];
 
-    // A write transaction (with rollback if not first writer to employees table).
+    // Start a write transaction
+    [sharedGroup writeWithBlock:^(TightdbGroup *group) {
 
-    [sharedGroup writeTransaction:^(TightdbGroup *group) {
+        // Get a specific table from the group
+        PeopleTable *table = [group getTable:  @"employees"
+                                    withClass: [PeopleTable class]
+                                    error:     nil];
 
-        // Write transactions with the shared group are possible via the provided variable binding named group.
-
-        PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class]];
+        // Rollback if the table is not empty
         if ([table count] > 0) {
             NSLog(@"Not empty!");
             return NO; // Rollback
         }
 
+        // Otherwise add a row
         [table addName:@"Bill" Age:53 Hired:YES];
         NSLog(@"Row added!");
         return YES; // Commit
 
-    }];
+    } withError:nil];
 
-    // A read transaction
+    // Start a read transaction
+    [sharedGroup readWithBlock:^(TightdbGroup *group) {
 
-    [sharedGroup readTransaction:^(TightdbGroup *group) {
+        // Get the table
+        PeopleTable *table = [group getTable:  @"employees"
+                                    withClass: [PeopleTable class]
+                                    error:     nil];
 
-        // Read transactions with the shared group are possible via the provided variable binding named group.
-
-        PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class]];
-
+        // Interate over all rows in table
         for (PeopleTable_Cursor *curser in table) {
             NSLog(@"Name: %@", [curser Name]);
         }
@@ -250,11 +175,34 @@ void sharedGroupFunc() {
     // @@EndExample@@
 }
 
-int main(int argc, const char * argv[])
-{
-    @autoreleasepool {
-        tableFunc();
-        groupFunc();
-        sharedGroupFunc();
-    }
+void groupFunc() {
+
+    // @@Example: serialisation @@
+    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup sharedGroupWithFile:@"people.tightdb"
+                                                              withError:nil];
+
+    // Within a single read transaction we can write a copy of the entire db to a new file.
+    // This is usefull both for backups and for transfering datasets to other machines.
+    [sharedGroup readWithBlock:^(TightdbGroup *group) {
+        // Write entire db to disk (in a new file)
+        [group writeToFile:@"people_backup.tightdb" withError:nil];
+    }];
+    // @@EndExample@@
 }
+
+@implementation AppDelegate
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+    /* We want to clear out old state before running tutorial */
+    NSFileManager *manager = [NSFileManager defaultManager];
+    [manager removeItemAtPath:@"people.tightdb" error:nil];
+    [manager removeItemAtPath:@"people_backup.tightdb" error:nil];
+
+    tableFunc();
+    sharedGroupFunc();
+    groupFunc();
+    return YES;
+}
+
+@end

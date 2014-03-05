@@ -49,11 +49,11 @@
 
     // 2. Add a row with data
 
-    //const size_t ndx = [_table addRow];
+    //const size_t ndx = [_table addEmptyRow];
     //[_table set:0 ndx:ndx value:0];
     //[_table set:1 ndx:ndx value:10];
 
-    TightdbCursor* cursor = [_table addRow];
+    TightdbCursor* cursor = [_table addEmptyRow];
     size_t ndx = [cursor index];
     [cursor setInt:0 inColumn:0];
     [cursor setInt:10 inColumn:1];
@@ -179,12 +179,12 @@
 
 
 
-    cursor = [subtab1 addRow];
+    cursor = [subtab1 addEmptyRow];
     [cursor setInt:200 inColumn:0];
 
 
 
-    cursor = [subtab2 addRow];
+    cursor = [subtab2 addEmptyRow];
     [cursor setInt:100 inColumn:0];
 
 
@@ -196,7 +196,7 @@
 
 
 
-    c = [table addRow];
+    c = [table addEmptyRow];
 
 
 
@@ -210,7 +210,7 @@
     [c setTable:   subtab1   inColumn:TableCol];
     [c setMixed:   mixInt1   inColumn:MixedCol];
 
-    c = [table addRow];
+    c = [table addEmptyRow];
 
     [c setBool:    YES       inColumn:BoolCol];
     [c setInt:     506       inColumn:IntCol];
