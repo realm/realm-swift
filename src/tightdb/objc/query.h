@@ -22,7 +22,6 @@
 
 @class TightdbBinary;
 @class TightdbTable;
-@class TightdbTableView; /* jjepsen: this must be an error? */
 
 /* jjepsen: please review this */
 @class TightdbView;
