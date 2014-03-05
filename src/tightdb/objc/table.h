@@ -278,6 +278,7 @@
 -(size_t)count;
 -(BOOL)isEmpty;
 -(TightdbType)getColumnType:(size_t)colNdx;
+-(size_t)getColumnCount;
 -(void) sortColumnWithIndex: (size_t)columnIndex;
 -(void) sortColumnWithIndex: (size_t)columnIndex inOrder: (TightdbSortOrder)order;
 -(int64_t)get:(size_t)colNdx ndx:(size_t)ndx;
