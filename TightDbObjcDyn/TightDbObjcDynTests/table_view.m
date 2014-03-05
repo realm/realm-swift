@@ -152,9 +152,54 @@
     STAssertTrue([v getBool:boolCol ndx:2] == NO, @"matcing value after descending sort");
 }
 
+
 - (void)testSortOnViewDateColumn
 {
-    //FIXME, will do shortly
+    TightdbTable *t = [[TightdbTable alloc] init];
+    NSUInteger dateCol = [t addColumnWithType:tightdb_Date andName:@"dateCol"];
+    
+    
+    NSDateFormatter *formatter = [[NSDateFormatter alloc]init];
+    [formatter setDateFormat:@"MM/dd/yyyy hh:mm a"];
+    
+    NSDate *dateFirst   = [formatter dateFromString:@"01/01/2014 10:10 PM"];
+    NSDate *dateMiddle  = [formatter dateFromString:@"02/01/2014 10:10 PM"];
+    NSDate *dateLast    = [formatter dateFromString:@"03/01/2014 10:10 PM"];
+    
+    TightdbCursor *row = [t addEmptyRow];
+    [row setDate:[dateLast timeIntervalSince1970] inColumn:dateCol];
+    
+    row = [t addEmptyRow];
+    [row setDate:[dateMiddle timeIntervalSince1970] inColumn:dateCol];
+    
+    row = [t addEmptyRow];
+    [row setDate:[dateFirst timeIntervalSince1970] inColumn:dateCol];
+    
+    TightdbQuery *q = [t where];
+    TightdbView *v = [q findAll];
+    
+    // Not yet sorted
+    STAssertTrue([v getDate:dateCol ndx:0] == [dateLast timeIntervalSince1970], @"matcing value after no sort");
+    STAssertTrue([v getDate:dateCol ndx:1] == [dateMiddle timeIntervalSince1970], @"matcing value after no sort");
+    STAssertTrue([v getDate:dateCol ndx:2] == [dateFirst timeIntervalSince1970], @"matcing value after no sort");
+    
+    // Sort same way without order specified. Ascending default
+    [v sortColumnWithIndex:dateCol];
+    STAssertTrue([v getDate:dateCol ndx:0] == [dateFirst timeIntervalSince1970], @"matcing value after default sort");
+    STAssertTrue([v getDate:dateCol ndx:1] == [dateMiddle timeIntervalSince1970], @"matcing value after default sort");
+    STAssertTrue([v getDate:dateCol ndx:2] == [dateLast timeIntervalSince1970], @"matcing value after default sort");
+    
+    // Sort same way
+    [v sortColumnWithIndex:dateCol inOrder:tightdb_ascending];
+    STAssertTrue([v getDate:dateCol ndx:0] == [dateFirst timeIntervalSince1970], @"matcing value after ascending sort");
+    STAssertTrue([v getDate:dateCol ndx:1] == [dateMiddle timeIntervalSince1970], @"matcing value after ascending sort");
+    STAssertTrue([v getDate:dateCol ndx:2] == [dateLast timeIntervalSince1970], @"matcing value after ascending sort");
+    
+    // Sort descending
+    [v sortColumnWithIndex:dateCol inOrder: tightdb_descending];
+    STAssertTrue([v getDate:dateCol ndx:0] == [dateLast timeIntervalSince1970], @"matcing value after descending sort");
+    STAssertTrue([v getDate:dateCol ndx:1] == [dateMiddle timeIntervalSince1970], @"matcing value after descending sort");
+    STAssertTrue([v getDate:dateCol ndx:2] == [dateFirst timeIntervalSince1970], @"matcing value after descending sort");
 }
 
 
@@ -184,9 +229,6 @@
     STAssertThrows([v sortColumnWithIndex:mixedCol], @"Not supported on mixed column");
     STAssertThrows([v sortColumnWithIndex:stringCol], @"Not supported on string column");
     STAssertThrows([v sortColumnWithIndex:tableCol], @"Not supported on table column");
-    
-    ;
-    
 }
 
 @end
