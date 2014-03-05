@@ -277,6 +277,9 @@
 
 -(size_t)count;
 -(BOOL)isEmpty;
+-(TightdbType)getColumnType:(size_t)colNdx;
+-(void) sortColumnWithIndex: (size_t)columnIndex;
+-(void) sortColumnWithIndex: (size_t)columnIndex inOrder: (TightdbSortOrder)order;
 -(int64_t)get:(size_t)colNdx ndx:(size_t)ndx;
 -(BOOL)getBool:(size_t)colNdx ndx:(size_t)ndx;
 -(time_t)getDate:(size_t)colNdx ndx:(size_t)ndx;
