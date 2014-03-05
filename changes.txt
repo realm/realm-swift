@@ -1,3 +1,8 @@
+2014-03-05
+==========
++ tableview now supports sort on column with column type bool, date and int
++ tableview has method for checking the column type of a specified column
+
 2014-02-27
 ==========
 ! BREAKING CHANGE: addRow renamed to addEmptyRow
