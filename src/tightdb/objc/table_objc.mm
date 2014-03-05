@@ -388,6 +388,27 @@ using namespace std;
 {
     return m_view->is_empty();
 }
+-(TightdbType)getColumnType:(size_t)colNdx
+{
+    return TightdbType(m_view->get_column_type(colNdx));
+}
+-(void) sortColumnWithIndex: (size_t)columnIndex
+{
+    [self sortColumnWithIndex:columnIndex inOrder:tightdb_ascending];
+}
+-(void) sortColumnWithIndex: (size_t)columnIndex  inOrder: (TightdbSortOrder)order
+{
+    TightdbType columnType = [self getColumnType:columnIndex];
+    
+    if(columnType != tightdb_Int && columnType != tightdb_Bool && columnType != tightdb_Date) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:sort_on_column_with_type_not_supported" \
+                                                         reason:@"Sort is currently only supported on Integer, Boolean and Date columns." \
+                                                       userInfo:[NSMutableDictionary dictionary]]; \
+        [exception raise];
+    }
+    
+    m_view->sort(columnIndex, order == 0);
+}
 -(int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
 {
     return m_view->get_int(col_ndx, ndx);
