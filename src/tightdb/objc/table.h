@@ -112,13 +112,13 @@
 
 /* Column meta info */
 -(size_t)getColumnCount; // columnCount
--(NSString *)getColumnName:(size_t)ndx; // nameOfColumn: column
--(size_t)getColumnIndex:(NSString *)name; // indexOfColumnWithName: name
--(TightdbType)getColumnType:(size_t)ndx; //typeOfColumn: column
+-(NSString *)getColumnName:(size_t)ndx; // nameOfColumnWithIndex: columnIndex
+-(size_t)getColumnIndex:(NSString *)name; // indexOfColumnWithName: columnName
+-(TightdbType)getColumnType:(size_t)ndx; //typeOfColumnWithIndex: columnIndex
 -(TightdbDescriptor *)getDescriptor; // descripter
 -(TightdbDescriptor *)getDescriptorWithError:(NSError *__autoreleasing *)error; //does it even need to be here?
 -(BOOL)isEmpty;
--(size_t)count; //rowCount
+-(size_t)count;
 -(TightdbCursor *)addEmptyRow;
 
 /* Only curser based add should be public. This is just a temporaray way to hide the methods. */
@@ -126,7 +126,7 @@
 -(size_t)_addEmptyRow;
 -(size_t)_addEmptyRows:(size_t)rowCount;
 
--(BOOL)clear; //clearRows
+-(BOOL)clear; // removeAllRows
 -(BOOL)clearWithError:(NSError *__autoreleasing *)error; //Hm, should throw exception
 -(BOOL)removeRowAtIndex:(size_t)ndx; // removeRow: row
 -(BOOL)removeRowAtIndex:(size_t)ndx error:(NSError *__autoreleasing *)error; //Hm, should throw exception
@@ -141,8 +141,8 @@
 -(BOOL)insertRow:(size_t)ndx; //:index
 -(BOOL)insertRow:(size_t)ndx error:(NSError *__autoreleasing *)error; //Hm, should throw exception
 
--(BOOL)getBoolInColumn:(size_t)colNdx atRow:(size_t)ndx; // boolValueInColumn: column andRow: row
--(int64_t)getIntInColumn:(size_t)colNdx atRow:(size_t)ndx; //intValueInColumn: column andRow: row
+-(BOOL)getBoolInColumn:(size_t)colNdx atRow:(size_t)ndx; // boolValueInColumn: columnIndex andRow: rowIndex
+-(int64_t)getIntInColumn:(size_t)colNdx atRow:(size_t)ndx; //intValueInColumn: columnIndex andRow: rowIndex
 -(float)getFloatInColumn:(size_t)colNdx atRow:(size_t)ndx; // same as above......
 -(double)getDoubleInColumn:(size_t)colNdx atRow:(size_t)ndx;
 -(time_t)getDateInColumn:(size_t)colNdx atRow:(size_t)ndx;
@@ -169,9 +169,9 @@
  * `addEmptyRow` and then setting each column value afterwards, or possibly
  * by calling a method that takes all column values as arguments at
  * once. */
--(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value; // insertBoolValue: aBool inColumn: column andRow: row
--(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value error:(NSError *__autoreleasing *)error; //Hm, should throw exception
--(BOOL)insertInt:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value; // same same
+-(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value;
+-(BOOL)insertBool:(size_t)colNdx ndx:(size_t)ndx value:(BOOL)value error:(NSError *__autoreleasing *)error;
+-(BOOL)insertInt:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value;
 -(BOOL)insertInt:(size_t)colNdx ndx:(size_t)ndx value:(int64_t)value error:(NSError *__autoreleasing *)error;
 -(BOOL)insertFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value;
 -(BOOL)insertFloat:(size_t)colNdx ndx:(size_t)ndx value:(float)value error:(NSError *__autoreleasing *)error;
@@ -184,7 +184,7 @@
 -(BOOL)insertBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size;
 -(BOOL)insertBinary:(size_t)colNdx ndx:(size_t)ndx data:(const char *)data size:(size_t)size error:(NSError *__autoreleasing *)error;
 -(BOOL)insertDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value;
--(BOOL)insertDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value error:(NSError *__autoreleasing *)error; // same same
+-(BOOL)insertDate:(size_t)colNdx ndx:(size_t)ndx value:(time_t)value error:(NSError *__autoreleasing *)error;
 -(BOOL)insertDone;
 -(BOOL)insertDoneWithError:(NSError *__autoreleasing *)error;
 
@@ -207,7 +207,7 @@
 
 /* Searching */
 /* FIXME: Should be findBool:(BOOL)value inColumn:(size_t)colNdx; */
--(size_t)findBool:(size_t)colNdx value:(BOOL)value; // findfirstBoolValue: aBool inColumn: column
+-(size_t)findBool:(size_t)colNdx value:(BOOL)value; // indexOfBool: aBool inColumnWithIndex: columnIndex
 -(size_t)findInt:(size_t)colNdx value:(int64_t)value; // same same
 -(size_t)findFloat:(size_t)colNdx value:(float)value;
 -(size_t)findDouble:(size_t)colNdx value:(double)value;
@@ -219,7 +219,7 @@
 /* FIXME: The naming scheme used here is superior to the one used in
    most of the other methods in this class. As time allows, this
    scheme must be migrated to all those other methods. */
--(TightdbView *)findAllBool:(BOOL)value              inColumn:(size_t)colNdx; // findAllRowsWithBoolValue: aBool inColumn: column
+-(TightdbView *)findAllBool:(BOOL)value              inColumn:(size_t)colNdx; // findAllRowsWithBoolValue: aBool inColumnWithIndex: columnIndex
 -(TightdbView *)findAllInt:(int64_t)value            inColumn:(size_t)colNdx; // same same
 -(TightdbView *)findAllFloat:(float)value            inColumn:(size_t)colNdx;
 -(TightdbView *)findAllDouble:(double)value          inColumn:(size_t)colNdx;
@@ -281,8 +281,8 @@
 -(BOOL)getBool:(size_t)colNdx ndx:(size_t)ndx; // same
 -(time_t)getDate:(size_t)colNdx ndx:(size_t)ndx;
 -(NSString *)getString:(size_t)colNdx ndx:(size_t)ndx;
--(void)removeRowAtIndex:(size_t)ndx; // removeRow: row
--(void)clear; // clearRows
+-(void)removeRowAtIndex:(size_t)ndx;
+-(void)clear; // removeAllRows
 -(TightdbTable *)getTable; // sourceTable
 -(size_t)getSourceIndex:(size_t)ndx; // rowIndexInSourceTableForRow: row
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;

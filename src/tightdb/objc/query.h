@@ -37,9 +37,9 @@
 -(TightdbQuery *)endgroup;
 -(void)subtable:(size_t)column;
 -(void)parent;
--(NSNumber *)count; // countNumberOfRows
+-(NSNumber *)count; // countNumberOfMatchingRows
 -(NSNumber *)countWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)remove; // removeRow
+-(NSNumber *)remove; // removeRows
 -(NSNumber *)removeWithError:(NSError *__autoreleasing *)error;
 -(NSNumber *)minimumWithIntColumn:(size_t)colNdx;
 -(NSNumber *)minimumWithIntColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
@@ -75,8 +75,8 @@
 
 /* Conditions: */
 
--(TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and_:(int64_t)to; // intValuesIncolumn: column areBetween: from and: to
--(TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and_:(float)to; // floatValuesInColumn: column areBetween: from and: to
+-(TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and_:(int64_t)to; // intValuesIncolumn: column areGreaterThan: anInt andLessThan: anInt
+-(TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and_:(float)to; // floatValuesInColumn: column areGreaterThan: aFloat andLessThan: aFfloat
 -(TightdbQuery *)column:(size_t)colNdx isBetweenDouble:(double)from and_:(double)to;
 -(TightdbQuery *)column:(size_t)colNdx isBetweenDate:(time_t)from and_:(time_t)to;
 
