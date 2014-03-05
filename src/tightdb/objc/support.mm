@@ -95,7 +95,24 @@ BOOL verify_row(const Descriptor& descr, NSArray * data)
             break;
         case type_Mixed:
             break; /* everything goes */
-        /* FIXME: type_Binary, type_Date, type_Table */
+        case type_Table:
+            if ([obj isKindOfClass:[NSArray class]]) {
+                if ([obj count] == 0)
+                    break; /* empty subtable */
+                id subobj;
+                ConstDescriptorRef subdescr = descr.get_subdescriptor(col_ndx);
+                NSEnumerator *subenumerator = [obj objectEnumerator];
+                while (subobj = [subenumerator nextObject]) {
+                    if (![subobj isKindOfClass:[NSArray class]])
+                        return NO;
+                    if (!verify_row(*subdescr, (NSArray *)subobj))
+                        return NO;
+                }
+            }
+            else {
+                return NO;
+            }
+            break;
            
         }
         ++col_ndx;
@@ -141,9 +158,27 @@ BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
             break;
         case type_Binary:
             {
-                TightdbBinary *bin = (TightdbBinary *)obj;
                 BinaryData bd([obj getData], [obj getSize]);
                 table.insert_binary(col_ndx, row_ndx, bd);
+            }
+            break;
+        case type_Table:
+            if ([obj count]) {
+                table.clear_subtable(col_ndx, row_ndx);
+            }
+            else {
+                // Clear sub-table to prepare for new values
+                table.clear_subtable(col_ndx, row_ndx);
+                table.insert_subtable(col_ndx, row_ndx);
+                TableRef subtable = table.get_subtable(col_ndx, row_ndx);
+                NSEnumerator *subenumerator = [obj objectEnumerator];
+                id subobj;
+                size_t subrow_ndx = 0;
+                while (subobj = [subenumerator nextObject]) {                
+                    if (!insert_row(subrow_ndx, *subtable, subobj))
+                        return NO;
+                    ++subrow_ndx;
+                }
             }
             break;
         }

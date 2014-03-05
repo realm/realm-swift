@@ -127,6 +127,20 @@
         STFail(@"Cannot insert 'binary'");
     if ([_table7 count] != 1)
         STFail(@"1 row excepted");
+
+    TightdbTable* _table8 = [[TightdbTable alloc] init];
+    [_table8 addColumnWithType:tightdb_Int andName:@"first"];
+    TightdbDescriptor* _descr8 = [_table8 getDescriptor];
+    TightdbDescriptor* _subdescr8 = [_descr8 addColumnTable:@"second"];
+    [_subdescr8 addColumnWithType:tightdb_Int andName:@"TableCol_IntCol"];
+    if (![_table8 appendRow:@[@1, @[]]])
+        STFail(@"Cannot insert empty subtable");
+    if ([_table8 count] != 1)
+        STFail(@"1 row excepted");
+    if (![_table8 appendRow:@[@2, @[@[@3]]]])
+        STFail(@"Cannot insert subtable");
+    if ([_table8 count] != 2)
+        STFail(@"2 rows excepted");
 }
 
 - (void)testDataTypes_Dynamic
