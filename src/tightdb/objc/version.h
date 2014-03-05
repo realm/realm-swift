@@ -20,13 +20,16 @@
 
 #import <Foundation/Foundation.h>
 
-const int Tightdb_Version_Major = 0;
-const int Tightdb_Version_Minor = 1;
-const int Tightdb_Version_Patch = 6;
+#define Tightdb_Version_Major 0
+#define Tightdb_Version_Minor 1
+#define Tightdb_Version_Patch 6
 
 @interface TightdbVersion: NSObject
 -(id)init;
 +(const int)getMajor;
 +(const int)getMinor;
 +(const int)getPatch;
++(BOOL)isAtLeast:(int)major minor:(int)minor patch:(int)patch;
++(NSString*)getVersion;
++(NSString*)getCoreVersion;
 @end
