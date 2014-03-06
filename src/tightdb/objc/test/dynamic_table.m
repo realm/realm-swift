@@ -163,7 +163,14 @@
     if (![_table9 appendRow:@[@YES]])
         STFail(@"Cannot insert 'bool'");
     if ([_table9 count] != 5)
-        STFail(@"5 rows excepted");    
+        STFail(@"5 rows excepted");
+
+    TightdbTable* _table10 = [[TightdbTable alloc] init];
+    [_table10 addColumnWithType:tightdb_Bool andName:@"first"];
+    if (![_table10 appendRow:@[@YES]])
+        STFail(@"Cannot insert 'bool'");
+    if ([_table10 count] != 1)
+        STFail(@"1 row excepted");
 }
 
 - (void)testDataTypes_Dynamic
