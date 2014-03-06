@@ -137,7 +137,7 @@ catch(std::exception& ex) { \
 #define TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(columnIndex) \
     if (columnIndex >= [self getColumnCount]) { \
                         NSException* exception = [NSException exceptionWithName:@"tightdb:column_index_out_of_bounds" \
-                                reason:@"Tmmmhe specified column index is not within the table bounds" \
+                                reason:@"The specified column index is not within the table bounds" \
                                 userInfo:[NSMutableDictionary dictionary]]; \
     [exception raise]; \
 } \
