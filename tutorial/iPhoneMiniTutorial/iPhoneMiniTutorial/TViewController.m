@@ -11,7 +11,7 @@
 {
     [super viewDidLoad];
     
-    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup sharedGroupWithFile:@"MyDatabase.db" withError:nil];
+    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup sharedGroupWithFile:[self writeablePathForFile: @"MyDatabase.db"] withError:nil];
     
     [sharedGroup writeWithBlock:^(TightdbGroup *group) {
         
@@ -50,6 +50,13 @@
     } withError:nil];
     
     }
+
+-(NSString*)writeablePathForFile:(NSString*)fileName
+{
+    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString* documentsDirectory = [paths objectAtIndex:0];
+    return [documentsDirectory stringByAppendingPathComponent:fileName];
+}
 
 
 @end
