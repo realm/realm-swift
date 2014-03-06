@@ -1,3 +1,7 @@
+2014-03-06
+==========
+* Adding method removeColumn on table.
+
 2014-03-05
 ==========
 * Adding methods getVersion, getCoreVersion and isAtLeast.
