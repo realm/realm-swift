@@ -388,22 +388,79 @@ using namespace std;
 {
     return m_view->is_empty();
 }
--(int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
-{
-    return m_view->get_int(col_ndx, ndx);
-}
+
+
+
+
 -(BOOL)getBool:(size_t)col_ndx ndx:(size_t)ndx
 {
     return m_view->get_bool(col_ndx, ndx);
 }
+-(TightdbBinary *)getBinary:(size_t)colNdx atRow:(size_t)ndx
+{
+    return [[TightdbBinary alloc] initWithBinary:m_view->get_binary(colNdx, ndx)];
+}
+
 -(time_t)getDate:(size_t)col_ndx ndx:(size_t)ndx
 {
     return m_view->get_datetime(col_ndx, ndx).get_datetime();
+}
+
+-(double)getDouble:(size_t)colNdx atRow:(size_t)ndx
+{
+    return m_view->get_double(colNdx, ndx);
+}
+-(float)getFloat:(size_t)colNdx atRow:(size_t)ndx
+{
+    return m_view->get_float(colNdx, ndx);
+}
+-(int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
+{
+    return m_view->get_int(col_ndx, ndx);
+}
+
+-(TightdbMixed *)getMixed:(size_t)colNdx atRow:(size_t)ndx
+{
+    tightdb::Mixed mixed = m_view->get_mixed(colNdx, ndx);
+    if (mixed.get_type() != tightdb::type_Table)
+        return [TightdbMixed mixedWithNativeMixed:mixed];
+    
+    tightdb::TableRef table = m_view->get_subtable(colNdx, ndx);
+    if (!table)
+        return nil;
+    TightdbTable* table_2 = [[TightdbTable alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!table_2))
+        return nil;
+    [table_2 setNativeTable:table.get()];
+    [table_2 setParent:self];
+    //[table_2 setReadOnly:m_read_only]; FIXME
+    if (![table_2 _checkType])
+        return nil;
+    
+    return [TightdbMixed mixedWithTable:table_2];
+}
+-(TightdbTable *)getTable:(size_t)colNdx atRow:(size_t)ndx
+{
+    tightdb::DataType type = m_view->get_column_type(colNdx);
+    if (type != tightdb::type_Table)
+        return nil;
+    tightdb::TableRef table = m_view->get_subtable(colNdx, ndx);
+    if (!table)
+        return nil;
+    TightdbTable* table_2 = [[TightdbTable alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!table_2))
+        return nil;
+    [table_2 setNativeTable:table.get()];
+    [table_2 setParent:self];
+    //[table_2 setReadOnly:m_read_only]; FIXME
+    return table_2;
 }
 -(NSString*)getString:(size_t)col_ndx ndx:(size_t)ndx
 {
     return to_objc_string(m_view->get_string(col_ndx, ndx));
 }
+
+
 -(void)removeRowAtIndex:(size_t)ndx
 {
     m_view->remove(ndx);
