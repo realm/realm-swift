@@ -708,22 +708,15 @@ using namespace std;
 
 -(BOOL)clear
 {
-    return [self clearWithError:nil];
-}
--(BOOL)clearWithError:(NSError* __autoreleasing*)error
-{
     if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, @"Tried to clear while read-only.");
-        return NO;
-        
         NSException* exception = [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
                                                          reason:@"You tried to modify an immutable tableview"
                                                        userInfo:[NSMutableDictionary dictionary]];
         [exception raise];
+        return NO;
     }
     
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->clear();, NO);
+    m_table->clear();
     return YES;
 }
 

@@ -127,7 +127,6 @@
 -(size_t)_addEmptyRows:(size_t)rowCount;
 
 -(BOOL)clear;
--(BOOL)clearWithError:(NSError *__autoreleasing *)error;
 -(BOOL)removeRowAtIndex:(size_t)ndx;
 -(BOOL)removeRowAtIndex:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(BOOL)removeLastRow;
