@@ -86,7 +86,7 @@
 @interface TightdbTable: NSObject <NSFastEnumeration>
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
--(BOOL)isEqual:(TightdbTable *)other;
+-(BOOL)isEqual:(TightdbTable *)other; //isEqualToTable
 
 -(BOOL)isReadOnly;
 
@@ -98,7 +98,7 @@
  * The specified table class must be one that is declared by using
  * one of the table macros TIGHTDB_TABLE_*.
  */
--(BOOL)isClass:(Class)obj;
+-(BOOL)isClass:(Class)obj; //Hm, not very clear. Maybe isOfType
 
 /**
  * If the type of this table is not compatible with the specified
@@ -111,12 +111,12 @@
 -(id)castClass:(Class)obj;
 
 /* Column meta info */
--(size_t)getColumnCount;
--(NSString *)getColumnName:(size_t)ndx;
--(size_t)getColumnIndex:(NSString *)name;
--(TightdbType)getColumnType:(size_t)ndx;
--(TightdbDescriptor *)getDescriptor;
--(TightdbDescriptor *)getDescriptorWithError:(NSError *__autoreleasing *)error;
+-(size_t)getColumnCount; // columnCount
+-(NSString *)getColumnName:(size_t)ndx; // nameOfColumnWithIndex: columnIndex
+-(size_t)getColumnIndex:(NSString *)name; // indexOfColumnWithName: columnName
+-(TightdbType)getColumnType:(size_t)ndx; //typeOfColumnWithIndex: columnIndex
+-(TightdbDescriptor *)getDescriptor; // descripter
+-(TightdbDescriptor *)getDescriptorWithError:(NSError *__autoreleasing *)error; //does it even need to be here?
 -(BOOL)isEmpty;
 -(size_t)count;
 -(TightdbCursor *)addEmptyRow;
@@ -126,41 +126,41 @@
 -(size_t)_addEmptyRow;
 -(size_t)_addEmptyRows:(size_t)rowCount;
 
--(BOOL)clear;
--(BOOL)clearWithError:(NSError *__autoreleasing *)error;
--(BOOL)removeRowAtIndex:(size_t)ndx;
--(BOOL)removeRowAtIndex:(size_t)ndx error:(NSError *__autoreleasing *)error;
+-(BOOL)clear; // removeAllRows
+-(BOOL)clearWithError:(NSError *__autoreleasing *)error; //Hm, should throw exception
+-(BOOL)removeRowAtIndex:(size_t)ndx; // removeRow: row
+-(BOOL)removeRowAtIndex:(size_t)ndx error:(NSError *__autoreleasing *)error; //Hm, should throw exception
 -(BOOL)removeLastRow;
--(BOOL)removeLastRowWithError:(NSError *__autoreleasing *)error;
+-(BOOL)removeLastRowWithError:(NSError *__autoreleasing *)error; //Hm, should throw exception
 
--(TightdbCursor *)cursorAtIndex:(size_t)ndx;
+-(TightdbCursor *)cursorAtIndex:(size_t)ndx; //:index
 -(TightdbCursor *)cursorAtLastIndex;
 
--(TightdbCursor *)insertRowAtIndex:(size_t)ndx;
+-(TightdbCursor *)insertRowAtIndex:(size_t)ndx; //:index
 
--(BOOL)insertRow:(size_t)ndx;
--(BOOL)insertRow:(size_t)ndx error:(NSError *__autoreleasing *)error;
+-(BOOL)insertRow:(size_t)ndx; //:index
+-(BOOL)insertRow:(size_t)ndx error:(NSError *__autoreleasing *)error; //Hm, should throw exception
 
--(BOOL)getBoolInColumn:(size_t)colNdx atRow:(size_t)ndx;
--(int64_t)getIntInColumn:(size_t)colNdx atRow:(size_t)ndx;
--(float)getFloatInColumn:(size_t)colNdx atRow:(size_t)ndx;
+-(BOOL)getBoolInColumn:(size_t)colNdx atRow:(size_t)ndx; // boolValueInColumn: columnIndex andRow: rowIndex
+-(int64_t)getIntInColumn:(size_t)colNdx atRow:(size_t)ndx; //intValueInColumn: columnIndex andRow: rowIndex
+-(float)getFloatInColumn:(size_t)colNdx atRow:(size_t)ndx; // same as above......
 -(double)getDoubleInColumn:(size_t)colNdx atRow:(size_t)ndx;
 -(time_t)getDateInColumn:(size_t)colNdx atRow:(size_t)ndx;
 -(NSString *)getStringInColumn:(size_t)colNdx atRow:(size_t)ndx;
 -(TightdbBinary *)getBinaryInColumn:(size_t)colNdx atRow:(size_t)ndx;
 -(TightdbTable *)getTableInColumn:(size_t)colNdx atRow:(size_t)ndx;
 -(id)getTableInColumn:(size_t)colNdx atRow:(size_t)ndx withClass:(Class)obj;
--(TightdbMixed *)getMixedInColumn:(size_t)colNdx atRow:(size_t)ndx;
+-(TightdbMixed *)getMixedInColumn:(size_t)colNdx atRow:(size_t)ndx; // same same
 
--(void)setInt:(int64_t)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setBool:(BOOL)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
+-(void)setInt:(int64_t)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx; // setIntValue: anInt inColumn: column andRow: row
+-(void)setBool:(BOOL)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx; // same all the way down
 -(void)setFloat:(float)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
 -(void)setDouble:(double)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
 -(void)setDate:(time_t)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
 -(void)setString:(NSString *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
 -(void)setBinary:(TightdbBinary *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
 -(void)setTable:(TightdbTable *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setMixed:(TightdbMixed *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
+-(void)setMixed:(TightdbMixed *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx; // same same
 
 
 /* FIXME: It has been decided that the insert methods must not be a
@@ -207,8 +207,8 @@
 
 /* Searching */
 /* FIXME: Should be findBool:(BOOL)value inColumn:(size_t)colNdx; */
--(size_t)findBool:(size_t)colNdx value:(BOOL)value;
--(size_t)findInt:(size_t)colNdx value:(int64_t)value;
+-(size_t)findBool:(size_t)colNdx value:(BOOL)value; // indexOfBool: aBool inColumnWithIndex: columnIndex
+-(size_t)findInt:(size_t)colNdx value:(int64_t)value; // same same
 -(size_t)findFloat:(size_t)colNdx value:(float)value;
 -(size_t)findDouble:(size_t)colNdx value:(double)value;
 -(size_t)findString:(size_t)colNdx value:(NSString *)value;
@@ -219,8 +219,8 @@
 /* FIXME: The naming scheme used here is superior to the one used in
    most of the other methods in this class. As time allows, this
    scheme must be migrated to all those other methods. */
--(TightdbView *)findAllBool:(BOOL)value              inColumn:(size_t)colNdx;
--(TightdbView *)findAllInt:(int64_t)value            inColumn:(size_t)colNdx;
+-(TightdbView *)findAllBool:(BOOL)value              inColumn:(size_t)colNdx; // findAllRowsWithBoolValue: aBool inColumnWithIndex: columnIndex
+-(TightdbView *)findAllInt:(int64_t)value            inColumn:(size_t)colNdx; // same same
 -(TightdbView *)findAllFloat:(float)value            inColumn:(size_t)colNdx;
 -(TightdbView *)findAllDouble:(double)value          inColumn:(size_t)colNdx;
 -(TightdbView *)findAllString:(NSString *)value      inColumn:(size_t)colNdx;
@@ -232,8 +232,8 @@
 -(TightdbQuery *)whereWithError:(NSError *__autoreleasing *)error;
 
 /* Indexing */
--(BOOL)hasIndex:(size_t)colNdx;
--(void)setIndex:(size_t)colNdx;
+-(BOOL)hasIndex:(size_t)colNdx; // isIndexSetInColumn: column // columHasIndex: column
+-(void)setIndex:(size_t)colNdx; // setIndexInColumn: column
 
 /* Optimizing */
 -(BOOL)optimize;
@@ -244,20 +244,20 @@
 
 /* Aggregate functions */
 /* FIXME: Should be countInt:(int64_t)value inColumn:(size_t)colNdx; */
--(size_t)countWithIntColumn:(size_t)colNdx andValue:(int64_t)target;
--(size_t)countWithFloatColumn:(size_t)colNdx andValue:(float)target;
+-(size_t)countWithIntColumn:(size_t)colNdx andValue:(int64_t)target; // countRowsWithIntValue: antInt inColumn: column
+-(size_t)countWithFloatColumn:(size_t)colNdx andValue:(float)target; // same same
 -(size_t)countWithDoubleColumn:(size_t)colNdx andValue:(double)target;
 -(size_t)countWithStringColumn:(size_t)colNdx andValue:(NSString *)target;
--(int64_t)sumWithIntColumn:(size_t)colNdx;
--(double)sumWithFloatColumn:(size_t)colNdx;
+-(int64_t)sumWithIntColumn:(size_t)colNdx; // sumColumn: column containingIntValues // calcSumOnIntColumn : column
+-(double)sumWithFloatColumn:(size_t)colNdx; // sumColumn: column containingFloatValues
 -(double)sumWithDoubleColumn:(size_t)colNdx;
--(int64_t)maximumWithIntColumn:(size_t)colNdx;
+-(int64_t)maximumWithIntColumn:(size_t)colNdx; //maximumValueInColumn: column containingIntValues // calcMaximumOnIntColumn: column
 -(float)maximumWithFloatColumn:(size_t)colNdx;
 -(double)maximumWithDoubleColumn:(size_t)colNdx;
 -(int64_t)minimumWithIntColumn:(size_t)colNdx;
 -(float)minimumWithFloatColumn:(size_t)colNdx;
 -(double)minimumWithDoubleColumn:(size_t)colNdx;
--(double)averageWithIntColumn:(size_t)colNdx;
+-(double)averageWithIntColumn:(size_t)colNdx; // averageColumn: column containingIntValues
 -(double)averageWithFloatColumn:(size_t)colNdx;
 -(double)averageWithDoubleColumn:(size_t)colNDx;
 
@@ -275,16 +275,16 @@
 @interface TightdbView: NSObject <NSFastEnumeration>
 -(TightdbCursor *)cursorAtIndex:(size_t)ndx;
 
--(size_t)count;
+-(size_t)count; // countRows
 -(BOOL)isEmpty;
--(int64_t)get:(size_t)colNdx ndx:(size_t)ndx;
--(BOOL)getBool:(size_t)colNdx ndx:(size_t)ndx;
+-(int64_t)get:(size_t)colNdx ndx:(size_t)ndx; // intValueInColumn: column andRow: row
+-(BOOL)getBool:(size_t)colNdx ndx:(size_t)ndx; // same
 -(time_t)getDate:(size_t)colNdx ndx:(size_t)ndx;
 -(NSString *)getString:(size_t)colNdx ndx:(size_t)ndx;
 -(void)removeRowAtIndex:(size_t)ndx;
--(void)clear;
--(TightdbTable *)getTable;
--(size_t)getSourceIndex:(size_t)ndx;
+-(void)clear; // removeAllRows
+-(TightdbTable *)getTable; // sourceTable
+-(size_t)getSourceIndex:(size_t)ndx; // rowIndexInSourceTableForRow: row
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
 /* Private */
