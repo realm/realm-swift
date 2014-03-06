@@ -141,6 +141,29 @@
         STFail(@"Cannot insert subtable");
     if ([_table8 count] != 2)
         STFail(@"2 rows excepted");
+
+    TightdbTable* _table9 = [[TightdbTable alloc] init];
+    [_table9 addColumnWithType:tightdb_Mixed andName:@"first"];
+    if (![_table9 appendRow:@[@1]])
+        STFail(@"Cannot insert 'int'");
+    if ([_table9 count] != 1)
+        STFail(@"1 row excepted");
+    if (![_table9 appendRow:@[@"Hello"]])
+        STFail(@"Cannot insert 'string'");
+    if ([_table9 count] != 2)
+        STFail(@"2 rows excepted");
+    if (![_table9 appendRow:@[@3.14f]])
+        STFail(@"Cannot insert 'float'");
+    if ([_table9 count] != 3)
+        STFail(@"3 rows excepted");
+    if (![_table9 appendRow:@[@3.14]])
+        STFail(@"Cannot insert 'double'");
+    if ([_table9 count] != 4)
+        STFail(@"4 rows excepted");
+    if (![_table9 appendRow:@[@YES]])
+        STFail(@"Cannot insert 'bool'");
+    if ([_table9 count] != 5)
+        STFail(@"5 rows excepted");    
 }
 
 - (void)testDataTypes_Dynamic
