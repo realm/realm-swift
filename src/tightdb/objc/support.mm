@@ -8,6 +8,10 @@ using namespace tightdb;
 
 BOOL verify_row(const Descriptor& descr, NSArray * data)
 {
+    if (descr.get_column_count() != [data count]) {
+        return NO;
+    }
+
     NSEnumerator *enumerator = [data objectEnumerator];
     id obj;
 
