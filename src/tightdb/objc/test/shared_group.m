@@ -93,7 +93,8 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fromDisk readWithBlock:^(TightdbGroup* group) {
             SharedTable2* diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
             NSLog(@"Disktable size: %zu", [diskTable count]);
-                        [diskTable clear];
+        
+        STAssertThrows([diskTable clear], @"Not allowed in readtransaction");
 
         }];
 }
