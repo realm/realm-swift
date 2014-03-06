@@ -149,10 +149,9 @@
 
 -(void)testAppendRowsTooManyItems
 {
-//    SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
-//    [t addColumnWithType:tightdb_Int andName:@"first"];
-//    STAssertFalse(([t appendRow:@[@1, @1]]), @"Too many items for a row.");
+    TightdbTable *t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Int andName:@"first"];
+    STAssertFalse(([t appendRow:@[@1, @1]]), @"Too many items for a row.");
 }
 
 -(void)testAppendRowsTooFewItems
