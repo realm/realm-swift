@@ -28,8 +28,9 @@ BOOL verify_row(const Descriptor& descr, NSArray * data)
             if ([obj isKindOfClass:[NSNumber class]]) {
                 const char * data_type = [obj objCType];
                 const char dt = data_type[0];
-                if (dt != 'B')
-                    return NO;
+                if (dt == 'B' || dt == 'c')
+                    break;
+                return NO;
             }
             break;
         case type_DateTime:
