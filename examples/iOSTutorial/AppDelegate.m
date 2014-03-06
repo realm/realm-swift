@@ -85,7 +85,7 @@ void tableFunc() {
 
     // @@Example: updating_entire_row @@
     // (TODO: a curser should be used here) [people setAtIndex:4 Name:"Eric" Age:50 Hired:YES];
-    // @EndExample@@
+    // @@EndExample@@
 
     // @@Example: deleting_row @@
     [people removeRowAtIndex:2];
