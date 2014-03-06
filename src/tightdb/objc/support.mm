@@ -8,6 +8,10 @@ using namespace tightdb;
 
 BOOL verify_row(const Descriptor& descr, NSArray * data)
 {
+    if (descr.get_column_count() != [data count]) {
+        return NO;
+    }
+
     NSEnumerator *enumerator = [data objectEnumerator];
     id obj;
 
@@ -24,8 +28,9 @@ BOOL verify_row(const Descriptor& descr, NSArray * data)
             if ([obj isKindOfClass:[NSNumber class]]) {
                 const char * data_type = [obj objCType];
                 const char dt = data_type[0];
-                if (dt != 'B')
-                    return NO;
+                if (dt == 'B' || dt == 'c')
+                    break;
+                return NO;
             }
             break;
         case type_DateTime:
@@ -181,12 +186,39 @@ BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
                 }
             }
             break;
+        case type_Mixed:
+            /* FIXME: subtable, datetime and binary are missing */
+            if ([obj isKindOfClass:[NSString class]]) {
+                StringData sd([obj UTF8String]);
+                table.insert_mixed(col_ndx, row_ndx, sd);
+                break;
+            }
+            if ([obj isKindOfClass:[NSNumber class]]) {
+                const char *data_type = [obj objCType];
+                const char dt = data_type[0];
+                switch (dt) {
+                case 'i':
+                case 's':
+                case 'l':
+                    table.insert_mixed(col_ndx, row_ndx, (int64_t)[obj longValue]);
+                    break;
+                case 'f':
+                    table.insert_mixed(col_ndx, row_ndx, [obj floatValue]);
+                    break;
+                case 'd':
+                    table.insert_mixed(col_ndx, row_ndx, [obj doubleValue]);
+                    break;
+                case 'B':
+                    table.insert_mixed(col_ndx, row_ndx, [obj boolValue] == YES);
+                    break;
+                }
+                break;
+            }
+            return NO;
         }
         ++col_ndx;
     }
     table.insert_done();
-
-    /* FIXME: subtables */
 
     return YES;
 }
