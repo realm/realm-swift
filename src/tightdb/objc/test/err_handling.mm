@@ -339,8 +339,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 #endif
 
     // Test Clear
-    if (![table clearWithError:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
+    if (![table clear]) {
         STFail(@"Clear failed.");
     }
     STAssertEquals([table count], (size_t)0, @"Size should have been zero");
