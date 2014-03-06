@@ -43,8 +43,8 @@
         cursor1 = nil;
         
         // Print out info on iPhone screen
-        self.tableColumnCountOutlet.text = [NSString stringWithFormat:@"Number of columns in table: %zu", [table getColumnCount]];
-        self.tableSizeOutlet.text = [NSString stringWithFormat:@"Number of rows in table: %zu", [table count]];
+        self.tableColumnCountOutlet.text = [NSString stringWithFormat:@"# of columns: %zu", [table getColumnCount]];
+        self.tableSizeOutlet.text = [NSString stringWithFormat:@"# of rows: %zu", [table count]];
 
         return YES;
     } withError:nil];
