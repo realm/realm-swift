@@ -14,8 +14,14 @@ using namespace std;
     tightdb::util::UniquePtr<tightdb::SharedGroup> m_shared_group;
 }
 
-+(TightdbSharedGroup*)sharedGroupWithFile:(NSString*)path withError:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
++(TightdbSharedGroup*)sharedGroupWithFile:(NSString*)filename withError:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
 {
+    
+    // Determine the path to the file inside the app's sandbox file structure
+    NSArray *pathArray = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [pathArray objectAtIndex:0];
+    NSString *path = [documentsDirectory stringByAppendingPathComponent:filename];
+    
     TightdbSharedGroup* shared_group = [[TightdbSharedGroup alloc] init];
     if (!shared_group)
         return nil;
