@@ -165,7 +165,7 @@
 {
     TightdbTable *t = [[TightdbTable alloc] init];
     [t addColumnWithType:tightdb_Int andName:@"first"];
-    STAssertFalse(([t appendRow:@[@true]]), @"Wrong type for column.");
+    STAssertFalse(([t appendRow:@[@YES]]), @"Wrong type for column.");
     STAssertFalse(([t appendRow:@[@""]]), @"Wrong type for column.");
     STAssertFalse(([t appendRow:@[@3.5]]), @"Wrong type for column.");
     STAssertFalse(([t appendRow:@[@3.5F]]), @"Wrong type for column.");
@@ -178,7 +178,7 @@
     [t addColumnWithType:tightdb_Bool andName:@"first"];
     STAssertTrue(([t appendRow:@[@YES]]), @"Cannot append bool column.");
     STAssertTrue(([t appendRow:@[@NO]]), @"Cannot append bool column.");
-    STAssertEquals(2, [t count], @"2 rows expected");
+    STAssertEquals((size_t)2, [t count], @"2 rows expected");
 }
 
 -(void)testAppendRowsIntSubtableColumns
