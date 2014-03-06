@@ -164,6 +164,10 @@
         STFail(@"Cannot insert 'bool'");
     if ([_table9 count] != 5)
         STFail(@"5 rows excepted");
+    if (![_table9 appendRow:@[bin2]])
+        STFail(@"Cannot insert 'binary'");
+    if ([_table9 count] != 6)
+        STFail(@"6 rows excepted");
 
     TightdbTable* _table10 = [[TightdbTable alloc] init];
     [_table10 addColumnWithType:tightdb_Bool andName:@"first"];
