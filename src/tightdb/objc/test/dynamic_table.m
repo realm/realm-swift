@@ -73,15 +73,15 @@
     if (![t appendRow:@[ @1 ]])
         STFail(@"Impossible!");
     if ([t count] != 1)
-        STFail(@"Excepted 1 row");
+        STFail(@"Expected 1 row");
     if (![t appendRow:@[ @2 ]])
         STFail(@"Impossible!");
     if ([t count] != 2)
-        STFail(@"Excepted 2 rows");
+        STFail(@"Expected 2 rows");
     if ([t getIntInColumn:0 atRow:0] != 1)
-        STFail(@"Value 1 excepted");
+        STFail(@"Value 1 expected");
     if ([t getIntInColumn:0 atRow:1] != 2)
-        STFail(@"Value 2 excepted");
+        STFail(@"Value 2 expected");
     if ([t appendRow:@[@"Hello"]])
         STFail(@"Wrong type");
     if ([t appendRow:@[@1, @"Hello"]])
@@ -98,9 +98,9 @@
     if ([t count] != 1)
         STFail(@"1 row expected");
     if ([t getIntInColumn:0 atRow:0] != 1)
-        STFail(@"Value 1 excepted");
+        STFail(@"Value 1 expected");
     if (![[t getStringInColumn:1 atRow:0] isEqualToString:@"Hello"])
-        STFail(@"Value 'Hello' excepted");
+        STFail(@"Value 'Hello' expected");
     if ([t appendRow:@[@1, @2]])
         STFail(@"appendRow 2");
 }
@@ -112,7 +112,7 @@
     if (![t appendRow:@[@3.14]])  /* double is default */
         STFail(@"Cannot insert 'double'");
     if ([t count] != 1)
-        STFail(@"1 row excepted");
+        STFail(@"1 row expected");
 }
 
 -(void)testAppendRowsFloatColumn
@@ -122,7 +122,7 @@
     if (![t appendRow:@[@3.14F]])  /* F == float */
         STFail(@"Cannot insert 'float'");
     if ([t count] != 1)
-        STFail(@"1 row excepted");
+        STFail(@"1 row expected");
 }
 
 -(void)testAppendRowsDateColumn
@@ -132,7 +132,7 @@
     if (![t appendRow:@[@1000000000]])  /* 2001-09-09 01:46:40 */
         STFail(@"Cannot insert 'time_t'");
     if ([t count] != 1)
-        STFail(@"1 row excepted");
+        STFail(@"1 row expected");
 }
 
 -(void)testAppendRowsBinaryColumn
@@ -144,7 +144,7 @@
     if (![t appendRow:@[bin2]])
         STFail(@"Cannot insert 'binary'");
     if ([t count] != 1)
-        STFail(@"1 row excepted");
+        STFail(@"1 row expected");
 }
 
 -(void)testAppendRowsTooManyItems
@@ -172,11 +172,11 @@
     if (![t appendRow:@[@1, @[]]])
         STFail(@"Cannot insert empty subtable");
     if ([t count] != 1)
-        STFail(@"1 row excepted");
+        STFail(@"1 row expected");
     if (![t appendRow:@[@2, @[@[@3]]]])
         STFail(@"Cannot insert subtable");
     if ([t count] != 2)
-        STFail(@"2 rows excepted");
+        STFail(@"2 rows expected");
 }
 
 - (void)testDataTypes_Dynamic
