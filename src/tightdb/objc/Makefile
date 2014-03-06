@@ -1,14 +1,14 @@
 SUBDIRS = test
 test_DEPS = .
 
-nobase_subinclude_HEADERS = type.h cursor.h group.h query.h table.h group_shared.h helper_macros.h table_macros.h tightdb.h
+nobase_subinclude_HEADERS = type.h cursor.h group.h query.h table.h group_shared.h helper_macros.h table_macros.h tightdb.h version.h
 
 nobase_subinclude_HEADERS_EXTRA_UNINSTALL = *.h
 
 lib_LIBRARIES = libtightdb-objc.a
 
 libtightdb_objc_a_SOURCES = table_objc.mm cursor_objc.mm group_objc.mm query_objc.mm \
-group_shared_objc.mm
+group_shared_objc.mm version_objc.mm
 
 libtightdb_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2
 libtightdb_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
