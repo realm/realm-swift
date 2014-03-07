@@ -339,6 +339,7 @@ using namespace std;
     tightdb::util::UniquePtr<tightdb::TableView> m_view;
     TightdbTable* m_table;
     TightdbCursor* m_tmp_cursor;
+    BOOL m_read_only;
 }
 
 +(TightdbView*)viewWithTable:(TightdbTable*)table andNativeView:(const tightdb::TableView&)view
@@ -348,6 +349,8 @@ using namespace std;
         return nil;
     view_2->m_view.reset(new tightdb::TableView(view)); // FIXME: Exception handling needed here
     view_2->m_table = table;
+    view_2->m_read_only = [table isReadOnly];
+
     return view_2;
 }
 
@@ -358,6 +361,7 @@ using namespace std;
         tightdb::Query& query_2 = [query getNativeQuery];
         m_view.reset(new tightdb::TableView(query_2.find_all())); // FIXME: Exception handling needed here
         m_table = [query getTable];
+        m_read_only = [m_table isReadOnly];
     }
     return self;
 }
@@ -416,6 +420,13 @@ using namespace std;
 }
 -(void)clear
 {
+    if (m_read_only) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
+                                                         reason:@"You tried to modify an immutable tableview"
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
+    
     m_view->clear();
 }
 -(size_t)getSourceIndex:(size_t)ndx
@@ -715,16 +726,15 @@ using namespace std;
 
 -(BOOL)clear
 {
-    return [self clearWithError:nil];
-}
--(BOOL)clearWithError:(NSError* __autoreleasing*)error
-{
     if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, @"Tried to clear while read-only.");
+        NSException* exception = [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
+                                                         reason:@"You tried to modify an immutable tableview"
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
         return NO;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->clear();, NO);
+    
+    m_table->clear();
     return YES;
 }
 
