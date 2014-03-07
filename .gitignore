@@ -10,7 +10,7 @@ people.tightdb
 peopleErr.tightdb
 table_test.tightdb
 TightDbObjcDyn/readonlyTest.tightdb
-
+readonlyTest.tightdb
 
 
 /doc/ref/html/*.html
