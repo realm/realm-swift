@@ -272,6 +272,9 @@ using namespace std;
     return YES;
 }
 
+
+
+
 -(TightdbDescriptor*)addColumnTable:(NSString*)name
 {
     return [self addColumnTable:name error:nil];
@@ -336,6 +339,7 @@ using namespace std;
     tightdb::util::UniquePtr<tightdb::TableView> m_view;
     TightdbTable* m_table;
     TightdbCursor* m_tmp_cursor;
+    BOOL m_read_only;
 }
 
 +(TightdbView*)viewWithTable:(TightdbTable*)table andNativeView:(const tightdb::TableView&)view
@@ -345,6 +349,8 @@ using namespace std;
         return nil;
     view_2->m_view.reset(new tightdb::TableView(view)); // FIXME: Exception handling needed here
     view_2->m_table = table;
+    view_2->m_read_only = [table isReadOnly];
+
     return view_2;
 }
 
@@ -355,6 +361,7 @@ using namespace std;
         tightdb::Query& query_2 = [query getNativeQuery];
         m_view.reset(new tightdb::TableView(query_2.find_all())); // FIXME: Exception handling needed here
         m_table = [query getTable];
+        m_read_only = [m_table isReadOnly];
     }
     return self;
 }
@@ -391,6 +398,40 @@ using namespace std;
 {
     return m_view->is_empty();
 }
+-(size_t)getColumnCount
+{
+    return m_view->get_column_count();
+}
+
+-(TightdbType)getColumnType:(size_t)colNdx
+{
+    TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colNdx);
+    return TightdbType(m_view->get_column_type(colNdx));
+}
+-(void) sortColumnWithIndex: (size_t)columnIndex
+{
+    [self sortColumnWithIndex:columnIndex inOrder:tightdb_ascending];
+}
+-(void) sortColumnWithIndex: (size_t)columnIndex  inOrder: (TightdbSortOrder)order
+{
+    TightdbType columnType = [self getColumnType:columnIndex];
+    
+    if(columnType != tightdb_Int && columnType != tightdb_Bool && columnType != tightdb_Date) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:sort_on_column_with_type_not_supported"
+                                                         reason:@"Sort is currently only supported on Integer, Boolean and Date columns."
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
+    
+    try {
+        m_view->sort(columnIndex, order == 0);
+    } catch(std::exception& ex) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                         reason:[NSString stringWithUTF8String:ex.what()]
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
+}
 -(int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
 {
     return m_view->get_int(col_ndx, ndx);
@@ -413,6 +454,13 @@ using namespace std;
 }
 -(void)clear
 {
+    if (m_read_only) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
+                                                         reason:@"You tried to modify an immutable tableview"
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
+    
     m_view->clear();
 }
 -(size_t)getSourceIndex:(size_t)ndx
@@ -712,16 +760,15 @@ using namespace std;
 
 -(BOOL)clear
 {
-    return [self clearWithError:nil];
-}
--(BOOL)clearWithError:(NSError* __autoreleasing*)error
-{
     if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, @"Tried to clear while read-only.");
+        NSException* exception = [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
+                                                         reason:@"You tried to modify an immutable tableview"
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
         return NO;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->clear();, NO);
+    
+    m_table->clear();
     return YES;
 }
 
@@ -1219,6 +1266,20 @@ using namespace std;
         0);
 }
 
+-(void)removeColumnWithIndex:(size_t)columnIndex
+{
+    TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(columnIndex);
+    
+    try {
+        m_table->remove_column(columnIndex);
+    }
+    catch(std::exception& ex) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                         reason:[NSString stringWithUTF8String:ex.what()]
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
+}
 
 -(size_t)findBool:(size_t)col_ndx value:(BOOL)value
 {

@@ -127,7 +127,6 @@
 -(size_t)_addEmptyRows:(size_t)rowCount;
 
 -(BOOL)clear;
--(BOOL)clearWithError:(NSError *__autoreleasing *)error;
 -(BOOL)removeRowAtIndex:(size_t)ndx;
 -(BOOL)removeRowAtIndex:(size_t)ndx error:(NSError *__autoreleasing *)error;
 -(BOOL)removeLastRow;
@@ -208,6 +207,8 @@
 -(size_t)addColumnWithType:(TightdbType)type andName:(NSString *)name;
 -(size_t)addColumnWithType:(TightdbType)type andName:(NSString *)name error:(NSError *__autoreleasing *)error;
 
+-(void)removeColumnWithIndex:(size_t)columnIndex;
+
 /* Searching */
 /* FIXME: Should be findBool:(BOOL)value inColumn:(size_t)colNdx; */
 -(size_t)findBool:(size_t)colNdx value:(BOOL)value;
@@ -280,6 +281,10 @@
 
 -(size_t)count;
 -(BOOL)isEmpty;
+-(TightdbType)getColumnType:(size_t)colNdx;
+-(size_t)getColumnCount;
+-(void) sortColumnWithIndex: (size_t)columnIndex;
+-(void) sortColumnWithIndex: (size_t)columnIndex inOrder: (TightdbSortOrder)order;
 -(int64_t)get:(size_t)colNdx ndx:(size_t)ndx;
 -(BOOL)getBool:(size_t)colNdx ndx:(size_t)ndx;
 -(time_t)getDate:(size_t)colNdx ndx:(size_t)ndx;
