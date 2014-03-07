@@ -47,13 +47,13 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [table addBoolCol:YES  IntCol:506      FloatCol:7.7     DoubleCol:8.8       StringCol:@"banach"
             BinaryCol:bin2 DateCol:timeNow TableCol:subtab2 MixedCol:mixSubtab];
 
-    STAssertEquals([[[[table where].BoolCol   columnIsEqualTo:NO]      count] unsignedLongValue], (size_t)1, @"BoolCol equal");
-    STAssertEquals([[[[table where].IntCol    columnIsEqualTo:54]      count] unsignedLongValue], (size_t)1, @"IntCol equal");
-    STAssertEquals([[[[table where].FloatCol  columnIsEqualTo:0.7f]    count] unsignedLongValue], (size_t)1, @"FloatCol equal");
-    STAssertEquals([[[[table where].DoubleCol columnIsEqualTo:0.8]     count] unsignedLongValue], (size_t)1, @"DoubleCol equal");
-    STAssertEquals([[[[table where].StringCol columnIsEqualTo:@"foo"]  count] unsignedLongValue], (size_t)1, @"StringCol equal");
-    STAssertEquals([[[[table where].BinaryCol columnIsEqualTo:bin1]    count] unsignedLongValue], (size_t)1, @"BinaryCol equal");
-    STAssertEquals([[[[table where].DateCol   columnIsEqualTo:0]       count] unsignedLongValue], (size_t)1, @"DateCol equal");
+    STAssertEquals([[[table where].BoolCol   columnIsEqualTo:NO]      count], (size_t)1, @"BoolCol equal");
+    STAssertEquals([[[table where].IntCol    columnIsEqualTo:54]      count], (size_t)1, @"IntCol equal");
+    STAssertEquals([[[table where].FloatCol  columnIsEqualTo:0.7f]    count], (size_t)1, @"FloatCol equal");
+    STAssertEquals([[[table where].DoubleCol columnIsEqualTo:0.8]     count], (size_t)1, @"DoubleCol equal");
+    STAssertEquals([[[table where].StringCol columnIsEqualTo:@"foo"]  count], (size_t)1, @"StringCol equal");
+    STAssertEquals([[[table where].BinaryCol columnIsEqualTo:bin1]    count], (size_t)1, @"BinaryCol equal");
+    STAssertEquals([[[table where].DateCol   columnIsEqualTo:0]       count], (size_t)1, @"DateCol equal");
 // These are not yet implemented
 //    STAssertEquals([[[table where].TableCol  columnIsEqualTo:subtab1] count], (size_t)1, @"TableCol equal");
 //    STAssertEquals([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (size_t)1, @"MixedCol equal");

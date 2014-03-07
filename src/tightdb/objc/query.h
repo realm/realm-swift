@@ -36,10 +36,10 @@
 -(TightdbQuery *)endgroup;
 -(void)subtable:(size_t)column;
 -(void)parent;
--(NSNumber *)count;
--(NSNumber *)countWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)remove;
--(NSNumber *)removeWithError:(NSError *__autoreleasing *)error;
+-(NSUInteger)count;
+-(NSUInteger)countWithError:(NSError *__autoreleasing *)error;
+-(NSUInteger)remove;
+-(NSUInteger)removeWithError:(NSError *__autoreleasing *)error;
 -(NSNumber *)minimumWithIntColumn:(size_t)colNdx;
 -(NSNumber *)minimumWithIntColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
 -(NSNumber *)minimumWithFloatColumn:(size_t)colNdx;
@@ -74,47 +74,47 @@
 
 /* Conditions: */
 
--(TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and_:(int64_t)to;
--(TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and_:(float)to;
--(TightdbQuery *)column:(size_t)colNdx isBetweenDouble:(double)from and_:(double)to;
--(TightdbQuery *)column:(size_t)colNdx isBetweenDate:(time_t)from and_:(time_t)to;
+-(TightdbQuery *)column:(NSUInteger)colNdx isBetweenInt:(int64_t)from and_:(int64_t)to;
+-(TightdbQuery *)column:(NSUInteger)colNdx isBetweenFloat:(float)from and_:(float)to;
+-(TightdbQuery *)column:(NSUInteger)colNdx isBetweenDouble:(double)from and_:(double)to;
+-(TightdbQuery *)column:(NSUInteger)colNdx isBetweenDate:(time_t)from and_:(time_t)to;
 
--(TightdbQuery *)column:(size_t)colNdx isEqualToBool:(bool)value;
--(TightdbQuery *)column:(size_t)colNdx isEqualToInt:(int64_t)value;
--(TightdbQuery *)column:(size_t)colNdx isEqualToFloat:(float)value;
--(TightdbQuery *)column:(size_t)colNdx isEqualToDouble:(double)value;
--(TightdbQuery *)column:(size_t)colNdx isEqualToString:(NSString *)value;
--(TightdbQuery *)column:(size_t)colNdx isEqualToString:(NSString *)value caseSensitive:(bool)caseSensitive;
--(TightdbQuery *)column:(size_t)colNdx isEqualToDate:(time_t)value;
--(TightdbQuery *)column:(size_t)colNdx isEqualToBinary:(TightdbBinary *)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isEqualToBool:(bool)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isEqualToInt:(int64_t)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isEqualToFloat:(float)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isEqualToDouble:(double)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isEqualToString:(NSString *)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isEqualToString:(NSString *)value caseSensitive:(bool)caseSensitive;
+-(TightdbQuery *)column:(NSUInteger)colNdx isEqualToDate:(time_t)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isEqualToBinary:(TightdbBinary *)value;
 
--(TightdbQuery *)column:(size_t)colNdx isNotEqualToInt:(int64_t)value;
--(TightdbQuery *)column:(size_t)colNdx isNotEqualToFloat:(float)value;
--(TightdbQuery *)column:(size_t)colNdx isNotEqualToDouble:(double)value;
--(TightdbQuery *)column:(size_t)colNdx isNotEqualToString:(NSString *)value;
--(TightdbQuery *)column:(size_t)colNdx isNotEqualToString:(NSString *)value caseSensitive:(bool)caseSensitive;
--(TightdbQuery *)column:(size_t)colNdx isNotEqualToDate:(time_t)value;
--(TightdbQuery *)column:(size_t)colNdx isNotEqualToBinary:(TightdbBinary *)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isNotEqualToInt:(int64_t)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isNotEqualToFloat:(float)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isNotEqualToDouble:(double)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isNotEqualToString:(NSString *)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isNotEqualToString:(NSString *)value caseSensitive:(bool)caseSensitive;
+-(TightdbQuery *)column:(NSUInteger)colNdx isNotEqualToDate:(time_t)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isNotEqualToBinary:(TightdbBinary *)value;
 
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanInt:(int64_t)value;
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanFloat:(float)value;
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanDouble:(double)value;
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanDate:(time_t)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isGreaterThanInt:(int64_t)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isGreaterThanFloat:(float)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isGreaterThanDouble:(double)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isGreaterThanDate:(time_t)value;
 
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToInt:(int64_t)value;
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToFloat:(float)value;
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToDouble:(double)value;
--(TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToDate:(time_t)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isGreaterThanOrEqualToInt:(int64_t)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isGreaterThanOrEqualToFloat:(float)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isGreaterThanOrEqualToDouble:(double)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isGreaterThanOrEqualToDate:(time_t)value;
 
--(TightdbQuery *)column:(size_t)colNdx isLessThanInt:(int64_t)value;
--(TightdbQuery *)column:(size_t)colNdx isLessThanFloat:(float)value;
--(TightdbQuery *)column:(size_t)colNdx isLessThanDouble:(double)value;
--(TightdbQuery *)column:(size_t)colNdx isLessThanDate:(time_t)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isLessThanInt:(int64_t)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isLessThanFloat:(float)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isLessThanDouble:(double)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isLessThanDate:(time_t)value;
 
--(TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToInt:(int64_t)value;
--(TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToFloat:(float)value;
--(TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToDouble:(double)value;
--(TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToDate:(time_t)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isLessThanOrEqualToInt:(int64_t)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isLessThanOrEqualToFloat:(float)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isLessThanOrEqualToDouble:(double)value;
+-(TightdbQuery *)column:(NSUInteger)colNdx isLessThanOrEqualToDate:(time_t)value;
 
 
 @end

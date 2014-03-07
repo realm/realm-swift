@@ -133,11 +133,11 @@ using namespace std;
     m_query->end_subtable();
 }
 
--(NSNumber*)count
+-(NSUInteger)count
 {
     return [self countWithError:nil];
 }
--(NSNumber*)countWithError:(NSError* __autoreleasing*)error
+-(NSUInteger)countWithError:(NSError* __autoreleasing*)error
 {
     if (m_error) {
         if (error) {
@@ -146,17 +146,15 @@ using namespace std;
         }
         return nil;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-        return [NSNumber TIGHTDB_OBJC_SIZE_T_NUMBER_IN:m_query->count()];,
-        nil);
+    return m_query->count();
 }
 
--(NSNumber*)remove
+-(NSUInteger)remove
 {
     return [self removeWithError:nil];
 }
 
--(NSNumber*)removeWithError:(NSError* __autoreleasing*)error
+-(NSUInteger)removeWithError:(NSError* __autoreleasing*)error
 {
     if (m_error) {
         if (error) {
@@ -165,9 +163,7 @@ using namespace std;
         }
         return nil;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-        return [NSNumber TIGHTDB_OBJC_SIZE_T_NUMBER_IN:m_query->remove()];,
-        nil);
+    return m_query->remove();
 }
 
 -(NSNumber*)minimumWithIntColumn:(size_t)col_ndx
