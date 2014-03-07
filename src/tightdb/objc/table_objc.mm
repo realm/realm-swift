@@ -657,6 +657,11 @@ using namespace std;
     return index;
 }
 
+-(TightdbCursor *)objectAtIndexedSubscript:(NSUInteger)ndx
+{
+    return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
+}
+
 
 -(TightdbCursor*)cursorAtIndex:(size_t)ndx
 {

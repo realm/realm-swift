@@ -318,4 +318,36 @@
     STAssertEquals([table averageWithDoubleColumn:DoubleCol], (0.8 + 8.8) / 2,          @"DoubleCol avg");
 }
 
+- (void)testTableDynamic_Subscripting
+{
+    TightdbTable* _table = [[TightdbTable alloc] init];
+    STAssertNotNil(_table, @"Table is nil");
+
+    // 1. Add two columns
+    [_table addColumnWithType:tightdb_Int andName:@"first"];
+    [_table addColumnWithType:tightdb_String andName:@"second"];
+
+    TightdbCursor* c;
+
+    // Add some rows
+    c = [_table addEmptyRow];
+    [c setInt: 506 inColumn:0];
+    [c setString: @"test" inColumn:1];
+
+    c = [_table addEmptyRow];
+    [c setInt: 4 inColumn:0];
+    [c setString: @"more test" inColumn:1];
+
+    // Get cursor by object subscripting
+    c = _table[0];
+    STAssertEquals([c getIntInColumn:0], (int64_t)506, @"table[0].first");
+    STAssertTrue([[c getStringInColumn:1] isEqual:@"test"], @"table[0].second");
+
+    // Same but used directly
+    STAssertEquals([_table[0] getIntInColumn:0], (int64_t)506, @"table[0].first");
+    STAssertTrue([[_table[0] getStringInColumn:1] isEqual:@"test"], @"table[0].second");
+
+
+}
+
 @end
