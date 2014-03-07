@@ -95,9 +95,10 @@ BOOL verify_row(const Descriptor& descr, NSArray * data)
                 return NO;
             break; /* FIXME: remove */
         case type_Binary:
-            if (![obj isKindOfClass:[TightdbBinary class]])
-                return NO;
-            break;
+            if ([obj isKindOfClass:[TightdbBinary class]] || 
+                [obj isKindOfClass:[NSData class]])
+                break;
+            return NO;
         case type_Mixed:
             break; /* everything goes */
         case type_Table:
@@ -167,8 +168,13 @@ BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
             }
             break;
         case type_Binary:
-            {
+            if ([obj isKindOfClass:[TightdbBinary class]]) {
                 BinaryData bd([obj getData], [obj getSize]);
+                table.insert_binary(col_ndx, row_ndx, bd);
+            }
+            else { /* NSData */
+                const void *data = [obj bytes];
+                BinaryData bd(static_cast<const char *>(data), [obj length]);
                 table.insert_binary(col_ndx, row_ndx, bd);
             }
             break;

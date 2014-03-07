@@ -132,6 +132,11 @@
         STFail(@"Cannot insert 'binary'");
     if ([_table7 count] != 1)
         STFail(@"1 row excepted");
+    NSData *nsd = [NSData dataWithBytes:(const void *)bin length:4];
+    if (![_table7 appendRow:@[nsd]])
+        STFail(@"Cannot insert 'NSData'");
+    if ([_table7 count] != 2)
+        STFail(@"2 rows excepted");
 
     TightdbTable* _table8 = [[TightdbTable alloc] init];
     [_table8 addColumnWithType:tightdb_Int andName:@"first"];
