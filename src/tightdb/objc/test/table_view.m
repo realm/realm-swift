@@ -93,6 +93,23 @@
     STAssertThrows([v getColumnType:-1], @"Out of bounds");
 }
 
+-(void)testViewGetters
+{
+    TightdbTable *t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Bool andName:@"boolCol"];
+    [t addColumnWithType:tightdb_Binary andName:@"inaryCol"];
+    [t addColumnWithType:tightdb_Date andName:@"dateCol"];
+    [t addColumnWithType:tightdb_Double andName:@"doubleCol"];
+    [t addColumnWithType:tightdb_Float andName:@"floatCol"];
+    [t addColumnWithType:tightdb_Int andName:@"intCol"];
+    [t addColumnWithType:tightdb_Mixed andName:@"mixedCol"];
+    [t addColumnWithType:tightdb_String andName:@"stringCol"];
+    [t addColumnWithType:tightdb_Table andName:@"tableCol"];
+    
+    TightdbCursor *row = [t addEmptyRow];
+    
+}
+
 - (void)testSortOnViewIntColumn
 {
     TightdbTable *t = [[TightdbTable alloc] init];
@@ -111,27 +128,27 @@
     TightdbView *v = [q findAll];
     
     // Not yet sorted
-    STAssertTrue([v get:intCol ndx:0] == 2, @"matcing value after no sort");
-    STAssertTrue([v get:intCol ndx:1] == 1, @"matcing value after no sort");
-    STAssertTrue([v get:intCol ndx:2] == 0, @"matcing value after no sort");
+    STAssertTrue([v getInt:intCol ndx:0] == 2, @"matcing value after no sort");
+    STAssertTrue([v getInt:intCol ndx:1] == 1, @"matcing value after no sort");
+    STAssertTrue([v getInt:intCol ndx:2] == 0, @"matcing value after no sort");
     
     // Sort same way without order specified. Ascending default
     [v sortColumnWithIndex:intCol];
-    STAssertTrue([v get:intCol ndx:0] == 0, @"matcing value after default sort");
-    STAssertTrue([v get:intCol ndx:1] == 1, @"matcing value after default sort");
-    STAssertTrue([v get:intCol ndx:2] == 2, @"matcing value after default sort");
+    STAssertTrue([v getInt:intCol ndx:0] == 0, @"matcing value after default sort");
+    STAssertTrue([v getInt:intCol ndx:1] == 1, @"matcing value after default sort");
+    STAssertTrue([v getInt:intCol ndx:2] == 2, @"matcing value after default sort");
     
     // Sort same way
     [v sortColumnWithIndex:intCol inOrder:tightdb_ascending];
-    STAssertTrue([v get:intCol ndx:0] == 0, @"matcing value after ascending sort");
-    STAssertTrue([v get:intCol ndx:1] == 1, @"matcing value after ascending sort");
-    STAssertTrue([v get:intCol ndx:2] == 2, @"matcing value after ascending sort");
+    STAssertTrue([v getInt:intCol ndx:0] == 0, @"matcing value after ascending sort");
+    STAssertTrue([v getInt:intCol ndx:1] == 1, @"matcing value after ascending sort");
+    STAssertTrue([v getInt:intCol ndx:2] == 2, @"matcing value after ascending sort");
     
     // Sort descending
     [v sortColumnWithIndex:intCol inOrder: tightdb_descending];
-    STAssertTrue([v get:intCol ndx:0] == 2, @"matcing value after descending sort");
-    STAssertTrue([v get:intCol ndx:1] == 1, @"matcing value after descending sort");
-    STAssertTrue([v get:intCol ndx:2] == 0, @"matcing value after descending sort");
+    STAssertTrue([v getInt:intCol ndx:0] == 2, @"matcing value after descending sort");
+    STAssertTrue([v getInt:intCol ndx:1] == 1, @"matcing value after descending sort");
+    STAssertTrue([v getInt:intCol ndx:2] == 0, @"matcing value after descending sort");
 }
 
 - (void)testSortOnViewBoolColumn

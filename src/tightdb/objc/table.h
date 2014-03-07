@@ -292,7 +292,7 @@
 -(time_t)getDate:(size_t)colNdx ndx:(size_t)ndx;
 -(double)getDouble:(size_t)colNdx atRow:(size_t)ndx;
 -(float)getFloat:(size_t)colNdx atRow:(size_t)ndx;
--(int64_t)get:(size_t)colNdx ndx:(size_t)ndx;
+-(int64_t)getInt:(size_t)colNdx ndx:(size_t)ndx;
 -(TightdbMixed *)getMixed:(size_t)colNdx atRow:(size_t)ndx;
 -(NSString *)getString:(size_t)colNdx ndx:(size_t)ndx;
 -(TightdbTable *)getTable:(size_t)colNdx atRow:(size_t)ndx;

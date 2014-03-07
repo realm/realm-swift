@@ -456,7 +456,7 @@ using namespace std;
 {
     return m_view->get_float(colNdx, ndx);
 }
--(int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
+-(int64_t)getInt:(size_t)col_ndx ndx:(size_t)ndx
 {
     return m_view->get_int(col_ndx, ndx);
 }
