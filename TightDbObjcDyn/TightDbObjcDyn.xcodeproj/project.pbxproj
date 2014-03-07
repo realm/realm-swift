@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D01A9EF18C75B4100527AD5 /* table_view.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9EE18C75B4100527AD5 /* table_view.m */; };
 		4D79966018BDFC3E009EB0C0 /* table_macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D79965F18BDFC3E009EB0C0 /* table_macros.h */; };
 		4DB1DEFB18BF70AE005A7234 /* dynamic_table.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF818BF70AE005A7234 /* dynamic_table.m */; };
 		4DB1DEFC18BF70AE005A7234 /* functional.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF918BF70AE005A7234 /* functional.m */; };
@@ -59,6 +60,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4D01A9EE18C75B4100527AD5 /* table_view.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = table_view.m; sourceTree = "<group>"; };
 		4D79965F18BDFC3E009EB0C0 /* table_macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = table_macros.h; path = ../../src/tightdb/objc/table_macros.h; sourceTree = "<group>"; };
 		4DB1DEF818BF70AE005A7234 /* dynamic_table.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = dynamic_table.m; path = ../../src/tightdb/objc/test/dynamic_table.m; sourceTree = "<group>"; };
 		4DB1DEF918BF70AE005A7234 /* functional.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = functional.m; path = ../../src/tightdb/objc/test/functional.m; sourceTree = "<group>"; };
@@ -206,6 +208,7 @@
 				4DB1DEF818BF70AE005A7234 /* dynamic_table.m */,
 				4DB1DEF918BF70AE005A7234 /* functional.m */,
 				4DB1DEFA18BF70AE005A7234 /* typed_table.m */,
+				4D01A9EE18C75B4100527AD5 /* table_view.m */,
 				E91890E7177B71E400653D7A /* data_type.mm */,
 				E91890E8177B71E400653D7A /* enumerator.m */,
 				E91890E9177B71E400653D7A /* err_handling.mm */,
@@ -378,6 +381,7 @@
 				E91890FE177B71E400653D7A /* subtable.m in Sources */,
 				4DB1DEFC18BF70AE005A7234 /* functional.m in Sources */,
 				4DB1DEFD18BF70AE005A7234 /* typed_table.m in Sources */,
+				4D01A9EF18C75B4100527AD5 /* table_view.m in Sources */,
 				E91890FF177B71E400653D7A /* table_delete_all.m in Sources */,
 				4DB1DEFB18BF70AE005A7234 /* dynamic_table.m in Sources */,
 				E9189101177B71E400653D7A /* template.m in Sources */,
