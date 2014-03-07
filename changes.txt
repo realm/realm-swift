@@ -1,6 +1,7 @@
 2014-03-07
 ==========
 * Adding appendRow to TightdbTable.
+* Adding object subscripting.
 * Adding method removeColumn on table.
 
 2014-03-05
