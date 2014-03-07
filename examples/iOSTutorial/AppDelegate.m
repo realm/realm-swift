@@ -19,37 +19,18 @@ void tableFunc() {
 
     // @@Example: insert_rows @@
 
+    // Add a row
     PeopleTable_Cursor *cursor;
-
-    // Row 1
     cursor = [people addEmptyRow];
     cursor.Name  = @"John";
     cursor.Age   = 21;
     cursor.Hired = YES;
 
-    // Row 2
-    cursor = [people addEmptyRow];
-    cursor.Name  = @"Mary";
-    cursor.Age   = 76;
-    cursor.Hired = NO;
-
-    // Row 3
-    cursor = [people addEmptyRow];
-    cursor.Name  = @"Lars";
-    cursor.Age   = 22;
-    cursor.Hired = YES;
-
-    // Row 4
-    cursor = [people addEmptyRow];
-    cursor.Name  = @"Phil";
-    cursor.Age   = 43;
-    cursor.Hired = NO;
-
-    // Row 5
-    cursor = [people addEmptyRow];
-    cursor.Name  = @"Anni";
-    cursor.Age   = 54;
-    cursor.Hired = YES;
+    // Add more rows
+    [people appendRow:@[@"Mary", @76, @NO]];
+    [people appendRow:@[@"Lars", @22, @YES]];
+    [people appendRow:@[@"Phil", @43, @NO]];
+    [people appendRow:@[@"Anni", @54, @YES]];
     // @@EndExample@@
 
     // @@Example: insert_at_index @@
@@ -67,7 +48,7 @@ void tableFunc() {
 
     // @@Example: accessing_rows @@
     // Getting values directly
-    NSString* name = [people cursorAtIndex:5].Name;    // =&gt; 'Anni'
+    NSString* name = people[5].Name;                   // =&gt; 'Anni'
     // Using a cursor
     PeopleTable_Cursor *myRow = [people cursorAtIndex:5];
     int64_t age = myRow.Age;                           // =&gt; 54
@@ -84,7 +65,8 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: updating_entire_row @@
-    // (TODO: a curser should be used here) [people setAtIndex:4 Name:"Eric" Age:50 Hired:YES];
+    // Coming soon!
+    // [people setRowAtIndex:4 to:@[@"Eric", @50, @YES]];
     // @@EndExample@@
 
     // @@Example: deleting_row @@
