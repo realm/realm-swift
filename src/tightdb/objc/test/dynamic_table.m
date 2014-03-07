@@ -187,6 +187,37 @@
         STFail(@"1 row excepted");
 }
 
+-(void)testRemoveColumns
+{
+    
+    TightdbTable *t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Int andName:@"col0"];
+    STAssertTrue([t getColumnCount] == 1,@"1 column added" );
+    
+    [t removeColumnWithIndex:0];
+    STAssertTrue([t getColumnCount] == 0, @"Colum removed");
+    
+    for (int i=0;i<10;i++) {
+        [t addColumnWithType:tightdb_Int andName:@"name"];
+    }
+    
+    STAssertThrows([t removeColumnWithIndex:10], @"Out of bounds");
+    STAssertThrows([t removeColumnWithIndex:-1], @"Less than zero colIndex");
+
+    STAssertTrue([t getColumnCount] == 10, @"10 columns added");
+
+    for (int i=0;i<10;i++) {
+        [t removeColumnWithIndex:0];
+    }
+    
+    STAssertTrue([t getColumnCount] == 0, @"Colums removed");
+    
+    STAssertThrows([t removeColumnWithIndex:1], @"No columns added");
+    STAssertThrows([t removeColumnWithIndex:-1], @"Less than zero colIndex");
+
+    
+}
+
 - (void)testDataTypes_Dynamic
 {
     TightdbTable* table = [[TightdbTable alloc] init];
