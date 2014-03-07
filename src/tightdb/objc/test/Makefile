@@ -1,10 +1,12 @@
 check_PROGRAMS = unit-tests
 
 unit_tests_SOURCES = \
-data_type.mm typed_table.m dynamic_table.m group.m group_misc_2.m \
-table_delete_all.m tutorial.m enumerator.m get_subtable.m subtable.m \
-mixed.m query.m err_handling.mm functional.m shared_group.m \
+data_type.mm dynamic_table.m enumerator.m err_handling.mm functional.m \
+get_subtable.m group.m group_misc_2.m mixed.m query.m  shared_group.m \
+subtable.m table_delete_all.m table_view.m tutorial.m typed_table.m \
 version.m
+    
+ 
 
 
 #unit_tests_SOURCES = functional.m
