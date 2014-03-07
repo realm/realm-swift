@@ -9,6 +9,9 @@ STATUS:
             The Objective-C interface provides most of the functionality found in the
             core (C++) library. But the interface has not been tested as thoroughly
             as the core library, and it should be used with caution.
+
+            Currently, the Objective-C interface is heavily extended and modfied.
+            This implies that the API will likely change in the next release.
 DESCR     : >
             The goal of TightDB is to provide a high performance
             data storage for your applications.
