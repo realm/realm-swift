@@ -113,12 +113,12 @@
 /* Column meta info */
 -(size_t)getColumnCount;
 -(NSString *)getColumnName:(size_t)ndx;
--(size_t)getColumnIndex:(NSString *)name;
+-(NSUInteger)getColumnIndex:(NSString *)name;
 -(TightdbType)getColumnType:(size_t)ndx;
 -(TightdbDescriptor *)getDescriptor;
 -(TightdbDescriptor *)getDescriptorWithError:(NSError *__autoreleasing *)error;
 -(BOOL)isEmpty;
--(size_t)count;
+-(NSUInteger)count;
 -(TightdbCursor *)addEmptyRow;
 
 /* Only curser based add should be public. This is just a temporaray way to hide the methods. */
