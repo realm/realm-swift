@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D01A9FA18C9DDCD00527AD5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D01A9F918C9DDCD00527AD5 /* libc++.dylib */; };
 		4D54FC4A18B77D56002AD81E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC4918B77D56002AD81E /* Foundation.framework */; };
 		4D54FC4C18B77D56002AD81E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC4B18B77D56002AD81E /* CoreGraphics.framework */; };
 		4D54FC4E18B77D56002AD81E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC4D18B77D56002AD81E /* UIKit.framework */; };
@@ -22,7 +23,6 @@
 		4D54FC6E18B77D56002AD81E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC4D18B77D56002AD81E /* UIKit.framework */; };
 		4D54FC7618B77D56002AD81E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D54FC7418B77D56002AD81E /* InfoPlist.strings */; };
 		4D54FC7818B77D56002AD81E /* iPhoneMiniTutorialTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D54FC7718B77D56002AD81E /* iPhoneMiniTutorialTests.m */; };
-		4D54FC8418B77E1E002AD81E /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC8318B77E1E002AD81E /* libstdc++.dylib */; };
 		4D7995A618BCD9FB009EB0C0 /* Tightdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D7995A518BCD9FB009EB0C0 /* Tightdb.framework */; };
 /* End PBXBuildFile section */
 
@@ -37,6 +37,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4D01A9F918C9DDCD00527AD5 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		4D54FC4618B77D56002AD81E /* iPhoneMiniTutorial.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iPhoneMiniTutorial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D54FC4918B77D56002AD81E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4D54FC4B18B77D56002AD81E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -66,7 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D54FC8418B77E1E002AD81E /* libstdc++.dylib in Frameworks */,
+				4D01A9FA18C9DDCD00527AD5 /* libc++.dylib in Frameworks */,
 				4D54FC4C18B77D56002AD81E /* CoreGraphics.framework in Frameworks */,
 				4D7995A618BCD9FB009EB0C0 /* Tightdb.framework in Frameworks */,
 				4D54FC4E18B77D56002AD81E /* UIKit.framework in Frameworks */,
@@ -109,6 +110,7 @@
 		4D54FC4818B77D56002AD81E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4D01A9F918C9DDCD00527AD5 /* libc++.dylib */,
 				4D7995A518BCD9FB009EB0C0 /* Tightdb.framework */,
 				4D54FC8318B77E1E002AD81E /* libstdc++.dylib */,
 				4D54FC4918B77D56002AD81E /* Foundation.framework */,

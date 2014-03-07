@@ -3,7 +3,7 @@
  * TIGHTDB CONFIDENTIAL
  * __________________
  *
- *  [2011] - [2012] TightDB Inc
+ *  [2011] - [2014] TightDB Inc
  *  All Rights Reserved.
  *
  * NOTICE:  All information contained herein is, and remains
@@ -17,27 +17,13 @@
  * from TightDB Incorporated.
  *
  **************************************************************************/
-#ifndef TIGHTDB_OBJC_TYPE_H
-#define TIGHTDB_OBJC_TYPE_H
 
-/* Make sure numbers match those in <tightdb/data_type.hpp> */
-typedef enum {
-    tightdb_Bool   =  1,
-    tightdb_Int    =  0,
-    tightdb_Float  =  9,
-    tightdb_Double = 10,
-    tightdb_String =  2,
-    tightdb_Binary =  4,
-    tightdb_Date   =  7,
-    tightdb_Table  =  5,
-    tightdb_Mixed  =  6,
-} TightdbType;
+#ifndef TIGHTDB_OBJC_SUPPORT_H
+#define TIGHTDB_OBJC_SUPPORT_H
 
+#import <Foundation/Foundation.h>
+#include <tightdb/descriptor.hpp>
 
-typedef enum {
-    tightdb_ascending   =  0,
-    tightdb_descending   =  1,
-    
-} TightdbSortOrder;
-
-#endif /* TIGHTDB_OBJC_TYPE_H */
+BOOL verify_row(const tightdb::Descriptor& descr, NSArray * data);
+BOOL insert_row(size_t ndx, tightdb::Table& table, NSArray * data);
+#endif /* TIGHTDB_OBJC_SUPPORT_H */

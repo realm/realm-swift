@@ -91,6 +91,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 ; \
 -(TableName##_Query*)where; \
 -(TableName##_Cursor*)addEmptyRow; \
+-(TableName##_Cursor*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertRowAtIndex:(size_t)ndx; \
@@ -136,7 +137,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName${j+1}, CType${j+1}) \
 { \
     return [self find:ndx]; \
 } \
--(TightdbCursor*)getCursor:(long)ndx \
+-(TableName##_Cursor*)getCursor:(long)ndx \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:[self getTable] ndx:ndx]; \
 } \
@@ -247,6 +248,10 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 -(TableName##_Cursor*)addEmptyRow \
 { \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:[super _addEmptyRow]]; \
+} \
+-(TableName##_Cursor*)objectAtIndexedSubscript:(NSUInteger)ndx \
+{ \
+	return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx \
 { \
