@@ -63,120 +63,181 @@
         STFail(@"First not zero");
     if ([_table getIntInColumn:1 atRow:ndx] != 10)
         STFail(@"Second not 10");
- 
+}
+
+-(void)testAppendRowsIntColumn
+{
     // Add row using object literate
-    TightdbTable* _table2 = [[TightdbTable alloc] init];
-    [_table2 addColumnWithType:tightdb_Int andName:@"first"];
-    if (![_table2 appendRow:@[ @1 ]])
+    TightdbTable* t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Int andName:@"first"];
+    if (![t appendRow:@[ @1 ]])
         STFail(@"Impossible!");
-    if ([_table2 count] != 1)
-        STFail(@"Excepted 1 row");
-    if (![_table2 appendRow:@[ @2 ]])
+    if ([t count] != 1)
+        STFail(@"Expected 1 row");
+    if (![t appendRow:@[ @2 ]])
         STFail(@"Impossible!");
-    if ([_table2 count] != 2)
-        STFail(@"Excepted 2 rows");
-    if ([_table2 getIntInColumn:0 atRow:0] != 1)
-        STFail(@"Value 1 excepted");
-    if ([_table2 getIntInColumn:0 atRow:1] != 2)
-        STFail(@"Value 2 excepted");
-    if ([_table2 appendRow:@[@"Hello"]])
+    if ([t count] != 2)
+        STFail(@"Expected 2 rows");
+    if ([t getIntInColumn:0 atRow:0] != 1)
+        STFail(@"Value 1 expected");
+    if ([t getIntInColumn:0 atRow:1] != 2)
+        STFail(@"Value 2 expected");
+    if ([t appendRow:@[@"Hello"]])
         STFail(@"Wrong type");
-    if ([_table2 appendRow:@[@1, @"Hello"]])
+    if ([t appendRow:@[@1, @"Hello"]])
         STFail(@"Wrong number of columns");
+}
 
-    TightdbTable* _table3 = [[TightdbTable alloc] init];
-    [_table3 addColumnWithType:tightdb_Int andName:@"first"];
-    [_table3 addColumnWithType:tightdb_String andName:@"second"];
-    if (![_table3 appendRow:@[@1, @"Hello"]])
+-(void)testAppendRowsIntStringColumns
+{
+    TightdbTable* t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Int andName:@"first"];
+    [t addColumnWithType:tightdb_String andName:@"second"];
+    if (![t appendRow:@[@1, @"Hello"]])
         STFail(@"appendRow 1");
-    if ([_table3 count] != 1)
+    if ([t count] != 1)
         STFail(@"1 row expected");
-    if ([_table3 getIntInColumn:0 atRow:0] != 1)
-        STFail(@"Value 1 excepted");
-    if (![[_table3 getStringInColumn:1 atRow:0] isEqualToString:@"Hello"])
-        STFail(@"Value 'Hello' excepted");
-    if ([_table3 appendRow:@[@1, @2]])
+    if ([t getIntInColumn:0 atRow:0] != 1)
+        STFail(@"Value 1 expected");
+    if (![[t getStringInColumn:1 atRow:0] isEqualToString:@"Hello"])
+        STFail(@"Value 'Hello' expected");
+    if ([t appendRow:@[@1, @2]])
         STFail(@"appendRow 2");
+}
 
-    TightdbTable* _table4 = [[TightdbTable alloc] init];
-    [_table4 addColumnWithType:tightdb_Double andName:@"first"];
-    if (![_table4 appendRow:@[@3.14]])  /* double is default */
+-(void)testAppendRowsDoubleColumn
+{
+    TightdbTable* t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Double andName:@"first"];
+    if (![t appendRow:@[@3.14]])  /* double is default */
         STFail(@"Cannot insert 'double'");
-    if ([_table4 count] != 1)
-        STFail(@"1 row excepted");
+    if ([t count] != 1)
+        STFail(@"1 row expected");
+}
 
-    TightdbTable* _table5 = [[TightdbTable alloc] init];
-    [_table5 addColumnWithType:tightdb_Float andName:@"first"];
-    if (![_table5 appendRow:@[@3.14F]])  /* F == float */
+-(void)testAppendRowsFloatColumn
+{
+    TightdbTable* t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Float andName:@"first"];
+    if (![t appendRow:@[@3.14F]])  /* F == float */
         STFail(@"Cannot insert 'float'");
-    if ([_table5 count] != 1)
-        STFail(@"1 row excepted");
+    if ([t count] != 1)
+        STFail(@"1 row expected");
+}
 
-    TightdbTable* _table6 = [[TightdbTable alloc] init];
-    [_table6 addColumnWithType:tightdb_Date andName:@"first"];
-    if (![_table6 appendRow:@[@1000000000]])  /* 2001-09-09 01:46:40 */
+-(void)testAppendRowsDateColumn
+{
+    TightdbTable* t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Date andName:@"first"];
+    if (![t appendRow:@[@1000000000]])  /* 2001-09-09 01:46:40 */
         STFail(@"Cannot insert 'time_t'");
-    if ([_table6 count] != 1)
-        STFail(@"1 row excepted");
-    NSDate *d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
-    if (![_table6 appendRow:@[d]])
-        STFail(@"Cannot insert 'NSDate'");
-    if ([_table6 count] != 2)
-        STFail(@"2 rows excepted");
+    if ([t count] != 1)
+        STFail(@"1 row expected");
 
+    NSDate *d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
+    if (![t appendRow:@[d]])
+        STFail(@"Cannot insert 'NSDate'");
+    if ([t count] != 2)
+        STFail(@"2 rows excepted");
+}
+-(void)testAppendRowsBinaryColumn
+{
     const char bin[4] = { 0, 1, 2, 3 };
     TightdbBinary* bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
-    TightdbTable* _table7 = [[TightdbTable alloc] init];
-    [_table7 addColumnWithType:tightdb_Binary andName:@"first"];
-    if (![_table7 appendRow:@[bin2]])
+    TightdbTable* t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Binary andName:@"first"];
+    if (![t appendRow:@[bin2]])
         STFail(@"Cannot insert 'binary'");
-    if ([_table7 count] != 1)
-        STFail(@"1 row excepted");
+    if ([t count] != 1)
+        STFail(@"1 row expected");
     NSData *nsd = [NSData dataWithBytes:(const void *)bin length:4];
-    if (![_table7 appendRow:@[nsd]])
+    if (![t appendRow:@[nsd]])
         STFail(@"Cannot insert 'NSData'");
-    if ([_table7 count] != 2)
+    if ([t count] != 2)
         STFail(@"2 rows excepted");
+}
 
-    TightdbTable* _table8 = [[TightdbTable alloc] init];
-    [_table8 addColumnWithType:tightdb_Int andName:@"first"];
-    TightdbDescriptor* _descr8 = [_table8 getDescriptor];
-    TightdbDescriptor* _subdescr8 = [_descr8 addColumnTable:@"second"];
-    [_subdescr8 addColumnWithType:tightdb_Int andName:@"TableCol_IntCol"];
-    if (![_table8 appendRow:@[@1, @[]]])
-        STFail(@"Cannot insert empty subtable");
-    if ([_table8 count] != 1)
+-(void)testAppendRowsTooManyItems
+{
+    TightdbTable *t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Int andName:@"first"];
+    STAssertFalse(([t appendRow:@[@1, @1]]), @"Too many items for a row.");
+}
+
+-(void)testAppendRowsTooFewItems
+{
+    TightdbTable *t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Int andName:@"first"];
+    STAssertFalse(([t appendRow:@[]]), @"Too few items for a row.");
+}
+
+-(void)testAppendRowsWrongType
+{
+    TightdbTable *t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Int andName:@"first"];
+    STAssertFalse(([t appendRow:@[@YES]]), @"Wrong type for column.");
+    STAssertFalse(([t appendRow:@[@""]]), @"Wrong type for column.");
+    STAssertFalse(([t appendRow:@[@3.5]]), @"Wrong type for column.");
+    STAssertFalse(([t appendRow:@[@3.5F]]), @"Wrong type for column.");
+    STAssertFalse(([t appendRow:@[@[]]]), @"Wrong type for column.");
+}
+
+-(void)testAppendRowsBoolColumn
+{
+    TightdbTable *t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Bool andName:@"first"];
+    STAssertTrue(([t appendRow:@[@YES]]), @"Cannot append bool column.");
+    STAssertTrue(([t appendRow:@[@NO]]), @"Cannot append bool column.");
+    STAssertEquals((size_t)2, [t count], @"2 rows expected");
+}
+
+-(void)testAppendRowsIntSubtableColumns
+{
+    TightdbTable* t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Int andName:@"first"];
+    TightdbDescriptor* descr = [t getDescriptor];
+    TightdbDescriptor* subdescr = [descr addColumnTable:@"second"];
+    [subdescr addColumnWithType:tightdb_Int andName:@"TableCol_IntCol"];
+    if (![t appendRow:@[@1, @[]]])
         STFail(@"1 row excepted");
-    if (![_table8 appendRow:@[@2, @[@[@3]]]])
+    if ([t count] != 1)
+        STFail(@"1 row expected");
+    if (![t appendRow:@[@2, @[@[@3]]]])
         STFail(@"Cannot insert subtable");
-    if ([_table8 count] != 2)
-        STFail(@"2 rows excepted");
+    if ([t count] != 2)
+        STFail(@"2 rows expected");
+}
 
-    TightdbTable* _table9 = [[TightdbTable alloc] init];
-    [_table9 addColumnWithType:tightdb_Mixed andName:@"first"];
-    if (![_table9 appendRow:@[@1]])
+-(void)testAppendRowsMixedColumns
+{
+    const char bin[4] = { 0, 1, 2, 3 };
+    TightdbBinary* bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
+
+    TightdbTable* t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Mixed andName:@"first"];
+    if (![t appendRow:@[@1]])
         STFail(@"Cannot insert 'int'");
-    if ([_table9 count] != 1)
+    if ([t count] != 1)
         STFail(@"1 row excepted");
-    if (![_table9 appendRow:@[@"Hello"]])
+    if (![t appendRow:@[@"Hello"]])
         STFail(@"Cannot insert 'string'");
-    if ([_table9 count] != 2)
+    if ([t count] != 2)
         STFail(@"2 rows excepted");
-    if (![_table9 appendRow:@[@3.14f]])
+    if (![t appendRow:@[@3.14f]])
         STFail(@"Cannot insert 'float'");
-    if ([_table9 count] != 3)
+    if ([t count] != 3)
         STFail(@"3 rows excepted");
-    if (![_table9 appendRow:@[@3.14]])
+    if (![t appendRow:@[@3.14]])
         STFail(@"Cannot insert 'double'");
-    if ([_table9 count] != 4)
+    if ([t count] != 4)
         STFail(@"4 rows excepted");
-    if (![_table9 appendRow:@[@YES]])
+    if (![t appendRow:@[@YES]])
         STFail(@"Cannot insert 'bool'");
-    if ([_table9 count] != 5)
+    if ([t count] != 5)
         STFail(@"5 rows excepted");
-    if (![_table9 appendRow:@[bin2]])
+    if (![t appendRow:@[bin2]])
         STFail(@"Cannot insert 'binary'");
-    if ([_table9 count] != 6)
+    if ([t count] != 6)
         STFail(@"6 rows excepted");
 
     TightdbTable* _table10 = [[TightdbTable alloc] init];
@@ -185,6 +246,37 @@
         STFail(@"Cannot insert 'bool'");
     if ([_table10 count] != 1)
         STFail(@"1 row excepted");
+}
+
+-(void)testRemoveColumns
+{
+    
+    TightdbTable *t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Int andName:@"col0"];
+    STAssertTrue([t getColumnCount] == 1,@"1 column added" );
+    
+    [t removeColumnWithIndex:0];
+    STAssertTrue([t getColumnCount] == 0, @"Colum removed");
+    
+    for (int i=0;i<10;i++) {
+        [t addColumnWithType:tightdb_Int andName:@"name"];
+    }
+    
+    STAssertThrows([t removeColumnWithIndex:10], @"Out of bounds");
+    STAssertThrows([t removeColumnWithIndex:-1], @"Less than zero colIndex");
+
+    STAssertTrue([t getColumnCount] == 10, @"10 columns added");
+
+    for (int i=0;i<10;i++) {
+        [t removeColumnWithIndex:0];
+    }
+    
+    STAssertTrue([t getColumnCount] == 0, @"Colums removed");
+    
+    STAssertThrows([t removeColumnWithIndex:1], @"No columns added");
+    STAssertThrows([t removeColumnWithIndex:-1], @"Less than zero colIndex");
+
+    
 }
 
 - (void)testDataTypes_Dynamic
