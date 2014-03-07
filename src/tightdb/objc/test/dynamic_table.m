@@ -370,16 +370,6 @@
         @"Columnless table has no cursors."); 
 }
 
-- (void)testColumnlessAddRow
-{
-    TightdbTable *t = [[TightdbTable alloc] init];
-    TightdbCursor *c = [t addRow];
-    STAssertNotNil(c, @"addRow returns a non-nil reference.");
-    STAssertEquals((size_t)1, [t count], @"addRow adds a row.");
-    STAssertEquals((size_t)0, [t getColumnCount],
-        @"addRow doesn't modify column count.");
-}
-
 - (void)testRemoveRowAtIndex
 {
     TightdbTable *t = [[TightdbTable alloc] init];
