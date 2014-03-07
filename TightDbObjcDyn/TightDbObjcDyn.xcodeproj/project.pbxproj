@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4D01A9EF18C75B4100527AD5 /* table_view.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9EE18C75B4100527AD5 /* table_view.m */; };
+		4D01A9FC18C9F5E600527AD5 /* table_view.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9FB18C9F5E600527AD5 /* table_view.m */; };
+		4D01A9FE18C9F60F00527AD5 /* version.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9FD18C9F60F00527AD5 /* version.m */; };
 		4D79966018BDFC3E009EB0C0 /* table_macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D79965F18BDFC3E009EB0C0 /* table_macros.h */; };
 		4DB1DEFB18BF70AE005A7234 /* dynamic_table.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF818BF70AE005A7234 /* dynamic_table.m */; };
 		4DB1DEFC18BF70AE005A7234 /* functional.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF918BF70AE005A7234 /* functional.m */; };
@@ -60,7 +61,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		4D01A9EE18C75B4100527AD5 /* table_view.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = table_view.m; sourceTree = "<group>"; };
+		4D01A9FB18C9F5E600527AD5 /* table_view.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = table_view.m; path = ../../src/tightdb/objc/test/table_view.m; sourceTree = "<group>"; };
+		4D01A9FD18C9F60F00527AD5 /* version.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = version.m; path = ../../src/tightdb/objc/test/version.m; sourceTree = "<group>"; };
 		4D79965F18BDFC3E009EB0C0 /* table_macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = table_macros.h; path = ../../src/tightdb/objc/table_macros.h; sourceTree = "<group>"; };
 		4DB1DEF818BF70AE005A7234 /* dynamic_table.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = dynamic_table.m; path = ../../src/tightdb/objc/test/dynamic_table.m; sourceTree = "<group>"; };
 		4DB1DEF918BF70AE005A7234 /* functional.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = functional.m; path = ../../src/tightdb/objc/test/functional.m; sourceTree = "<group>"; };
@@ -205,24 +207,25 @@
 		E91890B4177B677900653D7A /* TightDbObjcDynTests */ = {
 			isa = PBXGroup;
 			children = (
-				4DB1DEF818BF70AE005A7234 /* dynamic_table.m */,
-				4DB1DEF918BF70AE005A7234 /* functional.m */,
-				4DB1DEFA18BF70AE005A7234 /* typed_table.m */,
-				4D01A9EE18C75B4100527AD5 /* table_view.m */,
 				E91890E7177B71E400653D7A /* data_type.mm */,
+				4DB1DEF818BF70AE005A7234 /* dynamic_table.m */,
 				E91890E8177B71E400653D7A /* enumerator.m */,
 				E91890E9177B71E400653D7A /* err_handling.mm */,
+				4DB1DEF918BF70AE005A7234 /* functional.m */,
 				E91890EA177B71E400653D7A /* get_subtable.m */,
-				E91890EB177B71E400653D7A /* group_misc_2.m */,
 				E91890EC177B71E400653D7A /* group.m */,
+				E91890EB177B71E400653D7A /* group_misc_2.m */,
 				E91890ED177B71E400653D7A /* mixed.m */,
 				E91890EE177B71E400653D7A /* query.m */,
 				E91890EF177B71E400653D7A /* shared_group.m */,
 				E91890F0177B71E400653D7A /* subtable.m */,
+				E91890B5177B677900653D7A /* Supporting Files */,
 				E91890F1177B71E400653D7A /* table_delete_all.m */,
+				4D01A9FB18C9F5E600527AD5 /* table_view.m */,
 				E91890F3177B71E400653D7A /* template.m */,
 				E91890F4177B71E400653D7A /* tutorial.m */,
-				E91890B5177B677900653D7A /* Supporting Files */,
+				4DB1DEFA18BF70AE005A7234 /* typed_table.m */,
+				4D01A9FD18C9F60F00527AD5 /* version.m */,
 			);
 			path = TightDbObjcDynTests;
 			sourceTree = "<group>";
@@ -373,6 +376,7 @@
 				E91890F6177B71E400653D7A /* enumerator.m in Sources */,
 				E91890F7177B71E400653D7A /* err_handling.mm in Sources */,
 				E91890F8177B71E400653D7A /* get_subtable.m in Sources */,
+				4D01A9FE18C9F60F00527AD5 /* version.m in Sources */,
 				E91890F9177B71E400653D7A /* group_misc_2.m in Sources */,
 				E91890FA177B71E400653D7A /* group.m in Sources */,
 				E91890FB177B71E400653D7A /* mixed.m in Sources */,
@@ -380,8 +384,8 @@
 				E91890FD177B71E400653D7A /* shared_group.m in Sources */,
 				E91890FE177B71E400653D7A /* subtable.m in Sources */,
 				4DB1DEFC18BF70AE005A7234 /* functional.m in Sources */,
+				4D01A9FC18C9F5E600527AD5 /* table_view.m in Sources */,
 				4DB1DEFD18BF70AE005A7234 /* typed_table.m in Sources */,
-				4D01A9EF18C75B4100527AD5 /* table_view.m in Sources */,
 				E91890FF177B71E400653D7A /* table_delete_all.m in Sources */,
 				4DB1DEFB18BF70AE005A7234 /* dynamic_table.m in Sources */,
 				E9189101177B71E400653D7A /* template.m in Sources */,
