@@ -475,7 +475,7 @@ using namespace std;
         return nil;
     [table_2 setNativeTable:table.get()];
     [table_2 setParent:self];
-    //[table_2 setReadOnly:m_read_only]; FIXME
+    [table_2 setReadOnly:m_read_only];
     if (![table_2 _checkType])
         return nil;
     
@@ -494,7 +494,7 @@ using namespace std;
         return nil;
     [table_2 setNativeTable:table.get()];
     [table_2 setParent:self];
-    //[table_2 setReadOnly:m_read_only]; FIXME
+    [table_2 setReadOnly:m_read_only];
     return table_2;
 }
 -(NSString*)getString:(size_t)col_ndx ndx:(size_t)ndx
