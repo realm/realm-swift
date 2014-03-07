@@ -118,6 +118,11 @@
         STFail(@"Cannot insert 'time_t'");
     if ([_table6 count] != 1)
         STFail(@"1 row excepted");
+    NSDate *d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
+    if (![_table6 appendRow:@[d]])
+        STFail(@"Cannot insert 'NSDate'");
+    if ([_table6 count] != 2)
+        STFail(@"2 rows excepted");
 
     const char bin[4] = { 0, 1, 2, 3 };
     TightdbBinary* bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];

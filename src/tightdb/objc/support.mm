@@ -45,10 +45,10 @@ BOOL verify_row(const Descriptor& descr, NSArray * data)
                     return NO;
                 }
             }
-            else {
-                return NO;
+            if ([obj isKindOfClass:[NSDate class]]) {
+                break;
             }
-            break;
+            return NO;
         case type_Int:
             if ([obj isKindOfClass:[NSNumber class]]) {
                 const char * data_type = [obj objCType];
@@ -144,7 +144,12 @@ BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
             table.insert_bool(col_ndx, row_ndx, bool([obj boolValue]));
             break;
         case type_DateTime:
-            table.insert_datetime(col_ndx, row_ndx, time_t([obj longValue]));
+            if ([obj isKindOfClass:[NSDate class]]) {
+                table.insert_datetime(col_ndx, row_ndx, time_t([obj timeIntervalSince1970]));
+            }
+            else {
+                table.insert_datetime(col_ndx, row_ndx, time_t([obj longValue]));
+            }
             break;
         case type_Int:
             table.insert_int(col_ndx, row_ndx, int64_t([obj longValue]));
