@@ -33,4 +33,11 @@ typedef enum {
     tightdb_Mixed  =  6,
 } TightdbType;
 
+
+typedef enum {
+    tightdb_ascending   =  0,
+    tightdb_descending   =  1,
+    
+} TightdbSortOrder;
+
 #endif /* TIGHTDB_OBJC_TYPE_H */

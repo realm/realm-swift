@@ -398,6 +398,40 @@ using namespace std;
 {
     return m_view->is_empty();
 }
+-(size_t)getColumnCount
+{
+    return m_view->get_column_count();
+}
+
+-(TightdbType)getColumnType:(size_t)colNdx
+{
+    TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colNdx);
+    return TightdbType(m_view->get_column_type(colNdx));
+}
+-(void) sortColumnWithIndex: (size_t)columnIndex
+{
+    [self sortColumnWithIndex:columnIndex inOrder:tightdb_ascending];
+}
+-(void) sortColumnWithIndex: (size_t)columnIndex  inOrder: (TightdbSortOrder)order
+{
+    TightdbType columnType = [self getColumnType:columnIndex];
+    
+    if(columnType != tightdb_Int && columnType != tightdb_Bool && columnType != tightdb_Date) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:sort_on_column_with_type_not_supported"
+                                                         reason:@"Sort is currently only supported on Integer, Boolean and Date columns."
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
+    
+    try {
+        m_view->sort(columnIndex, order == 0);
+    } catch(std::exception& ex) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                         reason:[NSString stringWithUTF8String:ex.what()]
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
+}
 -(int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
 {
     return m_view->get_int(col_ndx, ndx);
