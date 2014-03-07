@@ -154,15 +154,15 @@
 -(id)getTableInColumn:(NSUInteger)colNdx atRow:(NSUInteger)ndx withClass:(Class)obj;
 -(TightdbMixed *)getMixedInColumn:(NSUInteger)colNdx atRow:(NSUInteger)ndx;
 
--(void)setInt:(int64_t)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setBool:(BOOL)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setFloat:(float)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setDouble:(double)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setDate:(time_t)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setString:(NSString *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setBinary:(TightdbBinary *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setTable:(TightdbTable *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
--(void)setMixed:(TightdbMixed *)value inColumn:(size_t)col_ndx atRow:(size_t)row_ndx;
+-(void)setInt:(int64_t)value inColumn:(NSUInteger)col_ndx atRow:(NSUInteger)row_ndx;
+-(void)setBool:(BOOL)value inColumn:(NSUInteger)col_ndx atRow:(NSUInteger)row_ndx;
+-(void)setFloat:(float)value inColumn:(NSUInteger)col_ndx atRow:(NSUInteger)row_ndx;
+-(void)setDouble:(double)value inColumn:(NSUInteger)col_ndx atRow:(NSUInteger)row_ndx;
+-(void)setDate:(time_t)value inColumn:(NSUInteger)col_ndx atRow:(NSUInteger)row_ndx;
+-(void)setString:(NSString *)value inColumn:(NSUInteger)col_ndx atRow:(NSUInteger)row_ndx;
+-(void)setBinary:(TightdbBinary *)value inColumn:(NSUInteger)col_ndx atRow:(NSUInteger)row_ndx;
+-(void)setTable:(TightdbTable *)value inColumn:(NSUInteger)col_ndx atRow:(NSUInteger)row_ndx;
+-(void)setMixed:(TightdbMixed *)value inColumn:(NSUInteger)col_ndx atRow:(NSUInteger)row_ndx;
 
 
 /* FIXME: It has been decided that the insert methods must not be a
@@ -192,11 +192,11 @@
 
 
 /* Subtables */
--(size_t)getTableSize:(size_t)colNdx ndx:(size_t)ndx;
--(BOOL)insertSubtable:(size_t)colNdx ndx:(size_t)ndx;
--(BOOL)insertSubtable:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
--(BOOL)clearSubtable:(size_t)colNdx ndx:(size_t)ndx;
--(BOOL)clearSubtable:(size_t)colNdx ndx:(size_t)ndx error:(NSError *__autoreleasing *)error;
+-(size_t)getTableSize:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
+-(BOOL)insertSubtable:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
+-(BOOL)insertSubtable:(NSUInteger)colNdx ndx:(NSUInteger)ndx error:(NSError *__autoreleasing *)error;
+-(BOOL)clearSubtable:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
+-(BOOL)clearSubtable:(NSUInteger)colNdx ndx:(NSUInteger)ndx error:(NSError *__autoreleasing *)error;
 
 /* Mixed */
 
@@ -279,20 +279,20 @@
 @interface TightdbView: NSObject <NSFastEnumeration>
 -(TightdbCursor *)cursorAtIndex:(size_t)ndx;
 
--(size_t)count;
+-(NSUInteger)count;
 -(BOOL)isEmpty;
--(TightdbType)getColumnType:(size_t)colNdx;
--(size_t)getColumnCount;
--(void) sortColumnWithIndex: (size_t)columnIndex;
--(void) sortColumnWithIndex: (size_t)columnIndex inOrder: (TightdbSortOrder)order;
--(int64_t)get:(size_t)colNdx ndx:(size_t)ndx;
--(BOOL)getBool:(size_t)colNdx ndx:(size_t)ndx;
--(time_t)getDate:(size_t)colNdx ndx:(size_t)ndx;
--(NSString *)getString:(size_t)colNdx ndx:(size_t)ndx;
--(void)removeRowAtIndex:(size_t)ndx;
+-(TightdbType)getColumnType:(NSUInteger)colNdx;
+-(NSUInteger)getColumnCount;
+-(void) sortColumnWithIndex: (NSUInteger)columnIndex;
+-(void) sortColumnWithIndex: (NSUInteger)columnIndex inOrder: (TightdbSortOrder)order;
+-(int64_t)get:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
+-(BOOL)getBool:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
+-(time_t)getDate:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
+-(NSString *)getString:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
+-(void)removeRowAtIndex:(NSUInteger)ndx;
 -(void)clear;
 -(TightdbTable *)getTable;
--(size_t)getSourceIndex:(size_t)ndx;
+-(NSUInteger)getSourceIndex:(NSUInteger)ndx;
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
 /* Private */
