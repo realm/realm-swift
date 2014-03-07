@@ -272,6 +272,9 @@ using namespace std;
     return YES;
 }
 
+
+
+
 -(TightdbDescriptor*)addColumnTable:(NSString*)name
 {
     return [self addColumnTable:name error:nil];
@@ -655,6 +658,11 @@ using namespace std;
     }
 
     return index;
+}
+
+-(TightdbCursor *)objectAtIndexedSubscript:(NSUInteger)ndx
+{
+    return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
 }
 
 
@@ -1214,6 +1222,20 @@ using namespace std;
         0);
 }
 
+-(void)removeColumnWithIndex:(size_t)columnIndex
+{
+    TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(columnIndex);
+    
+    try {
+        m_table->remove_column(columnIndex);
+    }
+    catch(std::exception& ex) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                         reason:[NSString stringWithUTF8String:ex.what()]
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
+}
 
 -(size_t)findBool:(size_t)col_ndx value:(BOOL)value
 {

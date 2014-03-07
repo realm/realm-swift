@@ -45,10 +45,10 @@ BOOL verify_row(const Descriptor& descr, NSArray * data)
                     return NO;
                 }
             }
-            else {
-                return NO;
+            if ([obj isKindOfClass:[NSDate class]]) {
+                break;
             }
-            break;
+            return NO;
         case type_Int:
             if ([obj isKindOfClass:[NSNumber class]]) {
                 const char * data_type = [obj objCType];
@@ -95,9 +95,10 @@ BOOL verify_row(const Descriptor& descr, NSArray * data)
                 return NO;
             break; /* FIXME: remove */
         case type_Binary:
-            if (![obj isKindOfClass:[TightdbBinary class]])
-                return NO;
-            break;
+            if ([obj isKindOfClass:[TightdbBinary class]] || 
+                [obj isKindOfClass:[NSData class]])
+                break;
+            return NO;
         case type_Mixed:
             break; /* everything goes */
         case type_Table:
@@ -144,7 +145,12 @@ BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
             table.insert_bool(col_ndx, row_ndx, bool([obj boolValue]));
             break;
         case type_DateTime:
-            table.insert_datetime(col_ndx, row_ndx, time_t([obj longValue]));
+            if ([obj isKindOfClass:[NSDate class]]) {
+                table.insert_datetime(col_ndx, row_ndx, time_t([obj timeIntervalSince1970]));
+            }
+            else {
+                table.insert_datetime(col_ndx, row_ndx, time_t([obj longValue]));
+            }
             break;
         case type_Int:
             table.insert_int(col_ndx, row_ndx, int64_t([obj longValue]));
@@ -162,8 +168,13 @@ BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
             }
             break;
         case type_Binary:
-            {
+            if ([obj isKindOfClass:[TightdbBinary class]]) {
                 BinaryData bd([obj getData], [obj getSize]);
+                table.insert_binary(col_ndx, row_ndx, bd);
+            }
+            else { /* NSData */
+                const void *data = [obj bytes];
+                BinaryData bd(static_cast<const char *>(data), [obj length]);
                 table.insert_binary(col_ndx, row_ndx, bd);
             }
             break;
@@ -187,10 +198,15 @@ BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
             }
             break;
         case type_Mixed:
-            /* FIXME: subtable, datetime and binary are missing */
+            /* FIXME: subtable, datetime are missing */
             if ([obj isKindOfClass:[NSString class]]) {
                 StringData sd([obj UTF8String]);
                 table.insert_mixed(col_ndx, row_ndx, sd);
+                break;
+            }
+            if ([obj isKindOfClass:[TightdbBinary class]]) {
+                BinaryData bd([obj getData], [obj getSize]);
+                table.insert_mixed(col_ndx, row_ndx, bd);
                 break;
             }
             if ([obj isKindOfClass:[NSNumber class]]) {
@@ -209,6 +225,7 @@ BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
                     table.insert_mixed(col_ndx, row_ndx, [obj doubleValue]);
                     break;
                 case 'B':
+                case 'c':
                     table.insert_mixed(col_ndx, row_ndx, [obj boolValue] == YES);
                     break;
                 }

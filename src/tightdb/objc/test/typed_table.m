@@ -121,4 +121,17 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     STAssertEquals([table.DoubleCol average], (0.8 + 8.8) / 2,          @"DoubleCol avg");
 }
 
+- (void)testTableTyped_Subscripting
+{
+    TestTableSub *table = [[TestTableSub alloc] init];
+
+    // Add some rows
+    [table addAge: 10];
+    [table addAge: 20];
+
+    // Verify that you can access rows with object subscripting
+    STAssertEquals(table[0].Age, (int64_t)10, @"table[0].age");
+    STAssertEquals(table[1].Age, (int64_t)20, @"table[1].age");
+}
+
 @end

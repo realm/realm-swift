@@ -1,5 +1,16 @@
+2014-03-07
+==========
+* Adding appendRow to TightdbTable.
+* Adding method removeColumn on table.
+
+2014-03-05
+==========
+* Adding methods getVersion, getCoreVersion and isAtLeast.
+
 2014-02-27
 ==========
+* Adding a simple class for version numbering.
+* Adding get-version and set-version targets to build.sh.
 ! BREAKING CHANGE: addRow renamed to addEmptyRow
 
 2013-11-08
