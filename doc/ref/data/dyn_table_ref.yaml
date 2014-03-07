@@ -129,7 +129,7 @@ CATEGORIES :
   - g_dyn_table_add_column:
       NAME     : addColumn
       SUMMARY  : *g_dyn_table_add_column_summary
-      DESCR    : 
+      DESCR    :
       - TEXT   : *g_dyn_table_add_column_descr
       - TEXT   : >
                 Currently, the following types are supported:
@@ -274,6 +274,23 @@ CATEGORIES :
       RETURN:
         TYPES  : TightdbCursor *
         DESCR  : Returns a dynamic cursor at the inseted row.
+
+  - objc_dyn_table_append_row:
+      NAME     : appendRow
+      SUMMARY  : Append a row using object literals.
+      DESCR    : >
+                 This method will append (insert at the end) a row to a table.
+                 The row is represented as Cocoa (NS) objects as elements in
+                 array. The elements' types are validated before creating the
+                 new row.
+      SIGNATURE: -(BOOL)appendRow:(NSArray*)data
+      PARAMS:
+      - NAME   : data
+        TYPES  : NSArray *
+        DESCR  : The row
+      RETURN:
+        TYPES  : BOOL
+        DESCR  : <code>YES</code> if elements are valid and row inserted, <code>NO</code> otherwise.
 
 
 # TODO: Should this be supported at all?
