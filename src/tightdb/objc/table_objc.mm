@@ -343,7 +343,7 @@ using namespace std;
         return nil;
     view_2->m_view.reset(new tightdb::TableView(view)); // FIXME: Exception handling needed here
     view_2->m_table = table;
-    [view_2 setReadOnly: [table isReadOnly]];
+    view_2->m_read_only = [table isReadOnly];
 
     return view_2;
 }
@@ -382,11 +382,6 @@ using namespace std;
         return nil;
 
     return [[TightdbCursor alloc] initWithTable:m_table ndx:[self getSourceIndex:ndx]];
-}
-
--(void)setReadOnly:(BOOL)read_only
-{
-    m_read_only = read_only;
 }
 
 -(size_t)count
