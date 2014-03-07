@@ -132,10 +132,13 @@
 -(BOOL)removeLastRow;
 -(BOOL)removeLastRowWithError:(NSError *__autoreleasing *)error;
 
+-(TightdbCursor *)objectAtIndexedSubscript:(NSUInteger)ndx; /* object subscripting */
 -(TightdbCursor *)cursorAtIndex:(size_t)ndx;
 -(TightdbCursor *)cursorAtLastIndex;
 
 -(TightdbCursor *)insertRowAtIndex:(size_t)ndx;
+
+-(BOOL)appendRow:(NSArray *)data;
 
 -(BOOL)insertRow:(size_t)ndx;
 -(BOOL)insertRow:(size_t)ndx error:(NSError *__autoreleasing *)error;
