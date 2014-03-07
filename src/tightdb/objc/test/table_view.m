@@ -41,23 +41,24 @@
     [super tearDown];
 }
 
--(void)getColumnCount
+-(void)testGetColumnCount
 {
     TightdbTable *t = [[TightdbTable alloc] init];
     TightdbQuery *q = [t where];
     TightdbView *v = [q findAll];
     
-    STAssertEquals(0, [v getColumnCount], @"no columns added yet");
+    STAssertEquals((size_t)0, [v getColumnCount], @"no columns added yet");
     
     [t addColumnWithType:tightdb_Int andName:@"col0"];
-    STAssertEquals(1, [v getColumnCount], @"1 column added to table");
+    STAssertEquals((size_t)1, [v getColumnCount], @"1 column added to table");
     
     for (int i=0;i<10;i++) {
         [t addColumnWithType:tightdb_Int andName:@"name"];
     }
-    STAssertEquals(11, [v getColumnCount], @"10 more columns added to table");
+    STAssertEquals((size_t)11, [v getColumnCount], @"10 more columns added to table");
     
-    // remove column on table not yet implemented    
+    [t removeColumnWithIndex:0];
+    STAssertEquals((size_t)10,[v getColumnCount], @"1 column removed from table");
 }
 
 - (void)testColumnTypesOnView
