@@ -342,6 +342,32 @@ EOF
         exit 0
         ;;
 
+    "get-version")
+	version_file="src/tightdb/objc/version.h"
+	tightdb_version_major="$(grep Tightdb_Version_Major $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+	tightdb_version_minor="$(grep Tightdb_Version_Minor $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+	tightdb_version_patch="$(grep Tightdb_Version_Patch $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+	echo "$tightdb_version_major.$tightdb_version_minor.$tightdb_version_patch"
+	exit 0
+	;;
+
+    "set-version")
+	if [ "$OS" != "Darwin" ]; then
+	    echo "You can only set version when running Mac OS X"
+	    exit 1
+	fi
+        tightdb_version="$1"
+        version_file="src/tightdb/objc/version.h"
+        tightdb_ver_major="$(echo "$tightdb_version" | cut -f1 -d.)" || exit 1
+        tightdb_ver_minor="$(echo "$tightdb_version" | cut -f2 -d.)" || exit 1
+        tightdb_ver_patch="$(echo "$tightdb_version" | cut -f3 -d.)" || exit 1
+
+	sed -i '' -e "s/Tightdb_Version_Major .*$/Tightdb_Version_Major $tightdb_ver_major/" $version_file || exit 1
+	sed -i '' -e "s/Tightdb_Version_Minor .*$/Tightdb_Version_Minor $tightdb_ver_minor/" $version_file || exit 1
+	sed -i '' -e "s/Tightdb_Version_Patch .*$/Tightdb_Version_Patch $tightdb_ver_patch/" $version_file || exit 1
+	exit 0
+	;;
+
     "clean")
         auto_configure || exit 1
         $MAKE clean || exit 1
@@ -423,16 +449,17 @@ EOF
 	    echo "Framework for iOS can only be generated under Mac OS X"
 	    exit 0
 	fi
+	tightdb_version="$(sh build.sh get-version)"
 	FRAMEWORK=Tightdb.framework
-	rm -rf "$FRAMEWORK" Tightdb-ios.zip || exit 1
+	rm -rf "$FRAMEWORK" tightdb-ios*.zip || exit 1
 	mkdir -p "$FRAMEWORK/Headers" || exit 1
 	cp iphone-lib/libtightdb-objc-ios.a "$FRAMEWORK/Tightdb" || exit 1
 	cp iphone-lib/include/tightdb/objc/*.h "$FRAMEWORK/Headers" || exit 1
 	(cd "$FRAMEWORK/Headers" && mv tightdb.h Tightdb.h) || exit 1
 	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/import <tightdb\/objc\/\(.*\)>/import "\1"/g' {} \; || exit 1
 	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/include <tightdb\/objc\/\(.*\)>/include "\1"/g' {} \; || exit 1
-	zip -r -q tightdb-ios.zip $FRAMEWORK || exit 1
-	echo "Framwork for iOS can be found in tightdb-ios.zip"
+	zip -r -q tightdb-ios-$tightdb_version.zip $FRAMEWORK || exit 1
+	echo "Framwork for iOS can be found in tightdb-ios-$tightdb_version.zip"
 	exit 0
 	;;
 
@@ -613,6 +640,7 @@ Available modes are:
   config clean build build-iphone test test-debug test-gdb test-cover
   show-install install uninstall test-installed install-prod install-devel
   uninstall-prod uninstall-devel dist-copy ios-framework
+  get-version set-version
 EOF
         exit 1
         ;;
