@@ -29,25 +29,25 @@
 -(void)setNdx:(size_t)ndx;
 -(size_t)index;
 
--(void)setInt:(int64_t)value inColumn:(size_t)colNdx;
--(void)setString:(NSString *)value inColumn:(size_t)colNdx;
--(void)setBool:(BOOL)value inColumn:(size_t)colNdx;
--(void)setFloat:(float)value inColumn:(size_t)colNdx;
--(void)setDouble:(double)value inColumn:(size_t)colNdx;
--(void)setDate:(time_t)value inColumn:(size_t)colNdx;
--(void)setBinary:(TightdbBinary *)value inColumn:(size_t)colNdx;
--(void)setMixed:(TightdbMixed *)value inColumn:(size_t)colNdx;
--(void)setTable:(TightdbTable *)value inColumn:(size_t)colNdx;
+-(void)setInt:(int64_t)value inColumn:(NSUInteger)colNdx;
+-(void)setString:(NSString *)value inColumn:(NSUInteger)colNdx;
+-(void)setBool:(BOOL)value inColumn:(NSUInteger)colNdx;
+-(void)setFloat:(float)value inColumn:(NSUInteger)colNdx;
+-(void)setDouble:(double)value inColumn:(NSUInteger)colNdx;
+-(void)setDate:(time_t)value inColumn:(NSUInteger)colNdx;
+-(void)setBinary:(TightdbBinary *)value inColumn:(NSUInteger)colNdx;
+-(void)setMixed:(TightdbMixed *)value inColumn:(NSUInteger)colNdx;
+-(void)setTable:(TightdbTable *)value inColumn:(NSUInteger)colNdx;
 
--(int64_t)getIntInColumn:(size_t)colNdx;
--(NSString *)getStringInColumn:(size_t)colNdx;
--(BOOL)getBoolInColumn:(size_t)colNdx;
--(float)getFloatInColumn:(size_t)colNdx;
--(double)getDoubleInColumn:(size_t)colNdx;
--(time_t)getDateInColumn:(size_t)colNdx;
--(TightdbBinary *)getBinaryInColumn:(size_t)colNdx;
--(TightdbMixed *)getMixedInColumn:(size_t)colNdx;
--(TightdbTable *)getTableInColumn:(size_t)colNdx;
+-(int64_t)getIntInColumn:(NSUInteger)colNdx;
+-(NSString *)getStringInColumn:(NSUInteger)colNdx;
+-(BOOL)getBoolInColumn:(NSUInteger)colNdx;
+-(float)getFloatInColumn:(NSUInteger)colNdx;
+-(double)getDoubleInColumn:(NSUInteger)colNdx;
+-(time_t)getDateInColumn:(NSUInteger)colNdx;
+-(TightdbBinary *)getBinaryInColumn:(NSUInteger)colNdx;
+-(TightdbMixed *)getMixedInColumn:(NSUInteger)colNdx;
+-(TightdbTable *)getTableInColumn:(NSUInteger)colNdx;
 
 @end
 
