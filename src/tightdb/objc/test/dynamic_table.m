@@ -65,6 +65,16 @@
         STFail(@"Second not 10");
 }
 
+-(void)testAddColumn
+{
+    TightdbTable *t = [[TightdbTable alloc] init];
+    NSUInteger stringColIndex = [t addColumnWithType:tightdb_String andName:@"stringCol"];
+    TightdbCursor *row = [t addEmptyRow];
+    [row setString:@"val" inColumn:stringColIndex];
+    
+    
+}
+
 -(void)testAppendRowsIntColumn
 {
     // Add row using object literate

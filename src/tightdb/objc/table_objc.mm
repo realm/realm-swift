@@ -1254,12 +1254,12 @@ using namespace std;
 }
 
 
--(size_t)addColumnWithType:(TightdbType)type andName:(NSString*)name
+-(NSUInteger)addColumnWithType:(TightdbType)type andName:(NSString*)name
 {
     return [self addColumnWithType:type andName:name error:nil];
 }
 
--(size_t)addColumnWithType:(TightdbType)type andName:(NSString*)name error:(NSError* __autoreleasing*)error
+-(NSUInteger)addColumnWithType:(TightdbType)type andName:(NSString*)name error:(NSError* __autoreleasing*)error
 {
     TIGHTDB_EXCEPTION_ERRHANDLER(
         return m_table->add_column(tightdb::DataType(type), ObjcStringAccessor(name));,
