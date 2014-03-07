@@ -32,7 +32,7 @@ libtightdb_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
 # The meaning of this version string is identical to the one defined
 # by GNU Libtool. See also
 # http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning
-libtightdb_objc_a_VERSION = 2:0:0
+libtightdb_objc_a_VERSION = 3:0:0
 
 
 # Code generation
