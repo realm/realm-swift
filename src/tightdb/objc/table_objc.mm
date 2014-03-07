@@ -3,6 +3,8 @@
 //  TightDB
 //
 
+#import <Foundation/Foundation.h>
+
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/table.hpp>
 #include <tightdb/descriptor.hpp>
@@ -14,6 +16,7 @@
 #import <tightdb/objc/query.h>
 #import <tightdb/objc/query_priv.h>
 #import <tightdb/objc/cursor.h>
+#import <tightdb/objc/support.h>
 
 #include <tightdb/objc/util.hpp>
 
@@ -657,6 +660,11 @@ using namespace std;
     return index;
 }
 
+-(TightdbCursor *)objectAtIndexedSubscript:(NSUInteger)ndx
+{
+    return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
+}
+
 
 -(TightdbCursor*)cursorAtIndex:(size_t)ndx
 {
@@ -674,6 +682,18 @@ using namespace std;
 {
     [self insertRow:ndx];
     return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
+}
+
+-(BOOL)appendRow:(NSArray*)data
+{
+    tightdb::Table& table = *m_table;
+    tightdb::ConstDescriptorRef desc = table.get_descriptor();
+    if (!verify_row(*desc, data)) {
+        return NO;
+    }
+
+    /* append row */
+    return insert_row(table.size(), table, data);
 }
 
 -(BOOL)insertRow:(size_t)ndx
