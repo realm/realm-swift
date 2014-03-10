@@ -166,11 +166,11 @@ using namespace std;
     return m_query->remove();
 }
 
--(NSNumber*)minimumWithIntColumn:(size_t)col_ndx
+-(NSNumber*)minimumWithIntColumn:(NSUInteger)col_ndx
 {
     return [self minimumWithIntColumn:col_ndx error:nil];
 }
--(NSNumber*)minimumWithIntColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
+-(NSNumber*)minimumWithIntColumn:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
 {
     if (m_error) {
         if (error) {
@@ -184,11 +184,11 @@ using namespace std;
         nil);
 }
 
--(NSNumber*)minimumWithFloatColumn:(size_t)col_ndx
+-(NSNumber*)minimumWithFloatColumn:(NSUInteger)col_ndx
 {
     return [self minimumWithFloatColumn:col_ndx error:nil];
 }
--(NSNumber*)minimumWithFloatColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
+-(NSNumber*)minimumWithFloatColumn:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
 {
     if (m_error) {
         if (error) {
@@ -202,11 +202,11 @@ using namespace std;
         nil);
 }
 
--(NSNumber*)minimumWithDoubleColumn:(size_t)col_ndx
+-(NSNumber*)minimumWithDoubleColumn:(NSUInteger)col_ndx
 {
     return [self minimumWithDoubleColumn:col_ndx error:nil];
 }
--(NSNumber*)minimumWithDoubleColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
+-(NSNumber*)minimumWithDoubleColumn:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
 {
     if (m_error) {
         if (error) {
@@ -220,11 +220,11 @@ using namespace std;
         nil);
 }
 
--(NSNumber*)maximumWithIntColumn:(size_t)col_ndx
+-(NSNumber*)maximumWithIntColumn:(NSUInteger)col_ndx
 {
     return [self maximumWithIntColumn:col_ndx error:nil];
 }
--(NSNumber*)maximumWithIntColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
+-(NSNumber*)maximumWithIntColumn:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
 {
     if (m_error) {
         if (error) {
@@ -237,11 +237,11 @@ using namespace std;
         return [NSNumber numberWithLongLong:m_query->maximum_int(col_ndx)];,
         nil);
 }
--(NSNumber*)maximumWithFloatColumn:(size_t)col_ndx
+-(NSNumber*)maximumWithFloatColumn:(NSUInteger)col_ndx
 {
     return [self maximumWithFloatColumn:col_ndx error:nil];
 }
--(NSNumber*)maximumWithFloatColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
+-(NSNumber*)maximumWithFloatColumn:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
 {
     if (m_error) {
         if (error) {
@@ -255,11 +255,11 @@ using namespace std;
         nil);
 }
 
--(NSNumber*)maximumWithDoubleColumn:(size_t)col_ndx
+-(NSNumber*)maximumWithDoubleColumn:(NSUInteger)col_ndx
 {
     return [self maximumWithDoubleColumn:col_ndx error:nil];
 }
--(NSNumber*)maximumWithDoubleColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
+-(NSNumber*)maximumWithDoubleColumn:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
 {
     if (m_error) {
         if (error) {
@@ -273,11 +273,11 @@ using namespace std;
         nil);
 }
 
--(NSNumber*)sumWithIntColumn:(size_t)col_ndx
+-(NSNumber*)sumWithIntColumn:(NSUInteger)col_ndx
 {
     return [self sumWithIntColumn:col_ndx error:nil];
 }
--(NSNumber*)sumWithIntColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
+-(NSNumber*)sumWithIntColumn:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
 {
     if (m_error) {
         if (error) {
@@ -291,11 +291,11 @@ using namespace std;
         nil);
 }
 
--(NSNumber*)sumWithFloatColumn:(size_t)col_ndx
+-(NSNumber*)sumWithFloatColumn:(NSUInteger)col_ndx
 {
     return [self sumWithFloatColumn:col_ndx error:nil];
 }
--(NSNumber*)sumWithFloatColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
+-(NSNumber*)sumWithFloatColumn:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
 {
     if (m_error) {
         if (error) {
@@ -309,11 +309,11 @@ using namespace std;
         nil);
 }
 
--(NSNumber*)sumWithDoubleColumn:(size_t)col_ndx
+-(NSNumber*)sumWithDoubleColumn:(NSUInteger)col_ndx
 {
     return [self sumWithDoubleColumn:col_ndx error:nil];
 }
--(NSNumber*)sumWithDoubleColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
+-(NSNumber*)sumWithDoubleColumn:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
 {
     if (m_error) {
         if (error) {
@@ -327,11 +327,11 @@ using namespace std;
         nil);
 }
 
--(NSNumber*)averageWithIntColumn:(size_t)col_ndx
+-(NSNumber*)averageWithIntColumn:(NSUInteger)col_ndx
 {
     return [self averageWithIntColumn:col_ndx error:nil];
 }
--(NSNumber*)averageWithIntColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
+-(NSNumber*)averageWithIntColumn:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
 {
     if (m_error) {
         if (error) {
@@ -344,11 +344,11 @@ using namespace std;
         return [NSNumber numberWithDouble:m_query->average_int(col_ndx)];,
         nil);
 }
--(NSNumber*)averageWithFloatColumn:(size_t)col_ndx
+-(NSNumber*)averageWithFloatColumn:(NSUInteger)col_ndx
 {
     return [self averageWithFloatColumn:col_ndx error:nil];
 }
--(NSNumber*)averageWithFloatColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
+-(NSNumber*)averageWithFloatColumn:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
 {
     if (m_error) {
         if (error) {
@@ -362,12 +362,12 @@ using namespace std;
         nil);
 }
 
--(NSNumber*)averageWithDoubleColumn:(size_t)col_ndx
+-(NSNumber*)averageWithDoubleColumn:(NSUInteger)col_ndx
 {
     return [self averageWithDoubleColumn:col_ndx error:nil];
 }
 
--(NSNumber*)averageWithDoubleColumn:(size_t)col_ndx error:(NSError* __autoreleasing*)error
+-(NSNumber*)averageWithDoubleColumn:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
 {
     if (m_error) {
         if (error) {
@@ -387,11 +387,11 @@ using namespace std;
     return [TightdbView viewWithTable:m_table andNativeView:view];
 }
 
--(size_t)find:(size_t)last
+-(NSUInteger)find:(NSUInteger)last
 {
     return [self find:last error:nil];
 }
--(size_t)find:(size_t)last error:(NSError* __autoreleasing*)error
+-(NSUInteger)find:(NSUInteger)last error:(NSError* __autoreleasing*)error
 {
     if (m_error) {
         if (error) {
@@ -407,211 +407,211 @@ using namespace std;
 // Conditions:
 
 
--(TightdbQuery*)column:(size_t)colNdx isBetweenInt:(int64_t)from and_:(int64_t)to
+-(TightdbQuery*)column:(NSUInteger)colNdx isBetweenInt:(int64_t)from and_:(int64_t)to
 {
     m_query->between(colNdx, from, to);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isBetweenFloat:(float)from and_:(float)to
+-(TightdbQuery*)column:(NSUInteger)colNdx isBetweenFloat:(float)from and_:(float)to
 {
     m_query->between(colNdx, from, to);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isBetweenDouble:(double)from and_:(double)to
+-(TightdbQuery*)column:(NSUInteger)colNdx isBetweenDouble:(double)from and_:(double)to
 {
     m_query->between(colNdx, from, to);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isBetweenDate:(time_t)from and_:(time_t)to
+-(TightdbQuery*)column:(NSUInteger)colNdx isBetweenDate:(time_t)from and_:(time_t)to
 {
     m_query->between_datetime(colNdx, from, to);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isEqualToBool:(bool)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isEqualToBool:(bool)value
 {
     m_query->equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isEqualToInt:(int64_t)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isEqualToInt:(int64_t)value
 {
     m_query->equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isEqualToFloat:(float)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isEqualToFloat:(float)value
 {
     m_query->equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isEqualToDouble:(double)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isEqualToDouble:(double)value
 {
     m_query->equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isEqualToString:(NSString*)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isEqualToString:(NSString*)value
 {
     m_query->equal(colNdx, ObjcStringAccessor(value));
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isEqualToString:(NSString*)value caseSensitive:(bool)caseSensitive
+-(TightdbQuery*)column:(NSUInteger)colNdx isEqualToString:(NSString*)value caseSensitive:(bool)caseSensitive
 {
     m_query->equal(colNdx, ObjcStringAccessor(value), caseSensitive);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isEqualToDate:(time_t)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isEqualToDate:(time_t)value
 {
     m_query->equal_datetime(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isEqualToBinary:(TightdbBinary*)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isEqualToBinary:(TightdbBinary*)value
 {
     m_query->equal(colNdx, [value getNativeBinary]);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isNotEqualToInt:(int64_t)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isNotEqualToInt:(int64_t)value
 {
     m_query->not_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isNotEqualToFloat:(float)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isNotEqualToFloat:(float)value
 {
     m_query->not_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isNotEqualToDouble:(double)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isNotEqualToDouble:(double)value
 {
     m_query->not_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isNotEqualToString:(NSString*)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isNotEqualToString:(NSString*)value
 {
     m_query->not_equal(colNdx, ObjcStringAccessor(value));
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isNotEqualToString:(NSString*)value caseSensitive:(bool)caseSensitive
+-(TightdbQuery*)column:(NSUInteger)colNdx isNotEqualToString:(NSString*)value caseSensitive:(bool)caseSensitive
 {
     m_query->not_equal(colNdx, ObjcStringAccessor(value), caseSensitive);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isNotEqualToDate:(time_t)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isNotEqualToDate:(time_t)value
 {
     m_query->not_equal_datetime(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isNotEqualToBinary:(TightdbBinary*)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isNotEqualToBinary:(TightdbBinary*)value
 {
     m_query->not_equal(colNdx, [value getNativeBinary]);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isGreaterThanInt:(int64_t)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isGreaterThanInt:(int64_t)value
 {
     m_query->greater(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isGreaterThanFloat:(float)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isGreaterThanFloat:(float)value
 {
     m_query->greater(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isGreaterThanDouble:(double)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isGreaterThanDouble:(double)value
 {
     m_query->greater(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isGreaterThanDate:(time_t)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isGreaterThanDate:(time_t)value
 {
     m_query->greater_datetime(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isGreaterThanOrEqualToInt:(int64_t)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isGreaterThanOrEqualToInt:(int64_t)value
 {
     m_query->greater_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isGreaterThanOrEqualToFloat:(float)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isGreaterThanOrEqualToFloat:(float)value
 {
     m_query->greater_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isGreaterThanOrEqualToDouble:(double)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isGreaterThanOrEqualToDouble:(double)value
 {
     m_query->greater_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isGreaterThanOrEqualToDate:(time_t)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isGreaterThanOrEqualToDate:(time_t)value
 {
     m_query->greater_equal_datetime(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isLessThanInt:(int64_t)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isLessThanInt:(int64_t)value
 {
     m_query->less(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isLessThanFloat:(float)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isLessThanFloat:(float)value
 {
     m_query->less(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isLessThanDouble:(double)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isLessThanDouble:(double)value
 {
     m_query->less(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isLessThanDate:(time_t)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isLessThanDate:(time_t)value
 {
     m_query->less_datetime(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isLessThanOrEqualToInt:(int64_t)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isLessThanOrEqualToInt:(int64_t)value
 {
     m_query->less_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isLessThanOrEqualToFloat:(float)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isLessThanOrEqualToFloat:(float)value
 {
     m_query->less_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isLessThanOrEqualToDouble:(double)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isLessThanOrEqualToDouble:(double)value
 {
     m_query->less_equal(colNdx, value);
     return self;
 }
 
--(TightdbQuery*)column:(size_t)colNdx isLessThanOrEqualToDate:(time_t)value
+-(TightdbQuery*)column:(NSUInteger)colNdx isLessThanOrEqualToDate:(time_t)value
 {
     m_query->less_equal_datetime(colNdx, value);
     return self;
@@ -635,7 +635,7 @@ using namespace std;
     __weak TightdbQuery* _query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
@@ -657,7 +657,7 @@ using namespace std;
     __weak TightdbQuery* _query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
@@ -764,7 +764,7 @@ using namespace std;
     __weak TightdbQuery* _query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
@@ -857,7 +857,7 @@ using namespace std;
     __weak TightdbQuery* _query;
     size_t _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
@@ -948,9 +948,9 @@ using namespace std;
 @implementation TightdbQueryAccessorString
 {
     __weak TightdbQuery* _query;
-    size_t _column_ndx;
+    NSUInteger _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
@@ -1015,9 +1015,9 @@ using namespace std;
 @implementation TightdbQueryAccessorBinary
 {
     __weak TightdbQuery* _query;
-    size_t _column_ndx;
+    NSUInteger _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
@@ -1057,9 +1057,9 @@ using namespace std;
 @implementation TightdbQueryAccessorDate
 {
     __weak TightdbQuery* _query;
-    size_t _column_ndx;
+    NSUInteger _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
@@ -1109,9 +1109,9 @@ using namespace std;
 @implementation TightdbQueryAccessorSubtable
 {
     __weak TightdbQuery* _query;
-    size_t _column_ndx;
+    NSUInteger _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
@@ -1126,9 +1126,9 @@ using namespace std;
 @implementation TightdbQueryAccessorMixed
 {
     __weak TightdbQuery* _query;
-    size_t _column_ndx;
+    NSUInteger _column_ndx;
 }
--(id)initWithColumn:(size_t)columnId query:(TightdbQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(TightdbQuery*)query
 {
     self = [super init];
     if (self) {
