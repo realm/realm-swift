@@ -79,7 +79,7 @@
 -(NSUInteger)getColumnCount;
 -(TightdbType)getColumnType:(NSUInteger)colNdx;
 -(NSString *)getColumnName:(NSUInteger)colNdx;
--(size_t)getColumnIndex:(NSString *)name;
+-(NSUInteger)getColumnIndex:(NSString *)name;
 @end
 
 
