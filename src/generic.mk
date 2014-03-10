@@ -604,7 +604,8 @@ INSTALL_DATA    = $(INSTALL) -m 644
 INSTALL_LIBRARY = $(INSTALL) -m 644
 INSTALL_PROGRAM = $(INSTALL)
 
-VALGRIND = valgrind --quiet --track-origins=yes --leak-check=yes --leak-resolution=low
+VALGRIND       ?= valgrind
+VALGRIND_FLAGS ?= --quiet --track-origins=yes --leak-check=yes --leak-resolution=low
 
 # Alternative filesystem root for installation
 DESTDIR =
@@ -1445,10 +1446,10 @@ check-debug/local: $(TARGETS_CHECK_DEBUG)
 $(foreach x,$(TARGETS_CHECK_PROG_DEBUG),$(NL_TAB)./$(x)$(NEWLINE))
 
 memcheck/local: $(TARGETS_CHECK)
-$(foreach x,$(TARGETS_CHECK_PROG_OPTIM),$(NL_TAB)$$(VALGRIND) --error-exitcode=1 ./$(x) --no-error-exitcode$(NEWLINE))
+$(foreach x,$(TARGETS_CHECK_PROG_OPTIM),$(NL_TAB)$$(VALGRIND) $$(VALGRIND_FLAGS) --error-exitcode=1 ./$(x) --no-error-exitcode$(NEWLINE))
 
 memcheck-debug/local: $(TARGETS_CHECK_DEBUG)
-$(foreach x,$(TARGETS_CHECK_PROG_DEBUG),$(NL_TAB)$$(VALGRIND) --error-exitcode=1 ./$(x) --no-error-exitcode$(NEWLINE))
+$(foreach x,$(TARGETS_CHECK_PROG_DEBUG),$(NL_TAB)$$(VALGRIND) $$(VALGRIND_FLAGS) --error-exitcode=1 ./$(x) --no-error-exitcode$(NEWLINE))
 
 ifneq ($(strip $(or $(SOURCE_DIRS),$(TARGETS_CHECK_COVER))),)
 check-cover/local: $(TARGETS_CHECK_COVER)

@@ -123,8 +123,8 @@
 
 /* Only curser based add should be public. This is just a temporaray way to hide the methods. */
 /* TODO: Move to class extension. */
--(size_t)_addEmptyRow;
--(size_t)_addEmptyRows:(size_t)rowCount;
+-(NSUInteger)_addEmptyRow;
+-(NSUInteger)_addEmptyRows:(NSUInteger)rowCount;
 
 -(BOOL)clear;
 -(BOOL)removeRowAtIndex:(NSUInteger)ndx;
@@ -207,7 +207,7 @@
 -(NSUInteger)addColumnWithType:(TightdbType)type andName:(NSString *)name;
 -(NSUInteger)addColumnWithType:(TightdbType)type andName:(NSString *)name error:(NSError *__autoreleasing *)error;
 
--(void)removeColumnWithIndex:(size_t)columnIndex;
+-(void)removeColumnWithIndex:(NSUInteger)columnIndex;
 
 /* Searching */
 /* FIXME: Should be findBool:(BOOL)value inColumn:(size_t)colNdx; */
@@ -303,7 +303,7 @@
 @interface TightdbColumnProxy: NSObject
 @property(nonatomic, weak) TightdbTable *table;
 @property(nonatomic) size_t column;
--(id)initWithTable:(TightdbTable *)table column:(size_t)column;
+-(id)initWithTable:(TightdbTable *)table column:(NSUInteger)column;
 -(void)clear;
 @end
 
@@ -312,7 +312,7 @@
 @end
 
 @interface TightdbColumnProxy_Int: TightdbColumnProxy
--(size_t)find:(int64_t)value;
+-(NSUInteger)find:(int64_t)value;
 -(int64_t)minimum;
 -(int64_t)maximum;
 -(int64_t)sum;
