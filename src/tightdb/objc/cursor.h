@@ -25,9 +25,9 @@
 @class TightdbMixed;
 
 @interface TightdbCursor: NSObject
--(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx;
--(void)setNdx:(size_t)ndx;
--(size_t)index;
+-(id)initWithTable:(TightdbTable *)table ndx:(NSUInteger)ndx;
+-(void)setNdx:(NSUInteger)ndx;
+-(NSUInteger)index;
 
 -(void)setInt:(int64_t)value inColumn:(NSUInteger)colNdx;
 -(void)setString:(NSString *)value inColumn:(NSUInteger)colNdx;
