@@ -57,7 +57,7 @@
    TIGHTDB_CURSOR_PROPERTY macros similar to what is done for query
    accessors. */
 @interface TightdbAccessor: NSObject
--(id)initWithCursor:(TightdbCursor *)cursor columnId:(size_t)columnId;
+-(id)initWithCursor:(TightdbCursor *)cursor columnId:(NSUInteger)columnId;
 -(BOOL)getBool;
 -(void)setBool:(BOOL)value;
 -(int64_t)getInt;
