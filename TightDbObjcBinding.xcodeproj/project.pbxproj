@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		42AD3A9218CDB53600C86073 /* support.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42AD3A9118CDB53600C86073 /* support.mm */; };
 		4D0AEB5818214C9C00CA4A2D /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D0AEB5718214C9C00CA4A2D /* CoreFoundation.framework */; };
 		4D0AEBA118214FD000CA4A2D /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D0AEBA018214FD000CA4A2D /* SenTestingKit.framework */; };
 		4D54F7E018AA756D002AD81E /* cursor_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4D54F7AB18AA756D002AD81E /* cursor_objc.mm */; };
@@ -46,6 +47,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		42AD3A9018CDB51E00C86073 /* support.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = support.h; sourceTree = "<group>"; };
+		42AD3A9118CDB53600C86073 /* support.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = support.mm; sourceTree = "<group>"; };
 		4D0AEB5418214C9C00CA4A2D /* TightDbObjcBinding */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TightDbObjcBinding; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D0AEB5718214C9C00CA4A2D /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		4D0AEBA018214FD000CA4A2D /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
@@ -132,6 +135,8 @@
 		4D54F7A718AA756D002AD81E /* objc */ = {
 			isa = PBXGroup;
 			children = (
+				42AD3A9118CDB53600C86073 /* support.mm */,
+				42AD3A9018CDB51E00C86073 /* support.h */,
 				4D54F7A818AA756D002AD81E /* .gitignore */,
 				4D54F7A918AA756D002AD81E /* cheetah.sh */,
 				4D54F7AA18AA756D002AD81E /* cursor.h */,
@@ -240,6 +245,7 @@
 				4D54F7F718AA756D002AD81E /* table_delete_all.m in Sources */,
 				4D54F7EE18AA756D002AD81E /* get_subtable.m in Sources */,
 				4D54F7EF18AA756D002AD81E /* group.m in Sources */,
+				42AD3A9218CDB53600C86073 /* support.mm in Sources */,
 				4D54F7E018AA756D002AD81E /* cursor_objc.mm in Sources */,
 				4D54F7F918AA756D002AD81E /* tutorial.m in Sources */,
 				4D54F7E118AA756D002AD81E /* group_objc.mm in Sources */,
