@@ -19,8 +19,10 @@
  **************************************************************************/
 
 #import <SenTestingKit/SenTestingKit.h>
+#import <Foundation/NSException.h>
 
 #import <tightdb/objc/tightdb.h>
+
 
 @interface TightdbDynamicTableTests: SenTestCase
   // Intentionally left blank.
@@ -287,6 +289,415 @@
     STAssertThrows([t removeColumnWithIndex:-1], @"Less than zero colIndex");
 
     
+}
+
+- (void)testColumnlessCount
+{
+    TightdbTable* t = [[TightdbTable alloc] init];
+    STAssertEquals((size_t)0, [t count], @"Columnless table has 0 rows.");     
+}
+
+- (void)testColumnlessIsEmpty
+{
+    TightdbTable* t = [[TightdbTable alloc] init];
+    STAssertTrue([t isEmpty], @"Columnless table is empty.");
+}
+
+- (void)testColumnlessClear
+{
+    TightdbTable* t = [[TightdbTable alloc] init];
+    [t clear];
+}
+
+- (void)testColumnlessOptimize
+{
+    TightdbTable* t = [[TightdbTable alloc] init];
+    [t optimize];
+}
+
+- (void)testColumnlessIsEqual
+{
+    TightdbTable* t1 = [[TightdbTable alloc] init];
+    TightdbTable* t2 = [[TightdbTable alloc] init];
+    STAssertTrue([t1 isEqual:t1], @"Columnless table is equal to itself.");
+    STAssertTrue([t1 isEqual:t2], @"Columnless table is equal to another columnless table.");
+    STAssertTrue([t2 isEqual:t1], @"Columnless table is equal to another columnless table.");
+}
+
+- (void)testColumnlessGetColumnCount
+{
+    TightdbTable* t = [[TightdbTable alloc] init];
+    STAssertEquals((size_t)0, [t getColumnCount], @"Columnless table has column count 0.");
+}
+
+- (void)testColumnlessGetColumnName
+{
+    TightdbTable* t = [[TightdbTable alloc] init];
+    STAssertThrowsSpecific([t getColumnName:((size_t)-1)],
+        NSException, NSRangeException,
+        @"Columnless table has no column names.");
+    STAssertThrowsSpecific([t getColumnName:((size_t)0)],
+        NSException, NSRangeException,
+        @"Columnless table has no column names.");
+    STAssertThrowsSpecific([t getColumnName:((size_t)1)],
+        NSException, NSRangeException,
+        @"Columnless table has no column names.");
+}
+
+- (void)testColumnlessGetColumnType
+{
+    TightdbTable* t = [[TightdbTable alloc] init];
+    STAssertThrowsSpecific([t getColumnType:((size_t)-1)],
+        NSException, NSRangeException,
+        @"Columnless table has no column types.");
+    STAssertThrowsSpecific([t getColumnType:((size_t)0)],
+        NSException, NSRangeException,
+        @"Columnless table has no column types.");
+    STAssertThrowsSpecific([t getColumnType:((size_t)1)],
+        NSException, NSRangeException,
+        @"Columnless table has no column types.");
+}
+
+- (void)testColumnlessCursorAtIndex
+{
+    TightdbTable* t = [[TightdbTable alloc] init];
+    STAssertThrowsSpecific([t cursorAtIndex:((size_t)-1)],
+        NSException, NSRangeException,
+        @"Columnless table has no cursors.");
+    STAssertThrowsSpecific([t cursorAtIndex:((size_t)0)],
+        NSException, NSRangeException,
+        @"Columnless table has no cursors.");
+    STAssertThrowsSpecific([t cursorAtIndex:((size_t)1)],
+        NSException, NSRangeException,
+        @"Columnless table has no cursors.");
+}
+
+- (void)testColumnlessCursorAtLastIndex
+{
+    TightdbTable* t = [[TightdbTable alloc] init];
+    STAssertThrowsSpecific([t cursorAtLastIndex],
+        NSException, NSRangeException,
+        @"Columnless table has no cursors."); 
+}
+
+- (void)testRemoveRowAtIndex
+{
+    TightdbTable *t = [[TightdbTable alloc] init];
+    STAssertThrowsSpecific([t removeRowAtIndex:((size_t)-1)],
+        NSException, NSRangeException,
+        @"No rows in a columnless table.");
+    STAssertThrowsSpecific([t removeRowAtIndex:((size_t)0)],
+        NSException, NSRangeException,
+        @"No rows in a columnless table.");
+    STAssertThrowsSpecific([t removeRowAtIndex:((size_t)1)],
+        NSException, NSRangeException,
+        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessRemoveLastRow
+{
+    TightdbTable *t = [[TightdbTable alloc] init];
+    STAssertThrowsSpecific([t removeLastRow],
+        NSException, NSRangeException,
+        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessGetTableSize
+{
+    TightdbTable *t = [[TightdbTable alloc] init];
+    STAssertThrowsSpecific([t getTableSize:((size_t)0) ndx:((size_t)-1)],
+        NSException, NSRangeException,
+        @"No rows in a columnless table.");
+    STAssertThrowsSpecific([t getTableSize:((size_t)0) ndx:((size_t)0)],
+        NSException, NSRangeException,
+        @"No rows in a columnless table.");
+    STAssertThrowsSpecific([t getTableSize:((size_t)0) ndx:((size_t)1)],
+        NSException, NSRangeException,
+        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessClearSubtable
+{
+    TightdbTable *t = [[TightdbTable alloc] init];
+    STAssertThrowsSpecific([t clearSubtable:((size_t)0) ndx:((size_t)-1)],
+        NSException, NSRangeException,
+        @"No rows in a columnless table.");
+    STAssertThrowsSpecific([t clearSubtable:((size_t)0) ndx:((size_t)0)],
+        NSException, NSRangeException,
+        @"No rows in a columnless table.");
+    STAssertThrowsSpecific([t clearSubtable:((size_t)0) ndx:((size_t)1)],
+        NSException, NSRangeException,
+        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessSetIndex
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t setIndex:((size_t)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t setIndex:((size_t)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t setIndex:((size_t)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessHasIndex
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t hasIndex:((size_t)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t hasIndex:((size_t)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t hasIndex:((size_t)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessCountWithIntColumn
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t countWithIntColumn:((size_t)-1) andValue: 0],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t countWithIntColumn:((size_t)0) andValue: 0],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t countWithIntColumn:((size_t)1) andValue: 0],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessCountWithFloatColumn
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t countWithFloatColumn:((size_t)-1) andValue: 0.0f],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t countWithFloatColumn:((size_t)0) andValue: 0.0f],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t countWithFloatColumn:((size_t)1) andValue: 0.0f],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessCountWithDoubleColumn
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t countWithDoubleColumn:((size_t)-1) andValue: 0.0],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t countWithDoubleColumn:((size_t)0) andValue: 0.0],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t countWithDoubleColumn:((size_t)1) andValue: 0.0],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessCountWithStringColumn
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t countWithStringColumn:((size_t)-1) andValue: @""],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t countWithStringColumn:((size_t)0) andValue: @""],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t countWithStringColumn:((size_t)1) andValue: @""],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessSumWithIntColumn
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t sumWithIntColumn:((size_t)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t sumWithIntColumn:((size_t)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t sumWithIntColumn:((size_t)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessSumWithFloatColumn
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t sumWithFloatColumn:((size_t)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t sumWithFloatColumn:((size_t)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t sumWithFloatColumn:((size_t)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessSumWithDoubleColumn
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t sumWithDoubleColumn:((size_t)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t sumWithDoubleColumn:((size_t)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t sumWithDoubleColumn:((size_t)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessMaximumWithIntColumn
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t maximumWithIntColumn:((size_t)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t maximumWithIntColumn:((size_t)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t maximumWithIntColumn:((size_t)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessMaximumWithFloatColumn
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t maximumWithFloatColumn:((size_t)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t maximumWithFloatColumn:((size_t)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t maximumWithFloatColumn:((size_t)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessMaximumWithDoubleColumn
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t maximumWithDoubleColumn:((size_t)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t maximumWithDoubleColumn:((size_t)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t maximumWithDoubleColumn:((size_t)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessMinimumWithIntColumn
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t minimumWithIntColumn:((size_t)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t minimumWithIntColumn:((size_t)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t minimumWithIntColumn:((size_t)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessMinimumWithFloatColumn
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t minimumWithFloatColumn:((size_t)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t minimumWithFloatColumn:((size_t)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t minimumWithFloatColumn:((size_t)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessMinimumWithDoubleColumn
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t minimumWithDoubleColumn:((size_t)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t minimumWithDoubleColumn:((size_t)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t minimumWithDoubleColumn:((size_t)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessAverageWithIntColumn
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t averageWithIntColumn:((size_t)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t averageWithIntColumn:((size_t)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t averageWithIntColumn:((size_t)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessAverageWithFloatColumn
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t averageWithFloatColumn:((size_t)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t averageWithFloatColumn:((size_t)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t averageWithFloatColumn:((size_t)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+}
+
+- (void)testColumnlessAverageWithDoubleColumn
+{
+// SEGFAULT
+//    TightdbTable *t = [[TightdbTable alloc] init];
+//    STAssertThrowsSpecific([t averageWithDoubleColumn:((size_t)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t averageWithDoubleColumn:((size_t)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    STAssertThrowsSpecific([t averageWithDoubleColumn:((size_t)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
 }
 
 - (void)testDataTypes_Dynamic
