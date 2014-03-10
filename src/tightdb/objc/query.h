@@ -34,7 +34,7 @@
 -(TightdbQuery *)group;
 -(TightdbQuery *)or;
 -(TightdbQuery *)endgroup;
--(void)subtable:(size_t)column;
+-(void)subtable:(NSUInteger)column;
 -(void)parent;
 -(NSUInteger)count;
 -(NSUInteger)countWithError:(NSError *__autoreleasing *)error;
