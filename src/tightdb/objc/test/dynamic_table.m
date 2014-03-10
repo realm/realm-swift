@@ -291,6 +291,7 @@
     
 }
 
+/*
 - (void)testColumnlessCount
 {
     TightdbTable* t = [[TightdbTable alloc] init];
@@ -429,7 +430,7 @@
         NSException, NSRangeException,
         @"No rows in a columnless table.");
 }
-
+*/
 - (void)testColumnlessSetIndex
 {
 // SEGFAULT
