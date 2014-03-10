@@ -124,7 +124,7 @@ using namespace std;
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(m_query->end_group();, self, &m_error);
     return self;
 }
--(void)subtable:(size_t)column
+-(void)subtable:(NSUInteger)column
 {
     m_query->subtable(column);
 }
@@ -633,7 +633,7 @@ using namespace std;
 @implementation TightdbQueryAccessorBool
 {
     __weak TightdbQuery* _query;
-    size_t _column_ndx;
+    NSUInteger _column_ndx;
 }
 -(id)initWithColumn:(NSUInteger)columnId query:(TightdbQuery*)query
 {
@@ -655,7 +655,7 @@ using namespace std;
 @implementation TightdbQueryAccessorInt
 {
     __weak TightdbQuery* _query;
-    size_t _column_ndx;
+    NSUInteger _column_ndx;
 }
 -(id)initWithColumn:(NSUInteger)columnId query:(TightdbQuery*)query
 {
@@ -762,7 +762,7 @@ using namespace std;
 @implementation TightdbQueryAccessorFloat
 {
     __weak TightdbQuery* _query;
-    size_t _column_ndx;
+    NSUInteger _column_ndx;
 }
 -(id)initWithColumn:(NSUInteger)columnId query:(TightdbQuery*)query
 {
@@ -855,7 +855,7 @@ using namespace std;
 @implementation TightdbQueryAccessorDouble
 {
     __weak TightdbQuery* _query;
-    size_t _column_ndx;
+    NSUInteger _column_ndx;
 }
 -(id)initWithColumn:(NSUInteger)columnId query:(TightdbQuery*)query
 {
