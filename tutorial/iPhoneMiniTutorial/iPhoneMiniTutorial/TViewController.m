@@ -9,31 +9,41 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    // Create a data file
-    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup sharedGroupWithFile:[self writeablePathForFile: @"MyDatabase.db"] withError:nil];
+
+    // Remove old file
+    NSString *filename = [self writeablePathForFile: @"MyDatabase.db"];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSError *error;
+    [fileManager removeItemAtPath:filename error:&error];
+
+    // Create data file
+    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup sharedGroupWithFile:filename withError:nil];
 
     // Perform a write transaction
     [sharedGroup writeWithBlock:^(TightdbGroup *group) {
-        
+
         // Access table from group
         TightdbTable *table = [group getTable:@"myTable" error:nil];
-        
+
         // Add columns to the table
-        int const NAME  = [table addColumnWithType:tightdb_String andName:@"Name"];
-        int const AGE   = [table addColumnWithType:tightdb_Int    andName:@"Age"];
-        int const HIRED = [table addColumnWithType:tightdb_Bool   andName:@"Hired"];
-        
-        // Add two rows to the table
-        [table appendRow:@[@"Jill", @21, @YES]];
+        [table addColumnWithType:tightdb_String andName:@"Name"];
+        [table addColumnWithType:tightdb_Int    andName:@"Age"];
+       
+        // Add a row to the table
+        [table appendRow:@[@"Jill", @21]];
+
+        // Add a new column
+        int const HIRED = [table addColumnWithType:tightdb_Bool andName:@"Hired"];
+
+        // Add another row
         [table appendRow:@[@"Mary", @40, @NO]];
-      
+
         // Change value in row
         TightdbCursor *cursor = [table cursorAtIndex:0];
-        [cursor setBool:NO inColumn:HIRED];
-        
+        [cursor setBool:YES inColumn:HIRED];
+
         // Remove row from table
-        [table removeRowAtIndex:1];
+        [table removeRowAtIndex:0];
 
         // Print out info on iPhone screen
         self.tableColumnCountOutlet.text = [NSString stringWithFormat:@"# of columns: %zu", [table getColumnCount]];
