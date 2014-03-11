@@ -83,7 +83,7 @@
 @end
 
 
-@interface TightdbTable: NSObject <NSFastEnumeration>
+@interface TDBTable: NSObject <NSFastEnumeration>
 
 @property (readonly) NSUInteger columnCount;
 @property (readonly) TightdbDescriptor *descriptor;
@@ -264,7 +264,7 @@
 @end
 
 
-@interface TightdbView: NSObject <NSFastEnumeration>
+@interface TDBView: NSObject <NSFastEnumeration>
 
 @property (readonly) NSUInteger rowCount;
 @property (readonly) NSUInteger columnCount;
