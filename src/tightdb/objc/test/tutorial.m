@@ -120,8 +120,8 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
                                   .Age columnIsBetween:20 and_:30];
 
     // Get number of matching entries
-    NSLog(@"Query count: %@", [q count]);
-    STAssertEquals([[q count] unsignedLongValue] , (size_t)2,@"Expected 2 rows in query", nil);
+    NSLog(@"Query count: %lu",[q count]);
+    STAssertEquals([q count] , (size_t)2,@"Expected 2 rows in query", nil);
 
     // Get the average age - currently only a low-level interface!
     double avg = [[q.Age average] doubleValue];
