@@ -1154,7 +1154,7 @@ using namespace std;
 }
 
 
--(size_t)getTableSize:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx
+-(NSUInteger)getTableSize:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx
 {
     return m_table->get_subtable_size(col_ndx, row_ndx);
 }
