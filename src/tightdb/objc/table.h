@@ -139,6 +139,7 @@
 -(TightdbCursor *)insertRowAtIndex:(size_t)ndx;
 
 -(BOOL)appendRow:(NSArray *)data;
+-(BOOL)appendRowWithLabels:(NSDictionary *)data;
 
 -(BOOL)insertRow:(size_t)ndx;
 -(BOOL)insertRow:(size_t)ndx error:(NSError *__autoreleasing *)error;

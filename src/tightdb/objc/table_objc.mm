@@ -741,6 +741,17 @@ using namespace std;
     return insert_row(table.size(), table, data);
 }
 
+-(BOOL)appendRowWithLabels:(NSDictionary *)data
+{
+    tightdb::Table& table = *m_table;
+    tightdb::ConstDescriptorRef desc = table.get_descriptor();
+    if (!verify_row_with_labels(*desc, data)) {
+        return NO;
+    }
+    
+    return insert_row_with_labels(table.size(), table, data);
+}
+
 -(BOOL)insertRow:(size_t)ndx
 {
     return [self insertRow:ndx error:nil];

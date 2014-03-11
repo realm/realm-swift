@@ -1,3 +1,7 @@
+2014-03-11
+==========
+* Adding appendRowWithLabels to TightdbTable.
+
 2014-03-07
 ==========
 * Adding appendRow to TightdbTable.
