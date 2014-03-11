@@ -143,26 +143,26 @@
 
 -(BOOL)appendRow:(NSArray *)data;
 
--(BOOL)boolAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)colIndex;
--(int64_t)intAtColumnWithIndex:(NSUInteger)colIndex atRow:(NSUInteger)colIndex;
--(float)floatAtColumnWithIndex:(NSUInteger)colIndex atRow:(NSUInteger)colIndex;
--(double)doubleAtColumnWithIndex:(NSUInteger)colIndex atRow:(NSUInteger)colIndex;
--(time_t)dateAtColumnWithIndex:(NSUInteger)colIndex atRow:(NSUInteger)colIndex;
--(NSString *)stringAtColumnWithIndex:(NSUInteger)colIndex atRow:(NSUInteger)colIndex;
--(TightdbBinary *)binaryAtColumnWithIndex:(NSUInteger)colIndex atRow:(NSUInteger)colIndex;
--(TightdbTable *)tableAtColumnWithIndex:(NSUInteger)colIndex atRow:(NSUInteger)colIndex;
--(id)tableAtColumnWithIndex:(NSUInteger)colIndex atRow:(NSUInteger)colIndex asTableClass:(Class)tableClass;
--(TightdbMixed *)mixedAtColumnWithIndex:(NSUInteger)colNdx atRow:(NSUInteger)colIndex;
+-(BOOL)boolAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(int64_t)intAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(float)floatAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(double)doubleAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(time_t)dateAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(NSString *)stringAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(TightdbBinary *)binaryAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(TightdbTable *)tableAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(id)tableAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(Class)tableClass;
+-(TightdbMixed *)mixedAtColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex;
 
 -(void)setInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(void)setBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex atRow:(NSUInteger)atRowIndex;
--(void)setFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex atRow:(NSUInteger)atRowIndex;
--(void)setDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex atRow:(NSUInteger)atRowIndex;
--(void)setDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex atRow:(NSUInteger)atRowIndex;
--(void)setString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex atRow:(NSUInteger)atRowIndex;
--(void)setBinary:(TightdbBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex atRow:(NSUInteger)atRowIndex;
--(void)setTable:(TightdbTable *)aTable inColumnWithIndex:(NSUInteger)colIndex atRow:(NSUInteger)atRowIndex;
--(void)setMixed:(TightdbMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex atRow:(NSUInteger)atRowIndex;
+-(void)setBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)setFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)setDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)setDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)setString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)setBinary:(TightdbBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)setTable:(TightdbTable *)aTable inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)setMixed:(TightdbMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
 
 
 /* FIXME: It has been decided that the insert methods must not be a
@@ -251,29 +251,43 @@
 #endif
 
 /* Private */
--(id)_initRaw;
--(BOOL)_insertSubtableCopy:(NSUInteger)colNdx row:(NSUInteger)rowNdx subtable:(TightdbTable *)subtable;
--(BOOL)_insertSubtableCopy:(NSUInteger)colNdx row:(NSUInteger)rowNdx subtable:(TightdbTable *)subtable error:(NSError *__autoreleasing *)error;
+-(id)TDBInitRaw;
+-(BOOL)TDBInsertSubtableCopy:(NSUInteger)colNdx row:(NSUInteger)rowNdx subtable:(TightdbTable *)subtable;
+-(BOOL)TDBInsertSubtableCopy:(NSUInteger)colNdx row:(NSUInteger)rowNdx subtable:(TightdbTable *)subtable error:(NSError *__autoreleasing *)error;
 @end
 
 
 @interface TightdbView: NSObject <NSFastEnumeration>
--(TightdbCursor *)cursorAtIndex:(NSUInteger)ndx;
 
--(NSUInteger)count;
--(BOOL)isEmpty;
--(TightdbType)getColumnType:(NSUInteger)colNdx;
--(NSUInteger)getColumnCount;
--(void) sortColumnWithIndex: (NSUInteger)columnIndex;
--(void) sortColumnWithIndex: (NSUInteger)columnIndex inOrder: (TightdbSortOrder)order;
--(int64_t)get:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
--(BOOL)getBool:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
--(time_t)getDate:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
--(NSString *)getString:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
--(void)removeRowAtIndex:(NSUInteger)ndx;
--(void)clear;
--(TightdbTable *)getTable;
--(NSUInteger)getSourceIndex:(NSUInteger)ndx;
+@property (readonly) NSUInteger rowCount;
+@property (readonly) NSUInteger columnCount;
+
+-(TightdbCursor *)rowAtIndex:(NSUInteger)rowIndex;
+
+-(TightdbType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
+
+-(void) sortUsingColumnWithIndex: (NSUInteger)colIndex;
+-(void) sortUsingColumnWithIndex: (NSUInteger)colIndex inOrder: (TightdbSortOrder)order;
+
+
+-(BOOL)boolAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(int64_t)intAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(float)floatAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(double)doubleAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(time_t)dateAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(NSString *)stringAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(TightdbBinary *)binaryAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(TightdbTable *)tableAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(id)tableAtColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(Class)tableClass;
+-(TightdbMixed *)mixedAtColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex;
+
+
+-(void)removeRowAtIndex:(NSUInteger)atRowIndex;
+-(void)removeAllRows;
+
+-(TightdbTable *)getOriginTable;
+-(NSUInteger)rowIndexInOriginTableForRowAtIndex:(NSUInteger)atRowIndex;
+
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
 /* Private */
