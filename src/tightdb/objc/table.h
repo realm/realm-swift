@@ -192,7 +192,7 @@
 
 
 /* Subtables */
--(size_t)getTableSize:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
+-(NSUInteger)getTableSize:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
 -(BOOL)insertSubtable:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
 -(BOOL)insertSubtable:(NSUInteger)colNdx ndx:(NSUInteger)ndx error:(NSError *__autoreleasing *)error;
 -(BOOL)clearSubtable:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
