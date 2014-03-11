@@ -97,7 +97,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
      */
 
     FuncPeopleTable_Query *query = [[table where].Name columnIsNotEqualTo:@"Nothing is equal to this"];  // dummy query required right now
-    STAssertEquals([query count], [NSNumber numberWithLong:(TABLE_SIZE-2)], @"Check the size");
+    STAssertEquals([query count], (NSUInteger)(TABLE_SIZE-2), @"Check the size");
 
     i=0;
     for (cursor in query) {
@@ -113,7 +113,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
      */
 
     FuncPeopleTable_View *view = [[query.Hired columnIsEqualTo:YES] findAll];
-    STAssertEquals([query count], [NSNumber numberWithLong:(TABLE_SIZE-2)/2], @"Check the size");
+    STAssertEquals([query count], (NSUInteger)(TABLE_SIZE-2)/2, @"Check the size");
 
     i=0;
     for (cursor in view) {
@@ -226,7 +226,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
      */
 
     TightdbQuery *query = [[table where] column:NAME isNotEqualToString:@"Nothing is equal to this"];  // dummy query required right now
-    STAssertEquals([query count], [NSNumber numberWithLong:(TABLE_SIZE-2)], @"Check the size");
+    STAssertEquals([query count], (NSUInteger)(TABLE_SIZE-2), @"Check the size");
 
     i=0;
     for (cursor in query) {
@@ -242,7 +242,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
      */
 
     TightdbView *view = [[query column:HIRED isEqualToBool:YES] findAll];
-    STAssertEquals([query count], [NSNumber numberWithLong:(TABLE_SIZE-2)/2], @"Check the size");
+    STAssertEquals([query count], (NSUInteger)(TABLE_SIZE-2)/2, @"Check the size");
 
     i=0;
     for (cursor in view) {

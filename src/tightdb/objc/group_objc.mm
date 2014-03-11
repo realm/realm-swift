@@ -128,11 +128,11 @@ using namespace std;
 }
 
 
--(size_t)getTableCount
+-(NSUInteger)getTableCount
 {
     return m_group->size();
 }
--(NSString*)getTableName:(size_t)table_ndx
+-(NSString*)getTableName:(NSUInteger)table_ndx
 {
     return to_objc_string(m_group->get_table_name(table_ndx));
 }
