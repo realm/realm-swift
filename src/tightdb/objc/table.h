@@ -179,8 +179,15 @@
 -(BOOL)TDBInnsertBinary:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(TightdbBinary *)value;
 -(BOOL)TDBInnsertBinary:(NSUInteger)colNdx ndx:(NSUInteger)ndx data:(const char *)data size:(size_t)size;
 -(BOOL)TDBInnsertDate:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(time_t)value;
--(BOOL)iTDBInnsertDone;
+-(BOOL)TDBInnsertDone;
 
+
+/* Subtables */
+-(NSUInteger)getTableSize:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
+-(BOOL)insertSubtable:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
+-(BOOL)insertSubtable:(NSUInteger)colNdx ndx:(NSUInteger)ndx error:(NSError *__autoreleasing *)error;
+-(BOOL)clearSubtable:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
+-(BOOL)clearSubtable:(NSUInteger)colNdx ndx:(NSUInteger)ndx error:(NSError *__autoreleasing *)error;
 
 /* Mixed */
 

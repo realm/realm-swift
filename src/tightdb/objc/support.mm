@@ -136,6 +136,7 @@ BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
     NSEnumerator *enumerator = [data objectEnumerator];
     id obj;
 
+    bool subtable_seen = false;
     /* FIXME: handling of tightdb exceptions => return NO */
     size_t col_ndx = 0;
     while (obj = [enumerator nextObject]) {
@@ -179,29 +180,22 @@ BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
             }
             break;
         case type_Table:
-            if ([obj count]) {
-                table.clear_subtable(col_ndx, row_ndx);
-            }
-            else {
-                // Clear sub-table to prepare for new values
-                table.clear_subtable(col_ndx, row_ndx);
-                table.insert_subtable(col_ndx, row_ndx);
-                TableRef subtable = table.get_subtable(col_ndx, row_ndx);
-                NSEnumerator *subenumerator = [obj objectEnumerator];
-                id subobj;
-                size_t subrow_ndx = 0;
-                while (subobj = [subenumerator nextObject]) {                
-                    if (!insert_row(subrow_ndx, *subtable, subobj))
-                        return NO;
-                    ++subrow_ndx;
-                }
-            }
+            subtable_seen = true;
+            table.insert_subtable(col_ndx, row_ndx);
             break;
         case type_Mixed:
-            /* FIXME: subtable, datetime are missing */
             if ([obj isKindOfClass:[NSString class]]) {
                 StringData sd([obj UTF8String]);
                 table.insert_mixed(col_ndx, row_ndx, sd);
+                break;
+            }
+            if ([obj isKindOfClass:[NSArray class]]) {
+                table.insert_mixed(col_ndx, row_ndx, Mixed::subtable_tag());
+                subtable_seen = true;
+                break;
+            }
+            if ([obj isKindOfClass:[NSDate class]]) {
+                table.insert_mixed(col_ndx, row_ndx, DateTime(time_t([obj timeIntervalSince1970])));
                 break;
             }
             if ([obj isKindOfClass:[TightdbBinary class]]) {
@@ -237,5 +231,40 @@ BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
     }
     table.insert_done();
 
+    if (subtable_seen) {
+        NSEnumerator *enumerator = [data objectEnumerator];
+        size_t col_ndx = 0;
+        id obj;
+        while (obj = [enumerator nextObject]) {
+            DataType datatype = table.get_column_type(col_ndx);
+            if (datatype != type_Table && datatype != type_Mixed) {
+                ++col_ndx;
+                continue;
+            }
+            if (obj == nil) {
+                ++col_ndx;
+                continue;
+            }
+          
+            TableRef subtable = table.get_subtable(col_ndx, row_ndx);
+            NSEnumerator *subenumerator = [obj objectEnumerator];
+            id subobj;
+            size_t sub_ndx = 0;
+            while (subobj = [subenumerator nextObject]) {
+                if (datatype == type_Mixed && sub_ndx == 0) {
+                    /* first element is the description */
+                    ++sub_ndx;
+                    continue;
+                }
+                
+                /* Fill in data */
+                if (!insert_row(subtable->size(), *subtable, subobj)) {
+                    return NO;
+                }
+                ++sub_ndx;
+            }
+        }
+    }
+    
     return YES;
 }

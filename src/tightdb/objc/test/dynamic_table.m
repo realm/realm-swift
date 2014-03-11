@@ -202,7 +202,7 @@
     STAssertTrue(([t appendRow:@[@NO]]), @"Cannot append bool column.");
     STAssertEquals((size_t)2, [t count], @"2 rows expected");
 }
-/*
+
 -(void)testAppendRowsIntSubtableColumns
 {
     TightdbTable* t = [[TightdbTable alloc] init];
@@ -219,7 +219,7 @@
     if ([t count] != 2)
         STFail(@"2 rows expected");
 }
-*/
+
 -(void)testAppendRowsMixedColumns
 {
     const char bin[4] = { 0, 1, 2, 3 };
