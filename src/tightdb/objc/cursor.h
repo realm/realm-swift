@@ -29,6 +29,12 @@
 -(void)setNdx:(NSUInteger)ndx;
 -(NSUInteger)index;
 
+/* object subscripting */
+-(id)objectAtIndexedSubscript:(NSUInteger)colNdx;
+-(id)objectForKeyedSubscript:(id <NSCopying>)key;
+-(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colNdx;
+-(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key;
+
 -(void)setInt:(int64_t)value inColumn:(NSUInteger)colNdx;
 -(void)setString:(NSString *)value inColumn:(NSUInteger)colNdx;
 -(void)setBool:(BOOL)value inColumn:(NSUInteger)colNdx;
