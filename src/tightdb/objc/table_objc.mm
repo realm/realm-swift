@@ -731,7 +731,7 @@ using namespace std;
 
 -(BOOL)appendRow:(NSObject*)data
 {
-    return [self insertRow:[self count] andData:data];
+    return [self insertObject:data atRowIndex:[self count]];
 }
 
 -(BOOL)insertRow:(NSUInteger)ndx
@@ -739,23 +739,23 @@ using namespace std;
     return [self insertRow:ndx error:nil];
 }
 
--(BOOL)insertRow:(NSUInteger)ndx andData:(NSObject *)data
+-(BOOL)insertObject:(id)anObject atRowIndex:(NSUInteger)rowIndex
 {
     tightdb::Table& table = *m_table;
     tightdb::ConstDescriptorRef desc = table.get_descriptor();
     
-    if ([data isKindOfClass:[NSArray class]]) {
-        if (!verify_row(*desc, (NSArray *)data)) {
+    if ([anObject isKindOfClass:[NSArray class]]) {
+        if (!verify_row(*desc, (NSArray *)anObject)) {
             return NO;
         }
-        return insert_row(size_t(ndx), table, (NSArray *)data);
+        return insert_row(size_t(rowIndex), table, (NSArray *)anObject);
     }
     
-    if ([data isKindOfClass:[NSDictionary class]]) {
-        if (!verify_row_with_labels(*desc, (NSDictionary *)data)) {
+    if ([anObject isKindOfClass:[NSDictionary class]]) {
+        if (!verify_row_with_labels(*desc, (NSDictionary *)anObject)) {
             return NO;
         }
-        return insert_row_with_labels(size_t(ndx), table, (NSDictionary *)data);
+        return insert_row_with_labels(size_t(rowIndex), table, (NSDictionary *)anObject);
     }
     
     /* FIXME: pull out properties of object and insert as row */

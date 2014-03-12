@@ -1,46 +1,6 @@
 2014-03-12
 ==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.2014-03-12
-==========
-+ insertRow can take an optional NSObject.
++ Adding insertObject to TightdbTable.
 
 2014-03-11
 ==========

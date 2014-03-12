@@ -275,22 +275,21 @@ CATEGORIES :
         TYPES  : TightdbCursor *
         DESCR  : Returns a dynamic cursor at the inseted row.
 
-  - objc_dyn_table_insert_row:
-      NAME     : insertRow
+  - objc_dyn_table_insert_object:
+      NAME     : insertObject
       SUMMARY  : Insert a row.
       DESCR    : >
                  This method will insert a row in the table at a particular
                  place. The row is optionally represented as Cocoa (NS) objects,
                  otherwise an empty row is inserted.
       SIGNATURE: >
-                 -(BOOL)insertRow:(NSUInteger)ndx
-                 -(BOOL)insertRow:(NSUInteger)ndx andData:(NSObject *)data
+                 -(BOOL)insertObject:(id)anObject atRowIndex(NSUInteger)rowIndex
       PARAMS:
-      - NAME    : ndx
+      - NAME    : rowIndex
         TYPES   : NSUInteger
         DESCR   : *g_dyn_table_insert_empty_row_parm1_descr
       - NAME    : abdData
-        TYPES   : NSObject
+        TYPES   : id
         DESCR   : The row either as a <code>NSArray</code> or <code>NSDictionary</code>.
       RETURN:
         TYPES  : BOOL
