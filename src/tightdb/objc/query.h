@@ -39,22 +39,22 @@
 -(void)parent;
 
 -(NSUInteger)countRows;
--(NSUInteger)removeRows
-;
--(NSNumber *)minIntColumnWithIndex:(NSUInteger)colIndex;
--(NSNumber *)minFloatColumnWithIndex:(NSUInteger)colIndex;
--(NSNumber *)minDoubleColumnWithIndex:(NSUInteger)colIndex;
--(NSNumber *)maxIntColumnWithIndex:(NSUInteger)colIndex;
--(NSNumber *)maxFloatColumnWithIndex:(NSUInteger)colIndex;
--(NSNumber *)maxDoubleColumnWithIndex:(NSUInteger)colIndex;
--(NSNumber *)sumIntColumnWithIndex:(NSUInteger)colIndex;
--(NSNumber *)sumFloatColumnWithIndex:(NSUInteger)colIndex;
--(NSNumber *)sumDoubleColumnWithIndex:(NSUInteger)colIndex;
--(NSNumber *)avgOfIntColumnWithIndex:(NSUInteger)colIndex;
--(NSNumber *)avgOfFloatColumnWithIndex:(NSUInteger)colIndex;
--(NSNumber *)avgODoubleColumnWithIndex:(NSUInteger)colIndex;
+-(NSUInteger)removeRows;
 
--(NSUInteger)find:(NSUInteger)last; // Check java
+-(int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex;
+-(double)sumFloatColumnWithIndex:(NSUInteger)colIndex;
+-(double)sumDoubleColumnWithIndex:(NSUInteger)colIndex;
+-(int64_t)maxIntColumnWithIndex:(NSUInteger)colIndex;
+-(float)maxFloatColumnWithIndex:(NSUInteger)colIndex;
+-(double)maxDoubleColumnWithIndex:(NSUInteger)colIndex;
+-(int64_t)minIntColumnWithIndex:(NSUInteger)colIndex;
+-(float)minFloatColumnWithIndex:(NSUInteger)colIndex;
+-(double)minDoubleColumnWithIndex:(NSUInteger)colIndex;
+-(double)avgIntColumnWithIndex:(NSUInteger)colIndex;
+-(double)avgFloatColumnWithIndex:(NSUInteger)colIndex;
+-(double)avgDoubleColumnWithIndex:(NSUInteger)colIndex;
+
+-(NSUInteger)findFromRowIndex:(NSUInteger)rowIndex;
 
 -(TightdbView *)findAllRows;
 

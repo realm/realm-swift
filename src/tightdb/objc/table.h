@@ -249,9 +249,9 @@
 -(int64_t)minIntInColumnWithIndex:(NSUInteger)colIndex;
 -(float)minFloatInColumnWithIndex:(NSUInteger)colIndex;
 -(double)minDoubleInColumnWithIndex:(NSUInteger)colIndex;
--(double)avgOfIntColumnWithIndex:(NSUInteger)colIndex;
--(double)avgOfFloatColumnWithIndex:(NSUInteger)colIndex;
--(double)avgOfDoubleColumnWithIndex:(NSUInteger)colIndex;
+-(double)avgIntColumnWithIndex:(NSUInteger)colIndex;
+-(double)avgFloatColumnWithIndex:(NSUInteger)colIndex;
+-(double)avgDoubleColumnWithIndex:(NSUInteger)colIndex;
 
 #ifdef TIGHTDB_DEBUG
 -(void)verify;
