@@ -2,6 +2,10 @@
 ==========
 * Adding appendRowWithLabels to TightdbTable.
 
+2014-03-10
+==========
+* Return types and parameters changed from size_t to NSUInteger.
+
 2014-03-07
 ==========
 * Adding appendRow to TightdbTable.

@@ -38,8 +38,8 @@
 
 +(TightdbGroup *)group;
 
--(size_t)getTableCount;
--(NSString *)getTableName:(size_t)table_ndx;
+-(NSUInteger)getTableCount;
+-(NSString *)getTableName:(NSUInteger)table_ndx;
 
 -(BOOL)hasTable:(NSString *)name;
 

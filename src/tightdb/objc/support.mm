@@ -146,6 +146,7 @@ BOOL verify_row(const Descriptor& descr, NSArray * data)
     NSEnumerator *enumerator = [data objectEnumerator];
     id obj;
 
+    /* FIXME: handling of tightdb exceptions => return NO */
     size_t col_ndx = 0;
     while (obj = [enumerator nextObject]) {
         if (!verify_cell(descr, col_ndx, obj))
@@ -175,40 +176,67 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
     DataType type = table.get_column_type(col_ndx);
     switch (type) {
         case type_Bool:
-            table.insert_bool(col_ndx, row_ndx, bool([(NSNumber *)obj boolValue]));
+            if (obj == nil)
+                table.insert_bool(col_ndx, row_ndx, false);
+            else
+                table.insert_bool(col_ndx, row_ndx, bool([(NSNumber *)obj boolValue]));
             break;
         case type_DateTime:
-            if ([obj isKindOfClass:[NSDate class]]) {
-                table.insert_datetime(col_ndx, row_ndx, time_t([(NSDate *)obj timeIntervalSince1970]));
+            if (obj == nil) {
+                table.insert_datetime(col_ndx, row_ndx, time_t(0));
             }
             else {
-                table.insert_datetime(col_ndx, row_ndx, time_t([(NSNumber *)obj longValue]));
+                if ([obj isKindOfClass:[NSDate class]]) {
+                    table.insert_datetime(col_ndx, row_ndx, time_t([(NSDate *)obj timeIntervalSince1970]));
+                }
+                else {
+                    table.insert_datetime(col_ndx, row_ndx, time_t([(NSNumber *)obj longValue]));
+                }
             }
             break;
         case type_Int:
-            table.insert_int(col_ndx, row_ndx, int64_t([(NSNumber *)obj longValue]));
+            if (obj == nil)
+                table.insert_int(col_ndx, row_ndx, 0);
+            else
+                table.insert_int(col_ndx, row_ndx, int64_t([(NSNumber *)obj longValue]));
             break;
         case type_Float:
-            table.insert_float(col_ndx, row_ndx, float([(NSNumber *)obj floatValue]));
+            if (obj == nil)
+                table.insert_float(col_ndx, row_ndx, 0.0);
+            else
+                table.insert_float(col_ndx, row_ndx, float([(NSNumber *)obj floatValue]));
             break;
         case type_Double:
-            table.insert_double(col_ndx, row_ndx, double([(NSNumber *)obj doubleValue]));
+            if (obj == nil)
+                table.insert_double(col_ndx, row_ndx, 0.0);
+            else
+                table.insert_double(col_ndx, row_ndx, double([(NSNumber *)obj doubleValue]));
             break;
         case type_String:
-        {
-            StringData sd([(NSString *)obj UTF8String]);
-            table.insert_string(col_ndx, row_ndx, sd);
-        }
+            if (obj == nil) {
+                StringData sd("");
+                table.insert_string(col_ndx, row_ndx, sd);
+            }
+            else {
+                StringData sd([(NSString *)obj UTF8String]);
+                table.insert_string(col_ndx, row_ndx, sd);
+            }
             break;
         case type_Binary:
-            if ([obj isKindOfClass:[TightdbBinary class]]) {
-                BinaryData bd([(TightdbBinary *)obj getData], [(TightdbBinary *)obj getSize]);
+            if (obj == nil) {
+                BinaryData bd("", 0);
                 table.insert_binary(col_ndx, row_ndx, bd);
             }
-            else { /* NSData */
-                const void *data = [(NSData *)obj bytes];
-                BinaryData bd(static_cast<const char *>(data), [(NSData *)obj length]);
-                table.insert_binary(col_ndx, row_ndx, bd);
+            else {
+                if ([obj isKindOfClass:[TightdbBinary class]]) {
+                    BinaryData bd([(TightdbBinary *)obj getData], [(TightdbBinary *)obj getSize]);
+                    table.insert_binary(col_ndx, row_ndx, bd);
+                }
+                else { /* NSData */
+                    const void *data = [(NSData *)obj bytes];
+                    BinaryData bd(static_cast<const char *>(data), [(NSData *)obj length]);
+                    table.insert_binary(col_ndx, row_ndx, bd);
+                }
             }
             break;
         case type_Table:
@@ -216,6 +244,10 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
             table.insert_subtable(col_ndx, row_ndx);
             break;
         case type_Mixed:
+            if (obj == nil) {
+                table.insert_bool(col_ndx, row_ndx, false);
+                break;
+            }
             if ([obj isKindOfClass:[NSString class]]) {
                 StringData sd([(NSString *)obj UTF8String]);
                 table.insert_mixed(col_ndx, row_ndx, sd);
@@ -331,8 +363,6 @@ BOOL insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
         // Do we have a matching label?
         // (missing values are ok, they will be filled out with default values)
         id value = [data valueForKey:col_name];
-        if (value == nil)
-            continue;
         subtables_seen = subtables_seen || insert_cell(col_ndx, row_ndx, table, value);
     }
     table.insert_done();
@@ -358,5 +388,4 @@ BOOL insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
         }
     }
     return YES;
-    
 }

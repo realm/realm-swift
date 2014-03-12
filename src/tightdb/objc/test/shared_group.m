@@ -132,7 +132,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         STAssertThrows([v clear], @"Is in readTransaction");
         
         STAssertTrue([t count] == 1, @"No rows have been removed");
-        STAssertTrue([[q count] isEqualToNumber:[NSNumber numberWithInt:1]], @"No rows have been removed");
+        STAssertTrue([q count] == 1, @"No rows have been removed");
         STAssertTrue([v count] == 1, @"No rows have been removed");
     }];
 }
