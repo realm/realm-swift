@@ -20,12 +20,12 @@
 
 #import <Foundation/Foundation.h>
 
-@class TightdbTable;
+@class TDBTable;
 @class TightdbBinary;
 @class TightdbMixed;
 
 @interface TightdbCursor: NSObject
--(id)initWithTable:(TightdbTable *)table ndx:(NSUInteger)ndx;
+-(id)initWithTable:(TDBTable *)table ndx:(NSUInteger)ndx;
 -(void)TDBSetNdx:(NSUInteger)ndx;
 -(NSUInteger)TDBIndex;
 
@@ -37,7 +37,7 @@
 -(void)setDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setBinary:(TightdbBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setMixed:(TightdbMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
--(void)setTable:(TightdbTable *)aTable inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setTable:(TDBTable *)aTable inColumnWithIndex:(NSUInteger)colIndex;
 
 -(int64_t)intInColumnWithIndex:(NSUInteger)colIndex;
 -(NSString *)stringInColumnWithIndex:(NSUInteger)colIndex;
@@ -47,7 +47,7 @@
 -(time_t)dateInColumnWithIndex:(NSUInteger)colIndex;
 -(TightdbBinary *)binaryInColumnWithIndex:(NSUInteger)colIndex;
 -(TightdbMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex;
--(TightdbTable *)tableInColumnWithIndex:(NSUInteger)colIndex;
+-(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex;
 
 @end
 
@@ -72,7 +72,7 @@
 -(void)setBinary:(TightdbBinary *)value;
 -(time_t)getDate;
 -(void)setDate:(time_t)value;
--(void)setSubtable:(TightdbTable *)value;
+-(void)setSubtable:(TDBTable *)value;
 -(id)getSubtable:(Class)obj;
 -(TightdbMixed *)getMixed;
 -(void)setMixed:(TightdbMixed *)value;

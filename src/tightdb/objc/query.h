@@ -21,16 +21,16 @@
 #import <Foundation/Foundation.h>
 
 @class TightdbBinary;
-@class TightdbTable;
+@class TDBTable;
 
 /* jjepsen: please review this */
 @class TightdbView;
 
 
 @interface TightdbQuery: NSObject <NSFastEnumeration>
--(id)initWithTable:(TightdbTable *)table;
--(id)initWithTable:(TightdbTable *)table error:(NSError *__autoreleasing *)error;
--(TightdbTable *)originTable;
+-(id)initWithTable:(TDBTable *)table;
+-(id)initWithTable:(TDBTable *)table error:(NSError *__autoreleasing *)error;
+-(TDBTable *)originTable;
 
 -(TightdbQuery *)group;
 -(TightdbQuery *)Or;
