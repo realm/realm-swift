@@ -389,6 +389,39 @@
         STFail(@"1 row excepted");
 }
 
+-(void)testAppendRowWithLabelsMixedColumns
+{
+    const char bin[4] = { 0, 1, 2, 3 };
+    TightdbBinary* bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
+    
+    TightdbTable* t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Mixed andName:@"first"];
+    if (![t appendRowWithLabels:@{@"first": @1}])
+        STFail(@"Cannot insert 'int'");
+    if ([t count] != 1)
+        STFail(@"1 row excepted");
+    if (![t appendRowWithLabels:@{@"first": @"Hello"}])
+        STFail(@"Cannot insert 'string'");
+    if ([t count] != 2)
+        STFail(@"2 rows excepted");
+    if (![t appendRowWithLabels:@{@"first": @3.14f}])
+        STFail(@"Cannot insert 'float'");
+    if ([t count] != 3)
+        STFail(@"3 rows excepted");
+    if (![t appendRowWithLabels:@{@"first": @3.14}])
+        STFail(@"Cannot insert 'double'");
+    if ([t count] != 4)
+        STFail(@"4 rows excepted");
+    if (![t appendRowWithLabels:@{@"first": @YES}])
+        STFail(@"Cannot insert 'bool'");
+    if ([t count] != 5)
+        STFail(@"5 rows excepted");
+    if (![t appendRowWithLabels:@{@"first": bin2}])
+        STFail(@"Cannot insert 'binary'");
+    if ([t count] != 6)
+        STFail(@"6 rows excepted");
+    }
+
 -(void)testRemoveColumns
 {
     
