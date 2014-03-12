@@ -135,109 +135,99 @@ using namespace std;
 
 -(NSUInteger)countRows
 {
-    return m_query->count();
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(return m_query->count(););
 }
 
 
 -(NSUInteger)removeRows
 {
-    return m_query->remove();
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(return m_query->remove(););
 }
 
 
 
--(int64_t)minIntIntColumnWithIndex:(NSUInteger)col_ndx
+-(int64_t)minIntInColumnWithIndex:(NSUInteger)col_ndx
 {
-    return m_query->minimum_int(col_ndx);
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(return m_query->minimum_int(col_ndx););
 }
 
 
 -(float)minFloatInColumnWithIndex:(NSUInteger)col_ndx
 {
-    return m_query->minimum_float(col_ndx);
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(return m_query->minimum_float(col_ndx););
 }
 
 
 -(double)minDoubleInColumnWithIndex:(NSUInteger)col_ndx
 {
-    return m_query->minimum_double(col_ndx);
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(return m_query->minimum_double(col_ndx););
 }
 
 
--(int64_t)maxIntIntColumnWithIndex:(NSUInteger)col_ndx
+-(int64_t)maxIntInColumnWithIndex:(NSUInteger)col_ndx
 {
-    return m_query->maximum_int(col_ndx);
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(return m_query->maximum_int(col_ndx););
 }
 
--(float)maxFloatIntColumnWithIndex:(NSUInteger)col_ndx
+-(float)maxFloatInColumnWithIndex:(NSUInteger)col_ndx
 {
-    return m_query->maximum_float(col_ndx);
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(return m_query->maximum_float(col_ndx););
 }
 
 
--(double)maxDoubleIntColumnWithIndex:(NSUInteger)col_ndx
+-(double)maxDoubleInColumnWithIndex:(NSUInteger)col_ndx
 {
-    return m_query->maximum_double(col_ndx);
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(return m_query->maximum_double(col_ndx););
 }
 
 
 -(int64_t)sumIntColumnWithIndex:(NSUInteger)col_ndx
 {
-    return m_query->sum_int(col_ndx);
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(return m_query->sum_int(col_ndx););
 }
 
 
 -(double)sumFloatColumnWithIndex:(NSUInteger)col_ndx
 {
-    return m_query->sum_float(col_ndx);
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(return m_query->sum_float(col_ndx););
 }
 
 
 -(double)sumDoubleColumnWithIndex:(NSUInteger)col_ndx
 {
-    return m_query->sum_double(col_ndx);
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(return m_query->sum_double(col_ndx););
 }
 
 
 -(double)avgIntColumnWithIndex:(NSUInteger)col_ndx
 {
-    return m_query->average_int(col_ndx);
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(return m_query->average_int(col_ndx););
 }
 
 -(double)avgFloatColumnWithIndex:(NSUInteger)col_ndx
 {
-    return m_query->average_float(col_ndx);
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(return m_query->average_float(col_ndx););
 }
 
 
 -(double)avgDoubleColumnWithIndex:(NSUInteger)col_ndx
 {
-    return m_query->average_double(col_ndx);
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(return m_query->average_double(col_ndx););
 }
 
 
 
--(TightdbView*)findAll
+-(TightdbView*)findAllRows
 {
     tightdb::TableView view = m_query->find_all();
     return [TightdbView viewWithTable:m_table andNativeView:view];
 }
 
--(NSUInteger)find:(NSUInteger)last
+-(NSUInteger)findFromRowIndex:(NSUInteger)rowIndex
 {
-    return [self find:last error:nil];
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(return m_query->find(rowIndex););
 }
--(NSUInteger)find:(NSUInteger)last error:(NSError* __autoreleasing*)error
-{
-    if (m_error) {
-        if (error) {
-            *error = m_error;
-            m_error = nil;
-        }
-        return size_t(-1);
-    }
-    TIGHTDB_EXCEPTION_ERRHANDLER(return m_query->find(last);, size_t(-1));
-}
+
 
 
 // Conditions:
@@ -559,39 +549,23 @@ using namespace std;
     return _query;
 }
 
--(NSNumber*)minimum
+-(int64_t)minimum
 {
-    return [self minimumWithError:nil];
+    return [_query minIntInColumnWithIndex:_column_ndx];
 }
--(NSNumber*)minimumWithError:(NSError* __autoreleasing*)error
+-(int64_t)maximum
 {
-    return [_query minimumWithIntColumn:_column_ndx error:error];
+    return [_query maxIntInColumnWithIndex:_column_ndx];
 }
--(NSNumber*)maximum
+-(int64_t)sum
 {
-    return [self maximumWithError:nil];
+    return [_query sumIntColumnWithIndex:_column_ndx];
 }
--(NSNumber*)maximumWithError:(NSError* __autoreleasing*)error
+-(double)average
 {
-    return [_query maximumWithIntColumn:_column_ndx error:error];
+    return [_query avgIntColumnWithIndex:_column_ndx];
 }
 
--(NSNumber*)sum
-{
-    return [self sumWithError:nil];
-}
--(NSNumber*)sumWithError:(NSError* __autoreleasing*)error
-{
-    return [_query sumWithIntColumn:_column_ndx error:error];
-}
--(NSNumber*)average
-{
-    return [self averageWithError:nil];
-}
--(NSNumber*)averageWithError:(NSError* __autoreleasing*)error
-{
-    return [_query averageWithIntColumn:_column_ndx error:error];
-}
 @end
 
 
@@ -652,38 +626,21 @@ using namespace std;
     return _query;
 }
 
--(NSNumber*)minimum
+-(float)minimum
 {
-    return [self minimumWithError:nil];
+    return [_query minFloatInColumnWithIndex:_column_ndx];
 }
--(NSNumber*)minimumWithError:(NSError* __autoreleasing*)error
+-(float)maximum
 {
-    return [_query minimumWithFloatColumn:_column_ndx error:error];
+    return [_query maxFloatInColumnWithIndex:_column_ndx];
 }
--(NSNumber*)maximum
+-(double)sum
 {
-    return [self maximumWithError:nil];
+    return [_query sumFloatColumnWithIndex:_column_ndx];
 }
--(NSNumber*)maximumWithError:(NSError* __autoreleasing*)error
+-(double)average
 {
-    return [_query maximumWithFloatColumn:_column_ndx error:error];
-}
-
--(NSNumber*)sum
-{
-    return [self sumWithError:nil];
-}
--(NSNumber*)sumWithError:(NSError* __autoreleasing*)error
-{
-    return [_query sumWithFloatColumn:_column_ndx error:error];
-}
--(NSNumber*)average
-{
-    return [self averageWithError:nil];
-}
--(NSNumber*)averageWithError:(NSError* __autoreleasing*)error
-{
-    return [_query averageWithFloatColumn:_column_ndx error:error];
+    return [_query avgFloatColumnWithIndex:_column_ndx];
 }
 @end
 
@@ -745,38 +702,22 @@ using namespace std;
     return _query;
 }
 
--(NSNumber*)minimum
+-(double)minimum
 {
-    return [self minimumWithError:nil];
+    return [_query minDoubleInColumnWithIndex:_column_ndx];
 }
--(NSNumber*)minimumWithError:(NSError* __autoreleasing*)error
+-(double)maximum
 {
-    return [_query minimumWithDoubleColumn:_column_ndx error:error];
-}
--(NSNumber*)maximum
-{
-    return [self maximumWithError:nil];
-}
--(NSNumber*)maximumWithError:(NSError* __autoreleasing*)error
-{
-    return [_query maximumWithDoubleColumn:_column_ndx error:error];
+    return [_query maxDoubleInColumnWithIndex:_column_ndx];
 }
 
--(NSNumber*)sum
+-(double)sum
 {
-    return [self sumWithError:nil];
+    return [_query sumDoubleColumnWithIndex:_column_ndx];
 }
--(NSNumber*)sumWithError:(NSError* __autoreleasing*)error
+-(double)average
 {
-    return [_query sumWithDoubleColumn:_column_ndx error:error];
-}
--(NSNumber*)average
-{
-    return [self averageWithError:nil];
-}
--(NSNumber*)averageWithError:(NSError* __autoreleasing*)error
-{
-    return [_query averageWithDoubleColumn:_column_ndx error:error];
+    return [_query avgDoubleColumnWithIndex:_column_ndx];
 }
 @end
 
