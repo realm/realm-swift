@@ -729,27 +729,27 @@ using namespace std;
     return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
 }
 
--(BOOL)appendRow:(NSArray*)data
+-(BOOL)appendRow:(NSObject*)data
 {
     tightdb::Table& table = *m_table;
     tightdb::ConstDescriptorRef desc = table.get_descriptor();
-    if (!verify_row(*desc, data)) {
-        return NO;
-    }
-
-    /* append row */
-    return insert_row(table.size(), table, data);
-}
-
--(BOOL)appendRowWithLabels:(NSDictionary *)data
-{
-    tightdb::Table& table = *m_table;
-    tightdb::ConstDescriptorRef desc = table.get_descriptor();
-    if (!verify_row_with_labels(*desc, data)) {
-        return NO;
+ 
+    if ([data isKindOfClass:[NSArray class]]) {
+        if (!verify_row(*desc, (NSArray *)data)) {
+            return NO;
+        }
+        return insert_row(table.size(), table, (NSArray *)data);
     }
     
-    return insert_row_with_labels(table.size(), table, data);
+    if ([data isKindOfClass:[NSDictionary class]]) {
+        if (!verify_row_with_labels(*desc, (NSDictionary *)data)) {
+            return NO;
+        }
+        return insert_row_with_labels(table.size(), table, (NSDictionary *)data);
+    }
+    
+    /* FIXME: pull out properties of object and insert as row */
+    return NO;
 }
 
 -(BOOL)insertRow:(NSUInteger)ndx

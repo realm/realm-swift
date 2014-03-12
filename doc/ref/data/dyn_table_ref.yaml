@@ -283,31 +283,15 @@ CATEGORIES :
                  The row is represented as Cocoa (NS) objects as elements in
                  array. The elements' types are validated before creating the
                  new row.
-      SIGNATURE: -(BOOL)appendRow:(NSArray*)data
+      SIGNATURE: -(BOOL)appendRow:(NSObject*)data
       PARAMS:
       - NAME   : data
         TYPES  : NSArray *
-        DESCR  : The row.
+        DESCR  : The row either as a <code>NSArray</code> or <code>NSDictionary</code>.
       RETURN:
         TYPES  : BOOL
         DESCR  : <code>YES</code> if elements are valid and row inserted, <code>NO</code> otherwise.
 
-  - objc_dyn_table_append_row_with_labels:
-      NAME     : appendRowWithLabels
-      SUMMARY  : Append a row using object literals.
-      DESCR    : >
-                 This method will append (insert at the end) a row to a table.
-                 The row is represented as Cocoa (NS) objects as elements in
-                 array. The elements' types are validated before creating the
-                 new row.
-      SIGNATURE: -(BOOL)appendRowWithLabels:(NSDictionary*)data
-      PARAMS:
-      - NAME   : data
-        TYPES  : NSDictionary *
-        DESCR  : The row.
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : <code>YES</code> if elements are valid and row inserted, <code>NO</code> otherwise.
 
 # TODO: Should this be supported at all?
 #  - g_dyn_table_insert_bool:
