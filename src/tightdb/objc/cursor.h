@@ -24,8 +24,8 @@
 @class TightdbBinary;
 @class TightdbMixed;
 
-@interface TightdbRow: NSObject
--(id)TDBInitWithTable:(TightdbTable *)table ndx:(NSUInteger)ndx;
+@interface TightdbCursor: NSObject
+-(id)initWithTable:(TightdbTable *)table ndx:(NSUInteger)ndx;
 -(void)TDBSetNdx:(NSUInteger)ndx;
 -(NSUInteger)TDBIndex;
 

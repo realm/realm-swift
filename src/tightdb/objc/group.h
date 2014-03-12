@@ -24,11 +24,11 @@
 @class TightdbTable;
 
 
-@interface TDBGroup: NSObject
+@interface TightdbGroup: NSObject
 
 @property (readonly) NSUInteger tableCount;
 
-+(TDBGroup *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
++(TightdbGroup *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
 
 /**
  * You pass the ownership of the specified buffer to the group. The
@@ -36,9 +36,9 @@
  * the buffer you pass, must have been allocated using C function
  * malloc().
  */
-+(TDBGroup *)groupWithBuffer:(TightdbBinary *)buffer withError:(NSError *__autoreleasing *)error;
++(TightdbGroup *)groupWithBuffer:(TightdbBinary *)buffer withError:(NSError *__autoreleasing *)error;
 
-+(TDBGroup *)group;
++(TightdbGroup *)group;
 
 -(NSString *)getTableName:(NSUInteger)table_ndx;
 

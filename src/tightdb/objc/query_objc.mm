@@ -80,7 +80,7 @@ using namespace std;
         *stackbuf = tmp;
     }
     if ((int)state->state != -1) {
-        [((TightdbCursor*)*stackbuf) setNdx:state->state];
+        [((TightdbCursor*)*stackbuf) TDBSetNdx:state->state];
         state->itemsPtr = stackbuf;
         state->state = [self incrementFastEnum:state->state+1];
     } else {
