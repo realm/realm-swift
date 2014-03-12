@@ -86,7 +86,7 @@
 #endif
 
     // Test Clear
-    [table clear];
+    [table removeAllRows];
     STAssertEquals([table rowCount], (size_t)0, @"Size should have been zero");
 
 #ifdef TIGHTDB_DEBUG

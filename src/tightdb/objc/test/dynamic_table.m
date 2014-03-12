@@ -794,42 +794,42 @@
     [c setTable:   subtab2   inColumnWithIndex:TableCol];
     [c setMixed:   mixSubtab inColumnWithIndex:MixedCol];
 
-    TightdbCursor* row1 = [table cursorAtIndex:0];
-    TightdbCursor* row2 = [table cursorAtIndex:1];
+    TightdbCursor* row1 = [table rowAtIndex:0];
+    TightdbCursor* row2 = [table rowAtIndex:1];
 
-    STAssertEquals([row1 getBoolInColumn:BoolCol], NO, @"row1.BoolCol");
-    STAssertEquals([row2 getBoolInColumn:BoolCol], YES,                @"row2.BoolCol");
-    STAssertEquals([row1 getIntInColumn:IntCol], (int64_t)54,         @"row1.IntCol");
-    STAssertEquals([row2 getIntInColumn:IntCol], (int64_t)506,        @"row2.IntCol");
-    STAssertEquals([row1 getFloatInColumn:FloatCol], 0.7f,              @"row1.FloatCol");
-    STAssertEquals([row2 getFloatInColumn:FloatCol], 7.7f,              @"row2.FloatCol");
-    STAssertEquals([row1 getDoubleInColumn:DoubleCol], 0.8,              @"row1.DoubleCol");
-    STAssertEquals([row2 getDoubleInColumn:DoubleCol], 8.8,              @"row2.DoubleCol");
-    STAssertTrue([[row1 getStringInColumn:StringCol] isEqual:@"foo"],    @"row1.StringCol");
-    STAssertTrue([[row2 getStringInColumn:StringCol] isEqual:@"banach"], @"row2.StringCol");
-    STAssertTrue([[row1 getBinaryInColumn:BinaryCol] isEqual:bin1],      @"row1.BinaryCol");
-    STAssertTrue([[row2 getBinaryInColumn:BinaryCol] isEqual:bin2],      @"row2.BinaryCol");
-    STAssertEquals([row1 getDateInColumn:DateCol], (time_t)0,          @"row1.DateCol");
-    STAssertEquals([row2 getDateInColumn:DateCol], timeNow,            @"row2.DateCol");
-    STAssertTrue([[row1 getTableInColumn:TableCol] isEqual:subtab1],    @"row1.TableCol");
-    STAssertTrue([[row2 getTableInColumn:TableCol] isEqual:subtab2],    @"row2.TableCol");
-    STAssertTrue([[row1 getMixedInColumn:MixedCol] isEqual:mixInt1],    @"row1.MixedCol");
-    STAssertTrue([[row2 getMixedInColumn:MixedCol] isEqual:mixSubtab],  @"row2.MixedCol");
+    STAssertEquals([row1 boolInColumnWithIndex:BoolCol], NO, @"row1.BoolCol");
+    STAssertEquals([row2 boolInColumnWithIndex:BoolCol], YES,                @"row2.BoolCol");
+    STAssertEquals([row1 intInColumnWithIndex:IntCol], (int64_t)54,         @"row1.IntCol");
+    STAssertEquals([row2 intInColumnWithIndex:IntCol], (int64_t)506,        @"row2.IntCol");
+    STAssertEquals([row1 floatInColumnWithIndex:FloatCol], 0.7f,              @"row1.FloatCol");
+    STAssertEquals([row2 floatInColumnWithIndex:FloatCol], 7.7f,              @"row2.FloatCol");
+    STAssertEquals([row1 doubleInColumnWithIndex:DoubleCol], 0.8,              @"row1.DoubleCol");
+    STAssertEquals([row2 doubleInColumnWithIndex:DoubleCol], 8.8,              @"row2.DoubleCol");
+    STAssertTrue([[row1 stringInColumnWithIndex:StringCol] isEqual:@"foo"],    @"row1.StringCol");
+    STAssertTrue([[row2 stringInColumnWithIndex:StringCol] isEqual:@"banach"], @"row2.StringCol");
+    STAssertTrue([[row1 binaryInColumnWithIndex:BinaryCol] isEqual:bin1],      @"row1.BinaryCol");
+    STAssertTrue([[row2 binaryInColumnWithIndex:BinaryCol] isEqual:bin2],      @"row2.BinaryCol");
+    STAssertEquals([row1 dateInColumnWithIndex:DateCol], (time_t)0,          @"row1.DateCol");
+    STAssertEquals([row2 dateInColumnWithIndex:DateCol], timeNow,            @"row2.DateCol");
+    STAssertTrue([[row1 tableInColumnWithIndex:TableCol] isEqual:subtab1],    @"row1.TableCol");
+    STAssertTrue([[row2 tableInColumnWithIndex:TableCol] isEqual:subtab2],    @"row2.TableCol");
+    STAssertTrue([[row1 mixedInColumnWithIndex:MixedCol] isEqual:mixInt1],    @"row1.MixedCol");
+    STAssertTrue([[row2 mixedInColumnWithIndex:MixedCol] isEqual:mixSubtab],  @"row2.MixedCol");
 
-    STAssertEquals([table minimumWithIntColumn:IntCol], (int64_t)54,                 @"IntCol min");
-    STAssertEquals([table maximumWithIntColumn:IntCol], (int64_t)506,                @"IntCol max");
-    STAssertEquals([table sumWithIntColumn:IntCol], (int64_t)560,                @"IntCol sum");
-    STAssertEquals([table averageWithIntColumn:IntCol], 280.0,                       @"IntCol avg");
+    STAssertEquals([table minIntInColumnWithIndex:IntCol], (int64_t)54,                 @"IntCol min");
+    STAssertEquals([table maxIntInColumnWithIndex:IntCol], (int64_t)506,                @"IntCol max");
+    STAssertEquals([table sumIntColumnWithIndex:IntCol], (int64_t)560,                @"IntCol sum");
+    STAssertEquals([table avgIntColumnWithIndex:IntCol], 280.0,                       @"IntCol avg");
 
-    STAssertEquals([table minimumWithFloatColumn:FloatCol], 0.7f,                      @"FloatCol min");
-    STAssertEquals([table maximumWithFloatColumn:FloatCol], 7.7f,                      @"FloatCol max");
-    STAssertEquals([table sumWithFloatColumn:FloatCol], (double)0.7f + 7.7f,       @"FloatCol sum");
-    STAssertEquals([table averageWithFloatColumn:FloatCol], ((double)0.7f + 7.7f) / 2, @"FloatCol avg");
+    STAssertEquals([table minFloatInColumnWithIndex:FloatCol], 0.7f,                      @"FloatCol min");
+    STAssertEquals([table maxFloatInColumnWithIndex:FloatCol], 7.7f,                      @"FloatCol max");
+    STAssertEquals([table sumFloatColumnWithIndex:FloatCol], (double)0.7f + 7.7f,       @"FloatCol sum");
+    STAssertEquals([table avgFloatColumnWithIndex:FloatCol], ((double)0.7f + 7.7f) / 2, @"FloatCol avg");
 
-    STAssertEquals([table minimumWithDoubleColumn:DoubleCol], 0.8,                      @"DoubleCol min");
-    STAssertEquals([table maximumWithDoubleColumn:DoubleCol], 8.8,                      @"DoubleCol max");
-    STAssertEquals([table sumWithDoubleColumn:DoubleCol], 0.8 + 8.8,                @"DoubleCol sum");
-    STAssertEquals([table averageWithDoubleColumn:DoubleCol], (0.8 + 8.8) / 2,          @"DoubleCol avg");
+    STAssertEquals([table minDoubleInColumnWithIndex:DoubleCol], 0.8,                      @"DoubleCol min");
+    STAssertEquals([table maxDoubleInColumnWithIndex:DoubleCol], 8.8,                      @"DoubleCol max");
+    STAssertEquals([table sumDoubleColumnWithIndex:DoubleCol], 0.8 + 8.8,                @"DoubleCol sum");
+    STAssertEquals([table avgDoubleColumnWithIndex:DoubleCol], (0.8 + 8.8) / 2,          @"DoubleCol avg");
 }
 
 - (void)testTableDynamic_Subscripting
@@ -838,28 +838,28 @@
     STAssertNotNil(_table, @"Table is nil");
 
     // 1. Add two columns
-    [_table addColumnWithType:tightdb_Int andName:@"first"];
-    [_table addColumnWithType:tightdb_String andName:@"second"];
+    [_table addColumnWithName:@"first" andType:tightdb_Int];
+    [_table addColumnWithName:@"second" andType:tightdb_String];
 
     TightdbCursor* c;
 
     // Add some rows
     c = [_table addEmptyRow];
-    [c setInt: 506 inColumn:0];
-    [c setString: @"test" inColumn:1];
+    [c setInt: 506 inColumnWithIndex:0];
+    [c setString: @"test" inColumnWithIndex:1];
 
     c = [_table addEmptyRow];
-    [c setInt: 4 inColumn:0];
-    [c setString: @"more test" inColumn:1];
+    [c setInt: 4 inColumnWithIndex:0];
+    [c setString: @"more test" inColumnWithIndex:1];
 
     // Get cursor by object subscripting
     c = _table[0];
-    STAssertEquals([c getIntInColumn:0], (int64_t)506, @"table[0].first");
-    STAssertTrue([[c getStringInColumn:1] isEqual:@"test"], @"table[0].second");
+    STAssertEquals([c intInColumnWithIndex:0], (int64_t)506, @"table[0].first");
+    STAssertTrue([[c stringInColumnWithIndex:1] isEqual:@"test"], @"table[0].second");
 
     // Same but used directly
-    STAssertEquals([_table[0] getIntInColumn:0], (int64_t)506, @"table[0].first");
-    STAssertTrue([[_table[0] getStringInColumn:1] isEqual:@"test"], @"table[0].second");
+    STAssertEquals([_table[0] intInColumnWithIndex:0], (int64_t)506, @"table[0].first");
+    STAssertTrue([[_table[0] stringInColumnWithIndex:1] isEqual:@"test"], @"table[0].second");
 
 
 }

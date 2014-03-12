@@ -395,7 +395,7 @@ using namespace std;
     return m_view->size();
 }
 
--(NSUInteger)getColumnCount
+-(NSUInteger)columnCount
 {
     return m_view->get_column_count();
 }

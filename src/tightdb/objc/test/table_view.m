@@ -50,15 +50,15 @@
     STAssertEquals((size_t)0, [v columnCount], @"no columns added yet");
     
     [t addColumnWithName:@"col0" andType:tightdb_Int];
-    STAssertEquals((size_t)1, [v columnCount], @"1 column added to table");
+    STAssertEquals([v columnCount],(size_t)1,  @"1 column added to table");
     
     for (int i=0;i<10;i++) {
         [t addColumnWithName:@"name" andType:tightdb_Int];
     }
-    STAssertEquals((size_t)11, [v columnCount], @"10 more columns added to table");
+    STAssertEquals([v columnCount],(size_t)11,  @"10 more columns added to table");
     
     [t removeColumnWithIndex:0];
-    STAssertEquals((size_t)10,[v columnCount], @"1 column removed from table");
+    STAssertEquals([v columnCount],(size_t)10, @"1 column removed from table");
 }
 
 - (void)testColumnTypesOnView
