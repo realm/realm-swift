@@ -172,14 +172,14 @@
  * by calling a method that takes all column values as arguments at
  * once. */
 -(BOOL)TDBInsertBool:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(BOOL)value;
--(BOOL)TDBInnsertInt:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(int64_t)value;
--(BOOL)TDBInnsertFloat:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(float)value;
--(BOOL)TDBInnsertDouble:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(double)value;
--(BOOL)TDBInnsertString:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(NSString *)value;
--(BOOL)TDBInnsertBinary:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(TightdbBinary *)value;
--(BOOL)TDBInnsertBinary:(NSUInteger)colNdx ndx:(NSUInteger)ndx data:(const char *)data size:(size_t)size;
--(BOOL)TDBInnsertDate:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(time_t)value;
--(BOOL)TDBInnsertDone;
+-(BOOL)TDBInsertInt:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(int64_t)value;
+-(BOOL)TDBInsertFloat:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(float)value;
+-(BOOL)TDBInsertDouble:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(double)value;
+-(BOOL)TDBInsertString:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(NSString *)value;
+-(BOOL)TDBInsertBinary:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(TightdbBinary *)value;
+-(BOOL)TDBInsertBinary:(NSUInteger)colNdx ndx:(NSUInteger)ndx data:(const char *)data size:(size_t)size;
+-(BOOL)TDBInsertDate:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(time_t)value;
+-(BOOL)TDBInsertDone;
 
 
 /* Subtables */
@@ -192,8 +192,8 @@
 /* Mixed */
 
 -(TightdbType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(BOOL)TDBInnsertMixed:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(TightdbMixed *)value;
--(BOOL)TDBInnsertMixed:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(TightdbMixed *)value error:(NSError *__autoreleasing *)error;
+-(BOOL)TDBInsertMixed:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(TightdbMixed *)value;
+-(BOOL)TDBInsertMixed:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(TightdbMixed *)value error:(NSError *__autoreleasing *)error;
 
 
 
