@@ -108,13 +108,13 @@ if (m_read_only) { \
                                           userInfo:[NSMutableDictionary dictionary]]; \
     [exception raise]; \
 } \
-if (col_ndx >= [self getColumnCount]) { \
+if (col_ndx >= self.columnCount) { \
     NSException* exception = [NSException exceptionWithName:@"tightdb:column_index_out_of_bounds" \
                                           reason:@"The specified column index is not within the table bounds" \
                                           userInfo:[NSMutableDictionary dictionary]]; \
     [exception raise]; \
 } \
-if ([self getColumnType:col_ndx] != datatype) { \
+if ([self columnTypeOfColumn:col_ndx] != datatype) { \
     NSException* exception = [NSException exceptionWithName:@"tightdb:illegal_type" \
                                           reason:@"The supplied type is not compatible with the column type" \
                                           userInfo:[NSMutableDictionary dictionary]]; \
@@ -135,7 +135,7 @@ catch(std::exception& ex) { \
 }
 
 #define TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(columnIndex) \
-if (columnIndex >= [self getColumnCount]) { \
+if (columnIndex >= self.columnCount) { \
                         NSException* exception = [NSException exceptionWithName:@"tightdb:column_index_out_of_bounds" \
                                 reason:@"The specified column index is not within the table bounds" \
                                 userInfo:[NSMutableDictionary dictionary]]; \
