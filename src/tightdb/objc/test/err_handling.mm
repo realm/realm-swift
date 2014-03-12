@@ -392,7 +392,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     STAssertEquals([query.FloatCol minimum], 0.7f,         @"FloatCol min");
     STAssertEquals([query.FloatCol maximum], 0.7f,         @"FloatCol max");
-    STAssertEquals([query.FloatCol sum], 0.7f, @"FloatCol sum");
+    STAssertEquals([query.FloatCol sum], (double)0.7f, @"FloatCol sum");
     STAssertEquals([query.FloatCol average], (double)0.7f, @"FloatCol avg");
 
     STAssertEquals([query.DoubleCol minimum], 0.8,         @"DoubleCol min");
