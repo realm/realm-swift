@@ -141,6 +141,7 @@
 -(BOOL)appendRow:(NSObject *)data;
 
 -(BOOL)insertRow:(NSUInteger)ndx;
+-(BOOL)insertRow:(NSUInteger)ndx andData:(NSObject *)data;
 -(BOOL)insertRow:(NSUInteger)ndx error:(NSError *__autoreleasing *)error;
 
 -(BOOL)getBoolInColumn:(NSUInteger)colNdx atRow:(NSUInteger)ndx;

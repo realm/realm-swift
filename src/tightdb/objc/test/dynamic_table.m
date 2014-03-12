@@ -100,6 +100,29 @@
         STFail(@"Wrong number of columns");
 }
 
+-(void)testInsertRowsIntColumn
+{
+    // Add row using object literate
+    TightdbTable* t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Int andName:@"first"];
+    if (![t insertRow:0 andData:@[ @1 ]])
+        STFail(@"Impossible!");
+    if ([t count] != 1)
+        STFail(@"Expected 1 row");
+    if (![t insertRow:0 andData:@[ @2 ]])
+        STFail(@"Impossible!");
+    if ([t count] != 2)
+        STFail(@"Expected 2 rows");
+    if ([t getIntInColumn:0 atRow:1] != 1)
+        STFail(@"Value 1 expected");
+    if ([t getIntInColumn:0 atRow:0] != 2)
+        STFail(@"Value 2 expected");
+    if ([t insertRow:0 andData:@[@"Hello"]])
+        STFail(@"Wrong type");
+    if ([t insertRow:0 andData: @[@1, @"Hello"]])
+        STFail(@"Wrong number of columns");
+}
+
 -(void)testAppendRowWithLabelsIntColumn
 {
     // Add row using object literate
@@ -137,6 +160,46 @@
     if ([t count] != 4)
         STFail(@"Expected 4 rows");
     if ([t getIntInColumn:0 atRow:3] != 0)
+        STFail(@"Value 0 expected");
+}
+
+-(void)testInsertRowWithLabelsIntColumn
+{
+    // Add row using object literate
+    TightdbTable* t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Int andName:@"first"];
+    
+    if (![t insertRow:0 andData:@{ @"first": @1 }])
+        STFail(@"Impossible!");
+    if ([t count] != 1)
+        STFail(@"Expected 1 row");
+    
+    if (![t insertRow:0 andData:@{ @"first": @2 }])
+        STFail(@"Impossible!");
+    if ([t count] != 2)
+        STFail(@"Expected 2 rows");
+    
+    if ([t getIntInColumn:0 atRow:1] != 1)
+        STFail(@"Value 1 expected");
+    if ([t getIntInColumn:0 atRow:0] != 2)
+        STFail(@"Value 2 expected");
+    
+    if ([t insertRow:0 andData:@{ @"first": @"Hello" }])
+        STFail(@"Wrong type");
+    if ([t count] != 2)
+        STFail(@"Expected 2 rows");
+    
+    if (![t insertRow:0 andData:@{ @"first": @3, @"second": @"Hello"}])
+        STFail(@"Has 'first'");
+    if ([t count] != 3)
+        STFail(@"Expected 3 rows");
+    
+    
+    if (![t insertRow:0 andData:@{ @"second": @4 }])
+        STFail(@"This is impossible");
+    if ([t count] != 4)
+        STFail(@"Expected 4 rows");
+    if ([t getIntInColumn:0 atRow:0] != 0)
         STFail(@"Value 0 expected");
 }
 
