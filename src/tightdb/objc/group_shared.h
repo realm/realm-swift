@@ -24,7 +24,7 @@
 typedef void(^TightdbReadBlock)(TightdbGroup *group);
 typedef BOOL(^TightdbWriteBlock)(TightdbGroup *group);
 
-@interface TDBSharedGroup: NSObject
+@interface TightdbSharedGroup: NSObject
 +(TDBSharedGroup *)sharedGroupWithFile:(NSString *)path withError:(NSError **)error;
 
 -(void)readWithBlock:(TightdbReadBlock)block;
