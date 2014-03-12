@@ -125,14 +125,10 @@
 -(TightdbQuery *)columnIsLessThan:(int64_t)value;
 -(TightdbQuery *)columnIsLessThanOrEqualTo:(int64_t)value;
 -(TightdbQuery *)columnIsBetween:(int64_t)from and_:(int64_t)to;
--(NSNumber *)minimum;
--(NSNumber *)minimumWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)maximum;
--(NSNumber *)maximumWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)sum;
--(NSNumber *)sumWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)average;
--(NSNumber *)averageWithError:(NSError *__autoreleasing *)error;
+-(int64_t)minimum;
+-(int64_t)maximum;
+-(int64_t)sum;
+-(double)average;
 @end
 
 
@@ -145,14 +141,10 @@
 -(TightdbQuery *)columnIsLessThan:(float)value;
 -(TightdbQuery *)columnIsLessThanOrEqualTo:(float)value;
 -(TightdbQuery *)columnIsBetween:(float)from and_:(float)to;
--(NSNumber *)minimum;
--(NSNumber *)minimumWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)maximum;
--(NSNumber *)maximumWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)sum;
--(NSNumber *)sumWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)average;
--(NSNumber *)averageWithError:(NSError *__autoreleasing *)error;
+-(float)minimum;
+-(float)maximum;
+-(double)sum;
+-(double)average;
 @end
 
 
@@ -165,14 +157,10 @@
 -(TightdbQuery *)columnIsLessThan:(double)value;
 -(TightdbQuery *)columnIsLessThanOrEqualTo:(double)value;
 -(TightdbQuery *)columnIsBetween:(double)from and_:(double)to;
--(NSNumber *)minimum;
--(NSNumber *)minimumWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)maximum;
--(NSNumber *)maximumWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)sum;
--(NSNumber *)sumWithError:(NSError *__autoreleasing *)error;
--(NSNumber *)average;
--(NSNumber *)averageWithError:(NSError *__autoreleasing *)error;
+-(double)minimum;
+-(double)maximum;
+-(double)sum;
+-(double)average;
 @end
 
 
