@@ -360,13 +360,13 @@ using namespace std;
     if (self) {
         tightdb::Query& query_2 = [query getNativeQuery];
         m_view.reset(new tightdb::TableView(query_2.find_all())); // FIXME: Exception handling needed here
-        m_table = [query getTable];
+        m_table = [query originTable];
         m_read_only = [m_table isReadOnly];
     }
     return self;
 }
 
--(TightdbTable*)getTable
+-(TightdbTable*)originTable // Synthesize property
 {
     return m_table;
 }
@@ -379,18 +379,18 @@ using namespace std;
     m_table = nil; // FIXME: What is the point of doing this?
 }
 
--(TightdbCursor*)cursorAtIndex:(NSUInteger)ndx
+-(TightdbCursor*)rowAtIndex:(NSUInteger)ndx
 {
     // The cursor constructor checks the index is in bounds. However, getSourceIndex should
     // not be called with illegal index.
 
-    if (ndx >= [self count])
+    if (ndx >= self.rowCount)
         return nil;
 
-    return [[TightdbCursor alloc] initWithTable:m_table ndx:[self getSourceIndex:ndx]];
+    return [[TightdbCursor alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
 }
 
--(NSUInteger)count
+-(NSUInteger)rowCount
 {
     return m_view->size();
 }
@@ -403,18 +403,18 @@ using namespace std;
     return m_view->get_column_count();
 }
 
--(TightdbType)getColumnType:(NSUInteger)colNdx
+-(TightdbType)columnTypeOfColumn:(NSUInteger)colNdx
 {
     TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colNdx);
     return TightdbType(m_view->get_column_type(colNdx));
 }
--(void) sortColumnWithIndex: (NSUInteger)columnIndex
+-(void)sortUsingColumnWithIndex:(NSUInteger)colIndex
 {
-    [self sortColumnWithIndex:columnIndex inOrder:tightdb_ascending];
+    [self sortUsingColumnWithIndex:colIndex inOrder:tightdb_ascending];
 }
--(void) sortColumnWithIndex: (NSUInteger)columnIndex  inOrder: (TightdbSortOrder)order
+-(void)sortUsingColumnWithIndex:(NSUInteger)colIndex  inOrder: (TightdbSortOrder)order
 {
-    TightdbType columnType = [self getColumnType:columnIndex];
+    TightdbType columnType = [self columnTypeOfColumn:colIndex];
     
     if(columnType != tightdb_Int && columnType != tightdb_Bool && columnType != tightdb_Date) {
         NSException* exception = [NSException exceptionWithName:@"tightdb:sort_on_column_with_type_not_supported"
@@ -424,7 +424,7 @@ using namespace std;
     }
     
     try {
-        m_view->sort(columnIndex, order == 0);
+        m_view->sort(colIndex, order == 0);
     } catch(std::exception& ex) {
         NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
                                                          reason:[NSString stringWithUTF8String:ex.what()]
@@ -432,27 +432,59 @@ using namespace std;
         [exception raise];
     }
 }
--(int64_t)get:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+
+-(BOOL)boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
-    return m_view->get_int(col_ndx, ndx);
+    return m_view->get_bool(colIndex, rowIndex);
 }
--(BOOL)getBool:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+-(time_t)dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
-    return m_view->get_bool(col_ndx, ndx);
+    return m_view->get_datetime(colIndex, rowIndex).get_datetime();
 }
--(time_t)getDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+-(double)doubleInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
-    return m_view->get_datetime(col_ndx, ndx).get_datetime();
+    return m_view->get_double(colIndex, rowIndex);
 }
--(NSString*)getString:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+-(float)floatInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
-    return to_objc_string(m_view->get_string(col_ndx, ndx));
+    return m_view->get_float(colIndex, rowIndex);
 }
--(void)removeRowAtIndex:(NSUInteger)ndx
+-(int64_t)intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+{
+    return m_view->get_int(colIndex, rowIndex);
+}
+-(TightdbMixed *)mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
+{
+    tightdb::Mixed mixed = m_view->get_mixed(colNdx, rowIndex);
+    if (mixed.get_type() != tightdb::type_Table)
+        return [TightdbMixed mixedWithNativeMixed:mixed];
+    
+    tightdb::TableRef table = m_view->get_subtable(colNdx, rowIndex);
+    if (!table)
+        return nil;
+    TightdbTable* table_2 = [[TightdbTable alloc] TDBInitRaw];
+    if (TIGHTDB_UNLIKELY(!table_2))
+        return nil;
+    [table_2 setNativeTable:table.get()];
+    [table_2 setParent:self];
+    [table_2 setReadOnly:m_read_only];
+    if (![table_2 _checkType])
+        return nil;
+    
+    return [TightdbMixed mixedWithTable:table_2];
+}
+
+-(NSString*)stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+{
+    return to_objc_string(m_view->get_string(colIndex, rowIndex));
+}
+
+
+-(void) removeRowAtIndex:(NSUInteger)ndx
 {
     m_view->remove(ndx);
 }
--(void)clear
+-(void)removeAllRows
 {
     if (m_read_only) {
         NSException* exception = [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
@@ -463,9 +495,9 @@ using namespace std;
     
     m_view->clear();
 }
--(NSUInteger)getSourceIndex:(NSUInteger)ndx
+-(NSUInteger)rowIndexInOriginTableForRowAtIndex:(NSUInteger)rowIndex
 {
-    return m_view->get_source_ndx(ndx);
+    return m_view->get_source_ndx(rowIndex);
 }
 
 -(TightdbCursor*)getCursor
@@ -483,8 +515,8 @@ using namespace std;
         TightdbCursor* tmp = [self getCursor];
         *stackbuf = tmp;
     }
-    if (state->state < [self count]) {
-        [((TightdbCursor*)*stackbuf) setNdx:[self getSourceIndex:state->state]];
+    if (state->state < self.rowCount) {
+        [((TightdbCursor*)*stackbuf) TDBSetNdx:[self rowIndexInOriginTableForRowAtIndex:state->state]];
         state->itemsPtr = stackbuf;
         state->state++;
     }
