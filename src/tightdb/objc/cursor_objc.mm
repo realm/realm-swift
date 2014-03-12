@@ -15,14 +15,14 @@ using namespace std;
 // TODO: Concept for cursor invalidation (when table updates).
 
 @interface TightdbCursor()
-@property (nonatomic, weak) TightdbTable *table;
+@property (nonatomic, weak) TDBTable *table;
 @property (nonatomic) NSUInteger ndx;
 @end
 @implementation TightdbCursor
 @synthesize table = _table;
 @synthesize ndx = _ndx;
 
--(id)initWithTable:(TightdbTable *)table ndx:(NSUInteger)ndx
+-(id)initWithTable:(TDBTable *)table ndx:(NSUInteger)ndx
 {
     if (ndx >= [table rowCount])
         return nil;
@@ -85,7 +85,7 @@ using namespace std;
     return [_table dateInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(TightdbTable *)tableInColumnWithIndex:(NSUInteger)colNdx
+-(TDBTable *)tableInColumnWithIndex:(NSUInteger)colNdx
 {
     return [_table tableInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -130,7 +130,7 @@ using namespace std;
     [_table setDate:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(void)setTable:(TightdbTable *)value inColumnWithIndex:(NSUInteger)colNdx
+-(void)setTable:(TDBTable *)value inColumnWithIndex:(NSUInteger)colNdx
 {
     [_table setTable:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -239,7 +239,7 @@ using namespace std;
     return [_cursor.table tableInColumnWithIndex:_columnId atRowIndex:_cursor.ndx asTableClass:obj];
 }
 
--(void)setSubtable:(TightdbTable *)value
+-(void)setSubtable:(TDBTable *)value
 {
     [_cursor.table setTable:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }

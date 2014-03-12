@@ -31,17 +31,17 @@ using namespace std;
 @implementation TightdbQuery
 {
     tightdb::util::UniquePtr<tightdb::Query> m_query;
-    __weak TightdbTable* m_table;
+    __weak TDBTable* m_table;
 
     TightdbCursor* m_tmp_cursor;
 }
 
--(id)initWithTable:(TightdbTable*)table
+-(id)initWithTable:(TDBTable*)table
 {
     return [self initWithTable:table error:nil];
 }
 
--(id)initWithTable:(TightdbTable*)table error:(NSError* __autoreleasing*)error
+-(id)initWithTable:(TDBTable*)table error:(NSError* __autoreleasing*)error
 {
     self = [super init];
     if (self) {
@@ -104,7 +104,7 @@ using namespace std;
     return *m_query;
 }
 
--(TightdbTable*)originTable
+-(TDBTable*)originTable
 {
     return m_table;
 }
@@ -217,10 +217,10 @@ using namespace std;
 
 
 
--(TightdbView*)findAllRows
+-(TDBView*)findAllRows
 {
     tightdb::TableView view = m_query->find_all();
-    return [TightdbView viewWithTable:m_table andNativeView:view];
+    return [TDBView viewWithTable:m_table andNativeView:view];
 }
 
 -(NSUInteger)findFromRowIndex:(NSUInteger)rowIndex

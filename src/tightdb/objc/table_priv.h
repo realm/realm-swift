@@ -12,13 +12,13 @@
 
 @end
 
-@interface TightdbView()
+@interface TDBView()
 
-+(TightdbView*)viewWithTable:(TightdbTable*)table andNativeView:(const tightdb::TableView&)view;
++(TDBView*)viewWithTable:(TDBTable*)table andNativeView:(const tightdb::TableView&)view;
 
 @end
 
-@interface TightdbTable()
+@interface TDBTable()
 
 -(tightdb::Table&)getNativeTable;
 

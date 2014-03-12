@@ -202,7 +202,7 @@ using namespace std;
 {
     if (!m_group->has_table(ObjcStringAccessor(name)))
         return NO;
-    TightdbTable* table = [self getOrCreateTableWithName:name asTableClass:class_obj error:nil];
+    TDBTable* table = [self getOrCreateTableWithName:name asTableClass:class_obj error:nil];
     return table != nil;
 }
 
@@ -222,7 +222,7 @@ using namespace std;
         }
     }
 
-    TightdbTable* table = [[TightdbTable alloc] _initRaw];
+    TDBTable* table = [[TDBTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
     TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
@@ -250,7 +250,7 @@ using namespace std;
         }
     }
 
-    TightdbTable* table = [[class_obj alloc] _initRaw];
+    TDBTable* table = [[class_obj alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
     bool was_created;
