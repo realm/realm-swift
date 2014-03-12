@@ -1085,8 +1085,47 @@
     // Same but used directly
     STAssertEquals([_table[0] getIntInColumn:0], (int64_t)506, @"table[0].first");
     STAssertTrue([[_table[0] getStringInColumn:1] isEqual:@"test"], @"table[0].second");
+}
 
+- (void)testTableDynamic_Cursor_Subscripting
+{
+    TightdbTable* _table = [[TightdbTable alloc] init];
+    STAssertNotNil(_table, @"Table is nil");
 
+    // 1. Add two columns
+    [_table addColumnWithType:tightdb_Int andName:@"first"];
+    [_table addColumnWithType:tightdb_String andName:@"second"];
+
+    TightdbCursor* c;
+
+    // Add some rows
+    c = [_table addEmptyRow];
+    c[0] = @506;
+    c[1] = @"test";
+
+    c = [_table addEmptyRow];
+    c[@"first"]  = @4;
+    c[@"second"] = @"more test";
+
+    // Get values from cursor by object subscripting
+    c = _table[0];
+    STAssertTrue([c[0] isEqual:@506], @"table[0].first");
+    STAssertTrue([c[1] isEqual:@"test"], @"table[0].second");
+
+    // Same but used with column name
+    STAssertTrue([c[@"first"]  isEqual:@506], @"table[0].first");
+    STAssertTrue([c[@"second"] isEqual:@"test"], @"table[0].second");
+
+    // Combine with subscripting for rows
+    STAssertTrue([_table[0][0] isEqual:@506], @"table[0].first");
+    STAssertTrue([_table[0][1] isEqual:@"test"], @"table[0].second");
+    STAssertTrue([_table[0][@"first"] isEqual:@506], @"table[0].first");
+    STAssertTrue([_table[0][@"second"] isEqual:@"test"], @"table[0].second");
+
+    STAssertTrue([_table[1][0] isEqual:@4], @"table[1].first");
+    STAssertTrue([_table[1][1] isEqual:@"more test"], @"table[1].second");
+    STAssertTrue([_table[1][@"first"] isEqual:@4], @"table[1].first");
+    STAssertTrue([_table[1][@"second"] isEqual:@"more test"], @"table[1].second");
 }
 
 @end
