@@ -106,12 +106,12 @@
     TightdbTable* t = [[TightdbTable alloc] init];
     [t addColumnWithType:tightdb_Int andName:@"first"];
     
-    if (![t appendRowWithLabels:@{ @"first": @1 }])
+    if (![t appendRow:@{ @"first": @1 }])
         STFail(@"Impossible!");
     if ([t count] != 1)
         STFail(@"Expected 1 row");
 
-    if (![t appendRowWithLabels:@{ @"first": @2 }])
+    if (![t appendRow:@{ @"first": @2 }])
         STFail(@"Impossible!");
     if ([t count] != 2)
         STFail(@"Expected 2 rows");
@@ -121,18 +121,18 @@
     if ([t getIntInColumn:0 atRow:1] != 2)
         STFail(@"Value 2 expected");
 
-    if ([t appendRowWithLabels:@{ @"first": @"Hello" }])
+    if ([t appendRow:@{ @"first": @"Hello" }])
         STFail(@"Wrong type");
     if ([t count] != 2)
         STFail(@"Expected 2 rows");
 
-    if (![t appendRowWithLabels:@{ @"first": @1, @"second": @"Hello"}])
+    if (![t appendRow:@{ @"first": @1, @"second": @"Hello"}])
         STFail(@"Has 'first'");
     if ([t count] != 3)
         STFail(@"Expected 3 rows");
 
 
-    if (![t appendRowWithLabels:@{ @"second": @1 }])
+    if (![t appendRow:@{ @"second": @1 }])
         STFail(@"This is impossible");
     if ([t count] != 4)
         STFail(@"Expected 4 rows");
@@ -164,7 +164,7 @@
     TightdbTable* t = [[TightdbTable alloc] init];
     [t addColumnWithType:tightdb_Int andName:@"first"];
     [t addColumnWithType:tightdb_String andName:@"second"];
-    if (![t appendRowWithLabels:@{@"first": @1, @"second": @"Hello"}])
+    if (![t appendRow:@{@"first": @1, @"second": @"Hello"}])
         STFail(@"appendRowWithLabels 1");
     if ([t count] != 1)
         STFail(@"1 row expected");
@@ -172,7 +172,7 @@
         STFail(@"Value 1 expected");
     if (![[t getStringInColumn:1 atRow:0] isEqualToString:@"Hello"])
         STFail(@"Value 'Hello' expected");
-    if ([t appendRowWithLabels:@{@"first": @1, @"second": @2}])
+    if ([t appendRow:@{@"first": @1, @"second": @2}])
         STFail(@"appendRowWithLabels 2");
 }
 
@@ -191,7 +191,7 @@
 {
     TightdbTable* t = [[TightdbTable alloc] init];
     [t addColumnWithType:tightdb_Double andName:@"first"];
-    if (![t appendRowWithLabels:@{@"first": @3.14}])  /* double is default */
+    if (![t appendRow:@{@"first": @3.14}])  /* double is default */
         STFail(@"Cannot insert 'double'");
     if ([t count] != 1)
         STFail(@"1 row expected");
@@ -211,7 +211,7 @@
 {
     TightdbTable* t = [[TightdbTable alloc] init];
     [t addColumnWithType:tightdb_Float andName:@"first"];
-    if (![t appendRowWithLabels:@{@"first": @3.14F}])  /* F == float */
+    if (![t appendRow:@{@"first": @3.14F}])  /* F == float */
         STFail(@"Cannot insert 'float'");
     if ([t count] != 1)
         STFail(@"1 row expected");
@@ -238,13 +238,13 @@
     TightdbTable* t = [[TightdbTable alloc] init];
     [t addColumnWithType:tightdb_Date andName:@"first"];
 
-    if (![t appendRowWithLabels:@{@"first": @1000000000}])  /* 2001-09-09 01:46:40 */
+    if (![t appendRow:@{@"first": @1000000000}])  /* 2001-09-09 01:46:40 */
         STFail(@"Cannot insert 'time_t'");
     if ([t count] != 1)
         STFail(@"1 row expected");
     
     NSDate *d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
-    if (![t appendRowWithLabels:@{@"first": d}])
+    if (![t appendRow:@{@"first": d}])
         STFail(@"Cannot insert 'NSDate'");
     if ([t count] != 2)
         STFail(@"2 rows excepted");
@@ -277,13 +277,13 @@
     TightdbTable* t = [[TightdbTable alloc] init];
     [t addColumnWithType:tightdb_Binary andName:@"first"];
 
-    if (![t appendRowWithLabels:@{@"first": bin2}])
+    if (![t appendRow:@{@"first": bin2}])
         STFail(@"Cannot insert 'binary'");
     if ([t count] != 1)
         STFail(@"1 row expected");
 
     NSData *nsd = [NSData dataWithBytes:(const void *)bin length:4];
-    if (![t appendRowWithLabels:@{@"first": nsd}])
+    if (![t appendRow:@{@"first": nsd}])
         STFail(@"Cannot insert 'NSData'");
     if ([t count] != 2)
         STFail(@"2 rows excepted");
@@ -327,8 +327,8 @@
 {
     TightdbTable *t = [[TightdbTable alloc] init];
     [t addColumnWithType:tightdb_Bool andName:@"first"];
-    STAssertTrue(([t appendRowWithLabels:@{@"first": @YES}]), @"Cannot append bool column.");
-    STAssertTrue(([t appendRowWithLabels:@{@"first": @NO}]), @"Cannot append bool column.");
+    STAssertTrue(([t appendRow:@{@"first": @YES}]), @"Cannot append bool column.");
+    STAssertTrue(([t appendRow:@{@"first": @NO}]), @"Cannot append bool column.");
     STAssertEquals((size_t)2, [t count], @"2 rows expected");
 }
 
@@ -396,27 +396,27 @@
     
     TightdbTable* t = [[TightdbTable alloc] init];
     [t addColumnWithType:tightdb_Mixed andName:@"first"];
-    if (![t appendRowWithLabels:@{@"first": @1}])
+    if (![t appendRow:@{@"first": @1}])
         STFail(@"Cannot insert 'int'");
     if ([t count] != 1)
         STFail(@"1 row excepted");
-    if (![t appendRowWithLabels:@{@"first": @"Hello"}])
+    if (![t appendRow:@{@"first": @"Hello"}])
         STFail(@"Cannot insert 'string'");
     if ([t count] != 2)
         STFail(@"2 rows excepted");
-    if (![t appendRowWithLabels:@{@"first": @3.14f}])
+    if (![t appendRow:@{@"first": @3.14f}])
         STFail(@"Cannot insert 'float'");
     if ([t count] != 3)
         STFail(@"3 rows excepted");
-    if (![t appendRowWithLabels:@{@"first": @3.14}])
+    if (![t appendRow:@{@"first": @3.14}])
         STFail(@"Cannot insert 'double'");
     if ([t count] != 4)
         STFail(@"4 rows excepted");
-    if (![t appendRowWithLabels:@{@"first": @YES}])
+    if (![t appendRow:@{@"first": @YES}])
         STFail(@"Cannot insert 'bool'");
     if ([t count] != 5)
         STFail(@"5 rows excepted");
-    if (![t appendRowWithLabels:@{@"first": bin2}])
+    if (![t appendRow:@{@"first": bin2}])
         STFail(@"Cannot insert 'binary'");
     if ([t count] != 6)
         STFail(@"6 rows excepted");

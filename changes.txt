@@ -1,6 +1,6 @@
 2014-03-11
 ==========
-* Adding appendRowWithLabels to TightdbTable.
+* Extending appendRow to accept NSDictionary.
 
 2014-03-10
 ==========
