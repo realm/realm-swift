@@ -120,7 +120,7 @@ if ([self columnTypeOfColumn:col_ndx] != datatype) { \
                                           userInfo:[NSMutableDictionary dictionary]]; \
     [exception raise]; \
 } \
-if (row_ndx >= [self count]) { \
+if (row_ndx >= self.rowCount) { \
     NSException* exception = [NSException exceptionWithName:@"tightdb:row_index_out_of_bounds" \
                                           reason:@"The specified row index is not within the table bounds" \
                                           userInfo:[NSMutableDictionary dictionary]]; \

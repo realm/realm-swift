@@ -394,10 +394,7 @@ using namespace std;
 {
     return m_view->size();
 }
--(BOOL)isEmpty
-{
-    return m_view->is_empty();
-}
+
 -(NSUInteger)getColumnCount
 {
     return m_view->get_column_count();
@@ -462,7 +459,7 @@ using namespace std;
     tightdb::TableRef table = m_view->get_subtable(colNdx, rowIndex);
     if (!table)
         return nil;
-    TightdbTable* table_2 = [[TightdbTable alloc] TDBInitRaw];
+    TightdbTable* table_2 = [[TightdbTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table_2))
         return nil;
     [table_2 setNativeTable:table.get()];
@@ -585,7 +582,7 @@ using namespace std;
         TightdbCursor* tmp = [self getCursor];
         *stackbuf = tmp;
     }
-    if (state->state < [self count]) {
+    if (state->state < self.rowCount) {
         [((TightdbCursor*)*stackbuf) TDBSetNdx:state->state];
         state->itemsPtr = stackbuf;
         state->state++;
@@ -631,7 +628,7 @@ using namespace std;
 }
 
 // FIXME: Check that the specified class derives from TightdbTable.
--(BOOL)isClass:(__unsafe_unretained Class)class_obj
+-(BOOL)hasSameDescriptorAs:(Class)class_obj
 {
     TightdbTable* table = [[class_obj alloc] _initRaw];
     if (TIGHTDB_LIKELY(table)) {
@@ -692,11 +689,8 @@ using namespace std;
     BOOL read_only = m_read_only || m_table->has_shared_type();
     return [TightdbDescriptor descWithDesc:desc.get() readOnly:read_only error:error];
 }
--(BOOL)isEmpty
-{
-    return m_table->is_empty();
-}
--(NSUInteger)count
+
+-(NSUInteger)rowCount //Synthesize property
 {
     return m_table->size();
 }
@@ -704,6 +698,29 @@ using namespace std;
 -(TightdbCursor*)addEmptyRow
 {
     return [[TightdbCursor alloc] initWithTable:self ndx:[self TDBAddEmptyRow]];
+}
+
+-(TightdbCursor*)insertEmptyRowAtIndex:(NSUInteger)ndx
+{
+    [self TDBInsertRow:ndx];
+    return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
+}
+
+-(BOOL)TDBInsertRow:(NSUInteger)ndx
+{
+    return [self TDBInsertRow:ndx error:nil];
+}
+
+-(BOOL)TDBInsertRow:(NSUInteger)ndx error:(NSError* __autoreleasing*)error
+{
+    if (m_read_only) {
+        if (error)
+            *error = make_tightdb_error(tdb_err_FailRdOnly, @"Tried to insert row while read-only.");
+        return NO;
+    }
+    
+    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->insert_empty_row(ndx);, 0);
+    return YES;
 }
 
 
@@ -743,21 +760,26 @@ using namespace std;
 }
 
 
--(TightdbCursor*)cursorAtIndex:(NSUInteger)ndx
+-(TightdbCursor*)rowAtIndex:(NSUInteger)ndx
 {
     // initWithTable checks for illegal index.
 
     return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
 }
 
--(TightdbCursor*)cursorAtLastIndex
+-(TightdbCursor*)lastRow //FIXME must return nil, of table is empty. Consider property
 {
-    return [[TightdbCursor alloc] initWithTable:self ndx:[self count]-1];
+    return [[TightdbCursor alloc] initWithTable:self ndx:self.rowCount-1];
+}
+
+-(TightdbCursor*)firstRow //FIXME must return nil, of table is empty. Consider property
+{
+    return [[TightdbCursor alloc] initWithTable:self ndx:0];
 }
 
 -(TightdbCursor*)insertRowAtIndex:(NSUInteger)ndx
 {
-    [self insertRow:ndx];
+    [self insertEmptyRowAtIndex:ndx];
     return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
 }
 
@@ -773,22 +795,7 @@ using namespace std;
     return insert_row(table.size(), table, data);
 }
 
--(BOOL)insertRow:(NSUInteger)ndx
-{
-    return [self insertRow:ndx error:nil];
-}
 
--(BOOL)insertRow:(NSUInteger)ndx error:(NSError* __autoreleasing*)error
-{
-    if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, @"Tried to insert row while read-only.");
-        return NO;
-    }
-
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->insert_empty_row(ndx);, 0);
-    return YES;
-}
 
 -(BOOL)removeAllRows
 {
@@ -1387,14 +1394,14 @@ using namespace std;
     return [[TightdbQuery alloc] initWithTable:self error:error];
 }
 
--(BOOL)hasIndex:(NSUInteger)col_ndx
+-(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->has_index(col_ndx);
+    return m_table->has_index(colIndex);
 }
 
--(void)setIndex:(NSUInteger)col_ndx
+-(void)createIndexInColumnWithIndex:(NSUInteger)colIndex
 {
-    m_table->set_index(col_ndx);
+    m_table->set_index(colIndex);
 }
 
 -(BOOL)optimize
@@ -1408,73 +1415,73 @@ using namespace std;
     return YES;
 }
 
--(NSUInteger)countWithIntColumn:(NSUInteger)col_ndx andValue:(int64_t)target
+-(NSUInteger)countRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->count_int(col_ndx, target);
+    return m_table->count_int(colIndex, anInt);
 }
--(NSUInteger)countWithFloatColumn:(NSUInteger)col_ndx andValue:(float)target
+-(NSUInteger)countRowsWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->count_float(col_ndx, target);
+    return m_table->count_float(colIndex, aFloat);
 }
--(NSUInteger)countWithDoubleColumn:(NSUInteger)col_ndx andValue:(double)target
+-(NSUInteger)countRowsWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->count_double(col_ndx, target);
+    return m_table->count_double(colIndex, aDouble);
 }
--(NSUInteger)countWithStringColumn:(NSUInteger)col_ndx andValue:(NSString*)target
+-(NSUInteger)countRowsWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->count_string(col_ndx, ObjcStringAccessor(target));
-}
-
--(int64_t)sumWithIntColumn:(NSUInteger)col_ndx
-{
-    return m_table->sum_int(col_ndx);
-}
--(double)sumWithFloatColumn:(NSUInteger)col_ndx
-{
-    return m_table->sum_float(col_ndx);
-}
--(double)sumWithDoubleColumn:(NSUInteger)col_ndx
-{
-    return m_table->sum_double(col_ndx);
+    return m_table->count_string(colIndex, ObjcStringAccessor(aString));
 }
 
--(int64_t)maximumWithIntColumn:(NSUInteger)col_ndx
+-(int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->maximum_int(col_ndx);
+    return m_table->sum_int(colIndex);
 }
--(float)maximumWithFloatColumn:(NSUInteger)col_ndx
+-(double)sumFloatColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->maximum_float(col_ndx);
+    return m_table->sum_float(colIndex);
 }
--(double)maximumWithDoubleColumn:(NSUInteger)col_ndx
+-(double)sumDoubleColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->maximum_double(col_ndx);
-}
-
--(int64_t)minimumWithIntColumn:(NSUInteger)col_ndx
-{
-    return m_table->minimum_int(col_ndx);
-}
--(float)minimumWithFloatColumn:(NSUInteger)col_ndx
-{
-    return m_table->minimum_float(col_ndx);
-}
--(double)minimumWithDoubleColumn:(NSUInteger)col_ndx
-{
-    return m_table->minimum_double(col_ndx);
+    return m_table->sum_double(colIndex);
 }
 
--(double)averageWithIntColumn:(NSUInteger)col_ndx
+-(int64_t)maxIntInColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->average_int(col_ndx);
+    return m_table->maximum_int(colIndex);
 }
--(double)averageWithFloatColumn:(NSUInteger)col_ndx
+-(float)maxFloatInColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->average_float(col_ndx);
+    return m_table->maximum_float(colIndex);
 }
--(double)averageWithDoubleColumn:(NSUInteger)col_ndx
+-(double)maxDoubleInColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->average_double(col_ndx);
+    return m_table->maximum_double(colIndex);
+}
+
+-(int64_t)minIntInColumnWithIndex:(NSUInteger)colIndex
+{
+    return m_table->minimum_int(colIndex);
+}
+-(float)minFloatInColumnWithIndex:(NSUInteger)colIndex
+{
+    return m_table->minimum_float(colIndex);
+}
+-(double)minDoubleInColumnWithIndex:(NSUInteger)colIndex
+{
+    return m_table->minimum_double(colIndex);
+}
+
+-(double)avgIntColumnWithIndex:(NSUInteger)colIndex
+{
+    return m_table->average_int(colIndex);
+}
+-(double)avgFloatColumnWithIndex:(NSUInteger)colIndex
+{
+    return m_table->average_float(colIndex);
+}
+-(double)avgDoubleColumnWithIndex:(NSUInteger)colIndex
+{
+    return m_table->average_double(colIndex);
 }
 
 -(BOOL)_addColumns
@@ -1511,97 +1518,97 @@ using namespace std;
 @implementation TightdbColumnProxy_Bool
 -(NSUInteger)find:(BOOL)value
 {
-    return [self.table findBool:self.column value:value];
+    return [self.table findRowIndexWithBool:value inColumnWithIndex:self.column ];
 }
 @end
 
 @implementation TightdbColumnProxy_Int
 -(NSUInteger)find:(int64_t)value
 {
-    return [self.table findInt:self.column value:value];
+    return [self.table findRowIndexWithInt:value inColumnWithIndex:self.column ];
 }
 -(int64_t)minimum
 {
-    return [self.table minimumWithIntColumn:self.column];
+    return [self.table minIntInColumnWithIndex:self.column ];
 }
 -(int64_t)maximum
 {
-    return [self.table maximumWithIntColumn:self.column];
+    return [self.table maxIntInColumnWithIndex:self.column ];
 }
 -(int64_t)sum
 {
-    return [self.table sumWithIntColumn:self.column];
+    return [self.table sumIntColumnWithIndex:self.column ];
 }
 -(double)average
 {
-    return [self.table averageWithIntColumn:self.column];
+    return [self.table avgIntColumnWithIndex:self.column ];
 }
 @end
 
 @implementation TightdbColumnProxy_Float
 -(NSUInteger)find:(float)value
 {
-    return [self.table findFloat:self.column value:value];
+    return [self.table findRowIndexWithFloat:value inColumnWithIndex:self.column];
 }
 -(float)minimum
 {
-    return [self.table minimumWithFloatColumn:self.column];
+    return [self.table minFloatInColumnWithIndex:self.column];
 }
 -(float)maximum
 {
-    return [self.table maximumWithFloatColumn:self.column];
+    return [self.table maxFloatInColumnWithIndex:self.column];
 }
 -(double)sum
 {
-    return [self.table sumWithFloatColumn:self.column];
+    return [self.table sumFloatColumnWithIndex:self.column];
 }
 -(double)average
 {
-    return [self.table averageWithFloatColumn:self.column];
+    return [self.table avgFloatColumnWithIndex:self.column];
 }
 @end
 
 @implementation TightdbColumnProxy_Double
 -(NSUInteger)find:(double)value
 {
-    return [self.table findDouble:self.column value:value];
+    return [self.table findRowIndexWithDouble:value inColumnWithIndex:self.column];
 }
 -(double)minimum
 {
-    return [self.table minimumWithDoubleColumn:self.column];
+    return [self.table minDoubleInColumnWithIndex:self.column];
 }
 -(double)maximum
 {
-    return [self.table maximumWithDoubleColumn:self.column];
+    return [self.table maxDoubleInColumnWithIndex:self.column];
 }
 -(double)sum
 {
-    return [self.table sumWithDoubleColumn:self.column];
+    return [self.table sumDoubleColumnWithIndex:self.column];
 }
 -(double)average
 {
-    return [self.table averageWithDoubleColumn:self.column];
+    return [self.table avgDoubleColumnWithIndex:self.column];
 }
 @end
 
 @implementation TightdbColumnProxy_String
 -(NSUInteger)find:(NSString*)value
 {
-    return [self.table findString:self.column value:value];
+    return [self.table findRowIndexWithString:value inColumnWithIndex:self.column];
 }
 @end
 
 @implementation TightdbColumnProxy_Binary
 -(NSUInteger)find:(TightdbBinary*)value
 {
-    return [self.table findBinary:self.column value:value];
+    return [self.table findRowIndexWithBinary:value inColumnWithIndex:self.column];
 }
 @end
 
 @implementation TightdbColumnProxy_Date
 -(NSUInteger)find:(time_t)value
 {
-    return [self.table findDate:self.column value:value];
+    return [self.table findRowIndexWithDate:value inColumnWithIndex:self.column];
 }
 @end
 
@@ -1611,7 +1618,7 @@ using namespace std;
 @implementation TightdbColumnProxy_Mixed
 -(NSUInteger)find:(TightdbMixed*)value
 {
-    return [self.table findMixed:self.column value:value];
+    return [self.table findRowIndexWithMixed:value inColumnWithIndex:self.column];
 }
 @end
 

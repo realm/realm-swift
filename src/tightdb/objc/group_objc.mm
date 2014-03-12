@@ -222,7 +222,7 @@ using namespace std;
         }
     }
 
-    TightdbTable* table = [[TightdbTable alloc] TDBInitRaw];
+    TightdbTable* table = [[TightdbTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
     TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
@@ -250,7 +250,7 @@ using namespace std;
         }
     }
 
-    TightdbTable* table = [[class_obj alloc] TDBInitRaw];
+    TightdbTable* table = [[class_obj alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
     bool was_created;
