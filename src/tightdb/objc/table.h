@@ -103,7 +103,7 @@
  * The specified table class must be one that is declared by using
  * one of the table macros TIGHTDB_TABLE_*.
  */
--(BOOL)hasSameDescriptor:(Class)descriptor;
+-(BOOL)hasSameDescriptorAs:(Class)otherTableClass;
 
 /**
  * If the type of this table is not compatible with the specified
@@ -116,11 +116,11 @@
 -(id)castClass:(Class)obj;
 
 /* Column meta info */
--(NSString *)columnNameOfColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)indexOfColumnWithName:(NSString *)name;
--(TightdbType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)addColumnWithType:(TightdbType)type andName:(NSString *)name;
+-(NSUInteger)addColumnWithName:(NSString *)name andType:(TightdbType)type;
 -(void)removeColumnWithIndex:(NSUInteger)colIndex;
+-(NSString *)columnNameOfColumn:(NSUInteger)colIndex;
+-(NSUInteger)indexOfColumnWithName:(NSString *)name;
+-(TightdbType)columnTypeOfColumn:(NSUInteger)colIndex;
 
 
 -(TightdbCursor *)addEmptyRow;
