@@ -128,7 +128,7 @@
 /* Only curser based add should be public. This is just a temporaray way to hide the methods. */
 /* TODO: Move to class extension. */
 -(NSUInteger)TDBAddEmptyRow;
--(NSUInteger)TDBAEmptyRows:(NSUInteger)numberOfRows;
+-(NSUInteger)TDBAddEmptyRows:(NSUInteger)numberOfRows;
 
 -(BOOL)removeAllRows;
 -(BOOL)removeRowAtIndex:(NSUInteger)rowIndex;
@@ -257,7 +257,7 @@
 #endif
 
 /* Private */
--(id)TDBInitRaw;
+-(id)_initRaw;
 -(BOOL)TDBInsertSubtableCopy:(NSUInteger)colNdx row:(NSUInteger)rowNdx subtable:(TightdbTable *)subtable;
 -(BOOL)TDBInsertSubtableCopy:(NSUInteger)colNdx row:(NSUInteger)rowNdx subtable:(TightdbTable *)subtable error:(NSError *__autoreleasing *)error;
 @end

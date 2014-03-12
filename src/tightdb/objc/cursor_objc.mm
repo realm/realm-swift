@@ -236,7 +236,7 @@ using namespace std;
 
 -(id)getSubtable:(Class)obj
 {
-    return [_cursor.table tableInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_cursor.table tableInColumnWithIndex:_columnId atRowIndex:_cursor.ndx asTableClass:obj];
 }
 
 -(void)setSubtable:(TightdbTable *)value
