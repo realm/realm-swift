@@ -731,30 +731,36 @@ using namespace std;
 
 -(BOOL)appendRow:(NSObject*)data
 {
+    return [self insertRow:[self count] andData:data];
+}
+
+-(BOOL)insertRow:(NSUInteger)ndx
+{
+    return [self insertRow:ndx error:nil];
+}
+
+-(BOOL)insertRow:(NSUInteger)ndx andData:(NSObject *)data
+{
     tightdb::Table& table = *m_table;
     tightdb::ConstDescriptorRef desc = table.get_descriptor();
- 
+    
     if ([data isKindOfClass:[NSArray class]]) {
         if (!verify_row(*desc, (NSArray *)data)) {
             return NO;
         }
-        return insert_row(table.size(), table, (NSArray *)data);
+        return insert_row(size_t(ndx), table, (NSArray *)data);
     }
     
     if ([data isKindOfClass:[NSDictionary class]]) {
         if (!verify_row_with_labels(*desc, (NSDictionary *)data)) {
             return NO;
         }
-        return insert_row_with_labels(table.size(), table, (NSDictionary *)data);
+        return insert_row_with_labels(size_t(ndx), table, (NSDictionary *)data);
     }
     
     /* FIXME: pull out properties of object and insert as row */
     return NO;
-}
-
--(BOOL)insertRow:(NSUInteger)ndx
-{
-    return [self insertRow:ndx error:nil];
+    
 }
 
 -(BOOL)insertRow:(NSUInteger)ndx error:(NSError* __autoreleasing*)error

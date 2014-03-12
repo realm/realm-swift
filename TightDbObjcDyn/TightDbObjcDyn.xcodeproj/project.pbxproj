@@ -321,6 +321,7 @@
 		E9189091177B677900653D7A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastTestingUpgradeCheck = 0510;
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Thomas Andersen";
 			};
