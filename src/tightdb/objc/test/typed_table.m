@@ -50,15 +50,15 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     STAssertNotNil(table, @"Table is nil");
 
     // Verify column types
-    STAssertEquals(tightdb_Bool,   [table getColumnType:0], @"First column not bool");
-    STAssertEquals(tightdb_Int,    [table getColumnType:1], @"Second column not int");
-    STAssertEquals(tightdb_Float,  [table getColumnType:2], @"Third column not float");
-    STAssertEquals(tightdb_Double, [table getColumnType:3], @"Fourth column not double");
-    STAssertEquals(tightdb_String, [table getColumnType:4], @"Fifth column not string");
-    STAssertEquals(tightdb_Binary, [table getColumnType:5], @"Sixth column not binary");
-    STAssertEquals(tightdb_Date,   [table getColumnType:6], @"Seventh column not date");
-    STAssertEquals(tightdb_Table,  [table getColumnType:7], @"Eighth column not table");
-    STAssertEquals(tightdb_Mixed,  [table getColumnType:8], @"Ninth column not mixed");
+    STAssertEquals(tightdb_Bool,   [table columnTypeOfColumn:0], @"First column not bool");
+    STAssertEquals(tightdb_Int,    [table columnTypeOfColumn:1], @"Second column not int");
+    STAssertEquals(tightdb_Float,  [table columnTypeOfColumn:2], @"Third column not float");
+    STAssertEquals(tightdb_Double, [table columnTypeOfColumn:3], @"Fourth column not double");
+    STAssertEquals(tightdb_String, [table columnTypeOfColumn:4], @"Fifth column not string");
+    STAssertEquals(tightdb_Binary, [table columnTypeOfColumn:5], @"Sixth column not binary");
+    STAssertEquals(tightdb_Date,   [table columnTypeOfColumn:6], @"Seventh column not date");
+    STAssertEquals(tightdb_Table,  [table columnTypeOfColumn:7], @"Eighth column not table");
+    STAssertEquals(tightdb_Mixed,  [table columnTypeOfColumn:8], @"Ninth column not mixed");
 
     const char bin[4] = { 0, 1, 2, 3 };
     TightdbBinary* bin1 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin / 2];
