@@ -33,4 +33,4 @@ examples/tutorial
 
 # sh build.sh ios-framework
 /Tightdb.framework
-tightdb-ios.zip
+tightdb-ios-*.zip

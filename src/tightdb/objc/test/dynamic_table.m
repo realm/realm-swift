@@ -67,6 +67,16 @@
         STFail(@"Second not 10");
 }
 
+-(void)testAddColumn
+{
+    TightdbTable *t = [[TightdbTable alloc] init];
+    NSUInteger stringColIndex = [t addColumnWithType:tightdb_String andName:@"stringCol"];
+    TightdbCursor *row = [t addEmptyRow];
+    [row setString:@"val" inColumn:stringColIndex];
+    
+    
+}
+
 -(void)testAppendRowsIntColumn
 {
     // Add row using object literate
@@ -100,28 +110,28 @@
         STFail(@"Impossible!");
     if ([t count] != 1)
         STFail(@"Expected 1 row");
-    
+
     if (![t appendRowWithLabels:@{ @"first": @2 }])
         STFail(@"Impossible!");
     if ([t count] != 2)
         STFail(@"Expected 2 rows");
-    
+
     if ([t getIntInColumn:0 atRow:0] != 1)
         STFail(@"Value 1 expected");
     if ([t getIntInColumn:0 atRow:1] != 2)
         STFail(@"Value 2 expected");
-    
+
     if ([t appendRowWithLabels:@{ @"first": @"Hello" }])
         STFail(@"Wrong type");
     if ([t count] != 2)
         STFail(@"Expected 2 rows");
-    
+
     if (![t appendRowWithLabels:@{ @"first": @1, @"second": @"Hello"}])
         STFail(@"Has 'first'");
     if ([t count] != 3)
         STFail(@"Expected 3 rows");
 
-    
+
     if (![t appendRowWithLabels:@{ @"second": @1 }])
         STFail(@"This is impossible");
     if ([t count] != 4)
