@@ -1266,7 +1266,7 @@ using namespace std;
 }
 
 
--(NSUInteger)addColumnWithType:(TightdbType)type andName:(NSString*)name
+-(NSUInteger)addColumnWithName:(NSString*)name andType:(TightdbType)type
 {
     return [self addColumnWithType:type andName:name error:nil];
 }
@@ -1293,83 +1293,83 @@ using namespace std;
     }
 }
 
--(NSUInteger)findBool:(NSUInteger)col_ndx value:(BOOL)value
+-(NSUInteger)findRowIndexWithBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->find_first_bool(col_ndx, value);
+    return m_table->find_first_bool(colIndex, aBool);
 }
--(NSUInteger)findInt:(NSUInteger)col_ndx value:(int64_t)value
+-(NSUInteger)findRowIndexWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->find_first_int(col_ndx, value);
+    return m_table->find_first_int(colIndex, anInt);
 }
--(NSUInteger)findFloat:(NSUInteger)col_ndx value:(float)value
+-(NSUInteger)findRowIndexWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->find_first_float(col_ndx, value);
+    return m_table->find_first_float(colIndex, aFloat);
 }
--(NSUInteger)findDouble:(NSUInteger)col_ndx value:(double)value
+-(NSUInteger)findRowIndexWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->find_first_double(col_ndx, value);
+    return m_table->find_first_double(colIndex, aDouble);
 }
--(NSUInteger)findString:(NSUInteger)col_ndx value:(NSString*)value
+-(NSUInteger)findRowIndexWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->find_first_string(col_ndx, ObjcStringAccessor(value));
+    return m_table->find_first_string(colIndex, ObjcStringAccessor(aString));
 }
--(NSUInteger)findBinary:(NSUInteger)col_ndx value:(TightdbBinary*)value
+-(NSUInteger)findRowIndexWithBinary:(TightdbBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->find_first_binary(col_ndx, [value getNativeBinary]);
+    return m_table->find_first_binary(colIndex, [aBinary getNativeBinary]);
 }
--(NSUInteger)findDate:(NSUInteger)col_ndx value:(time_t)value
+-(NSUInteger)findRowIndexWithDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->find_first_datetime(col_ndx, value);
+    return m_table->find_first_datetime(colIndex, aDate);
 }
--(NSUInteger)findMixed:(NSUInteger)col_ndx value:(TightdbMixed*)value
+-(NSUInteger)findRowIndexWithMixed:(TightdbMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex
 {
-    static_cast<void>(col_ndx);
-    static_cast<void>(value);
+    static_cast<void>(colIndex);
+    static_cast<void>(aMixed);
     [NSException raise:@"NotImplemented" format:@"Not implemented"];
     // FIXME: Implement this!
 //    return _table->find_first_mixed(col_ndx, [value getNativeMixed]);
     return 0;
 }
 
--(TightdbView*)findAllBool:(BOOL)value inColumn:(NSUInteger)col_ndx
+-(TightdbView*)findAllRowsWithBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex
 {
-    tightdb::TableView view = m_table->find_all_bool(col_ndx, value);
+    tightdb::TableView view = m_table->find_all_bool(colIndex, aBool);
     return [TightdbView viewWithTable:self andNativeView:view];
 }
--(TightdbView*)findAllInt:(int64_t)value inColumn:(NSUInteger)col_ndx
+-(TightdbView*)findAllRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
 {
-    tightdb::TableView view = m_table->find_all_int(col_ndx, value);
+    tightdb::TableView view = m_table->find_all_int(colIndex, anInt);
     return [TightdbView viewWithTable:self andNativeView:view];
 }
--(TightdbView*)findAllFloat:(float)value inColumn:(NSUInteger)col_ndx
+-(TightdbView*)findAllRowsWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
 {
-    tightdb::TableView view = m_table->find_all_float(col_ndx, value);
+    tightdb::TableView view = m_table->find_all_float(colIndex, aFloat);
     return [TightdbView viewWithTable:self andNativeView:view];
 }
--(TightdbView*)findAllDouble:(double)value inColumn:(NSUInteger)col_ndx
+-(TightdbView*)findAllRowsWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
 {
-    tightdb::TableView view = m_table->find_all_double(col_ndx, value);
+    tightdb::TableView view = m_table->find_all_double(colIndex, aDouble);
     return [TightdbView viewWithTable:self andNativeView:view];
 }
--(TightdbView*)findAllString:(NSString*)value inColumn:(NSUInteger)col_ndx
+-(TightdbView*)findAllRowsWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
 {
-    tightdb::TableView view = m_table->find_all_string(col_ndx, ObjcStringAccessor(value));
+    tightdb::TableView view = m_table->find_all_string(colIndex, ObjcStringAccessor(aString));
     return [TightdbView viewWithTable:self andNativeView:view];
 }
--(TightdbView*)findAllBinary:(TightdbBinary*)value inColumn:(NSUInteger)col_ndx
+-(TightdbView*)findAllRowsWithBinary:(TightdbBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
-    tightdb::TableView view = m_table->find_all_binary(col_ndx, [value getNativeBinary]);
+    tightdb::TableView view = m_table->find_all_binary(colIndex, [aBinary getNativeBinary]);
     return [TightdbView viewWithTable:self andNativeView:view];
 }
--(TightdbView*)findAllDate:(time_t)value inColumn:(NSUInteger)col_ndx
+-(TightdbView*)findAllRowsWithDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
 {
-    tightdb::TableView view = m_table->find_all_datetime(col_ndx, value);
+    tightdb::TableView view = m_table->find_all_datetime(colIndex, aDate);
     return [TightdbView viewWithTable:self andNativeView:view];
 }
--(TightdbView*)findAllMixed:(TightdbMixed*)value inColumn:(NSUInteger)col_ndx
+-(TightdbView*)findAllRowsWithMixed:(TightdbMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex
 {
-    static_cast<void>(col_ndx);
-    static_cast<void>(value);
+    static_cast<void>(colIndex);
+    static_cast<void>(aMixed);
     [NSException raise:@"NotImplemented" format:@"Not implemented"];
     // FIXME: Implement this!
 //    tightdb::TableView view = m_table->find_all_mixed(col_ndx, [value getNativeMixed]);
