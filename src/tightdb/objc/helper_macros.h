@@ -144,7 +144,7 @@
 #define TIGHTDB_COLUMN_INSERT_2(is_subtable, table, col, row, value, type) TIGHTDB_COLUMN_INSERT_3(is_subtable, table, col, row, value, type)
 #define TIGHTDB_COLUMN_INSERT_3(is_subtable, table, col, row, value, type) TIGHTDB_COLUMN_INSERT_4_##is_subtable(table, col, row, value, type)
 #define TIGHTDB_COLUMN_INSERT_4_Y(table, col, _row, value, type)           [table _insertSubtableCopy:col row:_row subtable:value]
-#define TIGHTDB_COLUMN_INSERT_4_N(table, col, row, _value, type)           [table insert##type:col ndx:row value:_value]
+#define TIGHTDB_COLUMN_INSERT_4_N(table, col, row, _value, type)           [table TDBInsert##type:col ndx:row value:_value]
 
 
 
