@@ -190,7 +190,7 @@ using namespace std;
 }
 
 
--(BOOL)hasTable:(NSString*)name
+-(BOOL)hasTableWithName:(NSString*)name
 {
     return m_group->has_table(ObjcStringAccessor(name));
 }
@@ -198,15 +198,15 @@ using namespace std;
 // FIXME: Avoid creating a table instance. It should be enough to create an TightdbDescriptor and then check that.
 // FIXME: Check that the specified class derives from Table.
 // FIXME: Find a way to avoid having to transcode the table name twice
--(BOOL)hasTable:(NSString*)name withClass:(__unsafe_unretained Class)class_obj
+-(BOOL)hasTableWithName:(NSString *)name withTableClass:(__unsafe_unretained Class)class_obj
 {
     if (!m_group->has_table(ObjcStringAccessor(name)))
         return NO;
-    TightdbTable* table = [self getTable:name withClass:class_obj error:nil];
+    TightdbTable* table = [self getOrCreateTableWithName:name asTableClass:class_obj error:nil];
     return table != nil;
 }
 
--(id)getTable:(NSString*)name error:(NSError**)error
+-(id)getOrCreateTableWithName:(NSString*)name error:(NSError**)error
 {
     // FIXME: Read-only errors should probably be handled by throwing
     // an exception. That is what is done in other places in this
@@ -215,7 +215,7 @@ using namespace std;
     if (m_read_only) {
         // A group is readonly when it has been extracted from a shared group in a read transaction.
         // In this case, getTable should return nil for non-existing tables.
-        if (![self hasTable:name]) {
+        if (![self hasTableWithName:name]) {
             if (error) // allow nil as the error argument
                 *error = make_tightdb_error(tdb_err_TableNotFound, @"The table was not found. Cannot create the table in read only mode.");
             return nil;
@@ -234,7 +234,7 @@ using namespace std;
 }
 
 // FIXME: Check that the specified class derives from Table.
--(id)getTable:(NSString*)name withClass:(__unsafe_unretained Class)class_obj error:(NSError* __autoreleasing*)error
+-(id)getOrCreateTableWithName:(NSString*)name asTableClass:(__unsafe_unretained Class)class_obj error:(NSError* __autoreleasing*)error
 {
     // FIXME: Read-only errors should probably be handled by throwing
     // an exception. That is what is done in other places in this
@@ -243,7 +243,7 @@ using namespace std;
     if (m_read_only) {
         // A group is readonly when it has been extracted from a shared group in a read transaction.
         // In this case, getTable should return nil for non-existing tables.
-        if (![self hasTable:name]) {
+        if (![self hasTableWithName:name]) {
             if (error) // allow nil as the error argument
                 *error = make_tightdb_error(tdb_err_TableNotFound, @"The table was not found. Cannot create the table in read only mode.");
             return nil;

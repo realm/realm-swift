@@ -19,8 +19,8 @@
 		4D2433B118BF65C700271C32 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D24338D18BF65C700271C32 /* Foundation.framework */; };
 		4D2433BA18BF65C700271C32 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D2433B818BF65C700271C32 /* InfoPlist.strings */; };
 		4D2433BC18BF65C700271C32 /* iOSTutorialTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2433BB18BF65C700271C32 /* iOSTutorialTests.m */; };
+		4D88930518D1ADED0038AFD4 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88930418D1ADED0038AFD4 /* libc++.dylib */; };
 		4DB1DEF518BF67AE005A7234 /* Tightdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DB1DEF418BF67AE005A7234 /* Tightdb.framework */; };
-		4DB1DEF718BF67B3005A7234 /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DB1DEF618BF67B3005A7234 /* libstdc++.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +53,7 @@
 		4D2433B718BF65C700271C32 /* iOSTutorialTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iOSTutorialTests-Info.plist"; sourceTree = "<group>"; };
 		4D2433B918BF65C700271C32 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4D2433BB18BF65C700271C32 /* iOSTutorialTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iOSTutorialTests.m; sourceTree = "<group>"; };
+		4D88930418D1ADED0038AFD4 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/usr/lib/libc++.dylib"; sourceTree = DEVELOPER_DIR; };
 		4DB1DEF418BF67AE005A7234 /* Tightdb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Tightdb.framework; path = ../Tightdb.framework; sourceTree = "<group>"; };
 		4DB1DEF618BF67B3005A7234 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/usr/lib/libstdc++.dylib"; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
@@ -62,7 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4DB1DEF718BF67B3005A7234 /* libstdc++.dylib in Frameworks */,
+				4D88930518D1ADED0038AFD4 /* libc++.dylib in Frameworks */,
 				4D24339018BF65C700271C32 /* CoreGraphics.framework in Frameworks */,
 				4D24338E18BF65C700271C32 /* Foundation.framework in Frameworks */,
 				4DB1DEF518BF67AE005A7234 /* Tightdb.framework in Frameworks */,
@@ -103,6 +104,7 @@
 		4D1271F91833C1970099B36C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4D88930418D1ADED0038AFD4 /* libc++.dylib */,
 				4DB1DEF618BF67B3005A7234 /* libstdc++.dylib */,
 				4DB1DEF418BF67AE005A7234 /* Tightdb.framework */,
 				4D1271FA1833C1970099B36C /* CoreFoundation.framework */,

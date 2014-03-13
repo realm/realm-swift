@@ -23,31 +23,31 @@
     [sharedGroup writeWithBlock:^(TightdbGroup *group) {
 
         // Access table from group
-        TightdbTable *table = [group getTable:@"myTable" error:nil];
+        TightdbTable *table = [group getOrCreateTableWithName:@"myTable" error:nil];
 
         // Add columns to the table
-        [table addColumnWithType:tightdb_String andName:@"Name"];
-        [table addColumnWithType:tightdb_Int    andName:@"Age"];
+        [table addColumnWithName:@"Name" andType:tightdb_String];
+        [table addColumnWithName:@"Age" andType:tightdb_Int];
        
         // Add a row to the table
         [table appendRow:@[@"Jill", @21]];
 
         // Add a new column
-        int const HIRED = [table addColumnWithType:tightdb_Bool andName:@"Hired"];
+        int const HIRED = [table addColumnWithName:@"Hired" andType:tightdb_Bool];
 
         // Add another row
         [table appendRow:@[@"Mary", @40, @NO]];
 
         // Change value in row
-        TightdbCursor *cursor = [table cursorAtIndex:0];
-        [cursor setBool:YES inColumn:HIRED];
+        TightdbCursor *row = [table rowAtIndex:0];
+        [row setBool:YES inColumnWithIndex:HIRED];
 
         // Remove row from table
         [table removeRowAtIndex:0];
 
         // Print out info on iPhone screen
-        self.tableColumnCountOutlet.text = [NSString stringWithFormat:@"# of columns: %i", [table getColumnCount]];
-        self.tableSizeOutlet.text = [NSString stringWithFormat:@"# of rows: %i", [table count]];
+        self.tableColumnCountOutlet.text = [NSString stringWithFormat:@"# of columns: %i", table.columnCount];
+        self.tableSizeOutlet.text = [NSString stringWithFormat:@"# of rows: %i", table.rowCount];
 
         return YES;
     } withError:nil];
