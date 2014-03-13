@@ -105,7 +105,7 @@
     NSString* name = [NSString stringWithUTF8String:#_name]; \
     if (!name) \
         return NO; \
-    if (![desc addColumnWithType:TIGHTDB_TYPE_ID_##type andName:name]) \
+    if (![desc addColumnWithName:name andType:TIGHTDB_TYPE_ID_##type]) \
         return NO; \
 }
 
@@ -118,11 +118,11 @@
 #define TIGHTDB_CHECK_COLUMN_TYPE_3(is_subtable, desc, col, name, type) TIGHTDB_CHECK_COLUMN_TYPE_4_##is_subtable(desc, col, name, type)
 #define TIGHTDB_CHECK_COLUMN_TYPE_4_Y(desc, col, name, type)      \
 { \
-    if ([desc getColumnType:col] != tightdb_Table) \
+    if ([desc columnTypeOfColumn:col] != tightdb_Table) \
         return NO; \
-    if (![[desc getColumnName:col] isEqualToString:@#name]) \
+    if (![[desc columnNameOfColumn:col] isEqualToString:@#name]) \
         return NO; \
-    TightdbDescriptor* subdesc = [desc getSubdescriptor:col]; \
+    TightdbDescriptor* subdesc = [desc subdescriptorForColumnWithIndex:col]; \
     if (!subdesc) \
         return NO; \
     if (![type _checkType:subdesc]) \
@@ -130,9 +130,9 @@
 }
 #define TIGHTDB_CHECK_COLUMN_TYPE_4_N(desc, col, name, type) \
 { \
-    if ([desc getColumnType:col] != TIGHTDB_TYPE_ID_##type) \
+    if ([desc columnTypeOfColumn:col] != TIGHTDB_TYPE_ID_##type) \
         return NO; \
-    if (![[desc getColumnName:col] isEqualToString:@#name]) \
+    if (![[desc columnNameOfColumn:col] isEqualToString:@#name]) \
         return NO; \
 }
 
