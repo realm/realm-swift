@@ -61,91 +61,91 @@ using namespace std;
 @end
 
 
-@interface TightdbMixed()
-+(TightdbMixed*)mixedWithNativeMixed:(const tightdb::Mixed&)other;
+@interface TDBMixed()
++(TDBMixed*)mixedWithNativeMixed:(const tightdb::Mixed&)other;
 -(tightdb::Mixed&)getNativeMixed;
 @end
-@implementation TightdbMixed
+@implementation TDBMixed
 {
     tightdb::Mixed m_mixed;
     TDBTable* m_table;
 }
 
-+(TightdbMixed*)mixedWithBool:(BOOL)value
++(TDBMixed*)mixedWithBool:(BOOL)value
 {
-    TightdbMixed* mixed = [[TightdbMixed alloc] init];
+    TDBMixed* mixed = [[TDBMixed alloc] init];
     mixed->m_mixed = tightdb::Mixed(bool(value));
     mixed->m_table = nil;
     return mixed;
 }
 
-+(TightdbMixed*)mixedWithInt64:(int64_t)value
++(TDBMixed*)mixedWithInt64:(int64_t)value
 {
-    TightdbMixed* mixed = [[TightdbMixed alloc] init];
+    TDBMixed* mixed = [[TDBMixed alloc] init];
     mixed->m_mixed = tightdb::Mixed(value);
     mixed->m_table = nil;
     return mixed;
 }
 
-+(TightdbMixed*)mixedWithFloat:(float)value
++(TDBMixed*)mixedWithFloat:(float)value
 {
-    TightdbMixed* mixed = [[TightdbMixed alloc] init];
+    TDBMixed* mixed = [[TDBMixed alloc] init];
     mixed->m_mixed = tightdb::Mixed(value);
     mixed->m_table = nil;
     return mixed;
 }
 
-+(TightdbMixed*)mixedWithDouble:(double)value
++(TDBMixed*)mixedWithDouble:(double)value
 {
-    TightdbMixed* mixed = [[TightdbMixed alloc] init];
+    TDBMixed* mixed = [[TDBMixed alloc] init];
     mixed->m_mixed = tightdb::Mixed(value);
     mixed->m_table = nil;
     return mixed;
 }
 
-+(TightdbMixed*)mixedWithString:(NSString*)value
++(TDBMixed*)mixedWithString:(NSString*)value
 {
-    TightdbMixed* mixed = [[TightdbMixed alloc] init];
+    TDBMixed* mixed = [[TDBMixed alloc] init];
     mixed->m_mixed = tightdb::Mixed(ObjcStringAccessor(value));
     mixed->m_table = nil;
     return mixed;
 }
 
-+(TightdbMixed*)mixedWithBinary:(TDBBinary*)value
++(TDBMixed*)mixedWithBinary:(TDBBinary*)value
 {
-    TightdbMixed* mixed = [[TightdbMixed alloc] init];
+    TDBMixed* mixed = [[TDBMixed alloc] init];
     mixed->m_mixed = tightdb::Mixed([value getNativeBinary]);
     mixed->m_table = nil;
     return mixed;
 }
 
-+(TightdbMixed*)mixedWithBinary:(const char*)data size:(size_t)size
++(TDBMixed*)mixedWithBinary:(const char*)data size:(size_t)size
 {
-    TightdbMixed* mixed = [[TightdbMixed alloc] init];
+    TDBMixed* mixed = [[TDBMixed alloc] init];
     mixed->m_mixed = tightdb::Mixed(tightdb::BinaryData(data, size));
     mixed->m_table = nil;
     return mixed;
 }
 
-+(TightdbMixed*)mixedWithDate:(time_t)value
++(TDBMixed*)mixedWithDate:(time_t)value
 {
-    TightdbMixed* mixed = [[TightdbMixed alloc] init];
+    TDBMixed* mixed = [[TDBMixed alloc] init];
     mixed->m_mixed = tightdb::Mixed(tightdb::DateTime(value));
     mixed->m_table = nil;
     return mixed;
 }
 
-+(TightdbMixed*)mixedWithTable:(TDBTable*)value
++(TDBMixed*)mixedWithTable:(TDBTable*)value
 {
-    TightdbMixed* mixed = [[TightdbMixed alloc] init];
+    TDBMixed* mixed = [[TDBMixed alloc] init];
     mixed->m_mixed = tightdb::Mixed(tightdb::Mixed::subtable_tag());
     mixed->m_table = value;
     return mixed;
 }
 
-+(TightdbMixed*)mixedWithNativeMixed:(const tightdb::Mixed&)value
++(TDBMixed*)mixedWithNativeMixed:(const tightdb::Mixed&)value
 {
-    TightdbMixed* mixed = [[TightdbMixed alloc] init];
+    TDBMixed* mixed = [[TDBMixed alloc] init];
     mixed->m_mixed = value;
     mixed->m_table = nil;
     return mixed;
@@ -156,7 +156,7 @@ using namespace std;
     return m_mixed;
 }
 
--(BOOL)isEqual:(TightdbMixed*)other
+-(BOOL)isEqual:(TDBMixed*)other
 {
     tightdb::DataType type = m_mixed.get_type();
     if (type != other->m_mixed.get_type())
@@ -354,7 +354,7 @@ using namespace std;
     return view_2;
 }
 
--(id)_initWithQuery:(TightdbQuery*)query
+-(id)_initWithQuery:(TDBQuery*)query
 {
     self = [super init];
     if (self) {
@@ -450,11 +450,11 @@ using namespace std;
 {
     return m_view->get_int(colIndex, rowIndex);
 }
--(TightdbMixed *)mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
+-(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
 {
     tightdb::Mixed mixed = m_view->get_mixed(colNdx, rowIndex);
     if (mixed.get_type() != tightdb::type_Table)
-        return [TightdbMixed mixedWithNativeMixed:mixed];
+        return [TDBMixed mixedWithNativeMixed:mixed];
     
     tightdb::TableRef table = m_view->get_subtable(colNdx, rowIndex);
     if (!table)
@@ -468,7 +468,7 @@ using namespace std;
     if (![table_2 _checkType])
         return nil;
     
-    return [TightdbMixed mixedWithTable:table_2];
+    return [TDBMixed mixedWithTable:table_2];
 }
 
 -(NSString*)stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
@@ -916,11 +916,11 @@ using namespace std;
     return table_2;
 }
 
--(TightdbMixed*)mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
+-(TDBMixed*)mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
 {
     tightdb::Mixed mixed = m_table->get_mixed(colNdx, rowIndex);
     if (mixed.get_type() != tightdb::type_Table)
-        return [TightdbMixed mixedWithNativeMixed:mixed];
+        return [TDBMixed mixedWithNativeMixed:mixed];
 
     tightdb::TableRef table = m_table->get_subtable(colNdx, rowIndex);
     if (!table)
@@ -934,7 +934,7 @@ using namespace std;
     if (![table_2 _checkType])
         return nil;
 
-    return [TightdbMixed mixedWithTable:table_2];
+    return [TDBMixed mixedWithTable:table_2];
 }
 
 
@@ -997,7 +997,7 @@ using namespace std;
         tightdb_Table);
 }
 
--(void)setMixed:(TightdbMixed*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)setMixed:(TDBMixed*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     const tightdb::Mixed& mixed = [value getNativeMixed];
     TDBTable* subtable = mixed.get_type() == tightdb::type_Table ? [value getTable] : nil;
@@ -1246,12 +1246,12 @@ using namespace std;
     return TightdbType(m_table->get_mixed_type(colIndex, rowIndex));
 }
 
--(BOOL)TDBInsertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(TightdbMixed*)value
+-(BOOL)TDBInsertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(TDBMixed*)value
 {
     return [self TDBInsertMixed:col_ndx ndx:row_ndx value:value error:nil];
 }
 
--(BOOL)TDBInsertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(TightdbMixed*)value error:(NSError* __autoreleasing*)error
+-(BOOL)TDBInsertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(TDBMixed*)value error:(NSError* __autoreleasing*)error
 {
     if (m_read_only) {
         if (error)
@@ -1328,7 +1328,7 @@ using namespace std;
 {
     return m_table->find_first_datetime(colIndex, aDate);
 }
--(NSUInteger)findRowIndexWithMixed:(TightdbMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex
+-(NSUInteger)findRowIndexWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex
 {
     static_cast<void>(colIndex);
     static_cast<void>(aMixed);
@@ -1373,7 +1373,7 @@ using namespace std;
     tightdb::TableView view = m_table->find_all_datetime(colIndex, aDate);
     return [TDBView viewWithTable:self andNativeView:view];
 }
--(TDBView*)findAllRowsWithMixed:(TightdbMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex
+-(TDBView*)findAllRowsWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex
 {
     static_cast<void>(colIndex);
     static_cast<void>(aMixed);
@@ -1384,14 +1384,14 @@ using namespace std;
     return 0;
 }
 
--(TightdbQuery*)where
+-(TDBQuery*)where
 {
     return [self whereWithError:nil];
 }
 
--(TightdbQuery*)whereWithError:(NSError* __autoreleasing*)error
+-(TDBQuery*)whereWithError:(NSError* __autoreleasing*)error
 {
-    return [[TightdbQuery alloc] initWithTable:self error:error];
+    return [[TDBQuery alloc] initWithTable:self error:error];
 }
 
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex
@@ -1498,7 +1498,7 @@ using namespace std;
 @end
 
 
-@implementation TightdbColumnProxy
+@implementation TDBColumnProxy
 @synthesize table = _table, column = _column;
 -(id)initWithTable:(TDBTable*)table column:(NSUInteger)column
 {
@@ -1515,14 +1515,14 @@ using namespace std;
 }
 @end
 
-@implementation TightdbColumnProxy_Bool
+@implementation TDBColumnProxy_Bool
 -(NSUInteger)find:(BOOL)value
 {
     return [self.table findRowIndexWithBool:value inColumnWithIndex:self.column ];
 }
 @end
 
-@implementation TightdbColumnProxy_Int
+@implementation TDBColumnProxy_Int
 -(NSUInteger)find:(int64_t)value
 {
     return [self.table findRowIndexWithInt:value inColumnWithIndex:self.column ];
@@ -1545,7 +1545,7 @@ using namespace std;
 }
 @end
 
-@implementation TightdbColumnProxy_Float
+@implementation TDBColumnProxy_Float
 -(NSUInteger)find:(float)value
 {
     return [self.table findRowIndexWithFloat:value inColumnWithIndex:self.column];
@@ -1568,7 +1568,7 @@ using namespace std;
 }
 @end
 
-@implementation TightdbColumnProxy_Double
+@implementation TDBColumnProxy_Double
 -(NSUInteger)find:(double)value
 {
     return [self.table findRowIndexWithDouble:value inColumnWithIndex:self.column];
@@ -1591,32 +1591,32 @@ using namespace std;
 }
 @end
 
-@implementation TightdbColumnProxy_String
+@implementation TDBColumnProxy_String
 -(NSUInteger)find:(NSString*)value
 {
     return [self.table findRowIndexWithString:value inColumnWithIndex:self.column];
 }
 @end
 
-@implementation TightdbColumnProxy_Binary
+@implementation TDBColumnProxy_Binary
 -(NSUInteger)find:(TDBBinary*)value
 {
     return [self.table findRowIndexWithBinary:value inColumnWithIndex:self.column];
 }
 @end
 
-@implementation TightdbColumnProxy_Date
+@implementation TDBColumnProxy_Date
 -(NSUInteger)find:(time_t)value
 {
     return [self.table findRowIndexWithDate:value inColumnWithIndex:self.column];
 }
 @end
 
-@implementation TightdbColumnProxy_Subtable
+@implementation TDBColumnProxy_Subtable
 @end
 
-@implementation TightdbColumnProxy_Mixed
--(NSUInteger)find:(TightdbMixed*)value
+@implementation TDBColumnProxy_Mixed
+-(NSUInteger)find:(TDBMixed*)value
 {
     return [self.table findRowIndexWithMixed:value inColumnWithIndex:self.column];
 }
