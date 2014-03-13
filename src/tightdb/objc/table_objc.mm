@@ -185,9 +185,9 @@ using namespace std;
     return NO;
 }
 
--(TightdbType)getType
+-(TDBType)getType
 {
-    return TightdbType(m_mixed.get_type());
+    return TDBType(m_mixed.get_type());
 }
 
 -(BOOL)getBool
@@ -254,12 +254,12 @@ using namespace std;
 
 // FIXME: Provide a version of this method that takes a 'const char*'. This will simplify _addColumns of MyTable.
 // FIXME: Detect errors from core library
--(BOOL)addColumnWithName:(NSString*)name andType:(TightdbType)type
+-(BOOL)addColumnWithName:(NSString*)name andType:(TDBType)type
 {
     return [self addColumnWithName:name andType:type error:nil];
 }
 
--(BOOL)addColumnWithName:(NSString*)name andType:(TightdbType)type error:(NSError* __autoreleasing*)error
+-(BOOL)addColumnWithName:(NSString*)name andType:(TDBType)type error:(NSError* __autoreleasing*)error
 {
     if (m_read_only) {
         if (error)
@@ -311,9 +311,9 @@ using namespace std;
 {
     return m_desc->get_column_count();
 }
--(TightdbType)columnTypeOfColumn:(NSUInteger)colIndex
+-(TDBType)columnTypeOfColumn:(NSUInteger)colIndex
 {
-    return (TightdbType)m_desc->get_column_type(colIndex);
+    return (TDBType)m_desc->get_column_type(colIndex);
 }
 -(NSString*)columnNameOfColumn:(NSUInteger)colIndex
 {
@@ -400,10 +400,10 @@ using namespace std;
     return m_view->get_column_count();
 }
 
--(TightdbType)columnTypeOfColumn:(NSUInteger)colNdx
+-(TDBType)columnTypeOfColumn:(NSUInteger)colNdx
 {
     TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colNdx);
-    return TightdbType(m_view->get_column_type(colNdx));
+    return TDBType(m_view->get_column_type(colNdx));
 }
 -(void)sortUsingColumnWithIndex:(NSUInteger)colIndex
 {
@@ -411,7 +411,7 @@ using namespace std;
 }
 -(void)sortUsingColumnWithIndex:(NSUInteger)colIndex  inOrder: (TightdbSortOrder)order
 {
-    TightdbType columnType = [self columnTypeOfColumn:colIndex];
+    TDBType columnType = [self columnTypeOfColumn:colIndex];
     
     if(columnType != tightdb_Int && columnType != tightdb_Bool && columnType != tightdb_Date) {
         NSException* exception = [NSException exceptionWithName:@"tightdb:sort_on_column_with_type_not_supported"
@@ -675,9 +675,9 @@ using namespace std;
 {
     return m_table->get_column_index(ObjcStringAccessor(name));
 }
--(TightdbType)columnTypeOfColumn:(NSUInteger)ndx
+-(TDBType)columnTypeOfColumn:(NSUInteger)ndx
 {
-    return TightdbType(m_table->get_column_type(ndx));
+    return TDBType(m_table->get_column_type(ndx));
 }
 -(TDBDescriptor*)descriptor
 {
@@ -984,7 +984,7 @@ using namespace std;
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_datetime(col_ndx, row_ndx, value);,
-        tightdb_Date);
+       tightdb_Date);
 }
 
 -(void)setTable:(TDBTable*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
@@ -1241,9 +1241,9 @@ using namespace std;
 
 
 
--(TightdbType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(TDBType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
-    return TightdbType(m_table->get_mixed_type(colIndex, rowIndex));
+    return TDBType(m_table->get_mixed_type(colIndex, rowIndex));
 }
 
 -(BOOL)TDBInsertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(TDBMixed*)value
@@ -1273,12 +1273,12 @@ using namespace std;
 }
 
 
--(NSUInteger)addColumnWithName:(NSString*)name andType:(TightdbType)type
+-(NSUInteger)addColumnWithName:(NSString*)name andType:(TDBType)type
 {
     return [self addColumnWithType:type andName:name error:nil];
 }
 
--(NSUInteger)addColumnWithType:(TightdbType)type andName:(NSString*)name error:(NSError* __autoreleasing*)error
+-(NSUInteger)addColumnWithType:(TDBType)type andName:(NSString*)name error:(NSError* __autoreleasing*)error
 {
     TIGHTDB_EXCEPTION_ERRHANDLER(
         return m_table->add_column(tightdb::DataType(type), ObjcStringAccessor(name));,

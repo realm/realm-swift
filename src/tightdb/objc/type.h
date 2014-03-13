@@ -31,7 +31,7 @@ typedef enum {
     tightdb_Date   =  7,
     tightdb_Table  =  5,
     tightdb_Mixed  =  6,
-} TightdbType;
+} TDBType;
 
 
 typedef enum {
