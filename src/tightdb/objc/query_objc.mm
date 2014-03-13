@@ -33,7 +33,7 @@ using namespace std;
     tightdb::util::UniquePtr<tightdb::Query> m_query;
     __weak TDBTable* m_table;
 
-    TightdbCursor* m_tmp_cursor;
+    TDBRow* m_tmp_cursor;
 }
 
 -(id)initWithTable:(TDBTable*)table
@@ -53,10 +53,10 @@ using namespace std;
     return self;
 }
 
--(TightdbCursor*)getCursor:(long)ndx
+-(TDBRow*)getCursor:(long)ndx
 {
 
-    return m_tmp_cursor = [[TightdbCursor alloc] initWithTable:[self originTable] ndx:ndx];
+    return m_tmp_cursor = [[TDBRow alloc] initWithTable:[self originTable] ndx:ndx];
 }
 
 -(long)getFastEnumStart
@@ -76,11 +76,11 @@ using namespace std;
     {
         state->state = [self getFastEnumStart];
         state->mutationsPtr = (unsigned long*)objc_unretainedPointer(self);
-        TightdbCursor* tmp = [self getCursor:state->state];
+        TDBRow* tmp = [self getCursor:state->state];
         *stackbuf = tmp;
     }
     if ((int)state->state != -1) {
-        [((TightdbCursor*)*stackbuf) TDBSetNdx:state->state];
+        [((TDBRow*)*stackbuf) TDBSetNdx:state->state];
         state->itemsPtr = stackbuf;
         state->state = [self incrementFastEnum:state->state+1];
     } else {

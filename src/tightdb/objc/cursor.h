@@ -24,7 +24,7 @@
 @class TightdbBinary;
 @class TightdbMixed;
 
-@interface TightdbCursor: NSObject
+@interface TDBRow: NSObject
 -(id)initWithTable:(TDBTable *)table ndx:(NSUInteger)ndx;
 -(void)TDBSetNdx:(NSUInteger)ndx;
 -(NSUInteger)TDBIndex;
@@ -57,7 +57,7 @@
    TIGHTDB_CURSOR_PROPERTY macros similar to what is done for query
    accessors. */
 @interface TightdbAccessor: NSObject
--(id)initWithCursor:(TightdbCursor *)cursor columnId:(NSUInteger)columnId;
+-(id)initWithCursor:(TDBRow *)cursor columnId:(NSUInteger)columnId;
 -(BOOL)getBool;
 -(void)setBool:(BOOL)value;
 -(int64_t)getInt;

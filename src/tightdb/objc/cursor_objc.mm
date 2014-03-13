@@ -14,11 +14,11 @@ using namespace std;
 
 // TODO: Concept for cursor invalidation (when table updates).
 
-@interface TightdbCursor()
+@interface TDBRow()
 @property (nonatomic, weak) TDBTable *table;
 @property (nonatomic) NSUInteger ndx;
 @end
-@implementation TightdbCursor
+@implementation TDBRow
 @synthesize table = _table;
 @synthesize ndx = _ndx;
 
@@ -45,7 +45,7 @@ using namespace std;
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"TightdbCursor dealloc");
+    NSLog(@"TDBRow dealloc");
 #endif
     _table = nil;
 }
@@ -145,11 +145,11 @@ using namespace std;
 
 @implementation TightdbAccessor
 {
-    __weak TightdbCursor *_cursor;
+    __weak TDBRow *_cursor;
     size_t _columnId;
 }
 
--(id)initWithCursor:(TightdbCursor *)cursor columnId:(NSUInteger)columnId
+-(id)initWithCursor:(TDBRow *)cursor columnId:(NSUInteger)columnId
 {
     self = [super init];
     if (self) {
