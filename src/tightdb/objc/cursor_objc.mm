@@ -143,7 +143,7 @@ using namespace std;
 @end
 
 
-@implementation TightdbAccessor
+@implementation TDBAccessor
 {
     __weak TDBRow *_cursor;
     size_t _columnId;
