@@ -20,26 +20,26 @@
 
 +(const int)getMajor
 {
-    return Tightdb_Version_Major;
+    return TDB_Version_Major;
 }
 
 +(const int)getMinor
 {
-    return Tightdb_Version_Minor;
+    return TDB_Version_Minor;
 }
 
 +(const int)getPatch
 {
-    return Tightdb_Version_Patch;
+    return TDB_Version_Patch;
 }
 
 +(BOOL)isAtLeast:(int)major minor:(int)minor patch:(int)patch
 {
-    if (major < Tightdb_Version_Major)
+    if (major < TDB_Version_Major)
         return NO;
-    if (minor < Tightdb_Version_Minor)
+    if (minor < TDB_Version_Minor)
         return NO;
-    if (patch < Tightdb_Version_Patch)
+    if (patch < TDB_Version_Patch)
         return NO;
     return YES;
 }
