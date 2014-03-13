@@ -25,7 +25,7 @@
 @class TDBTable;
 @class TDBView;
 @class TightdbQuery;
-@class TightdbCursor;
+@class TDBRow;
 
 
 @interface TightdbBinary: NSObject
@@ -63,7 +63,7 @@
 @end
 
 
-@interface TightdbDescriptor: NSObject
+@interface TDBDescriptor: NSObject
 
 @property (nonatomic, readonly) NSUInteger columnCount;
 
@@ -75,10 +75,10 @@
 /**
  * Returns nil on memory allocation error.
  */
--(TightdbDescriptor *)addColumnTable:(NSString *)name;
--(TightdbDescriptor *)addColumnTable:(NSString *)name error:(NSError *__autoreleasing *)error;
--(TightdbDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex;
--(TightdbDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex error:(NSError *__autoreleasing *)error;
+-(TDBDescriptor *)addColumnTable:(NSString *)name;
+-(TDBDescriptor *)addColumnTable:(NSString *)name error:(NSError *__autoreleasing *)error;
+-(TDBDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex;
+-(TDBDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex error:(NSError *__autoreleasing *)error;
 
 -(TightdbType)columnTypeOfColumn:(NSUInteger)colIndex;
 -(NSString *)columnNameOfColumn:(NSUInteger)colIndex;
@@ -89,7 +89,7 @@
 @interface TDBTable: NSObject <NSFastEnumeration>
 
 @property (nonatomic, readonly) NSUInteger columnCount;
-@property (nonatomic, readonly) TightdbDescriptor *descriptor;
+@property (nonatomic, readonly) TDBDescriptor *descriptor;
 @property (nonatomic, readonly) NSUInteger rowCount;
 
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
@@ -126,7 +126,7 @@
 -(TightdbType)columnTypeOfColumn:(NSUInteger)colIndex;
 
 
--(TightdbCursor *)addEmptyRow;
+-(TDBRow *)addEmptyRow;
 
 /* Only curser based add should be public. This is just a temporaray way to hide the methods. */
 /* TODO: Move to class extension. */
@@ -137,12 +137,12 @@
 -(BOOL)removeRowAtIndex:(NSUInteger)rowIndex;
 -(BOOL)removeLastRow;
 
--(TightdbCursor *)objectAtIndexedSubscript:(NSUInteger)ndx; /* object subscripting */
--(TightdbCursor *)rowAtIndex:(NSUInteger)rowIndex;
--(TightdbCursor *)lastRow;
--(TightdbCursor *)firstRow;
+-(TDBRow *)objectAtIndexedSubscript:(NSUInteger)ndx; /* object subscripting */
+-(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
+-(TDBRow *)lastRow;
+-(TDBRow *)firstRow;
 
--(TightdbCursor *)insertEmptyRowAtIndex:(NSUInteger)ndx;
+-(TDBRow *)insertEmptyRowAtIndex:(NSUInteger)ndx;
 
 -(BOOL)appendRow:(NSArray *)data;
 
@@ -267,7 +267,7 @@
 @property (nonatomic, readonly) NSUInteger columnCount;
 @property (nonatomic, readonly) TDBTable *originTable;
 
--(TightdbCursor *)rowAtIndex:(NSUInteger)rowIndex;
+-(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
 
 -(TightdbType)columnTypeOfColumn:(NSUInteger)colIndex;
 

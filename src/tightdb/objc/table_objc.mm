@@ -232,21 +232,21 @@ using namespace std;
 @end
 
 
-@interface TightdbDescriptor()
-+(TightdbDescriptor*)descWithDesc:(tightdb::Descriptor*)desc readOnly:(BOOL)read_only error:(NSError* __autoreleasing*)error;
+@interface TDBDescriptor()
++(TDBDescriptor*)descWithDesc:(tightdb::Descriptor*)desc readOnly:(BOOL)read_only error:(NSError* __autoreleasing*)error;
 @end
 
-@implementation TightdbDescriptor
+@implementation TDBDescriptor
 {
     tightdb::DescriptorRef m_desc;
     BOOL m_read_only;
 }
 
 
-+(TightdbDescriptor*)descWithDesc:(tightdb::Descriptor*)desc readOnly:(BOOL)read_only error:(NSError* __autoreleasing*)error
++(TDBDescriptor*)descWithDesc:(tightdb::Descriptor*)desc readOnly:(BOOL)read_only error:(NSError* __autoreleasing*)error
 {
     static_cast<void>(error);
-    TightdbDescriptor* desc_2 = [[TightdbDescriptor alloc] init];
+    TDBDescriptor* desc_2 = [[TDBDescriptor alloc] init];
     desc_2->m_desc.reset(desc);
     desc_2->m_read_only = read_only;
     return desc_2;
@@ -275,12 +275,12 @@ using namespace std;
 
 
 
--(TightdbDescriptor*)addColumnTable:(NSString*)name
+-(TDBDescriptor*)addColumnTable:(NSString*)name
 {
     return [self addColumnTable:name error:nil];
 }
 
--(TightdbDescriptor*)addColumnTable:(NSString*)name error:(NSError* __autoreleasing*)error
+-(TDBDescriptor*)addColumnTable:(NSString*)name error:(NSError* __autoreleasing*)error
 {
     if (m_read_only) {
         if (error)
@@ -290,20 +290,20 @@ using namespace std;
     TIGHTDB_EXCEPTION_ERRHANDLER(
         tightdb::DescriptorRef subdesc;
         m_desc->add_column(tightdb::type_Table, ObjcStringAccessor(name), &subdesc);
-        return [TightdbDescriptor descWithDesc:subdesc.get() readOnly:FALSE error:error];,
+        return [TDBDescriptor descWithDesc:subdesc.get() readOnly:FALSE error:error];,
         nil);
 }
 
--(TightdbDescriptor*)subdescriptorForColumnWithIndex:(NSUInteger)col_ndx
+-(TDBDescriptor*)subdescriptorForColumnWithIndex:(NSUInteger)col_ndx
 {
     return [self subdescriptorForColumnWithIndex:col_ndx error:nil];
 }
 
--(TightdbDescriptor*)subdescriptorForColumnWithIndex:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
+-(TDBDescriptor*)subdescriptorForColumnWithIndex:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
 {
     TIGHTDB_EXCEPTION_ERRHANDLER(
         tightdb::DescriptorRef subdesc = m_desc->get_subdescriptor(col_ndx);
-        return [TightdbDescriptor descWithDesc:subdesc.get() readOnly:m_read_only error:error];,
+        return [TDBDescriptor descWithDesc:subdesc.get() readOnly:m_read_only error:error];,
         nil);
 }
 
@@ -326,7 +326,7 @@ using namespace std;
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"TightdbDescriptor dealloc");
+    NSLog(@"TDBDescriptor dealloc");
 #endif
 }
 
@@ -338,7 +338,7 @@ using namespace std;
 {
     tightdb::util::UniquePtr<tightdb::TableView> m_view;
     TDBTable* m_table;
-    TightdbCursor* m_tmp_cursor;
+    TDBRow* m_tmp_cursor;
     BOOL m_read_only;
 }
 
@@ -379,7 +379,7 @@ using namespace std;
     m_table = nil; // FIXME: What is the point of doing this?
 }
 
--(TightdbCursor*)rowAtIndex:(NSUInteger)ndx
+-(TDBRow*)rowAtIndex:(NSUInteger)ndx
 {
     // The cursor constructor checks the index is in bounds. However, getSourceIndex should
     // not be called with illegal index.
@@ -387,7 +387,7 @@ using namespace std;
     if (ndx >= self.rowCount)
         return nil;
 
-    return [[TightdbCursor alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
+    return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
 }
 
 -(NSUInteger)rowCount
@@ -497,9 +497,9 @@ using namespace std;
     return m_view->get_source_ndx(rowIndex);
 }
 
--(TightdbCursor*)getCursor
+-(TDBRow*)getCursor
 {
-    return m_tmp_cursor = [[TightdbCursor alloc] initWithTable: m_table
+    return m_tmp_cursor = [[TDBRow alloc] initWithTable: m_table
                                                            ndx: m_view->get_source_ndx(0)];
 }
 
@@ -509,11 +509,11 @@ using namespace std;
     if(state->state == 0) {
         const unsigned long* ptr = static_cast<const unsigned long*>(objc_unretainedPointer(self));
         state->mutationsPtr = const_cast<unsigned long*>(ptr); // FIXME: This casting away of constness seems dangerous. Is it?
-        TightdbCursor* tmp = [self getCursor];
+        TDBRow* tmp = [self getCursor];
         *stackbuf = tmp;
     }
     if (state->state < self.rowCount) {
-        [((TightdbCursor*)*stackbuf) TDBSetNdx:[self rowIndexInOriginTableForRowAtIndex:state->state]];
+        [((TDBRow*)*stackbuf) TDBSetNdx:[self rowIndexInOriginTableForRowAtIndex:state->state]];
         state->itemsPtr = stackbuf;
         state->state++;
     }
@@ -534,7 +534,7 @@ using namespace std;
     tightdb::TableRef m_table;
     id m_parent;
     BOOL m_read_only;
-    TightdbCursor* m_tmp_cursor;
+    TDBRow* m_tmp_cursor;
 }
 
 
@@ -561,9 +561,9 @@ using namespace std;
     // Dummy - must be overridden in tightdb.h - Check if spec matches the macro definitions
 }
 
--(TightdbCursor*)getCursor
+-(TDBRow*)getCursor
 {
-    return m_tmp_cursor = [[TightdbCursor alloc] initWithTable:self ndx:0];
+    return m_tmp_cursor = [[TDBRow alloc] initWithTable:self ndx:0];
 }
 -(void)clearCursor
 {
@@ -579,11 +579,11 @@ using namespace std;
     if(state->state == 0) {
         const unsigned long* ptr = static_cast<const unsigned long*>(objc_unretainedPointer(self));
         state->mutationsPtr = const_cast<unsigned long*>(ptr); // FIXME: This casting away of constness seems dangerous. Is it?
-        TightdbCursor* tmp = [self getCursor];
+        TDBRow* tmp = [self getCursor];
         *stackbuf = tmp;
     }
     if (state->state < self.rowCount) {
-        [((TightdbCursor*)*stackbuf) TDBSetNdx:state->state];
+        [((TDBRow*)*stackbuf) TDBSetNdx:state->state];
         state->itemsPtr = stackbuf;
         state->state++;
     }
@@ -679,15 +679,15 @@ using namespace std;
 {
     return TightdbType(m_table->get_column_type(ndx));
 }
--(TightdbDescriptor*)descriptor
+-(TDBDescriptor*)descriptor
 {
     return [self descriptorWithError:nil];
 }
--(TightdbDescriptor*)descriptorWithError:(NSError* __autoreleasing*)error
+-(TDBDescriptor*)descriptorWithError:(NSError* __autoreleasing*)error
 {
     tightdb::DescriptorRef desc = m_table->get_descriptor();
     BOOL read_only = m_read_only || m_table->has_shared_type();
-    return [TightdbDescriptor descWithDesc:desc.get() readOnly:read_only error:error];
+    return [TDBDescriptor descWithDesc:desc.get() readOnly:read_only error:error];
 }
 
 -(NSUInteger)rowCount //Synthesize property
@@ -695,15 +695,15 @@ using namespace std;
     return m_table->size();
 }
 
--(TightdbCursor*)addEmptyRow
+-(TDBRow*)addEmptyRow
 {
-    return [[TightdbCursor alloc] initWithTable:self ndx:[self TDBAddEmptyRow]];
+    return [[TDBRow alloc] initWithTable:self ndx:[self TDBAddEmptyRow]];
 }
 
--(TightdbCursor*)insertEmptyRowAtIndex:(NSUInteger)ndx
+-(TDBRow*)insertEmptyRowAtIndex:(NSUInteger)ndx
 {
     [self TDBInsertRow:ndx];
-    return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
+    return [[TDBRow alloc] initWithTable:self ndx:ndx];
 }
 
 -(BOOL)TDBInsertRow:(NSUInteger)ndx
@@ -754,33 +754,33 @@ using namespace std;
     return index;
 }
 
--(TightdbCursor *)objectAtIndexedSubscript:(NSUInteger)ndx
+-(TDBRow *)objectAtIndexedSubscript:(NSUInteger)ndx
 {
-    return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
+    return [[TDBRow alloc] initWithTable:self ndx:ndx];
 }
 
 
--(TightdbCursor*)rowAtIndex:(NSUInteger)ndx
+-(TDBRow*)rowAtIndex:(NSUInteger)ndx
 {
     // initWithTable checks for illegal index.
 
-    return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
+    return [[TDBRow alloc] initWithTable:self ndx:ndx];
 }
 
--(TightdbCursor*)lastRow //FIXME must return nil, of table is empty. Consider property
+-(TDBRow*)lastRow //FIXME must return nil, of table is empty. Consider property
 {
-    return [[TightdbCursor alloc] initWithTable:self ndx:self.rowCount-1];
+    return [[TDBRow alloc] initWithTable:self ndx:self.rowCount-1];
 }
 
--(TightdbCursor*)firstRow //FIXME must return nil, of table is empty. Consider property
+-(TDBRow*)firstRow //FIXME must return nil, of table is empty. Consider property
 {
-    return [[TightdbCursor alloc] initWithTable:self ndx:0];
+    return [[TDBRow alloc] initWithTable:self ndx:0];
 }
 
--(TightdbCursor*)insertRowAtIndex:(NSUInteger)ndx
+-(TDBRow*)insertRowAtIndex:(NSUInteger)ndx
 {
     [self insertEmptyRowAtIndex:ndx];
-    return [[TightdbCursor alloc] initWithTable:self ndx:ndx];
+    return [[TDBRow alloc] initWithTable:self ndx:ndx];
 }
 
 -(BOOL)appendRow:(NSArray*)data

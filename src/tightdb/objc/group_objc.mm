@@ -15,7 +15,7 @@
 using namespace std;
 
 
-@implementation TightdbGroup
+@implementation TDBGroup
 {
     tightdb::Group* m_group;
     BOOL m_is_owned;
@@ -23,9 +23,9 @@ using namespace std;
 }
 
 
-+(TightdbGroup*)group
++(TDBGroup*)group
 {
-    TightdbGroup* group = [[TightdbGroup alloc] init];
+    TDBGroup* group = [[TDBGroup alloc] init];
     try {
         group->m_group = new tightdb::Group;
     }
@@ -43,9 +43,9 @@ using namespace std;
 
 // Private.
 // Careful with this one - Remember that group will be deleted on dealloc.
-+(TightdbGroup*)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only
++(TDBGroup*)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only
 {
-    TightdbGroup* group_2 = [[TightdbGroup alloc] init];
+    TDBGroup* group_2 = [[TDBGroup alloc] init];
     group_2->m_group = group;
     group_2->m_is_owned  = is_owned;
     group_2->m_read_only = read_only;
@@ -53,9 +53,9 @@ using namespace std;
 }
 
 
-+(TightdbGroup *)groupWithFile:(NSString *)filename withError:(NSError **)error
++(TDBGroup *)groupWithFile:(NSString *)filename withError:(NSError **)error
 {
-    TightdbGroup* group = [[TightdbGroup alloc] init];
+    TDBGroup* group = [[TDBGroup alloc] init];
     if (!group)
         return nil;
     try {
@@ -91,9 +91,9 @@ using namespace std;
 }
 
 
-+(TightdbGroup*)groupWithBuffer:(TightdbBinary*)buffer withError:(NSError**)error
++(TDBGroup*)groupWithBuffer:(TightdbBinary*)buffer withError:(NSError**)error
 {
-    TightdbGroup* group = [[TightdbGroup alloc] init];
+    TDBGroup* group = [[TDBGroup alloc] init];
     if (!group)
         return nil;
     try {
