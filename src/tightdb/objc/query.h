@@ -74,7 +74,6 @@
 -(TightdbQuery *)binaryIsEqualTo:(TightdbBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
 
 
--(TightdbQuery *)boolIsNotEqualTo:(bool)aBool inColumnWithIndex:(NSUInteger)colIndex;
 -(TightdbQuery *)intIsNotEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(TightdbQuery *)floatIsNotEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
 -(TightdbQuery *)doubleIsNotEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;

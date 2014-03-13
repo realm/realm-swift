@@ -285,141 +285,151 @@ using namespace std;
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger) colNdx isNotEqualToInt:(int64_t)value
+// Not equal to
+
+-(TightdbQuery*)intIsNotEqualTo:(int64_t)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->not_equal(colNdx, value);
+    m_query->not_equal(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isNotEqualToFloat:(float)value
+-(TightdbQuery*)floatIsNotEqualTo:(float)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->not_equal(colNdx, value);
+    m_query->not_equal(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isNotEqualToDouble:(double)value
+-(TightdbQuery*)doubleIsNotEqualTo:(double)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->not_equal(colNdx, value);
+    m_query->not_equal(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isNotEqualToString:(NSString*)value
+-(TightdbQuery*)stringIsNotEqualTo:(NSString*)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->not_equal(colNdx, ObjcStringAccessor(value));
+    m_query->not_equal(colIndex, ObjcStringAccessor(value), true);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isNotEqualToString:(NSString*)value caseSensitive:(bool)caseSensitive
+-(TightdbQuery*)stringIsNotCaseInsensitiveEqualTo:(NSString*)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->not_equal(colNdx, ObjcStringAccessor(value), caseSensitive);
+    m_query->not_equal(colIndex, ObjcStringAccessor(value), false);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isNotEqualToDate:(time_t)value
+-(TightdbQuery*)dateIsNotEqualTo:(time_t)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->not_equal_datetime(colNdx, value);
+    m_query->not_equal_datetime(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isNotEqualToBinary:(TightdbBinary*)value
+-(TightdbQuery*)binaryIsNotEqualTo:(TightdbBinary*)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->not_equal(colNdx, [value getNativeBinary]);
+    m_query->not_equal(colIndex, [value getNativeBinary]);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isGreaterThanInt:(int64_t)value
+// Greater than
+
+-(TightdbQuery*)intIsGreaterThan:(int64_t)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->greater(colNdx, value);
+    m_query->greater(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isGreaterThanFloat:(float)value
+-(TightdbQuery*)floatIsGreaterThan:(float)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->greater(colNdx, value);
+    m_query->greater(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isGreaterThanDouble:(double)value
+-(TightdbQuery*)doubleIsGreaterThan:(double)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->greater(colNdx, value);
+    m_query->greater(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isGreaterThanDate:(time_t)value
+-(TightdbQuery*)dateIsGreaterThan:(time_t)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->greater_datetime(colNdx, value);
+    m_query->greater_datetime(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isGreaterThanOrEqualToInt:(int64_t)value
+// Greater thanOrEqualTo
+
+-(TightdbQuery*)intIsGreaterThanOrEqualTo:(int64_t)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->greater_equal(colNdx, value);
+    m_query->greater_equal(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isGreaterThanOrEqualToFloat:(float)value
+-(TightdbQuery*)floatIsGreaterThanOrEqualTo:(float)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->greater_equal(colNdx, value);
+    m_query->greater_equal(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isGreaterThanOrEqualToDouble:(double)value
+-(TightdbQuery*)doubleIsGreaterThanOrEqualTo:(double)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->greater_equal(colNdx, value);
+    m_query->greater_equal(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isGreaterThanOrEqualToDate:(time_t)value
+-(TightdbQuery*)dateIsGreaterThanOrEqualTo:(time_t)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->greater_equal_datetime(colNdx, value);
+    m_query->greater_equal_datetime(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isLessThanInt:(int64_t)value
+// Less than
+
+-(TightdbQuery*)intIsLessThan:(int64_t)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->less(colNdx, value);
+    m_query->less(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isLessThanFloat:(float)value
+-(TightdbQuery*)floatIsLessThan:(float)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->less(colNdx, value);
+    m_query->less(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isLessThanDouble:(double)value
+-(TightdbQuery*)doubleIsLessThan:(double)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->less(colNdx, value);
+    m_query->less(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isLessThanDate:(time_t)value
+-(TightdbQuery*)dateIsLessThan:(time_t)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->less_datetime(colNdx, value);
+    m_query->less_datetime(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isLessThanOrEqualToInt:(int64_t)value
+// Less thanOrEqualTo
+
+-(TightdbQuery*)intIsLessThanOrEqualTo:(int64_t)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->less_equal(colNdx, value);
+    m_query->less_equal(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isLessThanOrEqualToFloat:(float)value
+-(TightdbQuery*)floatIsLessThanOrEqualTo:(float)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->less_equal(colNdx, value);
+    m_query->less_equal(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isLessThanOrEqualToDouble:(double)value
+-(TightdbQuery*)doubleIsLessThanOrEqualTo:(double)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->less_equal(colNdx, value);
+    m_query->less_equal(colIndex, value);
     return self;
 }
 
--(TightdbQuery*)column:(NSUInteger)colNdx isLessThanOrEqualToDate:(time_t)value
+-(TightdbQuery*)dateIsLessThanOrEqualTo:(time_t)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->less_equal_datetime(colNdx, value);
+    m_query->less_equal_datetime(colIndex, value);
     return self;
 }
 
@@ -529,11 +539,11 @@ using namespace std;
     return _query;
 }
 
--(int64_t)minimum
+-(int64_t)min
 {
     return [_query minIntInColumnWithIndex:_column_ndx];
 }
--(int64_t)maximum
+-(int64_t)max
 {
     return [_query maxIntInColumnWithIndex:_column_ndx];
 }
@@ -541,7 +551,7 @@ using namespace std;
 {
     return [_query sumIntColumnWithIndex:_column_ndx];
 }
--(double)average
+-(double)avg
 {
     return [_query avgIntColumnWithIndex:_column_ndx];
 }
@@ -606,11 +616,11 @@ using namespace std;
     return _query;
 }
 
--(float)minimum
+-(float)min
 {
     return [_query minFloatInColumnWithIndex:_column_ndx];
 }
--(float)maximum
+-(float)max
 {
     return [_query maxFloatInColumnWithIndex:_column_ndx];
 }
@@ -618,7 +628,7 @@ using namespace std;
 {
     return [_query sumFloatColumnWithIndex:_column_ndx];
 }
--(double)average
+-(double)avg
 {
     return [_query avgFloatColumnWithIndex:_column_ndx];
 }
@@ -682,11 +692,11 @@ using namespace std;
     return _query;
 }
 
--(double)minimum
+-(double)min
 {
     return [_query minDoubleInColumnWithIndex:_column_ndx];
 }
--(double)maximum
+-(double)max
 {
     return [_query maxDoubleInColumnWithIndex:_column_ndx];
 }
@@ -695,7 +705,7 @@ using namespace std;
 {
     return [_query sumDoubleColumnWithIndex:_column_ndx];
 }
--(double)average
+-(double)avg
 {
     return [_query avgDoubleColumnWithIndex:_column_ndx];
 }
