@@ -26,6 +26,8 @@
 
 @interface TightdbGroup: NSObject
 
+@property (nonatomic, readonly) NSUInteger tableCount;
+
 +(TightdbGroup *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
 
 /**
@@ -38,10 +40,9 @@
 
 +(TightdbGroup *)group;
 
--(NSUInteger)getTableCount;
 -(NSString *)getTableName:(NSUInteger)table_ndx;
 
--(BOOL)hasTable:(NSString *)name;
+-(BOOL)hasTableWithName:(NSString *)name;
 
 /**
  * This method returns NO if it encounters a memory allocation error
@@ -50,13 +51,13 @@
  * The specified table class must be one that is declared by using
  * one of the table macros TIGHTDB_TABLE_*.
  */
--(BOOL)hasTable:(NSString *)name withClass:(Class)obj;
+-(BOOL)hasTableWithName:(NSString *)name withTableClass:(Class)obj;
 
 /**
  * This method returns nil if it encounters a memory allocation error
  * (out of memory).
  */
--(TightdbTable *)getTable:(NSString *)name error:(NSError *__autoreleasing *)error;
+-(TightdbTable *)getOrCreateTableWithName:(NSString *)name error:(NSError *__autoreleasing *)error;
 
 /**
  * This method returns nil if the group already contains a table with
@@ -67,10 +68,10 @@
  * The specified table class must be one that is declared by using
  * one of the table macros TIGHTDB_TABLE_*.
  */
--(id)getTable:(NSString *)name withClass:(Class)obj error:(NSError *__autoreleasing *)error;
+-(id)getOrCreateTableWithName:(NSString *)name asTableClass:(Class)obj error:(NSError *__autoreleasing *)error;
 
 /* Serialization */
--(BOOL)writeToFile:(NSString *)filePath withError:(NSError *__autoreleasing *)error;
+-(BOOL)writeToFile:(NSString *)path withError:(NSError *__autoreleasing *)error;
 
 /**
  * The ownership of the returned buffer is transferred to the

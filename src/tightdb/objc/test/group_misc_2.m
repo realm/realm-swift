@@ -42,11 +42,11 @@ TIGHTDB_TABLE_2(QueryTable,
 {
     size_t row;
     TightdbGroup* group = [TightdbGroup group];
-    NSLog(@"HasTable: %i", [group hasTable:@"employees" withClass:[MyTable class]] );
+    NSLog(@"HasTable: %i", [group hasTableWithName:@"employees" withTableClass:[MyTable class]] );
     // Create new table in group
-    MyTable* table = [group getTable:@"employees" withClass:[MyTable class] error:nil];
+    MyTable* table = [group getOrCreateTableWithName:@"employees" asTableClass:[MyTable class] error:nil];
     NSLog(@"Table: %@", table);
-    NSLog(@"HasTable: %i", [group hasTable:@"employees" withClass:[MyTable class]] );
+    NSLog(@"HasTable: %i", [group hasTableWithName:@"employees" withTableClass:[MyTable class]] );
 
     // Add some rows
     [table addName:@"John" Age:20 Hired:YES Spare:0];
@@ -55,7 +55,7 @@ TIGHTDB_TABLE_2(QueryTable,
     [table addName:@"Phil" Age:43 Hired:NO Spare:0];
     [table addName:@"Anni" Age:54 Hired:YES Spare:0];
 
-    NSLog(@"MyTable Size: %lu", [table count]);
+    NSLog(@"MyTable Size: %lu", table.rowCount);
 
     //------------------------------------------------------
 
@@ -67,7 +67,7 @@ TIGHTDB_TABLE_2(QueryTable,
     STAssertEquals(row, (size_t)1,@"Mary should have been there");
 
     MyTable_View *view = [[[table where].Age columnIsEqualTo:21] findAll];
-    size_t cnt = [view count];            // cnt = 2
+    size_t cnt = view.rowCount;            // cnt = 2
     STAssertEquals(cnt, (size_t)2,@"Should be two rows in view");
 
     //------------------------------------------------------
@@ -85,19 +85,19 @@ TIGHTDB_TABLE_2(QueryTable,
     MyTable2_Query* q = [[[table2 where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30];
 
     // Get number of matching entries
-    NSLog(@"Query count: %zu", [q count]);
-    STAssertEquals([q count], (size_t)2,@"Expected 2 rows in query");
+    NSLog(@"Query count: %zu", [q countRows]);
+    STAssertEquals([q countRows], (size_t)2,@"Expected 2 rows in query");
 
      // Get the average age - currently only a low-level interface!
-    double avg = [[q.Age average] doubleValue];
+    double avg = [q.Age avg];
     NSLog(@"Average: %f", avg);
     STAssertEquals(avg, 21.0,@"Expected 20.5 average");
 
     // Execute the query and return a table (view)
     TightdbView* res = [q findAll];
-    for (size_t i = 0; i < [res count]; i++) {
+    for (size_t i = 0; i < [res rowCount]; i++) {
         // cursor missing. Only low-level interface!
-        NSLog(@"%zu: is %lld years old",i , [res get:1 ndx:i]);
+        NSLog(@"%zu: is %lld years old",i , [res intInColumnWithIndex:1 atRowIndex:i]);
     }
 
     //------------------------------------------------------
@@ -110,16 +110,16 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Load a group from disk (and print contents)
     TightdbGroup* fromDisk = [TightdbGroup groupWithFile:@"employees.tightdb" withError:nil];
-    MyTable* diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class] error:nil];
+    MyTable* diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[MyTable class] error:nil];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
 //    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
-    NSLog(@"Disktable size: %zu", [diskTable count]);
-    for (size_t i = 0; i < [diskTable count]; i++) {
+    NSLog(@"Disktable size: %zu", diskTable.rowCount);
+    for (size_t i = 0; i < diskTable.rowCount; i++) {
         MyTable_Cursor* cursor = [diskTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, [cursor Name]);
         NSLog(@"%zu: %@", i, cursor.Name);
-        NSLog(@"%zu: %@", i, [diskTable getStringInColumn:0 atRow:i]);
+        NSLog(@"%zu: %@", i, [diskTable stringInColumnWithIndex:0 atRowIndex:i]);
     }
 
     // Write same group to memory buffer
@@ -127,8 +127,8 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Load a group from memory (and print contents)
     TightdbGroup* fromMem = [TightdbGroup groupWithBuffer:buffer withError:nil];
-    MyTable* memTable = [fromMem getTable:@"employees" withClass:[MyTable class] error:nil];
-    for (size_t i = 0; i < [memTable count]; i++) {
+    MyTable* memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[MyTable class] error:nil];
+    for (size_t i = 0; i < [memTable rowCount]; i++) {
         // ??? cursor
         NSLog(@"%zu: %@", i, memTable.Name);
     }
@@ -138,7 +138,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testQuery
 {
     TightdbGroup* group = [TightdbGroup group];
-    QueryTable* table = [group getTable:@"Query table" withClass:[QueryTable class] error:nil];
+    QueryTable* table = [group getOrCreateTableWithName:@"Query table" asTableClass:[QueryTable class] error:nil];
 
     // Add some rows
     [table addFirst:2 Second:@"a"];
@@ -148,42 +148,42 @@ TIGHTDB_TABLE_2(QueryTable,
 
     {
         QueryTable_Query* q = [[table where].First columnIsBetween:3 and_:7]; // Between
-        STAssertEquals((size_t)2,   [q count], @"count != 2");
+        STAssertEquals((size_t)2,   [q countRows], @"count != 2");
 //        STAssertEquals(9,   [q.First sum]); // Sum
-        STAssertEquals(4.5, [[q.First average] doubleValue], @"Avg!=4.5"); // Average
+        STAssertEquals(4.5, [q.First avg], @"Avg!=4.5"); // Average
 //        STAssertEquals(4,   [q.First min]); // Minimum
 //        STAssertEquals(5,   [q.First max]); // Maximum
     }
     {
         QueryTable_Query* q = [[table where].Second columnContains:@"quick" caseSensitive:NO]; // String contains
-        STAssertEquals((size_t)1, [q count], @"count != 1");
+        STAssertEquals((size_t)1, [q countRows], @"count != 1");
     }
     {
         QueryTable_Query* q = [[table where].Second columnBeginsWith:@"The" caseSensitive:NO]; // String prefix
-        STAssertEquals((size_t)1, [q count], @"count != 1");
+        STAssertEquals((size_t)1, [q countRows], @"count != 1");
     }
     {
         QueryTable_Query* q = [[table where].Second columnEndsWith:@"The" caseSensitive:NO]; // String suffix
-        STAssertEquals((size_t)0, [q count], @"count != 1");
+        STAssertEquals((size_t)0, [q countRows], @"count != 1");
     }
     {
         QueryTable_Query* q = [[[table where].Second columnIsNotEqualTo:@"a" caseSensitive:NO].Second columnIsNotEqualTo:@"b" caseSensitive:NO]; // And
-        STAssertEquals((size_t)1, [q count], @"count != 1");
+        STAssertEquals((size_t)1, [q countRows], @"count != 1");
     }
     {
-        QueryTable_Query* q = [[[[table where].Second columnIsNotEqualTo:@"a" caseSensitive:NO] or].Second columnIsNotEqualTo:@"b" caseSensitive:NO]; // Or
-        STAssertEquals((size_t)4, [q count], @"count != 1");
+        QueryTable_Query* q = [[[[table where].Second columnIsNotEqualTo:@"a" caseSensitive:NO] Or].Second columnIsNotEqualTo:@"b" caseSensitive:NO]; // Or
+        STAssertEquals((size_t)4, [q countRows], @"count != 1");
     }
     {
-        QueryTable_Query* q = [[[[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO] group].First columnIsLessThan:3] or].First columnIsGreaterThan:5] endgroup]; // Parentheses
-        STAssertEquals((size_t)1, [q count], @"count != 1");
+        QueryTable_Query* q = [[[[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO] group].First columnIsLessThan:3] Or].First columnIsGreaterThan:5] endGroup]; // Parentheses
+        STAssertEquals((size_t)1, [q countRows], @"count != 1");
     }
     {
-        QueryTable_Query* q = [[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO].First columnIsLessThan:3] or].First columnIsGreaterThan:5]; // No parenthesis
-        STAssertEquals((size_t)2, [q count], @"count != 2");
+        QueryTable_Query* q = [[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO].First columnIsLessThan:3] Or].First columnIsGreaterThan:5]; // No parenthesis
+        STAssertEquals((size_t)2, [q countRows], @"count != 2");
         TightdbView* tv = [q findAll];
-        STAssertEquals((size_t)2, [tv count], @"count != 2");
-        STAssertEquals((int64_t)8, [tv get:0 ndx:1], @"First != 8");
+        STAssertEquals((size_t)2, [tv rowCount], @"count != 2");
+        STAssertEquals((int64_t)8, [tv intInColumnWithIndex:0 atRowIndex:1], @"First != 8");
     }
 }
 
@@ -195,17 +195,17 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testSubtables
 {
     TightdbGroup* group = [TightdbGroup group];
-    TightdbTable* table = [group getTable:@"table" withClass:[TightdbTable class] error:nil];
+    TightdbTable* table = [group getOrCreateTableWithName:@"table" asTableClass:[TightdbTable class] error:nil];
 
     // Specify the table type
     {
-        TightdbDescriptor* desc = [table getDescriptor];
-        [desc addColumnWithType:tightdb_Int andName:@"int"];
+        TightdbDescriptor* desc = table.descriptor;
+        [desc addColumnWithName:@"int" andType:tightdb_Int];
         {
             TightdbDescriptor* subdesc = [desc addColumnTable:@"tab"];
-            [subdesc addColumnWithType:tightdb_Int andName:@"int"];
+            [subdesc addColumnWithName:@"int" andType:tightdb_Int];
         }
-        [desc addColumnWithType:tightdb_Mixed andName:@"mix"];
+        [desc addColumnWithName:@"mix" andType:tightdb_Mixed];
     }
 
     int COL_TABLE_INT = 0;
@@ -215,18 +215,18 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Add a row to the top level table
     [table addEmptyRow];
-    [table setInt:700 inColumn:COL_TABLE_INT atRow:0];
+    [table setInt:700 inColumnWithIndex:COL_TABLE_INT atRowIndex:0];
 
     // Add two rows to the subtable
-    TightdbTable* subtable = [table getTableInColumn:COL_TABLE_TAB atRow:0];
+    TightdbTable* subtable = [table tableInColumnWithIndex:COL_TABLE_TAB atRowIndex:0];
     [subtable addEmptyRow];
 
-    [subtable setInt:800 inColumn:COL_SUBTABLE_INT atRow:0];
+    [subtable setInt:800 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:0];
     [subtable addEmptyRow];
-    [subtable setInt:801 inColumn:COL_SUBTABLE_INT atRow:1];
+    [subtable setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
 
     // Make the mixed values column contain another subtable
-    [table setMixed:[TightdbMixed mixedWithTable:nil] inColumn:COL_TABLE_MIX atRow:0];
+    [table setMixed:[TightdbMixed mixedWithTable:nil] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
 
 /* Fails!!!
     // Specify its type

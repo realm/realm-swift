@@ -53,21 +53,21 @@ TIGHTDB_TABLE_2(TestTableGroup,
         STFail(@"From disk not valid");
 
     // Create new table in group
-    TestTableGroup *t = (TestTableGroup *)[fromDisk getTable:@"test" withClass:[TestTableGroup class] error:nil];
+    TestTableGroup *t = (TestTableGroup *)[fromDisk getOrCreateTableWithName:@"test" asTableClass:[TestTableGroup class] error:nil];
 
     // Verify
-    NSLog(@"Columns: %zu", [t getColumnCount]);
-    if ([t getColumnCount] != 2)
+    NSLog(@"Columns: %zu", t.columnCount);
+    if (t.columnCount != 2)
         STFail(@"Should have been 2 columns");
-    if ([t count] != 0)
+    if (t.rowCount != 0)
         STFail(@"Should have been empty");
 
     // Modify table
     [t addFirst:@"Test" Second:YES];
-    NSLog(@"Size: %lu", [t count]);
+    NSLog(@"Size: %lu", t.rowCount);
 
     // Verify
-    if ([t count] != 1)
+    if (t.rowCount != 1)
         STFail(@"Should have been one row");
 
     t = nil;
