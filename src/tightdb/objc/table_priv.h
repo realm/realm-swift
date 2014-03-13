@@ -6,7 +6,7 @@
 #import <Foundation/Foundation.h>
 
 
-@interface TightdbBinary()
+@interface TDBBinary()
 
 -(tightdb::BinaryData&)getNativeBinary;
 

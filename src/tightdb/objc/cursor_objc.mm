@@ -60,7 +60,7 @@ using namespace std;
     return [_table stringInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(TightdbBinary *)binaryInColumnWithIndex:(NSUInteger)colNdx
+-(TDBBinary *)binaryInColumnWithIndex:(NSUInteger)colNdx
 {
     return [_table binaryInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -105,7 +105,7 @@ using namespace std;
     [_table setString:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(void)setBinary:(TightdbBinary *)value inColumnWithIndex:(NSUInteger)colNdx
+-(void)setBinary:(TDBBinary *)value inColumnWithIndex:(NSUInteger)colNdx
 {
     [_table setBinary:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -209,12 +209,12 @@ using namespace std;
     [_cursor.table setString:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
--(TightdbBinary *)getBinary
+-(TDBBinary *)getBinary
 {
     return [_cursor.table binaryInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
--(void)setBinary:(TightdbBinary *)value
+-(void)setBinary:(TDBBinary *)value
 {
     [_cursor.table setBinary:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }

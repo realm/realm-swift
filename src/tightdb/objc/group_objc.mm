@@ -91,7 +91,7 @@ using namespace std;
 }
 
 
-+(TDBGroup*)groupWithBuffer:(TightdbBinary*)buffer withError:(NSError**)error
++(TDBGroup*)groupWithBuffer:(TDBBinary*)buffer withError:(NSError**)error
 {
     TDBGroup* group = [[TDBGroup alloc] init];
     if (!group)
@@ -172,9 +172,9 @@ using namespace std;
 }
 
 
--(TightdbBinary*)writeToBuffer
+-(TDBBinary*)writeToBuffer
 {
-    TightdbBinary* buffer = [[TightdbBinary alloc] init];
+    TDBBinary* buffer = [[TDBBinary alloc] init];
     if (!buffer)
         return nil;
     try {

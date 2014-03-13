@@ -279,7 +279,7 @@ using namespace std;
     return self;
 }
 
--(TightdbQuery*)binaryIsEqualTo:(TightdbBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex
+-(TightdbQuery*)binaryIsEqualTo:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->equal(colIndex, [aBinary getNativeBinary]);
     return self;
@@ -323,7 +323,7 @@ using namespace std;
     return self;
 }
 
--(TightdbQuery*)binaryIsNotEqualTo:(TightdbBinary*)value inColumnWithIndex:(NSUInteger)colIndex
+-(TightdbQuery*)binaryIsNotEqualTo:(TDBBinary*)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->not_equal(colIndex, [value getNativeBinary]);
     return self;
@@ -793,27 +793,27 @@ using namespace std;
     }
     return self;
 }
--(TightdbQuery*)columnIsEqualTo:(TightdbBinary*)value
+-(TightdbQuery*)columnIsEqualTo:(TDBBinary*)value
 {
     [_query getNativeQuery].equal(_column_ndx, [value getNativeBinary]);
     return _query;
 }
--(TightdbQuery*)columnIsNotEqualTo:(TightdbBinary*)value
+-(TightdbQuery*)columnIsNotEqualTo:(TDBBinary*)value
 {
     [_query getNativeQuery].not_equal(_column_ndx, [value getNativeBinary]);
     return _query;
 }
--(TightdbQuery*)columnBeginsWith:(TightdbBinary*)value
+-(TightdbQuery*)columnBeginsWith:(TDBBinary*)value
 {
     [_query getNativeQuery].begins_with(_column_ndx, [value getNativeBinary]);
     return _query;
 }
--(TightdbQuery*)columnEndsWith:(TightdbBinary*)value
+-(TightdbQuery*)columnEndsWith:(TDBBinary*)value
 {
     [_query getNativeQuery].ends_with(_column_ndx, [value getNativeBinary]);
     return _query;
 }
--(TightdbQuery*)columnContains:(TightdbBinary*)value
+-(TightdbQuery*)columnContains:(TDBBinary*)value
 {
     [_query getNativeQuery].contains(_column_ndx, [value getNativeBinary]);
     return _query;
