@@ -77,8 +77,8 @@
  */
 -(TightdbDescriptor *)addColumnTable:(NSString *)name;
 -(TightdbDescriptor *)addColumnTable:(NSString *)name error:(NSError *__autoreleasing *)error;
--(TightdbDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colNdx;
--(TightdbDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colNdx error:(NSError *__autoreleasing *)error;
+-(TightdbDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex error:(NSError *__autoreleasing *)error;
 
 -(TightdbType)columnTypeOfColumn:(NSUInteger)colIndex;
 -(NSString *)columnNameOfColumn:(NSUInteger)colIndex;
@@ -155,7 +155,7 @@
 -(TightdbBinary *)binaryInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(TightdbTable *)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(id)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(Class)tableClass;
--(TightdbMixed *)mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex;
+-(TightdbMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 
 -(void)setInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(void)setBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
@@ -169,28 +169,28 @@
 
 
 
--(BOOL)TDBInsertBool:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(BOOL)value;
--(BOOL)TDBInsertInt:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(int64_t)value;
--(BOOL)TDBInsertFloat:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(float)value;
--(BOOL)TDBInsertDouble:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(double)value;
--(BOOL)TDBInsertString:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(NSString *)value;
--(BOOL)TDBInsertBinary:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(TightdbBinary *)value;
--(BOOL)TDBInsertBinary:(NSUInteger)colNdx ndx:(NSUInteger)ndx data:(const char *)data size:(size_t)size;
--(BOOL)TDBInsertDate:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(time_t)value;
+-(BOOL)TDBInsertBool:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(BOOL)value;
+-(BOOL)TDBInsertInt:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(int64_t)value;
+-(BOOL)TDBInsertFloat:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(float)value;
+-(BOOL)TDBInsertDouble:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(double)value;
+-(BOOL)TDBInsertString:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(NSString *)value;
+-(BOOL)TDBInsertBinary:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(TightdbBinary *)value;
+-(BOOL)TDBInsertBinary:(NSUInteger)colIndex ndx:(NSUInteger)ndx data:(const char *)data size:(size_t)size;
+-(BOOL)TDBInsertDate:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(time_t)value;
 -(BOOL)TDBInsertDone;
 
 
 /* Subtables */
 
--(BOOL)TDBInsertSubtable:(NSUInteger)colNdx ndx:(NSUInteger)ndx;
--(BOOL)TDBInsertSubtable:(NSUInteger)colNdx ndx:(NSUInteger)ndx error:(NSError *__autoreleasing *)error;
+-(BOOL)TDBInsertSubtable:(NSUInteger)colIndex ndx:(NSUInteger)ndx;
+-(BOOL)TDBInsertSubtable:(NSUInteger)colIndex ndx:(NSUInteger)ndx error:(NSError *__autoreleasing *)error;
 
 
 /* Mixed */
 
 -(TightdbType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(BOOL)TDBInsertMixed:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(TightdbMixed *)value;
--(BOOL)TDBInsertMixed:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(TightdbMixed *)value error:(NSError *__autoreleasing *)error;
+-(BOOL)TDBInsertMixed:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(TightdbMixed *)value;
+-(BOOL)TDBInsertMixed:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(TightdbMixed *)value error:(NSError *__autoreleasing *)error;
 
 
 
@@ -255,8 +255,8 @@
 
 /* Private */
 -(id)_initRaw;
--(BOOL)TDBInsertSubtableCopy:(NSUInteger)colNdx row:(NSUInteger)rowNdx subtable:(TightdbTable *)subtable;
--(BOOL)TDBInsertSubtableCopy:(NSUInteger)colNdx row:(NSUInteger)rowNdx subtable:(TightdbTable *)subtable error:(NSError *__autoreleasing *)error;
+-(BOOL)TDBInsertSubtableCopy:(NSUInteger)colIndex row:(NSUInteger)rowNdx subtable:(TightdbTable *)subtable;
+-(BOOL)TDBInsertSubtableCopy:(NSUInteger)colIndex row:(NSUInteger)rowIndex subtable:(TightdbTable *)subtable error:(NSError *__autoreleasing *)error;
 @end
 
 
@@ -283,7 +283,7 @@
 //-(TightdbBinary *)binaryInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 //-(TightdbTable *)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 //-(id)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(Class)tableClass;
--(TightdbMixed *)mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex;
+-(TightdbMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 
 
 -(void)removeRowAtIndex:(NSUInteger)atRowIndex;
