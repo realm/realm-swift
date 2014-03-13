@@ -26,28 +26,28 @@
 
 @interface TightdbCursor: NSObject
 -(id)initWithTable:(TightdbTable *)table ndx:(NSUInteger)ndx;
--(void)setNdx:(NSUInteger)ndx;
--(NSUInteger)index;
+-(void)TDBSetNdx:(NSUInteger)ndx;
+-(NSUInteger)TDBIndex;
 
--(void)setInt:(int64_t)value inColumn:(NSUInteger)colNdx;
--(void)setString:(NSString *)value inColumn:(NSUInteger)colNdx;
--(void)setBool:(BOOL)value inColumn:(NSUInteger)colNdx;
--(void)setFloat:(float)value inColumn:(NSUInteger)colNdx;
--(void)setDouble:(double)value inColumn:(NSUInteger)colNdx;
--(void)setDate:(time_t)value inColumn:(NSUInteger)colNdx;
--(void)setBinary:(TightdbBinary *)value inColumn:(NSUInteger)colNdx;
--(void)setMixed:(TightdbMixed *)value inColumn:(NSUInteger)colNdx;
--(void)setTable:(TightdbTable *)value inColumn:(NSUInteger)colNdx;
+-(void)setInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setBinary:(TightdbBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setMixed:(TightdbMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setTable:(TightdbTable *)aTable inColumnWithIndex:(NSUInteger)colIndex;
 
--(int64_t)getIntInColumn:(NSUInteger)colNdx;
--(NSString *)getStringInColumn:(NSUInteger)colNdx;
--(BOOL)getBoolInColumn:(NSUInteger)colNdx;
--(float)getFloatInColumn:(NSUInteger)colNdx;
--(double)getDoubleInColumn:(NSUInteger)colNdx;
--(time_t)getDateInColumn:(NSUInteger)colNdx;
--(TightdbBinary *)getBinaryInColumn:(NSUInteger)colNdx;
--(TightdbMixed *)getMixedInColumn:(NSUInteger)colNdx;
--(TightdbTable *)getTableInColumn:(NSUInteger)colNdx;
+-(int64_t)intInColumnWithIndex:(NSUInteger)colIndex;
+-(NSString *)stringInColumnWithIndex:(NSUInteger)colIndex;
+-(BOOL)boolInColumnWithIndex:(NSUInteger)colIndex;
+-(float)floatInColumnWithIndex:(NSUInteger)colIndex;
+-(double)doubleInColumnWithIndex:(NSUInteger)colIndex;
+-(time_t)dateInColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbBinary *)binaryInColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbTable *)tableInColumnWithIndex:(NSUInteger)colIndex;
 
 @end
 

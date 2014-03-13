@@ -142,7 +142,7 @@ TIGHTDB_TABLE_2(SubMixedTable,
 
     TightdbGroup *group = [TightdbGroup group];
     // Create new table in group
-    MixedTable *table = [group getTable:@"MixedValues" withClass:[MixedTable class] error:nil];
+    MixedTable *table = [group getOrCreateTableWithName:@"MixedValues" asTableClass:[MixedTable class] error:nil];
     NSLog(@"Table: %@", table);
     // Add some rows
     TightdbMixed *mixedTable = [TightdbMixed mixedWithTable:tableSub];
@@ -162,18 +162,18 @@ TIGHTDB_TABLE_2(SubMixedTable,
 
     // Test cast and isClass
     TightdbTable *unknownTable = [mixedTable getTable];
-    NSLog(@"Is SubMixedTable type: %i", [unknownTable isClass:[SubMixedTable class]]);
-    STAssertEquals([unknownTable isClass:[SubMixedTable class]], YES,@"Unknown table should be of type SubMixedTable");
+    NSLog(@"Is SubMixedTable type: %i", [unknownTable hasSameDescriptorAs:[SubMixedTable class]]);
+    STAssertEquals([unknownTable hasSameDescriptorAs:[SubMixedTable class]], YES,@"Unknown table should be of type SubMixedTable");
     tableSub = [unknownTable castClass:[SubMixedTable class]];
-    NSLog(@"TableSub Size: %lu", [tableSub count]);
-    STAssertEquals([tableSub count], (size_t)5,@"Subtable should have 5 rows");
-    NSLog(@"Count int: %lu", [table countWithIntColumn:2 andValue:50]);
-    NSLog(@"Max: %lld", [table maximumWithIntColumn:2]);
-    NSLog(@"Avg: %.2f", [table averageWithIntColumn:2]);
+    NSLog(@"TableSub Size: %lu", [tableSub rowCount]);
+    STAssertEquals([tableSub rowCount], (size_t)5,@"Subtable should have 5 rows");
+    NSLog(@"Count int: %lu", [table countRowsWithInt:50 inColumnWithIndex:2]);
+    NSLog(@"Max: %lld", [table maxIntInColumnWithIndex:2]);
+    NSLog(@"Avg: %.2f", [table avgIntColumnWithIndex:2]);
 
-    NSLog(@"MyTable Size: %lu", [table count]);
+    NSLog(@"MyTable Size: %lu", [table rowCount]);
     int sumType = 0;
-    for (size_t i = 0; i < [table count]; i++) {
+    for (size_t i = 0; i < [table rowCount]; i++) {
         MixedTable_Cursor *cursor = [table cursorAtIndex:i];
         NSLog(@"%zu: %@", i, cursor.Other);
         NSLog(@"Type: %i", [cursor.Other getType] );

@@ -34,7 +34,7 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: insert_at_index @@
-    cursor = [people insertRowAtIndex:2];
+    cursor = [people insertEmptyRowAtIndex:2];
     cursor.Name = @"Frank";
     cursor.Age = 34;
     cursor.Hired = YES;
@@ -42,8 +42,8 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: number_of_rows @@
-    size_t cnt1 = [people count];                       // cnt = 6
-    BOOL empty = [people isEmpty];                      // empty = NO
+    size_t cnt1 = people.rowCount;                       // cnt = 6
+    BOOL empty = people.rowCount;                      // empty = NO
     // @@EndExample@@
 
     // @@Example: accessing_rows @@
@@ -71,11 +71,11 @@ void tableFunc() {
 
     // @@Example: deleting_row @@
     [people removeRowAtIndex:2];
-    size_t cnt2 = [people count];                      // cnt = 5
+    size_t cnt2 = [people rowCount];                      // cnt = 5
     // @@EndExample@@
 
     // @@Example: iteration @@
-    for (size_t i = 0; i < [people count]; ++i) {
+    for (size_t i = 0; i < people.rowCount; ++i) {
         PeopleTable_Cursor *row = [people cursorAtIndex:i];
         NSLog(@"%@ is %lld years old", row.Name, row.Age);
     }
@@ -93,14 +93,14 @@ void tableFunc() {
                                            .Age   columnIsBetween:20 and_:30];
 
     // Get number of matching entries
-    size_t cnt3 = [q count];                            // =&gt; 2
+    size_t cnt3 = [q countRows];                            // =&gt; 2
 
     // Get the average age (currently only a low-level interface)
-    NSNumber *avg = [q.Age average];
+    double avg = [q.Age avg];
 
     // Execute the query and return a table (view)
     PeopleTable_View *res = [q findAll];
-    for (size_t i = 0; i < [res count]; ++i) {
+    for (size_t i = 0; i < res.rowCount; ++i) {
         NSLog(@"%zu: %@ is %lld years old", i,
               [people cursorAtIndex:i].Name,
               [people cursorAtIndex:i].Age);
@@ -124,12 +124,12 @@ void sharedGroupFunc() {
     [sharedGroup writeWithBlock:^(TightdbGroup *group) {
 
         // Get a specific table from the group
-        PeopleTable *table = [group getTable:  @"employees"
-                                    withClass: [PeopleTable class]
+        PeopleTable *table = [group getOrCreateTableWithName: @"employees"
+                                    asTableClass: [PeopleTable class]
                                     error:     nil];
 
         // Rollback if the table is not empty
-        if ([table count] > 0) {
+        if (table.rowCount > 0) {
             NSLog(@"Not empty!");
             return NO; // Rollback
         }
@@ -145,8 +145,8 @@ void sharedGroupFunc() {
     [sharedGroup readWithBlock:^(TightdbGroup *group) {
 
         // Get the table
-        PeopleTable *table = [group getTable:  @"employees"
-                                    withClass: [PeopleTable class]
+        PeopleTable *table = [group getOrCreateTableWithName:  @"employees"
+                                    asTableClass: [PeopleTable class]
                                     error:     nil];
 
         // Interate over all rows in table
