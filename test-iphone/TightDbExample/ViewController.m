@@ -113,7 +113,7 @@ TIGHTDB_TABLE_2(MyTable2,
 
 
     // Get the average age - currently only a low-level interface!
-    double avg = [q.Age average];
+    double avg = [q.Age avg];
     NSLog(@"Average: %f", avg);
     [_utils Eval: avg== 21.0 msg:@"Expected 20.5 average"];
 

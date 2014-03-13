@@ -96,7 +96,7 @@ void tableFunc() {
     size_t cnt3 = [q countRows];                            // =&gt; 2
 
     // Get the average age (currently only a low-level interface)
-    double avg = [q.Age average];
+    double avg = [q.Age avg];
 
     // Execute the query and return a table (view)
     PeopleTable_View *res = [q findAll];
