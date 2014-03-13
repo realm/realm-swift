@@ -14,8 +14,8 @@
 -(void)testTableDeleteAll
 {
     // Create table with all column types
-    TightdbTable* table = [[TightdbTable alloc] init];
-    TightdbDescriptor* desc = [table descriptor];
+    TDBTable* table = [[TDBTable alloc] init];
+    TDBDescriptor* desc = [table descriptor];
     [desc addColumnWithName:@"int" andType:tightdb_Int];
     [desc addColumnWithName:@"bool" andType:tightdb_Bool];
     [desc addColumnWithName:@"date" andType:tightdb_Date];
@@ -24,7 +24,7 @@
     [desc addColumnWithName:@"string_enum" andType:tightdb_String];
     [desc addColumnWithName:@"binary" andType:tightdb_Binary];
     [desc addColumnWithName:@"mixed" andType:tightdb_Mixed];
-    TightdbDescriptor* subdesc = [desc addColumnTable:@"tables"];
+    TDBDescriptor* subdesc = [desc addColumnTable:@"tables"];
     [subdesc addColumnWithName:@"sub_first" andType:tightdb_Int];
     [subdesc addColumnWithName:@"sub_second" andType:tightdb_String];
 
@@ -51,13 +51,13 @@
         [table TDBInsertBinary:6 ndx:i data:"binary" size:7];
         switch (i % 3) {
             case 0:
-                [table TDBInsertMixed:7 ndx:i value:[TightdbMixed mixedWithBool:NO]];
+                [table TDBInsertMixed:7 ndx:i value:[TDBMixed mixedWithBool:NO]];
                 break;
             case 1:
-                [table TDBInsertMixed:7 ndx:i value:[TightdbMixed mixedWithInt64:i]];
+                [table TDBInsertMixed:7 ndx:i value:[TDBMixed mixedWithInt64:i]];
                 break;
             case 2:
-                [table TDBInsertMixed:7 ndx:i value:[TightdbMixed mixedWithString:@"string"]];
+                [table TDBInsertMixed:7 ndx:i value:[TDBMixed mixedWithString:@"string"]];
                 break;
         }
         [table TDBInsertSubtable:8 ndx:i];
@@ -65,7 +65,7 @@
 
         // Add sub-tables
         if (i == 2) {
-            TightdbTable* subtable = [table tableInColumnWithIndex:8 atRowIndex:i];
+            TDBTable* subtable = [table tableInColumnWithIndex:8 atRowIndex:i];
             [subtable TDBInsertInt:0 ndx:0 value:42];
             [subtable TDBInsertString:1 ndx:0 value:@"meaning"];
             [subtable TDBInsertDone];

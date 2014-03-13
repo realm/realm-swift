@@ -152,13 +152,13 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
      *  Cursor in a table.
      */
 
-    TightdbTable *table = [[TightdbTable alloc] init];
+    TDBTable *table = [[TDBTable alloc] init];
 
     size_t const NAME = [table addColumnWithName:@"Name" andType:tightdb_String];
     size_t const AGE = [table addColumnWithName:@"Age" andType:tightdb_Int];
     size_t const HIRED = [table addColumnWithName:@"Hired" andType:tightdb_Bool];
 
-    TightdbCursor *cursor;
+    TDBRow *cursor;
 
     // Add rows
     for (int i = 0; i < TABLE_SIZE; i++) {
@@ -225,7 +225,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
      *  Cursor in a query.
      */
 
-    TightdbQuery *query = [[table where] stringIsNotEqualTo:@"Nothing is equal to this" inColumnWithIndex:NAME ];  // dummy query required right now
+    TDBQuery *query = [[table where] stringIsNotEqualTo:@"Nothing is equal to this" inColumnWithIndex:NAME ];  // dummy query required right now
     STAssertEquals([query countRows], (NSUInteger)(TABLE_SIZE-2), @"Check the size");
 
     i=0;
@@ -241,7 +241,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
      *  Cursor in table view.
      */
 
-    TightdbView *view = [[query boolIsEqualTo:YES inColumnWithIndex:HIRED] findAllRows];
+    TDBView *view = [[query boolIsEqualTo:YES inColumnWithIndex:HIRED] findAllRows];
     STAssertEquals([query countRows], (NSUInteger)(TABLE_SIZE-2)/2, @"Check the size");
 
     i=0;

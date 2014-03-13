@@ -24,16 +24,16 @@
 #import <tightdb/objc/tightdb.h>
 
 
-@interface TightdbDynamicTableTests: SenTestCase
+@interface TDBDynamicTableTests: SenTestCase
   // Intentionally left blank.
   // No new public instance methods need be defined.
 @end
 
-@implementation TightdbDynamicTableTests
+@implementation TDBDynamicTableTests
 
 - (void)testTable
 {
-    TightdbTable* _table = [[TightdbTable alloc] init];
+    TDBTable* _table = [[TDBTable alloc] init];
     NSLog(@"Table: %@", _table);
     STAssertNotNil(_table, @"Table is nil");
 
@@ -55,7 +55,7 @@
     //[_table set:0 ndx:ndx value:0];
     //[_table set:1 ndx:ndx value:10];
 
-    TightdbCursor* cursor = [_table addEmptyRow];
+    TDBRow* cursor = [_table addEmptyRow];
     size_t ndx = [cursor TDBIndex];
     [cursor setInt:0 inColumnWithIndex:0];
     [cursor setInt:10 inColumnWithIndex:1];
@@ -69,9 +69,9 @@
 
 -(void)testAddColumn
 {
-    TightdbTable *t = [[TightdbTable alloc] init];
+    TDBTable *t = [[TDBTable alloc] init];
     NSUInteger stringColIndex = [t addColumnWithName:@"stringCol" andType:tightdb_String];
-    TightdbCursor *row = [t addEmptyRow];
+    TDBRow *row = [t addEmptyRow];
     [row setString:@"val" inColumnWithIndex:stringColIndex];
     
     
@@ -80,7 +80,7 @@
 -(void)testAppendRowsIntColumn
 {
     // Add row using object literate
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Int];
     if (![t appendRow:@[ @1 ]])
         STFail(@"Impossible!");
@@ -102,7 +102,7 @@
 
 -(void)testAppendRowsIntStringColumns
 {
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Int];
     [t addColumnWithName:@"second" andType:tightdb_String];
     if (![t appendRow:@[@1, @"Hello"]])
@@ -119,7 +119,7 @@
 
 -(void)testAppendRowsDoubleColumn
 {
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Double];
     if (![t appendRow:@[@3.14]])  /* double is default */
         STFail(@"Cannot insert 'double'");
@@ -129,7 +129,7 @@
 
 -(void)testAppendRowsFloatColumn
 {
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Float];
     if (![t appendRow:@[@3.14F]])  /* F == float */
         STFail(@"Cannot insert 'float'");
@@ -139,7 +139,7 @@
 
 -(void)testAppendRowsDateColumn
 {
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Date];
     if (![t appendRow:@[@1000000000]])  /* 2001-09-09 01:46:40 */
         STFail(@"Cannot insert 'time_t'");
@@ -155,8 +155,8 @@
 -(void)testAppendRowsBinaryColumn
 {
     const char bin[4] = { 0, 1, 2, 3 };
-    TightdbBinary* bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Binary];
     if (![t appendRow:@[bin2]])
         STFail(@"Cannot insert 'binary'");
@@ -171,21 +171,21 @@
 
 -(void)testAppendRowsTooManyItems
 {
-    TightdbTable *t = [[TightdbTable alloc] init];
+    TDBTable *t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Int];
     STAssertFalse(([t appendRow:@[@1, @1]]), @"Too many items for a row.");
 }
 
 -(void)testAppendRowsTooFewItems
 {
-    TightdbTable *t = [[TightdbTable alloc] init];
+    TDBTable *t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Int];
     STAssertFalse(([t appendRow:@[]]), @"Too few items for a row.");
 }
 
 -(void)testAppendRowsWrongType
 {
-    TightdbTable *t = [[TightdbTable alloc] init];
+    TDBTable *t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Int];
     STAssertFalse(([t appendRow:@[@YES]]), @"Wrong type for column.");
     STAssertFalse(([t appendRow:@[@""]]), @"Wrong type for column.");
@@ -196,7 +196,7 @@
 
 -(void)testAppendRowsBoolColumn
 {
-    TightdbTable *t = [[TightdbTable alloc] init];
+    TDBTable *t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Bool];
     STAssertTrue(([t appendRow:@[@YES]]), @"Cannot append bool column.");
     STAssertTrue(([t appendRow:@[@NO]]), @"Cannot append bool column.");
@@ -205,10 +205,10 @@
 
 -(void)testAppendRowsIntSubtableColumns
 {
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Int];
-    TightdbDescriptor* descr = [t descriptor];
-    TightdbDescriptor* subdescr = [descr addColumnTable:@"second"];
+    TDBDescriptor* descr = [t descriptor];
+    TDBDescriptor* subdescr = [descr addColumnTable:@"second"];
     [subdescr addColumnWithName:@"TableCol_IntCol" andType:tightdb_Int];
     if (![t appendRow:@[@1, @[]]])
         STFail(@"1 row excepted");
@@ -223,9 +223,9 @@
 -(void)testAppendRowsMixedColumns
 {
     const char bin[4] = { 0, 1, 2, 3 };
-    TightdbBinary* bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
+    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
 
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Mixed];
     if (![t appendRow:@[@1]])
         STFail(@"Cannot insert 'int'");
@@ -252,7 +252,7 @@
     if ([t rowCount] != 6)
         STFail(@"6 rows excepted");
 
-    TightdbTable* _table10 = [[TightdbTable alloc] init];
+    TDBTable* _table10 = [[TDBTable alloc] init];
     [_table10 addColumnWithName:@"first" andType:tightdb_Bool];
     if (![_table10 appendRow:@[@YES]])
         STFail(@"Cannot insert 'bool'");
@@ -263,7 +263,7 @@
 -(void)testRemoveColumns
 {
     
-    TightdbTable *t = [[TightdbTable alloc] init];
+    TDBTable *t = [[TDBTable alloc] init];
     [t addColumnWithName:@"col0" andType:tightdb_Int];
     STAssertTrue([t columnCount] == 1,@"1 column added" );
     
@@ -294,32 +294,32 @@
 /*
 - (void)testColumnlessCount
 {
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBTable* t = [[TDBTable alloc] init];
     STAssertEquals((size_t)0, [t count], @"Columnless table has 0 rows.");     
 }
 
 - (void)testColumnlessIsEmpty
 {
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBTable* t = [[TDBTable alloc] init];
     STAssertTrue([t isEmpty], @"Columnless table is empty.");
 }
 
 - (void)testColumnlessClear
 {
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBTable* t = [[TDBTable alloc] init];
     [t clear];
 }
 
 - (void)testColumnlessOptimize
 {
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBTable* t = [[TDBTable alloc] init];
     [t optimize];
 }
 
 - (void)testColumnlessIsEqual
 {
-    TightdbTable* t1 = [[TightdbTable alloc] init];
-    TightdbTable* t2 = [[TightdbTable alloc] init];
+    TDBTable* t1 = [[TDBTable alloc] init];
+    TDBTable* t2 = [[TDBTable alloc] init];
     STAssertTrue([t1 isEqual:t1], @"Columnless table is equal to itself.");
     STAssertTrue([t1 isEqual:t2], @"Columnless table is equal to another columnless table.");
     STAssertTrue([t2 isEqual:t1], @"Columnless table is equal to another columnless table.");
@@ -327,13 +327,13 @@
 
 - (void)testColumnlessGetColumnCount
 {
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBTable* t = [[TDBTable alloc] init];
     STAssertEquals((size_t)0, [t getColumnCount], @"Columnless table has column count 0.");
 }
 
 - (void)testColumnlessGetColumnName
 {
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBTable* t = [[TDBTable alloc] init];
     STAssertThrowsSpecific([t getColumnName:((size_t)-1)],
         NSException, NSRangeException,
         @"Columnless table has no column names.");
@@ -347,7 +347,7 @@
 
 - (void)testColumnlessGetColumnType
 {
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBTable* t = [[TDBTable alloc] init];
     STAssertThrowsSpecific([t getColumnType:((size_t)-1)],
         NSException, NSRangeException,
         @"Columnless table has no column types.");
@@ -361,7 +361,7 @@
 
 - (void)testColumnlessCursorAtIndex
 {
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBTable* t = [[TDBTable alloc] init];
     STAssertThrowsSpecific([t cursorAtIndex:((size_t)-1)],
         NSException, NSRangeException,
         @"Columnless table has no cursors.");
@@ -375,7 +375,7 @@
 
 - (void)testColumnlessCursorAtLastIndex
 {
-    TightdbTable* t = [[TightdbTable alloc] init];
+    TDBTable* t = [[TDBTable alloc] init];
     STAssertThrowsSpecific([t cursorAtLastIndex],
         NSException, NSRangeException,
         @"Columnless table has no cursors."); 
@@ -383,7 +383,7 @@
 
 - (void)testRemoveRowAtIndex
 {
-    TightdbTable *t = [[TightdbTable alloc] init];
+    TDBTable *t = [[TDBTable alloc] init];
     STAssertThrowsSpecific([t removeRowAtIndex:((size_t)-1)],
         NSException, NSRangeException,
         @"No rows in a columnless table.");
@@ -397,7 +397,7 @@
 
 - (void)testColumnlessRemoveLastRow
 {
-    TightdbTable *t = [[TightdbTable alloc] init];
+    TDBTable *t = [[TDBTable alloc] init];
     STAssertThrowsSpecific([t removeLastRow],
         NSException, NSRangeException,
         @"No rows in a columnless table.");
@@ -405,7 +405,7 @@
 
 - (void)testColumnlessGetTableSize
 {
-    TightdbTable *t = [[TightdbTable alloc] init];
+    TDBTable *t = [[TDBTable alloc] init];
     STAssertThrowsSpecific([t getTableSize:((size_t)0) ndx:((size_t)-1)],
         NSException, NSRangeException,
         @"No rows in a columnless table.");
@@ -419,7 +419,7 @@
 
 - (void)testColumnlessClearSubtable
 {
-    TightdbTable *t = [[TightdbTable alloc] init];
+    TDBTable *t = [[TDBTable alloc] init];
     STAssertThrowsSpecific([t clearSubtable:((size_t)0) ndx:((size_t)-1)],
         NSException, NSRangeException,
         @"No rows in a columnless table.");
@@ -434,7 +434,7 @@
 - (void)testColumnlessSetIndex
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t setIndex:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -449,7 +449,7 @@
 - (void)testColumnlessHasIndex
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t hasIndex:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -464,7 +464,7 @@
 - (void)testColumnlessCountWithIntColumn
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t countWithIntColumn:((size_t)-1) andValue: 0],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -479,7 +479,7 @@
 - (void)testColumnlessCountWithFloatColumn
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t countWithFloatColumn:((size_t)-1) andValue: 0.0f],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -494,7 +494,7 @@
 - (void)testColumnlessCountWithDoubleColumn
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t countWithDoubleColumn:((size_t)-1) andValue: 0.0],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -509,7 +509,7 @@
 - (void)testColumnlessCountWithStringColumn
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t countWithStringColumn:((size_t)-1) andValue: @""],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -524,7 +524,7 @@
 - (void)testColumnlessSumWithIntColumn
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t sumWithIntColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -539,7 +539,7 @@
 - (void)testColumnlessSumWithFloatColumn
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t sumWithFloatColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -554,7 +554,7 @@
 - (void)testColumnlessSumWithDoubleColumn
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t sumWithDoubleColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -569,7 +569,7 @@
 - (void)testColumnlessMaximumWithIntColumn
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t maximumWithIntColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -584,7 +584,7 @@
 - (void)testColumnlessMaximumWithFloatColumn
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t maximumWithFloatColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -599,7 +599,7 @@
 - (void)testColumnlessMaximumWithDoubleColumn
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t maximumWithDoubleColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -614,7 +614,7 @@
 - (void)testColumnlessMinimumWithIntColumn
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t minimumWithIntColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -629,7 +629,7 @@
 - (void)testColumnlessMinimumWithFloatColumn
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t minimumWithFloatColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -644,7 +644,7 @@
 - (void)testColumnlessMinimumWithDoubleColumn
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t minimumWithDoubleColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -659,7 +659,7 @@
 - (void)testColumnlessAverageWithIntColumn
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t averageWithIntColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -674,7 +674,7 @@
 - (void)testColumnlessAverageWithFloatColumn
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t averageWithFloatColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -689,7 +689,7 @@
 - (void)testColumnlessAverageWithDoubleColumn
 {
 // SEGFAULT
-//    TightdbTable *t = [[TightdbTable alloc] init];
+//    TDBTable *t = [[TDBTable alloc] init];
 //    STAssertThrowsSpecific([t averageWithDoubleColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -703,11 +703,11 @@
 
 - (void)testDataTypes_Dynamic
 {
-    TightdbTable* table = [[TightdbTable alloc] init];
+    TDBTable* table = [[TDBTable alloc] init];
     NSLog(@"Table: %@", table);
     STAssertNotNil(table, @"Table is nil");
 
-    TightdbDescriptor* desc = [table descriptor];
+    TDBDescriptor* desc = [table descriptor];
 
     [desc addColumnWithName:@"BoolCol" andType:tightdb_Bool];    const size_t BoolCol = 0;
     [desc addColumnWithName:@"IntCol" andType:tightdb_Int];     const size_t IntCol = 1;
@@ -716,7 +716,7 @@
     [desc addColumnWithName:@"StringCol" andType:tightdb_String];  const size_t StringCol = 4;
     [desc addColumnWithName:@"BinaryCol" andType:tightdb_Binary];  const size_t BinaryCol = 5;
     [desc addColumnWithName:@"DateCol" andType:tightdb_Date];    const size_t DateCol = 6;
-    TightdbDescriptor* subdesc = [desc addColumnTable:@"TableCol"]; const size_t TableCol = 7;
+    TDBDescriptor* subdesc = [desc addColumnTable:@"TableCol"]; const size_t TableCol = 7;
     [desc addColumnWithName:@"MixedCol" andType:tightdb_Mixed];   const size_t MixedCol = 8;
 
     [subdesc addColumnWithName:@"TableCol_IntCol" andType:tightdb_Int];
@@ -734,20 +734,20 @@
 
 
     const char bin[4] = { 0, 1, 2, 3 };
-    TightdbBinary* bin1 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin / 2];
-    TightdbBinary* bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
+    TDBBinary* bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
+    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
     time_t timeNow = [[NSDate date] timeIntervalSince1970];
 
 
 
-    TightdbTable* subtab1 = [[TightdbTable alloc] init];
+    TDBTable* subtab1 = [[TDBTable alloc] init];
     [subtab1 addColumnWithName:@"TableCol_IntCol" andType:tightdb_Int];
 
-    TightdbTable* subtab2 = [[TightdbTable alloc] init];
+    TDBTable* subtab2 = [[TDBTable alloc] init];
     [subtab2 addColumnWithName:@"TableCol_IntCol" andType:tightdb_Int];
 
 
-    TightdbCursor* cursor;
+    TDBRow* cursor;
 
 
 
@@ -761,10 +761,10 @@
 
 
 
-    TightdbMixed* mixInt1   = [TightdbMixed mixedWithInt64:1];
-    TightdbMixed* mixSubtab = [TightdbMixed mixedWithTable:subtab2];
+    TDBMixed* mixInt1   = [TDBMixed mixedWithInt64:1];
+    TDBMixed* mixSubtab = [TDBMixed mixedWithTable:subtab2];
 
-    TightdbCursor* c;
+    TDBRow* c;
 
 
 
@@ -794,8 +794,8 @@
     [c setTable:   subtab2   inColumnWithIndex:TableCol];
     [c setMixed:   mixSubtab inColumnWithIndex:MixedCol];
 
-    TightdbCursor* row1 = [table rowAtIndex:0];
-    TightdbCursor* row2 = [table rowAtIndex:1];
+    TDBRow* row1 = [table rowAtIndex:0];
+    TDBRow* row2 = [table rowAtIndex:1];
 
     STAssertEquals([row1 boolInColumnWithIndex:BoolCol], NO, @"row1.BoolCol");
     STAssertEquals([row2 boolInColumnWithIndex:BoolCol], YES,                @"row2.BoolCol");
@@ -834,14 +834,14 @@
 
 - (void)testTableDynamic_Subscripting
 {
-    TightdbTable* _table = [[TightdbTable alloc] init];
+    TDBTable* _table = [[TDBTable alloc] init];
     STAssertNotNil(_table, @"Table is nil");
 
     // 1. Add two columns
     [_table addColumnWithName:@"first" andType:tightdb_Int];
     [_table addColumnWithName:@"second" andType:tightdb_String];
 
-    TightdbCursor* c;
+    TDBRow* c;
 
     // Add some rows
     c = [_table addEmptyRow];
