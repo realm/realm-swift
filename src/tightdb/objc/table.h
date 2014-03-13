@@ -65,7 +65,7 @@
 
 @interface TightdbDescriptor: NSObject
 
-@property (readonly) NSUInteger columnCount;
+@property (nonatomic, readonly) NSUInteger columnCount;
 
 /**
  * Returns NO on memory allocation error.
@@ -88,9 +88,9 @@
 
 @interface TightdbTable: NSObject <NSFastEnumeration>
 
-@property (readonly) NSUInteger columnCount;
-@property (readonly) TightdbDescriptor *descriptor;
-@property (readonly) NSUInteger rowCount;
+@property (nonatomic, readonly) NSUInteger columnCount;
+@property (nonatomic, readonly) TightdbDescriptor *descriptor;
+@property (nonatomic, readonly) NSUInteger rowCount;
 
 -(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
@@ -269,9 +269,9 @@
 
 @interface TightdbView: NSObject <NSFastEnumeration>
 
-@property (readonly) NSUInteger rowCount;
-@property (readonly) NSUInteger columnCount;
-@property (readonly) TightdbTable *originTable;
+@property (nonatomic, readonly) NSUInteger rowCount;
+@property (nonatomic, readonly) NSUInteger columnCount;
+@property (nonatomic, readonly) TightdbTable *originTable;
 
 -(TightdbCursor *)rowAtIndex:(NSUInteger)rowIndex;
 

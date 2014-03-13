@@ -26,7 +26,7 @@
 
 @interface TightdbGroup: NSObject
 
-@property (readonly) NSUInteger tableCount;
+@property (nonatomic, readonly) NSUInteger tableCount;
 
 +(TightdbGroup *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
 
