@@ -36,12 +36,12 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
                 TableCol,  TestTableSub,
                 MixedCol,  Mixed)
 
-@interface TightdbTypedTableTests: SenTestCase
+@interface TDBTypedTableTests: SenTestCase
   // Intentionally left blank.
   // No new public instance methods need be defined.
 @end
 
-@implementation TightdbTypedTableTests
+@implementation TDBTypedTableTests
 
 - (void)testDataTypes_Typed
 {
@@ -61,15 +61,15 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     STAssertEquals(tightdb_Mixed,  [table columnTypeOfColumn:8], @"Ninth column not mixed");
 
     const char bin[4] = { 0, 1, 2, 3 };
-    TightdbBinary* bin1 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin / 2];
-    TightdbBinary* bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
+    TDBBinary* bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
+    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
     time_t timeNow = [[NSDate date] timeIntervalSince1970];
     TestTableSub* subtab1 = [[TestTableSub alloc] init];
     TestTableSub* subtab2 = [[TestTableSub alloc] init];
     [subtab1 addAge:200];
     [subtab2 addAge:100];
-    TightdbMixed* mixInt1   = [TightdbMixed mixedWithInt64:1];
-    TightdbMixed* mixSubtab = [TightdbMixed mixedWithTable:subtab2];
+    TDBMixed* mixInt1   = [TDBMixed mixedWithInt64:1];
+    TDBMixed* mixSubtab = [TDBMixed mixedWithTable:subtab2];
 
     TestTableAllTypes_Cursor* c;
 

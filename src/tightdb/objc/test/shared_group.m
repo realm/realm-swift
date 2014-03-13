@@ -26,7 +26,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     // TODO: Update test to include more ASSERTS
 
 
-    TightdbGroup* group = [TightdbGroup group];
+    TDBGroup* group = [TDBGroup group];
     // Create new table in group
     SharedTable2 *table = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class] error:nil];
     NSLog(@"Table: %@", table);
@@ -47,9 +47,9 @@ TIGHTDB_TABLE_2(SharedTable2,
     [group writeToFile:@"employees.tightdb" withError:nil];
 
     // Read only shared group
-    TightdbSharedGroup* fromDisk = [TightdbSharedGroup sharedGroupWithFile:@"employees.tightdb" withError:nil];
+    TDBSharedGroup* fromDisk = [TDBSharedGroup sharedGroupWithFile:@"employees.tightdb" withError:nil];
 
-    [fromDisk readWithBlock:^(TightdbGroup* group) {
+    [fromDisk readWithBlock:^(TDBGroup* group) {
             SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class] error:nil];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < [diskTable rowCount]; i++) {
@@ -61,7 +61,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         }];
 
 
-    [fromDisk writeWithBlock:^(TightdbGroup* group) {
+    [fromDisk writeWithBlock:^(TDBGroup* group) {
             SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class] error:nil];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < 50; i++) {
@@ -71,7 +71,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         } withError:nil];
 
 
-    [fromDisk writeWithBlock:^(TightdbGroup* group) {
+    [fromDisk writeWithBlock:^(TDBGroup* group) {
             SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class] error:nil];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < 50; i++) {
@@ -81,7 +81,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         } withError:nil];
 
 
-    [fromDisk writeWithBlock:^(TightdbGroup* group) {
+    [fromDisk writeWithBlock:^(TDBGroup* group) {
             SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class] error:nil];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < 50; i++) {
@@ -90,7 +90,7 @@ TIGHTDB_TABLE_2(SharedTable2,
             return YES; // commit
         } withError:nil];
 
-    [fromDisk readWithBlock:^(TightdbGroup* group) {
+    [fromDisk readWithBlock:^(TDBGroup* group) {
             SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class] error:nil];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
         
@@ -108,25 +108,25 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:@"readonlyTest.tightdb" error:nil];
     [fm removeItemAtPath:@"readonlyTest.tightdb.lock" error:nil];
     
-    TightdbSharedGroup* fromDisk = [TightdbSharedGroup sharedGroupWithFile:@"readonlyTest.tightdb" withError:nil];
+    TDBSharedGroup* fromDisk = [TDBSharedGroup sharedGroupWithFile:@"readonlyTest.tightdb" withError:nil];
     
-    [fromDisk writeWithBlock:^(TightdbGroup *group) {
-        TightdbTable *t = [group getOrCreateTableWithName:@"table" error:nil];
+    [fromDisk writeWithBlock:^(TDBGroup *group) {
+        TDBTable *t = [group getOrCreateTableWithName:@"table" error:nil];
         
         [t addColumnWithName:@"col0" andType:tightdb_Int];
-        TightdbCursor *row = [t addEmptyRow];
+        TDBRow *row = [t addEmptyRow];
         [row setInt:10 inColumnWithIndex:0 ];
          
         return YES;
         
     } withError:nil];
     
-    [fromDisk readWithBlock:^(TightdbGroup* group) {
-        TightdbTable *t = [group getOrCreateTableWithName:@"table" error:nil];
+    [fromDisk readWithBlock:^(TDBGroup* group) {
+        TDBTable *t = [group getOrCreateTableWithName:@"table" error:nil];
        
-        TightdbQuery *q = [t where];
+        TDBQuery *q = [t where];
         
-        TightdbView *v = [q findAllRows];
+        TDBView *v = [q findAllRows];
         
         // Should not be allowed!
         STAssertThrows([v removeAllRows], @"Is in readTransaction");

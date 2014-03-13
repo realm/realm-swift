@@ -18,15 +18,15 @@ TIGHTDB_TABLE_2(TestTableGroup,
 @end
 @implementation MACTestGroup
 {
-    TightdbGroup *_group;
+    TDBGroup *_group;
 }
 
 - (void)setUp
 {
     [super setUp];
 
-    // _group = [TightdbGroup group];
-    // NSLog(@"TightdbGroup: %@", _group);
+    // _group = [TDBGroup group];
+    // NSLog(@"TDBGroup: %@", _group);
     // STAssertNotNil(_group, @"Group is nil");
 }
 
@@ -43,12 +43,12 @@ TIGHTDB_TABLE_2(TestTableGroup,
     NSFileManager *fm = [NSFileManager defaultManager];
 
     // Create empty group and serialize to disk
-    TightdbGroup *toDisk = [TightdbGroup group];
+    TDBGroup *toDisk = [TDBGroup group];
     [fm removeItemAtPath:@"table_test.tightdb" error:NULL];
     [toDisk writeToFile:@"table_test.tightdb" withError:nil];
 
     // Load the group
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFile:@"table_test.tightdb" withError:nil];
+    TDBGroup *fromDisk = [TDBGroup groupWithFile:@"table_test.tightdb" withError:nil];
     if (!fromDisk)
         STFail(@"From disk not valid");
 
