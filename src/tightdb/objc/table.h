@@ -51,7 +51,7 @@
 +(TDBMixed *)mixedWithDate:(time_t)value;
 +(TDBMixed *)mixedWithTable:(TDBTable *)value;
 -(BOOL)isEqual:(TDBMixed *)other;
--(TightdbType)getType;
+-(TDBType)getType;
 -(BOOL)getBool;
 -(int64_t)getInt;
 -(float)getFloat;
@@ -70,8 +70,8 @@
 /**
  * Returns NO on memory allocation error.
  */
--(BOOL)addColumnWithName:(NSString *)name andType:(TightdbType)type;
--(BOOL)addColumnWithName:(NSString *)name andType:(TightdbType)type error:(NSError *__autoreleasing *)error;
+-(BOOL)addColumnWithName:(NSString *)name andType:(TDBType)type;
+-(BOOL)addColumnWithName:(NSString *)name andType:(TDBType)type error:(NSError *__autoreleasing *)error;
 /**
  * Returns nil on memory allocation error.
  */
@@ -80,7 +80,7 @@
 -(TDBDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex;
 -(TDBDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex error:(NSError *__autoreleasing *)error;
 
--(TightdbType)columnTypeOfColumn:(NSUInteger)colIndex;
+-(TDBType)columnTypeOfColumn:(NSUInteger)colIndex;
 -(NSString *)columnNameOfColumn:(NSUInteger)colIndex;
 -(NSUInteger)indexOfColumnWithName:(NSString *)name;
 @end
@@ -119,11 +119,11 @@
 -(id)castClass:(Class)obj;
 
 /* Column meta info */
--(NSUInteger)addColumnWithName:(NSString *)name andType:(TightdbType)type;
+-(NSUInteger)addColumnWithName:(NSString *)name andType:(TDBType)type;
 -(void)removeColumnWithIndex:(NSUInteger)colIndex;
 -(NSString *)columnNameOfColumn:(NSUInteger)colIndex;
 -(NSUInteger)indexOfColumnWithName:(NSString *)name;
--(TightdbType)columnTypeOfColumn:(NSUInteger)colIndex;
+-(TDBType)columnTypeOfColumn:(NSUInteger)colIndex;
 
 
 -(TDBRow *)addEmptyRow;
@@ -188,7 +188,7 @@
 
 /* Mixed */
 
--(TightdbType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(TDBType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(BOOL)TDBInsertMixed:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(TDBMixed *)value;
 -(BOOL)TDBInsertMixed:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(TDBMixed *)value error:(NSError *__autoreleasing *)error;
 
@@ -269,7 +269,7 @@
 
 -(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
 
--(TightdbType)columnTypeOfColumn:(NSUInteger)colIndex;
+-(TDBType)columnTypeOfColumn:(NSUInteger)colIndex;
 
 -(void) sortUsingColumnWithIndex: (NSUInteger)colIndex;
 -(void) sortUsingColumnWithIndex: (NSUInteger)colIndex inOrder: (TightdbSortOrder)order;
