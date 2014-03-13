@@ -73,35 +73,36 @@
 -(TightdbQuery *)dateIsEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(TightdbQuery *)binaryIsEqualTo:(TightdbBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
 
-// Same for the following.......
 
--(TightdbQuery *)column:(NSUInteger)colNdx isNotEqualToInt:(int64_t)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isNotEqualToFloat:(float)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isNotEqualToDouble:(double)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isNotEqualToString:(NSString *)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isNotEqualToString:(NSString *)value caseSensitive:(bool)caseSensitive;
--(TightdbQuery *)column:(NSUInteger)colNdx isNotEqualToDate:(time_t)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isNotEqualToBinary:(TightdbBinary *)value;
+-(TightdbQuery *)intIsNotEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)floatIsNotEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)doubleIsNotEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)stringIsNotEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)stringIsNotCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)dateIsNotEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)binaryIsNotEqualTo:(TightdbBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
 
--(TightdbQuery *)column:(NSUInteger)colNdx isGreaterThanInt:(int64_t)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isGreaterThanFloat:(float)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isGreaterThanDouble:(double)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isGreaterThanDate:(time_t)value;
+-(TightdbQuery *)dateIsGreaterThan:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)intIsGreaterThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)floatIsGreaterThan:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)doubleIsGreaterThan:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
 
--(TightdbQuery *)column:(NSUInteger)colNdx isGreaterThanOrEqualToInt:(int64_t)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isGreaterThanOrEqualToFloat:(float)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isGreaterThanOrEqualToDouble:(double)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isGreaterThanOrEqualToDate:(time_t)value;
+-(TightdbQuery *)dateIsGreaterThanOrEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)intIsGreaterThanOrEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)floatIsGreaterThanOrEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)doubleIsGreaterThanOrEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
 
--(TightdbQuery *)column:(NSUInteger)colNdx isLessThanInt:(int64_t)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isLessThanFloat:(float)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isLessThanDouble:(double)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isLessThanDate:(time_t)value;
+-(TightdbQuery *)dateIsLessThan:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)intIsLessThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)floatIsLessThan:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)doubleIsLessThan:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
 
--(TightdbQuery *)column:(NSUInteger)colNdx isLessThanOrEqualToInt:(int64_t)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isLessThanOrEqualToFloat:(float)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isLessThanOrEqualToDouble:(double)value;
--(TightdbQuery *)column:(NSUInteger)colNdx isLessThanOrEqualToDate:(time_t)value;
+-(TightdbQuery *)dateIsLessThanOrEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)intIsLessThanOrEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)floatIsLessThanOrEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
+-(TightdbQuery *)doubleIsLessThanOrEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
+
+
 
 
 @end
@@ -125,10 +126,10 @@
 -(TightdbQuery *)columnIsLessThan:(int64_t)value;
 -(TightdbQuery *)columnIsLessThanOrEqualTo:(int64_t)value;
 -(TightdbQuery *)columnIsBetween:(int64_t)from and_:(int64_t)to;
--(int64_t)minimum;
--(int64_t)maximum;
+-(int64_t)min;
+-(int64_t)max;
 -(int64_t)sum;
--(double)average;
+-(double)avg;
 @end
 
 
@@ -141,10 +142,10 @@
 -(TightdbQuery *)columnIsLessThan:(float)value;
 -(TightdbQuery *)columnIsLessThanOrEqualTo:(float)value;
 -(TightdbQuery *)columnIsBetween:(float)from and_:(float)to;
--(float)minimum;
--(float)maximum;
+-(float)min;
+-(float)max;
 -(double)sum;
--(double)average;
+-(double)avg;
 @end
 
 
@@ -157,10 +158,10 @@
 -(TightdbQuery *)columnIsLessThan:(double)value;
 -(TightdbQuery *)columnIsLessThanOrEqualTo:(double)value;
 -(TightdbQuery *)columnIsBetween:(double)from and_:(double)to;
--(double)minimum;
--(double)maximum;
+-(double)min;
+-(double)max;
 -(double)sum;
--(double)average;
+-(double)avg;
 @end
 
 
