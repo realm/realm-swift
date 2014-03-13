@@ -20,9 +20,9 @@
 
 #import <Foundation/Foundation.h>
 
-#define Tightdb_Version_Major 0
-#define Tightdb_Version_Minor 3
-#define Tightdb_Version_Patch 0
+#define TDB_Version_Major 0
+#define TDB_Version_Minor 3
+#define TDB_Version_Patch 0
 
 @interface TDBVersion: NSObject
 -(id)init;
