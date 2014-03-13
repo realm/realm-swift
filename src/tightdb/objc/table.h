@@ -24,7 +24,7 @@
 
 @class TDBTable;
 @class TDBView;
-@class TightdbQuery;
+@class TDBQuery;
 @class TDBRow;
 
 
@@ -40,17 +40,17 @@
 @end
 
 
-@interface TightdbMixed: NSObject
-+(TightdbMixed *)mixedWithBool:(BOOL)value;
-+(TightdbMixed *)mixedWithInt64:(int64_t)value;
-+(TightdbMixed *)mixedWithFloat:(float)value;
-+(TightdbMixed *)mixedWithDouble:(double)value;
-+(TightdbMixed *)mixedWithString:(NSString *)value;
-+(TightdbMixed *)mixedWithBinary:(TDBBinary *)value;
-+(TightdbMixed *)mixedWithBinary:(const char *)data size:(size_t)size;
-+(TightdbMixed *)mixedWithDate:(time_t)value;
-+(TightdbMixed *)mixedWithTable:(TDBTable *)value;
--(BOOL)isEqual:(TightdbMixed *)other;
+@interface TDBMixed: NSObject
++(TDBMixed *)mixedWithBool:(BOOL)value;
++(TDBMixed *)mixedWithInt64:(int64_t)value;
++(TDBMixed *)mixedWithFloat:(float)value;
++(TDBMixed *)mixedWithDouble:(double)value;
++(TDBMixed *)mixedWithString:(NSString *)value;
++(TDBMixed *)mixedWithBinary:(TDBBinary *)value;
++(TDBMixed *)mixedWithBinary:(const char *)data size:(size_t)size;
++(TDBMixed *)mixedWithDate:(time_t)value;
++(TDBMixed *)mixedWithTable:(TDBTable *)value;
+-(BOOL)isEqual:(TDBMixed *)other;
 -(TightdbType)getType;
 -(BOOL)getBool;
 -(int64_t)getInt;
@@ -155,7 +155,7 @@
 -(TDBBinary *)binaryInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(id)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(Class)tableClass;
--(TightdbMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 
 -(void)setInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(void)setBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
@@ -165,7 +165,7 @@
 -(void)setString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
 -(void)setBinary:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
 -(void)setTable:(TDBTable *)aTable inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
--(void)setMixed:(TightdbMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)setMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
 
 
 
@@ -189,8 +189,8 @@
 /* Mixed */
 
 -(TightdbType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(BOOL)TDBInsertMixed:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(TightdbMixed *)value;
--(BOOL)TDBInsertMixed:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(TightdbMixed *)value error:(NSError *__autoreleasing *)error;
+-(BOOL)TDBInsertMixed:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(TDBMixed *)value;
+-(BOOL)TDBInsertMixed:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(TDBMixed *)value error:(NSError *__autoreleasing *)error;
 
 
 
@@ -202,7 +202,7 @@
 -(NSUInteger)findRowIndexWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)findRowIndexWithBinary:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)findRowIndexWithDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)findRowIndexWithMixed:(TightdbMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
+-(NSUInteger)findRowIndexWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
 
 -(TDBView *)findAllRowsWithBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBView *)findAllRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
@@ -211,11 +211,11 @@
 -(TDBView *)findAllRowsWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBView *)findAllRowsWithBinary:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBView *)findAllRowsWithDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
--(TDBView *)findAllRowsWithMixed:(TightdbMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBView *)findAllRowsWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
 
 
--(TightdbQuery *)where;
--(TightdbQuery *)whereWithError:(NSError *__autoreleasing *)error;
+-(TDBQuery *)where;
+-(TDBQuery *)whereWithError:(NSError *__autoreleasing *)error;
 
 /* Indexing */
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;
@@ -284,7 +284,7 @@
 //-(TDBBinary *)binaryInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 //-(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 //-(id)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(Class)tableClass;
--(TightdbMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 
 
 -(void)removeRowAtIndex:(NSUInteger)atRowIndex;
@@ -295,22 +295,22 @@
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
 /* Private */
--(id)_initWithQuery:(TightdbQuery *)query;
+-(id)_initWithQuery:(TDBQuery *)query;
 @end
 
 
-@interface TightdbColumnProxy: NSObject
+@interface TDBColumnProxy: NSObject
 @property(nonatomic, weak) TDBTable *table;
 @property(nonatomic) size_t column;
 -(id)initWithTable:(TDBTable *)table column:(NSUInteger)column;
 -(void)clear;
 @end
 
-@interface TightdbColumnProxy_Bool: TightdbColumnProxy
+@interface TDBColumnProxy_Bool: TDBColumnProxy
 -(NSUInteger)find:(BOOL)value;
 @end
 
-@interface TightdbColumnProxy_Int: TightdbColumnProxy
+@interface TDBColumnProxy_Int: TDBColumnProxy
 -(NSUInteger)find:(int64_t)value;
 -(int64_t)minimum;
 -(int64_t)maximum;
@@ -318,7 +318,7 @@
 -(double)average;
 @end
 
-@interface TightdbColumnProxy_Float: TightdbColumnProxy
+@interface TDBColumnProxy_Float: TDBColumnProxy
 -(NSUInteger)find:(float)value;
 -(float)minimum;
 -(float)maximum;
@@ -326,7 +326,7 @@
 -(double)average;
 @end
 
-@interface TightdbColumnProxy_Double: TightdbColumnProxy
+@interface TDBColumnProxy_Double: TDBColumnProxy
 -(NSUInteger)find:(double)value;
 -(double)minimum;
 -(double)maximum;
@@ -334,21 +334,21 @@
 -(double)average;
 @end
 
-@interface TightdbColumnProxy_String: TightdbColumnProxy
+@interface TDBColumnProxy_String: TDBColumnProxy
 -(NSUInteger)find:(NSString *)value;
 @end
 
-@interface TightdbColumnProxy_Binary: TightdbColumnProxy
+@interface TDBColumnProxy_Binary: TDBColumnProxy
 -(NSUInteger)find:(TDBBinary *)value;
 @end
 
-@interface TightdbColumnProxy_Date: TightdbColumnProxy
+@interface TDBColumnProxy_Date: TDBColumnProxy
 -(NSUInteger)find:(time_t)value;
 @end
 
-@interface TightdbColumnProxy_Subtable: TightdbColumnProxy
+@interface TDBColumnProxy_Subtable: TDBColumnProxy
 @end
 
-@interface TightdbColumnProxy_Mixed: TightdbColumnProxy
--(NSUInteger)find:(TightdbMixed *)value;
+@interface TDBColumnProxy_Mixed: TDBColumnProxy
+-(NSUInteger)find:(TDBMixed *)value;
 @end

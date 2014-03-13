@@ -90,7 +90,7 @@ using namespace std;
     return [_table tableInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(TightdbMixed *)mixedInColumnWithIndex:(NSUInteger)colNdx
+-(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colNdx
 {
     return [_table mixedInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -135,7 +135,7 @@ using namespace std;
     [_table setTable:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(void)setMixed:(TightdbMixed *)value inColumnWithIndex:(NSUInteger)colNdx
+-(void)setMixed:(TDBMixed *)value inColumnWithIndex:(NSUInteger)colNdx
 {
     [_table setMixed:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -244,12 +244,12 @@ using namespace std;
     [_cursor.table setTable:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
--(TightdbMixed *)getMixed
+-(TDBMixed *)getMixed
 {
     return [_cursor.table mixedInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
--(void)setMixed:(TightdbMixed *)value
+-(void)setMixed:(TDBMixed *)value
 {
     [_cursor.table setMixed:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
