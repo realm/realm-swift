@@ -31,7 +31,7 @@ TIGHTDB_TABLE_2(EnumPeopleTable2,
     //------------------------------------------------------
     TightdbGroup *group = [TightdbGroup group];
     // Create new table in group
-    EnumPeopleTable *people = [group getTable:@"employees" withClass:[EnumPeopleTable class] error:nil];
+    EnumPeopleTable *people = [group getOrCreateTableWithName:@"employees" asTableClass:[EnumPeopleTable class] error:nil];
 
     // Add some rows
     [people addName:@"John" Age:20 Hired:YES];
@@ -51,7 +51,7 @@ TIGHTDB_TABLE_2(EnumPeopleTable2,
 
     // Do a query, and get all matches as TableView
     EnumPeopleTable_View *res = [[[[people where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30] findAll];
-    NSLog(@"View count: %zu", [res count]);
+    NSLog(@"View count: %zu", res.rowCount);
     // 2: Iterate over the resulting TableView
     for (EnumPeopleTable_Cursor *row in res) {
         NSLog(@"(Enum2) %@ is %lld years old.", row.Name, row.Age);
@@ -60,7 +60,7 @@ TIGHTDB_TABLE_2(EnumPeopleTable2,
     // 3: Iterate over query (lazy)
 
  EnumPeopleTable_Query *q = [[people where].Age columnIsEqualTo:21];
-    NSLog(@"Query lazy count: %zu", [q count] );
+    NSLog(@"Query lazy count: %zu", [q countRows] );
     for (EnumPeopleTable_Cursor *row in q) {
         NSLog(@"(Enum3) %@ is %lld years old.", row.Name, row.Age);
         if (row.Name == nil)

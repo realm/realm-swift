@@ -15,60 +15,60 @@
 {
     // Create table with all column types
     TightdbTable* table = [[TightdbTable alloc] init];
-    TightdbDescriptor* desc = [table getDescriptor];
-    [desc addColumnWithType:tightdb_Int andName:@"int"];
-    [desc addColumnWithType:tightdb_Bool andName:@"bool"];
-    [desc addColumnWithType:tightdb_Date andName:@"date"];
-    [desc addColumnWithType:tightdb_String andName:@"string"];
-    [desc addColumnWithType:tightdb_String andName:@"string_long"];
-    [desc addColumnWithType:tightdb_String andName:@"string_enum"];
-    [desc addColumnWithType:tightdb_Binary andName:@"binary"];
-    [desc addColumnWithType:tightdb_Mixed andName:@"mixed"];
+    TightdbDescriptor* desc = [table descriptor];
+    [desc addColumnWithName:@"int" andType:tightdb_Int];
+    [desc addColumnWithName:@"bool" andType:tightdb_Bool];
+    [desc addColumnWithName:@"date" andType:tightdb_Date];
+    [desc addColumnWithName:@"string" andType:tightdb_String];
+    [desc addColumnWithName:@"string_long" andType:tightdb_String];
+    [desc addColumnWithName:@"string_enum" andType:tightdb_String];
+    [desc addColumnWithName:@"binary" andType:tightdb_Binary];
+    [desc addColumnWithName:@"mixed" andType:tightdb_Mixed];
     TightdbDescriptor* subdesc = [desc addColumnTable:@"tables"];
-    [subdesc addColumnWithType:tightdb_Int andName:@"sub_first"];
-    [subdesc addColumnWithType:tightdb_String andName:@"sub_second"];
+    [subdesc addColumnWithName:@"sub_first" andType:tightdb_Int];
+    [subdesc addColumnWithName:@"sub_second" andType:tightdb_String];
 
     // Add some rows
     for (size_t i = 0; i < 15; ++i) {
-        [table insertInt:0 ndx:i value:i];
-        [table insertBool:1 ndx:i value:(i % 2 ? YES : NO)];
-        [table insertDate:2 ndx:i value:12345];
-        [table insertString:3 ndx:i value:[NSString stringWithFormat:@"string %zu", i]];
-        [table insertString:4 ndx:i value:@" Very long string.............."];
+        [table TDBInsertInt:0 ndx:i value:i];
+        [table TDBInsertBool:1 ndx:i value:(i % 2 ? YES : NO)];
+        [table TDBInsertDate:2 ndx:i value:12345];
+        [table TDBInsertString:3 ndx:i value:[NSString stringWithFormat:@"string %zu", i]];
+        [table TDBInsertString:4 ndx:i value:@" Very long string.............."];
 
         switch (i % 3) {
             case 0:
-                [table insertString:5 ndx:i value:@"test1"];
+                [table TDBInsertString:5 ndx:i value:@"test1"];
                 break;
             case 1:
-                [table insertString:5 ndx:i value:@"test2"];
+                [table TDBInsertString:5 ndx:i value:@"test2"];
                 break;
             case 2:
-                [table insertString:5 ndx:i value:@"test3"];
+                [table TDBInsertString:5 ndx:i value:@"test3"];
                 break;
         }
 
-        [table insertBinary:6 ndx:i data:"binary" size:7];
+        [table TDBInsertBinary:6 ndx:i data:"binary" size:7];
         switch (i % 3) {
             case 0:
-                [table insertMixed:7 ndx:i value:[TightdbMixed mixedWithBool:NO]];
+                [table TDBInsertMixed:7 ndx:i value:[TightdbMixed mixedWithBool:NO]];
                 break;
             case 1:
-                [table insertMixed:7 ndx:i value:[TightdbMixed mixedWithInt64:i]];
+                [table TDBInsertMixed:7 ndx:i value:[TightdbMixed mixedWithInt64:i]];
                 break;
             case 2:
-                [table insertMixed:7 ndx:i value:[TightdbMixed mixedWithString:@"string"]];
+                [table TDBInsertMixed:7 ndx:i value:[TightdbMixed mixedWithString:@"string"]];
                 break;
         }
-        [table insertSubtable:8 ndx:i];
-        [table insertDone];
+        [table TDBInsertSubtable:8 ndx:i];
+        [table TDBInsertDone];
 
         // Add sub-tables
         if (i == 2) {
-            TightdbTable* subtable = [table getTableInColumn:8 atRow:i];
-            [subtable insertInt:0 ndx:0 value:42];
-            [subtable insertString:1 ndx:0 value:@"meaning"];
-            [subtable insertDone];
+            TightdbTable* subtable = [table tableInColumnWithIndex:8 atRowIndex:i];
+            [subtable TDBInsertInt:0 ndx:0 value:42];
+            [subtable TDBInsertString:1 ndx:0 value:@"meaning"];
+            [subtable TDBInsertDone];
         }
 
     }
@@ -80,14 +80,14 @@
     [table removeRowAtIndex:14];
     [table removeRowAtIndex:0];
     [table removeRowAtIndex:5];
-    STAssertEquals([table count], (size_t)12, @"Size should have been 12");
+    STAssertEquals([table rowCount], (size_t)12, @"Size should have been 12");
 #ifdef TIGHTDB_DEBUG
     [table verify];
 #endif
 
     // Test Clear
-    [table clear];
-    STAssertEquals([table count], (size_t)0, @"Size should have been zero");
+    [table removeAllRows];
+    STAssertEquals([table rowCount], (size_t)0, @"Size should have been zero");
 
 #ifdef TIGHTDB_DEBUG
     [table verify];
