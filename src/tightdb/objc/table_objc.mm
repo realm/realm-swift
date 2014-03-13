@@ -254,12 +254,12 @@ using namespace std;
 
 // FIXME: Provide a version of this method that takes a 'const char*'. This will simplify _addColumns of MyTable.
 // FIXME: Detect errors from core library
--(BOOL)addColumnWithType:(TightdbType)type andName:(NSString*)name
+-(BOOL)addColumnWithName:(NSString*)name andType:(TightdbType)type
 {
-    return [self addColumnWithType:type andName:name error:nil];
+    return [self addColumnWithName:name andType:type error:nil];
 }
 
--(BOOL)addColumnWithType:(TightdbType)type andName:(NSString*)name error:(NSError* __autoreleasing*)error
+-(BOOL)addColumnWithName:(NSString*)name andType:(TightdbType)type error:(NSError* __autoreleasing*)error
 {
     if (m_read_only) {
         if (error)
@@ -294,12 +294,12 @@ using namespace std;
         nil);
 }
 
--(TightdbDescriptor*)getSubdescriptor:(NSUInteger)col_ndx
+-(TightdbDescriptor*)subdescriptorForColumnWithIndex:(NSUInteger)col_ndx
 {
-    return [self getSubdescriptor:col_ndx error:nil];
+    return [self subdescriptorForColumnWithIndex:col_ndx error:nil];
 }
 
--(TightdbDescriptor*)getSubdescriptor:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
+-(TightdbDescriptor*)subdescriptorForColumnWithIndex:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
 {
     TIGHTDB_EXCEPTION_ERRHANDLER(
         tightdb::DescriptorRef subdesc = m_desc->get_subdescriptor(col_ndx);
@@ -307,19 +307,19 @@ using namespace std;
         nil);
 }
 
--(NSUInteger)getColumnCount
+-(NSUInteger)columnCount
 {
     return m_desc->get_column_count();
 }
--(TightdbType)getColumnType:(NSUInteger)ndx
+-(TightdbType)columnTypeOfColumn:(NSUInteger)colIndex
 {
-    return (TightdbType)m_desc->get_column_type(ndx);
+    return (TightdbType)m_desc->get_column_type(colIndex);
 }
--(NSString*)getColumnName:(NSUInteger)ndx
+-(NSString*)columnNameOfColumn:(NSUInteger)colIndex
 {
-    return to_objc_string(m_desc->get_column_name(ndx));
+    return to_objc_string(m_desc->get_column_name(colIndex));
 }
--(NSUInteger)getColumnIndex:(NSString*)name
+-(NSUInteger)indexOfColumnWithName:(NSString *)name
 {
     return m_desc->get_column_index(ObjcStringAccessor(name));
 }
@@ -628,7 +628,7 @@ using namespace std;
 }
 
 // FIXME: Check that the specified class derives from TDBTable.
--(BOOL)hasSameDescriptorAs:(Class)class_obj
+-(BOOL)hasSameDescriptorAs:(__unsafe_unretained Class)class_obj
 {
     TDBTable* table = [[class_obj alloc] _initRaw];
     if (TIGHTDB_LIKELY(table)) {
@@ -897,7 +897,7 @@ using namespace std;
 }
 
 // FIXME: Check that the specified class derives from TDBTable.
--(id)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(Class)tableClass
+-(id)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(__unsafe_unretained Class)tableClass
 {
     tightdb::DataType type = m_table->get_column_type(colIndex);
     if (type != tightdb::type_Table)

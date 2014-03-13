@@ -89,7 +89,7 @@ TIGHTDB_TABLE_2(QueryTable,
     STAssertEquals([q countRows], (size_t)2,@"Expected 2 rows in query");
 
      // Get the average age - currently only a low-level interface!
-    double avg = [q.Age average];
+    double avg = [q.Age avg];
     NSLog(@"Average: %f", avg);
     STAssertEquals(avg, 21.0,@"Expected 20.5 average");
 
@@ -150,7 +150,7 @@ TIGHTDB_TABLE_2(QueryTable,
         QueryTable_Query* q = [[table where].First columnIsBetween:3 and_:7]; // Between
         STAssertEquals((size_t)2,   [q countRows], @"count != 2");
 //        STAssertEquals(9,   [q.First sum]); // Sum
-        STAssertEquals(4.5, [q.First average], @"Avg!=4.5"); // Average
+        STAssertEquals(4.5, [q.First avg], @"Avg!=4.5"); // Average
 //        STAssertEquals(4,   [q.First min]); // Minimum
 //        STAssertEquals(5,   [q.First max]); // Maximum
     }
@@ -200,12 +200,12 @@ TIGHTDB_TABLE_2(QueryTable,
     // Specify the table type
     {
         TightdbDescriptor* desc = table.descriptor;
-        [desc addColumnWithType:tightdb_Int andName:@"int"];
+        [desc addColumnWithName:@"int" andType:tightdb_Int];
         {
             TightdbDescriptor* subdesc = [desc addColumnTable:@"tab"];
-            [subdesc addColumnWithType:tightdb_Int andName:@"int"];
+            [subdesc addColumnWithName:@"int" andType:tightdb_Int];
         }
-        [desc addColumnWithType:tightdb_Mixed andName:@"mix"];
+        [desc addColumnWithName:@"mix" andType:tightdb_Mixed];
     }
 
     int COL_TABLE_INT = 0;

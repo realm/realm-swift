@@ -209,7 +209,7 @@
     [t addColumnWithName:@"first" andType:tightdb_Int];
     TightdbDescriptor* descr = [t descriptor];
     TightdbDescriptor* subdescr = [descr addColumnTable:@"second"];
-    [subdescr addColumnWithType:tightdb_Int andName:@"TableCol_IntCol"];
+    [subdescr addColumnWithName:@"TableCol_IntCol" andType:tightdb_Int];
     if (![t appendRow:@[@1, @[]]])
         STFail(@"1 row excepted");
     if ([t rowCount] != 1)
@@ -709,17 +709,17 @@
 
     TightdbDescriptor* desc = [table descriptor];
 
-    [desc addColumnWithType:tightdb_Bool   andName:@"BoolCol"];    const size_t BoolCol = 0;
-    [desc addColumnWithType:tightdb_Int    andName:@"IntCol"];     const size_t IntCol = 1;
-    [desc addColumnWithType:tightdb_Float  andName:@"FloatCol"];   const size_t FloatCol = 2;
-    [desc addColumnWithType:tightdb_Double andName:@"DoubleCol"];  const size_t DoubleCol = 3;
-    [desc addColumnWithType:tightdb_String andName:@"StringCol"];  const size_t StringCol = 4;
-    [desc addColumnWithType:tightdb_Binary andName:@"BinaryCol"];  const size_t BinaryCol = 5;
-    [desc addColumnWithType:tightdb_Date   andName:@"DateCol"];    const size_t DateCol = 6;
+    [desc addColumnWithName:@"BoolCol" andType:tightdb_Bool];    const size_t BoolCol = 0;
+    [desc addColumnWithName:@"IntCol" andType:tightdb_Int];     const size_t IntCol = 1;
+    [desc addColumnWithName:@"FloatCol" andType:tightdb_Float];   const size_t FloatCol = 2;
+    [desc addColumnWithName:@"DoubleCol" andType:tightdb_Double];  const size_t DoubleCol = 3;
+    [desc addColumnWithName:@"StringCol" andType:tightdb_String];  const size_t StringCol = 4;
+    [desc addColumnWithName:@"BinaryCol" andType:tightdb_Binary];  const size_t BinaryCol = 5;
+    [desc addColumnWithName:@"DateCol" andType:tightdb_Date];    const size_t DateCol = 6;
     TightdbDescriptor* subdesc = [desc addColumnTable:@"TableCol"]; const size_t TableCol = 7;
-    [desc addColumnWithType:tightdb_Mixed  andName:@"MixedCol"];   const size_t MixedCol = 8;
+    [desc addColumnWithName:@"MixedCol" andType:tightdb_Mixed];   const size_t MixedCol = 8;
 
-    [subdesc addColumnWithType:tightdb_Int andName:@"TableCol_IntCol"];
+    [subdesc addColumnWithName:@"TableCol_IntCol" andType:tightdb_Int];
 
     // Verify column types
     STAssertEquals(tightdb_Bool,   [table columnTypeOfColumn:0], @"First column not bool");

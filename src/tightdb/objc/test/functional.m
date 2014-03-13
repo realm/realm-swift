@@ -225,7 +225,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
      *  Cursor in a query.
      */
 
-    TightdbQuery *query = [[table where] column:NAME isNotEqualToString:@"Nothing is equal to this"];  // dummy query required right now
+    TightdbQuery *query = [[table where] stringIsNotEqualTo:@"Nothing is equal to this" inColumnWithIndex:NAME ];  // dummy query required right now
     STAssertEquals([query countRows], (NSUInteger)(TABLE_SIZE-2), @"Check the size");
 
     i=0;

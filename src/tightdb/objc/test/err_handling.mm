@@ -168,36 +168,36 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     // Create table with all column types
     TightdbTable* table = [[TightdbTable alloc] init];
     TightdbDescriptor* desc = [table descriptor];
-    if (![desc addColumnWithType:tightdb_Int andName:@"int" error:&error]) {
+    if (![desc addColumnWithName:@"int" andType:tightdb_Int error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithType:tightdb_Bool andName:@"bool" error:&error]) {
+    if (![desc addColumnWithName:@"bool" andType:tightdb_Bool error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
 
-    if (![desc addColumnWithType:tightdb_Date andName:@"date" error:&error]) {
+    if (![desc addColumnWithName:@"date" andType:tightdb_Date error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithType:tightdb_String andName:@"string" error:&error]) {
+    if (![desc addColumnWithName:@"string" andType:tightdb_String error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithType:tightdb_String andName:@"string_long" error:&error]) {
+    if (![desc addColumnWithName:@"string_long" andType:tightdb_String error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithType:tightdb_String andName:@"string_enum" error:&error]) {
+    if (![desc addColumnWithName:@"string_enum" andType:tightdb_String error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithType:tightdb_Binary andName:@"binary" error:&error]) {
+    if (![desc addColumnWithName:@"binary" andType:tightdb_Binary error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithType:tightdb_Mixed andName:@"mixed" error:&error]) {
+    if (![desc addColumnWithName:@"mixed" andType:tightdb_Mixed error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
@@ -206,11 +206,11 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![subdesc addColumnWithType:tightdb_Int andName:@"sub_first" error:&error]) {
+    if (![subdesc addColumnWithName:@"sub_first" andType:tightdb_Int error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![subdesc addColumnWithType:tightdb_String andName:@"sub_second" error:&error]) {
+    if (![subdesc addColumnWithName:@"sub_second" andType:tightdb_String error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
@@ -385,20 +385,20 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     TestQueryErrAllTypes_Query* query = [[table where].BoolCol   columnIsEqualTo:NO];
 
-    STAssertEquals([query.IntCol minimum] , (int64_t)54,    @"IntCol min");
-    STAssertEquals([query.IntCol maximum], (int64_t)54,    @"IntCol max");
+    STAssertEquals([query.IntCol min] , (int64_t)54,    @"IntCol min");
+    STAssertEquals([query.IntCol max], (int64_t)54,    @"IntCol max");
     STAssertEquals([query.IntCol sum] , (int64_t)54,    @"IntCol sum");
-    STAssertEquals([query.IntCol average] , 54.0,           @"IntCol avg");
+    STAssertEquals([query.IntCol avg] , 54.0,           @"IntCol avg");
 
-    STAssertEquals([query.FloatCol minimum], 0.7f,         @"FloatCol min");
-    STAssertEquals([query.FloatCol maximum], 0.7f,         @"FloatCol max");
+    STAssertEquals([query.FloatCol min], 0.7f,         @"FloatCol min");
+    STAssertEquals([query.FloatCol max], 0.7f,         @"FloatCol max");
     STAssertEquals([query.FloatCol sum], (double)0.7f, @"FloatCol sum");
-    STAssertEquals([query.FloatCol average], (double)0.7f, @"FloatCol avg");
+    STAssertEquals([query.FloatCol avg], (double)0.7f, @"FloatCol avg");
 
-    STAssertEquals([query.DoubleCol minimum], 0.8,         @"DoubleCol min");
-    STAssertEquals([query.DoubleCol maximum], 0.8,         @"DoubleCol max");
+    STAssertEquals([query.DoubleCol min], 0.8,         @"DoubleCol min");
+    STAssertEquals([query.DoubleCol max], 0.8,         @"DoubleCol max");
     STAssertEquals([query.DoubleCol sum] , 0.8,         @"DoubleCol sum");
-    STAssertEquals([query.DoubleCol average], 0.8,         @"DoubleCol avg");
+    STAssertEquals([query.DoubleCol avg], 0.8,         @"DoubleCol avg");
 
     // Check that all column conditions return query objects of the
     // right type
