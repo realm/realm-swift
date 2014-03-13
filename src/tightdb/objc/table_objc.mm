@@ -628,7 +628,7 @@ using namespace std;
 }
 
 // FIXME: Check that the specified class derives from TightdbTable.
--(BOOL)hasSameDescriptorAs:(Class)class_obj
+-(BOOL)hasSameDescriptorAs:(__unsafe_unretained Class)class_obj
 {
     TightdbTable* table = [[class_obj alloc] _initRaw];
     if (TIGHTDB_LIKELY(table)) {

@@ -168,12 +168,7 @@
 -(void)setMixed:(TightdbMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
 
 
-/* FIXME: It has been decided that the insert methods must not be a
- * part of the public Obj-C API. All row insertion must happen by
- * inserting a complete rows. This must occur either by calling
- * `addEmptyRow` and then setting each column value afterwards, or possibly
- * by calling a method that takes all column values as arguments at
- * once. */
+
 -(BOOL)TDBInsertBool:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(BOOL)value;
 -(BOOL)TDBInsertInt:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(int64_t)value;
 -(BOOL)TDBInsertFloat:(NSUInteger)colNdx ndx:(NSUInteger)ndx value:(float)value;
@@ -209,9 +204,7 @@
 -(NSUInteger)findRowIndexWithDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)findRowIndexWithMixed:(TightdbMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
 
-/* FIXME: The naming scheme used here is superior to the one used in
-   most of the other methods in this class. As time allows, this
-   scheme must be migrated to all those other methods. */
+
 -(TightdbView *)findAllRowsWithBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex;
 -(TightdbView *)findAllRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(TightdbView *)findAllRowsWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
