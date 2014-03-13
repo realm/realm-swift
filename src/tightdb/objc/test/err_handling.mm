@@ -385,20 +385,20 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     TestQueryErrAllTypes_Query* query = [[table where].BoolCol   columnIsEqualTo:NO];
 
-    STAssertEquals([query.IntCol minimum] , (int64_t)54,    @"IntCol min");
-    STAssertEquals([query.IntCol maximum], (int64_t)54,    @"IntCol max");
+    STAssertEquals([query.IntCol min] , (int64_t)54,    @"IntCol min");
+    STAssertEquals([query.IntCol max], (int64_t)54,    @"IntCol max");
     STAssertEquals([query.IntCol sum] , (int64_t)54,    @"IntCol sum");
-    STAssertEquals([query.IntCol average] , 54.0,           @"IntCol avg");
+    STAssertEquals([query.IntCol avg] , 54.0,           @"IntCol avg");
 
-    STAssertEquals([query.FloatCol minimum], 0.7f,         @"FloatCol min");
-    STAssertEquals([query.FloatCol maximum], 0.7f,         @"FloatCol max");
+    STAssertEquals([query.FloatCol min], 0.7f,         @"FloatCol min");
+    STAssertEquals([query.FloatCol max], 0.7f,         @"FloatCol max");
     STAssertEquals([query.FloatCol sum], (double)0.7f, @"FloatCol sum");
-    STAssertEquals([query.FloatCol average], (double)0.7f, @"FloatCol avg");
+    STAssertEquals([query.FloatCol avg], (double)0.7f, @"FloatCol avg");
 
-    STAssertEquals([query.DoubleCol minimum], 0.8,         @"DoubleCol min");
-    STAssertEquals([query.DoubleCol maximum], 0.8,         @"DoubleCol max");
+    STAssertEquals([query.DoubleCol min], 0.8,         @"DoubleCol min");
+    STAssertEquals([query.DoubleCol max], 0.8,         @"DoubleCol max");
     STAssertEquals([query.DoubleCol sum] , 0.8,         @"DoubleCol sum");
-    STAssertEquals([query.DoubleCol average], 0.8,         @"DoubleCol avg");
+    STAssertEquals([query.DoubleCol avg], 0.8,         @"DoubleCol avg");
 
     // Check that all column conditions return query objects of the
     // right type
