@@ -141,10 +141,12 @@
 -(TightdbCursor *)rowAtIndex:(NSUInteger)rowIndex;
 -(TightdbCursor *)lastRow;
 -(TightdbCursor *)firstRow;
+-(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
 
 -(TightdbCursor *)insertEmptyRowAtIndex:(NSUInteger)ndx;
 
--(BOOL)appendRow:(NSArray *)data;
+-(BOOL)appendRow:(NSObject *)data;
+-(BOOL)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex;
 
 -(BOOL)boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(int64_t)intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
