@@ -125,10 +125,10 @@
 -(TightdbQuery *)columnIsLessThan:(int64_t)value;
 -(TightdbQuery *)columnIsLessThanOrEqualTo:(int64_t)value;
 -(TightdbQuery *)columnIsBetween:(int64_t)from and_:(int64_t)to;
--(int64_t)minimum;
--(int64_t)maximum;
+-(int64_t)min;
+-(int64_t)max;
 -(int64_t)sum;
--(double)average;
+-(double)avg;
 @end
 
 
@@ -141,10 +141,10 @@
 -(TightdbQuery *)columnIsLessThan:(float)value;
 -(TightdbQuery *)columnIsLessThanOrEqualTo:(float)value;
 -(TightdbQuery *)columnIsBetween:(float)from and_:(float)to;
--(float)minimum;
--(float)maximum;
+-(float)min;
+-(float)max;
 -(double)sum;
--(double)average;
+-(double)avg;
 @end
 
 
@@ -157,10 +157,10 @@
 -(TightdbQuery *)columnIsLessThan:(double)value;
 -(TightdbQuery *)columnIsLessThanOrEqualTo:(double)value;
 -(TightdbQuery *)columnIsBetween:(double)from and_:(double)to;
--(double)minimum;
--(double)maximum;
+-(double)min;
+-(double)max;
 -(double)sum;
--(double)average;
+-(double)avg;
 @end
 
 
