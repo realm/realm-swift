@@ -134,6 +134,7 @@
 
 /* object subscripting */
 -(TightdbCursor *)objectAtIndexedSubscript:(NSUInteger)ndx;
+-(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
 
 -(TightdbCursor *)cursorAtIndex:(NSUInteger)ndx;
 -(TightdbCursor *)cursorAtLastIndex;

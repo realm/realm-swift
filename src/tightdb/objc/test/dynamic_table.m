@@ -123,6 +123,27 @@
         STFail(@"Wrong number of columns");
 }
 
+-(void)testUpdateRowIntColumn
+{
+    TightdbTable* t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Int andName:@"first"];
+    [t insertObject:@[@1] atRowIndex:0];
+    t[0] = @[@2];
+    if ([t getIntInColumn:0 atRow:0] != 2)
+        STFail(@"Value 2 expected");
+}
+
+-(void)testUpdateRowWithLabelsIntColumn
+{
+    TightdbTable* t = [[TightdbTable alloc] init];
+    [t addColumnWithType:tightdb_Int andName:@"first"];
+    [t insertObject:@[@1] atRowIndex:0];
+    t[0] = @{@"first": @2};
+    if ([t getIntInColumn:0 atRow:0] != 2)
+        STFail(@"Value 2 expected");
+}
+
+
 -(void)testAppendRowWithLabelsIntColumn
 {
     // Add row using object literate
