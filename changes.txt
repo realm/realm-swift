@@ -1,3 +1,7 @@
+2014-03-13
+==========
+! BREAKING CHANGE: Most selectors have been renamed in the binding!
+
 2014-03-10
 ==========
 * Return types and parameters changed from size_t to NSUInteger.
