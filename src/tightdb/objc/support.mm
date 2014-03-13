@@ -389,3 +389,169 @@ BOOL insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
     }
     return YES;
 }
+
+BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
+{
+    DataType type = table.get_column_type(col_ndx);
+    switch (type) {
+        case type_Bool:
+            if (obj == nil)
+                table.set_bool(col_ndx, row_ndx, false);
+            else
+                table.set_bool(col_ndx, row_ndx, bool([(NSNumber *)obj boolValue]));
+            break;
+        case type_DateTime:
+            if (obj == nil) {
+                table.set_datetime(col_ndx, row_ndx, time_t(0));
+            }
+            else {
+                if ([obj isKindOfClass:[NSDate class]]) {
+                    table.set_datetime(col_ndx, row_ndx, time_t([(NSDate *)obj timeIntervalSince1970]));
+                }
+                else {
+                    table.set_datetime(col_ndx, row_ndx, time_t([(NSNumber *)obj longValue]));
+                }
+            }
+            break;
+        case type_Int:
+            if (obj == nil)
+                table.set_int(col_ndx, row_ndx, 0);
+            else
+                table.set_int(col_ndx, row_ndx, int64_t([(NSNumber *)obj longValue]));
+            break;
+        case type_Float:
+            if (obj == nil)
+                table.set_float(col_ndx, row_ndx, 0.0);
+            else
+                table.set_float(col_ndx, row_ndx, float([(NSNumber *)obj floatValue]));
+            break;
+        case type_Double:
+            if (obj == nil)
+                table.set_double(col_ndx, row_ndx, 0.0);
+            else
+                table.set_double(col_ndx, row_ndx, double([(NSNumber *)obj doubleValue]));
+            break;
+        case type_String:
+            if (obj == nil) {
+                StringData sd("");
+                table.set_string(col_ndx, row_ndx, sd);
+            }
+            else {
+                StringData sd([(NSString *)obj UTF8String]);
+                table.set_string(col_ndx, row_ndx, sd);
+            }
+            break;
+        case type_Binary:
+            if (obj == nil) {
+                BinaryData bd("", 0);
+                table.set_binary(col_ndx, row_ndx, bd);
+            }
+            else {
+                if ([obj isKindOfClass:[TightdbBinary class]]) {
+                    BinaryData bd([(TightdbBinary *)obj getData], [(TightdbBinary *)obj getSize]);
+                    table.set_binary(col_ndx, row_ndx, bd);
+                }
+                else {
+                    const void *data = [(NSData *)obj bytes];
+                    BinaryData bd(static_cast<const char *>(data), [(NSData *)obj length]);
+                    table.set_binary(col_ndx, row_ndx, bd);
+                }
+            }
+            break;
+        case type_Table:
+            table.clear_subtable(col_ndx, row_ndx);
+            if ([obj isKindOfClass:[NSArray class]]) {
+                table.clear_subtable(col_ndx, row_ndx);
+                if ([(NSArray *)obj count] > 0) {
+                    table.insert_subtable(col_ndx, row_ndx);
+                    TableRef subtable = table.get_subtable(col_ndx, row_ndx);
+                    NSEnumerator *enumerator = [(NSArray *)obj objectEnumerator];
+                    id subobj;
+                    while (subobj = [enumerator nextObject]) {
+                        if (!set_row(row_ndx, *subtable, (NSArray *)subobj)) {
+                            return NO;
+                        }
+                    }
+                }
+            }
+            else {
+                return NO;
+            }
+            break;
+        case type_Mixed:
+            if (obj == nil) {
+                table.set_bool(col_ndx, row_ndx, false);
+                break;
+            }
+            if ([obj isKindOfClass:[NSString class]]) {
+                StringData sd([(NSString *)obj UTF8String]);
+                table.set_mixed(col_ndx, row_ndx, sd);
+                break;
+            }
+            if ([obj isKindOfClass:[NSArray class]]) {
+                // table.set_mixed(col_ndx, row_ndx, Mixed::subtable_tag());
+                break;
+            }
+            if ([obj isKindOfClass:[NSDate class]]) {
+                table.set_mixed(col_ndx, row_ndx, DateTime(time_t([(NSDate *)obj timeIntervalSince1970])));
+                break;
+            }
+            if ([obj isKindOfClass:[TightdbBinary class]]) {
+                BinaryData bd([(TightdbBinary *)obj getData], [(TightdbBinary *)obj getSize]);
+                table.set_mixed(col_ndx, row_ndx, bd);
+                break;
+            }
+            if ([obj isKindOfClass:[NSNumber class]]) {
+                const char *data_type = [(NSNumber *)obj objCType];
+                const char dt = data_type[0];
+                switch (dt) {
+                    case 'i':
+                    case 's':
+                    case 'l':
+                        table.set_mixed(col_ndx, row_ndx, (int64_t)[(NSNumber *)obj longValue]);
+                        break;
+                    case 'f':
+                        table.set_mixed(col_ndx, row_ndx, [(NSNumber *)obj floatValue]);
+                        break;
+                    case 'd':
+                        table.set_mixed(col_ndx, row_ndx, [(NSNumber *)obj doubleValue]);
+                        break;
+                    case 'B':
+                    case 'c':
+                        table.set_mixed(col_ndx, row_ndx, [(NSNumber *)obj boolValue] == YES);
+                        break;
+                }
+                break;
+            }
+            return NO;
+    }
+    return YES;
+}
+
+
+BOOL set_row(size_t row_ndx, Table& table, NSArray *data)
+{
+    NSEnumerator *enumerator = [data objectEnumerator];
+    id obj;
+
+    size_t col_ndx = 0;
+    while (obj = [enumerator nextObject]) {
+        if (!set_cell(col_ndx, row_ndx, table, obj)) {
+            return NO;
+        }
+        ++col_ndx;
+    }
+    return YES;
+}
+
+BOOL set_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
+{
+    size_t count = table.get_column_count();
+    for (size_t col_ndx = 0; col_ndx != count; ++col_ndx) {
+        NSString *col_name = to_objc_string(table.get_column_name(col_ndx));
+        id value = [data valueForKey:col_name];
+        if (!set_cell(col_ndx, row_ndx, table, value))
+            return NO;
+    }
+    return YES;
+}

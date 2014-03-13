@@ -1,3 +1,7 @@
+2014-03-13
+==========
++ Adding setObject to TightdbTable (t[2] = @[@1, @"Hello"] is possible).
+
 2014-03-12
 ==========
 + Adding insertObject to TightdbTable.
