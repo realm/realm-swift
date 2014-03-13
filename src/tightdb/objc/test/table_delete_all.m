@@ -16,17 +16,17 @@
     // Create table with all column types
     TightdbTable* table = [[TightdbTable alloc] init];
     TightdbDescriptor* desc = [table descriptor];
-    [desc addColumnWithType:tightdb_Int andName:@"int"];
-    [desc addColumnWithType:tightdb_Bool andName:@"bool"];
-    [desc addColumnWithType:tightdb_Date andName:@"date"];
-    [desc addColumnWithType:tightdb_String andName:@"string"];
-    [desc addColumnWithType:tightdb_String andName:@"string_long"];
-    [desc addColumnWithType:tightdb_String andName:@"string_enum"];
-    [desc addColumnWithType:tightdb_Binary andName:@"binary"];
-    [desc addColumnWithType:tightdb_Mixed andName:@"mixed"];
+    [desc addColumnWithName:@"int" andType:tightdb_Int];
+    [desc addColumnWithName:@"bool" andType:tightdb_Bool];
+    [desc addColumnWithName:@"date" andType:tightdb_Date];
+    [desc addColumnWithName:@"string" andType:tightdb_String];
+    [desc addColumnWithName:@"string_long" andType:tightdb_String];
+    [desc addColumnWithName:@"string_enum" andType:tightdb_String];
+    [desc addColumnWithName:@"binary" andType:tightdb_Binary];
+    [desc addColumnWithName:@"mixed" andType:tightdb_Mixed];
     TightdbDescriptor* subdesc = [desc addColumnTable:@"tables"];
-    [subdesc addColumnWithType:tightdb_Int andName:@"sub_first"];
-    [subdesc addColumnWithType:tightdb_String andName:@"sub_second"];
+    [subdesc addColumnWithName:@"sub_first" andType:tightdb_Int];
+    [subdesc addColumnWithName:@"sub_second" andType:tightdb_String];
 
     // Add some rows
     for (size_t i = 0; i < 15; ++i) {

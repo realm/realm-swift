@@ -200,12 +200,12 @@ TIGHTDB_TABLE_2(QueryTable,
     // Specify the table type
     {
         TightdbDescriptor* desc = table.descriptor;
-        [desc addColumnWithType:tightdb_Int andName:@"int"];
+        [desc addColumnWithName:@"int" andType:tightdb_Int];
         {
             TightdbDescriptor* subdesc = [desc addColumnTable:@"tab"];
-            [subdesc addColumnWithType:tightdb_Int andName:@"int"];
+            [subdesc addColumnWithName:@"int" andType:tightdb_Int];
         }
-        [desc addColumnWithType:tightdb_Mixed andName:@"mix"];
+        [desc addColumnWithName:@"mix" andType:tightdb_Mixed];
     }
 
     int COL_TABLE_INT = 0;

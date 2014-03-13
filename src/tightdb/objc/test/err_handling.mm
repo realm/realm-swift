@@ -168,36 +168,36 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     // Create table with all column types
     TightdbTable* table = [[TightdbTable alloc] init];
     TightdbDescriptor* desc = [table descriptor];
-    if (![desc addColumnWithType:tightdb_Int andName:@"int" error:&error]) {
+    if (![desc addColumnWithName:@"int" andType:tightdb_Int error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithType:tightdb_Bool andName:@"bool" error:&error]) {
+    if (![desc addColumnWithName:@"bool" andType:tightdb_Bool error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
 
-    if (![desc addColumnWithType:tightdb_Date andName:@"date" error:&error]) {
+    if (![desc addColumnWithName:@"date" andType:tightdb_Date error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithType:tightdb_String andName:@"string" error:&error]) {
+    if (![desc addColumnWithName:@"string" andType:tightdb_String error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithType:tightdb_String andName:@"string_long" error:&error]) {
+    if (![desc addColumnWithName:@"string_long" andType:tightdb_String error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithType:tightdb_String andName:@"string_enum" error:&error]) {
+    if (![desc addColumnWithName:@"string_enum" andType:tightdb_String error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithType:tightdb_Binary andName:@"binary" error:&error]) {
+    if (![desc addColumnWithName:@"binary" andType:tightdb_Binary error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithType:tightdb_Mixed andName:@"mixed" error:&error]) {
+    if (![desc addColumnWithName:@"mixed" andType:tightdb_Mixed error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
@@ -206,11 +206,11 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![subdesc addColumnWithType:tightdb_Int andName:@"sub_first" error:&error]) {
+    if (![subdesc addColumnWithName:@"sub_first" andType:tightdb_Int error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![subdesc addColumnWithType:tightdb_String andName:@"sub_second" error:&error]) {
+    if (![subdesc addColumnWithName:@"sub_second" andType:tightdb_String error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }

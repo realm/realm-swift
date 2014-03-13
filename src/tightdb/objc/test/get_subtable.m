@@ -34,11 +34,11 @@ TIGHTDB_TABLE_2(WrongTypeTable,
     // Create table with all column types
     TightdbTable* table = [[TightdbTable alloc] init];
     TightdbDescriptor* desc = table.descriptor;
-    [desc addColumnWithType:tightdb_Bool andName:@"Outer"];
-    [desc addColumnWithType:tightdb_Int andName:@"Number"];
+    [desc addColumnWithName:@"Outer" andType:tightdb_Bool];
+    [desc addColumnWithName:@"Number" andType:tightdb_Int];
     TightdbDescriptor* subdesc = [desc addColumnTable:@"GetSubtable"];
-    [subdesc addColumnWithType:tightdb_Bool andName:@"Hired"];
-    [subdesc addColumnWithType:tightdb_Int andName:@"Age"];
+    [subdesc addColumnWithName:@"Hired" andType:tightdb_Bool];
+    [subdesc addColumnWithName:@"Age" andType:tightdb_Int];
 
     [table TDBInsertBool:0 ndx:0 value:NO];
     [table TDBInsertInt:1 ndx:0 value:10];

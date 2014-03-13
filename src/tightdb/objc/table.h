@@ -64,22 +64,25 @@
 
 
 @interface TightdbDescriptor: NSObject
+
+@property (readonly) NSUInteger columnCount;
+
 /**
  * Returns NO on memory allocation error.
  */
--(BOOL)addColumnWithType:(TightdbType)type andName:(NSString *)name;
--(BOOL)addColumnWithType:(TightdbType)type andName:(NSString *)name error:(NSError *__autoreleasing *)error;
+-(BOOL)addColumnWithName:(NSString *)name andType:(TightdbType)type;
+-(BOOL)addColumnWithName:(NSString *)name andType:(TightdbType)type error:(NSError *__autoreleasing *)error;
 /**
  * Returns nil on memory allocation error.
  */
 -(TightdbDescriptor *)addColumnTable:(NSString *)name;
 -(TightdbDescriptor *)addColumnTable:(NSString *)name error:(NSError *__autoreleasing *)error;
--(TightdbDescriptor *)getSubdescriptor:(NSUInteger)colNdx;
--(TightdbDescriptor *)getSubdescriptor:(NSUInteger)colNdx error:(NSError *__autoreleasing *)error;
--(NSUInteger)getColumnCount;
--(TightdbType)getColumnType:(NSUInteger)colNdx;
--(NSString *)getColumnName:(NSUInteger)colNdx;
--(NSUInteger)getColumnIndex:(NSString *)name;
+-(TightdbDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colNdx;
+-(TightdbDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colNdx error:(NSError *__autoreleasing *)error;
+
+-(TightdbType)columnTypeOfColumn:(NSUInteger)colIndex;
+-(NSString *)columnNameOfColumn:(NSUInteger)colIndex;
+-(NSUInteger)indexOfColumnWithName:(NSString *)name;
 @end
 
 
@@ -196,8 +199,7 @@
 
 
 
-/* Searching */
-/* FIXME: Should be findBool:(BOOL)value inColumn:(size_t)colNdx; */
+
 -(NSUInteger)findRowIndexWithBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)findRowIndexWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)findRowIndexWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
@@ -234,7 +236,9 @@
 /* FIXME: Do we want to conversion methods? Maybe use NSData. */
 
 /* Aggregate functions */
-/* FIXME: Should be countInt:(int64_t)value inColumn:(size_t)colNdx; */
+/* FIXME: Consider adding:
+ countRowsWithValue: @"foo"
+ countRowsWithValue: @300 */
 -(NSUInteger)countRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)countRowsWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)countRowsWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
