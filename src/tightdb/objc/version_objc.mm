@@ -8,7 +8,7 @@
 #include <tightdb/version.hpp>
 #import  <tightdb/objc/version.h>
 
-@implementation TightdbVersion
+@implementation TDBVersion
 {
 }
 
@@ -47,9 +47,9 @@
 +(NSString*)getVersion
 {
     NSString *s = [NSString stringWithFormat:@"%d.%d.%d", 
-                            [TightdbVersion getMajor], 
-                            [TightdbVersion getMinor],
-                            [TightdbVersion getPatch]];
+                            [TDBVersion getMajor],
+                            [TDBVersion getMinor],
+                            [TDBVersion getPatch]];
     return s;
 }
 

@@ -24,7 +24,7 @@
 #define Tightdb_Version_Minor 3
 #define Tightdb_Version_Patch 0
 
-@interface TightdbVersion: NSObject
+@interface TDBVersion: NSObject
 -(id)init;
 +(const int)getMajor;
 +(const int)getMinor;

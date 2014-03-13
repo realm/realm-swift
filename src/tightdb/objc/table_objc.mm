@@ -22,7 +22,7 @@
 
 using namespace std;
 
-@implementation TightdbBinary
+@implementation TDBBinary
 {
     tightdb::BinaryData m_data;
 }
@@ -50,7 +50,7 @@ using namespace std;
 {
     return m_data.size();
 }
--(BOOL)isEqual:(TightdbBinary*)bin
+-(BOOL)isEqual:(TDBBinary*)bin
 {
     return m_data == bin->m_data;
 }
@@ -111,7 +111,7 @@ using namespace std;
     return mixed;
 }
 
-+(TightdbMixed*)mixedWithBinary:(TightdbBinary*)value
++(TightdbMixed*)mixedWithBinary:(TDBBinary*)value
 {
     TightdbMixed* mixed = [[TightdbMixed alloc] init];
     mixed->m_mixed = tightdb::Mixed([value getNativeBinary]);
@@ -215,9 +215,9 @@ using namespace std;
     return to_objc_string(m_mixed.get_string());
 }
 
--(TightdbBinary*)getBinary
+-(TDBBinary*)getBinary
 {
-    return [[TightdbBinary alloc] initWithBinary:m_mixed.get_binary()];
+    return [[TDBBinary alloc] initWithBinary:m_mixed.get_binary()];
 }
 
 -(time_t)getDate
@@ -869,9 +869,9 @@ using namespace std;
     return to_objc_string(m_table->get_string(colIndex, rowIndex));
 }
 
--(TightdbBinary*)binaryInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(TDBBinary*)binaryInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
-    return [[TightdbBinary alloc] initWithBinary:m_table->get_binary(colIndex, rowIndex)];
+    return [[TDBBinary alloc] initWithBinary:m_table->get_binary(colIndex, rowIndex)];
 }
 
 -(time_t)dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
@@ -973,7 +973,7 @@ using namespace std;
         tightdb_String);
 }
 
--(void)setBinary:(TightdbBinary*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)setBinary:(TDBBinary*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_binary(col_ndx, row_ndx, [value getNativeBinary]);,
@@ -1116,12 +1116,12 @@ using namespace std;
     return YES;
 }
 
--(BOOL)TDBInsertBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(TightdbBinary*)value
+-(BOOL)TDBInsertBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(TDBBinary*)value
 {
     return [self TDBInsertBinary:col_ndx ndx:ndx value:value error:nil];
 }
 
--(BOOL)TDBInsertBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(TightdbBinary*)value error:(NSError* __autoreleasing*)error
+-(BOOL)TDBInsertBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(TDBBinary*)value error:(NSError* __autoreleasing*)error
 {
     // FIXME: Read-only errors should probably be handled by throwing
     // an exception. That is what is done in other places in this
@@ -1320,7 +1320,7 @@ using namespace std;
 {
     return m_table->find_first_string(colIndex, ObjcStringAccessor(aString));
 }
--(NSUInteger)findRowIndexWithBinary:(TightdbBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex
+-(NSUInteger)findRowIndexWithBinary:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
     return m_table->find_first_binary(colIndex, [aBinary getNativeBinary]);
 }
@@ -1363,7 +1363,7 @@ using namespace std;
     tightdb::TableView view = m_table->find_all_string(colIndex, ObjcStringAccessor(aString));
     return [TDBView viewWithTable:self andNativeView:view];
 }
--(TDBView*)findAllRowsWithBinary:(TightdbBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex
+-(TDBView*)findAllRowsWithBinary:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_binary(colIndex, [aBinary getNativeBinary]);
     return [TDBView viewWithTable:self andNativeView:view];
@@ -1599,7 +1599,7 @@ using namespace std;
 @end
 
 @implementation TightdbColumnProxy_Binary
--(NSUInteger)find:(TightdbBinary*)value
+-(NSUInteger)find:(TDBBinary*)value
 {
     return [self.table findRowIndexWithBinary:value inColumnWithIndex:self.column];
 }
