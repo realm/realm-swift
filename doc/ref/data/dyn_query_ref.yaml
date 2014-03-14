@@ -346,7 +346,7 @@ CATEGORIES :
       NAMES    : group
       DESCR    : *g_dyn_query_group_descr
       SUMMARY  : *g_dyn_query_group_summary
-      SIGNATURE: (void)group
+      SIGNATURE: (TDBQuery *)group
       RETURN:
         TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
@@ -358,7 +358,7 @@ CATEGORIES :
       NAMES    : endGroup
       DESCR    : *g_dyn_query_endGroup_descr
       SUMMARY  : *g_dyn_query_endGroup_summary
-      SIGNATURE: (void)endgroup
+      SIGNATURE: (TDBQuery *)endgroup
       RETURN:
         TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
@@ -370,7 +370,7 @@ CATEGORIES :
       NAMES    : Or
       DESCR    : *g_dyn_query_or_descr
       SUMMARY  : *g_dyn_query_or_summary
-      SIGNATURE: (void)or
+      SIGNATURE: (TDBQuery *)or
       RETURN:
         TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
@@ -379,13 +379,13 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_or
 
   - g_dyn_query_subtable:
-      NAMES    : subtable
+      NAMES    : "subtableInColumnWithIndex:"
       DESCR    : *g_dyn_query_subtable_descr
       SUMMARY  : *g_dyn_query_subtable_summary
-      SIGNATURE: (void)subtable:(size_t)column
+      SIGNATURE: (void)subtableInColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : column
-        TYPES  : size_t
+      - NAME   : colIndex
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       RETURN:
         TYPES  : TDBQuery *
@@ -414,12 +414,12 @@ CATEGORIES :
   - g_dyn_query_find_all_2:
       TODO     : later
   - g_dyn_query_find_all:
-      NAME     : findAll
-      TITLE    : findAll
+      NAME     : findAllRows
+      TITLE    : findAllRows
       DESCR    : *g_dyn_query_find_all_descr
       SUMMARY  : *g_dyn_query_find_all_summary
       SIGNATURE: |
-                 - (TableView *)findAll;
+                 (TDBView *)findAllRows
 #      PARAMS:
 #      - NAME   : start
 #        TYPES  : size_t
@@ -431,50 +431,36 @@ CATEGORIES :
 #        TYPES  : size_t
 #        DESCR  : *g_dyn_query_find_all_parm3_descr
       RETURN:
-        TYPES  : TableView *
+        TYPES  : TDBView *
         DESCR  : *g_dyn_query_find_all_return_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_findall
 
   - g_dyn_query_find:
-      NAMES    : find
+      NAMES    : "findFromRowIndex:"
       DESCR    : *g_dyn_query_find_descr
       SUMMARY  : *g_dyn_query_find_summary
       SIGNATURE: |
-                 - (size_t)find:(size_t)lastMatch
+                 (NSUInteger)findFromRowIndex:(NSUInteger)rowIndex
       PARAMS:
-      - NAME   : lastMatch
-        TYPES  : size_t
+      - NAME   : rowIndex
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_query_find_parm1_descr
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_query_find_return_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_find
 
   - g_dyn_query_count:
-      NAME     : count
+      NAME     : countRows
       DESCR    : *g_dyn_query_size_descr
       SUMMARY  : *g_dyn_query_size_summary
-      SIGNATURE: (size_t)count
-      CONST    : true
-      PARAMS:
-      - NAME   : column
-        DESCR  : *g_dyn_query_column_index_descr
-        TYPES  : size_t
-      - NAME   : start
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_count_parm2_descr
-      - NAME   : end
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_count_parm3_descr
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_count_parm4_descr
+      SIGNATURE: (NSUInteger)countRows
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_query_count_return_descr
       EXAMPLES:
       - DESCR  :
@@ -486,17 +472,17 @@ CATEGORIES :
       NAME     : sumFloat
   - g_dyn_query_sum_double:
       NAME     : sumDouble
-      TITLE    : sumWith*Column
+      TITLE    : "sumW*ColumnWithIndex:"
       DESCR    : *g_dyn_query_sum_descr
       SUMMARY  : *g_dyn_query_sum_summary
       SIGNATURE: |
-                 (int64_t)sumWithIntColumn:(size_t)colNdx
-                 (double)sumWithFloatColumn:(size_t)colNdx
-                 (double)sumWithDoubleColumn:(size_t)colNdx
+                (int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex
+                (double)sumFloatColumnWithIndex:(NSUInteger)colIndex
+                (double)sumDoubleColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : colNdx
+      - NAME   : colIndex
         DESCR  : Column index. The datatype of the column must match the function called.
-        TYPES  : size_t
+        TYPES  : NSUInteger
       RETURN:
         TYPES  : [int64_t, double]
         DESCR  : *g_dyn_query_sum_return_descr
@@ -513,17 +499,17 @@ CATEGORIES :
       NAME     : maxDate
   - g_dyn_query_maximum_int:
       NAME     : maxInt
-      TITLE    : maximumWith*Column
+      TITLE    : "maximum*InColumnWithIndex:"
       DESCR    : *g_dyn_query_maximum_descr
       SUMMARY  : *g_dyn_query_maximum_summary
       SIGNATURE: |
-                 (int64_t)maximumWithIntColumn:(size_t)colNdx
-                 (float)maximumWithFloatColumn:(size_t)colNdx
-                 (double)maximumWithDoubleColumn:(size_t)colNdx
+                  (int64_t)maxIntInColumnWithIndex:(NSUInteger)colIndex
+                  (float)maxFloatInColumnWithIndex:(NSUInteger)colIndex
+                  (double)maxDoubleInColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : colNdx
+      - NAME   : colIndex
         DESCR  : Column index. The datatype of the column must match the function called.
-        TYPES  : size_t
+        TYPES  : NSUInteger
       RETURN:
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : *g_dyn_query_maximum_return_descr
@@ -540,17 +526,17 @@ CATEGORIES :
       NAME     : minFloat
   - g_dyn_query_minimum_int:
       NAME     : minInt
-      TITLE    : minimumWith*Column
+      TITLE    : "min*InColumnWithIndex:"
       DESCR    : *g_dyn_query_minimum_descr
       SUMMARY  : *g_dyn_query_minimum_summary
       SIGNATURE: |
-                 (int64_t)minWithIntColumn:(size_t)colNdx
-                 (float)minWithFloatColumn:(size_t)colNdx
-                 (double)minWithDoubleColumn:(size_t)colNdx
+                  (int64_t)minIntInColumnWithIndex:(NSUInteger)colIndex
+                  (float)minFloatInColumnWithIndex:(NSUInteger)colIndex
+                  (double)minDoubleInColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : colNdx
+      - NAME   : colIndex
         DESCR  : Column index. The datatype of the column must match the function called. E.g. <code>minFloat()</code> can only be used on columns which contains floats.
-        TYPES  : size_t
+        TYPES  : NSUInteger
       RETURN:
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : *g_dyn_query_minimum_return_descr
@@ -564,17 +550,17 @@ CATEGORIES :
       NAME     : avgFloat
   - g_dyn_query_average_double:
       NAME     : avgDouble
-      TITLE    : averageWith*Column
+      TITLE    : avg*ColumnWithIndex*Column
       SUMMARY  : *g_dyn_query_average_summary
       DESCR    : *g_dyn_query_average_descr
       SIGNATURE: |
-                 (double)averageWithIntColumn:(size_t)colNdx
-                 (double)averageWithFloatColumn:(size_t)colNdx
-                 (double)averageWithDoubleColumn:(size_t)colNdx
+                  (double)avgIntColumnWithIndex:(NSUInteger)colIndex
+                  (double)avgFloatColumnWithIndex:(NSUInteger)colIndex
+                  (double)avgDoubleColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : colNdx
+      - NAME   : colIndex
         DESCR  : Column index. The datatype of the column must match the function called.
-        TYPES  : size_t
+        TYPES  : NSUInteger
       RETURN:
         TYPES  : double
         DESCR  : *g_dyn_query_average_return_descr
