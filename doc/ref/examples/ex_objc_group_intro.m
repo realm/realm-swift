@@ -18,7 +18,7 @@ int main()
 
         /* Creates a group and uses it to create a new table. */
 
-        TightdbGroup* group = [TightdbGroup group];
+        TDBGroup* group = [TDBGroup group];
         PeopleTable* table = [group getOrCreateTableWithName:@"people" asTableClass:[PeopleTable class] error:nil];
 
         /* Adds values to the table. */
@@ -41,10 +41,10 @@ int main()
 
         /* Retrieves an in memory buffer from the group. */
 
-        TightdbBinary* buffer = [group writeToBuffer];
+        TDBBinary* buffer = [group writeToBuffer];
 
         /* Creates a group from an im memory buffer */
-        TightdbGroup* groupFromMemory = [TightdbGroup groupWithBuffer:buffer withError:nil];
+        TDBGroup* groupFromMemory = [TDBGroup groupWithBuffer:buffer withError:nil];
         PeopleTable* tableFromMemery = [groupFromMemory getOrCreateTableWithName:@"people" asTableClass:[PeopleTable class] error:nil];
 
         for (PeopleTable_Cursor* cursor in tableFromMemery) {
