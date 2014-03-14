@@ -274,7 +274,7 @@
 -(TDBType)columnTypeOfColumn:(NSUInteger)colIndex;
 
 -(void) sortUsingColumnWithIndex: (NSUInteger)colIndex;
--(void) sortUsingColumnWithIndex: (NSUInteger)colIndex inOrder: (TightdbSortOrder)order;
+-(void) sortUsingColumnWithIndex: (NSUInteger)colIndex inOrder: (TDBSortOrder)order;
 
 
 -(BOOL)boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;

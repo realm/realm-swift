@@ -407,9 +407,9 @@ using namespace std;
 }
 -(void)sortUsingColumnWithIndex:(NSUInteger)colIndex
 {
-    [self sortUsingColumnWithIndex:colIndex inOrder:tightdb_ascending];
+    [self sortUsingColumnWithIndex:colIndex inOrder:TDBAscending];
 }
--(void)sortUsingColumnWithIndex:(NSUInteger)colIndex  inOrder: (TightdbSortOrder)order
+-(void)sortUsingColumnWithIndex:(NSUInteger)colIndex  inOrder: (TDBSortOrder)order
 {
     TDBType columnType = [self columnTypeOfColumn:colIndex];
     
