@@ -50,6 +50,85 @@ using namespace std;
     _table = nil;
 }
 
+-(id)objectAtIndexedSubscript:(NSUInteger)colNdx
+{
+    TDBType columnType = [_table columnTypeOfColumn:colNdx];
+    switch (columnType) {
+        case tightdb_Bool:
+            return [NSNumber numberWithBool:[_table boolInColumnWithIndex:colNdx atRowIndex:_ndx]];
+        case tightdb_Int:
+            return [NSNumber numberWithLongLong:[_table intInColumnWithIndex:colNdx atRowIndex:_ndx]];
+        case tightdb_Float:
+            return [NSNumber numberWithFloat:[_table floatInColumnWithIndex:colNdx atRowIndex:_ndx]];
+        case tightdb_Double:
+            return [NSNumber numberWithLongLong:[_table doubleInColumnWithIndex:colNdx atRowIndex:_ndx]];
+        case tightdb_String:
+            return [_table stringInColumnWithIndex:colNdx atRowIndex:_ndx];
+        case tightdb_Date:
+            return [NSDate dateWithTimeIntervalSince1970:[_table dateInColumnWithIndex:colNdx atRowIndex:_ndx]];
+        case tightdb_Binary:
+            return [_table binaryInColumnWithIndex:colNdx atRowIndex:_ndx];
+        case tightdb_Table:
+            return [_table tableInColumnWithIndex:colNdx atRowIndex:_ndx];
+        case tightdb_Mixed:
+            return [_table mixedInColumnWithIndex:colNdx atRowIndex:_ndx];
+    }
+}
+
+- (id)objectForKeyedSubscript:(id <NSCopying>)key
+{
+    NSUInteger colNdx = [_table indexOfColumnWithName:(NSString *)key];
+    return [self objectAtIndexedSubscript:colNdx];
+}
+
+-(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colNdx
+{
+    TDBType columnType = [_table columnTypeOfColumn:colNdx];
+    
+    // TODO: Verify obj type
+    
+    switch (columnType) {
+        case tightdb_Bool:
+            [_table setBool:[obj boolValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
+            break;
+        case tightdb_Int:
+            [_table setInt:[obj longLongValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
+            break;
+        case tightdb_Float:
+            [_table setFloat:[obj floatValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
+            break;
+        case tightdb_Double:
+            [_table setDouble:[obj doubleValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
+            break;
+        case tightdb_String:
+            if (![obj isKindOfClass:[NSString class]])
+                [NSException raise:@"TypeException" format:@"Inserting non-string obj into string column"];
+            [_table setString:(NSString*)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
+            break;
+        case tightdb_Date:
+            if ([obj isKindOfClass:[NSDate class]])
+                [NSException raise:@"TypeException" format:@"Inserting non-date obj into date column"];
+            [_table setDate:time_t([obj timeIntervalSince1970]) inColumnWithIndex:colNdx atRowIndex:_ndx];
+            break;
+        case tightdb_Binary:
+            [_table setBinary:(TDBBinary *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
+            break;
+        case tightdb_Table:
+            [_table setTable:(TDBTable *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
+            break;
+        case tightdb_Mixed:
+            [_table setMixed:(TDBMixed *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
+            break;
+    }
+}
+
+-(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key
+{
+    NSUInteger colNdx = [_table indexOfColumnWithName:(NSString*)key];
+    [self setObject:obj atIndexedSubscript:colNdx];
+}
+
+
 -(int64_t)intInColumnWithIndex:(NSUInteger)colNdx
 {
     return [_table intInColumnWithIndex:colNdx atRowIndex:_ndx];

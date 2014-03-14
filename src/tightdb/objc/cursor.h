@@ -29,6 +29,11 @@
 -(void)TDBSetNdx:(NSUInteger)ndx;
 -(NSUInteger)TDBIndex;
 
+-(id)objectAtIndexedSubscript:(NSUInteger)colNdx;
+-(id)objectForKeyedSubscript:(id <NSCopying>)key;
+-(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colNdx;
+-(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key;
+
 -(void)setInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex;

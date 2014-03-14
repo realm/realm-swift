@@ -759,6 +759,39 @@ using namespace std;
     return [[TDBRow alloc] initWithTable:self ndx:ndx];
 }
 
+-(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex
+{
+    tightdb::Table& table = *m_table;
+    tightdb::ConstDescriptorRef desc = table.get_descriptor();
+
+    if (table.size() < (size_t)rowIndex) {
+        // FIXME: raise exception - out of bound
+        return ;
+    }
+
+    if ([newValue isKindOfClass:[NSArray class]]) {
+        if (!verify_row(*desc, (NSArray *)newValue)) {
+            return; // FIXME: raise exception
+        }
+        if (!set_row(size_t(rowIndex), table, (NSArray *)newValue)) {
+            // FIXME: raise exception
+            return ;
+        }
+    }
+    
+    if ([newValue isKindOfClass:[NSDictionary class]]) {
+        if (!verify_row_with_labels(*desc, (NSDictionary *)newValue)) {
+            return; // FIXME: raise exception
+        }
+        if (!set_row_with_labels(size_t(rowIndex), table, (NSDictionary *)newValue)) {
+            // FIXME: raise exception
+            return ;
+        }
+    }
+    
+    /* FIXME: pull out properties of object and insert as row */
+}
+
 
 -(TDBRow*)rowAtIndex:(NSUInteger)ndx
 {
@@ -783,18 +816,36 @@ using namespace std;
     return [[TDBRow alloc] initWithTable:self ndx:ndx];
 }
 
--(BOOL)appendRow:(NSArray*)data
+-(BOOL)appendRow:(NSObject*)data
+{
+    tightdb::Table& table = *m_table;
+    return [self insertRow:data atRowIndex:table.size()];
+}
+
+
+-(BOOL)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
 {
     tightdb::Table& table = *m_table;
     tightdb::ConstDescriptorRef desc = table.get_descriptor();
-    if (!verify_row(*desc, data)) {
-        return NO;
+    
+    if ([anObject isKindOfClass:[NSArray class]]) {
+        if (!verify_row(*desc, (NSArray *)anObject)) {
+            return NO;
+        }
+        return insert_row(size_t(rowIndex), table, (NSArray *)anObject);
     }
-
-    /* append row */
-    return insert_row(table.size(), table, data);
+    
+    if ([anObject isKindOfClass:[NSDictionary class]]) {
+        if (!verify_row_with_labels(*desc, (NSDictionary *)anObject)) {
+            return NO;
+        }
+        return insert_row_with_labels(size_t(rowIndex), table, (NSDictionary *)anObject);
+    }
+    
+    /* FIXME: pull out properties of object and insert as row */
+    return NO;
+    
 }
-
 
 
 -(BOOL)removeAllRows
