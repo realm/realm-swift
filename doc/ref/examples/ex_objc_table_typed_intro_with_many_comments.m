@@ -1,6 +1,6 @@
 /* @@Example: not_used @@ */
 
-#import <Tightdb/Tightdb.h>
+#import <tightdb/objc/tightdb.h>
 
 /* Defines a new table with two columns Name and Age. IMPORTANT: the column
  * names MUST begin with a capital. This table definition triggers a macro
