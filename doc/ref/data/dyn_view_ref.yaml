@@ -17,36 +17,26 @@ CATEGORIES :
 - State:
   METHODS:
   - g_dyn_view_size:
-      NAME     : count
+      NAME     : rowCount
       SUMMARY  : *g_dyn_table_size_summary
       DESCR    : *g_dyn_table_size_descr
-      SIGNATURE: (size_t)count
+      SIGNATURE: (NSUInteger)rowCount
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : The number of rows.
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_size
-        DESCR  :
+        DESCR  : Is a @property
 
-  - g_dyn_view_is_empty:
-      NAME     : isEmpty
-      SUMMARY  : *g_dyn_view_is_empty_summary
-      DESCR    : *g_dyn_view_is_empty_descr
-      SIGNATURE: (BOOL)isEmpty
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : <code>true</code> if empty, <code>false</code> otherwise.
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_view_is_empty
-        DESCR  :
+
 
 - View:
   METHODS:
   - g_dyn_view_clear:
-      NAME     : clear
+      NAME     : removeAllRows
       SUMMARY  : *g_dyn_table_clear_summary
       DESCR    : *g_dyn_view_clear_descr
-      SIGNATURE: (void)clear
+      SIGNATURE: (void)removeAllRows
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_clear
         DESCR  :
@@ -54,30 +44,29 @@ CATEGORIES :
 - Columns:
   METHODS:
   - g_dyn_view_get_column_count:
-      TODO     : soon
-
-      NAME     : getColumnCount
+      NAME     : columnCount
       SUMMARY  : *g_dyn_table_get_column_count_summary
       DESCR    : *g_dyn_table_get_column_count_descr
+      SIGNATURE: "@property (nonatomic, readonly) NSUInteger columnCount"
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : The number of columns.
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_get_column_count
-        DESCR  :
+        DESCR  : 
 
   - g_dyn_view_get_column_name:
       TODO     : later
-
-      NAME     : getColumnName
+      NAME     : "columnNameOfColumn:"
       SUMMARY  : *g_dyn_table_get_column_name_summary
       DESCR    : *g_dyn_table_get_column_name_descr
+      SIGNATURE: (NSString *)columnNameOfColumn:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : column_ndx
-        TYPES  : size_t
+      - NAME   : colIndex
+        TYPES  : NSUInteger
         DESCR  : The column index.
       RETURN:
-        TYPES  : const char*
+        TYPES  : NSString *
         DESCR  : The column name.
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_get_column_name
@@ -85,47 +74,46 @@ CATEGORIES :
 
   - g_dyn_view_get_column_index:
       TODO     : later
-
-      NAME     : getColumnIndex
+      NAME     : "indexOfColumnWithName:"
       SUMMARY  : *g_dyn_table_get_column_index_summary
       DESCR    : *g_dyn_table_get_column_index_descr
+      SIGNATURE: (NSUInteger)indexOfColumnWithName:(NSString *)name
       PARAMS:
-      - NAME   : column_name
-        TYPES  : const char*
+      - NAME   : name
+        TYPES  : NSString *
         DESCR  : The column name.
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : The column index.
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_get_column_index
         DESCR  :
 
   - g_dyn_view_get_column_type:
-      TODO     : later
-
-      NAME     : getColumnType
+      NAME     : "getColumnType:"
       SUMMARY  : *g_dyn_table_get_column_type_summary
       DESCR    :
       - TEXT   : *g_dyn_table_get_column_type_descr1
       - TEXT   : >
                  <ul>
-                   <li><code>tightdb_Bool</code></li>
-                   <li><code>tightdb_Int</code></li>
-                   <li><code>tightdb_Float</code></li>
-                   <li><code>tightdb_Double</code></li>
-                   <li><code>tightdb_String</code></li>
-                   <li><code>tightdb_Binary</code></li>
-                   <li><code>tightdb_Table</code></li>
-                   <li><code>tightdb_Date</code></li>
-                   <li><code>tightdb_Mixed</code></li>
+                   <li><code>TDBBoolType</code></li>
+                   <li><code>TDBIntType</code></li>
+                   <li><code>TDBFloatType</code></li>
+                   <li><code>TDBDoubleType</code></li>
+                   <li><code>TDBStringType</code></li>
+                   <li><code>TDBBinaryType</code></li>
+                   <li><code>TDBTableType</code></li>
+                   <li><code>TDBDateType</code></li>
+                   <li><code>TDBMixedType</code></li>
                  </ul>
       CONST    : True
+      SIGNATURE: (TDBType)columnTypeOfColumn:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : column_ndx
-        TYPES  : size_t
+      - NAME   : colIndex
+        TYPES  : NSUInteger
         DESCR  : The column index.
       RETURN:
-        TYPES  : DataType
+        TYPES  : TDBType
         DESCR  : The column type.
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_get_column_type
@@ -135,48 +123,48 @@ CATEGORIES :
 - Rows:
   METHODS:
   - g_dyn_view_cursor_at_index:
-      NAME     : cursorAtIndex
+      NAME     : "rowAtIndex:"
       SUMMARY  : Returns a cursor at a specified row number.
       DESCR    : *objc_typed_table_cursor_at_index_descr
-      SIGNATURE: "- (TightdbCursor *)cursorAtIndex:(size_t)ndx"
+      SIGNATURE: (TDBRow *)rowAtIndex:(NSUInteger)rowIndex
       PARAMS:
-      - NAME   : ndx
-        TYPES  : size_t
-        DESCR  : The row number.
+      - NAME   : rowIndex
+        TYPES  : NSUInteger
+        DESCR  : The row index.
       RETURN:
-        TYPES  : TightdbCursor *
-        DESCR  : The cursor.
+        TYPES  : TDBRow *
+        DESCR  : The row.
   - g_dyn_view_get_source_ndx:
-      NAME     : getSourceIndex
+      NAME     : "rowIndexInOriginTableForRowAtIndex:"
       SUMMARY  : *g_dyn_view_get_source_ndx_summary
       DESCR    : *g_dyn_view_get_source_ndx_descr
-      SIGNATURE: (size_t)getSourceIndex:(size_t)ndx
-      CONST    : True
+      SIGNATURE: (NSUInteger)rowIndexInOriginTableForRowAtIndex:(NSUInteger)rowIndex
       PARAMS:
-      - NAME   : ndx
-        TYPES  : size_t
+      - NAME   : rowIndex
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_view_get_source_ndx_parm1_descr
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_view_get_source_ndx_return1_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_get_source_ndx
         DESCR  :
 
   - g_dyn_view_remove_row:
-      NAME     : removeRowAtIndex
+      NAME     : "removeRowAtIndex:"
       SUMMARY  : *g_dyn_table_remove_row_summary
       DESCR    : *g_dyn_table_remove_row_descr
-      SIGNATURE: (void)removeRowAtIndex:(size_t)ndx;
+      SIGNATURE: (void)removeRowAtIndex:(NSUInteger)rowIndex
       PARAMS:
-      - NAME   : ndx
-        TYPES  : size_t
+      - NAME   : rowIndex
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_view_remove_row_parm1_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_remove
         DESCR  :
 
   - g_dyn_view_remove_last_row:
+      TODO     : soon
       NAME     : removeLastRow
       SUMMARY  : *g_dyn_table_remove_last_row_summary
       DESCR    : *g_dyn_table_remove_last_row_descr
