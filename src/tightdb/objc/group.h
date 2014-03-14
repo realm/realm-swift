@@ -20,15 +20,15 @@
 
 #import <Foundation/Foundation.h>
 
-@class TightdbBinary;
-@class TightdbTable;
+@class TDBBinary;
+@class TDBTable;
 
 
-@interface TightdbGroup: NSObject
+@interface TDBGroup: NSObject
 
 @property (nonatomic, readonly) NSUInteger tableCount;
 
-+(TightdbGroup *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
++(TDBGroup *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
 
 /**
  * You pass the ownership of the specified buffer to the group. The
@@ -36,9 +36,9 @@
  * the buffer you pass, must have been allocated using C function
  * malloc().
  */
-+(TightdbGroup *)groupWithBuffer:(TightdbBinary *)buffer withError:(NSError *__autoreleasing *)error;
++(TDBGroup *)groupWithBuffer:(TDBBinary *)buffer withError:(NSError *__autoreleasing *)error;
 
-+(TightdbGroup *)group;
++(TDBGroup *)group;
 
 -(NSString *)getTableName:(NSUInteger)table_ndx;
 
@@ -57,7 +57,7 @@
  * This method returns nil if it encounters a memory allocation error
  * (out of memory).
  */
--(TightdbTable *)getOrCreateTableWithName:(NSString *)name error:(NSError *__autoreleasing *)error;
+-(TDBTable *)getOrCreateTableWithName:(NSString *)name error:(NSError *__autoreleasing *)error;
 
 /**
  * This method returns nil if the group already contains a table with
@@ -79,7 +79,7 @@
  * malloc(), and it is the responsibility of the caller that C
  * function free() is eventually called to free the buffer.
  */
--(TightdbBinary *)writeToBuffer;
+-(TDBBinary *)writeToBuffer;
 
 @end
 

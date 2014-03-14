@@ -22,22 +22,22 @@
 
 /* Make sure numbers match those in <tightdb/data_type.hpp> */
 typedef enum {
-    tightdb_Bool   =  1,
-    tightdb_Int    =  0,
-    tightdb_Float  =  9,
-    tightdb_Double = 10,
-    tightdb_String =  2,
-    tightdb_Binary =  4,
-    tightdb_Date   =  7,
-    tightdb_Table  =  5,
-    tightdb_Mixed  =  6,
-} TightdbType;
+    TDBBoolType   =  1,
+    TDBIntType    =  0,
+    TDBFloatType  =  9,
+    TDBDoubleType = 10,
+    TDBStringType =  2,
+    TDBBinaryType =  4,
+    TDBDateType   =  7,
+    TDBTableType  =  5,
+    TDBMixedType  =  6,
+} TDBType;
 
 
 typedef enum {
-    tightdb_ascending   =  0,
-    tightdb_descending   =  1,
+    TDBAscending   =  0,
+    TDBDescending   =  1,
     
-} TightdbSortOrder;
+} TDBSortOrder;
 
 #endif /* TIGHTDB_OBJC_TYPE_H */

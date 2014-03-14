@@ -14,15 +14,15 @@ using namespace std;
 
 // TODO: Concept for cursor invalidation (when table updates).
 
-@interface TightdbCursor()
-@property (nonatomic, weak) TightdbTable *table;
+@interface TDBRow()
+@property (nonatomic, weak) TDBTable *table;
 @property (nonatomic) NSUInteger ndx;
 @end
-@implementation TightdbCursor
+@implementation TDBRow
 @synthesize table = _table;
 @synthesize ndx = _ndx;
 
--(id)initWithTable:(TightdbTable *)table ndx:(NSUInteger)ndx
+-(id)initWithTable:(TDBTable *)table ndx:(NSUInteger)ndx
 {
     if (ndx >= [table rowCount])
         return nil;
@@ -45,32 +45,32 @@ using namespace std;
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"TightdbCursor dealloc");
+    NSLog(@"TDBRow dealloc");
 #endif
     _table = nil;
 }
 
 -(id)objectAtIndexedSubscript:(NSUInteger)colNdx
 {
-    TightdbType columnType = [_table columnTypeOfColumn:colNdx];
+    TDBType columnType = [_table columnTypeOfColumn:colNdx];
     switch (columnType) {
-        case tightdb_Bool:
+        case TDBBoolType:
             return [NSNumber numberWithBool:[_table boolInColumnWithIndex:colNdx atRowIndex:_ndx]];
-        case tightdb_Int:
+        case TDBIntType:
             return [NSNumber numberWithLongLong:[_table intInColumnWithIndex:colNdx atRowIndex:_ndx]];
-        case tightdb_Float:
+        case TDBFloatType:
             return [NSNumber numberWithFloat:[_table floatInColumnWithIndex:colNdx atRowIndex:_ndx]];
-        case tightdb_Double:
+        case TDBDoubleType:
             return [NSNumber numberWithLongLong:[_table doubleInColumnWithIndex:colNdx atRowIndex:_ndx]];
-        case tightdb_String:
+        case TDBStringType:
             return [_table stringInColumnWithIndex:colNdx atRowIndex:_ndx];
-        case tightdb_Date:
+        case TDBDateType:
             return [NSDate dateWithTimeIntervalSince1970:[_table dateInColumnWithIndex:colNdx atRowIndex:_ndx]];
-        case tightdb_Binary:
+        case TDBBinaryType:
             return [_table binaryInColumnWithIndex:colNdx atRowIndex:_ndx];
-        case tightdb_Table:
+        case TDBTableType:
             return [_table tableInColumnWithIndex:colNdx atRowIndex:_ndx];
-        case tightdb_Mixed:
+        case TDBMixedType:
             return [_table mixedInColumnWithIndex:colNdx atRowIndex:_ndx];
     }
 }
@@ -83,41 +83,41 @@ using namespace std;
 
 -(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colNdx
 {
-    TightdbType columnType = [_table columnTypeOfColumn:colNdx];
+    TDBType columnType = [_table columnTypeOfColumn:colNdx];
     
     // TODO: Verify obj type
     
     switch (columnType) {
-        case tightdb_Bool:
+        case TDBBoolType:
             [_table setBool:[obj boolValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
-        case tightdb_Int:
+        case TDBIntType:
             [_table setInt:[obj longLongValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
-        case tightdb_Float:
+        case TDBFloatType:
             [_table setFloat:[obj floatValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
-        case tightdb_Double:
+        case TDBDoubleType:
             [_table setDouble:[obj doubleValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
-        case tightdb_String:
+        case TDBStringType:
             if (![obj isKindOfClass:[NSString class]])
                 [NSException raise:@"TypeException" format:@"Inserting non-string obj into string column"];
             [_table setString:(NSString*)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
-        case tightdb_Date:
+        case TDBDateType:
             if ([obj isKindOfClass:[NSDate class]])
                 [NSException raise:@"TypeException" format:@"Inserting non-date obj into date column"];
             [_table setDate:time_t([obj timeIntervalSince1970]) inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
-        case tightdb_Binary:
-            [_table setBinary:(TightdbBinary *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
+        case TDBBinaryType:
+            [_table setBinary:(TDBBinary *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
-        case tightdb_Table:
-            [_table setTable:(TightdbTable *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
+        case TDBTableType:
+            [_table setTable:(TDBTable *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
-        case tightdb_Mixed:
-            [_table setMixed:(TightdbMixed *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
+        case TDBMixedType:
+            [_table setMixed:(TDBMixed *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
     }
 }
@@ -139,7 +139,7 @@ using namespace std;
     return [_table stringInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(TightdbBinary *)binaryInColumnWithIndex:(NSUInteger)colNdx
+-(TDBBinary *)binaryInColumnWithIndex:(NSUInteger)colNdx
 {
     return [_table binaryInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -164,12 +164,12 @@ using namespace std;
     return [_table dateInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(TightdbTable *)tableInColumnWithIndex:(NSUInteger)colNdx
+-(TDBTable *)tableInColumnWithIndex:(NSUInteger)colNdx
 {
     return [_table tableInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(TightdbMixed *)mixedInColumnWithIndex:(NSUInteger)colNdx
+-(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colNdx
 {
     return [_table mixedInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -184,7 +184,7 @@ using namespace std;
     [_table setString:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(void)setBinary:(TightdbBinary *)value inColumnWithIndex:(NSUInteger)colNdx
+-(void)setBinary:(TDBBinary *)value inColumnWithIndex:(NSUInteger)colNdx
 {
     [_table setBinary:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -209,12 +209,12 @@ using namespace std;
     [_table setDate:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(void)setTable:(TightdbTable *)value inColumnWithIndex:(NSUInteger)colNdx
+-(void)setTable:(TDBTable *)value inColumnWithIndex:(NSUInteger)colNdx
 {
     [_table setTable:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(void)setMixed:(TightdbMixed *)value inColumnWithIndex:(NSUInteger)colNdx
+-(void)setMixed:(TDBMixed *)value inColumnWithIndex:(NSUInteger)colNdx
 {
     [_table setMixed:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -222,13 +222,13 @@ using namespace std;
 @end
 
 
-@implementation TightdbAccessor
+@implementation TDBAccessor
 {
-    __weak TightdbCursor *_cursor;
+    __weak TDBRow *_cursor;
     size_t _columnId;
 }
 
--(id)initWithCursor:(TightdbCursor *)cursor columnId:(NSUInteger)columnId
+-(id)initWithCursor:(TDBRow *)cursor columnId:(NSUInteger)columnId
 {
     self = [super init];
     if (self) {
@@ -288,12 +288,12 @@ using namespace std;
     [_cursor.table setString:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
--(TightdbBinary *)getBinary
+-(TDBBinary *)getBinary
 {
     return [_cursor.table binaryInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
--(void)setBinary:(TightdbBinary *)value
+-(void)setBinary:(TDBBinary *)value
 {
     [_cursor.table setBinary:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
@@ -318,17 +318,17 @@ using namespace std;
     return [_cursor.table tableInColumnWithIndex:_columnId atRowIndex:_cursor.ndx asTableClass:obj];
 }
 
--(void)setSubtable:(TightdbTable *)value
+-(void)setSubtable:(TDBTable *)value
 {
     [_cursor.table setTable:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
--(TightdbMixed *)getMixed
+-(TDBMixed *)getMixed
 {
     return [_cursor.table mixedInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
--(void)setMixed:(TightdbMixed *)value
+-(void)setMixed:(TDBMixed *)value
 {
     [_cursor.table setMixed:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }

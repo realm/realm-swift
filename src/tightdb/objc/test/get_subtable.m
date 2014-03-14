@@ -32,20 +32,20 @@ TIGHTDB_TABLE_2(WrongTypeTable,
 - (void)testGetSubtable
 {
     // Create table with all column types
-    TightdbTable* table = [[TightdbTable alloc] init];
-    TightdbDescriptor* desc = table.descriptor;
-    [desc addColumnWithName:@"Outer" andType:tightdb_Bool];
-    [desc addColumnWithName:@"Number" andType:tightdb_Int];
-    TightdbDescriptor* subdesc = [desc addColumnTable:@"GetSubtable"];
-    [subdesc addColumnWithName:@"Hired" andType:tightdb_Bool];
-    [subdesc addColumnWithName:@"Age" andType:tightdb_Int];
+    TDBTable* table = [[TDBTable alloc] init];
+    TDBDescriptor* desc = table.descriptor;
+    [desc addColumnWithName:@"Outer" andType:TDBBoolType];
+    [desc addColumnWithName:@"Number" andType:TDBIntType];
+    TDBDescriptor* subdesc = [desc addColumnTable:@"GetSubtable"];
+    [subdesc addColumnWithName:@"Hired" andType:TDBBoolType];
+    [subdesc addColumnWithName:@"Age" andType:TDBIntType];
 
     [table TDBInsertBool:0 ndx:0 value:NO];
     [table TDBInsertInt:1 ndx:0 value:10];
     [table TDBInsertSubtable:2 ndx:0];
     [table TDBInsertDone];
 
-    TightdbTable* subtable = [table tableInColumnWithIndex:2 atRowIndex:0];
+    TDBTable* subtable = [table tableInColumnWithIndex:2 atRowIndex:0];
     [subtable TDBInsertBool:0 ndx:0 value:YES];
     [subtable TDBInsertInt:1 ndx:0 value:42];
     [subtable TDBInsertDone];

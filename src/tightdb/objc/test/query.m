@@ -32,14 +32,14 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     STAssertNotNil(table, @"Table is nil");
 
     const char bin[4] = { 0, 1, 2, 3 };
-    TightdbBinary *bin1 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin / 2];
-    TightdbBinary *bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
+    TDBBinary *bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
+    TDBBinary *bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
     time_t timeNow = [[NSDate date] timeIntervalSince1970];
 //    TestQuerySub *subtab1 = [[TestQuerySub alloc] init];
     TestQuerySub *subtab2 = [[TestQuerySub alloc] init];
     [subtab2 addAge:100];
-    TightdbMixed *mixInt1   = [TightdbMixed mixedWithInt64:1];
-    TightdbMixed *mixSubtab = [TightdbMixed mixedWithTable:subtab2];
+    TDBMixed *mixInt1   = [TDBMixed mixedWithInt64:1];
+    TDBMixed *mixSubtab = [TDBMixed mixedWithTable:subtab2];
 
     [table addBoolCol:NO   IntCol:54       FloatCol:0.7     DoubleCol:0.8       StringCol:@"foo"
             BinaryCol:bin1 DateCol:0       TableCol:nil     MixedCol:mixInt1];
@@ -148,24 +148,24 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 - (void) testDynamic
 {
 
-        TightdbTable *table = [[TightdbTable alloc]init];
+        TDBTable *table = [[TDBTable alloc]init];
 
-        [table addColumnWithName:@"BoolCol" andType:tightdb_Bool];
-        [table addColumnWithName:@"IntCol" andType:tightdb_Int];
-        [table addColumnWithName:@"FloatCol" andType:tightdb_Float];
-        [table addColumnWithName:@"DoubleCol" andType:tightdb_Double];
-        [table addColumnWithName:@"StringCol" andType:tightdb_String];
-        [table addColumnWithName:@"BinaryCol" andType:tightdb_Binary];
-        [table addColumnWithName:@"DateCol" andType:tightdb_Date];
-        [table addColumnWithName:@"MixedCol" andType:tightdb_Mixed];
+        [table addColumnWithName:@"BoolCol" andType:TDBBoolType];
+        [table addColumnWithName:@"IntCol" andType:TDBIntType];
+        [table addColumnWithName:@"FloatCol" andType:TDBFloatType];
+        [table addColumnWithName:@"DoubleCol" andType:TDBDoubleType];
+        [table addColumnWithName:@"StringCol" andType:TDBStringType];
+        [table addColumnWithName:@"BinaryCol" andType:TDBBinaryType];
+        [table addColumnWithName:@"DateCol" andType:TDBDateType];
+        [table addColumnWithName:@"MixedCol" andType:TDBMixedType];
         // TODO: add Enum<T> and Subtable<T> when possible.
 
         const char bin[4] = { 0, 1, 2, 3 };
         time_t timeNow = [[NSDate date] timeIntervalSince1970];
-        TightdbMixed *mixInt1   = [TightdbMixed mixedWithInt64:1];
-        TightdbMixed *mixString   = [TightdbMixed mixedWithString:@"foo"];
-        TightdbBinary *bin1 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin / 2];
-        TightdbBinary *bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
+        TDBMixed *mixInt1   = [TDBMixed mixedWithInt64:1];
+        TDBMixed *mixString   = [TDBMixed mixedWithString:@"foo"];
+        TDBBinary *bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
+        TDBBinary *bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
 
         // Using private method just for the sake of testing the setters below.
         [table TDBAddEmptyRows:2];
@@ -242,7 +242,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
         //STAssertEquals([[[table where] column:INT_COL isBetweenInt:859 and_:861] find:0], (size_t) 1, @"find");
 
-       // STAssertEquals([[[[table where] column:INT_COL isBetweenInt:859 and_:861] findAll] class], [TightdbView class], @"findAll");
+       // STAssertEquals([[[[table where] column:INT_COL isBetweenInt:859 and_:861] findAll] class], [TDBView class], @"findAll");
 
         STAssertEquals([[table where] minIntInColumnWithIndex:INT_COL] , (int64_t)0, @"minimunIntOfColumn");
         STAssertEquals([[table where] sumIntColumnWithIndex:INT_COL] , (int64_t)860, @"IntCol max");
@@ -253,8 +253,8 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
 - (void)testFind
 {
-    TightdbTable* table = [[TightdbTable alloc]init];
-    [table addColumnWithName:@"IntCol" andType:tightdb_Int];
+    TDBTable* table = [[TDBTable alloc]init];
+    [table addColumnWithName:@"IntCol" andType:TDBIntType];
     [table TDBAddEmptyRows:6];
 
     [table setInt:10 inColumnWithIndex:0 atRowIndex:0];
