@@ -54,23 +54,23 @@ using namespace std;
 {
     TDBType columnType = [_table columnTypeOfColumn:colNdx];
     switch (columnType) {
-        case tightdb_Bool:
+        case TDBBoolType:
             return [NSNumber numberWithBool:[_table boolInColumnWithIndex:colNdx atRowIndex:_ndx]];
-        case tightdb_Int:
+        case TDBIntType:
             return [NSNumber numberWithLongLong:[_table intInColumnWithIndex:colNdx atRowIndex:_ndx]];
-        case tightdb_Float:
+        case TDBFloatType:
             return [NSNumber numberWithFloat:[_table floatInColumnWithIndex:colNdx atRowIndex:_ndx]];
-        case tightdb_Double:
+        case TDBDoubleType:
             return [NSNumber numberWithLongLong:[_table doubleInColumnWithIndex:colNdx atRowIndex:_ndx]];
-        case tightdb_String:
+        case TDBStringType:
             return [_table stringInColumnWithIndex:colNdx atRowIndex:_ndx];
-        case tightdb_Date:
+        case TDBDateType:
             return [NSDate dateWithTimeIntervalSince1970:[_table dateInColumnWithIndex:colNdx atRowIndex:_ndx]];
-        case tightdb_Binary:
+        case TDBBinaryType:
             return [_table binaryInColumnWithIndex:colNdx atRowIndex:_ndx];
-        case tightdb_Table:
+        case TDBTableType:
             return [_table tableInColumnWithIndex:colNdx atRowIndex:_ndx];
-        case tightdb_Mixed:
+        case TDBMixedType:
             return [_table mixedInColumnWithIndex:colNdx atRowIndex:_ndx];
     }
 }
@@ -88,35 +88,35 @@ using namespace std;
     // TODO: Verify obj type
     
     switch (columnType) {
-        case tightdb_Bool:
+        case TDBBoolType:
             [_table setBool:[obj boolValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
-        case tightdb_Int:
+        case TDBIntType:
             [_table setInt:[obj longLongValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
-        case tightdb_Float:
+        case TDBFloatType:
             [_table setFloat:[obj floatValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
-        case tightdb_Double:
+        case TDBDoubleType:
             [_table setDouble:[obj doubleValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
-        case tightdb_String:
+        case TDBStringType:
             if (![obj isKindOfClass:[NSString class]])
                 [NSException raise:@"TypeException" format:@"Inserting non-string obj into string column"];
             [_table setString:(NSString*)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
-        case tightdb_Date:
+        case TDBDateType:
             if ([obj isKindOfClass:[NSDate class]])
                 [NSException raise:@"TypeException" format:@"Inserting non-date obj into date column"];
             [_table setDate:time_t([obj timeIntervalSince1970]) inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
-        case tightdb_Binary:
+        case TDBBinaryType:
             [_table setBinary:(TDBBinary *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
-        case tightdb_Table:
+        case TDBTableType:
             [_table setTable:(TDBTable *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
-        case tightdb_Mixed:
+        case TDBMixedType:
             [_table setMixed:(TDBMixed *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
     }
