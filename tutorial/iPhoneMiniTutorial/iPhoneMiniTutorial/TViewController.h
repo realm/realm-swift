@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 
 @interface TViewController : UIViewController
-@property (weak, nonatomic) IBOutlet UILabel *tableColumnCountOutlet;
-@property (weak, nonatomic) IBOutlet UILabel *tableSizeOutlet;
+@property (weak, nonatomic) IBOutlet UILabel *columnCountOutlet;
+@property (weak, nonatomic) IBOutlet UILabel *sizeOutlet;
 
 @end
