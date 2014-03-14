@@ -40,8 +40,8 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: number_of_rows @@
-    size_t cnt1 = people.rowCount;                     // cnt = 6
-    BOOL empty  = people.rowCount;                     // empty = NO
+    NSUInteger cnt1 = people.rowCount;                 // cnt = 6
+    BOOL empty = people.rowCount;                      // empty = NO
     // @@EndExample@@
 
     // @@Example: accessing_rows @@
@@ -68,19 +68,19 @@ void tableFunc() {
 
     // @@Example: deleting_row @@
     [people removeRowAtIndex:2];
-    size_t cnt2 = [people rowCount];                      // cnt = 5
+    NSUInteger cnt2 = [people rowCount];                      // cnt = 5
     // @@EndExample@@
 
     // @@Example: iteration @@
-    for (size_t i = 0; i < people.rowCount; ++i) {
+    for (NSUInteger i = 0; i < people.rowCount; ++i) {
         PeopleTable_Cursor *row = people[i];
         NSLog(@"%@ is %lld years old", row.Name, row.Age);
     }
     // @@EndExample@@
 
     // @@Example: simple_seach @@
-    size_t row_id;
-    row_id = [people.Name find:@"Philip"];                 // (size_t)-1. Not found
+    NSUInteger row_id;
+    row_id = [people.Name find:@"Philip"];                 // (NSUInteger)-1: Not found
     row_id = [people.Name find:@"Mary"];                   // row = 1
     // @@EndExample@@
 
@@ -90,14 +90,14 @@ void tableFunc() {
                                            .Age   columnIsBetween:20 and_:30];
 
     // Get number of matching entries
-    size_t cnt3 = [q countRows];                            // =&gt; 2
+    NSUInteger cnt3 = [q countRows];                            // =&gt; 2
 
     // Get the average age (currently only a low-level interface)
     double avg = [q.Age avg];
 
     // Execute the query and return a table (view)
     PeopleTable_View *res = [q findAll];
-    for (size_t i = 0; i < res.rowCount; ++i) {
+    for (NSUInteger i = 0; i < res.rowCount; ++i) {
         NSLog(@"%zu: %@ is %lld years old", i, people[i].Name, people[i].Age);
     }
 
