@@ -137,6 +137,53 @@ TIGHTDB_TABLE_2(SharedTable2,
     }];
 }
 
+- (void) testHasChanged
+{
+    
+    NSFileManager* fm = [NSFileManager defaultManager];
+    
+    // Write to disk
+    [fm removeItemAtPath:@"hasChanged.tightdb" error:nil];
+    [fm removeItemAtPath:@"hasChanged.tightdb.lock" error:nil];
+    
+    TDBSharedGroup *sg = [TDBSharedGroup sharedGroupWithFile:@"hasChanged.tightdb" withError:nil];
+    
+    STAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not changed");
+    
+    [sg writeWithBlock:^(TDBGroup* group) {
+        [group getOrCreateTableWithName:@"t" error:nil];
+        return YES;
+    } withError:nil];
+    
+    STAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not been changed by another process");
+
+    
+    [sg writeWithBlock:^(TDBGroup* group) {
+        TDBTable *t = [group getOrCreateTableWithName:@"t" error:nil];
+        [t addColumnWithName:@"col" andType:TDBBoolType];
+        TDBRow *row = [t addEmptyRow];
+        [row setBool:YES inColumnWithIndex:0];
+        return YES;
+    } withError:nil];
+    
+    STAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not been changed by another process");
+    
+    
+    // OTHER sharedgroup
+    TDBSharedGroup *sg2 = [TDBSharedGroup sharedGroupWithFile:@"hasChanged.tightdb" withError:nil];
+    
+    
+    [sg2 writeWithBlock:^(TDBGroup* group) {
+        TDBTable *t = [group getOrCreateTableWithName:@"t" error:nil];
+        [t addEmptyRow]; /* Adding a row */
+        return YES;
+    } withError:nil];
+
+    STAssertTrue([sg hasChangedSinceLastTransaction], @"SharedGroup HAS been changed by another process");
+
+
+}
+
 @end
 
 
