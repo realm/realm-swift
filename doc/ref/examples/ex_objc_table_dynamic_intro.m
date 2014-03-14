@@ -1,7 +1,6 @@
 /* @@Example: ex_objc_table_dynamic_intro @@ */
 
-#import <tightdb/objc/table.h>
-#import <tightdb/objc/tightdb.h>
+#import <Tightdb/Tightdb.h>
 
 
 
@@ -11,78 +10,78 @@ int main()
 
         /* Create a new table dynamically. */
 
-        TightdbTable *table = [[TightdbTable alloc] init];
+        TDBTable *table = [[TDBTable alloc] init];
 
-        size_t const NAME = [table addColumnWithType:tightdb_String andName:@"Name"];
-        size_t const AGE = [table addColumnWithType:tightdb_Int andName:@"Age"];
+        NSUInteger const NAME = [table addColumnWithName:@"Name" andType:TDBStringType];
+        NSUInteger const AGE = [table addColumnWithName:@"Age" andType:TDBIntType];
 
         /* Add rows and values. */
 
-        TightdbCursor *cursor;
+        TDBRow *row;
 
         /* Row 0 */
 
-        cursor = [table addEmptyRow];
+        row = [table addEmptyRow];
 
-        [cursor setInt:23 inColumn:AGE];
-        [cursor setString:@"Joe" inColumn:NAME];
+        [row setInt:23 inColumnWithIndex:AGE];
+        [row setString:@"Joe" inColumnWithIndex:NAME];
 
         /* Row 1 */
 
-        cursor = [table addEmptyRow];
+        row = [table addEmptyRow];
 
-        [cursor setInt:32 inColumn:AGE];
-        [cursor setString:@"Simon" inColumn:NAME];
+        [row setInt:32 inColumnWithIndex:AGE];
+        [row setString:@"Simon" inColumnWithIndex:NAME];
 
         /* Row 2 */
 
-        cursor = [table addEmptyRow];
+        row = [table addEmptyRow];
 
-        [cursor setInt:12 inColumn:AGE];
-        [cursor setString:@"Steve" inColumn:NAME];
+        [row setInt:12 inColumnWithIndex:AGE];
+        [row setString:@"Steve" inColumnWithIndex:NAME];
 
         /* Row 3 */
 
-        cursor = [table addEmptyRow];
+        row = [table addEmptyRow];
 
-        [cursor setInt:100 inColumn:AGE];
-        [cursor setString:@"Nick" inColumn:NAME];
+        [row setInt:100 inColumnWithIndex:AGE];
+        [row setString:@"Nick" inColumnWithIndex:NAME];
 
         /* Print using a cursor. */
 
-        for (TightdbCursor *ite in table)
-            NSLog(@"Name: %@ Age: %lld", [ite getStringInColumn:NAME], [ite getIntInColumn:AGE]);
+        for (TDBRow *ite in table)
+            NSLog(@"Name: %@ Age: %lld", [ite stringInColumnWithIndex:NAME], [ite intInColumnWithIndex:AGE]);
 
 
         /* Insert a row and print. */
 
-        cursor = [table insertRowAtIndex:2];
-        [cursor setInt:21 inColumn:AGE];
-        [cursor setString:@"Hello I'm INSERTED" inColumn:NAME];
+        row = [table insertEmptyRowAtIndex:2];
+        [row setInt:21 inColumnWithIndex:AGE];
+        [row setString:@"Hello I'm INSERTED" inColumnWithIndex:NAME];
 
 
         NSLog(@"--------");
 
-        for (TightdbCursor *ite in table)
-            NSLog(@"Name: %@ Age: %lld", [ite getStringInColumn:NAME], [ite getIntInColumn:AGE]);
+        for (TDBRow *ite in table)
+            NSLog(@"Name: %@ Age: %lld", [ite stringInColumnWithIndex:NAME], [ite intInColumnWithIndex:AGE]);
 
 
         /* Update a few rows and print again. */
 
-        cursor = [table cursorAtIndex:2];
-        [cursor setString:@"Now I'm UPDATED" inColumn:NAME];
+        row = [table rowAtIndex:2];
+        [row setString:@"Now I'm UPDATED" inColumnWithIndex:NAME];
 
-        cursor = [table cursorAtLastIndex];
-        [cursor setString:@"I'm UPDATED" inColumn:NAME];
+        row = [table lastRow];
+        [row setString:@"I'm UPDATED" inColumnWithIndex:NAME];
 
         NSLog(@"--------");
 
-        for (TightdbCursor *ite in table)
-            NSLog(@"Name: %@ Age: %lld", [ite getStringInColumn:NAME], [ite getIntInColumn:AGE]);
+        for (TDBRow *ite in table)
+            NSLog(@"Name: %@ Age: %lld", [ite stringInColumnWithIndex:NAME], [ite intInColumnWithIndex:AGE]);
 
         /* Index not existing. */
 
-        TightdbCursor *c2 = [table cursorAtIndex:[table count]];
+        TDBRow *c2 = [table rowAtIndex:table.rowCount];
         if (c2 != nil)
             NSLog(@"Should not get here.");
     }
