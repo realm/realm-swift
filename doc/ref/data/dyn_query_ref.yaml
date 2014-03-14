@@ -472,7 +472,7 @@ CATEGORIES :
       NAME     : sumFloat
   - g_dyn_query_sum_double:
       NAME     : sumDouble
-      TITLE    : "sumW*ColumnWithIndex:"
+      TITLE    : "sum*ColumnWithIndex:"
       DESCR    : *g_dyn_query_sum_descr
       SUMMARY  : *g_dyn_query_sum_summary
       SIGNATURE: |
@@ -499,7 +499,7 @@ CATEGORIES :
       NAME     : maxDate
   - g_dyn_query_maximum_int:
       NAME     : maxInt
-      TITLE    : "maximum*InColumnWithIndex:"
+      TITLE    : "max*InColumnWithIndex:"
       DESCR    : *g_dyn_query_maximum_descr
       SUMMARY  : *g_dyn_query_maximum_summary
       SIGNATURE: |
@@ -569,10 +569,10 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_average
 
   - g_dyn_query_remove:
-      NAMES    : remove
+      NAMES    : "removeRows:"
       DESCR    : *g_dyn_query_remove_descr
       SUMMARY  : *g_dyn_query_remove_summary
-      SIGNATURE: (NSNumber *)remove
+      SIGNATURE: (NSUInteger)removeRows
 #      PARAMS:
 #      - NAME   : column
 #        DESCR  : *g_dyn_query_column_index_descr
@@ -590,7 +590,7 @@ CATEGORIES :
 #        TYPES  : size_t
 #        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
       RETURN:
-        TYPES  : NSNumber *
+        TYPES  : NSUInteger *
         DESCR  : *g_dyn_query_remove_return_descr
       EXAMPLES:
       - DESCR  :
