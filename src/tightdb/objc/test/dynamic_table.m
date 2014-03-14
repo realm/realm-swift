@@ -38,12 +38,12 @@
     STAssertNotNil(_table, @"Table is nil");
 
     // 1. Add two columns
-    [_table addColumnWithName:@"first" andType:tightdb_Int];
-    [_table addColumnWithName:@"second" andType:tightdb_Int];
+    [_table addColumnWithName:@"first" andType:TDBIntType];
+    [_table addColumnWithName:@"second" andType:TDBIntType];
 
     // Verify
-    STAssertEquals(tightdb_Int, [_table columnTypeOfColumn:0], @"First column not int");
-    STAssertEquals(tightdb_Int, [_table columnTypeOfColumn:1], @"Second column not int");
+    STAssertEquals(TDBIntType, [_table columnTypeOfColumn:0], @"First column not int");
+    STAssertEquals(TDBIntType, [_table columnTypeOfColumn:1], @"Second column not int");
     if (![[_table columnNameOfColumn:0] isEqualToString:@"first"])
         STFail(@"First not equal to first");
     if (![[_table columnNameOfColumn:1] isEqualToString:@"second"])
@@ -70,7 +70,7 @@
 -(void)testAddColumn
 {
     TDBTable *t = [[TDBTable alloc] init];
-    NSUInteger stringColIndex = [t addColumnWithName:@"stringCol" andType:tightdb_String];
+    NSUInteger stringColIndex = [t addColumnWithName:@"stringCol" andType:TDBStringType];
     TDBRow *row = [t addEmptyRow];
     [row setString:@"val" inColumnWithIndex:stringColIndex];
     
@@ -81,7 +81,7 @@
 {
     // Add row using object literate
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Int];
+    [t addColumnWithName:@"first" andType:TDBIntType];
     STAssertTrue([t appendRow:@[ @1 ]], @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
     STAssertTrue([t appendRow:@[ @2 ]], @"Impossible!");
@@ -97,7 +97,7 @@
 {
     // Add row using object literate
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Int];
+    [t addColumnWithName:@"first" andType:TDBIntType];
     STAssertTrue([t insertRow:@[ @1 ] atRowIndex:0], @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
     STAssertTrue([t insertRow:@[ @2 ] atRowIndex:0], @"Impossible!");
@@ -112,7 +112,7 @@
 -(void)testUpdateRowIntColumn
 {
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Int];
+    [t addColumnWithName:@"first" andType:TDBIntType];
     [t insertRow:@[@1] atRowIndex:0];
     t[0] = @[@2];
     STAssertEquals((int64_t)2, [t intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
@@ -121,7 +121,7 @@
 -(void)testUpdateRowWithLabelsIntColumn
 {
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Int];
+    [t addColumnWithName:@"first" andType:TDBIntType];
     [t insertRow:@[@1] atRowIndex:0];
     t[0] = @{@"first": @2};
     STAssertEquals((int64_t)2, [t intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
@@ -132,7 +132,7 @@
 {
     // Add row using object literate
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Int];
+    [t addColumnWithName:@"first" andType:TDBIntType];
     
     STAssertTrue([t appendRow:@{ @"first": @1 }], @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
@@ -159,7 +159,7 @@
 {
     // Add row using object literate
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Int];
+    [t addColumnWithName:@"first" andType:TDBIntType];
     
     STAssertTrue(([t insertRow:@{ @"first": @1 } atRowIndex:0]), @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
@@ -185,8 +185,8 @@
 -(void)testAppendRowsIntStringColumns
 {
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Int];
-    [t addColumnWithName:@"second" andType:tightdb_String];
+    [t addColumnWithName:@"first" andType:TDBIntType];
+    [t addColumnWithName:@"second" andType:TDBStringType];
 
     STAssertTrue(([t appendRow:@[@1, @"Hello"]]), @"appendRow 1");
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
@@ -199,8 +199,8 @@
 -(void)testAppendRowWithLabelsIntStringColumns
 {
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Int];
-    [t addColumnWithName:@"second" andType:tightdb_String];
+    [t addColumnWithName:@"first" andType:TDBIntType];
+    [t addColumnWithName:@"second" andType:TDBStringType];
     STAssertTrue(([t appendRow:@{@"first": @1, @"second": @"Hello"}]), @"appendRowWithLabels 1");
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
     STAssertEquals((int64_t)1, ([t intInColumnWithIndex:0 atRowIndex:0]), @"Value 1 expected");
@@ -212,7 +212,7 @@
 -(void)testAppendRowsDoubleColumn
 {
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Double];
+    [t addColumnWithName:@"first" andType:TDBDoubleType];
     STAssertTrue(([t appendRow:@[@3.14]]), @"Cannot insert 'double'");  /* double is default */
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 }
@@ -220,7 +220,7 @@
 -(void)testAppendRowWithLabelsDoubleColumn
 {
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Double];
+    [t addColumnWithName:@"first" andType:TDBDoubleType];
     STAssertTrue(([t appendRow:@{@"first": @3.14}]), @"Cannot insert 'double'");   /* double is default */
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 }
@@ -228,7 +228,7 @@
 -(void)testAppendRowsFloatColumn
 {
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Float];
+    [t addColumnWithName:@"first" andType:TDBFloatType];
     STAssertTrue(([t appendRow:@[@3.14F]]), @"Cannot insert 'float'"); /* F == float */
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 }
@@ -236,7 +236,7 @@
 -(void)testAppendRowWithLabelsFloatColumn
 {
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Float];
+    [t addColumnWithName:@"first" andType:TDBFloatType];
     STAssertTrue(([t appendRow:@{@"first": @3.14F}]), @"Cannot insert 'float'");   /* F == float */
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 }
@@ -244,7 +244,7 @@
 -(void)testAppendRowsDateColumn
 {
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Date];
+    [t addColumnWithName:@"first" andType:TDBDateType];
     STAssertTrue(([t appendRow:@[@1000000000]]), @"Cannot insert 'time_t'"); /* 2001-09-09 01:46:40 */
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 
@@ -256,7 +256,7 @@
 -(void)testAppendRowWithLabelsDateColumn
 {
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Date];
+    [t addColumnWithName:@"first" andType:TDBDateType];
 
     STAssertTrue(([t appendRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   /* 2001-09-09 01:46:40 */
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
@@ -271,7 +271,7 @@
     const char bin[4] = { 0, 1, 2, 3 };
     TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Binary];
+    [t addColumnWithName:@"first" andType:TDBBinaryType];
     if (![t appendRow:@[bin2]])
         STFail(@"Cannot insert 'binary'");
     if ([t rowCount] != 1)
@@ -290,7 +290,7 @@
     const char bin[4] = { 0, 1, 2, 3 };
     TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Binary];
+    [t addColumnWithName:@"first" andType:TDBBinaryType];
 
     if (![t appendRow:@{@"first": bin2}])
         STFail(@"Cannot insert 'binary'");
@@ -307,21 +307,21 @@
 -(void)testAppendRowsTooManyItems
 {
     TDBTable *t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Int];
+    [t addColumnWithName:@"first" andType:TDBIntType];
     STAssertFalse(([t appendRow:@[@1, @1]]), @"Too many items for a row.");
 }
 
 -(void)testAppendRowsTooFewItems
 {
     TDBTable *t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Int];
+    [t addColumnWithName:@"first" andType:TDBIntType];
     STAssertFalse(([t appendRow:@[]]), @"Too few items for a row.");
 }
 
 -(void)testAppendRowsWrongType
 {
     TDBTable *t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Int];
+    [t addColumnWithName:@"first" andType:TDBIntType];
     STAssertFalse(([t appendRow:@[@YES]]), @"Wrong type for column.");
     STAssertFalse(([t appendRow:@[@""]]), @"Wrong type for column.");
     STAssertFalse(([t appendRow:@[@3.5]]), @"Wrong type for column.");
@@ -332,7 +332,7 @@
 -(void)testAppendRowsBoolColumn
 {
     TDBTable *t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Bool];
+    [t addColumnWithName:@"first" andType:TDBBoolType];
     STAssertTrue(([t appendRow:@[@YES]]), @"Cannot append bool column.");
     STAssertTrue(([t appendRow:@[@NO]]), @"Cannot append bool column.");
     STAssertEquals((size_t)2, [t rowCount], @"2 rows expected");
@@ -341,7 +341,7 @@
 -(void)testAppendRowWithLabelsBoolColumn
 {
     TDBTable *t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Bool];
+    [t addColumnWithName:@"first" andType:TDBBoolType];
     STAssertTrue(([t appendRow:@{@"first": @YES}]), @"Cannot append bool column.");
     STAssertTrue(([t appendRow:@{@"first": @NO}]), @"Cannot append bool column.");
     STAssertEquals((size_t)2, [t rowCount], @"2 rows expected");
@@ -350,10 +350,10 @@
 -(void)testAppendRowsIntSubtableColumns
 {
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Int];
+    [t addColumnWithName:@"first" andType:TDBIntType];
     TDBDescriptor* descr = [t descriptor];
     TDBDescriptor* subdescr = [descr addColumnTable:@"second"];
-    [subdescr addColumnWithName:@"TableCol_IntCol" andType:tightdb_Int];
+    [subdescr addColumnWithName:@"TableCol_IntCol" andType:TDBIntType];
     if (![t appendRow:@[@1, @[]]])
         STFail(@"1 row excepted");
     if ([t rowCount] != 1)
@@ -370,7 +370,7 @@
     TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
 
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Mixed];
+    [t addColumnWithName:@"first" andType:TDBMixedType];
     if (![t appendRow:@[@1]])
         STFail(@"Cannot insert 'int'");
     if ([t rowCount] != 1)
@@ -397,7 +397,7 @@
         STFail(@"6 rows excepted");
 
     TDBTable* _table10 = [[TDBTable alloc] init];
-    [_table10 addColumnWithName:@"first" andType:tightdb_Bool];
+    [_table10 addColumnWithName:@"first" andType:TDBBoolType];
     if (![_table10 appendRow:@[@YES]])
         STFail(@"Cannot insert 'bool'");
     if ([_table10 rowCount] != 1)
@@ -410,7 +410,7 @@
     TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
     
     TDBTable* t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"first" andType:tightdb_Mixed];
+    [t addColumnWithName:@"first" andType:TDBMixedType];
     if (![t appendRow:@{@"first": @1}])
         STFail(@"Cannot insert 'int'");
     if ([t rowCount] != 1)
@@ -441,14 +441,14 @@
 {
     
     TDBTable *t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"col0" andType:tightdb_Int];
+    [t addColumnWithName:@"col0" andType:TDBIntType];
     STAssertTrue([t columnCount] == 1,@"1 column added" );
     
     [t removeColumnWithIndex:0];
     STAssertTrue([t columnCount] == 0, @"Colum removed");
     
     for (int i=0;i<10;i++) {
-        [t addColumnWithName:@"name" andType:tightdb_Int];
+        [t addColumnWithName:@"name" andType:TDBIntType];
     }
     
     STAssertThrows([t removeColumnWithIndex:10], @"Out of bounds");
@@ -886,28 +886,28 @@
 
     TDBDescriptor* desc = [table descriptor];
 
-    [desc addColumnWithName:@"BoolCol" andType:tightdb_Bool];    const size_t BoolCol = 0;
-    [desc addColumnWithName:@"IntCol" andType:tightdb_Int];     const size_t IntCol = 1;
-    [desc addColumnWithName:@"FloatCol" andType:tightdb_Float];   const size_t FloatCol = 2;
-    [desc addColumnWithName:@"DoubleCol" andType:tightdb_Double];  const size_t DoubleCol = 3;
-    [desc addColumnWithName:@"StringCol" andType:tightdb_String];  const size_t StringCol = 4;
-    [desc addColumnWithName:@"BinaryCol" andType:tightdb_Binary];  const size_t BinaryCol = 5;
-    [desc addColumnWithName:@"DateCol" andType:tightdb_Date];    const size_t DateCol = 6;
+    [desc addColumnWithName:@"BoolCol" andType:TDBBoolType];    const size_t BoolCol = 0;
+    [desc addColumnWithName:@"IntCol" andType:TDBIntType];     const size_t IntCol = 1;
+    [desc addColumnWithName:@"FloatCol" andType:TDBFloatType];   const size_t FloatCol = 2;
+    [desc addColumnWithName:@"DoubleCol" andType:TDBDoubleType];  const size_t DoubleCol = 3;
+    [desc addColumnWithName:@"StringCol" andType:TDBStringType];  const size_t StringCol = 4;
+    [desc addColumnWithName:@"BinaryCol" andType:TDBBinaryType];  const size_t BinaryCol = 5;
+    [desc addColumnWithName:@"DateCol" andType:TDBDateType];    const size_t DateCol = 6;
     TDBDescriptor* subdesc = [desc addColumnTable:@"TableCol"]; const size_t TableCol = 7;
-    [desc addColumnWithName:@"MixedCol" andType:tightdb_Mixed];   const size_t MixedCol = 8;
+    [desc addColumnWithName:@"MixedCol" andType:TDBMixedType];   const size_t MixedCol = 8;
 
-    [subdesc addColumnWithName:@"TableCol_IntCol" andType:tightdb_Int];
+    [subdesc addColumnWithName:@"TableCol_IntCol" andType:TDBIntType];
 
     // Verify column types
-    STAssertEquals(tightdb_Bool,   [table columnTypeOfColumn:0], @"First column not bool");
-    STAssertEquals(tightdb_Int,    [table columnTypeOfColumn:1], @"Second column not int");
-    STAssertEquals(tightdb_Float,  [table columnTypeOfColumn:2], @"Third column not float");
-    STAssertEquals(tightdb_Double, [table columnTypeOfColumn:3], @"Fourth column not double");
-    STAssertEquals(tightdb_String, [table columnTypeOfColumn:4], @"Fifth column not string");
-    STAssertEquals(tightdb_Binary, [table columnTypeOfColumn:5], @"Sixth column not binary");
-    STAssertEquals(tightdb_Date,   [table columnTypeOfColumn:6], @"Seventh column not date");
-    STAssertEquals(tightdb_Table,  [table columnTypeOfColumn:7], @"Eighth column not table");
-    STAssertEquals(tightdb_Mixed,  [table columnTypeOfColumn:8], @"Ninth column not mixed");
+    STAssertEquals(TDBBoolType,   [table columnTypeOfColumn:0], @"First column not bool");
+    STAssertEquals(TDBIntType,    [table columnTypeOfColumn:1], @"Second column not int");
+    STAssertEquals(TDBFloatType,  [table columnTypeOfColumn:2], @"Third column not float");
+    STAssertEquals(TDBDoubleType, [table columnTypeOfColumn:3], @"Fourth column not double");
+    STAssertEquals(TDBStringType, [table columnTypeOfColumn:4], @"Fifth column not string");
+    STAssertEquals(TDBBinaryType, [table columnTypeOfColumn:5], @"Sixth column not binary");
+    STAssertEquals(TDBDateType,   [table columnTypeOfColumn:6], @"Seventh column not date");
+    STAssertEquals(TDBTableType,  [table columnTypeOfColumn:7], @"Eighth column not table");
+    STAssertEquals(TDBMixedType,  [table columnTypeOfColumn:8], @"Ninth column not mixed");
 
 
     const char bin[4] = { 0, 1, 2, 3 };
@@ -918,10 +918,10 @@
 
 
     TDBTable* subtab1 = [[TDBTable alloc] init];
-    [subtab1 addColumnWithName:@"TableCol_IntCol" andType:tightdb_Int];
+    [subtab1 addColumnWithName:@"TableCol_IntCol" andType:TDBIntType];
 
     TDBTable* subtab2 = [[TDBTable alloc] init];
-    [subtab2 addColumnWithName:@"TableCol_IntCol" andType:tightdb_Int];
+    [subtab2 addColumnWithName:@"TableCol_IntCol" andType:TDBIntType];
 
 
     TDBRow* cursor;
@@ -1015,8 +1015,8 @@
     STAssertNotNil(_table, @"Table is nil");
 
     // 1. Add two columns
-    [_table addColumnWithName:@"first" andType:tightdb_Int];
-    [_table addColumnWithName:@"second" andType:tightdb_String];
+    [_table addColumnWithName:@"first" andType:TDBIntType];
+    [_table addColumnWithName:@"second" andType:TDBStringType];
 
     TDBRow* c;
 
@@ -1045,8 +1045,8 @@
     STAssertNotNil(_table, @"Table is nil");
 
     // 1. Add two columns
-    [_table addColumnWithName:@"first" andType:tightdb_Int];
-    [_table addColumnWithName:@"second" andType:tightdb_String];
+    [_table addColumnWithName:@"first" andType:TDBIntType];
+    [_table addColumnWithName:@"second" andType:TDBStringType];
 
     TDBRow* c;
 

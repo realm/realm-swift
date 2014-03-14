@@ -200,12 +200,12 @@ TIGHTDB_TABLE_2(QueryTable,
     // Specify the table type
     {
         TDBDescriptor* desc = table.descriptor;
-        [desc addColumnWithName:@"int" andType:tightdb_Int];
+        [desc addColumnWithName:@"int" andType:TDBIntType];
         {
             TDBDescriptor* subdesc = [desc addColumnTable:@"tab"];
-            [subdesc addColumnWithName:@"int" andType:tightdb_Int];
+            [subdesc addColumnWithName:@"int" andType:TDBIntType];
         }
-        [desc addColumnWithName:@"mix" andType:tightdb_Mixed];
+        [desc addColumnWithName:@"mix" andType:TDBMixedType];
     }
 
     int COL_TABLE_INT = 0;
@@ -233,7 +233,7 @@ TIGHTDB_TABLE_2(QueryTable,
     OCTopLevelTable* subtable2 = [table getTopLevelTable:COL_TABLE_MIX ndx:0];
     {
         TDBDescriptor* desc = [subtable2 getDescriptor];
-        [desc addColumnWithType:tightdb_Int andName:@"int"];
+        [desc addColumnWithType:TDBIntType andName:@"int"];
     }
     // Add a row to it
     [subtable2 addEmptyRow];

@@ -45,14 +45,14 @@
 #define TIGHTDB_TYPE_Date      time_t
 #define TIGHTDB_TYPE_Mixed     TDBMixed*
 
-#define TIGHTDB_TYPE_ID_Bool   tightdb_Bool
-#define TIGHTDB_TYPE_ID_Int    tightdb_Int
-#define TIGHTDB_TYPE_ID_Float  tightdb_Float
-#define TIGHTDB_TYPE_ID_Double tightdb_Double
-#define TIGHTDB_TYPE_ID_String tightdb_String
-#define TIGHTDB_TYPE_ID_Binary tightdb_Binary
-#define TIGHTDB_TYPE_ID_Date   tightdb_Date
-#define TIGHTDB_TYPE_ID_Mixed  tightdb_Mixed
+#define TIGHTDB_TYPE_ID_Bool   TDBBoolType
+#define TIGHTDB_TYPE_ID_Int    TDBIntType
+#define TIGHTDB_TYPE_ID_Float  TDBFloatType
+#define TIGHTDB_TYPE_ID_Double TDBDoubleType
+#define TIGHTDB_TYPE_ID_String TDBStringType
+#define TIGHTDB_TYPE_ID_Binary TDBBinaryType
+#define TIGHTDB_TYPE_ID_Date   TDBDateType
+#define TIGHTDB_TYPE_ID_Mixed  TDBMixedType
 
 
 
@@ -118,7 +118,7 @@
 #define TIGHTDB_CHECK_COLUMN_TYPE_3(is_subtable, desc, col, name, type) TIGHTDB_CHECK_COLUMN_TYPE_4_##is_subtable(desc, col, name, type)
 #define TIGHTDB_CHECK_COLUMN_TYPE_4_Y(desc, col, name, type)      \
 { \
-    if ([desc columnTypeOfColumn:col] != tightdb_Table) \
+    if ([desc columnTypeOfColumn:col] != TDBTableType) \
         return NO; \
     if (![[desc columnNameOfColumn:col] isEqualToString:@#name]) \
         return NO; \
