@@ -29,13 +29,13 @@
         [table addColumnWithName:@"Name" andType:TDBStringType];
         [table addColumnWithName:@"Age" andType:TDBIntType];
        
-        // Add a row to the table
-        [table appendRow:@[@"Jill", @21]];
+        // Add a row to the table using a NSDictionary
+        [table appendRow:@{@"Name": @"Jill", @"Age": @21}];
 
-        // Add a new column
+        // Add a new column dynamically
         int const HIRED = [table addColumnWithName:@"Hired" andType:TDBBoolType];
 
-        // Add another row
+        // Add another row using a NSArray
         [table appendRow:@[@"Mary", @40, @NO]];
 
         // Change value in row
@@ -46,8 +46,8 @@
         [table removeRowAtIndex:0];
 
         // Print out info on iPhone screen
-        self.tableColumnCountOutlet.text = [NSString stringWithFormat:@"# of columns: %i", table.columnCount];
-        self.tableSizeOutlet.text = [NSString stringWithFormat:@"# of rows: %i", table.rowCount];
+        self.columnCountOutlet.text = [NSString stringWithFormat:@"# of columns: %i", table.columnCount];
+        self.sizeOutlet.text = [NSString stringWithFormat:@"# of rows: %i", table.rowCount];
 
         return YES;
     } withError:nil];

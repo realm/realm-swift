@@ -137,13 +137,13 @@
 -(BOOL)removeRowAtIndex:(NSUInteger)rowIndex;
 -(BOOL)removeLastRow;
 
--(TDBRow *)objectAtIndexedSubscript:(NSUInteger)ndx; /* object subscripting */
+-(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex; /* object subscripting */
 -(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
 -(TDBRow *)lastRow;
 -(TDBRow *)firstRow;
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
 
--(TDBRow *)insertEmptyRowAtIndex:(NSUInteger)ndx;
+-(TDBRow *)insertEmptyRowAtIndex:(NSUInteger)rowIndex;
 
 -(BOOL)appendRow:(NSObject *)data;
 -(BOOL)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex;
@@ -289,7 +289,7 @@
 -(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 
 
--(void)removeRowAtIndex:(NSUInteger)atRowIndex;
+-(void)removeRowAtIndex:(NSUInteger)rowIndex;
 -(void)removeAllRows;
 
 -(NSUInteger)rowIndexInOriginTableForRowAtIndex:(NSUInteger)rowIndex;
