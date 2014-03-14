@@ -9,8 +9,8 @@ employees.tightdb
 people.tightdb
 peopleErr.tightdb
 table_test.tightdb
-TightDbObjcDyn/readonlyTest.tightdb
 readonlyTest.tightdb
+hasChanged.tightdb
 
 
 /doc/ref/html/*.html
@@ -34,3 +34,5 @@ examples/tutorial
 # sh build.sh ios-framework
 /Tightdb.framework
 tightdb-ios-*.zip
+
+

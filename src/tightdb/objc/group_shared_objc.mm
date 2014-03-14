@@ -137,4 +137,9 @@ using namespace std;
     return NO;
 }
 
+-(BOOL) hasChangedSinceLastTransaction
+{
+    return m_shared_group->has_changed();
+}
+
 @end
