@@ -55,14 +55,14 @@ CATEGORIES :
 #      TODO     : soon
 #      NAMES    : [ equal, equal, equal, equal, equal, equal, equal]
       SIGNATURE: |
-                  (TDBQuery *)boolIsEqualTo:(bool)aBool inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)intIsEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)floatIsEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)doubleIsEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)stringIsEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)stringIsCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)dateIsEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)binaryIsEqualTo:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
+                  (TDBQuery *)boolIsEqualTo:(bool)aBool inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)intIsEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)floatIsEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)doubleIsEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)stringIsEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)stringIsCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)dateIsEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)binaryIsEqualTo:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex
       SUMMARY  : *g_dyn_query_equals_summary
       DESCR    : *g_dyn_query_equals_descr
       PARAMS:
@@ -99,13 +99,13 @@ CATEGORIES :
       TITLE    : "*isNotEqualTo:inColumnWithIndex:"
 #      NAMES    : [ notEqual, notEqual, notEqual, notEqual, notEqual, notEqual ]
       SIGNATURE: |
-                  (TDBQuery *)intIsNotEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)floatIsNotEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)doubleIsNotEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)stringIsNotEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)stringIsNotCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)dateIsNotEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)binaryIsNotEqualTo:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
+                  (TDBQuery *)intIsNotEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)floatIsNotEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)doubleIsNotEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)stringIsNotEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)stringIsNotCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)dateIsNotEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)binaryIsNotEqualTo:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex
       SUMMARY  : *g_dyn_query_notEquals_summary
       DESCR    : *g_dyn_query_notEquals_descr
       PARAMS:
@@ -131,24 +131,24 @@ CATEGORIES :
   - g_dyn_query_greaterThan_date:
 # Not yet implemented in API
       NAME     : "isGreaterThanDate:"
-      TITLE    : "isGreaterThan"
+      TITLE    : "*isGreaterThan:inColumnWithIndex:"
 #TODO: check greater_date? does time_t work as int64_t?
       SIGNATURE: |
-                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanInt:(int64_t)value
-                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanFloat:(float)value
-                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanDouble:(double)value
-                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanDate:(time_t)value
+                 (TDBQuery *)dateIsGreaterThan:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
+                 (TDBQuery *)intIsGreaterThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+                 (TDBQuery *)floatIsGreaterThan:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+                 (TDBQuery *)doubleIsGreaterThan:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
       SUMMARY  : *g_dyn_query_greaterThan_summary
       DESCR    : *g_dyn_query_greaterThan_descr
       PARAMS:
-      - NAME   : colNdx
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : *g_dyn_query_value_descr
+      - NAME   : colIndex
+        TYPES  : NSUInteger
+        DESCR  : *g_dyn_query_column_index_descr
       RETURN:
-        TYPES  : TightdbQuery *
+        TYPES  : TDBuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -162,21 +162,21 @@ CATEGORIES :
       NAME     : "isGreaterThanOrEqualToDouble:"
   - g_dyn_query_greaterThanOrEqual_date:
       NAME     : "isGreaterThanOrEqualToDate:"
-      TITLE    : "isGreaterThanOrEqualTo"
+      TITLE    : "*isGreaterThanOrEqualTo:inColumnWithIndex:"
       SIGNATURE: |
-                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToInt:(int64_t)value
-                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToFloat:(float)value
-                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToDouble:(double)value
-                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToDate:(time_t)value
+                  (TDBQuery *)dateIsGreaterThanOrEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)intIsGreaterThanOrEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)floatIsGreaterThanOrEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)doubleIsGreaterThanOrEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
       SUMMARY  : *g_dyn_query_greaterThanOrEqual_summary
       DESCR    : *g_dyn_query_greaterThanOrEqual_descr
       PARAMS:
-      - NAME   : colNdx
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : *g_dyn_query_value_descr
+      - NAME   : colIndex
+        TYPES  : NSUInteger
+        DESCR  : *g_dyn_query_column_index_descr
       RETURN:
         TYPES  : TightdbQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
