@@ -113,7 +113,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fromDisk writeWithBlock:^(TDBGroup *group) {
         TDBTable *t = [group getOrCreateTableWithName:@"table" error:nil];
         
-        [t addColumnWithName:@"col0" andType:tightdb_Int];
+        [t addColumnWithName:@"col0" andType:TDBIntType];
         TDBRow *row = [t addEmptyRow];
         [row setInt:10 inColumnWithIndex:0 ];
          

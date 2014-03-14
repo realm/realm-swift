@@ -150,14 +150,14 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
         TDBTable *table = [[TDBTable alloc]init];
 
-        [table addColumnWithName:@"BoolCol" andType:tightdb_Bool];
-        [table addColumnWithName:@"IntCol" andType:tightdb_Int];
-        [table addColumnWithName:@"FloatCol" andType:tightdb_Float];
-        [table addColumnWithName:@"DoubleCol" andType:tightdb_Double];
-        [table addColumnWithName:@"StringCol" andType:tightdb_String];
-        [table addColumnWithName:@"BinaryCol" andType:tightdb_Binary];
-        [table addColumnWithName:@"DateCol" andType:tightdb_Date];
-        [table addColumnWithName:@"MixedCol" andType:tightdb_Mixed];
+        [table addColumnWithName:@"BoolCol" andType:TDBBoolType];
+        [table addColumnWithName:@"IntCol" andType:TDBIntType];
+        [table addColumnWithName:@"FloatCol" andType:TDBFloatType];
+        [table addColumnWithName:@"DoubleCol" andType:TDBDoubleType];
+        [table addColumnWithName:@"StringCol" andType:TDBStringType];
+        [table addColumnWithName:@"BinaryCol" andType:TDBBinaryType];
+        [table addColumnWithName:@"DateCol" andType:TDBDateType];
+        [table addColumnWithName:@"MixedCol" andType:TDBMixedType];
         // TODO: add Enum<T> and Subtable<T> when possible.
 
         const char bin[4] = { 0, 1, 2, 3 };
@@ -254,7 +254,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 - (void)testFind
 {
     TDBTable* table = [[TDBTable alloc]init];
-    [table addColumnWithName:@"IntCol" andType:tightdb_Int];
+    [table addColumnWithName:@"IntCol" andType:TDBIntType];
     [table TDBAddEmptyRows:6];
 
     [table setInt:10 inColumnWithIndex:0 atRowIndex:0];
