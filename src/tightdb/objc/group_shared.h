@@ -30,4 +30,6 @@ typedef BOOL(^TDBWriteBlock)(TDBGroup *group);
 -(void)readWithBlock:(TDBReadBlock)block;
 -(BOOL)writeWithBlock:(TDBWriteBlock)block withError:(NSError **)error;
 
+-(BOOL)hasChangedSinceLastTransaction;
+
 @end
