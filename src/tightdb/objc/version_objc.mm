@@ -8,7 +8,7 @@
 #include <tightdb/version.hpp>
 #import  <tightdb/objc/version.h>
 
-@implementation TightdbVersion
+@implementation TDBVersion
 {
 }
 
@@ -20,26 +20,26 @@
 
 +(const int)getMajor
 {
-    return Tightdb_Version_Major;
+    return TDB_VERSION_MAJOR;
 }
 
 +(const int)getMinor
 {
-    return Tightdb_Version_Minor;
+    return TDB_VERSION_MINOR;
 }
 
 +(const int)getPatch
 {
-    return Tightdb_Version_Patch;
+    return TDB_VERSION_PATCH;
 }
 
 +(BOOL)isAtLeast:(int)major minor:(int)minor patch:(int)patch
 {
-    if (major < Tightdb_Version_Major)
+    if (major < TDB_VERSION_MAJOR)
         return NO;
-    if (minor < Tightdb_Version_Minor)
+    if (minor < TDB_VERSION_MINOR)
         return NO;
-    if (patch < Tightdb_Version_Patch)
+    if (patch < TDB_VERSION_PATCH)
         return NO;
     return YES;
 }
@@ -47,9 +47,9 @@
 +(NSString*)getVersion
 {
     NSString *s = [NSString stringWithFormat:@"%d.%d.%d", 
-                            [TightdbVersion getMajor], 
-                            [TightdbVersion getMinor],
-                            [TightdbVersion getPatch]];
+                            [TDBVersion getMajor],
+                            [TDBVersion getMinor],
+                            [TDBVersion getPatch]];
     return s;
 }
 
