@@ -17,29 +17,29 @@
     [fileManager removeItemAtPath:filename error:&error];
 
     // Create data file
-    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup sharedGroupWithFile:filename withError:nil];
+    TDBSharedGroup *sharedGroup = [TDBSharedGroup sharedGroupWithFile:filename withError:nil];
 
     // Perform a write transaction
-    [sharedGroup writeWithBlock:^(TightdbGroup *group) {
+    [sharedGroup writeWithBlock:^(TDBGroup *group) {
 
         // Access table from group
-        TightdbTable *table = [group getOrCreateTableWithName:@"myTable" error:nil];
+        TDBTable *table = [group getOrCreateTableWithName:@"myTable" error:nil];
 
         // Add columns to the table
-        [table addColumnWithName:@"Name" andType:tightdb_String];
-        [table addColumnWithName:@"Age" andType:tightdb_Int];
+        [table addColumnWithName:@"Name" andType:TDBStringType];
+        [table addColumnWithName:@"Age" andType:TDBIntType];
        
         // Add a row to the table
         [table appendRow:@[@"Jill", @21]];
 
         // Add a new column
-        int const HIRED = [table addColumnWithName:@"Hired" andType:tightdb_Bool];
+        int const HIRED = [table addColumnWithName:@"Hired" andType:TDBBoolType];
 
         // Add another row
         [table appendRow:@[@"Mary", @40, @NO]];
 
         // Change value in row
-        TightdbCursor *row = [table rowAtIndex:0];
+        TDBRow *row = [table rowAtIndex:0];
         [row setBool:YES inColumnWithIndex:HIRED];
 
         // Remove row from table

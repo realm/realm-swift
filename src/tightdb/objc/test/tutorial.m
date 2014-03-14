@@ -38,7 +38,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    TightdbGroup *group = [TightdbGroup group];
+    TDBGroup *group = [TDBGroup group];
     // Create new table in group
     PeopleTable *people = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class] error:nil];
 
@@ -129,7 +129,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     STAssertEquals(avg, 20.5,@"Expected 20.5 average", nil);
 
     // Execute the query and return a table (view)
-    TightdbView *res = [q findAll];
+    TDBView *res = [q findAll];
     for (size_t i = 0; i < [res rowCount]; ++i) {
         NSLog(@"%zu: %@ is %lld years old", i,
             [people cursorAtIndex:i].Name,
@@ -147,7 +147,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     [group writeToFile:@"employees.tightdb" withError:nil];
 
     // Load a group from disk (and print contents)
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFile:@"employees.tightdb" withError:nil];
+    TDBGroup *fromDisk = [TDBGroup groupWithFile:@"employees.tightdb" withError:nil];
     PeopleTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class] error:nil];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES];
@@ -161,10 +161,10 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     }
 
     // Write same group to memory buffer
-    TightdbBinary* buffer = [group writeToBuffer];
+    TDBBinary* buffer = [group writeToBuffer];
 
     // Load a group from memory (and print contents)
-    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:buffer withError:nil];
+    TDBGroup *fromMem = [TDBGroup groupWithBuffer:buffer withError:nil];
     PeopleTable *memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class] error:nil];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];

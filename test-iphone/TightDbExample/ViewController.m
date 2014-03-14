@@ -65,7 +65,7 @@ TIGHTDB_TABLE_2(MyTable2,
 
 - (void)testGroup
 {
-    TightdbGroup *group = [TightdbGroup group];
+    TDBGroup *group = [TDBGroup group];
     // Create new table in group
     MyTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[MyTable class] error:nil];
 
@@ -118,7 +118,7 @@ TIGHTDB_TABLE_2(MyTable2,
     [_utils Eval: avg== 21.0 msg:@"Expected 20.5 average"];
 
     // Execute the query and return a table (view)
-    TightdbView *res = [q findAll];
+    TDBView *res = [q findAll];
     for (size_t i = 0; i < [res rowCount]; i++) {
         // cursor missing. Only low-level interface!
         NSLog(@"%zu: is %lld years old",i , [res intInColumnWithIndex:i atRowIndex:i]);
@@ -133,7 +133,7 @@ TIGHTDB_TABLE_2(MyTable2,
     [group writeToFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
 
     // Load a group from disk (and print contents)
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
+    TDBGroup *fromDisk = [TDBGroup groupWithFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
     MyTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[MyTable class] error:nil];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
@@ -147,10 +147,10 @@ TIGHTDB_TABLE_2(MyTable2,
     }
 
     // Write same group to memory buffer
-    TightdbBinary* buffer = [group writeToBuffer];
+    TDBBinary* buffer = [group writeToBuffer];
 
     // Load a group from memory (and print contents)
-    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:buffer withError:nil];
+    TDBGroup *fromMem = [TDBGroup groupWithBuffer:buffer withError:nil];
     MyTable *memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[MyTable class] error:nil];
 
     for (MyTable_Cursor *row in memTable)
