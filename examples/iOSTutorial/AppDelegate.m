@@ -117,11 +117,11 @@ void tableFunc() {
 void sharedGroupFunc() {
 
     // @@Example: transaction @@
-    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup sharedGroupWithFile:@"people.tightdb"
+    TDBSharedGroup *sharedGroup = [TDBSharedGroup sharedGroupWithFile:@"people.tightdb"
                                                           withError:nil];
 
     // Start a write transaction
-    [sharedGroup writeWithBlock:^(TightdbGroup *group) {
+    [sharedGroup writeWithBlock:^(TDBGroup *group) {
 
         // Get a specific table from the group
         PeopleTable *table = [group getOrCreateTableWithName: @"employees"
@@ -142,7 +142,7 @@ void sharedGroupFunc() {
     } withError:nil];
 
     // Start a read transaction
-    [sharedGroup readWithBlock:^(TightdbGroup *group) {
+    [sharedGroup readWithBlock:^(TDBGroup *group) {
 
         // Get the table
         PeopleTable *table = [group getOrCreateTableWithName:  @"employees"
@@ -160,12 +160,12 @@ void sharedGroupFunc() {
 void groupFunc() {
 
     // @@Example: serialisation @@
-    TightdbSharedGroup *sharedGroup = [TightdbSharedGroup sharedGroupWithFile:@"people.tightdb"
+    TDBSharedGroup *sharedGroup = [TDBSharedGroup sharedGroupWithFile:@"people.tightdb"
                                                               withError:nil];
 
     // Within a single read transaction we can write a copy of the entire db to a new file.
     // This is usefull both for backups and for transfering datasets to other machines.
-    [sharedGroup readWithBlock:^(TightdbGroup *group) {
+    [sharedGroup readWithBlock:^(TDBGroup *group) {
         // Write entire db to disk (in a new file)
         [group writeToFile:@"people_backup.tightdb" withError:nil];
     }];
