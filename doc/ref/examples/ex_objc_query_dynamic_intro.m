@@ -1,6 +1,6 @@
 /* @@Example: ex_objc_query_dynamic_intro @@ */
 
-#import <Tightdb/Tightdb.h>
+#import <tightdb/objc/tightdb.h>
 
 
 

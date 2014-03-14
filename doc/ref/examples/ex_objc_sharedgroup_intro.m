@@ -1,6 +1,6 @@
 /* @@Example: ex_objc_sharedgroup_intro @@ */
 
-#import <Tightdb/Tightdb.h>
+#import <tightdb/objc/tightdb.h>
 
 
 TIGHTDB_TABLE_3(PeopleTable,
