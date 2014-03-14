@@ -1,7 +1,6 @@
 /* @@Example: ex_objc_tableview_dynamic_intro @@ */
 
-#import <tightdb/objc/table.h>
-#import <tightdb/objc/tightdb.h>
+#import <Tightdb/Tightdb.h>
 
 
 int main()
