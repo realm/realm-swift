@@ -35,9 +35,9 @@ typedef enum {
 
 
 typedef enum {
-    tightdb_ascending   =  0,
-    tightdb_descending   =  1,
+    TDBAscending   =  0,
+    TDBDescending   =  1,
     
-} TightdbSortOrder;
+} TDBSortOrder;
 
 #endif /* TIGHTDB_OBJC_TYPE_H */
