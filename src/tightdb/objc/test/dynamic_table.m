@@ -44,10 +44,8 @@
     // Verify
     STAssertEquals(TDBIntType, [_table columnTypeOfColumn:0], @"First column not int");
     STAssertEquals(TDBIntType, [_table columnTypeOfColumn:1], @"Second column not int");
-    if (![[_table columnNameOfColumn:0] isEqualToString:@"first"])
-        STFail(@"First not equal to first");
-    if (![[_table columnNameOfColumn:1] isEqualToString:@"second"])
-        STFail(@"Second not equal to second");
+    STAssertTrue(([[_table columnNameOfColumn:0] isEqualToString:@"first"]), @"First not equal to first");
+    STAssertTrue(([[_table columnNameOfColumn:1] isEqualToString:@"second"]), @"Second not equal to second");
 
     // 2. Add a row with data
 
@@ -61,10 +59,8 @@
     [cursor setInt:10 inColumnWithIndex:1];
 
     // Verify
-    if ([_table intInColumnWithIndex:0 atRowIndex:ndx] != 0)
-        STFail(@"First not zero");
-    if ([_table intInColumnWithIndex:1 atRowIndex:ndx] != 10)
-        STFail(@"Second not 10");
+    STAssertEquals((int64_t)0, ([_table intInColumnWithIndex:0 atRowIndex:ndx]), @"First not zero");
+    STAssertEquals((int64_t)10, ([_table intInColumnWithIndex:1 atRowIndex:ndx]), @"Second not 10");
 }
 
 -(void)testAddColumn
@@ -73,8 +69,6 @@
     NSUInteger stringColIndex = [t addColumnWithName:@"stringCol" andType:TDBStringType];
     TDBRow *row = [t addEmptyRow];
     [row setString:@"val" inColumnWithIndex:stringColIndex];
-    
-    
 }
 
 -(void)testAppendRowsIntColumn
@@ -89,8 +83,7 @@
     STAssertEquals((int64_t)1, [t intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
     STAssertEquals((int64_t)2, [t intInColumnWithIndex:0 atRowIndex:1], @"Value 2 expected");
     STAssertFalse([t appendRow:@[@"Hello"]], @"Wrong type");
-    if ([t appendRow:@[@1, @"Hello"]])
-        STFail(@"Wrong number of columns");
+    STAssertFalse(([t appendRow:@[@1, @"Hello"]]), @"Wrong number of columns");
 }
 
 -(void)testInsertRowsIntColumn
@@ -105,8 +98,7 @@
     STAssertEquals((int64_t)1, [t intInColumnWithIndex:0 atRowIndex:1], @"Value 1 expected");
     STAssertEquals((int64_t)2, [t intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
     STAssertFalse([t insertRow:@[@"Hello"] atRowIndex:0], @"Wrong type");
-    if ([t insertRow:@[@1, @"Hello"] atRowIndex:0])
-        STFail(@"Wrong number of columns");
+    STAssertFalse(([t insertRow:@[@1, @"Hello"] atRowIndex:0]), @"Wrong number of columns");
 }
 
 -(void)testUpdateRowIntColumn
@@ -133,7 +125,7 @@
     // Add row using object literate
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:TDBIntType];
-    
+
     STAssertTrue([t appendRow:@{ @"first": @1 }], @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
 
@@ -272,16 +264,12 @@
     TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:TDBBinaryType];
-    if (![t appendRow:@[bin2]])
-        STFail(@"Cannot insert 'binary'");
-    if ([t rowCount] != 1)
-        STFail(@"1 row expected");
-    
+    STAssertTrue(([t appendRow:@[bin2]]), @"Cannot insert 'binary'");
+    STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
+
     NSData *nsd = [NSData dataWithBytes:(const void *)bin length:4];
-    if (![t appendRow:@[nsd]])
-        STFail(@"Cannot insert 'NSData'");
-    if ([t rowCount] != 2)
-        STFail(@"2 rows excepted");
+    STAssertTrue(([t appendRow:@[nsd]]), @"Cannot insert 'NSData'");
+    STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
 
@@ -292,16 +280,12 @@
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:TDBBinaryType];
 
-    if (![t appendRow:@{@"first": bin2}])
-        STFail(@"Cannot insert 'binary'");
-    if ([t rowCount] != 1)
-        STFail(@"1 row expected");
+    STAssertTrue(([t appendRow:@{@"first": bin2}]), @"Cannot insert 'binary'");
+    STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 
     NSData *nsd = [NSData dataWithBytes:(const void *)bin length:4];
-    if (![t appendRow:@{@"first": nsd}])
-        STFail(@"Cannot insert 'NSData'");
-    if ([t rowCount] != 2)
-        STFail(@"2 rows excepted");
+    STAssertTrue(([t appendRow:@{@"first": nsd}]), @"Cannot insert 'NSData'");
+    STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
 -(void)testAppendRowsTooManyItems
@@ -354,14 +338,10 @@
     TDBDescriptor* descr = [t descriptor];
     TDBDescriptor* subdescr = [descr addColumnTable:@"second"];
     [subdescr addColumnWithName:@"TableCol_IntCol" andType:TDBIntType];
-    if (![t appendRow:@[@1, @[]]])
-        STFail(@"1 row excepted");
-    if ([t rowCount] != 1)
-        STFail(@"1 row expected");
-    if (![t appendRow:@[@2, @[@[@3]]]])
-        STFail(@"Cannot insert subtable");
-    if ([t rowCount] != 2)
-        STFail(@"2 rows expected");
+    STAssertTrue(([t appendRow:@[@1, @[]]]), @"1 row excepted");
+    STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
+    STAssertTrue(([t appendRow:@[@2, @[@[@3]]]]), @"Cannot insert subtable");
+    STAssertEquals((size_t)2, ([t rowCount]), @"2 rows expected");
 }
 
 -(void)testAppendRowsMixedColumns
@@ -371,86 +351,55 @@
 
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:TDBMixedType];
-    if (![t appendRow:@[@1]])
-        STFail(@"Cannot insert 'int'");
-    if ([t rowCount] != 1)
-        STFail(@"1 row excepted");
-    if (![t appendRow:@[@"Hello"]])
-        STFail(@"Cannot insert 'string'");
-    if ([t rowCount] != 2)
-        STFail(@"2 rows excepted");
-    if (![t appendRow:@[@3.14f]])
-        STFail(@"Cannot insert 'float'");
-    if ([t rowCount] != 3)
-        STFail(@"3 rows excepted");
-    if (![t appendRow:@[@3.14]])
-        STFail(@"Cannot insert 'double'");
-    if ([t rowCount] != 4)
-        STFail(@"4 rows excepted");
-    if (![t appendRow:@[@YES]])
-        STFail(@"Cannot insert 'bool'");
-    if ([t rowCount] != 5)
-        STFail(@"5 rows excepted");
-    if (![t appendRow:@[bin2]])
-        STFail(@"Cannot insert 'binary'");
-    if ([t rowCount] != 6)
-        STFail(@"6 rows excepted");
-
-    TDBTable* _table10 = [[TDBTable alloc] init];
-    [_table10 addColumnWithName:@"first" andType:TDBBoolType];
-    if (![_table10 appendRow:@[@YES]])
-        STFail(@"Cannot insert 'bool'");
-    if ([_table10 rowCount] != 1)
-        STFail(@"1 row excepted");
+    STAssertTrue(([t appendRow:@[@1]]), @"Cannot insert 'int'");
+    STAssertEquals((size_t)1, ([t rowCount]), @"1 row excepted");
+    STAssertTrue(([t appendRow:@[@"Hello"]]), @"Cannot insert 'string'");
+    STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
+    STAssertTrue(([t appendRow:@[@3.14f]]), @"Cannot insert 'float'");
+    STAssertEquals((size_t)3, ([t rowCount]), @"3 rows excepted");
+    STAssertTrue(([t appendRow:@[@3.14]]), @"Cannot insert 'double'");
+    STAssertEquals((size_t)4, ([t rowCount]), @"4 rows excepted");
+    STAssertTrue(([t appendRow:@[@YES]]), @"Cannot insert 'bool'");
+    STAssertEquals((size_t)5, ([t rowCount]), @"5 rows excepted");
+    STAssertTrue(([t appendRow:@[bin2]]), @"Cannot insert 'binary'");
+    STAssertEquals((size_t)6, ([t rowCount]), @"6 rows excepted");
 }
 
 -(void)testAppendRowWithLabelsMixedColumns
 {
     const char bin[4] = { 0, 1, 2, 3 };
     TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
-    
+
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:TDBMixedType];
-    if (![t appendRow:@{@"first": @1}])
-        STFail(@"Cannot insert 'int'");
-    if ([t rowCount] != 1)
-        STFail(@"1 row excepted");
-    if (![t appendRow:@{@"first": @"Hello"}])
-        STFail(@"Cannot insert 'string'");
-    if ([t rowCount] != 2)
-        STFail(@"2 rows excepted");
-    if (![t appendRow:@{@"first": @3.14f}])
-        STFail(@"Cannot insert 'float'");
-    if ([t rowCount] != 3)
-        STFail(@"3 rows excepted");
-    if (![t appendRow:@{@"first": @3.14}])
-        STFail(@"Cannot insert 'double'");
-    if ([t rowCount] != 4)
-        STFail(@"4 rows excepted");
-    if (![t appendRow:@{@"first": @YES}])
-        STFail(@"Cannot insert 'bool'");
-    if ([t rowCount] != 5)
-        STFail(@"5 rows excepted");
-    if (![t appendRow:@{@"first": bin2}])
-        STFail(@"Cannot insert 'binary'");
-    if ([t rowCount] != 6)
-        STFail(@"6 rows excepted");
-    }
+    STAssertTrue(([t appendRow:@{@"first": @1}]), @"Cannot insert 'int'");
+    STAssertEquals((size_t)1, ([t rowCount]), @"1 row excepted");
+    STAssertTrue(([t appendRow:@{@"first": @"Hello"}]), @"Cannot insert 'string'$");
+    STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
+    STAssertTrue(([t appendRow:@{@"first": @3.14f}]), @"Cannot insert 'float'");
+    STAssertEquals((size_t)3, ([t rowCount]), @"3 rows excepted");
+    STAssertTrue(([t appendRow:@{@"first": @3.14}]), @"Cannot insert 'double'");
+    STAssertEquals((size_t)4, ([t rowCount]), @"4 rows excepted");
+    STAssertTrue(([t appendRow:@{@"first": @YES}]), @"Cannot insert 'bool'");
+    STAssertEquals((size_t)5, ([t rowCount]), @"5 rows excepted");
+    STAssertTrue(([t appendRow:@{@"first": bin2}]), @"Cannot insert 'binary'");
+    STAssertEquals((size_t)6, ([t rowCount]), @"6 rows excepted");
+}
 
 -(void)testRemoveColumns
 {
-    
+
     TDBTable *t = [[TDBTable alloc] init];
     [t addColumnWithName:@"col0" andType:TDBIntType];
     STAssertTrue([t columnCount] == 1,@"1 column added" );
-    
+
     [t removeColumnWithIndex:0];
     STAssertTrue([t columnCount] == 0, @"Colum removed");
-    
+
     for (int i=0;i<10;i++) {
         [t addColumnWithName:@"name" andType:TDBIntType];
     }
-    
+
     STAssertThrows([t removeColumnWithIndex:10], @"Out of bounds");
     STAssertThrows([t removeColumnWithIndex:-1], @"Less than zero colIndex");
 
@@ -459,13 +408,10 @@
     for (int i=0;i<10;i++) {
         [t removeColumnWithIndex:0];
     }
-    
+
     STAssertTrue([t columnCount] == 0, @"Colums removed");
-    
     STAssertThrows([t removeColumnWithIndex:1], @"No columns added");
     STAssertThrows([t removeColumnWithIndex:-1], @"Less than zero colIndex");
-
-    
 }
 
 /*
@@ -915,40 +861,24 @@
     TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
     time_t timeNow = [[NSDate date] timeIntervalSince1970];
 
-
-
     TDBTable* subtab1 = [[TDBTable alloc] init];
     [subtab1 addColumnWithName:@"TableCol_IntCol" andType:TDBIntType];
 
     TDBTable* subtab2 = [[TDBTable alloc] init];
     [subtab2 addColumnWithName:@"TableCol_IntCol" andType:TDBIntType];
 
-
     TDBRow* cursor;
-
-
-
     cursor = [subtab1 addEmptyRow];
     [cursor setInt:200 inColumnWithIndex:0];
 
-
-
     cursor = [subtab2 addEmptyRow];
     [cursor setInt:100 inColumnWithIndex:0];
-
-
 
     TDBMixed* mixInt1   = [TDBMixed mixedWithInt64:1];
     TDBMixed* mixSubtab = [TDBMixed mixedWithTable:subtab2];
 
     TDBRow* c;
-
-
-
     c = [table addEmptyRow];
-
-
-
     [c setBool:    NO        inColumnWithIndex:BoolCol];
     [c setInt:     54        inColumnWithIndex:IntCol];
     [c setFloat:   0.7       inColumnWithIndex:FloatCol];
