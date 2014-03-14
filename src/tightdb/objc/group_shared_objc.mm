@@ -9,14 +9,14 @@
 using namespace std;
 
 
-@implementation TightdbSharedGroup
+@implementation TDBSharedGroup
 {
     tightdb::util::UniquePtr<tightdb::SharedGroup> m_shared_group;
 }
 
-+(TightdbSharedGroup*)sharedGroupWithFile:(NSString*)path withError:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
++(TDBSharedGroup*)sharedGroupWithFile:(NSString*)path withError:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
 {
-    TightdbSharedGroup* shared_group = [[TightdbSharedGroup alloc] init];
+    TDBSharedGroup* shared_group = [[TDBSharedGroup alloc] init];
     if (!shared_group)
         return nil;
     try {
@@ -52,11 +52,11 @@ using namespace std;
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"TightdbSharedGroup dealloc");
+    NSLog(@"TDBSharedGroup dealloc");
 #endif
 }
 
--(void)readWithBlock:(TightdbReadBlock)block
+-(void)readWithBlock:(TDBReadBlock)block
 {
     const tightdb::Group* group;
     try {
@@ -74,7 +74,7 @@ using namespace std;
         // should throw anything but NSException or derivatives. Note: if the client calls other libraries
         // throwing other kinds of exceptions they will leak back to the client code, if he does not
         // catch them within the block.
-        TightdbGroup* group_2 = [TightdbGroup groupWithNativeGroup:const_cast<tightdb::Group*>(group) isOwned:NO readOnly:YES];
+        TDBGroup* group_2 = [TDBGroup groupWithNativeGroup:const_cast<tightdb::Group*>(group) isOwned:NO readOnly:YES];
         block(group_2);
 
     }
@@ -84,7 +84,7 @@ using namespace std;
 }
 
 
--(BOOL)writeWithBlock:(TightdbWriteBlock)block withError:(NSError**)error
+-(BOOL)writeWithBlock:(TDBWriteBlock)block withError:(NSError**)error
 {
     tightdb::Group* group;
     try {
@@ -102,7 +102,7 @@ using namespace std;
 
     BOOL confirmation = NO;
     @try {
-        TightdbGroup* group_2 = [TightdbGroup groupWithNativeGroup:group isOwned:NO readOnly:NO];
+        TDBGroup* group_2 = [TDBGroup groupWithNativeGroup:group isOwned:NO readOnly:NO];
         confirmation = block(group_2);
     }
     @catch (NSException* exception) {

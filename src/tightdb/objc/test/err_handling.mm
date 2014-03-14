@@ -60,7 +60,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    TightdbGroup* group = [TightdbGroup group];
+    TDBGroup* group = [TDBGroup group];
     // Create new table in group
     PeopleErrTable* people = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleErrTable class] error:nil];
 
@@ -111,7 +111,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     // Load a group from disk (and try to update, even though it is readonly)
     error = nil;
-    TightdbGroup* fromDisk = [TightdbGroup groupWithFile:@"peopleErr.tightdb" withError:&error];
+    TDBGroup* fromDisk = [TDBGroup groupWithFile:@"peopleErr.tightdb" withError:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
     }
@@ -133,7 +133,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     }
 
     error = nil;
-    fromDisk = [TightdbGroup groupWithFile:@"peopleErr.tightdb" withError:&error];
+    fromDisk = [TDBGroup groupWithFile:@"peopleErr.tightdb" withError:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"File should have been possible to open");
@@ -142,7 +142,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     PeopleErrTable* diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PeopleErrTable class] error:nil];
 
     // Fake readonly.
-    [((TightdbTable*)diskTable) setReadOnly:true];
+    [((TDBTable*)diskTable) setReadOnly:true];
 
     NSLog(@"Disktable size: %zu", [diskTable rowCount]);
 
@@ -166,51 +166,51 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     NSError* error;
 
     // Create table with all column types
-    TightdbTable* table = [[TightdbTable alloc] init];
-    TightdbDescriptor* desc = [table descriptor];
-    if (![desc addColumnWithName:@"int" andType:tightdb_Int error:&error]) {
+    TDBTable* table = [[TDBTable alloc] init];
+    TDBDescriptor* desc = [table descriptor];
+    if (![desc addColumnWithName:@"int" andType:TDBIntType error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithName:@"bool" andType:tightdb_Bool error:&error]) {
+    if (![desc addColumnWithName:@"bool" andType:TDBBoolType error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
 
-    if (![desc addColumnWithName:@"date" andType:tightdb_Date error:&error]) {
+    if (![desc addColumnWithName:@"date" andType:TDBDateType error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithName:@"string" andType:tightdb_String error:&error]) {
+    if (![desc addColumnWithName:@"string" andType:TDBStringType error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithName:@"string_long" andType:tightdb_String error:&error]) {
+    if (![desc addColumnWithName:@"string_long" andType:TDBStringType error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithName:@"string_enum" andType:tightdb_String error:&error]) {
+    if (![desc addColumnWithName:@"string_enum" andType:TDBStringType error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithName:@"binary" andType:tightdb_Binary error:&error]) {
+    if (![desc addColumnWithName:@"binary" andType:TDBBinaryType error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithName:@"mixed" andType:tightdb_Mixed error:&error]) {
+    if (![desc addColumnWithName:@"mixed" andType:TDBMixedType error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    TightdbDescriptor* subdesc;
+    TDBDescriptor* subdesc;
     if (!(subdesc = [desc addColumnTable:@"tables" error:&error])) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![subdesc addColumnWithName:@"sub_first" andType:tightdb_Int error:&error]) {
+    if (![subdesc addColumnWithName:@"sub_first" andType:TDBIntType error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
-    if (![subdesc addColumnWithName:@"sub_second" andType:tightdb_String error:&error]) {
+    if (![subdesc addColumnWithName:@"sub_second" andType:TDBStringType error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"addColumn failed.");
     }
@@ -265,19 +265,19 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
         }
         switch (i % 3) {
             case 0:
-                if (![table TDBInsertMixed:7 ndx:i value:[TightdbMixed mixedWithBool:NO] ]) {
+                if (![table TDBInsertMixed:7 ndx:i value:[TDBMixed mixedWithBool:NO] ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
                 break;
             case 1:
-                if (![table TDBInsertMixed:7 ndx:i value:[TightdbMixed mixedWithInt64:i] ]) {
+                if (![table TDBInsertMixed:7 ndx:i value:[TDBMixed mixedWithInt64:i] ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
                 break;
             case 2:
-                if (![table TDBInsertMixed:7 ndx:i value:[TightdbMixed mixedWithString:@"string"] ]) {
+                if (![table TDBInsertMixed:7 ndx:i value:[TDBMixed mixedWithString:@"string"] ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
@@ -295,7 +295,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
         // Add sub-tables
         if (i == 2) {
-            TightdbTable* subtable = [table tableInColumnWithIndex:8 atRowIndex:i];
+            TDBTable* subtable = [table tableInColumnWithIndex:8 atRowIndex:i];
             if (![subtable TDBInsertInt:0 ndx:0 value:42 ]) {
                 NSLog(@"%@", [error localizedDescription]);
                 STFail(@"Insert failed.");
@@ -357,14 +357,14 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     STAssertNotNil(table, @"Table is nil");
 
     const char bin[4] = { 0, 1, 2, 3 };
-    TightdbBinary* bin1 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin / 2];
-    TightdbBinary* bin2 = [[TightdbBinary alloc] initWithData:bin size:sizeof bin];
+    TDBBinary* bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
+    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
     time_t timeNow = [[NSDate date] timeIntervalSince1970];
     //    TestQueryErrSub* subtab1 = [[TestQueryErrSub alloc] init];
     TestQueryErrSub* subtab2 = [[TestQueryErrSub alloc] init];
     [subtab2 addAge:100];
-    TightdbMixed* mixInt1   = [TightdbMixed mixedWithInt64:1];
-    TightdbMixed* mixSubtab = [TightdbMixed mixedWithTable:subtab2];
+    TDBMixed* mixInt1   = [TDBMixed mixedWithInt64:1];
+    TDBMixed* mixSubtab = [TDBMixed mixedWithTable:subtab2];
 
     [table addBoolCol:NO   IntCol:54       FloatCol:0.7     DoubleCol:0.8       StringCol:@"foo"
             BinaryCol:bin1 DateCol:0       TableCol:nil     MixedCol:mixInt1];

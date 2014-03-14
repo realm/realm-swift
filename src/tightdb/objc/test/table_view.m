@@ -43,17 +43,17 @@
 
 -(void)testGetColumnCount
 {
-    TightdbTable *t = [[TightdbTable alloc] init];
-    TightdbQuery *q = [t where];
-    TightdbView *v = [q findAllRows];
+    TDBTable *t = [[TDBTable alloc] init];
+    TDBQuery *q = [t where];
+    TDBView *v = [q findAllRows];
     
     STAssertEquals((size_t)0, [v columnCount], @"no columns added yet");
     
-    [t addColumnWithName:@"col0" andType:tightdb_Int];
+    [t addColumnWithName:@"col0" andType:TDBIntType];
     STAssertEquals([v columnCount],(size_t)1,  @"1 column added to table");
     
     for (int i=0;i<10;i++) {
-        [t addColumnWithName:@"name" andType:tightdb_Int];
+        [t addColumnWithName:@"name" andType:TDBIntType];
     }
     STAssertEquals([v columnCount],(size_t)11,  @"10 more columns added to table");
     
@@ -63,31 +63,31 @@
 
 - (void)testColumnTypesOnView
 {
-    TightdbTable *t = [[TightdbTable alloc] init];
+    TDBTable *t = [[TDBTable alloc] init];
     
-    NSUInteger boolCol      = [t addColumnWithName:@"boolCol" andType:tightdb_Bool];
-    NSUInteger binaryCol    = [t addColumnWithName:@"binaryCol" andType:tightdb_Binary];
-    NSUInteger dateCol      = [t addColumnWithName:@"dateCol" andType:tightdb_Date];
-    NSUInteger doubleCol    = [t addColumnWithName:@"doubleCol" andType:tightdb_Double];
-    NSUInteger floatCol     = [t addColumnWithName:@"floatCol" andType:tightdb_Float];
-    NSUInteger intCol       = [t addColumnWithName:@"intCol" andType:tightdb_Int];
-    NSUInteger mixedCol     = [t addColumnWithName:@"MixedCol" andType:tightdb_Mixed];
-    NSUInteger stringCol    = [t addColumnWithName:@"stringCol" andType:tightdb_String];
-    NSUInteger tableCol     = [t addColumnWithName:@"tableCol" andType:tightdb_Table];
+    NSUInteger boolCol      = [t addColumnWithName:@"boolCol" andType:TDBBoolType];
+    NSUInteger binaryCol    = [t addColumnWithName:@"binaryCol" andType:TDBBinaryType];
+    NSUInteger dateCol      = [t addColumnWithName:@"dateCol" andType:TDBDateType];
+    NSUInteger doubleCol    = [t addColumnWithName:@"doubleCol" andType:TDBDoubleType];
+    NSUInteger floatCol     = [t addColumnWithName:@"floatCol" andType:TDBFloatType];
+    NSUInteger intCol       = [t addColumnWithName:@"intCol" andType:TDBIntType];
+    NSUInteger mixedCol     = [t addColumnWithName:@"MixedCol" andType:TDBMixedType];
+    NSUInteger stringCol    = [t addColumnWithName:@"stringCol" andType:TDBStringType];
+    NSUInteger tableCol     = [t addColumnWithName:@"tableCol" andType:TDBTableType];
     
     
-    TightdbQuery *q = [t where];
-    TightdbView *v = [q findAllRows];
+    TDBQuery *q = [t where];
+    TDBView *v = [q findAllRows];
     
-    STAssertTrue([v columnTypeOfColumn:boolCol]      == tightdb_Bool, @"Column types matches");
-    STAssertTrue([v columnTypeOfColumn:binaryCol]    == tightdb_Binary, @"Column types matches");
-    STAssertTrue([v columnTypeOfColumn:dateCol]      == tightdb_Date, @"Column types matches");
-    STAssertTrue([v columnTypeOfColumn:doubleCol]    == tightdb_Double, @"Column types matches");
-    STAssertTrue([v columnTypeOfColumn:floatCol]     == tightdb_Float, @"Column types matches");
-    STAssertTrue([v columnTypeOfColumn:intCol]       == tightdb_Int, @"Column types matches");
-    STAssertTrue([v columnTypeOfColumn:mixedCol]     == tightdb_Mixed, @"Column types matches");
-    STAssertTrue([v columnTypeOfColumn:stringCol]    == tightdb_String, @"Column types matches");
-    STAssertTrue([v columnTypeOfColumn:tableCol]     == tightdb_Table, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumn:boolCol]      == TDBBoolType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumn:binaryCol]    == TDBBinaryType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumn:dateCol]      == TDBDateType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumn:doubleCol]    == TDBDoubleType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumn:floatCol]     == TDBFloatType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumn:intCol]       == TDBIntType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumn:mixedCol]     == TDBMixedType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumn:stringCol]    == TDBStringType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumn:tableCol]     == TDBTableType, @"Column types matches");
     
     STAssertThrows([v columnTypeOfColumn:[v columnCount] + 1], @"Out of bounds");
     STAssertThrows([v columnTypeOfColumn:100], @"Out of bounds");
@@ -96,10 +96,10 @@
 
 - (void)testSortOnViewIntColumn
 {
-    TightdbTable *t = [[TightdbTable alloc] init];
-    NSUInteger intCol = [t addColumnWithName:@"intCol" andType:tightdb_Int];
+    TDBTable *t = [[TDBTable alloc] init];
+    NSUInteger intCol = [t addColumnWithName:@"intCol" andType:TDBIntType];
     
-    TightdbCursor *row = [t addEmptyRow];
+    TDBRow *row = [t addEmptyRow];
     [row setInt:2 inColumnWithIndex:intCol];
     
     row = [t addEmptyRow];
@@ -108,8 +108,8 @@
     row = [t addEmptyRow];
     [row setInt:0 inColumnWithIndex:intCol];
     
-    TightdbQuery *q = [t where];
-    TightdbView *v = [q findAllRows];
+    TDBQuery *q = [t where];
+    TDBView *v = [q findAllRows];
     
     // Not yet sorted
     STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:0] == 2, @"matcing value after no sort");
@@ -123,13 +123,13 @@
     STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:2] == 2, @"matcing value after default sort");
     
     // Sort same way
-    [v sortUsingColumnWithIndex:intCol inOrder:tightdb_ascending];
+    [v sortUsingColumnWithIndex:intCol inOrder:TDBAscending];
     STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:0] == 0, @"matcing value after ascending sort");
     STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after ascending sort");
     STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:2] == 2, @"matcing value after ascending sort");
     
     // Sort descending
-    [v sortUsingColumnWithIndex:intCol inOrder: tightdb_descending];
+    [v sortUsingColumnWithIndex:intCol inOrder: TDBDescending];
     STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:0] == 2, @"matcing value after descending sort");
     STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after descending sort");
     STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:2] == 0, @"matcing value after descending sort");
@@ -137,10 +137,10 @@
 
 - (void)testSortOnViewBoolColumn
 {
-    TightdbTable *t = [[TightdbTable alloc] init];
-    NSUInteger boolCol = [t addColumnWithName:@"boolCol" andType:tightdb_Bool];
+    TDBTable *t = [[TDBTable alloc] init];
+    NSUInteger boolCol = [t addColumnWithName:@"boolCol" andType:TDBBoolType];
     
-    TightdbCursor *row = [t addEmptyRow];
+    TDBRow *row = [t addEmptyRow];
     [row setBool:YES inColumnWithIndex:boolCol];
     
     row = [t addEmptyRow];
@@ -149,8 +149,8 @@
     row = [t addEmptyRow];
     [row setBool:NO inColumnWithIndex:boolCol];
     
-    TightdbQuery *q = [t where];
-    TightdbView *v = [q findAllRows];
+    TDBQuery *q = [t where];
+    TDBView *v = [q findAllRows];
     
     // Not yet sorted
     STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:0] == YES, @"matcing value after no sort");
@@ -164,13 +164,13 @@
     STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:2] == YES, @"matcing value after default sort");
     
     // Sort same way
-    [v sortUsingColumnWithIndex:boolCol inOrder:tightdb_ascending];
+    [v sortUsingColumnWithIndex:boolCol inOrder:TDBAscending];
     STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:0] == NO, @"matcing value after ascending sort");
     STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after ascending sort");
     STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:2] == YES, @"matcing value after ascending sort");
     
     // Sort descending
-    [v sortUsingColumnWithIndex:boolCol inOrder: tightdb_descending];
+    [v sortUsingColumnWithIndex:boolCol inOrder: TDBDescending];
     STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:0] == YES, @"matcing value after descending sort");
     STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after descending sort");
     STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:2] == NO, @"matcing value after descending sort");
@@ -179,8 +179,8 @@
 
 - (void)testSortOnViewDateColumn
 {
-    TightdbTable *t = [[TightdbTable alloc] init];
-    NSUInteger dateCol = [t addColumnWithName:@"dateCol" andType:tightdb_Date];
+    TDBTable *t = [[TDBTable alloc] init];
+    NSUInteger dateCol = [t addColumnWithName:@"dateCol" andType:TDBDateType];
     
     
     NSDateFormatter *formatter = [[NSDateFormatter alloc]init];
@@ -190,7 +190,7 @@
     NSDate *dateMiddle  = [formatter dateFromString:@"02/01/2014 10:10 PM"];
     NSDate *dateLast    = [formatter dateFromString:@"03/01/2014 10:10 PM"];
     
-    TightdbCursor *row = [t addEmptyRow];
+    TDBRow *row = [t addEmptyRow];
     [row setDate:[dateLast timeIntervalSince1970] inColumnWithIndex:dateCol];
     
     row = [t addEmptyRow];
@@ -199,8 +199,8 @@
     row = [t addEmptyRow];
     [row setDate:[dateFirst timeIntervalSince1970] inColumnWithIndex:dateCol];
     
-    TightdbQuery *q = [t where];
-    TightdbView *v = [q findAllRows];
+    TDBQuery *q = [t where];
+    TDBView *v = [q findAllRows];
     
     // Not yet sorted
     STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:0] == [dateLast timeIntervalSince1970], @"matcing value after no sort");
@@ -214,13 +214,13 @@
     STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:2] == [dateLast timeIntervalSince1970], @"matcing value after default sort");
     
     // Sort same way
-    [v sortUsingColumnWithIndex:dateCol inOrder:tightdb_ascending];
+    [v sortUsingColumnWithIndex:dateCol inOrder:TDBAscending];
     STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:0] == [dateFirst timeIntervalSince1970], @"matcing value after ascending sort");
     STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:1] == [dateMiddle timeIntervalSince1970], @"matcing value after ascending sort");
     STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:2] == [dateLast timeIntervalSince1970], @"matcing value after ascending sort");
     
     // Sort descending
-    [v sortUsingColumnWithIndex:dateCol inOrder: tightdb_descending];
+    [v sortUsingColumnWithIndex:dateCol inOrder: TDBDescending];
     STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:0] == [dateLast timeIntervalSince1970], @"matcing value after descending sort");
     STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:1] == [dateMiddle timeIntervalSince1970], @"matcing value after descending sort");
     STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:2] == [dateFirst timeIntervalSince1970], @"matcing value after descending sort");
@@ -229,20 +229,20 @@
 
 - (void)testSortOnAllColumnTypes
 {
-    TightdbTable *t = [[TightdbTable alloc] init];
+    TDBTable *t = [[TDBTable alloc] init];
     
-    NSUInteger boolCol      = [t addColumnWithName:@"boolCol" andType:tightdb_Bool];
-    NSUInteger binaryCol    = [t addColumnWithName:@"binaryCol" andType:tightdb_Binary];
-    NSUInteger dateCol      = [t addColumnWithName:@"dateCol" andType:tightdb_Date];
-    NSUInteger doubleCol    = [t addColumnWithName:@"doubleCol" andType:tightdb_Double];
-    NSUInteger floatCol     = [t addColumnWithName:@"floatCol" andType:tightdb_Float];
-    NSUInteger intCol       = [t addColumnWithName:@"intCol" andType:tightdb_Int];
-    NSUInteger mixedCol     = [t addColumnWithName:@"MixedCol" andType:tightdb_Mixed];
-    NSUInteger stringCol    = [t addColumnWithName:@"stringCol" andType:tightdb_String];
-    NSUInteger tableCol     = [t addColumnWithName:@"tableCol" andType:tightdb_Table];
+    NSUInteger boolCol      = [t addColumnWithName:@"boolCol" andType:TDBBoolType];
+    NSUInteger binaryCol    = [t addColumnWithName:@"binaryCol" andType:TDBBinaryType];
+    NSUInteger dateCol      = [t addColumnWithName:@"dateCol" andType:TDBDateType];
+    NSUInteger doubleCol    = [t addColumnWithName:@"doubleCol" andType:TDBDoubleType];
+    NSUInteger floatCol     = [t addColumnWithName:@"floatCol" andType:TDBFloatType];
+    NSUInteger intCol       = [t addColumnWithName:@"intCol" andType:TDBIntType];
+    NSUInteger mixedCol     = [t addColumnWithName:@"MixedCol" andType:TDBMixedType];
+    NSUInteger stringCol    = [t addColumnWithName:@"stringCol" andType:TDBStringType];
+    NSUInteger tableCol     = [t addColumnWithName:@"tableCol" andType:TDBTableType];
     
-    TightdbQuery *q = [t where];
-    TightdbView *v = [q findAllRows];
+    TDBQuery *q = [t where];
+    TDBView *v = [q findAllRows];
     
     [v sortUsingColumnWithIndex:boolCol]; // bool is supported
     STAssertThrows([v sortUsingColumnWithIndex:binaryCol], @"Not supported on binary column");

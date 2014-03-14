@@ -41,7 +41,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testGroup_Misc2
 {
     size_t row;
-    TightdbGroup* group = [TightdbGroup group];
+    TDBGroup* group = [TDBGroup group];
     NSLog(@"HasTable: %i", [group hasTableWithName:@"employees" withTableClass:[MyTable class]] );
     // Create new table in group
     MyTable* table = [group getOrCreateTableWithName:@"employees" asTableClass:[MyTable class] error:nil];
@@ -94,7 +94,7 @@ TIGHTDB_TABLE_2(QueryTable,
     STAssertEquals(avg, 21.0,@"Expected 20.5 average");
 
     // Execute the query and return a table (view)
-    TightdbView* res = [q findAll];
+    TDBView* res = [q findAll];
     for (size_t i = 0; i < [res rowCount]; i++) {
         // cursor missing. Only low-level interface!
         NSLog(@"%zu: is %lld years old",i , [res intInColumnWithIndex:1 atRowIndex:i]);
@@ -109,7 +109,7 @@ TIGHTDB_TABLE_2(QueryTable,
     [group writeToFile:@"employees.tightdb" withError:nil];
 
     // Load a group from disk (and print contents)
-    TightdbGroup* fromDisk = [TightdbGroup groupWithFile:@"employees.tightdb" withError:nil];
+    TDBGroup* fromDisk = [TDBGroup groupWithFile:@"employees.tightdb" withError:nil];
     MyTable* diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[MyTable class] error:nil];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
@@ -123,10 +123,10 @@ TIGHTDB_TABLE_2(QueryTable,
     }
 
     // Write same group to memory buffer
-    TightdbBinary* buffer = [group writeToBuffer];
+    TDBBinary* buffer = [group writeToBuffer];
 
     // Load a group from memory (and print contents)
-    TightdbGroup* fromMem = [TightdbGroup groupWithBuffer:buffer withError:nil];
+    TDBGroup* fromMem = [TDBGroup groupWithBuffer:buffer withError:nil];
     MyTable* memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[MyTable class] error:nil];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         // ??? cursor
@@ -137,7 +137,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
 - (void)testQuery
 {
-    TightdbGroup* group = [TightdbGroup group];
+    TDBGroup* group = [TDBGroup group];
     QueryTable* table = [group getOrCreateTableWithName:@"Query table" asTableClass:[QueryTable class] error:nil];
 
     // Add some rows
@@ -181,7 +181,7 @@ TIGHTDB_TABLE_2(QueryTable,
     {
         QueryTable_Query* q = [[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO].First columnIsLessThan:3] Or].First columnIsGreaterThan:5]; // No parenthesis
         STAssertEquals((size_t)2, [q countRows], @"count != 2");
-        TightdbView* tv = [q findAll];
+        TDBView* tv = [q findAll];
         STAssertEquals((size_t)2, [tv rowCount], @"count != 2");
         STAssertEquals((int64_t)8, [tv intInColumnWithIndex:0 atRowIndex:1], @"First != 8");
     }
@@ -194,18 +194,18 @@ TIGHTDB_TABLE_2(QueryTable,
  */
 - (void)testSubtables
 {
-    TightdbGroup* group = [TightdbGroup group];
-    TightdbTable* table = [group getOrCreateTableWithName:@"table" asTableClass:[TightdbTable class] error:nil];
+    TDBGroup* group = [TDBGroup group];
+    TDBTable* table = [group getOrCreateTableWithName:@"table" asTableClass:[TDBTable class] error:nil];
 
     // Specify the table type
     {
-        TightdbDescriptor* desc = table.descriptor;
-        [desc addColumnWithName:@"int" andType:tightdb_Int];
+        TDBDescriptor* desc = table.descriptor;
+        [desc addColumnWithName:@"int" andType:TDBIntType];
         {
-            TightdbDescriptor* subdesc = [desc addColumnTable:@"tab"];
-            [subdesc addColumnWithName:@"int" andType:tightdb_Int];
+            TDBDescriptor* subdesc = [desc addColumnTable:@"tab"];
+            [subdesc addColumnWithName:@"int" andType:TDBIntType];
         }
-        [desc addColumnWithName:@"mix" andType:tightdb_Mixed];
+        [desc addColumnWithName:@"mix" andType:TDBMixedType];
     }
 
     int COL_TABLE_INT = 0;
@@ -218,7 +218,7 @@ TIGHTDB_TABLE_2(QueryTable,
     [table setInt:700 inColumnWithIndex:COL_TABLE_INT atRowIndex:0];
 
     // Add two rows to the subtable
-    TightdbTable* subtable = [table tableInColumnWithIndex:COL_TABLE_TAB atRowIndex:0];
+    TDBTable* subtable = [table tableInColumnWithIndex:COL_TABLE_TAB atRowIndex:0];
     [subtable addEmptyRow];
 
     [subtable setInt:800 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:0];
@@ -226,14 +226,14 @@ TIGHTDB_TABLE_2(QueryTable,
     [subtable setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
 
     // Make the mixed values column contain another subtable
-    [table setMixed:[TightdbMixed mixedWithTable:nil] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
+    [table setMixed:[TDBMixed mixedWithTable:nil] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
 
 /* Fails!!!
     // Specify its type
     OCTopLevelTable* subtable2 = [table getTopLevelTable:COL_TABLE_MIX ndx:0];
     {
-        TightdbDescriptor* desc = [subtable2 getDescriptor];
-        [desc addColumnWithType:tightdb_Int andName:@"int"];
+        TDBDescriptor* desc = [subtable2 getDescriptor];
+        [desc addColumnWithType:TDBIntType andName:@"int"];
     }
     // Add a row to it
     [subtable2 addEmptyRow];
