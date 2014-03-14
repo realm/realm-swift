@@ -25,33 +25,33 @@
 
 -(void)testMajorVersion
 {
-  if (TDB_Version_Major != [TDBVersion getMajor])
+  if (TDB_VERSION_MAJOR != [TDBVersion getMajor])
     STFail(@"Wrong major version");
 }
 -(void)testMinorVersion
 {
-  if (TDB_Version_Minor != [TDBVersion getMinor])
+  if (TDB_VERSION_MINOR != [TDBVersion getMinor])
     STFail(@"Wrong minor version");
 }
 -(void)testPatchVersion
 {
-  if (TDB_Version_Patch != [TDBVersion getPatch])
+  if (TDB_VERSION_PATCH != [TDBVersion getPatch])
     STFail(@"Wrong patch version");
 }
 -(void)testIsAtLeast
 {
-    if ([TDBVersion isAtLeast:TDB_Version_Major-1 minor:TDB_Version_Minor patch:TDB_Version_Patch])
+    if ([TDBVersion isAtLeast:TDB_VERSION_MAJOR-1 minor:TDB_VERSION_MINOR patch:TDB_VERSION_PATCH])
         STFail(@"Wrong Major version");
-    if ([TDBVersion isAtLeast:TDB_Version_Major minor:TDB_Version_Minor-1 patch:TDB_Version_Patch])
+    if ([TDBVersion isAtLeast:TDB_VERSION_MAJOR minor:TDB_VERSION_MINOR-1 patch:TDB_VERSION_PATCH])
         STFail(@"Wrong Minor version");
-    if ([TDBVersion isAtLeast:TDB_Version_Major minor:TDB_Version_Minor patch:TDB_Version_Patch-1])
+    if ([TDBVersion isAtLeast:TDB_VERSION_MAJOR minor:TDB_VERSION_MINOR patch:TDB_VERSION_PATCH-1])
         STFail(@"Wrong Patch version");
 
-    if (![TDBVersion isAtLeast:TDB_Version_Major+1 minor:TDB_Version_Minor patch:TDB_Version_Patch])
+    if (![TDBVersion isAtLeast:TDB_VERSION_MAJOR+1 minor:TDB_VERSION_MINOR patch:TDB_VERSION_PATCH])
         STFail(@"Wrong Major version");
-    if (![TDBVersion isAtLeast:TDB_Version_Major minor:TDB_Version_Minor+1 patch:TDB_Version_Patch])
+    if (![TDBVersion isAtLeast:TDB_VERSION_MAJOR minor:TDB_VERSION_MINOR+1 patch:TDB_VERSION_PATCH])
         STFail(@"Wrong Minor version");
-    if (![TDBVersion isAtLeast:TDB_Version_Major minor:TDB_Version_Minor patch:TDB_Version_Patch+1])
+    if (![TDBVersion isAtLeast:TDB_VERSION_MAJOR minor:TDB_VERSION_MINOR patch:TDB_VERSION_PATCH+1])
         STFail(@"Wrong Patch version");
 }
 

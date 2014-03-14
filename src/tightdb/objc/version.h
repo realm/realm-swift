@@ -20,9 +20,9 @@
 
 #import <Foundation/Foundation.h>
 
-#define TDB_Version_Major 0
-#define TDB_Version_Minor 3
-#define TDB_Version_Patch 0
+#define TDB_VERSION_MAJOR 0
+#define TDB_VERSION_MINOR 3
+#define TDB_VERSION_PATCH 0
 
 @interface TDBVersion: NSObject
 -(id)init;
