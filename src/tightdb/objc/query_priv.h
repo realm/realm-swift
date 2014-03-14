@@ -5,6 +5,6 @@
 
 #import <Foundation/Foundation.h>
 
-@interface TightdbQuery()
+@interface TDBQuery()
 -(tightdb::Query&)getNativeQuery;
 @end

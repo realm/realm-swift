@@ -20,12 +20,12 @@
 
 #import <Foundation/Foundation.h>
 
-@class TightdbTable;
-@class TightdbBinary;
-@class TightdbMixed;
+@class TDBTable;
+@class TDBBinary;
+@class TDBMixed;
 
-@interface TightdbCursor: NSObject
--(id)initWithTable:(TightdbTable *)table ndx:(NSUInteger)ndx;
+@interface TDBRow: NSObject
+-(id)initWithTable:(TDBTable *)table ndx:(NSUInteger)ndx;
 -(void)TDBSetNdx:(NSUInteger)ndx;
 -(NSUInteger)TDBIndex;
 
@@ -40,9 +40,9 @@
 -(void)setFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
--(void)setBinary:(TightdbBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
--(void)setMixed:(TightdbMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
--(void)setTable:(TightdbTable *)aTable inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setBinary:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setTable:(TDBTable *)aTable inColumnWithIndex:(NSUInteger)colIndex;
 
 -(int64_t)intInColumnWithIndex:(NSUInteger)colIndex;
 -(NSString *)stringInColumnWithIndex:(NSUInteger)colIndex;
@@ -50,9 +50,9 @@
 -(float)floatInColumnWithIndex:(NSUInteger)colIndex;
 -(double)doubleInColumnWithIndex:(NSUInteger)colIndex;
 -(time_t)dateInColumnWithIndex:(NSUInteger)colIndex;
--(TightdbBinary *)binaryInColumnWithIndex:(NSUInteger)colIndex;
--(TightdbMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex;
--(TightdbTable *)tableInColumnWithIndex:(NSUInteger)colIndex;
+-(TDBBinary *)binaryInColumnWithIndex:(NSUInteger)colIndex;
+-(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex;
+-(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex;
 
 @end
 
@@ -61,8 +61,8 @@
    macro switching trick for the individual column types on
    TIGHTDB_CURSOR_PROPERTY macros similar to what is done for query
    accessors. */
-@interface TightdbAccessor: NSObject
--(id)initWithCursor:(TightdbCursor *)cursor columnId:(NSUInteger)columnId;
+@interface TDBAccessor: NSObject
+-(id)initWithCursor:(TDBRow *)cursor columnId:(NSUInteger)columnId;
 -(BOOL)getBool;
 -(void)setBool:(BOOL)value;
 -(int64_t)getInt;
@@ -73,12 +73,12 @@
 -(void)setDouble:(double)value;
 -(NSString *)getString;
 -(void)setString:(NSString *)value;
--(TightdbBinary *)getBinary;
--(void)setBinary:(TightdbBinary *)value;
+-(TDBBinary *)getBinary;
+-(void)setBinary:(TDBBinary *)value;
 -(time_t)getDate;
 -(void)setDate:(time_t)value;
--(void)setSubtable:(TightdbTable *)value;
+-(void)setSubtable:(TDBTable *)value;
 -(id)getSubtable:(Class)obj;
--(TightdbMixed *)getMixed;
--(void)setMixed:(TightdbMixed *)value;
+-(TDBMixed *)getMixed;
+-(void)setMixed:(TDBMixed *)value;
 @end
