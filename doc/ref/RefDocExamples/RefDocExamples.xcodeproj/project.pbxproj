@@ -415,7 +415,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/mk/git/git/tightdb_objc,
+					../../../,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RefDocExamples/RefDocExamples-Prefix.pch";
@@ -432,7 +432,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/mk/git/git/tightdb_objc,
+					../../../,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RefDocExamples/RefDocExamples-Prefix.pch";
@@ -503,6 +503,7 @@
 				4D88933D18D320D30038AFD4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4D88933E18D320D30038AFD4 /* Build configuration list for PBXNativeTarget "RefDocExamplesTests" */ = {
 			isa = XCConfigurationList;
@@ -511,6 +512,7 @@
 				4D88934018D320D30038AFD4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
