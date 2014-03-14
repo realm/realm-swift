@@ -413,7 +413,7 @@ using namespace std;
 {
     TDBType columnType = [self columnTypeOfColumn:colIndex];
     
-    if(columnType != tightdb_Int && columnType != tightdb_Bool && columnType != tightdb_Date) {
+    if(columnType != TDBIntType && columnType != TDBBoolType && columnType != TDBDateType) {
         NSException* exception = [NSException exceptionWithName:@"tightdb:sort_on_column_with_type_not_supported"
                                                          reason:@"Sort is currently only supported on Integer, Boolean and Date columns."
                                                        userInfo:[NSMutableDictionary dictionary]];
@@ -993,49 +993,49 @@ using namespace std;
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_bool(col_ndx, row_ndx, value);,
-        tightdb_Bool);
+        TDBBoolType);
 }
 
 -(void)setInt:(int64_t)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_int(col_ndx, row_ndx, value);,
-        tightdb_Int);
+        TDBIntType);
 }
 
 -(void)setFloat:(float)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_float(col_ndx, row_ndx, value);,
-        tightdb_Float);
+        TDBFloatType);
 }
 
 -(void)setDouble:(double)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_double(col_ndx, row_ndx, value);,
-        tightdb_Double);
+        TDBDoubleType);
 }
 
 -(void)setString:(NSString*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_string(col_ndx, row_ndx, ObjcStringAccessor(value));,
-        tightdb_String);
+        TDBStringType);
 }
 
 -(void)setBinary:(TDBBinary*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_binary(col_ndx, row_ndx, [value getNativeBinary]);,
-        tightdb_Binary);
+        TDBBinaryType);
 }
 
 -(void)setDate:(time_t)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_datetime(col_ndx, row_ndx, value);,
-       tightdb_Date);
+       TDBDateType);
 }
 
 -(void)setTable:(TDBTable*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
@@ -1045,7 +1045,7 @@ using namespace std;
 
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_subtable(col_ndx, row_ndx, &[value getNativeTable]);,
-        tightdb_Table);
+        TDBTableType);
 }
 
 -(void)setMixed:(TDBMixed*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
@@ -1060,7 +1060,7 @@ using namespace std;
         else {
             m_table->set_mixed(col_ndx, row_ndx, mixed);
         },
-        tightdb_Mixed);
+        TDBMixedType);
 }
 
 
