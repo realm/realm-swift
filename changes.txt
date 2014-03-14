@@ -1,5 +1,14 @@
 2014-03-13
 ==========
++ Adding setObject to TightdbTable (t[2] = @[@1, @"Hello"] is possible).
+
+2014-03-12
+==========
++ Adding insertRow to TightdbTable.
+
+2014-03-11
+==========
+* Extending appendRow to accept NSDictionary.
 ! BREAKING CHANGE: Most selectors have been renamed in the binding!
 
 2014-03-10

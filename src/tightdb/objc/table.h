@@ -141,10 +141,12 @@
 -(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
 -(TDBRow *)lastRow;
 -(TDBRow *)firstRow;
+-(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
 
 -(TDBRow *)insertEmptyRowAtIndex:(NSUInteger)ndx;
 
--(BOOL)appendRow:(NSArray *)data;
+-(BOOL)appendRow:(NSObject *)data;
+-(BOOL)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex;
 
 -(BOOL)boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(int64_t)intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;

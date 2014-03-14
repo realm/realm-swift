@@ -82,76 +82,190 @@
     // Add row using object literate
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Int];
-    if (![t appendRow:@[ @1 ]])
-        STFail(@"Impossible!");
-    if ([t rowCount] != 1)
-        STFail(@"Expected 1 row");
-    if (![t appendRow:@[ @2 ]])
-        STFail(@"Impossible!");
-    if ([t rowCount] != 2)
-        STFail(@"Expected 2 rows");
-    if ([t intInColumnWithIndex:0 atRowIndex:0] != 1)
-        STFail(@"Value 1 expected");
-    if ([t intInColumnWithIndex:0 atRowIndex:1] != 2)
-        STFail(@"Value 2 expected");
-    if ([t appendRow:@[@"Hello"]])
-        STFail(@"Wrong type");
+    STAssertTrue([t appendRow:@[ @1 ]], @"Impossible!");
+    STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
+    STAssertTrue([t appendRow:@[ @2 ]], @"Impossible!");
+    STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
+    STAssertEquals((int64_t)1, [t intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
+    STAssertEquals((int64_t)2, [t intInColumnWithIndex:0 atRowIndex:1], @"Value 2 expected");
+    STAssertFalse([t appendRow:@[@"Hello"]], @"Wrong type");
     if ([t appendRow:@[@1, @"Hello"]])
         STFail(@"Wrong number of columns");
 }
+
+-(void)testInsertRowsIntColumn
+{
+    // Add row using object literate
+    TDBTable* t = [[TDBTable alloc] init];
+    [t addColumnWithName:@"first" andType:tightdb_Int];
+    STAssertTrue([t insertRow:@[ @1 ] atRowIndex:0], @"Impossible!");
+    STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
+    STAssertTrue([t insertRow:@[ @2 ] atRowIndex:0], @"Impossible!");
+    STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
+    STAssertEquals((int64_t)1, [t intInColumnWithIndex:0 atRowIndex:1], @"Value 1 expected");
+    STAssertEquals((int64_t)2, [t intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
+    STAssertFalse([t insertRow:@[@"Hello"] atRowIndex:0], @"Wrong type");
+    if ([t insertRow:@[@1, @"Hello"] atRowIndex:0])
+        STFail(@"Wrong number of columns");
+}
+
+-(void)testUpdateRowIntColumn
+{
+    TDBTable* t = [[TDBTable alloc] init];
+    [t addColumnWithName:@"first" andType:tightdb_Int];
+    [t insertRow:@[@1] atRowIndex:0];
+    t[0] = @[@2];
+    STAssertEquals((int64_t)2, [t intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
+}
+
+-(void)testUpdateRowWithLabelsIntColumn
+{
+    TDBTable* t = [[TDBTable alloc] init];
+    [t addColumnWithName:@"first" andType:tightdb_Int];
+    [t insertRow:@[@1] atRowIndex:0];
+    t[0] = @{@"first": @2};
+    STAssertEquals((int64_t)2, [t intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
+}
+
+
+-(void)testAppendRowWithLabelsIntColumn
+{
+    // Add row using object literate
+    TDBTable* t = [[TDBTable alloc] init];
+    [t addColumnWithName:@"first" andType:tightdb_Int];
+    
+    STAssertTrue([t appendRow:@{ @"first": @1 }], @"Impossible!");
+    STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
+
+    STAssertTrue([t appendRow:@{ @"first": @2 }], @"Impossible!");
+    STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
+
+    STAssertEquals((int64_t)1, [t intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
+    STAssertEquals((int64_t)2, [t intInColumnWithIndex:0 atRowIndex:1], @"Value 2 expected");
+
+    STAssertFalse([t appendRow:@{ @"first": @"Hello" }], @"Wrong type");
+    STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
+
+    STAssertTrue(([t appendRow:@{ @"first": @1, @"second": @"Hello" }]), @"dh");
+    STAssertEquals((size_t)3, [t rowCount], @"Expected 3 rows");
+
+    STAssertTrue(([t appendRow:@{ @"second": @1 }]), @"This is impossible");
+    STAssertEquals((size_t)4, [t rowCount], @"Expected 4 rows");
+
+    STAssertEquals((int64_t)0, [t intInColumnWithIndex:0 atRowIndex:3], @"Value 0 expected");
+}
+
+-(void)testInsertRowWithLabelsIntColumn
+{
+    // Add row using object literate
+    TDBTable* t = [[TDBTable alloc] init];
+    [t addColumnWithName:@"first" andType:tightdb_Int];
+    
+    STAssertTrue(([t insertRow:@{ @"first": @1 } atRowIndex:0]), @"Impossible!");
+    STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
+    
+    STAssertTrue(([t insertRow:@{ @"first": @2 } atRowIndex:0]), @"Impossible!");
+    STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
+    
+    STAssertEquals((int64_t)1, ([t intInColumnWithIndex:0 atRowIndex:1]), @"Value 1 expected");
+    STAssertEquals((int64_t)2, ([t intInColumnWithIndex:0 atRowIndex:0]), @"Value 2 expected");
+    
+    STAssertFalse(([t insertRow:@{ @"first": @"Hello" } atRowIndex:0]), @"Wrong type");
+    STAssertEquals((size_t)2, ([t rowCount]), @"Expected 2 rows");
+    
+    STAssertTrue(([t insertRow:@{ @"first": @3, @"second": @"Hello"} atRowIndex:0]), @"Has 'first'");
+    STAssertEquals((size_t)3, [t rowCount], @"Expected 3 rows");
+    
+    STAssertTrue(([t insertRow:@{ @"second": @4 } atRowIndex:0]), @"This is impossible");
+    STAssertEquals((size_t)4, [t rowCount], @"Expected 4 rows");
+    STAssertTrue((int64_t)0 == ([t intInColumnWithIndex:0 atRowIndex:0]), @"Value 0 expected");
+}
+
 
 -(void)testAppendRowsIntStringColumns
 {
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Int];
     [t addColumnWithName:@"second" andType:tightdb_String];
-    if (![t appendRow:@[@1, @"Hello"]])
-        STFail(@"appendRow 1");
-    if ([t rowCount] != 1)
-        STFail(@"1 row expected");
-    if ([t intInColumnWithIndex:0 atRowIndex:0] != 1)
-        STFail(@"Value 1 expected");
-    if (![[t stringInColumnWithIndex:1 atRowIndex:0] isEqualToString:@"Hello"])
-        STFail(@"Value 'Hello' expected");
-    if ([t appendRow:@[@1, @2]])
-        STFail(@"appendRow 2");
+
+    STAssertTrue(([t appendRow:@[@1, @"Hello"]]), @"appendRow 1");
+    STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
+    STAssertEquals((int64_t)1, ([t intInColumnWithIndex:0 atRowIndex:0]), @"Value 1 expected");
+    STAssertTrue(([[t stringInColumnWithIndex:1 atRowIndex:0] isEqualToString:@"Hello"]), @"Value 'Hello' expected");
+    STAssertFalse(([t appendRow:@[@1, @2]]), @"appendRow 2");
 }
+
+
+-(void)testAppendRowWithLabelsIntStringColumns
+{
+    TDBTable* t = [[TDBTable alloc] init];
+    [t addColumnWithName:@"first" andType:tightdb_Int];
+    [t addColumnWithName:@"second" andType:tightdb_String];
+    STAssertTrue(([t appendRow:@{@"first": @1, @"second": @"Hello"}]), @"appendRowWithLabels 1");
+    STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
+    STAssertEquals((int64_t)1, ([t intInColumnWithIndex:0 atRowIndex:0]), @"Value 1 expected");
+    STAssertTrue(([[t stringInColumnWithIndex:1 atRowIndex:0] isEqualToString:@"Hello"]), @"Value 'Hello' expected");
+    STAssertFalse(([t appendRow:@{@"first": @1, @"second": @2}]), @"appendRowWithLabels 2");
+}
+
 
 -(void)testAppendRowsDoubleColumn
 {
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Double];
-    if (![t appendRow:@[@3.14]])  /* double is default */
-        STFail(@"Cannot insert 'double'");
-    if ([t rowCount] != 1)
-        STFail(@"1 row expected");
+    STAssertTrue(([t appendRow:@[@3.14]]), @"Cannot insert 'double'");  /* double is default */
+    STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
+}
+
+-(void)testAppendRowWithLabelsDoubleColumn
+{
+    TDBTable* t = [[TDBTable alloc] init];
+    [t addColumnWithName:@"first" andType:tightdb_Double];
+    STAssertTrue(([t appendRow:@{@"first": @3.14}]), @"Cannot insert 'double'");   /* double is default */
+    STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 }
 
 -(void)testAppendRowsFloatColumn
 {
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Float];
-    if (![t appendRow:@[@3.14F]])  /* F == float */
-        STFail(@"Cannot insert 'float'");
-    if ([t rowCount] != 1)
-        STFail(@"1 row expected");
+    STAssertTrue(([t appendRow:@[@3.14F]]), @"Cannot insert 'float'"); /* F == float */
+    STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
+}
+
+-(void)testAppendRowWithLabelsFloatColumn
+{
+    TDBTable* t = [[TDBTable alloc] init];
+    [t addColumnWithName:@"first" andType:tightdb_Float];
+    STAssertTrue(([t appendRow:@{@"first": @3.14F}]), @"Cannot insert 'float'");   /* F == float */
+    STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 }
 
 -(void)testAppendRowsDateColumn
 {
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:tightdb_Date];
-    if (![t appendRow:@[@1000000000]])  /* 2001-09-09 01:46:40 */
-        STFail(@"Cannot insert 'time_t'");
-    if ([t rowCount] != 1)
-        STFail(@"1 row expected");
+    STAssertTrue(([t appendRow:@[@1000000000]]), @"Cannot insert 'time_t'"); /* 2001-09-09 01:46:40 */
+    STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 
     NSDate *d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
-    if (![t appendRow:@[d]])
-        STFail(@"Cannot insert 'NSDate'");
-    if ([t rowCount] != 2)
-        STFail(@"2 rows excepted");
+    STAssertTrue(([t appendRow:@[d]]), @"Cannot insert 'NSDate'");
+    STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
+
+-(void)testAppendRowWithLabelsDateColumn
+{
+    TDBTable* t = [[TDBTable alloc] init];
+    [t addColumnWithName:@"first" andType:tightdb_Date];
+
+    STAssertTrue(([t appendRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   /* 2001-09-09 01:46:40 */
+    STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
+    
+    NSDate *d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
+    STAssertTrue(([t appendRow:@{@"first": d}]), @"Cannot insert 'NSDate'");
+    STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
+}
+
 -(void)testAppendRowsBinaryColumn
 {
     const char bin[4] = { 0, 1, 2, 3 };
@@ -162,8 +276,29 @@
         STFail(@"Cannot insert 'binary'");
     if ([t rowCount] != 1)
         STFail(@"1 row expected");
+    
     NSData *nsd = [NSData dataWithBytes:(const void *)bin length:4];
     if (![t appendRow:@[nsd]])
+        STFail(@"Cannot insert 'NSData'");
+    if ([t rowCount] != 2)
+        STFail(@"2 rows excepted");
+}
+
+
+-(void)testAppendRowWithLabelsBinaryColumn
+{
+    const char bin[4] = { 0, 1, 2, 3 };
+    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    TDBTable* t = [[TDBTable alloc] init];
+    [t addColumnWithName:@"first" andType:tightdb_Binary];
+
+    if (![t appendRow:@{@"first": bin2}])
+        STFail(@"Cannot insert 'binary'");
+    if ([t rowCount] != 1)
+        STFail(@"1 row expected");
+
+    NSData *nsd = [NSData dataWithBytes:(const void *)bin length:4];
+    if (![t appendRow:@{@"first": nsd}])
         STFail(@"Cannot insert 'NSData'");
     if ([t rowCount] != 2)
         STFail(@"2 rows excepted");
@@ -200,6 +335,15 @@
     [t addColumnWithName:@"first" andType:tightdb_Bool];
     STAssertTrue(([t appendRow:@[@YES]]), @"Cannot append bool column.");
     STAssertTrue(([t appendRow:@[@NO]]), @"Cannot append bool column.");
+    STAssertEquals((size_t)2, [t rowCount], @"2 rows expected");
+}
+
+-(void)testAppendRowWithLabelsBoolColumn
+{
+    TDBTable *t = [[TDBTable alloc] init];
+    [t addColumnWithName:@"first" andType:tightdb_Bool];
+    STAssertTrue(([t appendRow:@{@"first": @YES}]), @"Cannot append bool column.");
+    STAssertTrue(([t appendRow:@{@"first": @NO}]), @"Cannot append bool column.");
     STAssertEquals((size_t)2, [t rowCount], @"2 rows expected");
 }
 
@@ -259,6 +403,39 @@
     if ([_table10 rowCount] != 1)
         STFail(@"1 row excepted");
 }
+
+-(void)testAppendRowWithLabelsMixedColumns
+{
+    const char bin[4] = { 0, 1, 2, 3 };
+    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    
+    TDBTable* t = [[TDBTable alloc] init];
+    [t addColumnWithName:@"first" andType:tightdb_Mixed];
+    if (![t appendRow:@{@"first": @1}])
+        STFail(@"Cannot insert 'int'");
+    if ([t rowCount] != 1)
+        STFail(@"1 row excepted");
+    if (![t appendRow:@{@"first": @"Hello"}])
+        STFail(@"Cannot insert 'string'");
+    if ([t rowCount] != 2)
+        STFail(@"2 rows excepted");
+    if (![t appendRow:@{@"first": @3.14f}])
+        STFail(@"Cannot insert 'float'");
+    if ([t rowCount] != 3)
+        STFail(@"3 rows excepted");
+    if (![t appendRow:@{@"first": @3.14}])
+        STFail(@"Cannot insert 'double'");
+    if ([t rowCount] != 4)
+        STFail(@"4 rows excepted");
+    if (![t appendRow:@{@"first": @YES}])
+        STFail(@"Cannot insert 'bool'");
+    if ([t rowCount] != 5)
+        STFail(@"5 rows excepted");
+    if (![t appendRow:@{@"first": bin2}])
+        STFail(@"Cannot insert 'binary'");
+    if ([t rowCount] != 6)
+        STFail(@"6 rows excepted");
+    }
 
 -(void)testRemoveColumns
 {
@@ -860,8 +1037,49 @@
     // Same but used directly
     STAssertEquals([_table[0] intInColumnWithIndex:0], (int64_t)506, @"table[0].first");
     STAssertTrue([[_table[0] stringInColumnWithIndex:1] isEqual:@"test"], @"table[0].second");
+}
 
+- (void)testTableDynamic_Cursor_Subscripting
+{
+    TDBTable* _table = [[TDBTable alloc] init];
+    STAssertNotNil(_table, @"Table is nil");
 
+    // 1. Add two columns
+    [_table addColumnWithName:@"first" andType:tightdb_Int];
+    [_table addColumnWithName:@"second" andType:tightdb_String];
+
+    TDBRow* c;
+
+    // Add some rows
+    c = [_table addEmptyRow];
+    c[0] = @506;
+    c[1] = @"test";
+    STAssertEquals([_table[0] intInColumnWithIndex:0], (int64_t)506, @"table[0].first");
+    STAssertTrue([[_table[0] stringInColumnWithIndex:1] isEqual:@"test"], @"table[0].second");
+
+    c = [_table addEmptyRow];
+    c[@"first"]  = @4;
+    c[@"second"] = @"more test";
+
+    // Get values from cursor by object subscripting
+    c = _table[0];
+    STAssertTrue([c[0] isEqual:@506], @"table[0].first");
+    STAssertTrue([c[1] isEqual:@"test"], @"table[0].second");
+
+    // Same but used with column name
+    STAssertTrue([c[@"first"]  isEqual:@506], @"table[0].first");
+    STAssertTrue([c[@"second"] isEqual:@"test"], @"table[0].second");
+
+    // Combine with subscripting for rows
+    STAssertTrue([_table[0][0] isEqual:@506], @"table[0].first");
+    STAssertTrue([_table[0][1] isEqual:@"test"], @"table[0].second");
+    STAssertTrue([_table[0][@"first"] isEqual:@506], @"table[0].first");
+    STAssertTrue([_table[0][@"second"] isEqual:@"test"], @"table[0].second");
+
+    STAssertTrue([_table[1][0] isEqual:@4], @"table[1].first");
+    STAssertTrue([_table[1][1] isEqual:@"more test"], @"table[1].second");
+    STAssertTrue([_table[1][@"first"] isEqual:@4], @"table[1].first");
+    STAssertTrue([_table[1][@"second"] isEqual:@"more test"], @"table[1].second");
 }
 
 @end
