@@ -1,7 +1,6 @@
 /* @@Example: ex_objc_query_typed_intro @@ */
 
-#import <tightdb/objc/table.h>
-#import <tightdb/objc/tightdb.h>
+#import <Tightdb/Tightdb.h>
 
 /* Defines a new table with two columns Name and Age. */
 
@@ -27,7 +26,7 @@ int main()
 
         /* Create a query. */
 
-        PeopleTable_Query *query = [[[[table where].Age columnIsGreaterThan:20] or].Name columnIsEqualTo:@"Bob"];
+        PeopleTable_Query *query = [[[[table where].Age columnIsGreaterThan:20] Or].Name columnIsEqualTo:@"Bob"];
 
         /* Iterate over the query result. */
 

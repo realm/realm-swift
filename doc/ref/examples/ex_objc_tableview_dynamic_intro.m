@@ -13,9 +13,9 @@ int main()
 
         /* Add some colomns (obsolete style, see typed table example). */
 
-        size_t const NAME  = [table addColumnWithType:tightdb_String andName:@"Name"];
-        size_t const AGE   = [table addColumnWithType:tightdb_Int andName:@"Age"];
-        size_t const HIRED = [table addColumnWithType:tightdb_Bool andName:@"Hired"];
+        size_t const NAME  = [table addColumnWithName:@"Name" andType:tightdb_String];
+        size_t const AGE   = [table addColumnWithName:@"Age" andType:tightdb_Int];
+        size_t const HIRED = [table addColumnWithName:@"Hired" andType:tightdb_Bool];
 
         /* Add some people. */
 
@@ -27,60 +27,61 @@ int main()
 
         cursor = [table addEmptyRow];
 
-        [cursor setInt:23 inColumn:AGE];
-        [cursor setString:@"Joe" inColumn:NAME];
-        [cursor setBool:YES inColumn:HIRED];
+        [cursor setInt:23 inColumnWithIndex:AGE];
+        [cursor setString:@"Joe" inColumnWithIndex:NAME];
+        [cursor setBool:YES inColumnWithIndex:HIRED];
 
         /* Row 1 */
 
         cursor = [table addEmptyRow];
 
-        [cursor setInt:32 inColumn:AGE];
-        [cursor setString:@"Simon" inColumn:NAME];
-        [cursor setBool:YES inColumn:HIRED];
+        [cursor setInt:32 inColumnWithIndex:AGE];
+        [cursor setString:@"Simon" inColumnWithIndex:NAME];
+        [cursor setBool:YES inColumnWithIndex:HIRED];
 
         /* Row 2 */
 
         cursor = [table addEmptyRow];
 
-        [cursor setInt:12 inColumn:AGE];
-        [cursor setString:@"Steve" inColumn:NAME];
-        [cursor setBool:NO inColumn:HIRED];
+        [cursor setInt:12 inColumnWithIndex:AGE];
+        [cursor setString:@"Steve" inColumnWithIndex:NAME];
+        [cursor setBool:NO inColumnWithIndex:HIRED];
 
         /* Row 3 */
 
         cursor = [table addEmptyRow];
 
-        [cursor setInt:59 inColumn:AGE];
-        [cursor setString:@"Nick" inColumn:NAME];
-        [cursor setBool:YES inColumn:HIRED];
+        [cursor setInt:59 inColumnWithIndex:AGE];
+        [cursor setString:@"Nick" inColumnWithIndex:NAME];
+        [cursor setBool:YES inColumnWithIndex:HIRED];
 
         /* Set up a query to search for employees. */
 
-        TightdbQuery *q =  [[[table where] column: AGE   isBetweenInt:30 and_:60]
-                                           column: HIRED isEqualToBool:YES];
+        TightdbQuery *q =  [[[[table where] intIsGreaterThanOrEqualTo:30 inColumnWithIndex:AGE]
+                                           intIsLessThanOrEqualTo:60 inColumnWithIndex:AGE ]
+                                           boolIsEqualTo:YES inColumnWithIndex:HIRED];
 
         /* Execute the query. */
 
-        TightdbView *view = [q findAll];
+        TightdbView *view = [q findAllRows];
 
         /* Print the names. */
 
         for (TightdbCursor *ite in view) {
-            NSLog(@"With iterator.......name: %@",[ite getStringInColumn:NAME]);
+            NSLog(@"With iterator.......name: %@",[ite stringInColumnWithIndex:NAME]);
         }
 
         /* Take a curser at index one in the view. */
         /* Note: the index of this row is different in the underlaying table. */
 
-        TightdbCursor *c = [view cursorAtIndex:1];
+        TightdbCursor *c = [view rowAtIndex:1];
         if (c != nil)
-            NSLog(@"With fixed index....name: %@",[c getStringInColumn:NAME]);
+            NSLog(@"With fixed index....name: %@",[c stringInColumnWithIndex:NAME]);
 
 
         /* Index out-of-bounds index. */
 
-        TightdbCursor *c2 = [view cursorAtIndex:[view count]];
+        TightdbCursor *c2 = [view rowAtIndex:view.rowCount];
         if (c2 != nil)
             NSLog(@"Should not get here.");
 

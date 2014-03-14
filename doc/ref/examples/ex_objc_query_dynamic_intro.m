@@ -1,7 +1,6 @@
 /* @@Example: ex_objc_query_dynamic_intro @@ */
 
-#import <tightdb/objc/table.h>
-#import <tightdb/objc/tightdb.h>
+#import <Tightdb/Tightdb.h>
 
 
 
@@ -14,9 +13,9 @@ int main()
 
         TightdbTable *table = [[TightdbTable alloc] init];
 
-        size_t const NAME = [table addColumnWithType:tightdb_String andName:@"Name"];
-        size_t const AGE = [table addColumnWithType:tightdb_Int andName:@"Age"];
-        size_t const HIRED = [table addColumnWithType:tightdb_Bool andName:@"Hired"];
+        size_t const NAME = [table addColumnWithName:@"Name" andType:tightdb_String];
+        size_t const AGE = [table addColumnWithName:@"Age" andType:tightdb_Int];
+        size_t const HIRED = [table addColumnWithName:@"Hired" andType:tightdb_Bool];
 
         /* Add some people. */
 
@@ -28,48 +27,49 @@ int main()
 
         cursor = [table addEmptyRow];
 
-        [cursor setInt:23 inColumn:AGE];
-        [cursor setString:@"Joe" inColumn:NAME];
-        [cursor setBool:YES inColumn:HIRED];
+        [cursor setInt:23 inColumnWithIndex:AGE];
+        [cursor setString:@"Joe" inColumnWithIndex:NAME];
+        [cursor setBool:YES inColumnWithIndex:HIRED];
 
         /* Row 1 */
 
         cursor = [table addEmptyRow];
 
-        [cursor setInt:32 inColumn:AGE];
-        [cursor setString:@"Simon" inColumn:NAME];
-        [cursor setBool:YES inColumn:HIRED];
+        [cursor setInt:32 inColumnWithIndex:AGE];
+        [cursor setString:@"Simon" inColumnWithIndex:NAME];
+        [cursor setBool:YES inColumnWithIndex:HIRED];
 
         /* Row 2 */
 
         cursor = [table addEmptyRow];
 
-        [cursor setInt:12 inColumn:AGE];
-        [cursor setString:@"Steve" inColumn:NAME];
-        [cursor setBool:NO inColumn:HIRED];
+        [cursor setInt:12 inColumnWithIndex:AGE];
+        [cursor setString:@"Steve" inColumnWithIndex:NAME];
+        [cursor setBool:NO inColumnWithIndex:HIRED];
 
         /* Row 3 */
 
         cursor = [table addEmptyRow];
 
-        [cursor setInt:59 inColumn:AGE];
-        [cursor setString:@"Nick" inColumn:NAME];
-        [cursor setBool:YES inColumn:HIRED];
+        [cursor setInt:59 inColumnWithIndex:AGE];
+        [cursor setString:@"Nick" inColumnWithIndex:NAME];
+        [cursor setBool:YES inColumnWithIndex:HIRED];
 
         /* Set up a query to search for employees. */
 
-        TightdbQuery *q =  [[[table where] column: AGE   isBetweenInt:0 and_:60]
-                                           column: HIRED isEqualToBool:YES];
+        TightdbQuery *q =  [[[[table where] intIsGreaterThanOrEqualTo:0 inColumnWithIndex:AGE]
+                                            intIsLessThanOrEqualTo:60 inColumnWithIndex:AGE ]
+                                          boolIsEqualTo:YES inColumnWithIndex:HIRED];
 
         /* Execute the query. */
 
-        TightdbView *view = [q findAll];
+        TightdbView *view = [q findAllRows];
 
         /* Print the names. */
 
         for (TightdbCursor *c in view) {
 
-            NSLog(@"name: %@",[c getStringInColumn:NAME]);
+            NSLog(@"name: %@",[c stringInColumnWithIndex:NAME]);
 
         }
 
