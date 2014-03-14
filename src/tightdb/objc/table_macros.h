@@ -35,13 +35,13 @@
 
 
 #define TIGHTDB_TABLE_DEF_1(TableName, CName1, CType1) \
-@interface TableName##_Cursor: TightdbCursor \
+@interface TableName##_Cursor: TDBRow \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 @end \
 @class TableName##_Query; \
 @class TableName##_View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-@interface TableName##_Query: TightdbQuery \
+@interface TableName##_Query: TDBQuery \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
 -(TableName##_Query*)group; \
 -(TableName##_Query*)Or; \
@@ -50,7 +50,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 -(TableName##_Query*)parent; \
 -(TableName##_View*)findAll; \
 @end \
-@interface TableName: TightdbTable \
+@interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1; \
 -(void)insertEmptyRowAtIndex:(size_t)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1; \
@@ -61,20 +61,20 @@ TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertEmptyRowAtIndex:(size_t)ndx; \
 @end \
-@interface TableName##_View: TightdbView \
+@interface TableName##_View: TDBView \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_1(TableName, CName1, CType1) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor* _##CName1; \
+    TDBAccessor* _##CName1; \
 } \
--(id)initWithTable:(TightdbTable*)table ndx:(size_t)ndx \
+-(id)initWithTable:(TDBTable*)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
+        _##CName1 = [[TDBAccessor alloc] initWithCursor:self columnId:0]; \
     } \
     return self; \
 } \
@@ -97,7 +97,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName1, CType1) \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
--(id)initWithTable:(TightdbTable*)table \
+-(id)initWithTable:(TDBTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -197,32 +197,32 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
     [super insertEmptyRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TightdbDescriptor*)desc \
++(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     return YES; \
 } \
 -(BOOL)_checkType \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TightdbDescriptor*)desc \
++(BOOL)_addColumns:(TDBDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     return YES; \
 } \
 -(BOOL)_addColumns \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -234,7 +234,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 { \
     TableName##_Cursor* tmpCursor; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -250,7 +250,7 @@ TIGHTDB_TABLE_IMPL_1(TableName, CType1, CName1)
 
 
 #define TIGHTDB_TABLE_DEF_2(TableName, CName1, CType1, CName2, CType2) \
-@interface TableName##_Cursor: TightdbCursor \
+@interface TableName##_Cursor: TDBRow \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
 @end \
@@ -258,7 +258,7 @@ TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
 @class TableName##_View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
-@interface TableName##_Query: TightdbQuery \
+@interface TableName##_Query: TDBQuery \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
 -(TableName##_Query*)group; \
@@ -268,7 +268,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 -(TableName##_Query*)parent; \
 -(TableName##_View*)findAll; \
 @end \
-@interface TableName: TightdbTable \
+@interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2; \
@@ -280,22 +280,22 @@ TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertEmptyRowAtIndex:(size_t)ndx; \
 @end \
-@interface TableName##_View: TightdbView \
+@interface TableName##_View: TDBView \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_2(TableName, CName1, CType1, CName2, CType2) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor* _##CName1; \
-    TightdbAccessor* _##CName2; \
+    TDBAccessor* _##CName1; \
+    TDBAccessor* _##CName2; \
 } \
--(id)initWithTable:(TightdbTable*)table ndx:(size_t)ndx \
+-(id)initWithTable:(TDBTable*)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
+        _##CName1 = [[TDBAccessor alloc] initWithCursor:self columnId:0]; \
+        _##CName2 = [[TDBAccessor alloc] initWithCursor:self columnId:1]; \
     } \
     return self; \
 } \
@@ -320,7 +320,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName2, CType2) \
 } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
--(id)initWithTable:(TightdbTable*)table \
+-(id)initWithTable:(TDBTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -427,11 +427,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
     [super insertEmptyRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TightdbDescriptor*)desc \
++(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -439,14 +439,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 } \
 -(BOOL)_checkType \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TightdbDescriptor*)desc \
++(BOOL)_addColumns:(TDBDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -454,7 +454,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 } \
 -(BOOL)_addColumns \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -466,7 +466,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 { \
     TableName##_Cursor* tmpCursor; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -482,7 +482,7 @@ TIGHTDB_TABLE_IMPL_2(TableName, CType1, CName1, CType2, CName2)
 
 
 #define TIGHTDB_TABLE_DEF_3(TableName, CName1, CType1, CName2, CType2, CName3, CType3) \
-@interface TableName##_Cursor: TightdbCursor \
+@interface TableName##_Cursor: TDBRow \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName3, CType3) \
@@ -492,7 +492,7 @@ TIGHTDB_CURSOR_PROPERTY_DEF(CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
-@interface TableName##_Query: TightdbQuery \
+@interface TableName##_Query: TDBQuery \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
@@ -503,7 +503,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
 -(TableName##_Query*)parent; \
 -(TableName##_View*)findAll; \
 @end \
-@interface TableName: TightdbTable \
+@interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -516,24 +516,24 @@ TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertEmptyRowAtIndex:(size_t)ndx; \
 @end \
-@interface TableName##_View: TightdbView \
+@interface TableName##_View: TDBView \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_3(TableName, CName1, CType1, CName2, CType2, CName3, CType3) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor* _##CName1; \
-    TightdbAccessor* _##CName2; \
-    TightdbAccessor* _##CName3; \
+    TDBAccessor* _##CName1; \
+    TDBAccessor* _##CName2; \
+    TDBAccessor* _##CName3; \
 } \
--(id)initWithTable:(TightdbTable*)table ndx:(size_t)ndx \
+-(id)initWithTable:(TDBTable*)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
+        _##CName1 = [[TDBAccessor alloc] initWithCursor:self columnId:0]; \
+        _##CName2 = [[TDBAccessor alloc] initWithCursor:self columnId:1]; \
+        _##CName3 = [[TDBAccessor alloc] initWithCursor:self columnId:2]; \
     } \
     return self; \
 } \
@@ -560,7 +560,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName3, CType3) \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
 @synthesize CName3 = _CName3; \
--(id)initWithTable:(TightdbTable*)table \
+-(id)initWithTable:(TDBTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -674,11 +674,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
     [super insertEmptyRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TightdbDescriptor*)desc \
++(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -687,14 +687,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 } \
 -(BOOL)_checkType \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TightdbDescriptor*)desc \
++(BOOL)_addColumns:(TDBDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -703,7 +703,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 } \
 -(BOOL)_addColumns \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -715,7 +715,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 { \
     TableName##_Cursor* tmpCursor; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -731,7 +731,7 @@ TIGHTDB_TABLE_IMPL_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3)
 
 
 #define TIGHTDB_TABLE_DEF_4(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4) \
-@interface TableName##_Cursor: TightdbCursor \
+@interface TableName##_Cursor: TDBRow \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName3, CType3) \
@@ -743,7 +743,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
-@interface TableName##_Query: TightdbQuery \
+@interface TableName##_Query: TDBQuery \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
@@ -755,7 +755,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
 -(TableName##_Query*)parent; \
 -(TableName##_View*)findAll; \
 @end \
-@interface TableName: TightdbTable \
+@interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -769,26 +769,26 @@ TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertEmptyRowAtIndex:(size_t)ndx; \
 @end \
-@interface TableName##_View: TightdbView \
+@interface TableName##_View: TDBView \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_4(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor* _##CName1; \
-    TightdbAccessor* _##CName2; \
-    TightdbAccessor* _##CName3; \
-    TightdbAccessor* _##CName4; \
+    TDBAccessor* _##CName1; \
+    TDBAccessor* _##CName2; \
+    TDBAccessor* _##CName3; \
+    TDBAccessor* _##CName4; \
 } \
--(id)initWithTable:(TightdbTable*)table ndx:(size_t)ndx \
+-(id)initWithTable:(TDBTable*)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
+        _##CName1 = [[TDBAccessor alloc] initWithCursor:self columnId:0]; \
+        _##CName2 = [[TDBAccessor alloc] initWithCursor:self columnId:1]; \
+        _##CName3 = [[TDBAccessor alloc] initWithCursor:self columnId:2]; \
+        _##CName4 = [[TDBAccessor alloc] initWithCursor:self columnId:3]; \
     } \
     return self; \
 } \
@@ -817,7 +817,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName4, CType4) \
 @synthesize CName2 = _CName2; \
 @synthesize CName3 = _CName3; \
 @synthesize CName4 = _CName4; \
--(id)initWithTable:(TightdbTable*)table \
+-(id)initWithTable:(TDBTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -938,11 +938,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
     [super insertEmptyRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TightdbDescriptor*)desc \
++(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -952,14 +952,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 } \
 -(BOOL)_checkType \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TightdbDescriptor*)desc \
++(BOOL)_addColumns:(TDBDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -969,7 +969,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 } \
 -(BOOL)_addColumns \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -981,7 +981,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 { \
     TableName##_Cursor* tmpCursor; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -997,7 +997,7 @@ TIGHTDB_TABLE_IMPL_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_5(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5) \
-@interface TableName##_Cursor: TightdbCursor \
+@interface TableName##_Cursor: TDBRow \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName3, CType3) \
@@ -1011,7 +1011,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
-@interface TableName##_Query: TightdbQuery \
+@interface TableName##_Query: TDBQuery \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
@@ -1024,7 +1024,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
 -(TableName##_Query*)parent; \
 -(TableName##_View*)findAll; \
 @end \
-@interface TableName: TightdbTable \
+@interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -1039,28 +1039,28 @@ TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertEmptyRowAtIndex:(size_t)ndx; \
 @end \
-@interface TableName##_View: TightdbView \
+@interface TableName##_View: TDBView \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_5(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor* _##CName1; \
-    TightdbAccessor* _##CName2; \
-    TightdbAccessor* _##CName3; \
-    TightdbAccessor* _##CName4; \
-    TightdbAccessor* _##CName5; \
+    TDBAccessor* _##CName1; \
+    TDBAccessor* _##CName2; \
+    TDBAccessor* _##CName3; \
+    TDBAccessor* _##CName4; \
+    TDBAccessor* _##CName5; \
 } \
--(id)initWithTable:(TightdbTable*)table ndx:(size_t)ndx \
+-(id)initWithTable:(TDBTable*)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
+        _##CName1 = [[TDBAccessor alloc] initWithCursor:self columnId:0]; \
+        _##CName2 = [[TDBAccessor alloc] initWithCursor:self columnId:1]; \
+        _##CName3 = [[TDBAccessor alloc] initWithCursor:self columnId:2]; \
+        _##CName4 = [[TDBAccessor alloc] initWithCursor:self columnId:3]; \
+        _##CName5 = [[TDBAccessor alloc] initWithCursor:self columnId:4]; \
     } \
     return self; \
 } \
@@ -1091,7 +1091,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName5, CType5) \
 @synthesize CName3 = _CName3; \
 @synthesize CName4 = _CName4; \
 @synthesize CName5 = _CName5; \
--(id)initWithTable:(TightdbTable*)table \
+-(id)initWithTable:(TDBTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -1219,11 +1219,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
     [super insertEmptyRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TightdbDescriptor*)desc \
++(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -1234,14 +1234,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 } \
 -(BOOL)_checkType \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TightdbDescriptor*)desc \
++(BOOL)_addColumns:(TDBDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -1252,7 +1252,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 } \
 -(BOOL)_addColumns \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -1264,7 +1264,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 { \
     TableName##_Cursor* tmpCursor; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -1280,7 +1280,7 @@ TIGHTDB_TABLE_IMPL_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_6(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6) \
-@interface TableName##_Cursor: TightdbCursor \
+@interface TableName##_Cursor: TDBRow \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName3, CType3) \
@@ -1296,7 +1296,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
-@interface TableName##_Query: TightdbQuery \
+@interface TableName##_Query: TDBQuery \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
@@ -1310,7 +1310,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
 -(TableName##_Query*)parent; \
 -(TableName##_View*)findAll; \
 @end \
-@interface TableName: TightdbTable \
+@interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -1326,30 +1326,30 @@ TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertEmptyRowAtIndex:(size_t)ndx; \
 @end \
-@interface TableName##_View: TightdbView \
+@interface TableName##_View: TDBView \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_6(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor* _##CName1; \
-    TightdbAccessor* _##CName2; \
-    TightdbAccessor* _##CName3; \
-    TightdbAccessor* _##CName4; \
-    TightdbAccessor* _##CName5; \
-    TightdbAccessor* _##CName6; \
+    TDBAccessor* _##CName1; \
+    TDBAccessor* _##CName2; \
+    TDBAccessor* _##CName3; \
+    TDBAccessor* _##CName4; \
+    TDBAccessor* _##CName5; \
+    TDBAccessor* _##CName6; \
 } \
--(id)initWithTable:(TightdbTable*)table ndx:(size_t)ndx \
+-(id)initWithTable:(TDBTable*)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
+        _##CName1 = [[TDBAccessor alloc] initWithCursor:self columnId:0]; \
+        _##CName2 = [[TDBAccessor alloc] initWithCursor:self columnId:1]; \
+        _##CName3 = [[TDBAccessor alloc] initWithCursor:self columnId:2]; \
+        _##CName4 = [[TDBAccessor alloc] initWithCursor:self columnId:3]; \
+        _##CName5 = [[TDBAccessor alloc] initWithCursor:self columnId:4]; \
+        _##CName6 = [[TDBAccessor alloc] initWithCursor:self columnId:5]; \
     } \
     return self; \
 } \
@@ -1382,7 +1382,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName6, CType6) \
 @synthesize CName4 = _CName4; \
 @synthesize CName5 = _CName5; \
 @synthesize CName6 = _CName6; \
--(id)initWithTable:(TightdbTable*)table \
+-(id)initWithTable:(TDBTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -1517,11 +1517,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
     [super insertEmptyRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TightdbDescriptor*)desc \
++(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -1533,14 +1533,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 } \
 -(BOOL)_checkType \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TightdbDescriptor*)desc \
++(BOOL)_addColumns:(TDBDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -1552,7 +1552,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 } \
 -(BOOL)_addColumns \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -1564,7 +1564,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 { \
     TableName##_Cursor* tmpCursor; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -1580,7 +1580,7 @@ TIGHTDB_TABLE_IMPL_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_7(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7) \
-@interface TableName##_Cursor: TightdbCursor \
+@interface TableName##_Cursor: TDBRow \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName3, CType3) \
@@ -1598,7 +1598,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
-@interface TableName##_Query: TightdbQuery \
+@interface TableName##_Query: TDBQuery \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
@@ -1613,7 +1613,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
 -(TableName##_Query*)parent; \
 -(TableName##_View*)findAll; \
 @end \
-@interface TableName: TightdbTable \
+@interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -1630,32 +1630,32 @@ TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertEmptyRowAtIndex:(size_t)ndx; \
 @end \
-@interface TableName##_View: TightdbView \
+@interface TableName##_View: TDBView \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_7(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor* _##CName1; \
-    TightdbAccessor* _##CName2; \
-    TightdbAccessor* _##CName3; \
-    TightdbAccessor* _##CName4; \
-    TightdbAccessor* _##CName5; \
-    TightdbAccessor* _##CName6; \
-    TightdbAccessor* _##CName7; \
+    TDBAccessor* _##CName1; \
+    TDBAccessor* _##CName2; \
+    TDBAccessor* _##CName3; \
+    TDBAccessor* _##CName4; \
+    TDBAccessor* _##CName5; \
+    TDBAccessor* _##CName6; \
+    TDBAccessor* _##CName7; \
 } \
--(id)initWithTable:(TightdbTable*)table ndx:(size_t)ndx \
+-(id)initWithTable:(TDBTable*)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
+        _##CName1 = [[TDBAccessor alloc] initWithCursor:self columnId:0]; \
+        _##CName2 = [[TDBAccessor alloc] initWithCursor:self columnId:1]; \
+        _##CName3 = [[TDBAccessor alloc] initWithCursor:self columnId:2]; \
+        _##CName4 = [[TDBAccessor alloc] initWithCursor:self columnId:3]; \
+        _##CName5 = [[TDBAccessor alloc] initWithCursor:self columnId:4]; \
+        _##CName6 = [[TDBAccessor alloc] initWithCursor:self columnId:5]; \
+        _##CName7 = [[TDBAccessor alloc] initWithCursor:self columnId:6]; \
     } \
     return self; \
 } \
@@ -1690,7 +1690,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName7, CType7) \
 @synthesize CName5 = _CName5; \
 @synthesize CName6 = _CName6; \
 @synthesize CName7 = _CName7; \
--(id)initWithTable:(TightdbTable*)table \
+-(id)initWithTable:(TDBTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -1832,11 +1832,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
     [super insertEmptyRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TightdbDescriptor*)desc \
++(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -1849,14 +1849,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 } \
 -(BOOL)_checkType \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TightdbDescriptor*)desc \
++(BOOL)_addColumns:(TDBDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -1869,7 +1869,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 } \
 -(BOOL)_addColumns \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -1881,7 +1881,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 { \
     TableName##_Cursor* tmpCursor; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -1897,7 +1897,7 @@ TIGHTDB_TABLE_IMPL_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_8(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8) \
-@interface TableName##_Cursor: TightdbCursor \
+@interface TableName##_Cursor: TDBRow \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName3, CType3) \
@@ -1917,7 +1917,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
-@interface TableName##_Query: TightdbQuery \
+@interface TableName##_Query: TDBQuery \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
@@ -1933,7 +1933,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
 -(TableName##_Query*)parent; \
 -(TableName##_View*)findAll; \
 @end \
-@interface TableName: TightdbTable \
+@interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -1951,34 +1951,34 @@ TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertEmptyRowAtIndex:(size_t)ndx; \
 @end \
-@interface TableName##_View: TightdbView \
+@interface TableName##_View: TDBView \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_8(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor* _##CName1; \
-    TightdbAccessor* _##CName2; \
-    TightdbAccessor* _##CName3; \
-    TightdbAccessor* _##CName4; \
-    TightdbAccessor* _##CName5; \
-    TightdbAccessor* _##CName6; \
-    TightdbAccessor* _##CName7; \
-    TightdbAccessor* _##CName8; \
+    TDBAccessor* _##CName1; \
+    TDBAccessor* _##CName2; \
+    TDBAccessor* _##CName3; \
+    TDBAccessor* _##CName4; \
+    TDBAccessor* _##CName5; \
+    TDBAccessor* _##CName6; \
+    TDBAccessor* _##CName7; \
+    TDBAccessor* _##CName8; \
 } \
--(id)initWithTable:(TightdbTable*)table ndx:(size_t)ndx \
+-(id)initWithTable:(TDBTable*)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
-        _##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
+        _##CName1 = [[TDBAccessor alloc] initWithCursor:self columnId:0]; \
+        _##CName2 = [[TDBAccessor alloc] initWithCursor:self columnId:1]; \
+        _##CName3 = [[TDBAccessor alloc] initWithCursor:self columnId:2]; \
+        _##CName4 = [[TDBAccessor alloc] initWithCursor:self columnId:3]; \
+        _##CName5 = [[TDBAccessor alloc] initWithCursor:self columnId:4]; \
+        _##CName6 = [[TDBAccessor alloc] initWithCursor:self columnId:5]; \
+        _##CName7 = [[TDBAccessor alloc] initWithCursor:self columnId:6]; \
+        _##CName8 = [[TDBAccessor alloc] initWithCursor:self columnId:7]; \
     } \
     return self; \
 } \
@@ -2015,7 +2015,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName8, CType8) \
 @synthesize CName6 = _CName6; \
 @synthesize CName7 = _CName7; \
 @synthesize CName8 = _CName8; \
--(id)initWithTable:(TightdbTable*)table \
+-(id)initWithTable:(TDBTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -2164,11 +2164,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
     [super insertEmptyRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TightdbDescriptor*)desc \
++(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -2182,14 +2182,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 } \
 -(BOOL)_checkType \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TightdbDescriptor*)desc \
++(BOOL)_addColumns:(TDBDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -2203,7 +2203,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 } \
 -(BOOL)_addColumns \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -2215,7 +2215,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 { \
     TableName##_Cursor* tmpCursor; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -2231,7 +2231,7 @@ TIGHTDB_TABLE_IMPL_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_9(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9) \
-@interface TableName##_Cursor: TightdbCursor \
+@interface TableName##_Cursor: TDBRow \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName3, CType3) \
@@ -2253,7 +2253,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
-@interface TableName##_Query: TightdbQuery \
+@interface TableName##_Query: TDBQuery \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
@@ -2270,7 +2270,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
 -(TableName##_Query*)parent; \
 -(TableName##_View*)findAll; \
 @end \
-@interface TableName: TightdbTable \
+@interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -2289,36 +2289,36 @@ TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertEmptyRowAtIndex:(size_t)ndx; \
 @end \
-@interface TableName##_View: TightdbView \
+@interface TableName##_View: TDBView \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_9(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor* _##CName1; \
-    TightdbAccessor* _##CName2; \
-    TightdbAccessor* _##CName3; \
-    TightdbAccessor* _##CName4; \
-    TightdbAccessor* _##CName5; \
-    TightdbAccessor* _##CName6; \
-    TightdbAccessor* _##CName7; \
-    TightdbAccessor* _##CName8; \
-    TightdbAccessor* _##CName9; \
+    TDBAccessor* _##CName1; \
+    TDBAccessor* _##CName2; \
+    TDBAccessor* _##CName3; \
+    TDBAccessor* _##CName4; \
+    TDBAccessor* _##CName5; \
+    TDBAccessor* _##CName6; \
+    TDBAccessor* _##CName7; \
+    TDBAccessor* _##CName8; \
+    TDBAccessor* _##CName9; \
 } \
--(id)initWithTable:(TightdbTable*)table ndx:(size_t)ndx \
+-(id)initWithTable:(TDBTable*)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
-        _##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
-        _##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
+        _##CName1 = [[TDBAccessor alloc] initWithCursor:self columnId:0]; \
+        _##CName2 = [[TDBAccessor alloc] initWithCursor:self columnId:1]; \
+        _##CName3 = [[TDBAccessor alloc] initWithCursor:self columnId:2]; \
+        _##CName4 = [[TDBAccessor alloc] initWithCursor:self columnId:3]; \
+        _##CName5 = [[TDBAccessor alloc] initWithCursor:self columnId:4]; \
+        _##CName6 = [[TDBAccessor alloc] initWithCursor:self columnId:5]; \
+        _##CName7 = [[TDBAccessor alloc] initWithCursor:self columnId:6]; \
+        _##CName8 = [[TDBAccessor alloc] initWithCursor:self columnId:7]; \
+        _##CName9 = [[TDBAccessor alloc] initWithCursor:self columnId:8]; \
     } \
     return self; \
 } \
@@ -2357,7 +2357,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName9, CType9) \
 @synthesize CName7 = _CName7; \
 @synthesize CName8 = _CName8; \
 @synthesize CName9 = _CName9; \
--(id)initWithTable:(TightdbTable*)table \
+-(id)initWithTable:(TDBTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -2513,11 +2513,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
     [super insertEmptyRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TightdbDescriptor*)desc \
++(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -2532,14 +2532,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 } \
 -(BOOL)_checkType \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TightdbDescriptor*)desc \
++(BOOL)_addColumns:(TDBDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -2554,7 +2554,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 } \
 -(BOOL)_addColumns \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -2566,7 +2566,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 { \
     TableName##_Cursor* tmpCursor; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -2582,7 +2582,7 @@ TIGHTDB_TABLE_IMPL_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_10(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10) \
-@interface TableName##_Cursor: TightdbCursor \
+@interface TableName##_Cursor: TDBRow \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName3, CType3) \
@@ -2606,7 +2606,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
-@interface TableName##_Query: TightdbQuery \
+@interface TableName##_Query: TDBQuery \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
@@ -2624,7 +2624,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
 -(TableName##_Query*)parent; \
 -(TableName##_View*)findAll; \
 @end \
-@interface TableName: TightdbTable \
+@interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -2644,38 +2644,38 @@ TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertEmptyRowAtIndex:(size_t)ndx; \
 @end \
-@interface TableName##_View: TightdbView \
+@interface TableName##_View: TDBView \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_10(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor* _##CName1; \
-    TightdbAccessor* _##CName2; \
-    TightdbAccessor* _##CName3; \
-    TightdbAccessor* _##CName4; \
-    TightdbAccessor* _##CName5; \
-    TightdbAccessor* _##CName6; \
-    TightdbAccessor* _##CName7; \
-    TightdbAccessor* _##CName8; \
-    TightdbAccessor* _##CName9; \
-    TightdbAccessor* _##CName10; \
+    TDBAccessor* _##CName1; \
+    TDBAccessor* _##CName2; \
+    TDBAccessor* _##CName3; \
+    TDBAccessor* _##CName4; \
+    TDBAccessor* _##CName5; \
+    TDBAccessor* _##CName6; \
+    TDBAccessor* _##CName7; \
+    TDBAccessor* _##CName8; \
+    TDBAccessor* _##CName9; \
+    TDBAccessor* _##CName10; \
 } \
--(id)initWithTable:(TightdbTable*)table ndx:(size_t)ndx \
+-(id)initWithTable:(TDBTable*)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
-        _##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
-        _##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
-        _##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
+        _##CName1 = [[TDBAccessor alloc] initWithCursor:self columnId:0]; \
+        _##CName2 = [[TDBAccessor alloc] initWithCursor:self columnId:1]; \
+        _##CName3 = [[TDBAccessor alloc] initWithCursor:self columnId:2]; \
+        _##CName4 = [[TDBAccessor alloc] initWithCursor:self columnId:3]; \
+        _##CName5 = [[TDBAccessor alloc] initWithCursor:self columnId:4]; \
+        _##CName6 = [[TDBAccessor alloc] initWithCursor:self columnId:5]; \
+        _##CName7 = [[TDBAccessor alloc] initWithCursor:self columnId:6]; \
+        _##CName8 = [[TDBAccessor alloc] initWithCursor:self columnId:7]; \
+        _##CName9 = [[TDBAccessor alloc] initWithCursor:self columnId:8]; \
+        _##CName10 = [[TDBAccessor alloc] initWithCursor:self columnId:9]; \
     } \
     return self; \
 } \
@@ -2716,7 +2716,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName10, CType10) \
 @synthesize CName8 = _CName8; \
 @synthesize CName9 = _CName9; \
 @synthesize CName10 = _CName10; \
--(id)initWithTable:(TightdbTable*)table \
+-(id)initWithTable:(TDBTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -2879,11 +2879,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
     [super insertEmptyRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TightdbDescriptor*)desc \
++(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -2899,14 +2899,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 } \
 -(BOOL)_checkType \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TightdbDescriptor*)desc \
++(BOOL)_addColumns:(TDBDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -2922,7 +2922,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 } \
 -(BOOL)_addColumns \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -2934,7 +2934,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 { \
     TableName##_Cursor* tmpCursor; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -2950,7 +2950,7 @@ TIGHTDB_TABLE_IMPL_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3,
 
 
 #define TIGHTDB_TABLE_DEF_11(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11) \
-@interface TableName##_Cursor: TightdbCursor \
+@interface TableName##_Cursor: TDBRow \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName3, CType3) \
@@ -2976,7 +2976,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
-@interface TableName##_Query: TightdbQuery \
+@interface TableName##_Query: TDBQuery \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
@@ -2995,7 +2995,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
 -(TableName##_Query*)parent; \
 -(TableName##_View*)findAll; \
 @end \
-@interface TableName: TightdbTable \
+@interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -3016,40 +3016,40 @@ TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertEmptyRowAtIndex:(size_t)ndx; \
 @end \
-@interface TableName##_View: TightdbView \
+@interface TableName##_View: TDBView \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_11(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor* _##CName1; \
-    TightdbAccessor* _##CName2; \
-    TightdbAccessor* _##CName3; \
-    TightdbAccessor* _##CName4; \
-    TightdbAccessor* _##CName5; \
-    TightdbAccessor* _##CName6; \
-    TightdbAccessor* _##CName7; \
-    TightdbAccessor* _##CName8; \
-    TightdbAccessor* _##CName9; \
-    TightdbAccessor* _##CName10; \
-    TightdbAccessor* _##CName11; \
+    TDBAccessor* _##CName1; \
+    TDBAccessor* _##CName2; \
+    TDBAccessor* _##CName3; \
+    TDBAccessor* _##CName4; \
+    TDBAccessor* _##CName5; \
+    TDBAccessor* _##CName6; \
+    TDBAccessor* _##CName7; \
+    TDBAccessor* _##CName8; \
+    TDBAccessor* _##CName9; \
+    TDBAccessor* _##CName10; \
+    TDBAccessor* _##CName11; \
 } \
--(id)initWithTable:(TightdbTable*)table ndx:(size_t)ndx \
+-(id)initWithTable:(TDBTable*)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
-        _##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
-        _##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
-        _##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
-        _##CName11 = [[TightdbAccessor alloc] initWithCursor:self columnId:10]; \
+        _##CName1 = [[TDBAccessor alloc] initWithCursor:self columnId:0]; \
+        _##CName2 = [[TDBAccessor alloc] initWithCursor:self columnId:1]; \
+        _##CName3 = [[TDBAccessor alloc] initWithCursor:self columnId:2]; \
+        _##CName4 = [[TDBAccessor alloc] initWithCursor:self columnId:3]; \
+        _##CName5 = [[TDBAccessor alloc] initWithCursor:self columnId:4]; \
+        _##CName6 = [[TDBAccessor alloc] initWithCursor:self columnId:5]; \
+        _##CName7 = [[TDBAccessor alloc] initWithCursor:self columnId:6]; \
+        _##CName8 = [[TDBAccessor alloc] initWithCursor:self columnId:7]; \
+        _##CName9 = [[TDBAccessor alloc] initWithCursor:self columnId:8]; \
+        _##CName10 = [[TDBAccessor alloc] initWithCursor:self columnId:9]; \
+        _##CName11 = [[TDBAccessor alloc] initWithCursor:self columnId:10]; \
     } \
     return self; \
 } \
@@ -3092,7 +3092,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName11, CType11) \
 @synthesize CName9 = _CName9; \
 @synthesize CName10 = _CName10; \
 @synthesize CName11 = _CName11; \
--(id)initWithTable:(TightdbTable*)table \
+-(id)initWithTable:(TDBTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -3262,11 +3262,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
     [super insertEmptyRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TightdbDescriptor*)desc \
++(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -3283,14 +3283,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 } \
 -(BOOL)_checkType \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TightdbDescriptor*)desc \
++(BOOL)_addColumns:(TDBDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -3307,7 +3307,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 } \
 -(BOOL)_addColumns \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -3319,7 +3319,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 { \
     TableName##_Cursor* tmpCursor; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -3335,7 +3335,7 @@ TIGHTDB_TABLE_IMPL_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3,
 
 
 #define TIGHTDB_TABLE_DEF_12(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12) \
-@interface TableName##_Cursor: TightdbCursor \
+@interface TableName##_Cursor: TDBRow \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName3, CType3) \
@@ -3363,7 +3363,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
-@interface TableName##_Query: TightdbQuery \
+@interface TableName##_Query: TDBQuery \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
@@ -3383,7 +3383,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
 -(TableName##_Query*)parent; \
 -(TableName##_View*)findAll; \
 @end \
-@interface TableName: TightdbTable \
+@interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -3405,42 +3405,42 @@ TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertEmptyRowAtIndex:(size_t)ndx; \
 @end \
-@interface TableName##_View: TightdbView \
+@interface TableName##_View: TDBView \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_12(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor* _##CName1; \
-    TightdbAccessor* _##CName2; \
-    TightdbAccessor* _##CName3; \
-    TightdbAccessor* _##CName4; \
-    TightdbAccessor* _##CName5; \
-    TightdbAccessor* _##CName6; \
-    TightdbAccessor* _##CName7; \
-    TightdbAccessor* _##CName8; \
-    TightdbAccessor* _##CName9; \
-    TightdbAccessor* _##CName10; \
-    TightdbAccessor* _##CName11; \
-    TightdbAccessor* _##CName12; \
+    TDBAccessor* _##CName1; \
+    TDBAccessor* _##CName2; \
+    TDBAccessor* _##CName3; \
+    TDBAccessor* _##CName4; \
+    TDBAccessor* _##CName5; \
+    TDBAccessor* _##CName6; \
+    TDBAccessor* _##CName7; \
+    TDBAccessor* _##CName8; \
+    TDBAccessor* _##CName9; \
+    TDBAccessor* _##CName10; \
+    TDBAccessor* _##CName11; \
+    TDBAccessor* _##CName12; \
 } \
--(id)initWithTable:(TightdbTable*)table ndx:(size_t)ndx \
+-(id)initWithTable:(TDBTable*)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
-        _##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
-        _##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
-        _##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
-        _##CName11 = [[TightdbAccessor alloc] initWithCursor:self columnId:10]; \
-        _##CName12 = [[TightdbAccessor alloc] initWithCursor:self columnId:11]; \
+        _##CName1 = [[TDBAccessor alloc] initWithCursor:self columnId:0]; \
+        _##CName2 = [[TDBAccessor alloc] initWithCursor:self columnId:1]; \
+        _##CName3 = [[TDBAccessor alloc] initWithCursor:self columnId:2]; \
+        _##CName4 = [[TDBAccessor alloc] initWithCursor:self columnId:3]; \
+        _##CName5 = [[TDBAccessor alloc] initWithCursor:self columnId:4]; \
+        _##CName6 = [[TDBAccessor alloc] initWithCursor:self columnId:5]; \
+        _##CName7 = [[TDBAccessor alloc] initWithCursor:self columnId:6]; \
+        _##CName8 = [[TDBAccessor alloc] initWithCursor:self columnId:7]; \
+        _##CName9 = [[TDBAccessor alloc] initWithCursor:self columnId:8]; \
+        _##CName10 = [[TDBAccessor alloc] initWithCursor:self columnId:9]; \
+        _##CName11 = [[TDBAccessor alloc] initWithCursor:self columnId:10]; \
+        _##CName12 = [[TDBAccessor alloc] initWithCursor:self columnId:11]; \
     } \
     return self; \
 } \
@@ -3485,7 +3485,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName12, CType12) \
 @synthesize CName10 = _CName10; \
 @synthesize CName11 = _CName11; \
 @synthesize CName12 = _CName12; \
--(id)initWithTable:(TightdbTable*)table \
+-(id)initWithTable:(TDBTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -3662,11 +3662,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
     [super insertEmptyRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TightdbDescriptor*)desc \
++(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -3684,14 +3684,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 } \
 -(BOOL)_checkType \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TightdbDescriptor*)desc \
++(BOOL)_addColumns:(TDBDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -3709,7 +3709,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 } \
 -(BOOL)_addColumns \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -3721,7 +3721,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 { \
     TableName##_Cursor* tmpCursor; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -3737,7 +3737,7 @@ TIGHTDB_TABLE_IMPL_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3,
 
 
 #define TIGHTDB_TABLE_DEF_13(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13) \
-@interface TableName##_Cursor: TightdbCursor \
+@interface TableName##_Cursor: TDBRow \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName3, CType3) \
@@ -3767,7 +3767,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
-@interface TableName##_Query: TightdbQuery \
+@interface TableName##_Query: TDBQuery \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
@@ -3788,7 +3788,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
 -(TableName##_Query*)parent; \
 -(TableName##_View*)findAll; \
 @end \
-@interface TableName: TightdbTable \
+@interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -3811,44 +3811,44 @@ TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertEmptyRowAtIndex:(size_t)ndx; \
 @end \
-@interface TableName##_View: TightdbView \
+@interface TableName##_View: TDBView \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_13(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor* _##CName1; \
-    TightdbAccessor* _##CName2; \
-    TightdbAccessor* _##CName3; \
-    TightdbAccessor* _##CName4; \
-    TightdbAccessor* _##CName5; \
-    TightdbAccessor* _##CName6; \
-    TightdbAccessor* _##CName7; \
-    TightdbAccessor* _##CName8; \
-    TightdbAccessor* _##CName9; \
-    TightdbAccessor* _##CName10; \
-    TightdbAccessor* _##CName11; \
-    TightdbAccessor* _##CName12; \
-    TightdbAccessor* _##CName13; \
+    TDBAccessor* _##CName1; \
+    TDBAccessor* _##CName2; \
+    TDBAccessor* _##CName3; \
+    TDBAccessor* _##CName4; \
+    TDBAccessor* _##CName5; \
+    TDBAccessor* _##CName6; \
+    TDBAccessor* _##CName7; \
+    TDBAccessor* _##CName8; \
+    TDBAccessor* _##CName9; \
+    TDBAccessor* _##CName10; \
+    TDBAccessor* _##CName11; \
+    TDBAccessor* _##CName12; \
+    TDBAccessor* _##CName13; \
 } \
--(id)initWithTable:(TightdbTable*)table ndx:(size_t)ndx \
+-(id)initWithTable:(TDBTable*)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
-        _##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
-        _##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
-        _##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
-        _##CName11 = [[TightdbAccessor alloc] initWithCursor:self columnId:10]; \
-        _##CName12 = [[TightdbAccessor alloc] initWithCursor:self columnId:11]; \
-        _##CName13 = [[TightdbAccessor alloc] initWithCursor:self columnId:12]; \
+        _##CName1 = [[TDBAccessor alloc] initWithCursor:self columnId:0]; \
+        _##CName2 = [[TDBAccessor alloc] initWithCursor:self columnId:1]; \
+        _##CName3 = [[TDBAccessor alloc] initWithCursor:self columnId:2]; \
+        _##CName4 = [[TDBAccessor alloc] initWithCursor:self columnId:3]; \
+        _##CName5 = [[TDBAccessor alloc] initWithCursor:self columnId:4]; \
+        _##CName6 = [[TDBAccessor alloc] initWithCursor:self columnId:5]; \
+        _##CName7 = [[TDBAccessor alloc] initWithCursor:self columnId:6]; \
+        _##CName8 = [[TDBAccessor alloc] initWithCursor:self columnId:7]; \
+        _##CName9 = [[TDBAccessor alloc] initWithCursor:self columnId:8]; \
+        _##CName10 = [[TDBAccessor alloc] initWithCursor:self columnId:9]; \
+        _##CName11 = [[TDBAccessor alloc] initWithCursor:self columnId:10]; \
+        _##CName12 = [[TDBAccessor alloc] initWithCursor:self columnId:11]; \
+        _##CName13 = [[TDBAccessor alloc] initWithCursor:self columnId:12]; \
     } \
     return self; \
 } \
@@ -3895,7 +3895,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName13, CType13) \
 @synthesize CName11 = _CName11; \
 @synthesize CName12 = _CName12; \
 @synthesize CName13 = _CName13; \
--(id)initWithTable:(TightdbTable*)table \
+-(id)initWithTable:(TDBTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -4079,11 +4079,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
     [super insertEmptyRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TightdbDescriptor*)desc \
++(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -4102,14 +4102,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 } \
 -(BOOL)_checkType \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TightdbDescriptor*)desc \
++(BOOL)_addColumns:(TDBDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -4128,7 +4128,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 } \
 -(BOOL)_addColumns \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -4140,7 +4140,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 { \
     TableName##_Cursor* tmpCursor; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -4156,7 +4156,7 @@ TIGHTDB_TABLE_IMPL_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3,
 
 
 #define TIGHTDB_TABLE_DEF_14(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14) \
-@interface TableName##_Cursor: TightdbCursor \
+@interface TableName##_Cursor: TDBRow \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName3, CType3) \
@@ -4188,7 +4188,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName14, CType14) \
-@interface TableName##_Query: TightdbQuery \
+@interface TableName##_Query: TDBQuery \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
@@ -4210,7 +4210,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName14, CType14) \
 -(TableName##_Query*)parent; \
 -(TableName##_View*)findAll; \
 @end \
-@interface TableName: TightdbTable \
+@interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -4234,46 +4234,46 @@ TIGHTDB_COLUMN_PROXY_DEF(CName14, CType14) \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertEmptyRowAtIndex:(size_t)ndx; \
 @end \
-@interface TableName##_View: TightdbView \
+@interface TableName##_View: TDBView \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_14(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor* _##CName1; \
-    TightdbAccessor* _##CName2; \
-    TightdbAccessor* _##CName3; \
-    TightdbAccessor* _##CName4; \
-    TightdbAccessor* _##CName5; \
-    TightdbAccessor* _##CName6; \
-    TightdbAccessor* _##CName7; \
-    TightdbAccessor* _##CName8; \
-    TightdbAccessor* _##CName9; \
-    TightdbAccessor* _##CName10; \
-    TightdbAccessor* _##CName11; \
-    TightdbAccessor* _##CName12; \
-    TightdbAccessor* _##CName13; \
-    TightdbAccessor* _##CName14; \
+    TDBAccessor* _##CName1; \
+    TDBAccessor* _##CName2; \
+    TDBAccessor* _##CName3; \
+    TDBAccessor* _##CName4; \
+    TDBAccessor* _##CName5; \
+    TDBAccessor* _##CName6; \
+    TDBAccessor* _##CName7; \
+    TDBAccessor* _##CName8; \
+    TDBAccessor* _##CName9; \
+    TDBAccessor* _##CName10; \
+    TDBAccessor* _##CName11; \
+    TDBAccessor* _##CName12; \
+    TDBAccessor* _##CName13; \
+    TDBAccessor* _##CName14; \
 } \
--(id)initWithTable:(TightdbTable*)table ndx:(size_t)ndx \
+-(id)initWithTable:(TDBTable*)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
-        _##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
-        _##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
-        _##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
-        _##CName11 = [[TightdbAccessor alloc] initWithCursor:self columnId:10]; \
-        _##CName12 = [[TightdbAccessor alloc] initWithCursor:self columnId:11]; \
-        _##CName13 = [[TightdbAccessor alloc] initWithCursor:self columnId:12]; \
-        _##CName14 = [[TightdbAccessor alloc] initWithCursor:self columnId:13]; \
+        _##CName1 = [[TDBAccessor alloc] initWithCursor:self columnId:0]; \
+        _##CName2 = [[TDBAccessor alloc] initWithCursor:self columnId:1]; \
+        _##CName3 = [[TDBAccessor alloc] initWithCursor:self columnId:2]; \
+        _##CName4 = [[TDBAccessor alloc] initWithCursor:self columnId:3]; \
+        _##CName5 = [[TDBAccessor alloc] initWithCursor:self columnId:4]; \
+        _##CName6 = [[TDBAccessor alloc] initWithCursor:self columnId:5]; \
+        _##CName7 = [[TDBAccessor alloc] initWithCursor:self columnId:6]; \
+        _##CName8 = [[TDBAccessor alloc] initWithCursor:self columnId:7]; \
+        _##CName9 = [[TDBAccessor alloc] initWithCursor:self columnId:8]; \
+        _##CName10 = [[TDBAccessor alloc] initWithCursor:self columnId:9]; \
+        _##CName11 = [[TDBAccessor alloc] initWithCursor:self columnId:10]; \
+        _##CName12 = [[TDBAccessor alloc] initWithCursor:self columnId:11]; \
+        _##CName13 = [[TDBAccessor alloc] initWithCursor:self columnId:12]; \
+        _##CName14 = [[TDBAccessor alloc] initWithCursor:self columnId:13]; \
     } \
     return self; \
 } \
@@ -4322,7 +4322,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName14, CType14) \
 @synthesize CName12 = _CName12; \
 @synthesize CName13 = _CName13; \
 @synthesize CName14 = _CName14; \
--(id)initWithTable:(TightdbTable*)table \
+-(id)initWithTable:(TDBTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -4513,11 +4513,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
     [super insertEmptyRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TightdbDescriptor*)desc \
++(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -4537,14 +4537,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 } \
 -(BOOL)_checkType \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TightdbDescriptor*)desc \
++(BOOL)_addColumns:(TDBDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -4564,7 +4564,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 } \
 -(BOOL)_addColumns \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -4576,7 +4576,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 { \
     TableName##_Cursor* tmpCursor; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -4592,7 +4592,7 @@ TIGHTDB_TABLE_IMPL_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3,
 
 
 #define TIGHTDB_TABLE_DEF_15(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14, CName15, CType15) \
-@interface TableName##_Cursor: TightdbCursor \
+@interface TableName##_Cursor: TDBRow \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_CURSOR_PROPERTY_DEF(CName3, CType3) \
@@ -4626,7 +4626,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName14, CType14) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName15, CType15) \
-@interface TableName##_Query: TightdbQuery \
+@interface TableName##_Query: TDBQuery \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
 @property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
@@ -4649,7 +4649,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName15, CType15) \
 -(TableName##_Query*)parent; \
 -(TableName##_View*)findAll; \
 @end \
-@interface TableName: TightdbTable \
+@interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -4674,48 +4674,48 @@ TIGHTDB_COLUMN_PROXY_DEF(CName15, CType15) \
 -(TableName##_Cursor*)cursorAtLastIndex; \
 -(TableName##_Cursor*)insertEmptyRowAtIndex:(size_t)ndx; \
 @end \
-@interface TableName##_View: TightdbView \
+@interface TableName##_View: TDBView \
 -(TableName##_Cursor*)cursorAtIndex:(size_t)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_15(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14, CName15, CType15) \
 @implementation TableName##_Cursor \
 { \
-    TightdbAccessor* _##CName1; \
-    TightdbAccessor* _##CName2; \
-    TightdbAccessor* _##CName3; \
-    TightdbAccessor* _##CName4; \
-    TightdbAccessor* _##CName5; \
-    TightdbAccessor* _##CName6; \
-    TightdbAccessor* _##CName7; \
-    TightdbAccessor* _##CName8; \
-    TightdbAccessor* _##CName9; \
-    TightdbAccessor* _##CName10; \
-    TightdbAccessor* _##CName11; \
-    TightdbAccessor* _##CName12; \
-    TightdbAccessor* _##CName13; \
-    TightdbAccessor* _##CName14; \
-    TightdbAccessor* _##CName15; \
+    TDBAccessor* _##CName1; \
+    TDBAccessor* _##CName2; \
+    TDBAccessor* _##CName3; \
+    TDBAccessor* _##CName4; \
+    TDBAccessor* _##CName5; \
+    TDBAccessor* _##CName6; \
+    TDBAccessor* _##CName7; \
+    TDBAccessor* _##CName8; \
+    TDBAccessor* _##CName9; \
+    TDBAccessor* _##CName10; \
+    TDBAccessor* _##CName11; \
+    TDBAccessor* _##CName12; \
+    TDBAccessor* _##CName13; \
+    TDBAccessor* _##CName14; \
+    TDBAccessor* _##CName15; \
 } \
--(id)initWithTable:(TightdbTable*)table ndx:(size_t)ndx \
+-(id)initWithTable:(TDBTable*)table ndx:(size_t)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TightdbAccessor alloc] initWithCursor:self columnId:0]; \
-        _##CName2 = [[TightdbAccessor alloc] initWithCursor:self columnId:1]; \
-        _##CName3 = [[TightdbAccessor alloc] initWithCursor:self columnId:2]; \
-        _##CName4 = [[TightdbAccessor alloc] initWithCursor:self columnId:3]; \
-        _##CName5 = [[TightdbAccessor alloc] initWithCursor:self columnId:4]; \
-        _##CName6 = [[TightdbAccessor alloc] initWithCursor:self columnId:5]; \
-        _##CName7 = [[TightdbAccessor alloc] initWithCursor:self columnId:6]; \
-        _##CName8 = [[TightdbAccessor alloc] initWithCursor:self columnId:7]; \
-        _##CName9 = [[TightdbAccessor alloc] initWithCursor:self columnId:8]; \
-        _##CName10 = [[TightdbAccessor alloc] initWithCursor:self columnId:9]; \
-        _##CName11 = [[TightdbAccessor alloc] initWithCursor:self columnId:10]; \
-        _##CName12 = [[TightdbAccessor alloc] initWithCursor:self columnId:11]; \
-        _##CName13 = [[TightdbAccessor alloc] initWithCursor:self columnId:12]; \
-        _##CName14 = [[TightdbAccessor alloc] initWithCursor:self columnId:13]; \
-        _##CName15 = [[TightdbAccessor alloc] initWithCursor:self columnId:14]; \
+        _##CName1 = [[TDBAccessor alloc] initWithCursor:self columnId:0]; \
+        _##CName2 = [[TDBAccessor alloc] initWithCursor:self columnId:1]; \
+        _##CName3 = [[TDBAccessor alloc] initWithCursor:self columnId:2]; \
+        _##CName4 = [[TDBAccessor alloc] initWithCursor:self columnId:3]; \
+        _##CName5 = [[TDBAccessor alloc] initWithCursor:self columnId:4]; \
+        _##CName6 = [[TDBAccessor alloc] initWithCursor:self columnId:5]; \
+        _##CName7 = [[TDBAccessor alloc] initWithCursor:self columnId:6]; \
+        _##CName8 = [[TDBAccessor alloc] initWithCursor:self columnId:7]; \
+        _##CName9 = [[TDBAccessor alloc] initWithCursor:self columnId:8]; \
+        _##CName10 = [[TDBAccessor alloc] initWithCursor:self columnId:9]; \
+        _##CName11 = [[TDBAccessor alloc] initWithCursor:self columnId:10]; \
+        _##CName12 = [[TDBAccessor alloc] initWithCursor:self columnId:11]; \
+        _##CName13 = [[TDBAccessor alloc] initWithCursor:self columnId:12]; \
+        _##CName14 = [[TDBAccessor alloc] initWithCursor:self columnId:13]; \
+        _##CName15 = [[TDBAccessor alloc] initWithCursor:self columnId:14]; \
     } \
     return self; \
 } \
@@ -4766,7 +4766,7 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName15, CType15) \
 @synthesize CName13 = _CName13; \
 @synthesize CName14 = _CName14; \
 @synthesize CName15 = _CName15; \
--(id)initWithTable:(TightdbTable*)table \
+-(id)initWithTable:(TDBTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -4964,11 +4964,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
     [super insertEmptyRowAtIndex:ndx]; \
     return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TightdbDescriptor*)desc \
++(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -4989,14 +4989,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 } \
 -(BOOL)_checkType \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TightdbDescriptor*)desc \
++(BOOL)_addColumns:(TDBDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -5017,7 +5017,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 } \
 -(BOOL)_addColumns \
 { \
-    TightdbDescriptor* desc = self.descriptor; \
+    TDBDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -5029,7 +5029,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 { \
     TableName##_Cursor* tmpCursor; \
 } \
--(TightdbCursor*)getCursor \
+-(TDBRow*)getCursor \
 { \
     return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
