@@ -63,7 +63,7 @@ CATEGORIES :
         DESCR  :
 
   - g_dyn_table_optimize:
-      NAME     : "optimize:"
+      NAME     : "optimize"
       SUMMARY  : *g_table_optimize_summary
       DESCR    : *g_table_optimize_descr
       SIGNATURE: (BOOL)optimize
@@ -827,7 +827,7 @@ CATEGORIES :
   - g_dyn_table_average_float:
   - g_dyn_table_average_double:
       NAMES    : [avgInt, averageFloat, averageDouble]
-      TITLE    : "averageWith*Column"
+      TITLE    : "avg*ColumnWithIndex:"
       SUMMARY  : *g_dyn_table_average_summary
       DESCR    : *g_dyn_table_average_descr
       SIGNATURE: |
