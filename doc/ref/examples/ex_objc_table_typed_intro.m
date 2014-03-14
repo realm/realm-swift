@@ -1,7 +1,6 @@
 /* @@Example: ex_objc_table_typed_intro @@ */
 
-#import <tightdb/objc/table.h>
-#import <tightdb/objc/tightdb.h>
+#import <Tightdb/Tightdb.h>
 
 
 /* Defines a new table with two columns Name and Age. */
@@ -36,7 +35,7 @@ int main()
         cursor.Name = @"Jesper";
         cursor.Age = 200;
 
-        NSLog(@"The size of the table is now %zd", [table count]);
+        NSLog(@"The size of the table is now %zd", table.rowCount);
 
         for (PeopleTable_Cursor *ite in table) {
             NSLog(@"Name: %@ Age: %lli", ite.Name, ite.Age);
@@ -44,18 +43,18 @@ int main()
 
         NSLog(@"Insert a new row");
 
-        cursor = [table insertRowAtIndex:1];
+        cursor = [table insertEmptyRowAtIndex:1];
         cursor.Name = @"Sam"; cursor.Age = 30;
 
         for (PeopleTable_Cursor *ite in table) {
             NSLog(@"Name: %@ Age: %lli", ite.Name, ite.Age);
         }
 
-        TightdbCursor *c2 = [table cursorAtIndex:[table count]-1];
+        TightdbCursor *c2 = [table cursorAtIndex:table.rowCount-1];
         if (c2 != nil)
             NSLog(@"Last row");
 
-        TightdbCursor *c3 = [table cursorAtIndex:[table count]];
+        TightdbCursor *c3 = [table cursorAtIndex:table.rowCount];
         if (c3 != nil)
             NSLog(@"Should not get here.");
     }
