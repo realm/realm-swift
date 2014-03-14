@@ -29,28 +29,28 @@ CATEGORIES :
   METHODS:
   - g_dyn_query_equals_binary:
 #      TODO     : soon
-      NAME     : "isEqualToBinary:"
+      NAME     : "binaryIsEqualTo:inColumnWithIndex:"
   - g_dyn_query_equals_boolean:
 #      TODO     : soon
-      NAME     : "isEqualToBoolean:"
+      NAME     : "BoolIsEqualTo:inColumnWithIndex:"
   - g_dyn_query_equals_integer:
 #      TODO     : soon
-      NAME     : "isEqualToInteger:"
+      NAME     : "intIsEqualTo:inColumnWithIndex:"
   - g_dyn_query_equals_float:
 #      TODO     : soon
-      NAME     : "isEqualToFloat:"
+      NAME     : "floatIsEqualTo:inColumnWithIndex:"
   - g_dyn_query_equals_double:
 #      TODO     : soon
-      NAME     : "isEqualToDouble:"
+      NAME     : "doubleIsEqualTo:inColumnWithIndex:"
   - g_dyn_query_equals_string:
 #      TODO     : soon
-      NAME     : "isEqualToString:"
+      NAME     : "stringIsEqualTo:inColumnWithIndex:"
   - g_dyn_query_equals_string_2:
 #      TODO     : soon
-      NAME     : "isEqualToString:caseSensitive:"
+      NAME     : "stringIsCaseInsensitiveEqualTo:inColumnWithIndex:"
   - g_dyn_query_equals_date:
-      NAME     : "isEqualToDate:"
-      TITLE    : "*isEqualTo:inColumnWithIndex:"
+      NAME     : "dateIsEqualTo:inColumnWithIndex:"
+      TITLE    : "*IsEqualTo:inColumnWithIndex:"
 # Not yet implemented in API
 #      TODO     : soon
 #      NAMES    : [ equal, equal, equal, equal, equal, equal, equal]
