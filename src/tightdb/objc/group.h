@@ -53,6 +53,13 @@
  */
 -(BOOL)hasTableWithName:(NSString *)name withTableClass:(Class)obj;
 
+
+/**
+ * This method returns a table with the specified from the group.
+ * Returns nil if no table with the specified name exists.
+ */
+-(TDBTable *)getTableWithName:(NSString *)name;
+
 /**
  * This method returns nil if it encounters a memory allocation error
  * (out of memory).
