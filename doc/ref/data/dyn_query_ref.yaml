@@ -9,9 +9,9 @@
 ## JJEPSEN: "or" a obj-c keyword?
 ## JJEPSEN: count() does not take a column index as parameter (like in c++)
 ## JJEPSEN: max, min not defined for time compare as in c++.
-## !! Do we at all have a dynamic query interface? 
+## !! Do we at all have a dynamic query interface?
 ## !! All the Conditions don't take a colIndex...
-## All the Combiners return (void) - don't they return TightdbQuery ? - check-&-fix
+## All the Combiners return (void) - don't they return TDBQuery ? - check-&-fix
 
 
 ID         : class_dyn_query
@@ -29,259 +29,224 @@ CATEGORIES :
   METHODS:
   - g_dyn_query_equals_binary:
 #      TODO     : soon
-      NAME     : "column:isEqualToBinary:"
+      NAME     : "binaryIsEqualTo:inColumnWithIndex:"
   - g_dyn_query_equals_boolean:
 #      TODO     : soon
-      NAME     : "column:isEqualToBoolean:"
+      NAME     : "BoolIsEqualTo:inColumnWithIndex:"
   - g_dyn_query_equals_integer:
 #      TODO     : soon
-      NAME     : "column:isEqualToInteger:"
+      NAME     : "intIsEqualTo:inColumnWithIndex:"
   - g_dyn_query_equals_float:
 #      TODO     : soon
-      NAME     : "column:isEqualToFloat:"
+      NAME     : "floatIsEqualTo:inColumnWithIndex:"
   - g_dyn_query_equals_double:
 #      TODO     : soon
-      NAME     : "column:isEqualToDouble:"
+      NAME     : "doubleIsEqualTo:inColumnWithIndex:"
   - g_dyn_query_equals_string:
 #      TODO     : soon
-      NAME     : "column:isEqualToString:"
+      NAME     : "stringIsEqualTo:inColumnWithIndex:"
   - g_dyn_query_equals_string_2:
 #      TODO     : soon
-      NAME     : "column:isEqualToString:caseSensitive:"
+      NAME     : "stringIsCaseInsensitiveEqualTo:inColumnWithIndex:"
   - g_dyn_query_equals_date:
-      NAME     : "column:isEqualToDate:"
-      TITLE    : "column:isEqualTo"
+      NAME     : "dateIsEqualTo:inColumnWithIndex:"
+      TITLE    : "*IsEqualTo:inColumnWithIndex:"
 # Not yet implemented in API
 #      TODO     : soon
 #      NAMES    : [ equal, equal, equal, equal, equal, equal, equal]
       SIGNATURE: |
-                 - (TightdbQuery *)column:(size_t)colNdx isEqualToBool:(bool)value
-                 - (TightdbQuery *)column:(size_t)colNdx isEqualToInt:(int64_t)value
-                 - (TightdbQuery *)column:(size_t)colNdx isEqualToFloat:(float)value
-                 - (TightdbQuery *)column:(size_t)colNdx isEqualToDouble:(double)value
-                 - (TightdbQuery *)column:(size_t)colNdx isEqualToString:(NSString *)value
-                 - (TightdbQuery *)column:(size_t)colNdx isEqualToString:(NSString *)value caseSensitive:(bool)caseSensitive
-                 - (TightdbQuery *)column:(size_t)colNdx isEqualToDate:(time_t)value
-                 - (TightdbQuery *)column:(size_t)colNdx isEqualToBinary:(TightdbBinary *)value                 
+                  (TDBQuery *)boolIsEqualTo:(bool)aBool inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)intIsEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)floatIsEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)doubleIsEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)stringIsEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)stringIsCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)dateIsEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)binaryIsEqualTo:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex
       SUMMARY  : *g_dyn_query_equals_summary
       DESCR    : *g_dyn_query_equals_descr
       PARAMS:
-      - NAME   : colNdx
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
         TYPES  : [BOOL, int64_t, float, double, NSString*, BinaryData, time_t]
         DESCR  : *g_dyn_query_value_descr
-      - NAME   : caseSensitive
-        TYPES  : BOOL
-        DESCR  : *g_dyn_query_case_sensitive_descr
+      - NAME   : colIndex
+        TYPES  : NSUInteger
+        DESCR  : *g_dyn_query_column_index_descr
       RETURN:
-        TYPES  : TightdbQuery *
+        TYPES  : TDBbQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_equals
 
   - g_dyn_query_notEquals_bool:
-      NAME     : "column:isNotEqualToBoolean:"
+      NAME     : "isNotEqualToBoolean:"
   - g_dyn_query_notEquals_binary:
-      NAME     : "column:isNotEqualToBinary:"
+      NAME     : "isNotEqualToBinary:"
   - g_dyn_query_notEquals_integer:
-      NAME     : "column:isNotEqualToInteger:"
+      NAME     : "isNotEqualToInteger:"
   - g_dyn_query_notEquals_float:
-      NAME     : "column:isNotEqualToFloat:"
+      NAME     : "isNotEqualToFloat:"
   - g_dyn_query_notEquals_double:
-      NAME     : "column:isNotEqualToDouble:"
+      NAME     : "isNotEqualToDouble:"
   - g_dyn_query_notEquals_string:
-      NAME     : "column:isNotEqualToString"
+      NAME     : "isNotEqualToString"
   - g_dyn_query_notEquals_string_2:
-      NAME     : "column:isNotEqualToString:caseSensitive:"
+      NAME     : "sNotEqualToString:caseSensitive:"
   - g_dyn_query_notEquals_date:
 # Not yet implemented in API
-      NAME     : "column:isNotEqualToDate:"
-      TITLE    : "column:isNotEqualTo"
+      NAME     : "isNotEqualToDate:"
+      TITLE    : "*IsNotEqualTo:inColumnWithIndex:"
 #      NAMES    : [ notEqual, notEqual, notEqual, notEqual, notEqual, notEqual ]
       SIGNATURE: |
-                 - (TightdbQuery *)column:(size_t)colNdx isNotEqualToInt:(int64_t)value
-                 - (TightdbQuery *)column:(size_t)colNdx isNotEqualToFloat:(float)value
-                 - (TightdbQuery *)column:(size_t)colNdx isNotEqualToDouble:(double)value
-                 - (TightdbQuery *)column:(size_t)colNdx isNotEqualToString:(NSString *)value
-                 - (TightdbQuery *)column:(size_t)colNdx isNotEqualToString:(NSString *)value caseSensitive:(bool)caseSensitive
-                 - (TightdbQuery *)column:(size_t)colNdx isNotEqualToDate:(time_t)value
-                 - (TightdbQuery *)column:(size_t)colNdx isNotEqualToBinary:(TightdbBinary *)value
+                  (TDBQuery *)intIsNotEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)floatIsNotEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)doubleIsNotEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)stringIsNotEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)stringIsNotCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)dateIsNotEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)binaryIsNotEqualTo:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex
       SUMMARY  : *g_dyn_query_notEquals_summary
       DESCR    : *g_dyn_query_notEquals_descr
       PARAMS:
-      - NAME   : colNdx
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
         TYPES  : [BOOL, int64_t, float, double, NSString*, time_t]
         DESCR  : *g_dyn_query_value_descr
-      - NAME   : case_sensitive
-        TYPES  : BOOL
-        DESCR  : *g_dyn_query_case_sensitive_descr
+      - NAME   : colIndex
+        TYPES  : NSUInteger
+        DESCR  : *g_dyn_query_column_index_descr
       RETURN:
-        TYPES  : TightdbQuery *
+        TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_notEquals
 
   - g_dyn_query_greaterThan_integer:
-      NAME     : "column:isGreaterThanInt:"
+      NAME     : "isGreaterThanInt:"
   - g_dyn_query_greaterThan_float:
-      NAME     : "column:isGreaterThanFloat:"
+      NAME     : "isGreaterThanFloat:"
   - g_dyn_query_greaterThan_double:
-      NAME     : "column:isGreaterThanDouble:"
+      NAME     : "isGreaterThanDouble:"
   - g_dyn_query_greaterThan_date:
 # Not yet implemented in API
-      NAME     : "column:isGreaterThanDate:"
-      TITLE    : "column:isGreaterThan"
+      NAME     : "isGreaterThanDate:"
+      TITLE    : "*IsGreaterThan:inColumnWithIndex:"
 #TODO: check greater_date? does time_t work as int64_t?
       SIGNATURE: |
-                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanInt:(int64_t)value
-                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanFloat:(float)value
-                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanDouble:(double)value
-                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanDate:(time_t)value
+                 (TDBQuery *)dateIsGreaterThan:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
+                 (TDBQuery *)intIsGreaterThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+                 (TDBQuery *)floatIsGreaterThan:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+                 (TDBQuery *)doubleIsGreaterThan:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
       SUMMARY  : *g_dyn_query_greaterThan_summary
       DESCR    : *g_dyn_query_greaterThan_descr
       PARAMS:
-      - NAME   : colNdx
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : *g_dyn_query_value_descr
+      - NAME   : colIndex
+        TYPES  : NSUInteger
+        DESCR  : *g_dyn_query_column_index_descr
       RETURN:
-        TYPES  : TightdbQuery *
+        TYPES  : TDBuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_greaterThan
 
   - g_dyn_query_greaterThanOrEqual_integer:
-      NAME     : "column:isGreaterThanOrEqualToInt:"
+      NAME     : "isGreaterThanOrEqualToInt:"
   - g_dyn_query_greaterThanOrEqual_float:
-      NAME     : "column:isGreaterThanOrEqualToFlaot:"
+      NAME     : "isGreaterThanOrEqualToFlaot:"
   - g_dyn_query_greaterThanOrEqual_double:
-      NAME     : "column:isGreaterThanOrEqualToDouble:"
+      NAME     : "isGreaterThanOrEqualToDouble:"
   - g_dyn_query_greaterThanOrEqual_date:
-      NAME     : "column:isGreaterThanOrEqualToDate:"
-      TITLE    : "column:isGreaterThanOrEqualTo"
+      NAME     : "isGreaterThanOrEqualToDate:"
+      TITLE    : "*IsGreaterThanOrEqualTo:inColumnWithIndex:"
       SIGNATURE: |
-                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToInt:(int64_t)value
-                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToFloat:(float)value
-                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToDouble:(double)value
-                 - (TightdbQuery *)column:(size_t)colNdx isGreaterThanOrEqualToDate:(time_t)value
+                  (TDBQuery *)dateIsGreaterThanOrEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)intIsGreaterThanOrEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)floatIsGreaterThanOrEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)doubleIsGreaterThanOrEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
       SUMMARY  : *g_dyn_query_greaterThanOrEqual_summary
       DESCR    : *g_dyn_query_greaterThanOrEqual_descr
       PARAMS:
-      - NAME   : colNdx
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : *g_dyn_query_value_descr
+      - NAME   : colIndex
+        TYPES  : NSUInteger
+        DESCR  : *g_dyn_query_column_index_descr
       RETURN:
-        TYPES  : TightdbQuery *
+        TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_greaterThanOrEqual
-        
+
   - g_dyn_query_lessThan_integer:
-      NAME     : "column:isLessThanInt:"
+      NAME     : "isLessThanInt:"
   - g_dyn_query_lessThan_float:
-      NAME     : "column:isLessThanFloat:"
+      NAME     : "isLessThanFloat:"
   - g_dyn_query_lessThan_double:
-      NAME     : "column:isLessThanDouble:"
+      NAME     : "isLessThanDouble:"
   - g_dyn_query_lessThan_date:
-      NAME     : "column:isLessThanDate:"
-      TITLE    : "column:isLessThan"
+      NAME     : "isLessThanDate:"
+      TITLE    : "*IsLessThan:inColumnWithIndex:"
       SIGNATURE: |
-                 - (TightdbQuery *)column:(size_t)colNdx isLessThanInt:(int64_t)value
-                 - (TightdbQuery *)column:(size_t)colNdx isLessThanFloat:(float)value
-                 - (TightdbQuery *)column:(size_t)colNdx isLessThanDouble:(double)value
-                 - (TightdbQuery *)column:(size_t)colNdx isLessThanDate:(time_t)value
+                  (TDBQuery *)dateIsLessThan:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
+                  (TDBQuery *)intIsLessThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
+                  (TDBQuery *)floatIsLessThan:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
+                  (TDBQuery *)doubleIsLessThan:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
       SUMMARY  : *g_dyn_query_lessThan_summary
       DESCR    : *g_dyn_query_lessThan_descr
       PARAMS:
-      - NAME   : colNdx
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : *g_dyn_query_value_descr
+      - NAME   : colIndex
+        TYPES  : NSUInteger
+        DESCR  : *g_dyn_query_column_index_descr
+
       RETURN:
-        TYPES  : TightdbQuery *
+        TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_lessThan
 
   - g_dyn_query_lessThanOrEqual_integer:
-      NAME     : "column:isLessThanOrEqualToInt:"
+      NAME     : "isLessThanOrEqualToInt:"
   - g_dyn_query_lessThanOrEqual_float:
-      NAME     : "column:isLessThanOrEqualToFloat:"
+      NAME     : "isLessThanOrEqualToFloat:"
   - g_dyn_query_lessThanOrEqual_double:
-      NAME     : "column:isLessThanOrEqualToDouble:"
+      NAME     : "isLessThanOrEqualToDouble:"
   - g_dyn_query_lessThanOrEqual_date:
-      NAME     : "column:isLessThanOrEqualToDate:"
-      TITLE    : "column:isLessThanOrEqualTo"
+      NAME     : "isLessThanOrEqualToDate"
+      TITLE    : "*IsLessThanOrEqualTo:inColumnWithIndex:"
       SIGNATURE: |
-                 - (TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToInt:(int64_t)value
-                 - (TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToFloat:(float)value
-                 - (TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToDouble:(double)value
-                 - (TightdbQuery *)column:(size_t)colNdx isLessThanOrEqualToDate:(time_t)value
+                  (TDBQuery *)dateIsLessThanOrEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
+                  (TDBQuery *)intIsLessThanOrEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
+                  (TDBQuery *)floatIsLessThanOrEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
+                  (TDBQuery *)doubleIsLessThanOrEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
       SUMMARY  : *g_dyn_query_lessThanOrEqual_summary
       DESCR    : *g_dyn_query_lessThanOrEqual_descr
       PARAMS:
-      - NAME   : colNdx
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : *g_dyn_query_value_descr
+      - NAME   : colIndex
+        TYPES  : NSUInteger
+        DESCR  : *g_dyn_query_column_index_descr
+
       RETURN:
-        TYPES  : TightdbQuery *
+        TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_lessThanOrEqual
-        
-  - g_dyn_query_between_integer:
-      NAME     : "column:isBetweenInt:"
-  - g_dyn_query_between_float:
-      NAME     : "column:isBetweenFloat:"
-  - g_dyn_query_between_double:
-      NAME     : "column:isBetweenDouble:"
-  - g_dyn_query_between_date:
-      NAME     : "column:isBetweenDate:"
-      TITLE    : "column:isBetween"
-      SIGNATURE: |
-                 - (TightdbQuery *)column:(size_t)colNdx isBetweenInt:(int64_t)from and:(int64_t)to
-                 - (TightdbQuery *)column:(size_t)colNdx isBetweenFloat:(float)from and:(float)to
-                 - (TightdbQuery *)column:(size_t)colNdx isBetweenDouble:(double)from and:(double)to
-                 - (TightdbQuery *)column:(size_t)colNdx isBetweenDate:(time_t)from and:(time_t)to
-      DESCR    : *g_dyn_query_between_descr
-      SUMMARY  : *g_dyn_query_between_summary
-      PARAMS:
-      - NAME   : colNdx
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_column_index_descr
-      - NAME   : from
-        TYPES  : [int64_t, float, double, time_t]
-        DESCR  : *g_dyn_query_between_parm1_descr
-      - NAME   : to
-        TYPES  : [int64_t, float, double, time_t]
-        DESCR  : *g_dyn_query_between_parm2_descr
-      RETURN:
-        TYPES  : TightdbQuery *
-        DESCR  : *g_dyn_query_return_query_object_descr
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_objc_dyn_query_between
+
+
 
   - g_dyn_query_startsWith_binary:
       TODO     : soon
@@ -292,8 +257,8 @@ CATEGORIES :
       TODO     : soon
       NAME     : beginsWith
       SIGNATURE: |
-                 (TightdbQuery *)beginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
-#                (TightdbQuery *)beginsWith:(NSString *)value
+                 (TDBQuery *)beginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+#                (TDBQuery *)beginsWith:(NSString *)value
       DESCR    : *g_dyn_query_startsWith_descr
       SUMMARY  : *g_dyn_query_startsWith_summary
       PARAMS:
@@ -307,7 +272,7 @@ CATEGORIES :
         TYPES  : BOOL
         DESCR  : *g_dyn_query_case_sensitive_descr
       RETURN:
-        TYPES  : TightdbQuery
+        TYPES  : TDBQuery
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -322,8 +287,8 @@ CATEGORIES :
       TODO     : soon
       NAME     : endsWith
       SIGNATURE: |
-                 (TightdbQuery *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
-#                (TightdbQuery *)endsWith:(NSString *)value
+                 (TDBQuery *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+#                (TDBQuery *)endsWith:(NSString *)value
       DESCR    : *g_dyn_query_endsWith_descr
       SUMMARY  : *g_dyn_query_endsWith_summary
       PARAMS:
@@ -337,7 +302,7 @@ CATEGORIES :
         TYPES  : BOOL
         DESCR  : *g_dyn_query_case_sensitive_descr
       RETURN:
-        TYPES  : TightdbQuery *
+        TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -346,15 +311,15 @@ CATEGORIES :
   - g_dyn_query_contains_binary:
       TODO     : soon
   - g_dyn_query_contains_string:
-      NAME     : contains  
+      NAME     : contains
       TODO     : soon
   - g_dyn_query_contains_string_2:
       TODO     : soon
       NAME     : contains
       SIGNATURE: |
-                 (TightdbQuery *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive
-                 (TightdbQuery *)contains:(NSString *)value
-#                 TightdbQuery * contains_binary(size_t column_ndx, NSString* data, size_t size);
+                 (TDBQuery *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 (TDBQuery *)contains:(NSString *)value
+#                 TDBQuery * contains_binary(size_t column_ndx, NSString* data, size_t size);
       DESCR    : *g_dyn_query_contains_descr
       SUMMARY  : *g_dyn_query_contains_summary
       PARAMS:
@@ -368,7 +333,7 @@ CATEGORIES :
         TYPES  : BOOL
         DESCR  : *g_dyn_query_case_sensitive_descr
       RETURN:
-        TYPES  : TightdbQuery *
+        TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -381,9 +346,9 @@ CATEGORIES :
       NAMES    : group
       DESCR    : *g_dyn_query_group_descr
       SUMMARY  : *g_dyn_query_group_summary
-      SIGNATURE: (void)group
+      SIGNATURE: (TDBQuery *)group
       RETURN:
-        TYPES  : TightdbQuery *
+        TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -393,49 +358,49 @@ CATEGORIES :
       NAMES    : endGroup
       DESCR    : *g_dyn_query_endGroup_descr
       SUMMARY  : *g_dyn_query_endGroup_summary
-      SIGNATURE: (void)endgroup
+      SIGNATURE: (TDBQuery *)endgroup
       RETURN:
-        TYPES  : TightdbQuery *
+        TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_group
 
   - g_dyn_query_or:
-      NAMES    : or
+      NAMES    : Or
       DESCR    : *g_dyn_query_or_descr
       SUMMARY  : *g_dyn_query_or_summary
-      SIGNATURE: (void)or
+      SIGNATURE: (TDBQuery *)or
       RETURN:
-        TYPES  : TightdbQuery *
+        TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_or
 
   - g_dyn_query_subtable:
-      NAMES    : subtable
+      NAMES    : "subtableInColumnWithIndex:"
       DESCR    : *g_dyn_query_subtable_descr
       SUMMARY  : *g_dyn_query_subtable_summary
-      SIGNATURE: (void)subtable:(size_t)column
+      SIGNATURE: (void)subtableInColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : column
-        TYPES  : size_t
+      - NAME   : colIndex
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       RETURN:
-        TYPES  : TightdbQuery *
+        TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_subtable
- 
+
   - g_dyn_query_endSubtable:
       NAMES    : parent
       DESCR    : *g_dyn_query_endSubtable_descr
       SUMMARY  : *g_dyn_query_endSubtable_summary
       SIGNATURE: (void)parent
       RETURN:
-        TYPES  : TightdbQuery *
+        TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -449,12 +414,12 @@ CATEGORIES :
   - g_dyn_query_find_all_2:
       TODO     : later
   - g_dyn_query_find_all:
-      NAME     : findAll
-      TITLE    : findAll
+      NAME     : findAllRows
+      TITLE    : findAllRows
       DESCR    : *g_dyn_query_find_all_descr
       SUMMARY  : *g_dyn_query_find_all_summary
       SIGNATURE: |
-                 - (TableView *)findAll;
+                 (TDBView *)findAllRows
 #      PARAMS:
 #      - NAME   : start
 #        TYPES  : size_t
@@ -466,28 +431,40 @@ CATEGORIES :
 #        TYPES  : size_t
 #        DESCR  : *g_dyn_query_find_all_parm3_descr
       RETURN:
-        TYPES  : TableView *
-        DESCR  : *g_dyn_query_find_all_return_desc
+        TYPES  : TDBView *
+        DESCR  : *g_dyn_query_find_all_return_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_findall
 
-  - g_dyn_query_find_next:
-      NAMES    : findNext 
-      DESCR    : *g_dyn_query_find_next_descr
-      SUMMARY  : *g_dyn_query_find_next_summary
+  - g_dyn_query_find:
+      NAMES    : "findFromRowIndex:"
+      DESCR    : *g_dyn_query_find_descr
+      SUMMARY  : *g_dyn_query_find_summary
       SIGNATURE: |
-                 - (size_t)findNext:(size_t)lastMatch
+                 (NSUInteger)findFromRowIndex:(NSUInteger)rowIndex
       PARAMS:
-      - NAME   : lastMatch
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_find_next_parm1_descr
+      - NAME   : rowIndex
+        TYPES  : NSUInteger
+        DESCR  : *g_dyn_query_find_parm1_descr
       RETURN:
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_find_next
+        TYPES  : NSUInteger
+        DESCR  : *g_dyn_query_find_return_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_objc_dyn_query_find_next
+        CODE   : ex_objc_dyn_query_find
+
+  - g_dyn_query_count:
+      NAME     : countRows
+      DESCR    : *g_dyn_query_size_descr
+      SUMMARY  : *g_dyn_query_size_summary
+      SIGNATURE: (NSUInteger)countRows
+      RETURN:
+        TYPES  : NSUInteger
+        DESCR  : *g_dyn_query_count_return_descr
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_objc_dyn_query_size
 
   - g_dyn_query_sum_int:
       NAME     : sumInt
@@ -495,50 +472,23 @@ CATEGORIES :
       NAME     : sumFloat
   - g_dyn_query_sum_double:
       NAME     : sumDouble
-      TITLE    : sum*
+      TITLE    : "sum*ColumnWithIndex:"
       DESCR    : *g_dyn_query_sum_descr
       SUMMARY  : *g_dyn_query_sum_summary
       SIGNATURE: |
-                 (int64_t)sumInt:(size_t)col_ndx
-                 (double)sumFloat:(size_t)col_ndx
-                 (double)sumDouble:(size_t)col_ndx
+                (int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex
+                (double)sumFloatColumnWithIndex:(NSUInteger)colIndex
+                (double)sumDoubleColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : col_ndx
-        DESCR  : Column index. The datatype of the column must match the function called. E.g. <code>sumFloat()</code> can only be used on columns which contains floats.
-        TYPES  : size_t
+      - NAME   : colIndex
+        DESCR  : Column index. The datatype of the column must match the function called.
+        TYPES  : NSUInteger
       RETURN:
         TYPES  : [int64_t, double]
         DESCR  : *g_dyn_query_sum_return_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_sum
-
-  - g_dyn_query_count:
-      NAME     : count
-      DESCR    : *g_dyn_query_size_descr
-      SUMMARY  : *g_dyn_query_size_summary
-      SIGNATURE: (size_t)count
-      CONST    : true
-      PARAMS:
-      - NAME   : column
-        DESCR  : *g_dyn_query_column_index_descr
-        TYPES  : size_t
-      - NAME   : start
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_count_parm2_descr
-      - NAME   : end
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_count_parm3_descr
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_count_parm4_descr
-      RETURN:
-        TYPES  : size_t
-        DESCR  : *g_dyn_query_count_return_descr
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_objc_dyn_query_size
-
 
   - g_dyn_query_maximum_double:
       NAME     : maxDouble
@@ -549,17 +499,17 @@ CATEGORIES :
       NAME     : maxDate
   - g_dyn_query_maximum_int:
       NAME     : maxInt
-      TITLE    : max*
+      TITLE    : "max*InColumnWithIndex:"
       DESCR    : *g_dyn_query_maximum_descr
       SUMMARY  : *g_dyn_query_maximum_summary
       SIGNATURE: |
-                 (int64_t)maxInt:(size_t)col_ndx
-                 (float)maxFloat:(size_t)col_ndx
-                 (double)maxDouble:(size_t)col_ndx
+                  (int64_t)maxIntInColumnWithIndex:(NSUInteger)colIndex
+                  (float)maxFloatInColumnWithIndex:(NSUInteger)colIndex
+                  (double)maxDoubleInColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : col_ndx
-        DESCR  : Column index. The datatype of the column must match the function called. E.g. <code>maxFloat()</code> can only be used on columns which contains floats.
-        TYPES  : size_t
+      - NAME   : colIndex
+        DESCR  : Column index. The datatype of the column must match the function called.
+        TYPES  : NSUInteger
       RETURN:
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : *g_dyn_query_maximum_return_descr
@@ -576,17 +526,17 @@ CATEGORIES :
       NAME     : minFloat
   - g_dyn_query_minimum_int:
       NAME     : minInt
-      TITLE    : min*
+      TITLE    : "min*InColumnWithIndex:"
       DESCR    : *g_dyn_query_minimum_descr
       SUMMARY  : *g_dyn_query_minimum_summary
       SIGNATURE: |
-                 (int64_t)minInt:(size_t)col_ndx
-                 (float)minFloat:(size_t)col_ndx
-                 (double)minDouble:(size_t)col_ndx
+                  (int64_t)minIntInColumnWithIndex:(NSUInteger)colIndex
+                  (float)minFloatInColumnWithIndex:(NSUInteger)colIndex
+                  (double)minDoubleInColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : col_ndx
+      - NAME   : colIndex
         DESCR  : Column index. The datatype of the column must match the function called. E.g. <code>minFloat()</code> can only be used on columns which contains floats.
-        TYPES  : size_t
+        TYPES  : NSUInteger
       RETURN:
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : *g_dyn_query_minimum_return_descr
@@ -600,17 +550,17 @@ CATEGORIES :
       NAME     : avgFloat
   - g_dyn_query_average_double:
       NAME     : avgDouble
-      TITLE    : avg*
+      TITLE    : avg*ColumnWithIndex*Column
       SUMMARY  : *g_dyn_query_average_summary
       DESCR    : *g_dyn_query_average_descr
       SIGNATURE: |
-                 (double)avgInt:(size_t)col_ndx
-                 (double)avgFloat:(size_t)col_ndx
-                 (double)avgDouble:(size_t)col_ndx
+                  (double)avgIntColumnWithIndex:(NSUInteger)colIndex
+                  (double)avgFloatColumnWithIndex:(NSUInteger)colIndex
+                  (double)avgDoubleColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : col_ndx
-        DESCR  : Column index. The datatype of the column must match the function called. E.g. <code>average_float()</code> can only be used on columns which contains floats.
-        TYPES  : size_t
+      - NAME   : colIndex
+        DESCR  : Column index. The datatype of the column must match the function called.
+        TYPES  : NSUInteger
       RETURN:
         TYPES  : double
         DESCR  : *g_dyn_query_average_return_descr
@@ -619,10 +569,10 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_average
 
   - g_dyn_query_remove:
-      NAMES    : remove 
+      NAMES    : "removeRows:"
       DESCR    : *g_dyn_query_remove_descr
       SUMMARY  : *g_dyn_query_remove_summary
-      SIGNATURE: (size_t)remove
+      SIGNATURE: (NSUInteger)removeRows
 #      PARAMS:
 #      - NAME   : column
 #        DESCR  : *g_dyn_query_column_index_descr
@@ -640,7 +590,7 @@ CATEGORIES :
 #        TYPES  : size_t
 #        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger *
         DESCR  : *g_dyn_query_remove_return_descr
       EXAMPLES:
       - DESCR  :

@@ -6,22 +6,27 @@
 #import <Foundation/Foundation.h>
 
 
-@interface TightdbBinary()
+@interface TDBBinary()
 
--(tightdb::BinaryData)getBinary;
+-(tightdb::BinaryData&)getNativeBinary;
 
 @end
 
+@interface TDBView()
 
-@interface TightdbTable()
++(TDBView*)viewWithTable:(TDBTable*)table andNativeView:(const tightdb::TableView&)view;
 
-@property (nonatomic) tightdb::TableRef table;
+@end
 
--(tightdb::Table&)getTable;
+@interface TDBTable()
+
+-(tightdb::Table&)getNativeTable;
+
+-(void)setNativeTable:(tightdb::Table*)table;
 
 -(void)setParent:(id)parent; // Workaround for ARC release problem.
 
--(void)setReadOnly:(BOOL)readOnly;
+-(void)setReadOnly:(BOOL)read_only;
 
 /// Also returns NO if memory allocation fails.
 -(BOOL)_checkType;

@@ -10,6 +10,9 @@
 		410B4DCA156E0C8F0048E4C8 /* Performance.m in Sources */ = {isa = PBXBuildFile; fileRef = 410B4DC9156E0C8F0048E4C8 /* Performance.m */; };
 		410B4DCE156E10430048E4C8 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 410B4DCD156E10430048E4C8 /* Utils.m */; };
 		410B4DD3156E59A30048E4C8 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 410B4DD2156E59A30048E4C8 /* libsqlite3.dylib */; };
+		4D01A9F818C9DD9F00527AD5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D01A9F718C9DD9F00527AD5 /* libc++.dylib */; };
+		4D49F55818A912CD0071DDC1 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4D49F55718A912CD0071DDC1 /* Default-568h@2x.png */; };
+		4D7995A818BCDD5F009EB0C0 /* Tightdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D7995A718BCDD5F009EB0C0 /* Tightdb.framework */; };
 		E9D58B4F1541A375009150B1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B4E1541A375009150B1 /* UIKit.framework */; };
 		E9D58B511541A375009150B1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B501541A375009150B1 /* Foundation.framework */; };
 		E9D58B531541A375009150B1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B521541A375009150B1 /* CoreGraphics.framework */; };
@@ -27,6 +30,10 @@
 		410B4DCC156E10430048E4C8 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 		410B4DCD156E10430048E4C8 /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
 		410B4DD2156E59A30048E4C8 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
+		4D01A9F718C9DD9F00527AD5 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
+		4D302E8118BB8A3E0086A628 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
+		4D49F55718A912CD0071DDC1 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		4D7995A718BCDD5F009EB0C0 /* Tightdb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Tightdb.framework; path = ../Tightdb.framework; sourceTree = "<group>"; };
 		E9D58B4A1541A375009150B1 /* TightDbExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TightDbExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9D58B4E1541A375009150B1 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		E9D58B501541A375009150B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -41,7 +48,6 @@
 		E9D58B611541A375009150B1 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		E9D58B641541A375009150B1 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPhone.xib; sourceTree = "<group>"; };
 		E9D58B671541A375009150B1 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPad.xib; sourceTree = "<group>"; };
-		FEF1C0B116538A2A00A9F612 /* libtightdb-objc-ios-dbg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libtightdb-objc-ios-dbg.a"; path = "../src/tightdb/objc/libtightdb-objc-ios-dbg.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,10 +55,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D01A9F818C9DD9F00527AD5 /* libc++.dylib in Frameworks */,
 				410B4DD3156E59A30048E4C8 /* libsqlite3.dylib in Frameworks */,
 				E9D58B4F1541A375009150B1 /* UIKit.framework in Frameworks */,
 				E9D58B511541A375009150B1 /* Foundation.framework in Frameworks */,
 				E9D58B531541A375009150B1 /* CoreGraphics.framework in Frameworks */,
+				4D7995A818BCDD5F009EB0C0 /* Tightdb.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,7 +70,7 @@
 		E9D58B3F1541A374009150B1 = {
 			isa = PBXGroup;
 			children = (
-				FEF1C0B116538A2A00A9F612 /* libtightdb-objc-ios-dbg.a */,
+				4D49F55718A912CD0071DDC1 /* Default-568h@2x.png */,
 				410B4DD2156E59A30048E4C8 /* libsqlite3.dylib */,
 				E9D58B541541A375009150B1 /* TightDbExample */,
 				E9D58B4D1541A375009150B1 /* Frameworks */,
@@ -81,6 +89,9 @@
 		E9D58B4D1541A375009150B1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4D01A9F718C9DD9F00527AD5 /* libc++.dylib */,
+				4D7995A718BCDD5F009EB0C0 /* Tightdb.framework */,
+				4D302E8118BB8A3E0086A628 /* libstdc++.dylib */,
 				E9D58B4E1541A375009150B1 /* UIKit.framework */,
 				E9D58B501541A375009150B1 /* Foundation.framework */,
 				E9D58B521541A375009150B1 /* CoreGraphics.framework */,
@@ -169,6 +180,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E9D58B591541A375009150B1 /* InfoPlist.strings in Resources */,
+				4D49F55818A912CD0071DDC1 /* Default-568h@2x.png in Resources */,
 				E9D58B651541A375009150B1 /* ViewController_iPhone.xib in Resources */,
 				E9D58B681541A375009150B1 /* ViewController_iPad.xib in Resources */,
 			);
@@ -265,16 +277,23 @@
 		E9D58B6C1541A375009150B1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					../,
+					../../,
+				);
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TightDbExample/TightDbExample-Prefix.pch";
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../iphone-lib/include\"";
+				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "TightDbExample/TightDbExample-Info.plist";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../iphone-lib\"";
-				OTHER_LDFLAGS = (
-					"-lstdc++",
-					"-ltightdb-objc-ios-dbg",
-				);
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LIBRARY_SEARCH_PATHS = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = "arm64 armv7";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -282,16 +301,23 @@
 		E9D58B6D1541A375009150B1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					../,
+					../../,
+				);
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TightDbExample/TightDbExample-Prefix.pch";
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../iphone-lib/include\"";
+				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "TightDbExample/TightDbExample-Info.plist";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../iphone-lib\"";
-				OTHER_LDFLAGS = (
-					"-lstdc++",
-					"-ltightdb-objc-ios",
-				);
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LIBRARY_SEARCH_PATHS = "";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALID_ARCHS = "arm64 armv7";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

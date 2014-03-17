@@ -6,7 +6,8 @@
 #import <Foundation/Foundation.h>
 
 
-@interface TightdbGroup()
-+(TightdbGroup *)groupTightdbGroup:(tightdb::Group *)tightdbGroup readOnly:(BOOL)readOnly;
--(void)clearGroup;
+@interface TDBGroup()
+
++(TDBGroup*)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only;
+
 @end

@@ -1,1 +1,1 @@
-../generic.mk
+../src/generic.mk

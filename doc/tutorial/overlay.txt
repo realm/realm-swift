@@ -1,9 +1,9 @@
 @@Overlay: accessing_rows @@
-To get the last row the <tt>lastObject</tt> method can be used:
+To get the last row the <tt>cursorAtLastIndex</tt> method can be used:
 @@EndOverlay
 
 @@Overlay: bracket @@
-the <tt>objectAtIndex</tt> method which returns a cursor to the row index
+the <tt>cursorAtIndex</tt> method which returns a cursor to the row index
 @@EndOverlay
 
 @@Overlay: output @@

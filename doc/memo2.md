@@ -14,12 +14,12 @@ In this case the method name is defined by the selector. The selector created fr
 Calling methods (sending messages to objects)
 ---------------------------------------------
 
-	[object addedMethod];                              // works ONLY with ARC disabled
-	[object performSelector:@selector(addedMethod)];   // works with our without ARC
+    [object addedMethod];                              // works ONLY with ARC disabled
+    [object performSelector:@selector(addedMethod)];   // works with our without ARC
 
 
 Conclusion
 ----------
 While it's possilbe to add methods dynamically, they cannot be called without ugly looking syntax (with ARC). In our case this syntax is not useful. Disabling ARC is not an option. Apple has responded on a blog to an inquery about why the methods cannot be called directly after ARC.
 
-"Our reasoning was split about 50/50 between (1) needing to be more careful about types and ownership and (2) wanting to eliminate an embarrassing wart in the language (not being allowed to complain about completely unknown methods with anything more strenuous than a warning). There is really no legitimate reason to call a method that's not even declared somewhere. The ability to do this makes some really trivial bugs (e.g. typos in selectors) runtime failures instead of compile failures. We have always warned about it. Fix your code."      
+"Our reasoning was split about 50/50 between (1) needing to be more careful about types and ownership and (2) wanting to eliminate an embarrassing wart in the language (not being allowed to complain about completely unknown methods with anything more strenuous than a warning). There is really no legitimate reason to call a method that's not even declared somewhere. The ability to do this makes some really trivial bugs (e.g. typos in selectors) runtime failures instead of compile failures. We have always warned about it. Fix your code."

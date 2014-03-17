@@ -3,10 +3,16 @@
 #
 ID        : objc
 TITLE     : 'Objective-C'
-DESCR     : >
-            <b>The Objective C interface is under heavy reorganization, and this reference
-            documentation might be out-of-date.</b>
+STATUS:
+  CODE    : Experimental
+  DESCR   : >
+            The Objective-C interface provides most of the functionality found in the
+            core (C++) library. But the interface has not been tested as thoroughly
+            as the core library, and it should be used with caution.
 
+            Currently, the Objective-C interface is heavily extended and modfied.
+            This implies that the API will likely change in the next release.
+DESCR     : >
             The goal of TightDB is to provide a high performance
             data storage for your applications.
 
@@ -19,10 +25,10 @@ DESCR     : >
             possibilities in an intuitive language and the ability to share your data
             across all supported languages and platforms.
 
-            The core of the framework is the class {@link class_table}. The
+            The core of the framework is the class {@link class_dyn_table}. The
             class is a representation of the
             fundamental concept <strong>Table</strong>. You can use
-            {@link class_table} in the situations where you know the table structure
+            {@link class_typed_table} in the situations where you know the table structure
             a priori or when the data structure changes dynamically through the run time
             of the application.
 
@@ -31,11 +37,11 @@ DESCR     : >
             data structures. Moreover, tables can have nested tables as data. Using subtables
             and mixed types you can build arbitrarily complex data structures.
 
-            It is possible to query data using the {@link class_query} and
+            It is possible to query data using the {@link class_dyn_query} and
             class. Queries can be complex - involving
             any number of columns and values. You can either apply aggregate functions to you
             resulting data set or use the data set in your application as a
-            {@link class_tableview} object.
+            {@link class_dyn_tableview} object.
 
             The {@link class_group} class lets you serialize tables to disk or memory. The
             TightDB data format is consistent across operating systems, hardware platforms,

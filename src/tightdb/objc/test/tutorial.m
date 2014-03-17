@@ -38,9 +38,9 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    TightdbGroup *group = [TightdbGroup group];
+    TDBGroup *group = [TDBGroup group];
     // Create new table in group
-    PeopleTable *people = [group getTable:@"employees" withClass:[PeopleTable class]];
+    PeopleTable *people = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class] error:nil];
 
     // Add some rows
     [people addName:@"John" Age:20 Hired:YES];
@@ -50,11 +50,11 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     [people addName:@"Anni" Age:54 Hired:YES];
 
     // Insert at specific position
-    [people insertAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
+    [people insertEmptyRowAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
 
     // Getting the size of the table
-    NSLog(@"PeopleTable Size: %lu - is %@.    [6 - not empty]", [people count],
-        [people isEmpty] ? @"empty" : @"not empty");
+    NSLog(@"PeopleTable Size: %lu - is %@.    [6 - not empty]", [people rowCount],
+        people.rowCount == 0 ? @"empty" : @"not empty");
 
     //------------------------------------------------------
     NSLog(@"--- Working with individual rows ---");
@@ -69,12 +69,9 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"%@ is %lld years old.", name, age);
     if (hired) NSLog(@"is hired.");
 
-    // Setting values
-    NSError *error;
-    if (![[people cursorAtIndex:5] setAge:43 error:&error]) {               // Getting younger
-        NSLog(@"%@", [error localizedDescription]);
-        STFail(@"This action should not fail");
-    }
+    // Setting values  (note: setter access will be made obsolete, use dot notation)
+    [[people cursorAtIndex:5] setAge:43];  // Getting younger
+    
     // or with dot-syntax:
     myRow.Age += 1;                                    // Happy birthday!
     NSLog(@"%@ age is now %lld.   [44]", myRow.Name, myRow.Age);
@@ -87,12 +84,12 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     // [people setAtIndex:4 Name:"Eric" Age:50 Hired:YES];
 
     // Delete row
-    [people remove:2];
-    NSLog(@"%lu rows after remove.  [5]", [people count]);  // 5
-    STAssertEquals([people count], (size_t)5,@"rows should be 5");
+    [people removeRowAtIndex:2];
+    NSLog(@"%lu rows after remove.  [5]", [people rowCount]);  // 5
+    STAssertEquals([people rowCount], (size_t)5,@"rows should be 5");
 
     // Iterating over rows:
-    for (size_t i = 0; i < [people count]; ++i) {
+    for (size_t i = 0; i < [people rowCount]; ++i) {
         PeopleTable_Cursor *row = [people cursorAtIndex:i];
         NSLog(@"(Rows) %@ is %lld years old.", row.Name, row.Age);
     }
@@ -110,8 +107,8 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"Mary: %zu", row);
     STAssertEquals(row, (size_t)1,@"Mary should have been there", nil);
 
-    TightdbView *view = [people.Age findAll:21];
-    size_t cnt = [view count];             // cnt = 2
+    PeopleTable_View *view = [[[people where].Age columnIsEqualTo:21] findAll];
+    size_t cnt = [view rowCount];             // cnt = 2
     STAssertEquals(cnt, (size_t)2,@"Should be two rows in view", nil);
 
     //------------------------------------------------------
@@ -123,17 +120,17 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
                                   .Age columnIsBetween:20 and_:30];
 
     // Get number of matching entries
-    NSLog(@"Query count: %@", [q count]);
-    STAssertEquals([[q count] unsignedLongValue] , (size_t)2,@"Expected 2 rows in query", nil);
+    NSLog(@"Query count: %lu",[q countRows]);
+    STAssertEquals([q countRows] , (size_t)2,@"Expected 2 rows in query", nil);
 
     // Get the average age - currently only a low-level interface!
-    double avg = [[q.Age average] doubleValue];
+    double avg = [q.Age avg] ;
     NSLog(@"Average: %f    [20.5]", avg);
     STAssertEquals(avg, 20.5,@"Expected 20.5 average", nil);
 
     // Execute the query and return a table (view)
-    TightdbView *res = [q findAll];
-    for (size_t i = 0; i < [res count]; ++i) {
+    TDBView *res = [q findAll];
+    for (size_t i = 0; i < [res rowCount]; ++i) {
         NSLog(@"%zu: %@ is %lld years old", i,
             [people cursorAtIndex:i].Name,
             [people cursorAtIndex:i].Age);
@@ -146,31 +143,30 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSFileManager *fm = [NSFileManager defaultManager];
 
     // Write the group to disk
-    [fm removeItemAtPath:@"employees.tightdb" error:NULL];
-    [group write:@"employees.tightdb"];
+    [fm removeItemAtPath:@"employees.tightdb" error:nil];
+    [group writeToFile:@"employees.tightdb" withError:nil];
 
     // Load a group from disk (and print contents)
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFilename:@"employees.tightdb"];
-    PeopleTable *diskTable = [fromDisk getTable:@"employees" withClass:[PeopleTable class]];
+    TDBGroup *fromDisk = [TDBGroup groupWithFile:@"employees.tightdb" withError:nil];
+    PeopleTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class] error:nil];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES];
 
-    NSLog(@"Disktable size: %zu", [diskTable count]);
+    NSLog(@"Disktable size: %zu", [diskTable rowCount]);
 
-    for (size_t i = 0; i < [diskTable count]; i++) {
+    for (size_t i = 0; i < [diskTable rowCount]; i++) {
         PeopleTable_Cursor *cursor = [diskTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, [cursor Name]);
         NSLog(@"%zu: %@", i, cursor.Name);
     }
 
     // Write same group to memory buffer
-    size_t size;
-    const char* const data = [group writeToMem:&size];
+    TDBBinary* buffer = [group writeToBuffer];
 
     // Load a group from memory (and print contents)
-    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:data size:size];
-    PeopleTable *memTable = [fromMem getTable:@"employees" withClass:[PeopleTable class]];
-    for (size_t i = 0; i < [memTable count]; i++) {
+    TDBGroup *fromMem = [TDBGroup groupWithBuffer:buffer withError:nil];
+    PeopleTable *memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class] error:nil];
+    for (size_t i = 0; i < [memTable rowCount]; i++) {
         PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, cursor.Name);
     }
