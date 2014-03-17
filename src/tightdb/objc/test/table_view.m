@@ -191,39 +191,39 @@
     NSDate *dateLast    = [formatter dateFromString:@"03/01/2014 10:10 PM"];
     
     TDBRow *row = [t addEmptyRow];
-    [row setDate:[dateLast timeIntervalSince1970] inColumnWithIndex:dateCol];
+    [row setDate:dateLast inColumnWithIndex:dateCol];
     
     row = [t addEmptyRow];
-    [row setDate:[dateMiddle timeIntervalSince1970] inColumnWithIndex:dateCol];
+    [row setDate:dateMiddle inColumnWithIndex:dateCol];
     
     row = [t addEmptyRow];
-    [row setDate:[dateFirst timeIntervalSince1970] inColumnWithIndex:dateCol];
+    [row setDate:dateFirst inColumnWithIndex:dateCol];
     
     TDBQuery *q = [t where];
     TDBView *v = [q findAllRows];
     
     // Not yet sorted
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:0] == [dateLast timeIntervalSince1970], @"matcing value after no sort");
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:1] == [dateMiddle timeIntervalSince1970], @"matcing value after no sort");
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:2] == [dateFirst timeIntervalSince1970], @"matcing value after no sort");
+    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:0] == dateLast, @"matcing value after no sort");
+    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after no sort");
+    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:2] == dateFirst, @"matcing value after no sort");
     
     // Sort same way without order specified. Ascending default
     [v sortUsingColumnWithIndex:dateCol];
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:0] == [dateFirst timeIntervalSince1970], @"matcing value after default sort");
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:1] == [dateMiddle timeIntervalSince1970], @"matcing value after default sort");
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:2] == [dateLast timeIntervalSince1970], @"matcing value after default sort");
+    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:0] == dateFirst, @"matcing value after default sort");
+    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after default sort");
+    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:2] == dateLast, @"matcing value after default sort");
     
     // Sort same way
     [v sortUsingColumnWithIndex:dateCol inOrder:TDBAscending];
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:0] == [dateFirst timeIntervalSince1970], @"matcing value after ascending sort");
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:1] == [dateMiddle timeIntervalSince1970], @"matcing value after ascending sort");
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:2] == [dateLast timeIntervalSince1970], @"matcing value after ascending sort");
+    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:0] == dateFirst, @"matcing value after ascending sort");
+    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after ascending sort");
+    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:2] == dateLast, @"matcing value after ascending sort");
     
     // Sort descending
     [v sortUsingColumnWithIndex:dateCol inOrder: TDBDescending];
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:0] == [dateLast timeIntervalSince1970], @"matcing value after descending sort");
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:1] == [dateMiddle timeIntervalSince1970], @"matcing value after descending sort");
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:2] == [dateFirst timeIntervalSince1970], @"matcing value after descending sort");
+    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:0] == dateLast, @"matcing value after descending sort");
+    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after descending sort");
+    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:2] == dateFirst, @"matcing value after descending sort");
 }
 
 
