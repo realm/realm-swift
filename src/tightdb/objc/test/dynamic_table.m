@@ -969,6 +969,26 @@
     STAssertTrue([[_table[0] stringInColumnWithIndex:1] isEqual:@"test"], @"table[0].second");
 }
 
+- (void)testFirstLastRow
+{
+    TDBTable *t = [[TDBTable alloc] init];
+    NSUInteger col0 = [t addColumnWithName:@"col" andType:TDBStringType];
+    
+    STAssertNil([t firstRow], @"Table is empty");
+    STAssertNil([t lastRow], @"Table is empty");
+    
+    TDBRow *row0 = [t addEmptyRow];
+    NSString *value0 = @"value0";
+    [row0 setString:value0 inColumnWithIndex:col0];
+    
+    TDBRow *row1 = [t addEmptyRow];
+    NSString *value1 = @"value1";
+    [row1 setString:value1 inColumnWithIndex:col0];
+    
+    STAssertEqualObjects(value0, [[t firstRow] stringInColumnWithIndex:col0], nil);
+    STAssertEqualObjects(value1, [[t lastRow] stringInColumnWithIndex:col0], nil);
+}
+
 - (void)testTableDynamic_Cursor_Subscripting
 {
     TDBTable* _table = [[TDBTable alloc] init];

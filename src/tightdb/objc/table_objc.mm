@@ -390,6 +390,23 @@ using namespace std;
     return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
 }
 
+-(TDBRow *)firstRow
+{
+    if(self.rowCount == 0){
+        return nil;
+    }
+    return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:0]];
+}
+
+-(TDBRow *)lastRow
+{
+    if(self.rowCount == 0){
+        return nil;
+    }
+    return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1]];
+}
+
+
 -(NSUInteger)rowCount
 {
     return m_view->size();
@@ -800,13 +817,19 @@ using namespace std;
     return [[TDBRow alloc] initWithTable:self ndx:ndx];
 }
 
--(TDBRow*)lastRow //FIXME must return nil, of table is empty. Consider property
+-(TDBRow*)lastRow
 {
+    if(self.rowCount == 0){
+        return nil;
+    }
     return [[TDBRow alloc] initWithTable:self ndx:self.rowCount-1];
 }
 
--(TDBRow*)firstRow //FIXME must return nil, of table is empty. Consider property
+-(TDBRow*)firstRow
 {
+    if(self.rowCount == 0){
+        return nil;
+    }
     return [[TDBRow alloc] initWithTable:self ndx:0];
 }
 
