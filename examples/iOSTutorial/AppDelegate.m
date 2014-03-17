@@ -41,7 +41,7 @@ void tableFunc() {
 
     // @@Example: number_of_rows @@
     NSUInteger cnt1 = people.rowCount;                 // cnt = 6
-    BOOL empty = people.rowCount;                      // empty = NO
+    BOOL empty = people.rowCount == 0;                 // empty = NO
     // @@EndExample@@
 
     // @@Example: accessing_rows @@
@@ -68,7 +68,7 @@ void tableFunc() {
 
     // @@Example: deleting_row @@
     [people removeRowAtIndex:2];
-    NSUInteger cnt2 = [people rowCount];                      // cnt = 5
+    NSUInteger cnt2 = people.rowCount;                  // cnt = 5
     // @@EndExample@@
 
     // @@Example: iteration @@
@@ -80,8 +80,8 @@ void tableFunc() {
 
     // @@Example: simple_seach @@
     NSUInteger row_id;
-    row_id = [people.Name find:@"Philip"];                 // (NSUInteger)-1: Not found
-    row_id = [people.Name find:@"Mary"];                   // row = 1
+    row_id = [people.Name find:@"Philip"];              // (NSUInteger)-1: Not found
+    row_id = [people.Name find:@"Mary"];                // row = 1
     // @@EndExample@@
 
     // @@Example: advanced_search @@
@@ -90,18 +90,15 @@ void tableFunc() {
                                            .Age   columnIsBetween:20 and_:30];
 
     // Get number of matching entries
-    NSUInteger cnt3 = [q countRows];                            // =&gt; 2
+    NSUInteger cnt3 = [q countRows];                     // =&gt; 2
 
     // Get the average age (currently only a low-level interface)
     double avg = [q.Age avg];
 
     // Execute the query and return a table (view)
     PeopleTable_View *res = [q findAll];
-    for (NSUInteger i = 0; i < res.rowCount; ++i) {
-        NSLog(@"%zu: %@ is %lld years old", i, people[i].Name, people[i].Age);
-    }
 
-    // Alternatively with fast emunaration
+    // fast emunaration on view
     for (PeopleTable_Cursor *c in res)
         NSLog(@"%@ is %lld years old", c.Name, c.Age);
 
@@ -110,6 +107,10 @@ void tableFunc() {
 }
 
 void sharedGroupFunc() {
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSError *error;
+    [fileManager removeItemAtPath:@"people.tightdb" error:&error];
 
     // @@Example: transaction @@
     TDBSharedGroup *sharedGroup = [TDBSharedGroup sharedGroupWithFile:@"people.tightdb"
