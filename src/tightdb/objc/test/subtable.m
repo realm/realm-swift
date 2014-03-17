@@ -42,10 +42,10 @@ TIGHTDB_TABLE_3(TestSubtableMain,
 
 - (void)testSubtable
 {
-    TightdbGroup *group = [TightdbGroup group];
+    TDBGroup *group = [TDBGroup group];
 
     /* Create new table in group */
-    TestSubtableMain *people = [group getTable:@"employees" withClass:[TestSubtableMain class]];
+    TestSubtableMain *people = [group getOrCreateTableWithName:@"employees" asTableClass:[TestSubtableMain class] error:nil];
 
     /* FIXME: Add support for specifying a subtable to the 'add'
        method. The subtable must then be copied into the parent

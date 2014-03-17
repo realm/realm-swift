@@ -20,18 +20,24 @@ because some source files are generated from Cheetah templates.
 
 Currently, the Objective-C binding is availble only on Mac OS X (and
 iPhone). The following is a suggestion of how to install the
-prerequisites on Mac OS X 10.7 and 10.8:
+prerequisites on Mac OS X 10.7, 10.8, and 10.9:
 
-Clang comes with Xcode, so install Xcode if it is not already
-installed. If you have a version that preceeds 4.2, we recommend that
-you upgrade. This will ensure that the Clang version is at least
-3.0. Run the following command in the command prompt to see if you
-have Xcode installed, and, if so, what version it is:
+The build procedure uses Clang as the C/C++ compiler by default. It
+needs at least Clang 3.0 which comes with Xcode 4.2. On OS X 10.9
+(Mavericks) we recommend at least Xcode 5.0, since in some cases when
+a previous version of OS X is upgraded to 10.9, you will be left with
+a malfunctioning set of command line tools (in particular the `lipo`
+command), and this is most easily fixed by upgrading to Xcode 5. Run
+the following command in the command prompt to see if you have Xcode
+installed, and, if so, what version it is:
 
     xcodebuild -version
 
-Make sure you also install "Command line tools" found under the
-preferences pane "Downloads" in Xcode.
+If you have Xcode 5 or later, you will already have the required
+command line tools installed. In Xcode 4, however, the "Command line
+tools" is an optional Xcode add-on that you must install. You can find
+it under the "Downloads" pane of the "Preferences" dialog in the Xcode
+4 menu.
 
 Download the latest version of Python Cheetah
 (https://pypi.python.org/packages/source/C/Cheetah/Cheetah-2.4.4.tar.gz),
@@ -42,17 +48,16 @@ then:
     sudo python setup.py install
 
 
-Building, testing, and installing
----------------------------------
+
+Configure, build, install
+-------------------------
+
+Run the following commands to configure, build, and install the
+language binding:
 
     sh build.sh config
-    sh build.sh clean
     sh build.sh build
-    sh build.sh test
-    sh build.sh test-debug
-    sh build.sh test-gdb
     sudo sh build.sh install
-    sh build.sh test-intalled
 
 Headers are installed in:
 
@@ -62,6 +67,19 @@ The following libraries are installed:
 
     /usr/local/lib/libtightdb-objc.dylib
     /usr/local/lib/libtightdb-objc-dbg.dylib
+
+Here is a more complete set of build-related commands:
+
+    sh build.sh config
+    sh build.sh clean
+    sh build.sh build
+    sh build.sh test
+    sh build.sh test-debug
+    sh build.sh show-install
+    sudo sh build.sh install
+    sh build.sh test-intalled
+    sudo sh build.sh uninstall
+
 
 
 Building for iPhone
@@ -101,6 +119,12 @@ can be tested via the Xcode project in:
 
     test-iphone/
 
+To ease the development using Xcode, you can generate a framework using
+the command:
+
+    sh build.sh ios-framework
+
+The framework is stored in the `tightdb-ios.zip` file.
 
 Configuration
 -------------
@@ -113,11 +137,21 @@ following command before building and installing:
 Here, `PREFIX` is the installation prefix. If it is not specified, it
 defaults to `/usr/local`.
 
+By default, the configuration step uses `which tightdb-config` to
+locate the installation of the TightDB core library. If this is not
+appropriate, because you have multiple versions of the TightDB core
+library installed, or `tightdb-config` is not available in your
+`PATH`, set the environment variable `TIGHTDB_CONFIG` before calling
+`sh build.sh config`. For example:
+
+    TIGHTDB_CONFIG=/opt/tightdb-v0.1.2/bin/tightdb-config build.sh config
+
 To use a nondefault compiler, or a compiler in a nondefault location,
 set the environment variable `CC` before calling `sh build.sh build`,
 as in the following example:
 
     CC=clang sh build.sh build
+
 
 
 Notes

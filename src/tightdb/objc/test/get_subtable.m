@@ -32,32 +32,31 @@ TIGHTDB_TABLE_2(WrongTypeTable,
 - (void)testGetSubtable
 {
     // Create table with all column types
-    TightdbTable *table = [[TightdbTable alloc] init];
-    TightdbSpec *s = [table getSpec];
-    [s addColumnWithType:tightdb_Bool andName:@"Outer"];
-    [s addColumnWithType:tightdb_Int andName:@"Number"];
-    TightdbSpec *sub = [s addColumnTable:@"GetSubtable"];
-    [sub addColumnWithType:tightdb_Bool andName:@"Hired"];
-    [sub addColumnWithType:tightdb_Int andName:@"Age"];
-    [table updateFromSpec];
+    TDBTable* table = [[TDBTable alloc] init];
+    TDBDescriptor* desc = table.descriptor;
+    [desc addColumnWithName:@"Outer" andType:TDBBoolType];
+    [desc addColumnWithName:@"Number" andType:TDBIntType];
+    TDBDescriptor* subdesc = [desc addColumnTable:@"GetSubtable"];
+    [subdesc addColumnWithName:@"Hired" andType:TDBBoolType];
+    [subdesc addColumnWithName:@"Age" andType:TDBIntType];
 
-    [table insertBool:0 ndx:0 value:NO];
-    [table insertInt:1 ndx:0 value:10];
-    [table insertSubtable:2 ndx:0];
-    [table insertDone];
+    [table TDBInsertBool:0 ndx:0 value:NO];
+    [table TDBInsertInt:1 ndx:0 value:10];
+    [table TDBInsertSubtable:2 ndx:0];
+    [table TDBInsertDone];
 
-    TightdbTable *subtable = [table getSubtable:2 ndx:0];
-    [subtable insertBool:0 ndx:0 value:YES];
-    [subtable insertInt:1 ndx:0 value:42];
-    [subtable insertDone];
+    TDBTable* subtable = [table tableInColumnWithIndex:2 atRowIndex:0];
+    [subtable TDBInsertBool:0 ndx:0 value:YES];
+    [subtable TDBInsertInt:1 ndx:0 value:42];
+    [subtable TDBInsertDone];
 
-    GetSubtable *testTable = [table getSubtable:2 ndx:0 withClass:[GetSubtable class]];
-    GetSubtable_Cursor *cursor = [testTable cursorAtIndex:0];
+    GetSubtable* testTable = [table tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[GetSubtable class]];
+    GetSubtable_Cursor* cursor = [testTable cursorAtIndex:0];
     NSLog(@"Age in subtable: %lld", cursor.Age);
     STAssertEquals(cursor.Age, (int64_t)42, @"Sub table row should be 42");
 
-    STAssertNil([table getSubtable:2 ndx:0 withClass:[WrongNameTable class]], @"should return nil because wrong name");
-    STAssertNil([table getSubtable:2 ndx:0 withClass:[WrongTypeTable class]], @"should return nil because wrong type");
+    STAssertNil([table tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongNameTable class]], @"should return nil because wrong name");
+    STAssertNil([table tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongTypeTable class]], @"should return nil because wrong type");
 }
 
 

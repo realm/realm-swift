@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		42AD3A9718CDBDFF00C86073 /* support.h in Headers */ = {isa = PBXBuildFile; fileRef = 42AD3A9318CDBDFF00C86073 /* support.h */; };
+		42AD3A9818CDBDFF00C86073 /* support.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42AD3A9418CDBDFF00C86073 /* support.mm */; };
+		42AD3A9918CDBDFF00C86073 /* version_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42AD3A9518CDBDFF00C86073 /* version_objc.mm */; };
+		42AD3A9A18CDBDFF00C86073 /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = 42AD3A9618CDBDFF00C86073 /* version.h */; };
+		4D01A9FC18C9F5E600527AD5 /* table_view.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9FB18C9F5E600527AD5 /* table_view.m */; };
+		4D01A9FE18C9F60F00527AD5 /* version.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9FD18C9F60F00527AD5 /* version.m */; };
+		4D79966018BDFC3E009EB0C0 /* table_macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D79965F18BDFC3E009EB0C0 /* table_macros.h */; };
+		4DB1DEFB18BF70AE005A7234 /* dynamic_table.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF818BF70AE005A7234 /* dynamic_table.m */; };
+		4DB1DEFC18BF70AE005A7234 /* functional.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF918BF70AE005A7234 /* functional.m */; };
+		4DB1DEFD18BF70AE005A7234 /* typed_table.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEFA18BF70AE005A7234 /* typed_table.m */; };
 		E918909D177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		E91890AF177B677900653D7A /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E91890AE177B677900653D7A /* SenTestingKit.framework */; };
 		E91890B0177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
@@ -40,7 +50,6 @@
 		E91890FD177B71E400653D7A /* shared_group.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890EF177B71E400653D7A /* shared_group.m */; };
 		E91890FE177B71E400653D7A /* subtable.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F0177B71E400653D7A /* subtable.m */; };
 		E91890FF177B71E400653D7A /* table_delete_all.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F1177B71E400653D7A /* table_delete_all.m */; };
-		E9189100177B71E400653D7A /* table.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F2177B71E400653D7A /* table.m */; };
 		E9189101177B71E400653D7A /* template.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F3177B71E400653D7A /* template.m */; };
 		E9189102177B71E400653D7A /* tutorial.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890F4177B71E400653D7A /* tutorial.m */; };
 /* End PBXBuildFile section */
@@ -56,6 +65,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		42AD3A9318CDBDFF00C86073 /* support.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = support.h; path = ../../src/tightdb/objc/support.h; sourceTree = "<group>"; };
+		42AD3A9418CDBDFF00C86073 /* support.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = support.mm; path = ../../src/tightdb/objc/support.mm; sourceTree = "<group>"; };
+		42AD3A9518CDBDFF00C86073 /* version_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = version_objc.mm; path = ../../src/tightdb/objc/version_objc.mm; sourceTree = "<group>"; };
+		42AD3A9618CDBDFF00C86073 /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = version.h; path = ../../src/tightdb/objc/version.h; sourceTree = "<group>"; };
+		4D01A9FB18C9F5E600527AD5 /* table_view.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = table_view.m; path = ../../src/tightdb/objc/test/table_view.m; sourceTree = "<group>"; };
+		4D01A9FD18C9F60F00527AD5 /* version.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = version.m; path = ../../src/tightdb/objc/test/version.m; sourceTree = "<group>"; };
+		4D79965F18BDFC3E009EB0C0 /* table_macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = table_macros.h; path = ../../src/tightdb/objc/table_macros.h; sourceTree = "<group>"; };
+		4DB1DEF818BF70AE005A7234 /* dynamic_table.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = dynamic_table.m; path = ../../src/tightdb/objc/test/dynamic_table.m; sourceTree = "<group>"; };
+		4DB1DEF918BF70AE005A7234 /* functional.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = functional.m; path = ../../src/tightdb/objc/test/functional.m; sourceTree = "<group>"; };
+		4DB1DEFA18BF70AE005A7234 /* typed_table.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = typed_table.m; path = ../../src/tightdb/objc/test/typed_table.m; sourceTree = "<group>"; };
 		E9189099177B677900653D7A /* TightDbObjcDyn.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = TightDbObjcDyn.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		E918909C177B677900653D7A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		E918909F177B677900653D7A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -94,7 +113,6 @@
 		E91890EF177B71E400653D7A /* shared_group.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = shared_group.m; path = ../../src/tightdb/objc/test/shared_group.m; sourceTree = "<group>"; };
 		E91890F0177B71E400653D7A /* subtable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = subtable.m; path = ../../src/tightdb/objc/test/subtable.m; sourceTree = "<group>"; };
 		E91890F1177B71E400653D7A /* table_delete_all.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = table_delete_all.m; path = ../../src/tightdb/objc/test/table_delete_all.m; sourceTree = "<group>"; };
-		E91890F2177B71E400653D7A /* table.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = table.m; path = ../../src/tightdb/objc/test/table.m; sourceTree = "<group>"; };
 		E91890F3177B71E400653D7A /* template.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = template.m; path = ../../src/tightdb/objc/test/template.m; sourceTree = "<group>"; };
 		E91890F4177B71E400653D7A /* tutorial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = tutorial.m; path = ../../src/tightdb/objc/test/tutorial.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -163,6 +181,11 @@
 		E91890A2177B677900653D7A /* TightDbObjcDyn */ = {
 			isa = PBXGroup;
 			children = (
+				42AD3A9318CDBDFF00C86073 /* support.h */,
+				42AD3A9418CDBDFF00C86073 /* support.mm */,
+				42AD3A9518CDBDFF00C86073 /* version_objc.mm */,
+				42AD3A9618CDBDFF00C86073 /* version.h */,
+				4D79965F18BDFC3E009EB0C0 /* table_macros.h */,
 				E91890C5177B67AB00653D7A /* cursor_objc.mm */,
 				E91890C6177B67AB00653D7A /* cursor.h */,
 				E91890C7177B67AB00653D7A /* group_objc.mm */,
@@ -197,20 +220,24 @@
 			isa = PBXGroup;
 			children = (
 				E91890E7177B71E400653D7A /* data_type.mm */,
+				4DB1DEF818BF70AE005A7234 /* dynamic_table.m */,
 				E91890E8177B71E400653D7A /* enumerator.m */,
 				E91890E9177B71E400653D7A /* err_handling.mm */,
+				4DB1DEF918BF70AE005A7234 /* functional.m */,
 				E91890EA177B71E400653D7A /* get_subtable.m */,
-				E91890EB177B71E400653D7A /* group_misc_2.m */,
 				E91890EC177B71E400653D7A /* group.m */,
+				E91890EB177B71E400653D7A /* group_misc_2.m */,
 				E91890ED177B71E400653D7A /* mixed.m */,
 				E91890EE177B71E400653D7A /* query.m */,
 				E91890EF177B71E400653D7A /* shared_group.m */,
 				E91890F0177B71E400653D7A /* subtable.m */,
+				E91890B5177B677900653D7A /* Supporting Files */,
 				E91890F1177B71E400653D7A /* table_delete_all.m */,
-				E91890F2177B71E400653D7A /* table.m */,
+				4D01A9FB18C9F5E600527AD5 /* table_view.m */,
 				E91890F3177B71E400653D7A /* template.m */,
 				E91890F4177B71E400653D7A /* tutorial.m */,
-				E91890B5177B677900653D7A /* Supporting Files */,
+				4DB1DEFA18BF70AE005A7234 /* typed_table.m */,
+				4D01A9FD18C9F60F00527AD5 /* version.m */,
 			);
 			path = TightDbObjcDynTests;
 			sourceTree = "<group>";
@@ -231,14 +258,17 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				42AD3A9718CDBDFF00C86073 /* support.h in Headers */,
 				E91890D7177B67AB00653D7A /* cursor.h in Headers */,
 				E91890D9177B67AB00653D7A /* group_priv.h in Headers */,
 				E91890DB177B67AB00653D7A /* group_shared.h in Headers */,
 				E91890DC177B67AB00653D7A /* group.h in Headers */,
 				E91890DD177B67AB00653D7A /* helper_macros.h in Headers */,
+				4D79966018BDFC3E009EB0C0 /* table_macros.h in Headers */,
 				E91890DF177B67AB00653D7A /* query_priv.h in Headers */,
 				E91890E0177B67AB00653D7A /* query.h in Headers */,
 				E91890E2177B67AB00653D7A /* table_priv.h in Headers */,
+				42AD3A9A18CDBDFF00C86073 /* version.h in Headers */,
 				E91890E3177B67AB00653D7A /* table.h in Headers */,
 				E91890E4177B67AB00653D7A /* tightdb.h in Headers */,
 				E91890E5177B67AB00653D7A /* type.h in Headers */,
@@ -291,7 +321,8 @@
 		E9189091177B677900653D7A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0460;
+				LastTestingUpgradeCheck = 0510;
+				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Thomas Andersen";
 			};
 			buildConfigurationList = E9189094177B677900653D7A /* Build configuration list for PBXProject "TightDbObjcDyn" */;
@@ -345,6 +376,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				E91890D6177B67AB00653D7A /* cursor_objc.mm in Sources */,
+				42AD3A9818CDBDFF00C86073 /* support.mm in Sources */,
+				42AD3A9918CDBDFF00C86073 /* version_objc.mm in Sources */,
 				E91890D8177B67AB00653D7A /* group_objc.mm in Sources */,
 				E91890DA177B67AB00653D7A /* group_shared_objc.mm in Sources */,
 				E91890DE177B67AB00653D7A /* query_objc.mm in Sources */,
@@ -360,14 +393,18 @@
 				E91890F6177B71E400653D7A /* enumerator.m in Sources */,
 				E91890F7177B71E400653D7A /* err_handling.mm in Sources */,
 				E91890F8177B71E400653D7A /* get_subtable.m in Sources */,
+				4D01A9FE18C9F60F00527AD5 /* version.m in Sources */,
 				E91890F9177B71E400653D7A /* group_misc_2.m in Sources */,
 				E91890FA177B71E400653D7A /* group.m in Sources */,
 				E91890FB177B71E400653D7A /* mixed.m in Sources */,
 				E91890FC177B71E400653D7A /* query.m in Sources */,
 				E91890FD177B71E400653D7A /* shared_group.m in Sources */,
 				E91890FE177B71E400653D7A /* subtable.m in Sources */,
+				4DB1DEFC18BF70AE005A7234 /* functional.m in Sources */,
+				4D01A9FC18C9F5E600527AD5 /* table_view.m in Sources */,
+				4DB1DEFD18BF70AE005A7234 /* typed_table.m in Sources */,
 				E91890FF177B71E400653D7A /* table_delete_all.m in Sources */,
-				E9189100177B71E400653D7A /* table.m in Sources */,
+				4DB1DEFB18BF70AE005A7234 /* dynamic_table.m in Sources */,
 				E9189101177B71E400653D7A /* template.m in Sources */,
 				E9189102177B71E400653D7A /* tutorial.m in Sources */,
 			);
@@ -399,8 +436,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "libstdc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -441,8 +477,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "libstdc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;

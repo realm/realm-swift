@@ -58,21 +58,22 @@ CATEGORIES :
   - g_typed_view_object_at_index:
       NAME     : cursorAtIndex
       SUMMARY  : Returns a typed cursor at a specified row number.
-      DESCR    : TBD.
+      DESCR    : &objc_typed_table_cursor_at_index_descr
+                 The cursor is initialized using the table view index. Internally the cursor uses the source table index.
       SIGNATURE: "- (TableName_Cursor *)cursorAtIndex:(size_t)ndx"
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
-        DESCR  : The row number.
+        DESCR  : The row number in the table view.
       RETURN:
         TYPES  : TableName_Cursor
         DESCR  : The curser object. Note that <code>TableName</code> is replaced with the name of your specific table.
 
   - g_typed_view_get_source_ndx:
-      NAME     : getSourceNdx
+      NAME     : getSourceIndex
       SUMMARY  : *g_typed_view_get_source_ndx_summary
       DESCR    : *g_typed_view_get_source_ndx_descr
-      SIGNATURE: (size_t)getSourceNdx:(size_t)ndx
+      SIGNATURE: (size_t)getSourceIndex:(size_t)ndx
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
@@ -84,10 +85,10 @@ CATEGORIES :
       - CODE   : ex_objc_typed_view_get_source_ndx
         DESCR  :
   - g_typed_view_remove_row:
-      NAME     : remove
+      NAME     : removeRowAtIndex
       SUMMARY  : *g_typed_table_remove_row_summary
       DESCR    : *g_typed_table_remove_row_descr
-      SIGNATURE: (void)remove:(size_t)ndx
+      SIGNATURE: (void)removeRowAtIndex:(size_t)ndx
       PARAMS:
       - NAME   : ndx
         TYPES  : size_t
@@ -95,19 +96,19 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_objc_typed_table_remove
         DESCR  :
-        
+
   - g_typed_view_remove_last_row:
       TODO     : soon
 
-      NAME     : removeLast
+      NAME     : removeLastRow
       SUMMARY  : *g_typed_table_remove_last_row_summary
       DESCR    : *g_typed_table_remove_last_row_descr
-      SIGNATURE: void remove_last();
+      SIGNATURE: -(void)removeLastRow;
       EXAMPLES:
       - CODE   : ex_objc_typed_table_remove_last_row
         DESCR  :
-        
-        
+
+
 - Sub-tables:
   METHODS:
   - g_typed_view_get_subtable_size:
@@ -126,7 +127,7 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_objc_typed_view_get_subtable
         DESCR  :
-        
+
   - g_typed_view_clear_subtable:
       TODO     : soon
 

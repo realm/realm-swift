@@ -20,37 +20,39 @@
 
 #import <Foundation/Foundation.h>
 
-@class TightdbTable;
-@class TightdbBinary;
-@class TightdbMixed;
+@class TDBTable;
+@class TDBBinary;
+@class TDBMixed;
 
-@interface TightdbCursor: NSObject
--(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx;
--(void)setNdx:(size_t)ndx;
--(size_t)index;
+@interface TDBRow: NSObject
+-(id)initWithTable:(TDBTable *)table ndx:(NSUInteger)ndx;
+-(void)TDBSetNdx:(NSUInteger)ndx;
+-(NSUInteger)TDBIndex;
 
--(BOOL)setInt:(int64_t)value inColumn:(size_t)colNdx;
--(BOOL)setInt:(int64_t)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(BOOL)setString:(NSString *)value inColumn:(size_t)colNdx;
--(BOOL)setString:(NSString *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(BOOL)setBool:(BOOL)value inColumn:(size_t)colNdx;
--(BOOL)setBool:(BOOL)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(BOOL)setFloat:(float)value inColumn:(size_t)colNdx;
--(BOOL)setFloat:(float)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(BOOL)setDouble:(double)value inColumn:(size_t)colNdx;
--(BOOL)setDouble:(double)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(BOOL)setBinary:(TightdbBinary *)value inColumn:(size_t)colNdx;
--(BOOL)setBinary:(TightdbBinary *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
--(BOOL)setMixed:(TightdbMixed *)value inColumn:(size_t)colNdx;
--(BOOL)setMixed:(TightdbMixed *)value inColumn:(size_t)colNdx error:(NSError *__autoreleasing *)error;
+-(id)objectAtIndexedSubscript:(NSUInteger)colNdx;
+-(id)objectForKeyedSubscript:(id <NSCopying>)key;
+-(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colNdx;
+-(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key;
 
--(int64_t)getIntInColumn:(size_t)colNdx;
--(NSString *)getStringInColumn:(size_t)colNdx;
--(BOOL)getBoolInColumn:(size_t)colNdx;
--(float)getFloatInColumn:(size_t)colNdx;
--(double)getDoubleInColumn:(size_t)colNdx;
--(TightdbBinary *)getBinaryInColumn:(size_t)colNdx;
--(TightdbMixed *)getMixedInColumn:(size_t)colNdx;
+-(void)setInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setBinary:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setTable:(TDBTable *)aTable inColumnWithIndex:(NSUInteger)colIndex;
+
+-(int64_t)intInColumnWithIndex:(NSUInteger)colIndex;
+-(NSString *)stringInColumnWithIndex:(NSUInteger)colIndex;
+-(BOOL)boolInColumnWithIndex:(NSUInteger)colIndex;
+-(float)floatInColumnWithIndex:(NSUInteger)colIndex;
+-(double)doubleInColumnWithIndex:(NSUInteger)colIndex;
+-(time_t)dateInColumnWithIndex:(NSUInteger)colIndex;
+-(TDBBinary *)binaryInColumnWithIndex:(NSUInteger)colIndex;
+-(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex;
+-(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex;
 
 @end
 
@@ -59,33 +61,24 @@
    macro switching trick for the individual column types on
    TIGHTDB_CURSOR_PROPERTY macros similar to what is done for query
    accessors. */
-@interface TightdbAccessor: NSObject
--(id)initWithCursor:(TightdbCursor *)cursor columnId:(size_t)columnId;
+@interface TDBAccessor: NSObject
+-(id)initWithCursor:(TDBRow *)cursor columnId:(NSUInteger)columnId;
 -(BOOL)getBool;
--(BOOL)setBool:(BOOL)value;
--(BOOL)setBool:(BOOL)value error:(NSError *__autoreleasing *)error;
+-(void)setBool:(BOOL)value;
 -(int64_t)getInt;
--(BOOL)setInt:(int64_t)value;
--(BOOL)setInt:(int64_t)value error:(NSError *__autoreleasing *)error;
+-(void)setInt:(int64_t)value;
 -(float)getFloat;
--(BOOL)setFloat:(float)value;
--(BOOL)setFloat:(float)value error:(NSError *__autoreleasing *)error;
+-(void)setFloat:(float)value;
 -(double)getDouble;
--(BOOL)setDouble:(double)value;
--(BOOL)setDouble:(double)value error:(NSError *__autoreleasing *)error;
+-(void)setDouble:(double)value;
 -(NSString *)getString;
--(BOOL)setString:(NSString *)value;
--(BOOL)setString:(NSString *)value error:(NSError *__autoreleasing *)error;
--(TightdbBinary *)getBinary;
--(BOOL)setBinary:(TightdbBinary *)value;
--(BOOL)setBinary:(TightdbBinary *)value error:(NSError *__autoreleasing *)error;
--(BOOL)setBinary:(const char *)data size:(size_t)size;
--(BOOL)setBinary:(const char *)data size:(size_t)size error:(NSError *__autoreleasing *)error;
+-(void)setString:(NSString *)value;
+-(TDBBinary *)getBinary;
+-(void)setBinary:(TDBBinary *)value;
 -(time_t)getDate;
--(BOOL)setDate:(time_t)value;
--(BOOL)setDate:(time_t)value error:(NSError *__autoreleasing *)error;
+-(void)setDate:(time_t)value;
+-(void)setSubtable:(TDBTable *)value;
 -(id)getSubtable:(Class)obj;
--(TightdbMixed *)getMixed;
--(BOOL)setMixed:(TightdbMixed *)value;
--(BOOL)setMixed:(TightdbMixed *)value error:(NSError *__autoreleasing *)error;
+-(TDBMixed *)getMixed;
+-(void)setMixed:(TDBMixed *)value;
 @end

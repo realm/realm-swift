@@ -52,7 +52,7 @@ CATEGORIES:
                  (TightdbMixed *)mixedWithTable:(TightdbTable *)value
       PARAMS:
       - NAME   : v
-        TYPES  : [BOOL, int64_t, float, double, Date, NSString, 
+        TYPES  : [BOOL, int64_t, float, double, Date, NSString,
                   TightdbBinary, const char*, TightdbTable]
         DESCR  : *g_mixed_constructor_parm1_descr
       EXAMPLES:
@@ -82,7 +82,7 @@ CATEGORIES:
   - g_mixed_get_float:
       NAME     : getFloat
   - g_mixed_get_double:
-      NAME     : getDouble      
+      NAME     : getDouble
   - g_mixed_get_date:
       NAME     : getDate
   - g_mixed_get_string:
@@ -97,13 +97,13 @@ CATEGORIES:
                  (int64_t)getInt
                  (time_t)getDate
                  (float)getFloat
-                 (double)getDouble                 
+                 (double)getDouble
                  (NSString *)getString
                  (TightdbBinary *)getBinary
                  (TightdbTable *)getTable
       CONST    : True
       RETURN:
-        TYPES  : [BOOL, int64_t, float, double, time_t, NSString, 
+        TYPES  : [BOOL, int64_t, float, double, time_t, NSString,
                   TightdbBinary, TightdbTable]
         DESCR  : *g_mixed_get_return1_descr
       EXAMPLES:

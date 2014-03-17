@@ -55,8 +55,8 @@ CATEGORIES :
         DESCR  : &g_typed_query_case_sensitive_descr_objc
                  >
                  The class of the returned object is defined by a macro.
-                 The first part of the class name, specifically <code>TableName</code>, 
-                 is replaced with the name of your typed table. 
+                 The first part of the class name, specifically <code>TableName</code>,
+                 is replaced with the name of your typed table.
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_equals
@@ -95,7 +95,7 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_notEquals
-        
+
   - g_typed_query_greaterThan_int:
   - g_typed_query_greaterThan_float:
   - g_typed_query_greaterThan_double:
@@ -119,7 +119,7 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_greaterThan
-        
+
   - g_typed_query_greaterThanOrEqual_int:
   - g_typed_query_greaterThanOrEqual_float:
   - g_typed_query_greaterThanOrEqual_double:
@@ -167,7 +167,7 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_lessThan
-        
+
   - g_typed_query_lessThanOrEqual_int:
   - g_typed_query_lessThanOrEqual_float:
   - g_typed_query_lessThanOrEqual_double:
@@ -191,7 +191,7 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_lessThanOrEqual
-        
+
   - g_typed_query_between_int:
   - g_typed_query_between_float:
   - g_typed_query_between_double:
@@ -218,7 +218,7 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_between
-        
+
   - g_typed_query_startsWith_binary:
       TODO: soon
   - g_typed_query_startsWith_string:
@@ -244,7 +244,7 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_startsWith
-        
+
   - g_typed_query_endsWith_binary:
       TODO: soon
   - g_typed_query_endsWith_string:
@@ -270,7 +270,7 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_endsWith
-        
+
   - g_typed_query_contains_binary:
       TODO: soon
   - g_typed_query_contains_string:
@@ -309,7 +309,7 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_group
-        
+
   - g_typed_query_endGroup:
       NAME     : endGroup
       SIGNATURE: (TableName_Query *)endgroup
@@ -338,7 +338,7 @@ CATEGORIES :
       TODO: soon
   - g_typed_query_endSubtable:
       TODO: soon
-  
+
 - Actions:
   METHODS:
   - g_typed_query_find_all_const:
@@ -354,30 +354,44 @@ CATEGORIES :
         TYPES  : TableName_View *
         DESCR  : &g_typed_query_view_return_descr
                  >
-                 The query result is represented as a <code>TableName_View</code>. 
-                 Note that part of the class name, specifically <code>TableName</code>, 
+                 The query result is represented as a <code>TableName_View</code>.
+                 Note that part of the class name, specifically <code>TableName</code>,
                  is replaced with the name of your specific table.
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_findall
-        
-  - g_typed_query_find_next:
-      NAMES    : findNext
+
+  - g_typed_query_find:
+      NAMES    : find
       SIGNATURE: |
-                 (size_t)findNext:(size_t)last
-      DESCR    : *g_typed_query_find_next_descr
-      SUMMARY  : *g_typed_query_find_next_summary
+                 (size_t)find:(size_t)last
+      DESCR    : *g_typed_query_find_descr
+      SUMMARY  : *g_typed_query_find_summary
       PARAMS:
       - NAME   : last
         TYPES  : size_t
-        DESCR  : *g_typed_query_find_next_parm_lastmatch_descr
+        DESCR  : *g_typed_query_find_parm_1_descr
       RETURN:
         TYPES  : size_t
-        DESCR  : *g_typed_query_find_next_return_descr
+        DESCR  : *g_typed_query_find_return_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_objc_typed_query_find_next
-        
+        CODE   : ex_objc_typed_query_find
+
+
+
+  - g_typed_query_size:
+      NAMES    : count
+      SIGNATURE: (size_t)count
+      DESCR    : *g_typed_query_size_descr
+      SUMMARY  : *g_typed_query_size_summary
+      RETURN:
+        TYPES  : size_t
+        DESCR  : *g_typed_query_size_return1_descr
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_objc_typed_query_size
+
   - g_typed_query_sum:
       TODO: soon (+ start, end, limit)
   - g_typed_query_sum_float:
@@ -402,19 +416,7 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_sum
-        
-  - g_typed_query_size:
-      NAMES    : count
-      SIGNATURE: (size_t)count
-      DESCR    : *g_typed_query_size_descr
-      SUMMARY  : *g_typed_query_size_summary
-      RETURN:
-        TYPES  : size_t
-        DESCR  : *g_typed_query_size_return1_descr
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_objc_typed_query_size
-        
+
   - g_typed_query_maximum:
       TODO: soon (+ start, end, limit)
   - g_typed_query_maximum_float:
@@ -431,20 +433,20 @@ CATEGORIES :
       NAME     : max
   - g_typed_query_maximum_double_2:
       NAME     : max
-      TITLE    : "*max"
+      TITLE    : "*maximum"
       DESCR    : *g_typed_query_maximum_descr
       SUMMARY  : *g_typed_query_maximum_summary
       SIGNATURE: |
-                 .CName (int64_t)max
-                 .CName (float)max
-                 .CName (double)max
+                 .CName (int64_t)maximum
+                 .CName (float)maximum
+                 .CName (double)maximum
       RETURN:
         TYPES  : [int64_t, float, double]
         DESCR  : *g_typed_query_maximum_return1_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_maximum
- 
+
   - g_typed_query_minimum:
       TODO: soon (+ start, end, limit)
   - g_typed_query_minimum_float:
@@ -461,20 +463,20 @@ CATEGORIES :
       NAME     : min
   - g_typed_query_minimum_double_2:
       NAME     : min
-      TITLE    : "*min"
+      TITLE    : "*minimum"
       DESCR    : *g_typed_query_minimum_descr
       SUMMARY  : *g_typed_query_minimum_summary
       SIGNATURE: |
-                 .CName (int64_t)min
-                 .CName (float)min
-                 .CName (double)min
+                 .CName (int64_t)minimum
+                 .CName (float)minimum
+                 .CName (double)minimum
       RETURN:
         TYPES  : [int64_t, float, double]
         DESCR  : *g_typed_query_minimum_return1_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_manimum
-        
+
   - g_typed_query_average:
       TODO: soon (+ start, end, limit)
   - g_typed_query_average_float:
@@ -487,25 +489,25 @@ CATEGORIES :
       NAME     : avg
   - g_typed_query_average_double_2:
       NAME     : avg
-      TITLE    : "*avg"
+      TITLE    : "*average"
       SUMMARY  : *g_typed_query_average_summary
       DESCR    : *g_typed_query_average_descr
-      SIGNATURE: .CName (double)avg
+      SIGNATURE: .CName (double)average
       RETURN:
         TYPES  : double
         DESCR  : *g_typed_query_average_return1_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_average
-        
+
   - g_typed_query_remove:
       NAMES    : remove
       SIGNATURE: |
-                 (size_t)remove
+                 (NSNumber *)remove
       DESCR    : *g_typed_query_remove_descr
       SUMMARY  : *g_typed_query_remove_summary
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSNumber *
         DESCR  : *g_typed_query_remove_return1_descr
       EXAMPLES:
       - DESCR  :

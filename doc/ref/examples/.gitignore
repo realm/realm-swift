@@ -1,0 +1,4 @@
+*.d
+*.o
+*.example
+*.tightdb
