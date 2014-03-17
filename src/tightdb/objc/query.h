@@ -68,7 +68,7 @@
 -(TDBQuery *)doubleIsEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)stringIsEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)stringIsCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
--(TDBQuery *)dateIsEqualTo:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBQuery *)dateIsEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)binaryIsEqualTo:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
 
 
@@ -77,25 +77,25 @@
 -(TDBQuery *)doubleIsNotEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)stringIsNotEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)stringIsNotCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
--(TDBQuery *)dateIsNotEqualTo:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBQuery *)dateIsNotEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)binaryIsNotEqualTo:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
 
--(TDBQuery *)dateIsGreaterThan:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBQuery *)dateIsGreaterThan:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)intIsGreaterThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)floatIsGreaterThan:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)doubleIsGreaterThan:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
 
--(TDBQuery *)dateIsGreaterThanOrEqualTo:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBQuery *)dateIsGreaterThanOrEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)intIsGreaterThanOrEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)floatIsGreaterThanOrEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)doubleIsGreaterThanOrEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
 
--(TDBQuery *)dateIsLessThan:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBQuery *)dateIsLessThan:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)intIsLessThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)floatIsLessThan:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)doubleIsLessThan:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
 
--(TDBQuery *)dateIsLessThanOrEqualTo:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBQuery *)dateIsLessThanOrEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)intIsLessThanOrEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)floatIsLessThanOrEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)doubleIsLessThanOrEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
@@ -190,13 +190,13 @@
 
 @interface TDBQueryAccessorDate: NSObject
 -(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery *)query;
--(TDBQuery *)columnIsEqualTo:(NSDate *)value;
--(TDBQuery *)columnIsNotEqualTo:(NSDate *)value;
--(TDBQuery *)columnIsGreaterThan:(NSDate *)value;
--(TDBQuery *)columnIsGreaterThanOrEqualTo:(NSDate *)value;
--(TDBQuery *)columnIsLessThan:(NSDate *)value;
--(TDBQuery *)columnIsLessThanOrEqualTo:(NSDate *)value;
--(TDBQuery *)columnIsBetween:(NSDate *)from and_:(NSDate *)to;
+-(TDBQuery *)columnIsEqualTo:(time_t)value;
+-(TDBQuery *)columnIsNotEqualTo:(time_t)value;
+-(TDBQuery *)columnIsGreaterThan:(time_t)value;
+-(TDBQuery *)columnIsGreaterThanOrEqualTo:(time_t)value;
+-(TDBQuery *)columnIsLessThan:(time_t)value;
+-(TDBQuery *)columnIsLessThanOrEqualTo:(time_t)value;
+-(TDBQuery *)columnIsBetween:(time_t)from and_:(time_t)to;
 @end
 
 

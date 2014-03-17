@@ -127,10 +127,10 @@ using namespace std;
     return mixed;
 }
 
-+(TDBMixed*)mixedWithDate:(NSDate *)value
++(TDBMixed*)mixedWithDate:(time_t)value
 {
     TDBMixed* mixed = [[TDBMixed alloc] init];
-    mixed->m_mixed = tightdb::Mixed(tightdb::DateTime([value timeIntervalSince1970]));
+    mixed->m_mixed = tightdb::Mixed(tightdb::DateTime(value));
     mixed->m_table = nil;
     return mixed;
 }
@@ -220,9 +220,9 @@ using namespace std;
     return [[TDBBinary alloc] initWithBinary:m_mixed.get_binary()];
 }
 
--(NSDate *)getDate
+-(time_t)getDate
 {
-    return [NSDate dateWithTimeIntervalSince1970: m_mixed.get_datetime().get_datetime()];
+    return m_mixed.get_datetime().get_datetime();
 }
 
 -(TDBTable*)getTable
@@ -434,9 +434,9 @@ using namespace std;
 {
     return m_view->get_bool(colIndex, rowIndex);
 }
--(NSDate *)dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(time_t)dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
-    return [NSDate dateWithTimeIntervalSince1970:m_view->get_datetime(colIndex, rowIndex).get_datetime()];
+    return m_view->get_datetime(colIndex, rowIndex).get_datetime();
 }
 -(double)doubleInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
@@ -925,9 +925,9 @@ using namespace std;
     return [[TDBBinary alloc] initWithBinary:m_table->get_binary(colIndex, rowIndex)];
 }
 
--(NSDate *)dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(time_t)dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
-    return [NSDate dateWithTimeIntervalSince1970: m_table->get_datetime(colIndex, rowIndex).get_datetime()];
+    return m_table->get_datetime(colIndex, rowIndex).get_datetime();
 }
 
 -(TDBTable*)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
@@ -1031,10 +1031,10 @@ using namespace std;
         TDBBinaryType);
 }
 
--(void)setDate:(NSDate *)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)setDate:(time_t)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
-        m_table->set_datetime(col_ndx, row_ndx, (size_t)[value timeIntervalSince1970]);,
+        m_table->set_datetime(col_ndx, row_ndx, value);,
        TDBDateType);
 }
 
@@ -1211,12 +1211,12 @@ using namespace std;
     return YES;
 }
 
--(BOOL)TDBInsertDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(NSDate *)value
+-(BOOL)TDBInsertDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(time_t)value
 {
     return [self TDBInsertDate:col_ndx ndx:ndx value:value error:nil];
 }
 
--(BOOL)TDBInsertDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(NSDate *)value error:(NSError* __autoreleasing*)error
+-(BOOL)TDBInsertDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(time_t)value error:(NSError* __autoreleasing*)error
 {
     // FIXME: Read-only errors should probably be handled by throwing
     // an exception. That is what is done in other places in this
@@ -1227,7 +1227,7 @@ using namespace std;
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->insert_datetime(col_ndx, ndx, [value timeIntervalSince1970]);, NO);
+    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->insert_datetime(col_ndx, ndx, value);, NO);
     return YES;
 }
 
@@ -1375,9 +1375,9 @@ using namespace std;
 {
     return m_table->find_first_binary(colIndex, [aBinary getNativeBinary]);
 }
--(NSUInteger)findRowIndexWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
+-(NSUInteger)findRowIndexWithDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->find_first_datetime(colIndex, [aDate timeIntervalSince1970]);
+    return m_table->find_first_datetime(colIndex, aDate);
 }
 -(NSUInteger)findRowIndexWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex
 {
@@ -1419,9 +1419,9 @@ using namespace std;
     tightdb::TableView view = m_table->find_all_binary(colIndex, [aBinary getNativeBinary]);
     return [TDBView viewWithTable:self andNativeView:view];
 }
--(TDBView*)findAllRowsWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
+-(TDBView*)findAllRowsWithDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
 {
-    tightdb::TableView view = m_table->find_all_datetime(colIndex, [aDate timeIntervalSince1970]);
+    tightdb::TableView view = m_table->find_all_datetime(colIndex, aDate);
     return [TDBView viewWithTable:self andNativeView:view];
 }
 -(TDBView*)findAllRowsWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex
@@ -1657,7 +1657,7 @@ using namespace std;
 @end
 
 @implementation TDBColumnProxy_Date
--(NSUInteger)find:(NSDate *)value
+-(NSUInteger)find:(time_t)value
 {
     return [self.table findRowIndexWithDate:value inColumnWithIndex:self.column];
 }

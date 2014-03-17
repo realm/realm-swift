@@ -859,7 +859,7 @@
     const char bin[4] = { 0, 1, 2, 3 };
     TDBBinary* bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
     TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
-    NSDate *timeNow = [NSDate date];
+    time_t timeNow = [[NSDate date] timeIntervalSince1970];
 
     TDBTable* subtab1 = [[TDBTable alloc] init];
     [subtab1 addColumnWithName:@"TableCol_IntCol" andType:TDBIntType];
@@ -897,13 +897,12 @@
     [c setDouble:  8.8       inColumnWithIndex:DoubleCol];
     [c setString:  @"banach" inColumnWithIndex:StringCol];
     [c setBinary:  bin2      inColumnWithIndex:BinaryCol];
-    [c setDate:    [NSDate date]   inColumnWithIndex:DateCol];
+    [c setDate:    timeNow   inColumnWithIndex:DateCol];
     [c setTable:   subtab2   inColumnWithIndex:TableCol];
     [c setMixed:   mixSubtab inColumnWithIndex:MixedCol];
 
     TDBRow* row1 = [table rowAtIndex:0];
     TDBRow* row2 = [table rowAtIndex:1];
-    
 
     STAssertEquals([row1 boolInColumnWithIndex:BoolCol], NO, @"row1.BoolCol");
     STAssertEquals([row2 boolInColumnWithIndex:BoolCol], YES,                @"row2.BoolCol");
@@ -917,8 +916,8 @@
     STAssertTrue([[row2 stringInColumnWithIndex:StringCol] isEqual:@"banach"], @"row2.StringCol");
     STAssertTrue([[row1 binaryInColumnWithIndex:BinaryCol] isEqual:bin1],      @"row1.BinaryCol");
     STAssertTrue([[row2 binaryInColumnWithIndex:BinaryCol] isEqual:bin2],      @"row2.BinaryCol");
-    STAssertEqualObjects([row1 dateInColumnWithIndex:DateCol], (time_t)0,          @"row1.DateCol");
-    STAssertEquals([[row2 dateInColumnWithIndex:DateCol] timeIntervalSince1970], [timeNow timeIntervalSince1970],            @"row2.DateCol");
+    STAssertEquals([row1 dateInColumnWithIndex:DateCol], (time_t)0,          @"row1.DateCol");
+    STAssertEquals([row2 dateInColumnWithIndex:DateCol], timeNow,            @"row2.DateCol");
     STAssertTrue([[row1 tableInColumnWithIndex:TableCol] isEqual:subtab1],    @"row1.TableCol");
     STAssertTrue([[row2 tableInColumnWithIndex:TableCol] isEqual:subtab2],    @"row2.TableCol");
     STAssertTrue([[row1 mixedInColumnWithIndex:MixedCol] isEqual:mixInt1],    @"row1.MixedCol");

@@ -32,7 +32,7 @@
     for (size_t i = 0; i < 15; ++i) {
         [table TDBInsertInt:0 ndx:i value:i];
         [table TDBInsertBool:1 ndx:i value:(i % 2 ? YES : NO)];
-        [table TDBInsertDate:2 ndx:i value:[NSDate date]];
+        [table TDBInsertDate:2 ndx:i value:12345];
         [table TDBInsertString:3 ndx:i value:[NSString stringWithFormat:@"string %zu", i]];
         [table TDBInsertString:4 ndx:i value:@" Very long string.............."];
 

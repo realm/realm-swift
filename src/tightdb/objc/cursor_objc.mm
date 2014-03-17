@@ -65,7 +65,7 @@ using namespace std;
         case TDBStringType:
             return [_table stringInColumnWithIndex:colNdx atRowIndex:_ndx];
         case TDBDateType:
-            return [_table dateInColumnWithIndex:colNdx atRowIndex:_ndx];
+            return [NSDate dateWithTimeIntervalSince1970:[_table dateInColumnWithIndex:colNdx atRowIndex:_ndx]];
         case TDBBinaryType:
             return [_table binaryInColumnWithIndex:colNdx atRowIndex:_ndx];
         case TDBTableType:
@@ -108,7 +108,7 @@ using namespace std;
         case TDBDateType:
             if ([obj isKindOfClass:[NSDate class]])
                 [NSException raise:@"TypeException" format:@"Inserting non-date obj into date column"];
-            [_table setDate:(NSDate *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
+            [_table setDate:time_t([obj timeIntervalSince1970]) inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
         case TDBBinaryType:
             [_table setBinary:(TDBBinary *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
@@ -159,7 +159,7 @@ using namespace std;
     return [_table doubleInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(NSDate *)dateInColumnWithIndex:(NSUInteger)colNdx
+-(time_t)dateInColumnWithIndex:(NSUInteger)colNdx
 {
     return [_table dateInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -204,7 +204,7 @@ using namespace std;
     [_table setDouble:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(void)setDate:(NSDate *)value inColumnWithIndex:(NSUInteger)colNdx
+-(void)setDate:(time_t)value inColumnWithIndex:(NSUInteger)colNdx
 {
     [_table setDate:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -303,12 +303,12 @@ using namespace std;
 //    return [_cursor.table setBinary:_columnId ndx:_cursor.ndx data:data size:size error:error];
 // }
 
--(NSDate *)getDate
+-(time_t)getDate
 {
     return [_cursor.table dateInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
--(void)setDate:(NSDate *)value
+-(void)setDate:(time_t)value
 {
     [_cursor.table setDate:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
