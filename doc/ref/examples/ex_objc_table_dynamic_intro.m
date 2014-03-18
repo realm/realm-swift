@@ -1,10 +1,8 @@
 /* @@Example: ex_objc_table_dynamic_intro @@ */
 
-#import <tightdb/objc/tightdb.h>
+#import <Tightdb/Tightdb.h>
 
-
-
-int main()
+void ex_objc_table_dynamic_intro()
 {
     @autoreleasepool {
 
