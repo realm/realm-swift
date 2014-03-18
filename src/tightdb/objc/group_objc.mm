@@ -191,8 +191,8 @@ using namespace std;
 
 -(TDBTable *)getTableWithName:(NSString *)name
 {
-    if([self hasTableWithName:name]){
-        return [self getOrCreateTableWithName:name error:nil];
+    if ([self hasTableWithName:name]) {
+        return [self getOrCreateTableWithName:name];
     }
     
     return nil;

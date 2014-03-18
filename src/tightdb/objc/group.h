@@ -55,7 +55,7 @@
 
 
 /**
- * This method returns a table with the specified from the group.
+ * This method returns a table with the specified name from the group.
  * Returns nil if no table with the specified name exists.
  */
 -(TDBTable *)getTableWithName:(NSString *)name;
