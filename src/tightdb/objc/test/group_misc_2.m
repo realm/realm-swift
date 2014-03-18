@@ -44,7 +44,7 @@ TIGHTDB_TABLE_2(QueryTable,
     TDBGroup* group = [TDBGroup group];
     NSLog(@"HasTable: %i", [group hasTableWithName:@"employees" withTableClass:[MyTable class]] );
     // Create new table in group
-    MyTable* table = [group getOrCreateTableWithName:@"employees" asTableClass:[MyTable class] error:nil];
+    MyTable* table = [group getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
     NSLog(@"Table: %@", table);
     NSLog(@"HasTable: %i", [group hasTableWithName:@"employees" withTableClass:[MyTable class]] );
 
@@ -110,7 +110,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Load a group from disk (and print contents)
     TDBGroup* fromDisk = [TDBGroup groupWithFile:@"employees.tightdb" withError:nil];
-    MyTable* diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[MyTable class] error:nil];
+    MyTable* diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
 //    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
@@ -127,7 +127,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Load a group from memory (and print contents)
     TDBGroup* fromMem = [TDBGroup groupWithBuffer:buffer withError:nil];
-    MyTable* memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[MyTable class] error:nil];
+    MyTable* memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         // ??? cursor
         NSLog(@"%zu: %@", i, memTable.Name);
@@ -138,7 +138,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testQuery
 {
     TDBGroup* group = [TDBGroup group];
-    QueryTable* table = [group getOrCreateTableWithName:@"Query table" asTableClass:[QueryTable class] error:nil];
+    QueryTable* table = [group getOrCreateTableWithName:@"Query table" asTableClass:[QueryTable class]];
 
     // Add some rows
     [table addFirst:2 Second:@"a"];
@@ -195,7 +195,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testSubtables
 {
     TDBGroup* group = [TDBGroup group];
-    TDBTable* table = [group getOrCreateTableWithName:@"table" asTableClass:[TDBTable class] error:nil];
+    TDBTable* table = [group getOrCreateTableWithName:@"table" asTableClass:[TDBTable class]];
 
     // Specify the table type
     {

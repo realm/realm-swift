@@ -202,11 +202,11 @@ using namespace std;
 {
     if (!m_group->has_table(ObjcStringAccessor(name)))
         return NO;
-    TDBTable* table = [self getOrCreateTableWithName:name asTableClass:class_obj error:nil];
+    TDBTable* table = [self getOrCreateTableWithName:name asTableClass:class_obj];
     return table != nil;
 }
 
--(id)getOrCreateTableWithName:(NSString*)name error:(NSError**)error
+-(id)getOrCreateTableWithName:(NSString*)name
 {
     // FIXME: Read-only errors should probably be handled by throwing
     // an exception. That is what is done in other places in this
@@ -216,8 +216,6 @@ using namespace std;
         // A group is readonly when it has been extracted from a shared group in a read transaction.
         // In this case, getTable should return nil for non-existing tables.
         if (![self hasTableWithName:name]) {
-            if (error) // allow nil as the error argument
-                *error = make_tightdb_error(tdb_err_TableNotFound, @"The table was not found. Cannot create the table in read only mode.");
             return nil;
         }
     }
@@ -234,7 +232,7 @@ using namespace std;
 }
 
 // FIXME: Check that the specified class derives from Table.
--(id)getOrCreateTableWithName:(NSString*)name asTableClass:(__unsafe_unretained Class)class_obj error:(NSError* __autoreleasing*)error
+-(id)getOrCreateTableWithName:(NSString*)name asTableClass:(__unsafe_unretained Class)class_obj
 {
     // FIXME: Read-only errors should probably be handled by throwing
     // an exception. That is what is done in other places in this
@@ -244,8 +242,6 @@ using namespace std;
         // A group is readonly when it has been extracted from a shared group in a read transaction.
         // In this case, getTable should return nil for non-existing tables.
         if (![self hasTableWithName:name]) {
-            if (error) // allow nil as the error argument
-                *error = make_tightdb_error(tdb_err_TableNotFound, @"The table was not found. Cannot create the table in read only mode.");
             return nil;
         }
     }
