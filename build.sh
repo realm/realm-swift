@@ -344,9 +344,9 @@ EOF
 
     "get-version")
 	version_file="src/tightdb/objc/version.h"
-	tightdb_version_major="$(grep Tightdb_Version_Major $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	tightdb_version_minor="$(grep Tightdb_Version_Minor $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	tightdb_version_patch="$(grep Tightdb_Version_Patch $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+	tightdb_version_major="$(grep TDB_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+	tightdb_version_minor="$(grep TDB_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+	tightdb_version_patch="$(grep TDB_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
 	echo "$tightdb_version_major.$tightdb_version_minor.$tightdb_version_patch"
 	exit 0
 	;;
@@ -362,9 +362,9 @@ EOF
         tightdb_ver_minor="$(echo "$tightdb_version" | cut -f2 -d.)" || exit 1
         tightdb_ver_patch="$(echo "$tightdb_version" | cut -f3 -d.)" || exit 1
 
-	sed -i '' -e "s/Tightdb_Version_Major .*$/Tightdb_Version_Major $tightdb_ver_major/" $version_file || exit 1
-	sed -i '' -e "s/Tightdb_Version_Minor .*$/Tightdb_Version_Minor $tightdb_ver_minor/" $version_file || exit 1
-	sed -i '' -e "s/Tightdb_Version_Patch .*$/Tightdb_Version_Patch $tightdb_ver_patch/" $version_file || exit 1
+	sed -i '' -e "s/Tightdb_Version_Major .*$/TDB_VERSION_MAJOR $tightdb_ver_major/" $version_file || exit 1
+	sed -i '' -e "s/Tightdb_Version_Minor .*$/TDB_VERSION_MINOR $tightdb_ver_minor/" $version_file || exit 1
+	sed -i '' -e "s/Tightdb_Version_Patch .*$/TDB_VERSION_PATCH $tightdb_ver_patch/" $version_file || exit 1
 	exit 0
 	;;
 
@@ -598,7 +598,7 @@ EOF
         export TIGHTDB_OBJC_INCLUDEDIR="$install_includedir"
         export TIGHTDB_OBJC_LIBDIR="$install_libdir"
         $MAKE -C "test-installed" clean || exit 1
-        $MAKE -C "test-installed" check  || exit 1
+        $MAKE -C "test-installed" check || exit 1
         echo "Test passed"
         exit 0
         ;;

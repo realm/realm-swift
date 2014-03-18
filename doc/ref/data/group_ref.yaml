@@ -58,10 +58,12 @@ CATEGORIES:
 - Table:
   METHODS:
   - g_group_has_table:
-      NAME     : hasTable
+      NAME     : "hasTableWithName:"
       SUMMARY  : *g_group_has_table_summary
       DESCR    : *g_group_has_table_descr
-      SIGNATURE: (BOOL)hasTable:(NSString *)name withClass:(Class)obj;
+      SIGNATURE: |
+                  (BOOL)hasTableWithName:(NSString *)name
+                  (BOOL)hasTableWithName:(NSString *)name withTableClass:(Class)obj
       PARAMS:
       - NAME   : name
         TYPES  : NSString *
@@ -76,12 +78,12 @@ CATEGORIES:
       - DESCR  :
         CODE   : ex_objc_group_optional_table
   - g_group_get_table:
-      NAMES    : getTable
+      NAMES    : "getTableWithName:"
       SUMMARY  : *g_group_get_table_summary
       DESCR    : *g_group_get_table_descr
       SIGNATURE: |
-                 (TightdbTable *)getTable:(NSString *)name;
-                 (id)getTable:(NSString *)name withClass:(Class)obj;
+                 (TDBTable *)getTable:(NSString *)name
+                 (id)getTable:(NSString *)name withClass:(Class)obj
       PARAMS:
       - NAME   : name
         TYPES  : NSString
@@ -90,7 +92,30 @@ CATEGORIES:
         TYPES  : Class
         DESCR  : *g_group_get_table_parm2_descr
       RETURN:
-        TYPES  : TightdbTable *
+        TYPES  : TDBTable *
+        DESCR  : *g_group_get_table_return1_descr
+      EXAMPLES:
+      -  DESCR :
+         CODE  : ex_objc_group_traverse
+      -  DESCR :
+         CODE  : ex_objc_group_optional_table
+      SEE      : "{@link g_group_has_table}"
+  - g_group_get_or_create_table:
+      NAMES    : "getOrCreateTableWithName:"
+      SUMMARY  : Get table from group if it exists. Otherwise create and get it.
+      DESCR    : Get table from group if it exists. Otherwise create and get it.
+      SIGNATURE: |
+                 (TDBTable *)getOrCreateTableWithName:(NSString *)name
+                 (id)getOrCreateTableWithName:(NSString *)name asTableClass:(Class)obj
+      PARAMS:
+      - NAME   : name
+        TYPES  : NSString
+        DESCR  : *g_group_get_table_parm1_descr
+      - NAME   : obj
+        TYPES  : Class
+        DESCR  : *g_group_get_table_parm2_descr
+      RETURN:
+        TYPES  : TDBTable *
         DESCR  : *g_group_get_table_return1_descr
       EXAMPLES:
       -  DESCR :

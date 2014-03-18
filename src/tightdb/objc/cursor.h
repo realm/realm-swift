@@ -20,34 +20,39 @@
 
 #import <Foundation/Foundation.h>
 
-@class TightdbTable;
-@class TightdbBinary;
-@class TightdbMixed;
+@class TDBTable;
+@class TDBBinary;
+@class TDBMixed;
 
-@interface TightdbCursor: NSObject
--(id)initWithTable:(TightdbTable *)table ndx:(size_t)ndx;
--(void)setNdx:(size_t)ndx;
--(size_t)index;
+@interface TDBRow: NSObject
+-(id)initWithTable:(TDBTable *)table ndx:(NSUInteger)ndx;
+-(void)TDBSetNdx:(NSUInteger)ndx;
+-(NSUInteger)TDBIndex;
 
--(void)setInt:(int64_t)value inColumn:(size_t)colNdx;
--(void)setString:(NSString *)value inColumn:(size_t)colNdx;
--(void)setBool:(BOOL)value inColumn:(size_t)colNdx;
--(void)setFloat:(float)value inColumn:(size_t)colNdx;
--(void)setDouble:(double)value inColumn:(size_t)colNdx;
--(void)setDate:(time_t)value inColumn:(size_t)colNdx;
--(void)setBinary:(TightdbBinary *)value inColumn:(size_t)colNdx;
--(void)setMixed:(TightdbMixed *)value inColumn:(size_t)colNdx;
--(void)setTable:(TightdbTable *)value inColumn:(size_t)colNdx;
+-(id)objectAtIndexedSubscript:(NSUInteger)colNdx;
+-(id)objectForKeyedSubscript:(id <NSCopying>)key;
+-(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colNdx;
+-(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key;
 
--(int64_t)getIntInColumn:(size_t)colNdx;
--(NSString *)getStringInColumn:(size_t)colNdx;
--(BOOL)getBoolInColumn:(size_t)colNdx;
--(float)getFloatInColumn:(size_t)colNdx;
--(double)getDoubleInColumn:(size_t)colNdx;
--(time_t)getDateInColumn:(size_t)colNdx;
--(TightdbBinary *)getBinaryInColumn:(size_t)colNdx;
--(TightdbMixed *)getMixedInColumn:(size_t)colNdx;
--(TightdbTable *)getTableInColumn:(size_t)colNdx;
+-(void)setInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setBinary:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setTable:(TDBTable *)aTable inColumnWithIndex:(NSUInteger)colIndex;
+
+-(int64_t)intInColumnWithIndex:(NSUInteger)colIndex;
+-(NSString *)stringInColumnWithIndex:(NSUInteger)colIndex;
+-(BOOL)boolInColumnWithIndex:(NSUInteger)colIndex;
+-(float)floatInColumnWithIndex:(NSUInteger)colIndex;
+-(double)doubleInColumnWithIndex:(NSUInteger)colIndex;
+-(time_t)dateInColumnWithIndex:(NSUInteger)colIndex;
+-(TDBBinary *)binaryInColumnWithIndex:(NSUInteger)colIndex;
+-(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex;
+-(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex;
 
 @end
 
@@ -56,8 +61,8 @@
    macro switching trick for the individual column types on
    TIGHTDB_CURSOR_PROPERTY macros similar to what is done for query
    accessors. */
-@interface TightdbAccessor: NSObject
--(id)initWithCursor:(TightdbCursor *)cursor columnId:(size_t)columnId;
+@interface TDBAccessor: NSObject
+-(id)initWithCursor:(TDBRow *)cursor columnId:(NSUInteger)columnId;
 -(BOOL)getBool;
 -(void)setBool:(BOOL)value;
 -(int64_t)getInt;
@@ -68,12 +73,12 @@
 -(void)setDouble:(double)value;
 -(NSString *)getString;
 -(void)setString:(NSString *)value;
--(TightdbBinary *)getBinary;
--(void)setBinary:(TightdbBinary *)value;
+-(TDBBinary *)getBinary;
+-(void)setBinary:(TDBBinary *)value;
 -(time_t)getDate;
 -(void)setDate:(time_t)value;
--(void)setSubtable:(TightdbTable *)value;
+-(void)setSubtable:(TDBTable *)value;
 -(id)getSubtable:(Class)obj;
--(TightdbMixed *)getMixed;
--(void)setMixed:(TightdbMixed *)value;
+-(TDBMixed *)getMixed;
+-(void)setMixed:(TDBMixed *)value;
 @end

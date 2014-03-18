@@ -1,6 +1,5 @@
 /* @@Example: not_used @@ */
 
-#import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
 
 /* Defines a new table with two columns Name and Age. IMPORTANT: the column
