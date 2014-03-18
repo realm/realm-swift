@@ -71,7 +71,7 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     TDBMixed* mixInt1   = [TDBMixed mixedWithInt64:1];
     TDBMixed* mixSubtab = [TDBMixed mixedWithTable:subtab2];
 
-    TestTableAllTypes_Cursor* c;
+    TestTableAllTypes_Row* c;
 
     c = [table addEmptyRow];
 
@@ -83,8 +83,8 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
         c.BoolCol   = YES  ; c.IntCol  = 506     ; c.FloatCol = 7.7         ; c.DoubleCol = 8.8       ; c.StringCol = @"banach";
         c.BinaryCol = bin2 ; c.DateCol = timeNow ; c.TableCol = subtab2     ; c.MixedCol  = mixSubtab ;
 
-    TestTableAllTypes_Cursor* row1 = [table cursorAtIndex:0];
-    TestTableAllTypes_Cursor* row2 = [table cursorAtIndex:1];
+    TestTableAllTypes_Row* row1 = [table rowAtIndex:0];
+    TestTableAllTypes_Row* row2 = [table rowAtIndex:1];
 
     STAssertEquals(row1.BoolCol, NO,                 @"row1.BoolCol");
     STAssertEquals(row2.BoolCol, YES,                @"row2.BoolCol");
@@ -119,6 +119,8 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     STAssertEquals([table.DoubleCol maximum], 8.8,                      @"DoubleCol max");
     STAssertEquals([table.DoubleCol sum], 0.8 + 8.8,                @"DoubleCol sum");
     STAssertEquals([table.DoubleCol average], (0.8 + 8.8) / 2,          @"DoubleCol avg");
+    
+    
 }
 
 - (void)testTableTyped_Subscripting
