@@ -28,17 +28,8 @@
 
 @property (nonatomic, readonly) NSUInteger tableCount;
 
-+(TDBTransaction *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
 
-/**
- * You pass the ownership of the specified buffer to the group. The
- * buffer will eventually be freed using the C function free(), so
- * the buffer you pass, must have been allocated using C function
- * malloc().
- */
-+(TDBTransaction *)groupWithBuffer:(TDBBinary *)buffer withError:(NSError *__autoreleasing *)error;
 
-+(TDBTransaction *)group;
 
 -(NSString *)getTableName:(NSUInteger)table_ndx;
 
@@ -77,16 +68,7 @@
  */
 -(id)getOrCreateTableWithName:(NSString *)name asTableClass:(Class)obj;
 
-/* Serialization */
--(BOOL)writeToFile:(NSString *)path withError:(NSError *__autoreleasing *)error;
 
-/**
- * The ownership of the returned buffer is transferred to the
- * caller. The buffer will have been allocated using C function
- * malloc(), and it is the responsibility of the caller that C
- * function free() is eventually called to free the buffer.
- */
--(TDBBinary *)writeToBuffer;
 
 @end
 
