@@ -255,4 +255,37 @@
     STAssertThrows([v sortUsingColumnWithIndex:tableCol], @"Not supported on table column");
 }
 
+- (void)testFirstLastRow
+{
+    TDBTable *t = [[TDBTable alloc] init];
+    NSUInteger col0 = [t addColumnWithName:@"col" andType:TDBStringType];
+    NSUInteger col1 = [t addColumnWithName:@"col" andType:TDBIntType];
+    
+    TDBView *v = [[t where] findAllRows];
+    
+    STAssertNil([v firstRow], @"Table is empty");
+    STAssertNil([v lastRow], @"Table is empty");
+    
+    // add empty rows before to filter out
+    [t addEmptyRow];
+    [t addEmptyRow];
+    [t addEmptyRow];
+    
+    NSString *value0 = @"value0";
+    [t appendRow:@[value0, @1]];
+    
+    NSString *value1 = @"value1";
+    [t appendRow:@[value1, @1]];
+    
+    // add empty rows after to filter out
+    [t addEmptyRow];
+    [t addEmptyRow];
+    [t addEmptyRow];
+    
+    v = [[[t where] intIsEqualTo:1 inColumnWithIndex:col1] findAllRows];
+    
+    STAssertEqualObjects(value0, [[v firstRow] stringInColumnWithIndex:col0], nil);
+    STAssertEqualObjects(value1, [[v lastRow] stringInColumnWithIndex:col0], nil);
+}
+
 @end

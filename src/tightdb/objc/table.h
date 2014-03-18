@@ -270,6 +270,8 @@
 @property (nonatomic, readonly) TDBTable *originTable;
 
 -(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
+-(TDBRow *)lastRow;
+-(TDBRow *)firstRow;
 
 -(TDBType)columnTypeOfColumn:(NSUInteger)colIndex;
 
