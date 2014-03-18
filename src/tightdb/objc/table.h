@@ -92,7 +92,6 @@
 @property (nonatomic, readonly) TDBDescriptor *descriptor;
 @property (nonatomic, readonly) NSUInteger rowCount;
 
--(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
 -(BOOL)isEqual:(TDBTable *)other;
 
@@ -296,7 +295,6 @@
 
 -(NSUInteger)rowIndexInOriginTableForRowAtIndex:(NSUInteger)rowIndex;
 
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
 
 /* Private */
 -(id)_initWithQuery:(TDBQuery *)query;

@@ -56,8 +56,6 @@
 
 -(TDBView *)findAllRows;
 
--(NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained *)stackbuf count:(NSUInteger)len;
-
 /* Conditions: */
 
 
