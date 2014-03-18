@@ -592,7 +592,7 @@ EOF
         export TIGHTDB_OBJC_INCLUDEDIR="$install_includedir"
         export TIGHTDB_OBJC_LIBDIR="$install_libdir"
         $MAKE -C "test-installed" clean || exit 1
-        $MAKE -C "test-installed" check  || exit 1
+        $MAKE -C "test-installed" check || exit 1
         echo "Test passed"
         exit 0
         ;;

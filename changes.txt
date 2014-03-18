@@ -1,3 +1,8 @@
+2014-03-17
+==========
++ Added firstRow, lastRow selectors on view.
+* firstRow and lastRow on table now return nil if table is empty.
+
 2014-03-14
 ==========
 ! BREAKING CHANGE: Prepend TDB-prefix on all classes and types.
