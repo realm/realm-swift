@@ -51,7 +51,7 @@ TIGHTDB_TABLE_2(WrongTypeTable,
     [subtable TDBInsertDone];
 
     GetSubtable* testTable = [table tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[GetSubtable class]];
-    GetSubtable_Cursor* cursor = [testTable cursorAtIndex:0];
+    GetSubtable_Row* cursor = [testTable rowAtIndex:0];
     NSLog(@"Age in subtable: %lld", cursor.Age);
     STAssertEquals(cursor.Age, (int64_t)42, @"Sub table row should be 42");
 
