@@ -57,7 +57,7 @@
  * This method returns nil if it encounters a memory allocation error
  * (out of memory).
  */
--(TDBTable *)getOrCreateTableWithName:(NSString *)name error:(NSError *__autoreleasing *)error;
+-(TDBTable *)getOrCreateTableWithName:(NSString *)name;
 
 /**
  * This method returns nil if the group already contains a table with
@@ -68,7 +68,7 @@
  * The specified table class must be one that is declared by using
  * one of the table macros TIGHTDB_TABLE_*.
  */
--(id)getOrCreateTableWithName:(NSString *)name asTableClass:(Class)obj error:(NSError *__autoreleasing *)error;
+-(id)getOrCreateTableWithName:(NSString *)name asTableClass:(Class)obj;
 
 /* Serialization */
 -(BOOL)writeToFile:(NSString *)path withError:(NSError *__autoreleasing *)error;

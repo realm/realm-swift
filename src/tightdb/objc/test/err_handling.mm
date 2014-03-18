@@ -62,7 +62,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     TDBGroup* group = [TDBGroup group];
     // Create new table in group
-    PeopleErrTable* people = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleErrTable class] error:nil];
+    PeopleErrTable* people = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
     // No longer supports errors, the tes may be redundant
     // Add some rows
@@ -139,7 +139,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
         STFail(@"File should have been possible to open");
     }
 
-    PeopleErrTable* diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PeopleErrTable class] error:nil];
+    PeopleErrTable* diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
     // Fake readonly.
     [((TDBTable*)diskTable) setReadOnly:true];
