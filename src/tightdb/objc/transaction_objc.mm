@@ -6,7 +6,7 @@
 #include <tightdb/group.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
-#import <tightdb/objc/group.h>
+#import <tightdb/objc/transaction.h>
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/table_priv.h>
 
