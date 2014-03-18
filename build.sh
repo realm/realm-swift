@@ -470,7 +470,9 @@ EOF
         mkdir -p "$TEMP_DIR/unit-tests.octest/Contents/MacOS" || exit 1
         cp "src/tightdb/objc/test/unit-tests" "$TEMP_DIR/unit-tests.octest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests.octest" || exit 1
+        path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
+        export DYLD_LIBRARY_PATH
+        OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests.octest" || exit 1
         echo "Test passed"
         exit 0
         ;;
@@ -482,7 +484,9 @@ EOF
         mkdir -p "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS" || exit 1
         cp "src/tightdb/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest" || exit 1
+        path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
+        export DYLD_LIBRARY_PATH
+        OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest" || exit 1
         echo "Test passed"
         exit 0
         ;;
@@ -494,7 +498,9 @@ EOF
         mkdir -p "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS" || exit 1
         cp "src/tightdb/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" OBJC_DISABLE_GC=YES gdb --args "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest"
+        path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
+        export DYLD_LIBRARY_PATH
+        OBJC_DISABLE_GC=YES gdb --args "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest"
         ;;
 
     "check-doc-examples")
