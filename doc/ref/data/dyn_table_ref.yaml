@@ -27,27 +27,15 @@ CATEGORIES :
 - State:
   METHODS:
   - g_dyn_table_size:
-      NAME     : count
+      NAME     : "rowCount:"
       SUMMARY  : *g_dyn_table_size_summary
       DESCR    : *g_dyn_table_size_descr
-      SIGNATURE: (size_t)count
+      SIGNATURE: "@property (nonatomic, readonly) NSUInteger rowCount"
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_size_summary
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_size
-        DESCR  :
-
-  - g_dyn_table_is_empty:
-      NAME     : isEmpty
-      SUMMARY  : *g_dyn_table_is_empty_summary
-      DESCR    : *g_dyn_table_is_empty_descr
-      SIGNATURE: (BOOL)isEmpty
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : *g_dyn_table_is_empty_return_descr
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_is_empty
         DESCR  :
 
   - g_dyn_table_is_valid:
@@ -66,31 +54,31 @@ CATEGORIES :
 - Table:
   METHODS:
   - g_dyn_table_clear:
-      NAME     : clear
+      NAME     : "removeAllRows:"
       SUMMARY  : *g_dyn_table_clear_summary
       DESCR    : *g_dyn_table_clear_descr
-      SIGNATURE: (void)clear
+      SIGNATURE: (BOOL)removeAllRows
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_clear
         DESCR  :
 
   - g_dyn_table_optimize:
-      NAME     : optimize
+      NAME     : "optimize"
       SUMMARY  : *g_table_optimize_summary
       DESCR    : *g_table_optimize_descr
-      SIGNATURE: (void)optimize
+      SIGNATURE: (BOOL)optimize
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_optimize
         DESCR  :
 
   - g_dyn_table_opertator==:
-      NAME     : isEqual
+      NAME     : "isEqual:"
       SUMMARY  : *g_dyn_table_operator_eq_summary
       DESCR    : *g_dyn_table_operator_eq_descr
-      SIGNATURE: (BOOL)isEqual:(TightdbTable *)other
+      SIGNATURE: (BOOL)isEqual:(TDBTable *)other
       PARAMS:
       - NAME   : other
-        TYPES  : TightdbTable *
+        TYPES  : TDBTable *
         DESCR  : *g_dyn_table_operator_eq_table_descr
       RETURN:
         TYPES  : BOOL
@@ -127,7 +115,7 @@ CATEGORIES :
       TODO     : later
 
   - g_dyn_table_add_column:
-      NAME     : addColumn
+      NAME     : "addColumnWithName:andType:"
       SUMMARY  : *g_dyn_table_add_column_summary
       DESCR    :
       - TEXT   : *g_dyn_table_add_column_descr
@@ -144,34 +132,41 @@ CATEGORIES :
                    <li><code>tightdb_Date</code></li>
                    <li><code>tightdb_Mixed</code></li>
                  </ul>
-      SIGNATURE: (size_t)addColumn
+      SIGNATURE: (NSUInteger)addColumnWithName:(NSString *)name andType:(TDBType)type
+      PARAMS:
+      - NAME   : name
+        TYPES  : NSString *
+        DESCR  : ""
+      - NAME   : type
+        TYPES  : TDBType
+        DESCR  : ""
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_add_column_return_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_add_column
         DESCR  :
 
   - g_dyn_table_get_column_count:
-      NAME     : getColumnCount
+      NAME     : columnCount
       SUMMARY  : *g_dyn_table_get_column_count_summary
       DESCR    : *g_dyn_table_get_column_count_descr
-      SIGNATURE: (size_t)getColumnCount
+      SIGNATURE: "@property (nonatomic, readonly) NSUInteger columnCount"
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_get_column_count_return_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_get_column_count
         DESCR  :
 
   - g_dyn_table_get_column_name:
-      NAME     : getColumnName
+      NAME     : "columnNameOfColumn:"
       SUMMARY  : *g_dyn_table_get_column_name_summary
       DESCR    : *g_dyn_table_get_column_name_descr
-      SIGNATURE: (NSString *)getColumnName:(size_t)ndx
+      SIGNATURE: (NSString *)columnNameOfColumn:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : ndx
-        TYPES  : size_t
+      - NAME   : colIndex
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_get_column_name_param1_descr
       RETURN:
         TYPES  : NSString *
@@ -181,23 +176,23 @@ CATEGORIES :
         DESCR  :
 
   - g_dyn_table_get_column_index:
-      NAME     : getColumnIndex
+      NAME     : "indexOfColumnWithName:"
       SUMMARY  : *g_dyn_table_get_column_index_summary
       DESCR    : *g_dyn_table_get_column_index_descr
-      SIGNATURE: (size_t)getColumnIndex:(NSString *)name
+      SIGNATURE: (NSUInteger)indexOfColumnWithName:(NSString *)name
       PARAMS:
       - NAME   : name
         TYPES  : NSString *
         DESCR  : *g_dyn_table_name_of_column_descr
       RETURN:
-        TYPES  : size_t
-        DESCR  : The column index or <code>size_t(-1)</code> if there is no column with the specified name.
+        TYPES  : NSUInteger
+        DESCR  : The column index or <code>-1</code> if there is no column with the specified name.
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_get_column_index
         DESCR  : ""
 
   - g_dyn_table_get_column_type:
-      NAME     : getColumnType
+      NAME     : "columnTypeOfColumn:"
       SUMMARY  : *g_dyn_table_get_column_type_summary
       DESCR    :
       - TEXT   : *g_dyn_table_get_column_type_descr1
@@ -213,13 +208,13 @@ CATEGORIES :
                    <li><code>tightdb_Date</code></li>
                    <li><code>tightdb_Mixed</code></li>
                  </ul>
-      SIGNATURE: (TightdbType)getColumnType:(size_t)ndx
+      SIGNATURE: (TDBType)columnTypeOfColumn:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : ndx
-        TYPES  : size_t
+      - NAME   : colIndex
+        TYPES  : NSUInteger
         DESCR  : g_dyn_table_get_column_type_parm1_descr
       RETURN:
-        TYPES  : DataType
+        TYPES  : TDBType
         DESCR  : *g_dyn_table_get_column_type_return1_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_get_column_type
@@ -232,62 +227,81 @@ CATEGORIES :
 - Rows:
   METHODS:
   - g_dyn_table_cursor_at_index:
-      NAME     : cursorAtIndex
+      NAME     : "rowAtIndex:"
       SUMMARY  : Returns a cursor at a specified row number.
       DESCR    : *g_typed_table_cursor_at_index_descr
-      SIGNATURE: "- (TightdbCursor *)cursorAtIndex:(size_t)ndx"
+      SIGNATURE: "(TDBRow *)rowAtIndex:(NSUInteger)rowIndex"
       PARAMS:
-      - NAME   : ndx
-        TYPES  : size_t
+      - NAME   : rowIndex
+        TYPES  : NSUInteger
         DESCR  : The row number.
       RETURN:
-        TYPES  : TightdbCursor *
-        DESCR  : The cursor.
+        TYPES  : TDBRow *
+        DESCR  : The row.
 
   - g_dyn_table_cursor_at_last_index:
-      NAME     : cursorAtLastIndex
+      NAME     : lastRow
       SUMMARY  : Returns a typed curser at highest row number.
       DESCR    : *g_typed_table_cursor_at_index_descr
-      SIGNATURE: "- (TightdbCursor *)cursorAtLastIndex"
+      SIGNATURE: "(TDBRow *)lastRow"
       RETURN:
-        TYPES  : TightdbCursor *
-        DESCR  : The cursor.
+        TYPES  : TDBRow *
+        DESCR  : The row.
 
   - g_dyn_table_add_empty_row:
       NAME     : addEmptyRow
       SUMMARY  : *objc_typed_table_add_empty_row_summary
       DESCR    : *objc_typed_table_add_empty_row_descr
-      SIGNATURE: -(TightdbCursor *)addEmptyRow
+      SIGNATURE: (TDBRow *)addEmptyRow
       RETURN:
-        TYPES  : TightdbCursor *
-        DESCR  : Returns a dynamic cursor at the added row.
+        TYPES  : TDBRow *
+        DESCR  : Returns the inserted row.
 
   - g_dyn_table_insert_empty_row:
-      NAME     : insertRowAtIndex
+      NAME     : "insertEmptyRowAtIndex:"
       SUMMARY  : *g_dyn_table_insert_empty_row_summary
       DESCR    : *g_dyn_table_insert_empty_row_descr
-      SIGNATURE: -(TightdbCursor *)insertRowAtIndex:(size_t)ndx
+      SIGNATURE: (TDBRow *)insertEmptyRowAtIndex:(NSUInteger)rowIndex
       PARAMS:
-      - NAME   : ndx
-        TYPES  : size_t
+      - NAME   : rowIndex
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_insert_empty_row_parm1_descr
       RETURN:
-        TYPES  : TightdbCursor *
-        DESCR  : Returns a dynamic cursor at the inseted row.
+        TYPES  : TDBRow *
+        DESCR  : Returns the inserted row.
+
+  - objc_dyn_table_insert_object:
+      NAME     : "insertRow:atRowIndex:"
+      SUMMARY  : Insert a row.
+      DESCR    : >
+                 This method will insert a row in the table at a particular
+                 place. The row is optionally represented as Cocoa (NS) objects,
+                 otherwise an empty row is inserted.
+      SIGNATURE: (BOOL)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
+      PARAMS:
+      - NAME    : anObject
+        TYPES   : id
+        DESCR   : The row either as a <code>NSArray</code> or <code>NSDictionary</code>.
+      - NAME    : rowIndex
+        TYPES   : NSUInteger
+        DESCR   : *g_dyn_table_insert_empty_row_parm1_descr
+      RETURN:
+        TYPES  : BOOL
+        DESCR  : <code>YES</code> if elements are valid and row inserted, <code>NO</code> otherwise.
 
   - objc_dyn_table_append_row:
-      NAME     : appendRow
+      NAME     : "appendRow:"
       SUMMARY  : Append a row using object literals.
       DESCR    : >
                  This method will append (insert at the end) a row to a table.
                  The row is represented as Cocoa (NS) objects as elements in
                  array. The elements' types are validated before creating the
                  new row.
-      SIGNATURE: -(BOOL)appendRow:(NSArray*)data
+      SIGNATURE: (BOOL)appendRow:(NSObject *)data
       PARAMS:
       - NAME   : data
-        TYPES  : NSArray *
-        DESCR  : The row
+        TYPES  : NSObject *
+        DESCR  : The row either as a <code>NSArray</code> or <code>NSDictionary</code>.
       RETURN:
         TYPES  : BOOL
         DESCR  : <code>YES</code> if elements are valid and row inserted, <code>NO</code> otherwise.
@@ -353,26 +367,29 @@ CATEGORIES :
 #      SEE      : "For a safe way to insert rows, use {@link g_dyn_table_insert_empty_row}, and then set individual values in the columns."
 
   - g_dyn_table_remove_row:
-      NAME     : removeRowAtIndex
+      NAME     : "removeRowAtIndex:"
       SUMMARY  : *g_dyn_table_remove_row_summary
       DESCR    : *g_dyn_table_remove_row_descr
-      SIGNATURE: (void)removeRowAtIndex:(size_t)ndx
+      SIGNATURE: (BOOL)removeRowAtIndex:(NSUInteger)rowIndex
       PARAMS:
-      - NAME   : ndx
-        TYPES  : size_t
+      - NAME   : rowIndex
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_remove_row_param1_descr
+      RETURN:
+        TYPES  : BOOL
+        DESCR  :  ""
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_remove
-        DESCR  :
+        DESCR  : ""
 
   - g_dyn_table_remove_last_row:
       NAME     : removeLastRow
       SUMMARY  : *g_dyn_table_remove_last_row_summary
       DESCR    : *g_dyn_table_remove_last_row_descr
-      SIGNATURE: (void)removeLastRow
+      SIGNATURE: (BOOL)removeLastRow
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_remove_last_row
-        DESCR  :
+        DESCR  : ""
 
 #- Values:
 #  METHODS:
@@ -498,67 +515,30 @@ CATEGORIES :
  #     - CODE   : ex_objc_dyn_table_set_xxx
  #       DESCR  :
 
-- Sub-tables:
-  METHODS:
-  - g_dyn_table_get_subtable_size:
-      NAME     : getTableSize
-      SUMMARY  : *g_dyn_table_get_subtable_size_summary
-      DESCR    : *g_dyn_table_get_subtable_size_descr
-      SIGNATURE: (size_t)getTableSize:(size_t)col_ndx ndx:(size_t)row_ndx
-      PARAMS:
-      - NAME   : col_ndx
-        TYPES  : size_t
-        DESCR  : *g_dyn_table_get_xxx_parm1_descr
-      - NAME   : row_ndx
-        TYPES  : size_t
-        DESCR  : *g_dyn_table_get_xxx_parm2_descr
-      RETURN:
-        TYPES  : size_t
-        DESCR  : *g_dyn_table_get_subtable_size_return_descr
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_get_subtable
-        DESCR  :
-
-  - g_dyn_table_clear_subtable:
-      NAME     : clearSubtable
-      SUMMARY  : *g_dyn_table_clear_subtable_summary
-      DESCR    : *g_dyn_table_clear_subtable_descr
-      SIGNATURE: (void)clearSubtable:(size_t)col_ndx ndx:(size_t)row_ndx
-      PARAMS:
-      - NAME   : col_ndx
-        TYPES  : size_t
-        DESCR  : *g_dyn_table_get_xxx_parm1_descr
-      - NAME   : row_ndx
-        TYPES  : size_t
-        DESCR  : *g_dyn_table_get_xxx_parm2_descr
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_clear_subtable
-        DESCR  :
-
 
 - Indexes:
   METHODS:
   - g_dyn_table_set_index:
-      NAME     : setIndex
+      NAME     : "createIndexInColumnWithIndex:"
       SUMMARY  : *g_dyn_table_set_index_summary
       DESCR    : *g_dyn_table_set_index_descr
-      SIGNATURE: (void)setIndex:(size_t)col_ndx
+      SIGNATURE: (void)createIndexInColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : col_ndx
-        TYPES  : size_t
+      - NAME   : colIndex
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_get_xxx_parm1_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_set_index
         DESCR  :
 
   - g_dyn_table_has_index:
-      NAME     : hasIndex
+      NAME     : "isIndexCreatedInColumnWithIndex:"
       SUMMARY  : *g_dyn_table_has_index_summary
       DESCR    : *g_dyn_table_has_index_descr
-      SIGNATURE: (BOOL)hasIndex:(size_t)col_ndx
+      SIGNATURE: (BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex;
       PARAMS:
-      - NAME   : col_ndx
-        TYPES  : size_t
+      - NAME   : colIndex
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_get_xxx_parm1_descr
       RETURN:
         TYPES  : BOOL
@@ -731,14 +711,14 @@ CATEGORIES :
       IGNORE   : ""
   - g_dyn_table_where:
       NAME     : where
-      SIGNATURE: (TightdbQuery *) where
+      SIGNATURE: (TDBQuery *) where
       SUMMARY  : *g_dyn_table_where_summary
       DESCR    : *g_dyn_table_where_descr
       RETURN:
-        TYPES  : Query
+        TYPES  : TDBQuery
         DESCR  : *g_dyn_table_where_return_descr
       EXAMPLES:
-      - DESCR  :
+      - DESCR  : ""
         CODE   : ex_objc_dyn_table_where
 
 
@@ -751,26 +731,26 @@ CATEGORIES :
   - g_dyn_table_count_double:
       NAME     : countDouble
   - g_dyn_table_count_string:
-      NAME     : countString
-      TITLE    : countWith*Column
+      NAME     : countRowsWith
+      TITLE    : "countRowsWith*Column:inColumnWithIndex:"
       SUMMARY  : *g_dyn_table_count_summary
       DESCR    : *g_dyn_table_count_descr
       SIGNATURE: |
-                 (size_t)countWithIntColumn:(size_t)colNdx andValue:(int64_t)target
-                 (size_t)countWithFloatColumn:(size_t)colNdx andValue:(float)target
-                 (size_t)countWithDoubleColumn:(size_t)colNdx andValue:(double)target
-                 (size_t)countWithStringColumn:(size_t)colNdx andValue:(NSString *)target
+                 (NSUInteger)countRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+                 (NSUInteger)countRowsWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+                 (NSUInteger)countRowsWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
+                 (NSUInteger)countRowsWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : colNdx
-        TYPES  : size_t
+      - NAME   : colIndex
+        TYPES  : NSUInteger
         DESCR  :
         - TEXT : *g_dyn_table_count_parm1_descr0
         - TEXT : *g_dyn_table_count_parm1_descr1
-      - NAME   : target
+      - NAME   : anInt
         TYPES  : int64_t
         DESCR  : *g_dyn_table_count_parm2_descr
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_count_return_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_count
@@ -780,16 +760,16 @@ CATEGORIES :
   - g_dyn_table_sum_float:
   - g_dyn_table_sum_double:
       NAMES    : [sumInt, sumFloat, sumDouble]
-      TITLE    : sumWith*Column
+      TITLE    : "sum*ColumnWithIndex:"
       SUMMARY  : *g_dyn_table_sum_summary
       DESCR    : *g_dyn_table_sum_descr
       SIGNATURE: |
-                 (int64_t)sumWithIntColumn:(size_t)colNdx
-                 (double)sumWithFloatColumn:(size_t)colNdx
-                 (double)sumWithDoubleColumn:(size_t)colNdx
+                 (int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex
+                 (double)sumFloatColumnWithIndex:(NSUInteger)colIndex
+                 (double)sumDoubleColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : colNdx
-        TYPES  : size_t
+      - NAME   : colIndex
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_sum_parm1_descr
       RETURN:
         TYPES  : [int64_t, double]
@@ -802,17 +782,17 @@ CATEGORIES :
   - g_dyn_table_maximum_float:
   - g_dyn_table_maximum_double:
       NAMES    : [maxInt, maxFloat, maximumDouble]
-      TITLE    : maximumWith*Column
+      TITLE    : "max*InColumnWithIndex:"
       SUMMARY  : *g_dyn_table_maximum_summary
       DESCR    : *g_dyn_table_maximum_descr
       SIGNATURE: |
-                 (int64_t)maximumWithIntColumn:(size_t)colNdx
-                 (float)maximumWithFloatColumn:(size_t)colNdx
-                 (double)maximumWithDoubleColumn:(size_t)colNdx
+                 (int64_t)maxIntInColumnWithIndex:(NSUInteger)colIndex
+                 (float)maxFloatInColumnWithIndex:(NSUInteger)colIndex
+                 (double)maxDoubleInColumnWithIndex:(NSUInteger)colIndex
       CONST    : True
       PARAMS:
-      - NAME   : colNdx
-        TYPES  : size_t
+      - NAME   : colIndex
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_maximum_parm1_descr
       RETURN:
         TYPES  : [int64_t, float, double]
@@ -825,16 +805,16 @@ CATEGORIES :
   - g_dyn_table_minimum_float:
   - g_dyn_table_minimum_double:
       NAMES    : [minInt, minimumFloat, minimumDouble]
-      TITLE    : minimumWith*Column
+      TITLE    : "min*InColumnWithIndex:"
       SUMMARY  : *g_dyn_table_minimum_summary
       DESCR    : *g_dyn_table_minimum_descr
       SIGNATURE: |
-                 (int64_t)minimumWithIntColumn:(size_t)colNdx
-                 (float)minimumWithFloatColumn:(size_t)colNdx
-                 (double)minimumWithDoubleColumn:(size_t)colNdx
+                 (int64_t)minIntInColumnWithIndex:(NSUInteger)colIndex
+                 (float)minFloatInColumnWithIndex:(NSUInteger)colIndex
+                 (double)minDoubleInColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : colNdx
-        TYPES  : size_t
+      - NAME   : colIndex
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_maximum_parm1_descr
       RETURN:
         TYPES  : [int64_t, float, double]
@@ -847,16 +827,16 @@ CATEGORIES :
   - g_dyn_table_average_float:
   - g_dyn_table_average_double:
       NAMES    : [avgInt, averageFloat, averageDouble]
-      TITLE    : "averageWith*Column"
+      TITLE    : "avg*ColumnWithIndex:"
       SUMMARY  : *g_dyn_table_average_summary
       DESCR    : *g_dyn_table_average_descr
       SIGNATURE: |
-                 (double)averageWithIntColumn:(size_t)colNdx
-                 (double)averageWithFloatColumn:(size_t)colNdx
-                 (double)averageWithDoubleColumn:(size_t)colNdx
+                 (double)avgIntColumnWithIndex:(NSUInteger)colIndex
+                 (double)avgFloatColumnWithIndex:(NSUInteger)colIndex
+                 (double)avgDoubleColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : colNdx
-        TYPES  : size_t
+      - NAME   : colIndex
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_maximum_parm1_descr
       RETURN:
         TYPES  : double

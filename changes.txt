@@ -1,3 +1,34 @@
+2014-03-18
+==========
++ getTableWithName selector added on group.
+* getting and creating table methods on group no longer take error argument.
+
+2014-03-17
+==========
++ Added firstRow, lastRow selectors on view.
+* firstRow and lastRow on table now return nil if table is empty.
+
+2014-03-14
+==========
+! BREAKING CHANGE: Prepend TDB-prefix on all classes and types.
+
+2014-03-13
+==========
++ Adding setObject to TightdbTable (t[2] = @[@1, @"Hello"] is possible).
+
+2014-03-12
+==========
++ Adding insertRow to TightdbTable.
+
+2014-03-11
+==========
+* Extending appendRow to accept NSDictionary.
+! BREAKING CHANGE: Most selectors have been renamed in the binding!
+
+2014-03-10
+==========
+* Return types and parameters changed from size_t to NSUInteger.
+
 2014-03-07
 ==========
 * Adding appendRow to TightdbTable.

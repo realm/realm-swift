@@ -1,8 +1,5 @@
 /* @@Example: ex_objc_sharedgroup_intro @@ */
 
-#import <tightdb/objc/group.h>
-#import <tightdb/objc/group_shared.h>
-#import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
 
 
@@ -24,7 +21,7 @@ int main()
         [fm removeItemAtPath:@"sharedgrouptest.tightdb" error:nil];
         [fm removeItemAtPath:@"sharedgrouptest.tightdb.lock" error:nil];
 
-        TightdbSharedGroup *shared = [TightdbSharedGroup sharedGroupWithFile:@"sharedgrouptest.tightdb" withError:nil];
+        TDBSharedGroup *shared = [TDBSharedGroup sharedGroupWithFile:@"sharedgrouptest.tightdb" withError:nil];
         if (!shared) {
             NSLog(@"Error");
         }
@@ -37,13 +34,13 @@ int main()
         NSError *error = nil;
         BOOL success;
 
-        success = [shared writeTransactionWithError:&error withBlock:^(TightdbGroup *group) {
+        success = [shared writeWithBlock:^(TDBGroup *group) {
 
             /* Write transactions with the shared group are possible via the provided variable binding named group. */
 
-            PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class] error:nil];
+            PeopleTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class] error:nil];
 
-            if ([table count] > 0) {
+            if (table.rowCount) {
                 NSLog(@"Not empty!");
                 return NO; /* Rollback */
             }
@@ -51,20 +48,20 @@ int main()
             [table addName:@"Bill" Age:53 Hired:YES];
             NSLog(@"Commit!");
             return YES; /* Commit */
-        } ];
+        } withError:&error];
 
         if(!success)
             NSLog(@"Error : %@", [error localizedDescription]);
 
         /* A write transaction (with rollback). */
 
-       success = [shared writeTransactionWithError:&error withBlock:^(TightdbGroup *group) {
+        success = [shared writeWithBlock:^(TDBGroup *group) {
 
             /* Write transactions with the shared group are possible via the provided variable binding named group. */
 
-           PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class] error:nil];
+           PeopleTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class] error:nil];
 
-           if ([table count] > 0) {
+           if (table.rowCount) {
                NSLog(@"Roll back!");
                return NO; /* Rollback */
            }
@@ -72,7 +69,7 @@ int main()
            [table addName:@"Bill" Age:53 Hired:YES];
            NSLog(@"Commit!");
            return YES; /* Commit */
-       }];
+       } withError:&error];
 
         if(!success)
             NSLog(@"Error : %@", [error localizedDescription]);
@@ -80,14 +77,14 @@ int main()
 
         /* A read transaction */
 
-        [shared readTransactionWithBlock:^(TightdbGroup *group) {
+        [shared readWithBlock:^(TDBGroup *group) {
 
             /* Read transactions with the shared group are possible via the provided variable binding named group. */
 
-            PeopleTable *table = [group getTable:@"employees" withClass:[PeopleTable class] error:nil];
+            PeopleTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class] error:nil];
 
-            for (PeopleTable_Cursor *curser in table) {
-                NSLog(@"Name: %@", [curser Name]);
+            for (PeopleTable_Cursor *row in table) {
+                NSLog(@"Name: %@", [row Name]);
             }
         }];
 

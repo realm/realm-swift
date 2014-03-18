@@ -65,9 +65,9 @@ TIGHTDB_TABLE_2(MyTable2,
 
 - (void)testGroup
 {
-    TightdbGroup *group = [TightdbGroup group];
+    TDBGroup *group = [TDBGroup group];
     // Create new table in group
-    MyTable *table = [group getTable:@"employees" withClass:[MyTable class] error:nil];
+    MyTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[MyTable class] error:nil];
 
     // Add some rows
     [table addName:@"John" Age:20 Hired:YES Spare:0];
@@ -76,7 +76,7 @@ TIGHTDB_TABLE_2(MyTable2,
     [table addName:@"Phil" Age:43 Hired:NO Spare:0];
     [table addName:@"Anni" Age:54 Hired:YES Spare:0];
 
-    NSLog(@"MyTable Size: %lu", [table count]);
+    NSLog(@"MyTable Size: %i", [table rowCount]);
 
     //------------------------------------------------------
 
@@ -89,7 +89,7 @@ TIGHTDB_TABLE_2(MyTable2,
     [_utils Eval:row==1 msg:@"Mary should have been there"];
 
     MyTable_View *view = [[[table where].Age columnIsEqualTo:21] findAll];
-    size_t cnt = [view count];                      // cnt = 2
+    size_t cnt = [view rowCount];                      // cnt = 2
     [_utils Eval:cnt == 2 msg:@"Should be two rows in view"];
 
     //------------------------------------------------------
@@ -108,20 +108,20 @@ TIGHTDB_TABLE_2(MyTable2,
                                         .Age   columnIsBetween:20 and_:30];
 
     // Get number of matching entries
-    NSLog(@"Query count: %@", [q count]);
-    [_utils Eval:[[q count] intValue] == 2 msg:@"Expected 2 rows in query"];
+    NSLog(@"Query count: %i", [q countRows]);
+    [_utils Eval:[q countRows] == 2 msg:@"Expected 2 rows in query"];
 
 
     // Get the average age - currently only a low-level interface!
-    NSNumber *avg = [q.Age average];
-    NSLog(@"Average: %i", [avg intValue]);
-    [_utils Eval:[avg intValue]== 21.0 msg:@"Expected 20.5 average"];
+    double avg = [q.Age avg];
+    NSLog(@"Average: %f", avg);
+    [_utils Eval: avg== 21.0 msg:@"Expected 20.5 average"];
 
     // Execute the query and return a table (view)
-    TightdbView *res = [q findAll];
-    for (size_t i = 0; i < [res count]; i++) {
+    TDBView *res = [q findAll];
+    for (size_t i = 0; i < [res rowCount]; i++) {
         // cursor missing. Only low-level interface!
-        NSLog(@"%zu: is %lld years old",i , [res get:1 ndx:i]);
+        NSLog(@"%zu: is %lld years old",i , [res intInColumnWithIndex:i atRowIndex:i]);
     }
 
     //------------------------------------------------------
@@ -133,25 +133,25 @@ TIGHTDB_TABLE_2(MyTable2,
     [group writeToFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
 
     // Load a group from disk (and print contents)
-    TightdbGroup *fromDisk = [TightdbGroup groupWithFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
-    MyTable *diskTable = [fromDisk getTable:@"employees" withClass:[MyTable class] error:nil];
+    TDBGroup *fromDisk = [TDBGroup groupWithFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
+    MyTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[MyTable class] error:nil];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
-    [diskTable insertRowAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
-    NSLog(@"Disktable size: %zu", [diskTable count]);
-    for (size_t i = 0; i < [diskTable count]; i++) {
+    [diskTable insertEmptyRowAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
+    NSLog(@"Disktable size: %i", [diskTable rowCount]);
+    for (size_t i = 0; i < [diskTable rowCount]; i++) {
         MyTable_Cursor *cursor = [diskTable cursorAtIndex:i];
         NSLog(@"%zu: %@", i, [cursor Name]);
         NSLog(@"%zu: %@", i, cursor.Name);
-        NSLog(@"%zu: %@", i, [diskTable getStringInColumn:0 atRow:i]);
+        NSLog(@"%zu: %@", i, [diskTable stringInColumnWithIndex:0 atRowIndex:i]);
     }
 
     // Write same group to memory buffer
-    TightdbBinary* buffer = [group writeToBuffer];
+    TDBBinary* buffer = [group writeToBuffer];
 
     // Load a group from memory (and print contents)
-    TightdbGroup *fromMem = [TightdbGroup groupWithBuffer:buffer withError:nil];
-    MyTable *memTable = [fromMem getTable:@"employees" withClass:[MyTable class] error:nil];
+    TDBGroup *fromMem = [TDBGroup groupWithBuffer:buffer withError:nil];
+    MyTable *memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[MyTable class] error:nil];
 
     for (MyTable_Cursor *row in memTable)
     {
@@ -167,7 +167,7 @@ TIGHTDB_TABLE_2(MyTable2,
 
     // Do a query, and get all matches as TableView
     MyTable_View *v = [[[[diskTable where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30] findAll];
-    NSLog(@"View count: %zu", [v count]);
+    NSLog(@"View count: %i", [v rowCount]);
     // 2: Iterate over the resulting TableView
     for (MyTable_Cursor *row in v) {
         NSLog(@"%@ is %lld years old.", row.Name, row.Age);
@@ -176,7 +176,7 @@ TIGHTDB_TABLE_2(MyTable2,
     // 3: Iterate over query (lazy)
 
     MyTable_Query *qe = [[diskTable where].Age columnIsEqualTo:21];
-    NSLog(@"Query lazy count: %u", [[qe count] intValue]);
+    NSLog(@"Query lazy count: %i", [qe countRows]);
     for (MyTable_Cursor *row in qe) {
         NSLog(@"%@ is %lld years old.", row.Name, row.Age);
     }

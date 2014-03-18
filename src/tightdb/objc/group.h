@@ -20,13 +20,15 @@
 
 #import <Foundation/Foundation.h>
 
-@class TightdbBinary;
-@class TightdbTable;
+@class TDBBinary;
+@class TDBTable;
 
 
-@interface TightdbGroup: NSObject
+@interface TDBGroup: NSObject
 
-+(TightdbGroup *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
+@property (nonatomic, readonly) NSUInteger tableCount;
+
++(TDBGroup *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
 
 /**
  * You pass the ownership of the specified buffer to the group. The
@@ -34,14 +36,13 @@
  * the buffer you pass, must have been allocated using C function
  * malloc().
  */
-+(TightdbGroup *)groupWithBuffer:(TightdbBinary *)buffer withError:(NSError *__autoreleasing *)error;
++(TDBGroup *)groupWithBuffer:(TDBBinary *)buffer withError:(NSError *__autoreleasing *)error;
 
-+(TightdbGroup *)group;
++(TDBGroup *)group;
 
--(size_t)getTableCount;
--(NSString *)getTableName:(size_t)table_ndx;
+-(NSString *)getTableName:(NSUInteger)table_ndx;
 
--(BOOL)hasTable:(NSString *)name;
+-(BOOL)hasTableWithName:(NSString *)name;
 
 /**
  * This method returns NO if it encounters a memory allocation error
@@ -50,13 +51,20 @@
  * The specified table class must be one that is declared by using
  * one of the table macros TIGHTDB_TABLE_*.
  */
--(BOOL)hasTable:(NSString *)name withClass:(Class)obj;
+-(BOOL)hasTableWithName:(NSString *)name withTableClass:(Class)obj;
+
+
+/**
+ * This method returns a table with the specified name from the group.
+ * Returns nil if no table with the specified name exists.
+ */
+-(TDBTable *)getTableWithName:(NSString *)name;
 
 /**
  * This method returns nil if it encounters a memory allocation error
  * (out of memory).
  */
--(TightdbTable *)getTable:(NSString *)name error:(NSError *__autoreleasing *)error;
+-(TDBTable *)getOrCreateTableWithName:(NSString *)name;
 
 /**
  * This method returns nil if the group already contains a table with
@@ -67,10 +75,10 @@
  * The specified table class must be one that is declared by using
  * one of the table macros TIGHTDB_TABLE_*.
  */
--(id)getTable:(NSString *)name withClass:(Class)obj error:(NSError *__autoreleasing *)error;
+-(id)getOrCreateTableWithName:(NSString *)name asTableClass:(Class)obj;
 
 /* Serialization */
--(BOOL)writeToFile:(NSString *)filePath withError:(NSError *__autoreleasing *)error;
+-(BOOL)writeToFile:(NSString *)path withError:(NSError *__autoreleasing *)error;
 
 /**
  * The ownership of the returned buffer is transferred to the
@@ -78,7 +86,7 @@
  * malloc(), and it is the responsibility of the caller that C
  * function free() is eventually called to free the buffer.
  */
--(TightdbBinary *)writeToBuffer;
+-(TDBBinary *)writeToBuffer;
 
 @end
 

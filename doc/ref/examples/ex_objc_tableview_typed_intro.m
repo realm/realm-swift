@@ -1,6 +1,5 @@
 /* @@Example: ex_objc_tableview_typed_intro @@ */
 
-#import <tightdb/objc/table.h>
 #import <tightdb/objc/tightdb.h>
 
 /* Defines a new table with two columns Name and Age. */

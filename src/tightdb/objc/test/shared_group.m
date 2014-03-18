@@ -26,9 +26,9 @@ TIGHTDB_TABLE_2(SharedTable2,
     // TODO: Update test to include more ASSERTS
 
 
-    TightdbGroup* group = [TightdbGroup group];
+    TDBGroup* group = [TDBGroup group];
     // Create new table in group
-    SharedTable2 *table = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
+    SharedTable2 *table = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class]];
     NSLog(@"Table: %@", table);
     // Add some rows
     [table addHired:YES Age:50];
@@ -36,7 +36,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [table addHired:YES Age:53];
     [table addHired:YES Age:54];
 
-    NSLog(@"MyTable Size: %lu", [table count]);
+    NSLog(@"MyTable Size: %lu", [table rowCount]);
 
 
     NSFileManager* fm = [NSFileManager defaultManager];
@@ -47,23 +47,23 @@ TIGHTDB_TABLE_2(SharedTable2,
     [group writeToFile:@"employees.tightdb" withError:nil];
 
     // Read only shared group
-    TightdbSharedGroup* fromDisk = [TightdbSharedGroup sharedGroupWithFile:@"employees.tightdb" withError:nil];
+    TDBSharedGroup* fromDisk = [TDBSharedGroup sharedGroupWithFile:@"employees.tightdb" withError:nil];
 
-    [fromDisk readWithBlock:^(TightdbGroup* group) {
-            SharedTable2* diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
-            NSLog(@"Disktable size: %zu", [diskTable count]);
-            for (size_t i = 0; i < [diskTable count]; i++) {
+    [fromDisk readWithBlock:^(TDBGroup* group) {
+            SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class]];
+            NSLog(@"Disktable size: %zu", [diskTable rowCount]);
+            for (size_t i = 0; i < [diskTable rowCount]; i++) {
                 SharedTable2_Cursor *cursor = [diskTable cursorAtIndex:i];
                 NSLog(@"%zu: %lld", i, [cursor Age]);
                 NSLog(@"%zu: %lld", i, cursor.Age);
-                NSLog(@"%zu: %i", i, [diskTable getBoolInColumn:0 atRow:i]);
+                NSLog(@"%zu: %i", i, [diskTable boolInColumnWithIndex: 0 atRowIndex:i]);
             }
         }];
 
 
-    [fromDisk writeWithBlock:^(TightdbGroup* group) {
-            SharedTable2* diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
-            NSLog(@"Disktable size: %zu", [diskTable count]);
+    [fromDisk writeWithBlock:^(TDBGroup* group) {
+            SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class]];
+            NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < 50; i++) {
                 [diskTable addHired:YES Age:i];
             }
@@ -71,9 +71,9 @@ TIGHTDB_TABLE_2(SharedTable2,
         } withError:nil];
 
 
-    [fromDisk writeWithBlock:^(TightdbGroup* group) {
-            SharedTable2* diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
-            NSLog(@"Disktable size: %zu", [diskTable count]);
+    [fromDisk writeWithBlock:^(TDBGroup* group) {
+            SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class]];
+            NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < 50; i++) {
                 [diskTable addHired:YES Age:i];
             }
@@ -81,20 +81,23 @@ TIGHTDB_TABLE_2(SharedTable2,
         } withError:nil];
 
 
-    [fromDisk writeWithBlock:^(TightdbGroup* group) {
-            SharedTable2* diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
-            NSLog(@"Disktable size: %zu", [diskTable count]);
+    [fromDisk writeWithBlock:^(TDBGroup* group) {
+            SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class]];
+            NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < 50; i++) {
                 [diskTable addHired:YES Age:i];
             }
+        
+            STAssertNil([group getTableWithName:@"Does not exist"], @"Table does not exist");
+
             return YES; // commit
         } withError:nil];
 
-    [fromDisk readWithBlock:^(TightdbGroup* group) {
-            SharedTable2* diskTable = [group getTable:@"employees" withClass:[SharedTable2 class] error:nil];
-            NSLog(@"Disktable size: %zu", [diskTable count]);
+    [fromDisk readWithBlock:^(TDBGroup* group) {
+            SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class]];
+            NSLog(@"Disktable size: %zu", [diskTable rowCount]);
         
-        STAssertThrows([diskTable clear], @"Not allowed in readtransaction");
+        STAssertThrows([diskTable removeAllRows], @"Not allowed in readtransaction");
 
         }];
 }
@@ -108,33 +111,82 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:@"readonlyTest.tightdb" error:nil];
     [fm removeItemAtPath:@"readonlyTest.tightdb.lock" error:nil];
     
-    TightdbSharedGroup* fromDisk = [TightdbSharedGroup sharedGroupWithFile:@"readonlyTest.tightdb" withError:nil];
+    TDBSharedGroup* fromDisk = [TDBSharedGroup sharedGroupWithFile:@"readonlyTest.tightdb" withError:nil];
     
-    [fromDisk writeWithBlock:^(TightdbGroup *group) {
-        TightdbTable *t = [group getTable:@"table" error:nil];
+    [fromDisk writeWithBlock:^(TDBGroup *group) {
+        TDBTable *t = [group getOrCreateTableWithName:@"table"];
         
-        [t addColumnWithType:tightdb_Int andName:@"col0"];
-        TightdbCursor *row = [t addEmptyRow];
-        [row setInt:10 inColumn:0 ];
+        [t addColumnWithName:@"col0" andType:TDBIntType];
+        TDBRow *row = [t addEmptyRow];
+        [row setInt:10 inColumnWithIndex:0 ];
          
         return YES;
         
     } withError:nil];
     
-    [fromDisk readWithBlock:^(TightdbGroup* group) {
-        TightdbTable *t = [group getTable:@"table" error:nil];
+    [fromDisk readWithBlock:^(TDBGroup* group) {
+        TDBTable *t = [group getOrCreateTableWithName:@"table"];
        
-        TightdbQuery *q = [t where];
+        TDBQuery *q = [t where];
         
-        TightdbView *v = [q findAll];
+        TDBView *v = [q findAllRows];
         
         // Should not be allowed!
-        STAssertThrows([v clear], @"Is in readTransaction");
+        STAssertThrows([v removeAllRows], @"Is in readTransaction");
         
-        STAssertTrue([t count] == 1, @"No rows have been removed");
-        STAssertTrue([[q count] isEqualToNumber:[NSNumber numberWithInt:1]], @"No rows have been removed");
-        STAssertTrue([v count] == 1, @"No rows have been removed");
+        STAssertTrue([t rowCount] == 1, @"No rows have been removed");
+        STAssertTrue([q countRows] == 1, @"No rows have been removed");
+        STAssertTrue([v rowCount] == 1, @"No rows have been removed");
+        
+        STAssertNil([group getTableWithName:@"Does not exist"], @"Table does not exist");
     }];
+}
+
+- (void) testHasChanged
+{
+    
+    NSFileManager* fm = [NSFileManager defaultManager];
+    
+    // Write to disk
+    [fm removeItemAtPath:@"hasChanged.tightdb" error:nil];
+    [fm removeItemAtPath:@"hasChanged.tightdb.lock" error:nil];
+    
+    TDBSharedGroup *sg = [TDBSharedGroup sharedGroupWithFile:@"hasChanged.tightdb" withError:nil];
+    
+    STAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not changed");
+    
+    [sg writeWithBlock:^(TDBGroup* group) {
+        [group getOrCreateTableWithName:@"t"];
+        return YES;
+    } withError:nil];
+    
+    STAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not been changed by another process");
+
+    
+    [sg writeWithBlock:^(TDBGroup* group) {
+        TDBTable *t = [group getOrCreateTableWithName:@"t"];
+        [t addColumnWithName:@"col" andType:TDBBoolType];
+        TDBRow *row = [t addEmptyRow];
+        [row setBool:YES inColumnWithIndex:0];
+        return YES;
+    } withError:nil];
+    
+    STAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not been changed by another process");
+    
+    
+    // OTHER sharedgroup
+    TDBSharedGroup *sg2 = [TDBSharedGroup sharedGroupWithFile:@"hasChanged.tightdb" withError:nil];
+    
+    
+    [sg2 writeWithBlock:^(TDBGroup* group) {
+        TDBTable *t = [group getOrCreateTableWithName:@"t"];
+        [t addEmptyRow]; /* Adding a row */
+        return YES;
+    } withError:nil];
+
+    STAssertTrue([sg hasChangedSinceLastTransaction], @"SharedGroup HAS been changed by another process");
+
+
 }
 
 @end
