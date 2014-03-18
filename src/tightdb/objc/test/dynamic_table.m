@@ -977,16 +977,14 @@
     STAssertNil([t firstRow], @"Table is empty");
     STAssertNil([t lastRow], @"Table is empty");
     
-    TDBRow *row0 = [t addEmptyRow];
     NSString *value0 = @"value0";
-    [row0 setString:value0 inColumnWithIndex:col0];
+    [t appendRow:@[value0]];
     
-    TDBRow *row1 = [t addEmptyRow];
     NSString *value1 = @"value1";
-    [row1 setString:value1 inColumnWithIndex:col0];
+    [t appendRow:@[value1]];
     
-    STAssertEqualObjects(value0, [[t firstRow] stringInColumnWithIndex:col0], nil);
-    STAssertEqualObjects(value1, [[t lastRow] stringInColumnWithIndex:col0], nil);
+    STAssertEqualObjects([[t firstRow] stringInColumnWithIndex:col0], value0, nil);
+    STAssertEqualObjects( [[t lastRow] stringInColumnWithIndex:col0], value1, nil);
 }
 
 - (void)testTableDynamic_Cursor_Subscripting

@@ -271,15 +271,11 @@
     [t addEmptyRow];
     [t addEmptyRow];
     
-    TDBRow *row0 = [t addEmptyRow];
     NSString *value0 = @"value0";
-    [row0 setString:value0 inColumnWithIndex:col0];
-    [row0 setInt:1 inColumnWithIndex:col1];
+    [t appendRow:@[value0, @1]];
     
-    TDBRow *row1 = [t addEmptyRow];
     NSString *value1 = @"value1";
-    [row1 setString:value1 inColumnWithIndex:col0];
-    [row1 setInt:1 inColumnWithIndex:col1];
+    [t appendRow:@[value1, @1]];
     
     // add empty rows after to filter out
     [t addEmptyRow];

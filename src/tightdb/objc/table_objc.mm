@@ -392,7 +392,7 @@ using namespace std;
 
 -(TDBRow *)firstRow
 {
-    if(self.rowCount == 0){
+    if (self.rowCount == 0) {
         return nil;
     }
     return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:0]];
@@ -400,7 +400,7 @@ using namespace std;
 
 -(TDBRow *)lastRow
 {
-    if(self.rowCount == 0){
+    if (self.rowCount == 0) {
         return nil;
     }
     return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1]];
@@ -817,20 +817,20 @@ using namespace std;
     return [[TDBRow alloc] initWithTable:self ndx:ndx];
 }
 
--(TDBRow*)lastRow
-{
-    if(self.rowCount == 0){
-        return nil;
-    }
-    return [[TDBRow alloc] initWithTable:self ndx:self.rowCount-1];
-}
-
 -(TDBRow*)firstRow
 {
-    if(self.rowCount == 0){
+    if (self.rowCount == 0) {
         return nil;
     }
     return [[TDBRow alloc] initWithTable:self ndx:0];
+}
+
+-(TDBRow*)lastRow
+{
+    if (self.rowCount == 0) {
+        return nil;
+    }
+    return [[TDBRow alloc] initWithTable:self ndx:self.rowCount-1];
 }
 
 -(TDBRow*)insertRowAtIndex:(NSUInteger)ndx
