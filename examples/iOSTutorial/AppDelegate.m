@@ -92,7 +92,7 @@ void tableFunc() {
     // Get number of matching entries
     NSUInteger cnt3 = [q countRows];                     // =&gt; 2
 
-    // Get the average age (currently only a low-level interface)
+    // You can do aggregates on columns, like calculating the average age
     double avg = [q.Age avg];
 
     // Execute the query and return a table (view)
