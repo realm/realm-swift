@@ -6,8 +6,8 @@
 #import <Foundation/Foundation.h>
 
 
-@interface TDBGroup()
+@interface TDBTransaction()
 
-+(TDBGroup*)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only;
++(TDBTransaction*)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only;
 
 @end

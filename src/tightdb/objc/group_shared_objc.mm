@@ -74,7 +74,7 @@ using namespace std;
         // should throw anything but NSException or derivatives. Note: if the client calls other libraries
         // throwing other kinds of exceptions they will leak back to the client code, if he does not
         // catch them within the block.
-        TDBGroup* group_2 = [TDBGroup groupWithNativeGroup:const_cast<tightdb::Group*>(group) isOwned:NO readOnly:YES];
+        TDBTransaction* group_2 = [TDBTransaction groupWithNativeGroup:const_cast<tightdb::Group*>(group) isOwned:NO readOnly:YES];
         block(group_2);
 
     }
@@ -102,7 +102,7 @@ using namespace std;
 
     BOOL confirmation = NO;
     @try {
-        TDBGroup* group_2 = [TDBGroup groupWithNativeGroup:group isOwned:NO readOnly:NO];
+        TDBTransaction* group_2 = [TDBTransaction groupWithNativeGroup:group isOwned:NO readOnly:NO];
         confirmation = block(group_2);
     }
     @catch (NSException* exception) {

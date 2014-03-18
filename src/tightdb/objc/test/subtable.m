@@ -42,7 +42,7 @@ TIGHTDB_TABLE_3(TestSubtableMain,
 
 - (void)testSubtable
 {
-    TDBGroup *group = [TDBGroup group];
+    TDBTransaction *group = [TDBTransaction group];
 
     /* Create new table in group */
     TestSubtableMain *people = [group getOrCreateTableWithName:@"employees" asTableClass:[TestSubtableMain class]];

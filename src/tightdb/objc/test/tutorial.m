@@ -38,7 +38,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    TDBGroup *group = [TDBGroup group];
+    TDBTransaction *group = [TDBTransaction group];
     // Create new table in group
     PeopleTable *people = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
 
@@ -147,7 +147,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     [group writeToFile:@"employees.tightdb" withError:nil];
 
     // Load a group from disk (and print contents)
-    TDBGroup *fromDisk = [TDBGroup groupWithFile:@"employees.tightdb" withError:nil];
+    TDBTransaction *fromDisk = [TDBTransaction groupWithFile:@"employees.tightdb" withError:nil];
     PeopleTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES];
@@ -164,7 +164,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     TDBBinary* buffer = [group writeToBuffer];
 
     // Load a group from memory (and print contents)
-    TDBGroup *fromMem = [TDBGroup groupWithBuffer:buffer withError:nil];
+    TDBTransaction *fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
     PeopleTable *memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];
