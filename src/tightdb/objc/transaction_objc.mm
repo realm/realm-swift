@@ -1,12 +1,29 @@
-//
-//  group.m
-//  TightDB
-//
+/*************************************************************************
+ *
+ * TIGHTDB CONFIDENTIAL
+ * __________________
+ *
+ *  [2011] - [2014] TightDB Inc
+ *  All Rights Reserved.
+ *
+ * NOTICE:  All information contained herein is, and remains
+ * the property of TightDB Incorporated and its suppliers,
+ * if any.  The intellectual and technical concepts contained
+ * herein are proprietary to TightDB Incorporated
+ * and its suppliers and may be covered by U.S. and Foreign Patents,
+ * patents in process, and are protected by trade secret or copyright law.
+ * Dissemination of this information or reproduction of this material
+ * is strictly forbidden unless prior written permission is obtained
+ * from TightDB Incorporated.
+ *
+ **************************************************************************/
 
 #include <tightdb/group.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
 #import <tightdb/objc/transaction.h>
+#import <tightdb/objc/group.h>
+#import <tightdb/objc/transaction_priv.h>
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/table_priv.h>
 
@@ -23,6 +40,7 @@ using namespace std;
 }
 
 
+/* Removed from header for now */
 +(TDBTransaction*)group
 {
     TDBTransaction* group = [[TDBTransaction alloc] init];
@@ -52,7 +70,7 @@ using namespace std;
     return group_2;
 }
 
-
+/* Removed from header for now */
 +(TDBTransaction *)groupWithFile:(NSString *)filename withError:(NSError **)error
 {
     TDBTransaction* group = [[TDBTransaction alloc] init];
@@ -90,7 +108,7 @@ using namespace std;
     return group;
 }
 
-
+/* Removed from header for now */
 +(TDBTransaction*)groupWithBuffer:(TDBBinary*)buffer withError:(NSError**)error
 {
     TDBTransaction* group = [[TDBTransaction alloc] init];
@@ -171,7 +189,7 @@ using namespace std;
     return YES;
 }
 
-
+/* Removed from header for now */
 -(TDBBinary*)writeToBuffer
 {
     TDBBinary* buffer = [[TDBBinary alloc] init];
