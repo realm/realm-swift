@@ -73,6 +73,12 @@ TIGHTDB_TABLE_2(TestTableGroup,
     t = nil;
 }
 
+- (void)testGetTable
+{
+    TDBGroup *g = [TDBGroup group];
+    STAssertNil([g getTableWithName:@"noTable"], @"Table does not exist");
+}
+
 @end
 
 

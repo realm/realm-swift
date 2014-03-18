@@ -87,6 +87,9 @@ TIGHTDB_TABLE_2(SharedTable2,
             for (size_t i = 0; i < 50; i++) {
                 [diskTable addHired:YES Age:i];
             }
+        
+            STAssertNil([group getTableWithName:@"Does not exist"], @"Table does not exist");
+
             return YES; // commit
         } withError:nil];
 
@@ -134,6 +137,8 @@ TIGHTDB_TABLE_2(SharedTable2,
         STAssertTrue([t rowCount] == 1, @"No rows have been removed");
         STAssertTrue([q countRows] == 1, @"No rows have been removed");
         STAssertTrue([v rowCount] == 1, @"No rows have been removed");
+        
+        STAssertNil([group getTableWithName:@"Does not exist"], @"Table does not exist");
     }];
 }
 

@@ -189,6 +189,15 @@ using namespace std;
     return buffer;
 }
 
+-(TDBTable *)getTableWithName:(NSString *)name
+{
+    if ([self hasTableWithName:name]) {
+        return [self getOrCreateTableWithName:name];
+    }
+    
+    return nil;
+}
+
 
 -(BOOL)hasTableWithName:(NSString*)name
 {

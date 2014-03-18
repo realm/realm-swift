@@ -1,5 +1,6 @@
 2014-03-18
 ==========
++ getTableWithName selector added on group.
 * getting and creating table methods on group no longer take error argument.
 
 2014-03-17
