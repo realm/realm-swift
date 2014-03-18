@@ -3,7 +3,7 @@
 #
 # Author: Kristian Spangsege
 #
-# Version: 1.0.1
+# Version: 1.0.2
 #
 # This makefile requires GNU Make. It has been tested with version
 # 3.81, and it is known to work well on both Linux and OS X.
@@ -446,7 +446,7 @@
 # the command line. For example, to enable POSIX Threads and disable
 # automatic dependency tracking, you could do this:
 #
-#   make CFLAGS_PTHREADS=-pthreads CFLAGS_AUTODEP=""
+#   make CFLAGS_PTHREADS="-pthreads" CFLAGS_AUTODEP=""
 #
 # If CFLAGS is specified in the environment or on the command line, it
 # will replace the value of CFLAGS_GENERAL. Similarly with LDFLAGS and
@@ -455,28 +455,55 @@
 # If EXTRA_CFLAGS is specified on the command line, its contents will
 # be added to CFLAGS_GENERAL. Similarly with LDFLAGS.
 #
-# If CC, CXX, LD, or AR is specified in the environment or on the
-# command line, its value will be respected.
+# If CC, CXX, OCC, OCXX, LD, and AR are specified in the environment
+# or on the command line, their values will be respected.
 #
 # NOTE: When you change the configuration specified via the
 # environment or the command line from one invocation of make to the
 # next, you should always start with a 'make clean'. MAKE does this
 # automatically when you change `project.mk`.
 #
-# A function CC_CXX_AND_LD_ARE is made available to check for a
-# specific compiler in `project.mk`. For example:
+# If `CC` is neither specified in the environment nor on the command
+# line, `generic.mk` will look for a number of well-known compilers
+# (GCC, Clang), and set `CC` accordingly. If CXX or OCC is neither
+# specified in the environment nor on the command line, it will be set
+# to whatever `CC` is set to. Likewise, if `OCXX` is neither specified
+# in the environment nor on the command line, it will be set to
+# whatever `OCC` is set to. If `LD` or `AR` is neither specified in
+# the environment nor on the command line, `generic.mk` will attempt
+# to derive their values from `CC`.
 #
-#   ifneq ($(call CC_CXX_AND_LD_ARE,clang),)
-#   # Clang specific stuff
-#   endif
+# A number of variables are provided to query about the
+# detected/specified tool chain:
 #
-# Likewise, a variable CC_CXX_AND_LD_ARE_GCC_LIKE is made available to
-# check for any GCC like compiler in `project.mk` (gcc, llvm-gcc,
-# clang). For example:
+# If `generic.mk` can identify the contents of `CC` as GCC or Clang,
+# it sets `CC_IS` to `gcc` or `clang` respectively, and
+# `CC_IS_GCC_LIKE` to `yes`. Otherwise it sets both `CC_IS` and
+# `CC_IS_GCC_LIKE` to empty strings. Equivalent variables exist for
+# `CXX`, `OCC`, `OCXX`, and `LD`.
 #
-#   ifneq ($(CC_CXX_AND_LD_ARE_GCC_LIKE),)
-#   # GCC specific stuff
-#   endif
+# Additionally, if `IS_CC`, `IS_CXX`, `IS_OCC`, and `IS_OCXX` are all
+# equal, then `COMPILER_IS` is set to that value (`gcc` or
+# `clang`). Likewise, if all four are GCC-like, then
+# `COMPILER_IS_GCC_LIKE` is set to `yes`.
+#
+# In general, `generic.mk` can identify a compiler or linker as GCC if
+# its name (when arguments are stripped away and path is removed) is
+# `gcc` or `g++`, or begins with `gcc-` or `g++-`. Likewise with Clang
+# if the name is `clang` or `clang++`.
+#
+# When `COMPILER_IS_GCC_LIKE` is true (not empty), `generic.mk` will
+# add a number of sensible GCC-like compiler flags for optimization,
+# debugging, profiling, header dependency tracking, and
+# more. Likewise, if `LD_IS_GCC_LIKE` is not empty, extra linker flags
+# will be added.
+#
+# If you set `CC` to something that is GCC-like, but is not
+# automatically identified as such (e.g. `arm-linux-androideabi-gcc`),
+# you can manually override `CC_IS` (or any of the other classifying
+# variables) on the `make` command line. When done right, this will
+# fix "chained" classification variables, and reenable the automatic
+# addition of extra GCC-like compiler/linker flags.
 #
 #
 # Technicalities
@@ -634,6 +661,7 @@ IDENTITY = $(1)
 
 IS_EQUAL_TO = $(and $(findstring $(1),$(2)),$(findstring $(2),$(1)))
 
+# ARGS: prefix, string
 IS_PREFIX_OF = $(findstring .$(call IS_PREFIX_OF_1,$(1)),.$(call IS_PREFIX_OF_1,$(2)))
 IS_PREFIX_OF_1 = $(subst .,:d:,$(subst :,:c:,$(1)))
 
@@ -649,7 +677,7 @@ STABLE_PARTITION_1 = $(if $(2),$(call STABLE_PARTITION_2,$(1),$(wordlist 2,$(wor
 STABLE_PARTITION_2 = $(if $(call $(1),$(6),$(3)),$(call STABLE_PARTITION_1,$(1),$(2),$(3),$(4) $(6),$(5)),$(call STABLE_PARTITION_1,$(1),$(2),$(3),$(4),$(5) $(6)))
 
 # ARGS: predicate, list, optional_predicate_arg
-# Expands to first matching entry
+# Expands to first entry that satisfies the predicate, or the empty string if no entry satsifies it.
 FIND = $(call FIND_1,$(1),$(strip $(2)),$(3))
 FIND_1 = $(if $(2),$(call FIND_2,$(1),$(2),$(3),$(word 1,$(2))))
 FIND_2 = $(if $(call $(1),$(4),$(3)),$(4),$(call FIND_1,$(1),$(wordlist 2,$(words $(2)),$(2)),$(3)))
@@ -721,9 +749,25 @@ SHELL_ESCAPE = $(shell printf '%s\n' '$(call SHELL_ESCAPE_1,$(1))' | sed $(SHELL
 SHELL_ESCAPE_1 = $(subst $(APOSTROPHE),$(APOSTROPHE)\$(APOSTROPHE)$(APOSTROPHE),$(1))
 SHELL_ESCAPE_2 = 's/\([]$(TAB)$(SPACE)!"\#$$&'\''()*;<>?[\`{|}~]\)/\\\1/g'
 
-HAVE_CMD = $(shell which $(1))
-MATCH_CMD = $(filter $(1) $(1)-%,$(notdir $(2)))
-MAP_CMD = $(if $(call MATCH_CMD,$(1),$(3)),$(if $(findstring /,$(3)),$(dir $(3)))$(patsubst $(1)%,$(2)%,$(notdir $(3))))
+HAVE_CMD = $(shell which $(word 1,$(1)))
+
+# ARGS: command, prefix_to_class_map
+# Returns empty if identification fails
+IDENT_CMD = $(call IDENT_CMD_1,$(notdir $(word 1,$(1))),$(2))
+IDENT_CMD_1 = $(word 1,$(foreach x,$(2),$(call IDENT_CMD_2,$(1),$(subst :,$(SPACE),$(x)))))
+IDENT_CMD_2 = $(call IDENT_CMD_3,$(1),$(word 1,$(2)),$(word 2,$(2)))
+IDENT_CMD_3 = $(if $(call IS_PREFIX_OF,$(2)-,$(1)-),$(3))
+
+# ARGS: command, subsitutions
+# Returns empty if mapping fails
+MAP_CMD = $(call MAP_CMD_1,$(word 1,$(1)),$(wordlist 2,$(words $(1)),$(1)),$(2))
+MAP_CMD_1 = $(call MAP_CMD_2,$(if $(findstring /,$(1)),$(dir $(1))),$(notdir $(1)),$(2),$(3))
+MAP_CMD_2 = $(call MAP_CMD_3,$(1),$(word 1,$(foreach x,$(4),$(call MAP_CMD_4,$(x),$(2)))),$(3))
+MAP_CMD_3 = $(if $(2),$(call LIST_CONCAT,$(1)$(2),$(3)))
+MAP_CMD_4 = $(call MAP_CMD_5,$(subst :,$(SPACE),$(1)),$(2))
+MAP_CMD_5 = $(call MAP_CMD_6,-$(word 1,$(1))-,-$(word 2,$(1))-,-$(2)-)
+MAP_CMD_6 = $(if $(findstring $(1),$(3)),$(call MAP_CMD_7,$(patsubst -%-,%,$(subst $(1),$(2),$(3)))))
+MAP_CMD_7 = $(if $(call HAVE_CMD,$(1)),$(1))
 
 CAT_OPT_FILE = $(shell cat $(1) 2>/dev/null)
 
@@ -775,109 +819,145 @@ INT_65536 := $(foreach a,$(INT_16),$(foreach b,$(INT_16),$(foreach c,$(INT_16),$
 
 # PLATFORM SPECIFICS
 
-OS   := $(shell uname)
+OS := $(shell uname)
 ARCH := $(shell uname -m)
 
 ifeq ($(OS),Darwin)
-LIB_SUFFIX_SHARED = .dylib
+  LIB_SUFFIX_SHARED = .dylib
 endif
 
 USE_LIB64 =
 ifeq ($(OS),Linux)
-IS_64BIT = $(filter x86_64 ia64,$(ARCH))
-ifneq ($(IS_64BIT),)
-ifeq ($(shell [ -e /etc/redhat-release -o -e /etc/SuSE-release ] && echo yes),yes)
-USE_LIB64 = 1
-else ifneq ($(shell [ -e /etc/system-release ] && grep Amazon /etc/system-release),)
-USE_LIB64 = 1
+  IS_64BIT = $(filter x86_64 ia64,$(ARCH))
+  ifneq ($(IS_64BIT),)
+    ifeq ($(shell [ -e /etc/redhat-release -o -e /etc/SuSE-release ] && echo yes),yes)
+      USE_LIB64 = 1
+    else ifneq ($(shell [ -e /etc/system-release ] && grep Amazon /etc/system-release),)
+      USE_LIB64 = 1
+    endif
+  endif
 endif
-endif
-endif
 
 
 
-# SETUP A GCC-LIKE DEFAULT COMPILER IF POSSIBLE
+# SETUP A GCC-LIKE TOOL CHAIN IF POSSIBLE
 
-# The general idea is as follows: If neither CC nor CXX is specified,
-# then check for available C compilers, and set CC and CXX
-# accordingly. Otherwise, if CC is specified, but CXX is not, then set
-# CXX to the C++ version of CC.
-
-# Note: No correspondence is required between the compilers
-# mentioned in GCC_LIKE_COMPILERS, and those mentioned in
-# MAP_CC_TO_CXX
+# If CC is not specified, search PATH for these compilers in the
+# specified order.
 ifeq ($(OS),Darwin)
-GCC_LIKE_COMPILERS = clang llvm-gcc gcc
+  COMPILER_DETECT_LIST = clang llvm-gcc gcc
 else
-GCC_LIKE_COMPILERS = gcc llvm-gcc clang
-endif
-MAP_CC_TO_CXX = $(or $(call MAP_CMD,gcc,g++,$(1)),$(call MAP_CMD,llvm-gcc,llvm-g++,$(1)),$(call MAP_CMD,clang,clang++,$(1)))
-
-GXX_LIKE_COMPILERS = $(strip $(foreach x,$(GCC_LIKE_COMPILERS),$(call MAP_CC_TO_CXX,$(x))))
-IS_GCC_LIKE = $(strip $(foreach x,$(GCC_LIKE_COMPILERS),$(call MATCH_CMD,$(x),$(1))))
-IS_GXX_LIKE = $(strip $(foreach x,$(GXX_LIKE_COMPILERS),$(call MATCH_CMD,$(x),$(1))))
-
-# C and C++
-CC_SPECIFIED        = $(filter-out undefined default,$(origin CC))
-CXX_SPECIFIED       = $(filter-out undefined default,$(origin CXX))
-CC_OR_CXX_SPECIFIED = $(or $(CC_SPECIFIED),$(CXX_SPECIFIED))
-ifeq ($(CC_OR_CXX_SPECIFIED),)
-# Neither CC nor CXX is specified
-X := $(call FIND,HAVE_CMD,$(GCC_LIKE_COMPILERS))
-ifneq ($(X),)
-CC := $(X)
-X := $(call MAP_CC_TO_CXX,$(CC))
-ifneq ($(X),)
-CXX := $(X)
-endif
-endif
-else ifeq ($(CXX_SPECIFIED),)
-# CXX is not specified, but CC is
-X := $(call MAP_CC_TO_CXX,$(CC))
-ifneq ($(X),)
-CXX := $(X)
-endif
-endif
-CC_AND_CXX_ARE_GCC_LIKE = $(and $(call IS_GCC_LIKE,$(CC)),$(or $(call IS_GCC_LIKE,$(CXX)),$(call IS_GXX_LIKE,$(CXX))))
-ifneq ($(CC_AND_CXX_ARE_GCC_LIKE),)
-CFLAGS_OPTIM   = -O3 -DNDEBUG
-CFLAGS_DEBUG   = -ggdb
-CFLAGS_COVER   = --coverage
-CFLAGS_SHARED  = -fPIC -DPIC
-CFLAGS_GENERAL = -Wall
-CFLAGS_AUTODEP = -MMD -MP
+  COMPILER_DETECT_LIST = gcc clang
 endif
 
-# Objective-C and Objective-C++
-OCC_SPECIFIED         = $(filter-out undefined default,$(origin OCC))
-OCXX_SPECIFIED        = $(filter-out undefined default,$(origin OCXX))
-OCC_OR_OCXX_SPECIFIED = $(or $(OCC_SPECIFIED),$(OCXX_SPECIFIED))
-ifeq ($(OCC_OR_OCXX_SPECIFIED),)
-# Neither OCC nor OCXX is specified
-OCC  := $(CC)
-OCXX := $(CXX)
-else ifeq ($(OCXX_SPECIFIED),)
-# OCXX is not specified, but OCC is
-X := $(call MAP_CC_TO_CXX,$(OCC))
-ifneq ($(X),)
-OCXX := $(X)
+# Compiler identification. Maps command prefix to compiler class.
+COMPILER_IDENT_MAP = gcc:gcc g++:gcc llvm-gcc:gcc llvm-g++:gcc clang:clang clang++:clang
+
+# Compiler classes that are mostly like GCC.
+GCC_LIKE_COMPILERS = gcc clang
+
+# How to map C compiler to corresponding C++ linker.
+CC_TO_CXXL_MAP = gcc:g++ g++:g++ clang:clang++ clang++:clang++
+
+# How to map C compiler to corresponding archiver (static libraries).
+CC_TO_AR_MAP  = gcc:gcc-ar g++:gcc-ar gcc:ar g++:ar clang:clang-ar clang++:clang-ar clang:ar clang++:ar
+
+DETECT_COMPILER = $(call FIND,HAVE_CMD,$(COMPILER_DETECT_LIST))
+IDENT_COMPILER = $(call IDENT_CMD,$(1),$(COMPILER_IDENT_MAP))
+CLASS_IS_GCC_LIKE = $(if $(filter $(GCC_LIKE_COMPILERS),$(1)),yes)
+
+# C compiler
+CC_SPECIFIED := $(filter-out undefined default,$(origin CC))
+ifeq ($(CC_SPECIFIED),)
+  # CC was not specified
+  X := $(call DETECT_COMPILER)
+  ifneq ($(X),)
+    CC := $(X)
+  endif
 endif
+CC_IS := $(call IDENT_COMPILER,$(CC))
+CC_IS_GCC_LIKE := $(call CLASS_IS_GCC_LIKE,$(CC_IS))
+
+# C++ compiler
+CXX_SPECIFIED := $(filter-out undefined default,$(origin CXX))
+ifeq ($(CXX_SPECIFIED),)
+  # CXX was not specified
+  CXX := $(CC)
+  CXX_IS := $(CC_IS)
+  CXX_IS_GCC_LIKE := $(CC_IS_GCC_LIKE)
+else
+  CXX_IS := $(call IDENT_COMPILER,$(CXX))
+  CXX_IS_GCC_LIKE := $(call CLASS_IS_GCC_LIKE,$(CXX_IS))
 endif
-OCC_AND_OCXX_ARE_GCC_LIKE = $(and $(call IS_GCC_LIKE,$(OCC)),$(or $(call IS_GCC_LIKE,$(OCXX)),$(call IS_GXX_LIKE,$(OCXX))))
 
+# Objective-C compiler
+OCC_SPECIFIED := $(filter-out undefined default,$(origin OCC))
+ifeq ($(OCC_SPECIFIED),)
+  # OCC was not specified
+  OCC := $(CC)
+  OCC_IS := $(CC_IS)
+  OCC_IS_GCC_LIKE := $(CC_IS_GCC_LIKE)
+else
+  OCC_IS := $(call IDENT_COMPILER,$(OCC))
+  OCC_IS_GCC_LIKE := $(call CLASS_IS_GCC_LIKE,$(OCC_IS))
+endif
 
+# Objective-C++ compiler
+OCXX_SPECIFIED := $(filter-out undefined default,$(origin OCXX))
+ifeq ($(OCXX_SPECIFIED),)
+  # OCXX was not specified
+  OCXX := $(OCC)
+  OCXX_IS := $(OCC_IS)
+  OCXX_IS_GCC_LIKE := $(OCC_IS_GCC_LIKE)
+else
+  OCXX_IS := $(call IDENT_COMPILER,$(OCXX))
+  OCXX_IS_GCC_LIKE := $(call CLASS_IS_GCC_LIKE,$(OCXX_IS))
+endif
 
-# SETUP A GCC-LIKE DEFAULT LINKER IF POSSIBLE
+COMPILER_IS = $(if $(word 2,$(call REMOVE_DUPES,x$(CC_IS) x$(CXX_IS) x$(OCC_IS) x$(OCXX_IS))),,$(CC_IS))
+COMPILER_IS_GCC_LIKE := $(and $(CC_IS_GCC_LIKE),$(CXX_IS_GCC_LIKE),$(OCC_IS_GCC_LIKE),$(OCXX_IS_GCC_LIKE))
 
-ifneq ($(CC_AND_CXX_ARE_GCC_LIKE),)
+ifneq ($(COMPILER_IS_GCC_LIKE),)
+  CFLAGS_OPTIM   = -O3 -DNDEBUG
+  CFLAGS_DEBUG   = -ggdb
+  CFLAGS_COVER   = --coverage
+  CFLAGS_SHARED  = -fPIC -DPIC
+  CFLAGS_GENERAL = -Wall
+  CFLAGS_AUTODEP = -MMD -MP
+endif
+
+# Linker
+X := $(EMPTY)
 LD_SPECIFIED = $(filter-out undefined default,$(origin LD))
 ifeq ($(LD_SPECIFIED),)
-LD := $(CXX)
+  # LD was not specified
+  ifneq ($(CC_IS_GCC_LIKE),)
+    X := $(call MAP_CMD,$(CC),$(CC_TO_CXXL_MAP))
+    ifneq ($(X),)
+      LD := $(X)
+      LD_IS := $(CC_IS)
+      LD_IS_GCC_LIKE := yes
+    endif
+  endif
 endif
+ifeq ($(X),)
+  LD_IS := $(call IDENT_COMPILER,$(LD))
+  LD_IS_GCC_LIKE := $(call CLASS_IS_GCC_LIKE,$(LD_IS))
 endif
-LD_IS_GCC_LIKE = $(or $(call IS_GCC_LIKE,$(LD)),$(call IS_GXX_LIKE,$(LD)))
 ifneq ($(LD_IS_GCC_LIKE),)
-LDFLAGS_SHARED = -shared
+  LDFLAGS_SHARED = -shared
+endif
+
+# Archiver (static libraries)
+AR_SPECIFIED = $(filter-out undefined default,$(origin AR))
+ifeq ($(AR_SPECIFIED),)
+  # AR was not specified
+  ifneq ($(CC_IS_GCC_LIKE),)
+    X := $(call MAP_CMD,$(CC),$(CC_TO_AR_MAP))
+    ifneq ($(X),)
+      AR := $(X)
+    endif
+  endif
 endif
 
 
@@ -887,28 +967,24 @@ endif
 EXTRA_CFLAGS  =
 EXTRA_LDFLAGS =
 
-CC_CXX_AND_LD_ARE = $(call CC_CXX_AND_LD_ARE_1,$(1),$(call MAP_CC_TO_CXX,$(1)))
-CC_CXX_AND_LD_ARE_1 = $(and $(call MATCH_CMD,$(1),$(CC)),$(strip $(foreach x,$(1) $(2),$(call MATCH_CMD,$(x),$(CXX)))),$(strip $(foreach x,$(1) $(2),$(call MATCH_CMD,$(x),$(LD)))))
-CC_CXX_AND_LD_ARE_GCC_LIKE = $(strip $(foreach x,$(GCC_LIKE_COMPILERS),$(call CC_CXX_AND_LD_ARE,$(x))))
-
 GENERIC_MK := $(lastword $(MAKEFILE_LIST))
 GENERIC_MK_DIR := $(patsubst %/,%,$(dir $(GENERIC_MK)))
 PROJECT_MK := $(GENERIC_MK_DIR)/project.mk
 DEP_MAKEFILES := Makefile $(GENERIC_MK)
 ifneq ($(wildcard $(PROJECT_MK)),)
-DEP_MAKEFILES += $(PROJECT_MK)
-include $(PROJECT_MK)
+  DEP_MAKEFILES += $(PROJECT_MK)
+  include $(PROJECT_MK)
 endif
 
 ifneq ($(INCLUDE_ROOT),)
-REL_INCLUDE_ROOT := $(call MAKE_REL_PATH,$(dir $(GENERIC_MK))/$(INCLUDE_ROOT))
+  REL_INCLUDE_ROOT := $(call MAKE_REL_PATH,$(dir $(GENERIC_MK))/$(INCLUDE_ROOT))
 endif
 
 ROOT_INC_FLAG := $(EMPTY)
 ROOT_INC_FLAG_COVER := $(EMPTY)
 ifneq ($(REL_INCLUDE_ROOT),)
-ROOT_INC_FLAG += -I$(REL_INCLUDE_ROOT)
-ROOT_INC_FLAG_COVER += -I$(call MAKE_ABS_PATH,$(REL_INCLUDE_ROOT))
+  ROOT_INC_FLAG += -I$(REL_INCLUDE_ROOT)
+  ROOT_INC_FLAG_COVER += -I$(call MAKE_ABS_PATH,$(REL_INCLUDE_ROOT))
 endif
 
 
