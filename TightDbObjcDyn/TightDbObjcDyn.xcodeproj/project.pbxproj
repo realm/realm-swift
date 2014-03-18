@@ -24,11 +24,11 @@
 		E91890B9177B677900653D7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E91890B7177B677900653D7A /* InfoPlist.strings */; };
 		E91890D6177B67AB00653D7A /* cursor_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C5177B67AB00653D7A /* cursor_objc.mm */; };
 		E91890D7177B67AB00653D7A /* cursor.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890C6177B67AB00653D7A /* cursor.h */; };
-		E91890D8177B67AB00653D7A /* group_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C7177B67AB00653D7A /* group_objc.mm */; };
-		E91890D9177B67AB00653D7A /* group_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890C8177B67AB00653D7A /* group_priv.h */; };
+		E91890D8177B67AB00653D7A /* transaction_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C7177B67AB00653D7A /* transaction_objc.mm */; };
+		E91890D9177B67AB00653D7A /* transaction_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890C8177B67AB00653D7A /* transaction_priv.h */; };
 		E91890DA177B67AB00653D7A /* group_shared_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C9177B67AB00653D7A /* group_shared_objc.mm */; };
 		E91890DB177B67AB00653D7A /* group_shared.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CA177B67AB00653D7A /* group_shared.h */; };
-		E91890DC177B67AB00653D7A /* group.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CB177B67AB00653D7A /* group.h */; };
+		E91890DC177B67AB00653D7A /* transaction.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CB177B67AB00653D7A /* transaction.h */; };
 		E91890DD177B67AB00653D7A /* helper_macros.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CC177B67AB00653D7A /* helper_macros.h */; };
 		E91890DE177B67AB00653D7A /* query_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890CD177B67AB00653D7A /* query_objc.mm */; };
 		E91890DF177B67AB00653D7A /* query_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CE177B67AB00653D7A /* query_priv.h */; };
@@ -87,11 +87,11 @@
 		E91890B8177B677900653D7A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E91890C5177B67AB00653D7A /* cursor_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = cursor_objc.mm; path = ../../src/tightdb/objc/cursor_objc.mm; sourceTree = "<group>"; };
 		E91890C6177B67AB00653D7A /* cursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursor.h; path = ../../src/tightdb/objc/cursor.h; sourceTree = "<group>"; };
-		E91890C7177B67AB00653D7A /* group_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = group_objc.mm; path = ../../src/tightdb/objc/group_objc.mm; sourceTree = "<group>"; };
-		E91890C8177B67AB00653D7A /* group_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = group_priv.h; path = ../../src/tightdb/objc/group_priv.h; sourceTree = "<group>"; };
+		E91890C7177B67AB00653D7A /* transaction_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = transaction_objc.mm; path = ../../src/tightdb/objc/transaction_objc.mm; sourceTree = "<group>"; };
+		E91890C8177B67AB00653D7A /* transaction_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = transaction_priv.h; path = ../../src/tightdb/objc/transaction_priv.h; sourceTree = "<group>"; };
 		E91890C9177B67AB00653D7A /* group_shared_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = group_shared_objc.mm; path = ../../src/tightdb/objc/group_shared_objc.mm; sourceTree = "<group>"; };
 		E91890CA177B67AB00653D7A /* group_shared.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = group_shared.h; path = ../../src/tightdb/objc/group_shared.h; sourceTree = "<group>"; };
-		E91890CB177B67AB00653D7A /* group.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = group.h; path = ../../src/tightdb/objc/group.h; sourceTree = "<group>"; };
+		E91890CB177B67AB00653D7A /* transaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = transaction.h; path = ../../src/tightdb/objc/transaction.h; sourceTree = "<group>"; };
 		E91890CC177B67AB00653D7A /* helper_macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = helper_macros.h; path = ../../src/tightdb/objc/helper_macros.h; sourceTree = "<group>"; };
 		E91890CD177B67AB00653D7A /* query_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = query_objc.mm; path = ../../src/tightdb/objc/query_objc.mm; sourceTree = "<group>"; };
 		E91890CE177B67AB00653D7A /* query_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = query_priv.h; path = ../../src/tightdb/objc/query_priv.h; sourceTree = "<group>"; };
@@ -188,11 +188,11 @@
 				4D79965F18BDFC3E009EB0C0 /* table_macros.h */,
 				E91890C5177B67AB00653D7A /* cursor_objc.mm */,
 				E91890C6177B67AB00653D7A /* cursor.h */,
-				E91890C7177B67AB00653D7A /* group_objc.mm */,
-				E91890C8177B67AB00653D7A /* group_priv.h */,
+				E91890C7177B67AB00653D7A /* transaction_objc.mm */,
+				E91890C8177B67AB00653D7A /* transaction_priv.h */,
 				E91890C9177B67AB00653D7A /* group_shared_objc.mm */,
 				E91890CA177B67AB00653D7A /* group_shared.h */,
-				E91890CB177B67AB00653D7A /* group.h */,
+				E91890CB177B67AB00653D7A /* transaction.h */,
 				E91890CC177B67AB00653D7A /* helper_macros.h */,
 				E91890CD177B67AB00653D7A /* query_objc.mm */,
 				E91890CE177B67AB00653D7A /* query_priv.h */,
@@ -260,9 +260,9 @@
 			files = (
 				42AD3A9718CDBDFF00C86073 /* support.h in Headers */,
 				E91890D7177B67AB00653D7A /* cursor.h in Headers */,
-				E91890D9177B67AB00653D7A /* group_priv.h in Headers */,
+				E91890D9177B67AB00653D7A /* transaction_priv.h in Headers */,
 				E91890DB177B67AB00653D7A /* group_shared.h in Headers */,
-				E91890DC177B67AB00653D7A /* group.h in Headers */,
+				E91890DC177B67AB00653D7A /* transaction.h in Headers */,
 				E91890DD177B67AB00653D7A /* helper_macros.h in Headers */,
 				4D79966018BDFC3E009EB0C0 /* table_macros.h in Headers */,
 				E91890DF177B67AB00653D7A /* query_priv.h in Headers */,
@@ -378,7 +378,7 @@
 				E91890D6177B67AB00653D7A /* cursor_objc.mm in Sources */,
 				42AD3A9818CDBDFF00C86073 /* support.mm in Sources */,
 				42AD3A9918CDBDFF00C86073 /* version_objc.mm in Sources */,
-				E91890D8177B67AB00653D7A /* group_objc.mm in Sources */,
+				E91890D8177B67AB00653D7A /* transaction_objc.mm in Sources */,
 				E91890DA177B67AB00653D7A /* group_shared_objc.mm in Sources */,
 				E91890DE177B67AB00653D7A /* query_objc.mm in Sources */,
 				E91890E1177B67AB00653D7A /* table_objc.mm in Sources */,

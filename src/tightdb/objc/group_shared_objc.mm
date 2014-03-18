@@ -2,7 +2,7 @@
 #include <tightdb/group_shared.hpp>
 
 #import <tightdb/objc/group_shared.h>
-#import <tightdb/objc/group_priv.h>
+#import <tightdb/objc/transaction_priv.h>
 
 #include <tightdb/objc/util.hpp>
 
