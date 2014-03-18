@@ -41,7 +41,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testGroup_Misc2
 {
     size_t row;
-    TDBGroup* group = [TDBGroup group];
+    TDBTransaction* group = [TDBTransaction group];
     NSLog(@"HasTable: %i", [group hasTableWithName:@"employees" withTableClass:[MyTable class]] );
     // Create new table in group
     MyTable* table = [group getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
@@ -109,7 +109,7 @@ TIGHTDB_TABLE_2(QueryTable,
     [group writeToFile:@"employees.tightdb" withError:nil];
 
     // Load a group from disk (and print contents)
-    TDBGroup* fromDisk = [TDBGroup groupWithFile:@"employees.tightdb" withError:nil];
+    TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"employees.tightdb" withError:nil];
     MyTable* diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
@@ -126,7 +126,7 @@ TIGHTDB_TABLE_2(QueryTable,
     TDBBinary* buffer = [group writeToBuffer];
 
     // Load a group from memory (and print contents)
-    TDBGroup* fromMem = [TDBGroup groupWithBuffer:buffer withError:nil];
+    TDBTransaction* fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
     MyTable* memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         // ??? cursor
@@ -137,7 +137,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
 - (void)testQuery
 {
-    TDBGroup* group = [TDBGroup group];
+    TDBTransaction* group = [TDBTransaction group];
     QueryTable* table = [group getOrCreateTableWithName:@"Query table" asTableClass:[QueryTable class]];
 
     // Add some rows
@@ -194,7 +194,7 @@ TIGHTDB_TABLE_2(QueryTable,
  */
 - (void)testSubtables
 {
-    TDBGroup* group = [TDBGroup group];
+    TDBTransaction* group = [TDBTransaction group];
     TDBTable* table = [group getOrCreateTableWithName:@"table" asTableClass:[TDBTable class]];
 
     // Specify the table type

@@ -21,8 +21,8 @@
 #import <Foundation/Foundation.h>
 #import <tightdb/objc/group.h>
 
-typedef void(^TDBReadBlock)(TDBGroup *group);
-typedef BOOL(^TDBWriteBlock)(TDBGroup *group);
+typedef void(^TDBReadBlock)(TDBTransaction *group);
+typedef BOOL(^TDBWriteBlock)(TDBTransaction *group);
 
 @interface TDBSharedGroup: NSObject
 +(TDBSharedGroup *)sharedGroupWithFile:(NSString *)path withError:(NSError **)error;
