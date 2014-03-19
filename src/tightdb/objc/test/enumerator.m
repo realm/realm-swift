@@ -8,6 +8,7 @@
 #import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/tightdb.h>
+#import <tightdb/objc/transaction.h>
 #import <tightdb/objc/group.h>
 #import <tightdb/objc/table.h>
 
@@ -29,7 +30,7 @@ TIGHTDB_TABLE_2(EnumPeopleTable2,
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
-    TDBGroup *group = [TDBGroup group];
+    TDBTransaction *group = [TDBTransaction group];
     // Create new table in group
     EnumPeopleTable *people = [group getOrCreateTableWithName:@"employees" asTableClass:[EnumPeopleTable class]];
 

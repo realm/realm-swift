@@ -1,21 +1,41 @@
-//
-//  group.m
-//  TightDB
-//
+/*************************************************************************
+ *
+ * TIGHTDB CONFIDENTIAL
+ * __________________
+ *
+ *  [2011] - [2014] TightDB Inc
+ *  All Rights Reserved.
+ *
+ * NOTICE:  All information contained herein is, and remains
+ * the property of TightDB Incorporated and its suppliers,
+ * if any.  The intellectual and technical concepts contained
+ * herein are proprietary to TightDB Incorporated
+ * and its suppliers and may be covered by U.S. and Foreign Patents,
+ * patents in process, and are protected by trade secret or copyright law.
+ * Dissemination of this information or reproduction of this material
+ * is strictly forbidden unless prior written permission is obtained
+ * from TightDB Incorporated.
+ *
+ **************************************************************************/
 
 #include <tightdb/group.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
+#import <tightdb/objc/transaction.h>
 #import <tightdb/objc/group.h>
+#import <tightdb/objc/transaction_priv.h>
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/table_priv.h>
+#import <tightdb/objc/binary.h>
+#import <tightdb/objc/binary_priv.h>
+
 
 #include <tightdb/objc/util.hpp>
 
 using namespace std;
 
 
-@implementation TDBGroup
+@implementation TDBTransaction
 {
     tightdb::Group* m_group;
     BOOL m_is_owned;
@@ -23,9 +43,10 @@ using namespace std;
 }
 
 
-+(TDBGroup*)group
+/* Removed from header for now */
++(TDBTransaction*)group
 {
-    TDBGroup* group = [[TDBGroup alloc] init];
+    TDBTransaction* group = [[TDBTransaction alloc] init];
     try {
         group->m_group = new tightdb::Group;
     }
@@ -43,19 +64,19 @@ using namespace std;
 
 // Private.
 // Careful with this one - Remember that group will be deleted on dealloc.
-+(TDBGroup*)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only
++(TDBTransaction*)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only
 {
-    TDBGroup* group_2 = [[TDBGroup alloc] init];
+    TDBTransaction* group_2 = [[TDBTransaction alloc] init];
     group_2->m_group = group;
     group_2->m_is_owned  = is_owned;
     group_2->m_read_only = read_only;
     return group_2;
 }
 
-
-+(TDBGroup *)groupWithFile:(NSString *)filename withError:(NSError **)error
+/* Removed from header for now */
++(TDBTransaction *)groupWithFile:(NSString *)filename withError:(NSError **)error
 {
-    TDBGroup* group = [[TDBGroup alloc] init];
+    TDBTransaction* group = [[TDBTransaction alloc] init];
     if (!group)
         return nil;
     try {
@@ -90,10 +111,10 @@ using namespace std;
     return group;
 }
 
-
-+(TDBGroup*)groupWithBuffer:(TDBBinary*)buffer withError:(NSError**)error
+/* Removed from header for now */
++(TDBTransaction*)groupWithBuffer:(TDBBinary*)buffer withError:(NSError**)error
 {
-    TDBGroup* group = [[TDBGroup alloc] init];
+    TDBTransaction* group = [[TDBTransaction alloc] init];
     if (!group)
         return nil;
     try {
@@ -171,7 +192,7 @@ using namespace std;
     return YES;
 }
 
-
+/* Removed from header for now */
 -(TDBBinary*)writeToBuffer
 {
     TDBBinary* buffer = [[TDBBinary alloc] init];

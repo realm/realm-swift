@@ -3,7 +3,7 @@
  * TIGHTDB CONFIDENTIAL
  * __________________
  *
- *  [2011] - [2012] TightDB Inc
+ *  [2011] - [2014] TightDB Inc
  *  All Rights Reserved.
  *
  * NOTICE:  All information contained herein is, and remains
@@ -19,17 +19,15 @@
  **************************************************************************/
 
 #import <Foundation/Foundation.h>
-#import <tightdb/objc/transaction.h>
+#import "binary.h"
 
-typedef void(^TDBReadBlock)(TDBTransaction *group);
-typedef BOOL(^TDBWriteBlock)(TDBTransaction *group);
+@interface TDBBinary: NSObject
+-(id)initWithData:(const char *)data size:(size_t)size;
+-(const char *)getData;
+-(size_t)getSize;
 
-@interface TDBSharedGroup: NSObject
-+(TDBSharedGroup *)sharedGroupWithFile:(NSString *)path withError:(NSError **)error;
-
--(void)readWithBlock:(TDBReadBlock)block;
--(BOOL)writeWithBlock:(TDBWriteBlock)block withError:(NSError **)error;
-
--(BOOL)hasChangedSinceLastTransaction;
-
+/**
+ * Compare the referenced binary data for equality.
+ */
+-(BOOL)isEqual:(TDBBinary *)bin;
 @end
