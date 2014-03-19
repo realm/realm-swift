@@ -138,33 +138,19 @@ void sharedGroupFunc() {
     } withError:nil];
 
     // Start a read transaction
-    [sharedGroup readWithBlock:^(TDBTransaction *transaction) {
+    [context readWithBlock:^(TDBTransaction *transaction) {
         // Get the table
-        PeopleTable *table = [group getOrCreateTableWithName:@"employees"
+        PeopleTable *table = [transaction getOrCreateTableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
 
         // Interate over all rows in table
-        for (PeopleTable_Cursor *row in table) {
+        for (PeopleTable_Row *row in table) {
             NSLog(@"Name: %@", row.Name);
         }
     }];
     // @@EndExample@@
 }
 
-void groupFunc() {
-
-    // @@Example: serialisation @@
-    TDBContext *sharedGroup = [TDBContext sharedGroupWithFile:@"people.tightdb"
-                                                              withError:nil];
-
-    // Within a single read transaction we can write a copy of the entire db to a new file.
-    // This is usefull both for backups and for transfering datasets to other machines.
-    [sharedGroup readWithBlock:^(TDBTransaction *transaction) {
-        // Write entire db to disk (in a new file)
-        [transaction writeToFile:@"people_backup.tightdb" withError:nil];
-    }];
-    // @@EndExample@@
-}
 
 @implementation AppDelegate
 
@@ -177,7 +163,6 @@ void groupFunc() {
 
     tableFunc();
     sharedGroupFunc();
-    groupFunc();
     return YES;
 }
 
