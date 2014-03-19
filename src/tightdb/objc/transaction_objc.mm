@@ -26,6 +26,9 @@
 #import <tightdb/objc/transaction_priv.h>
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/table_priv.h>
+#import <tightdb/objc/binary.h>
+#import <tightdb/objc/binary_priv.h>
+
 
 #include <tightdb/objc/util.hpp>
 

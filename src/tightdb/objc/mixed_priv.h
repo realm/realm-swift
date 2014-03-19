@@ -3,7 +3,7 @@
  * TIGHTDB CONFIDENTIAL
  * __________________
  *
- *  [2011] - [2012] TightDB Inc
+ *  [2011] - [2014] TightDB Inc
  *  All Rights Reserved.
  *
  * NOTICE:  All information contained herein is, and remains
@@ -18,13 +18,12 @@
  *
  **************************************************************************/
 
-#import <tightdb/objc/table.h>
-#import <tightdb/objc/mixed.h>
-#import <tightdb/objc/table_view.h>
-#import <tightdb/objc/binary.h>
-#import <tightdb/objc/query.h>
-#import <tightdb/objc/cursor.h>
-#import <tightdb/objc/helper_macros.h>
-#import <tightdb/objc/table_macros.h>
-#import <tightdb/objc/group_shared.h>
-#import <tightdb/objc/version.h>
+
+#import "mixed.h"
+#include <tightdb/mixed.hpp>
+
+@interface TDBMixed()
++(TDBMixed*)mixedWithNativeMixed:(const tightdb::Mixed&)other;
+-(tightdb::Mixed&)getNativeMixed;
+@end
+
