@@ -24,8 +24,8 @@
 typedef void(^TDBReadBlock)(TDBTransaction *group);
 typedef BOOL(^TDBWriteBlock)(TDBTransaction *group);
 
-@interface TDBSharedGroup: NSObject
-+(TDBSharedGroup *)sharedGroupWithFile:(NSString *)path withError:(NSError **)error;
+@interface TDBContext: NSObject
++(TDBContext *)sharedGroupWithFile:(NSString *)path withError:(NSError **)error;
 
 -(void)readWithBlock:(TDBReadBlock)block;
 -(BOOL)writeWithBlock:(TDBWriteBlock)block withError:(NSError **)error;

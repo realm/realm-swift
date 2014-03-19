@@ -20,7 +20,7 @@ void tableFunc() {
     // @@Example: insert_rows @@
 
     // Add a row
-    PeopleTable_Cursor *cursor;
+    PeopleTable_Row *cursor;
     cursor = [people addEmptyRow];
     cursor.Name  = @"John";
     cursor.Age   = 21;
@@ -52,7 +52,7 @@ void tableFunc() {
     NSLog(@"Name: %@", name);
 
     // Using a cursor
-    PeopleTable_Cursor *myRow = people[5];
+    PeopleTable_Row *myRow = people[5];
     int64_t age = myRow.Age;                           // =&gt; 54
     NSLog(@"Age: %lli", age);
     BOOL hired  = myRow.Hired;                         // =&gt; true
@@ -64,7 +64,7 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: last_row @@
-    NSString *last = [people cursorAtLastIndex].Name;  // =&gt; "Anni"
+    NSString *last = [people rowAtLastIndex].Name;  // =&gt; "Anni"
     NSLog(@"Last name: %@", last);
     // @@EndExample@@
 
@@ -80,7 +80,7 @@ void tableFunc() {
 
     // @@Example: iteration @@
     for (NSUInteger i = 0; i < people.rowCount; ++i) {
-        PeopleTable_Cursor *row = people[i];
+        PeopleTable_Row *row = people[i];
         NSLog(@"%@ is %lld years old", row.Name, row.Age);
     }
     // @@EndExample@@
@@ -108,7 +108,7 @@ void tableFunc() {
     PeopleTable_View *res = [q findAll];
 
     // fast emunaration on view
-    for (PeopleTable_Cursor *c in res)
+    for (PeopleTable_Row *c in res)
         NSLog(@"%@ is %lld years old", c.Name, c.Age);
 
     // @@EndExample@@
@@ -122,13 +122,13 @@ void sharedGroupFunc() {
     [fileManager removeItemAtPath:@"people.tightdb" error:&error];
 
     // @@Example: transaction @@
-    TDBSharedGroup *sharedGroup = [TDBSharedGroup sharedGroupWithFile:@"people.tightdb"
+    TDBContext *context = [TDBContext sharedGroupWithFile:@"people.tightdb"
                                                             withError:nil];
 
     // Start a write transaction
-    [sharedGroup writeWithBlock:^(TDBGroup *group) {
+    [context writeWithBlock:^(TDBTransaction *transaction) {
         // Get a specific table from the group
-        PeopleTable *table = [group getOrCreateTableWithName:@"employees"
+        PeopleTable *table = [transaction getOrCreateTableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
 
         // Add a row
@@ -138,7 +138,7 @@ void sharedGroupFunc() {
     } withError:nil];
 
     // Start a read transaction
-    [sharedGroup readWithBlock:^(TDBGroup *group) {
+    [sharedGroup readWithBlock:^(TDBTransaction *transaction) {
         // Get the table
         PeopleTable *table = [group getOrCreateTableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
@@ -154,14 +154,14 @@ void sharedGroupFunc() {
 void groupFunc() {
 
     // @@Example: serialisation @@
-    TDBSharedGroup *sharedGroup = [TDBSharedGroup sharedGroupWithFile:@"people.tightdb"
+    TDBContext *sharedGroup = [TDBContext sharedGroupWithFile:@"people.tightdb"
                                                               withError:nil];
 
     // Within a single read transaction we can write a copy of the entire db to a new file.
     // This is usefull both for backups and for transfering datasets to other machines.
-    [sharedGroup readWithBlock:^(TDBGroup *group) {
+    [sharedGroup readWithBlock:^(TDBTransaction *transaction) {
         // Write entire db to disk (in a new file)
-        [group writeToFile:@"people_backup.tightdb" withError:nil];
+        [transaction writeToFile:@"people_backup.tightdb" withError:nil];
     }];
     // @@EndExample@@
 }
