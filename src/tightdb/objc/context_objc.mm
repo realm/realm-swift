@@ -14,7 +14,7 @@ using namespace std;
     tightdb::util::UniquePtr<tightdb::SharedGroup> m_shared_group;
 }
 
-+(TDBContext*)sharedGroupWithFile:(NSString*)path withError:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
++(TDBContext*)initWithFile:(NSString*)path withError:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
 {
     TDBContext* shared_group = [[TDBContext alloc] init];
     if (!shared_group)
