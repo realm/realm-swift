@@ -122,7 +122,7 @@ void sharedGroupFunc() {
     [fileManager removeItemAtPath:@"people.tightdb" error:&error];
 
     // @@Example: transaction @@
-    TDBContext *context = [TDBContext sharedGroupWithFile:@"people.tightdb"
+    TDBContext *context = [TDBContext initWithFile:@"people.tightdb"
                                                             withError:nil];
 
     // Start a write transaction

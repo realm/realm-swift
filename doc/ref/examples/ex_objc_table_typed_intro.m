@@ -24,7 +24,7 @@ void ex_objc_table_typed_intro()
 
         NSLog(@"The size of the table is now %zd", table.rowCount);
 
-        for (PeopleTable_Cursor *ite in table) {
+        for (PeopleTable_Row *ite in table) {
             NSLog(@"Name: %@ Age: %lli", ite.Name, ite.Age);
         }
 
@@ -32,15 +32,15 @@ void ex_objc_table_typed_intro()
 
         [table insertRow:@{@"Name":@"Sam", @"Age":@30, @"Hired":@YES} atRowIndex:1];
 
-        for (PeopleTable_Cursor *ite in table) {
+        for (PeopleTable_Row *ite in table) {
             NSLog(@"Name: %@ Age: %lli", ite.Name, ite.Age);
         }
 
-        TDBRow *c2 = [table cursorAtIndex:table.rowCount-1];
+        TDBRow *c2 = [table rowAtIndex:table.rowCount-1];
         if (c2 != nil)
             NSLog(@"Last row");
 
-        TDBRow *c3 = [table cursorAtIndex:table.rowCount];
+        TDBRow *c3 = [table rowAtIndex:table.rowCount];
         if (c3 != nil)
             NSLog(@"Should not get here.");
     }
