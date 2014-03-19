@@ -165,7 +165,7 @@ TIGHTDB_TABLE_2(MyTable2,
     } withError:nil];
 
 
-    
+
 
     /*// Load a group from memory (and print contents)
     TDBTransaction *fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];

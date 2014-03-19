@@ -267,8 +267,8 @@ TIGHTDB_TABLE_4(PerfTable,
 
     PerfTable_View *res = [q findAll];
     int agesum = 0;
-    for (PerfTable_Row *cur in res) {
-        agesum += cur.Age;
+    for (PerfTable_Row *row in res) {
+        agesum += row.Age;
         counter++;
     }
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
@@ -288,8 +288,8 @@ TIGHTDB_TABLE_4(PerfTable,
     PerfTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class] ];
 
     int agesum = 0;
-    for (PerfTable_Row *cur in diskTable) {
-        agesum += cur.Age;
+    for (PerfTable_Row *row in diskTable) {
+        agesum += row.Age;
     }
     NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
     dispatch_async(dispatch_get_main_queue(), ^{
