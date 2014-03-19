@@ -13,7 +13,11 @@
 #import <tightdb/objc/query.h>
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/table_priv.h>
+#import <tightdb/objc/table_view.h>
+#import <tightdb/objc/table_view_priv.h>
 #import <tightdb/objc/cursor.h>
+#import <tightdb/objc/binary.h>
+#import <tightdb/objc/binary_priv.h>
 
 #include <tightdb/objc/util.hpp>
 
@@ -273,9 +277,9 @@ using namespace std;
 
 
 
--(TDBQuery*)dateIsEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
+-(TDBQuery*)dateIsEqualTo:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->equal_datetime(colIndex, aDate);
+    m_query->equal_datetime(colIndex, [aDate timeIntervalSince1970]);
     return self;
 }
 
@@ -317,9 +321,9 @@ using namespace std;
     return self;
 }
 
--(TDBQuery*)dateIsNotEqualTo:(time_t)value inColumnWithIndex:(NSUInteger)colIndex
+-(TDBQuery*)dateIsNotEqualTo:(NSDate *)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->not_equal_datetime(colIndex, value);
+    m_query->not_equal_datetime(colIndex, [value timeIntervalSince1970]);
     return self;
 }
 
@@ -349,9 +353,9 @@ using namespace std;
     return self;
 }
 
--(TDBQuery*)dateIsGreaterThan:(time_t)value inColumnWithIndex:(NSUInteger)colIndex
+-(TDBQuery*)dateIsGreaterThan:(NSDate *)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->greater_datetime(colIndex, value);
+    m_query->greater_datetime(colIndex, [value timeIntervalSince1970]);
     return self;
 }
 
@@ -375,9 +379,9 @@ using namespace std;
     return self;
 }
 
--(TDBQuery*)dateIsGreaterThanOrEqualTo:(time_t)value inColumnWithIndex:(NSUInteger)colIndex
+-(TDBQuery*)dateIsGreaterThanOrEqualTo:(NSDate *)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->greater_equal_datetime(colIndex, value);
+    m_query->greater_equal_datetime(colIndex, [value timeIntervalSince1970]);
     return self;
 }
 
@@ -401,9 +405,9 @@ using namespace std;
     return self;
 }
 
--(TDBQuery*)dateIsLessThan:(time_t)value inColumnWithIndex:(NSUInteger)colIndex
+-(TDBQuery*)dateIsLessThan:(NSDate *)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->less_datetime(colIndex, value);
+    m_query->less_datetime(colIndex, [value timeIntervalSince1970]);
     return self;
 }
 
@@ -427,9 +431,9 @@ using namespace std;
     return self;
 }
 
--(TDBQuery*)dateIsLessThanOrEqualTo:(time_t)value inColumnWithIndex:(NSUInteger)colIndex
+-(TDBQuery*)dateIsLessThanOrEqualTo:(NSDate *)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->less_equal_datetime(colIndex, value);
+    m_query->less_equal_datetime(colIndex, [value timeIntervalSince1970]);
     return self;
 }
 
@@ -835,39 +839,39 @@ using namespace std;
     }
     return self;
 }
--(TDBQuery*)columnIsEqualTo:(time_t)value
+-(TDBQuery*)columnIsEqualTo:(NSDate *)value
 {
-    [_query getNativeQuery].equal_datetime(_column_ndx, value);
+    [_query getNativeQuery].equal_datetime(_column_ndx, [value timeIntervalSince1970]);
     return _query;
 }
--(TDBQuery*)columnIsNotEqualTo:(time_t)value
+-(TDBQuery*)columnIsNotEqualTo:(NSDate *)value
 {
-    [_query getNativeQuery].not_equal_datetime(_column_ndx, value);
+    [_query getNativeQuery].not_equal_datetime(_column_ndx, [value timeIntervalSince1970]);
     return _query;
 }
--(TDBQuery*)columnIsGreaterThan:(time_t)value
+-(TDBQuery*)columnIsGreaterThan:(NSDate *)value
 {
-    [_query getNativeQuery].greater_datetime(_column_ndx, value);
+    [_query getNativeQuery].greater_datetime(_column_ndx, [value timeIntervalSince1970]);
     return _query;
 }
--(TDBQuery*)columnIsGreaterThanOrEqualTo:(time_t)value
+-(TDBQuery*)columnIsGreaterThanOrEqualTo:(NSDate *)value
 {
-    [_query getNativeQuery].greater_equal_datetime(_column_ndx, value);
+    [_query getNativeQuery].greater_equal_datetime(_column_ndx, [value timeIntervalSince1970]);
     return _query;
 }
--(TDBQuery*)columnIsLessThan:(time_t)value
+-(TDBQuery*)columnIsLessThan:(NSDate *)value
 {
-    [_query getNativeQuery].less_datetime(_column_ndx, value);
+    [_query getNativeQuery].less_datetime(_column_ndx, [value timeIntervalSince1970]);
     return _query;
 }
--(TDBQuery*)columnIsLessThanOrEqualTo:(time_t)value
+-(TDBQuery*)columnIsLessThanOrEqualTo:(NSDate *)value
 {
-    [_query getNativeQuery].less_equal_datetime(_column_ndx, value);
+    [_query getNativeQuery].less_equal_datetime(_column_ndx, [value timeIntervalSince1970]);
     return _query;
 }
--(TDBQuery*)columnIsBetween:(time_t)from and_:(time_t)to
+-(TDBQuery*)columnIsBetween:(NSDate *)from and_:(NSDate *)to
 {
-    [_query getNativeQuery].between_datetime(_column_ndx, from, to);
+    [_query getNativeQuery].between_datetime(_column_ndx, [from timeIntervalSince1970], [to timeIntervalSince1970]);
     return _query;
 }
 @end

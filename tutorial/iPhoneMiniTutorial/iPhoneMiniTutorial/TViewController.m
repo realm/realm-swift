@@ -20,10 +20,10 @@
     TDBSharedGroup *sharedGroup = [TDBSharedGroup sharedGroupWithFile:filename withError:nil];
 
     // Perform a write transaction
-    [sharedGroup writeWithBlock:^(TDBGroup *group) {
+    [sharedGroup writeWithBlock:^(TDBTransaction *transaction) {
 
         // Access table from group
-        TDBTable *table = [group getOrCreateTableWithName:@"myTable"];
+        TDBTable *table = [transaction getOrCreateTableWithName:@"myTable"];
 
         // Add columns to the table
         [table addColumnWithName:@"Name" andType:TDBStringType];

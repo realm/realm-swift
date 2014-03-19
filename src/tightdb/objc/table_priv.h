@@ -5,18 +5,7 @@
 
 #import <Foundation/Foundation.h>
 
-
-@interface TDBBinary()
-
--(tightdb::BinaryData&)getNativeBinary;
-
-@end
-
-@interface TDBView()
-
-+(TDBView*)viewWithTable:(TDBTable*)table andNativeView:(const tightdb::TableView&)view;
-
-@end
+#include <tightdb/table.hpp>
 
 @interface TDBTable()
 

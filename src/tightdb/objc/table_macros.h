@@ -32,6 +32,12 @@
 #import <tightdb/objc/query.h>
 #import <tightdb/objc/cursor.h>
 #import <tightdb/objc/helper_macros.h>
+#import <tightdb/objc/descriptor.h>
+#import <tightdb/objc/table_view.h>
+#import <tightdb/objc/column_proxy.h>
+#import <tightdb/objc/binary.h>
+#import <tightdb/objc/mixed.h>
+
 
 
 #define TIGHTDB_TABLE_DEF_1(TableName, CName1, CType1) \

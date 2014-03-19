@@ -3,7 +3,7 @@
  * TIGHTDB CONFIDENTIAL
  * __________________
  *
- *  [2011] - [2012] TightDB Inc
+ *  [2011] - [2014] TightDB Inc
  *  All Rights Reserved.
  *
  * NOTICE:  All information contained herein is, and remains
@@ -19,17 +19,47 @@
  **************************************************************************/
 
 #import <Foundation/Foundation.h>
-#import <tightdb/objc/transaction.h>
 
-typedef void(^TDBReadBlock)(TDBTransaction *group);
-typedef BOOL(^TDBWriteBlock)(TDBTransaction *group);
+#include <tightdb/util/unique_ptr.hpp>
+#include <tightdb/binary_data.hpp>
 
-@interface TDBSharedGroup: NSObject
-+(TDBSharedGroup *)sharedGroupWithFile:(NSString *)path withError:(NSError **)error;
+#import "binary.h"
+#import "binary_priv.h"
 
--(void)readWithBlock:(TDBReadBlock)block;
--(BOOL)writeWithBlock:(TDBWriteBlock)block withError:(NSError **)error;
-
--(BOOL)hasChangedSinceLastTransaction;
-
+@implementation TDBBinary
+{
+    tightdb::BinaryData m_data;
+}
+-(id)initWithData:(const char*)data size:(size_t)size
+{
+    self = [super init];
+    if (self) {
+        m_data = tightdb::BinaryData(data, size);
+    }
+    return self;
+}
+-(id)initWithBinary:(tightdb::BinaryData)data
+{
+    self = [super init];
+    if (self) {
+        m_data = data;
+    }
+    return self;
+}
+-(const char*)getData
+{
+    return m_data.data();
+}
+-(size_t)getSize
+{
+    return m_data.size();
+}
+-(BOOL)isEqual:(TDBBinary*)bin
+{
+    return m_data == bin->m_data;
+}
+-(tightdb::BinaryData&)getNativeBinary
+{
+    return m_data;
+}
 @end
