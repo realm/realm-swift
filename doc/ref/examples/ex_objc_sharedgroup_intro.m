@@ -33,7 +33,7 @@ void ex_objc_sharedgroup_intro()
 
         success = [shared writeWithBlock:^(TDBGroup *group) {
             /* Write transactions with the shared group are possible via the provided variable binding named group. */
-            PeopleTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class] error:nil];
+            PeopleTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
 
             if ([table rowCount] == 0) {
                 NSLog(@"Not empty!");
@@ -52,7 +52,7 @@ void ex_objc_sharedgroup_intro()
         success = [shared writeWithBlock:^(TDBGroup *group) {
 
             /* Write transactions with the shared group are possible via the provided variable binding named group. */
-           PeopleTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class] error:nil];
+           PeopleTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
 
            if ([table rowCount] == 0) {
                NSLog(@"Roll back!");
@@ -71,9 +71,9 @@ void ex_objc_sharedgroup_intro()
         [shared readWithBlock:^(TDBGroup *group) {
 
             /* Read transactions with the shared group are possible via the provided variable binding named group. */
-            PeopleTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class] error:nil];
+            PeopleTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
 
-            for (PeopleTable_Cursor *row in table) {
+            for (PeopleTable_Row *row in table) {
                 NSLog(@"Name: %@", [row Name]);
             }
         }];
