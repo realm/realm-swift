@@ -12,6 +12,7 @@
 #import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/tightdb.h>
+#import <tightdb/objc/transaction.h>
 #import <tightdb/objc/group.h>
 #import <tightdb/objc/table.h>
 #include <tightdb/binary_data.hpp>
@@ -60,7 +61,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    TDBGroup* group = [TDBGroup group];
+    TDBTransaction* group = [TDBTransaction group];
     // Create new table in group
     PeopleErrTable* people = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
@@ -111,7 +112,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     // Load a group from disk (and try to update, even though it is readonly)
     error = nil;
-    TDBGroup* fromDisk = [TDBGroup groupWithFile:@"peopleErr.tightdb" withError:&error];
+    TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"peopleErr.tightdb" withError:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
     }
@@ -133,7 +134,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     }
 
     error = nil;
-    fromDisk = [TDBGroup groupWithFile:@"peopleErr.tightdb" withError:&error];
+    fromDisk = [TDBTransaction groupWithFile:@"peopleErr.tightdb" withError:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"File should have been possible to open");

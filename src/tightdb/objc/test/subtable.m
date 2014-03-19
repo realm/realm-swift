@@ -8,6 +8,7 @@
 #import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/tightdb.h>
+#import <tightdb/objc/transaction.h>
 #import <tightdb/objc/group.h>
 
 TIGHTDB_TABLE_2(TestSubtableSub,
@@ -42,7 +43,7 @@ TIGHTDB_TABLE_3(TestSubtableMain,
 
 - (void)testSubtable
 {
-    TDBGroup *group = [TDBGroup group];
+    TDBTransaction *group = [TDBTransaction group];
 
     /* Create new table in group */
     TestSubtableMain *people = [group getOrCreateTableWithName:@"employees" asTableClass:[TestSubtableMain class]];

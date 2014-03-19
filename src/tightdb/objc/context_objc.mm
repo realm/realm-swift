@@ -1,22 +1,22 @@
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/group_shared.hpp>
 
-#import <tightdb/objc/group_shared.h>
-#import <tightdb/objc/group_priv.h>
+#import <tightdb/objc/context.h>
+#import <tightdb/objc/transaction_priv.h>
 
 #include <tightdb/objc/util.hpp>
 
 using namespace std;
 
 
-@implementation TDBSharedGroup
+@implementation TDBContext
 {
     tightdb::util::UniquePtr<tightdb::SharedGroup> m_shared_group;
 }
 
-+(TDBSharedGroup*)sharedGroupWithFile:(NSString*)path withError:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
++(TDBContext*)sharedGroupWithFile:(NSString*)path withError:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
 {
-    TDBSharedGroup* shared_group = [[TDBSharedGroup alloc] init];
+    TDBContext* shared_group = [[TDBContext alloc] init];
     if (!shared_group)
         return nil;
     try {
@@ -74,7 +74,7 @@ using namespace std;
         // should throw anything but NSException or derivatives. Note: if the client calls other libraries
         // throwing other kinds of exceptions they will leak back to the client code, if he does not
         // catch them within the block.
-        TDBGroup* group_2 = [TDBGroup groupWithNativeGroup:const_cast<tightdb::Group*>(group) isOwned:NO readOnly:YES];
+        TDBTransaction* group_2 = [TDBTransaction groupWithNativeGroup:const_cast<tightdb::Group*>(group) isOwned:NO readOnly:YES];
         block(group_2);
 
     }
@@ -102,7 +102,7 @@ using namespace std;
 
     BOOL confirmation = NO;
     @try {
-        TDBGroup* group_2 = [TDBGroup groupWithNativeGroup:group isOwned:NO readOnly:NO];
+        TDBTransaction* group_2 = [TDBTransaction groupWithNativeGroup:group isOwned:NO readOnly:NO];
         confirmation = block(group_2);
     }
     @catch (NSException* exception) {

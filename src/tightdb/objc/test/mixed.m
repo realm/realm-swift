@@ -11,8 +11,9 @@
 #import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/tightdb.h>
+#import <tightdb/objc/transaction.h>
 #import <tightdb/objc/group.h>
-#import <tightdb/objc/group_shared.h>
+#import <tightdb/objc/context.h>
 
 TIGHTDB_TABLE_3(MixedTable,
                 Hired, Bool,
@@ -140,7 +141,7 @@ TIGHTDB_TABLE_2(SubMixedTable,
     [tableSub addHired:NO Age:43];
     [tableSub addHired:YES Age:54];
 
-    TDBGroup *group = [TDBGroup group];
+    TDBTransaction *group = [TDBTransaction group];
     // Create new table in group
     MixedTable *table = [group getOrCreateTableWithName:@"MixedValues" asTableClass:[MixedTable class]];
     NSLog(@"Table: %@", table);
