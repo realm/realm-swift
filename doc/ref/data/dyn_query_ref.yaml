@@ -73,7 +73,7 @@ CATEGORIES :
         TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       RETURN:
-        TYPES  : TDBbQuery *
+        TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -112,7 +112,7 @@ CATEGORIES :
       - NAME   : value
         TYPES  : [BOOL, int64_t, float, double, NSString*, time_t]
         DESCR  : *g_dyn_query_value_descr
-      - NAME   : colIndex
+      - NAME   : inColunmWithIndex
         TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       RETURN:
@@ -144,11 +144,11 @@ CATEGORIES :
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : *g_dyn_query_value_descr
-      - NAME   : colIndex
+      - NAME   : inColumnWithIndex
         TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       RETURN:
-        TYPES  : TDBuery *
+        TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -174,7 +174,7 @@ CATEGORIES :
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : *g_dyn_query_value_descr
-      - NAME   : colIndex
+      - NAME   : inColumnWithIndex
         TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       RETURN:
@@ -204,7 +204,7 @@ CATEGORIES :
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : *g_dyn_query_value_descr
-      - NAME   : colIndex
+      - NAME   : inColumnWithIndex
         TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
 
@@ -235,7 +235,7 @@ CATEGORIES :
       - NAME   : value
         TYPES  : [int64_t, float, double, time_t]
         DESCR  : *g_dyn_query_value_descr
-      - NAME   : colIndex
+      - NAME   : inColumnWithIndex
         TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
 
@@ -248,16 +248,17 @@ CATEGORIES :
 
 
 
+# FIXME: This is not correct but implementation should change
   - g_dyn_query_startsWith_binary:
       TODO     : soon
   - g_dyn_query_startsWith_string:
       TODO     : soon
-      NAME     : beginsWith
+      NAME     : columnBeginsWith
   - g_dyn_query_startsWith_string_2:
       TODO     : soon
       NAME     : beginsWith
       SIGNATURE: |
-                 (TDBQuery *)beginsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 (TDBQuery *)columnBeginsWith:(NSString *)value
 #                (TDBQuery *)beginsWith:(NSString *)value
       DESCR    : *g_dyn_query_startsWith_descr
       SUMMARY  : *g_dyn_query_startsWith_summary
@@ -285,9 +286,9 @@ CATEGORIES :
       NAME     : endsWith
   - g_dyn_query_endsWith_string_2:
       TODO     : soon
-      NAME     : endsWith
+      NAME     : columnEndsWith
       SIGNATURE: |
-                 (TDBQuery *)endsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 (TDBQuery *)columnEndsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
 #                (TDBQuery *)endsWith:(NSString *)value
       DESCR    : *g_dyn_query_endsWith_descr
       SUMMARY  : *g_dyn_query_endsWith_summary
@@ -315,10 +316,10 @@ CATEGORIES :
       TODO     : soon
   - g_dyn_query_contains_string_2:
       TODO     : soon
-      NAME     : contains
+      NAME     : columnContains
       SIGNATURE: |
-                 (TDBQuery *)contains:(NSString *)value caseSensitive:(BOOL)caseSensitive
-                 (TDBQuery *)contains:(NSString *)value
+                 (TDBQuery *)columnContains:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 (TDBQuery *)columnContains:(NSString *)value
 #                 TDBQuery * contains_binary(size_t column_ndx, NSString* data, size_t size);
       DESCR    : *g_dyn_query_contains_descr
       SUMMARY  : *g_dyn_query_contains_summary
@@ -382,9 +383,9 @@ CATEGORIES :
       NAMES    : "subtableInColumnWithIndex:"
       DESCR    : *g_dyn_query_subtable_descr
       SUMMARY  : *g_dyn_query_subtable_summary
-      SIGNATURE: (void)subtableInColumnWithIndex:(NSUInteger)colIndex
+      SIGNATURE: (void)subtableInColumnWithIndex:(NSUInteger)column
       PARAMS:
-      - NAME   : colIndex
+        NAME   : column
         TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       RETURN:
