@@ -258,7 +258,7 @@ CATEGORIES :
       TODO     : soon
       NAME     : beginsWith
       SIGNATURE: |
-                 (TDBQuery *)columnBeginWith:(NSString *)value
+                 (TDBQuery *)columnBeginsWith:(NSString *)value
 #                (TDBQuery *)beginsWith:(NSString *)value
       DESCR    : *g_dyn_query_startsWith_descr
       SUMMARY  : *g_dyn_query_startsWith_summary
