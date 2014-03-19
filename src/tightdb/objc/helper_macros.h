@@ -42,7 +42,7 @@
 #define TIGHTDB_TYPE_Double    double
 #define TIGHTDB_TYPE_String    NSString*
 #define TIGHTDB_TYPE_Binary    TDBBinary*
-#define TIGHTDB_TYPE_Date      time_t
+#define TIGHTDB_TYPE_Date      NSDate *
 #define TIGHTDB_TYPE_Mixed     TDBMixed*
 
 #define TIGHTDB_TYPE_ID_Bool   TDBBoolType
@@ -462,42 +462,42 @@
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Date(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TDBQueryAccessorDate \
--(table##_Query*)columnIsEqualTo:(time_t)value; \
--(table##_Query*)columnIsNotEqualTo:(time_t)value; \
--(table##_Query*)columnIsGreaterThan:(time_t)value; \
--(table##_Query*)columnIsGreaterThanOrEqualTo:(time_t)value; \
--(table##_Query*)columnIsLessThan:(time_t)value; \
--(table##_Query*)columnIsLessThanOrEqualTo:(time_t)value; \
--(table##_Query*)columnIsBetween:(time_t)from and_:(time_t)to; \
+-(table##_Query*)columnIsEqualTo:(NSDate *)value; \
+-(table##_Query*)columnIsNotEqualTo:(NSDate *)value; \
+-(table##_Query*)columnIsGreaterThan:(NSDate *)value; \
+-(table##_Query*)columnIsGreaterThanOrEqualTo:(NSDate *)value; \
+-(table##_Query*)columnIsLessThan:(NSDate *)value; \
+-(table##_Query*)columnIsLessThanOrEqualTo:(NSDate *)value; \
+-(table##_Query*)columnIsBetween:(NSDate *)from and_:(NSDate *)to; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Date(table, col_name) \
 @implementation table##_QueryAccessor_##col_name \
--(table##_Query*)columnIsEqualTo:(time_t)value \
+-(table##_Query*)columnIsEqualTo:(NSDate *)value \
 { \
     return (table##_Query*)[super columnIsEqualTo:value]; \
 } \
--(table##_Query*)columnIsNotEqualTo:(time_t)value \
+-(table##_Query*)columnIsNotEqualTo:(NSDate *)value \
 { \
     return (table##_Query*)[super columnIsNotEqualTo:value]; \
 } \
--(table##_Query*)columnIsGreaterThan:(time_t)value \
+-(table##_Query*)columnIsGreaterThan:(NSDate *)value \
 { \
     return (table##_Query*)[super columnIsGreaterThan:value]; \
 } \
--(table##_Query*)columnIsGreaterThanOrEqualTo:(time_t)value \
+-(table##_Query*)columnIsGreaterThanOrEqualTo:(NSDate *)value \
 { \
     return (table##_Query*)[super columnIsGreaterThanOrEqualTo:value]; \
 } \
--(table##_Query*)columnIsLessThan:(time_t)value \
+-(table##_Query*)columnIsLessThan:(NSDate *)value \
 { \
     return (table##_Query*)[super columnIsLessThan:value]; \
 } \
--(table##_Query*)columnIsLessThanOrEqualTo:(time_t)value \
+-(table##_Query*)columnIsLessThanOrEqualTo:(NSDate *)value \
 { \
     return (table##_Query*)[super columnIsLessThanOrEqualTo:value]; \
 } \
--(table##_Query*)columnIsBetween:(time_t)from and_:(time_t)to \
+-(table##_Query*)columnIsBetween:(NSDate *)from and_:(NSDate *)to \
 { \
     return (table##_Query*)[super columnIsBetween:from and_:to]; \
 } \
