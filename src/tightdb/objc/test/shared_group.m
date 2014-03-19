@@ -10,7 +10,7 @@
 #import <tightdb/objc/tightdb.h>
 #import <tightdb/objc/transaction.h>
 #import <tightdb/objc/group.h>
-#import <tightdb/objc/group_shared.h>
+#import <tightdb/objc/context.h>
 
 TIGHTDB_TABLE_2(SharedTable2,
                 Hired, Bool,
@@ -45,10 +45,10 @@ TIGHTDB_TABLE_2(SharedTable2,
     // Write to disk
     [fm removeItemAtPath:@"employees.tightdb" error:nil];
     [fm removeItemAtPath:@"employees.tightdb.lock" error:nil];
-    [group writeToFile:@"employees.tightdb" withError:nil];
+    [group writeContextToFile:@"employees.tightdb" withError:nil];
 
     // Read only shared group
-    TDBSharedGroup* fromDisk = [TDBSharedGroup sharedGroupWithFile:@"employees.tightdb" withError:nil];
+    TDBContext* fromDisk = [TDBContext initWithFile:@"employees.tightdb" withError:nil];
 
     [fromDisk readWithBlock:^(TDBTransaction* group) {
             SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class]];
@@ -112,7 +112,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:@"readonlyTest.tightdb" error:nil];
     [fm removeItemAtPath:@"readonlyTest.tightdb.lock" error:nil];
     
-    TDBSharedGroup* fromDisk = [TDBSharedGroup sharedGroupWithFile:@"readonlyTest.tightdb" withError:nil];
+    TDBContext* fromDisk = [TDBContext initWithFile:@"readonlyTest.tightdb" withError:nil];
     
     [fromDisk writeWithBlock:^(TDBTransaction *group) {
         TDBTable *t = [group getOrCreateTableWithName:@"table"];
@@ -152,7 +152,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:@"hasChanged.tightdb" error:nil];
     [fm removeItemAtPath:@"hasChanged.tightdb.lock" error:nil];
     
-    TDBSharedGroup *sg = [TDBSharedGroup sharedGroupWithFile:@"hasChanged.tightdb" withError:nil];
+    TDBContext *sg = [TDBContext initWithFile:@"hasChanged.tightdb" withError:nil];
     
     STAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not changed");
     
@@ -176,7 +176,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     
     
     // OTHER sharedgroup
-    TDBSharedGroup *sg2 = [TDBSharedGroup sharedGroupWithFile:@"hasChanged.tightdb" withError:nil];
+    TDBContext *sg2 = [TDBContext initWithFile:@"hasChanged.tightdb" withError:nil];
     
     
     [sg2 writeWithBlock:^(TDBTransaction* group) {

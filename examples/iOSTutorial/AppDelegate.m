@@ -122,13 +122,13 @@ void sharedGroupFunc() {
     [fileManager removeItemAtPath:@"people.tightdb" error:&error];
 
     // @@Example: transaction @@
-    TDBSharedGroup *sharedGroup = [TDBSharedGroup sharedGroupWithFile:@"people.tightdb"
+    TDBContext *context = [TDBContext initWithFile:@"people.tightdb"
                                                             withError:nil];
 
     // Start a write transaction
-    [sharedGroup writeWithBlock:^(TDBGroup *group) {
+    [context writeWithBlock:^(TDBTransaction *transaction) {
         // Get a specific table from the group
-        PeopleTable *table = [group getOrCreateTableWithName:@"employees"
+        PeopleTable *table = [transaction getOrCreateTableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
 
         // Add a row
@@ -138,9 +138,9 @@ void sharedGroupFunc() {
     } withError:nil];
 
     // Start a read transaction
-    [sharedGroup readWithBlock:^(TDBGroup *group) {
+    [context readWithBlock:^(TDBTransaction *transaction) {
         // Get the table
-        PeopleTable *table = [group getOrCreateTableWithName:@"employees"
+        PeopleTable *table = [transaction getOrCreateTableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
 
         // Interate over all rows in table
@@ -151,20 +151,6 @@ void sharedGroupFunc() {
     // @@EndExample@@
 }
 
-void groupFunc() {
-
-    // @@Example: serialisation @@
-    TDBSharedGroup *sharedGroup = [TDBSharedGroup sharedGroupWithFile:@"people.tightdb"
-                                                              withError:nil];
-
-    // Within a single read transaction we can write a copy of the entire db to a new file.
-    // This is usefull both for backups and for transfering datasets to other machines.
-    [sharedGroup readWithBlock:^(TDBGroup *group) {
-        // Write entire db to disk (in a new file)
-        [group writeToFile:@"people_backup.tightdb" withError:nil];
-    }];
-    // @@EndExample@@
-}
 
 @implementation AppDelegate
 
@@ -177,7 +163,6 @@ void groupFunc() {
 
     tableFunc();
     sharedGroupFunc();
-    groupFunc();
     return YES;
 }
 

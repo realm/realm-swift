@@ -107,7 +107,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Write to disk
     [fm removeItemAtPath:@"employees.tightdb" error:nil];
-    [group writeToFile:@"employees.tightdb" withError:nil];
+    [group writeContextToFile:@"employees.tightdb" withError:nil];
 
     // Load a group from disk (and print contents)
     TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"employees.tightdb" withError:nil];
@@ -124,7 +124,7 @@ TIGHTDB_TABLE_2(QueryTable,
     }
 
     // Write same group to memory buffer
-    TDBBinary* buffer = [group writeToBuffer];
+    TDBBinary* buffer = [group writeContextToBuffer];
 
     // Load a group from memory (and print contents)
     TDBTransaction* fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
