@@ -13,7 +13,7 @@
 #import <tightdb/objc/tightdb.h>
 #import <tightdb/objc/transaction.h>
 #import <tightdb/objc/group.h>
-#import <tightdb/objc/group_shared.h>
+#import <tightdb/objc/context.h>
 
 TIGHTDB_TABLE_3(MixedTable,
                 Hired, Bool,

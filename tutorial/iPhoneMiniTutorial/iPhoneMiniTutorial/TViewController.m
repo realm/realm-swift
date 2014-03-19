@@ -17,17 +17,14 @@
     [fileManager removeItemAtPath:filename error:&error];
 
     // Create data file
-    TDBSharedGroup *sharedGroup = [TDBSharedGroup sharedGroupWithFile:filename withError:nil];
+    TDBContext *context = [TDBContext sharedGroupWithFile:filename withError:nil];
 
     // Perform a write transaction
-    [sharedGroup writeWithBlock:^(TDBTransaction *transaction) {
+    [context writeWithBlock:^(TDBTransaction *transaction) {
 
         // Access table from group
-<<<<<<< HEAD
         TDBTable *table = [transaction getOrCreateTableWithName:@"myTable"];
-=======
-        TDBTable *table = [group getOrCreateTableWithName:@"myTable"];
->>>>>>> dee8be2b4a8d09b67b1d0c4911ce680acb3a56d3
+
 
         // Add columns to the table
         [table addColumnWithName:@"Name" andType:TDBStringType];

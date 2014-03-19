@@ -1,7 +1,7 @@
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/group_shared.hpp>
 
-#import <tightdb/objc/group_shared.h>
+#import <tightdb/objc/context.h>
 #import <tightdb/objc/transaction_priv.h>
 
 #include <tightdb/objc/util.hpp>
@@ -9,14 +9,14 @@
 using namespace std;
 
 
-@implementation TDBSharedGroup
+@implementation TDBContext
 {
     tightdb::util::UniquePtr<tightdb::SharedGroup> m_shared_group;
 }
 
-+(TDBSharedGroup*)sharedGroupWithFile:(NSString*)path withError:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
++(TDBContext*)sharedGroupWithFile:(NSString*)path withError:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
 {
-    TDBSharedGroup* shared_group = [[TDBSharedGroup alloc] init];
+    TDBContext* shared_group = [[TDBContext alloc] init];
     if (!shared_group)
         return nil;
     try {
