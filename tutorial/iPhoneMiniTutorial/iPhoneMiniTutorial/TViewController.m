@@ -17,7 +17,7 @@
     [fileManager removeItemAtPath:filename error:&error];
 
     // Create data file
-    TDBContext *context = [TDBContext sharedGroupWithFile:filename withError:nil];
+    TDBContext *context = [TDBContext initWithFile:filename withError:nil];
 
     // Perform a write transaction
     [context writeWithBlock:^(TDBTransaction *transaction) {
