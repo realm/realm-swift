@@ -20,11 +20,11 @@ void tableFunc() {
     // @@Example: insert_rows @@
 
     // Add a row
-    PeopleTable_Row *cursor;
-    cursor = [people addEmptyRow];
-    cursor.Name  = @"John";
-    cursor.Age   = 21;
-    cursor.Hired = YES;
+    PeopleTable_Row *row;
+    row = [people addEmptyRow];
+    row.Name  = @"John";
+    row.Age   = 21;
+    row.Hired = YES;
 
     // Add more rows
     [people appendRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
@@ -108,8 +108,8 @@ void tableFunc() {
     PeopleTable_View *res = [q findAll];
 
     // fast emunaration on view
-    for (PeopleTable_Row *c in res)
-        NSLog(@"%@ is %lld years old", c.Name, c.Age);
+    for (PeopleTable_Row *r in res)
+        NSLog(@"%@ is %lld years old", r.Name, r.Age);
 
     // @@EndExample@@
 
