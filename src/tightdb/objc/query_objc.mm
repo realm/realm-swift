@@ -13,7 +13,11 @@
 #import <tightdb/objc/query.h>
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/table_priv.h>
+#import <tightdb/objc/table_view.h>
+#import <tightdb/objc/table_view_priv.h>
 #import <tightdb/objc/cursor.h>
+#import <tightdb/objc/binary.h>
+#import <tightdb/objc/binary_priv.h>
 
 #include <tightdb/objc/util.hpp>
 
