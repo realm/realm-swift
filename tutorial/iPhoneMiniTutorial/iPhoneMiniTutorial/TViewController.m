@@ -17,10 +17,10 @@
     [fileManager removeItemAtPath:filename error:&error];
 
     // Create data file
-    TDBSharedGroup *sharedGroup = [TDBSharedGroup sharedGroupWithFile:filename withError:nil];
+    TDBContext *context = [TDBContext initWithFile:filename withError:nil];
 
     // Perform a write transaction
-    [sharedGroup writeWithBlock:^(TDBTransaction *transaction) {
+    [context writeWithBlock:^(TDBTransaction *transaction) {
 
         // Access table from group
         TDBTable *table = [transaction getOrCreateTableWithName:@"myTable"];

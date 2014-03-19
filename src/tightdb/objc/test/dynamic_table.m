@@ -859,7 +859,7 @@
     const char bin[4] = { 0, 1, 2, 3 };
     TDBBinary* bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
     TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
-    NSDate *timeNow = [NSDate date];
+    // NSDate *timeNow = [NSDate date];
 
     TDBTable* subtab1 = [[TDBTable alloc] init];
     [subtab1 addColumnWithName:@"TableCol_IntCol" andType:TDBIntType];

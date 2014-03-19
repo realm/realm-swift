@@ -26,5 +26,5 @@
 #import <tightdb/objc/cursor.h>
 #import <tightdb/objc/helper_macros.h>
 #import <tightdb/objc/table_macros.h>
-#import <tightdb/objc/group_shared.h>
+#import <tightdb/objc/context.h>
 #import <tightdb/objc/version.h>
