@@ -257,7 +257,7 @@ TIGHTDB_TABLE_4(PerfTable,
 #ifdef TDB_GROUP_IMPLEMENTED
     int counter = 0;
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
-    
+
     TDBTransaction *fromDisk = [TDBTransaction groupWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"]withError:nil];
     PerfTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class] ];
 
