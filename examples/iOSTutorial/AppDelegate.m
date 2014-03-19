@@ -20,11 +20,11 @@ void tableFunc() {
     // @@Example: insert_rows @@
 
     // Add a row
-    PeopleTable_Cursor *cursor;
-    cursor = [people addEmptyRow];
-    cursor.Name  = @"John";
-    cursor.Age   = 21;
-    cursor.Hired = YES;
+    PeopleTable_Row *row;
+    row = [people addEmptyRow];
+    row.Name  = @"John";
+    row.Age   = 21;
+    row.Hired = YES;
 
     // Add more rows
     [people appendRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
@@ -52,7 +52,7 @@ void tableFunc() {
     NSLog(@"Name: %@", name);
 
     // Using a cursor
-    PeopleTable_Cursor *myRow = people[5];
+    PeopleTable_Row *myRow = people[5];
     int64_t age = myRow.Age;                           // =&gt; 54
     NSLog(@"Age: %lli", age);
     BOOL hired  = myRow.Hired;                         // =&gt; true
@@ -64,7 +64,7 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: last_row @@
-    NSString *last = [people cursorAtLastIndex].Name;  // =&gt; "Anni"
+    NSString *last = [people rowAtLastIndex].Name;  // =&gt; "Anni"
     NSLog(@"Last name: %@", last);
     // @@EndExample@@
 
@@ -80,7 +80,7 @@ void tableFunc() {
 
     // @@Example: iteration @@
     for (NSUInteger i = 0; i < people.rowCount; ++i) {
-        PeopleTable_Cursor *row = people[i];
+        PeopleTable_Row *row = people[i];
         NSLog(@"%@ is %lld years old", row.Name, row.Age);
     }
     // @@EndExample@@
@@ -108,8 +108,8 @@ void tableFunc() {
     PeopleTable_View *res = [q findAll];
 
     // fast emunaration on view
-    for (PeopleTable_Cursor *c in res)
-        NSLog(@"%@ is %lld years old", c.Name, c.Age);
+    for (PeopleTable_Row *r in res)
+        NSLog(@"%@ is %lld years old", r.Name, r.Age);
 
     // @@EndExample@@
 
@@ -144,7 +144,7 @@ void sharedGroupFunc() {
                                                 asTableClass:[PeopleTable class]];
 
         // Interate over all rows in table
-        for (PeopleTable_Cursor *row in table) {
+        for (PeopleTable_Row *row in table) {
             NSLog(@"Name: %@", row.Name);
         }
     }];
