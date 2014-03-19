@@ -53,11 +53,11 @@ TIGHTDB_TABLE_3(TestSubtableMain,
        table. */
     [people addFirst:@"first" Sub:nil Second:8];
 
-    TestSubtableMain_Cursor *cursor = [people cursorAtIndex:0];
+    TestSubtableMain_Row *cursor = [people rowAtIndex:0];
     TestSubtableSub *subtable = cursor.Sub;
     [subtable addName:@"name" Age:999];
 
-    STAssertEquals([subtable cursorAtIndex:0].Age, (int64_t)999, @"Age should be 999");
+    STAssertEquals([subtable rowAtIndex:0].Age, (int64_t)999, @"Age should be 999");
 }
 
 @end
