@@ -45,7 +45,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     // Write to disk
     [fm removeItemAtPath:@"employees.tightdb" error:nil];
     [fm removeItemAtPath:@"employees.tightdb.lock" error:nil];
-    [group writeToFile:@"employees.tightdb" withError:nil];
+    [group writeContextToFile:@"employees.tightdb" withError:nil];
 
     // Read only shared group
     TDBContext* fromDisk = [TDBContext sharedGroupWithFile:@"employees.tightdb" withError:nil];

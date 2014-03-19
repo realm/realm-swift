@@ -88,7 +88,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     // Write the group to disk
     [fm removeItemAtPath:@"peopleErr.tightdb" error:NULL];
     error = nil;
-    if (![group writeToFile:@"peopleErr.tightdb" withError:&error]) {
+    if (![group writeContextToFile:@"peopleErr.tightdb" withError:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"No error expected");
     }
