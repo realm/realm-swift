@@ -58,7 +58,6 @@ void tableFunc() {
     BOOL hired  = myRow.Hired;                         // =&gt; true
     NSLog(@"Hired? %d", hired);
 
-
     // Setting values
     people[5].Age = 43;                                // Getting younger
     myRow.Age += 1;                                    // Happy birthday!
@@ -77,7 +76,6 @@ void tableFunc() {
     [people removeRowAtIndex:2];
     NSUInteger cnt2 = people.rowCount;                  // cnt = 5
     NSLog(@"RowCount: %i", cnt2);
-    
     // @@EndExample@@
 
     // @@Example: iteration @@
@@ -101,7 +99,6 @@ void tableFunc() {
     // Get number of matching entries
     NSUInteger cnt3 = [q countRows];                     // =&gt; 2
     NSLog(@"RowCount: %i", cnt3);
-
 
     // Get the average age (currently only a low-level interface)
     double avg = [q.Age avg];
