@@ -23,7 +23,7 @@
     [sharedGroup writeWithBlock:^(TDBGroup *group) {
 
         // Access table from group
-        TDBTable *table = [group getOrCreateTableWithName:@"myTable" error:nil];
+        TDBTable *table = [group getOrCreateTableWithName:@"myTable"];
 
         // Add columns to the table
         [table addColumnWithName:@"Name" andType:TDBStringType];
