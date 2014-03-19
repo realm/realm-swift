@@ -40,9 +40,9 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    TDBTransaction *group = [TDBTransaction group];
-    // Create new table in group
-    PeopleTable *people = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
+    TDBTransaction *transaction = [TDBTransaction group];
+    // Create new table in transaction
+    PeopleTable *people = [transaction getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
 
     // Add some rows
     [people addName:@"John" Age:20 Hired:YES];
@@ -144,11 +144,11 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
 
     NSFileManager *fm = [NSFileManager defaultManager];
 
-    // Write the group to disk
+    // Write the transaction to disk
     [fm removeItemAtPath:@"employees.tightdb" error:nil];
-    [group writeToFile:@"employees.tightdb" withError:nil];
+    [transaction writeContextToFile:@"employees.tightdb" withError:nil];
 
-    // Load a group from disk (and print contents)
+    // Load a transaction from disk (and print contents)
     TDBTransaction *fromDisk = [TDBTransaction groupWithFile:@"employees.tightdb" withError:nil];
     PeopleTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
 
@@ -162,10 +162,10 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
         NSLog(@"%zu: %@", i, row.Name);
     }
 
-    // Write same group to memory buffer
-    TDBBinary* buffer = [group writeToBuffer];
+    // Write same transaction to memory buffer
+    TDBBinary* buffer = [transaction writeContextToBuffer];
 
-    // Load a group from memory (and print contents)
+    // Load a transaction from memory (and print contents)
     TDBTransaction *fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
     PeopleTable *memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {

@@ -29,8 +29,8 @@ void ex_objc_query_typed_intro()
         PeopleTable_Query *query = [[[[table where].Age columnIsGreaterThan:20] Or].Name columnIsEqualTo:@"Bob"];
 
         /* Iterate over the query result. */
-        for (PeopleTable_Cursor *curser in query) {
-            NSLog(@"Person matching query: %@", [curser Name]);
+        for (PeopleTable_Row *row in query) {
+            NSLog(@"Person matching query: %@", row.Name);
         }
     }
 }
