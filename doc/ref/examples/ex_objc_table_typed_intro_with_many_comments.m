@@ -35,13 +35,13 @@ void ex_objc_table_typed_intro_with_many_comments()
 
         /* Accesses query result directly on the quiry object. The quiry is
          * executed once. */
-        for (PersonTable_Cursor *curser in query)
-            NSLog(@"Name: %@", [curser Name]);
+        for (PersonTable_Row *row in query)
+            NSLog(@"Name: %@", [row Name]);
 
         /* For time consuming queries (in particular) the following is
          * inefficient because the query is executed again. */
-        for (PersonTable_Cursor *curser in query)
-            NSLog(@"Name: %lld", [curser Age]);
+        for (PersonTable_Row *row in query)
+            NSLog(@"Name: %lld", [row Age]);
 
         /* To avoid repeating the same query, the result may be stored in
          * a table view for multiple access. The following code executes the
@@ -50,11 +50,11 @@ void ex_objc_table_typed_intro_with_many_comments()
 
         /* Iterates over all rows in the result (view) 2 times based on the single
          * query executed above. */
-        for (PersonTable_Cursor *curser in tableView)
-            NSLog(@"Name: %@", [curser Name]);
+        for (PersonTable_Row *row in tableView)
+            NSLog(@"Name: %@", [row Name]);
 
-        for (PersonTable_Cursor *curser in tableView)
-            NSLog(@"Name: %lld", [curser Age]);
+        for (PersonTable_Row *row in tableView)
+            NSLog(@"Name: %lld", [row Age]);
     }
 }
 /* @@EndExample@@ */
