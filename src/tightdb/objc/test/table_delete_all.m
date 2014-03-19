@@ -6,6 +6,8 @@
 #import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/table.h>
+#import <tightdb/objc/descriptor.h>
+#import <tightdb/objc/mixed.h>
 
 @interface MACTestTableDeleteAll: SenTestCase
 @end

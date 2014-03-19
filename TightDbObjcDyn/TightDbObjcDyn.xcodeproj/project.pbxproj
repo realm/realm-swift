@@ -7,6 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		424EEDD418D9C0CB00337A13 /* binary_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEDD118D9C0CB00337A13 /* binary_objc.mm */; };
+		424EEDD518D9C0CB00337A13 /* binary_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEDD218D9C0CB00337A13 /* binary_priv.h */; };
+		424EEDD618D9C0CB00337A13 /* binary.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEDD318D9C0CB00337A13 /* binary.h */; };
+		424EEF9E18D9C10100337A13 /* column_proxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEF9D18D9C10100337A13 /* column_proxy.h */; };
+		424EEFA218D9C11D00337A13 /* descriptor_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEF9F18D9C11D00337A13 /* descriptor_objc.mm */; };
+		424EEFA318D9C11D00337A13 /* descriptor_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA018D9C11D00337A13 /* descriptor_priv.h */; };
+		424EEFA418D9C11D00337A13 /* descriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA118D9C11D00337A13 /* descriptor.h */; };
+		424EEFA818D9C13700337A13 /* mixed_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEFA518D9C13700337A13 /* mixed_objc.mm */; };
+		424EEFA918D9C13700337A13 /* mixed_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA618D9C13700337A13 /* mixed_priv.h */; };
+		424EEFAA18D9C13700337A13 /* mixed.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA718D9C13700337A13 /* mixed.h */; };
+		424EEFAE18D9C15A00337A13 /* table_view_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEFAB18D9C15900337A13 /* table_view_objc.mm */; };
+		424EEFAF18D9C15A00337A13 /* table_view_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFAC18D9C15900337A13 /* table_view_priv.h */; };
+		424EEFB018D9C15A00337A13 /* table_view.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFAD18D9C15A00337A13 /* table_view.h */; };
+		424EEFB218D9C97900337A13 /* column_proxy.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEFB118D9C97900337A13 /* column_proxy.mm */; };
 		42AD3A9718CDBDFF00C86073 /* support.h in Headers */ = {isa = PBXBuildFile; fileRef = 42AD3A9318CDBDFF00C86073 /* support.h */; };
 		42AD3A9818CDBDFF00C86073 /* support.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42AD3A9418CDBDFF00C86073 /* support.mm */; };
 		42AD3A9918CDBDFF00C86073 /* version_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42AD3A9518CDBDFF00C86073 /* version_objc.mm */; };
@@ -66,6 +80,20 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		424EEDD118D9C0CB00337A13 /* binary_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = binary_objc.mm; path = ../../src/tightdb/objc/binary_objc.mm; sourceTree = "<group>"; };
+		424EEDD218D9C0CB00337A13 /* binary_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = binary_priv.h; path = ../../src/tightdb/objc/binary_priv.h; sourceTree = "<group>"; };
+		424EEDD318D9C0CB00337A13 /* binary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = binary.h; path = ../../src/tightdb/objc/binary.h; sourceTree = "<group>"; };
+		424EEF9D18D9C10100337A13 /* column_proxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = column_proxy.h; path = ../../src/tightdb/objc/column_proxy.h; sourceTree = "<group>"; };
+		424EEF9F18D9C11D00337A13 /* descriptor_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = descriptor_objc.mm; path = ../../src/tightdb/objc/descriptor_objc.mm; sourceTree = "<group>"; };
+		424EEFA018D9C11D00337A13 /* descriptor_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = descriptor_priv.h; path = ../../src/tightdb/objc/descriptor_priv.h; sourceTree = "<group>"; };
+		424EEFA118D9C11D00337A13 /* descriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = descriptor.h; path = ../../src/tightdb/objc/descriptor.h; sourceTree = "<group>"; };
+		424EEFA518D9C13700337A13 /* mixed_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = mixed_objc.mm; path = ../../src/tightdb/objc/mixed_objc.mm; sourceTree = "<group>"; };
+		424EEFA618D9C13700337A13 /* mixed_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mixed_priv.h; path = ../../src/tightdb/objc/mixed_priv.h; sourceTree = "<group>"; };
+		424EEFA718D9C13700337A13 /* mixed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mixed.h; path = ../../src/tightdb/objc/mixed.h; sourceTree = "<group>"; };
+		424EEFAB18D9C15900337A13 /* table_view_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = table_view_objc.mm; path = ../../src/tightdb/objc/table_view_objc.mm; sourceTree = "<group>"; };
+		424EEFAC18D9C15900337A13 /* table_view_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = table_view_priv.h; path = ../../src/tightdb/objc/table_view_priv.h; sourceTree = "<group>"; };
+		424EEFAD18D9C15A00337A13 /* table_view.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = table_view.h; path = ../../src/tightdb/objc/table_view.h; sourceTree = "<group>"; };
+		424EEFB118D9C97900337A13 /* column_proxy.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = column_proxy.mm; path = ../../src/tightdb/objc/column_proxy.mm; sourceTree = "<group>"; };
 		42AD3A9318CDBDFF00C86073 /* support.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = support.h; path = ../../src/tightdb/objc/support.h; sourceTree = "<group>"; };
 		42AD3A9418CDBDFF00C86073 /* support.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = support.mm; path = ../../src/tightdb/objc/support.mm; sourceTree = "<group>"; };
 		42AD3A9518CDBDFF00C86073 /* version_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = version_objc.mm; path = ../../src/tightdb/objc/version_objc.mm; sourceTree = "<group>"; };
@@ -183,6 +211,20 @@
 		E91890A2177B677900653D7A /* TightDbObjcDyn */ = {
 			isa = PBXGroup;
 			children = (
+				424EEFAB18D9C15900337A13 /* table_view_objc.mm */,
+				424EEFAC18D9C15900337A13 /* table_view_priv.h */,
+				424EEFAD18D9C15A00337A13 /* table_view.h */,
+				424EEFA518D9C13700337A13 /* mixed_objc.mm */,
+				424EEFB118D9C97900337A13 /* column_proxy.mm */,
+				424EEFA618D9C13700337A13 /* mixed_priv.h */,
+				424EEFA718D9C13700337A13 /* mixed.h */,
+				424EEF9F18D9C11D00337A13 /* descriptor_objc.mm */,
+				424EEFA018D9C11D00337A13 /* descriptor_priv.h */,
+				424EEFA118D9C11D00337A13 /* descriptor.h */,
+				424EEF9D18D9C10100337A13 /* column_proxy.h */,
+				424EEDD118D9C0CB00337A13 /* binary_objc.mm */,
+				424EEDD218D9C0CB00337A13 /* binary_priv.h */,
+				424EEDD318D9C0CB00337A13 /* binary.h */,
 				4DA8E6CB18D8ADD8005B5B28 /* group.h */,
 				E91890C6177B67AB00653D7A /* cursor.h */,
 				E91890C5177B67AB00653D7A /* cursor_objc.mm */,
@@ -261,6 +303,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				424EEFA418D9C11D00337A13 /* descriptor.h in Headers */,
 				42AD3A9718CDBDFF00C86073 /* support.h in Headers */,
 				E91890D7177B67AB00653D7A /* cursor.h in Headers */,
 				E91890D9177B67AB00653D7A /* transaction_priv.h in Headers */,
@@ -268,14 +311,22 @@
 				E91890DC177B67AB00653D7A /* transaction.h in Headers */,
 				E91890DD177B67AB00653D7A /* helper_macros.h in Headers */,
 				4D79966018BDFC3E009EB0C0 /* table_macros.h in Headers */,
+				424EEFAA18D9C13700337A13 /* mixed.h in Headers */,
+				424EEFAF18D9C15A00337A13 /* table_view_priv.h in Headers */,
 				E91890DF177B67AB00653D7A /* query_priv.h in Headers */,
+				424EEF9E18D9C10100337A13 /* column_proxy.h in Headers */,
 				E91890E0177B67AB00653D7A /* query.h in Headers */,
 				E91890E2177B67AB00653D7A /* table_priv.h in Headers */,
 				4DA8E6CC18D8ADD8005B5B28 /* group.h in Headers */,
+				424EEDD618D9C0CB00337A13 /* binary.h in Headers */,
 				42AD3A9A18CDBDFF00C86073 /* version.h in Headers */,
+				424EEFB018D9C15A00337A13 /* table_view.h in Headers */,
+				424EEDD518D9C0CB00337A13 /* binary_priv.h in Headers */,
 				E91890E3177B67AB00653D7A /* table.h in Headers */,
+				424EEFA918D9C13700337A13 /* mixed_priv.h in Headers */,
 				E91890E4177B67AB00653D7A /* tightdb.h in Headers */,
 				E91890E5177B67AB00653D7A /* type.h in Headers */,
+				424EEFA318D9C11D00337A13 /* descriptor_priv.h in Headers */,
 				E91890E6177B67AB00653D7A /* util.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -379,13 +430,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				424EEDD418D9C0CB00337A13 /* binary_objc.mm in Sources */,
+				424EEFA218D9C11D00337A13 /* descriptor_objc.mm in Sources */,
 				E91890D6177B67AB00653D7A /* cursor_objc.mm in Sources */,
 				42AD3A9818CDBDFF00C86073 /* support.mm in Sources */,
 				42AD3A9918CDBDFF00C86073 /* version_objc.mm in Sources */,
+				424EEFAE18D9C15A00337A13 /* table_view_objc.mm in Sources */,
+				424EEFB218D9C97900337A13 /* column_proxy.mm in Sources */,
 				E91890D8177B67AB00653D7A /* transaction_objc.mm in Sources */,
 				E91890DA177B67AB00653D7A /* group_shared_objc.mm in Sources */,
 				E91890DE177B67AB00653D7A /* query_objc.mm in Sources */,
 				E91890E1177B67AB00653D7A /* table_objc.mm in Sources */,
+				424EEFA818D9C13700337A13 /* mixed_objc.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -518,6 +574,10 @@
 				DYLIB_CURRENT_VERSION = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TightDbObjcDyn/TightDbObjcDyn-Prefix.pch";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/kneth/Projects/tightdb_objc/src/tightdb/objc,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -529,6 +589,10 @@
 				DYLIB_CURRENT_VERSION = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TightDbObjcDyn/TightDbObjcDyn-Prefix.pch";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/kneth/Projects/tightdb_objc/src/tightdb/objc,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
