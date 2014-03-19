@@ -183,9 +183,9 @@
 		E91890A2177B677900653D7A /* TightDbObjcDyn */ = {
 			isa = PBXGroup;
 			children = (
-				4DA8E6CB18D8ADD8005B5B28 /* group.h */,
 				E91890C6177B67AB00653D7A /* cursor.h */,
 				E91890C5177B67AB00653D7A /* cursor_objc.mm */,
+				4DA8E6CB18D8ADD8005B5B28 /* group.h */,
 				E91890CA177B67AB00653D7A /* group_shared.h */,
 				E91890C9177B67AB00653D7A /* group_shared_objc.mm */,
 				E91890CC177B67AB00653D7A /* helper_macros.h */,
