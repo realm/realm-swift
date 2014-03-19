@@ -185,7 +185,7 @@ TIGHTDB_TABLE_2(SubMixedTable,
             NSLog(@"StringMixed: %@", [cursor.Other getString]);
         else if ([cursor.Other getType] == TDBDateType) {
             NSLog(@"DateMixed: %@", [cursor.Other getDate]);
-            // STAssertEqualObjects(nowTime, [cursor.Other getDate],@"Date should match what went in");
+            STAssertEqualsWithAccuracy([[cursor.Other getDate] timeIntervalSince1970], [nowTime timeIntervalSince1970], 0.999, @"Date should almost match what went in");
         }
         else if ([cursor.Other getType] == TDBTableType) {
             NSLog(@"TableMixed: %@", [cursor.Other getTable]);
