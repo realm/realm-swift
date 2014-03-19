@@ -1,5 +1,6 @@
 2014-03-18
 ==========
+! BREAKING CHANGE: Typed interface Cursor has now been renamed to Row.
 + getTableWithName selector added on group.
 * getting and creating table methods on group no longer take error argument.
 
