@@ -31,7 +31,8 @@ TIGHTDB_TABLE_2(SubMixedTable,
 
 - (void)testMixedEqual
 {
-    time_t nowTime = [[NSDate date] timeIntervalSince1970];
+    NSDate *nowTime = [NSDate date];
+    NSDate *nowTime1 = [[NSDate date] dateByAddingTimeInterval:1];
 
     TDBMixed *mixedBool1 = [TDBMixed mixedWithBool:YES];
     TDBMixed *mixedBool2 = [TDBMixed mixedWithBool:NO];
@@ -68,8 +69,8 @@ TIGHTDB_TABLE_2(SubMixedTable,
     STAssertEquals([mixedBinary1 isEqual:mixedBinary2], NO,  @"Mixed with different binary data should be different");
 
     TDBMixed *mixedDate1 = [TDBMixed mixedWithDate:nowTime];
-    TDBMixed *mixedDate2 = [TDBMixed mixedWithDate:nowTime+1];
-    TDBMixed *mixedDate3 = [TDBMixed mixedWithDate:nowTime+1];
+    TDBMixed *mixedDate2 = [TDBMixed mixedWithDate:nowTime1];
+    TDBMixed *mixedDate3 = [TDBMixed mixedWithDate:nowTime1];
     STAssertEquals([mixedDate1 isEqual:mixedDate1], YES, @"Same mixed should be equal (9)");
     STAssertEquals([mixedDate2 isEqual:mixedDate2], YES, @"Same mixed should be equal (10)");
     STAssertEquals([mixedDate2 isEqual:mixedDate3], YES, @"Mixed with same timestamps should be equal");
@@ -130,7 +131,8 @@ TIGHTDB_TABLE_2(SubMixedTable,
 
 - (void)testMixed
 {
-    time_t nowTime = [[NSDate date] timeIntervalSince1970];
+    NSDate *nowTime = [NSDate date];
+    NSDate *nowTime1 = [[NSDate date] dateByAddingTimeInterval:1];
 
     SubMixedTable *tableSub = [[SubMixedTable alloc] init];
 
@@ -157,7 +159,7 @@ TIGHTDB_TABLE_2(SubMixedTable,
 
     // Test isequal
     TDBMixed *mixedDate2 = [TDBMixed mixedWithDate:nowTime];
-    TDBMixed *mixedDate3 = [TDBMixed mixedWithDate:nowTime+1];
+    TDBMixed *mixedDate3 = [TDBMixed mixedWithDate:nowTime1];
     STAssertEquals([mixedDate isEqual:mixedDate2], YES,@"Mixed dates should be equal");
     STAssertEquals([mixedDate isEqual:mixedDate3], NO,@"Mixed dates should not be equal");
 
@@ -182,8 +184,8 @@ TIGHTDB_TABLE_2(SubMixedTable,
         if ([cursor.Other getType] == TDBStringType)
             NSLog(@"StringMixed: %@", [cursor.Other getString]);
         else if ([cursor.Other getType] == TDBDateType) {
-            NSLog(@"DateMixed: %ld", [cursor.Other getDate]);
-            STAssertEquals(nowTime, [cursor.Other getDate],@"Date should match what went in");
+            NSLog(@"DateMixed: %@", [cursor.Other getDate]);
+            STAssertEqualObjects(nowTime, [cursor.Other getDate],@"Date should match what went in");
         }
         else if ([cursor.Other getType] == TDBTableType) {
             NSLog(@"TableMixed: %@", [cursor.Other getTable]);
