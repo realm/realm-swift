@@ -55,7 +55,7 @@ TIGHTDB_TABLE_4(PerfTable,
 
     TDBGroup *group = [TDBGroup group];
     // Create new table in group
-    PerfTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class] error:nil];
+    PerfTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class] ];
 
     // Add some rows
     NSUInteger count = _size;
@@ -138,7 +138,7 @@ TIGHTDB_TABLE_4(PerfTable,
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
     TDBGroup *fromDisk = [TDBGroup groupWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"]withError:nil];
-    PerfTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class] error:nil];
+    PerfTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class]];
 
     if ([diskTable rowCount] != _size+1) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -195,7 +195,7 @@ TIGHTDB_TABLE_4(PerfTable,
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
     TDBGroup *fromDisk = [TDBGroup groupWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"]withError:nil];
-    PerfTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class] error:nil];
+    PerfTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class]];
 
     // Create query (current employees between 20 and 30 years old)
     PerfTable_Query *q = [[diskTable where].Age columnIsBetween:40 and_:50];
@@ -251,7 +251,7 @@ TIGHTDB_TABLE_4(PerfTable,
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
     TDBGroup *fromDisk = [TDBGroup groupWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"]withError:nil];
-    PerfTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class] error:nil];
+    PerfTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class]];
 
 
     // Create query (current employees between 20 and 30 years old)
@@ -274,7 +274,7 @@ TIGHTDB_TABLE_4(PerfTable,
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
     TDBGroup *fromDisk = [TDBGroup groupWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"]withError:nil];
-    PerfTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class] error:nil];
+    PerfTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class]];
 
     int agesum = 0;
     for (PerfTable_Cursor *cur in diskTable) {
@@ -308,7 +308,7 @@ TIGHTDB_TABLE_4(PerfTable,
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
     TDBSharedGroup *fromDisk = [TDBSharedGroup sharedGroupWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
     [fromDisk readWithBlock:^(TDBGroup *group) {
-        PerfTable *diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class] error:nil];
+        PerfTable *diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class]];
 
         // Create query (current employees between 20 and 30 years old)
         PerfTable_Query *q = [[[diskTable where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30];
@@ -332,7 +332,7 @@ TIGHTDB_TABLE_4(PerfTable,
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
     TDBSharedGroup *fromDisk = [TDBSharedGroup sharedGroupWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
     [fromDisk writeWithBlock:^(TDBGroup *group) {
-        PerfTable *diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class] error:nil];
+        PerfTable *diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class]];
 
         // Add some rows
         NSUInteger count = _size;
