@@ -20,7 +20,7 @@ CATEGORIES :
       NAME     : rowCount
       SUMMARY  : *g_dyn_table_size_summary
       DESCR    : *g_dyn_table_size_descr
-      SIGNATURE: (NSUInteger)rowCount
+      SIGNATURE: "@property (nonatomic, readonly) NSUInteger rowCount"
       RETURN:
         TYPES  : NSUInteger
         DESCR  : The number of rows.
