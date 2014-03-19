@@ -47,7 +47,7 @@ TIGHTDB_TABLE_2(TestTableGroup,
     // Create empty group and serialize to disk
     TDBTransaction *toDisk = [TDBTransaction group];
     [fm removeItemAtPath:@"table_test.tightdb" error:NULL];
-    [toDisk writeToFile:@"table_test.tightdb" withError:nil];
+    [toDisk writeContextToFile:@"table_test.tightdb" withError:nil];
 
     // Load the group
     TDBTransaction *fromDisk = [TDBTransaction groupWithFile:@"table_test.tightdb" withError:nil];
