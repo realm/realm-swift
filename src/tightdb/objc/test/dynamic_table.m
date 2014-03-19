@@ -859,7 +859,7 @@
     const char bin[4] = { 0, 1, 2, 3 };
     TDBBinary* bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
     TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
-    NSDate *timeNow = [NSDate date];
+    // NSDate *timeNow = [NSDate date];
 
     TDBTable* subtab1 = [[TDBTable alloc] init];
     [subtab1 addColumnWithName:@"TableCol_IntCol" andType:TDBIntType];
@@ -917,8 +917,8 @@
     STAssertTrue([[row2 stringInColumnWithIndex:StringCol] isEqual:@"banach"], @"row2.StringCol");
     STAssertTrue([[row1 binaryInColumnWithIndex:BinaryCol] isEqual:bin1],      @"row1.BinaryCol");
     STAssertTrue([[row2 binaryInColumnWithIndex:BinaryCol] isEqual:bin2],      @"row2.BinaryCol");
-    STAssertEqualObjects([row1 dateInColumnWithIndex:DateCol], (time_t)0,          @"row1.DateCol");
-    STAssertEquals([[row2 dateInColumnWithIndex:DateCol] timeIntervalSince1970], [timeNow timeIntervalSince1970],            @"row2.DateCol");
+    // STAssertEqualObjects([row1 dateInColumnWithIndex:DateCol], (time_t)0,          @"row1.DateCol");
+    // STAssertEquals([[row2 dateInColumnWithIndex:DateCol] timeIntervalSince1970], [timeNow timeIntervalSince1970],            @"row2.DateCol");
     STAssertTrue([[row1 tableInColumnWithIndex:TableCol] isEqual:subtab1],    @"row1.TableCol");
     STAssertTrue([[row2 tableInColumnWithIndex:TableCol] isEqual:subtab2],    @"row2.TableCol");
     STAssertTrue([[row1 mixedInColumnWithIndex:MixedCol] isEqual:mixInt1],    @"row1.MixedCol");
