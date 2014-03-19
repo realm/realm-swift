@@ -51,9 +51,9 @@ directiveStartToken = %
 , CName${j+1}, CType${j+1}%slurp
 %end for
 ) \
-@interface TableName##_Cursor: TDBRow \
+@interface TableName##_Row: TDBRow \
 %for $j in range($num_cols)
-TIGHTDB_CURSOR_PROPERTY_DEF(CName${j+1}, CType${j+1}) \
+TIGHTDB_ROW_PROPERTY_DEF(CName${j+1}, CType${j+1}) \
 %end for
 @end \
 @class TableName##_Query; \
@@ -90,14 +90,14 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 %end for
 ; \
 -(TableName##_Query*)where; \
--(TableName##_Cursor*)addEmptyRow; \
--(TableName##_Cursor*)objectAtIndexedSubscript:(NSUInteger)ndx; \
--(TableName##_Cursor*)cursorAtIndex:(NSUInteger)ndx; \
--(TableName##_Cursor*)cursorAtLastIndex; \
--(TableName##_Cursor*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
+-(TableName##_Row*)addEmptyRow; \
+-(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
+-(TableName##_Row*)rowAtLastIndex; \
+-(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
 @interface TableName##_View: TDBView \
--(TableName##_Cursor*)cursorAtIndex:(NSUInteger)ndx; \
+-(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_${num_cols}(TableName%slurp
@@ -105,7 +105,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 , CName${j+1}, CType${j+1}%slurp
 %end for
 ) \
-@implementation TableName##_Cursor \
+@implementation TableName##_Row \
 { \
 %for $j in range($num_cols)
     TDBAccessor* _##CName${j+1}; \
@@ -116,18 +116,18 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
 %for $j in range($num_cols)
-        _##CName${j+1} = [[TDBAccessor alloc] initWithCursor:self columnId:${j}]; \
+        _##CName${j+1} = [[TDBAccessor alloc] initWithRow:self columnId:${j}]; \
 %end for
     } \
     return self; \
 } \
 %for $j in range($num_cols)
-TIGHTDB_CURSOR_PROPERTY_IMPL(CName${j+1}, CType${j+1}) \
+TIGHTDB_ROW_PROPERTY_IMPL(CName${j+1}, CType${j+1}) \
 %end for
 @end \
 @implementation TableName##_Query \
 { \
-    TableName##_Cursor* tmpCursor; \
+    TableName##_Row* tmpRow; \
 } \
 -(long)getFastEnumStart \
 { \
@@ -137,9 +137,9 @@ TIGHTDB_CURSOR_PROPERTY_IMPL(CName${j+1}, CType${j+1}) \
 { \
     return [self findFromRowIndex:ndx]; \
 } \
--(TableName##_Cursor*)getCursor:(long)ndx \
+-(TableName##_Row*)getRow:(long)ndx \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:ndx]; \
+    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 %for $j in range($num_cols)
 @synthesize CName${j+1} = _CName${j+1}; \
@@ -189,7 +189,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName${j+1}, CType${j+1}) \
 %end for
 @implementation TableName \
 { \
-    TableName##_Cursor* tmpCursor; \
+    TableName##_Row* tmpRow; \
 } \
 %for $j in range($num_cols)
 TIGHTDB_COLUMN_PROXY_IMPL(CName${j+1}, CType${j+1}) \
@@ -245,30 +245,30 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 { \
     return [[TableName##_Query alloc] initWithTable:self]; \
 } \
--(TableName##_Cursor*)addEmptyRow \
+-(TableName##_Row*)addEmptyRow \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##_Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
 } \
--(TableName##_Cursor*)objectAtIndexedSubscript:(NSUInteger)ndx \
+-(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
-	return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
+	return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor*)cursorAtIndex:(NSUInteger)ndx \
+-(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Cursor*)cursorAtLastIndex \
+-(TableName##_Row*)rowAtLastIndex \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:self.rowCount-1]; \
+    return [[TableName##_Row alloc] initWithTable:self ndx:self.rowCount-1]; \
 } \
--(TableName##_Cursor*)insertEmptyRowAtIndex:(NSUInteger)ndx \
+-(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
     [super insertEmptyRowAtIndex:ndx]; \
-    return [[TableName##_Cursor alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getCursor \
+-(TDBRow*)getRow \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self ndx:0]; \
+    return tmpRow = [[TableName##_Row alloc] initWithTable:self ndx:0]; \
 } \
 +(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
@@ -305,15 +305,15 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 @end \
 @implementation TableName##_View \
 { \
-    TableName##_Cursor* tmpCursor; \
+    TableName##_Row* tmpRow; \
 } \
--(TDBRow*)getCursor \
+-(TDBRow*)getRow \
 { \
-    return tmpCursor = [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
+    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
--(TableName##_Cursor*)cursorAtIndex:(NSUInteger)ndx \
+-(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Cursor alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
+    return [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
 } \
 @end
 

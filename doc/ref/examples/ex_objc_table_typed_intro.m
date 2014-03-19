@@ -1,39 +1,26 @@
 /* @@Example: ex_objc_table_typed_intro @@ */
 
-#import <tightdb/objc/tightdb.h>
+#import <Tightdb/Tightdb.h>
+#import "people.h"
 
-
-/* Defines a new table with two columns Name and Age. */
-
-TIGHTDB_TABLE_2(PeopleTable,
+/* PeopleTable is declared in people.h as
+TIGHTDB_TABLE_3(PeopleTable,
                 Name, String,
-                Age, Int)
+                Age,  Int,
+                Hired, Bool);
+ */
 
-
-int main()
+void ex_objc_table_typed_intro()
 {
     @autoreleasepool {
 
         /* Creates a new table of the type defined above. */
-
         PeopleTable *table = [[PeopleTable alloc] init];
 
-        PeopleTable_Cursor *row = [table addEmptyRow];
-        row.Name = @"Brian";
-        row.Age = 10;
-
-        row = [table addEmptyRow];
-        row.Name = @"Sofie";
-        row.Age = 40;
-
-/*
-        [table addOrInsertRowAtIndex:[table count]
-                                Name:@"Jesper"
-                                 Age:200];
-*/
-        row = [table addEmptyRow];
-        row.Name = @"Jesper";
-        row.Age = 200;
+        /* Append three rows. */
+        [table appendRow:@{@"Name":@"Brian",  @"Age":@10,  @"Hired":@NO}];
+        [table appendRow:@{@"Name":@"Sofie",  @"Age":@40,  @"Hired":@YES}];
+        [table appendRow:@{@"Name":@"Jesper", @"Age":@200, @"Hired":@NO}];
 
         NSLog(@"The size of the table is now %zd", table.rowCount);
 
@@ -43,8 +30,7 @@ int main()
 
         NSLog(@"Insert a new row");
 
-        row = [table insertEmptyRowAtIndex:1];
-        row.Name = @"Sam"; row.Age = 30;
+        [table insertRow:@{@"Name":@"Sam", @"Age":@30, @"Hired":@YES} atRowIndex:1];
 
         for (PeopleTable_Cursor *ite in table) {
             NSLog(@"Name: %@ Age: %lli", ite.Name, ite.Age);
@@ -59,5 +45,4 @@ int main()
             NSLog(@"Should not get here.");
     }
 }
-
 /* @@EndExample@@ */

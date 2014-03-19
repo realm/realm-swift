@@ -133,7 +133,11 @@ TIGHTDB_TABLE_2(MyTable2,
     [group writeToFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
 
     // Load a group from disk (and print contents)
+<<<<<<< HEAD
     TDBTransaction *fromDisk = [TDBTransaction groupWithFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
+=======
+    TDBGroup *fromDisk = [TDBGroup groupWithFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
+>>>>>>> dee8be2b4a8d09b67b1d0c4911ce680acb3a56d3
     MyTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
@@ -150,7 +154,11 @@ TIGHTDB_TABLE_2(MyTable2,
     TDBBinary* buffer = [group writeToBuffer];
 
     // Load a group from memory (and print contents)
+<<<<<<< HEAD
     TDBTransaction *fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
+=======
+    TDBGroup *fromMem = [TDBGroup groupWithBuffer:buffer withError:nil];
+>>>>>>> dee8be2b4a8d09b67b1d0c4911ce680acb3a56d3
     MyTable *memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
 
     for (MyTable_Cursor *row in memTable)

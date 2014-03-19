@@ -148,27 +148,27 @@
 
 
 
-/* TIGHTDB_CURSOR_PROPERTY */
+/* TIGHTDB_ROW_PROPERTY */
 
-#define TIGHTDB_CURSOR_PROPERTY_DEF(name, type)                 TIGHTDB_CURSOR_PROPERTY_DEF_2(TIGHTDB_IS_SUBTABLE(type), name, type)
-#define TIGHTDB_CURSOR_PROPERTY_DEF_2(is_subtable, name, type)  TIGHTDB_CURSOR_PROPERTY_DEF_3(is_subtable, name, type)
-#define TIGHTDB_CURSOR_PROPERTY_DEF_3(is_subtable, name, type)  TIGHTDB_CURSOR_PROPERTY_DEF_4_##is_subtable(name, type)
-#define TIGHTDB_CURSOR_PROPERTY_DEF_4_Y(name, type)             TIGHTDB_CURSOR_PROPERTY_DEF_SUBTABLE(name, type)
-#define TIGHTDB_CURSOR_PROPERTY_DEF_4_N(name, type)             TIGHTDB_CURSOR_PROPERTY_DEF_SIMPLE(name, type)
+#define TIGHTDB_ROW_PROPERTY_DEF(name, type)                 TIGHTDB_ROW_PROPERTY_DEF_2(TIGHTDB_IS_SUBTABLE(type), name, type)
+#define TIGHTDB_ROW_PROPERTY_DEF_2(is_subtable, name, type)  TIGHTDB_ROW_PROPERTY_DEF_3(is_subtable, name, type)
+#define TIGHTDB_ROW_PROPERTY_DEF_3(is_subtable, name, type)  TIGHTDB_ROW_PROPERTY_DEF_4_##is_subtable(name, type)
+#define TIGHTDB_ROW_PROPERTY_DEF_4_Y(name, type)             TIGHTDB_ROW_PROPERTY_DEF_SUBTABLE(name, type)
+#define TIGHTDB_ROW_PROPERTY_DEF_4_N(name, type)             TIGHTDB_ROW_PROPERTY_DEF_SIMPLE(name, type)
 
-#define TIGHTDB_CURSOR_PROPERTY_IMPL(name, type)                TIGHTDB_CURSOR_PROPERTY_IMPL_2(TIGHTDB_IS_SUBTABLE(type), name, type)
-#define TIGHTDB_CURSOR_PROPERTY_IMPL_2(is_subtable, name, type) TIGHTDB_CURSOR_PROPERTY_IMPL_3(is_subtable, name, type)
-#define TIGHTDB_CURSOR_PROPERTY_IMPL_3(is_subtable, name, type) TIGHTDB_CURSOR_PROPERTY_IMPL_4_##is_subtable(name, type)
-#define TIGHTDB_CURSOR_PROPERTY_IMPL_4_Y(name, type)            TIGHTDB_CURSOR_PROPERTY_IMPL_SUBTABLE(name, type)
-#define TIGHTDB_CURSOR_PROPERTY_IMPL_4_N(name, type)            TIGHTDB_CURSOR_PROPERTY_IMPL_SIMPLE(name, type)
+#define TIGHTDB_ROW_PROPERTY_IMPL(name, type)                TIGHTDB_ROW_PROPERTY_IMPL_2(TIGHTDB_IS_SUBTABLE(type), name, type)
+#define TIGHTDB_ROW_PROPERTY_IMPL_2(is_subtable, name, type) TIGHTDB_ROW_PROPERTY_IMPL_3(is_subtable, name, type)
+#define TIGHTDB_ROW_PROPERTY_IMPL_3(is_subtable, name, type) TIGHTDB_ROW_PROPERTY_IMPL_4_##is_subtable(name, type)
+#define TIGHTDB_ROW_PROPERTY_IMPL_4_Y(name, type)            TIGHTDB_ROW_PROPERTY_IMPL_SUBTABLE(name, type)
+#define TIGHTDB_ROW_PROPERTY_IMPL_4_N(name, type)            TIGHTDB_ROW_PROPERTY_IMPL_SIMPLE(name, type)
 
 
-#define TIGHTDB_CURSOR_PROPERTY_DEF_SIMPLE(name, type) \
+#define TIGHTDB_ROW_PROPERTY_DEF_SIMPLE(name, type) \
 @property TIGHTDB_TYPE_##type name; \
 -(TIGHTDB_TYPE_##type)name; \
 -(void)set##name:(TIGHTDB_TYPE_##type)value;
 
-#define TIGHTDB_CURSOR_PROPERTY_IMPL_SIMPLE(name, type) \
+#define TIGHTDB_ROW_PROPERTY_IMPL_SIMPLE(name, type) \
 -(TIGHTDB_TYPE_##type)name \
 { \
     return [_##name get##type]; \
@@ -178,11 +178,11 @@
     [_##name set##type:value]; \
 }
 
-#define TIGHTDB_CURSOR_PROPERTY_DEF_SUBTABLE(name, type) \
+#define TIGHTDB_ROW_PROPERTY_DEF_SUBTABLE(name, type) \
 @property type* name; \
 -(type*)name; \
 
-#define TIGHTDB_CURSOR_PROPERTY_IMPL_SUBTABLE(name, type) \
+#define TIGHTDB_ROW_PROPERTY_IMPL_SUBTABLE(name, type) \
 -(type*)name \
 { \
     return [_##name getSubtable:[type class]]; \
