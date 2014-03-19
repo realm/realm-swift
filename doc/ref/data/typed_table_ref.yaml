@@ -50,13 +50,13 @@ CATEGORIES:
                  <tr><th>Name</th>              <th>Desc</th>         <th>C++ type</th></tr>
                  </thead>
                  <tbody>
-                 <tr><td>Int</td>               <td>Integer</td>      <td>(int64_t)</td></tr>
-                 <tr><td>Float</td>             <td>Floating-point</d><td>(float)</td></tr>
-                 <tr><td>Double</td>            <td>Floating-point</d><td>(double)</td></tr>
-                 <tr><td>Bool</td>              <td>Boolean</td>      <td>(BOOL)</td></tr>
-                 <tr><td>String </td>           <td>Text</td>         <td>(NSString*)</td></tr>
-                 <tr><td>Date</td>              <td>UTC datetime</td> <td>(time_t)</td></tr>
-                 <tr><td>Mixed</td>             <td>Dynamic</td>      <td>(contains any of the above)</td></tr>
+                 <tr><td>TDBIntType</td>               <td>Integer</td>      <td>(int64_t)</td></tr>
+                 <tr><td>TDBFloatType</td>             <td>Floating-point</d><td>(float)</td></tr>
+                 <tr><td>TDBDoubleType</td>            <td>Floating-point</d><td>(double)</td></tr>
+                 <tr><td>TDBBoolType</td>              <td>Boolean</td>      <td>(BOOL)</td></tr>
+                 <tr><td>TDBStringType</td>            <td>Text</td>         <td>(NSString*)</td></tr>
+                 <tr><td>TDBDateType</td>              <td>UTC datetime</td> <td>(time_t)</td></tr>
+                 <tr><td>TDBMixedType</td>             <td>Dynamic</td>      <td>(contains any of the above)</td></tr>
                  </tbody>
                  </table>
 
@@ -83,12 +83,12 @@ CATEGORIES:
         DESCR  :
 
   - g_typed_table_size:
-      NAME     : count
+      NAME     : rowCount
       DESCR    : *g_typed_table_size_descr
       SUMMARY  : *g_typed_table_size_summary
-      SIGNATURE: (size_t)count
+      SIGNATURE: "@property (nonatomic, readonly) NSUInteger rowCount"
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_typed_table_size_return1_descr
       EXAMPLES:
       - CODE   :  ex_objc_type_table_size
@@ -98,10 +98,10 @@ CATEGORIES:
 - Table:
   METHODS:
   - g_typed_table_clear:
-      NAME     : clear
+      NAME     : removeAllRows
       SUMMARY  : *g_typed_table_clear_summary
       DESCR    : *g_typed_table_clear_descr
-      SIGNATURE: (void)clear
+      SIGNATURE: (BOOL)removeAllRows
       EXAMPLES:
       - CODE   : ex_objc_typed_table_clear
         DESCR  :
