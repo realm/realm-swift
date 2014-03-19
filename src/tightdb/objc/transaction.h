@@ -69,6 +69,11 @@
 -(id)getOrCreateTableWithName:(NSString *)name asTableClass:(Class)obj;
 
 
+-(BOOL)writeContextToFile:(NSString *)path withError:(NSError *__autoreleasing *)error;
+
+-(TDBBinary *)writeContextToBuffer;
+
+
 
 @end
 

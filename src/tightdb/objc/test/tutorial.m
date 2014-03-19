@@ -146,7 +146,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
 
     // Write the transaction to disk
     [fm removeItemAtPath:@"employees.tightdb" error:nil];
-    [transaction writeToFile:@"employees.tightdb" withError:nil];
+    [transaction writeContextToFile:@"employees.tightdb" withError:nil];
 
     // Load a transaction from disk (and print contents)
     TDBTransaction *fromDisk = [TDBTransaction groupWithFile:@"employees.tightdb" withError:nil];
@@ -163,7 +163,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     }
 
     // Write same transaction to memory buffer
-    TDBBinary* buffer = [transaction writeToBuffer];
+    TDBBinary* buffer = [transaction writeContextToBuffer];
 
     // Load a transaction from memory (and print contents)
     TDBTransaction *fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];

@@ -40,7 +40,7 @@ using namespace std;
 }
 
 
-/* Removed from header for now */
+/* Moved to group_priv header for now */
 +(TDBTransaction*)group
 {
     TDBTransaction* group = [[TDBTransaction alloc] init];
@@ -70,7 +70,7 @@ using namespace std;
     return group_2;
 }
 
-/* Removed from header for now */
+/* Moved to group_priv header for now */
 +(TDBTransaction *)groupWithFile:(NSString *)filename withError:(NSError **)error
 {
     TDBTransaction* group = [[TDBTransaction alloc] init];
@@ -108,7 +108,7 @@ using namespace std;
     return group;
 }
 
-/* Removed from header for now */
+/* Moved to group_priv header for now */
 +(TDBTransaction*)groupWithBuffer:(TDBBinary*)buffer withError:(NSError**)error
 {
     TDBTransaction* group = [[TDBTransaction alloc] init];
@@ -156,7 +156,7 @@ using namespace std;
 }
 
 
--(BOOL)writeToFile:(NSString*)path withError:(NSError* __autoreleasing*)error
+-(BOOL)writeContextToFile:(NSString*)path withError:(NSError* __autoreleasing*)error
 {
     try {
         m_group->write(tightdb::StringData(ObjcStringAccessor(path)));
@@ -189,8 +189,7 @@ using namespace std;
     return YES;
 }
 
-/* Removed from header for now */
--(TDBBinary*)writeToBuffer
+-(TDBBinary*)writeContextToBuffer
 {
     TDBBinary* buffer = [[TDBBinary alloc] init];
     if (!buffer)
