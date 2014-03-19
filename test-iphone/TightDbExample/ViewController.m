@@ -140,9 +140,9 @@ TIGHTDB_TABLE_2(MyTable2,
     [diskTable insertEmptyRowAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
     NSLog(@"Disktable size: %i", [diskTable rowCount]);
     for (size_t i = 0; i < [diskTable rowCount]; i++) {
-        MyTable_Cursor *cursor = [diskTable cursorAtIndex:i];
-        NSLog(@"%zu: %@", i, [cursor Name]);
-        NSLog(@"%zu: %@", i, cursor.Name);
+        MyTable_Row *row = [diskTable rowAtIndex:i];
+        NSLog(@"%zu: %@", i, [row Name]);
+        NSLog(@"%zu: %@", i, row.Name);
         NSLog(@"%zu: %@", i, [diskTable stringInColumnWithIndex:0 atRowIndex:i]);
     }
 
@@ -153,13 +153,13 @@ TIGHTDB_TABLE_2(MyTable2,
     TDBTransaction *fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
     MyTable *memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
 
-    for (MyTable_Cursor *row in memTable)
+    for (MyTable_Row *row in memTable)
     {
         NSLog(@"From mem: %@ is %lld years old.", row.Name, row.Age);
     }
 
     // 1: Iterate over table
-    for (MyTable_Cursor *row in diskTable)
+    for (MyTable_Row *row in diskTable)
     {
         [_utils Eval:YES msg:@"Enumerator running"];
         NSLog(@"From disk: %@ is %lld years old.", row.Name, row.Age);
@@ -169,7 +169,7 @@ TIGHTDB_TABLE_2(MyTable2,
     MyTable_View *v = [[[[diskTable where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30] findAll];
     NSLog(@"View count: %i", [v rowCount]);
     // 2: Iterate over the resulting TableView
-    for (MyTable_Cursor *row in v) {
+    for (MyTable_Row *row in v) {
         NSLog(@"%@ is %lld years old.", row.Name, row.Age);
     }
 
@@ -177,7 +177,7 @@ TIGHTDB_TABLE_2(MyTable2,
 
     MyTable_Query *qe = [[diskTable where].Age columnIsEqualTo:21];
     NSLog(@"Query lazy count: %i", [qe countRows]);
-    for (MyTable_Cursor *row in qe) {
+    for (MyTable_Row *row in qe) {
         NSLog(@"%@ is %lld years old.", row.Name, row.Age);
     }
 

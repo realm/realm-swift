@@ -20,11 +20,11 @@ void tableFunc() {
     // @@Example: insert_rows @@
 
     // Add a row
-    PeopleTable_Cursor *cursor;
-    cursor = [people addEmptyRow];
-    cursor.Name  = @"John";
-    cursor.Age   = 21;
-    cursor.Hired = YES;
+    PeopleTable_Row *row;
+    row = [people addEmptyRow];
+    row.Name  = @"John";
+    row.Age   = 21;
+    row.Hired = YES;
 
     // Add more rows
     [people appendRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
@@ -41,17 +41,22 @@ void tableFunc() {
 
     // @@Example: number_of_rows @@
     NSUInteger cnt1 = people.rowCount;                 // cnt = 6
+    NSLog(@"RowCount: %i", cnt1);
     BOOL empty = people.rowCount == 0;                 // empty = NO
+    NSLog(@"Table is empty? %d", empty);
     // @@EndExample@@
 
     // @@Example: accessing_rows @@
     // Getting values directly
     NSString* name = people[5].Name;                   // =&gt; 'Anni'
+    NSLog(@"Name: %@", name);
 
     // Using a cursor
-    PeopleTable_Cursor *myRow = people[5];
+    PeopleTable_Row *myRow = people[5];
     int64_t age = myRow.Age;                           // =&gt; 54
+    NSLog(@"Age: %lli", age);
     BOOL hired  = myRow.Hired;                         // =&gt; true
+    NSLog(@"Hired? %d", hired);
 
     // Setting values
     people[5].Age = 43;                                // Getting younger
@@ -59,7 +64,8 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: last_row @@
-    NSString *last = [people cursorAtLastIndex].Name;  // =&gt; "Anni"
+    NSString *last = [people rowAtLastIndex].Name;  // =&gt; "Anni"
+    NSLog(@"Last name: %@", last);
     // @@EndExample@@
 
     // @@Example: updating_entire_row @@
@@ -69,11 +75,12 @@ void tableFunc() {
     // @@Example: deleting_row @@
     [people removeRowAtIndex:2];
     NSUInteger cnt2 = people.rowCount;                  // cnt = 5
+    NSLog(@"RowCount: %i", cnt2);
     // @@EndExample@@
 
     // @@Example: iteration @@
     for (NSUInteger i = 0; i < people.rowCount; ++i) {
-        PeopleTable_Cursor *row = people[i];
+        PeopleTable_Row *row = people[i];
         NSLog(@"%@ is %lld years old", row.Name, row.Age);
     }
     // @@EndExample@@
@@ -91,16 +98,18 @@ void tableFunc() {
 
     // Get number of matching entries
     NSUInteger cnt3 = [q countRows];                     // =&gt; 2
+    NSLog(@"RowCount: %i", cnt3);
 
     // Get the average age (currently only a low-level interface)
     double avg = [q.Age avg];
+    NSLog(@"Avg age: %f", avg);
 
     // Execute the query and return a table (view)
     PeopleTable_View *res = [q findAll];
 
     // fast emunaration on view
-    for (PeopleTable_Cursor *c in res)
-        NSLog(@"%@ is %lld years old", c.Name, c.Age);
+    for (PeopleTable_Row *r in res)
+        NSLog(@"%@ is %lld years old", r.Name, r.Age);
 
     // @@EndExample@@
 
@@ -120,8 +129,7 @@ void sharedGroupFunc() {
     [sharedGroup writeWithBlock:^(TDBGroup *group) {
         // Get a specific table from the group
         PeopleTable *table = [group getOrCreateTableWithName:@"employees"
-                                                asTableClass:[PeopleTable class]
-                                                       error:nil];
+                                                asTableClass:[PeopleTable class]];
 
         // Add a row
         [table addName:@"Bill" Age:53 Hired:YES];
@@ -133,11 +141,10 @@ void sharedGroupFunc() {
     [sharedGroup readWithBlock:^(TDBGroup *group) {
         // Get the table
         PeopleTable *table = [group getOrCreateTableWithName:@"employees"
-                                                asTableClass:[PeopleTable class]
-                                                       error:nil];
+                                                asTableClass:[PeopleTable class]];
 
         // Interate over all rows in table
-        for (PeopleTable_Cursor *row in table) {
+        for (PeopleTable_Row *row in table) {
             NSLog(@"Name: %@", row.Name);
         }
     }];
