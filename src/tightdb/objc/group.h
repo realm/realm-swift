@@ -34,11 +34,18 @@
 
 @interface  TDBTransaction() // Selectors are currently implemented in TDBTransaction
 
+/*
+ * Init a free-stading in memory group
+ */
 +(TDBTransaction *)group;
 
 +(TDBTransaction *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
 
 +(TDBTransaction *)groupWithBuffer:(TDBBinary *)buffer withError:(NSError *__autoreleasing *)error;
+
+-(BOOL)writeContextToFile:(NSString *)path withError:(NSError *__autoreleasing *)error;
+
+-(TDBBinary *)writeContextToBuffer;
 
 @end
 

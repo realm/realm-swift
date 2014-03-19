@@ -155,7 +155,7 @@ using namespace std;
     return to_objc_string(m_group->get_table_name(table_ndx));
 }
 
-
+/* Moved to group_priv header for now */
 -(BOOL)writeContextToFile:(NSString*)path withError:(NSError* __autoreleasing*)error
 {
     try {
@@ -189,6 +189,7 @@ using namespace std;
     return YES;
 }
 
+/* Moved to group_priv header for now */
 -(TDBBinary*)writeContextToBuffer
 {
     TDBBinary* buffer = [[TDBBinary alloc] init];
