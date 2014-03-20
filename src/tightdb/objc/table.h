@@ -159,7 +159,6 @@
 
 
 -(TDBQuery *)where;
--(TDBQuery *)whereWithError:(NSError *__autoreleasing *)error;
 
 /* Indexing */
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;
@@ -167,7 +166,6 @@
 
 /* Optimizing */
 -(BOOL)optimize;
--(BOOL)optimizeWithError:(NSError *__autoreleasing *)error;
 
 /* Conversion */
 /* FIXME: Do we want to conversion methods? Maybe use NSData. */

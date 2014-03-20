@@ -21,7 +21,7 @@ void ex_objc_group_intro()
         /* Creates a group and uses it to create a new table. */
 
         TDBGroup* group = [TDBGroup group];
-        PeopleTable* table = [group getOrCreateTableWithName:@"people" asTableClass:[PeopleTable class] error:nil];
+        PeopleTable* table = [group getOrCreateTableWithName:@"people" asTableClass:[PeopleTable class]];
 
         /* Adds values to the table. */
         [table appendRow:@{@"Name":@"Mary", @"Age":@14, @"Hired":@YES}];
@@ -44,7 +44,7 @@ void ex_objc_group_intro()
 
         /* Creates a group from an im memory buffer */
         TDBGroup* groupFromMemory = [TDBGroup groupWithBuffer:buffer withError:nil];
-        PeopleTable* tableFromMemery = [groupFromMemory getOrCreateTableWithName:@"people" asTableClass:[PeopleTable class] error:nil];
+        PeopleTable* tableFromMemery = [groupFromMemory getOrCreateTableWithName:@"people" asTableClass:[PeopleTable class]];
 
         for (PeopleTable_Roq *row in tableFromMemery) {
             NSLog(@"Name: %@", row.Name);
