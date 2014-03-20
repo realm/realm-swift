@@ -7,10 +7,9 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-#import <tightdb/objc/tightdb.h>
-#import <tightdb/objc/transaction.h>
+#import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/TDBTransaction.h>
 #import <tightdb/objc/group.h>
-#import <tightdb/objc/context.h>
 
 TIGHTDB_TABLE_2(SharedTable2,
                 Hired, Bool,
