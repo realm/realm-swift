@@ -24,8 +24,8 @@
 #include <tightdb/data_type.hpp>
 #include <tightdb/descriptor.hpp>
 
-#import "type.h"
-#import "descriptor.h"
+#import "TDBType.h"
+#import "TDBDescriptor.h"
 
 #include <tightdb/objc/util.hpp>
 

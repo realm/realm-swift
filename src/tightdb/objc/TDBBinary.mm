@@ -20,28 +20,46 @@
 
 #import <Foundation/Foundation.h>
 
-#import "table.h"
-#import "binary.h"
+#include <tightdb/util/unique_ptr.hpp>
+#include <tightdb/binary_data.hpp>
 
-@interface TDBMixed: NSObject
-+(TDBMixed *)mixedWithBool:(BOOL)value;
-+(TDBMixed *)mixedWithInt64:(int64_t)value;
-+(TDBMixed *)mixedWithFloat:(float)value;
-+(TDBMixed *)mixedWithDouble:(double)value;
-+(TDBMixed *)mixedWithString:(NSString *)value;
-+(TDBMixed *)mixedWithBinary:(TDBBinary *)value;
-+(TDBMixed *)mixedWithBinary:(const char *)data size:(size_t)size;
-+(TDBMixed *)mixedWithDate:(NSDate *)value;
-+(TDBMixed *)mixedWithTable:(TDBTable *)value;
--(BOOL)isEqual:(TDBMixed *)other;
--(TDBType)getType;
--(BOOL)getBool;
--(int64_t)getInt;
--(float)getFloat;
--(double)getDouble;
--(NSString *)getString;
--(TDBBinary *)getBinary;
--(NSDate *)getDate;
--(TDBTable *)getTable;
+#import "TDBBinary.h"
+#import "TDBBinary_priv.h"
+
+@implementation TDBBinary
+{
+    tightdb::BinaryData m_data;
+}
+-(id)initWithData:(const char*)data size:(size_t)size
+{
+    self = [super init];
+    if (self) {
+        m_data = tightdb::BinaryData(data, size);
+    }
+    return self;
+}
+-(id)initWithBinary:(tightdb::BinaryData)data
+{
+    self = [super init];
+    if (self) {
+        m_data = data;
+    }
+    return self;
+}
+-(const char*)getData
+{
+    return m_data.data();
+}
+-(size_t)getSize
+{
+    return m_data.size();
+}
+-(BOOL)isEqual:(TDBBinary*)bin
+{
+    return m_data == bin->m_data;
+}
+-(tightdb::BinaryData&)getNativeBinary
+{
+    return m_data;
+}
 @end
-

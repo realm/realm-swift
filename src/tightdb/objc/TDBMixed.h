@@ -18,12 +18,30 @@
  *
  **************************************************************************/
 
+#import <Foundation/Foundation.h>
 
-#import "mixed.h"
-#include <tightdb/mixed.hpp>
+#import "TDBTable.h"
+#import "TDBBinary.h"
 
-@interface TDBMixed()
-+(TDBMixed*)mixedWithNativeMixed:(const tightdb::Mixed&)other;
--(tightdb::Mixed&)getNativeMixed;
+@interface TDBMixed: NSObject
++(TDBMixed *)mixedWithBool:(BOOL)value;
++(TDBMixed *)mixedWithInt64:(int64_t)value;
++(TDBMixed *)mixedWithFloat:(float)value;
++(TDBMixed *)mixedWithDouble:(double)value;
++(TDBMixed *)mixedWithString:(NSString *)value;
++(TDBMixed *)mixedWithBinary:(TDBBinary *)value;
++(TDBMixed *)mixedWithBinary:(const char *)data size:(size_t)size;
++(TDBMixed *)mixedWithDate:(NSDate *)value;
++(TDBMixed *)mixedWithTable:(TDBTable *)value;
+-(BOOL)isEqual:(TDBMixed *)other;
+-(TDBType)getType;
+-(BOOL)getBool;
+-(int64_t)getInt;
+-(float)getFloat;
+-(double)getDouble;
+-(NSString *)getString;
+-(TDBBinary *)getBinary;
+-(NSDate *)getDate;
+-(TDBTable *)getTable;
 @end
 
