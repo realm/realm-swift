@@ -19,7 +19,7 @@
  **************************************************************************/
 
 
-#import "mixed.h"
+#import "TDBMixed.h"
 #include <tightdb/mixed.hpp>
 
 @interface TDBMixed()

@@ -20,12 +20,12 @@
 
 #import <Foundation/Foundation.h>
 
-#import <tightdb/objc/table.h>
-#import <tightdb/objc/table_priv.h>
-#import <tightdb/objc/binary.h>
-#import <tightdb/objc/binary_priv.h>
-#import <tightdb/objc/mixed.h>
-#import "mixed_priv.h"
+#import <tightdb/objc/TDBTable.h>
+#import <tightdb/objc/TDBTable_priv.h>
+#import <tightdb/objc/TDBBinary.h>
+#import <tightdb/objc/TDBBinary_priv.h>
+#import <tightdb/objc/TDBMixed.h>
+#import "TDBMixed_priv.h"
 #import <tightdb/objc/util.hpp>
 
 #include <tightdb/util/unique_ptr.hpp>

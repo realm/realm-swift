@@ -4,8 +4,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "table.h"
-#import "table_view.h"
+#import "TDBTable.h"
+#import "TDBView.h"
 
 #include <tightdb/table_view.hpp>
 

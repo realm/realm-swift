@@ -19,7 +19,7 @@
  **************************************************************************/
 
 #import <Foundation/Foundation.h>
-#import "binary.h"
+#import "TDBBinary.h"
 
 @interface TDBBinary: NSObject
 -(id)initWithData:(const char *)data size:(size_t)size;

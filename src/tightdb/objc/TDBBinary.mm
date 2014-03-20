@@ -23,8 +23,8 @@
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/binary_data.hpp>
 
-#import "binary.h"
-#import "binary_priv.h"
+#import "TDBBinary.h"
+#import "TDBBinary_priv.h"
 
 @implementation TDBBinary
 {
