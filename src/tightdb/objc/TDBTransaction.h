@@ -52,10 +52,16 @@
 -(TDBTable *)getTableWithName:(NSString *)name;
 
 /**
+ * This method returns a table with the specified name from the group.
+ * Returns nil if no table with the specified name exists.
+ */
+-(id)getTableWithName:(NSString *)name asTableClass:(Class)obj;
+
+/**
  * This method returns nil if it encounters a memory allocation error
  * (out of memory).
  */
--(TDBTable *)getOrCreateTableWithName:(NSString *)name;
+-(TDBTable *)createTableWithName:(NSString *)name;
 
 /**
  * This method returns nil if the group already contains a table with
@@ -66,7 +72,7 @@
  * The specified table class must be one that is declared by using
  * one of the table macros TIGHTDB_TABLE_*.
  */
--(id)getOrCreateTableWithName:(NSString *)name asTableClass:(Class)obj;
+-(id)createTableWithName:(NSString *)name asTableClass:(Class)obj;
 
 
 

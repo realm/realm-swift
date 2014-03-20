@@ -55,7 +55,7 @@ TIGHTDB_TABLE_2(TestTableGroup,
         STFail(@"From disk not valid");
 
     // Create new table in group
-    TestTableGroup *t = (TestTableGroup *)[fromDisk getOrCreateTableWithName:@"test" asTableClass:[TestTableGroup class]];
+    TestTableGroup *t = (TestTableGroup *)[fromDisk createTableWithName:@"test" asTableClass:[TestTableGroup class]];
 
     // Verify
     NSLog(@"Columns: %zu", t.columnCount);
