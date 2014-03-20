@@ -273,6 +273,27 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (size_t)-1, @"find");
 }
 
+- (void)testView
+{
+    TDBTable* table = [[TDBTable alloc]init];
+    [table addColumnWithName:@"IntCol" andType:TDBIntType];
+
+    [table appendRow:@[@10]];
+    [table appendRow:@[@42]];
+    [table appendRow:@[@27]];
+    [table appendRow:@[@31]];
+    [table appendRow:@[@8]];
+    [table appendRow:@[@39]];
+
+    TDBView* view = [[[table where] intIsLessThanOrEqualTo:30 inColumnWithIndex:0] findAllRows];
+
+    STAssertEquals(view.rowCount, (NSUInteger)3, @"found 3 matches");
+
+    STAssertTrue([view[0][0] isEqual:@10], @"row 0 -> 0");
+    STAssertTrue([view[1][0] isEqual:@27], @"row 1 -> 2");
+    STAssertTrue([view[2][0] isEqual:@8],  @"row 2 -> 4");
+}
+
 
 
 
