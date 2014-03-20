@@ -20,8 +20,8 @@
 
 #import <Foundation/Foundation.h>
 
-#import "table.h"
-#import "column_proxy.h"
+#import "TDBTable.h"
+#import "TDBColumnProxy.h"
 
 @implementation TDBColumnProxy
 @synthesize table = _table, column = _column;

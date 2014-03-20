@@ -19,7 +19,7 @@
  **************************************************************************/
 
 #import <Foundation/Foundation.h>
-#import <tightdb/objc/transaction.h>
+#import <tightdb/objc/TDBTransaction.h>
 
 typedef void(^TDBReadBlock)(TDBTransaction *transaction);
 typedef BOOL(^TDBWriteBlock)(TDBTransaction *transaction);

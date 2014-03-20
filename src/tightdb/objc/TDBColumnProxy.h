@@ -19,9 +19,9 @@
  **************************************************************************/
 
 #import <Foundation/Foundation.h>
-#import "table.h"
-#import "mixed.h"
-#import "binary.h"
+#import "TDBTable.h"
+#import "TDBMixed.h"
+#import "TDBBinary.h"
 
 @interface TDBColumnProxy: NSObject
 @property(nonatomic, weak) TDBTable *table;
