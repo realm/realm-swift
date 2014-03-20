@@ -5,7 +5,7 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-#import <tightdb/objc/table.h>
+#import <tightdb/objc/TDBTable.h>
 
 @interface MacTightDbTests: SenTestCase
 @end
