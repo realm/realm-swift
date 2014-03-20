@@ -338,7 +338,7 @@ using namespace std;
 {
     tightdb::util::UniquePtr<tightdb::TableView> m_view;
     TDBTable* m_table;
-    TDBRow* m_tmp_cursor;
+    TDBRow* m_tmp_row;
     BOOL m_read_only;
 }
 
@@ -525,9 +525,9 @@ using namespace std;
     return m_view->get_source_ndx(rowIndex);
 }
 
--(TDBRow*)getCursor
+-(TDBRow*)getRow
 {
-    return m_tmp_cursor = [[TDBRow alloc] initWithTable: m_table
+    return m_tmp_row = [[TDBRow alloc] initWithTable: m_table
                                                            ndx: m_view->get_source_ndx(0)];
 }
 
@@ -537,7 +537,7 @@ using namespace std;
     if(state->state == 0) {
         const unsigned long* ptr = static_cast<const unsigned long*>(objc_unretainedPointer(self));
         state->mutationsPtr = const_cast<unsigned long*>(ptr); // FIXME: This casting away of constness seems dangerous. Is it?
-        TDBRow* tmp = [self getCursor];
+        TDBRow* tmp = [self getRow];
         *stackbuf = tmp;
     }
     if (state->state < self.rowCount) {
@@ -562,7 +562,7 @@ using namespace std;
     tightdb::TableRef m_table;
     id m_parent;
     BOOL m_read_only;
-    TDBRow* m_tmp_cursor;
+    TDBRow* m_tmp_row;
 }
 
 
@@ -589,11 +589,11 @@ using namespace std;
     // Dummy - must be overridden in tightdb.h - Check if spec matches the macro definitions
 }
 
--(TDBRow*)getCursor
+-(TDBRow*)getRow
 {
-    return m_tmp_cursor = [[TDBRow alloc] initWithTable:self ndx:0];
+    return m_tmp_row = [[TDBRow alloc] initWithTable:self ndx:0];
 }
--(void)clearCursor
+-(void)clearRow
 {
     // Dummy - must be overridden in tightdb.h
 
@@ -607,7 +607,7 @@ using namespace std;
     if(state->state == 0) {
         const unsigned long* ptr = static_cast<const unsigned long*>(objc_unretainedPointer(self));
         state->mutationsPtr = const_cast<unsigned long*>(ptr); // FIXME: This casting away of constness seems dangerous. Is it?
-        TDBRow* tmp = [self getCursor];
+        TDBRow* tmp = [self getRow];
         *stackbuf = tmp;
     }
     if (state->state < self.rowCount) {
@@ -619,7 +619,7 @@ using namespace std;
         *stackbuf = nil;
         state->itemsPtr = nil;
         state->mutationsPtr = nil;
-        [self clearCursor];
+        [self clearRow];
         return 0;
     }
     return 1;

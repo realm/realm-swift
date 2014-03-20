@@ -174,7 +174,7 @@ TIGHTDB_TABLE_2(SubMixedTable,
     NSLog(@"MyTable Size: %lu", [table rowCount]);
     int sumType = 0;
     for (size_t i = 0; i < [table rowCount]; i++) {
-        MixedTable_Cursor *cursor = [table cursorAtIndex:i];
+        MixedTable_Row *cursor = [table rowAtIndex:i];
         NSLog(@"%zu: %@", i, cursor.Other);
         NSLog(@"Type: %i", [cursor.Other getType] );
         sumType += [cursor.Other getType];

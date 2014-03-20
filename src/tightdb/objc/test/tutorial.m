@@ -61,23 +61,23 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     //------------------------------------------------------
 
     // Getting values
-    NSString * name = [people cursorAtIndex:5].Name;   // => 'Anni'
-    // Using a cursor
-    PeopleTable_Cursor *myRow = [people cursorAtIndex:5];
+    NSString * name = [people rowAtIndex:5].Name;   // => 'Anni'
+    // Using a row
+    PeopleTable_Row *myRow = [people rowAtIndex:5];
     int64_t age = myRow.Age;                           // => 54
     BOOL hired  = myRow.Hired;                         // => true
     NSLog(@"%@ is %lld years old.", name, age);
     if (hired) NSLog(@"is hired.");
 
     // Setting values  (note: setter access will be made obsolete, use dot notation)
-    [[people cursorAtIndex:5] setAge:43];  // Getting younger
+    [[people rowAtIndex:5] setAge:43];  // Getting younger
     
     // or with dot-syntax:
     myRow.Age += 1;                                    // Happy birthday!
     NSLog(@"%@ age is now %lld.   [44]", myRow.Name, myRow.Age);
 
     // Get last row
-    NSString *lastname = [people cursorAtLastIndex].Name;       // => "Anni"
+    NSString *lastname = [people rowAtLastIndex].Name;       // => "Anni"
     NSLog(@"Last name is %@.   [Anni]", lastname);
 
     // Change a row - not implemented yet
@@ -90,7 +90,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
 
     // Iterating over rows:
     for (size_t i = 0; i < [people rowCount]; ++i) {
-        PeopleTable_Cursor *row = [people cursorAtIndex:i];
+        PeopleTable_Row *row = [people rowAtIndex:i];
         NSLog(@"(Rows) %@ is %lld years old.", row.Name, row.Age);
     }
 
@@ -132,8 +132,8 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     TDBView *res = [q findAll];
     for (size_t i = 0; i < [res rowCount]; ++i) {
         NSLog(@"%zu: %@ is %lld years old", i,
-            [people cursorAtIndex:i].Name,
-            [people cursorAtIndex:i].Age);
+            [people rowAtIndex:i].Name,
+            [people rowAtIndex:i].Age);
     }
 
     //------------------------------------------------------
@@ -155,9 +155,9 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"Disktable size: %zu", [diskTable rowCount]);
 
     for (size_t i = 0; i < [diskTable rowCount]; i++) {
-        PeopleTable_Cursor *cursor = [diskTable cursorAtIndex:i];
-        NSLog(@"%zu: %@", i, [cursor Name]);
-        NSLog(@"%zu: %@", i, cursor.Name);
+        PeopleTable_Row *row = [diskTable rowAtIndex:i];
+        NSLog(@"%zu: %@", i, [row Name]);
+        NSLog(@"%zu: %@", i, row.Name);
     }
 
     // Write same group to memory buffer
@@ -167,8 +167,8 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     TDBGroup *fromMem = [TDBGroup groupWithBuffer:buffer withError:nil];
     PeopleTable *memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
-        PeopleTable_Cursor *cursor = [memTable cursorAtIndex:i];
-        NSLog(@"%zu: %@", i, cursor.Name);
+        PeopleTable_Row *row = [memTable rowAtIndex:i];
+        NSLog(@"%zu: %@", i, row.Name);
     }
 }
 

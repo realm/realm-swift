@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		42211A4B18D8958400E1CA0B /* people.m in Sources */ = {isa = PBXBuildFile; fileRef = 42211A4A18D8958400E1CA0B /* people.m */; };
 		4D88931318D320D20038AFD4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88931218D320D20038AFD4 /* Foundation.framework */; };
 		4D88931518D320D20038AFD4 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88931418D320D20038AFD4 /* CoreGraphics.framework */; };
 		4D88931718D320D20038AFD4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88931618D320D20038AFD4 /* UIKit.framework */; };
@@ -43,6 +44,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		42211A2C18D879DA00E1CA0B /* people.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = people.h; path = ../examples/people.h; sourceTree = "<group>"; };
+		42211A4A18D8958400E1CA0B /* people.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = people.m; path = ../examples/people.m; sourceTree = "<group>"; };
+		42211A4C18D895D000E1CA0B /* people.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = people.m; path = ../examples/people.m; sourceTree = "<group>"; };
+		42211A4E18D897F500E1CA0B /* examples.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = examples.h; path = ../examples/examples.h; sourceTree = "<group>"; };
 		4D88930F18D320D20038AFD4 /* RefDocExamples.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RefDocExamples.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D88931218D320D20038AFD4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4D88931418D320D20038AFD4 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -174,7 +179,11 @@
 		4D88934118D320DB0038AFD4 /* examples */ = {
 			isa = PBXGroup;
 			children = (
+				42211A4E18D897F500E1CA0B /* examples.h */,
 				4D88934218D320EF0038AFD4 /* ex_objc_sharedgroup_intro.m */,
+				42211A4C18D895D000E1CA0B /* people.m */,
+				42211A2C18D879DA00E1CA0B /* people.h */,
+				42211A4A18D8958400E1CA0B /* people.m */,
 				4D88934318D320EF0038AFD4 /* ex_objc_tableview_dynamic_intro.m */,
 				4D88934418D320EF0038AFD4 /* ex_objc_table_typed_intro_with_many_comments.m */,
 				4D88934518D320EF0038AFD4 /* ex_objc_table_dynamic_intro.m */,
@@ -231,7 +240,7 @@
 		4D88930718D320D20038AFD4 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = tightdb;
 				TargetAttributes = {
 					4D88932918D320D30038AFD4 = {
@@ -282,6 +291,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				42211A4B18D8958400E1CA0B /* people.m in Sources */,
 				4D88934B18D320EF0038AFD4 /* ex_objc_sharedgroup_intro.m in Sources */,
 				4D88934C18D320EF0038AFD4 /* ex_objc_tableview_dynamic_intro.m in Sources */,
 				4D88934D18D320EF0038AFD4 /* ex_objc_table_typed_intro_with_many_comments.m in Sources */,
@@ -338,7 +348,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -378,7 +387,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -445,7 +453,6 @@
 		4D88933F18D320D30038AFD4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/RefDocExamples.app/RefDocExamples";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
@@ -468,7 +475,6 @@
 		4D88934018D320D30038AFD4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/RefDocExamples.app/RefDocExamples";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",

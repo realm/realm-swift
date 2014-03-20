@@ -228,7 +228,7 @@ using namespace std;
     size_t _columnId;
 }
 
--(id)initWithCursor:(TDBRow *)cursor columnId:(NSUInteger)columnId
+-(id)initWithRow:(TDBRow *)cursor columnId:(NSUInteger)columnId
 {
     self = [super init];
     if (self) {
