@@ -342,7 +342,7 @@ EOF
         ;;
 
     "get-version")
-	version_file="src/tightdb/objc/version.h"
+	version_file="src/tightdb/objc/TDBVersion.h"
 	tightdb_version_major="$(grep TDB_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
 	tightdb_version_minor="$(grep TDB_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
 	tightdb_version_patch="$(grep TDB_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
@@ -356,7 +356,7 @@ EOF
 	    exit 1
 	fi
         tightdb_version="$1"
-        version_file="src/tightdb/objc/version.h"
+        version_file="src/tightdb/objc/TDBVersion.h"
         tightdb_ver_major="$(echo "$tightdb_version" | cut -f1 -d.)" || exit 1
         tightdb_ver_minor="$(echo "$tightdb_version" | cut -f2 -d.)" || exit 1
         tightdb_ver_patch="$(echo "$tightdb_version" | cut -f3 -d.)" || exit 1
