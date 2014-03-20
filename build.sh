@@ -604,7 +604,7 @@ EOF
         ;;
 
     "build-test-core")
-        TMP=$(mktemp -d)
+        TMP=$(mktemp -d /tmp/tightdb.objc.build-test-core.XXXX)
 
         cp ../tightdb/src/tightdb.hpp "$TMP/"
         mkdir "$TMP/tightdb"
