@@ -33,8 +33,8 @@
 -(TDBQuery *)group;
 -(TDBQuery *)Or;
 -(TDBQuery *)endGroup;
--(void)subtableInColumnWithIndex:(NSUInteger)colIndex;
--(void)parent;
+-(TDBQuery *)subtableInColumnWithIndex:(NSUInteger)colIndex;
+-(TDBQuery *)parent;
 
 -(NSUInteger)countRows;
 -(NSUInteger)removeRows;
