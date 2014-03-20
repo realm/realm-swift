@@ -1,5 +1,6 @@
 #
-# Obj-C reference documentation for Group class
+# Obj-C reference documentation for TDBTransaction class
+# Notice: this is a rename of Group
 #
 
 #INCONSISTENCY the parameters mode and take_ownership are not implemented in constructors
@@ -8,53 +9,18 @@
 #UNDOCUMENTED: [commit, to_json, get_table_typed]
 
 ID         : class_group
-TITLE      : Group
-SUMMARY    : *g_group_summary
-DESCR      : *g_group_descr
+TITLE      : TDBTransaction
+SUMMARY    : A TDBTransaction is a fully ACID compliant access to tables.
+DESCR      : >
+             A TDBTransaction can only be created/initiated from a TDBContext (see {link class_shared_group}.
+             By using TDBContext and TDBTransaction, you can access your data in multi-threaded applications. Moreover,
+             a successful write transaction is sesameless persisted to your storage device.
 SEE        :
 EXAMPLES:
 - DESCR    :
   CODE     : ex_objc_group_intro
 IGNORE     : []                   # List of method-ids to ignore
 CATEGORIES:
-- Constructor:
-  METHODS:
-  - g_group_constructor_plain:
-      NAME     : group
-  - g_group_constructor_file:
-      NAME     : groupWithFilename
-  - g_group_constructor_memory:
-      NAME     : groupWithBuffer
-      TITLE    : group*
-      DESCR    : *g_group_constructor_descr
-      SUMMARY  : *g_group_constructor_summary
-      SIGNATURE: |
-                 (TightdbGroup *)groupWithFilename:(NSString *)filename;
-                 (TightdbGroup *)groupWithBuffer:(const char*)data size:(size_t)size;
-                 (TightdbGroup *)group;
-      PARAMS:
-      - NAME   : filename
-        TYPES  : NSString
-        DESCR  : TBD #*g_group_constructor_memory_parm1_descr
-      - NAME   : data
-        TYPES  : const char*
-        DESCR  : *g_group_constructor_memory_parm3_descr
-      - NAME   : size
-        TYPES  : Group::BufferSpec
-        DESCR  : Size of the binary which <code>data</code> points at.
-      RETURN:
-        TYPES  : TightdbGroup
-        DESCR  : *g_group_constructor_memory_return1_descr
-      THROWS:
-      - EXCEPT : TBD
-        DESCR  : TBD
-      EXAMPLES:
-      - DESCR  :
-        CODE   : #ex_objc_group_constructor_plain
-      - DESCR  :
-        CODE   : #ex_objc_group_constructor_file
-      - DESCR  :
-        CODE   : #ex_objc_group_constructor_memory
 - Table:
   METHODS:
   - g_group_has_table:
@@ -102,8 +68,8 @@ CATEGORIES:
       SEE      : "{@link g_group_has_table}"
   - g_group_get_or_create_table:
       NAMES    : "getOrCreateTableWithName:"
-      SUMMARY  : Get table from group if it exists. Otherwise create and get it.
-      DESCR    : Get table from group if it exists. Otherwise create and get it.
+      SUMMARY  : Get table if it exists. Otherwise create and get it.
+      DESCR    : Get table if it exists. Otherwise create and get it.
       SIGNATURE: |
                  (TDBTable *)getOrCreateTableWithName:(NSString *)name
                  (id)getOrCreateTableWithName:(NSString *)name asTableClass:(Class)obj
@@ -123,33 +89,3 @@ CATEGORIES:
       -  DESCR :
          CODE  : ex_objc_group_optional_table
       SEE      : "{@link g_group_has_table}"
-- IO:
-  METHODS:
-  - g_group_write_to_file:
-      NAMES    : write
-      SUMMARY  : *g_group_write_to_file_summary
-      DESCR    : *g_group_write_to_file_descr
-      SIGNATURE: |
-                 (void)write:(NSString *)filePath;
-      PARAMS:
-      - NAME   : filePath
-        TYPES  : NSString *
-        DESCR  : *g_group_write_to_file_parm1_descr
-      THROWS:
-      - EXCEPT : TBD
-        DESCR  : TBD
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_objc_group_write_to_file
-  - g_group_write_to_mem:
-      NAMES    : writeToMem
-      SUMMARY  : *g_group_write_to_mem_summary
-      DESCR    : *g_group_write_to_mem_descr
-      SIGNATURE: |
-                 (const char*)writeToMem:(size_t*)size;
-      RETURN:
-        DESCR  : The allocated buffer. You will have to call free() when you are done with it.
-        TYPES  : const char*
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_objc_group_write_to_mem
