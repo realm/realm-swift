@@ -603,6 +603,53 @@ EOF
         exit 0
         ;;
 
+    "build-test-core")
+        TMP=$(mktemp -d)
+
+        cp ../tightdb/src/tightdb.hpp "$TMP/"
+        mkdir "$TMP/tightdb"
+        find ../tightdb/src/tightdb/ -maxdepth 1 \
+          -type f -iregex '^.*\.[ch]\(pp\)?$' \
+          -exec cp {} "$TMP/tightdb/" \;
+        mkdir "$TMP/tightdb/util"
+        find ../tightdb/src/tightdb/util/ -maxdepth 1 \
+          -type f -iregex '^.*\.[ch]\(pp\)?$' \
+          -exec cp {} "$TMP/tightdb/util/" \;
+        mkdir "$TMP/tightdb/impl"
+        find ../tightdb/src/tightdb/impl/ -maxdepth 1 \
+          -type f -iregex '^.*\.[ch]\(pp\)?$' \
+          -exec cp {} "$TMP/tightdb/impl" \;
+
+        find ../tightdb/test/ -maxdepth 1 \
+          -type f -iregex '^.*\.[ch]\(pp\)?$' \
+          -exec cp {} "$TMP/" \;
+        mkdir "$TMP/util"
+        find ../tightdb/test/util/ -maxdepth 1 \
+          -type f -iregex '^.*\.[ch]\(pp\)?$' \
+          -exec cp {} "$TMP/util/" \;
+        mkdir "$TMP/large_tests"
+        find ../tightdb/test/large_tests/ -maxdepth 1 \
+          -type f -iregex '^.*\.[ch]\(pp\)?$' \
+          -exec cp {} "$TMP/large_tests/" \;
+
+        mkdir "$TMP/UnitTest++"
+        find ../tightdb/test/UnitTest++/src/ -maxdepth 1 \
+          -type f -iregex '^.*\.[ch]\(pp\)?$' \
+          -exec cp {} "$TMP/UnitTest++/" \;
+        mkdir "$TMP/UnitTest++/Posix"
+        find ../tightdb/test/UnitTest++/src/Posix/ -maxdepth 1 \
+          -type f -iregex '^.*\.[ch]\(pp\)?$' \
+          -exec cp {} "$TMP/UnitTest++/Posix/" \;
+
+        mkdir -p test-core || exit 1
+        (cd test-core && cmake -G Xcode "$TMP")
+        rm -rf test-core/* || exit 1
+
+        rm -rf "$TMP"
+        echo "Test passed"
+        exit 0
+        ;;
+
     "dist-copy")
         # Copy to distribution package
         TARGET_DIR="$1"
