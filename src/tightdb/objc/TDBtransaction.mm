@@ -21,13 +21,12 @@
 #include <tightdb/group.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
-#import <tightdb/objc/transaction.h>
-#import <tightdb/objc/group.h>
-#import <tightdb/objc/transaction_priv.h>
-#import <tightdb/objc/table.h>
-#import <tightdb/objc/table_priv.h>
-#import <tightdb/objc/binary.h>
-#import <tightdb/objc/binary_priv.h>
+#import <tightdb/objc/TDBTransaction.h>
+#import <tightdb/objc/TDBTransaction_priv.h>
+#import <tightdb/objc/TDBTable.h>
+#import <tightdb/objc/TDBTable_priv.h>
+#import <tightdb/objc/TDBBinary.h>
+#import <tightdb/objc/TDBBinary_priv.h>
 
 
 #include <tightdb/objc/util.hpp>
