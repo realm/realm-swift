@@ -30,7 +30,7 @@ TIGHTDB_TABLE_2(EnumPeopleTable2,
     //------------------------------------------------------
     TDBTransaction *group = [TDBTransaction group];
     // Create new table in group
-    EnumPeopleTable *people = [group getOrCreateTableWithName:@"employees" asTableClass:[EnumPeopleTable class]];
+    EnumPeopleTable *people = [group createTableWithName:@"employees" asTableClass:[EnumPeopleTable class]];
 
     // Add some rows
     [people addName:@"John" Age:20 Hired:YES];

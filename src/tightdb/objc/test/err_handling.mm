@@ -60,9 +60,9 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    TDBTransaction* group = [TDBTransaction group];
+    TDBTransaction* transaction = [TDBTransaction group];
     // Create new table in group
-    PeopleErrTable* people = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
+    PeopleErrTable* people = [transaction createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
     // No longer supports errors, the tes may be redundant
     // Add some rows
@@ -87,7 +87,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     // Write the group to disk
     [fm removeItemAtPath:@"peopleErr.tightdb" error:NULL];
     error = nil;
-    if (![group writeContextToFile:@"peopleErr.tightdb" withError:&error]) {
+    if (![transaction writeContextToFile:@"peopleErr.tightdb" withError:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"No error expected");
     }
@@ -139,7 +139,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
         STFail(@"File should have been possible to open");
     }
 
-    PeopleErrTable* diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
+    PeopleErrTable* diskTable = [fromDisk getTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
     // Fake readonly.
     [((TDBTable*)diskTable) setReadOnly:true];

@@ -45,7 +45,7 @@ TIGHTDB_TABLE_2(QueryTable,
     TDBTransaction* group = [TDBTransaction group];
     NSLog(@"HasTable: %i", [group hasTableWithName:@"employees" withTableClass:[MyTable class]] );
     // Create new table in group
-    MyTable* table = [group getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
+    MyTable* table = [group createTableWithName:@"employees" asTableClass:[MyTable class]];
     NSLog(@"Table: %@", table);
     NSLog(@"HasTable: %i", [group hasTableWithName:@"employees" withTableClass:[MyTable class]] );
 
@@ -111,7 +111,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Load a group from disk (and print contents)
     TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"employees.tightdb" withError:nil];
-    MyTable* diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
+    MyTable* diskTable = [fromDisk getTableWithName:@"employees" asTableClass:[MyTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
 //    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
@@ -128,7 +128,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Load a group from memory (and print contents)
     TDBTransaction* fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
-    MyTable* memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
+    MyTable* memTable = [fromMem getTableWithName:@"employees" asTableClass:[MyTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         // ??? cursor
         NSLog(@"%zu: %@", i, memTable.Name);
@@ -139,7 +139,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testQuery
 {
     TDBTransaction* group = [TDBTransaction group];
-    QueryTable* table = [group getOrCreateTableWithName:@"Query table" asTableClass:[QueryTable class]];
+    QueryTable* table = [group createTableWithName:@"Query table" asTableClass:[QueryTable class]];
 
     // Add some rows
     [table addFirst:2 Second:@"a"];
@@ -196,7 +196,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testSubtables
 {
     TDBTransaction* group = [TDBTransaction group];
-    TDBTable* table = [group getOrCreateTableWithName:@"table" asTableClass:[TDBTable class]];
+    TDBTable* table = [group createTableWithName:@"table" asTableClass:[TDBTable class]];
 
     // Specify the table type
     {

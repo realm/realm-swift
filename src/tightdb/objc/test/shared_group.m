@@ -28,7 +28,7 @@ TIGHTDB_TABLE_2(SharedTable2,
 
     TDBTransaction* group = [TDBTransaction group];
     // Create new table in group
-    SharedTable2 *table = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class]];
+    SharedTable2 *table = [group createTableWithName:@"employees" asTableClass:[SharedTable2 class]];
     NSLog(@"Table: %@", table);
     // Add some rows
     [table addHired:YES Age:50];
@@ -50,7 +50,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     TDBContext* fromDisk = [TDBContext initWithFile:@"employees.tightdb" withError:nil];
 
     [fromDisk readWithBlock:^(TDBTransaction* group) {
-            SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class]];
+            SharedTable2* diskTable = [group createTableWithName:@"employees" asTableClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < [diskTable rowCount]; i++) {
                 SharedTable2_Row *cursor = [diskTable rowAtIndex:i];
@@ -62,7 +62,7 @@ TIGHTDB_TABLE_2(SharedTable2,
 
 
     [fromDisk writeWithBlock:^(TDBTransaction* group) {
-            SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class]];
+            SharedTable2* diskTable = [group createTableWithName:@"employees" asTableClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < 50; i++) {
                 [diskTable addHired:YES Age:i];
@@ -72,7 +72,7 @@ TIGHTDB_TABLE_2(SharedTable2,
 
 
     [fromDisk writeWithBlock:^(TDBTransaction* group) {
-            SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class]];
+            SharedTable2* diskTable = [group createTableWithName:@"employees" asTableClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < 50; i++) {
                 [diskTable addHired:YES Age:i];
@@ -82,7 +82,7 @@ TIGHTDB_TABLE_2(SharedTable2,
 
 
     [fromDisk writeWithBlock:^(TDBTransaction* group) {
-            SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class]];
+            SharedTable2* diskTable = [group createTableWithName:@"employees" asTableClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < 50; i++) {
                 [diskTable addHired:YES Age:i];
@@ -94,7 +94,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         } withError:nil];
 
     [fromDisk readWithBlock:^(TDBTransaction* group) {
-            SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class]];
+            SharedTable2* diskTable = [group createTableWithName:@"employees" asTableClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
         
         STAssertThrows([diskTable removeAllRows], @"Not allowed in readtransaction");
@@ -114,7 +114,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     TDBContext* fromDisk = [TDBContext initWithFile:@"readonlyTest.tightdb" withError:nil];
     
     [fromDisk writeWithBlock:^(TDBTransaction *group) {
-        TDBTable *t = [group getOrCreateTableWithName:@"table"];
+        TDBTable *t = [group createTableWithName:@"table"];
         
         [t addColumnWithName:@"col0" andType:TDBIntType];
         TDBRow *row = [t addEmptyRow];
@@ -125,7 +125,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     } withError:nil];
     
     [fromDisk readWithBlock:^(TDBTransaction* group) {
-        TDBTable *t = [group getOrCreateTableWithName:@"table"];
+        TDBTable *t = [group createTableWithName:@"table"];
        
         TDBQuery *q = [t where];
         
@@ -156,7 +156,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     STAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not changed");
     
     [sg writeWithBlock:^(TDBTransaction* group) {
-        [group getOrCreateTableWithName:@"t"];
+        [group createTableWithName:@"t"];
         return YES;
     } withError:nil];
     
@@ -164,7 +164,7 @@ TIGHTDB_TABLE_2(SharedTable2,
 
     
     [sg writeWithBlock:^(TDBTransaction* group) {
-        TDBTable *t = [group getOrCreateTableWithName:@"t"];
+        TDBTable *t = [group createTableWithName:@"t"];
         [t addColumnWithName:@"col" andType:TDBBoolType];
         TDBRow *row = [t addEmptyRow];
         [row setBool:YES inColumnWithIndex:0];
@@ -179,7 +179,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     
     
     [sg2 writeWithBlock:^(TDBTransaction* group) {
-        TDBTable *t = [group getOrCreateTableWithName:@"t"];
+        TDBTable *t = [group createTableWithName:@"t"];
         [t addEmptyRow]; /* Adding a row */
         return YES;
     } withError:nil];

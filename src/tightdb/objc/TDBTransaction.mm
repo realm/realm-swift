@@ -211,8 +211,19 @@ using namespace std;
 
 -(TDBTable *)getTableWithName:(NSString *)name
 {
+    // If table exists in context, then getTable (now renamed to createTable)
     if ([self hasTableWithName:name]) {
-        return [self getOrCreateTableWithName:name];
+        return [self createTableWithName:name];
+    }
+    
+    return nil;
+}
+
+-(id)getTableWithName:(NSString *)name asTableClass:(__unsafe_unretained Class)class_obj
+{
+    // If table exists in context, then getTable (now renamed to createTable)
+    if ([self hasTableWithName:name withTableClass:class_obj]) {
+        return [self createTableWithName:name asTableClass:class_obj];
     }
     
     return nil;
@@ -231,12 +242,13 @@ using namespace std;
 {
     if (!m_group->has_table(ObjcStringAccessor(name)))
         return NO;
-    TDBTable* table = [self getOrCreateTableWithName:name asTableClass:class_obj];
+    TDBTable* table = [self createTableWithName:name asTableClass:class_obj];
     return table != nil;
 }
 
--(id)getOrCreateTableWithName:(NSString*)name
+-(TDBTable *)createTableWithName:(NSString*)name
 {
+    
     // FIXME: Read-only errors should probably be handled by throwing
     // an exception. That is what is done in other places in this
     // binding, and it also seems like the right thing to do. This
@@ -247,6 +259,13 @@ using namespace std;
         if (![self hasTableWithName:name]) {
             return nil;
         }
+    }
+    
+    if ([self hasTableWithName:name]) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:table_with_name_already_exists"
+                                                         reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the context.", name]
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
     }
 
     TDBTable* table = [[TDBTable alloc] _initRaw];
@@ -261,7 +280,7 @@ using namespace std;
 }
 
 // FIXME: Check that the specified class derives from Table.
--(id)getOrCreateTableWithName:(NSString*)name asTableClass:(__unsafe_unretained Class)class_obj
+-(id)createTableWithName:(NSString*)name asTableClass:(__unsafe_unretained Class)class_obj
 {
     // FIXME: Read-only errors should probably be handled by throwing
     // an exception. That is what is done in other places in this
@@ -273,6 +292,13 @@ using namespace std;
         if (![self hasTableWithName:name]) {
             return nil;
         }
+    }
+    
+    if ([self hasTableWithName:name]) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:table_with_name_already_exists"
+                                                         reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the context.", name]
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
     }
 
     TDBTable* table = [[class_obj alloc] _initRaw];
