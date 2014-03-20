@@ -8,7 +8,9 @@
 #import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/tightdb.h>
+#import <tightdb/objc/transaction.h>
 #import <tightdb/objc/group.h>
+
 
 TIGHTDB_TABLE_DEF_3(PeopleTable,
                     Name,  String,
@@ -38,9 +40,9 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    TDBGroup *group = [TDBGroup group];
-    // Create new table in group
-    PeopleTable *people = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
+    TDBTransaction *transaction = [TDBTransaction group];
+    // Create new table in transaction
+    PeopleTable *people = [transaction getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
 
     // Add some rows
     [people addName:@"John" Age:20 Hired:YES];
@@ -142,12 +144,12 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
 
     NSFileManager *fm = [NSFileManager defaultManager];
 
-    // Write the group to disk
+    // Write the transaction to disk
     [fm removeItemAtPath:@"employees.tightdb" error:nil];
-    [group writeToFile:@"employees.tightdb" withError:nil];
+    [transaction writeContextToFile:@"employees.tightdb" withError:nil];
 
-    // Load a group from disk (and print contents)
-    TDBGroup *fromDisk = [TDBGroup groupWithFile:@"employees.tightdb" withError:nil];
+    // Load a transaction from disk (and print contents)
+    TDBTransaction *fromDisk = [TDBTransaction groupWithFile:@"employees.tightdb" withError:nil];
     PeopleTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES];
@@ -160,11 +162,11 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
         NSLog(@"%zu: %@", i, row.Name);
     }
 
-    // Write same group to memory buffer
-    TDBBinary* buffer = [group writeToBuffer];
+    // Write same transaction to memory buffer
+    TDBBinary* buffer = [transaction writeContextToBuffer];
 
-    // Load a group from memory (and print contents)
-    TDBGroup *fromMem = [TDBGroup groupWithBuffer:buffer withError:nil];
+    // Load a transaction from memory (and print contents)
+    TDBTransaction *fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
     PeopleTable *memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         PeopleTable_Row *row = [memTable rowAtIndex:i];

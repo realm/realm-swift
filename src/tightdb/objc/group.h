@@ -18,75 +18,34 @@
  *
  **************************************************************************/
 
+
+/* NBNB. This class is not included in our public framework!
+ * It contains selectors removed from Transaction when the old Group became Transaction.
+ * The following selectors are all tested extensively from previuos.
+ * They have been put here, as we might wan't to reintroduce Group later on....
+ * MEKJAER
+ */
+
 #import <Foundation/Foundation.h>
 
 @class TDBBinary;
 @class TDBTable;
 
 
-@interface TDBGroup: NSObject
+@interface  TDBTransaction() // Selectors are currently implemented in TDBTransaction
 
-@property (nonatomic, readonly) NSUInteger tableCount;
-
-+(TDBGroup *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
-
-/**
- * You pass the ownership of the specified buffer to the group. The
- * buffer will eventually be freed using the C function free(), so
- * the buffer you pass, must have been allocated using C function
- * malloc().
+/*
+ * Init a free-stading in memory group
  */
-+(TDBGroup *)groupWithBuffer:(TDBBinary *)buffer withError:(NSError *__autoreleasing *)error;
++(TDBTransaction *)group;
 
-+(TDBGroup *)group;
++(TDBTransaction *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
 
--(NSString *)getTableName:(NSUInteger)table_ndx;
++(TDBTransaction *)groupWithBuffer:(TDBBinary *)buffer withError:(NSError *__autoreleasing *)error;
 
--(BOOL)hasTableWithName:(NSString *)name;
+-(BOOL)writeContextToFile:(NSString *)path withError:(NSError *__autoreleasing *)error;
 
-/**
- * This method returns NO if it encounters a memory allocation error
- * (out of memory).
- *
- * The specified table class must be one that is declared by using
- * one of the table macros TIGHTDB_TABLE_*.
- */
--(BOOL)hasTableWithName:(NSString *)name withTableClass:(Class)obj;
-
-
-/**
- * This method returns a table with the specified name from the group.
- * Returns nil if no table with the specified name exists.
- */
--(TDBTable *)getTableWithName:(NSString *)name;
-
-/**
- * This method returns nil if it encounters a memory allocation error
- * (out of memory).
- */
--(TDBTable *)getOrCreateTableWithName:(NSString *)name;
-
-/**
- * This method returns nil if the group already contains a table with
- * the specified name, but its type is incompatible with the
- * specified table class. This method also returns nil if it
- * encounters a memory allocation error (out of memory).
- *
- * The specified table class must be one that is declared by using
- * one of the table macros TIGHTDB_TABLE_*.
- */
--(id)getOrCreateTableWithName:(NSString *)name asTableClass:(Class)obj;
-
-/* Serialization */
--(BOOL)writeToFile:(NSString *)path withError:(NSError *__autoreleasing *)error;
-
-/**
- * The ownership of the returned buffer is transferred to the
- * caller. The buffer will have been allocated using C function
- * malloc(), and it is the responsibility of the caller that C
- * function free() is eventually called to free the buffer.
- */
--(TDBBinary *)writeToBuffer;
+-(TDBBinary *)writeContextToBuffer;
 
 @end
 

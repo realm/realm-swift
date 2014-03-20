@@ -8,7 +8,9 @@
 #import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/tightdb.h>
+#import <tightdb/objc/transaction.h>
 #import <tightdb/objc/group.h>
+
 
 TIGHTDB_TABLE_2(TestTableGroup,
                 First,  String,
@@ -18,15 +20,15 @@ TIGHTDB_TABLE_2(TestTableGroup,
 @end
 @implementation MACTestGroup
 {
-    TDBGroup *_group;
+    TDBTransaction *_group;
 }
 
 - (void)setUp
 {
     [super setUp];
 
-    // _group = [TDBGroup group];
-    // NSLog(@"TDBGroup: %@", _group);
+    // _group = [TDBTransaction group];
+    // NSLog(@"TDBTransaction: %@", _group);
     // STAssertNotNil(_group, @"Group is nil");
 }
 
@@ -43,12 +45,12 @@ TIGHTDB_TABLE_2(TestTableGroup,
     NSFileManager *fm = [NSFileManager defaultManager];
 
     // Create empty group and serialize to disk
-    TDBGroup *toDisk = [TDBGroup group];
+    TDBTransaction *toDisk = [TDBTransaction group];
     [fm removeItemAtPath:@"table_test.tightdb" error:NULL];
-    [toDisk writeToFile:@"table_test.tightdb" withError:nil];
+    [toDisk writeContextToFile:@"table_test.tightdb" withError:nil];
 
     // Load the group
-    TDBGroup *fromDisk = [TDBGroup groupWithFile:@"table_test.tightdb" withError:nil];
+    TDBTransaction *fromDisk = [TDBTransaction groupWithFile:@"table_test.tightdb" withError:nil];
     if (!fromDisk)
         STFail(@"From disk not valid");
 
@@ -75,7 +77,7 @@ TIGHTDB_TABLE_2(TestTableGroup,
 
 - (void)testGetTable
 {
-    TDBGroup *g = [TDBGroup group];
+    TDBTransaction *g = [TDBTransaction group];
     STAssertNil([g getTableWithName:@"noTable"], @"Table does not exist");
 }
 

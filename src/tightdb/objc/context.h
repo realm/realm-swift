@@ -3,7 +3,7 @@
  * TIGHTDB CONFIDENTIAL
  * __________________
  *
- *  [2011] - [2012] TightDB Inc
+ *  [2011] - [2014] TightDB Inc
  *  All Rights Reserved.
  *
  * NOTICE:  All information contained herein is, and remains
@@ -18,13 +18,18 @@
  *
  **************************************************************************/
 
-#import <tightdb/objc/table.h>
-#import <tightdb/objc/mixed.h>
-#import <tightdb/objc/table_view.h>
-#import <tightdb/objc/binary.h>
-#import <tightdb/objc/query.h>
-#import <tightdb/objc/cursor.h>
-#import <tightdb/objc/helper_macros.h>
-#import <tightdb/objc/table_macros.h>
-#import <tightdb/objc/context.h>
-#import <tightdb/objc/version.h>
+#import <Foundation/Foundation.h>
+#import <tightdb/objc/transaction.h>
+
+typedef void(^TDBReadBlock)(TDBTransaction *transaction);
+typedef BOOL(^TDBWriteBlock)(TDBTransaction *transaction);
+
+@interface TDBContext: NSObject
++(TDBContext *)initWithFile:(NSString *)path withError:(NSError **)error;
+
+-(void)readWithBlock:(TDBReadBlock)block;
+-(BOOL)writeWithBlock:(TDBWriteBlock)block withError:(NSError **)error;
+
+-(BOOL)hasChangedSinceLastTransaction;
+
+@end

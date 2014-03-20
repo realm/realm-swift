@@ -13,538 +13,23 @@
 
 #import <tightdb/objc/table.h>
 #import <tightdb/objc/table_priv.h>
+#import <tightdb/objc/table_view.h>
+#import <tightdb/objc/table_view_priv.h>
 #import <tightdb/objc/query.h>
 #import <tightdb/objc/query_priv.h>
 #import <tightdb/objc/cursor.h>
 #import <tightdb/objc/support.h>
+#import <tightdb/objc/descriptor.h>
+#import <tightdb/objc/descriptor_priv.h>
+#import <tightdb/objc/binary.h>
+#import <tightdb/objc/binary_priv.h>
+#import <tightdb/objc/mixed.h>
+#import <tightdb/objc/mixed_priv.h>
+#import <tightdb/objc/column_proxy.h>
 
 #include <tightdb/objc/util.hpp>
 
 using namespace std;
-
-@implementation TDBBinary
-{
-    tightdb::BinaryData m_data;
-}
--(id)initWithData:(const char*)data size:(size_t)size
-{
-    self = [super init];
-    if (self) {
-        m_data = tightdb::BinaryData(data, size);
-    }
-    return self;
-}
--(id)initWithBinary:(tightdb::BinaryData)data
-{
-    self = [super init];
-    if (self) {
-        m_data = data;
-    }
-    return self;
-}
--(const char*)getData
-{
-    return m_data.data();
-}
--(size_t)getSize
-{
-    return m_data.size();
-}
--(BOOL)isEqual:(TDBBinary*)bin
-{
-    return m_data == bin->m_data;
-}
--(tightdb::BinaryData&)getNativeBinary
-{
-    return m_data;
-}
-@end
-
-
-@interface TDBMixed()
-+(TDBMixed*)mixedWithNativeMixed:(const tightdb::Mixed&)other;
--(tightdb::Mixed&)getNativeMixed;
-@end
-@implementation TDBMixed
-{
-    tightdb::Mixed m_mixed;
-    TDBTable* m_table;
-}
-
-+(TDBMixed*)mixedWithBool:(BOOL)value
-{
-    TDBMixed* mixed = [[TDBMixed alloc] init];
-    mixed->m_mixed = tightdb::Mixed(bool(value));
-    mixed->m_table = nil;
-    return mixed;
-}
-
-+(TDBMixed*)mixedWithInt64:(int64_t)value
-{
-    TDBMixed* mixed = [[TDBMixed alloc] init];
-    mixed->m_mixed = tightdb::Mixed(value);
-    mixed->m_table = nil;
-    return mixed;
-}
-
-+(TDBMixed*)mixedWithFloat:(float)value
-{
-    TDBMixed* mixed = [[TDBMixed alloc] init];
-    mixed->m_mixed = tightdb::Mixed(value);
-    mixed->m_table = nil;
-    return mixed;
-}
-
-+(TDBMixed*)mixedWithDouble:(double)value
-{
-    TDBMixed* mixed = [[TDBMixed alloc] init];
-    mixed->m_mixed = tightdb::Mixed(value);
-    mixed->m_table = nil;
-    return mixed;
-}
-
-+(TDBMixed*)mixedWithString:(NSString*)value
-{
-    TDBMixed* mixed = [[TDBMixed alloc] init];
-    mixed->m_mixed = tightdb::Mixed(ObjcStringAccessor(value));
-    mixed->m_table = nil;
-    return mixed;
-}
-
-+(TDBMixed*)mixedWithBinary:(TDBBinary*)value
-{
-    TDBMixed* mixed = [[TDBMixed alloc] init];
-    mixed->m_mixed = tightdb::Mixed([value getNativeBinary]);
-    mixed->m_table = nil;
-    return mixed;
-}
-
-+(TDBMixed*)mixedWithBinary:(const char*)data size:(size_t)size
-{
-    TDBMixed* mixed = [[TDBMixed alloc] init];
-    mixed->m_mixed = tightdb::Mixed(tightdb::BinaryData(data, size));
-    mixed->m_table = nil;
-    return mixed;
-}
-
-+(TDBMixed*)mixedWithDate:(time_t)value
-{
-    TDBMixed* mixed = [[TDBMixed alloc] init];
-    mixed->m_mixed = tightdb::Mixed(tightdb::DateTime(value));
-    mixed->m_table = nil;
-    return mixed;
-}
-
-+(TDBMixed*)mixedWithTable:(TDBTable*)value
-{
-    TDBMixed* mixed = [[TDBMixed alloc] init];
-    mixed->m_mixed = tightdb::Mixed(tightdb::Mixed::subtable_tag());
-    mixed->m_table = value;
-    return mixed;
-}
-
-+(TDBMixed*)mixedWithNativeMixed:(const tightdb::Mixed&)value
-{
-    TDBMixed* mixed = [[TDBMixed alloc] init];
-    mixed->m_mixed = value;
-    mixed->m_table = nil;
-    return mixed;
-}
-
--(tightdb::Mixed&)getNativeMixed
-{
-    return m_mixed;
-}
-
--(BOOL)isEqual:(TDBMixed*)other
-{
-    tightdb::DataType type = m_mixed.get_type();
-    if (type != other->m_mixed.get_type())
-        return NO;
-    switch (type) {
-        case tightdb::type_Bool:
-            return m_mixed.get_bool() == other->m_mixed.get_bool();
-        case tightdb::type_Int:
-            return m_mixed.get_int() == other->m_mixed.get_int();
-        case tightdb::type_Float:
-            return m_mixed.get_float() == other->m_mixed.get_float();
-        case tightdb::type_Double:
-            return m_mixed.get_double() == other->m_mixed.get_double();
-        case tightdb::type_String:
-            return m_mixed.get_string() == other->m_mixed.get_string();
-        case tightdb::type_Binary:
-            return m_mixed.get_binary() == other->m_mixed.get_binary();
-        case tightdb::type_DateTime:
-            return m_mixed.get_datetime() == other->m_mixed.get_datetime();
-        case tightdb::type_Table:
-            return [m_table getNativeTable] == [other->m_table getNativeTable]; // Compare table contents
-        case tightdb::type_Mixed:
-            TIGHTDB_ASSERT(false);
-            break;
-    }
-    return NO;
-}
-
--(TDBType)getType
-{
-    return TDBType(m_mixed.get_type());
-}
-
--(BOOL)getBool
-{
-    return m_mixed.get_bool();
-}
-
--(int64_t)getInt
-{
-    return m_mixed.get_int();
-}
-
--(float)getFloat
-{
-    return m_mixed.get_float();
-}
-
--(double)getDouble
-{
-    return m_mixed.get_double();
-}
-
--(NSString*)getString
-{
-    return to_objc_string(m_mixed.get_string());
-}
-
--(TDBBinary*)getBinary
-{
-    return [[TDBBinary alloc] initWithBinary:m_mixed.get_binary()];
-}
-
--(time_t)getDate
-{
-    return m_mixed.get_datetime().get_datetime();
-}
-
--(TDBTable*)getTable
-{
-    return m_table;
-}
-@end
-
-
-@interface TDBDescriptor()
-+(TDBDescriptor*)descWithDesc:(tightdb::Descriptor*)desc readOnly:(BOOL)read_only error:(NSError* __autoreleasing*)error;
-@end
-
-@implementation TDBDescriptor
-{
-    tightdb::DescriptorRef m_desc;
-    BOOL m_read_only;
-}
-
-
-+(TDBDescriptor*)descWithDesc:(tightdb::Descriptor*)desc readOnly:(BOOL)read_only error:(NSError* __autoreleasing*)error
-{
-    static_cast<void>(error);
-    TDBDescriptor* desc_2 = [[TDBDescriptor alloc] init];
-    desc_2->m_desc.reset(desc);
-    desc_2->m_read_only = read_only;
-    return desc_2;
-}
-
-// FIXME: Provide a version of this method that takes a 'const char*'. This will simplify _addColumns of MyTable.
-// FIXME: Detect errors from core library
--(BOOL)addColumnWithName:(NSString*)name andType:(TDBType)type
-{
-    return [self addColumnWithName:name andType:type error:nil];
-}
-
--(BOOL)addColumnWithName:(NSString*)name andType:(TDBType)type error:(NSError* __autoreleasing*)error
-{
-    if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, @"Tried to add column while read only");
-        return NO;
-    }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-        m_desc->add_column(tightdb::DataType(type), ObjcStringAccessor(name));,
-        NO);
-    return YES;
-}
-
-
-
-
--(TDBDescriptor*)addColumnTable:(NSString*)name
-{
-    return [self addColumnTable:name error:nil];
-}
-
--(TDBDescriptor*)addColumnTable:(NSString*)name error:(NSError* __autoreleasing*)error
-{
-    if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, @"Tried to add column while read only");
-        return nil;
-    }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-        tightdb::DescriptorRef subdesc;
-        m_desc->add_column(tightdb::type_Table, ObjcStringAccessor(name), &subdesc);
-        return [TDBDescriptor descWithDesc:subdesc.get() readOnly:FALSE error:error];,
-        nil);
-}
-
--(TDBDescriptor*)subdescriptorForColumnWithIndex:(NSUInteger)col_ndx
-{
-    return [self subdescriptorForColumnWithIndex:col_ndx error:nil];
-}
-
--(TDBDescriptor*)subdescriptorForColumnWithIndex:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
-{
-    TIGHTDB_EXCEPTION_ERRHANDLER(
-        tightdb::DescriptorRef subdesc = m_desc->get_subdescriptor(col_ndx);
-        return [TDBDescriptor descWithDesc:subdesc.get() readOnly:m_read_only error:error];,
-        nil);
-}
-
--(NSUInteger)columnCount
-{
-    return m_desc->get_column_count();
-}
--(TDBType)columnTypeOfColumn:(NSUInteger)colIndex
-{
-    return (TDBType)m_desc->get_column_type(colIndex);
-}
--(NSString*)columnNameOfColumn:(NSUInteger)colIndex
-{
-    return to_objc_string(m_desc->get_column_name(colIndex));
-}
--(NSUInteger)indexOfColumnWithName:(NSString *)name
-{
-    return m_desc->get_column_index(ObjcStringAccessor(name));
-}
--(void)dealloc
-{
-#ifdef TIGHTDB_DEBUG
-    NSLog(@"TDBDescriptor dealloc");
-#endif
-}
-
-
-@end
-
-
-@implementation TDBView
-{
-    tightdb::util::UniquePtr<tightdb::TableView> m_view;
-    TDBTable* m_table;
-    TDBRow* m_tmp_row;
-    BOOL m_read_only;
-}
-
-+(TDBView*)viewWithTable:(TDBTable*)table andNativeView:(const tightdb::TableView&)view
-{
-    TDBView* view_2 = [[TDBView alloc] init];
-    if (!view_2)
-        return nil;
-    view_2->m_view.reset(new tightdb::TableView(view)); // FIXME: Exception handling needed here
-    view_2->m_table = table;
-    view_2->m_read_only = [table isReadOnly];
-
-    return view_2;
-}
-
--(id)_initWithQuery:(TDBQuery*)query
-{
-    self = [super init];
-    if (self) {
-        tightdb::Query& query_2 = [query getNativeQuery];
-        m_view.reset(new tightdb::TableView(query_2.find_all())); // FIXME: Exception handling needed here
-        m_table = [query originTable];
-        m_read_only = [m_table isReadOnly];
-    }
-    return self;
-}
-
--(TDBTable*)originTable // Synthesize property
-{
-    return m_table;
-}
-
--(void)dealloc
-{
-#ifdef TIGHTDB_DEBUG
-    NSLog(@"TDBView dealloc");
-#endif
-    m_table = nil; // FIXME: What is the point of doing this?
-}
-
--(TDBRow*)rowAtIndex:(NSUInteger)ndx
-{
-    // The cursor constructor checks the index is in bounds. However, getSourceIndex should
-    // not be called with illegal index.
-
-    if (ndx >= self.rowCount)
-        return nil;
-
-    return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
-}
-
--(TDBRow *)firstRow
-{
-    if (self.rowCount == 0) {
-        return nil;
-    }
-    return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:0]];
-}
-
--(TDBRow *)lastRow
-{
-    if (self.rowCount == 0) {
-        return nil;
-    }
-    return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1]];
-}
-
-
--(NSUInteger)rowCount
-{
-    return m_view->size();
-}
-
--(NSUInteger)columnCount
-{
-    return m_view->get_column_count();
-}
-
--(TDBType)columnTypeOfColumn:(NSUInteger)colNdx
-{
-    TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colNdx);
-    return TDBType(m_view->get_column_type(colNdx));
-}
--(void)sortUsingColumnWithIndex:(NSUInteger)colIndex
-{
-    [self sortUsingColumnWithIndex:colIndex inOrder:TDBAscending];
-}
--(void)sortUsingColumnWithIndex:(NSUInteger)colIndex  inOrder: (TDBSortOrder)order
-{
-    TDBType columnType = [self columnTypeOfColumn:colIndex];
-    
-    if(columnType != TDBIntType && columnType != TDBBoolType && columnType != TDBDateType) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:sort_on_column_with_type_not_supported"
-                                                         reason:@"Sort is currently only supported on Integer, Boolean and Date columns."
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
-    }
-    
-    try {
-        m_view->sort(colIndex, order == 0);
-    } catch(std::exception& ex) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                         reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
-    }
-}
-
--(BOOL)boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
-{
-    return m_view->get_bool(colIndex, rowIndex);
-}
--(time_t)dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
-{
-    return m_view->get_datetime(colIndex, rowIndex).get_datetime();
-}
--(double)doubleInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
-{
-    return m_view->get_double(colIndex, rowIndex);
-}
--(float)floatInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
-{
-    return m_view->get_float(colIndex, rowIndex);
-}
--(int64_t)intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
-{
-    return m_view->get_int(colIndex, rowIndex);
-}
--(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
-{
-    tightdb::Mixed mixed = m_view->get_mixed(colNdx, rowIndex);
-    if (mixed.get_type() != tightdb::type_Table)
-        return [TDBMixed mixedWithNativeMixed:mixed];
-    
-    tightdb::TableRef table = m_view->get_subtable(colNdx, rowIndex);
-    if (!table)
-        return nil;
-    TDBTable* table_2 = [[TDBTable alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table_2))
-        return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    if (![table_2 _checkType])
-        return nil;
-    
-    return [TDBMixed mixedWithTable:table_2];
-}
-
--(NSString*)stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
-{
-    return to_objc_string(m_view->get_string(colIndex, rowIndex));
-}
-
-
--(void) removeRowAtIndex:(NSUInteger)ndx
-{
-    m_view->remove(ndx);
-}
--(void)removeAllRows
-{
-    if (m_read_only) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
-                                                         reason:@"You tried to modify an immutable tableview"
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
-    }
-    
-    m_view->clear();
-}
--(NSUInteger)rowIndexInOriginTableForRowAtIndex:(NSUInteger)rowIndex
-{
-    return m_view->get_source_ndx(rowIndex);
-}
-
--(TDBRow*)getRow
-{
-    return m_tmp_row = [[TDBRow alloc] initWithTable: m_table
-                                                           ndx: m_view->get_source_ndx(0)];
-}
-
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState*)state objects:(id __unsafe_unretained*)stackbuf count:(NSUInteger)len
-{
-    static_cast<void>(len);
-    if(state->state == 0) {
-        const unsigned long* ptr = static_cast<const unsigned long*>(objc_unretainedPointer(self));
-        state->mutationsPtr = const_cast<unsigned long*>(ptr); // FIXME: This casting away of constness seems dangerous. Is it?
-        TDBRow* tmp = [self getRow];
-        *stackbuf = tmp;
-    }
-    if (state->state < self.rowCount) {
-        [((TDBRow*)*stackbuf) TDBSetNdx:[self rowIndexInOriginTableForRowAtIndex:state->state]];
-        state->itemsPtr = stackbuf;
-        state->state++;
-    }
-    else {
-        *stackbuf = nil;
-        state->itemsPtr = nil;
-        state->mutationsPtr = nil;
-        return 0;
-    }
-    return 1;
-}
-
-@end
-
 
 @implementation TDBTable
 {
@@ -948,9 +433,9 @@ using namespace std;
     return [[TDBBinary alloc] initWithBinary:m_table->get_binary(colIndex, rowIndex)];
 }
 
--(time_t)dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(NSDate *)dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
-    return m_table->get_datetime(colIndex, rowIndex).get_datetime();
+    return [NSDate dateWithTimeIntervalSince1970: m_table->get_datetime(colIndex, rowIndex).get_datetime()];
 }
 
 -(TDBTable*)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
@@ -1054,10 +539,10 @@ using namespace std;
         TDBBinaryType);
 }
 
--(void)setDate:(time_t)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)setDate:(NSDate *)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
-        m_table->set_datetime(col_ndx, row_ndx, value);,
+        m_table->set_datetime(col_ndx, row_ndx, (size_t)[value timeIntervalSince1970]);,
        TDBDateType);
 }
 
@@ -1234,12 +719,12 @@ using namespace std;
     return YES;
 }
 
--(BOOL)TDBInsertDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(time_t)value
+-(BOOL)TDBInsertDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(NSDate *)value
 {
     return [self TDBInsertDate:col_ndx ndx:ndx value:value error:nil];
 }
 
--(BOOL)TDBInsertDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(time_t)value error:(NSError* __autoreleasing*)error
+-(BOOL)TDBInsertDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(NSDate *)value error:(NSError* __autoreleasing*)error
 {
     // FIXME: Read-only errors should probably be handled by throwing
     // an exception. That is what is done in other places in this
@@ -1250,7 +735,7 @@ using namespace std;
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->insert_datetime(col_ndx, ndx, value);, NO);
+    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->insert_datetime(col_ndx, ndx, [value timeIntervalSince1970]);, NO);
     return YES;
 }
 
@@ -1398,9 +883,9 @@ using namespace std;
 {
     return m_table->find_first_binary(colIndex, [aBinary getNativeBinary]);
 }
--(NSUInteger)findRowIndexWithDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
+-(NSUInteger)findRowIndexWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->find_first_datetime(colIndex, aDate);
+    return m_table->find_first_datetime(colIndex, [aDate timeIntervalSince1970]);
 }
 -(NSUInteger)findRowIndexWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex
 {
@@ -1442,9 +927,9 @@ using namespace std;
     tightdb::TableView view = m_table->find_all_binary(colIndex, [aBinary getNativeBinary]);
     return [TDBView viewWithTable:self andNativeView:view];
 }
--(TDBView*)findAllRowsWithDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
+-(TDBView*)findAllRowsWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
 {
-    tightdb::TableView view = m_table->find_all_datetime(colIndex, aDate);
+    tightdb::TableView view = m_table->find_all_datetime(colIndex, [aDate timeIntervalSince1970]);
     return [TDBView viewWithTable:self andNativeView:view];
 }
 -(TDBView*)findAllRowsWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex
@@ -1571,128 +1056,4 @@ using namespace std;
 #endif
 @end
 
-
-@implementation TDBColumnProxy
-@synthesize table = _table, column = _column;
--(id)initWithTable:(TDBTable*)table column:(NSUInteger)column
-{
-    self = [super init];
-    if (self) {
-        _table = table;
-        _column = column;
-    }
-    return self;
-}
--(void)clear
-{
-    _table = nil;
-}
-@end
-
-@implementation TDBColumnProxy_Bool
--(NSUInteger)find:(BOOL)value
-{
-    return [self.table findRowIndexWithBool:value inColumnWithIndex:self.column ];
-}
-@end
-
-@implementation TDBColumnProxy_Int
--(NSUInteger)find:(int64_t)value
-{
-    return [self.table findRowIndexWithInt:value inColumnWithIndex:self.column ];
-}
--(int64_t)minimum
-{
-    return [self.table minIntInColumnWithIndex:self.column ];
-}
--(int64_t)maximum
-{
-    return [self.table maxIntInColumnWithIndex:self.column ];
-}
--(int64_t)sum
-{
-    return [self.table sumIntColumnWithIndex:self.column ];
-}
--(double)average
-{
-    return [self.table avgIntColumnWithIndex:self.column ];
-}
-@end
-
-@implementation TDBColumnProxy_Float
--(NSUInteger)find:(float)value
-{
-    return [self.table findRowIndexWithFloat:value inColumnWithIndex:self.column];
-}
--(float)minimum
-{
-    return [self.table minFloatInColumnWithIndex:self.column];
-}
--(float)maximum
-{
-    return [self.table maxFloatInColumnWithIndex:self.column];
-}
--(double)sum
-{
-    return [self.table sumFloatColumnWithIndex:self.column];
-}
--(double)average
-{
-    return [self.table avgFloatColumnWithIndex:self.column];
-}
-@end
-
-@implementation TDBColumnProxy_Double
--(NSUInteger)find:(double)value
-{
-    return [self.table findRowIndexWithDouble:value inColumnWithIndex:self.column];
-}
--(double)minimum
-{
-    return [self.table minDoubleInColumnWithIndex:self.column];
-}
--(double)maximum
-{
-    return [self.table maxDoubleInColumnWithIndex:self.column];
-}
--(double)sum
-{
-    return [self.table sumDoubleColumnWithIndex:self.column];
-}
--(double)average
-{
-    return [self.table avgDoubleColumnWithIndex:self.column];
-}
-@end
-
-@implementation TDBColumnProxy_String
--(NSUInteger)find:(NSString*)value
-{
-    return [self.table findRowIndexWithString:value inColumnWithIndex:self.column];
-}
-@end
-
-@implementation TDBColumnProxy_Binary
--(NSUInteger)find:(TDBBinary*)value
-{
-    return [self.table findRowIndexWithBinary:value inColumnWithIndex:self.column];
-}
-@end
-
-@implementation TDBColumnProxy_Date
--(NSUInteger)find:(time_t)value
-{
-    return [self.table findRowIndexWithDate:value inColumnWithIndex:self.column];
-}
-@end
-
-@implementation TDBColumnProxy_Subtable
-@end
-
-@implementation TDBColumnProxy_Mixed
--(NSUInteger)find:(TDBMixed*)value
-{
-    return [self.table findRowIndexWithMixed:value inColumnWithIndex:self.column];
-}
-@end
 

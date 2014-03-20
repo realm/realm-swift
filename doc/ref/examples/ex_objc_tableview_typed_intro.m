@@ -27,7 +27,7 @@ void ex_objc_tableview_typed_intro()
 
         /* Iterate over the result in the table view. */
         for (PeopleTable_Row *row in tableView) {
-            NSLog(@"This person is over the age of 20: %@", [row Name]);
+            NSLog(@"This person is over the age of 20: %@", row.Name);
         }
     }
 }

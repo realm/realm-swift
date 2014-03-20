@@ -22,69 +22,12 @@
 
 #include <tightdb/objc/type.h>
 
-@class TDBTable;
+@class TDBBinary;
 @class TDBView;
 @class TDBQuery;
+@class TDBDescriptor;
 @class TDBRow;
-
-
-@interface TDBBinary: NSObject
--(id)initWithData:(const char *)data size:(size_t)size;
--(const char *)getData;
--(size_t)getSize;
-
-/**
- * Compare the referenced binary data for equality.
- */
--(BOOL)isEqual:(TDBBinary *)bin;
-@end
-
-
-@interface TDBMixed: NSObject
-+(TDBMixed *)mixedWithBool:(BOOL)value;
-+(TDBMixed *)mixedWithInt64:(int64_t)value;
-+(TDBMixed *)mixedWithFloat:(float)value;
-+(TDBMixed *)mixedWithDouble:(double)value;
-+(TDBMixed *)mixedWithString:(NSString *)value;
-+(TDBMixed *)mixedWithBinary:(TDBBinary *)value;
-+(TDBMixed *)mixedWithBinary:(const char *)data size:(size_t)size;
-+(TDBMixed *)mixedWithDate:(time_t)value;
-+(TDBMixed *)mixedWithTable:(TDBTable *)value;
--(BOOL)isEqual:(TDBMixed *)other;
--(TDBType)getType;
--(BOOL)getBool;
--(int64_t)getInt;
--(float)getFloat;
--(double)getDouble;
--(NSString *)getString;
--(TDBBinary *)getBinary;
--(time_t)getDate;
--(TDBTable *)getTable;
-@end
-
-
-@interface TDBDescriptor: NSObject
-
-@property (nonatomic, readonly) NSUInteger columnCount;
-
-/**
- * Returns NO on memory allocation error.
- */
--(BOOL)addColumnWithName:(NSString *)name andType:(TDBType)type;
--(BOOL)addColumnWithName:(NSString *)name andType:(TDBType)type error:(NSError *__autoreleasing *)error;
-/**
- * Returns nil on memory allocation error.
- */
--(TDBDescriptor *)addColumnTable:(NSString *)name;
--(TDBDescriptor *)addColumnTable:(NSString *)name error:(NSError *__autoreleasing *)error;
--(TDBDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex;
--(TDBDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex error:(NSError *__autoreleasing *)error;
-
--(TDBType)columnTypeOfColumn:(NSUInteger)colIndex;
--(NSString *)columnNameOfColumn:(NSUInteger)colIndex;
--(NSUInteger)indexOfColumnWithName:(NSString *)name;
-@end
-
+@class TDBMixed;
 
 @interface TDBTable: NSObject <NSFastEnumeration>
 
@@ -151,7 +94,7 @@
 -(int64_t)intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(float)floatInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(double)doubleInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(time_t)dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(NSDate *)dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(NSString *)stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(TDBBinary *)binaryInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
@@ -162,7 +105,7 @@
 -(void)setBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
 -(void)setFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
 -(void)setDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
--(void)setDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)setDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
 -(void)setString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
 -(void)setBinary:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
 -(void)setTable:(TDBTable *)aTable inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
@@ -177,7 +120,7 @@
 -(BOOL)TDBInsertString:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(NSString *)value;
 -(BOOL)TDBInsertBinary:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(TDBBinary *)value;
 -(BOOL)TDBInsertBinary:(NSUInteger)colIndex ndx:(NSUInteger)ndx data:(const char *)data size:(size_t)size;
--(BOOL)TDBInsertDate:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(time_t)value;
+-(BOOL)TDBInsertDate:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(NSDate *)value;
 -(BOOL)TDBInsertDone;
 
 
@@ -202,7 +145,7 @@
 -(NSUInteger)findRowIndexWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)findRowIndexWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)findRowIndexWithBinary:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)findRowIndexWithDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
+-(NSUInteger)findRowIndexWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)findRowIndexWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
 
 -(TDBView *)findAllRowsWithBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex;
@@ -211,7 +154,7 @@
 -(TDBView *)findAllRowsWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBView *)findAllRowsWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBView *)findAllRowsWithBinary:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
--(TDBView *)findAllRowsWithDate:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBView *)findAllRowsWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBView *)findAllRowsWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
 
 
@@ -256,99 +199,4 @@
 -(id)_initRaw;
 -(BOOL)TDBInsertSubtableCopy:(NSUInteger)colIndex row:(NSUInteger)rowNdx subtable:(TDBTable *)subtable;
 -(BOOL)TDBInsertSubtableCopy:(NSUInteger)colIndex row:(NSUInteger)rowIndex subtable:(TDBTable *)subtable error:(NSError *__autoreleasing *)error;
-@end
-
-
-@interface TDBView: NSObject <NSFastEnumeration>
-
-
-@property (nonatomic, readonly) NSUInteger rowCount;
-@property (nonatomic, readonly) NSUInteger columnCount;
-@property (nonatomic, readonly) TDBTable *originTable;
-
--(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
--(TDBRow *)lastRow;
--(TDBRow *)firstRow;
-
--(TDBType)columnTypeOfColumn:(NSUInteger)colIndex;
-
--(void) sortUsingColumnWithIndex: (NSUInteger)colIndex;
--(void) sortUsingColumnWithIndex: (NSUInteger)colIndex inOrder: (TDBSortOrder)order;
-
-
--(BOOL)boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(int64_t)intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(float)floatInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(double)doubleInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(time_t)dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(NSString *)stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
-//-(TDBBinary *)binaryInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
-//-(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
-//-(id)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(Class)tableClass;
--(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
-
-
--(void)removeRowAtIndex:(NSUInteger)rowIndex;
--(void)removeAllRows;
-
--(NSUInteger)rowIndexInOriginTableForRowAtIndex:(NSUInteger)rowIndex;
-
-
-/* Private */
--(id)_initWithQuery:(TDBQuery *)query;
-@end
-
-
-@interface TDBColumnProxy: NSObject
-@property(nonatomic, weak) TDBTable *table;
-@property(nonatomic) size_t column;
--(id)initWithTable:(TDBTable *)table column:(NSUInteger)column;
--(void)clear;
-@end
-
-@interface TDBColumnProxy_Bool: TDBColumnProxy
--(NSUInteger)find:(BOOL)value;
-@end
-
-@interface TDBColumnProxy_Int: TDBColumnProxy
--(NSUInteger)find:(int64_t)value;
--(int64_t)minimum;
--(int64_t)maximum;
--(int64_t)sum;
--(double)average;
-@end
-
-@interface TDBColumnProxy_Float: TDBColumnProxy
--(NSUInteger)find:(float)value;
--(float)minimum;
--(float)maximum;
--(double)sum;
--(double)average;
-@end
-
-@interface TDBColumnProxy_Double: TDBColumnProxy
--(NSUInteger)find:(double)value;
--(double)minimum;
--(double)maximum;
--(double)sum;
--(double)average;
-@end
-
-@interface TDBColumnProxy_String: TDBColumnProxy
--(NSUInteger)find:(NSString *)value;
-@end
-
-@interface TDBColumnProxy_Binary: TDBColumnProxy
--(NSUInteger)find:(TDBBinary *)value;
-@end
-
-@interface TDBColumnProxy_Date: TDBColumnProxy
--(NSUInteger)find:(time_t)value;
-@end
-
-@interface TDBColumnProxy_Subtable: TDBColumnProxy
-@end
-
-@interface TDBColumnProxy_Mixed: TDBColumnProxy
--(NSUInteger)find:(TDBMixed *)value;
 @end

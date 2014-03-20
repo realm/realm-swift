@@ -11,9 +11,12 @@ TIGHTDB_TABLE_3(PeopleTable,
  */
 
 
+
 void ex_objc_group_intro()
 {
     @autoreleasepool {
+        
+        #ifdef TDB_GROUP_IMPLEMENTED
 
         /* Creates a group and uses it to create a new table. */
 
@@ -43,7 +46,7 @@ void ex_objc_group_intro()
         TDBGroup* groupFromMemory = [TDBGroup groupWithBuffer:buffer withError:nil];
         PeopleTable* tableFromMemery = [groupFromMemory getOrCreateTableWithName:@"people" asTableClass:[PeopleTable class]];
 
-        for (PeopleTable_Row* row in tableFromMemery) {
+        for (PeopleTable_Roq *row in tableFromMemery) {
             NSLog(@"Name: %@", row.Name);
         }
 
@@ -51,8 +54,12 @@ void ex_objc_group_intro()
            the group that retrieves data from memeory takes responsibilty for the memory allocation in this example. */
 
         /* free((char*)buffer); */ /* not needed in this particular situation. */
+        
+        #endif
     }
 }
+
+
 
 
 

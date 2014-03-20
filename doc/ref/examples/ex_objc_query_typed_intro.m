@@ -30,7 +30,7 @@ void ex_objc_query_typed_intro()
 
         /* Iterate over the query result. */
         for (PeopleTable_Row *row in query) {
-            NSLog(@"Person matching query: %@", [row Name]);
+            NSLog(@"Person matching query: %@", row.Name);
         }
     }
 }

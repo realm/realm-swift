@@ -27,7 +27,7 @@ CATEGORIES :
 - State:
   METHODS:
   - g_dyn_table_size:
-      NAME     : "rowCount:"
+      NAME     : "rowCount"
       SUMMARY  : *g_dyn_table_size_summary
       DESCR    : *g_dyn_table_size_descr
       SIGNATURE: "@property (nonatomic, readonly) NSUInteger rowCount"
@@ -54,10 +54,14 @@ CATEGORIES :
 - Table:
   METHODS:
   - g_dyn_table_clear:
-      NAME     : "removeAllRows:"
+      NAME     : "removeAllRows"
       SUMMARY  : *g_dyn_table_clear_summary
       DESCR    : *g_dyn_table_clear_descr
       SIGNATURE: (BOOL)removeAllRows
+      RETURN:
+        TYPES  : BOOL
+        DESCR  : &objc_no_if_error
+                 "<code>NO</code> if an error occured, otherwise <code>YES</code>"
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_clear
         DESCR  :
@@ -67,12 +71,15 @@ CATEGORIES :
       SUMMARY  : *g_table_optimize_summary
       DESCR    : *g_table_optimize_descr
       SIGNATURE: (BOOL)optimize
+      RETURN:
+        TYPES  : BOOL
+        DESCR  : *objc_no_if_error
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_optimize
         DESCR  :
 
   - g_dyn_table_opertator==:
-      NAME     : "isEqual:"
+      NAME     : "isEqual"
       SUMMARY  : *g_dyn_table_operator_eq_summary
       DESCR    : *g_dyn_table_operator_eq_descr
       SIGNATURE: (BOOL)isEqual:(TDBTable *)other
@@ -119,18 +126,19 @@ CATEGORIES :
       SUMMARY  : *g_dyn_table_add_column_summary
       DESCR    :
       - TEXT   : *g_dyn_table_add_column_descr
-      - TEXT   : >
-                Currently, the following types are supported:
+      - TEXT   : &objc_column_types 
+                >
+                Currently, the following types are supported (declared in <code>type.h</code>):
                  <ul>
-                   <li><code>tightdb_Bool</code></li>
-                   <li><code>tightdb_Int</code></li>
-                   <li><code>tightdb_Float</code></li>
-                   <li><code>tightdb_Double</code></li>
-                   <li><code>tightdb_String</code></li>
-                   <li><code>tightdb_Binary</code></li>
-                   <li><code>tightdb_Table</code></li>
-                   <li><code>tightdb_Date</code></li>
-                   <li><code>tightdb_Mixed</code></li>
+                   <li><code>TDBBoolType</code></li>
+                   <li><code>TDBIntType</code></li>
+                   <li><code>TDBFloatType</code></li>
+                   <li><code>TDBDoubleType</code></li>
+                   <li><code>TDBStringType</code></li>
+                   <li><code>TDBBinaryType</code></li>
+                   <li><code>TDBTableType</code></li>
+                   <li><code>TDBDateType</code></li>
+                   <li><code>TDBMixedType</code></li>
                  </ul>
       SIGNATURE: (NSUInteger)addColumnWithName:(NSString *)name andType:(TDBType)type
       PARAMS:
@@ -196,18 +204,7 @@ CATEGORIES :
       SUMMARY  : *g_dyn_table_get_column_type_summary
       DESCR    :
       - TEXT   : *g_dyn_table_get_column_type_descr1
-      - TEXT   : >
-                 <ul>
-                   <li><code>tightdb_Bool</code></li>
-                   <li><code>tightdb_Int</code></li>
-                   <li><code>tightdb_Float</code></li>
-                   <li><code>tightdb_Double</code></li>
-                   <li><code>tightdb_String</code></li>
-                   <li><code>tightdb_Binary</code></li>
-                   <li><code>tightdb_Table</code></li>
-                   <li><code>tightdb_Date</code></li>
-                   <li><code>tightdb_Mixed</code></li>
-                 </ul>
+      - TEXT   : *objc_column_types
       SIGNATURE: (TDBType)columnTypeOfColumn:(NSUInteger)colIndex
       PARAMS:
       - NAME   : colIndex
@@ -377,10 +374,10 @@ CATEGORIES :
         DESCR  : *g_dyn_table_remove_row_param1_descr
       RETURN:
         TYPES  : BOOL
-        DESCR  :  ""
+        DESCR  : ""
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_remove
-        DESCR  : ""
+        DESCR  : *objc_no_if_error
 
   - g_dyn_table_remove_last_row:
       NAME     : removeLastRow
@@ -389,7 +386,7 @@ CATEGORIES :
       SIGNATURE: (BOOL)removeLastRow
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_remove_last_row
-        DESCR  : ""
+        DESCR  : *objc_no_if_error
 
 #- Values:
 #  METHODS:
