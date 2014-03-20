@@ -12,7 +12,7 @@ ID         : class_group
 TITLE      : TDBTransaction
 SUMMARY    : A TDBTransaction is a fully ACID compliant access to tables.
 DESCR      : >
-             A TDBTransaction can only be created/initiated from a TDBContext (see {link class_shared_group}.
+             A TDBTransaction can only be created/initiated from a TDBContext (see {link class_shared_group}).
              By using TDBContext and TDBTransaction, you can access your data in multi-threaded applications. Moreover,
              a successful write transaction is sesameless persisted to your storage device.
 SEE        :

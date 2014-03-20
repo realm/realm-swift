@@ -34,7 +34,7 @@ CATEGORIES:
         TYPES  : NSString
         DESCR  : TBD #*g_shared_group_constructor_parm1_descr
       RETURN:
-        TYPES  : TightdbSharedGroup
+        TYPES  : TDBContext
         DESCR  : *g_shared_group_constructor_return1_descr
       THROWS:
       - EXCEPT : TBD
@@ -45,14 +45,19 @@ CATEGORIES:
 
 - Status:
   METHODS:
-  - g_shared_group_has_changes:
-      NAMES    : hasChangesSinceLastTransaction
+  - g_shared_group_has_changed:
+      NAMES    : hasChangedSinceLastTransaction
       SUMMARY  : *g_shared_group_has_changed_summary
       DESCR    : *g_shared_group_has_changed_descr
       SIGNATURE: (BOOL)hasChangedSinceLastTransaction
       RETURN:
         TYPES  : BOOL
-        DESCR  : <code>YES</code> if context has been changes, otherwise <code>NO</code>.
+        DESCR  : >
+                 <code>YES</code> if the context has been changed since last transaction,
+                 otherwise <code>NO</code>.
+                 A context has been changed if a new table has been added to the context, the
+                 description of a table has been modified, or the contents of a table has been
+                 modified.
       EXAMPLES:
       - CODE   : ex_objc_shared_group_has_changed
         DESCR  :
@@ -67,7 +72,10 @@ CATEGORIES:
       PARAMS:
         NAME   : block
         TYPES  : TDBWriteBlock
-        DESCR  : A block of code. Changes are written to disk if the block returns <code>YES</code>, discarded otherwise.
+        DESCR  : >
+                 A block of code. The block can modify the tables or add new tables in a 
+                 transactional manner.
+                 Changes are written to disk if the block returns <code>YES</code>, discarded otherwise.
       RETURN:
         TYPES  : BOOL
         DESCR  : TBD
