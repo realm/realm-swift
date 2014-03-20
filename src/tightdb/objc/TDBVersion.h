@@ -18,12 +18,18 @@
  *
  **************************************************************************/
 
+#import <Foundation/Foundation.h>
 
-#import "mixed.h"
-#include <tightdb/mixed.hpp>
+#define TDB_VERSION_MAJOR 0
+#define TDB_VERSION_MINOR 4
+#define TDB_VERSION_PATCH 0
 
-@interface TDBMixed()
-+(TDBMixed*)mixedWithNativeMixed:(const tightdb::Mixed&)other;
--(tightdb::Mixed&)getNativeMixed;
+@interface TDBVersion: NSObject
+-(id)init;
++(const int)getMajor;
++(const int)getMinor;
++(const int)getPatch;
++(BOOL)isAtLeast:(int)major minor:(int)minor patch:(int)patch;
++(NSString*)getVersion;
++(NSString*)getCoreVersion;
 @end
-

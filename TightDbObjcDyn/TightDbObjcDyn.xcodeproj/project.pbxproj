@@ -7,24 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		424EEDD418D9C0CB00337A13 /* binary_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEDD118D9C0CB00337A13 /* binary_objc.mm */; };
-		424EEDD518D9C0CB00337A13 /* binary_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEDD218D9C0CB00337A13 /* binary_priv.h */; };
-		424EEDD618D9C0CB00337A13 /* binary.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEDD318D9C0CB00337A13 /* binary.h */; };
-		424EEF9E18D9C10100337A13 /* column_proxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEF9D18D9C10100337A13 /* column_proxy.h */; };
-		424EEFA218D9C11D00337A13 /* descriptor_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEF9F18D9C11D00337A13 /* descriptor_objc.mm */; };
-		424EEFA318D9C11D00337A13 /* descriptor_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA018D9C11D00337A13 /* descriptor_priv.h */; };
-		424EEFA418D9C11D00337A13 /* descriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA118D9C11D00337A13 /* descriptor.h */; };
-		424EEFA818D9C13700337A13 /* mixed_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEFA518D9C13700337A13 /* mixed_objc.mm */; };
-		424EEFA918D9C13700337A13 /* mixed_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA618D9C13700337A13 /* mixed_priv.h */; };
-		424EEFAA18D9C13700337A13 /* mixed.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA718D9C13700337A13 /* mixed.h */; };
-		424EEFAE18D9C15A00337A13 /* table_view_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEFAB18D9C15900337A13 /* table_view_objc.mm */; };
-		424EEFAF18D9C15A00337A13 /* table_view_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFAC18D9C15900337A13 /* table_view_priv.h */; };
-		424EEFB018D9C15A00337A13 /* table_view.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFAD18D9C15A00337A13 /* table_view.h */; };
-		424EEFB218D9C97900337A13 /* column_proxy.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEFB118D9C97900337A13 /* column_proxy.mm */; };
+		424EEDD418D9C0CB00337A13 /* TDBBinary.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEDD118D9C0CB00337A13 /* TDBBinary.mm */; };
+		424EEDD518D9C0CB00337A13 /* TDBBinary_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEDD218D9C0CB00337A13 /* TDBBinary_priv.h */; };
+		424EEDD618D9C0CB00337A13 /* TDBBinary.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEDD318D9C0CB00337A13 /* TDBBinary.h */; };
+		424EEF9E18D9C10100337A13 /* TDBColumnProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEF9D18D9C10100337A13 /* TDBColumnProxy.h */; };
+		424EEFA218D9C11D00337A13 /* TDBDescriptor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEF9F18D9C11D00337A13 /* TDBDescriptor.mm */; };
+		424EEFA318D9C11D00337A13 /* TDBDescriptor_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA018D9C11D00337A13 /* TDBDescriptor_priv.h */; };
+		424EEFA418D9C11D00337A13 /* TDBDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA118D9C11D00337A13 /* TDBDescriptor.h */; };
+		424EEFA818D9C13700337A13 /* TDBMixed.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEFA518D9C13700337A13 /* TDBMixed.mm */; };
+		424EEFA918D9C13700337A13 /* TDBMixed_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA618D9C13700337A13 /* TDBMixed_priv.h */; };
+		424EEFAA18D9C13700337A13 /* TDBMixed.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA718D9C13700337A13 /* TDBMixed.h */; };
+		424EEFAE18D9C15A00337A13 /* TDBView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEFAB18D9C15900337A13 /* TDBView.mm */; };
+		424EEFAF18D9C15A00337A13 /* TDBView_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFAC18D9C15900337A13 /* TDBView_priv.h */; };
+		424EEFB018D9C15A00337A13 /* TDBView.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFAD18D9C15A00337A13 /* TDBView.h */; };
+		424EEFB218D9C97900337A13 /* TDBColumnProxy.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEFB118D9C97900337A13 /* TDBColumnProxy.mm */; };
 		42AD3A9718CDBDFF00C86073 /* support.h in Headers */ = {isa = PBXBuildFile; fileRef = 42AD3A9318CDBDFF00C86073 /* support.h */; };
 		42AD3A9818CDBDFF00C86073 /* support.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42AD3A9418CDBDFF00C86073 /* support.mm */; };
-		42AD3A9918CDBDFF00C86073 /* version_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42AD3A9518CDBDFF00C86073 /* version_objc.mm */; };
-		42AD3A9A18CDBDFF00C86073 /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = 42AD3A9618CDBDFF00C86073 /* version.h */; };
+		42AD3A9918CDBDFF00C86073 /* TDBVersion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42AD3A9518CDBDFF00C86073 /* TDBVersion.mm */; };
+		42AD3A9A18CDBDFF00C86073 /* TDBVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 42AD3A9618CDBDFF00C86073 /* TDBVersion.h */; };
 		4D01A9FC18C9F5E600527AD5 /* table_view.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9FB18C9F5E600527AD5 /* table_view.m */; };
 		4D01A9FE18C9F60F00527AD5 /* version.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9FD18C9F60F00527AD5 /* version.m */; };
 		4D79966018BDFC3E009EB0C0 /* table_macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D79965F18BDFC3E009EB0C0 /* table_macros.h */; };
@@ -37,22 +37,22 @@
 		E91890B0177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		E91890B3177B677900653D7A /* TightDbObjcDyn.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E9189099177B677900653D7A /* TightDbObjcDyn.dylib */; };
 		E91890B9177B677900653D7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E91890B7177B677900653D7A /* InfoPlist.strings */; };
-		E91890D6177B67AB00653D7A /* cursor_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C5177B67AB00653D7A /* cursor_objc.mm */; };
-		E91890D7177B67AB00653D7A /* cursor.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890C6177B67AB00653D7A /* cursor.h */; };
-		E91890D8177B67AB00653D7A /* transaction_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C7177B67AB00653D7A /* transaction_objc.mm */; };
-		E91890D9177B67AB00653D7A /* transaction_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890C8177B67AB00653D7A /* transaction_priv.h */; };
-		E91890DA177B67AB00653D7A /* context_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C9177B67AB00653D7A /* context_objc.mm */; };
-		E91890DB177B67AB00653D7A /* context.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CA177B67AB00653D7A /* context.h */; };
-		E91890DC177B67AB00653D7A /* transaction.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CB177B67AB00653D7A /* transaction.h */; };
+		E91890D6177B67AB00653D7A /* TDBRow.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C5177B67AB00653D7A /* TDBRow.mm */; };
+		E91890D7177B67AB00653D7A /* TDBRow.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890C6177B67AB00653D7A /* TDBRow.h */; };
+		E91890D8177B67AB00653D7A /* TDBtransaction.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C7177B67AB00653D7A /* TDBtransaction.mm */; };
+		E91890D9177B67AB00653D7A /* TDBTransaction_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890C8177B67AB00653D7A /* TDBTransaction_priv.h */; };
+		E91890DA177B67AB00653D7A /* TDBContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C9177B67AB00653D7A /* TDBContext.mm */; };
+		E91890DB177B67AB00653D7A /* TDBContext.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CA177B67AB00653D7A /* TDBContext.h */; };
+		E91890DC177B67AB00653D7A /* TDBTransaction.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CB177B67AB00653D7A /* TDBTransaction.h */; };
 		E91890DD177B67AB00653D7A /* helper_macros.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CC177B67AB00653D7A /* helper_macros.h */; };
-		E91890DE177B67AB00653D7A /* query_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890CD177B67AB00653D7A /* query_objc.mm */; };
-		E91890DF177B67AB00653D7A /* query_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CE177B67AB00653D7A /* query_priv.h */; };
-		E91890E0177B67AB00653D7A /* query.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CF177B67AB00653D7A /* query.h */; };
-		E91890E1177B67AB00653D7A /* table_objc.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890D0177B67AB00653D7A /* table_objc.mm */; };
-		E91890E2177B67AB00653D7A /* table_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D1177B67AB00653D7A /* table_priv.h */; };
-		E91890E3177B67AB00653D7A /* table.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D2177B67AB00653D7A /* table.h */; };
+		E91890DE177B67AB00653D7A /* TDBQuery.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890CD177B67AB00653D7A /* TDBQuery.mm */; };
+		E91890DF177B67AB00653D7A /* TDBQuery_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CE177B67AB00653D7A /* TDBQuery_priv.h */; };
+		E91890E0177B67AB00653D7A /* TDBQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CF177B67AB00653D7A /* TDBQuery.h */; };
+		E91890E1177B67AB00653D7A /* TDBTable.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890D0177B67AB00653D7A /* TDBTable.mm */; };
+		E91890E2177B67AB00653D7A /* TDBTable_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D1177B67AB00653D7A /* TDBTable_priv.h */; };
+		E91890E3177B67AB00653D7A /* TDBTable.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D2177B67AB00653D7A /* TDBTable.h */; };
 		E91890E4177B67AB00653D7A /* tightdb.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D3177B67AB00653D7A /* tightdb.h */; };
-		E91890E5177B67AB00653D7A /* type.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D4177B67AB00653D7A /* type.h */; };
+		E91890E5177B67AB00653D7A /* TDBType.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D4177B67AB00653D7A /* TDBType.h */; };
 		E91890E6177B67AB00653D7A /* util.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E91890D5177B67AB00653D7A /* util.hpp */; };
 		E91890F5177B71E400653D7A /* data_type.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890E7177B71E400653D7A /* data_type.mm */; };
 		E91890F6177B71E400653D7A /* enumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890E8177B71E400653D7A /* enumerator.m */; };
@@ -80,24 +80,24 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		424EEDD118D9C0CB00337A13 /* binary_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = binary_objc.mm; path = ../../src/tightdb/objc/binary_objc.mm; sourceTree = "<group>"; };
-		424EEDD218D9C0CB00337A13 /* binary_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = binary_priv.h; path = ../../src/tightdb/objc/binary_priv.h; sourceTree = "<group>"; };
-		424EEDD318D9C0CB00337A13 /* binary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = binary.h; path = ../../src/tightdb/objc/binary.h; sourceTree = "<group>"; };
-		424EEF9D18D9C10100337A13 /* column_proxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = column_proxy.h; path = ../../src/tightdb/objc/column_proxy.h; sourceTree = "<group>"; };
-		424EEF9F18D9C11D00337A13 /* descriptor_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = descriptor_objc.mm; path = ../../src/tightdb/objc/descriptor_objc.mm; sourceTree = "<group>"; };
-		424EEFA018D9C11D00337A13 /* descriptor_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = descriptor_priv.h; path = ../../src/tightdb/objc/descriptor_priv.h; sourceTree = "<group>"; };
-		424EEFA118D9C11D00337A13 /* descriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = descriptor.h; path = ../../src/tightdb/objc/descriptor.h; sourceTree = "<group>"; };
-		424EEFA518D9C13700337A13 /* mixed_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = mixed_objc.mm; path = ../../src/tightdb/objc/mixed_objc.mm; sourceTree = "<group>"; };
-		424EEFA618D9C13700337A13 /* mixed_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mixed_priv.h; path = ../../src/tightdb/objc/mixed_priv.h; sourceTree = "<group>"; };
-		424EEFA718D9C13700337A13 /* mixed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mixed.h; path = ../../src/tightdb/objc/mixed.h; sourceTree = "<group>"; };
-		424EEFAB18D9C15900337A13 /* table_view_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = table_view_objc.mm; path = ../../src/tightdb/objc/table_view_objc.mm; sourceTree = "<group>"; };
-		424EEFAC18D9C15900337A13 /* table_view_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = table_view_priv.h; path = ../../src/tightdb/objc/table_view_priv.h; sourceTree = "<group>"; };
-		424EEFAD18D9C15A00337A13 /* table_view.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = table_view.h; path = ../../src/tightdb/objc/table_view.h; sourceTree = "<group>"; };
-		424EEFB118D9C97900337A13 /* column_proxy.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = column_proxy.mm; path = ../../src/tightdb/objc/column_proxy.mm; sourceTree = "<group>"; };
+		424EEDD118D9C0CB00337A13 /* TDBBinary.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBBinary.mm; path = ../../src/tightdb/objc/TDBBinary.mm; sourceTree = "<group>"; };
+		424EEDD218D9C0CB00337A13 /* TDBBinary_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBBinary_priv.h; path = ../../src/tightdb/objc/TDBBinary_priv.h; sourceTree = "<group>"; };
+		424EEDD318D9C0CB00337A13 /* TDBBinary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBBinary.h; path = ../../src/tightdb/objc/TDBBinary.h; sourceTree = "<group>"; };
+		424EEF9D18D9C10100337A13 /* TDBColumnProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBColumnProxy.h; path = ../../src/tightdb/objc/TDBColumnProxy.h; sourceTree = "<group>"; };
+		424EEF9F18D9C11D00337A13 /* TDBDescriptor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBDescriptor.mm; path = ../../src/tightdb/objc/TDBDescriptor.mm; sourceTree = "<group>"; };
+		424EEFA018D9C11D00337A13 /* TDBDescriptor_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBDescriptor_priv.h; path = ../../src/tightdb/objc/TDBDescriptor_priv.h; sourceTree = "<group>"; };
+		424EEFA118D9C11D00337A13 /* TDBDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBDescriptor.h; path = ../../src/tightdb/objc/TDBDescriptor.h; sourceTree = "<group>"; };
+		424EEFA518D9C13700337A13 /* TDBMixed.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBMixed.mm; path = ../../src/tightdb/objc/TDBMixed.mm; sourceTree = "<group>"; };
+		424EEFA618D9C13700337A13 /* TDBMixed_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBMixed_priv.h; path = ../../src/tightdb/objc/TDBMixed_priv.h; sourceTree = "<group>"; };
+		424EEFA718D9C13700337A13 /* TDBMixed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBMixed.h; path = ../../src/tightdb/objc/TDBMixed.h; sourceTree = "<group>"; };
+		424EEFAB18D9C15900337A13 /* TDBView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBView.mm; path = ../../src/tightdb/objc/TDBView.mm; sourceTree = "<group>"; };
+		424EEFAC18D9C15900337A13 /* TDBView_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBView_priv.h; path = ../../src/tightdb/objc/TDBView_priv.h; sourceTree = "<group>"; };
+		424EEFAD18D9C15A00337A13 /* TDBView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBView.h; path = ../../src/tightdb/objc/TDBView.h; sourceTree = "<group>"; };
+		424EEFB118D9C97900337A13 /* TDBColumnProxy.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBColumnProxy.mm; path = ../../src/tightdb/objc/TDBColumnProxy.mm; sourceTree = "<group>"; };
 		42AD3A9318CDBDFF00C86073 /* support.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = support.h; path = ../../src/tightdb/objc/support.h; sourceTree = "<group>"; };
 		42AD3A9418CDBDFF00C86073 /* support.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = support.mm; path = ../../src/tightdb/objc/support.mm; sourceTree = "<group>"; };
-		42AD3A9518CDBDFF00C86073 /* version_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = version_objc.mm; path = ../../src/tightdb/objc/version_objc.mm; sourceTree = "<group>"; };
-		42AD3A9618CDBDFF00C86073 /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = version.h; path = ../../src/tightdb/objc/version.h; sourceTree = "<group>"; };
+		42AD3A9518CDBDFF00C86073 /* TDBVersion.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBVersion.mm; path = ../../src/tightdb/objc/TDBVersion.mm; sourceTree = "<group>"; };
+		42AD3A9618CDBDFF00C86073 /* TDBVersion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBVersion.h; path = ../../src/tightdb/objc/TDBVersion.h; sourceTree = "<group>"; };
 		4D01A9FB18C9F5E600527AD5 /* table_view.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = table_view.m; path = ../../src/tightdb/objc/test/table_view.m; sourceTree = "<group>"; };
 		4D01A9FD18C9F60F00527AD5 /* version.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = version.m; path = ../../src/tightdb/objc/test/version.m; sourceTree = "<group>"; };
 		4D79965F18BDFC3E009EB0C0 /* table_macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = table_macros.h; path = ../../src/tightdb/objc/table_macros.h; sourceTree = "<group>"; };
@@ -115,22 +115,22 @@
 		E91890AE177B677900653D7A /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		E91890B6177B677900653D7A /* TightDbObjcDynTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TightDbObjcDynTests-Info.plist"; sourceTree = "<group>"; };
 		E91890B8177B677900653D7A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		E91890C5177B67AB00653D7A /* cursor_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = cursor_objc.mm; path = ../../src/tightdb/objc/cursor_objc.mm; sourceTree = "<group>"; };
-		E91890C6177B67AB00653D7A /* cursor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cursor.h; path = ../../src/tightdb/objc/cursor.h; sourceTree = "<group>"; };
-		E91890C7177B67AB00653D7A /* transaction_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = transaction_objc.mm; path = ../../src/tightdb/objc/transaction_objc.mm; sourceTree = "<group>"; };
-		E91890C8177B67AB00653D7A /* transaction_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = transaction_priv.h; path = ../../src/tightdb/objc/transaction_priv.h; sourceTree = "<group>"; };
-		E91890C9177B67AB00653D7A /* context_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = context_objc.mm; path = ../../src/tightdb/objc/context_objc.mm; sourceTree = "<group>"; };
-		E91890CA177B67AB00653D7A /* context.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = context.h; path = ../../src/tightdb/objc/context.h; sourceTree = "<group>"; };
-		E91890CB177B67AB00653D7A /* transaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = transaction.h; path = ../../src/tightdb/objc/transaction.h; sourceTree = "<group>"; };
+		E91890C5177B67AB00653D7A /* TDBRow.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBRow.mm; path = ../../src/tightdb/objc/TDBRow.mm; sourceTree = "<group>"; };
+		E91890C6177B67AB00653D7A /* TDBRow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBRow.h; path = ../../src/tightdb/objc/TDBRow.h; sourceTree = "<group>"; };
+		E91890C7177B67AB00653D7A /* TDBtransaction.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBtransaction.mm; path = ../../src/tightdb/objc/TDBtransaction.mm; sourceTree = "<group>"; };
+		E91890C8177B67AB00653D7A /* TDBTransaction_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBTransaction_priv.h; path = ../../src/tightdb/objc/TDBTransaction_priv.h; sourceTree = "<group>"; };
+		E91890C9177B67AB00653D7A /* TDBContext.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBContext.mm; path = ../../src/tightdb/objc/TDBContext.mm; sourceTree = "<group>"; };
+		E91890CA177B67AB00653D7A /* TDBContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBContext.h; path = ../../src/tightdb/objc/TDBContext.h; sourceTree = "<group>"; };
+		E91890CB177B67AB00653D7A /* TDBTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBTransaction.h; path = ../../src/tightdb/objc/TDBTransaction.h; sourceTree = "<group>"; };
 		E91890CC177B67AB00653D7A /* helper_macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = helper_macros.h; path = ../../src/tightdb/objc/helper_macros.h; sourceTree = "<group>"; };
-		E91890CD177B67AB00653D7A /* query_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = query_objc.mm; path = ../../src/tightdb/objc/query_objc.mm; sourceTree = "<group>"; };
-		E91890CE177B67AB00653D7A /* query_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = query_priv.h; path = ../../src/tightdb/objc/query_priv.h; sourceTree = "<group>"; };
-		E91890CF177B67AB00653D7A /* query.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = query.h; path = ../../src/tightdb/objc/query.h; sourceTree = "<group>"; };
-		E91890D0177B67AB00653D7A /* table_objc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = table_objc.mm; path = ../../src/tightdb/objc/table_objc.mm; sourceTree = "<group>"; };
-		E91890D1177B67AB00653D7A /* table_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = table_priv.h; path = ../../src/tightdb/objc/table_priv.h; sourceTree = "<group>"; };
-		E91890D2177B67AB00653D7A /* table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = table.h; path = ../../src/tightdb/objc/table.h; sourceTree = "<group>"; };
+		E91890CD177B67AB00653D7A /* TDBQuery.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBQuery.mm; path = ../../src/tightdb/objc/TDBQuery.mm; sourceTree = "<group>"; };
+		E91890CE177B67AB00653D7A /* TDBQuery_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBQuery_priv.h; path = ../../src/tightdb/objc/TDBQuery_priv.h; sourceTree = "<group>"; };
+		E91890CF177B67AB00653D7A /* TDBQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBQuery.h; path = ../../src/tightdb/objc/TDBQuery.h; sourceTree = "<group>"; };
+		E91890D0177B67AB00653D7A /* TDBTable.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBTable.mm; path = ../../src/tightdb/objc/TDBTable.mm; sourceTree = "<group>"; };
+		E91890D1177B67AB00653D7A /* TDBTable_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBTable_priv.h; path = ../../src/tightdb/objc/TDBTable_priv.h; sourceTree = "<group>"; };
+		E91890D2177B67AB00653D7A /* TDBTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBTable.h; path = ../../src/tightdb/objc/TDBTable.h; sourceTree = "<group>"; };
 		E91890D3177B67AB00653D7A /* tightdb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tightdb.h; path = ../../src/tightdb/objc/tightdb.h; sourceTree = "<group>"; };
-		E91890D4177B67AB00653D7A /* type.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = type.h; path = ../../src/tightdb/objc/type.h; sourceTree = "<group>"; };
+		E91890D4177B67AB00653D7A /* TDBType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBType.h; path = ../../src/tightdb/objc/TDBType.h; sourceTree = "<group>"; };
 		E91890D5177B67AB00653D7A /* util.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = util.hpp; path = ../../src/tightdb/objc/util.hpp; sourceTree = "<group>"; };
 		E91890E7177B71E400653D7A /* data_type.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = data_type.mm; path = ../../src/tightdb/objc/test/data_type.mm; sourceTree = "<group>"; };
 		E91890E8177B71E400653D7A /* enumerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = enumerator.m; path = ../../src/tightdb/objc/test/enumerator.m; sourceTree = "<group>"; };
@@ -211,45 +211,45 @@
 		E91890A2177B677900653D7A /* TightDbObjcDyn */ = {
 			isa = PBXGroup;
 			children = (
-				424EEFAB18D9C15900337A13 /* table_view_objc.mm */,
-				424EEFAC18D9C15900337A13 /* table_view_priv.h */,
-				424EEFAD18D9C15A00337A13 /* table_view.h */,
-				424EEFA518D9C13700337A13 /* mixed_objc.mm */,
-				424EEFB118D9C97900337A13 /* column_proxy.mm */,
-				424EEFA618D9C13700337A13 /* mixed_priv.h */,
-				424EEFA718D9C13700337A13 /* mixed.h */,
-				424EEF9F18D9C11D00337A13 /* descriptor_objc.mm */,
-				424EEFA018D9C11D00337A13 /* descriptor_priv.h */,
-				424EEFA118D9C11D00337A13 /* descriptor.h */,
-				424EEF9D18D9C10100337A13 /* column_proxy.h */,
-				424EEDD118D9C0CB00337A13 /* binary_objc.mm */,
-				424EEDD218D9C0CB00337A13 /* binary_priv.h */,
-				424EEDD318D9C0CB00337A13 /* binary.h */,
+				424EEFAB18D9C15900337A13 /* TDBView.mm */,
+				424EEFAC18D9C15900337A13 /* TDBView_priv.h */,
+				424EEFAD18D9C15A00337A13 /* TDBView.h */,
+				424EEFA518D9C13700337A13 /* TDBMixed.mm */,
+				424EEFB118D9C97900337A13 /* TDBColumnProxy.mm */,
+				424EEFA618D9C13700337A13 /* TDBMixed_priv.h */,
+				424EEFA718D9C13700337A13 /* TDBMixed.h */,
+				424EEF9F18D9C11D00337A13 /* TDBDescriptor.mm */,
+				424EEFA018D9C11D00337A13 /* TDBDescriptor_priv.h */,
+				424EEFA118D9C11D00337A13 /* TDBDescriptor.h */,
+				424EEF9D18D9C10100337A13 /* TDBColumnProxy.h */,
+				424EEDD118D9C0CB00337A13 /* TDBBinary.mm */,
+				424EEDD218D9C0CB00337A13 /* TDBBinary_priv.h */,
+				424EEDD318D9C0CB00337A13 /* TDBBinary.h */,
 				4DA8E6CB18D8ADD8005B5B28 /* group.h */,
-				E91890C6177B67AB00653D7A /* cursor.h */,
-				E91890C5177B67AB00653D7A /* cursor_objc.mm */,
+				E91890C6177B67AB00653D7A /* TDBRow.h */,
+				E91890C5177B67AB00653D7A /* TDBRow.mm */,
 				4DA8E6CB18D8ADD8005B5B28 /* group.h */,
-				E91890CA177B67AB00653D7A /* context.h */,
-				E91890C9177B67AB00653D7A /* context_objc.mm */,
+				E91890CA177B67AB00653D7A /* TDBContext.h */,
+				E91890C9177B67AB00653D7A /* TDBContext.mm */,
 				E91890CC177B67AB00653D7A /* helper_macros.h */,
-				E91890CF177B67AB00653D7A /* query.h */,
-				E91890CD177B67AB00653D7A /* query_objc.mm */,
-				E91890CE177B67AB00653D7A /* query_priv.h */,
+				E91890CF177B67AB00653D7A /* TDBQuery.h */,
+				E91890CD177B67AB00653D7A /* TDBQuery.mm */,
+				E91890CE177B67AB00653D7A /* TDBQuery_priv.h */,
 				42AD3A9318CDBDFF00C86073 /* support.h */,
 				42AD3A9418CDBDFF00C86073 /* support.mm */,
 				E91890A3177B677900653D7A /* Supporting Files */,
-				E91890D2177B67AB00653D7A /* table.h */,
+				E91890D2177B67AB00653D7A /* TDBTable.h */,
 				4D79965F18BDFC3E009EB0C0 /* table_macros.h */,
-				E91890D0177B67AB00653D7A /* table_objc.mm */,
-				E91890D1177B67AB00653D7A /* table_priv.h */,
+				E91890D0177B67AB00653D7A /* TDBTable.mm */,
+				E91890D1177B67AB00653D7A /* TDBTable_priv.h */,
 				E91890D3177B67AB00653D7A /* tightdb.h */,
-				E91890CB177B67AB00653D7A /* transaction.h */,
-				E91890C7177B67AB00653D7A /* transaction_objc.mm */,
-				E91890C8177B67AB00653D7A /* transaction_priv.h */,
-				E91890D4177B67AB00653D7A /* type.h */,
+				E91890CB177B67AB00653D7A /* TDBTransaction.h */,
+				E91890C7177B67AB00653D7A /* TDBtransaction.mm */,
+				E91890C8177B67AB00653D7A /* TDBTransaction_priv.h */,
+				E91890D4177B67AB00653D7A /* TDBType.h */,
 				E91890D5177B67AB00653D7A /* util.hpp */,
-				42AD3A9618CDBDFF00C86073 /* version.h */,
-				42AD3A9518CDBDFF00C86073 /* version_objc.mm */,
+				42AD3A9618CDBDFF00C86073 /* TDBVersion.h */,
+				42AD3A9518CDBDFF00C86073 /* TDBVersion.mm */,
 			);
 			path = TightDbObjcDyn;
 			sourceTree = "<group>";
@@ -304,30 +304,30 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				424EEFA418D9C11D00337A13 /* descriptor.h in Headers */,
+				424EEFA418D9C11D00337A13 /* TDBDescriptor.h in Headers */,
 				42AD3A9718CDBDFF00C86073 /* support.h in Headers */,
-				E91890D7177B67AB00653D7A /* cursor.h in Headers */,
-				E91890D9177B67AB00653D7A /* transaction_priv.h in Headers */,
-				E91890DB177B67AB00653D7A /* context.h in Headers */,
-				E91890DC177B67AB00653D7A /* transaction.h in Headers */,
+				E91890D7177B67AB00653D7A /* TDBRow.h in Headers */,
+				E91890D9177B67AB00653D7A /* TDBTransaction_priv.h in Headers */,
+				E91890DB177B67AB00653D7A /* TDBContext.h in Headers */,
+				E91890DC177B67AB00653D7A /* TDBTransaction.h in Headers */,
 				E91890DD177B67AB00653D7A /* helper_macros.h in Headers */,
 				4D79966018BDFC3E009EB0C0 /* table_macros.h in Headers */,
-				424EEFAA18D9C13700337A13 /* mixed.h in Headers */,
-				424EEFAF18D9C15A00337A13 /* table_view_priv.h in Headers */,
-				E91890DF177B67AB00653D7A /* query_priv.h in Headers */,
-				424EEF9E18D9C10100337A13 /* column_proxy.h in Headers */,
-				E91890E0177B67AB00653D7A /* query.h in Headers */,
-				E91890E2177B67AB00653D7A /* table_priv.h in Headers */,
+				424EEFAA18D9C13700337A13 /* TDBMixed.h in Headers */,
+				424EEFAF18D9C15A00337A13 /* TDBView_priv.h in Headers */,
+				E91890DF177B67AB00653D7A /* TDBQuery_priv.h in Headers */,
+				424EEF9E18D9C10100337A13 /* TDBColumnProxy.h in Headers */,
+				E91890E0177B67AB00653D7A /* TDBQuery.h in Headers */,
+				E91890E2177B67AB00653D7A /* TDBTable_priv.h in Headers */,
 				4DA8E6CC18D8ADD8005B5B28 /* group.h in Headers */,
-				424EEDD618D9C0CB00337A13 /* binary.h in Headers */,
-				42AD3A9A18CDBDFF00C86073 /* version.h in Headers */,
-				424EEFB018D9C15A00337A13 /* table_view.h in Headers */,
-				424EEDD518D9C0CB00337A13 /* binary_priv.h in Headers */,
-				E91890E3177B67AB00653D7A /* table.h in Headers */,
-				424EEFA918D9C13700337A13 /* mixed_priv.h in Headers */,
+				424EEDD618D9C0CB00337A13 /* TDBBinary.h in Headers */,
+				42AD3A9A18CDBDFF00C86073 /* TDBVersion.h in Headers */,
+				424EEFB018D9C15A00337A13 /* TDBView.h in Headers */,
+				424EEDD518D9C0CB00337A13 /* TDBBinary_priv.h in Headers */,
+				E91890E3177B67AB00653D7A /* TDBTable.h in Headers */,
+				424EEFA918D9C13700337A13 /* TDBMixed_priv.h in Headers */,
 				E91890E4177B67AB00653D7A /* tightdb.h in Headers */,
-				E91890E5177B67AB00653D7A /* type.h in Headers */,
-				424EEFA318D9C11D00337A13 /* descriptor_priv.h in Headers */,
+				E91890E5177B67AB00653D7A /* TDBType.h in Headers */,
+				424EEFA318D9C11D00337A13 /* TDBDescriptor_priv.h in Headers */,
 				E91890E6177B67AB00653D7A /* util.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -431,18 +431,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				424EEDD418D9C0CB00337A13 /* binary_objc.mm in Sources */,
-				424EEFA218D9C11D00337A13 /* descriptor_objc.mm in Sources */,
-				E91890D6177B67AB00653D7A /* cursor_objc.mm in Sources */,
+				424EEDD418D9C0CB00337A13 /* TDBBinary.mm in Sources */,
+				424EEFA218D9C11D00337A13 /* TDBDescriptor.mm in Sources */,
+				E91890D6177B67AB00653D7A /* TDBRow.mm in Sources */,
 				42AD3A9818CDBDFF00C86073 /* support.mm in Sources */,
-				42AD3A9918CDBDFF00C86073 /* version_objc.mm in Sources */,
-				424EEFAE18D9C15A00337A13 /* table_view_objc.mm in Sources */,
-				424EEFB218D9C97900337A13 /* column_proxy.mm in Sources */,
-				E91890D8177B67AB00653D7A /* transaction_objc.mm in Sources */,
-				E91890DA177B67AB00653D7A /* context_objc.mm in Sources */,
-				E91890DE177B67AB00653D7A /* query_objc.mm in Sources */,
-				E91890E1177B67AB00653D7A /* table_objc.mm in Sources */,
-				424EEFA818D9C13700337A13 /* mixed_objc.mm in Sources */,
+				42AD3A9918CDBDFF00C86073 /* TDBVersion.mm in Sources */,
+				424EEFAE18D9C15A00337A13 /* TDBView.mm in Sources */,
+				424EEFB218D9C97900337A13 /* TDBColumnProxy.mm in Sources */,
+				E91890D8177B67AB00653D7A /* TDBtransaction.mm in Sources */,
+				E91890DA177B67AB00653D7A /* TDBContext.mm in Sources */,
+				E91890DE177B67AB00653D7A /* TDBQuery.mm in Sources */,
+				E91890E1177B67AB00653D7A /* TDBTable.mm in Sources */,
+				424EEFA818D9C13700337A13 /* TDBMixed.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

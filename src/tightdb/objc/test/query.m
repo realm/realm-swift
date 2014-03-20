@@ -5,7 +5,7 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-#import <tightdb/objc/tightdb.h>
+#import <tightdb/objc/Tightdb.h>
 
 TIGHTDB_TABLE_1(TestQuerySub,
                 Age,  Int)

@@ -6,7 +6,7 @@
 #include <string>
 #include <tightdb.hpp>
 #include <tightdb/version.hpp>
-#import  <tightdb/objc/version.h>
+#import  <tightdb/objc/TDBVersion.h>
 
 @implementation TDBVersion
 {

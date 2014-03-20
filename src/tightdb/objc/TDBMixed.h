@@ -20,8 +20,8 @@
 
 #import <Foundation/Foundation.h>
 
-#import "table.h"
-#import "binary.h"
+#import "TDBTable.h"
+#import "TDBBinary.h"
 
 @interface TDBMixed: NSObject
 +(TDBMixed *)mixedWithBool:(BOOL)value;

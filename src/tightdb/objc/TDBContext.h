@@ -19,47 +19,17 @@
  **************************************************************************/
 
 #import <Foundation/Foundation.h>
+#import <tightdb/objc/TDBTransaction.h>
 
-#include <tightdb/util/unique_ptr.hpp>
-#include <tightdb/binary_data.hpp>
+typedef void(^TDBReadBlock)(TDBTransaction *transaction);
+typedef BOOL(^TDBWriteBlock)(TDBTransaction *transaction);
 
-#import "binary.h"
-#import "binary_priv.h"
+@interface TDBContext: NSObject
++(TDBContext *)initWithFile:(NSString *)path withError:(NSError **)error;
 
-@implementation TDBBinary
-{
-    tightdb::BinaryData m_data;
-}
--(id)initWithData:(const char*)data size:(size_t)size
-{
-    self = [super init];
-    if (self) {
-        m_data = tightdb::BinaryData(data, size);
-    }
-    return self;
-}
--(id)initWithBinary:(tightdb::BinaryData)data
-{
-    self = [super init];
-    if (self) {
-        m_data = data;
-    }
-    return self;
-}
--(const char*)getData
-{
-    return m_data.data();
-}
--(size_t)getSize
-{
-    return m_data.size();
-}
--(BOOL)isEqual:(TDBBinary*)bin
-{
-    return m_data == bin->m_data;
-}
--(tightdb::BinaryData&)getNativeBinary
-{
-    return m_data;
-}
+-(void)readWithBlock:(TDBReadBlock)block;
+-(BOOL)writeWithBlock:(TDBWriteBlock)block withError:(NSError **)error;
+
+-(BOOL)hasChangedSinceLastTransaction;
+
 @end

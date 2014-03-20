@@ -21,7 +21,7 @@
 #import <SenTestingKit/SenTestingKit.h>
 #import <Foundation/NSException.h>
 
-#import <tightdb/objc/tightdb.h>
+#import <tightdb/objc/Tightdb.h>
 
 
 @interface TDBDynamicTableTests: SenTestCase

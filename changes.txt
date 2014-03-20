@@ -1,3 +1,8 @@
+2014-08-20
+==========
+! BREAKING CHANCE: Header files are renamed so names match class names.
+
+
 2014-03-18
 ==========
 ! BREAKING CHANGE: Typed interface Cursor has now been renamed to Row.
