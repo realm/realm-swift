@@ -1,6 +1,5 @@
 # NOTE: THIS SCRIPT IS SUPPOSED TO RUN IN A POSIX SHELL
 
-
 ORIG_CWD="$(pwd)" || exit 1
 cd "$(dirname "$0")" || exit 1
 TIGHTDB_OBJC_HOME="$(pwd)" || exit 1
@@ -362,9 +361,9 @@ EOF
         tightdb_ver_minor="$(echo "$tightdb_version" | cut -f2 -d.)" || exit 1
         tightdb_ver_patch="$(echo "$tightdb_version" | cut -f3 -d.)" || exit 1
 
-	sed -i '' -e "s/Tightdb_Version_Major .*$/TDB_VERSION_MAJOR $tightdb_ver_major/" $version_file || exit 1
-	sed -i '' -e "s/Tightdb_Version_Minor .*$/TDB_VERSION_MINOR $tightdb_ver_minor/" $version_file || exit 1
-	sed -i '' -e "s/Tightdb_Version_Patch .*$/TDB_VERSION_PATCH $tightdb_ver_patch/" $version_file || exit 1
+	sed -i '' -e "s/TDB_VERSION_MAJOR .*$/TDB_VERSION_MAJOR $tightdb_ver_major/" $version_file || exit 1
+	sed -i '' -e "s/TDB_VERSION_MINOR .*$/TDB_VERSION_MINOR $tightdb_ver_minor/" $version_file || exit 1
+	sed -i '' -e "s/TDB_VERSION_PATCH .*$/TDB_VERSION_PATCH $tightdb_ver_patch/" $version_file || exit 1
 	exit 0
 	;;
 
