@@ -20,9 +20,9 @@
 
 #import <Foundation/Foundation.h>
 
-#import "table.h"
+#import "TDBTable.h"
 
-#include <tightdb/objc/type.h>
+#include <tightdb/objc/TDBType.h>
 
 @interface TDBView: NSObject <NSFastEnumeration>
 

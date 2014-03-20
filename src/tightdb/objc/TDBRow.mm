@@ -4,9 +4,9 @@
 
 #include <tightdb/table.hpp>
 
-#import <tightdb/objc/cursor.h>
-#import <tightdb/objc/table.h>
-#import <tightdb/objc/table_priv.h>
+#import <tightdb/objc/TDBRow.h>
+#import <tightdb/objc/TDBTable.h>
+#import <tightdb/objc/TDBTable_priv.h>
 
 #include <tightdb/objc/util.hpp>
 

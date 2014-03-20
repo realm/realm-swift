@@ -7,9 +7,9 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-#import <tightdb/objc/tightdb.h>
-#import <tightdb/objc/transaction.h>
-#import <tightdb/objc/context.h>
+#import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/TDBTransaction.h>
+#import <tightdb/objc/TDBContext.h>
 
 TIGHTDB_TABLE_2(GetSubtable,
                 Hired, Bool,

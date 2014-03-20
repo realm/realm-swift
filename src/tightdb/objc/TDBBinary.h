@@ -19,17 +19,15 @@
  **************************************************************************/
 
 #import <Foundation/Foundation.h>
-#import <tightdb/objc/transaction.h>
+#import "TDBBinary.h"
 
-typedef void(^TDBReadBlock)(TDBTransaction *transaction);
-typedef BOOL(^TDBWriteBlock)(TDBTransaction *transaction);
+@interface TDBBinary: NSObject
+-(id)initWithData:(const char *)data size:(size_t)size;
+-(const char *)getData;
+-(size_t)getSize;
 
-@interface TDBContext: NSObject
-+(TDBContext *)initWithFile:(NSString *)path withError:(NSError **)error;
-
--(void)readWithBlock:(TDBReadBlock)block;
--(BOOL)writeWithBlock:(TDBWriteBlock)block withError:(NSError **)error;
-
--(BOOL)hasChangedSinceLastTransaction;
-
+/**
+ * Compare the referenced binary data for equality.
+ */
+-(BOOL)isEqual:(TDBBinary *)bin;
 @end

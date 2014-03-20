@@ -27,6 +27,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "TDBTransaction.h"
 
 @class TDBBinary;
 @class TDBTable;

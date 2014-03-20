@@ -20,7 +20,7 @@
 
 #import <Foundation/Foundation.h>
 
-#include <tightdb/objc/type.h>
+#include <tightdb/objc/TDBType.h>
 
 @class TDBBinary;
 @class TDBView;

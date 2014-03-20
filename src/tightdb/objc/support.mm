@@ -2,10 +2,10 @@
 
 #include <tightdb/descriptor.hpp>
 
-#import "table.h"
+#import "TDBTable.h"
 #import "util.hpp"
 #import "support.h"
-#import "binary.h"
+#import "TDBBinary.h"
 
 using namespace tightdb;
 

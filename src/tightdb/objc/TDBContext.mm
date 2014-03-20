@@ -1,8 +1,8 @@
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/group_shared.hpp>
 
-#import <tightdb/objc/context.h>
-#import <tightdb/objc/transaction_priv.h>
+#import <tightdb/objc/TDBContext.h>
+#import <tightdb/objc/TDBTransaction_priv.h>
 
 #include <tightdb/objc/util.hpp>
 

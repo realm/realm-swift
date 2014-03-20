@@ -10,14 +10,14 @@
 #include <tightdb/table_view.hpp>
 #include <tightdb/query.hpp>
 
-#import <tightdb/objc/query.h>
-#import <tightdb/objc/table.h>
-#import <tightdb/objc/table_priv.h>
-#import <tightdb/objc/table_view.h>
-#import <tightdb/objc/table_view_priv.h>
-#import <tightdb/objc/cursor.h>
-#import <tightdb/objc/binary.h>
-#import <tightdb/objc/binary_priv.h>
+#import <tightdb/objc/TDBQuery.h>
+#import <tightdb/objc/TDBTable.h>
+#import <tightdb/objc/TDBTable_priv.h>
+#import <tightdb/objc/TDBView.h>
+#import <tightdb/objc/TDBView_priv.h>
+#import <tightdb/objc/TDBRow.h>
+#import <tightdb/objc/TDBBinary.h>
+#import <tightdb/objc/TDBBinary_priv.h>
 
 #include <tightdb/objc/util.hpp>
 
