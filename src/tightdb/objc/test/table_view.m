@@ -20,8 +20,8 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-#import <tightdb/objc/tightdb.h>
-
+#import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/group.h>
 
 @interface table_view : SenTestCase
 

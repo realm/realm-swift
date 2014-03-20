@@ -7,8 +7,7 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-#import <tightdb/objc/tightdb.h>
-#import <tightdb/objc/transaction.h>
+#import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/group.h>
 
 TIGHTDB_TABLE_2(TestSubtableSub,

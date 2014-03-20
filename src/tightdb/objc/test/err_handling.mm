@@ -11,13 +11,12 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-#import <tightdb/objc/tightdb.h>
-#import <tightdb/objc/transaction.h>
+#import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/group.h>
-#import <tightdb/objc/table.h>
+
 #include <tightdb/binary_data.hpp>
 #include <tightdb/table.hpp>
-#import <tightdb/objc/table_priv.h>
+#import <tightdb/objc/TDBTable_priv.h>
 
 TIGHTDB_TABLE_DEF_3(PeopleErrTable,
                     Name,  String,

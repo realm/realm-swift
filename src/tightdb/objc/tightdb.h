@@ -18,13 +18,13 @@
  *
  **************************************************************************/
 
-#import <tightdb/objc/table.h>
-#import <tightdb/objc/mixed.h>
-#import <tightdb/objc/table_view.h>
-#import <tightdb/objc/binary.h>
-#import <tightdb/objc/query.h>
-#import <tightdb/objc/cursor.h>
+#import <tightdb/objc/TDBTable.h>
+#import <tightdb/objc/TDBMixed.h>
+#import <tightdb/objc/TDBView.h>
+#import <tightdb/objc/TDBBinary.h>
+#import <tightdb/objc/TDBQuery.h>
+#import <tightdb/objc/TDBRow.h>
 #import <tightdb/objc/helper_macros.h>
 #import <tightdb/objc/table_macros.h>
-#import <tightdb/objc/context.h>
-#import <tightdb/objc/version.h>
+#import <tightdb/objc/TDBContext.h>
+#import <tightdb/objc/TDBVersion.h>

@@ -26,15 +26,15 @@
 #include <tightdb/table_view.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
-#import "table.h"
-#import "table_priv.h"
-#import "cursor.h"
-#import "table_view.h"
-#import "table_view_priv.h"
-#import "query.h"
-#import "query_priv.h"
-#import "mixed.h"
-#import "mixed_priv.h"
+#import "TDBTable.h"
+#import "TDBTable_priv.h"
+#import "TDBRow.h"
+#import "TDBView.h"
+#import "TDBView_priv.h"
+#import "TDBQuery.h"
+#import "TDBQuery_priv.h"
+#import "TDBMixed.h"
+#import "TDBMixed_priv.h"
 
 #include <tightdb/objc/util.hpp>
 
