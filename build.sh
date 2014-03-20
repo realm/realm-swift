@@ -605,20 +605,22 @@ EOF
 
     "build-test-core")
         TMP=$(mktemp -d /tmp/tightdb.objc.build-test-core.XXXX)
+        function build_test_core_fail {
+            rm -rf "$TMP"
+            exit 1
+        }
+
+        function build_test_core_cp {
+        mkdir "$TMP/$2" || build_test_core_fail
+        find "../tightdb/$1/" -maxdepth 1 \
+          -type f -iregex '^.*\.[ch]\(pp\)?$' \
+          -exec cp {} "$TMP/$2/" \; || build_test_core_fail
+        }
 
         cp ../tightdb/src/tightdb.hpp "$TMP/"
-        mkdir "$TMP/tightdb"
-        find ../tightdb/src/tightdb/ -maxdepth 1 \
-          -type f -iregex '^.*\.[ch]\(pp\)?$' \
-          -exec cp {} "$TMP/tightdb/" \;
-        mkdir "$TMP/tightdb/util"
-        find ../tightdb/src/tightdb/util/ -maxdepth 1 \
-          -type f -iregex '^.*\.[ch]\(pp\)?$' \
-          -exec cp {} "$TMP/tightdb/util/" \;
-        mkdir "$TMP/tightdb/impl"
-        find ../tightdb/src/tightdb/impl/ -maxdepth 1 \
-          -type f -iregex '^.*\.[ch]\(pp\)?$' \
-          -exec cp {} "$TMP/tightdb/impl" \;
+        build_test_core_cp src/tightdb tightdb
+        build_test_core_cp src/tightdb/util tightdb/util
+        build_test_core_cp src/tightdb/impl tightdb/impl
 
         find ../tightdb/test/ -maxdepth 1 \
           -type f -iregex '^.*\.[ch]\(pp\)?$' \
@@ -632,17 +634,11 @@ EOF
           -type f -iregex '^.*\.[ch]\(pp\)?$' \
           -exec cp {} "$TMP/large_tests/" \;
 
-        mkdir "$TMP/UnitTest++"
-        find ../tightdb/test/UnitTest++/src/ -maxdepth 1 \
-          -type f -iregex '^.*\.[ch]\(pp\)?$' \
-          -exec cp {} "$TMP/UnitTest++/" \;
-        mkdir "$TMP/UnitTest++/Posix"
-        find ../tightdb/test/UnitTest++/src/Posix/ -maxdepth 1 \
-          -type f -iregex '^.*\.[ch]\(pp\)?$' \
-          -exec cp {} "$TMP/UnitTest++/Posix/" \;
+        build_test_core_cp test/UnitTest++/src UnitTest++
+        build_test_core_cp test/UnitTest++/src/Posix UnitTest++/Posix
 
         mkdir -p test-core || exit 1
-        (cd test-core && cmake -G Xcode "$TMP")
+        (cd test-core && cmake -G Xcode "$TMP") || 
         rm -rf test-core/* || exit 1
 
         rm -rf "$TMP"
