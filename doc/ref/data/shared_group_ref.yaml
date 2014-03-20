@@ -20,7 +20,7 @@ CATEGORIES:
       DESCR    :
       - TEXT   : *g_shared_group_constructor_descr
       - TEXT   : *g_shared_group_durability_modes
-      SIGNATURE: (TightdbSharedGroup *)groupWithFilename:(NSString *)filename
+      SIGNATURE: (TDBSharedGroup *)groupWithFilename:(NSString *)filename
       PARAMS:
       - NAME   : filename
         TYPES  : NSString
@@ -42,9 +42,9 @@ CATEGORIES:
       NAMES    : writeTransaction
       SUMMARY  : *g_shared_group_begin_write_summary
       DESCR    : *g_shared_group_begin_write_descr
-      SIGNATURE: (void)writeTransaction:(TightdbSharedGroupWriteTransactionBlock)block
+      SIGNATURE: (void)writeTransaction:(TDBSharedGroupWriteTransactionBlock)block
       RETURN:
-        TYPES  : TightdbSharedGroupReadTransactionBlock
+        TYPES  : TDBSharedGroupReadTransactionBlock
         DESCR  : A block of code.
       EXAMPLES:
       - CODE   : ex_objc_shared_group_begin_write
@@ -57,10 +57,10 @@ CATEGORIES:
       NAMES    : readTransaction
       SUMMARY  : *g_shared_group_begin_read_summary
       DESCR    : *g_shared_group_begin_read_descr
-      SIGNATURE: (void)readTransaction:(TightdbSharedGroupReadTransactionBlock)block
+      SIGNATURE: (void)readTransaction:(TDBSharedGroupReadTransactionBlock)block
       CONST    : True
       RETURN:
-        TYPES  : TightdbSharedGroupReadTransactionBlock
+        TYPES  : TDBSharedGroupReadTransactionBlock
         DESCR  : A block of code.
       EXAMPLES:
       - CODE   : ex_objc_shared_group_begin_read

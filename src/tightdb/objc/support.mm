@@ -5,6 +5,7 @@
 #import "table.h"
 #import "util.hpp"
 #import "support.h"
+#import "binary.h"
 
 using namespace tightdb;
 

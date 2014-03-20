@@ -6,6 +6,8 @@
 #import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/table.h>
+#import <tightdb/objc/descriptor.h>
+#import <tightdb/objc/mixed.h>
 
 @interface MACTestTableDeleteAll: SenTestCase
 @end
@@ -32,7 +34,7 @@
     for (size_t i = 0; i < 15; ++i) {
         [table TDBInsertInt:0 ndx:i value:i];
         [table TDBInsertBool:1 ndx:i value:(i % 2 ? YES : NO)];
-        [table TDBInsertDate:2 ndx:i value:12345];
+        [table TDBInsertDate:2 ndx:i value:[NSDate date]];
         [table TDBInsertString:3 ndx:i value:[NSString stringWithFormat:@"string %zu", i]];
         [table TDBInsertString:4 ndx:i value:@" Very long string.............."];
 

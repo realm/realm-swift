@@ -8,6 +8,7 @@
 #import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/tightdb.h>
+#import <tightdb/objc/transaction.h>
 #import <tightdb/objc/group.h>
 
 TIGHTDB_TABLE_DEF_4(MyTable,
@@ -41,7 +42,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testGroup_Misc2
 {
     size_t row;
-    TDBGroup* group = [TDBGroup group];
+    TDBTransaction* group = [TDBTransaction group];
     NSLog(@"HasTable: %i", [group hasTableWithName:@"employees" withTableClass:[MyTable class]] );
     // Create new table in group
     MyTable* table = [group getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
@@ -106,10 +107,10 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Write to disk
     [fm removeItemAtPath:@"employees.tightdb" error:nil];
-    [group writeToFile:@"employees.tightdb" withError:nil];
+    [group writeContextToFile:@"employees.tightdb" withError:nil];
 
     // Load a group from disk (and print contents)
-    TDBGroup* fromDisk = [TDBGroup groupWithFile:@"employees.tightdb" withError:nil];
+    TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"employees.tightdb" withError:nil];
     MyTable* diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
@@ -123,10 +124,10 @@ TIGHTDB_TABLE_2(QueryTable,
     }
 
     // Write same group to memory buffer
-    TDBBinary* buffer = [group writeToBuffer];
+    TDBBinary* buffer = [group writeContextToBuffer];
 
     // Load a group from memory (and print contents)
-    TDBGroup* fromMem = [TDBGroup groupWithBuffer:buffer withError:nil];
+    TDBTransaction* fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
     MyTable* memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         // ??? cursor
@@ -137,7 +138,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
 - (void)testQuery
 {
-    TDBGroup* group = [TDBGroup group];
+    TDBTransaction* group = [TDBTransaction group];
     QueryTable* table = [group getOrCreateTableWithName:@"Query table" asTableClass:[QueryTable class]];
 
     // Add some rows
@@ -194,7 +195,7 @@ TIGHTDB_TABLE_2(QueryTable,
  */
 - (void)testSubtables
 {
-    TDBGroup* group = [TDBGroup group];
+    TDBTransaction* group = [TDBTransaction group];
     TDBTable* table = [group getOrCreateTableWithName:@"table" asTableClass:[TDBTable class]];
 
     // Specify the table type

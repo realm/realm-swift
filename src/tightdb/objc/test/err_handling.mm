@@ -12,6 +12,7 @@
 #import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/tightdb.h>
+#import <tightdb/objc/transaction.h>
 #import <tightdb/objc/group.h>
 #import <tightdb/objc/table.h>
 #include <tightdb/binary_data.hpp>
@@ -60,7 +61,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    TDBGroup* group = [TDBGroup group];
+    TDBTransaction* group = [TDBTransaction group];
     // Create new table in group
     PeopleErrTable* people = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
@@ -87,7 +88,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     // Write the group to disk
     [fm removeItemAtPath:@"peopleErr.tightdb" error:NULL];
     error = nil;
-    if (![group writeToFile:@"peopleErr.tightdb" withError:&error]) {
+    if (![group writeContextToFile:@"peopleErr.tightdb" withError:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"No error expected");
     }
@@ -111,7 +112,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     // Load a group from disk (and try to update, even though it is readonly)
     error = nil;
-    TDBGroup* fromDisk = [TDBGroup groupWithFile:@"peopleErr.tightdb" withError:&error];
+    TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"peopleErr.tightdb" withError:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
     }
@@ -133,7 +134,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     }
 
     error = nil;
-    fromDisk = [TDBGroup groupWithFile:@"peopleErr.tightdb" withError:&error];
+    fromDisk = [TDBTransaction groupWithFile:@"peopleErr.tightdb" withError:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"File should have been possible to open");
@@ -225,7 +226,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
-        if (![table TDBInsertDate:2 ndx:i value:12345 ]) {
+        if (![table TDBInsertDate:2 ndx:i value:[NSDate date] ]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
@@ -359,7 +360,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     const char bin[4] = { 0, 1, 2, 3 };
     TDBBinary* bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
     TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
-    time_t timeNow = [[NSDate date] timeIntervalSince1970];
+    NSDate *timeNow = [NSDate date];
     //    TestQueryErrSub* subtab1 = [[TestQueryErrSub alloc] init];
     TestQueryErrSub* subtab2 = [[TestQueryErrSub alloc] init];
     [subtab2 addAge:100];
