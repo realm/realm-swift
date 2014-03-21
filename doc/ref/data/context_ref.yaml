@@ -23,22 +23,19 @@ CATEGORIES:
 - Constructor:
   METHODS:
   - g_shared_group_constructor:
-      NAME     : TDBContext
+      NAME     : "contextWithPersistenceToFile:"
       SUMMARY  : *g_shared_group_constructor_summary
       DESCR    :
       - TEXT   : *g_shared_group_constructor_descr
       - TEXT   : *g_shared_group_durability_modes
-      SIGNATURE: (TDBContext *)initWithFilename:(NSString *)path withError:(NSError **)error
+      SIGNATURE: + (TDBContext *)contextWithPersistenceToFile:(NSString *)path withError:(NSError **)error
       PARAMS:
       - NAME   : path
         TYPES  : NSString
-        DESCR  : TBD #*g_shared_group_constructor_parm1_descr
+        DESCR  : A path to a file. E.g. documents-folder/myDatabase.tightdb
       RETURN:
         TYPES  : TDBContext
-        DESCR  : *g_shared_group_constructor_return1_descr
-      THROWS:
-      - EXCEPT : TBD
-        DESCR  : TBD
+        DESCR  : A context mapped to a file.
       EXAMPLES:
       - CODE   : ex_objc_shared_group_constructor
         DESCR  :
