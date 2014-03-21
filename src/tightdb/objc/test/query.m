@@ -280,19 +280,18 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     
     TDBDescriptor *d = t.descriptor;
     TDBDescriptor *subDesc = [d addColumnTable:@"subtable"];
-    NSUInteger subIntCol = [subDesc addColumnWithName:@"subCol" andType:TDBIntType];
-    
+    [subDesc addColumnWithName:@"subCol" andType:TDBBoolType];
     [t addEmptyRow];
     STAssertEquals(t.rowCount, (NSUInteger)1,@"one row added");
     
     TDBTable * subTable = [t tableInColumnWithIndex:0 atRowIndex:0];
     [subTable addEmptyRow];
-    [subTable setInt:10 inColumnWithIndex:0 atRowIndex:0];
+    [subTable setBool:YES inColumnWithIndex:0 atRowIndex:0];
+    TDBQuery *q = [t where];
     
-    TDBView *q = [[[[[t where] subtableInColumnWithIndex:0] intIsEqualTo:10 inColumnWithIndex:subIntCol] parent] findAllRows];
-    STAssertEquals(q.rowCount, (NSUInteger)1,@"one match");
+    TDBView *v = [[[[q subtableInColumnWithIndex:0] boolIsEqualTo:YES inColumnWithIndex:0] parent] findAllRows];
+    STAssertEquals(v.rowCount, (NSUInteger)1,@"one match");
 }
-
 
 
 @end
