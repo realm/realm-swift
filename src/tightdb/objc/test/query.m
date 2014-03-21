@@ -57,7 +57,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 //    STAssertEquals([[[table where].TableCol  columnIsEqualTo:subtab1] count], (size_t)1, @"TableCol equal");
 //    STAssertEquals([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (size_t)1, @"MixedCol equal");
 
-    TestQueryAllTypes_Query *query = [[table where].BoolCol   columnIsEqualTo:NO];
+    TestQueryAllTypesQuery *query = [[table where].BoolCol   columnIsEqualTo:NO];
 
     STAssertEquals([query.IntCol min], (int64_t)54,    @"IntCol min");
     STAssertEquals([query.IntCol max], (int64_t)54,    @"IntCol max");

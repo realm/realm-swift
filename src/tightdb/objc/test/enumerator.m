@@ -44,23 +44,23 @@ TIGHTDB_TABLE_2(EnumPeopleTable2,
     //------------------------------------------------------
 
     // 1: Iterate over table
-    for (EnumPeopleTable_Row *row in people) {
+    for (EnumPeopleTableRow *row in people) {
         NSLog(@"(Enum)%@ is %lld years old.", row.Name, row.Age);
     }
 
     // Do a query, and get all matches as TableView
-    EnumPeopleTable_View *res = [[[[people where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30] findAll];
+    EnumPeopleTableView *res = [[[[people where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30] findAll];
     NSLog(@"View count: %zu", res.rowCount);
     // 2: Iterate over the resulting TableView
-    for (EnumPeopleTable_Row *row in res) {
+    for (EnumPeopleTableRow *row in res) {
         NSLog(@"(Enum2) %@ is %lld years old.", row.Name, row.Age);
     }
 
     // 3: Iterate over query (lazy)
 
- EnumPeopleTable_Query *q = [[people where].Age columnIsEqualTo:21];
+ EnumPeopleTableQuery *q = [[people where].Age columnIsEqualTo:21];
     NSLog(@"Query lazy count: %zu", [q countRows] );
-    for (EnumPeopleTable_Row *row in q) {
+    for (EnumPeopleTableRow *row in q) {
         NSLog(@"(Enum3) %@ is %lld years old.", row.Name, row.Age);
         if (row.Name == nil)
             break;
