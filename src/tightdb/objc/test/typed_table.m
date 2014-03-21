@@ -61,8 +61,8 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     STAssertEquals(TDBMixedType,  [table columnTypeOfColumn:8], @"Ninth column not mixed");
 
     const char bin[4] = { 0, 1, 2, 3 };
-    TDBBinary* bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
-    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
     NSDate *timeNow = [NSDate date];
     TestTableSub* subtab1 = [[TestTableSub alloc] init];
     TestTableSub* subtab2 = [[TestTableSub alloc] init];
