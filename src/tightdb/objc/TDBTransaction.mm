@@ -91,7 +91,6 @@ using namespace std;
 
 -(id)getTableWithName:(NSString *)name asTableClass:(__unsafe_unretained Class)class_obj
 {
-    
     if ([name length] == 0) {
         NSException *exception = [NSException exceptionWithName:@"tightdb:table_name_exception"
                                                          reason:@"Name must be a non-empty NSString"

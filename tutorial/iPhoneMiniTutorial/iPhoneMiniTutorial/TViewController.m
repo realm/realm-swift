@@ -23,7 +23,7 @@
     [context writeWithBlock:^(TDBTransaction *transaction) {
 
         // Access table from group
-        TDBTable *table = [transaction getOrCreateTableWithName:@"myTable"];
+        TDBTable *table = [transaction createTableWithName:@"myTable"];
 
         // Add columns to the table
         [table addColumnWithName:@"Name" andType:TDBStringType];
