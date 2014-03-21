@@ -29,20 +29,10 @@
 @property (nonatomic, readonly) NSUInteger tableCount;
 
 
-
-
--(NSString *)getTableName:(NSUInteger)table_ndx;
-
--(BOOL)hasTableWithName:(NSString *)name;
-
 /**
- * This method returns NO if it encounters a memory allocation error
- * (out of memory).
- *
- * The specified table class must be one that is declared by using
- * one of the table macros TIGHTDB_TABLE_*.
+ * This method returns YES if a table with the specified name already exists. NO if it does not exist.
  */
--(BOOL)hasTableWithName:(NSString *)name withTableClass:(Class)obj;
+-(BOOL)hasTableWithName:(NSString *)name;
 
 
 /**
@@ -58,16 +48,14 @@
 -(id)getTableWithName:(NSString *)name asTableClass:(Class)obj;
 
 /**
- * This method returns nil if it encounters a memory allocation error
- * (out of memory).
+ * This method creates a table with the specific name.
+ * If a table with that name already exists, an exception is thrown.
  */
 -(TDBTable *)createTableWithName:(NSString *)name;
 
 /**
- * This method returns nil if the group already contains a table with
- * the specified name, but its type is incompatible with the
- * specified table class. This method also returns nil if it
- * encounters a memory allocation error (out of memory).
+ * This method creates a table with the specified name as a specific table.
+ * If a table with that name already exists, an exception is thrown.
  *
  * The specified table class must be one that is declared by using
  * one of the table macros TIGHTDB_TABLE_*.
@@ -77,6 +65,19 @@
 
 
 
+-(NSString *)nameOfTableWithIndex:(NSUInteger)tableIndex;
+
+
+#ifdef HAS_TABLE_WITH_NAME_AND_CLASS
+/**
+ * This method returns YES if a table with the specified name already exists. NO if it does not exists.
+ *
+ * The specified table class must be one that is declared by using
+ * one of the table macros TIGHTDB_TABLE_*.
+ */
+-(BOOL)hasTableWithName:(NSString *)name withTableClass:(Class)obj;
+
+#endif
 
 
 @end

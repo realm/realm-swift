@@ -43,11 +43,11 @@ TIGHTDB_TABLE_2(QueryTable,
 {
     size_t row;
     TDBTransaction* group = [TDBTransaction group];
-    NSLog(@"HasTable: %i", [group hasTableWithName:@"employees" withTableClass:[MyTable class]] );
+    NSLog(@"HasTable: %i", [group hasTableWithName:@"employees"] );
     // Create new table in group
     MyTable* table = [group createTableWithName:@"employees" asTableClass:[MyTable class]];
     NSLog(@"Table: %@", table);
-    NSLog(@"HasTable: %i", [group hasTableWithName:@"employees" withTableClass:[MyTable class]] );
+    NSLog(@"HasTable: %i", [group hasTableWithName:@"employees"] );
 
     // Add some rows
     [table addName:@"John" Age:20 Hired:YES Spare:0];

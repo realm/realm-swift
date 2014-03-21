@@ -81,6 +81,14 @@ TIGHTDB_TABLE_2(TestTableGroup,
     STAssertNil([g getTableWithName:@"noTable"], @"Table does not exist");
 }
 
+- (void)testGroupTableCount
+{
+    TDBTransaction *t = [TDBTransaction group];
+    STAssertEquals(t.tableCount, (NSUInteger)0, @"No tables added");
+    [t createTableWithName:@"tableName"];
+    STAssertEquals(t.tableCount, (NSUInteger)1, @"1 table added");
+}
+
 @end
 
 
