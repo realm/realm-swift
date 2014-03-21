@@ -31,29 +31,29 @@ void ex_objc_table_typed_intro_with_many_comments()
 
         /* Creates a query expression to filter on age. Note that the
          * query is defined but not executed here. */
-        PersonTable_Query *query = [[table where].Age columnIsBetween:13 and_:19];
+        PersonTableQuery *query = [[table where].Age columnIsBetween:13 and_:19];
 
         /* Accesses query result directly on the quiry object. The quiry is
          * executed once. */
-        for (PersonTable_Row *row in query)
+        for (PersonTableRow *row in query)
             NSLog(@"Name: %@", [row Name]);
 
         /* For time consuming queries (in particular) the following is
          * inefficient because the query is executed again. */
-        for (PersonTable_Row *row in query)
+        for (PersonTableRow *row in query)
             NSLog(@"Name: %lld", [row Age]);
 
         /* To avoid repeating the same query, the result may be stored in
          * a table view for multiple access. The following code executes the
          * query once and saves the result in a table view. */
-        PersonTable_View *tableView = [query findAll];
+        PersonTableView *tableView = [query findAll];
 
         /* Iterates over all rows in the result (view) 2 times based on the single
          * query executed above. */
-        for (PersonTable_Row *row in tableView)
+        for (PersonTableRow *row in tableView)
             NSLog(@"Name: %@", [row Name]);
 
-        for (PersonTable_Row *row in tableView)
+        for (PersonTableRow *row in tableView)
             NSLog(@"Name: %lld", [row Age]);
     }
 }
