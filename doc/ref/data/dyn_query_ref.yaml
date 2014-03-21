@@ -383,7 +383,7 @@ CATEGORIES :
       NAMES    : "subtableInColumnWithIndex:"
       DESCR    : *g_dyn_query_subtable_descr
       SUMMARY  : *g_dyn_query_subtable_summary
-      SIGNATURE: (void)subtableInColumnWithIndex:(NSUInteger)column
+      SIGNATURE: (TDBQuery *)subtableInColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
         NAME   : column
         TYPES  : NSUInteger
@@ -399,7 +399,7 @@ CATEGORIES :
       NAMES    : parent
       DESCR    : *g_dyn_query_endSubtable_descr
       SUMMARY  : *g_dyn_query_endSubtable_summary
-      SIGNATURE: (void)parent
+      SIGNATURE: (TDBQuery *)parent
       RETURN:
         TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
