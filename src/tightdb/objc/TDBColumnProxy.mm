@@ -124,7 +124,7 @@
 @end
 
 @implementation TDBColumnProxy_Binary
--(NSUInteger)find:(TDBBinary*)value
+-(NSUInteger)find:(NSData*)value
 {
     return [self.table findRowIndexWithBinary:value inColumnWithIndex:self.column];
 }

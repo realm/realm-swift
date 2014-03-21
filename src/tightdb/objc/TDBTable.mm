@@ -21,8 +21,6 @@
 #import <tightdb/objc/support.h>
 #import <tightdb/objc/TDBDescriptor.h>
 #import <tightdb/objc/TDBDescriptor_priv.h>
-#import <tightdb/objc/TDBBinary.h>
-#import <tightdb/objc/TDBBinary_priv.h>
 #import <tightdb/objc/TDBMixed.h>
 #import <tightdb/objc/TDBMixed_priv.h>
 #import <tightdb/objc/TDBColumnProxy.h>
@@ -443,9 +441,10 @@ using namespace std;
     return to_objc_string(m_table->get_string(colIndex, rowIndex));
 }
 
--(TDBBinary*)binaryInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(NSData*)binaryInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
-    return [[TDBBinary alloc] initWithBinary:m_table->get_binary(colIndex, rowIndex)];
+    tightdb::BinaryData bd = m_table->get_binary(colIndex, rowIndex);
+    return [[NSData alloc] initWithBytes:static_cast<const void *>(bd.data()) length:bd.size()];
 }
 
 -(NSDate *)dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
@@ -547,10 +546,12 @@ using namespace std;
         TDBStringType);
 }
 
--(void)setBinary:(TDBBinary*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)setBinary:(NSData*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
+    const void *data = [(NSData *)value bytes];
+    tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)value length]);
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
-        m_table->set_binary(col_ndx, row_ndx, [value getNativeBinary]);,
+        m_table->set_binary(col_ndx, row_ndx, bd);,
         TDBBinaryType);
 }
 
@@ -690,12 +691,12 @@ using namespace std;
     return YES;
 }
 
--(BOOL)TDBInsertBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(TDBBinary*)value
+-(BOOL)TDBInsertBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(NSData*)value
 {
     return [self TDBInsertBinary:col_ndx ndx:ndx value:value error:nil];
 }
 
--(BOOL)TDBInsertBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(TDBBinary*)value error:(NSError* __autoreleasing*)error
+-(BOOL)TDBInsertBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(NSData*)value error:(NSError* __autoreleasing*)error
 {
     // FIXME: Read-only errors should probably be handled by throwing
     // an exception. That is what is done in other places in this
@@ -706,8 +707,10 @@ using namespace std;
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
+    const void *data = [(NSData *)value bytes];
+    tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)value length]);
     TIGHTDB_EXCEPTION_ERRHANDLER(
-        m_table->insert_binary(col_ndx, ndx, [value getNativeBinary]);,
+        m_table->insert_binary(col_ndx, ndx, bd);,
         NO);
     return YES;
 }
@@ -894,9 +897,11 @@ using namespace std;
 {
     return m_table->find_first_string(colIndex, ObjcStringAccessor(aString));
 }
--(NSUInteger)findRowIndexWithBinary:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex
+-(NSUInteger)findRowIndexWithBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->find_first_binary(colIndex, [aBinary getNativeBinary]);
+    const void *data = [(NSData *)aBinary bytes];
+    tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)aBinary length]);
+    return m_table->find_first_binary(colIndex, bd);
 }
 -(NSUInteger)findRowIndexWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
 {
@@ -937,9 +942,11 @@ using namespace std;
     tightdb::TableView view = m_table->find_all_string(colIndex, ObjcStringAccessor(aString));
     return [TDBView viewWithTable:self andNativeView:view];
 }
--(TDBView*)findAllRowsWithBinary:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex
+-(TDBView*)findAllRowsWithBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
-    tightdb::TableView view = m_table->find_all_binary(colIndex, [aBinary getNativeBinary]);
+    const void *data = [(NSData *)aBinary bytes];
+    tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)aBinary length]);
+    tightdb::TableView view = m_table->find_all_binary(colIndex, bd);
     return [TDBView viewWithTable:self andNativeView:view];
 }
 -(TDBView*)findAllRowsWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex

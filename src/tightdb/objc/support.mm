@@ -5,7 +5,6 @@
 #import "TDBTable.h"
 #import "util.hpp"
 #import "support.h"
-#import "TDBBinary.h"
 
 using namespace tightdb;
 
@@ -90,8 +89,7 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
                 return NO;
             break; /* FIXME: remove */
         case type_Binary:
-            if ([obj isKindOfClass:[TDBBinary class]] ||
-                [obj isKindOfClass:[NSData class]])
+            if ([obj isKindOfClass:[NSData class]])
                 break;
             return NO;
         case type_Mixed:
@@ -229,15 +227,9 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 table.insert_binary(col_ndx, row_ndx, bd);
             }
             else {
-                if ([obj isKindOfClass:[TDBBinary class]]) {
-                    BinaryData bd([(TDBBinary *)obj getData], [(TDBBinary *)obj getSize]);
-                    table.insert_binary(col_ndx, row_ndx, bd);
-                }
-                else { /* NSData */
-                    const void *data = [(NSData *)obj bytes];
-                    BinaryData bd(static_cast<const char *>(data), [(NSData *)obj length]);
-                    table.insert_binary(col_ndx, row_ndx, bd);
-                }
+                const void *data = [(NSData *)obj bytes];
+                BinaryData bd(static_cast<const char *>(data), [(NSData *)obj length]);
+                table.insert_binary(col_ndx, row_ndx, bd);
             }
             break;
         case type_Table:
@@ -263,8 +255,9 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 table.insert_mixed(col_ndx, row_ndx, DateTime(time_t([(NSDate *)obj timeIntervalSince1970])));
                 break;
             }
-            if ([obj isKindOfClass:[TDBBinary class]]) {
-                BinaryData bd([(TDBBinary *)obj getData], [(TDBBinary *)obj getSize]);
+            if ([obj isKindOfClass:[NSData class]]) {
+                const void *data = [(NSData *)obj bytes];
+                tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)obj length]);
                 table.insert_mixed(col_ndx, row_ndx, bd);
                 break;
             }
@@ -448,15 +441,9 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 table.set_binary(col_ndx, row_ndx, bd);
             }
             else {
-                if ([obj isKindOfClass:[TDBBinary class]]) {
-                    BinaryData bd([(TDBBinary *)obj getData], [(TDBBinary *)obj getSize]);
-                    table.set_binary(col_ndx, row_ndx, bd);
-                }
-                else {
-                    const void *data = [(NSData *)obj bytes];
-                    BinaryData bd(static_cast<const char *>(data), [(NSData *)obj length]);
-                    table.set_binary(col_ndx, row_ndx, bd);
-                }
+                const void *data = [(NSData *)obj bytes];
+                BinaryData bd(static_cast<const char *>(data), [(NSData *)obj length]);
+                table.set_binary(col_ndx, row_ndx, bd);
             }
             break;
         case type_Table:
@@ -497,8 +484,9 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 table.set_mixed(col_ndx, row_ndx, DateTime(time_t([(NSDate *)obj timeIntervalSince1970])));
                 break;
             }
-            if ([obj isKindOfClass:[TDBBinary class]]) {
-                BinaryData bd([(TDBBinary *)obj getData], [(TDBBinary *)obj getSize]);
+            if ([obj isKindOfClass:[NSData class]]) {
+                const void *data = [(NSData *)obj bytes];
+                tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)obj length]);
                 table.set_mixed(col_ndx, row_ndx, bd);
                 break;
             }
