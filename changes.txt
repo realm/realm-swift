@@ -1,5 +1,7 @@
 2014-03-21
 ==========
+! BREAKING CHANGE: Table findFirstRow and min/max/sum/avg operations has been hidden.
+! BREAKING CHANGE: Table.appendRow has been renamed to addRow.
 ! BREAKING CHANGE: Underscope (_) removed from generated typed table classes.
 ! BREAKING CHANCE: Constructor for TDBContext has been renamed to contextWithPersistenceToFile:
 
