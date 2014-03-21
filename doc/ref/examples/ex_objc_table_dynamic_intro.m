@@ -20,9 +20,9 @@ void ex_objc_table_dynamic_intro()
         [row setString:@"Joe" inColumnWithIndex:NAME];
 
         /* And a few more rows - in a simpler manner */
-        [table appendRow:@[@32, @"Simon"]];
-        [table appendRow:@[@12, @"Steve"]];
-        [table appendRow:@[@100, @"Nick"]];
+        [table addRow:@[@32, @"Simon"]];
+        [table addRow:@[@12, @"Steve"]];
+        [table addRow:@[@100, @"Nick"]];
 
         /* Print using a cursor. */
         for (TDBRow *ite in table)

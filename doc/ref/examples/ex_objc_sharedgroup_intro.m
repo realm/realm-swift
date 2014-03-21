@@ -40,7 +40,7 @@ void ex_objc_sharedgroup_intro()
                 return NO; /* Rollback */
             }
 
-            [table appendRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
+            [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
             NSLog(@"Commit!");
             return YES; /* Commit */
         } withError:&error];

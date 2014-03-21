@@ -14,10 +14,10 @@ void ex_objc_query_dynamic_intro()
         NSUInteger const HIRED = [table addColumnWithName:@"Hired" andType:TDBBoolType];
 
         /* Add some people. */
-        [table appendRow:@[@23, @"Joe", @YES]];
-        [table appendRow:@[@32, @"Simon", @YES]];
-        [table appendRow:@[@12, @"Steve", @NO]];
-        [table appendRow:@[@59, @"Nick", @YES]];
+        [table addRow:@[@23, @"Joe", @YES]];
+        [table addRow:@[@32, @"Simon", @YES]];
+        [table addRow:@[@12, @"Steve", @NO]];
+        [table addRow:@[@59, @"Nick", @YES]];
 
         /* Set up a query to search for employees. */
         TDBQuery *q =  [[[[table where] intIsGreaterThanOrEqualTo:0 inColumnWithIndex:AGE]

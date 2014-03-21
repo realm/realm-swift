@@ -30,13 +30,13 @@
         [table addColumnWithName:@"Age" andType:TDBIntType];
        
         // Add a row to the table using a NSDictionary
-        [table appendRow:@{@"Name": @"Jill", @"Age": @21}];
+        [table addRow:@{@"Name": @"Jill", @"Age": @21}];
 
         // Add a new column dynamically
         int const HIRED = [table addColumnWithName:@"Hired" andType:TDBBoolType];
 
         // Add another row using a NSArray
-        [table appendRow:@[@"Mary", @40, @NO]];
+        [table addRow:@[@"Mary", @40, @NO]];
 
         // Change value in row
         TDBRow *row = [table rowAtIndex:0];

@@ -27,15 +27,15 @@ void tableFunc() {
     row.Hired = YES;
 
     // Add more rows
-    [people appendRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
-    [people appendRow:@{@"Name": @"Lars", @"Age": @22, @"Hired": @YES}];
-    [people appendRow:@{@"Name": @"Phil", @"Age": @43, @"Hired": @NO}];
-    [people appendRow:@{@"Name": @"Anni", @"Age": @54, @"Hired": @YES}];
+    [people addRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
+    [people addRow:@{@"Name": @"Lars", @"Age": @22, @"Hired": @YES}];
+    [people addRow:@{@"Name": @"Phil", @"Age": @43, @"Hired": @NO}];
+    [people addRow:@{@"Name": @"Anni", @"Age": @54, @"Hired": @YES}];
 
     // @@EndExample@@
 
     // @@Example: insert_at_index @@
-    [people insertRow:@{@"Name": @"Frank", @"Age": @34, @"Hired": @YES} atRowIndex:2];
+    [people insertRow:@{@"Name": @"Frank", @"Age": @34, @"Hired": @YES} atIndex:2];
 
     // @@EndExample@@
 
