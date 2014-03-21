@@ -52,14 +52,12 @@
 -(double)avgFloatColumnWithIndex:(NSUInteger)colIndex;
 -(double)avgDoubleColumnWithIndex:(NSUInteger)colIndex;
 
--(NSUInteger)findFromRowIndex:(NSUInteger)rowIndex;
-
+/* Search */
+-(NSUInteger)findFirstRow;
+-(NSUInteger)findFirstRowFromIndex:(NSUInteger)rowIndex;
 -(TDBView *)findAllRows;
 
 /* Conditions: */
-
-
-
 -(TDBQuery *)boolIsEqualTo:(bool)aBool inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)intIsEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)floatIsEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
