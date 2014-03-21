@@ -92,7 +92,7 @@ TIGHTDB_TABLE_2(MyTable2,
         NSLog(@"Mary: %zu", row);
         [_utils Eval:row==1 msg:@"Mary should have been there"];
         
-        MyTable_View *view = [[[table where].Age columnIsEqualTo:21] findAll];
+        MyTableView *view = [[[table where].Age columnIsEqualTo:21] findAll];
         size_t cnt = [view rowCount];                      // cnt = 2
         [_utils Eval:cnt == 2 msg:@"Should be two rows in view"];
         
@@ -108,7 +108,7 @@ TIGHTDB_TABLE_2(MyTable2,
         [table2 addHired:YES Age:54];
         
         // Create query (current employees between 20 and 30 years old)
-        MyTable2_Query *q = [[[table2 where].Hired columnIsEqualTo:YES]
+        MyTable2Query *q = [[[table2 where].Hired columnIsEqualTo:YES]
                              .Age   columnIsBetween:20 and_:30];
         
         // Get number of matching entries
@@ -151,7 +151,7 @@ TIGHTDB_TABLE_2(MyTable2,
         [diskTable insertEmptyRowAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
         NSLog(@"Disktable size: %i", [diskTable rowCount]);
         for (size_t i = 0; i < [diskTable rowCount]; i++) {
-            MyTable_Row *cursor = [diskTable rowAtIndex:i];
+            MyTableRow *cursor = [diskTable rowAtIndex:i];
             NSLog(@"%zu: %@", i, [cursor Name]);
             NSLog(@"%zu: %@", i, cursor.Name);
             NSLog(@"%zu: %@", i, [diskTable stringInColumnWithIndex:0 atRowIndex:i]);
@@ -198,25 +198,25 @@ TIGHTDB_TABLE_2(MyTable2,
         MyTable *diskTable = [transaction getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
         
         // 1: Iterate over table
-        for (MyTable_Row *row in diskTable)
+        for (MyTableRow *row in diskTable)
         {
             [_utils Eval:YES msg:@"Enumerator running"];
             NSLog(@"From disk: %@ is %lld years old.", row.Name, row.Age);
         }
         
         // Do a query, and get all matches as TableView
-        MyTable_View *v = [[[[diskTable where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30] findAll];
+        MyTableView *v = [[[[diskTable where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30] findAll];
         NSLog(@"View count: %i", [v rowCount]);
         // 2: Iterate over the resulting TableView
-        for (MyTable_Row *row in v) {
+        for (MyTableRow *row in v) {
             NSLog(@"%@ is %lld years old.", row.Name, row.Age);
         }
         
         // 3: Iterate over query (lazy)
         
-        MyTable_Query *qe = [[diskTable where].Age columnIsEqualTo:21];
+        MyTableQuery *qe = [[diskTable where].Age columnIsEqualTo:21];
         NSLog(@"Query lazy count: %i", [qe countRows]);
-        for (MyTable_Row *row in qe) {
+        for (MyTableRow *row in qe) {
             NSLog(@"%@ is %lld years old.", row.Name, row.Age);
         }
     }];

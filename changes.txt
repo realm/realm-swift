@@ -1,5 +1,6 @@
-2014-08-21
+2014-03-21
 ==========
+! BREAKING CHANGE: Underscope (_) removed from generated typed table classes.
 ! BREAKING CHANCE: Constructor for TDBContext has been renamed to contextWithPersistenceToFile:
 
 2014-08-20

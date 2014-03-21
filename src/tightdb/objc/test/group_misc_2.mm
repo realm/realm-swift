@@ -67,7 +67,7 @@ TIGHTDB_TABLE_2(QueryTable,
     NSLog(@"Mary: %zu", row);
     STAssertEquals(row, (size_t)1,@"Mary should have been there");
 
-    MyTable_View *view = [[[table where].Age columnIsEqualTo:21] findAll];
+    MyTableView *view = [[[table where].Age columnIsEqualTo:21] findAll];
     size_t cnt = view.rowCount;            // cnt = 2
     STAssertEquals(cnt, (size_t)2,@"Should be two rows in view");
 
@@ -83,7 +83,7 @@ TIGHTDB_TABLE_2(QueryTable,
     [table2 addHired:YES Age:54];
 
     // Create query (current employees between 20 and 30 years old)
-    MyTable2_Query* q = [[[table2 where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30];
+    MyTable2Query* q = [[[table2 where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30];
 
     // Get number of matching entries
     NSLog(@"Query count: %zu", [q countRows]);
@@ -117,7 +117,7 @@ TIGHTDB_TABLE_2(QueryTable,
 //    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
     NSLog(@"Disktable size: %zu", diskTable.rowCount);
     for (size_t i = 0; i < diskTable.rowCount; i++) {
-        MyTable_Row* cursor = [diskTable rowAtIndex:i];
+        MyTableRow* cursor = [diskTable rowAtIndex:i];
         NSLog(@"%zu: %@", i, [cursor Name]);
         NSLog(@"%zu: %@", i, cursor.Name);
         NSLog(@"%zu: %@", i, [diskTable stringInColumnWithIndex:0 atRowIndex:i]);
@@ -148,7 +148,7 @@ TIGHTDB_TABLE_2(QueryTable,
     [table addFirst:8 Second:@"The quick brown fox"];
 
     {
-        QueryTable_Query* q = [[table where].First columnIsBetween:3 and_:7]; // Between
+        QueryTableQuery* q = [[table where].First columnIsBetween:3 and_:7]; // Between
         STAssertEquals((size_t)2,   [q countRows], @"count != 2");
 //        STAssertEquals(9,   [q.First sum]); // Sum
         STAssertEquals(4.5, [q.First avg], @"Avg!=4.5"); // Average
@@ -156,31 +156,31 @@ TIGHTDB_TABLE_2(QueryTable,
 //        STAssertEquals(5,   [q.First max]); // Maximum
     }
     {
-        QueryTable_Query* q = [[table where].Second columnContains:@"quick" caseSensitive:NO]; // String contains
+        QueryTableQuery* q = [[table where].Second columnContains:@"quick" caseSensitive:NO]; // String contains
         STAssertEquals((size_t)1, [q countRows], @"count != 1");
     }
     {
-        QueryTable_Query* q = [[table where].Second columnBeginsWith:@"The" caseSensitive:NO]; // String prefix
+        QueryTableQuery* q = [[table where].Second columnBeginsWith:@"The" caseSensitive:NO]; // String prefix
         STAssertEquals((size_t)1, [q countRows], @"count != 1");
     }
     {
-        QueryTable_Query* q = [[table where].Second columnEndsWith:@"The" caseSensitive:NO]; // String suffix
+        QueryTableQuery* q = [[table where].Second columnEndsWith:@"The" caseSensitive:NO]; // String suffix
         STAssertEquals((size_t)0, [q countRows], @"count != 1");
     }
     {
-        QueryTable_Query* q = [[[table where].Second columnIsNotEqualTo:@"a" caseSensitive:NO].Second columnIsNotEqualTo:@"b" caseSensitive:NO]; // And
+        QueryTableQuery* q = [[[table where].Second columnIsNotEqualTo:@"a" caseSensitive:NO].Second columnIsNotEqualTo:@"b" caseSensitive:NO]; // And
         STAssertEquals((size_t)1, [q countRows], @"count != 1");
     }
     {
-        QueryTable_Query* q = [[[[table where].Second columnIsNotEqualTo:@"a" caseSensitive:NO] Or].Second columnIsNotEqualTo:@"b" caseSensitive:NO]; // Or
+        QueryTableQuery* q = [[[[table where].Second columnIsNotEqualTo:@"a" caseSensitive:NO] Or].Second columnIsNotEqualTo:@"b" caseSensitive:NO]; // Or
         STAssertEquals((size_t)4, [q countRows], @"count != 1");
     }
     {
-        QueryTable_Query* q = [[[[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO] group].First columnIsLessThan:3] Or].First columnIsGreaterThan:5] endGroup]; // Parentheses
+        QueryTableQuery* q = [[[[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO] group].First columnIsLessThan:3] Or].First columnIsGreaterThan:5] endGroup]; // Parentheses
         STAssertEquals((size_t)1, [q countRows], @"count != 1");
     }
     {
-        QueryTable_Query* q = [[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO].First columnIsLessThan:3] Or].First columnIsGreaterThan:5]; // No parenthesis
+        QueryTableQuery* q = [[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO].First columnIsLessThan:3] Or].First columnIsGreaterThan:5]; // No parenthesis
         STAssertEquals((size_t)2, [q countRows], @"count != 2");
         TDBView* tv = [q findAll];
         STAssertEquals((size_t)2, [tv rowCount], @"count != 2");

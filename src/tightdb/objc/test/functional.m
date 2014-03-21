@@ -29,7 +29,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
 
     FuncPeopleTable *table = [[FuncPeopleTable alloc] init];
 
-    FuncPeopleTable_Row *cursor;
+    FuncPeopleTableRow *cursor;
 
     // Add rows
     for (int i = 0; i < TABLE_SIZE; i++) {
@@ -96,7 +96,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
      *  Row in a query.
      */
 
-    FuncPeopleTable_Query *query = [[table where].Name columnIsNotEqualTo:@"Nothing is equal to this"];  // dummy query required right now
+    FuncPeopleTableQuery *query = [[table where].Name columnIsNotEqualTo:@"Nothing is equal to this"];  // dummy query required right now
     STAssertEquals([query countRows], (NSUInteger)(TABLE_SIZE-2), @"Check the size");
 
     i=0;
@@ -112,7 +112,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
      *  Row in table view.
      */
 
-    FuncPeopleTable_View *view = [[query.Hired columnIsEqualTo:YES] findAll];
+    FuncPeopleTableView *view = [[query.Hired columnIsEqualTo:YES] findAll];
     STAssertEquals([query countRows], (NSUInteger)(TABLE_SIZE-2)/2, @"Check the size");
 
     i=0;
