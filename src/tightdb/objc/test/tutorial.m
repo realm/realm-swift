@@ -162,7 +162,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     }
 
     // Write same transaction to memory buffer
-    TDBBinary* buffer = [transaction writeContextToBuffer];
+    NSData* buffer = [transaction writeContextToBuffer];
 
     // Load a transaction from memory (and print contents)
     TDBTransaction *fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];

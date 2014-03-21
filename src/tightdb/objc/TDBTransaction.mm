@@ -116,7 +116,7 @@ using namespace std;
     try {
         const void *data = [(NSData *)buffer bytes];
         tightdb::BinaryData buffer_2(static_cast<const char *>(data), [(NSData *)buffer length]);
-        bool take_ownership = true;
+        bool take_ownership = false; // FIXME: should this be true?
         group->m_group = new tightdb::Group(buffer_2, take_ownership);
     }
     catch (tightdb::InvalidDatabase& ex) {

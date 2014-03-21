@@ -41,7 +41,7 @@
 #define TIGHTDB_TYPE_Float     float
 #define TIGHTDB_TYPE_Double    double
 #define TIGHTDB_TYPE_String    NSString*
-#define TIGHTDB_TYPE_Binary    TDBBinary*
+#define TIGHTDB_TYPE_Binary    NSData *
 #define TIGHTDB_TYPE_Date      NSDate *
 #define TIGHTDB_TYPE_Mixed     TDBMixed*
 
@@ -426,32 +426,32 @@
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Binary(table, col_name) \
 @interface table##_QueryAccessor_##col_name : TDBQueryAccessorBinary \
--(table##_Query*)columnIsEqualTo:(TDBBinary*)value; \
--(table##_Query*)columnIsNotEqualTo:(TDBBinary*)value; \
--(table##_Query*)columnBeginsWith:(TDBBinary*)value; \
--(table##_Query*)columnEndsWith:(TDBBinary*)value; \
--(table##_Query*)columnContains:(TDBBinary*)value; \
+-(table##_Query*)columnIsEqualTo:(NSData*)value; \
+-(table##_Query*)columnIsNotEqualTo:(NSData*)value; \
+-(table##_Query*)columnBeginsWith:(NSData*)value; \
+-(table##_Query*)columnEndsWith:(NSData*)value; \
+-(table##_Query*)columnContains:(NSData*)value; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Binary(table, col_name) \
 @implementation table##_QueryAccessor_##col_name \
--(table##_Query*)columnIsEqualTo:(TDBBinary*)value \
+-(table##_Query*)columnIsEqualTo:(NSData*)value \
 { \
     return (table##_Query*)[super columnIsEqualTo:value]; \
 } \
--(table##_Query*)columnIsNotEqualTo:(TDBBinary*)value \
+-(table##_Query*)columnIsNotEqualTo:(NSData*)value \
 { \
     return (table##_Query*)[super columnIsNotEqualTo:value]; \
 } \
--(table##_Query*)columnBeginsWith:(TDBBinary*)value \
+-(table##_Query*)columnBeginsWith:(NSData*)value \
 { \
     return (table##_Query*)[super columnBeginsWith:value]; \
 } \
--(table##_Query*)columnEndsWith:(TDBBinary*)value \
+-(table##_Query*)columnEndsWith:(NSData*)value \
 { \
     return (table##_Query*)[super columnEndsWith:value]; \
 } \
--(table##_Query*)columnContains:(TDBBinary*)value \
+-(table##_Query*)columnContains:(NSData*)value \
 { \
     return (table##_Query*)[super columnContains:value]; \
 } \
