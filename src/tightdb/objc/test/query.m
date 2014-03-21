@@ -274,7 +274,24 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (size_t)-1, @"find");
 }
 
-
+- (void) testSubtableQuery
+{
+    TDBTable *t = [[TDBTable alloc] init];
+    
+    TDBDescriptor *d = t.descriptor;
+    TDBDescriptor *subDesc = [d addColumnTable:@"subtable"];
+    [subDesc addColumnWithName:@"subCol" andType:TDBBoolType];
+    [t addEmptyRow];
+    STAssertEquals(t.rowCount, (NSUInteger)1,@"one row added");
+    
+    TDBTable * subTable = [t tableInColumnWithIndex:0 atRowIndex:0];
+    [subTable addEmptyRow];
+    [subTable setBool:YES inColumnWithIndex:0 atRowIndex:0];
+    TDBQuery *q = [t where];
+    
+    TDBView *v = [[[[q subtableInColumnWithIndex:0] boolIsEqualTo:YES inColumnWithIndex:0] parent] findAllRows];
+    STAssertEquals(v.rowCount, (NSUInteger)1,@"one match");
+}
 
 
 @end

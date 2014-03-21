@@ -128,13 +128,15 @@ using namespace std;
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(m_query->end_group();, self, &m_error);
     return self;
 }
--(void)subtableInColumnWithIndex:(NSUInteger)column
+-(TDBQuery *)subtableInColumnWithIndex:(NSUInteger)column
 {
     m_query->subtable(column);
+    return self;
 }
--(void)parent
+-(TDBQuery *)parent
 {
     m_query->end_subtable();
+    return self;
 }
 
 -(NSUInteger)countRows
