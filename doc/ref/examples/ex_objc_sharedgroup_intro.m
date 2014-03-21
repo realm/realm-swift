@@ -19,7 +19,7 @@ void ex_objc_sharedgroup_intro()
         [fm removeItemAtPath:@"sharedgrouptest.tightdb" error:nil];
         [fm removeItemAtPath:@"sharedgrouptest.tightdb.lock" error:nil];
 
-        TDBContext *context = [TDBContext initWithFile:@"sharedgrouptest.tightdb" withError:nil];
+        TDBContext *context = [TDBContext contextWithPersistenceToFile:@"sharedgrouptest.tightdb" withError:nil];
         if (!context) {
             NSLog(@"Error");
         }
