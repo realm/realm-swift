@@ -20,7 +20,7 @@ void tableFunc() {
     // @@Example: insert_rows @@
 
     // Add a row
-    PeopleTable_Row *row;
+    PeopleTableRow *row;
     row = [people addEmptyRow];
     row.Name  = @"John";
     row.Age   = 21;
@@ -52,7 +52,7 @@ void tableFunc() {
     NSLog(@"Name: %@", name);
 
     // Using a cursor
-    PeopleTable_Row *myRow = people[5];
+    PeopleTableRow *myRow = people[5];
     int64_t age = myRow.Age;                           // =&gt; 54
     NSLog(@"Age: %lli", age);
     BOOL hired  = myRow.Hired;                         // =&gt; true
@@ -80,7 +80,7 @@ void tableFunc() {
 
     // @@Example: iteration @@
     for (NSUInteger i = 0; i < people.rowCount; ++i) {
-        PeopleTable_Row *row = people[i];
+        PeopleTableRow *row = people[i];
         NSLog(@"%@ is %lld years old", row.Name, row.Age);
     }
     // @@EndExample@@
@@ -93,7 +93,7 @@ void tableFunc() {
 
     // @@Example: advanced_search @@
     // Create query (current employees between 20 and 30 years old)
-    PeopleTable_Query *q = [[[people where].Hired columnIsEqualTo:YES]
+    PeopleTableQuery *q = [[[people where].Hired columnIsEqualTo:YES]
                                            .Age   columnIsBetween:20 and_:30];
 
     // Get number of matching entries
@@ -105,10 +105,10 @@ void tableFunc() {
     NSLog(@"Avg age: %f", avg);
 
     // Execute the query and return a table (view)
-    PeopleTable_View *res = [q findAll];
+    PeopleTableView *res = [q findAll];
 
     // fast emunaration on view
-    for (PeopleTable_Row *r in res)
+    for (PeopleTableRow *r in res)
         NSLog(@"%@ is %lld years old", r.Name, r.Age);
 
     // @@EndExample@@
@@ -144,7 +144,7 @@ void sharedGroupFunc() {
                                                 asTableClass:[PeopleTable class]];
 
         // Interate over all rows in table
-        for (PeopleTable_Row *row in table) {
+        for (PeopleTableRow *row in table) {
             NSLog(@"Name: %@", row.Name);
         }
     }];
