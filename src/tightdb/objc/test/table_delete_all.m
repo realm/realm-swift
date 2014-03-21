@@ -83,17 +83,11 @@
     [table removeRowAtIndex:0];
     [table removeRowAtIndex:5];
     STAssertEquals([table rowCount], (size_t)12, @"Size should have been 12");
-#ifdef TIGHTDB_DEBUG
-    [table verify];
-#endif
 
     // Test Clear
     [table removeAllRows];
     STAssertEquals([table rowCount], (size_t)0, @"Size should have been zero");
 
-#ifdef TIGHTDB_DEBUG
-    [table verify];
-#endif
 }
 
 @end
