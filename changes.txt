@@ -1,3 +1,7 @@
+2014-03-21
+==========
+! BREAKING CHANCE: TDBBinary has been removed; use NSData instead.
+
 2014-08-20
 ==========
 * [TDBQuery parent] and [TDBQuery subtable:] selectors now return self.
