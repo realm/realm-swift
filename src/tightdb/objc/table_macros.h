@@ -41,38 +41,38 @@
 
 
 #define TIGHTDB_TABLE_DEF_1(TableName, CName1, CType1) \
-@interface TableName##_Row: TDBRow \
+@interface TableName##Row: TDBRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 @end \
-@class TableName##_Query; \
-@class TableName##_View; \
+@class TableName##Query; \
+@class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-@interface TableName##_Query: TDBQuery \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
--(TableName##_Query*)group; \
--(TableName##_Query*)Or; \
--(TableName##_Query*)endGroup; \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column; \
--(TableName##_Query*)parent; \
--(TableName##_View*)findAll; \
+@interface TableName##Query: TDBQuery \
+@property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
+-(TableName##Query*)group; \
+-(TableName##Query*)Or; \
+-(TableName##Query*)endGroup; \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column; \
+-(TableName##Query*)parent; \
+-(TableName##View*)findAll; \
 @end \
 @interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1; \
--(TableName##_Query*)where; \
--(TableName##_Row*)addEmptyRow; \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtLastIndex; \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
+-(TableName##Query*)where; \
+-(TableName##Row*)addEmptyRow; \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtLastIndex; \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##_View: TDBView \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
+@interface TableName##View: TDBView \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_1(TableName, CName1, CType1) \
-@implementation TableName##_Row \
+@implementation TableName##Row \
 { \
     TDBAccessor* _##CName1; \
 } \
@@ -86,9 +86,9 @@ TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 } \
 TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
 @end \
-@implementation TableName##_Query \
+@implementation TableName##Query \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(long)getFastEnumStart \
 { \
@@ -98,53 +98,53 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
 { \
     return [self findFirstRowFromIndex:ndx]; \
 } \
--(TableName##_Row*)getRow:(long)ndx \
+-(TableName##Row*)getRow:(long)ndx \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:ndx]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
 -(id)initWithTable:(TDBTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
-        _CName1 = [[TableName##_QueryAccessor_##CName1 alloc] initWithColumn:0 query:self]; \
+        _CName1 = [[TableName##QueryAccessor##CName1 alloc] initWithColumn:0 query:self]; \
     } \
     return self; \
 } \
--(TableName##_Query*)group \
+-(TableName##Query*)group \
 { \
     [super group]; \
     return self; \
 } \
--(TableName##_Query*)Or \
+-(TableName##Query*)Or \
 { \
     [super Or]; \
     return self; \
 } \
--(TableName##_Query*)endGroup \
+-(TableName##Query*)endGroup \
 { \
     [super endGroup]; \
     return self; \
 } \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column \
 { \
     [super subtableInColumnWithIndex:column]; \
     return self; \
 } \
--(TableName##_Query*)parent \
+-(TableName##Query*)parent \
 { \
     [super parent]; \
     return self; \
 } \
--(TableName##_View*)findAll \
+-(TableName##View*)findAll \
 { \
-    return [[TableName##_View alloc] _initWithQuery:self]; \
+    return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
 @implementation TableName \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 \
@@ -178,34 +178,34 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
     TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     [self TDBInsertDone]; \
 } \
--(TableName##_Query*)where \
+-(TableName##Query*)where \
 { \
-    return [[TableName##_Query alloc] initWithTable:self]; \
+    return [[TableName##Query alloc] initWithTable:self]; \
 } \
--(TableName##_Row*)addEmptyRow \
+-(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
 } \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
-	return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtLastIndex \
+-(TableName##Row*)rowAtLastIndex \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:self.rowCount-1]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:self.rowCount-1]; \
 } \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
     [super insertEmptyRowAtIndex:ndx]; \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self ndx:0]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
 +(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
@@ -236,17 +236,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
     return YES; \
 } \
 @end \
-@implementation TableName##_View \
+@implementation TableName##View \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
+    return [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
 } \
 @end
 
@@ -256,42 +256,42 @@ TIGHTDB_TABLE_IMPL_1(TableName, CType1, CName1)
 
 
 #define TIGHTDB_TABLE_DEF_2(TableName, CName1, CType1, CName2, CType2) \
-@interface TableName##_Row: TDBRow \
+@interface TableName##Row: TDBRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 @end \
-@class TableName##_Query; \
-@class TableName##_View; \
+@class TableName##Query; \
+@class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
-@interface TableName##_Query: TDBQuery \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
--(TableName##_Query*)group; \
--(TableName##_Query*)Or; \
--(TableName##_Query*)endGroup; \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column; \
--(TableName##_Query*)parent; \
--(TableName##_View*)findAll; \
+@interface TableName##Query: TDBQuery \
+@property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
+-(TableName##Query*)group; \
+-(TableName##Query*)Or; \
+-(TableName##Query*)endGroup; \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column; \
+-(TableName##Query*)parent; \
+-(TableName##View*)findAll; \
 @end \
 @interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2; \
--(TableName##_Query*)where; \
--(TableName##_Row*)addEmptyRow; \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtLastIndex; \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
+-(TableName##Query*)where; \
+-(TableName##Row*)addEmptyRow; \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtLastIndex; \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##_View: TDBView \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
+@interface TableName##View: TDBView \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_2(TableName, CName1, CType1, CName2, CType2) \
-@implementation TableName##_Row \
+@implementation TableName##Row \
 { \
     TDBAccessor* _##CName1; \
     TDBAccessor* _##CName2; \
@@ -308,9 +308,9 @@ TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
 @end \
-@implementation TableName##_Query \
+@implementation TableName##Query \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(long)getFastEnumStart \
 { \
@@ -320,9 +320,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
 { \
     return [self findFirstRowFromIndex:ndx]; \
 } \
--(TableName##_Row*)getRow:(long)ndx \
+-(TableName##Row*)getRow:(long)ndx \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:ndx]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -330,46 +330,46 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
-        _CName1 = [[TableName##_QueryAccessor_##CName1 alloc] initWithColumn:0 query:self]; \
-        _CName2 = [[TableName##_QueryAccessor_##CName2 alloc] initWithColumn:1 query:self]; \
+        _CName1 = [[TableName##QueryAccessor##CName1 alloc] initWithColumn:0 query:self]; \
+        _CName2 = [[TableName##QueryAccessor##CName2 alloc] initWithColumn:1 query:self]; \
     } \
     return self; \
 } \
--(TableName##_Query*)group \
+-(TableName##Query*)group \
 { \
     [super group]; \
     return self; \
 } \
--(TableName##_Query*)Or \
+-(TableName##Query*)Or \
 { \
     [super Or]; \
     return self; \
 } \
--(TableName##_Query*)endGroup \
+-(TableName##Query*)endGroup \
 { \
     [super endGroup]; \
     return self; \
 } \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column \
 { \
     [super subtableInColumnWithIndex:column]; \
     return self; \
 } \
--(TableName##_Query*)parent \
+-(TableName##Query*)parent \
 { \
     [super parent]; \
     return self; \
 } \
--(TableName##_View*)findAll \
+-(TableName##View*)findAll \
 { \
-    return [[TableName##_View alloc] _initWithQuery:self]; \
+    return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
 @implementation TableName \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
@@ -408,34 +408,34 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
     TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
     [self TDBInsertDone]; \
 } \
--(TableName##_Query*)where \
+-(TableName##Query*)where \
 { \
-    return [[TableName##_Query alloc] initWithTable:self]; \
+    return [[TableName##Query alloc] initWithTable:self]; \
 } \
--(TableName##_Row*)addEmptyRow \
+-(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
 } \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
-	return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtLastIndex \
+-(TableName##Row*)rowAtLastIndex \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:self.rowCount-1]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:self.rowCount-1]; \
 } \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
     [super insertEmptyRowAtIndex:ndx]; \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self ndx:0]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
 +(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
@@ -468,17 +468,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
     return YES; \
 } \
 @end \
-@implementation TableName##_View \
+@implementation TableName##View \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
+    return [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
 } \
 @end
 
@@ -488,26 +488,26 @@ TIGHTDB_TABLE_IMPL_2(TableName, CType1, CName1, CType2, CName2)
 
 
 #define TIGHTDB_TABLE_DEF_3(TableName, CName1, CType1, CName2, CType2, CName3, CType3) \
-@interface TableName##_Row: TDBRow \
+@interface TableName##Row: TDBRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
 @end \
-@class TableName##_Query; \
-@class TableName##_View; \
+@class TableName##Query; \
+@class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
-@interface TableName##_Query: TDBQuery \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
--(TableName##_Query*)group; \
--(TableName##_Query*)Or; \
--(TableName##_Query*)endGroup; \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column; \
--(TableName##_Query*)parent; \
--(TableName##_View*)findAll; \
+@interface TableName##Query: TDBQuery \
+@property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
+-(TableName##Query*)group; \
+-(TableName##Query*)Or; \
+-(TableName##Query*)endGroup; \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column; \
+-(TableName##Query*)parent; \
+-(TableName##View*)findAll; \
 @end \
 @interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
@@ -515,19 +515,19 @@ TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3; \
--(TableName##_Query*)where; \
--(TableName##_Row*)addEmptyRow; \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtLastIndex; \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
+-(TableName##Query*)where; \
+-(TableName##Row*)addEmptyRow; \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtLastIndex; \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##_View: TDBView \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
+@interface TableName##View: TDBView \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_3(TableName, CName1, CType1, CName2, CType2, CName3, CType3) \
-@implementation TableName##_Row \
+@implementation TableName##Row \
 { \
     TDBAccessor* _##CName1; \
     TDBAccessor* _##CName2; \
@@ -547,9 +547,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
 @end \
-@implementation TableName##_Query \
+@implementation TableName##Query \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(long)getFastEnumStart \
 { \
@@ -559,9 +559,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
 { \
     return [self findFirstRowFromIndex:ndx]; \
 } \
--(TableName##_Row*)getRow:(long)ndx \
+-(TableName##Row*)getRow:(long)ndx \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:ndx]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -570,40 +570,40 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
-        _CName1 = [[TableName##_QueryAccessor_##CName1 alloc] initWithColumn:0 query:self]; \
-        _CName2 = [[TableName##_QueryAccessor_##CName2 alloc] initWithColumn:1 query:self]; \
-        _CName3 = [[TableName##_QueryAccessor_##CName3 alloc] initWithColumn:2 query:self]; \
+        _CName1 = [[TableName##QueryAccessor##CName1 alloc] initWithColumn:0 query:self]; \
+        _CName2 = [[TableName##QueryAccessor##CName2 alloc] initWithColumn:1 query:self]; \
+        _CName3 = [[TableName##QueryAccessor##CName3 alloc] initWithColumn:2 query:self]; \
     } \
     return self; \
 } \
--(TableName##_Query*)group \
+-(TableName##Query*)group \
 { \
     [super group]; \
     return self; \
 } \
--(TableName##_Query*)Or \
+-(TableName##Query*)Or \
 { \
     [super Or]; \
     return self; \
 } \
--(TableName##_Query*)endGroup \
+-(TableName##Query*)endGroup \
 { \
     [super endGroup]; \
     return self; \
 } \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column \
 { \
     [super subtableInColumnWithIndex:column]; \
     return self; \
 } \
--(TableName##_Query*)parent \
+-(TableName##Query*)parent \
 { \
     [super parent]; \
     return self; \
 } \
--(TableName##_View*)findAll \
+-(TableName##View*)findAll \
 { \
-    return [[TableName##_View alloc] _initWithQuery:self]; \
+    return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -611,7 +611,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
 @implementation TableName \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
@@ -655,34 +655,34 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
     TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
     [self TDBInsertDone]; \
 } \
--(TableName##_Query*)where \
+-(TableName##Query*)where \
 { \
-    return [[TableName##_Query alloc] initWithTable:self]; \
+    return [[TableName##Query alloc] initWithTable:self]; \
 } \
--(TableName##_Row*)addEmptyRow \
+-(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
 } \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
-	return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtLastIndex \
+-(TableName##Row*)rowAtLastIndex \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:self.rowCount-1]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:self.rowCount-1]; \
 } \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
     [super insertEmptyRowAtIndex:ndx]; \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self ndx:0]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
 +(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
@@ -717,17 +717,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
     return YES; \
 } \
 @end \
-@implementation TableName##_View \
+@implementation TableName##View \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
+    return [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
 } \
 @end
 
@@ -737,29 +737,29 @@ TIGHTDB_TABLE_IMPL_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3)
 
 
 #define TIGHTDB_TABLE_DEF_4(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4) \
-@interface TableName##_Row: TDBRow \
+@interface TableName##Row: TDBRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
 TIGHTDB_ROW_PROPERTY_DEF(CName4, CType4) \
 @end \
-@class TableName##_Query; \
-@class TableName##_View; \
+@class TableName##Query; \
+@class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
-@interface TableName##_Query: TDBQuery \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName4* CName4; \
--(TableName##_Query*)group; \
--(TableName##_Query*)Or; \
--(TableName##_Query*)endGroup; \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column; \
--(TableName##_Query*)parent; \
--(TableName##_View*)findAll; \
+@interface TableName##Query: TDBQuery \
+@property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName4* CName4; \
+-(TableName##Query*)group; \
+-(TableName##Query*)Or; \
+-(TableName##Query*)endGroup; \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column; \
+-(TableName##Query*)parent; \
+-(TableName##View*)findAll; \
 @end \
 @interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
@@ -768,19 +768,19 @@ TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
 TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4; \
--(TableName##_Query*)where; \
--(TableName##_Row*)addEmptyRow; \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtLastIndex; \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
+-(TableName##Query*)where; \
+-(TableName##Row*)addEmptyRow; \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtLastIndex; \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##_View: TDBView \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
+@interface TableName##View: TDBView \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_4(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4) \
-@implementation TableName##_Row \
+@implementation TableName##Row \
 { \
     TDBAccessor* _##CName1; \
     TDBAccessor* _##CName2; \
@@ -803,9 +803,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
 @end \
-@implementation TableName##_Query \
+@implementation TableName##Query \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(long)getFastEnumStart \
 { \
@@ -815,9 +815,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
 { \
     return [self findFirstRowFromIndex:ndx]; \
 } \
--(TableName##_Row*)getRow:(long)ndx \
+-(TableName##Row*)getRow:(long)ndx \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:ndx]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -827,41 +827,41 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
-        _CName1 = [[TableName##_QueryAccessor_##CName1 alloc] initWithColumn:0 query:self]; \
-        _CName2 = [[TableName##_QueryAccessor_##CName2 alloc] initWithColumn:1 query:self]; \
-        _CName3 = [[TableName##_QueryAccessor_##CName3 alloc] initWithColumn:2 query:self]; \
-        _CName4 = [[TableName##_QueryAccessor_##CName4 alloc] initWithColumn:3 query:self]; \
+        _CName1 = [[TableName##QueryAccessor##CName1 alloc] initWithColumn:0 query:self]; \
+        _CName2 = [[TableName##QueryAccessor##CName2 alloc] initWithColumn:1 query:self]; \
+        _CName3 = [[TableName##QueryAccessor##CName3 alloc] initWithColumn:2 query:self]; \
+        _CName4 = [[TableName##QueryAccessor##CName4 alloc] initWithColumn:3 query:self]; \
     } \
     return self; \
 } \
--(TableName##_Query*)group \
+-(TableName##Query*)group \
 { \
     [super group]; \
     return self; \
 } \
--(TableName##_Query*)Or \
+-(TableName##Query*)Or \
 { \
     [super Or]; \
     return self; \
 } \
--(TableName##_Query*)endGroup \
+-(TableName##Query*)endGroup \
 { \
     [super endGroup]; \
     return self; \
 } \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column \
 { \
     [super subtableInColumnWithIndex:column]; \
     return self; \
 } \
--(TableName##_Query*)parent \
+-(TableName##Query*)parent \
 { \
     [super parent]; \
     return self; \
 } \
--(TableName##_View*)findAll \
+-(TableName##View*)findAll \
 { \
-    return [[TableName##_View alloc] _initWithQuery:self]; \
+    return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -870,7 +870,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
 @implementation TableName \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
@@ -919,34 +919,34 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
     TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
     [self TDBInsertDone]; \
 } \
--(TableName##_Query*)where \
+-(TableName##Query*)where \
 { \
-    return [[TableName##_Query alloc] initWithTable:self]; \
+    return [[TableName##Query alloc] initWithTable:self]; \
 } \
--(TableName##_Row*)addEmptyRow \
+-(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
 } \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
-	return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtLastIndex \
+-(TableName##Row*)rowAtLastIndex \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:self.rowCount-1]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:self.rowCount-1]; \
 } \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
     [super insertEmptyRowAtIndex:ndx]; \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self ndx:0]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
 +(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
@@ -983,17 +983,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
     return YES; \
 } \
 @end \
-@implementation TableName##_View \
+@implementation TableName##View \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
+    return [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
 } \
 @end
 
@@ -1003,32 +1003,32 @@ TIGHTDB_TABLE_IMPL_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_5(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5) \
-@interface TableName##_Row: TDBRow \
+@interface TableName##Row: TDBRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
 TIGHTDB_ROW_PROPERTY_DEF(CName4, CType4) \
 TIGHTDB_ROW_PROPERTY_DEF(CName5, CType5) \
 @end \
-@class TableName##_Query; \
-@class TableName##_View; \
+@class TableName##Query; \
+@class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
-@interface TableName##_Query: TDBQuery \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName4* CName4; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName5* CName5; \
--(TableName##_Query*)group; \
--(TableName##_Query*)Or; \
--(TableName##_Query*)endGroup; \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column; \
--(TableName##_Query*)parent; \
--(TableName##_View*)findAll; \
+@interface TableName##Query: TDBQuery \
+@property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName4* CName4; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName5* CName5; \
+-(TableName##Query*)group; \
+-(TableName##Query*)Or; \
+-(TableName##Query*)endGroup; \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column; \
+-(TableName##Query*)parent; \
+-(TableName##View*)findAll; \
 @end \
 @interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
@@ -1038,19 +1038,19 @@ TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
 TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5; \
--(TableName##_Query*)where; \
--(TableName##_Row*)addEmptyRow; \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtLastIndex; \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
+-(TableName##Query*)where; \
+-(TableName##Row*)addEmptyRow; \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtLastIndex; \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##_View: TDBView \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
+@interface TableName##View: TDBView \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_5(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5) \
-@implementation TableName##_Row \
+@implementation TableName##Row \
 { \
     TDBAccessor* _##CName1; \
     TDBAccessor* _##CName2; \
@@ -1076,9 +1076,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
 @end \
-@implementation TableName##_Query \
+@implementation TableName##Query \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(long)getFastEnumStart \
 { \
@@ -1088,9 +1088,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
 { \
     return [self findFirstRowFromIndex:ndx]; \
 } \
--(TableName##_Row*)getRow:(long)ndx \
+-(TableName##Row*)getRow:(long)ndx \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:ndx]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -1101,42 +1101,42 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
-        _CName1 = [[TableName##_QueryAccessor_##CName1 alloc] initWithColumn:0 query:self]; \
-        _CName2 = [[TableName##_QueryAccessor_##CName2 alloc] initWithColumn:1 query:self]; \
-        _CName3 = [[TableName##_QueryAccessor_##CName3 alloc] initWithColumn:2 query:self]; \
-        _CName4 = [[TableName##_QueryAccessor_##CName4 alloc] initWithColumn:3 query:self]; \
-        _CName5 = [[TableName##_QueryAccessor_##CName5 alloc] initWithColumn:4 query:self]; \
+        _CName1 = [[TableName##QueryAccessor##CName1 alloc] initWithColumn:0 query:self]; \
+        _CName2 = [[TableName##QueryAccessor##CName2 alloc] initWithColumn:1 query:self]; \
+        _CName3 = [[TableName##QueryAccessor##CName3 alloc] initWithColumn:2 query:self]; \
+        _CName4 = [[TableName##QueryAccessor##CName4 alloc] initWithColumn:3 query:self]; \
+        _CName5 = [[TableName##QueryAccessor##CName5 alloc] initWithColumn:4 query:self]; \
     } \
     return self; \
 } \
--(TableName##_Query*)group \
+-(TableName##Query*)group \
 { \
     [super group]; \
     return self; \
 } \
--(TableName##_Query*)Or \
+-(TableName##Query*)Or \
 { \
     [super Or]; \
     return self; \
 } \
--(TableName##_Query*)endGroup \
+-(TableName##Query*)endGroup \
 { \
     [super endGroup]; \
     return self; \
 } \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column \
 { \
     [super subtableInColumnWithIndex:column]; \
     return self; \
 } \
--(TableName##_Query*)parent \
+-(TableName##Query*)parent \
 { \
     [super parent]; \
     return self; \
 } \
--(TableName##_View*)findAll \
+-(TableName##View*)findAll \
 { \
-    return [[TableName##_View alloc] _initWithQuery:self]; \
+    return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -1146,7 +1146,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
 @implementation TableName \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
@@ -1200,34 +1200,34 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
     TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
     [self TDBInsertDone]; \
 } \
--(TableName##_Query*)where \
+-(TableName##Query*)where \
 { \
-    return [[TableName##_Query alloc] initWithTable:self]; \
+    return [[TableName##Query alloc] initWithTable:self]; \
 } \
--(TableName##_Row*)addEmptyRow \
+-(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
 } \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
-	return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtLastIndex \
+-(TableName##Row*)rowAtLastIndex \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:self.rowCount-1]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:self.rowCount-1]; \
 } \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
     [super insertEmptyRowAtIndex:ndx]; \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self ndx:0]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
 +(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
@@ -1266,17 +1266,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
     return YES; \
 } \
 @end \
-@implementation TableName##_View \
+@implementation TableName##View \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
+    return [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
 } \
 @end
 
@@ -1286,7 +1286,7 @@ TIGHTDB_TABLE_IMPL_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_6(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6) \
-@interface TableName##_Row: TDBRow \
+@interface TableName##Row: TDBRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -1294,27 +1294,27 @@ TIGHTDB_ROW_PROPERTY_DEF(CName4, CType4) \
 TIGHTDB_ROW_PROPERTY_DEF(CName5, CType5) \
 TIGHTDB_ROW_PROPERTY_DEF(CName6, CType6) \
 @end \
-@class TableName##_Query; \
-@class TableName##_View; \
+@class TableName##Query; \
+@class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
-@interface TableName##_Query: TDBQuery \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName4* CName4; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName5* CName5; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName6* CName6; \
--(TableName##_Query*)group; \
--(TableName##_Query*)Or; \
--(TableName##_Query*)endGroup; \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column; \
--(TableName##_Query*)parent; \
--(TableName##_View*)findAll; \
+@interface TableName##Query: TDBQuery \
+@property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName4* CName4; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName5* CName5; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName6* CName6; \
+-(TableName##Query*)group; \
+-(TableName##Query*)Or; \
+-(TableName##Query*)endGroup; \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column; \
+-(TableName##Query*)parent; \
+-(TableName##View*)findAll; \
 @end \
 @interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
@@ -1325,19 +1325,19 @@ TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
 TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6; \
--(TableName##_Query*)where; \
--(TableName##_Row*)addEmptyRow; \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtLastIndex; \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
+-(TableName##Query*)where; \
+-(TableName##Row*)addEmptyRow; \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtLastIndex; \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##_View: TDBView \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
+@interface TableName##View: TDBView \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_6(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6) \
-@implementation TableName##_Row \
+@implementation TableName##Row \
 { \
     TDBAccessor* _##CName1; \
     TDBAccessor* _##CName2; \
@@ -1366,9 +1366,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
 @end \
-@implementation TableName##_Query \
+@implementation TableName##Query \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(long)getFastEnumStart \
 { \
@@ -1378,9 +1378,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
 { \
     return [self findFirstRowFromIndex:ndx]; \
 } \
--(TableName##_Row*)getRow:(long)ndx \
+-(TableName##Row*)getRow:(long)ndx \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:ndx]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -1392,43 +1392,43 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
-        _CName1 = [[TableName##_QueryAccessor_##CName1 alloc] initWithColumn:0 query:self]; \
-        _CName2 = [[TableName##_QueryAccessor_##CName2 alloc] initWithColumn:1 query:self]; \
-        _CName3 = [[TableName##_QueryAccessor_##CName3 alloc] initWithColumn:2 query:self]; \
-        _CName4 = [[TableName##_QueryAccessor_##CName4 alloc] initWithColumn:3 query:self]; \
-        _CName5 = [[TableName##_QueryAccessor_##CName5 alloc] initWithColumn:4 query:self]; \
-        _CName6 = [[TableName##_QueryAccessor_##CName6 alloc] initWithColumn:5 query:self]; \
+        _CName1 = [[TableName##QueryAccessor##CName1 alloc] initWithColumn:0 query:self]; \
+        _CName2 = [[TableName##QueryAccessor##CName2 alloc] initWithColumn:1 query:self]; \
+        _CName3 = [[TableName##QueryAccessor##CName3 alloc] initWithColumn:2 query:self]; \
+        _CName4 = [[TableName##QueryAccessor##CName4 alloc] initWithColumn:3 query:self]; \
+        _CName5 = [[TableName##QueryAccessor##CName5 alloc] initWithColumn:4 query:self]; \
+        _CName6 = [[TableName##QueryAccessor##CName6 alloc] initWithColumn:5 query:self]; \
     } \
     return self; \
 } \
--(TableName##_Query*)group \
+-(TableName##Query*)group \
 { \
     [super group]; \
     return self; \
 } \
--(TableName##_Query*)Or \
+-(TableName##Query*)Or \
 { \
     [super Or]; \
     return self; \
 } \
--(TableName##_Query*)endGroup \
+-(TableName##Query*)endGroup \
 { \
     [super endGroup]; \
     return self; \
 } \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column \
 { \
     [super subtableInColumnWithIndex:column]; \
     return self; \
 } \
--(TableName##_Query*)parent \
+-(TableName##Query*)parent \
 { \
     [super parent]; \
     return self; \
 } \
--(TableName##_View*)findAll \
+-(TableName##View*)findAll \
 { \
-    return [[TableName##_View alloc] _initWithQuery:self]; \
+    return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -1439,7 +1439,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
 @implementation TableName \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
@@ -1498,34 +1498,34 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
     TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
     [self TDBInsertDone]; \
 } \
--(TableName##_Query*)where \
+-(TableName##Query*)where \
 { \
-    return [[TableName##_Query alloc] initWithTable:self]; \
+    return [[TableName##Query alloc] initWithTable:self]; \
 } \
--(TableName##_Row*)addEmptyRow \
+-(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
 } \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
-	return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtLastIndex \
+-(TableName##Row*)rowAtLastIndex \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:self.rowCount-1]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:self.rowCount-1]; \
 } \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
     [super insertEmptyRowAtIndex:ndx]; \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self ndx:0]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
 +(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
@@ -1566,17 +1566,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
     return YES; \
 } \
 @end \
-@implementation TableName##_View \
+@implementation TableName##View \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
+    return [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
 } \
 @end
 
@@ -1586,7 +1586,7 @@ TIGHTDB_TABLE_IMPL_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_7(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7) \
-@interface TableName##_Row: TDBRow \
+@interface TableName##Row: TDBRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -1595,8 +1595,8 @@ TIGHTDB_ROW_PROPERTY_DEF(CName5, CType5) \
 TIGHTDB_ROW_PROPERTY_DEF(CName6, CType6) \
 TIGHTDB_ROW_PROPERTY_DEF(CName7, CType7) \
 @end \
-@class TableName##_Query; \
-@class TableName##_View; \
+@class TableName##Query; \
+@class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
@@ -1604,20 +1604,20 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
-@interface TableName##_Query: TDBQuery \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName4* CName4; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName5* CName5; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName6* CName6; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName7* CName7; \
--(TableName##_Query*)group; \
--(TableName##_Query*)Or; \
--(TableName##_Query*)endGroup; \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column; \
--(TableName##_Query*)parent; \
--(TableName##_View*)findAll; \
+@interface TableName##Query: TDBQuery \
+@property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName4* CName4; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName5* CName5; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName6* CName6; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName7* CName7; \
+-(TableName##Query*)group; \
+-(TableName##Query*)Or; \
+-(TableName##Query*)endGroup; \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column; \
+-(TableName##Query*)parent; \
+-(TableName##View*)findAll; \
 @end \
 @interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
@@ -1629,19 +1629,19 @@ TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
 TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7; \
--(TableName##_Query*)where; \
--(TableName##_Row*)addEmptyRow; \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtLastIndex; \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
+-(TableName##Query*)where; \
+-(TableName##Row*)addEmptyRow; \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtLastIndex; \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##_View: TDBView \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
+@interface TableName##View: TDBView \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_7(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7) \
-@implementation TableName##_Row \
+@implementation TableName##Row \
 { \
     TDBAccessor* _##CName1; \
     TDBAccessor* _##CName2; \
@@ -1673,9 +1673,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName7, CType7) \
 @end \
-@implementation TableName##_Query \
+@implementation TableName##Query \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(long)getFastEnumStart \
 { \
@@ -1685,9 +1685,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName7, CType7) \
 { \
     return [self findFirstRowFromIndex:ndx]; \
 } \
--(TableName##_Row*)getRow:(long)ndx \
+-(TableName##Row*)getRow:(long)ndx \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:ndx]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -1700,44 +1700,44 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName7, CType7) \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
-        _CName1 = [[TableName##_QueryAccessor_##CName1 alloc] initWithColumn:0 query:self]; \
-        _CName2 = [[TableName##_QueryAccessor_##CName2 alloc] initWithColumn:1 query:self]; \
-        _CName3 = [[TableName##_QueryAccessor_##CName3 alloc] initWithColumn:2 query:self]; \
-        _CName4 = [[TableName##_QueryAccessor_##CName4 alloc] initWithColumn:3 query:self]; \
-        _CName5 = [[TableName##_QueryAccessor_##CName5 alloc] initWithColumn:4 query:self]; \
-        _CName6 = [[TableName##_QueryAccessor_##CName6 alloc] initWithColumn:5 query:self]; \
-        _CName7 = [[TableName##_QueryAccessor_##CName7 alloc] initWithColumn:6 query:self]; \
+        _CName1 = [[TableName##QueryAccessor##CName1 alloc] initWithColumn:0 query:self]; \
+        _CName2 = [[TableName##QueryAccessor##CName2 alloc] initWithColumn:1 query:self]; \
+        _CName3 = [[TableName##QueryAccessor##CName3 alloc] initWithColumn:2 query:self]; \
+        _CName4 = [[TableName##QueryAccessor##CName4 alloc] initWithColumn:3 query:self]; \
+        _CName5 = [[TableName##QueryAccessor##CName5 alloc] initWithColumn:4 query:self]; \
+        _CName6 = [[TableName##QueryAccessor##CName6 alloc] initWithColumn:5 query:self]; \
+        _CName7 = [[TableName##QueryAccessor##CName7 alloc] initWithColumn:6 query:self]; \
     } \
     return self; \
 } \
--(TableName##_Query*)group \
+-(TableName##Query*)group \
 { \
     [super group]; \
     return self; \
 } \
--(TableName##_Query*)Or \
+-(TableName##Query*)Or \
 { \
     [super Or]; \
     return self; \
 } \
--(TableName##_Query*)endGroup \
+-(TableName##Query*)endGroup \
 { \
     [super endGroup]; \
     return self; \
 } \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column \
 { \
     [super subtableInColumnWithIndex:column]; \
     return self; \
 } \
--(TableName##_Query*)parent \
+-(TableName##Query*)parent \
 { \
     [super parent]; \
     return self; \
 } \
--(TableName##_View*)findAll \
+-(TableName##View*)findAll \
 { \
-    return [[TableName##_View alloc] _initWithQuery:self]; \
+    return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -1749,7 +1749,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
 @implementation TableName \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
@@ -1813,34 +1813,34 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
     TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
     [self TDBInsertDone]; \
 } \
--(TableName##_Query*)where \
+-(TableName##Query*)where \
 { \
-    return [[TableName##_Query alloc] initWithTable:self]; \
+    return [[TableName##Query alloc] initWithTable:self]; \
 } \
--(TableName##_Row*)addEmptyRow \
+-(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
 } \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
-	return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtLastIndex \
+-(TableName##Row*)rowAtLastIndex \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:self.rowCount-1]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:self.rowCount-1]; \
 } \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
     [super insertEmptyRowAtIndex:ndx]; \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self ndx:0]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
 +(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
@@ -1883,17 +1883,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
     return YES; \
 } \
 @end \
-@implementation TableName##_View \
+@implementation TableName##View \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
+    return [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
 } \
 @end
 
@@ -1903,7 +1903,7 @@ TIGHTDB_TABLE_IMPL_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_8(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8) \
-@interface TableName##_Row: TDBRow \
+@interface TableName##Row: TDBRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -1913,8 +1913,8 @@ TIGHTDB_ROW_PROPERTY_DEF(CName6, CType6) \
 TIGHTDB_ROW_PROPERTY_DEF(CName7, CType7) \
 TIGHTDB_ROW_PROPERTY_DEF(CName8, CType8) \
 @end \
-@class TableName##_Query; \
-@class TableName##_View; \
+@class TableName##Query; \
+@class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
@@ -1923,21 +1923,21 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
-@interface TableName##_Query: TDBQuery \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName4* CName4; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName5* CName5; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName6* CName6; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName7* CName7; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName8* CName8; \
--(TableName##_Query*)group; \
--(TableName##_Query*)Or; \
--(TableName##_Query*)endGroup; \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column; \
--(TableName##_Query*)parent; \
--(TableName##_View*)findAll; \
+@interface TableName##Query: TDBQuery \
+@property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName4* CName4; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName5* CName5; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName6* CName6; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName7* CName7; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName8* CName8; \
+-(TableName##Query*)group; \
+-(TableName##Query*)Or; \
+-(TableName##Query*)endGroup; \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column; \
+-(TableName##Query*)parent; \
+-(TableName##View*)findAll; \
 @end \
 @interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
@@ -1950,19 +1950,19 @@ TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
 TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8; \
--(TableName##_Query*)where; \
--(TableName##_Row*)addEmptyRow; \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtLastIndex; \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
+-(TableName##Query*)where; \
+-(TableName##Row*)addEmptyRow; \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtLastIndex; \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##_View: TDBView \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
+@interface TableName##View: TDBView \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_8(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8) \
-@implementation TableName##_Row \
+@implementation TableName##Row \
 { \
     TDBAccessor* _##CName1; \
     TDBAccessor* _##CName2; \
@@ -1997,9 +1997,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName7, CType7) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName8, CType8) \
 @end \
-@implementation TableName##_Query \
+@implementation TableName##Query \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(long)getFastEnumStart \
 { \
@@ -2009,9 +2009,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName8, CType8) \
 { \
     return [self findFirstRowFromIndex:ndx]; \
 } \
--(TableName##_Row*)getRow:(long)ndx \
+-(TableName##Row*)getRow:(long)ndx \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:ndx]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -2025,45 +2025,45 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName8, CType8) \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
-        _CName1 = [[TableName##_QueryAccessor_##CName1 alloc] initWithColumn:0 query:self]; \
-        _CName2 = [[TableName##_QueryAccessor_##CName2 alloc] initWithColumn:1 query:self]; \
-        _CName3 = [[TableName##_QueryAccessor_##CName3 alloc] initWithColumn:2 query:self]; \
-        _CName4 = [[TableName##_QueryAccessor_##CName4 alloc] initWithColumn:3 query:self]; \
-        _CName5 = [[TableName##_QueryAccessor_##CName5 alloc] initWithColumn:4 query:self]; \
-        _CName6 = [[TableName##_QueryAccessor_##CName6 alloc] initWithColumn:5 query:self]; \
-        _CName7 = [[TableName##_QueryAccessor_##CName7 alloc] initWithColumn:6 query:self]; \
-        _CName8 = [[TableName##_QueryAccessor_##CName8 alloc] initWithColumn:7 query:self]; \
+        _CName1 = [[TableName##QueryAccessor##CName1 alloc] initWithColumn:0 query:self]; \
+        _CName2 = [[TableName##QueryAccessor##CName2 alloc] initWithColumn:1 query:self]; \
+        _CName3 = [[TableName##QueryAccessor##CName3 alloc] initWithColumn:2 query:self]; \
+        _CName4 = [[TableName##QueryAccessor##CName4 alloc] initWithColumn:3 query:self]; \
+        _CName5 = [[TableName##QueryAccessor##CName5 alloc] initWithColumn:4 query:self]; \
+        _CName6 = [[TableName##QueryAccessor##CName6 alloc] initWithColumn:5 query:self]; \
+        _CName7 = [[TableName##QueryAccessor##CName7 alloc] initWithColumn:6 query:self]; \
+        _CName8 = [[TableName##QueryAccessor##CName8 alloc] initWithColumn:7 query:self]; \
     } \
     return self; \
 } \
--(TableName##_Query*)group \
+-(TableName##Query*)group \
 { \
     [super group]; \
     return self; \
 } \
--(TableName##_Query*)Or \
+-(TableName##Query*)Or \
 { \
     [super Or]; \
     return self; \
 } \
--(TableName##_Query*)endGroup \
+-(TableName##Query*)endGroup \
 { \
     [super endGroup]; \
     return self; \
 } \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column \
 { \
     [super subtableInColumnWithIndex:column]; \
     return self; \
 } \
--(TableName##_Query*)parent \
+-(TableName##Query*)parent \
 { \
     [super parent]; \
     return self; \
 } \
--(TableName##_View*)findAll \
+-(TableName##View*)findAll \
 { \
-    return [[TableName##_View alloc] _initWithQuery:self]; \
+    return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -2076,7 +2076,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
 @implementation TableName \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
@@ -2145,34 +2145,34 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
     TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
     [self TDBInsertDone]; \
 } \
--(TableName##_Query*)where \
+-(TableName##Query*)where \
 { \
-    return [[TableName##_Query alloc] initWithTable:self]; \
+    return [[TableName##Query alloc] initWithTable:self]; \
 } \
--(TableName##_Row*)addEmptyRow \
+-(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
 } \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
-	return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtLastIndex \
+-(TableName##Row*)rowAtLastIndex \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:self.rowCount-1]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:self.rowCount-1]; \
 } \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
     [super insertEmptyRowAtIndex:ndx]; \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self ndx:0]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
 +(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
@@ -2217,17 +2217,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
     return YES; \
 } \
 @end \
-@implementation TableName##_View \
+@implementation TableName##View \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
+    return [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
 } \
 @end
 
@@ -2237,7 +2237,7 @@ TIGHTDB_TABLE_IMPL_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_9(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9) \
-@interface TableName##_Row: TDBRow \
+@interface TableName##Row: TDBRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -2248,8 +2248,8 @@ TIGHTDB_ROW_PROPERTY_DEF(CName7, CType7) \
 TIGHTDB_ROW_PROPERTY_DEF(CName8, CType8) \
 TIGHTDB_ROW_PROPERTY_DEF(CName9, CType9) \
 @end \
-@class TableName##_Query; \
-@class TableName##_View; \
+@class TableName##Query; \
+@class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
@@ -2259,22 +2259,22 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
-@interface TableName##_Query: TDBQuery \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName4* CName4; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName5* CName5; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName6* CName6; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName7* CName7; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName8* CName8; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName9* CName9; \
--(TableName##_Query*)group; \
--(TableName##_Query*)Or; \
--(TableName##_Query*)endGroup; \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column; \
--(TableName##_Query*)parent; \
--(TableName##_View*)findAll; \
+@interface TableName##Query: TDBQuery \
+@property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName4* CName4; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName5* CName5; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName6* CName6; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName7* CName7; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName8* CName8; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName9* CName9; \
+-(TableName##Query*)group; \
+-(TableName##Query*)Or; \
+-(TableName##Query*)endGroup; \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column; \
+-(TableName##Query*)parent; \
+-(TableName##View*)findAll; \
 @end \
 @interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
@@ -2288,19 +2288,19 @@ TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
 TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9; \
--(TableName##_Query*)where; \
--(TableName##_Row*)addEmptyRow; \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtLastIndex; \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
+-(TableName##Query*)where; \
+-(TableName##Row*)addEmptyRow; \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtLastIndex; \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##_View: TDBView \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
+@interface TableName##View: TDBView \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_9(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9) \
-@implementation TableName##_Row \
+@implementation TableName##Row \
 { \
     TDBAccessor* _##CName1; \
     TDBAccessor* _##CName2; \
@@ -2338,9 +2338,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName7, CType7) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName8, CType8) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName9, CType9) \
 @end \
-@implementation TableName##_Query \
+@implementation TableName##Query \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(long)getFastEnumStart \
 { \
@@ -2350,9 +2350,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName9, CType9) \
 { \
     return [self findFirstRowFromIndex:ndx]; \
 } \
--(TableName##_Row*)getRow:(long)ndx \
+-(TableName##Row*)getRow:(long)ndx \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:ndx]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -2367,46 +2367,46 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName9, CType9) \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
-        _CName1 = [[TableName##_QueryAccessor_##CName1 alloc] initWithColumn:0 query:self]; \
-        _CName2 = [[TableName##_QueryAccessor_##CName2 alloc] initWithColumn:1 query:self]; \
-        _CName3 = [[TableName##_QueryAccessor_##CName3 alloc] initWithColumn:2 query:self]; \
-        _CName4 = [[TableName##_QueryAccessor_##CName4 alloc] initWithColumn:3 query:self]; \
-        _CName5 = [[TableName##_QueryAccessor_##CName5 alloc] initWithColumn:4 query:self]; \
-        _CName6 = [[TableName##_QueryAccessor_##CName6 alloc] initWithColumn:5 query:self]; \
-        _CName7 = [[TableName##_QueryAccessor_##CName7 alloc] initWithColumn:6 query:self]; \
-        _CName8 = [[TableName##_QueryAccessor_##CName8 alloc] initWithColumn:7 query:self]; \
-        _CName9 = [[TableName##_QueryAccessor_##CName9 alloc] initWithColumn:8 query:self]; \
+        _CName1 = [[TableName##QueryAccessor##CName1 alloc] initWithColumn:0 query:self]; \
+        _CName2 = [[TableName##QueryAccessor##CName2 alloc] initWithColumn:1 query:self]; \
+        _CName3 = [[TableName##QueryAccessor##CName3 alloc] initWithColumn:2 query:self]; \
+        _CName4 = [[TableName##QueryAccessor##CName4 alloc] initWithColumn:3 query:self]; \
+        _CName5 = [[TableName##QueryAccessor##CName5 alloc] initWithColumn:4 query:self]; \
+        _CName6 = [[TableName##QueryAccessor##CName6 alloc] initWithColumn:5 query:self]; \
+        _CName7 = [[TableName##QueryAccessor##CName7 alloc] initWithColumn:6 query:self]; \
+        _CName8 = [[TableName##QueryAccessor##CName8 alloc] initWithColumn:7 query:self]; \
+        _CName9 = [[TableName##QueryAccessor##CName9 alloc] initWithColumn:8 query:self]; \
     } \
     return self; \
 } \
--(TableName##_Query*)group \
+-(TableName##Query*)group \
 { \
     [super group]; \
     return self; \
 } \
--(TableName##_Query*)Or \
+-(TableName##Query*)Or \
 { \
     [super Or]; \
     return self; \
 } \
--(TableName##_Query*)endGroup \
+-(TableName##Query*)endGroup \
 { \
     [super endGroup]; \
     return self; \
 } \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column \
 { \
     [super subtableInColumnWithIndex:column]; \
     return self; \
 } \
--(TableName##_Query*)parent \
+-(TableName##Query*)parent \
 { \
     [super parent]; \
     return self; \
 } \
--(TableName##_View*)findAll \
+-(TableName##View*)findAll \
 { \
-    return [[TableName##_View alloc] _initWithQuery:self]; \
+    return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -2420,7 +2420,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
 @implementation TableName \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
@@ -2494,34 +2494,34 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
     TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
     [self TDBInsertDone]; \
 } \
--(TableName##_Query*)where \
+-(TableName##Query*)where \
 { \
-    return [[TableName##_Query alloc] initWithTable:self]; \
+    return [[TableName##Query alloc] initWithTable:self]; \
 } \
--(TableName##_Row*)addEmptyRow \
+-(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
 } \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
-	return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtLastIndex \
+-(TableName##Row*)rowAtLastIndex \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:self.rowCount-1]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:self.rowCount-1]; \
 } \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
     [super insertEmptyRowAtIndex:ndx]; \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self ndx:0]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
 +(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
@@ -2568,17 +2568,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
     return YES; \
 } \
 @end \
-@implementation TableName##_View \
+@implementation TableName##View \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
+    return [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
 } \
 @end
 
@@ -2588,7 +2588,7 @@ TIGHTDB_TABLE_IMPL_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_10(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10) \
-@interface TableName##_Row: TDBRow \
+@interface TableName##Row: TDBRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -2600,8 +2600,8 @@ TIGHTDB_ROW_PROPERTY_DEF(CName8, CType8) \
 TIGHTDB_ROW_PROPERTY_DEF(CName9, CType9) \
 TIGHTDB_ROW_PROPERTY_DEF(CName10, CType10) \
 @end \
-@class TableName##_Query; \
-@class TableName##_View; \
+@class TableName##Query; \
+@class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
@@ -2612,23 +2612,23 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
-@interface TableName##_Query: TDBQuery \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName4* CName4; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName5* CName5; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName6* CName6; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName7* CName7; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName8* CName8; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName9* CName9; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName10* CName10; \
--(TableName##_Query*)group; \
--(TableName##_Query*)Or; \
--(TableName##_Query*)endGroup; \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column; \
--(TableName##_Query*)parent; \
--(TableName##_View*)findAll; \
+@interface TableName##Query: TDBQuery \
+@property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName4* CName4; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName5* CName5; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName6* CName6; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName7* CName7; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName8* CName8; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName9* CName9; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName10* CName10; \
+-(TableName##Query*)group; \
+-(TableName##Query*)Or; \
+-(TableName##Query*)endGroup; \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column; \
+-(TableName##Query*)parent; \
+-(TableName##View*)findAll; \
 @end \
 @interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
@@ -2643,19 +2643,19 @@ TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
 TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10; \
--(TableName##_Query*)where; \
--(TableName##_Row*)addEmptyRow; \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtLastIndex; \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
+-(TableName##Query*)where; \
+-(TableName##Row*)addEmptyRow; \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtLastIndex; \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##_View: TDBView \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
+@interface TableName##View: TDBView \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_10(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10) \
-@implementation TableName##_Row \
+@implementation TableName##Row \
 { \
     TDBAccessor* _##CName1; \
     TDBAccessor* _##CName2; \
@@ -2696,9 +2696,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName8, CType8) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName9, CType9) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName10, CType10) \
 @end \
-@implementation TableName##_Query \
+@implementation TableName##Query \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(long)getFastEnumStart \
 { \
@@ -2708,9 +2708,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName10, CType10) \
 { \
     return [self findFirstRowFromIndex:ndx]; \
 } \
--(TableName##_Row*)getRow:(long)ndx \
+-(TableName##Row*)getRow:(long)ndx \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:ndx]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -2726,47 +2726,47 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName10, CType10) \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
-        _CName1 = [[TableName##_QueryAccessor_##CName1 alloc] initWithColumn:0 query:self]; \
-        _CName2 = [[TableName##_QueryAccessor_##CName2 alloc] initWithColumn:1 query:self]; \
-        _CName3 = [[TableName##_QueryAccessor_##CName3 alloc] initWithColumn:2 query:self]; \
-        _CName4 = [[TableName##_QueryAccessor_##CName4 alloc] initWithColumn:3 query:self]; \
-        _CName5 = [[TableName##_QueryAccessor_##CName5 alloc] initWithColumn:4 query:self]; \
-        _CName6 = [[TableName##_QueryAccessor_##CName6 alloc] initWithColumn:5 query:self]; \
-        _CName7 = [[TableName##_QueryAccessor_##CName7 alloc] initWithColumn:6 query:self]; \
-        _CName8 = [[TableName##_QueryAccessor_##CName8 alloc] initWithColumn:7 query:self]; \
-        _CName9 = [[TableName##_QueryAccessor_##CName9 alloc] initWithColumn:8 query:self]; \
-        _CName10 = [[TableName##_QueryAccessor_##CName10 alloc] initWithColumn:9 query:self]; \
+        _CName1 = [[TableName##QueryAccessor##CName1 alloc] initWithColumn:0 query:self]; \
+        _CName2 = [[TableName##QueryAccessor##CName2 alloc] initWithColumn:1 query:self]; \
+        _CName3 = [[TableName##QueryAccessor##CName3 alloc] initWithColumn:2 query:self]; \
+        _CName4 = [[TableName##QueryAccessor##CName4 alloc] initWithColumn:3 query:self]; \
+        _CName5 = [[TableName##QueryAccessor##CName5 alloc] initWithColumn:4 query:self]; \
+        _CName6 = [[TableName##QueryAccessor##CName6 alloc] initWithColumn:5 query:self]; \
+        _CName7 = [[TableName##QueryAccessor##CName7 alloc] initWithColumn:6 query:self]; \
+        _CName8 = [[TableName##QueryAccessor##CName8 alloc] initWithColumn:7 query:self]; \
+        _CName9 = [[TableName##QueryAccessor##CName9 alloc] initWithColumn:8 query:self]; \
+        _CName10 = [[TableName##QueryAccessor##CName10 alloc] initWithColumn:9 query:self]; \
     } \
     return self; \
 } \
--(TableName##_Query*)group \
+-(TableName##Query*)group \
 { \
     [super group]; \
     return self; \
 } \
--(TableName##_Query*)Or \
+-(TableName##Query*)Or \
 { \
     [super Or]; \
     return self; \
 } \
--(TableName##_Query*)endGroup \
+-(TableName##Query*)endGroup \
 { \
     [super endGroup]; \
     return self; \
 } \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column \
 { \
     [super subtableInColumnWithIndex:column]; \
     return self; \
 } \
--(TableName##_Query*)parent \
+-(TableName##Query*)parent \
 { \
     [super parent]; \
     return self; \
 } \
--(TableName##_View*)findAll \
+-(TableName##View*)findAll \
 { \
-    return [[TableName##_View alloc] _initWithQuery:self]; \
+    return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -2781,7 +2781,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
 @implementation TableName \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
@@ -2860,34 +2860,34 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
     TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
     [self TDBInsertDone]; \
 } \
--(TableName##_Query*)where \
+-(TableName##Query*)where \
 { \
-    return [[TableName##_Query alloc] initWithTable:self]; \
+    return [[TableName##Query alloc] initWithTable:self]; \
 } \
--(TableName##_Row*)addEmptyRow \
+-(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
 } \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
-	return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtLastIndex \
+-(TableName##Row*)rowAtLastIndex \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:self.rowCount-1]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:self.rowCount-1]; \
 } \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
     [super insertEmptyRowAtIndex:ndx]; \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self ndx:0]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
 +(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
@@ -2936,17 +2936,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
     return YES; \
 } \
 @end \
-@implementation TableName##_View \
+@implementation TableName##View \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
+    return [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
 } \
 @end
 
@@ -2956,7 +2956,7 @@ TIGHTDB_TABLE_IMPL_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3,
 
 
 #define TIGHTDB_TABLE_DEF_11(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11) \
-@interface TableName##_Row: TDBRow \
+@interface TableName##Row: TDBRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -2969,8 +2969,8 @@ TIGHTDB_ROW_PROPERTY_DEF(CName9, CType9) \
 TIGHTDB_ROW_PROPERTY_DEF(CName10, CType10) \
 TIGHTDB_ROW_PROPERTY_DEF(CName11, CType11) \
 @end \
-@class TableName##_Query; \
-@class TableName##_View; \
+@class TableName##Query; \
+@class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
@@ -2982,24 +2982,24 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
-@interface TableName##_Query: TDBQuery \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName4* CName4; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName5* CName5; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName6* CName6; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName7* CName7; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName8* CName8; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName9* CName9; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName10* CName10; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName11* CName11; \
--(TableName##_Query*)group; \
--(TableName##_Query*)Or; \
--(TableName##_Query*)endGroup; \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column; \
--(TableName##_Query*)parent; \
--(TableName##_View*)findAll; \
+@interface TableName##Query: TDBQuery \
+@property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName4* CName4; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName5* CName5; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName6* CName6; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName7* CName7; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName8* CName8; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName9* CName9; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName10* CName10; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName11* CName11; \
+-(TableName##Query*)group; \
+-(TableName##Query*)Or; \
+-(TableName##Query*)endGroup; \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column; \
+-(TableName##Query*)parent; \
+-(TableName##View*)findAll; \
 @end \
 @interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
@@ -3015,19 +3015,19 @@ TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
 TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11; \
--(TableName##_Query*)where; \
--(TableName##_Row*)addEmptyRow; \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtLastIndex; \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
+-(TableName##Query*)where; \
+-(TableName##Row*)addEmptyRow; \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtLastIndex; \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##_View: TDBView \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
+@interface TableName##View: TDBView \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_11(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11) \
-@implementation TableName##_Row \
+@implementation TableName##Row \
 { \
     TDBAccessor* _##CName1; \
     TDBAccessor* _##CName2; \
@@ -3071,9 +3071,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName9, CType9) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName10, CType10) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName11, CType11) \
 @end \
-@implementation TableName##_Query \
+@implementation TableName##Query \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(long)getFastEnumStart \
 { \
@@ -3083,9 +3083,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName11, CType11) \
 { \
     return [self findFirstRowFromIndex:ndx]; \
 } \
--(TableName##_Row*)getRow:(long)ndx \
+-(TableName##Row*)getRow:(long)ndx \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:ndx]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -3102,48 +3102,48 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName11, CType11) \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
-        _CName1 = [[TableName##_QueryAccessor_##CName1 alloc] initWithColumn:0 query:self]; \
-        _CName2 = [[TableName##_QueryAccessor_##CName2 alloc] initWithColumn:1 query:self]; \
-        _CName3 = [[TableName##_QueryAccessor_##CName3 alloc] initWithColumn:2 query:self]; \
-        _CName4 = [[TableName##_QueryAccessor_##CName4 alloc] initWithColumn:3 query:self]; \
-        _CName5 = [[TableName##_QueryAccessor_##CName5 alloc] initWithColumn:4 query:self]; \
-        _CName6 = [[TableName##_QueryAccessor_##CName6 alloc] initWithColumn:5 query:self]; \
-        _CName7 = [[TableName##_QueryAccessor_##CName7 alloc] initWithColumn:6 query:self]; \
-        _CName8 = [[TableName##_QueryAccessor_##CName8 alloc] initWithColumn:7 query:self]; \
-        _CName9 = [[TableName##_QueryAccessor_##CName9 alloc] initWithColumn:8 query:self]; \
-        _CName10 = [[TableName##_QueryAccessor_##CName10 alloc] initWithColumn:9 query:self]; \
-        _CName11 = [[TableName##_QueryAccessor_##CName11 alloc] initWithColumn:10 query:self]; \
+        _CName1 = [[TableName##QueryAccessor##CName1 alloc] initWithColumn:0 query:self]; \
+        _CName2 = [[TableName##QueryAccessor##CName2 alloc] initWithColumn:1 query:self]; \
+        _CName3 = [[TableName##QueryAccessor##CName3 alloc] initWithColumn:2 query:self]; \
+        _CName4 = [[TableName##QueryAccessor##CName4 alloc] initWithColumn:3 query:self]; \
+        _CName5 = [[TableName##QueryAccessor##CName5 alloc] initWithColumn:4 query:self]; \
+        _CName6 = [[TableName##QueryAccessor##CName6 alloc] initWithColumn:5 query:self]; \
+        _CName7 = [[TableName##QueryAccessor##CName7 alloc] initWithColumn:6 query:self]; \
+        _CName8 = [[TableName##QueryAccessor##CName8 alloc] initWithColumn:7 query:self]; \
+        _CName9 = [[TableName##QueryAccessor##CName9 alloc] initWithColumn:8 query:self]; \
+        _CName10 = [[TableName##QueryAccessor##CName10 alloc] initWithColumn:9 query:self]; \
+        _CName11 = [[TableName##QueryAccessor##CName11 alloc] initWithColumn:10 query:self]; \
     } \
     return self; \
 } \
--(TableName##_Query*)group \
+-(TableName##Query*)group \
 { \
     [super group]; \
     return self; \
 } \
--(TableName##_Query*)Or \
+-(TableName##Query*)Or \
 { \
     [super Or]; \
     return self; \
 } \
--(TableName##_Query*)endGroup \
+-(TableName##Query*)endGroup \
 { \
     [super endGroup]; \
     return self; \
 } \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column \
 { \
     [super subtableInColumnWithIndex:column]; \
     return self; \
 } \
--(TableName##_Query*)parent \
+-(TableName##Query*)parent \
 { \
     [super parent]; \
     return self; \
 } \
--(TableName##_View*)findAll \
+-(TableName##View*)findAll \
 { \
-    return [[TableName##_View alloc] _initWithQuery:self]; \
+    return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -3159,7 +3159,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
 @implementation TableName \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
@@ -3243,34 +3243,34 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
     TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
     [self TDBInsertDone]; \
 } \
--(TableName##_Query*)where \
+-(TableName##Query*)where \
 { \
-    return [[TableName##_Query alloc] initWithTable:self]; \
+    return [[TableName##Query alloc] initWithTable:self]; \
 } \
--(TableName##_Row*)addEmptyRow \
+-(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
 } \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
-	return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtLastIndex \
+-(TableName##Row*)rowAtLastIndex \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:self.rowCount-1]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:self.rowCount-1]; \
 } \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
     [super insertEmptyRowAtIndex:ndx]; \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self ndx:0]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
 +(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
@@ -3321,17 +3321,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
     return YES; \
 } \
 @end \
-@implementation TableName##_View \
+@implementation TableName##View \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
+    return [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
 } \
 @end
 
@@ -3341,7 +3341,7 @@ TIGHTDB_TABLE_IMPL_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3,
 
 
 #define TIGHTDB_TABLE_DEF_12(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12) \
-@interface TableName##_Row: TDBRow \
+@interface TableName##Row: TDBRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -3355,8 +3355,8 @@ TIGHTDB_ROW_PROPERTY_DEF(CName10, CType10) \
 TIGHTDB_ROW_PROPERTY_DEF(CName11, CType11) \
 TIGHTDB_ROW_PROPERTY_DEF(CName12, CType12) \
 @end \
-@class TableName##_Query; \
-@class TableName##_View; \
+@class TableName##Query; \
+@class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
@@ -3369,25 +3369,25 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
-@interface TableName##_Query: TDBQuery \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName4* CName4; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName5* CName5; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName6* CName6; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName7* CName7; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName8* CName8; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName9* CName9; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName10* CName10; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName11* CName11; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName12* CName12; \
--(TableName##_Query*)group; \
--(TableName##_Query*)Or; \
--(TableName##_Query*)endGroup; \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column; \
--(TableName##_Query*)parent; \
--(TableName##_View*)findAll; \
+@interface TableName##Query: TDBQuery \
+@property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName4* CName4; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName5* CName5; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName6* CName6; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName7* CName7; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName8* CName8; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName9* CName9; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName10* CName10; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName11* CName11; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName12* CName12; \
+-(TableName##Query*)group; \
+-(TableName##Query*)Or; \
+-(TableName##Query*)endGroup; \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column; \
+-(TableName##Query*)parent; \
+-(TableName##View*)findAll; \
 @end \
 @interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
@@ -3404,19 +3404,19 @@ TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
 TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12; \
--(TableName##_Query*)where; \
--(TableName##_Row*)addEmptyRow; \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtLastIndex; \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
+-(TableName##Query*)where; \
+-(TableName##Row*)addEmptyRow; \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtLastIndex; \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##_View: TDBView \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
+@interface TableName##View: TDBView \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_12(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12) \
-@implementation TableName##_Row \
+@implementation TableName##Row \
 { \
     TDBAccessor* _##CName1; \
     TDBAccessor* _##CName2; \
@@ -3463,9 +3463,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName10, CType10) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName11, CType11) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName12, CType12) \
 @end \
-@implementation TableName##_Query \
+@implementation TableName##Query \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(long)getFastEnumStart \
 { \
@@ -3475,9 +3475,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName12, CType12) \
 { \
     return [self findFirstRowFromIndex:ndx]; \
 } \
--(TableName##_Row*)getRow:(long)ndx \
+-(TableName##Row*)getRow:(long)ndx \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:ndx]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -3495,49 +3495,49 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName12, CType12) \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
-        _CName1 = [[TableName##_QueryAccessor_##CName1 alloc] initWithColumn:0 query:self]; \
-        _CName2 = [[TableName##_QueryAccessor_##CName2 alloc] initWithColumn:1 query:self]; \
-        _CName3 = [[TableName##_QueryAccessor_##CName3 alloc] initWithColumn:2 query:self]; \
-        _CName4 = [[TableName##_QueryAccessor_##CName4 alloc] initWithColumn:3 query:self]; \
-        _CName5 = [[TableName##_QueryAccessor_##CName5 alloc] initWithColumn:4 query:self]; \
-        _CName6 = [[TableName##_QueryAccessor_##CName6 alloc] initWithColumn:5 query:self]; \
-        _CName7 = [[TableName##_QueryAccessor_##CName7 alloc] initWithColumn:6 query:self]; \
-        _CName8 = [[TableName##_QueryAccessor_##CName8 alloc] initWithColumn:7 query:self]; \
-        _CName9 = [[TableName##_QueryAccessor_##CName9 alloc] initWithColumn:8 query:self]; \
-        _CName10 = [[TableName##_QueryAccessor_##CName10 alloc] initWithColumn:9 query:self]; \
-        _CName11 = [[TableName##_QueryAccessor_##CName11 alloc] initWithColumn:10 query:self]; \
-        _CName12 = [[TableName##_QueryAccessor_##CName12 alloc] initWithColumn:11 query:self]; \
+        _CName1 = [[TableName##QueryAccessor##CName1 alloc] initWithColumn:0 query:self]; \
+        _CName2 = [[TableName##QueryAccessor##CName2 alloc] initWithColumn:1 query:self]; \
+        _CName3 = [[TableName##QueryAccessor##CName3 alloc] initWithColumn:2 query:self]; \
+        _CName4 = [[TableName##QueryAccessor##CName4 alloc] initWithColumn:3 query:self]; \
+        _CName5 = [[TableName##QueryAccessor##CName5 alloc] initWithColumn:4 query:self]; \
+        _CName6 = [[TableName##QueryAccessor##CName6 alloc] initWithColumn:5 query:self]; \
+        _CName7 = [[TableName##QueryAccessor##CName7 alloc] initWithColumn:6 query:self]; \
+        _CName8 = [[TableName##QueryAccessor##CName8 alloc] initWithColumn:7 query:self]; \
+        _CName9 = [[TableName##QueryAccessor##CName9 alloc] initWithColumn:8 query:self]; \
+        _CName10 = [[TableName##QueryAccessor##CName10 alloc] initWithColumn:9 query:self]; \
+        _CName11 = [[TableName##QueryAccessor##CName11 alloc] initWithColumn:10 query:self]; \
+        _CName12 = [[TableName##QueryAccessor##CName12 alloc] initWithColumn:11 query:self]; \
     } \
     return self; \
 } \
--(TableName##_Query*)group \
+-(TableName##Query*)group \
 { \
     [super group]; \
     return self; \
 } \
--(TableName##_Query*)Or \
+-(TableName##Query*)Or \
 { \
     [super Or]; \
     return self; \
 } \
--(TableName##_Query*)endGroup \
+-(TableName##Query*)endGroup \
 { \
     [super endGroup]; \
     return self; \
 } \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column \
 { \
     [super subtableInColumnWithIndex:column]; \
     return self; \
 } \
--(TableName##_Query*)parent \
+-(TableName##Query*)parent \
 { \
     [super parent]; \
     return self; \
 } \
--(TableName##_View*)findAll \
+-(TableName##View*)findAll \
 { \
-    return [[TableName##_View alloc] _initWithQuery:self]; \
+    return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -3554,7 +3554,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
 @implementation TableName \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
@@ -3643,34 +3643,34 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
     TIGHTDB_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
     [self TDBInsertDone]; \
 } \
--(TableName##_Query*)where \
+-(TableName##Query*)where \
 { \
-    return [[TableName##_Query alloc] initWithTable:self]; \
+    return [[TableName##Query alloc] initWithTable:self]; \
 } \
--(TableName##_Row*)addEmptyRow \
+-(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
 } \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
-	return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtLastIndex \
+-(TableName##Row*)rowAtLastIndex \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:self.rowCount-1]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:self.rowCount-1]; \
 } \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
     [super insertEmptyRowAtIndex:ndx]; \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self ndx:0]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
 +(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
@@ -3723,17 +3723,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
     return YES; \
 } \
 @end \
-@implementation TableName##_View \
+@implementation TableName##View \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
+    return [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
 } \
 @end
 
@@ -3743,7 +3743,7 @@ TIGHTDB_TABLE_IMPL_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3,
 
 
 #define TIGHTDB_TABLE_DEF_13(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13) \
-@interface TableName##_Row: TDBRow \
+@interface TableName##Row: TDBRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -3758,8 +3758,8 @@ TIGHTDB_ROW_PROPERTY_DEF(CName11, CType11) \
 TIGHTDB_ROW_PROPERTY_DEF(CName12, CType12) \
 TIGHTDB_ROW_PROPERTY_DEF(CName13, CType13) \
 @end \
-@class TableName##_Query; \
-@class TableName##_View; \
+@class TableName##Query; \
+@class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
@@ -3773,26 +3773,26 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
-@interface TableName##_Query: TDBQuery \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName4* CName4; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName5* CName5; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName6* CName6; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName7* CName7; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName8* CName8; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName9* CName9; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName10* CName10; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName11* CName11; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName12* CName12; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName13* CName13; \
--(TableName##_Query*)group; \
--(TableName##_Query*)Or; \
--(TableName##_Query*)endGroup; \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column; \
--(TableName##_Query*)parent; \
--(TableName##_View*)findAll; \
+@interface TableName##Query: TDBQuery \
+@property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName4* CName4; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName5* CName5; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName6* CName6; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName7* CName7; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName8* CName8; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName9* CName9; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName10* CName10; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName11* CName11; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName12* CName12; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName13* CName13; \
+-(TableName##Query*)group; \
+-(TableName##Query*)Or; \
+-(TableName##Query*)endGroup; \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column; \
+-(TableName##Query*)parent; \
+-(TableName##View*)findAll; \
 @end \
 @interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
@@ -3810,19 +3810,19 @@ TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
 TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13; \
--(TableName##_Query*)where; \
--(TableName##_Row*)addEmptyRow; \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtLastIndex; \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
+-(TableName##Query*)where; \
+-(TableName##Row*)addEmptyRow; \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtLastIndex; \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##_View: TDBView \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
+@interface TableName##View: TDBView \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_13(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13) \
-@implementation TableName##_Row \
+@implementation TableName##Row \
 { \
     TDBAccessor* _##CName1; \
     TDBAccessor* _##CName2; \
@@ -3872,9 +3872,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName11, CType11) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName12, CType12) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName13, CType13) \
 @end \
-@implementation TableName##_Query \
+@implementation TableName##Query \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(long)getFastEnumStart \
 { \
@@ -3884,9 +3884,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName13, CType13) \
 { \
     return [self findFirstRowFromIndex:ndx]; \
 } \
--(TableName##_Row*)getRow:(long)ndx \
+-(TableName##Row*)getRow:(long)ndx \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:ndx]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -3905,50 +3905,50 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName13, CType13) \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
-        _CName1 = [[TableName##_QueryAccessor_##CName1 alloc] initWithColumn:0 query:self]; \
-        _CName2 = [[TableName##_QueryAccessor_##CName2 alloc] initWithColumn:1 query:self]; \
-        _CName3 = [[TableName##_QueryAccessor_##CName3 alloc] initWithColumn:2 query:self]; \
-        _CName4 = [[TableName##_QueryAccessor_##CName4 alloc] initWithColumn:3 query:self]; \
-        _CName5 = [[TableName##_QueryAccessor_##CName5 alloc] initWithColumn:4 query:self]; \
-        _CName6 = [[TableName##_QueryAccessor_##CName6 alloc] initWithColumn:5 query:self]; \
-        _CName7 = [[TableName##_QueryAccessor_##CName7 alloc] initWithColumn:6 query:self]; \
-        _CName8 = [[TableName##_QueryAccessor_##CName8 alloc] initWithColumn:7 query:self]; \
-        _CName9 = [[TableName##_QueryAccessor_##CName9 alloc] initWithColumn:8 query:self]; \
-        _CName10 = [[TableName##_QueryAccessor_##CName10 alloc] initWithColumn:9 query:self]; \
-        _CName11 = [[TableName##_QueryAccessor_##CName11 alloc] initWithColumn:10 query:self]; \
-        _CName12 = [[TableName##_QueryAccessor_##CName12 alloc] initWithColumn:11 query:self]; \
-        _CName13 = [[TableName##_QueryAccessor_##CName13 alloc] initWithColumn:12 query:self]; \
+        _CName1 = [[TableName##QueryAccessor##CName1 alloc] initWithColumn:0 query:self]; \
+        _CName2 = [[TableName##QueryAccessor##CName2 alloc] initWithColumn:1 query:self]; \
+        _CName3 = [[TableName##QueryAccessor##CName3 alloc] initWithColumn:2 query:self]; \
+        _CName4 = [[TableName##QueryAccessor##CName4 alloc] initWithColumn:3 query:self]; \
+        _CName5 = [[TableName##QueryAccessor##CName5 alloc] initWithColumn:4 query:self]; \
+        _CName6 = [[TableName##QueryAccessor##CName6 alloc] initWithColumn:5 query:self]; \
+        _CName7 = [[TableName##QueryAccessor##CName7 alloc] initWithColumn:6 query:self]; \
+        _CName8 = [[TableName##QueryAccessor##CName8 alloc] initWithColumn:7 query:self]; \
+        _CName9 = [[TableName##QueryAccessor##CName9 alloc] initWithColumn:8 query:self]; \
+        _CName10 = [[TableName##QueryAccessor##CName10 alloc] initWithColumn:9 query:self]; \
+        _CName11 = [[TableName##QueryAccessor##CName11 alloc] initWithColumn:10 query:self]; \
+        _CName12 = [[TableName##QueryAccessor##CName12 alloc] initWithColumn:11 query:self]; \
+        _CName13 = [[TableName##QueryAccessor##CName13 alloc] initWithColumn:12 query:self]; \
     } \
     return self; \
 } \
--(TableName##_Query*)group \
+-(TableName##Query*)group \
 { \
     [super group]; \
     return self; \
 } \
--(TableName##_Query*)Or \
+-(TableName##Query*)Or \
 { \
     [super Or]; \
     return self; \
 } \
--(TableName##_Query*)endGroup \
+-(TableName##Query*)endGroup \
 { \
     [super endGroup]; \
     return self; \
 } \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column \
 { \
     [super subtableInColumnWithIndex:column]; \
     return self; \
 } \
--(TableName##_Query*)parent \
+-(TableName##Query*)parent \
 { \
     [super parent]; \
     return self; \
 } \
--(TableName##_View*)findAll \
+-(TableName##View*)findAll \
 { \
-    return [[TableName##_View alloc] _initWithQuery:self]; \
+    return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -3966,7 +3966,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
 @implementation TableName \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
@@ -4060,34 +4060,34 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
     TIGHTDB_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
     [self TDBInsertDone]; \
 } \
--(TableName##_Query*)where \
+-(TableName##Query*)where \
 { \
-    return [[TableName##_Query alloc] initWithTable:self]; \
+    return [[TableName##Query alloc] initWithTable:self]; \
 } \
--(TableName##_Row*)addEmptyRow \
+-(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
 } \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
-	return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtLastIndex \
+-(TableName##Row*)rowAtLastIndex \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:self.rowCount-1]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:self.rowCount-1]; \
 } \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
     [super insertEmptyRowAtIndex:ndx]; \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self ndx:0]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
 +(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
@@ -4142,17 +4142,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
     return YES; \
 } \
 @end \
-@implementation TableName##_View \
+@implementation TableName##View \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
+    return [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
 } \
 @end
 
@@ -4162,7 +4162,7 @@ TIGHTDB_TABLE_IMPL_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3,
 
 
 #define TIGHTDB_TABLE_DEF_14(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14) \
-@interface TableName##_Row: TDBRow \
+@interface TableName##Row: TDBRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -4178,8 +4178,8 @@ TIGHTDB_ROW_PROPERTY_DEF(CName12, CType12) \
 TIGHTDB_ROW_PROPERTY_DEF(CName13, CType13) \
 TIGHTDB_ROW_PROPERTY_DEF(CName14, CType14) \
 @end \
-@class TableName##_Query; \
-@class TableName##_View; \
+@class TableName##Query; \
+@class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
@@ -4194,27 +4194,27 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName14, CType14) \
-@interface TableName##_Query: TDBQuery \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName4* CName4; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName5* CName5; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName6* CName6; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName7* CName7; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName8* CName8; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName9* CName9; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName10* CName10; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName11* CName11; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName12* CName12; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName13* CName13; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName14* CName14; \
--(TableName##_Query*)group; \
--(TableName##_Query*)Or; \
--(TableName##_Query*)endGroup; \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column; \
--(TableName##_Query*)parent; \
--(TableName##_View*)findAll; \
+@interface TableName##Query: TDBQuery \
+@property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName4* CName4; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName5* CName5; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName6* CName6; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName7* CName7; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName8* CName8; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName9* CName9; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName10* CName10; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName11* CName11; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName12* CName12; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName13* CName13; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName14* CName14; \
+-(TableName##Query*)group; \
+-(TableName##Query*)Or; \
+-(TableName##Query*)endGroup; \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column; \
+-(TableName##Query*)parent; \
+-(TableName##View*)findAll; \
 @end \
 @interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
@@ -4233,19 +4233,19 @@ TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
 TIGHTDB_COLUMN_PROXY_DEF(CName14, CType14) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14; \
--(TableName##_Query*)where; \
--(TableName##_Row*)addEmptyRow; \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtLastIndex; \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
+-(TableName##Query*)where; \
+-(TableName##Row*)addEmptyRow; \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtLastIndex; \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##_View: TDBView \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
+@interface TableName##View: TDBView \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_14(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14) \
-@implementation TableName##_Row \
+@implementation TableName##Row \
 { \
     TDBAccessor* _##CName1; \
     TDBAccessor* _##CName2; \
@@ -4298,9 +4298,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName12, CType12) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName13, CType13) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName14, CType14) \
 @end \
-@implementation TableName##_Query \
+@implementation TableName##Query \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(long)getFastEnumStart \
 { \
@@ -4310,9 +4310,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName14, CType14) \
 { \
     return [self findFirstRowFromIndex:ndx]; \
 } \
--(TableName##_Row*)getRow:(long)ndx \
+-(TableName##Row*)getRow:(long)ndx \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:ndx]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -4332,51 +4332,51 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName14, CType14) \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
-        _CName1 = [[TableName##_QueryAccessor_##CName1 alloc] initWithColumn:0 query:self]; \
-        _CName2 = [[TableName##_QueryAccessor_##CName2 alloc] initWithColumn:1 query:self]; \
-        _CName3 = [[TableName##_QueryAccessor_##CName3 alloc] initWithColumn:2 query:self]; \
-        _CName4 = [[TableName##_QueryAccessor_##CName4 alloc] initWithColumn:3 query:self]; \
-        _CName5 = [[TableName##_QueryAccessor_##CName5 alloc] initWithColumn:4 query:self]; \
-        _CName6 = [[TableName##_QueryAccessor_##CName6 alloc] initWithColumn:5 query:self]; \
-        _CName7 = [[TableName##_QueryAccessor_##CName7 alloc] initWithColumn:6 query:self]; \
-        _CName8 = [[TableName##_QueryAccessor_##CName8 alloc] initWithColumn:7 query:self]; \
-        _CName9 = [[TableName##_QueryAccessor_##CName9 alloc] initWithColumn:8 query:self]; \
-        _CName10 = [[TableName##_QueryAccessor_##CName10 alloc] initWithColumn:9 query:self]; \
-        _CName11 = [[TableName##_QueryAccessor_##CName11 alloc] initWithColumn:10 query:self]; \
-        _CName12 = [[TableName##_QueryAccessor_##CName12 alloc] initWithColumn:11 query:self]; \
-        _CName13 = [[TableName##_QueryAccessor_##CName13 alloc] initWithColumn:12 query:self]; \
-        _CName14 = [[TableName##_QueryAccessor_##CName14 alloc] initWithColumn:13 query:self]; \
+        _CName1 = [[TableName##QueryAccessor##CName1 alloc] initWithColumn:0 query:self]; \
+        _CName2 = [[TableName##QueryAccessor##CName2 alloc] initWithColumn:1 query:self]; \
+        _CName3 = [[TableName##QueryAccessor##CName3 alloc] initWithColumn:2 query:self]; \
+        _CName4 = [[TableName##QueryAccessor##CName4 alloc] initWithColumn:3 query:self]; \
+        _CName5 = [[TableName##QueryAccessor##CName5 alloc] initWithColumn:4 query:self]; \
+        _CName6 = [[TableName##QueryAccessor##CName6 alloc] initWithColumn:5 query:self]; \
+        _CName7 = [[TableName##QueryAccessor##CName7 alloc] initWithColumn:6 query:self]; \
+        _CName8 = [[TableName##QueryAccessor##CName8 alloc] initWithColumn:7 query:self]; \
+        _CName9 = [[TableName##QueryAccessor##CName9 alloc] initWithColumn:8 query:self]; \
+        _CName10 = [[TableName##QueryAccessor##CName10 alloc] initWithColumn:9 query:self]; \
+        _CName11 = [[TableName##QueryAccessor##CName11 alloc] initWithColumn:10 query:self]; \
+        _CName12 = [[TableName##QueryAccessor##CName12 alloc] initWithColumn:11 query:self]; \
+        _CName13 = [[TableName##QueryAccessor##CName13 alloc] initWithColumn:12 query:self]; \
+        _CName14 = [[TableName##QueryAccessor##CName14 alloc] initWithColumn:13 query:self]; \
     } \
     return self; \
 } \
--(TableName##_Query*)group \
+-(TableName##Query*)group \
 { \
     [super group]; \
     return self; \
 } \
--(TableName##_Query*)Or \
+-(TableName##Query*)Or \
 { \
     [super Or]; \
     return self; \
 } \
--(TableName##_Query*)endGroup \
+-(TableName##Query*)endGroup \
 { \
     [super endGroup]; \
     return self; \
 } \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column \
 { \
     [super subtableInColumnWithIndex:column]; \
     return self; \
 } \
--(TableName##_Query*)parent \
+-(TableName##Query*)parent \
 { \
     [super parent]; \
     return self; \
 } \
--(TableName##_View*)findAll \
+-(TableName##View*)findAll \
 { \
-    return [[TableName##_View alloc] _initWithQuery:self]; \
+    return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -4395,7 +4395,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
 @implementation TableName \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
@@ -4494,34 +4494,34 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
     TIGHTDB_COLUMN_INSERT(self, 13, ndx, CName14, CType14); \
     [self TDBInsertDone]; \
 } \
--(TableName##_Query*)where \
+-(TableName##Query*)where \
 { \
-    return [[TableName##_Query alloc] initWithTable:self]; \
+    return [[TableName##Query alloc] initWithTable:self]; \
 } \
--(TableName##_Row*)addEmptyRow \
+-(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
 } \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
-	return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtLastIndex \
+-(TableName##Row*)rowAtLastIndex \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:self.rowCount-1]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:self.rowCount-1]; \
 } \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
     [super insertEmptyRowAtIndex:ndx]; \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self ndx:0]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
 +(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
@@ -4578,17 +4578,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
     return YES; \
 } \
 @end \
-@implementation TableName##_View \
+@implementation TableName##View \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
+    return [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
 } \
 @end
 
@@ -4598,7 +4598,7 @@ TIGHTDB_TABLE_IMPL_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3,
 
 
 #define TIGHTDB_TABLE_DEF_15(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14, CName15, CType15) \
-@interface TableName##_Row: TDBRow \
+@interface TableName##Row: TDBRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -4615,8 +4615,8 @@ TIGHTDB_ROW_PROPERTY_DEF(CName13, CType13) \
 TIGHTDB_ROW_PROPERTY_DEF(CName14, CType14) \
 TIGHTDB_ROW_PROPERTY_DEF(CName15, CType15) \
 @end \
-@class TableName##_Query; \
-@class TableName##_View; \
+@class TableName##Query; \
+@class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
@@ -4632,28 +4632,28 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName14, CType14) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName15, CType15) \
-@interface TableName##_Query: TDBQuery \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName1* CName1; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName2* CName2; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName3* CName3; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName4* CName4; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName5* CName5; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName6* CName6; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName7* CName7; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName8* CName8; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName9* CName9; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName10* CName10; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName11* CName11; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName12* CName12; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName13* CName13; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName14* CName14; \
-@property(nonatomic, strong) TableName##_QueryAccessor_##CName15* CName15; \
--(TableName##_Query*)group; \
--(TableName##_Query*)Or; \
--(TableName##_Query*)endGroup; \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column; \
--(TableName##_Query*)parent; \
--(TableName##_View*)findAll; \
+@interface TableName##Query: TDBQuery \
+@property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName4* CName4; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName5* CName5; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName6* CName6; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName7* CName7; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName8* CName8; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName9* CName9; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName10* CName10; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName11* CName11; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName12* CName12; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName13* CName13; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName14* CName14; \
+@property(nonatomic, strong) TableName##QueryAccessor##CName15* CName15; \
+-(TableName##Query*)group; \
+-(TableName##Query*)Or; \
+-(TableName##Query*)endGroup; \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column; \
+-(TableName##Query*)parent; \
+-(TableName##View*)findAll; \
 @end \
 @interface TableName: TDBTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
@@ -4673,19 +4673,19 @@ TIGHTDB_COLUMN_PROXY_DEF(CName14, CType14) \
 TIGHTDB_COLUMN_PROXY_DEF(CName15, CType15) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15; \
--(TableName##_Query*)where; \
--(TableName##_Row*)addEmptyRow; \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
--(TableName##_Row*)rowAtLastIndex; \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
+-(TableName##Query*)where; \
+-(TableName##Row*)addEmptyRow; \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
+-(TableName##Row*)rowAtLastIndex; \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##_View: TDBView \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx; \
+@interface TableName##View: TDBView \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
 #define TIGHTDB_TABLE_IMPL_15(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14, CName15, CType15) \
-@implementation TableName##_Row \
+@implementation TableName##Row \
 { \
     TDBAccessor* _##CName1; \
     TDBAccessor* _##CName2; \
@@ -4741,9 +4741,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName13, CType13) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName14, CType14) \
 TIGHTDB_ROW_PROPERTY_IMPL(CName15, CType15) \
 @end \
-@implementation TableName##_Query \
+@implementation TableName##Query \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(long)getFastEnumStart \
 { \
@@ -4753,9 +4753,9 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName15, CType15) \
 { \
     return [self findFirstRowFromIndex:ndx]; \
 } \
--(TableName##_Row*)getRow:(long)ndx \
+-(TableName##Row*)getRow:(long)ndx \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:ndx]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
@@ -4776,52 +4776,52 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName15, CType15) \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
-        _CName1 = [[TableName##_QueryAccessor_##CName1 alloc] initWithColumn:0 query:self]; \
-        _CName2 = [[TableName##_QueryAccessor_##CName2 alloc] initWithColumn:1 query:self]; \
-        _CName3 = [[TableName##_QueryAccessor_##CName3 alloc] initWithColumn:2 query:self]; \
-        _CName4 = [[TableName##_QueryAccessor_##CName4 alloc] initWithColumn:3 query:self]; \
-        _CName5 = [[TableName##_QueryAccessor_##CName5 alloc] initWithColumn:4 query:self]; \
-        _CName6 = [[TableName##_QueryAccessor_##CName6 alloc] initWithColumn:5 query:self]; \
-        _CName7 = [[TableName##_QueryAccessor_##CName7 alloc] initWithColumn:6 query:self]; \
-        _CName8 = [[TableName##_QueryAccessor_##CName8 alloc] initWithColumn:7 query:self]; \
-        _CName9 = [[TableName##_QueryAccessor_##CName9 alloc] initWithColumn:8 query:self]; \
-        _CName10 = [[TableName##_QueryAccessor_##CName10 alloc] initWithColumn:9 query:self]; \
-        _CName11 = [[TableName##_QueryAccessor_##CName11 alloc] initWithColumn:10 query:self]; \
-        _CName12 = [[TableName##_QueryAccessor_##CName12 alloc] initWithColumn:11 query:self]; \
-        _CName13 = [[TableName##_QueryAccessor_##CName13 alloc] initWithColumn:12 query:self]; \
-        _CName14 = [[TableName##_QueryAccessor_##CName14 alloc] initWithColumn:13 query:self]; \
-        _CName15 = [[TableName##_QueryAccessor_##CName15 alloc] initWithColumn:14 query:self]; \
+        _CName1 = [[TableName##QueryAccessor##CName1 alloc] initWithColumn:0 query:self]; \
+        _CName2 = [[TableName##QueryAccessor##CName2 alloc] initWithColumn:1 query:self]; \
+        _CName3 = [[TableName##QueryAccessor##CName3 alloc] initWithColumn:2 query:self]; \
+        _CName4 = [[TableName##QueryAccessor##CName4 alloc] initWithColumn:3 query:self]; \
+        _CName5 = [[TableName##QueryAccessor##CName5 alloc] initWithColumn:4 query:self]; \
+        _CName6 = [[TableName##QueryAccessor##CName6 alloc] initWithColumn:5 query:self]; \
+        _CName7 = [[TableName##QueryAccessor##CName7 alloc] initWithColumn:6 query:self]; \
+        _CName8 = [[TableName##QueryAccessor##CName8 alloc] initWithColumn:7 query:self]; \
+        _CName9 = [[TableName##QueryAccessor##CName9 alloc] initWithColumn:8 query:self]; \
+        _CName10 = [[TableName##QueryAccessor##CName10 alloc] initWithColumn:9 query:self]; \
+        _CName11 = [[TableName##QueryAccessor##CName11 alloc] initWithColumn:10 query:self]; \
+        _CName12 = [[TableName##QueryAccessor##CName12 alloc] initWithColumn:11 query:self]; \
+        _CName13 = [[TableName##QueryAccessor##CName13 alloc] initWithColumn:12 query:self]; \
+        _CName14 = [[TableName##QueryAccessor##CName14 alloc] initWithColumn:13 query:self]; \
+        _CName15 = [[TableName##QueryAccessor##CName15 alloc] initWithColumn:14 query:self]; \
     } \
     return self; \
 } \
--(TableName##_Query*)group \
+-(TableName##Query*)group \
 { \
     [super group]; \
     return self; \
 } \
--(TableName##_Query*)Or \
+-(TableName##Query*)Or \
 { \
     [super Or]; \
     return self; \
 } \
--(TableName##_Query*)endGroup \
+-(TableName##Query*)endGroup \
 { \
     [super endGroup]; \
     return self; \
 } \
--(TableName##_Query*)subtableInColumnWithIndex:(NSUInteger)column \
+-(TableName##Query*)subtableInColumnWithIndex:(NSUInteger)column \
 { \
     [super subtableInColumnWithIndex:column]; \
     return self; \
 } \
--(TableName##_Query*)parent \
+-(TableName##Query*)parent \
 { \
     [super parent]; \
     return self; \
 } \
--(TableName##_View*)findAll \
+-(TableName##View*)findAll \
 { \
-    return [[TableName##_View alloc] _initWithQuery:self]; \
+    return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
@@ -4841,7 +4841,7 @@ TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
 TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName15, CType15) \
 @implementation TableName \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
@@ -4945,34 +4945,34 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
     TIGHTDB_COLUMN_INSERT(self, 14, ndx, CName15, CType15); \
     [self TDBInsertDone]; \
 } \
--(TableName##_Query*)where \
+-(TableName##Query*)where \
 { \
-    return [[TableName##_Query alloc] initWithTable:self]; \
+    return [[TableName##Query alloc] initWithTable:self]; \
 } \
--(TableName##_Row*)addEmptyRow \
+-(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
 } \
--(TableName##_Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
+-(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
-	return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TableName##_Row*)rowAtLastIndex \
+-(TableName##Row*)rowAtLastIndex \
 { \
-    return [[TableName##_Row alloc] initWithTable:self ndx:self.rowCount-1]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:self.rowCount-1]; \
 } \
--(TableName##_Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
     [super insertEmptyRowAtIndex:ndx]; \
-    return [[TableName##_Row alloc] initWithTable:self ndx:ndx]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self ndx:0]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
 +(BOOL)_checkType:(TDBDescriptor*)desc \
 { \
@@ -5031,17 +5031,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
     return YES; \
 } \
 @end \
-@implementation TableName##_View \
+@implementation TableName##View \
 { \
-    TableName##_Row* tmpRow; \
+    TableName##Row* tmpRow; \
 } \
 -(TDBRow*)getRow \
 { \
-    return tmpRow = [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
+    return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
--(TableName##_Row*)rowAtIndex:(NSUInteger)ndx \
+-(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
-    return [[TableName##_Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
+    return [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]]; \
 } \
 @end
 
