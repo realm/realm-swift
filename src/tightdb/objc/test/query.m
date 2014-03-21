@@ -261,6 +261,9 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [table setInt:31 inColumnWithIndex:0 atRowIndex:3];
     [table setInt:8  inColumnWithIndex:0 atRowIndex:4];
     [table setInt:39 inColumnWithIndex:0 atRowIndex:5];
+    
+    STAssertEquals((NSUInteger)1, [[[table where ] intIsGreaterThan:10 inColumnWithIndex:0 ] findFirstRow], @"Row 1 is greater than 10");
+    STAssertEquals((NSUInteger)-1, [[[table where ] intIsGreaterThan:100 inColumnWithIndex:0 ] findFirstRow], @"No rows are greater than 100");
 
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:0], (size_t)2,  @"find");
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:3], (size_t)3,  @"find");

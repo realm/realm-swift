@@ -137,11 +137,11 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName${j+1}, CType${j+1}) \
 } \
 -(long)getFastEnumStart \
 { \
-    return [self findFromRowIndex:0]; \
+    return [self findFirstRowFromIndex:0]; \
 } \
 -(long)incrementFastEnum:(long)ndx \
 { \
-    return [self findFromRowIndex:ndx]; \
+    return [self findFirstRowFromIndex:ndx]; \
 } \
 -(TableName##_Row*)getRow:(long)ndx \
 { \

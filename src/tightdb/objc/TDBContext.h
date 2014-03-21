@@ -24,12 +24,18 @@
 typedef void(^TDBReadBlock)(TDBTransaction *transaction);
 typedef BOOL(^TDBWriteBlock)(TDBTransaction *transaction);
 
+/****************	  TDBContext	****************/
+
 @interface TDBContext: NSObject
+
+// Initializers
 +(TDBContext *)initWithFile:(NSString *)path withError:(NSError **)error;
 
+// Transactions
 -(void)readWithBlock:(TDBReadBlock)block;
 -(BOOL)writeWithBlock:(TDBWriteBlock)block withError:(NSError **)error;
 
+// Context state info
 -(BOOL)hasChangedSinceLastTransaction;
 
 @end
