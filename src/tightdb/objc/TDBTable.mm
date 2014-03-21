@@ -129,6 +129,13 @@ using namespace std;
     return *m_table == *other->m_table;
 }
 
+/**
+ * This method will return NO if it encounters a memory allocation
+ * error (out of memory).
+ *
+ * The specified table class must be one that is declared by using
+ * one of the table macros TIGHTDB_TABLE_*.
+ */
 // FIXME: Check that the specified class derives from TDBTable.
 -(BOOL)hasSameDescriptorAs:(__unsafe_unretained Class)class_obj
 {
@@ -143,6 +150,14 @@ using namespace std;
     return NO;
 }
 
+/**
+ * If the type of this table is not compatible with the specified
+ * table class, then this method returns nil. It also returns nil if
+ * it encounters a memory allocation error (out of memory).
+ *
+ * The specified table class must be one that is declared by using
+ * one of the table macros TIGHTDB_TABLE_*.
+ */
 // FIXME: Check that the specified class derives from TDBTable.
 -(id)castClass:(__unsafe_unretained Class)class_obj
 {
