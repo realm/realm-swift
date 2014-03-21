@@ -334,9 +334,6 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     }
 
     STAssertEquals([table rowCount], (size_t)12, @"Size should have been 12");
-#ifdef TIGHTDB_DEBUG
-    [table verify];
-#endif
 
     // Test Clear
     if (![table removeAllRows]) {
@@ -344,9 +341,6 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     }
     STAssertEquals([table rowCount], (size_t)0, @"Size should have been zero");
 
-#ifdef TIGHTDB_DEBUG
-    [table verify];
-#endif
 }
 
 
