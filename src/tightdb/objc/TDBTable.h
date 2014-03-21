@@ -37,47 +37,47 @@
 @property (nonatomic, readonly) NSUInteger columnCount;
 @property (nonatomic, readonly) TDBDescriptor *descriptor;
 
-/* Initializers for standalone tables */
+// Initializers for standalone tables
 -(instancetype)init;
 
-/* Working with columns */
+// Working with columns
 -(NSUInteger)addColumnWithName:(NSString *)name andType:(TDBType)type;
 -(void)removeColumnWithIndex:(NSUInteger)colIndex;
 -(NSString *)columnNameOfColumn:(NSUInteger)colIndex;
 -(NSUInteger)indexOfColumnWithName:(NSString *)name;
 -(TDBType)columnTypeOfColumn:(NSUInteger)colIndex;
 
-/* Getting and setting individual rows (uses object subscripting) */
+// Getting and setting individual rows (uses object subscripting)
 -(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
 -(TDBRow *)lastRow;
 -(TDBRow *)firstRow;
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
 
-/* Appending rows to end of table */
+// Appending rows to end of table
 -(TDBRow *)addEmptyRow;
 -(BOOL)appendRow:(NSObject *)data;
 
-/* Inserting rows at specific positions */
+// Inserting rows at specific positions
 -(TDBRow *)insertEmptyRowAtIndex:(NSUInteger)rowIndex;
 -(BOOL)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex;
 
-/* Removing rows */
+// Removing rows
 -(BOOL)removeAllRows;
 -(BOOL)removeRowAtIndex:(NSUInteger)rowIndex;
 -(BOOL)removeLastRow;
 
-/* Queries */
+// Queries
 -(TDBQuery *)where;
 
-/* Indexing */
+// Indexing
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex;
 
-/* Optimizing */
+// Optimizing
 -(BOOL)optimize;
 
-/* Table type and schema */
+// Table type and schema
 -(BOOL)isReadOnly;
 -(BOOL)isEqual:(TDBTable *)other;
 -(BOOL)hasSameDescriptorAs:(Class)otherTableClass;
