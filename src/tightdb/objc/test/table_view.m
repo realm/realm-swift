@@ -272,10 +272,10 @@
     [t addEmptyRow];
     
     NSString *value0 = @"value0";
-    [t appendRow:@[value0, @1]];
+    [t addRow:@[value0, @1]];
     
     NSString *value1 = @"value1";
-    [t appendRow:@[value1, @1]];
+    [t addRow:@[value1, @1]];
     
     // add empty rows after to filter out
     [t addEmptyRow];

@@ -184,7 +184,7 @@ using namespace std;
 {
     return m_table->get_column_count();
 }
--(NSString*)columnNameOfColumn:(NSUInteger)ndx
+-(NSString*)nameOfColumnWithIndex:(NSUInteger)ndx
 {
     return to_objc_string(m_table->get_column_name(ndx));
 }
@@ -339,14 +339,14 @@ using namespace std;
     return [[TDBRow alloc] initWithTable:self ndx:ndx];
 }
 
--(BOOL)appendRow:(NSObject*)data
+-(BOOL)addRow:(NSObject*)data
 {
     tightdb::Table& table = *m_table;
-    return [self insertRow:data atRowIndex:table.size()];
+    return [self insertRow:data atIndex:table.size()];
 }
 
 
--(BOOL)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
+-(BOOL)insertRow:(id)anObject atIndex:(NSUInteger)rowIndex
 {
     tightdb::Table& table = *m_table;
     tightdb::ConstDescriptorRef desc = table.get_descriptor();
