@@ -24,7 +24,7 @@ void ex_objc_table_typed_intro()
 
         NSLog(@"The size of the table is now %zd", table.rowCount);
 
-        for (PeopleTable_Row *ite in table) {
+        for (PeopleTableRow *ite in table) {
             NSLog(@"Name: %@ Age: %lli", ite.Name, ite.Age);
         }
 
@@ -32,7 +32,7 @@ void ex_objc_table_typed_intro()
 
         [table insertRow:@{@"Name":@"Sam", @"Age":@30, @"Hired":@YES} atRowIndex:1];
 
-        for (PeopleTable_Row *ite in table) {
+        for (PeopleTableRow *ite in table) {
             NSLog(@"Name: %@ Age: %lli", ite.Name, ite.Age);
         }
 
