@@ -26,10 +26,10 @@ void ex_objc_query_typed_intro()
         [table appendRow:@{@"Name":@"Bob",   @"Age":@10, @"Hired":@NO}];
 
         /* Create a query. */
-        PeopleTable_Query *query = [[[[table where].Age columnIsGreaterThan:20] Or].Name columnIsEqualTo:@"Bob"];
+        PeopleTableQuery *query = [[[[table where].Age columnIsGreaterThan:20] Or].Name columnIsEqualTo:@"Bob"];
 
         /* Iterate over the query result. */
-        for (PeopleTable_Row *row in query) {
+        for (PeopleTableRow *row in query) {
             NSLog(@"Person matching query: %@", row.Name);
         }
     }

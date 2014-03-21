@@ -1,8 +1,10 @@
 2014-03-21
 ==========
 ! BREAKING CHANCE: TDBBinary has been removed; use NSData instead.
+! BREAKING CHANGE: Underscope (_) removed from generated typed table classes.
+! BREAKING CHANCE: Constructor for TDBContext has been renamed to contextWithPersistenceToFile:
 
-2014-08-20
+2014-03-20
 ==========
 * [TDBQuery parent] and [TDBQuery subtable:] selectors now return self.
 ! BREAKING CHANCE: Header files are renamed so names match class names.

@@ -71,16 +71,16 @@
 #define TIGHTDB_COLUMN_PROXY_DEF(name, type)                 TIGHTDB_COLUMN_PROXY_DEF_2(TIGHTDB_IS_SUBTABLE(type), name, type)
 #define TIGHTDB_COLUMN_PROXY_DEF_2(is_subtable, name, type)  TIGHTDB_COLUMN_PROXY_DEF_3(is_subtable, name, type)
 #define TIGHTDB_COLUMN_PROXY_DEF_3(is_subtable, name, type)  TIGHTDB_COLUMN_PROXY_DEF_4_##is_subtable(name, type)
-#define TIGHTDB_COLUMN_PROXY_DEF_4_Y(name, type)             @property(nonatomic, strong) TDBColumnProxy_Subtable* name;
-#define TIGHTDB_COLUMN_PROXY_DEF_4_N(name, type)             @property(nonatomic, strong) TDBColumnProxy_##type* name;
+#define TIGHTDB_COLUMN_PROXY_DEF_4_Y(name, type)             @property(nonatomic, strong) TDBColumnProxySubtable* name;
+#define TIGHTDB_COLUMN_PROXY_DEF_4_N(name, type)             @property(nonatomic, strong) TDBColumnProxy##type* name;
 
 #define TIGHTDB_COLUMN_PROXY_IMPL(name, type)                @synthesize name = _##name;
 
 #define TIGHTDB_COLUMN_PROXY_INIT(table, col, name, type)                TIGHTDB_COLUMN_PROXY_INIT_2(TIGHTDB_IS_SUBTABLE(type), table, col, name, type)
 #define TIGHTDB_COLUMN_PROXY_INIT_2(is_subtable, table, col, name, type) TIGHTDB_COLUMN_PROXY_INIT_3(is_subtable, table, col, name, type)
 #define TIGHTDB_COLUMN_PROXY_INIT_3(is_subtable, table, col, name, type) TIGHTDB_COLUMN_PROXY_INIT_4_##is_subtable(table, col, name, type)
-#define TIGHTDB_COLUMN_PROXY_INIT_4_Y(table, col, name, type)            _##name = [[TDBColumnProxy_Subtable alloc] initWithTable:table column:col]
-#define TIGHTDB_COLUMN_PROXY_INIT_4_N(table, col, name, type)            _##name = [[TDBColumnProxy_##type alloc] initWithTable:table column:col]
+#define TIGHTDB_COLUMN_PROXY_INIT_4_Y(table, col, name, type)            _##name = [[TDBColumnProxySubtable alloc] initWithTable:table column:col]
+#define TIGHTDB_COLUMN_PROXY_INIT_4_N(table, col, name, type)            _##name = [[TDBColumnProxy##type alloc] initWithTable:table column:col]
 
 
 
@@ -210,15 +210,15 @@
 /* Boolean */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Bool(table, col_name) \
-@interface table##_QueryAccessor_##col_name : TDBQueryAccessorBool \
--(table##_Query*)columnIsEqualTo:(BOOL)value; \
+@interface table##QueryAccessor##col_name : TDBQueryAccessorBool \
+-(table##Query*)columnIsEqualTo:(BOOL)value; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Bool(table, col_name) \
-@implementation table##_QueryAccessor_##col_name \
--(table##_Query*)columnIsEqualTo:(BOOL)value \
+@implementation table##QueryAccessor##col_name \
+-(table##Query*)columnIsEqualTo:(BOOL)value \
 { \
-    return (table##_Query*)[super columnIsEqualTo:value]; \
+    return (table##Query*)[super columnIsEqualTo:value]; \
 } \
 @end
 
@@ -226,45 +226,45 @@
 /* Integer */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Int(table, col_name) \
-@interface table##_QueryAccessor_##col_name : TDBQueryAccessorInt \
--(table##_Query*)columnIsEqualTo:(int64_t)value; \
--(table##_Query*)columnIsNotEqualTo:(int64_t)value; \
--(table##_Query*)columnIsGreaterThan:(int64_t)value; \
--(table##_Query*)columnIsGreaterThanOrEqualTo:(int64_t)value; \
--(table##_Query*)columnIsLessThan:(int64_t)value; \
--(table##_Query*)columnIsLessThanOrEqualTo:(int64_t)value; \
--(table##_Query*)columnIsBetween:(int64_t)from and_:(int64_t)to; \
+@interface table##QueryAccessor##col_name : TDBQueryAccessorInt \
+-(table##Query*)columnIsEqualTo:(int64_t)value; \
+-(table##Query*)columnIsNotEqualTo:(int64_t)value; \
+-(table##Query*)columnIsGreaterThan:(int64_t)value; \
+-(table##Query*)columnIsGreaterThanOrEqualTo:(int64_t)value; \
+-(table##Query*)columnIsLessThan:(int64_t)value; \
+-(table##Query*)columnIsLessThanOrEqualTo:(int64_t)value; \
+-(table##Query*)columnIsBetween:(int64_t)from and_:(int64_t)to; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Int(table, col_name) \
-@implementation table##_QueryAccessor_##col_name \
--(table##_Query*)columnIsEqualTo:(int64_t)value \
+@implementation table##QueryAccessor##col_name \
+-(table##Query*)columnIsEqualTo:(int64_t)value \
 { \
-    return (table##_Query*)[super columnIsEqualTo:value]; \
+    return (table##Query*)[super columnIsEqualTo:value]; \
 } \
--(table##_Query*)columnIsNotEqualTo:(int64_t)value \
+-(table##Query*)columnIsNotEqualTo:(int64_t)value \
 { \
-    return (table##_Query*)[super columnIsNotEqualTo:value]; \
+    return (table##Query*)[super columnIsNotEqualTo:value]; \
 } \
--(table##_Query*)columnIsGreaterThan:(int64_t)value \
+-(table##Query*)columnIsGreaterThan:(int64_t)value \
 { \
-    return (table##_Query*)[super columnIsGreaterThan:value]; \
+    return (table##Query*)[super columnIsGreaterThan:value]; \
 } \
--(table##_Query*)columnIsGreaterThanOrEqualTo:(int64_t)value \
+-(table##Query*)columnIsGreaterThanOrEqualTo:(int64_t)value \
 { \
-    return (table##_Query*)[super columnIsGreaterThanOrEqualTo:value]; \
+    return (table##Query*)[super columnIsGreaterThanOrEqualTo:value]; \
 } \
--(table##_Query*)columnIsLessThan:(int64_t)value \
+-(table##Query*)columnIsLessThan:(int64_t)value \
 { \
-    return (table##_Query*)[super columnIsLessThan:value]; \
+    return (table##Query*)[super columnIsLessThan:value]; \
 } \
--(table##_Query*)columnIsLessThanOrEqualTo:(int64_t)value \
+-(table##Query*)columnIsLessThanOrEqualTo:(int64_t)value \
 { \
-    return (table##_Query*)[super columnIsLessThanOrEqualTo:value]; \
+    return (table##Query*)[super columnIsLessThanOrEqualTo:value]; \
 } \
--(table##_Query*)columnIsBetween:(int64_t)from and_:(int64_t)to \
+-(table##Query*)columnIsBetween:(int64_t)from and_:(int64_t)to \
 { \
-    return (table##_Query*)[super columnIsBetween:from and_:to]; \
+    return (table##Query*)[super columnIsBetween:from and_:to]; \
 } \
 @end
 
@@ -272,45 +272,45 @@
 /* Float */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Float(table, col_name) \
-@interface table##_QueryAccessor_##col_name : TDBQueryAccessorFloat \
--(table##_Query*)columnIsEqualTo:(float)value; \
--(table##_Query*)columnIsNotEqualTo:(float)value; \
--(table##_Query*)columnIsGreaterThan:(float)value; \
--(table##_Query*)columnIsGreaterThanOrEqualTo:(float)value; \
--(table##_Query*)columnIsLessThan:(float)value; \
--(table##_Query*)columnIsLessThanOrEqualTo:(float)value; \
--(table##_Query*)columnIsBetween:(float)from and_:(float)to; \
+@interface table##QueryAccessor##col_name : TDBQueryAccessorFloat \
+-(table##Query*)columnIsEqualTo:(float)value; \
+-(table##Query*)columnIsNotEqualTo:(float)value; \
+-(table##Query*)columnIsGreaterThan:(float)value; \
+-(table##Query*)columnIsGreaterThanOrEqualTo:(float)value; \
+-(table##Query*)columnIsLessThan:(float)value; \
+-(table##Query*)columnIsLessThanOrEqualTo:(float)value; \
+-(table##Query*)columnIsBetween:(float)from and_:(float)to; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Float(table, col_name) \
-@implementation table##_QueryAccessor_##col_name \
--(table##_Query*)columnIsEqualTo:(float)value \
+@implementation table##QueryAccessor##col_name \
+-(table##Query*)columnIsEqualTo:(float)value \
 { \
-    return (table##_Query*)[super columnIsEqualTo:value]; \
+    return (table##Query*)[super columnIsEqualTo:value]; \
 } \
--(table##_Query*)columnIsNotEqualTo:(float)value \
+-(table##Query*)columnIsNotEqualTo:(float)value \
 { \
-    return (table##_Query*)[super columnIsNotEqualTo:value]; \
+    return (table##Query*)[super columnIsNotEqualTo:value]; \
 } \
--(table##_Query*)columnIsGreaterThan:(float)value \
+-(table##Query*)columnIsGreaterThan:(float)value \
 { \
-    return (table##_Query*)[super columnIsGreaterThan:value]; \
+    return (table##Query*)[super columnIsGreaterThan:value]; \
 } \
--(table##_Query*)columnIsGreaterThanOrEqualTo:(float)value \
+-(table##Query*)columnIsGreaterThanOrEqualTo:(float)value \
 { \
-    return (table##_Query*)[super columnIsGreaterThanOrEqualTo:value]; \
+    return (table##Query*)[super columnIsGreaterThanOrEqualTo:value]; \
 } \
--(table##_Query*)columnIsLessThan:(float)value \
+-(table##Query*)columnIsLessThan:(float)value \
 { \
-    return (table##_Query*)[super columnIsLessThan:value]; \
+    return (table##Query*)[super columnIsLessThan:value]; \
 } \
--(table##_Query*)columnIsLessThanOrEqualTo:(float)value \
+-(table##Query*)columnIsLessThanOrEqualTo:(float)value \
 { \
-    return (table##_Query*)[super columnIsLessThanOrEqualTo:value]; \
+    return (table##Query*)[super columnIsLessThanOrEqualTo:value]; \
 } \
--(table##_Query*)columnIsBetween:(float)from and_:(float)to \
+-(table##Query*)columnIsBetween:(float)from and_:(float)to \
 { \
-    return (table##_Query*)[super columnIsBetween:from and_:to]; \
+    return (table##Query*)[super columnIsBetween:from and_:to]; \
 } \
 @end
 
@@ -318,45 +318,45 @@
 /* Double */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Double(table, col_name) \
-@interface table##_QueryAccessor_##col_name : TDBQueryAccessorDouble \
--(table##_Query*)columnIsEqualTo:(double)value; \
--(table##_Query*)columnIsNotEqualTo:(double)value; \
--(table##_Query*)columnIsGreaterThan:(double)value; \
--(table##_Query*)columnIsGreaterThanOrEqualTo:(double)value; \
--(table##_Query*)columnIsLessThan:(double)value; \
--(table##_Query*)columnIsLessThanOrEqualTo:(double)value; \
--(table##_Query*)columnIsBetween:(double)from and_:(double)to; \
+@interface table##QueryAccessor##col_name : TDBQueryAccessorDouble \
+-(table##Query*)columnIsEqualTo:(double)value; \
+-(table##Query*)columnIsNotEqualTo:(double)value; \
+-(table##Query*)columnIsGreaterThan:(double)value; \
+-(table##Query*)columnIsGreaterThanOrEqualTo:(double)value; \
+-(table##Query*)columnIsLessThan:(double)value; \
+-(table##Query*)columnIsLessThanOrEqualTo:(double)value; \
+-(table##Query*)columnIsBetween:(double)from and_:(double)to; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Double(table, col_name) \
-@implementation table##_QueryAccessor_##col_name \
--(table##_Query*)columnIsEqualTo:(double)value \
+@implementation table##QueryAccessor##col_name \
+-(table##Query*)columnIsEqualTo:(double)value \
 { \
-    return (table##_Query*)[super columnIsEqualTo:value]; \
+    return (table##Query*)[super columnIsEqualTo:value]; \
 } \
--(table##_Query*)columnIsNotEqualTo:(double)value \
+-(table##Query*)columnIsNotEqualTo:(double)value \
 { \
-    return (table##_Query*)[super columnIsNotEqualTo:value]; \
+    return (table##Query*)[super columnIsNotEqualTo:value]; \
 } \
--(table##_Query*)columnIsGreaterThan:(double)value \
+-(table##Query*)columnIsGreaterThan:(double)value \
 { \
-    return (table##_Query*)[super columnIsGreaterThan:value]; \
+    return (table##Query*)[super columnIsGreaterThan:value]; \
 } \
--(table##_Query*)columnIsGreaterThanOrEqualTo:(double)value \
+-(table##Query*)columnIsGreaterThanOrEqualTo:(double)value \
 { \
-    return (table##_Query*)[super columnIsGreaterThanOrEqualTo:value]; \
+    return (table##Query*)[super columnIsGreaterThanOrEqualTo:value]; \
 } \
--(table##_Query*)columnIsLessThan:(double)value \
+-(table##Query*)columnIsLessThan:(double)value \
 { \
-    return (table##_Query*)[super columnIsLessThan:value]; \
+    return (table##Query*)[super columnIsLessThan:value]; \
 } \
--(table##_Query*)columnIsLessThanOrEqualTo:(double)value \
+-(table##Query*)columnIsLessThanOrEqualTo:(double)value \
 { \
-    return (table##_Query*)[super columnIsLessThanOrEqualTo:value]; \
+    return (table##Query*)[super columnIsLessThanOrEqualTo:value]; \
 } \
--(table##_Query*)columnIsBetween:(double)from and_:(double)to \
+-(table##Query*)columnIsBetween:(double)from and_:(double)to \
 { \
-    return (table##_Query*)[super columnIsBetween:from and_:to]; \
+    return (table##Query*)[super columnIsBetween:from and_:to]; \
 } \
 @end
 
@@ -364,60 +364,60 @@
 /* String */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_String(table, col_name) \
-@interface table##_QueryAccessor_##col_name : TDBQueryAccessorString \
--(table##_Query*)columnIsEqualTo:(NSString*)value; \
--(table##_Query*)columnIsEqualTo:(NSString*)value caseSensitive:(BOOL)caseSensitive; \
--(table##_Query*)columnIsNotEqualTo:(NSString*)value; \
--(table##_Query*)columnIsNotEqualTo:(NSString*)value caseSensitive:(BOOL)caseSensitive; \
--(table##_Query*)columnBeginsWith:(NSString*)value; \
--(table##_Query*)columnBeginsWith:(NSString*)value caseSensitive:(BOOL)caseSensitive; \
--(table##_Query*)columnEndsWith:(NSString*)value; \
--(table##_Query*)columnEndsWith:(NSString*)value caseSensitive:(BOOL)caseSensitive; \
--(table##_Query*)columnContains:(NSString*)value; \
--(table##_Query*)columnContains:(NSString*)value caseSensitive:(BOOL)caseSensitive; \
+@interface table##QueryAccessor##col_name : TDBQueryAccessorString \
+-(table##Query*)columnIsEqualTo:(NSString*)value; \
+-(table##Query*)columnIsEqualTo:(NSString*)value caseSensitive:(BOOL)caseSensitive; \
+-(table##Query*)columnIsNotEqualTo:(NSString*)value; \
+-(table##Query*)columnIsNotEqualTo:(NSString*)value caseSensitive:(BOOL)caseSensitive; \
+-(table##Query*)columnBeginsWith:(NSString*)value; \
+-(table##Query*)columnBeginsWith:(NSString*)value caseSensitive:(BOOL)caseSensitive; \
+-(table##Query*)columnEndsWith:(NSString*)value; \
+-(table##Query*)columnEndsWith:(NSString*)value caseSensitive:(BOOL)caseSensitive; \
+-(table##Query*)columnContains:(NSString*)value; \
+-(table##Query*)columnContains:(NSString*)value caseSensitive:(BOOL)caseSensitive; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_String(table, col_name) \
-@implementation table##_QueryAccessor_##col_name \
--(table##_Query*)columnIsEqualTo:(NSString*)value \
+@implementation table##QueryAccessor##col_name \
+-(table##Query*)columnIsEqualTo:(NSString*)value \
 { \
-    return (table##_Query*)[super columnIsEqualTo:value]; \
+    return (table##Query*)[super columnIsEqualTo:value]; \
 } \
--(table##_Query*)columnIsEqualTo:(NSString*)value caseSensitive:(BOOL)caseSensitive \
+-(table##Query*)columnIsEqualTo:(NSString*)value caseSensitive:(BOOL)caseSensitive \
 { \
-    return (table##_Query*)[super columnIsEqualTo:value caseSensitive:caseSensitive]; \
+    return (table##Query*)[super columnIsEqualTo:value caseSensitive:caseSensitive]; \
 } \
--(table##_Query*)columnIsNotEqualTo:(NSString*)value \
+-(table##Query*)columnIsNotEqualTo:(NSString*)value \
 { \
-    return (table##_Query*)[super columnIsNotEqualTo:value]; \
+    return (table##Query*)[super columnIsNotEqualTo:value]; \
 } \
--(table##_Query*)columnIsNotEqualTo:(NSString*)value caseSensitive:(BOOL)caseSensitive \
+-(table##Query*)columnIsNotEqualTo:(NSString*)value caseSensitive:(BOOL)caseSensitive \
 { \
-    return (table##_Query*)[super columnIsNotEqualTo:value caseSensitive:caseSensitive]; \
+    return (table##Query*)[super columnIsNotEqualTo:value caseSensitive:caseSensitive]; \
 } \
--(table##_Query*)columnBeginsWith:(NSString*)value \
+-(table##Query*)columnBeginsWith:(NSString*)value \
 { \
-    return (table##_Query*)[super columnBeginsWith:value]; \
+    return (table##Query*)[super columnBeginsWith:value]; \
 } \
--(table##_Query*)columnBeginsWith:(NSString*)value caseSensitive:(BOOL)caseSensitive \
+-(table##Query*)columnBeginsWith:(NSString*)value caseSensitive:(BOOL)caseSensitive \
 { \
-    return (table##_Query*)[super columnBeginsWith:value caseSensitive:caseSensitive]; \
+    return (table##Query*)[super columnBeginsWith:value caseSensitive:caseSensitive]; \
 } \
--(table##_Query*)columnEndsWith:(NSString*)value \
+-(table##Query*)columnEndsWith:(NSString*)value \
 { \
-    return (table##_Query*)[super columnEndsWith:value]; \
+    return (table##Query*)[super columnEndsWith:value]; \
 } \
--(table##_Query*)columnEndsWith:(NSString*)value caseSensitive:(BOOL)caseSensitive \
+-(table##Query*)columnEndsWith:(NSString*)value caseSensitive:(BOOL)caseSensitive \
 { \
-    return (table##_Query*)[super columnEndsWith:value caseSensitive:caseSensitive]; \
+    return (table##Query*)[super columnEndsWith:value caseSensitive:caseSensitive]; \
 } \
--(table##_Query*)columnContains:(NSString*)value \
+-(table##Query*)columnContains:(NSString*)value \
 { \
-    return (table##_Query*)[super columnContains:value]; \
+    return (table##Query*)[super columnContains:value]; \
 } \
--(table##_Query*)columnContains:(NSString*)value caseSensitive:(BOOL)caseSensitive \
+-(table##Query*)columnContains:(NSString*)value caseSensitive:(BOOL)caseSensitive \
 { \
-    return (table##_Query*)[super columnContains:value caseSensitive:caseSensitive]; \
+    return (table##Query*)[super columnContains:value caseSensitive:caseSensitive]; \
 } \
 @end
 
@@ -425,35 +425,35 @@
 /* Binary */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Binary(table, col_name) \
-@interface table##_QueryAccessor_##col_name : TDBQueryAccessorBinary \
--(table##_Query*)columnIsEqualTo:(NSData*)value; \
--(table##_Query*)columnIsNotEqualTo:(NSData*)value; \
--(table##_Query*)columnBeginsWith:(NSData*)value; \
--(table##_Query*)columnEndsWith:(NSData*)value; \
--(table##_Query*)columnContains:(NSData*)value; \
+@interface table##QueryAccessor##col_name : TDBQueryAccessorBinary \
+-(table##Query*)columnIsEqualTo:(NSData*)value; \
+-(table##Query*)columnIsNotEqualTo:(NSData*)value; \
+-(table##Query*)columnBeginsWith:(NSData*)value; \
+-(table##Query*)columnEndsWith:(NSData*)value; \
+-(table##Query*)columnContains:(NSData*)value; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Binary(table, col_name) \
-@implementation table##_QueryAccessor_##col_name \
--(table##_Query*)columnIsEqualTo:(NSData*)value \
+@implementation table##QueryAccessor##col_name \
+-(table##Query*)columnIsEqualTo:(NSData*)value \
 { \
-    return (table##_Query*)[super columnIsEqualTo:value]; \
+    return (table##Query*)[super columnIsEqualTo:value]; \
 } \
--(table##_Query*)columnIsNotEqualTo:(NSData*)value \
+-(table##Query*)columnIsNotEqualTo:(NSData*)value \
 { \
-    return (table##_Query*)[super columnIsNotEqualTo:value]; \
+    return (table##Query*)[super columnIsNotEqualTo:value]; \
 } \
--(table##_Query*)columnBeginsWith:(NSData*)value \
+-(table##Query*)columnBeginsWith:(NSData*)value \
 { \
-    return (table##_Query*)[super columnBeginsWith:value]; \
+    return (table##Query*)[super columnBeginsWith:value]; \
 } \
--(table##_Query*)columnEndsWith:(NSData*)value \
+-(table##Query*)columnEndsWith:(NSData*)value \
 { \
-    return (table##_Query*)[super columnEndsWith:value]; \
+    return (table##Query*)[super columnEndsWith:value]; \
 } \
--(table##_Query*)columnContains:(NSData*)value \
+-(table##Query*)columnContains:(NSData*)value \
 { \
-    return (table##_Query*)[super columnContains:value]; \
+    return (table##Query*)[super columnContains:value]; \
 } \
 @end
 
@@ -461,45 +461,45 @@
 /* Date */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Date(table, col_name) \
-@interface table##_QueryAccessor_##col_name : TDBQueryAccessorDate \
--(table##_Query*)columnIsEqualTo:(NSDate *)value; \
--(table##_Query*)columnIsNotEqualTo:(NSDate *)value; \
--(table##_Query*)columnIsGreaterThan:(NSDate *)value; \
--(table##_Query*)columnIsGreaterThanOrEqualTo:(NSDate *)value; \
--(table##_Query*)columnIsLessThan:(NSDate *)value; \
--(table##_Query*)columnIsLessThanOrEqualTo:(NSDate *)value; \
--(table##_Query*)columnIsBetween:(NSDate *)from and_:(NSDate *)to; \
+@interface table##QueryAccessor##col_name : TDBQueryAccessorDate \
+-(table##Query*)columnIsEqualTo:(NSDate *)value; \
+-(table##Query*)columnIsNotEqualTo:(NSDate *)value; \
+-(table##Query*)columnIsGreaterThan:(NSDate *)value; \
+-(table##Query*)columnIsGreaterThanOrEqualTo:(NSDate *)value; \
+-(table##Query*)columnIsLessThan:(NSDate *)value; \
+-(table##Query*)columnIsLessThanOrEqualTo:(NSDate *)value; \
+-(table##Query*)columnIsBetween:(NSDate *)from and_:(NSDate *)to; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Date(table, col_name) \
-@implementation table##_QueryAccessor_##col_name \
--(table##_Query*)columnIsEqualTo:(NSDate *)value \
+@implementation table##QueryAccessor##col_name \
+-(table##Query*)columnIsEqualTo:(NSDate *)value \
 { \
-    return (table##_Query*)[super columnIsEqualTo:value]; \
+    return (table##Query*)[super columnIsEqualTo:value]; \
 } \
--(table##_Query*)columnIsNotEqualTo:(NSDate *)value \
+-(table##Query*)columnIsNotEqualTo:(NSDate *)value \
 { \
-    return (table##_Query*)[super columnIsNotEqualTo:value]; \
+    return (table##Query*)[super columnIsNotEqualTo:value]; \
 } \
--(table##_Query*)columnIsGreaterThan:(NSDate *)value \
+-(table##Query*)columnIsGreaterThan:(NSDate *)value \
 { \
-    return (table##_Query*)[super columnIsGreaterThan:value]; \
+    return (table##Query*)[super columnIsGreaterThan:value]; \
 } \
--(table##_Query*)columnIsGreaterThanOrEqualTo:(NSDate *)value \
+-(table##Query*)columnIsGreaterThanOrEqualTo:(NSDate *)value \
 { \
-    return (table##_Query*)[super columnIsGreaterThanOrEqualTo:value]; \
+    return (table##Query*)[super columnIsGreaterThanOrEqualTo:value]; \
 } \
--(table##_Query*)columnIsLessThan:(NSDate *)value \
+-(table##Query*)columnIsLessThan:(NSDate *)value \
 { \
-    return (table##_Query*)[super columnIsLessThan:value]; \
+    return (table##Query*)[super columnIsLessThan:value]; \
 } \
--(table##_Query*)columnIsLessThanOrEqualTo:(NSDate *)value \
+-(table##Query*)columnIsLessThanOrEqualTo:(NSDate *)value \
 { \
-    return (table##_Query*)[super columnIsLessThanOrEqualTo:value]; \
+    return (table##Query*)[super columnIsLessThanOrEqualTo:value]; \
 } \
--(table##_Query*)columnIsBetween:(NSDate *)from and_:(NSDate *)to \
+-(table##Query*)columnIsBetween:(NSDate *)from and_:(NSDate *)to \
 { \
-    return (table##_Query*)[super columnIsBetween:from and_:to]; \
+    return (table##Query*)[super columnIsBetween:from and_:to]; \
 } \
 @end
 
@@ -507,20 +507,20 @@
 /* Subtable */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_SUBTABLE(table, col_name, col_type) \
-@interface table##_QueryAccessor_##col_name : TDBQueryAccessorSubtable \
+@interface table##QueryAccessor##col_name : TDBQueryAccessorSubtable \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_SUBTABLE(table, col_name, col_type) \
-@implementation table##_QueryAccessor_##col_name \
+@implementation table##QueryAccessor##col_name \
 @end
 
 
 /* Mixed */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Mixed(table, col_name) \
-@interface table##_QueryAccessor_##col_name : TDBQueryAccessorMixed \
+@interface table##QueryAccessor##col_name : TDBQueryAccessorMixed \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Mixed(table, col_name) \
-@implementation table##_QueryAccessor_##col_name \
+@implementation table##QueryAccessor##col_name \
 @end
