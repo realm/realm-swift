@@ -47,7 +47,7 @@ CATEGORIES:
                  (TDBMixed *)mixedWithDouble:(double)value
                  (TDBMixed *)mixedWithDate:(NSDate)value
                  (TDBMixed *)mixedWithString:(NSString *)value
-                 (TDBMixed *)mixedWithBinary:(TDBBinary *)value
+                 (TDBMixed *)mixedWithBinary:(NSData *)value
                  (TDBMixed *)mixedWithBinary:(const char *)data size:(size_t)size
                  (TDBMixed *)mixedWithTable:(TDBTable *)value
       PARAMS:
@@ -99,12 +99,12 @@ CATEGORIES:
                  (float)getFloat
                  (double)getDouble
                  (NSString *)getString
-                 (TDBBinary *)getBinary
+                 (NSData *)getBinary
                  (TDBTable *)getTable
       CONST    : True
       RETURN:
         TYPES  : [BOOL, int64_t, float, double, NSDate, NSString,
-                  TDBBinary, TDBTable]
+                  NSData, TDBTable]
         DESCR  : *g_mixed_get_return1_descr
       EXAMPLES:
       - CODE   : ex_objc_mixed_get_value
