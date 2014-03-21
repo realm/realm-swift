@@ -29,66 +29,67 @@
 @class TDBRow;
 @class TDBMixed;
 
+/****************	  TDBTable		****************/
+
 @interface TDBTable: NSObject <NSFastEnumeration>
 
+@property (nonatomic, readonly) NSUInteger rowCount;
 @property (nonatomic, readonly) NSUInteger columnCount;
 @property (nonatomic, readonly) TDBDescriptor *descriptor;
-@property (nonatomic, readonly) NSUInteger rowCount;
 
+// Initializers for standalone tables
+-(instancetype)init;
 
--(BOOL)isEqual:(TDBTable *)other;
-
--(BOOL)isReadOnly;
-
-
-/**
- * This method will return NO if it encounters a memory allocation
- * error (out of memory).
- *
- * The specified table class must be one that is declared by using
- * one of the table macros TIGHTDB_TABLE_*.
- */
--(BOOL)hasSameDescriptorAs:(Class)otherTableClass;
-
-/**
- * If the type of this table is not compatible with the specified
- * table class, then this method returns nil. It also returns nil if
- * it encounters a memory allocation error (out of memory).
- *
- * The specified table class must be one that is declared by using
- * one of the table macros TIGHTDB_TABLE_*.
- */
--(id)castClass:(Class)obj;
-
-/* Column meta info */
+// Working with columns
 -(NSUInteger)addColumnWithName:(NSString *)name andType:(TDBType)type;
 -(void)removeColumnWithIndex:(NSUInteger)colIndex;
 -(NSString *)columnNameOfColumn:(NSUInteger)colIndex;
 -(NSUInteger)indexOfColumnWithName:(NSString *)name;
 -(TDBType)columnTypeOfColumn:(NSUInteger)colIndex;
 
-
--(TDBRow *)addEmptyRow;
-
-/* Only curser based add should be public. This is just a temporaray way to hide the methods. */
-/* TODO: Move to class extension. */
--(NSUInteger)TDBAddEmptyRow;
--(NSUInteger)TDBAddEmptyRows:(NSUInteger)numberOfRows;
-
--(BOOL)removeAllRows;
--(BOOL)removeRowAtIndex:(NSUInteger)rowIndex;
--(BOOL)removeLastRow;
-
--(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex; /* object subscripting */
+// Getting and setting individual rows (uses object subscripting)
+-(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
 -(TDBRow *)lastRow;
 -(TDBRow *)firstRow;
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
 
--(TDBRow *)insertEmptyRowAtIndex:(NSUInteger)rowIndex;
-
+// Appending rows to end of table
+-(TDBRow *)addEmptyRow;
 -(BOOL)appendRow:(NSObject *)data;
+
+// Inserting rows at specific positions
+-(TDBRow *)insertEmptyRowAtIndex:(NSUInteger)rowIndex;
 -(BOOL)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex;
+
+// Removing rows
+-(BOOL)removeAllRows;
+-(BOOL)removeRowAtIndex:(NSUInteger)rowIndex;
+-(BOOL)removeLastRow;
+
+// Queries
+-(TDBQuery *)where;
+
+// Indexing
+-(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;
+-(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex;
+
+// Optimizing
+-(BOOL)optimize;
+
+// Table type and schema
+-(BOOL)isReadOnly;
+-(BOOL)isEqual:(TDBTable *)other;
+-(BOOL)hasSameDescriptorAs:(Class)otherTableClass;
+-(id)castClass:(Class)obj;
+
+
+/* -\/- EVERYTHING BELOW HERE SHOULD BE REMOVED / HIDDEN AWAY -\/- */
+
+/* Only curser based add should be public. This is just a temporaray way to hide the methods. */
+/* TODO: Move to class extension. */
+-(NSUInteger)TDBAddEmptyRow;
+-(NSUInteger)TDBAddEmptyRows:(NSUInteger)numberOfRows;
 
 -(BOOL)boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(int64_t)intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
@@ -158,14 +159,7 @@
 -(TDBView *)findAllRowsWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
 
 
--(TDBQuery *)where;
 
-/* Indexing */
--(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;
--(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex;
-
-/* Optimizing */
--(BOOL)optimize;
 
 /* Conversion */
 /* FIXME: Do we want to conversion methods? Maybe use NSData. */
@@ -191,9 +185,6 @@
 -(double)avgFloatColumnWithIndex:(NSUInteger)colIndex;
 -(double)avgDoubleColumnWithIndex:(NSUInteger)colIndex;
 
-#ifdef TIGHTDB_DEBUG
--(void)verify;
-#endif
 
 /* Private */
 -(id)_initRaw;

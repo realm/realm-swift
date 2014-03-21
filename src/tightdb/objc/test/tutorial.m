@@ -64,7 +64,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     // Getting values
     NSString * name = [people rowAtIndex:5].Name;   // => 'Anni'
     // Using a row
-    PeopleTable_Row *myRow = [people rowAtIndex:5];
+    PeopleTableRow *myRow = [people rowAtIndex:5];
     int64_t age = myRow.Age;                           // => 54
     BOOL hired  = myRow.Hired;                         // => true
     NSLog(@"%@ is %lld years old.", name, age);
@@ -91,7 +91,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
 
     // Iterating over rows:
     for (size_t i = 0; i < [people rowCount]; ++i) {
-        PeopleTable_Row *row = [people rowAtIndex:i];
+        PeopleTableRow *row = [people rowAtIndex:i];
         NSLog(@"(Rows) %@ is %lld years old.", row.Name, row.Age);
     }
 
@@ -108,7 +108,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"Mary: %zu", row);
     STAssertEquals(row, (size_t)1,@"Mary should have been there", nil);
 
-    PeopleTable_View *view = [[[people where].Age columnIsEqualTo:21] findAll];
+    PeopleTableView *view = [[[people where].Age columnIsEqualTo:21] findAll];
     size_t cnt = [view rowCount];             // cnt = 2
     STAssertEquals(cnt, (size_t)2,@"Should be two rows in view", nil);
 
@@ -117,7 +117,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     //------------------------------------------------------
 
     // Create query (current employees between 20 and 30 years old)
-    PeopleTable_Query *q = [[[people where].Hired columnIsEqualTo:YES]            // Implicit AND
+    PeopleTableQuery *q = [[[people where].Hired columnIsEqualTo:YES]            // Implicit AND
                                   .Age columnIsBetween:20 and_:30];
 
     // Get number of matching entries
@@ -156,7 +156,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"Disktable size: %zu", [diskTable rowCount]);
 
     for (size_t i = 0; i < [diskTable rowCount]; i++) {
-        PeopleTable_Row *row = [diskTable rowAtIndex:i];
+        PeopleTableRow *row = [diskTable rowAtIndex:i];
         NSLog(@"%zu: %@", i, [row Name]);
         NSLog(@"%zu: %@", i, row.Name);
     }
@@ -168,7 +168,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     TDBTransaction *fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
     PeopleTable *memTable = [fromMem createTableWithName:@"employees" asTableClass:[PeopleTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
-        PeopleTable_Row *row = [memTable rowAtIndex:i];
+        PeopleTableRow *row = [memTable rowAtIndex:i];
         NSLog(@"%zu: %@", i, row.Name);
     }
 }

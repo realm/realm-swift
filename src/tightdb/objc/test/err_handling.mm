@@ -334,9 +334,6 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     }
 
     STAssertEquals([table rowCount], (size_t)12, @"Size should have been 12");
-#ifdef TIGHTDB_DEBUG
-    [table verify];
-#endif
 
     // Test Clear
     if (![table removeAllRows]) {
@@ -344,9 +341,6 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     }
     STAssertEquals([table rowCount], (size_t)0, @"Size should have been zero");
 
-#ifdef TIGHTDB_DEBUG
-    [table verify];
-#endif
 }
 
 
@@ -383,7 +377,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     //    STAssertEquals([[[table where].TableCol  columnIsEqualTo:subtab1] count], (size_t)1, @"TableCol equal");
     //    STAssertEquals([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (size_t)1, @"MixedCol equal");
 
-    TestQueryErrAllTypes_Query* query = [[table where].BoolCol   columnIsEqualTo:NO];
+    TestQueryErrAllTypesQuery* query = [[table where].BoolCol   columnIsEqualTo:NO];
 
     STAssertEquals([query.IntCol min] , (int64_t)54,    @"IntCol min");
     STAssertEquals([query.IntCol max], (int64_t)54,    @"IntCol max");
@@ -445,7 +439,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     [[[table where].BinaryCol columnEndsWith:bin1].BoolCol columnIsEqualTo:NO];
     [[[table where].BinaryCol columnContains:bin1].BoolCol columnIsEqualTo:NO];
 
-    TestQueryErrAllTypes_View* view = [[[[table where].DateCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO] findAll];
+    TestQueryErrAllTypesView* view = [[[[table where].DateCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO] findAll];
     for (size_t i = 0; i < [view rowCount]; i++) {
         NSLog(@"%zu: %c", i, [[view rowAtIndex:i] BoolCol]);
     }

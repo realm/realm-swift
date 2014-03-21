@@ -57,7 +57,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 //    STAssertEquals([[[table where].TableCol  columnIsEqualTo:subtab1] count], (size_t)1, @"TableCol equal");
 //    STAssertEquals([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (size_t)1, @"MixedCol equal");
 
-    TestQueryAllTypes_Query *query = [[table where].BoolCol   columnIsEqualTo:NO];
+    TestQueryAllTypesQuery *query = [[table where].BoolCol   columnIsEqualTo:NO];
 
     STAssertEquals([query.IntCol min], (int64_t)54,    @"IntCol min");
     STAssertEquals([query.IntCol max], (int64_t)54,    @"IntCol max");
@@ -261,6 +261,9 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [table setInt:31 inColumnWithIndex:0 atRowIndex:3];
     [table setInt:8  inColumnWithIndex:0 atRowIndex:4];
     [table setInt:39 inColumnWithIndex:0 atRowIndex:5];
+    
+    STAssertEquals((NSUInteger)1, [[[table where ] intIsGreaterThan:10 inColumnWithIndex:0 ] findFirstRow], @"Row 1 is greater than 10");
+    STAssertEquals((NSUInteger)-1, [[[table where ] intIsGreaterThan:100 inColumnWithIndex:0 ] findFirstRow], @"No rows are greater than 100");
 
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:0], (size_t)2,  @"find");
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:3], (size_t)3,  @"find");
@@ -271,7 +274,24 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (size_t)-1, @"find");
 }
 
-
+- (void) testSubtableQuery
+{
+    TDBTable *t = [[TDBTable alloc] init];
+    
+    TDBDescriptor *d = t.descriptor;
+    TDBDescriptor *subDesc = [d addColumnTable:@"subtable"];
+    [subDesc addColumnWithName:@"subCol" andType:TDBBoolType];
+    [t addEmptyRow];
+    STAssertEquals(t.rowCount, (NSUInteger)1,@"one row added");
+    
+    TDBTable * subTable = [t tableInColumnWithIndex:0 atRowIndex:0];
+    [subTable addEmptyRow];
+    [subTable setBool:YES inColumnWithIndex:0 atRowIndex:0];
+    TDBQuery *q = [t where];
+    
+    TDBView *v = [[[[q subtableInColumnWithIndex:0] boolIsEqualTo:YES inColumnWithIndex:0] parent] findAllRows];
+    STAssertEquals(v.rowCount, (NSUInteger)1,@"one match");
+}
 
 
 @end
