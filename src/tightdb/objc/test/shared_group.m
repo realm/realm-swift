@@ -47,7 +47,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [group writeContextToFile:@"employees.tightdb" withError:nil];
 
     // Read only shared group
-    TDBContext* fromDisk = [TDBContext initWithFile:@"employees.tightdb" withError:nil];
+    TDBContext* fromDisk = [TDBContext contextWithPersistenceToFile:@"employees.tightdb" withError:nil];
 
     [fromDisk readWithBlock:^(TDBTransaction* group) {
             SharedTable2* diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[SharedTable2 class]];
@@ -111,7 +111,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:@"readonlyTest.tightdb" error:nil];
     [fm removeItemAtPath:@"readonlyTest.tightdb.lock" error:nil];
     
-    TDBContext* fromDisk = [TDBContext initWithFile:@"readonlyTest.tightdb" withError:nil];
+    TDBContext* fromDisk = [TDBContext contextWithPersistenceToFile:@"readonlyTest.tightdb" withError:nil];
     
     [fromDisk writeWithBlock:^(TDBTransaction *group) {
         TDBTable *t = [group getOrCreateTableWithName:@"table"];
@@ -151,7 +151,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:@"hasChanged.tightdb" error:nil];
     [fm removeItemAtPath:@"hasChanged.tightdb.lock" error:nil];
     
-    TDBContext *sg = [TDBContext initWithFile:@"hasChanged.tightdb" withError:nil];
+    TDBContext *sg = [TDBContext contextWithPersistenceToFile:@"hasChanged.tightdb" withError:nil];
     
     STAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not changed");
     
@@ -175,7 +175,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     
     
     // OTHER sharedgroup
-    TDBContext *sg2 = [TDBContext initWithFile:@"hasChanged.tightdb" withError:nil];
+    TDBContext *sg2 = [TDBContext contextWithPersistenceToFile:@"hasChanged.tightdb" withError:nil];
     
     
     [sg2 writeWithBlock:^(TDBTransaction* group) {
