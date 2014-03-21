@@ -19,7 +19,7 @@ void ex_objc_sharedgroup_intro()
         [fm removeItemAtPath:@"sharedgrouptest.tightdb" error:nil];
         [fm removeItemAtPath:@"sharedgrouptest.tightdb.lock" error:nil];
 
-        TDBContext *context = [TDBContext initWithFile:@"sharedgrouptest.tightdb" withError:nil];
+        TDBContext *context = [TDBContext contextWithPersistenceToFile:@"sharedgrouptest.tightdb" withError:nil];
         if (!context) {
             NSLog(@"Error");
         }
@@ -73,7 +73,7 @@ void ex_objc_sharedgroup_intro()
             /* Read transactions with the shared group are possible via the provided variable binding named group. */
             PeopleTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
 
-            for (PeopleTable_Row *row in table) {
+            for (PeopleTableRow *row in table) {
                 NSLog(@"Name: %@", [row Name]);
             }
         }];

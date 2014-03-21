@@ -52,7 +52,7 @@ TIGHTDB_TABLE_3(TestSubtableMain,
        table. */
     [people addFirst:@"first" Sub:nil Second:8];
 
-    TestSubtableMain_Row *cursor = [people rowAtIndex:0];
+    TestSubtableMainRow *cursor = [people rowAtIndex:0];
     TestSubtableSub *subtable = cursor.Sub;
     [subtable addName:@"name" Age:999];
 
