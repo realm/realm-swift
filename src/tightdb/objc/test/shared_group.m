@@ -185,8 +185,37 @@ TIGHTDB_TABLE_2(SharedTable2,
     } withError:nil];
 
     STAssertTrue([sg hasChangedSinceLastTransaction], @"SharedGroup HAS been changed by another process");
+}
 
 
+- (void)testContextExceptions
+{
+    NSString *contextPath = @"contextTest.tightdb";
+    NSFileManager* fm = [NSFileManager defaultManager];
+        [fm removeItemAtPath:contextPath error:nil];
+    [fm removeItemAtPath:[contextPath stringByAppendingString:@".lock"] error:nil];
+    
+    TDBContext *c = [TDBContext contextWithPersistenceToFile:contextPath withError:nil];
+    
+    [c writeWithBlock:^BOOL(TDBTransaction *transaction) {
+        
+        STAssertThrows([transaction createTableWithName:nil], @"name is nil");
+        STAssertThrows([transaction createTableWithName:@""], @"name is empty");
+
+        [transaction createTableWithName:@"name"];
+        STAssertThrows([transaction createTableWithName:@"name"], @"name already exists");
+        
+        return YES;
+    } withError:nil];
+    
+    [c readWithBlock:^(TDBTransaction *transaction) {
+        
+        STAssertThrows([transaction getTableWithName:nil], @"name is nil");
+        STAssertThrows([transaction getTableWithName:@""], @"name is empty");
+        STAssertThrows([transaction createTableWithName:@"same name"], @"creating table not allowed in read transaction");
+        STAssertThrows([transaction createTableWithName:@"name"], @"creating table not allowed in read transaction");
+        STAssertNil([transaction getTableWithName:@"weird name"], @"get table that does not exists return nil");
+    }];
 }
 
 @end
