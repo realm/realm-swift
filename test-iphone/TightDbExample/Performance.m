@@ -322,7 +322,7 @@ TIGHTDB_TABLE_4(PerfTable,
 {
     
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
-    TDBContext *fromDisk = [TDBContext initWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
+    TDBContext *fromDisk = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
     [fromDisk readWithBlock:^(TDBTransaction *group) {
         PerfTable *diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class] ];
 
@@ -346,7 +346,7 @@ TIGHTDB_TABLE_4(PerfTable,
 -(void)testWriteTransaction
 {
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
-    TDBContext *fromDisk = [TDBContext initWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
+    TDBContext *fromDisk = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
     [fromDisk writeWithBlock:^(TDBTransaction *group) {
         PerfTable *diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class] ];
 
