@@ -1070,12 +1070,6 @@ using namespace std;
     return YES; // Must be overridden in typed table classes.
 }
 
-#ifdef TIGHTDB_DEBUG
--(void)verify
-{
-    m_table->Verify();
-}
-#endif
 @end
 
 

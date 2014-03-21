@@ -322,16 +322,16 @@ TIGHTDB_TABLE_4(PerfTable,
 {
     
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
-    TDBContext *fromDisk = [TDBContext initWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
+    TDBContext *fromDisk = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
     [fromDisk readWithBlock:^(TDBTransaction *group) {
         PerfTable *diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class] ];
 
         // Create query (current employees between 20 and 30 years old)
-        PerfTable_Query *q = [[[diskTable where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30];
+        PerfTableQuery *q = [[[diskTable where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30];
 
-        PerfTable_View *res = [q findAll];
+        PerfTableView *res = [q findAll];
         int agesum = 0;
-        for (PerfTable_Row *row in res) {
+        for (PerfTableRow *row in res) {
             agesum += row.Age;
         }
     }];
@@ -346,7 +346,7 @@ TIGHTDB_TABLE_4(PerfTable,
 -(void)testWriteTransaction
 {
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
-    TDBContext *fromDisk = [TDBContext initWithFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
+    TDBContext *fromDisk = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
     [fromDisk writeWithBlock:^(TDBTransaction *group) {
         PerfTable *diskTable = [group getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class] ];
 

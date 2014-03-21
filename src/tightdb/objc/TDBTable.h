@@ -184,9 +184,6 @@
 -(double)avgFloatColumnWithIndex:(NSUInteger)colIndex;
 -(double)avgDoubleColumnWithIndex:(NSUInteger)colIndex;
 
-#ifdef TIGHTDB_DEBUG
--(void)verify;
-#endif
 
 /* Private */
 -(id)_initRaw;

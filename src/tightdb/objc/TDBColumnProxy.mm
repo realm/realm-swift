@@ -40,14 +40,14 @@
 }
 @end
 
-@implementation TDBColumnProxy_Bool
+@implementation TDBColumnProxyBool
 -(NSUInteger)find:(BOOL)value
 {
     return [self.table findRowIndexWithBool:value inColumnWithIndex:self.column ];
 }
 @end
 
-@implementation TDBColumnProxy_Int
+@implementation TDBColumnProxyInt
 -(NSUInteger)find:(int64_t)value
 {
     return [self.table findRowIndexWithInt:value inColumnWithIndex:self.column ];
@@ -70,7 +70,7 @@
 }
 @end
 
-@implementation TDBColumnProxy_Float
+@implementation TDBColumnProxyFloat
 -(NSUInteger)find:(float)value
 {
     return [self.table findRowIndexWithFloat:value inColumnWithIndex:self.column];
@@ -93,7 +93,7 @@
 }
 @end
 
-@implementation TDBColumnProxy_Double
+@implementation TDBColumnProxyDouble
 -(NSUInteger)find:(double)value
 {
     return [self.table findRowIndexWithDouble:value inColumnWithIndex:self.column];
@@ -116,31 +116,31 @@
 }
 @end
 
-@implementation TDBColumnProxy_String
+@implementation TDBColumnProxyString
 -(NSUInteger)find:(NSString*)value
 {
     return [self.table findRowIndexWithString:value inColumnWithIndex:self.column];
 }
 @end
 
-@implementation TDBColumnProxy_Binary
+@implementation TDBColumnProxyBinary
 -(NSUInteger)find:(NSData*)value
 {
     return [self.table findRowIndexWithBinary:value inColumnWithIndex:self.column];
 }
 @end
 
-@implementation TDBColumnProxy_Date
+@implementation TDBColumnProxyDate
 -(NSUInteger)find:(NSDate *)value
 {
     return [self.table findRowIndexWithDate:value inColumnWithIndex:self.column];
 }
 @end
 
-@implementation TDBColumnProxy_Subtable
+@implementation TDBColumnProxySubtable
 @end
 
-@implementation TDBColumnProxy_Mixed
+@implementation TDBColumnProxyMixed
 -(NSUInteger)find:(TDBMixed*)value
 {
     return [self.table findRowIndexWithMixed:value inColumnWithIndex:self.column];

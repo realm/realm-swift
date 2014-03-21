@@ -29,11 +29,11 @@
 -(void)clear;
 @end
 
-@interface TDBColumnProxy_Bool: TDBColumnProxy
+@interface TDBColumnProxyBool: TDBColumnProxy
 -(NSUInteger)find:(BOOL)value;
 @end
 
-@interface TDBColumnProxy_Int: TDBColumnProxy
+@interface TDBColumnProxyInt: TDBColumnProxy
 -(NSUInteger)find:(int64_t)value;
 -(int64_t)minimum;
 -(int64_t)maximum;
@@ -41,7 +41,7 @@
 -(double)average;
 @end
 
-@interface TDBColumnProxy_Float: TDBColumnProxy
+@interface TDBColumnProxyFloat: TDBColumnProxy
 -(NSUInteger)find:(float)value;
 -(float)minimum;
 -(float)maximum;
@@ -49,7 +49,7 @@
 -(double)average;
 @end
 
-@interface TDBColumnProxy_Double: TDBColumnProxy
+@interface TDBColumnProxyDouble: TDBColumnProxy
 -(NSUInteger)find:(double)value;
 -(double)minimum;
 -(double)maximum;
@@ -57,21 +57,21 @@
 -(double)average;
 @end
 
-@interface TDBColumnProxy_String: TDBColumnProxy
+@interface TDBColumnProxyString: TDBColumnProxy
 -(NSUInteger)find:(NSString *)value;
 @end
 
-@interface TDBColumnProxy_Binary: TDBColumnProxy
+@interface TDBColumnProxyBinary: TDBColumnProxy
 -(NSUInteger)find:(NSData *)value;
 @end
 
-@interface TDBColumnProxy_Date: TDBColumnProxy
+@interface TDBColumnProxyDate: TDBColumnProxy
 -(NSUInteger)find:(NSDate *)value;
 @end
 
-@interface TDBColumnProxy_Subtable: TDBColumnProxy
+@interface TDBColumnProxySubtable: TDBColumnProxy
 @end
 
-@interface TDBColumnProxy_Mixed: TDBColumnProxy
+@interface TDBColumnProxyMixed: TDBColumnProxy
 -(NSUInteger)find:(TDBMixed *)value;
 @end
