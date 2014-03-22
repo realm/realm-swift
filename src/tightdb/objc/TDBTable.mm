@@ -41,13 +41,30 @@ using namespace std;
 
 
 
--(id)init
+-(instancetype)init
 {
     self = [super init];
     if (self) {
         m_read_only = NO;
         m_table = tightdb::Table::create(); // FIXME: May throw
     }
+    return self;
+}
+
+-(instancetype)initWithSchema:(NSArray *)schema
+{
+    self = [super init];
+    if (!self) return nil;
+
+    m_read_only = NO;
+    m_table = tightdb::Table::create(); // FIXME: May throw
+
+    if (!set_columns(m_table, schema)) {
+        m_table.reset();
+        //TODO: Parsing the schema failed, we should return an error message
+        return nil;
+    }
+
     return self;
 }
 

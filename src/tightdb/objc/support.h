@@ -30,4 +30,6 @@ BOOL set_row(size_t ndx, tightdb::Table& table, NSArray *data);
 BOOL verify_row_with_labels(const tightdb::Descriptor& descr, NSDictionary* data);
 BOOL insert_row_with_labels(size_t row_ndx, tightdb::Table& table, NSDictionary *data);
 BOOL set_row_with_labels(size_t row_ndx, tightdb::Table& table, NSDictionary *data);
+BOOL set_columns(tightdb::TableRef& parent, NSArray *schema);
+
 #endif /* TIGHTDB_OBJC_SUPPORT_H */
