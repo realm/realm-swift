@@ -20,7 +20,7 @@
 
 #import <Foundation/Foundation.h>
 
-#include <tightdb/objc/TDBType.h>
+#import "TDBViewProtocol.h"
 
 @class TDBBinary;
 @class TDBView;
@@ -31,7 +31,7 @@
 
 /****************	  TDBTable		****************/
 
-@interface TDBTable: NSObject <NSFastEnumeration>
+@interface TDBTable: NSObject <TDBViewProtocol,NSFastEnumeration>
 
 @property (nonatomic, readonly) NSUInteger rowCount;
 @property (nonatomic, readonly) NSUInteger columnCount;

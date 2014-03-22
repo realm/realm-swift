@@ -24,7 +24,7 @@
 
 #include <tightdb/objc/TDBType.h>
 
-@interface TDBView: NSObject <NSFastEnumeration>
+@interface TDBView: NSObject <TDBViewProtocol,NSFastEnumeration>
 
 @property (nonatomic, readonly) NSUInteger rowCount;
 @property (nonatomic, readonly) NSUInteger columnCount;
