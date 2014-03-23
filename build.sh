@@ -399,14 +399,14 @@ EOF
         auto_configure || exit 1
         iphone_sdks_avail="$(get_config_param "IPHONE_SDKS_AVAIL")" || exit 1
         if [ "$iphone_sdks_avail" != "yes" ]; then
-            tightdb_abort "ERROR: iPhone SDKs were not found during configuration!"
+            tightdb_abort "ERROR: iPhone SDKs were not found during configuration"
         fi
         iphone_core_lib="$(get_config_param "IPHONE_CORE_LIB")" || exit 1
         if [ "$iphone_core_lib" = "none" ]; then
-            tightdb_abort "ERROR: TightDB core library for iPhone was not found during configuration!"
+            tightdb_abort "ERROR: TightDB core library for iPhone was not found during configuration"
         fi
         if ! [ -e "$iphone_core_lib/libtightdb-ios.a" ]; then
-            tightdb_abort "ERROR: TightDB core library for iPhone is not available in '$iphone_core_lib'!"
+            tightdb_abort "ERROR: TightDB core library for iPhone is not available in '$iphone_core_lib'"
         fi
         temp_dir="$(mktemp -d /tmp/tightdb.objc.build-iphone.XXXX)" || exit 1
         xcode_home="$(get_config_param "XCODE_HOME")" || exit 1
