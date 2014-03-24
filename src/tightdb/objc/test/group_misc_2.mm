@@ -216,18 +216,18 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Add a row to the top level table
     [table addEmptyRow];
-    [table setInt:700 inColumnWithIndex:COL_TABLE_INT atRowIndex:0];
+    [table TDBsetInt:700 inColumnWithIndex:COL_TABLE_INT atRowIndex:0];
 
     // Add two rows to the subtable
     TDBTable* subtable = [table TDBtableInColumnWithIndex:COL_TABLE_TAB atRowIndex:0];
     [subtable addEmptyRow];
 
-    [subtable setInt:800 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:0];
+    [subtable TDBsetInt:800 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:0];
     [subtable addEmptyRow];
-    [subtable setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
+    [subtable TDBsetInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
 
     // Make the mixed values column contain another subtable
-    [table setMixed:[TDBMixed mixedWithTable:nil] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
+    [table TDBsetMixed:[TDBMixed mixedWithTable:nil] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
 
 /* Fails!!!
     // Specify its type
