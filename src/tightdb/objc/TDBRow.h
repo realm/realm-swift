@@ -3,7 +3,7 @@
  * TIGHTDB CONFIDENTIAL
  * __________________
  *
- *  [2011] - [2012] TightDB Inc
+ *  [2011] - [2014] TightDB Inc
  *  All Rights Reserved.
  *
  * NOTICE:  All information contained herein is, and remains
@@ -21,7 +21,6 @@
 #import <Foundation/Foundation.h>
 
 @class TDBTable;
-@class TDBBinary;
 @class TDBMixed;
 
 @interface TDBRow: NSObject
@@ -40,7 +39,7 @@
 -(void)setFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
--(void)setBinary:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setTable:(TDBTable *)aTable inColumnWithIndex:(NSUInteger)colIndex;
 
@@ -50,7 +49,7 @@
 -(float)floatInColumnWithIndex:(NSUInteger)colIndex;
 -(double)doubleInColumnWithIndex:(NSUInteger)colIndex;
 -(NSDate *)dateInColumnWithIndex:(NSUInteger)colIndex;
--(TDBBinary *)binaryInColumnWithIndex:(NSUInteger)colIndex;
+-(NSData *)binaryInColumnWithIndex:(NSUInteger)colIndex;
 -(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex;
 -(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex;
 
@@ -73,8 +72,8 @@
 -(void)setDouble:(double)value;
 -(NSString *)getString;
 -(void)setString:(NSString *)value;
--(TDBBinary *)getBinary;
--(void)setBinary:(TDBBinary *)value;
+-(NSData *)getBinary;
+-(void)setBinary:(NSData *)value;
 -(NSDate *)getDate;
 -(void)setDate:(NSDate *)value;
 -(void)setSubtable:(TDBTable *)value;

@@ -3,7 +3,7 @@
  * TIGHTDB CONFIDENTIAL
  * __________________
  *
- *  [2011] - [2012] TightDB Inc
+ *  [2011] - [2014] TightDB Inc
  *  All Rights Reserved.
  *
  * NOTICE:  All information contained herein is, and remains
@@ -42,9 +42,10 @@
 
 +(TDBTransaction *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
 
-+(TDBTransaction *)groupWithBuffer:(TDBBinary *)buffer withError:(NSError *__autoreleasing *)error;
++(TDBTransaction *)groupWithBuffer:(NSData *)buffer withError:(NSError *__autoreleasing *)error;
 
--(TDBBinary *)writeContextToBuffer;
+-(BOOL)writeContextToFile:(NSString *)path withError:(NSError *__autoreleasing *)error;
 
+-(NSData *)writeContextToBuffer;
 @end
 

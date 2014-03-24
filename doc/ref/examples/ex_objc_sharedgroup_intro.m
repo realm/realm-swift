@@ -14,45 +14,34 @@ void ex_objc_sharedgroup_intro()
 {
     @autoreleasepool {
 
-        /* Creates a group and uses it to create a new table. */
         NSFileManager *fm = [NSFileManager defaultManager];
-        [fm removeItemAtPath:@"sharedgrouptest.tightdb" error:nil];
-        [fm removeItemAtPath:@"sharedgrouptest.tightdb.lock" error:nil];
+        [fm removeItemAtPath:@"contextTest.tightdb" error:nil];
+        [fm removeItemAtPath:@"contextTest.tightdb.lock" error:nil];
 
-        TDBContext *context = [TDBContext contextWithPersistenceToFile:@"sharedgrouptest.tightdb" withError:nil];
-        if (!context) {
-            NSLog(@"Error");
-        }
-        else {
-            NSLog(@"%@", context);
-        }
+        /* Creates a context and uses it to create a new table. */
+        TDBContext *context = [TDBContext contextWithPersistenceToFile:@"contextTest.tightdb" withError:nil];
 
         /* A write transaction (with commit). */
         NSError *error = nil;
         BOOL success;
 
         success = [context writeWithBlock:^(TDBTransaction *group) {
-            /* Write transactions with the shared group are possible via the provided variable binding named group. */
-            PeopleTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
 
-            if ([table rowCount] == 0) {
-                NSLog(@"Not empty!");
-                return NO; /* Rollback */
-            }
-
-            [table appendRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
-            NSLog(@"Commit!");
+            /* Write transactions with the context are possible via the provided variable binding named transaction. */
+            PeopleTable *table = [group createTableWithName:@"employees" asTableClass:[PeopleTable class]];
+            [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
+            
             return YES; /* Commit */
         } withError:&error];
 
-        if(!success)
-            NSLog(@"Error : %@", [error localizedDescription]);
+        if (!success)
+            NSLog(@"Something went wrong in the write-transaction: %@", [error description]);
 
         /* A write transaction (with rollback). */
         success = [context writeWithBlock:^(TDBTransaction *group) {
 
             /* Write transactions with the shared group are possible via the provided variable binding named group. */
-           PeopleTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
+           PeopleTable *table = [group createTableWithName:@"employees" asTableClass:[PeopleTable class]];
 
            if ([table rowCount] == 0) {
                NSLog(@"Roll back!");
@@ -71,7 +60,7 @@ void ex_objc_sharedgroup_intro()
         [context readWithBlock:^(TDBTransaction *group) {
 
             /* Read transactions with the shared group are possible via the provided variable binding named group. */
-            PeopleTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleTable class]];
+            PeopleTable *table = [group getTableWithName:@"employees" asTableClass:[PeopleTable class]];
 
             for (PeopleTableRow *row in table) {
                 NSLog(@"Name: %@", [row Name]);

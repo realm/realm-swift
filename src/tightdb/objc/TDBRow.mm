@@ -1,6 +1,22 @@
-//
-//  cursor.mm
-//  TightDb
+/*************************************************************************
+ *
+ * TIGHTDB CONFIDENTIAL
+ * __________________
+ *
+ *  [2011] - [2014] TightDB Inc
+ *  All Rights Reserved.
+ *
+ * NOTICE:  All information contained herein is, and remains
+ * the property of TightDB Incorporated and its suppliers,
+ * if any.  The intellectual and technical concepts contained
+ * herein are proprietary to TightDB Incorporated
+ * and its suppliers and may be covered by U.S. and Foreign Patents,
+ * patents in process, and are protected by trade secret or copyright law.
+ * Dissemination of this information or reproduction of this material
+ * is strictly forbidden unless prior written permission is obtained
+ * from TightDB Incorporated.
+ *
+ **************************************************************************/
 
 #include <tightdb/table.hpp>
 
@@ -111,7 +127,7 @@ using namespace std;
             [_table setDate:(NSDate *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
         case TDBBinaryType:
-            [_table setBinary:(TDBBinary *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
+            [_table setBinary:(NSData *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
         case TDBTableType:
             [_table setTable:(TDBTable *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
@@ -139,7 +155,7 @@ using namespace std;
     return [_table stringInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(TDBBinary *)binaryInColumnWithIndex:(NSUInteger)colNdx
+-(NSData *)binaryInColumnWithIndex:(NSUInteger)colNdx
 {
     return [_table binaryInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -184,7 +200,7 @@ using namespace std;
     [_table setString:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(void)setBinary:(TDBBinary *)value inColumnWithIndex:(NSUInteger)colNdx
+-(void)setBinary:(NSData *)value inColumnWithIndex:(NSUInteger)colNdx
 {
     [_table setBinary:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -288,12 +304,12 @@ using namespace std;
     [_cursor.table setString:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
--(TDBBinary *)getBinary
+-(NSData *)getBinary
 {
     return [_cursor.table binaryInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
--(void)setBinary:(TDBBinary *)value
+-(void)setBinary:(NSData *)value
 {
     [_cursor.table setBinary:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }

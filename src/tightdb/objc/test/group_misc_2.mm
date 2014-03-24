@@ -43,11 +43,11 @@ TIGHTDB_TABLE_2(QueryTable,
 {
     size_t row;
     TDBTransaction* group = [TDBTransaction group];
-    NSLog(@"HasTable: %i", [group hasTableWithName:@"employees" withTableClass:[MyTable class]] );
+    NSLog(@"HasTable: %i", [group hasTableWithName:@"employees"] );
     // Create new table in group
-    MyTable* table = [group getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
+    MyTable* table = [group createTableWithName:@"employees" asTableClass:[MyTable class]];
     NSLog(@"Table: %@", table);
-    NSLog(@"HasTable: %i", [group hasTableWithName:@"employees" withTableClass:[MyTable class]] );
+    NSLog(@"HasTable: %i", [group hasTableWithName:@"employees"] );
 
     // Add some rows
     [table addName:@"John" Age:20 Hired:YES Spare:0];
@@ -111,7 +111,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Load a group from disk (and print contents)
     TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"employees.tightdb" withError:nil];
-    MyTable* diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
+    MyTable* diskTable = [fromDisk getTableWithName:@"employees" asTableClass:[MyTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
 //    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
@@ -124,11 +124,11 @@ TIGHTDB_TABLE_2(QueryTable,
     }
 
     // Write same group to memory buffer
-    TDBBinary* buffer = [group writeContextToBuffer];
+    NSData* buffer = [group writeContextToBuffer];
 
     // Load a group from memory (and print contents)
     TDBTransaction* fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
-    MyTable* memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
+    MyTable* memTable = [fromMem getTableWithName:@"employees" asTableClass:[MyTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         // ??? cursor
         NSLog(@"%zu: %@", i, memTable.Name);
@@ -139,7 +139,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testQuery
 {
     TDBTransaction* group = [TDBTransaction group];
-    QueryTable* table = [group getOrCreateTableWithName:@"Query table" asTableClass:[QueryTable class]];
+    QueryTable* table = [group createTableWithName:@"Query table" asTableClass:[QueryTable class]];
 
     // Add some rows
     [table addFirst:2 Second:@"a"];
@@ -196,7 +196,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testSubtables
 {
     TDBTransaction* group = [TDBTransaction group];
-    TDBTable* table = [group getOrCreateTableWithName:@"table" asTableClass:[TDBTable class]];
+    TDBTable* table = [group createTableWithName:@"table" asTableClass:[TDBTable class]];
 
     // Specify the table type
     {
@@ -215,15 +215,15 @@ TIGHTDB_TABLE_2(QueryTable,
     int COL_SUBTABLE_INT = 0;
 
     // Add a row to the top level table
-    [table addEmptyRow];
+    [table addRow:nil];
     [table setInt:700 inColumnWithIndex:COL_TABLE_INT atRowIndex:0];
 
     // Add two rows to the subtable
     TDBTable* subtable = [table tableInColumnWithIndex:COL_TABLE_TAB atRowIndex:0];
-    [subtable addEmptyRow];
+    [subtable addRow:nil];
 
     [subtable setInt:800 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:0];
-    [subtable addEmptyRow];
+    [subtable addRow:nil];
     [subtable setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
 
     // Make the mixed values column contain another subtable

@@ -32,8 +32,8 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     STAssertNotNil(table, @"Table is nil");
 
     const char bin[4] = { 0, 1, 2, 3 };
-    TDBBinary *bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
-    TDBBinary *bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSData *bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
 //    TestQuerySub *subtab1 = [[TestQuerySub alloc] init];
     TestQuerySub *subtab2 = [[TestQuerySub alloc] init];
     [subtab2 addAge:100];
@@ -162,8 +162,8 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         const char bin[4] = { 0, 1, 2, 3 };
         TDBMixed *mixInt1   = [TDBMixed mixedWithInt64:1];
         TDBMixed *mixString   = [TDBMixed mixedWithString:@"foo"];
-        TDBBinary *bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
-        TDBBinary *bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+        NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+        NSData *bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
 
         // Using private method just for the sake of testing the setters below.
         [table TDBAddEmptyRows:2];
@@ -281,11 +281,11 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     TDBDescriptor *d = t.descriptor;
     TDBDescriptor *subDesc = [d addColumnTable:@"subtable"];
     [subDesc addColumnWithName:@"subCol" andType:TDBBoolType];
-    [t addEmptyRow];
+    [t addRow:nil];
     STAssertEquals(t.rowCount, (NSUInteger)1,@"one row added");
     
     TDBTable * subTable = [t tableInColumnWithIndex:0 atRowIndex:0];
-    [subTable addEmptyRow];
+    [subTable addRow:nil];
     [subTable setBool:YES inColumnWithIndex:0 atRowIndex:0];
     TDBQuery *q = [t where];
     
