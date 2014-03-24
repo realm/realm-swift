@@ -246,6 +246,7 @@ CATEGORIES :
         DESCR  : The row.
 
   - g_dyn_table_add_empty_row:
+      TODO     : later  
       NAME     : addEmptyRow
       SUMMARY  : *objc_typed_table_add_empty_row_summary
       DESCR    : *objc_typed_table_add_empty_row_descr
@@ -255,6 +256,7 @@ CATEGORIES :
         DESCR  : Returns the inserted row.
 
   - g_dyn_table_insert_empty_row:
+      TODO     : later
       NAME     : "insertEmptyRowAtIndex:"
       SUMMARY  : *g_dyn_table_insert_empty_row_summary
       DESCR    : *g_dyn_table_insert_empty_row_descr
@@ -273,7 +275,8 @@ CATEGORIES :
       DESCR    : >
                  This method will insert a row in the table at a particular
                  place. The row is optionally represented as Cocoa (NS) objects,
-                 otherwise an empty row is inserted.
+                 otherwise an empty row is inserted. If data is nil, an empty row
+                 with default values is inserted.
       SIGNATURE: (BOOL)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME    : anObject
@@ -287,13 +290,14 @@ CATEGORIES :
         DESCR  : <code>YES</code> if elements are valid and row inserted, <code>NO</code> otherwise.
 
   - objc_dyn_table_append_row:
-      NAME     : "appendRow:"
+      NAME     : "addRow:"
       SUMMARY  : Append a row using object literals.
       DESCR    : >
                  This method will append (insert at the end) a row to a table.
                  The row is represented as Cocoa (NS) objects as elements in
                  array. The elements' types are validated before creating the
-                 new row.
+                 new row. If data is nil, an empty row
+                 with default values is inserted.
       SIGNATURE: (BOOL)appendRow:(NSObject *)data
       PARAMS:
       - NAME   : data
@@ -722,12 +726,16 @@ CATEGORIES :
 - Aggregates:
   METHODS:
   - g_dyn_table_count_int:
+      TODO     : later
       NAME     : countInt
   - g_dyn_table_count_float:
+      TODO     : later
       NAME     : countFloat
   - g_dyn_table_count_double:
+      TODO     : later
       NAME     : countDouble
   - g_dyn_table_count_string:
+      TODO     : later
       NAME     : countRowsWith
       TITLE    : "countRowsWith*Column:inColumnWithIndex:"
       SUMMARY  : *g_dyn_table_count_summary
@@ -756,6 +764,7 @@ CATEGORIES :
   - g_dyn_table_sum_int:
   - g_dyn_table_sum_float:
   - g_dyn_table_sum_double:
+      TODO     : later
       NAMES    : [sumInt, sumFloat, sumDouble]
       TITLE    : "sum*ColumnWithIndex:"
       SUMMARY  : *g_dyn_table_sum_summary
@@ -778,6 +787,7 @@ CATEGORIES :
   - g_dyn_table_maximum_int:
   - g_dyn_table_maximum_float:
   - g_dyn_table_maximum_double:
+      TODO     : later
       NAMES    : [maxInt, maxFloat, maximumDouble]
       TITLE    : "max*InColumnWithIndex:"
       SUMMARY  : *g_dyn_table_maximum_summary
@@ -801,6 +811,7 @@ CATEGORIES :
   - g_dyn_table_minimum_int:
   - g_dyn_table_minimum_float:
   - g_dyn_table_minimum_double:
+      TODO     : later
       NAMES    : [minInt, minimumFloat, minimumDouble]
       TITLE    : "min*InColumnWithIndex:"
       SUMMARY  : *g_dyn_table_minimum_summary
@@ -823,6 +834,7 @@ CATEGORIES :
   - g_dyn_table_average_int:
   - g_dyn_table_average_float:
   - g_dyn_table_average_double:
+      TODO     : later
       NAMES    : [avgInt, averageFloat, averageDouble]
       TITLE    : "avg*ColumnWithIndex:"
       SUMMARY  : *g_dyn_table_average_summary
