@@ -212,11 +212,6 @@ using namespace std;
     return m_table->size();
 }
 
--(TDBRow*)addEmptyRow
-{
-    return [[TDBRow alloc] initWithTable:self ndx:[self TDBAddEmptyRow]];
-}
-
 -(TDBRow*)insertEmptyRowAtIndex:(NSUInteger)ndx
 {
     [self TDBInsertRow:ndx];
@@ -339,10 +334,20 @@ using namespace std;
     return [[TDBRow alloc] initWithTable:self ndx:ndx];
 }
 
--(BOOL)addRow:(NSObject*)data
+-(NSUInteger)addRow:(NSObject*)data
 {
+    if(!data) {
+        return [self TDBAddEmptyRows:1];
+    }
     tightdb::Table& table = *m_table;
-    return [self insertRow:data atIndex:table.size()];
+    [self insertRow:data atIndex:table.size()];
+    return table.size()-1;
+}
+
+/* Moved to private header */
+-(TDBRow*)addEmptyRow
+{
+    return [[TDBRow alloc] initWithTable:self ndx:[self TDBAddEmptyRow]];
 }
 
 
@@ -353,7 +358,10 @@ using namespace std;
     
     if ([anObject isKindOfClass:[NSArray class]]) {
         if (!verify_row(*desc, (NSArray *)anObject)) {
-            return NO;
+            NSException* exception = [NSException exceptionWithName:@"tightdb:table_wrong_column_type"
+                                                             reason:@"Column type is wrong"
+                                                           userInfo:[NSMutableDictionary dictionary]];
+            [exception raise];
         }
         return insert_row(size_t(rowIndex), table, (NSArray *)anObject);
     }

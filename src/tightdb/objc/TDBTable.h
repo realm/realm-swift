@@ -55,8 +55,7 @@
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
 
 // Adding rows to end of table
--(TDBRow *)addEmptyRow;
--(BOOL)addRow:(NSObject *)data;
+-(NSUInteger)addRow:(NSObject *)data;
 
 // Inserting rows at specific positions
 -(TDBRow *)insertEmptyRowAtIndex:(NSUInteger)rowIndex;
