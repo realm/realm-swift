@@ -943,9 +943,7 @@ using namespace std;
 }
 -(TDBView*)findAllRowsWithBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
-    const void *data = [(NSData *)aBinary bytes];
-    tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)aBinary length]);
-    tightdb::TableView view = m_table->find_all_binary(colIndex, bd);
+    tightdb::TableView view = m_table->find_all_binary(colIndex, [aBinary tdbBinaryData]);
     return [TDBView viewWithTable:self andNativeView:view];
 }
 -(TDBView*)findAllRowsWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
