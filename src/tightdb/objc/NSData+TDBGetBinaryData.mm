@@ -18,11 +18,15 @@
  *
  **************************************************************************/
 
+#import "NSData+TDBGetBinaryData.h"
+
 #include <tightdb/binary_data.hpp>
 
-@interface TDBBinary()
+@implementation NSData (TDBGetBinaryData)
 
--(tightdb::BinaryData&)getNativeBinary;
--(id)initWithBinary:(tightdb::BinaryData)data;
-
+-(tightdb::BinaryData) tdbBinaryData
+{
+    const void *data = self.bytes;
+    return tightdb::BinaryData(static_cast<const char *>(data), self.length);
+}
 @end

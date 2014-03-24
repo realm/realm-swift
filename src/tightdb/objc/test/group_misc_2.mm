@@ -124,7 +124,7 @@ TIGHTDB_TABLE_2(QueryTable,
     }
 
     // Write same group to memory buffer
-    TDBBinary* buffer = [group writeContextToBuffer];
+    NSData* buffer = [group writeContextToBuffer];
 
     // Load a group from memory (and print contents)
     TDBTransaction* fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];

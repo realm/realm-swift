@@ -16,10 +16,10 @@
 #import <tightdb/objc/TDBView.h>
 #import <tightdb/objc/TDBView_priv.h>
 #import <tightdb/objc/TDBRow.h>
-#import <tightdb/objc/TDBBinary.h>
-#import <tightdb/objc/TDBBinary_priv.h>
+#import "NSData+TDBGetBinaryData.h"
 
 #include <tightdb/objc/util.hpp>
+
 
 using namespace std;
 
@@ -240,12 +240,7 @@ using namespace std;
 }
 
 
-
 // Conditions:
-
-
-
-
 -(TDBQuery*)boolIsEqualTo:(bool)aBool inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->equal(colIndex, aBool);
@@ -283,16 +278,15 @@ using namespace std;
 }
 
 
-
 -(TDBQuery*)dateIsEqualTo:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->equal_datetime(colIndex, [aDate timeIntervalSince1970]);
     return self;
 }
 
--(TDBQuery*)binaryIsEqualTo:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex
+-(TDBQuery*)binaryIsEqualTo:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->equal(colIndex, [aBinary getNativeBinary]);
+    m_query->equal(colIndex, aBinary.tdbBinaryData);
     return self;
 }
 
@@ -334,9 +328,9 @@ using namespace std;
     return self;
 }
 
--(TDBQuery*)binaryIsNotEqualTo:(TDBBinary*)value inColumnWithIndex:(NSUInteger)colIndex
+-(TDBQuery*)binaryIsNotEqualTo:(NSData*)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->not_equal(colIndex, [value getNativeBinary]);
+    m_query->not_equal(colIndex, value.tdbBinaryData);
     return self;
 }
 
@@ -443,16 +437,6 @@ using namespace std;
     m_query->less_equal_datetime(colIndex, [value timeIntervalSince1970]);
     return self;
 }
-
-
-
-
-
-
-
-
-
-
 
 @end
 
@@ -804,29 +788,29 @@ using namespace std;
     }
     return self;
 }
--(TDBQuery*)columnIsEqualTo:(TDBBinary*)value
+-(TDBQuery*)columnIsEqualTo:(NSData*)value
 {
-    [_query getNativeQuery].equal(_column_ndx, [value getNativeBinary]);
+    [_query getNativeQuery].equal(_column_ndx, value.tdbBinaryData);
     return _query;
 }
--(TDBQuery*)columnIsNotEqualTo:(TDBBinary*)value
+-(TDBQuery*)columnIsNotEqualTo:(NSData*)value
 {
-    [_query getNativeQuery].not_equal(_column_ndx, [value getNativeBinary]);
+    [_query getNativeQuery].not_equal(_column_ndx, value.tdbBinaryData);
     return _query;
 }
--(TDBQuery*)columnBeginsWith:(TDBBinary*)value
+-(TDBQuery*)columnBeginsWith:(NSData*)value
 {
-    [_query getNativeQuery].begins_with(_column_ndx, [value getNativeBinary]);
+    [_query getNativeQuery].begins_with(_column_ndx, value.tdbBinaryData);
     return _query;
 }
--(TDBQuery*)columnEndsWith:(TDBBinary*)value
+-(TDBQuery*)columnEndsWith:(NSData*)value
 {
-    [_query getNativeQuery].ends_with(_column_ndx, [value getNativeBinary]);
+    [_query getNativeQuery].ends_with(_column_ndx, value.tdbBinaryData);
     return _query;
 }
--(TDBQuery*)columnContains:(TDBBinary*)value
+-(TDBQuery*)columnContains:(NSData*)value
 {
-    [_query getNativeQuery].contains(_column_ndx, [value getNativeBinary]);
+    [_query getNativeQuery].contains(_column_ndx, value.tdbBinaryData);
     return _query;
 }
 @end
