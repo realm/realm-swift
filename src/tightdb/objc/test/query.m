@@ -168,29 +168,29 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         // Using private method just for the sake of testing the setters below.
         [table TDBAddEmptyRows:2];
 
-        [table setBool:YES inColumnWithIndex:BOOL_COL atRowIndex:0];
-        [table setBool:NO inColumnWithIndex:BOOL_COL atRowIndex:1];
+        [table TDBsetBool:YES inColumnWithIndex:BOOL_COL atRowIndex:0];
+        [table TDBsetBool:NO inColumnWithIndex:BOOL_COL atRowIndex:1];
 
-        [table setInt:0 inColumnWithIndex:INT_COL atRowIndex:0];
-        [table setInt:860 inColumnWithIndex:INT_COL atRowIndex:1];
+        [table TDBsetInt:0 inColumnWithIndex:INT_COL atRowIndex:0];
+        [table TDBsetInt:860 inColumnWithIndex:INT_COL atRowIndex:1];
 
-        [table setFloat:0 inColumnWithIndex:FLOAT_COL atRowIndex:0];
-        [table setFloat:5.6 inColumnWithIndex:FLOAT_COL atRowIndex:1];
+        [table TDBsetFloat:0 inColumnWithIndex:FLOAT_COL atRowIndex:0];
+        [table TDBsetFloat:5.6 inColumnWithIndex:FLOAT_COL atRowIndex:1];
 
-        [table setDouble:0 inColumnWithIndex:DOUBLE_COL atRowIndex:0];
-        [table setDouble:5.6 inColumnWithIndex:DOUBLE_COL atRowIndex:1];
+        [table TDBsetDouble:0 inColumnWithIndex:DOUBLE_COL atRowIndex:0];
+        [table TDBsetDouble:5.6 inColumnWithIndex:DOUBLE_COL atRowIndex:1];
 
-        [table setString:@"" inColumnWithIndex:STRING_COL atRowIndex:0];
-        [table setString:@"foo" inColumnWithIndex:STRING_COL atRowIndex:1];
+        [table TDBsetString:@"" inColumnWithIndex:STRING_COL atRowIndex:0];
+        [table TDBsetString:@"foo" inColumnWithIndex:STRING_COL atRowIndex:1];
 
-        [table setBinary:bin1 inColumnWithIndex:BINARY_COL atRowIndex:0];
-        [table setBinary:bin2 inColumnWithIndex:BINARY_COL atRowIndex:1];
+        [table TDBsetBinary:bin1 inColumnWithIndex:BINARY_COL atRowIndex:0];
+        [table TDBsetBinary:bin2 inColumnWithIndex:BINARY_COL atRowIndex:1];
 
-        [table setDate:0 inColumnWithIndex:DATE_COL atRowIndex:0];
-        [table setDate:[NSDate date] inColumnWithIndex:DATE_COL atRowIndex:1];
+        [table TDBsetDate:0 inColumnWithIndex:DATE_COL atRowIndex:0];
+        [table TDBsetDate:[NSDate date] inColumnWithIndex:DATE_COL atRowIndex:1];
 
-        [table setMixed:mixInt1 inColumnWithIndex:MIXED_COL atRowIndex:0];
-        [table setMixed:mixString inColumnWithIndex:MIXED_COL atRowIndex:1];
+        [table TDBsetMixed:mixInt1 inColumnWithIndex:MIXED_COL atRowIndex:0];
+        [table TDBsetMixed:mixString inColumnWithIndex:MIXED_COL atRowIndex:1];
 
         // Conditions (note that count is invoked to get the number of matches)
 
@@ -255,12 +255,12 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [table addColumnWithName:@"IntCol" andType:TDBIntType];
     [table TDBAddEmptyRows:6];
 
-    [table setInt:10 inColumnWithIndex:0 atRowIndex:0];
-    [table setInt:42 inColumnWithIndex:0 atRowIndex:1];
-    [table setInt:27 inColumnWithIndex:0 atRowIndex:2];
-    [table setInt:31 inColumnWithIndex:0 atRowIndex:3];
-    [table setInt:8  inColumnWithIndex:0 atRowIndex:4];
-    [table setInt:39 inColumnWithIndex:0 atRowIndex:5];
+    [table TDBsetInt:10 inColumnWithIndex:0 atRowIndex:0];
+    [table TDBsetInt:42 inColumnWithIndex:0 atRowIndex:1];
+    [table TDBsetInt:27 inColumnWithIndex:0 atRowIndex:2];
+    [table TDBsetInt:31 inColumnWithIndex:0 atRowIndex:3];
+    [table TDBsetInt:8  inColumnWithIndex:0 atRowIndex:4];
+    [table TDBsetInt:39 inColumnWithIndex:0 atRowIndex:5];
     
     STAssertEquals((NSUInteger)1, [[[table where ] intIsGreaterThan:10 inColumnWithIndex:0 ] findFirstRow], @"Row 1 is greater than 10");
     STAssertEquals((NSUInteger)-1, [[[table where ] intIsGreaterThan:100 inColumnWithIndex:0 ] findFirstRow], @"No rows are greater than 100");
@@ -286,7 +286,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     
     TDBTable * subTable = [t TDBtableInColumnWithIndex:0 atRowIndex:0];
     [subTable addEmptyRow];
-    [subTable setBool:YES inColumnWithIndex:0 atRowIndex:0];
+    [subTable TDBsetBool:YES inColumnWithIndex:0 atRowIndex:0];
     TDBQuery *q = [t where];
     
     TDBView *v = [[[[q subtableInColumnWithIndex:0] boolIsEqualTo:YES inColumnWithIndex:0] parent] findAllRows];

@@ -512,56 +512,56 @@ using namespace std;
 }
 
 
--(void) setBool:(BOOL)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)TDBsetBool:(BOOL)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_bool(col_ndx, row_ndx, value);,
         TDBBoolType);
 }
 
--(void)setInt:(int64_t)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)TDBsetInt:(int64_t)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_int(col_ndx, row_ndx, value);,
         TDBIntType);
 }
 
--(void)setFloat:(float)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)TDBsetFloat:(float)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_float(col_ndx, row_ndx, value);,
         TDBFloatType);
 }
 
--(void)setDouble:(double)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)TDBsetDouble:(double)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_double(col_ndx, row_ndx, value);,
         TDBDoubleType);
 }
 
--(void)setString:(NSString*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)TDBsetString:(NSString*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_string(col_ndx, row_ndx, ObjcStringAccessor(value));,
         TDBStringType);
 }
 
--(void)setBinary:(NSData*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)TDBsetBinary:(NSData*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_binary(col_ndx, row_ndx, ((NSData *)value).tdbBinaryData);,
         TDBBinaryType);
 }
 
--(void)setDate:(NSDate *)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)TDBsetDate:(NSDate *)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_datetime(col_ndx, row_ndx, (size_t)[value timeIntervalSince1970]);,
        TDBDateType);
 }
 
--(void)setTable:(TDBTable*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)TDBsetTable:(TDBTable*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     // TODO: Use core method for checking the equality of two table specs. Even in the typed interface
     // the user might add columns (_checkType for typed and spec against spec for dynamic).
@@ -571,7 +571,7 @@ using namespace std;
         TDBTableType);
 }
 
--(void)setMixed:(TDBMixed*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)TDBsetMixed:(TDBMixed*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     const tightdb::Mixed& mixed = [value getNativeMixed];
     TDBTable* subtable = mixed.get_type() == tightdb::type_Table ? [value getTable] : nil;
