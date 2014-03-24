@@ -228,9 +228,7 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 table.insert_binary(col_ndx, row_ndx, bd);
             }
             else {
-                const void *data = [(NSData *)obj bytes];
-                BinaryData bd(static_cast<const char *>(data), [(NSData *)obj length]);
-                table.insert_binary(col_ndx, row_ndx, bd);
+                table.insert_binary(col_ndx, row_ndx, [(NSData *)obj tdbBinaryData]);
             }
             break;
         case type_Table:
