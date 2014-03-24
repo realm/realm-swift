@@ -358,10 +358,7 @@ using namespace std;
     
     if ([anObject isKindOfClass:[NSArray class]]) {
         if (!verify_row(*desc, (NSArray *)anObject)) {
-            NSException* exception = [NSException exceptionWithName:@"tightdb:table_wrong_column_type"
-                                                             reason:@"Column type is wrong"
-                                                           userInfo:[NSMutableDictionary dictionary]];
-            [exception raise];
+            return NO;
         }
         return insert_row(size_t(rowIndex), table, (NSArray *)anObject);
     }
