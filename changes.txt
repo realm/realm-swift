@@ -1,3 +1,7 @@
+2014-03-24
+==========
+! BREAKING CHANGE: addEmptyRow on table has been removed. Use [table addRow:nil] instead.
+
 2014-03-21
 ==========
 ! BREAKING CHANGE: Table findFirstRow and min/max/sum/avg operations has been hidden.
