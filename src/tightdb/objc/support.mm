@@ -140,6 +140,10 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
 BOOL verify_row(const Descriptor& descr, NSArray * data)
 {
     if (descr.get_column_count() != [data count]) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_count"
+                                                         reason:@"Number of columns do not match"
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
         return NO;
     }
 
@@ -149,8 +153,13 @@ BOOL verify_row(const Descriptor& descr, NSArray * data)
     /* FIXME: handling of tightdb exceptions => return NO */
     size_t col_ndx = 0;
     while (obj = [enumerator nextObject]) {
-        if (!verify_cell(descr, col_ndx, obj))
+        if (!verify_cell(descr, col_ndx, obj)) {
+            NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
+                                                             reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u", to_objc_string(descr.get_column_name(col_ndx)), col_ndx, descr.get_column_type(col_ndx) ]
+                                                           userInfo:[NSMutableDictionary dictionary]];
+            [exception raise];
             return NO;
+        }
         ++col_ndx;
     }
     return YES;
