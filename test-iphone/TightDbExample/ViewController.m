@@ -151,9 +151,8 @@ TIGHTDB_TABLE_2(MyTable2,
         [diskTable insertEmptyRowAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
         NSLog(@"Disktable size: %i", [diskTable rowCount]);
         for (size_t i = 0; i < [diskTable rowCount]; i++) {
-            MyTableRow *cursor = [diskTable rowAtIndex:i];
-            NSLog(@"%zu: %@", i, [cursor Name]);
-            NSLog(@"%zu: %@", i, cursor.Name);
+            MyTableRow *row = [diskTable rowAtIndex:i];
+            NSLog(@"%zu: %@", i, row.Name);
             NSLog(@"%zu: %@", i, [diskTable stringInColumnWithIndex:0 atRowIndex:i]);
         }
         
@@ -163,35 +162,6 @@ TIGHTDB_TABLE_2(MyTable2,
     } withError:nil];
 
 
-#ifdef TDB_GROUP_IMPLEMENTED
-    // Load a group from disk (and print contents)
-    TDBTransaction *fromDisk = [TDBTransaction groupWithFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
-    MyTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
-
-    [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
-    [diskTable insertEmptyRowAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
-    NSLog(@"Disktable size: %i", [diskTable rowCount]);
-    for (size_t i = 0; i < [diskTable rowCount]; i++) {
-        MyTable_Row *row = [diskTable rowAtIndex:i];
-        NSLog(@"%zu: %@", i, [row Name]);
-        NSLog(@"%zu: %@", i, row.Name);
-        NSLog(@"%zu: %@", i, [diskTable stringInColumnWithIndex:0 atRowIndex:i]);
-    }
-
-
-    // Load a group from memory (and print contents)
-    TDBTransaction *fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
-
-    // Load a group from memory (and print contents)
-    TDBTransaction *fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
-    MyTable *memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
-
-    for (MyTable_Row *row in memTable)
-    {
-        NSLog(@"From mem: %@ is %lld years old.", row.Name, row.Age);
-    }
-    
-#endif
     
     [context readWithBlock:^(TDBTransaction *transaction) {
         
