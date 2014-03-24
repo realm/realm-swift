@@ -57,7 +57,6 @@ using namespace std;
     return m_group->size();
 }
 
-
 -(BOOL)hasTableWithName:(NSString*)name
 {
     return m_group->has_table(ObjcStringAccessor(name));
@@ -124,8 +123,6 @@ using namespace std;
         return table;
     }
 }
-
-
 
 // FIXME: Avoid creating a table instance. It should be enough to create an TightdbDescriptor and then check that.
 // FIXME: Check that the specified class derives from Table.
@@ -216,7 +213,6 @@ using namespace std;
     }
     return table;
 }
-
 
 /* Moved to group_priv header for now */
 +(TDBTransaction*)group
@@ -364,6 +360,5 @@ using namespace std;
     }
     return buffer;
 }
-
 
 @end
