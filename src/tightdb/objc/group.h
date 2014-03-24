@@ -47,6 +47,5 @@
 -(BOOL)writeContextToFile:(NSString *)path withError:(NSError *__autoreleasing *)error;
 
 -(NSData *)writeContextToBuffer;
-
 @end
 
