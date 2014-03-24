@@ -295,7 +295,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
         // Add sub-tables
         if (i == 2) {
-            TDBTable* subtable = [table tableInColumnWithIndex:8 atRowIndex:i];
+            TDBTable* subtable = [table TDBtableInColumnWithIndex:8 atRowIndex:i];
             if (![subtable TDBInsertInt:0 ndx:0 value:42 ]) {
                 NSLog(@"%@", [error localizedDescription]);
                 STFail(@"Insert failed.");

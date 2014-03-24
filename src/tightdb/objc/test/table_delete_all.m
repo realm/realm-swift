@@ -67,7 +67,7 @@
 
         // Add sub-tables
         if (i == 2) {
-            TDBTable* subtable = [table tableInColumnWithIndex:8 atRowIndex:i];
+            TDBTable* subtable = [table TDBtableInColumnWithIndex:8 atRowIndex:i];
             [subtable TDBInsertInt:0 ndx:0 value:42];
             [subtable TDBInsertString:1 ndx:0 value:@"meaning"];
             [subtable TDBInsertDone];

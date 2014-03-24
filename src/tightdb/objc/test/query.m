@@ -284,7 +284,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [t addEmptyRow];
     STAssertEquals(t.rowCount, (NSUInteger)1,@"one row added");
     
-    TDBTable * subTable = [t tableInColumnWithIndex:0 atRowIndex:0];
+    TDBTable * subTable = [t TDBtableInColumnWithIndex:0 atRowIndex:0];
     [subTable addEmptyRow];
     [subTable setBool:YES inColumnWithIndex:0 atRowIndex:0];
     TDBQuery *q = [t where];
