@@ -68,7 +68,11 @@
 -(id)getOrCreateTableWithName:(NSString *)name asTableClass:(Class)obj;
 
 
-
+/**
+ * This method will write the context to disk at the specified path.
+ * Metadata and tables will be stored, and can be retrieved at later times.
+ */
+-(BOOL)writeContextToFile:(NSString *)path withError:(NSError *__autoreleasing *)error;
 
 
 
