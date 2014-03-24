@@ -144,7 +144,7 @@ TIGHTDB_TABLE_2(SubMixedTable,
 
     TDBTransaction *group = [TDBTransaction group];
     // Create new table in group
-    MixedTable *table = [group getOrCreateTableWithName:@"MixedValues" asTableClass:[MixedTable class]];
+    MixedTable *table = [group createTableWithName:@"MixedValues" asTableClass:[MixedTable class]];
     NSLog(@"Table: %@", table);
     // Add some rows
     TDBMixed *mixedTable = [TDBMixed mixedWithTable:tableSub];

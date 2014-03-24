@@ -128,7 +128,7 @@ void sharedGroupFunc() {
     // Start a write transaction
     [context writeWithBlock:^(TDBTransaction *transaction) {
         // Get a specific table from the group
-        PeopleTable *table = [transaction getOrCreateTableWithName:@"employees"
+        PeopleTable *table = [transaction createTableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
 
         // Add a row
@@ -140,7 +140,7 @@ void sharedGroupFunc() {
     // Start a read transaction
     [context readWithBlock:^(TDBTransaction *transaction) {
         // Get the table
-        PeopleTable *table = [transaction getOrCreateTableWithName:@"employees"
+        PeopleTable *table = [transaction getTableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
 
         // Interate over all rows in table
