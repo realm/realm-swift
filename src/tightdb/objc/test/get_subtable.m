@@ -45,18 +45,18 @@ TIGHTDB_TABLE_2(WrongTypeTable,
     [table TDBInsertSubtable:2 ndx:0];
     [table TDBInsertDone];
 
-    TDBTable* subtable = [table tableInColumnWithIndex:2 atRowIndex:0];
+    TDBTable* subtable = [table TDBtableInColumnWithIndex:2 atRowIndex:0];
     [subtable TDBInsertBool:0 ndx:0 value:YES];
     [subtable TDBInsertInt:1 ndx:0 value:42];
     [subtable TDBInsertDone];
 
-    GetSubtable* testTable = [table tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[GetSubtable class]];
+    GetSubtable* testTable = [table TDBtableInColumnWithIndex:2 atRowIndex:0 asTableClass:[GetSubtable class]];
     GetSubtableRow* cursor = [testTable rowAtIndex:0];
     NSLog(@"Age in subtable: %lld", cursor.Age);
     STAssertEquals(cursor.Age, (int64_t)42, @"Sub table row should be 42");
 
-    STAssertNil([table tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongNameTable class]], @"should return nil because wrong name");
-    STAssertNil([table tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongTypeTable class]], @"should return nil because wrong type");
+    STAssertNil([table TDBtableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongNameTable class]], @"should return nil because wrong name");
+    STAssertNil([table TDBtableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongTypeTable class]], @"should return nil because wrong type");
 }
 
 
