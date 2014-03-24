@@ -64,8 +64,14 @@
 
 
 
-
 -(NSString *)nameOfTableWithIndex:(NSUInteger)tableIndex;
+
+
+/**
+ * This method will write the context to disk at the specified path.
+ * Metadata and tables will be stored, and can be retrieved at later times.
+ */
+-(BOOL)writeContextToFile:(NSString *)path withError:(NSError *__autoreleasing *)error;
 
 
 #ifdef HAS_TABLE_WITH_NAME_AND_CLASS
