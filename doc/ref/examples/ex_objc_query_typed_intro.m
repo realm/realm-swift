@@ -18,12 +18,12 @@ void ex_objc_query_typed_intro()
         PeopleTable *table = [[PeopleTable alloc] init];
 
         /* Adds rows to the table. */
-        [table appendRow:@{@"Name":@"Brian", @"Age":@14, @"Hired":@NO}];
-        [table appendRow:@{@"Name":@"Joe",   @"Age":@17, @"Hired":@YES}];
-        [table appendRow:@{@"Name":@"Jack",  @"Age":@22, @"Hired":@YES}];
-        [table appendRow:@{@"Name":@"Sam",   @"Age":@22, @"Hired":@YES}];
-        [table appendRow:@{@"Name":@"Jack",  @"Age":@34, @"Hired":@YES}];
-        [table appendRow:@{@"Name":@"Bob",   @"Age":@10, @"Hired":@NO}];
+        [table addRow:@{@"Name":@"Brian", @"Age":@14, @"Hired":@NO}];
+        [table addRow:@{@"Name":@"Joe",   @"Age":@17, @"Hired":@YES}];
+        [table addRow:@{@"Name":@"Jack",  @"Age":@22, @"Hired":@YES}];
+        [table addRow:@{@"Name":@"Sam",   @"Age":@22, @"Hired":@YES}];
+        [table addRow:@{@"Name":@"Jack",  @"Age":@34, @"Hired":@YES}];
+        [table addRow:@{@"Name":@"Bob",   @"Age":@10, @"Hired":@NO}];
 
         /* Create a query. */
         PeopleTableQuery *query = [[[[table where].Age columnIsGreaterThan:20] Or].Name columnIsEqualTo:@"Bob"];

@@ -42,7 +42,7 @@
 // Working with columns
 -(NSUInteger)addColumnWithName:(NSString *)name andType:(TDBType)type;
 -(void)removeColumnWithIndex:(NSUInteger)colIndex;
--(NSString *)columnNameOfColumn:(NSUInteger)colIndex;
+-(NSString *)nameOfColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)indexOfColumnWithName:(NSString *)name;
 -(TDBType)columnTypeOfColumn:(NSUInteger)colIndex;
 
@@ -53,13 +53,15 @@
 -(TDBRow *)firstRow;
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
 
-// Appending rows to end of table
--(TDBRow *)addEmptyRow;
--(BOOL)appendRow:(NSObject *)data;
+/**
+ * Adds a row at the end of the table.
+ * If data is nil, an empty row with default values is added.
+ */
+-(NSUInteger)addRow:(NSObject *)data;
 
 // Inserting rows at specific positions
 -(TDBRow *)insertEmptyRowAtIndex:(NSUInteger)rowIndex;
--(BOOL)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex;
+-(BOOL)insertRow:(id)anObject atIndex:(NSUInteger)rowIndex;
 
 // Removing rows
 -(BOOL)removeAllRows;
@@ -85,10 +87,6 @@
 
 /* -\/- EVERYTHING BELOW HERE SHOULD BE REMOVED / HIDDEN AWAY -\/- */
 
-/* Only curser based add should be public. This is just a temporaray way to hide the methods. */
-/* TODO: Move to class extension. */
--(NSUInteger)TDBAddEmptyRow;
--(NSUInteger)TDBAddEmptyRows:(NSUInteger)numberOfRows;
 
 -(BOOL)TDBboolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(int64_t)TDBintInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
@@ -112,7 +110,13 @@
 -(void)TDBsetMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
 
 
+-(TDBType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 
+
+
+/* Private */
+-(NSUInteger)TDBAddEmptyRow;
+-(NSUInteger)TDBAddEmptyRows:(NSUInteger)numberOfRows;
 -(BOOL)TDBInsertBool:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(BOOL)value;
 -(BOOL)TDBInsertInt:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(int64_t)value;
 -(BOOL)TDBInsertFloat:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(float)value;
@@ -121,71 +125,11 @@
 -(BOOL)TDBInsertBinary:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(NSData *)value;
 -(BOOL)TDBInsertBinary:(NSUInteger)colIndex ndx:(NSUInteger)ndx data:(const char *)data size:(size_t)size;
 -(BOOL)TDBInsertDate:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(NSDate *)value;
--(BOOL)TDBInsertDone;
-
-
-/* Subtables */
-
 -(BOOL)TDBInsertSubtable:(NSUInteger)colIndex ndx:(NSUInteger)ndx;
 -(BOOL)TDBInsertSubtable:(NSUInteger)colIndex ndx:(NSUInteger)ndx error:(NSError *__autoreleasing *)error;
-
-
-/* Mixed */
-
--(TDBType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(BOOL)TDBInsertMixed:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(TDBMixed *)value;
 -(BOOL)TDBInsertMixed:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(TDBMixed *)value error:(NSError *__autoreleasing *)error;
-
-
-
-
--(NSUInteger)findRowIndexWithBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)findRowIndexWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)findRowIndexWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)findRowIndexWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)findRowIndexWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)findRowIndexWithBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)findRowIndexWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)findRowIndexWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
-
--(TDBView *)findAllRowsWithBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex;
--(TDBView *)findAllRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
--(TDBView *)findAllRowsWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
--(TDBView *)findAllRowsWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
--(TDBView *)findAllRowsWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
--(TDBView *)findAllRowsWithBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
--(TDBView *)findAllRowsWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
--(TDBView *)findAllRowsWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
-
-
-
-
-/* Conversion */
-/* FIXME: Do we want to conversion methods? Maybe use NSData. */
-
-/* Aggregate functions */
-/* FIXME: Consider adding:
- countRowsWithValue: @"foo"
- countRowsWithValue: @300 */
--(NSUInteger)countRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)countRowsWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)countRowsWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)countRowsWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
--(int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex;
--(double)sumFloatColumnWithIndex:(NSUInteger)colIndex;
--(double)sumDoubleColumnWithIndex:(NSUInteger)colIndex;
--(int64_t)maxIntInColumnWithIndex:(NSUInteger)colIndex;
--(float)maxFloatInColumnWithIndex:(NSUInteger)colIndex;
--(double)maxDoubleInColumnWithIndex:(NSUInteger)colIndex;
--(int64_t)minIntInColumnWithIndex:(NSUInteger)colIndex;
--(float)minFloatInColumnWithIndex:(NSUInteger)colIndex;
--(double)minDoubleInColumnWithIndex:(NSUInteger)colIndex;
--(double)avgIntColumnWithIndex:(NSUInteger)colIndex;
--(double)avgFloatColumnWithIndex:(NSUInteger)colIndex;
--(double)avgDoubleColumnWithIndex:(NSUInteger)colIndex;
-
-
-/* Private */
+-(BOOL)TDBInsertDone;
 -(id)_initRaw;
 -(BOOL)TDBInsertSubtableCopy:(NSUInteger)colIndex row:(NSUInteger)rowNdx subtable:(TDBTable *)subtable;
 -(BOOL)TDBInsertSubtableCopy:(NSUInteger)colIndex row:(NSUInteger)rowIndex subtable:(TDBTable *)subtable error:(NSError *__autoreleasing *)error;

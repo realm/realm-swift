@@ -154,7 +154,7 @@ TIGHTDB_TABLE_2(MyTable2,
             MyTableRow *cursor = [diskTable rowAtIndex:i];
             NSLog(@"%zu: %@", i, [cursor Name]);
             NSLog(@"%zu: %@", i, cursor.Name);
-            NSLog(@"%zu: %@", i, [diskTable stringInColumnWithIndex:0 atRowIndex:i]);
+            NSLog(@"%zu: %@", i, [diskTable TDBstringInColumnWithIndex:0 atRowIndex:i]);
         }
         
         // Write same group to memory buffer
