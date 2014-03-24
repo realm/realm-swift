@@ -1,5 +1,7 @@
 2014-03-24
 ==========
+! BREAKING CHANGE: set*:inColumnWithIndex:atRowIndex: methods have been prefixed with TDB
+! BREAKING CHANGE: *:inColumnWithIndex:atRowIndex: methods have been prefixed with TDB
 ! BREAKING CHANGE: addEmptyRow on table has been removed. Use [table addRow:nil] instead.
 
 2014-03-21
