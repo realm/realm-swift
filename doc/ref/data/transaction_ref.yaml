@@ -27,9 +27,7 @@ CATEGORIES:
       NAME     : "hasTableWithName:"
       SUMMARY  : *g_group_has_table_summary
       DESCR    : *g_group_has_table_descr
-      SIGNATURE: |
-                  (BOOL)hasTableWithName:(NSString *)name
-                  (BOOL)hasTableWithName:(NSString *)name withTableClass:(Class)obj
+      SIGNATURE: "- (BOOL)hasTableWithName:(NSString *)name"
       PARAMS:
       - NAME   : name
         TYPES  : NSString *
@@ -48,8 +46,8 @@ CATEGORIES:
       SUMMARY  : *g_group_get_table_summary
       DESCR    : *g_group_get_table_descr
       SIGNATURE: |
-                 (TDBTable *)getTable:(NSString *)name
-                 (id)getTable:(NSString *)name withClass:(Class)obj
+                 - (TDBTable *)getTable:(NSString *)name
+                 - (id)getTable:(NSString *)name withClass:(Class)obj
       PARAMS:
       - NAME   : name
         TYPES  : NSString
@@ -66,13 +64,13 @@ CATEGORIES:
       -  DESCR :
          CODE  : ex_objc_group_optional_table
       SEE      : "{@link g_group_has_table}"
-  - g_group_get_or_create_table:
-      NAMES    : "getOrCreateTableWithName:"
+  - g_group_get_create_table:
+      NAMES    : "createTableWithName:"
       SUMMARY  : Get table if it exists. Otherwise create and get it.
       DESCR    : Get table if it exists. Otherwise create and get it.
       SIGNATURE: |
-                 (TDBTable *)getOrCreateTableWithName:(NSString *)name
-                 (id)getOrCreateTableWithName:(NSString *)name asTableClass:(Class)obj
+                 - (TDBTable *)createTableWithName:(NSString *)name
+                 - (id)createTableWithName:(NSString *)name asTableClass:(Class)obj
       PARAMS:
       - NAME   : name
         TYPES  : NSString
