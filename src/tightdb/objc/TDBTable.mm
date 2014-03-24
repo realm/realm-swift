@@ -550,7 +550,7 @@ using namespace std;
 -(void)setBinary:(NSData*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
-        m_table->set_binary(col_ndx, row_ndx, [(NSData *)value tdbBinaryData]);,
+        m_table->set_binary(col_ndx, row_ndx, ((NSData *)value).tdbBinaryData);,
         TDBBinaryType);
 }
 
@@ -943,7 +943,7 @@ using namespace std;
 }
 -(TDBView*)findAllRowsWithBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
-    tightdb::TableView view = m_table->find_all_binary(colIndex, [aBinary tdbBinaryData]);
+    tightdb::TableView view = m_table->find_all_binary(colIndex, aBinary.tdbBinaryData);
     return [TDBView viewWithTable:self andNativeView:view];
 }
 -(TDBView*)findAllRowsWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex

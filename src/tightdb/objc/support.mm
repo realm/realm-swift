@@ -228,7 +228,7 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 table.insert_binary(col_ndx, row_ndx, bd);
             }
             else {
-                table.insert_binary(col_ndx, row_ndx, [(NSData *)obj tdbBinaryData]);
+                table.insert_binary(col_ndx, row_ndx, ((NSData *)obj).tdbBinaryData);
             }
             break;
         case type_Table:
@@ -255,7 +255,7 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 break;
             }
             if ([obj isKindOfClass:[NSData class]]) {
-                table.insert_mixed(col_ndx, row_ndx, [(NSData *)obj tdbBinaryData]);
+                table.insert_mixed(col_ndx, row_ndx, ((NSData *)obj).tdbBinaryData);
                 break;
             }
             if ([obj isKindOfClass:[NSNumber class]]) {
@@ -482,7 +482,7 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 break;
             }
             if ([obj isKindOfClass:[NSData class]]) {
-                table.set_mixed(col_ndx, row_ndx, [(NSData *)obj tdbBinaryData]);
+                table.set_mixed(col_ndx, row_ndx, ((NSData *)obj).tdbBinaryData);
                 break;
             }
             if ([obj isKindOfClass:[NSNumber class]]) {

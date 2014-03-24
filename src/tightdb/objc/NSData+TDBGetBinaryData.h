@@ -24,6 +24,6 @@
 
 @interface NSData (TDBGetBinaryData)
 
--(tightdb::BinaryData) tdbBinaryData;
+@property (nonatomic, readonly) tightdb::BinaryData tdbBinaryData;
 
 @end
