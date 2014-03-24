@@ -25,9 +25,6 @@
 #import <tightdb/objc/TDBTransaction_priv.h>
 #import <tightdb/objc/TDBTable.h>
 #import <tightdb/objc/TDBTable_priv.h>
-#import <tightdb/objc/TDBBinary.h>
-#import <tightdb/objc/TDBBinary_priv.h>
-
 
 #include <tightdb/objc/util.hpp>
 
@@ -111,14 +108,15 @@ using namespace std;
 }
 
 /* Moved to group_priv header for now */
-+(TDBTransaction*)groupWithBuffer:(TDBBinary*)buffer withError:(NSError**)error
++(TDBTransaction*)groupWithBuffer:(NSData*)buffer withError:(NSError**)error
 {
     TDBTransaction* group = [[TDBTransaction alloc] init];
     if (!group)
         return nil;
     try {
-        const tightdb::BinaryData& buffer_2 = [buffer getNativeBinary];
-        bool take_ownership = true;
+        const void *data = [(NSData *)buffer bytes];
+        tightdb::BinaryData buffer_2(static_cast<const char *>(data), [(NSData *)buffer length]);
+        bool take_ownership = false; // FIXME: should this be true?
         group->m_group = new tightdb::Group(buffer_2, take_ownership);
     }
     catch (tightdb::InvalidDatabase& ex) {
@@ -192,13 +190,11 @@ using namespace std;
 }
 
 /* Moved to group_priv header for now */
--(TDBBinary*)writeContextToBuffer
+-(NSData*)writeContextToBuffer
 {
-    TDBBinary* buffer = [[TDBBinary alloc] init];
-    if (!buffer)
-        return nil;
     try {
-        [buffer getNativeBinary] = m_group->write_to_mem();
+        tightdb::BinaryData bd = m_group->write_to_mem();
+        return [[NSData alloc] initWithBytes:static_cast<const void *>(bd.data()) length:bd.size()];
     }
     catch (std::exception& ex) {
         NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
@@ -206,7 +202,7 @@ using namespace std;
                                                        userInfo:[NSMutableDictionary dictionary]];  // IMPORTANT: cannot not be nil !!
         [exception raise];
     }
-    return buffer;
+    return nil;
 }
 
 -(TDBTable *)getTableWithName:(NSString *)name
