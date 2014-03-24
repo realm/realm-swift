@@ -13,7 +13,7 @@ TDBContext.mm support.mm TDBVersion.mm TDBDescriptor.mm TDBView.mm \
 TDBMixed.mm TDBColumnProxy.mm NSData+TDBGetBinaryData.mm TDBContext+CrashReporting.mm
 
 libtightdb_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2 -std=gnu++11
-libtightdb_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
+libtightdb_objc_a_LDFLAGS = -fobjc-link-runtime -framework UIKit
 
 # Format: CURRENT[:REVISION[:AGE]]
 #
