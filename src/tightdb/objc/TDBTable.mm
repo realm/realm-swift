@@ -24,6 +24,7 @@
 #import <tightdb/objc/TDBMixed.h>
 #import <tightdb/objc/TDBMixed_priv.h>
 #import <tightdb/objc/TDBColumnProxy.h>
+#import <tightdb/objc/NSData+TDBGetBinaryData.h>
 
 #include <tightdb/objc/util.hpp>
 
@@ -548,10 +549,8 @@ using namespace std;
 
 -(void)setBinary:(NSData*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
-    const void *data = [(NSData *)value bytes];
-    tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)value length]);
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
-        m_table->set_binary(col_ndx, row_ndx, bd);,
+        m_table->set_binary(col_ndx, row_ndx, [(NSData *)value tdbBinaryData]);,
         TDBBinaryType);
 }
 

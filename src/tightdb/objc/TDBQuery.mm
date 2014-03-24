@@ -240,12 +240,7 @@ using namespace std;
 }
 
 
-
 // Conditions:
-
-
-
-
 -(TDBQuery*)boolIsEqualTo:(bool)aBool inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->equal(colIndex, aBool);
@@ -283,7 +278,6 @@ using namespace std;
 }
 
 
-
 -(TDBQuery*)dateIsEqualTo:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->equal_datetime(colIndex, [aDate timeIntervalSince1970]);
@@ -292,9 +286,7 @@ using namespace std;
 
 -(TDBQuery*)binaryIsEqualTo:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
-    const void *data = [(NSData *)aBinary bytes];
-    tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)aBinary length]);
-    m_query->equal(colIndex, bd);
+    m_query->equal(colIndex, [aBinary tdbBinaryData]);
     return self;
 }
 
@@ -445,16 +437,6 @@ using namespace std;
     m_query->less_equal_datetime(colIndex, [value timeIntervalSince1970]);
     return self;
 }
-
-
-
-
-
-
-
-
-
-
 
 @end
 
