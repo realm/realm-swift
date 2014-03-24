@@ -22,12 +22,12 @@ void ex_objc_table_typed_intro_with_many_comments()
         /* Appends rows to the table. Notice that the signtaure of the method for
          * appendig rows requires that the order the columns is exactly
          * as the declaration. */
-        [table appendRow:@[@"Mary",  @14]];
-        [table appendRow:@[@"Joe",   @17]];
-        [table appendRow:@[@"Jack",  @22]];
-        [table appendRow:@[@"Paul",  @33]];
-        [table appendRow:@[@"Simon", @16]];
-        [table appendRow:@[@"Carol", @66]];
+        [table addRow:@[@"Mary",  @14]];
+        [table addRow:@[@"Joe",   @17]];
+        [table addRow:@[@"Jack",  @22]];
+        [table addRow:@[@"Paul",  @33]];
+        [table addRow:@[@"Simon", @16]];
+        [table addRow:@[@"Carol", @66]];
 
         /* Creates a query expression to filter on age. Note that the
          * query is defined but not executed here. */

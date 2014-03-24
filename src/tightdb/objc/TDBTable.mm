@@ -183,7 +183,7 @@ using namespace std;
 {
     return m_table->get_column_count();
 }
--(NSString*)columnNameOfColumn:(NSUInteger)ndx
+-(NSString*)nameOfColumnWithIndex:(NSUInteger)ndx
 {
     return to_objc_string(m_table->get_column_name(ndx));
 }
@@ -209,11 +209,6 @@ using namespace std;
 -(NSUInteger)rowCount //Synthesize property
 {
     return m_table->size();
-}
-
--(TDBRow*)addEmptyRow
-{
-    return [[TDBRow alloc] initWithTable:self ndx:[self TDBAddEmptyRow]];
 }
 
 -(TDBRow*)insertEmptyRowAtIndex:(NSUInteger)ndx
@@ -338,14 +333,24 @@ using namespace std;
     return [[TDBRow alloc] initWithTable:self ndx:ndx];
 }
 
--(BOOL)appendRow:(NSObject*)data
+-(NSUInteger)addRow:(NSObject*)data
 {
+    if (!data) {
+        return [self TDBAddEmptyRows:1];
+    }
     tightdb::Table& table = *m_table;
-    return [self insertRow:data atRowIndex:table.size()];
+    [self insertRow:data atIndex:table.size()];
+    return table.size()-1;
+}
+
+/* Moved to private header */
+-(TDBRow*)addEmptyRow
+{
+    return [[TDBRow alloc] initWithTable:self ndx:[self TDBAddEmptyRow]];
 }
 
 
--(BOOL)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
+-(BOOL)insertRow:(id)anObject atIndex:(NSUInteger)rowIndex
 {
     tightdb::Table& table = *m_table;
     tightdb::ConstDescriptorRef desc = table.get_descriptor();

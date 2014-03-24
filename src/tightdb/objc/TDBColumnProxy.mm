@@ -21,6 +21,7 @@
 #import <Foundation/Foundation.h>
 
 #import "TDBTable.h"
+#import "TDBTable_priv.h"
 #import "TDBColumnProxy.h"
 
 @implementation TDBColumnProxy

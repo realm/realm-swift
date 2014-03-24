@@ -99,13 +99,16 @@
     TDBTable *t = [[TDBTable alloc] init];
     NSUInteger intCol = [t addColumnWithName:@"intCol" andType:TDBIntType];
     
-    TDBRow *row = [t addEmptyRow];
+    NSUInteger rowIndex = [t addRow:nil];
+    TDBRow *row = [t rowAtIndex:rowIndex];
     [row setInt:2 inColumnWithIndex:intCol];
     
-    row = [t addEmptyRow];
+    rowIndex = [t addRow:nil];
+    row = [t rowAtIndex:rowIndex];
     [row setInt:1 inColumnWithIndex:intCol];
     
-    row = [t addEmptyRow];
+    rowIndex = [t addRow:nil];
+    row = [t rowAtIndex:rowIndex];
     [row setInt:0 inColumnWithIndex:intCol];
     
     TDBQuery *q = [t where];
@@ -140,13 +143,13 @@
     TDBTable *t = [[TDBTable alloc] init];
     NSUInteger boolCol = [t addColumnWithName:@"boolCol" andType:TDBBoolType];
     
-    TDBRow *row = [t addEmptyRow];
+    TDBRow *row = [t rowAtIndex:[t addRow:nil]];
     [row setBool:YES inColumnWithIndex:boolCol];
     
-    row = [t addEmptyRow];
+    row = [t rowAtIndex:[t addRow:nil]];
     [row setBool:YES inColumnWithIndex:boolCol];
     
-    row = [t addEmptyRow];
+    row = [t rowAtIndex:[t addRow:nil]];
     [row setBool:NO inColumnWithIndex:boolCol];
     
     TDBQuery *q = [t where];
@@ -190,13 +193,16 @@
     NSDate *dateMiddle  = [formatter dateFromString:@"02/01/2014 10:10 PM"];
     NSDate *dateLast    = [formatter dateFromString:@"03/01/2014 10:10 PM"];
     
-    TDBRow *row = [t addEmptyRow];
+    NSUInteger rowIndex = [t addRow:nil];
+    TDBRow *row = [t rowAtIndex:rowIndex];
     [row setDate:dateLast inColumnWithIndex:dateCol];
     
-    row = [t addEmptyRow];
+    rowIndex = [t addRow:nil];
+    row = [t rowAtIndex:rowIndex];
     [row setDate:dateMiddle inColumnWithIndex:dateCol];
     
-    row = [t addEmptyRow];
+    rowIndex = [t addRow:nil];
+    row = [t rowAtIndex:rowIndex];
     [row setDate:dateFirst inColumnWithIndex:dateCol];
     
     TDBQuery *q = [t where];
@@ -267,20 +273,20 @@
     STAssertNil([v lastRow], @"Table is empty");
     
     // add empty rows before to filter out
-    [t addEmptyRow];
-    [t addEmptyRow];
-    [t addEmptyRow];
+    [t addRow:nil];
+    [t addRow:nil];
+    [t addRow:nil];
     
     NSString *value0 = @"value0";
-    [t appendRow:@[value0, @1]];
+    [t addRow:@[value0, @1]];
     
     NSString *value1 = @"value1";
-    [t appendRow:@[value1, @1]];
+    [t addRow:@[value1, @1]];
     
     // add empty rows after to filter out
-    [t addEmptyRow];
-    [t addEmptyRow];
-    [t addEmptyRow];
+    [t addRow:nil];
+    [t addRow:nil];
+    [t addRow:nil];
     
     v = [[[t where] intIsEqualTo:1 inColumnWithIndex:col1] findAllRows];
     

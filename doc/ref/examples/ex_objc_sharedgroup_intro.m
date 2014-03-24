@@ -26,9 +26,10 @@ void ex_objc_sharedgroup_intro()
         BOOL success;
 
         success = [context writeWithBlock:^(TDBTransaction *group) {
+
             /* Write transactions with the context are possible via the provided variable binding named transaction. */
             PeopleTable *table = [group createTableWithName:@"employees" asTableClass:[PeopleTable class]];
-            [table appendRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
+            [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
             
             return YES; /* Commit */
         } withError:&error];
