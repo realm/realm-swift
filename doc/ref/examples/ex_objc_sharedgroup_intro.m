@@ -33,7 +33,7 @@ void ex_objc_sharedgroup_intro()
             return YES; /* Commit */
         } withError:&error];
 
-        if(!success)
+        if (!success)
             NSLog(@"Something went wrong in the write-transaction: %@", [error description]);
 
         /* A write transaction (with rollback). */
