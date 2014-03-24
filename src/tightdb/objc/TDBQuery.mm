@@ -16,8 +16,10 @@
 #import <tightdb/objc/TDBView.h>
 #import <tightdb/objc/TDBView_priv.h>
 #import <tightdb/objc/TDBRow.h>
+#import "NSData+TDBGetBinaryData.h"
 
 #include <tightdb/objc/util.hpp>
+
 
 using namespace std;
 
@@ -336,9 +338,7 @@ using namespace std;
 
 -(TDBQuery*)binaryIsNotEqualTo:(NSData*)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    const void *data = [(NSData *)value bytes];
-    tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)value length]);
-    m_query->not_equal(colIndex, bd);
+    m_query->not_equal(colIndex, [value tdbBinaryData]);
     return self;
 }
 
@@ -808,37 +808,27 @@ using namespace std;
 }
 -(TDBQuery*)columnIsEqualTo:(NSData*)value
 {
-    const void *data = [(NSData *)value bytes];
-    tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)value length]);
-    [_query getNativeQuery].equal(_column_ndx, bd);
+    [_query getNativeQuery].equal(_column_ndx, [value tdbBinaryData]);
     return _query;
 }
 -(TDBQuery*)columnIsNotEqualTo:(NSData*)value
 {
-    const void *data = [(NSData *)value bytes];
-    tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)value length]);
-    [_query getNativeQuery].not_equal(_column_ndx, bd);
+    [_query getNativeQuery].not_equal(_column_ndx, [value tdbBinaryData]);
     return _query;
 }
 -(TDBQuery*)columnBeginsWith:(NSData*)value
 {
-    const void *data = [(NSData *)value bytes];
-    tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)value length]);
-    [_query getNativeQuery].begins_with(_column_ndx, bd);
+    [_query getNativeQuery].begins_with(_column_ndx, [value tdbBinaryData]);
     return _query;
 }
 -(TDBQuery*)columnEndsWith:(NSData*)value
 {
-    const void *data = [(NSData *)value bytes];
-    tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)value length]);
-    [_query getNativeQuery].ends_with(_column_ndx, bd);
+    [_query getNativeQuery].ends_with(_column_ndx, [value tdbBinaryData]);
     return _query;
 }
 -(TDBQuery*)columnContains:(NSData*)value
 {
-    const void *data = [(NSData *)value bytes];
-    tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)value length]);
-    [_query getNativeQuery].contains(_column_ndx, bd);
+    [_query getNativeQuery].contains(_column_ndx, [value tdbBinaryData]);
     return _query;
 }
 @end

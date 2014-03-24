@@ -10,7 +10,7 @@ lib_LIBRARIES = libtightdb-objc.a
 
 libtightdb_objc_a_SOURCES = TDBTable.mm TDBRow.mm TDBTransaction.mm TDBQuery.mm \
 TDBContext.mm support.mm TDBVersion.mm TDBDescriptor.mm TDBView.mm \
-TDBMixed.mm TDBColumnProxy.mm
+TDBMixed.mm TDBColumnProxy.mm NSData+TDBGetBinaryData.mm
 
 libtightdb_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2
 libtightdb_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa

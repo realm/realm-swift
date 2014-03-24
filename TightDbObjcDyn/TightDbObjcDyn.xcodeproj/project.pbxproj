@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4220871618E042FD00F3CF27 /* NSData+TDBGetBinaryData.h in Headers */ = {isa = PBXBuildFile; fileRef = 4220871418E042FD00F3CF27 /* NSData+TDBGetBinaryData.h */; };
+		4220871718E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4220871518E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm */; };
 		424EEF9E18D9C10100337A13 /* TDBColumnProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEF9D18D9C10100337A13 /* TDBColumnProxy.h */; };
 		424EEFA218D9C11D00337A13 /* TDBDescriptor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEF9F18D9C11D00337A13 /* TDBDescriptor.mm */; };
 		424EEFA318D9C11D00337A13 /* TDBDescriptor_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA018D9C11D00337A13 /* TDBDescriptor_priv.h */; };
@@ -77,6 +79,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4220871418E042FD00F3CF27 /* NSData+TDBGetBinaryData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+TDBGetBinaryData.h"; path = "../../src/tightdb/objc/NSData+TDBGetBinaryData.h"; sourceTree = "<group>"; };
+		4220871518E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "NSData+TDBGetBinaryData.mm"; path = "../../src/tightdb/objc/NSData+TDBGetBinaryData.mm"; sourceTree = "<group>"; };
 		424EEF9D18D9C10100337A13 /* TDBColumnProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBColumnProxy.h; path = ../../src/tightdb/objc/TDBColumnProxy.h; sourceTree = "<group>"; };
 		424EEF9F18D9C11D00337A13 /* TDBDescriptor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBDescriptor.mm; path = ../../src/tightdb/objc/TDBDescriptor.mm; sourceTree = "<group>"; };
 		424EEFA018D9C11D00337A13 /* TDBDescriptor_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBDescriptor_priv.h; path = ../../src/tightdb/objc/TDBDescriptor_priv.h; sourceTree = "<group>"; };
@@ -236,6 +240,8 @@
 				E91890D3177B67AB00653D7A /* tightdb.h */,
 				E91890CB177B67AB00653D7A /* TDBTransaction.h */,
 				E91890C7177B67AB00653D7A /* TDBtransaction.mm */,
+				4220871418E042FD00F3CF27 /* NSData+TDBGetBinaryData.h */,
+				4220871518E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm */,
 				E91890C8177B67AB00653D7A /* TDBTransaction_priv.h */,
 				E91890D4177B67AB00653D7A /* TDBType.h */,
 				E91890D5177B67AB00653D7A /* util.hpp */,
@@ -317,6 +323,7 @@
 				E91890E4177B67AB00653D7A /* tightdb.h in Headers */,
 				E91890E5177B67AB00653D7A /* TDBType.h in Headers */,
 				424EEFA318D9C11D00337A13 /* TDBDescriptor_priv.h in Headers */,
+				4220871618E042FD00F3CF27 /* NSData+TDBGetBinaryData.h in Headers */,
 				E91890E6177B67AB00653D7A /* util.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -427,6 +434,7 @@
 				424EEFAE18D9C15A00337A13 /* TDBView.mm in Sources */,
 				424EEFB218D9C97900337A13 /* TDBColumnProxy.mm in Sources */,
 				E91890D8177B67AB00653D7A /* TDBtransaction.mm in Sources */,
+				4220871718E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm in Sources */,
 				E91890DA177B67AB00653D7A /* TDBContext.mm in Sources */,
 				E91890DE177B67AB00653D7A /* TDBQuery.mm in Sources */,
 				E91890E1177B67AB00653D7A /* TDBTable.mm in Sources */,

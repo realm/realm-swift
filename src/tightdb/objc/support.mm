@@ -4,6 +4,7 @@
 
 #import "TDBTable.h"
 #import "util.hpp"
+#import "NSData+TDBGetBinaryData.h"
 #import "support.h"
 
 using namespace tightdb;
@@ -256,9 +257,7 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 break;
             }
             if ([obj isKindOfClass:[NSData class]]) {
-                const void *data = [(NSData *)obj bytes];
-                tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)obj length]);
-                table.insert_mixed(col_ndx, row_ndx, bd);
+                table.insert_mixed(col_ndx, row_ndx, [(NSData *)obj tdbBinaryData]);
                 break;
             }
             if ([obj isKindOfClass:[NSNumber class]]) {
@@ -485,9 +484,7 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 break;
             }
             if ([obj isKindOfClass:[NSData class]]) {
-                const void *data = [(NSData *)obj bytes];
-                tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)obj length]);
-                table.set_mixed(col_ndx, row_ndx, bd);
+                table.set_mixed(col_ndx, row_ndx, [(NSData *)obj tdbBinaryData]);
                 break;
             }
             if ([obj isKindOfClass:[NSNumber class]]) {
