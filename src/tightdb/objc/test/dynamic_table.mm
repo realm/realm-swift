@@ -262,7 +262,7 @@
 -(void)testAppendRowsBinaryColumn
 {
     const char bin[4] = { 0, 1, 2, 3 };
-    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    NSData* bin2 = [[NSData alloc] initWithBytes:(const void *)bin length:sizeof bin];
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:TDBBinaryType];
     STAssertNoThrow(([t addRow:@[bin2]]), @"Cannot insert 'binary'");
@@ -277,7 +277,7 @@
 -(void)testAppendRowWithLabelsBinaryColumn
 {
     const char bin[4] = { 0, 1, 2, 3 };
-    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    NSData* bin2 = [[NSData alloc] initWithBytes:(const void *)bin length:sizeof bin];
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:TDBBinaryType];
 
@@ -348,7 +348,7 @@
 -(void)testAppendRowsMixedColumns
 {
     const char bin[4] = { 0, 1, 2, 3 };
-    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    NSData* bin2 = [[NSData alloc] initWithBytes:(const void *)bin length:sizeof bin];
 
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:TDBMixedType];
@@ -369,7 +369,7 @@
 -(void)testAppendRowWithLabelsMixedColumns
 {
     const char bin[4] = { 0, 1, 2, 3 };
-    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
 
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:TDBMixedType];
@@ -858,8 +858,8 @@
 
 
     const char bin[4] = { 0, 1, 2, 3 };
-    TDBBinary* bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
-    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
     NSDate *timeNow = [NSDate date];
 
     TDBTable* subtab1 = [[TDBTable alloc] init];
@@ -898,7 +898,7 @@
     [c setDouble:  8.8       inColumnWithIndex:DoubleCol];
     [c setString:  @"banach" inColumnWithIndex:StringCol];
     [c setBinary:  bin2      inColumnWithIndex:BinaryCol];
-    [c setDate:    [NSDate date]   inColumnWithIndex:DateCol];
+    [c setDate:    timeNow   inColumnWithIndex:DateCol];
     [c setTable:   subtab2   inColumnWithIndex:TableCol];
     [c setMixed:   mixSubtab inColumnWithIndex:MixedCol];
 
