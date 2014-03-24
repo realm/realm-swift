@@ -22,8 +22,6 @@
 
 #import <tightdb/objc/TDBTable.h>
 #import <tightdb/objc/TDBTable_priv.h>
-#import <tightdb/objc/TDBBinary.h>
-#import <tightdb/objc/TDBBinary_priv.h>
 #import <tightdb/objc/TDBMixed.h>
 #import "TDBMixed_priv.h"
 #import <tightdb/objc/util.hpp>
@@ -78,10 +76,12 @@
     return mixed;
 }
 
-+(TDBMixed*)mixedWithBinary:(TDBBinary*)value
++(TDBMixed*)mixedWithBinary:(NSData*)value
 {
     TDBMixed* mixed = [[TDBMixed alloc] init];
-    mixed->m_mixed = tightdb::Mixed([value getNativeBinary]);
+    const void *data = [(NSData *)value bytes];
+    tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)value length]);
+    mixed->m_mixed = tightdb::Mixed(bd);
     mixed->m_table = nil;
     return mixed;
 }
@@ -182,9 +182,10 @@
     return to_objc_string(m_mixed.get_string());
 }
 
--(TDBBinary*)getBinary
+-(NSData*)getBinary
 {
-    return [[TDBBinary alloc] initWithBinary:m_mixed.get_binary()];
+    tightdb::BinaryData bd = m_mixed.get_binary();
+    return [[NSData alloc] initWithBytes:static_cast<const void *>(bd.data()) length:bd.size()];
 }
 
 -(NSDate *)getDate

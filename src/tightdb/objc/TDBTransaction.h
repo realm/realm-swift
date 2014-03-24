@@ -20,7 +20,6 @@
 
 #import <Foundation/Foundation.h>
 
-@class TDBBinary;
 @class TDBTable;
 
 

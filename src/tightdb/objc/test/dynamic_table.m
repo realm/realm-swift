@@ -261,7 +261,7 @@
 -(void)testAppendRowsBinaryColumn
 {
     const char bin[4] = { 0, 1, 2, 3 };
-    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    NSData* bin2 = [[NSData alloc] initWithBytes:(const void *)bin length:sizeof bin];
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:TDBBinaryType];
     STAssertTrue(([t appendRow:@[bin2]]), @"Cannot insert 'binary'");
@@ -276,7 +276,7 @@
 -(void)testAppendRowWithLabelsBinaryColumn
 {
     const char bin[4] = { 0, 1, 2, 3 };
-    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    NSData* bin2 = [[NSData alloc] initWithBytes:(const void *)bin length:sizeof bin];
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:TDBBinaryType];
 
@@ -347,7 +347,7 @@
 -(void)testAppendRowsMixedColumns
 {
     const char bin[4] = { 0, 1, 2, 3 };
-    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    NSData* bin2 = [[NSData alloc] initWithBytes:(const void *)bin length:sizeof bin];
 
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:TDBMixedType];
@@ -368,7 +368,7 @@
 -(void)testAppendRowWithLabelsMixedColumns
 {
     const char bin[4] = { 0, 1, 2, 3 };
-    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
 
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" andType:TDBMixedType];
@@ -857,8 +857,8 @@
 
 
     const char bin[4] = { 0, 1, 2, 3 };
-    TDBBinary* bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
-    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
     NSDate *timeNow = [NSDate date];
 
     TDBTable* subtab1 = [[TDBTable alloc] init];
