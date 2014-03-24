@@ -336,7 +336,7 @@ using namespace std;
 
 -(NSUInteger)addRow:(NSObject*)data
 {
-    if(!data) {
+    if (!data) {
         return [self TDBAddEmptyRows:1];
     }
     tightdb::Table& table = *m_table;

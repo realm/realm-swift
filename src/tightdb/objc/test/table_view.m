@@ -143,16 +143,13 @@
     TDBTable *t = [[TDBTable alloc] init];
     NSUInteger boolCol = [t addColumnWithName:@"boolCol" andType:TDBBoolType];
     
-    NSUInteger rowIndex = [t addRow:nil];
-    TDBRow *row = [t rowAtIndex:rowIndex];
+    TDBRow *row = [t rowAtIndex:[t addRow:nil]];
     [row setBool:YES inColumnWithIndex:boolCol];
     
-    rowIndex = [t addRow:nil];
-    row = [t rowAtIndex:rowIndex];
+    row = [t rowAtIndex:[t addRow:nil]];
     [row setBool:YES inColumnWithIndex:boolCol];
     
-    rowIndex = [t addRow:nil];
-    row = [t rowAtIndex:rowIndex];
+    row = [t rowAtIndex:[t addRow:nil]];
     [row setBool:NO inColumnWithIndex:boolCol];
     
     TDBQuery *q = [t where];
