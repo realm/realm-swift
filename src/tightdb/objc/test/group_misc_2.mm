@@ -215,15 +215,15 @@ TIGHTDB_TABLE_2(QueryTable,
     int COL_SUBTABLE_INT = 0;
 
     // Add a row to the top level table
-    [table addEmptyRow];
+    [table addRow:nil];
     [table setInt:700 inColumnWithIndex:COL_TABLE_INT atRowIndex:0];
 
     // Add two rows to the subtable
     TDBTable* subtable = [table tableInColumnWithIndex:COL_TABLE_TAB atRowIndex:0];
-    [subtable addEmptyRow];
+    [subtable addRow:nil];
 
     [subtable setInt:800 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:0];
-    [subtable addEmptyRow];
+    [subtable addRow:nil];
     [subtable setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
 
     // Make the mixed values column contain another subtable
