@@ -81,8 +81,9 @@ using namespace std;
         if (TIGHTDB_UNLIKELY(!table))
             return nil;
         TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
-                                                 tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name));
-                                                 [table setNativeTable:table_2.get()];)
+            tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name));
+            [table setNativeTable:table_2.get()];
+        )
         [table setParent:self];
         [table setReadOnly:m_read_only];
         return table;
@@ -98,30 +99,30 @@ using namespace std;
         [exception raise];
     }
     
-        // If table does not exist in context, return nil
-        if (![self hasTableWithName:name]) {
+    // If table does not exist in context, return nil
+    if (![self hasTableWithName:name]) {
+        return nil;
+    } else {
+        TDBTable* table = [[class_obj alloc] _initRaw];
+        if (TIGHTDB_UNLIKELY(!table))
             return nil;
-        } else {
-    
-            TDBTable* table = [[class_obj alloc] _initRaw];
-            if (TIGHTDB_UNLIKELY(!table))
+        bool was_created;
+        TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
+            tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name), was_created);
+            [table setNativeTable:table_2.get()];
+        )
+        [table setParent:self];
+        [table setReadOnly:m_read_only];
+        if (was_created) {
+            if (![table _addColumns])
                 return nil;
-            bool was_created;
-            TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
-                                                     tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name), was_created);
-                                                     [table setNativeTable:table_2.get()];)
-            [table setParent:self];
-            [table setReadOnly:m_read_only];
-            if (was_created) {
-                if (![table _addColumns])
-                    return nil;
-            }
-            else {
-                if (![table _checkType])
-                    return nil;
-            }
-            return table;
         }
+        else {
+            if (![table _checkType])
+                return nil;
+        }
+        return table;
+    }
 }
 
 
@@ -166,7 +167,8 @@ using namespace std;
         return nil;
     TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
         tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name));
-        [table setNativeTable:table_2.get()];)
+        [table setNativeTable:table_2.get()];
+    )
     [table setParent:self];
     [table setReadOnly:m_read_only];
     return table;
@@ -263,10 +265,9 @@ using namespace std;
         if (error) // allow nil as the error argument
             *error = make_tightdb_error(tdb_err_File_PermissionDenied, [NSString stringWithUTF8String:ex.what()]);
         return nil;
-        
     }
     catch (tightdb::util::File::Exists& ex) {
-        if(error) // allow nil as the error argument
+        if (error) // allow nil as the error argument
             *error = make_tightdb_error(tdb_err_File_Exists, [NSString stringWithUTF8String:ex.what()]);
         return nil;
         
@@ -275,7 +276,6 @@ using namespace std;
         if (error) // allow nil as the error argument
             *error = make_tightdb_error(tdb_err_File_AccessError, [NSString stringWithUTF8String:ex.what()]);
         return nil;
-        
     }
     catch (std::exception& ex) {
         if (error) // allow nil as the error argument
@@ -331,19 +331,16 @@ using namespace std;
         if (error) // allow nil as the error argument
             *error = make_tightdb_error(tdb_err_File_PermissionDenied, [NSString stringWithUTF8String:ex.what()]);
         return NO;
-        
     }
     catch (tightdb::util::File::Exists& ex) {
         if (error) // allow nil as the error argument
             *error = make_tightdb_error(tdb_err_File_Exists, [NSString stringWithUTF8String:ex.what()]);
         return NO;
-        
     }
     catch (tightdb::util::File::AccessError& ex) {
         if (error) // allow nil as the error argument
             *error = make_tightdb_error(tdb_err_File_AccessError, [NSString stringWithUTF8String:ex.what()]);
         return NO;
-        
     }
     catch (std::exception& ex) {
         if (error) // allow nil as the error argument

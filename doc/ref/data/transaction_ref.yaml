@@ -42,6 +42,8 @@ CATEGORIES:
       - DESCR  :
         CODE   : ex_objc_group_optional_table
   - g_group_get_table:
+      IGNORE   : ""      
+  - g_group_get_table_if_exists:
       NAMES    : "getTableWithName:"
       SUMMARY  : *g_group_get_table_summary
       DESCR    : *g_group_get_table_descr
@@ -64,10 +66,10 @@ CATEGORIES:
       -  DESCR :
          CODE  : ex_objc_group_optional_table
       SEE      : "{@link g_group_has_table}"
-  - g_group_get_create_table:
+  - g_group_create_table:
       NAMES    : "createTableWithName:"
-      SUMMARY  : Get table if it exists. Otherwise create and get it.
-      DESCR    : Get table if it exists. Otherwise create and get it.
+      SUMMARY  : Create table in context.
+      DESCR    : Create table with the specified name in context. If a table already exists, an exception is thrown.
       SIGNATURE: |
                  - (TDBTable *)createTableWithName:(NSString *)name
                  - (id)createTableWithName:(NSString *)name asTableClass:(Class)obj

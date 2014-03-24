@@ -1,9 +1,9 @@
 2014-03-24
 ==========
-! BREAKING CHANGE: getOrCreateTable on Transaction has removed.
+! BREAKING CHANGE: getOrCreateTable on Transaction has been removed.
 + createTable method added on Transaction. Throws exception if table with same name already exists.
 ==========
-! BREAKING CHANGE: Underscope (_) removed from generated typed table classes.
+! BREAKING CHANGE: Underscore (_) removed from generated typed table classes.
 
 ! BREAKING CHANCE: Constructor for TDBContext has been renamed to contextWithPersistenceToFile:
 
