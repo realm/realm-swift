@@ -18,9 +18,9 @@ void ex_objc_tableview_typed_intro()
         PeopleTable *table = [[PeopleTable alloc] init];
 
         /* Adds rows to the table. */
-        [table appendRow:@{@"Name":@"Brian",  @"Age":@10, @"Hired":@NO}];
-        [table appendRow:@{@"Name":@"Sofie",  @"Age":@40, @"Hired":@YES}];
-        [table appendRow:@{@"Name":@"Sam",    @"Age":@76, @"Hired":@NO}];
+        [table addRow:@{@"Name":@"Brian",  @"Age":@10, @"Hired":@NO}];
+        [table addRow:@{@"Name":@"Sofie",  @"Age":@40, @"Hired":@YES}];
+        [table addRow:@{@"Name":@"Sam",    @"Age":@76, @"Hired":@NO}];
 
         /* Place the result of a query in a table view. */
         PeopleTableView *tableView = [[[table where].Age columnIsGreaterThan:20] findAll];
