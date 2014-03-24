@@ -897,7 +897,7 @@
     [c setDouble:  8.8       inColumnWithIndex:DoubleCol];
     [c setString:  @"banach" inColumnWithIndex:StringCol];
     [c setBinary:  bin2      inColumnWithIndex:BinaryCol];
-    [c setDate:    [NSDate date]   inColumnWithIndex:DateCol];
+    [c setDate:    timeNow   inColumnWithIndex:DateCol];
     [c setTable:   subtab2   inColumnWithIndex:TableCol];
     [c setMixed:   mixSubtab inColumnWithIndex:MixedCol];
 
