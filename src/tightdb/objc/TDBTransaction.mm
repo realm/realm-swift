@@ -154,7 +154,6 @@ using namespace std;
         [exception raise];
     }
     
-    
     if ([self hasTableWithName:name]) {
         NSException* exception = [NSException exceptionWithName:@"tightdb:table_with_name_already_exists"
                                                          reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the context.", name]
@@ -191,7 +190,6 @@ using namespace std;
         [exception raise];
     }
     
-    
     if ([self hasTableWithName:name]) {
         NSException* exception = [NSException exceptionWithName:@"tightdb:table_with_name_already_exists"
                                                          reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the context.", name]
@@ -218,7 +216,6 @@ using namespace std;
     }
     return table;
 }
-
 
 
 /* Moved to group_priv header for now */

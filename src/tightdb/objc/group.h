@@ -44,8 +44,6 @@
 
 +(TDBTransaction *)groupWithBuffer:(TDBBinary *)buffer withError:(NSError *__autoreleasing *)error;
 
--(BOOL)writeContextToFile:(NSString *)path withError:(NSError *__autoreleasing *)error;
-
 -(TDBBinary *)writeContextToBuffer;
 
 @end
