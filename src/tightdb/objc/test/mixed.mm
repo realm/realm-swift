@@ -12,7 +12,7 @@
 
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/group.h>
-#import "TDBTable_priv.h"
+#import <tightdb/objc/TDBTable_priv.h>
 
 TIGHTDB_TABLE_3(MixedTable,
                 Hired, Bool,
