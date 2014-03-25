@@ -60,8 +60,8 @@
     [cursor setInt:10 inColumnWithIndex:1];
 
     // Verify
-    STAssertEquals((int64_t)0, ([_table TDBintInColumnWithIndex:0 atRowIndex:ndx]), @"First not zero");
-    STAssertEquals((int64_t)10, ([_table TDBintInColumnWithIndex:1 atRowIndex:ndx]), @"Second not 10");
+    STAssertEquals((int64_t)0, ([_table TDB_intInColumnWithIndex:0 atRowIndex:ndx]), @"First not zero");
+    STAssertEquals((int64_t)10, ([_table TDB_intInColumnWithIndex:1 atRowIndex:ndx]), @"Second not 10");
 }
 
 -(void)testAddColumn
@@ -81,8 +81,8 @@
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
     STAssertTrue([t addRow:@[ @2 ]], @"Impossible!");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
-    STAssertEquals((int64_t)1, [t TDBintInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
-    STAssertEquals((int64_t)2, [t TDBintInColumnWithIndex:0 atRowIndex:1], @"Value 2 expected");
+    STAssertEquals((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
+    STAssertEquals((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:1], @"Value 2 expected");
     STAssertThrows([t addRow:@[@"Hello"]], @"Wrong type");
     STAssertThrows(([t addRow:@[@1, @"Hello"]]), @"Wrong number of columns");
 }
@@ -96,8 +96,8 @@
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
     STAssertTrue([t insertRow:@[ @2 ] atIndex:0], @"Impossible!");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
-    STAssertEquals((int64_t)1, [t TDBintInColumnWithIndex:0 atRowIndex:1], @"Value 1 expected");
-    STAssertEquals((int64_t)2, [t TDBintInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
+    STAssertEquals((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:1], @"Value 1 expected");
+    STAssertEquals((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
     STAssertThrows([t insertRow:@[@"Hello"] atIndex:0], @"Wrong type");
     STAssertThrows(([t insertRow:@[@1, @"Hello"] atIndex:0]), @"Wrong number of columns");
 }
@@ -108,7 +108,7 @@
     [t addColumnWithName:@"first" andType:TDBIntType];
     [t insertRow:@[@1] atIndex:0];
     t[0] = @[@2];
-    STAssertEquals((int64_t)2, [t TDBintInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
+    STAssertEquals((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
 }
 
 -(void)testUpdateRowWithLabelsIntColumn
@@ -117,7 +117,7 @@
     [t addColumnWithName:@"first" andType:TDBIntType];
     [t insertRow:@[@1] atIndex:0];
     t[0] = @{@"first": @2};
-    STAssertEquals((int64_t)2, [t TDBintInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
+    STAssertEquals((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
 }
 
 
@@ -133,8 +133,8 @@
     STAssertTrue([t addRow:@{ @"first": @2 }], @"Impossible!");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
 
-    STAssertEquals((int64_t)1, [t TDBintInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
-    STAssertEquals((int64_t)2, [t TDBintInColumnWithIndex:0 atRowIndex:1], @"Value 2 expected");
+    STAssertEquals((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
+    STAssertEquals((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:1], @"Value 2 expected");
 
     STAssertNoThrow([t addRow:@{ @"first": @"Hello" }], @"Wrong type");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
@@ -145,7 +145,7 @@
     STAssertTrue(([t addRow:@{ @"second": @1 }]), @"This is impossible");
     STAssertEquals((size_t)4, [t rowCount], @"Expected 4 rows");
 
-    STAssertEquals((int64_t)0, [t TDBintInColumnWithIndex:0 atRowIndex:3], @"Value 0 expected");
+    STAssertEquals((int64_t)0, [t TDB_intInColumnWithIndex:0 atRowIndex:3], @"Value 0 expected");
 }
 
 -(void)testInsertRowWithLabelsIntColumn
@@ -160,8 +160,8 @@
     STAssertTrue(([t insertRow:@{ @"first": @2 } atIndex:0]), @"Impossible!");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
     
-    STAssertEquals((int64_t)1, ([t TDBintInColumnWithIndex:0 atRowIndex:1]), @"Value 1 expected");
-    STAssertEquals((int64_t)2, ([t TDBintInColumnWithIndex:0 atRowIndex:0]), @"Value 2 expected");
+    STAssertEquals((int64_t)1, ([t TDB_intInColumnWithIndex:0 atRowIndex:1]), @"Value 1 expected");
+    STAssertEquals((int64_t)2, ([t TDB_intInColumnWithIndex:0 atRowIndex:0]), @"Value 2 expected");
     
     STAssertFalse(([t insertRow:@{ @"first": @"Hello" } atIndex:0]), @"Wrong type");
     STAssertEquals((size_t)2, ([t rowCount]), @"Expected 2 rows");
@@ -171,7 +171,7 @@
     
     STAssertTrue(([t insertRow:@{ @"second": @4 } atIndex:0]), @"This is impossible");
     STAssertEquals((size_t)4, [t rowCount], @"Expected 4 rows");
-    STAssertTrue((int64_t)0 == ([t TDBintInColumnWithIndex:0 atRowIndex:0]), @"Value 0 expected");
+    STAssertTrue((int64_t)0 == ([t TDB_intInColumnWithIndex:0 atRowIndex:0]), @"Value 0 expected");
 }
 
 
@@ -183,8 +183,8 @@
 
     STAssertNoThrow(([t addRow:@[@1, @"Hello"]]), @"addRow 1");
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
-    STAssertEquals((int64_t)1, ([t TDBintInColumnWithIndex:0 atRowIndex:0]), @"Value 1 expected");
-    STAssertTrue(([[t TDBstringInColumnWithIndex:1 atRowIndex:0] isEqualToString:@"Hello"]), @"Value 'Hello' expected");
+    STAssertEquals((int64_t)1, ([t TDB_intInColumnWithIndex:0 atRowIndex:0]), @"Value 1 expected");
+    STAssertTrue(([[t TDB_stringInColumnWithIndex:1 atRowIndex:0] isEqualToString:@"Hello"]), @"Value 'Hello' expected");
     STAssertThrows(([t addRow:@[@1, @2]]), @"addRow 2");
 }
 
@@ -196,8 +196,8 @@
     [t addColumnWithName:@"second" andType:TDBStringType];
     STAssertNoThrow(([t addRow:@{@"first": @1, @"second": @"Hello"}]), @"addRowWithLabels 1");
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
-    STAssertEquals((int64_t)1, ([t TDBintInColumnWithIndex:0 atRowIndex:0]), @"Value 1 expected");
-    STAssertTrue(([[t TDBstringInColumnWithIndex:1 atRowIndex:0] isEqualToString:@"Hello"]), @"Value 'Hello' expected");
+    STAssertEquals((int64_t)1, ([t TDB_intInColumnWithIndex:0 atRowIndex:0]), @"Value 1 expected");
+    STAssertTrue(([[t TDB_stringInColumnWithIndex:1 atRowIndex:0] isEqualToString:@"Hello"]), @"Value 'Hello' expected");
     STAssertFalse(([t addRow:@{@"first": @1, @"second": @2}]), @"addRowWithLabels 2");
 }
 
