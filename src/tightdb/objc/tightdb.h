@@ -23,7 +23,9 @@
 #import <tightdb/objc/TDBView.h>
 #import <tightdb/objc/TDBQuery.h>
 #import <tightdb/objc/TDBRow.h>
-#import <tightdb/objc/helper_macros.h>
-#import <tightdb/objc/table_macros.h>
 #import <tightdb/objc/TDBContext.h>
 #import <tightdb/objc/TDBVersion.h>
+
+#import <tightdb/objc/helper_macros.h>
+#import <tightdb/objc/table_macros.h>
+#import <tightdb/objc/PrivateTDB.h>

@@ -46,6 +46,7 @@ directiveStartToken = %
 #import <tightdb/objc/TDBView.h>
 #import <tightdb/objc/TDBColumnProxy.h>
 #import <tightdb/objc/TDBMixed.h>
+#import <tightdb/objc/PrivateTDB.h>
 
 %for $i in range($max_cols)
 %set $num_cols = $i + 1

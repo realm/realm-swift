@@ -8,6 +8,7 @@
 #import <tightdb/objc/TDBTable.h>
 #import <tightdb/objc/TDBDescriptor.h>
 #import <tightdb/objc/TDBMixed.h>
+#import <tightdb/objc/PrivateTDB.h>
 
 @interface MACTestTableDeleteAll: SenTestCase
 @end

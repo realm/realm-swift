@@ -25,6 +25,7 @@
 #import <tightdb/objc/TDBTransaction_priv.h>
 #import <tightdb/objc/TDBTable.h>
 #import <tightdb/objc/TDBTable_priv.h>
+#import "PrivateTDB.h"
 
 #include <tightdb/objc/util.hpp>
 
