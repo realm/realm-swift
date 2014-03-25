@@ -67,7 +67,7 @@ TIGHTDB_TABLE_2(MyTable2,
 {
    // TDBTransaction *group = [TDBTransaction group];
     // Create new table in group
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:@"employees.tightdb" withError:nil];
+    TDBContext *context = [TDBContext contextWithPersistenceToFile:@"employees.tightdb" error:nil];
     
     [context writeWithBlock:^BOOL(TDBTransaction *group) {
         
@@ -138,11 +138,11 @@ TIGHTDB_TABLE_2(MyTable2,
         
         return YES;
 
-    } withError:nil];
+    } error:nil];
     
     // Load a group from disk (and print contents)
     
-    context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
+    context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"employees.tightdb"] error:nil];
     
     [context writeWithBlock:^BOOL(TDBTransaction *transaction) {
         MyTable *diskTable = [transaction getTableWithName:@"employees" asTableClass:[MyTable class]];
@@ -160,7 +160,7 @@ TIGHTDB_TABLE_2(MyTable2,
         // Write same group to memory buffer
        //buffer = [transaction writeContextToBuffer];
         return YES;
-    } withError:nil];
+    } error:nil];
 
 
 #ifdef TDB_GROUP_IMPLEMENTED
