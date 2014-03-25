@@ -19,7 +19,7 @@ void ex_objc_sharedgroup_intro()
         [fm removeItemAtPath:@"contextTest.tightdb.lock" error:nil];
 
         /* Creates a context and uses it to create a new table. */
-        TDBContext *context = [TDBContext contextWithPersistenceToFile:@"contextTest.tightdb" withError:nil];
+        TDBContext *context = [TDBContext contextWithPersistenceToFile:@"contextTest.tightdb" error:nil];
 
         /* A write transaction (with commit). */
         NSError *error = nil;
@@ -32,7 +32,7 @@ void ex_objc_sharedgroup_intro()
             [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
             
             return YES; /* Commit */
-        } withError:&error];
+        } error:&error];
 
         if (!success)
             NSLog(@"Something went wrong in the write-transaction: %@", [error description]);
@@ -51,7 +51,7 @@ void ex_objc_sharedgroup_intro()
            [table addName:@"Bill" Age:53 Hired:YES];
            NSLog(@"Commit!");
            return YES; /* Commit */
-       } withError:&error];
+       } error:&error];
 
         if (!success)
             NSLog(@"Error : %@", [error localizedDescription]);
