@@ -72,23 +72,23 @@ using namespace std;
     TDBType columnType = [_table columnTypeOfColumn:colNdx];
     switch (columnType) {
         case TDBBoolType:
-            return [NSNumber numberWithBool:[_table TDBboolInColumnWithIndex:colNdx atRowIndex:_ndx]];
+            return [NSNumber numberWithBool:[_table TDB_boolInColumnWithIndex:colNdx atRowIndex:_ndx]];
         case TDBIntType:
-            return [NSNumber numberWithLongLong:[_table TDBintInColumnWithIndex:colNdx atRowIndex:_ndx]];
+            return [NSNumber numberWithLongLong:[_table TDB_intInColumnWithIndex:colNdx atRowIndex:_ndx]];
         case TDBFloatType:
-            return [NSNumber numberWithFloat:[_table TDBfloatInColumnWithIndex:colNdx atRowIndex:_ndx]];
+            return [NSNumber numberWithFloat:[_table TDB_floatInColumnWithIndex:colNdx atRowIndex:_ndx]];
         case TDBDoubleType:
-            return [NSNumber numberWithLongLong:[_table TDBdoubleInColumnWithIndex:colNdx atRowIndex:_ndx]];
+            return [NSNumber numberWithLongLong:[_table TDB_doubleInColumnWithIndex:colNdx atRowIndex:_ndx]];
         case TDBStringType:
-            return [_table TDBstringInColumnWithIndex:colNdx atRowIndex:_ndx];
+            return [_table TDB_stringInColumnWithIndex:colNdx atRowIndex:_ndx];
         case TDBDateType:
-            return [_table TDBdateInColumnWithIndex:colNdx atRowIndex:_ndx];
+            return [_table TDB_dateInColumnWithIndex:colNdx atRowIndex:_ndx];
         case TDBBinaryType:
-            return [_table TDBbinaryInColumnWithIndex:colNdx atRowIndex:_ndx];
+            return [_table TDB_binaryInColumnWithIndex:colNdx atRowIndex:_ndx];
         case TDBTableType:
-            return [_table TDBtableInColumnWithIndex:colNdx atRowIndex:_ndx];
+            return [_table TDB_tableInColumnWithIndex:colNdx atRowIndex:_ndx];
         case TDBMixedType:
-            return [_table TDBmixedInColumnWithIndex:colNdx atRowIndex:_ndx];
+            return [_table TDB_mixedInColumnWithIndex:colNdx atRowIndex:_ndx];
     }
 }
 
@@ -148,47 +148,47 @@ using namespace std;
 
 -(int64_t)intInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDBintInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table TDB_intInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(NSString *)stringInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDBstringInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table TDB_stringInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(NSData *)binaryInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDBbinaryInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table TDB_binaryInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(BOOL)boolInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDBboolInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table TDB_boolInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(float)floatInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDBfloatInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table TDB_floatInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(double)doubleInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDBdoubleInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table TDB_doubleInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(NSDate *)dateInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDBdateInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table TDB_dateInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(TDBTable *)tableInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDBtableInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table TDB_tableInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDBmixedInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table TDB_mixedInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setInt:(int64_t)value inColumnWithIndex:(NSUInteger)colNdx
@@ -257,7 +257,7 @@ using namespace std;
 
 -(BOOL)getBool
 {
-    return [_cursor.table TDBboolInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_cursor.table TDB_boolInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
 -(void)setBool:(BOOL)value
@@ -267,7 +267,7 @@ using namespace std;
 
 -(int64_t)getInt
 {
-    return [_cursor.table TDBintInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_cursor.table TDB_intInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
 -(void)setInt:(int64_t)value
@@ -277,7 +277,7 @@ using namespace std;
 
 -(float)getFloat
 {
-    return [_cursor.table TDBfloatInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_cursor.table TDB_floatInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
 -(void)setFloat:(float)value
@@ -287,7 +287,7 @@ using namespace std;
 
 -(double)getDouble
 {
-    return [_cursor.table TDBdoubleInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_cursor.table TDB_doubleInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
 -(void)setDouble:(double)value
@@ -297,7 +297,7 @@ using namespace std;
 
 -(NSString *)getString
 {
-    return [_cursor.table TDBstringInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_cursor.table TDB_stringInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
 -(void)setString:(NSString *)value
@@ -307,7 +307,7 @@ using namespace std;
 
 -(NSData *)getBinary
 {
-    return [_cursor.table TDBbinaryInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_cursor.table TDB_binaryInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
 -(void)setBinary:(NSData *)value
@@ -322,7 +322,7 @@ using namespace std;
 
 -(NSDate *)getDate
 {
-    return [_cursor.table TDBdateInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_cursor.table TDB_dateInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
 -(void)setDate:(NSDate *)value
@@ -332,7 +332,7 @@ using namespace std;
 
 -(id)getSubtable:(Class)obj
 {
-    return [_cursor.table TDBtableInColumnWithIndex:_columnId atRowIndex:_cursor.ndx asTableClass:obj];
+    return [_cursor.table TDB_tableInColumnWithIndex:_columnId atRowIndex:_cursor.ndx asTableClass:obj];
 }
 
 -(void)setSubtable:(TDBTable *)value
@@ -342,7 +342,7 @@ using namespace std;
 
 -(TDBMixed *)getMixed
 {
-    return [_cursor.table TDBmixedInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_cursor.table TDB_mixedInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
 -(void)setMixed:(TDBMixed *)value
