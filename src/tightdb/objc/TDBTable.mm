@@ -250,12 +250,12 @@ using namespace std;
 }
 
 
--(NSUInteger)TDBAddEmptyRow
+-(NSUInteger)TDB_addEmptyRow
 {
-    return [self TDBAddEmptyRows:1];
+    return [self TDB_addEmptyRows:1];
 }
 
--(NSUInteger)TDBAddEmptyRows:(NSUInteger)num_rows
+-(NSUInteger)TDB_addEmptyRows:(NSUInteger)num_rows
 {
     // TODO: Use a macro or a function for error handling
 
@@ -351,7 +351,7 @@ using namespace std;
 -(NSUInteger)addRow:(NSObject*)data
 {
     if (!data) {
-        return [self TDBAddEmptyRows:1];
+        return [self TDB_addEmptyRows:1];
     }
     tightdb::Table& table = *m_table;
     [self insertRow:data atIndex:table.size()];
@@ -361,7 +361,7 @@ using namespace std;
 /* Moved to private header */
 -(TDBRow*)addEmptyRow
 {
-    return [[TDBRow alloc] initWithTable:self ndx:[self TDBAddEmptyRow]];
+    return [[TDBRow alloc] initWithTable:self ndx:[self TDB_addEmptyRow]];
 }
 
 
