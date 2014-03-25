@@ -21,7 +21,6 @@
 #import <Foundation/Foundation.h>
 
 @class TDBTable;
-@class TDBMixed;
 
 @interface TDBRow: NSObject
 -(id)initWithTable:(TDBTable *)table ndx:(NSUInteger)ndx;
@@ -40,7 +39,7 @@
 -(void)setDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
--(void)setMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setMixed:(id)aMixed inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setTable:(TDBTable *)aTable inColumnWithIndex:(NSUInteger)colIndex;
 
 -(int64_t)intInColumnWithIndex:(NSUInteger)colIndex;

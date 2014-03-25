@@ -153,7 +153,7 @@ using namespace std;
     return [_table tableInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colNdx
+-(id)mixedInColumnWithIndex:(NSUInteger)colNdx
 {
     return [_table mixedInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -198,7 +198,7 @@ using namespace std;
     [_table setTable:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(void)setMixed:(TDBMixed *)value inColumnWithIndex:(NSUInteger)colNdx
+-(void)setMixed:(id)value inColumnWithIndex:(NSUInteger)colNdx
 {
     [_table setMixed:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -307,12 +307,12 @@ using namespace std;
     [_cursor.table setTable:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
--(TDBMixed *)getMixed
+-(id)getMixed
 {
     return [_cursor.table mixedInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
--(void)setMixed:(TDBMixed *)value
+-(void)setMixed:(id)value
 {
     [_cursor.table setMixed:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
