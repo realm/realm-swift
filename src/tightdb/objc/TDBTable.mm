@@ -926,7 +926,7 @@ using namespace std;
 {
     return m_table->find_first_datetime(colIndex, [aDate timeIntervalSince1970]);
 }
--(NSUInteger)findRowIndexWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex
+-(NSUInteger)findRowIndexWithMixed:(id)aMixed inColumnWithIndex:(NSUInteger)colIndex
 {
     static_cast<void>(colIndex);
     static_cast<void>(aMixed);
@@ -971,7 +971,7 @@ using namespace std;
     tightdb::TableView view = m_table->find_all_datetime(colIndex, [aDate timeIntervalSince1970]);
     return [TDBView viewWithTable:self andNativeView:view];
 }
--(TDBView*)findAllRowsWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex
+-(TDBView*)findAllRowsWithMixed:(id)aMixed inColumnWithIndex:(NSUInteger)colIndex
 {
     static_cast<void>(colIndex);
     static_cast<void>(aMixed);
