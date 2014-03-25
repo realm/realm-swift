@@ -123,7 +123,7 @@ void sharedGroupFunc() {
 
     // @@Example: transaction @@
     TDBContext *context = [TDBContext contextWithPersistenceToFile:@"people.tightdb"
-                                                            withError:nil];
+                                                            error:nil];
 
     // Start a write transaction
     [context writeWithBlock:^(TDBTransaction *transaction) {
@@ -135,7 +135,7 @@ void sharedGroupFunc() {
         [table addName:@"Bill" Age:53 Hired:YES];
         NSLog(@"Row added!");
         return YES; // Commit (NO would rollback)
-    } withError:nil];
+    } error:nil];
 
     // Start a read transaction
     [context readWithBlock:^(TDBTransaction *transaction) {
