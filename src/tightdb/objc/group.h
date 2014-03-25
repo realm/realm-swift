@@ -40,11 +40,9 @@
  */
 +(TDBTransaction *)group;
 
-+(TDBTransaction *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
++(TDBTransaction *)groupWithFile:(NSString *)filename error:(NSError *__autoreleasing *)error;
 
-+(TDBTransaction *)groupWithBuffer:(NSData *)buffer withError:(NSError *__autoreleasing *)error;
-
--(BOOL)writeContextToFile:(NSString *)path withError:(NSError *__autoreleasing *)error;
++(TDBTransaction *)groupWithBuffer:(NSData *)buffer error:(NSError *__autoreleasing *)error;
 
 -(NSData *)writeContextToBuffer;
 @end
