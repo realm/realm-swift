@@ -38,7 +38,7 @@
 		E91890B9177B677900653D7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E91890B7177B677900653D7A /* InfoPlist.strings */; };
 		E91890D6177B67AB00653D7A /* TDBRow.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C5177B67AB00653D7A /* TDBRow.mm */; };
 		E91890D7177B67AB00653D7A /* TDBRow.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890C6177B67AB00653D7A /* TDBRow.h */; };
-		E91890D8177B67AB00653D7A /* othername.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C7177B67AB00653D7A /* othername.mm */; };
+		E91890D8177B67AB00653D7A /* TDBTransaction.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C7177B67AB00653D7A /* TDBTransaction.mm */; };
 		E91890D9177B67AB00653D7A /* TDBTransaction_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890C8177B67AB00653D7A /* TDBTransaction_priv.h */; };
 		E91890DA177B67AB00653D7A /* TDBContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C9177B67AB00653D7A /* TDBContext.mm */; };
 		E91890DB177B67AB00653D7A /* TDBContext.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CA177B67AB00653D7A /* TDBContext.h */; };
@@ -116,7 +116,7 @@
 		E91890B8177B677900653D7A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E91890C5177B67AB00653D7A /* TDBRow.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBRow.mm; path = ../../src/tightdb/objc/TDBRow.mm; sourceTree = "<group>"; };
 		E91890C6177B67AB00653D7A /* TDBRow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBRow.h; path = ../../src/tightdb/objc/TDBRow.h; sourceTree = "<group>"; };
-		E91890C7177B67AB00653D7A /* othername.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = othername.mm; path = ../../src/tightdb/objc/othername.mm; sourceTree = "<group>"; };
+		E91890C7177B67AB00653D7A /* TDBTransaction.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBTransaction.mm; path = ../../src/tightdb/objc/TDBTransaction.mm; sourceTree = "<group>"; };
 		E91890C8177B67AB00653D7A /* TDBTransaction_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBTransaction_priv.h; path = ../../src/tightdb/objc/TDBTransaction_priv.h; sourceTree = "<group>"; };
 		E91890C9177B67AB00653D7A /* TDBContext.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBContext.mm; path = ../../src/tightdb/objc/TDBContext.mm; sourceTree = "<group>"; };
 		E91890CA177B67AB00653D7A /* TDBContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBContext.h; path = ../../src/tightdb/objc/TDBContext.h; sourceTree = "<group>"; };
@@ -241,7 +241,7 @@
 				E91890D1177B67AB00653D7A /* TDBTable_priv.h */,
 				E91890D3177B67AB00653D7A /* tightdb.h */,
 				E91890CB177B67AB00653D7A /* TDBTransaction.h */,
-				E91890C7177B67AB00653D7A /* othername.mm */,
+				E91890C7177B67AB00653D7A /* TDBTransaction.mm */,
 				4220871418E042FD00F3CF27 /* NSData+TDBGetBinaryData.h */,
 				4220871518E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm */,
 				E91890C8177B67AB00653D7A /* TDBTransaction_priv.h */,
@@ -435,7 +435,7 @@
 				42AD3A9918CDBDFF00C86073 /* TDBVersion.mm in Sources */,
 				424EEFAE18D9C15A00337A13 /* TDBView.mm in Sources */,
 				424EEFB218D9C97900337A13 /* TDBColumnProxy.mm in Sources */,
-				E91890D8177B67AB00653D7A /* othername.mm in Sources */,
+				E91890D8177B67AB00653D7A /* TDBTransaction.mm in Sources */,
 				4220871718E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm in Sources */,
 				E91890DA177B67AB00653D7A /* TDBContext.mm in Sources */,
 				E91890DE177B67AB00653D7A /* TDBQuery.mm in Sources */,
