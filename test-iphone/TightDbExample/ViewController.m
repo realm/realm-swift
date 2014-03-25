@@ -36,6 +36,11 @@ TIGHTDB_TABLE_2(MyTable2,
     _utils = [[Utils alloc] initWithView:(UIScrollView *)self.view];
     [self testGroup];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@""]];
+        });
+        
         Performance *perf = [[Performance alloc] initWithUtils:_utils];
         [perf testInsert];
         [perf testFetch];
