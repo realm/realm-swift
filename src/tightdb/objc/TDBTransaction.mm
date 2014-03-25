@@ -22,9 +22,10 @@
 #include <tightdb/lang_bind_helper.hpp>
 
 #import <tightdb/objc/TDBTransaction.h>
-#import <tightdb/objc/TDBTransaction_priv.h>
+#import <tightdb/objc/TDBTransaction_noinst.h>
 #import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBTable_priv.h>
+#import <tightdb/objc/TDBTable_noinst.h>
+#import "PrivateTDB.h"
 
 #include <tightdb/objc/util.hpp>
 
@@ -242,7 +243,7 @@ using namespace std;
 }
 
 /* Moved to group_priv header for now */
-+(TDBTransaction *)groupWithFile:(NSString *)filename withError:(NSError **)error
++(TDBTransaction *)groupWithFile:(NSString *)filename error:(NSError **)error
 {
     TDBTransaction* group = [[TDBTransaction alloc] init];
     if (!group)
@@ -278,7 +279,7 @@ using namespace std;
 }
 
 /* Moved to group_priv header for now */
-+(TDBTransaction*)groupWithBuffer:(NSData*)buffer withError:(NSError**)error
++(TDBTransaction*)groupWithBuffer:(NSData*)buffer error:(NSError**)error
 {
     TDBTransaction* group = [[TDBTransaction alloc] init];
     if (!group)
@@ -311,7 +312,7 @@ using namespace std;
 }
 
 /* Moved to group_priv header for now */
--(BOOL)writeContextToFile:(NSString*)path withError:(NSError* __autoreleasing*)error
+-(BOOL)writeContextToFile:(NSString*)path error:(NSError* __autoreleasing*)error
 {
     try {
         m_group->write(tightdb::StringData(ObjcStringAccessor(path)));

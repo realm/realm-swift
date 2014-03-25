@@ -21,7 +21,6 @@
 #import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/Tightdb.h>
-#import <tightdb/objc/group.h>
 
 @interface table_view : SenTestCase
 
@@ -115,27 +114,27 @@
     TDBView *v = [q findAllRows];
     
     // Not yet sorted
-    STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:0] == 2, @"matcing value after no sort");
-    STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after no sort");
-    STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:2] == 0, @"matcing value after no sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:0] == 2, @"matcing value after no sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after no sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:2] == 0, @"matcing value after no sort");
     
     // Sort same way without order specified. Ascending default
     [v sortUsingColumnWithIndex:intCol];
-    STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:0] == 0, @"matcing value after default sort");
-    STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after default sort");
-    STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:2] == 2, @"matcing value after default sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:0] == 0, @"matcing value after default sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after default sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:2] == 2, @"matcing value after default sort");
     
     // Sort same way
     [v sortUsingColumnWithIndex:intCol inOrder:TDBAscending];
-    STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:0] == 0, @"matcing value after ascending sort");
-    STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after ascending sort");
-    STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:2] == 2, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:0] == 0, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:2] == 2, @"matcing value after ascending sort");
     
     // Sort descending
     [v sortUsingColumnWithIndex:intCol inOrder: TDBDescending];
-    STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:0] == 2, @"matcing value after descending sort");
-    STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after descending sort");
-    STAssertTrue([v intInColumnWithIndex:intCol atRowIndex:2] == 0, @"matcing value after descending sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:0] == 2, @"matcing value after descending sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after descending sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:2] == 0, @"matcing value after descending sort");
 }
 
 - (void)testSortOnViewBoolColumn
@@ -156,27 +155,27 @@
     TDBView *v = [q findAllRows];
     
     // Not yet sorted
-    STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:0] == YES, @"matcing value after no sort");
-    STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after no sort");
-    STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:2] == NO, @"matcing value after no sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:0] == YES, @"matcing value after no sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after no sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:2] == NO, @"matcing value after no sort");
     
     // Sort same way without order specified. Ascending default
     [v sortUsingColumnWithIndex:boolCol];
-    STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:0] == NO, @"matcing value after default sort");
-    STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after default sort");
-    STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:2] == YES, @"matcing value after default sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:0] == NO, @"matcing value after default sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after default sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:2] == YES, @"matcing value after default sort");
     
     // Sort same way
     [v sortUsingColumnWithIndex:boolCol inOrder:TDBAscending];
-    STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:0] == NO, @"matcing value after ascending sort");
-    STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after ascending sort");
-    STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:2] == YES, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:0] == NO, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:2] == YES, @"matcing value after ascending sort");
     
     // Sort descending
     [v sortUsingColumnWithIndex:boolCol inOrder: TDBDescending];
-    STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:0] == YES, @"matcing value after descending sort");
-    STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after descending sort");
-    STAssertTrue([v boolInColumnWithIndex:boolCol atRowIndex:2] == NO, @"matcing value after descending sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:0] == YES, @"matcing value after descending sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after descending sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:2] == NO, @"matcing value after descending sort");
 }
 
 
@@ -209,27 +208,27 @@
     TDBView *v = [q findAllRows];
     
     // Not yet sorted
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:0] == dateLast, @"matcing value after no sort");
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after no sort");
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:2] == dateFirst, @"matcing value after no sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:0] == dateLast, @"matcing value after no sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after no sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:2] == dateFirst, @"matcing value after no sort");
     
     // Sort same way without order specified. Ascending default
     [v sortUsingColumnWithIndex:dateCol];
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:0] == dateFirst, @"matcing value after default sort");
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after default sort");
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:2] == dateLast, @"matcing value after default sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:0] == dateFirst, @"matcing value after default sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after default sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:2] == dateLast, @"matcing value after default sort");
     
     // Sort same way
     [v sortUsingColumnWithIndex:dateCol inOrder:TDBAscending];
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:0] == dateFirst, @"matcing value after ascending sort");
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after ascending sort");
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:2] == dateLast, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:0] == dateFirst, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:2] == dateLast, @"matcing value after ascending sort");
     
     // Sort descending
     [v sortUsingColumnWithIndex:dateCol inOrder: TDBDescending];
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:0] == dateLast, @"matcing value after descending sort");
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after descending sort");
-    STAssertTrue([v dateInColumnWithIndex:dateCol atRowIndex:2] == dateFirst, @"matcing value after descending sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:0] == dateLast, @"matcing value after descending sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after descending sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:2] == dateFirst, @"matcing value after descending sort");
 }
 
 

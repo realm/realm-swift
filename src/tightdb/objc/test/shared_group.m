@@ -44,10 +44,10 @@ TIGHTDB_TABLE_2(SharedTable2,
     // Write to disk
     [fm removeItemAtPath:@"employees.tightdb" error:nil];
     [fm removeItemAtPath:@"employees.tightdb.lock" error:nil];
-    [group writeContextToFile:@"employees.tightdb" withError:nil];
+    [group writeContextToFile:@"employees.tightdb" error:nil];
 
     // Read only shared group
-    TDBContext* fromDisk = [TDBContext contextWithPersistenceToFile:@"employees.tightdb" withError:nil];
+    TDBContext* fromDisk = [TDBContext contextWithPersistenceToFile:@"employees.tightdb" error:nil];
 
     [fromDisk readWithBlock:^(TDBTransaction* group) {
             SharedTable2* diskTable = [group getTableWithName:@"employees" asTableClass:[SharedTable2 class]];
@@ -56,7 +56,7 @@ TIGHTDB_TABLE_2(SharedTable2,
                 SharedTable2Row *cursor = [diskTable rowAtIndex:i];
                 NSLog(@"%zu: %lld", i, [cursor Age]);
                 NSLog(@"%zu: %lld", i, cursor.Age);
-                NSLog(@"%zu: %i", i, [diskTable boolInColumnWithIndex: 0 atRowIndex:i]);
+                NSLog(@"%zu: %i", i, [diskTable TDB_boolInColumnWithIndex: 0 atRowIndex:i]);
             }
         }];
 
@@ -68,7 +68,7 @@ TIGHTDB_TABLE_2(SharedTable2,
                 [diskTable addHired:YES Age:i];
             }
             return YES; // Commit
-        } withError:nil];
+        } error:nil];
 
 
     [fromDisk writeWithBlock:^(TDBTransaction* group) {
@@ -78,7 +78,7 @@ TIGHTDB_TABLE_2(SharedTable2,
                 [diskTable addHired:YES Age:i];
             }
             return NO; // rollback
-        } withError:nil];
+        } error:nil];
 
 
     [fromDisk writeWithBlock:^(TDBTransaction* group) {
@@ -91,7 +91,7 @@ TIGHTDB_TABLE_2(SharedTable2,
             STAssertNil([group getTableWithName:@"Does not exist"], @"Table does not exist");
 
             return YES; // commit
-        } withError:nil];
+        } error:nil];
 
     [fromDisk readWithBlock:^(TDBTransaction* group) {
             SharedTable2* diskTable = [group getTableWithName:@"employees" asTableClass:[SharedTable2 class]];
@@ -111,7 +111,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:@"readonlyTest.tightdb" error:nil];
     [fm removeItemAtPath:@"readonlyTest.tightdb.lock" error:nil];
     
-    TDBContext* fromDisk = [TDBContext contextWithPersistenceToFile:@"readonlyTest.tightdb" withError:nil];
+    TDBContext* fromDisk = [TDBContext contextWithPersistenceToFile:@"readonlyTest.tightdb" error:nil];
     
     [fromDisk writeWithBlock:^(TDBTransaction *group) {
         TDBTable *t = [group createTableWithName:@"table"];
@@ -123,7 +123,7 @@ TIGHTDB_TABLE_2(SharedTable2,
          
         return YES;
         
-    } withError:nil];
+    } error:nil];
     
     [fromDisk readWithBlock:^(TDBTransaction* group) {
         TDBTable *t = [group getTableWithName:@"table"];
@@ -152,14 +152,14 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:@"hasChanged.tightdb" error:nil];
     [fm removeItemAtPath:@"hasChanged.tightdb.lock" error:nil];
     
-    TDBContext *sg = [TDBContext contextWithPersistenceToFile:@"hasChanged.tightdb" withError:nil];
+    TDBContext *sg = [TDBContext contextWithPersistenceToFile:@"hasChanged.tightdb" error:nil];
     
     STAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not changed");
     
     [sg writeWithBlock:^(TDBTransaction* group) {
         [group createTableWithName:@"t"];
         return YES;
-    } withError:nil];
+    } error:nil];
     
     STAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not been changed by another process");
 
@@ -171,20 +171,20 @@ TIGHTDB_TABLE_2(SharedTable2,
         TDBRow *row = [t rowAtIndex:rowIndex];
         [row setBool:YES inColumnWithIndex:0];
         return YES;
-    } withError:nil];
+    } error:nil];
     
     STAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not been changed by another process");
     
     
     // OTHER sharedgroup
-    TDBContext *sg2 = [TDBContext contextWithPersistenceToFile:@"hasChanged.tightdb" withError:nil];
+    TDBContext *sg2 = [TDBContext contextWithPersistenceToFile:@"hasChanged.tightdb" error:nil];
     
     
     [sg2 writeWithBlock:^(TDBTransaction* group) {
         TDBTable *t = [group getTableWithName:@"t"];
         [t addRow:nil]; /* Adding an empty row */
         return YES;
-    } withError:nil];
+    } error:nil];
 
     STAssertTrue([sg hasChangedSinceLastTransaction], @"SharedGroup HAS been changed by another process");
 }
@@ -197,7 +197,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         [fm removeItemAtPath:contextPath error:nil];
     [fm removeItemAtPath:[contextPath stringByAppendingString:@".lock"] error:nil];
     
-    TDBContext *c = [TDBContext contextWithPersistenceToFile:contextPath withError:nil];
+    TDBContext *c = [TDBContext contextWithPersistenceToFile:contextPath error:nil];
     
     [c writeWithBlock:^BOOL(TDBTransaction *transaction) {
         
@@ -208,7 +208,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         STAssertThrows([transaction createTableWithName:@"name"], @"name already exists");
         
         return YES;
-    } withError:nil];
+    } error:nil];
     
     [c readWithBlock:^(TDBTransaction *transaction) {
         
