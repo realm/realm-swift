@@ -34,7 +34,7 @@ using namespace std;
     tightdb::util::UniquePtr<tightdb::SharedGroup> m_shared_group;
 }
 
-+(TDBContext*)contextWithPersistenceToFile:(NSString*)path withError:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
++(TDBContext*)contextWithPersistenceToFile:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
 {
     TDBContext* shared_group = [[TDBContext alloc] init];
     if (!shared_group)
@@ -104,7 +104,7 @@ using namespace std;
 }
 
 
--(BOOL)writeWithBlock:(TDBWriteBlock)block withError:(NSError**)error
+-(BOOL)writeWithBlock:(TDBWriteBlock)block error:(NSError**)error
 {
     tightdb::Group* group;
     try {

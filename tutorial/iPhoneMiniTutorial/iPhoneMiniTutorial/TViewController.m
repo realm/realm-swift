@@ -17,7 +17,7 @@
     [fileManager removeItemAtPath:filename error:&error];
 
     // Create data file
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:filename withError:nil];
+    TDBContext *context = [TDBContext contextWithPersistenceToFile:filename error:nil];
 
     // Perform a write transaction
     [context writeWithBlock:^(TDBTransaction *transaction) {
@@ -50,7 +50,7 @@
         self.sizeOutlet.text = [NSString stringWithFormat:@"# of rows: %i", table.rowCount];
 
         return YES;
-    } withError:nil];
+    } error:nil];
 }
 
 - (NSString*)writeablePathForFile:(NSString*)fileName
