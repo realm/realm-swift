@@ -166,7 +166,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         NSData *bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
 
         // Using private method just for the sake of testing the setters below.
-        [table TDBAddEmptyRows:2];
+        [table TDB_addEmptyRows:2];
 
         [table TDB_setBool:YES inColumnWithIndex:BOOL_COL atRowIndex:0];
         [table TDB_setBool:NO inColumnWithIndex:BOOL_COL atRowIndex:1];
@@ -253,7 +253,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 {
     TDBTable* table = [[TDBTable alloc]init];
     [table addColumnWithName:@"IntCol" andType:TDBIntType];
-    [table TDBAddEmptyRows:6];
+    [table TDB_addEmptyRows:6];
 
     [table TDB_setInt:10 inColumnWithIndex:0 atRowIndex:0];
     [table TDB_setInt:42 inColumnWithIndex:0 atRowIndex:1];

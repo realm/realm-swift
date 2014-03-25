@@ -184,7 +184,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 } \
 -(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDB_addEmptyRow]]; \
 } \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
@@ -414,7 +414,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 } \
 -(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDB_addEmptyRow]]; \
 } \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
@@ -661,7 +661,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 } \
 -(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDB_addEmptyRow]]; \
 } \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
@@ -925,7 +925,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 } \
 -(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDB_addEmptyRow]]; \
 } \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
@@ -1206,7 +1206,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 } \
 -(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDB_addEmptyRow]]; \
 } \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
@@ -1504,7 +1504,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 } \
 -(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDB_addEmptyRow]]; \
 } \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
@@ -1819,7 +1819,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 } \
 -(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDB_addEmptyRow]]; \
 } \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
@@ -2151,7 +2151,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 } \
 -(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDB_addEmptyRow]]; \
 } \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
@@ -2500,7 +2500,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 } \
 -(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDB_addEmptyRow]]; \
 } \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
@@ -2866,7 +2866,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 } \
 -(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDB_addEmptyRow]]; \
 } \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
@@ -3249,7 +3249,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 } \
 -(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDB_addEmptyRow]]; \
 } \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
@@ -3649,7 +3649,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 } \
 -(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDB_addEmptyRow]]; \
 } \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
@@ -4066,7 +4066,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 } \
 -(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDB_addEmptyRow]]; \
 } \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
@@ -4500,7 +4500,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 } \
 -(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDB_addEmptyRow]]; \
 } \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
@@ -4951,7 +4951,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 } \
 -(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDB_addEmptyRow]]; \
 } \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \

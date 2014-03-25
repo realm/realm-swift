@@ -253,7 +253,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 } \
 -(TableName##Row*)addEmptyRow \
 { \
-    return [[TableName##Row alloc] initWithTable:self ndx:[super TDBAddEmptyRow]]; \
+    return [[TableName##Row alloc] initWithTable:self ndx:[super TDB_addEmptyRow]]; \
 } \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \

@@ -99,7 +99,7 @@ TIGHTDB_TABLE_2(QueryTable,
     TDBView* res = [q findAll];
     for (size_t i = 0; i < [res rowCount]; i++) {
         // cursor missing. Only low-level interface!
-        NSLog(@"%zu: is %lld years old",i , [res TDBintInColumnWithIndex:1 atRowIndex:i]);
+        NSLog(@"%zu: is %lld years old",i , [res TDB_intInColumnWithIndex:1 atRowIndex:i]);
     }
 
     //------------------------------------------------------
@@ -185,7 +185,7 @@ TIGHTDB_TABLE_2(QueryTable,
         STAssertEquals((size_t)2, [q countRows], @"count != 2");
         TDBView* tv = [q findAll];
         STAssertEquals((size_t)2, [tv rowCount], @"count != 2");
-        STAssertEquals((int64_t)8, [tv TDBintInColumnWithIndex:0 atRowIndex:1], @"First != 8");
+        STAssertEquals((int64_t)8, [tv TDB_intInColumnWithIndex:0 atRowIndex:1], @"First != 8");
     }
 }
 
