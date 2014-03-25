@@ -29,6 +29,42 @@
 
 using namespace tightdb;
 
+inline bool nsnumber_is_like_integer(NSObject *obj)
+{
+    const char* data_type = [(NSNumber *)obj objCType];
+    return (strcmp(data_type, @encode(int)) == 0 ||
+            strcmp(data_type, @encode(long)) ==  0 ||
+            strcmp(data_type, @encode(long long)) == 0 ||
+            strcmp(data_type, @encode(unsigned int)) == 0 ||
+            strcmp(data_type, @encode(unsigned long)) == 0 ||
+            strcmp(data_type, @encode(unsigned long long)) == 0);
+}
+
+inline bool nsnumber_is_like_float(NSObject *obj)
+{
+    const char* data_type = [(NSNumber *)obj objCType];
+    return (strcmp(data_type, @encode(int)) == 0 ||
+            strcmp(data_type, @encode(long)) ==  0 ||
+            strcmp(data_type, @encode(long long)) == 0 ||
+            strcmp(data_type, @encode(unsigned int)) == 0 ||
+            strcmp(data_type, @encode(unsigned long)) == 0 ||
+            strcmp(data_type, @encode(unsigned long long)) == 0 ||
+            strcmp(data_type, @encode(float)) == 0);
+}
+
+inline bool nsnumber_is_like_double(NSObject *obj)
+{
+    const char* data_type = [(NSNumber *)obj objCType];
+    return (strcmp(data_type, @encode(int)) == 0 ||
+            strcmp(data_type, @encode(long)) ==  0 ||
+            strcmp(data_type, @encode(long long)) == 0 ||
+            strcmp(data_type, @encode(unsigned int)) == 0 ||
+            strcmp(data_type, @encode(unsigned long)) == 0 ||
+            strcmp(data_type, @encode(unsigned long long)) == 0 ||
+            strcmp(data_type, @encode(float)) == 0 ||
+            strcmp(data_type, @encode(double)) == 0);
+}
+
 BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
 {
     DataType type = descr.get_column_type(col_ndx);
@@ -41,24 +77,15 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
             break;
         case type_Bool:
             if ([obj isKindOfClass:[NSNumber class]]) {
-                const char *data_type = [(NSNumber *)obj objCType];
-                const char dt = data_type[0];
-                if (dt == 'B' || dt == 'c')
+                if (strcmp([(NSNumber *)obj objCType], @encode(BOOL)) == 0)
                     break;
                 return NO;
             }
             break;
         case type_DateTime:
             if ([obj isKindOfClass:[NSNumber class]]) {
-                const char *data_type = [(NSNumber *)obj objCType];
-                const char dt = data_type[0];
-                /* time_t is an integer */
-                if (dt == 'i' || dt == 's' || dt == 'l' || dt == 'q' ||
-                    dt == 'I' || dt == 'S' || dt == 'L' || dt == 'Q')
+                if (nsnumber_is_like_integer(obj))
                     break;
-                else {
-                    return NO;
-                }
             }
             if ([obj isKindOfClass:[NSDate class]]) {
                 break;
@@ -66,49 +93,22 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
             return NO;
         case type_Int:
             if ([obj isKindOfClass:[NSNumber class]]) {
-                const char * data_type = [(NSNumber *)obj objCType];
-                const char dt = data_type[0];
-                /* FIXME: what about: 'c', 'C'  */
-                if (dt == 'i' || dt == 's' || dt == 'l' || dt == 'q' ||
-                    dt == 'I' || dt == 'S' || dt == 'L' || dt == 'Q')
+                if (nsnumber_is_like_integer(obj))
                     break;
-                else
-                    return NO;
             }
-            else {
-                return NO;
-            }
-            break;
+            return NO;
         case type_Float:
             if ([obj isKindOfClass:[NSNumber class]]) {
-                const char *data_type = [(NSNumber *)obj objCType];
-                const char dt = data_type[0];
-                /* FIXME: what about: 'c', 'C'  */
-                if (dt == 'i' || dt == 's' || dt == 'l' || dt == 'q' ||
-                    dt == 'I' || dt == 'S' || dt == 'L' || dt == 'Q' ||
-                    dt == 'f')
+                if (nsnumber_is_like_float(obj))
                     break;
-                else
-                    return NO;
             }
-            else
-                return NO;
-            break; /* FIXME: remove */
+            return NO;
         case type_Double:
             if ([obj isKindOfClass:[NSNumber class]]) {
-                const char * data_type = [(NSNumber *)obj objCType];
-                const char dt = data_type[0];
-                /* FIXME: what about: 'c', 'C'  */
-                if (dt == 'i' || dt == 's' || dt == 'l' || dt == 'q' ||
-                    dt == 'I' || dt == 'S' || dt == 'L' || dt == 'Q' ||
-                    dt == 'f' || dt == 'd')
+                if (nsnumber_is_like_double(obj))
                     break;
-                else
-                    return NO;
             }
-            else
-                return NO;
-            break; /* FIXME: remove */
+            return NO;
         case type_Binary:
             if ([obj isKindOfClass:[NSData class]])
                 break;
