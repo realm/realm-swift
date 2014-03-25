@@ -58,10 +58,10 @@ TIGHTDB_TABLE_4(PerfTable,
     [[NSFileManager defaultManager] removeItemAtPath:[_utils pathForDataFile:@"perfemployees.tightdb"] error:nil];
 
 
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
+    TDBContext *context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] error:nil];
     [context writeWithBlock:^BOOL(TDBTransaction *group) {
         // Create new table in group
-        PerfTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class]];
+        PerfTable *table = [group createTableWithName:@"employees" asTableClass:[PerfTable class]];
         
         // Add some rows
         
@@ -78,7 +78,7 @@ TIGHTDB_TABLE_4(PerfTable,
         });
         
         return YES;
-    } withError:nil];
+    } error:nil];
  
 
 
@@ -143,9 +143,9 @@ TIGHTDB_TABLE_4(PerfTable,
 
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
+    TDBContext *context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] error:nil];
     [context readWithBlock:^(TDBTransaction *fromDisk) {
-        PerfTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class]];
+        PerfTable *diskTable = [fromDisk getTableWithName:@"employees" asTableClass:[PerfTable class]];
         
         if ([diskTable rowCount] != _size+1) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -206,9 +206,9 @@ TIGHTDB_TABLE_4(PerfTable,
 
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
     
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
+    TDBContext *context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] error:nil];
     [context readWithBlock:^(TDBTransaction *fromDisk) {
-        PerfTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class]];
+        PerfTable *diskTable = [fromDisk getTableWithName:@"employees" asTableClass:[PerfTable class]];
         
         // Create query (current employees between 20 and 30 years old)
         PerfTableQuery *q = [[diskTable where].Age columnIsBetween:40 and_:50];
@@ -268,10 +268,10 @@ TIGHTDB_TABLE_4(PerfTable,
     __block int counter = 0;
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
+    TDBContext *context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] error:nil];
     [context readWithBlock:^(TDBTransaction *fromDisk) {
         
-        PerfTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class] ];
+        PerfTable *diskTable = [fromDisk getTableWithName:@"employees" asTableClass:[PerfTable class] ];
         
         
         // Create query (current employees between 20 and 30 years old)
@@ -297,9 +297,9 @@ TIGHTDB_TABLE_4(PerfTable,
 
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] withError:nil];
+    TDBContext *context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] error:nil];
     [context readWithBlock:^(TDBTransaction *fromDisk) {
-        PerfTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PerfTable class] ];
+        PerfTable *diskTable = [fromDisk getTableWithName:@"employees" asTableClass:[PerfTable class] ];
         
         int agesum = 0;
         for (PerfTableRow *row in diskTable) {
@@ -320,12 +320,12 @@ TIGHTDB_TABLE_4(PerfTable,
     
 
     NSString *tightDBPath = [_utils pathForDataFile:@"testemployees.tightdb"];
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:tightDBPath withError:nil];
+    TDBContext *context = [TDBContext contextWithPersistenceToFile:tightDBPath error:nil];
     [context readWithBlock:^(TDBTransaction *fromDisk) {
         
         NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
         [[NSFileManager defaultManager] removeItemAtPath:tightDBPath error:nil];
-        [fromDisk writeContextToFile:tightDBPath withError:nil];
+        [fromDisk writeContextToFile:tightDBPath error:nil];
         
         NSTimeInterval stop = [NSDate timeIntervalSinceReferenceDate];
         dispatch_async(dispatch_get_main_queue(), ^{
