@@ -180,7 +180,8 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
     }
 
     // Insert a row
-    cursor = [table insertEmptyRowAtIndex:INSERT_ROW];
+    [table insertRow:nil atIndex:INSERT_ROW];
+    cursor = [table rowAtIndex:INSERT_ROW];
     [cursor setString:@"Person_Inserted" inColumnWithIndex:NAME];
     [cursor setInt:99 inColumnWithIndex:AGE];
     [cursor setBool:YES inColumnWithIndex:HIRED];

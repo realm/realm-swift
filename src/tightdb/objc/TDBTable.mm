@@ -365,8 +365,13 @@ using namespace std;
 }
 
 
--(BOOL)insertRow:(id)anObject atIndex:(NSUInteger)rowIndex
+-(BOOL)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
 {
+    
+    if (!anObject) {
+        [self TDBInsertRow:rowIndex];
+    }
+    
     tightdb::Table& table = *m_table;
     tightdb::ConstDescriptorRef desc = table.get_descriptor();
     
