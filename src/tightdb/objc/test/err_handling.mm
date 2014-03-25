@@ -265,19 +265,19 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
         }
         switch (i % 3) {
             case 0:
-                if (![table TDBInsertMixed:7 ndx:i value:[TDBMixed mixedWithBool:NO] ]) {
+                if (![table TDBInsertMixed:7 ndx:i value:[NSNumber numberWithBool:NO] ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
                 break;
             case 1:
-                if (![table TDBInsertMixed:7 ndx:i value:[TDBMixed mixedWithInt64:i] ]) {
+                if (![table TDBInsertMixed:7 ndx:i value:[NSNumber numberWithLongLong:i] ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
                 break;
             case 2:
-                if (![table TDBInsertMixed:7 ndx:i value:[TDBMixed mixedWithString:@"string"] ]) {
+                if (![table TDBInsertMixed:7 ndx:i value:[NSString stringWithUTF8String:"string"] ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
@@ -357,14 +357,14 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     //    TestQueryErrSub* subtab1 = [[TestQueryErrSub alloc] init];
     TestQueryErrSub* subtab2 = [[TestQueryErrSub alloc] init];
     [subtab2 addAge:100];
-    TDBMixed* mixInt1   = [TDBMixed mixedWithInt64:1];
-    TDBMixed* mixSubtab = [TDBMixed mixedWithTable:subtab2];
+    NSNumber* mixInt1   = [NSNumber numberWithLongLong:1];
+//    TDBMixed* mixSubtab = [TDBMixed mixedWithTable:subtab2];
 
     [table addBoolCol:NO   IntCol:54       FloatCol:0.7     DoubleCol:0.8       StringCol:@"foo"
             BinaryCol:bin1 DateCol:0       TableCol:nil     MixedCol:mixInt1];
 
     [table addBoolCol:YES  IntCol:506      FloatCol:7.7     DoubleCol:8.8       StringCol:@"banach"
-            BinaryCol:bin2 DateCol:timeNow TableCol:subtab2 MixedCol:mixSubtab];
+            BinaryCol:bin2 DateCol:timeNow TableCol:subtab2 MixedCol:subtab2];
 
     STAssertEquals([[[table where].BoolCol   columnIsEqualTo:NO]      countRows], (size_t)1, @"BoolCol equal");
     STAssertEquals([[[table where].IntCol    columnIsEqualTo:54]      countRows], (size_t)1, @"IntCol equal");

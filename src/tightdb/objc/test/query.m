@@ -37,14 +37,14 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 //    TestQuerySub *subtab1 = [[TestQuerySub alloc] init];
     TestQuerySub *subtab2 = [[TestQuerySub alloc] init];
     [subtab2 addAge:100];
-    TDBMixed *mixInt1   = [TDBMixed mixedWithInt64:1];
-    TDBMixed *mixSubtab = [TDBMixed mixedWithTable:subtab2];
+    NSNumber *mixInt1   = [NSNumber numberWithLongLong:1];
+    //TDBMixed *mixSubtab = [TDBMixed mixedWithTable:subtab2];
 
     [table addBoolCol:NO   IntCol:54       FloatCol:0.7     DoubleCol:0.8       StringCol:@"foo"
             BinaryCol:bin1 DateCol:0       TableCol:nil     MixedCol:mixInt1];
 
     [table addBoolCol:YES  IntCol:506      FloatCol:7.7     DoubleCol:8.8       StringCol:@"banach"
-            BinaryCol:bin2 DateCol:[NSDate date] TableCol:subtab2 MixedCol:mixSubtab];
+            BinaryCol:bin2 DateCol:[NSDate date] TableCol:subtab2 MixedCol:subtab2];
 
     STAssertEquals([[[table where].BoolCol   columnIsEqualTo:NO]      countRows], (NSUInteger)1, @"BoolCol equal");
     STAssertEquals([[[table where].IntCol    columnIsEqualTo:54]      countRows], (NSUInteger)1, @"IntCol equal");
@@ -160,8 +160,8 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         // TODO: add Enum<T> and Subtable<T> when possible.
 
         const char bin[4] = { 0, 1, 2, 3 };
-        TDBMixed *mixInt1   = [TDBMixed mixedWithInt64:1];
-        TDBMixed *mixString   = [TDBMixed mixedWithString:@"foo"];
+        NSNumber *mixInt1   = [NSNumber numberWithLongLong:1];
+        NSString *mixString = [NSString stringWithUTF8String:"foo"];
         NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
         NSData *bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
 
