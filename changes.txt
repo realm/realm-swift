@@ -1,3 +1,7 @@
+2014-03-25
+==========
+! BREAKING CHANGE: insertEmptyRow has been removed from table. Use insertRow:nil atIndex:index instead.
+
 2014-03-24
 ==========
 ! BREAKING CHANGE: addEmptyRow on table has been removed. Use [table addRow:nil] instead.

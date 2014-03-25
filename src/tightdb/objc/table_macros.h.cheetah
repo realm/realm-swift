@@ -268,7 +268,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 } \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx \
 { \
-    [super insertEmptyRowAtIndex:ndx]; \
+    [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
 -(TDBRow*)getRow \
