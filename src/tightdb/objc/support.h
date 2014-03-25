@@ -24,6 +24,8 @@
 #import <Foundation/Foundation.h>
 #include <tightdb/descriptor.hpp>
 
+void to_mixed(id value, tightdb::Mixed& m);
+
 BOOL set_cell(size_t col_ndx, size_t row_ndx, tightdb::Table& table, NSObject *obj);
 BOOL verify_cell(const tightdb::Descriptor& descr, size_t col_ndx, NSObject *obj);
 

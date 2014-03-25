@@ -33,15 +33,13 @@
 #import <tightdb/objc/TDBQuery.h>
 #import <tightdb/objc/TDBQuery_priv.h>
 #import <tightdb/objc/TDBRow.h>
-#import <tightdb/objc/support.h>
 #import <tightdb/objc/TDBDescriptor.h>
 #import <tightdb/objc/TDBDescriptor_priv.h>
-#import <tightdb/objc/TDBMixed.h>
-#import <tightdb/objc/TDBMixed_priv.h>
 #import <tightdb/objc/TDBColumnProxy.h>
 #import <tightdb/objc/NSData+TDBGetBinaryData.h>
 
 #include <tightdb/objc/util.hpp>
+#include <tightdb/objc/support.h>
 
 using namespace std;
 
@@ -510,11 +508,11 @@ using namespace std;
     return table_2;
 }
 
--(TDBMixed*)mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
+-(id)mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
 {
     tightdb::Mixed mixed = m_table->get_mixed(colNdx, rowIndex);
     if (mixed.get_type() != tightdb::type_Table)
-        return [TDBMixed mixedWithNativeMixed:mixed];
+        return to_objc_object(mixed);
 
     tightdb::TableRef table = m_table->get_subtable(colNdx, rowIndex);
     if (!table)
@@ -528,7 +526,7 @@ using namespace std;
     if (![table_2 _checkType])
         return nil;
 
-    return [TDBMixed mixedWithTable:table_2];
+    return table_2;
 }
 
 
@@ -591,10 +589,11 @@ using namespace std;
         TDBTableType);
 }
 
--(void)setMixed:(TDBMixed*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)setMixed:(id)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
-    const tightdb::Mixed& mixed = [value getNativeMixed];
-    TDBTable* subtable = mixed.get_type() == tightdb::type_Table ? [value getTable] : nil;
+    tightdb::Mixed mixed;
+    to_mixed(value, mixed);
+    TDBTable* subtable = mixed.get_type() == tightdb::type_Table ? (TDBTable *)value : nil;
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         if (subtable) {
             tightdb::LangBindHelper::set_mixed_subtable(*m_table, col_ndx, row_ndx,
@@ -842,20 +841,21 @@ using namespace std;
     return TDBType(m_table->get_mixed_type(colIndex, rowIndex));
 }
 
--(BOOL)TDBInsertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(TDBMixed*)value
+-(BOOL)TDBInsertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(id)value
 {
     return [self TDBInsertMixed:col_ndx ndx:row_ndx value:value error:nil];
 }
 
--(BOOL)TDBInsertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(TDBMixed*)value error:(NSError* __autoreleasing*)error
+-(BOOL)TDBInsertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(id)value error:(NSError* __autoreleasing*)error
 {
     if (m_read_only) {
         if (error)
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    const tightdb::Mixed& mixed = [value getNativeMixed];
-    TDBTable* subtable = mixed.get_type() == tightdb::type_Table ? [value getTable] : nil;
+    tightdb::Mixed mixed;
+    to_mixed(value, mixed);
+    TDBTable* subtable = mixed.get_type() == tightdb::type_Table ? (TDBTable *)value : nil;
     TIGHTDB_EXCEPTION_ERRHANDLER(
         if (subtable) {
             tightdb::LangBindHelper::insert_mixed_subtable(*m_table, col_ndx, row_ndx,

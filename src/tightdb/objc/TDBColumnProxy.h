@@ -20,7 +20,6 @@
 
 #import <Foundation/Foundation.h>
 #import "TDBTable.h"
-#import "TDBMixed.h"
 
 @interface TDBColumnProxy: NSObject
 @property(nonatomic, weak) TDBTable *table;
@@ -73,5 +72,5 @@
 @end
 
 @interface TDBColumnProxyMixed: TDBColumnProxy
--(NSUInteger)find:(TDBMixed *)value;
+-(NSUInteger)find:(id)value;
 @end

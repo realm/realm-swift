@@ -21,6 +21,8 @@
 #import <Foundation/Foundation.h>
 
 #include <tightdb/descriptor.hpp>
+#include <tightdb/binary_data.hpp>
+#include <tightdb/string_data.hpp>
 
 #import "TDBTable.h"
 #import "util.hpp"
@@ -43,27 +45,64 @@ inline bool nsnumber_is_like_integer(NSObject *obj)
 inline bool nsnumber_is_like_float(NSObject *obj)
 {
     const char* data_type = [(NSNumber *)obj objCType];
-    return (strcmp(data_type, @encode(int)) == 0 ||
+    return (strcmp(data_type, @encode(float)) == 0 ||
+            strcmp(data_type, @encode(int)) == 0 ||
             strcmp(data_type, @encode(long)) ==  0 ||
             strcmp(data_type, @encode(long long)) == 0 ||
             strcmp(data_type, @encode(unsigned int)) == 0 ||
             strcmp(data_type, @encode(unsigned long)) == 0 ||
-            strcmp(data_type, @encode(unsigned long long)) == 0 ||
-            strcmp(data_type, @encode(float)) == 0);
+            strcmp(data_type, @encode(unsigned long long)) == 0);
 }
 
 inline bool nsnumber_is_like_double(NSObject *obj)
 {
     const char* data_type = [(NSNumber *)obj objCType];
-    return (strcmp(data_type, @encode(int)) == 0 ||
+    return (strcmp(data_type, @encode(double)) == 0 ||
+            strcmp(data_type, @encode(float)) == 0 ||
+            strcmp(data_type, @encode(int)) == 0 ||
             strcmp(data_type, @encode(long)) ==  0 ||
             strcmp(data_type, @encode(long long)) == 0 ||
             strcmp(data_type, @encode(unsigned int)) == 0 ||
             strcmp(data_type, @encode(unsigned long)) == 0 ||
-            strcmp(data_type, @encode(unsigned long long)) == 0 ||
-            strcmp(data_type, @encode(float)) == 0 ||
-            strcmp(data_type, @encode(double)) == 0);
+            strcmp(data_type, @encode(unsigned long long)) == 0);
 }
+
+
+void to_mixed(id value, Mixed& m)
+{
+    if ([value isKindOfClass:[NSString class]]) {
+        StringData s([(NSString *)value UTF8String], [(NSString *)value length]);
+        m.set_string(s);
+        return;
+    }
+    if ([value isKindOfClass:[NSNumber class]]) {
+        if (strcmp([(NSNumber *)value objCType], @encode(BOOL)) == 0) {
+            m.set_bool([(NSNumber *)value boolValue]);
+            return;
+        }
+        if (nsnumber_is_like_integer(value)) {
+            m.set_int(int64_t([(NSNumber *)value longLongValue]));
+            return;
+        }
+        if (nsnumber_is_like_float(value)) {
+            m.set_float([(NSNumber *)value floatValue]);
+            return;
+        }
+        if (nsnumber_is_like_double(value)) {
+            m.set_double([(NSNumber *)value doubleValue]);
+            return;
+        }
+    }
+    if ([value isKindOfClass:[NSData class]]) {
+        m.set_binary([(NSData *)value tdbBinaryData]);
+        return;
+    }
+    if ([value isKindOfClass:[NSDate class]]) {
+        m.set_datetime(DateTime(time_t([(NSDate *)value timeIntervalSince1970])));
+        return;
+    }
+}
+
 
 BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
 {
