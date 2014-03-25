@@ -125,7 +125,7 @@ TIGHTDB_TABLE_2(MyTable2,
         TDBView *res = [q findAll];
         for (size_t i = 0; i < [res rowCount]; i++) {
             // cursor missing. Only low-level interface!
-            NSLog(@"%zu: is %lld years old",i , [res intInColumnWithIndex:i atRowIndex:i]);
+            NSLog(@"%zu: is %lld years old",i , [res TDBintInColumnWithIndex:i atRowIndex:i]);
         }
         
         //------------------------------------------------------
