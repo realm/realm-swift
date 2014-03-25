@@ -67,11 +67,11 @@ TIGHTDB_TABLE_2(MyTable2,
 {
    // TDBTransaction *group = [TDBTransaction group];
     // Create new table in group
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:@"employees.tightdb" withError:nil];
+    TDBContext *context = [TDBContext contextWithPersistenceToFile:@"employees.tightdb" error:nil];
     
     [context writeWithBlock:^BOOL(TDBTransaction *group) {
         
-        MyTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
+        MyTable *table = [group createTableWithName:@"employees" asTableClass:[MyTable class]];
         
         // Add some rows
         [table addName:@"John" Age:20 Hired:YES Spare:0];
@@ -138,14 +138,14 @@ TIGHTDB_TABLE_2(MyTable2,
         
         return YES;
 
-    } withError:nil];
+    } error:nil];
     
     // Load a group from disk (and print contents)
     
-    context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
+    context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"employees.tightdb"] error:nil];
     
     [context writeWithBlock:^BOOL(TDBTransaction *transaction) {
-        MyTable *diskTable = [transaction getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
+        MyTable *diskTable = [transaction getTableWithName:@"employees" asTableClass:[MyTable class]];
         
         [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
         [diskTable insertEmptyRowAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
@@ -159,13 +159,13 @@ TIGHTDB_TABLE_2(MyTable2,
         // Write same group to memory buffer
        //buffer = [transaction writeContextToBuffer];
         return YES;
-    } withError:nil];
+    } error:nil];
 
 
     
     [context readWithBlock:^(TDBTransaction *transaction) {
         
-        MyTable *diskTable = [transaction getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
+        MyTable *diskTable = [transaction getTableWithName:@"employees" asTableClass:[MyTable class]];
         
         // 1: Iterate over table
         for (MyTableRow *row in diskTable)

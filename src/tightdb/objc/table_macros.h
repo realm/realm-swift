@@ -3,7 +3,7 @@
  * TIGHTDB CONFIDENTIAL
  * __________________
  *
- *  [2011] - [2012] TightDB Inc
+ *  [2011] - [2014] TightDB Inc
  *  All Rights Reserved.
  *
  * NOTICE:  All information contained herein is, and remains
@@ -35,7 +35,6 @@
 #import <tightdb/objc/TDBDescriptor.h>
 #import <tightdb/objc/TDBView.h>
 #import <tightdb/objc/TDBColumnProxy.h>
-#import <tightdb/objc/TDBBinary.h>
 #import <tightdb/objc/TDBMixed.h>
 
 

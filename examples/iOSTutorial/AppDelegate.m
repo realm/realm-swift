@@ -27,15 +27,15 @@ void tableFunc() {
     row.Hired = YES;
 
     // Add more rows
-    [people appendRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
-    [people appendRow:@{@"Name": @"Lars", @"Age": @22, @"Hired": @YES}];
-    [people appendRow:@{@"Name": @"Phil", @"Age": @43, @"Hired": @NO}];
-    [people appendRow:@{@"Name": @"Anni", @"Age": @54, @"Hired": @YES}];
+    [people addRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
+    [people addRow:@{@"Name": @"Lars", @"Age": @22, @"Hired": @YES}];
+    [people addRow:@{@"Name": @"Phil", @"Age": @43, @"Hired": @NO}];
+    [people addRow:@{@"Name": @"Anni", @"Age": @54, @"Hired": @YES}];
 
     // @@EndExample@@
 
     // @@Example: insert_at_index @@
-    [people insertRow:@{@"Name": @"Frank", @"Age": @34, @"Hired": @YES} atRowIndex:2];
+    [people insertRow:@{@"Name": @"Frank", @"Age": @34, @"Hired": @YES} atIndex:2];
 
     // @@EndExample@@
 
@@ -123,24 +123,24 @@ void sharedGroupFunc() {
 
     // @@Example: transaction @@
     TDBContext *context = [TDBContext contextWithPersistenceToFile:@"people.tightdb"
-                                                            withError:nil];
+                                                            error:nil];
 
     // Start a write transaction
     [context writeWithBlock:^(TDBTransaction *transaction) {
         // Get a specific table from the group
-        PeopleTable *table = [transaction getOrCreateTableWithName:@"employees"
+        PeopleTable *table = [transaction createTableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
 
         // Add a row
         [table addName:@"Bill" Age:53 Hired:YES];
         NSLog(@"Row added!");
         return YES; // Commit (NO would rollback)
-    } withError:nil];
+    } error:nil];
 
     // Start a read transaction
     [context readWithBlock:^(TDBTransaction *transaction) {
         // Get the table
-        PeopleTable *table = [transaction getOrCreateTableWithName:@"employees"
+        PeopleTable *table = [transaction getTableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
 
         // Interate over all rows in table

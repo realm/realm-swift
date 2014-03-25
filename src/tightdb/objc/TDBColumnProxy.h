@@ -21,7 +21,6 @@
 #import <Foundation/Foundation.h>
 #import "TDBTable.h"
 #import "TDBMixed.h"
-#import "TDBBinary.h"
 
 @interface TDBColumnProxy: NSObject
 @property(nonatomic, weak) TDBTable *table;
@@ -63,7 +62,7 @@
 @end
 
 @interface TDBColumnProxyBinary: TDBColumnProxy
--(NSUInteger)find:(TDBBinary *)value;
+-(NSUInteger)find:(NSData *)value;
 @end
 
 @interface TDBColumnProxyDate: TDBColumnProxy

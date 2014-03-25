@@ -21,7 +21,6 @@
 #import <Foundation/Foundation.h>
 
 #import "TDBTable.h"
-#import "TDBBinary.h"
 
 @interface TDBMixed: NSObject
 +(TDBMixed *)mixedWithBool:(BOOL)value;
@@ -29,7 +28,7 @@
 +(TDBMixed *)mixedWithFloat:(float)value;
 +(TDBMixed *)mixedWithDouble:(double)value;
 +(TDBMixed *)mixedWithString:(NSString *)value;
-+(TDBMixed *)mixedWithBinary:(TDBBinary *)value;
++(TDBMixed *)mixedWithBinary:(NSData *)value;
 +(TDBMixed *)mixedWithBinary:(const char *)data size:(size_t)size;
 +(TDBMixed *)mixedWithDate:(NSDate *)value;
 +(TDBMixed *)mixedWithTable:(TDBTable *)value;
@@ -40,7 +39,7 @@
 -(float)getFloat;
 -(double)getDouble;
 -(NSString *)getString;
--(TDBBinary *)getBinary;
+-(NSData *)getBinary;
 -(NSDate *)getDate;
 -(TDBTable *)getTable;
 @end

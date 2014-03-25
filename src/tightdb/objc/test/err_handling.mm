@@ -60,9 +60,9 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    TDBTransaction* group = [TDBTransaction group];
+    TDBTransaction* transaction = [TDBTransaction group];
     // Create new table in group
-    PeopleErrTable* people = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
+    PeopleErrTable* people = [transaction createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
     // No longer supports errors, the tes may be redundant
     // Add some rows
@@ -87,7 +87,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     // Write the group to disk
     [fm removeItemAtPath:@"peopleErr.tightdb" error:NULL];
     error = nil;
-    if (![group writeContextToFile:@"peopleErr.tightdb" withError:&error]) {
+    if (![transaction writeContextToFile:@"peopleErr.tightdb" error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"No error expected");
     }
@@ -111,7 +111,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     // Load a group from disk (and try to update, even though it is readonly)
     error = nil;
-    TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"peopleErr.tightdb" withError:&error];
+    TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"peopleErr.tightdb" error:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
     }
@@ -133,13 +133,13 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     }
 
     error = nil;
-    fromDisk = [TDBTransaction groupWithFile:@"peopleErr.tightdb" withError:&error];
+    fromDisk = [TDBTransaction groupWithFile:@"peopleErr.tightdb" error:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"File should have been possible to open");
     }
 
-    PeopleErrTable* diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
+    PeopleErrTable* diskTable = [fromDisk getTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
     // Fake readonly.
     [((TDBTable*)diskTable) setReadOnly:true];
@@ -351,8 +351,8 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     STAssertNotNil(table, @"Table is nil");
 
     const char bin[4] = { 0, 1, 2, 3 };
-    TDBBinary* bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
-    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
     NSDate *timeNow = [NSDate date];
     //    TestQueryErrSub* subtab1 = [[TestQueryErrSub alloc] init];
     TestQueryErrSub* subtab2 = [[TestQueryErrSub alloc] init];
