@@ -50,7 +50,7 @@
 -(double)doubleInColumnWithIndex:(NSUInteger)colIndex;
 -(NSDate *)dateInColumnWithIndex:(NSUInteger)colIndex;
 -(NSData *)binaryInColumnWithIndex:(NSUInteger)colIndex;
--(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex;
+-(id)mixedInColumnWithIndex:(NSUInteger)colIndex;
 -(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex;
 
 @end
@@ -78,6 +78,6 @@
 -(void)setDate:(NSDate *)value;
 -(void)setSubtable:(TDBTable *)value;
 -(id)getSubtable:(Class)obj;
--(TDBMixed *)getMixed;
--(void)setMixed:(TDBMixed *)value;
+-(id)getMixed;
+-(void)setMixed:(id)value;
 @end

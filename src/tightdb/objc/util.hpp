@@ -78,6 +78,32 @@ inline NSString* to_objc_string(tightdb::StringData s)
     return [[NSString alloc] initWithBytes:data length:size encoding:NSUTF8StringEncoding];
 }
 
+inline NSObject* to_objc_object(tightdb::Mixed m)
+{
+    switch (m.get_type()) {
+        case tightdb::type_Bool:
+            return [NSNumber numberWithBool:(m.get_bool() == true)];
+        case tightdb::type_Int:
+            return [NSNumber numberWithLongLong:m.get_int()];
+        case tightdb::type_Float:
+            return [NSNumber numberWithFloat:m.get_float()];
+        case tightdb::type_Double:
+            return [NSNumber numberWithDouble:m.get_double()];
+        case tightdb::type_DateTime:
+            return [NSDate dateWithTimeIntervalSince1970:m.get_datetime().get_datetime()];
+        case tightdb::type_String:
+            return to_objc_string(m.get_string());
+        case tightdb::type_Binary: {
+            tightdb::BinaryData bd = m.get_binary();
+            return [NSData dataWithBytes:bd.data() length:bd.size()];
+        }
+        case tightdb::type_Mixed:
+            return nil; /* we should never get here */
+        case tightdb::type_Table:
+            return nil; /* FIXME: this should not be a standalone table */
+    }
+}
+
 
 // Still used in the new error strategy. Perhaps it should be public?
 enum TightdbErr {

@@ -33,8 +33,6 @@
 #import "TDBView_priv.h"
 #import "TDBQuery.h"
 #import "TDBQuery_priv.h"
-#import "TDBMixed.h"
-#import "TDBMixed_priv.h"
 
 #include <tightdb/objc/util.hpp>
 
@@ -173,11 +171,11 @@
 {
     return m_view->get_int(colIndex, rowIndex);
 }
--(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
+-(id)mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
 {
     tightdb::Mixed mixed = m_view->get_mixed(colNdx, rowIndex);
     if (mixed.get_type() != tightdb::type_Table)
-        return [TDBMixed mixedWithNativeMixed:mixed];
+        return to_objc_object(mixed);
     
     tightdb::TableRef table = m_view->get_subtable(colNdx, rowIndex);
     if (!table)
@@ -191,7 +189,7 @@
     if (![table_2 _checkType])
         return nil;
     
-    return [TDBMixed mixedWithTable:table_2];
+    return table_2;
 }
 
 -(NSString*)stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex

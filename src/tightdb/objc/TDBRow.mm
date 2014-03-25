@@ -25,6 +25,7 @@
 #import <tightdb/objc/TDBTable_priv.h>
 
 #include <tightdb/objc/util.hpp>
+#include <tightdb/objc/support.h>
 
 using namespace std;
 
@@ -99,44 +100,11 @@ using namespace std;
 
 -(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colNdx
 {
-    TDBType columnType = [_table columnTypeOfColumn:colNdx];
-    
-    // TODO: Verify obj type
-    
-    switch (columnType) {
-        case TDBBoolType:
-            [_table setBool:[obj boolValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-        case TDBIntType:
-            [_table setInt:[obj longLongValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-        case TDBFloatType:
-            [_table setFloat:[obj floatValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-        case TDBDoubleType:
-            [_table setDouble:[obj doubleValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-        case TDBStringType:
-            if (![obj isKindOfClass:[NSString class]])
-                [NSException raise:@"TypeException" format:@"Inserting non-string obj into string column"];
-            [_table setString:(NSString*)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-        case TDBDateType:
-            if ([obj isKindOfClass:[NSDate class]])
-                [NSException raise:@"TypeException" format:@"Inserting non-date obj into date column"];
-            [_table setDate:(NSDate *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-        case TDBBinaryType:
-            [_table setBinary:(NSData *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-        case TDBTableType:
-            [_table setTable:(TDBTable *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-        case TDBMixedType:
-            [_table setMixed:(TDBMixed *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-    }
-}
+    tightdb::Table& t = [_table getNativeTable];
+    tightdb::ConstDescriptorRef descr = t.get_descriptor();
+    verify_cell(*descr, size_t(colNdx), (NSObject *)obj);
+    set_cell(size_t(colNdx), size_t(_ndx), t, (NSObject *)obj);
+}   
 
 -(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key
 {
