@@ -106,35 +106,35 @@ using namespace std;
     
     switch (columnType) {
         case TDBBoolType:
-            [_table TDBsetBool:[obj boolValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
+            [_table TDB_setBool:[obj boolValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
         case TDBIntType:
-            [_table TDBsetInt:[obj longLongValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
+            [_table TDB_setInt:[obj longLongValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
         case TDBFloatType:
-            [_table TDBsetFloat:[obj floatValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
+            [_table TDB_setFloat:[obj floatValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
         case TDBDoubleType:
-            [_table TDBsetDouble:[obj doubleValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
+            [_table TDB_setDouble:[obj doubleValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
         case TDBStringType:
             if (![obj isKindOfClass:[NSString class]])
                 [NSException raise:@"TypeException" format:@"Inserting non-string obj into string column"];
-            [_table TDBsetString:(NSString*)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
+            [_table TDB_setString:(NSString*)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
         case TDBDateType:
             if ([obj isKindOfClass:[NSDate class]])
                 [NSException raise:@"TypeException" format:@"Inserting non-date obj into date column"];
-            [_table TDBsetDate:(NSDate *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
+            [_table TDB_setDate:(NSDate *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
         case TDBBinaryType:
-            [_table TDBsetBinary:(NSData *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
+            [_table TDB_setBinary:(NSData *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
         case TDBTableType:
-            [_table TDBsetTable:(TDBTable *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
+            [_table TDB_setTable:(TDBTable *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
         case TDBMixedType:
-            [_table TDBsetMixed:(TDBMixed *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
+            [_table TDB_setMixed:(TDBMixed *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
             break;
     }
 }
@@ -193,47 +193,47 @@ using namespace std;
 
 -(void)setInt:(int64_t)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDBsetInt:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table TDB_setInt:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setString:(NSString *)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDBsetString:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table TDB_setString:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setBinary:(NSData *)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDBsetBinary:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table TDB_setBinary:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setBool:(BOOL)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDBsetBool:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table TDB_setBool:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setFloat:(float)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDBsetFloat:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table TDB_setFloat:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setDouble:(double)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDBsetDouble:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table TDB_setDouble:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setDate:(NSDate *)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDBsetDate:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table TDB_setDate:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setTable:(TDBTable *)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDBsetTable:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table TDB_setTable:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setMixed:(TDBMixed *)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDBsetMixed:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table TDB_setMixed:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 @end
@@ -262,7 +262,7 @@ using namespace std;
 
 -(void)setBool:(BOOL)value
 {
-    [_cursor.table TDBsetBool:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_cursor.table TDB_setBool:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
 -(int64_t)getInt
@@ -272,7 +272,7 @@ using namespace std;
 
 -(void)setInt:(int64_t)value
 {
-    [_cursor.table TDBsetInt:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_cursor.table TDB_setInt:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
 -(float)getFloat
@@ -282,7 +282,7 @@ using namespace std;
 
 -(void)setFloat:(float)value
 {
-    [_cursor.table TDBsetFloat:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_cursor.table TDB_setFloat:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
 -(double)getDouble
@@ -292,7 +292,7 @@ using namespace std;
 
 -(void)setDouble:(double)value
 {
-    [_cursor.table TDBsetDouble:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_cursor.table TDB_setDouble:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
 -(NSString *)getString
@@ -302,7 +302,7 @@ using namespace std;
 
 -(void)setString:(NSString *)value
 {
-    [_cursor.table TDBsetString:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_cursor.table TDB_setString:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
 -(NSData *)getBinary
@@ -312,7 +312,7 @@ using namespace std;
 
 -(void)setBinary:(NSData *)value
 {
-    [_cursor.table TDBsetBinary:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_cursor.table TDB_setBinary:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 // FIXME: should it be setBinaryWithBuffer / setBinaryWithBinary ?
 // -(BOOL)setBinary:(const char *)data size:(size_t)size
@@ -327,7 +327,7 @@ using namespace std;
 
 -(void)setDate:(NSDate *)value
 {
-    [_cursor.table TDBsetDate:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_cursor.table TDB_setDate:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
 -(id)getSubtable:(Class)obj
@@ -337,7 +337,7 @@ using namespace std;
 
 -(void)setSubtable:(TDBTable *)value
 {
-    [_cursor.table TDBsetTable:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_cursor.table TDB_setTable:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
 -(TDBMixed *)getMixed
@@ -347,7 +347,7 @@ using namespace std;
 
 -(void)setMixed:(TDBMixed *)value
 {
-    [_cursor.table TDBsetMixed:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_cursor.table TDB_setMixed:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
 @end
