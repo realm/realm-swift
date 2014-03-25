@@ -29,11 +29,11 @@ typedef BOOL(^TDBWriteBlock)(TDBTransaction *transaction);
 @interface TDBContext: NSObject
 
 // Initializers
-+(TDBContext *)contextWithPersistenceToFile:(NSString *)path withError:(NSError **)error;
++(TDBContext *)contextWithPersistenceToFile:(NSString *)path error:(NSError **)error;
 
 // Transactions
 -(void)readWithBlock:(TDBReadBlock)block;
--(BOOL)writeWithBlock:(TDBWriteBlock)block withError:(NSError **)error;
+-(BOOL)writeWithBlock:(TDBWriteBlock)block error:(NSError **)error;
 
 // Context state info
 -(BOOL)hasChangedSinceLastTransaction;

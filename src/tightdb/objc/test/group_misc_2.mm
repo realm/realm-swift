@@ -107,10 +107,10 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Write to disk
     [fm removeItemAtPath:@"employees.tightdb" error:nil];
-    [group writeContextToFile:@"employees.tightdb" withError:nil];
+    [group writeContextToFile:@"employees.tightdb" error:nil];
 
     // Load a group from disk (and print contents)
-    TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"employees.tightdb" withError:nil];
+    TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"employees.tightdb" error:nil];
     MyTable* diskTable = [fromDisk getTableWithName:@"employees" asTableClass:[MyTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
@@ -127,7 +127,7 @@ TIGHTDB_TABLE_2(QueryTable,
     NSData* buffer = [group writeContextToBuffer];
 
     // Load a group from memory (and print contents)
-    TDBTransaction* fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
+    TDBTransaction* fromMem = [TDBTransaction groupWithBuffer:buffer error:nil];
     MyTable* memTable = [fromMem getTableWithName:@"employees" asTableClass:[MyTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         // ??? cursor
