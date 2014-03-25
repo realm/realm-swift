@@ -60,8 +60,7 @@
 -(NSUInteger)addRow:(NSObject *)data;
 
 // Inserting rows at specific positions
--(TDBRow *)insertEmptyRowAtIndex:(NSUInteger)rowIndex;
--(BOOL)insertRow:(id)anObject atIndex:(NSUInteger)rowIndex;
+-(BOOL)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex;
 
 // Removing rows
 -(BOOL)removeAllRows;
