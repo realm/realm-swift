@@ -1,7 +1,7 @@
 SUBDIRS = test
 test_DEPS = .
 
-nobase_subinclude_HEADERS = TDBType.h TDBRow.h TDBTransaction.h TDBQuery.h TDBTable.h TDBContext.h helper_macros.h table_macros.h Tightdb.h TDBVersion.h \
+nobase_subinclude_HEADERS = TDBType.h TDBRow.h TDBTransaction.h TDBQuery.h TDBTable.h TDBContext.h helper_macros.h table_macros.h PrivateTDB.h Tightdb.h TDBVersion.h \
 TDBDescriptor.h TDBView.h TDBColumnProxy.h TDBMixed.h
 
 nobase_subinclude_HEADERS_EXTRA_UNINSTALL = *.h

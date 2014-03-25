@@ -35,6 +35,7 @@
 #import "TDBQuery_priv.h"
 #import "TDBMixed.h"
 #import "TDBMixed_priv.h"
+#import "PrivateTDB.h"
 
 #include <tightdb/objc/util.hpp>
 
@@ -153,27 +154,27 @@
     }
 }
 
--(BOOL)boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(BOOL)TDBboolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
     return m_view->get_bool(colIndex, rowIndex);
 }
--(NSDate *)dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(NSDate *)TDBdateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
     return [NSDate dateWithTimeIntervalSince1970:m_view->get_datetime(colIndex, rowIndex).get_datetime()];
 }
--(double)doubleInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(double)TDBdoubleInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
     return m_view->get_double(colIndex, rowIndex);
 }
--(float)floatInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(float)TDBfloatInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
     return m_view->get_float(colIndex, rowIndex);
 }
--(int64_t)intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(int64_t)TDBintInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
     return m_view->get_int(colIndex, rowIndex);
 }
--(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
+-(TDBMixed *)TDBmixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
 {
     tightdb::Mixed mixed = m_view->get_mixed(colNdx, rowIndex);
     if (mixed.get_type() != tightdb::type_Table)
@@ -194,7 +195,7 @@
     return [TDBMixed mixedWithTable:table_2];
 }
 
--(NSString*)stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(NSString*)TDBstringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
     return to_objc_string(m_view->get_string(colIndex, rowIndex));
 }
