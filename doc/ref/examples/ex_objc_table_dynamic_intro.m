@@ -29,7 +29,8 @@ void ex_objc_table_dynamic_intro()
             NSLog(@"Name: %@ Age: %lld", [ite stringInColumnWithIndex:NAME], [ite intInColumnWithIndex:AGE]);
         
         /* Insert a row and print. */
-        row = [table insertEmptyRowAtIndex:2];
+        [table insertRow: nil atIndex:2];
+        row = [table rowAtIndex:2];
         [row setInt:21 inColumnWithIndex:AGE];
         [row setString:@"Hello I'm INSERTED" inColumnWithIndex:NAME];
 

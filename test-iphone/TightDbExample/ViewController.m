@@ -67,7 +67,7 @@ TIGHTDB_TABLE_2(MyTable2,
 {
    // TDBTransaction *group = [TDBTransaction group];
     // Create new table in group
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:@"employees.tightdb" withError:nil];
+    TDBContext *context = [TDBContext contextWithPersistenceToFile:@"employees.tightdb" error:nil];
     
     [context writeWithBlock:^BOOL(TDBTransaction *group) {
         
@@ -125,7 +125,7 @@ TIGHTDB_TABLE_2(MyTable2,
         TDBView *res = [q findAll];
         for (size_t i = 0; i < [res rowCount]; i++) {
             // cursor missing. Only low-level interface!
-            NSLog(@"%zu: is %lld years old",i , [res intInColumnWithIndex:i atRowIndex:i]);
+            NSLog(@"%zu: is %lld years old",i , [res TDB_intInColumnWithIndex:i atRowIndex:i]);
         }
         
         //------------------------------------------------------
@@ -138,11 +138,11 @@ TIGHTDB_TABLE_2(MyTable2,
         
         return YES;
 
-    } withError:nil];
+    } error:nil];
     
     // Load a group from disk (and print contents)
     
-    context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
+    context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"employees.tightdb"] error:nil];
     
     [context writeWithBlock:^BOOL(TDBTransaction *transaction) {
         MyTable *diskTable = [transaction getTableWithName:@"employees" asTableClass:[MyTable class]];
@@ -154,13 +154,13 @@ TIGHTDB_TABLE_2(MyTable2,
             MyTableRow *cursor = [diskTable rowAtIndex:i];
             NSLog(@"%zu: %@", i, [cursor Name]);
             NSLog(@"%zu: %@", i, cursor.Name);
-            NSLog(@"%zu: %@", i, [diskTable stringInColumnWithIndex:0 atRowIndex:i]);
+            NSLog(@"%zu: %@", i, [diskTable TDB_stringInColumnWithIndex:0 atRowIndex:i]);
         }
         
         // Write same group to memory buffer
        //buffer = [transaction writeContextToBuffer];
         return YES;
-    } withError:nil];
+    } error:nil];
 
 
 #ifdef TDB_GROUP_IMPLEMENTED

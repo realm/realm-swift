@@ -39,25 +39,9 @@
 -(void) sortUsingColumnWithIndex: (NSUInteger)colIndex;
 -(void) sortUsingColumnWithIndex: (NSUInteger)colIndex inOrder: (TDBSortOrder)order;
 
-
--(BOOL)boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(int64_t)intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(float)floatInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(double)doubleInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(NSDate *)dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(NSString *)stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
-//-(TDBBinary *)binaryInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
-//-(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
-//-(id)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(Class)tableClass;
--(id)mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
-
-
 -(void)removeRowAtIndex:(NSUInteger)rowIndex;
 -(void)removeAllRows;
 
 -(NSUInteger)rowIndexInOriginTableForRowAtIndex:(NSUInteger)rowIndex;
 
-
-/* Private */
--(id)_initWithQuery:(TDBQuery *)query;
 @end
