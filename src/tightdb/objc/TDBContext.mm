@@ -22,7 +22,7 @@
 #include <tightdb/group_shared.hpp>
 
 #import <tightdb/objc/TDBContext.h>
-#import <tightdb/objc/TDBTransaction_priv.h>
+#import <tightdb/objc/TDBTransaction_noinst.h>
 
 #include <tightdb/objc/util.hpp>
 

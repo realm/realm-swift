@@ -16,7 +16,7 @@
 
 #include <tightdb/binary_data.hpp>
 #include <tightdb/table.hpp>
-#import <tightdb/objc/TDBTable_priv.h>
+#import <tightdb/objc/TDBTable_noinst.h>
 
 TIGHTDB_TABLE_DEF_3(PeopleErrTable,
                     Name,  String,

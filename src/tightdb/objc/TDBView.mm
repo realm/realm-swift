@@ -27,14 +27,14 @@
 #include <tightdb/lang_bind_helper.hpp>
 
 #import "TDBTable.h"
-#import "TDBTable_priv.h"
+#import "TDBTable_noinst.h"
 #import "TDBRow.h"
 #import "TDBView.h"
-#import "TDBView_priv.h"
+#import "TDBView_noinst.h"
 #import "TDBQuery.h"
-#import "TDBQuery_priv.h"
+#import "TDBQuery_noinst.h"
 #import "TDBMixed.h"
-#import "TDBMixed_priv.h"
+#import "TDBMixed_noinst.h"
 #import "PrivateTDB.h"
 
 #include <tightdb/objc/util.hpp>
