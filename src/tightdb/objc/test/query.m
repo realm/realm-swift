@@ -166,31 +166,31 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         NSData *bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
 
         // Using private method just for the sake of testing the setters below.
-        [table TDBAddEmptyRows:2];
+        [table TDB_addEmptyRows:2];
 
-        [table setBool:YES inColumnWithIndex:BOOL_COL atRowIndex:0];
-        [table setBool:NO inColumnWithIndex:BOOL_COL atRowIndex:1];
+        [table TDB_setBool:YES inColumnWithIndex:BOOL_COL atRowIndex:0];
+        [table TDB_setBool:NO inColumnWithIndex:BOOL_COL atRowIndex:1];
 
-        [table setInt:0 inColumnWithIndex:INT_COL atRowIndex:0];
-        [table setInt:860 inColumnWithIndex:INT_COL atRowIndex:1];
+        [table TDB_setInt:0 inColumnWithIndex:INT_COL atRowIndex:0];
+        [table TDB_setInt:860 inColumnWithIndex:INT_COL atRowIndex:1];
 
-        [table setFloat:0 inColumnWithIndex:FLOAT_COL atRowIndex:0];
-        [table setFloat:5.6 inColumnWithIndex:FLOAT_COL atRowIndex:1];
+        [table TDB_setFloat:0 inColumnWithIndex:FLOAT_COL atRowIndex:0];
+        [table TDB_setFloat:5.6 inColumnWithIndex:FLOAT_COL atRowIndex:1];
 
-        [table setDouble:0 inColumnWithIndex:DOUBLE_COL atRowIndex:0];
-        [table setDouble:5.6 inColumnWithIndex:DOUBLE_COL atRowIndex:1];
+        [table TDB_setDouble:0 inColumnWithIndex:DOUBLE_COL atRowIndex:0];
+        [table TDB_setDouble:5.6 inColumnWithIndex:DOUBLE_COL atRowIndex:1];
 
-        [table setString:@"" inColumnWithIndex:STRING_COL atRowIndex:0];
-        [table setString:@"foo" inColumnWithIndex:STRING_COL atRowIndex:1];
+        [table TDB_setString:@"" inColumnWithIndex:STRING_COL atRowIndex:0];
+        [table TDB_setString:@"foo" inColumnWithIndex:STRING_COL atRowIndex:1];
 
-        [table setBinary:bin1 inColumnWithIndex:BINARY_COL atRowIndex:0];
-        [table setBinary:bin2 inColumnWithIndex:BINARY_COL atRowIndex:1];
+        [table TDB_setBinary:bin1 inColumnWithIndex:BINARY_COL atRowIndex:0];
+        [table TDB_setBinary:bin2 inColumnWithIndex:BINARY_COL atRowIndex:1];
 
-        [table setDate:0 inColumnWithIndex:DATE_COL atRowIndex:0];
-        [table setDate:[NSDate date] inColumnWithIndex:DATE_COL atRowIndex:1];
+        [table TDB_setDate:0 inColumnWithIndex:DATE_COL atRowIndex:0];
+        [table TDB_setDate:[NSDate date] inColumnWithIndex:DATE_COL atRowIndex:1];
 
-        [table setMixed:mixInt1 inColumnWithIndex:MIXED_COL atRowIndex:0];
-        [table setMixed:mixString inColumnWithIndex:MIXED_COL atRowIndex:1];
+        [table TDB_setMixed:mixInt1 inColumnWithIndex:MIXED_COL atRowIndex:0];
+        [table TDB_setMixed:mixString inColumnWithIndex:MIXED_COL atRowIndex:1];
 
         // Conditions (note that count is invoked to get the number of matches)
 
@@ -253,14 +253,14 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 {
     TDBTable* table = [[TDBTable alloc]init];
     [table addColumnWithName:@"IntCol" andType:TDBIntType];
-    [table TDBAddEmptyRows:6];
+    [table TDB_addEmptyRows:6];
 
-    [table setInt:10 inColumnWithIndex:0 atRowIndex:0];
-    [table setInt:42 inColumnWithIndex:0 atRowIndex:1];
-    [table setInt:27 inColumnWithIndex:0 atRowIndex:2];
-    [table setInt:31 inColumnWithIndex:0 atRowIndex:3];
-    [table setInt:8  inColumnWithIndex:0 atRowIndex:4];
-    [table setInt:39 inColumnWithIndex:0 atRowIndex:5];
+    [table TDB_setInt:10 inColumnWithIndex:0 atRowIndex:0];
+    [table TDB_setInt:42 inColumnWithIndex:0 atRowIndex:1];
+    [table TDB_setInt:27 inColumnWithIndex:0 atRowIndex:2];
+    [table TDB_setInt:31 inColumnWithIndex:0 atRowIndex:3];
+    [table TDB_setInt:8  inColumnWithIndex:0 atRowIndex:4];
+    [table TDB_setInt:39 inColumnWithIndex:0 atRowIndex:5];
     
     STAssertEquals((NSUInteger)1, [[[table where ] intIsGreaterThan:10 inColumnWithIndex:0 ] findFirstRow], @"Row 1 is greater than 10");
     STAssertEquals((NSUInteger)-1, [[[table where ] intIsGreaterThan:100 inColumnWithIndex:0 ] findFirstRow], @"No rows are greater than 100");
@@ -284,9 +284,9 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [t addRow:nil];
     STAssertEquals(t.rowCount, (NSUInteger)1,@"one row added");
     
-    TDBTable * subTable = [t tableInColumnWithIndex:0 atRowIndex:0];
+    TDBTable * subTable = [t TDB_tableInColumnWithIndex:0 atRowIndex:0];
     [subTable addRow:nil];
-    [subTable setBool:YES inColumnWithIndex:0 atRowIndex:0];
+    [subTable TDB_setBool:YES inColumnWithIndex:0 atRowIndex:0];
     TDBQuery *q = [t where];
     
     TDBView *v = [[[[q subtableInColumnWithIndex:0] boolIsEqualTo:YES inColumnWithIndex:0] parent] findAllRows];

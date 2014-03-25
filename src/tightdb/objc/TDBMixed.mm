@@ -21,9 +21,9 @@
 #import <Foundation/Foundation.h>
 
 #import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBTable_priv.h>
+#import <tightdb/objc/TDBTable_noinst.h>
 #import <tightdb/objc/TDBMixed.h>
-#import "TDBMixed_priv.h"
+#import "TDBMixed_noinst.h"
 #import <tightdb/objc/util.hpp>
 
 #include <tightdb/util/unique_ptr.hpp>

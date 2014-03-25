@@ -16,7 +16,7 @@
 
 #include <tightdb/binary_data.hpp>
 #include <tightdb/table.hpp>
-#import <tightdb/objc/TDBTable_priv.h>
+#import <tightdb/objc/TDBTable_noinst.h>
 
 TIGHTDB_TABLE_DEF_3(PeopleErrTable,
                     Name,  String,
@@ -217,94 +217,94 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     // Add some rows
     for (size_t i = 0; i < 15; ++i) {
-        if (![table TDBInsertInt:0 ndx:i value:i ]) {
+        if (![table TDB_insertInt:0 ndx:i value:i ]) {
            // NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
-        if (![table TDBInsertBool:1 ndx:i value:(i % 2 ? YES : NO)  ]) {
+        if (![table TDB_insertBool:1 ndx:i value:(i % 2 ? YES : NO)  ]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
-        if (![table TDBInsertDate:2 ndx:i value:[NSDate date] ]) {
+        if (![table TDB_insertDate:2 ndx:i value:[NSDate date] ]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
-        if (![table TDBInsertString:3 ndx:i value:[NSString stringWithFormat:@"string %zu", i] ]) {
+        if (![table TDB_insertString:3 ndx:i value:[NSString stringWithFormat:@"string %zu", i] ]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
-        if (![table TDBInsertString:4 ndx:i value:@" Very long string.............."  ]) {
+        if (![table TDB_insertString:4 ndx:i value:@" Very long string.............."  ]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
 
         switch (i % 3) {
             case 0:
-                if (![table TDBInsertString:5 ndx:i value:@"test1" ]) {
+                if (![table TDB_insertString:5 ndx:i value:@"test1" ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
                 break;
             case 1:
-                if (![table TDBInsertString:5 ndx:i value:@"test2" ]) {
+                if (![table TDB_insertString:5 ndx:i value:@"test2" ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
                 break;
             case 2:
-                if (![table TDBInsertString:5 ndx:i value:@"test3" ]) {
+                if (![table TDB_insertString:5 ndx:i value:@"test3" ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
                 break;
         }
 
-        if (![table TDBInsertBinary:6 ndx:i data:"binary" size:7 ]) {
+        if (![table TDB_insertBinary:6 ndx:i data:"binary" size:7 ]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
         switch (i % 3) {
             case 0:
-                if (![table TDBInsertMixed:7 ndx:i value:[TDBMixed mixedWithBool:NO] ]) {
+                if (![table TDB_insertMixed:7 ndx:i value:[TDBMixed mixedWithBool:NO] ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
                 break;
             case 1:
-                if (![table TDBInsertMixed:7 ndx:i value:[TDBMixed mixedWithInt64:i] ]) {
+                if (![table TDB_insertMixed:7 ndx:i value:[TDBMixed mixedWithInt64:i] ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
                 break;
             case 2:
-                if (![table TDBInsertMixed:7 ndx:i value:[TDBMixed mixedWithString:@"string"] ]) {
+                if (![table TDB_insertMixed:7 ndx:i value:[TDBMixed mixedWithString:@"string"] ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
                 break;
         }
-        if (![table TDBInsertSubtable:8 ndx:i ]) {
+        if (![table TDB_insertSubtable:8 ndx:i ]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
 
-        if (![table TDBInsertDone ]) {
+        if (![table TDB_insertDone ]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"InsertDone failed.");
         }
 
         // Add sub-tables
         if (i == 2) {
-            TDBTable* subtable = [table tableInColumnWithIndex:8 atRowIndex:i];
-            if (![subtable TDBInsertInt:0 ndx:0 value:42 ]) {
+            TDBTable* subtable = [table TDB_tableInColumnWithIndex:8 atRowIndex:i];
+            if (![subtable TDB_insertInt:0 ndx:0 value:42 ]) {
                 NSLog(@"%@", [error localizedDescription]);
                 STFail(@"Insert failed.");
             }
-            if (![subtable TDBInsertString:1 ndx:0 value:@"meaning" ]) {
+            if (![subtable TDB_insertString:1 ndx:0 value:@"meaning" ]) {
                 NSLog(@"%@", [error localizedDescription]);
                 STFail(@"Insert failed.");
             }
-            if (![subtable TDBInsertDone ]) {
+            if (![subtable TDB_insertDone ]) {
                 NSLog(@"%@", [error localizedDescription]);
                 STFail(@"InsertDone failed.");
             }
