@@ -27,17 +27,17 @@
 #include <tightdb/lang_bind_helper.hpp>
 
 #import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBTable_priv.h>
+#import <tightdb/objc/TDBTable_noinst.h>
 #import <tightdb/objc/TDBView.h>
-#import <tightdb/objc/TDBView_priv.h>
+#import <tightdb/objc/TDBView_noinst.h>
 #import <tightdb/objc/TDBQuery.h>
-#import <tightdb/objc/TDBQuery_priv.h>
+#import <tightdb/objc/TDBQuery_noinst.h>
 #import <tightdb/objc/TDBRow.h>
 #import <tightdb/objc/support.h>
 #import <tightdb/objc/TDBDescriptor.h>
-#import <tightdb/objc/TDBDescriptor_priv.h>
+#import <tightdb/objc/TDBDescriptor_noinst.h>
 #import <tightdb/objc/TDBMixed.h>
-#import <tightdb/objc/TDBMixed_priv.h>
+#import <tightdb/objc/TDBMixed_noinst.h>
 #import <tightdb/objc/TDBColumnProxy.h>
 #import <tightdb/objc/NSData+TDBGetBinaryData.h>
 

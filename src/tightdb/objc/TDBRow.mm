@@ -22,7 +22,7 @@
 
 #import <tightdb/objc/TDBRow.h>
 #import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBTable_priv.h>
+#import <tightdb/objc/TDBTable_noinst.h>
 #import <tightdb/objc/PrivateTDB.h>
 
 #include <tightdb/objc/util.hpp>

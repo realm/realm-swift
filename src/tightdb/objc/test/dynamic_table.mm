@@ -22,7 +22,7 @@
 #import <Foundation/NSException.h>
 
 #import <tightdb/objc/Tightdb.h>
-#import <tightdb/objc/TDBTable_priv.h>
+#import <tightdb/objc/TDBTable_noinst.h>
 
 
 @interface TDBDynamicTableTests: SenTestCase
