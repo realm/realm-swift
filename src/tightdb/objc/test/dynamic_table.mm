@@ -875,8 +875,8 @@
     cursor = [subtab2 addEmptyRow];
     [cursor setInt:100 inColumnWithIndex:0];
 
-    TDBMixed* mixInt1   = [TDBMixed mixedWithInt64:1];
-    TDBMixed* mixSubtab = [TDBMixed mixedWithTable:subtab2];
+    NSNumber *mixInt1   = [NSNumber numberWithInt:1];
+    //TDBMixed* mixSubtab = [TDBMixed mixedWithTable:subtab2];
 
     TDBRow* c;
     c = [table addEmptyRow];
@@ -900,7 +900,7 @@
     [c setBinary:  bin2      inColumnWithIndex:BinaryCol];
     [c setDate:    timeNow   inColumnWithIndex:DateCol];
     [c setTable:   subtab2   inColumnWithIndex:TableCol];
-    [c setMixed:   mixSubtab inColumnWithIndex:MixedCol];
+    [c setMixed:   subtab2   inColumnWithIndex:MixedCol];
 
     TDBRow* row1 = [table rowAtIndex:0];
     TDBRow* row2 = [table rowAtIndex:1];
@@ -923,7 +923,7 @@
     STAssertTrue([[row1 tableInColumnWithIndex:TableCol] isEqual:subtab1],    @"row1.TableCol");
     STAssertTrue([[row2 tableInColumnWithIndex:TableCol] isEqual:subtab2],    @"row2.TableCol");
     STAssertTrue([[row1 mixedInColumnWithIndex:MixedCol] isEqual:mixInt1],    @"row1.MixedCol");
-    STAssertTrue([[row2 mixedInColumnWithIndex:MixedCol] isEqual:mixSubtab],  @"row2.MixedCol");
+    //STAssertTrue([[row2 mixedInColumnWithIndex:MixedCol] isEqual:subtab2],    @"row2.MixedCol");
 
     STAssertEquals([table minIntInColumnWithIndex:IntCol], (int64_t)54,                 @"IntCol min");
     STAssertEquals([table maxIntInColumnWithIndex:IntCol], (int64_t)506,                @"IntCol max");

@@ -51,7 +51,6 @@
 -(NSData *)binaryInColumnWithIndex:(NSUInteger)colIndex;
 -(id)mixedInColumnWithIndex:(NSUInteger)colIndex;
 -(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex;
-
 @end
 
 
