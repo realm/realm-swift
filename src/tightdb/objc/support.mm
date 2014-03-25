@@ -1,11 +1,31 @@
+/*************************************************************************
+ *
+ * TIGHTDB CONFIDENTIAL
+ * __________________
+ *
+ *  [2011] - [2014] TightDB Inc
+ *  All Rights Reserved.
+ *
+ * NOTICE:  All information contained herein is, and remains
+ * the property of TightDB Incorporated and its suppliers,
+ * if any.  The intellectual and technical concepts contained
+ * herein are proprietary to TightDB Incorporated
+ * and its suppliers and may be covered by U.S. and Foreign Patents,
+ * patents in process, and are protected by trade secret or copyright law.
+ * Dissemination of this information or reproduction of this material
+ * is strictly forbidden unless prior written permission is obtained
+ * from TightDB Incorporated.
+ *
+ **************************************************************************/
+
 #import <Foundation/Foundation.h>
 
 #include <tightdb/descriptor.hpp>
 
 #import "TDBTable.h"
 #import "util.hpp"
+#import "NSData+TDBGetBinaryData.h"
 #import "support.h"
-#import "TDBBinary.h"
 
 using namespace tightdb;
 
@@ -90,8 +110,7 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
                 return NO;
             break; /* FIXME: remove */
         case type_Binary:
-            if ([obj isKindOfClass:[TDBBinary class]] ||
-                [obj isKindOfClass:[NSData class]])
+            if ([obj isKindOfClass:[NSData class]])
                 break;
             return NO;
         case type_Mixed:
@@ -141,6 +160,10 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
 BOOL verify_row(const Descriptor& descr, NSArray * data)
 {
     if (descr.get_column_count() != [data count]) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_count"
+                                                         reason:@"Number of columns do not match"
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
         return NO;
     }
 
@@ -150,8 +173,13 @@ BOOL verify_row(const Descriptor& descr, NSArray * data)
     /* FIXME: handling of tightdb exceptions => return NO */
     size_t col_ndx = 0;
     while (obj = [enumerator nextObject]) {
-        if (!verify_cell(descr, col_ndx, obj))
+        if (!verify_cell(descr, col_ndx, obj)) {
+            NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
+                                                             reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u", to_objc_string(descr.get_column_name(col_ndx)), col_ndx, descr.get_column_type(col_ndx) ]
+                                                           userInfo:[NSMutableDictionary dictionary]];
+            [exception raise];
             return NO;
+        }
         ++col_ndx;
     }
     return YES;
@@ -229,15 +257,7 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 table.insert_binary(col_ndx, row_ndx, bd);
             }
             else {
-                if ([obj isKindOfClass:[TDBBinary class]]) {
-                    BinaryData bd([(TDBBinary *)obj getData], [(TDBBinary *)obj getSize]);
-                    table.insert_binary(col_ndx, row_ndx, bd);
-                }
-                else { /* NSData */
-                    const void *data = [(NSData *)obj bytes];
-                    BinaryData bd(static_cast<const char *>(data), [(NSData *)obj length]);
-                    table.insert_binary(col_ndx, row_ndx, bd);
-                }
+                table.insert_binary(col_ndx, row_ndx, ((NSData *)obj).tdbBinaryData);
             }
             break;
         case type_Table:
@@ -263,9 +283,8 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 table.insert_mixed(col_ndx, row_ndx, DateTime(time_t([(NSDate *)obj timeIntervalSince1970])));
                 break;
             }
-            if ([obj isKindOfClass:[TDBBinary class]]) {
-                BinaryData bd([(TDBBinary *)obj getData], [(TDBBinary *)obj getSize]);
-                table.insert_mixed(col_ndx, row_ndx, bd);
+            if ([obj isKindOfClass:[NSData class]]) {
+                table.insert_mixed(col_ndx, row_ndx, ((NSData *)obj).tdbBinaryData);
                 break;
             }
             if ([obj isKindOfClass:[NSNumber class]]) {
@@ -448,15 +467,9 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 table.set_binary(col_ndx, row_ndx, bd);
             }
             else {
-                if ([obj isKindOfClass:[TDBBinary class]]) {
-                    BinaryData bd([(TDBBinary *)obj getData], [(TDBBinary *)obj getSize]);
-                    table.set_binary(col_ndx, row_ndx, bd);
-                }
-                else {
-                    const void *data = [(NSData *)obj bytes];
-                    BinaryData bd(static_cast<const char *>(data), [(NSData *)obj length]);
-                    table.set_binary(col_ndx, row_ndx, bd);
-                }
+                const void *data = [(NSData *)obj bytes];
+                BinaryData bd(static_cast<const char *>(data), [(NSData *)obj length]);
+                table.set_binary(col_ndx, row_ndx, bd);
             }
             break;
         case type_Table:
@@ -497,9 +510,8 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 table.set_mixed(col_ndx, row_ndx, DateTime(time_t([(NSDate *)obj timeIntervalSince1970])));
                 break;
             }
-            if ([obj isKindOfClass:[TDBBinary class]]) {
-                BinaryData bd([(TDBBinary *)obj getData], [(TDBBinary *)obj getSize]);
-                table.set_mixed(col_ndx, row_ndx, bd);
+            if ([obj isKindOfClass:[NSData class]]) {
+                table.set_mixed(col_ndx, row_ndx, ((NSData *)obj).tdbBinaryData);
                 break;
             }
             if ([obj isKindOfClass:[NSNumber class]]) {

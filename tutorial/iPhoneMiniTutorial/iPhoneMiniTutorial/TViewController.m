@@ -17,26 +17,26 @@
     [fileManager removeItemAtPath:filename error:&error];
 
     // Create data file
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:filename withError:nil];
+    TDBContext *context = [TDBContext contextWithPersistenceToFile:filename error:nil];
 
     // Perform a write transaction
     [context writeWithBlock:^(TDBTransaction *transaction) {
 
         // Access table from group
-        TDBTable *table = [transaction getOrCreateTableWithName:@"myTable"];
+        TDBTable *table = [transaction createTableWithName:@"myTable"];
 
         // Add columns to the table
         [table addColumnWithName:@"Name" andType:TDBStringType];
         [table addColumnWithName:@"Age" andType:TDBIntType];
        
         // Add a row to the table using a NSDictionary
-        [table appendRow:@{@"Name": @"Jill", @"Age": @21}];
+        [table addRow:@{@"Name": @"Jill", @"Age": @21}];
 
         // Add a new column dynamically
         int const HIRED = [table addColumnWithName:@"Hired" andType:TDBBoolType];
 
         // Add another row using a NSArray
-        [table appendRow:@[@"Mary", @40, @NO]];
+        [table addRow:@[@"Mary", @40, @NO]];
 
         // Change value in row
         TDBRow *row = [table rowAtIndex:0];
@@ -50,7 +50,7 @@
         self.sizeOutlet.text = [NSString stringWithFormat:@"# of rows: %i", table.rowCount];
 
         return YES;
-    } withError:nil];
+    } error:nil];
 }
 
 - (NSString*)writeablePathForFile:(NSString*)fileName

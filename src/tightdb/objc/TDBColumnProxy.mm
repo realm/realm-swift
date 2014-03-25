@@ -21,6 +21,7 @@
 #import <Foundation/Foundation.h>
 
 #import "TDBTable.h"
+#import "TDBTable_priv.h"
 #import "TDBColumnProxy.h"
 
 @implementation TDBColumnProxy
@@ -124,7 +125,7 @@
 @end
 
 @implementation TDBColumnProxyBinary
--(NSUInteger)find:(TDBBinary*)value
+-(NSUInteger)find:(NSData*)value
 {
     return [self.table findRowIndexWithBinary:value inColumnWithIndex:self.column];
 }
