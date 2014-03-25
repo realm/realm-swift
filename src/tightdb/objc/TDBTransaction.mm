@@ -22,9 +22,9 @@
 #include <tightdb/lang_bind_helper.hpp>
 
 #import <tightdb/objc/TDBTransaction.h>
-#import <tightdb/objc/TDBTransaction_priv.h>
+#import <tightdb/objc/TDBTransaction_noinst.h>
 #import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBTable_priv.h>
+#import <tightdb/objc/TDBTable_noinst.h>
 #import "PrivateTDB.h"
 
 #include <tightdb/objc/util.hpp>
