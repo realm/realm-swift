@@ -1,6 +1,6 @@
 2014-03-26
 ==========
-+ Initial support for pinning transactions on Context.
++ Experimental support for pinning transactions on Context.
 + TDBView now has support for object subscripting.
 
 2014-03-25
