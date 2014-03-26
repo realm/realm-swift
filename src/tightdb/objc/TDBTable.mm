@@ -68,7 +68,8 @@ using namespace std;
 -(instancetype)initWithSchema:(NSArray *)schema
 {
     self = [super init];
-    if (!self) return nil;
+    if (!self)
+        return nil;
 
     m_read_only = NO;
     m_table = tightdb::Table::create(); // FIXME: May throw

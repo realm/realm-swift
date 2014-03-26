@@ -591,32 +591,32 @@ BOOL set_columns_aux(TableRef& parent, std::vector<size_t> path, NSArray *schema
             DataType type;
             BOOL need_index = false;
             if ([value isKindOfClass:[NSString class]]) {
-                if ([value isEqual:@"string"]) {
+                if ([value isEqualToString:@"string"]) {
                     type = type_String;
                 }
-                else if ([value isEqual:@"string:indexed"]) {
+                else if ([value isEqualToString:@"string:indexed"]) {
                     type = type_String;
                     need_index = YES;
                 }
-                else if ([value isEqual:@"binary"]) {
+                else if ([value isEqualToString:@"binary"]) {
                     type = type_Binary;
                 }
-                else if ([value isEqual:@"int"]) {
+                else if ([value isEqualToString:@"int"]) {
                     type = type_Int;
                 }
-                else if ([value isEqual:@"float"]) {
+                else if ([value isEqualToString:@"float"]) {
                     type = type_Float;
                 }
-                else if ([value isEqual:@"double"]) {
+                else if ([value isEqualToString:@"double"]) {
                     type = type_Double;
                 }
-                else if ([value isEqual:@"bool"]) {
+                else if ([value isEqualToString:@"bool"]) {
                     type = type_Bool;
                 }
-                else if ([value isEqual:@"date"]) {
+                else if ([value isEqualToString:@"date"]) {
                     type = type_DateTime;
                 }
-                else if ([value isEqual:@"mixed"]) {
+                else if ([value isEqualToString:@"mixed"]) {
                     type = type_Mixed;
                 }
                 else {
