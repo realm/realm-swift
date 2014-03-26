@@ -26,6 +26,9 @@
 
 #include <tightdb/util/safe_int_ops.hpp>
 #include <tightdb/string_data.hpp>
+#include <tightdb/mixed.hpp>
+#include <tightdb/descriptor.hpp>
+#include <tightdb/table.hpp>
 
 struct ObjcStringAccessor {
     ObjcStringAccessor(const NSString* s)
@@ -100,10 +103,25 @@ inline NSObject* to_objc_object(tightdb::Mixed m)
         case tightdb::type_Mixed:
             TIGHTDB_ASSERT(false); /* we should never get here */
         case tightdb::type_Table:
-            TIGHTDB_ASSERT(false); /* Done elsewhere - by caller */
+            TIGHTDB_ASSERT(false);
     }
     return nil;
 }
+
+
+// A few nice helpers
+void to_mixed(id value, tightdb::Mixed& m);
+
+BOOL set_cell(size_t col_ndx, size_t row_ndx, tightdb::Table& table, NSObject *obj);
+BOOL verify_cell(const tightdb::Descriptor& descr, size_t col_ndx, NSObject *obj);
+
+void verify_row(const tightdb::Descriptor& descr, NSArray * data);
+void insert_row(size_t ndx, tightdb::Table& table, NSArray * data);
+void set_row(size_t ndx, tightdb::Table& table, NSArray *data);
+
+void verify_row_with_labels(const tightdb::Descriptor& descr, NSDictionary* data);
+void insert_row_with_labels(size_t row_ndx, tightdb::Table& table, NSDictionary *data);
+void set_row_with_labels(size_t row_ndx, tightdb::Table& table, NSDictionary *data);
 
 
 // Still used in the new error strategy. Perhaps it should be public?

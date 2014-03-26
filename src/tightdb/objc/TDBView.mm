@@ -35,7 +35,7 @@
 #import "TDBQuery_noinst.h"
 #import "PrivateTDB.h"
 
-#include <tightdb/objc/util.hpp>
+#include <tightdb/objc/util_noinst.hpp>
 
 
 

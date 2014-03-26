@@ -24,7 +24,7 @@
 #import <tightdb/objc/TDBContext.h>
 #import <tightdb/objc/TDBTransaction_noinst.h>
 
-#include <tightdb/objc/util.hpp>
+#include <tightdb/objc/util_noinst.hpp>
 
 using namespace std;
 
