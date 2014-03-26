@@ -18,16 +18,14 @@
  *
  **************************************************************************/
 
-#import <Foundation/Foundation.h>
-#import "TDBBinary.h"
+#import <tightdb/objc/TDBTable.h>
+#import <tightdb/objc/TDBMixed.h>
+#import <tightdb/objc/TDBView.h>
+#import <tightdb/objc/TDBQuery.h>
+#import <tightdb/objc/TDBRow.h>
+#import <tightdb/objc/TDBContext.h>
+#import <tightdb/objc/TDBVersion.h>
 
-@interface TDBBinary: NSObject
--(id)initWithData:(const char *)data size:(size_t)size;
--(const char *)getData;
--(size_t)getSize;
-
-/**
- * Compare the referenced binary data for equality.
- */
--(BOOL)isEqual:(TDBBinary *)bin;
-@end
+#import <tightdb/objc/PrivateHelperMacros.h>
+#import <tightdb/objc/PrivateTableMacros.h>
+#import <tightdb/objc/PrivateTDB.h>

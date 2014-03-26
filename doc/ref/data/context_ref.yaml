@@ -28,7 +28,7 @@ CATEGORIES:
       DESCR    :
       - TEXT   : *g_shared_group_constructor_descr
       - TEXT   : *g_shared_group_durability_modes
-      SIGNATURE: + (TDBContext *)contextWithPersistenceToFile:(NSString *)path withError:(NSError **)error
+      SIGNATURE: + (TDBContext *)contextWithPersistenceToFile:(NSString *)path error:(NSError **)error
       PARAMS:
       - NAME   : path
         TYPES  : NSString
@@ -65,7 +65,7 @@ CATEGORIES:
       NAMES    : writeWithBlock
       SUMMARY  : *g_shared_group_begin_write_summary
       DESCR    : *g_shared_group_begin_write_descr
-      SIGNATURE: (BOOL)writeWithBlock:(TDBWriteBlock)block withError:(NSError **)error
+      SIGNATURE: (BOOL)writeWithBlock:(TDBWriteBlock)block error:(NSError **)error
       PARAMS:
         NAME   : block
         TYPES  : TDBWriteBlock

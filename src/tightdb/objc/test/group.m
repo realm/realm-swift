@@ -47,15 +47,15 @@ TIGHTDB_TABLE_2(TestTableGroup,
     // Create empty group and serialize to disk
     TDBTransaction *toDisk = [TDBTransaction group];
     [fm removeItemAtPath:@"table_test.tightdb" error:NULL];
-    [toDisk writeContextToFile:@"table_test.tightdb" withError:nil];
+    [toDisk writeContextToFile:@"table_test.tightdb" error:nil];
 
     // Load the group
-    TDBTransaction *fromDisk = [TDBTransaction groupWithFile:@"table_test.tightdb" withError:nil];
+    TDBTransaction *fromDisk = [TDBTransaction groupWithFile:@"table_test.tightdb" error:nil];
     if (!fromDisk)
         STFail(@"From disk not valid");
 
     // Create new table in group
-    TestTableGroup *t = (TestTableGroup *)[fromDisk getOrCreateTableWithName:@"test" asTableClass:[TestTableGroup class]];
+    TestTableGroup *t = (TestTableGroup *)[fromDisk createTableWithName:@"test" asTableClass:[TestTableGroup class]];
 
     // Verify
     NSLog(@"Columns: %zu", t.columnCount);
@@ -79,6 +79,14 @@ TIGHTDB_TABLE_2(TestTableGroup,
 {
     TDBTransaction *g = [TDBTransaction group];
     STAssertNil([g getTableWithName:@"noTable"], @"Table does not exist");
+}
+
+- (void)testGroupTableCount
+{
+    TDBTransaction *t = [TDBTransaction group];
+    STAssertEquals(t.tableCount, (NSUInteger)0, @"No tables added");
+    [t createTableWithName:@"tableName"];
+    STAssertEquals(t.tableCount, (NSUInteger)1, @"1 table added");
 }
 
 @end

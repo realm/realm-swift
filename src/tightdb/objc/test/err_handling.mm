@@ -16,7 +16,7 @@
 
 #include <tightdb/binary_data.hpp>
 #include <tightdb/table.hpp>
-#import <tightdb/objc/TDBTable_priv.h>
+#import <tightdb/objc/TDBTable_noinst.h>
 
 TIGHTDB_TABLE_DEF_3(PeopleErrTable,
                     Name,  String,
@@ -60,9 +60,9 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    TDBTransaction* group = [TDBTransaction group];
+    TDBTransaction* transaction = [TDBTransaction group];
     // Create new table in group
-    PeopleErrTable* people = [group getOrCreateTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
+    PeopleErrTable* people = [transaction createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
     // No longer supports errors, the tes may be redundant
     // Add some rows
@@ -87,7 +87,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     // Write the group to disk
     [fm removeItemAtPath:@"peopleErr.tightdb" error:NULL];
     error = nil;
-    if (![group writeContextToFile:@"peopleErr.tightdb" withError:&error]) {
+    if (![transaction writeContextToFile:@"peopleErr.tightdb" error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"No error expected");
     }
@@ -111,7 +111,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     // Load a group from disk (and try to update, even though it is readonly)
     error = nil;
-    TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"peopleErr.tightdb" withError:&error];
+    TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"peopleErr.tightdb" error:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
     }
@@ -133,13 +133,13 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     }
 
     error = nil;
-    fromDisk = [TDBTransaction groupWithFile:@"peopleErr.tightdb" withError:&error];
+    fromDisk = [TDBTransaction groupWithFile:@"peopleErr.tightdb" error:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
         STFail(@"File should have been possible to open");
     }
 
-    PeopleErrTable* diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
+    PeopleErrTable* diskTable = [fromDisk getTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
     // Fake readonly.
     [((TDBTable*)diskTable) setReadOnly:true];
@@ -217,94 +217,94 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     // Add some rows
     for (size_t i = 0; i < 15; ++i) {
-        if (![table TDBInsertInt:0 ndx:i value:i ]) {
+        if (![table TDB_insertInt:0 ndx:i value:i ]) {
            // NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
-        if (![table TDBInsertBool:1 ndx:i value:(i % 2 ? YES : NO)  ]) {
+        if (![table TDB_insertBool:1 ndx:i value:(i % 2 ? YES : NO)  ]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
-        if (![table TDBInsertDate:2 ndx:i value:[NSDate date] ]) {
+        if (![table TDB_insertDate:2 ndx:i value:[NSDate date] ]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
-        if (![table TDBInsertString:3 ndx:i value:[NSString stringWithFormat:@"string %zu", i] ]) {
+        if (![table TDB_insertString:3 ndx:i value:[NSString stringWithFormat:@"string %zu", i] ]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
-        if (![table TDBInsertString:4 ndx:i value:@" Very long string.............."  ]) {
+        if (![table TDB_insertString:4 ndx:i value:@" Very long string.............."  ]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
 
         switch (i % 3) {
             case 0:
-                if (![table TDBInsertString:5 ndx:i value:@"test1" ]) {
+                if (![table TDB_insertString:5 ndx:i value:@"test1" ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
                 break;
             case 1:
-                if (![table TDBInsertString:5 ndx:i value:@"test2" ]) {
+                if (![table TDB_insertString:5 ndx:i value:@"test2" ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
                 break;
             case 2:
-                if (![table TDBInsertString:5 ndx:i value:@"test3" ]) {
+                if (![table TDB_insertString:5 ndx:i value:@"test3" ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
                 break;
         }
 
-        if (![table TDBInsertBinary:6 ndx:i data:"binary" size:7 ]) {
+        if (![table TDB_insertBinary:6 ndx:i data:"binary" size:7 ]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
         switch (i % 3) {
             case 0:
-                if (![table TDBInsertMixed:7 ndx:i value:[TDBMixed mixedWithBool:NO] ]) {
+                if (![table TDB_insertMixed:7 ndx:i value:[TDBMixed mixedWithBool:NO] ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
                 break;
             case 1:
-                if (![table TDBInsertMixed:7 ndx:i value:[TDBMixed mixedWithInt64:i] ]) {
+                if (![table TDB_insertMixed:7 ndx:i value:[TDBMixed mixedWithInt64:i] ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
                 break;
             case 2:
-                if (![table TDBInsertMixed:7 ndx:i value:[TDBMixed mixedWithString:@"string"] ]) {
+                if (![table TDB_insertMixed:7 ndx:i value:[TDBMixed mixedWithString:@"string"] ]) {
                     NSLog(@"%@", [error localizedDescription]);
                     STFail(@"Insert failed.");
                 }
                 break;
         }
-        if (![table TDBInsertSubtable:8 ndx:i ]) {
+        if (![table TDB_insertSubtable:8 ndx:i ]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"Insert failed.");
         }
 
-        if (![table TDBInsertDone ]) {
+        if (![table TDB_insertDone ]) {
             NSLog(@"%@", [error localizedDescription]);
             STFail(@"InsertDone failed.");
         }
 
         // Add sub-tables
         if (i == 2) {
-            TDBTable* subtable = [table tableInColumnWithIndex:8 atRowIndex:i];
-            if (![subtable TDBInsertInt:0 ndx:0 value:42 ]) {
+            TDBTable* subtable = [table TDB_tableInColumnWithIndex:8 atRowIndex:i];
+            if (![subtable TDB_insertInt:0 ndx:0 value:42 ]) {
                 NSLog(@"%@", [error localizedDescription]);
                 STFail(@"Insert failed.");
             }
-            if (![subtable TDBInsertString:1 ndx:0 value:@"meaning" ]) {
+            if (![subtable TDB_insertString:1 ndx:0 value:@"meaning" ]) {
                 NSLog(@"%@", [error localizedDescription]);
                 STFail(@"Insert failed.");
             }
-            if (![subtable TDBInsertDone ]) {
+            if (![subtable TDB_insertDone ]) {
                 NSLog(@"%@", [error localizedDescription]);
                 STFail(@"InsertDone failed.");
             }
@@ -351,8 +351,8 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     STAssertNotNil(table, @"Table is nil");
 
     const char bin[4] = { 0, 1, 2, 3 };
-    TDBBinary* bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
-    TDBBinary* bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
     NSDate *timeNow = [NSDate date];
     //    TestQueryErrSub* subtab1 = [[TestQueryErrSub alloc] init];
     TestQueryErrSub* subtab2 = [[TestQueryErrSub alloc] init];

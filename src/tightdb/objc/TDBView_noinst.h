@@ -19,28 +19,13 @@
  **************************************************************************/
 
 #import <Foundation/Foundation.h>
-
 #import "TDBTable.h"
+#import "TDBView.h"
 
-@interface TDBMixed: NSObject
-+(TDBMixed *)mixedWithBool:(BOOL)value;
-+(TDBMixed *)mixedWithInt64:(int64_t)value;
-+(TDBMixed *)mixedWithFloat:(float)value;
-+(TDBMixed *)mixedWithDouble:(double)value;
-+(TDBMixed *)mixedWithString:(NSString *)value;
-+(TDBMixed *)mixedWithBinary:(NSData *)value;
-+(TDBMixed *)mixedWithBinary:(const char *)data size:(size_t)size;
-+(TDBMixed *)mixedWithDate:(NSDate *)value;
-+(TDBMixed *)mixedWithTable:(TDBTable *)value;
--(BOOL)isEqual:(TDBMixed *)other;
--(TDBType)getType;
--(BOOL)getBool;
--(int64_t)getInt;
--(float)getFloat;
--(double)getDouble;
--(NSString *)getString;
--(NSData *)getBinary;
--(NSDate *)getDate;
--(TDBTable *)getTable;
+#include <tightdb/table_view.hpp>
+
+@interface TDBView()
+
++(TDBView*)viewWithTable:(TDBTable*)table andNativeView:(const tightdb::TableView&)view;
+
 @end
-

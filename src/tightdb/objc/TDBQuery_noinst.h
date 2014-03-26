@@ -20,46 +20,6 @@
 
 #import <Foundation/Foundation.h>
 
-#include <tightdb/util/unique_ptr.hpp>
-#include <tightdb/binary_data.hpp>
-
-#import "TDBBinary.h"
-#import "TDBBinary_priv.h"
-
-@implementation TDBBinary
-{
-    tightdb::BinaryData m_data;
-}
--(id)initWithData:(const char*)data size:(size_t)size
-{
-    self = [super init];
-    if (self) {
-        m_data = tightdb::BinaryData(data, size);
-    }
-    return self;
-}
--(id)initWithBinary:(tightdb::BinaryData)data
-{
-    self = [super init];
-    if (self) {
-        m_data = data;
-    }
-    return self;
-}
--(const char*)getData
-{
-    return m_data.data();
-}
--(size_t)getSize
-{
-    return m_data.size();
-}
--(BOOL)isEqual:(TDBBinary*)bin
-{
-    return m_data == bin->m_data;
-}
--(tightdb::BinaryData&)getNativeBinary
-{
-    return m_data;
-}
+@interface TDBQuery()
+-(tightdb::Query&)getNativeQuery;
 @end
