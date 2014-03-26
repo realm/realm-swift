@@ -9,7 +9,7 @@ nobase_subinclude_HEADERS_EXTRA_UNINSTALL = *.h
 lib_LIBRARIES = libtightdb-objc.a
 
 libtightdb_objc_a_SOURCES = TDBTable.mm TDBRow.mm TDBTransaction.mm TDBQuery.mm \
-TDBContext.mm support.mm TDBVersion.mm TDBDescriptor.mm TDBView.mm \
+TDBContext.mm util.mm TDBVersion.mm TDBDescriptor.mm TDBView.mm \
 TDBColumnProxy.mm NSData+TDBGetBinaryData.mm
 
 libtightdb_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2

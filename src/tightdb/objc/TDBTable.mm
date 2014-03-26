@@ -38,8 +38,7 @@
 #import <tightdb/objc/TDBColumnProxy.h>
 #import <tightdb/objc/NSData+TDBGetBinaryData.h>
 
-#include <tightdb/objc/util.hpp>
-#include <tightdb/objc/support.h>
+#include <tightdb/objc/util_noinst.hpp>
 
 using namespace std;
 

@@ -26,9 +26,8 @@
 
 #import "TDBTable.h"
 #import "TDBTable_noinst.h"
-#import "util.hpp"
+#import "util_noinst.hpp"
 #import "NSData+TDBGetBinaryData.h"
-#import "support.h"
 
 using namespace tightdb;
 

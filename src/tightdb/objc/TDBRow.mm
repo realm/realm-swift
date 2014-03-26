@@ -25,8 +25,7 @@
 #import <tightdb/objc/TDBTable_noinst.h>
 #import <tightdb/objc/PrivateTDB.h>
 
-#include <tightdb/objc/util.hpp>
-#include <tightdb/objc/support.h>
+#include <tightdb/objc/util_noinst.hpp>
 
 using namespace std;
 
