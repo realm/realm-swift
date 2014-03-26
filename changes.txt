@@ -1,3 +1,9 @@
+2014-03-26
+==========
+* Transactions can now be started directly on named tables.
+* You can create dynamic tables with initial schema.
+* Table and View now have a shared protocol so they can easier be used interchangeably.
+
 2014-03-25
 ==========
 ! BREAKING CHANGE: insertEmptyRow has been removed from table. Use insertRow:nil atIndex:index instead.
