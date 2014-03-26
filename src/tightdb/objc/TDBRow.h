@@ -40,7 +40,7 @@
 -(void)setDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
--(void)setMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex DEPRECATED_ATTRIBUTE;
 -(void)setTable:(TDBTable *)aTable inColumnWithIndex:(NSUInteger)colIndex;
 
 -(int64_t)intInColumnWithIndex:(NSUInteger)colIndex;
@@ -50,7 +50,7 @@
 -(double)doubleInColumnWithIndex:(NSUInteger)colIndex;
 -(NSDate *)dateInColumnWithIndex:(NSUInteger)colIndex;
 -(NSData *)binaryInColumnWithIndex:(NSUInteger)colIndex;
--(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex;
+-(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex DEPRECATED_ATTRIBUTE;
 -(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex;
 
 @end
@@ -78,6 +78,6 @@
 -(void)setDate:(NSDate *)value;
 -(void)setSubtable:(TDBTable *)value;
 -(id)getSubtable:(Class)obj;
--(TDBMixed *)getMixed;
--(void)setMixed:(TDBMixed *)value;
+-(TDBMixed *)getMixed DEPRECATED_ATTRIBUTE;
+-(void)setMixed:(TDBMixed *)value DEPRECATED_ATTRIBUTE;
 @end
