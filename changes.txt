@@ -1,3 +1,7 @@
+2014-03-26
+==========
++ Initial support for pinning transactions on Context.
+
 2014-03-25
 ==========
 ! BREAKING CHANGE: insertEmptyRow has been removed from table. Use insertRow:nil atIndex:index instead.
