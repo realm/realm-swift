@@ -301,6 +301,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     {   // can't pin while we're inside a transaction
         [context1 readWithBlock:^(TDBTransaction *transaction) {
             STAssertThrows([context1 pinReadTransactions], @"Can't pin inside transaction");
+            STAssertNotNil(transaction, @"Parameter must be used");
         }];
     }
     
@@ -308,12 +309,14 @@ TIGHTDB_TABLE_2(SharedTable2,
         [context1 pinReadTransactions];
         [context1 readWithBlock:^(TDBTransaction *transaction) {
             STAssertThrows([context1 unpinReadTransactions], @"Can't unpin inside transaction");
+            STAssertNotNil(transaction, @"Parameter must be used");
         }];
         [context1 unpinReadTransactions];
     }
     {   // can't start a write transaction while pinned
         [context1 pinReadTransactions];
         STAssertThrows([context1 writeWithBlock:^BOOL(TDBTransaction *transaction) {
+            STAssertNotNil(transaction, @"Parameter must be used");
             return YES;
         } error:nil], @"Can't start write transaction while pinned");
         [context1 unpinReadTransactions];
