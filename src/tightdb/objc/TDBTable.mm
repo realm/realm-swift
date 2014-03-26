@@ -136,9 +136,11 @@ using namespace std;
     return m_read_only;
 }
 
--(BOOL)isEqual:(TDBTable*)other
+-(BOOL)isEqual:(id)other
 {
-    return *m_table == *other->m_table;
+    if ([other isKindOfClass:[TDBTable class]])
+        return *m_table == *(((TDBTable *)other)->m_table);
+    return NO;
 }
 
 /**
@@ -484,8 +486,7 @@ using namespace std;
     if (type != tightdb::type_Table)
         return nil;
     tightdb::TableRef table = m_table->get_subtable(colIndex, rowIndex);
-    if (!table)
-        return nil;
+    TIGHTDB_ASSERT(table);
     TDBTable* table_2 = [[tableClass alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
@@ -504,8 +505,7 @@ using namespace std;
         return to_objc_object(mixed);
 
     tightdb::TableRef table = m_table->get_subtable(colNdx, rowIndex);
-    if (!table)
-        return nil;
+    TIGHTDB_ASSERT(table);
     TDBTable* table_2 = [[TDBTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table_2))
         return nil;
