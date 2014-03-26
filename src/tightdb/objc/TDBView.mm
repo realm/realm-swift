@@ -86,6 +86,17 @@
     m_table = nil; // FIXME: What is the point of doing this?
 }
 
+-(TDBRow *)objectAtIndexedSubscript:(NSUInteger)ndx
+{
+    // The cursor constructor checks the index is in bounds. However, getSourceIndex should
+    // not be called with illegal index.
+    
+    if (ndx >= self.rowCount)
+        return nil;
+    
+    return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
+}
+
 -(TDBRow*)rowAtIndex:(NSUInteger)ndx
 {
     // The cursor constructor checks the index is in bounds. However, getSourceIndex should

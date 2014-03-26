@@ -38,8 +38,9 @@ typedef BOOL(^TDBWriteBlock)(TDBTransaction *transaction);
 // Context state info
 -(BOOL)hasChangedSinceLastTransaction;
 
--(BOOL)pinReadTransactions;
 
+/******** Experimental features **********/
+-(BOOL)pinReadTransactions;
 -(void)unpinReadTransactions;
 
 @end

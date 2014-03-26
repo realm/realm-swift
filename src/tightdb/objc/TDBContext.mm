@@ -170,10 +170,9 @@ using namespace std;
     catch(std::exception& ex) { 
         NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
                                                          reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+                                                       userInfo:nil];
+        @throw exception;
     }
-    return NO;
 }
 
 -(void)unpinReadTransactions
@@ -184,8 +183,8 @@ using namespace std;
     catch(std::exception& ex) {
         NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
                                                          reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+                                                       userInfo:nil];
+        @throw exception;
     }
 }
 
