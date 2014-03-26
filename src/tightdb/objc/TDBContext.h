@@ -39,7 +39,7 @@ typedef BOOL(^TDBTableWriteBlock)(TDBTable *table);
 
 // Shortcuts for transactions on a single table
 -(void)readTable:(NSString*)tablename withBlock:(TDBTableReadBlock)block;
--(BOOL)writeTable:(NSString*)tablename withBlock:(TDBTableWriteBlock)block withError:(NSError **)error;
+-(BOOL)writeTable:(NSString*)tablename withBlock:(TDBTableWriteBlock)block error:(NSError **)error;
 
 // Context state info
 -(BOOL)hasChangedSinceLastTransaction;

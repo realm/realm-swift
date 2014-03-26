@@ -1043,8 +1043,8 @@
     STAssertEquals([table columnCount], (NSUInteger)4, @"four columns");
 
     // Try to append a row that has to comply with the schema
-    [table appendRow:@[@"joe", @34, @YES, @[@[@"home",   @"(650) 434-4342"],
-                                            @[@"mobile", @"(650) 342-4243"]]]];
+    [table addRow:@[@"joe", @34, @YES, @[@[@"home",   @"(650) 434-4342"],
+                                         @[@"mobile", @"(650) 342-4243"]]]];
 }
 
 @end
