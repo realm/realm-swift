@@ -20,6 +20,7 @@
 
 #import "TDBTable.h"
 #import "TDBView.h"
+#import "TDBContext.h"
 
 /**
  * The selectors in this interface is not meant to be used directly.
@@ -92,3 +93,14 @@
 -(TDBMixed *)TDB_mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 @end
 
+/**
+ * The selectors in this interface is not meant to be used directly.
+ * However, they are public so that the typed table macros can use them.
+ */
+@interface TDBContext()
+
+/******** Experimental features **********/
+-(BOOL)pinReadTransactions;
+-(void)unpinReadTransactions;
+
+@end
