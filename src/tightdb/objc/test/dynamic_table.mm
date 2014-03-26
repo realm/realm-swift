@@ -341,7 +341,7 @@
     [subdescr addColumnWithName:@"TableCol_IntCol" andType:TDBIntType];
     STAssertNoThrow(([t addRow:@[@1, @[]]]), @"1 row excepted");
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
-    STAssertNoThrow(([t addRow:@[@2, @[@[@3]]]]), @"Wrong");
+    STAssertNoThrow(([t addRow:@[@2, @[ @[@3], @[@4] ] ]]), @"Wrong");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows expected");
 }
 
@@ -922,7 +922,6 @@
     STAssertTrue([[row1 tableInColumnWithIndex:TableCol] isEqual:subtab1],    @"row1.TableCol");
     STAssertTrue([[row2 tableInColumnWithIndex:TableCol] isEqual:subtab2],    @"row2.TableCol");
     STAssertTrue([[row1 mixedInColumnWithIndex:MixedCol] isEqual:mixInt1],    @"row1.MixedCol");
-    NSLog(@"FISK %@ HEST", [[row2 mixedInColumnWithIndex:MixedCol] class]);
     STAssertTrue([[row2 mixedInColumnWithIndex:MixedCol] isKindOfClass:[TDBTable class]], @"TDBTable expected");
     STAssertTrue([[row2 mixedInColumnWithIndex:MixedCol] isEqual:subtab2],    @"row2.MixedCol");
 
