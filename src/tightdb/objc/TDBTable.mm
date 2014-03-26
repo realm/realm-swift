@@ -355,9 +355,8 @@ using namespace std;
 
 -(BOOL)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
 {
-    
     if (!anObject) {
-        [self TDBInsertRow:rowIndex];
+        return [self TDBInsertRow:rowIndex];
     }
     
     tightdb::Table& table = *m_table;
