@@ -44,12 +44,12 @@ CATEGORIES:
   - g_group_get_table:
       IGNORE   : ""      
   - g_group_get_table_if_exists:
-      NAMES    : "getTableWithName:"
+      NAMES    : "tableWithName:"
       SUMMARY  : *g_group_get_table_summary
       DESCR    : *g_group_get_table_descr
       SIGNATURE: |
-                 - (TDBTable *)getTable:(NSString *)name
-                 - (id)getTable:(NSString *)name withClass:(Class)obj
+                 - (TDBTable *)tableWithName:(NSString *)name
+                 - (id)tableWithName:(NSString *)name asTableClass:(Class)obj
       PARAMS:
       - NAME   : name
         TYPES  : NSString

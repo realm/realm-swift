@@ -1,3 +1,7 @@
+2014-03-27
+==========
+! BREAKING CHANGE: getTableWithName: renamed to tableWithName: in Transaction.
+
 2014-03-26
 ==========
 + Experimental support for pinning transactions on Context.
