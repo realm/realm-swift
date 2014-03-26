@@ -76,8 +76,13 @@ using namespace std;
 
     if (!set_columns(m_table, schema)) {
         m_table.reset();
-        //TODO: Parsing the schema failed, we should return an error message
-        return nil;
+
+        // Parsing the schema failed
+        //TODO: More detailed error msg in exception
+        NSException* exception = [NSException exceptionWithName:@"tightdb:invalid_schema"
+                                                         reason:@"The supplied schema was invalid"
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
     }
 
     return self;
