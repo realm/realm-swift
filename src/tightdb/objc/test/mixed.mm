@@ -116,6 +116,12 @@ TIGHTDB_TABLE_2(SubMixedTable,
     STAssertEquals([mixedDate1 isEqual:mixedString1], NO, @"Mixed with different types should be different (23)");
     STAssertEquals([mixedDate1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (24)");
     STAssertEquals([mixedDate1 isEqual:table1],       NO, @"Mixed with different types should be different (25)");
+
+    STAssertEquals([table1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (26)");
+    STAssertEquals([table1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (27)");
+    STAssertEquals([table1 isEqual:mixedString1], NO, @"Mixed with different types should be different (28)");
+    STAssertEquals([table1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (29)");
+    STAssertEquals([table1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (30)");
 }
 
 

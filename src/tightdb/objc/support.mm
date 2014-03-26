@@ -25,6 +25,7 @@
 #include <tightdb/string_data.hpp>
 
 #import "TDBTable.h"
+#import "TDBTable_noinst.h"
 #import "util.hpp"
 #import "NSData+TDBGetBinaryData.h"
 #import "support.h"
@@ -101,6 +102,8 @@ void to_mixed(id value, Mixed& m)
         m.set_datetime(DateTime(time_t([(NSDate *)value timeIntervalSince1970])));
         return;
     }
+    if ([value isKindOfClass:[TDBTable class]])
+        m = Mixed(Mixed::subtable_tag());
 }
 
 
@@ -186,10 +189,9 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
                     verify_row(*subdescr, (NSArray *)subobj);
                 }
             }
-            else {
-                return NO;
-            }
-            break;
+            if ([obj isKindOfClass:[TDBTable class]])
+                break;
+            return NO;
     }
     return YES;
 }
@@ -505,7 +507,7 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 table.set_binary(col_ndx, row_ndx, bd);
             }
             break;
-        case type_Table:
+        case type_Table: {
             table.clear_subtable(col_ndx, row_ndx);
             if ([obj isKindOfClass:[NSArray class]]) {
                 table.clear_subtable(col_ndx, row_ndx);
@@ -518,15 +520,18 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                         set_row(row_ndx, *subtable, (NSArray *)subobj);
                     }
                 }
+                break;
             }
-            else {
-                NSException* exception = [NSException exceptionWithName:@"tightdb:cannot insert subtable"
-                                                                 reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
-                                                                         to_objc_string(table.get_column_name(col_ndx)), col_ndx, table.get_column_type(col_ndx) ]
-                                                               userInfo:[NSMutableDictionary dictionary]];
-                [exception raise];
+            if ([obj isKindOfClass:[TDBTable class]]) {
+                table.set_subtable(col_ndx, row_ndx, &[(TDBTable *)obj getNativeTable]);
+                break;
             }
-            break;
+            NSException* exception = [NSException exceptionWithName:@"tightdb:cannot insert subtable"
+                                                                reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
+                                                                        to_objc_string(table.get_column_name(col_ndx)), col_ndx, table.get_column_type(col_ndx) ]
+                                                                userInfo:[NSMutableDictionary dictionary]];
+            [exception raise];
+        }
         case type_Mixed:
             if (obj == nil) {
                 table.set_bool(col_ndx, row_ndx, false);
@@ -538,7 +543,12 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 break;
             }
             if ([obj isKindOfClass:[NSArray class]]) {
+                // FIXME: implement
                 // table.set_mixed(col_ndx, row_ndx, Mixed::subtable_tag());
+                break;
+            }
+            if ([obj isKindOfClass:[TDBTable class]]) {
+                table.set_subtable(col_ndx, row_ndx, &[(TDBTable *)obj getNativeTable]);
                 break;
             }
             if ([obj isKindOfClass:[NSDate class]]) {

@@ -179,8 +179,7 @@
         return to_objc_object(mixed);
     
     tightdb::TableRef table = m_view->get_subtable(colNdx, rowIndex);
-    if (!table)
-        return nil;
+    TIGHTDB_ASSERT(table);
     TDBTable* table_2 = [[TDBTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table_2))
         return nil;
