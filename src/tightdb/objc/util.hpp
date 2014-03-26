@@ -82,7 +82,7 @@ inline NSObject* to_objc_object(tightdb::Mixed m)
 {
     switch (m.get_type()) {
         case tightdb::type_Bool:
-            return [NSNumber numberWithBool:(m.get_bool() == true)];
+            return [NSNumber numberWithBool:m.get_bool()];
         case tightdb::type_Int:
             return [NSNumber numberWithLongLong:m.get_int()];
         case tightdb::type_Float:
@@ -98,10 +98,11 @@ inline NSObject* to_objc_object(tightdb::Mixed m)
             return [NSData dataWithBytes:bd.data() length:bd.size()];
         }
         case tightdb::type_Mixed:
-            return nil; /* we should never get here */
+            TIGHTDB_ASSERT(false); /* we should never get here */
         case tightdb::type_Table:
-            return nil; /* FIXME: this should not be a standalone table */
+            TIGHTDB_ASSERT(false); /* Done elsewhere - by caller */
     }
+    return nil;
 }
 
 
@@ -196,12 +197,6 @@ catch(std::exception& ex) { \
                                           userInfo:[NSMutableDictionary dictionary]]; \
     [exception raise]; \
 }
-
-
-
-
-
-
 
 
 #endif // TIGHTDB_OBJC_UTIL_HPP

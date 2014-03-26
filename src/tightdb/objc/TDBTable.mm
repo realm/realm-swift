@@ -294,23 +294,13 @@ using namespace std;
     }
 
     if ([newValue isKindOfClass:[NSArray class]]) {
-        if (!verify_row(*desc, (NSArray *)newValue)) {
-            return; // FIXME: raise exception
-        }
-        if (!set_row(size_t(rowIndex), table, (NSArray *)newValue)) {
-            // FIXME: raise exception
-            return ;
-        }
+        verify_row(*desc, (NSArray *)newValue);
+        set_row(size_t(rowIndex), table, (NSArray *)newValue);
     }
     
     if ([newValue isKindOfClass:[NSDictionary class]]) {
-        if (!verify_row_with_labels(*desc, (NSDictionary *)newValue)) {
-            return; // FIXME: raise exception
-        }
-        if (!set_row_with_labels(size_t(rowIndex), table, (NSDictionary *)newValue)) {
-            // FIXME: raise exception
-            return ;
-        }
+        verify_row_with_labels(*desc, (NSDictionary *)newValue);
+        set_row_with_labels(size_t(rowIndex), table, (NSDictionary *)newValue);
     }
     
     /* FIXME: pull out properties of object and insert as row */
@@ -374,22 +364,17 @@ using namespace std;
     tightdb::ConstDescriptorRef desc = table.get_descriptor();
     
     if ([anObject isKindOfClass:[NSArray class]]) {
-        if (!verify_row(*desc, (NSArray *)anObject)) {
-            return NO;
-        }
-        return insert_row(size_t(rowIndex), table, (NSArray *)anObject);
+        verify_row(*desc, (NSArray *)anObject);
+        insert_row(size_t(rowIndex), table, (NSArray *)anObject);
     }
     
     if ([anObject isKindOfClass:[NSDictionary class]]) {
-        if (!verify_row_with_labels(*desc, (NSDictionary *)anObject)) {
-            return NO;
-        }
-        return insert_row_with_labels(size_t(rowIndex), table, (NSDictionary *)anObject);
+        verify_row_with_labels(*desc, (NSDictionary *)anObject);
+        insert_row_with_labels(size_t(rowIndex), table, (NSDictionary *)anObject);
     }
     
     /* FIXME: pull out properties of object and insert as row */
-    return NO;
-    
+    return YES;
 }
 
 
@@ -859,8 +844,13 @@ using namespace std;
         return NO;
     }
     tightdb::Mixed mixed;
-    to_mixed(value, mixed);
-    TDBTable* subtable = mixed.get_type() == tightdb::type_Table ? (TDBTable *)value : nil;
+    TDBTable* subtable;
+    if ([value isKindOfClass:[TDBTable class]]) {
+        subtable = (TDBTable *)value;
+    }
+    else {
+        to_mixed(value, mixed);
+    }
     TIGHTDB_EXCEPTION_ERRHANDLER(
         if (subtable) {
             tightdb::LangBindHelper::insert_mixed_subtable(*m_table, col_ndx, row_ndx,

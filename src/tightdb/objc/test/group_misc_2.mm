@@ -229,7 +229,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Make the mixed values column contain another subtable
     [table TDB_setMixed:[[TDBTable alloc] init] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
-
+    
 /* Fails!!!
     // Specify its type
     OCTopLevelTable* subtable2 = [table getTopLevelTable:COL_TABLE_MIX ndx:0];

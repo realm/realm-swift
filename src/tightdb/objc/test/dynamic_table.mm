@@ -135,8 +135,8 @@
 
     STAssertEquals((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
     STAssertEquals((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:1], @"Value 2 expected");
-
-    STAssertNoThrow([t addRow:@{ @"first": @"Hello" }], @"Wrong type");
+    
+    STAssertThrows([t addRow:@{ @"first": @"Hello" }], @"Wrong type");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
 
     STAssertTrue(([t addRow:@{ @"first": @1, @"second": @"Hello" }]), @"dh");
@@ -163,7 +163,7 @@
     STAssertEquals((int64_t)1, ([t TDB_intInColumnWithIndex:0 atRowIndex:1]), @"Value 1 expected");
     STAssertEquals((int64_t)2, ([t TDB_intInColumnWithIndex:0 atRowIndex:0]), @"Value 2 expected");
     
-    STAssertFalse(([t insertRow:@{ @"first": @"Hello" } atIndex:0]), @"Wrong type");
+    STAssertThrows(([t insertRow:@{ @"first": @"Hello" } atIndex:0]), @"Wrong type");
     STAssertEquals((size_t)2, ([t rowCount]), @"Expected 2 rows");
     
     STAssertTrue(([t insertRow:@{ @"first": @3, @"second": @"Hello"} atIndex:0]), @"Has 'first'");
@@ -198,7 +198,7 @@
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
     STAssertEquals((int64_t)1, ([t TDB_intInColumnWithIndex:0 atRowIndex:0]), @"Value 1 expected");
     STAssertTrue(([[t TDB_stringInColumnWithIndex:1 atRowIndex:0] isEqualToString:@"Hello"]), @"Value 'Hello' expected");
-    STAssertFalse(([t addRow:@{@"first": @1, @"second": @2}]), @"addRowWithLabels 2");
+    STAssertThrows(([t addRow:@{@"first": @1, @"second": @2}]), @"addRowWithLabels 2");
 }
 
 
@@ -876,7 +876,6 @@
     [cursor setInt:100 inColumnWithIndex:0];
 
     NSNumber *mixInt1   = [NSNumber numberWithInt:1];
-    //TDBMixed* mixSubtab = [TDBMixed mixedWithTable:subtab2];
 
     TDBRow* c;
     c = [table addEmptyRow];
