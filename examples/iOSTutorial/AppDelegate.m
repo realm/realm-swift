@@ -100,7 +100,7 @@ void tableFunc() {
     NSUInteger cnt3 = [q countRows];                     // =&gt; 2
     NSLog(@"RowCount: %i", cnt3);
 
-    // Get the average age (currently only a low-level interface)
+     // You can do aggregates on columns, like calculating the average age
     double avg = [q.Age avg];
     NSLog(@"Avg age: %f", avg);
 
