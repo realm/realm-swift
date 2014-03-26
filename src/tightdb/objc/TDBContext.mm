@@ -167,7 +167,7 @@ using namespace std;
     return m_shared_group->pin_read_transactions();
 }
 
--(void)unpinReadTransactions;
+-(void)unpinReadTransactions
 {
     m_shared_group->unpin_read_transactions();
 }
