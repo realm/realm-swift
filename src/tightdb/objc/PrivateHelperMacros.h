@@ -3,7 +3,7 @@
  * TIGHTDB CONFIDENTIAL
  * __________________
  *
- *  [2011] - [2012] TightDB Inc
+ *  [2011] - [2014] TightDB Inc
  *  All Rights Reserved.
  *
  * NOTICE:  All information contained herein is, and remains
@@ -41,7 +41,7 @@
 #define TIGHTDB_TYPE_Float     float
 #define TIGHTDB_TYPE_Double    double
 #define TIGHTDB_TYPE_String    NSString*
-#define TIGHTDB_TYPE_Binary    TDBBinary*
+#define TIGHTDB_TYPE_Binary    NSData *
 #define TIGHTDB_TYPE_Date      NSDate *
 #define TIGHTDB_TYPE_Mixed     TDBMixed*
 
@@ -143,8 +143,8 @@
 #define TIGHTDB_COLUMN_INSERT(table, col, row, value, type)                TIGHTDB_COLUMN_INSERT_2(TIGHTDB_IS_SUBTABLE(type), table, col, row, value, type)
 #define TIGHTDB_COLUMN_INSERT_2(is_subtable, table, col, row, value, type) TIGHTDB_COLUMN_INSERT_3(is_subtable, table, col, row, value, type)
 #define TIGHTDB_COLUMN_INSERT_3(is_subtable, table, col, row, value, type) TIGHTDB_COLUMN_INSERT_4_##is_subtable(table, col, row, value, type)
-#define TIGHTDB_COLUMN_INSERT_4_Y(table, col, _row, value, type)           [table TDBInsertSubtableCopy:col row:_row subtable:value]
-#define TIGHTDB_COLUMN_INSERT_4_N(table, col, row, _value, type)           [table TDBInsert##type:col ndx:row value:_value]
+#define TIGHTDB_COLUMN_INSERT_4_Y(table, col, _row, value, type)           [table TDB_insertSubtableCopy:col row:_row subtable:value]
+#define TIGHTDB_COLUMN_INSERT_4_N(table, col, row, _value, type)           [table TDB_insert##type:col ndx:row value:_value]
 
 
 
@@ -426,32 +426,32 @@
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Binary(table, col_name) \
 @interface table##QueryAccessor##col_name : TDBQueryAccessorBinary \
--(table##Query*)columnIsEqualTo:(TDBBinary*)value; \
--(table##Query*)columnIsNotEqualTo:(TDBBinary*)value; \
--(table##Query*)columnBeginsWith:(TDBBinary*)value; \
--(table##Query*)columnEndsWith:(TDBBinary*)value; \
--(table##Query*)columnContains:(TDBBinary*)value; \
+-(table##Query*)columnIsEqualTo:(NSData*)value; \
+-(table##Query*)columnIsNotEqualTo:(NSData*)value; \
+-(table##Query*)columnBeginsWith:(NSData*)value; \
+-(table##Query*)columnEndsWith:(NSData*)value; \
+-(table##Query*)columnContains:(NSData*)value; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Binary(table, col_name) \
 @implementation table##QueryAccessor##col_name \
--(table##Query*)columnIsEqualTo:(TDBBinary*)value \
+-(table##Query*)columnIsEqualTo:(NSData*)value \
 { \
     return (table##Query*)[super columnIsEqualTo:value]; \
 } \
--(table##Query*)columnIsNotEqualTo:(TDBBinary*)value \
+-(table##Query*)columnIsNotEqualTo:(NSData*)value \
 { \
     return (table##Query*)[super columnIsNotEqualTo:value]; \
 } \
--(table##Query*)columnBeginsWith:(TDBBinary*)value \
+-(table##Query*)columnBeginsWith:(NSData*)value \
 { \
     return (table##Query*)[super columnBeginsWith:value]; \
 } \
--(table##Query*)columnEndsWith:(TDBBinary*)value \
+-(table##Query*)columnEndsWith:(NSData*)value \
 { \
     return (table##Query*)[super columnEndsWith:value]; \
 } \
--(table##Query*)columnContains:(TDBBinary*)value \
+-(table##Query*)columnContains:(NSData*)value \
 { \
     return (table##Query*)[super columnContains:value]; \
 } \

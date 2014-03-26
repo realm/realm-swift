@@ -10,6 +10,7 @@
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/TDBTransaction.h>
 #import <tightdb/objc/group.h>
+#import <tightdb/objc/PrivateTDB.h>
 
 TIGHTDB_TABLE_DEF_4(MyTable,
                     Name,  String,
@@ -43,11 +44,11 @@ TIGHTDB_TABLE_2(QueryTable,
 {
     size_t row;
     TDBTransaction* group = [TDBTransaction group];
-    NSLog(@"HasTable: %i", [group hasTableWithName:@"employees" withTableClass:[MyTable class]] );
+    NSLog(@"HasTable: %i", [group hasTableWithName:@"employees"] );
     // Create new table in group
-    MyTable* table = [group getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
+    MyTable* table = [group createTableWithName:@"employees" asTableClass:[MyTable class]];
     NSLog(@"Table: %@", table);
-    NSLog(@"HasTable: %i", [group hasTableWithName:@"employees" withTableClass:[MyTable class]] );
+    NSLog(@"HasTable: %i", [group hasTableWithName:@"employees"] );
 
     // Add some rows
     [table addName:@"John" Age:20 Hired:YES Spare:0];
@@ -98,7 +99,7 @@ TIGHTDB_TABLE_2(QueryTable,
     TDBView* res = [q findAll];
     for (size_t i = 0; i < [res rowCount]; i++) {
         // cursor missing. Only low-level interface!
-        NSLog(@"%zu: is %lld years old",i , [res intInColumnWithIndex:1 atRowIndex:i]);
+        NSLog(@"%zu: is %lld years old",i , [res TDB_intInColumnWithIndex:1 atRowIndex:i]);
     }
 
     //------------------------------------------------------
@@ -107,11 +108,11 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Write to disk
     [fm removeItemAtPath:@"employees.tightdb" error:nil];
-    [group writeContextToFile:@"employees.tightdb" withError:nil];
+    [group writeContextToFile:@"employees.tightdb" error:nil];
 
     // Load a group from disk (and print contents)
-    TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"employees.tightdb" withError:nil];
-    MyTable* diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
+    TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"employees.tightdb" error:nil];
+    MyTable* diskTable = [fromDisk getTableWithName:@"employees" asTableClass:[MyTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
 //    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
@@ -120,15 +121,15 @@ TIGHTDB_TABLE_2(QueryTable,
         MyTableRow* cursor = [diskTable rowAtIndex:i];
         NSLog(@"%zu: %@", i, [cursor Name]);
         NSLog(@"%zu: %@", i, cursor.Name);
-        NSLog(@"%zu: %@", i, [diskTable stringInColumnWithIndex:0 atRowIndex:i]);
+        NSLog(@"%zu: %@", i, [diskTable TDB_stringInColumnWithIndex:0 atRowIndex:i]);
     }
 
     // Write same group to memory buffer
-    TDBBinary* buffer = [group writeContextToBuffer];
+    NSData* buffer = [group writeContextToBuffer];
 
     // Load a group from memory (and print contents)
-    TDBTransaction* fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
-    MyTable* memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
+    TDBTransaction* fromMem = [TDBTransaction groupWithBuffer:buffer error:nil];
+    MyTable* memTable = [fromMem getTableWithName:@"employees" asTableClass:[MyTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         // ??? cursor
         NSLog(@"%zu: %@", i, memTable.Name);
@@ -139,7 +140,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testQuery
 {
     TDBTransaction* group = [TDBTransaction group];
-    QueryTable* table = [group getOrCreateTableWithName:@"Query table" asTableClass:[QueryTable class]];
+    QueryTable* table = [group createTableWithName:@"Query table" asTableClass:[QueryTable class]];
 
     // Add some rows
     [table addFirst:2 Second:@"a"];
@@ -184,7 +185,7 @@ TIGHTDB_TABLE_2(QueryTable,
         STAssertEquals((size_t)2, [q countRows], @"count != 2");
         TDBView* tv = [q findAll];
         STAssertEquals((size_t)2, [tv rowCount], @"count != 2");
-        STAssertEquals((int64_t)8, [tv intInColumnWithIndex:0 atRowIndex:1], @"First != 8");
+        STAssertEquals((int64_t)8, [tv TDB_intInColumnWithIndex:0 atRowIndex:1], @"First != 8");
     }
 }
 
@@ -196,7 +197,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testSubtables
 {
     TDBTransaction* group = [TDBTransaction group];
-    TDBTable* table = [group getOrCreateTableWithName:@"table" asTableClass:[TDBTable class]];
+    TDBTable* table = [group createTableWithName:@"table" asTableClass:[TDBTable class]];
 
     // Specify the table type
     {
@@ -215,19 +216,19 @@ TIGHTDB_TABLE_2(QueryTable,
     int COL_SUBTABLE_INT = 0;
 
     // Add a row to the top level table
-    [table addEmptyRow];
-    [table setInt:700 inColumnWithIndex:COL_TABLE_INT atRowIndex:0];
+    [table addRow:nil];
+    [table TDB_setInt:700 inColumnWithIndex:COL_TABLE_INT atRowIndex:0];
 
     // Add two rows to the subtable
-    TDBTable* subtable = [table tableInColumnWithIndex:COL_TABLE_TAB atRowIndex:0];
-    [subtable addEmptyRow];
+    TDBTable* subtable = [table TDB_tableInColumnWithIndex:COL_TABLE_TAB atRowIndex:0];
+    [subtable addRow:nil];
 
-    [subtable setInt:800 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:0];
-    [subtable addEmptyRow];
-    [subtable setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
+    [subtable TDB_setInt:800 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:0];
+    [subtable addRow:nil];
+    [subtable TDB_setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
 
     // Make the mixed values column contain another subtable
-    [table setMixed:[TDBMixed mixedWithTable:nil] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
+    [table TDB_setMixed:[TDBMixed mixedWithTable:nil] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
 
 /* Fails!!!
     // Specify its type

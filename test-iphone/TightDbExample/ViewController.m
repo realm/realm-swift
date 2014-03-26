@@ -36,6 +36,11 @@ TIGHTDB_TABLE_2(MyTable2,
     _utils = [[Utils alloc] initWithView:(UIScrollView *)self.view];
     [self testGroup];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [_utils OutGroup:GROUP_RUN msg:[NSString stringWithFormat:@""]];
+        });
+        
         Performance *perf = [[Performance alloc] initWithUtils:_utils];
         [perf testInsert];
         [perf testFetch];
@@ -67,11 +72,11 @@ TIGHTDB_TABLE_2(MyTable2,
 {
    // TDBTransaction *group = [TDBTransaction group];
     // Create new table in group
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:@"employees.tightdb" withError:nil];
+    TDBContext *context = [TDBContext contextWithPersistenceToFile:@"employees.tightdb" error:nil];
     
     [context writeWithBlock:^BOOL(TDBTransaction *group) {
         
-        MyTable *table = [group getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
+        MyTable *table = [group createTableWithName:@"employees" asTableClass:[MyTable class]];
         
         // Add some rows
         [table addName:@"John" Age:20 Hired:YES Spare:0];
@@ -125,7 +130,7 @@ TIGHTDB_TABLE_2(MyTable2,
         TDBView *res = [q findAll];
         for (size_t i = 0; i < [res rowCount]; i++) {
             // cursor missing. Only low-level interface!
-            NSLog(@"%zu: is %lld years old",i , [res intInColumnWithIndex:i atRowIndex:i]);
+            NSLog(@"%zu: is %lld years old",i , [res TDB_intInColumnWithIndex:i atRowIndex:i]);
         }
         
         //------------------------------------------------------
@@ -138,64 +143,34 @@ TIGHTDB_TABLE_2(MyTable2,
         
         return YES;
 
-    } withError:nil];
+    } error:nil];
     
     // Load a group from disk (and print contents)
     
-    context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
+    context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"employees.tightdb"] error:nil];
     
     [context writeWithBlock:^BOOL(TDBTransaction *transaction) {
-        MyTable *diskTable = [transaction getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
+        MyTable *diskTable = [transaction getTableWithName:@"employees" asTableClass:[MyTable class]];
         
         [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
         [diskTable insertEmptyRowAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
         NSLog(@"Disktable size: %i", [diskTable rowCount]);
         for (size_t i = 0; i < [diskTable rowCount]; i++) {
-            MyTableRow *cursor = [diskTable rowAtIndex:i];
-            NSLog(@"%zu: %@", i, [cursor Name]);
-            NSLog(@"%zu: %@", i, cursor.Name);
-            NSLog(@"%zu: %@", i, [diskTable stringInColumnWithIndex:0 atRowIndex:i]);
+            MyTableRow *row = [diskTable rowAtIndex:i];
+            NSLog(@"%zu: %@", i, row.Name);
+            NSLog(@"%zu: %@", i, [diskTable TDB_stringInColumnWithIndex:0 atRowIndex:i]);
         }
         
         // Write same group to memory buffer
        //buffer = [transaction writeContextToBuffer];
         return YES;
-    } withError:nil];
+    } error:nil];
 
 
-#ifdef TDB_GROUP_IMPLEMENTED
-    // Load a group from disk (and print contents)
-    TDBTransaction *fromDisk = [TDBTransaction groupWithFile:[_utils pathForDataFile:@"employees.tightdb"] withError:nil];
-    MyTable *diskTable = [fromDisk getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
-
-    [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
-    [diskTable insertEmptyRowAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
-    NSLog(@"Disktable size: %i", [diskTable rowCount]);
-    for (size_t i = 0; i < [diskTable rowCount]; i++) {
-        MyTable_Row *row = [diskTable rowAtIndex:i];
-        NSLog(@"%zu: %@", i, [row Name]);
-        NSLog(@"%zu: %@", i, row.Name);
-        NSLog(@"%zu: %@", i, [diskTable stringInColumnWithIndex:0 atRowIndex:i]);
-    }
-
-
-    // Load a group from memory (and print contents)
-    TDBTransaction *fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
-
-    // Load a group from memory (and print contents)
-    TDBTransaction *fromMem = [TDBTransaction groupWithBuffer:buffer withError:nil];
-    MyTable *memTable = [fromMem getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
-
-    for (MyTable_Row *row in memTable)
-    {
-        NSLog(@"From mem: %@ is %lld years old.", row.Name, row.Age);
-    }
-    
-#endif
     
     [context readWithBlock:^(TDBTransaction *transaction) {
         
-        MyTable *diskTable = [transaction getOrCreateTableWithName:@"employees" asTableClass:[MyTable class]];
+        MyTable *diskTable = [transaction getTableWithName:@"employees" asTableClass:[MyTable class]];
         
         // 1: Iterate over table
         for (MyTableRow *row in diskTable)

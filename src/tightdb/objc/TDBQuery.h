@@ -3,7 +3,7 @@
  * TIGHTDB CONFIDENTIAL
  * __________________
  *
- *  [2011] - [2012] TightDB Inc
+ *  [2011] - [2014] TightDB Inc
  *  All Rights Reserved.
  *
  * NOTICE:  All information contained herein is, and remains
@@ -20,7 +20,6 @@
 
 #import <Foundation/Foundation.h>
 
-@class TDBBinary;
 @class TDBTable;
 @class TDBView;
 
@@ -65,7 +64,7 @@
 -(TDBQuery *)stringIsEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)stringIsCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)dateIsEqualTo:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
--(TDBQuery *)binaryIsEqualTo:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBQuery *)binaryIsEqualTo:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
 
 
 -(TDBQuery *)intIsNotEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
@@ -74,7 +73,7 @@
 -(TDBQuery *)stringIsNotEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)stringIsNotCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)dateIsNotEqualTo:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
--(TDBQuery *)binaryIsNotEqualTo:(TDBBinary *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBQuery *)binaryIsNotEqualTo:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
 
 -(TDBQuery *)dateIsGreaterThan:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)intIsGreaterThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
@@ -176,11 +175,11 @@
 
 @interface TDBQueryAccessorBinary: NSObject
 -(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery *)query;
--(TDBQuery *)columnIsEqualTo:(TDBBinary *)value;
--(TDBQuery *)columnIsNotEqualTo:(TDBBinary *)value;
--(TDBQuery *)columnBeginsWith:(TDBBinary *)value;
--(TDBQuery *)columnEndsWith:(TDBBinary *)value;
--(TDBQuery *)columnContains:(TDBBinary *)value;
+-(TDBQuery *)columnIsEqualTo:(NSData *)value;
+-(TDBQuery *)columnIsNotEqualTo:(NSData *)value;
+-(TDBQuery *)columnBeginsWith:(NSData *)value;
+-(TDBQuery *)columnEndsWith:(NSData *)value;
+-(TDBQuery *)columnContains:(NSData *)value;
 @end
 
 

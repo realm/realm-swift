@@ -162,7 +162,8 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
 
     // Add rows
     for (int i = 0; i < TABLE_SIZE; i++) {
-        cursor = [table addEmptyRow];
+        NSUInteger rowIndex = [table addRow:nil];
+        cursor = [table rowAtIndex:rowIndex];
         [cursor setString:[@"Person_" stringByAppendingString: [NSString stringWithFormat:@"%d",i]] inColumnWithIndex:NAME];
         [cursor setInt:i inColumnWithIndex:AGE];
         [cursor setBool:i%2 == 0 inColumnWithIndex:HIRED];
@@ -179,7 +180,8 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
     }
 
     // Insert a row
-    cursor = [table insertEmptyRowAtIndex:INSERT_ROW];
+    [table insertRow:nil atIndex:INSERT_ROW];
+    cursor = [table rowAtIndex:INSERT_ROW];
     [cursor setString:@"Person_Inserted" inColumnWithIndex:NAME];
     [cursor setInt:99 inColumnWithIndex:AGE];
     [cursor setBool:YES inColumnWithIndex:HIRED];

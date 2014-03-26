@@ -3,7 +3,7 @@
  * TIGHTDB CONFIDENTIAL
  * __________________
  *
- *  [2011] - [2012] TightDB Inc
+ *  [2011] - [2014] TightDB Inc
  *  All Rights Reserved.
  *
  * NOTICE:  All information contained herein is, and remains
@@ -18,13 +18,12 @@
  *
  **************************************************************************/
 
-#import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBMixed.h>
-#import <tightdb/objc/TDBView.h>
-#import <tightdb/objc/TDBBinary.h>
-#import <tightdb/objc/TDBQuery.h>
-#import <tightdb/objc/TDBRow.h>
-#import <tightdb/objc/helper_macros.h>
-#import <tightdb/objc/table_macros.h>
-#import <tightdb/objc/TDBContext.h>
-#import <tightdb/objc/TDBVersion.h>
+#import <Foundation/Foundation.h>
+
+#include <tightdb/binary_data.hpp>
+
+@interface NSData (TDBGetBinaryData)
+
+@property (nonatomic, readonly) tightdb::BinaryData tdbBinaryData;
+
+@end
