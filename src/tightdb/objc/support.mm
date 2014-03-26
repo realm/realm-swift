@@ -111,7 +111,6 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
 {
     DataType type = descr.get_column_type(col_ndx);
     StringData name = descr.get_column_name(col_ndx);
-
     switch (type) {
         case type_String:
             if (![obj isKindOfClass:[NSString class]])
@@ -188,6 +187,7 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
                         return NO;
                     verify_row(*subdescr, (NSArray *)subobj);
                 }
+                break;
             }
             if ([obj isKindOfClass:[TDBTable class]])
                 break;
@@ -197,7 +197,7 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
 }
 
 
-void verify_row(const Descriptor& descr, NSArray * data)
+void verify_row(const Descriptor& descr, NSArray* data)
 {
     if (descr.get_column_count() != [data count]) {
         NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_count"
@@ -209,7 +209,6 @@ void verify_row(const Descriptor& descr, NSArray * data)
     NSEnumerator *enumerator = [data objectEnumerator];
     id obj;
 
-    /* FIXME: handling of tightdb exceptions => return NO */
     size_t col_ndx = 0;
     while (obj = [enumerator nextObject]) {
         if (!verify_cell(descr, col_ndx, obj)) {
