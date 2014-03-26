@@ -220,6 +220,130 @@ TIGHTDB_TABLE_2(SharedTable2,
     }];
 }
 
+-(void)testPinnedTransactions
+{
+    NSString *contextPath = @"pinnedTransactions.tightdb";
+    NSFileManager* fm = [NSFileManager defaultManager];
+    [fm removeItemAtPath:contextPath error:nil];
+    [fm removeItemAtPath:[contextPath stringByAppendingString:@".lock"] error:nil];
+   
+    TDBContext *context1 = [TDBContext contextWithPersistenceToFile:contextPath error:nil];
+    TDBContext *context2 = [TDBContext contextWithPersistenceToFile:contextPath error:nil];
+    
+    {
+        // initially, always say that the db has changed
+        BOOL changed = [context2 pinReadTransactions];
+        STAssertTrue(changed, nil);
+        [context2 unpinReadTransactions];
+        // asking again - this time there is no change
+        changed = [context2 pinReadTransactions];
+        STAssertFalse(changed, nil);
+
+        [context2 unpinReadTransactions];
+    }
+    {   // add something to the db to play with
+        [context1 writeWithBlock:^BOOL(TDBTransaction *transaction) {
+            TDBTable *t1 = [transaction createTableWithName:@"test"];
+            [t1 addColumnWithName:@"col0" andType:TDBBoolType];
+            [t1 addRow:@[@YES]];
+            //t1->add(0, 2, false, "test");
+            return YES;
+        } error:nil];
+        
+    }
+    {   // validate that we can see previous commit from within a new pinned transaction
+        BOOL changed = [context2 pinReadTransactions];
+        STAssertTrue(changed, nil);
+        [context2 readWithBlock:^(TDBTransaction *transaction) {
+            TDBTable *t = [transaction getTableWithName:@"test"];
+            STAssertEquals([[t rowAtIndex:0] boolInColumnWithIndex:0], YES, nil);
+        }];
+        
+    }
+    {   // commit new data in another context, without unpinning
+        [context1 writeWithBlock:^BOOL(TDBTransaction *transaction) {
+            TDBTable *t = [transaction getTableWithName:@"test"];
+            [t addRow:@[@NO]];
+            return YES;
+        } error:nil];
+        
+    }
+    {   // validate that we can see previous commit if we're not pinned
+        [context1 readWithBlock:^(TDBTransaction *transaction) {
+            TDBTable *t = [transaction getTableWithName:@"test"];
+            STAssertEquals([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, nil);
+        }];
+        
+    }
+     /*{   // validate that we can NOT see previous commit from within a pinned transaction
+        ReadTransaction rt(sg2);
+        TestTableShared::ConstRef t1 = rt.get_table<TestTableShared>("test");
+        CHECK_EQUAL(2, t1[0].second);
+    }
+    {   // unpin, pin again and validate that we can now see previous commit
+        sg2.unpin_read_transactions();
+        bool changed = sg2.pin_read_transactions();
+        CHECK(changed);
+        ReadTransaction rt(sg2);
+        TestTableShared::ConstRef t1 = rt.get_table<TestTableShared>("test");
+        CHECK_EQUAL(5, t1[0].second);
+    }
+    {   // can't pin if already pinned
+        bool is_ok = false;
+        try {
+            sg2.pin_read_transactions();
+        } catch (runtime_error&) {
+            is_ok = true;
+        }
+        CHECK(is_ok);
+        sg2.unpin_read_transactions();
+    }
+    {   // can't unpin if already unpinned
+        bool is_ok = false;
+        try {
+            sg2.unpin_read_transactions();
+        } catch (runtime_error&) {
+            is_ok = true;
+        }
+        CHECK(is_ok);
+    }
+    {   // can't pin while we're inside a transaction
+        ReadTransaction rt(sg1);
+        bool is_ok = false;
+        try {
+            sg1.pin_read_transactions();
+        } catch (runtime_error&) {
+            is_ok = true;
+        }
+        CHECK(is_ok);
+    }
+    {   // can't unpin while we're inside a transaction
+        sg1.pin_read_transactions();
+        {
+            ReadTransaction rt(sg1);
+            bool is_ok = false;
+            try {
+                sg1.unpin_read_transactions();
+            } catch (runtime_error&) {
+                is_ok = true;
+            }
+            CHECK(is_ok);
+        }
+        sg1.unpin_read_transactions();
+    }
+    {   // can't start a write transaction while pinned
+        sg1.pin_read_transactions();
+        bool is_ok = false;
+        try {
+            WriteTransaction rt(sg1);
+        } catch (runtime_error&) {
+            is_ok = true;
+        }
+        CHECK(is_ok);
+        sg1.unpin_read_transactions();
+    }*/
+}
+
 @end
 
 
