@@ -183,8 +183,7 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
                 while (subobj = [subenumerator nextObject]) {
                     if (![subobj isKindOfClass:[NSArray class]])
                         return NO;
-                    if (!verify_row(*subdescr, (NSArray *)subobj))
-                        return NO;
+                    verify_row(*subdescr, (NSArray *)subobj);
                 }
             }
             else {
@@ -196,14 +195,13 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
 }
 
 
-BOOL verify_row(const Descriptor& descr, NSArray * data)
+void verify_row(const Descriptor& descr, NSArray * data)
 {
     if (descr.get_column_count() != [data count]) {
         NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_count"
                                                          reason:@"Number of columns do not match"
                                                        userInfo:[NSMutableDictionary dictionary]];
         [exception raise];
-        return NO;
     }
 
     NSEnumerator *enumerator = [data objectEnumerator];
@@ -214,17 +212,16 @@ BOOL verify_row(const Descriptor& descr, NSArray * data)
     while (obj = [enumerator nextObject]) {
         if (!verify_cell(descr, col_ndx, obj)) {
             NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
-                                                             reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u", to_objc_string(descr.get_column_name(col_ndx)), col_ndx, descr.get_column_type(col_ndx) ]
+                                                             reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
+                                                                     to_objc_string(descr.get_column_name(col_ndx)), col_ndx, descr.get_column_type(col_ndx) ]
                                                            userInfo:[NSMutableDictionary dictionary]];
             [exception raise];
-            return NO;
         }
         ++col_ndx;
     }
-    return YES;
 }
 
-BOOL verify_row_with_labels(const Descriptor& descr, NSDictionary* data)
+void verify_row_with_labels(const Descriptor& descr, NSDictionary* data)
 {
     size_t n = descr.get_column_count();
     for (size_t i = 0; i != n; ++i) {
@@ -232,10 +229,14 @@ BOOL verify_row_with_labels(const Descriptor& descr, NSDictionary* data)
         id value = [data valueForKey:col_name];
         if (value == nil)
             continue;
-        if (!verify_cell(descr, i, value))
-            return NO;
+        if (!verify_cell(descr, i, value)) {
+            NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
+                                                             reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
+                                                                     to_objc_string(descr.get_column_name(i)), i, descr.get_column_type(i) ]
+                                                           userInfo:[NSMutableDictionary dictionary]];
+            [exception raise];
+        }
     }
-    return YES;
 }
 
 bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
@@ -354,7 +355,7 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
 }
 
 
-BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
+void insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
 {
     /*
        Assumption:
@@ -400,18 +401,14 @@ BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
                 }
                 
                 /* Fill in data */
-                if (!insert_row(subtable->size(), *subtable, subobj)) {
-                    return NO;
-                }
+                insert_row(subtable->size(), *subtable, subobj);
                 ++sub_ndx;
             }
         }
     }
-
-    return YES;
 }
 
-BOOL insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
+void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
 {
     bool subtables_seen = false;
     
@@ -439,14 +436,11 @@ BOOL insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
             }
             
             TableRef subtable = table.get_subtable(col_ndx, row_ndx);
-            /* fill in data */
             
-            if (!insert_row_with_labels(row_ndx, *subtable, (NSDictionary *)value)) {
-                return NO;
-            }
+            /* fill in data */
+            insert_row_with_labels(row_ndx, *subtable, (NSDictionary *)value);
         }
     }
-    return YES;
 }
 
 BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
@@ -521,14 +515,16 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                     NSEnumerator *enumerator = [(NSArray *)obj objectEnumerator];
                     id subobj;
                     while (subobj = [enumerator nextObject]) {
-                        if (!set_row(row_ndx, *subtable, (NSArray *)subobj)) {
-                            return NO;
-                        }
+                        set_row(row_ndx, *subtable, (NSArray *)subobj);
                     }
                 }
             }
             else {
-                return NO;
+                NSException* exception = [NSException exceptionWithName:@"tightdb:cannot insert subtable"
+                                                                 reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
+                                                                         to_objc_string(table.get_column_name(col_ndx)), col_ndx, table.get_column_type(col_ndx) ]
+                                                               userInfo:[NSMutableDictionary dictionary]];
+                [exception raise];
             }
             break;
         case type_Mixed:
@@ -581,29 +577,24 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
 }
 
 
-BOOL set_row(size_t row_ndx, Table& table, NSArray *data)
+void set_row(size_t row_ndx, Table& table, NSArray *data)
 {
     NSEnumerator *enumerator = [data objectEnumerator];
     id obj;
 
     size_t col_ndx = 0;
     while (obj = [enumerator nextObject]) {
-        if (!set_cell(col_ndx, row_ndx, table, obj)) {
-            return NO;
-        }
+        set_cell(col_ndx, row_ndx, table, obj);
         ++col_ndx;
     }
-    return YES;
 }
 
-BOOL set_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
+void set_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
 {
     size_t count = table.get_column_count();
     for (size_t col_ndx = 0; col_ndx != count; ++col_ndx) {
         NSString *col_name = to_objc_string(table.get_column_name(col_ndx));
         id value = [data valueForKey:col_name];
-        if (!set_cell(col_ndx, row_ndx, table, value))
-            return NO;
+        set_cell(col_ndx, row_ndx, table, value);
     }
-    return YES;
 }
