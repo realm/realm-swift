@@ -164,12 +164,29 @@ using namespace std;
 
 -(BOOL)pinReadTransactions
 {
-    return m_shared_group->pin_read_transactions();
+    try {
+        return m_shared_group->pin_read_transactions();
+    }
+    catch(std::exception& ex) { 
+        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                         reason:[NSString stringWithUTF8String:ex.what()]
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
+    return NO;
 }
 
 -(void)unpinReadTransactions
 {
-    m_shared_group->unpin_read_transactions();
+    try {
+        m_shared_group->unpin_read_transactions();
+    }
+    catch(std::exception& ex) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                         reason:[NSString stringWithUTF8String:ex.what()]
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
 }
 
 @end
