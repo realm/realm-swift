@@ -604,45 +604,69 @@ EOF
         ;;
 
     "build-test-core")
-        TMP=$(mktemp -d /tmp/tightdb.objc.build-test-core.XXXX)
-        function build_test_core_fail {
-            rm -rf "$TMP"
-            exit 1
-        }
+        mkdir -p test-core || exit 1
+        rm -rf test-core/* || exit 1
+        cd test-core
+
+        DIR="iOSTestCoreAppTests"
+        
+        mkdir -p "$DIR" || exit 1
+        rm -rf "$DIR/*" || exit 1
 
         function build_test_core_cp {
-        mkdir "$TMP/$2" || build_test_core_fail
-        find "../tightdb/$1/" -maxdepth 1 \
-          -type f -iregex '^.*\.[ch]\(pp\)?$' \
-          -exec cp {} "$TMP/$2/" \; || build_test_core_fail
+        mkdir -p "$DIR/$2" || exit 1
+        find "../../tightdb/$1/" -maxdepth 1 \
+          -type f -iregex "^.*\.[ch]\(pp\)\{0,1\}$" \
+          -exec cp {} "$DIR/$2/" \; || exit 1
         }
 
-        cp ../tightdb/src/tightdb.hpp "$TMP/"
+        cp ../../tightdb/src/tightdb.hpp "$DIR/"
         build_test_core_cp src/tightdb tightdb
         build_test_core_cp src/tightdb/util tightdb/util
         build_test_core_cp src/tightdb/impl tightdb/impl
-
-        find ../tightdb/test/ -maxdepth 1 \
-          -type f -iregex '^.*\.[ch]\(pp\)?$' \
-          -exec cp {} "$TMP/" \;
-        mkdir "$TMP/util"
-        find ../tightdb/test/util/ -maxdepth 1 \
-          -type f -iregex '^.*\.[ch]\(pp\)?$' \
-          -exec cp {} "$TMP/util/" \;
-        mkdir "$TMP/large_tests"
-        find ../tightdb/test/large_tests/ -maxdepth 1 \
-          -type f -iregex '^.*\.[ch]\(pp\)?$' \
-          -exec cp {} "$TMP/large_tests/" \;
+ 
+        build_test_core_cp test
+        build_test_core_cp test/util util
+        build_test_core_cp test/large_tests large_tests
 
         build_test_core_cp test/UnitTest++/src UnitTest++
         build_test_core_cp test/UnitTest++/src/Posix UnitTest++/Posix
 
-        mkdir -p test-core || exit 1
-        (cd test-core && cmake -G Xcode "$TMP") || 
-        rm -rf test-core/* || exit 1
+        rm "$DIR/main.cpp"
+        rm "$DIR/tightdb/config_tool.cpp"
+        rm "$DIR/tightdb/importer_tool.cpp"
+        rm "$DIR/tightdb/tightdbd.cpp"
 
-        rm -rf "$TMP"
-        echo "Test passed"
+        cat >"$DIR/iOSTestCoreAppTests.mm" <<EOF
+#import <XCTest/XCTest.h>
+#include "run_tests.hpp"
+
+@interface iOSTestCoreAppTests : XCTestCase
+
+@end
+
+@implementation iOSTestCoreAppTests
+
+-(void)testRunTests
+{
+    run_tests(0, NULL);
+}
+
+@end
+EOF
+
+        cat >"$DIR/CMakeLists.txt" <<EOF
+cmake_minimum_required(VERSION 2.6)
+project(iOSTestCoreApp)
+enable_testing()
+file(GLOB SRC *.mm *.cpp)
+add_library(run_tests \${SRC})
+add_test(TestName ExeName)
+EOF
+
+        cmake -G Xcode "$DIR" || exit 1
+        cd ..
+        echo "Done building"
         exit 0
         ;;
 
