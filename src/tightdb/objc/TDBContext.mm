@@ -165,12 +165,12 @@ using namespace std;
     return NO;
 }
 
--(BOOL)writeTable:(NSString*)tablename withBlock:(TDBTableWriteBlock)block withError:(NSError **)error
+-(BOOL)writeTable:(NSString*)tablename withBlock:(TDBTableWriteBlock)block error:(NSError **)error
 {
     return [self writeWithBlock:^(TDBTransaction* trx){
         TDBTable *table = [trx getTableWithName:tablename];
         return block(table);
-    } withError: error];
+    } error: error];
 }
 
 -(BOOL) hasChangedSinceLastTransaction

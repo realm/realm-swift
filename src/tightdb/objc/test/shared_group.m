@@ -151,26 +151,23 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:@"singleTest.tightdb" error:nil];
     [fm removeItemAtPath:@"singleTest.tightdb.lock" error:nil];
 
-    TDBContext* ctx = [TDBContext contextWithPersistenceToFile:@"singleTest.tightdb" withError:nil];
+    TDBContext* ctx = [TDBContext contextWithPersistenceToFile:@"singleTest.tightdb" error:nil];
 
     [ctx writeWithBlock:^(TDBTransaction *trx) {
-        TDBTable *t = [trx getOrCreateTableWithName:@"table"];
-
+        TDBTable *t = [trx createTableWithName:@"table"];
         [t addColumnWithName:@"col0" andType:TDBIntType];
-        TDBRow *row = [t addEmptyRow];
-        [row setInt:10 inColumnWithIndex:0 ];
-
+        [t addRow:@[@10]];
         return YES;
-    } withError:nil];
+    } error:nil];
 
     [ctx readTable:@"table" withBlock:^(TDBTable* table) {
         STAssertTrue([table rowCount] == 1, @"No rows have been removed");
     }];
 
     [ctx writeTable:@"table" withBlock:^(TDBTable* table) {
-        [table appendRow:@[@10]];
+        [table addRow:@[@10]];
         return YES;
-    } withError:nil];
+    } error:nil];
 
     [ctx readTable:@"table" withBlock:^(TDBTable* table) {
         STAssertTrue([table rowCount] == 2, @"Rows were added");
