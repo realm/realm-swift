@@ -130,7 +130,7 @@ TIGHTDB_TABLE_2(MyTable2,
         TDBView *res = [q findAll];
         for (size_t i = 0; i < [res rowCount]; i++) {
             // cursor missing. Only low-level interface!
-            NSLog(@"%zu: is %lld years old",i , [res intInColumnWithIndex:i atRowIndex:i]);
+            NSLog(@"%zu: is %lld years old",i , [res TDB_intInColumnWithIndex:i atRowIndex:i]);
         }
         
         //------------------------------------------------------
@@ -158,7 +158,7 @@ TIGHTDB_TABLE_2(MyTable2,
         for (size_t i = 0; i < [diskTable rowCount]; i++) {
             MyTableRow *row = [diskTable rowAtIndex:i];
             NSLog(@"%zu: %@", i, row.Name);
-            NSLog(@"%zu: %@", i, [diskTable stringInColumnWithIndex:0 atRowIndex:i]);
+            NSLog(@"%zu: %@", i, [diskTable TDB_stringInColumnWithIndex:0 atRowIndex:i]);
         }
         
         // Write same group to memory buffer
