@@ -27,9 +27,9 @@
 
 #import <tightdb/objc/TDBQuery.h>
 #import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBTable_priv.h>
+#import <tightdb/objc/TDBTable_noinst.h>
 #import <tightdb/objc/TDBView.h>
-#import <tightdb/objc/TDBView_priv.h>
+#import <tightdb/objc/TDBView_noinst.h>
 #import <tightdb/objc/TDBRow.h>
 #import "NSData+TDBGetBinaryData.h"
 

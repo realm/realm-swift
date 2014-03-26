@@ -10,6 +10,7 @@
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/TDBTransaction.h>
 #import <tightdb/objc/group.h>
+#import <tightdb/objc/PrivateTDB.h>
 
 TIGHTDB_TABLE_DEF_4(MyTable,
                     Name,  String,
@@ -98,7 +99,7 @@ TIGHTDB_TABLE_2(QueryTable,
     TDBView* res = [q findAll];
     for (size_t i = 0; i < [res rowCount]; i++) {
         // cursor missing. Only low-level interface!
-        NSLog(@"%zu: is %lld years old",i , [res intInColumnWithIndex:1 atRowIndex:i]);
+        NSLog(@"%zu: is %lld years old",i , [res TDB_intInColumnWithIndex:1 atRowIndex:i]);
     }
 
     //------------------------------------------------------
@@ -120,7 +121,7 @@ TIGHTDB_TABLE_2(QueryTable,
         MyTableRow* cursor = [diskTable rowAtIndex:i];
         NSLog(@"%zu: %@", i, [cursor Name]);
         NSLog(@"%zu: %@", i, cursor.Name);
-        NSLog(@"%zu: %@", i, [diskTable stringInColumnWithIndex:0 atRowIndex:i]);
+        NSLog(@"%zu: %@", i, [diskTable TDB_stringInColumnWithIndex:0 atRowIndex:i]);
     }
 
     // Write same group to memory buffer
@@ -184,7 +185,7 @@ TIGHTDB_TABLE_2(QueryTable,
         STAssertEquals((size_t)2, [q countRows], @"count != 2");
         TDBView* tv = [q findAll];
         STAssertEquals((size_t)2, [tv rowCount], @"count != 2");
-        STAssertEquals((int64_t)8, [tv intInColumnWithIndex:0 atRowIndex:1], @"First != 8");
+        STAssertEquals((int64_t)8, [tv TDB_intInColumnWithIndex:0 atRowIndex:1], @"First != 8");
     }
 }
 
@@ -216,18 +217,18 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Add a row to the top level table
     [table addRow:nil];
-    [table setInt:700 inColumnWithIndex:COL_TABLE_INT atRowIndex:0];
+    [table TDB_setInt:700 inColumnWithIndex:COL_TABLE_INT atRowIndex:0];
 
     // Add two rows to the subtable
-    TDBTable* subtable = [table tableInColumnWithIndex:COL_TABLE_TAB atRowIndex:0];
+    TDBTable* subtable = [table TDB_tableInColumnWithIndex:COL_TABLE_TAB atRowIndex:0];
     [subtable addRow:nil];
 
-    [subtable setInt:800 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:0];
+    [subtable TDB_setInt:800 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:0];
     [subtable addRow:nil];
-    [subtable setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
+    [subtable TDB_setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
 
     // Make the mixed values column contain another subtable
-    [table setMixed:[TDBMixed mixedWithTable:nil] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
+    [table TDB_setMixed:[TDBMixed mixedWithTable:nil] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
 
 /* Fails!!!
     // Specify its type
