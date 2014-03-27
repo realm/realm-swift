@@ -30,6 +30,7 @@
 @property (nonatomic, readonly) NSUInteger columnCount;
 @property (nonatomic, readonly) TDBTable *originTable;
 
+-(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
 -(TDBRow *)lastRow;
 -(TDBRow *)firstRow;
@@ -38,7 +39,6 @@
 
 -(void) sortUsingColumnWithIndex: (NSUInteger)colIndex;
 -(void) sortUsingColumnWithIndex: (NSUInteger)colIndex inOrder: (TDBSortOrder)order;
-
 
 -(void)removeRowAtIndex:(NSUInteger)rowIndex;
 -(void)removeAllRows;

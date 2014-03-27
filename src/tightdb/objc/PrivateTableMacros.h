@@ -35,7 +35,6 @@
 #import <tightdb/objc/TDBDescriptor.h>
 #import <tightdb/objc/TDBView.h>
 #import <tightdb/objc/TDBColumnProxy.h>
-#import <tightdb/objc/TDBMixed.h>
 #import <tightdb/objc/PrivateTDB.h>
 
 

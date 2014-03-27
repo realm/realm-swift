@@ -28,6 +28,7 @@
 @property (nonatomic, readonly) NSUInteger columnCount;
 
 // Getting and setting individual rows
+-(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
 -(TDBRow *)lastRow;
 -(TDBRow *)firstRow;
