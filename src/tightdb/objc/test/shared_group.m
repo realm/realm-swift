@@ -116,7 +116,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fromDisk writeWithBlock:^(TDBTransaction *group) {
         TDBTable *t = [group createTableWithName:@"table"];
         
-        [t addColumnWithName:@"col0" andType:TDBIntType];
+        [t addColumnWithName:@"col0" type:TDBIntType];
         NSUInteger rowIndex = [t addRow:nil];
         TDBRow *row = [t rowAtIndex:rowIndex];
         [row setInt:10 inColumnWithIndex:0 ];
@@ -166,7 +166,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     
     [sg writeWithBlock:^(TDBTransaction* group) {
         TDBTable *t = [group getTableWithName:@"t"];
-        [t addColumnWithName:@"col" andType:TDBBoolType];
+        [t addColumnWithName:@"col" type:TDBBoolType];
         NSUInteger rowIndex = [t addRow:nil];
         TDBRow *row = [t rowAtIndex:rowIndex];
         [row setBool:YES inColumnWithIndex:0];
@@ -244,7 +244,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     {   // add something to the db to play with
         [context1 writeWithBlock:^BOOL(TDBTransaction *transaction) {
             TDBTable *t1 = [transaction createTableWithName:@"test"];
-            [t1 addColumnWithName:@"col0" andType:TDBBoolType];
+            [t1 addColumnWithName:@"col0" type:TDBBoolType];
             [t1 addRow:@[@YES]];
             //t1->add(0, 2, false, "test");
             return YES;

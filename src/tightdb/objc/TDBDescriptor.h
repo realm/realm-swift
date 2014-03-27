@@ -27,18 +27,16 @@
 /**
  * Returns NO on memory allocation error.
  */
--(BOOL)addColumnWithName:(NSString *)name andType:(TDBType)type;
--(BOOL)addColumnWithName:(NSString *)name andType:(TDBType)type error:(NSError *__autoreleasing *)error;
+-(BOOL)addColumnWithName:(NSString *)name type:(TDBType)type;
 /**
  * Returns nil on memory allocation error.
  */
 -(TDBDescriptor *)addColumnTable:(NSString *)name;
--(TDBDescriptor *)addColumnTable:(NSString *)name error:(NSError *__autoreleasing *)error;
 -(TDBDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex;
 -(TDBDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex error:(NSError *__autoreleasing *)error;
 
--(TDBType)columnTypeOfColumn:(NSUInteger)colIndex;
--(NSString *)columnNameOfColumn:(NSUInteger)colIndex;
+-(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
+-(NSString *)nameOfColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)indexOfColumnWithName:(NSString *)name;
 @end
 

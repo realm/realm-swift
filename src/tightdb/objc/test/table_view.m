@@ -48,11 +48,11 @@
     
     STAssertEquals((size_t)0, [v columnCount], @"no columns added yet");
     
-    [t addColumnWithName:@"col0" andType:TDBIntType];
+    [t addColumnWithName:@"col0" type:TDBIntType];
     STAssertEquals([v columnCount],(size_t)1,  @"1 column added to table");
     
     for (int i=0;i<10;i++) {
-        [t addColumnWithName:@"name" andType:TDBIntType];
+        [t addColumnWithName:@"name" type:TDBIntType];
     }
     STAssertEquals([v columnCount],(size_t)11,  @"10 more columns added to table");
     
@@ -64,15 +64,15 @@
 {
     TDBTable *t = [[TDBTable alloc] init];
     
-    NSUInteger boolCol      = [t addColumnWithName:@"boolCol" andType:TDBBoolType];
-    NSUInteger binaryCol    = [t addColumnWithName:@"binaryCol" andType:TDBBinaryType];
-    NSUInteger dateCol      = [t addColumnWithName:@"dateCol" andType:TDBDateType];
-    NSUInteger doubleCol    = [t addColumnWithName:@"doubleCol" andType:TDBDoubleType];
-    NSUInteger floatCol     = [t addColumnWithName:@"floatCol" andType:TDBFloatType];
-    NSUInteger intCol       = [t addColumnWithName:@"intCol" andType:TDBIntType];
-    NSUInteger mixedCol     = [t addColumnWithName:@"MixedCol" andType:TDBMixedType];
-    NSUInteger stringCol    = [t addColumnWithName:@"stringCol" andType:TDBStringType];
-    NSUInteger tableCol     = [t addColumnWithName:@"tableCol" andType:TDBTableType];
+    NSUInteger boolCol      = [t addColumnWithName:@"boolCol" type:TDBBoolType];
+    NSUInteger binaryCol    = [t addColumnWithName:@"binaryCol" type:TDBBinaryType];
+    NSUInteger dateCol      = [t addColumnWithName:@"dateCol" type:TDBDateType];
+    NSUInteger doubleCol    = [t addColumnWithName:@"doubleCol" type:TDBDoubleType];
+    NSUInteger floatCol     = [t addColumnWithName:@"floatCol" type:TDBFloatType];
+    NSUInteger intCol       = [t addColumnWithName:@"intCol" type:TDBIntType];
+    NSUInteger mixedCol     = [t addColumnWithName:@"MixedCol" type:TDBMixedType];
+    NSUInteger stringCol    = [t addColumnWithName:@"stringCol" type:TDBStringType];
+    NSUInteger tableCol     = [t addColumnWithName:@"tableCol" type:TDBTableType];
     
     
     TDBQuery *q = [t where];
@@ -96,7 +96,7 @@
 - (void)testSortOnViewIntColumn
 {
     TDBTable *t = [[TDBTable alloc] init];
-    NSUInteger intCol = [t addColumnWithName:@"intCol" andType:TDBIntType];
+    NSUInteger intCol = [t addColumnWithName:@"intCol" type:TDBIntType];
     
     NSUInteger rowIndex = [t addRow:nil];
     TDBRow *row = [t rowAtIndex:rowIndex];
@@ -140,7 +140,7 @@
 - (void)testSortOnViewBoolColumn
 {
     TDBTable *t = [[TDBTable alloc] init];
-    NSUInteger boolCol = [t addColumnWithName:@"boolCol" andType:TDBBoolType];
+    NSUInteger boolCol = [t addColumnWithName:@"boolCol" type:TDBBoolType];
     
     TDBRow *row = [t rowAtIndex:[t addRow:nil]];
     [row setBool:YES inColumnWithIndex:boolCol];
@@ -182,7 +182,7 @@
 - (void)testSortOnViewDateColumn
 {
     TDBTable *t = [[TDBTable alloc] init];
-    NSUInteger dateCol = [t addColumnWithName:@"dateCol" andType:TDBDateType];
+    NSUInteger dateCol = [t addColumnWithName:@"dateCol" type:TDBDateType];
     
     
     NSDateFormatter *formatter = [[NSDateFormatter alloc]init];
@@ -236,15 +236,15 @@
 {
     TDBTable *t = [[TDBTable alloc] init];
     
-    NSUInteger boolCol      = [t addColumnWithName:@"boolCol" andType:TDBBoolType];
-    NSUInteger binaryCol    = [t addColumnWithName:@"binaryCol" andType:TDBBinaryType];
-    NSUInteger dateCol      = [t addColumnWithName:@"dateCol" andType:TDBDateType];
-    NSUInteger doubleCol    = [t addColumnWithName:@"doubleCol" andType:TDBDoubleType];
-    NSUInteger floatCol     = [t addColumnWithName:@"floatCol" andType:TDBFloatType];
-    NSUInteger intCol       = [t addColumnWithName:@"intCol" andType:TDBIntType];
-    NSUInteger mixedCol     = [t addColumnWithName:@"MixedCol" andType:TDBMixedType];
-    NSUInteger stringCol    = [t addColumnWithName:@"stringCol" andType:TDBStringType];
-    NSUInteger tableCol     = [t addColumnWithName:@"tableCol" andType:TDBTableType];
+    NSUInteger boolCol      = [t addColumnWithName:@"boolCol" type:TDBBoolType];
+    NSUInteger binaryCol    = [t addColumnWithName:@"binaryCol" type:TDBBinaryType];
+    NSUInteger dateCol      = [t addColumnWithName:@"dateCol" type:TDBDateType];
+    NSUInteger doubleCol    = [t addColumnWithName:@"doubleCol" type:TDBDoubleType];
+    NSUInteger floatCol     = [t addColumnWithName:@"floatCol" type:TDBFloatType];
+    NSUInteger intCol       = [t addColumnWithName:@"intCol" type:TDBIntType];
+    NSUInteger mixedCol     = [t addColumnWithName:@"MixedCol" type:TDBMixedType];
+    NSUInteger stringCol    = [t addColumnWithName:@"stringCol" type:TDBStringType];
+    NSUInteger tableCol     = [t addColumnWithName:@"tableCol" type:TDBTableType];
     
     TDBQuery *q = [t where];
     TDBView *v = [q findAllRows];
@@ -263,8 +263,8 @@
 - (void)testFirstLastRow
 {
     TDBTable *t = [[TDBTable alloc] init];
-    NSUInteger col0 = [t addColumnWithName:@"col" andType:TDBStringType];
-    NSUInteger col1 = [t addColumnWithName:@"col" andType:TDBIntType];
+    NSUInteger col0 = [t addColumnWithName:@"col" type:TDBStringType];
+    NSUInteger col1 = [t addColumnWithName:@"col" type:TDBIntType];
     
     TDBView *v = [[t where] findAllRows];
     
@@ -296,7 +296,7 @@
 - (void)testViewSubscripting
 {
     TDBTable* table = [[TDBTable alloc]init];
-    [table addColumnWithName:@"IntCol" andType:TDBIntType];
+    [table addColumnWithName:@"IntCol" type:TDBIntType];
     
     [table addRow:@[@10]];
     [table addRow:@[@42]];

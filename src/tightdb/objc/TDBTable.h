@@ -39,11 +39,12 @@
 -(instancetype)init;
 
 // Working with columns
--(NSUInteger)addColumnWithName:(NSString *)name andType:(TDBType)type;
+-(NSUInteger)addColumnWithName:(NSString *)name type:(TDBType)type;
 -(void)removeColumnWithIndex:(NSUInteger)colIndex;
+
 -(NSString *)nameOfColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)indexOfColumnWithName:(NSString *)name;
--(TDBType)columnTypeOfColumn:(NSUInteger)colIndex;
+-(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
 // Getting and setting individual rows (uses object subscripting)
 -(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
