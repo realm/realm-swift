@@ -26,7 +26,6 @@
 @class TDBQuery;
 @class TDBDescriptor;
 @class TDBRow;
-@class TDBMixed;
 
 /****************	  TDBTable		****************/
 
@@ -79,13 +78,10 @@
 
 // Table type and schema
 -(BOOL)isReadOnly;
--(BOOL)isEqual:(TDBTable *)other;
+-(BOOL)isEqual:(id)other;
 -(BOOL)hasSameDescriptorAs:(Class)otherTableClass;
 -(id)castClass:(Class)obj;
 
-
-
 -(TDBType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
-
 
 @end

@@ -40,7 +40,6 @@
 -(void) sortUsingColumnWithIndex: (NSUInteger)colIndex;
 -(void) sortUsingColumnWithIndex: (NSUInteger)colIndex inOrder: (TDBSortOrder)order;
 
-
 -(void)removeRowAtIndex:(NSUInteger)rowIndex;
 -(void)removeAllRows;
 

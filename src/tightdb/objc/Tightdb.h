@@ -19,7 +19,6 @@
  **************************************************************************/
 
 #import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBMixed.h>
 #import <tightdb/objc/TDBView.h>
 #import <tightdb/objc/TDBQuery.h>
 #import <tightdb/objc/TDBRow.h>
