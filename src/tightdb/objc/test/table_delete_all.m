@@ -7,7 +7,6 @@
 
 #import <tightdb/objc/TDBTable.h>
 #import <tightdb/objc/TDBDescriptor.h>
-#import <tightdb/objc/TDBMixed.h>
 #import <tightdb/objc/PrivateTDB.h>
 
 @interface MACTestTableDeleteAll: SenTestCase
@@ -54,13 +53,13 @@
         [table TDB_insertBinary:6 ndx:i data:"binary" size:7];
         switch (i % 3) {
             case 0:
-                [table TDB_insertMixed:7 ndx:i value:[TDBMixed mixedWithBool:NO]];
+                [table TDB_insertMixed:7 ndx:i value:[NSNumber numberWithBool:NO]];
                 break;
             case 1:
-                [table TDB_insertMixed:7 ndx:i value:[TDBMixed mixedWithInt64:i]];
+                [table TDB_insertMixed:7 ndx:i value:[NSNumber numberWithLongLong:i]];
                 break;
             case 2:
-                [table TDB_insertMixed:7 ndx:i value:[TDBMixed mixedWithString:@"string"]];
+                [table TDB_insertMixed:7 ndx:i value:[NSString stringWithUTF8String:"string"]];
                 break;
         }
         [table TDB_insertSubtable:8 ndx:i];

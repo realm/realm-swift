@@ -21,19 +21,95 @@
 #import <Foundation/Foundation.h>
 
 #include <tightdb/descriptor.hpp>
+#include <tightdb/binary_data.hpp>
+#include <tightdb/string_data.hpp>
 
 #import "TDBTable.h"
-#import "util.hpp"
+#import "TDBTable_noinst.h"
+#import "util_noinst.hpp"
 #import "NSData+TDBGetBinaryData.h"
-#import "support.h"
 
 using namespace tightdb;
+
+inline bool nsnumber_is_like_integer(NSObject *obj)
+{
+    const char* data_type = [(NSNumber *)obj objCType];
+    return (strcmp(data_type, @encode(int)) == 0 ||
+            strcmp(data_type, @encode(long)) ==  0 ||
+            strcmp(data_type, @encode(long long)) == 0 ||
+            strcmp(data_type, @encode(unsigned int)) == 0 ||
+            strcmp(data_type, @encode(unsigned long)) == 0 ||
+            strcmp(data_type, @encode(unsigned long long)) == 0);
+}
+
+inline bool nsnumber_is_like_float(NSObject *obj)
+{
+    const char* data_type = [(NSNumber *)obj objCType];
+    return (strcmp(data_type, @encode(float)) == 0 ||
+            strcmp(data_type, @encode(int)) == 0 ||
+            strcmp(data_type, @encode(long)) ==  0 ||
+            strcmp(data_type, @encode(long long)) == 0 ||
+            strcmp(data_type, @encode(unsigned int)) == 0 ||
+            strcmp(data_type, @encode(unsigned long)) == 0 ||
+            strcmp(data_type, @encode(unsigned long long)) == 0);
+}
+
+inline bool nsnumber_is_like_double(NSObject *obj)
+{
+    const char* data_type = [(NSNumber *)obj objCType];
+    return (strcmp(data_type, @encode(double)) == 0 ||
+            strcmp(data_type, @encode(float)) == 0 ||
+            strcmp(data_type, @encode(int)) == 0 ||
+            strcmp(data_type, @encode(long)) ==  0 ||
+            strcmp(data_type, @encode(long long)) == 0 ||
+            strcmp(data_type, @encode(unsigned int)) == 0 ||
+            strcmp(data_type, @encode(unsigned long)) == 0 ||
+            strcmp(data_type, @encode(unsigned long long)) == 0);
+}
+
+
+void to_mixed(id value, Mixed& m)
+{
+    if ([value isKindOfClass:[NSString class]]) {
+        StringData s([(NSString *)value UTF8String], [(NSString *)value length]);
+        m.set_string(s);
+        return;
+    }
+    if ([value isKindOfClass:[NSNumber class]]) {
+        if (strcmp([(NSNumber *)value objCType], @encode(BOOL)) == 0) {
+            m.set_bool([(NSNumber *)value boolValue]);
+            return;
+        }
+        if (nsnumber_is_like_integer(value)) {
+            m.set_int(int64_t([(NSNumber *)value longLongValue]));
+            return;
+        }
+        if (nsnumber_is_like_float(value)) {
+            m.set_float([(NSNumber *)value floatValue]);
+            return;
+        }
+        if (nsnumber_is_like_double(value)) {
+            m.set_double([(NSNumber *)value doubleValue]);
+            return;
+        }
+    }
+    if ([value isKindOfClass:[NSData class]]) {
+        m.set_binary([(NSData *)value tdbBinaryData]);
+        return;
+    }
+    if ([value isKindOfClass:[NSDate class]]) {
+        m.set_datetime(DateTime(time_t([(NSDate *)value timeIntervalSince1970])));
+        return;
+    }
+    if ([value isKindOfClass:[TDBTable class]])
+        m = Mixed(Mixed::subtable_tag());
+}
+
 
 BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
 {
     DataType type = descr.get_column_type(col_ndx);
     StringData name = descr.get_column_name(col_ndx);
-
     switch (type) {
         case type_String:
             if (![obj isKindOfClass:[NSString class]])
@@ -41,24 +117,15 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
             break;
         case type_Bool:
             if ([obj isKindOfClass:[NSNumber class]]) {
-                const char *data_type = [(NSNumber *)obj objCType];
-                const char dt = data_type[0];
-                if (dt == 'B' || dt == 'c')
+                if (strcmp([(NSNumber *)obj objCType], @encode(BOOL)) == 0)
                     break;
                 return NO;
             }
             break;
         case type_DateTime:
             if ([obj isKindOfClass:[NSNumber class]]) {
-                const char *data_type = [(NSNumber *)obj objCType];
-                const char dt = data_type[0];
-                /* time_t is an integer */
-                if (dt == 'i' || dt == 's' || dt == 'l' || dt == 'q' ||
-                    dt == 'I' || dt == 'S' || dt == 'L' || dt == 'Q')
+                if (nsnumber_is_like_integer(obj))
                     break;
-                else {
-                    return NO;
-                }
             }
             if ([obj isKindOfClass:[NSDate class]]) {
                 break;
@@ -66,54 +133,28 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
             return NO;
         case type_Int:
             if ([obj isKindOfClass:[NSNumber class]]) {
-                const char * data_type = [(NSNumber *)obj objCType];
-                const char dt = data_type[0];
-                /* FIXME: what about: 'c', 'C'  */
-                if (dt == 'i' || dt == 's' || dt == 'l' || dt == 'q' ||
-                    dt == 'I' || dt == 'S' || dt == 'L' || dt == 'Q')
+                if (nsnumber_is_like_integer(obj))
                     break;
-                else
-                    return NO;
             }
-            else {
-                return NO;
-            }
-            break;
+            return NO;
         case type_Float:
             if ([obj isKindOfClass:[NSNumber class]]) {
-                const char *data_type = [(NSNumber *)obj objCType];
-                const char dt = data_type[0];
-                /* FIXME: what about: 'c', 'C'  */
-                if (dt == 'i' || dt == 's' || dt == 'l' || dt == 'q' ||
-                    dt == 'I' || dt == 'S' || dt == 'L' || dt == 'Q' ||
-                    dt == 'f')
+                if (nsnumber_is_like_float(obj))
                     break;
-                else
-                    return NO;
             }
-            else
-                return NO;
-            break; /* FIXME: remove */
+            return NO;
         case type_Double:
             if ([obj isKindOfClass:[NSNumber class]]) {
-                const char * data_type = [(NSNumber *)obj objCType];
-                const char dt = data_type[0];
-                /* FIXME: what about: 'c', 'C'  */
-                if (dt == 'i' || dt == 's' || dt == 'l' || dt == 'q' ||
-                    dt == 'I' || dt == 'S' || dt == 'L' || dt == 'Q' ||
-                    dt == 'f' || dt == 'd')
+                if (nsnumber_is_like_double(obj))
                     break;
-                else
-                    return NO;
             }
-            else
-                return NO;
-            break; /* FIXME: remove */
+            return NO;
         case type_Binary:
             if ([obj isKindOfClass:[NSData class]])
                 break;
             return NO;
         case type_Mixed:
+            // FIXME: Do a proper check!
             /*            if ([obj isKindOfClass:[NSArray class]]) {
              TableRef t = Table::create();
              NSEnumerator *subobj = [obj objectEnumerator];
@@ -144,48 +185,44 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
                 while (subobj = [subenumerator nextObject]) {
                     if (![subobj isKindOfClass:[NSArray class]])
                         return NO;
-                    if (!verify_row(*subdescr, (NSArray *)subobj))
-                        return NO;
+                    verify_row(*subdescr, (NSArray *)subobj);
                 }
+                break;
             }
-            else {
-                return NO;
-            }
-            break;
+            if ([obj isKindOfClass:[TDBTable class]])
+                break;
+            return NO;
     }
     return YES;
 }
 
 
-BOOL verify_row(const Descriptor& descr, NSArray * data)
+void verify_row(const Descriptor& descr, NSArray* data)
 {
     if (descr.get_column_count() != [data count]) {
         NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_count"
                                                          reason:@"Number of columns do not match"
                                                        userInfo:[NSMutableDictionary dictionary]];
         [exception raise];
-        return NO;
     }
 
     NSEnumerator *enumerator = [data objectEnumerator];
     id obj;
 
-    /* FIXME: handling of tightdb exceptions => return NO */
     size_t col_ndx = 0;
     while (obj = [enumerator nextObject]) {
         if (!verify_cell(descr, col_ndx, obj)) {
             NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
-                                                             reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u", to_objc_string(descr.get_column_name(col_ndx)), col_ndx, descr.get_column_type(col_ndx) ]
+                                                             reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
+                                                                     to_objc_string(descr.get_column_name(col_ndx)), col_ndx, descr.get_column_type(col_ndx) ]
                                                            userInfo:[NSMutableDictionary dictionary]];
             [exception raise];
-            return NO;
         }
         ++col_ndx;
     }
-    return YES;
 }
 
-BOOL verify_row_with_labels(const Descriptor& descr, NSDictionary* data)
+void verify_row_with_labels(const Descriptor& descr, NSDictionary* data)
 {
     size_t n = descr.get_column_count();
     for (size_t i = 0; i != n; ++i) {
@@ -193,10 +230,14 @@ BOOL verify_row_with_labels(const Descriptor& descr, NSDictionary* data)
         id value = [data valueForKey:col_name];
         if (value == nil)
             continue;
-        if (!verify_cell(descr, i, value))
-            return NO;
+        if (!verify_cell(descr, i, value)) {
+            NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
+                                                             reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
+                                                                     to_objc_string(descr.get_column_name(i)), i, descr.get_column_type(i) ]
+                                                           userInfo:[NSMutableDictionary dictionary]];
+            [exception raise];
+        }
     }
-    return YES;
 }
 
 bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
@@ -315,7 +356,7 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
 }
 
 
-BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
+void insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
 {
     /*
        Assumption:
@@ -361,18 +402,14 @@ BOOL insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
                 }
                 
                 /* Fill in data */
-                if (!insert_row(subtable->size(), *subtable, subobj)) {
-                    return NO;
-                }
+                insert_row(subtable->size(), *subtable, subobj);
                 ++sub_ndx;
             }
         }
     }
-
-    return YES;
 }
 
-BOOL insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
+void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
 {
     bool subtables_seen = false;
     
@@ -400,14 +437,11 @@ BOOL insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
             }
             
             TableRef subtable = table.get_subtable(col_ndx, row_ndx);
-            /* fill in data */
             
-            if (!insert_row_with_labels(row_ndx, *subtable, (NSDictionary *)value)) {
-                return NO;
-            }
+            /* fill in data */
+            insert_row_with_labels(row_ndx, *subtable, (NSDictionary *)value);
         }
     }
-    return YES;
 }
 
 BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
@@ -472,7 +506,7 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 table.set_binary(col_ndx, row_ndx, bd);
             }
             break;
-        case type_Table:
+        case type_Table: {
             table.clear_subtable(col_ndx, row_ndx);
             if ([obj isKindOfClass:[NSArray class]]) {
                 table.clear_subtable(col_ndx, row_ndx);
@@ -482,16 +516,21 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                     NSEnumerator *enumerator = [(NSArray *)obj objectEnumerator];
                     id subobj;
                     while (subobj = [enumerator nextObject]) {
-                        if (!set_row(row_ndx, *subtable, (NSArray *)subobj)) {
-                            return NO;
-                        }
+                        set_row(row_ndx, *subtable, (NSArray *)subobj);
                     }
                 }
+                break;
             }
-            else {
-                return NO;
+            if ([obj isKindOfClass:[TDBTable class]]) {
+                table.set_subtable(col_ndx, row_ndx, &[(TDBTable *)obj getNativeTable]);
+                break;
             }
-            break;
+            NSException* exception = [NSException exceptionWithName:@"tightdb:cannot insert subtable"
+                                                                reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
+                                                                        to_objc_string(table.get_column_name(col_ndx)), col_ndx, table.get_column_type(col_ndx) ]
+                                                                userInfo:[NSMutableDictionary dictionary]];
+            [exception raise];
+        }
         case type_Mixed:
             if (obj == nil) {
                 table.set_bool(col_ndx, row_ndx, false);
@@ -503,7 +542,12 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 break;
             }
             if ([obj isKindOfClass:[NSArray class]]) {
+                // FIXME: implement
                 // table.set_mixed(col_ndx, row_ndx, Mixed::subtable_tag());
+                break;
+            }
+            if ([obj isKindOfClass:[TDBTable class]]) {
+                table.set_subtable(col_ndx, row_ndx, &[(TDBTable *)obj getNativeTable]);
                 break;
             }
             if ([obj isKindOfClass:[NSDate class]]) {
@@ -542,29 +586,24 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
 }
 
 
-BOOL set_row(size_t row_ndx, Table& table, NSArray *data)
+void set_row(size_t row_ndx, Table& table, NSArray *data)
 {
     NSEnumerator *enumerator = [data objectEnumerator];
     id obj;
 
     size_t col_ndx = 0;
     while (obj = [enumerator nextObject]) {
-        if (!set_cell(col_ndx, row_ndx, table, obj)) {
-            return NO;
-        }
+        set_cell(col_ndx, row_ndx, table, obj);
         ++col_ndx;
     }
-    return YES;
 }
 
-BOOL set_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
+void set_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
 {
     size_t count = table.get_column_count();
     for (size_t col_ndx = 0; col_ndx != count; ++col_ndx) {
         NSString *col_name = to_objc_string(table.get_column_name(col_ndx));
         id value = [data valueForKey:col_name];
-        if (!set_cell(col_ndx, row_ndx, table, value))
-            return NO;
+        set_cell(col_ndx, row_ndx, table, value);
     }
-    return YES;
 }
