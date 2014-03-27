@@ -69,7 +69,7 @@ using namespace std;
 
 -(id)objectAtIndexedSubscript:(NSUInteger)colNdx
 {
-    TDBType columnType = [_table columnTypeOfColumn:colNdx];
+    TDBType columnType = [_table columnTypeOfColumnWithIndex:colNdx];
     switch (columnType) {
         case TDBBoolType:
             return [NSNumber numberWithBool:[_table TDB_boolInColumnWithIndex:colNdx atRowIndex:_ndx]];

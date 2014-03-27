@@ -18,17 +18,17 @@
     // Create table with all column types
     TDBTable* table = [[TDBTable alloc] init];
     TDBDescriptor* desc = [table descriptor];
-    [desc addColumnWithName:@"int" andType:TDBIntType];
-    [desc addColumnWithName:@"bool" andType:TDBBoolType];
-    [desc addColumnWithName:@"date" andType:TDBDateType];
-    [desc addColumnWithName:@"string" andType:TDBStringType];
-    [desc addColumnWithName:@"string_long" andType:TDBStringType];
-    [desc addColumnWithName:@"string_enum" andType:TDBStringType];
-    [desc addColumnWithName:@"binary" andType:TDBBinaryType];
-    [desc addColumnWithName:@"mixed" andType:TDBMixedType];
+    [desc addColumnWithName:@"int" type:TDBIntType];
+    [desc addColumnWithName:@"bool" type:TDBBoolType];
+    [desc addColumnWithName:@"date" type:TDBDateType];
+    [desc addColumnWithName:@"string" type:TDBStringType];
+    [desc addColumnWithName:@"string_long" type:TDBStringType];
+    [desc addColumnWithName:@"string_enum" type:TDBStringType];
+    [desc addColumnWithName:@"binary" type:TDBBinaryType];
+    [desc addColumnWithName:@"mixed" type:TDBMixedType];
     TDBDescriptor* subdesc = [desc addColumnTable:@"tables"];
-    [subdesc addColumnWithName:@"sub_first" andType:TDBIntType];
-    [subdesc addColumnWithName:@"sub_second" andType:TDBStringType];
+    [subdesc addColumnWithName:@"sub_first" type:TDBIntType];
+    [subdesc addColumnWithName:@"sub_second" type:TDBStringType];
 
     // Add some rows
     for (size_t i = 0; i < 15; ++i) {

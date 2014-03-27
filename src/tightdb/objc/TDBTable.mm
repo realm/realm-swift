@@ -205,7 +205,7 @@ using namespace std;
 {
     return m_table->get_column_index(ObjcStringAccessor(name));
 }
--(TDBType)columnTypeOfColumn:(NSUInteger)ndx
+-(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)ndx
 {
     return TDBType(m_table->get_column_type(ndx));
 }
@@ -862,7 +862,7 @@ using namespace std;
 }
 
 
--(NSUInteger)addColumnWithName:(NSString*)name andType:(TDBType)type
+-(NSUInteger)addColumnWithName:(NSString*)name type:(TDBType)type
 {
     return [self addColumnWithType:type andName:name error:nil];
 }
