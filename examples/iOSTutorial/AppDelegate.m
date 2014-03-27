@@ -140,7 +140,7 @@ void sharedGroupFunc() {
     // Start a read transaction
     [context readWithBlock:^(TDBTransaction *transaction) {
         // Get the table
-        PeopleTable *table = [transaction getTableWithName:@"employees"
+        PeopleTable *table = [transaction tableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
 
         // Interate over all rows in table

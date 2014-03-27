@@ -112,7 +112,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Load a group from disk (and print contents)
     TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"employees.tightdb" error:nil];
-    MyTable* diskTable = [fromDisk getTableWithName:@"employees" asTableClass:[MyTable class]];
+    MyTable* diskTable = [fromDisk tableWithName:@"employees" asTableClass:[MyTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
 //    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
@@ -129,7 +129,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Load a group from memory (and print contents)
     TDBTransaction* fromMem = [TDBTransaction groupWithBuffer:buffer error:nil];
-    MyTable* memTable = [fromMem getTableWithName:@"employees" asTableClass:[MyTable class]];
+    MyTable* memTable = [fromMem tableWithName:@"employees" asTableClass:[MyTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         // ??? cursor
         NSLog(@"%zu: %@", i, memTable.Name);
