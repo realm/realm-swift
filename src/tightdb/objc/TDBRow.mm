@@ -25,7 +25,7 @@
 #import <tightdb/objc/TDBTable_noinst.h>
 #import <tightdb/objc/PrivateTDB.h>
 
-#include <tightdb/objc/util.hpp>
+#include <tightdb/objc/util_noinst.hpp>
 
 using namespace std;
 
@@ -100,44 +100,19 @@ using namespace std;
 
 -(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colNdx
 {
-    TDBType columnType = [_table columnTypeOfColumn:colNdx];
-    
-    // TODO: Verify obj type
-    
-    switch (columnType) {
-        case TDBBoolType:
-            [_table TDB_setBool:[obj boolValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-        case TDBIntType:
-            [_table TDB_setInt:[obj longLongValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-        case TDBFloatType:
-            [_table TDB_setFloat:[obj floatValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-        case TDBDoubleType:
-            [_table TDB_setDouble:[obj doubleValue] inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-        case TDBStringType:
-            if (![obj isKindOfClass:[NSString class]])
-                [NSException raise:@"TypeException" format:@"Inserting non-string obj into string column"];
-            [_table TDB_setString:(NSString*)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-        case TDBDateType:
-            if ([obj isKindOfClass:[NSDate class]])
-                [NSException raise:@"TypeException" format:@"Inserting non-date obj into date column"];
-            [_table TDB_setDate:(NSDate *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-        case TDBBinaryType:
-            [_table TDB_setBinary:(NSData *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-        case TDBTableType:
-            [_table TDB_setTable:(TDBTable *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
-        case TDBMixedType:
-            [_table TDB_setMixed:(TDBMixed *)obj inColumnWithIndex:colNdx atRowIndex:_ndx];
-            break;
+
+    tightdb::Table& t = [_table getNativeTable];
+    tightdb::ConstDescriptorRef descr = t.get_descriptor();
+    if (!verify_cell(*descr, size_t(colNdx), (NSObject *)obj)) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
+                                                         reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
+                                                                 to_objc_string(t.get_column_name(colNdx)), (unsigned long)colNdx, t.get_column_type(colNdx) ]
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+        
     }
-}
+    set_cell(size_t(colNdx), size_t(_ndx), t, (NSObject *)obj);
+}   
 
 -(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key
 {
@@ -186,7 +161,7 @@ using namespace std;
     return [_table TDB_tableInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colNdx
+-(id)mixedInColumnWithIndex:(NSUInteger)colNdx
 {
     return [_table TDB_mixedInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -231,7 +206,7 @@ using namespace std;
     [_table TDB_setTable:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(void)setMixed:(TDBMixed *)value inColumnWithIndex:(NSUInteger)colNdx
+-(void)setMixed:(id)value inColumnWithIndex:(NSUInteger)colNdx
 {
     [_table TDB_setMixed:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -340,12 +315,12 @@ using namespace std;
     [_cursor.table TDB_setTable:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
--(TDBMixed *)getMixed
+-(id)getMixed
 {
     return [_cursor.table TDB_mixedInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }
 
--(void)setMixed:(TDBMixed *)value
+-(void)setMixed:(id)value
 {
     [_cursor.table TDB_setMixed:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
 }

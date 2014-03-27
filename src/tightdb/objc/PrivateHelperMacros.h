@@ -43,7 +43,7 @@
 #define TIGHTDB_TYPE_String    NSString*
 #define TIGHTDB_TYPE_Binary    NSData *
 #define TIGHTDB_TYPE_Date      NSDate *
-#define TIGHTDB_TYPE_Mixed     TDBMixed*
+#define TIGHTDB_TYPE_Mixed     id
 
 #define TIGHTDB_TYPE_ID_Bool   TDBBoolType
 #define TIGHTDB_TYPE_ID_Int    TDBIntType
