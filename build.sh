@@ -702,9 +702,7 @@ EOF
             'target_name': 'iOSTestCoreApp',
             'type': 'executable',
             'mac_bundle': 1,
-            'sources': [
-$APP_SOURCES
-            ]
+            'sources': []
         },
         {
             'target_name': 'iOSTestCoreAppTests',
