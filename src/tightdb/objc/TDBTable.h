@@ -29,7 +29,7 @@
 
 /****************	  TDBTable		****************/
 
-@interface TDBTable: NSObject <TDBViewProtocol,NSFastEnumeration>
+@interface TDBTable: NSObject <TDBView,NSFastEnumeration>
 
 @property (nonatomic, readonly) NSUInteger rowCount;
 @property (nonatomic, readonly) NSUInteger columnCount;
