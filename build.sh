@@ -608,9 +608,6 @@ EOF
         rm -rf test-core/* || exit 1
         cd test-core
 
-        rm -rf iOSTestCoreApp
-        cp -r ../iOSTestCoreApp/iOSTestCoreApp .
-
         DIR="iOSTestCoreAppTests"
         
         mkdir -p "$DIR" || exit 1
@@ -665,14 +662,10 @@ EOF
                 -e 's/<tightdb\(.*\)>/"tightdb\1"/g' \
                 -e 's/<UnitTest++\.h>/"UnitTest++.h"/g' {} \; || exit 1
 
-        function build_test_core_src_list {
-            find $1 -type f | \
-            sed -E 's/^(.*)$/                "\1",/'
-        }
-
 # pylib/gyp/xcodeproj_file.py
-        APP_SOURCES=$(build_test_core_src_list iOSTestCoreApp)
-        APP_TESTS_SOURCES=$(build_test_core_src_list iOSTestCoreAppTests)
+        APP_TESTS_SOURCES=$(find iOSTestCoreAppTests -type f | \
+            sed -E 's/^(.*)$/                "\1",/')
+
         cat >"iOSTestCoreApp.gyp" <<EOF
 {
     'target_defaults': {
