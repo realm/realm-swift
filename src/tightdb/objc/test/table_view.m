@@ -293,4 +293,25 @@
     STAssertEqualObjects(value1, [[v lastRow] stringInColumnWithIndex:col0], nil);
 }
 
+- (void)testViewSubscripting
+{
+    TDBTable* table = [[TDBTable alloc]init];
+    [table addColumnWithName:@"IntCol" andType:TDBIntType];
+    
+    [table addRow:@[@10]];
+    [table addRow:@[@42]];
+    [table addRow:@[@27]];
+    [table addRow:@[@31]];
+    [table addRow:@[@8]];
+    [table addRow:@[@39]];
+    
+    TDBView* view = [[[table where] intIsLessThanOrEqualTo:30 inColumnWithIndex:0] findAllRows];
+    
+    STAssertEquals(view.rowCount, (NSUInteger)3, @"found 3 matches");
+    
+    STAssertTrue([view[0][0] isEqual:@10], @"row 0 -> 0");
+    STAssertTrue([view[1][0] isEqual:@27], @"row 1 -> 2");
+    STAssertTrue([view[2][0] isEqual:@8],  @"row 2 -> 4");
+}
+
 @end

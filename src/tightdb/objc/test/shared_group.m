@@ -220,6 +220,109 @@ TIGHTDB_TABLE_2(SharedTable2,
     }];
 }
 
+-(void)testPinnedTransactions
+{
+    NSString *contextPath = @"pinnedTransactions.tightdb";
+    NSFileManager* fm = [NSFileManager defaultManager];
+    [fm removeItemAtPath:contextPath error:nil];
+    [fm removeItemAtPath:[contextPath stringByAppendingString:@".lock"] error:nil];
+   
+    TDBContext *context1 = [TDBContext contextWithPersistenceToFile:contextPath error:nil];
+    TDBContext *context2 = [TDBContext contextWithPersistenceToFile:contextPath error:nil];
+    
+    {
+        // initially, always say that the db has changed
+        BOOL changed = [context2 pinReadTransactions];
+        STAssertTrue(changed, nil);
+        [context2 unpinReadTransactions];
+        // asking again - this time there is no change
+        changed = [context2 pinReadTransactions];
+        STAssertFalse(changed, nil);
+
+        [context2 unpinReadTransactions];
+    }
+    {   // add something to the db to play with
+        [context1 writeWithBlock:^BOOL(TDBTransaction *transaction) {
+            TDBTable *t1 = [transaction createTableWithName:@"test"];
+            [t1 addColumnWithName:@"col0" andType:TDBBoolType];
+            [t1 addRow:@[@YES]];
+            //t1->add(0, 2, false, "test");
+            return YES;
+        } error:nil];
+    }
+    {   // validate that we can see previous commit from within a new pinned transaction
+        BOOL changed = [context2 pinReadTransactions];
+        STAssertTrue(changed, nil);
+        [context2 readWithBlock:^(TDBTransaction *transaction) {
+            TDBTable *t = [transaction getTableWithName:@"test"];
+            STAssertEquals([[t rowAtIndex:0] boolInColumnWithIndex:0], YES, nil);
+        }];
+    }
+    {   // commit new data in another context, without unpinning
+        [context1 writeWithBlock:^BOOL(TDBTransaction *transaction) {
+            TDBTable *t = [transaction getTableWithName:@"test"];
+            [t addRow:@[@NO]];
+            return YES;
+        } error:nil];
+        
+    }
+    {   // validate that we can see previous commit if we're not pinned
+        [context1 readWithBlock:^(TDBTransaction *transaction) {
+            TDBTable *t = [transaction getTableWithName:@"test"];
+            STAssertEquals([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, nil);
+        }];
+        
+    }
+     {   // validate that we can NOT see previous commit from within a pinned transaction
+        [context2 readWithBlock:^(TDBTransaction *transaction) {
+            TDBTable *t = [transaction getTableWithName:@"test"];
+            STAssertEquals(t.rowCount, (NSUInteger)1, @"Still only 1 row");
+        }];
+        
+    }
+    {   // unpin, pin again and validate that we can now see previous commit
+        [context2 unpinReadTransactions];
+        BOOL changed = [context2 pinReadTransactions];
+        STAssertTrue(changed, @"changes since last transaction");
+        [context2 readWithBlock:^(TDBTransaction *transaction) {
+            TDBTable *t = [transaction getTableWithName:@"test"];
+            STAssertEquals(t.rowCount, (NSUInteger)2, @"Now we see 2 rows");
+            STAssertEquals([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, nil);
+        }];
+    }
+    {   // can't pin if already pinned
+        STAssertThrows([context2 pinReadTransactions], @"Already pinned");
+    }
+    {   // can't unpin if already unpinned
+        [context2 unpinReadTransactions];
+        STAssertThrows([context2 unpinReadTransactions], @"Already unpinned");
+
+    }
+    {   // can't pin while we're inside a transaction
+        [context1 readWithBlock:^(TDBTransaction *transaction) {
+            STAssertThrows([context1 pinReadTransactions], @"Can't pin inside transaction");
+            STAssertNotNil(transaction, @"Parameter must be used");
+        }];
+    }
+    
+    {   // can't unpin while we're inside a transaction
+        [context1 pinReadTransactions];
+        [context1 readWithBlock:^(TDBTransaction *transaction) {
+            STAssertThrows([context1 unpinReadTransactions], @"Can't unpin inside transaction");
+            STAssertNotNil(transaction, @"Parameter must be used");
+        }];
+        [context1 unpinReadTransactions];
+    }
+    {   // can't start a write transaction while pinned
+        [context1 pinReadTransactions];
+        STAssertThrows([context1 writeWithBlock:^BOOL(TDBTransaction *transaction) {
+            STAssertNotNil(transaction, @"Parameter must be used");
+            return YES;
+        } error:nil], @"Can't start write transaction while pinned");
+        [context1 unpinReadTransactions];
+    }
+}
+
 @end
 
 

@@ -162,4 +162,30 @@ using namespace std;
     return m_shared_group->has_changed();
 }
 
+-(BOOL)pinReadTransactions
+{
+    try {
+        return m_shared_group->pin_read_transactions();
+    }
+    catch(std::exception& ex) { 
+        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                         reason:[NSString stringWithUTF8String:ex.what()]
+                                                       userInfo:nil];
+        @throw exception;
+    }
+}
+
+-(void)unpinReadTransactions
+{
+    try {
+        m_shared_group->unpin_read_transactions();
+    }
+    catch(std::exception& ex) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                         reason:[NSString stringWithUTF8String:ex.what()]
+                                                       userInfo:nil];
+        @throw exception;
+    }
+}
+
 @end
