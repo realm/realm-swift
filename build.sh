@@ -604,6 +604,7 @@ EOF
         ;;
 
     "build-test-core")
+        ## Setup directories
         mkdir -p test-core || exit 1
         rm -rf test-core/* || exit 1
         cd test-core
@@ -613,6 +614,7 @@ EOF
         mkdir -p "$DIR" || exit 1
         rm -rf "$DIR/*" || exit 1
 
+        ## Copy sources and unit tests
         function build_test_core_cp {
             mkdir -p "$DIR/$2" || exit 1
             find "../../tightdb/$1/" -maxdepth 1 \
@@ -632,12 +634,21 @@ EOF
         build_test_core_cp test/UnitTest++/src UnitTest++
         build_test_core_cp test/UnitTest++/src/Posix UnitTest++/Posix
 
+        ## Remove breaking files (containing main or unportable code).
         rm "$DIR/main.cpp"
         rm "$DIR/tightdb/config_tool.cpp"
         rm "$DIR/tightdb/importer_tool.cpp"
         rm "$DIR/tightdb/tightdbd.cpp"
         rm "$DIR/tightdb/replication.cpp"
 
+        ## Replace all dynamic includes with static includes
+        find $DIR \
+            -type f -iregex "^.*\.[ch]\(pp\)\{0,1\}$" \
+            -exec sed -i '' \
+                -e 's/<tightdb\(.*\)>/"tightdb\1"/g' \
+                -e 's/<UnitTest++\.h>/"UnitTest++.h"/g' {} \; || exit 1
+
+        ## Create an XCTestCase
         cat >"$DIR/iOSTestCoreAppTests.mm" <<EOF
 #import <XCTest/XCTest.h>
 #include "run_tests.hpp"
@@ -656,16 +667,14 @@ EOF
 @end
 EOF
 
-        find $DIR \
-            -type f -iregex "^.*\.[ch]\(pp\)\{0,1\}$" \
-            -exec sed -i '' \
-                -e 's/<tightdb\(.*\)>/"tightdb\1"/g' \
-                -e 's/<UnitTest++\.h>/"UnitTest++.h"/g' {} \; || exit 1
-
-# pylib/gyp/xcodeproj_file.py
+        ## Gather all the sources in a Python-friendly format.
         APP_TESTS_SOURCES=$(find iOSTestCoreAppTests -type f | \
             sed -E 's/^(.*)$/                "\1",/')
 
+        ## Create a gyp file.
+        # To use xctest, the project must have an app and a test target. The
+        # app can be left fairly featureless, but enough must exist for us to
+        # trick Xcode into thinking it's testing the app.
         cat >"iOSTestCoreApp.gyp" <<EOF
 {
     'target_defaults': {
@@ -721,22 +730,24 @@ $APP_TESTS_SOURCES
     ],
 }
 EOF
-
+        ## Run gyp, generating an .xcodeproj folder with a project.pbxproj file.
         gyp --depth="." "iOSTestCoreApp.gyp" || exit 1
 
+        ## Collect the main app id from the project.pbxproj file.
         APP_ID=$(cat iOSTestCoreApp.xcodeproj/project.pbxproj | tr -d '\n' | \
             egrep -o "remoteGlobalIDString.*?remoteInfo = iOSTestCoreApp;" | \
             head -n 1 | sed 's/remoteGlobalIDString = \([A-F0-9]*\);.*/\1/')
 
+        ## Collect the test app id from the project.pbxproj file.
         APP_TEST_ID=$(cat iOSTestCoreApp.xcodeproj/project.pbxproj | tr -d '\n' | \
             egrep -o "remoteGlobalIDString.*?remoteInfo = iOSTestCoreAppTests;" | \
             head -n 1 | sed 's/remoteGlobalIDString = \([A-F0-9]*\);.*/\1/')
 
+        ## Generate a scheme with a test action.
         USER=$(whoami)
         mkdir "iOSTestCoreApp.xcodeproj/xcuserdata"
         mkdir "iOSTestCoreApp.xcodeproj/xcuserdata/$USER.xcuserdatad"
         mkdir "iOSTestCoreApp.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes"
-
         cat >"iOSTestCoreApp.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes/iOSTestCoreApp.xcscheme" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
@@ -771,7 +782,7 @@ EOF
    </TestAction>
 </Scheme>
 EOF
-
+        ## We are now ready to invoke the test action.
         echo "Done building"
         exit 0
         ;;
