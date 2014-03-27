@@ -106,7 +106,7 @@ using namespace std;
     if (!verify_cell(*descr, size_t(colNdx), (NSObject *)obj)) {
         NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
                                                          reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
-                                                                 to_objc_string(t.get_column_name(colNdx)), colNdx, t.get_column_type(colNdx) ]
+                                                                 to_objc_string(t.get_column_name(colNdx)), (unsigned long)colNdx, t.get_column_type(colNdx) ]
                                                        userInfo:[NSMutableDictionary dictionary]];
         [exception raise];
         
