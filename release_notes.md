@@ -31,6 +31,10 @@ The Objective-C API has been updated and your code will break!
 ### API breaking changes:
 
 * getTableWithName: renamed to tableWithName: in `TDBTransaction`.
+* addColumnWithName:andType: renamed to addColumnWithName:type: in `TDBTable`.
+* columnTypeOfColumn: renamed to columnTypeOfColumnWithIndex in `TDBTable`.
+* columnNameOfColumn: renamed to nameOfColumnWithIndex: in `TDBTable`.
+* addColumnWithName:andType: renamed to addColumnWithName:type: in `TDBDescriptor`.
 
 
 ### Enhancements:
