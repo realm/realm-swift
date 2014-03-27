@@ -1,6 +1,6 @@
 Template
 =============================================================
-0.4.0 Release notes (yyyy—MM-dd)
+x.x.x Release notes (yyyy—MM-dd)
 Objective-C
 -----------
 The Objective-C API has been updated and your code will break!
