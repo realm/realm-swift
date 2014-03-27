@@ -1032,4 +1032,49 @@
     STAssertTrue([_table[1][@"second"] isEqual:@"more test"], @"table[1].second");
 }
 
+-(void)testTableDynamic_Row_Set
+{
+    TDBTable* _table = [[TDBTable alloc] init];
+    STAssertNotNil(_table, @"Table is nil");
+
+    // Add two columns
+    [_table addColumnWithName:@"first" andType:TDBIntType];
+    [_table addColumnWithName:@"second" andType:TDBStringType];
+
+    // Add three rows
+    [_table addRow:@[@1, @"Hello"]];
+    [_table addRow:@[@2, @"World"]];
+    [_table addRow:@[@3, @"Hello World"]];
+
+    TDBRow* c = _table[1];
+    [c set:@4 inColumnWithIndex:0];
+    [c set:@"Universe" inColumnWithIndex:1];
+
+    STAssertTrue([_table[1][@"first"] isEqualToNumber:@4], @"Value 4 expected");
+    STAssertTrue([_table[1][@"second"] isEqualToString:@"Universe"], @"Value 'Universe' expected");
+}
+
+-(void)testTableDynamic_Row_Get
+{
+    TDBTable* _table = [[TDBTable alloc] init];
+    STAssertNotNil(_table, @"Table is nil");
+
+    // Add two columns
+    [_table addColumnWithName:@"first" andType:TDBIntType];
+    [_table addColumnWithName:@"second" andType:TDBStringType];
+
+    // Add three rows
+    [_table addRow:@[@1, @"Hello"]];
+    [_table addRow:@[@2, @"World"]];
+    [_table addRow:@[@3, @"Hello World"]];
+
+    TDBRow* c = _table[1];
+    NSObject *obj = [c get:0];
+
+    STAssertTrue([obj isKindOfClass:[NSNumber class]], @"NSNumber expected");
+    STAssertTrue(strcmp([(NSNumber *)obj objCType], @encode(int64_t)) == 0, @"Integer expected");
+    STAssertEquals([(NSNumber *)obj longLongValue], (int64_t)2, @"Value '2' expected");
+
+}
+
 @end

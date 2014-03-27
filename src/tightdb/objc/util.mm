@@ -106,6 +106,93 @@ void to_mixed(id value, Mixed& m)
 }
 
 
+NSObject* get_cell(size_t col_ndx, size_t row_ndx, Table& table)
+{
+    DataType type = table.get_column_type(col_ndx);
+    switch (type) {
+        case type_String: {
+            NSString *s = [NSString stringWithUTF8String:table.get_string(col_ndx, row_ndx).data()];
+            return s;
+        }
+        case type_Int: {
+            NSNumber *n = [NSNumber numberWithLongLong:table.get_int(col_ndx, row_ndx)];
+            return n;
+        }
+        case type_Float: {
+            NSNumber *n = [NSNumber numberWithFloat:table.get_float(col_ndx, row_ndx)];
+            return n;
+        }
+        case type_Double: {
+            NSNumber *n = [NSNumber numberWithDouble:table.get_double(col_ndx, row_ndx)];
+            return n;
+        }
+        case type_Bool: {
+            NSNumber *n = [NSNumber numberWithBool:table.get_bool(col_ndx, row_ndx)];
+            return n;
+        }
+        case type_Binary: {
+            BinaryData bd = table.get_binary(col_ndx, row_ndx);
+            NSData *d = [NSData dataWithBytes:bd.data() length:bd.size()];
+            return d;
+        }
+        case type_Table: {
+            TDBTable *t = [[TDBTable alloc] init];
+            TableRef table_ref = table.get_subtable(col_ndx, row_ndx);
+            [t setNativeTable:table_ref.get()];
+            return t;
+        }
+        case type_DateTime: {
+            NSDate *d = [NSDate dateWithTimeIntervalSince1970:table.get_datetime(col_ndx, row_ndx).get_datetime()];
+            return d;
+        }
+        case type_Mixed: {
+            Mixed m = table.get_mixed(col_ndx, row_ndx);
+            switch (m.get_type()) {
+                case type_String: {
+                    NSString *s = [NSString stringWithUTF8String:m.get_string().data()];
+                    return s;
+                }
+                case type_Int: {
+                    NSNumber *n = [NSNumber numberWithLongLong:m.get_int()];
+                    return n;
+                }
+                case type_Float: {
+                    NSNumber *n = [NSNumber numberWithFloat:m.get_float()];
+                    return n;
+                }
+                case type_Double: {
+                    NSNumber *n = [NSNumber numberWithDouble:m.get_double()];
+                    return n;
+                }
+                case type_Bool: {
+                    NSNumber *n = [NSNumber numberWithBool:m.get_bool()];
+                    return n;
+                }
+                case type_Binary: {
+                    BinaryData bd = m.get_binary();
+                    NSData *d = [NSData dataWithBytes:bd.data() length:bd.size()];
+                    return d;
+                }
+                case type_Table: {
+                    TDBTable *t = [[TDBTable alloc] init];
+                    TableRef table_ref = table.get_subtable(col_ndx, row_ndx);
+                    [t setNativeTable:table_ref.get()];
+                    return t;
+                }
+                case type_DateTime: {
+                    NSDate *d = [NSDate dateWithTimeIntervalSince1970:table.get_datetime(col_ndx, row_ndx).get_datetime()];
+                    return d;
+                }
+                case type_Mixed:
+                    TIGHTDB_ASSERT(false);
+            }
+        }
+    }
+    TIGHTDB_ASSERT(false);
+    return nil; // make clang happy
+}
+
+
 BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
 {
     DataType type = descr.get_column_type(col_ndx);

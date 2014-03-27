@@ -114,6 +114,7 @@ void to_mixed(id value, tightdb::Mixed& m);
 
 BOOL set_cell(size_t col_ndx, size_t row_ndx, tightdb::Table& table, NSObject *obj);
 BOOL verify_cell(const tightdb::Descriptor& descr, size_t col_ndx, NSObject *obj);
+NSObject* get_cell(size_t col_ndx, size_t row_ndx, tightdb::Table& table);
 
 void verify_row(const tightdb::Descriptor& descr, NSArray * data);
 void insert_row(size_t ndx, tightdb::Table& table, NSArray * data);
