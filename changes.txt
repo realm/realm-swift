@@ -46,7 +46,7 @@ The Objective-C API has been updated and your code will break!
 
 2014-03-25
 ==========
-< BREAKING CHANGE: TDBMixed removed. Use id and NSObject instead.
+! BREAKING CHANGE: TDBMixed removed. Use id and NSObject instead.
 ! BREAKING CHANGE: insertEmptyRow has been removed from table. Use insertRow:nil atIndex:index instead.
 
 2014-03-24
