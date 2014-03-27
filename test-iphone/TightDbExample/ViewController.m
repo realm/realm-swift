@@ -150,7 +150,7 @@ TIGHTDB_TABLE_2(MyTable2,
     context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"employees.tightdb"] error:nil];
     
     [context writeWithBlock:^BOOL(TDBTransaction *transaction) {
-        MyTable *diskTable = [transaction getTableWithName:@"employees" asTableClass:[MyTable class]];
+        MyTable *diskTable = [transaction tableWithName:@"employees" asTableClass:[MyTable class]];
         
         [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
         [diskTable insertEmptyRowAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
@@ -170,7 +170,7 @@ TIGHTDB_TABLE_2(MyTable2,
     
     [context readWithBlock:^(TDBTransaction *transaction) {
         
-        MyTable *diskTable = [transaction getTableWithName:@"employees" asTableClass:[MyTable class]];
+        MyTable *diskTable = [transaction tableWithName:@"employees" asTableClass:[MyTable class]];
         
         // 1: Iterate over table
         for (MyTableRow *row in diskTable)

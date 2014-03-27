@@ -1,3 +1,44 @@
+Template
+=============================================================
+x.x.x Release notes (yyyy—MM-dd)
+Objective-C
+-----------
+The Objective-C API has been updated and your code will break!
+
+### Bugfixes:
+
+* None.
+
+### API breaking changes:
+
+* Typed interface `Cursor` has now been renamed to `TDBRow`.
+
+
+### Enhancements:
+
+* `TDBView` now has support for object subscripting.
+
+=============================================================
+0.5.0 Release notes (yyyy—MM-dd)
+Objective-C
+-----------
+The Objective-C API has been updated and your code will break!
+
+### Bugfixes:
+
+* None.
+
+### API breaking changes:
+
+* getTableWithName: renamed to tableWithName: in `TDBTransaction`.
+
+
+### Enhancements:
+
+
+
+=============================================================
+0.4.0 Release notes (2014-03-26)
 2014-03-26
 ==========
 + Experimental support for pinning transactions on Context.
@@ -5,7 +46,7 @@
 
 2014-03-25
 ==========
-< BREAKING CHANGE: TDBMixed removed. Use id and NSObject instead.
+! BREAKING CHANGE: TDBMixed removed. Use id and NSObject instead.
 ! BREAKING CHANGE: insertEmptyRow has been removed from table. Use insertRow:nil atIndex:index instead.
 
 2014-03-24
