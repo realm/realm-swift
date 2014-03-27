@@ -660,12 +660,14 @@ cmake_minimum_required(VERSION 2.6)
 project(iOSTestCoreApp)
 file(GLOB SRCS *.mm *.cpp)
 set(CMAKE_OSX_SYSROOT "iphoneos")
-add_custom_target(TEST SOURCES \${SRCS})
-set_target_properties(TEST PROPERTIES
-    XCODE_ATTRIBUTE_BUNDLE_LOADER "\$(BUILT_PRODUCTS_DIR)/iOSTestCoreApp.app/iOSTestCoreApp"
-    XCODE_ATTRIBUTE_TEST_HOST "\$(BUNDLE_LOADER)"
-)
+add_executable(iOSTestCoreApp.xctest MACOSX_BUNDLE \${SRCS})
 EOF
+#add_custom_target(TEST SOURCES \${SRCS})
+#set_target_properties(TEST PROPERTIES
+#    XCODE_ATTRIBUTE_BUNDLE_LOADER "\$(BUILT_PRODUCTS_DIR)/iOSTestCoreApp.app/iOSTestCoreApp"
+#    XCODE_ATTRIBUTE_TEST_HOST "\$(BUNDLE_LOADER)"
+#)
+#EOF
 
         cmake -G Xcode "$DIR" || exit 1
         cd ..
