@@ -154,6 +154,7 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
                 break;
             return NO;
         case type_Mixed:
+            // FIXME: Do a proper check!
             /*            if ([obj isKindOfClass:[NSArray class]]) {
              TableRef t = Table::create();
              NSEnumerator *subobj = [obj objectEnumerator];
