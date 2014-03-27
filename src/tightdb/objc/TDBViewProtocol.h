@@ -22,7 +22,7 @@
 
 @class TDBRow;
 
-@protocol TDBViewProtocol
+@protocol TDBView
 
 @property (nonatomic, readonly) NSUInteger rowCount;
 @property (nonatomic, readonly) NSUInteger columnCount;
