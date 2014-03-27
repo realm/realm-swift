@@ -142,7 +142,7 @@
 @end
 
 @implementation TDBColumnProxyMixed
--(NSUInteger)find:(TDBMixed*)value
+-(NSUInteger)find:(id)value
 {
     return [self.table findRowIndexWithMixed:value inColumnWithIndex:self.column];
 }

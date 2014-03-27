@@ -33,15 +33,12 @@
 #import <tightdb/objc/TDBQuery.h>
 #import <tightdb/objc/TDBQuery_noinst.h>
 #import <tightdb/objc/TDBRow.h>
-#import <tightdb/objc/support.h>
 #import <tightdb/objc/TDBDescriptor.h>
 #import <tightdb/objc/TDBDescriptor_noinst.h>
-#import <tightdb/objc/TDBMixed.h>
-#import <tightdb/objc/TDBMixed_noinst.h>
 #import <tightdb/objc/TDBColumnProxy.h>
 #import <tightdb/objc/NSData+TDBGetBinaryData.h>
 
-#include <tightdb/objc/util.hpp>
+#include <tightdb/objc/util_noinst.hpp>
 
 using namespace std;
 
@@ -138,9 +135,11 @@ using namespace std;
     return m_read_only;
 }
 
--(BOOL)isEqual:(TDBTable*)other
+-(BOOL)isEqual:(id)other
 {
-    return *m_table == *other->m_table;
+    if ([other isKindOfClass:[TDBTable class]])
+        return *m_table == *(((TDBTable *)other)->m_table);
+    return NO;
 }
 
 /**
@@ -296,23 +295,13 @@ using namespace std;
     }
 
     if ([newValue isKindOfClass:[NSArray class]]) {
-        if (!verify_row(*desc, (NSArray *)newValue)) {
-            return; // FIXME: raise exception
-        }
-        if (!set_row(size_t(rowIndex), table, (NSArray *)newValue)) {
-            // FIXME: raise exception
-            return ;
-        }
+        verify_row(*desc, (NSArray *)newValue);
+        set_row(size_t(rowIndex), table, (NSArray *)newValue);
     }
     
     if ([newValue isKindOfClass:[NSDictionary class]]) {
-        if (!verify_row_with_labels(*desc, (NSDictionary *)newValue)) {
-            return; // FIXME: raise exception
-        }
-        if (!set_row_with_labels(size_t(rowIndex), table, (NSDictionary *)newValue)) {
-            // FIXME: raise exception
-            return ;
-        }
+        verify_row_with_labels(*desc, (NSDictionary *)newValue);
+        set_row_with_labels(size_t(rowIndex), table, (NSDictionary *)newValue);
     }
     
     /* FIXME: pull out properties of object and insert as row */
@@ -375,21 +364,17 @@ using namespace std;
     tightdb::ConstDescriptorRef desc = table.get_descriptor();
     
     if ([anObject isKindOfClass:[NSArray class]]) {
-        if (!verify_row(*desc, (NSArray *)anObject)) {
-            return NO;
-        }
-        return insert_row(size_t(rowIndex), table, (NSArray *)anObject);
+        verify_row(*desc, (NSArray *)anObject);
+        insert_row(size_t(rowIndex), table, (NSArray *)anObject);
     }
     
     if ([anObject isKindOfClass:[NSDictionary class]]) {
-        if (!verify_row_with_labels(*desc, (NSDictionary *)anObject)) {
-            return NO;
-        }
-        return insert_row_with_labels(size_t(rowIndex), table, (NSDictionary *)anObject);
+        verify_row_with_labels(*desc, (NSDictionary *)anObject);
+        insert_row_with_labels(size_t(rowIndex), table, (NSDictionary *)anObject);
     }
     
     /* FIXME: pull out properties of object and insert as row */
-    return NO;
+    return YES;
 }
 
 
@@ -500,8 +485,7 @@ using namespace std;
     if (type != tightdb::type_Table)
         return nil;
     tightdb::TableRef table = m_table->get_subtable(colIndex, rowIndex);
-    if (!table)
-        return nil;
+    TIGHTDB_ASSERT(table);
     TDBTable* table_2 = [[tableClass alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
@@ -513,15 +497,14 @@ using namespace std;
     return table_2;
 }
 
--(TDBMixed*)TDB_mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
+-(id)TDB_mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
 {
     tightdb::Mixed mixed = m_table->get_mixed(colNdx, rowIndex);
     if (mixed.get_type() != tightdb::type_Table)
-        return [TDBMixed mixedWithNativeMixed:mixed];
+        return to_objc_object(mixed);
 
     tightdb::TableRef table = m_table->get_subtable(colNdx, rowIndex);
-    if (!table)
-        return nil;
+    TIGHTDB_ASSERT(table);
     TDBTable* table_2 = [[TDBTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table_2))
         return nil;
@@ -531,7 +514,7 @@ using namespace std;
     if (![table_2 _checkType])
         return nil;
 
-    return [TDBMixed mixedWithTable:table_2];
+    return table_2;
 }
 
 
@@ -594,10 +577,11 @@ using namespace std;
         TDBTableType);
 }
 
--(void)TDB_setMixed:(TDBMixed*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)TDB_setMixed:(id)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
-    const tightdb::Mixed& mixed = [value getNativeMixed];
-    TDBTable* subtable = mixed.get_type() == tightdb::type_Table ? [value getTable] : nil;
+    tightdb::Mixed mixed;
+    to_mixed(value, mixed);
+    TDBTable* subtable = mixed.get_type() == tightdb::type_Table ? (TDBTable *)value : nil;
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         if (subtable) {
             tightdb::LangBindHelper::set_mixed_subtable(*m_table, col_ndx, row_ndx,
@@ -845,20 +829,26 @@ using namespace std;
     return TDBType(m_table->get_mixed_type(colIndex, rowIndex));
 }
 
--(BOOL)TDB_insertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(TDBMixed*)value
+-(BOOL)TDB_insertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(id)value
 {
     return [self TDB_insertMixed:col_ndx ndx:row_ndx value:value error:nil];
 }
 
--(BOOL)TDB_insertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(TDBMixed*)value error:(NSError* __autoreleasing*)error
+-(BOOL)TDB_insertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(id)value error:(NSError* __autoreleasing*)error
 {
     if (m_read_only) {
         if (error)
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    const tightdb::Mixed& mixed = [value getNativeMixed];
-    TDBTable* subtable = mixed.get_type() == tightdb::type_Table ? [value getTable] : nil;
+    tightdb::Mixed mixed;
+    TDBTable* subtable;
+    if ([value isKindOfClass:[TDBTable class]]) {
+        subtable = (TDBTable *)value;
+    }
+    else {
+        to_mixed(value, mixed);
+    }
     TIGHTDB_EXCEPTION_ERRHANDLER(
         if (subtable) {
             tightdb::LangBindHelper::insert_mixed_subtable(*m_table, col_ndx, row_ndx,
@@ -929,7 +919,7 @@ using namespace std;
 {
     return m_table->find_first_datetime(colIndex, [aDate timeIntervalSince1970]);
 }
--(NSUInteger)findRowIndexWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex
+-(NSUInteger)findRowIndexWithMixed:(id)aMixed inColumnWithIndex:(NSUInteger)colIndex
 {
     static_cast<void>(colIndex);
     static_cast<void>(aMixed);
@@ -974,7 +964,7 @@ using namespace std;
     tightdb::TableView view = m_table->find_all_datetime(colIndex, [aDate timeIntervalSince1970]);
     return [TDBView viewWithTable:self andNativeView:view];
 }
--(TDBView*)findAllRowsWithMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex
+-(TDBView*)findAllRowsWithMixed:(id)aMixed inColumnWithIndex:(NSUInteger)colIndex
 {
     static_cast<void>(colIndex);
     static_cast<void>(aMixed);
