@@ -1038,20 +1038,37 @@
     STAssertNotNil(_table, @"Table is nil");
 
     // Add two columns
-    [_table addColumnWithName:@"first" andType:TDBIntType];
-    [_table addColumnWithName:@"second" andType:TDBStringType];
+    [_table addColumnWithName:@"int"    andType:TDBIntType];
+    [_table addColumnWithName:@"string" andType:TDBStringType];
+    [_table addColumnWithName:@"float"  andType:TDBFloatType];
+    [_table addColumnWithName:@"double" andType:TDBDoubleType];
+    [_table addColumnWithName:@"bool"   andType:TDBBoolType];
+    [_table addColumnWithName:@"date"   andType:TDBDateType];
+    [_table addColumnWithName:@"binary" andType:TDBBinaryType];
 
+    char bin4[] = {1, 2, 4, 4};
     // Add three rows
-    [_table addRow:@[@1, @"Hello"]];
-    [_table addRow:@[@2, @"World"]];
-    [_table addRow:@[@3, @"Hello World"]];
+    [_table addRow:@[@1, @"Hello", @3.1415f, @3.1415, @NO, [NSDate dateWithTimeIntervalSince1970:1], [NSData dataWithBytes:bin4 length:4]]];
+    [_table addRow:@[@2, @"World", @2.7182f, @2.7182, @NO, [NSDate dateWithTimeIntervalSince1970:2], [NSData dataWithBytes:bin4 length:4]]];
+    [_table addRow:@[@3, @"Hello World", @1.0f, @1.0, @NO, [NSDate dateWithTimeIntervalSince1970:3], [NSData dataWithBytes:bin4 length:4]]];
 
     TDBRow* c = _table[1];
     [c set:@4 inColumnWithIndex:0];
     [c set:@"Universe" inColumnWithIndex:1];
+    [c set:@4.6692f inColumnWithIndex:2];
+    [c set:@4.6692 inColumnWithIndex:3];
+    [c set:@YES inColumnWithIndex:4];
+    [c set:[NSDate dateWithTimeIntervalSince1970:4] inColumnWithIndex:5];
+    char bin5[] = {5, 6, 7, 8, 9};
+    [c set:[NSData dataWithBytes:bin5 length:5] inColumnWithIndex:6];
 
-    STAssertTrue([_table[1][@"first"] isEqualToNumber:@4], @"Value 4 expected");
-    STAssertTrue([_table[1][@"second"] isEqualToString:@"Universe"], @"Value 'Universe' expected");
+    STAssertTrue([_table[1][@"int"] isEqualToNumber:@4], @"Value 4 expected");
+    STAssertTrue([_table[1][@"string"] isEqualToString:@"Universe"], @"Value 'Universe' expected");
+    STAssertTrue([_table[1][@"float"] isEqualToNumber:@4.6692f], @"Value '4.6692f' expected");
+    STAssertTrue([_table[1][@"double"] isEqualToNumber:@4.6692], @"Value '4.6692' expected");
+    STAssertTrue([_table[1][@"bool"] isEqual:@YES], @"Value 'YES' expected");
+    STAssertTrue([_table[1][@"date"] isEqualToDate:[NSDate dateWithTimeIntervalSince1970:4]], @"Wrong date");
+    STAssertTrue([_table[1][@"binary"] isEqualToData:[NSData dataWithBytes:bin5 length:5]], @"Wrong data");
 }
 
 -(void)testTableDynamic_Row_Get
