@@ -27,7 +27,7 @@
 #import <tightdb/objc/TDBTable_noinst.h>
 #import "PrivateTDB.h"
 
-#include <tightdb/objc/util.hpp>
+#include <tightdb/objc/util_noinst.hpp>
 
 using namespace std;
 
@@ -60,7 +60,7 @@ using namespace std;
     return m_group->has_table(ObjcStringAccessor(name));
 }
 
--(TDBTable *)getTableWithName:(NSString *)name
+-(TDBTable *)tableWithName:(NSString *)name
 {
     if ([name length] == 0) {
         NSException *exception = [NSException exceptionWithName:@"tightdb:table_name_exception"
@@ -87,7 +87,7 @@ using namespace std;
     }
 }
 
--(id)getTableWithName:(NSString *)name asTableClass:(__unsafe_unretained Class)class_obj
+-(id)tableWithName:(NSString *)name asTableClass:(__unsafe_unretained Class)class_obj
 {
     if ([name length] == 0) {
         NSException *exception = [NSException exceptionWithName:@"tightdb:table_name_exception"

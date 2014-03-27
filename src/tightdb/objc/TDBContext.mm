@@ -24,7 +24,7 @@
 #import <tightdb/objc/TDBContext.h>
 #import <tightdb/objc/TDBTransaction_noinst.h>
 
-#include <tightdb/objc/util.hpp>
+#include <tightdb/objc/util_noinst.hpp>
 
 using namespace std;
 
@@ -106,7 +106,7 @@ using namespace std;
 -(void)readTable:(NSString*)tablename withBlock:(TDBTableReadBlock)block
 {
     [self readWithBlock:^(TDBTransaction* trx){
-        TDBTable *table = [trx getTableWithName:tablename];
+        TDBTable *table = [trx tableWithName:tablename];
         block(table);
     }];
 }
@@ -168,7 +168,7 @@ using namespace std;
 -(BOOL)writeTable:(NSString*)tablename withBlock:(TDBTableWriteBlock)block error:(NSError **)error
 {
     return [self writeWithBlock:^(TDBTransaction* trx){
-        TDBTable *table = [trx getTableWithName:tablename];
+        TDBTable *table = [trx tableWithName:tablename];
         return block(table);
     } error: error];
 }
@@ -176,6 +176,32 @@ using namespace std;
 -(BOOL) hasChangedSinceLastTransaction
 {
     return m_shared_group->has_changed();
+}
+
+-(BOOL)pinReadTransactions
+{
+    try {
+        return m_shared_group->pin_read_transactions();
+    }
+    catch(std::exception& ex) { 
+        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                         reason:[NSString stringWithUTF8String:ex.what()]
+                                                       userInfo:nil];
+        @throw exception;
+    }
+}
+
+-(void)unpinReadTransactions
+{
+    try {
+        m_shared_group->unpin_read_transactions();
+    }
+    catch(std::exception& ex) {
+        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
+                                                         reason:[NSString stringWithUTF8String:ex.what()]
+                                                       userInfo:nil];
+        @throw exception;
+    }
 }
 
 @end

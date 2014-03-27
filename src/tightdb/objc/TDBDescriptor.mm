@@ -27,7 +27,7 @@
 #import "TDBType.h"
 #import "TDBDescriptor.h"
 
-#include <tightdb/objc/util.hpp>
+#include <tightdb/objc/util_noinst.hpp>
 
 
 @implementation TDBDescriptor

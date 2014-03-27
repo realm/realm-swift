@@ -65,8 +65,7 @@ CATEGORIES:                       # list global class-id in order of appearence
 - Collection:
   - transaction
   - context
-- Helpers:
-  - mixed
+#- Helpers:
 #  - cursor
 
 EXAMPLES  :

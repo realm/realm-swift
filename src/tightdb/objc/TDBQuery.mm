@@ -33,7 +33,7 @@
 #import <tightdb/objc/TDBRow.h>
 #import "NSData+TDBGetBinaryData.h"
 
-#include <tightdb/objc/util.hpp>
+#include <tightdb/objc/util_noinst.hpp>
 
 
 using namespace std;
