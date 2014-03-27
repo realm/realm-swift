@@ -1,3 +1,8 @@
+2014-03-26
+==========
++ Experimental support for pinning transactions on Context.
++ TDBView now has support for object subscripting.
+
 2014-03-25
 ==========
 < BREAKING CHANGE: TDBMixed removed. Use id and NSObject instead.
