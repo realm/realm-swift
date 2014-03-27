@@ -608,16 +608,19 @@ EOF
         rm -rf test-core/* || exit 1
         cd test-core
 
+        rm -rf iOSTestCoreApp
+        cp -r ../iOSTestCoreApp/iOSTestCoreApp .
+
         DIR="iOSTestCoreAppTests"
         
         mkdir -p "$DIR" || exit 1
         rm -rf "$DIR/*" || exit 1
 
         function build_test_core_cp {
-        mkdir -p "$DIR/$2" || exit 1
-        find "../../tightdb/$1/" -maxdepth 1 \
-          -type f -iregex "^.*\.[ch]\(pp\)\{0,1\}$" \
-          -exec cp {} "$DIR/$2/" \; || exit 1
+            mkdir -p "$DIR/$2" || exit 1
+            find "../../tightdb/$1/" -maxdepth 1 \
+                -type f -iregex "^.*\.[ch]\(pp\)\{0,1\}$" \
+                -exec cp {} "$DIR/$2/" \; || exit 1
         }
 
         cp ../../tightdb/src/tightdb.hpp "$DIR/"
@@ -636,6 +639,7 @@ EOF
         rm "$DIR/tightdb/config_tool.cpp"
         rm "$DIR/tightdb/importer_tool.cpp"
         rm "$DIR/tightdb/tightdbd.cpp"
+        rm "$DIR/tightdb/replication.cpp"
 
         cat >"$DIR/iOSTestCoreAppTests.mm" <<EOF
 #import <XCTest/XCTest.h>
@@ -655,22 +659,128 @@ EOF
 @end
 EOF
 
-        cat >"$DIR/CMakeLists.txt" <<EOF
-cmake_minimum_required(VERSION 2.6)
-project(iOSTestCoreApp)
-file(GLOB SRCS *.mm *.cpp)
-set(CMAKE_OSX_SYSROOT "iphoneos")
-add_executable(iOSTestCoreApp.xctest MACOSX_BUNDLE \${SRCS})
-EOF
-#add_custom_target(TEST SOURCES \${SRCS})
-#set_target_properties(TEST PROPERTIES
-#    XCODE_ATTRIBUTE_BUNDLE_LOADER "\$(BUILT_PRODUCTS_DIR)/iOSTestCoreApp.app/iOSTestCoreApp"
-#    XCODE_ATTRIBUTE_TEST_HOST "\$(BUNDLE_LOADER)"
-#)
-#EOF
+        find $DIR \
+            -type f -iregex "^.*\.[ch]\(pp\)\{0,1\}$" \
+            -exec sed -i '' \
+                -e 's/<tightdb\(.*\)>/"tightdb\1"/g' \
+                -e 's/<UnitTest++\.h>/"UnitTest++.h"/g' {} \; || exit 1
 
-        cmake -G Xcode "$DIR" || exit 1
-        cd ..
+        function build_test_core_src_list {
+            find $1 -type f | \
+            sed -E 's/^(.*)$/                "\1",/'
+        }
+
+# pylib/gyp/xcodeproj_file.py
+        APP_SOURCES=$(build_test_core_src_list iOSTestCoreApp)
+        APP_TESTS_SOURCES=$(build_test_core_src_list iOSTestCoreAppTests)
+        cat >"iOSTestCoreApp.gyp" <<EOF
+{
+    'target_defaults': {
+        'link_settings': {
+            'libraries': [
+                '\$(SDKROOT)/usr/lib/libc++.dylib',
+                '\$(DEVELOPER_DIR)/Library/Frameworks/XCTest.framework',
+                '\$(DEVELOPER_DIR)/Library/Frameworks/Foundation.framework',
+                '\$(DEVELOPER_DIR)/Library/Frameworks/CoreGraphics.framework',
+                '\$(DEVELOPER_DIR)/Library/Frameworks/UIKit.framework',
+            ],
+        },
+        'xcode_settings': {
+            'ARCHS': [
+                '\$(ARCHS_STANDARD_INCLUDING_64_BIT)',
+            ],
+            'SDKROOT': 'iphoneos',
+            'TARGETED_DEVICE_FAMILY': '1,2', # iPhone/iPad
+            'FRAMEWORK_SEARCH_PATHS': [
+                '\$(SDKROOT)/Developer/Library/Frameworks',
+            ],
+            'CODE_SIGN_IDENTITY[sdk=iphoneos*]': 'iPhone Developer: Oleksandr(Alex Shturmov (CB4YV2W7W5)',
+        },
+    },
+    'targets': [
+        {
+            'target_name': 'iOSTestCoreApp',
+            'type': 'executable',
+            'mac_bundle': 1,
+            'sources': [
+$APP_SOURCES
+            ]
+        },
+        {
+            'target_name': 'iOSTestCoreAppTests',
+
+            # see pylib/gyp/generator/xcode.py
+            'type': 'loadable_module',
+            'mac_xctest_bundle': 1,
+            'sources': [
+$APP_TESTS_SOURCES
+            ],
+            'dependencies': [
+                'iOSTestCoreApp'
+            ],
+            'include_dirs': [
+                './iOSTestCoreAppTests/**'
+            ],
+            'xcode_settings': {
+                'WRAPPER_EXTENSION': 'xctest',
+                'BUNDLE_LOADER': '\$(BUILT_PRODUCTS_DIR)/iOSTestCoreApp.app/iOSTestCoreApp',
+                'TEST_HOST': '\$(BUNDLE_LOADER)',
+            },
+        },
+    ],
+}
+EOF
+
+        gyp --depth="." "iOSTestCoreApp.gyp" || exit 1
+
+        APP_ID=$(cat iOSTestCoreApp.xcodeproj/project.pbxproj | tr -d '\n' | \
+            egrep -o "remoteGlobalIDString.*?remoteInfo = iOSTestCoreApp;" | \
+            head -n 1 | sed 's/remoteGlobalIDString = \([A-F0-9]*\);.*/\1/')
+
+        APP_TEST_ID=$(cat iOSTestCoreApp.xcodeproj/project.pbxproj | tr -d '\n' | \
+            egrep -o "remoteGlobalIDString.*?remoteInfo = iOSTestCoreAppTests;" | \
+            head -n 1 | sed 's/remoteGlobalIDString = \([A-F0-9]*\);.*/\1/')
+
+        USER=$(whoami)
+        mkdir "iOSTestCoreApp.xcodeproj/xcuserdata"
+        mkdir "iOSTestCoreApp.xcodeproj/xcuserdata/$USER.xcuserdatad"
+        mkdir "iOSTestCoreApp.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes"
+
+        cat >"iOSTestCoreApp.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes/iOSTestCoreApp.xcscheme" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   LastUpgradeVersion = "0500"
+   version = "1.3">
+   <TestAction
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      buildConfiguration = "Default">
+      <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "$APP_TEST_ID"
+               BuildableName = "iOSTestCoreAppTests.xctest"
+               BlueprintName = "iOSTestCoreAppTests"
+               ReferencedContainer = "container:iOSTestCoreApp.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "$APP_ID"
+            BuildableName = "iOSTestCoreApp.app"
+            BlueprintName = "iOSTestCoreApp"
+            ReferencedContainer = "container:iOSTestCoreApp.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
+   </TestAction>
+</Scheme>
+EOF
+
         echo "Done building"
         exit 0
         ;;
