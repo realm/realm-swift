@@ -1,6 +1,7 @@
 Template
 =============================================================
 x.x.x Release notes (yyyy—MM-dd)
+
 Objective-C
 -----------
 The Objective-C API has been updated and your code will break!
@@ -11,12 +12,11 @@ The Objective-C API has been updated and your code will break!
 
 ### API breaking changes:
 
-* Typed interface `Cursor` has now been renamed to `TDBRow`.
-
+* `???`
 
 ### Enhancements:
 
-* `TDBView` now has support for object subscripting.
+* `???`
 
 =============================================================
 0.5.0 Release notes (yyyy—MM-dd)
@@ -30,19 +30,20 @@ The Objective-C API has been updated and your code will break!
 
 ### API breaking changes:
 
-* getTableWithName: renamed to tableWithName: in `TDBTransaction`.
-* addColumnWithName:andType: renamed to addColumnWithName:type: in `TDBTable`.
-* columnTypeOfColumn: renamed to columnTypeOfColumnWithIndex in `TDBTable`.
-* columnNameOfColumn: renamed to nameOfColumnWithIndex: in `TDBTable`.
-* addColumnWithName:andType: renamed to addColumnWithName:type: in `TDBDescriptor`.
+* `getTableWithName:` renamed to `tableWithName:` in `TDBTransaction`.
+* `addColumnWithName:andType:` renamed to `addColumnWithName:type:` in `TDBTable`.
+* `columnTypeOfColumn:` renamed to `columnTypeOfColumnWithIndex` in `TDBTable`.
+* `columnNameOfColumn:` renamed to `nameOfColumnWithIndex:` in `TDBTable`.
+* `addColumnWithName:andType:` renamed to `addColumnWithName:type:` in `TDBDescriptor`.
 
 
 ### Enhancements:
-
+* 
 
 
 =============================================================
 0.4.0 Release notes (2014-03-26)
+
 2014-03-26
 ==========
 + Experimental support for pinning transactions on Context.
