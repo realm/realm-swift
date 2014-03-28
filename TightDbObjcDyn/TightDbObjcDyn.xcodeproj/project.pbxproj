@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		4220871618E042FD00F3CF27 /* NSData+TDBGetBinaryData.h in Headers */ = {isa = PBXBuildFile; fileRef = 4220871418E042FD00F3CF27 /* NSData+TDBGetBinaryData.h */; };
 		4220871718E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4220871518E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm */; };
+		424E0BA918E5A505008FB39B /* NSObject+TDBTypeConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 424E0BA718E5A505008FB39B /* NSObject+TDBTypeConversion.h */; };
+		424E0BAA18E5A505008FB39B /* NSObject+TDBTypeConversion.m in Sources */ = {isa = PBXBuildFile; fileRef = 424E0BA818E5A505008FB39B /* NSObject+TDBTypeConversion.m */; };
 		424EEF9E18D9C10100337A13 /* TDBColumnProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEF9D18D9C10100337A13 /* TDBColumnProxy.h */; };
 		424EEFA218D9C11D00337A13 /* TDBDescriptor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEF9F18D9C11D00337A13 /* TDBDescriptor.mm */; };
 		424EEFA318D9C11D00337A13 /* TDBDescriptor_noinst.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA018D9C11D00337A13 /* TDBDescriptor_noinst.h */; };
@@ -77,6 +79,8 @@
 /* Begin PBXFileReference section */
 		4220871418E042FD00F3CF27 /* NSData+TDBGetBinaryData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+TDBGetBinaryData.h"; path = "../../src/tightdb/objc/NSData+TDBGetBinaryData.h"; sourceTree = "<group>"; };
 		4220871518E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "NSData+TDBGetBinaryData.mm"; path = "../../src/tightdb/objc/NSData+TDBGetBinaryData.mm"; sourceTree = "<group>"; };
+		424E0BA718E5A505008FB39B /* NSObject+TDBTypeConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSObject+TDBTypeConversion.h"; path = "../../src/tightdb/objc/NSObject+TDBTypeConversion.h"; sourceTree = "<group>"; };
+		424E0BA818E5A505008FB39B /* NSObject+TDBTypeConversion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSObject+TDBTypeConversion.m"; path = "../../src/tightdb/objc/NSObject+TDBTypeConversion.m"; sourceTree = "<group>"; };
 		424EEF9D18D9C10100337A13 /* TDBColumnProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBColumnProxy.h; path = ../../src/tightdb/objc/TDBColumnProxy.h; sourceTree = "<group>"; };
 		424EEF9F18D9C11D00337A13 /* TDBDescriptor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBDescriptor.mm; path = ../../src/tightdb/objc/TDBDescriptor.mm; sourceTree = "<group>"; };
 		424EEFA018D9C11D00337A13 /* TDBDescriptor_noinst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBDescriptor_noinst.h; path = ../../src/tightdb/objc/TDBDescriptor_noinst.h; sourceTree = "<group>"; };
@@ -228,6 +232,8 @@
 				E91890D3177B67AB00653D7A /* tightdb.h */,
 				E91890CB177B67AB00653D7A /* TDBTransaction.h */,
 				E91890C7177B67AB00653D7A /* TDBTransaction.mm */,
+				424E0BA718E5A505008FB39B /* NSObject+TDBTypeConversion.h */,
+				424E0BA818E5A505008FB39B /* NSObject+TDBTypeConversion.m */,
 				4220871418E042FD00F3CF27 /* NSData+TDBGetBinaryData.h */,
 				4220871518E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm */,
 				E91890C8177B67AB00653D7A /* TDBTransaction_noinst.h */,
@@ -311,6 +317,7 @@
 				424EEFA318D9C11D00337A13 /* TDBDescriptor_noinst.h in Headers */,
 				4220871618E042FD00F3CF27 /* NSData+TDBGetBinaryData.h in Headers */,
 				E91890E6177B67AB00653D7A /* util_noinst.hpp in Headers */,
+				424E0BA918E5A505008FB39B /* NSObject+TDBTypeConversion.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -413,6 +420,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				424E0BAA18E5A505008FB39B /* NSObject+TDBTypeConversion.m in Sources */,
 				424EEFA218D9C11D00337A13 /* TDBDescriptor.mm in Sources */,
 				E91890D6177B67AB00653D7A /* TDBRow.mm in Sources */,
 				42AD3A9818CDBDFF00C86073 /* util.mm in Sources */,
