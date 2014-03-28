@@ -21,6 +21,7 @@
 #import "TDBTable.h"
 #import "TDBView.h"
 #import "TDBContext.h"
+#import "TDBRow.h"
 
 /**
  * The selectors in this interface is not meant to be used directly.
@@ -91,6 +92,12 @@
 //-(TDBTable *)TD_BtableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 //-(id)TDB_tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(Class)tableClass;
 -(id)TDB_mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+@end
+
+@interface TDBRow()
+-(id)initWithTable:(TDBTable *)table ndx:(NSUInteger)ndx;
+-(void)TDB_setNdx:(NSUInteger)ndx;
+-(NSUInteger)TDB_index;
 @end
 
 /**

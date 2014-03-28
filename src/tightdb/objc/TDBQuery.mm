@@ -31,7 +31,8 @@
 #import <tightdb/objc/TDBView.h>
 #import <tightdb/objc/TDBView_noinst.h>
 #import <tightdb/objc/TDBRow.h>
-#import "NSData+TDBGetBinaryData.h"
+#import <NSData+TDBGetBinaryData.h>
+#import <tightdb/objc/PrivateTDB.h>
 
 #include <tightdb/objc/util_noinst.hpp>
 
@@ -99,7 +100,7 @@ using namespace std;
         *stackbuf = tmp;
     }
     if ((int)state->state != -1) {
-        [((TDBRow*)*stackbuf) TDBSetNdx:state->state];
+        [((TDBRow*)*stackbuf) TDB_setNdx:state->state];
         state->itemsPtr = stackbuf;
         state->state = [self incrementFastEnum:state->state+1];
     } else {
