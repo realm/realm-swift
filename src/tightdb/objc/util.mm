@@ -180,7 +180,7 @@ NSObject* get_cell(size_t col_ndx, size_t row_ndx, Table& table)
                     return t;
                 }
                 case type_DateTime: {
-                    NSDate *d = [NSDate dateWithTimeIntervalSince1970:table.get_datetime(col_ndx, row_ndx).get_datetime()];
+                    NSDate *d = [NSDate dateWithTimeIntervalSince1970:m.get_datetime().get_datetime()];
                     return d;
                 }
                 case type_Mixed:
