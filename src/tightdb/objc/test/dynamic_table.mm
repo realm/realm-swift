@@ -23,6 +23,7 @@
 
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/TDBTable_noinst.h>
+#import <tightdb/objc/NSObject+TDBTypeConversion.h>
 
 #include <string.h>
 
@@ -1072,6 +1073,8 @@
     STAssertTrue([table[1][@"binary"] isEqualToData:[NSData dataWithBytes:bin5 length:5]], @"Wrong data");
 }
 
+
+
 -(void)testTableDynamic_Row_Set_Mixed
 {
     TDBTable* table = [[TDBTable alloc] init];
@@ -1091,6 +1094,7 @@
     STAssertTrue([table[0][@"first"] isKindOfClass:[NSNumber class]], @"NSNumber expected");
     STAssertTrue((strcmp([(NSNumber *)table[0][@"first"] objCType], @encode(float)) == 0), @"'float' expected");
     STAssertEqualsWithAccuracy([(NSNumber *)table[0][@"first"] floatValue], (float)4.6692, 0.0001, @"Value 4.6692 expected");
+    STAssertEqualsWithAccuracy([table[0][@"first"] floatValue], (float)4.6692, 0.0001, @"Value 4.6692 expected");
 
     [table[0] set:@4.6692 inColumnWithIndex:0];
     STAssertTrue([table[0][@"first"] isKindOfClass:[NSNumber class]], @"NSNumber expected");
@@ -1106,6 +1110,7 @@
     STAssertTrue([table[0][@"first"] isKindOfClass:[NSNumber class]], @"NSNumber expected");
     STAssertTrue((strcmp([(NSNumber *)table[0][@"first"] objCType], @encode(BOOL)) == 0), @"'long long' expected");
     STAssertTrue([(NSNumber *)table[0][@"first"] boolValue], @"Value YES expected");
+    STAssertTrue([table[0][@"first"] boolValue], @"Valye YES expected");
 
     NSDate* d = [NSDate dateWithTimeIntervalSince1970:10000];
     [table[0] set:d inColumnWithIndex:0];
@@ -1139,6 +1144,27 @@
     STAssertTrue(strcmp([(NSNumber *)obj objCType], @encode(int64_t)) == 0, @"Integer expected");
     STAssertEquals([(NSNumber *)obj longLongValue], (int64_t)2, @"Value '2' expected");
 
+}
+
+-(void)testTableDynamic_Row_Get_Mixed
+{
+    TDBTable* table = [[TDBTable alloc] init];
+    STAssertNotNil(table, @"Table is nil");
+
+    // Add two columns
+    [table addColumnWithName:@"first" andType:TDBMixedType];
+
+    // Add three rows
+    [table addRow:@[@1]];
+    [table addRow:@[@"World"]];
+    [table addRow:@[@3.0f]];
+    [table addRow:@[@3.0]];
+
+
+    STAssertEquals([[table[0] get:0] longLongValue], (long long)1, @"Value '1' expected");
+    STAssertEqualsWithAccuracy([[table[2] get:0] floatValue], (float)3.0, 0.0001, @"Value 3.0 expected");
+    STAssertEqualsWithAccuracy([[table[3] get:0] doubleValue], (double)3.0, 0.0001, @"Value 3.0 expected");
+    STAssertTrue([(NSString *)[table[1] get:0] isEqualToString:@"World"], @"'World' expected");
 }
 
 @end
