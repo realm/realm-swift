@@ -78,7 +78,6 @@
 -(BOOL)optimize;
 
 // Table type and schema
--(BOOL)isReadOnly;
 -(BOOL)isEqual:(id)other;
 -(BOOL)hasSameDescriptorAs:(Class)otherTableClass;
 -(id)castClass:(Class)obj;
