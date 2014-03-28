@@ -26,14 +26,14 @@
         TDBTable *table = [transaction createTableWithName:@"myTable"];
 
         // Add columns to the table
-        [table addColumnWithName:@"Name" andType:TDBStringType];
-        [table addColumnWithName:@"Age" andType:TDBIntType];
+        [table addColumnWithName:@"Name" type:TDBStringType];
+        [table addColumnWithName:@"Age" type:TDBIntType];
        
         // Add a row to the table using a NSDictionary
         [table addRow:@{@"Name": @"Jill", @"Age": @21}];
 
         // Add a new column dynamically
-        int const HIRED = [table addColumnWithName:@"Hired" andType:TDBBoolType];
+        int const HIRED = [table addColumnWithName:@"Hired" type:TDBBoolType];
 
         // Add another row using a NSArray
         [table addRow:@[@"Mary", @40, @NO]];
