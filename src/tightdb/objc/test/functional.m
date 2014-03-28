@@ -154,9 +154,9 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
 
     TDBTable *table = [[TDBTable alloc] init];
 
-    size_t const NAME = [table addColumnWithName:@"Name" andType:TDBStringType];
-    size_t const AGE = [table addColumnWithName:@"Age" andType:TDBIntType];
-    size_t const HIRED = [table addColumnWithName:@"Hired" andType:TDBBoolType];
+    size_t const NAME = [table addColumnWithName:@"Name" type:TDBStringType];
+    size_t const AGE = [table addColumnWithName:@"Age" type:TDBIntType];
+    size_t const HIRED = [table addColumnWithName:@"Hired" type:TDBBoolType];
 
     TDBRow *cursor;
 

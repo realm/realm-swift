@@ -60,7 +60,7 @@ void ex_objc_sharedgroup_intro()
         [context readWithBlock:^(TDBTransaction *group) {
 
             /* Read transactions with the shared group are possible via the provided variable binding named group. */
-            PeopleTable *table = [group getTableWithName:@"employees" asTableClass:[PeopleTable class]];
+            PeopleTable *table = [group tableWithName:@"employees" asTableClass:[PeopleTable class]];
 
             for (PeopleTableRow *row in table) {
                 NSLog(@"Name: %@", [row Name]);

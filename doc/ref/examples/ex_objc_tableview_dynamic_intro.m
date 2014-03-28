@@ -11,9 +11,9 @@ void ex_objc_tableview_dynamic_intro()
         TDBTable *table = [[TDBTable alloc] init];
 
         /* Add some colomns (obsolete style, see typed table example). */
-        NSUInteger const NAME  = [table addColumnWithName:@"Name" andType:TDBStringType];
-        NSUInteger const AGE   = [table addColumnWithName:@"Age" andType:TDBIntType];
-        NSUInteger const HIRED = [table addColumnWithName:@"Hired" andType:TDBBoolType];
+        NSUInteger const NAME  = [table addColumnWithName:@"Name" type:TDBStringType];
+        NSUInteger const AGE   = [table addColumnWithName:@"Age" type:TDBIntType];
+        NSUInteger const HIRED = [table addColumnWithName:@"Hired" type:TDBBoolType];
 
         /* Add people (rows). */
         [table addRow:@[@"Joe", @23, @YES]];

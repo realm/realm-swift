@@ -38,13 +38,13 @@
  * This method returns a table with the specified name from the group.
  * Returns nil if no table with the specified name exists.
  */
--(TDBTable *)getTableWithName:(NSString *)name;
+-(TDBTable *)tableWithName:(NSString *)name;
 
 /**
  * This method returns a table with the specified name from the group.
  * Returns nil if no table with the specified name exists.
  */
--(id)getTableWithName:(NSString *)name asTableClass:(Class)obj;
+-(id)tableWithName:(NSString *)name asTableClass:(Class)obj;
 
 /**
  * This method creates a table with the specific name.

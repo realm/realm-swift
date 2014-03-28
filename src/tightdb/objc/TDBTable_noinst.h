@@ -25,12 +25,12 @@
 @interface TDBTable()
 
 -(tightdb::Table&)getNativeTable;
-
 -(void)setNativeTable:(tightdb::Table*)table;
 
 -(void)setParent:(id)parent; // Workaround for ARC release problem.
 
 -(void)setReadOnly:(BOOL)read_only;
+-(BOOL)isReadOnly;
 
 /// Also returns NO if memory allocation fails.
 -(BOOL)_checkType;

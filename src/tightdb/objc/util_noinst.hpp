@@ -180,7 +180,7 @@ if (col_ndx >= self.columnCount) { \
                                           userInfo:[NSMutableDictionary dictionary]]; \
     [exception raise]; \
 } \
-if ([self columnTypeOfColumn:col_ndx] != datatype) { \
+if ([self columnTypeOfColumnWithIndex:col_ndx] != datatype) { \
     NSException* exception = [NSException exceptionWithName:@"tightdb:illegal_type" \
                                           reason:@"The supplied type is not compatible with the column type" \
                                           userInfo:[NSMutableDictionary dictionary]]; \
