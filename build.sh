@@ -605,14 +605,14 @@ EOF
 
     "build-test-core")
         ## Setup directories
-        mkdir -p test-core || exit 1
-        rm -rf test-core/* || exit 1
         cd test-core
 
         DIR="iOSTestCoreAppTests"
         
         mkdir -p "$DIR" || exit 1
         rm -rf "$DIR/*" || exit 1
+        rm -rf "iOSTestCoreApp.xcodeproj"
+        rm -f "iOSTestCoreApp.gyp"
 
         ## Copy sources and unit tests
         function build_test_core_cp {
@@ -677,34 +677,47 @@ EOF
         # trick Xcode into thinking it's testing the app.
         cat >"iOSTestCoreApp.gyp" <<EOF
 {
-    'target_defaults': {
-        'link_settings': {
-            'libraries': [
-                '\$(SDKROOT)/usr/lib/libc++.dylib',
-                '\$(DEVELOPER_DIR)/Library/Frameworks/XCTest.framework',
-                '\$(DEVELOPER_DIR)/Library/Frameworks/Foundation.framework',
-                '\$(DEVELOPER_DIR)/Library/Frameworks/CoreGraphics.framework',
-                '\$(DEVELOPER_DIR)/Library/Frameworks/UIKit.framework',
-            ],
-        },
-        'xcode_settings': {
-            'ARCHS': [
-                '\$(ARCHS_STANDARD_INCLUDING_64_BIT)',
-            ],
-            'SDKROOT': 'iphoneos',
-            'TARGETED_DEVICE_FAMILY': '1,2', # iPhone/iPad
-            'FRAMEWORK_SEARCH_PATHS': [
-                '\$(SDKROOT)/Developer/Library/Frameworks',
-            ],
-            'CODE_SIGN_IDENTITY[sdk=iphoneos*]': 'iPhone Developer: Oleksandr(Alex Shturmov (CB4YV2W7W5)',
-        },
+    'xcode_settings': {
+        'ARCHS': [
+            '\$(ARCHS_STANDARD_INCLUDING_64_BIT)',
+        ],
+        'SDKROOT': 'iphoneos',
+        'TARGETED_DEVICE_FAMILY': '1,2', # iPhone/iPad
+        'FRAMEWORK_SEARCH_PATHS': [
+            '\$(SDKROOT)/Developer/Library/Frameworks',
+        ],
+        'CODE_SIGN_IDENTITY[sdk=iphoneos*]': 'iPhone Developer: Oleksandr(Alex Shturmov (CB4YV2W7W5)',
     },
     'targets': [
         {
             'target_name': 'iOSTestCoreApp',
             'type': 'executable',
             'mac_bundle': 1,
-            'sources': []
+            'sources': [
+                './iOSTestCoreApp/AppDelegate.h',
+                './iOSTestCoreApp/AppDelegate.m',
+                './iOSTestCoreApp/main.m',
+            ],
+            'mac_bundle_resources': [
+                './iOSTestCoreApp/Images.xcassets',
+                './iOSTestCoreApp/en.lproj/InfoPlist.strings',
+                './iOSTestCoreApp/iOSTestCoreApp-Info.plist',
+                './iOSTestCoreApp/iOSTestCoreApp-Prefix.pch',
+            ],
+            'link_settings': {
+                'libraries': [
+                    '\$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
+                    '\$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
+                    '\$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
+                ],
+            },
+            'xcode_settings': {
+                'SDKROOT': 'iphoneos',
+                'WRAPPER_EXTENSION': 'app',
+                'INFOPLIST_FILE': 'iOSTestCoreApp/iOSTestCoreApp-Info.plist',
+                'GCC_PRECOMPILE_PREFIX_HEADER': 'YES',
+                'GCC_PREFIX_HEADER': 'iOSTestCoreApp/iOSTestCoreApp-Prefix.pch',
+            }
         },
         {
             'target_name': 'iOSTestCoreAppTests',
@@ -721,7 +734,14 @@ $APP_TESTS_SOURCES
             'include_dirs': [
                 './iOSTestCoreAppTests/**'
             ],
+            'link_settings': {
+                'libraries': [
+                    '\$(SDKROOT)/usr/lib/libc++.dylib',
+                    '\$(DEVELOPER_DIR)/Library/Frameworks/XCTest.framework',
+                ],
+            },
             'xcode_settings': {
+                'SDKROOT': 'iphoneos',
                 'WRAPPER_EXTENSION': 'xctest',
                 'BUNDLE_LOADER': '\$(BUILT_PRODUCTS_DIR)/iOSTestCoreApp.app/iOSTestCoreApp',
                 'TEST_HOST': '\$(BUNDLE_LOADER)',
@@ -745,9 +765,9 @@ EOF
 
         ## Generate a scheme with a test action.
         USER=$(whoami)
-        mkdir "iOSTestCoreApp.xcodeproj/xcuserdata"
-        mkdir "iOSTestCoreApp.xcodeproj/xcuserdata/$USER.xcuserdatad"
-        mkdir "iOSTestCoreApp.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes"
+        mkdir -p "iOSTestCoreApp.xcodeproj/xcuserdata"
+        mkdir -p "iOSTestCoreApp.xcodeproj/xcuserdata/$USER.xcuserdatad"
+        mkdir -p "iOSTestCoreApp.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes"
         cat >"iOSTestCoreApp.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes/iOSTestCoreApp.xcscheme" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
