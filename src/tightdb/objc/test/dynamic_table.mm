@@ -24,6 +24,7 @@
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/TDBTable_noinst.h>
 
+#include <string.h>
 
 @interface TDBDynamicTableTests: SenTestCase
   // Intentionally left blank.
@@ -1069,6 +1070,52 @@
     STAssertTrue([_table[1][@"bool"] isEqual:@YES], @"Value 'YES' expected");
     STAssertTrue([_table[1][@"date"] isEqualToDate:[NSDate dateWithTimeIntervalSince1970:4]], @"Wrong date");
     STAssertTrue([_table[1][@"binary"] isEqualToData:[NSData dataWithBytes:bin5 length:5]], @"Wrong data");
+}
+
+-(void)testTableDynamic_Row_Set_Mixed
+{
+    TDBTable* table = [[TDBTable alloc] init];
+
+    // Mixed column
+    [table addColumnWithName:@"first" andType:TDBMixedType];
+
+    // Add row
+    [table addRow:@[@1]];
+
+    // Change value and check
+    [table[0] set:@"Hello" inColumnWithIndex:0];
+    STAssertTrue([table[0][@"first"] isKindOfClass:[NSString class]], @"string expected");
+    STAssertTrue(([table[0][@"first"] isEqualToString:@"Hello"]), @"'Hello' expected");
+
+    [table[0] set:@4.6692f inColumnWithIndex:0];
+    STAssertTrue([table[0][@"first"] isKindOfClass:[NSNumber class]], @"NSNumber expected");
+    STAssertTrue((strcmp([(NSNumber *)table[0][@"first"] objCType], @encode(float)) == 0), @"'float' expected");
+    STAssertEqualsWithAccuracy([(NSNumber *)table[0][@"first"] floatValue], (float)4.6692, 0.0001, @"Value 4.6692 expected");
+
+    [table[0] set:@4.6692 inColumnWithIndex:0];
+    STAssertTrue([table[0][@"first"] isKindOfClass:[NSNumber class]], @"NSNumber expected");
+    STAssertTrue((strcmp([(NSNumber *)table[0][@"first"] objCType], @encode(double)) == 0), @"'double' expected");
+    STAssertEqualsWithAccuracy([(NSNumber *)table[0][@"first"] doubleValue], 4.6692, 0.0001, @"Value 4.6692 expected");
+
+    [table[0] set:@4 inColumnWithIndex:0];
+    STAssertTrue([table[0][@"first"] isKindOfClass:[NSNumber class]], @"NSNumber expected");
+    STAssertTrue((strcmp([(NSNumber *)table[0][@"first"] objCType], @encode(long long)) == 0), @"'long long' expected");
+    STAssertEquals([(NSNumber *)table[0][@"first"] longLongValue], (long long)4, @"Value 1 expected");
+
+    [table[0] set:@YES inColumnWithIndex:0];
+    STAssertTrue([table[0][@"first"] isKindOfClass:[NSNumber class]], @"NSNumber expected");
+    STAssertTrue((strcmp([(NSNumber *)table[0][@"first"] objCType], @encode(BOOL)) == 0), @"'long long' expected");
+    STAssertTrue([(NSNumber *)table[0][@"first"] boolValue], @"Value YES expected");
+
+    NSDate* d = [NSDate dateWithTimeIntervalSince1970:10000];
+    [table[0] set:d inColumnWithIndex:0];
+    STAssertTrue([table[0][@"first"] isKindOfClass:[NSDate class]], @"NSDate expected");
+    STAssertTrue([(NSDate *)table[0][@"first"] isEqualToDate:d], @"Wrong date");
+
+    char bin5[] = {5, 6, 7, 8, 9};
+    [table[0] set:[NSData dataWithBytes:bin5 length:5] inColumnWithIndex:0];
+    STAssertTrue([table[0][@"first"] isKindOfClass:[NSData class]], @"NSData expected");
+    STAssertTrue([(NSData *)table[0][@"first"] isEqualToData:[NSData dataWithBytes:bin5 length:5]], @"Wrong data");
 }
 
 -(void)testTableDynamic_Row_Get
