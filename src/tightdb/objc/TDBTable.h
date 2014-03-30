@@ -37,7 +37,7 @@
 
 // Initializers for standalone tables
 -(instancetype)init;
--(instancetype)initWithSchema:(NSArray *)schema;
+-(instancetype)initWithColumns:(NSArray *)columns;
 
 // Working with columns
 -(NSUInteger)addColumnWithName:(NSString *)name andType:(TDBType)type;

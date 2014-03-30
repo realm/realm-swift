@@ -1032,13 +1032,13 @@
     STAssertTrue([_table[1][@"second"] isEqual:@"more test"], @"table[1].second");
 }
 
-- (void)testTableDynamic_initWithSchema
+- (void)testTableDynamic_initWithColumns
 {
-    TDBTable* table = [[TDBTable alloc] initWithSchema:@[@"name",   @"string",
-                                                         @"age",    @"int",
-                                                         @"hired",  @"bool",
-                                                         @"phones", @[@"type",   @"string",
-                                                                      @"number", @"string"]]];
+    TDBTable* table = [[TDBTable alloc] initWithColumns:@[@"name",   @"string",
+                                                          @"age",    @"int",
+                                                          @"hired",  @"bool",
+                                                          @"phones", @[@"type",   @"string",
+                                                                       @"number", @"string"]]];
 
     STAssertEquals([table columnCount], (NSUInteger)4, @"four columns");
 
