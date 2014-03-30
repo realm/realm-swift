@@ -701,7 +701,8 @@ BOOL set_columns_aux(TableRef& parent, std::vector<size_t> path, NSArray *schema
     return YES;
 }
 
-BOOL set_columns(TableRef& parent, NSArray *schema) {
+BOOL set_columns(TableRef& parent, NSArray *schema)
+{
     std::vector<size_t> v;
     return set_columns_aux(parent, v, schema);
 }
