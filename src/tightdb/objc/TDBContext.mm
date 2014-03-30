@@ -105,7 +105,7 @@ using namespace std;
 
 -(void)readTable:(NSString*)tablename withBlock:(TDBTableReadBlock)block
 {
-    [self readWithBlock:^(TDBTransaction* trx){
+    [self readWithBlock:^(TDBTransaction *trx){
         TDBTable *table = [trx tableWithName:tablename];
         block(table);
     }];
@@ -167,7 +167,7 @@ using namespace std;
 
 -(BOOL)writeTable:(NSString*)tablename withBlock:(TDBTableWriteBlock)block error:(NSError **)error
 {
-    return [self writeWithBlock:^(TDBTransaction* trx){
+    return [self writeWithBlock:^(TDBTransaction *trx){
         TDBTable *table = [trx tableWithName:tablename];
         return block(table);
     } error: error];
