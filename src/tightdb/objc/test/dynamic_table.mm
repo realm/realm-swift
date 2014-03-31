@@ -23,7 +23,6 @@
 
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/TDBTable_noinst.h>
-#import <tightdb/objc/NSObject+TDBTypeConversion.h>
 
 #include <string.h>
 
@@ -1137,13 +1136,9 @@
     [table addRow:@[@2, @"World"]];
     [table addRow:@[@3, @"Hello World"]];
 
-    TDBRow* row = table[1];
-    NSObject *obj = [row get:0];
-
-    STAssertTrue([obj isKindOfClass:[NSNumber class]], @"NSNumber expected");
-    STAssertTrue(strcmp([(NSNumber *)obj objCType], @encode(int64_t)) == 0, @"Integer expected");
-    STAssertEquals([(NSNumber *)obj longLongValue], (int64_t)2, @"Value '2' expected");
-
+    STAssertEquals([table[1] get:0].tdbLongLongValue, (int64_t)2, @"Value '2' expected");
+    STAssertThrows([table[1] get:0].asNSString, @"Is not NSString");
+    STAssertThrows(([table[1] get:0].tdbFloatValue), @"Is not float");
 }
 
 -(void)testTableDynamic_Row_Get_Mixed
@@ -1161,10 +1156,11 @@
     [table addRow:@[@3.0]];
 
 
-    STAssertEquals([[table[0] get:0] longLongValue], (long long)1, @"Value '1' expected");
-    STAssertEqualsWithAccuracy([[table[2] get:0] floatValue], (float)3.0, 0.0001, @"Value 3.0 expected");
-    STAssertEqualsWithAccuracy([[table[3] get:0] doubleValue], (double)3.0, 0.0001, @"Value 3.0 expected");
-    STAssertTrue([(NSString *)[table[1] get:0] isEqualToString:@"World"], @"'World' expected");
+    STAssertEquals([[table[0] get:0] tdbLongLongValue], (long long)1, @"Value '1' expected");
+    STAssertEqualsWithAccuracy([[table[2] get:0] tdbFloatValue], (float)3.0, 0.0001, @"Value 3.0 expected");
+    STAssertEqualsWithAccuracy([[table[3] get:0] tdbDoubleValue], (double)3.0, 0.0001, @"Value 3.0 expected");
+    STAssertTrue([[table[1] get:0].asNSString isEqualToString:@"World"], @"'World' expected");
+    STAssertThrows([table[1] get:0].tdbBoolValue, @"NSString expected");
 }
 
 @end

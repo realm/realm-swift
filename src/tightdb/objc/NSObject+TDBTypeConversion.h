@@ -19,10 +19,15 @@
  **************************************************************************/
 
 #import <Foundation/Foundation.h>
+#import "TDBTable.h"
 
 @interface NSObject (TDBTypeConversion)
--(BOOL) boolValue;
--(long long)longLongValue;
--(float) floatValue;
--(double) doubleValue;
+@property (nonatomic, readonly) BOOL tdbBoolValue;
+@property (nonatomic, readonly) long long tdbLongLongValue;
+@property (nonatomic, readonly) float tdbFloatValue;
+@property (nonatomic, readonly) double tdbDoubleValue;
+@property (nonatomic, readonly) NSData   *asNSData;
+@property (nonatomic, readonly) NSString *asNSString;
+@property (nonatomic, readonly) NSDate   *asNSDate;
+@property (nonatomic, readonly) TDBTable *asTDBTable;
 @end
