@@ -660,7 +660,6 @@ EOF
     // Change working directory to somewhere we can write.
     [[NSFileManager defaultManager]
         changeCurrentDirectoryPath:(NSTemporaryDirectory())];
-    tightdb::StringData tightdb_path(data, size);
     run_tests(0, NULL);
 }
 
