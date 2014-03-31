@@ -110,6 +110,11 @@ inline NSObject* to_objc_object(tightdb::Mixed m)
 
 
 // A few nice helpers
+inline bool nsnumber_is_like_bool(NSObject *obj);
+inline bool nsnumber_is_like_integer(NSObject *obj);
+inline bool nsnumber_is_like_float(NSObject *obj);
+inline bool nsnumber_is_like_double(NSObject *obj);
+
 void to_mixed(id value, tightdb::Mixed& m);
 
 BOOL set_cell(size_t col_ndx, size_t row_ndx, tightdb::Table& table, NSObject *obj);
