@@ -1138,7 +1138,7 @@
 
     STAssertEquals([table[1] get:0].TDBLongLongValue, (int64_t)2, @"Value '2' expected");
     STAssertThrows([table[1] get:0].TDBasNSString, @"Is not NSString");
-    STAssertThrows(([table[1] get:0].TDBFloatValue), @"Is not float");
+    STAssertNoThrow(([table[1] get:0].TDBFloatValue), @"Is not a number");
 }
 
 -(void)testTableDynamic_Row_Get_Mixed
