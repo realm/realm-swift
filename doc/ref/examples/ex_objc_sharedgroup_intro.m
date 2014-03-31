@@ -25,7 +25,7 @@ void ex_objc_sharedgroup_intro()
         NSError *error = nil;
         BOOL success;
 
-        success = [context writeWithBlock:^(TDBTransaction *group) {
+        success = [context writeTransactionUsingBlock:^(TDBTransaction *group) {
 
             /* Write transactions with the context are possible via the provided variable binding named transaction. */
             PeopleTable *table = [group createTableWithName:@"employees" asTableClass:[PeopleTable class]];
@@ -38,7 +38,7 @@ void ex_objc_sharedgroup_intro()
             NSLog(@"Something went wrong in the write-transaction: %@", [error description]);
 
         /* A write transaction (with rollback). */
-        success = [context writeWithBlock:^(TDBTransaction *group) {
+        success = [context writeTransactionUsingBlock:^(TDBTransaction *group) {
 
             /* Write transactions with the shared group are possible via the provided variable binding named group. */
            PeopleTable *table = [group createTableWithName:@"employees" asTableClass:[PeopleTable class]];
@@ -57,7 +57,7 @@ void ex_objc_sharedgroup_intro()
             NSLog(@"Error : %@", [error localizedDescription]);
 
         /* A read transaction */
-        [context readWithBlock:^(TDBTransaction *group) {
+        [context readTransactionUsingBlock:^(TDBTransaction *group) {
 
             /* Read transactions with the shared group are possible via the provided variable binding named group. */
             PeopleTable *table = [group tableWithName:@"employees" asTableClass:[PeopleTable class]];
