@@ -126,7 +126,7 @@ void sharedGroupFunc() {
                                                             error:nil];
 
     // Start a write transaction
-    [context writeWithBlock:^(TDBTransaction *transaction) {
+    [context writeTransactionUsingBlock:^(TDBTransaction *transaction) {
         // Get a specific table from the group
         PeopleTable *table = [transaction createTableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
@@ -138,7 +138,7 @@ void sharedGroupFunc() {
     } error:nil];
 
     // Start a read transaction
-    [context readWithBlock:^(TDBTransaction *transaction) {
+    [context readTransactionUsingBlock:^(TDBTransaction *transaction) {
         // Get the table
         PeopleTable *table = [transaction tableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
