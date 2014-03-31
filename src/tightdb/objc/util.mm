@@ -37,7 +37,7 @@ inline bool nsnumber_is_like_bool(NSObject *obj)
     /* @encode(BOOL) is 'B' on iOS 64 and 'c'
      objcType is always 'c'. Therefore compare to "c".
      */
-    return (strcmp(data_type, "c") == 0);
+    return data_type[0] == 'c';
 }
 
 inline bool nsnumber_is_like_integer(NSObject *obj)
