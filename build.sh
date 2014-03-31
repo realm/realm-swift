@@ -1,6 +1,5 @@
 # NOTE: THIS SCRIPT IS SUPPOSED TO RUN IN A POSIX SHELL
 
-
 ORIG_CWD="$(pwd)" || exit 1
 cd "$(dirname "$0")" || exit 1
 TIGHTDB_OBJC_HOME="$(pwd)" || exit 1
@@ -343,7 +342,7 @@ EOF
         ;;
 
     "get-version")
-	version_file="src/tightdb/objc/version.h"
+	version_file="src/tightdb/objc/TDBVersion.h"
 	tightdb_version_major="$(grep TDB_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
 	tightdb_version_minor="$(grep TDB_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
 	tightdb_version_patch="$(grep TDB_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
@@ -357,14 +356,14 @@ EOF
 	    exit 1
 	fi
         tightdb_version="$1"
-        version_file="src/tightdb/objc/version.h"
+        version_file="src/tightdb/objc/TDBVersion.h"
         tightdb_ver_major="$(echo "$tightdb_version" | cut -f1 -d.)" || exit 1
         tightdb_ver_minor="$(echo "$tightdb_version" | cut -f2 -d.)" || exit 1
         tightdb_ver_patch="$(echo "$tightdb_version" | cut -f3 -d.)" || exit 1
 
-	sed -i '' -e "s/Tightdb_Version_Major .*$/TDB_VERSION_MAJOR $tightdb_ver_major/" $version_file || exit 1
-	sed -i '' -e "s/Tightdb_Version_Minor .*$/TDB_VERSION_MINOR $tightdb_ver_minor/" $version_file || exit 1
-	sed -i '' -e "s/Tightdb_Version_Patch .*$/TDB_VERSION_PATCH $tightdb_ver_patch/" $version_file || exit 1
+	sed -i '' -e "s/TDB_VERSION_MAJOR .*$/TDB_VERSION_MAJOR $tightdb_ver_major/" $version_file || exit 1
+	sed -i '' -e "s/TDB_VERSION_MINOR .*$/TDB_VERSION_MINOR $tightdb_ver_minor/" $version_file || exit 1
+	sed -i '' -e "s/TDB_VERSION_PATCH .*$/TDB_VERSION_PATCH $tightdb_ver_patch/" $version_file || exit 1
 	exit 0
 	;;
 
@@ -400,14 +399,14 @@ EOF
         auto_configure || exit 1
         iphone_sdks_avail="$(get_config_param "IPHONE_SDKS_AVAIL")" || exit 1
         if [ "$iphone_sdks_avail" != "yes" ]; then
-            tightdb_abort "ERROR: iPhone SDKs were not found during configuration!"
+            tightdb_abort "ERROR: iPhone SDKs were not found during configuration"
         fi
         iphone_core_lib="$(get_config_param "IPHONE_CORE_LIB")" || exit 1
         if [ "$iphone_core_lib" = "none" ]; then
-            tightdb_abort "ERROR: TightDB core library for iPhone was not found during configuration!"
+            tightdb_abort "ERROR: TightDB core library for iPhone was not found during configuration"
         fi
         if ! [ -e "$iphone_core_lib/libtightdb-ios.a" ]; then
-            tightdb_abort "ERROR: TightDB core library for iPhone is not available in '$iphone_core_lib'!"
+            tightdb_abort "ERROR: TightDB core library for iPhone is not available in '$iphone_core_lib'"
         fi
         temp_dir="$(mktemp -d /tmp/tightdb.objc.build-iphone.XXXX)" || exit 1
         xcode_home="$(get_config_param "XCODE_HOME")" || exit 1

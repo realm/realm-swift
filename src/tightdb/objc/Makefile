@@ -1,16 +1,16 @@
 SUBDIRS = test
 test_DEPS = .
 
-nobase_subinclude_HEADERS = type.h cursor.h transaction.h query.h table.h context.h helper_macros.h table_macros.h tightdb.h version.h \
-descriptor.h table_view.h binary.h column_proxy.h mixed.h
+nobase_subinclude_HEADERS = TDBType.h TDBRow.h TDBTransaction.h TDBQuery.h TDBTable.h TDBContext.h PrivateHelperMacros.h PrivateTableMacros.h PrivateTDB.h Tightdb.h TDBVersion.h \
+TDBDescriptor.h TDBView.h TDBColumnProxy.h
 
 nobase_subinclude_HEADERS_EXTRA_UNINSTALL = *.h
 
 lib_LIBRARIES = libtightdb-objc.a
 
-libtightdb_objc_a_SOURCES = table_objc.mm cursor_objc.mm transaction_objc.mm query_objc.mm \
-context_objc.mm support.mm version_objc.mm descriptor_objc.mm table_view_objc.mm \
-binary_objc.mm mixed_objc.mm column_proxy.mm
+libtightdb_objc_a_SOURCES = TDBTable.mm TDBRow.mm TDBTransaction.mm TDBQuery.mm \
+TDBContext.mm util.mm TDBVersion.mm TDBDescriptor.mm TDBView.mm \
+TDBColumnProxy.mm NSData+TDBGetBinaryData.mm
 
 libtightdb_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2
 libtightdb_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
@@ -39,8 +39,8 @@ libtightdb_objc_a_VERSION = 4:0:0
 
 # Code generation
 ifeq ($(DISABLE_CHEETAH_CODE_GEN),)
-GENERATED_SOURCES += table_macros.h
-table_macros.h: table_macros.h.cheetah cheetah.sh
+GENERATED_SOURCES += PrivateTableMacros.h
+PrivateTableMacros.h: PrivateTableMacros.h.cheetah cheetah.sh
 	$(SHELL) cheetah.sh $< $@
 endif
 

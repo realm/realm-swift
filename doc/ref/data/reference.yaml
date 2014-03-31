@@ -27,7 +27,7 @@ DESCR     : >
 
             The core of the framework is the class {@link class_dyn_table}. The
             class is a representation of the
-            fundamental concept <strong>Table</strong>. You can use
+            fundamental concept <strong>TDBTable</strong>. You can use
             {@link class_typed_table} in the situations where you know the table structure
             a priori or when the data structure changes dynamically through the run time
             of the application.
@@ -37,7 +37,7 @@ DESCR     : >
             data structures. Moreover, tables can have nested tables as data. Using subtables
             and mixed types you can build arbitrarily complex data structures.
 
-            It is possible to query data using the {@link class_dyn_query} and
+            It is possible to query data using the {@link class_dyn_query} 
             class. Queries can be complex - involving
             any number of columns and values. You can either apply aggregate functions to you
             resulting data set or use the data set in your application as a
@@ -63,10 +63,9 @@ CATEGORIES:                       # list global class-id in order of appearence
   - dyn_view
   - dyn_query
 - Collection:
-  - group
-  - shared_group
-- Helpers:
-  - mixed
+  - transaction
+  - context
+#- Helpers:
 #  - cursor
 
 EXAMPLES  :

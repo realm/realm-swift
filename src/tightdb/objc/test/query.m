@@ -5,7 +5,7 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-#import <tightdb/objc/tightdb.h>
+#import <tightdb/objc/Tightdb.h>
 
 TIGHTDB_TABLE_1(TestQuerySub,
                 Age,  Int)
@@ -32,19 +32,19 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     STAssertNotNil(table, @"Table is nil");
 
     const char bin[4] = { 0, 1, 2, 3 };
-    TDBBinary *bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
-    TDBBinary *bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+    NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+    NSData *bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
 //    TestQuerySub *subtab1 = [[TestQuerySub alloc] init];
     TestQuerySub *subtab2 = [[TestQuerySub alloc] init];
     [subtab2 addAge:100];
-    TDBMixed *mixInt1   = [TDBMixed mixedWithInt64:1];
-    TDBMixed *mixSubtab = [TDBMixed mixedWithTable:subtab2];
+    NSNumber *mixInt1   = [NSNumber numberWithLongLong:1];
+    //TDBMixed *mixSubtab = [TDBMixed mixedWithTable:subtab2];
 
     [table addBoolCol:NO   IntCol:54       FloatCol:0.7     DoubleCol:0.8       StringCol:@"foo"
             BinaryCol:bin1 DateCol:0       TableCol:nil     MixedCol:mixInt1];
 
     [table addBoolCol:YES  IntCol:506      FloatCol:7.7     DoubleCol:8.8       StringCol:@"banach"
-            BinaryCol:bin2 DateCol:[NSDate date] TableCol:subtab2 MixedCol:mixSubtab];
+            BinaryCol:bin2 DateCol:[NSDate date] TableCol:subtab2 MixedCol:subtab2];
 
     STAssertEquals([[[table where].BoolCol   columnIsEqualTo:NO]      countRows], (NSUInteger)1, @"BoolCol equal");
     STAssertEquals([[[table where].IntCol    columnIsEqualTo:54]      countRows], (NSUInteger)1, @"IntCol equal");
@@ -57,7 +57,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 //    STAssertEquals([[[table where].TableCol  columnIsEqualTo:subtab1] count], (size_t)1, @"TableCol equal");
 //    STAssertEquals([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (size_t)1, @"MixedCol equal");
 
-    TestQueryAllTypes_Query *query = [[table where].BoolCol   columnIsEqualTo:NO];
+    TestQueryAllTypesQuery *query = [[table where].BoolCol   columnIsEqualTo:NO];
 
     STAssertEquals([query.IntCol min], (int64_t)54,    @"IntCol min");
     STAssertEquals([query.IntCol max], (int64_t)54,    @"IntCol max");
@@ -149,48 +149,48 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
         TDBTable *table = [[TDBTable alloc]init];
 
-        [table addColumnWithName:@"BoolCol" andType:TDBBoolType];
-        [table addColumnWithName:@"IntCol" andType:TDBIntType];
-        [table addColumnWithName:@"FloatCol" andType:TDBFloatType];
-        [table addColumnWithName:@"DoubleCol" andType:TDBDoubleType];
-        [table addColumnWithName:@"StringCol" andType:TDBStringType];
-        [table addColumnWithName:@"BinaryCol" andType:TDBBinaryType];
-        [table addColumnWithName:@"DateCol" andType:TDBDateType];
-        [table addColumnWithName:@"MixedCol" andType:TDBMixedType];
+        [table addColumnWithName:@"BoolCol" type:TDBBoolType];
+        [table addColumnWithName:@"IntCol" type:TDBIntType];
+        [table addColumnWithName:@"FloatCol" type:TDBFloatType];
+        [table addColumnWithName:@"DoubleCol" type:TDBDoubleType];
+        [table addColumnWithName:@"StringCol" type:TDBStringType];
+        [table addColumnWithName:@"BinaryCol" type:TDBBinaryType];
+        [table addColumnWithName:@"DateCol" type:TDBDateType];
+        [table addColumnWithName:@"MixedCol" type:TDBMixedType];
         // TODO: add Enum<T> and Subtable<T> when possible.
 
         const char bin[4] = { 0, 1, 2, 3 };
-        TDBMixed *mixInt1   = [TDBMixed mixedWithInt64:1];
-        TDBMixed *mixString   = [TDBMixed mixedWithString:@"foo"];
-        TDBBinary *bin1 = [[TDBBinary alloc] initWithData:bin size:sizeof bin / 2];
-        TDBBinary *bin2 = [[TDBBinary alloc] initWithData:bin size:sizeof bin];
+        NSNumber *mixInt1   = [NSNumber numberWithLongLong:1];
+        NSString *mixString = [NSString stringWithUTF8String:"foo"];
+        NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+        NSData *bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
 
         // Using private method just for the sake of testing the setters below.
-        [table TDBAddEmptyRows:2];
+        [table TDB_addEmptyRows:2];
 
-        [table setBool:YES inColumnWithIndex:BOOL_COL atRowIndex:0];
-        [table setBool:NO inColumnWithIndex:BOOL_COL atRowIndex:1];
+        [table TDB_setBool:YES inColumnWithIndex:BOOL_COL atRowIndex:0];
+        [table TDB_setBool:NO inColumnWithIndex:BOOL_COL atRowIndex:1];
 
-        [table setInt:0 inColumnWithIndex:INT_COL atRowIndex:0];
-        [table setInt:860 inColumnWithIndex:INT_COL atRowIndex:1];
+        [table TDB_setInt:0 inColumnWithIndex:INT_COL atRowIndex:0];
+        [table TDB_setInt:860 inColumnWithIndex:INT_COL atRowIndex:1];
 
-        [table setFloat:0 inColumnWithIndex:FLOAT_COL atRowIndex:0];
-        [table setFloat:5.6 inColumnWithIndex:FLOAT_COL atRowIndex:1];
+        [table TDB_setFloat:0 inColumnWithIndex:FLOAT_COL atRowIndex:0];
+        [table TDB_setFloat:5.6 inColumnWithIndex:FLOAT_COL atRowIndex:1];
 
-        [table setDouble:0 inColumnWithIndex:DOUBLE_COL atRowIndex:0];
-        [table setDouble:5.6 inColumnWithIndex:DOUBLE_COL atRowIndex:1];
+        [table TDB_setDouble:0 inColumnWithIndex:DOUBLE_COL atRowIndex:0];
+        [table TDB_setDouble:5.6 inColumnWithIndex:DOUBLE_COL atRowIndex:1];
 
-        [table setString:@"" inColumnWithIndex:STRING_COL atRowIndex:0];
-        [table setString:@"foo" inColumnWithIndex:STRING_COL atRowIndex:1];
+        [table TDB_setString:@"" inColumnWithIndex:STRING_COL atRowIndex:0];
+        [table TDB_setString:@"foo" inColumnWithIndex:STRING_COL atRowIndex:1];
 
-        [table setBinary:bin1 inColumnWithIndex:BINARY_COL atRowIndex:0];
-        [table setBinary:bin2 inColumnWithIndex:BINARY_COL atRowIndex:1];
+        [table TDB_setBinary:bin1 inColumnWithIndex:BINARY_COL atRowIndex:0];
+        [table TDB_setBinary:bin2 inColumnWithIndex:BINARY_COL atRowIndex:1];
 
-        [table setDate:0 inColumnWithIndex:DATE_COL atRowIndex:0];
-        [table setDate:[NSDate date] inColumnWithIndex:DATE_COL atRowIndex:1];
+        [table TDB_setDate:0 inColumnWithIndex:DATE_COL atRowIndex:0];
+        [table TDB_setDate:[NSDate date] inColumnWithIndex:DATE_COL atRowIndex:1];
 
-        [table setMixed:mixInt1 inColumnWithIndex:MIXED_COL atRowIndex:0];
-        [table setMixed:mixString inColumnWithIndex:MIXED_COL atRowIndex:1];
+        [table TDB_setMixed:mixInt1 inColumnWithIndex:MIXED_COL atRowIndex:0];
+        [table TDB_setMixed:mixString inColumnWithIndex:MIXED_COL atRowIndex:1];
 
         // Conditions (note that count is invoked to get the number of matches)
 
@@ -252,15 +252,18 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 - (void)testFind
 {
     TDBTable* table = [[TDBTable alloc]init];
-    [table addColumnWithName:@"IntCol" andType:TDBIntType];
-    [table TDBAddEmptyRows:6];
+    [table addColumnWithName:@"IntCol" type:TDBIntType];
+    [table TDB_addEmptyRows:6];
 
-    [table setInt:10 inColumnWithIndex:0 atRowIndex:0];
-    [table setInt:42 inColumnWithIndex:0 atRowIndex:1];
-    [table setInt:27 inColumnWithIndex:0 atRowIndex:2];
-    [table setInt:31 inColumnWithIndex:0 atRowIndex:3];
-    [table setInt:8  inColumnWithIndex:0 atRowIndex:4];
-    [table setInt:39 inColumnWithIndex:0 atRowIndex:5];
+    [table TDB_setInt:10 inColumnWithIndex:0 atRowIndex:0];
+    [table TDB_setInt:42 inColumnWithIndex:0 atRowIndex:1];
+    [table TDB_setInt:27 inColumnWithIndex:0 atRowIndex:2];
+    [table TDB_setInt:31 inColumnWithIndex:0 atRowIndex:3];
+    [table TDB_setInt:8  inColumnWithIndex:0 atRowIndex:4];
+    [table TDB_setInt:39 inColumnWithIndex:0 atRowIndex:5];
+    
+    STAssertEquals((NSUInteger)1, [[[table where ] intIsGreaterThan:10 inColumnWithIndex:0 ] findFirstRow], @"Row 1 is greater than 10");
+    STAssertEquals((NSUInteger)-1, [[[table where ] intIsGreaterThan:100 inColumnWithIndex:0 ] findFirstRow], @"No rows are greater than 100");
 
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:0], (size_t)2,  @"find");
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:3], (size_t)3,  @"find");
@@ -271,7 +274,24 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (size_t)-1, @"find");
 }
 
-
+- (void) testSubtableQuery
+{
+    TDBTable *t = [[TDBTable alloc] init];
+    
+    TDBDescriptor *d = t.descriptor;
+    TDBDescriptor *subDesc = [d addColumnTable:@"subtable"];
+    [subDesc addColumnWithName:@"subCol" type:TDBBoolType];
+    [t addRow:nil];
+    STAssertEquals(t.rowCount, (NSUInteger)1,@"one row added");
+    
+    TDBTable * subTable = [t TDB_tableInColumnWithIndex:0 atRowIndex:0];
+    [subTable addRow:nil];
+    [subTable TDB_setBool:YES inColumnWithIndex:0 atRowIndex:0];
+    TDBQuery *q = [t where];
+    
+    TDBView *v = [[[[q subtableInColumnWithIndex:0] boolIsEqualTo:YES inColumnWithIndex:0] parent] findAllRows];
+    STAssertEquals(v.rowCount, (NSUInteger)1,@"one match");
+}
 
 
 @end

@@ -3,7 +3,7 @@
  * TIGHTDB CONFIDENTIAL
  * __________________
  *
- *  [2011] - [2012] TightDB Inc
+ *  [2011] - [2014] TightDB Inc
  *  All Rights Reserved.
  *
  * NOTICE:  All information contained herein is, and remains
@@ -27,6 +27,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "TDBTransaction.h"
 
 @class TDBBinary;
 @class TDBTable;
@@ -39,13 +40,10 @@
  */
 +(TDBTransaction *)group;
 
-+(TDBTransaction *)groupWithFile:(NSString *)filename withError:(NSError *__autoreleasing *)error;
++(TDBTransaction *)groupWithFile:(NSString *)filename error:(NSError *__autoreleasing *)error;
 
-+(TDBTransaction *)groupWithBuffer:(TDBBinary *)buffer withError:(NSError *__autoreleasing *)error;
++(TDBTransaction *)groupWithBuffer:(NSData *)buffer error:(NSError *__autoreleasing *)error;
 
--(BOOL)writeContextToFile:(NSString *)path withError:(NSError *__autoreleasing *)error;
-
--(TDBBinary *)writeContextToBuffer;
-
+-(NSData *)writeContextToBuffer;
 @end
 

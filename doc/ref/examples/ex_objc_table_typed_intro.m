@@ -18,21 +18,21 @@ void ex_objc_table_typed_intro()
         PeopleTable *table = [[PeopleTable alloc] init];
 
         /* Append three rows. */
-        [table appendRow:@{@"Name":@"Brian",  @"Age":@10,  @"Hired":@NO}];
-        [table appendRow:@{@"Name":@"Sofie",  @"Age":@40,  @"Hired":@YES}];
-        [table appendRow:@{@"Name":@"Jesper", @"Age":@200, @"Hired":@NO}];
+        [table addRow:@{@"Name":@"Brian",  @"Age":@10,  @"Hired":@NO}];
+        [table addRow:@{@"Name":@"Sofie",  @"Age":@40,  @"Hired":@YES}];
+        [table addRow:@{@"Name":@"Jesper", @"Age":@200, @"Hired":@NO}];
 
         NSLog(@"The size of the table is now %zd", table.rowCount);
 
-        for (PeopleTable_Row *ite in table) {
+        for (PeopleTableRow *ite in table) {
             NSLog(@"Name: %@ Age: %lli", ite.Name, ite.Age);
         }
 
         NSLog(@"Insert a new row");
 
-        [table insertRow:@{@"Name":@"Sam", @"Age":@30, @"Hired":@YES} atRowIndex:1];
+        [table insertRow:@{@"Name":@"Sam", @"Age":@30, @"Hired":@YES} atIndex:1];
 
-        for (PeopleTable_Row *ite in table) {
+        for (PeopleTableRow *ite in table) {
             NSLog(@"Name: %@ Age: %lli", ite.Name, ite.Age);
         }
 
