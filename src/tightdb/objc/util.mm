@@ -31,6 +31,15 @@
 
 using namespace tightdb;
 
+inline bool nsnumber_is_like_bool(NSObject *obj)
+{
+    const char* data_type = [(NSNumber *)obj objCType];
+    /* @encode(BOOL) is 'B' on iOS 64 and 'c'
+     objcType is always 'c'. Therefore compare to "c".
+     */
+    return data_type[0] == 'c';
+}
+
 inline bool nsnumber_is_like_integer(NSObject *obj)
 {
     const char* data_type = [(NSNumber *)obj objCType];
@@ -76,7 +85,7 @@ void to_mixed(id value, Mixed& m)
         return;
     }
     if ([value isKindOfClass:[NSNumber class]]) {
-        if (strcmp([(NSNumber *)value objCType], @encode(BOOL)) == 0) {
+        if (nsnumber_is_like_bool(value)) {
             m.set_bool([(NSNumber *)value boolValue]);
             return;
         }
@@ -117,7 +126,7 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
             break;
         case type_Bool:
             if ([obj isKindOfClass:[NSNumber class]]) {
-                if (strcmp([(NSNumber *)obj objCType], @encode(BOOL)) == 0)
+                if (nsnumber_is_like_bool(obj))
                     break;
                 return NO;
             }
