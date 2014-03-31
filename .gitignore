@@ -6,7 +6,7 @@
 
 # sh build.sh test
 *.tightdb
-
+*.tightdb.lock
 
 
 /doc/ref/html/*.html
@@ -30,5 +30,7 @@ examples/tutorial
 # sh build.sh ios-framework
 /Tightdb.framework
 tightdb-ios-*.zip
+
+
 
 

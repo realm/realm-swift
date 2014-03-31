@@ -9,27 +9,28 @@ void ex_objc_table_dynamic_intro()
         /* Create a new table dynamically. */
         TDBTable *table = [[TDBTable alloc] init];
 
-        NSUInteger const NAME = [table addColumnWithName:@"Name" andType:TDBStringType];
-        NSUInteger const AGE = [table addColumnWithName:@"Age" andType:TDBIntType];
+        NSUInteger const NAME = [table addColumnWithName:@"Name" type:TDBStringType];
+        NSUInteger const AGE = [table addColumnWithName:@"Age" type:TDBIntType];
 
         /* Add a row with values. */
-        TDBRow *row;
-        row = [table addEmptyRow];
+        NSUInteger rowIndex = [table addRow:nil];
+        TDBRow *row = [table rowAtIndex:rowIndex];
 
-        [row setInt:23 inColumnWithIndex:AGE];
         [row setString:@"Joe" inColumnWithIndex:NAME];
+        [row setInt:23 inColumnWithIndex:AGE];
 
         /* And a few more rows - in a simpler manner */
-        [table appendRow:@[@32, @"Simon"]];
-        [table appendRow:@[@12, @"Steve"]];
-        [table appendRow:@[@100, @"Nick"]];
+        [table addRow:@[@"Simon", @32]];
+        [table addRow:@[@"Steve", @12]];
+        [table addRow:@[@"Nick", @100]];
 
         /* Print using a cursor. */
         for (TDBRow *ite in table)
             NSLog(@"Name: %@ Age: %lld", [ite stringInColumnWithIndex:NAME], [ite intInColumnWithIndex:AGE]);
         
         /* Insert a row and print. */
-        row = [table insertEmptyRowAtIndex:2];
+        [table insertRow: nil atIndex:2];
+        row = [table rowAtIndex:2];
         [row setInt:21 inColumnWithIndex:AGE];
         [row setString:@"Hello I'm INSERTED" inColumnWithIndex:NAME];
 

@@ -7,9 +7,9 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-#import <tightdb/objc/tightdb.h>
-#import <tightdb/objc/transaction.h>
-#import <tightdb/objc/context.h>
+#import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/TDBTransaction.h>
+#import <tightdb/objc/TDBContext.h>
 
 TIGHTDB_TABLE_2(GetSubtable,
                 Hired, Bool,
@@ -34,29 +34,29 @@ TIGHTDB_TABLE_2(WrongTypeTable,
     // Create table with all column types
     TDBTable* table = [[TDBTable alloc] init];
     TDBDescriptor* desc = table.descriptor;
-    [desc addColumnWithName:@"Outer" andType:TDBBoolType];
-    [desc addColumnWithName:@"Number" andType:TDBIntType];
+    [desc addColumnWithName:@"Outer" type:TDBBoolType];
+    [desc addColumnWithName:@"Number" type:TDBIntType];
     TDBDescriptor* subdesc = [desc addColumnTable:@"GetSubtable"];
-    [subdesc addColumnWithName:@"Hired" andType:TDBBoolType];
-    [subdesc addColumnWithName:@"Age" andType:TDBIntType];
+    [subdesc addColumnWithName:@"Hired" type:TDBBoolType];
+    [subdesc addColumnWithName:@"Age" type:TDBIntType];
 
-    [table TDBInsertBool:0 ndx:0 value:NO];
-    [table TDBInsertInt:1 ndx:0 value:10];
-    [table TDBInsertSubtable:2 ndx:0];
-    [table TDBInsertDone];
+    [table TDB_insertBool:0 ndx:0 value:NO];
+    [table TDB_insertInt:1 ndx:0 value:10];
+    [table TDB_insertSubtable:2 ndx:0];
+    [table TDB_insertDone];
 
-    TDBTable* subtable = [table tableInColumnWithIndex:2 atRowIndex:0];
-    [subtable TDBInsertBool:0 ndx:0 value:YES];
-    [subtable TDBInsertInt:1 ndx:0 value:42];
-    [subtable TDBInsertDone];
+    TDBTable* subtable = [table TDB_tableInColumnWithIndex:2 atRowIndex:0];
+    [subtable TDB_insertBool:0 ndx:0 value:YES];
+    [subtable TDB_insertInt:1 ndx:0 value:42];
+    [subtable TDB_insertDone];
 
-    GetSubtable* testTable = [table tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[GetSubtable class]];
-    GetSubtable_Row* cursor = [testTable rowAtIndex:0];
+    GetSubtable* testTable = [table TDB_tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[GetSubtable class]];
+    GetSubtableRow* cursor = [testTable rowAtIndex:0];
     NSLog(@"Age in subtable: %lld", cursor.Age);
     STAssertEquals(cursor.Age, (int64_t)42, @"Sub table row should be 42");
 
-    STAssertNil([table tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongNameTable class]], @"should return nil because wrong name");
-    STAssertNil([table tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongTypeTable class]], @"should return nil because wrong type");
+    STAssertNil([table TDB_tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongNameTable class]], @"should return nil because wrong name");
+    STAssertNil([table TDB_tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongTypeTable class]], @"should return nil because wrong type");
 }
 
 

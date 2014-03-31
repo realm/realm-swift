@@ -5,7 +5,7 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-#import <tightdb/objc/version.h>
+#import <tightdb/objc/TDBVersion.h>
 
 @interface MACTestVersion: SenTestCase
 @end

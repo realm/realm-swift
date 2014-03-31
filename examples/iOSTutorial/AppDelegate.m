@@ -20,22 +20,22 @@ void tableFunc() {
     // @@Example: insert_rows @@
 
     // Add a row
-    PeopleTable_Row *row;
+    PeopleTableRow *row;
     row = [people addEmptyRow];
     row.Name  = @"John";
     row.Age   = 21;
     row.Hired = YES;
 
     // Add more rows
-    [people appendRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
-    [people appendRow:@{@"Name": @"Lars", @"Age": @22, @"Hired": @YES}];
-    [people appendRow:@{@"Name": @"Phil", @"Age": @43, @"Hired": @NO}];
-    [people appendRow:@{@"Name": @"Anni", @"Age": @54, @"Hired": @YES}];
+    [people addRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
+    [people addRow:@{@"Name": @"Lars", @"Age": @22, @"Hired": @YES}];
+    [people addRow:@{@"Name": @"Phil", @"Age": @43, @"Hired": @NO}];
+    [people addRow:@{@"Name": @"Anni", @"Age": @54, @"Hired": @YES}];
 
     // @@EndExample@@
 
     // @@Example: insert_at_index @@
-    [people insertRow:@{@"Name": @"Frank", @"Age": @34, @"Hired": @YES} atRowIndex:2];
+    [people insertRow:@{@"Name": @"Frank", @"Age": @34, @"Hired": @YES} atIndex:2];
 
     // @@EndExample@@
 
@@ -52,7 +52,7 @@ void tableFunc() {
     NSLog(@"Name: %@", name);
 
     // Using a cursor
-    PeopleTable_Row *myRow = people[5];
+    PeopleTableRow *myRow = people[5];
     int64_t age = myRow.Age;                           // =&gt; 54
     NSLog(@"Age: %lli", age);
     BOOL hired  = myRow.Hired;                         // =&gt; true
@@ -80,7 +80,7 @@ void tableFunc() {
 
     // @@Example: iteration @@
     for (NSUInteger i = 0; i < people.rowCount; ++i) {
-        PeopleTable_Row *row = people[i];
+        PeopleTableRow *row = people[i];
         NSLog(@"%@ is %lld years old", row.Name, row.Age);
     }
     // @@EndExample@@
@@ -93,22 +93,22 @@ void tableFunc() {
 
     // @@Example: advanced_search @@
     // Create query (current employees between 20 and 30 years old)
-    PeopleTable_Query *q = [[[people where].Hired columnIsEqualTo:YES]
+    PeopleTableQuery *q = [[[people where].Hired columnIsEqualTo:YES]
                                            .Age   columnIsBetween:20 and_:30];
 
     // Get number of matching entries
     NSUInteger cnt3 = [q countRows];                     // =&gt; 2
     NSLog(@"RowCount: %i", cnt3);
 
-    // Get the average age (currently only a low-level interface)
+     // You can do aggregates on columns, like calculating the average age
     double avg = [q.Age avg];
     NSLog(@"Avg age: %f", avg);
 
     // Execute the query and return a table (view)
-    PeopleTable_View *res = [q findAll];
+    PeopleTableView *res = [q findAll];
 
     // fast emunaration on view
-    for (PeopleTable_Row *r in res)
+    for (PeopleTableRow *r in res)
         NSLog(@"%@ is %lld years old", r.Name, r.Age);
 
     // @@EndExample@@
@@ -122,29 +122,29 @@ void sharedGroupFunc() {
     [fileManager removeItemAtPath:@"people.tightdb" error:&error];
 
     // @@Example: transaction @@
-    TDBContext *context = [TDBContext initWithFile:@"people.tightdb"
-                                                            withError:nil];
+    TDBContext *context = [TDBContext contextWithPersistenceToFile:@"people.tightdb"
+                                                            error:nil];
 
     // Start a write transaction
     [context writeWithBlock:^(TDBTransaction *transaction) {
         // Get a specific table from the group
-        PeopleTable *table = [transaction getOrCreateTableWithName:@"employees"
+        PeopleTable *table = [transaction createTableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
 
         // Add a row
         [table addName:@"Bill" Age:53 Hired:YES];
         NSLog(@"Row added!");
         return YES; // Commit (NO would rollback)
-    } withError:nil];
+    } error:nil];
 
     // Start a read transaction
     [context readWithBlock:^(TDBTransaction *transaction) {
         // Get the table
-        PeopleTable *table = [transaction getOrCreateTableWithName:@"employees"
+        PeopleTable *table = [transaction tableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
 
         // Interate over all rows in table
-        for (PeopleTable_Row *row in table) {
+        for (PeopleTableRow *row in table) {
             NSLog(@"Name: %@", row.Name);
         }
     }];

@@ -5,8 +5,8 @@
 
 
 #import <SenTestingKit/SenTestingKit.h>
-#import <tightdb/objc/tightdb.h>
-#import <tightdb/objc/table.h>
+#import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/TDBTable.h>
 
 TIGHTDB_TABLE_3(FuncPeopleTable,
                 Name,  String,
@@ -29,7 +29,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
 
     FuncPeopleTable *table = [[FuncPeopleTable alloc] init];
 
-    FuncPeopleTable_Row *cursor;
+    FuncPeopleTableRow *cursor;
 
     // Add rows
     for (int i = 0; i < TABLE_SIZE; i++) {
@@ -96,7 +96,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
      *  Row in a query.
      */
 
-    FuncPeopleTable_Query *query = [[table where].Name columnIsNotEqualTo:@"Nothing is equal to this"];  // dummy query required right now
+    FuncPeopleTableQuery *query = [[table where].Name columnIsNotEqualTo:@"Nothing is equal to this"];  // dummy query required right now
     STAssertEquals([query countRows], (NSUInteger)(TABLE_SIZE-2), @"Check the size");
 
     i=0;
@@ -112,7 +112,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
      *  Row in table view.
      */
 
-    FuncPeopleTable_View *view = [[query.Hired columnIsEqualTo:YES] findAll];
+    FuncPeopleTableView *view = [[query.Hired columnIsEqualTo:YES] findAll];
     STAssertEquals([query countRows], (NSUInteger)(TABLE_SIZE-2)/2, @"Check the size");
 
     i=0;
@@ -154,15 +154,16 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
 
     TDBTable *table = [[TDBTable alloc] init];
 
-    size_t const NAME = [table addColumnWithName:@"Name" andType:TDBStringType];
-    size_t const AGE = [table addColumnWithName:@"Age" andType:TDBIntType];
-    size_t const HIRED = [table addColumnWithName:@"Hired" andType:TDBBoolType];
+    size_t const NAME = [table addColumnWithName:@"Name" type:TDBStringType];
+    size_t const AGE = [table addColumnWithName:@"Age" type:TDBIntType];
+    size_t const HIRED = [table addColumnWithName:@"Hired" type:TDBBoolType];
 
     TDBRow *cursor;
 
     // Add rows
     for (int i = 0; i < TABLE_SIZE; i++) {
-        cursor = [table addEmptyRow];
+        NSUInteger rowIndex = [table addRow:nil];
+        cursor = [table rowAtIndex:rowIndex];
         [cursor setString:[@"Person_" stringByAppendingString: [NSString stringWithFormat:@"%d",i]] inColumnWithIndex:NAME];
         [cursor setInt:i inColumnWithIndex:AGE];
         [cursor setBool:i%2 == 0 inColumnWithIndex:HIRED];
@@ -179,7 +180,8 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
     }
 
     // Insert a row
-    cursor = [table insertEmptyRowAtIndex:INSERT_ROW];
+    [table insertRow:nil atIndex:INSERT_ROW];
+    cursor = [table rowAtIndex:INSERT_ROW];
     [cursor setString:@"Person_Inserted" inColumnWithIndex:NAME];
     [cursor setInt:99 inColumnWithIndex:AGE];
     [cursor setBool:YES inColumnWithIndex:HIRED];
