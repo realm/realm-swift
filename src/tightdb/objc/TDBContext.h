@@ -32,8 +32,8 @@ typedef BOOL(^TDBWriteBlock)(TDBTransaction *transaction);
 +(TDBContext *)contextWithPersistenceToFile:(NSString *)path error:(NSError **)error;
 
 // Transactions
--(void)readWithBlock:(TDBReadBlock)block;
--(BOOL)writeWithBlock:(TDBWriteBlock)block error:(NSError **)error;
+-(void)readTransactionUsingBlock:(TDBReadBlock)block;
+-(BOOL)writeTransactionUsingBlock:(TDBWriteBlock)block error:(NSError **)error;
 
 // Context state info
 -(BOOL)hasChangedSinceLastTransaction;
