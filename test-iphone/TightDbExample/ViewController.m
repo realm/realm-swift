@@ -74,7 +74,7 @@ TIGHTDB_TABLE_2(MyTable2,
     // Create new table in group
     TDBContext *context = [TDBContext contextWithPersistenceToFile:@"employees.tightdb" error:nil];
     
-    [context writeWithBlock:^BOOL(TDBTransaction *group) {
+    [context writeTransactionUsingBlock:^BOOL(TDBTransaction *group) {
         
         MyTable *table = [group createTableWithName:@"employees" asTableClass:[MyTable class]];
         
@@ -149,7 +149,7 @@ TIGHTDB_TABLE_2(MyTable2,
     
     context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"employees.tightdb"] error:nil];
     
-    [context writeWithBlock:^BOOL(TDBTransaction *transaction) {
+    [context writeTransactionUsingBlock:^BOOL(TDBTransaction *transaction) {
         MyTable *diskTable = [transaction tableWithName:@"employees" asTableClass:[MyTable class]];
         
         [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
@@ -168,7 +168,7 @@ TIGHTDB_TABLE_2(MyTable2,
 
 
     
-    [context readWithBlock:^(TDBTransaction *transaction) {
+    [context readTransactionUsingBlock:^(TDBTransaction *transaction) {
         
         MyTable *diskTable = [transaction tableWithName:@"employees" asTableClass:[MyTable class]];
         

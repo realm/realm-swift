@@ -59,7 +59,7 @@ TIGHTDB_TABLE_4(PerfTable,
 
 
     TDBContext *context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] error:nil];
-    [context writeWithBlock:^BOOL(TDBTransaction *group) {
+    [context writeTransactionUsingBlock:^BOOL(TDBTransaction *group) {
         // Create new table in group
         PerfTable *table = [group createTableWithName:@"employees" asTableClass:[PerfTable class]];
         
@@ -144,7 +144,7 @@ TIGHTDB_TABLE_4(PerfTable,
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
     TDBContext *context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] error:nil];
-    [context readWithBlock:^(TDBTransaction *fromDisk) {
+    [context readTransactionUsingBlock:^(TDBTransaction *fromDisk) {
         PerfTable *diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PerfTable class]];
         
         if ([diskTable rowCount] != _size+1) {
@@ -207,7 +207,7 @@ TIGHTDB_TABLE_4(PerfTable,
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
     
     TDBContext *context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] error:nil];
-    [context readWithBlock:^(TDBTransaction *fromDisk) {
+    [context readTransactionUsingBlock:^(TDBTransaction *fromDisk) {
         PerfTable *diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PerfTable class]];
         
         // Create query (current employees between 20 and 30 years old)
@@ -269,7 +269,7 @@ TIGHTDB_TABLE_4(PerfTable,
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
     TDBContext *context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] error:nil];
-    [context readWithBlock:^(TDBTransaction *fromDisk) {
+    [context readTransactionUsingBlock:^(TDBTransaction *fromDisk) {
         
         PerfTable *diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PerfTable class] ];
         
@@ -298,7 +298,7 @@ TIGHTDB_TABLE_4(PerfTable,
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
 
     TDBContext *context = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] error:nil];
-    [context readWithBlock:^(TDBTransaction *fromDisk) {
+    [context readTransactionUsingBlock:^(TDBTransaction *fromDisk) {
         PerfTable *diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PerfTable class] ];
         
         int agesum = 0;
@@ -321,7 +321,7 @@ TIGHTDB_TABLE_4(PerfTable,
 
     NSString *tightDBPath = [_utils pathForDataFile:@"testemployees.tightdb"];
     TDBContext *context = [TDBContext contextWithPersistenceToFile:tightDBPath error:nil];
-    [context readWithBlock:^(TDBTransaction *fromDisk) {
+    [context readTransactionUsingBlock:^(TDBTransaction *fromDisk) {
         
         NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
         [[NSFileManager defaultManager] removeItemAtPath:tightDBPath error:nil];
@@ -341,7 +341,7 @@ TIGHTDB_TABLE_4(PerfTable,
     
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
     TDBContext *fromDisk = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] error:nil];
-    [fromDisk readWithBlock:^(TDBTransaction *group) {
+    [fromDisk readTransactionUsingBlock:^(TDBTransaction *group) {
         PerfTable *diskTable = [group tableWithName:@"employees" asTableClass:[PerfTable class] ];
 
         // Create query (current employees between 20 and 30 years old)
@@ -365,7 +365,7 @@ TIGHTDB_TABLE_4(PerfTable,
 {
     NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
     TDBContext *fromDisk = [TDBContext contextWithPersistenceToFile:[_utils pathForDataFile:@"perfemployees.tightdb"] error:nil];
-    [fromDisk writeWithBlock:^(TDBTransaction *group) {
+    [fromDisk writeTransactionUsingBlock:^(TDBTransaction *group) {
         PerfTable *diskTable = [group tableWithName:@"employees" asTableClass:[PerfTable class] ];
 
         // Add some rows
