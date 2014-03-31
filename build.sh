@@ -630,9 +630,6 @@ EOF
         build_test_core_cp test/util util
         build_test_core_cp test/large_tests large_tests
 
-        build_test_core_cp test/UnitTest++/src UnitTest++
-        build_test_core_cp test/UnitTest++/src/Posix UnitTest++/Posix
-
         ## Remove breaking files (containing main or unportable code).
         rm "$DIR/main.cpp"
         rm "$DIR/tightdb/config_tool.cpp"
@@ -660,6 +657,10 @@ EOF
 
 -(void)testRunTests
 {
+    // Change working directory to somewhere we can write.
+    [[NSFileManager defaultManager]
+        changeCurrentDirectoryPath:(NSTemporaryDirectory())];
+    tightdb::StringData tightdb_path(data, size);
     run_tests(0, NULL);
 }
 
