@@ -27,7 +27,7 @@
  * The selectors in this interface is not meant to be used directly.
  * However, they are public so that the typed table macros can use them.
  */
-@interface TDBTable()
+@interface TDBTable (Private)
 
 -(id)_initRaw;
 
@@ -74,12 +74,11 @@
 
 @end
 
-
 /**
  * The selectors in this interface is not meant to be used directly.
  * However, they are public so that the typed table macros can use them.
  */
-@interface TDBView()
+@interface TDBView (Private)
 -(id)_initWithQuery:(TDBQuery *)query;
 
 -(BOOL)TDB_boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
@@ -94,7 +93,11 @@
 -(id)TDB_mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 @end
 
-@interface TDBRow()
+/**
+ * The selectors in this interface is not meant to be used directly.
+ * However, they are public so that the typed table macros can use them.
+ */
+@interface TDBRow (Private)
 -(id)initWithTable:(TDBTable *)table ndx:(NSUInteger)ndx;
 -(void)TDB_setNdx:(NSUInteger)ndx;
 -(NSUInteger)TDB_index;
@@ -102,9 +105,9 @@
 
 /**
  * The selectors in this interface is not meant to be used directly.
- * However, they are public so that the typed table macros can use them.
+ * However, they are publicly available so that the typed table macros can use them.
  */
-@interface TDBContext()
+@interface TDBContext (Experiment)
 
 /******** Experimental features **********/
 -(BOOL)pinReadTransactions;

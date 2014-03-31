@@ -31,7 +31,7 @@
 #import <tightdb/objc/TDBView.h>
 #import <tightdb/objc/TDBView_noinst.h>
 #import <tightdb/objc/TDBRow.h>
-#import <NSData+TDBGetBinaryData.h>
+#import "NSData+TDBGetBinaryData.h"
 #import <tightdb/objc/PrivateTDB.h>
 
 #include <tightdb/objc/util_noinst.hpp>
