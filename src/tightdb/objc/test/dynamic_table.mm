@@ -55,7 +55,7 @@
     //[_table set:1 ndx:ndx value:10];
 
     TDBRow* cursor = [_table addEmptyRow];
-    size_t ndx = [cursor TDBIndex];
+    size_t ndx = [cursor TDB_index];
     [cursor setInt:0 inColumnWithIndex:0];
     [cursor setInt:10 inColumnWithIndex:1];
 

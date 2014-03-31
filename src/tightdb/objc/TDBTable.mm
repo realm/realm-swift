@@ -37,6 +37,8 @@
 #import <tightdb/objc/TDBDescriptor_noinst.h>
 #import <tightdb/objc/TDBColumnProxy.h>
 #import <tightdb/objc/NSData+TDBGetBinaryData.h>
+#import <tightdb/objc/PrivateTDB.h>
+
 
 #include <tightdb/objc/util_noinst.hpp>
 
@@ -96,7 +98,7 @@ using namespace std;
         *stackbuf = tmp;
     }
     if (state->state < self.rowCount) {
-        [((TDBRow*)*stackbuf) TDBSetNdx:state->state];
+        [((TDBRow*)*stackbuf) TDB_setNdx:state->state];
         state->itemsPtr = stackbuf;
         state->state++;
     }
