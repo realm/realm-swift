@@ -1136,9 +1136,9 @@
     [table addRow:@[@2, @"World"]];
     [table addRow:@[@3, @"Hello World"]];
 
-    STAssertEquals([table[1] get:0].tdbLongLongValue, (int64_t)2, @"Value '2' expected");
-    STAssertThrows([table[1] get:0].asNSString, @"Is not NSString");
-    STAssertThrows(([table[1] get:0].tdbFloatValue), @"Is not float");
+    STAssertEquals([table[1] get:0].TDBLongLongValue, (int64_t)2, @"Value '2' expected");
+    STAssertThrows([table[1] get:0].TDBasNSString, @"Is not NSString");
+    STAssertThrows(([table[1] get:0].TDBFloatValue), @"Is not float");
 }
 
 -(void)testTableDynamic_Row_Get_Mixed
@@ -1156,11 +1156,11 @@
     [table addRow:@[@3.0]];
 
 
-    STAssertEquals([[table[0] get:0] tdbLongLongValue], (long long)1, @"Value '1' expected");
-    STAssertEqualsWithAccuracy([[table[2] get:0] tdbFloatValue], (float)3.0, 0.0001, @"Value 3.0 expected");
-    STAssertEqualsWithAccuracy([[table[3] get:0] tdbDoubleValue], (double)3.0, 0.0001, @"Value 3.0 expected");
-    STAssertTrue([[table[1] get:0].asNSString isEqualToString:@"World"], @"'World' expected");
-    STAssertThrows([table[1] get:0].tdbBoolValue, @"NSString expected");
+    STAssertEquals([[table[0] get:0] TDBLongLongValue], (long long)1, @"Value '1' expected");
+    STAssertEqualsWithAccuracy([[table[2] get:0] TDBFloatValue], (float)3.0, 0.0001, @"Value 3.0 expected");
+    STAssertEqualsWithAccuracy([[table[3] get:0] TDBDoubleValue], (double)3.0, 0.0001, @"Value 3.0 expected");
+    STAssertTrue([[table[1] get:0].TDBasNSString isEqualToString:@"World"], @"'World' expected");
+    STAssertThrows([table[1] get:0].TDBBoolValue, @"NSString expected");
 }
 
 @end

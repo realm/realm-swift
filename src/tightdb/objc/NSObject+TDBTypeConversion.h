@@ -22,12 +22,12 @@
 #import "TDBTable.h"
 
 @interface NSObject (TDBTypeConversion)
-@property (nonatomic, readonly) BOOL tdbBoolValue;
-@property (nonatomic, readonly) long long tdbLongLongValue;
-@property (nonatomic, readonly) float tdbFloatValue;
-@property (nonatomic, readonly) double tdbDoubleValue;
-@property (nonatomic, readonly) NSData   *asNSData;
-@property (nonatomic, readonly) NSString *asNSString;
-@property (nonatomic, readonly) NSDate   *asNSDate;
-@property (nonatomic, readonly) TDBTable *asTDBTable;
+@property (nonatomic, readonly) BOOL TDBBoolValue;
+@property (nonatomic, readonly) long long TDBLongLongValue;
+@property (nonatomic, readonly) float TDBFloatValue;
+@property (nonatomic, readonly) double TDBDoubleValue;
+@property (nonatomic, readonly) NSData   *TDBasNSData;
+@property (nonatomic, readonly) NSString *TDBasNSString;
+@property (nonatomic, readonly) NSDate   *TDBasNSDate;
+@property (nonatomic, readonly) TDBTable *TDBasTDBTable;
 @end
