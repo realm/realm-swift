@@ -31,52 +31,6 @@
 
 using namespace tightdb;
 
-inline bool nsnumber_is_like_bool(NSObject *obj)
-{
-    const char* data_type = [(NSNumber *)obj objCType];
-    /* @encode(BOOL) is 'B' on iOS 64 and 'c'
-     objcType is always 'c'. Therefore compare to "c".
-     */
-    return data_type[0] == 'c';
-}
-
-inline bool nsnumber_is_like_integer(NSObject *obj)
-{
-    const char* data_type = [(NSNumber *)obj objCType];
-    return (strcmp(data_type, @encode(int)) == 0 ||
-            strcmp(data_type, @encode(long)) ==  0 ||
-            strcmp(data_type, @encode(long long)) == 0 ||
-            strcmp(data_type, @encode(unsigned int)) == 0 ||
-            strcmp(data_type, @encode(unsigned long)) == 0 ||
-            strcmp(data_type, @encode(unsigned long long)) == 0);
-}
-
-inline bool nsnumber_is_like_float(NSObject *obj)
-{
-    const char* data_type = [(NSNumber *)obj objCType];
-    return (strcmp(data_type, @encode(float)) == 0 ||
-            strcmp(data_type, @encode(int)) == 0 ||
-            strcmp(data_type, @encode(long)) ==  0 ||
-            strcmp(data_type, @encode(long long)) == 0 ||
-            strcmp(data_type, @encode(unsigned int)) == 0 ||
-            strcmp(data_type, @encode(unsigned long)) == 0 ||
-            strcmp(data_type, @encode(unsigned long long)) == 0);
-}
-
-inline bool nsnumber_is_like_double(NSObject *obj)
-{
-    const char* data_type = [(NSNumber *)obj objCType];
-    return (strcmp(data_type, @encode(double)) == 0 ||
-            strcmp(data_type, @encode(float)) == 0 ||
-            strcmp(data_type, @encode(int)) == 0 ||
-            strcmp(data_type, @encode(long)) ==  0 ||
-            strcmp(data_type, @encode(long long)) == 0 ||
-            strcmp(data_type, @encode(unsigned int)) == 0 ||
-            strcmp(data_type, @encode(unsigned long)) == 0 ||
-            strcmp(data_type, @encode(unsigned long long)) == 0);
-}
-
-
 void to_mixed(id value, Mixed& m)
 {
     if ([value isKindOfClass:[NSString class]]) {

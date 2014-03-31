@@ -21,108 +21,91 @@
 #import <Foundation/Foundation.h>
 #import "NSObject+TDBTypeConversion.h"
 #import "TDBTable.h"
-
+#import "util_noinst.hpp"
 
 @implementation NSObject (TDBTypeConversion)
 
 -(BOOL) TDBBoolValue
 {
     if ([self isKindOfClass:[NSNumber class]]) {
-        if (strcmp([(NSNumber *)self objCType], @encode(BOOL)) == 0) {
+        if (nsnumber_is_like_bool(self)) {
             return [(NSNumber *)self boolValue];
         }
     }
-    NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
-                                                     reason:@"NSNumber/BOOL expected"
-                                                   userInfo:nil];
-    [exception raise];
-    __builtin_unreachable();
+    @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
+                        reason:@"NSNumber/BOOL expected"
+                        userInfo:nil];
 }
 
 -(long long) TDBLongLongValue
 {
     if ([self isKindOfClass:[NSNumber class]]) {
-        if (strcmp([(NSNumber *)self objCType], @encode(long long)) == 0)
+        if (nsnumber_is_like_integer(self))
             return [(NSNumber *)self longLongValue];
     }
-    NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
-                                                     reason:@"NSNumber/long long expected"
-                                                     userInfo:nil];
-    [exception raise];
-    __builtin_unreachable();
-
+    @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
+                        reason:@"NSNumber/long long expected"
+                        userInfo:nil];
 }
 
 -(float) TDBFloatValue
 {
     if ([self isKindOfClass:[NSNumber class]]) {
-        if (strcmp([(NSNumber *)self objCType], @encode(float)) == 0) {
+        if (nsnumber_is_like_float(self)) {
             return [(NSNumber *)self floatValue];
         }
     }
-    NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
-                                                     reason:@"NSNumber/float expected"
-                                                     userInfo:nil];
-    [exception raise];
-    __builtin_unreachable();
+    @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
+                        reason:@"NSNumber/float expected"
+                        userInfo:nil];
 }
 
 -(double) TDBDoubleValue
 {
     if ([self isKindOfClass:[NSNumber class]]) {
-        if (strcmp([(NSNumber *)self objCType], @encode(double)) == 0) {
+        if (nsnumber_is_like_double(self)) {
             return [(NSNumber *)self doubleValue];
         }
     }
-    NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
-                                                     reason:@"NSNumber/double expected"
-                                                     userInfo:nil];
-    [exception raise];
-    __builtin_unreachable();
+    @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
+                        reason:@"NSNumber/double expected"
+                        userInfo:nil];
 }
 
 -(NSData *) TDBasNSData
 {
     if ([self isKindOfClass:[NSData class]])
         return (NSData *)self;
-    NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
-                                                     reason:@"NSData expected"
-                                                     userInfo:nil];
-    [exception raise];
-    __builtin_unreachable();
+    @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
+                        reason:@"NSData expected"
+                        userInfo:nil];
 }
 
 -(NSString *) TDBasNSString
 {
     if ([self isKindOfClass:[NSString class]])
         return (NSString *)self;
-    NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
-                                                     reason:@"NSString expected"
-                                                     userInfo:nil];
-    [exception raise];
-    __builtin_unreachable();
+    @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
+                        reason:@"NSString expected"
+                        userInfo:nil];
 }
 
 -(NSDate *) TDBasNSDate
 {
     if ([self isKindOfClass:[NSDate class]])
         return (NSDate *)self;
-    NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
-                                                     reason:@"NSDate expected"
-                                                   userInfo:nil];
-    [exception raise];
-    __builtin_unreachable();
+    @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
+                        reason:@"NSDate expected"
+                        userInfo:nil];
 }
 
 -(TDBTable *) TDBasTDBTable
 {
     if ([self isKindOfClass:[TDBTable class]])
         return (TDBTable *)self;
-    NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
-                                                     reason:@"TDBTable expected"
-                                                   userInfo:nil];
-    [exception raise];
-    __builtin_unreachable();
+    @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
+                        reason:@"TDBTable expected"
+                        userInfo:nil];
 }
 
 @end
