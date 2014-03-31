@@ -56,7 +56,7 @@
     //[table set:1 ndx:ndx value:10];
 
     TDBRow* row = [table addEmptyRow];
-    size_t ndx = [row TDBIndex];
+    size_t ndx = [row TDB_index];
     [row setInt:0 inColumnWithIndex:0];
     [row setInt:10 inColumnWithIndex:1];
 
