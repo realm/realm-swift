@@ -23,9 +23,6 @@
 @class TDBTable;
 
 @interface TDBRow: NSObject
--(id)initWithTable:(TDBTable *)table ndx:(NSUInteger)ndx;
--(void)TDBSetNdx:(NSUInteger)ndx;
--(NSUInteger)TDBIndex;
 
 /* Setters */
 -(void)set:(id)value inColumnWithIndex:(NSUInteger)colIndex;

@@ -51,11 +51,11 @@ using namespace std;
     }
     return self;
 }
--(NSUInteger)TDBIndex
+-(NSUInteger)TDB_index
 {
     return _ndx;
 }
--(void)TDBSetNdx:(NSUInteger)ndx
+-(void)TDB_setNdx:(NSUInteger)ndx
 {
     _ndx = ndx;
 }
