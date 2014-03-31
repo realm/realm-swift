@@ -9,7 +9,7 @@
 //
 
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/group.h>
@@ -44,7 +44,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
 
 
-@interface MACTestErrHandling: SenTestCase
+@interface MACTestErrHandling: XCTestCase
 @end
 @implementation MACTestErrHandling
 
@@ -89,7 +89,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     error = nil;
     if (![transaction writeContextToFile:@"peopleErr.tightdb" error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
-        STFail(@"No error expected");
+        XCTFail(@"No error expected");
     }
 
     //------------------------------------------------------
@@ -102,7 +102,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     error = nil;
     [fm setAttributes:attributes ofItemAtPath:@"peopleErr.tightdb" error:&error];
     if (error) {
-        STFail(@"Failed to set readonly attributes");
+        XCTFail(@"Failed to set readonly attributes");
     }
 
     //------------------------------------------------------
@@ -129,14 +129,14 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     error = nil;
     [fm setAttributes:attributes ofItemAtPath:@"peopleErr.tightdb" error:&error];
     if (error) {
-        STFail(@"Failed to set readonly attributes");
+        XCTFail(@"Failed to set readonly attributes");
     }
 
     error = nil;
     fromDisk = [TDBTransaction groupWithFile:@"peopleErr.tightdb" error:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
-        STFail(@"File should have been possible to open");
+        XCTFail(@"File should have been possible to open");
     }
 
     PeopleErrTable* diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PeopleErrTable class]];
@@ -168,117 +168,117 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     TDBTable* table = [[TDBTable alloc] init];
     TDBDescriptor* desc = [table descriptor];
     if (![desc addColumnWithName:@"int" type:TDBIntType]) {
-        STFail(@"addColumn failed.");
+        XCTFail(@"addColumn failed.");
     }
     if (![desc addColumnWithName:@"bool" type:TDBBoolType]) {
-        STFail(@"addColumn failed.");
+        XCTFail(@"addColumn failed.");
     }
 
     if (![desc addColumnWithName:@"date" type:TDBDateType]) {
-        STFail(@"addColumn failed.");
+        XCTFail(@"addColumn failed.");
     }
     if (![desc addColumnWithName:@"string" type:TDBStringType]) {
-        STFail(@"addColumn failed.");
+        XCTFail(@"addColumn failed.");
     }
     if (![desc addColumnWithName:@"string_long" type:TDBStringType]) {
-        STFail(@"addColumn failed.");
+        XCTFail(@"addColumn failed.");
     }
     if (![desc addColumnWithName:@"string_enum" type:TDBStringType]) {
-        STFail(@"addColumn failed.");
+        XCTFail(@"addColumn failed.");
     }
     if (![desc addColumnWithName:@"binary" type:TDBBinaryType]) {
-        STFail(@"addColumn failed.");
+        XCTFail(@"addColumn failed.");
     }
     if (![desc addColumnWithName:@"mixed" type:TDBMixedType]) {
-        STFail(@"addColumn failed.");
+        XCTFail(@"addColumn failed.");
     }
     TDBDescriptor* subdesc;
     if (!(subdesc = [desc addColumnTable:@"tables"])) {
-        STFail(@"addColumn failed.");
+        XCTFail(@"addColumn failed.");
     }
     if (![subdesc addColumnWithName:@"sub_first" type:TDBIntType]) {
-        STFail(@"addColumn failed.");
+        XCTFail(@"addColumn failed.");
     }
     if (![subdesc addColumnWithName:@"sub_second" type:TDBStringType]) {
-        STFail(@"addColumn failed.");
+        XCTFail(@"addColumn failed.");
     }
 
     // Add some rows
     for (size_t i = 0; i < 15; ++i) {
         if (![table TDB_insertInt:0 ndx:i value:i ]) {
            // NSLog(@"%@", [error localizedDescription]);
-            STFail(@"Insert failed.");
+            XCTFail(@"Insert failed.");
         }
         if (![table TDB_insertBool:1 ndx:i value:(i % 2 ? YES : NO)  ]) {
-            STFail(@"Insert failed.");
+            XCTFail(@"Insert failed.");
         }
         if (![table TDB_insertDate:2 ndx:i value:[NSDate date] ]) {
-            STFail(@"Insert failed.");
+            XCTFail(@"Insert failed.");
         }
         if (![table TDB_insertString:3 ndx:i value:[NSString stringWithFormat:@"string %zu", i] ]) {
-            STFail(@"Insert failed.");
+            XCTFail(@"Insert failed.");
         }
         if (![table TDB_insertString:4 ndx:i value:@" Very long string.............."  ]) {
-            STFail(@"Insert failed.");
+            XCTFail(@"Insert failed.");
         }
 
         switch (i % 3) {
             case 0:
                 if (![table TDB_insertString:5 ndx:i value:@"test1" ]) {
-                    STFail(@"Insert failed.");
+                    XCTFail(@"Insert failed.");
                 }
                 break;
             case 1:
                 if (![table TDB_insertString:5 ndx:i value:@"test2" ]) {
-                    STFail(@"Insert failed.");
+                    XCTFail(@"Insert failed.");
                 }
                 break;
             case 2:
                 if (![table TDB_insertString:5 ndx:i value:@"test3" ]) {
-                    STFail(@"Insert failed.");
+                    XCTFail(@"Insert failed.");
                 }
                 break;
         }
 
         if (![table TDB_insertBinary:6 ndx:i data:"binary" size:7 ]) {
-            STFail(@"Insert failed.");
+            XCTFail(@"Insert failed.");
         }
         switch (i % 3) {
             case 0:
                if (![table TDB_insertMixed:7 ndx:i value:[NSNumber numberWithBool:NO] ]) {
-                    STFail(@"Insert failed.");
+                    XCTFail(@"Insert failed.");
                 }
                 break;
             case 1:
                 if (![table TDB_insertMixed:7 ndx:i value:[NSNumber numberWithLongLong:i] ]) {
-                    STFail(@"Insert failed.");
+                    XCTFail(@"Insert failed.");
                 }
                 break;
             case 2:
                 if (![table TDB_insertMixed:7 ndx:i value:[NSString stringWithUTF8String:"string"] ]) {
-                    STFail(@"Insert failed.");
+                    XCTFail(@"Insert failed.");
                 }
                 break;
         }
         if (![table TDB_insertSubtable:8 ndx:i ]) {
-            STFail(@"Insert failed.");
+            XCTFail(@"Insert failed.");
         }
 
         if (![table TDB_insertDone ]) {
-            STFail(@"InsertDone failed.");
+            XCTFail(@"InsertDone failed.");
         }
 
         // Add sub-tables
         if (i == 2) {
             TDBTable* subtable = [table TDB_tableInColumnWithIndex:8 atRowIndex:i];
             if (![subtable TDB_insertInt:0 ndx:0 value:42 ]) {
-                STFail(@"Insert failed.");
+                XCTFail(@"Insert failed.");
             }
             if (![subtable TDB_insertString:1 ndx:0 value:@"meaning" ]) {
-                STFail(@"Insert failed.");
+                XCTFail(@"Insert failed.");
             }
             if (![subtable TDB_insertDone ]) {
-                STFail(@"InsertDone failed.");
+                XCTFail(@"InsertDone failed.");
             }
         }
 
@@ -287,27 +287,27 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     // We also want a ColumnStringEnum
     if (![table optimize]) {
-        STFail(@"Insert failed.");
+        XCTFail(@"Insert failed.");
     }
 
     // Test Deletes
     if (![table removeRowAtIndex:14 ]) {
-        STFail(@"Remove failed.");
+        XCTFail(@"Remove failed.");
     }
     if (![table removeRowAtIndex:0 ]) {
-        STFail(@"Remove failed.");
+        XCTFail(@"Remove failed.");
     }
     if (![table removeRowAtIndex:5 ]) {
-        STFail(@"Remove failed.");
+        XCTFail(@"Remove failed.");
     }
 
-    STAssertEquals([table rowCount], (size_t)12, @"Size should have been 12");
+    XCTAssertEqual([table rowCount], (size_t)12, @"Size should have been 12");
 
     // Test Clear
     if (![table removeAllRows]) {
-        STFail(@"Clear failed.");
+        XCTFail(@"Clear failed.");
     }
-    STAssertEquals([table rowCount], (size_t)0, @"Size should have been zero");
+    XCTAssertEqual([table rowCount], (size_t)0, @"Size should have been zero");
 
 }
 
@@ -316,7 +316,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 {
     TestQueryErrAllTypes* table = [[TestQueryErrAllTypes alloc] init];
     NSLog(@"Table: %@", table);
-    STAssertNotNil(table, @"Table is nil");
+    XCTAssertNotNil(table, @"Table is nil");
 
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
@@ -334,33 +334,33 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     [table addBoolCol:YES  IntCol:506      FloatCol:7.7     DoubleCol:8.8       StringCol:@"banach"
             BinaryCol:bin2 DateCol:timeNow TableCol:subtab2 MixedCol:subtab2];
 
-    STAssertEquals([[[table where].BoolCol   columnIsEqualTo:NO]      countRows], (size_t)1, @"BoolCol equal");
-    STAssertEquals([[[table where].IntCol    columnIsEqualTo:54]      countRows], (size_t)1, @"IntCol equal");
-    STAssertEquals([[[table where].FloatCol  columnIsEqualTo:0.7f]    countRows], (size_t)1, @"FloatCol equal");
-    STAssertEquals([[[table where].DoubleCol columnIsEqualTo:0.8]     countRows], (size_t)1, @"DoubleCol equal");
-    STAssertEquals([[[table where].StringCol columnIsEqualTo:@"foo"]  countRows], (size_t)1, @"StringCol equal");
-    STAssertEquals([[[table where].BinaryCol columnIsEqualTo:bin1]    countRows], (size_t)1, @"BinaryCol equal");
-    STAssertEquals([[[table where].DateCol   columnIsEqualTo:0]       countRows], (size_t)1, @"DateCol equal");
+    XCTAssertEqual([[[table where].BoolCol   columnIsEqualTo:NO]      countRows], (size_t)1, @"BoolCol equal");
+    XCTAssertEqual([[[table where].IntCol    columnIsEqualTo:54]      countRows], (size_t)1, @"IntCol equal");
+    XCTAssertEqual([[[table where].FloatCol  columnIsEqualTo:0.7f]    countRows], (size_t)1, @"FloatCol equal");
+    XCTAssertEqual([[[table where].DoubleCol columnIsEqualTo:0.8]     countRows], (size_t)1, @"DoubleCol equal");
+    XCTAssertEqual([[[table where].StringCol columnIsEqualTo:@"foo"]  countRows], (size_t)1, @"StringCol equal");
+    XCTAssertEqual([[[table where].BinaryCol columnIsEqualTo:bin1]    countRows], (size_t)1, @"BinaryCol equal");
+    XCTAssertEqual([[[table where].DateCol   columnIsEqualTo:0]       countRows], (size_t)1, @"DateCol equal");
     // These are not yet implemented
     //    STAssertEquals([[[table where].TableCol  columnIsEqualTo:subtab1] count], (size_t)1, @"TableCol equal");
     //    STAssertEquals([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (size_t)1, @"MixedCol equal");
 
     TestQueryErrAllTypesQuery* query = [[table where].BoolCol   columnIsEqualTo:NO];
 
-    STAssertEquals([query.IntCol min] , (int64_t)54,    @"IntCol min");
-    STAssertEquals([query.IntCol max], (int64_t)54,    @"IntCol max");
-    STAssertEquals([query.IntCol sum] , (int64_t)54,    @"IntCol sum");
-    STAssertEquals([query.IntCol avg] , 54.0,           @"IntCol avg");
+    XCTAssertEqual([query.IntCol min] , (int64_t)54,    @"IntCol min");
+    XCTAssertEqual([query.IntCol max], (int64_t)54,    @"IntCol max");
+    XCTAssertEqual([query.IntCol sum] , (int64_t)54,    @"IntCol sum");
+    XCTAssertEqual([query.IntCol avg] , 54.0,           @"IntCol avg");
 
-    STAssertEquals([query.FloatCol min], 0.7f,         @"FloatCol min");
-    STAssertEquals([query.FloatCol max], 0.7f,         @"FloatCol max");
-    STAssertEquals([query.FloatCol sum], (double)0.7f, @"FloatCol sum");
-    STAssertEquals([query.FloatCol avg], (double)0.7f, @"FloatCol avg");
+    XCTAssertEqual([query.FloatCol min], 0.7f,         @"FloatCol min");
+    XCTAssertEqual([query.FloatCol max], 0.7f,         @"FloatCol max");
+    XCTAssertEqual([query.FloatCol sum], (double)0.7f, @"FloatCol sum");
+    XCTAssertEqual([query.FloatCol avg], (double)0.7f, @"FloatCol avg");
 
-    STAssertEquals([query.DoubleCol min], 0.8,         @"DoubleCol min");
-    STAssertEquals([query.DoubleCol max], 0.8,         @"DoubleCol max");
-    STAssertEquals([query.DoubleCol sum] , 0.8,         @"DoubleCol sum");
-    STAssertEquals([query.DoubleCol avg], 0.8,         @"DoubleCol avg");
+    XCTAssertEqual([query.DoubleCol min], 0.8,         @"DoubleCol min");
+    XCTAssertEqual([query.DoubleCol max], 0.8,         @"DoubleCol max");
+    XCTAssertEqual([query.DoubleCol sum] , 0.8,         @"DoubleCol sum");
+    XCTAssertEqual([query.DoubleCol avg], 0.8,         @"DoubleCol avg");
 
     // Check that all column conditions return query objects of the
     // right type

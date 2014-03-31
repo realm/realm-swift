@@ -5,7 +5,7 @@
 //  Test save/load on disk of a group with one table
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/group.h>
@@ -19,7 +19,7 @@ TIGHTDB_TABLE_3(TestSubtableMain,
                 Sub,    TestSubtableSub,
                 Second, Int)
 
-@interface MACTestSubtable: SenTestCase
+@interface MACTestSubtable: XCTestCase
 @end
 @implementation MACTestSubtable
 
@@ -56,7 +56,7 @@ TIGHTDB_TABLE_3(TestSubtableMain,
     TestSubtableSub *subtable = cursor.Sub;
     [subtable addName:@"name" Age:999];
 
-    STAssertEquals([subtable rowAtIndex:0].Age, (int64_t)999, @"Age should be 999");
+    XCTAssertEqual([subtable rowAtIndex:0].Age, (int64_t)999, @"Age should be 999");
 }
 
 @end

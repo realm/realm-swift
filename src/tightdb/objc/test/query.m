@@ -3,7 +3,7 @@
 //  TightDB
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 
 #import <tightdb/objc/Tightdb.h>
 
@@ -21,7 +21,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
                 TableCol,  TestQuerySub,
                 MixedCol,  Mixed)
 
-@interface MACtestQuery: SenTestCase
+@interface MACtestQuery: XCTestCase
 @end
 @implementation MACtestQuery
 
@@ -29,7 +29,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 {
     TestQueryAllTypes *table = [[TestQueryAllTypes alloc] init];
     NSLog(@"Table: %@", table);
-    STAssertNotNil(table, @"Table is nil");
+    XCTAssertNotNil(table, @"Table is nil");
 
     const char bin[4] = { 0, 1, 2, 3 };
     NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
@@ -46,33 +46,33 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [table addBoolCol:YES  IntCol:506      FloatCol:7.7     DoubleCol:8.8       StringCol:@"banach"
             BinaryCol:bin2 DateCol:[NSDate date] TableCol:subtab2 MixedCol:subtab2];
 
-    STAssertEquals([[[table where].BoolCol   columnIsEqualTo:NO]      countRows], (NSUInteger)1, @"BoolCol equal");
-    STAssertEquals([[[table where].IntCol    columnIsEqualTo:54]      countRows], (NSUInteger)1, @"IntCol equal");
-    STAssertEquals([[[table where].FloatCol  columnIsEqualTo:0.7f]    countRows], (NSUInteger)1, @"FloatCol equal");
-    STAssertEquals([[[table where].DoubleCol columnIsEqualTo:0.8]     countRows], (NSUInteger)1, @"DoubleCol equal");
-    STAssertEquals([[[table where].StringCol columnIsEqualTo:@"foo"]  countRows], (NSUInteger)1, @"StringCol equal");
-    STAssertEquals([[[table where].BinaryCol columnIsEqualTo:bin1]    countRows], (NSUInteger)1, @"BinaryCol equal");
-    STAssertEquals([[[table where].DateCol   columnIsEqualTo:0]       countRows], (NSUInteger)1, @"DateCol equal");
+    XCTAssertEqual([[[table where].BoolCol   columnIsEqualTo:NO]      countRows], (NSUInteger)1, @"BoolCol equal");
+    XCTAssertEqual([[[table where].IntCol    columnIsEqualTo:54]      countRows], (NSUInteger)1, @"IntCol equal");
+    XCTAssertEqual([[[table where].FloatCol  columnIsEqualTo:0.7f]    countRows], (NSUInteger)1, @"FloatCol equal");
+    XCTAssertEqual([[[table where].DoubleCol columnIsEqualTo:0.8]     countRows], (NSUInteger)1, @"DoubleCol equal");
+    XCTAssertEqual([[[table where].StringCol columnIsEqualTo:@"foo"]  countRows], (NSUInteger)1, @"StringCol equal");
+    XCTAssertEqual([[[table where].BinaryCol columnIsEqualTo:bin1]    countRows], (NSUInteger)1, @"BinaryCol equal");
+    XCTAssertEqual([[[table where].DateCol   columnIsEqualTo:0]       countRows], (NSUInteger)1, @"DateCol equal");
 // These are not yet implemented
 //    STAssertEquals([[[table where].TableCol  columnIsEqualTo:subtab1] count], (size_t)1, @"TableCol equal");
 //    STAssertEquals([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (size_t)1, @"MixedCol equal");
 
     TestQueryAllTypesQuery *query = [[table where].BoolCol   columnIsEqualTo:NO];
 
-    STAssertEquals([query.IntCol min], (int64_t)54,    @"IntCol min");
-    STAssertEquals([query.IntCol max], (int64_t)54,    @"IntCol max");
-    STAssertEquals([query.IntCol sum], (int64_t)54,    @"IntCol sum");
-    STAssertEquals([query.IntCol avg] , 54.0,           @"IntCol avg");
+    XCTAssertEqual([query.IntCol min], (int64_t)54,    @"IntCol min");
+    XCTAssertEqual([query.IntCol max], (int64_t)54,    @"IntCol max");
+    XCTAssertEqual([query.IntCol sum], (int64_t)54,    @"IntCol sum");
+    XCTAssertEqual([query.IntCol avg] , 54.0,           @"IntCol avg");
 
-    STAssertEquals([query.FloatCol min], 0.7f,         @"FloatCol min");
-    STAssertEquals([query.FloatCol max], 0.7f,         @"FloatCol max");
-    STAssertEquals([query.FloatCol sum], (double)0.7f, @"FloatCol sum");
-    STAssertEquals([query.FloatCol avg], (double)0.7f, @"FloatCol avg");
+    XCTAssertEqual([query.FloatCol min], 0.7f,         @"FloatCol min");
+    XCTAssertEqual([query.FloatCol max], 0.7f,         @"FloatCol max");
+    XCTAssertEqual([query.FloatCol sum], (double)0.7f, @"FloatCol sum");
+    XCTAssertEqual([query.FloatCol avg], (double)0.7f, @"FloatCol avg");
 
-    STAssertEquals([query.DoubleCol min], 0.8,         @"DoubleCol min");
-    STAssertEquals([query.DoubleCol max], 0.8,         @"DoubleCol max");
-    STAssertEquals([query.DoubleCol sum], 0.8,         @"DoubleCol sum");
-    STAssertEquals([query.DoubleCol avg], 0.8,         @"DoubleCol avg");
+    XCTAssertEqual([query.DoubleCol min], 0.8,         @"DoubleCol min");
+    XCTAssertEqual([query.DoubleCol max], 0.8,         @"DoubleCol max");
+    XCTAssertEqual([query.DoubleCol sum], 0.8,         @"DoubleCol sum");
+    XCTAssertEqual([query.DoubleCol avg], 0.8,         @"DoubleCol avg");
 
     // Check that all column conditions return query objects of the
     // right type
@@ -199,51 +199,51 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         //STAssertEquals([[[table where] column:DOUBLE_COL isBetweenDouble:5.5 and_:5.7] count], (NSUInteger)1, @"betweenDouble");
         //STAssertEquals([[[table where] column:DATE_COL isBetweenDate:1 and_:timeNow] count], (NSUInteger)1, @"betweenDate");
 
-        STAssertEquals([[[table where] boolIsEqualTo:YES inColumnWithIndex:BOOL_COL ] countRows], (NSUInteger)1, @"isEqualToBool");
-        STAssertEquals([[[table where] intIsEqualTo:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isEqualToInt");
-        STAssertEquals([[[table where] floatIsEqualTo:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isEqualToFloat");
-        STAssertEquals([[[table where] doubleIsEqualTo:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isEqualToDouble");
-        STAssertEquals([[[table where] stringIsEqualTo:@"foo" inColumnWithIndex:STRING_COL ] countRows], (NSUInteger)1, @"isEqualToString");
-        STAssertEquals([[[table where] stringIsCaseInsensitiveEqualTo:@"Foo" inColumnWithIndex:STRING_COL] countRows], (NSUInteger)1, @"isEqualToStringCaseNO");
+        XCTAssertEqual([[[table where] boolIsEqualTo:YES inColumnWithIndex:BOOL_COL ] countRows], (NSUInteger)1, @"isEqualToBool");
+        XCTAssertEqual([[[table where] intIsEqualTo:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isEqualToInt");
+        XCTAssertEqual([[[table where] floatIsEqualTo:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isEqualToFloat");
+        XCTAssertEqual([[[table where] doubleIsEqualTo:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isEqualToDouble");
+        XCTAssertEqual([[[table where] stringIsEqualTo:@"foo" inColumnWithIndex:STRING_COL ] countRows], (NSUInteger)1, @"isEqualToString");
+        XCTAssertEqual([[[table where] stringIsCaseInsensitiveEqualTo:@"Foo" inColumnWithIndex:STRING_COL] countRows], (NSUInteger)1, @"isEqualToStringCaseNO");
         //STAssertEquals([[[table where] column:STRING_COL isEqualToString:@"Foo" caseSensitive:YES] countRows], (NSUInteger)0, @"isEqualToStringCaseYES");
-        STAssertEquals([[[table where] dateIsEqualTo:[NSDate date] inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isEqualToDate");
-        STAssertEquals([[[table where] binaryIsEqualTo:bin1 inColumnWithIndex:BINARY_COL] countRows], (NSUInteger)1, @"isEqualToBinary");
+        XCTAssertEqual([[[table where] dateIsEqualTo:[NSDate date] inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isEqualToDate");
+        XCTAssertEqual([[[table where] binaryIsEqualTo:bin1 inColumnWithIndex:BINARY_COL] countRows], (NSUInteger)1, @"isEqualToBinary");
 
-        STAssertEquals([[[table where] intIsNotEqualTo:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isEqualToInt");
-        STAssertEquals([[[table where] floatIsNotEqualTo:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isEqualToFloat");
-        STAssertEquals([[[table where] doubleIsNotEqualTo:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isEqualToDouble");
-        STAssertEquals([[[table where] stringIsNotEqualTo:@"foo" inColumnWithIndex:STRING_COL] countRows], (NSUInteger)1, @"isEqualToString");
-        STAssertEquals([[[table where] stringIsNotCaseInsensitiveEqualTo:@"Foo" inColumnWithIndex:STRING_COL] countRows], (NSUInteger)1, @"isEqualToStringCaseNO");
+        XCTAssertEqual([[[table where] intIsNotEqualTo:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isEqualToInt");
+        XCTAssertEqual([[[table where] floatIsNotEqualTo:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isEqualToFloat");
+        XCTAssertEqual([[[table where] doubleIsNotEqualTo:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isEqualToDouble");
+        XCTAssertEqual([[[table where] stringIsNotEqualTo:@"foo" inColumnWithIndex:STRING_COL] countRows], (NSUInteger)1, @"isEqualToString");
+        XCTAssertEqual([[[table where] stringIsNotCaseInsensitiveEqualTo:@"Foo" inColumnWithIndex:STRING_COL] countRows], (NSUInteger)1, @"isEqualToStringCaseNO");
         //STAssertEquals([[[table where] column:STRING_COL isNotEqualToString:@"Foo" caseSensitive:YES] countRows], (NSUInteger)2, @"isEqualToStringCaseYES");
-        STAssertEquals([[[table where] dateIsNotEqualTo:[NSDate date] inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isEqualToDate");
-        STAssertEquals([[[table where] binaryIsNotEqualTo:bin1 inColumnWithIndex:BINARY_COL] countRows], (NSUInteger)1, @"isEqualToBinary");
+        XCTAssertEqual([[[table where] dateIsNotEqualTo:[NSDate date] inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isEqualToDate");
+        XCTAssertEqual([[[table where] binaryIsNotEqualTo:bin1 inColumnWithIndex:BINARY_COL] countRows], (NSUInteger)1, @"isEqualToBinary");
 
-        STAssertEquals([[[table where] intIsGreaterThan:859 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isGreaterThanInt");
-        STAssertEquals([[[table where] floatIsGreaterThan:5.5 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isGreaterThanFloat");
-        STAssertEquals([[[table where] doubleIsGreaterThan:5.5 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isGreaterThanDouble");
-        STAssertEquals([[[table where] dateIsGreaterThan:0 inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isGreaterThanDate");
+        XCTAssertEqual([[[table where] intIsGreaterThan:859 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isGreaterThanInt");
+        XCTAssertEqual([[[table where] floatIsGreaterThan:5.5 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isGreaterThanFloat");
+        XCTAssertEqual([[[table where] doubleIsGreaterThan:5.5 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isGreaterThanDouble");
+        XCTAssertEqual([[[table where] dateIsGreaterThan:0 inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isGreaterThanDate");
 
-        STAssertEquals([[[table where] intIsGreaterThanOrEqualTo:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isGreaterThanInt");
-        STAssertEquals([[[table where] floatIsGreaterThanOrEqualTo:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isGreaterThanFloat");
-        STAssertEquals([[[table where] doubleIsGreaterThanOrEqualTo:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isGreaterThanDouble");
-        STAssertEquals([[[table where] dateIsGreaterThanOrEqualTo:[NSDate date] inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isGreaterThanDate");
+        XCTAssertEqual([[[table where] intIsGreaterThanOrEqualTo:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isGreaterThanInt");
+        XCTAssertEqual([[[table where] floatIsGreaterThanOrEqualTo:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isGreaterThanFloat");
+        XCTAssertEqual([[[table where] doubleIsGreaterThanOrEqualTo:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isGreaterThanDouble");
+        XCTAssertEqual([[[table where] dateIsGreaterThanOrEqualTo:[NSDate date] inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isGreaterThanDate");
 
-        STAssertEquals([[[table where] intIsLessThan:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isLessThanInt");
-        STAssertEquals([[[table where] floatIsLessThan:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isLessThanFloat");
-        STAssertEquals([[[table where] doubleIsLessThan:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isLessThanDouble");
-        STAssertEquals([[[table where] dateIsLessThan:[NSDate date] inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isLessThanDate");
+        XCTAssertEqual([[[table where] intIsLessThan:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isLessThanInt");
+        XCTAssertEqual([[[table where] floatIsLessThan:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isLessThanFloat");
+        XCTAssertEqual([[[table where] doubleIsLessThan:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isLessThanDouble");
+        XCTAssertEqual([[[table where] dateIsLessThan:[NSDate date] inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isLessThanDate");
 
-        STAssertEquals([[[table where] intIsLessThanOrEqualTo:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToInt");
-        STAssertEquals([[[table where] floatIsLessThanOrEqualTo:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToFloat");
-        STAssertEquals([[[table where] doubleIsLessThanOrEqualTo:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToDouble");
-        STAssertEquals([[[table where] dateIsLessThanOrEqualTo:[NSDate date] inColumnWithIndex:DATE_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToDate");
+        XCTAssertEqual([[[table where] intIsLessThanOrEqualTo:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToInt");
+        XCTAssertEqual([[[table where] floatIsLessThanOrEqualTo:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToFloat");
+        XCTAssertEqual([[[table where] doubleIsLessThanOrEqualTo:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToDouble");
+        XCTAssertEqual([[[table where] dateIsLessThanOrEqualTo:[NSDate date] inColumnWithIndex:DATE_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToDate");
 
         //STAssertEquals([[[table where] column:INT_COL isBetweenInt:859 and_:861] find:0], (size_t) 1, @"find");
 
        // STAssertEquals([[[[table where] column:INT_COL isBetweenInt:859 and_:861] findAll] class], [TDBView class], @"findAll");
 
-        STAssertEquals([[table where] minIntInColumnWithIndex:INT_COL] , (int64_t)0, @"minimunIntOfColumn");
-        STAssertEquals([[table where] sumIntColumnWithIndex:INT_COL] , (int64_t)860, @"IntCol max");
+        XCTAssertEqual([[table where] minIntInColumnWithIndex:INT_COL] , (int64_t)0, @"minimunIntOfColumn");
+        XCTAssertEqual([[table where] sumIntColumnWithIndex:INT_COL] , (int64_t)860, @"IntCol max");
         /// TODO: Tests missing....
 
 }
@@ -262,8 +262,8 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [table TDB_setInt:8  inColumnWithIndex:0 atRowIndex:4];
     [table TDB_setInt:39 inColumnWithIndex:0 atRowIndex:5];
     
-    STAssertEquals((NSUInteger)1, [[[table where ] intIsGreaterThan:10 inColumnWithIndex:0 ] findFirstRow], @"Row 1 is greater than 10");
-    STAssertEquals((NSUInteger)-1, [[[table where ] intIsGreaterThan:100 inColumnWithIndex:0 ] findFirstRow], @"No rows are greater than 100");
+    XCTAssertEqual((NSUInteger)1, [[[table where ] intIsGreaterThan:10 inColumnWithIndex:0 ] findFirstRow], @"Row 1 is greater than 10");
+    XCTAssertEqual((NSUInteger)-1, [[[table where ] intIsGreaterThan:100 inColumnWithIndex:0 ] findFirstRow], @"No rows are greater than 100");
 
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:0], (size_t)2,  @"find");
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:3], (size_t)3,  @"find");
@@ -282,7 +282,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     TDBDescriptor *subDesc = [d addColumnTable:@"subtable"];
     [subDesc addColumnWithName:@"subCol" type:TDBBoolType];
     [t addRow:nil];
-    STAssertEquals(t.rowCount, (NSUInteger)1,@"one row added");
+    XCTAssertEqual(t.rowCount, (NSUInteger)1,@"one row added");
     
     TDBTable * subTable = [t TDB_tableInColumnWithIndex:0 atRowIndex:0];
     [subTable addRow:nil];
@@ -290,7 +290,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     TDBQuery *q = [t where];
     
     TDBView *v = [[[[q subtableInColumnWithIndex:0] boolIsEqualTo:YES inColumnWithIndex:0] parent] findAllRows];
-    STAssertEquals(v.rowCount, (NSUInteger)1,@"one match");
+    XCTAssertEqual(v.rowCount, (NSUInteger)1,@"one match");
 }
 
 
