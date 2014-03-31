@@ -76,7 +76,7 @@ using namespace std;
 #endif
 }
 
--(void)readWithBlock:(TDBReadBlock)block
+-(void)readTransactionUsingBlock:(TDBReadBlock)block
 {
     const tightdb::Group* group;
     try {
@@ -104,7 +104,7 @@ using namespace std;
 }
 
 
--(BOOL)writeWithBlock:(TDBWriteBlock)block error:(NSError**)error
+-(BOOL)writeTransactionUsingBlock:(TDBWriteBlock)block error:(NSError**)error
 {
     tightdb::Group* group;
     try {
