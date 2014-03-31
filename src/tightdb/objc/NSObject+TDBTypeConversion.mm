@@ -25,7 +25,7 @@
 
 @implementation NSObject (TDBTypeConversion)
 
--(BOOL) tdbBoolValue
+-(BOOL) TDBBoolValue
 {
     if ([self isKindOfClass:[NSNumber class]]) {
         if (strcmp([(NSNumber *)self objCType], @encode(BOOL)) == 0) {
@@ -39,7 +39,7 @@
     __builtin_unreachable();
 }
 
--(long long) tdbLongLongValue
+-(long long) TDBLongLongValue
 {
     if ([self isKindOfClass:[NSNumber class]]) {
         if (strcmp([(NSNumber *)self objCType], @encode(long long)) == 0)
@@ -53,7 +53,7 @@
 
 }
 
--(float) tdbFloatValue
+-(float) TDBFloatValue
 {
     if ([self isKindOfClass:[NSNumber class]]) {
         if (strcmp([(NSNumber *)self objCType], @encode(float)) == 0) {
@@ -67,7 +67,7 @@
     __builtin_unreachable();
 }
 
--(double) tdbDoubleValue
+-(double) TDBDoubleValue
 {
     if ([self isKindOfClass:[NSNumber class]]) {
         if (strcmp([(NSNumber *)self objCType], @encode(double)) == 0) {
@@ -81,7 +81,7 @@
     __builtin_unreachable();
 }
 
--(NSData *) asNSData
+-(NSData *) TDBasNSData
 {
     if ([self isKindOfClass:[NSData class]])
         return (NSData *)self;
@@ -92,7 +92,7 @@
     __builtin_unreachable();
 }
 
--(NSString *) asNSString
+-(NSString *) TDBasNSString
 {
     if ([self isKindOfClass:[NSString class]])
         return (NSString *)self;
@@ -103,7 +103,7 @@
     __builtin_unreachable();
 }
 
--(NSDate *) asNSDate
+-(NSDate *) TDBasNSDate
 {
     if ([self isKindOfClass:[NSDate class]])
         return (NSDate *)self;
@@ -114,7 +114,7 @@
     __builtin_unreachable();
 }
 
--(TDBTable *) asTDBTable
+-(TDBTable *) TDBasTDBTable
 {
     if ([self isKindOfClass:[TDBTable class]])
         return (TDBTable *)self;
