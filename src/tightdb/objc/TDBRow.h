@@ -24,11 +24,7 @@
 
 @interface TDBRow: NSObject
 
--(id)objectAtIndexedSubscript:(NSUInteger)colNdx;
--(id)objectForKeyedSubscript:(id <NSCopying>)key;
--(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colNdx;
--(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key;
-
+/* Setters */
 -(void)setInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex;
@@ -39,6 +35,7 @@
 -(void)setMixed:(id)aMixed inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setTable:(TDBTable *)aTable inColumnWithIndex:(NSUInteger)colIndex;
 
+/* Getters */
 -(int64_t)intInColumnWithIndex:(NSUInteger)colIndex;
 -(NSString *)stringInColumnWithIndex:(NSUInteger)colIndex;
 -(BOOL)boolInColumnWithIndex:(NSUInteger)colIndex;
@@ -48,6 +45,12 @@
 -(NSData *)binaryInColumnWithIndex:(NSUInteger)colIndex;
 -(id)mixedInColumnWithIndex:(NSUInteger)colIndex;
 -(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex;
+
+// Getting and setting individual columns (uses object subscripting)
+-(id)objectAtIndexedSubscript:(NSUInteger)colIndex;
+-(id)objectForKeyedSubscript:(id <NSCopying>)key;
+-(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colIndex;
+-(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key;
 @end
 
 
