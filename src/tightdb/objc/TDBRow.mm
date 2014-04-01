@@ -69,50 +69,27 @@ using namespace std;
 
 -(id)objectAtIndexedSubscript:(NSUInteger)colNdx
 {
-    TDBType columnType = [_table columnTypeOfColumnWithIndex:colNdx];
-    switch (columnType) {
-        case TDBBoolType:
-            return [NSNumber numberWithBool:[_table TDB_boolInColumnWithIndex:colNdx atRowIndex:_ndx]];
-        case TDBIntType:
-            return [NSNumber numberWithLongLong:[_table TDB_intInColumnWithIndex:colNdx atRowIndex:_ndx]];
-        case TDBFloatType:
-            return [NSNumber numberWithFloat:[_table TDB_floatInColumnWithIndex:colNdx atRowIndex:_ndx]];
-        case TDBDoubleType:
-            return [NSNumber numberWithLongLong:[_table TDB_doubleInColumnWithIndex:colNdx atRowIndex:_ndx]];
-        case TDBStringType:
-            return [_table TDB_stringInColumnWithIndex:colNdx atRowIndex:_ndx];
-        case TDBDateType:
-            return [_table TDB_dateInColumnWithIndex:colNdx atRowIndex:_ndx];
-        case TDBBinaryType:
-            return [_table TDB_binaryInColumnWithIndex:colNdx atRowIndex:_ndx];
-        case TDBTableType:
-            return [_table TDB_tableInColumnWithIndex:colNdx atRowIndex:_ndx];
-        case TDBMixedType:
-            return [_table TDB_mixedInColumnWithIndex:colNdx atRowIndex:_ndx];
-    }
+    return get_cell(colNdx, _ndx, [_table getNativeTable]);
 }
 
 - (id)objectForKeyedSubscript:(id <NSCopying>)key
 {
     NSUInteger colNdx = [_table indexOfColumnWithName:(NSString *)key];
-    return [self objectAtIndexedSubscript:colNdx];
+    return get_cell(colNdx, _ndx, [_table getNativeTable]);
 }
 
 -(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colNdx
 {
-
     tightdb::Table& t = [_table getNativeTable];
     tightdb::ConstDescriptorRef descr = t.get_descriptor();
     if (!verify_cell(*descr, size_t(colNdx), (NSObject *)obj)) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
-                                                         reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
-                                                                 to_objc_string(t.get_column_name(colNdx)), (unsigned long)colNdx, t.get_column_type(colNdx) ]
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
-        
+        @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
+                            reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
+                            to_objc_string(t.get_column_name(colNdx)), (unsigned long)colNdx, t.get_column_type(colNdx)]
+                            userInfo:nil];
     }
     set_cell(size_t(colNdx), size_t(_ndx), t, (NSObject *)obj);
-}   
+}
 
 -(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key
 {
@@ -121,6 +98,7 @@ using namespace std;
 }
 
 
+/* Getters */
 -(int64_t)intInColumnWithIndex:(NSUInteger)colNdx
 {
     return [_table TDB_intInColumnWithIndex:colNdx atRowIndex:_ndx];
@@ -166,6 +144,7 @@ using namespace std;
     return [_table TDB_mixedInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
+/* Setters */
 -(void)setInt:(int64_t)value inColumnWithIndex:(NSUInteger)colNdx
 {
     [_table TDB_setInt:value inColumnWithIndex:colNdx atRowIndex:_ndx];
