@@ -49,7 +49,7 @@ void ex_objc_table_dynamic_intro()
         NSLog(@"--------");
 
         for (TDBRow *ite in table)
-            NSLog(@"Name: %@ Age: %lld", ite[NAME], ite[AGE]);
+            NSLog(@"Name: %@ Age: %@", ite[NAME], ite[AGE]);
 
         /* Index not existing. */
         TDBRow *c2 = [table rowAtIndex:table.rowCount];
