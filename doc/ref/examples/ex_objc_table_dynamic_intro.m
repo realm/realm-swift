@@ -16,8 +16,8 @@ void ex_objc_table_dynamic_intro()
         NSUInteger rowIndex = [table addRow:nil];
         TDBRow *row = [table rowAtIndex:rowIndex];
 
-        [row setString:@"Joe" inColumnWithIndex:NAME];
-        [row setInt:23 inColumnWithIndex:AGE];
+        row[NAME] = @"Joe";
+        row[AGE] = @23;
 
         /* And a few more rows - in a simpler manner */
         [table addRow:@[@"Simon", @32]];
@@ -26,30 +26,30 @@ void ex_objc_table_dynamic_intro()
 
         /* Print using a cursor. */
         for (TDBRow *ite in table)
-            NSLog(@"Name: %@ Age: %lld", [ite stringInColumnWithIndex:NAME], [ite intInColumnWithIndex:AGE]);
+            NSLog(@"Name: %@ Age: %@", ite[NAME], ite[AGE]);
         
         /* Insert a row and print. */
         [table insertRow: nil atIndex:2];
         row = [table rowAtIndex:2];
-        [row setInt:21 inColumnWithIndex:AGE];
-        [row setString:@"Hello I'm INSERTED" inColumnWithIndex:NAME];
+        row[AGE] = @21;
+        row[NAME] = @"Hello I'm INSERTED";
 
         NSLog(@"--------");
 
         for (TDBRow *ite in table)
-            NSLog(@"Name: %@ Age: %lld", [ite stringInColumnWithIndex:NAME], [ite intInColumnWithIndex:AGE]);
+            NSLog(@"Name: %@ Age: %@", ite[NAME], ite[AGE]);
 
 
         /* Update a few rows and print again. */
         table[2][@"Name"] = @"Now I'm UPDATED";
 
         row = [table lastRow];
-        [row setString:@"I'm UPDATED" inColumnWithIndex:NAME];
+        row[NAME] = @"I'm UPDATED";
 
         NSLog(@"--------");
 
         for (TDBRow *ite in table)
-            NSLog(@"Name: %@ Age: %lld", [ite stringInColumnWithIndex:NAME], [ite intInColumnWithIndex:AGE]);
+            NSLog(@"Name: %@ Age: %lld", ite[NAME], ite[AGE]);
 
         /* Index not existing. */
         TDBRow *c2 = [table rowAtIndex:table.rowCount];

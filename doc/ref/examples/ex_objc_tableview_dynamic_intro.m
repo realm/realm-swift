@@ -31,7 +31,7 @@ void ex_objc_tableview_dynamic_intro()
 
         /* Print the names. */
         for (TDBRow *ite in view) {
-            NSLog(@"With iterator.......name: %@",[ite stringInColumnWithIndex:NAME]);
+            NSLog(@"With iterator.......name: %@",ite[NAME]);
         }
 
         /* Take a curser at index one in the view. */
@@ -39,7 +39,7 @@ void ex_objc_tableview_dynamic_intro()
 
         TDBRow *c = [view rowAtIndex:1];
         if (c != nil)
-            NSLog(@"With fixed index....name: %@",[c stringInColumnWithIndex:NAME]);
+            NSLog(@"With fixed index....name: %@",c[NAME]);
 
 
         /* Index out-of-bounds index. */

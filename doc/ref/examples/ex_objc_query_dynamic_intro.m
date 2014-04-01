@@ -29,7 +29,7 @@ void ex_objc_query_dynamic_intro()
 
         /* Print the names. */
         for (TDBRow *c in view) {
-            NSLog(@"name: %@",[c stringInColumnWithIndex:NAME]);
+            NSLog(@"name: %@",c[NAME]);
         }
     }
 }

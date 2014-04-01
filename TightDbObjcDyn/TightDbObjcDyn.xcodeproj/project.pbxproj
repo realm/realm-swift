@@ -96,6 +96,8 @@
 		4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = dynamic_table.mm; path = ../../src/tightdb/objc/test/dynamic_table.mm; sourceTree = "<group>"; };
 		4DB1DEF918BF70AE005A7234 /* functional.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = functional.m; path = ../../src/tightdb/objc/test/functional.m; sourceTree = "<group>"; };
 		4DB1DEFA18BF70AE005A7234 /* typed_table.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = typed_table.m; path = ../../src/tightdb/objc/test/typed_table.m; sourceTree = "<group>"; };
+		4DDDD67018EAF1C000E94613 /* TDBRowFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TDBRowFast.h; path = ../../src/tightdb/objc/TDBRowFast.h; sourceTree = "<group>"; };
+		4DDDD67218EAF22100E94613 /* TightdbFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TightdbFast.h; path = ../../src/tightdb/objc/TightdbFast.h; sourceTree = "<group>"; };
 		E9189099177B677900653D7A /* TightDbObjcDyn.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = TightDbObjcDyn.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		E918909C177B677900653D7A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		E918909F177B677900653D7A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -160,6 +162,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4DDDD67118EAF1DC00E94613 /* TDBFast */ = {
+			isa = PBXGroup;
+			children = (
+				4DDDD67018EAF1C000E94613 /* TDBRowFast.h */,
+				4DDDD67218EAF22100E94613 /* TightdbFast.h */,
+			);
+			name = TDBFast;
+			sourceTree = "<group>";
+		};
 		E9189090177B677900653D7A = {
 			isa = PBXGroup;
 			children = (
@@ -202,6 +213,7 @@
 		E91890A2177B677900653D7A /* TightDbObjcDyn */ = {
 			isa = PBXGroup;
 			children = (
+				4DDDD67118EAF1DC00E94613 /* TDBFast */,
 				4D1ED30A18E1B6E8003CFF44 /* group.h */,
 				4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */,
 				424EEFAB18D9C15900337A13 /* TDBView.mm */,
