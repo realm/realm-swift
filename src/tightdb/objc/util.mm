@@ -31,52 +31,6 @@
 
 using namespace tightdb;
 
-inline bool nsnumber_is_like_bool(NSObject *obj)
-{
-    const char* data_type = [(NSNumber *)obj objCType];
-    /* @encode(BOOL) is 'B' on iOS 64 and 'c'
-     objcType is always 'c'. Therefore compare to "c".
-     */
-    return data_type[0] == 'c';
-}
-
-inline bool nsnumber_is_like_integer(NSObject *obj)
-{
-    const char* data_type = [(NSNumber *)obj objCType];
-    return (strcmp(data_type, @encode(int)) == 0 ||
-            strcmp(data_type, @encode(long)) ==  0 ||
-            strcmp(data_type, @encode(long long)) == 0 ||
-            strcmp(data_type, @encode(unsigned int)) == 0 ||
-            strcmp(data_type, @encode(unsigned long)) == 0 ||
-            strcmp(data_type, @encode(unsigned long long)) == 0);
-}
-
-inline bool nsnumber_is_like_float(NSObject *obj)
-{
-    const char* data_type = [(NSNumber *)obj objCType];
-    return (strcmp(data_type, @encode(float)) == 0 ||
-            strcmp(data_type, @encode(int)) == 0 ||
-            strcmp(data_type, @encode(long)) ==  0 ||
-            strcmp(data_type, @encode(long long)) == 0 ||
-            strcmp(data_type, @encode(unsigned int)) == 0 ||
-            strcmp(data_type, @encode(unsigned long)) == 0 ||
-            strcmp(data_type, @encode(unsigned long long)) == 0);
-}
-
-inline bool nsnumber_is_like_double(NSObject *obj)
-{
-    const char* data_type = [(NSNumber *)obj objCType];
-    return (strcmp(data_type, @encode(double)) == 0 ||
-            strcmp(data_type, @encode(float)) == 0 ||
-            strcmp(data_type, @encode(int)) == 0 ||
-            strcmp(data_type, @encode(long)) ==  0 ||
-            strcmp(data_type, @encode(long long)) == 0 ||
-            strcmp(data_type, @encode(unsigned int)) == 0 ||
-            strcmp(data_type, @encode(unsigned long)) == 0 ||
-            strcmp(data_type, @encode(unsigned long long)) == 0);
-}
-
-
 void to_mixed(id value, Mixed& m)
 {
     if ([value isKindOfClass:[NSString class]]) {
@@ -112,6 +66,93 @@ void to_mixed(id value, Mixed& m)
     }
     if ([value isKindOfClass:[TDBTable class]])
         m = Mixed(Mixed::subtable_tag());
+}
+
+
+NSObject* get_cell(size_t col_ndx, size_t row_ndx, Table& table)
+{
+    DataType type = table.get_column_type(col_ndx);
+    switch (type) {
+        case type_String: {
+            NSString *s = [NSString stringWithUTF8String:table.get_string(col_ndx, row_ndx).data()];
+            return s;
+        }
+        case type_Int: {
+            NSNumber *n = [NSNumber numberWithLongLong:table.get_int(col_ndx, row_ndx)];
+            return n;
+        }
+        case type_Float: {
+            NSNumber *n = [NSNumber numberWithFloat:table.get_float(col_ndx, row_ndx)];
+            return n;
+        }
+        case type_Double: {
+            NSNumber *n = [NSNumber numberWithDouble:table.get_double(col_ndx, row_ndx)];
+            return n;
+        }
+        case type_Bool: {
+            NSNumber *n = [NSNumber numberWithBool:table.get_bool(col_ndx, row_ndx)];
+            return n;
+        }
+        case type_Binary: {
+            BinaryData bd = table.get_binary(col_ndx, row_ndx);
+            NSData *d = [NSData dataWithBytes:bd.data() length:bd.size()];
+            return d;
+        }
+        case type_Table: {
+            TDBTable *t = [[TDBTable alloc] init];
+            TableRef table_ref = table.get_subtable(col_ndx, row_ndx);
+            [t setNativeTable:table_ref.get()];
+            return t;
+        }
+        case type_DateTime: {
+            NSDate *d = [NSDate dateWithTimeIntervalSince1970:table.get_datetime(col_ndx, row_ndx).get_datetime()];
+            return d;
+        }
+        case type_Mixed: {
+            Mixed m = table.get_mixed(col_ndx, row_ndx);
+            switch (m.get_type()) {
+                case type_String: {
+                    NSString *s = [NSString stringWithUTF8String:m.get_string().data()];
+                    return s;
+                }
+                case type_Int: {
+                    NSNumber *n = [NSNumber numberWithLongLong:m.get_int()];
+                    return n;
+                }
+                case type_Float: {
+                    NSNumber *n = [NSNumber numberWithFloat:m.get_float()];
+                    return n;
+                }
+                case type_Double: {
+                    NSNumber *n = [NSNumber numberWithDouble:m.get_double()];
+                    return n;
+                }
+                case type_Bool: {
+                    NSNumber *n = [NSNumber numberWithBool:m.get_bool()];
+                    return n;
+                }
+                case type_Binary: {
+                    BinaryData bd = m.get_binary();
+                    NSData *d = [NSData dataWithBytes:bd.data() length:bd.size()];
+                    return d;
+                }
+                case type_Table: {
+                    TDBTable *t = [[TDBTable alloc] init];
+                    TableRef table_ref = table.get_subtable(col_ndx, row_ndx);
+                    [t setNativeTable:table_ref.get()];
+                    return t;
+                }
+                case type_DateTime: {
+                    NSDate *d = [NSDate dateWithTimeIntervalSince1970:m.get_datetime().get_datetime()];
+                    return d;
+                }
+                case type_Mixed:
+                    TIGHTDB_ASSERT(false);
+            }
+        }
+    }
+    TIGHTDB_ASSERT(false);
+    return nil; // make clang happy
 }
 
 
