@@ -29,7 +29,6 @@
 -(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colNdx;
 -(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key;
 
-
 @end
 
 

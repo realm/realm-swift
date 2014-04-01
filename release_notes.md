@@ -40,7 +40,6 @@ To use these methods import <Tightdb/TightdbFast.h>.
 * `addColumnWithName:andType:` renamed to `addColumnWithName:type:` in `TDBDescriptor`.
 * Fast getters and setters moved from `TDBRow.h` to `TDBRowFast.h`.
 
-
 ### Enhancements:
 * 
 
