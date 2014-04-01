@@ -28,8 +28,8 @@ void ex_objc_query_dynamic_intro()
         TDBView *view = [q findAllRows];
 
         /* Print the names. */
-        for (TDBRow *c in view) {
-            NSLog(@"name: %@",[c stringInColumnWithIndex:NAME]);
+        for (TDBRow *row in view) {
+            NSLog(@"name: %@",row[NAME]);
         }
     }
 }

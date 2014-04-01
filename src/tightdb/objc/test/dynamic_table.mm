@@ -21,7 +21,7 @@
 #import <SenTestingKit/SenTestingKit.h>
 #import <Foundation/NSException.h>
 
-#import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/TightdbFast.h>
 #import <tightdb/objc/TDBTable_noinst.h>
 
 #include <string.h>

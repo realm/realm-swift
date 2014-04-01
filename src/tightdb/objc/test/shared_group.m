@@ -7,7 +7,7 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-#import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/TightdbFast.h>
 #import <tightdb/objc/TDBTransaction.h>
 #import <tightdb/objc/group.h>
 

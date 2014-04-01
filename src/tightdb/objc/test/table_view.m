@@ -20,7 +20,7 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-#import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/TightdbFast.h>
 
 @interface table_view : SenTestCase
 
