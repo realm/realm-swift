@@ -149,14 +149,14 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
         TDBTable *table = [[TDBTable alloc]init];
 
-        [table addColumnWithName:@"BoolCol" andType:TDBBoolType];
-        [table addColumnWithName:@"IntCol" andType:TDBIntType];
-        [table addColumnWithName:@"FloatCol" andType:TDBFloatType];
-        [table addColumnWithName:@"DoubleCol" andType:TDBDoubleType];
-        [table addColumnWithName:@"StringCol" andType:TDBStringType];
-        [table addColumnWithName:@"BinaryCol" andType:TDBBinaryType];
-        [table addColumnWithName:@"DateCol" andType:TDBDateType];
-        [table addColumnWithName:@"MixedCol" andType:TDBMixedType];
+        [table addColumnWithName:@"BoolCol" type:TDBBoolType];
+        [table addColumnWithName:@"IntCol" type:TDBIntType];
+        [table addColumnWithName:@"FloatCol" type:TDBFloatType];
+        [table addColumnWithName:@"DoubleCol" type:TDBDoubleType];
+        [table addColumnWithName:@"StringCol" type:TDBStringType];
+        [table addColumnWithName:@"BinaryCol" type:TDBBinaryType];
+        [table addColumnWithName:@"DateCol" type:TDBDateType];
+        [table addColumnWithName:@"MixedCol" type:TDBMixedType];
         // TODO: add Enum<T> and Subtable<T> when possible.
 
         const char bin[4] = { 0, 1, 2, 3 };
@@ -252,7 +252,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 - (void)testFind
 {
     TDBTable* table = [[TDBTable alloc]init];
-    [table addColumnWithName:@"IntCol" andType:TDBIntType];
+    [table addColumnWithName:@"IntCol" type:TDBIntType];
     [table TDB_addEmptyRows:6];
 
     [table TDB_setInt:10 inColumnWithIndex:0 atRowIndex:0];
@@ -280,7 +280,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     
     TDBDescriptor *d = t.descriptor;
     TDBDescriptor *subDesc = [d addColumnTable:@"subtable"];
-    [subDesc addColumnWithName:@"subCol" andType:TDBBoolType];
+    [subDesc addColumnWithName:@"subCol" type:TDBBoolType];
     [t addRow:nil];
     STAssertEquals(t.rowCount, (NSUInteger)1,@"one row added");
     

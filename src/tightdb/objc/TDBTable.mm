@@ -39,6 +39,8 @@
 #import <tightdb/objc/TDBDescriptor_noinst.h>
 #import <tightdb/objc/TDBColumnProxy.h>
 #import <tightdb/objc/NSData+TDBGetBinaryData.h>
+#import <tightdb/objc/PrivateTDB.h>
+
 
 #include <tightdb/objc/util_noinst.hpp>
 
@@ -121,7 +123,7 @@ using namespace std;
         *stackbuf = tmp;
     }
     if (state->state < self.rowCount) {
-        [((TDBRow*)*stackbuf) TDBSetNdx:state->state];
+        [((TDBRow*)*stackbuf) TDB_setNdx:state->state];
         state->itemsPtr = stackbuf;
         state->state++;
     }
@@ -230,7 +232,7 @@ using namespace std;
 {
     return m_table->get_column_index(ObjcStringAccessor(name));
 }
--(TDBType)columnTypeOfColumn:(NSUInteger)ndx
+-(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)ndx
 {
     return TDBType(m_table->get_column_type(ndx));
 }
@@ -588,7 +590,7 @@ using namespace std;
 -(void)TDB_setDate:(NSDate *)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
-        m_table->set_datetime(col_ndx, row_ndx, (size_t)[value timeIntervalSince1970]);,
+       m_table->set_datetime(col_ndx, row_ndx, tightdb::DateTime((time_t)[value timeIntervalSince1970]));,
        TDBDateType);
 }
 
@@ -887,7 +889,7 @@ using namespace std;
 }
 
 
--(NSUInteger)addColumnWithName:(NSString*)name andType:(TDBType)type
+-(NSUInteger)addColumnWithName:(NSString*)name type:(TDBType)type
 {
     return [self addColumnWithType:type andName:name error:nil];
 }

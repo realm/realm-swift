@@ -9,8 +9,8 @@ void ex_objc_table_dynamic_intro()
         /* Create a new table dynamically. */
         TDBTable *table = [[TDBTable alloc] init];
 
-        NSUInteger const NAME = [table addColumnWithName:@"Name" andType:TDBStringType];
-        NSUInteger const AGE = [table addColumnWithName:@"Age" andType:TDBIntType];
+        NSUInteger const NAME = [table addColumnWithName:@"Name" type:TDBStringType];
+        NSUInteger const AGE = [table addColumnWithName:@"Age" type:TDBIntType];
 
         /* Add a row with values. */
         NSUInteger rowIndex = [table addRow:nil];
