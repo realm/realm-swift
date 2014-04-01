@@ -26,7 +26,6 @@
 #import <tightdb/objc/TDBTable_noinst.h>
 
 
-
 @interface TDBDynamicTableTests: SenTestCase
   // Intentionally left blank.
   // No new public instance methods need be defined.
