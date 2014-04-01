@@ -565,7 +565,7 @@ using namespace std;
 -(void)TDB_setDate:(NSDate *)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
-        m_table->set_datetime(col_ndx, row_ndx, (size_t)[value timeIntervalSince1970]);,
+       m_table->set_datetime(col_ndx, row_ndx, tightdb::DateTime((time_t)[value timeIntervalSince1970]));,
        TDBDateType);
 }
 
