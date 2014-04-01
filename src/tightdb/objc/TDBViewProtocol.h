@@ -18,31 +18,26 @@
  *
  **************************************************************************/
 
-#import <Foundation/Foundation.h>
-
-#import "TDBTable.h"
-
 #include <tightdb/objc/TDBType.h>
 
-@interface TDBView: NSObject <TDBView, NSFastEnumeration>
+@class TDBRow;
+
+@protocol TDBView
 
 @property (nonatomic, readonly) NSUInteger rowCount;
 @property (nonatomic, readonly) NSUInteger columnCount;
-@property (nonatomic, readonly) TDBTable *originTable;
 
+// Getting and setting individual rows
 -(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
 -(TDBRow *)lastRow;
 -(TDBRow *)firstRow;
 
+// Working with columns
 -(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
--(void) sortUsingColumnWithIndex: (NSUInteger)colIndex;
--(void) sortUsingColumnWithIndex: (NSUInteger)colIndex inOrder: (TDBSortOrder)order;
-
+// Removing rows
 -(void)removeRowAtIndex:(NSUInteger)rowIndex;
 -(void)removeAllRows;
-
--(NSUInteger)rowIndexInOriginTableForRowAtIndex:(NSUInteger)rowIndex;
 
 @end

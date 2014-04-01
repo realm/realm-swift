@@ -143,6 +143,37 @@ TIGHTDB_TABLE_2(SharedTable2,
     }];
 }
 
+- (void) testSingleTableTransactions
+{
+    NSFileManager* fm = [NSFileManager defaultManager];
+
+    // Write to disk
+    [fm removeItemAtPath:@"singleTest.tightdb" error:nil];
+    [fm removeItemAtPath:@"singleTest.tightdb.lock" error:nil];
+
+    TDBContext* ctx = [TDBContext contextWithPersistenceToFile:@"singleTest.tightdb" error:nil];
+
+    [ctx writeWithBlock:^(TDBTransaction *trx) {
+        TDBTable *t = [trx createTableWithName:@"table"];
+        [t addColumnWithName:@"col0" type:TDBIntType];
+        [t addRow:@[@10]];
+        return YES;
+    } error:nil];
+
+    [ctx readTable:@"table" withBlock:^(TDBTable* table) {
+        STAssertTrue([table rowCount] == 1, @"No rows have been removed");
+    }];
+
+    [ctx writeTable:@"table" withBlock:^(TDBTable* table) {
+        [table addRow:@[@10]];
+        return YES;
+    } error:nil];
+
+    [ctx readTable:@"table" withBlock:^(TDBTable* table) {
+        STAssertTrue([table rowCount] == 2, @"Rows were added");
+    }];
+}
+
 - (void) testHasChanged
 {
     
