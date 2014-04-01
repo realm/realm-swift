@@ -24,6 +24,7 @@
 #import <tightdb/objc/TDBTable.h>
 #import <tightdb/objc/TDBTable_noinst.h>
 #import <tightdb/objc/PrivateTDB.h>
+#import <tightdb/objc/TDBRowFast.h>
 
 #include <tightdb/objc/util_noinst.hpp>
 

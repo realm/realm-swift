@@ -23,6 +23,9 @@ The Objective-C API has been updated and your code will break!
 Objective-C
 -----------
 The Objective-C API has been updated and your code will break!
+Of notable changes a fast interface has been added. 
+This interface includes specific methods to get and set values into Tightdb.
+To use these methods import <Tightdb/TightdbFast.h>.
 
 ### Bugfixes:
 
@@ -35,6 +38,7 @@ The Objective-C API has been updated and your code will break!
 * `columnTypeOfColumn:` renamed to `columnTypeOfColumnWithIndex` in `TDBTable`.
 * `columnNameOfColumn:` renamed to `nameOfColumnWithIndex:` in `TDBTable`.
 * `addColumnWithName:andType:` renamed to `addColumnWithName:type:` in `TDBDescriptor`.
+* Fast getters and setters moved from `TDBRow.h` to `TDBRowFast.h`.
 
 ### Enhancements:
 
