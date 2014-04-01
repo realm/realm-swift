@@ -32,16 +32,16 @@ void ex_objc_table_typed_intro()
 
         [table insertRow:@{@"Name":@"Sam", @"Age":@30, @"Hired":@YES} atIndex:1];
 
-        for (PeopleTableRow *ite in table) {
-            NSLog(@"Name: %@ Age: %lli", ite.Name, ite.Age);
+        for (PeopleTableRow *row in table) {
+            NSLog(@"Name: %@ Age: %lli", row.Name, row.Age);
         }
 
-        TDBRow *c2 = [table rowAtIndex:table.rowCount-1];
-        if (c2 != nil)
+        TDBRow *row2 = [table rowAtIndex:table.rowCount-1];
+        if (row2 != nil)
             NSLog(@"Last row");
 
-        TDBRow *c3 = [table rowAtIndex:table.rowCount];
-        if (c3 != nil)
+        TDBRow *row3 = [table rowAtIndex:table.rowCount];
+        if (row3 != nil)
             NSLog(@"Should not get here.");
     }
 }

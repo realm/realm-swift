@@ -18,13 +18,26 @@
  *
  **************************************************************************/
 
-#import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBView.h>
-#import <tightdb/objc/TDBQuery.h>
-#import <tightdb/objc/TDBRow.h>
-#import <tightdb/objc/TDBContext.h>
-#import <tightdb/objc/TDBVersion.h>
+#include <tightdb/objc/TDBType.h>
 
-#import <tightdb/objc/PrivateHelperMacros.h>
-#import <tightdb/objc/PrivateTableMacros.h>
-#import <tightdb/objc/PrivateTDB.h>
+@class TDBRow;
+
+@protocol TDBView
+
+@property (nonatomic, readonly) NSUInteger rowCount;
+@property (nonatomic, readonly) NSUInteger columnCount;
+
+// Getting and setting individual rows
+-(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
+-(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
+-(TDBRow *)lastRow;
+-(TDBRow *)firstRow;
+
+// Working with columns
+-(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
+
+// Removing rows
+-(void)removeRowAtIndex:(NSUInteger)rowIndex;
+-(void)removeAllRows;
+
+@end
