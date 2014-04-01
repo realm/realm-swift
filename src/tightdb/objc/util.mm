@@ -24,6 +24,8 @@
 #include <tightdb/binary_data.hpp>
 #include <tightdb/string_data.hpp>
 
+#include <vector>
+
 #import "TDBTable.h"
 #import "TDBTable_noinst.h"
 #import "util_noinst.hpp"
@@ -657,3 +659,101 @@ void set_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
         set_cell(col_ndx, row_ndx, table, value);
     }
 }
+
+BOOL set_columns_aux(TableRef& parent, std::vector<size_t> path, NSArray *schema)
+{
+    size_t list_count = [schema count];
+    if (list_count % 2 != 0) {
+        //Error: "Invalid number of entries in schema"
+        return NO;
+    }
+
+    for (size_t i = 0; i < list_count; i += 2) {
+        NSString *key   = [schema objectAtIndex: i];
+        id        value = [schema objectAtIndex: i+1];
+
+        if (![key isKindOfClass:[NSString class]]) {
+            // Error: "Column name must be a string"
+            return NO;
+        }
+
+        try {
+            DataType type;
+            BOOL need_index = false;
+            if ([value isKindOfClass:[NSString class]]) {
+                if ([value isEqualToString:@"string"]) {
+                    type = type_String;
+                }
+                else if ([value isEqualToString:@"string:indexed"]) {
+                    type = type_String;
+                    need_index = YES;
+                }
+                else if ([value isEqualToString:@"binary"]) {
+                    type = type_Binary;
+                }
+                else if ([value isEqualToString:@"int"]) {
+                    type = type_Int;
+                }
+                else if ([value isEqualToString:@"float"]) {
+                    type = type_Float;
+                }
+                else if ([value isEqualToString:@"double"]) {
+                    type = type_Double;
+                }
+                else if ([value isEqualToString:@"bool"]) {
+                    type = type_Bool;
+                }
+                else if ([value isEqualToString:@"date"]) {
+                    type = type_DateTime;
+                }
+                else if ([value isEqualToString:@"mixed"]) {
+                    type = type_Mixed;
+                }
+                else {
+                    // Error: "Invalid column type. Can be \"bool\", \"int\", \"date\", \"string\", \"binary\" or \"mixed\"."
+                    return NO;
+                }
+            }
+            else if ([value isKindOfClass:[NSArray class]]) {
+                type = type_Table;
+            }
+            else {
+                // Error:  "Invalid column type. Can be \"bool\", \"int\", \"date\", \"string\", \"binary\", \"mixed\" or \"[]\"."
+                return NO;
+            }
+
+            size_t column_ndx;
+            StringData column_name([(NSString *)key UTF8String]);
+            if (path.size() > 0) {
+                column_ndx = (*parent).add_subcolumn(path, type, column_name);
+            }
+            else {
+                column_ndx = (*parent).add_column(type, column_name);
+            }
+
+            if (need_index) {
+                (*parent).set_index(column_ndx);
+            }
+
+            if (type == type_Table) {
+                path.push_back(column_ndx);
+                if (!set_columns_aux(parent, path, value)) {
+                    return false;
+                }
+                path.pop_back();
+            }
+        }
+        catch (...) {
+            // Error: "Exception during schema creation"
+            return NO;
+        }
+    }
+    return YES;
+}
+
+BOOL set_columns(TableRef& parent, NSArray *schema)
+{
+    std::vector<size_t> v;
+    return set_columns_aux(parent, v, schema);
+}
+

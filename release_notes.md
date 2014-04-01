@@ -41,7 +41,10 @@ To use these methods import <Tightdb/TightdbFast.h>.
 * Fast getters and setters moved from `TDBRow.h` to `TDBRowFast.h`.
 
 ### Enhancements:
-* 
+
+* Transactions can now be started directly on named tables.
+* You can create dynamic tables with initial schema.
+* Table and View now have a shared protocol so they can easier be used interchangeably.
 
 
 =============================================================
