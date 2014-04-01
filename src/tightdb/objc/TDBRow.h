@@ -29,25 +29,7 @@
 -(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colNdx;
 -(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key;
 
--(void)setInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
--(void)setString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
--(void)setBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex;
--(void)setFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
--(void)setDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
--(void)setDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
--(void)setBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
--(void)setMixed:(id)aMixed inColumnWithIndex:(NSUInteger)colIndex;
--(void)setTable:(TDBTable *)aTable inColumnWithIndex:(NSUInteger)colIndex;
 
--(int64_t)intInColumnWithIndex:(NSUInteger)colIndex;
--(NSString *)stringInColumnWithIndex:(NSUInteger)colIndex;
--(BOOL)boolInColumnWithIndex:(NSUInteger)colIndex;
--(float)floatInColumnWithIndex:(NSUInteger)colIndex;
--(double)doubleInColumnWithIndex:(NSUInteger)colIndex;
--(NSDate *)dateInColumnWithIndex:(NSUInteger)colIndex;
--(NSData *)binaryInColumnWithIndex:(NSUInteger)colIndex;
--(id)mixedInColumnWithIndex:(NSUInteger)colIndex;
--(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex;
 @end
 
 

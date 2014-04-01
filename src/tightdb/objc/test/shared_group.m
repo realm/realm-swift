@@ -10,6 +10,7 @@
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/TDBTransaction.h>
 #import <tightdb/objc/group.h>
+#import <tightdb/objc/TightdbFast.h>
 
 TIGHTDB_TABLE_2(SharedTable2,
                 Hired, Bool,
