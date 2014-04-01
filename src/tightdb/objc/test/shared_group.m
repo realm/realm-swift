@@ -155,7 +155,7 @@ TIGHTDB_TABLE_2(SharedTable2,
 
     [ctx writeWithBlock:^(TDBTransaction *trx) {
         TDBTable *t = [trx createTableWithName:@"table"];
-        [t addColumnWithName:@"col0" andType:TDBIntType];
+        [t addColumnWithName:@"col0" type:TDBIntType];
         [t addRow:@[@10]];
         return YES;
     } error:nil];
