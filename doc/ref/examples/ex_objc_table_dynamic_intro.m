@@ -25,8 +25,8 @@ void ex_objc_table_dynamic_intro()
         [table addRow:@[@"Nick", @100]];
 
         /* Print using a cursor. */
-        for (TDBRow *ite in table)
-            NSLog(@"Name: %@ Age: %@", ite[NAME], ite[AGE]);
+        for (TDBRow *row in table)
+            NSLog(@"Name: %@ Age: %@", row[NAME], row[AGE]);
         
         /* Insert a row and print. */
         [table insertRow: nil atIndex:2];
@@ -36,8 +36,8 @@ void ex_objc_table_dynamic_intro()
 
         NSLog(@"--------");
 
-        for (TDBRow *ite in table)
-            NSLog(@"Name: %@ Age: %@", ite[NAME], ite[AGE]);
+        for (TDBRow *row in table)
+            NSLog(@"Name: %@ Age: %@", row[NAME], row[AGE]);
 
 
         /* Update a few rows and print again. */
@@ -48,12 +48,12 @@ void ex_objc_table_dynamic_intro()
 
         NSLog(@"--------");
 
-        for (TDBRow *ite in table)
-            NSLog(@"Name: %@ Age: %@", ite[NAME], ite[AGE]);
+        for (TDBRow *row in table)
+            NSLog(@"Name: %@ Age: %@", row[NAME], row[AGE]);
 
         /* Index not existing. */
-        TDBRow *c2 = [table rowAtIndex:table.rowCount];
-        if (c2 != nil)
+        TDBRow *row2 = [table rowAtIndex:table.rowCount];
+        if (row2 != nil)
             NSLog(@"Should not get here.");
     }
 }
