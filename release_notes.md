@@ -35,7 +35,6 @@ The Objective-C API has been updated and your code will break!
 * `columnTypeOfColumn:` renamed to `columnTypeOfColumnWithIndex` in `TDBTable`.
 * `columnNameOfColumn:` renamed to `nameOfColumnWithIndex:` in `TDBTable`.
 * `addColumnWithName:andType:` renamed to `addColumnWithName:type:` in `TDBDescriptor`.
-* unified `get` and `set` in `TDBRow`
 
 ### Enhancements:
 * 
