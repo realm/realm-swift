@@ -5,9 +5,8 @@
 
 
 #import <SenTestingKit/SenTestingKit.h>
-#import <tightdb/objc/Tightdb.h>
-#import <tightdb/objc/TDBTable.h>
 #import <tightdb/objc/TightdbFast.h>
+#import <tightdb/objc/TDBTable.h>
 
 TIGHTDB_TABLE_3(FuncPeopleTable,
                 Name,  String,

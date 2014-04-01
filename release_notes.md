@@ -23,6 +23,9 @@ The Objective-C API has been updated and your code will break!
 Objective-C
 -----------
 The Objective-C API has been updated and your code will break!
+Of notable changes a fast interface has been added. 
+This interface includes specific methods to get and set values into Tightdb.
+To use these methods import <Tightdb/TightdbFast.h>.
 
 ### Bugfixes:
 
