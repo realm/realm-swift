@@ -92,8 +92,8 @@ using namespace std;
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState*)state objects:(id __unsafe_unretained*)stackbuf count:(NSUInteger)len
 {
     (void)len;
-    if(state->state == 0)
-    {
+    
+    if (state->state == 0) {
         state->state = [self getFastEnumStart];
         state->mutationsPtr = (unsigned long*)objc_unretainedPointer(self);
         TDBRow* tmp = [self getRow:state->state];
@@ -173,16 +173,19 @@ using namespace std;
     return m_query->minimum_int(col_ndx);
 }
 
-
 -(float)minFloatInColumnWithIndex:(NSUInteger)col_ndx
 {
     return m_query->minimum_float(col_ndx);
 }
 
-
 -(double)minDoubleInColumnWithIndex:(NSUInteger)col_ndx
 {
     return m_query->minimum_double(col_ndx);
+}
+
+-(NSDate *)minDateInColumnWithIndex:(NSUInteger)col_ndx
+{
+    return [NSDate dateWithTimeIntervalSince1970: m_query->minimum_int(col_ndx)];
 }
 
 
@@ -196,10 +199,14 @@ using namespace std;
     return m_query->maximum_float(col_ndx);
 }
 
-
 -(double)maxDoubleInColumnWithIndex:(NSUInteger)col_ndx
 {
     return m_query->maximum_double(col_ndx);
+}
+
+-(NSDate *)maxDateInColumnWithIndex:(NSUInteger)col_ndx
+{
+    return [NSDate dateWithTimeIntervalSince1970: m_query->maximum_int(col_ndx)];
 }
 
 
