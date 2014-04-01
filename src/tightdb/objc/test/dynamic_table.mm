@@ -1160,4 +1160,19 @@
     STAssertTrue([(NSString *)table[1][0] isEqualToString:@"World"], @"'World' expected");
 }
 
+- (void)testTableDynamic_initWithColumns
+{
+    TDBTable* table = [[TDBTable alloc] initWithColumns:@[@"name",   @"string",
+                                                          @"age",    @"int",
+                                                          @"hired",  @"bool",
+                                                          @"phones", @[@"type",   @"string",
+                                                                       @"number", @"string"]]];
+
+    STAssertEquals([table columnCount], (NSUInteger)4, @"four columns");
+
+    // Try to append a row that has to comply with the schema
+    [table addRow:@[@"joe", @34, @YES, @[@[@"home",   @"(650) 434-4342"],
+                                         @[@"mobile", @"(650) 342-4243"]]]];
+}
+
 @end

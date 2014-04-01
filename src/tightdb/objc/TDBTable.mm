@@ -26,6 +26,8 @@
 #include <tightdb/table_view.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
+#include "support.h"
+
 #import <tightdb/objc/TDBTable.h>
 #import <tightdb/objc/TDBTable_noinst.h>
 #import <tightdb/objc/TDBView.h>
@@ -54,13 +56,36 @@ using namespace std;
 
 
 
--(id)init
+-(instancetype)init
 {
     self = [super init];
     if (self) {
         m_read_only = NO;
         m_table = tightdb::Table::create(); // FIXME: May throw
     }
+    return self;
+}
+
+-(instancetype)initWithColumns:(NSArray *)columns
+{
+    self = [super init];
+    if (!self)
+        return nil;
+
+    m_read_only = NO;
+    m_table = tightdb::Table::create(); // FIXME: May throw
+
+    if (!set_columns(m_table, columns)) {
+        m_table.reset();
+
+        // Parsing the schema failed
+        //TODO: More detailed error msg in exception
+        NSException* exception = [NSException exceptionWithName:@"tightdb:invalid_columns"
+                                                         reason:@"The supplied list of columns was invalid"
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
+
     return self;
 }
 
