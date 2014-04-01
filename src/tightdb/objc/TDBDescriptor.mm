@@ -48,7 +48,7 @@
 
 // FIXME: Provide a version of this method that takes a 'const char*'. This will simplify _addColumns of MyTable.
 // FIXME: Detect errors from core library
--(BOOL)addColumnWithName:(NSString*)name andType:(TDBType)type
+-(BOOL)addColumnWithName:(NSString*)name type:(TDBType)type
 {
     return [self addColumnWithName:name andType:type error:nil];
 }
@@ -105,11 +105,11 @@
 {
     return m_desc->get_column_count();
 }
--(TDBType)columnTypeOfColumn:(NSUInteger)colIndex
+-(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex
 {
     return (TDBType)m_desc->get_column_type(colIndex);
 }
--(NSString*)columnNameOfColumn:(NSUInteger)colIndex
+-(NSString*)nameOfColumnWithIndex:(NSUInteger)colIndex
 {
     return to_objc_string(m_desc->get_column_name(colIndex));
 }

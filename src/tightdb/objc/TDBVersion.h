@@ -21,7 +21,7 @@
 #import <Foundation/Foundation.h>
 
 #define TDB_VERSION_MAJOR 0
-#define TDB_VERSION_MINOR 4
+#define TDB_VERSION_MINOR 5
 #define TDB_VERSION_PATCH 0
 
 @interface TDBVersion: NSObject

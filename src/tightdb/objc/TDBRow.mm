@@ -51,11 +51,11 @@ using namespace std;
     }
     return self;
 }
--(NSUInteger)TDBIndex
+-(NSUInteger)TDB_index
 {
     return _ndx;
 }
--(void)TDBSetNdx:(NSUInteger)ndx
+-(void)TDB_setNdx:(NSUInteger)ndx
 {
     _ndx = ndx;
 }
@@ -69,7 +69,7 @@ using namespace std;
 
 -(id)objectAtIndexedSubscript:(NSUInteger)colNdx
 {
-    TDBType columnType = [_table columnTypeOfColumn:colNdx];
+    TDBType columnType = [_table columnTypeOfColumnWithIndex:colNdx];
     switch (columnType) {
         case TDBBoolType:
             return [NSNumber numberWithBool:[_table TDB_boolInColumnWithIndex:colNdx atRowIndex:_ndx]];

@@ -245,7 +245,7 @@
         *stackbuf = tmp;
     }
     if (state->state < self.rowCount) {
-        [((TDBRow*)*stackbuf) TDBSetNdx:[self rowIndexInOriginTableForRowAtIndex:state->state]];
+        [((TDBRow*)*stackbuf) TDB_setNdx:[self rowIndexInOriginTableForRowAtIndex:state->state]];
         state->itemsPtr = stackbuf;
         state->state++;
     }

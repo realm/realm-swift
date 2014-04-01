@@ -9,9 +9,9 @@ void ex_objc_query_dynamic_intro()
         /* Creates a new table dynamically. */
         TDBTable *table = [[TDBTable alloc] init];
 
-        NSUInteger const NAME = [table addColumnWithName:@"Name" andType:TDBStringType];
-        NSUInteger const AGE = [table addColumnWithName:@"Age" andType:TDBIntType];
-        NSUInteger const HIRED = [table addColumnWithName:@"Hired" andType:TDBBoolType];
+        NSUInteger const NAME = [table addColumnWithName:@"Name" type:TDBStringType];
+        NSUInteger const AGE = [table addColumnWithName:@"Age" type:TDBIntType];
+        NSUInteger const HIRED = [table addColumnWithName:@"Hired" type:TDBBoolType];
 
         /* Add some people. */
         [table addRow:@[@"Joe", @23, @YES]];
