@@ -30,21 +30,21 @@ void ex_objc_tableview_dynamic_intro()
         TDBView *view = [q findAllRows];
 
         /* Print the names. */
-        for (TDBRow *ite in view) {
-            NSLog(@"With iterator.......name: %@",[ite stringInColumnWithIndex:NAME]);
+        for (TDBRow *row in view) {
+            NSLog(@"With fast enumerator.......name: %@",row[NAME]);
         }
 
         /* Take a curser at index one in the view. */
         /* Note: the index of this row is different in the underlaying table. */
 
-        TDBRow *c = [view rowAtIndex:1];
-        if (c != nil)
-            NSLog(@"With fixed index....name: %@",[c stringInColumnWithIndex:NAME]);
+        TDBRow *row = [view rowAtIndex:1];
+        if (row != nil)
+            NSLog(@"With fixed index....name: %@",row[NAME]);
 
 
         /* Index out-of-bounds index. */
-        TDBRow *c2 = [view rowAtIndex:view.rowCount];
-        if (c2 != nil)
+        TDBRow *row2 = [view rowAtIndex:view.rowCount];
+        if (row2 != nil)
             NSLog(@"Should not get here.");
     }
 }

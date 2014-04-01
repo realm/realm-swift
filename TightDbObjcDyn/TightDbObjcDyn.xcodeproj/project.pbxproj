@@ -45,6 +45,7 @@
 		8017879218EA0CF10098AE7A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8017877818EA0CF10098AE7A /* main.m */; };
 		8017879318EA0CF10098AE7A /* RefDocExamples-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 8017877A18EA0CF10098AE7A /* RefDocExamples-Prefix.pch */; };
 		8017879418EA0CF10098AE7A /* RefDocExamplesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8017878218EA0CF10098AE7A /* RefDocExamplesTests.m */; };
+		4DDDD67418EB049300E94613 /* TDBViewProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DDDD67318EB049300E94613 /* TDBViewProtocol.h */; };
 		E918909D177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		E91890AF177B677900653D7A /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E91890AE177B677900653D7A /* SenTestingKit.framework */; };
 		E91890B0177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
@@ -163,6 +164,9 @@
 		8017878018EA0CF10098AE7A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8017878118EA0CF10098AE7A /* RefDocExamplesTests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "RefDocExamplesTests-Info.plist"; sourceTree = "<group>"; };
 		8017878218EA0CF10098AE7A /* RefDocExamplesTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RefDocExamplesTests.m; sourceTree = "<group>"; };
+		4DDDD67018EAF1C000E94613 /* TDBRowFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TDBRowFast.h; path = ../../src/tightdb/objc/TDBRowFast.h; sourceTree = "<group>"; };
+		4DDDD67218EAF22100E94613 /* TightdbFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TightdbFast.h; path = ../../src/tightdb/objc/TightdbFast.h; sourceTree = "<group>"; };
+		4DDDD67318EB049300E94613 /* TDBViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBViewProtocol.h; path = ../../src/tightdb/objc/TDBViewProtocol.h; sourceTree = "<group>"; };
 		E9189099177B677900653D7A /* TightDbObjcDyn.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = TightDbObjcDyn.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		E918909C177B677900653D7A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		E918909F177B677900653D7A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -318,6 +322,15 @@
 			path = RefDocExamplesTests;
 			sourceTree = "<group>";
 		};
+		4DDDD67118EAF1DC00E94613 /* TDBFast */ = {
+			isa = PBXGroup;
+			children = (
+				4DDDD67018EAF1C000E94613 /* TDBRowFast.h */,
+				4DDDD67218EAF22100E94613 /* TightdbFast.h */,
+			);
+			name = TDBFast;
+			sourceTree = "<group>";
+		};
 		E9189090177B677900653D7A = {
 			isa = PBXGroup;
 			children = (
@@ -362,16 +375,18 @@
 		E91890A2177B677900653D7A /* TightDbObjcDyn */ = {
 			isa = PBXGroup;
 			children = (
+				4DDDD67118EAF1DC00E94613 /* TDBFast */,
 				4D1ED30A18E1B6E8003CFF44 /* group.h */,
+				4DDDD67318EB049300E94613 /* TDBViewProtocol.h */,
 				4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */,
 				424EEFAB18D9C15900337A13 /* TDBView.mm */,
 				424EEFAC18D9C15900337A13 /* TDBView_noinst.h */,
 				424EEFAD18D9C15A00337A13 /* TDBView.h */,
+				424EEF9D18D9C10100337A13 /* TDBColumnProxy.h */,
 				424EEFB118D9C97900337A13 /* TDBColumnProxy.mm */,
 				424EEF9F18D9C11D00337A13 /* TDBDescriptor.mm */,
 				424EEFA018D9C11D00337A13 /* TDBDescriptor_noinst.h */,
 				424EEFA118D9C11D00337A13 /* TDBDescriptor.h */,
-				424EEF9D18D9C10100337A13 /* TDBColumnProxy.h */,
 				E91890C6177B67AB00653D7A /* TDBRow.h */,
 				E91890C5177B67AB00653D7A /* TDBRow.mm */,
 				E91890CA177B67AB00653D7A /* TDBContext.h */,
@@ -380,7 +395,6 @@
 				E91890CF177B67AB00653D7A /* TDBQuery.h */,
 				E91890CD177B67AB00653D7A /* TDBQuery.mm */,
 				E91890CE177B67AB00653D7A /* TDBQuery_noinst.h */,
-				42AD3A9418CDBDFF00C86073 /* util.mm */,
 				E91890A3177B677900653D7A /* Supporting Files */,
 				E91890D2177B67AB00653D7A /* TDBTable.h */,
 				4D1ED30618E198AD003CFF44 /* PrivateTDB.h */,
@@ -393,6 +407,7 @@
 				4220871518E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm */,
 				E91890C8177B67AB00653D7A /* TDBTransaction_noinst.h */,
 				E91890D4177B67AB00653D7A /* TDBType.h */,
+				42AD3A9418CDBDFF00C86073 /* util.mm */,
 				E91890D5177B67AB00653D7A /* util_noinst.hpp */,
 				42AD3A9618CDBDFF00C86073 /* TDBVersion.h */,
 				42AD3A9518CDBDFF00C86073 /* TDBVersion.mm */,
@@ -465,6 +480,7 @@
 				42AD3A9A18CDBDFF00C86073 /* TDBVersion.h in Headers */,
 				424EEFB018D9C15A00337A13 /* TDBView.h in Headers */,
 				E91890E3177B67AB00653D7A /* TDBTable.h in Headers */,
+				4DDDD67418EB049300E94613 /* TDBViewProtocol.h in Headers */,
 				4D1ED30818E1AF4E003CFF44 /* PrivateTableMacros.h in Headers */,
 				8017878C18EA0CF10098AE7A /* examples.h in Headers */,
 				4D1ED30B18E1B6E8003CFF44 /* group.h in Headers */,

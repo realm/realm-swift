@@ -7,7 +7,7 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-#import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/TightdbFast.h>
 #import <tightdb/objc/TDBTransaction.h>
 #import <tightdb/objc/group.h>
 
@@ -140,6 +140,37 @@ TIGHTDB_TABLE_2(SharedTable2,
         STAssertTrue([v rowCount] == 1, @"No rows have been removed");
         
         STAssertNil([group tableWithName:@"Does not exist"], @"Table does not exist");
+    }];
+}
+
+- (void) testSingleTableTransactions
+{
+    NSFileManager* fm = [NSFileManager defaultManager];
+
+    // Write to disk
+    [fm removeItemAtPath:@"singleTest.tightdb" error:nil];
+    [fm removeItemAtPath:@"singleTest.tightdb.lock" error:nil];
+
+    TDBContext* ctx = [TDBContext contextWithPersistenceToFile:@"singleTest.tightdb" error:nil];
+
+    [ctx writeWithBlock:^(TDBTransaction *trx) {
+        TDBTable *t = [trx createTableWithName:@"table"];
+        [t addColumnWithName:@"col0" type:TDBIntType];
+        [t addRow:@[@10]];
+        return YES;
+    } error:nil];
+
+    [ctx readTable:@"table" withBlock:^(TDBTable* table) {
+        STAssertTrue([table rowCount] == 1, @"No rows have been removed");
+    }];
+
+    [ctx writeTable:@"table" withBlock:^(TDBTable* table) {
+        [table addRow:@[@10]];
+        return YES;
+    } error:nil];
+
+    [ctx readTable:@"table" withBlock:^(TDBTable* table) {
+        STAssertTrue([table rowCount] == 2, @"Rows were added");
     }];
 }
 
