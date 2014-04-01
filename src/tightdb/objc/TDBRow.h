@@ -25,9 +25,6 @@
 @interface TDBRow: NSObject
 
 /* Setters */
--(void)set:(id)value inColumnWithIndex:(NSUInteger)colIndex;
-
-/* These setters will likely be deprecated in a future release */
 -(void)setInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex;
@@ -39,8 +36,6 @@
 -(void)setTable:(TDBTable *)aTable inColumnWithIndex:(NSUInteger)colIndex;
 
 /* Getters */
--(NSObject *)get:(NSUInteger)colIndex;
-
 -(int64_t)intInColumnWithIndex:(NSUInteger)colIndex;
 -(NSString *)stringInColumnWithIndex:(NSUInteger)colIndex;
 -(BOOL)boolInColumnWithIndex:(NSUInteger)colIndex;

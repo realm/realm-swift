@@ -28,5 +28,3 @@
 #import <tightdb/objc/PrivateHelperMacros.h>
 #import <tightdb/objc/PrivateTableMacros.h>
 #import <tightdb/objc/PrivateTDB.h>
-
-#import <tightdb/objc/NSObject+TDBTypeConversion.h>

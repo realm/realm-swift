@@ -75,12 +75,20 @@ using namespace std;
 - (id)objectForKeyedSubscript:(id <NSCopying>)key
 {
     NSUInteger colNdx = [_table indexOfColumnWithName:(NSString *)key];
-    return [self objectAtIndexedSubscript:colNdx];
+    return get_cell(colNdx, _ndx, [_table getNativeTable]);
 }
 
 -(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colNdx
 {
-    [self set:obj inColumnWithIndex:colNdx];
+    tightdb::Table& t = [_table getNativeTable];
+    tightdb::ConstDescriptorRef descr = t.get_descriptor();
+    if (!verify_cell(*descr, size_t(colNdx), (NSObject *)obj)) {
+        @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
+                            reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
+                            to_objc_string(t.get_column_name(colNdx)), (unsigned long)colNdx, t.get_column_type(colNdx)]
+                            userInfo:nil];
+    }
+    set_cell(size_t(colNdx), size_t(_ndx), t, (NSObject *)obj);
 }
 
 -(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key
@@ -91,11 +99,6 @@ using namespace std;
 
 
 /* Getters */
-
--(NSObject *)get:(NSUInteger)colIndex {
-    return get_cell(size_t(colIndex), size_t(_ndx), [_table getNativeTable]);
-}
-
 -(int64_t)intInColumnWithIndex:(NSUInteger)colNdx
 {
     return [_table TDB_intInColumnWithIndex:colNdx atRowIndex:_ndx];
@@ -141,24 +144,7 @@ using namespace std;
     return [_table TDB_mixedInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(void)set:(id)value inColumnWithIndex:(NSUInteger)colIndex
-{
-
-    tightdb::Table& t = [_table getNativeTable];
-    tightdb::ConstDescriptorRef descr = t.get_descriptor();
-    if (!verify_cell(*descr, size_t(colIndex), (NSObject *)value)) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:wrong_column_type"
-                                                         reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
-                                                                 to_objc_string(t.get_column_name(colIndex)), (unsigned long)colIndex, t.get_column_type(colIndex) ]
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
-
-    }
-    set_cell(size_t(colIndex), size_t(_ndx), t, (NSObject *)value);
-}
-
-
-
+/* Setters */
 -(void)setInt:(int64_t)value inColumnWithIndex:(NSUInteger)colNdx
 {
     [_table TDB_setInt:value inColumnWithIndex:colNdx atRowIndex:_ndx];
