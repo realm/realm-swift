@@ -47,11 +47,11 @@
 -(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
 // Getting and setting individual rows (uses object subscripting)
--(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
 -(TDBRow *)lastRow;
 -(TDBRow *)firstRow;
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
+-(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 
 /**
  * Adds a row at the end of the table.
