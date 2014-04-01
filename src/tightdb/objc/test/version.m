@@ -3,11 +3,11 @@
  TightDB
 */
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 
 #import <tightdb/objc/TDBVersion.h>
 
-@interface MACTestVersion: SenTestCase
+@interface MACTestVersion: XCTestCase
 @end
 
 @implementation MACTestVersion
@@ -26,33 +26,33 @@
 -(void)testMajorVersion
 {
   if (TDB_VERSION_MAJOR != [TDBVersion getMajor])
-    STFail(@"Wrong major version");
+    XCTFail(@"Wrong major version");
 }
 -(void)testMinorVersion
 {
   if (TDB_VERSION_MINOR != [TDBVersion getMinor])
-    STFail(@"Wrong minor version");
+    XCTFail(@"Wrong minor version");
 }
 -(void)testPatchVersion
 {
   if (TDB_VERSION_PATCH != [TDBVersion getPatch])
-    STFail(@"Wrong patch version");
+    XCTFail(@"Wrong patch version");
 }
 -(void)testIsAtLeast
 {
     if ([TDBVersion isAtLeast:TDB_VERSION_MAJOR-1 minor:TDB_VERSION_MINOR patch:TDB_VERSION_PATCH])
-        STFail(@"Wrong Major version");
+        XCTFail(@"Wrong Major version");
     if ([TDBVersion isAtLeast:TDB_VERSION_MAJOR minor:TDB_VERSION_MINOR-1 patch:TDB_VERSION_PATCH])
-        STFail(@"Wrong Minor version");
+        XCTFail(@"Wrong Minor version");
     if ([TDBVersion isAtLeast:TDB_VERSION_MAJOR minor:TDB_VERSION_MINOR patch:TDB_VERSION_PATCH-1])
-        STFail(@"Wrong Patch version");
+        XCTFail(@"Wrong Patch version");
 
     if (![TDBVersion isAtLeast:TDB_VERSION_MAJOR+1 minor:TDB_VERSION_MINOR patch:TDB_VERSION_PATCH])
-        STFail(@"Wrong Major version");
+        XCTFail(@"Wrong Major version");
     if (![TDBVersion isAtLeast:TDB_VERSION_MAJOR minor:TDB_VERSION_MINOR+1 patch:TDB_VERSION_PATCH])
-        STFail(@"Wrong Minor version");
+        XCTFail(@"Wrong Minor version");
     if (![TDBVersion isAtLeast:TDB_VERSION_MAJOR minor:TDB_VERSION_MINOR patch:TDB_VERSION_PATCH+1])
-        STFail(@"Wrong Patch version");
+        XCTFail(@"Wrong Patch version");
 }
 
 -(void)testGetVersion
@@ -62,6 +62,6 @@
                              [TDBVersion getMinor],
                              [TDBVersion getPatch]];
     if (![[TDBVersion getVersion] isEqualTo:s1])
-        STFail(@"Version string incorrect");
+        XCTFail(@"Version string incorrect");
 }
 @end
