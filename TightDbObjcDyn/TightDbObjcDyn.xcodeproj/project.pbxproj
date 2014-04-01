@@ -27,24 +27,6 @@
 		4DB1DEFB18BF70AE005A7234 /* dynamic_table.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */; };
 		4DB1DEFC18BF70AE005A7234 /* functional.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF918BF70AE005A7234 /* functional.m */; };
 		4DB1DEFD18BF70AE005A7234 /* typed_table.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEFA18BF70AE005A7234 /* typed_table.m */; };
-		8017878318EA0CF10098AE7A /* ex_objc_group_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 8017876418EA0CF10098AE7A /* ex_objc_group_intro.m */; };
-		8017878418EA0CF10098AE7A /* ex_objc_query_dynamic_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 8017876518EA0CF10098AE7A /* ex_objc_query_dynamic_intro.m */; };
-		8017878518EA0CF10098AE7A /* ex_objc_query_typed_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 8017876618EA0CF10098AE7A /* ex_objc_query_typed_intro.m */; };
-		8017878618EA0CF10098AE7A /* ex_objc_sharedgroup_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 8017876718EA0CF10098AE7A /* ex_objc_sharedgroup_intro.m */; };
-		8017878718EA0CF10098AE7A /* ex_objc_table_dynamic_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 8017876818EA0CF10098AE7A /* ex_objc_table_dynamic_intro.m */; };
-		8017878818EA0CF10098AE7A /* ex_objc_table_typed_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 8017876918EA0CF10098AE7A /* ex_objc_table_typed_intro.m */; };
-		8017878918EA0CF10098AE7A /* ex_objc_table_typed_intro_with_many_comments.m in Sources */ = {isa = PBXBuildFile; fileRef = 8017876A18EA0CF10098AE7A /* ex_objc_table_typed_intro_with_many_comments.m */; };
-		8017878A18EA0CF10098AE7A /* ex_objc_tableview_dynamic_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 8017876B18EA0CF10098AE7A /* ex_objc_tableview_dynamic_intro.m */; };
-		8017878B18EA0CF10098AE7A /* ex_objc_tableview_typed_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 8017876C18EA0CF10098AE7A /* ex_objc_tableview_typed_intro.m */; };
-		8017878C18EA0CF10098AE7A /* examples.h in Headers */ = {isa = PBXBuildFile; fileRef = 8017876D18EA0CF10098AE7A /* examples.h */; };
-		8017878D18EA0CF10098AE7A /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 8017876E18EA0CF10098AE7A /* Makefile */; };
-		8017878E18EA0CF10098AE7A /* people.h in Headers */ = {isa = PBXBuildFile; fileRef = 8017876F18EA0CF10098AE7A /* people.h */; };
-		8017878F18EA0CF10098AE7A /* people.m in Sources */ = {isa = PBXBuildFile; fileRef = 8017877018EA0CF10098AE7A /* people.m */; };
-		8017879018EA0CF10098AE7A /* AppDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 8017877318EA0CF10098AE7A /* AppDelegate.h */; };
-		8017879118EA0CF10098AE7A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8017877418EA0CF10098AE7A /* AppDelegate.m */; };
-		8017879218EA0CF10098AE7A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8017877818EA0CF10098AE7A /* main.m */; };
-		8017879318EA0CF10098AE7A /* RefDocExamples-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 8017877A18EA0CF10098AE7A /* RefDocExamples-Prefix.pch */; };
-		8017879418EA0CF10098AE7A /* RefDocExamplesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8017878218EA0CF10098AE7A /* RefDocExamplesTests.m */; };
 		4DDDD67418EB049300E94613 /* TDBViewProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DDDD67318EB049300E94613 /* TDBViewProtocol.h */; };
 		E918909D177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		E91890AF177B677900653D7A /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E91890AE177B677900653D7A /* SenTestingKit.framework */; };
@@ -84,20 +66,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		8017879718EA0CF10098AE7A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8017877B18EA0CF10098AE7A /* RefDocExamples.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4D88930F18D320D20038AFD4;
-			remoteInfo = RefDocExamples;
-		};
-		8017879918EA0CF10098AE7A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 8017877B18EA0CF10098AE7A /* RefDocExamples.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4D88932A18D320D30038AFD4;
-			remoteInfo = RefDocExamplesTests;
-		};
 		E91890B1177B677900653D7A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E9189091177B677900653D7A /* Project object */;
@@ -129,44 +97,10 @@
 		4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = dynamic_table.mm; path = ../../src/tightdb/objc/test/dynamic_table.mm; sourceTree = "<group>"; };
 		4DB1DEF918BF70AE005A7234 /* functional.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = functional.m; path = ../../src/tightdb/objc/test/functional.m; sourceTree = "<group>"; };
 		4DB1DEFA18BF70AE005A7234 /* typed_table.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = typed_table.m; path = ../../src/tightdb/objc/test/typed_table.m; sourceTree = "<group>"; };
-		8017875618EA0AFC0098AE7A /* release_notes.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = release_notes.md; path = ../release_notes.md; sourceTree = "<group>"; };
-		8017875918EA0CF10098AE7A /* context_ref.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = context_ref.yaml; sourceTree = "<group>"; };
-		8017875A18EA0CF10098AE7A /* dyn_query_ref.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dyn_query_ref.yaml; sourceTree = "<group>"; };
-		8017875B18EA0CF10098AE7A /* dyn_table_ref.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dyn_table_ref.yaml; sourceTree = "<group>"; };
-		8017875C18EA0CF10098AE7A /* dyn_view_ref.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dyn_view_ref.yaml; sourceTree = "<group>"; };
-		8017875D18EA0CF10098AE7A /* reference.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = reference.yaml; sourceTree = "<group>"; };
-		8017875E18EA0CF10098AE7A /* transaction_ref.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = transaction_ref.yaml; sourceTree = "<group>"; };
-		8017875F18EA0CF10098AE7A /* typed_query_ref.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = typed_query_ref.yaml; sourceTree = "<group>"; };
-		8017876018EA0CF10098AE7A /* typed_table_ref.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = typed_table_ref.yaml; sourceTree = "<group>"; };
-		8017876118EA0CF10098AE7A /* typed_view_ref.yaml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = typed_view_ref.yaml; sourceTree = "<group>"; };
-		8017876318EA0CF10098AE7A /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
-		8017876418EA0CF10098AE7A /* ex_objc_group_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ex_objc_group_intro.m; sourceTree = "<group>"; };
-		8017876518EA0CF10098AE7A /* ex_objc_query_dynamic_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ex_objc_query_dynamic_intro.m; sourceTree = "<group>"; };
-		8017876618EA0CF10098AE7A /* ex_objc_query_typed_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ex_objc_query_typed_intro.m; sourceTree = "<group>"; };
-		8017876718EA0CF10098AE7A /* ex_objc_sharedgroup_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ex_objc_sharedgroup_intro.m; sourceTree = "<group>"; };
-		8017876818EA0CF10098AE7A /* ex_objc_table_dynamic_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ex_objc_table_dynamic_intro.m; sourceTree = "<group>"; };
-		8017876918EA0CF10098AE7A /* ex_objc_table_typed_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ex_objc_table_typed_intro.m; sourceTree = "<group>"; };
-		8017876A18EA0CF10098AE7A /* ex_objc_table_typed_intro_with_many_comments.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ex_objc_table_typed_intro_with_many_comments.m; sourceTree = "<group>"; };
-		8017876B18EA0CF10098AE7A /* ex_objc_tableview_dynamic_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ex_objc_tableview_dynamic_intro.m; sourceTree = "<group>"; };
-		8017876C18EA0CF10098AE7A /* ex_objc_tableview_typed_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ex_objc_tableview_typed_intro.m; sourceTree = "<group>"; };
-		8017876D18EA0CF10098AE7A /* examples.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = examples.h; sourceTree = "<group>"; };
-		8017876E18EA0CF10098AE7A /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		8017876F18EA0CF10098AE7A /* people.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = people.h; sourceTree = "<group>"; };
-		8017877018EA0CF10098AE7A /* people.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = people.m; sourceTree = "<group>"; };
-		8017877318EA0CF10098AE7A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		8017877418EA0CF10098AE7A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		8017877618EA0CF10098AE7A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		8017877718EA0CF10098AE7A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		8017877818EA0CF10098AE7A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		8017877918EA0CF10098AE7A /* RefDocExamples-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "RefDocExamples-Info.plist"; sourceTree = "<group>"; };
-		8017877A18EA0CF10098AE7A /* RefDocExamples-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RefDocExamples-Prefix.pch"; sourceTree = "<group>"; };
-		8017877B18EA0CF10098AE7A /* RefDocExamples.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = RefDocExamples.xcodeproj; sourceTree = "<group>"; };
-		8017878018EA0CF10098AE7A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		8017878118EA0CF10098AE7A /* RefDocExamplesTests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "RefDocExamplesTests-Info.plist"; sourceTree = "<group>"; };
-		8017878218EA0CF10098AE7A /* RefDocExamplesTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RefDocExamplesTests.m; sourceTree = "<group>"; };
 		4DDDD67018EAF1C000E94613 /* TDBRowFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TDBRowFast.h; path = ../../src/tightdb/objc/TDBRowFast.h; sourceTree = "<group>"; };
 		4DDDD67218EAF22100E94613 /* TightdbFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TightdbFast.h; path = ../../src/tightdb/objc/TightdbFast.h; sourceTree = "<group>"; };
 		4DDDD67318EB049300E94613 /* TDBViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBViewProtocol.h; path = ../../src/tightdb/objc/TDBViewProtocol.h; sourceTree = "<group>"; };
+		8017875618EA0AFC0098AE7A /* release_notes.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = release_notes.md; path = ../release_notes.md; sourceTree = "<group>"; };
 		E9189099177B677900653D7A /* TightDbObjcDyn.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = TightDbObjcDyn.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		E918909C177B677900653D7A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		E918909F177B677900653D7A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -231,97 +165,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		8017875718EA0CF10098AE7A /* ref */ = {
-			isa = PBXGroup;
-			children = (
-				8017875818EA0CF10098AE7A /* data */,
-				8017876218EA0CF10098AE7A /* examples */,
-				8017877118EA0CF10098AE7A /* RefDocExamples */,
-			);
-			name = ref;
-			path = ../doc/ref;
-			sourceTree = "<group>";
-		};
-		8017875818EA0CF10098AE7A /* data */ = {
-			isa = PBXGroup;
-			children = (
-				8017875918EA0CF10098AE7A /* context_ref.yaml */,
-				8017875A18EA0CF10098AE7A /* dyn_query_ref.yaml */,
-				8017875B18EA0CF10098AE7A /* dyn_table_ref.yaml */,
-				8017875C18EA0CF10098AE7A /* dyn_view_ref.yaml */,
-				8017875D18EA0CF10098AE7A /* reference.yaml */,
-				8017875E18EA0CF10098AE7A /* transaction_ref.yaml */,
-				8017875F18EA0CF10098AE7A /* typed_query_ref.yaml */,
-				8017876018EA0CF10098AE7A /* typed_table_ref.yaml */,
-				8017876118EA0CF10098AE7A /* typed_view_ref.yaml */,
-			);
-			path = data;
-			sourceTree = "<group>";
-		};
-		8017876218EA0CF10098AE7A /* examples */ = {
-			isa = PBXGroup;
-			children = (
-				8017876318EA0CF10098AE7A /* .gitignore */,
-				8017876418EA0CF10098AE7A /* ex_objc_group_intro.m */,
-				8017876518EA0CF10098AE7A /* ex_objc_query_dynamic_intro.m */,
-				8017876618EA0CF10098AE7A /* ex_objc_query_typed_intro.m */,
-				8017876718EA0CF10098AE7A /* ex_objc_sharedgroup_intro.m */,
-				8017876818EA0CF10098AE7A /* ex_objc_table_dynamic_intro.m */,
-				8017876918EA0CF10098AE7A /* ex_objc_table_typed_intro.m */,
-				8017876A18EA0CF10098AE7A /* ex_objc_table_typed_intro_with_many_comments.m */,
-				8017876B18EA0CF10098AE7A /* ex_objc_tableview_dynamic_intro.m */,
-				8017876C18EA0CF10098AE7A /* ex_objc_tableview_typed_intro.m */,
-				8017876D18EA0CF10098AE7A /* examples.h */,
-				8017876E18EA0CF10098AE7A /* Makefile */,
-				8017876F18EA0CF10098AE7A /* people.h */,
-				8017877018EA0CF10098AE7A /* people.m */,
-			);
-			path = examples;
-			sourceTree = "<group>";
-		};
-		8017877118EA0CF10098AE7A /* RefDocExamples */ = {
-			isa = PBXGroup;
-			children = (
-				8017877218EA0CF10098AE7A /* RefDocExamples */,
-				8017877B18EA0CF10098AE7A /* RefDocExamples.xcodeproj */,
-				8017877E18EA0CF10098AE7A /* RefDocExamplesTests */,
-			);
-			path = RefDocExamples;
-			sourceTree = "<group>";
-		};
-		8017877218EA0CF10098AE7A /* RefDocExamples */ = {
-			isa = PBXGroup;
-			children = (
-				8017877318EA0CF10098AE7A /* AppDelegate.h */,
-				8017877418EA0CF10098AE7A /* AppDelegate.m */,
-				8017877518EA0CF10098AE7A /* InfoPlist.strings */,
-				8017877718EA0CF10098AE7A /* Images.xcassets */,
-				8017877818EA0CF10098AE7A /* main.m */,
-				8017877918EA0CF10098AE7A /* RefDocExamples-Info.plist */,
-				8017877A18EA0CF10098AE7A /* RefDocExamples-Prefix.pch */,
-			);
-			path = RefDocExamples;
-			sourceTree = "<group>";
-		};
-		8017877C18EA0CF10098AE7A /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				8017879818EA0CF10098AE7A /* RefDocExamples.app */,
-				8017879A18EA0CF10098AE7A /* RefDocExamplesTests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		8017877E18EA0CF10098AE7A /* RefDocExamplesTests */ = {
-			isa = PBXGroup;
-			children = (
-				8017877F18EA0CF10098AE7A /* InfoPlist.strings */,
-				8017878118EA0CF10098AE7A /* RefDocExamplesTests-Info.plist */,
-				8017878218EA0CF10098AE7A /* RefDocExamplesTests.m */,
-			);
-			path = RefDocExamplesTests;
-			sourceTree = "<group>";
-		};
 		4DDDD67118EAF1DC00E94613 /* TDBFast */ = {
 			isa = PBXGroup;
 			children = (
@@ -334,7 +177,6 @@
 		E9189090177B677900653D7A = {
 			isa = PBXGroup;
 			children = (
-				8017875718EA0CF10098AE7A /* ref */,
 				8017875618EA0AFC0098AE7A /* release_notes.md */,
 				E91890A2177B677900653D7A /* TightDbObjcDyn */,
 				E91890B4177B677900653D7A /* TightDbObjcDynTests */,
@@ -471,7 +313,6 @@
 				E91890DB177B67AB00653D7A /* TDBContext.h in Headers */,
 				E91890DC177B67AB00653D7A /* TDBTransaction.h in Headers */,
 				E91890DD177B67AB00653D7A /* PrivateHelperMacros.h in Headers */,
-				8017878E18EA0CF10098AE7A /* people.h in Headers */,
 				424EEFAF18D9C15A00337A13 /* TDBView_noinst.h in Headers */,
 				E91890DF177B67AB00653D7A /* TDBQuery_noinst.h in Headers */,
 				424EEF9E18D9C10100337A13 /* TDBColumnProxy.h in Headers */,
@@ -482,15 +323,12 @@
 				E91890E3177B67AB00653D7A /* TDBTable.h in Headers */,
 				4DDDD67418EB049300E94613 /* TDBViewProtocol.h in Headers */,
 				4D1ED30818E1AF4E003CFF44 /* PrivateTableMacros.h in Headers */,
-				8017878C18EA0CF10098AE7A /* examples.h in Headers */,
 				4D1ED30B18E1B6E8003CFF44 /* group.h in Headers */,
-				8017879318EA0CF10098AE7A /* RefDocExamples-Prefix.pch in Headers */,
 				E91890E4177B67AB00653D7A /* tightdb.h in Headers */,
 				E91890E5177B67AB00653D7A /* TDBType.h in Headers */,
 				424EEFA318D9C11D00337A13 /* TDBDescriptor_noinst.h in Headers */,
 				4220871618E042FD00F3CF27 /* NSData+TDBGetBinaryData.h in Headers */,
 				E91890E6177B67AB00653D7A /* util_noinst.hpp in Headers */,
-				8017879018EA0CF10098AE7A /* AppDelegate.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -553,12 +391,6 @@
 			mainGroup = E9189090177B677900653D7A;
 			productRefGroup = E918909A177B677900653D7A /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 8017877C18EA0CF10098AE7A /* Products */;
-					ProjectRef = 8017877B18EA0CF10098AE7A /* RefDocExamples.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				E9189098177B677900653D7A /* TightDbObjcDyn */,
@@ -566,23 +398,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		8017879818EA0CF10098AE7A /* RefDocExamples.app */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = RefDocExamples.app;
-			remoteRef = 8017879718EA0CF10098AE7A /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		8017879A18EA0CF10098AE7A /* RefDocExamplesTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = RefDocExamplesTests.xctest;
-			remoteRef = 8017879918EA0CF10098AE7A /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		E91890AA177B677900653D7A /* Resources */ = {
@@ -616,30 +431,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8017879118EA0CF10098AE7A /* AppDelegate.m in Sources */,
 				424EEFA218D9C11D00337A13 /* TDBDescriptor.mm in Sources */,
-				8017879418EA0CF10098AE7A /* RefDocExamplesTests.m in Sources */,
-				8017878518EA0CF10098AE7A /* ex_objc_query_typed_intro.m in Sources */,
 				E91890D6177B67AB00653D7A /* TDBRow.mm in Sources */,
 				42AD3A9818CDBDFF00C86073 /* util.mm in Sources */,
 				42AD3A9918CDBDFF00C86073 /* TDBVersion.mm in Sources */,
 				424EEFAE18D9C15A00337A13 /* TDBView.mm in Sources */,
-				8017878618EA0CF10098AE7A /* ex_objc_sharedgroup_intro.m in Sources */,
 				424EEFB218D9C97900337A13 /* TDBColumnProxy.mm in Sources */,
-				8017878718EA0CF10098AE7A /* ex_objc_table_dynamic_intro.m in Sources */,
 				E91890D8177B67AB00653D7A /* TDBTransaction.mm in Sources */,
-				8017878818EA0CF10098AE7A /* ex_objc_table_typed_intro.m in Sources */,
 				4220871718E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm in Sources */,
-				8017878D18EA0CF10098AE7A /* Makefile in Sources */,
-				8017878418EA0CF10098AE7A /* ex_objc_query_dynamic_intro.m in Sources */,
-				8017878F18EA0CF10098AE7A /* people.m in Sources */,
 				E91890DA177B67AB00653D7A /* TDBContext.mm in Sources */,
-				8017878A18EA0CF10098AE7A /* ex_objc_tableview_dynamic_intro.m in Sources */,
-				8017878318EA0CF10098AE7A /* ex_objc_group_intro.m in Sources */,
 				E91890DE177B67AB00653D7A /* TDBQuery.mm in Sources */,
-				8017878918EA0CF10098AE7A /* ex_objc_table_typed_intro_with_many_comments.m in Sources */,
-				8017878B18EA0CF10098AE7A /* ex_objc_tableview_typed_intro.m in Sources */,
-				8017879218EA0CF10098AE7A /* main.m in Sources */,
 				E91890E1177B67AB00653D7A /* TDBTable.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -680,22 +481,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		8017877518EA0CF10098AE7A /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8017877618EA0CF10098AE7A /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		8017877F18EA0CF10098AE7A /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8017878018EA0CF10098AE7A /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
 		E91890B7177B677900653D7A /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
