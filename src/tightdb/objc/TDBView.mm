@@ -133,7 +133,7 @@
     return m_view->get_column_count();
 }
 
--(TDBType)columnTypeOfColumn:(NSUInteger)colNdx
+-(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colNdx
 {
     TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colNdx);
     return TDBType(m_view->get_column_type(colNdx));
@@ -144,7 +144,7 @@
 }
 -(void)sortUsingColumnWithIndex:(NSUInteger)colIndex  inOrder: (TDBSortOrder)order
 {
-    TDBType columnType = [self columnTypeOfColumn:colIndex];
+    TDBType columnType = [self columnTypeOfColumnWithIndex:colIndex];
     
     if(columnType != TDBIntType && columnType != TDBBoolType && columnType != TDBDateType) {
         NSException* exception = [NSException exceptionWithName:@"tightdb:sort_on_column_with_type_not_supported"

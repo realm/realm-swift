@@ -35,7 +35,7 @@
 -(TDBRow *)lastRow;
 -(TDBRow *)firstRow;
 
--(TDBType)columnTypeOfColumn:(NSUInteger)colIndex;
+-(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
 -(void) sortUsingColumnWithIndex: (NSUInteger)colIndex;
 -(void) sortUsingColumnWithIndex: (NSUInteger)colIndex inOrder: (TDBSortOrder)order;

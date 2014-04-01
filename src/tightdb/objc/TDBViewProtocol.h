@@ -34,7 +34,7 @@
 -(TDBRow *)firstRow;
 
 // Working with columns
--(TDBType)columnTypeOfColumn:(NSUInteger)colIndex;
+-(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
 // Removing rows
 -(void)removeRowAtIndex:(NSUInteger)rowIndex;
