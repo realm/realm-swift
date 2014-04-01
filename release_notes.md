@@ -37,7 +37,10 @@ The Objective-C API has been updated and your code will break!
 * `addColumnWithName:andType:` renamed to `addColumnWithName:type:` in `TDBDescriptor`.
 
 ### Enhancements:
-* 
+
+* Transactions can now be started directly on named tables.
+* You can create dynamic tables with initial schema.
+* Table and View now have a shared protocol so they can easier be used interchangeably.
 
 
 =============================================================

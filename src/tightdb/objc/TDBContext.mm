@@ -103,6 +103,14 @@ using namespace std;
     }
 }
 
+-(void)readTable:(NSString*)tablename withBlock:(TDBTableReadBlock)block
+{
+    [self readWithBlock:^(TDBTransaction *trx){
+        TDBTable *table = [trx tableWithName:tablename];
+        block(table);
+    }];
+}
+
 
 -(BOOL)writeWithBlock:(TDBWriteBlock)block error:(NSError**)error
 {
@@ -155,6 +163,14 @@ using namespace std;
 
     m_shared_group->rollback();
     return NO;
+}
+
+-(BOOL)writeTable:(NSString*)tablename withBlock:(TDBTableWriteBlock)block error:(NSError **)error
+{
+    return [self writeWithBlock:^(TDBTransaction *trx){
+        TDBTable *table = [trx tableWithName:tablename];
+        return block(table);
+    } error: error];
 }
 
 -(BOOL) hasChangedSinceLastTransaction
