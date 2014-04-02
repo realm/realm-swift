@@ -26,6 +26,24 @@ The Objective-C API has been updated and your code will break!
 
 
 =============================================================
+0.6.0 Release notes (yyyy—MM-dd)
+Objective-C
+-----------
+Description......
+
+### Bugfixes:
+
+* none.
+
+### API breaking changes:
+
+* none.
+
+### Enhancements:
+* `renameColumnWithIndex:to:` has been added to `TDBTable`.
+
+
+=============================================================
 0.5.0 Release notes (2014-04-02)
 Objective-C
 -----------
