@@ -164,16 +164,16 @@
 
 
 #define TIGHTDB_ROW_PROPERTY_DEF_SIMPLE(name, type) \
-@property TIGHTDB_TYPE_##type name; \
--(TIGHTDB_TYPE_##type)name; \
--(void)set##name:(TIGHTDB_TYPE_##type)value;
+@property (nonatomic, setter = TDB_set##name: , getter = TDB_##name) TIGHTDB_TYPE_##type name; \
+-(TIGHTDB_TYPE_##type)TDB_##name; \
+-(void)TDB_set##name:(TIGHTDB_TYPE_##type)value;
 
 #define TIGHTDB_ROW_PROPERTY_IMPL_SIMPLE(name, type) \
--(TIGHTDB_TYPE_##type)name \
+-(TIGHTDB_TYPE_##type)TDB_##name \
 { \
     return [_##name get##type]; \
 } \
--(void)set##name:(TIGHTDB_TYPE_##type)value \
+-(void)TDB_set##name:(TIGHTDB_TYPE_##type)value \
 { \
     [_##name set##type:value]; \
 }
