@@ -18,6 +18,13 @@ The Objective-C API has been updated and your code will break!
 
 * `???`
 
+-------------
+
+### Internals:
+
+* `???`
+
+
 =============================================================
 0.5.0 Release notes (yyyy—MM-dd)
 Objective-C
