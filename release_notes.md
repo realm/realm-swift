@@ -36,7 +36,7 @@ To use these methods import <Tightdb/TightdbFast.h>.
 
 ### Bugfixes:
 
-* None.
+* Fixed bug in 64 bit iOS when inserting BOOL as NSNumber.
 
 ### API breaking changes:
 

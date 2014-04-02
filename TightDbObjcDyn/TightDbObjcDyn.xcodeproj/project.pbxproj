@@ -106,7 +106,6 @@
 		E918909F177B677900653D7A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		E91890A0177B677900653D7A /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		E91890A1177B677900653D7A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		E91890A4177B677900653D7A /* TightDbObjcDyn-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TightDbObjcDyn-Prefix.pch"; sourceTree = "<group>"; };
 		E91890AD177B677900653D7A /* TightDbObjcDynTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TightDbObjcDynTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E91890AE177B677900653D7A /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		E91890B6177B677900653D7A /* TightDbObjcDynTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TightDbObjcDynTests-Info.plist"; sourceTree = "<group>"; };
@@ -219,50 +218,41 @@
 			children = (
 				4DDDD67118EAF1DC00E94613 /* TDBFast */,
 				4D1ED30A18E1B6E8003CFF44 /* group.h */,
-				4DDDD67318EB049300E94613 /* TDBViewProtocol.h */,
+				4220871418E042FD00F3CF27 /* NSData+TDBGetBinaryData.h */,
+				4220871518E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm */,
+				E91890CC177B67AB00653D7A /* PrivateHelperMacros.h */,
 				4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */,
-				424EEFAB18D9C15900337A13 /* TDBView.mm */,
-				424EEFAC18D9C15900337A13 /* TDBView_noinst.h */,
-				424EEFAD18D9C15A00337A13 /* TDBView.h */,
+				4D1ED30618E198AD003CFF44 /* PrivateTDB.h */,
 				424EEF9D18D9C10100337A13 /* TDBColumnProxy.h */,
 				424EEFB118D9C97900337A13 /* TDBColumnProxy.mm */,
-				424EEF9F18D9C11D00337A13 /* TDBDescriptor.mm */,
-				424EEFA018D9C11D00337A13 /* TDBDescriptor_noinst.h */,
-				424EEFA118D9C11D00337A13 /* TDBDescriptor.h */,
-				E91890C6177B67AB00653D7A /* TDBRow.h */,
-				E91890C5177B67AB00653D7A /* TDBRow.mm */,
 				E91890CA177B67AB00653D7A /* TDBContext.h */,
 				E91890C9177B67AB00653D7A /* TDBContext.mm */,
-				E91890CC177B67AB00653D7A /* PrivateHelperMacros.h */,
+				424EEFA118D9C11D00337A13 /* TDBDescriptor.h */,
+				424EEF9F18D9C11D00337A13 /* TDBDescriptor.mm */,
+				424EEFA018D9C11D00337A13 /* TDBDescriptor_noinst.h */,
 				E91890CF177B67AB00653D7A /* TDBQuery.h */,
 				E91890CD177B67AB00653D7A /* TDBQuery.mm */,
 				E91890CE177B67AB00653D7A /* TDBQuery_noinst.h */,
-				E91890A3177B677900653D7A /* Supporting Files */,
+				E91890C6177B67AB00653D7A /* TDBRow.h */,
+				E91890C5177B67AB00653D7A /* TDBRow.mm */,
 				E91890D2177B67AB00653D7A /* TDBTable.h */,
-				4D1ED30618E198AD003CFF44 /* PrivateTDB.h */,
 				E91890D0177B67AB00653D7A /* TDBTable.mm */,
 				E91890D1177B67AB00653D7A /* TDBTable_noinst.h */,
-				E91890D3177B67AB00653D7A /* tightdb.h */,
 				E91890CB177B67AB00653D7A /* TDBTransaction.h */,
 				E91890C7177B67AB00653D7A /* TDBTransaction.mm */,
-				4220871418E042FD00F3CF27 /* NSData+TDBGetBinaryData.h */,
-				4220871518E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm */,
 				E91890C8177B67AB00653D7A /* TDBTransaction_noinst.h */,
 				E91890D4177B67AB00653D7A /* TDBType.h */,
-				42AD3A9418CDBDFF00C86073 /* util.mm */,
-				E91890D5177B67AB00653D7A /* util_noinst.hpp */,
 				42AD3A9618CDBDFF00C86073 /* TDBVersion.h */,
 				42AD3A9518CDBDFF00C86073 /* TDBVersion.mm */,
+				424EEFAD18D9C15A00337A13 /* TDBView.h */,
+				424EEFAB18D9C15900337A13 /* TDBView.mm */,
+				424EEFAC18D9C15900337A13 /* TDBView_noinst.h */,
+				4DDDD67318EB049300E94613 /* TDBViewProtocol.h */,
+				E91890D3177B67AB00653D7A /* tightdb.h */,
+				42AD3A9418CDBDFF00C86073 /* util.mm */,
+				E91890D5177B67AB00653D7A /* util_noinst.hpp */,
 			);
 			path = TightDbObjcDyn;
-			sourceTree = "<group>";
-		};
-		E91890A3177B677900653D7A /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				E91890A4177B677900653D7A /* TightDbObjcDyn-Prefix.pch */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		E91890B4177B677900653D7A /* TightDbObjcDynTests */ = {
@@ -573,7 +563,7 @@
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TightDbObjcDyn/TightDbObjcDyn-Prefix.pch";
+				GCC_PREFIX_HEADER = "";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -585,7 +575,7 @@
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TightDbObjcDyn/TightDbObjcDyn-Prefix.pch";
+				GCC_PREFIX_HEADER = "";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -597,7 +587,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TightDbObjcDyn/TightDbObjcDyn-Prefix.pch";
+				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "TightDbObjcDynTests/TightDbObjcDynTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = octest;
@@ -610,7 +600,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TightDbObjcDyn/TightDbObjcDyn-Prefix.pch";
+				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "TightDbObjcDynTests/TightDbObjcDynTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = octest;
