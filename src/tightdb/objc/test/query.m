@@ -185,18 +185,19 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [table TDB_setBinary:bin1 inColumnWithIndex:BINARY_COL atRowIndex:0];
     [table TDB_setBinary:bin2 inColumnWithIndex:BINARY_COL atRowIndex:1];
     
+    NSDate *dateNow = [NSDate date];
     [table TDB_setDate:0 inColumnWithIndex:DATE_COL atRowIndex:0];
-    [table TDB_setDate:[NSDate date] inColumnWithIndex:DATE_COL atRowIndex:1];
+    [table TDB_setDate:dateNow inColumnWithIndex:DATE_COL atRowIndex:1];
     
     [table TDB_setMixed:mixInt1 inColumnWithIndex:MIXED_COL atRowIndex:0];
     [table TDB_setMixed:mixString inColumnWithIndex:MIXED_COL atRowIndex:1];
     
     // Conditions (note that count is invoked to get the number of matches)
     
-    //STAssertEquals([[[table where] column:INT_COL isBetweenInt:859 and_:861] count], (NSUInteger)1, @"betweenInt");
-    //STAssertEquals([[[table where] column:FLOAT_COL isBetweenFloat:5.5 and_:5.7] count], (NSUInteger)1, @"betweenFloat");
-    //STAssertEquals([[[table where] column:DOUBLE_COL isBetweenDouble:5.5 and_:5.7] count], (NSUInteger)1, @"betweenDouble");
-    //STAssertEquals([[[table where] column:DATE_COL isBetweenDate:1 and_:timeNow] count], (NSUInteger)1, @"betweenDate");
+    STAssertEquals([[[table where] intIsBetween:859 and:861 inColumnWithIndex:INT_COL ] countRows], (NSUInteger)1, @"betweenInt");
+    STAssertEquals([[[table where] floatIsBetween:5.5 and:5.7 inColumnWithIndex:FLOAT_COL ] countRows], (NSUInteger)1, @"betweenFloat");
+    STAssertEquals([[[table where] doubleIsBetween:5.5 and:5.7 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"betweenDouble");
+    STAssertEquals([[[table where] dateIsBetween:0 and:[dateNow dateByAddingTimeInterval:1 ]inColumnWithIndex :DATE_COL ] countRows], (NSUInteger)1, @"betweenDate");
     
     STAssertEquals([[[table where] boolIsEqualTo:YES inColumnWithIndex:BOOL_COL ] countRows], (NSUInteger)1, @"isEqualToBool");
     STAssertEquals([[[table where] intIsEqualTo:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isEqualToInt");
@@ -267,11 +268,11 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     STAssertEquals((NSUInteger)1, [[[table where ] intIsGreaterThan:10 inColumnWithIndex:0 ] findFirstRow], @"Row 1 is greater than 10");
     STAssertEquals((NSUInteger)-1, [[[table where ] intIsGreaterThan:100 inColumnWithIndex:0 ] findFirstRow], @"No rows are greater than 100");
 
-    //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:0], (size_t)2,  @"find");
-    //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:3], (size_t)3,  @"find");
-    //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:4], (size_t)5,  @"find");
-    //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:6], (size_t)-1, @"find");
-    //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:3], (size_t)3,  @"find");
+    STAssertEquals([[[table where] intIsBetween:20 and:40 inColumnWithIndex:0] findFirstRowFromIndex:0], (NSUInteger)2,  @"find");
+    STAssertEquals([[[table where] intIsBetween:20 and:40 inColumnWithIndex:0] findFirstRowFromIndex:3], (NSUInteger)3,  @"find");
+    STAssertEquals([[[table where] intIsBetween:20 and:40 inColumnWithIndex:0] findFirstRowFromIndex:4], (NSUInteger)5,  @"find");
+    STAssertEquals([[[table where] intIsBetween:20 and:40 inColumnWithIndex:0] findFirstRowFromIndex:6], (NSUInteger)-1, @"find");
+    STAssertEquals([[[table where] intIsBetween:20 and:40 inColumnWithIndex:0] findFirstRowFromIndex:3], (NSUInteger)3,  @"find");
     // jjepsen: disabled this test, perhaps it's not relevant after query sematics update.
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (size_t)-1, @"find");
 }
