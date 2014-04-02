@@ -1012,6 +1012,12 @@ using namespace std;
     return [[TDBQuery alloc] initWithTable:self error:error];
 }
 
+-(TDBView *)viewWithDistinctValuesInColumnWithIndex:(NSUInteger)colIndex
+{
+    tightdb::TableView distinctView = m_table->get_distinct_view(colIndex);
+    return [TDBView viewWithTable:self andNativeView:distinctView];
+}
+
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex
 {
     return m_table->has_index(colIndex);

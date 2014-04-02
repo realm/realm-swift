@@ -70,6 +70,7 @@
 
 // Queries
 -(TDBQuery *)where;
+-(TDBView *)viewWithDistinctValuesInColumnWithIndex:(NSUInteger)colIndex;
 
 // Indexing
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;
