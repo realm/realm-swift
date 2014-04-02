@@ -411,7 +411,7 @@
         [table removeColumnWithIndex:0];
     }
 
-    STAssertEquals(table.columnCount, 0, @"Colums removed");
+    STAssertEquals(table.columnCount, (NSUInteger)0, @"Colums removed");
     STAssertThrows([table removeColumnWithIndex:1], @"No columns added");
     STAssertThrows([table removeColumnWithIndex:-1], @"Less than zero colIndex");
 }
