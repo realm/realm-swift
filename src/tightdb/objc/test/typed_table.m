@@ -67,7 +67,7 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
     TestTableSub* subtab1 = [[TestTableSub alloc] init];
     TestTableSub* subtab2 = [[TestTableSub alloc] init];
-    [subtab1 addage:200];
+    [subtab1 addage:200]; // NOTE: the name is simply add+name of first column!
     [subtab2 addage:100];
     NSNumber* mixInt1   = [NSNumber numberWithLongLong:1];
 
