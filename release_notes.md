@@ -26,7 +26,7 @@ The Objective-C API has been updated and your code will break!
 
 
 =============================================================
-0.5.0 Release notes (yyyy—MM-dd)
+0.5.0 Release notes (2014-04-02)
 Objective-C
 -----------
 The Objective-C API has been updated and your code will break!
@@ -49,9 +49,11 @@ To use these methods import <Tightdb/TightdbFast.h>.
 
 ### Enhancements:
 
+### Enhancements:
+* Added `minDateInColumnWithIndex` and `maxDateInColumnWithIndex` to `TDBQuery`.
 * Transactions can now be started directly on named tables.
 * You can create dynamic tables with initial schema.
-* Table and View now have a shared protocol so they can easier be used interchangeably.
+* `TDBTable` and `TDBView` now have a shared protocol so they can easier be used interchangeably.
 
 
 =============================================================
