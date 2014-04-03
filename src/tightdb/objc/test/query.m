@@ -274,6 +274,10 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:3], (size_t)3,  @"find");
     // jjepsen: disabled this test, perhaps it's not relevant after query sematics update.
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (size_t)-1, @"find");
+    
+    [table removeAllRows];
+    STAssertEquals([[table where] findFirstRow], (NSUInteger)-1,nil);
+    STAssertEquals([[table where] findFirstRowFromIndex:0], (NSUInteger)-1,nil);
 }
 
 - (void) testSubtableQuery
