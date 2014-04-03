@@ -575,7 +575,7 @@ using namespace std;
     return _query;
 }
 
--(TDBQuery*)columnIsBetween:(int64_t)from and_:(int64_t)to
+-(TDBQuery*)columnIsBetween:(int64_t)from :(int64_t)to
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
         [_query getNativeQuery].between(_column_ndx, from, to);,
@@ -654,7 +654,7 @@ using namespace std;
     return _query;
 }
 
--(TDBQuery*)columnIsBetween:(float)from and_:(float)to
+-(TDBQuery*)columnIsBetween:(float)from :(float)to
 {
     [_query getNativeQuery].between(_column_ndx, from, to);
     return _query;
@@ -730,7 +730,7 @@ using namespace std;
     return _query;
 }
 
--(TDBQuery*)columnIsBetween:(double)from and_:(double)to
+-(TDBQuery*)columnIsBetween:(double)from :(double)to
 {
     [_query getNativeQuery].between(_column_ndx, from, to);
     return _query;
@@ -909,7 +909,7 @@ using namespace std;
     [_query getNativeQuery].less_equal_datetime(_column_ndx, [value timeIntervalSince1970]);
     return _query;
 }
--(TDBQuery*)columnIsBetween:(NSDate *)from and_:(NSDate *)to
+-(TDBQuery*)columnIsBetween:(NSDate *)from :(NSDate *)to
 {
     [_query getNativeQuery].between_datetime(_column_ndx, [from timeIntervalSince1970], [to timeIntervalSince1970]);
     return _query;
