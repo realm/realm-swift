@@ -42,6 +42,12 @@ Description......
 ### Enhancements:
 * `renameColumnWithIndex:to:` has been added to `TDBTable`.
 * `viewWithDistinctValuesInColumnWithIndex` has been added to `TDBTable`.
+* Column names can begin with non-capital letters too. The generated `addX`
+  selector can look odd. For example, a table with one column with name `age`,
+  appending a new row will look like `[table addage:7]`.
+* Mixed typed values are better validated when rows are added, inserted, 
+  or modified as object literals.
+
 
 =============================================================
 0.5.0 Release notes (2014-04-02)
