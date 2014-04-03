@@ -609,7 +609,7 @@ EOF
         DIR="iOSTestCoreAppTests"
         
         mkdir -p "$DIR" || exit 1
-        rm -rf "$DIR/*" || exit 1
+        rm -rf "$DIR/"* || exit 1
         rm -rf "iOSTestCoreApp.xcodeproj"
         rm -f "iOSTestCoreApp.gyp"
 
@@ -621,33 +621,23 @@ EOF
                 -exec cp {} "$DIR/$2/" \; || exit 1
         }
 
-        cp ../../tightdb/src/tightdb.hpp "$DIR/"
-        build_test_core_cp src/tightdb tightdb
-        build_test_core_cp src/tightdb/util tightdb/util
-        build_test_core_cp src/tightdb/impl tightdb/impl
- 
         build_test_core_cp test
         build_test_core_cp test/util util
         build_test_core_cp test/large_tests large_tests
 
         ## Remove breaking files (containing main or unportable code).
         rm "$DIR/main.cpp"
-        rm "$DIR/tightdb/config_tool.cpp"
-        rm "$DIR/tightdb/importer_tool.cpp"
-        rm "$DIR/tightdb/tightdbd.cpp"
-        rm "$DIR/tightdb/replication.cpp"
 
         ## Replace all dynamic includes with static includes
         find $DIR \
             -type f -iregex "^.*\.[ch]\(pp\)\{0,1\}$" \
             -exec sed -i '' \
-                -e 's/<tightdb\(.*\)>/"tightdb\1"/g' \
-                -e 's/<UnitTest++\.h>/"UnitTest++.h"/g' {} \; || exit 1
+                -e 's/<tightdb\(.*\)>/<TightdbCore\/tightdb\1>/g' {} \; || exit 1
 
         ## Create an XCTestCase
         cat >"$DIR/iOSTestCoreAppTests.mm" <<EOF
 #import <XCTest/XCTest.h>
-#include "run_tests.hpp"
+#include "test_all.hpp"
 
 @interface iOSTestCoreAppTests : XCTestCase
 
@@ -660,7 +650,7 @@ EOF
     // Change working directory to somewhere we can write.
     [[NSFileManager defaultManager]
         changeCurrentDirectoryPath:(NSTemporaryDirectory())];
-    run_tests(0, NULL);
+    test_all(0, NULL);
 }
 
 @end
@@ -669,6 +659,18 @@ EOF
         ## Gather all the sources in a Python-friendly format.
         APP_TESTS_SOURCES=$(find iOSTestCoreAppTests -type f | \
             sed -E 's/^(.*)$/                "\1",/')
+
+        ## Copy core framework to project directory.
+        CORE_FRAMEWORK="TightdbCore.framework"
+        CORE_FRAMEWORK_ORIGIN="../../tightdb/$CORE_FRAMEWORK"
+        rm -rf "$CORE_FRAMEWORK"
+        if [ ! -d "$CORE_FRAMEWORK_ORIGIN" ]; then
+            echo "\"$CORE_FRAMEWORK_ORIGIN\" missing."
+            echo "Did you forget to build-iphone and build-ios-core-framework in core?"
+            exit 1
+        fi
+        cp -r "$CORE_FRAMEWORK_ORIGIN" "$CORE_FRAMEWORK" || exit 1
+        CORE_FRAMEWORK_ORIGIN=
 
         ## Create a gyp file.
         # To use xctest, the project must have an app and a test target. The
@@ -684,8 +686,18 @@ EOF
         'TARGETED_DEVICE_FAMILY': '1,2', # iPhone/iPad
         'FRAMEWORK_SEARCH_PATHS': [
             '\$(SDKROOT)/Developer/Library/Frameworks',
+            '\$(PROJECT_DIR)',
         ],
         'CODE_SIGN_IDENTITY[sdk=iphoneos*]': 'iPhone Developer: Oleksandr(Alex Shturmov (CB4YV2W7W5)',
+    },
+    'target_defaults': {
+        'link_settings': {
+            'libraries': [
+                '\$(SDKROOT)/usr/lib/libc++.dylib',
+                '\$(DEVELOPER_DIR)/Library/Frameworks/XCTest.framework',
+                'TightdbCore.framework',
+            ],
+        },
     },
     'targets': [
         {
@@ -694,14 +706,18 @@ EOF
             'mac_bundle': 1,
             'sources': [
                 './iOSTestCoreApp/AppDelegate.h',
-                './iOSTestCoreApp/AppDelegate.m',
+                './iOSTestCoreApp/AppDelegate.mm',
                 './iOSTestCoreApp/main.m',
+$APP_TESTS_SOURCES
             ],
             'mac_bundle_resources': [
                 './iOSTestCoreApp/Images.xcassets',
                 './iOSTestCoreApp/en.lproj/InfoPlist.strings',
                 './iOSTestCoreApp/iOSTestCoreApp-Info.plist',
                 './iOSTestCoreApp/iOSTestCoreApp-Prefix.pch',
+            ],
+            'include_dirs': [
+                './iOSTestCoreAppTests/**'
             ],
             'link_settings': {
                 'libraries': [
@@ -711,7 +727,6 @@ EOF
                 ],
             },
             'xcode_settings': {
-                'SDKROOT': 'iphoneos',
                 'WRAPPER_EXTENSION': 'app',
                 'INFOPLIST_FILE': 'iOSTestCoreApp/iOSTestCoreApp-Info.plist',
                 'GCC_PRECOMPILE_PREFIX_HEADER': 'YES',
@@ -733,15 +748,8 @@ $APP_TESTS_SOURCES
             'include_dirs': [
                 './iOSTestCoreAppTests/**'
             ],
-            'link_settings': {
-                'libraries': [
-                    '\$(SDKROOT)/usr/lib/libc++.dylib',
-                    '\$(DEVELOPER_DIR)/Library/Frameworks/XCTest.framework',
-                ],
-            },
             'xcode_settings': {
                 'SDKROOT': 'iphoneos',
-                'WRAPPER_EXTENSION': 'xctest',
                 'BUNDLE_LOADER': '\$(BUILT_PRODUCTS_DIR)/iOSTestCoreApp.app/iOSTestCoreApp',
                 'TEST_HOST': '\$(BUNDLE_LOADER)',
             },
