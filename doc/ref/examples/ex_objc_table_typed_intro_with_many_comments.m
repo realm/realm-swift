@@ -33,7 +33,7 @@ void ex_objc_table_typed_intro_with_many_comments()
     /* Accesses query result directly on the query object.
      * The query is only executed once and iterated lazily */
     for (PersonTableRow *row in query)
-        NSLog(@"Name: %@", [row Name]);
+        NSLog(@"Name: %@", row.Name);
     
     /* To avoid repeating the same query, the result may be stored in
      * a table view for multiple accesses. The following code executes the
@@ -44,9 +44,9 @@ void ex_objc_table_typed_intro_with_many_comments()
     /* Iterates over all rows in the result (view) 2 times based on the single
      * query executed above. */
     for (PersonTableRow *row in tableView)
-        NSLog(@"Name: %@", [row Name]);
+        NSLog(@"Name: %@", row.Name);
     
     for (PersonTableRow *row in tableView)
-        NSLog(@"Name: %lld", [row Age]);
+        NSLog(@"Name: %lld", row.Age);
 }
 /* @@EndExample@@ */

@@ -24,6 +24,33 @@ The Objective-C API has been updated and your code will break!
 
 * `???`
 
+=============================================================
+0.6.0 Release notes (yyyy—MM-dd)
+
+Objective-C
+-----------
+The Objective-C API has been updated and your code will break!
+
+### Bugfixes:
+
+* None.
+
+### API breaking changes:
+
+* `???`
+
+### Enhancements:
+
+* Column names can begin with non-capital letters too. The generated `addX`
+  selector can look odd. For example, a table with one column with name `age`,
+  appending a new row will look like `[table addage:7]`.
+
+-------------
+
+### Internals:
+
+* `???`
+
 
 =============================================================
 0.6.0 Release notes (yyyy—MM-dd)
