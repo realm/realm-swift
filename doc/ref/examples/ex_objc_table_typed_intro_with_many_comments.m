@@ -28,7 +28,7 @@ void ex_objc_table_typed_intro_with_many_comments()
     
     /* Creates a query expression to filter on age. Note that the
      * query is defined but not executed here. */
-    PersonTableQuery *query = [[table where].Age columnIsBetween:13 and_:19];
+    PersonTableQuery *query = [[table where].Age columnIsBetween:13 :19];
     
     /* Accesses query result directly on the query object.
      * The query is only executed once and iterated lazily */
