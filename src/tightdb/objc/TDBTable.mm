@@ -1021,6 +1021,17 @@ using namespace std;
 
 -(TDBView *)viewWithDistinctValuesInColumnWithIndex:(NSUInteger)colIndex
 {
+    if (!([self columnTypeOfColumnWithIndex:colIndex] == TDBStringType)) {
+        @throw [NSException exceptionWithName:@"tightdb:column_type_not_supported"
+                                       reason:@"Distinct currently only supported on columns of type TDBStringType"
+                                     userInfo:nil];
+    }
+    if (![self isIndexCreatedInColumnWithIndex:colIndex]) {
+        @throw [NSException exceptionWithName:@"tightdb:column_not_indexed"
+                                       reason:@"An index must be created on the column to get distinct values"
+                                     userInfo:nil];
+    }
+    
     tightdb::TableView distinctView = m_table->get_distinct_view(colIndex);
     return [TDBView viewWithTable:self andNativeView:distinctView];
 }
