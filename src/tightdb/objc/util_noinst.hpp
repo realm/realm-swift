@@ -109,7 +109,13 @@ inline NSObject* to_objc_object(tightdb::Mixed m)
 }
 
 
-// A few nice helpers
+inline NSUInteger was_not_found(size_t n)
+{
+    if (n == tightdb::not_found)
+        return NSNotFound;
+    return (NSUInteger)n;
+}
+
 inline bool nsnumber_is_like_bool(NSObject *obj)
 {
     const char* data_type = [(NSNumber *)obj objCType];

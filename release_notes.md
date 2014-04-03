@@ -37,7 +37,7 @@ Description......
 
 ### API breaking changes:
 
-* none.
+* Return `NSNotFound` when appropriate.
 
 ### Enhancements:
 * `renameColumnWithIndex:to:` has been added to `TDBTable`.
