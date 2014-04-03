@@ -439,56 +439,57 @@
     STAssertThrows([table renameColumnWithIndex:2 to:@"someName"], @"Out of bounds");
 }
 
-/*
+
 - (void)testColumnlessCount
 {
-    TDBTable* t = [[TDBTable alloc] init];
-    STAssertEquals((size_t)0, [t count], @"Columnless table has 0 rows.");     
+    TDBTable* table = [[TDBTable alloc] init];
+    STAssertEquals((size_t)0, [table rowCount], @"Columnless table has 0 rows.");
 }
 
-- (void)testColumnlessIsEmpty
-{
-    TDBTable* t = [[TDBTable alloc] init];
-    STAssertTrue([t isEmpty], @"Columnless table is empty.");
-}
+
 
 - (void)testColumnlessClear
 {
-    TDBTable* t = [[TDBTable alloc] init];
-    [t clear];
+    TDBTable* table = [[TDBTable alloc] init];
+    [table removeAllRows];
+    STAssertEquals((size_t)0, [table rowCount], @"Columnless table has 0 rows.");
 }
 
 - (void)testColumnlessOptimize
 {
-    TDBTable* t = [[TDBTable alloc] init];
-    [t optimize];
+    TDBTable* table = [[TDBTable alloc] init];
+    STAssertEquals((size_t)0, [table rowCount], @"Columnless table has 0 rows.");
+    [table optimize];
+    STAssertEquals((size_t)0, [table rowCount], @"Columnless table has 0 rows.");
 }
+
 
 - (void)testColumnlessIsEqual
 {
-    TDBTable* t1 = [[TDBTable alloc] init];
-    TDBTable* t2 = [[TDBTable alloc] init];
-    STAssertTrue([t1 isEqual:t1], @"Columnless table is equal to itself.");
-    STAssertTrue([t1 isEqual:t2], @"Columnless table is equal to another columnless table.");
-    STAssertTrue([t2 isEqual:t1], @"Columnless table is equal to another columnless table.");
+    TDBTable* table1 = [[TDBTable alloc] init];
+    TDBTable* table2 = [[TDBTable alloc] init];
+    STAssertTrue([table1 isEqual:table1], @"Columnless table is equal to itself.");
+    STAssertTrue([table1 isEqual:table2], @"Columnless table is equal to another columnless table.");
+    STAssertTrue([table2 isEqual:table1], @"Columnless table is equal to another columnless table.");
 }
 
-- (void)testColumnlessGetColumnCount
+- (void)testColumnlessColumnCount
 {
-    TDBTable* t = [[TDBTable alloc] init];
-    STAssertEquals((size_t)0, [t getColumnCount], @"Columnless table has column count 0.");
+    TDBTable* table = [[TDBTable alloc] init];
+    STAssertEquals((size_t)0, [table columnCount], @"Columnless table has column count 0.");
 }
 
-- (void)testColumnlessGetColumnName
+/*
+- (void)testColumnlessNameOfColumnWithIndex
 {
-    TDBTable* t = [[TDBTable alloc] init];
-    STAssertThrowsSpecific([t getColumnName:((size_t)-1)],
+    TDBTable* table = [[TDBTable alloc] init];
+    STAssertThrowsSpecific([table nameOfColumnWithIndex:NSNotFound],
         NSException, NSRangeException,
         @"Columnless table has no column names.");
-    STAssertThrowsSpecific([t getColumnName:((size_t)0)],
+    STAssertThrowsSpecific([table nameOfColumnWithIndex:(0)],
         NSException, NSRangeException,
         @"Columnless table has no column names.");
-    STAssertThrowsSpecific([t getColumnName:((size_t)1)],
+    STAssertThrowsSpecific([table nameOfColumnWithIndex:1],
         NSException, NSRangeException,
         @"Columnless table has no column names.");
 }

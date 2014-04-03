@@ -15,7 +15,7 @@
 
 
 ID         : class_dyn_query
-TITLE      : Query  (dynamic)
+TITLE      : TDBQuery  (dynamic)
 SUMMARY    : *g_dyn_query_intro_summary
 DESCR      : *g_dyn_query_intro_descr
 SEE        :
@@ -121,6 +121,39 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_notEquals
+
+  - g_dyn_query_between_integer:
+      NAME     : "intIsBetween::inColumnWithIndex:"
+  - g_dyn_query_between_float:
+      NAME     : "floatIsBetween::inColumnWithIndex:"
+  - g_dyn_query_between_double:
+      NAME     : "doubleIsBetween::inColumnWithIndex:"
+  - g_dyn_query_between_date:
+      NAME     : "dateIsbetween::inColumnWithIndex:"
+      TITLE    : "*IsBetween::inColumnWithIndex:"
+      SIGNATURE: |
+                 (TDBQuery *)dateIsBetween:(NSDate *)lower :(NSDate *)upper inColumnWithIndex:(NSUInteger)colIndex
+                 (TDBQuery *)intIsBetween:(int64_t)lower :(int64_t)upper inColumnWithIndex:(NSUInteger)colIndex
+                 (TDBQuery *)floatIsBetween:(float)lower :(float)upper inColumnWithIndex:(NSUInteger)colIndex
+                 (TDBQuery *)doubleIsBetween:(double)lower :(double)upper inColumnWithIndex:(NSUInteger)colIndex
+      SUMMARY  : *g_dyn_query_greaterThan_summary
+      DESCR    : *g_dyn_query_greaterThan_descr
+      PARAMS:
+      - NAME   : lower
+        TYPES  : [int64_t, float, double, time_t]
+        DESCR  : Lower bound (bound included).
+      - NAME   : upper
+        TYPES  : [int64_t, float, double, time_t]
+        DESCR  : Upper bound (bound included).
+      - NAME   : inColumnWithIndex
+        TYPES  : NSUInteger
+        DESCR  : *g_dyn_query_column_index_descr
+      RETURN:
+        TYPES  : TDBQuery *
+        DESCR  : *g_dyn_query_return_query_object_descr
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_objc_dyn_query_greaterThan        
 
   - g_dyn_query_greaterThan_integer:
       NAME     : "isGreaterThanInt:"
