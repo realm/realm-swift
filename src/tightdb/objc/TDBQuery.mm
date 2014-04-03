@@ -254,12 +254,12 @@ using namespace std;
 
 -(NSUInteger)findFirstRow
 {
-    return m_query->find(0);
+    return was_not_found(m_query->find(0));
 }
 
 -(NSUInteger)findFirstRowFromIndex:(NSUInteger)rowIndex
 {
-    return m_query->find(rowIndex);
+    return was_not_found(m_query->find(rowIndex));
 }
 
 

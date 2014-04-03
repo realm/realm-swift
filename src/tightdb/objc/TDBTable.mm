@@ -230,7 +230,7 @@ using namespace std;
 }
 -(NSUInteger)indexOfColumnWithName:(NSString *)name
 {
-    return m_table->get_column_index(ObjcStringAccessor(name));
+    return was_not_found(m_table->get_column_index(ObjcStringAccessor(name)));
 }
 -(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)ndx
 {
