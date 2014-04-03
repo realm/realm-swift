@@ -703,10 +703,10 @@ CATEGORIES :
   - g_dyn_table_distinct_const:
       IGNORE   : ""
   - g_dyn_table_distinct:
-      NAMES    : "viewWithDistinctValuesInColumnWithIndex:"
+      NAMES    : "distinctValuesInColumnWithIndex:"
       SUMMARY  : *g_dyn_table_distinct_summary
       DESCR    : *g_dyn_table_distinct_desc
-      SIGNATURE: -(TDBView *)viewWithDistinctValuesInColumnWithIndex:(NSUInteger)colIndex;
+      SIGNATURE: -(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
       PARAMS:
       - NAME   : colIndex
         TYPES  : NSUInteger

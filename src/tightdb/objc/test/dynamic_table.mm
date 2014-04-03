@@ -1206,8 +1206,8 @@
     NSUInteger nameIndex = [t addColumnWithName:@"name" type:TDBStringType];
     NSUInteger ageIndex = [t addColumnWithName:@"age" type:TDBIntType];
     
-    STAssertThrows([t viewWithDistinctValuesInColumnWithIndex:ageIndex], @"Not a string column");
-    STAssertThrows([t viewWithDistinctValuesInColumnWithIndex:nameIndex], @"Index not set");
+    STAssertThrows([t distinctValuesInColumnWithIndex:ageIndex], @"Not a string column");
+    STAssertThrows([t distinctValuesInColumnWithIndex:nameIndex], @"Index not set");
     [t createIndexInColumnWithIndex:nameIndex];
 
     
@@ -1219,7 +1219,7 @@
     [t addRow:@[@"name2", @2]];
     
     // Distinct on string column
-    TDBView *v = [t viewWithDistinctValuesInColumnWithIndex:nameIndex];
+    TDBView *v = [t distinctValuesInColumnWithIndex:nameIndex];
     STAssertEquals(v.rowCount, (NSUInteger)3, @"Distinct values removed");
     STAssertEqualObjects(v[0][nameIndex], @"name0", nil);
     STAssertEqualObjects(v[1][nameIndex], @"name1", nil);
