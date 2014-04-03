@@ -24,7 +24,7 @@
 
 #include <tightdb/table_view.hpp>
 
-@interface TDBView()
+@interface TDBView (noinst)
 
 +(TDBView*)viewWithTable:(TDBTable*)table andNativeView:(const tightdb::TableView&)view;
 

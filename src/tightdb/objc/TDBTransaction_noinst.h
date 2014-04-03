@@ -21,7 +21,7 @@
 #import <Foundation/Foundation.h>
 
 
-@interface TDBTransaction()
+@interface TDBTransaction (noinst)
 
 +(TDBTransaction*)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only;
 
