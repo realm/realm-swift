@@ -361,7 +361,7 @@ using namespace std;
 
 -(TDBQuery*)dateIsBetween:(NSDate *)lower :(NSDate *)upper inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query-> between(colIndex, lower.timeIntervalSince1970, upper.timeIntervalSince1970);
+    m_query->between_datetime(colIndex, lower.timeIntervalSince1970, upper.timeIntervalSince1970);
     return self;
 }
 
