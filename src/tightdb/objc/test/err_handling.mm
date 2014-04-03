@@ -409,7 +409,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     TestQueryErrAllTypesView* view = [[[[table where].DateCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO] findAll];
     for (size_t i = 0; i < [view rowCount]; i++) {
-        NSLog(@"%zu: %c", i, [[view rowAtIndex:i] BoolCol]);
+        NSLog(@"%zu: %c", i, [view rowAtIndex:i].BoolCol);
     }
 
 
