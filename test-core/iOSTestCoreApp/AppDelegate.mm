@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#include "test_all.hpp"
 
 @implementation AppDelegate
 
@@ -16,6 +17,12 @@
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
+    
+    // Change working directory to somewhere we can write.
+    [[NSFileManager defaultManager]
+     changeCurrentDirectoryPath:(NSTemporaryDirectory())];
+    test_all(0, NULL);
+    
     return YES;
 }
 
