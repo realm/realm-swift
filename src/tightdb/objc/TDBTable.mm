@@ -1019,7 +1019,7 @@ using namespace std;
     return [[TDBQuery alloc] initWithTable:self error:error];
 }
 
--(TDBView *)viewWithDistinctValuesInColumnWithIndex:(NSUInteger)colIndex
+-(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex
 {
     if (!([self columnTypeOfColumnWithIndex:colIndex] == TDBStringType)) {
         @throw [NSException exceptionWithName:@"tightdb:column_type_not_supported"
