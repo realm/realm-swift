@@ -15,7 +15,7 @@
 
 
 ID         : class_dyn_query
-TITLE      : Query  (dynamic)
+TITLE      : TDBQuery  (dynamic)
 SUMMARY    : *g_dyn_query_intro_summary
 DESCR      : *g_dyn_query_intro_descr
 SEE        :

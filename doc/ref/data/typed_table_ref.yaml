@@ -8,7 +8,7 @@
 #INCONSISTENCY popBack(), find_first_* ->> find*   ("first" is omitted)
 
 ID         : class_typed_table
-TITLE      : Table (typed)
+TITLE      : TDBTable (typed)
 SUMMARY    : *g_typed_table_summary
 DESCR      : >
              NOTE: The current documentation of Typed Table is under construction,
