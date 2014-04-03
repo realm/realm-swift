@@ -41,7 +41,7 @@ Description......
 
 ### Enhancements:
 * `renameColumnWithIndex:to:` has been added to `TDBTable`.
-
+* `viewWithDistinctValuesInColumnWithIndex` has been added to `TDBTable`.
 
 =============================================================
 0.5.0 Release notes (2014-04-02)
