@@ -901,7 +901,7 @@ using namespace std;
         0);
 }
 
--(void)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString*)newName
+-(void)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString *)newName
 {
     TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colIndex);
     m_table->rename_column(colIndex, ObjcStringAccessor(newName));

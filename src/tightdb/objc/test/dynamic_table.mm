@@ -430,8 +430,13 @@
     STAssertEqualObjects([table nameOfColumnWithIndex:0], @"evenNewerName", @"Get column name");
     
     STAssertThrows([table renameColumnWithIndex:1 to:@"someName"], @"Out of bounds");
-    STAssertThrows([table renameColumnWithIndex:100 to:@"someName"], @"Out of bounds");
     STAssertThrows([table renameColumnWithIndex:-1 to:@"someName"], @"Less than zero colIndex");
+    
+    [table addColumnWithName:@"oldName2" type:TDBIntType];
+    [table renameColumnWithIndex:1 to:@"newName2"];
+    STAssertEqualObjects([table nameOfColumnWithIndex:1], @"newName2", @"Get column name");
+    
+    STAssertThrows([table renameColumnWithIndex:2 to:@"someName"], @"Out of bounds");
 }
 
 /*

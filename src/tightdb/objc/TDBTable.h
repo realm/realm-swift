@@ -41,7 +41,7 @@
 
 // Working with columns
 -(NSUInteger)addColumnWithName:(NSString *)name type:(TDBType)type;
--(void)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString*)newName;
+-(void)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString *)newName;
 -(void)removeColumnWithIndex:(NSUInteger)colIndex;
 
 -(NSString *)nameOfColumnWithIndex:(NSUInteger)colIndex;
