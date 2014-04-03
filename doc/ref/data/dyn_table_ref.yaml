@@ -703,18 +703,16 @@ CATEGORIES :
   - g_dyn_table_distinct_const:
       IGNORE   : ""
   - g_dyn_table_distinct:
-      TODO     : later
-
-      NAMES    : distinct
+      NAMES    : "viewWithDistinctValuesInColumnWithIndex:"
       SUMMARY  : *g_dyn_table_distinct_summary
       DESCR    : *g_dyn_table_distinct_desc
-      SIGNATURE: TableView distinct(size_t column_ndx);
+      SIGNATURE: -(TDBView *)viewWithDistinctValuesInColumnWithIndex:(NSUInteger)colIndex;
       PARAMS:
-      - NAME   : column_ndx
-        TYPES  : size_t
-        DESCR  : *g_dyn_table_distinct_parm1_desc
+      - NAME   : colIndex
+        TYPES  : NSUInteger
+        DESCR  : NOTE! Currently only supported on TDBStringType columns.
       RETURN:
-        TYPES  : TableView
+        TYPES  : TDBView *
         DESCR  : *g_dyn_table_distinct_return_desc
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_distinct
