@@ -20,6 +20,6 @@
 
 #import <Foundation/Foundation.h>
 
-@interface TDBQuery()
+@interface TDBQuery (noinst)
 -(tightdb::Query&)getNativeQuery;
 @end
