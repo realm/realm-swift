@@ -23,7 +23,7 @@
 #import <tightdb/objc/Tightdb.h>
 
 TIGHTDB_TABLE_1(TestTableSub,
-                Age,  Int)
+                age,  Int)
 
 TIGHTDB_TABLE_9(TestTableAllTypes,
                 BoolCol,   Bool,
@@ -67,8 +67,8 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
     TestTableSub* subtab1 = [[TestTableSub alloc] init];
     TestTableSub* subtab2 = [[TestTableSub alloc] init];
-    [subtab1 addAge:200];
-    [subtab2 addAge:100];
+    [subtab1 addage:200]; // NOTE: the name is simply add+name of first column!
+    [subtab2 addage:100];
     NSNumber* mixInt1   = [NSNumber numberWithLongLong:1];
 
     TestTableAllTypesRow* c;
@@ -128,12 +128,14 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     TestTableSub *table = [[TestTableSub alloc] init];
 
     // Add some rows
-    [table addAge: 10];
-    [table addAge: 20];
+    [table addage: 10];
+    [table addage:20];
 
+    table[0].age = 7;
+    
     // Verify that you can access rows with object subscripting
-    STAssertEquals(table[0].Age, (int64_t)10, @"table[0].age");
-    STAssertEquals(table[1].Age, (int64_t)20, @"table[1].age");
+    STAssertEquals(table[0].age, (int64_t)7, @"table[0].age");
+    STAssertEquals(table[1].age, (int64_t)20, @"table[1].age");
 }
 
 @end

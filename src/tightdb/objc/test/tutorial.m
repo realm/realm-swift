@@ -71,7 +71,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     if (hired) NSLog(@"is hired.");
 
     // Setting values  (note: setter access will be made obsolete, use dot notation)
-    [[people rowAtIndex:5] setAge:43];  // Getting younger
+    [people rowAtIndex:5].Age = 43;  // Getting younger
     
     // or with dot-syntax:
     myRow.Age += 1;                                    // Happy birthday!
@@ -157,7 +157,6 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
 
     for (size_t i = 0; i < [diskTable rowCount]; i++) {
         PeopleTableRow *row = [diskTable rowAtIndex:i];
-        NSLog(@"%zu: %@", i, [row Name]);
         NSLog(@"%zu: %@", i, row.Name);
     }
 
