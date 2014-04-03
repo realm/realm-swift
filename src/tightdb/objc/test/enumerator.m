@@ -49,7 +49,7 @@ TIGHTDB_TABLE_2(EnumPeopleTable2,
     }
 
     // Do a query, and get all matches as TableView
-    EnumPeopleTableView *res = [[[[people where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30] findAll];
+    EnumPeopleTableView *res = [[[[people where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 :30] findAll];
     NSLog(@"View count: %zu", res.rowCount);
     // 2: Iterate over the resulting TableView
     for (EnumPeopleTableRow *row in res) {
