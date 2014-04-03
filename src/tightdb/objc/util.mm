@@ -206,27 +206,30 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
                 break;
             return NO;
         case type_Mixed:
-            // FIXME: Do a proper check!
-            /*            if ([obj isKindOfClass:[NSArray class]]) {
-             TableRef t = Table::create();
-             NSEnumerator *subobj = [obj objectEnumerator];
-             size_t subndx = 0;
-             while ([subobj nextObject]) {
-             if (subndx == 0) {
-             if (!set_columns(*t, subobj))
-             return NO;
-             }
-             else {
-             ConstDescriptorRef subdescr = t->get_descriptor();
-             if (!verify_row(*subdescr, (NSArray *)subobj))
-             return NO;
-             }
-             }
-             }
-             else
-             return NO;
-             */
-            break; /* everything goes */
+            if ([obj isKindOfClass:[NSNumber class]]) {
+                if (nsnumber_is_like_bool((NSNumber *)obj))
+                    break;
+                if (nsnumber_is_like_integer((NSNumber *)obj))
+                    break;
+                if (nsnumber_is_like_float((NSNumber *)obj))
+                    break;
+                if (nsnumber_is_like_double((NSNumber *)obj))
+                    break;
+                return NO;
+            }
+            if ([obj isKindOfClass:[NSString class]]) {
+                break;
+            }
+            if ([obj isKindOfClass:[NSDate class]]) {
+                break;
+            }
+            if ([obj isKindOfClass:[NSData class]]) {
+                break;
+            }
+            if ([obj isKindOfClass:[TDBTable class]]) { // subtables are inserted as TDBTable
+                break;
+            }
+            return NO;
         case type_Table:
             if ([obj isKindOfClass:[NSArray class]]) {
                 if ([(NSArray *)obj count] == 0)
@@ -426,7 +429,7 @@ void insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
         ++col_ndx;
     }
     table.insert_done();
-    
+
     if (subtable_seen) {
         NSEnumerator *enumerator = [data objectEnumerator];
         size_t col_ndx = 0;
@@ -441,7 +444,7 @@ void insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
                 ++col_ndx;
                 continue;
             }
-            
+
             TableRef subtable = table.get_subtable(col_ndx, row_ndx);
             NSEnumerator *subenumerator = [obj objectEnumerator];
             id subobj;
@@ -452,7 +455,7 @@ void insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
                     ++sub_ndx;
                     continue;
                 }
-                
+
                 /* Fill in data */
                 insert_row(subtable->size(), *subtable, subobj);
                 ++sub_ndx;
@@ -464,18 +467,18 @@ void insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
 void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
 {
     bool subtables_seen = false;
-    
+
     size_t count = table.get_column_count();
     for (size_t col_ndx = 0; col_ndx != count; ++col_ndx) {
         NSString *col_name = to_objc_string(table.get_column_name(col_ndx));
-        
+
         // Do we have a matching label?
         // (missing values are ok, they will be filled out with default values)
         id value = [data valueForKey:col_name];
         subtables_seen = subtables_seen || insert_cell(col_ndx, row_ndx, table, value);
     }
     table.insert_done();
-    
+
     if (subtables_seen) {
         for(size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
             DataType type = table.get_column_type(col_ndx);
@@ -487,9 +490,9 @@ void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
             if (value == nil) {
                 continue;
             }
-            
+
             TableRef subtable = table.get_subtable(col_ndx, row_ndx);
-            
+
             /* fill in data */
             insert_row_with_labels(row_ndx, *subtable, (NSDictionary *)value);
         }
@@ -591,11 +594,6 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
             if ([obj isKindOfClass:[NSString class]]) {
                 StringData sd([(NSString *)obj UTF8String]);
                 table.set_mixed(col_ndx, row_ndx, sd);
-                break;
-            }
-            if ([obj isKindOfClass:[NSArray class]]) {
-                // FIXME: implement
-                // table.set_mixed(col_ndx, row_ndx, Mixed::subtable_tag());
                 break;
             }
             if ([obj isKindOfClass:[TDBTable class]]) {
@@ -756,4 +754,3 @@ BOOL set_columns(TableRef& parent, NSArray *schema)
     std::vector<size_t> v;
     return set_columns_aux(parent, v, schema);
 }
-
