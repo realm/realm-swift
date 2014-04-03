@@ -129,7 +129,7 @@ TIGHTDB_TABLE_2(SubMixedTable,
 {
     SubMixedTable *tableSub = [[SubMixedTable alloc] init];
     STAssertTrue([tableSub isKindOfClass:[TDBTable class]], @"TDBTable excepted");
-    
+
     // Add some rows
     [tableSub addHired:YES Age:20];
     [tableSub addHired:NO Age:21];
@@ -154,7 +154,7 @@ TIGHTDB_TABLE_2(SubMixedTable,
     STAssertTrue([table[4].Other isKindOfClass:[TDBTable class]], @"TDBTable excepted");
     STAssertEquals([(TDBTable *)table[4].Other rowCount], (size_t)5,@"Subtable should have 5 rows");
     STAssertTrue([table[5].Other isKindOfClass:[NSDate class]], @"NSDate excepted");
-    
+
     // Test cast and isClass
     NSLog(@"Is SubMixedTable type: %i", [tableSub hasSameDescriptorAs:[SubMixedTable class]]);
     STAssertEquals([tableSub hasSameDescriptorAs:[SubMixedTable class]], YES,@"Unknown table should be of type SubMixedTable");
@@ -166,5 +166,10 @@ TIGHTDB_TABLE_2(SubMixedTable,
     NSLog(@"Avg: %.2f", [table avgIntColumnWithIndex:2]);
 }
 
-
+-(void)testMixedValidate
+{
+    MixedTable *table = [[MixedTable alloc] init];
+    STAssertThrows(([table addRow:@[@YES, @[@1, @2], @7]]), @"Mixed cannot be an NSArray");
+    STAssertThrows(([table addRow:@[@YES, @{@"key": @7}, @11]]), @"Mixed cannot be an NSDictionary");
+}
 @end
