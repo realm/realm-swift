@@ -21,6 +21,6 @@
 #import <Foundation/Foundation.h>
 #include <tightdb/descriptor.hpp>
 
-@interface TDBDescriptor()
+@interface TDBDescriptor (noinst)
 +(TDBDescriptor*)descWithDesc:(tightdb::Descriptor*)desc readOnly:(BOOL)read_only error:(NSError* __autoreleasing*)error;
 @end
