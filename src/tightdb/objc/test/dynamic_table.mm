@@ -393,10 +393,10 @@
 
     TDBTable *table = [[TDBTable alloc] init];
     [table addColumnWithName:@"col0" type:TDBIntType];
-    STAssertTrue([table columnCount] == 1,@"1 column added" );
+    STAssertTrue(table.columnCount == 1,@"1 column added" );
 
     [table removeColumnWithIndex:0];
-    STAssertTrue([table columnCount] == 0, @"Colum removed");
+    STAssertTrue(table.columnCount  == 0, @"Colum removed");
 
     for (int i=0;i<10;i++) {
         [table addColumnWithName:@"name" type:TDBIntType];
@@ -405,15 +405,38 @@
     STAssertThrows([table removeColumnWithIndex:10], @"Out of bounds");
     STAssertThrows([table removeColumnWithIndex:-1], @"Less than zero colIndex");
 
-    STAssertTrue([table columnCount] == 10, @"10 columns added");
+    STAssertTrue(table.columnCount  == 10, @"10 columns added");
 
     for (int i=0;i<10;i++) {
         [table removeColumnWithIndex:0];
     }
 
-    STAssertTrue([table columnCount] == 0, @"Colums removed");
+    STAssertEquals(table.columnCount, (NSUInteger)0, @"Colums removed");
     STAssertThrows([table removeColumnWithIndex:1], @"No columns added");
     STAssertThrows([table removeColumnWithIndex:-1], @"Less than zero colIndex");
+}
+
+-(void)testRenameColumns
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    STAssertThrows([table renameColumnWithIndex:0 to:@"someName"], @"Out of bounds");
+    
+    [table addColumnWithName:@"oldName" type:TDBIntType];
+    
+    [table renameColumnWithIndex:0 to:@"newName"];
+    STAssertEqualObjects([table nameOfColumnWithIndex:0], @"newName", @"Get column name");
+    
+    [table renameColumnWithIndex:0 to:@"evenNewerName"];
+    STAssertEqualObjects([table nameOfColumnWithIndex:0], @"evenNewerName", @"Get column name");
+    
+    STAssertThrows([table renameColumnWithIndex:1 to:@"someName"], @"Out of bounds");
+    STAssertThrows([table renameColumnWithIndex:-1 to:@"someName"], @"Less than zero colIndex");
+    
+    [table addColumnWithName:@"oldName2" type:TDBIntType];
+    [table renameColumnWithIndex:1 to:@"newName2"];
+    STAssertEqualObjects([table nameOfColumnWithIndex:1], @"newName2", @"Get column name");
+    
+    STAssertThrows([table renameColumnWithIndex:2 to:@"someName"], @"Out of bounds");
 }
 
 /*
