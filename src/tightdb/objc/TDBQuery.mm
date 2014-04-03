@@ -359,25 +359,25 @@ using namespace std;
 
 // Between
 
--(TDBQuery*)dateIsBetween:(NSDate *)lower and:(NSDate *)upper inColumnWithIndex:(NSUInteger)colIndex
+-(TDBQuery*)dateIsBetween:(NSDate *)lower :(NSDate *)upper inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query-> between(colIndex, lower.timeIntervalSince1970, upper.timeIntervalSince1970);
     return self;
 }
 
--(TDBQuery*)intIsBetween:(int64_t)lower and:(int64_t)upper inColumnWithIndex:(NSUInteger)colIndex
+-(TDBQuery*)intIsBetween:(int64_t)lower :(int64_t)upper inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->between(colIndex, lower, upper);
     return self;
 }
 
--(TDBQuery*)floatIsBetween:(float)lower and:(float)upper inColumnWithIndex:(NSUInteger)colIndex
+-(TDBQuery*)floatIsBetween:(float)lower :(float)upper inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->between(colIndex, lower, upper);
     return self;
 }
 
--(TDBQuery*)doubleIsBetween:(double)lower and:(double)upper inColumnWithIndex:(NSUInteger)colIndex
+-(TDBQuery*)doubleIsBetween:(double)lower :(double)upper inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->between(colIndex, lower, upper);
     return self;

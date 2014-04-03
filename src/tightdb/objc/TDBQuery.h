@@ -81,10 +81,10 @@
 -(TDBQuery *)dateIsNotEqualTo:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)binaryIsNotEqualTo:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
 
--(TDBQuery *)dateIsBetween:(NSDate *)lower and:(NSDate *)upper inColumnWithIndex:(NSUInteger)colIndex;
--(TDBQuery *)intIsBetween:(int64_t)lower and:(int64_t)upper inColumnWithIndex:(NSUInteger)colIndex;
--(TDBQuery *)floatIsBetween:(float)lower and:(float)upper inColumnWithIndex:(NSUInteger)colIndex;
--(TDBQuery *)doubleIsBetween:(double)lower and:(double)upper inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBQuery *)dateIsBetween:(NSDate *)lower :(NSDate *)upper inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBQuery *)intIsBetween:(int64_t)lower :(int64_t)upper inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBQuery *)floatIsBetween:(float)lower :(float)upper inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBQuery *)doubleIsBetween:(double)lower :(double)upper inColumnWithIndex:(NSUInteger)colIndex;
 
 -(TDBQuery *)dateIsGreaterThan:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)intIsGreaterThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
