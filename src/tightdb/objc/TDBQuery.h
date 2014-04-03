@@ -129,7 +129,7 @@
 -(TDBQuery *)columnIsGreaterThanOrEqualTo:(int64_t)value;
 -(TDBQuery *)columnIsLessThan:(int64_t)value;
 -(TDBQuery *)columnIsLessThanOrEqualTo:(int64_t)value;
--(TDBQuery *)columnIsBetween:(int64_t)from and_:(int64_t)to;
+-(TDBQuery *)columnIsBetween:(int64_t)lower :(int64_t)upper;
 -(int64_t)min;
 -(int64_t)max;
 -(int64_t)sum;
@@ -145,7 +145,7 @@
 -(TDBQuery *)columnIsGreaterThanOrEqualTo:(float)value;
 -(TDBQuery *)columnIsLessThan:(float)value;
 -(TDBQuery *)columnIsLessThanOrEqualTo:(float)value;
--(TDBQuery *)columnIsBetween:(float)from and_:(float)to;
+-(TDBQuery *)columnIsBetween:(float)lower :(float)upper;
 -(float)min;
 -(float)max;
 -(double)sum;
@@ -161,7 +161,7 @@
 -(TDBQuery *)columnIsGreaterThanOrEqualTo:(double)value;
 -(TDBQuery *)columnIsLessThan:(double)value;
 -(TDBQuery *)columnIsLessThanOrEqualTo:(double)value;
--(TDBQuery *)columnIsBetween:(double)from and_:(double)to;
+-(TDBQuery *)columnIsBetween:(double)lower :(double)upper;
 -(double)min;
 -(double)max;
 -(double)sum;
@@ -202,7 +202,7 @@
 -(TDBQuery *)columnIsGreaterThanOrEqualTo:(NSDate *)value;
 -(TDBQuery *)columnIsLessThan:(NSDate *)value;
 -(TDBQuery *)columnIsLessThanOrEqualTo:(NSDate *)value;
--(TDBQuery *)columnIsBetween:(NSDate *)from and_:(NSDate *)to;
+-(TDBQuery *)columnIsBetween:(NSDate *)lower :(NSDate *)upper;
 @end
 
 
