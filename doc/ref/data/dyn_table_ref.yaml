@@ -9,7 +9,7 @@
 # MISSING where (only possible in typed tables)
 
 ID         : class_dyn_table
-TITLE      : Table (dynamic)
+TITLE      : TDBTable (dynamic)
 SUMMARY    : *g_dyn_table_intro_summary
 DESCR      :
 - TEXT     : *g_dyn_table_intro_descr_core
