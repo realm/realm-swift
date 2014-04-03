@@ -602,9 +602,9 @@ EOF
         exit 0
         ;;
 
-    "build-test-core")
+    "build-ios-test-core")
         ## Setup directories
-        cd test-core
+        cd ios-test-core
 
         DIR="iOSTestCoreAppTests"
         
@@ -854,9 +854,9 @@ EOF
         cat << EOF
 Unspecified or bad mode '$MODE'.
 Available modes are:
-  config clean build build-iphone test test-debug test-gdb test-cover
-  show-install install uninstall test-installed install-prod install-devel
-  uninstall-prod uninstall-devel dist-copy ios-framework
+  config clean build build-iphone build-ios-test-core test test-debug test-gdb
+  test-cover show-install install uninstall test-installed install-prod
+  install-devel uninstall-prod uninstall-devel dist-copy ios-framework
   get-version set-version
 EOF
         exit 1
