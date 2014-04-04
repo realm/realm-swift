@@ -112,7 +112,7 @@ inline NSObject* to_objc_object(tightdb::Mixed m)
 inline NSUInteger was_not_found(size_t n)
 {
     if (n == tightdb::not_found)
-        return NSNotFound;
+        return (NSUInteger)NSNotFound;
     return (NSUInteger)n;
 }
 
