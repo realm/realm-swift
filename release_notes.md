@@ -37,7 +37,8 @@ Description......
 
 ### API breaking changes:
 
-* none.
+* `findFirstRow` renamed to `indexOfFirstMatchingRow` on `TDBQuery`.
+* `findFirstRowFromIndex:` renamed to `indexOfFirstMatchingRowFromIndex:` on `TDBQuery`.
 
 ### Enhancements:
 * `renameColumnWithIndex:to:` has been added to `TDBTable`.
