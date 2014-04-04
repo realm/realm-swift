@@ -272,6 +272,16 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [table addRow:@[@33, @33.33f, @33.33, date33]];
     [table addRow:@[@333, @333.333f, @333.333, date333]];
     
+    // Using specific column type operations SUM
+    STAssertEquals([[table where] sumIntColumnWithIndex:intCol], (int64_t)369, nil);
+    STAssertEqualsWithAccuracy([[table where] sumFloatColumnWithIndex:floatCol], (double)369.963, 0.1, nil);
+    STAssertEqualsWithAccuracy([[table where] sumDoubleColumnWithIndex:doubleCol], (double)369.963, 0.1, nil);
+    
+    // Using generic column type operations SUM
+    STAssertEqualObjects([[table where] sumColumnWithIndex:intCol], @369, nil);
+    STAssertEqualsWithAccuracy([[[table where] sumColumnWithIndex:floatCol] doubleValue], (double)369.963, 0.1, nil);
+    STAssertEqualsWithAccuracy([[[table where] sumColumnWithIndex:doubleCol] doubleValue], (double)369.963, 0.1, nil);
+    
     // Using specific column type operations AVG
     STAssertEquals([[table where] avgIntColumnWithIndex:intCol], (double)123, nil);
     STAssertEqualsWithAccuracy([[table where] avgFloatColumnWithIndex:floatCol], (double)123.321, 0.1, nil);

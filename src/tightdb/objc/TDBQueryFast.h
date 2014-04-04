@@ -20,9 +20,12 @@
 
 @interface TDBQuery (Fast)
 
+-(int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex;
+-(double)sumFloatColumnWithIndex:(NSUInteger)colIndex;
+-(double)sumDoubleColumnWithIndex:(NSUInteger)colIndex;
+
 -(double)avgIntColumnWithIndex:(NSUInteger)colIndex;
 -(double)avgFloatColumnWithIndex:(NSUInteger)colIndex;
 -(double)avgDoubleColumnWithIndex:(NSUInteger)colIndex;
-
 
 @end

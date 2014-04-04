@@ -49,9 +49,7 @@
 -(double)maxDoubleInColumnWithIndex:(NSUInteger)colIndex;
 -(NSDate *)maxDateInColumnWithIndex:(NSUInteger)colIndex;
 
--(int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex;
--(double)sumFloatColumnWithIndex:(NSUInteger)colIndex;
--(double)sumDoubleColumnWithIndex:(NSUInteger)colIndex;
+-(NSNumber *)sumColumnWithIndex:(NSUInteger)colIndex;
 
 -(NSNumber *)avgColumnWithIndex:(NSUInteger)colIndex;
 
