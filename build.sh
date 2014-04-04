@@ -175,6 +175,16 @@ EOF
     printf "%s\n" "$value"
 }
 
+copy_or_fail()
+{
+    rm -rf "$2"
+    if [ ! -e "$1" ]; then
+        echo "\"$1\" missing."
+        exit 1
+    fi
+    cp -r "$1" "$2" || exit 1
+}
+
 build_ios_test()
 {
     # Expects the working directory to be the directory where to put .xcodeproj.
@@ -191,17 +201,6 @@ build_ios_test()
     APP_TESTS_SOURCES=$(find "$TEST_APP" -type f | \
         sed -E 's/^(.*)$/                "\1",/')
 
-    ## Copy core framework to project directory.
-    CORE_FRAMEWORK="TightdbCore.framework"
-    CORE_FRAMEWORK_ORIGIN="../../tightdb/$CORE_FRAMEWORK"
-    rm -rf "$CORE_FRAMEWORK"
-    if [ ! -d "$CORE_FRAMEWORK_ORIGIN" ]; then
-        echo "\"$CORE_FRAMEWORK_ORIGIN\" missing."
-        echo "Did you forget to build-iphone and build-ios-core-framework in core?"
-        exit 1
-    fi
-    cp -r "$CORE_FRAMEWORK_ORIGIN" "$CORE_FRAMEWORK" || exit 1
-
     ## Create a gyp file.
     # To use xctest, the project must have an app and a test target. The
     # app can be left fairly featureless, but enough must exist for us to
@@ -213,7 +212,7 @@ build_ios_test()
             '\$(ARCHS_STANDARD_INCLUDING_64_BIT)',
         ],
         'SDKROOT': 'iphoneos',
-        'TARGETED_DEVICE_FAMILY': '1,2', # iPhone/iPad
+        'TARGETED_DEVICE_FAMILY': '_BASENAME1,2', # iPhone/iPad
         'FRAMEWORK_SEARCH_PATHS': [
             '\$(SDKROOT)/Developer/Library/Frameworks',
             '\$(PROJECT_DIR)',
@@ -225,7 +224,7 @@ build_ios_test()
             'libraries': [
                 '\$(SDKROOT)/usr/lib/libc++.dylib',
                 '\$(DEVELOPER_DIR)/Library/Frameworks/XCTest.framework',
-                'TightdbCore.framework',
+                '$FRAMEWORK',
             ],
         },
     },
@@ -776,24 +775,14 @@ EOF
         APP="iOSTestCoreApp"
         TEST_APP="${APP}Tests"
         
-       ## Initialize app test directory
-        function build_test_core_cp {
-            mkdir -p "$TEST_APP/$2" || exit 1
-            find "../../tightdb/$1/" -maxdepth 1 \
-                -type f -iregex "^.*\.[ch]\(pp\)\{0,1\}$" \
-                -exec cp {} "$TEST_APP/$2/" \; || exit 1
-        }
-
-        build_test_core_cp test
-        build_test_core_cp test/util util
-        build_test_core_cp test/large_tests large_tests
+        ## Initialize app test directory
+        cp -r "../../tightdb/test" "$TEST_APP"
+        find "$TEST_APP" -type f \
+            ! -iregex "^.*\.[ch]\(pp\)\{0,1\}$" \
+            -exec rm {} \; || exit 1
 
         ## Remove breaking files (containing main or unportable code).
         rm "$TEST_APP/main.cpp"
-
-        ## Replace all dynamic includes with static includes
-        find "$TEST_APP" -type f -exec sed -i '' \
-            -e 's/<tightdb\(.*\)>/<TightdbCore\/tightdb\1>/g' {} \; || exit 1
 
         ## Create an XCTestCase
         cat >"$TEST_APP/$TEST_APP.mm" <<EOF
@@ -816,6 +805,55 @@ EOF
 
 @end
 EOF
+
+        ## Set up frameworks.
+        copy_or_fail "../../tightdb/TightdbCore.framework" \
+            "TightdbCore.framework" 
+        FRAMEWORK="TightdbCore"
+
+        ## Replace all test includes with framework includes.
+        find "$TEST_APP" -type f -exec sed -i '' \
+            -e "s/<tightdb\(.*\)>/<TightdbCore\/tightdb\1>/g" {} \; || exit 1
+
+        build_ios_test
+        echo "Done building"
+        exit 0
+        ;;
+
+    "build-ios-test-binding")
+        ## Setup directories
+        rm -rf ios-test-binding || exit 1
+        mkdir ios-test-binding || exit 1
+        cd ios-test-binding
+
+        APP="iOSTestBindingApp"
+        TEST_APP="${APP}Tests"
+        
+        ## Initialize app test directory
+        cp -r "../src/tightdb/objc/test" "$TEST_APP"
+        find "$TEST_APP" -type f \
+            ! -iregex "^.*\.[hm]\{1,2\}$" \
+            -exec rm {} \; || exit 1
+
+        ## Set up frameworks
+        copy_or_fail "../../tightdb/TightdbCore.framework" \
+            "TightdbCore.framework" 
+        copy_or_fail "../Tightdb.framework" "Tightdb.framework"
+        FRAMEWORK="TightdbCore', 'Tightdb"
+        # Add missing (hidden) headers
+        find "../src/tightdb/objc/" -maxdepth 1 -iname *.h \
+            -exec cp {} "Tightdb.framework/Headers" \; 
+        find "Tightdb.framework/Headers/" -type f -exec sed -i '' \
+            -e "s/<tightdb\/objc\/\(.*\)>/<Tightdb\/\1>/g" {} \; || exit 1
+        find "Tightdb.framework/Headers/" -type f -exec sed -i '' \
+            -e "s/<tightdb\(.*\)>/<TightdbCore\/tightdb\1>/g" {} \; || exit 1
+ 
+        ## Replace all test includes with framework includes.
+        find "$TEST_APP" -type f -exec sed -i '' \
+            -e "s/<tightdb\/objc\/\(.*\)>/<Tightdb\/\1>/g" {} \; || exit 1
+        find "$TEST_APP" -type f -exec sed -i '' \
+            -e "s/<tightdb\(.*\)>/<TightdbCore\/tightdb\1>/g" {} \; || exit 1
+ 
         build_ios_test
         echo "Done building"
         exit 0
