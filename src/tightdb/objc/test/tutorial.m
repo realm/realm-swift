@@ -118,7 +118,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
 
     // Create query (current employees between 20 and 30 years old)
     PeopleTableQuery *q = [[[people where].Hired columnIsEqualTo:YES]            // Implicit AND
-                                  .Age columnIsBetween:20 and_:30];
+                                  .Age columnIsBetween:20 :30];
 
     // Get number of matching entries
     NSLog(@"Query count: %lu",[q countRows]);

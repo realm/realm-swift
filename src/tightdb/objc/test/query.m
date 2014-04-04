@@ -84,7 +84,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [[[table where].IntCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].IntCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
     [[[table where].IntCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].IntCol columnIsBetween:0 and_:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].IntCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
 
     [[[table where].FloatCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].FloatCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
@@ -92,7 +92,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [[[table where].FloatCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].FloatCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
     [[[table where].FloatCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].FloatCol columnIsBetween:0 and_:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].FloatCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
 
     [[[table where].DoubleCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DoubleCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
@@ -100,7 +100,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [[[table where].DoubleCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DoubleCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DoubleCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DoubleCol columnIsBetween:0 and_:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].DoubleCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
 
     [[[table where].StringCol columnIsEqualTo:@""].BoolCol columnIsEqualTo:NO];
     [[[table where].StringCol columnIsEqualTo:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
@@ -125,7 +125,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [[[table where].DateCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DateCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DateCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DateCol columnIsBetween:0 and_:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].DateCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
 
 // These are not yet implemented
 //    [[[table where].TableCol columnIsEqualTo:nil].BoolCol columnIsEqualTo:NO];
@@ -185,18 +185,20 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [table TDB_setBinary:bin1 inColumnWithIndex:BINARY_COL atRowIndex:0];
     [table TDB_setBinary:bin2 inColumnWithIndex:BINARY_COL atRowIndex:1];
     
-    [table TDB_setDate:0 inColumnWithIndex:DATE_COL atRowIndex:0];
-    [table TDB_setDate:[NSDate date] inColumnWithIndex:DATE_COL atRowIndex:1];
+    NSDate *date1 = [NSDate date];
+    NSDate *date2 = [date1 dateByAddingTimeInterval:1];
+    [table TDB_setDate:date1 inColumnWithIndex:DATE_COL atRowIndex:0];
+    [table TDB_setDate:date2 inColumnWithIndex:DATE_COL atRowIndex:1];
     
     [table TDB_setMixed:mixInt1 inColumnWithIndex:MIXED_COL atRowIndex:0];
     [table TDB_setMixed:mixString inColumnWithIndex:MIXED_COL atRowIndex:1];
     
     // Conditions (note that count is invoked to get the number of matches)
     
-    //STAssertEquals([[[table where] column:INT_COL isBetweenInt:859 and_:861] count], (NSUInteger)1, @"betweenInt");
-    //STAssertEquals([[[table where] column:FLOAT_COL isBetweenFloat:5.5 and_:5.7] count], (NSUInteger)1, @"betweenFloat");
-    //STAssertEquals([[[table where] column:DOUBLE_COL isBetweenDouble:5.5 and_:5.7] count], (NSUInteger)1, @"betweenDouble");
-    //STAssertEquals([[[table where] column:DATE_COL isBetweenDate:1 and_:timeNow] count], (NSUInteger)1, @"betweenDate");
+    STAssertEquals([[[table where] intIsBetween:859 :861 inColumnWithIndex:INT_COL ] countRows], (NSUInteger)1, @"betweenInt");
+    STAssertEquals([[[table where] floatIsBetween:5.5 :5.7 inColumnWithIndex:FLOAT_COL ] countRows], (NSUInteger)1, @"betweenFloat");
+    STAssertEquals([[[table where] doubleIsBetween:5.5 :5.7 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"betweenDouble");
+    STAssertEquals([[[table where] dateIsBetween:date1 :date2 inColumnWithIndex :DATE_COL ] countRows], (NSUInteger)2, @"betweenDate");
     
     STAssertEquals([[[table where] boolIsEqualTo:YES inColumnWithIndex:BOOL_COL ] countRows], (NSUInteger)1, @"isEqualToBool");
     STAssertEquals([[[table where] intIsEqualTo:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isEqualToInt");
@@ -220,22 +222,22 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     STAssertEquals([[[table where] intIsGreaterThan:859 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isGreaterThanInt");
     STAssertEquals([[[table where] floatIsGreaterThan:5.5 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isGreaterThanFloat");
     STAssertEquals([[[table where] doubleIsGreaterThan:5.5 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isGreaterThanDouble");
-    STAssertEquals([[[table where] dateIsGreaterThan:0 inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isGreaterThanDate");
+    STAssertEquals([[[table where] dateIsGreaterThan:date1 inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isGreaterThanDate");
     
     STAssertEquals([[[table where] intIsGreaterThanOrEqualTo:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isGreaterThanInt");
     STAssertEquals([[[table where] floatIsGreaterThanOrEqualTo:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isGreaterThanFloat");
     STAssertEquals([[[table where] doubleIsGreaterThanOrEqualTo:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isGreaterThanDouble");
-    STAssertEquals([[[table where] dateIsGreaterThanOrEqualTo:[NSDate date] inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isGreaterThanDate");
+    STAssertEquals([[[table where] dateIsGreaterThanOrEqualTo:date1 inColumnWithIndex:DATE_COL] countRows], (NSUInteger)2, @"isGreaterThanDate");
     
     STAssertEquals([[[table where] intIsLessThan:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isLessThanInt");
     STAssertEquals([[[table where] floatIsLessThan:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isLessThanFloat");
     STAssertEquals([[[table where] doubleIsLessThan:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isLessThanDouble");
-    STAssertEquals([[[table where] dateIsLessThan:[NSDate date] inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isLessThanDate");
+    STAssertEquals([[[table where] dateIsLessThan:date2 inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isLessThanDate");
     
     STAssertEquals([[[table where] intIsLessThanOrEqualTo:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToInt");
     STAssertEquals([[[table where] floatIsLessThanOrEqualTo:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToFloat");
     STAssertEquals([[[table where] doubleIsLessThanOrEqualTo:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToDouble");
-    STAssertEquals([[[table where] dateIsLessThanOrEqualTo:[NSDate date] inColumnWithIndex:DATE_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToDate");
+    STAssertEquals([[[table where] dateIsLessThanOrEqualTo:date2 inColumnWithIndex:DATE_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToDate");
     
     //STAssertEquals([[[table where] column:INT_COL isBetweenInt:859 and_:861] find:0], (size_t) 1, @"find");
     
@@ -243,8 +245,8 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     
     STAssertEquals([[table where] minIntInColumnWithIndex:INT_COL], (int64_t)0, @"minIntInColumn");
     STAssertEquals([[table where] sumIntColumnWithIndex:INT_COL], (int64_t)860, @"IntCol max");
-    STAssertEqualsWithAccuracy([[[table where] minDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], (NSTimeInterval)0, 0.99, @"MinDateInColumn");
-    STAssertEqualsWithAccuracy([[[table where] maxDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], [[NSDate date] timeIntervalSince1970], 0.99, @"MaxDateInColumn");
+    STAssertEqualsWithAccuracy([[[table where] minDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], [date1 timeIntervalSince1970], 0.99, @"MinDateInColumn");
+    STAssertEqualsWithAccuracy([[[table where] maxDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], [date2 timeIntervalSince1970], 0.99, @"MaxDateInColumn");
     
     /// TODO: Tests missing....
 
@@ -267,13 +269,17 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     STAssertEquals((NSUInteger)1, [[[table where ] intIsGreaterThan:10 inColumnWithIndex:0 ] findFirstRow], @"Row 1 is greater than 10");
     STAssertEquals(NSNotFound, [[[table where ] intIsGreaterThan:100 inColumnWithIndex:0 ] findFirstRow], @"No rows are greater than 100");
 
-    //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:0], (size_t)2,  @"find");
-    //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:3], (size_t)3,  @"find");
-    //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:4], (size_t)5,  @"find");
-    //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:6], (size_t)-1, @"find");
-    //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:3], (size_t)3,  @"find");
+    STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:0], (NSUInteger)2,  @"find");
+    STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:3], (NSUInteger)3,  @"find");
+    STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:4], (NSUInteger)5,  @"find");
+    STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:6], (NSUInteger)-1, @"find");
+    STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:3], (NSUInteger)3,  @"find");
     // jjepsen: disabled this test, perhaps it's not relevant after query sematics update.
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (size_t)-1, @"find");
+    
+    [table removeAllRows];
+    STAssertEquals([[table where] findFirstRow], (NSUInteger)-1,nil);
+    STAssertEquals([[table where] findFirstRowFromIndex:0], (NSUInteger)-1,nil);
 }
 
 - (void) testSubtableQuery

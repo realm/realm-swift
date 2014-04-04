@@ -82,7 +82,7 @@ TIGHTDB_TABLE_2(QueryTable,
     [table2 addHired:YES Age:54];
 
     // Create query (current employees between 20 and 30 years old)
-    MyTable2Query* q = [[[table2 where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30];
+    MyTable2Query* q = [[[table2 where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 :30];
 
     // Get number of matching entries
     NSLog(@"Query count: %zu", [q countRows]);
@@ -146,7 +146,7 @@ TIGHTDB_TABLE_2(QueryTable,
     [table addFirst:8 Second:@"The quick brown fox"];
 
     {
-        QueryTableQuery* q = [[table where].First columnIsBetween:3 and_:7]; // Between
+        QueryTableQuery* q = [[table where].First columnIsBetween:3 :7]; // Between
         STAssertEquals((size_t)2,   [q countRows], @"count != 2");
 //        STAssertEquals(9,   [q.First sum]); // Sum
         STAssertEquals(4.5, [q.First avg], @"Avg!=4.5"); // Average
