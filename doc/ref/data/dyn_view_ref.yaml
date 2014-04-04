@@ -3,7 +3,7 @@
 #
 
 ID         : class_dyn_tableview
-TITLE      : TableView (dynamic)
+TITLE      : TDBView (dynamic)
 SUMMARY    : *g_dyn_view_intro_summary
 DESCR      : *g_dyn_view_intro_descr
 SEE        :
