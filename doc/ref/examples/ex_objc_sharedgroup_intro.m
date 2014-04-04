@@ -23,9 +23,9 @@ void ex_objc_context_intro()
     /* Perform a write transaction (with commit to file). */
     NSError *error = nil;
     BOOL success;
-    success = [context writeWithBlock:^(TDBTransaction *group) {
-        PeopleTable *table = [group createTableWithName:@"employees"
-                                           asTableClass:[PeopleTable class]];
+    success = [context writeWithBlock:^(TDBTransaction *transaction) {
+        PeopleTable *table = [transaction createTableWithName:@"employees"
+                                                 asTableClass:[PeopleTable class]];
         [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
         
         return YES; /* Commit */
@@ -35,9 +35,9 @@ void ex_objc_context_intro()
 
     
     /* Perform a write transaction (with rollback). */
-    success = [context writeWithBlock:^(TDBTransaction *group) {
-        PeopleTable *table = [group createTableWithName:@"employees"
-                                           asTableClass:[PeopleTable class]];
+    success = [context writeWithBlock:^(TDBTransaction *transaction) {
+        PeopleTable *table = [transaction createTableWithName:@"employees"
+                                                 asTableClass:[PeopleTable class]];
         if ([table rowCount] == 0) {
             NSLog(@"Roll back!");
             return NO; /* Rollback */
