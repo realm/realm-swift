@@ -227,6 +227,24 @@ using namespace std;
     return m_query->sum_double(col_ndx);
 }
 
+-(NSNumber *)avgColumnWithIndex:(NSUInteger)colIndex
+{
+    TDBType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
+    if (colType == TDBIntType) {
+        return [NSNumber numberWithDouble:[self avgIntColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBDoubleType) {
+        return [NSNumber numberWithDouble:[self avgDoubleColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBFloatType) {
+        return [NSNumber numberWithDouble:[self avgFloatColumnWithIndex:colIndex]];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"tightdb:operation_not_supprted"
+                                       reason:@"Avg only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+}
 
 -(double)avgIntColumnWithIndex:(NSUInteger)col_ndx
 {

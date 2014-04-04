@@ -53,9 +53,8 @@
 -(double)sumFloatColumnWithIndex:(NSUInteger)colIndex;
 -(double)sumDoubleColumnWithIndex:(NSUInteger)colIndex;
 
--(double)avgIntColumnWithIndex:(NSUInteger)colIndex;
--(double)avgFloatColumnWithIndex:(NSUInteger)colIndex;
--(double)avgDoubleColumnWithIndex:(NSUInteger)colIndex;
+-(NSNumber *)avgColumnWithIndex:(NSUInteger)colIndex;
+
 
 /* Search */
 -(NSUInteger)findFirstRow;
