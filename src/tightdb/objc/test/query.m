@@ -272,14 +272,14 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:0], (NSUInteger)2,  @"find");
     STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:3], (NSUInteger)3,  @"find");
     STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:4], (NSUInteger)5,  @"find");
-    STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:6], (NSUInteger)-1, @"find");
+    STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:6], (NSUInteger)NSNotFound, @"find");
     STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:3], (NSUInteger)3,  @"find");
     // jjepsen: disabled this test, perhaps it's not relevant after query sematics update.
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (size_t)-1, @"find");
     
     [table removeAllRows];
-    STAssertEquals([[table where] findFirstRow], (NSUInteger)-1,nil);
-    STAssertEquals([[table where] findFirstRowFromIndex:0], (NSUInteger)-1,nil);
+    STAssertEquals([[table where] findFirstRow], (NSUInteger)NSNotFound,nil);
+    STAssertEquals([[table where] findFirstRowFromIndex:0], (NSUInteger)NSNotFound,nil);
 }
 
 - (void) testSubtableQuery
