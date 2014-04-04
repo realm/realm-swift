@@ -209,6 +209,25 @@ using namespace std;
     return [NSDate dateWithTimeIntervalSince1970: m_query->maximum_int(col_ndx)];
 }
 
+-(NSNumber *)sumColumnWithIndex:(NSUInteger)colIndex
+{
+    TDBType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
+    if (colType == TDBIntType) {
+        return [NSNumber numberWithInteger:[self sumIntColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBDoubleType) {
+        return [NSNumber numberWithDouble:[self sumDoubleColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBFloatType) {
+        return [NSNumber numberWithDouble:[self sumFloatColumnWithIndex:colIndex]];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"tightdb:operation_not_supprted"
+                                       reason:@"Sum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+}
+
 
 -(int64_t)sumIntColumnWithIndex:(NSUInteger)col_ndx
 {
