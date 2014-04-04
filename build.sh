@@ -175,7 +175,172 @@ EOF
     printf "%s\n" "$value"
 }
 
+build_ios_test()
+{
+    # Expects the working directory to be the directory where to put .xcodeproj.
 
+    # Expects for APP and TEST_APP to be set, and for TEST_APP to be already
+    # filled with XCTestCases.
+
+    ## Initialize app directory
+    cp -r "../ios-test-template/App" "$APP"
+    mv "$APP/App-Info.plist" "$APP/$APP-Info.plist"
+    mv "$APP/App-Prefix.pch" "$APP/$APP-Prefix.pch"
+
+    ## Gather all the sources in a Python-friendly format.
+    APP_TESTS_SOURCES=$(find "$TEST_APP" -type f | \
+        sed -E 's/^(.*)$/                "\1",/')
+
+    ## Copy core framework to project directory.
+    CORE_FRAMEWORK="TightdbCore.framework"
+    CORE_FRAMEWORK_ORIGIN="../../tightdb/$CORE_FRAMEWORK"
+    rm -rf "$CORE_FRAMEWORK"
+    if [ ! -d "$CORE_FRAMEWORK_ORIGIN" ]; then
+        echo "\"$CORE_FRAMEWORK_ORIGIN\" missing."
+        echo "Did you forget to build-iphone and build-ios-core-framework in core?"
+        exit 1
+    fi
+    cp -r "$CORE_FRAMEWORK_ORIGIN" "$CORE_FRAMEWORK" || exit 1
+
+    ## Create a gyp file.
+    # To use xctest, the project must have an app and a test target. The
+    # app can be left fairly featureless, but enough must exist for us to
+    # trick Xcode into thinking it's testing the app.
+    cat >"$APP.gyp" <<EOF
+{
+    'xcode_settings': {
+        'ARCHS': [
+            '\$(ARCHS_STANDARD_INCLUDING_64_BIT)',
+        ],
+        'SDKROOT': 'iphoneos',
+        'TARGETED_DEVICE_FAMILY': '1,2', # iPhone/iPad
+        'FRAMEWORK_SEARCH_PATHS': [
+            '\$(SDKROOT)/Developer/Library/Frameworks',
+            '\$(PROJECT_DIR)',
+        ],
+        'CODE_SIGN_IDENTITY[sdk=iphoneos*]': 'iPhone Developer: Oleksandr(Alex Shturmov (CB4YV2W7W5)',
+    },
+    'target_defaults': {
+        'link_settings': {
+            'libraries': [
+                '\$(SDKROOT)/usr/lib/libc++.dylib',
+                '\$(DEVELOPER_DIR)/Library/Frameworks/XCTest.framework',
+                'TightdbCore.framework',
+            ],
+        },
+    },
+    'targets': [
+        {
+            'target_name': '$APP',
+            'type': 'executable',
+            'mac_bundle': 1,
+            'sources': [
+                './$APP/AppDelegate.h',
+                './$APP/AppDelegate.mm',
+                './$APP/main.m',
+$APP_TESTS_SOURCES
+            ],
+            'mac_bundle_resources': [
+                './$APP/Images.xcassets',
+                './$APP/en.lproj/InfoPlist.strings',
+                './$APP/$APP-Info.plist',
+                './$APP/$APP-Prefix.pch',
+            ],
+            'include_dirs': [
+                './$TEST_APP/**'
+            ],
+            'link_settings': {
+                'libraries': [
+                    '\$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
+                    '\$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
+                    '\$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
+                ],
+            },
+            'xcode_settings': {
+                'WRAPPER_EXTENSION': 'app',
+                'INFOPLIST_FILE': '$APP/$APP-Info.plist',
+                'GCC_PRECOMPILE_PREFIX_HEADER': 'YES',
+                'GCC_PREFIX_HEADER': '$APP/$APP-Prefix.pch',
+            }
+        },
+        {
+            'target_name': '$TEST_APP',
+
+            # see pylib/gyp/generator/xcode.py
+            'type': 'loadable_module',
+            'mac_xctest_bundle': 1,
+            'sources': [
+$APP_TESTS_SOURCES
+            ],
+            'dependencies': [
+                '$APP'
+            ],
+            'include_dirs': [
+                './$TEST_APP/**'
+            ],
+            'xcode_settings': {
+                'SDKROOT': 'iphoneos',
+                'BUNDLE_LOADER': '\$(BUILT_PRODUCTS_DIR)/$APP.app/$APP',
+                'TEST_HOST': '\$(BUNDLE_LOADER)',
+            },
+        },
+    ],
+}
+EOF
+    ## Run gyp, generating an .xcodeproj folder with a project.pbxproj file.
+    gyp --depth="." "$APP.gyp" || exit 1
+
+    ## Collect the main app id from the project.pbxproj file.
+    APP_ID=$(cat "$APP.xcodeproj/project.pbxproj" | tr -d '\n' | \
+        egrep -o "remoteGlobalIDString.*?remoteInfo = $APP;" | \
+        head -n 1 | sed 's/remoteGlobalIDString = \([A-F0-9]*\);.*/\1/')
+
+    ## Collect the test app id from the project.pbxproj file.
+    TEST_APP_ID=$(cat "$APP.xcodeproj/project.pbxproj" | tr -d '\n' | \
+        egrep -o "remoteGlobalIDString.*?remoteInfo = $TEST_APP;" | \
+        head -n 1 | sed 's/remoteGlobalIDString = \([A-F0-9]*\);.*/\1/')
+
+    ## Generate a scheme with a test action.
+    USER=$(whoami)
+    mkdir -p "$APP.xcodeproj/xcuserdata"
+    mkdir -p "$APP.xcodeproj/xcuserdata/$USER.xcuserdatad"
+    mkdir -p "$APP.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes"
+    cat >"$APP.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes/$APP.xcscheme" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   LastUpgradeVersion = "0500"
+   version = "1.3">
+   <TestAction
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      buildConfiguration = "Default">
+      <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "$TEST_APP_ID"
+               BuildableName = "$TEST_APP.xctest"
+               BlueprintName = "$TEST_APP"
+               ReferencedContainer = "container:$APP.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "$APP_ID"
+            BuildableName = "$APP.app"
+            BlueprintName = "$APP"
+            ReferencedContainer = "container:$APP.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
+   </TestAction>
+</Scheme>
+EOF
+    ## We are now ready to invoke the test action.
+}
 
 case "$MODE" in
 
@@ -611,12 +776,7 @@ EOF
         APP="iOSTestCoreApp"
         TEST_APP="${APP}Tests"
         
-        ## Initialize app directory        
-        cp -r "../ios-test-template/App" "$APP"
-        mv "$APP/App-Info.plist" "$APP/$APP-Info.plist"
-        mv "$APP/App-Prefix.pch" "$APP/$APP-Prefix.pch"
-
-        ## Initialize app test directory
+       ## Initialize app test directory
         function build_test_core_cp {
             mkdir -p "$TEST_APP/$2" || exit 1
             find "../../tightdb/$1/" -maxdepth 1 \
@@ -656,161 +816,7 @@ EOF
 
 @end
 EOF
-
-        ## Gather all the sources in a Python-friendly format.
-        APP_TESTS_SOURCES=$(find "$TEST_APP" -type f | \
-            sed -E 's/^(.*)$/                "\1",/')
-
-        ## Copy core framework to project directory.
-        CORE_FRAMEWORK="TightdbCore.framework"
-        CORE_FRAMEWORK_ORIGIN="../../tightdb/$CORE_FRAMEWORK"
-        rm -rf "$CORE_FRAMEWORK"
-        if [ ! -d "$CORE_FRAMEWORK_ORIGIN" ]; then
-            echo "\"$CORE_FRAMEWORK_ORIGIN\" missing."
-            echo "Did you forget to build-iphone and build-ios-core-framework in core?"
-            exit 1
-        fi
-        cp -r "$CORE_FRAMEWORK_ORIGIN" "$CORE_FRAMEWORK" || exit 1
-        CORE_FRAMEWORK_ORIGIN=
-
-        ## Create a gyp file.
-        # To use xctest, the project must have an app and a test target. The
-        # app can be left fairly featureless, but enough must exist for us to
-        # trick Xcode into thinking it's testing the app.
-        cat >"$APP.gyp" <<EOF
-{
-    'xcode_settings': {
-        'ARCHS': [
-            '\$(ARCHS_STANDARD_INCLUDING_64_BIT)',
-        ],
-        'SDKROOT': 'iphoneos',
-        'TARGETED_DEVICE_FAMILY': '1,2', # iPhone/iPad
-        'FRAMEWORK_SEARCH_PATHS': [
-            '\$(SDKROOT)/Developer/Library/Frameworks',
-            '\$(PROJECT_DIR)',
-        ],
-        'CODE_SIGN_IDENTITY[sdk=iphoneos*]': 'iPhone Developer: Oleksandr(Alex Shturmov (CB4YV2W7W5)',
-    },
-    'target_defaults': {
-        'link_settings': {
-            'libraries': [
-                '\$(SDKROOT)/usr/lib/libc++.dylib',
-                '\$(DEVELOPER_DIR)/Library/Frameworks/XCTest.framework',
-                'TightdbCore.framework',
-            ],
-        },
-    },
-    'targets': [
-        {
-            'target_name': '$APP',
-            'type': 'executable',
-            'mac_bundle': 1,
-            'sources': [
-                './$APP/AppDelegate.h',
-                './$APP/AppDelegate.mm',
-                './$APP/main.m',
-$APP_TESTS_SOURCES
-            ],
-            'mac_bundle_resources': [
-                './$APP/Images.xcassets',
-                './$APP/en.lproj/InfoPlist.strings',
-                './$APP/$APP-Info.plist',
-                './$APP/$APP-Prefix.pch',
-            ],
-            'include_dirs': [
-                './$TEST_APP/**'
-            ],
-            'link_settings': {
-                'libraries': [
-                    '\$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
-                    '\$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
-                    '\$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
-                ],
-            },
-            'xcode_settings': {
-                'WRAPPER_EXTENSION': 'app',
-                'INFOPLIST_FILE': '$APP/$APP-Info.plist',
-                'GCC_PRECOMPILE_PREFIX_HEADER': 'YES',
-                'GCC_PREFIX_HEADER': '$APP/$APP-Prefix.pch',
-            }
-        },
-        {
-            'target_name': '$TEST_APP',
-
-            # see pylib/gyp/generator/xcode.py
-            'type': 'loadable_module',
-            'mac_xctest_bundle': 1,
-            'sources': [
-$APP_TESTS_SOURCES
-            ],
-            'dependencies': [
-                '$APP'
-            ],
-            'include_dirs': [
-                './$TEST_APP/**'
-            ],
-            'xcode_settings': {
-                'SDKROOT': 'iphoneos',
-                'BUNDLE_LOADER': '\$(BUILT_PRODUCTS_DIR)/$APP.app/$APP',
-                'TEST_HOST': '\$(BUNDLE_LOADER)',
-            },
-        },
-    ],
-}
-EOF
-        ## Run gyp, generating an .xcodeproj folder with a project.pbxproj file.
-        gyp --depth="." "$APP.gyp" || exit 1
-
-        ## Collect the main app id from the project.pbxproj file.
-        APP_ID=$(cat "$APP.xcodeproj/project.pbxproj" | tr -d '\n' | \
-            egrep -o "remoteGlobalIDString.*?remoteInfo = $APP;" | \
-            head -n 1 | sed 's/remoteGlobalIDString = \([A-F0-9]*\);.*/\1/')
-
-        ## Collect the test app id from the project.pbxproj file.
-        TEST_APP_ID=$(cat "$APP.xcodeproj/project.pbxproj" | tr -d '\n' | \
-            egrep -o "remoteGlobalIDString.*?remoteInfo = $TEST_APP;" | \
-            head -n 1 | sed 's/remoteGlobalIDString = \([A-F0-9]*\);.*/\1/')
-
-        ## Generate a scheme with a test action.
-        USER=$(whoami)
-        mkdir -p "$APP.xcodeproj/xcuserdata"
-        mkdir -p "$APP.xcodeproj/xcuserdata/$USER.xcuserdatad"
-        mkdir -p "$APP.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes"
-        cat >"$APP.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes/$APP.xcscheme" <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<Scheme
-   LastUpgradeVersion = "0500"
-   version = "1.3">
-   <TestAction
-      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
-      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      buildConfiguration = "Default">
-      <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "$TEST_APP_ID"
-               BuildableName = "$TEST_APP.xctest"
-               BlueprintName = "$TEST_APP"
-               ReferencedContainer = "container:$APP.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-      </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "$APP_ID"
-            BuildableName = "$APP.app"
-            BlueprintName = "$APP"
-            ReferencedContainer = "container:$APP.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
-   </TestAction>
-</Scheme>
-EOF
-        ## We are now ready to invoke the test action.
+        build_ios_test
         echo "Done building"
         exit 0
         ;;
