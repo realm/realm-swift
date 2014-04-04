@@ -310,7 +310,7 @@ CATEGORIES:
   #      DESCR  : *g_typed_table_lookup_parm1_descr
   #    RETURN:
   #      TYPES  : size_t
-  #      DESCR  : "The row index or <code>TBD</code> (equal to <code>size_t(-1)</code>) if there is no match."
+  #      DESCR  : "The row index or <code>NSNotFound</code> if there is no match."
   #    EXAMPLES:
   #    - CODE   : ex_objc_typed_table_find_first_xxx
   #      DESCR  :
