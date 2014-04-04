@@ -301,5 +301,32 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     STAssertEquals(v.rowCount, (NSUInteger)1,@"one match");
 }
 
+-(void) testQueryEnumeratorNoCondition
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"first" type:TDBIntType];
+    for(int i=0; i<10; ++i)
+        [table addRow:@[[NSNumber numberWithInt:i]]];
+    TDBQuery *query = [table where];
+    int i = 0;
+    for(TDBRow *row in query) {
+        STAssertEquals((int64_t)i, [(NSNumber *)row[@"first"] longLongValue], @"Wrong value");
+        ++i;
+    }
+}
+
+-(void) testQueryEnumeratorWithCondition
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"first" type:TDBIntType];
+    for(int i=0; i<10; ++i)
+        [table addRow:@[[NSNumber numberWithInt:i]]];
+    TDBQuery *query = [[table where] intIsGreaterThan:-1 inColumnWithIndex:0];
+    int i = 0;
+    for(TDBRow *row in query) {
+        STAssertEquals((int64_t)i, [(NSNumber *)row[@"first"] longLongValue], @"Wrong value");
+        ++i;
+    }
+}
 
 @end
