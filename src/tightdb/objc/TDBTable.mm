@@ -26,6 +26,8 @@
 #include <tightdb/table_view.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
+#include "support.h"
+
 #import <tightdb/objc/TDBTable.h>
 #import <tightdb/objc/TDBTable_noinst.h>
 #import <tightdb/objc/TDBView.h>
@@ -54,13 +56,36 @@ using namespace std;
 
 
 
--(id)init
+-(instancetype)init
 {
     self = [super init];
     if (self) {
         m_read_only = NO;
         m_table = tightdb::Table::create(); // FIXME: May throw
     }
+    return self;
+}
+
+-(instancetype)initWithColumns:(NSArray *)columns
+{
+    self = [super init];
+    if (!self)
+        return nil;
+
+    m_read_only = NO;
+    m_table = tightdb::Table::create(); // FIXME: May throw
+
+    if (!set_columns(m_table, columns)) {
+        m_table.reset();
+
+        // Parsing the schema failed
+        //TODO: More detailed error msg in exception
+        NSException* exception = [NSException exceptionWithName:@"tightdb:invalid_columns"
+                                                         reason:@"The supplied list of columns was invalid"
+                                                       userInfo:[NSMutableDictionary dictionary]];
+        [exception raise];
+    }
+
     return self;
 }
 
@@ -565,7 +590,7 @@ using namespace std;
 -(void)TDB_setDate:(NSDate *)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
-        m_table->set_datetime(col_ndx, row_ndx, (size_t)[value timeIntervalSince1970]);,
+       m_table->set_datetime(col_ndx, row_ndx, tightdb::DateTime((time_t)[value timeIntervalSince1970]));,
        TDBDateType);
 }
 
@@ -875,6 +900,13 @@ using namespace std;
         return m_table->add_column(tightdb::DataType(type), ObjcStringAccessor(name));,
         0);
 }
+
+-(void)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString *)newName
+{
+    TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colIndex);
+    m_table->rename_column(colIndex, ObjcStringAccessor(newName));
+}
+
 
 -(void)removeColumnWithIndex:(NSUInteger)columnIndex
 {

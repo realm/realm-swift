@@ -20,7 +20,7 @@
 
 #import <Foundation/Foundation.h>
 
-#include <tightdb/objc/TDBType.h>
+#import "TDBViewProtocol.h"
 
 @class TDBView;
 @class TDBQuery;
@@ -29,7 +29,7 @@
 
 /****************	  TDBTable		****************/
 
-@interface TDBTable: NSObject <NSFastEnumeration>
+@interface TDBTable: NSObject <TDBView,NSFastEnumeration>
 
 @property (nonatomic, readonly) NSUInteger rowCount;
 @property (nonatomic, readonly) NSUInteger columnCount;
@@ -37,9 +37,11 @@
 
 // Initializers for standalone tables
 -(instancetype)init;
+-(instancetype)initWithColumns:(NSArray *)columns;
 
 // Working with columns
 -(NSUInteger)addColumnWithName:(NSString *)name type:(TDBType)type;
+-(void)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString *)newName;
 -(void)removeColumnWithIndex:(NSUInteger)colIndex;
 
 -(NSString *)nameOfColumnWithIndex:(NSUInteger)colIndex;
@@ -47,11 +49,11 @@
 -(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
 // Getting and setting individual rows (uses object subscripting)
--(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
 -(TDBRow *)lastRow;
 -(TDBRow *)firstRow;
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
+-(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 
 /**
  * Adds a row at the end of the table.

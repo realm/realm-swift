@@ -18,8 +18,6 @@
  *
  **************************************************************************/
 
-#import <Foundation/Foundation.h>
+#import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/TDBRowFast.h>
 
-@interface TDBQuery (noinst)
--(tightdb::Query&)getNativeQuery;
-@end

@@ -94,7 +94,7 @@ void tableFunc() {
     // @@Example: advanced_search @@
     // Create query (current employees between 20 and 30 years old)
     PeopleTableQuery *q = [[[people where].Hired columnIsEqualTo:YES]
-                                           .Age   columnIsBetween:20 and_:30];
+                                           .Age   columnIsBetween:20 :30];
 
     // Get number of matching entries
     NSUInteger cnt3 = [q countRows];                     // =&gt; 2

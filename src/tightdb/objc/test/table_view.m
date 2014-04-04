@@ -20,7 +20,7 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-#import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/TightdbFast.h>
 
 @interface table_view : SenTestCase
 
@@ -78,19 +78,19 @@
     TDBQuery *q = [t where];
     TDBView *v = [q findAllRows];
     
-    STAssertTrue([v columnTypeOfColumn:boolCol]      == TDBBoolType, @"Column types matches");
-    STAssertTrue([v columnTypeOfColumn:binaryCol]    == TDBBinaryType, @"Column types matches");
-    STAssertTrue([v columnTypeOfColumn:dateCol]      == TDBDateType, @"Column types matches");
-    STAssertTrue([v columnTypeOfColumn:doubleCol]    == TDBDoubleType, @"Column types matches");
-    STAssertTrue([v columnTypeOfColumn:floatCol]     == TDBFloatType, @"Column types matches");
-    STAssertTrue([v columnTypeOfColumn:intCol]       == TDBIntType, @"Column types matches");
-    STAssertTrue([v columnTypeOfColumn:mixedCol]     == TDBMixedType, @"Column types matches");
-    STAssertTrue([v columnTypeOfColumn:stringCol]    == TDBStringType, @"Column types matches");
-    STAssertTrue([v columnTypeOfColumn:tableCol]     == TDBTableType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:boolCol]      == TDBBoolType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:binaryCol]    == TDBBinaryType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:dateCol]      == TDBDateType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:doubleCol]    == TDBDoubleType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:floatCol]     == TDBFloatType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:intCol]       == TDBIntType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:mixedCol]     == TDBMixedType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:stringCol]    == TDBStringType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:tableCol]     == TDBTableType, @"Column types matches");
     
-    STAssertThrows([v columnTypeOfColumn:[v columnCount] + 1], @"Out of bounds");
-    STAssertThrows([v columnTypeOfColumn:100], @"Out of bounds");
-    STAssertThrows([v columnTypeOfColumn:-1], @"Out of bounds");
+    STAssertThrows([v columnTypeOfColumnWithIndex:[v columnCount] + 1], @"Out of bounds");
+    STAssertThrows([v columnTypeOfColumnWithIndex:100], @"Out of bounds");
+    STAssertThrows([v columnTypeOfColumnWithIndex:-1], @"Out of bounds");
 }
 
 - (void)testSortOnViewIntColumn
