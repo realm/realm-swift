@@ -5,8 +5,8 @@ int main()
     @autoreleasepool {
         TDBTable* table = [[TDBTable alloc] init];
 
-        [table addColumnWithName:@"first" andType:TDBIntType];
-        [table addColumnWithName:@"second" andType:TDBIntType];
+        [table addColumnWithName:@"first" type:TDBIntType];
+        [table addColumnWithName:@"second" type:TDBIntType];
 
         [table addRow:@[@1, @2]];
 

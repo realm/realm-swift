@@ -18,15 +18,50 @@ The Objective-C API has been updated and your code will break!
 
 * `???`
 
+-------------
+
+### Internals:
+
+* `???`
+
+
 =============================================================
-0.5.0 Release notes (yyyy—MM-dd)
+0.6.0 Release notes (yyyy—MM-dd)
 Objective-C
 -----------
-The Objective-C API has been updated and your code will break!
+Description......
 
 ### Bugfixes:
 
-* None.
+* none.
+
+### API breaking changes:
+
+* none.
+
+### Enhancements:
+* `renameColumnWithIndex:to:` has been added to `TDBTable`.
+* `dateIsBetween::`, `doubleIsBetween::`, `floatIsBetween::` and `intIsBetween::`
+   have been added to `TDBQuery`.
+* Column names can begin with non-capital letters too. The generated `addX`
+  selector can look odd. For example, a table with one column with name `age`,
+  appending a new row will look like `[table addage:7]`.
+* Mixed typed values are better validated when rows are added, inserted, 
+  or modified as object literals.
+
+
+=============================================================
+0.5.0 Release notes (2014-04-02)
+Objective-C
+-----------
+The Objective-C API has been updated and your code will break!
+Of notable changes a fast interface has been added. 
+This interface includes specific methods to get and set values into Tightdb.
+To use these methods import <Tightdb/TightdbFast.h>.
+
+### Bugfixes:
+
+* Fixed bug in 64 bit iOS when inserting BOOL as NSNumber.
 
 ### API breaking changes:
 
@@ -35,10 +70,15 @@ The Objective-C API has been updated and your code will break!
 * `columnTypeOfColumn:` renamed to `columnTypeOfColumnWithIndex` in `TDBTable`.
 * `columnNameOfColumn:` renamed to `nameOfColumnWithIndex:` in `TDBTable`.
 * `addColumnWithName:andType:` renamed to `addColumnWithName:type:` in `TDBDescriptor`.
-
+* Fast getters and setters moved from `TDBRow.h` to `TDBRowFast.h`.
 
 ### Enhancements:
-* 
+
+### Enhancements:
+* Added `minDateInColumnWithIndex` and `maxDateInColumnWithIndex` to `TDBQuery`.
+* Transactions can now be started directly on named tables.
+* You can create dynamic tables with initial schema.
+* `TDBTable` and `TDBView` now have a shared protocol so they can easier be used interchangeably.
 
 
 =============================================================

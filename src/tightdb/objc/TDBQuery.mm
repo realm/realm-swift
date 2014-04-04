@@ -92,8 +92,8 @@ using namespace std;
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState*)state objects:(id __unsafe_unretained*)stackbuf count:(NSUInteger)len
 {
     (void)len;
-    if(state->state == 0)
-    {
+    
+    if (state->state == 0) {
         state->state = [self getFastEnumStart];
         state->mutationsPtr = (unsigned long*)objc_unretainedPointer(self);
         TDBRow* tmp = [self getRow:state->state];
@@ -173,16 +173,19 @@ using namespace std;
     return m_query->minimum_int(col_ndx);
 }
 
-
 -(float)minFloatInColumnWithIndex:(NSUInteger)col_ndx
 {
     return m_query->minimum_float(col_ndx);
 }
 
-
 -(double)minDoubleInColumnWithIndex:(NSUInteger)col_ndx
 {
     return m_query->minimum_double(col_ndx);
+}
+
+-(NSDate *)minDateInColumnWithIndex:(NSUInteger)col_ndx
+{
+    return [NSDate dateWithTimeIntervalSince1970: m_query->minimum_int(col_ndx)];
 }
 
 
@@ -196,10 +199,14 @@ using namespace std;
     return m_query->maximum_float(col_ndx);
 }
 
-
 -(double)maxDoubleInColumnWithIndex:(NSUInteger)col_ndx
 {
     return m_query->maximum_double(col_ndx);
+}
+
+-(NSDate *)maxDateInColumnWithIndex:(NSUInteger)col_ndx
+{
+    return [NSDate dateWithTimeIntervalSince1970: m_query->maximum_int(col_ndx)];
 }
 
 
@@ -347,6 +354,32 @@ using namespace std;
 -(TDBQuery*)binaryIsNotEqualTo:(NSData*)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->not_equal(colIndex, value.tdbBinaryData);
+    return self;
+}
+
+// Between
+
+-(TDBQuery*)dateIsBetween:(NSDate *)lower :(NSDate *)upper inColumnWithIndex:(NSUInteger)colIndex
+{
+    m_query->between_datetime(colIndex, lower.timeIntervalSince1970, upper.timeIntervalSince1970);
+    return self;
+}
+
+-(TDBQuery*)intIsBetween:(int64_t)lower :(int64_t)upper inColumnWithIndex:(NSUInteger)colIndex
+{
+    m_query->between(colIndex, lower, upper);
+    return self;
+}
+
+-(TDBQuery*)floatIsBetween:(float)lower :(float)upper inColumnWithIndex:(NSUInteger)colIndex
+{
+    m_query->between(colIndex, lower, upper);
+    return self;
+}
+
+-(TDBQuery*)doubleIsBetween:(double)lower :(double)upper inColumnWithIndex:(NSUInteger)colIndex
+{
+    m_query->between(colIndex, lower, upper);
     return self;
 }
 
@@ -542,7 +575,7 @@ using namespace std;
     return _query;
 }
 
--(TDBQuery*)columnIsBetween:(int64_t)from and_:(int64_t)to
+-(TDBQuery*)columnIsBetween:(int64_t)from :(int64_t)to
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
         [_query getNativeQuery].between(_column_ndx, from, to);,
@@ -621,7 +654,7 @@ using namespace std;
     return _query;
 }
 
--(TDBQuery*)columnIsBetween:(float)from and_:(float)to
+-(TDBQuery*)columnIsBetween:(float)from :(float)to
 {
     [_query getNativeQuery].between(_column_ndx, from, to);
     return _query;
@@ -697,7 +730,7 @@ using namespace std;
     return _query;
 }
 
--(TDBQuery*)columnIsBetween:(double)from and_:(double)to
+-(TDBQuery*)columnIsBetween:(double)from :(double)to
 {
     [_query getNativeQuery].between(_column_ndx, from, to);
     return _query;
@@ -876,7 +909,7 @@ using namespace std;
     [_query getNativeQuery].less_equal_datetime(_column_ndx, [value timeIntervalSince1970]);
     return _query;
 }
--(TDBQuery*)columnIsBetween:(NSDate *)from and_:(NSDate *)to
+-(TDBQuery*)columnIsBetween:(NSDate *)from :(NSDate *)to
 {
     [_query getNativeQuery].between_datetime(_column_ndx, [from timeIntervalSince1970], [to timeIntervalSince1970]);
     return _query;
