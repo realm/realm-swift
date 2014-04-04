@@ -604,21 +604,24 @@ EOF
 
     "build-ios-test-core")
         ## Setup directories
+        rm -rf ios-test-core || exit 1
+        mkdir ios-test-core || exit 1
         cd ios-test-core
 
-        DIR="iOSTestCoreAppTests"
+        APP="iOSTestCoreApp"
+        TEST_APP="${APP}Tests"
         
-        mkdir -p "$DIR" || exit 1
-        rm -rf "$DIR/"* || exit 1
-        rm -rf "iOSTestCoreApp.xcodeproj"
-        rm -f "iOSTestCoreApp.gyp"
+        ## Initialize app directory        
+        cp -r "../ios-test-template/App" "$APP"
+        mv "$APP/App-Info.plist" "$APP/$APP-Info.plist"
+        mv "$APP/App-Prefix.pch" "$APP/$APP-Prefix.pch"
 
-        ## Copy sources and unit tests
+        ## Initialize app test directory
         function build_test_core_cp {
-            mkdir -p "$DIR/$2" || exit 1
+            mkdir -p "$TEST_APP/$2" || exit 1
             find "../../tightdb/$1/" -maxdepth 1 \
                 -type f -iregex "^.*\.[ch]\(pp\)\{0,1\}$" \
-                -exec cp {} "$DIR/$2/" \; || exit 1
+                -exec cp {} "$TEST_APP/$2/" \; || exit 1
         }
 
         build_test_core_cp test
@@ -626,24 +629,22 @@ EOF
         build_test_core_cp test/large_tests large_tests
 
         ## Remove breaking files (containing main or unportable code).
-        rm "$DIR/main.cpp"
+        rm "$TEST_APP/main.cpp"
 
         ## Replace all dynamic includes with static includes
-        find $DIR \
-            -type f -iregex "^.*\.[ch]\(pp\)\{0,1\}$" \
-            -exec sed -i '' \
-                -e 's/<tightdb\(.*\)>/<TightdbCore\/tightdb\1>/g' {} \; || exit 1
+        find "$TEST_APP" -type f -exec sed -i '' \
+            -e 's/<tightdb\(.*\)>/<TightdbCore\/tightdb\1>/g' {} \; || exit 1
 
         ## Create an XCTestCase
-        cat >"$DIR/iOSTestCoreAppTests.mm" <<EOF
+        cat >"$TEST_APP/$TEST_APP.mm" <<EOF
 #import <XCTest/XCTest.h>
 #include "test_all.hpp"
 
-@interface iOSTestCoreAppTests : XCTestCase
+@interface $TEST_APP : XCTestCase
 
 @end
 
-@implementation iOSTestCoreAppTests
+@implementation $TEST_APP
 
 -(void)testRunTests
 {
@@ -657,7 +658,7 @@ EOF
 EOF
 
         ## Gather all the sources in a Python-friendly format.
-        APP_TESTS_SOURCES=$(find iOSTestCoreAppTests -type f | \
+        APP_TESTS_SOURCES=$(find "$TEST_APP" -type f | \
             sed -E 's/^(.*)$/                "\1",/')
 
         ## Copy core framework to project directory.
@@ -676,7 +677,7 @@ EOF
         # To use xctest, the project must have an app and a test target. The
         # app can be left fairly featureless, but enough must exist for us to
         # trick Xcode into thinking it's testing the app.
-        cat >"iOSTestCoreApp.gyp" <<EOF
+        cat >"$APP.gyp" <<EOF
 {
     'xcode_settings': {
         'ARCHS': [
@@ -701,23 +702,23 @@ EOF
     },
     'targets': [
         {
-            'target_name': 'iOSTestCoreApp',
+            'target_name': '$APP',
             'type': 'executable',
             'mac_bundle': 1,
             'sources': [
-                './iOSTestCoreApp/AppDelegate.h',
-                './iOSTestCoreApp/AppDelegate.mm',
-                './iOSTestCoreApp/main.m',
+                './$APP/AppDelegate.h',
+                './$APP/AppDelegate.mm',
+                './$APP/main.m',
 $APP_TESTS_SOURCES
             ],
             'mac_bundle_resources': [
-                './iOSTestCoreApp/Images.xcassets',
-                './iOSTestCoreApp/en.lproj/InfoPlist.strings',
-                './iOSTestCoreApp/iOSTestCoreApp-Info.plist',
-                './iOSTestCoreApp/iOSTestCoreApp-Prefix.pch',
+                './$APP/Images.xcassets',
+                './$APP/en.lproj/InfoPlist.strings',
+                './$APP/$APP-Info.plist',
+                './$APP/$APP-Prefix.pch',
             ],
             'include_dirs': [
-                './iOSTestCoreAppTests/**'
+                './$TEST_APP/**'
             ],
             'link_settings': {
                 'libraries': [
@@ -728,13 +729,13 @@ $APP_TESTS_SOURCES
             },
             'xcode_settings': {
                 'WRAPPER_EXTENSION': 'app',
-                'INFOPLIST_FILE': 'iOSTestCoreApp/iOSTestCoreApp-Info.plist',
+                'INFOPLIST_FILE': '$APP/$APP-Info.plist',
                 'GCC_PRECOMPILE_PREFIX_HEADER': 'YES',
-                'GCC_PREFIX_HEADER': 'iOSTestCoreApp/iOSTestCoreApp-Prefix.pch',
+                'GCC_PREFIX_HEADER': '$APP/$APP-Prefix.pch',
             }
         },
         {
-            'target_name': 'iOSTestCoreAppTests',
+            'target_name': '$TEST_APP',
 
             # see pylib/gyp/generator/xcode.py
             'type': 'loadable_module',
@@ -743,14 +744,14 @@ $APP_TESTS_SOURCES
 $APP_TESTS_SOURCES
             ],
             'dependencies': [
-                'iOSTestCoreApp'
+                '$APP'
             ],
             'include_dirs': [
-                './iOSTestCoreAppTests/**'
+                './$TEST_APP/**'
             ],
             'xcode_settings': {
                 'SDKROOT': 'iphoneos',
-                'BUNDLE_LOADER': '\$(BUILT_PRODUCTS_DIR)/iOSTestCoreApp.app/iOSTestCoreApp',
+                'BUNDLE_LOADER': '\$(BUILT_PRODUCTS_DIR)/$APP.app/$APP',
                 'TEST_HOST': '\$(BUNDLE_LOADER)',
             },
         },
@@ -758,24 +759,24 @@ $APP_TESTS_SOURCES
 }
 EOF
         ## Run gyp, generating an .xcodeproj folder with a project.pbxproj file.
-        gyp --depth="." "iOSTestCoreApp.gyp" || exit 1
+        gyp --depth="." "$APP.gyp" || exit 1
 
         ## Collect the main app id from the project.pbxproj file.
-        APP_ID=$(cat iOSTestCoreApp.xcodeproj/project.pbxproj | tr -d '\n' | \
-            egrep -o "remoteGlobalIDString.*?remoteInfo = iOSTestCoreApp;" | \
+        APP_ID=$(cat "$APP.xcodeproj/project.pbxproj" | tr -d '\n' | \
+            egrep -o "remoteGlobalIDString.*?remoteInfo = $APP;" | \
             head -n 1 | sed 's/remoteGlobalIDString = \([A-F0-9]*\);.*/\1/')
 
         ## Collect the test app id from the project.pbxproj file.
-        APP_TEST_ID=$(cat iOSTestCoreApp.xcodeproj/project.pbxproj | tr -d '\n' | \
-            egrep -o "remoteGlobalIDString.*?remoteInfo = iOSTestCoreAppTests;" | \
+        TEST_APP_ID=$(cat "$APP.xcodeproj/project.pbxproj" | tr -d '\n' | \
+            egrep -o "remoteGlobalIDString.*?remoteInfo = $TEST_APP;" | \
             head -n 1 | sed 's/remoteGlobalIDString = \([A-F0-9]*\);.*/\1/')
 
         ## Generate a scheme with a test action.
         USER=$(whoami)
-        mkdir -p "iOSTestCoreApp.xcodeproj/xcuserdata"
-        mkdir -p "iOSTestCoreApp.xcodeproj/xcuserdata/$USER.xcuserdatad"
-        mkdir -p "iOSTestCoreApp.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes"
-        cat >"iOSTestCoreApp.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes/iOSTestCoreApp.xcscheme" <<EOF
+        mkdir -p "$APP.xcodeproj/xcuserdata"
+        mkdir -p "$APP.xcodeproj/xcuserdata/$USER.xcuserdatad"
+        mkdir -p "$APP.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes"
+        cat >"$APP.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes/$APP.xcscheme" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "0500"
@@ -790,10 +791,10 @@ EOF
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "$APP_TEST_ID"
-               BuildableName = "iOSTestCoreAppTests.xctest"
-               BlueprintName = "iOSTestCoreAppTests"
-               ReferencedContainer = "container:iOSTestCoreApp.xcodeproj">
+               BlueprintIdentifier = "$TEST_APP_ID"
+               BuildableName = "$TEST_APP.xctest"
+               BlueprintName = "$TEST_APP"
+               ReferencedContainer = "container:$APP.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -801,9 +802,9 @@ EOF
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "$APP_ID"
-            BuildableName = "iOSTestCoreApp.app"
-            BlueprintName = "iOSTestCoreApp"
-            ReferencedContainer = "container:iOSTestCoreApp.xcodeproj">
+            BuildableName = "$APP.app"
+            BlueprintName = "$APP"
+            ReferencedContainer = "container:$APP.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
