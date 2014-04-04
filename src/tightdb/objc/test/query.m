@@ -262,7 +262,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     NSUInteger intCol = [table addColumnWithName:@"IntCol" type:TDBIntType];
     NSUInteger floatCol = [table addColumnWithName:@"FloatCol" type:TDBFloatType];
     NSUInteger doubleCol = [table addColumnWithName:@"DoubleCol" type:TDBDoubleType];
-    [table addColumnWithName:@"DateCol" type:TDBDateType];
+    NSUInteger dateCol = [table addColumnWithName:@"DateCol" type:TDBDateType];
     
     NSDate *date3 = [NSDate date];
     NSDate *date33 = [date3 dateByAddingTimeInterval:1];
@@ -271,6 +271,32 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [table addRow:@[@3, @3.3f, @3.3, date3]];
     [table addRow:@[@33, @33.33f, @33.33, date33]];
     [table addRow:@[@333, @333.333f, @333.333, date333]];
+    
+    // Using specific column type operations MIN
+    STAssertEquals([[table where] minIntInColumnWithIndex:intCol], (int64_t)3, nil);
+    STAssertEqualsWithAccuracy([[table where] minFloatInColumnWithIndex:floatCol], (float)3.3, 0.1, nil);
+    STAssertEqualsWithAccuracy([[table where] minDoubleInColumnWithIndex:doubleCol], (double)3.3, 0.1, nil);
+    STAssertEqualsWithAccuracy([[table where] minDateInColumnWithIndex:dateCol].timeIntervalSince1970, date3.timeIntervalSince1970, 0.999, nil);
+    
+    // Using generic column type operations MIN
+    STAssertEqualObjects([[table where] minInColumnWithIndex:intCol], @3, nil);
+    STAssertEquals([[[table where] minInColumnWithIndex:floatCol] floatValue], (float)3.3, nil);
+    STAssertEquals([[[table where] minInColumnWithIndex:doubleCol] doubleValue], (double)3.3, nil);
+    NSDate *minOutDate = [[table where] minInColumnWithIndex:dateCol];
+    STAssertEqualsWithAccuracy(minOutDate.timeIntervalSince1970, date3.timeIntervalSince1970, 0.999, nil);
+    
+    // Using specific column type operations MAX
+    STAssertEquals([[table where] maxIntInColumnWithIndex:intCol], (int64_t)333, nil);
+    STAssertEqualsWithAccuracy([[table where] maxFloatInColumnWithIndex:floatCol], (float)333.333, 0.1, nil);
+    STAssertEqualsWithAccuracy([[table where] maxDoubleInColumnWithIndex:doubleCol], (double)333.333, 0.1, nil);
+    STAssertEqualsWithAccuracy([[table where] maxDateInColumnWithIndex:dateCol].timeIntervalSince1970, date333.timeIntervalSince1970, 0.999, nil);
+    
+    // Using generic column type operations MAX
+    STAssertEqualObjects([[table where] maxInColumnWithIndex:intCol], @333, nil);
+    STAssertEquals([[[table where] maxInColumnWithIndex:floatCol] floatValue], (float)333.333, nil);
+    STAssertEquals([[[table where] maxInColumnWithIndex:doubleCol] doubleValue], (double)333.333, nil);
+    NSDate *maxOutDate = [[table where] maxInColumnWithIndex:dateCol];
+    STAssertEqualsWithAccuracy(maxOutDate.timeIntervalSince1970, date333.timeIntervalSince1970, 0.999, nil);
     
     // Using specific column type operations SUM
     STAssertEquals([[table where] sumIntColumnWithIndex:intCol], (int64_t)369, nil);
