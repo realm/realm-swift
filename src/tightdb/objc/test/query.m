@@ -6,6 +6,7 @@
 #import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/TDBQueryFast.h>
 
 TIGHTDB_TABLE_1(TestQuerySub,
                 Age,  Int)
@@ -249,7 +250,37 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     STAssertEqualsWithAccuracy([[[table where] maxDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], [date2 timeIntervalSince1970], 0.99, @"MaxDateInColumn");
     
     /// TODO: Tests missing....
+    
+    
 
+}
+
+- (void)testMathOperations
+{
+    TDBTable *table = [[TDBTable alloc]init];
+    
+    NSUInteger intCol = [table addColumnWithName:@"IntCol" type:TDBIntType];
+    NSUInteger floatCol = [table addColumnWithName:@"FloatCol" type:TDBFloatType];
+    NSUInteger doubleCol = [table addColumnWithName:@"DoubleCol" type:TDBDoubleType];
+    [table addColumnWithName:@"DateCol" type:TDBDateType];
+    
+    NSDate *date3 = [NSDate date];
+    NSDate *date33 = [date3 dateByAddingTimeInterval:1];
+    NSDate *date333 = [date33 dateByAddingTimeInterval:1];
+    
+    [table addRow:@[@3, @3.3f, @3.3, date3]];
+    [table addRow:@[@33, @33.33f, @33.33, date33]];
+    [table addRow:@[@333, @333.333f, @333.333, date333]];
+    
+    // Using specific column type operations AVG
+    STAssertEquals([[table where] avgIntColumnWithIndex:intCol], (double)123, nil);
+    STAssertEqualsWithAccuracy([[table where] avgFloatColumnWithIndex:floatCol], (double)123.321, 0.1, nil);
+    STAssertEqualsWithAccuracy([[table where] avgDoubleColumnWithIndex:doubleCol], (double)123.321, 0.1, nil);
+    
+    // Using generic column type operations AVG
+    STAssertEqualObjects([[table where] avgColumnWithIndex:intCol], @123, nil);
+    STAssertEqualsWithAccuracy([[[table where] avgColumnWithIndex:floatCol] doubleValue], (double)123.321, 0.1, nil);
+    STAssertEqualsWithAccuracy([[[table where] avgColumnWithIndex:doubleCol] doubleValue], (double)123.321, 0.1, nil);
 }
 
 
