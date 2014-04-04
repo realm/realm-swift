@@ -81,12 +81,12 @@ using namespace std;
 
 -(long)getFastEnumStart
 {
-    return [self findFirstRowFromIndex:0];
+    return [self indexOfFirstMatchingRowFromIndex:0];
 }
 
 -(long)incrementFastEnum:(long)ndx
 {
-    return [self findFirstRowFromIndex:ndx];
+    return [self indexOfFirstMatchingRowFromIndex:ndx];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState*)state objects:(id __unsafe_unretained*)stackbuf count:(NSUInteger)len
@@ -252,12 +252,12 @@ using namespace std;
     return [TDBView viewWithTable:m_table andNativeView:view];
 }
 
--(NSUInteger)findFirstRow
+-(NSUInteger)indexOfFirstMatchingRow
 {
     return m_query->find(0);
 }
 
--(NSUInteger)findFirstRowFromIndex:(NSUInteger)rowIndex
+-(NSUInteger)indexOfFirstMatchingRowFromIndex:(NSUInteger)rowIndex
 {
     return m_query->find(rowIndex);
 }
