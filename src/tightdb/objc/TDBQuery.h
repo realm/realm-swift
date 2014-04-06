@@ -38,15 +38,21 @@
 -(NSUInteger)countRows;
 -(NSUInteger)removeRows;
 
--(int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex;
--(double)sumFloatColumnWithIndex:(NSUInteger)colIndex;
--(double)sumDoubleColumnWithIndex:(NSUInteger)colIndex;
--(int64_t)maxIntInColumnWithIndex:(NSUInteger)colIndex;
--(float)maxFloatInColumnWithIndex:(NSUInteger)colIndex;
--(double)maxDoubleInColumnWithIndex:(NSUInteger)colIndex;
+// Aggregates
 -(int64_t)minIntInColumnWithIndex:(NSUInteger)colIndex;
 -(float)minFloatInColumnWithIndex:(NSUInteger)colIndex;
 -(double)minDoubleInColumnWithIndex:(NSUInteger)colIndex;
+-(NSDate *)minDateInColumnWithIndex:(NSUInteger)colIndex;
+
+-(int64_t)maxIntInColumnWithIndex:(NSUInteger)colIndex;
+-(float)maxFloatInColumnWithIndex:(NSUInteger)colIndex;
+-(double)maxDoubleInColumnWithIndex:(NSUInteger)colIndex;
+-(NSDate *)maxDateInColumnWithIndex:(NSUInteger)colIndex;
+
+-(int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex;
+-(double)sumFloatColumnWithIndex:(NSUInteger)colIndex;
+-(double)sumDoubleColumnWithIndex:(NSUInteger)colIndex;
+
 -(double)avgIntColumnWithIndex:(NSUInteger)colIndex;
 -(double)avgFloatColumnWithIndex:(NSUInteger)colIndex;
 -(double)avgDoubleColumnWithIndex:(NSUInteger)colIndex;
@@ -74,6 +80,11 @@
 -(TDBQuery *)stringIsNotCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)dateIsNotEqualTo:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)binaryIsNotEqualTo:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
+
+-(TDBQuery *)dateIsBetween:(NSDate *)lower :(NSDate *)upper inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBQuery *)intIsBetween:(int64_t)lower :(int64_t)upper inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBQuery *)floatIsBetween:(float)lower :(float)upper inColumnWithIndex:(NSUInteger)colIndex;
+-(TDBQuery *)doubleIsBetween:(double)lower :(double)upper inColumnWithIndex:(NSUInteger)colIndex;
 
 -(TDBQuery *)dateIsGreaterThan:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)intIsGreaterThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
@@ -118,7 +129,7 @@
 -(TDBQuery *)columnIsGreaterThanOrEqualTo:(int64_t)value;
 -(TDBQuery *)columnIsLessThan:(int64_t)value;
 -(TDBQuery *)columnIsLessThanOrEqualTo:(int64_t)value;
--(TDBQuery *)columnIsBetween:(int64_t)from and_:(int64_t)to;
+-(TDBQuery *)columnIsBetween:(int64_t)lower :(int64_t)upper;
 -(int64_t)min;
 -(int64_t)max;
 -(int64_t)sum;
@@ -134,7 +145,7 @@
 -(TDBQuery *)columnIsGreaterThanOrEqualTo:(float)value;
 -(TDBQuery *)columnIsLessThan:(float)value;
 -(TDBQuery *)columnIsLessThanOrEqualTo:(float)value;
--(TDBQuery *)columnIsBetween:(float)from and_:(float)to;
+-(TDBQuery *)columnIsBetween:(float)lower :(float)upper;
 -(float)min;
 -(float)max;
 -(double)sum;
@@ -150,7 +161,7 @@
 -(TDBQuery *)columnIsGreaterThanOrEqualTo:(double)value;
 -(TDBQuery *)columnIsLessThan:(double)value;
 -(TDBQuery *)columnIsLessThanOrEqualTo:(double)value;
--(TDBQuery *)columnIsBetween:(double)from and_:(double)to;
+-(TDBQuery *)columnIsBetween:(double)lower :(double)upper;
 -(double)min;
 -(double)max;
 -(double)sum;
@@ -191,7 +202,7 @@
 -(TDBQuery *)columnIsGreaterThanOrEqualTo:(NSDate *)value;
 -(TDBQuery *)columnIsLessThan:(NSDate *)value;
 -(TDBQuery *)columnIsLessThanOrEqualTo:(NSDate *)value;
--(TDBQuery *)columnIsBetween:(NSDate *)from and_:(NSDate *)to;
+-(TDBQuery *)columnIsBetween:(NSDate *)lower :(NSDate *)upper;
 @end
 
 

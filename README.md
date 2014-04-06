@@ -151,10 +151,3 @@ set the environment variable `CC` before calling `sh build.sh build`,
 as in the following example:
 
     CC=clang sh build.sh build
-
-
-
-Notes
------
-
-Naming of database fields: Must start with capital letter.

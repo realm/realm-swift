@@ -8,7 +8,7 @@
  * TIGHTDB_TABLE_* in the documentation. */
 
 TIGHTDB_TABLE_2(PersonTable,    // Name of Table
-                name, String,   // First column with Strings
+                Name, String,   // First column with Strings
                 Age, Int)       // Second column with Integers
 
 void ex_objc_table_typed_intro_with_many_comments()
@@ -28,12 +28,12 @@ void ex_objc_table_typed_intro_with_many_comments()
     
     /* Creates a query expression to filter on age. Note that the
      * query is defined but not executed here. */
-    PersonTableQuery *query = [[table where].Age columnIsBetween:13 and_:19];
+    PersonTableQuery *query = [[table where].Age columnIsBetween:13 :19];
     
     /* Accesses query result directly on the query object.
      * The query is only executed once and iterated lazily */
     for (PersonTableRow *row in query)
-        NSLog(@"Name: %@", [row name]);
+        NSLog(@"Name: %@", row.Name);
     
     /* To avoid repeating the same query, the result may be stored in
      * a table view for multiple accesses. The following code executes the
@@ -44,9 +44,9 @@ void ex_objc_table_typed_intro_with_many_comments()
     /* Iterates over all rows in the result (view) 2 times based on the single
      * query executed above. */
     for (PersonTableRow *row in tableView)
-        NSLog(@"Name: %@", [row name]);
+        NSLog(@"Name: %@", row.Name);
     
     for (PersonTableRow *row in tableView)
-        NSLog(@"Name: %lld", [row Age]);
+        NSLog(@"Name: %lld", row.Age);
 }
 /* @@EndExample@@ */

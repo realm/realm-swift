@@ -372,7 +372,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     [[[table where].IntCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].IntCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
     [[[table where].IntCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].IntCol columnIsBetween:0 and_:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].IntCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
 
     [[[table where].FloatCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].FloatCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
@@ -380,7 +380,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     [[[table where].FloatCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].FloatCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
     [[[table where].FloatCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].FloatCol columnIsBetween:0 and_:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].FloatCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
 
     [[[table where].DoubleCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DoubleCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
@@ -388,7 +388,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     [[[table where].DoubleCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DoubleCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DoubleCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DoubleCol columnIsBetween:0 and_:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].DoubleCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
 
     [[[table where].StringCol columnIsEqualTo:@""].BoolCol columnIsEqualTo:NO];
     [[[table where].StringCol columnIsEqualTo:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
@@ -409,7 +409,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     TestQueryErrAllTypesView* view = [[[[table where].DateCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO] findAll];
     for (size_t i = 0; i < [view rowCount]; i++) {
-        NSLog(@"%zu: %c", i, [[view rowAtIndex:i] BoolCol]);
+        NSLog(@"%zu: %c", i, [view rowAtIndex:i].BoolCol);
     }
 
 
@@ -418,7 +418,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     [[[table where].DateCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DateCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
     [[[table where].DateCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DateCol columnIsBetween:0 and_:0].BoolCol columnIsEqualTo:NO];
+    [[[table where].DateCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
 
     // These are not yet implemented
     //    [[[table where].TableCol columnIsEqualTo:nil].BoolCol columnIsEqualTo:NO];
