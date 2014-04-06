@@ -164,16 +164,16 @@
 
 
 #define TIGHTDB_ROW_PROPERTY_DEF_SIMPLE(name, type) \
-@property TIGHTDB_TYPE_##type name; \
--(TIGHTDB_TYPE_##type)name; \
--(void)set##name:(TIGHTDB_TYPE_##type)value;
+@property (nonatomic, setter = TDB_set##name: , getter = TDB_##name) TIGHTDB_TYPE_##type name; \
+-(TIGHTDB_TYPE_##type)TDB_##name; \
+-(void)TDB_set##name:(TIGHTDB_TYPE_##type)value;
 
 #define TIGHTDB_ROW_PROPERTY_IMPL_SIMPLE(name, type) \
--(TIGHTDB_TYPE_##type)name \
+-(TIGHTDB_TYPE_##type)TDB_##name \
 { \
     return [_##name get##type]; \
 } \
--(void)set##name:(TIGHTDB_TYPE_##type)value \
+-(void)TDB_set##name:(TIGHTDB_TYPE_##type)value \
 { \
     [_##name set##type:value]; \
 }
@@ -233,7 +233,7 @@
 -(table##Query*)columnIsGreaterThanOrEqualTo:(int64_t)value; \
 -(table##Query*)columnIsLessThan:(int64_t)value; \
 -(table##Query*)columnIsLessThanOrEqualTo:(int64_t)value; \
--(table##Query*)columnIsBetween:(int64_t)from and_:(int64_t)to; \
+-(table##Query*)columnIsBetween:(int64_t)from :(int64_t)to; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Int(table, col_name) \
@@ -262,9 +262,9 @@
 { \
     return (table##Query*)[super columnIsLessThanOrEqualTo:value]; \
 } \
--(table##Query*)columnIsBetween:(int64_t)from and_:(int64_t)to \
+-(table##Query*)columnIsBetween:(int64_t)from :(int64_t)to \
 { \
-    return (table##Query*)[super columnIsBetween:from and_:to]; \
+    return (table##Query*)[super columnIsBetween:from :to]; \
 } \
 @end
 
@@ -279,7 +279,7 @@
 -(table##Query*)columnIsGreaterThanOrEqualTo:(float)value; \
 -(table##Query*)columnIsLessThan:(float)value; \
 -(table##Query*)columnIsLessThanOrEqualTo:(float)value; \
--(table##Query*)columnIsBetween:(float)from and_:(float)to; \
+-(table##Query*)columnIsBetween:(float)from :(float)to; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Float(table, col_name) \
@@ -308,9 +308,9 @@
 { \
     return (table##Query*)[super columnIsLessThanOrEqualTo:value]; \
 } \
--(table##Query*)columnIsBetween:(float)from and_:(float)to \
+-(table##Query*)columnIsBetween:(float)from :(float)to \
 { \
-    return (table##Query*)[super columnIsBetween:from and_:to]; \
+    return (table##Query*)[super columnIsBetween:from :to]; \
 } \
 @end
 
@@ -325,7 +325,7 @@
 -(table##Query*)columnIsGreaterThanOrEqualTo:(double)value; \
 -(table##Query*)columnIsLessThan:(double)value; \
 -(table##Query*)columnIsLessThanOrEqualTo:(double)value; \
--(table##Query*)columnIsBetween:(double)from and_:(double)to; \
+-(table##Query*)columnIsBetween:(double)from :(double)to; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Double(table, col_name) \
@@ -354,9 +354,9 @@
 { \
     return (table##Query*)[super columnIsLessThanOrEqualTo:value]; \
 } \
--(table##Query*)columnIsBetween:(double)from and_:(double)to \
+-(table##Query*)columnIsBetween:(double)from :(double)to \
 { \
-    return (table##Query*)[super columnIsBetween:from and_:to]; \
+    return (table##Query*)[super columnIsBetween:from :to]; \
 } \
 @end
 
@@ -468,7 +468,7 @@
 -(table##Query*)columnIsGreaterThanOrEqualTo:(NSDate *)value; \
 -(table##Query*)columnIsLessThan:(NSDate *)value; \
 -(table##Query*)columnIsLessThanOrEqualTo:(NSDate *)value; \
--(table##Query*)columnIsBetween:(NSDate *)from and_:(NSDate *)to; \
+-(table##Query*)columnIsBetween:(NSDate *)from :(NSDate *)to; \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Date(table, col_name) \
@@ -497,9 +497,9 @@
 { \
     return (table##Query*)[super columnIsLessThanOrEqualTo:value]; \
 } \
--(table##Query*)columnIsBetween:(NSDate *)from and_:(NSDate *)to \
+-(table##Query*)columnIsBetween:(NSDate *)from :(NSDate *)to \
 { \
-    return (table##Query*)[super columnIsBetween:from and_:to]; \
+    return (table##Query*)[super columnIsBetween:from :to]; \
 } \
 @end
 

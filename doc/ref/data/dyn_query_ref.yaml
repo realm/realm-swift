@@ -15,7 +15,7 @@
 
 
 ID         : class_dyn_query
-TITLE      : Query  (dynamic)
+TITLE      : TDBQuery  (dynamic)
 SUMMARY    : *g_dyn_query_intro_summary
 DESCR      : *g_dyn_query_intro_descr
 SEE        :
@@ -121,6 +121,39 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_notEquals
+
+  - g_dyn_query_between_integer:
+      NAME     : "intIsBetween::inColumnWithIndex:"
+  - g_dyn_query_between_float:
+      NAME     : "floatIsBetween::inColumnWithIndex:"
+  - g_dyn_query_between_double:
+      NAME     : "doubleIsBetween::inColumnWithIndex:"
+  - g_dyn_query_between_date:
+      NAME     : "dateIsbetween::inColumnWithIndex:"
+      TITLE    : "*IsBetween::inColumnWithIndex:"
+      SIGNATURE: |
+                 (TDBQuery *)dateIsBetween:(NSDate *)lower :(NSDate *)upper inColumnWithIndex:(NSUInteger)colIndex
+                 (TDBQuery *)intIsBetween:(int64_t)lower :(int64_t)upper inColumnWithIndex:(NSUInteger)colIndex
+                 (TDBQuery *)floatIsBetween:(float)lower :(float)upper inColumnWithIndex:(NSUInteger)colIndex
+                 (TDBQuery *)doubleIsBetween:(double)lower :(double)upper inColumnWithIndex:(NSUInteger)colIndex
+      SUMMARY  : *g_dyn_query_greaterThan_summary
+      DESCR    : *g_dyn_query_greaterThan_descr
+      PARAMS:
+      - NAME   : lower
+        TYPES  : [int64_t, float, double, time_t]
+        DESCR  : Lower bound (bound included).
+      - NAME   : upper
+        TYPES  : [int64_t, float, double, time_t]
+        DESCR  : Upper bound (bound included).
+      - NAME   : inColumnWithIndex
+        TYPES  : NSUInteger
+        DESCR  : *g_dyn_query_column_index_descr
+      RETURN:
+        TYPES  : TDBQuery *
+        DESCR  : *g_dyn_query_return_query_object_descr
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_objc_dyn_query_greaterThan        
 
   - g_dyn_query_greaterThan_integer:
       NAME     : "isGreaterThanInt:"
@@ -496,7 +529,6 @@ CATEGORIES :
   - g_dyn_query_maximum_float:
       NAME     : maxFloat
   - g_dyn_query_maximum_date:
-      TODO     : later
       NAME     : maxDate
   - g_dyn_query_maximum_int:
       NAME     : maxInt
@@ -507,19 +539,19 @@ CATEGORIES :
                   (int64_t)maxIntInColumnWithIndex:(NSUInteger)colIndex
                   (float)maxFloatInColumnWithIndex:(NSUInteger)colIndex
                   (double)maxDoubleInColumnWithIndex:(NSUInteger)colIndex
+                  (NSDate *)maxDateInColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
       - NAME   : colIndex
         DESCR  : Column index. The datatype of the column must match the function called.
         TYPES  : NSUInteger
       RETURN:
-        TYPES  : [int64_t, float, double, time_t]
+        TYPES  : [int64_t, float, double, NSDate*]
         DESCR  : *g_dyn_query_maximum_return_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_maximum
 
   - g_dyn_query_minimum_date:
-      TODO     : later
       NAME     : minDate
   - g_dyn_query_minimum_double:
       NAME     : minDouble
@@ -534,12 +566,13 @@ CATEGORIES :
                   (int64_t)minIntInColumnWithIndex:(NSUInteger)colIndex
                   (float)minFloatInColumnWithIndex:(NSUInteger)colIndex
                   (double)minDoubleInColumnWithIndex:(NSUInteger)colIndex
+                  (NSDate *)minDateInColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
       - NAME   : colIndex
         DESCR  : Column index. The datatype of the column must match the function called. E.g. <code>minFloat()</code> can only be used on columns which contains floats.
         TYPES  : NSUInteger
       RETURN:
-        TYPES  : [int64_t, float, double, time_t]
+        TYPES  : [int64_t, float, double, NSDate*]
         DESCR  : *g_dyn_query_minimum_return_descr
       EXAMPLES:
       - DESCR  :

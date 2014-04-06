@@ -9,7 +9,7 @@
 # MISSING where (only possible in typed tables)
 
 ID         : class_dyn_table
-TITLE      : Table (dynamic)
+TITLE      : TDBTable (dynamic)
 SUMMARY    : *g_dyn_table_intro_summary
 DESCR      :
 - TEXT     : *g_dyn_table_intro_descr_core
@@ -36,6 +36,18 @@ CATEGORIES :
         DESCR  : *g_dyn_table_size_summary
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_size
+        DESCR  :
+
+  - g_dyn_table_get_column_count:
+      NAME     : columnCount
+      SUMMARY  : *g_dyn_table_get_column_count_summary
+      DESCR    : *g_dyn_table_get_column_count_descr
+      SIGNATURE: "@property (nonatomic, readonly) NSUInteger columnCount"
+      RETURN:
+        TYPES  : NSUInteger
+        DESCR  : *g_dyn_table_get_column_count_return_descr
+      EXAMPLES:
+      - CODE   : ex_objc_dyn_table_get_column_count
         DESCR  :
 
   - g_dyn_table_is_valid:
@@ -114,15 +126,11 @@ CATEGORIES :
 
 - Columns:
   METHODS:
-  - g_dyn_table_add_column:
-      TODO     : later
-  - g_dyn_table_remove_column:
-      TODO     : later
   - g_dyn_table_rename_column:
       TODO     : later
 
   - g_dyn_table_add_column:
-      NAME     : "addColumnWithName:andType:"
+      NAME     : "addColumnWithName:type:"
       SUMMARY  : *g_dyn_table_add_column_summary
       DESCR    :
       - TEXT   : *g_dyn_table_add_column_descr
@@ -140,7 +148,7 @@ CATEGORIES :
                    <li><code>TDBDateType</code></li>
                    <li><code>TDBMixedType</code></li>
                  </ul>
-      SIGNATURE: (NSUInteger)addColumnWithName:(NSString *)name andType:(TDBType)type
+      SIGNATURE: (NSUInteger)addColumnWithName:(NSString *)name type:(TDBType)type
       PARAMS:
       - NAME   : name
         TYPES  : NSString *
@@ -154,24 +162,28 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_add_column
         DESCR  :
-
-  - g_dyn_table_get_column_count:
-      NAME     : columnCount
-      SUMMARY  : *g_dyn_table_get_column_count_summary
-      DESCR    : *g_dyn_table_get_column_count_descr
-      SIGNATURE: "@property (nonatomic, readonly) NSUInteger columnCount"
-      RETURN:
+  - g_dyn_table_remove_column:
+      NAME     : "renameColumnWithIndex:to:"
+      SUMMARY  : *g_dyn_table_rename_column_summary
+      DESCR    : *g_dyn_table_rename_column_descr
+      SIGNATURE: (NSString *)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString *)newName
+      PARAMS:
+      - NAME   : colIndex
         TYPES  : NSUInteger
-        DESCR  : *g_dyn_table_get_column_count_return_descr
+        DESCR  : *g_dyn_table_rename_column_param1_descr
+      - NAME   : newName
+        TYPES  : NSString *
+        DESCR  : *g_dyn_table_rename_column_param1_descr
       EXAMPLES:
-      - CODE   : ex_objc_dyn_table_get_column_count
+      - CODE   : ex_objc_dyn_table_rename_column
         DESCR  :
 
+
   - g_dyn_table_get_column_name:
-      NAME     : "columnNameOfColumn:"
+      NAME     : "nameOfColumnWithIndex:"
       SUMMARY  : *g_dyn_table_get_column_name_summary
       DESCR    : *g_dyn_table_get_column_name_descr
-      SIGNATURE: (NSString *)columnNameOfColumn:(NSUInteger)colIndex
+      SIGNATURE: (NSString *)nameOfColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
       - NAME   : colIndex
         TYPES  : NSUInteger
@@ -200,12 +212,12 @@ CATEGORIES :
         DESCR  : ""
 
   - g_dyn_table_get_column_type:
-      NAME     : "columnTypeOfColumn:"
+      NAME     : "columnTypeOfColumnWithIndex:"
       SUMMARY  : *g_dyn_table_get_column_type_summary
       DESCR    :
       - TEXT   : *g_dyn_table_get_column_type_descr1
       - TEXT   : *objc_column_types
-      SIGNATURE: (TDBType)columnTypeOfColumn:(NSUInteger)colIndex
+      SIGNATURE: (TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
       - NAME   : colIndex
         TYPES  : NSUInteger

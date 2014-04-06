@@ -55,7 +55,7 @@ void ex_objc_context_intro()
         PeopleTable *table = [group tableWithName:@"employees"
                                      asTableClass:[PeopleTable class]];
         for (PeopleTableRow *row in table) {
-            NSLog(@"Name: %@", [row Name]);
+            NSLog(@"Name: %@", row.Name);
         }
     }];
 }
