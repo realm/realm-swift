@@ -48,7 +48,7 @@ void tableFunc() {
     PeopleTableRow *myRow = people[5];
     int64_t age = myRow.Age;                           // =&gt; 54
     NSLog(@"Age: %lli", age);
-    BOOL hired  = myRow.Hired;                         // =&gt; true
+    BOOL hired  = myRow.Hired;                         // =&gt; YES
     NSLog(@"Hired? %d", hired);
 
     // Setting values
@@ -72,8 +72,7 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: iteration @@
-    for (NSUInteger i = 0; i < people.rowCount; ++i) {
-        PeopleTableRow *row = people[i];
+    for(PeopleTableRow* row in people) {
         NSLog(@"%@ is %lld years old", row.Name, row.Age);
     }
     // @@EndExample@@
@@ -86,23 +85,23 @@ void tableFunc() {
 
     // @@Example: advanced_search @@
     // Create query (current employees between 20 and 30 years old)
-    PeopleTableQuery *q = [[[people where].Hired columnIsEqualTo:YES]
-                                           .Age   columnIsBetween:20 :30];
+    PeopleTableQuery *query = [[[people where].Hired columnIsEqualTo:YES]
+                                              .Age   columnIsBetween:20 :30];
 
     // Get number of matching entries
-    NSUInteger cnt3 = [q countRows];                     // =&gt; 2
+    NSUInteger cnt3 = [query countRows];                     // =&gt; 2
     NSLog(@"RowCount: %i", cnt3);
 
      // You can do aggregates on columns, like calculating the average age
-    double avg = [q.Age avg];
+    double avg = [query.Age avg];
     NSLog(@"Avg age: %f", avg);
 
     // Execute the query and return a table (view)
-    PeopleTableView *res = [q findAll];
+    PeopleTableView *view = [query findAll];
 
     // fast emunaration on view
-    for (PeopleTableRow *r in res)
-        NSLog(@"%@ is %lld years old", r.Name, r.Age);
+    for (PeopleTableRow* row in view)
+        NSLog(@"%@ is %lld years old", row.Name, row.Age);
     // @@EndExample@@
 
 }
@@ -124,7 +123,7 @@ void sharedGroupFunc() {
                                                 asTableClass:[PeopleTable class]];
 
         // Add a row
-        [table addName:@"Bill" Age:53 Hired:YES];
+        [table addRow:@{@"Name": @"Bill", @"Age":@53, @"Hired":@YES}];
         NSLog(@"Row added!");
         return YES; // Commit (NO would rollback)
     } error:nil];
