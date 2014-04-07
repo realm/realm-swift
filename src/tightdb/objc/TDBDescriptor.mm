@@ -115,7 +115,7 @@
 }
 -(NSUInteger)indexOfColumnWithName:(NSString *)name
 {
-    return m_desc->get_column_index(ObjcStringAccessor(name));
+    return was_not_found(m_desc->get_column_index(ObjcStringAccessor(name)));
 }
 -(void)dealloc
 {
