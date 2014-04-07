@@ -230,7 +230,7 @@ using namespace std;
 }
 -(NSUInteger)indexOfColumnWithName:(NSString *)name
 {
-    return m_table->get_column_index(ObjcStringAccessor(name));
+    return was_not_found(m_table->get_column_index(ObjcStringAccessor(name)));
 }
 -(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)ndx
 {
@@ -925,33 +925,33 @@ using namespace std;
 
 -(NSUInteger)findRowIndexWithBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->find_first_bool(colIndex, aBool);
+    return was_not_found(m_table->find_first_bool(colIndex, aBool));
 }
 -(NSUInteger)findRowIndexWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->find_first_int(colIndex, anInt);
+    return was_not_found(m_table->find_first_int(colIndex, anInt));
 }
 -(NSUInteger)findRowIndexWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->find_first_float(colIndex, aFloat);
+    return was_not_found(m_table->find_first_float(colIndex, aFloat));
 }
 -(NSUInteger)findRowIndexWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->find_first_double(colIndex, aDouble);
+    return was_not_found(m_table->find_first_double(colIndex, aDouble));
 }
 -(NSUInteger)findRowIndexWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->find_first_string(colIndex, ObjcStringAccessor(aString));
+    return was_not_found(m_table->find_first_string(colIndex, ObjcStringAccessor(aString)));
 }
 -(NSUInteger)findRowIndexWithBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
     const void *data = [(NSData *)aBinary bytes];
     tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)aBinary length]);
-    return m_table->find_first_binary(colIndex, bd);
+    return was_not_found(m_table->find_first_binary(colIndex, bd));
 }
 -(NSUInteger)findRowIndexWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
 {
-    return m_table->find_first_datetime(colIndex, [aDate timeIntervalSince1970]);
+    return was_not_found(m_table->find_first_datetime(colIndex, [aDate timeIntervalSince1970]));
 }
 -(NSUInteger)findRowIndexWithMixed:(id)aMixed inColumnWithIndex:(NSUInteger)colIndex
 {
@@ -1017,6 +1017,23 @@ using namespace std;
 -(TDBQuery*)whereWithError:(NSError* __autoreleasing*)error
 {
     return [[TDBQuery alloc] initWithTable:self error:error];
+}
+
+-(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex
+{
+    if (!([self columnTypeOfColumnWithIndex:colIndex] == TDBStringType)) {
+        @throw [NSException exceptionWithName:@"tightdb:column_type_not_supported"
+                                       reason:@"Distinct currently only supported on columns of type TDBStringType"
+                                     userInfo:nil];
+    }
+    if (![self isIndexCreatedInColumnWithIndex:colIndex]) {
+        @throw [NSException exceptionWithName:@"tightdb:column_not_indexed"
+                                       reason:@"An index must be created on the column to get distinct values"
+                                     userInfo:nil];
+    }
+    
+    tightdb::TableView distinctView = m_table->get_distinct_view(colIndex);
+    return [TDBView viewWithTable:self andNativeView:distinctView];
 }
 
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex

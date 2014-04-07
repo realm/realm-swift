@@ -81,25 +81,24 @@ using namespace std;
 
 -(long)getFastEnumStart
 {
-    return [self findFirstRowFromIndex:0];
+    return [self indexOfFirstMatchingRowFromIndex:0];
 }
 
 -(long)incrementFastEnum:(long)ndx
 {
-    return [self findFirstRowFromIndex:ndx];
+    return [self indexOfFirstMatchingRowFromIndex:ndx];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState*)state objects:(id __unsafe_unretained*)stackbuf count:(NSUInteger)len
 {
-    (void)len;
-    
+    static_cast<void>(len);
     if (state->state == 0) {
         state->state = [self getFastEnumStart];
         state->mutationsPtr = (unsigned long*)objc_unretainedPointer(self);
         TDBRow* tmp = [self getRow:state->state];
         *stackbuf = tmp;
     }
-    if ((int)state->state != -1) {
+    if (state->state < [self originTable].rowCount && state->state != (NSUInteger)NSNotFound) {
         [((TDBRow*)*stackbuf) TDB_setNdx:state->state];
         state->itemsPtr = stackbuf;
         state->state = [self incrementFastEnum:state->state+1];
@@ -252,14 +251,16 @@ using namespace std;
     return [TDBView viewWithTable:m_table andNativeView:view];
 }
 
--(NSUInteger)findFirstRow
+-(NSUInteger)indexOfFirstMatchingRow
 {
-    return m_query->find(0);
+    return was_not_found(m_query->find(0));
 }
 
--(NSUInteger)findFirstRowFromIndex:(NSUInteger)rowIndex
+-(NSUInteger)indexOfFirstMatchingRowFromIndex:(NSUInteger)rowIndex
 {
-    return m_query->find(rowIndex);
+    size_t n = m_query->find(size_t(rowIndex));
+    NSUInteger m = was_not_found(n);
+    return m;
 }
 
 
