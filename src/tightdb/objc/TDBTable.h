@@ -71,6 +71,7 @@
 
 // Queries
 -(TDBQuery *)where;
+// Only supported on string columns with an index
 -(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
 
 // Indexing
