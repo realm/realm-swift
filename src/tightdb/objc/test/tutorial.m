@@ -102,7 +102,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     size_t row;
     row = [people.Name find:@"Philip"];    // row = (size_t)-1
     NSLog(@"Philip: %zu  [-1]", row);
-    STAssertEquals(row, (size_t)-1,@"Philip should not be there", nil);
+    STAssertEquals(row, NSNotFound, @"Philip should not be there", nil);
 
     row = [people.Name find:@"Mary"];
     NSLog(@"Mary: %zu", row);

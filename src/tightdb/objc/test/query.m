@@ -267,19 +267,19 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [table TDB_setInt:39 inColumnWithIndex:0 atRowIndex:5];
     
     STAssertEquals((NSUInteger)1, [[[table where ] intIsGreaterThan:10 inColumnWithIndex:0 ] findFirstRow], @"Row 1 is greater than 10");
-    STAssertEquals((NSUInteger)-1, [[[table where ] intIsGreaterThan:100 inColumnWithIndex:0 ] findFirstRow], @"No rows are greater than 100");
+    STAssertEquals(NSNotFound, [[[table where ] intIsGreaterThan:100 inColumnWithIndex:0 ] findFirstRow], @"No rows are greater than 100");
 
     STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:0], (NSUInteger)2,  @"find");
     STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:3], (NSUInteger)3,  @"find");
     STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:4], (NSUInteger)5,  @"find");
-    STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:6], (NSUInteger)-1, @"find");
+    STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:6], (NSUInteger)NSNotFound, @"find");
     STAssertEquals([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] findFirstRowFromIndex:3], (NSUInteger)3,  @"find");
     // jjepsen: disabled this test, perhaps it's not relevant after query sematics update.
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (size_t)-1, @"find");
     
     [table removeAllRows];
-    STAssertEquals([[table where] findFirstRow], (NSUInteger)-1,nil);
-    STAssertEquals([[table where] findFirstRowFromIndex:0], (NSUInteger)-1,nil);
+    STAssertEquals([[table where] findFirstRow], (NSUInteger)NSNotFound,nil);
+    STAssertEquals([[table where] findFirstRowFromIndex:0], (NSUInteger)NSNotFound,nil);
 }
 
 - (void) testSubtableQuery
@@ -301,5 +301,32 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     STAssertEquals(v.rowCount, (NSUInteger)1,@"one match");
 }
 
+-(void) testQueryEnumeratorNoCondition
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"first" type:TDBIntType];
+    for(int i=0; i<10; ++i)
+        [table addRow:@[[NSNumber numberWithInt:i]]];
+    TDBQuery *query = [table where];
+    int i = 0;
+    for(TDBRow *row in query) {
+        STAssertEquals((int64_t)i, [(NSNumber *)row[@"first"] longLongValue], @"Wrong value");
+        ++i;
+    }
+}
+
+-(void) testQueryEnumeratorWithCondition
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"first" type:TDBIntType];
+    for(int i=0; i<10; ++i)
+        [table addRow:@[[NSNumber numberWithInt:i]]];
+    TDBQuery *query = [[table where] intIsGreaterThan:-1 inColumnWithIndex:0];
+    int i = 0;
+    for(TDBRow *row in query) {
+        STAssertEquals((int64_t)i, [(NSNumber *)row[@"first"] longLongValue], @"Wrong value");
+        ++i;
+    }
+}
 
 @end
