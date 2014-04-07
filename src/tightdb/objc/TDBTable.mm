@@ -286,10 +286,9 @@ using namespace std;
     // TODO: Use a macro or a function for error handling
 
     if(m_read_only) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:table_is_read_only"
-                                                         reason:@"You tried to modify a table in read only mode"
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+                                       reason:@"You tried to modify a table in read only mode"
+                                     userInfo:[NSMutableDictionary dictionary]];
     }
 
     NSUInteger index;
@@ -297,10 +296,9 @@ using namespace std;
         index = m_table->add_empty_row(num_rows);
     }
     catch(std::exception& ex) {
-        NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                         reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+                                       reason:[NSString stringWithUTF8String:ex.what()]
+                                     userInfo:[NSMutableDictionary dictionary]];
     }
 
     return index;
@@ -916,10 +914,9 @@ using namespace std;
         m_table->remove_column(columnIndex);
     }
     catch(std::exception& ex) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                         reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw[NSException exceptionWithName:@"tightdb:core_exception"
+                                      reason:[NSString stringWithUTF8String:ex.what()]
+                                    userInfo:[NSMutableDictionary dictionary]];
     }
 }
 
