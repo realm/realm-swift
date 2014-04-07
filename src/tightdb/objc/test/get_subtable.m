@@ -5,7 +5,7 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/TDBTransaction.h>
@@ -25,7 +25,7 @@ TIGHTDB_TABLE_2(WrongTypeTable,
                 Age,   Bool)
 
 
-@interface MACTestGetSubtable: SenTestCase
+@interface MACTestGetSubtable: XCTestCase
 @end
 @implementation MACTestGetSubtable
 
@@ -53,10 +53,10 @@ TIGHTDB_TABLE_2(WrongTypeTable,
     GetSubtable* testTable = [table TDB_tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[GetSubtable class]];
     GetSubtableRow* cursor = [testTable rowAtIndex:0];
     NSLog(@"Age in subtable: %lld", cursor.Age);
-    STAssertEquals(cursor.Age, (int64_t)42, @"Sub table row should be 42");
+    XCTAssertEqual(cursor.Age, (int64_t)42, @"Sub table row should be 42");
 
-    STAssertNil([table TDB_tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongNameTable class]], @"should return nil because wrong name");
-    STAssertNil([table TDB_tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongTypeTable class]], @"should return nil because wrong type");
+    XCTAssertNil([table TDB_tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongNameTable class]], @"should return nil because wrong name");
+    XCTAssertNil([table TDB_tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongTypeTable class]], @"should return nil because wrong type");
 }
 
 
