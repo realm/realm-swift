@@ -224,6 +224,7 @@ build_ios_test()
             'libraries': [
                 '\$(SDKROOT)/usr/lib/libc++.dylib',
                 '\$(DEVELOPER_DIR)/Library/Frameworks/XCTest.framework',
+                '\$(DEVELOPER_DIR)/Library/Frameworks/SenTestingKit.framework',
                 '$FRAMEWORK',
             ],
         },
@@ -830,27 +831,24 @@ EOF
         TEST_APP="${APP}Tests"
         
         ## Initialize app test directory
-        cp -r "../src/tightdb/objc/test" "$TEST_APP"
-        find "$TEST_APP" -type f \
-            ! -iregex "^.*\.[hm]\{1,2\}$" \
+        mkdir -p "$TEST_APP"
+        find -E "../src/tightdb/objc" -type f -maxdepth 1 \
+            -iregex "^.*\.(h(pp)?|mm?)$" \
+            -exec cp {} "$TEST_APP" \; || exit 1
+
+        cp -r "../src/tightdb/objc/test" "$TEST_APP/test"
+        find -E "$TEST_APP" -type f \
+            ! -iregex "^.*\.(h(pp)?|mm?)$" \
             -exec rm {} \; || exit 1
 
         ## Set up frameworks
         copy_or_fail "../../tightdb/TightdbCore.framework" \
             "TightdbCore.framework" 
-        copy_or_fail "../Tightdb.framework" "Tightdb.framework"
-        FRAMEWORK="TightdbCore', 'Tightdb"
-        # Add missing (hidden) headers
-        find "../src/tightdb/objc/" -maxdepth 1 -iname *.h \
-            -exec cp {} "Tightdb.framework/Headers" \; 
-        find "Tightdb.framework/Headers/" -type f -exec sed -i '' \
-            -e "s/<tightdb\/objc\/\(.*\)>/<Tightdb\/\1>/g" {} \; || exit 1
-        find "Tightdb.framework/Headers/" -type f -exec sed -i '' \
-            -e "s/<tightdb\(.*\)>/<TightdbCore\/tightdb\1>/g" {} \; || exit 1
+        FRAMEWORK="TightdbCore"
  
         ## Replace all test includes with framework includes.
         find "$TEST_APP" -type f -exec sed -i '' \
-            -e "s/<tightdb\/objc\/\(.*\)>/<Tightdb\/\1>/g" {} \; || exit 1
+            -e "s/<tightdb\/objc\/\(.*\)>/\"\1\"/g" {} \; || exit 1
         find "$TEST_APP" -type f -exec sed -i '' \
             -e "s/<tightdb\(.*\)>/<TightdbCore\/tightdb\1>/g" {} \; || exit 1
  
