@@ -781,6 +781,10 @@ EOF
 
         ## Remove breaking files (containing main or unportable code).
         rm "$TEST_APP/main.cpp"
+        rm -rf "$TEST_APP/benchmark-"*
+        rm -rf "$TEST_APP/experiments"
+        rm -rf "$TEST_APP/performance"
+        rm -rf "$TEST_APP/test-"*
 
         ## Create an XCTestCase
         cat >"$TEST_APP/$TEST_APP.mm" <<EOF
