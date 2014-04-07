@@ -5,7 +5,7 @@
 //  Test save/load on disk of a group with one table
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/TDBTransaction.h>
@@ -16,7 +16,7 @@ TIGHTDB_TABLE_2(TestTableGroup,
                 First,  String,
                 Second, Int)
 
-@interface MACTestGroup: SenTestCase
+@interface MACTestGroup: XCTestCase
 @end
 @implementation MACTestGroup
 {
@@ -29,7 +29,7 @@ TIGHTDB_TABLE_2(TestTableGroup,
 
     // _group = [TDBTransaction group];
     // NSLog(@"TDBTransaction: %@", _group);
-    // STAssertNotNil(_group, @"Group is nil");
+    // XCTAssertNotNil(_group, @"Group is nil");
 }
 
 - (void)tearDown
@@ -52,7 +52,7 @@ TIGHTDB_TABLE_2(TestTableGroup,
     // Load the group
     TDBTransaction *fromDisk = [TDBTransaction groupWithFile:@"table_test.tightdb" error:nil];
     if (!fromDisk)
-        STFail(@"From disk not valid");
+        XCTFail(@"From disk not valid");
 
     // Create new table in group
     TestTableGroup *t = (TestTableGroup *)[fromDisk createTableWithName:@"test" asTableClass:[TestTableGroup class]];
@@ -60,9 +60,9 @@ TIGHTDB_TABLE_2(TestTableGroup,
     // Verify
     NSLog(@"Columns: %zu", t.columnCount);
     if (t.columnCount != 2)
-        STFail(@"Should have been 2 columns");
+        XCTFail(@"Should have been 2 columns");
     if (t.rowCount != 0)
-        STFail(@"Should have been empty");
+        XCTFail(@"Should have been empty");
 
     // Modify table
     [t addFirst:@"Test" Second:YES];
@@ -70,7 +70,7 @@ TIGHTDB_TABLE_2(TestTableGroup,
 
     // Verify
     if (t.rowCount != 1)
-        STFail(@"Should have been one row");
+        XCTFail(@"Should have been one row");
 
     t = nil;
 }
@@ -78,15 +78,15 @@ TIGHTDB_TABLE_2(TestTableGroup,
 - (void)testGetTable
 {
     TDBTransaction *g = [TDBTransaction group];
-    STAssertNil([g tableWithName:@"noTable"], @"Table does not exist");
+    XCTAssertNil([g tableWithName:@"noTable"], @"Table does not exist");
 }
 
 - (void)testGroupTableCount
 {
     TDBTransaction *t = [TDBTransaction group];
-    STAssertEquals(t.tableCount, (NSUInteger)0, @"No tables added");
+    XCTAssertEqual(t.tableCount, (NSUInteger)0, @"No tables added");
     [t createTableWithName:@"tableName"];
-    STAssertEquals(t.tableCount, (NSUInteger)1, @"1 table added");
+    XCTAssertEqual(t.tableCount, (NSUInteger)1, @"1 table added");
 }
 
 @end
