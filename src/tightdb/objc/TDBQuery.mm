@@ -205,6 +205,9 @@ using namespace std;
 
 -(NSDate *)minDateInColumnWithIndex:(NSUInteger)col_ndx
 {
+    if (self.originTable.rowCount == 0) {
+        return nil;
+    }
     return [NSDate dateWithTimeIntervalSince1970: m_query->minimum_int(col_ndx)];
 }
 
@@ -248,6 +251,9 @@ using namespace std;
 
 -(NSDate *)maxDateInColumnWithIndex:(NSUInteger)col_ndx
 {
+    if (self.originTable.rowCount == 0) {
+        return nil;
+    }
     return [NSDate dateWithTimeIntervalSince1970: m_query->maximum_int(col_ndx)];
 }
 
