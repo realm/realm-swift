@@ -344,24 +344,24 @@ CATEGORIES :
 #      SUMMARY  : *g_dyn_table_insert_xxx_summary
 #      DESCR    : *g_dyn_table_insert_xxx_descr
 #      SIGNATURE: |
-#                 (void)insertBool:(size_t)col_ndx ndx:(size_t)ndx value:(BOOL)value
-#                 (void)insertInt:(size_t)col_ndx ndx:(size_t)ndx value:(int64_t)value
-#                 (void)insertFloat:(size_t)col_ndx ndx:(size_t)ndx value:(float)value
-#                 (void)insertDouble:(size_t)col_ndx ndx:(size_t)ndx value:(double)value
-#                 (void)insertDate:(size_t)col_ndx ndx:(size_t)ndx value:(time_t)value
-#                 (void)insertString:(size_t)col_ndx ndx:(size_t)ndx value:(NSString *)value
-#                 (void)insertBinary:(size_t)col_ndx ndx:(size_t)ndx value:(TightdbBinary *)value
-#                 (void)insertBinary:(size_t)col_ndx ndx:(size_t)ndx data:(const char *)data size:(size_t)size
-#                 (void)insertMixed:(size_t)col_ndx ndx:(size_t)row_ndx value:(TightdbMixed *)value
-#                 (void)insertSubtable:(size_t)col_ndx ndx:(size_t)row_ndx
+#                 (void)insertBool:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(BOOL)value
+#                 (void)insertInt:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(int64_t)value
+#                 (void)insertFloat:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(float)value
+#                 (void)insertDouble:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(double)value
+#                 (void)insertDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(time_t)value
+#                 (void)insertString:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(NSString *)value
+#                 (void)insertBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(TightdbBinary *)value
+#                 (void)insertBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx data:(const char *)data size:(NSUInteger)size
+#                 (void)insertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(TightdbMixed *)value
+#                 (void)insertSubtable:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx
 #                 (void)insertDone
 #TODO: does insertBinary with direct char*/size exist?
 #      PARAMS:
 #      - NAME   : ndx, row_ndx
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #        DESCR  : *g_dyn_table_insert_parm1_descr
 #      - NAME   : ndx
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #        DESCR  : *g_dyn_table_insert_parm2_descr
 #      - NAME   : value
 #        TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, TightdbBinary*, const char*, TightdbMixed*]
@@ -371,7 +371,7 @@ CATEGORIES :
 #        DESCR  : &g_dyn_table_insert_xxx_parm4_descr
 #                 Pointer to start of binary data.
 #      - NAME   : size
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #        DESCR  : &g_dyn_table_insert_xxx_parm5_descr
 #                 Size in bytes of binary data.
 #      EXAMPLES:
@@ -443,26 +443,26 @@ CATEGORIES :
       #SUMMARY  : *g_dyn_table_get_xxx_summary
       #DESCR    : *g_dyn_table_get_xxx_descr
       #SIGNATURE: |
-                 #(BOOL)getBool:(size_t)col_ndx ndx:(size_t)ndx
-                 #(int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
-                 #(float)getFloat:(size_t)col_ndx ndx:(size_t)ndx
-                 #(double)getDouble:(size_t)col_ndx ndx:(size_t)ndx
-                 #(time_t)getDate:(size_t)col_ndx ndx:(size_t)ndx
-                 #(NSString *)getString:(size_t)col_ndx ndx:(size_t)ndx
-                 #(TightdbBinary *)getBinary:(size_t)col_ndx ndx:(size_t)ndx
-                 #(TightdbMixed *)getMixed:(size_t)col_ndx ndx:(size_t)row_ndx
-                 #(TightdbType)getMixedType:(size_t)col_ndx ndx:(size_t)row_ndx
+                 #(BOOL)getBool:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(int64_t)get:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(float)getFloat:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(double)getDouble:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(time_t)getDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(NSString *)getString:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(TightdbBinary *)getBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(TightdbMixed *)getMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx
+                 #(TightdbType)getMixedType:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx
 
-                 #(TightdbTable *)getSubtable:(size_t)col_ndx ndx:(size_t)ndx
-                 #(id)getSubtable:(size_t)col_ndx ndx:(size_t)ndx withClass:(__unsafe_unretained Class)classObj
+                 #(TightdbTable *)getSubtable:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(id)getSubtable:(NSUInteger)col_ndx ndx:(NSUInteger)ndx withClass:(__unsafe_unretained Class)classObj
 #TODO: What's the last method about?
 
       #PARAMS:
       #- NAME   : col_ndx
-      #  TYPES  : size_t
+      #  TYPES  : NSUInteger
       #  DESCR  : *g_dyn_table_get_xxx_parm1_descr
       #- NAME   : row_ndx
-      #  TYPES  : size_t
+      #  TYPES  : NSUInteger
       #  DESCR  : *g_dyn_table_get_xxx_parm2_descr
       #RETURN:
       #  TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, TightdbBinary*,
@@ -498,31 +498,31 @@ CATEGORIES :
  #     SUMMARY  : *g_dyn_table_set_xxx_summary
  #     DESCR    : *g_dyn_table_set_xxx_descr
  #     SIGNATURE: |
- #                (void)setBool:(size_t)col_ndx ndx:(size_t)ndx value:(BOOL)value
- #                (void)set:(size_t)col_ndx ndx:(size_t)ndx value:(int64_t)value
- #                (void)setFloat:(size_t)col_ndx ndx:(size_t)ndx value:(float)value
- #                (void)setDouble:(size_t)col_ndx ndx:(size_t)ndx value:(double)value
- #                (void)setDate:(size_t)col_ndx ndx:(size_t)ndx value:(time_t)value
- #                (void)setString:(size_t)col_ndx ndx:(size_t)ndx value:(NSString *)value
- #                (void)setBinary:(size_t)col_ndx ndx:(size_t)ndx value:(TightdbBinary *)value
- #               (void)setBinary:(size_t)col_ndx ndx:(size_t)ndx data:(const char *)data size:(size_t)size
- #                (void)setMixed:(size_t)col_ndx ndx:(size_t)row_ndx value:(TightdbMixed *)value
+ #                (void)setBool:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(BOOL)value
+ #                (void)set:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(int64_t)value
+ #                (void)setFloat:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(float)value
+ #                (void)setDouble:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(double)value
+ #                (void)setDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(time_t)value
+ #                (void)setString:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(NSString *)value
+ #                (void)setBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(TightdbBinary *)value
+ #               (void)setBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx data:(const char *)data size:(NSUInteger)size
+ #                (void)setMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(TightdbMixed *)value
  #     PARAMS:
  #     - NAME   : col_ndx
- #       TYPES  : size_t
+ #       TYPES  : NSUInteger
  #       DESCR  : *g_dyn_table_get_xxx_parm1_descr
  #     - NAME   : row_ndx
- #       TYPES  : size_t
+ #       TYPES  : NSUInteger
  #       DESCR  : *g_dyn_table_get_xxx_parm2_descr
  #     - NAME   : value
  #       TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, TightdbBinary*,
- #                 const char*, size_t, TightdbMixed*]
+ #                 const char*, NSUInteger, TightdbMixed*]
  #       DESCR  : *g_dyn_table_set_xxx_parm3_descr
  #     - NAME   : data
  #       TYPES  : const char *
  #       DESCR  : *g_dyn_table_insert_xxx_parm4_descr
  #     - NAME   : size
- #       TYPES  : size_t
+ #       TYPES  : NSUInteger
  #       DESCR  : *g_dyn_table_insert_xxx_parm5_descr
  #     EXAMPLES:
  #     - CODE   : ex_objc_dyn_table_set_xxx
@@ -575,7 +575,7 @@ CATEGORIES :
         TYPES  : NSString *
         DESCR  : *g_dyn_table_lookup_parm1_descr
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : "The row index or <code>NSNotFound</code> if there is no match."
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_lookup
@@ -603,22 +603,22 @@ CATEGORIES :
 #      SUMMARY  : Find first matching row.
 #      DESCR    : The method finds the first occurence of a given value in a column.
 #      SIGNATURE: |
-#                 (size_t)findBool:(size_t)col_ndx value:(BOOL)value
-#                 (size_t)findInt:(size_t)col_ndx value:(int64_t)value
-#                 (size_t)findFloat:(size_t)col_ndx value:(float)value
-#                 (size_t)findDouble:(size_t)col_ndx value:(double)value
-#                 (size_t)findDate:(size_t)col_ndx value:(time_t)value
-#                 (size_t)findString:(size_t)col_ndx value:(NSString *)value
-#                 (size_t)findBinary:(size_t)col_ndx value:(TightdbBinary *)value
+#                 (NSUInteger)findBool:(NSUInteger)col_ndx value:(BOOL)value
+#                 (NSUInteger)findInt:(NSUInteger)col_ndx value:(int64_t)value
+#                 (NSUInteger)findFloat:(NSUInteger)col_ndx value:(float)value
+#                 (NSUInteger)findDouble:(NSUInteger)col_ndx value:(double)value
+#                 (NSUInteger)findDate:(NSUInteger)col_ndx value:(time_t)value
+#                 (NSUInteger)findString:(NSUInteger)col_ndx value:(NSString *)value
+#                 (NSUInteger)findBinary:(NSUInteger)col_ndx value:(TightdbBinary *)value
 #      PARAMS:
 #      - NAME   : col_ndx
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #        DESCR  : *g_dyn_table_find_first_xxx_parm1_descr
 #      - NAME   : value
 #        TYPES  : [BOOL, int64_t, float, double, time_t, NSString, const char*]
 #        DESCR  : *g_dyn_table_find_first_xxx_parm2_descr
 #      RETURN:
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #TODO: is that the same in objc?
 #        DESCR  : "The row index or <code>NSNotFound</code> if there is no match."
 #      EXAMPLES:
@@ -658,10 +658,10 @@ CATEGORIES :
  #                The method finds all occurences of a given value in a specific column.
  #                The rows are returned as a {@link class_dyn_tableview} object.
  #     SIGNATURE: |
- #                (TightdbView *)findAll:(TightdbView *)view column:(size_t)col_ndx value:(int64_t)value
+ #                (TightdbView *)findAll:(TightdbView *)view column:(NSUInteger)col_ndx value:(int64_t)value
  #     PARAMS:
  #     - NAME   : col_ndx
- #       TYPES  : size_t
+ #       TYPES  : NSUInteger
  #       DESCR  : *g_dyn_table_find_all_xxx_parm1_descr
  #     - NAME   : value
  #       TYPES  : [BOOL, int64_t, float, double, time_t, NSString]
@@ -685,10 +685,10 @@ CATEGORIES :
       NAME     : getSortedView
       SUMMARY  : *g_dyn_table_get_sorted_view_summary
       DESCR    : *g_dyn_table_get_sorted_view_desc
-      SIGNATURE: TableView get_sorted_view(size_t column_ndx, bool ascending=true);
+      SIGNATURE: TableView get_sorted_view(NSUInteger column_ndx, bool ascending=true);
       PARAMS:
       - NAME   : column_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_get_sorted_view_parm1_descr
       - NAME   : ascending
         TYPES  : BOOL
@@ -708,10 +708,10 @@ CATEGORIES :
       NAMES    : distinct
       SUMMARY  : *g_dyn_table_distinct_summary
       DESCR    : *g_dyn_table_distinct_desc
-      SIGNATURE: TableView distinct(size_t column_ndx);
+      SIGNATURE: TableView distinct(NSUInteger column_ndx);
       PARAMS:
       - NAME   : column_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_distinct_parm1_desc
       RETURN:
         TYPES  : TableView
@@ -894,7 +894,7 @@ CATEGORIES :
         TYPES  : std::ostream&
         DESCR  : Output stream.
       - NAME   : limit
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_to_string_parm2_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_to_string

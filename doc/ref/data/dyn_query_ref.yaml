@@ -297,7 +297,7 @@ CATEGORIES :
       SUMMARY  : *g_dyn_query_startsWith_summary
       PARAMS:
       - NAME   : col_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
         TYPES  : NSString *
@@ -327,7 +327,7 @@ CATEGORIES :
       SUMMARY  : *g_dyn_query_endsWith_summary
       PARAMS:
       - NAME   : col_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
         TYPES  : NSString*
@@ -353,12 +353,12 @@ CATEGORIES :
       SIGNATURE: |
                  (TDBQuery *)columnContains:(NSString *)value caseSensitive:(BOOL)caseSensitive
                  (TDBQuery *)columnContains:(NSString *)value
-#                 TDBQuery * contains_binary(size_t column_ndx, NSString* data, size_t size);
+#                 TDBQuery * contains_binary(NSUInteger column_ndx, NSString* data, NSUInteger size);
       DESCR    : *g_dyn_query_contains_descr
       SUMMARY  : *g_dyn_query_contains_summary
       PARAMS:
       - NAME   : col_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       - NAME   : value
         TYPES  : NSString *
@@ -456,13 +456,13 @@ CATEGORIES :
                  (TDBView *)findAllRows
 #      PARAMS:
 #      - NAME   : start
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #        DESCR  : *g_dyn_query_find_all_parm1_descr
 #      - NAME   : end
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #        DESCR  : *g_dyn_query_find_all_parm2_descr
 #      - NAME   : limit
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #        DESCR  : *g_dyn_query_find_all_parm3_descr
       RETURN:
         TYPES  : TDBView *
@@ -610,18 +610,18 @@ CATEGORIES :
 #      PARAMS:
 #      - NAME   : column
 #        DESCR  : *g_dyn_query_column_index_descr
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #      - NAME   : resultcount
 #        DESCR  : The number of rows used to calculate the average.
-#        TYPES  : size_t*
+#        TYPES  : NSUInteger*
 #      - NAME   : start
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #        DESCR  : "Row to begin search. Default: 0."
 #     - NAME   : end
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #        DESCR  : "Row to stop search. Default: -1 (infinity)."
 #      - NAME   : limit
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
       RETURN:
         TYPES  : NSUInteger *
