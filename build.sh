@@ -218,6 +218,7 @@ build_ios_test()
             '\$(PROJECT_DIR)',
         ],
         'CODE_SIGN_IDENTITY[sdk=iphoneos*]': 'iPhone Developer: Oleksandr(Alex Shturmov (CB4YV2W7W5)',
+        'CLANG_ENABLE_OBJC_ARC': 'YES',
     },
     'target_defaults': {
         'link_settings': {
@@ -225,6 +226,9 @@ build_ios_test()
                 '\$(SDKROOT)/usr/lib/libc++.dylib',
                 '\$(DEVELOPER_DIR)/Library/Frameworks/XCTest.framework',
                 '\$(DEVELOPER_DIR)/Library/Frameworks/SenTestingKit.framework',
+                '\$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
+                '\$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
+                '\$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
                 '$FRAMEWORK',
             ],
         },
@@ -249,13 +253,6 @@ $APP_TESTS_SOURCES
             'include_dirs': [
                 './$TEST_APP/**'
             ],
-            'link_settings': {
-                'libraries': [
-                    '\$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
-                    '\$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
-                    '\$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
-                ],
-            },
             'xcode_settings': {
                 'WRAPPER_EXTENSION': 'app',
                 'INFOPLIST_FILE': '$APP/$APP-Info.plist',
@@ -810,7 +807,7 @@ EOF
         ## Set up frameworks.
         copy_or_fail "../../tightdb/TightdbCore.framework" \
             "TightdbCore.framework" 
-        FRAMEWORK="TightdbCore"
+        FRAMEWORK="TightdbCore.framework"
 
         ## Replace all test includes with framework includes.
         find "$TEST_APP" -type f -exec sed -i '' \
@@ -839,13 +836,13 @@ EOF
         ## Set up frameworks
         copy_or_fail "../../tightdb/TightdbCore.framework" \
             "TightdbCore.framework" 
-        FRAMEWORK="TightdbCore"
+        FRAMEWORK="TightdbCore.framework"
  
         ## Replace all test includes with framework includes.
         find "$TEST_APP" -type f -exec sed -E -i '' \
-            -e "s/#(include|import) <tightdb\/objc\/(.*)>/#\1 \"\2\"/g" {} \; || exit 1
+            -e "s/#(include|import) +<tightdb\/objc\/(.*)>/#\1 \"\2\"/g" {} \; || exit 1
         find "$TEST_APP" -type f -exec sed -E -i '' \
-            -e "s/#(include|import) <tightdb(.*)>/#\1 <TightdbCore\/tightdb\2>/g" {} \; || exit 1
+            -e "s/#(include|import) +<tightdb(.*)>/#\1 <TightdbCore\/tightdb\2>/g" {} \; || exit 1
  
         build_ios_test
         echo "Done building"
