@@ -26,7 +26,7 @@
 #include <tightdb/table_view.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
-#include "support.h"
+#include "util_noinst.hpp"
 
 #import <tightdb/objc/TDBTable.h>
 #import <tightdb/objc/TDBTable_noinst.h>
