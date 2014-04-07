@@ -58,8 +58,8 @@
 -(double)avgDoubleColumnWithIndex:(NSUInteger)colIndex;
 
 /* Search */
--(NSUInteger)findFirstRow;
--(NSUInteger)findFirstRowFromIndex:(NSUInteger)rowIndex;
+-(NSUInteger)indexOfFirstMatchingRow;
+-(NSUInteger)indexOfFirstMatchingRowFromIndex:(NSUInteger)rowIndex;
 -(TDBView *)findAllRows;
 
 /* Conditions: */
