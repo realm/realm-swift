@@ -1016,7 +1016,7 @@
 
 - (void)testTableDynamic_Cursor_Subscripting
 {
-    TDBTable* table = [[TDBTable alloc] init];
+    TDBTable *table = [[TDBTable alloc] init];
     STAssertNotNil(table, @"Table is nil");
 
     // 1. Add two columns
@@ -1059,7 +1059,7 @@
 
 -(void)testTableDynamic_Row_Set
 {
-    TDBTable* table = [[TDBTable alloc] init];
+    TDBTable *table = [[TDBTable alloc] init];
     STAssertNotNil(table, @"Table is nil");
 
     // Add two columns
@@ -1100,7 +1100,7 @@
 
 -(void)testTableDynamic_Row_Set_Mixed
 {
-    TDBTable* table = [[TDBTable alloc] init];
+    TDBTable *table = [[TDBTable alloc] init];
 
     // Mixed column
     [table addColumnWithName:@"first" type:TDBMixedType];
@@ -1148,7 +1148,7 @@
 
 -(void)testTableDynamic_Row_Get
 {
-    TDBTable* table = [[TDBTable alloc] init];
+    TDBTable *table = [[TDBTable alloc] init];
     STAssertNotNil(table, @"Table is nil");
 
     // Add two columns
@@ -1165,7 +1165,7 @@
 
 -(void)testTableDynamic_Row_Get_Mixed
 {
-    TDBTable* table = [[TDBTable alloc] init];
+    TDBTable *table = [[TDBTable alloc] init];
     STAssertNotNil(table, @"Table is nil");
 
     // Add two columns
@@ -1186,7 +1186,7 @@
 
 - (void)testTableDynamic_initWithColumns
 {
-    TDBTable* table = [[TDBTable alloc] initWithColumns:@[@"name",   @"string",
+    TDBTable *table = [[TDBTable alloc] initWithColumns:@[@"name",   @"string",
                                                           @"age",    @"int",
                                                           @"hired",  @"bool",
                                                           @"phones", @[@"type",   @"string",
@@ -1198,5 +1198,98 @@
     [table addRow:@[@"joe", @34, @YES, @[@[@"home",   @"(650) 434-4342"],
                                          @[@"mobile", @"(650) 342-4243"]]]];
 }
+
+- (void)testDistinctView
+{
+    TDBTable *t = [[TDBTable alloc] init];
+    
+    NSUInteger nameIndex = [t addColumnWithName:@"name" type:TDBStringType];
+    NSUInteger ageIndex = [t addColumnWithName:@"age" type:TDBIntType];
+    
+    STAssertThrows([t distinctValuesInColumnWithIndex:ageIndex], @"Not a string column");
+    STAssertThrows([t distinctValuesInColumnWithIndex:nameIndex], @"Index not set");
+    [t createIndexInColumnWithIndex:nameIndex];
+
+    
+    [t addRow:@[@"name0", @0]];
+    [t addRow:@[@"name0", @0]];
+    [t addRow:@[@"name0", @0]];
+    [t addRow:@[@"name1", @1]];
+    [t addRow:@[@"name1", @1]];
+    [t addRow:@[@"name2", @2]];
+    
+    // Distinct on string column
+    TDBView *v = [t distinctValuesInColumnWithIndex:nameIndex];
+    STAssertEquals(v.rowCount, (NSUInteger)3, @"Distinct values removed");
+    STAssertEqualObjects(v[0][nameIndex], @"name0", nil);
+    STAssertEqualObjects(v[1][nameIndex], @"name1", nil);
+    STAssertEqualObjects(v[2][nameIndex], @"name2", nil);
+    STAssertEqualObjects(v[0][ageIndex], @0, nil);
+    STAssertEqualObjects(v[1][ageIndex], @1, nil);
+    STAssertEqualObjects(v[2][ageIndex], @2, nil);
+}
+
+-(void)testTableDynamic_find_int
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"first" type:TDBIntType];
+    for(int i=0; i<10; ++i)
+        [table addRow:@[[NSNumber numberWithInt:i]]];
+    STAssertEquals((NSUInteger)5, [table findRowIndexWithInt:5 inColumnWithIndex:0], @"Cannot find element");
+    STAssertEquals((NSUInteger)NSNotFound, ([table findRowIndexWithInt:11 inColumnWithIndex:0]), @"Found something");
+}
+
+-(void)testTableDynamic_find_float
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"first" type:TDBFloatType];
+    for(int i=0; i<10; ++i)
+        [table addRow:@[[NSNumber numberWithFloat:(float)i]]];
+    STAssertEquals((NSUInteger)5, [table findRowIndexWithFloat:5.0 inColumnWithIndex:0], @"Cannot find element");
+    STAssertEquals((NSUInteger)NSNotFound, ([table findRowIndexWithFloat:11.0 inColumnWithIndex:0]), @"Found something");
+}
+
+-(void)testTableDynamic_find_double
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"first" type:TDBDoubleType];
+    for(int i=0; i<10; ++i)
+        [table addRow:@[[NSNumber numberWithDouble:(double)i]]];
+    STAssertEquals((NSUInteger)5, [table findRowIndexWithDouble:5.0 inColumnWithIndex:0], @"Cannot find element");
+    STAssertEquals((NSUInteger)NSNotFound, ([table findRowIndexWithDouble:11.0 inColumnWithIndex:0]), @"Found something");
+}
+
+-(void)testTableDynamic_find_bool
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"first" type:TDBBoolType];
+    for(int i=0; i<10; ++i)
+        [table addRow:@[[NSNumber numberWithBool:YES]]];
+    table[5][@"first"] = @NO;
+    STAssertEquals((NSUInteger)5, [table findRowIndexWithBool:NO inColumnWithIndex:0], @"Cannot find element");
+    table[5][@"first"] = @YES;
+    STAssertEquals((NSUInteger)NSNotFound, ([table findRowIndexWithBool:NO inColumnWithIndex:0]), @"Found something");
+}
+
+-(void)testTableDynamic_find_string
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"first" type:TDBStringType];
+    for(int i=0; i<10; ++i)
+        [table addRow:@[[NSString stringWithFormat:@"%d", i]]];
+    STAssertEquals((NSUInteger)5, [table findRowIndexWithString:@"5" inColumnWithIndex:0], @"Cannot find element");
+    STAssertEquals((NSUInteger)NSNotFound, ([table findRowIndexWithString:@"11" inColumnWithIndex:0]), @"Found something");
+}
+
+-(void)testTableDynamic_find_date
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"first" type:TDBDateType];
+    for(int i=0; i<10; ++i)
+        [table addRow:@[[NSDate dateWithTimeIntervalSince1970:i]]];
+    STAssertEquals((NSUInteger)5, [table findRowIndexWithDate:[NSDate dateWithTimeIntervalSince1970:5] inColumnWithIndex:0], @"Cannot find element");
+    STAssertEquals((NSUInteger)NSNotFound, ([table findRowIndexWithDate:[NSDate dateWithTimeIntervalSince1970:11] inColumnWithIndex:0]), @"Found something");
+}
+
 
 @end

@@ -37,10 +37,13 @@ Description......
 
 ### API breaking changes:
 
-* none.
+* `findFirstRow` renamed to `indexOfFirstMatchingRow` on `TDBQuery`.
+* `findFirstRowFromIndex:` renamed to `indexOfFirstMatchingRowFromIndex:` on `TDBQuery`.
+* Return `NSNotFound` when appropriate.
 
 ### Enhancements:
 * `renameColumnWithIndex:to:` has been added to `TDBTable`.
+* `distinctValuesInColumnWithIndex` has been added to `TDBTable`.
 * `dateIsBetween::`, `doubleIsBetween::`, `floatIsBetween::` and `intIsBetween::`
    have been added to `TDBQuery`.
 * Column names can begin with non-capital letters too. The generated `addX`
