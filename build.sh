@@ -831,12 +831,7 @@ EOF
         TEST_APP="${APP}Tests"
         
         ## Initialize app test directory
-        mkdir -p "$TEST_APP"
-        find -E "../src/tightdb/objc" -type f -maxdepth 1 \
-            -iregex "^.*\.(h(pp)?|mm?)$" \
-            -exec cp {} "$TEST_APP" \; || exit 1
-
-        cp -r "../src/tightdb/objc/test" "$TEST_APP/test"
+        cp -r "../src/tightdb/objc" "$TEST_APP"
         find -E "$TEST_APP" -type f \
             ! -iregex "^.*\.(h(pp)?|mm?)$" \
             -exec rm {} \; || exit 1
