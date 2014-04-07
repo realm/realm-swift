@@ -847,10 +847,10 @@ EOF
         FRAMEWORK="TightdbCore"
  
         ## Replace all test includes with framework includes.
-        find "$TEST_APP" -type f -exec sed -i '' \
-            -e "s/<tightdb\/objc\/\(.*\)>/\"\1\"/g" {} \; || exit 1
-        find "$TEST_APP" -type f -exec sed -i '' \
-            -e "s/<tightdb\(.*\)>/<TightdbCore\/tightdb\1>/g" {} \; || exit 1
+        find "$TEST_APP" -type f -exec sed -E -i '' \
+            -e "s/#(include|import) <tightdb\/objc\/(.*)>/#\1 \"\2\"/g" {} \; || exit 1
+        find "$TEST_APP" -type f -exec sed -E -i '' \
+            -e "s/#(include|import) <tightdb(.*)>/#\1 <TightdbCore\/tightdb\2>/g" {} \; || exit 1
  
         build_ios_test
         echo "Done building"
