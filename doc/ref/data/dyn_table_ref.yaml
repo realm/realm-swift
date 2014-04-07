@@ -206,7 +206,7 @@ CATEGORIES :
         DESCR  : *g_dyn_table_name_of_column_descr
       RETURN:
         TYPES  : NSUInteger
-        DESCR  : The column index or <code>-1</code> if there is no column with the specified name.
+        DESCR  : The column index or <code>NSNotFound</code> if there is no column with the specified name.
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_get_column_index
         DESCR  : ""
@@ -576,7 +576,7 @@ CATEGORIES :
         DESCR  : *g_dyn_table_lookup_parm1_descr
       RETURN:
         TYPES  : size_t
-        DESCR  : "The row index or <code>tightdb::not_found</code> (equal to <code>size_t(-1)</code>) if there is no match."
+        DESCR  : "The row index or <code>NSNotFound</code> if there is no match."
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_lookup
         DESCR  :
@@ -620,7 +620,7 @@ CATEGORIES :
 #      RETURN:
 #        TYPES  : size_t
 #TODO: is that the same in objc?
-#        DESCR  : "The row index or <code>tightdb::not_found</code> (equal to <code>std::size_t(-1)</code>) if there is no match."
+#        DESCR  : "The row index or <code>NSNotFound</code> if there is no match."
 #      EXAMPLES:
 #      - CODE   : ex_objc_dyn_table_find_first_xxx
 #       DESCR  :

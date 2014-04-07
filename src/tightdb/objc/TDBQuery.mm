@@ -91,15 +91,14 @@ using namespace std;
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState*)state objects:(id __unsafe_unretained*)stackbuf count:(NSUInteger)len
 {
-    (void)len;
-    
+    static_cast<void>(len);
     if (state->state == 0) {
         state->state = [self getFastEnumStart];
         state->mutationsPtr = (unsigned long*)objc_unretainedPointer(self);
         TDBRow* tmp = [self getRow:state->state];
         *stackbuf = tmp;
     }
-    if ((int)state->state != -1) {
+    if (state->state < [self originTable].rowCount && state->state != (NSUInteger)NSNotFound) {
         [((TDBRow*)*stackbuf) TDB_setNdx:state->state];
         state->itemsPtr = stackbuf;
         state->state = [self incrementFastEnum:state->state+1];
@@ -254,12 +253,14 @@ using namespace std;
 
 -(NSUInteger)findFirstRow
 {
-    return m_query->find(0);
+    return was_not_found(m_query->find(0));
 }
 
 -(NSUInteger)findFirstRowFromIndex:(NSUInteger)rowIndex
 {
-    return m_query->find(rowIndex);
+    size_t n = m_query->find(size_t(rowIndex));
+    NSUInteger m = was_not_found(n);
+    return m;
 }
 
 
