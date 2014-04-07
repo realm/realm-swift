@@ -29,6 +29,7 @@
 #include <tightdb/mixed.hpp>
 #include <tightdb/descriptor.hpp>
 #include <tightdb/table.hpp>
+#include <tightdb/table_ref.hpp>
 
 struct ObjcStringAccessor {
     ObjcStringAccessor(const NSString* s)
@@ -175,6 +176,7 @@ void verify_row_with_labels(const tightdb::Descriptor& descr, NSDictionary* data
 void insert_row_with_labels(size_t row_ndx, tightdb::Table& table, NSDictionary *data);
 void set_row_with_labels(size_t row_ndx, tightdb::Table& table, NSDictionary *data);
 
+BOOL set_columns(tightdb::TableRef& parent, NSArray *schema);
 
 // Still used in the new error strategy. Perhaps it should be public?
 enum TightdbErr {
