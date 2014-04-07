@@ -42,7 +42,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
 - (void)testGroup_Misc2
 {
-    size_t row;
+    NSUInteger rowIndex;
     TDBTransaction* group = [TDBTransaction group];
     NSLog(@"HasTable: %i", [group hasTableWithName:@"employees"] );
     // Create new table in group
@@ -61,12 +61,10 @@ TIGHTDB_TABLE_2(QueryTable,
 
     //------------------------------------------------------
 
-    row = [table.Name find:@"Philip"];    // row = (size_t)-1
-    NSLog(@"Philip: %zu", row);
-    STAssertEquals(row, (size_t)-1,@"Philip should not be there");
-    row = [table.Name find:@"Mary"];
-    NSLog(@"Mary: %zu", row);
-    STAssertEquals(row, (size_t)1,@"Mary should have been there");
+    rowIndex = [table.Name find:@"Philip"];    // row = NSNotFound
+    STAssertEquals(rowIndex, (NSUInteger)NSNotFound, @"Philip should not be there");
+    rowIndex = [table.Name find:@"Mary"];
+    STAssertEquals(rowIndex, (size_t)1,@"Mary should have been there");
 
     MyTableView *view = [[[table where].Age columnIsEqualTo:21] findAll];
     size_t cnt = view.rowCount;            // cnt = 2
