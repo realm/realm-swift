@@ -18,31 +18,24 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: insert_rows @@
-
     // Add a row
-    PeopleTableRow *row;
-    row = [people addEmptyRow];
-    row.Name  = @"John";
-    row.Age   = 21;
-    row.Hired = YES;
+    [people addRow:@[@"John", @21, @YES]];
 
     // Add more rows
     [people addRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
     [people addRow:@{@"Name": @"Lars", @"Age": @22, @"Hired": @YES}];
     [people addRow:@{@"Name": @"Phil", @"Age": @43, @"Hired": @NO}];
     [people addRow:@{@"Name": @"Anni", @"Age": @54, @"Hired": @YES}];
-
     // @@EndExample@@
 
     // @@Example: insert_at_index @@
     [people insertRow:@{@"Name": @"Frank", @"Age": @34, @"Hired": @YES} atIndex:2];
-
     // @@EndExample@@
 
     // @@Example: number_of_rows @@
-    NSUInteger cnt1 = people.rowCount;                 // cnt = 6
+    NSUInteger cnt1 = people.rowCount;                 // =&gt; 6
     NSLog(@"RowCount: %i", cnt1);
-    BOOL empty = people.rowCount == 0;                 // empty = NO
+    BOOL empty = people.rowCount == 0;                 // =&gt; NO
     NSLog(@"Table is empty? %d", empty);
     // @@EndExample@@
 
@@ -64,7 +57,7 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: last_row @@
-    NSString *last = [people rowAtLastIndex].Name;  // =&gt; "Anni"
+    NSString *last = [people rowAtLastIndex].Name;     // =&gt; "Anni"
     NSLog(@"Last name: %@", last);
     // @@EndExample@@
 
@@ -74,7 +67,7 @@ void tableFunc() {
 
     // @@Example: deleting_row @@
     [people removeRowAtIndex:2];
-    NSUInteger cnt2 = people.rowCount;                  // cnt = 5
+    NSUInteger cnt2 = people.rowCount;                  // =&gt; 5
     NSLog(@"RowCount: %i", cnt2);
     // @@EndExample@@
 
@@ -86,9 +79,9 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: simple_seach @@
-    NSUInteger row_id;
-    row_id = [people.Name find:@"Philip"];              // (NSUInteger)-1: Not found
-    row_id = [people.Name find:@"Mary"];                // row = 1
+    NSUInteger rowIndex;
+    rowIndex = [people.Name find:@"Philip"];              // =&gt; NSNotFound
+    rowIndex = [people.Name find:@"Mary"];                // =&gt; 1
     // @@EndExample@@
 
     // @@Example: advanced_search @@
@@ -110,7 +103,6 @@ void tableFunc() {
     // fast emunaration on view
     for (PeopleTableRow *r in res)
         NSLog(@"%@ is %lld years old", r.Name, r.Age);
-
     // @@EndExample@@
 
 }
