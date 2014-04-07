@@ -65,9 +65,9 @@
 -(BOOL)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex;
 
 // Removing rows
--(BOOL)removeAllRows;
--(BOOL)removeRowAtIndex:(NSUInteger)rowIndex;
--(BOOL)removeLastRow;
+-(void)removeAllRows;
+-(void)removeRowAtIndex:(NSUInteger)rowIndex;
+-(void)removeLastRow;
 
 // Queries
 -(TDBQuery *)where;
