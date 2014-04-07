@@ -264,53 +264,54 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     NSUInteger doubleCol = [table addColumnWithName:@"DoubleCol" type:TDBDoubleType];
     NSUInteger dateCol = [table addColumnWithName:@"DateCol" type:TDBDateType];
     
-    // Zero row added
+    ////////// Zero rows added ///////////
     
-    // MIN
+    // Using specific column type operations MIN
     STAssertEquals([[table where] minIntInColumnWithIndex:intCol], NSIntegerMax, nil);
     STAssertEquals([[table where] minFloatInColumnWithIndex:floatCol], (float)INFINITY, nil);
     STAssertEquals([[table where] minDoubleInColumnWithIndex:doubleCol], (double)INFINITY, nil);
     STAssertNil([[table where] minDateInColumnWithIndex:dateCol], nil);
     
+    // Using generic column type operations MIN
     STAssertEqualObjects([[table where] minInColumnWithIndex:intCol], @NSIntegerMax, nil);
     STAssertEquals([[[table where] minInColumnWithIndex:floatCol] floatValue], (float)INFINITY, nil);
     STAssertEquals([[[table where] minInColumnWithIndex:doubleCol] doubleValue], (double)INFINITY, nil);
     STAssertNil([[table where] minInColumnWithIndex:dateCol], nil);
     
-    
-    // MAX
+    // Using specific column type operations MAX
     STAssertEquals([[table where] maxIntInColumnWithIndex:intCol], NSIntegerMin, nil);
     STAssertEquals([[table where] maxFloatInColumnWithIndex:floatCol], (float)-INFINITY, nil);
     STAssertEquals([[table where] maxDoubleInColumnWithIndex:doubleCol], (double)-INFINITY, nil);
     STAssertNil([[table where] maxDateInColumnWithIndex:dateCol], nil);
     
+    // Using generic column type operations MAX
     STAssertEqualObjects([[table where] maxInColumnWithIndex:intCol], @NSIntegerMin, nil);
     STAssertEquals([[[table where] maxInColumnWithIndex:floatCol] floatValue], (float)-INFINITY, nil);
     STAssertEquals([[[table where] maxInColumnWithIndex:doubleCol] doubleValue], (double)-INFINITY, nil);
     STAssertNil([[table where] maxInColumnWithIndex:dateCol], nil);
     
-    
-    // SUM
+    // Using specific column type operations SUM
     STAssertEquals([[table where] sumIntColumnWithIndex:intCol], (int64_t)0, nil);
     STAssertEquals([[table where] sumFloatColumnWithIndex:floatCol], (double)0, nil);
     STAssertEquals([[table where] sumDoubleColumnWithIndex:doubleCol], (double)0, nil);
     
+    // Using generic column type operations SUM
     STAssertEqualObjects([[table where] sumColumnWithIndex:intCol], @0, nil);
     STAssertEquals([[[table where] sumColumnWithIndex:floatCol] doubleValue], (double)0,  nil);
     STAssertEquals([[[table where] sumColumnWithIndex:doubleCol] doubleValue], (double)0, nil);
     
-    
-    // AVG
+    // Using specific column type operations AVG
     STAssertEquals([[table where] avgIntColumnWithIndex:intCol], (double)0, nil);
     STAssertEquals([[table where] avgFloatColumnWithIndex:floatCol], (double)0, nil);
     STAssertEquals([[table where] avgDoubleColumnWithIndex:doubleCol], (double)0, nil);
     
+    // Using generic column type operations AVG
     STAssertEqualObjects([[table where] avgColumnWithIndex:intCol], @0, nil);
     STAssertEquals([[[table where] avgColumnWithIndex:floatCol] doubleValue], (double)0,  nil);
     STAssertEquals([[[table where] avgColumnWithIndex:doubleCol] doubleValue], (double)0, nil);
 
-    
-    // Add rows with values
+    ////////// Add rows with values ///////////
+
     NSDate *date3 = [NSDate date];
     NSDate *date33 = [date3 dateByAddingTimeInterval:1];
     NSDate *date333 = [date33 dateByAddingTimeInterval:1];
