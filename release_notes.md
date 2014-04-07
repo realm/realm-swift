@@ -37,6 +37,8 @@ Description......
 
 ### API breaking changes:
 
+* `findFirstRow` renamed to `indexOfFirstMatchingRow` on `TDBQuery`.
+* `findFirstRowFromIndex:` renamed to `indexOfFirstMatchingRowFromIndex:` on `TDBQuery`.
 * Return `NSNotFound` when appropriate.
 
 ### Enhancements:
