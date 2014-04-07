@@ -218,6 +218,7 @@ build_ios_test()
             '\$(PROJECT_DIR)',
         ],
         'CODE_SIGN_IDENTITY[sdk=iphoneos*]': 'iPhone Developer: Oleksandr(Alex Shturmov (CB4YV2W7W5)',
+        #'CODE_SIGN_IDENTITY[sdk=iphoneos*]': 'iOS Developer: Oleksandr(Alex Shturmov (Tightdb Denmark ApS)',
         'CLANG_ENABLE_OBJC_ARC': 'YES',
     },
     'target_defaults': {
@@ -225,7 +226,7 @@ build_ios_test()
             'libraries': [
                 '\$(SDKROOT)/usr/lib/libc++.dylib',
                 '\$(DEVELOPER_DIR)/Library/Frameworks/XCTest.framework',
-                '\$(DEVELOPER_DIR)/Library/Frameworks/SenTestingKit.framework',
+                #'\$(DEVELOPER_DIR)/Library/Frameworks/SenTestingKit.framework',
                 '\$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
                 '\$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
                 '\$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
