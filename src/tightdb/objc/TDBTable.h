@@ -57,15 +57,15 @@
 
 // Add a row at the end of the table.
 // If data is nil, an empty row with default values is added.
--(NSUInteger)addRow:(NSObject *)data;
+-(void)addRow:(NSObject *)data;
 
 // Inserting rows at specific positions
--(BOOL)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex;
+-(void)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex;
 
 // Removing rows
--(BOOL)removeAllRows;
--(BOOL)removeRowAtIndex:(NSUInteger)rowIndex;
--(BOOL)removeLastRow;
+-(void)removeAllRows;
+-(void)removeRowAtIndex:(NSUInteger)rowIndex;
+-(void)removeLastRow;
 
 // Queries
 -(TDBQuery *)where;
