@@ -280,10 +280,9 @@ using namespace std;
     // TODO: Use a macro or a function for error handling
 
     if(m_read_only) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:table_is_read_only"
-                                                         reason:@"You tried to modify a table in read only mode"
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+                                       reason:@"You tried to modify a table in read only mode"
+                                     userInfo:nil];
     }
 
     NSUInteger index;
@@ -291,10 +290,9 @@ using namespace std;
         index = m_table->add_empty_row(num_rows);
     }
     catch(std::exception& ex) {
-        NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                         reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+                                       reason:[NSString stringWithUTF8String:ex.what()]
+                                     userInfo:nil];
     }
 
     return index;
@@ -358,14 +356,20 @@ using namespace std;
     return [[TDBRow alloc] initWithTable:self ndx:ndx];
 }
 
--(NSUInteger)addRow:(NSObject*)data
+-(void)addRow:(NSObject*)data
 {
+    if(m_read_only) {
+        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+                                       reason:@"You tried to modify a table in read only mode"
+                                     userInfo:[NSMutableDictionary dictionary]];
+    }
+    
     if (!data) {
-        return [self TDB_addEmptyRows:1];
+        [self TDB_addEmptyRow];
+        return ;
     }
     tightdb::Table& table = *m_table;
     [self insertRow:data atIndex:table.size()];
-    return table.size()-1;
 }
 
 /* Moved to private header */
@@ -375,10 +379,11 @@ using namespace std;
 }
 
 
--(BOOL)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
+-(void)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
 {
     if (!anObject) {
-        return [self TDBInsertRow:rowIndex];
+        [self TDBInsertRow:rowIndex];
+        return ;
     }
     
     tightdb::Table& table = *m_table;
@@ -387,62 +392,51 @@ using namespace std;
     if ([anObject isKindOfClass:[NSArray class]]) {
         verify_row(*desc, (NSArray *)anObject);
         insert_row(size_t(rowIndex), table, (NSArray *)anObject);
+        return ;
     }
     
     if ([anObject isKindOfClass:[NSDictionary class]]) {
         verify_row_with_labels(*desc, (NSDictionary *)anObject);
         insert_row_with_labels(size_t(rowIndex), table, (NSDictionary *)anObject);
+        return ;
     }
     
     /* FIXME: pull out properties of object and insert as row */
-    return YES;
+    @throw [NSException exceptionWithName:@"tightdb:column_not_implemented"
+                                   reason:@"You should either use NSDictionary or NSArray"
+                                 userInfo:nil];
 }
 
 
--(BOOL)removeAllRows
+-(void)removeAllRows
 {
     if (m_read_only) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
-                                                         reason:@"You tried to modify an immutable tableview"
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
-        return NO;
+        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+                                       reason:@"You tried to modify an immutable table."
+                                     userInfo:nil];
     }
     
     m_table->clear();
-    return YES;
 }
 
--(BOOL)removeRowAtIndex:(NSUInteger)ndx
-{
-    return [self removeRowAtIndex:ndx error:nil];
-}
-
--(BOOL)removeRowAtIndex:(NSUInteger)ndx error:(NSError* __autoreleasing*)error
+-(void)removeRowAtIndex:(NSUInteger)ndx
 {
     if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to remove row while read only ndx: %llu", (unsigned long long)ndx]);
-        return NO;
+        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+                                       reason:@"You tried to modify an immutable table."
+                                     userInfo:nil];
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->remove(ndx);, NO);
-    return YES;
+    m_table->remove(ndx);
 }
 
--(BOOL)removeLastRow
-{
-    return [self removeLastRowWithError:nil];
-}
-
--(BOOL)removeLastRowWithError:(NSError* __autoreleasing*)error
+-(void)removeLastRow
 {
     if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, @"Tried to remove last while read-only.");
-        return NO;
+        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+                                       reason:@"You tried to modify an immutable table."
+                                     userInfo:nil];
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->remove_last();, NO);
-    return YES;
+    m_table->remove_last();
 }
 
 
@@ -910,10 +904,9 @@ using namespace std;
         m_table->remove_column(columnIndex);
     }
     catch(std::exception& ex) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                         reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw[NSException exceptionWithName:@"tightdb:core_exception"
+                                      reason:[NSString stringWithUTF8String:ex.what()]
+                                    userInfo:nil];
     }
 }
 

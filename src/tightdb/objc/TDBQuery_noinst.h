@@ -22,9 +22,11 @@
 
 #import "TDBQuery.h"
 
+#include <tightdb/table_view.hpp>
 
 @interface TDBQuery (noinst)
 
 -(tightdb::Query&)getNativeQuery;
 
+-(void)setTableView:(tightdb::TableView&)tableView;
 @end
