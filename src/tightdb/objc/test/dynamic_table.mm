@@ -26,6 +26,8 @@
 
 #include <string.h>
 
+using namespace std;
+
 @interface TDBDynamicTableTests: XCTestCase
   // Intentionally left blank.
   // No new public instance methods need be defined.
