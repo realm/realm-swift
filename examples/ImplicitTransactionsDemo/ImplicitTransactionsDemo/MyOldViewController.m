@@ -7,7 +7,6 @@
 @implementation MyOldViewController
 {
     NSTimer *refreshTimer;
-    BOOL refreshEnabled;
     int numRefreshTicks;
     TDBContext *context;
 }
