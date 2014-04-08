@@ -52,7 +52,8 @@ Description......
   appending a new row will look like `[table addage:7]`.
 * Mixed typed values are better validated when rows are added, inserted, 
   or modified as object literals.
-
+* `addRow`, `insertRow`, and row updates can be done using objects
+   derived from `NSObject`.
 
 =============================================================
 0.5.0 Release notes (2014-04-02)
