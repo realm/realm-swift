@@ -26,25 +26,19 @@
 #include <tightdb/table_view.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
-#include "util_noinst.hpp"
-
-#import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBTable_noinst.h>
-#import <tightdb/objc/TDBView.h>
-#import <tightdb/objc/TDBView_noinst.h>
-#import <tightdb/objc/TDBQuery.h>
-#import <tightdb/objc/TDBQuery_noinst.h>
-#import <tightdb/objc/TDBRow.h>
-#import <tightdb/objc/TDBDescriptor.h>
-#import <tightdb/objc/TDBDescriptor_noinst.h>
-#import <tightdb/objc/TDBColumnProxy.h>
-#import <tightdb/objc/NSData+TDBGetBinaryData.h>
-#import <tightdb/objc/PrivateTDB.h>
-
-
-#include <tightdb/objc/util_noinst.hpp>
+#import "TDBTable_noinst.h"
+#import "TDBView_noinst.h"
+#import "TDBQuery_noinst.h"
+#import "TDBRow.h"
+#import "TDBDescriptor_noinst.h"
+#import "TDBColumnProxy.h"
+#import "NSData+TDBGetBinaryData.h"
+#import "PrivateTDB.h"
+#import "TDBSmartContext_noinst.h"
+#import "util_noinst.hpp"
 
 using namespace std;
+
 
 @implementation TDBTable
 {
@@ -214,10 +208,10 @@ using namespace std;
 
 -(void)dealloc
 {
-#ifdef TIGHTDB_DEBUG
-    NSLog(@"TDBTable dealloc");
-#endif
-    m_parent = nil; // FIXME: Does this really make a difference?
+    if ([m_parent isKindOfClass:[TDBSmartContext class]]) {
+        TDBSmartContext *context = (TDBSmartContext *)m_parent;
+        [context tableDidDie];
+    }
 }
 
 -(NSUInteger)columnCount

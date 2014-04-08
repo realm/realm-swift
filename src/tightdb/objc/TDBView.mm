@@ -26,17 +26,12 @@
 #include <tightdb/table_view.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
-#import "TDBTable.h"
 #import "TDBTable_noinst.h"
 #import "TDBRow.h"
-#import "TDBView.h"
 #import "TDBView_noinst.h"
-#import "TDBQuery.h"
 #import "TDBQuery_noinst.h"
 #import "PrivateTDB.h"
-
-#include <tightdb/objc/util_noinst.hpp>
-
+#import "util_noinst.hpp"
 
 
 @implementation TDBView
@@ -55,7 +50,7 @@
     view_2->m_view.reset(new tightdb::TableView(view)); // FIXME: Exception handling needed here
     view_2->m_table = table;
     view_2->m_read_only = [table isReadOnly];
-    
+
     return view_2;
 }
 

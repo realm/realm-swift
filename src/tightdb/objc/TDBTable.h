@@ -27,7 +27,6 @@
 @class TDBDescriptor;
 @class TDBRow;
 
-/****************	  TDBTable		****************/
 
 @interface TDBTable: NSObject <TDBView,NSFastEnumeration>
 

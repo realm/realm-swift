@@ -20,6 +20,7 @@
 
 #import <Foundation/Foundation.h>
 
+
 @class TDBTable;
 
 @interface TDBRow: NSObject
