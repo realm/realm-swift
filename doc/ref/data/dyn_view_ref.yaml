@@ -202,17 +202,17 @@ CATEGORIES :
 #      SUMMARY  : *g_dyn_table_get_xxx_summary
 #      DESCR    : *g_dyn_table_get_xxx_descr
 #      SIGNATURE: |
-#                 (BOOL)getBool:(size_t)col_ndx ndx:(size_t)ndx
-#                 (int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
-#                 (time_t)getDate:(size_t)col_ndx ndx:(size_t)ndx
-#                 (NSString *)getString:(size_t)col_ndx ndx:(size_t)ndx
+#                 (BOOL)getBool:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+#                 (int64_t)get:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+#                 (time_t)getDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+#                 (NSString *)getString:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
 #      CONST    : True
 #      PARAMS:
 #      - NAME   : column_ndx
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #        DESCR  : The column index.
 #      - NAME   : row_ndx
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #        DESCR  : The row index.
 #      RETURN:
 #        TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, BinaryData, Mixed, DataType, TableRef, ConstTableRef]
@@ -245,27 +245,27 @@ CATEGORIES :
       SUMMARY  : *g_dyn_table_set_xxx_summary
       DESCR    : *g_dyn_table_set_xxx_descr
       SIGNATURE: |
-                 void set_bool(size_t column_ndx, size_t row_ndx, bool value);
-                 void set_int(size_t column_ndx, size_t row_ndx, int64_t value);
-                 void set_float(size_t column_ndx, size_t row_ndx, float value);
-                 void set_double(size_t column_ndx, size_t row_ndx, double value);
-                 template<class E> void set_enum(size_t column_ndx, size_t row_ndx, E value);
-                 void set_date(size_t column_ndx, size_t row_ndx, time_t value);
-                 void set_string(size_t column_ndx, size_t row_ndx, const char* value);
-                 void set_binary(size_t column_ndx, size_t row_ndx, const char* value, size_t len);
-                 void set_mixed(size_t column_ndx, size_t row_ndx, Mixed value);
+                 void set_bool(NSUInteger column_ndx, NSUInteger row_ndx, bool value);
+                 void set_int(NSUInteger column_ndx, NSUInteger row_ndx, int64_t value);
+                 void set_float(NSUInteger column_ndx, NSUInteger row_ndx, float value);
+                 void set_double(NSUInteger column_ndx, NSUInteger row_ndx, double value);
+                 template<class E> void set_enum(NSUInteger column_ndx, NSUInteger row_ndx, E value);
+                 void set_date(NSUInteger column_ndx, NSUInteger row_ndx, time_t value);
+                 void set_string(NSUInteger column_ndx, NSUInteger row_ndx, const char* value);
+                 void set_binary(NSUInteger column_ndx, NSUInteger row_ndx, const char* value, NSUInteger len);
+                 void set_mixed(NSUInteger column_ndx, NSUInteger row_ndx, Mixed value);
       PARAMS:
       - NAME   : column_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : The column index.
       - NAME   : row_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : The row index.
       - NAME   : value
         TYPES  : [BOOL, int64_t, float, double, time_t, const char*, Mixed]
         DESCR  : The value.
       - NAME   : len
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : Size in bytes of binary value.
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_set_xxx
@@ -281,13 +281,13 @@ CATEGORIES :
       DESCR    : *g_dyn_table_get_subtable_size_descr
       PARAMS:
       - NAME   : column_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : The column index.
       - NAME   : row_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : The row index.
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : Number of rows.
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_get_subtable
@@ -301,10 +301,10 @@ CATEGORIES :
       DESCR    : *g_dyn_table_clear_subtable_descr
       PARAMS:
       - NAME   : column_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : The column index.
       - NAME   : row_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : The row index.
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_clear_subtable
@@ -344,21 +344,21 @@ CATEGORIES :
       SUMMARY  : *g_dyn_table_find_first_xxx_summary
       DESCR    : *g_dyn_table_find_first_xxx_descr
       SIGNATURE: |
-                 size_t find_first_int(size_t column_ndx, int64_t value) const;
-                 size_t find_first_bool(size_t column_ndx, bool value) const;
-                 size_t find_first_float(size_t column_ndx, float value) const;
-                 size_t find_first_double(size_t column_ndx, double value) const;
-                 size_t find_first_date(size_t column_ndx, time_t value) const;
-                 size_t find_first_string(size_t column_ndx, const char* value) const;
+                 NSUInteger find_first_int(NSUInteger column_ndx, int64_t value) const;
+                 NSUInteger find_first_bool(NSUInteger column_ndx, bool value) const;
+                 NSUInteger find_first_float(NSUInteger column_ndx, float value) const;
+                 NSUInteger find_first_double(NSUInteger column_ndx, double value) const;
+                 NSUInteger find_first_date(NSUInteger column_ndx, time_t value) const;
+                 NSUInteger find_first_string(NSUInteger column_ndx, const char* value) const;
       PARAMS:
       - NAME   : column_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : The column index.
       - NAME   : value
         TYPES  : [BOOL, int64_t, float, double, time_t, const char*]
         DESCR  : The value.
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : "The row index or <code>NSNotFound<code> if there is no match."
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_find_first_xxx
@@ -394,15 +394,15 @@ CATEGORIES :
       SUMMARY  : *g_dyn_table_find_all_xxx_summary
       DESCR    : *g_dyn_table_find_all_xxx_descr
       SIGNATURE: |
-                 TableView      find_all_int(size_t column_ndx, int64_t value);
-                 TableView      find_all_bool(size_t column_ndx, bool value);
-                 TableView      find_all_date(size_t column_ndx, time_t value);
-                 TableView      find_all_string(size_t column_ndx, const char* value);
-                 TableView      find_all_float(size_t column_ndx, float value);
-                 TableView      find_all_double(size_t column_ndx, double value);
+                 TableView      find_all_int(NSUInteger column_ndx, int64_t value);
+                 TableView      find_all_bool(NSUInteger column_ndx, bool value);
+                 TableView      find_all_date(NSUInteger column_ndx, time_t value);
+                 TableView      find_all_string(NSUInteger column_ndx, const char* value);
+                 TableView      find_all_float(NSUInteger column_ndx, float value);
+                 TableView      find_all_double(NSUInteger column_ndx, double value);
       PARAMS:
       - NAME   : column_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : The column index.
       - NAME   : value
         TYPES  : [BOOL, int64_t, float, double, time_t, const char*]
@@ -422,7 +422,7 @@ CATEGORIES :
       DESCR    : *g_dyn_view_get_sorted_view_desc
       PARAMS:
       - NAME   : column_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : The column index.
       - NAME   : ascending
         TYPES  : bool
@@ -445,12 +445,12 @@ CATEGORIES :
       SUMMARY  : *g_dyn_view_sum_summary
       DESCR    : *g_dyn_view_sum_descr
       SIGNATURE: |
-                 int64_t sum(size_t column_ndx) const;
-                 double sum_float(size_t column_ndx) const;
-                 double sum_double(size_t column_ndx) const;
+                 int64_t sum(NSUInteger column_ndx) const;
+                 double sum_float(NSUInteger column_ndx) const;
+                 double sum_double(NSUInteger column_ndx) const;
       PARAMS:
       - NAME   : column_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : Column index.
       RETURN:
         TYPES  : [int64_t, float, double]
@@ -471,12 +471,12 @@ CATEGORIES :
       DESCR    : *g_dyn_view_maximum_descr
       CONST    : True
       SIGNATURE: |
-                 int64_t maximum(size_t column_ndx) const;
-                 double  maximum_float(size_t column_ndx) const;
-                 double  maximum_double(size_t column_ndx) const;
+                 int64_t maximum(NSUInteger column_ndx) const;
+                 double  maximum_float(NSUInteger column_ndx) const;
+                 double  maximum_double(NSUInteger column_ndx) const;
       PARAMS:
       - NAME   : column_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : Column index.
       RETURN:
         TYPES  : [int64_t, double]
@@ -497,12 +497,12 @@ CATEGORIES :
       DESCR    : *g_dyn_view_minimum_descr
       CONST    : True
       SIGNATURE: |
-                 int64_t minimum(size_t column_ndx) const;
-                 double  minimum_float(size_t column_ndx) const;
-                 double  minimum_double(size_t column_ndx) const;
+                 int64_t minimum(NSUInteger column_ndx) const;
+                 double  minimum_float(NSUInteger column_ndx) const;
+                 double  minimum_double(NSUInteger column_ndx) const;
       PARAMS:
       - NAME   : column_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : Column index.
       RETURN:
         TYPES  : [int64_t, double]
@@ -539,7 +539,7 @@ CATEGORIES :
         TYPES  : std::ostream&
         DESCR  : Output stream.
       - NAME   : limit
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : "The number of rows to convert. Default: 500."
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_to_string
