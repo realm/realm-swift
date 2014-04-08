@@ -18,8 +18,26 @@
  *
  **************************************************************************/
 
-#import <Foundation/Foundation.h>
+#include <tightdb/objc/TDBType.h>
 
-@interface TDBQuery (noinst)
--(tightdb::Query&)getNativeQuery;
+@class TDBRow;
+
+@protocol TDBView
+
+@property (nonatomic, readonly) NSUInteger rowCount;
+@property (nonatomic, readonly) NSUInteger columnCount;
+
+// Getting and setting individual rows
+-(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
+-(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
+-(TDBRow *)lastRow;
+-(TDBRow *)firstRow;
+
+// Working with columns
+-(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
+
+// Removing rows
+-(void)removeRowAtIndex:(NSUInteger)rowIndex;
+-(void)removeAllRows;
+
 @end

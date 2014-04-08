@@ -71,7 +71,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     if (hired) NSLog(@"is hired.");
 
     // Setting values  (note: setter access will be made obsolete, use dot notation)
-    [[people rowAtIndex:5] setAge:43];  // Getting younger
+    [people rowAtIndex:5].Age = 43;  // Getting younger
     
     // or with dot-syntax:
     myRow.Age += 1;                                    // Happy birthday!
@@ -102,7 +102,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     size_t row;
     row = [people.Name find:@"Philip"];    // row = (size_t)-1
     NSLog(@"Philip: %zu  [-1]", row);
-    STAssertEquals(row, (size_t)-1,@"Philip should not be there", nil);
+    STAssertEquals(row, NSNotFound, @"Philip should not be there", nil);
 
     row = [people.Name find:@"Mary"];
     NSLog(@"Mary: %zu", row);
@@ -118,7 +118,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
 
     // Create query (current employees between 20 and 30 years old)
     PeopleTableQuery *q = [[[people where].Hired columnIsEqualTo:YES]            // Implicit AND
-                                  .Age columnIsBetween:20 and_:30];
+                                  .Age columnIsBetween:20 :30];
 
     // Get number of matching entries
     NSLog(@"Query count: %lu",[q countRows]);
@@ -157,7 +157,6 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
 
     for (size_t i = 0; i < [diskTable rowCount]; i++) {
         PeopleTableRow *row = [diskTable rowAtIndex:i];
-        NSLog(@"%zu: %@", i, [row Name]);
         NSLog(@"%zu: %@", i, row.Name);
     }
 

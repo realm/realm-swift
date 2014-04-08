@@ -9,7 +9,7 @@
 # JJEPSEN c++ reference documentation note :  get/set should be replaced with operator overloading
 
 ID         : class_typed_tableview
-TITLE      : TableView (typed)
+TITLE      : TDBView (typed)
 SUMMARY    : *g_typed_view_intro_summary
 DESCR      : *g_typed_view_intro_descr
 SEE        :
@@ -181,7 +181,7 @@ CATEGORIES :
         DESCR  : The value.
       RETURN:
         TYPES  : size_t
-        DESCR  : "The row index or <code>tightdb::not_found</code> (equal to <code>std::size_t(-1)</code>) if there is no match."
+        DESCR  : "The row index or <code>NSNotFound</code> if there is no match."
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_find_first_xxx
         DESCR  :

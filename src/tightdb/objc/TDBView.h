@@ -24,7 +24,7 @@
 
 #include <tightdb/objc/TDBType.h>
 
-@interface TDBView: NSObject <NSFastEnumeration>
+@interface TDBView: NSObject <TDBView, NSFastEnumeration>
 
 @property (nonatomic, readonly) NSUInteger rowCount;
 @property (nonatomic, readonly) NSUInteger columnCount;
@@ -35,7 +35,7 @@
 -(TDBRow *)lastRow;
 -(TDBRow *)firstRow;
 
--(TDBType)columnTypeOfColumn:(NSUInteger)colIndex;
+-(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
 -(void) sortUsingColumnWithIndex: (NSUInteger)colIndex;
 -(void) sortUsingColumnWithIndex: (NSUInteger)colIndex inOrder: (TDBSortOrder)order;

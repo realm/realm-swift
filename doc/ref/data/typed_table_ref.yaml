@@ -8,7 +8,7 @@
 #INCONSISTENCY popBack(), find_first_* ->> find*   ("first" is omitted)
 
 ID         : class_typed_table
-TITLE      : Table (typed)
+TITLE      : TDBTable (typed)
 SUMMARY    : *g_typed_table_summary
 DESCR      : >
              NOTE: The current documentation of Typed Table is under construction,
@@ -24,18 +24,6 @@ DESCR      : >
              When the number and types of columns are known a priori, you can use a set of macros
              to define type safe and efficient table classes. The compiler can take avantage of
              a typed table and enforce type checking of the methods parameters at compile time.
-
-             The table supports the most common types including integers, timestamps and strings.
-             It is possible to use a TightDB table class as column type. This means that you can
-             have tables of tables structure.
-
-             Moreover, TightDB introduces a column type called <b>Mixed</b>. A value of the
-             Mixed type can be any supported value of TightDB. This implies - as the name
-             indicates - that you can mix the type of values in the the column. In one row the
-             value could be an integer, in another row the value could be a string or even a table.
-             The Objective-C binding to TightDB utilizes Cocoa objects (<code>NSNumber</code>,
-             <code>NSString</code>, <code>NSDate</code>, etc.) to support the <b>Mixed</b> typed
-             columns.
 
              The aim of the TightDB table class is that it feels as close to the native data
              structures (in particular arrays) as possible.
@@ -208,8 +196,11 @@ CATEGORIES:
       DESCR    : |
                  This method adds a new row to a typed table.
 
-                 The method is made available by a macro based on the table definition {@link g_typed_table_macros}. Note that the method name includes specific column names defined in the table definition. E.g. "CName1" will be replaced by the name of the first column in your table and so forth.
-                 Please refer to the example below.
+                 The method is made available by a macro based on the table definition {@link g_typed_table_macros}. 
+                 Note that the method name includes specific column names defined in the table definition. 
+                 For example "CName1" will be replaced by the name of the first column in your table and so forth.
+                 Moreover, if the first column is named "age", the method is <code>addage</code>. That is, the name of 
+                 method is a simply concatenation of "add" and the name of the first column.
       SIGNATURE: (void)addCName1:(CType1*)value1 CName2:(CType2*)value2 CName3:(CType3*)value3
       PARAMS:
       - NAME   : "value1, value2, value3, &#133;"
@@ -319,7 +310,7 @@ CATEGORIES:
   #      DESCR  : *g_typed_table_lookup_parm1_descr
   #    RETURN:
   #      TYPES  : size_t
-  #      DESCR  : "The row index or <code>TBD</code> (equal to <code>size_t(-1)</code>) if there is no match."
+  #      DESCR  : "The row index or <code>NSNotFound</code> if there is no match."
   #    EXAMPLES:
   #    - CODE   : ex_objc_typed_table_find_first_xxx
   #      DESCR  :

@@ -9,7 +9,7 @@
 # TODO: describe which column-types the methods can be used on.
 
 ID         : class_typed_query
-TITLE      : Query (typed)
+TITLE      : TDBQuery (typed)
 SUMMARY    : *g_typed_query_intro_summary
 DESCR      : *g_typed_query_intro_descr
 SEE        :
@@ -196,13 +196,13 @@ CATEGORIES :
   - g_typed_query_between_float:
   - g_typed_query_between_double:
   - g_typed_query_between_date:
-      NAMES    : ["columnIsBetween:and_:", "columnIsBetween:and_:", "columnIsBetween:and_:", "columnIsBetween:and_:"]
+      NAMES    : ["columnIsBetween::", "columnIsBetween::", "columnIsBetween::", "columnIsBetween::"]
       TITLE    : "*columnIsBetween"
       SIGNATURE: |
-                 .CName (TableName_Query *)columnIsBetween:(int64_t)from and_:(int64_t)to
-                 .CName (TableName_Query *)columnIsBetween:(float)from and_:(float)to
-                 .CName (TableName_Query *)columnIsBetween:(double)from and_:(double)to
-                 .CName (TableName_Query *)columnIsBetween:(time_t)from and_:(time_t)to
+                 .CName (TableName_Query *)columnIsBetween:(int64_t)from :(int64_t)to
+                 .CName (TableName_Query *)columnIsBetween:(float)from :(float)to
+                 .CName (TableName_Query *)columnIsBetween:(double)from :(double)to
+                 .CName (TableName_Query *)columnIsBetween:(time_t)from :(time_t)to
       DESCR    : *g_typed_query_between_descr
       SUMMARY  : *g_typed_query_between_summary
       PARAMS:

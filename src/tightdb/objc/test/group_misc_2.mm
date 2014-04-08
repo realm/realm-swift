@@ -42,7 +42,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
 - (void)testGroup_Misc2
 {
-    size_t row;
+    NSUInteger rowIndex;
     TDBTransaction* group = [TDBTransaction group];
     NSLog(@"HasTable: %i", [group hasTableWithName:@"employees"] );
     // Create new table in group
@@ -61,12 +61,10 @@ TIGHTDB_TABLE_2(QueryTable,
 
     //------------------------------------------------------
 
-    row = [table.Name find:@"Philip"];    // row = (size_t)-1
-    NSLog(@"Philip: %zu", row);
-    STAssertEquals(row, (size_t)-1,@"Philip should not be there");
-    row = [table.Name find:@"Mary"];
-    NSLog(@"Mary: %zu", row);
-    STAssertEquals(row, (size_t)1,@"Mary should have been there");
+    rowIndex = [table.Name find:@"Philip"];    // row = NSNotFound
+    STAssertEquals(rowIndex, (NSUInteger)NSNotFound, @"Philip should not be there");
+    rowIndex = [table.Name find:@"Mary"];
+    STAssertEquals(rowIndex, (size_t)1,@"Mary should have been there");
 
     MyTableView *view = [[[table where].Age columnIsEqualTo:21] findAll];
     size_t cnt = view.rowCount;            // cnt = 2
@@ -84,7 +82,7 @@ TIGHTDB_TABLE_2(QueryTable,
     [table2 addHired:YES Age:54];
 
     // Create query (current employees between 20 and 30 years old)
-    MyTable2Query* q = [[[table2 where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 and_:30];
+    MyTable2Query* q = [[[table2 where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 :30];
 
     // Get number of matching entries
     NSLog(@"Query count: %zu", [q countRows]);
@@ -119,7 +117,6 @@ TIGHTDB_TABLE_2(QueryTable,
     NSLog(@"Disktable size: %zu", diskTable.rowCount);
     for (size_t i = 0; i < diskTable.rowCount; i++) {
         MyTableRow* cursor = [diskTable rowAtIndex:i];
-        NSLog(@"%zu: %@", i, [cursor Name]);
         NSLog(@"%zu: %@", i, cursor.Name);
         NSLog(@"%zu: %@", i, [diskTable TDB_stringInColumnWithIndex:0 atRowIndex:i]);
     }
@@ -149,7 +146,7 @@ TIGHTDB_TABLE_2(QueryTable,
     [table addFirst:8 Second:@"The quick brown fox"];
 
     {
-        QueryTableQuery* q = [[table where].First columnIsBetween:3 and_:7]; // Between
+        QueryTableQuery* q = [[table where].First columnIsBetween:3 :7]; // Between
         STAssertEquals((size_t)2,   [q countRows], @"count != 2");
 //        STAssertEquals(9,   [q.First sum]); // Sum
         STAssertEquals(4.5, [q.First avg], @"Avg!=4.5"); // Average

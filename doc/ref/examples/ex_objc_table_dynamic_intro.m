@@ -1,61 +1,53 @@
 /* @@Example: ex_objc_table_dynamic_intro @@ */
-
 #import <Tightdb/Tightdb.h>
 
 void ex_objc_table_dynamic_intro()
 {
-    @autoreleasepool {
-
-        /* Create a new table dynamically. */
-        TDBTable *table = [[TDBTable alloc] init];
-
-        NSUInteger const NAME = [table addColumnWithName:@"Name" type:TDBStringType];
-        NSUInteger const AGE = [table addColumnWithName:@"Age" type:TDBIntType];
-
-        /* Add a row with values. */
-        NSUInteger rowIndex = [table addRow:nil];
-        TDBRow *row = [table rowAtIndex:rowIndex];
-
-        [row setString:@"Joe" inColumnWithIndex:NAME];
-        [row setInt:23 inColumnWithIndex:AGE];
-
-        /* And a few more rows - in a simpler manner */
-        [table addRow:@[@"Simon", @32]];
-        [table addRow:@[@"Steve", @12]];
-        [table addRow:@[@"Nick", @100]];
-
-        /* Print using a cursor. */
-        for (TDBRow *ite in table)
-            NSLog(@"Name: %@ Age: %lld", [ite stringInColumnWithIndex:NAME], [ite intInColumnWithIndex:AGE]);
-        
-        /* Insert a row and print. */
-        [table insertRow: nil atIndex:2];
-        row = [table rowAtIndex:2];
-        [row setInt:21 inColumnWithIndex:AGE];
-        [row setString:@"Hello I'm INSERTED" inColumnWithIndex:NAME];
-
-        NSLog(@"--------");
-
-        for (TDBRow *ite in table)
-            NSLog(@"Name: %@ Age: %lld", [ite stringInColumnWithIndex:NAME], [ite intInColumnWithIndex:AGE]);
-
-
-        /* Update a few rows and print again. */
-        table[2][@"Name"] = @"Now I'm UPDATED";
-
-        row = [table lastRow];
-        [row setString:@"I'm UPDATED" inColumnWithIndex:NAME];
-
-        NSLog(@"--------");
-
-        for (TDBRow *ite in table)
-            NSLog(@"Name: %@ Age: %lld", [ite stringInColumnWithIndex:NAME], [ite intInColumnWithIndex:AGE]);
-
-        /* Index not existing. */
-        TDBRow *c2 = [table rowAtIndex:table.rowCount];
-        if (c2 != nil)
-            NSLog(@"Should not get here.");
-    }
+    /* Create a new table dynamically. */
+    TDBTable *table = [[TDBTable alloc] init];
+    /* First column added will get column index 0 */
+    NSUInteger const NAME = [table addColumnWithName:@"Name"
+                                                type:TDBStringType];
+    /* Second column added will get column index 1 */
+    NSUInteger const AGE  = [table addColumnWithName:@"Age"
+                                                type:TDBIntType];
+    /* Add an empty row and set column values. */
+    [table addRow:nil];
+    TDBRow *row = [table lastRow];
+    row[NAME] = @"Joe";
+    row[AGE] = @23;
+    
+    /* And a row with dictionary style, with properties in any order */
+    [table addRow:@{@"Name":@"Simon", @"Age":@32}];
+    
+    /* Add rows with array style, with properties in order of column definition */
+    [table addRow:@[@"Steve", @12]];
+    [table addRow:@[@"Nick", @100]];
+    
+    /* Iterate over all rows in the table */
+    for (TDBRow *row in table)
+        NSLog(@"Name: %@ Age: %@", row[NAME], row[AGE]);
+    
+    /* Insert a row*/
+    [table insertRow: @[@"Inserted new", @21] atIndex:2];
+    
+    NSLog(@"--------");
+    for (TDBRow *row in table)
+        NSLog(@"Name: %@ Age: %@", row[NAME], row[AGE]);
+    
+    /* Update a few rows and print again. */
+    table[2][@"Name"] = @"Now I'm UPDATED";
+    
+    row = [table lastRow];
+    row[NAME] = @"I'm UPDATED";
+    
+    NSLog(@"--------");
+    for (TDBRow *row in table)
+        NSLog(@"Name: %@ Age: %@", row[NAME], row[AGE]);
+    
+    /* Refer to non existing row. */
+    TDBRow *row2 = [table rowAtIndex:table.rowCount];
+    if (row2 == nil)
+        NSLog(@"No row with this index. Indexes start at 0.");
 }
-
 /* @@EndExample@@ */
