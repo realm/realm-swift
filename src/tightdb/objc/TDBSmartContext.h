@@ -21,23 +21,13 @@
 #import <Foundation/Foundation.h>
 
 
-@interface TDBDescriptor: NSObject
+@interface TDBSmartContext: NSObject
 
-@property (nonatomic, readonly) NSUInteger columnCount;
++(TDBSmartContext *)contextWithPersistenceToFile:(NSString *)path
+                                         runLoop:(NSRunLoop *)runLoop
+                              notificationCenter:(NSNotificationCenter *)notificationCenter
+                                           error:(NSError **)error;
 
-/**
- * Returns NO on memory allocation error.
- */
--(BOOL)addColumnWithName:(NSString *)name type:(TDBType)type;
-/**
- * Returns nil on memory allocation error.
- */
--(TDBDescriptor *)addColumnTable:(NSString *)name;
--(TDBDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex;
--(TDBDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex error:(NSError *__autoreleasing *)error;
+-(TDBTable *)tableWithName:(NSString *)name;
 
--(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
--(NSString *)nameOfColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)indexOfColumnWithName:(NSString *)name;
 @end
-

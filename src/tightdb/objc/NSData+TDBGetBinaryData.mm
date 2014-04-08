@@ -22,6 +22,7 @@
 
 #include <tightdb/binary_data.hpp>
 
+
 @implementation NSData (TDBGetBinaryData)
 
 -(tightdb::BinaryData) tdbBinaryData
@@ -29,4 +30,5 @@
     const void *data = self.bytes;
     return tightdb::BinaryData(static_cast<const char *>(data), self.length);
 }
+
 @end

@@ -28,15 +28,14 @@
  *
  **************************************************************************/
 
-#import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBQuery.h>
-#import <tightdb/objc/TDBRow.h>
-#import <tightdb/objc/PrivateHelperMacros.h>
-#import <tightdb/objc/TDBDescriptor.h>
-#import <tightdb/objc/TDBView.h>
-#import <tightdb/objc/TDBColumnProxy.h>
-#import <tightdb/objc/PrivateTDB.h>
-
+#import "TDBTable.h"
+#import "TDBQuery.h"
+#import "TDBRow.h"
+#import "PrivateHelperMacros.h"
+#import "TDBDescriptor.h"
+#import "TDBView.h"
+#import "TDBColumnProxy.h"
+#import "PrivateTDB.h"
 
 
 #define TIGHTDB_TABLE_DEF_1(TableName, CName1, CType1) \

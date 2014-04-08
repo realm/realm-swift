@@ -20,24 +20,13 @@
 
 #import <Foundation/Foundation.h>
 
+#import "TDBSmartContext.h"
 
-@interface TDBDescriptor: NSObject
 
-@property (nonatomic, readonly) NSUInteger columnCount;
+@interface TDBSmartContext (noinst)
 
-/**
- * Returns NO on memory allocation error.
- */
--(BOOL)addColumnWithName:(NSString *)name type:(TDBType)type;
-/**
- * Returns nil on memory allocation error.
- */
--(TDBDescriptor *)addColumnTable:(NSString *)name;
--(TDBDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex;
--(TDBDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex error:(NSError *__autoreleasing *)error;
+- (void)tableDidDie;
 
--(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
--(NSString *)nameOfColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)indexOfColumnWithName:(NSString *)name;
+- (void)checkForChange:(NSTimer *)timer;
+
 @end
-
