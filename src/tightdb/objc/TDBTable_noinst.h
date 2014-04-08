@@ -22,7 +22,7 @@
 
 #include <tightdb/table.hpp>
 
-@interface TDBTable()
+@interface TDBTable (noinst)
 
 -(tightdb::Table&)getNativeTable;
 -(void)setNativeTable:(tightdb::Table*)table;

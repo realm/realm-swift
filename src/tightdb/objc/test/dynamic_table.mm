@@ -21,9 +21,10 @@
 #import <SenTestingKit/SenTestingKit.h>
 #import <Foundation/NSException.h>
 
-#import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/TightdbFast.h>
 #import <tightdb/objc/TDBTable_noinst.h>
 
+#include <string.h>
 
 @interface TDBDynamicTableTests: SenTestCase
   // Intentionally left blank.
@@ -34,34 +35,34 @@
 
 - (void)testTable
 {
-    TDBTable* _table = [[TDBTable alloc] init];
-    NSLog(@"Table: %@", _table);
-    STAssertNotNil(_table, @"Table is nil");
+    TDBTable* table = [[TDBTable alloc] init];
+    NSLog(@"Table: %@", table);
+    STAssertNotNil(table, @"Table is nil");
 
     // 1. Add two columns
-    [_table addColumnWithName:@"first" type:TDBIntType];
-    [_table addColumnWithName:@"second" type:TDBIntType];
+    [table addColumnWithName:@"first" type:TDBIntType];
+    [table addColumnWithName:@"second" type:TDBIntType];
 
     // Verify
-    STAssertEquals(TDBIntType, [_table columnTypeOfColumnWithIndex:0], @"First column not int");
-    STAssertEquals(TDBIntType, [_table columnTypeOfColumnWithIndex:1], @"Second column not int");
-    STAssertTrue(([[_table nameOfColumnWithIndex:0] isEqualToString:@"first"]), @"First not equal to first");
-    STAssertTrue(([[_table nameOfColumnWithIndex:1] isEqualToString:@"second"]), @"Second not equal to second");
+    STAssertEquals(TDBIntType, [table columnTypeOfColumnWithIndex:0], @"First column not int");
+    STAssertEquals(TDBIntType, [table columnTypeOfColumnWithIndex:1], @"Second column not int");
+    STAssertTrue(([[table nameOfColumnWithIndex:0] isEqualToString:@"first"]), @"First not equal to first");
+    STAssertTrue(([[table nameOfColumnWithIndex:1] isEqualToString:@"second"]), @"Second not equal to second");
 
     // 2. Add a row with data
 
-    //const size_t ndx = [_table addEmptyRow];
-    //[_table set:0 ndx:ndx value:0];
-    //[_table set:1 ndx:ndx value:10];
+    //const size_t ndx = [table addEmptyRow];
+    //[table set:0 ndx:ndx value:0];
+    //[table set:1 ndx:ndx value:10];
 
-    TDBRow* cursor = [_table addEmptyRow];
-    size_t ndx = [cursor TDB_index];
-    [cursor setInt:0 inColumnWithIndex:0];
-    [cursor setInt:10 inColumnWithIndex:1];
+    TDBRow* row = [table addEmptyRow];
+    size_t ndx = [row TDB_index];
+    [row setInt:0 inColumnWithIndex:0];
+    [row setInt:10 inColumnWithIndex:1];
 
     // Verify
-    STAssertEquals((int64_t)0, ([_table TDB_intInColumnWithIndex:0 atRowIndex:ndx]), @"First not zero");
-    STAssertEquals((int64_t)10, ([_table TDB_intInColumnWithIndex:1 atRowIndex:ndx]), @"Second not 10");
+    STAssertEquals((int64_t)0, ([table TDB_intInColumnWithIndex:0 atRowIndex:ndx]), @"First not zero");
+    STAssertEquals((int64_t)10, ([table TDB_intInColumnWithIndex:1 atRowIndex:ndx]), @"Second not 10");
 }
 
 -(void)testAddColumn
@@ -79,7 +80,7 @@
     [t addColumnWithName:@"first" type:TDBIntType];
     STAssertNoThrow([t addRow:@[ @1 ]], @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
-    STAssertTrue([t addRow:@[ @2 ]], @"Impossible!");
+    STAssertNoThrow([t addRow:@[ @2 ]], @"Impossible!");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
     STAssertEquals((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
     STAssertEquals((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:1], @"Value 2 expected");
@@ -92,9 +93,9 @@
     // Add row using object literate
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
-    STAssertTrue([t insertRow:@[ @1 ] atIndex:0], @"Impossible!");
+    STAssertNoThrow([t insertRow:@[ @1 ] atIndex:0], @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
-    STAssertTrue([t insertRow:@[ @2 ] atIndex:0], @"Impossible!");
+    STAssertNoThrow([t insertRow:@[ @2 ] atIndex:0], @"Impossible!");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
     STAssertEquals((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:1], @"Value 1 expected");
     STAssertEquals((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
@@ -130,7 +131,7 @@
     STAssertNoThrow([t addRow:@{ @"first": @1 }], @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
 
-    STAssertTrue([t addRow:@{ @"first": @2 }], @"Impossible!");
+    STAssertNoThrow([t addRow:@{ @"first": @2 }], @"Impossible!");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
 
     STAssertEquals((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
@@ -139,10 +140,10 @@
     STAssertThrows([t addRow:@{ @"first": @"Hello" }], @"Wrong type");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
 
-    STAssertTrue(([t addRow:@{ @"first": @1, @"second": @"Hello" }]), @"dh");
+    STAssertNoThrow(([t addRow:@{ @"first": @1, @"second": @"Hello" }]), @"dh");
     STAssertEquals((size_t)3, [t rowCount], @"Expected 3 rows");
 
-    STAssertTrue(([t addRow:@{ @"second": @1 }]), @"This is impossible");
+    STAssertNoThrow(([t addRow:@{ @"second": @1 }]), @"This is impossible");
     STAssertEquals((size_t)4, [t rowCount], @"Expected 4 rows");
 
     STAssertEquals((int64_t)0, [t TDB_intInColumnWithIndex:0 atRowIndex:3], @"Value 0 expected");
@@ -154,10 +155,10 @@
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
     
-    STAssertTrue(([t insertRow:@{ @"first": @1 } atIndex:0]), @"Impossible!");
+    STAssertNoThrow(([t insertRow:@{ @"first": @1 } atIndex:0]), @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
     
-    STAssertTrue(([t insertRow:@{ @"first": @2 } atIndex:0]), @"Impossible!");
+    STAssertNoThrow(([t insertRow:@{ @"first": @2 } atIndex:0]), @"Impossible!");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
     
     STAssertEquals((int64_t)1, ([t TDB_intInColumnWithIndex:0 atRowIndex:1]), @"Value 1 expected");
@@ -166,10 +167,10 @@
     STAssertThrows(([t insertRow:@{ @"first": @"Hello" } atIndex:0]), @"Wrong type");
     STAssertEquals((size_t)2, ([t rowCount]), @"Expected 2 rows");
     
-    STAssertTrue(([t insertRow:@{ @"first": @3, @"second": @"Hello"} atIndex:0]), @"Has 'first'");
+    STAssertNoThrow(([t insertRow:@{ @"first": @3, @"second": @"Hello"} atIndex:0]), @"Has 'first'");
     STAssertEquals((size_t)3, [t rowCount], @"Expected 3 rows");
     
-    STAssertTrue(([t insertRow:@{ @"second": @4 } atIndex:0]), @"This is impossible");
+    STAssertNoThrow(([t insertRow:@{ @"second": @4 } atIndex:0]), @"This is impossible");
     STAssertEquals((size_t)4, [t rowCount], @"Expected 4 rows");
     STAssertTrue((int64_t)0 == ([t TDB_intInColumnWithIndex:0 atRowIndex:0]), @"Value 0 expected");
 }
@@ -242,7 +243,7 @@
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 
     NSDate *d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
-    STAssertTrue(([t addRow:@[d]]), @"Cannot insert 'NSDate'");
+    STAssertNoThrow(([t addRow:@[d]]), @"Cannot insert 'NSDate'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
@@ -255,7 +256,7 @@
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
     
     NSDate *d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
-    STAssertTrue(([t addRow:@{@"first": d}]), @"Cannot insert 'NSDate'");
+    STAssertNoThrow(([t addRow:@{@"first": d}]), @"Cannot insert 'NSDate'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
@@ -269,7 +270,7 @@
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 
     NSData *nsd = [NSData dataWithBytes:(const void *)bin length:4];
-    STAssertTrue(([t addRow:@[nsd]]), @"Cannot insert 'NSData'");
+    STAssertNoThrow(([t addRow:@[nsd]]), @"Cannot insert 'NSData'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
@@ -285,7 +286,7 @@
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 
     NSData *nsd = [NSData dataWithBytes:(const void *)bin length:4];
-    STAssertTrue(([t addRow:@{@"first": nsd}]), @"Cannot insert 'NSData'");
+    STAssertNoThrow(([t addRow:@{@"first": nsd}]), @"Cannot insert 'NSData'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
@@ -319,7 +320,7 @@
     TDBTable *t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBBoolType];
     STAssertNoThrow(([t addRow:@[@YES]]), @"Cannot append bool column.");
-    STAssertTrue(([t addRow:@[@NO]]), @"Cannot append bool column.");
+    STAssertNoThrow(([t addRow:@[@NO]]), @"Cannot append bool column.");
     STAssertEquals((size_t)2, [t rowCount], @"2 rows expected");
 }
 
@@ -328,7 +329,7 @@
     TDBTable *t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBBoolType];
     STAssertNoThrow(([t addRow:@{@"first": @YES}]), @"Cannot append bool column.");
-    STAssertTrue(([t addRow:@{@"first": @NO}]), @"Cannot append bool column.");
+    STAssertNoThrow(([t addRow:@{@"first": @NO}]), @"Cannot append bool column.");
     STAssertEquals((size_t)2, [t rowCount], @"2 rows expected");
 }
 
@@ -354,15 +355,15 @@
     [t addColumnWithName:@"first" type:TDBMixedType];
     STAssertNoThrow(([t addRow:@[@1]]), @"Cannot insert 'int'");
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row excepted");
-    STAssertTrue(([t addRow:@[@"Hello"]]), @"Cannot insert 'string'");
+    STAssertNoThrow(([t addRow:@[@"Hello"]]), @"Cannot insert 'string'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
-    STAssertTrue(([t addRow:@[@3.14f]]), @"Cannot insert 'float'");
+    STAssertNoThrow(([t addRow:@[@3.14f]]), @"Cannot insert 'float'");
     STAssertEquals((size_t)3, ([t rowCount]), @"3 rows excepted");
-    STAssertTrue(([t addRow:@[@3.14]]), @"Cannot insert 'double'");
+    STAssertNoThrow(([t addRow:@[@3.14]]), @"Cannot insert 'double'");
     STAssertEquals((size_t)4, ([t rowCount]), @"4 rows excepted");
-    STAssertTrue(([t addRow:@[@YES]]), @"Cannot insert 'bool'");
+    STAssertNoThrow(([t addRow:@[@YES]]), @"Cannot insert 'bool'");
     STAssertEquals((size_t)5, ([t rowCount]), @"5 rows excepted");
-    STAssertTrue(([t addRow:@[bin2]]), @"Cannot insert 'binary'");
+    STAssertNoThrow(([t addRow:@[bin2]]), @"Cannot insert 'binary'");
     STAssertEquals((size_t)6, ([t rowCount]), @"6 rows excepted");
 }
 
@@ -375,96 +376,120 @@
     [t addColumnWithName:@"first" type:TDBMixedType];
     STAssertNoThrow(([t addRow:@{@"first": @1}]), @"Cannot insert 'int'");
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row excepted");
-    STAssertTrue(([t addRow:@{@"first": @"Hello"}]), @"Cannot insert 'string'$");
+    STAssertNoThrow(([t addRow:@{@"first": @"Hello"}]), @"Cannot insert 'string'$");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
-    STAssertTrue(([t addRow:@{@"first": @3.14f}]), @"Cannot insert 'float'");
+    STAssertNoThrow(([t addRow:@{@"first": @3.14f}]), @"Cannot insert 'float'");
     STAssertEquals((size_t)3, ([t rowCount]), @"3 rows excepted");
-    STAssertTrue(([t addRow:@{@"first": @3.14}]), @"Cannot insert 'double'");
+    STAssertNoThrow(([t addRow:@{@"first": @3.14}]), @"Cannot insert 'double'");
     STAssertEquals((size_t)4, ([t rowCount]), @"4 rows excepted");
-    STAssertTrue(([t addRow:@{@"first": @YES}]), @"Cannot insert 'bool'");
+    STAssertNoThrow(([t addRow:@{@"first": @YES}]), @"Cannot insert 'bool'");
     STAssertEquals((size_t)5, ([t rowCount]), @"5 rows excepted");
-    STAssertTrue(([t addRow:@{@"first": bin2}]), @"Cannot insert 'binary'");
+    STAssertNoThrow(([t addRow:@{@"first": bin2}]), @"Cannot insert 'binary'");
     STAssertEquals((size_t)6, ([t rowCount]), @"6 rows excepted");
 }
 
 -(void)testRemoveColumns
 {
 
-    TDBTable *t = [[TDBTable alloc] init];
-    [t addColumnWithName:@"col0" type:TDBIntType];
-    STAssertTrue([t columnCount] == 1,@"1 column added" );
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"col0" type:TDBIntType];
+    STAssertTrue(table.columnCount == 1,@"1 column added" );
 
-    [t removeColumnWithIndex:0];
-    STAssertTrue([t columnCount] == 0, @"Colum removed");
-
-    for (int i=0;i<10;i++) {
-        [t addColumnWithName:@"name" type:TDBIntType];
-    }
-
-    STAssertThrows([t removeColumnWithIndex:10], @"Out of bounds");
-    STAssertThrows([t removeColumnWithIndex:-1], @"Less than zero colIndex");
-
-    STAssertTrue([t columnCount] == 10, @"10 columns added");
+    [table removeColumnWithIndex:0];
+    STAssertTrue(table.columnCount  == 0, @"Colum removed");
 
     for (int i=0;i<10;i++) {
-        [t removeColumnWithIndex:0];
+        [table addColumnWithName:@"name" type:TDBIntType];
     }
 
-    STAssertTrue([t columnCount] == 0, @"Colums removed");
-    STAssertThrows([t removeColumnWithIndex:1], @"No columns added");
-    STAssertThrows([t removeColumnWithIndex:-1], @"Less than zero colIndex");
+    STAssertThrows([table removeColumnWithIndex:10], @"Out of bounds");
+    STAssertThrows([table removeColumnWithIndex:-1], @"Less than zero colIndex");
+
+    STAssertTrue(table.columnCount  == 10, @"10 columns added");
+
+    for (int i=0;i<10;i++) {
+        [table removeColumnWithIndex:0];
+    }
+
+    STAssertEquals(table.columnCount, (NSUInteger)0, @"Colums removed");
+    STAssertThrows([table removeColumnWithIndex:1], @"No columns added");
+    STAssertThrows([table removeColumnWithIndex:-1], @"Less than zero colIndex");
 }
 
-/*
+-(void)testRenameColumns
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    STAssertThrows([table renameColumnWithIndex:0 to:@"someName"], @"Out of bounds");
+    
+    [table addColumnWithName:@"oldName" type:TDBIntType];
+    
+    [table renameColumnWithIndex:0 to:@"newName"];
+    STAssertEqualObjects([table nameOfColumnWithIndex:0], @"newName", @"Get column name");
+    
+    [table renameColumnWithIndex:0 to:@"evenNewerName"];
+    STAssertEqualObjects([table nameOfColumnWithIndex:0], @"evenNewerName", @"Get column name");
+    
+    STAssertThrows([table renameColumnWithIndex:1 to:@"someName"], @"Out of bounds");
+    STAssertThrows([table renameColumnWithIndex:-1 to:@"someName"], @"Less than zero colIndex");
+    
+    [table addColumnWithName:@"oldName2" type:TDBIntType];
+    [table renameColumnWithIndex:1 to:@"newName2"];
+    STAssertEqualObjects([table nameOfColumnWithIndex:1], @"newName2", @"Get column name");
+    
+    STAssertThrows([table renameColumnWithIndex:2 to:@"someName"], @"Out of bounds");
+}
+
+
 - (void)testColumnlessCount
 {
-    TDBTable* t = [[TDBTable alloc] init];
-    STAssertEquals((size_t)0, [t count], @"Columnless table has 0 rows.");     
+    TDBTable* table = [[TDBTable alloc] init];
+    STAssertEquals((size_t)0, [table rowCount], @"Columnless table has 0 rows.");
 }
 
-- (void)testColumnlessIsEmpty
-{
-    TDBTable* t = [[TDBTable alloc] init];
-    STAssertTrue([t isEmpty], @"Columnless table is empty.");
-}
+
 
 - (void)testColumnlessClear
 {
-    TDBTable* t = [[TDBTable alloc] init];
-    [t clear];
+    TDBTable* table = [[TDBTable alloc] init];
+    [table removeAllRows];
+    STAssertEquals((size_t)0, [table rowCount], @"Columnless table has 0 rows.");
 }
 
 - (void)testColumnlessOptimize
 {
-    TDBTable* t = [[TDBTable alloc] init];
-    [t optimize];
+    TDBTable* table = [[TDBTable alloc] init];
+    STAssertEquals((size_t)0, [table rowCount], @"Columnless table has 0 rows.");
+    [table optimize];
+    STAssertEquals((size_t)0, [table rowCount], @"Columnless table has 0 rows.");
 }
+
 
 - (void)testColumnlessIsEqual
 {
-    TDBTable* t1 = [[TDBTable alloc] init];
-    TDBTable* t2 = [[TDBTable alloc] init];
-    STAssertTrue([t1 isEqual:t1], @"Columnless table is equal to itself.");
-    STAssertTrue([t1 isEqual:t2], @"Columnless table is equal to another columnless table.");
-    STAssertTrue([t2 isEqual:t1], @"Columnless table is equal to another columnless table.");
+    TDBTable* table1 = [[TDBTable alloc] init];
+    TDBTable* table2 = [[TDBTable alloc] init];
+    STAssertTrue([table1 isEqual:table1], @"Columnless table is equal to itself.");
+    STAssertTrue([table1 isEqual:table2], @"Columnless table is equal to another columnless table.");
+    STAssertTrue([table2 isEqual:table1], @"Columnless table is equal to another columnless table.");
 }
 
-- (void)testColumnlessGetColumnCount
+- (void)testColumnlessColumnCount
 {
-    TDBTable* t = [[TDBTable alloc] init];
-    STAssertEquals((size_t)0, [t getColumnCount], @"Columnless table has column count 0.");
+    TDBTable* table = [[TDBTable alloc] init];
+    STAssertEquals((size_t)0, [table columnCount], @"Columnless table has column count 0.");
 }
 
-- (void)testColumnlessGetColumnName
+/*
+- (void)testColumnlessNameOfColumnWithIndex
 {
-    TDBTable* t = [[TDBTable alloc] init];
-    STAssertThrowsSpecific([t getColumnName:((size_t)-1)],
+    TDBTable* table = [[TDBTable alloc] init];
+    STAssertThrowsSpecific([table nameOfColumnWithIndex:NSNotFound],
         NSException, NSRangeException,
         @"Columnless table has no column names.");
-    STAssertThrowsSpecific([t getColumnName:((size_t)0)],
+    STAssertThrowsSpecific([table nameOfColumnWithIndex:(0)],
         NSException, NSRangeException,
         @"Columnless table has no column names.");
-    STAssertThrowsSpecific([t getColumnName:((size_t)1)],
+    STAssertThrowsSpecific([table nameOfColumnWithIndex:1],
         NSException, NSRangeException,
         @"Columnless table has no column names.");
 }
@@ -943,93 +968,328 @@
 
 - (void)testTableDynamic_Subscripting
 {
-    TDBTable* _table = [[TDBTable alloc] init];
-    STAssertNotNil(_table, @"Table is nil");
+    TDBTable* table = [[TDBTable alloc] init];
+    STAssertNotNil(table, @"Table is nil");
 
     // 1. Add two columns
-    [_table addColumnWithName:@"first" type:TDBIntType];
-    [_table addColumnWithName:@"second" type:TDBStringType];
+    [table addColumnWithName:@"first" type:TDBIntType];
+    [table addColumnWithName:@"second" type:TDBStringType];
 
-    TDBRow* c;
+    TDBRow* row;
 
     // Add some rows
-    c = [_table addEmptyRow];
-    [c setInt: 506 inColumnWithIndex:0];
-    [c setString: @"test" inColumnWithIndex:1];
+    row = [table addEmptyRow];
+    [row setInt: 506 inColumnWithIndex:0];
+    [row setString: @"test" inColumnWithIndex:1];
 
-    c = [_table addEmptyRow];
-    [c setInt: 4 inColumnWithIndex:0];
-    [c setString: @"more test" inColumnWithIndex:1];
+    row = [table addEmptyRow];
+    [row setInt: 4 inColumnWithIndex:0];
+    [row setString: @"more test" inColumnWithIndex:1];
 
     // Get cursor by object subscripting
-    c = _table[0];
-    STAssertEquals([c intInColumnWithIndex:0], (int64_t)506, @"table[0].first");
-    STAssertTrue([[c stringInColumnWithIndex:1] isEqual:@"test"], @"table[0].second");
+    row = table[0];
+    STAssertEquals([row intInColumnWithIndex:0], (int64_t)506, @"table[0].first");
+    STAssertTrue([[row stringInColumnWithIndex:1] isEqual:@"test"], @"table[0].second");
 
     // Same but used directly
-    STAssertEquals([_table[0] intInColumnWithIndex:0], (int64_t)506, @"table[0].first");
-    STAssertTrue([[_table[0] stringInColumnWithIndex:1] isEqual:@"test"], @"table[0].second");
+    STAssertEquals([table[0] intInColumnWithIndex:0], (int64_t)506, @"table[0].first");
+    STAssertTrue([[table[0] stringInColumnWithIndex:1] isEqual:@"test"], @"table[0].second");
 }
 
 - (void)testFirstLastRow
 {
-    TDBTable *t = [[TDBTable alloc] init];
-    NSUInteger col0 = [t addColumnWithName:@"col" type:TDBStringType];
-    
-    STAssertNil([t firstRow], @"Table is empty");
-    STAssertNil([t lastRow], @"Table is empty");
+    TDBTable *table = [[TDBTable alloc] init];
+    NSUInteger col0 = [table addColumnWithName:@"col" type:TDBStringType];
+
+    STAssertNil([table firstRow], @"Table is empty");
+    STAssertNil([table lastRow], @"Table is empty");
     
     NSString *value0 = @"value0";
-    [t addRow:@[value0]];
+    [table addRow:@[value0]];
     
     NSString *value1 = @"value1";
-    [t addRow:@[value1]];
+    [table addRow:@[value1]];
     
-    STAssertEqualObjects([[t firstRow] stringInColumnWithIndex:col0], value0, nil);
-    STAssertEqualObjects( [[t lastRow] stringInColumnWithIndex:col0], value1, nil);
+    STAssertEqualObjects([[table firstRow] stringInColumnWithIndex:col0], value0, nil);
+    STAssertEqualObjects( [[table lastRow] stringInColumnWithIndex:col0], value1, nil);
 }
 
 - (void)testTableDynamic_Cursor_Subscripting
 {
-    TDBTable* _table = [[TDBTable alloc] init];
-    STAssertNotNil(_table, @"Table is nil");
+    TDBTable *table = [[TDBTable alloc] init];
+    STAssertNotNil(table, @"Table is nil");
 
     // 1. Add two columns
-    [_table addColumnWithName:@"first" type:TDBIntType];
-    [_table addColumnWithName:@"second" type:TDBStringType];
+    [table addColumnWithName:@"first" type:TDBIntType];
+    [table addColumnWithName:@"second" type:TDBStringType];
 
-    TDBRow* c;
+    TDBRow* row;
 
     // Add some rows
-    c = [_table addEmptyRow];
-    c[0] = @506;
-    c[1] = @"test";
-    STAssertEquals([_table[0] intInColumnWithIndex:0], (int64_t)506, @"table[0].first");
-    STAssertTrue([[_table[0] stringInColumnWithIndex:1] isEqual:@"test"], @"table[0].second");
+    row = [table addEmptyRow];
+    row[0] = @506;
+    row[1] = @"test";
+    STAssertEquals([table[0] intInColumnWithIndex:0], (int64_t)506, @"table[0].first");
+    STAssertTrue([[table[0] stringInColumnWithIndex:1] isEqual:@"test"], @"table[0].second");
 
-    c = [_table addEmptyRow];
-    c[@"first"]  = @4;
-    c[@"second"] = @"more test";
+    row = [table addEmptyRow];
+    row[@"first"]  = @4;
+    row[@"second"] = @"more test";
 
     // Get values from cursor by object subscripting
-    c = _table[0];
-    STAssertTrue([c[0] isEqual:@506], @"table[0].first");
-    STAssertTrue([c[1] isEqual:@"test"], @"table[0].second");
+    row = table[0];
+    STAssertTrue([row[0] isEqual:@506], @"table[0].first");
+    STAssertTrue([row[1] isEqual:@"test"], @"table[0].second");
 
     // Same but used with column name
-    STAssertTrue([c[@"first"]  isEqual:@506], @"table[0].first");
-    STAssertTrue([c[@"second"] isEqual:@"test"], @"table[0].second");
+    STAssertTrue([row[@"first"]  isEqual:@506], @"table[0].first");
+    STAssertTrue([row[@"second"] isEqual:@"test"], @"table[0].second");
 
     // Combine with subscripting for rows
-    STAssertTrue([_table[0][0] isEqual:@506], @"table[0].first");
-    STAssertTrue([_table[0][1] isEqual:@"test"], @"table[0].second");
-    STAssertTrue([_table[0][@"first"] isEqual:@506], @"table[0].first");
-    STAssertTrue([_table[0][@"second"] isEqual:@"test"], @"table[0].second");
+    STAssertTrue([table[0][0] isEqual:@506], @"table[0].first");
+    STAssertTrue([table[0][1] isEqual:@"test"], @"table[0].second");
+    STAssertTrue([table[0][@"first"] isEqual:@506], @"table[0].first");
+    STAssertTrue([table[0][@"second"] isEqual:@"test"], @"table[0].second");
 
-    STAssertTrue([_table[1][0] isEqual:@4], @"table[1].first");
-    STAssertTrue([_table[1][1] isEqual:@"more test"], @"table[1].second");
-    STAssertTrue([_table[1][@"first"] isEqual:@4], @"table[1].first");
-    STAssertTrue([_table[1][@"second"] isEqual:@"more test"], @"table[1].second");
+    STAssertTrue([table[1][0] isEqual:@4], @"table[1].first");
+    STAssertTrue([table[1][1] isEqual:@"more test"], @"table[1].second");
+    STAssertTrue([table[1][@"first"] isEqual:@4], @"table[1].first");
+    STAssertTrue([table[1][@"second"] isEqual:@"more test"], @"table[1].second");
 }
+
+-(void)testTableDynamic_Row_Set
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    STAssertNotNil(table, @"Table is nil");
+
+    // Add two columns
+    [table addColumnWithName:@"int"    type:TDBIntType];
+    [table addColumnWithName:@"string" type:TDBStringType];
+    [table addColumnWithName:@"float"  type:TDBFloatType];
+    [table addColumnWithName:@"double" type:TDBDoubleType];
+    [table addColumnWithName:@"bool"   type:TDBBoolType];
+    [table addColumnWithName:@"date"   type:TDBDateType];
+    [table addColumnWithName:@"binary" type:TDBBinaryType];
+
+    char bin4[] = {1, 2, 4, 4};
+    // Add three rows
+    [table addRow:@[@1, @"Hello", @3.1415f, @3.1415, @NO, [NSDate dateWithTimeIntervalSince1970:1], [NSData dataWithBytes:bin4 length:4]]];
+    [table addRow:@[@2, @"World", @2.7182f, @2.7182, @NO, [NSDate dateWithTimeIntervalSince1970:2], [NSData dataWithBytes:bin4 length:4]]];
+    [table addRow:@[@3, @"Hello World", @1.0f, @1.0, @NO, [NSDate dateWithTimeIntervalSince1970:3], [NSData dataWithBytes:bin4 length:4]]];
+
+    TDBRow* col = table[1];
+    col[0] = @4;
+    col[1] = @"Universe";
+    col[2] = @4.6692f;
+    col[3] = @4.6692;
+    col[4] = @YES;
+    col[5] = [NSDate dateWithTimeIntervalSince1970:4];
+    char bin5[] = {5, 6, 7, 8, 9};
+    col[6] = [NSData dataWithBytes:bin5 length:5];
+
+    STAssertTrue([table[1][@"int"] isEqualToNumber:@4], @"Value 4 expected");
+    STAssertTrue([table[1][@"string"] isEqualToString:@"Universe"], @"Value 'Universe' expected");
+    STAssertTrue([table[1][@"float"] isEqualToNumber:@4.6692f], @"Value '4.6692f' expected");
+    STAssertTrue([table[1][@"double"] isEqualToNumber:@4.6692], @"Value '4.6692' expected");
+    STAssertTrue([table[1][@"bool"] isEqual:@YES], @"Value 'YES' expected");
+    STAssertTrue([table[1][@"date"] isEqualToDate:[NSDate dateWithTimeIntervalSince1970:4]], @"Wrong date");
+    STAssertTrue([table[1][@"binary"] isEqualToData:[NSData dataWithBytes:bin5 length:5]], @"Wrong data");
+}
+
+
+
+-(void)testTableDynamic_Row_Set_Mixed
+{
+    TDBTable *table = [[TDBTable alloc] init];
+
+    // Mixed column
+    [table addColumnWithName:@"first" type:TDBMixedType];
+
+    // Add row
+    [table addRow:@[@1]];
+
+    // Change value and check
+    table[0][0] = @"Hello";
+    STAssertTrue([table[0][@"first"] isKindOfClass:[NSString class]], @"string expected");
+    STAssertTrue(([table[0][@"first"] isEqualToString:@"Hello"]), @"'Hello' expected");
+
+    table[0][0] = @4.6692f;
+    STAssertTrue([table[0][@"first"] isKindOfClass:[NSNumber class]], @"NSNumber expected");
+    STAssertTrue((strcmp([(NSNumber *)table[0][@"first"] objCType], @encode(float)) == 0), @"'float' expected");
+    STAssertEqualsWithAccuracy([(NSNumber *)table[0][@"first"] floatValue], (float)4.6692, 0.0001, @"Value 4.6692 expected");
+    STAssertEqualsWithAccuracy([table[0][@"first"] floatValue], (float)4.6692, 0.0001, @"Value 4.6692 expected");
+
+    table[0][0] = @4.6692;
+    STAssertTrue([table[0][@"first"] isKindOfClass:[NSNumber class]], @"NSNumber expected");
+    STAssertTrue((strcmp([(NSNumber *)table[0][@"first"] objCType], @encode(double)) == 0), @"'double' expected");
+    STAssertEqualsWithAccuracy([(NSNumber *)table[0][@"first"] doubleValue], 4.6692, 0.0001, @"Value 4.6692 expected");
+
+    table[0][0] = @4;
+    STAssertTrue([table[0][@"first"] isKindOfClass:[NSNumber class]], @"NSNumber expected");
+    STAssertTrue((strcmp([(NSNumber *)table[0][@"first"] objCType], @encode(long long)) == 0), @"'long long' expected");
+    STAssertEquals([(NSNumber *)table[0][@"first"] longLongValue], (long long)4, @"Value 1 expected");
+
+    table[0][0] = @YES;
+    STAssertTrue([table[0][@"first"] isKindOfClass:[NSNumber class]], @"NSNumber expected");
+    STAssertTrue((strcmp([(NSNumber *)table[0][@"first"] objCType], @encode(BOOL)) == 0), @"'long long' expected");
+    STAssertTrue([(NSNumber *)table[0][@"first"] boolValue], @"Value YES expected");
+    STAssertTrue([table[0][@"first"] boolValue], @"Valye YES expected");
+
+    NSDate* d = [NSDate dateWithTimeIntervalSince1970:10000];
+    table[0][0] = d;
+    STAssertTrue([table[0][@"first"] isKindOfClass:[NSDate class]], @"NSDate expected");
+    STAssertTrue([(NSDate *)table[0][@"first"] isEqualToDate:d], @"Wrong date");
+
+    char bin5[] = {5, 6, 7, 8, 9};
+    table[0][0] = [NSData dataWithBytes:bin5 length:5];
+    STAssertTrue([table[0][@"first"] isKindOfClass:[NSData class]], @"NSData expected");
+    STAssertTrue([(NSData *)table[0][@"first"] isEqualToData:[NSData dataWithBytes:bin5 length:5]], @"Wrong data");
+}
+
+-(void)testTableDynamic_Row_Get
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    STAssertNotNil(table, @"Table is nil");
+
+    // Add two columns
+    [table addColumnWithName:@"first" type:TDBIntType];
+    [table addColumnWithName:@"second" type:TDBStringType];
+
+    // Add three rows
+    [table addRow:@[@1, @"Hello"]];
+    [table addRow:@[@2, @"World"]];
+    [table addRow:@[@3, @"Hello World"]];
+
+    STAssertEquals([(NSNumber *)table[1][0] longLongValue], (int64_t)2, @"Value '2' expected");
+}
+
+-(void)testTableDynamic_Row_Get_Mixed
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    STAssertNotNil(table, @"Table is nil");
+
+    // Add two columns
+    [table addColumnWithName:@"first" type:TDBMixedType];
+
+    // Add three rows
+    [table addRow:@[@1]];
+    [table addRow:@[@"World"]];
+    [table addRow:@[@3.0f]];
+    [table addRow:@[@3.0]];
+
+
+    STAssertEquals([(NSNumber *)table[0][0] longLongValue], (long long)1, @"Value '1' expected");
+    STAssertEqualsWithAccuracy([(NSNumber *)table[2][0] floatValue], (float)3.0, 0.0001, @"Value 3.0 expected");
+    STAssertEqualsWithAccuracy([(NSNumber *)table[3][0] doubleValue], (double)3.0, 0.0001, @"Value 3.0 expected");
+    STAssertTrue([(NSString *)table[1][0] isEqualToString:@"World"], @"'World' expected");
+}
+
+- (void)testTableDynamic_initWithColumns
+{
+    TDBTable *table = [[TDBTable alloc] initWithColumns:@[@"name",   @"string",
+                                                          @"age",    @"int",
+                                                          @"hired",  @"bool",
+                                                          @"phones", @[@"type",   @"string",
+                                                                       @"number", @"string"]]];
+
+    STAssertEquals([table columnCount], (NSUInteger)4, @"four columns");
+
+    // Try to append a row that has to comply with the schema
+    [table addRow:@[@"joe", @34, @YES, @[@[@"home",   @"(650) 434-4342"],
+                                         @[@"mobile", @"(650) 342-4243"]]]];
+}
+
+- (void)testDistinctView
+{
+    TDBTable *t = [[TDBTable alloc] init];
+    
+    NSUInteger nameIndex = [t addColumnWithName:@"name" type:TDBStringType];
+    NSUInteger ageIndex = [t addColumnWithName:@"age" type:TDBIntType];
+    
+    STAssertThrows([t distinctValuesInColumnWithIndex:ageIndex], @"Not a string column");
+    STAssertThrows([t distinctValuesInColumnWithIndex:nameIndex], @"Index not set");
+    [t createIndexInColumnWithIndex:nameIndex];
+
+    
+    [t addRow:@[@"name0", @0]];
+    [t addRow:@[@"name0", @0]];
+    [t addRow:@[@"name0", @0]];
+    [t addRow:@[@"name1", @1]];
+    [t addRow:@[@"name1", @1]];
+    [t addRow:@[@"name2", @2]];
+    
+    // Distinct on string column
+    TDBView *v = [t distinctValuesInColumnWithIndex:nameIndex];
+    STAssertEquals(v.rowCount, (NSUInteger)3, @"Distinct values removed");
+    STAssertEqualObjects(v[0][nameIndex], @"name0", nil);
+    STAssertEqualObjects(v[1][nameIndex], @"name1", nil);
+    STAssertEqualObjects(v[2][nameIndex], @"name2", nil);
+    STAssertEqualObjects(v[0][ageIndex], @0, nil);
+    STAssertEqualObjects(v[1][ageIndex], @1, nil);
+    STAssertEqualObjects(v[2][ageIndex], @2, nil);
+}
+
+-(void)testTableDynamic_find_int
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"first" type:TDBIntType];
+    for(int i=0; i<10; ++i)
+        [table addRow:@[[NSNumber numberWithInt:i]]];
+    STAssertEquals((NSUInteger)5, [table findRowIndexWithInt:5 inColumnWithIndex:0], @"Cannot find element");
+    STAssertEquals((NSUInteger)NSNotFound, ([table findRowIndexWithInt:11 inColumnWithIndex:0]), @"Found something");
+}
+
+-(void)testTableDynamic_find_float
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"first" type:TDBFloatType];
+    for(int i=0; i<10; ++i)
+        [table addRow:@[[NSNumber numberWithFloat:(float)i]]];
+    STAssertEquals((NSUInteger)5, [table findRowIndexWithFloat:5.0 inColumnWithIndex:0], @"Cannot find element");
+    STAssertEquals((NSUInteger)NSNotFound, ([table findRowIndexWithFloat:11.0 inColumnWithIndex:0]), @"Found something");
+}
+
+-(void)testTableDynamic_find_double
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"first" type:TDBDoubleType];
+    for(int i=0; i<10; ++i)
+        [table addRow:@[[NSNumber numberWithDouble:(double)i]]];
+    STAssertEquals((NSUInteger)5, [table findRowIndexWithDouble:5.0 inColumnWithIndex:0], @"Cannot find element");
+    STAssertEquals((NSUInteger)NSNotFound, ([table findRowIndexWithDouble:11.0 inColumnWithIndex:0]), @"Found something");
+}
+
+-(void)testTableDynamic_find_bool
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"first" type:TDBBoolType];
+    for(int i=0; i<10; ++i)
+        [table addRow:@[[NSNumber numberWithBool:YES]]];
+    table[5][@"first"] = @NO;
+    STAssertEquals((NSUInteger)5, [table findRowIndexWithBool:NO inColumnWithIndex:0], @"Cannot find element");
+    table[5][@"first"] = @YES;
+    STAssertEquals((NSUInteger)NSNotFound, ([table findRowIndexWithBool:NO inColumnWithIndex:0]), @"Found something");
+}
+
+-(void)testTableDynamic_find_string
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"first" type:TDBStringType];
+    for(int i=0; i<10; ++i)
+        [table addRow:@[[NSString stringWithFormat:@"%d", i]]];
+    STAssertEquals((NSUInteger)5, [table findRowIndexWithString:@"5" inColumnWithIndex:0], @"Cannot find element");
+    STAssertEquals((NSUInteger)NSNotFound, ([table findRowIndexWithString:@"11" inColumnWithIndex:0]), @"Found something");
+}
+
+-(void)testTableDynamic_find_date
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    [table addColumnWithName:@"first" type:TDBDateType];
+    for(int i=0; i<10; ++i)
+        [table addRow:@[[NSDate dateWithTimeIntervalSince1970:i]]];
+    STAssertEquals((NSUInteger)5, [table findRowIndexWithDate:[NSDate dateWithTimeIntervalSince1970:5] inColumnWithIndex:0], @"Cannot find element");
+    STAssertEquals((NSUInteger)NSNotFound, ([table findRowIndexWithDate:[NSDate dateWithTimeIntervalSince1970:11] inColumnWithIndex:0]), @"Found something");
+}
+
 
 @end

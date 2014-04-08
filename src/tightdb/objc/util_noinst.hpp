@@ -29,6 +29,7 @@
 #include <tightdb/mixed.hpp>
 #include <tightdb/descriptor.hpp>
 #include <tightdb/table.hpp>
+#include <tightdb/table_ref.hpp>
 
 struct ObjcStringAccessor {
     ObjcStringAccessor(const NSString* s)
@@ -109,16 +110,63 @@ inline NSObject* to_objc_object(tightdb::Mixed m)
 }
 
 
-// A few nice helpers
-inline bool nsnumber_is_like_bool(NSObject *obj);
-inline bool nsnumber_is_like_integer(NSObject *obj);
-inline bool nsnumber_is_like_float(NSObject *obj);
-inline bool nsnumber_is_like_double(NSObject *obj);
+inline NSUInteger was_not_found(size_t n)
+{
+    if (n == tightdb::not_found)
+        return (NSUInteger)NSNotFound;
+    return (NSUInteger)n;
+}
+
+inline bool nsnumber_is_like_bool(NSObject *obj)
+{
+    const char* data_type = [(NSNumber *)obj objCType];
+    /* @encode(BOOL) is 'B' on iOS 64 and 'c'
+     objcType is always 'c'. Therefore compare to "c".
+     */
+    return data_type[0] == 'c';
+}
+
+inline bool nsnumber_is_like_integer(NSObject *obj)
+{
+    const char* data_type = [(NSNumber *)obj objCType];
+    return (strcmp(data_type, @encode(int)) == 0 ||
+            strcmp(data_type, @encode(long)) ==  0 ||
+            strcmp(data_type, @encode(long long)) == 0 ||
+            strcmp(data_type, @encode(unsigned int)) == 0 ||
+            strcmp(data_type, @encode(unsigned long)) == 0 ||
+            strcmp(data_type, @encode(unsigned long long)) == 0);
+}
+
+inline bool nsnumber_is_like_float(NSObject *obj)
+{
+    const char* data_type = [(NSNumber *)obj objCType];
+    return (strcmp(data_type, @encode(float)) == 0 ||
+            strcmp(data_type, @encode(int)) == 0 ||
+            strcmp(data_type, @encode(long)) ==  0 ||
+            strcmp(data_type, @encode(long long)) == 0 ||
+            strcmp(data_type, @encode(unsigned int)) == 0 ||
+            strcmp(data_type, @encode(unsigned long)) == 0 ||
+            strcmp(data_type, @encode(unsigned long long)) == 0);
+}
+
+inline bool nsnumber_is_like_double(NSObject *obj)
+{
+    const char* data_type = [(NSNumber *)obj objCType];
+    return (strcmp(data_type, @encode(double)) == 0 ||
+            strcmp(data_type, @encode(float)) == 0 ||
+            strcmp(data_type, @encode(int)) == 0 ||
+            strcmp(data_type, @encode(long)) ==  0 ||
+            strcmp(data_type, @encode(long long)) == 0 ||
+            strcmp(data_type, @encode(unsigned int)) == 0 ||
+            strcmp(data_type, @encode(unsigned long)) == 0 ||
+            strcmp(data_type, @encode(unsigned long long)) == 0);
+}
 
 void to_mixed(id value, tightdb::Mixed& m);
 
 BOOL set_cell(size_t col_ndx, size_t row_ndx, tightdb::Table& table, NSObject *obj);
 BOOL verify_cell(const tightdb::Descriptor& descr, size_t col_ndx, NSObject *obj);
+NSObject* get_cell(size_t col_ndx, size_t row_ndx, tightdb::Table& table);
 
 void verify_row(const tightdb::Descriptor& descr, NSArray * data);
 void insert_row(size_t ndx, tightdb::Table& table, NSArray * data);
@@ -128,6 +176,7 @@ void verify_row_with_labels(const tightdb::Descriptor& descr, NSDictionary* data
 void insert_row_with_labels(size_t row_ndx, tightdb::Table& table, NSDictionary *data);
 void set_row_with_labels(size_t row_ndx, tightdb::Table& table, NSDictionary *data);
 
+BOOL set_columns(tightdb::TableRef& parent, NSArray *schema);
 
 // Still used in the new error strategy. Perhaps it should be public?
 enum TightdbErr {

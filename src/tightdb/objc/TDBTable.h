@@ -20,7 +20,7 @@
 
 #import <Foundation/Foundation.h>
 
-#include <tightdb/objc/TDBType.h>
+#import "TDBViewProtocol.h"
 
 @class TDBView;
 @class TDBQuery;
@@ -29,7 +29,7 @@
 
 /****************	  TDBTable		****************/
 
-@interface TDBTable: NSObject <NSFastEnumeration>
+@interface TDBTable: NSObject <TDBView,NSFastEnumeration>
 
 @property (nonatomic, readonly) NSUInteger rowCount;
 @property (nonatomic, readonly) NSUInteger columnCount;
@@ -37,9 +37,11 @@
 
 // Initializers for standalone tables
 -(instancetype)init;
+-(instancetype)initWithColumns:(NSArray *)columns;
 
 // Working with columns
 -(NSUInteger)addColumnWithName:(NSString *)name type:(TDBType)type;
+-(void)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString *)newName;
 -(void)removeColumnWithIndex:(NSUInteger)colIndex;
 
 -(NSString *)nameOfColumnWithIndex:(NSUInteger)colIndex;
@@ -47,28 +49,30 @@
 -(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
 // Getting and setting individual rows (uses object subscripting)
--(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
 -(TDBRow *)lastRow;
 -(TDBRow *)firstRow;
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
+-(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 
 /**
  * Adds a row at the end of the table.
  * If data is nil, an empty row with default values is added.
  */
--(NSUInteger)addRow:(NSObject *)data;
+-(void)addRow:(NSObject *)data;
 
 // Inserting rows at specific positions
--(BOOL)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex;
+-(void)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex;
 
 // Removing rows
--(BOOL)removeAllRows;
--(BOOL)removeRowAtIndex:(NSUInteger)rowIndex;
--(BOOL)removeLastRow;
+-(void)removeAllRows;
+-(void)removeRowAtIndex:(NSUInteger)rowIndex;
+-(void)removeLastRow;
 
 // Queries
 -(TDBQuery *)where;
+// Only supported on string columns with an index
+-(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
 
 // Indexing
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;
