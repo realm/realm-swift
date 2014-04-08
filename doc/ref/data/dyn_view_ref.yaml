@@ -316,11 +316,11 @@ CATEGORIES :
   - g_dyn_table_where:
       NAME     : where
       SIGNATURE: (TDBQuery *) where
-      SUMMARY  : *g_dyn_view_where_summary
-      DESCR    : *g_dyn_view_where_descr
+      SUMMARY  : Query the view.
+      DESCR    : This method initiates a query in the view.
       RETURN:
         TYPES  : TDBQuery
-        DESCR  : *g_dyn_view_where_return_descr
+        DESCR  : *g_dyn_table_where_return_descr
       EXAMPLES:
       - DESCR  : ""
         CODE   : ex_objc_dyn_view_where
