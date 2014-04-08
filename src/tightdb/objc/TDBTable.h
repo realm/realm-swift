@@ -47,17 +47,16 @@
 -(NSUInteger)indexOfColumnWithName:(NSString *)name;
 -(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
-// Getting and setting individual rows (uses object subscripting)
+// Getting individual rows
 -(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
--(TDBRow *)lastRow;
 -(TDBRow *)firstRow;
--(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
+-(TDBRow *)lastRow;
+// Getting and setting individual rows with object subscripting
 -(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
+-(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
 
-/**
- * Adds a row at the end of the table.
- * If data is nil, an empty row with default values is added.
- */
+// Add a row at the end of the table.
+// If data is nil, an empty row with default values is added.
 -(void)addRow:(NSObject *)data;
 
 // Inserting rows at specific positions
@@ -81,9 +80,9 @@
 -(BOOL)optimize;
 
 // Table type and schema
--(BOOL)isEqual:(id)other;
+-(BOOL)isEqual:(id)otherTableClass;
 -(BOOL)hasSameDescriptorAs:(Class)otherTableClass;
--(id)castClass:(Class)obj;
+-(id)castToTypedTableClass:(Class)typedTableClass;
 
 -(TDBType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 
