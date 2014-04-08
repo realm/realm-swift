@@ -169,7 +169,7 @@ using namespace std;
     if ([m_table isReadOnly]) {
         @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
                                        reason:@"You tried to modify an immutable table"
-                                     userInfo:[NSMutableDictionary dictionary]];
+                                     userInfo:nil];
     }
     return m_query->remove();
 }
