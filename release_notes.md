@@ -39,14 +39,15 @@ Description......
 
 * `findFirstRow` renamed to `indexOfFirstMatchingRow` on `TDBQuery`.
 * `findFirstRowFromIndex:` renamed to `indexOfFirstMatchingRowFromIndex:` on `TDBQuery`.
-* Return `NSNotFound` when appropriate.
+* Return `NSNotFound` instead of -1 when appropriate.
+* Renamed `castClass` to `castToTytpedTableClass` on `TDBTable`.
 
 ### Enhancements:
 * `renameColumnWithIndex:to:` has been added to `TDBTable`.
 * `distinctValuesInColumnWithIndex` has been added to `TDBTable`.
 * `dateIsBetween::`, `doubleIsBetween::`, `floatIsBetween::` and `intIsBetween::`
-   have been added to `TDBQuery`.
-* Column names can begin with non-capital letters too. The generated `addX`
+  have been added to `TDBQuery`.
+* Column names in Typed Tables can begin with non-capital letters too. The generated `addX`
   selector can look odd. For example, a table with one column with name `age`,
   appending a new row will look like `[table addage:7]`.
 * Mixed typed values are better validated when rows are added, inserted, 
