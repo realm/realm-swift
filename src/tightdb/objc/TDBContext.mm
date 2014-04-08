@@ -83,10 +83,9 @@ using namespace std;
         group = &m_shared_group->begin_read();
     }
     catch (std::exception& ex) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                         reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:[NSMutableDictionary dictionary]];  // IMPORTANT: cannot not be nil !!
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+                                       reason:[NSString stringWithUTF8String:ex.what()]
+                                     userInfo:nil];
     }
 
     @try {
@@ -122,10 +121,9 @@ using namespace std;
         // File access errors are treated as exceptions here since they should not occur after the shared
         // group has already beenn successfully opened on the file and memeory mapped. The shared group constructor handles
         // the excepted error related to file access.
-        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                         reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+                                       reason:[NSString stringWithUTF8String:ex.what()]
+                                     userInfo:nil];
     }
 
     BOOL confirmation = NO;
@@ -144,10 +142,9 @@ using namespace std;
             m_shared_group->commit();
         }
         catch (std::exception& ex) {
-            NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                             reason:@""
-                                                           userInfo:[NSMutableDictionary dictionary]];
-            [exception raise];
+            @throw [NSException exceptionWithName:@"tightdb:core_exception"
+                                           reason:[NSString stringWithUTF8String:ex.what()]
+                                         userInfo:nil];
         }
         return YES;
     }
@@ -184,10 +181,9 @@ using namespace std;
         return m_shared_group->pin_read_transactions();
     }
     catch(std::exception& ex) { 
-        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                         reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:nil];
-        @throw exception;
+        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+                                       reason:[NSString stringWithUTF8String:ex.what()]
+                                     userInfo:nil];
     }
 }
 
@@ -197,10 +193,9 @@ using namespace std;
         m_shared_group->unpin_read_transactions();
     }
     catch(std::exception& ex) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                         reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:nil];
-        @throw exception;
+        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+                                       reason:[NSString stringWithUTF8String:ex.what()]
+                                     userInfo:nil];
     }
 }
 
