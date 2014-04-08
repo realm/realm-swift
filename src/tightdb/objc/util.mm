@@ -257,7 +257,7 @@ void verify_row(const Descriptor& descr, NSArray* data)
     if (descr.get_column_count() != [data count]) {
         @throw [NSException exceptionWithName:@"tightdb:wrong_column_count"
                                        reason:@"Number of columns do not match"
-                                     userInfo:[NSMutableDictionary dictionary]];
+                                     userInfo:nil];
     }
 
     NSEnumerator *enumerator = [data objectEnumerator];
@@ -269,7 +269,7 @@ void verify_row(const Descriptor& descr, NSArray* data)
             @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
                                            reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
                                                    to_objc_string(descr.get_column_name(col_ndx)), col_ndx, descr.get_column_type(col_ndx) ]
-                                         userInfo:[NSMutableDictionary dictionary]];
+                                         userInfo:nil];
         }
         ++col_ndx;
     }
@@ -287,7 +287,7 @@ void verify_row_with_labels(const Descriptor& descr, NSDictionary* data)
             @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
                                            reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
                                                    to_objc_string(descr.get_column_name(i)), i, descr.get_column_type(i) ]
-                                         userInfo:[NSMutableDictionary dictionary]];
+                                         userInfo:nil];
         }
     }
 }
@@ -580,7 +580,7 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
             @throw [NSException exceptionWithName:@"tightdb:cannot insert subtable"
                                            reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
                                                    to_objc_string(table.get_column_name(col_ndx)), col_ndx, table.get_column_type(col_ndx) ]
-                                         userInfo:[NSMutableDictionary dictionary]];
+                                         userInfo:nil];
         }
         case type_Mixed:
             if (obj == nil) {

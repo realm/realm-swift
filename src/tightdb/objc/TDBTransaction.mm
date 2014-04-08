@@ -65,7 +65,7 @@ using namespace std;
     if ([name length] == 0) {
         @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
                                        reason:@"Name must be a non-empty NSString"
-                                     userInfo:[NSMutableDictionary dictionary]];
+                                     userInfo:nil];
     }
     
     // If table does not exist in context, return nil
@@ -91,7 +91,7 @@ using namespace std;
     if ([name length] == 0) {
         @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
                                        reason:@"Name must be a non-empty NSString"
-                                     userInfo:[NSMutableDictionary dictionary]];
+                                     userInfo:nil];
     }
     
     // If table does not exist in context, return nil
@@ -136,19 +136,19 @@ using namespace std;
     if ([name length] == 0) {
         @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
                                        reason:@"Name must be a non-empty NSString"
-                                     userInfo:[NSMutableDictionary dictionary]];
+                                     userInfo:nil];
     }
     
     if (m_read_only) {
         @throw [NSException exceptionWithName:@"tightdb:core_read_only_exception"
                                        reason:@"Transaction is read-only."
-                                     userInfo:[NSMutableDictionary dictionary]];
+                                     userInfo:nil];
     }
     
     if ([self hasTableWithName:name]) {
         @throw [NSException exceptionWithName:@"tightdb:table_with_name_already_exists"
                                        reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the context.", name]
-                                     userInfo:[NSMutableDictionary dictionary]];
+                                     userInfo:nil];
     }
 
     TDBTable* table = [[TDBTable alloc] _initRaw];
@@ -169,19 +169,19 @@ using namespace std;
     if ([name length] == 0) {
        @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
                                       reason:@"Name must be a non-empty NSString"
-                                    userInfo:[NSMutableDictionary dictionary]];
+                                    userInfo:nil];
     }
     
     if (m_read_only) {
         @throw [NSException exceptionWithName:@"tightdb:core_read_only_exception"
                                        reason:@"Transaction is read-only."
-                                     userInfo:[NSMutableDictionary dictionary]];
+                                     userInfo:nil];
     }
     
     if ([self hasTableWithName:name]) {
         @throw [NSException exceptionWithName:@"tightdb:table_with_name_already_exists"
                                        reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the context.", name]
-                                     userInfo:[NSMutableDictionary dictionary]];
+                                     userInfo:nil];
     }
 
     TDBTable* table = [[class_obj alloc] _initRaw];
@@ -214,7 +214,7 @@ using namespace std;
     catch (std::exception& ex) {
         @throw [NSException exceptionWithName:@"tightdb:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
-                                     userInfo:[NSMutableDictionary dictionary]];  // IMPORTANT: cannot not be nil !!
+                                     userInfo:nil];
     }
     group->m_is_owned  = YES;
     group->m_read_only = NO;
@@ -342,7 +342,7 @@ using namespace std;
     catch (std::exception& ex) {
         @throw [NSException exceptionWithName:@"tightdb:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
-                                     userInfo:[NSMutableDictionary dictionary]];  // IMPORTANT: cannot not be nil !!
+                                     userInfo:nil];
     }
     return nil;
 }

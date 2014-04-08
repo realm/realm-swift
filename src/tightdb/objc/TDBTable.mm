@@ -288,7 +288,7 @@ using namespace std;
     if(m_read_only) {
         @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
                                        reason:@"You tried to modify a table in read only mode"
-                                     userInfo:[NSMutableDictionary dictionary]];
+                                     userInfo:nil];
     }
 
     NSUInteger index;
@@ -298,7 +298,7 @@ using namespace std;
     catch(std::exception& ex) {
         @throw [NSException exceptionWithName:@"tightdb:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
-                                     userInfo:[NSMutableDictionary dictionary]];
+                                     userInfo:nil];
     }
 
     return index;
@@ -407,8 +407,8 @@ using namespace std;
 {
     if (m_read_only) {
         NSException* exception = [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
-                                                         reason:@"You tried to modify an immutable tableview"
-                                                       userInfo:[NSMutableDictionary dictionary]];
+                                                         reason:@"You tried to modify an immutable table."
+                                                       userInfo:nil];
         [exception raise];
         return NO;
     }

@@ -85,7 +85,7 @@ using namespace std;
     catch (std::exception& ex) {
         @throw [NSException exceptionWithName:@"tightdb:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
-                                     userInfo:[NSMutableDictionary dictionary]];  // IMPORTANT: cannot not be nil !!
+                                     userInfo:nil];
     }
 
     @try {
@@ -123,7 +123,7 @@ using namespace std;
         // the excepted error related to file access.
         @throw [NSException exceptionWithName:@"tightdb:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
-                                     userInfo:[NSMutableDictionary dictionary]];
+                                     userInfo:nil];
     }
 
     BOOL confirmation = NO;
@@ -144,7 +144,7 @@ using namespace std;
         catch (std::exception& ex) {
             @throw [NSException exceptionWithName:@"tightdb:core_exception"
                                            reason:[NSString stringWithUTF8String:ex.what()]
-                                         userInfo:[NSMutableDictionary dictionary]];
+                                         userInfo:nil];
         }
         return YES;
     }
