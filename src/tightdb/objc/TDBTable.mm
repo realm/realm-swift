@@ -364,6 +364,12 @@ using namespace std;
 
 -(void)addRow:(NSObject*)data
 {
+    if(m_read_only) {
+        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+                                       reason:@"You tried to modify a table in read only mode"
+                                     userInfo:[NSMutableDictionary dictionary]];
+    }
+    
     if (!data) {
         [self TDB_addEmptyRow];
         return ;
