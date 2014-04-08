@@ -116,9 +116,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         TDBTable *t = [group createTableWithName:@"table"];
         
         [t addColumnWithName:@"col0" type:TDBIntType];
-        NSUInteger rowIndex = [t addRow:nil];
-        TDBRow *row = [t rowAtIndex:rowIndex];
-        [row setInt:10 inColumnWithIndex:0 ];
+        [t addRow:@[@10]];
          
         return YES;
         
@@ -126,17 +124,18 @@ TIGHTDB_TABLE_2(SharedTable2,
     
     [fromDisk readWithBlock:^(TDBTransaction* group) {
         TDBTable *t = [group tableWithName:@"table"];
+        
+        STAssertThrows([t addRow:nil], @"Is in readTransaction");
+        STAssertThrows([t addRow:@[@1]], @"Is in readTransaction");
        
         TDBQuery *q = [t where];
-        
         TDBView *v = [q findAllRows];
         
-        // Should not be allowed!
         STAssertThrows([v removeAllRows], @"Is in readTransaction");
         
-        STAssertTrue([t rowCount] == 1, @"No rows have been removed");
-        STAssertTrue([q countRows] == 1, @"No rows have been removed");
-        STAssertTrue([v rowCount] == 1, @"No rows have been removed");
+        STAssertEquals(t.rowCount,      (NSUInteger)1, @"No rows have been removed");
+        STAssertEquals([q countRows],   (NSUInteger)1, @"No rows have been removed");
+        STAssertEquals(v.rowCount,      (NSUInteger)1, @"No rows have been removed");
         
         STAssertNil([group tableWithName:@"Does not exist"], @"Table does not exist");
     }];
