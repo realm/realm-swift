@@ -55,6 +55,7 @@ Description......
 * Mixed typed values are better validated when rows are added, inserted, 
   or modified as object literals.
 * `Where`has been added to `TDBView`and `TDBViewProtocol`.
+* Adding support for "smart" contexts (`TDBSmartContext`).
 
 
 =============================================================
