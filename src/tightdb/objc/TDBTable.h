@@ -59,10 +59,10 @@
  * Adds a row at the end of the table.
  * If data is nil, an empty row with default values is added.
  */
--(NSUInteger)addRow:(NSObject *)data;
+-(void)addRow:(NSObject *)data;
 
 // Inserting rows at specific positions
--(BOOL)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex;
+-(void)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex;
 
 // Removing rows
 -(void)removeAllRows;

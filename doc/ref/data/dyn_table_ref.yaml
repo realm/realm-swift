@@ -286,7 +286,7 @@ CATEGORIES :
                  place. The row is optionally represented as Cocoa (NS) objects,
                  otherwise an empty row is inserted. If data is nil, an empty row
                  with default values is inserted.
-      SIGNATURE: (BOOL)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
+      SIGNATURE: (void)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME    : anObject
         TYPES   : id
@@ -294,9 +294,6 @@ CATEGORIES :
       - NAME    : rowIndex
         TYPES   : NSUInteger
         DESCR   : *g_dyn_table_insert_empty_row_parm1_descr
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : <code>YES</code> if elements are valid and row inserted, <code>NO</code> otherwise.
 
   - objc_dyn_table_append_row:
       NAME     : "addRow:"
@@ -306,15 +303,12 @@ CATEGORIES :
                  The row is represented as Cocoa (NS) objects as elements in
                  array. The elements' types are validated before creating the
                  new row. If data is nil, an empty row
-                 with default values is inserted.
-      SIGNATURE: (BOOL)appendRow:(NSObject *)data
+			 with default values is appended.
+      SIGNATURE: (void)addRow:(NSObject *)data
       PARAMS:
       - NAME   : data
         TYPES  : NSObject *
         DESCR  : The row either as a <code>NSArray</code> or <code>NSDictionary</code>.
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : <code>YES</code> if elements are valid and row inserted, <code>NO</code> otherwise.
 
 
 # TODO: Should this be supported at all?
