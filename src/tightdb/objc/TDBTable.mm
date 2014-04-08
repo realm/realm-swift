@@ -364,14 +364,14 @@ using namespace std;
     return [[TDBRow alloc] initWithTable:self ndx:ndx];
 }
 
--(NSUInteger)addRow:(NSObject*)data
+-(void)addRow:(NSObject*)data
 {
     if (!data) {
-        return [self TDB_addEmptyRows:1];
+        [self TDB_addEmptyRow];
+        return ;
     }
     tightdb::Table& table = *m_table;
     [self insertRow:data atIndex:table.size()];
-    return table.size()-1;
 }
 
 /* Moved to private header */
@@ -381,10 +381,11 @@ using namespace std;
 }
 
 
--(BOOL)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
+-(void)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
 {
     if (!anObject) {
-        return [self TDBInsertRow:rowIndex];
+        [self TDBInsertRow:rowIndex];
+        return ;
     }
     
     tightdb::Table& table = *m_table;
@@ -393,15 +394,19 @@ using namespace std;
     if ([anObject isKindOfClass:[NSArray class]]) {
         verify_row(*desc, (NSArray *)anObject);
         insert_row(size_t(rowIndex), table, (NSArray *)anObject);
+        return ;
     }
     
     if ([anObject isKindOfClass:[NSDictionary class]]) {
         verify_row_with_labels(*desc, (NSDictionary *)anObject);
         insert_row_with_labels(size_t(rowIndex), table, (NSDictionary *)anObject);
+        return ;
     }
     
     /* FIXME: pull out properties of object and insert as row */
-    return YES;
+    @throw [NSException exceptionWithName:@"tightdb:column_not_implemented"
+                                   reason:@"You should either use NSDictionary or NSArray"
+                                 userInfo:nil];
 }
 
 

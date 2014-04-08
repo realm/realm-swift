@@ -80,7 +80,7 @@
     [t addColumnWithName:@"first" type:TDBIntType];
     STAssertNoThrow([t addRow:@[ @1 ]], @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
-    STAssertTrue([t addRow:@[ @2 ]], @"Impossible!");
+    STAssertNoThrow([t addRow:@[ @2 ]], @"Impossible!");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
     STAssertEquals((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
     STAssertEquals((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:1], @"Value 2 expected");
@@ -93,9 +93,9 @@
     // Add row using object literate
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
-    STAssertTrue([t insertRow:@[ @1 ] atIndex:0], @"Impossible!");
+    STAssertNoThrow([t insertRow:@[ @1 ] atIndex:0], @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
-    STAssertTrue([t insertRow:@[ @2 ] atIndex:0], @"Impossible!");
+    STAssertNoThrow([t insertRow:@[ @2 ] atIndex:0], @"Impossible!");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
     STAssertEquals((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:1], @"Value 1 expected");
     STAssertEquals((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
@@ -131,7 +131,7 @@
     STAssertNoThrow([t addRow:@{ @"first": @1 }], @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
 
-    STAssertTrue([t addRow:@{ @"first": @2 }], @"Impossible!");
+    STAssertNoThrow([t addRow:@{ @"first": @2 }], @"Impossible!");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
 
     STAssertEquals((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
@@ -140,10 +140,10 @@
     STAssertThrows([t addRow:@{ @"first": @"Hello" }], @"Wrong type");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
 
-    STAssertTrue(([t addRow:@{ @"first": @1, @"second": @"Hello" }]), @"dh");
+    STAssertNoThrow(([t addRow:@{ @"first": @1, @"second": @"Hello" }]), @"dh");
     STAssertEquals((size_t)3, [t rowCount], @"Expected 3 rows");
 
-    STAssertTrue(([t addRow:@{ @"second": @1 }]), @"This is impossible");
+    STAssertNoThrow(([t addRow:@{ @"second": @1 }]), @"This is impossible");
     STAssertEquals((size_t)4, [t rowCount], @"Expected 4 rows");
 
     STAssertEquals((int64_t)0, [t TDB_intInColumnWithIndex:0 atRowIndex:3], @"Value 0 expected");
@@ -155,10 +155,10 @@
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
     
-    STAssertTrue(([t insertRow:@{ @"first": @1 } atIndex:0]), @"Impossible!");
+    STAssertNoThrow(([t insertRow:@{ @"first": @1 } atIndex:0]), @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
     
-    STAssertTrue(([t insertRow:@{ @"first": @2 } atIndex:0]), @"Impossible!");
+    STAssertNoThrow(([t insertRow:@{ @"first": @2 } atIndex:0]), @"Impossible!");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
     
     STAssertEquals((int64_t)1, ([t TDB_intInColumnWithIndex:0 atRowIndex:1]), @"Value 1 expected");
@@ -167,10 +167,10 @@
     STAssertThrows(([t insertRow:@{ @"first": @"Hello" } atIndex:0]), @"Wrong type");
     STAssertEquals((size_t)2, ([t rowCount]), @"Expected 2 rows");
     
-    STAssertTrue(([t insertRow:@{ @"first": @3, @"second": @"Hello"} atIndex:0]), @"Has 'first'");
+    STAssertNoThrow(([t insertRow:@{ @"first": @3, @"second": @"Hello"} atIndex:0]), @"Has 'first'");
     STAssertEquals((size_t)3, [t rowCount], @"Expected 3 rows");
     
-    STAssertTrue(([t insertRow:@{ @"second": @4 } atIndex:0]), @"This is impossible");
+    STAssertNoThrow(([t insertRow:@{ @"second": @4 } atIndex:0]), @"This is impossible");
     STAssertEquals((size_t)4, [t rowCount], @"Expected 4 rows");
     STAssertTrue((int64_t)0 == ([t TDB_intInColumnWithIndex:0 atRowIndex:0]), @"Value 0 expected");
 }
@@ -243,7 +243,7 @@
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 
     NSDate *d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
-    STAssertTrue(([t addRow:@[d]]), @"Cannot insert 'NSDate'");
+    STAssertNoThrow(([t addRow:@[d]]), @"Cannot insert 'NSDate'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
@@ -256,7 +256,7 @@
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
     
     NSDate *d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
-    STAssertTrue(([t addRow:@{@"first": d}]), @"Cannot insert 'NSDate'");
+    STAssertNoThrow(([t addRow:@{@"first": d}]), @"Cannot insert 'NSDate'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
@@ -270,7 +270,7 @@
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 
     NSData *nsd = [NSData dataWithBytes:(const void *)bin length:4];
-    STAssertTrue(([t addRow:@[nsd]]), @"Cannot insert 'NSData'");
+    STAssertNoThrow(([t addRow:@[nsd]]), @"Cannot insert 'NSData'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
@@ -286,7 +286,7 @@
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 
     NSData *nsd = [NSData dataWithBytes:(const void *)bin length:4];
-    STAssertTrue(([t addRow:@{@"first": nsd}]), @"Cannot insert 'NSData'");
+    STAssertNoThrow(([t addRow:@{@"first": nsd}]), @"Cannot insert 'NSData'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
@@ -320,7 +320,7 @@
     TDBTable *t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBBoolType];
     STAssertNoThrow(([t addRow:@[@YES]]), @"Cannot append bool column.");
-    STAssertTrue(([t addRow:@[@NO]]), @"Cannot append bool column.");
+    STAssertNoThrow(([t addRow:@[@NO]]), @"Cannot append bool column.");
     STAssertEquals((size_t)2, [t rowCount], @"2 rows expected");
 }
 
@@ -329,7 +329,7 @@
     TDBTable *t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBBoolType];
     STAssertNoThrow(([t addRow:@{@"first": @YES}]), @"Cannot append bool column.");
-    STAssertTrue(([t addRow:@{@"first": @NO}]), @"Cannot append bool column.");
+    STAssertNoThrow(([t addRow:@{@"first": @NO}]), @"Cannot append bool column.");
     STAssertEquals((size_t)2, [t rowCount], @"2 rows expected");
 }
 
@@ -355,15 +355,15 @@
     [t addColumnWithName:@"first" type:TDBMixedType];
     STAssertNoThrow(([t addRow:@[@1]]), @"Cannot insert 'int'");
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row excepted");
-    STAssertTrue(([t addRow:@[@"Hello"]]), @"Cannot insert 'string'");
+    STAssertNoThrow(([t addRow:@[@"Hello"]]), @"Cannot insert 'string'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
-    STAssertTrue(([t addRow:@[@3.14f]]), @"Cannot insert 'float'");
+    STAssertNoThrow(([t addRow:@[@3.14f]]), @"Cannot insert 'float'");
     STAssertEquals((size_t)3, ([t rowCount]), @"3 rows excepted");
-    STAssertTrue(([t addRow:@[@3.14]]), @"Cannot insert 'double'");
+    STAssertNoThrow(([t addRow:@[@3.14]]), @"Cannot insert 'double'");
     STAssertEquals((size_t)4, ([t rowCount]), @"4 rows excepted");
-    STAssertTrue(([t addRow:@[@YES]]), @"Cannot insert 'bool'");
+    STAssertNoThrow(([t addRow:@[@YES]]), @"Cannot insert 'bool'");
     STAssertEquals((size_t)5, ([t rowCount]), @"5 rows excepted");
-    STAssertTrue(([t addRow:@[bin2]]), @"Cannot insert 'binary'");
+    STAssertNoThrow(([t addRow:@[bin2]]), @"Cannot insert 'binary'");
     STAssertEquals((size_t)6, ([t rowCount]), @"6 rows excepted");
 }
 
@@ -376,15 +376,15 @@
     [t addColumnWithName:@"first" type:TDBMixedType];
     STAssertNoThrow(([t addRow:@{@"first": @1}]), @"Cannot insert 'int'");
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row excepted");
-    STAssertTrue(([t addRow:@{@"first": @"Hello"}]), @"Cannot insert 'string'$");
+    STAssertNoThrow(([t addRow:@{@"first": @"Hello"}]), @"Cannot insert 'string'$");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
-    STAssertTrue(([t addRow:@{@"first": @3.14f}]), @"Cannot insert 'float'");
+    STAssertNoThrow(([t addRow:@{@"first": @3.14f}]), @"Cannot insert 'float'");
     STAssertEquals((size_t)3, ([t rowCount]), @"3 rows excepted");
-    STAssertTrue(([t addRow:@{@"first": @3.14}]), @"Cannot insert 'double'");
+    STAssertNoThrow(([t addRow:@{@"first": @3.14}]), @"Cannot insert 'double'");
     STAssertEquals((size_t)4, ([t rowCount]), @"4 rows excepted");
-    STAssertTrue(([t addRow:@{@"first": @YES}]), @"Cannot insert 'bool'");
+    STAssertNoThrow(([t addRow:@{@"first": @YES}]), @"Cannot insert 'bool'");
     STAssertEquals((size_t)5, ([t rowCount]), @"5 rows excepted");
-    STAssertTrue(([t addRow:@{@"first": bin2}]), @"Cannot insert 'binary'");
+    STAssertNoThrow(([t addRow:@{@"first": bin2}]), @"Cannot insert 'binary'");
     STAssertEquals((size_t)6, ([t rowCount]), @"6 rows excepted");
 }
 
