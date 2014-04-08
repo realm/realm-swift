@@ -1,7 +1,7 @@
 * TightDB Objective C Interface
 
 This short tutorial to TightDB will introduce you to
-commonly used features of TightDB. Please refer to the <a href="http://www.tightdb.com/documentation/}/1/Reference/">reference documentation</a> for further details.
+commonly used features of TightDB. Please refer to the <a href="http://www.tightdb.com/documentation/1/Reference/">reference documentation</a> for further details.
 
 TightDB is a very fast embedded database that integrates transparently
 into Objective C and gives you the full benefits of a database, but
