@@ -147,19 +147,17 @@
     TDBType columnType = [self columnTypeOfColumnWithIndex:colIndex];
     
     if(columnType != TDBIntType && columnType != TDBBoolType && columnType != TDBDateType) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:sort_on_column_with_type_not_supported"
-                                                         reason:@"Sort is currently only supported on Integer, Boolean and Date columns."
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:sort_on_column_with_type_not_supported"
+                                       reason:@"Sort is currently only supported on Integer, Boolean and Date columns."
+                                     userInfo:nil];
     }
     
     try {
         m_view->sort(colIndex, order == 0);
     } catch(std::exception& ex) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                         reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+                                       reason:[NSString stringWithUTF8String:ex.what()]
+                                     userInfo:nil];
     }
 }
 
@@ -209,17 +207,22 @@
 }
 
 
--(void) removeRowAtIndex:(NSUInteger)ndx
+-(void) removeRowAtIndex:(NSUInteger)rowIndex
 {
-    m_view->remove(ndx);
+    if (m_read_only) {
+        @throw [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
+                                       reason:@"You tried to modify an immutable tableview"
+                                     userInfo:[NSMutableDictionary dictionary]];
+    }
+    
+    m_view->remove(rowIndex);
 }
 -(void)removeAllRows
 {
     if (m_read_only) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
-                                                         reason:@"You tried to modify an immutable tableview"
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
+                                       reason:@"You tried to modify an immutable tableview"
+                                     userInfo:nil];
     }
     
     m_view->clear();

@@ -81,12 +81,12 @@ using namespace std;
 
 -(long)getFastEnumStart
 {
-    return [self findFirstRowFromIndex:0];
+    return [self indexOfFirstMatchingRowFromIndex:0];
 }
 
 -(long)incrementFastEnum:(long)ndx
 {
-    return [self findFirstRowFromIndex:ndx];
+    return [self indexOfFirstMatchingRowFromIndex:ndx];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState*)state objects:(id __unsafe_unretained*)stackbuf count:(NSUInteger)len
@@ -165,7 +165,27 @@ using namespace std;
     return m_query->remove();
 }
 
-
+-(id)minInColumnWithIndex:(NSUInteger)colIndex
+{
+    TDBType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
+    if (colType == TDBIntType) {
+        return [NSNumber numberWithInteger:[self minIntInColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBDoubleType) {
+        return [NSNumber numberWithDouble:[self minDoubleInColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBFloatType) {
+        return [NSNumber numberWithDouble:[self minFloatInColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBDateType) {
+        return [self minDateInColumnWithIndex:colIndex];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"tightdb:operation_not_supprted"
+                                       reason:@"Min only supported on int, float, double and date columns."
+                                     userInfo:nil];
+    }
+}
 
 -(int64_t)minIntInColumnWithIndex:(NSUInteger)col_ndx
 {
@@ -184,9 +204,34 @@ using namespace std;
 
 -(NSDate *)minDateInColumnWithIndex:(NSUInteger)col_ndx
 {
+    if (self.originTable.rowCount == 0) {
+        return nil;
+    }
     return [NSDate dateWithTimeIntervalSince1970: m_query->minimum_int(col_ndx)];
 }
 
+
+-(id)maxInColumnWithIndex:(NSUInteger)colIndex
+{
+    TDBType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
+    if (colType == TDBIntType) {
+        return [NSNumber numberWithInteger:[self maxIntInColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBDoubleType) {
+        return [NSNumber numberWithDouble:[self maxDoubleInColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBFloatType) {
+        return [NSNumber numberWithDouble:[self maxFloatInColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBDateType) {
+        return [self maxDateInColumnWithIndex:colIndex];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"tightdb:operation_not_supprted"
+                                       reason:@"Max only supported on int, float, double and date columns."
+                                     userInfo:nil];
+    }
+}
 
 -(int64_t)maxIntInColumnWithIndex:(NSUInteger)col_ndx
 {
@@ -205,7 +250,29 @@ using namespace std;
 
 -(NSDate *)maxDateInColumnWithIndex:(NSUInteger)col_ndx
 {
+    if (self.originTable.rowCount == 0) {
+        return nil;
+    }
     return [NSDate dateWithTimeIntervalSince1970: m_query->maximum_int(col_ndx)];
+}
+
+-(NSNumber *)sumColumnWithIndex:(NSUInteger)colIndex
+{
+    TDBType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
+    if (colType == TDBIntType) {
+        return [NSNumber numberWithInteger:[self sumIntColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBDoubleType) {
+        return [NSNumber numberWithDouble:[self sumDoubleColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBFloatType) {
+        return [NSNumber numberWithDouble:[self sumFloatColumnWithIndex:colIndex]];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"tightdb:operation_not_supprted"
+                                       reason:@"Sum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
 }
 
 
@@ -226,6 +293,24 @@ using namespace std;
     return m_query->sum_double(col_ndx);
 }
 
+-(NSNumber *)avgColumnWithIndex:(NSUInteger)colIndex
+{
+    TDBType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
+    if (colType == TDBIntType) {
+        return [NSNumber numberWithDouble:[self avgIntColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBDoubleType) {
+        return [NSNumber numberWithDouble:[self avgDoubleColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBFloatType) {
+        return [NSNumber numberWithDouble:[self avgFloatColumnWithIndex:colIndex]];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"tightdb:operation_not_supprted"
+                                       reason:@"Avg only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+}
 
 -(double)avgIntColumnWithIndex:(NSUInteger)col_ndx
 {
@@ -251,12 +336,12 @@ using namespace std;
     return [TDBView viewWithTable:m_table andNativeView:view];
 }
 
--(NSUInteger)findFirstRow
+-(NSUInteger)indexOfFirstMatchingRow
 {
     return was_not_found(m_query->find(0));
 }
 
--(NSUInteger)findFirstRowFromIndex:(NSUInteger)rowIndex
+-(NSUInteger)indexOfFirstMatchingRowFromIndex:(NSUInteger)rowIndex
 {
     size_t n = m_query->find(size_t(rowIndex));
     NSUInteger m = was_not_found(n);

@@ -472,11 +472,11 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_findall
 
   - g_dyn_query_find:
-      NAMES    : "findFromRowIndex:"
+      NAMES    : "indexOfFirstMatchingRowFromIndex:"
       DESCR    : *g_dyn_query_find_descr
       SUMMARY  : *g_dyn_query_find_summary
       SIGNATURE: |
-                 (NSUInteger)findFromRowIndex:(NSUInteger)rowIndex
+                 (NSUInteger)indexOfFirstMatchingRowFromIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME   : rowIndex
         TYPES  : NSUInteger
@@ -487,6 +487,20 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_find
+
+  - g_dyn_query_find_first:
+      NAMES    : "indexOfFirstMatchingRow:"
+      DESCR    : This will find the first row index that fulfils the query condition. Use the return value + 1 as parameter for successive calls to iterate through matching rows.
+      SUMMARY  : Find first matching row.
+      SIGNATURE: |
+                 (NSUInteger)indexOfFirstMatchingRow
+      RETURN:
+        TYPES  : NSUInteger
+        DESCR  : Table row index of first matching row (NSNotFound if no match).
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_objc_dyn_query_find_first
+
 
   - g_dyn_query_count:
       NAME     : countRows

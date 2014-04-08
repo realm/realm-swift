@@ -69,11 +69,7 @@ CATEGORIES :
       NAME     : "removeAllRows"
       SUMMARY  : *g_dyn_table_clear_summary
       DESCR    : *g_dyn_table_clear_descr
-      SIGNATURE: (BOOL)removeAllRows
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : &objc_no_if_error
-                 "<code>NO</code> if an error occured, otherwise <code>YES</code>"
+      SIGNATURE: (void)removeAllRows
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_clear
         DESCR  :
@@ -85,7 +81,8 @@ CATEGORIES :
       SIGNATURE: (BOOL)optimize
       RETURN:
         TYPES  : BOOL
-        DESCR  : *objc_no_if_error
+        DESCR  : &objc_no_if_error
+                 "<code>NO</code> if an error occured, otherwise <code>YES</code>"
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_optimize
         DESCR  :
@@ -134,7 +131,7 @@ CATEGORIES :
       SUMMARY  : *g_dyn_table_add_column_summary
       DESCR    :
       - TEXT   : *g_dyn_table_add_column_descr
-      - TEXT   : &objc_column_types 
+      - TEXT   : &objc_column_types
                 >
                 Currently, the following types are supported (declared in <code>type.h</code>):
                  <ul>
@@ -258,7 +255,7 @@ CATEGORIES :
         DESCR  : The row.
 
   - g_dyn_table_add_empty_row:
-      TODO     : later  
+      TODO     : later
       NAME     : addEmptyRow
       SUMMARY  : *objc_typed_table_add_empty_row_summary
       DESCR    : *objc_typed_table_add_empty_row_descr
@@ -289,7 +286,7 @@ CATEGORIES :
                  place. The row is optionally represented as Cocoa (NS) objects,
                  otherwise an empty row is inserted. If data is nil, an empty row
                  with default values is inserted.
-      SIGNATURE: (BOOL)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
+      SIGNATURE: (void)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME    : anObject
         TYPES   : id
@@ -297,9 +294,6 @@ CATEGORIES :
       - NAME    : rowIndex
         TYPES   : NSUInteger
         DESCR   : *g_dyn_table_insert_empty_row_parm1_descr
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : <code>YES</code> if elements are valid and row inserted, <code>NO</code> otherwise.
 
   - objc_dyn_table_append_row:
       NAME     : "addRow:"
@@ -309,15 +303,12 @@ CATEGORIES :
                  The row is represented as Cocoa (NS) objects as elements in
                  array. The elements' types are validated before creating the
                  new row. If data is nil, an empty row
-                 with default values is inserted.
-      SIGNATURE: (BOOL)appendRow:(NSObject *)data
+                 with default values is appended.
+      SIGNATURE: (void)addRow:(NSObject *)data
       PARAMS:
       - NAME   : data
         TYPES  : NSObject *
         DESCR  : The row either as a <code>NSArray</code> or <code>NSDictionary</code>.
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : <code>YES</code> if elements are valid and row inserted, <code>NO</code> otherwise.
 
 
 # TODO: Should this be supported at all?
@@ -383,14 +374,11 @@ CATEGORIES :
       NAME     : "removeRowAtIndex:"
       SUMMARY  : *g_dyn_table_remove_row_summary
       DESCR    : *g_dyn_table_remove_row_descr
-      SIGNATURE: (BOOL)removeRowAtIndex:(NSUInteger)rowIndex
+      SIGNATURE: (void)removeRowAtIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME   : rowIndex
         TYPES  : NSUInteger
         DESCR  : *g_dyn_table_remove_row_param1_descr
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : ""
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_remove
         DESCR  : *objc_no_if_error
@@ -399,7 +387,7 @@ CATEGORIES :
       NAME     : removeLastRow
       SUMMARY  : *g_dyn_table_remove_last_row_summary
       DESCR    : *g_dyn_table_remove_last_row_descr
-      SIGNATURE: (BOOL)removeLastRow
+      SIGNATURE: (void)removeLastRow
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_remove_last_row
         DESCR  : *objc_no_if_error
@@ -703,18 +691,16 @@ CATEGORIES :
   - g_dyn_table_distinct_const:
       IGNORE   : ""
   - g_dyn_table_distinct:
-      TODO     : later
-
-      NAMES    : distinct
+      NAMES    : "distinctValuesInColumnWithIndex:"
       SUMMARY  : *g_dyn_table_distinct_summary
       DESCR    : *g_dyn_table_distinct_desc
-      SIGNATURE: TableView distinct(NSUInteger column_ndx);
+      SIGNATURE: -(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : colIndex
         TYPES  : NSUInteger
-        DESCR  : *g_dyn_table_distinct_parm1_desc
+        DESCR  : NOTE! Currently only supported on TDBStringType columns.
       RETURN:
-        TYPES  : TableView
+        TYPES  : TDBView *
         DESCR  : *g_dyn_table_distinct_return_desc
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_distinct
