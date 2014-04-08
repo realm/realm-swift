@@ -515,7 +515,7 @@ EOF
         path_list_prepend DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
-        "$XCODE_HOME/Tools/xtest" -XCTest All "$TEMP_DIR/unit-tests-cov.xctest" || exit 1
+        "$XCODE_HOME/usr/bin/xctest" -XCTest All "$TEMP_DIR/unit-tests-cov.xctest" || exit 1
         echo "Generating 'gcovr.xml'.."
         gcovr -f '.*/tightdb_objc/src/.*' -e '.*/test/.*' -x > gcovr.xml
         echo "Test passed."
