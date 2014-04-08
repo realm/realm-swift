@@ -40,6 +40,7 @@ Description......
 * `findFirstRow` renamed to `indexOfFirstMatchingRow` on `TDBQuery`.
 * `findFirstRowFromIndex:` renamed to `indexOfFirstMatchingRowFromIndex:` on `TDBQuery`.
 * Return `NSNotFound` when appropriate.
+* `removeAllRows`, `removeRowAtIndex` and `removeLastRow` methods on table do not return any value.
 
 ### Enhancements:
 * `renameColumnWithIndex:to:` has been added to `TDBTable`.
