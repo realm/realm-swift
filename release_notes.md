@@ -39,6 +39,8 @@ Description......
 
 * `readWithBlock:` renamed to `readUsingBlock:` in `TDBContext`
 * `writeWithBlock:error:` renamed to `writeUsingBlock:error:` in `TDBContext`
+* `readTable:withBlock:` renamed to `readTable:usingBlock:` in `TDBContext`
+* `writeTable:withBlock:error:` renamed to `writeTable:usingBlock:error:` in `TDBContext`
 * `findFirstRow` renamed to `indexOfFirstMatchingRow` on `TDBQuery`.
 * `findFirstRowFromIndex:` renamed to `indexOfFirstMatchingRowFromIndex:` on `TDBQuery`.
 * Return `NSNotFound` when appropriate.
