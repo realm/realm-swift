@@ -166,6 +166,11 @@ using namespace std;
 
 -(NSUInteger)removeRows
 {
+    if ([m_table isReadOnly]) {
+        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+                                       reason:@"You tried to modify an immutable table"
+                                     userInfo:[NSMutableDictionary dictionary]];
+    }
     return m_query->remove();
 }
 
