@@ -162,8 +162,8 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
 
     // Add rows
     for (int i = 0; i < TABLE_SIZE; i++) {
-        NSUInteger rowIndex = [table addRow:nil];
-        cursor = [table rowAtIndex:rowIndex];
+        [table addRow:nil];
+        cursor = [table lastRow];
         [cursor setString:[@"Person_" stringByAppendingString: [NSString stringWithFormat:@"%d",i]] inColumnWithIndex:NAME];
         [cursor setInt:i inColumnWithIndex:AGE];
         [cursor setBool:i%2 == 0 inColumnWithIndex:HIRED];
