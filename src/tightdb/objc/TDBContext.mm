@@ -26,8 +26,18 @@
 
 #include <tightdb/objc/util.hpp>
 
+#define TIGHTDB_CRASH_REPORTING_ENABLED 1
+
+#ifdef TIGHTDB_CRASH_REPORTING_ENABLED
+#import <tightdb/objc/TDBCrashReportingAgentLauncher.h>
+#endif
+
+
 using namespace std;
 
+#ifdef TIGHTDB_CRASH_REPORTING_ENABLED
+static TDBCrashReportingAgentLauncher* s_agentLauncher = nil;
+#endif
 
 @implementation TDBContext
 {
@@ -36,6 +46,16 @@ using namespace std;
 
 +(TDBContext*)contextWithPersistenceToFile:(NSString*)path withError:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
 {
+#ifdef TIGHTDB_CRASH_REPORTING_ENABLED
+    static dispatch_once_t once;
+   
+    dispatch_once(&once, ^{
+        NSLog(@"initializing crash reporting agent launcher");
+        s_agentLauncher = [[TDBCrashReportingAgentLauncher alloc] init];
+        [s_agentLauncher startCrashReporter];
+    });
+#endif
+
     TDBContext* shared_group = [[TDBContext alloc] init];
     if (!shared_group)
         return nil;
