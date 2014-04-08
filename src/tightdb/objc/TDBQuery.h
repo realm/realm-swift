@@ -39,27 +39,15 @@
 -(NSUInteger)removeRows;
 
 // Aggregates
--(int64_t)minIntInColumnWithIndex:(NSUInteger)colIndex;
--(float)minFloatInColumnWithIndex:(NSUInteger)colIndex;
--(double)minDoubleInColumnWithIndex:(NSUInteger)colIndex;
--(NSDate *)minDateInColumnWithIndex:(NSUInteger)colIndex;
+-(id)minInColumnWithIndex:(NSUInteger)colIndex;
+-(id)maxInColumnWithIndex:(NSUInteger)colIndex;
+-(NSNumber *)sumColumnWithIndex:(NSUInteger)colIndex;
+-(NSNumber *)avgColumnWithIndex:(NSUInteger)colIndex;
 
--(int64_t)maxIntInColumnWithIndex:(NSUInteger)colIndex;
--(float)maxFloatInColumnWithIndex:(NSUInteger)colIndex;
--(double)maxDoubleInColumnWithIndex:(NSUInteger)colIndex;
--(NSDate *)maxDateInColumnWithIndex:(NSUInteger)colIndex;
-
--(int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex;
--(double)sumFloatColumnWithIndex:(NSUInteger)colIndex;
--(double)sumDoubleColumnWithIndex:(NSUInteger)colIndex;
-
--(double)avgIntColumnWithIndex:(NSUInteger)colIndex;
--(double)avgFloatColumnWithIndex:(NSUInteger)colIndex;
--(double)avgDoubleColumnWithIndex:(NSUInteger)colIndex;
 
 /* Search */
--(NSUInteger)findFirstRow;
--(NSUInteger)findFirstRowFromIndex:(NSUInteger)rowIndex;
+-(NSUInteger)indexOfFirstMatchingRow;
+-(NSUInteger)indexOfFirstMatchingRowFromIndex:(NSUInteger)rowIndex;
 -(TDBView *)findAllRows;
 
 /* Conditions: */

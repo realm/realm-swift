@@ -116,8 +116,8 @@ TIGHTDB_TABLE_2(SharedTable2,
         TDBTable *t = [group createTableWithName:@"table"];
         
         [t addColumnWithName:@"col0" type:TDBIntType];
-        NSUInteger rowIndex = [t addRow:nil];
-        TDBRow *row = [t rowAtIndex:rowIndex];
+        [t addRow:nil];
+        TDBRow *row = [t lastRow];
         [row setInt:10 inColumnWithIndex:0 ];
          
         return YES;
@@ -197,8 +197,8 @@ TIGHTDB_TABLE_2(SharedTable2,
     [sg writeWithBlock:^(TDBTransaction* group) {
         TDBTable *t = [group tableWithName:@"t"];
         [t addColumnWithName:@"col" type:TDBBoolType];
-        NSUInteger rowIndex = [t addRow:nil];
-        TDBRow *row = [t rowAtIndex:rowIndex];
+        [t addRow:nil];
+        TDBRow *row = [t lastRow];
         [row setBool:YES inColumnWithIndex:0];
         return YES;
     } error:nil];
