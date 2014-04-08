@@ -129,9 +129,12 @@ TIGHTDB_TABLE_2(SharedTable2,
         STAssertThrows([t addRow:@[@1]], @"Is in readTransaction");
        
         TDBQuery *q = [t where];
+        STAssertThrows([q removeRows], @"Is in readTransaction");
+
         TDBView *v = [q findAllRows];
         
         STAssertThrows([v removeAllRows], @"Is in readTransaction");
+        STAssertThrows([[v where] removeRows], @"Is in readTransaction");
         
         STAssertEquals(t.rowCount,      (NSUInteger)1, @"No rows have been removed");
         STAssertEquals([q countRows],   (NSUInteger)1, @"No rows have been removed");
