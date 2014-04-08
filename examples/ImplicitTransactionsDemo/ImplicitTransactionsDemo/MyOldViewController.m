@@ -26,7 +26,8 @@
     self.title = NSLocalizedString(@"Old", @"Old");
     self.tabBarItem.image = [UIImage imageNamed:@"first"];
 
-    context = [TDBContext contextWithPersistenceToFile:[self pathForName:@"demo.tightdb"] error:nil];
+    context = [TDBContext contextWithPersistenceToFile:[self pathForName:@"demo.tightdb"]
+                                                 error:nil];
 
     return self;
 }
@@ -54,7 +55,9 @@
         if (refreshTimer)
             return;
         // Start
-        refreshTimer = [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(tick:) userInfo:nil repeats:YES];
+        refreshTimer = [NSTimer scheduledTimerWithTimeInterval:0.3 target:self
+                                                      selector:@selector(tick:)
+                                                      userInfo:nil repeats:YES];
     }
     else {
         if (!refreshTimer)
@@ -82,14 +85,17 @@
     return numRows;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView2 cellForRowAtIndexPath:(NSIndexPath *)indexPath
+- (UITableViewCell *)tableView:(UITableView *)tableView2
+         cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *simpleTableIdentifier = @"SimpleTableItem";
 
-    __block UITableViewCell *cell = [tableView2 dequeueReusableCellWithIdentifier:simpleTableIdentifier];
+    __block UITableViewCell *cell =
+        [tableView2 dequeueReusableCellWithIdentifier:simpleTableIdentifier];
 
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:simpleTableIdentifier];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
+                                      reuseIdentifier:simpleTableIdentifier];
     }
 
     [context readWithBlock:^(TDBTransaction *transact) {
