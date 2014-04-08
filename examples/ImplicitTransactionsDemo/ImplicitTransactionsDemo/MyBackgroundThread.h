@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 
-@interface MyBackgroundThread : NSThread
+
+@interface MyBackgroundThread: NSThread
 
 - (void)main;
 

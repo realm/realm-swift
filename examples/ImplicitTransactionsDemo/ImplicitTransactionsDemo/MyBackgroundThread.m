@@ -2,6 +2,7 @@
 
 #import "MyBackgroundThread.h"
 
+
 @implementation MyBackgroundThread
 
 - (void)main
@@ -24,7 +25,7 @@
 
 - (NSString *)pathForName:(NSString *)name
 {
-    NSArray* dirs = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSArray *dirs = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     return [NSString stringWithFormat:@"%@/%@", [dirs objectAtIndex:0], name];
 }
 

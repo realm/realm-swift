@@ -1,9 +1,10 @@
 #import <UIKit/UIKit.h>
 
-@interface MyNewViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+
+@interface MyNewViewController: UIViewController <UITableViewDelegate, UITableViewDataSource>
 {
     IBOutlet UILabel *changeCount;
-    IBOutlet UITableView* tableView;
+    IBOutlet UITableView *tableView;
 }
 
 @end
