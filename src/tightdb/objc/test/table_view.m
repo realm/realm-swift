@@ -317,4 +317,31 @@
     STAssertTrue([view[2][0] isEqual:@8],  @"row 2 -> 4");
 }
 
+- (void)testQueryOnView
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    
+    // Specify the column types and names
+    [table addColumnWithName:@"firstName" type:TDBStringType];
+    [table addColumnWithName:@"lastName" type:TDBStringType];
+    [table addColumnWithName:@"salary" type:TDBIntType];
+    
+    // Add data to the table
+    [table addRow:@[@"John", @"Lee", @10000]];
+    [table addRow:@[@"Jane", @"Lee", @15000]];
+    [table addRow:@[@"John", @"Anderson", @20000]];
+    [table addRow:@[@"Erik", @"Lee", @30000]];
+    [table addRow:@[@"Henry", @"Anderson", @10000]];
+    
+    
+    TDBView *view = [[table where] findAllRows];
+    STAssertEquals(view.rowCount, (NSUInteger)5, @"All 5 rows still here");
+
+    TDBView *view2 = [[[view where ] stringIsCaseInsensitiveEqualTo:@"John" inColumnWithIndex:0 ] findAllRows];
+    STAssertEquals(view2.rowCount, (NSUInteger)2, @"2 rows match");
+    
+    TDBView *view3 = [[[view2 where] stringIsCaseInsensitiveEqualTo:@"Anderson" inColumnWithIndex:1 ] findAllRows];
+    STAssertEquals(view3.rowCount, (NSUInteger)1, @"Only 1 row left");
+}
+
 @end
