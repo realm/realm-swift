@@ -177,9 +177,9 @@ using namespace std;
  * one of the table macros TIGHTDB_TABLE_*.
  */
 // FIXME: Check that the specified class derives from TDBTable.
--(BOOL)hasSameDescriptorAs:(__unsafe_unretained Class)class_obj
+-(BOOL)hasSameDescriptorAs:(__unsafe_unretained Class)tableClass
 {
-    TDBTable* table = [[class_obj alloc] _initRaw];
+    TDBTable* table = [[tableClass alloc] _initRaw];
     if (TIGHTDB_LIKELY(table)) {
         [table setNativeTable:m_table.get()];
         [table setParent:m_parent];
@@ -199,9 +199,9 @@ using namespace std;
  * one of the table macros TIGHTDB_TABLE_*.
  */
 // FIXME: Check that the specified class derives from TDBTable.
--(id)castClass:(__unsafe_unretained Class)class_obj
+-(id)castToTypedTableClass:(__unsafe_unretained Class)typedTableClass
 {
-    TDBTable* table = [[class_obj alloc] _initRaw];
+    TDBTable* table = [[typedTableClass alloc] _initRaw];
     if (TIGHTDB_LIKELY(table)) {
         [table setNativeTable:m_table.get()];
         [table setParent:m_parent];
@@ -224,22 +224,27 @@ using namespace std;
 {
     return m_table->get_column_count();
 }
+
 -(NSString*)nameOfColumnWithIndex:(NSUInteger)ndx
 {
     return to_objc_string(m_table->get_column_name(ndx));
 }
+
 -(NSUInteger)indexOfColumnWithName:(NSString *)name
 {
     return was_not_found(m_table->get_column_index(ObjcStringAccessor(name)));
 }
+
 -(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)ndx
 {
     return TDBType(m_table->get_column_type(ndx));
 }
+
 -(TDBDescriptor*)descriptor
 {
     return [self descriptorWithError:nil];
 }
+
 -(TDBDescriptor*)descriptorWithError:(NSError* __autoreleasing*)error
 {
     tightdb::DescriptorRef desc = m_table->get_descriptor();
