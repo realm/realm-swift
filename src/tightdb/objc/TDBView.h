@@ -45,4 +45,6 @@
 
 -(NSUInteger)rowIndexInOriginTableForRowAtIndex:(NSUInteger)rowIndex;
 
+-(TDBQuery *)where;
+
 @end

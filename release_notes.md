@@ -41,6 +41,8 @@ Description......
 * `findFirstRowFromIndex:` renamed to `indexOfFirstMatchingRowFromIndex:` on `TDBQuery`.
 * Return `NSNotFound` instead of -1 when appropriate.
 * Renamed `castClass` to `castToTytpedTableClass` on `TDBTable`.
+* `removeAllRows`, `removeRowAtIndex`, `removeLastRow`, `addRow` and `insertRow` methods 
+  on table now return void instead of BOOL.
 
 ### Enhancements:
 * `renameColumnWithIndex:to:` has been added to `TDBTable`.
@@ -52,6 +54,7 @@ Description......
   appending a new row will look like `[table addage:7]`.
 * Mixed typed values are better validated when rows are added, inserted, 
   or modified as object literals.
+* `Where`has been added to `TDBView`and `TDBViewProtocol`.
 
 
 =============================================================
