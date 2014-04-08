@@ -289,7 +289,7 @@ using namespace std;
     catch (std::exception& ex) {
         @throw [NSException exceptionWithName:@"tightdb:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
-                                     userInfo:[NSMutableDictionary dictionary]];  // IMPORTANT: cannot not be nil !!
+                                     userInfo:nil];
     }
     group->m_is_owned  = YES;
     group->m_read_only = NO;
