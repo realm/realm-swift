@@ -3,17 +3,18 @@
 #import "MyAppDelegate.h"
 #import "MyOldViewController.h"
 
+
 @implementation MyOldViewController
 {
-    NSTimer* refreshTimer;
+    NSTimer *refreshTimer;
     BOOL refreshEnabled;
     int numRefreshTicks;
-    TDBContext* context;
+    TDBContext *context;
 }
 
 - (NSString *)pathForName:(NSString *)name
 {
-    NSArray* dirs = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSArray *dirs = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     return [NSString stringWithFormat:@"%@/%@", [dirs objectAtIndex:0], name];
 }
 
@@ -47,7 +48,7 @@
     return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
 }
 
-- (IBAction)refreshSwitchChanged:(UISwitch*)theSwitch
+- (IBAction)refreshSwitchChanged:(UISwitch *)theSwitch
 {
     if (theSwitch.on) {
         if (refreshTimer)

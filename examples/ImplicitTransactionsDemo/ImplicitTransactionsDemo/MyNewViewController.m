@@ -2,15 +2,16 @@
 
 #import "MyNewViewController.h"
 
+
 @implementation MyNewViewController
 {
-    TDBTable* table;
+    TDBTable *table;
     int numChangeTicks;
 }
 
 - (NSString *)pathForName:(NSString *)name
 {
-    NSArray* dirs = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSArray *dirs = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     return [NSString stringWithFormat:@"%@/%@", [dirs objectAtIndex:0], name];
 }
 
@@ -23,9 +24,9 @@
     self.title = NSLocalizedString(@"New", @"New");
     self.tabBarItem.image = [UIImage imageNamed:@"second"];
 
-    NSRunLoop* runLoop = [NSRunLoop mainRunLoop];
-    NSNotificationCenter* notificationCenter = [NSNotificationCenter defaultCenter];
-    TDBSmartContext* context =
+    NSRunLoop *runLoop = [NSRunLoop mainRunLoop];
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    TDBSmartContext *context =
         [TDBSmartContext contextWithPersistenceToFile:[self pathForName:@"demo.tightdb"]
                                               runLoop:runLoop
                                    notificationCenter:notificationCenter
@@ -39,7 +40,7 @@
     return self;
 }
 
-- (void)contextDidChange:(NSNotification*)theNotification
+- (void)contextDidChange:(NSNotification *)theNotification
 {
     ++numChangeTicks;
     changeCount.text = [[NSNumber numberWithInt:numChangeTicks] stringValue];
