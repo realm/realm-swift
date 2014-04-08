@@ -40,7 +40,6 @@ Description......
 * `findFirstRow` renamed to `indexOfFirstMatchingRow` on `TDBQuery`.
 * `findFirstRowFromIndex:` renamed to `indexOfFirstMatchingRowFromIndex:` on `TDBQuery`.
 * Return `NSNotFound` when appropriate.
-<<<<<<< HEAD
 * `removeAllRows`, `removeRowAtIndex`, `removeLastRow`, `addRow` and `insertRow` methods 
   on table now return void instead of BOOL.
 
