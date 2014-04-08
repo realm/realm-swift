@@ -313,6 +313,19 @@ CATEGORIES :
 
 - Searching:
   METHODS:
+  - g_dyn_table_where:
+      NAME     : where
+      SIGNATURE: (TDBQuery *) where
+      SUMMARY  : Query the view.
+      DESCR    : This method initiates a query in the view.
+      RETURN:
+        TYPES  : TDBQuery
+        DESCR  : *g_dyn_table_where_return_descr
+      EXAMPLES:
+      - DESCR  : ""
+        CODE   : ex_objc_dyn_view_where
+
+
   - g_dyn_view_find_first_bool:
       TODO     : soon
   - g_dyn_view_find_first_int:
