@@ -134,7 +134,7 @@ CATEGORIES :
       SUMMARY  : *g_dyn_table_add_column_summary
       DESCR    :
       - TEXT   : *g_dyn_table_add_column_descr
-      - TEXT   : &objc_column_types 
+      - TEXT   : &objc_column_types
                 >
                 Currently, the following types are supported (declared in <code>type.h</code>):
                  <ul>
@@ -258,7 +258,7 @@ CATEGORIES :
         DESCR  : The row.
 
   - g_dyn_table_add_empty_row:
-      TODO     : later  
+      TODO     : later
       NAME     : addEmptyRow
       SUMMARY  : *objc_typed_table_add_empty_row_summary
       DESCR    : *objc_typed_table_add_empty_row_descr
@@ -308,7 +308,7 @@ CATEGORIES :
                  The row is represented as Cocoa (NS) objects as elements in
                  array. The elements' types are validated before creating the
                  new row. If data is nil, an empty row
-		 with default values is appended. Properties in generic objects 
+                 with default values is appended. Properties in generic objects
                  (derived from <code>NSObject</code>) which match columsn names
                  will be used.
       SIGNATURE: (void)addRow:(NSObject *)data
