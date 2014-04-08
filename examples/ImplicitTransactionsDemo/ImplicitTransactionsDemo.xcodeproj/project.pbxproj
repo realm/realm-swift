@@ -22,8 +22,8 @@
 		522AF34B18F372AB00237BAB /* MyOldViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 522AF34918F372AB00237BAB /* MyOldViewController.xib */; };
 		522AF34E18F372AB00237BAB /* MyNewViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 522AF34C18F372AB00237BAB /* MyNewViewController.xib */; };
 		52CFD12318F37BDE0088B460 /* Tightdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52CFD12218F37BDE0088B460 /* Tightdb.framework */; };
-		52CFD12618F37BFE0088B460 /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 52CFD12518F37BFE0088B460 /* libstdc++.dylib */; };
 		52CFD12918F37C520088B460 /* MyBackgroundThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 52CFD12818F37C520088B460 /* MyBackgroundThread.m */; };
+		80FE492918F41B0A003ACC23 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 80FE492818F41B0A003ACC23 /* libc++.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +51,7 @@
 		52CFD12518F37BFE0088B460 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
 		52CFD12718F37C2D0088B460 /* MyBackgroundThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyBackgroundThread.h; sourceTree = "<group>"; };
 		52CFD12818F37C520088B460 /* MyBackgroundThread.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyBackgroundThread.m; sourceTree = "<group>"; };
+		80FE492818F41B0A003ACC23 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,7 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				52CFD12618F37BFE0088B460 /* libstdc++.dylib in Frameworks */,
+				80FE492918F41B0A003ACC23 /* libc++.dylib in Frameworks */,
 				522AF32A18F372AB00237BAB /* UIKit.framework in Frameworks */,
 				522AF32C18F372AB00237BAB /* Foundation.framework in Frameworks */,
 				522AF32E18F372AB00237BAB /* CoreGraphics.framework in Frameworks */,
@@ -90,6 +91,7 @@
 		522AF32818F372AB00237BAB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				80FE492818F41B0A003ACC23 /* libc++.dylib */,
 				52CFD12218F37BDE0088B460 /* Tightdb.framework */,
 				522AF32918F372AB00237BAB /* UIKit.framework */,
 				522AF32B18F372AB00237BAB /* Foundation.framework */,
