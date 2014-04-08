@@ -98,16 +98,16 @@
     TDBTable *t = [[TDBTable alloc] init];
     NSUInteger intCol = [t addColumnWithName:@"intCol" type:TDBIntType];
     
-    NSUInteger rowIndex = [t addRow:nil];
-    TDBRow *row = [t rowAtIndex:rowIndex];
+    [t addRow:nil];
+    TDBRow *row = [t lastRow];
     [row setInt:2 inColumnWithIndex:intCol];
     
-    rowIndex = [t addRow:nil];
-    row = [t rowAtIndex:rowIndex];
+    [t addRow:nil];
+    row = [t lastRow];
     [row setInt:1 inColumnWithIndex:intCol];
     
-    rowIndex = [t addRow:nil];
-    row = [t rowAtIndex:rowIndex];
+    [t addRow:nil];
+    row = [t lastRow];
     [row setInt:0 inColumnWithIndex:intCol];
     
     TDBQuery *q = [t where];
@@ -141,14 +141,17 @@
 {
     TDBTable *t = [[TDBTable alloc] init];
     NSUInteger boolCol = [t addColumnWithName:@"boolCol" type:TDBBoolType];
-    
-    TDBRow *row = [t rowAtIndex:[t addRow:nil]];
+
+    [t addRow:nil];
+    TDBRow *row = [t lastRow];
     [row setBool:YES inColumnWithIndex:boolCol];
-    
-    row = [t rowAtIndex:[t addRow:nil]];
+
+    [t addRow:nil];
+    row = [t lastRow];
     [row setBool:YES inColumnWithIndex:boolCol];
-    
-    row = [t rowAtIndex:[t addRow:nil]];
+
+    [t addRow:nil];
+    row = [t lastRow];
     [row setBool:NO inColumnWithIndex:boolCol];
     
     TDBQuery *q = [t where];
@@ -192,16 +195,16 @@
     NSDate *dateMiddle  = [formatter dateFromString:@"02/01/2014 10:10 PM"];
     NSDate *dateLast    = [formatter dateFromString:@"03/01/2014 10:10 PM"];
     
-    NSUInteger rowIndex = [t addRow:nil];
-    TDBRow *row = [t rowAtIndex:rowIndex];
+    [t addRow:nil];
+    TDBRow *row = [t lastRow];
     [row setDate:dateLast inColumnWithIndex:dateCol];
     
-    rowIndex = [t addRow:nil];
-    row = [t rowAtIndex:rowIndex];
+    [t addRow:nil];
+    row = [t lastRow];
     [row setDate:dateMiddle inColumnWithIndex:dateCol];
     
-    rowIndex = [t addRow:nil];
-    row = [t rowAtIndex:rowIndex];
+    [t addRow:nil];
+    row = [t lastRow];
     [row setDate:dateFirst inColumnWithIndex:dateCol];
     
     TDBQuery *q = [t where];
