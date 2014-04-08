@@ -40,7 +40,9 @@ Description......
 * `findFirstRow` renamed to `indexOfFirstMatchingRow` on `TDBQuery`.
 * `findFirstRowFromIndex:` renamed to `indexOfFirstMatchingRowFromIndex:` on `TDBQuery`.
 * Return `NSNotFound` when appropriate.
-* `addRow` and `insertRow` do not return any value.
+* `removeAllRows`, `removeRowAtIndex`, `removeLastRow`, `addRow` and `insertRow` methods 
+  on table now return void instead of BOOL.
+
 
 ### Enhancements:
 * `renameColumnWithIndex:to:` has been added to `TDBTable`.
