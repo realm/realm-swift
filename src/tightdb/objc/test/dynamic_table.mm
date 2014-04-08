@@ -26,6 +26,15 @@
 
 #include <string.h>
 
+@interface TestClass : NSObject
+@property (nonatomic) NSString *name;
+@property (nonatomic) NSNumber *age;
+@end
+
+@implementation TestClass
+// no needed
+@end
+
 @interface TDBDynamicTableTests: SenTestCase
   // Intentionally left blank.
   // No new public instance methods need be defined.
@@ -110,6 +119,28 @@
     [t insertRow:@[@1] atIndex:0];
     t[0] = @[@2];
     STAssertEquals((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
+}
+
+-(void)testAppendRowGenericObject
+{
+    TDBTable* table1 = [[TDBTable alloc] init];
+    [table1 addColumnWithName:@"name" type:TDBStringType];
+    [table1 addColumnWithName:@"age" type:TDBIntType];
+
+    TestClass *person = [TestClass new];
+    person.name = @"Joe";
+    person.age = @11;
+    STAssertNoThrow([table1 addRow:person], @"Cannot add person");
+    STAssertEquals((NSUInteger)1, table1.rowCount, @"1 row excepted");
+    STAssertEquals((long long)11, [(NSNumber *)table1[0][@"age"] longLongValue], @"11 excepted");
+    STAssertTrue([((NSString *)table1[0][@"name"]) isEqualToString:@"Joe"], @"'Joe' excepted");
+
+    TDBTable* table2 = [[TDBTable alloc] init];
+    [table2 addColumnWithName:@"name" type:TDBStringType];
+    [table2 addColumnWithName:@"age" type:TDBStringType];
+
+    STAssertThrows([table2 addRow:person], @"Impossible");
+    STAssertEquals((NSUInteger)0, table2.rowCount, @"0 rows excepted");
 }
 
 -(void)testUpdateRowWithLabelsIntColumn
