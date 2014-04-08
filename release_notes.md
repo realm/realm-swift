@@ -54,6 +54,7 @@ Description......
   appending a new row will look like `[table addage:7]`.
 * Mixed typed values are better validated when rows are added, inserted, 
   or modified as object literals.
+* `Where`has been added to `TDBView`and `TDBViewProtocol`.
 
 
 =============================================================

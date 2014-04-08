@@ -261,5 +261,12 @@
     return 1;
 }
 
+- (TDBQuery *) where
+{
+    TDBQuery *query = [[TDBQuery alloc] initWithTable:self.originTable error:nil];
+    [query setTableView:*m_view];
+    return query;
+}
+
 @end
 
