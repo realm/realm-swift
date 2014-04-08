@@ -68,9 +68,13 @@ using namespace std;
     return self;
 }
 
+-(void)setTableView:(tightdb::TableView&)tableView
+{
+    m_query->tableview(tableView);
+}
+
 -(TDBRow*)getRow:(long)ndx
 {
-
     return m_tmp_row = [[TDBRow alloc] initWithTable:[self originTable] ndx:ndx];
 }
 
