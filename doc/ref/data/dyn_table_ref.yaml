@@ -69,11 +69,7 @@ CATEGORIES :
       NAME     : "removeAllRows"
       SUMMARY  : *g_dyn_table_clear_summary
       DESCR    : *g_dyn_table_clear_descr
-      SIGNATURE: (BOOL)removeAllRows
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : &objc_no_if_error
-                 "<code>NO</code> if an error occured, otherwise <code>YES</code>"
+      SIGNATURE: (void)removeAllRows
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_clear
         DESCR  :
@@ -85,7 +81,8 @@ CATEGORIES :
       SIGNATURE: (BOOL)optimize
       RETURN:
         TYPES  : BOOL
-        DESCR  : *objc_no_if_error
+        DESCR  : &objc_no_if_error
+                 "<code>NO</code> if an error occured, otherwise <code>YES</code>"
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_optimize
         DESCR  :
@@ -383,14 +380,11 @@ CATEGORIES :
       NAME     : "removeRowAtIndex:"
       SUMMARY  : *g_dyn_table_remove_row_summary
       DESCR    : *g_dyn_table_remove_row_descr
-      SIGNATURE: (BOOL)removeRowAtIndex:(NSUInteger)rowIndex
+      SIGNATURE: (void)removeRowAtIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME   : rowIndex
         TYPES  : NSUInteger
         DESCR  : *g_dyn_table_remove_row_param1_descr
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : ""
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_remove
         DESCR  : *objc_no_if_error
@@ -399,7 +393,7 @@ CATEGORIES :
       NAME     : removeLastRow
       SUMMARY  : *g_dyn_table_remove_last_row_summary
       DESCR    : *g_dyn_table_remove_last_row_descr
-      SIGNATURE: (BOOL)removeLastRow
+      SIGNATURE: (void)removeLastRow
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_remove_last_row
         DESCR  : *objc_no_if_error
