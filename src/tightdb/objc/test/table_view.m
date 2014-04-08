@@ -18,11 +18,11 @@
  *
  **************************************************************************/
 
-#import <XCTest/XCTest.h>
+#import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/TightdbFast.h>
 
-@interface table_view : XCTestCase
+@interface table_view : SenTestCase
 
 @end
 
@@ -46,18 +46,18 @@
     TDBQuery *q = [t where];
     TDBView *v = [q findAllRows];
     
-    XCTAssertEqual((size_t)0, [v columnCount], @"no columns added yet");
+    STAssertEquals((size_t)0, [v columnCount], @"no columns added yet");
     
     [t addColumnWithName:@"col0" type:TDBIntType];
-    XCTAssertEqual([v columnCount],(size_t)1,  @"1 column added to table");
+    STAssertEquals([v columnCount],(size_t)1,  @"1 column added to table");
     
     for (int i=0;i<10;i++) {
         [t addColumnWithName:@"name" type:TDBIntType];
     }
-    XCTAssertEqual([v columnCount],(size_t)11,  @"10 more columns added to table");
+    STAssertEquals([v columnCount],(size_t)11,  @"10 more columns added to table");
     
     [t removeColumnWithIndex:0];
-    XCTAssertEqual([v columnCount],(size_t)10, @"1 column removed from table");
+    STAssertEquals([v columnCount],(size_t)10, @"1 column removed from table");
 }
 
 - (void)testColumnTypesOnView
@@ -78,19 +78,19 @@
     TDBQuery *q = [t where];
     TDBView *v = [q findAllRows];
     
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:boolCol]      == TDBBoolType, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:binaryCol]    == TDBBinaryType, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:dateCol]      == TDBDateType, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:doubleCol]    == TDBDoubleType, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:floatCol]     == TDBFloatType, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:intCol]       == TDBIntType, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:mixedCol]     == TDBMixedType, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:stringCol]    == TDBStringType, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:tableCol]     == TDBTableType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:boolCol]      == TDBBoolType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:binaryCol]    == TDBBinaryType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:dateCol]      == TDBDateType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:doubleCol]    == TDBDoubleType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:floatCol]     == TDBFloatType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:intCol]       == TDBIntType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:mixedCol]     == TDBMixedType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:stringCol]    == TDBStringType, @"Column types matches");
+    STAssertTrue([v columnTypeOfColumnWithIndex:tableCol]     == TDBTableType, @"Column types matches");
     
-    XCTAssertThrows([v columnTypeOfColumnWithIndex:[v columnCount] + 1], @"Out of bounds");
-    XCTAssertThrows([v columnTypeOfColumnWithIndex:100], @"Out of bounds");
-    XCTAssertThrows([v columnTypeOfColumnWithIndex:-1], @"Out of bounds");
+    STAssertThrows([v columnTypeOfColumnWithIndex:[v columnCount] + 1], @"Out of bounds");
+    STAssertThrows([v columnTypeOfColumnWithIndex:100], @"Out of bounds");
+    STAssertThrows([v columnTypeOfColumnWithIndex:-1], @"Out of bounds");
 }
 
 - (void)testSortOnViewIntColumn
@@ -98,84 +98,87 @@
     TDBTable *t = [[TDBTable alloc] init];
     NSUInteger intCol = [t addColumnWithName:@"intCol" type:TDBIntType];
     
-    NSUInteger rowIndex = [t addRow:nil];
-    TDBRow *row = [t rowAtIndex:rowIndex];
+    [t addRow:nil];
+    TDBRow *row = [t lastRow];
     [row setInt:2 inColumnWithIndex:intCol];
     
-    rowIndex = [t addRow:nil];
-    row = [t rowAtIndex:rowIndex];
+    [t addRow:nil];
+    row = [t lastRow];
     [row setInt:1 inColumnWithIndex:intCol];
     
-    rowIndex = [t addRow:nil];
-    row = [t rowAtIndex:rowIndex];
+    [t addRow:nil];
+    row = [t lastRow];
     [row setInt:0 inColumnWithIndex:intCol];
     
     TDBQuery *q = [t where];
     TDBView *v = [q findAllRows];
     
     // Not yet sorted
-    XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:0] == 2, @"matcing value after no sort");
-    XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after no sort");
-    XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:2] == 0, @"matcing value after no sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:0] == 2, @"matcing value after no sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after no sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:2] == 0, @"matcing value after no sort");
     
     // Sort same way without order specified. Ascending default
     [v sortUsingColumnWithIndex:intCol];
-    XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:0] == 0, @"matcing value after default sort");
-    XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after default sort");
-    XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:2] == 2, @"matcing value after default sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:0] == 0, @"matcing value after default sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after default sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:2] == 2, @"matcing value after default sort");
     
     // Sort same way
     [v sortUsingColumnWithIndex:intCol inOrder:TDBAscending];
-    XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:0] == 0, @"matcing value after ascending sort");
-    XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after ascending sort");
-    XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:2] == 2, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:0] == 0, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:2] == 2, @"matcing value after ascending sort");
     
     // Sort descending
     [v sortUsingColumnWithIndex:intCol inOrder: TDBDescending];
-    XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:0] == 2, @"matcing value after descending sort");
-    XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after descending sort");
-    XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:2] == 0, @"matcing value after descending sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:0] == 2, @"matcing value after descending sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after descending sort");
+    STAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:2] == 0, @"matcing value after descending sort");
 }
 
 - (void)testSortOnViewBoolColumn
 {
     TDBTable *t = [[TDBTable alloc] init];
     NSUInteger boolCol = [t addColumnWithName:@"boolCol" type:TDBBoolType];
-    
-    TDBRow *row = [t rowAtIndex:[t addRow:nil]];
+
+    [t addRow:nil];
+    TDBRow *row = [t lastRow];
     [row setBool:YES inColumnWithIndex:boolCol];
-    
-    row = [t rowAtIndex:[t addRow:nil]];
+
+    [t addRow:nil];
+    row = [t lastRow];
     [row setBool:YES inColumnWithIndex:boolCol];
-    
-    row = [t rowAtIndex:[t addRow:nil]];
+
+    [t addRow:nil];
+    row = [t lastRow];
     [row setBool:NO inColumnWithIndex:boolCol];
     
     TDBQuery *q = [t where];
     TDBView *v = [q findAllRows];
     
     // Not yet sorted
-    XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:0] == YES, @"matcing value after no sort");
-    XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after no sort");
-    XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:2] == NO, @"matcing value after no sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:0] == YES, @"matcing value after no sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after no sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:2] == NO, @"matcing value after no sort");
     
     // Sort same way without order specified. Ascending default
     [v sortUsingColumnWithIndex:boolCol];
-    XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:0] == NO, @"matcing value after default sort");
-    XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after default sort");
-    XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:2] == YES, @"matcing value after default sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:0] == NO, @"matcing value after default sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after default sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:2] == YES, @"matcing value after default sort");
     
     // Sort same way
     [v sortUsingColumnWithIndex:boolCol inOrder:TDBAscending];
-    XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:0] == NO, @"matcing value after ascending sort");
-    XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after ascending sort");
-    XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:2] == YES, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:0] == NO, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:2] == YES, @"matcing value after ascending sort");
     
     // Sort descending
     [v sortUsingColumnWithIndex:boolCol inOrder: TDBDescending];
-    XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:0] == YES, @"matcing value after descending sort");
-    XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after descending sort");
-    XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:2] == NO, @"matcing value after descending sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:0] == YES, @"matcing value after descending sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after descending sort");
+    STAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:2] == NO, @"matcing value after descending sort");
 }
 
 
@@ -192,43 +195,43 @@
     NSDate *dateMiddle  = [formatter dateFromString:@"02/01/2014 10:10 PM"];
     NSDate *dateLast    = [formatter dateFromString:@"03/01/2014 10:10 PM"];
     
-    NSUInteger rowIndex = [t addRow:nil];
-    TDBRow *row = [t rowAtIndex:rowIndex];
+    [t addRow:nil];
+    TDBRow *row = [t lastRow];
     [row setDate:dateLast inColumnWithIndex:dateCol];
     
-    rowIndex = [t addRow:nil];
-    row = [t rowAtIndex:rowIndex];
+    [t addRow:nil];
+    row = [t lastRow];
     [row setDate:dateMiddle inColumnWithIndex:dateCol];
     
-    rowIndex = [t addRow:nil];
-    row = [t rowAtIndex:rowIndex];
+    [t addRow:nil];
+    row = [t lastRow];
     [row setDate:dateFirst inColumnWithIndex:dateCol];
     
     TDBQuery *q = [t where];
     TDBView *v = [q findAllRows];
     
     // Not yet sorted
-    XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:0] == dateLast, @"matcing value after no sort");
-    XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after no sort");
-    XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:2] == dateFirst, @"matcing value after no sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:0] == dateLast, @"matcing value after no sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after no sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:2] == dateFirst, @"matcing value after no sort");
     
     // Sort same way without order specified. Ascending default
     [v sortUsingColumnWithIndex:dateCol];
-    XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:0] == dateFirst, @"matcing value after default sort");
-    XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after default sort");
-    XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:2] == dateLast, @"matcing value after default sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:0] == dateFirst, @"matcing value after default sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after default sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:2] == dateLast, @"matcing value after default sort");
     
     // Sort same way
     [v sortUsingColumnWithIndex:dateCol inOrder:TDBAscending];
-    XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:0] == dateFirst, @"matcing value after ascending sort");
-    XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after ascending sort");
-    XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:2] == dateLast, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:0] == dateFirst, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after ascending sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:2] == dateLast, @"matcing value after ascending sort");
     
     // Sort descending
     [v sortUsingColumnWithIndex:dateCol inOrder: TDBDescending];
-    XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:0] == dateLast, @"matcing value after descending sort");
-    XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after descending sort");
-    XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:2] == dateFirst, @"matcing value after descending sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:0] == dateLast, @"matcing value after descending sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after descending sort");
+    STAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:2] == dateFirst, @"matcing value after descending sort");
 }
 
 
@@ -250,14 +253,14 @@
     TDBView *v = [q findAllRows];
     
     [v sortUsingColumnWithIndex:boolCol]; // bool is supported
-    XCTAssertThrows([v sortUsingColumnWithIndex:binaryCol], @"Not supported on binary column");
+    STAssertThrows([v sortUsingColumnWithIndex:binaryCol], @"Not supported on binary column");
     [v sortUsingColumnWithIndex:dateCol]; // bool is supported
-    XCTAssertThrows([v sortUsingColumnWithIndex:doubleCol], @"Not supported on double column");
-    XCTAssertThrows([v sortUsingColumnWithIndex:floatCol], @"Not supported on float column");
+    STAssertThrows([v sortUsingColumnWithIndex:doubleCol], @"Not supported on double column");
+    STAssertThrows([v sortUsingColumnWithIndex:floatCol], @"Not supported on float column");
     [v sortUsingColumnWithIndex:intCol]; // int is supported
-    XCTAssertThrows([v sortUsingColumnWithIndex:mixedCol], @"Not supported on mixed column");
-    XCTAssertThrows([v sortUsingColumnWithIndex:stringCol], @"Not supported on string column");
-    XCTAssertThrows([v sortUsingColumnWithIndex:tableCol], @"Not supported on table column");
+    STAssertThrows([v sortUsingColumnWithIndex:mixedCol], @"Not supported on mixed column");
+    STAssertThrows([v sortUsingColumnWithIndex:stringCol], @"Not supported on string column");
+    STAssertThrows([v sortUsingColumnWithIndex:tableCol], @"Not supported on table column");
 }
 
 - (void)testFirstLastRow
@@ -268,8 +271,8 @@
     
     TDBView *v = [[t where] findAllRows];
     
-    XCTAssertNil([v firstRow], @"Table is empty");
-    XCTAssertNil([v lastRow], @"Table is empty");
+    STAssertNil([v firstRow], @"Table is empty");
+    STAssertNil([v lastRow], @"Table is empty");
     
     // add empty rows before to filter out
     [t addRow:nil];
@@ -289,8 +292,8 @@
     
     v = [[[t where] intIsEqualTo:1 inColumnWithIndex:col1] findAllRows];
     
-    XCTAssertEqualObjects(value0, [[v firstRow] stringInColumnWithIndex:col0], @"");
-    XCTAssertEqualObjects(value1, [[v lastRow] stringInColumnWithIndex:col0], @"");
+    STAssertEqualObjects(value0, [[v firstRow] stringInColumnWithIndex:col0], @"");
+    STAssertEqualObjects(value1, [[v lastRow] stringInColumnWithIndex:col0], @"");
 }
 
 - (void)testViewSubscripting
@@ -307,11 +310,38 @@
     
     TDBView* view = [[[table where] intIsLessThanOrEqualTo:30 inColumnWithIndex:0] findAllRows];
     
-    XCTAssertEqual(view.rowCount, (NSUInteger)3, @"found 3 matches");
+    STAssertEquals(view.rowCount, (NSUInteger)3, @"found 3 matches");
     
-    XCTAssertTrue([view[0][0] isEqual:@10], @"row 0 -> 0");
-    XCTAssertTrue([view[1][0] isEqual:@27], @"row 1 -> 2");
-    XCTAssertTrue([view[2][0] isEqual:@8],  @"row 2 -> 4");
+    STAssertTrue([view[0][0] isEqual:@10], @"row 0 -> 0");
+    STAssertTrue([view[1][0] isEqual:@27], @"row 1 -> 2");
+    STAssertTrue([view[2][0] isEqual:@8],  @"row 2 -> 4");
+}
+
+- (void)testQueryOnView
+{
+    TDBTable *table = [[TDBTable alloc] init];
+    
+    // Specify the column types and names
+    [table addColumnWithName:@"firstName" type:TDBStringType];
+    [table addColumnWithName:@"lastName" type:TDBStringType];
+    [table addColumnWithName:@"salary" type:TDBIntType];
+    
+    // Add data to the table
+    [table addRow:@[@"John", @"Lee", @10000]];
+    [table addRow:@[@"Jane", @"Lee", @15000]];
+    [table addRow:@[@"John", @"Anderson", @20000]];
+    [table addRow:@[@"Erik", @"Lee", @30000]];
+    [table addRow:@[@"Henry", @"Anderson", @10000]];
+    
+    
+    TDBView *view = [[table where] findAllRows];
+    STAssertEquals(view.rowCount, (NSUInteger)5, @"All 5 rows still here");
+
+    TDBView *view2 = [[[view where ] stringIsCaseInsensitiveEqualTo:@"John" inColumnWithIndex:0 ] findAllRows];
+    STAssertEquals(view2.rowCount, (NSUInteger)2, @"2 rows match");
+    
+    TDBView *view3 = [[[view2 where] stringIsCaseInsensitiveEqualTo:@"Anderson" inColumnWithIndex:1 ] findAllRows];
+    STAssertEquals(view3.rowCount, (NSUInteger)1, @"Only 1 row left");
 }
 
 @end

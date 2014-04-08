@@ -3,11 +3,11 @@
 //  TightDb
 //
 
-#import <XCTest/XCTest.h>
+#import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/TDBTable.h>
 
-@interface MacTightDbTests: XCTestCase
+@interface MacTightDbTests: SenTestCase
 @end
 @implementation MacTightDbTests
 

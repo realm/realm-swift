@@ -5,7 +5,7 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
-#import <XCTest/XCTest.h>
+#import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/group.h>
@@ -19,7 +19,7 @@ TIGHTDB_TABLE_2(EnumPeopleTable2,
                 Hired, Bool,
                 Age,   Int)
 
-@interface MACTestEnumerator: XCTestCase
+@interface MACTestEnumerator: SenTestCase
 @end
 @implementation MACTestEnumerator
 

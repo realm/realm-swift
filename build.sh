@@ -854,6 +854,16 @@ EOF
             -e "s/#(include|import) +<tightdb\/objc\/(.*)>/#\1 \"\2\"/g" {} \; || exit 1
         find "$TEST_APP" -type f -exec sed -E -i '' \
             -e "s/#(include|import) +<tightdb(.*)>/#\1 <TightdbCore\/tightdb\2>/g" {} \; || exit 1
+
+        cat >"$TEST_APP/test/test_all.hpp" <<EOF
+#ifndef ${TEST_APP}_TEST_ALL
+#define ${TEST_APP}_TEST_ALL
+int test_all(int argc, char* argv[])
+{
+    // Intentionally left blank.
+}
+#endif ${TEST_APP}_TEST_ALL
+EOF
  
         build_ios_test
         echo "Done building"

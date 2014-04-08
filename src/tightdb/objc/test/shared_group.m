@@ -5,7 +5,7 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
-#import <XCTest/XCTest.h>
+#import <SenTestingKit/SenTestingKit.h>
 
 #import <tightdb/objc/TightdbFast.h>
 #import <tightdb/objc/TDBTransaction.h>
@@ -16,7 +16,7 @@ TIGHTDB_TABLE_2(SharedTable2,
                 Age,   Int)
 
 
-@interface MACTestSharedGroup: XCTestCase
+@interface MACTestSharedGroup: SenTestCase
 @end
 @implementation MACTestSharedGroup
 
@@ -47,9 +47,9 @@ TIGHTDB_TABLE_2(SharedTable2,
     [group writeContextToFile:@"employees.tightdb" error:nil];
 
     // Read only shared group
-    TDBContext* fromDisk = [TDBContext contextWithPersistenceToFile:@"employees.tightdb" error:nil];
+    TDBContext* fromDisk = [TDBContext contextPersistedAtPath:@"employees.tightdb" error:nil];
 
-    [fromDisk readWithBlock:^(TDBTransaction* group) {
+    [fromDisk readUsingBlock:^(TDBTransaction* group) {
             SharedTable2* diskTable = [group tableWithName:@"employees" asTableClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < [diskTable rowCount]; i++) {
@@ -60,7 +60,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         }];
 
 
-    [fromDisk writeWithBlock:^(TDBTransaction* group) {
+    [fromDisk writeUsingBlock:^(TDBTransaction* group) {
             SharedTable2* diskTable = [group tableWithName:@"employees" asTableClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < 50; i++) {
@@ -70,7 +70,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         } error:nil];
 
 
-    [fromDisk writeWithBlock:^(TDBTransaction* group) {
+    [fromDisk writeUsingBlock:^(TDBTransaction* group) {
             SharedTable2* diskTable = [group tableWithName:@"employees" asTableClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < 50; i++) {
@@ -80,25 +80,55 @@ TIGHTDB_TABLE_2(SharedTable2,
         } error:nil];
 
 
-    [fromDisk writeWithBlock:^(TDBTransaction* group) {
+    [fromDisk writeUsingBlock:^(TDBTransaction* group) {
             SharedTable2* diskTable = [group tableWithName:@"employees" asTableClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < 50; i++) {
                 [diskTable addHired:YES Age:i];
             }
         
-            XCTAssertNil([group tableWithName:@"Does not exist"], @"Table does not exist");
+            STAssertNil([group tableWithName:@"Does not exist"], @"Table does not exist");
 
             return YES; // commit
         } error:nil];
 
-    [fromDisk readWithBlock:^(TDBTransaction* group) {
+    [fromDisk readUsingBlock:^(TDBTransaction* group) {
             SharedTable2* diskTable = [group tableWithName:@"employees" asTableClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
         
-        XCTAssertThrows([diskTable removeAllRows], @"Not allowed in readtransaction");
+        STAssertThrows([diskTable removeAllRows], @"Not allowed in readtransaction");
 
-        }];
+    }];
+}
+
+
+-(void)testContextAtDefaultPath
+{
+    // Delete existing files
+
+    NSString *defaultPath = [TDBContext defaultPath];
+    
+    NSFileManager* fm = [NSFileManager defaultManager];
+    [fm removeItemAtPath:defaultPath error:nil];
+    [fm removeItemAtPath:[defaultPath stringByAppendingString:@".lock"] error:nil];
+    
+    // Create a new context at default location
+    TDBContext *context = [TDBContext contextWithDefaultPersistence];
+    
+    [context writeUsingBlock:^(TDBTransaction *transaction) {
+        TDBTable *t = [transaction createTableWithName:@"table"];
+        
+        [t addColumnWithName:@"col0" type:TDBIntType];
+        [t addRow:@[@10]];
+        
+        return YES;
+        
+    } error:nil];
+    
+    [context readUsingBlock:^(TDBTransaction* transaction) {
+        TDBTable *t = [transaction tableWithName:@"table"];
+        STAssertEqualObjects(t[0][0], @10, nil);
+    }];
 }
 
 - (void) testReadTransaction
@@ -110,35 +140,37 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:@"readonlyTest.tightdb" error:nil];
     [fm removeItemAtPath:@"readonlyTest.tightdb.lock" error:nil];
     
-    TDBContext* fromDisk = [TDBContext contextWithPersistenceToFile:@"readonlyTest.tightdb" error:nil];
+    TDBContext* fromDisk = [TDBContext contextPersistedAtPath:@"readonlyTest.tightdb" error:nil];
     
-    [fromDisk writeWithBlock:^(TDBTransaction *group) {
+    [fromDisk writeUsingBlock:^(TDBTransaction *group) {
         TDBTable *t = [group createTableWithName:@"table"];
         
         [t addColumnWithName:@"col0" type:TDBIntType];
-        NSUInteger rowIndex = [t addRow:nil];
-        TDBRow *row = [t rowAtIndex:rowIndex];
-        [row setInt:10 inColumnWithIndex:0 ];
+        [t addRow:@[@10]];
          
         return YES;
         
     } error:nil];
     
-    [fromDisk readWithBlock:^(TDBTransaction* group) {
+    [fromDisk readUsingBlock:^(TDBTransaction* group) {
         TDBTable *t = [group tableWithName:@"table"];
+        
+        STAssertThrows([t addRow:nil], @"Is in readTransaction");
+        STAssertThrows([t addRow:@[@1]], @"Is in readTransaction");
        
         TDBQuery *q = [t where];
-        
+        STAssertThrows([q removeRows], @"Is in readTransaction");
+
         TDBView *v = [q findAllRows];
         
-        // Should not be allowed!
-        XCTAssertThrows([v removeAllRows], @"Is in readTransaction");
+        STAssertThrows([v removeAllRows], @"Is in readTransaction");
+        STAssertThrows([[v where] removeRows], @"Is in readTransaction");
         
-        XCTAssertTrue([t rowCount] == 1, @"No rows have been removed");
-        XCTAssertTrue([q countRows] == 1, @"No rows have been removed");
-        XCTAssertTrue([v rowCount] == 1, @"No rows have been removed");
+        STAssertEquals(t.rowCount,      (NSUInteger)1, @"No rows have been removed");
+        STAssertEquals([q countRows],   (NSUInteger)1, @"No rows have been removed");
+        STAssertEquals(v.rowCount,      (NSUInteger)1, @"No rows have been removed");
         
-        XCTAssertNil([group tableWithName:@"Does not exist"], @"Table does not exist");
+        STAssertNil([group tableWithName:@"Does not exist"], @"Table does not exist");
     }];
 }
 
@@ -150,26 +182,26 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:@"singleTest.tightdb" error:nil];
     [fm removeItemAtPath:@"singleTest.tightdb.lock" error:nil];
 
-    TDBContext* ctx = [TDBContext contextWithPersistenceToFile:@"singleTest.tightdb" error:nil];
+    TDBContext* ctx = [TDBContext contextPersistedAtPath:@"singleTest.tightdb" error:nil];
 
-    [ctx writeWithBlock:^(TDBTransaction *trx) {
+    [ctx writeUsingBlock:^(TDBTransaction *trx) {
         TDBTable *t = [trx createTableWithName:@"table"];
         [t addColumnWithName:@"col0" type:TDBIntType];
         [t addRow:@[@10]];
         return YES;
     } error:nil];
 
-    [ctx readTable:@"table" withBlock:^(TDBTable* table) {
-        XCTAssertTrue([table rowCount] == 1, @"No rows have been removed");
+    [ctx readTable:@"table" usingBlock:^(TDBTable* table) {
+        STAssertTrue([table rowCount] == 1, @"No rows have been removed");
     }];
 
-    [ctx writeTable:@"table" withBlock:^(TDBTable* table) {
+    [ctx writeTable:@"table" usingBlock:^(TDBTable* table) {
         [table addRow:@[@10]];
         return YES;
     } error:nil];
 
-    [ctx readTable:@"table" withBlock:^(TDBTable* table) {
-        XCTAssertTrue([table rowCount] == 2, @"Rows were added");
+    [ctx readTable:@"table" usingBlock:^(TDBTable* table) {
+        STAssertTrue([table rowCount] == 2, @"Rows were added");
     }];
 }
 
@@ -182,41 +214,41 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:@"hasChanged.tightdb" error:nil];
     [fm removeItemAtPath:@"hasChanged.tightdb.lock" error:nil];
     
-    TDBContext *sg = [TDBContext contextWithPersistenceToFile:@"hasChanged.tightdb" error:nil];
+    TDBContext *sg = [TDBContext contextPersistedAtPath:@"hasChanged.tightdb" error:nil];
     
-    XCTAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not changed");
+    STAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not changed");
     
-    [sg writeWithBlock:^(TDBTransaction* group) {
+    [sg writeUsingBlock:^(TDBTransaction* group) {
         [group createTableWithName:@"t"];
         return YES;
     } error:nil];
     
-    XCTAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not been changed by another process");
+    STAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not been changed by another process");
 
     
-    [sg writeWithBlock:^(TDBTransaction* group) {
+    [sg writeUsingBlock:^(TDBTransaction* group) {
         TDBTable *t = [group tableWithName:@"t"];
         [t addColumnWithName:@"col" type:TDBBoolType];
-        NSUInteger rowIndex = [t addRow:nil];
-        TDBRow *row = [t rowAtIndex:rowIndex];
+        [t addRow:nil];
+        TDBRow *row = [t lastRow];
         [row setBool:YES inColumnWithIndex:0];
         return YES;
     } error:nil];
     
-    XCTAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not been changed by another process");
+    STAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not been changed by another process");
     
     
     // OTHER sharedgroup
-    TDBContext *sg2 = [TDBContext contextWithPersistenceToFile:@"hasChanged.tightdb" error:nil];
+    TDBContext *sg2 = [TDBContext contextPersistedAtPath:@"hasChanged.tightdb" error:nil];
     
     
-    [sg2 writeWithBlock:^(TDBTransaction* group) {
+    [sg2 writeUsingBlock:^(TDBTransaction* group) {
         TDBTable *t = [group tableWithName:@"t"];
         [t addRow:nil]; /* Adding an empty row */
         return YES;
     } error:nil];
 
-    XCTAssertTrue([sg hasChangedSinceLastTransaction], @"SharedGroup HAS been changed by another process");
+    STAssertTrue([sg hasChangedSinceLastTransaction], @"SharedGroup HAS been changed by another process");
 }
 
 
@@ -227,26 +259,26 @@ TIGHTDB_TABLE_2(SharedTable2,
         [fm removeItemAtPath:contextPath error:nil];
     [fm removeItemAtPath:[contextPath stringByAppendingString:@".lock"] error:nil];
     
-    TDBContext *c = [TDBContext contextWithPersistenceToFile:contextPath error:nil];
+    TDBContext *c = [TDBContext contextPersistedAtPath:contextPath error:nil];
     
-    [c writeWithBlock:^BOOL(TDBTransaction *transaction) {
+    [c writeUsingBlock:^BOOL(TDBTransaction *transaction) {
         
-        XCTAssertThrows([transaction createTableWithName:nil], @"name is nil");
-        XCTAssertThrows([transaction createTableWithName:@""], @"name is empty");
+        STAssertThrows([transaction createTableWithName:nil], @"name is nil");
+        STAssertThrows([transaction createTableWithName:@""], @"name is empty");
 
         [transaction createTableWithName:@"name"];
-        XCTAssertThrows([transaction createTableWithName:@"name"], @"name already exists");
+        STAssertThrows([transaction createTableWithName:@"name"], @"name already exists");
         
         return YES;
     } error:nil];
     
-    [c readWithBlock:^(TDBTransaction *transaction) {
+    [c readUsingBlock:^(TDBTransaction *transaction) {
         
-        XCTAssertThrows([transaction tableWithName:nil], @"name is nil");
-        XCTAssertThrows([transaction tableWithName:@""], @"name is empty");
-        XCTAssertThrows([transaction createTableWithName:@"same name"], @"creating table not allowed in read transaction");
-        XCTAssertThrows([transaction createTableWithName:@"name"], @"creating table not allowed in read transaction");
-        XCTAssertNil([transaction tableWithName:@"weird name"], @"get table that does not exists return nil");
+        STAssertThrows([transaction tableWithName:nil], @"name is nil");
+        STAssertThrows([transaction tableWithName:@""], @"name is empty");
+        STAssertThrows([transaction createTableWithName:@"same name"], @"creating table not allowed in read transaction");
+        STAssertThrows([transaction createTableWithName:@"name"], @"creating table not allowed in read transaction");
+        STAssertNil([transaction tableWithName:@"weird name"], @"get table that does not exists return nil");
     }];
 }
 
@@ -257,22 +289,22 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:contextPath error:nil];
     [fm removeItemAtPath:[contextPath stringByAppendingString:@".lock"] error:nil];
    
-    TDBContext *context1 = [TDBContext contextWithPersistenceToFile:contextPath error:nil];
-    TDBContext *context2 = [TDBContext contextWithPersistenceToFile:contextPath error:nil];
+    __block TDBContext *context1 = [TDBContext contextPersistedAtPath:contextPath error:nil];
+    __block TDBContext *context2 = [TDBContext contextPersistedAtPath:contextPath error:nil];
     
     {
         // initially, always say that the db has changed
         BOOL changed = [context2 pinReadTransactions];
-        XCTAssertTrue(changed, @"");
+        STAssertTrue(changed, @"");
         [context2 unpinReadTransactions];
         // asking again - this time there is no change
         changed = [context2 pinReadTransactions];
-        XCTAssertFalse(changed, @"");
+        STAssertFalse(changed, @"");
 
         [context2 unpinReadTransactions];
     }
     {   // add something to the db to play with
-        [context1 writeWithBlock:^BOOL(TDBTransaction *transaction) {
+        [context1 writeUsingBlock:^BOOL(TDBTransaction *transaction) {
             TDBTable *t1 = [transaction createTableWithName:@"test"];
             [t1 addColumnWithName:@"col0" type:TDBBoolType];
             [t1 addRow:@[@YES]];
@@ -282,14 +314,14 @@ TIGHTDB_TABLE_2(SharedTable2,
     }
     {   // validate that we can see previous commit from within a new pinned transaction
         BOOL changed = [context2 pinReadTransactions];
-        XCTAssertTrue(changed, @"");
-        [context2 readWithBlock:^(TDBTransaction *transaction) {
+        STAssertTrue(changed, nil);
+        [context2 readUsingBlock:^(TDBTransaction *transaction) {
             TDBTable *t = [transaction tableWithName:@"test"];
-            XCTAssertEqual([[t rowAtIndex:0] boolInColumnWithIndex:0], YES, @"");
+            STAssertEquals([[t rowAtIndex:0] boolInColumnWithIndex:0], YES, @"");
         }];
     }
     {   // commit new data in another context, without unpinning
-        [context1 writeWithBlock:^BOOL(TDBTransaction *transaction) {
+        [context1 writeUsingBlock:^BOOL(TDBTransaction *transaction) {
             TDBTable *t = [transaction tableWithName:@"test"];
             [t addRow:@[@NO]];
             return YES;
@@ -297,56 +329,56 @@ TIGHTDB_TABLE_2(SharedTable2,
         
     }
     {   // validate that we can see previous commit if we're not pinned
-        [context1 readWithBlock:^(TDBTransaction *transaction) {
+        [context1 readUsingBlock:^(TDBTransaction *transaction) {
             TDBTable *t = [transaction tableWithName:@"test"];
-            XCTAssertEqual([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, @"");
+            STAssertEquals([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, @"");
         }];
         
     }
      {   // validate that we can NOT see previous commit from within a pinned transaction
-        [context2 readWithBlock:^(TDBTransaction *transaction) {
+        [context2 readUsingBlock:^(TDBTransaction *transaction) {
             TDBTable *t = [transaction tableWithName:@"test"];
-            XCTAssertEqual(t.rowCount, (NSUInteger)1, @"Still only 1 row");
+            STAssertEquals(t.rowCount, (NSUInteger)1, @"Still only 1 row");
         }];
         
     }
     {   // unpin, pin again and validate that we can now see previous commit
         [context2 unpinReadTransactions];
         BOOL changed = [context2 pinReadTransactions];
-        XCTAssertTrue(changed, @"changes since last transaction");
-        [context2 readWithBlock:^(TDBTransaction *transaction) {
+        STAssertTrue(changed, @"changes since last transaction");
+        [context2 readUsingBlock:^(TDBTransaction *transaction) {
             TDBTable *t = [transaction tableWithName:@"test"];
-            XCTAssertEqual(t.rowCount, (NSUInteger)2, @"Now we see 2 rows");
-            XCTAssertEqual([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, @"");
+            STAssertEquals(t.rowCount, (NSUInteger)2, @"Now we see 2 rows");
+            STAssertEquals([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, @"");
         }];
     }
     {   // can't pin if already pinned
-        XCTAssertThrows([context2 pinReadTransactions], @"Already pinned");
+        STAssertThrows([context2 pinReadTransactions], @"Already pinned");
     }
     {   // can't unpin if already unpinned
         [context2 unpinReadTransactions];
-        XCTAssertThrows([context2 unpinReadTransactions], @"Already unpinned");
+        STAssertThrows([context2 unpinReadTransactions], @"Already unpinned");
 
     }
     {   // can't pin while we're inside a transaction
-        [context1 readWithBlock:^(TDBTransaction *transaction) {
-            XCTAssertThrows([context1 pinReadTransactions], @"Can't pin inside transaction");
-            XCTAssertNotNil(transaction, @"Parameter must be used");
+        [context1 readUsingBlock:^(TDBTransaction *transaction) {
+            STAssertThrows([context1 pinReadTransactions], @"Can't pin inside transaction");
+            STAssertNotNil(transaction, @"Parameter must be used");
         }];
     }
     
     {   // can't unpin while we're inside a transaction
         [context1 pinReadTransactions];
-        [context1 readWithBlock:^(TDBTransaction *transaction) {
-            XCTAssertThrows([context1 unpinReadTransactions], @"Can't unpin inside transaction");
-            XCTAssertNotNil(transaction, @"Parameter must be used");
+        [context1 readUsingBlock:^(TDBTransaction *transaction) {
+            STAssertThrows([context1 unpinReadTransactions], @"Can't unpin inside transaction");
+            STAssertNotNil(transaction, @"Parameter must be used");
         }];
         [context1 unpinReadTransactions];
     }
     {   // can't start a write transaction while pinned
         [context1 pinReadTransactions];
-        XCTAssertThrows([context1 writeWithBlock:^BOOL(TDBTransaction *transaction) {
-            XCTAssertNotNil(transaction, @"Parameter must be used");
+        STAssertThrows([context1 writeUsingBlock:^BOOL(TDBTransaction *transaction) {
+            STAssertNotNil(transaction, @"Parameter must be used");
             return YES;
         } error:nil], @"Can't start write transaction while pinned");
         [context1 unpinReadTransactions];
