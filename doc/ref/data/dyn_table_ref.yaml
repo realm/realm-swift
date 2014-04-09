@@ -702,8 +702,12 @@ CATEGORIES :
 
   - g_dyn_table_predicate:
       NAMES    : ["filterWithPredicate:", "filterWithPredicate:orderedBy:"] 
-      SUMMARY  : *g_dyn_table_predicate_summary
-      DESCR    : *g_dyn_table_predicate_desc
+      SUMMARY  : Create a filtered TDBView using an NSPredicate and NSSortDescriptor
+      DESCR    : >
+                 These methods allow you to create a TDBView using an NSPredicate or an NSPredicate string.
+                 The first variant takes a fully constructed NSPredicate and/or a NSSortDescriptor and creates
+                 a TDBView. The second variant takes a string which is parsed into an NSPredicate. Both variants
+                 support AND and OR compound predicats, and comparison of constant values against column names.
       SIGNATURE: -(TDBView *)filterWithPredicate:(NSPredicate *)predicate orderedBy:(NSSortDescriptor *)sort;
                  -(TDBView *)filterWithPredicate:(NSString *)predicateString;
       PARAMS:
@@ -718,10 +722,7 @@ CATEGORIES :
         DESCR  : A string which is parsed as a NSPredicate
       RETURN:
         TYPES  : TDBView *
-        DESCR  : *g_dyn_table_predicate_return_desc
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_predicate
-        DESCR  :
+        DESCR  : The filtered and/or sorted view
 
   - g_dyn_table_where_const:
       IGNORE   : ""
