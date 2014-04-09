@@ -105,13 +105,12 @@ TIGHTDB_TABLE_2(SharedTable2,
 -(void)testContextAtDefaultPath
 {
     // Delete existing files
-    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString* documentsDirectory = [paths objectAtIndex:0];
-    NSString *path = [documentsDirectory stringByAppendingPathComponent:@"default.tightdb"];
+
+    NSString *defaultPath = [TDBContext defaultPath];
     
     NSFileManager* fm = [NSFileManager defaultManager];
-    [fm removeItemAtPath:path error:nil];
-    [fm removeItemAtPath:[path stringByAppendingString:@".lock"] error:nil];
+    [fm removeItemAtPath:defaultPath error:nil];
+    [fm removeItemAtPath:[defaultPath stringByAppendingString:@".lock"] error:nil];
     
     // Create a new context at default location
     TDBContext *context = [TDBContext contextPersistedAtDefaultPathWithError:nil];
