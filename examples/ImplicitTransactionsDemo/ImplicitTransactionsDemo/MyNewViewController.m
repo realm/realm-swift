@@ -5,8 +5,8 @@
 
 @implementation MyNewViewController
 {
-    TDBTable *table;
-    int numChangeTicks;
+    TDBTable *_table;
+    int _numChangeTicks;
 }
 
 - (NSString *)pathForName:(NSString *)name
@@ -27,7 +27,7 @@
     TDBSmartContext *context =
         [TDBSmartContext contextWithPersistenceToFile:[self pathForName:@"demo.tightdb"]];
 
-    table = [context tableWithName:@"demo"];
+    _table = [context tableWithName:@"demo"];
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self selector:@selector(contextDidChange:)
@@ -38,8 +38,8 @@
 
 - (void)contextDidChange:(NSNotification *)theNotification
 {
-    ++numChangeTicks;
-    changeCount.text = [[NSNumber numberWithInt:numChangeTicks] stringValue];
+    ++_numChangeTicks;
+    changeCount.text = [[NSNumber numberWithInt:_numChangeTicks] stringValue];
     [tableView reloadData];
 }
 
@@ -62,7 +62,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return table.rowCount;
+    return _table.rowCount;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView2
@@ -74,7 +74,7 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
                                       reuseIdentifier:simpleTableIdentifier];
     }
-    cell.textLabel.text = table[indexPath.row][0];
+    cell.textLabel.text = _table[indexPath.row][0];
     return cell;
 }
 

@@ -53,25 +53,25 @@ void throw_objc_exception(exception &ex)
 
 @implementation TDBPrivateWeakTableReference
 {
-    __weak TDBTable *table;
-    size_t indexInGroup;
+    __weak TDBTable *_table;
+    size_t _indexInGroup;
 }
 
-- (instancetype)initWithTable:(TDBTable *)aTable indexInGroup:(size_t)anIndex
+- (instancetype)initWithTable:(TDBTable *)table indexInGroup:(size_t)index
 {
-    table = aTable;
-    indexInGroup = anIndex;
+    _table = table;
+    _indexInGroup = index;
     return self;
 }
 
 - (TDBTable *)table
 {
-    return table;
+    return _table;
 }
 
 - (size_t)indexInGroup
 {
-    return indexInGroup;
+    return _indexInGroup;
 }
 
 @end
@@ -86,18 +86,18 @@ void throw_objc_exception(exception &ex)
 
 @implementation TDBPrivateWeakTimerTarget
 {
-    __weak TDBSmartContext *context;
+    __weak TDBSmartContext *_context;
 }
 
-- (instancetype)initWithContext:(TDBSmartContext *)aContext
+- (instancetype)initWithContext:(TDBSmartContext *)context
 {
-    context = aContext;
+    _context = context;
     return self;
 }
 
 - (void)timerDidFire:(NSTimer *)timer
 {
-    [context checkForChange:timer];
+    [_context checkForChange:timer];
 }
 
 @end
@@ -105,12 +105,12 @@ void throw_objc_exception(exception &ex)
 
 @implementation TDBSmartContext
 {
-    NSNotificationCenter *notificationCenter;
-    UniquePtr<SharedGroup> sharedGroup;
-    const Group *group;
-    NSTimer *timer;
-    NSMutableArray *tables; // Elements are instances of TDBPrivateWeakTableReference
-    BOOL tableRefsHaveDied;
+    NSNotificationCenter *_notificationCenter;
+    UniquePtr<SharedGroup> _sharedGroup;
+    const Group *_group;
+    NSTimer *_timer;
+    NSMutableArray *_weakTableRefs; // Elements are instances of TDBPrivateWeakTableReference
+    BOOL _tableRefsHaveDied;
 }
 
 +(TDBSmartContext *)contextWithPersistenceToFile:(NSString *)path
@@ -132,12 +132,12 @@ void throw_objc_exception(exception &ex)
     if (!context)
         return nil;
 
-    context->notificationCenter = notificationCenter;
+    context->_notificationCenter = notificationCenter;
 
     TightdbErr errorCode = tdb_err_Ok;
     NSString *errorMessage;
     try {
-        context->sharedGroup.reset(new SharedGroup(StringData(ObjcStringAccessor(path))));
+        context->_sharedGroup.reset(new SharedGroup(StringData(ObjcStringAccessor(path))));
     }
     catch (File::PermissionDenied &ex) {
         errorCode    = tdb_err_File_PermissionDenied;
@@ -165,15 +165,15 @@ void throw_objc_exception(exception &ex)
     NSTimeInterval seconds = 0.1; // Ten times per second
     TDBPrivateWeakTimerTarget *weakTimerTarget =
         [[TDBPrivateWeakTimerTarget alloc] initWithContext:context];
-    context->timer = [NSTimer timerWithTimeInterval:seconds target:weakTimerTarget
-                                           selector:@selector(timerDidFire:)
-                                           userInfo:nil repeats:YES];
-    [runLoop addTimer:context->timer forMode:NSDefaultRunLoopMode];
+    context->_timer = [NSTimer timerWithTimeInterval:seconds target:weakTimerTarget
+                                            selector:@selector(timerDidFire:)
+                                            userInfo:nil repeats:YES];
+    [runLoop addTimer:context->_timer forMode:NSDefaultRunLoopMode];
 
-    context->tables = [NSMutableArray array];
+    context->_weakTableRefs = [NSMutableArray array];
 
     try {
-        context->group = &context->sharedGroup->begin_read();
+        context->_group = &context->_sharedGroup->begin_read();
     }
     catch (exception &ex) {
         throw_objc_exception(ex);
@@ -184,7 +184,7 @@ void throw_objc_exception(exception &ex)
 
 -(void)dealloc
 {
-    [timer invalidate];
+    [_timer invalidate];
 }
 
 - (void)checkForChange:(NSTimer *)theTimer
@@ -192,33 +192,33 @@ void throw_objc_exception(exception &ex)
     static_cast<void>(theTimer);
 
     // Remove dead table references from list
-    if (tableRefsHaveDied) {
-        NSMutableArray *deadTables = [NSMutableArray array];
-        for (TDBPrivateWeakTableReference *weakTableReference in tables) {
-            if (![weakTableReference table])
-                [deadTables addObject:weakTableReference];
+    if (_tableRefsHaveDied) {
+        NSMutableArray *deadTableRefs = [NSMutableArray array];
+        for (TDBPrivateWeakTableReference *weakTableRef in _weakTableRefs) {
+            if (![weakTableRef table])
+                [deadTableRefs addObject:weakTableRef];
         }
-        [tables removeObjectsInArray:deadTables];
-        tableRefsHaveDied = NO;
+        [_weakTableRefs removeObjectsInArray:deadTableRefs];
+        _tableRefsHaveDied = NO;
     }
 
     // Advance transaction if database has changed
     try {
-        if (sharedGroup->has_changed()) { // Throws
-            sharedGroup->end_read();
-            group = &sharedGroup->begin_read(); // Throws
+        if (_sharedGroup->has_changed()) { // Throws
+            _sharedGroup->end_read();
+            _group = &_sharedGroup->begin_read(); // Throws
 
             // Revive all group level table accessors
-            for (TDBPrivateWeakTableReference *weakTableReference in tables) {
-                TDBTable *table = [weakTableReference table];
-                size_t indexInGroup = [weakTableReference indexInGroup];
-                ConstTableRef table_2 = group->get_table(indexInGroup); // Throws
+            for (TDBPrivateWeakTableRef *weakTableRef in _weakTableRefs) {
+                TDBTable *table = [weakTableRef table];
+                size_t indexInGroup = [weakTableRef indexInGroup];
+                ConstTableRef table_2 = _group->get_table(indexInGroup); // Throws
                 // Note: Const spoofing is alright, because the
                 // Objective-C table accessor is in 'read-only' mode.
                 [table setNativeTable:const_cast<Table*>(table_2.get())];
             }
 
-            [notificationCenter postNotificationName:TDBContextDidChangeNotification object:self];
+            [_notificationCenter postNotificationName:TDBContextDidChangeNotification object:self];
         }
     }
     catch (exception &ex) {
@@ -229,12 +229,12 @@ void throw_objc_exception(exception &ex)
 -(TDBTable *)tableWithName:(NSString *)name
 {
     ObjcStringAccessor name_2(name);
-    if (!group->has_table(name_2))
+    if (!_group->has_table(name_2))
         return nil;
     TDBTable *table = [[TDBTable alloc] _initRaw];
     size_t indexInGroup;
     try {
-        ConstTableRef table_2 = group->get_table(name_2); // Throws
+        ConstTableRef table_2 = _group->get_table(name_2); // Throws
         // Note: Const spoofing is alright, because the
         // Objective-C table accessor is in 'read-only' mode.
         [table setNativeTable:const_cast<Table*>(table_2.get())];
@@ -245,15 +245,15 @@ void throw_objc_exception(exception &ex)
     }
     [table setParent:self];
     [table setReadOnly:YES];
-    TDBPrivateWeakTableReference *weakTableReference =
+    TDBPrivateWeakTableReference *weakTableRef =
         [[TDBPrivateWeakTableReference alloc] initWithTable:table indexInGroup:indexInGroup];
-    [tables addObject:weakTableReference];
+    [_weakTableRefs addObject:weakTableRef];
     return table;
 }
 
 - (void)tableRefDidDie
 {
-    tableRefsHaveDied = YES;
+    _tableRefsHaveDied = YES;
 }
 
 @end
