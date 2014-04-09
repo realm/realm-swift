@@ -63,7 +63,7 @@ using namespace std;
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"TDBRow dealloc");
+    // NSLog(@"TDBRow dealloc");
 #endif
     _table = nil;
 }

@@ -66,9 +66,6 @@
     return YES;
 }
 
-
-
-
 -(TDBDescriptor*)addColumnTable:(NSString*)name
 {
     return [self addColumnTable:name error:nil];
@@ -105,22 +102,26 @@
 {
     return m_desc->get_column_count();
 }
+
 -(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex
 {
     return (TDBType)m_desc->get_column_type(colIndex);
 }
+
 -(NSString*)nameOfColumnWithIndex:(NSUInteger)colIndex
 {
     return to_objc_string(m_desc->get_column_name(colIndex));
 }
+
 -(NSUInteger)indexOfColumnWithName:(NSString *)name
 {
     return was_not_found(m_desc->get_column_index(ObjcStringAccessor(name)));
 }
+
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"TDBDescriptor dealloc");
+    // NSLog(@"TDBDescriptor dealloc");
 #endif
 }
 

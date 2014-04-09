@@ -43,7 +43,7 @@ using namespace std;
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"TightdbGroup dealloc");
+    // NSLog(@"TightdbGroup dealloc");
 #endif
     if (m_is_owned)
         delete m_group;
