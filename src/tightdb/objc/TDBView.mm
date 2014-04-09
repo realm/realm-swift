@@ -213,7 +213,7 @@
     if (m_read_only) {
         @throw [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
                                        reason:@"You tried to modify an immutable tableview"
-                                     userInfo:[NSMutableDictionary dictionary]];
+                                     userInfo:nil];
     }
     
     m_view->remove(rowIndex);
