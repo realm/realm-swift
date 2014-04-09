@@ -177,9 +177,9 @@ using namespace std;
 // one of the table macros TIGHTDB_TABLE_*.
 //
 // FIXME: Check that the specified class derives from TDBTable.
--(BOOL)hasSameDescriptorAs:(__unsafe_unretained Class)class_obj
+-(BOOL)hasSameDescriptorAs:(__unsafe_unretained Class)tableClass
 {
-    TDBTable* table = [[class_obj alloc] _initRaw];
+    TDBTable* table = [[tableClass alloc] _initRaw];
     if (TIGHTDB_LIKELY(table)) {
         [table setNativeTable:m_table.get()];
         [table setParent:m_parent];
@@ -199,9 +199,9 @@ using namespace std;
 // one of the table macros TIGHTDB_TABLE_*.
 //
 // FIXME: Check that the specified class derives from TDBTable.
--(id)castClass:(__unsafe_unretained Class)class_obj
+-(id)castToTypedTableClass:(__unsafe_unretained Class)typedTableClass
 {
-    TDBTable* table = [[class_obj alloc] _initRaw];
+    TDBTable* table = [[typedTableClass alloc] _initRaw];
     if (TIGHTDB_LIKELY(table)) {
         [table setNativeTable:m_table.get()];
         [table setParent:m_parent];
@@ -224,22 +224,27 @@ using namespace std;
 {
     return m_table->get_column_count();
 }
+
 -(NSString*)nameOfColumnWithIndex:(NSUInteger)ndx
 {
     return to_objc_string(m_table->get_column_name(ndx));
 }
+
 -(NSUInteger)indexOfColumnWithName:(NSString *)name
 {
     return was_not_found(m_table->get_column_index(ObjcStringAccessor(name)));
 }
+
 -(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)ndx
 {
     return TDBType(m_table->get_column_type(ndx));
 }
+
 -(TDBDescriptor*)descriptor
 {
     return [self descriptorWithError:nil];
 }
+
 -(TDBDescriptor*)descriptorWithError:(NSError* __autoreleasing*)error
 {
     tightdb::DescriptorRef desc = m_table->get_descriptor();
@@ -374,6 +379,12 @@ using namespace std;
 
 -(void)addRow:(NSObject*)data
 {
+    if(m_read_only) {
+        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+                                       reason:@"You tried to modify a table in read only mode"
+                                     userInfo:[NSMutableDictionary dictionary]];
+    }
+    
     if (!data) {
         [self TDB_addEmptyRow];
         return ;
@@ -423,50 +434,35 @@ using namespace std;
 }
 
 
--(BOOL)removeAllRows
+-(void)removeAllRows
 {
     if (m_read_only) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
-                                                         reason:@"You tried to modify an immutable table."
-                                                       userInfo:nil];
-        [exception raise];
-        return NO;
+        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+                                       reason:@"You tried to modify an immutable table."
+                                     userInfo:nil];
     }
     
     m_table->clear();
-    return YES;
 }
 
--(BOOL)removeRowAtIndex:(NSUInteger)ndx
-{
-    return [self removeRowAtIndex:ndx error:nil];
-}
-
--(BOOL)removeRowAtIndex:(NSUInteger)ndx error:(NSError* __autoreleasing*)error
+-(void)removeRowAtIndex:(NSUInteger)ndx
 {
     if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to remove row while read only ndx: %llu", (unsigned long long)ndx]);
-        return NO;
+        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+                                       reason:@"You tried to modify an immutable table."
+                                     userInfo:nil];
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->remove(ndx);, NO);
-    return YES;
+    m_table->remove(ndx);
 }
 
--(BOOL)removeLastRow
-{
-    return [self removeLastRowWithError:nil];
-}
-
--(BOOL)removeLastRowWithError:(NSError* __autoreleasing*)error
+-(void)removeLastRow
 {
     if (m_read_only) {
-        if (error)
-            *error = make_tightdb_error(tdb_err_FailRdOnly, @"Tried to remove last while read-only.");
-        return NO;
+        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+                                       reason:@"You tried to modify an immutable table."
+                                     userInfo:nil];
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->remove_last();, NO);
-    return YES;
+    m_table->remove_last();
 }
 
 

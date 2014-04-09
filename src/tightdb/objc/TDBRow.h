@@ -24,12 +24,13 @@
 
 @interface TDBRow: NSObject
 
--(id)objectAtIndexedSubscript:(NSUInteger)colNdx;
+-(id)objectAtIndexedSubscript:(NSUInteger)colIndex;
 -(id)objectForKeyedSubscript:(id <NSCopying>)key;
--(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colNdx;
+-(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colIndex;
 -(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key;
 
 @end
+
 
 
 /* FIXME: This class can be (and should be) eliminated by using a
