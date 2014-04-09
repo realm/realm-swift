@@ -1261,22 +1261,27 @@
     STAssertEquals(v.rowCount, (NSUInteger)2, @"View with two matches");
     STAssertEqualObjects(v[0][ageIndex], @1, nil);
     
+    // test AND
     v = [t filterWithPredicate:@"age == 1 AND name == \"name1\""];
     STAssertEquals(v.rowCount, (NSUInteger)1, @"View with two matches");
     STAssertEqualObjects(v[0][nameIndex], @"name1", nil);
     
+    // test OR
+    v = [t filterWithPredicate:@"age == 1 OR age == 4"];
+    STAssertEquals(v.rowCount, (NSUInteger)3, @"View with 3 matches");
+    
     // test other numeric operators
     v = [t filterWithPredicate:@"age > 3"];
-    STAssertEquals(v.rowCount, (NSUInteger)1, @"View with two matches");
+    STAssertEquals(v.rowCount, (NSUInteger)1, @"View with 1 matches");
     
     v = [t filterWithPredicate:@"age >= 3"];
-    STAssertEquals(v.rowCount, (NSUInteger)2, @"View with two matches");
+    STAssertEquals(v.rowCount, (NSUInteger)2, @"View with 2 matches");
     
     v = [t filterWithPredicate:@"age < 1"];
-    STAssertEquals(v.rowCount, (NSUInteger)1, @"View with two matches");
+    STAssertEquals(v.rowCount, (NSUInteger)1, @"View with 1 matches");
     
     v = [t filterWithPredicate:@"age <= 1"];
-    STAssertEquals(v.rowCount, (NSUInteger)3, @"View with two matches");
+    STAssertEquals(v.rowCount, (NSUInteger)3, @"View with 3 matches");
 }
 
 -(void)testTableDynamic_find_int
