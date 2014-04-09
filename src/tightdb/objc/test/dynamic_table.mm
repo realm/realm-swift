@@ -1229,6 +1229,42 @@
     STAssertEqualObjects(v[2][ageIndex], @2, nil);
 }
 
+
+- (void)testPredicateView
+{
+    TDBTable *t = [[TDBTable alloc] init];
+    
+    NSUInteger nameIndex = [t addColumnWithName:@"name" type:TDBStringType];
+    NSUInteger ageIndex = [t addColumnWithName:@"age" type:TDBIntType];
+
+    [t addRow:@[@"name0", @0]];
+    [t addRow:@[@"name1", @1]];
+    [t addRow:@[@"name2", @1]];
+
+    STAssertThrows([t filterWithPredicate:@"garbage"], @"Garbage predicate");
+    STAssertThrows([t filterWithPredicate:@"name == notAValue"], @"Invalid expression");
+    STAssertThrows([t filterWithPredicate:@"naem == \"name0\""], @"Invalid column");
+    STAssertThrows([t filterWithPredicate:@"name == 30"], @"Invalid value type");
+
+    // Distinct on string column
+    TDBView *v = [t filterWithPredicate:@"name == \"name0\""];
+    STAssertEquals(v.rowCount, (NSUInteger)1, @"View with single match");
+    STAssertEqualObjects(v[0][nameIndex], @"name0", nil);
+    STAssertEqualObjects(v[0][ageIndex], @0, nil);
+    
+    v = [t filterWithPredicate:@"age == 1"];
+    STAssertEquals(v.rowCount, (NSUInteger)2, @"View with two matches");
+    STAssertEqualObjects(v[0][ageIndex], @1, nil);
+    
+    v = [t filterWithPredicate:@"1 == age"];
+    STAssertEquals(v.rowCount, (NSUInteger)2, @"View with two matches");
+    STAssertEqualObjects(v[0][ageIndex], @1, nil);
+    
+    v = [t filterWithPredicate:@"age == 1 AND name == \"name1\""];
+    STAssertEquals(v.rowCount, (NSUInteger)1, @"View with two matches");
+    STAssertEqualObjects(v[0][nameIndex], @"name1", nil);
+}
+
 -(void)testTableDynamic_find_int
 {
     TDBTable *table = [[TDBTable alloc] init];
