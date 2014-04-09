@@ -700,8 +700,6 @@ CATEGORIES :
       - CODE   : ex_objc_dyn_table_distinct
         DESCR  :
 
-  - g_dyn_table_predicate_const:
-      IGNORE   : ""
   - g_dyn_table_predicate:
       NAMES    : ["filterWithPredicate:", "filterWithPredicate:orderedBy:"] 
       SUMMARY  : *g_dyn_table_predicate_summary
