@@ -46,7 +46,7 @@ void tableFunc() {
 
     // Using a cursor
     PeopleTableRow *myRow = people[5];
-    int64_t age = myRow.Age;                           // =&gt; 54
+    long long age = myRow.Age;                         // =&gt; 54
     NSLog(@"Age: %lli", age);
     BOOL hired  = myRow.Hired;                         // =&gt; YES
     NSLog(@"Hired? %d", hired);
@@ -72,7 +72,7 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: iteration @@
-    for(PeopleTableRow* row in people) {
+    for (PeopleTableRow* row in people) {
         NSLog(@"%@ is %lld years old", row.Name, row.Age);
     }
     // @@EndExample@@
@@ -85,14 +85,20 @@ void tableFunc() {
 
     // @@Example: advanced_search @@
     // Create query (current employees between 20 and 30 years old)
-    PeopleTableQuery *query = [[[people where].Hired columnIsEqualTo:YES]
-                                              .Age   columnIsBetween:20 :30];
+
+    PeopleTableQuery *query = [[[[[[[[people where].Age columnIsBetween:20 :35]
+                                                   .Name columnContains:@"a"]
+                                                   group]
+                                                      .Hired columnIsEqualTo:YES]
+                                                      Or]
+                                                      .Name columnEndsWith:@"y"]
+                                                   endGroup];
 
     // Get number of matching entries
-    NSUInteger cnt3 = [query countRows];                     // =&gt; 2
+    NSUInteger cnt3 = [query countRows];                 // =&gt; 2
     NSLog(@"RowCount: %i", cnt3);
 
-     // You can do aggregates on columns, like calculating the average age
+    // You can do aggregates on columns, like calculating the average age
     double avg = [query.Age avg];
     NSLog(@"Avg age: %f", avg);
 
