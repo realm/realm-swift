@@ -321,25 +321,25 @@ using namespace std;
 
     if (table.size() < (size_t)rowIndex) {
         // FIXME: raise exception - out of bound
-        return ;
+        return;
     }
 
     if ([newValue isKindOfClass:[NSArray class]]) {
         verify_row(*desc, (NSArray *)newValue);
         set_row(size_t(rowIndex), table, (NSArray *)newValue);
-        return ;
+        return;
     }
     
     if ([newValue isKindOfClass:[NSDictionary class]]) {
         verify_row_with_labels(*desc, (NSDictionary *)newValue);
         set_row_with_labels(size_t(rowIndex), table, (NSDictionary *)newValue);
-        return ;
+        return;
     }
 
     if ([newValue isKindOfClass:[NSObject class]]) {
         verify_row_from_object(*desc, (NSObject *)newValue);
         set_row_from_object(rowIndex, table, (NSObject *)newValue);
-        return ;
+        return;
     }
 
     @throw [NSException exceptionWithName:@"tightdb:column_not_implemented"
@@ -387,7 +387,7 @@ using namespace std;
     
     if (!data) {
         [self TDB_addEmptyRow];
-        return ;
+        return;
     }
     tightdb::Table& table = *m_table;
     [self insertRow:data atIndex:table.size()];
@@ -404,7 +404,7 @@ using namespace std;
 {
     if (!anObject) {
         [self TDBInsertRow:rowIndex];
-        return ;
+        return;
     }
     
     tightdb::Table& table = *m_table;
@@ -413,19 +413,19 @@ using namespace std;
     if ([anObject isKindOfClass:[NSArray class]]) {
         verify_row(*desc, (NSArray *)anObject);
         insert_row(size_t(rowIndex), table, (NSArray *)anObject);
-        return ;
+        return;
     }
     
     if ([anObject isKindOfClass:[NSDictionary class]]) {
         verify_row_with_labels(*desc, (NSDictionary *)anObject);
         insert_row_with_labels(size_t(rowIndex), table, (NSDictionary *)anObject);
-        return ;
+        return;
     }
     
     if ([anObject isKindOfClass:[NSObject class]]) {
         verify_row_from_object(*desc, (NSObject *)anObject);
         insert_row_from_object(size_t(rowIndex), table, (NSObject *)anObject);
-        return ;
+        return;
     }
 
     @throw [NSException exceptionWithName:@"tightdb:column_not_implemented"

@@ -496,7 +496,7 @@ void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
     table.insert_done();
 
     if (subtables_seen) {
-        for(size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
+        for (size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
             DataType type = table.get_column_type(col_ndx);
             if (type != type_Table && type != type_Mixed) {
                 continue;
@@ -533,7 +533,7 @@ void insert_row_from_object(size_t row_ndx, Table& table, NSObject *data) {
     table.insert_done();
 
     if (subtables_seen) {
-        for(size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
+        for (size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
             DataType type = table.get_column_type(col_ndx);
             if (type != type_Table && type != type_Mixed) {
                 continue;
@@ -542,7 +542,6 @@ void insert_row_from_object(size_t row_ndx, Table& table, NSObject *data) {
             id value;
             @try {
                 value = [data valueForKey:col_name];
-
             }
             @catch (NSException *exception) {
                 continue;

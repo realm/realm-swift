@@ -254,16 +254,6 @@ CATEGORIES :
         TYPES  : TDBRow *
         DESCR  : The row.
 
-  - g_dyn_table_add_empty_row:
-      TODO     : later
-      NAME     : addEmptyRow
-      SUMMARY  : *objc_typed_table_add_empty_row_summary
-      DESCR    : *objc_typed_table_add_empty_row_descr
-      SIGNATURE: (TDBRow *)addEmptyRow
-      RETURN:
-        TYPES  : TDBRow *
-        DESCR  : Returns the inserted row.
-
   - g_dyn_table_insert_empty_row:
       TODO     : later
       NAME     : "insertEmptyRowAtIndex:"
@@ -286,13 +276,13 @@ CATEGORIES :
                  place. The row is optionally represented as Cocoa (NS) objects,
                  otherwise an empty row is inserted. If data is nil, an empty row
                  with default values is inserted. Properties in generic objects
-                 (derived from <code>NSObject</code>) which match columsn names
-                 will be used.
+                 (derived from <code>NSObject</code>) which match columns names
+                 will be used. Non-matching properties are ignored.
       SIGNATURE: (void)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME    : anObject
         TYPES   : id
-        DESCR   : The row either as a <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>.
+        DESCR   : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>.
       - NAME    : rowIndex
         TYPES   : NSUInteger
         DESCR   : *g_dyn_table_insert_empty_row_parm1_descr
@@ -312,7 +302,7 @@ CATEGORIES :
       PARAMS:
       - NAME   : data
         TYPES  : NSObject *
-        DESCR  : The row either as a <code>NSArray</code>, <code>NSDictionary</code>, or a generic <code>NSObject</code>.
+        DESCR  : The row either as an <code>NSArray</code>, <code>NSDictionary</code>, or a generic <code>NSObject</code>.
 
 
 # TODO: Should this be supported at all?
