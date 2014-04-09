@@ -207,12 +207,12 @@
 }
 
 
--(void) removeRowAtIndex:(NSUInteger)rowIndex
+-(void)removeRowAtIndex:(NSUInteger)rowIndex
 {
     if (m_read_only) {
         @throw [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
                                        reason:@"You tried to modify an immutable tableview"
-                                     userInfo:[NSMutableDictionary dictionary]];
+                                     userInfo:nil];
     }
     
     m_view->remove(rowIndex);
@@ -261,7 +261,7 @@
     return 1;
 }
 
-- (TDBQuery *) where
+- (TDBQuery *)where
 {
     TDBQuery *query = [[TDBQuery alloc] initWithTable:self.originTable error:nil];
     [query setTableView:*m_view];
