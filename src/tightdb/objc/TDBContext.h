@@ -32,7 +32,7 @@ typedef BOOL(^TDBTableWriteBlock)(TDBTable *table);
 
 // Initializers
 +(TDBContext *)contextAtDefaultPathWithError:(NSError **)error;
-+(TDBContext *)contextWithPersistenceToFile:(NSString *)path error:(NSError **)error;
++(TDBContext *)contextAtPath:(NSString *)path error:(NSError **)error;
 
 // Transactions
 -(void)readUsingBlock:(TDBReadBlock)block;

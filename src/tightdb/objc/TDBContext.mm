@@ -41,11 +41,11 @@ using namespace std;
     NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString* documentsDirectory = [paths objectAtIndex:0];
     NSString *path = [documentsDirectory stringByAppendingPathComponent:@"default.tightdb"];
-    return [self contextWithPersistenceToFile:path error:error];
+    return [self contextAtPath:path error:error];
 }
 
 
-+(TDBContext*)contextWithPersistenceToFile:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
++(TDBContext*)contextAtPath:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
 {
     TDBContext* shared_group = [[TDBContext alloc] init];
     if (!shared_group)
