@@ -700,6 +700,31 @@ CATEGORIES :
       - CODE   : ex_objc_dyn_table_distinct
         DESCR  :
 
+  - g_dyn_table_predicate_const:
+      IGNORE   : ""
+  - g_dyn_table_predicate:
+      NAMES    : ["filterWithPredicate:", "filterWithPredicate:orderedBy:"] 
+      SUMMARY  : *g_dyn_table_predicate_summary
+      DESCR    : *g_dyn_table_predicate_desc
+      SIGNATURE: -(TDBView *)filterWithPredicate:(NSPredicate *)predicate orderedBy:(NSSortDescriptor *)sort;
+                 -(TDBView *)filterWithPredicate:(NSString *)predicateString;
+      PARAMS:
+      - NAME   : predicate
+        TYPES  : NSPredicate
+        DESCR  : NOTE! We only support compound predicates and those comparing columns to constant values.
+      - NAME   : sort
+        TYPES  : NSSortDescriptor
+        DESCR  : NOTE! We only support ascending sorts
+      - NAME   : predicateString
+        TYPES  : NSString
+        DESCR  : A string which is parsed as a NSPredicate
+      RETURN:
+        TYPES  : TDBView *
+        DESCR  : *g_dyn_table_predicate_return_desc
+      EXAMPLES:
+      - CODE   : ex_objc_dyn_table_predicate
+        DESCR  :
+
   - g_dyn_table_where_const:
       IGNORE   : ""
   - g_dyn_table_where:
