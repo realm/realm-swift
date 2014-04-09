@@ -1315,6 +1315,27 @@
     STAssertEquals(v.rowCount, (NSUInteger)3, @"View with 3 matches");
 }
 
+- (void)testPredicateSort
+{
+    TDBTable *t = [[TDBTable alloc] init];
+    
+    NSUInteger ageIndex = [t addColumnWithName:@"age" type:TDBIntType];
+    
+    [t addRow:@[@4]];
+    [t addRow:@[@0]];
+    
+    NSSortDescriptor * reverseSort = [NSSortDescriptor sortDescriptorWithKey:@"age" ascending:NO];
+    STAssertThrows([t filterWithPredicate:nil orderedBy:reverseSort], @"Invalid sort");
+    
+    NSSortDescriptor * misspell = [NSSortDescriptor sortDescriptorWithKey:@"oge" ascending:YES];
+    STAssertThrows([t filterWithPredicate:nil orderedBy:misspell], @"Invalid sort");
+    
+    TDBView *v = [t filterWithPredicate:nil orderedBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:YES]];
+    STAssertEqualObjects(v[0][ageIndex], @0, nil);
+    
+}
+
+
 -(void)testTableDynamic_find_int
 {
     TDBTable *table = [[TDBTable alloc] init];
