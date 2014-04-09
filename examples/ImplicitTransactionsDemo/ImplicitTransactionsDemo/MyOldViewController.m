@@ -77,7 +77,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     __block NSUInteger numRows = 0;
-    [context readWithBlock:^(TDBTransaction *transact) {
+    [context readUsingBlock:^(TDBTransaction *transact) {
         TDBTable *table = [transact tableWithName:@"demo"];
         numRows = table.rowCount;
     }];
@@ -97,7 +97,7 @@
                                       reuseIdentifier:simpleTableIdentifier];
     }
 
-    [context readWithBlock:^(TDBTransaction *transact) {
+    [context readUsingBlock:^(TDBTransaction *transact) {
         TDBTable *table = [transact tableWithName:@"demo"];
         cell.textLabel.text = table[indexPath.row][0];
     }];

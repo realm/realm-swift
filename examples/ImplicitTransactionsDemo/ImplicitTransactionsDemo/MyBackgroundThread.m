@@ -13,7 +13,7 @@
     __block int i = 0;
     for (;;) {
         [NSThread sleepForTimeInterval:5.0];
-        [context writeWithBlock:^(TDBTransaction *transact) {
+        [context writeUsingBlock:^(TDBTransaction *transact) {
             TDBTable *table = [transact tableWithName:@"demo"];
             ++i;
             [table firstRow][0] = [NSString stringWithFormat:@"First %i", i];
