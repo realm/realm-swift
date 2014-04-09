@@ -242,7 +242,7 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
         case type_Table:
             if ([obj isKindOfClass:[NSArray class]]) {
                 if ([(NSArray *)obj count] == 0)
-                    break; /* empty subtable */
+                    break; // empty subtable
                 id subobj;
                 ConstDescriptorRef subdescr = descr.get_subdescriptor(col_ndx);
                 NSEnumerator *subenumerator = [(NSArray *)obj objectEnumerator];
@@ -278,8 +278,9 @@ void verify_row(const Descriptor& descr, NSArray* data)
     while (obj = [enumerator nextObject]) {
         if (!verify_cell(descr, col_ndx, obj)) {
             @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
-                                           reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
-                                                   to_objc_string(descr.get_column_name(col_ndx)), col_ndx, descr.get_column_type(col_ndx) ]
+                                           reason:[NSString stringWithFormat: @"colName %@ with index: %lu is of type %u",
+                                                            to_objc_string(descr.get_column_name(col_ndx)), col_ndx,
+                                                                           descr.get_column_type(col_ndx) ]
                                          userInfo:nil];
         }
         ++col_ndx;
@@ -289,7 +290,7 @@ void verify_row(const Descriptor& descr, NSArray* data)
 void verify_row_with_labels(const Descriptor& descr, NSDictionary* data)
 {
     size_t n = descr.get_column_count();
-    for (size_t i = 0; i != n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
         NSString *col_name = to_objc_string(descr.get_column_name(i));
         id value = [data valueForKey:col_name];
         if (value == nil)
@@ -300,6 +301,29 @@ void verify_row_with_labels(const Descriptor& descr, NSDictionary* data)
                                                    to_objc_string(descr.get_column_name(i)), i, descr.get_column_type(i) ]
                                          userInfo:nil];
         }
+    }
+}
+
+void verify_row_from_object(const Descriptor& descr, NSObject* data)
+{
+    size_t count = descr.get_column_count();
+    for (size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
+        NSString *col_name = to_objc_string(descr.get_column_name(col_ndx));
+        id value;
+        @try {
+            value = [data valueForKey:col_name];
+        }
+        @catch (NSException *exception) {
+            continue;
+        }
+        if (!verify_cell(descr, col_ndx, value)) {
+            @throw [NSException exceptionWithName: @"tightdb:wrong_column_type"
+                                           reason: [NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
+                                                    to_objc_string(descr.get_column_name(col_ndx)), col_ndx,
+                                                                   descr.get_column_type(col_ndx) ]
+                                         userInfo: nil];
+        }
+
     }
 }
 
@@ -421,16 +445,11 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
 
 void insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
 {
-    /*
-       Assumption:
-       - data has been validated by verify_row
-    */
-
     NSEnumerator *enumerator = [data objectEnumerator];
     id obj;
 
     bool subtable_seen = false;
-    /* FIXME: handling of tightdb exceptions => return NO */
+    // FIXME: handling of tightdb exceptions => return NO
     size_t col_ndx = 0;
     while (obj = [enumerator nextObject]) {
         subtable_seen = subtable_seen || insert_cell(col_ndx, row_ndx, table, obj);
@@ -459,12 +478,12 @@ void insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
             size_t sub_ndx = 0;
             while (subobj = [subenumerator nextObject]) {
                 if (datatype == type_Mixed && sub_ndx == 0) {
-                    /* first element is the description */
+                    // first element is the description
                     ++sub_ndx;
                     continue;
                 }
 
-                /* Fill in data */
+                // Fill in data
                 insert_row(subtable->size(), *subtable, subobj);
                 ++sub_ndx;
             }
@@ -477,7 +496,7 @@ void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
     bool subtables_seen = false;
 
     size_t count = table.get_column_count();
-    for (size_t col_ndx = 0; col_ndx != count; ++col_ndx) {
+    for (size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
         NSString *col_name = to_objc_string(table.get_column_name(col_ndx));
 
         // Do we have a matching label?
@@ -488,7 +507,7 @@ void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
     table.insert_done();
 
     if (subtables_seen) {
-        for(size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
+        for (size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
             DataType type = table.get_column_type(col_ndx);
             if (type != type_Table && type != type_Mixed) {
                 continue;
@@ -503,6 +522,43 @@ void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
 
             /* fill in data */
             insert_row_with_labels(row_ndx, *subtable, (NSDictionary *)value);
+        }
+    }
+}
+
+void insert_row_from_object(size_t row_ndx, Table& table, NSObject *data) {
+    bool subtables_seen = false;
+
+    size_t count = table.get_column_count();
+    for (size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
+        NSString *col_name = to_objc_string(table.get_column_name(col_ndx));
+        id value;
+        @try {
+            value = [data valueForKey:col_name];
+        }
+        @catch (NSException *exception) {
+            continue;
+        }
+        subtables_seen = subtables_seen || insert_cell(col_ndx, row_ndx, table, value);
+    }
+    table.insert_done();
+
+    if (subtables_seen) {
+        for (size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
+            DataType type = table.get_column_type(col_ndx);
+            if (type != type_Table && type != type_Mixed) {
+                continue;
+            }
+            NSString *col_name = to_objc_string(table.get_column_name(col_ndx));
+            id value;
+            @try {
+                value = [data valueForKey:col_name];
+            }
+            @catch (NSException *exception) {
+                continue;
+            }
+            TableRef subtable = table.get_subtable(col_ndx, row_ndx);
+            insert_row_from_object(row_ndx, *subtable, value);
         }
     }
 }
@@ -590,7 +646,8 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
             }
             @throw [NSException exceptionWithName:@"tightdb:cannot insert subtable"
                                            reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
-                                                   to_objc_string(table.get_column_name(col_ndx)), col_ndx, table.get_column_type(col_ndx) ]
+                                                            to_objc_string(table.get_column_name(col_ndx)), col_ndx,
+                                                                           table.get_column_type(col_ndx) ]
                                          userInfo:nil];
         }
         case type_Mixed:
@@ -658,9 +715,24 @@ void set_row(size_t row_ndx, Table& table, NSArray *data)
 void set_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
 {
     size_t count = table.get_column_count();
-    for (size_t col_ndx = 0; col_ndx != count; ++col_ndx) {
+    for (size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
         NSString *col_name = to_objc_string(table.get_column_name(col_ndx));
         id value = [data valueForKey:col_name];
+        set_cell(col_ndx, row_ndx, table, value);
+    }
+}
+
+void set_row_from_object(size_t row_ndx, Table& table, NSObject *data) {
+    size_t count = table.get_column_count();
+    for (size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
+        NSString *col_name = to_objc_string(table.get_column_name(col_ndx));
+        id value;
+        @try {
+            value = [data valueForKey:col_name];
+        }
+        @catch (NSException *) {
+            continue;
+        }
         set_cell(col_ndx, row_ndx, table, value);
     }
 }
