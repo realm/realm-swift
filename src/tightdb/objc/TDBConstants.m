@@ -18,21 +18,7 @@
  *
  **************************************************************************/
 
-#import <Foundation/Foundation.h>
+#import "TDBConstants.h"
 
 
-@interface TDBSmartContext: NSObject
-
-/**
- * Use the main run loop and the default notification center.
- */
-+(TDBSmartContext *)contextWithPersistenceToFile:(NSString *)path;
-
-+(TDBSmartContext *)contextWithPersistenceToFile:(NSString *)path
-                                         runLoop:(NSRunLoop *)runLoop
-                              notificationCenter:(NSNotificationCenter *)notificationCenter
-                                           error:(NSError **)error;
-
--(TDBTable *)tableWithName:(NSString *)name;
-
-@end
+NSString *const TDBContextDidChangeNotification = @"TDBContextDidChangeNotification";

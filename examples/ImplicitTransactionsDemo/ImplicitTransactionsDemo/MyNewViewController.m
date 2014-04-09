@@ -22,20 +22,16 @@
         return nil;
 
     self.title = NSLocalizedString(@"New", @"New");
-    self.tabBarItem.image = [UIImage imageNamed:@"second"];
+    self.tabBarItem.image = [UIImage imageNamed:@"new"];
 
-    NSRunLoop *runLoop = [NSRunLoop mainRunLoop];
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     TDBSmartContext *context =
-        [TDBSmartContext contextWithPersistenceToFile:[self pathForName:@"demo.tightdb"]
-                                              runLoop:runLoop
-                                   notificationCenter:notificationCenter
-                                                error:nil];
+        [TDBSmartContext contextWithPersistenceToFile:[self pathForName:@"demo.tightdb"]];
+
     table = [context tableWithName:@"demo"];
 
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self selector:@selector(contextDidChange:)
-                               name:@"TDBContextDidChangeNotification"
-                             object:context];
+                               name:TDBContextDidChangeNotification object:context];
 
     return self;
 }
