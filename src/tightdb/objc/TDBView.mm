@@ -79,7 +79,7 @@
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"TDBView dealloc");
+    // NSLog(@"TDBView dealloc");
 #endif
     m_table = nil; // FIXME: What is the point of doing this?
 }
@@ -122,7 +122,6 @@
     return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1]];
 }
 
-
 -(NSUInteger)rowCount
 {
     return m_view->size();
@@ -138,10 +137,12 @@
     TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colNdx);
     return TDBType(m_view->get_column_type(colNdx));
 }
+
 -(void)sortUsingColumnWithIndex:(NSUInteger)colIndex
 {
     [self sortUsingColumnWithIndex:colIndex inOrder:TDBAscending];
 }
+
 -(void)sortUsingColumnWithIndex:(NSUInteger)colIndex  inOrder: (TDBSortOrder)order
 {
     TDBType columnType = [self columnTypeOfColumnWithIndex:colIndex];
@@ -207,7 +208,7 @@
 }
 
 
--(void) removeRowAtIndex:(NSUInteger)rowIndex
+-(void)removeRowAtIndex:(NSUInteger)rowIndex
 {
     if (m_read_only) {
         @throw [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
@@ -261,7 +262,7 @@
     return 1;
 }
 
-- (TDBQuery *) where
+- (TDBQuery *)where
 {
     TDBQuery *query = [[TDBQuery alloc] initWithTable:self.originTable error:nil];
     [query setTableView:*m_view];
