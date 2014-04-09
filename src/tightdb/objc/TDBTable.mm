@@ -1034,6 +1034,174 @@ using namespace std;
     return [TDBView viewWithTable:self andNativeView:distinctView];
 }
 
+inline NSExpressionType validated_expression_type(NSExpression * expression) {
+    if (expression.expressionType != NSConstantValueExpressionType &&
+        expression.expressionType != NSKeyPathExpressionType) {
+        @throw [NSException exceptionWithName:@"filterWithPredicate:orderedBy: - invalid expression type"
+                                       reason:@"Only support NSConstantValueExpressionType and NSKeyPathExpressionType"
+                                     userInfo:nil];
+    }
+    return expression.expressionType;
+}
+
+void update_query_with_subpredicate(NSPredicate * predicate,
+    TDBTable * table, tightdb::Query & query) {
+    
+    // compound predicates
+    if ([predicate isMemberOfClass:[NSCompoundPredicate class]]) {
+        NSCompoundPredicate * comp = (NSCompoundPredicate *)predicate;
+        if ([comp compoundPredicateType] != NSAndPredicateType) {
+            @throw [NSException exceptionWithName:@"filterWithPredicate:orderedBy: - invalid compound predicate type"
+                                           reason:@"Only support NSAndPredicateType predicate type"
+                                         userInfo:nil];
+        }
+        
+        // add all of the subprediates
+        for (NSPredicate * subp in comp.subpredicates) {
+            update_query_with_subpredicate(subp, table, query);
+        }
+    }
+    else if ([predicate isMemberOfClass:[NSComparisonPredicate class]]) {
+        NSComparisonPredicate * compp = (NSComparisonPredicate *)predicate;
+        // validate expressions
+        NSString * columnName = nil;
+        NSObject * value = nil;
+        
+        // validate out left expression
+        if( validated_expression_type(compp.leftExpression) == NSConstantValueExpressionType ) {
+            value = compp.leftExpression.constantValue;
+        }
+        else {
+            columnName = compp.leftExpression.keyPath;
+        }
+        
+        // validate right expression
+        if( validated_expression_type(compp.rightExpression) == NSConstantValueExpressionType ) {
+            value = compp.rightExpression.constantValue;
+        }
+        else {
+            columnName = compp.rightExpression.keyPath;
+        }
+        
+        // validate we have compatible expressions
+        if (!columnName || !value) {
+            @throw [NSException exceptionWithName:@"filterWithPredicate:orderedBy: - invalid predicate expressions"
+                                           reason:@"Requires one constant expression and one keyPath expression"
+                                         userInfo:nil];
+        }
+        
+        NSUInteger index = [table indexOfColumnWithName:columnName];
+        if (index == NSNotFound) {
+            @throw [NSException exceptionWithName:@"filterWithPredicate:orderedBy - invalid sort column"
+                                           reason:@"column name in sort description not valid"
+                                         userInfo:nil];
+        }
+        
+        // only support equality for now
+        if (compp.predicateOperatorType != NSEqualToPredicateOperatorType) {
+            @throw [NSException exceptionWithName:@"filterWithPredicate:orderedBy - invalid predicate comparison type"
+                                           reason:@"only support equality comparison type"
+                                         userInfo:nil];
+        }
+        
+        switch (table->m_table->get_column_type(index)) {
+            case tightdb::type_Bool:
+                if (!nsnumber_is_like_bool(value)) {
+                    @throw [NSException exceptionWithName:@"filterWithPredicate:orderedBy - invalid predicate comparison value"
+                                                   reason:@"value must be of type BOOL"
+                                                 userInfo:nil];
+                }
+                query.equal(index, bool([(NSNumber *)value boolValue]));
+                break;
+            case tightdb::type_DateTime:
+                if (![value isKindOfClass:[NSDate class]]) {
+                    @throw [NSException exceptionWithName:@"filterWithPredicate:orderedBy - invalid predicate comparison value"
+                                                   reason:@"value must be of type NSDate"
+                                                 userInfo:nil];
+                }
+                query.equal_datetime(index, time_t([(NSDate *)value timeIntervalSince1970]));
+                break;
+            case tightdb::type_Double:
+                if (!nsnumber_is_like_double(value)) {
+                    @throw [NSException exceptionWithName:@"filterWithPredicate:orderedBy - invalid predicate comparison value"
+                                                   reason:@"value must be of type double (NSNumber)"
+                                                 userInfo:nil];
+                }
+                query.equal(index, double([(NSNumber *)value doubleValue]));
+                break;
+            case tightdb::type_Float:
+                if (!nsnumber_is_like_float(value)) {
+                    @throw [NSException exceptionWithName:@"filterWithPredicate:orderedBy - invalid predicate comparison value"
+                                                   reason:@"value must be of type float"
+                                                 userInfo:nil];
+                }
+                query.equal(index, float([(NSNumber *)value floatValue]));
+                break;
+            case tightdb::type_Int:
+                if (!nsnumber_is_like_integer(value)) {
+                    @throw [NSException exceptionWithName:@"filterWithPredicate:orderedBy - invalid predicate comparison value"
+                                                   reason:@"value must be of type integer"
+                                                 userInfo:nil];
+                }
+                query.equal(index, int([(NSNumber *)value intValue]));
+                break;
+            case tightdb::type_String:
+            {
+                if (![value isKindOfClass:[NSString class]]) {
+                    @throw [NSException exceptionWithName:@"filterWithPredicate:orderedBy - invalid predicate comparison value"
+                                                   reason:@"value must be of type NSString"
+                                                 userInfo:nil];
+                }
+                tightdb::StringData sd([(NSString *)value UTF8String]);
+                query.equal(index, sd);
+                break;
+            }
+            default:
+                @throw [NSException exceptionWithName:@"filterWithPredicate:orderedBy - unsupported predicate value expression"
+                                               reason:@"value must be supported"
+                                             userInfo:nil];
+        }
+    }
+    else {
+        // invalid predicate type
+        @throw [NSException exceptionWithName:@"filterWithPredicate:orderedBy: - invalid predicate"
+                                       reason:@"Only support compound and comparison predicates"
+                                     userInfo:nil];
+    }
+}
+
+// throws if predicates or sort is not compatible with table
+-(TDBView *)filterWithPredicate:(NSPredicate *)predicate orderedBy:(NSSortDescriptor *)sort {
+    // parse the predicate tree
+    tightdb::Query query = m_table->where();
+    update_query_with_subpredicate(predicate, self, query);
+    tightdb::TableView view = query.find_all();
+    
+    // apply sort
+    if (sort) {
+        if (!sort.ascending) {
+            @throw [NSException exceptionWithName:@"filterWithPredicate:orderedBy - unsupported order"
+                                           reason:@"Must currently set ascending to YES"
+                                         userInfo:nil];
+        }
+        NSUInteger index = [self indexOfColumnWithName:sort.key];
+        if (index == NSNotFound) {
+            @throw [NSException exceptionWithName:@"filterWithPredicate:orderedBy - invalid sort column"
+                                           reason:@"column name in sort description not valid"
+                                         userInfo:nil];
+        }
+
+        // sort the view
+        view.sort(index);
+    }
+    return [TDBView viewWithTable:self andNativeView:view];
+}
+
+-(TDBView *)filterWithPredicate:(NSString *)predicateString {
+    return [self filterWithPredicate:[NSPredicate predicateWithFormat:predicateString] orderedBy:nil];
+}
+
+
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex
 {
     return m_table->has_index(colIndex);
