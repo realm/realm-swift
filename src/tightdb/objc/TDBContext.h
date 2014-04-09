@@ -35,12 +35,12 @@ typedef BOOL(^TDBTableWriteBlock)(TDBTable *table);
 +(TDBContext *)contextWithPersistenceToFile:(NSString *)path error:(NSError **)error;
 
 // Transactions
--(void)readWithBlock:(TDBReadBlock)block;
--(BOOL)writeWithBlock:(TDBWriteBlock)block error:(NSError **)error;
+-(void)readUsingBlock:(TDBReadBlock)block;
+-(BOOL)writeUsingBlock:(TDBWriteBlock)block error:(NSError **)error;
 
 // Shortcuts for transactions on a single table
--(void)readTable:(NSString*)tablename withBlock:(TDBTableReadBlock)block;
--(BOOL)writeTable:(NSString*)tablename withBlock:(TDBTableWriteBlock)block error:(NSError **)error;
+-(void)readTable:(NSString*)tablename usingBlock:(TDBTableReadBlock)block;
+-(BOOL)writeTable:(NSString*)tablename usingBlock:(TDBTableWriteBlock)block error:(NSError **)error;
 
 // Context state info
 -(BOOL)hasChangedSinceLastTransaction;
