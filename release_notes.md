@@ -8,7 +8,7 @@ The Objective-C API has been updated and your code will break!
 
 ### Bugfixes:
 
-* None.
+* Modifications of a `TDBView` and `TDBQuery` now throw an exception in a readtransaction.
 
 ### API breaking changes:
 
