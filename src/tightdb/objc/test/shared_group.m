@@ -98,7 +98,38 @@ TIGHTDB_TABLE_2(SharedTable2,
         
         STAssertThrows([diskTable removeAllRows], @"Not allowed in readtransaction");
 
-        }];
+    }];
+}
+
+
+-(void)testContextAtDefaultPath
+{
+    // Delete existing files
+    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString* documentsDirectory = [paths objectAtIndex:0];
+    NSString *path = [documentsDirectory stringByAppendingPathComponent:@"default.tightdb"];
+    
+    NSFileManager* fm = [NSFileManager defaultManager];
+    [fm removeItemAtPath:path error:nil];
+    [fm removeItemAtPath:[path stringByAppendingString:@".lock"] error:nil];
+    
+    // Create a new context at default location
+    TDBContext *context = [TDBContext contextAtDefaultPathWithError:nil];
+    
+    [context writeWithBlock:^(TDBTransaction *transaction) {
+        TDBTable *t = [transaction createTableWithName:@"table"];
+        
+        [t addColumnWithName:@"col0" type:TDBIntType];
+        [t addRow:@[@10]];
+        
+        return YES;
+        
+    } error:nil];
+    
+    [context readWithBlock:^(TDBTransaction* transaction) {
+        TDBTable *t = [transaction tableWithName:@"table"];
+        STAssertEqualObjects(t[0][0], @10, nil);
+    }];
 }
 
 - (void) testReadTransaction
