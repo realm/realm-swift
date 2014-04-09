@@ -203,7 +203,7 @@ BOOL verify_object_is_type(id obj, DataType type) {
                 break;
             return NO;
         default:
-            break;
+            TIGHTDB_ASSERT(false);
     }
     return YES;
 }
