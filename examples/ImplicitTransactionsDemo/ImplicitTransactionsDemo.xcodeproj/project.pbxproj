@@ -14,11 +14,11 @@
 		522AF33618F372AB00237BAB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 522AF33518F372AB00237BAB /* main.m */; };
 		522AF33A18F372AB00237BAB /* MyAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 522AF33918F372AB00237BAB /* MyAppDelegate.m */; };
 		522AF33D18F372AB00237BAB /* MyOldViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 522AF33C18F372AB00237BAB /* MyOldViewController.m */; };
-		522AF33F18F372AB00237BAB /* first.png in Resources */ = {isa = PBXBuildFile; fileRef = 522AF33E18F372AB00237BAB /* first.png */; };
-		522AF34118F372AB00237BAB /* first@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 522AF34018F372AB00237BAB /* first@2x.png */; };
+		522AF33F18F372AB00237BAB /* old.png in Resources */ = {isa = PBXBuildFile; fileRef = 522AF33E18F372AB00237BAB /* old.png */; };
+		522AF34118F372AB00237BAB /* old@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 522AF34018F372AB00237BAB /* old@2x.png */; };
 		522AF34418F372AB00237BAB /* MyNewViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 522AF34318F372AB00237BAB /* MyNewViewController.m */; };
-		522AF34618F372AB00237BAB /* second.png in Resources */ = {isa = PBXBuildFile; fileRef = 522AF34518F372AB00237BAB /* second.png */; };
-		522AF34818F372AB00237BAB /* second@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 522AF34718F372AB00237BAB /* second@2x.png */; };
+		522AF34618F372AB00237BAB /* new.png in Resources */ = {isa = PBXBuildFile; fileRef = 522AF34518F372AB00237BAB /* new.png */; };
+		522AF34818F372AB00237BAB /* new@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 522AF34718F372AB00237BAB /* new@2x.png */; };
 		522AF34B18F372AB00237BAB /* MyOldViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 522AF34918F372AB00237BAB /* MyOldViewController.xib */; };
 		522AF34E18F372AB00237BAB /* MyNewViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 522AF34C18F372AB00237BAB /* MyNewViewController.xib */; };
 		52CFD12318F37BDE0088B460 /* Tightdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52CFD12218F37BDE0088B460 /* Tightdb.framework */; };
@@ -39,12 +39,12 @@
 		522AF33918F372AB00237BAB /* MyAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MyAppDelegate.m; sourceTree = "<group>"; };
 		522AF33B18F372AB00237BAB /* MyOldViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MyOldViewController.h; sourceTree = "<group>"; };
 		522AF33C18F372AB00237BAB /* MyOldViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MyOldViewController.m; sourceTree = "<group>"; };
-		522AF33E18F372AB00237BAB /* first.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = first.png; sourceTree = "<group>"; };
-		522AF34018F372AB00237BAB /* first@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "first@2x.png"; sourceTree = "<group>"; };
+		522AF33E18F372AB00237BAB /* old.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = old.png; sourceTree = "<group>"; };
+		522AF34018F372AB00237BAB /* old@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "old@2x.png"; sourceTree = "<group>"; };
 		522AF34218F372AB00237BAB /* MyNewViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MyNewViewController.h; sourceTree = "<group>"; };
 		522AF34318F372AB00237BAB /* MyNewViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MyNewViewController.m; sourceTree = "<group>"; };
-		522AF34518F372AB00237BAB /* second.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = second.png; sourceTree = "<group>"; };
-		522AF34718F372AB00237BAB /* second@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "second@2x.png"; sourceTree = "<group>"; };
+		522AF34518F372AB00237BAB /* new.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new.png; sourceTree = "<group>"; };
+		522AF34718F372AB00237BAB /* new@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "new@2x.png"; sourceTree = "<group>"; };
 		522AF34A18F372AB00237BAB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MyOldViewController.xib; sourceTree = "<group>"; };
 		522AF34D18F372AB00237BAB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MyNewViewController.xib; sourceTree = "<group>"; };
 		52CFD12218F37BDE0088B460 /* Tightdb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Tightdb.framework; path = ../../Tightdb.framework; sourceTree = "<group>"; };
@@ -113,10 +113,10 @@
 				522AF34C18F372AB00237BAB /* MyNewViewController.xib */,
 				52CFD12718F37C2D0088B460 /* MyBackgroundThread.h */,
 				52CFD12818F37C520088B460 /* MyBackgroundThread.m */,
-				522AF33E18F372AB00237BAB /* first.png */,
-				522AF34018F372AB00237BAB /* first@2x.png */,
-				522AF34518F372AB00237BAB /* second.png */,
-				522AF34718F372AB00237BAB /* second@2x.png */,
+				522AF33E18F372AB00237BAB /* old.png */,
+				522AF34018F372AB00237BAB /* old@2x.png */,
+				522AF34518F372AB00237BAB /* new.png */,
+				522AF34718F372AB00237BAB /* new@2x.png */,
 				522AF33018F372AB00237BAB /* Supporting Files */,
 			);
 			path = ImplicitTransactionsDemo;
@@ -186,10 +186,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				522AF33418F372AB00237BAB /* InfoPlist.strings in Resources */,
-				522AF33F18F372AB00237BAB /* first.png in Resources */,
-				522AF34118F372AB00237BAB /* first@2x.png in Resources */,
-				522AF34618F372AB00237BAB /* second.png in Resources */,
-				522AF34818F372AB00237BAB /* second@2x.png in Resources */,
+				522AF33F18F372AB00237BAB /* old.png in Resources */,
+				522AF34118F372AB00237BAB /* old@2x.png in Resources */,
+				522AF34618F372AB00237BAB /* new.png in Resources */,
+				522AF34818F372AB00237BAB /* new@2x.png in Resources */,
 				522AF34B18F372AB00237BAB /* MyOldViewController.xib in Resources */,
 				522AF34E18F372AB00237BAB /* MyNewViewController.xib in Resources */,
 			);

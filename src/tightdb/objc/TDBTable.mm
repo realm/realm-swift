@@ -210,7 +210,7 @@ using namespace std;
 {
     if ([m_parent isKindOfClass:[TDBSmartContext class]]) {
         TDBSmartContext *context = (TDBSmartContext *)m_parent;
-        [context tableDidDie];
+        [context tableRefDidDie];
     }
 }
 

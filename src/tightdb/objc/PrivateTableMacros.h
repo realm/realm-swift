@@ -29,13 +29,14 @@
  **************************************************************************/
 
 #import "TDBTable.h"
-#import "TDBQuery.h"
 #import "TDBRow.h"
-#import "PrivateHelperMacros.h"
 #import "TDBDescriptor.h"
+#import "TDBQuery.h"
 #import "TDBView.h"
 #import "TDBColumnProxy.h"
 #import "PrivateTDB.h"
+#import "PrivateHelperMacros.h"
+
 
 
 #define TIGHTDB_TABLE_DEF_1(TableName, CName1, CType1) \

@@ -21,18 +21,8 @@
 #import <Foundation/Foundation.h>
 
 
-@interface TDBSmartContext: NSObject
-
 /**
- * Use the main run loop and the default notification center.
+ * Posted by TDBSmartContext when it changes, that is when a table is
+ * added, removed, or changed in any way.
  */
-+(TDBSmartContext *)contextWithPersistenceToFile:(NSString *)path;
-
-+(TDBSmartContext *)contextWithPersistenceToFile:(NSString *)path
-                                         runLoop:(NSRunLoop *)runLoop
-                              notificationCenter:(NSNotificationCenter *)notificationCenter
-                                           error:(NSError **)error;
-
--(TDBTable *)tableWithName:(NSString *)name;
-
-@end
+extern NSString *const TDBContextDidChangeNotification;

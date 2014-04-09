@@ -23,7 +23,7 @@
     if (!self)
         return nil;
     self.title = NSLocalizedString(@"Old", @"Old");
-    self.tabBarItem.image = [UIImage imageNamed:@"first"];
+    self.tabBarItem.image = [UIImage imageNamed:@"old"];
 
     context = [TDBContext contextWithPersistenceToFile:[self pathForName:@"demo.tightdb"]
                                                  error:nil];

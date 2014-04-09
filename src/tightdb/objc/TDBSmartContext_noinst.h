@@ -25,7 +25,7 @@
 
 @interface TDBSmartContext (noinst)
 
-- (void)tableDidDie;
+- (void)tableRefDidDie;
 
 - (void)checkForChange:(NSTimer *)timer;
 
