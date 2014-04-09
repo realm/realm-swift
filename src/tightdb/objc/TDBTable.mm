@@ -1240,7 +1240,7 @@ void update_query_with_subpredicate(NSPredicate * predicate,
         else if ([comp compoundPredicateType] == NSOrPredicateType) {
             // add all of the subprediates with ors inbetween
             query.group();
-            for (int i = 0; i < comp.subpredicates.count; i++) {
+            for (NSUInteger i = 0; i < comp.subpredicates.count; i++) {
                 NSPredicate * subp = comp.subpredicates[i];
                 if (i > 0) {
                     query.Or();
@@ -1304,8 +1304,7 @@ void update_query_with_subpredicate(NSPredicate * predicate,
                                        @"Must currently set ascending to YES");
         }
         NSUInteger index = [self indexOfColumnWithName:sort.key];
-        // having to cast this is silly
-        if (index == (NSUInteger)NSNotFound) {
+        if (index == NSNotFound) {
             @throw predicate_exception(@"Invalid sort column",
                                        @"column name in sort description not valid");
         }
