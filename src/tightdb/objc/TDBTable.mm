@@ -1223,7 +1223,7 @@ void update_query_with_value_expression(TDBTable * table, tightdb::Query & query
     }
 }
 
-void update_query_with_subpredicate(NSPredicate * predicate,
+void update_query_with_predicate(NSPredicate * predicate,
     TDBTable * table, tightdb::Query & query) {
     
     // compound predicates
@@ -1233,7 +1233,7 @@ void update_query_with_subpredicate(NSPredicate * predicate,
             // add all of the subprediates
             query.group();
             for (NSPredicate * subp in comp.subpredicates) {
-                update_query_with_subpredicate(subp, table, query);
+                update_query_with_predicate(subp, table, query);
             }
             query.end_group();
         }
@@ -1245,7 +1245,7 @@ void update_query_with_subpredicate(NSPredicate * predicate,
                 if (i > 0) {
                     query.Or();
                 }
-                update_query_with_subpredicate(subp, table, query);
+                update_query_with_predicate(subp, table, query);
             }
             query.end_group();
         }
@@ -1292,26 +1292,29 @@ void update_query_with_subpredicate(NSPredicate * predicate,
 
 // throws if predicates or sort is not compatible with table
 -(TDBView *)filterWithPredicate:(NSPredicate *)predicate orderedBy:(NSSortDescriptor *)sort {
-    // parse the predicate tree
     tightdb::Query query = m_table->where();
-    update_query_with_subpredicate(predicate, self, query);
-    tightdb::TableView view = query.find_all();
     
+    // parse and apply predicate tree
+    if (predicate) {
+        update_query_with_predicate(predicate, self, query);
+    }
+    
+    // create view
+    tightdb::TableView view = query.find_all();
+
     // apply sort
     if (sort) {
         if (!sort.ascending) {
             @throw predicate_exception(@"Unsupported order",
                                        @"Must currently set ascending to YES");
         }
-        NSUInteger index = [self indexOfColumnWithName:sort.key];
-        if (index == NSNotFound) {
-            @throw predicate_exception(@"Invalid sort column",
-                                       @"column name in sort description not valid");
-        }
 
         // sort the view
+        NSUInteger index = validated_column_index(self, sort.key);
         view.sort(index);
     }
+    
+    // create objc view and return
     return [TDBView viewWithTable:self andNativeView:view];
 }
 
