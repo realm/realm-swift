@@ -1060,6 +1060,7 @@ inline NSUInteger validated_column_index(TDBTable * table, NSString * columnName
 
 
 // apply an expression between two columns to a query
+/*
 void update_query_with_column_expression(TDBTable * table, tightdb::Query & query,
     NSString * col1, NSString * col2, NSPredicateOperatorType operatorType) {
     
@@ -1084,6 +1085,7 @@ void update_query_with_column_expression(TDBTable * table, tightdb::Query & quer
     // use templated function for all numeric types this would be much easier
     @throw predicate_exception(@"Unsupported predicate", @"Not suppoting column comparison for now");
 }
+ */
 
 // add a clause for numeric constraints based on operator type
 template <typename T>
@@ -1112,7 +1114,7 @@ void add_numeric_constraint_to_query(tightdb::Query & query,
             query.not_equal(index, value);
             break;
         default:
-            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for type %u", operatorType, datatype]);
+            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for type %u", (unsigned long)operatorType, datatype]);
             break;
     }
 }
@@ -1129,7 +1131,7 @@ void add_bool_constraint_to_query(tightdb::Query & query,
             query.not_equal(index, value);
             break;
         default:
-            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for bool type", operatorType]);
+            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for bool type", (unsigned long)operatorType]);
             break;
     }
 }
@@ -1158,7 +1160,7 @@ void add_string_constraint_to_query(tightdb::Query & query,
             query.not_equal(index, sd);
             break;
         default:
-            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for string type", operatorType]);
+            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for string type", (unsigned long)operatorType]);
             break;
     }
 }
@@ -1248,8 +1250,9 @@ void update_query_with_subpredicate(NSPredicate * predicate,
         // we are limited here to KeyPath expressions and constantValue expressions from validation
         if (exp1Type == NSKeyPathExpressionType) {
             if (exp2Type == NSKeyPathExpressionType) {
-                update_query_with_column_expression(table, query, compp.leftExpression.keyPath,
-                    compp.rightExpression.keyPath, compp.predicateOperatorType);
+                @throw predicate_exception(@"Unsupported predicate", @"Not suppoting column comparison for now");
+//                update_query_with_column_expression(table, query, compp.leftExpression.keyPath,
+//                    compp.rightExpression.keyPath, compp.predicateOperatorType);
             }
             else {
                 update_query_with_value_expression(table, query, compp.leftExpression.keyPath, compp.rightExpression.constantValue, compp.predicateOperatorType);
@@ -1286,7 +1289,8 @@ void update_query_with_subpredicate(NSPredicate * predicate,
                                        @"Must currently set ascending to YES");
         }
         NSUInteger index = [self indexOfColumnWithName:sort.key];
-        if (index == NSNotFound) {
+        // having to cast this is silly
+        if (index == (NSUInteger)NSNotFound) {
             @throw predicate_exception(@"Invalid sort column",
                                        @"column name in sort description not valid");
         }
