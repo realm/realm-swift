@@ -6,9 +6,9 @@
 
 @implementation MyOldViewController
 {
-    NSTimer *refreshTimer;
-    int numRefreshTicks;
-    TDBContext *context;
+    NSTimer *_refreshTimer;
+    int _numRefreshTicks;
+    TDBContext *_context;
 }
 
 - (NSString *)pathForName:(NSString *)name
@@ -25,8 +25,8 @@
     self.title = NSLocalizedString(@"Old", @"Old");
     self.tabBarItem.image = [UIImage imageNamed:@"old"];
 
-    context = [TDBContext contextWithPersistenceToFile:[self pathForName:@"demo.tightdb"]
-                                                 error:nil];
+    _context = [TDBContext contextWithPersistenceToFile:[self pathForName:@"demo.tightdb"]
+                                                  error:nil];
 
     return self;
 }
@@ -51,33 +51,33 @@
 - (IBAction)refreshSwitchChanged:(UISwitch *)theSwitch
 {
     if (theSwitch.on) {
-        if (refreshTimer)
+        if (_refreshTimer)
             return;
         // Start
-        refreshTimer = [NSTimer scheduledTimerWithTimeInterval:0.3 target:self
-                                                      selector:@selector(tick:)
-                                                      userInfo:nil repeats:YES];
+        _refreshTimer = [NSTimer scheduledTimerWithTimeInterval:0.3 target:self
+                                                       selector:@selector(tick:)
+                                                       userInfo:nil repeats:YES];
     }
     else {
-        if (!refreshTimer)
+        if (!_refreshTimer)
             return;
         // Stop
-        [refreshTimer invalidate];
-        refreshTimer = nil;
+        [_refreshTimer invalidate];
+        _refreshTimer = nil;
     }
 }
 
 - (void)tick:(NSTimer *)theTimer
 {
-    ++numRefreshTicks;
-    refreshCount.text = [[NSNumber numberWithInt:numRefreshTicks] stringValue];
+    ++_numRefreshTicks;
+    refreshCount.text = [[NSNumber numberWithInt:_numRefreshTicks] stringValue];
     [tableView reloadData];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     __block NSUInteger numRows = 0;
-    [context readUsingBlock:^(TDBTransaction *transact) {
+    [_context readUsingBlock:^(TDBTransaction *transact) {
         TDBTable *table = [transact tableWithName:@"demo"];
         numRows = table.rowCount;
     }];
@@ -97,7 +97,7 @@
                                       reuseIdentifier:simpleTableIdentifier];
     }
 
-    [context readUsingBlock:^(TDBTransaction *transact) {
+    [_context readUsingBlock:^(TDBTransaction *transact) {
         TDBTable *table = [transact tableWithName:@"demo"];
         cell.textLabel.text = table[indexPath.row][0];
     }];
