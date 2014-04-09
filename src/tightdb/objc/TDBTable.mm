@@ -1212,14 +1212,29 @@ void update_query_with_subpredicate(NSPredicate * predicate,
     // compound predicates
     if ([predicate isMemberOfClass:[NSCompoundPredicate class]]) {
         NSCompoundPredicate * comp = (NSCompoundPredicate *)predicate;
-        if ([comp compoundPredicateType] != NSAndPredicateType) {
-            @throw predicate_exception(@"Invalid compound predicate type",
-                                       @"Only support NSAndPredicateType predicate type");
+        if ([comp compoundPredicateType] == NSAndPredicateType) {
+            // add all of the subprediates
+            query.group();
+            for (NSPredicate * subp in comp.subpredicates) {
+                update_query_with_subpredicate(subp, table, query);
+            }
+            query.end_group();
         }
-        
-        // add all of the subprediates
-        for (NSPredicate * subp in comp.subpredicates) {
-            update_query_with_subpredicate(subp, table, query);
+        else if ([comp compoundPredicateType] == NSOrPredicateType) {
+            // add all of the subprediates with ors inbetween
+            query.group();
+            for (int i = 0; i < comp.subpredicates.count; i++) {
+                NSPredicate * subp = comp.subpredicates[i];
+                if (i > 0) {
+                    query.Or();
+                }
+                update_query_with_subpredicate(subp, table, query);
+            }
+            query.end_group();
+        }
+        else {
+            @throw predicate_exception(@"Invalid compound predicate type",
+                                       @"Only support AND and OR predicate types");
         }
     }
     else if ([predicate isMemberOfClass:[NSComparisonPredicate class]]) {
