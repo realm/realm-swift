@@ -37,7 +37,7 @@ Description......
 
 ### API breaking changes:
 
-* `contextWithPersistenceToFile:error:` renamed to `contextAtPath:error:` in `TDBContext`
+* `contextWithPersistenceToFile:error:` renamed to `contextPersistedAtPath:error:` in `TDBContext`
 * `readWithBlock:` renamed to `readUsingBlock:` in `TDBContext`
 * `writeWithBlock:error:` renamed to `writeUsingBlock:error:` in `TDBContext`
 * `readTable:withBlock:` renamed to `readTable:usingBlock:` in `TDBContext`
@@ -50,7 +50,7 @@ Description......
   on table now return void instead of BOOL.
 
 ### Enhancements:
-* `contextAtDefaultPathWithError:t` class method added to `TDBContext`. Will create a context persisted
+* `contextPersistedAtDefaultPathWithError:t` class method added to `TDBContext`. Will create a context persisted
   to a file in app/documents folder.
 * `renameColumnWithIndex:to:` has been added to `TDBTable`.
 * `distinctValuesInColumnWithIndex` has been added to `TDBTable`.

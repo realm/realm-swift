@@ -36,16 +36,16 @@ using namespace std;
 
 
 
-+(TDBContext *)contextAtDefaultPathWithError:(NSError **)error
++(TDBContext *)contextPersistedAtDefaultPathWithError:(NSError **)error
 {
     NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString* documentsDirectory = [paths objectAtIndex:0];
     NSString *path = [documentsDirectory stringByAppendingPathComponent:@"default.tightdb"];
-    return [self contextAtPath:path error:error];
+    return [self contextPersistedAtPath:path error:error];
 }
 
 
-+(TDBContext*)contextAtPath:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
++(TDBContext*)contextPersistedAtPath:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
 {
     TDBContext* shared_group = [[TDBContext alloc] init];
     if (!shared_group)
