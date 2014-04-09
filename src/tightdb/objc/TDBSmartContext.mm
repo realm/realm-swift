@@ -39,8 +39,7 @@ namespace {
 void throw_objc_exception(exception &ex)
 {
     NSString *errorMessage = [NSString stringWithUTF8String:ex.what()];
-    @throw [NSException exceptionWithName:@"TDBException" reason:errorMessage
-                                 userInfo:[NSMutableDictionary dictionary]];
+    @throw [NSException exceptionWithName:@"TDBException" reason:errorMessage userInfo:nil];
 }
 
 } // anonymous namespace
