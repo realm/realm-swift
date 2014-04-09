@@ -8,7 +8,7 @@ The Objective-C API has been updated and your code will break!
 
 ### Bugfixes:
 
-* None.
+* Modifications of a `TDBView` and `TDBQuery` now throw an exception in a readtransaction.
 
 ### API breaking changes:
 
@@ -37,6 +37,10 @@ Description......
 
 ### API breaking changes:
 
+* `readWithBlock:` renamed to `readUsingBlock:` in `TDBContext`
+* `writeWithBlock:error:` renamed to `writeUsingBlock:error:` in `TDBContext`
+* `readTable:withBlock:` renamed to `readTable:usingBlock:` in `TDBContext`
+* `writeTable:withBlock:error:` renamed to `writeTable:usingBlock:error:` in `TDBContext`
 * `findFirstRow` renamed to `indexOfFirstMatchingRow` on `TDBQuery`.
 * `findFirstRowFromIndex:` renamed to `indexOfFirstMatchingRowFromIndex:` on `TDBQuery`.
 * Return `NSNotFound` instead of -1 when appropriate.
@@ -54,7 +58,9 @@ Description......
   appending a new row will look like `[table addage:7]`.
 * Mixed typed values are better validated when rows are added, inserted, 
   or modified as object literals.
-* `Where`has been added to `TDBView`and `TDBViewProtocol`.
+* `addRow`, `insertRow`, and row updates can be done using objects
+   derived from `NSObject`.
+* `where` has been added to `TDBView`and `TDBViewProtocol`.
 * Adding support for "smart" contexts (`TDBSmartContext`).
 
 
@@ -79,8 +85,6 @@ To use these methods import <Tightdb/TightdbFast.h>.
 * `columnNameOfColumn:` renamed to `nameOfColumnWithIndex:` in `TDBTable`.
 * `addColumnWithName:andType:` renamed to `addColumnWithName:type:` in `TDBDescriptor`.
 * Fast getters and setters moved from `TDBRow.h` to `TDBRowFast.h`.
-
-### Enhancements:
 
 ### Enhancements:
 * Added `minDateInColumnWithIndex` and `maxDateInColumnWithIndex` to `TDBQuery`.
