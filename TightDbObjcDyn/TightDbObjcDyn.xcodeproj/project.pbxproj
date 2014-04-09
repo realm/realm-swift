@@ -92,7 +92,7 @@
 		4D01A9FB18C9F5E600527AD5 /* table_view.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = table_view.m; path = ../../src/tightdb/objc/test/table_view.m; sourceTree = "<group>"; };
 		4D01A9FD18C9F60F00527AD5 /* version.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = version.m; path = ../../src/tightdb/objc/test/version.m; sourceTree = "<group>"; };
 		4D143CBC18ED5FCF00CEFF65 /* PrivateTableMacros.h.cheetah */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PrivateTableMacros.h.cheetah; path = ../src/tightdb/objc/PrivateTableMacros.h.cheetah; sourceTree = SOURCE_ROOT; };
-		4D143CBF18EEA9AE00CEFF65 /* TDBQueryFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TDBQueryFast.h; path = ../../src/tightdb/objc/TDBQueryFast.h; sourceTree = "<group>"; };
+		4D143CBF18EEA9AE00CEFF65 /* TDBQueryFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TDBQueryFast.h; path = ../src/tightdb/objc/TDBQueryFast.h; sourceTree = "<group>"; };
 		4D1ED30618E198AD003CFF44 /* PrivateTDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PrivateTDB.h; path = ../src/tightdb/objc/PrivateTDB.h; sourceTree = SOURCE_ROOT; };
 		4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PrivateTableMacros.h; path = ../src/tightdb/objc/PrivateTableMacros.h; sourceTree = SOURCE_ROOT; };
 		4D1ED30A18E1B6E8003CFF44 /* group.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = group.h; path = ../src/tightdb/objc/group.h; sourceTree = SOURCE_ROOT; };
