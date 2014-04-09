@@ -177,17 +177,17 @@ using namespace std;
     return NO;
 }
 
-/**
- * This method will return NO if it encounters a memory allocation
- * error (out of memory).
- *
- * The specified table class must be one that is declared by using
- * one of the table macros TIGHTDB_TABLE_*.
- */
+//
+// This method will return NO if it encounters a memory allocation
+// error (out of memory).
+//
+// The specified table class must be one that is declared by using
+// one of the table macros TIGHTDB_TABLE_*.
+//
 // FIXME: Check that the specified class derives from TDBTable.
--(BOOL)hasSameDescriptorAs:(__unsafe_unretained Class)class_obj
+-(BOOL)hasSameDescriptorAs:(__unsafe_unretained Class)tableClass
 {
-    TDBTable* table = [[class_obj alloc] _initRaw];
+    TDBTable* table = [[tableClass alloc] _initRaw];
     if (TIGHTDB_LIKELY(table)) {
         [table setNativeTable:m_table.get()];
         [table setParent:m_parent];
@@ -198,18 +198,18 @@ using namespace std;
     return NO;
 }
 
-/**
- * If the type of this table is not compatible with the specified
- * table class, then this method returns nil. It also returns nil if
- * it encounters a memory allocation error (out of memory).
- *
- * The specified table class must be one that is declared by using
- * one of the table macros TIGHTDB_TABLE_*.
- */
+//
+// If the type of this table is not compatible with the specified
+// table class, then this method returns nil. It also returns nil if
+// it encounters a memory allocation error (out of memory).
+//
+// The specified table class must be one that is declared by using
+// one of the table macros TIGHTDB_TABLE_*.
+//
 // FIXME: Check that the specified class derives from TDBTable.
--(id)castClass:(__unsafe_unretained Class)class_obj
+-(id)castToTypedTableClass:(__unsafe_unretained Class)typedTableClass
 {
-    TDBTable* table = [[class_obj alloc] _initRaw];
+    TDBTable* table = [[typedTableClass alloc] _initRaw];
     if (TIGHTDB_LIKELY(table)) {
         [table setNativeTable:m_table.get()];
         [table setParent:m_parent];
@@ -224,22 +224,27 @@ using namespace std;
 {
     return m_table->get_column_count();
 }
+
 -(NSString*)nameOfColumnWithIndex:(NSUInteger)ndx
 {
     return to_objc_string(m_table->get_column_name(ndx));
 }
+
 -(NSUInteger)indexOfColumnWithName:(NSString *)name
 {
     return was_not_found(m_table->get_column_index(ObjcStringAccessor(name)));
 }
+
 -(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)ndx
 {
     return TDBType(m_table->get_column_type(ndx));
 }
+
 -(TDBDescriptor*)descriptor
 {
     return [self descriptorWithError:nil];
 }
+
 -(TDBDescriptor*)descriptorWithError:(NSError* __autoreleasing*)error
 {
     tightdb::DescriptorRef desc = m_table->get_descriptor();
@@ -316,20 +321,30 @@ using namespace std;
 
     if (table.size() < (size_t)rowIndex) {
         // FIXME: raise exception - out of bound
-        return ;
+        return;
     }
 
     if ([newValue isKindOfClass:[NSArray class]]) {
         verify_row(*desc, (NSArray *)newValue);
         set_row(size_t(rowIndex), table, (NSArray *)newValue);
+        return;
     }
     
     if ([newValue isKindOfClass:[NSDictionary class]]) {
         verify_row_with_labels(*desc, (NSDictionary *)newValue);
         set_row_with_labels(size_t(rowIndex), table, (NSDictionary *)newValue);
+        return;
     }
-    
-    /* FIXME: pull out properties of object and insert as row */
+
+    if ([newValue isKindOfClass:[NSObject class]]) {
+        verify_row_from_object(*desc, (NSObject *)newValue);
+        set_row_from_object(rowIndex, table, (NSObject *)newValue);
+        return;
+    }
+
+    @throw [NSException exceptionWithName:@"tightdb:column_not_implemented"
+                                   reason:@"You should either use nil, NSObject, NSDictionary, or NSArray"
+                                 userInfo:nil];
 }
 
 
@@ -372,7 +387,7 @@ using namespace std;
     
     if (!data) {
         [self TDB_addEmptyRow];
-        return ;
+        return;
     }
     tightdb::Table& table = *m_table;
     [self insertRow:data atIndex:table.size()];
@@ -389,7 +404,7 @@ using namespace std;
 {
     if (!anObject) {
         [self TDBInsertRow:rowIndex];
-        return ;
+        return;
     }
     
     tightdb::Table& table = *m_table;
@@ -398,18 +413,23 @@ using namespace std;
     if ([anObject isKindOfClass:[NSArray class]]) {
         verify_row(*desc, (NSArray *)anObject);
         insert_row(size_t(rowIndex), table, (NSArray *)anObject);
-        return ;
+        return;
     }
     
     if ([anObject isKindOfClass:[NSDictionary class]]) {
         verify_row_with_labels(*desc, (NSDictionary *)anObject);
         insert_row_with_labels(size_t(rowIndex), table, (NSDictionary *)anObject);
-        return ;
+        return;
     }
     
-    /* FIXME: pull out properties of object and insert as row */
+    if ([anObject isKindOfClass:[NSObject class]]) {
+        verify_row_from_object(*desc, (NSObject *)anObject);
+        insert_row_from_object(size_t(rowIndex), table, (NSObject *)anObject);
+        return;
+    }
+
     @throw [NSException exceptionWithName:@"tightdb:column_not_implemented"
-                                   reason:@"You should either use NSDictionary or NSArray"
+                                   reason:@"You should either use nil, NSObject, NSDictionary, or NSArray"
                                  userInfo:nil];
 }
 

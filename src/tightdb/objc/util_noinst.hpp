@@ -176,6 +176,11 @@ void verify_row_with_labels(const tightdb::Descriptor& descr, NSDictionary* data
 void insert_row_with_labels(size_t row_ndx, tightdb::Table& table, NSDictionary *data);
 void set_row_with_labels(size_t row_ndx, tightdb::Table& table, NSDictionary *data);
 
+void verify_row_from_object(const tightdb::Descriptor& descr, NSObject* data);
+void insert_row_from_object(size_t row_ndx, tightdb::Table& table, NSObject *data);
+void set_row_from_object(size_t row_ndx, tightdb::Table& table, NSObject *data);
+
+
 BOOL set_columns(tightdb::TableRef& parent, NSArray *schema);
 
 // Still used in the new error strategy. Perhaps it should be public?

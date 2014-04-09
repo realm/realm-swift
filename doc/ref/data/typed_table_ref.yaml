@@ -196,10 +196,10 @@ CATEGORIES:
       DESCR    : |
                  This method adds a new row to a typed table.
 
-                 The method is made available by a macro based on the table definition {@link g_typed_table_macros}. 
-                 Note that the method name includes specific column names defined in the table definition. 
+                 The method is made available by a macro based on the table definition {@link g_typed_table_macros}.
+                 Note that the method name includes specific column names defined in the table definition.
                  For example "CName1" will be replaced by the name of the first column in your table and so forth.
-                 Moreover, if the first column is named "age", the method is <code>addage</code>. That is, the name of 
+                 Moreover, if the first column is named "age", the method is <code>addage</code>. That is, the name of
                  method is a simply concatenation of "add" and the name of the first column.
       SIGNATURE: (void)addCName1:(CType1*)value1 CName2:(CType2*)value2 CName3:(CType3*)value3
       PARAMS:
@@ -457,9 +457,3 @@ CATEGORIES:
 
 #  - g_typed_table_distinct:
 #  - g_typed_table_distinct_const:
-
-
-
-
-
-
