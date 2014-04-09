@@ -39,21 +39,25 @@ Description......
 
 * `findFirstRow` renamed to `indexOfFirstMatchingRow` on `TDBQuery`.
 * `findFirstRowFromIndex:` renamed to `indexOfFirstMatchingRowFromIndex:` on `TDBQuery`.
-* Return `NSNotFound` when appropriate.
-* `addRow` and `insertRow` do not return any value.
+* Return `NSNotFound` instead of -1 when appropriate.
+* Renamed `castClass` to `castToTytpedTableClass` on `TDBTable`.
+* `removeAllRows`, `removeRowAtIndex`, `removeLastRow`, `addRow` and `insertRow` methods 
+  on table now return void instead of BOOL.
 
 ### Enhancements:
 * `renameColumnWithIndex:to:` has been added to `TDBTable`.
 * `distinctValuesInColumnWithIndex` has been added to `TDBTable`.
 * `dateIsBetween::`, `doubleIsBetween::`, `floatIsBetween::` and `intIsBetween::`
-   have been added to `TDBQuery`.
-* Column names can begin with non-capital letters too. The generated `addX`
+  have been added to `TDBQuery`.
+* Column names in Typed Tables can begin with non-capital letters too. The generated `addX`
   selector can look odd. For example, a table with one column with name `age`,
   appending a new row will look like `[table addage:7]`.
 * Mixed typed values are better validated when rows are added, inserted, 
   or modified as object literals.
 * `addRow`, `insertRow`, and row updates can be done using objects
    derived from `NSObject`.
+* `where` has been added to `TDBView`and `TDBViewProtocol`.
+
 
 =============================================================
 0.5.0 Release notes (2014-04-02)

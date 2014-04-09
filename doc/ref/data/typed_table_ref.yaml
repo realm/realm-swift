@@ -170,10 +170,10 @@ CATEGORIES:
       SUMMARY  : Returns a typed cursor at a specified row number.
       DESCR    : &g_typed_table_cursor_at_index_descr
                  Use the curser to get or set the row values.
-      SIGNATURE: "- (TableName_Cursor *)cursorAtIndex:(size_t)ndx"
+      SIGNATURE: "- (TableName_Cursor *)cursorAtIndex:(NSUInteger)ndx"
       PARAMS:
       - NAME   : ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : The row number.
       RETURN:
         TYPES  : TableName_Cursor *
@@ -227,7 +227,7 @@ CATEGORIES:
 
   - g_typed_table_insert_row_at_index:
       NAME     : insertRowAtIndex
-      SIGNATURE: -(TableName_Cursor *)insertRowAtIndex:(size_t)ndx
+      SIGNATURE: -(TableName_Cursor *)insertRowAtIndex:(NSUInteger)ndx
       SUMMARY  : Inserts an empty row and returns a cursor. You can use the cursor to get or set the values.
       DESCR    : >
                  This method inserts one empty row at the specified index. Default values (e.g. 0 or "") will be
@@ -235,7 +235,7 @@ CATEGORIES:
                  will have their index increased by one.
       PARAMS:
       - NAME   : ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_typed_table_insert_position_descr
       RETURN:
         TYPES  : TableName_Cursor *
@@ -244,7 +244,7 @@ CATEGORIES:
   - g_typed_table_insert:
       TODO     : OBSOLETE
       NAME     : "insertAtIndex* {obsolete}"
-      SIGNATURE: (void)insertAtIndex:(size_t)ndx CName1:(CType1*)value1 CName2:(CType2*)value2 CName3:(CType3*)value3
+      SIGNATURE: (void)insertAtIndex:(NSUInteger)ndx CName1:(CType1*)value1 CName2:(CType2*)value2 CName3:(CType3*)value3
       SUMMARY  : *g_typed_table_insert_summary
       DESCR    : |
                  This method adds a new row to a typed table at a specified position.
@@ -253,7 +253,7 @@ CATEGORIES:
                  Please refer to the example below.
       PARAMS:
       - NAME   : ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_typed_table_insert_position_descr
       - NAME   : "value1, value2, value3, &#133;"
         TYPES  : various
@@ -269,10 +269,10 @@ CATEGORIES:
       NAMES    : removeRowAtIndex
       SUMMARY  : *g_typed_table_remove_row_summary
       DESCR    : *g_typed_table_remove_row_descr
-      SIGNATURE: (void)removeRowAtIndex:(size_t)ndx
+      SIGNATURE: (void)removeRowAtIndex:(NSUInteger)ndx
       PARAMS:
       - NAME   : ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_typed_table_delete_position_descr
       EXAMPLES:
       - CODE   : ex_objc_typed_table_remove
@@ -303,13 +303,13 @@ CATEGORIES:
   #    DESCR    : |
   #               The method finds the first occurence of a given value in a column.
   #               The method is automatically made available by a macro taking as input the table definition {@link g_typed_table_macros}. The method can only be accessed through a property of the table object. The property <code>CName</code> represents the column to be searched. The type of <code>value</code> must correspond type of the column being accessed. Refer also to the example below.
-  #    SIGNATURE: ".CName (size_t)find: (CType*)value"
+  #    SIGNATURE: ".CName (NSUInteger)find: (CType*)value"
   #    PARAMS:
   #    - NAME   : value
   #      TYPES  : [BOOL, int64_t, float, double, time_t, NSString *]
   #      DESCR  : *g_typed_table_lookup_parm1_descr
   #    RETURN:
-  #      TYPES  : size_t
+  #      TYPES  : NSUInteger
   #      DESCR  : "The row index or <code>NSNotFound</code> if there is no match."
   #    EXAMPLES:
   #    - CODE   : ex_objc_typed_table_find_first_xxx
