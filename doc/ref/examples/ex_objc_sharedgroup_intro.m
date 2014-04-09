@@ -17,7 +17,7 @@ void ex_objc_context_intro()
     [fm removeItemAtPath:@"contextTest.tightdb.lock" error:nil];
     
     /* Create datafile with a new table. */
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:@"contextTest.tightdb"
+    TDBContext *context = [TDBContext contextAtPath:@"contextTest.tightdb"
                                                              error:nil];
 
     /* Perform a write transaction (with commit to file). */
