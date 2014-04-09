@@ -1,29 +1,32 @@
 * TightDB Objective C Interface
 
 This short tutorial to TightDB will introduce you to
-commonly used features of TightDB. Please refer to the <a href="http://www.tightdb.com/documentation/}/1/Reference/">reference documentation</a> for further details.
+commonly used features of TightDB. Please refer to the
+<a href="http://www.tightdb.com/documentation/1/Reference/">reference documentation</a>
+for further details.
 
-TightDB is a very fast embedded database that integrates transparently
-into Objective C and gives you the full benefits of a database, but
+TightDB is a fast embedded database that integrates transparently
+into Objective C. It gives you the full benefits of a database, but
 with a much lower memory footprint and higher performance than native
-data structures. It is also much more flexible and has an easy to use interface.
+data structures.
 
 TightDB data structures are represented by tables with typed and
 untyped columns. A column in a table can be any of the following
 column types: Integers, Booleans, Floats, Doubles, Strings, Dates,
-Binary, Tables, and Mixed (any of the previous types, i.e. untyped). More datatypes will follow.
+Binary blobs, and Tables. Moreover, columns in a table can be of the
+type Mixed which means that the values can be of any support type.
 
 The core classes of TightDB are <code>TDBTable</code>,
 <code>TDBContext</code>, and <code>TDBTransaction</code>. A table is where
 data is stored, while a context can be used to work with
-persistent data (memory or disk). Transactions are be read or write
-operations within a context.
+persistent data (memory or disk). Transactions are read or write
+table operations within a context.
 
 ** Executing the tutorial
 
 While you walk through the below tutorial you may find it beneficial to actually execute the code.
-The source code for the tutorial is <a href="http://www.tightdb.com/downloads&/tutorial-ios.zip">avaiable</a>
-as a iOS project.
+The source code for the tutorial is <a href="http://www.tightdb.com/downloads&/tutorial-ios.zip">available</a>
+as an iOS project.
 
 ** Creating tables
 
@@ -41,7 +44,7 @@ We add rows to the end of the table using the <code>addRow</code>
 method. The method <code>addRow</code> allows you to add a row
 using object literal either by using an array or dictionary.
 The order of the elements in the array must be the same as the order in
-which we created the table columns with <code>TDB_TABLE_3()}@@</code>
+which we created the table columns with <code>TDB_TABLE_3()</code>
 while order is not important when you add a row using a dictionary.
 
 The below code appends 5 rows to our table:
@@ -52,7 +55,7 @@ Since tables are ordered, you can also insert rows at specific row positions:
 
 @@example insert_at_index @@
 
-To get the size of our table (number of rows) we can use the
+To get the number of row in of your table (number of rows) you can use the
 <code>rowCount</code> property.
 
 @@example number_of_rows @@
@@ -60,15 +63,14 @@ To get the size of our table (number of rows) we can use the
 ** Working with individual rows
 
 To access the individual rows of our table, we use brackets
-(<code>[]</code>) or the <code>rowAtIndex</code> method. A row is
+(<code>[]</code>) or the <code>rowAtIndex</code> method. In general a row is
 represented as a special object. In the
 general a row an instance of the <code>TDBRow</code> class. In the
 case of the typed table, the class is named <code>PeopleTableRow</code>.
 
 @@example accessing_rows @@
 
-To get the last row the <tt>lastRow</tt> method can be used, while
-<code>firstRow</code> can be used access the first row.
+You can easily access the first and last row like this:
 
 @@example last_row @@
 
@@ -76,7 +78,7 @@ It is possible update an entire row using object literals:
 
 @@example updating_entire_row @@
 
-Deleting a specific row can be done with the <code>removeRowAtIndex</code>:
+Deleting a specific row can be done with <code>removeRowAtIndex</code>:
 
 @@example deleting_row @@
 
@@ -109,7 +111,7 @@ To find values in a specific column, you use the <code>find</code> method:
 More advanced queries can be performed through query objects. Advanced
 queries can involve more than one column, and when the query is
 defined once, different operations can be performed with it. A query
-is instantiated with <code>where</code> method. In the general case, a
+is instantiated with the <code>where</code> method. In the general case, a
 query object is an instance of the <code>TDBQuery</code> class but for
 the typed table <code>PeopleTable</code> class, the class is named
 <code>PeopleTableQuery</code>.
@@ -122,7 +124,7 @@ You can perform some operations with the query itself, or use
 <code>findAll</code> method to get a table view with all the matching rows.
 
 The code below illustrates the simplicity and expressiveness of the
-fluent query interface (albeit with a somewhat hypothetical query):
+query interface (albeit with a somewhat hypothetical query):
 
 @@example advanced_search @@
 
