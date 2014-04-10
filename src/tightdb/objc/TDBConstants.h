@@ -21,23 +21,8 @@
 #import <Foundation/Foundation.h>
 
 
-@interface TDBDescriptor: NSObject
-
-@property (nonatomic, readonly) NSUInteger columnCount;
-
 /**
- * Returns NO on memory allocation error.
+ * Posted by TDBSmartContext when it changes, that is when a table is
+ * added, removed, or changed in any way.
  */
--(BOOL)addColumnWithName:(NSString *)name type:(TDBType)type;
-/**
- * Returns nil on memory allocation error.
- */
--(TDBDescriptor *)addColumnTable:(NSString *)name;
--(TDBDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex;
--(TDBDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex error:(NSError *__autoreleasing *)error;
-
--(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
--(NSString *)nameOfColumnWithIndex:(NSUInteger)colIndex;
--(NSUInteger)indexOfColumnWithName:(NSString *)name;
-@end
-
+extern NSString *const TDBContextDidChangeNotification;
