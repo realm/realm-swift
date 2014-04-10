@@ -708,7 +708,8 @@ CATEGORIES :
                  The first variant takes a fully constructed NSPredicate and/or a NSSortDescriptor and creates
                  a TDBView. The second variant takes a string which is parsed into an NSPredicate. Both variants
                  support AND and OR compound predicats, and comparison of constant values against column names.
-      SIGNATURE: -(TDBView *)filterWithPredicate:(NSPredicate *)predicate orderedBy:(NSSortDescriptor *)sort;
+      SIGNATURE: |
+                 -(TDBView *)filterWithPredicate:(NSPredicate *)predicate orderedBy:(NSSortDescriptor *)sort;
                  -(TDBView *)filterWithPredicate:(NSString *)predicateString;
       PARAMS:
       - NAME   : predicate
