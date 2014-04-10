@@ -21,13 +21,10 @@
 #include <tightdb/group.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
-#import <tightdb/objc/TDBTransaction.h>
-#import <tightdb/objc/TDBTransaction_noinst.h>
-#import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBTable_noinst.h>
+#import "TDBTransaction_noinst.h"
+#import "TDBTable_noinst.h"
 #import "PrivateTDB.h"
-
-#include <tightdb/objc/util_noinst.hpp>
+#import "util_noinst.hpp"
 
 using namespace std;
 
@@ -62,62 +59,76 @@ using namespace std;
 
 -(TDBTable *)tableWithName:(NSString *)name
 {
+    // FIXME: Why impose this restriction? Isn't it kind of arbitrary?
+    // The core library has no problems with an empty table name. What
+    // if the database was created through a different language
+    // binding without this restriction?
     if ([name length] == 0) {
+        // FIXME: Exception name must be `TDBException` according to
+        // the exception naming conventions of the official Cocoa
+        // style guide. The same is true for most (if not all) of the
+        // exceptions we throw.
         @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
                                        reason:@"Name must be a non-empty NSString"
                                      userInfo:nil];
     }
-    
+
     // If table does not exist in context, return nil
-    if (![self hasTableWithName:name]) {
+    if (![self hasTableWithName:name]) // FIXME: Do this using C++
         return nil;
-    } else {
-        // Otherwise
-        TDBTable* table = [[TDBTable alloc] _initRaw];
-        if (TIGHTDB_UNLIKELY(!table))
-            return nil;
-        TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
-            tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name));
-            [table setNativeTable:table_2.get()];
+
+    // Otherwise
+    TDBTable* table = [[TDBTable alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!table))
+        return nil;
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
+        tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name));
+        [table setNativeTable:table_2.get()];
         )
         [table setParent:self];
-        [table setReadOnly:m_read_only];
-        return table;
-    }
+    [table setReadOnly:m_read_only];
+    return table;
 }
 
 -(id)tableWithName:(NSString *)name asTableClass:(__unsafe_unretained Class)class_obj
 {
+    // FIXME: Why impose this restriction? Isn't it kind of arbitrary?
+    // The core library has no problems with an empty table name. What
+    // if the database was created through a different language
+    // binding without this restriction?
     if ([name length] == 0) {
+        // FIXME: Exception name must be `TDBException` according to
+        // the exception naming conventions of the official Cocoa
+        // style guide. The same is true for most (if not all) of the
+        // exceptions we throw.
         @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
                                        reason:@"Name must be a non-empty NSString"
                                      userInfo:nil];
     }
-    
+
     // If table does not exist in context, return nil
-    if (![self hasTableWithName:name]) {
+    if (![self hasTableWithName:name]) // FIXME: Do this using C++
         return nil;
-    } else {
-        TDBTable* table = [[class_obj alloc] _initRaw];
-        if (TIGHTDB_UNLIKELY(!table))
-            return nil;
-        bool was_created;
-        TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
-            tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name), was_created);
-            [table setNativeTable:table_2.get()];
+
+    TDBTable* table = [[class_obj alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!table))
+        return nil;
+    bool was_created;
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
+        tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name), was_created);
+        [table setNativeTable:table_2.get()];
         )
         [table setParent:self];
-        [table setReadOnly:m_read_only];
-        if (was_created) {
-            if (![table _addColumns])
-                return nil;
-        }
-        else {
-            if (![table _checkType])
-                return nil;
-        }
-        return table;
+    [table setReadOnly:m_read_only];
+    if (was_created) {
+        if (![table _addColumns])
+            return nil;
     }
+    else {
+        if (![table _checkType])
+            return nil;
+    }
+    return table;
 }
 
 // FIXME: Avoid creating a table instance. It should be enough to create an TightdbDescriptor and then check that.
@@ -138,13 +149,13 @@ using namespace std;
                                        reason:@"Name must be a non-empty NSString"
                                      userInfo:nil];
     }
-    
+
     if (m_read_only) {
         @throw [NSException exceptionWithName:@"tightdb:core_read_only_exception"
                                        reason:@"Transaction is read-only."
                                      userInfo:nil];
     }
-    
+
     if ([self hasTableWithName:name]) {
         @throw [NSException exceptionWithName:@"tightdb:table_with_name_already_exists"
                                        reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the context.", name]
@@ -189,13 +200,13 @@ using namespace std;
                                       reason:@"Name must be a non-empty NSString"
                                     userInfo:nil];
     }
-    
+
     if (m_read_only) {
         @throw [NSException exceptionWithName:@"tightdb:core_read_only_exception"
                                        reason:@"Transaction is read-only."
                                      userInfo:nil];
     }
-    
+
     if ([self hasTableWithName:name]) {
         @throw [NSException exceptionWithName:@"tightdb:table_with_name_already_exists"
                                        reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the context.", name]
