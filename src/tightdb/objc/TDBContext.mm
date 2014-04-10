@@ -21,10 +21,9 @@
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/group_shared.hpp>
 
-#import <tightdb/objc/TDBContext.h>
-#import <tightdb/objc/TDBTransaction_noinst.h>
-
-#include <tightdb/objc/util_noinst.hpp>
+#import "TDBContext.h"
+#import "TDBTransaction_noinst.h"
+#import "util_noinst.hpp"
 
 using namespace std;
 
@@ -76,7 +75,7 @@ using namespace std;
 #endif
 }
 
--(void)readWithBlock:(TDBReadBlock)block
+-(void)readUsingBlock:(TDBReadBlock)block
 {
     const tightdb::Group* group;
     try {
@@ -102,16 +101,16 @@ using namespace std;
     }
 }
 
--(void)readTable:(NSString*)tablename withBlock:(TDBTableReadBlock)block
+-(void)readTable:(NSString*)tablename usingBlock:(TDBTableReadBlock)block
 {
-    [self readWithBlock:^(TDBTransaction *trx){
+    [self readUsingBlock:^(TDBTransaction *trx){
         TDBTable *table = [trx tableWithName:tablename];
         block(table);
     }];
 }
 
 
--(BOOL)writeWithBlock:(TDBWriteBlock)block error:(NSError**)error
+-(BOOL)writeUsingBlock:(TDBWriteBlock)block error:(NSError**)error
 {
     tightdb::Group* group;
     try {
@@ -162,9 +161,9 @@ using namespace std;
     return NO;
 }
 
--(BOOL)writeTable:(NSString*)tablename withBlock:(TDBTableWriteBlock)block error:(NSError **)error
+-(BOOL)writeTable:(NSString*)tablename usingBlock:(TDBTableWriteBlock)block error:(NSError **)error
 {
-    return [self writeWithBlock:^(TDBTransaction *trx){
+    return [self writeUsingBlock:^(TDBTransaction *trx){
         TDBTable *table = [trx tableWithName:tablename];
         return block(table);
     } error: error];
