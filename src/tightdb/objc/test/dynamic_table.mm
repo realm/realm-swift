@@ -1319,20 +1319,33 @@
 {
     TDBTable *t = [[TDBTable alloc] init];
     
+    [t addColumnWithName:@"name" type:TDBStringType];
     NSUInteger ageIndex = [t addColumnWithName:@"age" type:TDBIntType];
+    [t addColumnWithName:@"hired" type:TDBBoolType];
     
-    [t addRow:@[@4]];
-    [t addRow:@[@0]];
+    [t addRow:@[@"name4", @4, [NSNumber numberWithBool:YES]]];
+    [t addRow:@[@"name0",@0, [NSNumber numberWithBool:NO]]];
+    
+    TDBView *vAscending = [t filterWithPredicate:nil orderedBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:YES]];
+    STAssertEqualObjects(vAscending[0][ageIndex], @0, nil);
+    STAssertEqualObjects(vAscending[1][ageIndex], @4, nil);
     
     NSSortDescriptor * reverseSort = [NSSortDescriptor sortDescriptorWithKey:@"age" ascending:NO];
-    STAssertThrows([t filterWithPredicate:nil orderedBy:reverseSort], @"Invalid sort");
+    TDBView *vDescending = [t filterWithPredicate:nil orderedBy:reverseSort];
+    STAssertEqualObjects(vDescending[0][ageIndex], @4, nil);
+    STAssertEqualObjects(vDescending[1][ageIndex], @0, nil);
+    
+    NSSortDescriptor * boolSort = [NSSortDescriptor sortDescriptorWithKey:@"hired" ascending:YES];
+    TDBView *vBool = [t filterWithPredicate:nil orderedBy:boolSort];
+    STAssertEqualObjects(vBool[0][ageIndex], @0, nil);
+    STAssertEqualObjects(vBool[1][ageIndex], @4, nil);
+    
     
     NSSortDescriptor * misspell = [NSSortDescriptor sortDescriptorWithKey:@"oge" ascending:YES];
     STAssertThrows([t filterWithPredicate:nil orderedBy:misspell], @"Invalid sort");
     
-    TDBView *v = [t filterWithPredicate:nil orderedBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:YES]];
-    STAssertEqualObjects(v[0][ageIndex], @0, nil);
-    
+    NSSortDescriptor * wrongColType = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
+    STAssertThrows([t filterWithPredicate:nil orderedBy:wrongColType], @"Invalid column type");
 }
 
 

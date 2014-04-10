@@ -1298,14 +1298,16 @@ void update_query_with_predicate(NSPredicate * predicate,
 
     // apply sort
     if (sort) {
-        if (!sort.ascending) {
-            @throw predicate_exception(@"Unsupported order",
-                                       @"Must currently set ascending to YES");
-        }
-
         // sort the view
         NSUInteger index = validated_column_index(self, sort.key);
-        view.sort(index);
+        TDBType columnType = [self columnTypeOfColumnWithIndex:index];
+        
+        if(columnType != TDBIntType && columnType != TDBBoolType && columnType != TDBDateType) {
+            @throw predicate_exception(@"Invalid sort column type",
+                                       @"Sort only suppoerted on Integer, Date and Boolean columns.");
+        }
+        
+        view.sort(index, sort.ascending);
     }
     
     // create objc view and return
