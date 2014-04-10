@@ -41,11 +41,10 @@ NSString *const defaultContextFileName = @"default.tightdb";
 }
 
 
-+(TDBContext *)contextPersistedAtDefaultPathWithError:(NSError **)error
++(TDBContext *)contextWithDefaultPersistence
 {
-
     NSString *path = [TDBContext writeablePathForFile:defaultContextFileName];
-    return [self contextPersistedAtPath:path error:error];
+    return [self contextPersistedAtPath:path error:nil];
 }
 
 + (NSString *)writeablePathForFile:(NSString*)fileName

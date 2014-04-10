@@ -40,7 +40,7 @@ CATEGORIES:
       - CODE   : ex_objc_shared_group_constructor
         DESCR  :
   - g_shared_group_constructor_default_path:
-      NAME     : "contextPersistedAtDefaultPathWithError:"
+      NAME     : "contextWithDefaultPersistence:"
       SUMMARY  : *g_shared_group_constructor_summary
       DESCR    :
       - TEXT   : *g_shared_group_constructor_descr
