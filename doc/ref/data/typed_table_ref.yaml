@@ -169,7 +169,7 @@ CATEGORIES:
       NAME     : cursorAtIndex
       SUMMARY  : Returns a typed cursor at a specified row number.
       DESCR    : &g_typed_table_cursor_at_index_descr
-                 Use the curser to get or set the row values.
+                 Use the row to get or set the row values.
       SIGNATURE: "- (TableName_Cursor *)cursorAtIndex:(NSUInteger)ndx"
       PARAMS:
       - NAME   : ndx

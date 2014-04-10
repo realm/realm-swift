@@ -1,11 +1,28 @@
 #
-# Obj-C reference documentation for TableView class
+# Obj-C reference documentation for TDBView class
 #
 
 ID         : class_dyn_tableview
 TITLE      : TDBView (dynamic)
-SUMMARY    : *g_dyn_view_intro_summary
-DESCR      : *g_dyn_view_intro_descr
+SUMMARY    : The TDBView class
+DESCR      : >
+             Queries and searches can return <code>TDBView</code>
+             objects, which works as virtual tables containing just
+             the matched rows. You can interact with a
+             <code>TBDView</code> just as a regular table.
+
+             A {@link class_dyn_tableview} is implicitely linked to a
+             {@link class_dyn_table}.  All changes to the view will
+             propagate to the original table. This includes operations
+             like updating values and deleting rows.
+
+             It is possible to create multiple views for one table. Updates to one
+             view propagates to the original table and is visible from other
+             views linked to the same table. Deletion of rows through a view
+             propagates to the original table and cause any other views
+             linked to the same table to become detached from the table
+             and your application is likely to crash if you access the data in
+             the other views.
 SEE        :
 EXAMPLES   :
 - DESCR:
@@ -27,8 +44,6 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_size
         DESCR  : Is a @property
-
-
 
 - View:
   METHODS:
@@ -53,7 +68,7 @@ CATEGORIES :
         DESCR  : The number of columns.
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_get_column_count
-        DESCR  : 
+        DESCR  :
 
   - g_dyn_view_get_column_name:
       TODO     : later
@@ -90,24 +105,12 @@ CATEGORIES :
         DESCR  :
 
   - g_dyn_view_get_column_type:
-      NAME     : "getColumnType:"
+      NAME     : columnTypeOfColumnWithIndex
       SUMMARY  : *g_dyn_table_get_column_type_summary
       DESCR    :
       - TEXT   : *g_dyn_table_get_column_type_descr1
-      - TEXT   : >
-                 <ul>
-                   <li><code>TDBBoolType</code></li>
-                   <li><code>TDBIntType</code></li>
-                   <li><code>TDBFloatType</code></li>
-                   <li><code>TDBDoubleType</code></li>
-                   <li><code>TDBStringType</code></li>
-                   <li><code>TDBBinaryType</code></li>
-                   <li><code>TDBTableType</code></li>
-                   <li><code>TDBDateType</code></li>
-                   <li><code>TDBMixedType</code></li>
-                 </ul>
-      CONST    : True
-      SIGNATURE: (TDBType)columnTypeOfColumn:(NSUInteger)colIndex
+      - TEXT   : *objc_column_types
+      SIGNATURE: (TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
       - NAME   : colIndex
         TYPES  : NSUInteger
@@ -124,7 +127,7 @@ CATEGORIES :
   METHODS:
   - g_dyn_view_cursor_at_index:
       NAME     : "rowAtIndex:"
-      SUMMARY  : Returns a cursor at a specified row number.
+      SUMMARY  : Returns the row at a specified row number.
       DESCR    : *objc_typed_table_cursor_at_index_descr
       SIGNATURE: (TDBRow *)rowAtIndex:(NSUInteger)rowIndex
       PARAMS:
@@ -134,6 +137,25 @@ CATEGORIES :
       RETURN:
         TYPES  : TDBRow *
         DESCR  : The row.
+
+  - objc_dyn_view_first:
+      NAME     : firstRow
+      SUMMARY  : Returns the first row.
+      DESCR    : This method returns the first row in the view.
+      SIGNATURE: (TDBRow *)
+      RETURN:
+        TYPES  : TDBRow *
+        DESCR  : The row.
+
+  - objc_dyn_view_last:
+      NAME     : "lastRow:"
+      SUMMARY  : Returns the last row.
+      DESCR    : This method returns the last row in the view.
+      SIGNATURE: (TDBRow *)
+      RETURN:
+        TYPES  : TDBRow *
+        DESCR  : The row.
+
   - g_dyn_view_get_source_ndx:
       NAME     : "rowIndexInOriginTableForRowAtIndex:"
       SUMMARY  : *g_dyn_view_get_source_ndx_summary
@@ -221,55 +243,55 @@ CATEGORIES :
 #      - CODE   : ex_objc_dyn_view_get_xxx
 #        DESCR  :
 
-  - g_dyn_view_set_bool:
-      TODO     : soon
-  - g_dyn_view_set_int:
-      TODO     : soon
-  - g_dyn_view_set_float:
-      TODO     : soon
-  - g_dyn_view_set_double:
-      TODO     : soon
-  - g_dyn_view_set_enum:
-      TODO     : soon
-  - g_dyn_view_set_date:
-      TODO     : soon
-  - g_dyn_view_set_string:
-      TODO     : soon
-  - g_dyn_view_set_binary:
-      TODO     : soon
-  - g_dyn_view_set_mixed:
-      TODO     : soon
-      NAME     : setMixed
+  # - g_dyn_view_set_bool:
+  #     TODO     : soon
+  # - g_dyn_view_set_int:
+  #     TODO     : soon
+  # - g_dyn_view_set_float:
+  #     TODO     : soon
+  # - g_dyn_view_set_double:
+  #     TODO     : soon
+  # - g_dyn_view_set_enum:
+  #     TODO     : soon
+  # - g_dyn_view_set_date:
+  #     TODO     : soon
+  # - g_dyn_view_set_string:
+  #     TODO     : soon
+  # - g_dyn_view_set_binary:
+  #     TODO     : soon
+  # - g_dyn_view_set_mixed:
+  #     TODO     : soon
+  #     NAME     : setMixed
 
-      TITLE    : set*
-      SUMMARY  : *g_dyn_table_set_xxx_summary
-      DESCR    : *g_dyn_table_set_xxx_descr
-      SIGNATURE: |
-                 void set_bool(NSUInteger column_ndx, NSUInteger row_ndx, bool value);
-                 void set_int(NSUInteger column_ndx, NSUInteger row_ndx, int64_t value);
-                 void set_float(NSUInteger column_ndx, NSUInteger row_ndx, float value);
-                 void set_double(NSUInteger column_ndx, NSUInteger row_ndx, double value);
-                 template<class E> void set_enum(NSUInteger column_ndx, NSUInteger row_ndx, E value);
-                 void set_date(NSUInteger column_ndx, NSUInteger row_ndx, time_t value);
-                 void set_string(NSUInteger column_ndx, NSUInteger row_ndx, const char* value);
-                 void set_binary(NSUInteger column_ndx, NSUInteger row_ndx, const char* value, NSUInteger len);
-                 void set_mixed(NSUInteger column_ndx, NSUInteger row_ndx, Mixed value);
-      PARAMS:
-      - NAME   : column_ndx
-        TYPES  : NSUInteger
-        DESCR  : The column index.
-      - NAME   : row_ndx
-        TYPES  : NSUInteger
-        DESCR  : The row index.
-      - NAME   : value
-        TYPES  : [BOOL, int64_t, float, double, time_t, const char*, Mixed]
-        DESCR  : The value.
-      - NAME   : len
-        TYPES  : NSUInteger
-        DESCR  : Size in bytes of binary value.
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_view_set_xxx
-        DESCR  :
+  #     TITLE    : set*
+  #     SUMMARY  : *g_dyn_table_set_xxx_summary
+  #     DESCR    : *g_dyn_table_set_xxx_descr
+  #     SIGNATURE: |
+  #                void set_bool(NSUInteger column_ndx, NSUInteger row_ndx, bool value);
+  #                void set_int(NSUInteger column_ndx, NSUInteger row_ndx, int64_t value);
+  #                void set_float(NSUInteger column_ndx, NSUInteger row_ndx, float value);
+  #                void set_double(NSUInteger column_ndx, NSUInteger row_ndx, double value);
+  #                template<class E> void set_enum(NSUInteger column_ndx, NSUInteger row_ndx, E value);
+  #                void set_date(NSUInteger column_ndx, NSUInteger row_ndx, time_t value);
+  #                void set_string(NSUInteger column_ndx, NSUInteger row_ndx, const char* value);
+  #                void set_binary(NSUInteger column_ndx, NSUInteger row_ndx, const char* value, NSUInteger len);
+  #                void set_mixed(NSUInteger column_ndx, NSUInteger row_ndx, Mixed value);
+  #     PARAMS:
+  #     - NAME   : column_ndx
+  #       TYPES  : NSUInteger
+  #       DESCR  : The column index.
+  #     - NAME   : row_ndx
+  #       TYPES  : NSUInteger
+  #       DESCR  : The row index.
+  #     - NAME   : value
+  #       TYPES  : [BOOL, int64_t, float, double, time_t, const char*, Mixed]
+  #       DESCR  : The value.
+  #     - NAME   : len
+  #       TYPES  : NSUInteger
+  #       DESCR  : Size in bytes of binary value.
+  #     EXAMPLES:
+  #     - CODE   : ex_objc_dyn_view_set_xxx
+  #       DESCR  :
 
 - Sub-tables:
   METHODS:
@@ -319,114 +341,126 @@ CATEGORIES :
       SUMMARY  : Query the view.
       DESCR    : This method initiates a query in the view.
       RETURN:
-        TYPES  : TDBQuery
+        TYPES  : TDBQuery *
         DESCR  : *g_dyn_table_where_return_descr
       EXAMPLES:
-      - DESCR  : ""
+      - DESCR  :
         CODE   : ex_objc_dyn_view_where
 
 
-  - g_dyn_view_find_first_bool:
-      TODO     : soon
-  - g_dyn_view_find_first_int:
-      TODO     : soon
-  - g_dyn_view_find_first_float:
-      TODO     : soon
-  - g_dyn_view_find_first_double:
-      TODO     : soon
-  - g_dyn_view_find_first_date:
-      TODO     : soon
-  - g_dyn_view_find_first_string:
-      TODO     : soon
-      NAME     : findFirstString
+  # - g_dyn_view_find_first_bool:
+  #     TODO     : soon
+  # - g_dyn_view_find_first_int:
+  #     TODO     : soon
+  # - g_dyn_view_find_first_float:
+  #     TODO     : soon
+  # - g_dyn_view_find_first_double:
+  #     TODO     : soon
+  # - g_dyn_view_find_first_date:
+  #     TODO     : soon
+  # - g_dyn_view_find_first_string:
+  #     TODO     : soon
+  #     NAME     : findFirstString
 
-      TITLE    : find*
-      SUMMARY  : *g_dyn_table_find_first_xxx_summary
-      DESCR    : *g_dyn_table_find_first_xxx_descr
-      SIGNATURE: |
-                 NSUInteger find_first_int(NSUInteger column_ndx, int64_t value) const;
-                 NSUInteger find_first_bool(NSUInteger column_ndx, bool value) const;
-                 NSUInteger find_first_float(NSUInteger column_ndx, float value) const;
-                 NSUInteger find_first_double(NSUInteger column_ndx, double value) const;
-                 NSUInteger find_first_date(NSUInteger column_ndx, time_t value) const;
-                 NSUInteger find_first_string(NSUInteger column_ndx, const char* value) const;
+  #     TITLE    : find*
+  #     SUMMARY  : *g_dyn_table_find_first_xxx_summary
+  #     DESCR    : *g_dyn_table_find_first_xxx_descr
+  #     SIGNATURE: |
+  #                NSUInteger find_first_int(NSUInteger column_ndx, int64_t value) const;
+  #                NSUInteger find_first_bool(NSUInteger column_ndx, bool value) const;
+  #                NSUInteger find_first_float(NSUInteger column_ndx, float value) const;
+  #                NSUInteger find_first_double(NSUInteger column_ndx, double value) const;
+  #                NSUInteger find_first_date(NSUInteger column_ndx, time_t value) const;
+  #                NSUInteger find_first_string(NSUInteger column_ndx, const char* value) const;
+  #     PARAMS:
+  #     - NAME   : column_ndx
+  #       TYPES  : NSUInteger
+  #       DESCR  : The column index.
+  #     - NAME   : value
+  #       TYPES  : [BOOL, int64_t, float, double, time_t, const char*]
+  #       DESCR  : The value.
+  #     RETURN:
+  #       TYPES  : NSUInteger
+  #       DESCR  : "The row index or <code>NSNotFound<code> if there is no match."
+  #     EXAMPLES:
+  #     - CODE   : ex_objc_dyn_view_find_first_xxx
+  #       DESCR  :
+
+  # - g_dyn_view_find_all_bool_const:
+  #     IGNORE   : ""
+  # - g_dyn_view_find_all_int_const:
+  #     IGNORE   : ""
+  # - g_dyn_view_find_all_float_const:
+  #     IGNORE   : ""
+  # - g_dyn_view_find_all_double_const:
+  #     IGNORE   : ""
+  # - g_dyn_view_find_all_date_const:
+  #     IGNORE   : ""
+  # - g_dyn_view_find_all_string_const:
+  #     IGNORE   : ""
+
+  # - g_dyn_view_find_all_bool:
+  #     NAME     : findAllBool
+  # - g_dyn_view_find_all_int:
+  #     NAME     : findAllInt
+  # - g_dyn_view_find_all_float:
+  #     NAME     : findAllFloat
+  # - g_dyn_view_find_all_double:
+  #     NAME     : findAllDouble
+  # - g_dyn_view_find_all_date:
+  #     NAME     : findAllDate
+  # - g_dyn_view_find_all_string:
+  #     NAME     : findAllString
+  #     TODO     : soon
+  #     TITLE    : findAll*
+  #     SUMMARY  : *g_dyn_table_find_all_xxx_summary
+  #     DESCR    : *g_dyn_table_find_all_xxx_descr
+  #     SIGNATURE: |
+  #                TableView      find_all_int(NSUInteger column_ndx, int64_t value);
+  #                TableView      find_all_bool(NSUInteger column_ndx, bool value);
+  #                TableView      find_all_date(NSUInteger column_ndx, time_t value);
+  #                TableView      find_all_string(NSUInteger column_ndx, const char* value);
+  #                TableView      find_all_float(NSUInteger column_ndx, float value);
+  #                TableView      find_all_double(NSUInteger column_ndx, double value);
+  #     PARAMS:
+  #     - NAME   : column_ndx
+  #       TYPES  : NSUInteger
+  #       DESCR  : The column index.
+  #     - NAME   : value
+  #       TYPES  : [BOOL, int64_t, float, double, time_t, const char*]
+  #       DESCR  : The value.
+  #     RETURN:
+  #       TYPES  : [TableView, ConstTableView]
+  #       DESCR  : The view.
+  #     EXAMPLES:
+  #     - CODE   : ex_objc_dyn_view_find_all_xxx
+  #       DESCR  :
+
+  - g_dyn_view_sort:
+      NAME     : sortUsingColumnWithIndex
+      SUMMARY  : *g_dyn_view_get_sorted_view_summary
+      DESCR    : *g_dyn_view_get_sorted_view_desc
+      SIGNATURE: (void) sortUsingColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : colIndex
         TYPES  : NSUInteger
         DESCR  : The column index.
-      - NAME   : value
-        TYPES  : [BOOL, int64_t, float, double, time_t, const char*]
-        DESCR  : The value.
-      RETURN:
-        TYPES  : NSUInteger
-        DESCR  : "The row index or <code>NSNotFound<code> if there is no match."
       EXAMPLES:
-      - CODE   : ex_objc_dyn_view_find_first_xxx
-        DESCR  :
-
-  - g_dyn_view_find_all_bool_const:
-      IGNORE   : ""
-  - g_dyn_view_find_all_int_const:
-      IGNORE   : ""
-  - g_dyn_view_find_all_float_const:
-      IGNORE   : ""
-  - g_dyn_view_find_all_double_const:
-      IGNORE   : ""
-  - g_dyn_view_find_all_date_const:
-      IGNORE   : ""
-  - g_dyn_view_find_all_string_const:
-      IGNORE   : ""
-
-  - g_dyn_view_find_all_bool:
-      NAME     : findAllBool
-  - g_dyn_view_find_all_int:
-      NAME     : findAllInt
-  - g_dyn_view_find_all_float:
-      NAME     : findAllFloat
-  - g_dyn_view_find_all_double:
-      NAME     : findAllDouble
-  - g_dyn_view_find_all_date:
-      NAME     : findAllDate
-  - g_dyn_view_find_all_string:
-      NAME     : findAllString
-      TODO     : soon
-      TITLE    : findAll*
-      SUMMARY  : *g_dyn_table_find_all_xxx_summary
-      DESCR    : *g_dyn_table_find_all_xxx_descr
-      SIGNATURE: |
-                 TableView      find_all_int(NSUInteger column_ndx, int64_t value);
-                 TableView      find_all_bool(NSUInteger column_ndx, bool value);
-                 TableView      find_all_date(NSUInteger column_ndx, time_t value);
-                 TableView      find_all_string(NSUInteger column_ndx, const char* value);
-                 TableView      find_all_float(NSUInteger column_ndx, float value);
-                 TableView      find_all_double(NSUInteger column_ndx, double value);
-      PARAMS:
-      - NAME   : column_ndx
-        TYPES  : NSUInteger
-        DESCR  : The column index.
-      - NAME   : value
-        TYPES  : [BOOL, int64_t, float, double, time_t, const char*]
-        DESCR  : The value.
-      RETURN:
-        TYPES  : [TableView, ConstTableView]
-        DESCR  : The view.
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_view_find_all_xxx
+      - CODE   : ex_objc_dyn_view_sort
         DESCR  :
 
   - g_dyn_view_sort:
-      TODO     : later
-
-      NAME     : sort
+      NAME     : "sortUsingColumnWithIndex:inOrder:"
       SUMMARY  : *g_dyn_view_get_sorted_view_summary
       DESCR    : *g_dyn_view_get_sorted_view_desc
+      SIGNATURE: (void) sortUsingColumnWithIndex:(NSUInteger)colIndex inOrder:(TDBSortOrder)order
       PARAMS:
-      - NAME   : column_ndx
+      - NAME   : colIndex
         TYPES  : NSUInteger
         DESCR  : The column index.
-      - NAME   : ascending
-        TYPES  : bool
-        DESCR  : "If <code>true</code>, rows are sorted ascending. Default: <code>true</code>."
+      - NAME   : order
+        TYPES  : TDBSortOrder
+        DESCR  : Sorting order; either <code>TDBAscending</code> or <code>TDBDescending</code> (declared in <code>TDBType.h</code>)
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_sort
         DESCR  :
