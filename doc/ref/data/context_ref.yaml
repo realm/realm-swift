@@ -62,7 +62,7 @@ CATEGORIES:
 - Transactions:
   METHODS:
   - g_shared_group_begin_write:
-      NAMES    : writeWithBlock
+      NAMES    : "writeUsingBlock:error:"
       SUMMARY  : *g_shared_group_begin_write_summary
       DESCR    : >
                  Execute a code block as a write transaction in order to
@@ -75,7 +75,7 @@ CATEGORIES:
                  returns <code>YES</code>, the changes are written to disk/storage
                  device, while any modification is discarded if the code block
                  returns <code>NO</code>.
-      SIGNATURE: (BOOL)writeWithBlock:(TDBWriteBlock)block error:(NSError **)error
+      SIGNATURE: (BOOL)writeUsingBlock:(TDBWriteBlock)block error:(NSError **)error
       PARAMS:
         NAME   : block
         TYPES  : TDBWriteBlock
@@ -91,13 +91,13 @@ CATEGORIES:
         DESCR  :
 
   - g_shared_group_begin_read:
-      NAMES    : readWithBlock
+      NAMES    : "readUsingBlock:"
       SUMMARY  : *g_shared_group_begin_read_summary
       DESCR    : >
                  Execute a code blocks as a read transaction. This will allow
                  you to get information about columns (type, name), number of rows in
                  a table, access rows, and execute queries on tables.
-      SIGNATURE: (void)readWithBlock:(TDBReadBlock)block
+      SIGNATURE: (void)readUsingBlock:(TDBReadBlock)block
       CONST    : True
       PARAMS:
         NAME   : block
