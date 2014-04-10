@@ -74,7 +74,7 @@
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"TDBView dealloc");
+    // NSLog(@"TDBView dealloc");
 #endif
     m_table = nil; // FIXME: What is the point of doing this?
 }
@@ -117,7 +117,6 @@
     return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1]];
 }
 
-
 -(NSUInteger)rowCount
 {
     return m_view->size();
@@ -133,10 +132,12 @@
     TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colNdx);
     return TDBType(m_view->get_column_type(colNdx));
 }
+
 -(void)sortUsingColumnWithIndex:(NSUInteger)colIndex
 {
     [self sortUsingColumnWithIndex:colIndex inOrder:TDBAscending];
 }
+
 -(void)sortUsingColumnWithIndex:(NSUInteger)colIndex  inOrder: (TDBSortOrder)order
 {
     TDBType columnType = [self columnTypeOfColumnWithIndex:colIndex];
