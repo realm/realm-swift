@@ -50,7 +50,7 @@ Description......
   on table now return void instead of BOOL.
 
 ### Enhancements:
-* `contextPersistedAtDefaultPathWithError:t` class method added to `TDBContext`. Will create a context persisted
+* `contextWithDefaultPersistence` class method added to `TDBContext`. Will create a context persisted
   to a file in app/documents folder.
 * `renameColumnWithIndex:to:` has been added to `TDBTable`.
 * `distinctValuesInColumnWithIndex` has been added to `TDBTable`.

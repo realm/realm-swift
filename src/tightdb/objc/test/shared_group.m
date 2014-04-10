@@ -113,7 +113,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:[defaultPath stringByAppendingString:@".lock"] error:nil];
     
     // Create a new context at default location
-    TDBContext *context = [TDBContext contextPersistedAtDefaultPathWithError:nil];
+    TDBContext *context = [TDBContext contextWithDefaultPersistence];
     
     [context writeUsingBlock:^(TDBTransaction *transaction) {
         TDBTable *t = [transaction createTableWithName:@"table"];
