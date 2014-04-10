@@ -19,7 +19,9 @@
  **************************************************************************/
 
 #import <Foundation/Foundation.h>
+
 #import "TDBTable.h"
+
 
 @interface TDBColumnProxy: NSObject
 @property(nonatomic, weak) TDBTable *table;

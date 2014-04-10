@@ -18,11 +18,13 @@
  *
  **************************************************************************/
 
+#import <tightdb/objc/TDBConstants.h>
 #import <tightdb/objc/TDBTable.h>
 #import <tightdb/objc/TDBView.h>
 #import <tightdb/objc/TDBQuery.h>
 #import <tightdb/objc/TDBRow.h>
 #import <tightdb/objc/TDBContext.h>
+#import <tightdb/objc/TDBSmartContext.h>
 #import <tightdb/objc/TDBVersion.h>
 
 #import <tightdb/objc/PrivateHelperMacros.h>

@@ -19,23 +19,18 @@
  **************************************************************************/
 
 #include <tightdb/util/unique_ptr.hpp>
-#include <tightdb/util/file.hpp>
 #include <tightdb/exceptions.hpp>
 #include <tightdb/table.hpp>
 #include <tightdb/table_view.hpp>
 #include <tightdb/query.hpp>
 
-#import <tightdb/objc/TDBQuery.h>
-#import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBTable_noinst.h>
-#import <tightdb/objc/TDBView.h>
-#import <tightdb/objc/TDBView_noinst.h>
-#import <tightdb/objc/TDBRow.h>
+#import "TDBQuery.h"
+#import "TDBTable_noinst.h"
+#import "TDBView_noinst.h"
+#import "TDBRow.h"
 #import "NSData+TDBGetBinaryData.h"
-#import <tightdb/objc/PrivateTDB.h>
-
-#include <tightdb/objc/util_noinst.hpp>
-
+#import "PrivateTDB.h"
+#import "util_noinst.hpp"
 
 using namespace std;
 

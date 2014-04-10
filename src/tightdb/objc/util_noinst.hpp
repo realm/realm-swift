@@ -25,6 +25,7 @@
 #include <stdexcept>
 
 #include <tightdb/util/safe_int_ops.hpp>
+#include <tightdb/util/file.hpp>
 #include <tightdb/string_data.hpp>
 #include <tightdb/mixed.hpp>
 #include <tightdb/descriptor.hpp>
