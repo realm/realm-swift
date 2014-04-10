@@ -20,6 +20,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "TDBTransaction.h"
+
 
 @interface TDBTransaction (noinst)
 

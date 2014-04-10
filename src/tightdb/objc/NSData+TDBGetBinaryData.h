@@ -22,6 +22,7 @@
 
 #include <tightdb/binary_data.hpp>
 
+
 @interface NSData (TDBGetBinaryData)
 
 @property (nonatomic, readonly) tightdb::BinaryData tdbBinaryData;

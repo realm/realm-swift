@@ -20,7 +20,6 @@
 
 @interface TDBRow (Fast)
 
-
 -(void)setInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex;
