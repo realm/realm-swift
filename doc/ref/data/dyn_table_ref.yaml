@@ -716,7 +716,7 @@ CATEGORIES :
         DESCR  : NOTE! We only support compound predicates and those comparing columns to constant values.
       - NAME   : sort
         TYPES  : NSSortDescriptor
-        DESCR  : NOTE! We only support ascending sorts
+        DESCR  : NOTE! Sort only supported on columns of type TDBIntegerType, TDBBoolType and TDBDateType.
       - NAME   : predicateString
         TYPES  : NSString
         DESCR  : A string which is parsed as a NSPredicate

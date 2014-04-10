@@ -1304,7 +1304,7 @@ void update_query_with_predicate(NSPredicate * predicate,
         
         if(columnType != TDBIntType && columnType != TDBBoolType && columnType != TDBDateType) {
             @throw predicate_exception(@"Invalid sort column type",
-                                       @"Sort only suppoerted on Integer, Date and Boolean columns.");
+                                       @"Sort only supported on Integer, Date and Boolean columns.");
         }
         
         view.sort(index, sort.ascending);
