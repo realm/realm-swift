@@ -30,7 +30,7 @@
 		4D88935218D320EF0038AFD4 /* ex_objc_tableview_typed_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D88934918D320EF0038AFD4 /* ex_objc_tableview_typed_intro.m */; };
 		4D88935318D320EF0038AFD4 /* ex_objc_query_typed_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D88934A18D320EF0038AFD4 /* ex_objc_query_typed_intro.m */; };
 		4D88935518D321080038AFD4 /* Tightdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88935418D321080038AFD4 /* Tightdb.framework */; };
-		5288036C18F62E3E0039005B /* libstdc++.6.0.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5288036B18F62E3E0039005B /* libstdc++.6.0.9.dylib */; };
+		529E744118F63AA600BF84DD /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 529E744018F63AA600BF84DD /* libstdc++.6.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +77,7 @@
 		4D88935618D321130038AFD4 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		5288036B18F62E3E0039005B /* libstdc++.6.0.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.0.9.dylib"; path = "usr/lib/libstdc++.6.0.9.dylib"; sourceTree = SDKROOT; };
 		5296DA3F18F624EF00EA9BEE /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
+		529E744018F63AA600BF84DD /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "usr/lib/libstdc++.6.dylib"; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,7 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5288036C18F62E3E0039005B /* libstdc++.6.0.9.dylib in Frameworks */,
+				529E744118F63AA600BF84DD /* libstdc++.6.dylib in Frameworks */,
 				4D88931518D320D20038AFD4 /* CoreGraphics.framework in Frameworks */,
 				4D88931718D320D20038AFD4 /* UIKit.framework in Frameworks */,
 				4D88931318D320D20038AFD4 /* Foundation.framework in Frameworks */,
@@ -108,6 +109,7 @@
 		4D88930618D320D20038AFD4 = {
 			isa = PBXGroup;
 			children = (
+				529E744018F63AA600BF84DD /* libstdc++.6.dylib */,
 				5288036B18F62E3E0039005B /* libstdc++.6.0.9.dylib */,
 				5296DA3F18F624EF00EA9BEE /* libstdc++.dylib */,
 				4D88934118D320DB0038AFD4 /* examples */,
