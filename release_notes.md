@@ -50,6 +50,8 @@ Description......
   on table now return void instead of BOOL.
 
 ### Enhancements:
+* A `TDBTable` can now be queried using `filterWithPredicate:` and `filterWithPredicate:orderedBy:` taking
+  `NSPredicate` and `NSSortDescriptor` as arguments. 
 * `contextWithDefaultPersistence` class method added to `TDBContext`. Will create a context persisted
   to a file in app/documents folder.
 * `renameColumnWithIndex:to:` has been added to `TDBTable`.
