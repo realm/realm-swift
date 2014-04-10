@@ -32,8 +32,11 @@ typedef BOOL(^TDBTableWriteBlock)(TDBTable *table);
 
 @interface TDBContext: NSObject
 
++(NSString *) defaultPath;
+
 // Initializers
-+(TDBContext *)contextWithPersistenceToFile:(NSString *)path error:(NSError **)error;
++(TDBContext *)contextWithDefaultPersistence;
++(TDBContext *)contextPersistedAtPath:(NSString *)path error:(NSError **)error;
 
 // Transactions
 -(void)readUsingBlock:(TDBReadBlock)block;
@@ -45,5 +48,6 @@ typedef BOOL(^TDBTableWriteBlock)(TDBTable *table);
 
 // Context state info
 -(BOOL)hasChangedSinceLastTransaction;
+
 
 @end
