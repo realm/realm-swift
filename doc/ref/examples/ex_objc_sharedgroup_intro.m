@@ -23,7 +23,7 @@ void ex_objc_context_intro()
     /* Perform a write transaction (with commit to file). */
     NSError *error = nil;
     BOOL success;
-    success = [context writeUsingBlock:^(TDBTransaction *transaction) {
+    success = [context writeWithBlock:^(TDBTransaction *transaction) {
         PeopleTable *table = [transaction createTableWithName:@"employees"
                                                  asTableClass:[PeopleTable class]];
         [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
@@ -35,7 +35,7 @@ void ex_objc_context_intro()
 
     
     /* Perform a write transaction (with rollback). */
-    success = [context writeUsingBlock:^(TDBTransaction *transaction) {
+    success = [context writeWithBlock:^(TDBTransaction *transaction) {
         PeopleTable *table = [transaction createTableWithName:@"employees"
                                                  asTableClass:[PeopleTable class]];
         if ([table rowCount] == 0) {
@@ -51,7 +51,7 @@ void ex_objc_context_intro()
 
     
     /* Perfrom a read transaction */
-    [context readUsingBlock:^(TDBTransaction *group) {
+    [context readWithBlock:^(TDBTransaction *group) {
         PeopleTable *table = [group tableWithName:@"employees"
                                      asTableClass:[PeopleTable class]];
         for (PeopleTableRow *row in table) {
