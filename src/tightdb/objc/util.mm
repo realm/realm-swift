@@ -20,18 +20,18 @@
 
 #import <Foundation/Foundation.h>
 
+#include <vector>
+
 #include <tightdb/descriptor.hpp>
 #include <tightdb/binary_data.hpp>
 #include <tightdb/string_data.hpp>
 
-#include <vector>
-
-#import "TDBTable.h"
 #import "TDBTable_noinst.h"
 #import "util_noinst.hpp"
 #import "NSData+TDBGetBinaryData.h"
 
 using namespace tightdb;
+
 
 void to_mixed(id value, Mixed& m)
 {

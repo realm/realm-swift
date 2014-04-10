@@ -20,14 +20,12 @@
 
 #import <Foundation/Foundation.h>
 
-#include <tightdb/util/file.hpp> /* FIXME: why include this? */
 #include <tightdb/data_type.hpp>
 #include <tightdb/descriptor.hpp>
 
 #import "TDBType.h"
 #import "TDBDescriptor.h"
-
-#include <tightdb/objc/util_noinst.hpp>
+#import "util_noinst.hpp"
 
 
 @implementation TDBDescriptor
