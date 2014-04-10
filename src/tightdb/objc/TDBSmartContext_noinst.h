@@ -20,30 +20,13 @@
 
 #import <Foundation/Foundation.h>
 
-#import "TDBTransaction.h"
+#import "TDBSmartContext.h"
 
 
-typedef void(^TDBReadBlock)(TDBTransaction *transaction);
-typedef BOOL(^TDBWriteBlock)(TDBTransaction *transaction);
-typedef void(^TDBTableReadBlock)(TDBTable *table);
-typedef BOOL(^TDBTableWriteBlock)(TDBTable *table);
+@interface TDBSmartContext (noinst)
 
-/****************	  TDBContext	****************/
+- (void)tableRefDidDie;
 
-@interface TDBContext: NSObject
-
-// Initializers
-+(TDBContext *)contextWithPersistenceToFile:(NSString *)path error:(NSError **)error;
-
-// Transactions
--(void)readUsingBlock:(TDBReadBlock)block;
--(BOOL)writeUsingBlock:(TDBWriteBlock)block error:(NSError **)error;
-
-// Shortcuts for transactions on a single table
--(void)readTable:(NSString*)tablename usingBlock:(TDBTableReadBlock)block;
--(BOOL)writeTable:(NSString*)tablename usingBlock:(TDBTableWriteBlock)block error:(NSError **)error;
-
-// Context state info
--(BOOL)hasChangedSinceLastTransaction;
+- (void)checkForChange:(NSTimer *)timer;
 
 @end

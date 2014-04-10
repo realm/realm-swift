@@ -19,10 +19,12 @@
  **************************************************************************/
 
 #import <Foundation/Foundation.h>
+
+#include <tightdb/table_view.hpp>
+
 #import "TDBTable.h"
 #import "TDBView.h"
 
-#include <tightdb/table_view.hpp>
 
 @interface TDBView (noinst)
 
