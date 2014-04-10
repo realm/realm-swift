@@ -71,7 +71,7 @@ using namespace std;
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"TDBSharedGroup dealloc");
+    // NSLog(@"TDBSharedGroup dealloc");
 #endif
 }
 
