@@ -18,7 +18,7 @@ void ex_objc_intro() {
                                                              error:nil];
 
     // Start a write transaction
-    [context writeWithBlock:^(TDBTransaction *transaction) {
+    [context writeUsingBlock:^(TDBTransaction *transaction) {
         // Get a specific table from the group
         Person *table = [transaction createTableWithName:@"employees"
                                             asTableClass:[Person class]];
@@ -33,7 +33,7 @@ void ex_objc_intro() {
     } error:nil];
 
     // Start a read transaction
-    [context readWithBlock:^(TDBTransaction *transaction) {
+    [context readUsingBlock:^(TDBTransaction *transaction) {
         // Get the table
         Person *table = [transaction tableWithName:@"employees"
                                       asTableClass:[Person class]];

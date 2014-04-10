@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		42211A4B18D8958400E1CA0B /* people.m in Sources */ = {isa = PBXBuildFile; fileRef = 42211A4A18D8958400E1CA0B /* people.m */; };
 		4272AB6418F56AB400397B62 /* ex_objc_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 4272AB6318F56AB400397B62 /* ex_objc_intro.m */; };
-		4272AB6518F698FD00397B62 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88935618D321130038AFD4 /* libc++.dylib */; };
+		4272AB6A18F6D42B00397B62 /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4272AB6918F6D42B00397B62 /* libstdc++.6.dylib */; };
 		4D88931318D320D20038AFD4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88931218D320D20038AFD4 /* Foundation.framework */; };
 		4D88931518D320D20038AFD4 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88931418D320D20038AFD4 /* CoreGraphics.framework */; };
 		4D88931718D320D20038AFD4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88931618D320D20038AFD4 /* UIKit.framework */; };
@@ -50,6 +50,8 @@
 		42211A4C18D895D000E1CA0B /* people.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = people.m; path = ../examples/people.m; sourceTree = "<group>"; };
 		42211A4E18D897F500E1CA0B /* examples.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = examples.h; path = ../examples/examples.h; sourceTree = "<group>"; };
 		4272AB6318F56AB400397B62 /* ex_objc_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_intro.m; path = ../examples/ex_objc_intro.m; sourceTree = "<group>"; };
+		4272AB6718F6ABB800397B62 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
+		4272AB6918F6D42B00397B62 /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "usr/lib/libstdc++.6.dylib"; sourceTree = SDKROOT; };
 		4D88930F18D320D20038AFD4 /* RefDocExamples.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RefDocExamples.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D88931218D320D20038AFD4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4D88931418D320D20038AFD4 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -77,9 +79,6 @@
 		4D88934A18D320EF0038AFD4 /* ex_objc_query_typed_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_query_typed_intro.m; path = ../examples/ex_objc_query_typed_intro.m; sourceTree = "<group>"; };
 		4D88935418D321080038AFD4 /* Tightdb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Tightdb.framework; path = ../../../Tightdb.framework; sourceTree = "<group>"; };
 		4D88935618D321130038AFD4 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
-		5288036B18F62E3E0039005B /* libstdc++.6.0.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.0.9.dylib"; path = "usr/lib/libstdc++.6.0.9.dylib"; sourceTree = SDKROOT; };
-		5296DA3F18F624EF00EA9BEE /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
-		529E744018F63AA600BF84DD /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "usr/lib/libstdc++.6.dylib"; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,7 +86,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4272AB6518F698FD00397B62 /* libc++.dylib in Frameworks */,
+				4272AB6A18F6D42B00397B62 /* libstdc++.6.dylib in Frameworks */,
 				4D88931518D320D20038AFD4 /* CoreGraphics.framework in Frameworks */,
 				4D88931718D320D20038AFD4 /* UIKit.framework in Frameworks */,
 				4D88931318D320D20038AFD4 /* Foundation.framework in Frameworks */,
@@ -111,9 +110,6 @@
 		4D88930618D320D20038AFD4 = {
 			isa = PBXGroup;
 			children = (
-				529E744018F63AA600BF84DD /* libstdc++.6.dylib */,
-				5288036B18F62E3E0039005B /* libstdc++.6.0.9.dylib */,
-				5296DA3F18F624EF00EA9BEE /* libstdc++.dylib */,
 				4D88934118D320DB0038AFD4 /* examples */,
 				4D88931818D320D20038AFD4 /* RefDocExamples */,
 				4D88933118D320D30038AFD4 /* RefDocExamplesTests */,
@@ -134,6 +130,8 @@
 		4D88931118D320D20038AFD4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4272AB6918F6D42B00397B62 /* libstdc++.6.dylib */,
+				4272AB6718F6ABB800397B62 /* libstdc++.dylib */,
 				4D88935618D321130038AFD4 /* libc++.dylib */,
 				4D88935418D321080038AFD4 /* Tightdb.framework */,
 				4D88931218D320D20038AFD4 /* Foundation.framework */,
