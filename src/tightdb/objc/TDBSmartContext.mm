@@ -209,7 +209,7 @@ void throw_objc_exception(exception &ex)
             _group = &_sharedGroup->begin_read(); // Throws
 
             // Revive all group level table accessors
-            for (TDBPrivateWeakTableRef *weakTableRef in _weakTableRefs) {
+            for (TDBPrivateWeakTableReference *weakTableRef in _weakTableRefs) {
                 TDBTable *table = [weakTableRef table];
                 size_t indexInGroup = [weakTableRef indexInGroup];
                 ConstTableRef table_2 = _group->get_table(indexInGroup); // Throws
