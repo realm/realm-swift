@@ -64,6 +64,7 @@ Description......
 * `addRow`, `insertRow`, and row updates can be done using objects
    derived from `NSObject`.
 * `where` has been added to `TDBView`and `TDBViewProtocol`.
+* Adding support for "smart" contexts (`TDBSmartContext`).
 
 
 =============================================================
