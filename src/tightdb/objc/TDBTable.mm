@@ -89,14 +89,6 @@ using namespace std;
     return self;
 }
 
--(void)dealloc
-{
-#ifdef TIGHTDB_DEBUG
-    // NSLog(@"TDBTable dealloc");
-#endif
-    m_parent = nil; // FIXME: Does this really make a difference?
-}
-
 -(BOOL)_checkType
 {
     return YES;
