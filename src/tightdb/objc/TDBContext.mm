@@ -21,10 +21,9 @@
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/group_shared.hpp>
 
-#import <tightdb/objc/TDBContext.h>
-#import <tightdb/objc/TDBTransaction_noinst.h>
-
-#include <tightdb/objc/util_noinst.hpp>
+#import "TDBContext.h"
+#import "TDBTransaction_noinst.h"
+#import "util_noinst.hpp"
 
 using namespace std;
 
