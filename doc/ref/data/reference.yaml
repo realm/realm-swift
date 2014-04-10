@@ -19,9 +19,9 @@ DESCR     : >
             TightDB integrates seamless in Objective-C, making it
             fast to learn and easy to use.  You can replace your traditional data
             structures with TightDB. Whether it is a simple array of integers or a
-            complex structure, you interface to TightDB as easily as using a
+            complex data structure, you interface to TightDB as easily as using a
             standard array like container. But in addition you can
-            handle much more data in much less space, you get powerful query
+            handle much more data in much less memory, you get powerful query
             possibilities in an intuitive language and the ability to share your data
             across all supported languages and platforms.
 
@@ -34,8 +34,15 @@ DESCR     : >
 
             Tables organize data in columns and rows and data is compacted for
             low memory usage. The interface to the data resembles the native
-            data structures. Moreover, tables can have nested tables as data. Using subtables
-            and mixed types you can build arbitrarily complex data structures.
+            data structures. Moreover, tables can have nested tables
+            as data (often referred to as subtables).
+
+            A table can work standalone but it is common to create
+            tables within a <i>context</i> (represented by
+            {@link class_context}). A context can be read and
+            written to disk while a table cannot. Moreover, the
+            context adds transactions - through {@link
+            class_transaction} - to TightDB.
 
             The table supports the most common types including numbers, timestamps and strings.
             It is possible to use a TightDB table class as column type. This means that you can
@@ -48,6 +55,8 @@ DESCR     : >
             The Objective-C binding to TightDB utilizes Cocoa objects (<code>NSNumber</code>,
             <code>NSString</code>, <code>NSDate</code>, etc.) to support the <b>Mixed</b> typed
             columns.
+
+            Using subtables and mixed types you can build arbitrarily complex data structures.
 
             The table below shows how the TightDB data types are mapped to Cocoa classes.
 
@@ -67,17 +76,11 @@ DESCR     : >
               </tbody>
             </table>
 
-            It is possible to query data using the {@link class_dyn_query} 
+            It is possible to query data using the {@link class_dyn_query}
             class. Queries can be complex - involving
             any number of columns and values. You can either apply aggregate functions to you
             resulting data set or use the data set in your application as a
             {@link class_dyn_tableview} object.
-
-            The {@link class_group} class lets you serialize tables to disk or memory. The
-            TightDB data format is consistent across operating systems, hardware platforms,
-            and programming languages. This implies that you can share data across applications
-            and environments. For multi-threaded or multi-process applications, you can
-            use the {@link class_shared_group}.
 
 IMPORT    : [reference, typed_table_ref, dyn_table_ref, dyn_query_ref, group_ref, typed_view_ref, dyn_view_ref, shared_group_ref, typed_query_ref, mixed_ref]
 IMPORTPATH: ../../tightdb/doc/ref_cpp/data
@@ -93,14 +96,14 @@ CATEGORIES:                       # list global class-id in order of appearence
   - dyn_view
   - dyn_query
 - Collection:
-  - transaction
   - context
+  - transaction
 #- Helpers:
 #  - cursor
 
 EXAMPLES  :
 - DESCR   :
-  CODE    : #ex_objc_intro           # id to example code
+  CODE    : ex_objc_intro           # id to example code
 
 ## Checked:
 ## dyn_table_ref
