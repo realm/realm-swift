@@ -81,8 +81,9 @@
 
 // Table type and schema
 -(BOOL)isEqual:(id)otherTableClass;
--(BOOL)hasSameDescriptorAs:(Class)otherTableClass;
 -(id)castToTypedTableClass:(Class)typedTableClass;
+// FIXME: implement method below and reenable and document it
+// -(BOOL)hasSameDescriptorAs:(Class)otherTableClass;
 
 -(TDBType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 
