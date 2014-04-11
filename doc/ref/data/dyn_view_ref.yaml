@@ -105,7 +105,7 @@ CATEGORIES :
         DESCR  :
 
   - g_dyn_view_get_column_type:
-      NAME     : columnTypeOfColumnWithIndex
+      NAME     : "columnTypeOfColumnWithIndex:"
       SUMMARY  : *g_dyn_table_get_column_type_summary
       DESCR    :
       - TEXT   : *g_dyn_table_get_column_type_descr1
@@ -127,7 +127,7 @@ CATEGORIES :
   METHODS:
   - g_dyn_view_cursor_at_index:
       NAME     : "rowAtIndex:"
-      SUMMARY  : Returns the row at a specified row number.
+      SUMMARY  : Returns the row at a specified row index.
       DESCR    : *objc_typed_table_cursor_at_index_descr
       SIGNATURE: (TDBRow *)rowAtIndex:(NSUInteger)rowIndex
       PARAMS:
