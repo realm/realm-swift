@@ -8,7 +8,7 @@
 
 #UNDOCUMENTED: [commit, to_json, get_table_typed]
 
-ID         : class_group
+ID         : class_transaction
 TITLE      : TDBTransaction
 SUMMARY    : A TDBTransaction is a fully ACID compliant access to tables.
 DESCR      : >
@@ -42,7 +42,7 @@ CATEGORIES:
       - DESCR  :
         CODE   : ex_objc_group_optional_table
   - g_group_get_table:
-      IGNORE   : ""      
+      IGNORE   : ""
   - g_group_get_table_if_exists:
       NAMES    : "tableWithName:"
       SUMMARY  : *g_group_get_table_summary
