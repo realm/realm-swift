@@ -21,9 +21,9 @@
 		522AF34818F372AB00237BAB /* new@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 522AF34718F372AB00237BAB /* new@2x.png */; };
 		522AF34B18F372AB00237BAB /* MyOldViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 522AF34918F372AB00237BAB /* MyOldViewController.xib */; };
 		522AF34E18F372AB00237BAB /* MyNewViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 522AF34C18F372AB00237BAB /* MyNewViewController.xib */; };
+		52ADEC7618F8351F000718FF /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 52ADEC7518F8351F000718FF /* libstdc++.6.dylib */; };
 		52CFD12318F37BDE0088B460 /* Tightdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52CFD12218F37BDE0088B460 /* Tightdb.framework */; };
 		52CFD12918F37C520088B460 /* MyBackgroundThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 52CFD12818F37C520088B460 /* MyBackgroundThread.m */; };
-		80FE492918F41B0A003ACC23 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 80FE492818F41B0A003ACC23 /* libc++.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +47,7 @@
 		522AF34718F372AB00237BAB /* new@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "new@2x.png"; sourceTree = "<group>"; };
 		522AF34A18F372AB00237BAB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MyOldViewController.xib; sourceTree = "<group>"; };
 		522AF34D18F372AB00237BAB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MyNewViewController.xib; sourceTree = "<group>"; };
+		52ADEC7518F8351F000718FF /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "usr/lib/libstdc++.6.dylib"; sourceTree = SDKROOT; };
 		52CFD12218F37BDE0088B460 /* Tightdb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Tightdb.framework; path = ../../Tightdb.framework; sourceTree = "<group>"; };
 		52CFD12518F37BFE0088B460 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
 		52CFD12718F37C2D0088B460 /* MyBackgroundThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyBackgroundThread.h; sourceTree = "<group>"; };
@@ -59,7 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				80FE492918F41B0A003ACC23 /* libc++.dylib in Frameworks */,
+				52ADEC7618F8351F000718FF /* libstdc++.6.dylib in Frameworks */,
 				522AF32A18F372AB00237BAB /* UIKit.framework in Frameworks */,
 				522AF32C18F372AB00237BAB /* Foundation.framework in Frameworks */,
 				522AF32E18F372AB00237BAB /* CoreGraphics.framework in Frameworks */,
@@ -91,6 +92,7 @@
 		522AF32818F372AB00237BAB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				52ADEC7518F8351F000718FF /* libstdc++.6.dylib */,
 				80FE492818F41B0A003ACC23 /* libc++.dylib */,
 				52CFD12218F37BDE0088B460 /* Tightdb.framework */,
 				522AF32918F372AB00237BAB /* UIKit.framework */,
