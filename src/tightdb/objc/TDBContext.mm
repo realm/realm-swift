@@ -22,9 +22,9 @@
 #include <tightdb/group_shared.hpp>
 
 #import <tightdb/objc/TDBContext.h>
-#import <tightdb/objc/TDBTransaction_priv.h>
+#import <tightdb/objc/TDBTransaction_noinst.h>
 
-#include <tightdb/objc/util.hpp>
+#include <tightdb/objc/util_noinst.hpp>
 
 #define TIGHTDB_CRASH_REPORTING_ENABLED 1
 
@@ -44,7 +44,7 @@ static TDBCrashReportingAgentLauncher* s_agentLauncher = nil;
     tightdb::util::UniquePtr<tightdb::SharedGroup> m_shared_group;
 }
 
-+(TDBContext*)contextWithPersistenceToFile:(NSString*)path withError:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
++ (void)load
 {
 #ifdef TIGHTDB_CRASH_REPORTING_ENABLED
     static dispatch_once_t once;
@@ -55,7 +55,10 @@ static TDBCrashReportingAgentLauncher* s_agentLauncher = nil;
         [s_agentLauncher startCrashReporter];
     });
 #endif
+}
 
++(TDBContext*)contextWithPersistenceToFile:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
+{
     TDBContext* shared_group = [[TDBContext alloc] init];
     if (!shared_group)
         return nil;
@@ -103,10 +106,9 @@ static TDBCrashReportingAgentLauncher* s_agentLauncher = nil;
         group = &m_shared_group->begin_read();
     }
     catch (std::exception& ex) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                         reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:[NSMutableDictionary dictionary]];  // IMPORTANT: cannot not be nil !!
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+                                       reason:[NSString stringWithUTF8String:ex.what()]
+                                     userInfo:nil];
     }
 
     @try {
@@ -123,8 +125,16 @@ static TDBCrashReportingAgentLauncher* s_agentLauncher = nil;
     }
 }
 
+-(void)readTable:(NSString*)tablename withBlock:(TDBTableReadBlock)block
+{
+    [self readWithBlock:^(TDBTransaction *trx){
+        TDBTable *table = [trx tableWithName:tablename];
+        block(table);
+    }];
+}
 
--(BOOL)writeWithBlock:(TDBWriteBlock)block withError:(NSError**)error
+
+-(BOOL)writeWithBlock:(TDBWriteBlock)block error:(NSError**)error
 {
     tightdb::Group* group;
     try {
@@ -134,10 +144,9 @@ static TDBCrashReportingAgentLauncher* s_agentLauncher = nil;
         // File access errors are treated as exceptions here since they should not occur after the shared
         // group has already beenn successfully opened on the file and memeory mapped. The shared group constructor handles
         // the excepted error related to file access.
-        NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                         reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+                                       reason:[NSString stringWithUTF8String:ex.what()]
+                                     userInfo:nil];
     }
 
     BOOL confirmation = NO;
@@ -156,10 +165,9 @@ static TDBCrashReportingAgentLauncher* s_agentLauncher = nil;
             m_shared_group->commit();
         }
         catch (std::exception& ex) {
-            NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                             reason:@""
-                                                           userInfo:[NSMutableDictionary dictionary]];
-            [exception raise];
+            @throw [NSException exceptionWithName:@"tightdb:core_exception"
+                                           reason:[NSString stringWithUTF8String:ex.what()]
+                                         userInfo:nil];
         }
         return YES;
     }
@@ -177,9 +185,41 @@ static TDBCrashReportingAgentLauncher* s_agentLauncher = nil;
     return NO;
 }
 
+-(BOOL)writeTable:(NSString*)tablename withBlock:(TDBTableWriteBlock)block error:(NSError **)error
+{
+    return [self writeWithBlock:^(TDBTransaction *trx){
+        TDBTable *table = [trx tableWithName:tablename];
+        return block(table);
+    } error: error];
+}
+
 -(BOOL) hasChangedSinceLastTransaction
 {
     return m_shared_group->has_changed();
+}
+
+-(BOOL)pinReadTransactions
+{
+    try {
+        return m_shared_group->pin_read_transactions();
+    }
+    catch(std::exception& ex) { 
+        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+                                       reason:[NSString stringWithUTF8String:ex.what()]
+                                     userInfo:nil];
+    }
+}
+
+-(void)unpinReadTransactions
+{
+    try {
+        m_shared_group->unpin_read_transactions();
+    }
+    catch(std::exception& ex) {
+        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+                                       reason:[NSString stringWithUTF8String:ex.what()]
+                                     userInfo:nil];
+    }
 }
 
 @end

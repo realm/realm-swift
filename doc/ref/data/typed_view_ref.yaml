@@ -9,7 +9,7 @@
 # JJEPSEN c++ reference documentation note :  get/set should be replaced with operator overloading
 
 ID         : class_typed_tableview
-TITLE      : TableView (typed)
+TITLE      : TDBView (typed)
 SUMMARY    : *g_typed_view_intro_summary
 DESCR      : *g_typed_view_intro_descr
 SEE        :
@@ -25,9 +25,9 @@ CATEGORIES :
       NAME     : count
       SUMMARY  : *g_typed_table_size_summary
       DESCR    : *g_typed_table_size_descr
-      SIGNATURE: (size_t)count
+      SIGNATURE: (NSUInteger)count
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_typed_view_size_return1_descr
       EXAMPLES:
       - CODE   : ex_objc_typed_view_size
@@ -60,10 +60,10 @@ CATEGORIES :
       SUMMARY  : Returns a typed cursor at a specified row number.
       DESCR    : &objc_typed_table_cursor_at_index_descr
                  The cursor is initialized using the table view index. Internally the cursor uses the source table index.
-      SIGNATURE: "- (TableName_Cursor *)cursorAtIndex:(size_t)ndx"
+      SIGNATURE: "- (TableName_Cursor *)cursorAtIndex:(NSUInteger)ndx"
       PARAMS:
       - NAME   : ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : The row number in the table view.
       RETURN:
         TYPES  : TableName_Cursor
@@ -73,13 +73,13 @@ CATEGORIES :
       NAME     : getSourceIndex
       SUMMARY  : *g_typed_view_get_source_ndx_summary
       DESCR    : *g_typed_view_get_source_ndx_descr
-      SIGNATURE: (size_t)getSourceIndex:(size_t)ndx
+      SIGNATURE: (NSUInteger)getSourceIndex:(NSUInteger)ndx
       PARAMS:
       - NAME   : ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_typed_view_parameter_row_position_descr
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_typed_view_return_row_position_descr
       EXAMPLES:
       - CODE   : ex_objc_typed_view_get_source_ndx
@@ -88,10 +88,10 @@ CATEGORIES :
       NAME     : removeRowAtIndex
       SUMMARY  : *g_typed_table_remove_row_summary
       DESCR    : *g_typed_table_remove_row_descr
-      SIGNATURE: (void)removeRowAtIndex:(size_t)ndx
+      SIGNATURE: (void)removeRowAtIndex:(NSUInteger)ndx
       PARAMS:
       - NAME   : ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_typed_view_parameter_row_position_descr
       EXAMPLES:
       - CODE   : ex_objc_typed_table_remove
@@ -119,10 +119,10 @@ CATEGORIES :
       DESCR    : *g_typed_view_get_subtable_size_descr
       PARAMS:
       - NAME   : row_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_typed_view_parameter_row_position_descr
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_typed_view_size_return1_descr
       EXAMPLES:
       - CODE   : ex_objc_typed_view_get_subtable
@@ -136,7 +136,7 @@ CATEGORIES :
       DESCR    : This method removes all rows in a subtable.
       PARAMS:
       - NAME   : row_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : The row index.
       EXAMPLES:
       - CODE   : ex_objc_typed_view_clear_subtable
@@ -168,20 +168,20 @@ CATEGORIES :
       SUMMARY  : Find first match row.
       DESCR    : This method finds the first matching row.
       SIGNATURE: |
-                 size_t find_first_bool(bool value) const;
-                 size_t find_first_int(int64_t value) const;
-                 size_t find_first_float(float value) const;
-                 size_t find_first_double(double value) const;
-                 size_t find_first_date(time_t value) const;
-                 size_t find_first_string(const char* value) const;
+                 NSUInteger find_first_bool(bool value) const;
+                 NSUInteger find_first_int(int64_t value) const;
+                 NSUInteger find_first_float(float value) const;
+                 NSUInteger find_first_double(double value) const;
+                 NSUInteger find_first_date(time_t value) const;
+                 NSUInteger find_first_string(const char* value) const;
       CONST    : True
       PARAMS:
       - NAME   : value
         TYPES  : [bool, int64_t, float, double, time_t, const char*]
         DESCR  : The value.
       RETURN:
-        TYPES  : size_t
-        DESCR  : "The row index or <code>tightdb::not_found</code> (equal to <code>std::size_t(-1)</code>) if there is no match."
+        TYPES  : NSUInteger
+        DESCR  : "The row index or <code>NSNotFound</code> if there is no match."
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_find_first_xxx
         DESCR  :
@@ -277,7 +277,7 @@ CATEGORIES :
       DESCR    : *g_typed_view_maximum_descr
       CONST    : True
       SIGNATURE: |
-                 int64_t maximum(size_t column_ndx) const;
+                 int64_t maximum(NSUInteger column_ndx) const;
                  float   maximum_float() const;
                  double  maximum_double() const;
       RETURN:
@@ -355,7 +355,7 @@ CATEGORIES :
         TYPES  : std::ostream&
         DESCR  : Output stream.
       - NAME   : limit
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : "The number of rows to convert. Default: 500."
       EXAMPLES:
       - CODE   : ex_objc_typed_view_to_string

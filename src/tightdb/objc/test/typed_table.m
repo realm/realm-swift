@@ -23,7 +23,7 @@
 #import <tightdb/objc/Tightdb.h>
 
 TIGHTDB_TABLE_1(TestTableSub,
-                Age,  Int)
+                age,  Int)
 
 TIGHTDB_TABLE_9(TestTableAllTypes,
                 BoolCol,   Bool,
@@ -50,26 +50,26 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     STAssertNotNil(table, @"Table is nil");
 
     // Verify column types
-    STAssertEquals(TDBBoolType,   [table columnTypeOfColumn:0], @"First column not bool");
-    STAssertEquals(TDBIntType,    [table columnTypeOfColumn:1], @"Second column not int");
-    STAssertEquals(TDBFloatType,  [table columnTypeOfColumn:2], @"Third column not float");
-    STAssertEquals(TDBDoubleType, [table columnTypeOfColumn:3], @"Fourth column not double");
-    STAssertEquals(TDBStringType, [table columnTypeOfColumn:4], @"Fifth column not string");
-    STAssertEquals(TDBBinaryType, [table columnTypeOfColumn:5], @"Sixth column not binary");
-    STAssertEquals(TDBDateType,   [table columnTypeOfColumn:6], @"Seventh column not date");
-    STAssertEquals(TDBTableType,  [table columnTypeOfColumn:7], @"Eighth column not table");
-    STAssertEquals(TDBMixedType,  [table columnTypeOfColumn:8], @"Ninth column not mixed");
+    STAssertEquals(TDBBoolType,   [table columnTypeOfColumnWithIndex:0], @"First column not bool");
+    STAssertEquals(TDBIntType,    [table columnTypeOfColumnWithIndex:1], @"Second column not int");
+    STAssertEquals(TDBFloatType,  [table columnTypeOfColumnWithIndex:2], @"Third column not float");
+    STAssertEquals(TDBDoubleType, [table columnTypeOfColumnWithIndex:3], @"Fourth column not double");
+    STAssertEquals(TDBStringType, [table columnTypeOfColumnWithIndex:4], @"Fifth column not string");
+    STAssertEquals(TDBBinaryType, [table columnTypeOfColumnWithIndex:5], @"Sixth column not binary");
+    STAssertEquals(TDBDateType,   [table columnTypeOfColumnWithIndex:6], @"Seventh column not date");
+    STAssertEquals(TDBTableType,  [table columnTypeOfColumnWithIndex:7], @"Eighth column not table");
+    STAssertEquals(TDBMixedType,  [table columnTypeOfColumnWithIndex:8], @"Ninth column not mixed");
 
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
     NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
-    NSDate *timeNow = [NSDate date];
+    NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
+    NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
     TestTableSub* subtab1 = [[TestTableSub alloc] init];
     TestTableSub* subtab2 = [[TestTableSub alloc] init];
-    [subtab1 addAge:200];
-    [subtab2 addAge:100];
-    TDBMixed* mixInt1   = [TDBMixed mixedWithInt64:1];
-    TDBMixed* mixSubtab = [TDBMixed mixedWithTable:subtab2];
+    [subtab1 addage:200]; // NOTE: the name is simply add+name of first column!
+    [subtab2 addage:100];
+    NSNumber* mixInt1   = [NSNumber numberWithLongLong:1];
 
     TestTableAllTypesRow* c;
 
@@ -81,7 +81,7 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     c = [table addEmptyRow];
 
         c.BoolCol   = YES  ; c.IntCol  = 506     ; c.FloatCol = 7.7         ; c.DoubleCol = 8.8       ; c.StringCol = @"banach";
-        c.BinaryCol = bin2 ; c.DateCol = timeNow ; c.TableCol = subtab2     ; c.MixedCol  = mixSubtab ;
+        c.BinaryCol = bin2 ; c.DateCol = timeNow ; c.TableCol = subtab2     ; c.MixedCol  = subtab2 ;
 
     TestTableAllTypesRow* row1 = [table rowAtIndex:0];
     TestTableAllTypesRow* row2 = [table rowAtIndex:1];
@@ -98,12 +98,12 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     STAssertTrue([row2.StringCol isEqual:@"banach"], @"row2.StringCol");
     STAssertTrue([row1.BinaryCol isEqual:bin1],      @"row1.BinaryCol");
     STAssertTrue([row2.BinaryCol isEqual:bin2],      @"row2.BinaryCol");
-  //  STAssertEquals(row1.DateCol, (time_t)0,          @"row1.DateCol");
-  //  STAssertEquals(row2.DateCol, timeNow,            @"row2.DateCol");
+    STAssertTrue(([row1.DateCol isEqual:timeZero]),  @"row1.DateCol");
+    STAssertTrue(([row2.DateCol isEqual:timeNow]),   @"row2.DateCol");
     STAssertTrue([row1.TableCol isEqual:subtab1],    @"row1.TableCol");
     STAssertTrue([row2.TableCol isEqual:subtab2],    @"row2.TableCol");
     STAssertTrue([row1.MixedCol isEqual:mixInt1],    @"row1.MixedCol");
-    STAssertTrue([row2.MixedCol isEqual:mixSubtab],  @"row2.MixedCol");
+    STAssertTrue([row2.MixedCol isEqual:subtab2],    @"row2.MixedCol");
 
     STAssertEquals([table.IntCol minimum], (int64_t)54,                 @"IntCol min");
     STAssertEquals([table.IntCol maximum], (int64_t)506,                @"IntCol max");
@@ -128,12 +128,14 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     TestTableSub *table = [[TestTableSub alloc] init];
 
     // Add some rows
-    [table addAge: 10];
-    [table addAge: 20];
+    [table addage: 10];
+    [table addage:20];
 
+    table[0].age = 7;
+    
     // Verify that you can access rows with object subscripting
-    STAssertEquals(table[0].Age, (int64_t)10, @"table[0].age");
-    STAssertEquals(table[1].Age, (int64_t)20, @"table[1].age");
+    STAssertEquals(table[0].age, (int64_t)7, @"table[0].age");
+    STAssertEquals(table[1].age, (int64_t)20, @"table[1].age");
 }
 
 @end

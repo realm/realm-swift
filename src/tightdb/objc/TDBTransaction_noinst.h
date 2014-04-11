@@ -18,32 +18,11 @@
  *
  **************************************************************************/
 
-
-/* NBNB. This class is not included in our public framework!
- * It contains selectors removed from Transaction when the old Group became Transaction.
- * The following selectors are all tested extensively from previuos.
- * They have been put here, as we might wan't to reintroduce Group later on....
- * MEKJAER
- */
-
 #import <Foundation/Foundation.h>
-#import "TDBTransaction.h"
-
-@class TDBBinary;
-@class TDBTable;
 
 
-@interface  TDBTransaction() // Selectors are currently implemented in TDBTransaction
+@interface TDBTransaction (noinst)
 
-/*
- * Init a free-stading in memory group
- */
-+(TDBTransaction *)group;
++(TDBTransaction*)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only;
 
-+(TDBTransaction *)groupWithFile:(NSString *)filename error:(NSError *__autoreleasing *)error;
-
-+(TDBTransaction *)groupWithBuffer:(NSData *)buffer error:(NSError *__autoreleasing *)error;
-
--(NSData *)writeContextToBuffer;
 @end
-

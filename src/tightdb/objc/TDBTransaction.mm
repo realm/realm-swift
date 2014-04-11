@@ -22,11 +22,12 @@
 #include <tightdb/lang_bind_helper.hpp>
 
 #import <tightdb/objc/TDBTransaction.h>
-#import <tightdb/objc/TDBTransaction_priv.h>
+#import <tightdb/objc/TDBTransaction_noinst.h>
 #import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBTable_priv.h>
+#import <tightdb/objc/TDBTable_noinst.h>
+#import "PrivateTDB.h"
 
-#include <tightdb/objc/util.hpp>
+#include <tightdb/objc/util_noinst.hpp>
 
 using namespace std;
 
@@ -59,13 +60,12 @@ using namespace std;
     return m_group->has_table(ObjcStringAccessor(name));
 }
 
--(TDBTable *)getTableWithName:(NSString *)name
+-(TDBTable *)tableWithName:(NSString *)name
 {
     if ([name length] == 0) {
-        NSException *exception = [NSException exceptionWithName:@"tightdb:table_name_exception"
-                                                         reason:@"Name must be a non-empty NSString"
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
+                                       reason:@"Name must be a non-empty NSString"
+                                     userInfo:nil];
     }
     
     // If table does not exist in context, return nil
@@ -86,13 +86,12 @@ using namespace std;
     }
 }
 
--(id)getTableWithName:(NSString *)name asTableClass:(__unsafe_unretained Class)class_obj
+-(id)tableWithName:(NSString *)name asTableClass:(__unsafe_unretained Class)class_obj
 {
     if ([name length] == 0) {
-        NSException *exception = [NSException exceptionWithName:@"tightdb:table_name_exception"
-                                                         reason:@"Name must be a non-empty NSString"
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
+                                       reason:@"Name must be a non-empty NSString"
+                                     userInfo:nil];
     }
     
     // If table does not exist in context, return nil
@@ -135,24 +134,21 @@ using namespace std;
 -(TDBTable *)createTableWithName:(NSString*)name
 {
     if ([name length] == 0) {
-        NSException *exception = [NSException exceptionWithName:@"tightdb:table_name_exception"
-                                                         reason:@"Name must be a non-empty NSString"
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
+                                       reason:@"Name must be a non-empty NSString"
+                                     userInfo:nil];
     }
     
     if (m_read_only) {
-        NSException *exception = [NSException exceptionWithName:@"tightdb:core_read_only_exception"
-                                                         reason:@"Transaction is read-only."
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:core_read_only_exception"
+                                       reason:@"Transaction is read-only."
+                                     userInfo:nil];
     }
     
     if ([self hasTableWithName:name]) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:table_with_name_already_exists"
-                                                         reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the context.", name]
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:table_with_name_already_exists"
+                                       reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the context.", name]
+                                     userInfo:nil];
     }
 
     TDBTable* table = [[TDBTable alloc] _initRaw];
@@ -171,24 +167,21 @@ using namespace std;
 -(id)createTableWithName:(NSString*)name asTableClass:(__unsafe_unretained Class)class_obj
 {
     if ([name length] == 0) {
-        NSException *exception = [NSException exceptionWithName:@"tightdb:table_name_exception"
-                                                         reason:@"Name must be a non-empty NSString"
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+       @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
+                                      reason:@"Name must be a non-empty NSString"
+                                    userInfo:nil];
     }
     
     if (m_read_only) {
-        NSException *exception = [NSException exceptionWithName:@"tightdb:core_read_only_exception"
-                                                         reason:@"Transaction is read-only."
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:core_read_only_exception"
+                                       reason:@"Transaction is read-only."
+                                     userInfo:nil];
     }
     
     if ([self hasTableWithName:name]) {
-        NSException* exception = [NSException exceptionWithName:@"tightdb:table_with_name_already_exists"
-                                                         reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the context.", name]
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:table_with_name_already_exists"
+                                       reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the context.", name]
+                                     userInfo:nil];
     }
 
     TDBTable* table = [[class_obj alloc] _initRaw];
@@ -219,10 +212,9 @@ using namespace std;
         group->m_group = new tightdb::Group;
     }
     catch (std::exception& ex) {
-        NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                         reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:[NSMutableDictionary dictionary]];  // IMPORTANT: cannot not be nil !!
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+                                       reason:[NSString stringWithUTF8String:ex.what()]
+                                     userInfo:nil];
     }
     group->m_is_owned  = YES;
     group->m_read_only = NO;
@@ -242,7 +234,7 @@ using namespace std;
 }
 
 /* Moved to group_priv header for now */
-+(TDBTransaction *)groupWithFile:(NSString *)filename withError:(NSError **)error
++(TDBTransaction *)groupWithFile:(NSString *)filename error:(NSError **)error
 {
     TDBTransaction* group = [[TDBTransaction alloc] init];
     if (!group)
@@ -278,7 +270,7 @@ using namespace std;
 }
 
 /* Moved to group_priv header for now */
-+(TDBTransaction*)groupWithBuffer:(NSData*)buffer withError:(NSError**)error
++(TDBTransaction*)groupWithBuffer:(NSData*)buffer error:(NSError**)error
 {
     TDBTransaction* group = [[TDBTransaction alloc] init];
     if (!group)
@@ -295,10 +287,9 @@ using namespace std;
         return nil;
     }
     catch (std::exception& ex) {
-        NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                         reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:[NSMutableDictionary dictionary]];  // IMPORTANT: cannot not be nil !!
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+                                       reason:[NSString stringWithUTF8String:ex.what()]
+                                     userInfo:nil];
     }
     group->m_is_owned  = YES;
     group->m_read_only = NO;
@@ -311,7 +302,7 @@ using namespace std;
 }
 
 /* Moved to group_priv header for now */
--(BOOL)writeContextToFile:(NSString*)path withError:(NSError* __autoreleasing*)error
+-(BOOL)writeContextToFile:(NSString*)path error:(NSError* __autoreleasing*)error
 {
     try {
         m_group->write(tightdb::StringData(ObjcStringAccessor(path)));
@@ -349,10 +340,9 @@ using namespace std;
         return [[NSData alloc] initWithBytes:static_cast<const void *>(bd.data()) length:bd.size()];
     }
     catch (std::exception& ex) {
-        NSException *exception = [NSException exceptionWithName:@"tightdb:core_exception"
-                                                         reason:[NSString stringWithUTF8String:ex.what()]
-                                                       userInfo:[NSMutableDictionary dictionary]];  // IMPORTANT: cannot not be nil !!
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+                                       reason:[NSString stringWithUTF8String:ex.what()]
+                                     userInfo:nil];
     }
     return nil;
 }

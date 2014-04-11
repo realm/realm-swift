@@ -20,17 +20,15 @@
 
 #import <Foundation/Foundation.h>
 
-#include <tightdb/objc/TDBType.h>
+#import "TDBViewProtocol.h"
 
 @class TDBView;
 @class TDBQuery;
 @class TDBDescriptor;
 @class TDBRow;
-@class TDBMixed;
 
-/****************	  TDBTable		****************/
 
-@interface TDBTable: NSObject <NSFastEnumeration>
+@interface TDBTable: NSObject <TDBView,NSFastEnumeration>
 
 @property (nonatomic, readonly) NSUInteger rowCount;
 @property (nonatomic, readonly) NSUInteger columnCount;
@@ -38,38 +36,41 @@
 
 // Initializers for standalone tables
 -(instancetype)init;
+-(instancetype)initWithColumns:(NSArray *)columns;
 
 // Working with columns
--(NSUInteger)addColumnWithName:(NSString *)name andType:(TDBType)type;
+-(NSUInteger)addColumnWithName:(NSString *)name type:(TDBType)type;
+-(void)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString *)newName;
 -(void)removeColumnWithIndex:(NSUInteger)colIndex;
+
 -(NSString *)nameOfColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)indexOfColumnWithName:(NSString *)name;
--(TDBType)columnTypeOfColumn:(NSUInteger)colIndex;
+-(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
-// Getting and setting individual rows (uses object subscripting)
--(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
+// Getting individual rows
 -(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
--(TDBRow *)lastRow;
 -(TDBRow *)firstRow;
+-(TDBRow *)lastRow;
+// Getting and setting individual rows with object subscripting
+-(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
 
-/**
- * Adds a row at the end of the table.
- * If data is nil, an empty row with default values is added.
- */
--(NSUInteger)addRow:(NSObject *)data;
+// Add a row at the end of the table.
+// If data is nil, an empty row with default values is added.
+-(void)addRow:(NSObject *)data;
 
 // Inserting rows at specific positions
--(TDBRow *)insertEmptyRowAtIndex:(NSUInteger)rowIndex;
--(BOOL)insertRow:(id)anObject atIndex:(NSUInteger)rowIndex;
+-(void)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex;
 
 // Removing rows
--(BOOL)removeAllRows;
--(BOOL)removeRowAtIndex:(NSUInteger)rowIndex;
--(BOOL)removeLastRow;
+-(void)removeAllRows;
+-(void)removeRowAtIndex:(NSUInteger)rowIndex;
+-(void)removeLastRow;
 
 // Queries
 -(TDBQuery *)where;
+// Only supported on string columns with an index
+-(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
 
 // Indexing
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;
@@ -79,58 +80,10 @@
 -(BOOL)optimize;
 
 // Table type and schema
--(BOOL)isReadOnly;
--(BOOL)isEqual:(TDBTable *)other;
+-(BOOL)isEqual:(id)otherTableClass;
 -(BOOL)hasSameDescriptorAs:(Class)otherTableClass;
--(id)castClass:(Class)obj;
-
-
-/* -\/- EVERYTHING BELOW HERE SHOULD BE REMOVED / HIDDEN AWAY -\/- */
-
-
--(BOOL)boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(int64_t)intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(float)floatInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(double)doubleInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(NSDate *)dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(NSString *)stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(NSData *)binaryInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(id)tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(Class)tableClass;
--(TDBMixed *)mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
-
--(void)setInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(void)setBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
--(void)setFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
--(void)setDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
--(void)setDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
--(void)setString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
--(void)setBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
--(void)setTable:(TDBTable *)aTable inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
--(void)setMixed:(TDBMixed *)aMixed inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
-
+-(id)castToTypedTableClass:(Class)typedTableClass;
 
 -(TDBType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 
-
-
-/* Private */
--(NSUInteger)TDBAddEmptyRow;
--(NSUInteger)TDBAddEmptyRows:(NSUInteger)numberOfRows;
--(BOOL)TDBInsertBool:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(BOOL)value;
--(BOOL)TDBInsertInt:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(int64_t)value;
--(BOOL)TDBInsertFloat:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(float)value;
--(BOOL)TDBInsertDouble:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(double)value;
--(BOOL)TDBInsertString:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(NSString *)value;
--(BOOL)TDBInsertBinary:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(NSData *)value;
--(BOOL)TDBInsertBinary:(NSUInteger)colIndex ndx:(NSUInteger)ndx data:(const char *)data size:(size_t)size;
--(BOOL)TDBInsertDate:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(NSDate *)value;
--(BOOL)TDBInsertSubtable:(NSUInteger)colIndex ndx:(NSUInteger)ndx;
--(BOOL)TDBInsertSubtable:(NSUInteger)colIndex ndx:(NSUInteger)ndx error:(NSError *__autoreleasing *)error;
--(BOOL)TDBInsertMixed:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(TDBMixed *)value;
--(BOOL)TDBInsertMixed:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(TDBMixed *)value error:(NSError *__autoreleasing *)error;
--(BOOL)TDBInsertDone;
--(id)_initRaw;
--(BOOL)TDBInsertSubtableCopy:(NSUInteger)colIndex row:(NSUInteger)rowNdx subtable:(TDBTable *)subtable;
--(BOOL)TDBInsertSubtableCopy:(NSUInteger)colIndex row:(NSUInteger)rowIndex subtable:(TDBTable *)subtable error:(NSError *__autoreleasing *)error;
 @end

@@ -27,7 +27,7 @@
 #import "TDBType.h"
 #import "TDBDescriptor.h"
 
-#include <tightdb/objc/util.hpp>
+#include <tightdb/objc/util_noinst.hpp>
 
 
 @implementation TDBDescriptor
@@ -48,7 +48,7 @@
 
 // FIXME: Provide a version of this method that takes a 'const char*'. This will simplify _addColumns of MyTable.
 // FIXME: Detect errors from core library
--(BOOL)addColumnWithName:(NSString*)name andType:(TDBType)type
+-(BOOL)addColumnWithName:(NSString*)name type:(TDBType)type
 {
     return [self addColumnWithName:name andType:type error:nil];
 }
@@ -105,17 +105,17 @@
 {
     return m_desc->get_column_count();
 }
--(TDBType)columnTypeOfColumn:(NSUInteger)colIndex
+-(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex
 {
     return (TDBType)m_desc->get_column_type(colIndex);
 }
--(NSString*)columnNameOfColumn:(NSUInteger)colIndex
+-(NSString*)nameOfColumnWithIndex:(NSUInteger)colIndex
 {
     return to_objc_string(m_desc->get_column_name(colIndex));
 }
 -(NSUInteger)indexOfColumnWithName:(NSString *)name
 {
-    return m_desc->get_column_index(ObjcStringAccessor(name));
+    return was_not_found(m_desc->get_column_index(ObjcStringAccessor(name)));
 }
 -(void)dealloc
 {

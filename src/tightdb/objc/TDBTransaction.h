@@ -38,13 +38,13 @@
  * This method returns a table with the specified name from the group.
  * Returns nil if no table with the specified name exists.
  */
--(TDBTable *)getTableWithName:(NSString *)name;
+-(TDBTable *)tableWithName:(NSString *)name;
 
 /**
  * This method returns a table with the specified name from the group.
  * Returns nil if no table with the specified name exists.
  */
--(id)getTableWithName:(NSString *)name asTableClass:(Class)obj;
+-(id)tableWithName:(NSString *)name asTableClass:(Class)obj;
 
 /**
  * This method creates a table with the specific name.
@@ -70,7 +70,7 @@
  * This method will write the context to disk at the specified path.
  * Metadata and tables will be stored, and can be retrieved at later times.
  */
--(BOOL)writeContextToFile:(NSString *)path withError:(NSError *__autoreleasing *)error;
+-(BOOL)writeContextToFile:(NSString *)path error:(NSError *__autoreleasing *)error;
 
 
 #ifdef HAS_TABLE_WITH_NAME_AND_CLASS

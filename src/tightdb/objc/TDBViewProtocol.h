@@ -18,32 +18,29 @@
  *
  **************************************************************************/
 
+#include <tightdb/objc/TDBType.h>
 
-/* NBNB. This class is not included in our public framework!
- * It contains selectors removed from Transaction when the old Group became Transaction.
- * The following selectors are all tested extensively from previuos.
- * They have been put here, as we might wan't to reintroduce Group later on....
- * MEKJAER
- */
+@class TDBRow;
+@class TDBQuery;
 
-#import <Foundation/Foundation.h>
-#import "TDBTransaction.h"
+@protocol TDBView
 
-@class TDBBinary;
-@class TDBTable;
+@property (nonatomic, readonly) NSUInteger rowCount;
+@property (nonatomic, readonly) NSUInteger columnCount;
 
+// Getting and setting individual rows
+-(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
+-(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
+-(TDBRow *)lastRow;
+-(TDBRow *)firstRow;
 
-@interface  TDBTransaction() // Selectors are currently implemented in TDBTransaction
+// Working with columns
+-(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
-/*
- * Init a free-stading in memory group
- */
-+(TDBTransaction *)group;
+// Removing rows
+-(void)removeRowAtIndex:(NSUInteger)rowIndex;
+-(void)removeAllRows;
 
-+(TDBTransaction *)groupWithFile:(NSString *)filename error:(NSError *__autoreleasing *)error;
+-(TDBQuery *)where;
 
-+(TDBTransaction *)groupWithBuffer:(NSData *)buffer error:(NSError *__autoreleasing *)error;
-
--(NSData *)writeContextToBuffer;
 @end
-

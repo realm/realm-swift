@@ -28,7 +28,7 @@ CATEGORIES:
       DESCR    :
       - TEXT   : *g_shared_group_constructor_descr
       - TEXT   : *g_shared_group_durability_modes
-      SIGNATURE: + (TDBContext *)contextWithPersistenceToFile:(NSString *)path withError:(NSError **)error
+      SIGNATURE: + (TDBContext *)contextWithPersistenceToFile:(NSString *)path error:(NSError **)error
       PARAMS:
       - NAME   : path
         TYPES  : NSString
@@ -64,8 +64,18 @@ CATEGORIES:
   - g_shared_group_begin_write:
       NAMES    : writeWithBlock
       SUMMARY  : *g_shared_group_begin_write_summary
-      DESCR    : *g_shared_group_begin_write_descr
-      SIGNATURE: (BOOL)writeWithBlock:(TDBWriteBlock)block withError:(NSError **)error
+      DESCR    : >
+                 Execute a code block as a write transaction in order to
+                 modify one or more tables or add new tables. During a write
+                 transaction, no other transactions can write except the
+                 active one. The other write transactions are blocked and
+                 wait until the active transaction has finished. 
+
+                 If the code block
+                 returns <code>YES</code>, the changes are written to disk/storage
+                 device, while any modification is discarded if the code block
+                 returns <code>NO</code>.
+      SIGNATURE: (BOOL)writeWithBlock:(TDBWriteBlock)block error:(NSError **)error
       PARAMS:
         NAME   : block
         TYPES  : TDBWriteBlock
@@ -83,7 +93,10 @@ CATEGORIES:
   - g_shared_group_begin_read:
       NAMES    : readWithBlock
       SUMMARY  : *g_shared_group_begin_read_summary
-      DESCR    : *g_shared_group_begin_read_descr
+      DESCR    : >
+                 Execute a code blocks as a read transaction. This will allow
+                 you to get information about columns (type, name), number of rows in
+                 a table, access rows, and execute queries on tables.
       SIGNATURE: (void)readWithBlock:(TDBReadBlock)block
       CONST    : True
       PARAMS:

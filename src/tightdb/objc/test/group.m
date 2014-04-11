@@ -47,10 +47,10 @@ TIGHTDB_TABLE_2(TestTableGroup,
     // Create empty group and serialize to disk
     TDBTransaction *toDisk = [TDBTransaction group];
     [fm removeItemAtPath:@"table_test.tightdb" error:NULL];
-    [toDisk writeContextToFile:@"table_test.tightdb" withError:nil];
+    [toDisk writeContextToFile:@"table_test.tightdb" error:nil];
 
     // Load the group
-    TDBTransaction *fromDisk = [TDBTransaction groupWithFile:@"table_test.tightdb" withError:nil];
+    TDBTransaction *fromDisk = [TDBTransaction groupWithFile:@"table_test.tightdb" error:nil];
     if (!fromDisk)
         STFail(@"From disk not valid");
 
@@ -78,7 +78,7 @@ TIGHTDB_TABLE_2(TestTableGroup,
 - (void)testGetTable
 {
     TDBTransaction *g = [TDBTransaction group];
-    STAssertNil([g getTableWithName:@"noTable"], @"Table does not exist");
+    STAssertNil([g tableWithName:@"noTable"], @"Table does not exist");
 }
 
 - (void)testGroupTableCount

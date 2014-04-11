@@ -5,7 +5,7 @@
 
 
 #import <SenTestingKit/SenTestingKit.h>
-#import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/TightdbFast.h>
 #import <tightdb/objc/TDBTable.h>
 
 TIGHTDB_TABLE_3(FuncPeopleTable,
@@ -154,16 +154,16 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
 
     TDBTable *table = [[TDBTable alloc] init];
 
-    size_t const NAME = [table addColumnWithName:@"Name" andType:TDBStringType];
-    size_t const AGE = [table addColumnWithName:@"Age" andType:TDBIntType];
-    size_t const HIRED = [table addColumnWithName:@"Hired" andType:TDBBoolType];
+    size_t const NAME = [table addColumnWithName:@"Name" type:TDBStringType];
+    size_t const AGE = [table addColumnWithName:@"Age" type:TDBIntType];
+    size_t const HIRED = [table addColumnWithName:@"Hired" type:TDBBoolType];
 
     TDBRow *cursor;
 
     // Add rows
     for (int i = 0; i < TABLE_SIZE; i++) {
-        NSUInteger rowIndex = [table addRow:nil];
-        cursor = [table rowAtIndex:rowIndex];
+        [table addRow:nil];
+        cursor = [table lastRow];
         [cursor setString:[@"Person_" stringByAppendingString: [NSString stringWithFormat:@"%d",i]] inColumnWithIndex:NAME];
         [cursor setInt:i inColumnWithIndex:AGE];
         [cursor setBool:i%2 == 0 inColumnWithIndex:HIRED];
@@ -180,7 +180,8 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
     }
 
     // Insert a row
-    cursor = [table insertEmptyRowAtIndex:INSERT_ROW];
+    [table insertRow:nil atIndex:INSERT_ROW];
+    cursor = [table rowAtIndex:INSERT_ROW];
     [cursor setString:@"Person_Inserted" inColumnWithIndex:NAME];
     [cursor setInt:99 inColumnWithIndex:AGE];
     [cursor setBool:YES inColumnWithIndex:HIRED];

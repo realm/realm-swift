@@ -21,7 +21,7 @@
 #import <Foundation/Foundation.h>
 
 #import "TDBTable.h"
-#import "TDBTable_priv.h"
+#import "TDBTable_noinst.h"
 #import "TDBColumnProxy.h"
 
 @implementation TDBColumnProxy
@@ -142,7 +142,7 @@
 @end
 
 @implementation TDBColumnProxyMixed
--(NSUInteger)find:(TDBMixed*)value
+-(NSUInteger)find:(id)value
 {
     return [self.table findRowIndexWithMixed:value inColumnWithIndex:self.column];
 }

@@ -1,14 +1,15 @@
-#import <tightdb/objc/group.h>
-#import <tightdb/objc/tightdb.h>
-
-TIGHTDB_TABLE_1(TestTable,
-                Value, Int)
+#import <tightdb/objc/Tightdb.h>
 
 int main()
 {
     @autoreleasepool {
-        TightdbGroup *db = [TightdbGroup group];
-        TestTable *t = (TestTable *)[db getTable:@"test" withClass:[TestTable class]];
-        return t ? 0 : 1;
+        TDBTable* table = [[TDBTable alloc] init];
+
+        [table addColumnWithName:@"first" type:TDBIntType];
+        [table addColumnWithName:@"second" type:TDBIntType];
+
+        [table addRow:@[@1, @2]];
+
+        return [table rowCount]>0?0:1;
     }
 }

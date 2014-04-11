@@ -18,32 +18,24 @@
  *
  **************************************************************************/
 
+@interface TDBQuery (Fast)
 
-/* NBNB. This class is not included in our public framework!
- * It contains selectors removed from Transaction when the old Group became Transaction.
- * The following selectors are all tested extensively from previuos.
- * They have been put here, as we might wan't to reintroduce Group later on....
- * MEKJAER
- */
+-(int64_t)minIntInColumnWithIndex:(NSUInteger)colIndex;
+-(float)minFloatInColumnWithIndex:(NSUInteger)colIndex;
+-(double)minDoubleInColumnWithIndex:(NSUInteger)colIndex;
+-(NSDate *)minDateInColumnWithIndex:(NSUInteger)colIndex;
 
-#import <Foundation/Foundation.h>
-#import "TDBTransaction.h"
+-(int64_t)maxIntInColumnWithIndex:(NSUInteger)colIndex;
+-(float)maxFloatInColumnWithIndex:(NSUInteger)colIndex;
+-(double)maxDoubleInColumnWithIndex:(NSUInteger)colIndex;
+-(NSDate *)maxDateInColumnWithIndex:(NSUInteger)colIndex;
 
-@class TDBBinary;
-@class TDBTable;
+-(int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex;
+-(double)sumFloatColumnWithIndex:(NSUInteger)colIndex;
+-(double)sumDoubleColumnWithIndex:(NSUInteger)colIndex;
 
+-(double)avgIntColumnWithIndex:(NSUInteger)colIndex;
+-(double)avgFloatColumnWithIndex:(NSUInteger)colIndex;
+-(double)avgDoubleColumnWithIndex:(NSUInteger)colIndex;
 
-@interface  TDBTransaction() // Selectors are currently implemented in TDBTransaction
-
-/*
- * Init a free-stading in memory group
- */
-+(TDBTransaction *)group;
-
-+(TDBTransaction *)groupWithFile:(NSString *)filename error:(NSError *__autoreleasing *)error;
-
-+(TDBTransaction *)groupWithBuffer:(NSData *)buffer error:(NSError *__autoreleasing *)error;
-
--(NSData *)writeContextToBuffer;
 @end
-

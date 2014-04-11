@@ -94,13 +94,13 @@ void tableFunc() {
     // @@Example: advanced_search @@
     // Create query (current employees between 20 and 30 years old)
     PeopleTableQuery *q = [[[people where].Hired columnIsEqualTo:YES]
-                                           .Age   columnIsBetween:20 and_:30];
+                                           .Age   columnIsBetween:20 :30];
 
     // Get number of matching entries
     NSUInteger cnt3 = [q countRows];                     // =&gt; 2
     NSLog(@"RowCount: %i", cnt3);
 
-    // Get the average age (currently only a low-level interface)
+     // You can do aggregates on columns, like calculating the average age
     double avg = [q.Age avg];
     NSLog(@"Avg age: %f", avg);
 
@@ -123,7 +123,7 @@ void sharedGroupFunc() {
 
     // @@Example: transaction @@
     TDBContext *context = [TDBContext contextWithPersistenceToFile:@"people.tightdb"
-                                                            withError:nil];
+                                                            error:nil];
 
     // Start a write transaction
     [context writeWithBlock:^(TDBTransaction *transaction) {
@@ -135,12 +135,12 @@ void sharedGroupFunc() {
         [table addName:@"Bill" Age:53 Hired:YES];
         NSLog(@"Row added!");
         return YES; // Commit (NO would rollback)
-    } withError:nil];
+    } error:nil];
 
     // Start a read transaction
     [context readWithBlock:^(TDBTransaction *transaction) {
         // Get the table
-        PeopleTable *table = [transaction getTableWithName:@"employees"
+        PeopleTable *table = [transaction tableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
 
         // Interate over all rows in table

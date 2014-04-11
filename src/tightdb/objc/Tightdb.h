@@ -18,32 +18,13 @@
  *
  **************************************************************************/
 
+#import <tightdb/objc/TDBTable.h>
+#import <tightdb/objc/TDBView.h>
+#import <tightdb/objc/TDBQuery.h>
+#import <tightdb/objc/TDBRow.h>
+#import <tightdb/objc/TDBContext.h>
+#import <tightdb/objc/TDBVersion.h>
 
-/* NBNB. This class is not included in our public framework!
- * It contains selectors removed from Transaction when the old Group became Transaction.
- * The following selectors are all tested extensively from previuos.
- * They have been put here, as we might wan't to reintroduce Group later on....
- * MEKJAER
- */
-
-#import <Foundation/Foundation.h>
-#import "TDBTransaction.h"
-
-@class TDBBinary;
-@class TDBTable;
-
-
-@interface  TDBTransaction() // Selectors are currently implemented in TDBTransaction
-
-/*
- * Init a free-stading in memory group
- */
-+(TDBTransaction *)group;
-
-+(TDBTransaction *)groupWithFile:(NSString *)filename error:(NSError *__autoreleasing *)error;
-
-+(TDBTransaction *)groupWithBuffer:(NSData *)buffer error:(NSError *__autoreleasing *)error;
-
--(NSData *)writeContextToBuffer;
-@end
-
+#import <tightdb/objc/PrivateHelperMacros.h>
+#import <tightdb/objc/PrivateTableMacros.h>
+#import <tightdb/objc/PrivateTDB.h>
