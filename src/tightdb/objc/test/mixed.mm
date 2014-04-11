@@ -158,7 +158,7 @@ TIGHTDB_TABLE_2(SubMixedTable,
     // Test cast and isClass
     NSLog(@"Is SubMixedTable type: %i", [tableSub hasSameDescriptorAs:[SubMixedTable class]]);
     STAssertEquals([tableSub hasSameDescriptorAs:[SubMixedTable class]], YES,@"Unknown table should be of type SubMixedTable");
-    tableSub = [tableSub castClass:[SubMixedTable class]];
+    tableSub = [tableSub castToTypedTableClass:[SubMixedTable class]];
     NSLog(@"TableSub Size: %lu", [tableSub rowCount]);
     STAssertEquals([tableSub rowCount], (size_t)5,@"Subtable should have 5 rows");
     NSLog(@"Count int: %lu", [table countRowsWithInt:50 inColumnWithIndex:2]);

@@ -27,6 +27,7 @@
  */
 
 #import <Foundation/Foundation.h>
+
 #import "TDBTransaction.h"
 
 @class TDBBinary;
@@ -45,5 +46,5 @@
 +(TDBTransaction *)groupWithBuffer:(NSData *)buffer error:(NSError *__autoreleasing *)error;
 
 -(NSData *)writeContextToBuffer;
-@end
 
+@end

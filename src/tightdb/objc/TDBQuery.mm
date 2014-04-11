@@ -19,23 +19,18 @@
  **************************************************************************/
 
 #include <tightdb/util/unique_ptr.hpp>
-#include <tightdb/util/file.hpp>
 #include <tightdb/exceptions.hpp>
 #include <tightdb/table.hpp>
 #include <tightdb/table_view.hpp>
 #include <tightdb/query.hpp>
 
-#import <tightdb/objc/TDBQuery.h>
-#import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBTable_noinst.h>
-#import <tightdb/objc/TDBView.h>
-#import <tightdb/objc/TDBView_noinst.h>
-#import <tightdb/objc/TDBRow.h>
+#import "TDBQuery.h"
+#import "TDBTable_noinst.h"
+#import "TDBView_noinst.h"
+#import "TDBRow.h"
 #import "NSData+TDBGetBinaryData.h"
-#import <tightdb/objc/PrivateTDB.h>
-
-#include <tightdb/objc/util_noinst.hpp>
-
+#import "PrivateTDB.h"
+#import "util_noinst.hpp"
 
 using namespace std;
 
@@ -73,9 +68,13 @@ using namespace std;
     return self;
 }
 
+-(void)setTableView:(tightdb::TableView&)tableView
+{
+    m_query->tableview(tableView);
+}
+
 -(TDBRow*)getRow:(long)ndx
 {
-
     return m_tmp_row = [[TDBRow alloc] initWithTable:[self originTable] ndx:ndx];
 }
 
@@ -114,7 +113,7 @@ using namespace std;
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"TDBQuery dealloc");
+    // NSLog(@"TDBQuery dealloc");
 #endif
 }
 
@@ -159,13 +158,37 @@ using namespace std;
     return m_query->count();
 }
 
-
 -(NSUInteger)removeRows
 {
+    if ([m_table isReadOnly]) {
+        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+                                       reason:@"You tried to modify an immutable table"
+                                     userInfo:nil];
+    }
     return m_query->remove();
 }
 
-
+-(id)minInColumnWithIndex:(NSUInteger)colIndex
+{
+    TDBType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
+    if (colType == TDBIntType) {
+        return [NSNumber numberWithInteger:[self minIntInColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBDoubleType) {
+        return [NSNumber numberWithDouble:[self minDoubleInColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBFloatType) {
+        return [NSNumber numberWithDouble:[self minFloatInColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBDateType) {
+        return [self minDateInColumnWithIndex:colIndex];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"tightdb:operation_not_supprted"
+                                       reason:@"Min only supported on int, float, double and date columns."
+                                     userInfo:nil];
+    }
+}
 
 -(int64_t)minIntInColumnWithIndex:(NSUInteger)col_ndx
 {
@@ -184,9 +207,34 @@ using namespace std;
 
 -(NSDate *)minDateInColumnWithIndex:(NSUInteger)col_ndx
 {
+    if (self.originTable.rowCount == 0) {
+        return nil;
+    }
     return [NSDate dateWithTimeIntervalSince1970: m_query->minimum_int(col_ndx)];
 }
 
+
+-(id)maxInColumnWithIndex:(NSUInteger)colIndex
+{
+    TDBType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
+    if (colType == TDBIntType) {
+        return [NSNumber numberWithInteger:[self maxIntInColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBDoubleType) {
+        return [NSNumber numberWithDouble:[self maxDoubleInColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBFloatType) {
+        return [NSNumber numberWithDouble:[self maxFloatInColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBDateType) {
+        return [self maxDateInColumnWithIndex:colIndex];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"tightdb:operation_not_supprted"
+                                       reason:@"Max only supported on int, float, double and date columns."
+                                     userInfo:nil];
+    }
+}
 
 -(int64_t)maxIntInColumnWithIndex:(NSUInteger)col_ndx
 {
@@ -205,7 +253,29 @@ using namespace std;
 
 -(NSDate *)maxDateInColumnWithIndex:(NSUInteger)col_ndx
 {
+    if (self.originTable.rowCount == 0) {
+        return nil;
+    }
     return [NSDate dateWithTimeIntervalSince1970: m_query->maximum_int(col_ndx)];
+}
+
+-(NSNumber *)sumColumnWithIndex:(NSUInteger)colIndex
+{
+    TDBType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
+    if (colType == TDBIntType) {
+        return [NSNumber numberWithInteger:[self sumIntColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBDoubleType) {
+        return [NSNumber numberWithDouble:[self sumDoubleColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBFloatType) {
+        return [NSNumber numberWithDouble:[self sumFloatColumnWithIndex:colIndex]];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"tightdb:operation_not_supprted"
+                                       reason:@"Sum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
 }
 
 
@@ -214,18 +284,34 @@ using namespace std;
     return m_query->sum_int(col_ndx);
 }
 
-
 -(double)sumFloatColumnWithIndex:(NSUInteger)col_ndx
 {
     return m_query->sum_float(col_ndx);
 }
-
 
 -(double)sumDoubleColumnWithIndex:(NSUInteger)col_ndx
 {
     return m_query->sum_double(col_ndx);
 }
 
+-(NSNumber *)avgColumnWithIndex:(NSUInteger)colIndex
+{
+    TDBType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
+    if (colType == TDBIntType) {
+        return [NSNumber numberWithDouble:[self avgIntColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBDoubleType) {
+        return [NSNumber numberWithDouble:[self avgDoubleColumnWithIndex:colIndex]];
+    }
+    else if (colType == TDBFloatType) {
+        return [NSNumber numberWithDouble:[self avgFloatColumnWithIndex:colIndex]];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"tightdb:operation_not_supprted"
+                                       reason:@"Avg only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+}
 
 -(double)avgIntColumnWithIndex:(NSUInteger)col_ndx
 {
@@ -237,12 +323,10 @@ using namespace std;
     return m_query->average_float(col_ndx);
 }
 
-
 -(double)avgDoubleColumnWithIndex:(NSUInteger)col_ndx
 {
     return m_query->average_double(col_ndx);
 }
-
 
 
 -(TDBView*)findAllRows
@@ -496,6 +580,7 @@ using namespace std;
     __weak TDBQuery* _query;
     NSUInteger _column_ndx;
 }
+
 -(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
 {
     self = [super init];
@@ -505,11 +590,13 @@ using namespace std;
     }
     return self;
 }
+
 -(TDBQuery*)columnIsEqualTo:(BOOL)value
 {
     [_query getNativeQuery].equal(_column_ndx, bool(value));
     return _query;
 }
+
 @end
 
 
@@ -518,6 +605,7 @@ using namespace std;
     __weak TDBQuery* _query;
     NSUInteger _column_ndx;
 }
+
 -(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
 {
     self = [super init];
@@ -605,10 +693,12 @@ using namespace std;
 
 
 @implementation TDBQueryAccessorFloat
+
 {
     __weak TDBQuery* _query;
     NSUInteger _column_ndx;
 }
+
 -(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
 {
     self = [super init];
@@ -677,6 +767,7 @@ using namespace std;
 {
     return [_query avgFloatColumnWithIndex:_column_ndx];
 }
+
 @end
 
 
@@ -685,6 +776,7 @@ using namespace std;
     __weak TDBQuery* _query;
     NSUInteger _column_ndx;
 }
+
 -(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
 {
     self = [super init];
@@ -741,6 +833,7 @@ using namespace std;
 {
     return [_query minDoubleInColumnWithIndex:_column_ndx];
 }
+
 -(double)max
 {
     return [_query maxDoubleInColumnWithIndex:_column_ndx];
@@ -750,10 +843,12 @@ using namespace std;
 {
     return [_query sumDoubleColumnWithIndex:_column_ndx];
 }
+
 -(double)avg
 {
     return [_query avgDoubleColumnWithIndex:_column_ndx];
 }
+
 @end
 
 
@@ -762,6 +857,7 @@ using namespace std;
     __weak TDBQuery* _query;
     NSUInteger _column_ndx;
 }
+
 -(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
 {
     self = [super init];
@@ -821,6 +917,7 @@ using namespace std;
     [_query getNativeQuery].contains(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
+
 @end
 
 
@@ -829,6 +926,7 @@ using namespace std;
     __weak TDBQuery* _query;
     NSUInteger _column_ndx;
 }
+
 -(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
 {
     self = [super init];
@@ -863,6 +961,7 @@ using namespace std;
     [_query getNativeQuery].contains(_column_ndx, value.tdbBinaryData);
     return _query;
 }
+
 @end
 
 
@@ -871,6 +970,7 @@ using namespace std;
     __weak TDBQuery* _query;
     NSUInteger _column_ndx;
 }
+
 -(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
 {
     self = [super init];
@@ -923,6 +1023,7 @@ using namespace std;
     __weak TDBQuery* _query;
     NSUInteger _column_ndx;
 }
+
 -(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
 {
     self = [super init];
@@ -932,6 +1033,7 @@ using namespace std;
     }
     return self;
 }
+
 @end
 
 
@@ -940,6 +1042,7 @@ using namespace std;
     __weak TDBQuery* _query;
     NSUInteger _column_ndx;
 }
+
 -(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
 {
     self = [super init];
@@ -949,5 +1052,5 @@ using namespace std;
     }
     return self;
 }
-@end
 
+@end

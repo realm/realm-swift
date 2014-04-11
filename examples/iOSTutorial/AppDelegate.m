@@ -119,11 +119,11 @@ void sharedGroupFunc() {
     [fileManager removeItemAtPath:@"people.tightdb" error:&error];
 
     // @@Example: transaction @@
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:@"people.tightdb"
+    TDBContext *context = [TDBContext contextPersistedAtPath:@"people.tightdb"
                                                             error:nil];
 
     // Start a write transaction
-    [context writeWithBlock:^(TDBTransaction *transaction) {
+    [context writeUsingBlock:^(TDBTransaction *transaction) {
         // Get a specific table from the group
         PeopleTable *table = [transaction createTableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
@@ -135,7 +135,7 @@ void sharedGroupFunc() {
     } error:nil];
 
     // Start a read transaction
-    [context readWithBlock:^(TDBTransaction *transaction) {
+    [context readUsingBlock:^(TDBTransaction *transaction) {
         // Get the table
         PeopleTable *table = [transaction tableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
