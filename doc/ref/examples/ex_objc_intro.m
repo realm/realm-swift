@@ -1,12 +1,26 @@
 // @@Example: ex_objc_intro @@
 #import <Foundation/Foundation.h>
 #import <Tightdb/Tightdb.h>
+#import "people.h"
 
-// Define table
-TIGHTDB_TABLE_3(Person,
-                Name, String,
-                Age,  Int,
-                Hired, Bool);
+/*
+ The classes People, PeopleQuery, PeopleView, and PeopleRow are declared
+ (interfaces are generated) in people.h as
+
+ TIGHTDB_TABLE_DEF_3(People,
+                     Name,  String,
+                     Age,   Int,
+                     Hired, Bool)
+
+ and in people.m you must have
+
+ TIGHTDB_TABLE_IMPL_3(People,
+                      Name, String,
+                      Age,  Int,
+                      Hired, Bool)
+
+ in order to generate the implementation of the classes.
+*/
 
 // Use it in a function
 void ex_objc_intro() {
@@ -14,14 +28,13 @@ void ex_objc_intro() {
     NSError *error;
     [fileManager removeItemAtPath:@"people.tightdb" error:&error];
 
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:@"people.tightdb"
-                                                             error:nil];
+    TDBContext *context = [TDBContext contextWithDefaultPersistence];
 
     // Start a write transaction
     [context writeUsingBlock:^(TDBTransaction *transaction) {
         // Get a specific table from the group
-        Person *table = [transaction createTableWithName:@"employees"
-                                            asTableClass:[Person class]];
+        People *table = [transaction createTableWithName:@"employees"
+                                            asTableClass:[People class]];
 
         // Add rows
         [table addRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
@@ -35,15 +48,15 @@ void ex_objc_intro() {
     // Start a read transaction
     [context readUsingBlock:^(TDBTransaction *transaction) {
         // Get the table
-        Person *table = [transaction tableWithName:@"employees"
-                                      asTableClass:[Person class]];
+        People *table = [transaction tableWithName:@"employees"
+                                      asTableClass:[People class]];
 
         // Query the table
-        PersonQuery *query = [[table where].Age columnIsGreaterThan:30];
-        PersonView  *view  = [query findAll];
+        PeopleQuery *query = [[table where].Age columnIsGreaterThan:30];
+        PeopleView  *view  = [query findAll];
 
         // Iterate over all rows in view
-        for (PersonRow *row in view) {
+        for (PeopleRow *row in view) {
             NSLog(@"Name: %@", row.Name);
         }
     }];

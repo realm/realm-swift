@@ -2,12 +2,25 @@
 #import <Tightdb/Tightdb.h>
 #import "people.h"
 
-/* PeopleTable is declared in people.h as
-TIGHTDB_TABLE_3(PeopleTable,
-                Name, String,
-                Age,  Int,
-                Hired, Bool);
-*/
+/*
+ The classes People, PeopleQuery, PeopleView, and PeopleRow are declared
+ (interfaces are generated) in people.h as
+
+ TIGHTDB_TABLE_DEF_3(People,
+                     Name,  String,
+                     Age,   Int,
+                     Hired, Bool)
+
+ and in people.m you must have
+
+ TIGHTDB_TABLE_IMPL_3(People,
+                      Name, String,
+                      Age,  Int,
+                      Hired, Bool)
+
+ in order to generate the implementation of the classes.
+ */
+
 
 void ex_objc_context_intro()
 {
@@ -24,8 +37,8 @@ void ex_objc_context_intro()
     NSError *error = nil;
     BOOL success;
     success = [context writeUsingBlock:^(TDBTransaction *transaction) {
-        PeopleTable *table = [transaction createTableWithName:@"employees"
-                                                 asTableClass:[PeopleTable class]];
+        People *table = [transaction createTableWithName:@"employees"
+                                            asTableClass:[People class]];
         [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
         
         return YES; /* Commit */
@@ -36,8 +49,8 @@ void ex_objc_context_intro()
     
     /* Perform a write transaction (with rollback). */
     success = [context writeUsingBlock:^(TDBTransaction *transaction) {
-        PeopleTable *table = [transaction createTableWithName:@"employees"
-                                                 asTableClass:[PeopleTable class]];
+        People *table = [transaction createTableWithName:@"employees"
+                                            asTableClass:[People class]];
         if ([table rowCount] == 0) {
             NSLog(@"Roll back!");
             return NO; /* Rollback */
@@ -52,9 +65,9 @@ void ex_objc_context_intro()
     
     /* Perfrom a read transaction */
     [context readUsingBlock:^(TDBTransaction *group) {
-        PeopleTable *table = [group tableWithName:@"employees"
-                                     asTableClass:[PeopleTable class]];
-        for (PeopleTableRow *row in table) {
+        People *table = [group tableWithName:@"employees"
+                                asTableClass:[People class]];
+        for (PeopleRow *row in table) {
             NSLog(@"Name: %@", row.Name);
         }
     }];
