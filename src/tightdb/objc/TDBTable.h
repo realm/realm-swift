@@ -72,6 +72,11 @@
 // Only supported on string columns with an index
 -(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
 
+// Predicate queries
+-(TDBRow *)find:(id)condition;
+-(TDBView *)where:(id)condition;
+-(TDBView *)where:(id)condition orderBy:(id)order;
+
 // Indexing
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex;
