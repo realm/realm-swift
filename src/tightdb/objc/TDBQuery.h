@@ -29,12 +29,14 @@
 -(id)initWithTable:(TDBTable *)table error:(NSError *__autoreleasing *)error;
 -(TDBTable *)originTable;
 
+// Combiners
 -(TDBQuery *)group;
 -(TDBQuery *)Or;
 -(TDBQuery *)endGroup;
 -(TDBQuery *)subtableInColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)parent;
 
+// Actions
 -(NSUInteger)countRows;
 -(NSUInteger)removeRows;
 
@@ -44,13 +46,12 @@
 -(NSNumber *)sumColumnWithIndex:(NSUInteger)colIndex;
 -(NSNumber *)avgColumnWithIndex:(NSUInteger)colIndex;
 
-
-/* Search */
+// Search
 -(NSUInteger)indexOfFirstMatchingRow;
 -(NSUInteger)indexOfFirstMatchingRowFromIndex:(NSUInteger)rowIndex;
 -(TDBView *)findAllRows;
 
-/* Conditions: */
+// Conditions
 -(TDBQuery *)boolIsEqualTo:(bool)aBool inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)intIsEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)floatIsEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
@@ -59,7 +60,6 @@
 -(TDBQuery *)stringIsCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)dateIsEqualTo:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)binaryIsEqualTo:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
-
 
 -(TDBQuery *)intIsNotEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)floatIsNotEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
@@ -94,8 +94,10 @@
 -(TDBQuery *)floatIsLessThanOrEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
 -(TDBQuery *)doubleIsLessThanOrEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
 
-
-
+// FIXME:
+// -(TDBQuery *)beginsWith:(NSString *)value
+// -(TDBQuery *)endsWith:(NSString *)value
+// -(TDBQuery *)contains:(NSString *)value
 
 @end
 

@@ -2,7 +2,7 @@
 # Obj-C reference documentation for TDBContext class
 #
 
-ID         : class_shared_group
+ID         : class_context
 TITLE      : TDBContext
 SUMMARY    : The TDBContext class is a way to work with persistent tables.
 DESCR      : >
@@ -82,7 +82,7 @@ CATEGORIES:
                  modify one or more tables or add new tables. During a write
                  transaction, no other transactions can write except the
                  active one. The other write transactions are blocked and
-                 wait until the active transaction has finished. 
+                 wait until the active transaction has finished.
 
                  If the code block
                  returns <code>YES</code>, the changes are written to disk/storage
@@ -93,7 +93,7 @@ CATEGORIES:
         NAME   : block
         TYPES  : TDBWriteBlock
         DESCR  : >
-                 A block of code. The block can modify the tables or add new tables in a 
+                 A block of code. The block can modify the tables or add new tables in a
                  transactional manner.
                  Changes are written to disk if the block returns <code>YES</code>, discarded otherwise.
       RETURN:

@@ -13,6 +13,9 @@
 ## !! All the Conditions don't take a colIndex...
 ## All the Combiners return (void) - don't they return TDBQuery ? - check-&-fix
 
+## NOTICE:
+##  The constructor (initWithTable) is not documented as the user
+##  should never call it explicitely.
 
 ID         : class_dyn_query
 TITLE      : TDBQuery  (dynamic)
@@ -25,6 +28,16 @@ EXAMPLES   :
 IGNORE     : []                   # List of method-ids to ignore
 
 CATEGORIES :
+- Utilities:
+  METHODS:
+  - objc_dyn_query_origin_table:
+      NAME     : originTable
+      SUMMARY  : Returns the origin table.
+      DESCR    : The method returns the table which created the query.
+      RETURN:
+        TYPES  : TDBTable *
+        DESCR  : The origin table.
+
 - Conditions:
   METHODS:
   - g_dyn_query_equals_binary:
@@ -94,10 +107,8 @@ CATEGORIES :
   - g_dyn_query_notEquals_string_2:
       NAME     : "sNotEqualToString:caseSensitive:"
   - g_dyn_query_notEquals_date:
-# Not yet implemented in API
       NAME     : "isNotEqualToDate:"
       TITLE    : "*IsNotEqualTo:inColumnWithIndex:"
-#      NAMES    : [ notEqual, notEqual, notEqual, notEqual, notEqual, notEqual ]
       SIGNATURE: |
                   (TDBQuery *)intIsNotEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
                   (TDBQuery *)floatIsNotEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
@@ -110,7 +121,7 @@ CATEGORIES :
       DESCR    : *g_dyn_query_notEquals_descr
       PARAMS:
       - NAME   : value
-        TYPES  : [BOOL, int64_t, float, double, NSString*, time_t]
+        TYPES  : [BOOL, int64_t, float, double, NSString*, NSDate, NSData]
         DESCR  : *g_dyn_query_value_descr
       - NAME   : inColunmWithIndex
         TYPES  : NSUInteger
@@ -140,10 +151,10 @@ CATEGORIES :
       DESCR    : *g_dyn_query_greaterThan_descr
       PARAMS:
       - NAME   : lower
-        TYPES  : [int64_t, float, double, time_t]
+        TYPES  : [int64_t, float, double, NSDate]
         DESCR  : Lower bound (bound included).
       - NAME   : upper
-        TYPES  : [int64_t, float, double, time_t]
+        TYPES  : [int64_t, float, double, NSDate]
         DESCR  : Upper bound (bound included).
       - NAME   : inColumnWithIndex
         TYPES  : NSUInteger
@@ -153,7 +164,7 @@ CATEGORIES :
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_objc_dyn_query_greaterThan        
+        CODE   : ex_objc_dyn_query_greaterThan
 
   - g_dyn_query_greaterThan_integer:
       NAME     : "isGreaterThanInt:"
@@ -167,7 +178,7 @@ CATEGORIES :
       TITLE    : "*IsGreaterThan:inColumnWithIndex:"
 #TODO: check greater_date? does time_t work as int64_t?
       SIGNATURE: |
-                 (TDBQuery *)dateIsGreaterThan:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
+                 (TDBQuery *)dateIsGreaterThan:(NSDate)aDate inColumnWithIndex:(NSUInteger)colIndex
                  (TDBQuery *)intIsGreaterThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
                  (TDBQuery *)floatIsGreaterThan:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
                  (TDBQuery *)doubleIsGreaterThan:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
@@ -197,7 +208,7 @@ CATEGORIES :
       NAME     : "isGreaterThanOrEqualToDate:"
       TITLE    : "*IsGreaterThanOrEqualTo:inColumnWithIndex:"
       SIGNATURE: |
-                  (TDBQuery *)dateIsGreaterThanOrEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
+                  (TDBQuery *)dateIsGreaterThanOrEqualTo:(NSDate)aDate inColumnWithIndex:(NSUInteger)colIndex
                   (TDBQuery *)intIsGreaterThanOrEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
                   (TDBQuery *)floatIsGreaterThanOrEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
                   (TDBQuery *)doubleIsGreaterThanOrEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
@@ -205,7 +216,7 @@ CATEGORIES :
       DESCR    : *g_dyn_query_greaterThanOrEqual_descr
       PARAMS:
       - NAME   : value
-        TYPES  : [int64_t, float, double, time_t]
+        TYPES  : [int64_t, float, double, NSDate]
         DESCR  : *g_dyn_query_value_descr
       - NAME   : inColumnWithIndex
         TYPES  : NSUInteger
@@ -227,7 +238,7 @@ CATEGORIES :
       NAME     : "isLessThanDate:"
       TITLE    : "*IsLessThan:inColumnWithIndex:"
       SIGNATURE: |
-                  (TDBQuery *)dateIsLessThan:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
+                  (TDBQuery *)dateIsLessThan:(NSDate)aDate inColumnWithIndex:(NSUInteger)colIndex;
                   (TDBQuery *)intIsLessThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
                   (TDBQuery *)floatIsLessThan:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
                   (TDBQuery *)doubleIsLessThan:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
@@ -235,7 +246,7 @@ CATEGORIES :
       DESCR    : *g_dyn_query_lessThan_descr
       PARAMS:
       - NAME   : value
-        TYPES  : [int64_t, float, double, time_t]
+        TYPES  : [int64_t, float, double, NSDate]
         DESCR  : *g_dyn_query_value_descr
       - NAME   : inColumnWithIndex
         TYPES  : NSUInteger
@@ -258,7 +269,7 @@ CATEGORIES :
       NAME     : "isLessThanOrEqualToDate"
       TITLE    : "*IsLessThanOrEqualTo:inColumnWithIndex:"
       SIGNATURE: |
-                  (TDBQuery *)dateIsLessThanOrEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex;
+                  (TDBQuery *)dateIsLessThanOrEqualTo:(NSDate)aDate inColumnWithIndex:(NSUInteger)colIndex;
                   (TDBQuery *)intIsLessThanOrEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
                   (TDBQuery *)floatIsLessThanOrEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
                   (TDBQuery *)doubleIsLessThanOrEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
@@ -266,12 +277,11 @@ CATEGORIES :
       DESCR    : *g_dyn_query_lessThanOrEqual_descr
       PARAMS:
       - NAME   : value
-        TYPES  : [int64_t, float, double, time_t]
+        TYPES  : [int64_t, float, double, NSDate]
         DESCR  : *g_dyn_query_value_descr
       - NAME   : inColumnWithIndex
         TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
-
       RETURN:
         TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
@@ -404,7 +414,7 @@ CATEGORIES :
       NAMES    : Or
       DESCR    : *g_dyn_query_or_descr
       SUMMARY  : *g_dyn_query_or_summary
-      SIGNATURE: (TDBQuery *)or
+      SIGNATURE: (TDBQuery *)Or
       RETURN:
         TYPES  : TDBQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
@@ -418,7 +428,7 @@ CATEGORIES :
       SUMMARY  : *g_dyn_query_subtable_summary
       SIGNATURE: (TDBQuery *)subtableInColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
-        NAME   : column
+        NAME   : colIndex
         TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       RETURN:
@@ -449,7 +459,6 @@ CATEGORIES :
       TODO     : later
   - g_dyn_query_find_all:
       NAME     : findAllRows
-      TITLE    : findAllRows
       DESCR    : *g_dyn_query_find_all_descr
       SUMMARY  : *g_dyn_query_find_all_summary
       SIGNATURE: |
@@ -466,7 +475,7 @@ CATEGORIES :
 #        DESCR  : *g_dyn_query_find_all_parm3_descr
       RETURN:
         TYPES  : TDBView *
-        DESCR  : *g_dyn_query_find_all_return_descr
+        DESCR  : A <code>TDBView</code> with the matching rows.
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_findall
@@ -490,13 +499,15 @@ CATEGORIES :
 
   - g_dyn_query_find_first:
       NAMES    : "indexOfFirstMatchingRow:"
-      DESCR    : This will find the first row index that fulfils the query condition. Use the return value + 1 as parameter for successive calls to iterate through matching rows.
+      DESCR    : >
+                 This will find the first row index that fulfils the query condition. Use the return value + 1
+                 as parameter for successive calls to {@link g_dyn_query_find} to iterate through matching rows.
       SUMMARY  : Find first matching row.
       SIGNATURE: |
                  (NSUInteger)indexOfFirstMatchingRow
       RETURN:
         TYPES  : NSUInteger
-        DESCR  : Table row index of first matching row (NSNotFound if no match).
+        DESCR  : Table row index of first matching row (<code>NSNotFound</code> if no match).
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_find_first
@@ -520,19 +531,16 @@ CATEGORIES :
       NAME     : sumFloat
   - g_dyn_query_sum_double:
       NAME     : sumDouble
-      TITLE    : "sum*ColumnWithIndex:"
+      TITLE    : "sumColumnWithIndex:"
       DESCR    : *g_dyn_query_sum_descr
       SUMMARY  : *g_dyn_query_sum_summary
-      SIGNATURE: |
-                (int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex
-                (double)sumFloatColumnWithIndex:(NSUInteger)colIndex
-                (double)sumDoubleColumnWithIndex:(NSUInteger)colIndex
+      SIGNATURE: -(NSNumber *)sumColumnWithIndex:(NSUInteger)colIndex;
       PARAMS:
       - NAME   : colIndex
         DESCR  : Column index. The datatype of the column must match the function called.
         TYPES  : NSUInteger
       RETURN:
-        TYPES  : [int64_t, double]
+        TYPES  : NSNumber
         DESCR  : *g_dyn_query_sum_return_descr
       EXAMPLES:
       - DESCR  :
@@ -549,18 +557,15 @@ CATEGORIES :
       TITLE    : "max*InColumnWithIndex:"
       DESCR    : *g_dyn_query_maximum_descr
       SUMMARY  : *g_dyn_query_maximum_summary
-      SIGNATURE: |
-                  (int64_t)maxIntInColumnWithIndex:(NSUInteger)colIndex
-                  (float)maxFloatInColumnWithIndex:(NSUInteger)colIndex
-                  (double)maxDoubleInColumnWithIndex:(NSUInteger)colIndex
-                  (NSDate *)maxDateInColumnWithIndex:(NSUInteger)colIndex
+      SIGNATURE: (id)maxInColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
       - NAME   : colIndex
-        DESCR  : Column index. The datatype of the column must match the function called.
+        DESCR  : &objc_dyn_query_number_column_descr
+                 The column index. The datatype of the column must be a number type (including timestamp).
         TYPES  : NSUInteger
       RETURN:
-        TYPES  : [int64_t, float, double, NSDate*]
-        DESCR  : *g_dyn_query_maximum_return_descr
+        TYPES  : id
+        DESCR  : The lowest value. Numbers are returned as <code>NSNumber</code> while timestamps are returned as <code>NSDate</code>.
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_maximum
@@ -573,21 +578,17 @@ CATEGORIES :
       NAME     : minFloat
   - g_dyn_query_minimum_int:
       NAME     : minInt
-      TITLE    : "min*InColumnWithIndex:"
+      TITLE    : "minInColumnWithIndex:"
       DESCR    : *g_dyn_query_minimum_descr
       SUMMARY  : *g_dyn_query_minimum_summary
-      SIGNATURE: |
-                  (int64_t)minIntInColumnWithIndex:(NSUInteger)colIndex
-                  (float)minFloatInColumnWithIndex:(NSUInteger)colIndex
-                  (double)minDoubleInColumnWithIndex:(NSUInteger)colIndex
-                  (NSDate *)minDateInColumnWithIndex:(NSUInteger)colIndex
+      SIGNATURE: (id)minInColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
       - NAME   : colIndex
-        DESCR  : Column index. The datatype of the column must match the function called. E.g. <code>minFloat()</code> can only be used on columns which contains floats.
+        DESCR  : *objc_dyn_query_number_column_descr
         TYPES  : NSUInteger
       RETURN:
-        TYPES  : [int64_t, float, double, NSDate*]
-        DESCR  : *g_dyn_query_minimum_return_descr
+        TYPES  : id
+        DESCR  : The lowest value. Numbers are returned as <code>NSNumber</code> while timestamps are returned as <code>NSDate</code>.
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_minimum
@@ -601,16 +602,13 @@ CATEGORIES :
       TITLE    : avg*ColumnWithIndex*Column
       SUMMARY  : *g_dyn_query_average_summary
       DESCR    : *g_dyn_query_average_descr
-      SIGNATURE: |
-                  (double)avgIntColumnWithIndex:(NSUInteger)colIndex
-                  (double)avgFloatColumnWithIndex:(NSUInteger)colIndex
-                  (double)avgDoubleColumnWithIndex:(NSUInteger)colIndex
+      SIGNATURE: -(NSNumber *)avgColumnWithIndex:(NSUInteger)colIndex;
       PARAMS:
       - NAME   : colIndex
-        DESCR  : Column index. The datatype of the column must match the function called.
+        DESCR  : Column index. The datatype of the column must be a number type.
         TYPES  : NSUInteger
       RETURN:
-        TYPES  : double
+        TYPES  : NSNumber
         DESCR  : *g_dyn_query_average_return_descr
       EXAMPLES:
       - DESCR  :
@@ -638,7 +636,7 @@ CATEGORIES :
 #        TYPES  : NSUInteger
 #        DESCR  : "Maximum number of rows to find. Default: -1 (infinity)."
       RETURN:
-        TYPES  : NSUInteger *
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_query_remove_return_descr
       EXAMPLES:
       - DESCR  :
