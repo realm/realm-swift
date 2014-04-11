@@ -700,27 +700,39 @@ CATEGORIES :
       - CODE   : ex_objc_dyn_table_distinct
         DESCR  :
 
-  - g_dyn_table_predicate:
-      NAMES    : ["filterWithPredicate:", "filterWithPredicate:orderedBy:"] 
+  - g_dyn_table_find_predicate:
+      NAMES    : "find:"
+      SUMMARY  : Find matching row using an NSPredicate
+      DESCR    : >
+                 This method allow you to find a row using a predicate string or NSPredicate object.
+      SIGNATURE: -(TDBRow *)find:(id)condition;
+      PARAMS:
+      - NAME   : condition
+        TYPES  : [NSString, NSPredicate]
+        DESCR  : NOTE! We only support compound predicates and those comparing columns to constant values.
+      RETURN:
+        TYPES  : [TDBRow, nil]
+        DESCR  : The first matching row or nil if there is no match
+
+  - g_dyn_table_where_predicate:
+      NAMES    : ["where:", "where:orderBy:"]
       SUMMARY  : Create a filtered TDBView using an NSPredicate and NSSortDescriptor
       DESCR    : >
-                 These methods allow you to create a TDBView using an NSPredicate or an NSPredicate string.
-                 The first variant takes a fully constructed NSPredicate and/or a NSSortDescriptor and creates
-                 a TDBView. The second variant takes a string which is parsed into an NSPredicate. Both variants
-                 support AND and OR compound predicats, and comparison of constant values against column names.
+                 These methods allow you to create a TDBView using a predicate string or NSPredicate object.
+                 The first variant takes a predicate as string or as fully constructed NSPredicate and creates
+                 a TDBView. The second variant also takes a column name or NSSortDescriptor to support ordering.
+                 Both variants support AND and OR compound predicats, and comparison of constant values against
+                 column names.
       SIGNATURE: |
-                 -(TDBView *)filterWithPredicate:(NSPredicate *)predicate orderedBy:(NSSortDescriptor *)sort;
-                 -(TDBView *)filterWithPredicate:(NSString *)predicateString;
+                 -(TDBView *)where:(id)condition;
+                 -(TDBView *)where:(id)condition orderBy:(id)order;
       PARAMS:
-      - NAME   : predicate
-        TYPES  : NSPredicate
+      - NAME   : condition
+        TYPES  : [NSString, NSPredicate]
         DESCR  : NOTE! We only support compound predicates and those comparing columns to constant values.
-      - NAME   : sort
-        TYPES  : NSSortDescriptor
+      - NAME   : order
+        TYPES  : [NSString, NSSortDescriptor]
         DESCR  : NOTE! Sort only supported on columns of type TDBIntegerType, TDBBoolType and TDBDateType.
-      - NAME   : predicateString
-        TYPES  : NSString
-        DESCR  : A string which is parsed as a NSPredicate
       RETURN:
         TYPES  : TDBView *
         DESCR  : The filtered and/or sorted view
