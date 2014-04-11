@@ -861,170 +861,170 @@ CATEGORIES :
         CODE   : ex_objc_dyn_table_where
 
 
-- Aggregates:
-  METHODS:
-  - g_dyn_table_count_int:
-      TODO     : later
-      NAME     : countInt
-  - g_dyn_table_count_float:
-      TODO     : later
-      NAME     : countFloat
-  - g_dyn_table_count_double:
-      TODO     : later
-      NAME     : countDouble
-  - g_dyn_table_count_string:
-      TODO     : later
-      NAME     : countRowsWith
-      TITLE    : "countRowsWith*Column:inColumnWithIndex:"
-      SUMMARY  : *g_dyn_table_count_summary
-      DESCR    : *g_dyn_table_count_descr
-      SIGNATURE: |
-                 (NSUInteger)countRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
-                 (NSUInteger)countRowsWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
-                 (NSUInteger)countRowsWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
-                 (NSUInteger)countRowsWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
-      PARAMS:
-      - NAME   : colIndex
-        TYPES  : NSUInteger
-        DESCR  :
-        - TEXT : *g_dyn_table_count_parm1_descr0
-        - TEXT : *g_dyn_table_count_parm1_descr1
-      - NAME   : anInt
-        TYPES  : int64_t
-        DESCR  : *g_dyn_table_count_parm2_descr
-      RETURN:
-        TYPES  : NSUInteger
-        DESCR  : *g_dyn_table_count_return_descr
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_count
-        DESCR  :
+# - Aggregates:
+#   METHODS:
+#   - g_dyn_table_count_int:
+#       TODO     : later
+#       NAME     : countInt
+#   - g_dyn_table_count_float:
+#       TODO     : later
+#       NAME     : countFloat
+#   - g_dyn_table_count_double:
+#       TODO     : later
+#       NAME     : countDouble
+#   - g_dyn_table_count_string:
+#       TODO     : later
+#       NAME     : countRowsWith
+#       TITLE    : "countRowsWith*Column:inColumnWithIndex:"
+#       SUMMARY  : *g_dyn_table_count_summary
+#       DESCR    : *g_dyn_table_count_descr
+#       SIGNATURE: |
+#                  (NSUInteger)countRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+#                  (NSUInteger)countRowsWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+#                  (NSUInteger)countRowsWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
+#                  (NSUInteger)countRowsWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+#       PARAMS:
+#       - NAME   : colIndex
+#         TYPES  : NSUInteger
+#         DESCR  :
+#         - TEXT : *g_dyn_table_count_parm1_descr0
+#         - TEXT : *g_dyn_table_count_parm1_descr1
+#       - NAME   : anInt
+#         TYPES  : int64_t
+#         DESCR  : *g_dyn_table_count_parm2_descr
+#       RETURN:
+#         TYPES  : NSUInteger
+#         DESCR  : *g_dyn_table_count_return_descr
+#       EXAMPLES:
+#       - CODE   : ex_objc_dyn_table_count
+#         DESCR  :
 
-  - g_dyn_table_sum_int:
-  - g_dyn_table_sum_float:
-  - g_dyn_table_sum_double:
-      TODO     : later
-      NAMES    : [sumInt, sumFloat, sumDouble]
-      TITLE    : "sum*ColumnWithIndex:"
-      SUMMARY  : *g_dyn_table_sum_summary
-      DESCR    : *g_dyn_table_sum_descr
-      SIGNATURE: |
-                 (int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex
-                 (double)sumFloatColumnWithIndex:(NSUInteger)colIndex
-                 (double)sumDoubleColumnWithIndex:(NSUInteger)colIndex
-      PARAMS:
-      - NAME   : colIndex
-        TYPES  : NSUInteger
-        DESCR  : *g_dyn_table_sum_parm1_descr
-      RETURN:
-        TYPES  : [int64_t, double]
-        DESCR  : *g_dyn_table_sum_return_descr
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_sum
-        DESCR  :
+#   - g_dyn_table_sum_int:
+#   - g_dyn_table_sum_float:
+#   - g_dyn_table_sum_double:
+#       TODO     : later
+#       NAMES    : [sumInt, sumFloat, sumDouble]
+#       TITLE    : "sum*ColumnWithIndex:"
+#       SUMMARY  : *g_dyn_table_sum_summary
+#       DESCR    : *g_dyn_table_sum_descr
+#       SIGNATURE: |
+#                  (int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex
+#                  (double)sumFloatColumnWithIndex:(NSUInteger)colIndex
+#                  (double)sumDoubleColumnWithIndex:(NSUInteger)colIndex
+#       PARAMS:
+#       - NAME   : colIndex
+#         TYPES  : NSUInteger
+#         DESCR  : *g_dyn_table_sum_parm1_descr
+#       RETURN:
+#         TYPES  : [int64_t, double]
+#         DESCR  : *g_dyn_table_sum_return_descr
+#       EXAMPLES:
+#       - CODE   : ex_objc_dyn_table_sum
+#         DESCR  :
 
-  - g_dyn_table_maximum_int:
-  - g_dyn_table_maximum_float:
-  - g_dyn_table_maximum_double:
-      TODO     : later
-      NAMES    : [maxInt, maxFloat, maximumDouble]
-      TITLE    : "max*InColumnWithIndex:"
-      SUMMARY  : *g_dyn_table_maximum_summary
-      DESCR    : *g_dyn_table_maximum_descr
-      SIGNATURE: |
-                 (int64_t)maxIntInColumnWithIndex:(NSUInteger)colIndex
-                 (float)maxFloatInColumnWithIndex:(NSUInteger)colIndex
-                 (double)maxDoubleInColumnWithIndex:(NSUInteger)colIndex
-      CONST    : True
-      PARAMS:
-      - NAME   : colIndex
-        TYPES  : NSUInteger
-        DESCR  : *g_dyn_table_maximum_parm1_descr
-      RETURN:
-        TYPES  : [int64_t, float, double]
-        DESCR  : *g_dyn_table_maximum_return_descr
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_maximum
-        DESCR  :
+#   - g_dyn_table_maximum_int:
+#   - g_dyn_table_maximum_float:
+#   - g_dyn_table_maximum_double:
+#       TODO     : later
+#       NAMES    : [maxInt, maxFloat, maximumDouble]
+#       TITLE    : "max*InColumnWithIndex:"
+#       SUMMARY  : *g_dyn_table_maximum_summary
+#       DESCR    : *g_dyn_table_maximum_descr
+#       SIGNATURE: |
+#                  (int64_t)maxIntInColumnWithIndex:(NSUInteger)colIndex
+#                  (float)maxFloatInColumnWithIndex:(NSUInteger)colIndex
+#                  (double)maxDoubleInColumnWithIndex:(NSUInteger)colIndex
+#       CONST    : True
+#       PARAMS:
+#       - NAME   : colIndex
+#         TYPES  : NSUInteger
+#         DESCR  : *g_dyn_table_maximum_parm1_descr
+#       RETURN:
+#         TYPES  : [int64_t, float, double]
+#         DESCR  : *g_dyn_table_maximum_return_descr
+#       EXAMPLES:
+#       - CODE   : ex_objc_dyn_table_maximum
+#         DESCR  :
 
-  - g_dyn_table_minimum_int:
-  - g_dyn_table_minimum_float:
-  - g_dyn_table_minimum_double:
-      TODO     : later
-      NAMES    : [minInt, minimumFloat, minimumDouble]
-      TITLE    : "min*InColumnWithIndex:"
-      SUMMARY  : *g_dyn_table_minimum_summary
-      DESCR    : *g_dyn_table_minimum_descr
-      SIGNATURE: |
-                 (int64_t)minIntInColumnWithIndex:(NSUInteger)colIndex
-                 (float)minFloatInColumnWithIndex:(NSUInteger)colIndex
-                 (double)minDoubleInColumnWithIndex:(NSUInteger)colIndex
-      PARAMS:
-      - NAME   : colIndex
-        TYPES  : NSUInteger
-        DESCR  : *g_dyn_table_maximum_parm1_descr
-      RETURN:
-        TYPES  : [int64_t, float, double]
-        DESCR  : *g_dyn_table_minimum_return_descr
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_minimum
-        DESCR  :
+#   - g_dyn_table_minimum_int:
+#   - g_dyn_table_minimum_float:
+#   - g_dyn_table_minimum_double:
+#       TODO     : later
+#       NAMES    : [minInt, minimumFloat, minimumDouble]
+#       TITLE    : "min*InColumnWithIndex:"
+#       SUMMARY  : *g_dyn_table_minimum_summary
+#       DESCR    : *g_dyn_table_minimum_descr
+#       SIGNATURE: |
+#                  (int64_t)minIntInColumnWithIndex:(NSUInteger)colIndex
+#                  (float)minFloatInColumnWithIndex:(NSUInteger)colIndex
+#                  (double)minDoubleInColumnWithIndex:(NSUInteger)colIndex
+#       PARAMS:
+#       - NAME   : colIndex
+#         TYPES  : NSUInteger
+#         DESCR  : *g_dyn_table_maximum_parm1_descr
+#       RETURN:
+#         TYPES  : [int64_t, float, double]
+#         DESCR  : *g_dyn_table_minimum_return_descr
+#       EXAMPLES:
+#       - CODE   : ex_objc_dyn_table_minimum
+#         DESCR  :
 
-  - g_dyn_table_average_int:
-  - g_dyn_table_average_float:
-  - g_dyn_table_average_double:
-      TODO     : later
-      NAMES    : [avgInt, averageFloat, averageDouble]
-      TITLE    : "avg*ColumnWithIndex:"
-      SUMMARY  : *g_dyn_table_average_summary
-      DESCR    : *g_dyn_table_average_descr
-      SIGNATURE: |
-                 (double)avgIntColumnWithIndex:(NSUInteger)colIndex
-                 (double)avgFloatColumnWithIndex:(NSUInteger)colIndex
-                 (double)avgDoubleColumnWithIndex:(NSUInteger)colIndex
-      PARAMS:
-      - NAME   : colIndex
-        TYPES  : NSUInteger
-        DESCR  : *g_dyn_table_maximum_parm1_descr
-      RETURN:
-        TYPES  : double
-        DESCR  : *g_dyn_table_average_return1_descr
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_average
-        DESCR  :
+#   - g_dyn_table_average_int:
+#   - g_dyn_table_average_float:
+#   - g_dyn_table_average_double:
+#       TODO     : later
+#       NAMES    : [avgInt, averageFloat, averageDouble]
+#       TITLE    : "avg*ColumnWithIndex:"
+#       SUMMARY  : *g_dyn_table_average_summary
+#       DESCR    : *g_dyn_table_average_descr
+#       SIGNATURE: |
+#                  (double)avgIntColumnWithIndex:(NSUInteger)colIndex
+#                  (double)avgFloatColumnWithIndex:(NSUInteger)colIndex
+#                  (double)avgDoubleColumnWithIndex:(NSUInteger)colIndex
+#       PARAMS:
+#       - NAME   : colIndex
+#         TYPES  : NSUInteger
+#         DESCR  : *g_dyn_table_maximum_parm1_descr
+#       RETURN:
+#         TYPES  : double
+#         DESCR  : *g_dyn_table_average_return1_descr
+#       EXAMPLES:
+#       - CODE   : ex_objc_dyn_table_average
+#         DESCR  :
 
 
-- Dump:
-  METHODS:
-  - g_dyn_table_to_json:
-      TODO     : later
+# - Dump:
+#   METHODS:
+#   - g_dyn_table_to_json:
+#       TODO     : later
 
-      NAMES    : toJSON
-      SUMMARY  : *g_dyn_table_to_json_summary
-      DESCR    : *g_dyn_table_to_json_descr
-      PARAMS:
-      - NAME   : out
-        TYPES  : std::ostream&
-        DESCR  : Output stream.
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_to_json
-        DESCR  :
+#       NAMES    : toJSON
+#       SUMMARY  : *g_dyn_table_to_json_summary
+#       DESCR    : *g_dyn_table_to_json_descr
+#       PARAMS:
+#       - NAME   : out
+#         TYPES  : std::ostream&
+#         DESCR  : Output stream.
+#       EXAMPLES:
+#       - CODE   : ex_objc_dyn_table_to_json
+#         DESCR  :
 
-  - g_dyn_table_to_string:
-      TODO     : later
+#   - g_dyn_table_to_string:
+#       TODO     : later
 
-      NAMES    : toString
-      SUMMARY  : *g_dyn_table_to_string_summary
-      DESCR    : *g_dyn_table_to_string_descr
-      PARAMS:
-      - NAME   : out
-        TYPES  : std::ostream&
-        DESCR  : Output stream.
-      - NAME   : limit
-        TYPES  : NSUInteger
-        DESCR  : *g_dyn_table_to_string_parm2_descr
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_to_string
-        DESCR  :
+#       NAMES    : toString
+#       SUMMARY  : *g_dyn_table_to_string_summary
+#       DESCR    : *g_dyn_table_to_string_descr
+#       PARAMS:
+#       - NAME   : out
+#         TYPES  : std::ostream&
+#         DESCR  : Output stream.
+#       - NAME   : limit
+#         TYPES  : NSUInteger
+#         DESCR  : *g_dyn_table_to_string_parm2_descr
+#       EXAMPLES:
+#       - CODE   : ex_objc_dyn_table_to_string
+#         DESCR  :
 
-  - g_dyn_table_row_to_string:
-      TODO     : later
+#   - g_dyn_table_row_to_string:
+#       TODO     : later

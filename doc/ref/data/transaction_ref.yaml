@@ -18,7 +18,7 @@ DESCR      : >
 SEE        :
 EXAMPLES:
 - DESCR    :
-  CODE     : ex_objc_group_intro
+  CODE     : ex_objc_sharedgroup_intro
 IGNORE     : []                   # List of method-ids to ignore
 CATEGORIES:
 - Table:

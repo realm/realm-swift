@@ -87,6 +87,9 @@ IMPORTPATH: ../../tightdb/doc/ref_cpp/data
 
 
 CATEGORIES:                       # list global class-id in order of appearence
+- Persistence:
+  - context
+  - transaction
 - Typed Table:                    # Category header name
   - typed_table                   # Global Class name. File 'typed_table_ref.yaml'
   - typed_view
@@ -95,15 +98,10 @@ CATEGORIES:                       # list global class-id in order of appearence
   - dyn_table
   - dyn_view
   - dyn_query
-- Collection:
-  - context
-  - transaction
 #- Helpers:
-#  - cursor
+#  - row
+#  - version
 
 EXAMPLES  :
 - DESCR   :
   CODE    : ex_objc_intro           # id to example code
-
-## Checked:
-## dyn_table_ref
