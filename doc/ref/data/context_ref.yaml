@@ -24,7 +24,7 @@ CATEGORIES:
   METHODS:
   - g_shared_group_constructor:
       NAME     : "contextPersistedAtPath:error:"
-      SUMMARY  : *g_shared_group_constructor_summary
+      SUMMARY  : TDBContext persisted at specified path.
       DESCR    :
       - TEXT   : *g_shared_group_constructor_descr
       - TEXT   : *g_shared_group_durability_modes
@@ -41,7 +41,7 @@ CATEGORIES:
         DESCR  :
   - g_shared_group_constructor_default_path:
       NAME     : "contextWithDefaultPersistence:"
-      SUMMARY  : *g_shared_group_constructor_summary
+      SUMMARY  : TDBContext persisted at default path.
       DESCR    :
       - TEXT   : *g_shared_group_constructor_descr
       - TEXT   : *g_shared_group_durability_modes
@@ -49,6 +49,24 @@ CATEGORIES:
       RETURN:
         TYPES  : TDBContext
         DESCR  : A context mapped to a file.
+      EXAMPLES:
+      - CODE   : ex_objc_shared_group_constructor
+        DESCR  :
+  - g_shared_group_constructor_memory:
+      NAME     : "contextInMemoryWithName:"
+      SUMMARY  : TDBContext in memory-only mode.
+      DESCR    :
+      - TEXT   : >
+                 Opens a TDBContext in memory-only mode. A file will be created with the name provided. This is just used for identification and backing; 
+                 it will be removed when there are no more processes using it.
+      SIGNATURE: + (TDBContext *)contextInMemoryWithName:(NSString *)name
+      PARAMS:
+      - NAME   : name
+        TYPES  : NSString
+        DESCR  : The identifier name of the context in memory.
+      RETURN:
+        TYPES  : TDBContext
+        DESCR  : A context with in-memory durability.
       EXAMPLES:
       - CODE   : ex_objc_shared_group_constructor
         DESCR  :
