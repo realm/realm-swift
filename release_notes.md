@@ -37,6 +37,7 @@ Description......
 
 ### API breaking changes:
 
+* `contextWithPersistenceToFile:error:` renamed to `contextPersistedAtPath:error:` in `TDBContext`
 * `readWithBlock:` renamed to `readUsingBlock:` in `TDBContext`
 * `writeWithBlock:error:` renamed to `writeUsingBlock:error:` in `TDBContext`
 * `readTable:withBlock:` renamed to `readTable:usingBlock:` in `TDBContext`
@@ -49,6 +50,11 @@ Description......
   on table now return void instead of BOOL.
 
 ### Enhancements:
+* A `TDBTable` can now be queried using `where:` and `where:orderBy:` taking
+  `NSPredicate` and `NSSortDescriptor` as arguments.
+* Added `find:` method on `TDBTable` to find first row matching predicate.
+* `contextWithDefaultPersistence` class method added to `TDBContext`. Will create a context persisted
+  to a file in app/documents folder.
 * `renameColumnWithIndex:to:` has been added to `TDBTable`.
 * `distinctValuesInColumnWithIndex` has been added to `TDBTable`.
 * `dateIsBetween::`, `doubleIsBetween::`, `floatIsBetween::` and `intIsBetween::`
