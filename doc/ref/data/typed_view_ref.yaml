@@ -58,17 +58,16 @@ CATEGORIES :
   METHODS:
   - g_typed_view_object_at_index:
       NAME     : rowAtIndex
-      SUMMARY  : Returns a typed row at a specified row number.
-      DESCR    : &objc_typed_table_cursor_at_index_descr
-                 The row is initialized using the view index. Internally the row uses the source table index.
+      SUMMARY  : Returns a typed row at a specified row index.
+      DESCR    : The method returns a row at a given row index.
       SIGNATURE: "- (ClassNameRow *)rowAtIndex:(NSUInteger)rowIndex"
       PARAMS:
       - NAME   : rowIndex
         TYPES  : NSUInteger
-        DESCR  : The row number in the table view.
+        DESCR  : The row index in the table view.
       RETURN:
-        TYPES  : ClassName_Cursor
-        DESCR  : The row object. Note that <code>ClassName</code> is replaced with the name of your specific classes (table, query, view, etc.).
+        TYPES  : <i>ClassName</i>Row
+        DESCR  : The row object. Note that <i>ClassName</i> is replaced with the name of your specific classes (table, query, view, etc.).
 
   - g_typed_view_get_source_ndx:
       NAME     : rowIndexInOriginTableForRowAtIndex
