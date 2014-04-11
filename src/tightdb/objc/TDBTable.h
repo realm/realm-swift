@@ -71,9 +71,11 @@
 -(TDBQuery *)where;
 // Only supported on string columns with an index
 -(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
-// create view with predicats/sort descriptors
--(TDBView *)filterWithPredicate:(NSPredicate *)predicate orderedBy:(NSSortDescriptor *)sort;
--(TDBView *)filterWithPredicate:(NSString *)predicateString;
+
+// Predicate queries
+-(TDBRow *)find:(id)condition;
+-(TDBView *)where:(id)condition;
+-(TDBView *)where:(id)condition orderBy:(id)order;
 
 // Indexing
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;

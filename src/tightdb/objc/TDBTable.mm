@@ -1043,6 +1043,8 @@ using namespace std;
     return [TDBView viewWithTable:self andNativeView:distinctView];
 }
 
+namespace {
+
 // small helper to create the many exceptions thrown when parsing predicates
 inline NSException * predicate_exception(NSString * name, NSString * reason) {
     return [NSException exceptionWithName:[NSString stringWithFormat:@"filterWithPredicate:orderedBy: - %@", name] reason:reason userInfo:nil];
@@ -1284,40 +1286,90 @@ void update_query_with_predicate(NSPredicate * predicate,
     }
 }
 
-// throws if predicates or sort is not compatible with table
--(TDBView *)filterWithPredicate:(NSPredicate *)predicate orderedBy:(NSSortDescriptor *)sort {
-    tightdb::Query query = m_table->where();
-    
+tightdb::Query queryFromPredicate(TDBTable *table, id condition)
+{
+    tightdb::Query query = table->m_table->where();
+
     // parse and apply predicate tree
-    if (predicate) {
-        update_query_with_predicate(predicate, self, query);
+    if (condition) {
+        if ([condition isKindOfClass:[NSString class]]) {
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:condition];
+            update_query_with_predicate(predicate, table, query);
+        }
+        else if ([condition isKindOfClass:[NSPredicate class]]) {
+            update_query_with_predicate(condition, table, query);
+        }
+        else {
+            @throw predicate_exception(@"Invalid argument", @"Condition should be predicate as string or NSPredicate object");
+        }
     }
-    
+
+    return query;
+}
+
+} //namespace
+
+-(TDBRow *)find:(id)condition
+{
+    tightdb::Query query = queryFromPredicate(self, condition);
+
+    size_t row_ndx = query.find();
+
+    if (row_ndx == tightdb::not_found)
+        return nil;
+
+    return [[TDBRow alloc] initWithTable:self ndx:row_ndx];
+}
+
+-(TDBView *)where:(id)condition
+{
+    tightdb::Query query = queryFromPredicate(self, condition);
+
     // create view
     tightdb::TableView view = query.find_all();
 
-    // apply sort
-    if (sort) {
-        // sort the view
-        NSUInteger index = validated_column_index(self, sort.key);
-        TDBType columnType = [self columnTypeOfColumnWithIndex:index];
-        
-        if(columnType != TDBIntType && columnType != TDBBoolType && columnType != TDBDateType) {
-            @throw predicate_exception(@"Invalid sort column type",
-                                       @"Sort only supported on Integer, Date and Boolean columns.");
-        }
-        
-        view.sort(index, sort.ascending);
-    }
-    
     // create objc view and return
     return [TDBView viewWithTable:self andNativeView:view];
 }
 
--(TDBView *)filterWithPredicate:(NSString *)predicateString {
-    return [self filterWithPredicate:[NSPredicate predicateWithFormat:predicateString] orderedBy:nil];
-}
+-(TDBView *)where:(id)condition orderBy:(id)order
+{
+    tightdb::Query query = queryFromPredicate(self, condition);
 
+    // create view
+    tightdb::TableView view = query.find_all();
+
+    // apply order
+    if (order) {
+        NSString *columnName;
+        BOOL ascending = YES;
+
+        if ([order isKindOfClass:[NSString class]]) {
+            columnName = order;
+        }
+        else if ([order isKindOfClass:[NSSortDescriptor class]]) {
+            columnName = ((NSSortDescriptor*)order).key;
+            ascending = ((NSSortDescriptor*)order).ascending;
+        }
+        else {
+            @throw predicate_exception(@"Invalid order type",
+                                       @"Order must be column name or NSSortDescriptor");
+        }
+
+        NSUInteger index = validated_column_index(self, columnName);
+        TDBType columnType = [self columnTypeOfColumnWithIndex:index];
+
+        if (columnType != TDBIntType && columnType != TDBBoolType && columnType != TDBDateType) {
+            @throw predicate_exception(@"Invalid sort column type",
+                                       @"Sort only supported on Integer, Date and Boolean columns.");
+        }
+
+        view.sort(index, ascending);
+    }
+
+    // create objc view and return
+    return [TDBView viewWithTable:self andNativeView:view];
+}
 
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex
 {

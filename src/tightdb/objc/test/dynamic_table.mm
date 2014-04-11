@@ -1260,6 +1260,42 @@
     STAssertEqualObjects(v[2][ageIndex], @2, nil);
 }
 
+- (void)testPredicateFind
+{
+    TDBTable *t = [[TDBTable alloc] initWithColumns:@[@"name", @"string",
+                                                      @"age",  @"int"]];
+    [t addRow:@[@"name0", @0]];
+    [t addRow:@[@"name1", @1]];
+    [t addRow:@[@"name2", @1]];
+    [t addRow:@[@"name3", @3]];
+    [t addRow:@[@"name4", @4]];
+
+    STAssertThrows([t find:@"garbage"], @"Garbage predicate");
+    STAssertThrows([t find:@"name == notAValue"], @"Invalid expression");
+    STAssertThrows([t find:@"naem == \"name0\""], @"Invalid column");
+    STAssertThrows([t find:@"name == 30"], @"Invalid value type");
+    STAssertThrows([t find:@1], @"Invalid condition");
+
+    // Searching with no condition just finds first row
+    TDBRow *r = [t find:nil];
+    STAssertEqualObjects(r[@"name"], @"name0", @"first row");
+
+    // Search with predicate string
+    r = [t find:@"name == \"name10\""];
+    STAssertEqualObjects(r, nil, @"no match");
+
+    r = [t find:@"name == \"name0\""];
+    STAssertEqualObjects(r[@"name"], @"name0", nil);
+
+    r = [t find:@"age == 4"];
+    STAssertEqualObjects(r[@"name"], @"name4", nil);
+
+    // Search with predicate object
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
+    r = [t find:predicate];
+    STAssertEqualObjects(r[@"name"], @"name3", nil);
+}
+
 
 - (void)testPredicateView
 {
@@ -1274,45 +1310,52 @@
     [t addRow:@[@"name3", @3]];
     [t addRow:@[@"name4", @4]];
 
-    STAssertThrows([t filterWithPredicate:@"garbage"], @"Garbage predicate");
-    STAssertThrows([t filterWithPredicate:@"name == notAValue"], @"Invalid expression");
-    STAssertThrows([t filterWithPredicate:@"naem == \"name0\""], @"Invalid column");
-    STAssertThrows([t filterWithPredicate:@"name == 30"], @"Invalid value type");
+    STAssertThrows([t where:@"garbage"], @"Garbage predicate");
+    STAssertThrows([t where:@"name == notAValue"], @"Invalid expression");
+    STAssertThrows([t where:@"naem == \"name0\""], @"Invalid column");
+    STAssertThrows([t where:@"name == 30"], @"Invalid value type");
 
-    TDBView *v = [t filterWithPredicate:@"name == \"name0\""];
+    // Filter with predicate string
+    TDBView *v = [t where:@"name == \"name0\""];
     STAssertEquals(v.rowCount, (NSUInteger)1, @"View with single match");
     STAssertEqualObjects(v[0][nameIndex], @"name0", nil);
     STAssertEqualObjects(v[0][ageIndex], @0, nil);
     
-    v = [t filterWithPredicate:@"age == 1"];
+    v = [t where:@"age == 1"];
     STAssertEquals(v.rowCount, (NSUInteger)2, @"View with two matches");
     STAssertEqualObjects(v[0][ageIndex], @1, nil);
     
-    v = [t filterWithPredicate:@"1 == age"];
+    v = [t where:@"1 == age"];
     STAssertEquals(v.rowCount, (NSUInteger)2, @"View with two matches");
     STAssertEqualObjects(v[0][ageIndex], @1, nil);
     
     // test AND
-    v = [t filterWithPredicate:@"age == 1 AND name == \"name1\""];
-    STAssertEquals(v.rowCount, (NSUInteger)1, @"View with two matches");
+    v = [t where:@"age == 1 AND name == \"name1\""];
+    STAssertEquals(v.rowCount, (NSUInteger)1, @"View with one match");
     STAssertEqualObjects(v[0][nameIndex], @"name1", nil);
     
     // test OR
-    v = [t filterWithPredicate:@"age == 1 OR age == 4"];
+    v = [t where:@"age == 1 OR age == 4"];
     STAssertEquals(v.rowCount, (NSUInteger)3, @"View with 3 matches");
     
     // test other numeric operators
-    v = [t filterWithPredicate:@"age > 3"];
+    v = [t where:@"age > 3"];
     STAssertEquals(v.rowCount, (NSUInteger)1, @"View with 1 matches");
     
-    v = [t filterWithPredicate:@"age >= 3"];
+    v = [t where:@"age >= 3"];
     STAssertEquals(v.rowCount, (NSUInteger)2, @"View with 2 matches");
     
-    v = [t filterWithPredicate:@"age < 1"];
+    v = [t where:@"age < 1"];
     STAssertEquals(v.rowCount, (NSUInteger)1, @"View with 1 matches");
     
-    v = [t filterWithPredicate:@"age <= 1"];
+    v = [t where:@"age <= 1"];
     STAssertEquals(v.rowCount, (NSUInteger)3, @"View with 3 matches");
+
+    // Filter with predicate object
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @1];
+    v = [t where:predicate];
+    STAssertEquals(v.rowCount, (NSUInteger)2, @"View with two matches");
+    STAssertEqualObjects(v[0][ageIndex], @1, nil);
 }
 
 - (void)testPredicateSort
@@ -1325,27 +1368,36 @@
     
     [t addRow:@[@"name4", @4, [NSNumber numberWithBool:YES]]];
     [t addRow:@[@"name0",@0, [NSNumber numberWithBool:NO]]];
-    
-    TDBView *vAscending = [t filterWithPredicate:nil orderedBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:YES]];
+
+    TDBView *v = [t where:nil orderBy:nil];
+    STAssertEqualObjects(v[0][ageIndex], @4, nil);
+    STAssertEqualObjects(v[1][ageIndex], @0, nil);
+
+    TDBView *vAscending = [t where:nil orderBy:@"age"];
     STAssertEqualObjects(vAscending[0][ageIndex], @0, nil);
     STAssertEqualObjects(vAscending[1][ageIndex], @4, nil);
     
+    TDBView *vAscending2 = [t where:nil orderBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:YES]];
+    STAssertEqualObjects(vAscending2[0][ageIndex], @0, nil);
+    STAssertEqualObjects(vAscending2[1][ageIndex], @4, nil);
+    
     NSSortDescriptor * reverseSort = [NSSortDescriptor sortDescriptorWithKey:@"age" ascending:NO];
-    TDBView *vDescending = [t filterWithPredicate:nil orderedBy:reverseSort];
+    TDBView *vDescending = [t where:nil orderBy:reverseSort];
     STAssertEqualObjects(vDescending[0][ageIndex], @4, nil);
     STAssertEqualObjects(vDescending[1][ageIndex], @0, nil);
     
     NSSortDescriptor * boolSort = [NSSortDescriptor sortDescriptorWithKey:@"hired" ascending:YES];
-    TDBView *vBool = [t filterWithPredicate:nil orderedBy:boolSort];
+    TDBView *vBool = [t where:nil orderBy:boolSort];
     STAssertEqualObjects(vBool[0][ageIndex], @0, nil);
     STAssertEqualObjects(vBool[1][ageIndex], @4, nil);
-    
+
+    STAssertThrows([t where:nil orderBy:@1], @"Invalid order type");
     
     NSSortDescriptor * misspell = [NSSortDescriptor sortDescriptorWithKey:@"oge" ascending:YES];
-    STAssertThrows([t filterWithPredicate:nil orderedBy:misspell], @"Invalid sort");
+    STAssertThrows([t where:nil orderBy:misspell], @"Invalid sort");
     
     NSSortDescriptor * wrongColType = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
-    STAssertThrows([t filterWithPredicate:nil orderedBy:wrongColType], @"Invalid column type");
+    STAssertThrows([t where:nil orderBy:wrongColType], @"Invalid column type");
 }
 
 
