@@ -62,8 +62,8 @@ void ex_objc_table_dyn_table_sizes()
     [table addRow:@[@"Mary",  @27]];
 
     // Print the number of rows and columns
-    NSLog(@"Number of rows: %d",    table.rowCount);
-    NSLog(@"Number of columns: %d", table.columnCount);
+    NSLog(@"Number of rows: %lu",    (unsigned long)table.rowCount);
+    NSLog(@"Number of columns: %lu", (unsigned long)table.columnCount);
     // @@EndExample@@
 }
 
@@ -80,7 +80,7 @@ void ex_objc_table_dyn_table_init_with_columns()
     [table addRow:@[@"Mary",  @27]];
 
     // Print the number of rows and columns
-    NSLog(@"Number of rows: %d",    table.rowCount);
-    NSLog(@"Number of columns: %d", table.columnCount);
+    NSLog(@"Number of rows: %lu",    (unsigned long)table.rowCount);
+    NSLog(@"Number of columns: %lu", (unsigned long)table.columnCount);
     // @@EndExample@@
 }
