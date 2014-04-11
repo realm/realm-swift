@@ -289,8 +289,8 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:contextPath error:nil];
     [fm removeItemAtPath:[contextPath stringByAppendingString:@".lock"] error:nil];
    
-    TDBContext *context1 = [TDBContext contextPersistedAtPath:contextPath error:nil];
-    TDBContext *context2 = [TDBContext contextPersistedAtPath:contextPath error:nil];
+    __block TDBContext *context1 = [TDBContext contextPersistedAtPath:contextPath error:nil];
+    __block TDBContext *context2 = [TDBContext contextPersistedAtPath:contextPath error:nil];
     
     {
         // initially, always say that the db has changed
