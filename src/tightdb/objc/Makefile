@@ -1,19 +1,22 @@
 SUBDIRS = test
 test_DEPS = .
 
-nobase_subinclude_HEADERS = TDBType.h TDBRow.h TDBTransaction.h TDBQuery.h TDBTable.h TDBContext.h PrivateHelperMacros.h PrivateTableMacros.h PrivateTDB.h Tightdb.h TDBVersion.h \
-TDBDescriptor.h TDBView.h TDBColumnProxy.h TDBViewProtocol.h \
+# Headers to be installed
+nobase_subinclude_HEADERS = TDBConstants.h TDBType.h TDBRow.h TDBTransaction.h TDBQuery.h \
+TDBTable.h TDBContext.h TDBSmartContext.h PrivateHelperMacros.h PrivateTableMacros.h PrivateTDB.h \
+Tightdb.h TDBVersion.h TDBDescriptor.h TDBView.h TDBColumnProxy.h TDBViewProtocol.h \
 TightdbFast.h TDBRowFast.h
 
 nobase_subinclude_HEADERS_EXTRA_UNINSTALL = *.h
 
 lib_LIBRARIES = libtightdb-objc.a
 
-libtightdb_objc_a_SOURCES = TDBTable.mm TDBRow.mm TDBTransaction.mm TDBQuery.mm \
-TDBContext.mm util.mm TDBVersion.mm TDBDescriptor.mm TDBView.mm \
+libtightdb_objc_a_SOURCES = TDBConstants.m TDBTable.mm TDBRow.mm TDBTransaction.mm TDBQuery.mm \
+TDBContext.mm TDBSmartContext.mm util.mm TDBVersion.mm TDBDescriptor.mm TDBView.mm \
 TDBColumnProxy.mm NSData+TDBGetBinaryData.mm TDBCrashReportingAgentLauncher.mm
 
-libtightdb_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2 -std=gnu++11
+
+libtightdb_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2
 libtightdb_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
 
 # Format: CURRENT[:REVISION[:AGE]]

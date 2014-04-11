@@ -21,10 +21,9 @@
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/group_shared.hpp>
 
-#import <tightdb/objc/TDBContext.h>
-#import <tightdb/objc/TDBTransaction_noinst.h>
-
-#include <tightdb/objc/util_noinst.hpp>
+#import "TDBContext.h"
+#import "TDBTransaction_noinst.h"
+#import "util_noinst.hpp"
 
 #define TIGHTDB_CRASH_REPORTING_ENABLED 1
 
@@ -57,7 +56,30 @@ static TDBCrashReportingAgentLauncher* s_agentLauncher = nil;
 #endif
 }
 
-+(TDBContext*)contextWithPersistenceToFile:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
+NSString *const defaultContextFileName = @"default.tightdb";
+
++(NSString *)defaultPath
+{
+    return [TDBContext writeablePathForFile:defaultContextFileName];
+}
+
+
++(TDBContext *)contextWithDefaultPersistence
+{
+    NSString *path = [TDBContext writeablePathForFile:defaultContextFileName];
+    return [self contextPersistedAtPath:path error:nil];
+}
+
++ (NSString *)writeablePathForFile:(NSString*)fileName
+{
+    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString* documentsDirectory = [paths objectAtIndex:0];
+    return [documentsDirectory stringByAppendingPathComponent:fileName];
+}
+
+
+
++(TDBContext*)contextPersistedAtPath:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
 {
     TDBContext* shared_group = [[TDBContext alloc] init];
     if (!shared_group)
@@ -95,11 +117,11 @@ static TDBCrashReportingAgentLauncher* s_agentLauncher = nil;
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"TDBSharedGroup dealloc");
+    // NSLog(@"TDBSharedGroup dealloc");
 #endif
 }
 
--(void)readWithBlock:(TDBReadBlock)block
+-(void)readUsingBlock:(TDBReadBlock)block
 {
     const tightdb::Group* group;
     try {
@@ -125,16 +147,16 @@ static TDBCrashReportingAgentLauncher* s_agentLauncher = nil;
     }
 }
 
--(void)readTable:(NSString*)tablename withBlock:(TDBTableReadBlock)block
+-(void)readTable:(NSString*)tablename usingBlock:(TDBTableReadBlock)block
 {
-    [self readWithBlock:^(TDBTransaction *trx){
+    [self readUsingBlock:^(TDBTransaction *trx){
         TDBTable *table = [trx tableWithName:tablename];
         block(table);
     }];
 }
 
 
--(BOOL)writeWithBlock:(TDBWriteBlock)block error:(NSError**)error
+-(BOOL)writeUsingBlock:(TDBWriteBlock)block error:(NSError**)error
 {
     tightdb::Group* group;
     try {
@@ -185,9 +207,9 @@ static TDBCrashReportingAgentLauncher* s_agentLauncher = nil;
     return NO;
 }
 
--(BOOL)writeTable:(NSString*)tablename withBlock:(TDBTableWriteBlock)block error:(NSError **)error
+-(BOOL)writeTable:(NSString*)tablename usingBlock:(TDBTableWriteBlock)block error:(NSError **)error
 {
-    return [self writeWithBlock:^(TDBTransaction *trx){
+    return [self writeUsingBlock:^(TDBTransaction *trx){
         TDBTable *table = [trx tableWithName:tablename];
         return block(table);
     } error: error];
@@ -197,6 +219,7 @@ static TDBCrashReportingAgentLauncher* s_agentLauncher = nil;
 {
     return m_shared_group->has_changed();
 }
+
 
 -(BOOL)pinReadTransactions
 {

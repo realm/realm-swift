@@ -26,17 +26,12 @@
 #include <tightdb/table_view.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
-#import "TDBTable.h"
 #import "TDBTable_noinst.h"
 #import "TDBRow.h"
-#import "TDBView.h"
 #import "TDBView_noinst.h"
-#import "TDBQuery.h"
 #import "TDBQuery_noinst.h"
 #import "PrivateTDB.h"
-
-#include <tightdb/objc/util_noinst.hpp>
-
+#import "util_noinst.hpp"
 
 
 @implementation TDBView
@@ -55,7 +50,7 @@
     view_2->m_view.reset(new tightdb::TableView(view)); // FIXME: Exception handling needed here
     view_2->m_table = table;
     view_2->m_read_only = [table isReadOnly];
-    
+
     return view_2;
 }
 
@@ -79,7 +74,7 @@
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"TDBView dealloc");
+    // NSLog(@"TDBView dealloc");
 #endif
     m_table = nil; // FIXME: What is the point of doing this?
 }
@@ -88,10 +83,10 @@
 {
     // The cursor constructor checks the index is in bounds. However, getSourceIndex should
     // not be called with illegal index.
-    
+
     if (ndx >= self.rowCount)
         return nil;
-    
+
     return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
 }
 
@@ -99,10 +94,10 @@
 {
     // The cursor constructor checks the index is in bounds. However, getSourceIndex should
     // not be called with illegal index.
-    
+
     if (ndx >= self.rowCount)
         return nil;
-    
+
     return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
 }
 
@@ -122,7 +117,6 @@
     return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1]];
 }
 
-
 -(NSUInteger)rowCount
 {
     return m_view->size();
@@ -138,20 +132,22 @@
     TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colNdx);
     return TDBType(m_view->get_column_type(colNdx));
 }
+
 -(void)sortUsingColumnWithIndex:(NSUInteger)colIndex
 {
     [self sortUsingColumnWithIndex:colIndex inOrder:TDBAscending];
 }
+
 -(void)sortUsingColumnWithIndex:(NSUInteger)colIndex  inOrder: (TDBSortOrder)order
 {
     TDBType columnType = [self columnTypeOfColumnWithIndex:colIndex];
-    
+
     if(columnType != TDBIntType && columnType != TDBBoolType && columnType != TDBDateType) {
         @throw [NSException exceptionWithName:@"tightdb:sort_on_column_with_type_not_supported"
                                        reason:@"Sort is currently only supported on Integer, Boolean and Date columns."
                                      userInfo:nil];
     }
-    
+
     try {
         m_view->sort(colIndex, order == 0);
     } catch(std::exception& ex) {
@@ -186,7 +182,7 @@
     tightdb::Mixed mixed = m_view->get_mixed(colNdx, rowIndex);
     if (mixed.get_type() != tightdb::type_Table)
         return to_objc_object(mixed);
-    
+
     tightdb::TableRef table = m_view->get_subtable(colNdx, rowIndex);
     TIGHTDB_ASSERT(table);
     TDBTable* table_2 = [[TDBTable alloc] _initRaw];
@@ -197,7 +193,7 @@
     [table_2 setReadOnly:m_read_only];
     if (![table_2 _checkType])
         return nil;
-    
+
     return table_2;
 }
 
@@ -207,14 +203,14 @@
 }
 
 
--(void) removeRowAtIndex:(NSUInteger)rowIndex
+-(void)removeRowAtIndex:(NSUInteger)rowIndex
 {
     if (m_read_only) {
         @throw [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
                                        reason:@"You tried to modify an immutable tableview"
-                                     userInfo:[NSMutableDictionary dictionary]];
+                                     userInfo:nil];
     }
-    
+
     m_view->remove(rowIndex);
 }
 -(void)removeAllRows
@@ -224,7 +220,7 @@
                                        reason:@"You tried to modify an immutable tableview"
                                      userInfo:nil];
     }
-    
+
     m_view->clear();
 }
 -(NSUInteger)rowIndexInOriginTableForRowAtIndex:(NSUInteger)rowIndex
@@ -261,7 +257,7 @@
     return 1;
 }
 
-- (TDBQuery *) where
+- (TDBQuery *)where
 {
     TDBQuery *query = [[TDBQuery alloc] initWithTable:self.originTable error:nil];
     [query setTableView:*m_view];

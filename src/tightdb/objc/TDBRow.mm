@@ -20,15 +20,14 @@
 
 #include <tightdb/table.hpp>
 
-#import <tightdb/objc/TDBRow.h>
-#import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBTable_noinst.h>
-#import <tightdb/objc/PrivateTDB.h>
-#import <tightdb/objc/TDBRowFast.h>
-
-#include <tightdb/objc/util_noinst.hpp>
+#import "TDBRow.h"
+#import "TDBTable_noinst.h"
+#import "PrivateTDB.h"
+#import "TDBRowFast.h"
+#import "util_noinst.hpp"
 
 using namespace std;
+
 
 // TODO: Concept for row invalidation (when table updates).
 
@@ -63,7 +62,7 @@ using namespace std;
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"TDBRow dealloc");
+    // NSLog(@"TDBRow dealloc");
 #endif
     _table = nil;
 }

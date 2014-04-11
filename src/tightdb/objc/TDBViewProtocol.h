@@ -18,10 +18,11 @@
  *
  **************************************************************************/
 
-#include <tightdb/objc/TDBType.h>
+#include "TDBType.h"
 
 @class TDBRow;
 @class TDBQuery;
+
 
 @protocol TDBView
 
