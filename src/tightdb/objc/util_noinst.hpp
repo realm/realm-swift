@@ -166,6 +166,7 @@ inline bool nsnumber_is_like_double(NSObject *obj)
 void to_mixed(id value, tightdb::Mixed& m);
 
 BOOL set_cell(size_t col_ndx, size_t row_ndx, tightdb::Table& table, NSObject *obj);
+BOOL verify_object_is_type(id obj, tightdb::DataType type);
 BOOL verify_cell(const tightdb::Descriptor& descr, size_t col_ndx, NSObject *obj);
 NSObject* get_cell(size_t col_ndx, size_t row_ndx, tightdb::Table& table);
 
