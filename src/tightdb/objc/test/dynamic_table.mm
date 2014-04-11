@@ -26,6 +26,15 @@
 
 #include <string.h>
 
+@interface TestClass : NSObject
+@property (nonatomic) NSString *name;
+@property (nonatomic) NSNumber *age;
+@end
+
+@implementation TestClass
+// no needed
+@end
+
 @interface TDBDynamicTableTests: SenTestCase
   // Intentionally left blank.
   // No new public instance methods need be defined.
@@ -80,7 +89,7 @@
     [t addColumnWithName:@"first" type:TDBIntType];
     STAssertNoThrow([t addRow:@[ @1 ]], @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
-    STAssertTrue([t addRow:@[ @2 ]], @"Impossible!");
+    STAssertNoThrow([t addRow:@[ @2 ]], @"Impossible!");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
     STAssertEquals((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
     STAssertEquals((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:1], @"Value 2 expected");
@@ -93,9 +102,9 @@
     // Add row using object literate
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
-    STAssertTrue([t insertRow:@[ @1 ] atIndex:0], @"Impossible!");
+    STAssertNoThrow([t insertRow:@[ @1 ] atIndex:0], @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
-    STAssertTrue([t insertRow:@[ @2 ] atIndex:0], @"Impossible!");
+    STAssertNoThrow([t insertRow:@[ @2 ] atIndex:0], @"Impossible!");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
     STAssertEquals((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:1], @"Value 1 expected");
     STAssertEquals((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
@@ -110,6 +119,28 @@
     [t insertRow:@[@1] atIndex:0];
     t[0] = @[@2];
     STAssertEquals((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
+}
+
+-(void)testAppendRowGenericObject
+{
+    TDBTable* table1 = [[TDBTable alloc] init];
+    [table1 addColumnWithName:@"name" type:TDBStringType];
+    [table1 addColumnWithName:@"age" type:TDBIntType];
+
+    TestClass *person = [TestClass new];
+    person.name = @"Joe";
+    person.age = @11;
+    STAssertNoThrow([table1 addRow:person], @"Cannot add person");
+    STAssertEquals((NSUInteger)1, table1.rowCount, @"1 row excepted");
+    STAssertEquals((long long)11, [(NSNumber *)table1[0][@"age"] longLongValue], @"11 excepted");
+    STAssertTrue([((NSString *)table1[0][@"name"]) isEqualToString:@"Joe"], @"'Joe' excepted");
+
+    TDBTable* table2 = [[TDBTable alloc] init];
+    [table2 addColumnWithName:@"name" type:TDBStringType];
+    [table2 addColumnWithName:@"age" type:TDBStringType];
+
+    STAssertThrows([table2 addRow:person], @"Impossible");
+    STAssertEquals((NSUInteger)0, table2.rowCount, @"0 rows excepted");
 }
 
 -(void)testUpdateRowWithLabelsIntColumn
@@ -131,7 +162,7 @@
     STAssertNoThrow([t addRow:@{ @"first": @1 }], @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
 
-    STAssertTrue([t addRow:@{ @"first": @2 }], @"Impossible!");
+    STAssertNoThrow([t addRow:@{ @"first": @2 }], @"Impossible!");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
 
     STAssertEquals((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
@@ -140,10 +171,10 @@
     STAssertThrows([t addRow:@{ @"first": @"Hello" }], @"Wrong type");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
 
-    STAssertTrue(([t addRow:@{ @"first": @1, @"second": @"Hello" }]), @"dh");
+    STAssertNoThrow(([t addRow:@{ @"first": @1, @"second": @"Hello" }]), @"dh");
     STAssertEquals((size_t)3, [t rowCount], @"Expected 3 rows");
 
-    STAssertTrue(([t addRow:@{ @"second": @1 }]), @"This is impossible");
+    STAssertNoThrow(([t addRow:@{ @"second": @1 }]), @"This is impossible");
     STAssertEquals((size_t)4, [t rowCount], @"Expected 4 rows");
 
     STAssertEquals((int64_t)0, [t TDB_intInColumnWithIndex:0 atRowIndex:3], @"Value 0 expected");
@@ -155,10 +186,10 @@
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
     
-    STAssertTrue(([t insertRow:@{ @"first": @1 } atIndex:0]), @"Impossible!");
+    STAssertNoThrow(([t insertRow:@{ @"first": @1 } atIndex:0]), @"Impossible!");
     STAssertEquals((size_t)1, [t rowCount], @"Expected 1 row");
     
-    STAssertTrue(([t insertRow:@{ @"first": @2 } atIndex:0]), @"Impossible!");
+    STAssertNoThrow(([t insertRow:@{ @"first": @2 } atIndex:0]), @"Impossible!");
     STAssertEquals((size_t)2, [t rowCount], @"Expected 2 rows");
     
     STAssertEquals((int64_t)1, ([t TDB_intInColumnWithIndex:0 atRowIndex:1]), @"Value 1 expected");
@@ -167,10 +198,10 @@
     STAssertThrows(([t insertRow:@{ @"first": @"Hello" } atIndex:0]), @"Wrong type");
     STAssertEquals((size_t)2, ([t rowCount]), @"Expected 2 rows");
     
-    STAssertTrue(([t insertRow:@{ @"first": @3, @"second": @"Hello"} atIndex:0]), @"Has 'first'");
+    STAssertNoThrow(([t insertRow:@{ @"first": @3, @"second": @"Hello"} atIndex:0]), @"Has 'first'");
     STAssertEquals((size_t)3, [t rowCount], @"Expected 3 rows");
     
-    STAssertTrue(([t insertRow:@{ @"second": @4 } atIndex:0]), @"This is impossible");
+    STAssertNoThrow(([t insertRow:@{ @"second": @4 } atIndex:0]), @"This is impossible");
     STAssertEquals((size_t)4, [t rowCount], @"Expected 4 rows");
     STAssertTrue((int64_t)0 == ([t TDB_intInColumnWithIndex:0 atRowIndex:0]), @"Value 0 expected");
 }
@@ -243,7 +274,7 @@
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 
     NSDate *d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
-    STAssertTrue(([t addRow:@[d]]), @"Cannot insert 'NSDate'");
+    STAssertNoThrow(([t addRow:@[d]]), @"Cannot insert 'NSDate'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
@@ -256,7 +287,7 @@
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
     
     NSDate *d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
-    STAssertTrue(([t addRow:@{@"first": d}]), @"Cannot insert 'NSDate'");
+    STAssertNoThrow(([t addRow:@{@"first": d}]), @"Cannot insert 'NSDate'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
@@ -270,7 +301,7 @@
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 
     NSData *nsd = [NSData dataWithBytes:(const void *)bin length:4];
-    STAssertTrue(([t addRow:@[nsd]]), @"Cannot insert 'NSData'");
+    STAssertNoThrow(([t addRow:@[nsd]]), @"Cannot insert 'NSData'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
@@ -286,7 +317,7 @@
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 
     NSData *nsd = [NSData dataWithBytes:(const void *)bin length:4];
-    STAssertTrue(([t addRow:@{@"first": nsd}]), @"Cannot insert 'NSData'");
+    STAssertNoThrow(([t addRow:@{@"first": nsd}]), @"Cannot insert 'NSData'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
@@ -320,7 +351,7 @@
     TDBTable *t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBBoolType];
     STAssertNoThrow(([t addRow:@[@YES]]), @"Cannot append bool column.");
-    STAssertTrue(([t addRow:@[@NO]]), @"Cannot append bool column.");
+    STAssertNoThrow(([t addRow:@[@NO]]), @"Cannot append bool column.");
     STAssertEquals((size_t)2, [t rowCount], @"2 rows expected");
 }
 
@@ -329,7 +360,7 @@
     TDBTable *t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBBoolType];
     STAssertNoThrow(([t addRow:@{@"first": @YES}]), @"Cannot append bool column.");
-    STAssertTrue(([t addRow:@{@"first": @NO}]), @"Cannot append bool column.");
+    STAssertNoThrow(([t addRow:@{@"first": @NO}]), @"Cannot append bool column.");
     STAssertEquals((size_t)2, [t rowCount], @"2 rows expected");
 }
 
@@ -355,15 +386,15 @@
     [t addColumnWithName:@"first" type:TDBMixedType];
     STAssertNoThrow(([t addRow:@[@1]]), @"Cannot insert 'int'");
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row excepted");
-    STAssertTrue(([t addRow:@[@"Hello"]]), @"Cannot insert 'string'");
+    STAssertNoThrow(([t addRow:@[@"Hello"]]), @"Cannot insert 'string'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
-    STAssertTrue(([t addRow:@[@3.14f]]), @"Cannot insert 'float'");
+    STAssertNoThrow(([t addRow:@[@3.14f]]), @"Cannot insert 'float'");
     STAssertEquals((size_t)3, ([t rowCount]), @"3 rows excepted");
-    STAssertTrue(([t addRow:@[@3.14]]), @"Cannot insert 'double'");
+    STAssertNoThrow(([t addRow:@[@3.14]]), @"Cannot insert 'double'");
     STAssertEquals((size_t)4, ([t rowCount]), @"4 rows excepted");
-    STAssertTrue(([t addRow:@[@YES]]), @"Cannot insert 'bool'");
+    STAssertNoThrow(([t addRow:@[@YES]]), @"Cannot insert 'bool'");
     STAssertEquals((size_t)5, ([t rowCount]), @"5 rows excepted");
-    STAssertTrue(([t addRow:@[bin2]]), @"Cannot insert 'binary'");
+    STAssertNoThrow(([t addRow:@[bin2]]), @"Cannot insert 'binary'");
     STAssertEquals((size_t)6, ([t rowCount]), @"6 rows excepted");
 }
 
@@ -376,15 +407,15 @@
     [t addColumnWithName:@"first" type:TDBMixedType];
     STAssertNoThrow(([t addRow:@{@"first": @1}]), @"Cannot insert 'int'");
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row excepted");
-    STAssertTrue(([t addRow:@{@"first": @"Hello"}]), @"Cannot insert 'string'$");
+    STAssertNoThrow(([t addRow:@{@"first": @"Hello"}]), @"Cannot insert 'string'$");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
-    STAssertTrue(([t addRow:@{@"first": @3.14f}]), @"Cannot insert 'float'");
+    STAssertNoThrow(([t addRow:@{@"first": @3.14f}]), @"Cannot insert 'float'");
     STAssertEquals((size_t)3, ([t rowCount]), @"3 rows excepted");
-    STAssertTrue(([t addRow:@{@"first": @3.14}]), @"Cannot insert 'double'");
+    STAssertNoThrow(([t addRow:@{@"first": @3.14}]), @"Cannot insert 'double'");
     STAssertEquals((size_t)4, ([t rowCount]), @"4 rows excepted");
-    STAssertTrue(([t addRow:@{@"first": @YES}]), @"Cannot insert 'bool'");
+    STAssertNoThrow(([t addRow:@{@"first": @YES}]), @"Cannot insert 'bool'");
     STAssertEquals((size_t)5, ([t rowCount]), @"5 rows excepted");
-    STAssertTrue(([t addRow:@{@"first": bin2}]), @"Cannot insert 'binary'");
+    STAssertNoThrow(([t addRow:@{@"first": bin2}]), @"Cannot insert 'binary'");
     STAssertEquals((size_t)6, ([t rowCount]), @"6 rows excepted");
 }
 
@@ -942,8 +973,8 @@
     STAssertTrue([[row2 stringInColumnWithIndex:StringCol] isEqual:@"banach"], @"row2.StringCol");
     STAssertTrue([[row1 binaryInColumnWithIndex:BinaryCol] isEqual:bin1],      @"row1.BinaryCol");
     STAssertTrue([[row2 binaryInColumnWithIndex:BinaryCol] isEqual:bin2],      @"row2.BinaryCol");
-    STAssertEqualsWithAccuracy([[row1 dateInColumnWithIndex:DateCol] timeIntervalSince1970], (NSTimeInterval)0, 0.99,               @"row1.DateCol");
-    STAssertEqualsWithAccuracy([[row2 dateInColumnWithIndex:DateCol] timeIntervalSince1970], [timeNow timeIntervalSince1970], 0.99, @"row2.DateCol");
+    STAssertEqualsWithAccuracy([[row1 dateInColumnWithIndex:DateCol] timeIntervalSince1970], (NSTimeInterval)0, 0.99, @"row1.DateCol");
+    STAssertTrue((fabs([[row2 dateInColumnWithIndex:DateCol] timeIntervalSinceDate:timeNow]) < 1.0), @"row2.DateCol");
     STAssertTrue([[row1 tableInColumnWithIndex:TableCol] isEqual:subtab1],    @"row1.TableCol");
     STAssertTrue([[row2 tableInColumnWithIndex:TableCol] isEqual:subtab2],    @"row2.TableCol");
     STAssertTrue([[row1 mixedInColumnWithIndex:MixedCol] isEqual:mixInt1],    @"row1.MixedCol");
@@ -1228,6 +1259,147 @@
     STAssertEqualObjects(v[1][ageIndex], @1, nil);
     STAssertEqualObjects(v[2][ageIndex], @2, nil);
 }
+
+- (void)testPredicateFind
+{
+    TDBTable *t = [[TDBTable alloc] initWithColumns:@[@"name", @"string",
+                                                      @"age",  @"int"]];
+    [t addRow:@[@"name0", @0]];
+    [t addRow:@[@"name1", @1]];
+    [t addRow:@[@"name2", @1]];
+    [t addRow:@[@"name3", @3]];
+    [t addRow:@[@"name4", @4]];
+
+    STAssertThrows([t find:@"garbage"], @"Garbage predicate");
+    STAssertThrows([t find:@"name == notAValue"], @"Invalid expression");
+    STAssertThrows([t find:@"naem == \"name0\""], @"Invalid column");
+    STAssertThrows([t find:@"name == 30"], @"Invalid value type");
+    STAssertThrows([t find:@1], @"Invalid condition");
+
+    // Searching with no condition just finds first row
+    TDBRow *r = [t find:nil];
+    STAssertEqualObjects(r[@"name"], @"name0", @"first row");
+
+    // Search with predicate string
+    r = [t find:@"name == \"name10\""];
+    STAssertEqualObjects(r, nil, @"no match");
+
+    r = [t find:@"name == \"name0\""];
+    STAssertEqualObjects(r[@"name"], @"name0", nil);
+
+    r = [t find:@"age == 4"];
+    STAssertEqualObjects(r[@"name"], @"name4", nil);
+
+    // Search with predicate object
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
+    r = [t find:predicate];
+    STAssertEqualObjects(r[@"name"], @"name3", nil);
+}
+
+
+- (void)testPredicateView
+{
+    TDBTable *t = [[TDBTable alloc] init];
+    
+    NSUInteger nameIndex = [t addColumnWithName:@"name" type:TDBStringType];
+    NSUInteger ageIndex = [t addColumnWithName:@"age" type:TDBIntType];
+
+    [t addRow:@[@"name0", @0]];
+    [t addRow:@[@"name1", @1]];
+    [t addRow:@[@"name2", @1]];
+    [t addRow:@[@"name3", @3]];
+    [t addRow:@[@"name4", @4]];
+
+    STAssertThrows([t where:@"garbage"], @"Garbage predicate");
+    STAssertThrows([t where:@"name == notAValue"], @"Invalid expression");
+    STAssertThrows([t where:@"naem == \"name0\""], @"Invalid column");
+    STAssertThrows([t where:@"name == 30"], @"Invalid value type");
+
+    // Filter with predicate string
+    TDBView *v = [t where:@"name == \"name0\""];
+    STAssertEquals(v.rowCount, (NSUInteger)1, @"View with single match");
+    STAssertEqualObjects(v[0][nameIndex], @"name0", nil);
+    STAssertEqualObjects(v[0][ageIndex], @0, nil);
+    
+    v = [t where:@"age == 1"];
+    STAssertEquals(v.rowCount, (NSUInteger)2, @"View with two matches");
+    STAssertEqualObjects(v[0][ageIndex], @1, nil);
+    
+    v = [t where:@"1 == age"];
+    STAssertEquals(v.rowCount, (NSUInteger)2, @"View with two matches");
+    STAssertEqualObjects(v[0][ageIndex], @1, nil);
+    
+    // test AND
+    v = [t where:@"age == 1 AND name == \"name1\""];
+    STAssertEquals(v.rowCount, (NSUInteger)1, @"View with one match");
+    STAssertEqualObjects(v[0][nameIndex], @"name1", nil);
+    
+    // test OR
+    v = [t where:@"age == 1 OR age == 4"];
+    STAssertEquals(v.rowCount, (NSUInteger)3, @"View with 3 matches");
+    
+    // test other numeric operators
+    v = [t where:@"age > 3"];
+    STAssertEquals(v.rowCount, (NSUInteger)1, @"View with 1 matches");
+    
+    v = [t where:@"age >= 3"];
+    STAssertEquals(v.rowCount, (NSUInteger)2, @"View with 2 matches");
+    
+    v = [t where:@"age < 1"];
+    STAssertEquals(v.rowCount, (NSUInteger)1, @"View with 1 matches");
+    
+    v = [t where:@"age <= 1"];
+    STAssertEquals(v.rowCount, (NSUInteger)3, @"View with 3 matches");
+
+    // Filter with predicate object
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @1];
+    v = [t where:predicate];
+    STAssertEquals(v.rowCount, (NSUInteger)2, @"View with two matches");
+    STAssertEqualObjects(v[0][ageIndex], @1, nil);
+}
+
+- (void)testPredicateSort
+{
+    TDBTable *t = [[TDBTable alloc] init];
+    
+    [t addColumnWithName:@"name" type:TDBStringType];
+    NSUInteger ageIndex = [t addColumnWithName:@"age" type:TDBIntType];
+    [t addColumnWithName:@"hired" type:TDBBoolType];
+    
+    [t addRow:@[@"name4", @4, [NSNumber numberWithBool:YES]]];
+    [t addRow:@[@"name0",@0, [NSNumber numberWithBool:NO]]];
+
+    TDBView *v = [t where:nil orderBy:nil];
+    STAssertEqualObjects(v[0][ageIndex], @4, nil);
+    STAssertEqualObjects(v[1][ageIndex], @0, nil);
+
+    TDBView *vAscending = [t where:nil orderBy:@"age"];
+    STAssertEqualObjects(vAscending[0][ageIndex], @0, nil);
+    STAssertEqualObjects(vAscending[1][ageIndex], @4, nil);
+    
+    TDBView *vAscending2 = [t where:nil orderBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:YES]];
+    STAssertEqualObjects(vAscending2[0][ageIndex], @0, nil);
+    STAssertEqualObjects(vAscending2[1][ageIndex], @4, nil);
+    
+    NSSortDescriptor * reverseSort = [NSSortDescriptor sortDescriptorWithKey:@"age" ascending:NO];
+    TDBView *vDescending = [t where:nil orderBy:reverseSort];
+    STAssertEqualObjects(vDescending[0][ageIndex], @4, nil);
+    STAssertEqualObjects(vDescending[1][ageIndex], @0, nil);
+    
+    NSSortDescriptor * boolSort = [NSSortDescriptor sortDescriptorWithKey:@"hired" ascending:YES];
+    TDBView *vBool = [t where:nil orderBy:boolSort];
+    STAssertEqualObjects(vBool[0][ageIndex], @0, nil);
+    STAssertEqualObjects(vBool[1][ageIndex], @4, nil);
+
+    STAssertThrows([t where:nil orderBy:@1], @"Invalid order type");
+    
+    NSSortDescriptor * misspell = [NSSortDescriptor sortDescriptorWithKey:@"oge" ascending:YES];
+    STAssertThrows([t where:nil orderBy:misspell], @"Invalid sort");
+    
+    NSSortDescriptor * wrongColType = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
+    STAssertThrows([t where:nil orderBy:wrongColType], @"Invalid column type");
+}
+
 
 -(void)testTableDynamic_find_int
 {

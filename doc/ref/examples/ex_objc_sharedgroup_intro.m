@@ -17,13 +17,13 @@ void ex_objc_context_intro()
     [fm removeItemAtPath:@"contextTest.tightdb.lock" error:nil];
     
     /* Create datafile with a new table. */
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:@"contextTest.tightdb"
+    TDBContext *context = [TDBContext contextPersistedAtPath:@"contextTest.tightdb"
                                                              error:nil];
 
     /* Perform a write transaction (with commit to file). */
     NSError *error = nil;
     BOOL success;
-    success = [context writeWithBlock:^(TDBTransaction *transaction) {
+    success = [context writeUsingBlock:^(TDBTransaction *transaction) {
         PeopleTable *table = [transaction createTableWithName:@"employees"
                                                  asTableClass:[PeopleTable class]];
         [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
@@ -35,7 +35,7 @@ void ex_objc_context_intro()
 
     
     /* Perform a write transaction (with rollback). */
-    success = [context writeWithBlock:^(TDBTransaction *transaction) {
+    success = [context writeUsingBlock:^(TDBTransaction *transaction) {
         PeopleTable *table = [transaction createTableWithName:@"employees"
                                                  asTableClass:[PeopleTable class]];
         if ([table rowCount] == 0) {
@@ -51,7 +51,7 @@ void ex_objc_context_intro()
 
     
     /* Perfrom a read transaction */
-    [context readWithBlock:^(TDBTransaction *group) {
+    [context readUsingBlock:^(TDBTransaction *group) {
         PeopleTable *table = [group tableWithName:@"employees"
                                      asTableClass:[PeopleTable class]];
         for (PeopleTableRow *row in table) {

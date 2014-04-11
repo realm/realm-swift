@@ -12,8 +12,8 @@ void ex_objc_table_dynamic_intro()
     NSUInteger const AGE  = [table addColumnWithName:@"Age"
                                                 type:TDBIntType];
     /* Add an empty row and set column values. */
-    NSUInteger rowIndex = [table addRow:nil];
-    TDBRow *row = [table rowAtIndex:rowIndex];
+    [table addRow:nil];
+    TDBRow *row = [table lastRow];
     row[NAME] = @"Joe";
     row[AGE] = @23;
     

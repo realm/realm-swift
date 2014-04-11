@@ -18,9 +18,11 @@
  *
  **************************************************************************/
 
-#include <tightdb/objc/TDBType.h>
+#include "TDBType.h"
 
 @class TDBRow;
+@class TDBQuery;
+
 
 @protocol TDBView
 
@@ -39,5 +41,7 @@
 // Removing rows
 -(void)removeRowAtIndex:(NSUInteger)rowIndex;
 -(void)removeAllRows;
+
+-(TDBQuery *)where;
 
 @end
