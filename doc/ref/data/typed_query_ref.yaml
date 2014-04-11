@@ -39,6 +39,7 @@ CATEGORIES :
                  .columnName (ClassNameQuery *)columnIsEqualTo:(NSString *)value
                  .columnName (ClassNameQuery *)columnIsEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive
                  .columnName (ClassNameQuery *)columnIsEqualTo:(NSDate *)value
+                 .columnName (ClassNameQuery *)columnIsEqualTo:(NSData *)value
       SUMMARY  : *g_typed_query_equals_summary
       DESCR    : *g_typed_query_equals_descr
       PARAMS:
@@ -60,7 +61,6 @@ CATEGORIES :
         CODE   : ex_objc_typed_query_equals
 
   - g_typed_query_notEquals_bool:
-       TODO: soon
   - g_typed_query_notEquals_binary:
   - g_typed_query_notEquals_int:
   - g_typed_query_notEquals_float:
@@ -77,6 +77,7 @@ CATEGORIES :
                  .columnName (ClassNameQuery *)columnIsNotEqualTo:(NSString *)value
                  .columnName (ClassNameQuery *)columnIsNotEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive
                  .columnName (ClassNameQuery *)columnIsNotEqualTo:(NSDate *)value
+                 .columnName (ClassNameQuery *)columnIsNotEqualTo:(NSData *)value
       SUMMARY  : *g_typed_query_notEquals_summary
       DESCR    : *g_typed_query_notEquals_descr
       PARAMS:
@@ -122,7 +123,7 @@ CATEGORIES :
   - g_typed_query_greaterThanOrEqual_double:
   - g_typed_query_greaterThanOrEqual_date:
       NAMES    : [columnIsGreaterThanOrEqualTo, columnIsGreaterThanOrEqualTo, columnIsGreaterThanOrEqualTo, columnIsGreaterThanOrEqualTo]
-      TITLE    : "*columnIsGreaterThanOrEqualTo"
+      TITLE    : "columnIsGreaterThanOrEqualTo"
       SIGNATURE: |
                  .columnName (ClassNameQuery *)columnIsGreaterThanOrEqualTo:(int64_t)value
                  .columnName (ClassNameQuery *)columnIsGreaterThanOrEqualTo:(float)value
@@ -217,7 +218,6 @@ CATEGORIES :
         CODE   : ex_objc_typed_query_between
 
   - g_typed_query_startsWith_binary:
-      TODO: soon
   - g_typed_query_startsWith_string:
       NAME     : columnBeginsWith
   - g_typed_query_startsWith_string_2:
@@ -226,11 +226,12 @@ CATEGORIES :
       SIGNATURE: |
                  .columnName (ClassNameQuery *)columnBeginsWith:(NSString *)value
                  .columnName (ClassNameQuery *)columnBeginsWith:(NSString *)value caseSensitive:(BOOL)
+                 .columnName (ClassNameQuery *)columnBeginsWith:(NSData *)value
       DESCR    : *g_typed_query_startsWith_descr
       SUMMARY  : *g_typed_query_startsWith_summary
       PARAMS:
       - NAME   : value
-        TYPES  : NSString *
+        TYPES  : [NSString *, NSData *]
         DESCR  : *g_typed_query_value_descr
       - NAME   : caseSensitive
         TYPES  : BOOL
@@ -243,20 +244,20 @@ CATEGORIES :
         CODE   : ex_objc_typed_query_startsWith
 
   - g_typed_query_endsWith_binary:
-      TODO: soon
   - g_typed_query_endsWith_string:
       NAME     : columnEndsWith
   - g_typed_query_endsWith_string_2:
       NAME     : columnEndsWith
-      TITLE    : "*columnEndsWith"
+      TITLE    : columnEndsWith
       SIGNATURE: |
                  .columnName (ClassNameQuery *)columnEndsWith:(NSString *)value
                  .columnName (ClassNameQuery *)columnEndsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 .columnName (ClassNameQuery *)columnEndsWith:(NSData *)value
       DESCR    : *g_typed_query_endsWith_descr
       SUMMARY  : *g_typed_query_endsWith_summary
       PARAMS:
       - NAME   : value
-        TYPES  : NSString *
+        TYPES  : [NSString *, NSData *]
         DESCR  : *g_typed_query_value_descr
       - NAME   : caseSensitive
         TYPES  : BOOL
@@ -269,7 +270,6 @@ CATEGORIES :
         CODE   : ex_objc_typed_query_endsWith
 
   - g_typed_query_contains_binary:
-      TODO: soon
   - g_typed_query_contains_string:
   - g_typed_query_contains_string_2:
       NAMES    : [columnContains, columnContains]
@@ -277,11 +277,12 @@ CATEGORIES :
       SIGNATURE: |
                  .columnName (ClassNameQuery *)columnContains:(NSString *)value
                  .columnName (ClassNameQuery *)columnContains:(NSString *)value caseSensitive:(BOOL)
+                 .columnName (ClassNameQuery *)columnContains:(NSData *)value
       DESCR    : *g_typed_query_contains_descr
       SUMMARY  : *g_typed_query_contains_summary
       PARAMS:
       - NAME   : value
-        TYPES  : NSString*
+        TYPES  : [NSString *, NSData *]
         DESCR  : *g_typed_query_value_descr
       - NAME   : caseSensitive
         TYPES  : BOOL
