@@ -8,7 +8,7 @@ The Objective-C API has been updated and your code will break!
 
 ### Bugfixes:
 
-* Modifications of a `TDBView` and `TDBQuery` now throw an exception in a readtransaction.
+* none.
 
 ### API breaking changes:
 
@@ -26,14 +26,40 @@ The Objective-C API has been updated and your code will break!
 
 
 =============================================================
-0.6.0 Release notes (yyyy—MM-dd)
+0.7.0 Release notes (yyyy—MM-dd)
+
+Objective-C
+-----------
+The Objective-C API has been updated and your code will break!
+
+### Bugfixes:
+
+* none.
+
+### API breaking changes:
+
+* `???`
+
+### Enhancements:
+
+* `???`
+
+-------------
+
+### Internals:
+
+* `???`
+
+
+=============================================================
+0.6.0 Release notes (2014—04-11)
 Objective-C
 -----------
 Description......
 
 ### Bugfixes:
 
-* none.
+* Modifications of a `TDBView` and `TDBQuery` now throw an exception in a readtransaction.
 
 ### API breaking changes:
 
