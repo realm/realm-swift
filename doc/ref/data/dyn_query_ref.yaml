@@ -28,16 +28,6 @@ EXAMPLES   :
 IGNORE     : []                   # List of method-ids to ignore
 
 CATEGORIES :
-- Utilities:
-  METHODS:
-  - objc_dyn_query_origin_table:
-      NAME     : originTable
-      SUMMARY  : Returns the origin table.
-      DESCR    : The method returns the table which created the query.
-      RETURN:
-        TYPES  : TDBTable *
-        DESCR  : The origin table.
-
 - Conditions:
   METHODS:
   - g_dyn_query_equals_binary:
@@ -105,7 +95,7 @@ CATEGORIES :
   - g_dyn_query_notEquals_string:
       NAME     : "isNotEqualToString"
   - g_dyn_query_notEquals_string_2:
-      NAME     : "sNotEqualToString:caseSensitive:"
+      NAME     : "isNotEqualToString:caseSensitive:"
   - g_dyn_query_notEquals_date:
       NAME     : "isNotEqualToDate:"
       TITLE    : "*IsNotEqualTo:inColumnWithIndex:"
@@ -167,16 +157,14 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_greaterThan
 
   - g_dyn_query_greaterThan_integer:
-      NAME     : "isGreaterThanInt:"
+      NAME     : "intIsGreaterThan:"
   - g_dyn_query_greaterThan_float:
-      NAME     : "isGreaterThanFloat:"
+      NAME     : "floatIsGreaterThan:"
   - g_dyn_query_greaterThan_double:
-      NAME     : "isGreaterThanDouble:"
+      NAME     : "doubleIsGreaterThan:"
   - g_dyn_query_greaterThan_date:
-# Not yet implemented in API
       NAME     : "isGreaterThanDate:"
       TITLE    : "*IsGreaterThan:inColumnWithIndex:"
-#TODO: check greater_date? does time_t work as int64_t?
       SIGNATURE: |
                  (TDBQuery *)dateIsGreaterThan:(NSDate)aDate inColumnWithIndex:(NSUInteger)colIndex
                  (TDBQuery *)intIsGreaterThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
@@ -186,7 +174,7 @@ CATEGORIES :
       DESCR    : *g_dyn_query_greaterThan_descr
       PARAMS:
       - NAME   : value
-        TYPES  : [int64_t, float, double, time_t]
+        TYPES  : [int64_t, float, double, NSDate]
         DESCR  : *g_dyn_query_value_descr
       - NAME   : inColumnWithIndex
         TYPES  : NSUInteger
@@ -199,13 +187,13 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_greaterThan
 
   - g_dyn_query_greaterThanOrEqual_integer:
-      NAME     : "isGreaterThanOrEqualToInt:"
+      NAME     : "intIsGreaterThanOrEqualTo:"
   - g_dyn_query_greaterThanOrEqual_float:
-      NAME     : "isGreaterThanOrEqualToFlaot:"
+      NAME     : "floatIsGreaterThanOrEqualTo:"
   - g_dyn_query_greaterThanOrEqual_double:
-      NAME     : "isGreaterThanOrEqualToDouble:"
+      NAME     : "doubleIsGreaterThanOrEqualTo:"
   - g_dyn_query_greaterThanOrEqual_date:
-      NAME     : "isGreaterThanOrEqualToDate:"
+      NAME     : "dateIsGreaterThanOrEqualTo:"
       TITLE    : "*IsGreaterThanOrEqualTo:inColumnWithIndex:"
       SIGNATURE: |
                   (TDBQuery *)dateIsGreaterThanOrEqualTo:(NSDate)aDate inColumnWithIndex:(NSUInteger)colIndex
@@ -229,13 +217,13 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_greaterThanOrEqual
 
   - g_dyn_query_lessThan_integer:
-      NAME     : "isLessThanInt:"
+      NAME     : "intIsLessThan:"
   - g_dyn_query_lessThan_float:
-      NAME     : "isLessThanFloat:"
+      NAME     : "floatIsLessThan:"
   - g_dyn_query_lessThan_double:
-      NAME     : "isLessThanDouble:"
+      NAME     : "doubleIsLessThan:"
   - g_dyn_query_lessThan_date:
-      NAME     : "isLessThanDate:"
+      NAME     : "dateIsLessThan:"
       TITLE    : "*IsLessThan:inColumnWithIndex:"
       SIGNATURE: |
                   (TDBQuery *)dateIsLessThan:(NSDate)aDate inColumnWithIndex:(NSUInteger)colIndex;
@@ -260,13 +248,13 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_lessThan
 
   - g_dyn_query_lessThanOrEqual_integer:
-      NAME     : "isLessThanOrEqualToInt:"
+      NAME     : "intIsLessThanOrEqualTo:"
   - g_dyn_query_lessThanOrEqual_float:
-      NAME     : "isLessThanOrEqualToFloat:"
+      NAME     : "floatIsLessThanOrEqualTo:"
   - g_dyn_query_lessThanOrEqual_double:
-      NAME     : "isLessThanOrEqualToDouble:"
+      NAME     : "doubleIsLessThanOrEqualTo:"
   - g_dyn_query_lessThanOrEqual_date:
-      NAME     : "isLessThanOrEqualToDate"
+      NAME     : "dateIsLessThanOrEqualTo:"
       TITLE    : "*IsLessThanOrEqualTo:inColumnWithIndex:"
       SIGNATURE: |
                   (TDBQuery *)dateIsLessThanOrEqualTo:(NSDate)aDate inColumnWithIndex:(NSUInteger)colIndex;
@@ -302,7 +290,6 @@ CATEGORIES :
       NAME     : beginsWith
       SIGNATURE: |
                  (TDBQuery *)columnBeginsWith:(NSString *)value
-#                (TDBQuery *)beginsWith:(NSString *)value
       DESCR    : *g_dyn_query_startsWith_descr
       SUMMARY  : *g_dyn_query_startsWith_summary
       PARAMS:
@@ -332,7 +319,6 @@ CATEGORIES :
       NAME     : columnEndsWith
       SIGNATURE: |
                  (TDBQuery *)columnEndsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
-#                (TDBQuery *)endsWith:(NSString *)value
       DESCR    : *g_dyn_query_endsWith_descr
       SUMMARY  : *g_dyn_query_endsWith_summary
       PARAMS:
@@ -363,7 +349,6 @@ CATEGORIES :
       SIGNATURE: |
                  (TDBQuery *)columnContains:(NSString *)value caseSensitive:(BOOL)caseSensitive
                  (TDBQuery *)columnContains:(NSString *)value
-#                 TDBQuery * contains_binary(NSUInteger column_ndx, NSString* data, NSUInteger size);
       DESCR    : *g_dyn_query_contains_descr
       SUMMARY  : *g_dyn_query_contains_summary
       PARAMS:
@@ -526,18 +511,15 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_size
 
   - g_dyn_query_sum_int:
-      NAME     : sumInt
   - g_dyn_query_sum_float:
-      NAME     : sumFloat
   - g_dyn_query_sum_double:
-      NAME     : sumDouble
-      TITLE    : "sumColumnWithIndex:"
+      NAME     : "sumColumnWithIndex:"
       DESCR    : *g_dyn_query_sum_descr
       SUMMARY  : *g_dyn_query_sum_summary
       SIGNATURE: -(NSNumber *)sumColumnWithIndex:(NSUInteger)colIndex;
       PARAMS:
       - NAME   : colIndex
-        DESCR  : Column index. The datatype of the column must match the function called.
+        DESCR  : Column index. The datatype of the column must a number type (integer, float or double).
         TYPES  : NSUInteger
       RETURN:
         TYPES  : NSNumber
@@ -547,14 +529,10 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_sum
 
   - g_dyn_query_maximum_double:
-      NAME     : maxDouble
   - g_dyn_query_maximum_float:
-      NAME     : maxFloat
   - g_dyn_query_maximum_date:
-      NAME     : maxDate
   - g_dyn_query_maximum_int:
-      NAME     : maxInt
-      TITLE    : "max*InColumnWithIndex:"
+      NAME     : "maxInColumnWithIndex:"
       DESCR    : *g_dyn_query_maximum_descr
       SUMMARY  : *g_dyn_query_maximum_summary
       SIGNATURE: (id)maxInColumnWithIndex:(NSUInteger)colIndex
@@ -571,14 +549,10 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_maximum
 
   - g_dyn_query_minimum_date:
-      NAME     : minDate
   - g_dyn_query_minimum_double:
-      NAME     : minDouble
   - g_dyn_query_minimum_float:
-      NAME     : minFloat
   - g_dyn_query_minimum_int:
-      NAME     : minInt
-      TITLE    : "minInColumnWithIndex:"
+      NAME     : "minInColumnWithIndex:"
       DESCR    : *g_dyn_query_minimum_descr
       SUMMARY  : *g_dyn_query_minimum_summary
       SIGNATURE: (id)minInColumnWithIndex:(NSUInteger)colIndex
@@ -594,18 +568,15 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_minimum
 
   - g_dyn_query_average_int:
-      NAME     : avgInt
   - g_dyn_query_average_float:
-      NAME     : avgFloat
   - g_dyn_query_average_double:
-      NAME     : avgDouble
-      TITLE    : avg*ColumnWithIndex*Column
+      NAME     : avgColumnWithIndex
       SUMMARY  : *g_dyn_query_average_summary
       DESCR    : *g_dyn_query_average_descr
       SIGNATURE: -(NSNumber *)avgColumnWithIndex:(NSUInteger)colIndex;
       PARAMS:
       - NAME   : colIndex
-        DESCR  : Column index. The datatype of the column must be a number type.
+        DESCR  : Column index. The datatype of the column must be a number type (integer, float or double).
         TYPES  : NSUInteger
       RETURN:
         TYPES  : NSNumber
@@ -641,3 +612,13 @@ CATEGORIES :
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_remove
+
+- Utilities:
+  METHODS:
+  - objc_dyn_query_origin_table:
+      NAME     : originTable
+      SUMMARY  : Returns the origin table.
+      DESCR    : The method returns the table which created the query.
+      RETURN:
+        TYPES  : TDBTable *
+        DESCR  : The origin table.
