@@ -91,6 +91,20 @@ NSString *const defaultContextFileName = @"default.tightdb";
     return shared_group;
 }
 
++(TDBContext *)contextInMemoryWithName:(NSString *)name
+{
+    if(!name || [name isEqualToString:@""]) {
+        @throw [NSException exceptionWithName:@"tightdb:invalid_name_to_context_in_memory"
+                                       reason:@"The name of a context in memory must be non-nil and != @\"\""
+                                     userInfo:nil];
+    }
+    
+    TDBContext *context = [[TDBContext alloc] init];
+    context->m_shared_group.reset(new tightdb::SharedGroup(tightdb::StringData(ObjcStringAccessor(name)), false, tightdb::SharedGroup::durability_MemOnly));
+    return context;
+}
+
+
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
