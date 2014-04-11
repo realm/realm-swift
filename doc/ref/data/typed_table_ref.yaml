@@ -45,19 +45,20 @@ CATEGORIES:
                  to observe that these macros expand to actual Objective C classes. You must
                  use these macros at the outer-most scope.
 
-                 The class name (<code>ClassName</code> below) is used a prefix for the class names. The
-                 name of the table class is the same as the class name, while the row class is names
-                 <i>ClassName</i>Row, the query class is <i>ClassName</i>Query, etc.
+                 The class name (<code>ClassName</code> below) is used as prefix for the class names. The
+                 name of the table class is the same as the class name, while the row class is named
+                 <i>ClassName</i>Row, the query class is <i>ClassName</i>Query, and the view class is
+                 <i>ClassName</i>View.
 
                  If you need to use the classes in
                  more than one source code file (<code>.m</code>), you can declare the class'
-                 interface using the TIGHTDB_TABLE_*_DEF macros in a header file (<code>.h</code>)
+                 interface using the TIGHTDB_TABLE_DEF_* macros in a header file (<code>.h</code>)
                  and include this header file in source code file where you use the class. Moreover,
                  the implementation part of the classes must be placed in a separate <code>.m</code>
-                 using the TIGHTDB_TABLE_*_IMPL macros.
+                 using the TIGHTDB_TABLE_IMPL_* macros.
 
       SIGNATURE: |
-                  TIGHTDB_TABLE_*(ClassName,
+                 TIGHTDB_TABLE_*(ClassName,
                                  ColumnName, ColumnType
                                  ...)
       SUMMARY  : Declare type safe table classes.
@@ -96,13 +97,13 @@ CATEGORIES:
 #                <tr><td>Subtable&lt;T&gt;</td> <td>Sub-tables</td>   <td>(T as table class)</td></tr>
 
       EXAMPLES:
-      - CODE   : ex_objc_typed_table_macros
+      - CODE   : ex_objc_table_typed_intro
         DESCR  :
 
 - State:
   METHODS:
   - g_typed_table_is_empty:
-      TODO     : never
+      IGNORE   : ""
       NAME     : isEmpty
       DESCR    : *g_typed_table_is_empty_descr
       SUMMARY  : *g_typed_table_is_empty_summary
@@ -183,26 +184,26 @@ CATEGORIES:
 
   - g_typed_table_cursor_at_index:
       NAME     : rowAtIndex
-      SUMMARY  : Returns a typed row at a specified row number.
+      SUMMARY  : Returns a typed row at a specified row index.
       DESCR    : &g_typed_table_cursor_at_index_descr
                  Use the row to get or set the row values.
       SIGNATURE: "- (<i>ClassName</i>Row *)rowAtIndex:(NSUInteger)rowIndex"
       PARAMS:
       - NAME   : rowIndex
         TYPES  : NSUInteger
-        DESCR  : The row number.
+        DESCR  : The row index.
       RETURN:
         TYPES  : <i>ClassName</i>Row *
-        DESCR  : The row object. Note that <code>ClassName</code> is replaced with the name of your specific table.
+        DESCR  : The row object. Note that <i>ClassName</i> is replaced with the name of your specific table.
 
   - g_typed_table_cursor_at_last_index:
       NAME     : lastRow
-      SUMMARY  : Returns a typed row at highest row number.
+      SUMMARY  : Returns a typed row at highest row index.
       DESCR    : *g_typed_table_cursor_at_index_descr
       SIGNATURE: (<i>ClassName</i>Row *)lastRow
       RETURN:
         TYPES  : <i>ClassName</i>Row *
-        DESCR  : The row object. Note that <code>ClassName</code> is replaced with the name of your specific table.
+        DESCR  : The row object. Note that <i>ClassName</i> is replaced with the name of your specific table.
 
   - g_typed_table_add:
       TODO     : OBSOLETE
@@ -247,16 +248,25 @@ CATEGORIES:
       SUMMARY  : Insert a row.
       DESCR    : >
                  This method will insert a row in the table at a particular
-                 place. The row is optionally represented as Cocoa (NS) objects,
-                 otherwise an empty row is inserted. If data is nil, an empty row
-                 with default values is inserted. Properties in generic objects
-                 (derived from <code>NSObject</code>) which match columns names
+                 position. The row is represented as an <code>NSObject</code>,
+                 an <code>NSArray</code>, or an <code>NSDictionary</code>.
+
+                 For the <code>NSArray</code> and <code>NSDictionary</code> cases, the type of
+                 the elements are validated before creating the
+                 new row. If <i>data</i> is <code>nil</code>, an empty row
+                 with default values is appended.
+
+                 If <i>data</i> is <code>nil</code>, an empty row
+                 with default values is inserted.
+
+                 Properties in generic objects
+                 (derived from <code>NSObject</code>) which match column names
                  will be used. Non-matching properties are ignored.
       SIGNATURE: (void)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME    : anObject
         TYPES   : id
-        DESCR   : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>.
+        DESCR   : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>. A <code>nil</code> implies that a row of default values is inserted.
       - NAME    : rowIndex
         TYPES   : NSUInteger
         DESCR   : *g_dyn_table_insert_empty_row_parm1_descr
@@ -265,18 +275,23 @@ CATEGORIES:
       NAME     : "addRow:"
       SUMMARY  : Append a row using object literals.
       DESCR    : >
-                 This method will append (insert at the end) a row to a table.
-                 The row is represented as Cocoa (NS) objects as elements in
-                 array. The elements' types are validated before creating the
-                 new row. If data is nil, an empty row
-                 with default values is appended. Properties in generic objects
-                 (derived from <code>NSObject</code>) which match columsn names
+                 This method will append (add at the end) a row to a table.
+                 The row is represented as an <code>NSObject</code>,
+                 an <code>NSArray</code>, or an <code>NSDictionary</code>.
+
+                 For the <code>NSArray</code> and <code>NSDictionary</code> cases, the type of
+                 the elements are validated before creating the
+                 new row. If <i>data</i> is <code>nil</code>, an empty row
+                 with default values is appended.
+
+                 Properties in generic objects
+                 (derived from <code>NSObject</code>) which match column names
                  will be used.
       SIGNATURE: (void)addRow:(NSObject *)data
       PARAMS:
       - NAME   : data
         TYPES  : NSObject *
-        DESCR  : The row either as an <code>NSArray</code>, <code>NSDictionary</code>, or a generic <code>NSObject</code>.
+        DESCR  : The row either as an <code>NSArray</code>, <code>NSDictionary</code>, or a generic <code>NSObject</code>. A <code>nil</code> value implies that a row of default values will be appended.
 
   - g_typed_table_insert:
       TODO     : OBSOLETE
@@ -358,8 +373,8 @@ CATEGORIES:
       SUMMARY  : *g_typed_table_where_summary
       DESCR    : This method initiates a query. See {@link class_typed_query}.
       RETURN:
-        TYPES  : ClassNameQuery
-        DESCR  : The query object. Note that <code>ClassName</code> is replaced with the name of your specific table.
+        TYPES  : <i>ClassName</i>Query
+        DESCR  : The query object. Note that <i>ClassName</i> is replaced with the name of your specific table.
       EXAMPLES:
       - DESCR  :
         CODE   : ex_cpp_typed_table_where
@@ -406,7 +421,7 @@ CATEGORIES:
       NAME     : max
   - g_typed_table_maximum_double_2:
       NAME     : max
-      TITLE    : maximum
+      TITLE    : max
       DESCR    : *g_typed_query_maximum_descr
       SUMMARY  : *g_typed_query_maximum_summary
       SIGNATURE: |
@@ -436,7 +451,7 @@ CATEGORIES:
       NAME     : min
   - g_typed_table_minimum_double_2:
       NAME     : min
-      TITLE    : minimum
+      TITLE    : min
       DESCR    : *g_typed_query_minimum_descr
       SUMMARY  : *g_typed_query_minimum_summary
       SIGNATURE: |
@@ -448,7 +463,7 @@ CATEGORIES:
         DESCR  : *g_typed_query_minimum_return1_descr
       EXAMPLES:
       - DESCR  :
-        CODE   : ex_objc_typed_query_manimum
+        CODE   : ex_objc_typed_query_minimum
 
   - g_typed_table_average:
       TODO: soon (+ start, end, limit)
@@ -462,7 +477,7 @@ CATEGORIES:
       NAME     : avg
   - g_typed_table_average_double_2:
       NAME     : avg
-      TITLE    : average
+      TITLE    : avg
       SUMMARY  : *g_typed_query_average_summary
       DESCR    : *g_typed_query_average_descr
       SIGNATURE: .columnName (double)avg
