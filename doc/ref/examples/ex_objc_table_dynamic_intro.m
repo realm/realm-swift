@@ -10,35 +10,34 @@ void ex_objc_table_dynamic_intro()
     [table addColumnWithName:@"Name" type:TDBStringType];
     [table addColumnWithName:@"Age"  type:TDBIntType];
 
-
     // Add a row with dictionary style, with properties in any order
     [table addRow:@{@"Name":@"Simon", @"Age":@32}];
-    
+
     // Add rows with array style, with properties in order of column definition
     [table addRow:@[@"Steve", @12]];
     [table addRow:@[@"Nick", @100]];
-    
+
     // Iterate over all rows in the table
     for (TDBRow *row in table)
         NSLog(@"Name: %@ Age: %@", row[@"Name"], row[@"Age"]);
-    
+
     // Insert a row
     [table insertRow:@[@"Jill", @21] atIndex:2];
 
     // Print table
     for (TDBRow *row in table)
         NSLog(@"Name: %@ Age: %@", row[@"Name"], row[@"Age"]);
-    
+
     // Update two rows
     table[0][@"Name"] = @"John";
-    
+
     TDBRow *row = [table lastRow];
     row[@"Name"] = @"Mary";
 
     //  And print again
     for (TDBRow *row in table)
         NSLog(@"Name: %@ Age: %@", row[@"Name"], row[@"Age"]);
-    
+
     // Refer to non existing row
     TDBRow *row2 = [table rowAtIndex:table.rowCount];
     if (row2 == nil)
