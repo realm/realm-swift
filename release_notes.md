@@ -42,7 +42,7 @@ The Objective-C API has been updated and your code will break!
 
 ### Enhancements:
 
-* `???`
+* A `TDBContext` can now be instantiated in-memory only using `contextInMemoryWithName:`. 
 
 -------------
 

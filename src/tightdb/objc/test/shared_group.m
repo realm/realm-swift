@@ -131,6 +131,34 @@ TIGHTDB_TABLE_2(SharedTable2,
     }];
 }
 
+
+-(void)testContextInMemory
+{
+    TDBContext *context1 = [TDBContext contextInMemoryWithName:@"context"];
+    [context1 writeUsingBlock:^BOOL(TDBTransaction *transaction) {
+        TDBTable *table = [transaction createTableWithName:@"table1"];
+        [table addColumnWithName:@"col0" type:TDBBoolType];
+        return YES;
+    } error:nil];
+    
+    TDBContext *context2 = [TDBContext contextInMemoryWithName:@"context"];
+    [context2 readUsingBlock:^(TDBTransaction *transaction) {
+        STAssertNotNil([transaction tableWithName:@"table1"], @"get table from memory");
+    }];
+    
+    [context2 writeUsingBlock:^BOOL(TDBTransaction *transaction) {
+        [transaction createTableWithName:@"table2"];
+        return YES;
+    } error:nil];
+    
+    [context1 readUsingBlock:^(TDBTransaction *transaction) {
+        STAssertNotNil([transaction tableWithName:@"table2"], @"get table from memory");
+    }];
+    
+    STAssertThrows([TDBContext contextInMemoryWithName:nil], @"nil name");
+    STAssertThrows([TDBContext contextInMemoryWithName:@""], @"empty name");
+}
+
 - (void) testReadTransaction
 {
     
