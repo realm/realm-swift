@@ -581,7 +581,7 @@ EOF
             platform="$(printf "%s\n" "$x" | cut -d: -f1)" || exit 1
             sdk="$(printf "%s\n" "$x" | cut -d: -f2)" || exit 1
             archs="$(printf "%s\n" "$x" | cut -d: -f3 | sed 's/,/ /g')" || exit 1
-            cflags_arch=""
+            cflags_arch="-mios-version-min=5.0"
             for y in $archs; do
                 word_list_append "cflags_arch" "-arch $y" || exit 1
             done
@@ -629,13 +629,13 @@ EOF
         auto_configure || exit 1
         $MAKE check-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test.XXXX)" || exit 1
-        mkdir -p "$TEMP_DIR/unit-tests.xctest/Contents/MacOS" || exit 1
-        cp "src/tightdb/objc/test/unit-tests" "$TEMP_DIR/unit-tests.xctest/Contents/MacOS/" || exit 1
+        mkdir -p "$TEMP_DIR/unit-tests.octest/Contents/MacOS" || exit 1
+        cp "src/tightdb/objc/test/unit-tests" "$TEMP_DIR/unit-tests.octest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
         path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
-        "$XCODE_HOME/usr/bin/xctest" -XCTest All "$TEMP_DIR/unit-tests.xctest" || exit 1
+        "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests.octest" || exit 1
         echo "Test passed"
         exit 0
         ;;
@@ -644,13 +644,13 @@ EOF
         auto_configure || exit 1
         $MAKE check-debug-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test-debug.XXXX)" || exit 1
-        mkdir -p "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS" || exit 1
-        cp "src/tightdb/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS/" || exit 1
+        mkdir -p "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS" || exit 1
+        cp "src/tightdb/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
         path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
-        "$XCODE_HOME/usr/bin/xctest" -XCTest All "$TEMP_DIR/unit-tests-dbg.xctest" || exit 1
+        "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest" || exit 1
         echo "Test passed"
         exit 0
         ;;
@@ -659,26 +659,26 @@ EOF
         auto_configure || exit 1
         $MAKE check-debug-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test-gdb.XXXX)" || exit 1
-        mkdir -p "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS" || exit 1
-        cp "src/tightdb/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS/" || exit 1
+        mkdir -p "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS" || exit 1
+        cp "src/tightdb/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
         path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
-        gdb --args "$XCODE_HOME/usr/bin/xctest" -XCTest All "$TEMP_DIR/unit-tests-dbg.xctest"
+        gdb --args "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest"
         ;;
 
     "test-cover")
         auto_configure || exit 1
         $MAKE check-cover-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.check-cover.XXXX)" || exit 1
-        mkdir -p "$TEMP_DIR/unit-tests-cov.xctest/Contents/MacOS" || exit 1
-        cp "src/tightdb/objc/test/unit-tests-cov" "$TEMP_DIR/unit-tests-cov.xctest/Contents/MacOS/" || exit 1
+        mkdir -p "$TEMP_DIR/unit-tests-cov.octest/Contents/MacOS" || exit 1
+        cp "src/tightdb/objc/test/unit-tests-cov" "$TEMP_DIR/unit-tests-cov.octest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
         path_list_prepend DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
-        "$XCODE_HOME/usr/bin/xctest" -XCTest All "$TEMP_DIR/unit-tests-cov.xctest" || exit 1
+        "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-cov.octest" || exit 1
         echo "Generating 'gcovr.xml'.."
         gcovr -f '.*/tightdb_objc/src/.*' -e '.*/test/.*' -x > gcovr.xml
         echo "Test passed."
