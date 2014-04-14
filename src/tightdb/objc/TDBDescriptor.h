@@ -20,6 +20,7 @@
 
 #import <Foundation/Foundation.h>
 
+
 @interface TDBDescriptor: NSObject
 
 @property (nonatomic, readonly) NSUInteger columnCount;

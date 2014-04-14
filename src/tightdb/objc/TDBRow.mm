@@ -20,17 +20,16 @@
 
 #include <tightdb/table.hpp>
 
-#import <tightdb/objc/TDBRow.h>
-#import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBTable_noinst.h>
-#import <tightdb/objc/PrivateTDB.h>
-#import <tightdb/objc/TDBRowFast.h>
-
-#include <tightdb/objc/util_noinst.hpp>
+#import "TDBRow.h"
+#import "TDBTable_noinst.h"
+#import "PrivateTDB.h"
+#import "TDBRowFast.h"
+#import "util_noinst.hpp"
 
 using namespace std;
 
-// TODO: Concept for cursor invalidation (when table updates).
+
+// TODO: Concept for row invalidation (when table updates).
 
 @interface TDBRow()
 @property (nonatomic, weak) TDBTable *table;
@@ -63,14 +62,14 @@ using namespace std;
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"TDBRow dealloc");
+    // NSLog(@"TDBRow dealloc");
 #endif
     _table = nil;
 }
 
--(id)objectAtIndexedSubscript:(NSUInteger)colNdx
+-(id)objectAtIndexedSubscript:(NSUInteger)colIndex
 {
-    return get_cell(colNdx, _ndx, [_table getNativeTable]);
+    return get_cell(colIndex, _ndx, [_table getNativeTable]);
 }
 
 - (id)objectForKeyedSubscript:(id <NSCopying>)key
@@ -79,17 +78,17 @@ using namespace std;
     return get_cell(colNdx, _ndx, [_table getNativeTable]);
 }
 
--(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colNdx
+-(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colIndex
 {
     tightdb::Table& t = [_table getNativeTable];
     tightdb::ConstDescriptorRef descr = t.get_descriptor();
-    if (!verify_cell(*descr, size_t(colNdx), (NSObject *)obj)) {
+    if (!verify_cell(*descr, size_t(colIndex), (NSObject *)obj)) {
         @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
                             reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
-                            to_objc_string(t.get_column_name(colNdx)), (unsigned long)colNdx, t.get_column_type(colNdx)]
+                            to_objc_string(t.get_column_name(colIndex)), (unsigned long)colIndex, t.get_column_type(colIndex)]
                             userInfo:nil];
     }
-    set_cell(size_t(colNdx), size_t(_ndx), t, (NSObject *)obj);
+    set_cell(size_t(colIndex), size_t(_ndx), t, (NSObject *)obj);
 }
 
 -(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key
@@ -196,15 +195,15 @@ using namespace std;
 
 @implementation TDBAccessor
 {
-    __weak TDBRow *_cursor;
+    __weak TDBRow *_row;
     size_t _columnId;
 }
 
--(id)initWithRow:(TDBRow *)cursor columnId:(NSUInteger)columnId
+-(id)initWithRow:(TDBRow *)row columnId:(NSUInteger)columnId
 {
     self = [super init];
     if (self) {
-        _cursor = cursor;
+        _row = row;
         _columnId = columnId;
     }
     return self;
@@ -212,97 +211,97 @@ using namespace std;
 
 -(BOOL)getBool
 {
-    return [_cursor.table TDB_boolInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_row.table TDB_boolInColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(void)setBool:(BOOL)value
 {
-    [_cursor.table TDB_setBool:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_row.table TDB_setBool:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(int64_t)getInt
 {
-    return [_cursor.table TDB_intInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_row.table TDB_intInColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(void)setInt:(int64_t)value
 {
-    [_cursor.table TDB_setInt:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_row.table TDB_setInt:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(float)getFloat
 {
-    return [_cursor.table TDB_floatInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_row.table TDB_floatInColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(void)setFloat:(float)value
 {
-    [_cursor.table TDB_setFloat:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_row.table TDB_setFloat:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(double)getDouble
 {
-    return [_cursor.table TDB_doubleInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_row.table TDB_doubleInColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(void)setDouble:(double)value
 {
-    [_cursor.table TDB_setDouble:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_row.table TDB_setDouble:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(NSString *)getString
 {
-    return [_cursor.table TDB_stringInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_row.table TDB_stringInColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(void)setString:(NSString *)value
 {
-    [_cursor.table TDB_setString:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_row.table TDB_setString:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(NSData *)getBinary
 {
-    return [_cursor.table TDB_binaryInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_row.table TDB_binaryInColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(void)setBinary:(NSData *)value
 {
-    [_cursor.table TDB_setBinary:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_row.table TDB_setBinary:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 // FIXME: should it be setBinaryWithBuffer / setBinaryWithBinary ?
 // -(BOOL)setBinary:(const char *)data size:(size_t)size
 // {
-//    return [_cursor.table setBinary:_columnId ndx:_cursor.ndx data:data size:size error:error];
+//    return [_row.table setBinary:_columnId ndx:_cursor.ndx data:data size:size error:error];
 // }
 
 -(NSDate *)getDate
 {
-    return [_cursor.table TDB_dateInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_row.table TDB_dateInColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(void)setDate:(NSDate *)value
 {
-    [_cursor.table TDB_setDate:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_row.table TDB_setDate:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(id)getSubtable:(Class)obj
 {
-    return [_cursor.table TDB_tableInColumnWithIndex:_columnId atRowIndex:_cursor.ndx asTableClass:obj];
+    return [_row.table TDB_tableInColumnWithIndex:_columnId atRowIndex:_row.ndx asTableClass:obj];
 }
 
 -(void)setSubtable:(TDBTable *)value
 {
-    [_cursor.table TDB_setTable:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_row.table TDB_setTable:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(id)getMixed
 {
-    return [_cursor.table TDB_mixedInColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    return [_row.table TDB_mixedInColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(void)setMixed:(id)value
 {
-    [_cursor.table TDB_setMixed:value inColumnWithIndex:_columnId atRowIndex:_cursor.ndx];
+    [_row.table TDB_setMixed:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 @end

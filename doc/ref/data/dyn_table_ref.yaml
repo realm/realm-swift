@@ -2,20 +2,16 @@
 # Obj-C reference documentation for Table class
 #
 
-# INCONSISTENCY index* (row_ndx)
-# INCONSISTENCY getTable & insertSubtable
-# NAMING deleteRow -> remove,  get -> getInt, set -> setInt (and ndx->row_ndx)
-# MISSING lookup
-# MISSING where (only possible in typed tables)
-
 ID         : class_dyn_table
 TITLE      : TDBTable (dynamic)
 SUMMARY    : *g_dyn_table_intro_summary
 DESCR      :
-- TEXT     : *g_dyn_table_intro_descr_core
+- TEXT     : >
+             The TDBTable class is the core of the TightDB framework. The
+             class is used to store and manipulate data in terms of
+             columns and rows.
 - TEXT     : *g_dyn_table_intro_descr_dynamic
 - TEXT     : *g_dyn_table_intro_descr_types
-- TEXT     : *g_dyn_table_intro_descr_notice
 SEE        :
 EXAMPLES   :
 - DESCR:
@@ -24,34 +20,91 @@ IGNORE     : []                   # List of method-ids to ignore
 
 CATEGORIES :
 
+- Constructors:
+  METHODS:
+  - objc_dyn_table_init:
+     NAME     : init
+     SUMMARY  : Create an empty table.
+     DESCR    : Create an empty table (no columns, no rows).
+     SIGNATURE: -(instancetype)init
+     EXAMPLES:
+     - CODE   : ex_objc_dyn_table_sizes
+       DESCR  :
+
+
+  - objc_dyn_table_init_with_columns:
+     NAME     : initWithColumns
+     SUMMARY  : Create a table with a set of columns.
+     DESCR    : Create a table with a set of columns but no rows.
+     SIGNATURE: "-(instancetype)initWithColumns:(NSArray *)columns"
+     PARAMS:
+     - NAME   : columns
+       TYPES  : NSArray
+       DESCR  : |
+                Column names and types. The types are encoded as strings, and
+                the mapping between a string and a TightDB type is:
+
+                <table>
+                  <thead>
+                    <tr><th>String</th><th>TightDB type</th></tr>
+                  </thead>
+                  <tbody>
+                   <tr><td>"bool"</td><td>TDBBoolType</td></tr>
+                   <tr><td>"int"</td><td>TDBIntType</td></tr>
+                   <tr><td>"float"</td><td>TDBFloatType</td></tr>
+                   <tr><td>"double"</td><td>TDBDoubleType</td></tr>
+                   <tr><td>"string"</td><td>TDBStringType</td></tr>
+                   <tr><td>"binary"</td><td>TDBBinaryType</td></tr>
+                   <tr><td>"date"</td><td>TDBDateType</td></tr>
+                   <tr><td>"mixed"</td><td>TDBMixedType</td></tr>
+                 </tbody>
+                </table>
+
+                The table column type (TDBTableType) is encoded as an <code>NSArray</code>.
+     EXAMPLES:
+     - CODE   : ex_objc_dyn_table_init_with_columns
+       DESCR  :
+
 - State:
   METHODS:
   - g_dyn_table_size:
-      NAME     : "rowCount"
-      SUMMARY  : *g_dyn_table_size_summary
-      DESCR    : *g_dyn_table_size_descr
+      NAME     : rowCount
+      SUMMARY  : The number of rows.
+      DESCR    : The property returns the number of rows in the table.
       SIGNATURE: "@property (nonatomic, readonly) NSUInteger rowCount"
       RETURN:
         TYPES  : NSUInteger
         DESCR  : *g_dyn_table_size_summary
       EXAMPLES:
-      - CODE   : ex_objc_dyn_table_size
+      - CODE   : ex_objc_dyn_table_sizes
         DESCR  :
 
   - g_dyn_table_get_column_count:
       NAME     : columnCount
-      SUMMARY  : *g_dyn_table_get_column_count_summary
-      DESCR    : *g_dyn_table_get_column_count_descr
+      SUMMARY  : The number of columns.
+      DESCR    : The property is equal to the number of columns in the table.
       SIGNATURE: "@property (nonatomic, readonly) NSUInteger columnCount"
       RETURN:
         TYPES  : NSUInteger
         DESCR  : *g_dyn_table_get_column_count_return_descr
       EXAMPLES:
-      - CODE   : ex_objc_dyn_table_get_column_count
+      - CODE   : ex_objc_dyn_table_sizes
         DESCR  :
 
+  - g_dyn_table_get_descriptor:
+      NAME     : descriptor
+      SUMMARY  : The descriptor of the table.
+      DESCR    : >
+                 The property holds the descriptor (see @{link
+                 class_descriptor}) of the class.
+      SIGNATURE: "@property (nonatomic, readonly) TDBDescriptor descriptor"
+      EXAMPLES:
+      - CODE   : ex_objc_dyn_table_descriptor
+        DESCR  :
+
+
   - g_dyn_table_is_valid:
-      TODO     : soon
+      IGNORE   : ""
       NAME     : isValid
       SUMMARY  : *g_dyn_table_is_attached_summary
       DESCR    : *g_dyn_table_is_attached_descr
@@ -69,11 +122,7 @@ CATEGORIES :
       NAME     : "removeAllRows"
       SUMMARY  : *g_dyn_table_clear_summary
       DESCR    : *g_dyn_table_clear_descr
-      SIGNATURE: (BOOL)removeAllRows
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : &objc_no_if_error
-                 "<code>NO</code> if an error occured, otherwise <code>YES</code>"
+      SIGNATURE: (void)removeAllRows
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_clear
         DESCR  :
@@ -85,7 +134,8 @@ CATEGORIES :
       SIGNATURE: (BOOL)optimize
       RETURN:
         TYPES  : BOOL
-        DESCR  : *objc_no_if_error
+        DESCR  : &objc_no_if_error
+                 "<code>NO</code> if an error occured, otherwise <code>YES</code>"
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_optimize
         DESCR  :
@@ -105,6 +155,23 @@ CATEGORIES :
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_operator==
         DESCR  :
+
+  - objc_dyn_table_cast_to_typed_table:
+      NAME     : castToTypedTableClass
+      SUMMARY  : Cast at dynamic table to a typed table.
+      DESCR    : >
+                 This method will cast a dynamic table as a typed table. The columns in
+                 the two tables must match, other <code>nil</code> is returned.
+      SIGNATURE: -(id)castToTypedTableClass:(Class)typedTableClass;
+      PARAMS:
+      - NAME   : typedTableClass
+        TYPES  : Class
+        DESCR  : A table class generated by {@link class_typed_table}.
+      RETURN:
+        TYPES  : id
+        DESCR  : >
+                 The table as an instance of the typed table class.
+                 Returns <code>nil/code> if the columns in the table does not match the typed table columns.
 
   - g_dyn_table_opertator!=:
       TODO     : soon
@@ -126,17 +193,14 @@ CATEGORIES :
 
 - Columns:
   METHODS:
-  - g_dyn_table_rename_column:
-      TODO     : later
-
   - g_dyn_table_add_column:
       NAME     : "addColumnWithName:type:"
       SUMMARY  : *g_dyn_table_add_column_summary
       DESCR    :
       - TEXT   : *g_dyn_table_add_column_descr
-      - TEXT   : &objc_column_types 
+      - TEXT   : &objc_column_types
                 >
-                Currently, the following types are supported (declared in <code>type.h</code>):
+                Currently, the following types are supported (declared in <code>TDBType.h</code>):
                  <ul>
                    <li><code>TDBBoolType</code></li>
                    <li><code>TDBIntType</code></li>
@@ -152,21 +216,22 @@ CATEGORIES :
       PARAMS:
       - NAME   : name
         TYPES  : NSString *
-        DESCR  : ""
+        DESCR  : *g_dyn_table_add_column_param2_descr
       - NAME   : type
         TYPES  : TDBType
-        DESCR  : ""
+        DESCR  : *g_dyn_table_add_column_param1_descr
       RETURN:
         TYPES  : NSUInteger
         DESCR  : *g_dyn_table_add_column_return_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_add_column
         DESCR  :
-  - g_dyn_table_remove_column:
+
+  - g_dyn_table_rename_column:
       NAME     : "renameColumnWithIndex:to:"
       SUMMARY  : *g_dyn_table_rename_column_summary
       DESCR    : *g_dyn_table_rename_column_descr
-      SIGNATURE: (NSString *)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString *)newName
+      SIGNATURE: (void)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString *)newName
       PARAMS:
       - NAME   : colIndex
         TYPES  : NSUInteger
@@ -178,6 +243,18 @@ CATEGORIES :
       - CODE   : ex_objc_dyn_table_rename_column
         DESCR  :
 
+  - g_dyn_table_remove_column:
+      NAME     : "removeColumnWithIndex:"
+      SUMMARY  : *g_dyn_table_remove_column_summary
+      DESCR    : *g_dyn_table_remove_column_descr
+      SIGNATURE: (void)removeColumnWithIndex:(NSUInteger)colIndex
+      PARAMS:
+      - NAME   : colIndex
+        TYPES  : NSUInteger
+        DESCR  : *g_dyn_table_remove_column_param1_descr
+      EXAMPLES:
+      - CODE   : ex_objc_dyn_table_rename_column
+        DESCR  :
 
   - g_dyn_table_get_column_name:
       NAME     : "nameOfColumnWithIndex:"
@@ -209,7 +286,7 @@ CATEGORIES :
         DESCR  : The column index or <code>NSNotFound</code> if there is no column with the specified name.
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_get_column_index
-        DESCR  : ""
+        DESCR  :
 
   - g_dyn_table_get_column_type:
       NAME     : "columnTypeOfColumnWithIndex:"
@@ -221,24 +298,44 @@ CATEGORIES :
       PARAMS:
       - NAME   : colIndex
         TYPES  : NSUInteger
-        DESCR  : g_dyn_table_get_column_type_parm1_descr
+        DESCR  : *g_dyn_table_get_column_type_parm1_descr
       RETURN:
         TYPES  : TDBType
-        DESCR  : *g_dyn_table_get_column_type_return1_descr
+        DESCR  :
+        - TEXT : *g_dyn_table_get_column_type_return1_descr
+        - TEXT : *objc_column_types
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_get_column_type
         DESCR  :
 
+  - g_mixed_get_type:
+      NAME     : "mixedTypeForColumnWithIndex:rowIndex:"
+      SUMMARY  : Get the type of a mixed value.
+      DESCR    : The method returns the type of a mixed typed value.
+      SIGNATURE: -(TDBType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+      PARAMS:
+      - NAME   : colIndex
+        TYPES  : NSUInteger
+        DESCR  : The column index.
+      - NAME   : rowIndex
+        TYPES  : NSUInteger
+        DESCR  : The row index.
+      RETURN:
+        TYPES  : TDBType
+        DESCR  :
+        - TEXT : *g_dyn_table_get_column_type_return1_descr
+        - TEXT : *objc_column_types
+
   - g_dyn_table_add_int:
-      TODO     : later
+      IGNORE   : ""
 
 
 - Rows:
   METHODS:
   - g_dyn_table_cursor_at_index:
       NAME     : "rowAtIndex:"
-      SUMMARY  : Returns a cursor at a specified row number.
-      DESCR    : *g_typed_table_cursor_at_index_descr
+      SUMMARY  : Returns a row object at a specified row number.
+      DESCR    : The method returns a row object at a specific row number.
       SIGNATURE: "(TDBRow *)rowAtIndex:(NSUInteger)rowIndex"
       PARAMS:
       - NAME   : rowIndex
@@ -248,27 +345,26 @@ CATEGORIES :
         TYPES  : TDBRow *
         DESCR  : The row.
 
-  - g_dyn_table_cursor_at_last_index:
-      NAME     : lastRow
-      SUMMARY  : Returns a typed curser at highest row number.
-      DESCR    : *g_typed_table_cursor_at_index_descr
+  - g_dyn_table_cursor_at_first_index:
+      NAME     : firstRow
+      SUMMARY  : Returns the first row.
+      DESCR    : The method returns the first row in the table.
       SIGNATURE: "(TDBRow *)lastRow"
       RETURN:
         TYPES  : TDBRow *
         DESCR  : The row.
 
-  - g_dyn_table_add_empty_row:
-      TODO     : later  
-      NAME     : addEmptyRow
-      SUMMARY  : *objc_typed_table_add_empty_row_summary
-      DESCR    : *objc_typed_table_add_empty_row_descr
-      SIGNATURE: (TDBRow *)addEmptyRow
+  - g_dyn_table_cursor_at_last_index:
+      NAME     : lastRow
+      SUMMARY  : Returns the last row.
+      DESCR    : The method returns the last row in the table.
+      SIGNATURE: "(TDBRow *)lastRow"
       RETURN:
         TYPES  : TDBRow *
-        DESCR  : Returns the inserted row.
+        DESCR  : The row.
 
   - g_dyn_table_insert_empty_row:
-      TODO     : later
+      IGNORE   : ""
       NAME     : "insertEmptyRowAtIndex:"
       SUMMARY  : *g_dyn_table_insert_empty_row_summary
       DESCR    : *g_dyn_table_insert_empty_row_descr
@@ -288,18 +384,17 @@ CATEGORIES :
                  This method will insert a row in the table at a particular
                  place. The row is optionally represented as Cocoa (NS) objects,
                  otherwise an empty row is inserted. If data is nil, an empty row
-                 with default values is inserted.
-      SIGNATURE: (BOOL)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
+                 with default values is inserted. Properties in generic objects
+                 (derived from <code>NSObject</code>) which match columns names
+                 will be used. Non-matching properties are ignored.
+      SIGNATURE: (void)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME    : anObject
         TYPES   : id
-        DESCR   : The row either as a <code>NSArray</code> or <code>NSDictionary</code>.
+        DESCR   : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>.
       - NAME    : rowIndex
         TYPES   : NSUInteger
         DESCR   : *g_dyn_table_insert_empty_row_parm1_descr
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : <code>YES</code> if elements are valid and row inserted, <code>NO</code> otherwise.
 
   - objc_dyn_table_append_row:
       NAME     : "addRow:"
@@ -309,15 +404,14 @@ CATEGORIES :
                  The row is represented as Cocoa (NS) objects as elements in
                  array. The elements' types are validated before creating the
                  new row. If data is nil, an empty row
-                 with default values is inserted.
-      SIGNATURE: (BOOL)appendRow:(NSObject *)data
+                 with default values is appended. Properties in generic objects
+                 (derived from <code>NSObject</code>) which match columsn names
+                 will be used.
+      SIGNATURE: (void)addRow:(NSObject *)data
       PARAMS:
       - NAME   : data
         TYPES  : NSObject *
-        DESCR  : The row either as a <code>NSArray</code> or <code>NSDictionary</code>.
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : <code>YES</code> if elements are valid and row inserted, <code>NO</code> otherwise.
+        DESCR  : The row either as an <code>NSArray</code>, <code>NSDictionary</code>, or a generic <code>NSObject</code>.
 
 
 # TODO: Should this be supported at all?
@@ -344,24 +438,24 @@ CATEGORIES :
 #      SUMMARY  : *g_dyn_table_insert_xxx_summary
 #      DESCR    : *g_dyn_table_insert_xxx_descr
 #      SIGNATURE: |
-#                 (void)insertBool:(size_t)col_ndx ndx:(size_t)ndx value:(BOOL)value
-#                 (void)insertInt:(size_t)col_ndx ndx:(size_t)ndx value:(int64_t)value
-#                 (void)insertFloat:(size_t)col_ndx ndx:(size_t)ndx value:(float)value
-#                 (void)insertDouble:(size_t)col_ndx ndx:(size_t)ndx value:(double)value
-#                 (void)insertDate:(size_t)col_ndx ndx:(size_t)ndx value:(time_t)value
-#                 (void)insertString:(size_t)col_ndx ndx:(size_t)ndx value:(NSString *)value
-#                 (void)insertBinary:(size_t)col_ndx ndx:(size_t)ndx value:(TightdbBinary *)value
-#                 (void)insertBinary:(size_t)col_ndx ndx:(size_t)ndx data:(const char *)data size:(size_t)size
-#                 (void)insertMixed:(size_t)col_ndx ndx:(size_t)row_ndx value:(TightdbMixed *)value
-#                 (void)insertSubtable:(size_t)col_ndx ndx:(size_t)row_ndx
+#                 (void)insertBool:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(BOOL)value
+#                 (void)insertInt:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(int64_t)value
+#                 (void)insertFloat:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(float)value
+#                 (void)insertDouble:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(double)value
+#                 (void)insertDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(time_t)value
+#                 (void)insertString:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(NSString *)value
+#                 (void)insertBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(TightdbBinary *)value
+#                 (void)insertBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx data:(const char *)data size:(NSUInteger)size
+#                 (void)insertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(TightdbMixed *)value
+#                 (void)insertSubtable:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx
 #                 (void)insertDone
 #TODO: does insertBinary with direct char*/size exist?
 #      PARAMS:
 #      - NAME   : ndx, row_ndx
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #        DESCR  : *g_dyn_table_insert_parm1_descr
 #      - NAME   : ndx
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #        DESCR  : *g_dyn_table_insert_parm2_descr
 #      - NAME   : value
 #        TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, TightdbBinary*, const char*, TightdbMixed*]
@@ -371,7 +465,7 @@ CATEGORIES :
 #        DESCR  : &g_dyn_table_insert_xxx_parm4_descr
 #                 Pointer to start of binary data.
 #      - NAME   : size
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #        DESCR  : &g_dyn_table_insert_xxx_parm5_descr
 #                 Size in bytes of binary data.
 #      EXAMPLES:
@@ -383,14 +477,11 @@ CATEGORIES :
       NAME     : "removeRowAtIndex:"
       SUMMARY  : *g_dyn_table_remove_row_summary
       DESCR    : *g_dyn_table_remove_row_descr
-      SIGNATURE: (BOOL)removeRowAtIndex:(NSUInteger)rowIndex
+      SIGNATURE: (void)removeRowAtIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME   : rowIndex
         TYPES  : NSUInteger
         DESCR  : *g_dyn_table_remove_row_param1_descr
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : ""
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_remove
         DESCR  : *objc_no_if_error
@@ -399,7 +490,7 @@ CATEGORIES :
       NAME     : removeLastRow
       SUMMARY  : *g_dyn_table_remove_last_row_summary
       DESCR    : *g_dyn_table_remove_last_row_descr
-      SIGNATURE: (BOOL)removeLastRow
+      SIGNATURE: (void)removeLastRow
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_remove_last_row
         DESCR  : *objc_no_if_error
@@ -443,26 +534,26 @@ CATEGORIES :
       #SUMMARY  : *g_dyn_table_get_xxx_summary
       #DESCR    : *g_dyn_table_get_xxx_descr
       #SIGNATURE: |
-                 #(BOOL)getBool:(size_t)col_ndx ndx:(size_t)ndx
-                 #(int64_t)get:(size_t)col_ndx ndx:(size_t)ndx
-                 #(float)getFloat:(size_t)col_ndx ndx:(size_t)ndx
-                 #(double)getDouble:(size_t)col_ndx ndx:(size_t)ndx
-                 #(time_t)getDate:(size_t)col_ndx ndx:(size_t)ndx
-                 #(NSString *)getString:(size_t)col_ndx ndx:(size_t)ndx
-                 #(TightdbBinary *)getBinary:(size_t)col_ndx ndx:(size_t)ndx
-                 #(TightdbMixed *)getMixed:(size_t)col_ndx ndx:(size_t)row_ndx
-                 #(TightdbType)getMixedType:(size_t)col_ndx ndx:(size_t)row_ndx
+                 #(BOOL)getBool:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(int64_t)get:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(float)getFloat:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(double)getDouble:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(time_t)getDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(NSString *)getString:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(TightdbBinary *)getBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(TightdbMixed *)getMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx
+                 #(TightdbType)getMixedType:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx
 
-                 #(TightdbTable *)getSubtable:(size_t)col_ndx ndx:(size_t)ndx
-                 #(id)getSubtable:(size_t)col_ndx ndx:(size_t)ndx withClass:(__unsafe_unretained Class)classObj
+                 #(TightdbTable *)getSubtable:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(id)getSubtable:(NSUInteger)col_ndx ndx:(NSUInteger)ndx withClass:(__unsafe_unretained Class)classObj
 #TODO: What's the last method about?
 
       #PARAMS:
       #- NAME   : col_ndx
-      #  TYPES  : size_t
+      #  TYPES  : NSUInteger
       #  DESCR  : *g_dyn_table_get_xxx_parm1_descr
       #- NAME   : row_ndx
-      #  TYPES  : size_t
+      #  TYPES  : NSUInteger
       #  DESCR  : *g_dyn_table_get_xxx_parm2_descr
       #RETURN:
       #  TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, TightdbBinary*,
@@ -498,31 +589,31 @@ CATEGORIES :
  #     SUMMARY  : *g_dyn_table_set_xxx_summary
  #     DESCR    : *g_dyn_table_set_xxx_descr
  #     SIGNATURE: |
- #                (void)setBool:(size_t)col_ndx ndx:(size_t)ndx value:(BOOL)value
- #                (void)set:(size_t)col_ndx ndx:(size_t)ndx value:(int64_t)value
- #                (void)setFloat:(size_t)col_ndx ndx:(size_t)ndx value:(float)value
- #                (void)setDouble:(size_t)col_ndx ndx:(size_t)ndx value:(double)value
- #                (void)setDate:(size_t)col_ndx ndx:(size_t)ndx value:(time_t)value
- #                (void)setString:(size_t)col_ndx ndx:(size_t)ndx value:(NSString *)value
- #                (void)setBinary:(size_t)col_ndx ndx:(size_t)ndx value:(TightdbBinary *)value
- #               (void)setBinary:(size_t)col_ndx ndx:(size_t)ndx data:(const char *)data size:(size_t)size
- #                (void)setMixed:(size_t)col_ndx ndx:(size_t)row_ndx value:(TightdbMixed *)value
+ #                (void)setBool:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(BOOL)value
+ #                (void)set:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(int64_t)value
+ #                (void)setFloat:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(float)value
+ #                (void)setDouble:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(double)value
+ #                (void)setDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(time_t)value
+ #                (void)setString:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(NSString *)value
+ #                (void)setBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(TightdbBinary *)value
+ #               (void)setBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx data:(const char *)data size:(NSUInteger)size
+ #                (void)setMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(TightdbMixed *)value
  #     PARAMS:
  #     - NAME   : col_ndx
- #       TYPES  : size_t
+ #       TYPES  : NSUInteger
  #       DESCR  : *g_dyn_table_get_xxx_parm1_descr
  #     - NAME   : row_ndx
- #       TYPES  : size_t
+ #       TYPES  : NSUInteger
  #       DESCR  : *g_dyn_table_get_xxx_parm2_descr
  #     - NAME   : value
  #       TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, TightdbBinary*,
- #                 const char*, size_t, TightdbMixed*]
+ #                 const char*, NSUInteger, TightdbMixed*]
  #       DESCR  : *g_dyn_table_set_xxx_parm3_descr
  #     - NAME   : data
  #       TYPES  : const char *
  #       DESCR  : *g_dyn_table_insert_xxx_parm4_descr
  #     - NAME   : size
- #       TYPES  : size_t
+ #       TYPES  : NSUInteger
  #       DESCR  : *g_dyn_table_insert_xxx_parm5_descr
  #     EXAMPLES:
  #     - CODE   : ex_objc_dyn_table_set_xxx
@@ -555,7 +646,7 @@ CATEGORIES :
         DESCR  : *g_dyn_table_get_xxx_parm1_descr
       RETURN:
         TYPES  : BOOL
-        DESCR  : *g_dyn_table_has_index_return_descr
+        DESCR  : <code>YES</cocde> if column is indexed, otherwise <code>NO</code>.
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_has_index
         DESCR  :
@@ -575,7 +666,7 @@ CATEGORIES :
         TYPES  : NSString *
         DESCR  : *g_dyn_table_lookup_parm1_descr
       RETURN:
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : "The row index or <code>NSNotFound</code> if there is no match."
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_lookup
@@ -603,22 +694,22 @@ CATEGORIES :
 #      SUMMARY  : Find first matching row.
 #      DESCR    : The method finds the first occurence of a given value in a column.
 #      SIGNATURE: |
-#                 (size_t)findBool:(size_t)col_ndx value:(BOOL)value
-#                 (size_t)findInt:(size_t)col_ndx value:(int64_t)value
-#                 (size_t)findFloat:(size_t)col_ndx value:(float)value
-#                 (size_t)findDouble:(size_t)col_ndx value:(double)value
-#                 (size_t)findDate:(size_t)col_ndx value:(time_t)value
-#                 (size_t)findString:(size_t)col_ndx value:(NSString *)value
-#                 (size_t)findBinary:(size_t)col_ndx value:(TightdbBinary *)value
+#                 (NSUInteger)findBool:(NSUInteger)col_ndx value:(BOOL)value
+#                 (NSUInteger)findInt:(NSUInteger)col_ndx value:(int64_t)value
+#                 (NSUInteger)findFloat:(NSUInteger)col_ndx value:(float)value
+#                 (NSUInteger)findDouble:(NSUInteger)col_ndx value:(double)value
+#                 (NSUInteger)findDate:(NSUInteger)col_ndx value:(time_t)value
+#                 (NSUInteger)findString:(NSUInteger)col_ndx value:(NSString *)value
+#                 (NSUInteger)findBinary:(NSUInteger)col_ndx value:(TightdbBinary *)value
 #      PARAMS:
 #      - NAME   : col_ndx
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #        DESCR  : *g_dyn_table_find_first_xxx_parm1_descr
 #      - NAME   : value
 #        TYPES  : [BOOL, int64_t, float, double, time_t, NSString, const char*]
 #        DESCR  : *g_dyn_table_find_first_xxx_parm2_descr
 #      RETURN:
-#        TYPES  : size_t
+#        TYPES  : NSUInteger
 #TODO: is that the same in objc?
 #        DESCR  : "The row index or <code>NSNotFound</code> if there is no match."
 #      EXAMPLES:
@@ -658,10 +749,10 @@ CATEGORIES :
  #                The method finds all occurences of a given value in a specific column.
  #                The rows are returned as a {@link class_dyn_tableview} object.
  #     SIGNATURE: |
- #                (TightdbView *)findAll:(TightdbView *)view column:(size_t)col_ndx value:(int64_t)value
+ #                (TightdbView *)findAll:(TightdbView *)view column:(NSUInteger)col_ndx value:(int64_t)value
  #     PARAMS:
  #     - NAME   : col_ndx
- #       TYPES  : size_t
+ #       TYPES  : NSUInteger
  #       DESCR  : *g_dyn_table_find_all_xxx_parm1_descr
  #     - NAME   : value
  #       TYPES  : [BOOL, int64_t, float, double, time_t, NSString]
@@ -685,10 +776,10 @@ CATEGORIES :
       NAME     : getSortedView
       SUMMARY  : *g_dyn_table_get_sorted_view_summary
       DESCR    : *g_dyn_table_get_sorted_view_desc
-      SIGNATURE: TableView get_sorted_view(size_t column_ndx, bool ascending=true);
+      SIGNATURE: TableView get_sorted_view(NSUInteger column_ndx, bool ascending=true);
       PARAMS:
       - NAME   : column_ndx
-        TYPES  : size_t
+        TYPES  : NSUInteger
         DESCR  : *g_dyn_table_get_sorted_view_parm1_descr
       - NAME   : ascending
         TYPES  : BOOL
@@ -710,7 +801,7 @@ CATEGORIES :
       PARAMS:
       - NAME   : colIndex
         TYPES  : NSUInteger
-        DESCR  : NOTE! Currently only supported on TDBStringType columns.
+        DESCR  : "The column index. <strong>NOTE!</strong> Currently only supported on <code>TDBStringType</code> columns."
       RETURN:
         TYPES  : TDBView *
         DESCR  : *g_dyn_table_distinct_return_desc
@@ -718,185 +809,222 @@ CATEGORIES :
       - CODE   : ex_objc_dyn_table_distinct
         DESCR  :
 
+  - g_dyn_table_find_predicate:
+      NAMES    : "find:"
+      SUMMARY  : Find matching row using an NSPredicate
+      DESCR    : >
+                 This method allow you to find a row using a predicate string or NSPredicate object.
+      SIGNATURE: -(TDBRow *)find:(id)condition;
+      PARAMS:
+      - NAME   : condition
+        TYPES  : [NSString, NSPredicate]
+        DESCR  : NOTE! We only support compound predicates and those comparing columns to constant values.
+      RETURN:
+        TYPES  : [TDBRow, nil]
+        DESCR  : The first matching row or nil if there is no match
+
+  - g_dyn_table_where_predicate:
+      NAMES    : ["where:", "where:orderBy:"]
+      SUMMARY  : Create a filtered TDBView using an NSPredicate and NSSortDescriptor
+      DESCR    : >
+                 These methods allow you to create a TDBView using a predicate string or NSPredicate object.
+                 The first variant takes a predicate as string or as fully constructed NSPredicate and creates
+                 a TDBView. The second variant also takes a column name or NSSortDescriptor to support ordering.
+                 Both variants support AND and OR compound predicats, and comparison of constant values against
+                 column names.
+      SIGNATURE: |
+                 -(TDBView *)where:(id)condition;
+                 -(TDBView *)where:(id)condition orderBy:(id)order;
+      PARAMS:
+      - NAME   : condition
+        TYPES  : [NSString, NSPredicate]
+        DESCR  : NOTE! We only support compound predicates and those comparing columns to constant values.
+      - NAME   : order
+        TYPES  : [NSString, NSSortDescriptor]
+        DESCR  : NOTE! Sort only supported on columns of type TDBIntegerType, TDBBoolType and TDBDateType.
+      RETURN:
+        TYPES  : TDBView *
+        DESCR  : The filtered and/or sorted view
+
   - g_dyn_table_where_const:
       IGNORE   : ""
   - g_dyn_table_where:
       NAME     : where
-      SIGNATURE: (TDBQuery *) where
+      SIGNATURE: (TDBQuery *)where
       SUMMARY  : *g_dyn_table_where_summary
       DESCR    : *g_dyn_table_where_descr
       RETURN:
-        TYPES  : TDBQuery
+        TYPES  : TDBQuery *
         DESCR  : *g_dyn_table_where_return_descr
       EXAMPLES:
-      - DESCR  : ""
+      - DESCR  :
         CODE   : ex_objc_dyn_table_where
 
 
-- Aggregates:
-  METHODS:
-  - g_dyn_table_count_int:
-      TODO     : later
-      NAME     : countInt
-  - g_dyn_table_count_float:
-      TODO     : later
-      NAME     : countFloat
-  - g_dyn_table_count_double:
-      TODO     : later
-      NAME     : countDouble
-  - g_dyn_table_count_string:
-      TODO     : later
-      NAME     : countRowsWith
-      TITLE    : "countRowsWith*Column:inColumnWithIndex:"
-      SUMMARY  : *g_dyn_table_count_summary
-      DESCR    : *g_dyn_table_count_descr
-      SIGNATURE: |
-                 (NSUInteger)countRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
-                 (NSUInteger)countRowsWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
-                 (NSUInteger)countRowsWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
-                 (NSUInteger)countRowsWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
-      PARAMS:
-      - NAME   : colIndex
-        TYPES  : NSUInteger
-        DESCR  :
-        - TEXT : *g_dyn_table_count_parm1_descr0
-        - TEXT : *g_dyn_table_count_parm1_descr1
-      - NAME   : anInt
-        TYPES  : int64_t
-        DESCR  : *g_dyn_table_count_parm2_descr
-      RETURN:
-        TYPES  : NSUInteger
-        DESCR  : *g_dyn_table_count_return_descr
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_count
-        DESCR  :
+# - Aggregates:
+#   METHODS:
+#   - g_dyn_table_count_int:
+#       TODO     : later
+#       NAME     : countInt
+#   - g_dyn_table_count_float:
+#       TODO     : later
+#       NAME     : countFloat
+#   - g_dyn_table_count_double:
+#       TODO     : later
+#       NAME     : countDouble
+#   - g_dyn_table_count_string:
+#       TODO     : later
+#       NAME     : countRowsWith
+#       TITLE    : "countRowsWith*Column:inColumnWithIndex:"
+#       SUMMARY  : *g_dyn_table_count_summary
+#       DESCR    : *g_dyn_table_count_descr
+#       SIGNATURE: |
+#                  (NSUInteger)countRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+#                  (NSUInteger)countRowsWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+#                  (NSUInteger)countRowsWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
+#                  (NSUInteger)countRowsWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+#       PARAMS:
+#       - NAME   : colIndex
+#         TYPES  : NSUInteger
+#         DESCR  :
+#         - TEXT : *g_dyn_table_count_parm1_descr0
+#         - TEXT : *g_dyn_table_count_parm1_descr1
+#       - NAME   : anInt
+#         TYPES  : int64_t
+#         DESCR  : *g_dyn_table_count_parm2_descr
+#       RETURN:
+#         TYPES  : NSUInteger
+#         DESCR  : *g_dyn_table_count_return_descr
+#       EXAMPLES:
+#       - CODE   : ex_objc_dyn_table_count
+#         DESCR  :
 
-  - g_dyn_table_sum_int:
-  - g_dyn_table_sum_float:
-  - g_dyn_table_sum_double:
-      TODO     : later
-      NAMES    : [sumInt, sumFloat, sumDouble]
-      TITLE    : "sum*ColumnWithIndex:"
-      SUMMARY  : *g_dyn_table_sum_summary
-      DESCR    : *g_dyn_table_sum_descr
-      SIGNATURE: |
-                 (int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex
-                 (double)sumFloatColumnWithIndex:(NSUInteger)colIndex
-                 (double)sumDoubleColumnWithIndex:(NSUInteger)colIndex
-      PARAMS:
-      - NAME   : colIndex
-        TYPES  : NSUInteger
-        DESCR  : *g_dyn_table_sum_parm1_descr
-      RETURN:
-        TYPES  : [int64_t, double]
-        DESCR  : *g_dyn_table_sum_return_descr
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_sum
-        DESCR  :
+#   - g_dyn_table_sum_int:
+#   - g_dyn_table_sum_float:
+#   - g_dyn_table_sum_double:
+#       TODO     : later
+#       NAMES    : [sumInt, sumFloat, sumDouble]
+#       TITLE    : "sum*ColumnWithIndex:"
+#       SUMMARY  : *g_dyn_table_sum_summary
+#       DESCR    : *g_dyn_table_sum_descr
+#       SIGNATURE: |
+#                  (int64_t)sumIntColumnWithIndex:(NSUInteger)colIndex
+#                  (double)sumFloatColumnWithIndex:(NSUInteger)colIndex
+#                  (double)sumDoubleColumnWithIndex:(NSUInteger)colIndex
+#       PARAMS:
+#       - NAME   : colIndex
+#         TYPES  : NSUInteger
+#         DESCR  : *g_dyn_table_sum_parm1_descr
+#       RETURN:
+#         TYPES  : [int64_t, double]
+#         DESCR  : *g_dyn_table_sum_return_descr
+#       EXAMPLES:
+#       - CODE   : ex_objc_dyn_table_sum
+#         DESCR  :
 
-  - g_dyn_table_maximum_int:
-  - g_dyn_table_maximum_float:
-  - g_dyn_table_maximum_double:
-      TODO     : later
-      NAMES    : [maxInt, maxFloat, maximumDouble]
-      TITLE    : "max*InColumnWithIndex:"
-      SUMMARY  : *g_dyn_table_maximum_summary
-      DESCR    : *g_dyn_table_maximum_descr
-      SIGNATURE: |
-                 (int64_t)maxIntInColumnWithIndex:(NSUInteger)colIndex
-                 (float)maxFloatInColumnWithIndex:(NSUInteger)colIndex
-                 (double)maxDoubleInColumnWithIndex:(NSUInteger)colIndex
-      CONST    : True
-      PARAMS:
-      - NAME   : colIndex
-        TYPES  : NSUInteger
-        DESCR  : *g_dyn_table_maximum_parm1_descr
-      RETURN:
-        TYPES  : [int64_t, float, double]
-        DESCR  : *g_dyn_table_maximum_return_descr
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_maximum
-        DESCR  :
+#   - g_dyn_table_maximum_int:
+#   - g_dyn_table_maximum_float:
+#   - g_dyn_table_maximum_double:
+#       TODO     : later
+#       NAMES    : [maxInt, maxFloat, maximumDouble]
+#       TITLE    : "max*InColumnWithIndex:"
+#       SUMMARY  : *g_dyn_table_maximum_summary
+#       DESCR    : *g_dyn_table_maximum_descr
+#       SIGNATURE: |
+#                  (int64_t)maxIntInColumnWithIndex:(NSUInteger)colIndex
+#                  (float)maxFloatInColumnWithIndex:(NSUInteger)colIndex
+#                  (double)maxDoubleInColumnWithIndex:(NSUInteger)colIndex
+#       CONST    : True
+#       PARAMS:
+#       - NAME   : colIndex
+#         TYPES  : NSUInteger
+#         DESCR  : *g_dyn_table_maximum_parm1_descr
+#       RETURN:
+#         TYPES  : [int64_t, float, double]
+#         DESCR  : *g_dyn_table_maximum_return_descr
+#       EXAMPLES:
+#       - CODE   : ex_objc_dyn_table_maximum
+#         DESCR  :
 
-  - g_dyn_table_minimum_int:
-  - g_dyn_table_minimum_float:
-  - g_dyn_table_minimum_double:
-      TODO     : later
-      NAMES    : [minInt, minimumFloat, minimumDouble]
-      TITLE    : "min*InColumnWithIndex:"
-      SUMMARY  : *g_dyn_table_minimum_summary
-      DESCR    : *g_dyn_table_minimum_descr
-      SIGNATURE: |
-                 (int64_t)minIntInColumnWithIndex:(NSUInteger)colIndex
-                 (float)minFloatInColumnWithIndex:(NSUInteger)colIndex
-                 (double)minDoubleInColumnWithIndex:(NSUInteger)colIndex
-      PARAMS:
-      - NAME   : colIndex
-        TYPES  : NSUInteger
-        DESCR  : *g_dyn_table_maximum_parm1_descr
-      RETURN:
-        TYPES  : [int64_t, float, double]
-        DESCR  : *g_dyn_table_minimum_return_descr
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_minimum
-        DESCR  :
+#   - g_dyn_table_minimum_int:
+#   - g_dyn_table_minimum_float:
+#   - g_dyn_table_minimum_double:
+#       TODO     : later
+#       NAMES    : [minInt, minimumFloat, minimumDouble]
+#       TITLE    : "min*InColumnWithIndex:"
+#       SUMMARY  : *g_dyn_table_minimum_summary
+#       DESCR    : *g_dyn_table_minimum_descr
+#       SIGNATURE: |
+#                  (int64_t)minIntInColumnWithIndex:(NSUInteger)colIndex
+#                  (float)minFloatInColumnWithIndex:(NSUInteger)colIndex
+#                  (double)minDoubleInColumnWithIndex:(NSUInteger)colIndex
+#       PARAMS:
+#       - NAME   : colIndex
+#         TYPES  : NSUInteger
+#         DESCR  : *g_dyn_table_maximum_parm1_descr
+#       RETURN:
+#         TYPES  : [int64_t, float, double]
+#         DESCR  : *g_dyn_table_minimum_return_descr
+#       EXAMPLES:
+#       - CODE   : ex_objc_dyn_table_minimum
+#         DESCR  :
 
-  - g_dyn_table_average_int:
-  - g_dyn_table_average_float:
-  - g_dyn_table_average_double:
-      TODO     : later
-      NAMES    : [avgInt, averageFloat, averageDouble]
-      TITLE    : "avg*ColumnWithIndex:"
-      SUMMARY  : *g_dyn_table_average_summary
-      DESCR    : *g_dyn_table_average_descr
-      SIGNATURE: |
-                 (double)avgIntColumnWithIndex:(NSUInteger)colIndex
-                 (double)avgFloatColumnWithIndex:(NSUInteger)colIndex
-                 (double)avgDoubleColumnWithIndex:(NSUInteger)colIndex
-      PARAMS:
-      - NAME   : colIndex
-        TYPES  : NSUInteger
-        DESCR  : *g_dyn_table_maximum_parm1_descr
-      RETURN:
-        TYPES  : double
-        DESCR  : *g_dyn_table_average_return1_descr
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_average
-        DESCR  :
+#   - g_dyn_table_average_int:
+#   - g_dyn_table_average_float:
+#   - g_dyn_table_average_double:
+#       TODO     : later
+#       NAMES    : [avgInt, averageFloat, averageDouble]
+#       TITLE    : "avg*ColumnWithIndex:"
+#       SUMMARY  : *g_dyn_table_average_summary
+#       DESCR    : *g_dyn_table_average_descr
+#       SIGNATURE: |
+#                  (double)avgIntColumnWithIndex:(NSUInteger)colIndex
+#                  (double)avgFloatColumnWithIndex:(NSUInteger)colIndex
+#                  (double)avgDoubleColumnWithIndex:(NSUInteger)colIndex
+#       PARAMS:
+#       - NAME   : colIndex
+#         TYPES  : NSUInteger
+#         DESCR  : *g_dyn_table_maximum_parm1_descr
+#       RETURN:
+#         TYPES  : double
+#         DESCR  : *g_dyn_table_average_return1_descr
+#       EXAMPLES:
+#       - CODE   : ex_objc_dyn_table_average
+#         DESCR  :
 
 
-- Dump:
-  METHODS:
-  - g_dyn_table_to_json:
-      TODO     : later
+# - Dump:
+#   METHODS:
+#   - g_dyn_table_to_json:
+#       TODO     : later
 
-      NAMES    : toJSON
-      SUMMARY  : *g_dyn_table_to_json_summary
-      DESCR    : *g_dyn_table_to_json_descr
-      PARAMS:
-      - NAME   : out
-        TYPES  : std::ostream&
-        DESCR  : Output stream.
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_to_json
-        DESCR  :
+#       NAMES    : toJSON
+#       SUMMARY  : *g_dyn_table_to_json_summary
+#       DESCR    : *g_dyn_table_to_json_descr
+#       PARAMS:
+#       - NAME   : out
+#         TYPES  : std::ostream&
+#         DESCR  : Output stream.
+#       EXAMPLES:
+#       - CODE   : ex_objc_dyn_table_to_json
+#         DESCR  :
 
-  - g_dyn_table_to_string:
-      TODO     : later
+#   - g_dyn_table_to_string:
+#       TODO     : later
 
-      NAMES    : toString
-      SUMMARY  : *g_dyn_table_to_string_summary
-      DESCR    : *g_dyn_table_to_string_descr
-      PARAMS:
-      - NAME   : out
-        TYPES  : std::ostream&
-        DESCR  : Output stream.
-      - NAME   : limit
-        TYPES  : size_t
-        DESCR  : *g_dyn_table_to_string_parm2_descr
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_to_string
-        DESCR  :
+#       NAMES    : toString
+#       SUMMARY  : *g_dyn_table_to_string_summary
+#       DESCR    : *g_dyn_table_to_string_descr
+#       PARAMS:
+#       - NAME   : out
+#         TYPES  : std::ostream&
+#         DESCR  : Output stream.
+#       - NAME   : limit
+#         TYPES  : NSUInteger
+#         DESCR  : *g_dyn_table_to_string_parm2_descr
+#       EXAMPLES:
+#       - CODE   : ex_objc_dyn_table_to_string
+#         DESCR  :
 
-  - g_dyn_table_row_to_string:
-      TODO     : later
+#   - g_dyn_table_row_to_string:
+#       TODO     : later
