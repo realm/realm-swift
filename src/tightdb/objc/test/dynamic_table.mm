@@ -1294,7 +1294,6 @@
     STAssertEqualObjects(r[@"name"], @"name3", nil);
 }
 
-
 - (void)testPredicateView
 {
     TDBTable *t = [[TDBTable alloc] init];
