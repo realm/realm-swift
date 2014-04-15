@@ -62,6 +62,7 @@ Description......
    derived from `NSObject`.
 * `where` has been added to `TDBView`and `TDBViewProtocol`.
 * Adding support for "smart" contexts (`TDBSmartContext`).
+* `createTableWithName:columns:` has been added to `TDBTransaction`.
 
 
 =============================================================
