@@ -156,8 +156,8 @@ TIGHTDB_TABLE_2(SubMixedTable,
     STAssertTrue([table[5].Other isKindOfClass:[NSDate class]], @"NSDate excepted");
 
     // Test cast and isClass
-    NSLog(@"Is SubMixedTable type: %i", [tableSub hasSameDescriptorAs:[SubMixedTable class]]);
-    STAssertEquals([tableSub hasSameDescriptorAs:[SubMixedTable class]], YES,@"Unknown table should be of type SubMixedTable");
+    // FIXME: When hasSameDescriptorAs is implemented, reenable unit test below
+    // STAssertEquals([tableSub hasSameDescriptorAs:[SubMixedTable class]], YES,@"Unknown table should be of type SubMixedTable");
     tableSub = [tableSub castToTypedTableClass:[SubMixedTable class]];
     NSLog(@"TableSub Size: %lu", [tableSub rowCount]);
     STAssertEquals([tableSub rowCount], (size_t)5,@"Subtable should have 5 rows");

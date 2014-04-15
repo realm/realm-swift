@@ -22,7 +22,6 @@ CATEGORIES :
 - Conditions:
   METHODS:
   - g_typed_query_equals_binary:
-      TODO: soon
   - g_typed_query_equals_bool:
   - g_typed_query_equals_int:
   - g_typed_query_equals_float:
@@ -33,64 +32,63 @@ CATEGORIES :
       TITLE    : "*columnIsEqualTo"
       NAMES    : [columnIsEqualTo, columnIsEqualTo, columnIsEqualTo, columnIsEqualTo, columnIsEqualTo, columnIsEqualTo, columnIsEqualTo]
       SIGNATURE: |
-                 .CName (TableName_Query *)columnIsEqualTo:(BOOL)value
-                 .CName (TableName_Query *)columnIsEqualTo:(int64_t)value
-                 .CName (TableName_Query *)columnIsEqualTo:(float)value
-                 .CName (TableName_Query *)columnIsEqualTo:(double)value
-                 .CName (TableName_Query *)columnIsEqualTo:(NSString *)value
-                 .CName (TableName_Query *)columnIsEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive
-                 .CName (TableName_Query *)columnIsEqualTo:(time_t)value
+                 .columnName (ClassNameQuery *)columnIsEqualTo:(BOOL)value
+                 .columnName (ClassNameQuery *)columnIsEqualTo:(int64_t)value
+                 .columnName (ClassNameQuery *)columnIsEqualTo:(float)value
+                 .columnName (ClassNameQuery *)columnIsEqualTo:(double)value
+                 .columnName (ClassNameQuery *)columnIsEqualTo:(NSString *)value
+                 .columnName (ClassNameQuery *)columnIsEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 .columnName (ClassNameQuery *)columnIsEqualTo:(NSDate *)value
+                 .columnName (ClassNameQuery *)columnIsEqualTo:(NSData *)value
       SUMMARY  : *g_typed_query_equals_summary
       DESCR    : *g_typed_query_equals_descr
       PARAMS:
       - NAME   : value
-        TYPES  : [BOOL, int64_t, float, double, NSString*, NSString*, time_t]
+        TYPES  : [BOOL, int64_t, float, double, NSString*, NSString*, NSDate *]
         DESCR  : *g_typed_query_value_descr
       - NAME   : caseSensitive
         TYPES  : BOOL
         DESCR  : *g_typed_query_parm_case_sensitive_descr
       RETURN:
-        TYPES  : TableName_Query *
-        TYPES  : TableName_Query *
+        TYPES  : ClassNameQuery *
         DESCR  : &g_typed_query_case_sensitive_descr_objc
                  >
                  The class of the returned object is defined by a macro.
-                 The first part of the class name, specifically <code>TableName</code>,
+                 The first part of the class name, specifically <code>ClassName</code>,
                  is replaced with the name of your typed table.
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_equals
 
   - g_typed_query_notEquals_bool:
-       TODO: soon
   - g_typed_query_notEquals_binary:
-       TODO: soon
   - g_typed_query_notEquals_int:
   - g_typed_query_notEquals_float:
   - g_typed_query_notEquals_double:
   - g_typed_query_notEquals_string:
   - g_typed_query_notEquals_string_2:
   - g_typed_query_notEquals_date:
-      NAMES    : [ columnIsNotEqualTo, columnIsNotEqualTo, columnIsNotEqualTo, columnIsNotEqualTo, columnIsNotEqualTo, columnIsNotEqualTo]
-      TITLE    : "*columnIsNotEqualTo"
+      NAMES    : [ columnIsNotEqualTo, columnIsNotEqualTo, columnIsNotEqualTo, columnIsNotEqualTo, columnIsNotEqualTo, columnIsNotEqualTo, columnIsNotEqualTo]
+      TITLE    : "columnIsNotEqualTo"
       SIGNATURE: |
-                 .CName (TableName_Query *)columnIsNotEqualTo:(int64_t)value
-                 .CName (TableName_Query *)columnIsNotEqualTo:(float)value
-                 .CName (TableName_Query *)columnIsNotEqualTo:(double)value
-                 .CName (TableName_Query *)columnIsNotEqualTo:(NSString *)value
-                 .CName (TableName_Query *)columnIsNotEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive
-                 .CName (TableName_Query *)columnIsNotEqualTo:(time_t)value
+                 .columnName (ClassNameQuery *)columnIsNotEqualTo:(int64_t)value
+                 .columnName (ClassNameQuery *)columnIsNotEqualTo:(float)value
+                 .columnName (ClassNameQuery *)columnIsNotEqualTo:(double)value
+                 .columnName (ClassNameQuery *)columnIsNotEqualTo:(NSString *)value
+                 .columnName (ClassNameQuery *)columnIsNotEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 .columnName (ClassNameQuery *)columnIsNotEqualTo:(NSDate *)value
+                 .columnName (ClassNameQuery *)columnIsNotEqualTo:(NSData *)value
       SUMMARY  : *g_typed_query_notEquals_summary
       DESCR    : *g_typed_query_notEquals_descr
       PARAMS:
       - NAME   : value
-        TYPES  : [int64_t, float, double, NSString*, NSString*, time_t]
+        TYPES  : [int64_t, float, double, NSString*, NSString*, NSDate *]
         DESCR  : *g_typed_query_value_descr
       - NAME   : caseSensitive
         TYPES  : BOOL
         DESCR  : *g_typed_query_parm_case_sensitive_descr
       RETURN:
-        TYPES  : TableName_Query *
+        TYPES  : ClassNameQuery *
         DESCR  : *g_typed_query_query_object_return_descr
       EXAMPLES:
       - DESCR  :
@@ -101,20 +99,20 @@ CATEGORIES :
   - g_typed_query_greaterThan_double:
   - g_typed_query_greaterThan_date:
       NAMES    : [ columnIsGreaterThan, columnIsGreaterThan, columnIsGreaterThan, columnIsGreaterThan ]
-      TITLE    : "*columnIsGreaterThan"
+      TITLE    : "columnIsGreaterThan"
       SIGNATURE: |
-                 .CName (TableName_Query *)columnIsGreaterThan:(int64_t)value
-                 .CName (TableName_Query *)columnIsGreaterThan:(float)value
-                 .CName (TableName_Query *)columnIsGreaterThan:(double)value
-                 .CName (TableName_Query *)columnIsGreaterThan:(time_t)value
+                 .columnName (ClassNameQuery *)columnIsGreaterThan:(int64_t)value
+                 .columnName (ClassNameQuery *)columnIsGreaterThan:(float)value
+                 .columnName (ClassNameQuery *)columnIsGreaterThan:(double)value
+                 .columnName (ClassNameQuery *)columnIsGreaterThan:(NSDate *)value
       SUMMARY  : *g_typed_query_greaterThan_summary
       DESCR    : *g_typed_query_greaterThan_descr
       PARAMS:
       - NAME   : value
-        TYPES  : [int64_t, float, double, time_t]
+        TYPES  : [int64_t, float, double, NSDate *]
         DESCR  : *g_typed_query_value_descr
       RETURN:
-        TYPES  : TableName_Query *
+        TYPES  : ClassNameQuery *
         DESCR  : *g_typed_query_query_object_return_descr
       EXAMPLES:
       - DESCR  :
@@ -125,20 +123,20 @@ CATEGORIES :
   - g_typed_query_greaterThanOrEqual_double:
   - g_typed_query_greaterThanOrEqual_date:
       NAMES    : [columnIsGreaterThanOrEqualTo, columnIsGreaterThanOrEqualTo, columnIsGreaterThanOrEqualTo, columnIsGreaterThanOrEqualTo]
-      TITLE    : "*columnIsGreaterThanOrEqualTo"
+      TITLE    : "columnIsGreaterThanOrEqualTo"
       SIGNATURE: |
-                 .CName (TableName_Query *)columnIsGreaterThanOrEqualTo:(int64_t)value
-                 .CName (TableName_Query *)columnIsGreaterThanOrEqualTo:(float)value
-                 .CName (TableName_Query *)columnIsGreaterThanOrEqualTo:(double)value
-                 .CName (TableName_Query *)columnIsGreaterThanOrEqualTo:(time_t)value
+                 .columnName (ClassNameQuery *)columnIsGreaterThanOrEqualTo:(int64_t)value
+                 .columnName (ClassNameQuery *)columnIsGreaterThanOrEqualTo:(float)value
+                 .columnName (ClassNameQuery *)columnIsGreaterThanOrEqualTo:(double)value
+                 .columnName (ClassNameQuery *)columnIsGreaterThanOrEqualTo:(NSDate *)value
       SUMMARY  : *g_typed_query_greaterThanOrEqual_summary
       DESCR    : *g_typed_query_greaterThanOrEqual_descr
       PARAMS:
       - NAME   : value
-        TYPES  : [int64_t, float, double, time_t]
+        TYPES  : [int64_t, float, double, NSDate *]
         DESCR  : *g_typed_query_value_descr
       RETURN:
-        TYPES  : TableName_Query *
+        TYPES  : ClassNameQuery *
         DESCR  : *g_typed_query_query_object_return_descr
       EXAMPLES:
       - DESCR  :
@@ -149,20 +147,20 @@ CATEGORIES :
   - g_typed_query_lessThan_double:
   - g_typed_query_lessThan_date:
       NAMES    : [columnIsLessThan, columnIsLessThan, columnIsLessThan, columnIsLessThan]
-      TITLE    : "*columnIsLessThan"
+      TITLE    : "columnIsLessThan"
       SIGNATURE: |
-                 .CName (TableName_Query *)columnIsLessThan:(int64_t)value
-                 .CName (TableName_Query *)columnIsLessThan:(float)value
-                 .CName (TableName_Query *)columnIsLessThan:(double)value
-                 .CName (TableName_Query *)columnIsLessThan:(time_t)value
+                 .columnName (ClassNameQuery *)columnIsLessThan:(int64_t)value
+                 .columnName (ClassNameQuery *)columnIsLessThan:(float)value
+                 .columnName (ClassNameQuery *)columnIsLessThan:(double)value
+                 .columnName (ClassNameQuery *)columnIsLessThan:(NSDate *)value
       SUMMARY  : *g_typed_query_lessThan_summary
       DESCR    : *g_typed_query_lessThan_descr
       PARAMS:
       - NAME   : value
-        TYPES  : [int64_t, float, double, time_t]
+        TYPES  : [int64_t, float, double, NSDate *]
         DESCR  : *g_typed_query_value_descr
       RETURN:
-        TYPES  : TableName_Query *
+        TYPES  : ClassNameQuery *
         DESCR  : *g_typed_query_query_object_return_descr
       EXAMPLES:
       - DESCR  :
@@ -173,20 +171,20 @@ CATEGORIES :
   - g_typed_query_lessThanOrEqual_double:
   - g_typed_query_lessThanOrEqual_date:
       NAMES    : [columnIsLessThanOrEqualTo, columnIsLessThanOrEqualTo, columnIsLessThanOrEqualTo, columnIsLessThanOrEqualTo]
-      TITLE    : "*columnIsLessThanOrEqualTo"
+      TITLE    : "columnIsLessThanOrEqualTo"
       SIGNATURE: |
-                 .CName (TableName_Query *)columnIsLessThanOrEqualTo:(int64_t)value
-                 .CName (TableName_Query *)columnIsLessThanOrEqualTo:(float)value
-                 .CName (TableName_Query *)columnIsLessThanOrEqualTo:(double)value
-                 .CName (TableName_Query *)columnIsLessThanOrEqualTo:(time_t)value
+                 .columnName (ClassNameQuery *)columnIsLessThanOrEqualTo:(int64_t)value
+                 .columnName (ClassNameQuery *)columnIsLessThanOrEqualTo:(float)value
+                 .columnName (ClassNameQuery *)columnIsLessThanOrEqualTo:(double)value
+                 .columnName (ClassNameQuery *)columnIsLessThanOrEqualTo:(NSDate *)value
       SUMMARY  : *g_typed_query_lessThanOrEqual_summary
       DESCR    : *g_typed_query_lessThanOrEqual_descr
       PARAMS:
       - NAME   : value
-        TYPES  : [int64_t, float, double, time_t]
+        TYPES  : [int64_t, float, double, NSDate *]
         DESCR  : *g_typed_query_value_descr
       RETURN:
-        TYPES  : TableName_Query *
+        TYPES  : ClassNameQuery *
         DESCR  : *g_typed_query_query_object_return_descr
       EXAMPLES:
       - DESCR  :
@@ -197,20 +195,20 @@ CATEGORIES :
   - g_typed_query_between_double:
   - g_typed_query_between_date:
       NAMES    : ["columnIsBetween::", "columnIsBetween::", "columnIsBetween::", "columnIsBetween::"]
-      TITLE    : "*columnIsBetween"
+      TITLE    : "columnIsBetween"
       SIGNATURE: |
-                 .CName (TableName_Query *)columnIsBetween:(int64_t)from :(int64_t)to
-                 .CName (TableName_Query *)columnIsBetween:(float)from :(float)to
-                 .CName (TableName_Query *)columnIsBetween:(double)from :(double)to
-                 .CName (TableName_Query *)columnIsBetween:(time_t)from :(time_t)to
+                 .columnName (ClassNameQuery *)columnIsBetween:(int64_t)lower :(int64_t)upper
+                 .columnName (ClassNameQuery *)columnIsBetween:(float)lower :(float)upper
+                 .columnName (ClassNameQuery *)columnIsBetween:(double)lower :(double)upper
+                 .columnName (ClassNameQuery *)columnIsBetween:(NSDate *)lower :(NSDate *)upper
       DESCR    : *g_typed_query_between_descr
       SUMMARY  : *g_typed_query_between_summary
       PARAMS:
       - NAME   : from
-        TYPES  : [int64_t, float, double, time_t]
+        TYPES  : [int64_t, float, double, NSDate *]
         DESCR  : *g_typed_query_between_parm1_descr
       - NAME   : to
-        TYPES  : [int64_t, time_t]
+        TYPES  : [int64_t, NSDate *]
         DESCR  : *g_typed_query_between_parm2_descr
       RETURN:
         TYPES  : TableName_Query *
@@ -220,77 +218,77 @@ CATEGORIES :
         CODE   : ex_objc_typed_query_between
 
   - g_typed_query_startsWith_binary:
-      TODO: soon
   - g_typed_query_startsWith_string:
       NAME     : columnBeginsWith
   - g_typed_query_startsWith_string_2:
       NAME     : columnBeginsWith
-      TITLE    : "*columnBeginsWith"
+      TITLE    : "columnBeginsWith"
       SIGNATURE: |
-                 .CName (TableName_Query *)columnBeginsWith:(NSString *)value
-                 .CName (TableName_Query *)columnBeginsWith:(NSString *)value caseSensitive:(BOOL)
+                 .columnName (ClassNameQuery *)columnBeginsWith:(NSString *)value
+                 .columnName (ClassNameQuery *)columnBeginsWith:(NSString *)value caseSensitive:(BOOL)
+                 .columnName (ClassNameQuery *)columnBeginsWith:(NSData *)value
       DESCR    : *g_typed_query_startsWith_descr
       SUMMARY  : *g_typed_query_startsWith_summary
       PARAMS:
       - NAME   : value
-        TYPES  : NSString *
+        TYPES  : [NSString *, NSData *]
         DESCR  : *g_typed_query_value_descr
       - NAME   : caseSensitive
         TYPES  : BOOL
         DESCR  : *g_typed_query_parm_case_sensitive_descr
       RETURN:
-        TYPES  : TableName_Query *
+        TYPES  : ClassNameQuery *
         DESCR  : *g_typed_query_query_object_return_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_startsWith
 
   - g_typed_query_endsWith_binary:
-      TODO: soon
   - g_typed_query_endsWith_string:
       NAME     : columnEndsWith
   - g_typed_query_endsWith_string_2:
       NAME     : columnEndsWith
-      TITLE    : "*columnEndsWith"
+      TITLE    : columnEndsWith
       SIGNATURE: |
-                 .CName (TableName_Query *)columnEndsWith:(NSString *)value
-                 .CName (TableName_Query *)columnEndsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 .columnName (ClassNameQuery *)columnEndsWith:(NSString *)value
+                 .columnName (ClassNameQuery *)columnEndsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 .columnName (ClassNameQuery *)columnEndsWith:(NSData *)value
       DESCR    : *g_typed_query_endsWith_descr
       SUMMARY  : *g_typed_query_endsWith_summary
       PARAMS:
       - NAME   : value
-        TYPES  : NSString *
+        TYPES  : [NSString *, NSData *]
         DESCR  : *g_typed_query_value_descr
       - NAME   : caseSensitive
         TYPES  : BOOL
         DESCR  : *g_typed_query_parm_case_sensitive_descr
       RETURN:
-        TYPES  : TableName_Query *
+        TYPES  : ClassNameQuery *
         DESCR  : *g_typed_query_query_object_return_descr
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_endsWith
 
   - g_typed_query_contains_binary:
-      TODO: soon
   - g_typed_query_contains_string:
   - g_typed_query_contains_string_2:
       NAMES    : [columnContains, columnContains]
-      TITLE    : "*columnContains"
+      TITLE    : "columnContains"
       SIGNATURE: |
-                 .CName (TableName_Query *)columnContains:(NSString *)value
-                 .CName (TableName_Query *)columnContains:(NSString *)value caseSensitive:(BOOL)
+                 .columnName (ClassNameQuery *)columnContains:(NSString *)value
+                 .columnName (ClassNameQuery *)columnContains:(NSString *)value caseSensitive:(BOOL)
+                 .columnName (ClassNameQuery *)columnContains:(NSData *)value
       DESCR    : *g_typed_query_contains_descr
       SUMMARY  : *g_typed_query_contains_summary
       PARAMS:
       - NAME   : value
-        TYPES  : NSString*
+        TYPES  : [NSString *, NSData *]
         DESCR  : *g_typed_query_value_descr
       - NAME   : caseSensitive
         TYPES  : BOOL
         DESCR  : *g_typed_query_parm_case_sensitive_descr
       RETURN:
-        TYPES  : TableName_Query *
+        TYPES  : ClassNameQuery *
         DESCR  : *g_typed_query_query_object_return_descr
       EXAMPLES:
       - DESCR  :
@@ -304,7 +302,7 @@ CATEGORIES :
       DESCR    : *g_typed_query_group_descr
       SUMMARY  : *g_typed_query_group_summary
       RETURN:
-        TYPES  : TableName_Query *
+        TYPES  : ClassNameQuery *
         DESCR  : *g_typed_query_query_object_return_descr
       EXAMPLES:
       - DESCR  :
@@ -312,11 +310,11 @@ CATEGORIES :
 
   - g_typed_query_endGroup:
       NAME     : endGroup
-      SIGNATURE: (TableName_Query *)endgroup
+      SIGNATURE: (ClassNameQuery *)endgroup
       DESCR    : *g_typed_query_endGroup_descr
       SUMMARY  : *g_typed_query_endGroup_summary
       RETURN:
-        TYPES  : TableName_Query *
+        TYPES  : ClassNameQuery *
         DESCR  : *g_typed_query_query_object_return_descr
       EXAMPLES:
       - DESCR  :
@@ -324,11 +322,11 @@ CATEGORIES :
 
   - g_typed_query_or:
       NAME     : or
-      SIGNATURE: (TableName_Query *)or
+      SIGNATURE: (ClassNameQuery *)or
       DESCR    : *g_typed_query_or_descr
       SUMMARY  : *g_typed_query_or_summary
       RETURN:
-        TYPES  : TableName_Query *
+        TYPES  : ClassNameQuery *
         DESCR  : *g_typed_query_query_object_return_descr
       EXAMPLES:
       - DESCR  :
@@ -349,14 +347,14 @@ CATEGORIES :
       NAME     : findAll
       DESCR    : *g_typed_query_find_all_descr
       SUMMARY  : *g_typed_query_find_all_summary
-      SIGNATURE: (TableName_View *)findAll
+      SIGNATURE: (ClassNameView *)findAll
       RETURN:
-        TYPES  : TableName_View *
+        TYPES  : ClassNameView *
         DESCR  : &g_typed_query_view_return_descr
                  >
-                 The query result is represented as a <code>TableName_View</code>.
-                 Note that part of the class name, specifically <code>TableName</code>,
-                 is replaced with the name of your specific table.
+                 The query result is represented as a <code>ClassNameView</code>.
+                 Note that part of the class name, specifically <code>ClassName</code>,
+                 is replaced with the name of your specific classes (tables, queries, views, etc.).
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_typed_query_findall
@@ -381,7 +379,7 @@ CATEGORIES :
 
 
   - g_typed_query_size:
-      NAMES    : count
+      NAMES    : rowCount
       SIGNATURE: (NSUInteger)count
       DESCR    : *g_typed_query_size_descr
       SUMMARY  : *g_typed_query_size_summary
@@ -404,12 +402,12 @@ CATEGORIES :
       NAME     : sum
   - g_typed_query_sum_double_2:
       NAME     : sum
-      TITLE    : "*sum"
+      TITLE    : "sum"
       DESCR    : *g_typed_query_sum_descr
       SUMMARY  : *g_typed_query_sum_summary
       SIGNATURE: |
-                 .CName (int64_t)sum
-                 .CName (double)sum
+                 .columnName (int64_t)sum
+                 .columnName (double)sum
       RETURN:
         TYPES  : [int64_t, double, double]
         DESCR  : *g_typed_query_sum_return_descr
@@ -433,13 +431,13 @@ CATEGORIES :
       NAME     : max
   - g_typed_query_maximum_double_2:
       NAME     : max
-      TITLE    : "*maximum"
+      TITLE    : maximum
       DESCR    : *g_typed_query_maximum_descr
       SUMMARY  : *g_typed_query_maximum_summary
       SIGNATURE: |
-                 .CName (int64_t)maximum
-                 .CName (float)maximum
-                 .CName (double)maximum
+                 .columnName (int64_t)max
+                 .columnName (float)max
+                 .columnName (double)max
       RETURN:
         TYPES  : [int64_t, float, double]
         DESCR  : *g_typed_query_maximum_return1_descr
@@ -463,13 +461,13 @@ CATEGORIES :
       NAME     : min
   - g_typed_query_minimum_double_2:
       NAME     : min
-      TITLE    : "*minimum"
+      TITLE    : minimum
       DESCR    : *g_typed_query_minimum_descr
       SUMMARY  : *g_typed_query_minimum_summary
       SIGNATURE: |
-                 .CName (int64_t)minimum
-                 .CName (float)minimum
-                 .CName (double)minimum
+                 .columnName (int64_t)min
+                 .columnName (float)min
+                 .columnName (double)min
       RETURN:
         TYPES  : [int64_t, float, double]
         DESCR  : *g_typed_query_minimum_return1_descr
@@ -489,10 +487,10 @@ CATEGORIES :
       NAME     : avg
   - g_typed_query_average_double_2:
       NAME     : avg
-      TITLE    : "*average"
+      TITLE    : "average"
       SUMMARY  : *g_typed_query_average_summary
       DESCR    : *g_typed_query_average_descr
-      SIGNATURE: .CName (double)average
+      SIGNATURE: .columnName (double)average
       RETURN:
         TYPES  : double
         DESCR  : *g_typed_query_average_return1_descr
@@ -501,9 +499,9 @@ CATEGORIES :
         CODE   : ex_objc_typed_query_average
 
   - g_typed_query_remove:
-      NAMES    : remove
+      NAMES    : removeRows
       SIGNATURE: |
-                 (NSNumber *)remove
+                 (NSNumber *)removeRows
       DESCR    : *g_typed_query_remove_descr
       SUMMARY  : *g_typed_query_remove_summary
       RETURN:

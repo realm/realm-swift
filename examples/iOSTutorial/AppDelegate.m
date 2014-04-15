@@ -18,31 +18,24 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: insert_rows @@
-
     // Add a row
-    PeopleTableRow *row;
-    row = [people addEmptyRow];
-    row.Name  = @"John";
-    row.Age   = 21;
-    row.Hired = YES;
+    [people addRow:@[@"John", @21, @YES]];
 
     // Add more rows
     [people addRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
     [people addRow:@{@"Name": @"Lars", @"Age": @22, @"Hired": @YES}];
     [people addRow:@{@"Name": @"Phil", @"Age": @43, @"Hired": @NO}];
     [people addRow:@{@"Name": @"Anni", @"Age": @54, @"Hired": @YES}];
-
     // @@EndExample@@
 
     // @@Example: insert_at_index @@
     [people insertRow:@{@"Name": @"Frank", @"Age": @34, @"Hired": @YES} atIndex:2];
-
     // @@EndExample@@
 
     // @@Example: number_of_rows @@
-    NSUInteger cnt1 = people.rowCount;                 // cnt = 6
+    NSUInteger cnt1 = people.rowCount;                 // =&gt; 6
     NSLog(@"RowCount: %i", cnt1);
-    BOOL empty = people.rowCount == 0;                 // empty = NO
+    BOOL empty = people.rowCount == 0;                 // =&gt; NO
     NSLog(@"Table is empty? %d", empty);
     // @@EndExample@@
 
@@ -53,9 +46,9 @@ void tableFunc() {
 
     // Using a cursor
     PeopleTableRow *myRow = people[5];
-    int64_t age = myRow.Age;                           // =&gt; 54
+    long long age = myRow.Age;                         // =&gt; 54
     NSLog(@"Age: %lli", age);
-    BOOL hired  = myRow.Hired;                         // =&gt; true
+    BOOL hired  = myRow.Hired;                         // =&gt; YES
     NSLog(@"Hired? %d", hired);
 
     // Setting values
@@ -64,7 +57,7 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: last_row @@
-    NSString *last = [people rowAtLastIndex].Name;  // =&gt; "Anni"
+    NSString *last = [people rowAtLastIndex].Name;     // =&gt; "Anni"
     NSLog(@"Last name: %@", last);
     // @@EndExample@@
 
@@ -74,43 +67,47 @@ void tableFunc() {
 
     // @@Example: deleting_row @@
     [people removeRowAtIndex:2];
-    NSUInteger cnt2 = people.rowCount;                  // cnt = 5
+    NSUInteger cnt2 = people.rowCount;                  // =&gt; 5
     NSLog(@"RowCount: %i", cnt2);
     // @@EndExample@@
 
     // @@Example: iteration @@
-    for (NSUInteger i = 0; i < people.rowCount; ++i) {
-        PeopleTableRow *row = people[i];
+    for (PeopleTableRow* row in people) {
         NSLog(@"%@ is %lld years old", row.Name, row.Age);
     }
     // @@EndExample@@
 
     // @@Example: simple_seach @@
-    NSUInteger row_id;
-    row_id = [people.Name find:@"Philip"];              // (NSUInteger)-1: Not found
-    row_id = [people.Name find:@"Mary"];                // row = 1
+    NSUInteger rowIndex;
+    rowIndex = [people.Name find:@"Philip"];              // =&gt; NSNotFound
+    rowIndex = [people.Name find:@"Mary"];                // =&gt; 1
     // @@EndExample@@
 
     // @@Example: advanced_search @@
     // Create query (current employees between 20 and 30 years old)
-    PeopleTableQuery *q = [[[people where].Hired columnIsEqualTo:YES]
-                                           .Age   columnIsBetween:20 :30];
+
+    PeopleTableQuery *query = [[[[[[[[people where].Age columnIsBetween:20 :35]
+                                                   .Name columnContains:@"a"]
+                                                   group]
+                                                      .Hired columnIsEqualTo:YES]
+                                                      Or]
+                                                      .Name columnEndsWith:@"y"]
+                                                   endGroup];
 
     // Get number of matching entries
-    NSUInteger cnt3 = [q countRows];                     // =&gt; 2
+    NSUInteger cnt3 = [query countRows];                 // =&gt; 2
     NSLog(@"RowCount: %i", cnt3);
 
-     // You can do aggregates on columns, like calculating the average age
-    double avg = [q.Age avg];
+    // You can do aggregates on columns, like calculating the average age
+    double avg = [query.Age avg];
     NSLog(@"Avg age: %f", avg);
 
     // Execute the query and return a table (view)
-    PeopleTableView *res = [q findAll];
+    PeopleTableView *view = [query findAll];
 
     // fast emunaration on view
-    for (PeopleTableRow *r in res)
-        NSLog(@"%@ is %lld years old", r.Name, r.Age);
-
+    for (PeopleTableRow* row in view)
+        NSLog(@"%@ is %lld years old", row.Name, row.Age);
     // @@EndExample@@
 
 }
@@ -122,7 +119,7 @@ void sharedGroupFunc() {
     [fileManager removeItemAtPath:@"people.tightdb" error:&error];
 
     // @@Example: transaction @@
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:@"people.tightdb"
+    TDBContext *context = [TDBContext contextPersistedAtPath:@"people.tightdb"
                                                             error:nil];
 
     // Start a write transaction
@@ -132,7 +129,7 @@ void sharedGroupFunc() {
                                                 asTableClass:[PeopleTable class]];
 
         // Add a row
-        [table addName:@"Bill" Age:53 Hired:YES];
+        [table addRow:@{@"Name": @"Bill", @"Age":@53, @"Hired":@YES}];
         NSLog(@"Row added!");
         return YES; // Commit (NO would rollback)
     } error:nil];

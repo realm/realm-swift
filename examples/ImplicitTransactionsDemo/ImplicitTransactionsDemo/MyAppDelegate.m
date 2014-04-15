@@ -16,7 +16,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:[self pathForName:@"demo.tightdb"] error:nil];
+    TDBContext *context = [TDBContext contextPersistedAtPath:[self pathForName:@"demo.tightdb"] error:nil];
     [context writeUsingBlock:^(TDBTransaction *transact) {
         TDBTable *table = nil;
         if (![transact hasTableWithName:@"demo"]) {

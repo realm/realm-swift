@@ -158,10 +158,7 @@ NSObject* get_cell(size_t col_ndx, size_t row_ndx, Table& table)
 }
 
 
-BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
-{
-    DataType type = descr.get_column_type(col_ndx);
-    StringData name = descr.get_column_name(col_ndx);
+BOOL verify_object_is_type(id obj, DataType type) {
     switch (type) {
         case type_String:
             if (![obj isKindOfClass:[NSString class]])
@@ -205,6 +202,18 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
             if ([obj isKindOfClass:[NSData class]])
                 break;
             return NO;
+        default:
+            TIGHTDB_ASSERT(false);
+    }
+    return YES;
+}
+
+
+BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
+{
+    DataType type = descr.get_column_type(col_ndx);
+    StringData name = descr.get_column_name(col_ndx);
+    switch (type) {
         case type_Mixed:
             if ([obj isKindOfClass:[NSNumber class]]) {
                 if (nsnumber_is_like_bool((NSNumber *)obj))
@@ -247,6 +256,8 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
             if ([obj isKindOfClass:[TDBTable class]])
                 break;
             return NO;
+        default:
+            return verify_object_is_type(obj, type);
     }
     return YES;
 }

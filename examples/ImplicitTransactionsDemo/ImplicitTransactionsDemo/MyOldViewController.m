@@ -25,7 +25,7 @@
     self.title = NSLocalizedString(@"Old", @"Old");
     self.tabBarItem.image = [UIImage imageNamed:@"old"];
 
-    _context = [TDBContext contextWithPersistenceToFile:[self pathForName:@"demo.tightdb"]
+    _context = [TDBContext contextPersistedAtPath:[self pathForName:@"demo.tightdb"]
                                                   error:nil];
 
     return self;
