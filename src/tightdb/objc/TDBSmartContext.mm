@@ -22,6 +22,8 @@
 
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/group_shared.hpp>
+// FIXME: this is absolutely no-go:
+#include </Users/test/tightdb/src/tightdb/replication.hpp>
 
 #import "TDBConstants.h"
 #import "TDBTable_noinst.h"
@@ -102,6 +104,94 @@ void throw_objc_exception(exception &ex)
 
 @end
 
+// FIXME: To be moved to a separate file
+class WriteLogRegistry {
+public:
+    typedef Replication::version_type version_type;
+    struct CommitEntry { std::size_t sz; char* data; };
+    // Add a commit for a given version:
+    // The registry takes ownership of the buffer data.
+    void add_commit(version_type version, char* data, std::size_t sz);
+    
+    // The registry retains commit buffers for as long as there is a
+    // registered interest:
+    
+    // Register an interest in commits following version 'from'
+    void register_interest(version_type from);
+    
+    // Register that you are no longer interested in commits following
+    // version 'from'.
+    void unregister_interest(version_type from);
+
+    // Get an array of commits for a version range - ]from..to]
+    // The array will have exactly 'to' - 'from' entries.
+    // The call takes ownership of the array of commits, but not of the
+    // buffers pointed to by each commit in the array. Ownership of the
+    // buffers remains with the WriteLogRegistry.
+    CommitEntry* get_commit_entries(version_type from, version_type to);
+    
+    // Release access to commits for a version range - ]from..to]
+    // This also unregisters interest in the same version range.
+    void release_commit_entries(version_type from, version_type to);
+};
+
+class WriteLogCollector : public Replication
+{
+public:
+    WriteLogCollector(std::string database_name, WriteLogRegistry* registry);
+    ~WriteLogCollector() TIGHTDB_NOEXCEPT {};
+    std::string do_get_database_path() TIGHTDB_OVERRIDE { return m_database_name; }
+    void do_begin_write_transact(SharedGroup& sg) TIGHTDB_OVERRIDE
+    {
+        static_cast<void>(sg);
+        m_transact_log_free_begin = m_transact_log_buffer.data();
+        m_transact_log_free_end   = m_transact_log_free_begin + m_transact_log_buffer.size();
+    }
+    version_type do_commit_write_transact(SharedGroup& sg, version_type orig_version) TIGHTDB_OVERRIDE
+    {
+        static_cast<void>(sg);
+        char* data     = m_transact_log_buffer.release();
+        std::size_t sz = m_transact_log_free_begin - data;
+        version_type new_version = orig_version + 1;
+        m_registry->add_commit(new_version, data, sz);
+        return new_version;
+    };
+    void do_rollback_write_transact(SharedGroup& sg) TIGHTDB_NOEXCEPT TIGHTDB_OVERRIDE
+    {
+        // not used in this setting
+        static_cast<void>(sg);
+    };
+    void do_interrupt() TIGHTDB_NOEXCEPT TIGHTDB_OVERRIDE {};
+    void do_clear_interrupt() TIGHTDB_NOEXCEPT TIGHTDB_OVERRIDE {};
+    void do_transact_log_reserve(std::size_t sz) TIGHTDB_OVERRIDE
+    {
+        transact_log_reserve(sz);
+    };
+    void do_transact_log_append(const char* data, std::size_t size) TIGHTDB_OVERRIDE
+    {
+        transact_log_reserve(size);
+        m_transact_log_free_begin = copy(data, data+size, m_transact_log_free_begin);
+    };
+    void transact_log_reserve(std::size_t n) TIGHTDB_OVERRIDE
+    {
+        char* data = m_transact_log_buffer.data();
+        std::size_t size = m_transact_log_free_begin - data;
+        m_transact_log_buffer.reserve_extra(size, n);
+        data = m_transact_log_buffer.data();
+        m_transact_log_free_begin = data + size;
+        m_transact_log_free_end = data + m_transact_log_buffer.size();
+    };
+protected:
+    std::string m_database_name;
+    util::Buffer<char> m_transact_log_buffer;
+    WriteLogRegistry* m_registry;
+};
+
+WriteLogCollector::WriteLogCollector(std::string database_name, WriteLogRegistry* registry)
+{
+    m_database_name = database_name;
+    m_registry = registry;
+}
 
 @implementation TDBSmartContext
 {
@@ -111,6 +201,7 @@ void throw_objc_exception(exception &ex)
     NSTimer *_timer;
     NSMutableArray *_weakTableRefs; // Elements are instances of TDBPrivateWeakTableReference
     BOOL _tableRefsHaveDied;
+    WriteLogRegistry* _registry;
 }
 
 +(TDBSmartContext *)contextWithPersistenceToFile:(NSString *)path
@@ -136,8 +227,11 @@ void throw_objc_exception(exception &ex)
 
     TightdbErr errorCode = tdb_err_Ok;
     NSString *errorMessage;
+    // FIXME: Should not be created here, but passed in by ref or be a global singleton
+    context->_registry = new WriteLogRegistry;
+    WriteLogCollector* collector = new WriteLogCollector(StringData(ObjcStringAccessor(path)), context->_registry);
     try {
-        context->_sharedGroup.reset(new SharedGroup(StringData(ObjcStringAccessor(path))));
+        context->_sharedGroup.reset(new SharedGroup( *collector));
     }
     catch (File::PermissionDenied &ex) {
         errorCode    = tdb_err_File_PermissionDenied;
@@ -174,6 +268,7 @@ void throw_objc_exception(exception &ex)
 
     try {
         context->_group = &context->_sharedGroup->begin_read();
+        context->_registry->register_interest(context->_sharedGroup->get_last_transaction_version());
     }
     catch (exception &ex) {
         throw_objc_exception(ex);
@@ -205,9 +300,17 @@ void throw_objc_exception(exception &ex)
     // Advance transaction if database has changed
     try {
         if (_sharedGroup->has_changed()) { // Throws
+            Replication::version_type from_version = _sharedGroup->get_last_transaction_version();
             _sharedGroup->end_read();
             _group = &_sharedGroup->begin_read(); // Throws
-
+            Replication::version_type to_version = _sharedGroup->get_last_transaction_version();
+            WriteLogRegistry::CommitEntry* commits = _registry->get_commit_entries(from_version, to_version);
+            // FIXME: Use the commit entries to update accessors...
+            // TODO
+            static_cast<void>(commits); // avoding a warning until we put the entries to use
+            // Done - tell the registry, that we're done reading the commit entries:
+            _registry->release_commit_entries(from_version, to_version);
+            
             // Revive all group level table accessors
             for (TDBPrivateWeakTableReference *weakTableRef in _weakTableRefs) {
                 TDBTable *table = [weakTableRef table];
