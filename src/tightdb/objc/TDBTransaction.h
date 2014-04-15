@@ -53,6 +53,15 @@
 -(TDBTable *)createTableWithName:(NSString *)name;
 
 /**
+ * This method creates a table with the specific name.
+ * If a table with that name already exists, an exception is thrown.
+ *
+ * The columns parameter adds columns to the table the same way as
+ * TDBTable's initWithColumns:.
+ */
+-(TDBTable *)createTableWithName:(NSString*)name columns:(NSArray*)columns;
+
+/**
  * This method creates a table with the specified name as a specific table.
  * If a table with that name already exists, an exception is thrown.
  *

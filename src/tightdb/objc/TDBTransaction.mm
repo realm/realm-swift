@@ -174,6 +174,23 @@ using namespace std;
     return table;
 }
 
+-(TDBTable *)createTableWithName:(NSString*)name columns:(NSArray*)columns
+{
+    TDBTable* table = [self createTableWithName:name];
+    
+    //Set columns
+    tightdb::TableRef nativeTable = [table getNativeTable].get_table_ref();
+    if (!set_columns(nativeTable, columns)) {
+        // Parsing the schema failed
+        //TODO: More detailed error msg in exception
+        @throw [NSException exceptionWithName:@"tightdb:invalid_columns"
+                                       reason:@"The supplied list of columns was invalid"
+                                     userInfo:nil];
+    }
+    
+    return table;
+}
+
 // FIXME: Check that the specified class derives from Table.
 -(id)createTableWithName:(NSString*)name asTableClass:(__unsafe_unretained Class)class_obj
 {
