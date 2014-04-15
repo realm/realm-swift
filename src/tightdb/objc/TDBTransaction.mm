@@ -183,10 +183,9 @@ using namespace std;
     if (!set_columns(nativeTable, columns)) {
         // Parsing the schema failed
         //TODO: More detailed error msg in exception
-        NSException* exception = [NSException exceptionWithName:@"tightdb:invalid_columns"
-                                                         reason:@"The supplied list of columns was invalid"
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+        @throw [NSException exceptionWithName:@"tightdb:invalid_columns"
+                                       reason:@"The supplied list of columns was invalid"
+                                     userInfo:nil];
     }
     
     return table;
