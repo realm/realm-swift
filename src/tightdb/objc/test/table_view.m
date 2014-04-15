@@ -292,8 +292,8 @@
     
     v = [[[t where] intIsEqualTo:1 inColumnWithIndex:col1] findAllRows];
     
-    STAssertEqualObjects(value0, [[v firstRow] stringInColumnWithIndex:col0], nil);
-    STAssertEqualObjects(value1, [[v lastRow] stringInColumnWithIndex:col0], nil);
+    STAssertEqualObjects(value0, [[v firstRow] stringInColumnWithIndex:col0], @"");
+    STAssertEqualObjects(value1, [[v lastRow] stringInColumnWithIndex:col0], @"");
 }
 
 - (void)testViewSubscripting

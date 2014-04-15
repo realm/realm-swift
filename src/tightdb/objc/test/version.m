@@ -61,7 +61,7 @@
                              [TDBVersion getMajor], 
                              [TDBVersion getMinor],
                              [TDBVersion getPatch]];
-    if (![[TDBVersion getVersion] isEqualTo:s1])
+    if (![[TDBVersion getVersion] isEqualToString:s1])
         STFail(@"Version string incorrect");
 }
 @end

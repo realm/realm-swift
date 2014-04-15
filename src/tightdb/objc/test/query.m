@@ -393,8 +393,8 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     //STAssertEquals([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (size_t)-1, @"find");
     
     [table removeAllRows];
-    STAssertEquals([[table where] indexOfFirstMatchingRow], NSNotFound, nil);
-    STAssertEquals([[table where] indexOfFirstMatchingRowFromIndex:0], NSNotFound, nil);
+    STAssertEquals([[table where] indexOfFirstMatchingRow], NSNotFound, @"");
+    STAssertEquals([[table where] indexOfFirstMatchingRowFromIndex:0], NSNotFound, @"");
 }
 
 - (void) testSubtableQuery

@@ -273,7 +273,7 @@
     STAssertNoThrow(([t addRow:@[@1000000000]]), @"Cannot insert 'time_t'"); /* 2001-09-09 01:46:40 */
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
 
-    NSDate *d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
+    NSDate *d = [[NSDate alloc] initWithTimeIntervalSince1970:1396963324];   
     STAssertNoThrow(([t addRow:@[d]]), @"Cannot insert 'NSDate'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
@@ -286,7 +286,7 @@
     STAssertNoThrow(([t addRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   /* 2001-09-09 01:46:40 */
     STAssertEquals((size_t)1, ([t rowCount]), @"1 row expected");
     
-    NSDate *d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
+    NSDate *d = [[NSDate alloc] initWithTimeIntervalSince1970:1396963324];   
     STAssertNoThrow(([t addRow:@{@"first": d}]), @"Cannot insert 'NSDate'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
@@ -304,7 +304,6 @@
     STAssertNoThrow(([t addRow:@[nsd]]), @"Cannot insert 'NSData'");
     STAssertEquals((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
-
 
 -(void)testAppendRowWithLabelsBinaryColumn
 {
@@ -960,7 +959,6 @@
     TDBRow* row1 = [table rowAtIndex:0];
     TDBRow* row2 = [table rowAtIndex:1];
     
-
     STAssertEquals([row1 boolInColumnWithIndex:BoolCol], NO, @"row1.BoolCol");
     STAssertEquals([row2 boolInColumnWithIndex:BoolCol], YES,                @"row2.BoolCol");
     STAssertEquals([row1 intInColumnWithIndex:IntCol], (int64_t)54,         @"row1.IntCol");
@@ -1041,8 +1039,8 @@
     NSString *value1 = @"value1";
     [table addRow:@[value1]];
     
-    STAssertEqualObjects([[table firstRow] stringInColumnWithIndex:col0], value0, nil);
-    STAssertEqualObjects( [[table lastRow] stringInColumnWithIndex:col0], value1, nil);
+    STAssertEqualObjects([[table firstRow] stringInColumnWithIndex:col0], value0, @"");
+    STAssertEqualObjects( [[table lastRow] stringInColumnWithIndex:col0], value1, @"");
 }
 
 - (void)testTableDynamic_Cursor_Subscripting
@@ -1252,12 +1250,12 @@
     // Distinct on string column
     TDBView *v = [t distinctValuesInColumnWithIndex:nameIndex];
     STAssertEquals(v.rowCount, (NSUInteger)3, @"Distinct values removed");
-    STAssertEqualObjects(v[0][nameIndex], @"name0", nil);
-    STAssertEqualObjects(v[1][nameIndex], @"name1", nil);
-    STAssertEqualObjects(v[2][nameIndex], @"name2", nil);
-    STAssertEqualObjects(v[0][ageIndex], @0, nil);
-    STAssertEqualObjects(v[1][ageIndex], @1, nil);
-    STAssertEqualObjects(v[2][ageIndex], @2, nil);
+    STAssertEqualObjects(v[0][nameIndex], @"name0", @"");
+    STAssertEqualObjects(v[1][nameIndex], @"name1", @"");
+    STAssertEqualObjects(v[2][nameIndex], @"name2", @"");
+    STAssertEqualObjects(v[0][ageIndex], @0, @"");
+    STAssertEqualObjects(v[1][ageIndex], @1, @"");
+    STAssertEqualObjects(v[2][ageIndex], @2, @"");
 }
 
 - (void)testPredicateFind
@@ -1295,7 +1293,6 @@
     r = [t find:predicate];
     STAssertEqualObjects(r[@"name"], @"name3", nil);
 }
-
 
 - (void)testPredicateView
 {

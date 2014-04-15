@@ -319,11 +319,11 @@ TIGHTDB_TABLE_2(SharedTable2,
     {
         // initially, always say that the db has changed
         BOOL changed = [context2 pinReadTransactions];
-        STAssertTrue(changed, nil);
+        STAssertTrue(changed, @"");
         [context2 unpinReadTransactions];
         // asking again - this time there is no change
         changed = [context2 pinReadTransactions];
-        STAssertFalse(changed, nil);
+        STAssertFalse(changed, @"");
 
         [context2 unpinReadTransactions];
     }
@@ -341,7 +341,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         STAssertTrue(changed, nil);
         [context2 readUsingBlock:^(TDBTransaction *transaction) {
             TDBTable *t = [transaction tableWithName:@"test"];
-            STAssertEquals([[t rowAtIndex:0] boolInColumnWithIndex:0], YES, nil);
+            STAssertEquals([[t rowAtIndex:0] boolInColumnWithIndex:0], YES, @"");
         }];
     }
     {   // commit new data in another context, without unpinning
@@ -355,7 +355,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     {   // validate that we can see previous commit if we're not pinned
         [context1 readUsingBlock:^(TDBTransaction *transaction) {
             TDBTable *t = [transaction tableWithName:@"test"];
-            STAssertEquals([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, nil);
+            STAssertEquals([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, @"");
         }];
         
     }
@@ -373,7 +373,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         [context2 readUsingBlock:^(TDBTransaction *transaction) {
             TDBTable *t = [transaction tableWithName:@"test"];
             STAssertEquals(t.rowCount, (NSUInteger)2, @"Now we see 2 rows");
-            STAssertEquals([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, nil);
+            STAssertEquals([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, @"");
         }];
     }
     {   // can't pin if already pinned

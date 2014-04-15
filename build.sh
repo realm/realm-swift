@@ -175,7 +175,170 @@ EOF
     printf "%s\n" "$value"
 }
 
+copy_or_fail()
+{
+    rm -rf "$2"
+    if [ ! -e "$1" ]; then
+        echo "\"$1\" missing."
+        exit 1
+    fi
+    cp -r "$1" "$2" || exit 1
+}
 
+build_ios_test()
+{
+    # Expects the working directory to be the directory where to put .xcodeproj.
+
+    # Expects for APP and TEST_APP to be set, and for TEST_APP to be already
+    # filled with XCTestCases.
+
+    ## Initialize app directory
+    cp -r "../ios-test-template/App" "$APP"
+    mv "$APP/App-Info.plist" "$APP/$APP-Info.plist"
+    mv "$APP/App-Prefix.pch" "$APP/$APP-Prefix.pch"
+
+    ## Gather all the sources in a Python-friendly format.
+    APP_TESTS_SOURCES=$(find "$TEST_APP" -type f | \
+        sed -E 's/^(.*)$/                "\1",/')
+
+    ## Create a gyp file.
+    # To use xctest, the project must have an app and a test target. The
+    # app can be left fairly featureless, but enough must exist for us to
+    # trick Xcode into thinking it's testing the app.
+    cat >"$APP.gyp" <<EOF
+{
+    'xcode_settings': {
+        'ARCHS': [
+            '\$(ARCHS_STANDARD_INCLUDING_64_BIT)',
+        ],
+        'SDKROOT': 'iphoneos',
+        'TARGETED_DEVICE_FAMILY': '_BASENAME1,2', # iPhone/iPad
+        'FRAMEWORK_SEARCH_PATHS': [
+            '\$(SDKROOT)/Developer/Library/Frameworks',
+            '\$(PROJECT_DIR)',
+        ],
+        'CODE_SIGN_IDENTITY[sdk=iphoneos*]': 'iPhone Developer: Oleksandr(Alex Shturmov (CB4YV2W7W5)',
+        #'CODE_SIGN_IDENTITY[sdk=iphoneos*]': 'iOS Developer: Oleksandr(Alex Shturmov (Tightdb Denmark ApS)',
+        'CLANG_ENABLE_OBJC_ARC': 'YES',
+    },
+    'target_defaults': {
+        'link_settings': {
+            'libraries': [
+                '\$(SDKROOT)/usr/lib/libc++.dylib',
+                '\$(DEVELOPER_DIR)/Library/Frameworks/XCTest.framework',
+                #'\$(DEVELOPER_DIR)/Library/Frameworks/SenTestingKit.framework',
+                '\$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
+                '\$(SDKROOT)/System/Library/Frameworks/CoreGraphics.framework',
+                '\$(SDKROOT)/System/Library/Frameworks/UIKit.framework',
+                '$FRAMEWORK',
+            ],
+        },
+    },
+    'targets': [
+        {
+            'target_name': '$APP',
+            'type': 'executable',
+            'mac_bundle': 1,
+            'sources': [
+                './$APP/AppDelegate.h',
+                './$APP/AppDelegate.mm',
+                './$APP/main.m',
+$APP_TESTS_SOURCES
+            ],
+            'mac_bundle_resources': [
+                './$APP/Images.xcassets',
+                './$APP/en.lproj/InfoPlist.strings',
+                './$APP/$APP-Info.plist',
+                './$APP/$APP-Prefix.pch',
+            ],
+            'include_dirs': [
+                './$TEST_APP/**'
+            ],
+            'xcode_settings': {
+                'WRAPPER_EXTENSION': 'app',
+                'INFOPLIST_FILE': '$APP/$APP-Info.plist',
+                'GCC_PRECOMPILE_PREFIX_HEADER': 'YES',
+                'GCC_PREFIX_HEADER': '$APP/$APP-Prefix.pch',
+            }
+        },
+        {
+            'target_name': '$TEST_APP',
+
+            # see pylib/gyp/generator/xcode.py
+            'type': 'loadable_module',
+            'mac_xctest_bundle': 1,
+            'sources': [
+$APP_TESTS_SOURCES
+            ],
+            'dependencies': [
+                '$APP'
+            ],
+            'include_dirs': [
+                './$TEST_APP/**'
+            ],
+            'xcode_settings': {
+                'SDKROOT': 'iphoneos',
+                'BUNDLE_LOADER': '\$(BUILT_PRODUCTS_DIR)/$APP.app/$APP',
+                'TEST_HOST': '\$(BUNDLE_LOADER)',
+            },
+        },
+    ],
+}
+EOF
+    ## Run gyp, generating an .xcodeproj folder with a project.pbxproj file.
+    gyp --depth="." "$APP.gyp" || exit 1
+
+    ## Collect the main app id from the project.pbxproj file.
+    APP_ID=$(cat "$APP.xcodeproj/project.pbxproj" | tr -d '\n' | \
+        egrep -o "remoteGlobalIDString.*?remoteInfo = $APP;" | \
+        head -n 1 | sed 's/remoteGlobalIDString = \([A-F0-9]*\);.*/\1/')
+
+    ## Collect the test app id from the project.pbxproj file.
+    TEST_APP_ID=$(cat "$APP.xcodeproj/project.pbxproj" | tr -d '\n' | \
+        egrep -o "remoteGlobalIDString.*?remoteInfo = $TEST_APP;" | \
+        head -n 1 | sed 's/remoteGlobalIDString = \([A-F0-9]*\);.*/\1/')
+
+    ## Generate a scheme with a test action.
+    USER=$(whoami)
+    mkdir -p "$APP.xcodeproj/xcuserdata"
+    mkdir -p "$APP.xcodeproj/xcuserdata/$USER.xcuserdatad"
+    mkdir -p "$APP.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes"
+    cat >"$APP.xcodeproj/xcuserdata/$USER.xcuserdatad/xcschemes/$APP.xcscheme" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   LastUpgradeVersion = "0500"
+   version = "1.3">
+   <TestAction
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      buildConfiguration = "Default">
+      <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "$TEST_APP_ID"
+               BuildableName = "$TEST_APP.xctest"
+               BlueprintName = "$TEST_APP"
+               ReferencedContainer = "container:$APP.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "$APP_ID"
+            BuildableName = "$APP.app"
+            BlueprintName = "$APP"
+            ReferencedContainer = "container:$APP.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
+   </TestAction>
+</Scheme>
+EOF
+    ## We are now ready to invoke the test action.
+}
 
 case "$MODE" in
 
@@ -471,7 +634,8 @@ EOF
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
         path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
         export DYLD_LIBRARY_PATH
-        OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests.octest" || exit 1
+        OBJC_DISABLE_GC=YES
+        "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests.octest" || exit 1
         echo "Test passed"
         exit 0
         ;;
@@ -485,7 +649,8 @@ EOF
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
         path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
         export DYLD_LIBRARY_PATH
-        OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest" || exit 1
+        OBJC_DISABLE_GC=YES
+        "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest" || exit 1
         echo "Test passed"
         exit 0
         ;;
@@ -499,12 +664,8 @@ EOF
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
         path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
         export DYLD_LIBRARY_PATH
-        OBJC_DISABLE_GC=YES gdb --args "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest"
-        ;;
-
-    "check-doc-examples")
-        auto_configure || exit 1
-        $MAKE check-doc-examples || exit 1
+        OBJC_DISABLE_GC=YES
+        gdb --args "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest"
         ;;
 
     "test-cover")
@@ -514,11 +675,19 @@ EOF
         mkdir -p "$TEMP_DIR/unit-tests-cov.octest/Contents/MacOS" || exit 1
         cp "src/tightdb/objc/test/unit-tests-cov" "$TEMP_DIR/unit-tests-cov.octest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" OBJC_DISABLE_GC=YES "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-cov.octest" || exit 1
+        path_list_prepend DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
+        export DYLD_LIBRARY_PATH
+        OBJC_DISABLE_GC=YES
+        "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-cov.octest" || exit 1
         echo "Generating 'gcovr.xml'.."
         gcovr -f '.*/tightdb_objc/src/.*' -e '.*/test/.*' -x > gcovr.xml
         echo "Test passed."
         exit 0
+        ;;
+
+    "check-doc-examples")
+        auto_configure || exit 1
+        $MAKE check-doc-examples || exit 1
         ;;
 
     "test-examples")
@@ -602,6 +771,105 @@ EOF
         exit 0
         ;;
 
+    "build-ios-test-core")
+        ## Setup directories
+        rm -rf ios-test-core || exit 1
+        mkdir ios-test-core || exit 1
+        cd ios-test-core
+
+        APP="iOSTestCoreApp"
+        TEST_APP="${APP}Tests"
+        
+        ## Initialize app test directory
+        cp -r "../../tightdb/test" "$TEST_APP"
+        find "$TEST_APP" -type f \
+            ! -iregex "^.*\.[ch]\(pp\)\{0,1\}$" \
+            -exec rm {} \; || exit 1
+
+        ## Remove breaking files (containing main or unportable code).
+        rm "$TEST_APP/main.cpp"
+        rm -rf "$TEST_APP/benchmark-"*
+        rm -rf "$TEST_APP/experiments"
+        rm -rf "$TEST_APP/performance"
+        rm -rf "$TEST_APP/test-"*
+
+        ## Create an XCTestCase
+        cat >"$TEST_APP/$TEST_APP.mm" <<EOF
+#import <XCTest/XCTest.h>
+#include "test_all.hpp"
+
+@interface $TEST_APP : XCTestCase
+
+@end
+
+@implementation $TEST_APP
+
+-(void)testRunTests
+{
+    // Change working directory to somewhere we can write.
+    [[NSFileManager defaultManager]
+        changeCurrentDirectoryPath:(NSTemporaryDirectory())];
+    test_all(0, NULL);
+}
+
+@end
+EOF
+
+        ## Set up frameworks.
+        copy_or_fail "../../tightdb/TightdbCore.framework" \
+            "TightdbCore.framework" 
+        FRAMEWORK="TightdbCore.framework"
+
+        ## Replace all test includes with framework includes.
+        find "$TEST_APP" -type f -exec sed -i '' \
+            -e "s/<tightdb\(.*\)>/<TightdbCore\/tightdb\1>/g" {} \; || exit 1
+
+        build_ios_test
+        echo "Done building"
+        exit 0
+        ;;
+
+    "build-ios-test-binding")
+        ## Setup directories
+        rm -rf ios-test-binding || exit 1
+        mkdir ios-test-binding || exit 1
+        cd ios-test-binding
+
+        APP="iOSTestBindingApp"
+        TEST_APP="${APP}Tests"
+        
+        ## Initialize app test directory
+        cp -r "../src/tightdb/objc" "$TEST_APP"
+        find -E "$TEST_APP" -type f \
+            ! -iregex "^.*\.(h(pp)?|mm?)$" \
+            -exec rm {} \; || exit 1
+
+        ## Set up frameworks
+        copy_or_fail "../../tightdb/TightdbCore.framework" \
+            "TightdbCore.framework" 
+        FRAMEWORK="TightdbCore.framework"
+ 
+        ## Replace all test includes with framework includes.
+        find "$TEST_APP" -type f -exec sed -E -i '' \
+            -e "s/#(include|import) +<tightdb\/objc\/(.*)>/#\1 \"\2\"/g" {} \; || exit 1
+        find "$TEST_APP" -type f -exec sed -E -i '' \
+            -e "s/#(include|import) +<tightdb(.*)>/#\1 <TightdbCore\/tightdb\2>/g" {} \; || exit 1
+
+        cat >"$TEST_APP/test/test_all.hpp" <<EOF
+#ifndef ${TEST_APP}_TEST_ALL
+#define ${TEST_APP}_TEST_ALL
+int test_all(int argc, char* argv[])
+{
+    // Intentionally left blank.
+}
+#endif ${TEST_APP}_TEST_ALL
+EOF
+ 
+        build_ios_test
+        echo "Done building"
+        exit 0
+        ;;
+
     "dist-copy")
         # Copy to distribution package
         TARGET_DIR="$1"
@@ -642,9 +910,9 @@ EOF
         cat << EOF
 Unspecified or bad mode '$MODE'.
 Available modes are:
-  config clean build build-iphone test test-debug test-gdb test-cover
-  show-install install uninstall test-installed install-prod install-devel
-  uninstall-prod uninstall-devel dist-copy ios-framework
+  config clean build build-iphone build-ios-test-core test test-debug test-gdb
+  test-cover show-install install uninstall test-installed install-prod
+  install-devel uninstall-prod uninstall-devel dist-copy ios-framework
   get-version set-version
 EOF
         exit 1

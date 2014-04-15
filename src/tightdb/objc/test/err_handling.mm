@@ -300,7 +300,6 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     // Test Clear
     STAssertNoThrow([table removeAllRows], nil);
     STAssertEquals(table.rowCount, (NSUInteger)0, @"Size should have been zero");
-
 }
 
 
