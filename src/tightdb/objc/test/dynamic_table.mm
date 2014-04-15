@@ -284,7 +284,7 @@ using namespace std;
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBDateType];
 
-    XCTAssertNoThrow(([t addRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   /* 2001-09-09 01:46:40 */
+    XCTAssertNoThrow(([t addRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   // 2001-09-09 01:46:40
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
     
     NSDate *d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
@@ -295,13 +295,13 @@ using namespace std;
 // obviopus reasons. Oleks, please investigate.
 
 /*
-    XCTAssertNoThrow(([t addRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   /* 2001-09-09 01:46:40 */
+    XCTAssertNoThrow(([t addRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   // 2001-09-09 01:46:40
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
 
     d = [[NSDate alloc] initWithTimeIntervalSince1970:1396963324];
     XCTAssertNoThrow(([t addRow:@{@"first": d}]), @"Cannot insert 'NSDate'");
     XCTAssertEqual((size_t)2, ([t rowCount]), @"2 rows excepted");
-    XCTAssertNoThrow(([t addRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   /* 2001-09-09 01:46:40 */
+    XCTAssertNoThrow(([t addRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   // 2001-09-09 01:46:40
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
     
     d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
