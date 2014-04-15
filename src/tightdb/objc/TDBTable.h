@@ -72,6 +72,11 @@
 // Only supported on string columns with an index
 -(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
 
+// Predicate queries
+-(TDBRow *)find:(id)condition;
+-(TDBView *)where:(id)condition;
+-(TDBView *)where:(id)condition orderBy:(id)order;
+
 // Indexing
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex;
@@ -81,8 +86,9 @@
 
 // Table type and schema
 -(BOOL)isEqual:(id)otherTableClass;
--(BOOL)hasSameDescriptorAs:(Class)otherTableClass;
 -(id)castToTypedTableClass:(Class)typedTableClass;
+// FIXME: implement method below and reenable and document it
+// -(BOOL)hasSameDescriptorAs:(Class)otherTableClass;
 
 -(TDBType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 

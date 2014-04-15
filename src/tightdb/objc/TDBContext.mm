@@ -33,7 +33,30 @@ using namespace std;
     tightdb::util::UniquePtr<tightdb::SharedGroup> m_shared_group;
 }
 
-+(TDBContext*)contextWithPersistenceToFile:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
+NSString *const defaultContextFileName = @"default.tightdb";
+
++(NSString *)defaultPath
+{
+    return [TDBContext writeablePathForFile:defaultContextFileName];
+}
+
+
++(TDBContext *)contextWithDefaultPersistence
+{
+    NSString *path = [TDBContext writeablePathForFile:defaultContextFileName];
+    return [self contextPersistedAtPath:path error:nil];
+}
+
++ (NSString *)writeablePathForFile:(NSString*)fileName
+{
+    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString* documentsDirectory = [paths objectAtIndex:0];
+    return [documentsDirectory stringByAppendingPathComponent:fileName];
+}
+
+
+
++(TDBContext*)contextPersistedAtPath:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
 {
     TDBContext* shared_group = [[TDBContext alloc] init];
     if (!shared_group)
@@ -71,7 +94,7 @@ using namespace std;
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    NSLog(@"TDBSharedGroup dealloc");
+    // NSLog(@"TDBSharedGroup dealloc");
 #endif
 }
 
@@ -173,6 +196,7 @@ using namespace std;
 {
     return m_shared_group->has_changed();
 }
+
 
 -(BOOL)pinReadTransactions
 {

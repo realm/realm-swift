@@ -74,10 +74,9 @@ using namespace std;
 
         // Parsing the schema failed
         //TODO: More detailed error msg in exception
-        NSException* exception = [NSException exceptionWithName:@"tightdb:invalid_columns"
+        @throw [NSException exceptionWithName:@"tightdb:invalid_columns"
                                                          reason:@"The supplied list of columns was invalid"
-                                                       userInfo:[NSMutableDictionary dictionary]];
-        [exception raise];
+                                                       userInfo:nil];
     }
 
     return self;
@@ -1041,6 +1040,334 @@ using namespace std;
     
     tightdb::TableView distinctView = m_table->get_distinct_view(colIndex);
     return [TDBView viewWithTable:self andNativeView:distinctView];
+}
+
+namespace {
+
+// small helper to create the many exceptions thrown when parsing predicates
+inline NSException * predicate_exception(NSString * name, NSString * reason) {
+    return [NSException exceptionWithName:[NSString stringWithFormat:@"filterWithPredicate:orderedBy: - %@", name] reason:reason userInfo:nil];
+}
+
+// validate that we support the passed in expression type
+inline NSExpressionType validated_expression_type(NSExpression * expression) {
+    if (expression.expressionType != NSConstantValueExpressionType &&
+        expression.expressionType != NSKeyPathExpressionType) {
+        @throw predicate_exception(@"Invalid expression type", @"Only support NSConstantValueExpressionType and NSKeyPathExpressionType");
+    }
+    return expression.expressionType;
+}
+
+// return the column index for a validated column name
+inline NSUInteger validated_column_index(TDBTable * table, NSString * columnName) {
+    NSUInteger index = [table indexOfColumnWithName:columnName];
+    if (index == NSNotFound) {
+        @throw predicate_exception(@"Invalid column name",
+            [NSString stringWithFormat:@"Column name %@ not found in table", columnName]);
+    }
+    return index;
+}
+
+
+// apply an expression between two columns to a query
+/*
+void update_query_with_column_expression(TDBTable * table, tightdb::Query & query,
+    NSString * col1, NSString * col2, NSPredicateOperatorType operatorType) {
+    
+    // only support equality for now
+    if (operatorType != NSEqualToPredicateOperatorType) {
+        @throw predicate_exception(@"Invalid predicate comparison type", @"only support equality comparison type");
+    }
+    
+    // validate column names
+    NSUInteger index1 = validated_column_index(table, col1);
+    NSUInteger index2 = validated_column_index(table, col2);
+    
+    // make sure they are the same type
+    tightdb::DataType type1 = table->m_table->get_column_type(index1);
+    tightdb::DataType type2 = table->m_table->get_column_type(index2);
+
+    if (type1 == type2) {
+        @throw predicate_exception(@"Invalid predicate expression", @"Columns must be the same type");
+    }
+
+    // not suppoting for now - if we changed names for column comparisons so that we could
+    // use templated function for all numeric types this would be much easier
+    @throw predicate_exception(@"Unsupported predicate", @"Not suppoting column comparison for now");
+}
+ */
+
+// add a clause for numeric constraints based on operator type
+template <typename T>
+void add_numeric_constraint_to_query(tightdb::Query & query,
+                                     tightdb::DataType datatype,
+                                     NSPredicateOperatorType operatorType,
+                                     NSUInteger index,
+                                     T value) {
+    switch (operatorType) {
+        case NSLessThanPredicateOperatorType:
+            query.less(index, value);
+            break;
+        case NSLessThanOrEqualToPredicateOperatorType:
+            query.less_equal(index, value);
+            break;
+        case NSGreaterThanPredicateOperatorType:
+            query.greater(index, value);
+            break;
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            query.greater_equal(index, value);
+            break;
+        case NSEqualToPredicateOperatorType:
+            query.equal(index, value);
+            break;
+        case NSNotEqualToPredicateOperatorType:
+            query.not_equal(index, value);
+            break;
+        default:
+            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for type %u", (unsigned long)operatorType, datatype]);
+            break;
+    }
+}
+
+void add_bool_constraint_to_query(tightdb::Query & query,
+                                    NSPredicateOperatorType operatorType,
+                                    NSUInteger index,
+                                    bool value) {
+    switch (operatorType) {
+        case NSEqualToPredicateOperatorType:
+            query.equal(index, value);
+            break;
+        case NSNotEqualToPredicateOperatorType:
+            query.not_equal(index, value);
+            break;
+        default:
+            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for bool type", (unsigned long)operatorType]);
+            break;
+    }
+}
+
+void add_string_constraint_to_query(tightdb::Query & query,
+                                    NSPredicateOperatorType operatorType,
+                                    NSUInteger index,
+                                    NSString * value) {
+    
+    tightdb::StringData sd([(NSString *)value UTF8String]);
+    query.equal(index, sd);
+    switch (operatorType) {
+        case NSBeginsWithPredicateOperatorType:
+            query.begins_with(index, sd);
+            break;
+        case NSEndsWithPredicateOperatorType:
+            query.ends_with(index, sd);
+            break;
+        case NSContainsPredicateOperatorType:
+            query.contains(index, sd);
+            break;
+        case NSEqualToPredicateOperatorType:
+            query.equal(index, sd);
+            break;
+        case NSNotEqualToPredicateOperatorType:
+            query.not_equal(index, sd);
+            break;
+        default:
+            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for string type", (unsigned long)operatorType]);
+            break;
+    }
+}
+
+void update_query_with_value_expression(TDBTable * table, tightdb::Query & query,
+    NSString * columnName, id value, NSPredicateOperatorType operatorType) {
+
+    // validate object type
+    NSUInteger index = validated_column_index(table, columnName);
+    tightdb::DataType type = table->m_table->get_column_type(index);
+    if (!verify_object_is_type(value, type)) {
+        @throw predicate_exception(@"Invalid value",
+                                   [NSString stringWithFormat:@"object must be of type %i", type]);
+    }
+    
+    // finally cast to native types and add query clause
+    switch (type) {
+        case tightdb::type_Bool:
+            add_bool_constraint_to_query(query, operatorType, index,
+                                         bool([(NSNumber *)value boolValue]));
+            break;
+        case tightdb::type_DateTime:
+            // TODO: change datetime so method signaturs match other numeric types
+            @throw predicate_exception(@"Unsupported predicate value type",
+                                       @"Not supporting dates temporarily");
+            break;
+        case tightdb::type_Double:
+            add_numeric_constraint_to_query(query, type, operatorType,
+                                            index, double([(NSNumber *)value doubleValue]));
+            break;
+        case tightdb::type_Float:
+            add_numeric_constraint_to_query(query, type, operatorType,
+                                            index, float([(NSNumber *)value floatValue]));
+            break;
+        case tightdb::type_Int:
+            add_numeric_constraint_to_query(query, type, operatorType,
+                                            index, int([(NSNumber *)value intValue]));
+            break;
+        case tightdb::type_String:
+            add_string_constraint_to_query(query, operatorType, index, (NSString *)value);
+            break;
+        default:
+            @throw predicate_exception(@"Unsupported predicate value type",
+                [NSString stringWithFormat:@"Object type %i not supported", type]);
+    }
+}
+
+void update_query_with_predicate(NSPredicate * predicate,
+    TDBTable * table, tightdb::Query & query) {
+    
+    // compound predicates
+    if ([predicate isMemberOfClass:[NSCompoundPredicate class]]) {
+        NSCompoundPredicate * comp = (NSCompoundPredicate *)predicate;
+        if ([comp compoundPredicateType] == NSAndPredicateType) {
+            // add all of the subprediates
+            query.group();
+            for (NSPredicate * subp in comp.subpredicates) {
+                update_query_with_predicate(subp, table, query);
+            }
+            query.end_group();
+        }
+        else if ([comp compoundPredicateType] == NSOrPredicateType) {
+            // add all of the subprediates with ors inbetween
+            query.group();
+            for (NSUInteger i = 0; i < comp.subpredicates.count; i++) {
+                NSPredicate * subp = comp.subpredicates[i];
+                if (i > 0) {
+                    query.Or();
+                }
+                update_query_with_predicate(subp, table, query);
+            }
+            query.end_group();
+        }
+        else {
+            @throw predicate_exception(@"Invalid compound predicate type",
+                                       @"Only support AND and OR predicate types");
+        }
+    }
+    else if ([predicate isMemberOfClass:[NSComparisonPredicate class]]) {
+        NSComparisonPredicate * compp = (NSComparisonPredicate *)predicate;
+ 
+        // validate expressions
+        NSExpressionType exp1Type = validated_expression_type(compp.leftExpression);
+        NSExpressionType exp2Type = validated_expression_type(compp.rightExpression);
+
+        // figure out if we have column expression or value expression and update query accordingly
+        // we are limited here to KeyPath expressions and constantValue expressions from validation
+        if (exp1Type == NSKeyPathExpressionType) {
+            if (exp2Type == NSKeyPathExpressionType) {
+                @throw predicate_exception(@"Unsupported predicate", @"Not suppoting column comparison for now");
+//                update_query_with_column_expression(table, query, compp.leftExpression.keyPath,
+//                    compp.rightExpression.keyPath, compp.predicateOperatorType);
+            }
+            else {
+                update_query_with_value_expression(table, query, compp.leftExpression.keyPath, compp.rightExpression.constantValue, compp.predicateOperatorType);
+            }
+        }
+        else {
+            if (exp2Type == NSKeyPathExpressionType) {
+                update_query_with_value_expression(table, query, compp.rightExpression.keyPath, compp.leftExpression.constantValue, compp.predicateOperatorType);
+            }
+            else {
+                @throw predicate_exception(@"Invalid predicate expressions",
+                                           @"Tring to compare two constant values");
+            }
+        }
+    }
+    else {
+        // invalid predicate type
+        @throw predicate_exception(@"Invalid predicate",
+                                   @"Only support compound and comparison predicates");
+    }
+}
+
+tightdb::Query queryFromPredicate(TDBTable *table, id condition)
+{
+    tightdb::Query query = table->m_table->where();
+
+    // parse and apply predicate tree
+    if (condition) {
+        if ([condition isKindOfClass:[NSString class]]) {
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:condition];
+            update_query_with_predicate(predicate, table, query);
+        }
+        else if ([condition isKindOfClass:[NSPredicate class]]) {
+            update_query_with_predicate(condition, table, query);
+        }
+        else {
+            @throw predicate_exception(@"Invalid argument", @"Condition should be predicate as string or NSPredicate object");
+        }
+    }
+
+    return query;
+}
+
+} //namespace
+
+-(TDBRow *)find:(id)condition
+{
+    tightdb::Query query = queryFromPredicate(self, condition);
+
+    size_t row_ndx = query.find();
+
+    if (row_ndx == tightdb::not_found)
+        return nil;
+
+    return [[TDBRow alloc] initWithTable:self ndx:row_ndx];
+}
+
+-(TDBView *)where:(id)condition
+{
+    tightdb::Query query = queryFromPredicate(self, condition);
+
+    // create view
+    tightdb::TableView view = query.find_all();
+
+    // create objc view and return
+    return [TDBView viewWithTable:self andNativeView:view];
+}
+
+-(TDBView *)where:(id)condition orderBy:(id)order
+{
+    tightdb::Query query = queryFromPredicate(self, condition);
+
+    // create view
+    tightdb::TableView view = query.find_all();
+
+    // apply order
+    if (order) {
+        NSString *columnName;
+        BOOL ascending = YES;
+
+        if ([order isKindOfClass:[NSString class]]) {
+            columnName = order;
+        }
+        else if ([order isKindOfClass:[NSSortDescriptor class]]) {
+            columnName = ((NSSortDescriptor*)order).key;
+            ascending = ((NSSortDescriptor*)order).ascending;
+        }
+        else {
+            @throw predicate_exception(@"Invalid order type",
+                                       @"Order must be column name or NSSortDescriptor");
+        }
+
+        NSUInteger index = validated_column_index(self, columnName);
+        TDBType columnType = [self columnTypeOfColumnWithIndex:index];
+
+        if (columnType != TDBIntType && columnType != TDBBoolType && columnType != TDBDateType) {
+            @throw predicate_exception(@"Invalid sort column type",
+                                       @"Sort only supported on Integer, Date and Boolean columns.");
+        }
+
+        view.sort(index, ascending);
+    }
+
+    // create objc view and return
+    return [TDBView viewWithTable:self andNativeView:view];
 }
 
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex

@@ -8,7 +8,7 @@
 - (void)main
 {
     TDBContext *context =
-        [TDBContext contextWithPersistenceToFile:[self pathForName:@"demo.tightdb"] error:nil];
+        [TDBContext contextPersistedAtPath:[self pathForName:@"demo.tightdb"] error:nil];
 
     __block int i = 0;
     for (;;) {

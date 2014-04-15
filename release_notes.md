@@ -8,7 +8,7 @@ The Objective-C API has been updated and your code will break!
 
 ### Bugfixes:
 
-* Modifications of a `TDBView` and `TDBQuery` now throw an exception in a readtransaction.
+* none.
 
 ### API breaking changes:
 
@@ -26,10 +26,11 @@ The Objective-C API has been updated and your code will break!
 
 
 =============================================================
-0.6.0 Release notes (yyyy—MM-dd)
+0.7.0 Release notes (yyyy—MM-dd)
+
 Objective-C
 -----------
-Description......
+The Objective-C API has been updated and your code will break!
 
 ### Bugfixes:
 
@@ -37,6 +38,32 @@ Description......
 
 ### API breaking changes:
 
+* `???`
+
+### Enhancements:
+
+* `???`
+
+-------------
+
+### Internals:
+
+* `???`
+
+
+=============================================================
+0.6.0 Release notes (2014—04-11)
+Objective-C
+-----------
+Description......
+
+### Bugfixes:
+
+* Modifications of a `TDBView` and `TDBQuery` now throw an exception in a readtransaction.
+
+### API breaking changes:
+
+* `contextWithPersistenceToFile:error:` renamed to `contextPersistedAtPath:error:` in `TDBContext`
 * `readWithBlock:` renamed to `readUsingBlock:` in `TDBContext`
 * `writeWithBlock:error:` renamed to `writeUsingBlock:error:` in `TDBContext`
 * `readTable:withBlock:` renamed to `readTable:usingBlock:` in `TDBContext`
@@ -49,6 +76,11 @@ Description......
   on table now return void instead of BOOL.
 
 ### Enhancements:
+* A `TDBTable` can now be queried using `where:` and `where:orderBy:` taking
+  `NSPredicate` and `NSSortDescriptor` as arguments.
+* Added `find:` method on `TDBTable` to find first row matching predicate.
+* `contextWithDefaultPersistence` class method added to `TDBContext`. Will create a context persisted
+  to a file in app/documents folder.
 * `renameColumnWithIndex:to:` has been added to `TDBTable`.
 * `distinctValuesInColumnWithIndex` has been added to `TDBTable`.
 * `dateIsBetween::`, `doubleIsBetween::`, `floatIsBetween::` and `intIsBetween::`
