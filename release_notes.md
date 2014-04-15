@@ -8,7 +8,7 @@ The Objective-C API has been updated and your code will break!
 
 ### Bugfixes:
 
-* None.
+* none.
 
 ### API breaking changes:
 
@@ -26,10 +26,11 @@ The Objective-C API has been updated and your code will break!
 
 
 =============================================================
-0.6.0 Release notes (yyyy—MM-dd)
+0.7.0 Release notes (yyyy—MM-dd)
+
 Objective-C
 -----------
-Description......
+The Objective-C API has been updated and your code will break!
 
 ### Bugfixes:
 
@@ -37,20 +38,62 @@ Description......
 
 ### API breaking changes:
 
-* `findFirstRow` renamed to `indexOfFirstMatchingRow` on `TDBQuery`.
-* `findFirstRowFromIndex:` renamed to `indexOfFirstMatchingRowFromIndex:` on `TDBQuery`.
-* Return `NSNotFound` when appropriate.
+* `???`
 
 ### Enhancements:
+
+* `???`
+
+-------------
+
+### Internals:
+
+* `???`
+
+
+=============================================================
+0.6.0 Release notes (2014—04-11)
+Objective-C
+-----------
+Description......
+
+### Bugfixes:
+
+* Modifications of a `TDBView` and `TDBQuery` now throw an exception in a readtransaction.
+
+### API breaking changes:
+
+* `contextWithPersistenceToFile:error:` renamed to `contextPersistedAtPath:error:` in `TDBContext`
+* `readWithBlock:` renamed to `readUsingBlock:` in `TDBContext`
+* `writeWithBlock:error:` renamed to `writeUsingBlock:error:` in `TDBContext`
+* `readTable:withBlock:` renamed to `readTable:usingBlock:` in `TDBContext`
+* `writeTable:withBlock:error:` renamed to `writeTable:usingBlock:error:` in `TDBContext`
+* `findFirstRow` renamed to `indexOfFirstMatchingRow` on `TDBQuery`.
+* `findFirstRowFromIndex:` renamed to `indexOfFirstMatchingRowFromIndex:` on `TDBQuery`.
+* Return `NSNotFound` instead of -1 when appropriate.
+* Renamed `castClass` to `castToTytpedTableClass` on `TDBTable`.
+* `removeAllRows`, `removeRowAtIndex`, `removeLastRow`, `addRow` and `insertRow` methods 
+  on table now return void instead of BOOL.
+
+### Enhancements:
+* A `TDBTable` can now be queried using `where:` and `where:orderBy:` taking
+  `NSPredicate` and `NSSortDescriptor` as arguments.
+* Added `find:` method on `TDBTable` to find first row matching predicate.
+* `contextWithDefaultPersistence` class method added to `TDBContext`. Will create a context persisted
+  to a file in app/documents folder.
 * `renameColumnWithIndex:to:` has been added to `TDBTable`.
 * `distinctValuesInColumnWithIndex` has been added to `TDBTable`.
 * `dateIsBetween::`, `doubleIsBetween::`, `floatIsBetween::` and `intIsBetween::`
-   have been added to `TDBQuery`.
-* Column names can begin with non-capital letters too. The generated `addX`
+  have been added to `TDBQuery`.
+* Column names in Typed Tables can begin with non-capital letters too. The generated `addX`
   selector can look odd. For example, a table with one column with name `age`,
   appending a new row will look like `[table addage:7]`.
 * Mixed typed values are better validated when rows are added, inserted, 
   or modified as object literals.
+* `addRow`, `insertRow`, and row updates can be done using objects
+   derived from `NSObject`.
+* `where` has been added to `TDBView`and `TDBViewProtocol`.
+* Adding support for "smart" contexts (`TDBSmartContext`).
 
 
 =============================================================
@@ -74,8 +117,6 @@ To use these methods import <Tightdb/TightdbFast.h>.
 * `columnNameOfColumn:` renamed to `nameOfColumnWithIndex:` in `TDBTable`.
 * `addColumnWithName:andType:` renamed to `addColumnWithName:type:` in `TDBDescriptor`.
 * Fast getters and setters moved from `TDBRow.h` to `TDBRowFast.h`.
-
-### Enhancements:
 
 ### Enhancements:
 * Added `minDateInColumnWithIndex` and `maxDateInColumnWithIndex` to `TDBQuery`.

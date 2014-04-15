@@ -25,10 +25,12 @@
 #include <stdexcept>
 
 #include <tightdb/util/safe_int_ops.hpp>
+#include <tightdb/util/file.hpp>
 #include <tightdb/string_data.hpp>
 #include <tightdb/mixed.hpp>
 #include <tightdb/descriptor.hpp>
 #include <tightdb/table.hpp>
+#include <tightdb/table_ref.hpp>
 
 struct ObjcStringAccessor {
     ObjcStringAccessor(const NSString* s)
@@ -164,6 +166,7 @@ inline bool nsnumber_is_like_double(NSObject *obj)
 void to_mixed(id value, tightdb::Mixed& m);
 
 BOOL set_cell(size_t col_ndx, size_t row_ndx, tightdb::Table& table, NSObject *obj);
+BOOL verify_object_is_type(id obj, tightdb::DataType type);
 BOOL verify_cell(const tightdb::Descriptor& descr, size_t col_ndx, NSObject *obj);
 NSObject* get_cell(size_t col_ndx, size_t row_ndx, tightdb::Table& table);
 
@@ -175,6 +178,12 @@ void verify_row_with_labels(const tightdb::Descriptor& descr, NSDictionary* data
 void insert_row_with_labels(size_t row_ndx, tightdb::Table& table, NSDictionary *data);
 void set_row_with_labels(size_t row_ndx, tightdb::Table& table, NSDictionary *data);
 
+void verify_row_from_object(const tightdb::Descriptor& descr, NSObject* data);
+void insert_row_from_object(size_t row_ndx, tightdb::Table& table, NSObject *data);
+void set_row_from_object(size_t row_ndx, tightdb::Table& table, NSObject *data);
+
+
+BOOL set_columns(tightdb::TableRef& parent, NSArray *schema);
 
 // Still used in the new error strategy. Perhaps it should be public?
 enum TightdbErr {

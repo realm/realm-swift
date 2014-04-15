@@ -27,6 +27,14 @@
 #include <string.h>
 
 using namespace std;
+@interface TestClass : NSObject
+@property (nonatomic) NSString *name;
+@property (nonatomic) NSNumber *age;
+@end
+
+@implementation TestClass
+// no needed
+@end
 
 @interface TDBDynamicTableTests: XCTestCase
   // Intentionally left blank.
@@ -82,7 +90,7 @@ using namespace std;
     [t addColumnWithName:@"first" type:TDBIntType];
     XCTAssertNoThrow([t addRow:@[ @1 ]], @"Impossible!");
     XCTAssertEqual((size_t)1, [t rowCount], @"Expected 1 row");
-    XCTAssertTrue([t addRow:@[ @2 ]], @"Impossible!");
+    XCTAssertNoThrow([t addRow:@[ @2 ]], @"Impossible!");
     XCTAssertEqual((size_t)2, [t rowCount], @"Expected 2 rows");
     XCTAssertEqual((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
     XCTAssertEqual((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:1], @"Value 2 expected");
@@ -95,9 +103,9 @@ using namespace std;
     // Add row using object literate
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
-    XCTAssertTrue([t insertRow:@[ @1 ] atIndex:0], @"Impossible!");
+    XCTAssertNoThrow([t insertRow:@[ @1 ] atIndex:0], @"Impossible!");
     XCTAssertEqual((size_t)1, [t rowCount], @"Expected 1 row");
-    XCTAssertTrue([t insertRow:@[ @2 ] atIndex:0], @"Impossible!");
+    XCTAssertNoThrow([t insertRow:@[ @2 ] atIndex:0], @"Impossible!");
     XCTAssertEqual((size_t)2, [t rowCount], @"Expected 2 rows");
     XCTAssertEqual((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:1], @"Value 1 expected");
     XCTAssertEqual((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
@@ -112,6 +120,28 @@ using namespace std;
     [t insertRow:@[@1] atIndex:0];
     t[0] = @[@2];
     XCTAssertEqual((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
+}
+
+-(void)testAppendRowGenericObject
+{
+    TDBTable* table1 = [[TDBTable alloc] init];
+    [table1 addColumnWithName:@"name" type:TDBStringType];
+    [table1 addColumnWithName:@"age" type:TDBIntType];
+
+    TestClass *person = [TestClass new];
+    person.name = @"Joe";
+    person.age = @11;
+    XCTAssertNoThrow([table1 addRow:person], @"Cannot add person");
+    XCTAssertEqual((NSUInteger)1, table1.rowCount, @"1 row excepted");
+    XCTAssertEqual((long long)11, [(NSNumber *)table1[0][@"age"] longLongValue], @"11 excepted");
+    XCTAssertTrue([((NSString *)table1[0][@"name"]) isEqualToString:@"Joe"], @"'Joe' excepted");
+
+    TDBTable* table2 = [[TDBTable alloc] init];
+    [table2 addColumnWithName:@"name" type:TDBStringType];
+    [table2 addColumnWithName:@"age" type:TDBStringType];
+
+    XCTAssertThrows([table2 addRow:person], @"Impossible");
+    XCTAssertEqual((NSUInteger)0, table2.rowCount, @"0 rows excepted");
 }
 
 -(void)testUpdateRowWithLabelsIntColumn
@@ -133,7 +163,7 @@ using namespace std;
     XCTAssertNoThrow([t addRow:@{ @"first": @1 }], @"Impossible!");
     XCTAssertEqual((size_t)1, [t rowCount], @"Expected 1 row");
 
-    XCTAssertTrue([t addRow:@{ @"first": @2 }], @"Impossible!");
+    XCTAssertNoThrow([t addRow:@{ @"first": @2 }], @"Impossible!");
     XCTAssertEqual((size_t)2, [t rowCount], @"Expected 2 rows");
 
     XCTAssertEqual((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
@@ -142,10 +172,10 @@ using namespace std;
     XCTAssertThrows([t addRow:@{ @"first": @"Hello" }], @"Wrong type");
     XCTAssertEqual((size_t)2, [t rowCount], @"Expected 2 rows");
 
-    XCTAssertTrue(([t addRow:@{ @"first": @1, @"second": @"Hello" }]), @"dh");
+    XCTAssertNoThrow(([t addRow:@{ @"first": @1, @"second": @"Hello" }]), @"dh");
     XCTAssertEqual((size_t)3, [t rowCount], @"Expected 3 rows");
 
-    XCTAssertTrue(([t addRow:@{ @"second": @1 }]), @"This is impossible");
+    XCTAssertNoThrow(([t addRow:@{ @"second": @1 }]), @"This is impossible");
     XCTAssertEqual((size_t)4, [t rowCount], @"Expected 4 rows");
 
     XCTAssertEqual((int64_t)0, [t TDB_intInColumnWithIndex:0 atRowIndex:3], @"Value 0 expected");
@@ -157,10 +187,10 @@ using namespace std;
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
     
-    XCTAssertTrue(([t insertRow:@{ @"first": @1 } atIndex:0]), @"Impossible!");
+    XCTAssertNoThrow(([t insertRow:@{ @"first": @1 } atIndex:0]), @"Impossible!");
     XCTAssertEqual((size_t)1, [t rowCount], @"Expected 1 row");
     
-    XCTAssertTrue(([t insertRow:@{ @"first": @2 } atIndex:0]), @"Impossible!");
+    XCTAssertNoThrow(([t insertRow:@{ @"first": @2 } atIndex:0]), @"Impossible!");
     XCTAssertEqual((size_t)2, [t rowCount], @"Expected 2 rows");
     
     XCTAssertEqual((int64_t)1, ([t TDB_intInColumnWithIndex:0 atRowIndex:1]), @"Value 1 expected");
@@ -169,10 +199,10 @@ using namespace std;
     XCTAssertThrows(([t insertRow:@{ @"first": @"Hello" } atIndex:0]), @"Wrong type");
     XCTAssertEqual((size_t)2, ([t rowCount]), @"Expected 2 rows");
     
-    XCTAssertTrue(([t insertRow:@{ @"first": @3, @"second": @"Hello"} atIndex:0]), @"Has 'first'");
+    XCTAssertNoThrow(([t insertRow:@{ @"first": @3, @"second": @"Hello"} atIndex:0]), @"Has 'first'");
     XCTAssertEqual((size_t)3, [t rowCount], @"Expected 3 rows");
     
-    XCTAssertTrue(([t insertRow:@{ @"second": @4 } atIndex:0]), @"This is impossible");
+    XCTAssertNoThrow(([t insertRow:@{ @"second": @4 } atIndex:0]), @"This is impossible");
     XCTAssertEqual((size_t)4, [t rowCount], @"Expected 4 rows");
     XCTAssertTrue((int64_t)0 == ([t TDB_intInColumnWithIndex:0 atRowIndex:0]), @"Value 0 expected");
 }
@@ -245,7 +275,7 @@ using namespace std;
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
 
     NSDate *d = [[NSDate alloc] initWithTimeIntervalSince1970:1396963324];   
-    XCTAssertTrue(([t addRow:@[d]]), @"Cannot insert 'NSDate'");
+    XCTAssertNoThrow(([t addRow:@[d]]), @"Cannot insert 'NSDate'");
     XCTAssertEqual((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
@@ -256,9 +286,21 @@ using namespace std;
 
     XCTAssertNoThrow(([t addRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   /* 2001-09-09 01:46:40 */
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
+    
+    NSDate *d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
+    XCTAssertNoThrow(([t addRow:@{@"first": d}]), @"Cannot insert 'NSDate'");
+    XCTAssertEqual((size_t)2, ([t rowCount]), @"2 rows excepted");
+    XCTAssertNoThrow(([t addRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   /* 2001-09-09 01:46:40 */
+    XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
 
-    NSDate *d = [[NSDate alloc] initWithTimeIntervalSince1970:1396963324];   
-    XCTAssertTrue(([t addRow:@{@"first": d}]), @"Cannot insert 'NSDate'");
+    d = [[NSDate alloc] initWithTimeIntervalSince1970:1396963324];
+    XCTAssertNoThrow(([t addRow:@{@"first": d}]), @"Cannot insert 'NSDate'");
+    XCTAssertEqual((size_t)2, ([t rowCount]), @"2 rows excepted");
+    XCTAssertNoThrow(([t addRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   /* 2001-09-09 01:46:40 */
+    XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
+    
+    d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
+    XCTAssertNoThrow(([t addRow:@{@"first": d}]), @"Cannot insert 'NSDate'");
     XCTAssertEqual((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
@@ -272,7 +314,7 @@ using namespace std;
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
 
     NSData *nsd = [NSData dataWithBytes:(const void *)bin length:4];
-    XCTAssertTrue(([t addRow:@[nsd]]), @"Cannot insert 'NSData'");
+    XCTAssertNoThrow(([t addRow:@[nsd]]), @"Cannot insert 'NSData'");
     XCTAssertEqual((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
@@ -288,7 +330,7 @@ using namespace std;
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
 
     NSData *nsd = [NSData dataWithBytes:(const void *)bin length:4];
-    XCTAssertTrue(([t addRow:@{@"first": nsd}]), @"Cannot insert 'NSData'");
+    XCTAssertNoThrow(([t addRow:@{@"first": nsd}]), @"Cannot insert 'NSData'");
     XCTAssertEqual((size_t)2, ([t rowCount]), @"2 rows excepted");
 }
 
@@ -322,7 +364,7 @@ using namespace std;
     TDBTable *t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBBoolType];
     XCTAssertNoThrow(([t addRow:@[@YES]]), @"Cannot append bool column.");
-    XCTAssertTrue(([t addRow:@[@NO]]), @"Cannot append bool column.");
+    XCTAssertNoThrow(([t addRow:@[@NO]]), @"Cannot append bool column.");
     XCTAssertEqual((size_t)2, [t rowCount], @"2 rows expected");
 }
 
@@ -331,7 +373,7 @@ using namespace std;
     TDBTable *t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBBoolType];
     XCTAssertNoThrow(([t addRow:@{@"first": @YES}]), @"Cannot append bool column.");
-    XCTAssertTrue(([t addRow:@{@"first": @NO}]), @"Cannot append bool column.");
+    XCTAssertNoThrow(([t addRow:@{@"first": @NO}]), @"Cannot append bool column.");
     XCTAssertEqual((size_t)2, [t rowCount], @"2 rows expected");
 }
 
@@ -357,15 +399,15 @@ using namespace std;
     [t addColumnWithName:@"first" type:TDBMixedType];
     XCTAssertNoThrow(([t addRow:@[@1]]), @"Cannot insert 'int'");
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row excepted");
-    XCTAssertTrue(([t addRow:@[@"Hello"]]), @"Cannot insert 'string'");
+    XCTAssertNoThrow(([t addRow:@[@"Hello"]]), @"Cannot insert 'string'");
     XCTAssertEqual((size_t)2, ([t rowCount]), @"2 rows excepted");
-    XCTAssertTrue(([t addRow:@[@3.14f]]), @"Cannot insert 'float'");
+    XCTAssertNoThrow(([t addRow:@[@3.14f]]), @"Cannot insert 'float'");
     XCTAssertEqual((size_t)3, ([t rowCount]), @"3 rows excepted");
-    XCTAssertTrue(([t addRow:@[@3.14]]), @"Cannot insert 'double'");
+    XCTAssertNoThrow(([t addRow:@[@3.14]]), @"Cannot insert 'double'");
     XCTAssertEqual((size_t)4, ([t rowCount]), @"4 rows excepted");
-    XCTAssertTrue(([t addRow:@[@YES]]), @"Cannot insert 'bool'");
+    XCTAssertNoThrow(([t addRow:@[@YES]]), @"Cannot insert 'bool'");
     XCTAssertEqual((size_t)5, ([t rowCount]), @"5 rows excepted");
-    XCTAssertTrue(([t addRow:@[bin2]]), @"Cannot insert 'binary'");
+    XCTAssertNoThrow(([t addRow:@[bin2]]), @"Cannot insert 'binary'");
     XCTAssertEqual((size_t)6, ([t rowCount]), @"6 rows excepted");
 }
 
@@ -378,15 +420,15 @@ using namespace std;
     [t addColumnWithName:@"first" type:TDBMixedType];
     XCTAssertNoThrow(([t addRow:@{@"first": @1}]), @"Cannot insert 'int'");
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row excepted");
-    XCTAssertTrue(([t addRow:@{@"first": @"Hello"}]), @"Cannot insert 'string'$");
+    XCTAssertNoThrow(([t addRow:@{@"first": @"Hello"}]), @"Cannot insert 'string'$");
     XCTAssertEqual((size_t)2, ([t rowCount]), @"2 rows excepted");
-    XCTAssertTrue(([t addRow:@{@"first": @3.14f}]), @"Cannot insert 'float'");
+    XCTAssertNoThrow(([t addRow:@{@"first": @3.14f}]), @"Cannot insert 'float'");
     XCTAssertEqual((size_t)3, ([t rowCount]), @"3 rows excepted");
-    XCTAssertTrue(([t addRow:@{@"first": @3.14}]), @"Cannot insert 'double'");
+    XCTAssertNoThrow(([t addRow:@{@"first": @3.14}]), @"Cannot insert 'double'");
     XCTAssertEqual((size_t)4, ([t rowCount]), @"4 rows excepted");
-    XCTAssertTrue(([t addRow:@{@"first": @YES}]), @"Cannot insert 'bool'");
+    XCTAssertNoThrow(([t addRow:@{@"first": @YES}]), @"Cannot insert 'bool'");
     XCTAssertEqual((size_t)5, ([t rowCount]), @"5 rows excepted");
-    XCTAssertTrue(([t addRow:@{@"first": bin2}]), @"Cannot insert 'binary'");
+    XCTAssertNoThrow(([t addRow:@{@"first": bin2}]), @"Cannot insert 'binary'");
     XCTAssertEqual((size_t)6, ([t rowCount]), @"6 rows excepted");
 }
 
@@ -933,19 +975,19 @@ using namespace std;
     
 
     XCTAssertEqual([row1 boolInColumnWithIndex:BoolCol], NO, @"row1.BoolCol");
-    XCTAssertEqual([row2 boolInColumnWithIndex:BoolCol], YES,                @"row2.BoolCol");
-    XCTAssertEqual([row1 intInColumnWithIndex:IntCol], (int64_t)54,         @"row1.IntCol");
-    XCTAssertEqual([row2 intInColumnWithIndex:IntCol], (int64_t)506,        @"row2.IntCol");
-    XCTAssertEqual([row1 floatInColumnWithIndex:FloatCol], 0.7f,              @"row1.FloatCol");
-    XCTAssertEqual([row2 floatInColumnWithIndex:FloatCol], 7.7f,              @"row2.FloatCol");
-    XCTAssertEqual([row1 doubleInColumnWithIndex:DoubleCol], 0.8,              @"row1.DoubleCol");
-    XCTAssertEqual([row2 doubleInColumnWithIndex:DoubleCol], 8.8,              @"row2.DoubleCol");
+    XCTAssertEqual([row2 boolInColumnWithIndex:BoolCol], YES,                   @"row2.BoolCol");
+    XCTAssertEqual([row1 intInColumnWithIndex:IntCol], (int64_t)54,             @"row1.IntCol");
+    XCTAssertEqual([row2 intInColumnWithIndex:IntCol], (int64_t)506,            @"row2.IntCol");
+    XCTAssertEqual([row1 floatInColumnWithIndex:FloatCol], 0.7f,                @"row1.FloatCol");
+    XCTAssertEqual([row2 floatInColumnWithIndex:FloatCol], 7.7f,                @"row2.FloatCol");
+    XCTAssertEqual([row1 doubleInColumnWithIndex:DoubleCol], 0.8,               @"row1.DoubleCol");
+    XCTAssertEqual([row2 doubleInColumnWithIndex:DoubleCol], 8.8,               @"row2.DoubleCol");
     XCTAssertTrue([[row1 stringInColumnWithIndex:StringCol] isEqual:@"foo"],    @"row1.StringCol");
     XCTAssertTrue([[row2 stringInColumnWithIndex:StringCol] isEqual:@"banach"], @"row2.StringCol");
     XCTAssertTrue([[row1 binaryInColumnWithIndex:BinaryCol] isEqual:bin1],      @"row1.BinaryCol");
     XCTAssertTrue([[row2 binaryInColumnWithIndex:BinaryCol] isEqual:bin2],      @"row2.BinaryCol");
-    XCTAssertEqualWithAccuracy([[row1 dateInColumnWithIndex:DateCol] timeIntervalSince1970], (NSTimeInterval)0, 0.99,               @"row1.DateCol");
-    XCTAssertEqualWithAccuracy([[row2 dateInColumnWithIndex:DateCol] timeIntervalSince1970], [timeNow timeIntervalSince1970], 0.99, @"row2.DateCol");
+    XCTAssertEqualWithAccuracy([[row1 dateInColumnWithIndex:DateCol] timeIntervalSince1970], (NSTimeInterval)0, 0.99, @"row1.DateCol");
+    XCTAssertTrue((fabs([[row2 dateInColumnWithIndex:DateCol] timeIntervalSinceDate:timeNow]) < 1.0), @"row2.DateCol");
     XCTAssertTrue([[row1 tableInColumnWithIndex:TableCol] isEqual:subtab1],    @"row1.TableCol");
     XCTAssertTrue([[row2 tableInColumnWithIndex:TableCol] isEqual:subtab2],    @"row2.TableCol");
     XCTAssertTrue([[row1 mixedInColumnWithIndex:MixedCol] isEqual:mixInt1],    @"row1.MixedCol");
@@ -1230,6 +1272,147 @@ using namespace std;
     XCTAssertEqualObjects(v[1][ageIndex], @1, @"");
     XCTAssertEqualObjects(v[2][ageIndex], @2, @"");
 }
+
+- (void)testPredicateFind
+{
+    TDBTable *t = [[TDBTable alloc] initWithColumns:@[@"name", @"string",
+                                                      @"age",  @"int"]];
+    [t addRow:@[@"name0", @0]];
+    [t addRow:@[@"name1", @1]];
+    [t addRow:@[@"name2", @1]];
+    [t addRow:@[@"name3", @3]];
+    [t addRow:@[@"name4", @4]];
+
+    XCTAssertThrows([t find:@"garbage"], @"Garbage predicate");
+    XCTAssertThrows([t find:@"name == notAValue"], @"Invalid expression");
+    XCTAssertThrows([t find:@"naem == \"name0\""], @"Invalid column");
+    XCTAssertThrows([t find:@"name == 30"], @"Invalid value type");
+    XCTAssertThrows([t find:@1], @"Invalid condition");
+
+    // Searching with no condition just finds first row
+    TDBRow *r = [t find:nil];
+    XCTAssertEqualObjects(r[@"name"], @"name0", @"first row");
+
+    // Search with predicate string
+    r = [t find:@"name == \"name10\""];
+    XCTAssertEqualObjects(r, nil, @"no match");
+
+    r = [t find:@"name == \"name0\""];
+    XCTAssertEqualObjects(r[@"name"], @"name0");
+
+    r = [t find:@"age == 4"];
+    XCTAssertEqualObjects(r[@"name"], @"name4");
+
+    // Search with predicate object
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
+    r = [t find:predicate];
+    XCTAssertEqualObjects(r[@"name"], @"name3");
+}
+
+
+- (void)testPredicateView
+{
+    TDBTable *t = [[TDBTable alloc] init];
+    
+    NSUInteger nameIndex = [t addColumnWithName:@"name" type:TDBStringType];
+    NSUInteger ageIndex = [t addColumnWithName:@"age" type:TDBIntType];
+
+    [t addRow:@[@"name0", @0]];
+    [t addRow:@[@"name1", @1]];
+    [t addRow:@[@"name2", @1]];
+    [t addRow:@[@"name3", @3]];
+    [t addRow:@[@"name4", @4]];
+
+    XCTAssertThrows([t where:@"garbage"], @"Garbage predicate");
+    XCTAssertThrows([t where:@"name == notAValue"], @"Invalid expression");
+    XCTAssertThrows([t where:@"naem == \"name0\""], @"Invalid column");
+    XCTAssertThrows([t where:@"name == 30"], @"Invalid value type");
+
+    // Filter with predicate string
+    TDBView *v = [t where:@"name == \"name0\""];
+    XCTAssertEqual(v.rowCount, (NSUInteger)1, @"View with single match");
+    XCTAssertEqualObjects(v[0][nameIndex], @"name0");
+    XCTAssertEqualObjects(v[0][ageIndex], @0);
+    
+    v = [t where:@"age == 1"];
+    XCTAssertEqual(v.rowCount, (NSUInteger)2, @"View with two matches");
+    XCTAssertEqualObjects(v[0][ageIndex], @1);
+    
+    v = [t where:@"1 == age"];
+    XCTAssertEqual(v.rowCount, (NSUInteger)2, @"View with two matches");
+    XCTAssertEqualObjects(v[0][ageIndex], @1);
+    
+    // test AND
+    v = [t where:@"age == 1 AND name == \"name1\""];
+    XCTAssertEqual(v.rowCount, (NSUInteger)1, @"View with one match");
+    XCTAssertEqualObjects(v[0][nameIndex], @"name1");
+    
+    // test OR
+    v = [t where:@"age == 1 OR age == 4"];
+    XCTAssertEqual(v.rowCount, (NSUInteger)3, @"View with 3 matches");
+    
+    // test other numeric operators
+    v = [t where:@"age > 3"];
+    XCTAssertEqual(v.rowCount, (NSUInteger)1, @"View with 1 matches");
+    
+    v = [t where:@"age >= 3"];
+    XCTAssertEqual(v.rowCount, (NSUInteger)2, @"View with 2 matches");
+    
+    v = [t where:@"age < 1"];
+    XCTAssertEqual(v.rowCount, (NSUInteger)1, @"View with 1 matches");
+    
+    v = [t where:@"age <= 1"];
+    XCTAssertEqual(v.rowCount, (NSUInteger)3, @"View with 3 matches");
+
+    // Filter with predicate object
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @1];
+    v = [t where:predicate];
+    XCTAssertEqual(v.rowCount, (NSUInteger)2, @"View with two matches");
+    XCTAssertEqualObjects(v[0][ageIndex], @1);
+}
+
+- (void)testPredicateSort
+{
+    TDBTable *t = [[TDBTable alloc] init];
+    
+    [t addColumnWithName:@"name" type:TDBStringType];
+    NSUInteger ageIndex = [t addColumnWithName:@"age" type:TDBIntType];
+    [t addColumnWithName:@"hired" type:TDBBoolType];
+    
+    [t addRow:@[@"name4", @4, [NSNumber numberWithBool:YES]]];
+    [t addRow:@[@"name0",@0, [NSNumber numberWithBool:NO]]];
+
+    TDBView *v = [t where:nil orderBy:nil];
+    XCTAssertEqualObjects(v[0][ageIndex], @4);
+    XCTAssertEqualObjects(v[1][ageIndex], @0);
+
+    TDBView *vAscending = [t where:nil orderBy:@"age"];
+    XCTAssertEqualObjects(vAscending[0][ageIndex], @0);
+    XCTAssertEqualObjects(vAscending[1][ageIndex], @4);
+    
+    TDBView *vAscending2 = [t where:nil orderBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:YES]];
+    XCTAssertEqualObjects(vAscending2[0][ageIndex], @0);
+    XCTAssertEqualObjects(vAscending2[1][ageIndex], @4);
+    
+    NSSortDescriptor * reverseSort = [NSSortDescriptor sortDescriptorWithKey:@"age" ascending:NO];
+    TDBView *vDescending = [t where:nil orderBy:reverseSort];
+    XCTAssertEqualObjects(vDescending[0][ageIndex], @4);
+    XCTAssertEqualObjects(vDescending[1][ageIndex], @0);
+    
+    NSSortDescriptor * boolSort = [NSSortDescriptor sortDescriptorWithKey:@"hired" ascending:YES];
+    TDBView *vBool = [t where:nil orderBy:boolSort];
+    XCTAssertEqualObjects(vBool[0][ageIndex], @0);
+    XCTAssertEqualObjects(vBool[1][ageIndex], @4);
+
+    XCTAssertThrows([t where:nil orderBy:@1], @"Invalid order type");
+    
+    NSSortDescriptor * misspell = [NSSortDescriptor sortDescriptorWithKey:@"oge" ascending:YES];
+    XCTAssertThrows([t where:nil orderBy:misspell], @"Invalid sort");
+    
+    NSSortDescriptor * wrongColType = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
+    XCTAssertThrows([t where:nil orderBy:wrongColType], @"Invalid column type");
+}
+
 
 -(void)testTableDynamic_find_int
 {

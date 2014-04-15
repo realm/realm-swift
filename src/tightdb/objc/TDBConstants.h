@@ -18,12 +18,11 @@
  *
  **************************************************************************/
 
+#import <Foundation/Foundation.h>
 
-#import "TDBMixed.h"
-#include <tightdb/mixed.hpp>
 
-@interface TDBMixed()
-+(TDBMixed*)mixedWithNativeMixed:(const tightdb::Mixed&)other;
--(tightdb::Mixed&)getNativeMixed;
-@end
-
+/**
+ * Posted by TDBSmartContext when it changes, that is when a table is
+ * added, removed, or changed in any way.
+ */
+extern NSString *const TDBContextDidChangeNotification;

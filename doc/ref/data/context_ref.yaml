@@ -2,7 +2,7 @@
 # Obj-C reference documentation for TDBContext class
 #
 
-ID         : class_shared_group
+ID         : class_context
 TITLE      : TDBContext
 SUMMARY    : The TDBContext class is a way to work with persistent tables.
 DESCR      : >
@@ -23,16 +23,29 @@ CATEGORIES:
 - Constructor:
   METHODS:
   - g_shared_group_constructor:
-      NAME     : "contextWithPersistenceToFile:"
+      NAME     : "contextPersistedAtPath:error:"
       SUMMARY  : *g_shared_group_constructor_summary
       DESCR    :
       - TEXT   : *g_shared_group_constructor_descr
       - TEXT   : *g_shared_group_durability_modes
-      SIGNATURE: + (TDBContext *)contextWithPersistenceToFile:(NSString *)path error:(NSError **)error
+      SIGNATURE: + (TDBContext *)contextPersistedAtPath:(NSString *)path error:(NSError **)error
       PARAMS:
       - NAME   : path
         TYPES  : NSString
         DESCR  : A path to a file. E.g. documents-folder/myDatabase.tightdb
+      RETURN:
+        TYPES  : TDBContext
+        DESCR  : A context mapped to a file.
+      EXAMPLES:
+      - CODE   : ex_objc_shared_group_constructor
+        DESCR  :
+  - g_shared_group_constructor_default_path:
+      NAME     : "contextWithDefaultPersistence:"
+      SUMMARY  : *g_shared_group_constructor_summary
+      DESCR    :
+      - TEXT   : *g_shared_group_constructor_descr
+      - TEXT   : *g_shared_group_durability_modes
+      SIGNATURE: + (TDBContext *)contextPersistedAtPath:(NSString *)path error:(NSError **)error
       RETURN:
         TYPES  : TDBContext
         DESCR  : A context mapped to a file.
@@ -62,25 +75,25 @@ CATEGORIES:
 - Transactions:
   METHODS:
   - g_shared_group_begin_write:
-      NAMES    : writeWithBlock
+      NAMES    : "writeUsingBlock:error:"
       SUMMARY  : *g_shared_group_begin_write_summary
       DESCR    : >
                  Execute a code block as a write transaction in order to
                  modify one or more tables or add new tables. During a write
                  transaction, no other transactions can write except the
                  active one. The other write transactions are blocked and
-                 wait until the active transaction has finished. 
+                 wait until the active transaction has finished.
 
                  If the code block
                  returns <code>YES</code>, the changes are written to disk/storage
                  device, while any modification is discarded if the code block
                  returns <code>NO</code>.
-      SIGNATURE: (BOOL)writeWithBlock:(TDBWriteBlock)block error:(NSError **)error
+      SIGNATURE: (BOOL)writeUsingBlock:(TDBWriteBlock)block error:(NSError **)error
       PARAMS:
         NAME   : block
         TYPES  : TDBWriteBlock
         DESCR  : >
-                 A block of code. The block can modify the tables or add new tables in a 
+                 A block of code. The block can modify the tables or add new tables in a
                  transactional manner.
                  Changes are written to disk if the block returns <code>YES</code>, discarded otherwise.
       RETURN:
@@ -91,13 +104,13 @@ CATEGORIES:
         DESCR  :
 
   - g_shared_group_begin_read:
-      NAMES    : readWithBlock
+      NAMES    : "readUsingBlock:"
       SUMMARY  : *g_shared_group_begin_read_summary
       DESCR    : >
                  Execute a code blocks as a read transaction. This will allow
                  you to get information about columns (type, name), number of rows in
                  a table, access rows, and execute queries on tables.
-      SIGNATURE: (void)readWithBlock:(TDBReadBlock)block
+      SIGNATURE: (void)readUsingBlock:(TDBReadBlock)block
       CONST    : True
       PARAMS:
         NAME   : block

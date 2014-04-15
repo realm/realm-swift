@@ -291,23 +291,15 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     }
 
     // Test Deletes
-    if (![table removeRowAtIndex:14 ]) {
-        XCTFail(@"Remove failed.");
-    }
-    if (![table removeRowAtIndex:0 ]) {
-        XCTFail(@"Remove failed.");
-    }
-    if (![table removeRowAtIndex:5 ]) {
-        XCTFail(@"Remove failed.");
-    }
+    XCTAssertNoThrow([table removeRowAtIndex:14]);
+    XCTAssertNoThrow([table removeRowAtIndex:0]);
+    XCTAssertNoThrow([table removeRowAtIndex:5]);
 
-    XCTAssertEqual([table rowCount], (size_t)12, @"Size should have been 12");
+    XCTAssertEqual(table.rowCount, (NSUInteger)12, @"Size should have been 12");
 
     // Test Clear
-    if (![table removeAllRows]) {
-        XCTFail(@"Clear failed.");
-    }
-    XCTAssertEqual([table rowCount], (size_t)0, @"Size should have been zero");
+    XCTAssertNoThrow([table removeAllRows]);
+    XCTAssertEqual(table.rowCount, (NSUInteger)0, @"Size should have been zero");
 
 }
 

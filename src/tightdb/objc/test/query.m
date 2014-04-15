@@ -6,6 +6,7 @@
 #import <XCTest/XCTest.h>
 
 #import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/TDBQueryFast.h>
 
 TIGHTDB_TABLE_1(TestQuerySub,
                 Age,  Int)
@@ -249,7 +250,121 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     XCTAssertEqualWithAccuracy([[[table where] maxDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], [date2 timeIntervalSince1970], 0.99, @"MaxDateInColumn");
     
     /// TODO: Tests missing....
+    
+    
 
+}
+
+- (void)testMathOperations
+{
+    TDBTable *table = [[TDBTable alloc]init];
+    
+    NSUInteger intCol = [table addColumnWithName:@"IntCol" type:TDBIntType];
+    NSUInteger floatCol = [table addColumnWithName:@"FloatCol" type:TDBFloatType];
+    NSUInteger doubleCol = [table addColumnWithName:@"DoubleCol" type:TDBDoubleType];
+    NSUInteger dateCol = [table addColumnWithName:@"DateCol" type:TDBDateType];
+    
+    ////////// Zero rows added ///////////
+    
+    // Using specific column type operations MIN
+    XCTAssertEqual([[table where] minIntInColumnWithIndex:intCol], NSIntegerMax);
+    XCTAssertEqual([[table where] minFloatInColumnWithIndex:floatCol], (float)INFINITY);
+    XCTAssertEqual([[table where] minDoubleInColumnWithIndex:doubleCol], (double)INFINITY);
+    XCTAssertNil([[table where] minDateInColumnWithIndex:dateCol]);
+    
+    // Using generic column type operations MIN
+    XCTAssertEqualObjects([[table where] minInColumnWithIndex:intCol], @NSIntegerMax);
+    XCTAssertEqual([[[table where] minInColumnWithIndex:floatCol] floatValue], (float)INFINITY);
+    XCTAssertEqual([[[table where] minInColumnWithIndex:doubleCol] doubleValue], (double)INFINITY);
+    XCTAssertNil([[table where] minInColumnWithIndex:dateCol]);
+    
+    // Using specific column type operations MAX
+    XCTAssertEqual([[table where] maxIntInColumnWithIndex:intCol], NSIntegerMin);
+    XCTAssertEqual([[table where] maxFloatInColumnWithIndex:floatCol], (float)-INFINITY);
+    XCTAssertEqual([[table where] maxDoubleInColumnWithIndex:doubleCol], (double)-INFINITY);
+    XCTAssertNil([[table where] maxDateInColumnWithIndex:dateCol]);
+    
+    // Using generic column type operations MAX
+    XCTAssertEqualObjects([[table where] maxInColumnWithIndex:intCol], @NSIntegerMin);
+    XCTAssertEqual([[[table where] maxInColumnWithIndex:floatCol] floatValue], (float)-INFINITY);
+    XCTAssertEqual([[[table where] maxInColumnWithIndex:doubleCol] doubleValue], (double)-INFINITY);
+    XCTAssertNil([[table where] maxInColumnWithIndex:dateCol]);
+
+    // Using specific column type operations SUM
+    XCTAssertEqual([[table where] sumIntColumnWithIndex:intCol], (int64_t)0);
+    XCTAssertEqual([[table where] sumFloatColumnWithIndex:floatCol], (double)0);
+    XCTAssertEqual([[table where] sumDoubleColumnWithIndex:doubleCol], (double)0);
+    
+    // Using generic column type operations SUM
+    XCTAssertEqualObjects([[table where] sumColumnWithIndex:intCol], @0);
+    XCTAssertEqual([[[table where] sumColumnWithIndex:floatCol] doubleValue], (double)0);
+    XCTAssertEqual([[[table where] sumColumnWithIndex:doubleCol] doubleValue], (double)0);
+    
+    // Using specific column type operations AVG
+    XCTAssertEqual([[table where] avgIntColumnWithIndex:intCol], (double)0);
+    XCTAssertEqual([[table where] avgFloatColumnWithIndex:floatCol], (double)0);
+    XCTAssertEqual([[table where] avgDoubleColumnWithIndex:doubleCol], (double)0);
+    
+    // Using generic column type operations AVG
+    XCTAssertEqualObjects([[table where] avgColumnWithIndex:intCol], @0);
+    XCTAssertEqual([[[table where] avgColumnWithIndex:floatCol] doubleValue], (double)0);
+    XCTAssertEqual([[[table where] avgColumnWithIndex:doubleCol] doubleValue], (double)0);
+
+    ////////// Add rows with values ///////////
+
+    NSDate *date3 = [NSDate date];
+    NSDate *date33 = [date3 dateByAddingTimeInterval:1];
+    NSDate *date333 = [date33 dateByAddingTimeInterval:1];
+    
+    [table addRow:@[@3, @3.3f, @3.3, date3]];
+    [table addRow:@[@33, @33.33f, @33.33, date33]];
+    [table addRow:@[@333, @333.333f, @333.333, date333]];
+    
+    // Using specific column type operations MIN
+    XCTAssertEqual([[table where] minIntInColumnWithIndex:intCol], (int64_t)3);
+    XCTAssertEqualWithAccuracy([[table where] minFloatInColumnWithIndex:floatCol], (float)3.3, 0.1);
+    XCTAssertEqualWithAccuracy([[table where] minDoubleInColumnWithIndex:doubleCol], (double)3.3, 0.1);
+    XCTAssertEqualWithAccuracy([[table where] minDateInColumnWithIndex:dateCol].timeIntervalSince1970, date3.timeIntervalSince1970, 0.999);
+    
+    // Using generic column type operations MIN
+    XCTAssertEqualObjects([[table where] minInColumnWithIndex:intCol], @3);
+    XCTAssertEqual([[[table where] minInColumnWithIndex:floatCol] floatValue], (float)3.3);
+    XCTAssertEqual([[[table where] minInColumnWithIndex:doubleCol] doubleValue], (double)3.3);
+    NSDate *minOutDate = [[table where] minInColumnWithIndex:dateCol];
+    XCTAssertEqualWithAccuracy(minOutDate.timeIntervalSince1970, date3.timeIntervalSince1970, 0.999);
+    
+    // Using specific column type operations MAX
+    XCTAssertEqual([[table where] maxIntInColumnWithIndex:intCol], (int64_t)333);
+    XCTAssertEqualWithAccuracy([[table where] maxFloatInColumnWithIndex:floatCol], (float)333.333, 0.1);
+    XCTAssertEqualWithAccuracy([[table where] maxDoubleInColumnWithIndex:doubleCol], (double)333.333, 0.1);
+    XCTAssertEqualWithAccuracy([[table where] maxDateInColumnWithIndex:dateCol].timeIntervalSince1970, date333.timeIntervalSince1970, 0.999);
+    
+    // Using generic column type operations MAX
+    XCTAssertEqualObjects([[table where] maxInColumnWithIndex:intCol], @333);
+    XCTAssertEqual([[[table where] maxInColumnWithIndex:floatCol] floatValue], (float)333.333);
+    XCTAssertEqual([[[table where] maxInColumnWithIndex:doubleCol] doubleValue], (double)333.333);
+    NSDate *maxOutDate = [[table where] maxInColumnWithIndex:dateCol];
+    XCTAssertEqualWithAccuracy(maxOutDate.timeIntervalSince1970, date333.timeIntervalSince1970, 0.999);
+    
+    // Using specific column type operations SUM
+    XCTAssertEqual([[table where] sumIntColumnWithIndex:intCol], (int64_t)369);
+    XCTAssertEqualWithAccuracy([[table where] sumFloatColumnWithIndex:floatCol], (double)369.963, 0.1);
+    XCTAssertEqualWithAccuracy([[table where] sumDoubleColumnWithIndex:doubleCol], (double)369.963, 0.1);
+    
+    // Using generic column type operations SUM
+    XCTAssertEqualObjects([[table where] sumColumnWithIndex:intCol], @369);
+    XCTAssertEqualWithAccuracy([[[table where] sumColumnWithIndex:floatCol] doubleValue], (double)369.963, 0.1);
+    XCTAssertEqualWithAccuracy([[[table where] sumColumnWithIndex:doubleCol] doubleValue], (double)369.963, 0.1);
+    
+    // Using specific column type operations AVG
+    XCTAssertEqual([[table where] avgIntColumnWithIndex:intCol], (double)123);
+    XCTAssertEqualWithAccuracy([[table where] avgFloatColumnWithIndex:floatCol], (double)123.321, 0.1);
+    XCTAssertEqualWithAccuracy([[table where] avgDoubleColumnWithIndex:doubleCol], (double)123.321, 0.1);
+    
+    // Using generic column type operations AVG
+    XCTAssertEqualObjects([[table where] avgColumnWithIndex:intCol], @123);
+    XCTAssertEqualWithAccuracy([[[table where] avgColumnWithIndex:floatCol] doubleValue], (double)123.321, 0.1);
+    XCTAssertEqualWithAccuracy([[[table where] avgColumnWithIndex:doubleCol] doubleValue], (double)123.321, 0.1);
 }
 
 

@@ -418,7 +418,7 @@ EOF
             platform="$(printf "%s\n" "$x" | cut -d: -f1)" || exit 1
             sdk="$(printf "%s\n" "$x" | cut -d: -f2)" || exit 1
             archs="$(printf "%s\n" "$x" | cut -d: -f3 | sed 's/,/ /g')" || exit 1
-            cflags_arch=""
+            cflags_arch="-mios-version-min=5.0"
             for y in $archs; do
                 word_list_append "cflags_arch" "-arch $y" || exit 1
             done
