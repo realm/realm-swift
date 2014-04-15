@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		42211A4B18D8958400E1CA0B /* people.m in Sources */ = {isa = PBXBuildFile; fileRef = 42211A4A18D8958400E1CA0B /* people.m */; };
+		4272AB6418F56AB400397B62 /* ex_objc_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 4272AB6318F56AB400397B62 /* ex_objc_intro.m */; };
+		4272AB6A18F6D42B00397B62 /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4272AB6918F6D42B00397B62 /* libstdc++.6.dylib */; };
 		4D88931318D320D20038AFD4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88931218D320D20038AFD4 /* Foundation.framework */; };
 		4D88931518D320D20038AFD4 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88931418D320D20038AFD4 /* CoreGraphics.framework */; };
 		4D88931718D320D20038AFD4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88931618D320D20038AFD4 /* UIKit.framework */; };
@@ -30,7 +32,6 @@
 		4D88935218D320EF0038AFD4 /* ex_objc_tableview_typed_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D88934918D320EF0038AFD4 /* ex_objc_tableview_typed_intro.m */; };
 		4D88935318D320EF0038AFD4 /* ex_objc_query_typed_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D88934A18D320EF0038AFD4 /* ex_objc_query_typed_intro.m */; };
 		4D88935518D321080038AFD4 /* Tightdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88935418D321080038AFD4 /* Tightdb.framework */; };
-		4D88935718D321130038AFD4 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88935618D321130038AFD4 /* libc++.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,9 @@
 		42211A4A18D8958400E1CA0B /* people.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = people.m; path = ../examples/people.m; sourceTree = "<group>"; };
 		42211A4C18D895D000E1CA0B /* people.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = people.m; path = ../examples/people.m; sourceTree = "<group>"; };
 		42211A4E18D897F500E1CA0B /* examples.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = examples.h; path = ../examples/examples.h; sourceTree = "<group>"; };
+		4272AB6318F56AB400397B62 /* ex_objc_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_intro.m; path = ../examples/ex_objc_intro.m; sourceTree = "<group>"; };
+		4272AB6718F6ABB800397B62 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
+		4272AB6918F6D42B00397B62 /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "usr/lib/libstdc++.6.dylib"; sourceTree = SDKROOT; };
 		4D88930F18D320D20038AFD4 /* RefDocExamples.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RefDocExamples.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D88931218D320D20038AFD4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4D88931418D320D20038AFD4 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -82,7 +86,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D88935718D321130038AFD4 /* libc++.dylib in Frameworks */,
+				4272AB6A18F6D42B00397B62 /* libstdc++.6.dylib in Frameworks */,
 				4D88931518D320D20038AFD4 /* CoreGraphics.framework in Frameworks */,
 				4D88931718D320D20038AFD4 /* UIKit.framework in Frameworks */,
 				4D88931318D320D20038AFD4 /* Foundation.framework in Frameworks */,
@@ -126,6 +130,8 @@
 		4D88931118D320D20038AFD4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4272AB6918F6D42B00397B62 /* libstdc++.6.dylib */,
+				4272AB6718F6ABB800397B62 /* libstdc++.dylib */,
 				4D88935618D321130038AFD4 /* libc++.dylib */,
 				4D88935418D321080038AFD4 /* Tightdb.framework */,
 				4D88931218D320D20038AFD4 /* Foundation.framework */,
@@ -191,6 +197,7 @@
 				4D88934718D320EF0038AFD4 /* ex_objc_query_dynamic_intro.m */,
 				4D88934818D320EF0038AFD4 /* ex_objc_table_typed_intro.m */,
 				4D88934918D320EF0038AFD4 /* ex_objc_tableview_typed_intro.m */,
+				4272AB6318F56AB400397B62 /* ex_objc_intro.m */,
 				4D88934A18D320EF0038AFD4 /* ex_objc_query_typed_intro.m */,
 			);
 			name = examples;
@@ -298,6 +305,7 @@
 				4D88932318D320D20038AFD4 /* AppDelegate.m in Sources */,
 				4D88934E18D320EF0038AFD4 /* ex_objc_table_dynamic_intro.m in Sources */,
 				4D88935318D320EF0038AFD4 /* ex_objc_query_typed_intro.m in Sources */,
+				4272AB6418F56AB400397B62 /* ex_objc_intro.m in Sources */,
 				4D88934F18D320EF0038AFD4 /* ex_objc_group_intro.m in Sources */,
 				4D88935118D320EF0038AFD4 /* ex_objc_table_typed_intro.m in Sources */,
 				4D88935018D320EF0038AFD4 /* ex_objc_query_dynamic_intro.m in Sources */,
@@ -377,7 +385,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

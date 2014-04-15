@@ -22,6 +22,9 @@
 
 #include <tightdb/table.hpp>
 
+#import "TDBTable.h"
+
+
 @interface TDBTable (noinst)
 
 -(tightdb::Table&)getNativeTable;

@@ -2,59 +2,70 @@
 #import <Tightdb/Tightdb.h>
 #import "people.h"
 
-/* PeopleTable is declared in people.h as
-TIGHTDB_TABLE_3(PeopleTable,
-                Name, String,
-                Age,  Int,
-                Hired, Bool);
-*/
+/*
+ The classes People, PeopleQuery, PeopleView, and PeopleRow are declared
+ (interfaces are generated) in people.h as
+
+ TIGHTDB_TABLE_DEF_3(People,
+                     Name,  String,
+                     Age,   Int,
+                     Hired, Bool)
+
+ and in people.m you must have
+
+ TIGHTDB_TABLE_IMPL_3(People,
+                      Name, String,
+                      Age,  Int,
+                      Hired, Bool)
+
+ in order to generate the implementation of the classes.
+ */
+
 
 void ex_objc_context_intro()
 {
-    /* Remove any previous file */
+    // Remove any previous file
     NSFileManager *fm = [NSFileManager defaultManager];
     [fm removeItemAtPath:@"contextTest.tightdb" error:nil];
     [fm removeItemAtPath:@"contextTest.tightdb.lock" error:nil];
-    
-    /* Create datafile with a new table. */
-    TDBContext *context = [TDBContext contextWithPersistenceToFile:@"contextTest.tightdb"
-                                                             error:nil];
 
-    /* Perform a write transaction (with commit to file). */
+    // Create datafile with a new table
+    TDBContext *context = [TDBContext contextPersistedAtPath:@"contextTest.tightdb"
+                                                       error:nil];
+
+    // Perform a write transaction (with commit to file)
     NSError *error = nil;
     BOOL success;
-    success = [context writeWithBlock:^(TDBTransaction *transaction) {
-        PeopleTable *table = [transaction createTableWithName:@"employees"
-                                                 asTableClass:[PeopleTable class]];
+    success = [context writeUsingBlock:^(TDBTransaction *transaction) {
+        People *table = [transaction createTableWithName:@"employees"
+                                            asTableClass:[People class]];
         [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
-        
-        return YES; /* Commit */
+
+        return YES; // Commit
     } error:&error];
     if (!success)
         NSLog(@"write-transaction failed: %@", [error description]);
 
-    
-    /* Perform a write transaction (with rollback). */
-    success = [context writeWithBlock:^(TDBTransaction *transaction) {
-        PeopleTable *table = [transaction createTableWithName:@"employees"
-                                                 asTableClass:[PeopleTable class]];
+    // Perform a write transaction (with rollback)
+    success = [context writeUsingBlock:^(TDBTransaction *transaction) {
+        People *table = [transaction createTableWithName:@"employees"
+                                            asTableClass:[People class]];
         if ([table rowCount] == 0) {
             NSLog(@"Roll back!");
-            return NO; /* Rollback */
+            return NO;
         }
         [table addName:@"Bill" Age:53 Hired:YES];
         NSLog(@"Commit!");
-        return YES; /* Commit */
+        return YES;
     } error:&error];
     if (!success)
         NSLog(@"Transaction Rolled back : %@", [error description]);
 
-    
-    /* Perfrom a read transaction */
-    [context readWithBlock:^(TDBTransaction *group) {
-        PeopleTable *table = [group tableWithName:@"employees"
-                                     asTableClass:[PeopleTable class]];
-        for (PeopleTableRow *row in table) {
+    // Perform a read transaction
+    [context readUsingBlock:^(TDBTransaction *transaction) {
+        People *table = [transaction tableWithName:@"employees"
+                                      asTableClass:[People class]];
+        for (PeopleRow *row in table) {
             NSLog(@"Name: %@", row.Name);
         }
     }];
