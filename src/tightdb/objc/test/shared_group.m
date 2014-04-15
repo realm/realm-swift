@@ -147,12 +147,12 @@ TIGHTDB_TABLE_2(SharedTable2,
     
     // Test adding rows for multi-column table
     NSString* const TDBTableNameEmployee = @"Employee";
-    TDBTable* employeeTable = [transaction createTableWithName:TDBTableNameEmployee columns:@[@"id", @"string", @"name", @"string", @"position", @"string"]];
+    TDBTable* employeeTable = [transaction createTableWithName:TDBTableNameEmployee columns:@[@"id", @"int", @"name", @"string", @"position", @"string"]];
     STAssertTrue(employeeTable.columnCount == 3, @"Table should have 3 column");
     STAssertTrue([[employeeTable nameOfColumnWithIndex:0] isEqualToString:@"id"], @"Column at index 0 should be id");
     STAssertTrue([[employeeTable nameOfColumnWithIndex:1] isEqualToString:@"name"], @"Column at index 1 should be name");
     STAssertTrue([[employeeTable nameOfColumnWithIndex:2] isEqualToString:@"position"], @"Column at index 0 should be position");
-    STAssertNoThrow(([employeeTable addRow:@{@"name" : @"Engineering"}]), @"Adding row should not throw exception");
+    STAssertNoThrow(([employeeTable addRow:@{@"id" : @124312, @"name" : @"Fiel Guhit", @"position" : @"iOS Engineer"}]), @"Adding row should not throw exception");
 }
 
 - (void) testReadTransaction
