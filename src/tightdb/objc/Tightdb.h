@@ -23,7 +23,7 @@
 #import <tightdb/objc/TDBView.h>
 #import <tightdb/objc/TDBQuery.h>
 #import <tightdb/objc/TDBRow.h>
-#import <tightdb/objc/TDBContext.h>
+#import <tightdb/objc/RLMRealm.h>
 #import <tightdb/objc/TDBSmartContext.h>
 #import <tightdb/objc/TDBVersion.h>
 

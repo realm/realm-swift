@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="CIDR_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/NSData+TDBGetBinaryData.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/NSData+TDBGetBinaryData.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/NSData+TDBGetBinaryData.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/NSData+TDBGetBinaryData.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/PrivateHelperMacros.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/PrivateHelperMacros.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/PrivateTDB.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/PrivateTDB.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/PrivateTableMacros.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/PrivateTableMacros.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/PrivateTableMacros.h.cheetah">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/PrivateTableMacros.h.cheetah" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBColumnProxy.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBColumnProxy.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBColumnProxy.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBColumnProxy.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBConstants.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBConstants.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBConstants.m">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBConstants.m" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/RLMRealm.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/RLMRealm.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/RLMRealm.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/RLMRealm.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBDescriptor.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBDescriptor.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBDescriptor.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBDescriptor.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBDescriptor_noinst.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBDescriptor_noinst.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBQuery.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBQuery.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBQuery.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBQuery.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBQueryFast.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBQueryFast.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBQuery_noinst.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBQuery_noinst.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBRow.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBRow.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBRow.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBRow.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBRowFast.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBRowFast.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBSmartContext.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBSmartContext.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBSmartContext.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBSmartContext.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBSmartContext_noinst.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBSmartContext_noinst.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBTable.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBTable.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBTable.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBTable.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBTable_noinst.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBTable_noinst.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBTransaction.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBTransaction.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBTransaction.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBTransaction.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBTransaction_noinst.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBTransaction_noinst.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBType.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBType.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBVersion.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBVersion.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBVersion.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBVersion.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBView.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBView.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBView.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBView.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBViewProtocol.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBViewProtocol.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TDBView_noinst.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TDBView_noinst.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/Tightdb.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/Tightdb.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/TightdbFast.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/TightdbFast.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/group.h">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/group.h" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/data_type.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/data_type.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/dynamic_table.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/dynamic_table.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/enumerator.m">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/enumerator.m" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/err_handling.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/err_handling.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/functional.m">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/functional.m" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/get_subtable.m">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/get_subtable.m" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/group.m">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/group.m" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/group_misc_2.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/group_misc_2.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/mixed.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/mixed.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/query.m">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/query.m" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/shared_group.m">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/shared_group.m" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/subtable.m">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/subtable.m" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/table_delete_all.m">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/table_delete_all.m" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/table_view.m">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/table_view.m" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/template.m">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/template.m" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/tutorial.m">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/tutorial.m" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/typed_table.m">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/typed_table.m" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/test/version.m">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/test/version.m" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/util.mm">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/util.mm" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../src/tightdb/objc/util_noinst.hpp">
+      <sourceFolder url="file://$MODULE_DIR$/../src/tightdb/objc/util_noinst.hpp" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
+

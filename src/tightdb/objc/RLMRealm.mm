@@ -21,14 +21,14 @@
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/group_shared.hpp>
 
-#import "TDBContext.h"
+#import "RLMRealm.h"
 #import "TDBTransaction_noinst.h"
 #import "util_noinst.hpp"
 
 using namespace std;
 
 
-@implementation TDBContext
+@implementation RLMRealm
 {
     tightdb::util::UniquePtr<tightdb::SharedGroup> m_shared_group;
 }
@@ -37,13 +37,13 @@ NSString *const defaultContextFileName = @"default.tightdb";
 
 +(NSString *)defaultPath
 {
-    return [TDBContext writeablePathForFile:defaultContextFileName];
+    return [RLMRealm writeablePathForFile:defaultContextFileName];
 }
 
 
-+(TDBContext *)contextWithDefaultPersistence
++(RLMRealm *)contextWithDefaultPersistence
 {
-    NSString *path = [TDBContext writeablePathForFile:defaultContextFileName];
+    NSString *path = [RLMRealm writeablePathForFile:defaultContextFileName];
     return [self contextPersistedAtPath:path error:nil];
 }
 
@@ -56,9 +56,9 @@ NSString *const defaultContextFileName = @"default.tightdb";
 
 
 
-+(TDBContext*)contextPersistedAtPath:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
++(RLMRealm *)contextPersistedAtPath:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
 {
-    TDBContext* shared_group = [[TDBContext alloc] init];
+    RLMRealm * shared_group = [[RLMRealm alloc] init];
     if (!shared_group)
         return nil;
     try {
