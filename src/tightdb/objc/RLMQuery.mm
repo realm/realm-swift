@@ -113,7 +113,7 @@ using namespace std;
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    // NSLog(@"TDBQuery dealloc");
+    // NSLog(@"RLMQuery dealloc");
 #endif
 }
 

@@ -28,7 +28,7 @@
 
 #import "TDBTable_noinst.h"
 #import "TDBView_noinst.h"
-#import "TDBQuery_noinst.h"
+#import "RLMQuery_noinst.h"
 #import "TDBRow.h"
 #import "RLMDescriptor_noinst.h"
 #import "TDBColumnProxy.h"
