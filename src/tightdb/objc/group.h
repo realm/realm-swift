@@ -30,7 +30,6 @@
 
 #import "RLMTransaction.h"
 
-@class TDBBinary;
 @class RLMTable;
 
 
