@@ -23,7 +23,7 @@
 #import "RLMRow.h"
 #import "TDBTable_noinst.h"
 #import "PrivateTDB.h"
-#import "TDBRowFast.h"
+#import "RLMRowFast.h"
 #import "util_noinst.hpp"
 
 using namespace std;
