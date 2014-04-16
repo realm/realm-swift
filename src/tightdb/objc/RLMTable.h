@@ -39,13 +39,13 @@
 -(instancetype)initWithColumns:(NSArray *)columns;
 
 // Working with columns
--(NSUInteger)addColumnWithName:(NSString *)name type:(TDBType)type;
+-(NSUInteger)addColumnWithName:(NSString *)name type:(RLMType)type;
 -(void)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString *)newName;
 -(void)removeColumnWithIndex:(NSUInteger)colIndex;
 
 -(NSString *)nameOfColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)indexOfColumnWithName:(NSString *)name;
--(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
+-(RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
 // Getting individual rows
 -(RLMRow *)rowAtIndex:(NSUInteger)rowIndex;
@@ -90,6 +90,6 @@
 // FIXME: implement method below and reenable and document it
 // -(BOOL)hasSameDescriptorAs:(Class)otherTableClass;
 
--(TDBType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(RLMType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 
 @end

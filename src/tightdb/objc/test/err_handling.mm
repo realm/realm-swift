@@ -167,39 +167,39 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     // Create table with all column types
     RLMTable* table = [[RLMTable alloc] init];
     RLMDescriptor * desc = [table descriptor];
-    if (![desc addColumnWithName:@"int" type:TDBIntType]) {
+    if (![desc addColumnWithName:@"int" type:RLMTypeInt]) {
         XCTFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithName:@"bool" type:TDBBoolType]) {
+    if (![desc addColumnWithName:@"bool" type:RLMTypeBool]) {
         XCTFail(@"addColumn failed.");
     }
 
-    if (![desc addColumnWithName:@"date" type:TDBDateType]) {
+    if (![desc addColumnWithName:@"date" type:RLMTypeDate]) {
         XCTFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithName:@"string" type:TDBStringType]) {
+    if (![desc addColumnWithName:@"string" type:RLMTypeString]) {
         XCTFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithName:@"string_long" type:TDBStringType]) {
+    if (![desc addColumnWithName:@"string_long" type:RLMTypeString]) {
         XCTFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithName:@"string_enum" type:TDBStringType]) {
+    if (![desc addColumnWithName:@"string_enum" type:RLMTypeString]) {
         XCTFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithName:@"binary" type:TDBBinaryType]) {
+    if (![desc addColumnWithName:@"binary" type:RLMTypeBinary]) {
         XCTFail(@"addColumn failed.");
     }
-    if (![desc addColumnWithName:@"mixed" type:TDBMixedType]) {
+    if (![desc addColumnWithName:@"mixed" type:RLMTypeMixed]) {
         XCTFail(@"addColumn failed.");
     }
     RLMDescriptor * subdesc;
     if (!(subdesc = [desc addColumnTable:@"tables"])) {
         XCTFail(@"addColumn failed.");
     }
-    if (![subdesc addColumnWithName:@"sub_first" type:TDBIntType]) {
+    if (![subdesc addColumnWithName:@"sub_first" type:RLMTypeInt]) {
         XCTFail(@"addColumn failed.");
     }
-    if (![subdesc addColumnWithName:@"sub_second" type:TDBStringType]) {
+    if (![subdesc addColumnWithName:@"sub_second" type:RLMTypeString]) {
         XCTFail(@"addColumn failed.");
     }
 

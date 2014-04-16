@@ -50,15 +50,15 @@ TIGHTDB_TABLE_9(TestTableAllTypes,
     XCTAssertNotNil(table, @"Table is nil");
 
     // Verify column types
-    XCTAssertEqual(TDBBoolType,   [table columnTypeOfColumnWithIndex:0], @"First column not bool");
-    XCTAssertEqual(TDBIntType,    [table columnTypeOfColumnWithIndex:1], @"Second column not int");
-    XCTAssertEqual(TDBFloatType,  [table columnTypeOfColumnWithIndex:2], @"Third column not float");
-    XCTAssertEqual(TDBDoubleType, [table columnTypeOfColumnWithIndex:3], @"Fourth column not double");
-    XCTAssertEqual(TDBStringType, [table columnTypeOfColumnWithIndex:4], @"Fifth column not string");
-    XCTAssertEqual(TDBBinaryType, [table columnTypeOfColumnWithIndex:5], @"Sixth column not binary");
-    XCTAssertEqual(TDBDateType,   [table columnTypeOfColumnWithIndex:6], @"Seventh column not date");
-    XCTAssertEqual(TDBTableType,  [table columnTypeOfColumnWithIndex:7], @"Eighth column not table");
-    XCTAssertEqual(TDBMixedType,  [table columnTypeOfColumnWithIndex:8], @"Ninth column not mixed");
+    XCTAssertEqual(RLMTypeBool,   [table columnTypeOfColumnWithIndex:0], @"First column not bool");
+    XCTAssertEqual(RLMTypeInt,    [table columnTypeOfColumnWithIndex:1], @"Second column not int");
+    XCTAssertEqual(RLMTypeFloat,  [table columnTypeOfColumnWithIndex:2], @"Third column not float");
+    XCTAssertEqual(RLMTypeDouble, [table columnTypeOfColumnWithIndex:3], @"Fourth column not double");
+    XCTAssertEqual(RLMTypeString, [table columnTypeOfColumnWithIndex:4], @"Fifth column not string");
+    XCTAssertEqual(RLMTypeBinary, [table columnTypeOfColumnWithIndex:5], @"Sixth column not binary");
+    XCTAssertEqual(RLMTypeDate,   [table columnTypeOfColumnWithIndex:6], @"Seventh column not date");
+    XCTAssertEqual(RLMTypeTable,  [table columnTypeOfColumnWithIndex:7], @"Eighth column not table");
+    XCTAssertEqual(RLMTypeMixed,  [table columnTypeOfColumnWithIndex:8], @"Ninth column not mixed");
 
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];

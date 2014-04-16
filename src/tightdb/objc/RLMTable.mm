@@ -228,9 +228,9 @@ using namespace std;
     return was_not_found(m_table->get_column_index(ObjcStringAccessor(name)));
 }
 
--(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)ndx
+-(RLMType)columnTypeOfColumnWithIndex:(NSUInteger)ndx
 {
-    return TDBType(m_table->get_column_type(ndx));
+    return RLMType(m_table->get_column_type(ndx));
 }
 
 -(RLMDescriptor*)descriptor
@@ -556,49 +556,49 @@ using namespace std;
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_bool(col_ndx, row_ndx, value);,
-        TDBBoolType);
+    RLMTypeBool);
 }
 
 -(void)TDB_setInt:(int64_t)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_int(col_ndx, row_ndx, value);,
-        TDBIntType);
+        RLMTypeInt);
 }
 
 -(void)TDB_setFloat:(float)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_float(col_ndx, row_ndx, value);,
-        TDBFloatType);
+        RLMTypeFloat);
 }
 
 -(void)TDB_setDouble:(double)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_double(col_ndx, row_ndx, value);,
-        TDBDoubleType);
+        RLMTypeDouble);
 }
 
 -(void)TDB_setString:(NSString*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_string(col_ndx, row_ndx, ObjcStringAccessor(value));,
-        TDBStringType);
+        RLMTypeString);
 }
 
 -(void)TDB_setBinary:(NSData*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_binary(col_ndx, row_ndx, ((NSData *)value).rlmBinaryData);,
-        TDBBinaryType);
+        RLMTypeBinary);
 }
 
 -(void)TDB_setDate:(NSDate *)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
        m_table->set_datetime(col_ndx, row_ndx, tightdb::DateTime((time_t)[value timeIntervalSince1970]));,
-       TDBDateType);
+       RLMTypeDate);
 }
 
 -(void)TDB_setTable:(RLMTable *)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
@@ -608,7 +608,7 @@ using namespace std;
 
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         m_table->set_subtable(col_ndx, row_ndx, &[value getNativeTable]);,
-        TDBTableType);
+        RLMTypeTable);
 }
 
 -(void)TDB_setMixed:(id)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
@@ -624,7 +624,7 @@ using namespace std;
         else {
             m_table->set_mixed(col_ndx, row_ndx, mixed);
         },
-        TDBMixedType);
+        RLMTypeMixed);
 }
 
 
@@ -858,9 +858,9 @@ using namespace std;
 
 
 
--(TDBType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(RLMType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
-    return TDBType(m_table->get_mixed_type(colIndex, rowIndex));
+    return RLMType(m_table->get_mixed_type(colIndex, rowIndex));
 }
 
 -(BOOL)TDB_insertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(id)value
@@ -896,12 +896,12 @@ using namespace std;
 }
 
 
--(NSUInteger)addColumnWithName:(NSString*)name type:(TDBType)type
+-(NSUInteger)addColumnWithName:(NSString*)name type:(RLMType)type
 {
     return [self addColumnWithType:type andName:name error:nil];
 }
 
--(NSUInteger)addColumnWithType:(TDBType)type andName:(NSString*)name error:(NSError* __autoreleasing*)error
+-(NSUInteger)addColumnWithType:(RLMType)type andName:(NSString*)name error:(NSError* __autoreleasing*)error
 {
     TIGHTDB_EXCEPTION_ERRHANDLER(
         return m_table->add_column(tightdb::DataType(type), ObjcStringAccessor(name));,
@@ -1027,9 +1027,9 @@ using namespace std;
 
 -(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex
 {
-    if (!([self columnTypeOfColumnWithIndex:colIndex] == TDBStringType)) {
+    if (!([self columnTypeOfColumnWithIndex:colIndex] == RLMTypeString)) {
         @throw [NSException exceptionWithName:@"tightdb:column_type_not_supported"
-                                       reason:@"Distinct currently only supported on columns of type TDBStringType"
+                                       reason:@"Distinct currently only supported on columns of type RLMTypeString"
                                      userInfo:nil];
     }
     if (![self isIndexCreatedInColumnWithIndex:colIndex]) {
@@ -1356,9 +1356,9 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
         }
 
         NSUInteger index = validated_column_index(self, columnName);
-        TDBType columnType = [self columnTypeOfColumnWithIndex:index];
+        RLMType columnType = [self columnTypeOfColumnWithIndex:index];
 
-        if (columnType != TDBIntType && columnType != TDBBoolType && columnType != TDBDateType) {
+        if (columnType != RLMTypeInt && columnType != RLMTypeBool && columnType != RLMTypeDate) {
             @throw predicate_exception(@"Invalid sort column type",
                                        @"Sort only supported on Integer, Date and Boolean columns.");
         }

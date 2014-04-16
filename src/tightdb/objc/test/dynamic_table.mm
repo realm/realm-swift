@@ -50,12 +50,12 @@ using namespace std;
     XCTAssertNotNil(table, @"Table is nil");
 
     // 1. Add two columns
-    [table addColumnWithName:@"first" type:TDBIntType];
-    [table addColumnWithName:@"second" type:TDBIntType];
+    [table addColumnWithName:@"first" type:RLMTypeInt];
+    [table addColumnWithName:@"second" type:RLMTypeInt];
 
     // Verify
-    XCTAssertEqual(TDBIntType, [table columnTypeOfColumnWithIndex:0], @"First column not int");
-    XCTAssertEqual(TDBIntType, [table columnTypeOfColumnWithIndex:1], @"Second column not int");
+    XCTAssertEqual(RLMTypeInt, [table columnTypeOfColumnWithIndex:0], @"First column not int");
+    XCTAssertEqual(RLMTypeInt, [table columnTypeOfColumnWithIndex:1], @"Second column not int");
     XCTAssertTrue(([[table nameOfColumnWithIndex:0] isEqualToString:@"first"]), @"First not equal to first");
     XCTAssertTrue(([[table nameOfColumnWithIndex:1] isEqualToString:@"second"]), @"Second not equal to second");
 
@@ -78,7 +78,7 @@ using namespace std;
 -(void)testAddColumn
 {
     RLMTable *t = [[RLMTable alloc] init];
-    NSUInteger stringColIndex = [t addColumnWithName:@"stringCol" type:TDBStringType];
+    NSUInteger stringColIndex = [t addColumnWithName:@"stringCol" type:RLMTypeString];
     RLMRow *row = [t addEmptyRow];
     [row setString:@"val" inColumnWithIndex:stringColIndex];
 }
@@ -87,7 +87,7 @@ using namespace std;
 {
     // Add row using object literate
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBIntType];
+    [t addColumnWithName:@"first" type:RLMTypeInt];
     XCTAssertNoThrow([t addRow:@[ @1 ]], @"Impossible!");
     XCTAssertEqual((size_t)1, [t rowCount], @"Expected 1 row");
     XCTAssertNoThrow([t addRow:@[ @2 ]], @"Impossible!");
@@ -102,7 +102,7 @@ using namespace std;
 {
     // Add row using object literate
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBIntType];
+    [t addColumnWithName:@"first" type:RLMTypeInt];
     XCTAssertNoThrow([t insertRow:@[ @1 ] atIndex:0], @"Impossible!");
     XCTAssertEqual((size_t)1, [t rowCount], @"Expected 1 row");
     XCTAssertNoThrow([t insertRow:@[ @2 ] atIndex:0], @"Impossible!");
@@ -116,7 +116,7 @@ using namespace std;
 -(void)testUpdateRowIntColumn
 {
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBIntType];
+    [t addColumnWithName:@"first" type:RLMTypeInt];
     [t insertRow:@[@1] atIndex:0];
     t[0] = @[@2];
     XCTAssertEqual((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
@@ -125,8 +125,8 @@ using namespace std;
 -(void)testAppendRowGenericObject
 {
     RLMTable* table1 = [[RLMTable alloc] init];
-    [table1 addColumnWithName:@"name" type:TDBStringType];
-    [table1 addColumnWithName:@"age" type:TDBIntType];
+    [table1 addColumnWithName:@"name" type:RLMTypeString];
+    [table1 addColumnWithName:@"age" type:RLMTypeInt];
 
     TestClass *person = [TestClass new];
     person.name = @"Joe";
@@ -137,8 +137,8 @@ using namespace std;
     XCTAssertTrue([((NSString *)table1[0][@"name"]) isEqualToString:@"Joe"], @"'Joe' excepted");
 
     RLMTable* table2 = [[RLMTable alloc] init];
-    [table2 addColumnWithName:@"name" type:TDBStringType];
-    [table2 addColumnWithName:@"age" type:TDBStringType];
+    [table2 addColumnWithName:@"name" type:RLMTypeString];
+    [table2 addColumnWithName:@"age" type:RLMTypeString];
 
     XCTAssertThrows([table2 addRow:person], @"Impossible");
     XCTAssertEqual((NSUInteger)0, table2.rowCount, @"0 rows excepted");
@@ -147,7 +147,7 @@ using namespace std;
 -(void)testUpdateRowWithLabelsIntColumn
 {
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBIntType];
+    [t addColumnWithName:@"first" type:RLMTypeInt];
     [t insertRow:@[@1] atIndex:0];
     t[0] = @{@"first": @2};
     XCTAssertEqual((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
@@ -158,7 +158,7 @@ using namespace std;
 {
     // Add row using object literate
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBIntType];
+    [t addColumnWithName:@"first" type:RLMTypeInt];
 
     XCTAssertNoThrow([t addRow:@{ @"first": @1 }], @"Impossible!");
     XCTAssertEqual((size_t)1, [t rowCount], @"Expected 1 row");
@@ -185,7 +185,7 @@ using namespace std;
 {
     // Add row using object literate
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBIntType];
+    [t addColumnWithName:@"first" type:RLMTypeInt];
     
     XCTAssertNoThrow(([t insertRow:@{ @"first": @1 } atIndex:0]), @"Impossible!");
     XCTAssertEqual((size_t)1, [t rowCount], @"Expected 1 row");
@@ -211,8 +211,8 @@ using namespace std;
 -(void)testAppendRowsIntStringColumns
 {
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBIntType];
-    [t addColumnWithName:@"second" type:TDBStringType];
+    [t addColumnWithName:@"first" type:RLMTypeInt];
+    [t addColumnWithName:@"second" type:RLMTypeString];
 
     XCTAssertNoThrow(([t addRow:@[@1, @"Hello"]]), @"addRow 1");
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
@@ -225,8 +225,8 @@ using namespace std;
 -(void)testAppendRowWithLabelsIntStringColumns
 {
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBIntType];
-    [t addColumnWithName:@"second" type:TDBStringType];
+    [t addColumnWithName:@"first" type:RLMTypeInt];
+    [t addColumnWithName:@"second" type:RLMTypeString];
     XCTAssertNoThrow(([t addRow:@{@"first": @1, @"second": @"Hello"}]), @"addRowWithLabels 1");
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
     XCTAssertEqual((int64_t)1, ([t TDB_intInColumnWithIndex:0 atRowIndex:0]), @"Value 1 expected");
@@ -238,7 +238,7 @@ using namespace std;
 -(void)testAppendRowsDoubleColumn
 {
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBDoubleType];
+    [t addColumnWithName:@"first" type:RLMTypeDouble];
     XCTAssertNoThrow(([t addRow:@[@3.14]]), @"Cannot insert 'double'");  /* double is default */
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
 }
@@ -246,7 +246,7 @@ using namespace std;
 -(void)testAppendRowWithLabelsDoubleColumn
 {
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBDoubleType];
+    [t addColumnWithName:@"first" type:RLMTypeDouble];
     XCTAssertNoThrow(([t addRow:@{@"first": @3.14}]), @"Cannot insert 'double'");   /* double is default */
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
 }
@@ -254,7 +254,7 @@ using namespace std;
 -(void)testAppendRowsFloatColumn
 {
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBFloatType];
+    [t addColumnWithName:@"first" type:RLMTypeFloat];
     XCTAssertNoThrow(([t addRow:@[@3.14F]]), @"Cannot insert 'float'"); /* F == float */
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
 }
@@ -262,7 +262,7 @@ using namespace std;
 -(void)testAppendRowWithLabelsFloatColumn
 {
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBFloatType];
+    [t addColumnWithName:@"first" type:RLMTypeFloat];
     XCTAssertNoThrow(([t addRow:@{@"first": @3.14F}]), @"Cannot insert 'float'");   /* F == float */
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
 }
@@ -270,7 +270,7 @@ using namespace std;
 -(void)testAppendRowsDateColumn
 {
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBDateType];
+    [t addColumnWithName:@"first" type:RLMTypeDate];
     XCTAssertNoThrow(([t addRow:@[@1000000000]]), @"Cannot insert 'time_t'"); /* 2001-09-09 01:46:40 */
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
 
@@ -282,7 +282,7 @@ using namespace std;
 -(void)testAppendRowWithLabelsDateColumn
 {
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBDateType];
+    [t addColumnWithName:@"first" type:RLMTypeDate];
 
     XCTAssertNoThrow(([t addRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   // 2001-09-09 01:46:40
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
@@ -315,7 +315,7 @@ using namespace std;
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin2 = [[NSData alloc] initWithBytes:(const void *)bin length:sizeof bin];
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBBinaryType];
+    [t addColumnWithName:@"first" type:RLMTypeBinary];
     XCTAssertNoThrow(([t addRow:@[bin2]]), @"Cannot insert 'binary'");
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
 
@@ -330,7 +330,7 @@ using namespace std;
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin2 = [[NSData alloc] initWithBytes:(const void *)bin length:sizeof bin];
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBBinaryType];
+    [t addColumnWithName:@"first" type:RLMTypeBinary];
 
     XCTAssertNoThrow(([t addRow:@{@"first": bin2}]), @"Cannot insert 'binary'");
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
@@ -343,21 +343,21 @@ using namespace std;
 -(void)testAppendRowsTooManyItems
 {
     RLMTable *t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBIntType];
+    [t addColumnWithName:@"first" type:RLMTypeInt];
     XCTAssertThrows(([t addRow:@[@1, @1]]), @"Too many items for a row.");
 }
 
 -(void)testAppendRowsTooFewItems
 {
     RLMTable *t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBIntType];
+    [t addColumnWithName:@"first" type:RLMTypeInt];
     XCTAssertThrows(([t addRow:@[]]),  @"Too few items for a row.");
 }
 
 -(void)testAppendRowsWrongType
 {
     RLMTable *t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBIntType];
+    [t addColumnWithName:@"first" type:RLMTypeInt];
     XCTAssertThrows(([t addRow:@[@YES]]), @"Wrong type for column.");
     XCTAssertThrows(([t addRow:@[@""]]),  @"Wrong type for column.");
     XCTAssertThrows(([t addRow:@[@3.5]]), @"Wrong type for column.");
@@ -368,7 +368,7 @@ using namespace std;
 -(void)testAppendRowsBoolColumn
 {
     RLMTable *t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBBoolType];
+    [t addColumnWithName:@"first" type:RLMTypeBool];
     XCTAssertNoThrow(([t addRow:@[@YES]]), @"Cannot append bool column.");
     XCTAssertNoThrow(([t addRow:@[@NO]]), @"Cannot append bool column.");
     XCTAssertEqual((size_t)2, [t rowCount], @"2 rows expected");
@@ -377,7 +377,7 @@ using namespace std;
 -(void)testAppendRowWithLabelsBoolColumn
 {
     RLMTable *t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBBoolType];
+    [t addColumnWithName:@"first" type:RLMTypeBool];
     XCTAssertNoThrow(([t addRow:@{@"first": @YES}]), @"Cannot append bool column.");
     XCTAssertNoThrow(([t addRow:@{@"first": @NO}]), @"Cannot append bool column.");
     XCTAssertEqual((size_t)2, [t rowCount], @"2 rows expected");
@@ -386,10 +386,10 @@ using namespace std;
 -(void)testAppendRowsIntSubtableColumns
 {
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBIntType];
+    [t addColumnWithName:@"first" type:RLMTypeInt];
     RLMDescriptor * descr = [t descriptor];
     RLMDescriptor * subdescr = [descr addColumnTable:@"second"];
-    [subdescr addColumnWithName:@"TableCol_IntCol" type:TDBIntType];
+    [subdescr addColumnWithName:@"TableCol_IntCol" type:RLMTypeInt];
     XCTAssertNoThrow(([t addRow:@[@1, @[]]]), @"1 row excepted");
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
     XCTAssertNoThrow(([t addRow:@[@2, @[ @[@3], @[@4] ] ]]), @"Wrong");
@@ -402,7 +402,7 @@ using namespace std;
     NSData* bin2 = [[NSData alloc] initWithBytes:(const void *)bin length:sizeof bin];
 
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBMixedType];
+    [t addColumnWithName:@"first" type:RLMTypeMixed];
     XCTAssertNoThrow(([t addRow:@[@1]]), @"Cannot insert 'int'");
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row excepted");
     XCTAssertNoThrow(([t addRow:@[@"Hello"]]), @"Cannot insert 'string'");
@@ -423,7 +423,7 @@ using namespace std;
     NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
 
     RLMTable* t = [[RLMTable alloc] init];
-    [t addColumnWithName:@"first" type:TDBMixedType];
+    [t addColumnWithName:@"first" type:RLMTypeMixed];
     XCTAssertNoThrow(([t addRow:@{@"first": @1}]), @"Cannot insert 'int'");
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row excepted");
     XCTAssertNoThrow(([t addRow:@{@"first": @"Hello"}]), @"Cannot insert 'string'$");
@@ -442,14 +442,14 @@ using namespace std;
 {
 
     RLMTable *table = [[RLMTable alloc] init];
-    [table addColumnWithName:@"col0" type:TDBIntType];
+    [table addColumnWithName:@"col0" type:RLMTypeInt];
     XCTAssertTrue(table.columnCount == 1,@"1 column added" );
 
     [table removeColumnWithIndex:0];
     XCTAssertTrue(table.columnCount  == 0, @"Colum removed");
 
     for (int i=0;i<10;i++) {
-        [table addColumnWithName:@"name" type:TDBIntType];
+        [table addColumnWithName:@"name" type:RLMTypeInt];
     }
 
     XCTAssertThrows([table removeColumnWithIndex:10], @"Out of bounds");
@@ -471,7 +471,7 @@ using namespace std;
     RLMTable *table = [[RLMTable alloc] init];
     XCTAssertThrows([table renameColumnWithIndex:0 to:@"someName"], @"Out of bounds");
     
-    [table addColumnWithName:@"oldName" type:TDBIntType];
+    [table addColumnWithName:@"oldName" type:RLMTypeInt];
     
     [table renameColumnWithIndex:0 to:@"newName"];
     XCTAssertEqualObjects([table nameOfColumnWithIndex:0], @"newName", @"Get column name");
@@ -482,7 +482,7 @@ using namespace std;
     XCTAssertThrows([table renameColumnWithIndex:1 to:@"someName"], @"Out of bounds");
     XCTAssertThrows([table renameColumnWithIndex:-1 to:@"someName"], @"Less than zero colIndex");
     
-    [table addColumnWithName:@"oldName2" type:TDBIntType];
+    [table addColumnWithName:@"oldName2" type:RLMTypeInt];
     [table renameColumnWithIndex:1 to:@"newName2"];
     XCTAssertEqualObjects([table nameOfColumnWithIndex:1], @"newName2", @"Get column name");
     
@@ -908,28 +908,28 @@ using namespace std;
 
     RLMDescriptor * desc = [table descriptor];
 
-    [desc addColumnWithName:@"BoolCol" type:TDBBoolType];    const size_t BoolCol = 0;
-    [desc addColumnWithName:@"IntCol" type:TDBIntType];     const size_t IntCol = 1;
-    [desc addColumnWithName:@"FloatCol" type:TDBFloatType];   const size_t FloatCol = 2;
-    [desc addColumnWithName:@"DoubleCol" type:TDBDoubleType];  const size_t DoubleCol = 3;
-    [desc addColumnWithName:@"StringCol" type:TDBStringType];  const size_t StringCol = 4;
-    [desc addColumnWithName:@"BinaryCol" type:TDBBinaryType];  const size_t BinaryCol = 5;
-    [desc addColumnWithName:@"DateCol" type:TDBDateType];    const size_t DateCol = 6;
+    [desc addColumnWithName:@"BoolCol" type:RLMTypeBool];    const size_t BoolCol = 0;
+    [desc addColumnWithName:@"IntCol" type:RLMTypeInt];     const size_t IntCol = 1;
+    [desc addColumnWithName:@"FloatCol" type:RLMTypeFloat];   const size_t FloatCol = 2;
+    [desc addColumnWithName:@"DoubleCol" type:RLMTypeDouble];  const size_t DoubleCol = 3;
+    [desc addColumnWithName:@"StringCol" type:RLMTypeString];  const size_t StringCol = 4;
+    [desc addColumnWithName:@"BinaryCol" type:RLMTypeBinary];  const size_t BinaryCol = 5;
+    [desc addColumnWithName:@"DateCol" type:RLMTypeDate];    const size_t DateCol = 6;
     RLMDescriptor * subdesc = [desc addColumnTable:@"TableCol"]; const size_t TableCol = 7;
-    [desc addColumnWithName:@"MixedCol" type:TDBMixedType];   const size_t MixedCol = 8;
+    [desc addColumnWithName:@"MixedCol" type:RLMTypeMixed];   const size_t MixedCol = 8;
 
-    [subdesc addColumnWithName:@"TableCol_IntCol" type:TDBIntType];
+    [subdesc addColumnWithName:@"TableCol_IntCol" type:RLMTypeInt];
 
     // Verify column types
-    XCTAssertEqual(TDBBoolType,   [table columnTypeOfColumnWithIndex:0], @"First column not bool");
-    XCTAssertEqual(TDBIntType,    [table columnTypeOfColumnWithIndex:1], @"Second column not int");
-    XCTAssertEqual(TDBFloatType,  [table columnTypeOfColumnWithIndex:2], @"Third column not float");
-    XCTAssertEqual(TDBDoubleType, [table columnTypeOfColumnWithIndex:3], @"Fourth column not double");
-    XCTAssertEqual(TDBStringType, [table columnTypeOfColumnWithIndex:4], @"Fifth column not string");
-    XCTAssertEqual(TDBBinaryType, [table columnTypeOfColumnWithIndex:5], @"Sixth column not binary");
-    XCTAssertEqual(TDBDateType,   [table columnTypeOfColumnWithIndex:6], @"Seventh column not date");
-    XCTAssertEqual(TDBTableType,  [table columnTypeOfColumnWithIndex:7], @"Eighth column not table");
-    XCTAssertEqual(TDBMixedType,  [table columnTypeOfColumnWithIndex:8], @"Ninth column not mixed");
+    XCTAssertEqual(RLMTypeBool,   [table columnTypeOfColumnWithIndex:0], @"First column not bool");
+    XCTAssertEqual(RLMTypeInt,    [table columnTypeOfColumnWithIndex:1], @"Second column not int");
+    XCTAssertEqual(RLMTypeFloat,  [table columnTypeOfColumnWithIndex:2], @"Third column not float");
+    XCTAssertEqual(RLMTypeDouble, [table columnTypeOfColumnWithIndex:3], @"Fourth column not double");
+    XCTAssertEqual(RLMTypeString, [table columnTypeOfColumnWithIndex:4], @"Fifth column not string");
+    XCTAssertEqual(RLMTypeBinary, [table columnTypeOfColumnWithIndex:5], @"Sixth column not binary");
+    XCTAssertEqual(RLMTypeDate,   [table columnTypeOfColumnWithIndex:6], @"Seventh column not date");
+    XCTAssertEqual(RLMTypeTable,  [table columnTypeOfColumnWithIndex:7], @"Eighth column not table");
+    XCTAssertEqual(RLMTypeMixed,  [table columnTypeOfColumnWithIndex:8], @"Ninth column not mixed");
 
 
     const char bin[4] = { 0, 1, 2, 3 };
@@ -938,10 +938,10 @@ using namespace std;
     NSDate *timeNow = [NSDate date];
 
     RLMTable* subtab1 = [[RLMTable alloc] init];
-    [subtab1 addColumnWithName:@"TableCol_IntCol" type:TDBIntType];
+    [subtab1 addColumnWithName:@"TableCol_IntCol" type:RLMTypeInt];
 
     RLMTable* subtab2 = [[RLMTable alloc] init];
-    [subtab2 addColumnWithName:@"TableCol_IntCol" type:TDBIntType];
+    [subtab2 addColumnWithName:@"TableCol_IntCol" type:RLMTypeInt];
 
     RLMRow * cursor;
     cursor = [subtab1 addEmptyRow];
@@ -1022,8 +1022,8 @@ using namespace std;
     XCTAssertNotNil(table, @"Table is nil");
 
     // 1. Add two columns
-    [table addColumnWithName:@"first" type:TDBIntType];
-    [table addColumnWithName:@"second" type:TDBStringType];
+    [table addColumnWithName:@"first" type:RLMTypeInt];
+    [table addColumnWithName:@"second" type:RLMTypeString];
 
     RLMRow * row;
 
@@ -1049,7 +1049,7 @@ using namespace std;
 - (void)testFirstLastRow
 {
     RLMTable *table = [[RLMTable alloc] init];
-    NSUInteger col0 = [table addColumnWithName:@"col" type:TDBStringType];
+    NSUInteger col0 = [table addColumnWithName:@"col" type:RLMTypeString];
 
     XCTAssertNil([table firstRow], @"Table is empty");
     XCTAssertNil([table lastRow], @"Table is empty");
@@ -1070,8 +1070,8 @@ using namespace std;
     XCTAssertNotNil(table, @"Table is nil");
 
     // 1. Add two columns
-    [table addColumnWithName:@"first" type:TDBIntType];
-    [table addColumnWithName:@"second" type:TDBStringType];
+    [table addColumnWithName:@"first" type:RLMTypeInt];
+    [table addColumnWithName:@"second" type:RLMTypeString];
 
     RLMRow * row;
 
@@ -1113,13 +1113,13 @@ using namespace std;
     XCTAssertNotNil(table, @"Table is nil");
 
     // Add two columns
-    [table addColumnWithName:@"int"    type:TDBIntType];
-    [table addColumnWithName:@"string" type:TDBStringType];
-    [table addColumnWithName:@"float"  type:TDBFloatType];
-    [table addColumnWithName:@"double" type:TDBDoubleType];
-    [table addColumnWithName:@"bool"   type:TDBBoolType];
-    [table addColumnWithName:@"date"   type:TDBDateType];
-    [table addColumnWithName:@"binary" type:TDBBinaryType];
+    [table addColumnWithName:@"int"    type:RLMTypeInt];
+    [table addColumnWithName:@"string" type:RLMTypeString];
+    [table addColumnWithName:@"float"  type:RLMTypeFloat];
+    [table addColumnWithName:@"double" type:RLMTypeDouble];
+    [table addColumnWithName:@"bool" type:RLMTypeBool];
+    [table addColumnWithName:@"date"   type:RLMTypeDate];
+    [table addColumnWithName:@"binary" type:RLMTypeBinary];
 
     char bin4[] = {1, 2, 4, 4};
     // Add three rows
@@ -1153,7 +1153,7 @@ using namespace std;
     RLMTable *table = [[RLMTable alloc] init];
 
     // Mixed column
-    [table addColumnWithName:@"first" type:TDBMixedType];
+    [table addColumnWithName:@"first" type:RLMTypeMixed];
 
     // Add row
     [table addRow:@[@1]];
@@ -1202,8 +1202,8 @@ using namespace std;
     XCTAssertNotNil(table, @"Table is nil");
 
     // Add two columns
-    [table addColumnWithName:@"first" type:TDBIntType];
-    [table addColumnWithName:@"second" type:TDBStringType];
+    [table addColumnWithName:@"first" type:RLMTypeInt];
+    [table addColumnWithName:@"second" type:RLMTypeString];
 
     // Add three rows
     [table addRow:@[@1, @"Hello"]];
@@ -1219,7 +1219,7 @@ using namespace std;
     XCTAssertNotNil(table, @"Table is nil");
 
     // Add two columns
-    [table addColumnWithName:@"first" type:TDBMixedType];
+    [table addColumnWithName:@"first" type:RLMTypeMixed];
 
     // Add three rows
     [table addRow:@[@1]];
@@ -1253,8 +1253,8 @@ using namespace std;
 {
     RLMTable *t = [[RLMTable alloc] init];
     
-    NSUInteger nameIndex = [t addColumnWithName:@"name" type:TDBStringType];
-    NSUInteger ageIndex = [t addColumnWithName:@"age" type:TDBIntType];
+    NSUInteger nameIndex = [t addColumnWithName:@"name" type:RLMTypeString];
+    NSUInteger ageIndex = [t addColumnWithName:@"age" type:RLMTypeInt];
     
     XCTAssertThrows([t distinctValuesInColumnWithIndex:ageIndex], @"Not a string column");
     XCTAssertThrows([t distinctValuesInColumnWithIndex:nameIndex], @"Index not set");
@@ -1320,8 +1320,8 @@ using namespace std;
 {
     RLMTable *t = [[RLMTable alloc] init];
     
-    NSUInteger nameIndex = [t addColumnWithName:@"name" type:TDBStringType];
-    NSUInteger ageIndex = [t addColumnWithName:@"age" type:TDBIntType];
+    NSUInteger nameIndex = [t addColumnWithName:@"name" type:RLMTypeString];
+    NSUInteger ageIndex = [t addColumnWithName:@"age" type:RLMTypeInt];
 
     [t addRow:@[@"name0", @0]];
     [t addRow:@[@"name1", @1]];
@@ -1380,10 +1380,10 @@ using namespace std;
 - (void)testPredicateSort
 {
     RLMTable *t = [[RLMTable alloc] init];
-    
-    [t addColumnWithName:@"name" type:TDBStringType];
-    NSUInteger ageIndex = [t addColumnWithName:@"age" type:TDBIntType];
-    [t addColumnWithName:@"hired" type:TDBBoolType];
+
+    [t addColumnWithName:@"name" type:RLMTypeString];
+    NSUInteger ageIndex = [t addColumnWithName:@"age" type:RLMTypeInt];
+    [t addColumnWithName:@"hired" type:RLMTypeBool];
     
     [t addRow:@[@"name4", @4, [NSNumber numberWithBool:YES]]];
     [t addRow:@[@"name0",@0, [NSNumber numberWithBool:NO]]];
@@ -1423,7 +1423,7 @@ using namespace std;
 -(void)testTableDynamic_find_int
 {
     RLMTable *table = [[RLMTable alloc] init];
-    [table addColumnWithName:@"first" type:TDBIntType];
+    [table addColumnWithName:@"first" type:RLMTypeInt];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithInt:i]]];
     XCTAssertEqual((NSUInteger)5, [table findRowIndexWithInt:5 inColumnWithIndex:0], @"Cannot find element");
@@ -1433,7 +1433,7 @@ using namespace std;
 -(void)testTableDynamic_find_float
 {
     RLMTable *table = [[RLMTable alloc] init];
-    [table addColumnWithName:@"first" type:TDBFloatType];
+    [table addColumnWithName:@"first" type:RLMTypeFloat];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithFloat:(float)i]]];
     XCTAssertEqual((NSUInteger)5, [table findRowIndexWithFloat:5.0 inColumnWithIndex:0], @"Cannot find element");
@@ -1443,7 +1443,7 @@ using namespace std;
 -(void)testTableDynamic_find_double
 {
     RLMTable *table = [[RLMTable alloc] init];
-    [table addColumnWithName:@"first" type:TDBDoubleType];
+    [table addColumnWithName:@"first" type:RLMTypeDouble];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithDouble:(double)i]]];
     XCTAssertEqual((NSUInteger)5, [table findRowIndexWithDouble:5.0 inColumnWithIndex:0], @"Cannot find element");
@@ -1453,7 +1453,7 @@ using namespace std;
 -(void)testTableDynamic_find_bool
 {
     RLMTable *table = [[RLMTable alloc] init];
-    [table addColumnWithName:@"first" type:TDBBoolType];
+    [table addColumnWithName:@"first" type:RLMTypeBool];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithBool:YES]]];
     table[5][@"first"] = @NO;
@@ -1465,7 +1465,7 @@ using namespace std;
 -(void)testTableDynamic_find_string
 {
     RLMTable *table = [[RLMTable alloc] init];
-    [table addColumnWithName:@"first" type:TDBStringType];
+    [table addColumnWithName:@"first" type:RLMTypeString];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSString stringWithFormat:@"%d", i]]];
     XCTAssertEqual((NSUInteger)5, [table findRowIndexWithString:@"5" inColumnWithIndex:0], @"Cannot find element");
@@ -1475,7 +1475,7 @@ using namespace std;
 -(void)testTableDynamic_find_date
 {
     RLMTable *table = [[RLMTable alloc] init];
-    [table addColumnWithName:@"first" type:TDBDateType];
+    [table addColumnWithName:@"first" type:RLMTypeDate];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSDate dateWithTimeIntervalSince1970:i]]];
     XCTAssertEqual((NSUInteger)5, [table findRowIndexWithDate:[NSDate dateWithTimeIntervalSince1970:5] inColumnWithIndex:0], @"Cannot find element");

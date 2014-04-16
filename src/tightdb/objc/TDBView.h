@@ -20,7 +20,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "TDBType.h"
+#import "RLMType.h"
 #import "RLMTable.h"
 
 
@@ -35,10 +35,10 @@
 -(RLMRow *)lastRow;
 -(RLMRow *)firstRow;
 
--(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
+-(RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
 -(void) sortUsingColumnWithIndex: (NSUInteger)colIndex;
--(void) sortUsingColumnWithIndex: (NSUInteger)colIndex inOrder: (TDBSortOrder)order;
+-(void) sortUsingColumnWithIndex: (NSUInteger)colIndex inOrder: (RLMSortOrder)order;
 
 -(void)removeRowAtIndex:(NSUInteger)rowIndex;
 -(void)removeAllRows;

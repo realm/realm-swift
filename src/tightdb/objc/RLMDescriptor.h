@@ -28,7 +28,7 @@
 /**
  * Returns NO on memory allocation error.
  */
--(BOOL)addColumnWithName:(NSString *)name type:(TDBType)type;
+-(BOOL)addColumnWithName:(NSString *)name type:(RLMType)type;
 /**
  * Returns nil on memory allocation error.
  */
@@ -36,7 +36,7 @@
 -(RLMDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex;
 -(RLMDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex error:(NSError *__autoreleasing *)error;
 
--(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
+-(RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 -(NSString *)nameOfColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)indexOfColumnWithName:(NSString *)name;
 @end

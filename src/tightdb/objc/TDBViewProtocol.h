@@ -18,7 +18,7 @@
  *
  **************************************************************************/
 
-#include "TDBType.h"
+#include "RLMType.h"
 
 @class RLMRow;
 @class RLMQuery;
@@ -36,7 +36,7 @@
 -(RLMRow *)firstRow;
 
 // Working with columns
--(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
+-(RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
 // Removing rows
 -(void)removeRowAtIndex:(NSUInteger)rowIndex;

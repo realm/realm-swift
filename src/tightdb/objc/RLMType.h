@@ -21,23 +21,22 @@
 #define TIGHTDB_OBJC_TYPE_H
 
 /* Make sure numbers match those in <tightdb/data_type.hpp> */
-typedef enum {
-    TDBBoolType   =  1,
-    TDBIntType    =  0,
-    TDBFloatType  =  9,
-    TDBDoubleType = 10,
-    TDBStringType =  2,
-    TDBBinaryType =  4,
-    TDBDateType   =  7,
-    TDBTableType  =  5,
-    TDBMixedType  =  6,
-} TDBType;
+typedef NS_ENUM(NSInteger, RLMType) {
+    RLMTypeBool =  1,
+    RLMTypeInt =  0,
+    RLMTypeFloat =  9,
+    RLMTypeDouble = 10,
+    RLMTypeString =  2,
+    RLMTypeBinary =  4,
+    RLMTypeDate =  7,
+    RLMTypeTable =  5,
+    RLMTypeMixed =  6,
+};
 
 
-typedef enum {
-    TDBAscending   =  0,
-    TDBDescending   =  1,
-
-} TDBSortOrder;
+typedef NS_ENUM(NSInteger, RLMSortOrder) {
+    RLMSortOrderAscending =  0,
+    RLMSortOrderDescending =  1,
+};
 
 #endif /* TIGHTDB_OBJC_TYPE_H */

@@ -34,11 +34,11 @@ TIGHTDB_TABLE_2(WrongTypeTable,
     // Create table with all column types
     RLMTable* table = [[RLMTable alloc] init];
     RLMDescriptor * desc = table.descriptor;
-    [desc addColumnWithName:@"Outer" type:TDBBoolType];
-    [desc addColumnWithName:@"Number" type:TDBIntType];
+    [desc addColumnWithName:@"Outer" type:RLMTypeBool];
+    [desc addColumnWithName:@"Number" type:RLMTypeInt];
     RLMDescriptor * subdesc = [desc addColumnTable:@"GetSubtable"];
-    [subdesc addColumnWithName:@"Hired" type:TDBBoolType];
-    [subdesc addColumnWithName:@"Age" type:TDBIntType];
+    [subdesc addColumnWithName:@"Hired" type:RLMTypeBool];
+    [subdesc addColumnWithName:@"Age" type:RLMTypeInt];
 
     [table TDB_insertBool:0 ndx:0 value:NO];
     [table TDB_insertInt:1 ndx:0 value:10];

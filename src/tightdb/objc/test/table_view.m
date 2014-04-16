@@ -48,11 +48,11 @@
     
     XCTAssertEqual((size_t)0, [v columnCount], @"no columns added yet");
     
-    [t addColumnWithName:@"col0" type:TDBIntType];
+    [t addColumnWithName:@"col0" type:RLMTypeInt];
     XCTAssertEqual([v columnCount],(size_t)1,  @"1 column added to table");
     
     for (int i=0;i<10;i++) {
-        [t addColumnWithName:@"name" type:TDBIntType];
+        [t addColumnWithName:@"name" type:RLMTypeInt];
     }
     XCTAssertEqual([v columnCount],(size_t)11,  @"10 more columns added to table");
     
@@ -64,29 +64,29 @@
 {
     RLMTable *t = [[RLMTable alloc] init];
     
-    NSUInteger boolCol      = [t addColumnWithName:@"boolCol" type:TDBBoolType];
-    NSUInteger binaryCol    = [t addColumnWithName:@"binaryCol" type:TDBBinaryType];
-    NSUInteger dateCol      = [t addColumnWithName:@"dateCol" type:TDBDateType];
-    NSUInteger doubleCol    = [t addColumnWithName:@"doubleCol" type:TDBDoubleType];
-    NSUInteger floatCol     = [t addColumnWithName:@"floatCol" type:TDBFloatType];
-    NSUInteger intCol       = [t addColumnWithName:@"intCol" type:TDBIntType];
-    NSUInteger mixedCol     = [t addColumnWithName:@"MixedCol" type:TDBMixedType];
-    NSUInteger stringCol    = [t addColumnWithName:@"stringCol" type:TDBStringType];
-    NSUInteger tableCol     = [t addColumnWithName:@"tableCol" type:TDBTableType];
+    NSUInteger boolCol      = [t addColumnWithName:@"boolCol" type:RLMTypeBool];
+    NSUInteger binaryCol    = [t addColumnWithName:@"binaryCol" type:RLMTypeBinary];
+    NSUInteger dateCol      = [t addColumnWithName:@"dateCol" type:RLMTypeDate];
+    NSUInteger doubleCol    = [t addColumnWithName:@"doubleCol" type:RLMTypeDouble];
+    NSUInteger floatCol     = [t addColumnWithName:@"floatCol" type:RLMTypeFloat];
+    NSUInteger intCol       = [t addColumnWithName:@"intCol" type:RLMTypeInt];
+    NSUInteger mixedCol     = [t addColumnWithName:@"MixedCol" type:RLMTypeMixed];
+    NSUInteger stringCol    = [t addColumnWithName:@"stringCol" type:RLMTypeString];
+    NSUInteger tableCol     = [t addColumnWithName:@"tableCol" type:RLMTypeTable];
     
     
     RLMQuery *q = [t where];
     TDBView *v = [q findAllRows];
     
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:boolCol]      == TDBBoolType, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:binaryCol]    == TDBBinaryType, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:dateCol]      == TDBDateType, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:doubleCol]    == TDBDoubleType, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:floatCol]     == TDBFloatType, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:intCol]       == TDBIntType, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:mixedCol]     == TDBMixedType, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:stringCol]    == TDBStringType, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:tableCol]     == TDBTableType, @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:boolCol]      == RLMTypeBool, @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:binaryCol]    == RLMTypeBinary, @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:dateCol]      == RLMTypeDate, @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:doubleCol]    == RLMTypeDouble, @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:floatCol]     == RLMTypeFloat, @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:intCol]       == RLMTypeInt, @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:mixedCol]     == RLMTypeMixed, @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:stringCol]    == RLMTypeString, @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:tableCol]     == RLMTypeTable, @"Column types matches");
     
     XCTAssertThrows([v columnTypeOfColumnWithIndex:[v columnCount] + 1], @"Out of bounds");
     XCTAssertThrows([v columnTypeOfColumnWithIndex:100], @"Out of bounds");
@@ -96,7 +96,7 @@
 - (void)testSortOnViewIntColumn
 {
     RLMTable *t = [[RLMTable alloc] init];
-    NSUInteger intCol = [t addColumnWithName:@"intCol" type:TDBIntType];
+    NSUInteger intCol = [t addColumnWithName:@"intCol" type:RLMTypeInt];
     
     [t addRow:nil];
     RLMRow *row = [t lastRow];
@@ -125,13 +125,13 @@
     XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:2] == 2, @"matcing value after default sort");
     
     // Sort same way
-    [v sortUsingColumnWithIndex:intCol inOrder:TDBAscending];
+    [v sortUsingColumnWithIndex:intCol inOrder:RLMSortOrderAscending];
     XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:0] == 0, @"matcing value after ascending sort");
     XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after ascending sort");
     XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:2] == 2, @"matcing value after ascending sort");
     
     // Sort descending
-    [v sortUsingColumnWithIndex:intCol inOrder: TDBDescending];
+    [v sortUsingColumnWithIndex:intCol inOrder: RLMSortOrderDescending];
     XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:0] == 2, @"matcing value after descending sort");
     XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:1] == 1, @"matcing value after descending sort");
     XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:2] == 0, @"matcing value after descending sort");
@@ -140,7 +140,7 @@
 - (void)testSortOnViewBoolColumn
 {
     RLMTable *t = [[RLMTable alloc] init];
-    NSUInteger boolCol = [t addColumnWithName:@"boolCol" type:TDBBoolType];
+    NSUInteger boolCol = [t addColumnWithName:@"boolCol" type:RLMTypeBool];
 
     [t addRow:nil];
     RLMRow *row = [t lastRow];
@@ -169,13 +169,13 @@
     XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:2] == YES, @"matcing value after default sort");
     
     // Sort same way
-    [v sortUsingColumnWithIndex:boolCol inOrder:TDBAscending];
+    [v sortUsingColumnWithIndex:boolCol inOrder:RLMSortOrderAscending];
     XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:0] == NO, @"matcing value after ascending sort");
     XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after ascending sort");
     XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:2] == YES, @"matcing value after ascending sort");
     
     // Sort descending
-    [v sortUsingColumnWithIndex:boolCol inOrder: TDBDescending];
+    [v sortUsingColumnWithIndex:boolCol inOrder: RLMSortOrderDescending];
     XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:0] == YES, @"matcing value after descending sort");
     XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:1] == YES, @"matcing value after descending sort");
     XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:2] == NO, @"matcing value after descending sort");
@@ -185,7 +185,7 @@
 - (void)testSortOnViewDateColumn
 {
     RLMTable *t = [[RLMTable alloc] init];
-    NSUInteger dateCol = [t addColumnWithName:@"dateCol" type:TDBDateType];
+    NSUInteger dateCol = [t addColumnWithName:@"dateCol" type:RLMTypeDate];
     
     
     NSDateFormatter *formatter = [[NSDateFormatter alloc]init];
@@ -222,13 +222,13 @@
     XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:2] == dateLast, @"matcing value after default sort");
     
     // Sort same way
-    [v sortUsingColumnWithIndex:dateCol inOrder:TDBAscending];
+    [v sortUsingColumnWithIndex:dateCol inOrder:RLMSortOrderAscending];
     XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:0] == dateFirst, @"matcing value after ascending sort");
     XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after ascending sort");
     XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:2] == dateLast, @"matcing value after ascending sort");
     
     // Sort descending
-    [v sortUsingColumnWithIndex:dateCol inOrder: TDBDescending];
+    [v sortUsingColumnWithIndex:dateCol inOrder: RLMSortOrderDescending];
     XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:0] == dateLast, @"matcing value after descending sort");
     XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:1] == dateMiddle, @"matcing value after descending sort");
     XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:2] == dateFirst, @"matcing value after descending sort");
@@ -239,15 +239,15 @@
 {
     RLMTable *t = [[RLMTable alloc] init];
     
-    NSUInteger boolCol      = [t addColumnWithName:@"boolCol" type:TDBBoolType];
-    NSUInteger binaryCol    = [t addColumnWithName:@"binaryCol" type:TDBBinaryType];
-    NSUInteger dateCol      = [t addColumnWithName:@"dateCol" type:TDBDateType];
-    NSUInteger doubleCol    = [t addColumnWithName:@"doubleCol" type:TDBDoubleType];
-    NSUInteger floatCol     = [t addColumnWithName:@"floatCol" type:TDBFloatType];
-    NSUInteger intCol       = [t addColumnWithName:@"intCol" type:TDBIntType];
-    NSUInteger mixedCol     = [t addColumnWithName:@"MixedCol" type:TDBMixedType];
-    NSUInteger stringCol    = [t addColumnWithName:@"stringCol" type:TDBStringType];
-    NSUInteger tableCol     = [t addColumnWithName:@"tableCol" type:TDBTableType];
+    NSUInteger boolCol      = [t addColumnWithName:@"boolCol" type:RLMTypeBool];
+    NSUInteger binaryCol    = [t addColumnWithName:@"binaryCol" type:RLMTypeBinary];
+    NSUInteger dateCol      = [t addColumnWithName:@"dateCol" type:RLMTypeDate];
+    NSUInteger doubleCol    = [t addColumnWithName:@"doubleCol" type:RLMTypeDouble];
+    NSUInteger floatCol     = [t addColumnWithName:@"floatCol" type:RLMTypeFloat];
+    NSUInteger intCol       = [t addColumnWithName:@"intCol" type:RLMTypeInt];
+    NSUInteger mixedCol     = [t addColumnWithName:@"MixedCol" type:RLMTypeMixed];
+    NSUInteger stringCol    = [t addColumnWithName:@"stringCol" type:RLMTypeString];
+    NSUInteger tableCol     = [t addColumnWithName:@"tableCol" type:RLMTypeTable];
     
     RLMQuery *q = [t where];
     TDBView *v = [q findAllRows];
@@ -266,8 +266,8 @@
 - (void)testFirstLastRow
 {
     RLMTable *t = [[RLMTable alloc] init];
-    NSUInteger col0 = [t addColumnWithName:@"col" type:TDBStringType];
-    NSUInteger col1 = [t addColumnWithName:@"col" type:TDBIntType];
+    NSUInteger col0 = [t addColumnWithName:@"col" type:RLMTypeString];
+    NSUInteger col1 = [t addColumnWithName:@"col" type:RLMTypeInt];
     
     TDBView *v = [[t where] findAllRows];
     
@@ -299,7 +299,7 @@
 - (void)testViewSubscripting
 {
     RLMTable* table = [[RLMTable alloc]init];
-    [table addColumnWithName:@"IntCol" type:TDBIntType];
+    [table addColumnWithName:@"IntCol" type:RLMTypeInt];
     
     [table addRow:@[@10]];
     [table addRow:@[@42]];
@@ -322,9 +322,9 @@
     RLMTable *table = [[RLMTable alloc] init];
     
     // Specify the column types and names
-    [table addColumnWithName:@"firstName" type:TDBStringType];
-    [table addColumnWithName:@"lastName" type:TDBStringType];
-    [table addColumnWithName:@"salary" type:TDBIntType];
+    [table addColumnWithName:@"firstName" type:RLMTypeString];
+    [table addColumnWithName:@"lastName" type:RLMTypeString];
+    [table addColumnWithName:@"salary" type:RLMTypeInt];
     
     // Add data to the table
     [table addRow:@[@"John", @"Lee", @10000]];
