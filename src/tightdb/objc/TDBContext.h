@@ -23,8 +23,8 @@
 #import "RLMTransaction.h"
 
 
-typedef void(^TDBReadBlock)(RLMTransaction *transaction);
-typedef BOOL(^TDBWriteBlock)(RLMTransaction *transaction);
+typedef void(^RLMReadBlock)(RLMTransaction *transaction);
+typedef BOOL(^RLMWriteBlock)(RLMTransaction *transaction);
 typedef void(^RLMTableReadBlock)(RLMTable *table);
 typedef BOOL(^RLMTableWriteBlock)(RLMTable *table);
 
@@ -39,8 +39,8 @@ typedef BOOL(^RLMTableWriteBlock)(RLMTable *table);
 +(TDBContext *)contextPersistedAtPath:(NSString *)path error:(NSError **)error;
 
 // Transactions
--(void)readUsingBlock:(TDBReadBlock)block;
--(BOOL)writeUsingBlock:(TDBWriteBlock)block error:(NSError **)error;
+-(void)readUsingBlock:(RLMReadBlock)block;
+-(BOOL)writeUsingBlock:(RLMWriteBlock)block error:(NSError **)error;
 
 // Shortcuts for transactions on a single table
 -(void)readTable:(NSString*)tablename usingBlock:(RLMTableReadBlock)block;
