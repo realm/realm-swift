@@ -27,7 +27,7 @@
 #import "RLMQuery.h"
 #import "TDBTable_noinst.h"
 #import "TDBView_noinst.h"
-#import "TDBRow.h"
+#import "RLMRow.h"
 #import "NSData+RLMGetBinaryData.h"
 #import "PrivateTDB.h"
 #import "util_noinst.hpp"
@@ -48,7 +48,7 @@ using namespace std;
     tightdb::util::UniquePtr<tightdb::Query> m_query;
     __weak TDBTable* m_table;
 
-    TDBRow* m_tmp_row;
+    RLMRow * m_tmp_row;
 }
 
 -(id)initWithTable:(TDBTable*)table
@@ -73,9 +73,9 @@ using namespace std;
     m_query->tableview(tableView);
 }
 
--(TDBRow*)getRow:(long)ndx
+-(RLMRow *)getRow:(long)ndx
 {
-    return m_tmp_row = [[TDBRow alloc] initWithTable:[self originTable] ndx:ndx];
+    return m_tmp_row = [[RLMRow alloc] initWithTable:[self originTable] ndx:ndx];
 }
 
 -(long)getFastEnumStart
@@ -94,11 +94,11 @@ using namespace std;
     if (state->state == 0) {
         state->state = [self getFastEnumStart];
         state->mutationsPtr = (unsigned long*)objc_unretainedPointer(self);
-        TDBRow* tmp = [self getRow:state->state];
+        RLMRow * tmp = [self getRow:state->state];
         *stackbuf = tmp;
     }
     if (state->state < [self originTable].rowCount && state->state != (NSUInteger)NSNotFound) {
-        [((TDBRow*)*stackbuf) TDB_setNdx:state->state];
+        [((RLMRow *)*stackbuf) TDB_setNdx:state->state];
         state->itemsPtr = stackbuf;
         state->state = [self incrementFastEnum:state->state+1];
     } else {

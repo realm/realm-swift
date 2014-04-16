@@ -29,7 +29,7 @@
  **************************************************************************/
 
 #import "TDBTable.h"
-#import "TDBRow.h"
+#import "RLMRow.h"
 #import "RLMDescriptor.h"
 #import "RLMQuery.h"
 #import "TDBView.h"
@@ -40,7 +40,7 @@
 
 
 #define TIGHTDB_TABLE_DEF_1(TableName, CName1, CType1) \
-@interface TableName##Row: TDBRow \
+@interface TableName##Row: RLMRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 @end \
 @class TableName##Query; \
@@ -202,7 +202,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
     [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
@@ -239,7 +239,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 { \
     TableName##Row* tmpRow; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -255,7 +255,7 @@ TIGHTDB_TABLE_IMPL_1(TableName, CType1, CName1)
 
 
 #define TIGHTDB_TABLE_DEF_2(TableName, CName1, CType1, CName2, CType2) \
-@interface TableName##Row: TDBRow \
+@interface TableName##Row: RLMRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 @end \
@@ -432,7 +432,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
     [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
@@ -471,7 +471,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 { \
     TableName##Row* tmpRow; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -487,7 +487,7 @@ TIGHTDB_TABLE_IMPL_2(TableName, CType1, CName1, CType2, CName2)
 
 
 #define TIGHTDB_TABLE_DEF_3(TableName, CName1, CType1, CName2, CType2, CName3, CType3) \
-@interface TableName##Row: TDBRow \
+@interface TableName##Row: RLMRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -679,7 +679,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
     [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
@@ -720,7 +720,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 { \
     TableName##Row* tmpRow; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -736,7 +736,7 @@ TIGHTDB_TABLE_IMPL_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3)
 
 
 #define TIGHTDB_TABLE_DEF_4(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4) \
-@interface TableName##Row: TDBRow \
+@interface TableName##Row: RLMRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -943,7 +943,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
     [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
@@ -986,7 +986,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 { \
     TableName##Row* tmpRow; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -1002,7 +1002,7 @@ TIGHTDB_TABLE_IMPL_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_5(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5) \
-@interface TableName##Row: TDBRow \
+@interface TableName##Row: RLMRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -1224,7 +1224,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
     [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
@@ -1269,7 +1269,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 { \
     TableName##Row* tmpRow; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -1285,7 +1285,7 @@ TIGHTDB_TABLE_IMPL_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_6(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6) \
-@interface TableName##Row: TDBRow \
+@interface TableName##Row: RLMRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -1522,7 +1522,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
     [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
@@ -1569,7 +1569,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 { \
     TableName##Row* tmpRow; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -1585,7 +1585,7 @@ TIGHTDB_TABLE_IMPL_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_7(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7) \
-@interface TableName##Row: TDBRow \
+@interface TableName##Row: RLMRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -1837,7 +1837,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
     [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
@@ -1886,7 +1886,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 { \
     TableName##Row* tmpRow; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -1902,7 +1902,7 @@ TIGHTDB_TABLE_IMPL_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_8(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8) \
-@interface TableName##Row: TDBRow \
+@interface TableName##Row: RLMRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -2169,7 +2169,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
     [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
@@ -2220,7 +2220,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 { \
     TableName##Row* tmpRow; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -2236,7 +2236,7 @@ TIGHTDB_TABLE_IMPL_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_9(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9) \
-@interface TableName##Row: TDBRow \
+@interface TableName##Row: RLMRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -2518,7 +2518,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
     [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
@@ -2571,7 +2571,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 { \
     TableName##Row* tmpRow; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -2587,7 +2587,7 @@ TIGHTDB_TABLE_IMPL_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, 
 
 
 #define TIGHTDB_TABLE_DEF_10(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10) \
-@interface TableName##Row: TDBRow \
+@interface TableName##Row: RLMRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -2884,7 +2884,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
     [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
@@ -2939,7 +2939,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 { \
     TableName##Row* tmpRow; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -2955,7 +2955,7 @@ TIGHTDB_TABLE_IMPL_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3,
 
 
 #define TIGHTDB_TABLE_DEF_11(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11) \
-@interface TableName##Row: TDBRow \
+@interface TableName##Row: RLMRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -3267,7 +3267,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
     [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
@@ -3324,7 +3324,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 { \
     TableName##Row* tmpRow; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -3340,7 +3340,7 @@ TIGHTDB_TABLE_IMPL_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3,
 
 
 #define TIGHTDB_TABLE_DEF_12(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12) \
-@interface TableName##Row: TDBRow \
+@interface TableName##Row: RLMRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -3667,7 +3667,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
     [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
@@ -3726,7 +3726,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 { \
     TableName##Row* tmpRow; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -3742,7 +3742,7 @@ TIGHTDB_TABLE_IMPL_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3,
 
 
 #define TIGHTDB_TABLE_DEF_13(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13) \
-@interface TableName##Row: TDBRow \
+@interface TableName##Row: RLMRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -4084,7 +4084,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
     [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
@@ -4145,7 +4145,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 { \
     TableName##Row* tmpRow; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -4161,7 +4161,7 @@ TIGHTDB_TABLE_IMPL_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3,
 
 
 #define TIGHTDB_TABLE_DEF_14(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14) \
-@interface TableName##Row: TDBRow \
+@interface TableName##Row: RLMRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -4518,7 +4518,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
     [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
@@ -4581,7 +4581,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 { \
     TableName##Row* tmpRow; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \
@@ -4597,7 +4597,7 @@ TIGHTDB_TABLE_IMPL_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3,
 
 
 #define TIGHTDB_TABLE_DEF_15(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14, CName15, CType15) \
-@interface TableName##Row: TDBRow \
+@interface TableName##Row: RLMRow \
 TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
@@ -4969,7 +4969,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
     [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
@@ -5034,7 +5034,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 { \
     TableName##Row* tmpRow; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \

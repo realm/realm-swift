@@ -158,7 +158,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
     size_t const AGE = [table addColumnWithName:@"Age" type:TDBIntType];
     size_t const HIRED = [table addColumnWithName:@"Hired" type:TDBBoolType];
 
-    TDBRow *cursor;
+    RLMRow *cursor;
 
     // Add rows
     for (int i = 0; i < TABLE_SIZE; i++) {

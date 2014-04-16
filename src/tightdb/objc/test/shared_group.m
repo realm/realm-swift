@@ -253,7 +253,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         TDBTable *t = [group tableWithName:@"t"];
         [t addColumnWithName:@"col" type:TDBBoolType];
         [t addRow:nil];
-        TDBRow *row = [t lastRow];
+        RLMRow *row = [t lastRow];
         [row setBool:YES inColumnWithIndex:0];
         return YES;
     } error:nil];

@@ -23,7 +23,7 @@
 
 @class TDBTable;
 
-@interface TDBRow: NSObject
+@interface RLMRow : NSObject
 
 -(id)objectAtIndexedSubscript:(NSUInteger)colIndex;
 -(id)objectForKeyedSubscript:(id <NSCopying>)key;
@@ -39,7 +39,7 @@
    TIGHTDB_CURSOR_PROPERTY macros similar to what is done for query
    accessors. */
 @interface TDBAccessor: NSObject
--(id)initWithRow:(TDBRow *)cursor columnId:(NSUInteger)columnId;
+-(id)initWithRow:(RLMRow *)cursor columnId:(NSUInteger)columnId;
 -(BOOL)getBool;
 -(void)setBool:(BOOL)value;
 -(int64_t)getInt;

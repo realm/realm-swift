@@ -29,7 +29,7 @@
 #import "TDBTable_noinst.h"
 #import "TDBView_noinst.h"
 #import "RLMQuery_noinst.h"
-#import "TDBRow.h"
+#import "RLMRow.h"
 #import "RLMDescriptor_noinst.h"
 #import "TDBColumnProxy.h"
 #import "NSData+RLMGetBinaryData.h"
@@ -45,7 +45,7 @@ using namespace std;
     tightdb::TableRef m_table;
     id m_parent;
     BOOL m_read_only;
-    TDBRow* m_tmp_row;
+    RLMRow * m_tmp_row;
 }
 
 
@@ -94,9 +94,9 @@ using namespace std;
     // Dummy - must be overridden in tightdb.h - Check if spec matches the macro definitions
 }
 
--(TDBRow*)getRow
+-(RLMRow *)getRow
 {
-    return m_tmp_row = [[TDBRow alloc] initWithTable:self ndx:0];
+    return m_tmp_row = [[RLMRow alloc] initWithTable:self ndx:0];
 }
 -(void)clearRow
 {
@@ -112,11 +112,11 @@ using namespace std;
     if(state->state == 0) {
         const unsigned long* ptr = static_cast<const unsigned long*>(objc_unretainedPointer(self));
         state->mutationsPtr = const_cast<unsigned long*>(ptr); // FIXME: This casting away of constness seems dangerous. Is it?
-        TDBRow* tmp = [self getRow];
+        RLMRow * tmp = [self getRow];
         *stackbuf = tmp;
     }
     if (state->state < self.rowCount) {
-        [((TDBRow*)*stackbuf) TDB_setNdx:state->state];
+        [((RLMRow *)*stackbuf) TDB_setNdx:state->state];
         state->itemsPtr = stackbuf;
         state->state++;
     }
@@ -250,10 +250,10 @@ using namespace std;
     return m_table->size();
 }
 
--(TDBRow*)insertEmptyRowAtIndex:(NSUInteger)ndx
+-(RLMRow *)insertEmptyRowAtIndex:(NSUInteger)ndx
 {
     [self TDBInsertRow:ndx];
-    return [[TDBRow alloc] initWithTable:self ndx:ndx];
+    return [[RLMRow alloc] initWithTable:self ndx:ndx];
 }
 
 -(BOOL)TDBInsertRow:(NSUInteger)ndx
@@ -302,9 +302,9 @@ using namespace std;
     return index;
 }
 
--(TDBRow *)objectAtIndexedSubscript:(NSUInteger)ndx
+-(RLMRow *)objectAtIndexedSubscript:(NSUInteger)ndx
 {
-    return [[TDBRow alloc] initWithTable:self ndx:ndx];
+    return [[RLMRow alloc] initWithTable:self ndx:ndx];
 }
 
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex
@@ -341,33 +341,33 @@ using namespace std;
 }
 
 
--(TDBRow*)rowAtIndex:(NSUInteger)ndx
+-(RLMRow *)rowAtIndex:(NSUInteger)ndx
 {
     // initWithTable checks for illegal index.
 
-    return [[TDBRow alloc] initWithTable:self ndx:ndx];
+    return [[RLMRow alloc] initWithTable:self ndx:ndx];
 }
 
--(TDBRow*)firstRow
+-(RLMRow *)firstRow
 {
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[TDBRow alloc] initWithTable:self ndx:0];
+    return [[RLMRow alloc] initWithTable:self ndx:0];
 }
 
--(TDBRow*)lastRow
+-(RLMRow *)lastRow
 {
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[TDBRow alloc] initWithTable:self ndx:self.rowCount-1];
+    return [[RLMRow alloc] initWithTable:self ndx:self.rowCount-1];
 }
 
--(TDBRow*)insertRowAtIndex:(NSUInteger)ndx
+-(RLMRow *)insertRowAtIndex:(NSUInteger)ndx
 {
     [self insertEmptyRowAtIndex:ndx];
-    return [[TDBRow alloc] initWithTable:self ndx:ndx];
+    return [[RLMRow alloc] initWithTable:self ndx:ndx];
 }
 
 -(void)addRow:(NSObject*)data
@@ -387,9 +387,9 @@ using namespace std;
 }
 
 /* Moved to private header */
--(TDBRow*)addEmptyRow
+-(RLMRow *)addEmptyRow
 {
-    return [[TDBRow alloc] initWithTable:self ndx:[self TDB_addEmptyRow]];
+    return [[RLMRow alloc] initWithTable:self ndx:[self TDB_addEmptyRow]];
 }
 
 
@@ -1308,7 +1308,7 @@ tightdb::Query queryFromPredicate(TDBTable *table, id condition)
 
 } //namespace
 
--(TDBRow *)find:(id)condition
+-(RLMRow *)find:(id)condition
 {
     tightdb::Query query = queryFromPredicate(self, condition);
 
@@ -1317,7 +1317,7 @@ tightdb::Query queryFromPredicate(TDBTable *table, id condition)
     if (row_ndx == tightdb::not_found)
         return nil;
 
-    return [[TDBRow alloc] initWithTable:self ndx:row_ndx];
+    return [[RLMRow alloc] initWithTable:self ndx:row_ndx];
 }
 
 -(TDBView *)where:(id)condition

@@ -30,10 +30,10 @@
 @property (nonatomic, readonly) NSUInteger columnCount;
 @property (nonatomic, readonly) TDBTable *originTable;
 
--(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
--(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
--(TDBRow *)lastRow;
--(TDBRow *)firstRow;
+-(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
+-(RLMRow *)rowAtIndex:(NSUInteger)rowIndex;
+-(RLMRow *)lastRow;
+-(RLMRow *)firstRow;
 
 -(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
