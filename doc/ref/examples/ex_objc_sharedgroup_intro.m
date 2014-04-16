@@ -36,7 +36,7 @@ void ex_objc_context_intro()
     // Perform a write transaction (with commit to file)
     NSError *error = nil;
     BOOL success;
-    success = [context writeUsingBlock:^(TDBTransaction *transaction) {
+    success = [context writeUsingBlock:^(RLMTransaction *transaction) {
         People *table = [transaction createTableWithName:@"employees"
                                             asTableClass:[People class]];
         [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
@@ -47,7 +47,7 @@ void ex_objc_context_intro()
         NSLog(@"write-transaction failed: %@", [error description]);
 
     // Perform a write transaction (with rollback)
-    success = [context writeUsingBlock:^(TDBTransaction *transaction) {
+    success = [context writeUsingBlock:^(RLMTransaction *transaction) {
         People *table = [transaction createTableWithName:@"employees"
                                             asTableClass:[People class]];
         if ([table rowCount] == 0) {
@@ -62,7 +62,7 @@ void ex_objc_context_intro()
         NSLog(@"Transaction Rolled back : %@", [error description]);
 
     // Perform a read transaction
-    [context readUsingBlock:^(TDBTransaction *transaction) {
+    [context readUsingBlock:^(RLMTransaction *transaction) {
         People *table = [transaction tableWithName:@"employees"
                                       asTableClass:[People class]];
         for (PeopleRow *row in table) {
