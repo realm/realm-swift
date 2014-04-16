@@ -18,7 +18,7 @@
  *
  **************************************************************************/
 
-#import "TDBConstants.h"
+#import "RLMConstants.h"
 
 
 NSString *const RLMContextDidChangeNotification = @"RLMContextDidChangeNotification";
