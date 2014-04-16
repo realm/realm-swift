@@ -22,10 +22,10 @@
 #include <tightdb.hpp>
 #include <tightdb/version.hpp>
 
-#import  "TDBVersion.h"
+#import "RLMVersion.h"
 
 
-@implementation TDBVersion
+@implementation RLMVersion
 {
 }
 
@@ -64,9 +64,9 @@
 +(NSString*)getVersion
 {
     NSString *s = [NSString stringWithFormat:@"%d.%d.%d", 
-                            [TDBVersion getMajor],
-                            [TDBVersion getMinor],
-                            [TDBVersion getPatch]];
+                            [RLMVersion getMajor],
+                            [RLMVersion getMinor],
+                            [RLMVersion getPatch]];
     return s;
 }
 
