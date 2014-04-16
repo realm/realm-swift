@@ -27,8 +27,8 @@
 		4D143CEE18F7E8C200CEFF65 /* TDBSmartContext_noinst.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D143CEB18F7E8C200CEFF65 /* TDBSmartContext_noinst.h */; };
 		4D143CEF18F7E8C200CEFF65 /* TDBSmartContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D143CEC18F7E8C200CEFF65 /* TDBSmartContext.h */; };
 		4D143CF018F7E8C200CEFF65 /* TDBSmartContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4D143CED18F7E8C200CEFF65 /* TDBSmartContext.mm */; };
-		4D143CF318F7E97500CEFF65 /* TDBConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D143CF118F7E97500CEFF65 /* TDBConstants.h */; };
-		4D143CF418F7E97500CEFF65 /* TDBConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D143CF218F7E97500CEFF65 /* TDBConstants.m */; };
+		4D143CF318F7E97500CEFF65 /* RLMConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D143CF118F7E97500CEFF65 /* RLMConstants.h */; };
+		4D143CF418F7E97500CEFF65 /* RLMConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D143CF218F7E97500CEFF65 /* RLMConstants.m */; };
 		4D1ED30818E1AF4E003CFF44 /* PrivateTableMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */; };
 		4D1ED30B18E1B6E8003CFF44 /* group.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1ED30A18E1B6E8003CFF44 /* group.h */; };
 		4DB1DEFB18BF70AE005A7234 /* dynamic_table.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */; };
@@ -103,8 +103,8 @@
 		4D143CEB18F7E8C200CEFF65 /* TDBSmartContext_noinst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBSmartContext_noinst.h; path = ../src/tightdb/objc/TDBSmartContext_noinst.h; sourceTree = SOURCE_ROOT; };
 		4D143CEC18F7E8C200CEFF65 /* TDBSmartContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBSmartContext.h; path = ../src/tightdb/objc/TDBSmartContext.h; sourceTree = SOURCE_ROOT; };
 		4D143CED18F7E8C200CEFF65 /* TDBSmartContext.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBSmartContext.mm; path = ../src/tightdb/objc/TDBSmartContext.mm; sourceTree = SOURCE_ROOT; };
-		4D143CF118F7E97500CEFF65 /* TDBConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBConstants.h; path = ../src/tightdb/objc/TDBConstants.h; sourceTree = SOURCE_ROOT; };
-		4D143CF218F7E97500CEFF65 /* TDBConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TDBConstants.m; path = ../src/tightdb/objc/TDBConstants.m; sourceTree = SOURCE_ROOT; };
+		4D143CF118F7E97500CEFF65 /* RLMConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMConstants.h; path = ../src/tightdb/objc/RLMConstants.h; sourceTree = SOURCE_ROOT; };
+		4D143CF218F7E97500CEFF65 /* RLMConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMConstants.m; path = ../src/tightdb/objc/RLMConstants.m; sourceTree = SOURCE_ROOT; };
 		4D1ED30618E198AD003CFF44 /* PrivateTDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PrivateTDB.h; path = ../src/tightdb/objc/PrivateTDB.h; sourceTree = SOURCE_ROOT; };
 		4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PrivateTableMacros.h; path = ../src/tightdb/objc/PrivateTableMacros.h; sourceTree = SOURCE_ROOT; };
 		4D1ED30A18E1B6E8003CFF44 /* group.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = group.h; path = ../src/tightdb/objc/group.h; sourceTree = SOURCE_ROOT; };
@@ -240,8 +240,8 @@
 				4D1ED30618E198AD003CFF44 /* PrivateTDB.h */,
 				424EEF9D18D9C10100337A13 /* TDBColumnProxy.h */,
 				424EEFB118D9C97900337A13 /* TDBColumnProxy.mm */,
-				4D143CF118F7E97500CEFF65 /* TDBConstants.h */,
-				4D143CF218F7E97500CEFF65 /* TDBConstants.m */,
+				4D143CF118F7E97500CEFF65 /* RLMConstants.h */,
+				4D143CF218F7E97500CEFF65 /* RLMConstants.m */,
 				E91890CA177B67AB00653D7A /* TDBContext.h */,
 				E91890C9177B67AB00653D7A /* TDBContext.mm */,
 				424EEFA118D9C11D00337A13 /* RLMDescriptor.h */,
@@ -338,7 +338,7 @@
 				4D1ED30B18E1B6E8003CFF44 /* group.h in Headers */,
 				E91890E4177B67AB00653D7A /* Tightdb.h in Headers */,
 				E91890E5177B67AB00653D7A /* TDBType.h in Headers */,
-				4D143CF318F7E97500CEFF65 /* TDBConstants.h in Headers */,
+				4D143CF318F7E97500CEFF65 /* RLMConstants.h in Headers */,
 				4D143CEE18F7E8C200CEFF65 /* TDBSmartContext_noinst.h in Headers */,
 				424EEFA318D9C11D00337A13 /* TDBDescriptor_noinst.h in Headers */,
 				4220871618E042FD00F3CF27 /* NSData+RLMGetBinaryData.h in Headers */,
@@ -452,7 +452,7 @@
 				4D143CF018F7E8C200CEFF65 /* TDBSmartContext.mm in Sources */,
 				424EEFAE18D9C15A00337A13 /* TDBView.mm in Sources */,
 				424EEFB218D9C97900337A13 /* TDBColumnProxy.mm in Sources */,
-				4D143CF418F7E97500CEFF65 /* TDBConstants.m in Sources */,
+				4D143CF418F7E97500CEFF65 /* RLMConstants.m in Sources */,
 				E91890D8177B67AB00653D7A /* TDBTransaction.mm in Sources */,
 				4220871718E042FD00F3CF27 /* NSData+RLMGetBinaryData.mm in Sources */,
 				E91890DA177B67AB00653D7A /* TDBContext.mm in Sources */,
