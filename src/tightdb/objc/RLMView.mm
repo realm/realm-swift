@@ -28,13 +28,13 @@
 
 #import "RLMTable_noinst.h"
 #import "RLMRow.h"
-#import "TDBView_noinst.h"
+#import "RLMView_noinst.h"
 #import "RLMQuery_noinst.h"
 #import "PrivateTDB.h"
 #import "util_noinst.hpp"
 
 
-@implementation TDBView
+@implementation RLMView
 {
     tightdb::util::UniquePtr<tightdb::TableView> m_view;
     RLMTable * m_table;
@@ -42,9 +42,9 @@
     BOOL m_read_only;
 }
 
-+(TDBView*)viewWithTable:(RLMTable *)table andNativeView:(const tightdb::TableView&)view
++(RLMView *)viewWithTable:(RLMTable *)table andNativeView:(const tightdb::TableView&)view
 {
-    TDBView* view_2 = [[TDBView alloc] init];
+    RLMView * view_2 = [[RLMView alloc] init];
     if (!view_2)
         return nil;
     view_2->m_view.reset(new tightdb::TableView(view)); // FIXME: Exception handling needed here
@@ -74,7 +74,7 @@
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    // NSLog(@"TDBView dealloc");
+    // NSLog(@"RLMView dealloc");
 #endif
     m_table = nil; // FIXME: What is the point of doing this?
 }

@@ -19,7 +19,7 @@
  **************************************************************************/
 
 #import "RLMTable.h"
-#import "TDBView.h"
+#import "RLMView.h"
 #import "TDBContext.h"
 #import "RLMRow.h"
 
@@ -79,7 +79,7 @@
  * The selectors in this interface is not meant to be used directly.
  * However, they are public so that the typed table macros can use them.
  */
-@interface TDBView (Private)
+@interface RLMView (Private)
 -(id)_initWithQuery:(RLMQuery *)query;
 
 -(BOOL)TDB_boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;

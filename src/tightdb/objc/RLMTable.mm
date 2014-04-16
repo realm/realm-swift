@@ -27,7 +27,7 @@
 #include <tightdb/lang_bind_helper.hpp>
 
 #import "RLMTable_noinst.h"
-#import "TDBView_noinst.h"
+#import "RLMView_noinst.h"
 #import "RLMQuery_noinst.h"
 #import "RLMRow.h"
 #import "RLMDescriptor_noinst.h"
@@ -969,49 +969,49 @@ using namespace std;
     return 0;
 }
 
--(TDBView*)findAllRowsWithBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex
+-(RLMView*)findAllRowsWithBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_bool(colIndex, aBool);
-    return [TDBView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self andNativeView:view];
 }
--(TDBView*)findAllRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+-(RLMView*)findAllRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_int(colIndex, anInt);
-    return [TDBView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self andNativeView:view];
 }
--(TDBView*)findAllRowsWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+-(RLMView*)findAllRowsWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_float(colIndex, aFloat);
-    return [TDBView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self andNativeView:view];
 }
--(TDBView*)findAllRowsWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
+-(RLMView*)findAllRowsWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_double(colIndex, aDouble);
-    return [TDBView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self andNativeView:view];
 }
--(TDBView*)findAllRowsWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+-(RLMView*)findAllRowsWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_string(colIndex, ObjcStringAccessor(aString));
-    return [TDBView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self andNativeView:view];
 }
--(TDBView*)findAllRowsWithBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
+-(RLMView*)findAllRowsWithBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_binary(colIndex, aBinary.rlmBinaryData);
-    return [TDBView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self andNativeView:view];
 }
--(TDBView*)findAllRowsWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
+-(RLMView*)findAllRowsWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_datetime(colIndex, [aDate timeIntervalSince1970]);
-    return [TDBView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self andNativeView:view];
 }
--(TDBView*)findAllRowsWithMixed:(id)aMixed inColumnWithIndex:(NSUInteger)colIndex
+-(RLMView*)findAllRowsWithMixed:(id)aMixed inColumnWithIndex:(NSUInteger)colIndex
 {
     static_cast<void>(colIndex);
     static_cast<void>(aMixed);
     [NSException raise:@"NotImplemented" format:@"Not implemented"];
     // FIXME: Implement this!
 //    tightdb::TableView view = m_table->find_all_mixed(col_ndx, [value getNativeMixed]);
-//    return [TDBView viewWithTable:self andNativeView:view];
+//    return [RLMView viewWithTable:self andNativeView:view];
     return 0;
 }
 
@@ -1025,7 +1025,7 @@ using namespace std;
     return [[RLMQuery alloc] initWithTable:self error:error];
 }
 
--(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex
+-(RLMView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex
 {
     if (!([self columnTypeOfColumnWithIndex:colIndex] == RLMTypeString)) {
         @throw [NSException exceptionWithName:@"tightdb:column_type_not_supported"
@@ -1039,7 +1039,7 @@ using namespace std;
     }
     
     tightdb::TableView distinctView = m_table->get_distinct_view(colIndex);
-    return [TDBView viewWithTable:self andNativeView:distinctView];
+    return [RLMView viewWithTable:self andNativeView:distinctView];
 }
 
 namespace {
@@ -1320,7 +1320,7 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     return [[RLMRow alloc] initWithTable:self ndx:row_ndx];
 }
 
--(TDBView *)where:(id)condition
+-(RLMView *)where:(id)condition
 {
     tightdb::Query query = queryFromPredicate(self, condition);
 
@@ -1328,10 +1328,10 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     tightdb::TableView view = query.find_all();
 
     // create objc view and return
-    return [TDBView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self andNativeView:view];
 }
 
--(TDBView *)where:(id)condition orderBy:(id)order
+-(RLMView *)where:(id)condition orderBy:(id)order
 {
     tightdb::Query query = queryFromPredicate(self, condition);
 
@@ -1367,7 +1367,7 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     }
 
     // create objc view and return
-    return [TDBView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self andNativeView:view];
 }
 
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex

@@ -242,7 +242,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     
     //XCTAssertEqual([[[table where] column:INT_COL isBetweenInt:859 and_:861] find:0], (size_t) 1, @"find");
     
-    // XCTAssertEqual([[[[table where] column:INT_COL isBetweenInt:859 and_:861] findAll] class], [TDBView class], @"findAll");
+    // XCTAssertEqual([[[[table where] column:INT_COL isBetweenInt:859 and_:861] findAll] class], [RLMView class], @"findAll");
     
     XCTAssertEqual([[table where] minIntInColumnWithIndex:INT_COL], (int64_t)0, @"minIntInColumn");
     XCTAssertEqual([[table where] sumIntColumnWithIndex:INT_COL], (int64_t)860, @"IntCol max");
@@ -412,7 +412,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [subTable TDB_setBool:YES inColumnWithIndex:0 atRowIndex:0];
     RLMQuery *q = [t where];
     
-    TDBView *v = [[[[q subtableInColumnWithIndex:0] boolIsEqualTo:YES inColumnWithIndex:0] parent] findAllRows];
+    RLMView *v = [[[[q subtableInColumnWithIndex:0] boolIsEqualTo:YES inColumnWithIndex:0] parent] findAllRows];
     XCTAssertEqual(v.rowCount, (NSUInteger)1,@"one match");
 }
 

@@ -94,7 +94,7 @@ TIGHTDB_TABLE_2(QueryTable,
     XCTAssertEqual(avg, 21.0,@"Expected 20.5 average");
 
     // Execute the query and return a table (view)
-    TDBView* res = [q findAll];
+    RLMView* res = [q findAll];
     for (size_t i = 0; i < [res rowCount]; i++) {
         // cursor missing. Only low-level interface!
         NSLog(@"%zu: is %lld years old",i , [res TDB_intInColumnWithIndex:1 atRowIndex:i]);
@@ -180,7 +180,7 @@ TIGHTDB_TABLE_2(QueryTable,
     {
         QueryTableQuery* q = [[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO].First columnIsLessThan:3] Or].First columnIsGreaterThan:5]; // No parenthesis
         XCTAssertEqual((size_t)2, [q countRows], @"count != 2");
-        TDBView* tv = [q findAll];
+        RLMView* tv = [q findAll];
         XCTAssertEqual((size_t)2, [tv rowCount], @"count != 2");
         XCTAssertEqual((int64_t)8, [tv TDB_intInColumnWithIndex:0 atRowIndex:1], @"First != 8");
     }

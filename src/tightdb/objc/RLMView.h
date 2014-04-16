@@ -24,7 +24,7 @@
 #import "RLMTable.h"
 
 
-@interface TDBView: NSObject <TDBView, NSFastEnumeration>
+@interface RLMView : NSObject <RLMView, NSFastEnumeration>
 
 @property (nonatomic, readonly) NSUInteger rowCount;
 @property (nonatomic, readonly) NSUInteger columnCount;

@@ -20,15 +20,15 @@
 
 #import <Foundation/Foundation.h>
 
-#import "TDBViewProtocol.h"
+#import "RLMViewProtocol.h"
 
-@class TDBView;
+@class RLMView;
 @class RLMQuery;
 @class RLMDescriptor;
 @class RLMRow;
 
 
-@interface RLMTable : NSObject <TDBView,NSFastEnumeration>
+@interface RLMTable : NSObject <RLMView,NSFastEnumeration>
 
 @property (nonatomic, readonly) NSUInteger rowCount;
 @property (nonatomic, readonly) NSUInteger columnCount;
@@ -70,12 +70,12 @@
 // Queries
 -(RLMQuery *)where;
 // Only supported on string columns with an index
--(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
+-(RLMView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
 
 // Predicate queries
 -(RLMRow *)find:(id)condition;
--(TDBView *)where:(id)condition;
--(TDBView *)where:(id)condition orderBy:(id)order;
+-(RLMView *)where:(id)condition;
+-(RLMView *)where:(id)condition orderBy:(id)order;
 
 // Indexing
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;
