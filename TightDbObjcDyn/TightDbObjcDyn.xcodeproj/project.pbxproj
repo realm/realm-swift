@@ -20,6 +20,7 @@
 		42AD3A9818CDBDFF00C86073 /* util.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42AD3A9418CDBDFF00C86073 /* util.mm */; };
 		42AD3A9918CDBDFF00C86073 /* TDBVersion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42AD3A9518CDBDFF00C86073 /* TDBVersion.mm */; };
 		42AD3A9A18CDBDFF00C86073 /* TDBVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 42AD3A9618CDBDFF00C86073 /* TDBVersion.h */; };
+		4B7ACCD918FDD96F008B7B95 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */; };
 		4D01A9FC18C9F5E600527AD5 /* table_view.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9FB18C9F5E600527AD5 /* table_view.m */; };
 		4D01A9FE18C9F60F00527AD5 /* version.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9FD18C9F60F00527AD5 /* version.m */; };
 		4D143CCF18F69D0F00CEFF65 /* TDBQueryFast.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D143CCE18F69D0F00CEFF65 /* TDBQueryFast.h */; };
@@ -35,7 +36,6 @@
 		4DB1DEFD18BF70AE005A7234 /* typed_table.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEFA18BF70AE005A7234 /* typed_table.m */; };
 		4DDDD67418EB049300E94613 /* TDBViewProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DDDD67318EB049300E94613 /* TDBViewProtocol.h */; };
 		E918909D177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
-		E91890AF177B677900653D7A /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E91890AE177B677900653D7A /* SenTestingKit.framework */; };
 		E91890B0177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		E91890B3177B677900653D7A /* TightDbObjcDyn.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E9189099177B677900653D7A /* TightDbObjcDyn.dylib */; };
 		E91890B9177B677900653D7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E91890B7177B677900653D7A /* InfoPlist.strings */; };
@@ -95,6 +95,7 @@
 		42AD3A9418CDBDFF00C86073 /* util.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = util.mm; path = ../src/tightdb/objc/util.mm; sourceTree = SOURCE_ROOT; };
 		42AD3A9518CDBDFF00C86073 /* TDBVersion.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBVersion.mm; path = ../src/tightdb/objc/TDBVersion.mm; sourceTree = SOURCE_ROOT; };
 		42AD3A9618CDBDFF00C86073 /* TDBVersion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBVersion.h; path = ../src/tightdb/objc/TDBVersion.h; sourceTree = SOURCE_ROOT; };
+		4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4D01A9FB18C9F5E600527AD5 /* table_view.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = table_view.m; path = ../../src/tightdb/objc/test/table_view.m; sourceTree = "<group>"; };
 		4D01A9FD18C9F60F00527AD5 /* version.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = version.m; path = ../../src/tightdb/objc/test/version.m; sourceTree = "<group>"; };
 		4D143CBC18ED5FCF00CEFF65 /* PrivateTableMacros.h.cheetah */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PrivateTableMacros.h.cheetah; path = ../src/tightdb/objc/PrivateTableMacros.h.cheetah; sourceTree = SOURCE_ROOT; };
@@ -167,7 +168,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E91890AF177B677900653D7A /* SenTestingKit.framework in Frameworks */,
+				4B7ACCD918FDD96F008B7B95 /* XCTest.framework in Frameworks */,
 				E91890B0177B677900653D7A /* Cocoa.framework in Frameworks */,
 				E91890B3177B677900653D7A /* TightDbObjcDyn.dylib in Frameworks */,
 			);
@@ -208,6 +209,7 @@
 		E918909B177B677900653D7A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */,
 				E918909C177B677900653D7A /* Cocoa.framework */,
 				E91890AE177B677900653D7A /* SenTestingKit.framework */,
 				E918909E177B677900653D7A /* Other Frameworks */,
@@ -586,6 +588,10 @@
 			buildSettings = {
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
@@ -598,6 +604,10 @@
 			buildSettings = {
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
@@ -609,7 +619,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "TightDbObjcDynTests/TightDbObjcDynTests-Info.plist";
@@ -622,7 +635,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = "\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"";
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "TightDbObjcDynTests/TightDbObjcDynTests-Info.plist";
