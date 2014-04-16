@@ -18,7 +18,7 @@
  *
  **************************************************************************/
 
-@interface TDBQuery (Fast)
+@interface RLMQuery (Fast)
 
 -(int64_t)minIntInColumnWithIndex:(NSUInteger)colIndex;
 -(float)minFloatInColumnWithIndex:(NSUInteger)colIndex;

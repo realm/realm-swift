@@ -54,7 +54,7 @@
     return view_2;
 }
 
--(id)_initWithQuery:(TDBQuery*)query
+-(id)_initWithQuery:(RLMQuery *)query
 {
     self = [super init];
     if (self) {
@@ -257,9 +257,9 @@
     return 1;
 }
 
-- (TDBQuery *)where
+- (RLMQuery *)where
 {
-    TDBQuery *query = [[TDBQuery alloc] initWithTable:self.originTable error:nil];
+    RLMQuery *query = [[RLMQuery alloc] initWithTable:self.originTable error:nil];
     [query setTableView:*m_view];
     return query;
 }

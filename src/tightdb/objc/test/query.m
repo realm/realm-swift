@@ -410,7 +410,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     TDBTable * subTable = [t TDB_tableInColumnWithIndex:0 atRowIndex:0];
     [subTable addRow:nil];
     [subTable TDB_setBool:YES inColumnWithIndex:0 atRowIndex:0];
-    TDBQuery *q = [t where];
+    RLMQuery *q = [t where];
     
     TDBView *v = [[[[q subtableInColumnWithIndex:0] boolIsEqualTo:YES inColumnWithIndex:0] parent] findAllRows];
     XCTAssertEqual(v.rowCount, (NSUInteger)1,@"one match");
@@ -422,7 +422,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [table addColumnWithName:@"first" type:TDBIntType];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithInt:i]]];
-    TDBQuery *query = [table where];
+    RLMQuery *query = [table where];
     int i = 0;
     for(TDBRow *row in query) {
         XCTAssertEqual((int64_t)i, [(NSNumber *)row[@"first"] longLongValue], @"Wrong value");
@@ -436,7 +436,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [table addColumnWithName:@"first" type:TDBIntType];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithInt:i]]];
-    TDBQuery *query = [[table where] intIsGreaterThan:-1 inColumnWithIndex:0];
+    RLMQuery *query = [[table where] intIsGreaterThan:-1 inColumnWithIndex:0];
     int i = 0;
     for(TDBRow *row in query) {
         XCTAssertEqual((int64_t)i, [(NSNumber *)row[@"first"] longLongValue], @"Wrong value");

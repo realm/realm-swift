@@ -43,7 +43,7 @@
 -(void)testGetColumnCount
 {
     TDBTable *t = [[TDBTable alloc] init];
-    TDBQuery *q = [t where];
+    RLMQuery *q = [t where];
     TDBView *v = [q findAllRows];
     
     XCTAssertEqual((size_t)0, [v columnCount], @"no columns added yet");
@@ -75,7 +75,7 @@
     NSUInteger tableCol     = [t addColumnWithName:@"tableCol" type:TDBTableType];
     
     
-    TDBQuery *q = [t where];
+    RLMQuery *q = [t where];
     TDBView *v = [q findAllRows];
     
     XCTAssertTrue([v columnTypeOfColumnWithIndex:boolCol]      == TDBBoolType, @"Column types matches");
@@ -110,7 +110,7 @@
     row = [t lastRow];
     [row setInt:0 inColumnWithIndex:intCol];
     
-    TDBQuery *q = [t where];
+    RLMQuery *q = [t where];
     TDBView *v = [q findAllRows];
     
     // Not yet sorted
@@ -154,7 +154,7 @@
     row = [t lastRow];
     [row setBool:NO inColumnWithIndex:boolCol];
     
-    TDBQuery *q = [t where];
+    RLMQuery *q = [t where];
     TDBView *v = [q findAllRows];
     
     // Not yet sorted
@@ -207,7 +207,7 @@
     row = [t lastRow];
     [row setDate:dateFirst inColumnWithIndex:dateCol];
     
-    TDBQuery *q = [t where];
+    RLMQuery *q = [t where];
     TDBView *v = [q findAllRows];
     
     // Not yet sorted
@@ -249,7 +249,7 @@
     NSUInteger stringCol    = [t addColumnWithName:@"stringCol" type:TDBStringType];
     NSUInteger tableCol     = [t addColumnWithName:@"tableCol" type:TDBTableType];
     
-    TDBQuery *q = [t where];
+    RLMQuery *q = [t where];
     TDBView *v = [q findAllRows];
     
     [v sortUsingColumnWithIndex:boolCol]; // bool is supported

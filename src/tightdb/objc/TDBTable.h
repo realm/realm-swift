@@ -23,7 +23,7 @@
 #import "TDBViewProtocol.h"
 
 @class TDBView;
-@class TDBQuery;
+@class RLMQuery;
 @class RLMDescriptor;
 @class TDBRow;
 
@@ -68,7 +68,7 @@
 -(void)removeLastRow;
 
 // Queries
--(TDBQuery *)where;
+-(RLMQuery *)where;
 // Only supported on string columns with an index
 -(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
 

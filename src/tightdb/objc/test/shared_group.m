@@ -181,7 +181,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         XCTAssertThrows([t addRow:nil], @"Is in readTransaction");
         XCTAssertThrows([t addRow:@[@1]], @"Is in readTransaction");
        
-        TDBQuery *q = [t where];
+        RLMQuery *q = [t where];
         XCTAssertThrows([q removeRows], @"Is in readTransaction");
 
         TDBView *v = [q findAllRows];
