@@ -166,7 +166,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     // Create table with all column types
     TDBTable* table = [[TDBTable alloc] init];
-    TDBDescriptor* desc = [table descriptor];
+    RLMDescriptor * desc = [table descriptor];
     if (![desc addColumnWithName:@"int" type:TDBIntType]) {
         XCTFail(@"addColumn failed.");
     }
@@ -192,7 +192,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     if (![desc addColumnWithName:@"mixed" type:TDBMixedType]) {
         XCTFail(@"addColumn failed.");
     }
-    TDBDescriptor* subdesc;
+    RLMDescriptor * subdesc;
     if (!(subdesc = [desc addColumnTable:@"tables"])) {
         XCTFail(@"addColumn failed.");
     }

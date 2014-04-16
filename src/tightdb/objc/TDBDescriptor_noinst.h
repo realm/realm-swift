@@ -22,11 +22,11 @@
 
 #include <tightdb/descriptor.hpp>
 
-#import "TDBDescriptor.h"
+#import "RLMDescriptor.h"
 
 
-@interface TDBDescriptor (noinst)
+@interface RLMDescriptor (noinst)
 
-+(TDBDescriptor*)descWithDesc:(tightdb::Descriptor*)desc readOnly:(BOOL)read_only error:(NSError* __autoreleasing*)error;
++(RLMDescriptor *)descWithDesc:(tightdb::Descriptor*)desc readOnly:(BOOL)read_only error:(NSError* __autoreleasing*)error;
 
 @end

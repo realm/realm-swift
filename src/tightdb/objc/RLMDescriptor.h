@@ -21,7 +21,7 @@
 #import <Foundation/Foundation.h>
 
 
-@interface TDBDescriptor: NSObject
+@interface RLMDescriptor : NSObject
 
 @property (nonatomic, readonly) NSUInteger columnCount;
 
@@ -32,9 +32,9 @@
 /**
  * Returns nil on memory allocation error.
  */
--(TDBDescriptor *)addColumnTable:(NSString *)name;
--(TDBDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex;
--(TDBDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex error:(NSError *__autoreleasing *)error;
+-(RLMDescriptor *)addColumnTable:(NSString *)name;
+-(RLMDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex;
+-(RLMDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex error:(NSError *__autoreleasing *)error;
 
 -(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 -(NSString *)nameOfColumnWithIndex:(NSUInteger)colIndex;

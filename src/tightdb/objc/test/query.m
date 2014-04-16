@@ -401,8 +401,8 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 {
     TDBTable *t = [[TDBTable alloc] init];
     
-    TDBDescriptor *d = t.descriptor;
-    TDBDescriptor *subDesc = [d addColumnTable:@"subtable"];
+    RLMDescriptor *d = t.descriptor;
+    RLMDescriptor *subDesc = [d addColumnTable:@"subtable"];
     [subDesc addColumnWithName:@"subCol" type:TDBBoolType];
     [t addRow:nil];
     XCTAssertEqual(t.rowCount, (NSUInteger)1,@"one row added");

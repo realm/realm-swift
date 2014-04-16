@@ -387,8 +387,8 @@ using namespace std;
 {
     TDBTable* t = [[TDBTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
-    TDBDescriptor* descr = [t descriptor];
-    TDBDescriptor* subdescr = [descr addColumnTable:@"second"];
+    RLMDescriptor * descr = [t descriptor];
+    RLMDescriptor * subdescr = [descr addColumnTable:@"second"];
     [subdescr addColumnWithName:@"TableCol_IntCol" type:TDBIntType];
     XCTAssertNoThrow(([t addRow:@[@1, @[]]]), @"1 row excepted");
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
@@ -906,7 +906,7 @@ using namespace std;
     NSLog(@"Table: %@", table);
     XCTAssertNotNil(table, @"Table is nil");
 
-    TDBDescriptor* desc = [table descriptor];
+    RLMDescriptor * desc = [table descriptor];
 
     [desc addColumnWithName:@"BoolCol" type:TDBBoolType];    const size_t BoolCol = 0;
     [desc addColumnWithName:@"IntCol" type:TDBIntType];     const size_t IntCol = 1;
@@ -915,7 +915,7 @@ using namespace std;
     [desc addColumnWithName:@"StringCol" type:TDBStringType];  const size_t StringCol = 4;
     [desc addColumnWithName:@"BinaryCol" type:TDBBinaryType];  const size_t BinaryCol = 5;
     [desc addColumnWithName:@"DateCol" type:TDBDateType];    const size_t DateCol = 6;
-    TDBDescriptor* subdesc = [desc addColumnTable:@"TableCol"]; const size_t TableCol = 7;
+    RLMDescriptor * subdesc = [desc addColumnTable:@"TableCol"]; const size_t TableCol = 7;
     [desc addColumnWithName:@"MixedCol" type:TDBMixedType];   const size_t MixedCol = 8;
 
     [subdesc addColumnWithName:@"TableCol_IntCol" type:TDBIntType];

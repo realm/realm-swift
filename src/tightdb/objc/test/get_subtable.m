@@ -33,10 +33,10 @@ TIGHTDB_TABLE_2(WrongTypeTable,
 {
     // Create table with all column types
     TDBTable* table = [[TDBTable alloc] init];
-    TDBDescriptor* desc = table.descriptor;
+    RLMDescriptor * desc = table.descriptor;
     [desc addColumnWithName:@"Outer" type:TDBBoolType];
     [desc addColumnWithName:@"Number" type:TDBIntType];
-    TDBDescriptor* subdesc = [desc addColumnTable:@"GetSubtable"];
+    RLMDescriptor * subdesc = [desc addColumnTable:@"GetSubtable"];
     [subdesc addColumnWithName:@"Hired" type:TDBBoolType];
     [subdesc addColumnWithName:@"Age" type:TDBIntType];
 
