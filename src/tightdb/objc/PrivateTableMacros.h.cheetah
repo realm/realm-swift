@@ -38,7 +38,7 @@ directiveStartToken = %
  *
  **************************************************************************/
 
-#import "TDBTable.h"
+#import "RLMTable.h"
 #import "RLMRow.h"
 #import "RLMDescriptor.h"
 #import "RLMQuery.h"
@@ -77,7 +77,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName${j+1}, CType${j+1}) \
 -(TableName##Query*)parent; \
 -(TableName##View*)findAll; \
 @end \
-@interface TableName: TDBTable \
+@interface TableName: RLMTable \
 %for $j in range($num_cols)
 TIGHTDB_COLUMN_PROXY_DEF(CName${j+1}, CType${j+1}) \
 %end for
@@ -116,7 +116,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
     TDBAccessor* _##CName${j+1}; \
 %end for
 } \
--(id)initWithTable:(TDBTable*)table ndx:(NSUInteger)ndx \
+-(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -149,7 +149,7 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName${j+1}, CType${j+1}) \
 %for $j in range($num_cols)
 @synthesize CName${j+1} = _CName${j+1}; \
 %end for
--(id)initWithTable:(TDBTable*)table \
+-(id)initWithTable:(RLMTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \

@@ -28,7 +28,7 @@
  *
  **************************************************************************/
 
-#import "TDBTable.h"
+#import "RLMTable.h"
 #import "RLMRow.h"
 #import "RLMDescriptor.h"
 #import "RLMQuery.h"
@@ -55,7 +55,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 -(TableName##Query*)parent; \
 -(TableName##View*)findAll; \
 @end \
-@interface TableName: TDBTable \
+@interface TableName: RLMTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1; \
@@ -75,7 +75,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 { \
     TDBAccessor* _##CName1; \
 } \
--(id)initWithTable:(TDBTable*)table ndx:(NSUInteger)ndx \
+-(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -102,7 +102,7 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:ndx]; \
 } \
 @synthesize CName1 = _CName1; \
--(id)initWithTable:(TDBTable*)table \
+-(id)initWithTable:(RLMTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -273,7 +273,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 -(TableName##Query*)parent; \
 -(TableName##View*)findAll; \
 @end \
-@interface TableName: TDBTable \
+@interface TableName: RLMTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 -(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2; \
@@ -295,7 +295,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
     TDBAccessor* _##CName1; \
     TDBAccessor* _##CName2; \
 } \
--(id)initWithTable:(TDBTable*)table ndx:(NSUInteger)ndx \
+-(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -325,7 +325,7 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
 } \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
--(id)initWithTable:(TDBTable*)table \
+-(id)initWithTable:(RLMTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -508,7 +508,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
 -(TableName##Query*)parent; \
 -(TableName##View*)findAll; \
 @end \
-@interface TableName: TDBTable \
+@interface TableName: RLMTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -532,7 +532,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
     TDBAccessor* _##CName2; \
     TDBAccessor* _##CName3; \
 } \
--(id)initWithTable:(TDBTable*)table ndx:(NSUInteger)ndx \
+-(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -565,7 +565,7 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
 @synthesize CName1 = _CName1; \
 @synthesize CName2 = _CName2; \
 @synthesize CName3 = _CName3; \
--(id)initWithTable:(TDBTable*)table \
+-(id)initWithTable:(RLMTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -760,7 +760,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
 -(TableName##Query*)parent; \
 -(TableName##View*)findAll; \
 @end \
-@interface TableName: TDBTable \
+@interface TableName: RLMTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -786,7 +786,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
     TDBAccessor* _##CName3; \
     TDBAccessor* _##CName4; \
 } \
--(id)initWithTable:(TDBTable*)table ndx:(NSUInteger)ndx \
+-(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -822,7 +822,7 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
 @synthesize CName2 = _CName2; \
 @synthesize CName3 = _CName3; \
 @synthesize CName4 = _CName4; \
--(id)initWithTable:(TDBTable*)table \
+-(id)initWithTable:(RLMTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -1029,7 +1029,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
 -(TableName##Query*)parent; \
 -(TableName##View*)findAll; \
 @end \
-@interface TableName: TDBTable \
+@interface TableName: RLMTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -1057,7 +1057,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
     TDBAccessor* _##CName4; \
     TDBAccessor* _##CName5; \
 } \
--(id)initWithTable:(TDBTable*)table ndx:(NSUInteger)ndx \
+-(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -1096,7 +1096,7 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
 @synthesize CName3 = _CName3; \
 @synthesize CName4 = _CName4; \
 @synthesize CName5 = _CName5; \
--(id)initWithTable:(TDBTable*)table \
+-(id)initWithTable:(RLMTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -1315,7 +1315,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
 -(TableName##Query*)parent; \
 -(TableName##View*)findAll; \
 @end \
-@interface TableName: TDBTable \
+@interface TableName: RLMTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -1345,7 +1345,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
     TDBAccessor* _##CName5; \
     TDBAccessor* _##CName6; \
 } \
--(id)initWithTable:(TDBTable*)table ndx:(NSUInteger)ndx \
+-(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -1387,7 +1387,7 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
 @synthesize CName4 = _CName4; \
 @synthesize CName5 = _CName5; \
 @synthesize CName6 = _CName6; \
--(id)initWithTable:(TDBTable*)table \
+-(id)initWithTable:(RLMTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -1618,7 +1618,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
 -(TableName##Query*)parent; \
 -(TableName##View*)findAll; \
 @end \
-@interface TableName: TDBTable \
+@interface TableName: RLMTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -1650,7 +1650,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
     TDBAccessor* _##CName6; \
     TDBAccessor* _##CName7; \
 } \
--(id)initWithTable:(TDBTable*)table ndx:(NSUInteger)ndx \
+-(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -1695,7 +1695,7 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName7, CType7) \
 @synthesize CName5 = _CName5; \
 @synthesize CName6 = _CName6; \
 @synthesize CName7 = _CName7; \
--(id)initWithTable:(TDBTable*)table \
+-(id)initWithTable:(RLMTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -1938,7 +1938,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
 -(TableName##Query*)parent; \
 -(TableName##View*)findAll; \
 @end \
-@interface TableName: TDBTable \
+@interface TableName: RLMTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -1972,7 +1972,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
     TDBAccessor* _##CName7; \
     TDBAccessor* _##CName8; \
 } \
--(id)initWithTable:(TDBTable*)table ndx:(NSUInteger)ndx \
+-(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -2020,7 +2020,7 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName8, CType8) \
 @synthesize CName6 = _CName6; \
 @synthesize CName7 = _CName7; \
 @synthesize CName8 = _CName8; \
--(id)initWithTable:(TDBTable*)table \
+-(id)initWithTable:(RLMTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -2275,7 +2275,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
 -(TableName##Query*)parent; \
 -(TableName##View*)findAll; \
 @end \
-@interface TableName: TDBTable \
+@interface TableName: RLMTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -2311,7 +2311,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
     TDBAccessor* _##CName8; \
     TDBAccessor* _##CName9; \
 } \
--(id)initWithTable:(TDBTable*)table ndx:(NSUInteger)ndx \
+-(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -2362,7 +2362,7 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName9, CType9) \
 @synthesize CName7 = _CName7; \
 @synthesize CName8 = _CName8; \
 @synthesize CName9 = _CName9; \
--(id)initWithTable:(TDBTable*)table \
+-(id)initWithTable:(RLMTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -2629,7 +2629,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
 -(TableName##Query*)parent; \
 -(TableName##View*)findAll; \
 @end \
-@interface TableName: TDBTable \
+@interface TableName: RLMTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -2667,7 +2667,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
     TDBAccessor* _##CName9; \
     TDBAccessor* _##CName10; \
 } \
--(id)initWithTable:(TDBTable*)table ndx:(NSUInteger)ndx \
+-(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -2721,7 +2721,7 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName10, CType10) \
 @synthesize CName8 = _CName8; \
 @synthesize CName9 = _CName9; \
 @synthesize CName10 = _CName10; \
--(id)initWithTable:(TDBTable*)table \
+-(id)initWithTable:(RLMTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -3000,7 +3000,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
 -(TableName##Query*)parent; \
 -(TableName##View*)findAll; \
 @end \
-@interface TableName: TDBTable \
+@interface TableName: RLMTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -3040,7 +3040,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
     TDBAccessor* _##CName10; \
     TDBAccessor* _##CName11; \
 } \
--(id)initWithTable:(TDBTable*)table ndx:(NSUInteger)ndx \
+-(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -3097,7 +3097,7 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName11, CType11) \
 @synthesize CName9 = _CName9; \
 @synthesize CName10 = _CName10; \
 @synthesize CName11 = _CName11; \
--(id)initWithTable:(TDBTable*)table \
+-(id)initWithTable:(RLMTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -3388,7 +3388,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
 -(TableName##Query*)parent; \
 -(TableName##View*)findAll; \
 @end \
-@interface TableName: TDBTable \
+@interface TableName: RLMTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -3430,7 +3430,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
     TDBAccessor* _##CName11; \
     TDBAccessor* _##CName12; \
 } \
--(id)initWithTable:(TDBTable*)table ndx:(NSUInteger)ndx \
+-(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -3490,7 +3490,7 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName12, CType12) \
 @synthesize CName10 = _CName10; \
 @synthesize CName11 = _CName11; \
 @synthesize CName12 = _CName12; \
--(id)initWithTable:(TDBTable*)table \
+-(id)initWithTable:(RLMTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -3793,7 +3793,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
 -(TableName##Query*)parent; \
 -(TableName##View*)findAll; \
 @end \
-@interface TableName: TDBTable \
+@interface TableName: RLMTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -3837,7 +3837,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
     TDBAccessor* _##CName12; \
     TDBAccessor* _##CName13; \
 } \
--(id)initWithTable:(TDBTable*)table ndx:(NSUInteger)ndx \
+-(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -3900,7 +3900,7 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName13, CType13) \
 @synthesize CName11 = _CName11; \
 @synthesize CName12 = _CName12; \
 @synthesize CName13 = _CName13; \
--(id)initWithTable:(TDBTable*)table \
+-(id)initWithTable:(RLMTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -4215,7 +4215,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName14, CType14) \
 -(TableName##Query*)parent; \
 -(TableName##View*)findAll; \
 @end \
-@interface TableName: TDBTable \
+@interface TableName: RLMTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -4261,7 +4261,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName14, CType14) \
     TDBAccessor* _##CName13; \
     TDBAccessor* _##CName14; \
 } \
--(id)initWithTable:(TDBTable*)table ndx:(NSUInteger)ndx \
+-(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -4327,7 +4327,7 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName14, CType14) \
 @synthesize CName12 = _CName12; \
 @synthesize CName13 = _CName13; \
 @synthesize CName14 = _CName14; \
--(id)initWithTable:(TDBTable*)table \
+-(id)initWithTable:(RLMTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \
@@ -4654,7 +4654,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName15, CType15) \
 -(TableName##Query*)parent; \
 -(TableName##View*)findAll; \
 @end \
-@interface TableName: TDBTable \
+@interface TableName: RLMTable \
 TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
@@ -4702,7 +4702,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName15, CType15) \
     TDBAccessor* _##CName14; \
     TDBAccessor* _##CName15; \
 } \
--(id)initWithTable:(TDBTable*)table ndx:(NSUInteger)ndx \
+-(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
@@ -4771,7 +4771,7 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName15, CType15) \
 @synthesize CName13 = _CName13; \
 @synthesize CName14 = _CName14; \
 @synthesize CName15 = _CName15; \
--(id)initWithTable:(TDBTable*)table \
+-(id)initWithTable:(RLMTable*)table \
 { \
     self = [super initWithTable:table]; \
     if (self) { \

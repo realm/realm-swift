@@ -26,7 +26,7 @@
 #include <tightdb/binary_data.hpp>
 #include <tightdb/string_data.hpp>
 
-#import "TDBTable_noinst.h"
+#import "RLMTable_noinst.h"
 #import "util_noinst.hpp"
 #import "NSData+RLMGetBinaryData.h"
 
@@ -66,7 +66,7 @@ void to_mixed(id value, Mixed& m)
         m.set_datetime(DateTime(time_t([(NSDate *)value timeIntervalSince1970])));
         return;
     }
-    if ([value isKindOfClass:[TDBTable class]])
+    if ([value isKindOfClass:[RLMTable class]])
         m = Mixed(Mixed::subtable_tag());
 }
 
@@ -101,7 +101,7 @@ NSObject* get_cell(size_t col_ndx, size_t row_ndx, Table& table)
             return d;
         }
         case type_Table: {
-            TDBTable *t = [[TDBTable alloc] init];
+            RLMTable *t = [[RLMTable alloc] init];
             TableRef table_ref = table.get_subtable(col_ndx, row_ndx);
             [t setNativeTable:table_ref.get()];
             return t;
@@ -139,7 +139,7 @@ NSObject* get_cell(size_t col_ndx, size_t row_ndx, Table& table)
                     return d;
                 }
                 case type_Table: {
-                    TDBTable *t = [[TDBTable alloc] init];
+                    RLMTable *t = [[RLMTable alloc] init];
                     TableRef table_ref = table.get_subtable(col_ndx, row_ndx);
                     [t setNativeTable:table_ref.get()];
                     return t;
@@ -235,7 +235,7 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
             if ([obj isKindOfClass:[NSData class]]) {
                 break;
             }
-            if ([obj isKindOfClass:[TDBTable class]]) { // subtables are inserted as TDBTable
+            if ([obj isKindOfClass:[RLMTable class]]) { // subtables are inserted as RLMTable
                 break;
             }
             return NO;
@@ -253,7 +253,7 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
                 }
                 break;
             }
-            if ([obj isKindOfClass:[TDBTable class]])
+            if ([obj isKindOfClass:[RLMTable class]])
                 break;
             return NO;
         default:
@@ -640,8 +640,8 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 }
                 break;
             }
-            if ([obj isKindOfClass:[TDBTable class]]) {
-                table.set_subtable(col_ndx, row_ndx, &[(TDBTable *)obj getNativeTable]);
+            if ([obj isKindOfClass:[RLMTable class]]) {
+                table.set_subtable(col_ndx, row_ndx, &[(RLMTable *)obj getNativeTable]);
                 break;
             }
             @throw [NSException exceptionWithName:@"tightdb:cannot insert subtable"
@@ -660,8 +660,8 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 table.set_mixed(col_ndx, row_ndx, sd);
                 break;
             }
-            if ([obj isKindOfClass:[TDBTable class]]) {
-                table.set_subtable(col_ndx, row_ndx, &[(TDBTable *)obj getNativeTable]);
+            if ([obj isKindOfClass:[RLMTable class]]) {
+                table.set_subtable(col_ndx, row_ndx, &[(RLMTable *)obj getNativeTable]);
                 break;
             }
             if ([obj isKindOfClass:[NSDate class]]) {

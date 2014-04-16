@@ -21,7 +21,7 @@
 #import <Foundation/Foundation.h>
 
 
-@class TDBTable;
+@class RLMTable;
 
 @interface RLMRow : NSObject
 
@@ -54,7 +54,7 @@
 -(void)setBinary:(NSData *)value;
 -(NSDate *)getDate;
 -(void)setDate:(NSDate *)value;
--(void)setSubtable:(TDBTable *)value;
+-(void)setSubtable:(RLMTable *)value;
 -(id)getSubtable:(Class)obj;
 -(id)getMixed;
 -(void)setMixed:(id)value;

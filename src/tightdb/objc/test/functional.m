@@ -6,7 +6,7 @@
 
 #import <XCTest/XCTest.h>
 #import <tightdb/objc/TightdbFast.h>
-#import <tightdb/objc/TDBTable.h>
+#import <tightdb/objc/RLMTable.h>
 
 TIGHTDB_TABLE_3(FuncPeopleTable,
                 Name,  String,
@@ -152,7 +152,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
      *  Row in a table.
      */
 
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
 
     size_t const NAME = [table addColumnWithName:@"Name" type:TDBStringType];
     size_t const AGE = [table addColumnWithName:@"Age" type:TDBIntType];

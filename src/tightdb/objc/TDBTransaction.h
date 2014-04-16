@@ -20,7 +20,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class TDBTable;
+@class RLMTable;
 
 
 @interface TDBTransaction: NSObject
@@ -38,7 +38,7 @@
  * This method returns a table with the specified name from the group.
  * Returns nil if no table with the specified name exists.
  */
--(TDBTable *)tableWithName:(NSString *)name;
+-(RLMTable *)tableWithName:(NSString *)name;
 
 /**
  * This method returns a table with the specified name from the group.
@@ -50,16 +50,16 @@
  * This method creates a table with the specific name.
  * If a table with that name already exists, an exception is thrown.
  */
--(TDBTable *)createTableWithName:(NSString *)name;
+-(RLMTable *)createTableWithName:(NSString *)name;
 
 /**
  * This method creates a table with the specific name.
  * If a table with that name already exists, an exception is thrown.
  *
  * The columns parameter adds columns to the table the same way as
- * TDBTable's initWithColumns:.
+ * RLMTable's initWithColumns:.
  */
--(TDBTable *)createTableWithName:(NSString*)name columns:(NSArray*)columns;
+-(RLMTable *)createTableWithName:(NSString*)name columns:(NSArray*)columns;
 
 /**
  * This method creates a table with the specified name as a specific table.

@@ -21,14 +21,14 @@
 #import <Foundation/Foundation.h>
 
 #import "TDBType.h"
-#import "TDBTable.h"
+#import "RLMTable.h"
 
 
 @interface TDBView: NSObject <TDBView, NSFastEnumeration>
 
 @property (nonatomic, readonly) NSUInteger rowCount;
 @property (nonatomic, readonly) NSUInteger columnCount;
-@property (nonatomic, readonly) TDBTable *originTable;
+@property (nonatomic, readonly) RLMTable *originTable;
 
 -(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(RLMRow *)rowAtIndex:(NSUInteger)rowIndex;

@@ -26,7 +26,7 @@
 #include <tightdb/table_view.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
-#import "TDBTable_noinst.h"
+#import "RLMTable_noinst.h"
 #import "RLMRow.h"
 #import "TDBView_noinst.h"
 #import "RLMQuery_noinst.h"
@@ -37,12 +37,12 @@
 @implementation TDBView
 {
     tightdb::util::UniquePtr<tightdb::TableView> m_view;
-    TDBTable* m_table;
+    RLMTable * m_table;
     RLMRow * m_tmp_row;
     BOOL m_read_only;
 }
 
-+(TDBView*)viewWithTable:(TDBTable*)table andNativeView:(const tightdb::TableView&)view
++(TDBView*)viewWithTable:(RLMTable *)table andNativeView:(const tightdb::TableView&)view
 {
     TDBView* view_2 = [[TDBView alloc] init];
     if (!view_2)
@@ -66,7 +66,7 @@
     return self;
 }
 
--(TDBTable*)originTable // Synthesize property
+-(RLMTable *)originTable // Synthesize property
 {
     return m_table;
 }
@@ -185,7 +185,7 @@
 
     tightdb::TableRef table = m_view->get_subtable(colNdx, rowIndex);
     TIGHTDB_ASSERT(table);
-    TDBTable* table_2 = [[TDBTable alloc] _initRaw];
+    RLMTable * table_2 = [[RLMTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table_2))
         return nil;
     [table_2 setNativeTable:table.get()];

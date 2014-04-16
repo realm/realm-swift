@@ -22,7 +22,7 @@
 #include <tightdb/lang_bind_helper.hpp>
 
 #import "TDBTransaction_noinst.h"
-#import "TDBTable_noinst.h"
+#import "RLMTable_noinst.h"
 #import "PrivateTDB.h"
 #import "util_noinst.hpp"
 
@@ -57,7 +57,7 @@ using namespace std;
     return m_group->has_table(ObjcStringAccessor(name));
 }
 
--(TDBTable *)tableWithName:(NSString *)name
+-(RLMTable *)tableWithName:(NSString *)name
 {
     // FIXME: Why impose this restriction? Isn't it kind of arbitrary?
     // The core library has no problems with an empty table name. What
@@ -78,7 +78,7 @@ using namespace std;
         return nil;
 
     // Otherwise
-    TDBTable* table = [[TDBTable alloc] _initRaw];
+    RLMTable * table = [[RLMTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
     TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
@@ -110,7 +110,7 @@ using namespace std;
     if (![self hasTableWithName:name]) // FIXME: Do this using C++
         return nil;
 
-    TDBTable* table = [[class_obj alloc] _initRaw];
+    RLMTable * table = [[class_obj alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
     bool was_created;
@@ -138,11 +138,11 @@ using namespace std;
 {
     if (!m_group->has_table(ObjcStringAccessor(name)))
         return NO;
-    TDBTable* table = [self createTableWithName:name asTableClass:class_obj];
+    RLMTable * table = [self createTableWithName:name asTableClass:class_obj];
     return table != nil;
 }
 
--(TDBTable *)createTableWithName:(NSString*)name
+-(RLMTable *)createTableWithName:(NSString*)name
 {
     if ([name length] == 0) {
         @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
@@ -162,7 +162,7 @@ using namespace std;
                                      userInfo:nil];
     }
 
-    TDBTable* table = [[TDBTable alloc] _initRaw];
+    RLMTable * table = [[RLMTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
     TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
@@ -174,9 +174,9 @@ using namespace std;
     return table;
 }
 
--(TDBTable *)createTableWithName:(NSString*)name columns:(NSArray*)columns
+-(RLMTable *)createTableWithName:(NSString*)name columns:(NSArray*)columns
 {
-    TDBTable* table = [self createTableWithName:name];
+    RLMTable * table = [self createTableWithName:name];
     
     //Set columns
     tightdb::TableRef nativeTable = [table getNativeTable].get_table_ref();
@@ -212,7 +212,7 @@ using namespace std;
                                      userInfo:nil];
     }
 
-    TDBTable* table = [[class_obj alloc] _initRaw];
+    RLMTable * table = [[class_obj alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
     bool was_created;

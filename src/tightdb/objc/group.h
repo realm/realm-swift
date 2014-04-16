@@ -31,7 +31,7 @@
 #import "TDBTransaction.h"
 
 @class TDBBinary;
-@class TDBTable;
+@class RLMTable;
 
 
 @interface  TDBTransaction() // Selectors are currently implemented in TDBTransaction

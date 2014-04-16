@@ -16,7 +16,7 @@
 
 #include <tightdb/binary_data.hpp>
 #include <tightdb/table.hpp>
-#import <tightdb/objc/TDBTable_noinst.h>
+#import <tightdb/objc/RLMTable_noinst.h>
 
 TIGHTDB_TABLE_DEF_3(PeopleErrTable,
                     Name,  String,
@@ -142,7 +142,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     PeopleErrTable* diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
     // Fake readonly.
-    [((TDBTable*)diskTable) setReadOnly:true];
+    [((RLMTable*)diskTable) setReadOnly:true];
 
     NSLog(@"Disktable size: %zu", [diskTable rowCount]);
 
@@ -165,7 +165,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
 
     // Create table with all column types
-    TDBTable* table = [[TDBTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] init];
     RLMDescriptor * desc = [table descriptor];
     if (![desc addColumnWithName:@"int" type:TDBIntType]) {
         XCTFail(@"addColumn failed.");
@@ -270,7 +270,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
         // Add sub-tables
         if (i == 2) {
-            TDBTable* subtable = [table TDB_tableInColumnWithIndex:8 atRowIndex:i];
+            RLMTable* subtable = [table TDB_tableInColumnWithIndex:8 atRowIndex:i];
             if (![subtable TDB_insertInt:0 ndx:0 value:42 ]) {
                 XCTFail(@"Insert failed.");
             }

@@ -26,7 +26,7 @@
 #include <tightdb/table_view.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
-#import "TDBTable_noinst.h"
+#import "RLMTable_noinst.h"
 #import "TDBView_noinst.h"
 #import "RLMQuery_noinst.h"
 #import "RLMRow.h"
@@ -40,7 +40,7 @@
 using namespace std;
 
 
-@implementation TDBTable
+@implementation RLMTable
 {
     tightdb::TableRef m_table;
     id m_parent;
@@ -157,8 +157,8 @@ using namespace std;
 
 -(BOOL)isEqual:(id)other
 {
-    if ([other isKindOfClass:[TDBTable class]])
-        return *m_table == *(((TDBTable *)other)->m_table);
+    if ([other isKindOfClass:[RLMTable class]])
+        return *m_table == *(((RLMTable *)other)->m_table);
     return NO;
 }
 
@@ -169,10 +169,10 @@ using namespace std;
 // The specified table class must be one that is declared by using
 // one of the table macros TIGHTDB_TABLE_*.
 //
-// FIXME: Check that the specified class derives from TDBTable.
+// FIXME: Check that the specified class derives from RLMTable.
 -(BOOL)hasSameDescriptorAs:(__unsafe_unretained Class)tableClass
 {
-    TDBTable* table = [[tableClass alloc] _initRaw];
+    RLMTable * table = [[tableClass alloc] _initRaw];
     if (TIGHTDB_LIKELY(table)) {
         [table setNativeTable:m_table.get()];
         [table setParent:m_parent];
@@ -191,10 +191,10 @@ using namespace std;
 // The specified table class must be one that is declared by using
 // one of the table macros TIGHTDB_TABLE_*.
 //
-// FIXME: Check that the specified class derives from TDBTable.
+// FIXME: Check that the specified class derives from RLMTable.
 -(id)castToTypedTableClass:(__unsafe_unretained Class)typedTableClass
 {
-    TDBTable* table = [[typedTableClass alloc] _initRaw];
+    RLMTable * table = [[typedTableClass alloc] _initRaw];
     if (TIGHTDB_LIKELY(table)) {
         [table setNativeTable:m_table.get()];
         [table setParent:m_parent];
@@ -495,7 +495,7 @@ using namespace std;
     return [NSDate dateWithTimeIntervalSince1970: m_table->get_datetime(colIndex, rowIndex).get_datetime()];
 }
 
--(TDBTable*)TDB_tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(RLMTable *)TDB_tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
     tightdb::DataType type = m_table->get_column_type(colIndex);
     if (type != tightdb::type_Table)
@@ -503,7 +503,7 @@ using namespace std;
     tightdb::TableRef table = m_table->get_subtable(colIndex, rowIndex);
     if (!table)
         return nil;
-    TDBTable* table_2 = [[TDBTable alloc] _initRaw];
+    RLMTable * table_2 = [[RLMTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table_2))
         return nil;
     [table_2 setNativeTable:table.get()];
@@ -512,7 +512,7 @@ using namespace std;
     return table_2;
 }
 
-// FIXME: Check that the specified class derives from TDBTable.
+// FIXME: Check that the specified class derives from RLMTable.
 -(id)TDB_tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(__unsafe_unretained Class)tableClass
 {
     tightdb::DataType type = m_table->get_column_type(colIndex);
@@ -520,7 +520,7 @@ using namespace std;
         return nil;
     tightdb::TableRef table = m_table->get_subtable(colIndex, rowIndex);
     TIGHTDB_ASSERT(table);
-    TDBTable* table_2 = [[tableClass alloc] _initRaw];
+    RLMTable * table_2 = [[tableClass alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
     [table_2 setNativeTable:table.get()];
@@ -539,7 +539,7 @@ using namespace std;
 
     tightdb::TableRef table = m_table->get_subtable(colNdx, rowIndex);
     TIGHTDB_ASSERT(table);
-    TDBTable* table_2 = [[TDBTable alloc] _initRaw];
+    RLMTable * table_2 = [[RLMTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table_2))
         return nil;
     [table_2 setNativeTable:table.get()];
@@ -601,7 +601,7 @@ using namespace std;
        TDBDateType);
 }
 
--(void)TDB_setTable:(TDBTable*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
+-(void)TDB_setTable:(RLMTable *)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     // TODO: Use core method for checking the equality of two table specs. Even in the typed interface
     // the user might add columns (_checkType for typed and spec against spec for dynamic).
@@ -615,7 +615,7 @@ using namespace std;
 {
     tightdb::Mixed mixed;
     to_mixed(value, mixed);
-    TDBTable* subtable = mixed.get_type() == tightdb::type_Table ? (TDBTable *)value : nil;
+    RLMTable * subtable = mixed.get_type() == tightdb::type_Table ? (RLMTable *)value : nil;
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
         if (subtable) {
             tightdb::LangBindHelper::set_mixed_subtable(*m_table, col_ndx, row_ndx,
@@ -832,13 +832,13 @@ using namespace std;
     return YES;
 }
 
--(BOOL)TDB_insertSubtableCopy:(NSUInteger)col_ndx row:(NSUInteger)row_ndx subtable:(TDBTable*)subtable
+-(BOOL)TDB_insertSubtableCopy:(NSUInteger)col_ndx row:(NSUInteger)row_ndx subtable:(RLMTable *)subtable
 {
     return [self TDB_insertSubtableCopy:col_ndx row:row_ndx subtable:subtable error:nil];
 }
 
 
--(BOOL)TDB_insertSubtableCopy:(NSUInteger)col_ndx row:(NSUInteger)row_ndx subtable:(TDBTable*)subtable error:(NSError* __autoreleasing*)error
+-(BOOL)TDB_insertSubtableCopy:(NSUInteger)col_ndx row:(NSUInteger)row_ndx subtable:(RLMTable *)subtable error:(NSError* __autoreleasing*)error
 {
     // FIXME: Read-only errors should probably be handled by throwing
     // an exception. That is what is done in other places in this
@@ -876,9 +876,9 @@ using namespace std;
         return NO;
     }
     tightdb::Mixed mixed;
-    TDBTable* subtable;
-    if ([value isKindOfClass:[TDBTable class]]) {
-        subtable = (TDBTable *)value;
+    RLMTable * subtable;
+    if ([value isKindOfClass:[RLMTable class]]) {
+        subtable = (RLMTable *)value;
     }
     else {
         to_mixed(value, mixed);
@@ -1059,7 +1059,7 @@ inline NSExpressionType validated_expression_type(NSExpression * expression) {
 }
 
 // return the column index for a validated column name
-inline NSUInteger validated_column_index(TDBTable * table, NSString * columnName) {
+inline NSUInteger validated_column_index(RLMTable * table, NSString * columnName) {
     NSUInteger index = [table indexOfColumnWithName:columnName];
     if (index == NSNotFound) {
         @throw predicate_exception(@"Invalid column name",
@@ -1071,7 +1071,7 @@ inline NSUInteger validated_column_index(TDBTable * table, NSString * columnName
 
 // apply an expression between two columns to a query
 /*
-void update_query_with_column_expression(TDBTable * table, tightdb::Query & query,
+void update_query_with_column_expression(RLMTable * table, tightdb::Query & query,
     NSString * col1, NSString * col2, NSPredicateOperatorType operatorType) {
     
     // only support equality for now
@@ -1175,7 +1175,7 @@ void add_string_constraint_to_query(tightdb::Query & query,
     }
 }
 
-void update_query_with_value_expression(TDBTable * table, tightdb::Query & query,
+void update_query_with_value_expression(RLMTable * table, tightdb::Query & query,
     NSString * columnName, id value, NSPredicateOperatorType operatorType) {
 
     // validate object type
@@ -1219,7 +1219,7 @@ void update_query_with_value_expression(TDBTable * table, tightdb::Query & query
 }
 
 void update_query_with_predicate(NSPredicate * predicate,
-    TDBTable * table, tightdb::Query & query) {
+    RLMTable * table, tightdb::Query & query) {
     
     // compound predicates
     if ([predicate isMemberOfClass:[NSCompoundPredicate class]]) {
@@ -1285,7 +1285,7 @@ void update_query_with_predicate(NSPredicate * predicate,
     }
 }
 
-tightdb::Query queryFromPredicate(TDBTable *table, id condition)
+tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 {
     tightdb::Query query = table->m_table->where();
 

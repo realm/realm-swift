@@ -22,7 +22,7 @@
 #import <Foundation/NSException.h>
 
 #import <tightdb/objc/TightdbFast.h>
-#import <tightdb/objc/TDBTable_noinst.h>
+#import <tightdb/objc/RLMTable_noinst.h>
 
 #include <string.h>
 
@@ -45,7 +45,7 @@ using namespace std;
 
 - (void)testTable
 {
-    TDBTable* table = [[TDBTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] init];
     NSLog(@"Table: %@", table);
     XCTAssertNotNil(table, @"Table is nil");
 
@@ -77,7 +77,7 @@ using namespace std;
 
 -(void)testAddColumn
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     NSUInteger stringColIndex = [t addColumnWithName:@"stringCol" type:TDBStringType];
     RLMRow *row = [t addEmptyRow];
     [row setString:@"val" inColumnWithIndex:stringColIndex];
@@ -86,7 +86,7 @@ using namespace std;
 -(void)testAppendRowsIntColumn
 {
     // Add row using object literate
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
     XCTAssertNoThrow([t addRow:@[ @1 ]], @"Impossible!");
     XCTAssertEqual((size_t)1, [t rowCount], @"Expected 1 row");
@@ -101,7 +101,7 @@ using namespace std;
 -(void)testInsertRowsIntColumn
 {
     // Add row using object literate
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
     XCTAssertNoThrow([t insertRow:@[ @1 ] atIndex:0], @"Impossible!");
     XCTAssertEqual((size_t)1, [t rowCount], @"Expected 1 row");
@@ -115,7 +115,7 @@ using namespace std;
 
 -(void)testUpdateRowIntColumn
 {
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
     [t insertRow:@[@1] atIndex:0];
     t[0] = @[@2];
@@ -124,7 +124,7 @@ using namespace std;
 
 -(void)testAppendRowGenericObject
 {
-    TDBTable* table1 = [[TDBTable alloc] init];
+    RLMTable* table1 = [[RLMTable alloc] init];
     [table1 addColumnWithName:@"name" type:TDBStringType];
     [table1 addColumnWithName:@"age" type:TDBIntType];
 
@@ -136,7 +136,7 @@ using namespace std;
     XCTAssertEqual((long long)11, [(NSNumber *)table1[0][@"age"] longLongValue], @"11 excepted");
     XCTAssertTrue([((NSString *)table1[0][@"name"]) isEqualToString:@"Joe"], @"'Joe' excepted");
 
-    TDBTable* table2 = [[TDBTable alloc] init];
+    RLMTable* table2 = [[RLMTable alloc] init];
     [table2 addColumnWithName:@"name" type:TDBStringType];
     [table2 addColumnWithName:@"age" type:TDBStringType];
 
@@ -146,7 +146,7 @@ using namespace std;
 
 -(void)testUpdateRowWithLabelsIntColumn
 {
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
     [t insertRow:@[@1] atIndex:0];
     t[0] = @{@"first": @2};
@@ -157,7 +157,7 @@ using namespace std;
 -(void)testAppendRowWithLabelsIntColumn
 {
     // Add row using object literate
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
 
     XCTAssertNoThrow([t addRow:@{ @"first": @1 }], @"Impossible!");
@@ -184,7 +184,7 @@ using namespace std;
 -(void)testInsertRowWithLabelsIntColumn
 {
     // Add row using object literate
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
     
     XCTAssertNoThrow(([t insertRow:@{ @"first": @1 } atIndex:0]), @"Impossible!");
@@ -210,7 +210,7 @@ using namespace std;
 
 -(void)testAppendRowsIntStringColumns
 {
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
     [t addColumnWithName:@"second" type:TDBStringType];
 
@@ -224,7 +224,7 @@ using namespace std;
 
 -(void)testAppendRowWithLabelsIntStringColumns
 {
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
     [t addColumnWithName:@"second" type:TDBStringType];
     XCTAssertNoThrow(([t addRow:@{@"first": @1, @"second": @"Hello"}]), @"addRowWithLabels 1");
@@ -237,7 +237,7 @@ using namespace std;
 
 -(void)testAppendRowsDoubleColumn
 {
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBDoubleType];
     XCTAssertNoThrow(([t addRow:@[@3.14]]), @"Cannot insert 'double'");  /* double is default */
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
@@ -245,7 +245,7 @@ using namespace std;
 
 -(void)testAppendRowWithLabelsDoubleColumn
 {
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBDoubleType];
     XCTAssertNoThrow(([t addRow:@{@"first": @3.14}]), @"Cannot insert 'double'");   /* double is default */
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
@@ -253,7 +253,7 @@ using namespace std;
 
 -(void)testAppendRowsFloatColumn
 {
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBFloatType];
     XCTAssertNoThrow(([t addRow:@[@3.14F]]), @"Cannot insert 'float'"); /* F == float */
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
@@ -261,7 +261,7 @@ using namespace std;
 
 -(void)testAppendRowWithLabelsFloatColumn
 {
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBFloatType];
     XCTAssertNoThrow(([t addRow:@{@"first": @3.14F}]), @"Cannot insert 'float'");   /* F == float */
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
@@ -269,7 +269,7 @@ using namespace std;
 
 -(void)testAppendRowsDateColumn
 {
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBDateType];
     XCTAssertNoThrow(([t addRow:@[@1000000000]]), @"Cannot insert 'time_t'"); /* 2001-09-09 01:46:40 */
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
@@ -281,7 +281,7 @@ using namespace std;
 
 -(void)testAppendRowWithLabelsDateColumn
 {
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBDateType];
 
     XCTAssertNoThrow(([t addRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   // 2001-09-09 01:46:40
@@ -314,7 +314,7 @@ using namespace std;
 {
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin2 = [[NSData alloc] initWithBytes:(const void *)bin length:sizeof bin];
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBBinaryType];
     XCTAssertNoThrow(([t addRow:@[bin2]]), @"Cannot insert 'binary'");
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
@@ -329,7 +329,7 @@ using namespace std;
 {
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin2 = [[NSData alloc] initWithBytes:(const void *)bin length:sizeof bin];
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBBinaryType];
 
     XCTAssertNoThrow(([t addRow:@{@"first": bin2}]), @"Cannot insert 'binary'");
@@ -342,21 +342,21 @@ using namespace std;
 
 -(void)testAppendRowsTooManyItems
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
     XCTAssertThrows(([t addRow:@[@1, @1]]), @"Too many items for a row.");
 }
 
 -(void)testAppendRowsTooFewItems
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
     XCTAssertThrows(([t addRow:@[]]),  @"Too few items for a row.");
 }
 
 -(void)testAppendRowsWrongType
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
     XCTAssertThrows(([t addRow:@[@YES]]), @"Wrong type for column.");
     XCTAssertThrows(([t addRow:@[@""]]),  @"Wrong type for column.");
@@ -367,7 +367,7 @@ using namespace std;
 
 -(void)testAppendRowsBoolColumn
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBBoolType];
     XCTAssertNoThrow(([t addRow:@[@YES]]), @"Cannot append bool column.");
     XCTAssertNoThrow(([t addRow:@[@NO]]), @"Cannot append bool column.");
@@ -376,7 +376,7 @@ using namespace std;
 
 -(void)testAppendRowWithLabelsBoolColumn
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBBoolType];
     XCTAssertNoThrow(([t addRow:@{@"first": @YES}]), @"Cannot append bool column.");
     XCTAssertNoThrow(([t addRow:@{@"first": @NO}]), @"Cannot append bool column.");
@@ -385,7 +385,7 @@ using namespace std;
 
 -(void)testAppendRowsIntSubtableColumns
 {
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBIntType];
     RLMDescriptor * descr = [t descriptor];
     RLMDescriptor * subdescr = [descr addColumnTable:@"second"];
@@ -401,7 +401,7 @@ using namespace std;
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin2 = [[NSData alloc] initWithBytes:(const void *)bin length:sizeof bin];
 
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBMixedType];
     XCTAssertNoThrow(([t addRow:@[@1]]), @"Cannot insert 'int'");
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row excepted");
@@ -422,7 +422,7 @@ using namespace std;
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
 
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     [t addColumnWithName:@"first" type:TDBMixedType];
     XCTAssertNoThrow(([t addRow:@{@"first": @1}]), @"Cannot insert 'int'");
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row excepted");
@@ -441,7 +441,7 @@ using namespace std;
 -(void)testRemoveColumns
 {
 
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     [table addColumnWithName:@"col0" type:TDBIntType];
     XCTAssertTrue(table.columnCount == 1,@"1 column added" );
 
@@ -468,7 +468,7 @@ using namespace std;
 
 -(void)testRenameColumns
 {
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     XCTAssertThrows([table renameColumnWithIndex:0 to:@"someName"], @"Out of bounds");
     
     [table addColumnWithName:@"oldName" type:TDBIntType];
@@ -492,7 +492,7 @@ using namespace std;
 
 - (void)testColumnlessCount
 {
-    TDBTable* table = [[TDBTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] init];
     XCTAssertEqual((size_t)0, [table rowCount], @"Columnless table has 0 rows.");
 }
 
@@ -500,14 +500,14 @@ using namespace std;
 
 - (void)testColumnlessClear
 {
-    TDBTable* table = [[TDBTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] init];
     [table removeAllRows];
     XCTAssertEqual((size_t)0, [table rowCount], @"Columnless table has 0 rows.");
 }
 
 - (void)testColumnlessOptimize
 {
-    TDBTable* table = [[TDBTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] init];
     XCTAssertEqual((size_t)0, [table rowCount], @"Columnless table has 0 rows.");
     [table optimize];
     XCTAssertEqual((size_t)0, [table rowCount], @"Columnless table has 0 rows.");
@@ -516,8 +516,8 @@ using namespace std;
 
 - (void)testColumnlessIsEqual
 {
-    TDBTable* table1 = [[TDBTable alloc] init];
-    TDBTable* table2 = [[TDBTable alloc] init];
+    RLMTable* table1 = [[RLMTable alloc] init];
+    RLMTable* table2 = [[RLMTable alloc] init];
     XCTAssertTrue([table1 isEqual:table1], @"Columnless table is equal to itself.");
     XCTAssertTrue([table1 isEqual:table2], @"Columnless table is equal to another columnless table.");
     XCTAssertTrue([table2 isEqual:table1], @"Columnless table is equal to another columnless table.");
@@ -525,14 +525,14 @@ using namespace std;
 
 - (void)testColumnlessColumnCount
 {
-    TDBTable* table = [[TDBTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] init];
     XCTAssertEqual((size_t)0, [table columnCount], @"Columnless table has column count 0.");
 }
 
 /*
 - (void)testColumnlessNameOfColumnWithIndex
 {
-    TDBTable* table = [[TDBTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] init];
     XCTAssertThrowsSpecific([table nameOfColumnWithIndex:NSNotFound],
         NSException, NSRangeException,
         @"Columnless table has no column names.");
@@ -546,7 +546,7 @@ using namespace std;
 
 - (void)testColumnlessGetColumnType
 {
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     XCTAssertThrowsSpecific([t getColumnType:((size_t)-1)],
         NSException, NSRangeException,
         @"Columnless table has no column types.");
@@ -560,7 +560,7 @@ using namespace std;
 
 - (void)testColumnlessCursorAtIndex
 {
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     XCTAssertThrowsSpecific([t cursorAtIndex:((size_t)-1)],
         NSException, NSRangeException,
         @"Columnless table has no cursors.");
@@ -574,7 +574,7 @@ using namespace std;
 
 - (void)testColumnlessCursorAtLastIndex
 {
-    TDBTable* t = [[TDBTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] init];
     XCTAssertThrowsSpecific([t cursorAtLastIndex],
         NSException, NSRangeException,
         @"Columnless table has no cursors."); 
@@ -582,7 +582,7 @@ using namespace std;
 
 - (void)testRemoveRowAtIndex
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     XCTAssertThrowsSpecific([t removeRowAtIndex:((size_t)-1)],
         NSException, NSRangeException,
         @"No rows in a columnless table.");
@@ -596,7 +596,7 @@ using namespace std;
 
 - (void)testColumnlessRemoveLastRow
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     XCTAssertThrowsSpecific([t removeLastRow],
         NSException, NSRangeException,
         @"No rows in a columnless table.");
@@ -604,7 +604,7 @@ using namespace std;
 
 - (void)testColumnlessGetTableSize
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     XCTAssertThrowsSpecific([t getTableSize:((size_t)0) ndx:((size_t)-1)],
         NSException, NSRangeException,
         @"No rows in a columnless table.");
@@ -618,7 +618,7 @@ using namespace std;
 
 - (void)testColumnlessClearSubtable
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     XCTAssertThrowsSpecific([t clearSubtable:((size_t)0) ndx:((size_t)-1)],
         NSException, NSRangeException,
         @"No rows in a columnless table.");
@@ -633,7 +633,7 @@ using namespace std;
 - (void)testColumnlessSetIndex
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t setIndex:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -648,7 +648,7 @@ using namespace std;
 - (void)testColumnlessHasIndex
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t hasIndex:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -663,7 +663,7 @@ using namespace std;
 - (void)testColumnlessCountWithIntColumn
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t countWithIntColumn:((size_t)-1) andValue: 0],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -678,7 +678,7 @@ using namespace std;
 - (void)testColumnlessCountWithFloatColumn
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t countWithFloatColumn:((size_t)-1) andValue: 0.0f],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -693,7 +693,7 @@ using namespace std;
 - (void)testColumnlessCountWithDoubleColumn
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t countWithDoubleColumn:((size_t)-1) andValue: 0.0],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -708,7 +708,7 @@ using namespace std;
 - (void)testColumnlessCountWithStringColumn
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t countWithStringColumn:((size_t)-1) andValue: @""],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -723,7 +723,7 @@ using namespace std;
 - (void)testColumnlessSumWithIntColumn
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t sumWithIntColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -738,7 +738,7 @@ using namespace std;
 - (void)testColumnlessSumWithFloatColumn
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t sumWithFloatColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -753,7 +753,7 @@ using namespace std;
 - (void)testColumnlessSumWithDoubleColumn
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t sumWithDoubleColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -768,7 +768,7 @@ using namespace std;
 - (void)testColumnlessMaximumWithIntColumn
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t maximumWithIntColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -783,7 +783,7 @@ using namespace std;
 - (void)testColumnlessMaximumWithFloatColumn
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t maximumWithFloatColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -798,7 +798,7 @@ using namespace std;
 - (void)testColumnlessMaximumWithDoubleColumn
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t maximumWithDoubleColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -813,7 +813,7 @@ using namespace std;
 - (void)testColumnlessMinimumWithIntColumn
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t minimumWithIntColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -828,7 +828,7 @@ using namespace std;
 - (void)testColumnlessMinimumWithFloatColumn
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t minimumWithFloatColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -843,7 +843,7 @@ using namespace std;
 - (void)testColumnlessMinimumWithDoubleColumn
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t minimumWithDoubleColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -858,7 +858,7 @@ using namespace std;
 - (void)testColumnlessAverageWithIntColumn
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t averageWithIntColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -873,7 +873,7 @@ using namespace std;
 - (void)testColumnlessAverageWithFloatColumn
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t averageWithFloatColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -888,7 +888,7 @@ using namespace std;
 - (void)testColumnlessAverageWithDoubleColumn
 {
 // SEGFAULT
-//    TDBTable *t = [[TDBTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] init];
 //    XCTAssertThrowsSpecific([t averageWithDoubleColumn:((size_t)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -902,7 +902,7 @@ using namespace std;
 
 - (void)testDataTypes_Dynamic
 {
-    TDBTable* table = [[TDBTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] init];
     NSLog(@"Table: %@", table);
     XCTAssertNotNil(table, @"Table is nil");
 
@@ -937,10 +937,10 @@ using namespace std;
     NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
     NSDate *timeNow = [NSDate date];
 
-    TDBTable* subtab1 = [[TDBTable alloc] init];
+    RLMTable* subtab1 = [[RLMTable alloc] init];
     [subtab1 addColumnWithName:@"TableCol_IntCol" type:TDBIntType];
 
-    TDBTable* subtab2 = [[TDBTable alloc] init];
+    RLMTable* subtab2 = [[RLMTable alloc] init];
     [subtab2 addColumnWithName:@"TableCol_IntCol" type:TDBIntType];
 
     RLMRow * cursor;
@@ -997,7 +997,7 @@ using namespace std;
     XCTAssertTrue([[row1 tableInColumnWithIndex:TableCol] isEqual:subtab1],    @"row1.TableCol");
     XCTAssertTrue([[row2 tableInColumnWithIndex:TableCol] isEqual:subtab2],    @"row2.TableCol");
     XCTAssertTrue([[row1 mixedInColumnWithIndex:MixedCol] isEqual:mixInt1],    @"row1.MixedCol");
-    XCTAssertTrue([[row2 mixedInColumnWithIndex:MixedCol] isKindOfClass:[TDBTable class]], @"TDBTable expected");
+    XCTAssertTrue([[row2 mixedInColumnWithIndex:MixedCol] isKindOfClass:[RLMTable class]], @"RLMTable expected");
     XCTAssertTrue([[row2 mixedInColumnWithIndex:MixedCol] isEqual:subtab2],    @"row2.MixedCol");
 
     XCTAssertEqual([table minIntInColumnWithIndex:IntCol], (int64_t)54,                 @"IntCol min");
@@ -1018,7 +1018,7 @@ using namespace std;
 
 - (void)testTableDynamic_Subscripting
 {
-    TDBTable* table = [[TDBTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] init];
     XCTAssertNotNil(table, @"Table is nil");
 
     // 1. Add two columns
@@ -1048,7 +1048,7 @@ using namespace std;
 
 - (void)testFirstLastRow
 {
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     NSUInteger col0 = [table addColumnWithName:@"col" type:TDBStringType];
 
     XCTAssertNil([table firstRow], @"Table is empty");
@@ -1066,7 +1066,7 @@ using namespace std;
 
 - (void)testTableDynamic_Cursor_Subscripting
 {
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     XCTAssertNotNil(table, @"Table is nil");
 
     // 1. Add two columns
@@ -1109,7 +1109,7 @@ using namespace std;
 
 -(void)testTableDynamic_Row_Set
 {
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     XCTAssertNotNil(table, @"Table is nil");
 
     // Add two columns
@@ -1150,7 +1150,7 @@ using namespace std;
 
 -(void)testTableDynamic_Row_Set_Mixed
 {
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
 
     // Mixed column
     [table addColumnWithName:@"first" type:TDBMixedType];
@@ -1198,7 +1198,7 @@ using namespace std;
 
 -(void)testTableDynamic_Row_Get
 {
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     XCTAssertNotNil(table, @"Table is nil");
 
     // Add two columns
@@ -1215,7 +1215,7 @@ using namespace std;
 
 -(void)testTableDynamic_Row_Get_Mixed
 {
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     XCTAssertNotNil(table, @"Table is nil");
 
     // Add two columns
@@ -1236,7 +1236,7 @@ using namespace std;
 
 - (void)testTableDynamic_initWithColumns
 {
-    TDBTable *table = [[TDBTable alloc] initWithColumns:@[@"name",   @"string",
+    RLMTable *table = [[RLMTable alloc] initWithColumns:@[@"name",   @"string",
                                                           @"age",    @"int",
                                                           @"hired",  @"bool",
                                                           @"phones", @[@"type",   @"string",
@@ -1251,7 +1251,7 @@ using namespace std;
 
 - (void)testDistinctView
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     
     NSUInteger nameIndex = [t addColumnWithName:@"name" type:TDBStringType];
     NSUInteger ageIndex = [t addColumnWithName:@"age" type:TDBIntType];
@@ -1281,7 +1281,7 @@ using namespace std;
 
 - (void)testPredicateFind
 {
-    TDBTable *t = [[TDBTable alloc] initWithColumns:@[@"name", @"string",
+    RLMTable *t = [[RLMTable alloc] initWithColumns:@[@"name", @"string",
                                                       @"age",  @"int"]];
     [t addRow:@[@"name0", @0]];
     [t addRow:@[@"name1", @1]];
@@ -1318,7 +1318,7 @@ using namespace std;
 
 - (void)testPredicateView
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     
     NSUInteger nameIndex = [t addColumnWithName:@"name" type:TDBStringType];
     NSUInteger ageIndex = [t addColumnWithName:@"age" type:TDBIntType];
@@ -1379,7 +1379,7 @@ using namespace std;
 
 - (void)testPredicateSort
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     
     [t addColumnWithName:@"name" type:TDBStringType];
     NSUInteger ageIndex = [t addColumnWithName:@"age" type:TDBIntType];
@@ -1422,7 +1422,7 @@ using namespace std;
 
 -(void)testTableDynamic_find_int
 {
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     [table addColumnWithName:@"first" type:TDBIntType];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithInt:i]]];
@@ -1432,7 +1432,7 @@ using namespace std;
 
 -(void)testTableDynamic_find_float
 {
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     [table addColumnWithName:@"first" type:TDBFloatType];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithFloat:(float)i]]];
@@ -1442,7 +1442,7 @@ using namespace std;
 
 -(void)testTableDynamic_find_double
 {
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     [table addColumnWithName:@"first" type:TDBDoubleType];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithDouble:(double)i]]];
@@ -1452,7 +1452,7 @@ using namespace std;
 
 -(void)testTableDynamic_find_bool
 {
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     [table addColumnWithName:@"first" type:TDBBoolType];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithBool:YES]]];
@@ -1464,7 +1464,7 @@ using namespace std;
 
 -(void)testTableDynamic_find_string
 {
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     [table addColumnWithName:@"first" type:TDBStringType];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSString stringWithFormat:@"%d", i]]];
@@ -1474,7 +1474,7 @@ using namespace std;
 
 -(void)testTableDynamic_find_date
 {
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     [table addColumnWithName:@"first" type:TDBDateType];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSDate dateWithTimeIntervalSince1970:i]]];

@@ -42,7 +42,7 @@
 
 -(void)testGetColumnCount
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     RLMQuery *q = [t where];
     TDBView *v = [q findAllRows];
     
@@ -62,7 +62,7 @@
 
 - (void)testColumnTypesOnView
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     
     NSUInteger boolCol      = [t addColumnWithName:@"boolCol" type:TDBBoolType];
     NSUInteger binaryCol    = [t addColumnWithName:@"binaryCol" type:TDBBinaryType];
@@ -95,7 +95,7 @@
 
 - (void)testSortOnViewIntColumn
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     NSUInteger intCol = [t addColumnWithName:@"intCol" type:TDBIntType];
     
     [t addRow:nil];
@@ -139,7 +139,7 @@
 
 - (void)testSortOnViewBoolColumn
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     NSUInteger boolCol = [t addColumnWithName:@"boolCol" type:TDBBoolType];
 
     [t addRow:nil];
@@ -184,7 +184,7 @@
 
 - (void)testSortOnViewDateColumn
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     NSUInteger dateCol = [t addColumnWithName:@"dateCol" type:TDBDateType];
     
     
@@ -237,7 +237,7 @@
 
 - (void)testSortOnAllColumnTypes
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     
     NSUInteger boolCol      = [t addColumnWithName:@"boolCol" type:TDBBoolType];
     NSUInteger binaryCol    = [t addColumnWithName:@"binaryCol" type:TDBBinaryType];
@@ -265,7 +265,7 @@
 
 - (void)testFirstLastRow
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     NSUInteger col0 = [t addColumnWithName:@"col" type:TDBStringType];
     NSUInteger col1 = [t addColumnWithName:@"col" type:TDBIntType];
     
@@ -298,7 +298,7 @@
 
 - (void)testViewSubscripting
 {
-    TDBTable* table = [[TDBTable alloc]init];
+    RLMTable* table = [[RLMTable alloc]init];
     [table addColumnWithName:@"IntCol" type:TDBIntType];
     
     [table addRow:@[@10]];
@@ -319,7 +319,7 @@
 
 - (void)testQueryOnView
 {
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     
     // Specify the column types and names
     [table addColumnWithName:@"firstName" type:TDBStringType];

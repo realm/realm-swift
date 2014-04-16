@@ -33,6 +33,6 @@
                               notificationCenter:(NSNotificationCenter *)notificationCenter
                                            error:(NSError **)error;
 
--(TDBTable *)tableWithName:(NSString *)name;
+-(RLMTable *)tableWithName:(NSString *)name;
 
 @end

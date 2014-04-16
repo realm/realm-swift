@@ -20,13 +20,13 @@
 
 #import <Foundation/Foundation.h>
 
-#import "TDBTable_noinst.h"
+#import "RLMTable_noinst.h"
 #import "TDBColumnProxy.h"
 
 
 @implementation TDBColumnProxy
 @synthesize table = _table, column = _column;
--(id)initWithTable:(TDBTable*)table column:(NSUInteger)column
+-(id)initWithTable:(RLMTable*)table column:(NSUInteger)column
 {
     self = [super init];
     if (self) {

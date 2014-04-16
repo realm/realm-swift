@@ -50,9 +50,9 @@
 		E91890DE177B67AB00653D7A /* RLMQuery.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890CD177B67AB00653D7A /* RLMQuery.mm */; };
 		E91890DF177B67AB00653D7A /* RLMQuery_noinst.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CE177B67AB00653D7A /* RLMQuery_noinst.h */; };
 		E91890E0177B67AB00653D7A /* RLMQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CF177B67AB00653D7A /* RLMQuery.h */; };
-		E91890E1177B67AB00653D7A /* TDBTable.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890D0177B67AB00653D7A /* TDBTable.mm */; };
-		E91890E2177B67AB00653D7A /* TDBTable_noinst.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D1177B67AB00653D7A /* TDBTable_noinst.h */; };
-		E91890E3177B67AB00653D7A /* TDBTable.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D2177B67AB00653D7A /* TDBTable.h */; };
+		E91890E1177B67AB00653D7A /* RLMTable.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890D0177B67AB00653D7A /* RLMTable.mm */; };
+		E91890E2177B67AB00653D7A /* RLMTable_noinst.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D1177B67AB00653D7A /* RLMTable_noinst.h */; };
+		E91890E3177B67AB00653D7A /* RLMTable.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D2177B67AB00653D7A /* RLMTable.h */; };
 		E91890E4177B67AB00653D7A /* Tightdb.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D3177B67AB00653D7A /* Tightdb.h */; };
 		E91890E5177B67AB00653D7A /* TDBType.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D4177B67AB00653D7A /* TDBType.h */; };
 		E91890E6177B67AB00653D7A /* util_noinst.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E91890D5177B67AB00653D7A /* util_noinst.hpp */; };
@@ -134,9 +134,9 @@
 		E91890CD177B67AB00653D7A /* RLMQuery.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMQuery.mm; path = ../src/tightdb/objc/RLMQuery.mm; sourceTree = SOURCE_ROOT; };
 		E91890CE177B67AB00653D7A /* RLMQuery_noinst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMQuery_noinst.h; path = ../src/tightdb/objc/RLMQuery_noinst.h; sourceTree = SOURCE_ROOT; };
 		E91890CF177B67AB00653D7A /* RLMQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMQuery.h; path = ../src/tightdb/objc/RLMQuery.h; sourceTree = SOURCE_ROOT; };
-		E91890D0177B67AB00653D7A /* TDBTable.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBTable.mm; path = ../src/tightdb/objc/TDBTable.mm; sourceTree = SOURCE_ROOT; };
-		E91890D1177B67AB00653D7A /* TDBTable_noinst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBTable_noinst.h; path = ../src/tightdb/objc/TDBTable_noinst.h; sourceTree = SOURCE_ROOT; };
-		E91890D2177B67AB00653D7A /* TDBTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBTable.h; path = ../src/tightdb/objc/TDBTable.h; sourceTree = SOURCE_ROOT; };
+		E91890D0177B67AB00653D7A /* RLMTable.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMTable.mm; path = ../src/tightdb/objc/RLMTable.mm; sourceTree = SOURCE_ROOT; };
+		E91890D1177B67AB00653D7A /* RLMTable_noinst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTable_noinst.h; path = ../src/tightdb/objc/RLMTable_noinst.h; sourceTree = SOURCE_ROOT; };
+		E91890D2177B67AB00653D7A /* RLMTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTable.h; path = ../src/tightdb/objc/RLMTable.h; sourceTree = SOURCE_ROOT; };
 		E91890D3177B67AB00653D7A /* Tightdb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Tightdb.h; path = ../src/tightdb/objc/Tightdb.h; sourceTree = SOURCE_ROOT; };
 		E91890D4177B67AB00653D7A /* TDBType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBType.h; path = ../src/tightdb/objc/TDBType.h; sourceTree = SOURCE_ROOT; };
 		E91890D5177B67AB00653D7A /* util_noinst.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = util_noinst.hpp; path = ../src/tightdb/objc/util_noinst.hpp; sourceTree = SOURCE_ROOT; };
@@ -255,9 +255,9 @@
 				4D143CEC18F7E8C200CEFF65 /* TDBSmartContext.h */,
 				4D143CED18F7E8C200CEFF65 /* TDBSmartContext.mm */,
 				4D143CEB18F7E8C200CEFF65 /* TDBSmartContext_noinst.h */,
-				E91890D2177B67AB00653D7A /* TDBTable.h */,
-				E91890D0177B67AB00653D7A /* TDBTable.mm */,
-				E91890D1177B67AB00653D7A /* TDBTable_noinst.h */,
+				E91890D2177B67AB00653D7A /* RLMTable.h */,
+				E91890D0177B67AB00653D7A /* RLMTable.mm */,
+				E91890D1177B67AB00653D7A /* RLMTable_noinst.h */,
 				E91890CB177B67AB00653D7A /* TDBTransaction.h */,
 				E91890C7177B67AB00653D7A /* TDBTransaction.mm */,
 				E91890C8177B67AB00653D7A /* TDBTransaction_noinst.h */,
@@ -328,11 +328,11 @@
 				E91890DF177B67AB00653D7A /* RLMQuery_noinst.h in Headers */,
 				424EEF9E18D9C10100337A13 /* TDBColumnProxy.h in Headers */,
 				E91890E0177B67AB00653D7A /* RLMQuery.h in Headers */,
-				E91890E2177B67AB00653D7A /* TDBTable_noinst.h in Headers */,
+				E91890E2177B67AB00653D7A /* RLMTable_noinst.h in Headers */,
 				4D143CEF18F7E8C200CEFF65 /* TDBSmartContext.h in Headers */,
 				42AD3A9A18CDBDFF00C86073 /* TDBVersion.h in Headers */,
 				424EEFB018D9C15A00337A13 /* TDBView.h in Headers */,
-				E91890E3177B67AB00653D7A /* TDBTable.h in Headers */,
+				E91890E3177B67AB00653D7A /* RLMTable.h in Headers */,
 				4DDDD67418EB049300E94613 /* TDBViewProtocol.h in Headers */,
 				4D1ED30818E1AF4E003CFF44 /* PrivateTableMacros.h in Headers */,
 				4D1ED30B18E1B6E8003CFF44 /* group.h in Headers */,
@@ -457,7 +457,7 @@
 				4220871718E042FD00F3CF27 /* NSData+RLMGetBinaryData.mm in Sources */,
 				E91890DA177B67AB00653D7A /* TDBContext.mm in Sources */,
 				E91890DE177B67AB00653D7A /* RLMQuery.mm in Sources */,
-				E91890E1177B67AB00653D7A /* TDBTable.mm in Sources */,
+				E91890E1177B67AB00653D7A /* RLMTable.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

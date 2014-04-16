@@ -24,7 +24,7 @@
 #include <tightdb/group_shared.hpp>
 
 #import "RLMConstants.h"
-#import "TDBTable_noinst.h"
+#import "RLMTable_noinst.h"
 #import "TDBSmartContext_noinst.h"
 #import "PrivateTDB.h"
 #import "util_noinst.hpp"
@@ -46,25 +46,25 @@ void throw_objc_exception(exception &ex)
 
 
 @interface TDBPrivateWeakTableReference: NSObject
-- (instancetype)initWithTable:(TDBTable *)table indexInGroup:(size_t)index;
-- (TDBTable *)table;
+- (instancetype)initWithTable:(RLMTable *)table indexInGroup:(size_t)index;
+- (RLMTable *)table;
 - (size_t)indexInGroup;
 @end
 
 @implementation TDBPrivateWeakTableReference
 {
-    __weak TDBTable *_table;
+    __weak RLMTable *_table;
     size_t _indexInGroup;
 }
 
-- (instancetype)initWithTable:(TDBTable *)table indexInGroup:(size_t)index
+- (instancetype)initWithTable:(RLMTable *)table indexInGroup:(size_t)index
 {
     _table = table;
     _indexInGroup = index;
     return self;
 }
 
-- (TDBTable *)table
+- (RLMTable *)table
 {
     return _table;
 }
@@ -210,7 +210,7 @@ void throw_objc_exception(exception &ex)
 
             // Revive all group level table accessors
             for (TDBPrivateWeakTableReference *weakTableRef in _weakTableRefs) {
-                TDBTable *table = [weakTableRef table];
+                RLMTable *table = [weakTableRef table];
                 size_t indexInGroup = [weakTableRef indexInGroup];
                 ConstTableRef table_2 = _group->get_table(indexInGroup); // Throws
                 // Note: Const spoofing is alright, because the
@@ -226,12 +226,12 @@ void throw_objc_exception(exception &ex)
     }
 }
 
--(TDBTable *)tableWithName:(NSString *)name
+-(RLMTable *)tableWithName:(NSString *)name
 {
     ObjcStringAccessor name_2(name);
     if (!_group->has_table(name_2))
         return nil;
-    TDBTable *table = [[TDBTable alloc] _initRaw];
+    RLMTable *table = [[RLMTable alloc] _initRaw];
     size_t indexInGroup;
     try {
         ConstTableRef table_2 = _group->get_table(name_2); // Throws

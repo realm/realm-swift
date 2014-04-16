@@ -22,10 +22,10 @@
 
 #include <tightdb/table.hpp>
 
-#import "TDBTable.h"
+#import "RLMTable.h"
 
 
-@interface TDBTable (noinst)
+@interface RLMTable (noinst)
 
 -(tightdb::Table&)getNativeTable;
 -(void)setNativeTable:(tightdb::Table*)table;

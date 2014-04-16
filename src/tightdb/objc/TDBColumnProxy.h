@@ -20,13 +20,13 @@
 
 #import <Foundation/Foundation.h>
 
-#import "TDBTable.h"
+#import "RLMTable.h"
 
 
 @interface TDBColumnProxy: NSObject
-@property(nonatomic, weak) TDBTable *table;
+@property(nonatomic, weak) RLMTable *table;
 @property(nonatomic) size_t column;
--(id)initWithTable:(TDBTable *)table column:(NSUInteger)column;
+-(id)initWithTable:(RLMTable *)table column:(NSUInteger)column;
 -(void)clear;
 @end
 
