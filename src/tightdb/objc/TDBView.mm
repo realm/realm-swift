@@ -29,7 +29,7 @@
 #import "TDBTable_noinst.h"
 #import "TDBRow.h"
 #import "TDBView_noinst.h"
-#import "TDBQuery_noinst.h"
+#import "RLMQuery_noinst.h"
 #import "PrivateTDB.h"
 #import "util_noinst.hpp"
 
