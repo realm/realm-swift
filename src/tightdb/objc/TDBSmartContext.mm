@@ -109,30 +109,114 @@ class WriteLogRegistry {
 public:
     typedef Replication::version_type version_type;
     struct CommitEntry { std::size_t sz; char* data; };
+    WriteLogRegistry()
+    {
+        m_future_interest_count = 0;
+	    m_last_forgotten_version = 0;
+        m_newest_version = 0;
+        m_array_start = 0;
+    }
     // Add a commit for a given version:
     // The registry takes ownership of the buffer data.
-    void add_commit(version_type version, char* data, std::size_t sz);
+    void add_commit(version_type version, char* data, std::size_t sz)
+    {
+        // we assume that commits are entered in version order.
+        TIGHTDB_ASSERT(m_newest_version == 0 || version == 1 + m_newest_version);
+        if (m_newest_version == 0) {
+            m_array_start = version;
+            m_last_forgotten_version = version - 1;
+        }
+        CommitEntry ce = { sz, data };
+        m_commits.push_back(ce);
+        m_interest_counts.push_back(m_future_interest_count);
+        m_newest_version = version;
+    }
     
     // The registry retains commit buffers for as long as there is a
     // registered interest:
     
     // Register an interest in commits following version 'from'
-    void register_interest(version_type from);
+    void register_interest(version_type from)
+    {
+        // from is assumed to be within the range of commits already registered
+        size_t idx = from + 1 - m_array_start;
+        while (idx < m_interest_counts.size()) {
+            m_interest_counts[idx] += 1;
+        }
+        m_future_interest_count += 1;
+    }
     
     // Register that you are no longer interested in commits following
     // version 'from'.
-    void unregister_interest(version_type from);
+    void unregister_interest(version_type from)
+    {
+        // from is assumed to be within the range of commits already registered
+        size_t idx = from + 1 - m_array_start;
+        while (idx < m_interest_counts.size()) {
+            m_interest_counts[idx] -= 1;
+        }
+        m_future_interest_count -= 1;
+        cleanup();
+    }
 
     // Get an array of commits for a version range - ]from..to]
     // The array will have exactly 'to' - 'from' entries.
-    // The call takes ownership of the array of commits, but not of the
+    // The caller takes ownership of the array of commits, but not of the
     // buffers pointed to by each commit in the array. Ownership of the
     // buffers remains with the WriteLogRegistry.
-    CommitEntry* get_commit_entries(version_type from, version_type to);
+    CommitEntry* get_commit_entries(version_type from, version_type to)
+    {
+        CommitEntry* entries = new CommitEntry[ to - from ];
+        for (size_t idx = 0; idx < to - from; idx++) {
+            entries[idx] = m_commits[ idx + 1 + from - m_array_start];
+        }
+        return entries;
+    }
     
     // Release access to commits for a version range - ]from..to]
     // This also unregisters interest in the same version range.
-    void release_commit_entries(version_type from, version_type to);
+    void release_commit_entries(version_type from, version_type to)
+    {
+        for (size_t idx = 0; idx < to - from; idx++) {
+            m_interest_counts[ idx + 1 + from - m_array_start ] -= 1;
+        }
+        cleanup();
+    }
+private:
+    // cleanup and release unreferenced buffers. Buffers might be big, so
+    // we release them asap.
+    void cleanup()
+    {
+        size_t idx = m_last_forgotten_version - m_array_start + 1;
+        while (idx < m_interest_counts.size() &&  m_interest_counts[idx] == 0) {
+
+            delete[] m_commits[idx].data;
+            m_commits[idx].data = 0;
+            m_commits[idx].sz = 0;
+            ++idx;
+        }
+        m_last_forgotten_version = idx + m_array_start - 1;
+        if (idx > (m_interest_counts.size()+1) >> 1) {
+            
+            // more than half of the housekeeping arrays are free, so we'll
+            // shift contents down and resize the arrays.
+            std::copy(&m_commits[idx],
+                      &m_commits[m_newest_version + 1 - m_array_start],
+                      &m_commits[0]);
+            m_commits.resize(m_newest_version - m_last_forgotten_version);
+            std::copy(&m_interest_counts[idx],
+                      &m_interest_counts[m_newest_version + 1 - m_array_start],
+                      &m_interest_counts[0]);
+            m_interest_counts.resize(m_newest_version - m_last_forgotten_version);
+            m_array_start = m_last_forgotten_version + 1;
+        }
+    }
+    std::vector<CommitEntry> m_commits;
+    std::vector<int> m_interest_counts;
+    int m_future_interest_count;
+    version_type m_array_start;
+    version_type m_last_forgotten_version;
+    version_type m_newest_version;
 };
 
 class WriteLogCollector : public Replication
@@ -280,6 +364,7 @@ WriteLogCollector::WriteLogCollector(std::string database_name, WriteLogRegistry
 -(void)dealloc
 {
     [_timer invalidate];
+    _registry->unregister_interest(_sharedGroup->get_last_transaction_version());
 }
 
 - (void)checkForChange:(NSTimer *)theTimer
@@ -310,6 +395,7 @@ WriteLogCollector::WriteLogCollector(std::string database_name, WriteLogRegistry
             static_cast<void>(commits); // avoding a warning until we put the entries to use
             // Done - tell the registry, that we're done reading the commit entries:
             _registry->release_commit_entries(from_version, to_version);
+            delete[] commits;
             
             // Revive all group level table accessors
             for (TDBPrivateWeakTableReference *weakTableRef in _weakTableRefs) {
