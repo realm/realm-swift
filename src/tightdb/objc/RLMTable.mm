@@ -34,7 +34,7 @@
 #import "TDBColumnProxy.h"
 #import "NSData+RLMGetBinaryData.h"
 #import "PrivateTDB.h"
-#import "TDBSmartContext_noinst.h"
+#import "RLMSmartContext_noinst.h"
 #import "util_noinst.hpp"
 
 using namespace std;
@@ -207,8 +207,8 @@ using namespace std;
 
 -(void)dealloc
 {
-    if ([m_parent isKindOfClass:[TDBSmartContext class]]) {
-        TDBSmartContext *context = (TDBSmartContext *)m_parent;
+    if ([m_parent isKindOfClass:[RLMSmartContext class]]) {
+        RLMSmartContext *context = (RLMSmartContext *)m_parent;
         [context tableRefDidDie];
     }
 }

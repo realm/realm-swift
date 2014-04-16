@@ -21,14 +21,14 @@
 #import <Foundation/Foundation.h>
 
 
-@interface TDBSmartContext: NSObject
+@interface RLMSmartContext : NSObject
 
 /**
  * Use the main run loop and the default notification center.
  */
-+(TDBSmartContext *)contextWithPersistenceToFile:(NSString *)path;
++(RLMSmartContext *)contextWithPersistenceToFile:(NSString *)path;
 
-+(TDBSmartContext *)contextWithPersistenceToFile:(NSString *)path
++(RLMSmartContext *)contextWithPersistenceToFile:(NSString *)path
                                          runLoop:(NSRunLoop *)runLoop
                               notificationCenter:(NSNotificationCenter *)notificationCenter
                                            error:(NSError **)error;
