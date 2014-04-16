@@ -60,7 +60,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    TDBTransaction* transaction = [TDBTransaction group];
+    RLMTransaction * transaction = [RLMTransaction group];
     // Create new table in group
     PeopleErrTable* people = [transaction createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
@@ -111,7 +111,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     // Load a group from disk (and try to update, even though it is readonly)
     error = nil;
-    TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"peopleErr.tightdb" error:&error];
+    RLMTransaction * fromDisk = [RLMTransaction groupWithFile:@"peopleErr.tightdb" error:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
     }
@@ -133,7 +133,7 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
     }
 
     error = nil;
-    fromDisk = [TDBTransaction groupWithFile:@"peopleErr.tightdb" error:&error];
+    fromDisk = [RLMTransaction groupWithFile:@"peopleErr.tightdb" error:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
         XCTFail(@"File should have been possible to open");

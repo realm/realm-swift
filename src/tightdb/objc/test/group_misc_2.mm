@@ -8,7 +8,7 @@
 #import <XCTest/XCTest.h>
 
 #import <tightdb/objc/Tightdb.h>
-#import <tightdb/objc/TDBTransaction.h>
+#import <tightdb/objc/RLMTransaction.h>
 #import <tightdb/objc/group.h>
 #import <tightdb/objc/PrivateTDB.h>
 
@@ -43,7 +43,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testGroup_Misc2
 {
     NSUInteger rowIndex;
-    TDBTransaction* group = [TDBTransaction group];
+    RLMTransaction * group = [RLMTransaction group];
     NSLog(@"HasTable: %i", [group hasTableWithName:@"employees"] );
     // Create new table in group
     MyTable* table = [group createTableWithName:@"employees" asTableClass:[MyTable class]];
@@ -109,7 +109,7 @@ TIGHTDB_TABLE_2(QueryTable,
     [group writeContextToFile:@"employees.tightdb" error:nil];
 
     // Load a group from disk (and print contents)
-    TDBTransaction* fromDisk = [TDBTransaction groupWithFile:@"employees.tightdb" error:nil];
+    RLMTransaction * fromDisk = [RLMTransaction groupWithFile:@"employees.tightdb" error:nil];
     MyTable* diskTable = [fromDisk tableWithName:@"employees" asTableClass:[MyTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
@@ -125,7 +125,7 @@ TIGHTDB_TABLE_2(QueryTable,
     NSData* buffer = [group writeContextToBuffer];
 
     // Load a group from memory (and print contents)
-    TDBTransaction* fromMem = [TDBTransaction groupWithBuffer:buffer error:nil];
+    RLMTransaction * fromMem = [RLMTransaction groupWithBuffer:buffer error:nil];
     MyTable* memTable = [fromMem tableWithName:@"employees" asTableClass:[MyTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         // ??? cursor
@@ -136,7 +136,7 @@ TIGHTDB_TABLE_2(QueryTable,
 
 - (void)testQuery
 {
-    TDBTransaction* group = [TDBTransaction group];
+    RLMTransaction * group = [RLMTransaction group];
     QueryTable* table = [group createTableWithName:@"Query table" asTableClass:[QueryTable class]];
 
     // Add some rows
@@ -193,7 +193,7 @@ TIGHTDB_TABLE_2(QueryTable,
  */
 - (void)testSubtables
 {
-    TDBTransaction* group = [TDBTransaction group];
+    RLMTransaction * group = [RLMTransaction group];
     RLMTable* table = [group createTableWithName:@"table" asTableClass:[RLMTable class]];
 
     // Specify the table type

@@ -137,7 +137,7 @@ TIGHTDB_TABLE_2(SubMixedTable,
     [tableSub addHired:NO Age:43];
     [tableSub addHired:YES Age:54];
 
-    TDBTransaction *group = [TDBTransaction group];
+    RLMTransaction *group = [RLMTransaction group];
     // Create new table in group
     MixedTable *table = [group createTableWithName:@"MixedValues" asTableClass:[MixedTable class]];
     NSLog(@"Table: %@", table);

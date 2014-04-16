@@ -42,7 +42,7 @@ TIGHTDB_TABLE_3(TestSubtableMain,
 
 - (void)testSubtable
 {
-    TDBTransaction *group = [TDBTransaction group];
+    RLMTransaction *group = [RLMTransaction group];
 
     /* Create new table in group */
     TestSubtableMain *people = [group createTableWithName:@"employees" asTableClass:[TestSubtableMain class]];

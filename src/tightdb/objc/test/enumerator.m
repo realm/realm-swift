@@ -28,7 +28,7 @@ TIGHTDB_TABLE_2(EnumPeopleTable2,
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
-    TDBTransaction *group = [TDBTransaction group];
+    RLMTransaction *group = [RLMTransaction group];
     // Create new table in group
     EnumPeopleTable *people = [group createTableWithName:@"employees" asTableClass:[EnumPeopleTable class]];
 

@@ -20,11 +20,11 @@
 
 #import <Foundation/Foundation.h>
 
-#import "TDBTransaction.h"
+#import "RLMTransaction.h"
 
 
-typedef void(^TDBReadBlock)(TDBTransaction *transaction);
-typedef BOOL(^TDBWriteBlock)(TDBTransaction *transaction);
+typedef void(^TDBReadBlock)(RLMTransaction *transaction);
+typedef BOOL(^TDBWriteBlock)(RLMTransaction *transaction);
 typedef void(^RLMTableReadBlock)(RLMTable *table);
 typedef BOOL(^RLMTableWriteBlock)(RLMTable *table);
 

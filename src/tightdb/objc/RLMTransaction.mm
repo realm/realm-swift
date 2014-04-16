@@ -21,7 +21,7 @@
 #include <tightdb/group.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
-#import "TDBTransaction_noinst.h"
+#import "RLMTransaction_noinst.h"
 #import "RLMTable_noinst.h"
 #import "PrivateTDB.h"
 #import "util_noinst.hpp"
@@ -29,7 +29,7 @@
 using namespace std;
 
 
-@implementation TDBTransaction
+@implementation RLMTransaction
 {
     tightdb::Group* m_group;
     BOOL m_is_owned;
@@ -233,9 +233,9 @@ using namespace std;
 }
 
 /* Moved to group_priv header for now */
-+(TDBTransaction*)group
++(RLMTransaction *)group
 {
-    TDBTransaction* group = [[TDBTransaction alloc] init];
+    RLMTransaction * group = [[RLMTransaction alloc] init];
     try {
         group->m_group = new tightdb::Group;
     }
@@ -252,9 +252,9 @@ using namespace std;
 
 // Private.
 // Careful with this one - Remember that group will be deleted on dealloc.
-+(TDBTransaction*)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only
++(RLMTransaction *)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only
 {
-    TDBTransaction* group_2 = [[TDBTransaction alloc] init];
+    RLMTransaction * group_2 = [[RLMTransaction alloc] init];
     group_2->m_group = group;
     group_2->m_is_owned  = is_owned;
     group_2->m_read_only = read_only;
@@ -262,9 +262,9 @@ using namespace std;
 }
 
 /* Moved to group_priv header for now */
-+(TDBTransaction *)groupWithFile:(NSString *)filename error:(NSError **)error
++(RLMTransaction *)groupWithFile:(NSString *)filename error:(NSError **)error
 {
-    TDBTransaction* group = [[TDBTransaction alloc] init];
+    RLMTransaction * group = [[RLMTransaction alloc] init];
     if (!group)
         return nil;
     try {
@@ -298,9 +298,9 @@ using namespace std;
 }
 
 /* Moved to group_priv header for now */
-+(TDBTransaction*)groupWithBuffer:(NSData*)buffer error:(NSError**)error
++(RLMTransaction *)groupWithBuffer:(NSData*)buffer error:(NSError**)error
 {
-    TDBTransaction* group = [[TDBTransaction alloc] init];
+    RLMTransaction * group = [[RLMTransaction alloc] init];
     if (!group)
         return nil;
     try {
