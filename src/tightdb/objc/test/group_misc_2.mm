@@ -5,7 +5,7 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/TDBTransaction.h>
@@ -36,7 +36,7 @@ TIGHTDB_TABLE_2(QueryTable,
                 First,  Int,
                 Second, String)
 
-@interface MACTestGroupMisc2: SenTestCase
+@interface MACTestGroupMisc2: XCTestCase
 @end
 @implementation MACTestGroupMisc2
 
@@ -62,13 +62,13 @@ TIGHTDB_TABLE_2(QueryTable,
     //------------------------------------------------------
 
     rowIndex = [table.Name find:@"Philip"];    // row = NSNotFound
-    STAssertEquals(rowIndex, (NSUInteger)NSNotFound, @"Philip should not be there");
+    XCTAssertEqual(rowIndex, (NSUInteger)NSNotFound, @"Philip should not be there");
     rowIndex = [table.Name find:@"Mary"];
-    STAssertEquals(rowIndex, (size_t)1,@"Mary should have been there");
+    XCTAssertEqual(rowIndex, (size_t)1,@"Mary should have been there");
 
     MyTableView *view = [[[table where].Age columnIsEqualTo:21] findAll];
     size_t cnt = view.rowCount;            // cnt = 2
-    STAssertEquals(cnt, (size_t)2,@"Should be two rows in view");
+    XCTAssertEqual(cnt, (size_t)2,@"Should be two rows in view");
 
     //------------------------------------------------------
 
@@ -86,12 +86,12 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Get number of matching entries
     NSLog(@"Query count: %zu", [q countRows]);
-    STAssertEquals([q countRows], (size_t)2,@"Expected 2 rows in query");
+    XCTAssertEqual([q countRows], (size_t)2,@"Expected 2 rows in query");
 
      // Get the average age - currently only a low-level interface!
     double avg = [q.Age avg];
     NSLog(@"Average: %f", avg);
-    STAssertEquals(avg, 21.0,@"Expected 20.5 average");
+    XCTAssertEqual(avg, 21.0,@"Expected 20.5 average");
 
     // Execute the query and return a table (view)
     TDBView* res = [q findAll];
@@ -147,42 +147,42 @@ TIGHTDB_TABLE_2(QueryTable,
 
     {
         QueryTableQuery* q = [[table where].First columnIsBetween:3 :7]; // Between
-        STAssertEquals((size_t)2,   [q countRows], @"count != 2");
-//        STAssertEquals(9,   [q.First sum]); // Sum
-        STAssertEquals(4.5, [q.First avg], @"Avg!=4.5"); // Average
-//        STAssertEquals(4,   [q.First min]); // Minimum
-//        STAssertEquals(5,   [q.First max]); // Maximum
+        XCTAssertEqual((size_t)2,   [q countRows], @"count != 2");
+//        XCTAssertEqual(9,   [q.First sum]); // Sum
+        XCTAssertEqual(4.5, [q.First avg], @"Avg!=4.5"); // Average
+//        XCTAssertEqual(4,   [q.First min]); // Minimum
+//        XCTAssertEqual(5,   [q.First max]); // Maximum
     }
     {
         QueryTableQuery* q = [[table where].Second columnContains:@"quick" caseSensitive:NO]; // String contains
-        STAssertEquals((size_t)1, [q countRows], @"count != 1");
+        XCTAssertEqual((size_t)1, [q countRows], @"count != 1");
     }
     {
         QueryTableQuery* q = [[table where].Second columnBeginsWith:@"The" caseSensitive:NO]; // String prefix
-        STAssertEquals((size_t)1, [q countRows], @"count != 1");
+        XCTAssertEqual((size_t)1, [q countRows], @"count != 1");
     }
     {
         QueryTableQuery* q = [[table where].Second columnEndsWith:@"The" caseSensitive:NO]; // String suffix
-        STAssertEquals((size_t)0, [q countRows], @"count != 1");
+        XCTAssertEqual((size_t)0, [q countRows], @"count != 1");
     }
     {
         QueryTableQuery* q = [[[table where].Second columnIsNotEqualTo:@"a" caseSensitive:NO].Second columnIsNotEqualTo:@"b" caseSensitive:NO]; // And
-        STAssertEquals((size_t)1, [q countRows], @"count != 1");
+        XCTAssertEqual((size_t)1, [q countRows], @"count != 1");
     }
     {
         QueryTableQuery* q = [[[[table where].Second columnIsNotEqualTo:@"a" caseSensitive:NO] Or].Second columnIsNotEqualTo:@"b" caseSensitive:NO]; // Or
-        STAssertEquals((size_t)4, [q countRows], @"count != 1");
+        XCTAssertEqual((size_t)4, [q countRows], @"count != 1");
     }
     {
         QueryTableQuery* q = [[[[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO] group].First columnIsLessThan:3] Or].First columnIsGreaterThan:5] endGroup]; // Parentheses
-        STAssertEquals((size_t)1, [q countRows], @"count != 1");
+        XCTAssertEqual((size_t)1, [q countRows], @"count != 1");
     }
     {
         QueryTableQuery* q = [[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO].First columnIsLessThan:3] Or].First columnIsGreaterThan:5]; // No parenthesis
-        STAssertEquals((size_t)2, [q countRows], @"count != 2");
+        XCTAssertEqual((size_t)2, [q countRows], @"count != 2");
         TDBView* tv = [q findAll];
-        STAssertEquals((size_t)2, [tv rowCount], @"count != 2");
-        STAssertEquals((int64_t)8, [tv TDB_intInColumnWithIndex:0 atRowIndex:1], @"First != 8");
+        XCTAssertEqual((size_t)2, [tv rowCount], @"count != 2");
+        XCTAssertEqual((int64_t)8, [tv TDB_intInColumnWithIndex:0 atRowIndex:1], @"First != 8");
     }
 }
 
