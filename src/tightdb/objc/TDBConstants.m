@@ -21,4 +21,4 @@
 #import "TDBConstants.h"
 
 
-NSString *const TDBContextDidChangeNotification = @"TDBContextDidChangeNotification";
+NSString *const RLMContextDidChangeNotification = @"RLMContextDidChangeNotification";
