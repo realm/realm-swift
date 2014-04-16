@@ -24,7 +24,7 @@
 
 @class TDBView;
 @class TDBQuery;
-@class TDBDescriptor;
+@class RLMDescriptor;
 @class TDBRow;
 
 
@@ -32,7 +32,7 @@
 
 @property (nonatomic, readonly) NSUInteger rowCount;
 @property (nonatomic, readonly) NSUInteger columnCount;
-@property (nonatomic, readonly) TDBDescriptor *descriptor;
+@property (nonatomic, readonly) RLMDescriptor *descriptor;
 
 // Initializers for standalone tables
 -(instancetype)init;

@@ -6,7 +6,7 @@
 #import <XCTest/XCTest.h>
 
 #import <tightdb/objc/TDBTable.h>
-#import <tightdb/objc/TDBDescriptor.h>
+#import <tightdb/objc/RLMDescriptor.h>
 #import <tightdb/objc/PrivateTDB.h>
 
 @interface MACTestTableDeleteAll: XCTestCase
@@ -17,7 +17,7 @@
 {
     // Create table with all column types
     TDBTable* table = [[TDBTable alloc] init];
-    TDBDescriptor* desc = [table descriptor];
+    RLMDescriptor * desc = [table descriptor];
     [desc addColumnWithName:@"int" type:TDBIntType];
     [desc addColumnWithName:@"bool" type:TDBBoolType];
     [desc addColumnWithName:@"date" type:TDBDateType];
@@ -26,7 +26,7 @@
     [desc addColumnWithName:@"string_enum" type:TDBStringType];
     [desc addColumnWithName:@"binary" type:TDBBinaryType];
     [desc addColumnWithName:@"mixed" type:TDBMixedType];
-    TDBDescriptor* subdesc = [desc addColumnTable:@"tables"];
+    RLMDescriptor * subdesc = [desc addColumnTable:@"tables"];
     [subdesc addColumnWithName:@"sub_first" type:TDBIntType];
     [subdesc addColumnWithName:@"sub_second" type:TDBStringType];
 
