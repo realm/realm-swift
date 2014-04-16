@@ -7,7 +7,7 @@
 
 #import <XCTest/XCTest.h>
 
-#import <tightdb/objc/TightdbFast.h>
+#import <tightdb/objc/RLMFast.h>
 #import <tightdb/objc/RLMTransaction.h>
 #import <tightdb/objc/group.h>
 

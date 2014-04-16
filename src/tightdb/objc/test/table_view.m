@@ -20,7 +20,7 @@
 
 #import <XCTest/XCTest.h>
 
-#import <tightdb/objc/TightdbFast.h>
+#import <tightdb/objc/RLMFast.h>
 
 @interface table_view : XCTestCase
 
