@@ -20,10 +20,10 @@
 
 #import <Foundation/Foundation.h>
 
-#import "TDBSmartContext.h"
+#import "RLMSmartContext.h"
 
 
-@interface TDBSmartContext (noinst)
+@interface RLMSmartContext (noinst)
 
 - (void)tableRefDidDie;
 

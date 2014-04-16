@@ -24,7 +24,7 @@
 #import <tightdb/objc/RLMQuery.h>
 #import <tightdb/objc/RLMRow.h>
 #import <tightdb/objc/RLMContext.h>
-#import <tightdb/objc/TDBSmartContext.h>
+#import <tightdb/objc/RLMSmartContext.h>
 #import <tightdb/objc/RLMVersion.h>
 
 #import <tightdb/objc/PrivateHelperMacros.h>

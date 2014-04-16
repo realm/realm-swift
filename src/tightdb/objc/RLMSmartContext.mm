@@ -25,7 +25,7 @@
 
 #import "RLMConstants.h"
 #import "RLMTable_noinst.h"
-#import "TDBSmartContext_noinst.h"
+#import "RLMSmartContext_noinst.h"
 #import "PrivateTDB.h"
 #import "util_noinst.hpp"
 
@@ -77,19 +77,19 @@ void throw_objc_exception(exception &ex)
 @end
 
 
-@class TDBSmartContext;
+@class RLMSmartContext;
 
 @interface TDBPrivateWeakTimerTarget: NSObject
-- (instancetype)initWithContext:(TDBSmartContext *)target;
+- (instancetype)initWithContext:(RLMSmartContext *)target;
 - (void)timerDidFire:(NSTimer *)timer;
 @end
 
 @implementation TDBPrivateWeakTimerTarget
 {
-    __weak TDBSmartContext *_context;
+    __weak RLMSmartContext *_context;
 }
 
-- (instancetype)initWithContext:(TDBSmartContext *)context
+- (instancetype)initWithContext:(RLMSmartContext *)context
 {
     _context = context;
     return self;
@@ -103,7 +103,7 @@ void throw_objc_exception(exception &ex)
 @end
 
 
-@implementation TDBSmartContext
+@implementation RLMSmartContext
 {
     NSNotificationCenter *_notificationCenter;
     UniquePtr<SharedGroup> _sharedGroup;
@@ -113,7 +113,7 @@ void throw_objc_exception(exception &ex)
     BOOL _tableRefsHaveDied;
 }
 
-+(TDBSmartContext *)contextWithPersistenceToFile:(NSString *)path
++(RLMSmartContext *)contextWithPersistenceToFile:(NSString *)path
 {
     NSRunLoop *runLoop = [NSRunLoop mainRunLoop];
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
@@ -123,12 +123,12 @@ void throw_objc_exception(exception &ex)
                                         error:nil];
 }
 
-+(TDBSmartContext *)contextWithPersistenceToFile:(NSString *)path
++(RLMSmartContext *)contextWithPersistenceToFile:(NSString *)path
                                          runLoop:(NSRunLoop *)runLoop
                               notificationCenter:(NSNotificationCenter *)notificationCenter
                                            error:(NSError **)error
 {
-    TDBSmartContext *context = [[TDBSmartContext alloc] init];
+    RLMSmartContext *context = [[RLMSmartContext alloc] init];
     if (!context)
         return nil;
 
