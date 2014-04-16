@@ -31,7 +31,7 @@
 #import "TDBTable.h"
 #import "TDBRow.h"
 #import "RLMDescriptor.h"
-#import "TDBQuery.h"
+#import "RLMQuery.h"
 #import "TDBView.h"
 #import "TDBColumnProxy.h"
 #import "PrivateTDB.h"
@@ -46,7 +46,7 @@ TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
 @class TableName##Query; \
 @class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-@interface TableName##Query: TDBQuery \
+@interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 -(TableName##Query*)group; \
 -(TableName##Query*)Or; \
@@ -263,7 +263,7 @@ TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
 @class TableName##View; \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
-@interface TableName##Query: TDBQuery \
+@interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
 -(TableName##Query*)group; \
@@ -497,7 +497,7 @@ TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
-@interface TableName##Query: TDBQuery \
+@interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
@@ -748,7 +748,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
-@interface TableName##Query: TDBQuery \
+@interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
@@ -1016,7 +1016,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
-@interface TableName##Query: TDBQuery \
+@interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
@@ -1301,7 +1301,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
-@interface TableName##Query: TDBQuery \
+@interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
@@ -1603,7 +1603,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
-@interface TableName##Query: TDBQuery \
+@interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
@@ -1922,7 +1922,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
-@interface TableName##Query: TDBQuery \
+@interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
@@ -2258,7 +2258,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
-@interface TableName##Query: TDBQuery \
+@interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
@@ -2611,7 +2611,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
-@interface TableName##Query: TDBQuery \
+@interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
@@ -2981,7 +2981,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
-@interface TableName##Query: TDBQuery \
+@interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
@@ -3368,7 +3368,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
-@interface TableName##Query: TDBQuery \
+@interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
@@ -3772,7 +3772,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
-@interface TableName##Query: TDBQuery \
+@interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
@@ -4193,7 +4193,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName14, CType14) \
-@interface TableName##Query: TDBQuery \
+@interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \
@@ -4631,7 +4631,7 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName14, CType14) \
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName15, CType15) \
-@interface TableName##Query: TDBQuery \
+@interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName3* CName3; \

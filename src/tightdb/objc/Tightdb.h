@@ -21,7 +21,7 @@
 #import <tightdb/objc/RLMConstants.h>
 #import <tightdb/objc/TDBTable.h>
 #import <tightdb/objc/TDBView.h>
-#import <tightdb/objc/TDBQuery.h>
+#import <tightdb/objc/RLMQuery.h>
 #import <tightdb/objc/TDBRow.h>
 #import <tightdb/objc/TDBContext.h>
 #import <tightdb/objc/TDBSmartContext.h>

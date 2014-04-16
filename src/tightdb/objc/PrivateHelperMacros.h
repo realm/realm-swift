@@ -210,7 +210,7 @@
 /* Boolean */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Bool(table, col_name) \
-@interface table##QueryAccessor##col_name : TDBQueryAccessorBool \
+@interface table##QueryAccessor##col_name : RLMQueryAccessorBool \
 -(table##Query*)columnIsEqualTo:(BOOL)value; \
 @end
 
@@ -226,7 +226,7 @@
 /* Integer */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Int(table, col_name) \
-@interface table##QueryAccessor##col_name : TDBQueryAccessorInt \
+@interface table##QueryAccessor##col_name : RLMQueryAccessorInt \
 -(table##Query*)columnIsEqualTo:(int64_t)value; \
 -(table##Query*)columnIsNotEqualTo:(int64_t)value; \
 -(table##Query*)columnIsGreaterThan:(int64_t)value; \
@@ -272,7 +272,7 @@
 /* Float */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Float(table, col_name) \
-@interface table##QueryAccessor##col_name : TDBQueryAccessorFloat \
+@interface table##QueryAccessor##col_name : RLMQueryAccessorFloat \
 -(table##Query*)columnIsEqualTo:(float)value; \
 -(table##Query*)columnIsNotEqualTo:(float)value; \
 -(table##Query*)columnIsGreaterThan:(float)value; \
@@ -318,7 +318,7 @@
 /* Double */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Double(table, col_name) \
-@interface table##QueryAccessor##col_name : TDBQueryAccessorDouble \
+@interface table##QueryAccessor##col_name : RLMQueryAccessorDouble \
 -(table##Query*)columnIsEqualTo:(double)value; \
 -(table##Query*)columnIsNotEqualTo:(double)value; \
 -(table##Query*)columnIsGreaterThan:(double)value; \
@@ -364,7 +364,7 @@
 /* String */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_String(table, col_name) \
-@interface table##QueryAccessor##col_name : TDBQueryAccessorString \
+@interface table##QueryAccessor##col_name : RLMQueryAccessorString \
 -(table##Query*)columnIsEqualTo:(NSString*)value; \
 -(table##Query*)columnIsEqualTo:(NSString*)value caseSensitive:(BOOL)caseSensitive; \
 -(table##Query*)columnIsNotEqualTo:(NSString*)value; \
@@ -425,7 +425,7 @@
 /* Binary */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Binary(table, col_name) \
-@interface table##QueryAccessor##col_name : TDBQueryAccessorBinary \
+@interface table##QueryAccessor##col_name : RLMQueryAccessorBinary \
 -(table##Query*)columnIsEqualTo:(NSData*)value; \
 -(table##Query*)columnIsNotEqualTo:(NSData*)value; \
 -(table##Query*)columnBeginsWith:(NSData*)value; \
@@ -461,7 +461,7 @@
 /* Date */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Date(table, col_name) \
-@interface table##QueryAccessor##col_name : TDBQueryAccessorDate \
+@interface table##QueryAccessor##col_name : RLMQueryAccessorDate \
 -(table##Query*)columnIsEqualTo:(NSDate *)value; \
 -(table##Query*)columnIsNotEqualTo:(NSDate *)value; \
 -(table##Query*)columnIsGreaterThan:(NSDate *)value; \
@@ -507,7 +507,7 @@
 /* Subtable */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_SUBTABLE(table, col_name, col_type) \
-@interface table##QueryAccessor##col_name : TDBQueryAccessorSubtable \
+@interface table##QueryAccessor##col_name : RLMQueryAccessorSubtable \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_SUBTABLE(table, col_name, col_type) \
@@ -518,7 +518,7 @@
 /* Mixed */
 
 #define TIGHTDB_QUERY_ACCESSOR_DEF_Mixed(table, col_name) \
-@interface table##QueryAccessor##col_name : TDBQueryAccessorMixed \
+@interface table##QueryAccessor##col_name : RLMQueryAccessorMixed \
 @end
 
 #define TIGHTDB_QUERY_ACCESSOR_IMPL_Mixed(table, col_name) \

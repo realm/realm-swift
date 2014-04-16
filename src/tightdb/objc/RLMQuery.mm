@@ -575,7 +575,7 @@ using namespace std;
 @end
 
 
-@implementation TDBQueryAccessorBool
+@implementation RLMQueryAccessorBool
 {
     __weak RLMQuery * _query;
     NSUInteger _column_ndx;
@@ -600,7 +600,7 @@ using namespace std;
 @end
 
 
-@implementation TDBQueryAccessorInt
+@implementation RLMQueryAccessorInt
 {
     __weak RLMQuery * _query;
     NSUInteger _column_ndx;
@@ -692,7 +692,7 @@ using namespace std;
 @end
 
 
-@implementation TDBQueryAccessorFloat
+@implementation RLMQueryAccessorFloat
 
 {
     __weak RLMQuery * _query;
@@ -771,7 +771,7 @@ using namespace std;
 @end
 
 
-@implementation TDBQueryAccessorDouble
+@implementation RLMQueryAccessorDouble
 {
     __weak RLMQuery * _query;
     NSUInteger _column_ndx;
@@ -852,7 +852,7 @@ using namespace std;
 @end
 
 
-@implementation TDBQueryAccessorString
+@implementation RLMQueryAccessorString
 {
     __weak RLMQuery * _query;
     NSUInteger _column_ndx;
@@ -921,7 +921,7 @@ using namespace std;
 @end
 
 
-@implementation TDBQueryAccessorBinary
+@implementation RLMQueryAccessorBinary
 {
     __weak RLMQuery * _query;
     NSUInteger _column_ndx;
@@ -965,7 +965,7 @@ using namespace std;
 @end
 
 
-@implementation TDBQueryAccessorDate
+@implementation RLMQueryAccessorDate
 {
     __weak RLMQuery * _query;
     NSUInteger _column_ndx;
@@ -1018,7 +1018,7 @@ using namespace std;
 @end
 
 
-@implementation TDBQueryAccessorSubtable
+@implementation RLMQueryAccessorSubtable
 {
     __weak RLMQuery * _query;
     NSUInteger _column_ndx;
@@ -1037,7 +1037,7 @@ using namespace std;
 @end
 
 
-@implementation TDBQueryAccessorMixed
+@implementation RLMQueryAccessorMixed
 {
     __weak RLMQuery * _query;
     NSUInteger _column_ndx;
