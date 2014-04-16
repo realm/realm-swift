@@ -7,7 +7,7 @@
 
 #import <XCTest/XCTest.h>
 
-#import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/Realm.h>
 #import <tightdb/objc/group.h>
 
 TIGHTDB_TABLE_2(TestSubtableSub,
