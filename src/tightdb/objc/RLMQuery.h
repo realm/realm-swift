@@ -102,7 +102,7 @@
 @end
 
 
-@interface TDBQueryAccessorBool: NSObject
+@interface RLMQueryAccessorBool : NSObject
 -(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query;
 /* FIXME: Rename columnIsEqualTo to isEqualTo and likewise for all
  * predicates in all the other column proxies
@@ -111,7 +111,7 @@
 @end
 
 
-@interface TDBQueryAccessorInt: NSObject
+@interface RLMQueryAccessorInt : NSObject
 -(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query;
 -(RLMQuery *)columnIsEqualTo:(int64_t)value;
 -(RLMQuery *)columnIsNotEqualTo:(int64_t)value;
@@ -127,7 +127,7 @@
 @end
 
 
-@interface TDBQueryAccessorFloat: NSObject
+@interface RLMQueryAccessorFloat : NSObject
 -(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query;
 -(RLMQuery *)columnIsEqualTo:(float)value;
 -(RLMQuery *)columnIsNotEqualTo:(float)value;
@@ -143,7 +143,7 @@
 @end
 
 
-@interface TDBQueryAccessorDouble: NSObject
+@interface RLMQueryAccessorDouble : NSObject
 -(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query;
 -(RLMQuery *)columnIsEqualTo:(double)value;
 -(RLMQuery *)columnIsNotEqualTo:(double)value;
@@ -159,7 +159,7 @@
 @end
 
 
-@interface TDBQueryAccessorString: NSObject
+@interface RLMQueryAccessorString : NSObject
 -(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query;
 -(RLMQuery *)columnIsEqualTo:(NSString *)value;
 -(RLMQuery *)columnIsEqualTo:(NSString *)value caseSensitive:(BOOL)caseSensitive;
@@ -174,7 +174,7 @@
 @end
 
 
-@interface TDBQueryAccessorBinary: NSObject
+@interface RLMQueryAccessorBinary : NSObject
 -(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query;
 -(RLMQuery *)columnIsEqualTo:(NSData *)value;
 -(RLMQuery *)columnIsNotEqualTo:(NSData *)value;
@@ -184,7 +184,7 @@
 @end
 
 
-@interface TDBQueryAccessorDate: NSObject
+@interface RLMQueryAccessorDate : NSObject
 -(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query;
 -(RLMQuery *)columnIsEqualTo:(NSDate *)value;
 -(RLMQuery *)columnIsNotEqualTo:(NSDate *)value;
@@ -196,11 +196,11 @@
 @end
 
 
-@interface TDBQueryAccessorSubtable: NSObject
+@interface RLMQueryAccessorSubtable : NSObject
 -(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query;
 @end
 
 
-@interface TDBQueryAccessorMixed: NSObject
+@interface RLMQueryAccessorMixed : NSObject
 -(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query;
 @end

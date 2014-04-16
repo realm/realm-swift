@@ -41,7 +41,7 @@ directiveStartToken = %
 #import "TDBTable.h"
 #import "TDBRow.h"
 #import "RLMDescriptor.h"
-#import "TDBQuery.h"
+#import "RLMQuery.h"
 #import "TDBView.h"
 #import "TDBColumnProxy.h"
 #import "PrivateTDB.h"
@@ -66,7 +66,7 @@ TIGHTDB_ROW_PROPERTY_DEF(CName${j+1}, CType${j+1}) \
 %for $j in range($num_cols)
 TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName${j+1}, CType${j+1}) \
 %end for
-@interface TableName##Query: TDBQuery \
+@interface TableName##Query: RLMQuery \
 %for $j in range($num_cols)
 @property(nonatomic, strong) TableName##QueryAccessor##CName${j+1}* CName${j+1}; \
 %end for

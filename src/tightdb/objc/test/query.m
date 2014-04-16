@@ -6,7 +6,7 @@
 #import <XCTest/XCTest.h>
 
 #import <tightdb/objc/Tightdb.h>
-#import <tightdb/objc/TDBQueryFast.h>
+#import <tightdb/objc/RLMQueryFast.h>
 
 TIGHTDB_TABLE_1(TestQuerySub,
                 Age,  Int)
