@@ -227,7 +227,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
      *  Row in a query.
      */
 
-    TDBQuery *query = [[table where] stringIsNotEqualTo:@"Nothing is equal to this" inColumnWithIndex:NAME ];  // dummy query required right now
+    RLMQuery *query = [[table where] stringIsNotEqualTo:@"Nothing is equal to this" inColumnWithIndex:NAME ];  // dummy query required right now
     XCTAssertEqual([query countRows], (NSUInteger)(TABLE_SIZE-2), @"Check the size");
 
     i=0;

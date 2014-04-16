@@ -20,11 +20,11 @@
 
 #import <Foundation/Foundation.h>
 
-#import "TDBQuery.h"
+#import "RLMQuery.h"
 
 #include <tightdb/table_view.hpp>
 
-@interface TDBQuery (noinst)
+@interface RLMQuery (noinst)
 
 -(tightdb::Query&)getNativeQuery;
 

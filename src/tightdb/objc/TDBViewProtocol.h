@@ -21,7 +21,7 @@
 #include "TDBType.h"
 
 @class TDBRow;
-@class TDBQuery;
+@class RLMQuery;
 
 
 @protocol TDBView
@@ -42,6 +42,6 @@
 -(void)removeRowAtIndex:(NSUInteger)rowIndex;
 -(void)removeAllRows;
 
--(TDBQuery *)where;
+-(RLMQuery *)where;
 
 @end

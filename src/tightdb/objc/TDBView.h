@@ -45,6 +45,6 @@
 
 -(NSUInteger)rowIndexInOriginTableForRowAtIndex:(NSUInteger)rowIndex;
 
--(TDBQuery *)where;
+-(RLMQuery *)where;
 
 @end

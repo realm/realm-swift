@@ -24,7 +24,7 @@
 #include <tightdb/table_view.hpp>
 #include <tightdb/query.hpp>
 
-#import "TDBQuery.h"
+#import "RLMQuery.h"
 #import "TDBTable_noinst.h"
 #import "TDBView_noinst.h"
 #import "TDBRow.h"
@@ -35,7 +35,7 @@
 using namespace std;
 
 
-@interface TDBQuery()
+@interface RLMQuery ()
 {
     @public
     NSError* m_error; // To enable the flow of multiple stacked queries, any error is kept until the last step.
@@ -43,7 +43,7 @@ using namespace std;
 @end
 
 
-@implementation TDBQuery
+@implementation RLMQuery
 {
     tightdb::util::UniquePtr<tightdb::Query> m_query;
     __weak TDBTable* m_table;
@@ -127,27 +127,27 @@ using namespace std;
     return m_table;
 }
 
--(TDBQuery*)group
+-(RLMQuery *)group
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(m_query->group();, self, &m_error);
     return self;
 }
--(TDBQuery*)Or
+-(RLMQuery *)Or
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(m_query->Or();, self, &m_error);
     return self;
 }
--(TDBQuery*)endGroup
+-(RLMQuery *)endGroup
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(m_query->end_group();, self, &m_error);
     return self;
 }
--(TDBQuery *)subtableInColumnWithIndex:(NSUInteger)column
+-(RLMQuery *)subtableInColumnWithIndex:(NSUInteger)column
 {
     m_query->subtable(column);
     return self;
 }
--(TDBQuery *)parent
+-(RLMQuery *)parent
 {
     m_query->end_subtable();
     return self;
@@ -349,50 +349,50 @@ using namespace std;
 
 
 // Conditions:
--(TDBQuery*)boolIsEqualTo:(bool)aBool inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)boolIsEqualTo:(bool)aBool inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->equal(colIndex, aBool);
     return self;
 }
 
--(TDBQuery*)intIsEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)intIsEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->equal(colIndex, anInt);
     return self;
 }
 
--(TDBQuery*)floatIsEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)floatIsEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->equal(colIndex, aFloat);
     return self;
 }
 
--(TDBQuery*)doubleIsEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)doubleIsEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->equal(colIndex, aDouble);
     return self;
 }
 
--(TDBQuery*)stringIsEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)stringIsEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->equal(colIndex, ObjcStringAccessor(aString), true);
     return self;
 }
 
--(TDBQuery*)stringIsCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)stringIsCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->equal(colIndex, ObjcStringAccessor(aString), false);
     return self;
 }
 
 
--(TDBQuery*)dateIsEqualTo:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)dateIsEqualTo:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->equal_datetime(colIndex, [aDate timeIntervalSince1970]);
     return self;
 }
 
--(TDBQuery*)binaryIsEqualTo:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)binaryIsEqualTo:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->equal(colIndex, aBinary.rlmBinaryData);
     return self;
@@ -400,43 +400,43 @@ using namespace std;
 
 // Not equal to
 
--(TDBQuery*)intIsNotEqualTo:(int64_t)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)intIsNotEqualTo:(int64_t)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->not_equal(colIndex, value);
     return self;
 }
 
--(TDBQuery*)floatIsNotEqualTo:(float)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)floatIsNotEqualTo:(float)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->not_equal(colIndex, value);
     return self;
 }
 
--(TDBQuery*)doubleIsNotEqualTo:(double)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)doubleIsNotEqualTo:(double)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->not_equal(colIndex, value);
     return self;
 }
 
--(TDBQuery*)stringIsNotEqualTo:(NSString*)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)stringIsNotEqualTo:(NSString*)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->not_equal(colIndex, ObjcStringAccessor(value), true);
     return self;
 }
 
--(TDBQuery*)stringIsNotCaseInsensitiveEqualTo:(NSString*)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)stringIsNotCaseInsensitiveEqualTo:(NSString*)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->not_equal(colIndex, ObjcStringAccessor(value), false);
     return self;
 }
 
--(TDBQuery*)dateIsNotEqualTo:(NSDate *)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)dateIsNotEqualTo:(NSDate *)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->not_equal_datetime(colIndex, [value timeIntervalSince1970]);
     return self;
 }
 
--(TDBQuery*)binaryIsNotEqualTo:(NSData*)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)binaryIsNotEqualTo:(NSData*)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->not_equal(colIndex, value.rlmBinaryData);
     return self;
@@ -444,25 +444,25 @@ using namespace std;
 
 // Between
 
--(TDBQuery*)dateIsBetween:(NSDate *)lower :(NSDate *)upper inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)dateIsBetween:(NSDate *)lower :(NSDate *)upper inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->between_datetime(colIndex, lower.timeIntervalSince1970, upper.timeIntervalSince1970);
     return self;
 }
 
--(TDBQuery*)intIsBetween:(int64_t)lower :(int64_t)upper inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)intIsBetween:(int64_t)lower :(int64_t)upper inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->between(colIndex, lower, upper);
     return self;
 }
 
--(TDBQuery*)floatIsBetween:(float)lower :(float)upper inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)floatIsBetween:(float)lower :(float)upper inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->between(colIndex, lower, upper);
     return self;
 }
 
--(TDBQuery*)doubleIsBetween:(double)lower :(double)upper inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)doubleIsBetween:(double)lower :(double)upper inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->between(colIndex, lower, upper);
     return self;
@@ -470,25 +470,25 @@ using namespace std;
 
 // Greater than
 
--(TDBQuery*)intIsGreaterThan:(int64_t)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)intIsGreaterThan:(int64_t)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->greater(colIndex, value);
     return self;
 }
 
--(TDBQuery*)floatIsGreaterThan:(float)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)floatIsGreaterThan:(float)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->greater(colIndex, value);
     return self;
 }
 
--(TDBQuery*)doubleIsGreaterThan:(double)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)doubleIsGreaterThan:(double)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->greater(colIndex, value);
     return self;
 }
 
--(TDBQuery*)dateIsGreaterThan:(NSDate *)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)dateIsGreaterThan:(NSDate *)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->greater_datetime(colIndex, [value timeIntervalSince1970]);
     return self;
@@ -496,25 +496,25 @@ using namespace std;
 
 // Greater thanOrEqualTo
 
--(TDBQuery*)intIsGreaterThanOrEqualTo:(int64_t)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)intIsGreaterThanOrEqualTo:(int64_t)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->greater_equal(colIndex, value);
     return self;
 }
 
--(TDBQuery*)floatIsGreaterThanOrEqualTo:(float)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)floatIsGreaterThanOrEqualTo:(float)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->greater_equal(colIndex, value);
     return self;
 }
 
--(TDBQuery*)doubleIsGreaterThanOrEqualTo:(double)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)doubleIsGreaterThanOrEqualTo:(double)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->greater_equal(colIndex, value);
     return self;
 }
 
--(TDBQuery*)dateIsGreaterThanOrEqualTo:(NSDate *)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)dateIsGreaterThanOrEqualTo:(NSDate *)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->greater_equal_datetime(colIndex, [value timeIntervalSince1970]);
     return self;
@@ -522,25 +522,25 @@ using namespace std;
 
 // Less than
 
--(TDBQuery*)intIsLessThan:(int64_t)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)intIsLessThan:(int64_t)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->less(colIndex, value);
     return self;
 }
 
--(TDBQuery*)floatIsLessThan:(float)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)floatIsLessThan:(float)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->less(colIndex, value);
     return self;
 }
 
--(TDBQuery*)doubleIsLessThan:(double)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)doubleIsLessThan:(double)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->less(colIndex, value);
     return self;
 }
 
--(TDBQuery*)dateIsLessThan:(NSDate *)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)dateIsLessThan:(NSDate *)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->less_datetime(colIndex, [value timeIntervalSince1970]);
     return self;
@@ -548,25 +548,25 @@ using namespace std;
 
 // Less thanOrEqualTo
 
--(TDBQuery*)intIsLessThanOrEqualTo:(int64_t)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)intIsLessThanOrEqualTo:(int64_t)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->less_equal(colIndex, value);
     return self;
 }
 
--(TDBQuery*)floatIsLessThanOrEqualTo:(float)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)floatIsLessThanOrEqualTo:(float)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->less_equal(colIndex, value);
     return self;
 }
 
--(TDBQuery*)doubleIsLessThanOrEqualTo:(double)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)doubleIsLessThanOrEqualTo:(double)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->less_equal(colIndex, value);
     return self;
 }
 
--(TDBQuery*)dateIsLessThanOrEqualTo:(NSDate *)value inColumnWithIndex:(NSUInteger)colIndex
+-(RLMQuery *)dateIsLessThanOrEqualTo:(NSDate *)value inColumnWithIndex:(NSUInteger)colIndex
 {
     m_query->less_equal_datetime(colIndex, [value timeIntervalSince1970]);
     return self;
@@ -577,11 +577,11 @@ using namespace std;
 
 @implementation TDBQueryAccessorBool
 {
-    __weak TDBQuery* _query;
+    __weak RLMQuery * _query;
     NSUInteger _column_ndx;
 }
 
--(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query
 {
     self = [super init];
     if (self) {
@@ -591,7 +591,7 @@ using namespace std;
     return self;
 }
 
--(TDBQuery*)columnIsEqualTo:(BOOL)value
+-(RLMQuery *)columnIsEqualTo:(BOOL)value
 {
     [_query getNativeQuery].equal(_column_ndx, bool(value));
     return _query;
@@ -602,11 +602,11 @@ using namespace std;
 
 @implementation TDBQueryAccessorInt
 {
-    __weak TDBQuery* _query;
+    __weak RLMQuery * _query;
     NSUInteger _column_ndx;
 }
 
--(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query
 {
     self = [super init];
     if (self) {
@@ -616,7 +616,7 @@ using namespace std;
     return self;
 }
 
--(TDBQuery*)columnIsEqualTo:(int64_t)value
+-(RLMQuery *)columnIsEqualTo:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
         [_query getNativeQuery].equal(_column_ndx, value);,
@@ -624,7 +624,7 @@ using namespace std;
     return _query;
 }
 
--(TDBQuery*)columnIsNotEqualTo:(int64_t)value
+-(RLMQuery *)columnIsNotEqualTo:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
         [_query getNativeQuery].not_equal(_column_ndx, value);,
@@ -632,7 +632,7 @@ using namespace std;
     return _query;
 }
 
--(TDBQuery*)columnIsGreaterThan:(int64_t)value
+-(RLMQuery *)columnIsGreaterThan:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
         [_query getNativeQuery].greater(_column_ndx, value);,
@@ -640,7 +640,7 @@ using namespace std;
     return _query;
 }
 
--(TDBQuery*)columnIsGreaterThanOrEqualTo:(int64_t)value
+-(RLMQuery *)columnIsGreaterThanOrEqualTo:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
         [_query getNativeQuery].greater_equal(_column_ndx, value);,
@@ -648,7 +648,7 @@ using namespace std;
     return _query;
 }
 
--(TDBQuery*)columnIsLessThan:(int64_t)value
+-(RLMQuery *)columnIsLessThan:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
         [_query getNativeQuery].less(_column_ndx, value);,
@@ -656,7 +656,7 @@ using namespace std;
     return _query;
 }
 
--(TDBQuery*)columnIsLessThanOrEqualTo:(int64_t)value
+-(RLMQuery *)columnIsLessThanOrEqualTo:(int64_t)value
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
         [_query getNativeQuery].less_equal(_column_ndx, value);,
@@ -664,7 +664,7 @@ using namespace std;
     return _query;
 }
 
--(TDBQuery*)columnIsBetween:(int64_t)from :(int64_t)to
+-(RLMQuery *)columnIsBetween:(int64_t)from :(int64_t)to
 {
     TIGHTDB_EXCEPTION_ERRHANDLER_EX(
         [_query getNativeQuery].between(_column_ndx, from, to);,
@@ -695,11 +695,11 @@ using namespace std;
 @implementation TDBQueryAccessorFloat
 
 {
-    __weak TDBQuery* _query;
+    __weak RLMQuery * _query;
     NSUInteger _column_ndx;
 }
 
--(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query
 {
     self = [super init];
     if (self) {
@@ -709,43 +709,43 @@ using namespace std;
     return self;
 }
 
--(TDBQuery*)columnIsEqualTo:(float)value
+-(RLMQuery *)columnIsEqualTo:(float)value
 {
     [_query getNativeQuery].equal(_column_ndx, value);
     return _query;
 }
 
--(TDBQuery*)columnIsNotEqualTo:(float)value
+-(RLMQuery *)columnIsNotEqualTo:(float)value
 {
     [_query getNativeQuery].not_equal(_column_ndx, value);
     return _query;
 }
 
--(TDBQuery*)columnIsGreaterThan:(float)value
+-(RLMQuery *)columnIsGreaterThan:(float)value
 {
     [_query getNativeQuery].greater(_column_ndx, value);
     return _query;
 }
 
--(TDBQuery*)columnIsGreaterThanOrEqualTo:(float)value
+-(RLMQuery *)columnIsGreaterThanOrEqualTo:(float)value
 {
     [_query getNativeQuery].greater_equal(_column_ndx, value);
     return _query;
 }
 
--(TDBQuery*)columnIsLessThan:(float)value
+-(RLMQuery *)columnIsLessThan:(float)value
 {
     [_query getNativeQuery].less(_column_ndx, value);
     return _query;
 }
 
--(TDBQuery*)columnIsLessThanOrEqualTo:(float)value
+-(RLMQuery *)columnIsLessThanOrEqualTo:(float)value
 {
     [_query getNativeQuery].less_equal(_column_ndx, value);
     return _query;
 }
 
--(TDBQuery*)columnIsBetween:(float)from :(float)to
+-(RLMQuery *)columnIsBetween:(float)from :(float)to
 {
     [_query getNativeQuery].between(_column_ndx, from, to);
     return _query;
@@ -773,11 +773,11 @@ using namespace std;
 
 @implementation TDBQueryAccessorDouble
 {
-    __weak TDBQuery* _query;
+    __weak RLMQuery * _query;
     NSUInteger _column_ndx;
 }
 
--(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query
 {
     self = [super init];
     if (self) {
@@ -787,43 +787,43 @@ using namespace std;
     return self;
 }
 
--(TDBQuery*)columnIsEqualTo:(double)value
+-(RLMQuery *)columnIsEqualTo:(double)value
 {
     [_query getNativeQuery].equal(_column_ndx, value);
     return _query;
 }
 
--(TDBQuery*)columnIsNotEqualTo:(double)value
+-(RLMQuery *)columnIsNotEqualTo:(double)value
 {
     [_query getNativeQuery].not_equal(_column_ndx, value);
     return _query;
 }
 
--(TDBQuery*)columnIsGreaterThan:(double)value
+-(RLMQuery *)columnIsGreaterThan:(double)value
 {
     [_query getNativeQuery].greater(_column_ndx, value);
     return _query;
 }
 
--(TDBQuery*)columnIsGreaterThanOrEqualTo:(double)value
+-(RLMQuery *)columnIsGreaterThanOrEqualTo:(double)value
 {
     [_query getNativeQuery].greater_equal(_column_ndx, value);
     return _query;
 }
 
--(TDBQuery*)columnIsLessThan:(double)value
+-(RLMQuery *)columnIsLessThan:(double)value
 {
     [_query getNativeQuery].less(_column_ndx, value);
     return _query;
 }
 
--(TDBQuery*)columnIsLessThanOrEqualTo:(double)value
+-(RLMQuery *)columnIsLessThanOrEqualTo:(double)value
 {
     [_query getNativeQuery].less_equal(_column_ndx, value);
     return _query;
 }
 
--(TDBQuery*)columnIsBetween:(double)from :(double)to
+-(RLMQuery *)columnIsBetween:(double)from :(double)to
 {
     [_query getNativeQuery].between(_column_ndx, from, to);
     return _query;
@@ -854,11 +854,11 @@ using namespace std;
 
 @implementation TDBQueryAccessorString
 {
-    __weak TDBQuery* _query;
+    __weak RLMQuery * _query;
     NSUInteger _column_ndx;
 }
 
--(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query
 {
     self = [super init];
     if (self) {
@@ -867,52 +867,52 @@ using namespace std;
     }
     return self;
 }
--(TDBQuery*)columnIsEqualTo:(NSString*)value
+-(RLMQuery *)columnIsEqualTo:(NSString*)value
 {
     [_query getNativeQuery].equal(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
--(TDBQuery*)columnIsEqualTo:(NSString*)value caseSensitive:(BOOL)caseSensitive
+-(RLMQuery *)columnIsEqualTo:(NSString*)value caseSensitive:(BOOL)caseSensitive
 {
     [_query getNativeQuery].equal(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
--(TDBQuery*)columnIsNotEqualTo:(NSString*)value
+-(RLMQuery *)columnIsNotEqualTo:(NSString*)value
 {
     [_query getNativeQuery].not_equal(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
--(TDBQuery*)columnIsNotEqualTo:(NSString*)value caseSensitive:(BOOL)caseSensitive
+-(RLMQuery *)columnIsNotEqualTo:(NSString*)value caseSensitive:(BOOL)caseSensitive
 {
     [_query getNativeQuery].not_equal(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
--(TDBQuery*)columnBeginsWith:(NSString*)value
+-(RLMQuery *)columnBeginsWith:(NSString*)value
 {
     [_query getNativeQuery].begins_with(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
--(TDBQuery*)columnBeginsWith:(NSString*)value caseSensitive:(BOOL)caseSensitive
+-(RLMQuery *)columnBeginsWith:(NSString*)value caseSensitive:(BOOL)caseSensitive
 {
     [_query getNativeQuery].begins_with(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
--(TDBQuery*)columnEndsWith:(NSString*)value
+-(RLMQuery *)columnEndsWith:(NSString*)value
 {
     [_query getNativeQuery].ends_with(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
--(TDBQuery*)columnEndsWith:(NSString*)value caseSensitive:(BOOL)caseSensitive
+-(RLMQuery *)columnEndsWith:(NSString*)value caseSensitive:(BOOL)caseSensitive
 {
     [_query getNativeQuery].ends_with(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
 }
--(TDBQuery*)columnContains:(NSString*)value
+-(RLMQuery *)columnContains:(NSString*)value
 {
     [_query getNativeQuery].contains(_column_ndx, ObjcStringAccessor(value));
     return _query;
 }
--(TDBQuery*)columnContains:(NSString*)value caseSensitive:(BOOL)caseSensitive
+-(RLMQuery *)columnContains:(NSString*)value caseSensitive:(BOOL)caseSensitive
 {
     [_query getNativeQuery].contains(_column_ndx, ObjcStringAccessor(value), caseSensitive);
     return _query;
@@ -923,11 +923,11 @@ using namespace std;
 
 @implementation TDBQueryAccessorBinary
 {
-    __weak TDBQuery* _query;
+    __weak RLMQuery * _query;
     NSUInteger _column_ndx;
 }
 
--(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query
 {
     self = [super init];
     if (self) {
@@ -936,27 +936,27 @@ using namespace std;
     }
     return self;
 }
--(TDBQuery*)columnIsEqualTo:(NSData*)value
+-(RLMQuery *)columnIsEqualTo:(NSData*)value
 {
     [_query getNativeQuery].equal(_column_ndx, value.rlmBinaryData);
     return _query;
 }
--(TDBQuery*)columnIsNotEqualTo:(NSData*)value
+-(RLMQuery *)columnIsNotEqualTo:(NSData*)value
 {
     [_query getNativeQuery].not_equal(_column_ndx, value.rlmBinaryData);
     return _query;
 }
--(TDBQuery*)columnBeginsWith:(NSData*)value
+-(RLMQuery *)columnBeginsWith:(NSData*)value
 {
     [_query getNativeQuery].begins_with(_column_ndx, value.rlmBinaryData);
     return _query;
 }
--(TDBQuery*)columnEndsWith:(NSData*)value
+-(RLMQuery *)columnEndsWith:(NSData*)value
 {
     [_query getNativeQuery].ends_with(_column_ndx, value.rlmBinaryData);
     return _query;
 }
--(TDBQuery*)columnContains:(NSData*)value
+-(RLMQuery *)columnContains:(NSData*)value
 {
     [_query getNativeQuery].contains(_column_ndx, value.rlmBinaryData);
     return _query;
@@ -967,11 +967,11 @@ using namespace std;
 
 @implementation TDBQueryAccessorDate
 {
-    __weak TDBQuery* _query;
+    __weak RLMQuery * _query;
     NSUInteger _column_ndx;
 }
 
--(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query
 {
     self = [super init];
     if (self) {
@@ -980,37 +980,37 @@ using namespace std;
     }
     return self;
 }
--(TDBQuery*)columnIsEqualTo:(NSDate *)value
+-(RLMQuery *)columnIsEqualTo:(NSDate *)value
 {
     [_query getNativeQuery].equal_datetime(_column_ndx, [value timeIntervalSince1970]);
     return _query;
 }
--(TDBQuery*)columnIsNotEqualTo:(NSDate *)value
+-(RLMQuery *)columnIsNotEqualTo:(NSDate *)value
 {
     [_query getNativeQuery].not_equal_datetime(_column_ndx, [value timeIntervalSince1970]);
     return _query;
 }
--(TDBQuery*)columnIsGreaterThan:(NSDate *)value
+-(RLMQuery *)columnIsGreaterThan:(NSDate *)value
 {
     [_query getNativeQuery].greater_datetime(_column_ndx, [value timeIntervalSince1970]);
     return _query;
 }
--(TDBQuery*)columnIsGreaterThanOrEqualTo:(NSDate *)value
+-(RLMQuery *)columnIsGreaterThanOrEqualTo:(NSDate *)value
 {
     [_query getNativeQuery].greater_equal_datetime(_column_ndx, [value timeIntervalSince1970]);
     return _query;
 }
--(TDBQuery*)columnIsLessThan:(NSDate *)value
+-(RLMQuery *)columnIsLessThan:(NSDate *)value
 {
     [_query getNativeQuery].less_datetime(_column_ndx, [value timeIntervalSince1970]);
     return _query;
 }
--(TDBQuery*)columnIsLessThanOrEqualTo:(NSDate *)value
+-(RLMQuery *)columnIsLessThanOrEqualTo:(NSDate *)value
 {
     [_query getNativeQuery].less_equal_datetime(_column_ndx, [value timeIntervalSince1970]);
     return _query;
 }
--(TDBQuery*)columnIsBetween:(NSDate *)from :(NSDate *)to
+-(RLMQuery *)columnIsBetween:(NSDate *)from :(NSDate *)to
 {
     [_query getNativeQuery].between_datetime(_column_ndx, [from timeIntervalSince1970], [to timeIntervalSince1970]);
     return _query;
@@ -1020,11 +1020,11 @@ using namespace std;
 
 @implementation TDBQueryAccessorSubtable
 {
-    __weak TDBQuery* _query;
+    __weak RLMQuery * _query;
     NSUInteger _column_ndx;
 }
 
--(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query
 {
     self = [super init];
     if (self) {
@@ -1039,11 +1039,11 @@ using namespace std;
 
 @implementation TDBQueryAccessorMixed
 {
-    __weak TDBQuery* _query;
+    __weak RLMQuery * _query;
     NSUInteger _column_ndx;
 }
 
--(id)initWithColumn:(NSUInteger)columnId query:(TDBQuery*)query
+-(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query
 {
     self = [super init];
     if (self) {

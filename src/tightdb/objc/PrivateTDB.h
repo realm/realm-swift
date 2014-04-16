@@ -80,7 +80,7 @@
  * However, they are public so that the typed table macros can use them.
  */
 @interface TDBView (Private)
--(id)_initWithQuery:(TDBQuery *)query;
+-(id)_initWithQuery:(RLMQuery *)query;
 
 -(BOOL)TDB_boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 -(int64_t)TDB_intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
