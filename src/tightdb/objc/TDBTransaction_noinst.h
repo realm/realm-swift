@@ -20,11 +20,11 @@
 
 #import <Foundation/Foundation.h>
 
-#import "TDBTransaction.h"
+#import "RLMTransaction.h"
 
 
-@interface TDBTransaction (noinst)
+@interface RLMTransaction (noinst)
 
-+(TDBTransaction*)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only;
++(RLMTransaction *)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only;
 
 @end

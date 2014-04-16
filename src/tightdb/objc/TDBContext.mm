@@ -22,7 +22,7 @@
 #include <tightdb/group_shared.hpp>
 
 #import "TDBContext.h"
-#import "TDBTransaction_noinst.h"
+#import "RLMTransaction_noinst.h"
 #import "util_noinst.hpp"
 
 using namespace std;
@@ -115,7 +115,7 @@ NSString *const defaultContextFileName = @"default.tightdb";
         // should throw anything but NSException or derivatives. Note: if the client calls other libraries
         // throwing other kinds of exceptions they will leak back to the client code, if he does not
         // catch them within the block.
-        TDBTransaction* group_2 = [TDBTransaction groupWithNativeGroup:const_cast<tightdb::Group*>(group) isOwned:NO readOnly:YES];
+        RLMTransaction * group_2 = [RLMTransaction groupWithNativeGroup:const_cast<tightdb::Group *>(group) isOwned:NO readOnly:YES];
         block(group_2);
 
     }
@@ -126,7 +126,7 @@ NSString *const defaultContextFileName = @"default.tightdb";
 
 -(void)readTable:(NSString*)tablename usingBlock:(RLMTableReadBlock)block
 {
-    [self readUsingBlock:^(TDBTransaction *trx){
+    [self readUsingBlock:^(RLMTransaction *trx){
         RLMTable *table = [trx tableWithName:tablename];
         block(table);
     }];
@@ -150,7 +150,7 @@ NSString *const defaultContextFileName = @"default.tightdb";
 
     BOOL confirmation = NO;
     @try {
-        TDBTransaction* group_2 = [TDBTransaction groupWithNativeGroup:group isOwned:NO readOnly:NO];
+        RLMTransaction * group_2 = [RLMTransaction groupWithNativeGroup:group isOwned:NO readOnly:NO];
         confirmation = block(group_2);
     }
     @catch (NSException* exception) {
@@ -186,7 +186,7 @@ NSString *const defaultContextFileName = @"default.tightdb";
 
 -(BOOL)writeTable:(NSString*)tablename usingBlock:(RLMTableWriteBlock)block error:(NSError **)error
 {
-    return [self writeUsingBlock:^(TDBTransaction *trx){
+    return [self writeUsingBlock:^(RLMTransaction *trx){
         RLMTable *table = [trx tableWithName:tablename];
         return block(table);
     } error: error];

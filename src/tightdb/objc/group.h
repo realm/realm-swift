@@ -28,22 +28,22 @@
 
 #import <Foundation/Foundation.h>
 
-#import "TDBTransaction.h"
+#import "RLMTransaction.h"
 
 @class TDBBinary;
 @class RLMTable;
 
 
-@interface  TDBTransaction() // Selectors are currently implemented in TDBTransaction
+@interface RLMTransaction () // Selectors are currently implemented in RLMTransaction
 
 /*
  * Init a free-stading in memory group
  */
-+(TDBTransaction *)group;
++(RLMTransaction *)group;
 
-+(TDBTransaction *)groupWithFile:(NSString *)filename error:(NSError *__autoreleasing *)error;
++(RLMTransaction *)groupWithFile:(NSString *)filename error:(NSError *__autoreleasing *)error;
 
-+(TDBTransaction *)groupWithBuffer:(NSData *)buffer error:(NSError *__autoreleasing *)error;
++(RLMTransaction *)groupWithBuffer:(NSData *)buffer error:(NSError *__autoreleasing *)error;
 
 -(NSData *)writeContextToBuffer;
 

@@ -39,7 +39,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    TDBTransaction *transaction = [TDBTransaction group];
+    RLMTransaction *transaction = [RLMTransaction group];
     // Create new table in transaction
     PeopleTable *people = [transaction createTableWithName:@"employees" asTableClass:[PeopleTable class]];
 
@@ -148,7 +148,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     [transaction writeContextToFile:@"employees.tightdb" error:nil];
 
     // Load a transaction from disk (and print contents)
-    TDBTransaction *fromDisk = [TDBTransaction groupWithFile:@"employees.tightdb" error:nil];
+    RLMTransaction *fromDisk = [RLMTransaction groupWithFile:@"employees.tightdb" error:nil];
     PeopleTable *diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PeopleTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES];
@@ -164,7 +164,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     NSData* buffer = [transaction writeContextToBuffer];
 
     // Load a transaction from memory (and print contents)
-    TDBTransaction *fromMem = [TDBTransaction groupWithBuffer:buffer error:nil];
+    RLMTransaction *fromMem = [RLMTransaction groupWithBuffer:buffer error:nil];
     PeopleTable *memTable = [fromMem tableWithName:@"employees" asTableClass:[PeopleTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         PeopleTableRow *row = [memTable rowAtIndex:i];

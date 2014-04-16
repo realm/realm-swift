@@ -8,7 +8,7 @@
 #import <XCTest/XCTest.h>
 
 #import <tightdb/objc/Tightdb.h>
-#import <tightdb/objc/TDBTransaction.h>
+#import <tightdb/objc/RLMTransaction.h>
 #import <tightdb/objc/TDBContext.h>
 #import <tightdb/objc/group.h>
 
@@ -20,15 +20,15 @@ TIGHTDB_TABLE_2(TestTableGroup,
 @end
 @implementation MACTestGroup
 {
-    TDBTransaction *_group;
+    RLMTransaction *_group;
 }
 
 - (void)setUp
 {
     [super setUp];
 
-    // _group = [TDBTransaction group];
-    // NSLog(@"TDBTransaction: %@", _group);
+    // _group = [RLMTransaction group];
+    // NSLog(@"RLMTransaction: %@", _group);
     // XCTAssertNotNil(_group, @"Group is nil");
 }
 
@@ -45,12 +45,12 @@ TIGHTDB_TABLE_2(TestTableGroup,
     NSFileManager *fm = [NSFileManager defaultManager];
 
     // Create empty group and serialize to disk
-    TDBTransaction *toDisk = [TDBTransaction group];
+    RLMTransaction *toDisk = [RLMTransaction group];
     [fm removeItemAtPath:@"table_test.tightdb" error:NULL];
     [toDisk writeContextToFile:@"table_test.tightdb" error:nil];
 
     // Load the group
-    TDBTransaction *fromDisk = [TDBTransaction groupWithFile:@"table_test.tightdb" error:nil];
+    RLMTransaction *fromDisk = [RLMTransaction groupWithFile:@"table_test.tightdb" error:nil];
     if (!fromDisk)
         XCTFail(@"From disk not valid");
 
@@ -77,13 +77,13 @@ TIGHTDB_TABLE_2(TestTableGroup,
 
 - (void)testGetTable
 {
-    TDBTransaction *g = [TDBTransaction group];
+    RLMTransaction *g = [RLMTransaction group];
     XCTAssertNil([g tableWithName:@"noTable"], @"Table does not exist");
 }
 
 - (void)testGroupTableCount
 {
-    TDBTransaction *t = [TDBTransaction group];
+    RLMTransaction *t = [RLMTransaction group];
     XCTAssertEqual(t.tableCount, (NSUInteger)0, @"No tables added");
     [t createTableWithName:@"tableName"];
     XCTAssertEqual(t.tableCount, (NSUInteger)1, @"1 table added");

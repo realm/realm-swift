@@ -23,7 +23,7 @@
 @class RLMTable;
 
 
-@interface TDBTransaction: NSObject
+@interface RLMTransaction : NSObject
 
 @property (nonatomic, readonly) NSUInteger tableCount;
 

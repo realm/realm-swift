@@ -8,7 +8,7 @@
 #import <XCTest/XCTest.h>
 
 #import <tightdb/objc/Tightdb.h>
-#import <tightdb/objc/TDBTransaction.h>
+#import <tightdb/objc/RLMTransaction.h>
 #import <tightdb/objc/TDBContext.h>
 
 TIGHTDB_TABLE_2(GetSubtable,

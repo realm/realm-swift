@@ -8,7 +8,7 @@
 #import <XCTest/XCTest.h>
 
 #import <tightdb/objc/TightdbFast.h>
-#import <tightdb/objc/TDBTransaction.h>
+#import <tightdb/objc/RLMTransaction.h>
 #import <tightdb/objc/group.h>
 
 TIGHTDB_TABLE_2(SharedTable2,
@@ -26,7 +26,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     // TODO: Update test to include more ASSERTS
 
 
-    TDBTransaction* group = [TDBTransaction group];
+    RLMTransaction * group = [RLMTransaction group];
     // Create new table in group
     SharedTable2 *table = [group createTableWithName:@"employees" asTableClass:[SharedTable2 class]];
     NSLog(@"Table: %@", table);
@@ -49,7 +49,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     // Read only shared group
     TDBContext* fromDisk = [TDBContext contextPersistedAtPath:@"employees.tightdb" error:nil];
 
-    [fromDisk readUsingBlock:^(TDBTransaction* group) {
+    [fromDisk readUsingBlock:^(RLMTransaction * group) {
             SharedTable2* diskTable = [group tableWithName:@"employees" asTableClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < [diskTable rowCount]; i++) {
@@ -60,7 +60,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         }];
 
 
-    [fromDisk writeUsingBlock:^(TDBTransaction* group) {
+    [fromDisk writeUsingBlock:^(RLMTransaction * group) {
             SharedTable2* diskTable = [group tableWithName:@"employees" asTableClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < 50; i++) {
@@ -70,7 +70,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         } error:nil];
 
 
-    [fromDisk writeUsingBlock:^(TDBTransaction* group) {
+    [fromDisk writeUsingBlock:^(RLMTransaction * group) {
             SharedTable2* diskTable = [group tableWithName:@"employees" asTableClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < 50; i++) {
@@ -80,7 +80,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         } error:nil];
 
 
-    [fromDisk writeUsingBlock:^(TDBTransaction* group) {
+    [fromDisk writeUsingBlock:^(RLMTransaction * group) {
             SharedTable2* diskTable = [group tableWithName:@"employees" asTableClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
             for (size_t i = 0; i < 50; i++) {
@@ -92,7 +92,7 @@ TIGHTDB_TABLE_2(SharedTable2,
             return YES; // commit
         } error:nil];
 
-    [fromDisk readUsingBlock:^(TDBTransaction* group) {
+    [fromDisk readUsingBlock:^(RLMTransaction * group) {
             SharedTable2* diskTable = [group tableWithName:@"employees" asTableClass:[SharedTable2 class]];
             NSLog(@"Disktable size: %zu", [diskTable rowCount]);
         
@@ -115,7 +115,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     // Create a new context at default location
     TDBContext *context = [TDBContext contextWithDefaultPersistence];
     
-    [context writeUsingBlock:^(TDBTransaction *transaction) {
+    [context writeUsingBlock:^(RLMTransaction *transaction) {
         RLMTable *t = [transaction createTableWithName:@"table"];
         
         [t addColumnWithName:@"col0" type:TDBIntType];
@@ -125,7 +125,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         
     } error:nil];
     
-    [context readUsingBlock:^(TDBTransaction* transaction) {
+    [context readUsingBlock:^(RLMTransaction * transaction) {
         RLMTable *t = [transaction tableWithName:@"table"];
         XCTAssertEqualObjects(t[0][0], @10);
     }];
@@ -133,7 +133,7 @@ TIGHTDB_TABLE_2(SharedTable2,
 
 - (void)testSharedGroupCreateTableWithColumns
 {
-    TDBTransaction* transaction = [TDBTransaction group];
+    RLMTransaction * transaction = [RLMTransaction group];
     
     // Check if method throws exception
     XCTAssertNoThrow(([transaction createTableWithName:@"Test" columns:@[@"id", @"int"]]), @"Table should not throw exception");
@@ -166,7 +166,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     
     TDBContext* fromDisk = [TDBContext contextPersistedAtPath:@"readonlyTest.tightdb" error:nil];
     
-    [fromDisk writeUsingBlock:^(TDBTransaction *group) {
+    [fromDisk writeUsingBlock:^(RLMTransaction *group) {
         RLMTable *t = [group createTableWithName:@"table"];
         
         [t addColumnWithName:@"col0" type:TDBIntType];
@@ -175,7 +175,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         return YES;
     } error:nil];
     
-    [fromDisk readUsingBlock:^(TDBTransaction* group) {
+    [fromDisk readUsingBlock:^(RLMTransaction * group) {
         RLMTable *t = [group tableWithName:@"table"];
         
         XCTAssertThrows([t addRow:nil], @"Is in readTransaction");
@@ -207,7 +207,7 @@ TIGHTDB_TABLE_2(SharedTable2,
 
     TDBContext* ctx = [TDBContext contextPersistedAtPath:@"singleTest.tightdb" error:nil];
 
-    [ctx writeUsingBlock:^(TDBTransaction *trx) {
+    [ctx writeUsingBlock:^(RLMTransaction *trx) {
         RLMTable *t = [trx createTableWithName:@"table"];
         [t addColumnWithName:@"col0" type:TDBIntType];
         [t addRow:@[@10]];
@@ -241,7 +241,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     
     XCTAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not changed");
     
-    [sg writeUsingBlock:^(TDBTransaction* group) {
+    [sg writeUsingBlock:^(RLMTransaction * group) {
         [group createTableWithName:@"t"];
         return YES;
     } error:nil];
@@ -249,7 +249,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     XCTAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not been changed by another process");
 
     
-    [sg writeUsingBlock:^(TDBTransaction* group) {
+    [sg writeUsingBlock:^(RLMTransaction * group) {
         RLMTable *t = [group tableWithName:@"t"];
         [t addColumnWithName:@"col" type:TDBBoolType];
         [t addRow:nil];
@@ -265,7 +265,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     TDBContext *sg2 = [TDBContext contextPersistedAtPath:@"hasChanged.tightdb" error:nil];
     
     
-    [sg2 writeUsingBlock:^(TDBTransaction* group) {
+    [sg2 writeUsingBlock:^(RLMTransaction * group) {
         RLMTable *t = [group tableWithName:@"t"];
         [t addRow:nil]; /* Adding an empty row */
         return YES;
@@ -284,7 +284,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     
     TDBContext *c = [TDBContext contextPersistedAtPath:contextPath error:nil];
     
-    [c writeUsingBlock:^BOOL(TDBTransaction *transaction) {
+    [c writeUsingBlock:^BOOL(RLMTransaction *transaction) {
         
         XCTAssertThrows([transaction createTableWithName:nil], @"name is nil");
         XCTAssertThrows([transaction createTableWithName:@""], @"name is empty");
@@ -295,7 +295,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         return YES;
     } error:nil];
     
-    [c readUsingBlock:^(TDBTransaction *transaction) {
+    [c readUsingBlock:^(RLMTransaction *transaction) {
         
         XCTAssertThrows([transaction tableWithName:nil], @"name is nil");
         XCTAssertThrows([transaction tableWithName:@""], @"name is empty");
@@ -327,7 +327,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         [context2 unpinReadTransactions];
     }
     {   // add something to the db to play with
-        [context1 writeUsingBlock:^BOOL(TDBTransaction *transaction) {
+        [context1 writeUsingBlock:^BOOL(RLMTransaction *transaction) {
             RLMTable *t1 = [transaction createTableWithName:@"test"];
             [t1 addColumnWithName:@"col0" type:TDBBoolType];
             [t1 addRow:@[@YES]];
@@ -338,13 +338,13 @@ TIGHTDB_TABLE_2(SharedTable2,
     {   // validate that we can see previous commit from within a new pinned transaction
         BOOL changed = [context2 pinReadTransactions];
         XCTAssertTrue(changed, @"");
-        [context2 readUsingBlock:^(TDBTransaction *transaction) {
+        [context2 readUsingBlock:^(RLMTransaction *transaction) {
             RLMTable *t = [transaction tableWithName:@"test"];
             XCTAssertEqual([[t rowAtIndex:0] boolInColumnWithIndex:0], YES, @"");
         }];
     }
     {   // commit new data in another context, without unpinning
-        [context1 writeUsingBlock:^BOOL(TDBTransaction *transaction) {
+        [context1 writeUsingBlock:^BOOL(RLMTransaction *transaction) {
             RLMTable *t = [transaction tableWithName:@"test"];
             [t addRow:@[@NO]];
             return YES;
@@ -352,14 +352,14 @@ TIGHTDB_TABLE_2(SharedTable2,
         
     }
     {   // validate that we can see previous commit if we're not pinned
-        [context1 readUsingBlock:^(TDBTransaction *transaction) {
+        [context1 readUsingBlock:^(RLMTransaction *transaction) {
             RLMTable *t = [transaction tableWithName:@"test"];
             XCTAssertEqual([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, @"");
         }];
         
     }
      {   // validate that we can NOT see previous commit from within a pinned transaction
-        [context2 readUsingBlock:^(TDBTransaction *transaction) {
+        [context2 readUsingBlock:^(RLMTransaction *transaction) {
             RLMTable *t = [transaction tableWithName:@"test"];
             XCTAssertEqual(t.rowCount, (NSUInteger)1, @"Still only 1 row");
         }];
@@ -369,7 +369,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         [context2 unpinReadTransactions];
         BOOL changed = [context2 pinReadTransactions];
         XCTAssertTrue(changed, @"changes since last transaction");
-        [context2 readUsingBlock:^(TDBTransaction *transaction) {
+        [context2 readUsingBlock:^(RLMTransaction *transaction) {
             RLMTable *t = [transaction tableWithName:@"test"];
             XCTAssertEqual(t.rowCount, (NSUInteger)2, @"Now we see 2 rows");
             XCTAssertEqual([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, @"");
@@ -384,7 +384,7 @@ TIGHTDB_TABLE_2(SharedTable2,
 
     }
     {   // can't pin while we're inside a transaction
-        [context1 readUsingBlock:^(TDBTransaction *transaction) {
+        [context1 readUsingBlock:^(RLMTransaction *transaction) {
             XCTAssertThrows([context1 pinReadTransactions], @"Can't pin inside transaction");
             XCTAssertNotNil(transaction, @"Parameter must be used");
         }];
@@ -392,7 +392,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     
     {   // can't unpin while we're inside a transaction
         [context1 pinReadTransactions];
-        [context1 readUsingBlock:^(TDBTransaction *transaction) {
+        [context1 readUsingBlock:^(RLMTransaction *transaction) {
             XCTAssertThrows([context1 unpinReadTransactions], @"Can't unpin inside transaction");
             XCTAssertNotNil(transaction, @"Parameter must be used");
         }];
@@ -400,7 +400,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     }
     {   // can't start a write transaction while pinned
         [context1 pinReadTransactions];
-        XCTAssertThrows([context1 writeUsingBlock:^BOOL(TDBTransaction *transaction) {
+        XCTAssertThrows([context1 writeUsingBlock:^BOOL(RLMTransaction *transaction) {
             XCTAssertNotNil(transaction, @"Parameter must be used");
             return YES;
         } error:nil], @"Can't start write transaction while pinned");
