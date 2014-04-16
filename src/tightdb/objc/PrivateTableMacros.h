@@ -30,7 +30,7 @@
 
 #import "TDBTable.h"
 #import "TDBRow.h"
-#import "TDBDescriptor.h"
+#import "RLMDescriptor.h"
 #import "TDBQuery.h"
 #import "TDBView.h"
 #import "TDBColumnProxy.h"
@@ -206,28 +206,28 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TDBDescriptor*)desc \
++(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     return YES; \
 } \
 -(BOOL)_checkType \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TDBDescriptor*)desc \
++(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     return YES; \
 } \
 -(BOOL)_addColumns \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -436,7 +436,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TDBDescriptor*)desc \
++(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -444,14 +444,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 } \
 -(BOOL)_checkType \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TDBDescriptor*)desc \
++(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -459,7 +459,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 } \
 -(BOOL)_addColumns \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -683,7 +683,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TDBDescriptor*)desc \
++(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -692,14 +692,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 } \
 -(BOOL)_checkType \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TDBDescriptor*)desc \
++(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -708,7 +708,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 } \
 -(BOOL)_addColumns \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -947,7 +947,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TDBDescriptor*)desc \
++(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -957,14 +957,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 } \
 -(BOOL)_checkType \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TDBDescriptor*)desc \
++(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -974,7 +974,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 } \
 -(BOOL)_addColumns \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -1228,7 +1228,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TDBDescriptor*)desc \
++(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -1239,14 +1239,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 } \
 -(BOOL)_checkType \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TDBDescriptor*)desc \
++(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -1257,7 +1257,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 } \
 -(BOOL)_addColumns \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -1526,7 +1526,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TDBDescriptor*)desc \
++(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -1538,14 +1538,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 } \
 -(BOOL)_checkType \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TDBDescriptor*)desc \
++(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -1557,7 +1557,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 } \
 -(BOOL)_addColumns \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -1841,7 +1841,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TDBDescriptor*)desc \
++(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -1854,14 +1854,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 } \
 -(BOOL)_checkType \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TDBDescriptor*)desc \
++(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -1874,7 +1874,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 } \
 -(BOOL)_addColumns \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -2173,7 +2173,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TDBDescriptor*)desc \
++(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -2187,14 +2187,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 } \
 -(BOOL)_checkType \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TDBDescriptor*)desc \
++(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -2208,7 +2208,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 } \
 -(BOOL)_addColumns \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -2522,7 +2522,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TDBDescriptor*)desc \
++(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -2537,14 +2537,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 } \
 -(BOOL)_checkType \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TDBDescriptor*)desc \
++(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -2559,7 +2559,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 } \
 -(BOOL)_addColumns \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -2888,7 +2888,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TDBDescriptor*)desc \
++(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -2904,14 +2904,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 } \
 -(BOOL)_checkType \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TDBDescriptor*)desc \
++(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -2927,7 +2927,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 } \
 -(BOOL)_addColumns \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -3271,7 +3271,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TDBDescriptor*)desc \
++(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -3288,14 +3288,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 } \
 -(BOOL)_checkType \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TDBDescriptor*)desc \
++(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -3312,7 +3312,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 } \
 -(BOOL)_addColumns \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -3671,7 +3671,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TDBDescriptor*)desc \
++(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -3689,14 +3689,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 } \
 -(BOOL)_checkType \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TDBDescriptor*)desc \
++(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -3714,7 +3714,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 } \
 -(BOOL)_addColumns \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -4088,7 +4088,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TDBDescriptor*)desc \
++(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -4107,14 +4107,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 } \
 -(BOOL)_checkType \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TDBDescriptor*)desc \
++(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -4133,7 +4133,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 } \
 -(BOOL)_addColumns \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -4522,7 +4522,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TDBDescriptor*)desc \
++(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -4542,14 +4542,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 } \
 -(BOOL)_checkType \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TDBDescriptor*)desc \
++(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -4569,7 +4569,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 } \
 -(BOOL)_addColumns \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
@@ -4973,7 +4973,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TDBDescriptor*)desc \
++(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
@@ -4994,14 +4994,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 } \
 -(BOOL)_checkType \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TDBDescriptor*)desc \
++(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
     TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
     TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
@@ -5022,7 +5022,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 } \
 -(BOOL)_addColumns \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \

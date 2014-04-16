@@ -40,7 +40,7 @@ directiveStartToken = %
 
 #import "TDBTable.h"
 #import "TDBRow.h"
-#import "TDBDescriptor.h"
+#import "RLMDescriptor.h"
 #import "TDBQuery.h"
 #import "TDBView.h"
 #import "TDBColumnProxy.h"
@@ -275,7 +275,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
-+(BOOL)_checkType:(TDBDescriptor*)desc \
++(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
 %for $j in range($num_cols)
     TIGHTDB_CHECK_COLUMN_TYPE(desc, ${j}, CName${j+1}, CType${j+1}) \
@@ -284,14 +284,14 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 } \
 -(BOOL)_checkType \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _checkType:desc]) \
         return NO; \
     return YES; \
 } \
-+(BOOL)_addColumns:(TDBDescriptor*)desc \
++(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
 %for $j in range($num_cols)
     TIGHTDB_ADD_COLUMN(desc, CName${j+1}, CType${j+1}) \
@@ -300,7 +300,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 } \
 -(BOOL)_addColumns \
 { \
-    TDBDescriptor* desc = self.descriptor; \
+    RLMDescriptor* desc = self.descriptor; \
     if (!desc) \
         return NO; \
     if (![TableName _addColumns:desc]) \
