@@ -15,6 +15,10 @@ static NSString * const kTitleColumn = @"title";
 
 @interface RLMTableViewController ()
 
+@property (nonatomic, strong) TDBSmartContext *readContext;
+@property (nonatomic, strong) TDBContext *writeContext;
+@property (nonatomic, readonly) TDBTable *table;
+
 @end
 
 @implementation RLMTableViewController
@@ -36,33 +40,30 @@ static NSString * const kTitleColumn = @"title";
 #pragma mark - TightDB
 
 - (void)setupTightDB {
-    // Write initial data to table
-    [[TDBContext contextWithDefaultPersistence] writeUsingBlock:^BOOL(TDBTransaction *transaction){
-        if (![transaction tableWithName:kTableName]) {
+    self.readContext = [TDBSmartContext contextWithPersistenceToFile:[TDBContext defaultPath]];
+    self.writeContext = [TDBContext contextWithDefaultPersistence];
+    
+    if (!self.table) {
+        // Create table if it doesn't exist
+        NSError *error = nil;
+        [self.writeContext writeUsingBlock:^BOOL(TDBTransaction *transaction) {
             TDBTable *table = [transaction createTableWithName:kTableName];
             [table addColumnWithName:kTitleColumn type:TDBStringType];
-            [table addRow:[RLMTableViewController rowDictWithCount:table.rowCount]];
-        }
-        return YES;
-    } error:nil];
+            return YES;
+        } error:&error];
+    }
 }
 
 #pragma mark - Table view data source
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    __block NSInteger rowCount = 0;
-    [[TDBContext contextWithDefaultPersistence] readTable:kTableName usingBlock:^(TDBTable *table) {
-        rowCount = table.rowCount;
-    }];
-    return rowCount;
+    return self.table.rowCount;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellID forIndexPath:indexPath];
     
-    [[TDBContext contextWithDefaultPersistence] readTable:kTableName usingBlock:^(TDBTable *table) {
-        cell.textLabel.text = table[indexPath.row][kTitleColumn];
-    }];
+    cell.textLabel.text = self.table[indexPath.row][kTitleColumn];
     
     return cell;
 }
@@ -74,13 +75,15 @@ static NSString * const kTitleColumn = @"title";
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         NSError *error = nil;
-        [[TDBContext contextWithDefaultPersistence] writeTable:kTableName usingBlock:^BOOL(TDBTable *table) {
+        [self.writeContext writeTable:kTableName usingBlock:^BOOL(TDBTable *table) {
             [table removeRowAtIndex:indexPath.row];
             return YES;
         } error:&error];
         
         if (!error) {
-            [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+            });
         }
     }
 }
@@ -92,7 +95,7 @@ static NSString * const kTitleColumn = @"title";
     
     __block NSUInteger rowCount = 0;
     
-    [[TDBContext contextWithDefaultPersistence] writeTable:kTableName usingBlock:^BOOL(TDBTable *table) {
+    [self.writeContext writeTable:kTableName usingBlock:^BOOL(TDBTable *table) {
         rowCount = table.rowCount;
         [table addRow:[RLMTableViewController rowDictWithCount:rowCount]];
         return YES;
@@ -101,7 +104,10 @@ static NSString * const kTitleColumn = @"title";
     if (error) {
         NSLog(@"Error adding a new row: %@", error.localizedDescription);
     } else {
-        [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:rowCount inSection:0]] withRowAnimation:UITableViewRowAnimationFade];
+        // Perform on next run loop
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:rowCount inSection:0]] withRowAnimation:UITableViewRowAnimationFade];
+        });
     }
 }
 
@@ -109,6 +115,10 @@ static NSString * const kTitleColumn = @"title";
 
 + (NSDictionary *)rowDictWithCount:(NSUInteger)count {
     return @{kTitleColumn: [NSString stringWithFormat:@"Title %lu", (unsigned long)count]};
+}
+
+- (TDBTable *)table {
+    return [self.readContext tableWithName:kTableName];
 }
 
 @end
