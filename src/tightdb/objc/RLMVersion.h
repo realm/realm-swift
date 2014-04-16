@@ -24,7 +24,7 @@
 #define TDB_VERSION_MINOR 6
 #define TDB_VERSION_PATCH 0
 
-@interface TDBVersion: NSObject
+@interface RLMVersion : NSObject
 -(id)init;
 +(const int)getMajor;
 +(const int)getMinor;

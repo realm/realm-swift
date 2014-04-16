@@ -25,7 +25,7 @@
 #import <tightdb/objc/RLMRow.h>
 #import <tightdb/objc/TDBContext.h>
 #import <tightdb/objc/TDBSmartContext.h>
-#import <tightdb/objc/TDBVersion.h>
+#import <tightdb/objc/RLMVersion.h>
 
 #import <tightdb/objc/PrivateHelperMacros.h>
 #import <tightdb/objc/PrivateTableMacros.h>
