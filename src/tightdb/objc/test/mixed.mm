@@ -8,7 +8,7 @@
 #include <time.h>
 #include <string.h>
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/group.h>
@@ -24,7 +24,7 @@ TIGHTDB_TABLE_2(SubMixedTable,
                 Age,   Int)
 
 
-@interface MACTestMixed: SenTestCase
+@interface MACTestMixed: XCTestCase
 @end
 @implementation MACTestMixed
 
@@ -36,44 +36,44 @@ TIGHTDB_TABLE_2(SubMixedTable,
     NSNumber *mixedBool1 = [NSNumber numberWithBool:YES];
     NSNumber *mixedBool2 = [NSNumber numberWithBool:NO];
     NSNumber *mixedBool3 = [NSNumber numberWithBool:NO];
-    STAssertEquals([mixedBool1 isEqual:mixedBool1], YES, @"Same mixed should be equal (1)");
-    STAssertEquals([mixedBool2 isEqual:mixedBool2], YES, @"Same mixed should be equal (2)");
-    STAssertEquals([mixedBool2 isEqual:mixedBool3], YES,  @"Mixed with same bools should be equal");
-    STAssertEquals([mixedBool1 isEqual:mixedBool2], NO,  @"Mixed with different bools should be different");
+    XCTAssertEqual([mixedBool1 isEqual:mixedBool1], YES, @"Same mixed should be equal (1)");
+    XCTAssertEqual([mixedBool2 isEqual:mixedBool2], YES, @"Same mixed should be equal (2)");
+    XCTAssertEqual([mixedBool2 isEqual:mixedBool3], YES,  @"Mixed with same bools should be equal");
+    XCTAssertEqual([mixedBool1 isEqual:mixedBool2], NO,  @"Mixed with different bools should be different");
 
     NSNumber *mixedInt1 = [NSNumber numberWithLongLong:10001];
     NSNumber *mixedInt2 = [NSNumber numberWithLongLong:20002];
     NSNumber *mixedInt3 = [NSNumber numberWithLongLong:20002];
-    STAssertEquals([mixedInt1 isEqual:mixedInt1], YES, @"Same mixed should be equal (3)");
-    STAssertEquals([mixedInt2 isEqual:mixedInt2], YES, @"Same mixed should be equal (4)");
-    STAssertEquals([mixedInt2 isEqual:mixedInt3], YES, @"Mixed with same ints should be equal");
-    STAssertEquals([mixedInt1 isEqual:mixedInt2], NO,  @"Mixed with different ints should be different");
+    XCTAssertEqual([mixedInt1 isEqual:mixedInt1], YES, @"Same mixed should be equal (3)");
+    XCTAssertEqual([mixedInt2 isEqual:mixedInt2], YES, @"Same mixed should be equal (4)");
+    XCTAssertEqual([mixedInt2 isEqual:mixedInt3], YES, @"Mixed with same ints should be equal");
+    XCTAssertEqual([mixedInt1 isEqual:mixedInt2], NO,  @"Mixed with different ints should be different");
 
     NSString *mixedString1 = [NSString stringWithUTF8String:"Hello"];
     NSString *mixedString2 = [NSString stringWithUTF8String:"Goodbye"];
     NSString *mixedString3 = [NSString stringWithUTF8String:"Goodbye"];
-    STAssertEquals([mixedString1 isEqual:mixedString1], YES, @"Same mixed should be equal (5)");
-    STAssertEquals([mixedString2 isEqual:mixedString2], YES, @"Same mixed should be equal (6)");
-    STAssertEquals([mixedString2 isEqual:mixedString3], YES, @"Mixed with same strings should be equal");
-    STAssertEquals([mixedString1 isEqual:mixedString2], NO,  @"Mixed with different strings should be different");
+    XCTAssertEqual([mixedString1 isEqual:mixedString1], YES, @"Same mixed should be equal (5)");
+    XCTAssertEqual([mixedString2 isEqual:mixedString2], YES, @"Same mixed should be equal (6)");
+    XCTAssertEqual([mixedString2 isEqual:mixedString3], YES, @"Mixed with same strings should be equal");
+    XCTAssertEqual([mixedString1 isEqual:mixedString2], NO,  @"Mixed with different strings should be different");
 
     const char* str1 = "Hello";
     const char* str2 = "Goodbye";
     NSData *mixedBinary1 = [NSData dataWithBytes:str1 length:strlen(str1)];
     NSData *mixedBinary2 = [NSData dataWithBytes:str2 length:strlen(str2)];
     NSData *mixedBinary3 = [NSData dataWithBytes:str2 length:strlen(str2)];
-    STAssertEquals([mixedBinary1 isEqual:mixedBinary1], YES, @"Same mixed should be equal (7)");
-    STAssertEquals([mixedBinary2 isEqual:mixedBinary2], YES, @"Same mixed should be equal (8)");
-    STAssertEquals([mixedBinary2 isEqual:mixedBinary3], YES, @"Mixed with same binary data should be equal");
-    STAssertEquals([mixedBinary1 isEqual:mixedBinary2], NO,  @"Mixed with different binary data should be different");
+    XCTAssertEqual([mixedBinary1 isEqual:mixedBinary1], YES, @"Same mixed should be equal (7)");
+    XCTAssertEqual([mixedBinary2 isEqual:mixedBinary2], YES, @"Same mixed should be equal (8)");
+    XCTAssertEqual([mixedBinary2 isEqual:mixedBinary3], YES, @"Mixed with same binary data should be equal");
+    XCTAssertEqual([mixedBinary1 isEqual:mixedBinary2], NO,  @"Mixed with different binary data should be different");
 
     NSDate *mixedDate1 = nowTime;
     NSDate *mixedDate2 = nowTime1;
     NSDate *mixedDate3 = nowTime1;
-    STAssertEquals([mixedDate1 isEqual:mixedDate1], YES, @"Same mixed should be equal (9)");
-    STAssertEquals([mixedDate2 isEqual:mixedDate2], YES, @"Same mixed should be equal (10)");
-    STAssertEquals([mixedDate2 isEqual:mixedDate3], YES, @"Mixed with same timestamps should be equal");
-    STAssertEquals([mixedDate1 isEqual:mixedDate2], NO,  @"Mixed with different timestamps should be different");
+    XCTAssertEqual([mixedDate1 isEqual:mixedDate1], YES, @"Same mixed should be equal (9)");
+    XCTAssertEqual([mixedDate2 isEqual:mixedDate2], YES, @"Same mixed should be equal (10)");
+    XCTAssertEqual([mixedDate2 isEqual:mixedDate3], YES, @"Mixed with same timestamps should be equal");
+    XCTAssertEqual([mixedDate1 isEqual:mixedDate2], NO,  @"Mixed with different timestamps should be different");
 
     MixedTable    *table1 = [[MixedTable    alloc] init];
     SubMixedTable *table2 = [[SubMixedTable alloc] init];
@@ -81,54 +81,54 @@ TIGHTDB_TABLE_2(SubMixedTable,
     [table1 addHired:YES Other:mixedBool1 Age:54];
     [table2 addHired:YES                  Age:54];
     [table3 addHired:YES                  Age:54];
-    STAssertEquals([table1 isEqual:table1], YES, @"Same mixed should be equal (11)");
-    STAssertEquals([table2 isEqual:table2], YES, @"Same mixed should be equal (12)");
-    STAssertEquals([table2 isEqual:table3], YES, @"Mixed with same tables should be equal");
-    STAssertEquals([table1 isEqual:table2], NO,  @"Mixed with different tables should be different");
+    XCTAssertEqual([table1 isEqual:table1], YES, @"Same mixed should be equal (11)");
+    XCTAssertEqual([table2 isEqual:table2], YES, @"Same mixed should be equal (12)");
+    XCTAssertEqual([table2 isEqual:table3], YES, @"Mixed with same tables should be equal");
+    XCTAssertEqual([table1 isEqual:table2], NO,  @"Mixed with different tables should be different");
 
 
-    STAssertEquals([mixedBool1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (1)");
-    STAssertEquals([mixedBool1 isEqual:mixedString1], NO, @"Mixed with different types should be different (2)");
-    STAssertEquals([mixedBool1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (3)");
-    STAssertEquals([mixedBool1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (4)");
-    STAssertEquals([mixedBool1 isEqual:table1],       NO, @"Mixed with different types should be different (5)");
+    XCTAssertEqual([mixedBool1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (1)");
+    XCTAssertEqual([mixedBool1 isEqual:mixedString1], NO, @"Mixed with different types should be different (2)");
+    XCTAssertEqual([mixedBool1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (3)");
+    XCTAssertEqual([mixedBool1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (4)");
+    XCTAssertEqual([mixedBool1 isEqual:table1],       NO, @"Mixed with different types should be different (5)");
 
-    STAssertEquals([mixedInt1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (6)");
-    STAssertEquals([mixedInt1 isEqual:mixedString1], NO, @"Mixed with different types should be different (7)");
-    STAssertEquals([mixedInt1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (8)");
-    STAssertEquals([mixedInt1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (9)");
-    STAssertEquals([mixedInt1 isEqual:table1],       NO, @"Mixed with different types should be different (10)");
+    XCTAssertEqual([mixedInt1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (6)");
+    XCTAssertEqual([mixedInt1 isEqual:mixedString1], NO, @"Mixed with different types should be different (7)");
+    XCTAssertEqual([mixedInt1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (8)");
+    XCTAssertEqual([mixedInt1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (9)");
+    XCTAssertEqual([mixedInt1 isEqual:table1],       NO, @"Mixed with different types should be different (10)");
 
-    STAssertEquals([mixedString1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (11)");
-    STAssertEquals([mixedString1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (12)");
-    STAssertEquals([mixedString1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (13)");
-    STAssertEquals([mixedString1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (14)");
-    STAssertEquals([mixedString1 isEqual:table1],       NO, @"Mixed with different types should be different (15)");
+    XCTAssertEqual([mixedString1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (11)");
+    XCTAssertEqual([mixedString1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (12)");
+    XCTAssertEqual([mixedString1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (13)");
+    XCTAssertEqual([mixedString1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (14)");
+    XCTAssertEqual([mixedString1 isEqual:table1],       NO, @"Mixed with different types should be different (15)");
 
-    STAssertEquals([mixedBinary1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (16)");
-    STAssertEquals([mixedBinary1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (17)");
-    STAssertEquals([mixedBinary1 isEqual:mixedString1], NO, @"Mixed with different types should be different (18)");
-    STAssertEquals([mixedBinary1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (19)");
-    STAssertEquals([mixedBinary1 isEqual:table1],       NO, @"Mixed with different types should be different (20)");
+    XCTAssertEqual([mixedBinary1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (16)");
+    XCTAssertEqual([mixedBinary1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (17)");
+    XCTAssertEqual([mixedBinary1 isEqual:mixedString1], NO, @"Mixed with different types should be different (18)");
+    XCTAssertEqual([mixedBinary1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (19)");
+    XCTAssertEqual([mixedBinary1 isEqual:table1],       NO, @"Mixed with different types should be different (20)");
 
-    STAssertEquals([mixedDate1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (21)");
-    STAssertEquals([mixedDate1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (22)");
-    STAssertEquals([mixedDate1 isEqual:mixedString1], NO, @"Mixed with different types should be different (23)");
-    STAssertEquals([mixedDate1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (24)");
-    STAssertEquals([mixedDate1 isEqual:table1],       NO, @"Mixed with different types should be different (25)");
+    XCTAssertEqual([mixedDate1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (21)");
+    XCTAssertEqual([mixedDate1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (22)");
+    XCTAssertEqual([mixedDate1 isEqual:mixedString1], NO, @"Mixed with different types should be different (23)");
+    XCTAssertEqual([mixedDate1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (24)");
+    XCTAssertEqual([mixedDate1 isEqual:table1],       NO, @"Mixed with different types should be different (25)");
 
-    STAssertEquals([table1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (26)");
-    STAssertEquals([table1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (27)");
-    STAssertEquals([table1 isEqual:mixedString1], NO, @"Mixed with different types should be different (28)");
-    STAssertEquals([table1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (29)");
-    STAssertEquals([table1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (30)");
+    XCTAssertEqual([table1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (26)");
+    XCTAssertEqual([table1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (27)");
+    XCTAssertEqual([table1 isEqual:mixedString1], NO, @"Mixed with different types should be different (28)");
+    XCTAssertEqual([table1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (29)");
+    XCTAssertEqual([table1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (30)");
 }
 
 
 - (void)testMixed
 {
     SubMixedTable *tableSub = [[SubMixedTable alloc] init];
-    STAssertTrue([tableSub isKindOfClass:[TDBTable class]], @"TDBTable excepted");
+    XCTAssertTrue([tableSub isKindOfClass:[TDBTable class]], @"TDBTable excepted");
 
     // Add some rows
     [tableSub addHired:YES Age:20];
@@ -149,18 +149,18 @@ TIGHTDB_TABLE_2(SubMixedTable,
     [table addHired:YES Other:tableSub Age:54];
     [table addHired:YES Other:[NSDate date] Age:54];
 
-    STAssertEquals([table rowCount], (NSUInteger)6, @"6 rows expected");
-    STAssertTrue([table[0].Other isKindOfClass:[NSString class]], @"NSString excepted");
-    STAssertTrue([table[4].Other isKindOfClass:[TDBTable class]], @"TDBTable excepted");
-    STAssertEquals([(TDBTable *)table[4].Other rowCount], (size_t)5,@"Subtable should have 5 rows");
-    STAssertTrue([table[5].Other isKindOfClass:[NSDate class]], @"NSDate excepted");
+    XCTAssertEqual([table rowCount], (NSUInteger)6, @"6 rows expected");
+    XCTAssertTrue([table[0].Other isKindOfClass:[NSString class]], @"NSString excepted");
+    XCTAssertTrue([table[4].Other isKindOfClass:[TDBTable class]], @"TDBTable excepted");
+    XCTAssertEqual([(TDBTable *)table[4].Other rowCount], (size_t)5,@"Subtable should have 5 rows");
+    XCTAssertTrue([table[5].Other isKindOfClass:[NSDate class]], @"NSDate excepted");
 
     // Test cast and isClass
     // FIXME: When hasSameDescriptorAs is implemented, reenable unit test below
-    // STAssertEquals([tableSub hasSameDescriptorAs:[SubMixedTable class]], YES,@"Unknown table should be of type SubMixedTable");
+    // XCTAssertEquals([tableSub hasSameDescriptorAs:[SubMixedTable class]], YES,@"Unknown table should be of type SubMixedTable");
     tableSub = [tableSub castToTypedTableClass:[SubMixedTable class]];
     NSLog(@"TableSub Size: %lu", [tableSub rowCount]);
-    STAssertEquals([tableSub rowCount], (size_t)5,@"Subtable should have 5 rows");
+    XCTAssertEqual([tableSub rowCount], (size_t)5,@"Subtable should have 5 rows");
     NSLog(@"Count int: %lu", [table countRowsWithInt:50 inColumnWithIndex:2]);
     NSLog(@"Max: %lld", [table maxIntInColumnWithIndex:2]);
     NSLog(@"Avg: %.2f", [table avgIntColumnWithIndex:2]);
@@ -169,7 +169,7 @@ TIGHTDB_TABLE_2(SubMixedTable,
 -(void)testMixedValidate
 {
     MixedTable *table = [[MixedTable alloc] init];
-    STAssertThrows(([table addRow:@[@YES, @[@1, @2], @7]]), @"Mixed cannot be an NSArray");
-    STAssertThrows(([table addRow:@[@YES, @{@"key": @7}, @11]]), @"Mixed cannot be an NSDictionary");
+    XCTAssertThrows(([table addRow:@[@YES, @[@1, @2], @7]]), @"Mixed cannot be an NSArray");
+    XCTAssertThrows(([table addRow:@[@YES, @{@"key": @7}, @11]]), @"Mixed cannot be an NSDictionary");
 }
 @end

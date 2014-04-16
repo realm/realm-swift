@@ -3,13 +3,13 @@
 //  TightDB
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 
 #import <tightdb/objc/TDBTable.h>
 #import <tightdb/objc/TDBDescriptor.h>
 #import <tightdb/objc/PrivateTDB.h>
 
-@interface MACTestTableDeleteAll: SenTestCase
+@interface MACTestTableDeleteAll: XCTestCase
 @end
 @implementation MACTestTableDeleteAll
 
@@ -82,11 +82,11 @@
     [table removeRowAtIndex:14];
     [table removeRowAtIndex:0];
     [table removeRowAtIndex:5];
-    STAssertEquals([table rowCount], (size_t)12, @"Size should have been 12");
+    XCTAssertEqual([table rowCount], (size_t)12, @"Size should have been 12");
 
     // Test Clear
     [table removeAllRows];
-    STAssertEquals([table rowCount], (size_t)0, @"Size should have been zero");
+    XCTAssertEqual([table rowCount], (size_t)0, @"Size should have been zero");
 
 }
 
