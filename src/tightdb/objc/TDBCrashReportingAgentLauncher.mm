@@ -94,10 +94,20 @@ static char const * const keyCrashReportingAgent = "crashAgentKey";
                                                      OBJC_ASSOCIATION_RETAIN_NONATOMIC);
       
                             NSLog(@"crash reporter initialized and active");
+                        } else {
+                            NSLog(@"unable to obtain application delegate from UIApplication");
                         }
+                    } else {
+                        NSLog(@"unable to identify delegate method on UIApplication");
                     }
+                } else {
+                    NSLog(@"unable to obtain reference to UIApplication instance");
                 }
+            } else {
+                NSLog(@"unable to access sharedApplication method of UIApplication");
             }
+        } else {
+            NSLog(@"unable to obtain reference to UIApplication class");
         }
     } else {
         NSLog(@"error: unable to initialize crash reporter");

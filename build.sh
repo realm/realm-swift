@@ -433,10 +433,10 @@ EOF
         mkdir -p "$IPHONE_DIR" || exit 1
         tightdb_echo "Creating '$IPHONE_DIR/libtightdb-objc-ios.a'"
         lipo "$temp_dir"/*/"libtightdb-objc.a" -create -output "$temp_dir/libtightdb-objc-ios.a" || exit 1
-        libtool -static -o "$IPHONE_DIR/libtightdb-objc-ios.a" "$temp_dir/libtightdb-objc-ios.a" $(tightdb-config --libs) -lApigeeiOSSDK -L"$iphone_core_lib" -L"$apigee_path" || exit 1
+        libtool -static -o "$IPHONE_DIR/libtightdb-objc-ios.a" "$temp_dir/libtightdb-objc-ios.a" $(tightdb-config --libs) -L"$iphone_core_lib" -L"$apigee_path" -lApigeeiOSSDK  || exit 1
         tightdb_echo "Creating '$IPHONE_DIR/libtightdb-objc-ios-dbg.a'"
         lipo "$temp_dir"/*/"libtightdb-objc-dbg.a" -create -output "$temp_dir/libtightdb-objc-ios-dbg.a" || exit 1
-        libtool -static -o "$IPHONE_DIR/libtightdb-objc-ios-dbg.a" "$temp_dir/libtightdb-objc-ios-dbg.a" $(tightdb-config-dbg --libs) -lApigeeiOSSDK -L"$iphone_core_lib" -L"$apigee_path" || exit 1
+        libtool -static -o "$IPHONE_DIR/libtightdb-objc-ios-dbg.a" "$temp_dir/libtightdb-objc-ios-dbg.a" $(tightdb-config-dbg --libs) -L"$iphone_core_lib" -L"$apigee_path" -lApigeeiOSSDK  || exit 1
         tightdb_echo "Copying headers to '$IPHONE_DIR/include'"
         mkdir -p "$IPHONE_DIR/include/tightdb/objc" || exit 1
         inst_headers="$(cd src/tightdb/objc && $MAKE --no-print-directory get-inst-headers)" || exit 1
