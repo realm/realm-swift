@@ -9,7 +9,7 @@
 
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/RLMTransaction.h>
-#import <tightdb/objc/TDBContext.h>
+#import <tightdb/objc/RLMContext.h>
 #import <tightdb/objc/group.h>
 
 TIGHTDB_TABLE_2(TestTableGroup,

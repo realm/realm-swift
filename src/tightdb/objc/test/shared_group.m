@@ -47,7 +47,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [group writeContextToFile:@"employees.tightdb" error:nil];
 
     // Read only shared group
-    TDBContext* fromDisk = [TDBContext contextPersistedAtPath:@"employees.tightdb" error:nil];
+    RLMContext * fromDisk = [RLMContext contextPersistedAtPath:@"employees.tightdb" error:nil];
 
     [fromDisk readUsingBlock:^(RLMTransaction * group) {
             SharedTable2* diskTable = [group tableWithName:@"employees" asTableClass:[SharedTable2 class]];
@@ -106,14 +106,14 @@ TIGHTDB_TABLE_2(SharedTable2,
 {
     // Delete existing files
 
-    NSString *defaultPath = [TDBContext defaultPath];
+    NSString *defaultPath = [RLMContext defaultPath];
     
     NSFileManager* fm = [NSFileManager defaultManager];
     [fm removeItemAtPath:defaultPath error:nil];
     [fm removeItemAtPath:[defaultPath stringByAppendingString:@".lock"] error:nil];
     
     // Create a new context at default location
-    TDBContext *context = [TDBContext contextWithDefaultPersistence];
+    RLMContext *context = [RLMContext contextWithDefaultPersistence];
     
     [context writeUsingBlock:^(RLMTransaction *transaction) {
         RLMTable *t = [transaction createTableWithName:@"table"];
@@ -164,7 +164,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:@"readonlyTest.tightdb" error:nil];
     [fm removeItemAtPath:@"readonlyTest.tightdb.lock" error:nil];
     
-    TDBContext* fromDisk = [TDBContext contextPersistedAtPath:@"readonlyTest.tightdb" error:nil];
+    RLMContext * fromDisk = [RLMContext contextPersistedAtPath:@"readonlyTest.tightdb" error:nil];
     
     [fromDisk writeUsingBlock:^(RLMTransaction *group) {
         RLMTable *t = [group createTableWithName:@"table"];
@@ -205,7 +205,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:@"singleTest.tightdb" error:nil];
     [fm removeItemAtPath:@"singleTest.tightdb.lock" error:nil];
 
-    TDBContext* ctx = [TDBContext contextPersistedAtPath:@"singleTest.tightdb" error:nil];
+    RLMContext * ctx = [RLMContext contextPersistedAtPath:@"singleTest.tightdb" error:nil];
 
     [ctx writeUsingBlock:^(RLMTransaction *trx) {
         RLMTable *t = [trx createTableWithName:@"table"];
@@ -237,7 +237,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:@"hasChanged.tightdb" error:nil];
     [fm removeItemAtPath:@"hasChanged.tightdb.lock" error:nil];
     
-    TDBContext *sg = [TDBContext contextPersistedAtPath:@"hasChanged.tightdb" error:nil];
+    RLMContext *sg = [RLMContext contextPersistedAtPath:@"hasChanged.tightdb" error:nil];
     
     XCTAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not changed");
     
@@ -262,7 +262,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     
     
     // OTHER sharedgroup
-    TDBContext *sg2 = [TDBContext contextPersistedAtPath:@"hasChanged.tightdb" error:nil];
+    RLMContext *sg2 = [RLMContext contextPersistedAtPath:@"hasChanged.tightdb" error:nil];
     
     
     [sg2 writeUsingBlock:^(RLMTransaction * group) {
@@ -282,7 +282,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         [fm removeItemAtPath:contextPath error:nil];
     [fm removeItemAtPath:[contextPath stringByAppendingString:@".lock"] error:nil];
     
-    TDBContext *c = [TDBContext contextPersistedAtPath:contextPath error:nil];
+    RLMContext *c = [RLMContext contextPersistedAtPath:contextPath error:nil];
     
     [c writeUsingBlock:^BOOL(RLMTransaction *transaction) {
         
@@ -312,8 +312,8 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fm removeItemAtPath:contextPath error:nil];
     [fm removeItemAtPath:[contextPath stringByAppendingString:@".lock"] error:nil];
    
-    __block TDBContext *context1 = [TDBContext contextPersistedAtPath:contextPath error:nil];
-    __block TDBContext *context2 = [TDBContext contextPersistedAtPath:contextPath error:nil];
+    __block RLMContext *context1 = [RLMContext contextPersistedAtPath:contextPath error:nil];
+    __block RLMContext *context2 = [RLMContext contextPersistedAtPath:contextPath error:nil];
     
     {
         // initially, always say that the db has changed

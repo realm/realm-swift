@@ -28,15 +28,15 @@ typedef BOOL(^RLMWriteBlock)(RLMTransaction *transaction);
 typedef void(^RLMTableReadBlock)(RLMTable *table);
 typedef BOOL(^RLMTableWriteBlock)(RLMTable *table);
 
-/****************	  TDBContext	****************/
+/****************	  RLMContext	****************/
 
-@interface TDBContext: NSObject
+@interface RLMContext : NSObject
 
 +(NSString *) defaultPath;
 
 // Initializers
-+(TDBContext *)contextWithDefaultPersistence;
-+(TDBContext *)contextPersistedAtPath:(NSString *)path error:(NSError **)error;
++(RLMContext *)contextWithDefaultPersistence;
++(RLMContext *)contextPersistedAtPath:(NSString *)path error:(NSError **)error;
 
 // Transactions
 -(void)readUsingBlock:(RLMReadBlock)block;
