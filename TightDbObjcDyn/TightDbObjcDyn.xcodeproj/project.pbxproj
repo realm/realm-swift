@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4220871618E042FD00F3CF27 /* NSData+TDBGetBinaryData.h in Headers */ = {isa = PBXBuildFile; fileRef = 4220871418E042FD00F3CF27 /* NSData+TDBGetBinaryData.h */; };
-		4220871718E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4220871518E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm */; };
+		4220871618E042FD00F3CF27 /* NSData+RLMGetBinaryData.h in Headers */ = {isa = PBXBuildFile; fileRef = 4220871418E042FD00F3CF27 /* NSData+RLMGetBinaryData.h */; };
+		4220871718E042FD00F3CF27 /* NSData+RLMGetBinaryData.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4220871518E042FD00F3CF27 /* NSData+RLMGetBinaryData.mm */; };
 		424EEF9E18D9C10100337A13 /* TDBColumnProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEF9D18D9C10100337A13 /* TDBColumnProxy.h */; };
 		424EEFA218D9C11D00337A13 /* TDBDescriptor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEF9F18D9C11D00337A13 /* TDBDescriptor.mm */; };
 		424EEFA318D9C11D00337A13 /* TDBDescriptor_noinst.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA018D9C11D00337A13 /* TDBDescriptor_noinst.h */; };
@@ -82,8 +82,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		4220871418E042FD00F3CF27 /* NSData+TDBGetBinaryData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+TDBGetBinaryData.h"; path = "../src/tightdb/objc/NSData+TDBGetBinaryData.h"; sourceTree = SOURCE_ROOT; };
-		4220871518E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "NSData+TDBGetBinaryData.mm"; path = "../src/tightdb/objc/NSData+TDBGetBinaryData.mm"; sourceTree = SOURCE_ROOT; };
+		4220871418E042FD00F3CF27 /* NSData+RLMGetBinaryData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+RLMGetBinaryData.h"; path = "../src/tightdb/objc/NSData+RLMGetBinaryData.h"; sourceTree = SOURCE_ROOT; };
+		4220871518E042FD00F3CF27 /* NSData+RLMGetBinaryData.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "NSData+RLMGetBinaryData.mm"; path = "../src/tightdb/objc/NSData+RLMGetBinaryData.mm"; sourceTree = SOURCE_ROOT; };
 		424EEF9D18D9C10100337A13 /* TDBColumnProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBColumnProxy.h; path = ../src/tightdb/objc/TDBColumnProxy.h; sourceTree = SOURCE_ROOT; };
 		424EEF9F18D9C11D00337A13 /* TDBDescriptor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBDescriptor.mm; path = ../src/tightdb/objc/TDBDescriptor.mm; sourceTree = SOURCE_ROOT; };
 		424EEFA018D9C11D00337A13 /* TDBDescriptor_noinst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBDescriptor_noinst.h; path = ../src/tightdb/objc/TDBDescriptor_noinst.h; sourceTree = SOURCE_ROOT; };
@@ -232,8 +232,8 @@
 			children = (
 				4DDDD67118EAF1DC00E94613 /* TDBFast */,
 				4D1ED30A18E1B6E8003CFF44 /* group.h */,
-				4220871418E042FD00F3CF27 /* NSData+TDBGetBinaryData.h */,
-				4220871518E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm */,
+				4220871418E042FD00F3CF27 /* NSData+RLMGetBinaryData.h */,
+				4220871518E042FD00F3CF27 /* NSData+RLMGetBinaryData.mm */,
 				E91890CC177B67AB00653D7A /* PrivateHelperMacros.h */,
 				4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */,
 				4D143CBC18ED5FCF00CEFF65 /* PrivateTableMacros.h.cheetah */,
@@ -341,7 +341,7 @@
 				4D143CF318F7E97500CEFF65 /* TDBConstants.h in Headers */,
 				4D143CEE18F7E8C200CEFF65 /* TDBSmartContext_noinst.h in Headers */,
 				424EEFA318D9C11D00337A13 /* TDBDescriptor_noinst.h in Headers */,
-				4220871618E042FD00F3CF27 /* NSData+TDBGetBinaryData.h in Headers */,
+				4220871618E042FD00F3CF27 /* NSData+RLMGetBinaryData.h in Headers */,
 				E91890E6177B67AB00653D7A /* util_noinst.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -454,7 +454,7 @@
 				424EEFB218D9C97900337A13 /* TDBColumnProxy.mm in Sources */,
 				4D143CF418F7E97500CEFF65 /* TDBConstants.m in Sources */,
 				E91890D8177B67AB00653D7A /* TDBTransaction.mm in Sources */,
-				4220871718E042FD00F3CF27 /* NSData+TDBGetBinaryData.mm in Sources */,
+				4220871718E042FD00F3CF27 /* NSData+RLMGetBinaryData.mm in Sources */,
 				E91890DA177B67AB00653D7A /* TDBContext.mm in Sources */,
 				E91890DE177B67AB00653D7A /* TDBQuery.mm in Sources */,
 				E91890E1177B67AB00653D7A /* TDBTable.mm in Sources */,

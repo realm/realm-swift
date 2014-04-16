@@ -32,7 +32,7 @@
 #import "TDBRow.h"
 #import "TDBDescriptor_noinst.h"
 #import "TDBColumnProxy.h"
-#import "NSData+TDBGetBinaryData.h"
+#import "NSData+RLMGetBinaryData.h"
 #import "PrivateTDB.h"
 #import "TDBSmartContext_noinst.h"
 #import "util_noinst.hpp"
@@ -590,7 +590,7 @@ using namespace std;
 -(void)TDB_setBinary:(NSData*)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
     TIGHTDB_EXCEPTION_HANDLER_SETTERS(
-        m_table->set_binary(col_ndx, row_ndx, ((NSData *)value).tdbBinaryData);,
+        m_table->set_binary(col_ndx, row_ndx, ((NSData *)value).rlmBinaryData);,
         TDBBinaryType);
 }
 
@@ -996,7 +996,7 @@ using namespace std;
 }
 -(TDBView*)findAllRowsWithBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
-    tightdb::TableView view = m_table->find_all_binary(colIndex, aBinary.tdbBinaryData);
+    tightdb::TableView view = m_table->find_all_binary(colIndex, aBinary.rlmBinaryData);
     return [TDBView viewWithTable:self andNativeView:view];
 }
 -(TDBView*)findAllRowsWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
