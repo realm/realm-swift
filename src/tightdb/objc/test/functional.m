@@ -5,7 +5,7 @@
 
 
 #import <XCTest/XCTest.h>
-#import <tightdb/objc/TightdbFast.h>
+#import <tightdb/objc/RLMFast.h>
 #import <tightdb/objc/RLMTable.h>
 
 TIGHTDB_TABLE_3(FuncPeopleTable,
