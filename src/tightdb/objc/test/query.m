@@ -148,15 +148,15 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 - (void) testDynamic
 {
     RLMTable *table = [[RLMTable alloc]init];
-    
-    [table addColumnWithName:@"BoolCol" type:TDBBoolType];
-    [table addColumnWithName:@"IntCol" type:TDBIntType];
-    [table addColumnWithName:@"FloatCol" type:TDBFloatType];
-    [table addColumnWithName:@"DoubleCol" type:TDBDoubleType];
-    [table addColumnWithName:@"StringCol" type:TDBStringType];
-    [table addColumnWithName:@"BinaryCol" type:TDBBinaryType];
-    [table addColumnWithName:@"DateCol" type:TDBDateType];
-    [table addColumnWithName:@"MixedCol" type:TDBMixedType];
+
+    [table addColumnWithName:@"BoolCol" type:RLMTypeBool];
+    [table addColumnWithName:@"IntCol" type:RLMTypeInt];
+    [table addColumnWithName:@"FloatCol" type:RLMTypeFloat];
+    [table addColumnWithName:@"DoubleCol" type:RLMTypeDouble];
+    [table addColumnWithName:@"StringCol" type:RLMTypeString];
+    [table addColumnWithName:@"BinaryCol" type:RLMTypeBinary];
+    [table addColumnWithName:@"DateCol" type:RLMTypeDate];
+    [table addColumnWithName:@"MixedCol" type:RLMTypeMixed];
     // TODO: add Enum<T> and Subtable<T> when possible.
     
     const char bin[4] = { 0, 1, 2, 3 };
@@ -259,10 +259,10 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 {
     RLMTable *table = [[RLMTable alloc]init];
     
-    NSUInteger intCol = [table addColumnWithName:@"IntCol" type:TDBIntType];
-    NSUInteger floatCol = [table addColumnWithName:@"FloatCol" type:TDBFloatType];
-    NSUInteger doubleCol = [table addColumnWithName:@"DoubleCol" type:TDBDoubleType];
-    NSUInteger dateCol = [table addColumnWithName:@"DateCol" type:TDBDateType];
+    NSUInteger intCol = [table addColumnWithName:@"IntCol" type:RLMTypeInt];
+    NSUInteger floatCol = [table addColumnWithName:@"FloatCol" type:RLMTypeFloat];
+    NSUInteger doubleCol = [table addColumnWithName:@"DoubleCol" type:RLMTypeDouble];
+    NSUInteger dateCol = [table addColumnWithName:@"DateCol" type:RLMTypeDate];
     
     ////////// Zero rows added ///////////
     
@@ -371,7 +371,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 - (void)testFind
 {
     RLMTable* table = [[RLMTable alloc]init];
-    [table addColumnWithName:@"IntCol" type:TDBIntType];
+    [table addColumnWithName:@"IntCol" type:RLMTypeInt];
     [table TDB_addEmptyRows:6];
 
     [table TDB_setInt:10 inColumnWithIndex:0 atRowIndex:0];
@@ -403,7 +403,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     
     RLMDescriptor *d = t.descriptor;
     RLMDescriptor *subDesc = [d addColumnTable:@"subtable"];
-    [subDesc addColumnWithName:@"subCol" type:TDBBoolType];
+    [subDesc addColumnWithName:@"subCol" type:RLMTypeBool];
     [t addRow:nil];
     XCTAssertEqual(t.rowCount, (NSUInteger)1,@"one row added");
     
@@ -419,7 +419,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 -(void) testQueryEnumeratorNoCondition
 {
     RLMTable *table = [[RLMTable alloc] init];
-    [table addColumnWithName:@"first" type:TDBIntType];
+    [table addColumnWithName:@"first" type:RLMTypeInt];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithInt:i]]];
     RLMQuery *query = [table where];
@@ -433,7 +433,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 -(void) testQueryEnumeratorWithCondition
 {
     RLMTable *table = [[RLMTable alloc] init];
-    [table addColumnWithName:@"first" type:TDBIntType];
+    [table addColumnWithName:@"first" type:RLMTypeInt];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithInt:i]]];
     RLMQuery *query = [[table where] intIsGreaterThan:-1 inColumnWithIndex:0];

@@ -23,7 +23,7 @@
 #include <tightdb/data_type.hpp>
 #include <tightdb/descriptor.hpp>
 
-#import "TDBType.h"
+#import "RLMType.h"
 #import "RLMDescriptor.h"
 #import "util_noinst.hpp"
 
@@ -46,12 +46,12 @@
 
 // FIXME: Provide a version of this method that takes a 'const char*'. This will simplify _addColumns of MyTable.
 // FIXME: Detect errors from core library
--(BOOL)addColumnWithName:(NSString*)name type:(TDBType)type
+-(BOOL)addColumnWithName:(NSString*)name type:(RLMType)type
 {
     return [self addColumnWithName:name andType:type error:nil];
 }
 
--(BOOL)addColumnWithName:(NSString*)name andType:(TDBType)type error:(NSError* __autoreleasing*)error
+-(BOOL)addColumnWithName:(NSString*)name andType:(RLMType)type error:(NSError* __autoreleasing*)error
 {
     if (m_read_only) {
         if (error)
@@ -101,9 +101,9 @@
     return m_desc->get_column_count();
 }
 
--(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex
+-(RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex
 {
-    return (TDBType)m_desc->get_column_type(colIndex);
+    return (RLMType)m_desc->get_column_type(colIndex);
 }
 
 -(NSString*)nameOfColumnWithIndex:(NSUInteger)colIndex

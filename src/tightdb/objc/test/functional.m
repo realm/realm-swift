@@ -154,9 +154,9 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
 
     RLMTable *table = [[RLMTable alloc] init];
 
-    size_t const NAME = [table addColumnWithName:@"Name" type:TDBStringType];
-    size_t const AGE = [table addColumnWithName:@"Age" type:TDBIntType];
-    size_t const HIRED = [table addColumnWithName:@"Hired" type:TDBBoolType];
+    size_t const NAME = [table addColumnWithName:@"Name" type:RLMTypeString];
+    size_t const AGE = [table addColumnWithName:@"Age" type:RLMTypeInt];
+    size_t const HIRED = [table addColumnWithName:@"Hired" type:RLMTypeBool];
 
     RLMRow *cursor;
 

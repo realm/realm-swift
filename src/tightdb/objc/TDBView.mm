@@ -127,22 +127,22 @@
     return m_view->get_column_count();
 }
 
--(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colNdx
+-(RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colNdx
 {
     TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colNdx);
-    return TDBType(m_view->get_column_type(colNdx));
+    return RLMType(m_view->get_column_type(colNdx));
 }
 
 -(void)sortUsingColumnWithIndex:(NSUInteger)colIndex
 {
-    [self sortUsingColumnWithIndex:colIndex inOrder:TDBAscending];
+    [self sortUsingColumnWithIndex:colIndex inOrder:RLMSortOrderAscending];
 }
 
--(void)sortUsingColumnWithIndex:(NSUInteger)colIndex  inOrder: (TDBSortOrder)order
+-(void)sortUsingColumnWithIndex:(NSUInteger)colIndex  inOrder: (RLMSortOrder)order
 {
-    TDBType columnType = [self columnTypeOfColumnWithIndex:colIndex];
+    RLMType columnType = [self columnTypeOfColumnWithIndex:colIndex];
 
-    if(columnType != TDBIntType && columnType != TDBBoolType && columnType != TDBDateType) {
+    if(columnType != RLMTypeInt && columnType != RLMTypeBool && columnType != RLMTypeDate) {
         @throw [NSException exceptionWithName:@"tightdb:sort_on_column_with_type_not_supported"
                                        reason:@"Sort is currently only supported on Integer, Boolean and Date columns."
                                      userInfo:nil];

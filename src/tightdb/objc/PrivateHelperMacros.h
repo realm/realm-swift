@@ -45,14 +45,14 @@
 #define TIGHTDB_TYPE_Date      NSDate *
 #define TIGHTDB_TYPE_Mixed     id
 
-#define TIGHTDB_TYPE_ID_Bool   TDBBoolType
-#define TIGHTDB_TYPE_ID_Int    TDBIntType
-#define TIGHTDB_TYPE_ID_Float  TDBFloatType
-#define TIGHTDB_TYPE_ID_Double TDBDoubleType
-#define TIGHTDB_TYPE_ID_String TDBStringType
-#define TIGHTDB_TYPE_ID_Binary TDBBinaryType
-#define TIGHTDB_TYPE_ID_Date   TDBDateType
-#define TIGHTDB_TYPE_ID_Mixed  TDBMixedType
+#define TIGHTDB_TYPE_ID_Bool   RLMTypeBool
+#define TIGHTDB_TYPE_ID_Int    RLMTypeInt
+#define TIGHTDB_TYPE_ID_Float  RLMTypeFloat
+#define TIGHTDB_TYPE_ID_Double RLMTypeDouble
+#define TIGHTDB_TYPE_ID_String RLMTypeString
+#define TIGHTDB_TYPE_ID_Binary RLMTypeBinary
+#define TIGHTDB_TYPE_ID_Date   RLMTypeDate
+#define TIGHTDB_TYPE_ID_Mixed  RLMTypeMixed
 
 
 
@@ -118,7 +118,7 @@
 #define TIGHTDB_CHECK_COLUMN_TYPE_3(is_subtable, desc, col, name, type) TIGHTDB_CHECK_COLUMN_TYPE_4_##is_subtable(desc, col, name, type)
 #define TIGHTDB_CHECK_COLUMN_TYPE_4_Y(desc, col, name, type)      \
 { \
-    if ([desc columnTypeOfColumnWithIndex:col] != TDBTableType) \
+    if ([desc columnTypeOfColumnWithIndex:col] != RLMTypeTable) \
         return NO; \
     if (![[desc nameOfColumnWithIndex:col] isEqualToString:@#name]) \
         return NO; \

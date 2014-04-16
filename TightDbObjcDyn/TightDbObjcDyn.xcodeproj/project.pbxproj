@@ -54,7 +54,7 @@
 		E91890E2177B67AB00653D7A /* RLMTable_noinst.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D1177B67AB00653D7A /* RLMTable_noinst.h */; };
 		E91890E3177B67AB00653D7A /* RLMTable.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D2177B67AB00653D7A /* RLMTable.h */; };
 		E91890E4177B67AB00653D7A /* Tightdb.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D3177B67AB00653D7A /* Tightdb.h */; };
-		E91890E5177B67AB00653D7A /* TDBType.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D4177B67AB00653D7A /* TDBType.h */; };
+		E91890E5177B67AB00653D7A /* RLMType.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890D4177B67AB00653D7A /* RLMType.h */; };
 		E91890E6177B67AB00653D7A /* util_noinst.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E91890D5177B67AB00653D7A /* util_noinst.hpp */; };
 		E91890F5177B71E400653D7A /* data_type.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890E7177B71E400653D7A /* data_type.mm */; };
 		E91890F6177B71E400653D7A /* enumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = E91890E8177B71E400653D7A /* enumerator.m */; };
@@ -96,7 +96,7 @@
 		42AD3A9518CDBDFF00C86073 /* TDBVersion.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBVersion.mm; path = ../src/tightdb/objc/TDBVersion.mm; sourceTree = SOURCE_ROOT; };
 		42AD3A9618CDBDFF00C86073 /* TDBVersion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBVersion.h; path = ../src/tightdb/objc/TDBVersion.h; sourceTree = SOURCE_ROOT; };
 		4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		4D01A9FB18C9F5E600527AD5 /* table_view.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = table_view.m; path = ../../src/tightdb/objc/test/table_view.m; sourceTree = "<group>"; };
+		4D01A9FB18C9F5E600527AD5 /* table_view.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = table_view.m; path = ../../src/tightdb/objc/test/table_view.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		4D01A9FD18C9F60F00527AD5 /* version.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = version.m; path = ../../src/tightdb/objc/test/version.m; sourceTree = "<group>"; };
 		4D143CBC18ED5FCF00CEFF65 /* PrivateTableMacros.h.cheetah */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PrivateTableMacros.h.cheetah; path = ../src/tightdb/objc/PrivateTableMacros.h.cheetah; sourceTree = SOURCE_ROOT; };
 		4D143CCE18F69D0F00CEFF65 /* RLMQueryFast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMQueryFast.h; path = ../src/tightdb/objc/RLMQueryFast.h; sourceTree = SOURCE_ROOT; };
@@ -108,9 +108,9 @@
 		4D1ED30618E198AD003CFF44 /* PrivateTDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PrivateTDB.h; path = ../src/tightdb/objc/PrivateTDB.h; sourceTree = SOURCE_ROOT; };
 		4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PrivateTableMacros.h; path = ../src/tightdb/objc/PrivateTableMacros.h; sourceTree = SOURCE_ROOT; };
 		4D1ED30A18E1B6E8003CFF44 /* group.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = group.h; path = ../src/tightdb/objc/group.h; sourceTree = SOURCE_ROOT; };
-		4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = dynamic_table.mm; path = ../../src/tightdb/objc/test/dynamic_table.mm; sourceTree = "<group>"; };
+		4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = dynamic_table.mm; path = ../../src/tightdb/objc/test/dynamic_table.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		4DB1DEF918BF70AE005A7234 /* functional.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = functional.m; path = ../../src/tightdb/objc/test/functional.m; sourceTree = "<group>"; };
-		4DB1DEFA18BF70AE005A7234 /* typed_table.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = typed_table.m; path = ../../src/tightdb/objc/test/typed_table.m; sourceTree = "<group>"; };
+		4DB1DEFA18BF70AE005A7234 /* typed_table.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = typed_table.m; path = ../../src/tightdb/objc/test/typed_table.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		4DDDD67018EAF1C000E94613 /* RLMRowFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMRowFast.h; path = ../src/tightdb/objc/RLMRowFast.h; sourceTree = SOURCE_ROOT; };
 		4DDDD67218EAF22100E94613 /* TightdbFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TightdbFast.h; path = ../src/tightdb/objc/TightdbFast.h; sourceTree = SOURCE_ROOT; };
 		4DDDD67318EB049300E94613 /* TDBViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBViewProtocol.h; path = ../src/tightdb/objc/TDBViewProtocol.h; sourceTree = SOURCE_ROOT; };
@@ -134,20 +134,20 @@
 		E91890CD177B67AB00653D7A /* RLMQuery.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMQuery.mm; path = ../src/tightdb/objc/RLMQuery.mm; sourceTree = SOURCE_ROOT; };
 		E91890CE177B67AB00653D7A /* RLMQuery_noinst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMQuery_noinst.h; path = ../src/tightdb/objc/RLMQuery_noinst.h; sourceTree = SOURCE_ROOT; };
 		E91890CF177B67AB00653D7A /* RLMQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMQuery.h; path = ../src/tightdb/objc/RLMQuery.h; sourceTree = SOURCE_ROOT; };
-		E91890D0177B67AB00653D7A /* RLMTable.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMTable.mm; path = ../src/tightdb/objc/RLMTable.mm; sourceTree = SOURCE_ROOT; };
+		E91890D0177B67AB00653D7A /* RLMTable.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = RLMTable.mm; path = ../src/tightdb/objc/RLMTable.mm; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		E91890D1177B67AB00653D7A /* RLMTable_noinst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTable_noinst.h; path = ../src/tightdb/objc/RLMTable_noinst.h; sourceTree = SOURCE_ROOT; };
 		E91890D2177B67AB00653D7A /* RLMTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTable.h; path = ../src/tightdb/objc/RLMTable.h; sourceTree = SOURCE_ROOT; };
 		E91890D3177B67AB00653D7A /* Tightdb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Tightdb.h; path = ../src/tightdb/objc/Tightdb.h; sourceTree = SOURCE_ROOT; };
-		E91890D4177B67AB00653D7A /* TDBType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBType.h; path = ../src/tightdb/objc/TDBType.h; sourceTree = SOURCE_ROOT; };
+		E91890D4177B67AB00653D7A /* RLMType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMType.h; path = ../src/tightdb/objc/RLMType.h; sourceTree = SOURCE_ROOT; };
 		E91890D5177B67AB00653D7A /* util_noinst.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = util_noinst.hpp; path = ../src/tightdb/objc/util_noinst.hpp; sourceTree = SOURCE_ROOT; };
-		E91890E7177B71E400653D7A /* data_type.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = data_type.mm; path = ../../src/tightdb/objc/test/data_type.mm; sourceTree = "<group>"; };
+		E91890E7177B71E400653D7A /* data_type.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = data_type.mm; path = ../../src/tightdb/objc/test/data_type.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		E91890E8177B71E400653D7A /* enumerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = enumerator.m; path = ../../src/tightdb/objc/test/enumerator.m; sourceTree = "<group>"; };
 		E91890E9177B71E400653D7A /* err_handling.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = err_handling.mm; path = ../../src/tightdb/objc/test/err_handling.mm; sourceTree = "<group>"; };
 		E91890EA177B71E400653D7A /* get_subtable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = get_subtable.m; path = ../../src/tightdb/objc/test/get_subtable.m; sourceTree = "<group>"; };
 		E91890EB177B71E400653D7A /* group_misc_2.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = group_misc_2.mm; path = ../../src/tightdb/objc/test/group_misc_2.mm; sourceTree = "<group>"; };
 		E91890EC177B71E400653D7A /* group.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = group.m; path = ../../src/tightdb/objc/test/group.m; sourceTree = "<group>"; };
 		E91890ED177B71E400653D7A /* mixed.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = mixed.mm; path = ../../src/tightdb/objc/test/mixed.mm; sourceTree = "<group>"; };
-		E91890EE177B71E400653D7A /* query.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = query.m; path = ../../src/tightdb/objc/test/query.m; sourceTree = "<group>"; };
+		E91890EE177B71E400653D7A /* query.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = query.m; path = ../../src/tightdb/objc/test/query.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		E91890EF177B71E400653D7A /* shared_group.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = shared_group.m; path = ../../src/tightdb/objc/test/shared_group.m; sourceTree = "<group>"; };
 		E91890F0177B71E400653D7A /* subtable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = subtable.m; path = ../../src/tightdb/objc/test/subtable.m; sourceTree = "<group>"; };
 		E91890F1177B71E400653D7A /* table_delete_all.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = table_delete_all.m; path = ../../src/tightdb/objc/test/table_delete_all.m; sourceTree = "<group>"; };
@@ -261,7 +261,7 @@
 				E91890CB177B67AB00653D7A /* RLMTransaction.h */,
 				E91890C7177B67AB00653D7A /* RLMTransaction.mm */,
 				E91890C8177B67AB00653D7A /* RLMTransaction_noinst.h */,
-				E91890D4177B67AB00653D7A /* TDBType.h */,
+				E91890D4177B67AB00653D7A /* RLMType.h */,
 				42AD3A9618CDBDFF00C86073 /* TDBVersion.h */,
 				42AD3A9518CDBDFF00C86073 /* TDBVersion.mm */,
 				424EEFAD18D9C15A00337A13 /* TDBView.h */,
@@ -337,7 +337,7 @@
 				4D1ED30818E1AF4E003CFF44 /* PrivateTableMacros.h in Headers */,
 				4D1ED30B18E1B6E8003CFF44 /* group.h in Headers */,
 				E91890E4177B67AB00653D7A /* Tightdb.h in Headers */,
-				E91890E5177B67AB00653D7A /* TDBType.h in Headers */,
+				E91890E5177B67AB00653D7A /* RLMType.h in Headers */,
 				4D143CF318F7E97500CEFF65 /* RLMConstants.h in Headers */,
 				4D143CEE18F7E8C200CEFF65 /* TDBSmartContext_noinst.h in Headers */,
 				424EEFA318D9C11D00337A13 /* RLMDescriptor_noinst.h in Headers */,

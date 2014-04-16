@@ -18,17 +18,17 @@
     // Create table with all column types
     RLMTable * table = [[RLMTable alloc] init];
     RLMDescriptor * desc = [table descriptor];
-    [desc addColumnWithName:@"int" type:TDBIntType];
-    [desc addColumnWithName:@"bool" type:TDBBoolType];
-    [desc addColumnWithName:@"date" type:TDBDateType];
-    [desc addColumnWithName:@"string" type:TDBStringType];
-    [desc addColumnWithName:@"string_long" type:TDBStringType];
-    [desc addColumnWithName:@"string_enum" type:TDBStringType];
-    [desc addColumnWithName:@"binary" type:TDBBinaryType];
-    [desc addColumnWithName:@"mixed" type:TDBMixedType];
+    [desc addColumnWithName:@"int" type:RLMTypeInt];
+    [desc addColumnWithName:@"bool" type:RLMTypeBool];
+    [desc addColumnWithName:@"date" type:RLMTypeDate];
+    [desc addColumnWithName:@"string" type:RLMTypeString];
+    [desc addColumnWithName:@"string_long" type:RLMTypeString];
+    [desc addColumnWithName:@"string_enum" type:RLMTypeString];
+    [desc addColumnWithName:@"binary" type:RLMTypeBinary];
+    [desc addColumnWithName:@"mixed" type:RLMTypeMixed];
     RLMDescriptor * subdesc = [desc addColumnTable:@"tables"];
-    [subdesc addColumnWithName:@"sub_first" type:TDBIntType];
-    [subdesc addColumnWithName:@"sub_second" type:TDBStringType];
+    [subdesc addColumnWithName:@"sub_first" type:RLMTypeInt];
+    [subdesc addColumnWithName:@"sub_second" type:RLMTypeString];
 
     // Add some rows
     for (size_t i = 0; i < 15; ++i) {

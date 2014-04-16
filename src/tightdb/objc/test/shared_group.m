@@ -118,7 +118,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [context writeUsingBlock:^(RLMTransaction *transaction) {
         RLMTable *t = [transaction createTableWithName:@"table"];
         
-        [t addColumnWithName:@"col0" type:TDBIntType];
+        [t addColumnWithName:@"col0" type:RLMTypeInt];
         [t addRow:@[@10]];
         
         return YES;
@@ -169,7 +169,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     [fromDisk writeUsingBlock:^(RLMTransaction *group) {
         RLMTable *t = [group createTableWithName:@"table"];
         
-        [t addColumnWithName:@"col0" type:TDBIntType];
+        [t addColumnWithName:@"col0" type:RLMTypeInt];
         [t addRow:@[@10]];
          
         return YES;
@@ -209,7 +209,7 @@ TIGHTDB_TABLE_2(SharedTable2,
 
     [ctx writeUsingBlock:^(RLMTransaction *trx) {
         RLMTable *t = [trx createTableWithName:@"table"];
-        [t addColumnWithName:@"col0" type:TDBIntType];
+        [t addColumnWithName:@"col0" type:RLMTypeInt];
         [t addRow:@[@10]];
         return YES;
     } error:nil];
@@ -251,7 +251,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     
     [sg writeUsingBlock:^(RLMTransaction * group) {
         RLMTable *t = [group tableWithName:@"t"];
-        [t addColumnWithName:@"col" type:TDBBoolType];
+        [t addColumnWithName:@"col" type:RLMTypeBool];
         [t addRow:nil];
         RLMRow *row = [t lastRow];
         [row setBool:YES inColumnWithIndex:0];
@@ -329,7 +329,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     {   // add something to the db to play with
         [context1 writeUsingBlock:^BOOL(RLMTransaction *transaction) {
             RLMTable *t1 = [transaction createTableWithName:@"test"];
-            [t1 addColumnWithName:@"col0" type:TDBBoolType];
+            [t1 addColumnWithName:@"col0" type:RLMTypeBool];
             [t1 addRow:@[@YES]];
             //t1->add(0, 2, false, "test");
             return YES;

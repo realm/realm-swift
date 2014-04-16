@@ -170,17 +170,17 @@ using namespace std;
 
 -(id)minInColumnWithIndex:(NSUInteger)colIndex
 {
-    TDBType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
-    if (colType == TDBIntType) {
+    RLMType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
+    if (colType == RLMTypeInt) {
         return [NSNumber numberWithInteger:[self minIntInColumnWithIndex:colIndex]];
     }
-    else if (colType == TDBDoubleType) {
+    else if (colType == RLMTypeDouble) {
         return [NSNumber numberWithDouble:[self minDoubleInColumnWithIndex:colIndex]];
     }
-    else if (colType == TDBFloatType) {
+    else if (colType == RLMTypeFloat) {
         return [NSNumber numberWithDouble:[self minFloatInColumnWithIndex:colIndex]];
     }
-    else if (colType == TDBDateType) {
+    else if (colType == RLMTypeDate) {
         return [self minDateInColumnWithIndex:colIndex];
     }
     else {
@@ -216,17 +216,17 @@ using namespace std;
 
 -(id)maxInColumnWithIndex:(NSUInteger)colIndex
 {
-    TDBType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
-    if (colType == TDBIntType) {
+    RLMType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
+    if (colType == RLMTypeInt) {
         return [NSNumber numberWithInteger:[self maxIntInColumnWithIndex:colIndex]];
     }
-    else if (colType == TDBDoubleType) {
+    else if (colType == RLMTypeDouble) {
         return [NSNumber numberWithDouble:[self maxDoubleInColumnWithIndex:colIndex]];
     }
-    else if (colType == TDBFloatType) {
+    else if (colType == RLMTypeFloat) {
         return [NSNumber numberWithDouble:[self maxFloatInColumnWithIndex:colIndex]];
     }
-    else if (colType == TDBDateType) {
+    else if (colType == RLMTypeDate) {
         return [self maxDateInColumnWithIndex:colIndex];
     }
     else {
@@ -261,14 +261,14 @@ using namespace std;
 
 -(NSNumber *)sumColumnWithIndex:(NSUInteger)colIndex
 {
-    TDBType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
-    if (colType == TDBIntType) {
+    RLMType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
+    if (colType == RLMTypeInt) {
         return [NSNumber numberWithInteger:[self sumIntColumnWithIndex:colIndex]];
     }
-    else if (colType == TDBDoubleType) {
+    else if (colType == RLMTypeDouble) {
         return [NSNumber numberWithDouble:[self sumDoubleColumnWithIndex:colIndex]];
     }
-    else if (colType == TDBFloatType) {
+    else if (colType == RLMTypeFloat) {
         return [NSNumber numberWithDouble:[self sumFloatColumnWithIndex:colIndex]];
     }
     else {
@@ -296,14 +296,14 @@ using namespace std;
 
 -(NSNumber *)avgColumnWithIndex:(NSUInteger)colIndex
 {
-    TDBType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
-    if (colType == TDBIntType) {
+    RLMType colType = [[self originTable] columnTypeOfColumnWithIndex:colIndex];
+    if (colType == RLMTypeInt) {
         return [NSNumber numberWithDouble:[self avgIntColumnWithIndex:colIndex]];
     }
-    else if (colType == TDBDoubleType) {
+    else if (colType == RLMTypeDouble) {
         return [NSNumber numberWithDouble:[self avgDoubleColumnWithIndex:colIndex]];
     }
-    else if (colType == TDBFloatType) {
+    else if (colType == RLMTypeFloat) {
         return [NSNumber numberWithDouble:[self avgFloatColumnWithIndex:colIndex]];
     }
     else {
