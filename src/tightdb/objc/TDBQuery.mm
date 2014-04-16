@@ -28,7 +28,7 @@
 #import "TDBTable_noinst.h"
 #import "TDBView_noinst.h"
 #import "TDBRow.h"
-#import "NSData+TDBGetBinaryData.h"
+#import "NSData+RLMGetBinaryData.h"
 #import "PrivateTDB.h"
 #import "util_noinst.hpp"
 
@@ -394,7 +394,7 @@ using namespace std;
 
 -(TDBQuery*)binaryIsEqualTo:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->equal(colIndex, aBinary.tdbBinaryData);
+    m_query->equal(colIndex, aBinary.rlmBinaryData);
     return self;
 }
 
@@ -438,7 +438,7 @@ using namespace std;
 
 -(TDBQuery*)binaryIsNotEqualTo:(NSData*)value inColumnWithIndex:(NSUInteger)colIndex
 {
-    m_query->not_equal(colIndex, value.tdbBinaryData);
+    m_query->not_equal(colIndex, value.rlmBinaryData);
     return self;
 }
 
@@ -938,27 +938,27 @@ using namespace std;
 }
 -(TDBQuery*)columnIsEqualTo:(NSData*)value
 {
-    [_query getNativeQuery].equal(_column_ndx, value.tdbBinaryData);
+    [_query getNativeQuery].equal(_column_ndx, value.rlmBinaryData);
     return _query;
 }
 -(TDBQuery*)columnIsNotEqualTo:(NSData*)value
 {
-    [_query getNativeQuery].not_equal(_column_ndx, value.tdbBinaryData);
+    [_query getNativeQuery].not_equal(_column_ndx, value.rlmBinaryData);
     return _query;
 }
 -(TDBQuery*)columnBeginsWith:(NSData*)value
 {
-    [_query getNativeQuery].begins_with(_column_ndx, value.tdbBinaryData);
+    [_query getNativeQuery].begins_with(_column_ndx, value.rlmBinaryData);
     return _query;
 }
 -(TDBQuery*)columnEndsWith:(NSData*)value
 {
-    [_query getNativeQuery].ends_with(_column_ndx, value.tdbBinaryData);
+    [_query getNativeQuery].ends_with(_column_ndx, value.rlmBinaryData);
     return _query;
 }
 -(TDBQuery*)columnContains:(NSData*)value
 {
-    [_query getNativeQuery].contains(_column_ndx, value.tdbBinaryData);
+    [_query getNativeQuery].contains(_column_ndx, value.rlmBinaryData);
     return _query;
 }
 
