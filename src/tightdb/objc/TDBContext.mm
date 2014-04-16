@@ -98,7 +98,7 @@ NSString *const defaultContextFileName = @"default.tightdb";
 #endif
 }
 
--(void)readUsingBlock:(TDBReadBlock)block
+-(void)readUsingBlock:(RLMReadBlock)block
 {
     const tightdb::Group* group;
     try {
@@ -133,7 +133,7 @@ NSString *const defaultContextFileName = @"default.tightdb";
 }
 
 
--(BOOL)writeUsingBlock:(TDBWriteBlock)block error:(NSError**)error
+-(BOOL)writeUsingBlock:(RLMWriteBlock)block error:(NSError**)error
 {
     tightdb::Group* group;
     try {
