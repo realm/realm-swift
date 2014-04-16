@@ -94,7 +94,7 @@
     NSString* name = [NSString stringWithUTF8String:#_name]; \
     if (!name) \
         return NO; \
-    TDBDescriptor* subdesc = [desc addColumnTable:name]; \
+    RLMDescriptor* subdesc = [desc addColumnTable:name]; \
     if (!subdesc) \
         return NO; \
     if (![type _addColumns:subdesc]) \
@@ -122,7 +122,7 @@
         return NO; \
     if (![[desc nameOfColumnWithIndex:col] isEqualToString:@#name]) \
         return NO; \
-    TDBDescriptor* subdesc = [desc subdescriptorForColumnWithIndex:col]; \
+    RLMDescriptor* subdesc = [desc subdescriptorForColumnWithIndex:col]; \
     if (!subdesc) \
         return NO; \
     if (![type _checkType:subdesc]) \
