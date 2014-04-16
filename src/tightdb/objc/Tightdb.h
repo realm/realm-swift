@@ -18,7 +18,7 @@
  *
  **************************************************************************/
 
-#import <tightdb/objc/TDBConstants.h>
+#import <tightdb/objc/RLMConstants.h>
 #import <tightdb/objc/TDBTable.h>
 #import <tightdb/objc/TDBView.h>
 #import <tightdb/objc/TDBQuery.h>

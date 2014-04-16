@@ -23,7 +23,7 @@
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/group_shared.hpp>
 
-#import "TDBConstants.h"
+#import "RLMConstants.h"
 #import "TDBTable_noinst.h"
 #import "TDBSmartContext_noinst.h"
 #import "PrivateTDB.h"

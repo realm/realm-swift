@@ -30,7 +30,7 @@
 #import "TDBView_noinst.h"
 #import "TDBQuery_noinst.h"
 #import "TDBRow.h"
-#import "TDBDescriptor_noinst.h"
+#import "RLMDescriptor_noinst.h"
 #import "TDBColumnProxy.h"
 #import "NSData+RLMGetBinaryData.h"
 #import "PrivateTDB.h"
@@ -233,16 +233,16 @@ using namespace std;
     return TDBType(m_table->get_column_type(ndx));
 }
 
--(TDBDescriptor*)descriptor
+-(RLMDescriptor*)descriptor
 {
     return [self descriptorWithError:nil];
 }
 
--(TDBDescriptor*)descriptorWithError:(NSError* __autoreleasing*)error
+-(RLMDescriptor*)descriptorWithError:(NSError* __autoreleasing*)error
 {
     tightdb::DescriptorRef desc = m_table->get_descriptor();
     BOOL read_only = m_read_only || m_table->has_shared_type();
-    return [TDBDescriptor descWithDesc:desc.get() readOnly:read_only error:error];
+    return [RLMDescriptor descWithDesc:desc.get() readOnly:read_only error:error];
 }
 
 -(NSUInteger)rowCount // Implementing property accessor
@@ -1015,14 +1015,14 @@ using namespace std;
     return 0;
 }
 
--(TDBQuery*)where
+-(RLMQuery*)where
 {
     return [self whereWithError:nil];
 }
 
--(TDBQuery*)whereWithError:(NSError* __autoreleasing*)error
+-(RLMQuery*)whereWithError:(NSError* __autoreleasing*)error
 {
-    return [[TDBQuery alloc] initWithTable:self error:error];
+    return [[RLMQuery alloc] initWithTable:self error:error];
 }
 
 -(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex
