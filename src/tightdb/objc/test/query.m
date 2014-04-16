@@ -424,7 +424,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         [table addRow:@[[NSNumber numberWithInt:i]]];
     RLMQuery *query = [table where];
     int i = 0;
-    for(TDBRow *row in query) {
+    for(RLMRow *row in query) {
         XCTAssertEqual((int64_t)i, [(NSNumber *)row[@"first"] longLongValue], @"Wrong value");
         ++i;
     }
@@ -438,7 +438,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
         [table addRow:@[[NSNumber numberWithInt:i]]];
     RLMQuery *query = [[table where] intIsGreaterThan:-1 inColumnWithIndex:0];
     int i = 0;
-    for(TDBRow *row in query) {
+    for(RLMRow *row in query) {
         XCTAssertEqual((int64_t)i, [(NSNumber *)row[@"first"] longLongValue], @"Wrong value");
         ++i;
     }
