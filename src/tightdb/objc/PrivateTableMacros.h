@@ -32,7 +32,7 @@
 #import "RLMRow.h"
 #import "RLMDescriptor.h"
 #import "RLMQuery.h"
-#import "TDBView.h"
+#import "RLMView.h"
 #import "TDBColumnProxy.h"
 #import "PrivateTDB.h"
 #import "PrivateHelperMacros.h"
@@ -66,7 +66,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##View: TDBView \
+@interface TableName##View: RLMView \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
@@ -285,7 +285,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##View: TDBView \
+@interface TableName##View: RLMView \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
@@ -521,7 +521,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##View: TDBView \
+@interface TableName##View: RLMView \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
@@ -774,7 +774,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##View: TDBView \
+@interface TableName##View: RLMView \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
@@ -1044,7 +1044,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##View: TDBView \
+@interface TableName##View: RLMView \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
@@ -1331,7 +1331,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##View: TDBView \
+@interface TableName##View: RLMView \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
@@ -1635,7 +1635,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##View: TDBView \
+@interface TableName##View: RLMView \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
@@ -1956,7 +1956,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##View: TDBView \
+@interface TableName##View: RLMView \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
@@ -2294,7 +2294,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##View: TDBView \
+@interface TableName##View: RLMView \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
@@ -2649,7 +2649,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##View: TDBView \
+@interface TableName##View: RLMView \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
@@ -3021,7 +3021,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##View: TDBView \
+@interface TableName##View: RLMView \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
@@ -3410,7 +3410,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##View: TDBView \
+@interface TableName##View: RLMView \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
@@ -3816,7 +3816,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##View: TDBView \
+@interface TableName##View: RLMView \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
@@ -4239,7 +4239,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName14, CType14) \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##View: TDBView \
+@interface TableName##View: RLMView \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
@@ -4679,7 +4679,7 @@ TIGHTDB_COLUMN_PROXY_DEF(CName15, CType15) \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##View: TDBView \
+@interface TableName##View: RLMView \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 

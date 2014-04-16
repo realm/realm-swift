@@ -18,16 +18,30 @@
  *
  **************************************************************************/
 
-#import <Foundation/Foundation.h>
+#include "RLMType.h"
 
-#include <tightdb/table_view.hpp>
-
-#import "RLMTable.h"
-#import "TDBView.h"
+@class RLMRow;
+@class RLMQuery;
 
 
-@interface TDBView (noinst)
+@protocol RLMView
 
-+(TDBView*)viewWithTable:(RLMTable *)table andNativeView:(const tightdb::TableView&)view;
+@property (nonatomic, readonly) NSUInteger rowCount;
+@property (nonatomic, readonly) NSUInteger columnCount;
+
+// Getting and setting individual rows
+-(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
+-(RLMRow *)rowAtIndex:(NSUInteger)rowIndex;
+-(RLMRow *)lastRow;
+-(RLMRow *)firstRow;
+
+// Working with columns
+-(RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
+
+// Removing rows
+-(void)removeRowAtIndex:(NSUInteger)rowIndex;
+-(void)removeAllRows;
+
+-(RLMQuery *)where;
 
 @end

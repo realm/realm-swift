@@ -243,7 +243,7 @@ TIGHTDB_TABLE_3(FuncPeopleTable,
      *  Row in table view.
      */
 
-    TDBView *view = [[query boolIsEqualTo:YES inColumnWithIndex:HIRED] findAllRows];
+    RLMView *view = [[query boolIsEqualTo:YES inColumnWithIndex:HIRED] findAllRows];
     XCTAssertEqual([query countRows], (NSUInteger)(TABLE_SIZE-2)/2, @"Check the size");
 
     i=0;

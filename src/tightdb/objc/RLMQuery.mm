@@ -26,7 +26,7 @@
 
 #import "RLMQuery.h"
 #import "RLMTable_noinst.h"
-#import "TDBView_noinst.h"
+#import "RLMView_noinst.h"
 #import "RLMRow.h"
 #import "NSData+RLMGetBinaryData.h"
 #import "PrivateTDB.h"
@@ -329,10 +329,10 @@ using namespace std;
 }
 
 
--(TDBView*)findAllRows
+-(RLMView *)findAllRows
 {
     tightdb::TableView view = m_query->find_all();
-    return [TDBView viewWithTable:m_table andNativeView:view];
+    return [RLMView viewWithTable:m_table andNativeView:view];
 }
 
 -(NSUInteger)indexOfFirstMatchingRow

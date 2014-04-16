@@ -1269,7 +1269,7 @@ using namespace std;
     [t addRow:@[@"name2", @2]];
     
     // Distinct on string column
-    TDBView *v = [t distinctValuesInColumnWithIndex:nameIndex];
+    RLMView *v = [t distinctValuesInColumnWithIndex:nameIndex];
     XCTAssertEqual(v.rowCount, (NSUInteger)3, @"Distinct values removed");
     XCTAssertEqualObjects(v[0][nameIndex], @"name0", @"");
     XCTAssertEqualObjects(v[1][nameIndex], @"name1", @"");
@@ -1335,7 +1335,7 @@ using namespace std;
     XCTAssertThrows([t where:@"name == 30"], @"Invalid value type");
 
     // Filter with predicate string
-    TDBView *v = [t where:@"name == \"name0\""];
+    RLMView *v = [t where:@"name == \"name0\""];
     XCTAssertEqual(v.rowCount, (NSUInteger)1, @"View with single match");
     XCTAssertEqualObjects(v[0][nameIndex], @"name0");
     XCTAssertEqualObjects(v[0][ageIndex], @0);
@@ -1388,25 +1388,25 @@ using namespace std;
     [t addRow:@[@"name4", @4, [NSNumber numberWithBool:YES]]];
     [t addRow:@[@"name0",@0, [NSNumber numberWithBool:NO]]];
 
-    TDBView *v = [t where:nil orderBy:nil];
+    RLMView *v = [t where:nil orderBy:nil];
     XCTAssertEqualObjects(v[0][ageIndex], @4);
     XCTAssertEqualObjects(v[1][ageIndex], @0);
 
-    TDBView *vAscending = [t where:nil orderBy:@"age"];
+    RLMView *vAscending = [t where:nil orderBy:@"age"];
     XCTAssertEqualObjects(vAscending[0][ageIndex], @0);
     XCTAssertEqualObjects(vAscending[1][ageIndex], @4);
     
-    TDBView *vAscending2 = [t where:nil orderBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:YES]];
+    RLMView *vAscending2 = [t where:nil orderBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:YES]];
     XCTAssertEqualObjects(vAscending2[0][ageIndex], @0);
     XCTAssertEqualObjects(vAscending2[1][ageIndex], @4);
     
     NSSortDescriptor * reverseSort = [NSSortDescriptor sortDescriptorWithKey:@"age" ascending:NO];
-    TDBView *vDescending = [t where:nil orderBy:reverseSort];
+    RLMView *vDescending = [t where:nil orderBy:reverseSort];
     XCTAssertEqualObjects(vDescending[0][ageIndex], @4);
     XCTAssertEqualObjects(vDescending[1][ageIndex], @0);
     
     NSSortDescriptor * boolSort = [NSSortDescriptor sortDescriptorWithKey:@"hired" ascending:YES];
-    TDBView *vBool = [t where:nil orderBy:boolSort];
+    RLMView *vBool = [t where:nil orderBy:boolSort];
     XCTAssertEqualObjects(vBool[0][ageIndex], @0);
     XCTAssertEqualObjects(vBool[1][ageIndex], @4);
 

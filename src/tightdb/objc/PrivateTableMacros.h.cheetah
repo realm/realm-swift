@@ -42,7 +42,7 @@ directiveStartToken = %
 #import "RLMRow.h"
 #import "RLMDescriptor.h"
 #import "RLMQuery.h"
-#import "TDBView.h"
+#import "RLMView.h"
 #import "TDBColumnProxy.h"
 #import "PrivateTDB.h"
 #import "PrivateHelperMacros.h"
@@ -101,7 +101,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
 @end \
-@interface TableName##View: TDBView \
+@interface TableName##View: RLMView \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 

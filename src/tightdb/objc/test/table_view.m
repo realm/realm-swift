@@ -44,7 +44,7 @@
 {
     RLMTable *t = [[RLMTable alloc] init];
     RLMQuery *q = [t where];
-    TDBView *v = [q findAllRows];
+    RLMView *v = [q findAllRows];
     
     XCTAssertEqual((size_t)0, [v columnCount], @"no columns added yet");
     
@@ -76,7 +76,7 @@
     
     
     RLMQuery *q = [t where];
-    TDBView *v = [q findAllRows];
+    RLMView *v = [q findAllRows];
     
     XCTAssertTrue([v columnTypeOfColumnWithIndex:boolCol]      == RLMTypeBool, @"Column types matches");
     XCTAssertTrue([v columnTypeOfColumnWithIndex:binaryCol]    == RLMTypeBinary, @"Column types matches");
@@ -111,7 +111,7 @@
     [row setInt:0 inColumnWithIndex:intCol];
     
     RLMQuery *q = [t where];
-    TDBView *v = [q findAllRows];
+    RLMView *v = [q findAllRows];
     
     // Not yet sorted
     XCTAssertTrue([v TDB_intInColumnWithIndex:intCol atRowIndex:0] == 2, @"matcing value after no sort");
@@ -155,7 +155,7 @@
     [row setBool:NO inColumnWithIndex:boolCol];
     
     RLMQuery *q = [t where];
-    TDBView *v = [q findAllRows];
+    RLMView *v = [q findAllRows];
     
     // Not yet sorted
     XCTAssertTrue([v TDB_boolInColumnWithIndex:boolCol atRowIndex:0] == YES, @"matcing value after no sort");
@@ -208,7 +208,7 @@
     [row setDate:dateFirst inColumnWithIndex:dateCol];
     
     RLMQuery *q = [t where];
-    TDBView *v = [q findAllRows];
+    RLMView *v = [q findAllRows];
     
     // Not yet sorted
     XCTAssertTrue([v TDB_dateInColumnWithIndex:dateCol atRowIndex:0] == dateLast, @"matcing value after no sort");
@@ -250,7 +250,7 @@
     NSUInteger tableCol     = [t addColumnWithName:@"tableCol" type:RLMTypeTable];
     
     RLMQuery *q = [t where];
-    TDBView *v = [q findAllRows];
+    RLMView *v = [q findAllRows];
     
     [v sortUsingColumnWithIndex:boolCol]; // bool is supported
     XCTAssertThrows([v sortUsingColumnWithIndex:binaryCol], @"Not supported on binary column");
@@ -269,7 +269,7 @@
     NSUInteger col0 = [t addColumnWithName:@"col" type:RLMTypeString];
     NSUInteger col1 = [t addColumnWithName:@"col" type:RLMTypeInt];
     
-    TDBView *v = [[t where] findAllRows];
+    RLMView *v = [[t where] findAllRows];
     
     XCTAssertNil([v firstRow], @"Table is empty");
     XCTAssertNil([v lastRow], @"Table is empty");
@@ -308,7 +308,7 @@
     [table addRow:@[@8]];
     [table addRow:@[@39]];
     
-    TDBView* view = [[[table where] intIsLessThanOrEqualTo:30 inColumnWithIndex:0] findAllRows];
+    RLMView* view = [[[table where] intIsLessThanOrEqualTo:30 inColumnWithIndex:0] findAllRows];
     
     XCTAssertEqual(view.rowCount, (NSUInteger)3, @"found 3 matches");
     
@@ -334,13 +334,13 @@
     [table addRow:@[@"Henry", @"Anderson", @10000]];
     
     
-    TDBView *view = [[table where] findAllRows];
+    RLMView *view = [[table where] findAllRows];
     XCTAssertEqual(view.rowCount, (NSUInteger)5, @"All 5 rows still here");
 
-    TDBView *view2 = [[[view where ] stringIsCaseInsensitiveEqualTo:@"John" inColumnWithIndex:0 ] findAllRows];
+    RLMView *view2 = [[[view where ] stringIsCaseInsensitiveEqualTo:@"John" inColumnWithIndex:0 ] findAllRows];
     XCTAssertEqual(view2.rowCount, (NSUInteger)2, @"2 rows match");
     
-    TDBView *view3 = [[[view2 where] stringIsCaseInsensitiveEqualTo:@"Anderson" inColumnWithIndex:1 ] findAllRows];
+    RLMView *view3 = [[[view2 where] stringIsCaseInsensitiveEqualTo:@"Anderson" inColumnWithIndex:1 ] findAllRows];
     XCTAssertEqual(view3.rowCount, (NSUInteger)1, @"Only 1 row left");
 }
 

@@ -130,7 +130,7 @@ TIGHTDB_TABLE_IMPL_2(PeopleTable2,
     XCTAssertEqual(avg, 20.5,@"Expected 20.5 average", nil);
 
     // Execute the query and return a table (view)
-    TDBView *res = [q findAll];
+    RLMView *res = [q findAll];
     for (size_t i = 0; i < [res rowCount]; ++i) {
         NSLog(@"%zu: %@ is %lld years old", i,
             [people rowAtIndex:i].Name,

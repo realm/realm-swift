@@ -20,7 +20,7 @@
 
 #import <tightdb/objc/RLMConstants.h>
 #import <tightdb/objc/RLMTable.h>
-#import <tightdb/objc/TDBView.h>
+#import <tightdb/objc/RLMView.h>
 #import <tightdb/objc/RLMQuery.h>
 #import <tightdb/objc/RLMRow.h>
 #import <tightdb/objc/TDBContext.h>

@@ -21,7 +21,7 @@
 #import <Foundation/Foundation.h>
 
 @class RLMTable;
-@class TDBView;
+@class RLMView;
 
 
 @interface RLMQuery : NSObject <NSFastEnumeration>
@@ -49,7 +49,7 @@
 // Search
 -(NSUInteger)indexOfFirstMatchingRow;
 -(NSUInteger)indexOfFirstMatchingRowFromIndex:(NSUInteger)rowIndex;
--(TDBView *)findAllRows;
+-(RLMView *)findAllRows;
 
 // Conditions
 -(RLMQuery *)boolIsEqualTo:(bool)aBool inColumnWithIndex:(NSUInteger)colIndex;
