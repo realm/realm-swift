@@ -18,6 +18,6 @@
  *
  **************************************************************************/
 
-#import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/Realm.h>
 #import "RLMRowFast.h"
 

@@ -11,7 +11,7 @@
 
 #import <XCTest/XCTest.h>
 
-#import <tightdb/objc/Tightdb.h>
+#import <tightdb/objc/Realm.h>
 #import <tightdb/objc/group.h>
 
 #include <tightdb/binary_data.hpp>
