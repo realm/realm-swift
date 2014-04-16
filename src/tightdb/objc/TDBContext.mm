@@ -124,10 +124,10 @@ NSString *const defaultContextFileName = @"default.tightdb";
     }
 }
 
--(void)readTable:(NSString*)tablename usingBlock:(TDBTableReadBlock)block
+-(void)readTable:(NSString*)tablename usingBlock:(RLMTableReadBlock)block
 {
     [self readUsingBlock:^(TDBTransaction *trx){
-        TDBTable *table = [trx tableWithName:tablename];
+        RLMTable *table = [trx tableWithName:tablename];
         block(table);
     }];
 }
@@ -184,10 +184,10 @@ NSString *const defaultContextFileName = @"default.tightdb";
     return NO;
 }
 
--(BOOL)writeTable:(NSString*)tablename usingBlock:(TDBTableWriteBlock)block error:(NSError **)error
+-(BOOL)writeTable:(NSString*)tablename usingBlock:(RLMTableWriteBlock)block error:(NSError **)error
 {
     return [self writeUsingBlock:^(TDBTransaction *trx){
-        TDBTable *table = [trx tableWithName:tablename];
+        RLMTable *table = [trx tableWithName:tablename];
         return block(table);
     } error: error];
 }

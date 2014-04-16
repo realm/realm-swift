@@ -20,14 +20,14 @@
 
 #import <Foundation/Foundation.h>
 
-@class TDBTable;
+@class RLMTable;
 @class TDBView;
 
 
 @interface RLMQuery : NSObject <NSFastEnumeration>
--(id)initWithTable:(TDBTable *)table;
--(id)initWithTable:(TDBTable *)table error:(NSError *__autoreleasing *)error;
--(TDBTable *)originTable;
+-(id)initWithTable:(RLMTable *)table;
+-(id)initWithTable:(RLMTable *)table error:(NSError *__autoreleasing *)error;
+-(RLMTable *)originTable;
 
 // Combiners
 -(RLMQuery *)group;

@@ -28,7 +28,7 @@
 @class RLMRow;
 
 
-@interface TDBTable: NSObject <TDBView,NSFastEnumeration>
+@interface RLMTable : NSObject <TDBView,NSFastEnumeration>
 
 @property (nonatomic, readonly) NSUInteger rowCount;
 @property (nonatomic, readonly) NSUInteger columnCount;

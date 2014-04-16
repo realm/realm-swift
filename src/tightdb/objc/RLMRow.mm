@@ -21,7 +21,7 @@
 #include <tightdb/table.hpp>
 
 #import "RLMRow.h"
-#import "TDBTable_noinst.h"
+#import "RLMTable_noinst.h"
 #import "PrivateTDB.h"
 #import "RLMRowFast.h"
 #import "util_noinst.hpp"
@@ -32,14 +32,14 @@ using namespace std;
 // TODO: Concept for row invalidation (when table updates).
 
 @interface RLMRow ()
-@property (nonatomic, weak) TDBTable *table;
+@property (nonatomic, weak) RLMTable *table;
 @property (nonatomic) NSUInteger ndx;
 @end
 @implementation RLMRow
 @synthesize table = _table;
 @synthesize ndx = _ndx;
 
--(id)initWithTable:(TDBTable *)table ndx:(NSUInteger)ndx
+-(id)initWithTable:(RLMTable *)table ndx:(NSUInteger)ndx
 {
     if (ndx >= [table rowCount])
         return nil;
@@ -134,7 +134,7 @@ using namespace std;
     return [_table TDB_dateInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(TDBTable *)tableInColumnWithIndex:(NSUInteger)colNdx
+-(RLMTable *)tableInColumnWithIndex:(NSUInteger)colNdx
 {
     return [_table TDB_tableInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -180,7 +180,7 @@ using namespace std;
     [_table TDB_setDate:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
--(void)setTable:(TDBTable *)value inColumnWithIndex:(NSUInteger)colNdx
+-(void)setTable:(RLMTable *)value inColumnWithIndex:(NSUInteger)colNdx
 {
     [_table TDB_setTable:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
@@ -289,7 +289,7 @@ using namespace std;
     return [_row.table TDB_tableInColumnWithIndex:_columnId atRowIndex:_row.ndx asTableClass:obj];
 }
 
--(void)setSubtable:(TDBTable *)value
+-(void)setSubtable:(RLMTable *)value
 {
     [_row.table TDB_setTable:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }

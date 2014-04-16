@@ -32,7 +32,7 @@ TIGHTDB_TABLE_2(WrongTypeTable,
 - (void)testGetSubtable
 {
     // Create table with all column types
-    TDBTable* table = [[TDBTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] init];
     RLMDescriptor * desc = table.descriptor;
     [desc addColumnWithName:@"Outer" type:TDBBoolType];
     [desc addColumnWithName:@"Number" type:TDBIntType];
@@ -45,7 +45,7 @@ TIGHTDB_TABLE_2(WrongTypeTable,
     [table TDB_insertSubtable:2 ndx:0];
     [table TDB_insertDone];
 
-    TDBTable* subtable = [table TDB_tableInColumnWithIndex:2 atRowIndex:0];
+    RLMTable* subtable = [table TDB_tableInColumnWithIndex:2 atRowIndex:0];
     [subtable TDB_insertBool:0 ndx:0 value:YES];
     [subtable TDB_insertInt:1 ndx:0 value:42];
     [subtable TDB_insertDone];

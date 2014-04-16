@@ -194,7 +194,7 @@ TIGHTDB_TABLE_2(QueryTable,
 - (void)testSubtables
 {
     TDBTransaction* group = [TDBTransaction group];
-    TDBTable* table = [group createTableWithName:@"table" asTableClass:[TDBTable class]];
+    RLMTable* table = [group createTableWithName:@"table" asTableClass:[RLMTable class]];
 
     // Specify the table type
     {
@@ -217,7 +217,7 @@ TIGHTDB_TABLE_2(QueryTable,
     [table TDB_setInt:700 inColumnWithIndex:COL_TABLE_INT atRowIndex:0];
 
     // Add two rows to the subtable
-    TDBTable* subtable = [table TDB_tableInColumnWithIndex:COL_TABLE_TAB atRowIndex:0];
+    RLMTable* subtable = [table TDB_tableInColumnWithIndex:COL_TABLE_TAB atRowIndex:0];
     [subtable addRow:nil];
 
     [subtable TDB_setInt:800 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:0];
@@ -225,7 +225,7 @@ TIGHTDB_TABLE_2(QueryTable,
     [subtable TDB_setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
 
     // Make the mixed values column contain another subtable
-    [table TDB_setMixed:[[TDBTable alloc] init] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
+    [table TDB_setMixed:[[RLMTable alloc] init] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
     
 /* Fails!!!
     // Specify its type

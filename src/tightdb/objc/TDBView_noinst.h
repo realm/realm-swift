@@ -22,12 +22,12 @@
 
 #include <tightdb/table_view.hpp>
 
-#import "TDBTable.h"
+#import "RLMTable.h"
 #import "TDBView.h"
 
 
 @interface TDBView (noinst)
 
-+(TDBView*)viewWithTable:(TDBTable*)table andNativeView:(const tightdb::TableView&)view;
++(TDBView*)viewWithTable:(RLMTable *)table andNativeView:(const tightdb::TableView&)view;
 
 @end

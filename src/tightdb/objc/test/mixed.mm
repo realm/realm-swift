@@ -12,7 +12,7 @@
 
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/group.h>
-#import <tightdb/objc/TDBTable_noinst.h>
+#import <tightdb/objc/RLMTable_noinst.h>
 
 TIGHTDB_TABLE_3(MixedTable,
                 Hired, Bool,
@@ -128,7 +128,7 @@ TIGHTDB_TABLE_2(SubMixedTable,
 - (void)testMixed
 {
     SubMixedTable *tableSub = [[SubMixedTable alloc] init];
-    XCTAssertTrue([tableSub isKindOfClass:[TDBTable class]], @"TDBTable excepted");
+    XCTAssertTrue([tableSub isKindOfClass:[RLMTable class]], @"RLMTable excepted");
 
     // Add some rows
     [tableSub addHired:YES Age:20];
@@ -151,8 +151,8 @@ TIGHTDB_TABLE_2(SubMixedTable,
 
     XCTAssertEqual([table rowCount], (NSUInteger)6, @"6 rows expected");
     XCTAssertTrue([table[0].Other isKindOfClass:[NSString class]], @"NSString excepted");
-    XCTAssertTrue([table[4].Other isKindOfClass:[TDBTable class]], @"TDBTable excepted");
-    XCTAssertEqual([(TDBTable *)table[4].Other rowCount], (size_t)5,@"Subtable should have 5 rows");
+    XCTAssertTrue([table[4].Other isKindOfClass:[RLMTable class]], @"RLMTable excepted");
+    XCTAssertEqual([(RLMTable *)table[4].Other rowCount], (size_t)5,@"Subtable should have 5 rows");
     XCTAssertTrue([table[5].Other isKindOfClass:[NSDate class]], @"NSDate excepted");
 
     // Test cast and isClass

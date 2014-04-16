@@ -25,7 +25,7 @@
 #include <tightdb/query.hpp>
 
 #import "RLMQuery.h"
-#import "TDBTable_noinst.h"
+#import "RLMTable_noinst.h"
 #import "TDBView_noinst.h"
 #import "RLMRow.h"
 #import "NSData+RLMGetBinaryData.h"
@@ -46,17 +46,17 @@ using namespace std;
 @implementation RLMQuery
 {
     tightdb::util::UniquePtr<tightdb::Query> m_query;
-    __weak TDBTable* m_table;
+    __weak RLMTable * m_table;
 
     RLMRow * m_tmp_row;
 }
 
--(id)initWithTable:(TDBTable*)table
+-(id)initWithTable:(RLMTable *)table
 {
     return [self initWithTable:table error:nil];
 }
 
--(id)initWithTable:(TDBTable*)table error:(NSError* __autoreleasing*)error
+-(id)initWithTable:(RLMTable *)table error:(NSError* __autoreleasing*)error
 {
     self = [super init];
     if (self) {
@@ -122,7 +122,7 @@ using namespace std;
     return *m_query;
 }
 
--(TDBTable*)originTable
+-(RLMTable *)originTable
 {
     return m_table;
 }

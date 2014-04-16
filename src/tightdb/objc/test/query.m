@@ -147,7 +147,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
 - (void) testDynamic
 {
-    TDBTable *table = [[TDBTable alloc]init];
+    RLMTable *table = [[RLMTable alloc]init];
     
     [table addColumnWithName:@"BoolCol" type:TDBBoolType];
     [table addColumnWithName:@"IntCol" type:TDBIntType];
@@ -257,7 +257,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
 - (void)testMathOperations
 {
-    TDBTable *table = [[TDBTable alloc]init];
+    RLMTable *table = [[RLMTable alloc]init];
     
     NSUInteger intCol = [table addColumnWithName:@"IntCol" type:TDBIntType];
     NSUInteger floatCol = [table addColumnWithName:@"FloatCol" type:TDBFloatType];
@@ -370,7 +370,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
 - (void)testFind
 {
-    TDBTable* table = [[TDBTable alloc]init];
+    RLMTable* table = [[RLMTable alloc]init];
     [table addColumnWithName:@"IntCol" type:TDBIntType];
     [table TDB_addEmptyRows:6];
 
@@ -399,7 +399,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
 - (void) testSubtableQuery
 {
-    TDBTable *t = [[TDBTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] init];
     
     RLMDescriptor *d = t.descriptor;
     RLMDescriptor *subDesc = [d addColumnTable:@"subtable"];
@@ -407,7 +407,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [t addRow:nil];
     XCTAssertEqual(t.rowCount, (NSUInteger)1,@"one row added");
     
-    TDBTable * subTable = [t TDB_tableInColumnWithIndex:0 atRowIndex:0];
+    RLMTable * subTable = [t TDB_tableInColumnWithIndex:0 atRowIndex:0];
     [subTable addRow:nil];
     [subTable TDB_setBool:YES inColumnWithIndex:0 atRowIndex:0];
     RLMQuery *q = [t where];
@@ -418,7 +418,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
 -(void) testQueryEnumeratorNoCondition
 {
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     [table addColumnWithName:@"first" type:TDBIntType];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithInt:i]]];
@@ -432,7 +432,7 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 
 -(void) testQueryEnumeratorWithCondition
 {
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     [table addColumnWithName:@"first" type:TDBIntType];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithInt:i]]];

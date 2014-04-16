@@ -116,7 +116,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     TDBContext *context = [TDBContext contextWithDefaultPersistence];
     
     [context writeUsingBlock:^(TDBTransaction *transaction) {
-        TDBTable *t = [transaction createTableWithName:@"table"];
+        RLMTable *t = [transaction createTableWithName:@"table"];
         
         [t addColumnWithName:@"col0" type:TDBIntType];
         [t addRow:@[@10]];
@@ -126,7 +126,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     } error:nil];
     
     [context readUsingBlock:^(TDBTransaction* transaction) {
-        TDBTable *t = [transaction tableWithName:@"table"];
+        RLMTable *t = [transaction tableWithName:@"table"];
         XCTAssertEqualObjects(t[0][0], @10);
     }];
 }
@@ -139,15 +139,15 @@ TIGHTDB_TABLE_2(SharedTable2,
     XCTAssertNoThrow(([transaction createTableWithName:@"Test" columns:@[@"id", @"int"]]), @"Table should not throw exception");
     
     // Test adding rows for single column table
-    NSString* const TDBTableNameDepartment = @"Department";
-    TDBTable* departmentTable = [transaction createTableWithName:TDBTableNameDepartment columns:@[@"name", @"string"]];
+    NSString* const RLMTableNameDepartment = @"Department";
+    RLMTable* departmentTable = [transaction createTableWithName:RLMTableNameDepartment columns:@[@"name", @"string"]];
     XCTAssertTrue(departmentTable.columnCount == 1, @"Table should have 1 column");
     XCTAssertTrue([[departmentTable nameOfColumnWithIndex:0] isEqualToString:@"name"], @"Column at index 0 should be name");
     XCTAssertNoThrow(([departmentTable addRow:@{@"name" : @"Engineering"}]), @"Adding row should not throw exception");
     
     // Test adding rows for multi-column table
-    NSString* const TDBTableNameEmployee = @"Employee";
-    TDBTable* employeeTable = [transaction createTableWithName:TDBTableNameEmployee columns:@[@"id", @"int", @"name", @"string", @"position", @"string"]];
+    NSString* const RLMTableNameEmployee = @"Employee";
+    RLMTable* employeeTable = [transaction createTableWithName:RLMTableNameEmployee columns:@[@"id", @"int", @"name", @"string", @"position", @"string"]];
     XCTAssertTrue(employeeTable.columnCount == 3, @"Table should have 3 column");
     XCTAssertTrue([[employeeTable nameOfColumnWithIndex:0] isEqualToString:@"id"], @"Column at index 0 should be id");
     XCTAssertTrue([[employeeTable nameOfColumnWithIndex:1] isEqualToString:@"name"], @"Column at index 1 should be name");
@@ -167,7 +167,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     TDBContext* fromDisk = [TDBContext contextPersistedAtPath:@"readonlyTest.tightdb" error:nil];
     
     [fromDisk writeUsingBlock:^(TDBTransaction *group) {
-        TDBTable *t = [group createTableWithName:@"table"];
+        RLMTable *t = [group createTableWithName:@"table"];
         
         [t addColumnWithName:@"col0" type:TDBIntType];
         [t addRow:@[@10]];
@@ -176,7 +176,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     } error:nil];
     
     [fromDisk readUsingBlock:^(TDBTransaction* group) {
-        TDBTable *t = [group tableWithName:@"table"];
+        RLMTable *t = [group tableWithName:@"table"];
         
         XCTAssertThrows([t addRow:nil], @"Is in readTransaction");
         XCTAssertThrows([t addRow:@[@1]], @"Is in readTransaction");
@@ -208,22 +208,22 @@ TIGHTDB_TABLE_2(SharedTable2,
     TDBContext* ctx = [TDBContext contextPersistedAtPath:@"singleTest.tightdb" error:nil];
 
     [ctx writeUsingBlock:^(TDBTransaction *trx) {
-        TDBTable *t = [trx createTableWithName:@"table"];
+        RLMTable *t = [trx createTableWithName:@"table"];
         [t addColumnWithName:@"col0" type:TDBIntType];
         [t addRow:@[@10]];
         return YES;
     } error:nil];
 
-    [ctx readTable:@"table" usingBlock:^(TDBTable* table) {
+    [ctx readTable:@"table" usingBlock:^(RLMTable* table) {
         XCTAssertTrue([table rowCount] == 1, @"No rows have been removed");
     }];
 
-    [ctx writeTable:@"table" usingBlock:^(TDBTable* table) {
+    [ctx writeTable:@"table" usingBlock:^(RLMTable* table) {
         [table addRow:@[@10]];
         return YES;
     } error:nil];
 
-    [ctx readTable:@"table" usingBlock:^(TDBTable* table) {
+    [ctx readTable:@"table" usingBlock:^(RLMTable* table) {
         XCTAssertTrue([table rowCount] == 2, @"Rows were added");
     }];
 }
@@ -250,7 +250,7 @@ TIGHTDB_TABLE_2(SharedTable2,
 
     
     [sg writeUsingBlock:^(TDBTransaction* group) {
-        TDBTable *t = [group tableWithName:@"t"];
+        RLMTable *t = [group tableWithName:@"t"];
         [t addColumnWithName:@"col" type:TDBBoolType];
         [t addRow:nil];
         RLMRow *row = [t lastRow];
@@ -266,7 +266,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     
     
     [sg2 writeUsingBlock:^(TDBTransaction* group) {
-        TDBTable *t = [group tableWithName:@"t"];
+        RLMTable *t = [group tableWithName:@"t"];
         [t addRow:nil]; /* Adding an empty row */
         return YES;
     } error:nil];
@@ -328,7 +328,7 @@ TIGHTDB_TABLE_2(SharedTable2,
     }
     {   // add something to the db to play with
         [context1 writeUsingBlock:^BOOL(TDBTransaction *transaction) {
-            TDBTable *t1 = [transaction createTableWithName:@"test"];
+            RLMTable *t1 = [transaction createTableWithName:@"test"];
             [t1 addColumnWithName:@"col0" type:TDBBoolType];
             [t1 addRow:@[@YES]];
             //t1->add(0, 2, false, "test");
@@ -339,13 +339,13 @@ TIGHTDB_TABLE_2(SharedTable2,
         BOOL changed = [context2 pinReadTransactions];
         XCTAssertTrue(changed, @"");
         [context2 readUsingBlock:^(TDBTransaction *transaction) {
-            TDBTable *t = [transaction tableWithName:@"test"];
+            RLMTable *t = [transaction tableWithName:@"test"];
             XCTAssertEqual([[t rowAtIndex:0] boolInColumnWithIndex:0], YES, @"");
         }];
     }
     {   // commit new data in another context, without unpinning
         [context1 writeUsingBlock:^BOOL(TDBTransaction *transaction) {
-            TDBTable *t = [transaction tableWithName:@"test"];
+            RLMTable *t = [transaction tableWithName:@"test"];
             [t addRow:@[@NO]];
             return YES;
         } error:nil];
@@ -353,14 +353,14 @@ TIGHTDB_TABLE_2(SharedTable2,
     }
     {   // validate that we can see previous commit if we're not pinned
         [context1 readUsingBlock:^(TDBTransaction *transaction) {
-            TDBTable *t = [transaction tableWithName:@"test"];
+            RLMTable *t = [transaction tableWithName:@"test"];
             XCTAssertEqual([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, @"");
         }];
         
     }
      {   // validate that we can NOT see previous commit from within a pinned transaction
         [context2 readUsingBlock:^(TDBTransaction *transaction) {
-            TDBTable *t = [transaction tableWithName:@"test"];
+            RLMTable *t = [transaction tableWithName:@"test"];
             XCTAssertEqual(t.rowCount, (NSUInteger)1, @"Still only 1 row");
         }];
         
@@ -370,7 +370,7 @@ TIGHTDB_TABLE_2(SharedTable2,
         BOOL changed = [context2 pinReadTransactions];
         XCTAssertTrue(changed, @"changes since last transaction");
         [context2 readUsingBlock:^(TDBTransaction *transaction) {
-            TDBTable *t = [transaction tableWithName:@"test"];
+            RLMTable *t = [transaction tableWithName:@"test"];
             XCTAssertEqual(t.rowCount, (NSUInteger)2, @"Now we see 2 rows");
             XCTAssertEqual([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, @"");
         }];

@@ -28,7 +28,7 @@
 -(void)setDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setMixed:(id)aMixed inColumnWithIndex:(NSUInteger)colIndex;
--(void)setTable:(TDBTable *)aTable inColumnWithIndex:(NSUInteger)colIndex;
+-(void)setTable:(RLMTable *)aTable inColumnWithIndex:(NSUInteger)colIndex;
 
 -(int64_t)intInColumnWithIndex:(NSUInteger)colIndex;
 -(NSString *)stringInColumnWithIndex:(NSUInteger)colIndex;
@@ -38,6 +38,6 @@
 -(NSDate *)dateInColumnWithIndex:(NSUInteger)colIndex;
 -(NSData *)binaryInColumnWithIndex:(NSUInteger)colIndex;
 -(id)mixedInColumnWithIndex:(NSUInteger)colIndex;
--(TDBTable *)tableInColumnWithIndex:(NSUInteger)colIndex;
+-(RLMTable *)tableInColumnWithIndex:(NSUInteger)colIndex;
 
 @end

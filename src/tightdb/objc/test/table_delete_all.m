@@ -5,7 +5,7 @@
 
 #import <XCTest/XCTest.h>
 
-#import <tightdb/objc/TDBTable.h>
+#import <tightdb/objc/RLMTable.h>
 #import <tightdb/objc/RLMDescriptor.h>
 #import <tightdb/objc/PrivateTDB.h>
 
@@ -16,7 +16,7 @@
 -(void)testTableDeleteAll
 {
     // Create table with all column types
-    TDBTable* table = [[TDBTable alloc] init];
+    RLMTable * table = [[RLMTable alloc] init];
     RLMDescriptor * desc = [table descriptor];
     [desc addColumnWithName:@"int" type:TDBIntType];
     [desc addColumnWithName:@"bool" type:TDBBoolType];
@@ -67,7 +67,7 @@
 
         // Add sub-tables
         if (i == 2) {
-            TDBTable* subtable = [table TDB_tableInColumnWithIndex:8 atRowIndex:i];
+            RLMTable * subtable = [table TDB_tableInColumnWithIndex:8 atRowIndex:i];
             [subtable TDB_insertInt:0 ndx:0 value:42];
             [subtable TDB_insertString:1 ndx:0 value:@"meaning"];
             [subtable TDB_insertDone];
