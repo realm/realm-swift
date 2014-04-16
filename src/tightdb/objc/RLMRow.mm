@@ -20,7 +20,7 @@
 
 #include <tightdb/table.hpp>
 
-#import "TDBRow.h"
+#import "RLMRow.h"
 #import "TDBTable_noinst.h"
 #import "PrivateTDB.h"
 #import "TDBRowFast.h"
@@ -31,11 +31,11 @@ using namespace std;
 
 // TODO: Concept for row invalidation (when table updates).
 
-@interface TDBRow()
+@interface RLMRow ()
 @property (nonatomic, weak) TDBTable *table;
 @property (nonatomic) NSUInteger ndx;
 @end
-@implementation TDBRow
+@implementation RLMRow
 @synthesize table = _table;
 @synthesize ndx = _ndx;
 
@@ -62,7 +62,7 @@ using namespace std;
 -(void)dealloc
 {
 #ifdef TIGHTDB_DEBUG
-    // NSLog(@"TDBRow dealloc");
+    // NSLog(@"RLMRow dealloc");
 #endif
     _table = nil;
 }
@@ -195,11 +195,11 @@ using namespace std;
 
 @implementation TDBAccessor
 {
-    __weak TDBRow *_row;
+    __weak RLMRow *_row;
     size_t _columnId;
 }
 
--(id)initWithRow:(TDBRow *)row columnId:(NSUInteger)columnId
+-(id)initWithRow:(RLMRow *)row columnId:(NSUInteger)columnId
 {
     self = [super init];
     if (self) {

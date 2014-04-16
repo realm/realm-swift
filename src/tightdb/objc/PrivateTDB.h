@@ -21,7 +21,7 @@
 #import "TDBTable.h"
 #import "TDBView.h"
 #import "TDBContext.h"
-#import "TDBRow.h"
+#import "RLMRow.h"
 
 
 /**
@@ -98,7 +98,7 @@
  * The selectors in this interface is not meant to be used directly.
  * However, they are public so that the typed table macros can use them.
  */
-@interface TDBRow (Private)
+@interface RLMRow (Private)
 -(id)initWithTable:(TDBTable *)table ndx:(NSUInteger)ndx;
 -(void)TDB_setNdx:(NSUInteger)ndx;
 -(NSUInteger)TDB_index;

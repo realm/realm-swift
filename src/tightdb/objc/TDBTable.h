@@ -25,7 +25,7 @@
 @class TDBView;
 @class RLMQuery;
 @class RLMDescriptor;
-@class TDBRow;
+@class RLMRow;
 
 
 @interface TDBTable: NSObject <TDBView,NSFastEnumeration>
@@ -48,11 +48,11 @@
 -(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
 // Getting individual rows
--(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
--(TDBRow *)firstRow;
--(TDBRow *)lastRow;
+-(RLMRow *)rowAtIndex:(NSUInteger)rowIndex;
+-(RLMRow *)firstRow;
+-(RLMRow *)lastRow;
 // Getting and setting individual rows with object subscripting
--(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
+-(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
 
 // Add a row at the end of the table.
@@ -73,7 +73,7 @@
 -(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
 
 // Predicate queries
--(TDBRow *)find:(id)condition;
+-(RLMRow *)find:(id)condition;
 -(TDBView *)where:(id)condition;
 -(TDBView *)where:(id)condition orderBy:(id)order;
 

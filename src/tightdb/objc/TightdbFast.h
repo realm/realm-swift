@@ -19,5 +19,5 @@
  **************************************************************************/
 
 #import <tightdb/objc/Tightdb.h>
-#import <tightdb/objc/TDBRowFast.h>
+#import "RLMRowFast.h"
 

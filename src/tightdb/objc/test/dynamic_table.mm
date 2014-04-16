@@ -65,7 +65,7 @@ using namespace std;
     //[table set:0 ndx:ndx value:0];
     //[table set:1 ndx:ndx value:10];
 
-    TDBRow* row = [table addEmptyRow];
+    RLMRow * row = [table addEmptyRow];
     size_t ndx = [row TDB_index];
     [row setInt:0 inColumnWithIndex:0];
     [row setInt:10 inColumnWithIndex:1];
@@ -79,7 +79,7 @@ using namespace std;
 {
     TDBTable *t = [[TDBTable alloc] init];
     NSUInteger stringColIndex = [t addColumnWithName:@"stringCol" type:TDBStringType];
-    TDBRow *row = [t addEmptyRow];
+    RLMRow *row = [t addEmptyRow];
     [row setString:@"val" inColumnWithIndex:stringColIndex];
 }
 
@@ -943,7 +943,7 @@ using namespace std;
     TDBTable* subtab2 = [[TDBTable alloc] init];
     [subtab2 addColumnWithName:@"TableCol_IntCol" type:TDBIntType];
 
-    TDBRow* cursor;
+    RLMRow * cursor;
     cursor = [subtab1 addEmptyRow];
     [cursor setInt:200 inColumnWithIndex:0];
 
@@ -952,7 +952,7 @@ using namespace std;
 
     NSNumber *mixInt1   = [NSNumber numberWithInt:1];
 
-    TDBRow* c;
+    RLMRow * c;
     c = [table addEmptyRow];
     [c setBool:    NO        inColumnWithIndex:BoolCol];
     [c setInt:     54        inColumnWithIndex:IntCol];
@@ -976,8 +976,8 @@ using namespace std;
     [c setTable:   subtab2   inColumnWithIndex:TableCol];
     [c setMixed:   subtab2   inColumnWithIndex:MixedCol];
 
-    TDBRow* row1 = [table rowAtIndex:0];
-    TDBRow* row2 = [table rowAtIndex:1];
+    RLMRow * row1 = [table rowAtIndex:0];
+    RLMRow * row2 = [table rowAtIndex:1];
     
 
     XCTAssertEqual([row1 boolInColumnWithIndex:BoolCol], NO, @"row1.BoolCol");
@@ -1025,7 +1025,7 @@ using namespace std;
     [table addColumnWithName:@"first" type:TDBIntType];
     [table addColumnWithName:@"second" type:TDBStringType];
 
-    TDBRow* row;
+    RLMRow * row;
 
     // Add some rows
     row = [table addEmptyRow];
@@ -1073,7 +1073,7 @@ using namespace std;
     [table addColumnWithName:@"first" type:TDBIntType];
     [table addColumnWithName:@"second" type:TDBStringType];
 
-    TDBRow* row;
+    RLMRow * row;
 
     // Add some rows
     row = [table addEmptyRow];
@@ -1127,7 +1127,7 @@ using namespace std;
     [table addRow:@[@2, @"World", @2.7182f, @2.7182, @NO, [NSDate dateWithTimeIntervalSince1970:2], [NSData dataWithBytes:bin4 length:4]]];
     [table addRow:@[@3, @"Hello World", @1.0f, @1.0, @NO, [NSDate dateWithTimeIntervalSince1970:3], [NSData dataWithBytes:bin4 length:4]]];
 
-    TDBRow* col = table[1];
+    RLMRow * col = table[1];
     col[0] = @4;
     col[1] = @"Universe";
     col[2] = @4.6692f;
@@ -1296,7 +1296,7 @@ using namespace std;
     XCTAssertThrows([t find:@1], @"Invalid condition");
 
     // Searching with no condition just finds first row
-    TDBRow *r = [t find:nil];
+    RLMRow *r = [t find:nil];
     XCTAssertEqualObjects(r[@"name"], @"name0", @"first row");
 
     // Search with predicate string

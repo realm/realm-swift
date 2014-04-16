@@ -39,7 +39,7 @@ directiveStartToken = %
  **************************************************************************/
 
 #import "TDBTable.h"
-#import "TDBRow.h"
+#import "RLMRow.h"
 #import "RLMDescriptor.h"
 #import "RLMQuery.h"
 #import "TDBView.h"
@@ -56,7 +56,7 @@ directiveStartToken = %
 , CName${j+1}, CType${j+1}%slurp
 %end for
 ) \
-@interface TableName##Row: TDBRow \
+@interface TableName##Row: RLMRow \
 %for $j in range($num_cols)
 TIGHTDB_ROW_PROPERTY_DEF(CName${j+1}, CType${j+1}) \
 %end for
@@ -271,7 +271,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
     [super insertRow:nil atIndex:ndx]; \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self ndx:0]; \
 } \
@@ -312,7 +312,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 { \
     TableName##Row* tmpRow; \
 } \
--(TDBRow*)getRow \
+-(RLMRow*)getRow \
 { \
     return tmpRow = [[TableName##Row alloc] initWithTable:self.originTable ndx:[self rowIndexInOriginTableForRowAtIndex:0]]; \
 } \

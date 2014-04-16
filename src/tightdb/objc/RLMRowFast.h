@@ -18,7 +18,7 @@
  *
  **************************************************************************/
 
-@interface TDBRow (Fast)
+@interface RLMRow (Fast)
 
 -(void)setInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(void)setString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex;

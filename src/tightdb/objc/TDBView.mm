@@ -27,7 +27,7 @@
 #include <tightdb/lang_bind_helper.hpp>
 
 #import "TDBTable_noinst.h"
-#import "TDBRow.h"
+#import "RLMRow.h"
 #import "TDBView_noinst.h"
 #import "RLMQuery_noinst.h"
 #import "PrivateTDB.h"
@@ -38,7 +38,7 @@
 {
     tightdb::util::UniquePtr<tightdb::TableView> m_view;
     TDBTable* m_table;
-    TDBRow* m_tmp_row;
+    RLMRow * m_tmp_row;
     BOOL m_read_only;
 }
 
@@ -79,7 +79,7 @@
     m_table = nil; // FIXME: What is the point of doing this?
 }
 
--(TDBRow *)objectAtIndexedSubscript:(NSUInteger)ndx
+-(RLMRow *)objectAtIndexedSubscript:(NSUInteger)ndx
 {
     // The cursor constructor checks the index is in bounds. However, getSourceIndex should
     // not be called with illegal index.
@@ -87,10 +87,10 @@
     if (ndx >= self.rowCount)
         return nil;
 
-    return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
+    return [[RLMRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
 }
 
--(TDBRow*)rowAtIndex:(NSUInteger)ndx
+-(RLMRow *)rowAtIndex:(NSUInteger)ndx
 {
     // The cursor constructor checks the index is in bounds. However, getSourceIndex should
     // not be called with illegal index.
@@ -98,23 +98,23 @@
     if (ndx >= self.rowCount)
         return nil;
 
-    return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
+    return [[RLMRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
 }
 
--(TDBRow *)firstRow
+-(RLMRow *)firstRow
 {
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:0]];
+    return [[RLMRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:0]];
 }
 
--(TDBRow *)lastRow
+-(RLMRow *)lastRow
 {
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[TDBRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1]];
+    return [[RLMRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1]];
 }
 
 -(NSUInteger)rowCount
@@ -228,9 +228,9 @@
     return m_view->get_source_ndx(rowIndex);
 }
 
--(TDBRow*)getRow
+-(RLMRow *)getRow
 {
-    return m_tmp_row = [[TDBRow alloc] initWithTable: m_table
+    return m_tmp_row = [[RLMRow alloc] initWithTable: m_table
                                                  ndx: m_view->get_source_ndx(0)];
 }
 
@@ -240,11 +240,11 @@
     if(state->state == 0) {
         const unsigned long* ptr = static_cast<const unsigned long*>(objc_unretainedPointer(self));
         state->mutationsPtr = const_cast<unsigned long*>(ptr); // FIXME: This casting away of constness seems dangerous. Is it?
-        TDBRow* tmp = [self getRow];
+        RLMRow * tmp = [self getRow];
         *stackbuf = tmp;
     }
     if (state->state < self.rowCount) {
-        [((TDBRow*)*stackbuf) TDB_setNdx:[self rowIndexInOriginTableForRowAtIndex:state->state]];
+        [((RLMRow *)*stackbuf) TDB_setNdx:[self rowIndexInOriginTableForRowAtIndex:state->state]];
         state->itemsPtr = stackbuf;
         state->state++;
     }

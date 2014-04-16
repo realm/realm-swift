@@ -20,7 +20,7 @@
 
 #include "TDBType.h"
 
-@class TDBRow;
+@class RLMRow;
 @class RLMQuery;
 
 
@@ -30,10 +30,10 @@
 @property (nonatomic, readonly) NSUInteger columnCount;
 
 // Getting and setting individual rows
--(TDBRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
--(TDBRow *)rowAtIndex:(NSUInteger)rowIndex;
--(TDBRow *)lastRow;
--(TDBRow *)firstRow;
+-(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
+-(RLMRow *)rowAtIndex:(NSUInteger)rowIndex;
+-(RLMRow *)lastRow;
+-(RLMRow *)firstRow;
 
 // Working with columns
 -(TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;

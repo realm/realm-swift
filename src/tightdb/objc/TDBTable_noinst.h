@@ -42,8 +42,8 @@
 -(BOOL)_addColumns;
 
 
--(TDBRow *)addEmptyRow;
--(TDBRow *)insertEmptyRowAtIndex:(NSUInteger)rowIndex;
+-(RLMRow *)addEmptyRow;
+-(RLMRow *)insertEmptyRowAtIndex:(NSUInteger)rowIndex;
 
 /* Aggregate functions */
 /* FIXME: Consider adding:

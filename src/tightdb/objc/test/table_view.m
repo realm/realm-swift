@@ -99,7 +99,7 @@
     NSUInteger intCol = [t addColumnWithName:@"intCol" type:TDBIntType];
     
     [t addRow:nil];
-    TDBRow *row = [t lastRow];
+    RLMRow *row = [t lastRow];
     [row setInt:2 inColumnWithIndex:intCol];
     
     [t addRow:nil];
@@ -143,7 +143,7 @@
     NSUInteger boolCol = [t addColumnWithName:@"boolCol" type:TDBBoolType];
 
     [t addRow:nil];
-    TDBRow *row = [t lastRow];
+    RLMRow *row = [t lastRow];
     [row setBool:YES inColumnWithIndex:boolCol];
 
     [t addRow:nil];
@@ -196,7 +196,7 @@
     NSDate *dateLast    = [formatter dateFromString:@"03/01/2014 10:10 PM"];
     
     [t addRow:nil];
-    TDBRow *row = [t lastRow];
+    RLMRow *row = [t lastRow];
     [row setDate:dateLast inColumnWithIndex:dateCol];
     
     [t addRow:nil];
