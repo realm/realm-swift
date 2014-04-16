@@ -218,7 +218,7 @@ void throw_objc_exception(exception &ex)
                 [table setNativeTable:const_cast<Table*>(table_2.get())];
             }
 
-            [_notificationCenter postNotificationName:TDBContextDidChangeNotification object:self];
+            [_notificationCenter postNotificationName:RLMContextDidChangeNotification object:self];
         }
     }
     catch (exception &ex) {
