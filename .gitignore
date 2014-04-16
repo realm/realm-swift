@@ -31,6 +31,9 @@ examples/tutorial
 /Tightdb.framework
 tightdb-ios-*.zip
 
+# AppCode specific files
+.idea/
+*.iml
 
 
 
