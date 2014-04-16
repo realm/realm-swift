@@ -5,7 +5,7 @@ test_DEPS = .
 nobase_subinclude_HEADERS = RLMConstants.h RLMType.h RLMRow.h RLMTransaction.h RLMQuery.h \
 RLMTable.h RLMContext.h TDBSmartContext.h PrivateHelperMacros.h PrivateTableMacros.h PrivateTDB.h \
 Tightdb.h RLMVersion.h RLMDescriptor.h RLMView.h TDBColumnProxy.h RLMViewProtocol.h \
-TightdbFast.h RLMRowFast.h
+RLMFast.h RLMRowFast.h
 
 nobase_subinclude_HEADERS_EXTRA_UNINSTALL = *.h
 
