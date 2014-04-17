@@ -1,5 +1,5 @@
 /* @@Example: ex_objc_tableview_typed_intro @@ */
-#import <Tightdb/Realm.h>
+#import <Realm/Realm.h>
 #import "people.h"
 
 /*

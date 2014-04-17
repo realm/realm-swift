@@ -1,5 +1,5 @@
 /* @@Example: ex_objc_query_dynamic_intro @@ */
-#import <Tightdb/Realm.h>
+#import <Realm/Realm.h>
 
 void ex_objc_query_dynamic_intro()
 {

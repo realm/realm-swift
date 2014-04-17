@@ -1,5 +1,5 @@
 /* @@Example: not_used @@ */
-#import <Tightdb/Realm.h>
+#import <Realm/Realm.h>
 
 /* Defines a new table with two columns Name and Age. 
  * This table definition triggers a macro defining the classes
