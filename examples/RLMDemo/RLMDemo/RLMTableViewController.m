@@ -9,6 +9,8 @@
 #import "RLMTableViewController.h"
 #import <Tightdb/Tightdb.h>
 
+TIGHTDB_TABLE_1(RLMTitles, title, String)
+
 static NSString * const kCellID      = @"cell";
 static NSString * const kTableName   = @"table";
 static NSString * const kTitleColumn = @"title";
@@ -49,8 +51,7 @@ static NSString * const kTitleColumn = @"title";
     
     [self.writeContext writeUsingBlock:^BOOL(TDBTransaction *transaction) {
         if (transaction.tableCount == 0) {
-            TDBTable *table = [transaction createTableWithName:kTableName];
-            [table addColumnWithName:kTitleColumn type:TDBStringType];
+            [transaction createTableWithName:kTableName asTableClass:[RLMTitles class]];
         }
         return YES;
     } error:&error];
