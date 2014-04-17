@@ -61,7 +61,7 @@ using namespace std;
     self = [super init];
     if (self) {
         m_table = table;
-        TIGHTDB_EXCEPTION_ERRHANDLER(
+        REALM_EXCEPTION_ERRHANDLER(
             m_query.reset(new tightdb::Query([table getNativeTable].where()));,
             nil);
     }
@@ -112,7 +112,7 @@ using namespace std;
 
 -(void)dealloc
 {
-#ifdef TIGHTDB_DEBUG
+#ifdef REALM_DEBUG
     // NSLog(@"RLMQuery dealloc");
 #endif
 }
@@ -129,17 +129,17 @@ using namespace std;
 
 -(RLMQuery *)group
 {
-    TIGHTDB_EXCEPTION_ERRHANDLER_EX(m_query->group();, self, &m_error);
+    REALM_EXCEPTION_ERRHANDLER_EX(m_query->group();, self, &m_error);
     return self;
 }
 -(RLMQuery *)Or
 {
-    TIGHTDB_EXCEPTION_ERRHANDLER_EX(m_query->Or();, self, &m_error);
+    REALM_EXCEPTION_ERRHANDLER_EX(m_query->Or();, self, &m_error);
     return self;
 }
 -(RLMQuery *)endGroup
 {
-    TIGHTDB_EXCEPTION_ERRHANDLER_EX(m_query->end_group();, self, &m_error);
+    REALM_EXCEPTION_ERRHANDLER_EX(m_query->end_group();, self, &m_error);
     return self;
 }
 -(RLMQuery *)subtableInColumnWithIndex:(NSUInteger)column
@@ -618,7 +618,7 @@ using namespace std;
 
 -(RLMQuery *)columnIsEqualTo:(int64_t)value
 {
-    TIGHTDB_EXCEPTION_ERRHANDLER_EX(
+    REALM_EXCEPTION_ERRHANDLER_EX(
         [_query getNativeQuery].equal(_column_ndx, value);,
         _query, &_query->m_error);
     return _query;
@@ -626,7 +626,7 @@ using namespace std;
 
 -(RLMQuery *)columnIsNotEqualTo:(int64_t)value
 {
-    TIGHTDB_EXCEPTION_ERRHANDLER_EX(
+    REALM_EXCEPTION_ERRHANDLER_EX(
         [_query getNativeQuery].not_equal(_column_ndx, value);,
         _query, &_query->m_error);
     return _query;
@@ -634,7 +634,7 @@ using namespace std;
 
 -(RLMQuery *)columnIsGreaterThan:(int64_t)value
 {
-    TIGHTDB_EXCEPTION_ERRHANDLER_EX(
+    REALM_EXCEPTION_ERRHANDLER_EX(
         [_query getNativeQuery].greater(_column_ndx, value);,
         _query, &_query->m_error);
     return _query;
@@ -642,7 +642,7 @@ using namespace std;
 
 -(RLMQuery *)columnIsGreaterThanOrEqualTo:(int64_t)value
 {
-    TIGHTDB_EXCEPTION_ERRHANDLER_EX(
+    REALM_EXCEPTION_ERRHANDLER_EX(
         [_query getNativeQuery].greater_equal(_column_ndx, value);,
         _query, &_query->m_error);
     return _query;
@@ -650,7 +650,7 @@ using namespace std;
 
 -(RLMQuery *)columnIsLessThan:(int64_t)value
 {
-    TIGHTDB_EXCEPTION_ERRHANDLER_EX(
+    REALM_EXCEPTION_ERRHANDLER_EX(
         [_query getNativeQuery].less(_column_ndx, value);,
         _query, &_query->m_error);
     return _query;
@@ -658,7 +658,7 @@ using namespace std;
 
 -(RLMQuery *)columnIsLessThanOrEqualTo:(int64_t)value
 {
-    TIGHTDB_EXCEPTION_ERRHANDLER_EX(
+    REALM_EXCEPTION_ERRHANDLER_EX(
         [_query getNativeQuery].less_equal(_column_ndx, value);,
         _query, &_query->m_error);
     return _query;
@@ -666,7 +666,7 @@ using namespace std;
 
 -(RLMQuery *)columnIsBetween:(int64_t)from :(int64_t)to
 {
-    TIGHTDB_EXCEPTION_ERRHANDLER_EX(
+    REALM_EXCEPTION_ERRHANDLER_EX(
         [_query getNativeQuery].between(_column_ndx, from, to);,
         _query, &_query->m_error);
     return _query;

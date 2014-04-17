@@ -93,7 +93,7 @@ NSString *const defaultContextFileName = @"default.tightdb";
 
 -(void)dealloc
 {
-#ifdef TIGHTDB_DEBUG
+#ifdef REALM_DEBUG
     // NSLog(@"TDBSharedGroup dealloc");
 #endif
 }

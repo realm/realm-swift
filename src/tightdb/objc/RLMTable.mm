@@ -269,7 +269,7 @@ using namespace std;
         return NO;
     }
     
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->insert_empty_row(ndx);, 0);
+    REALM_EXCEPTION_ERRHANDLER(m_table->insert_empty_row(ndx);, 0);
     return YES;
 }
 
@@ -554,49 +554,49 @@ using namespace std;
 
 -(void)RLM_setBool:(BOOL)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
-    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+    REALM_EXCEPTION_HANDLER_SETTERS(
         m_table->set_bool(col_ndx, row_ndx, value);,
     RLMTypeBool);
 }
 
 -(void)RLM_setInt:(int64_t)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
-    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+    REALM_EXCEPTION_HANDLER_SETTERS(
         m_table->set_int(col_ndx, row_ndx, value);,
         RLMTypeInt);
 }
 
 -(void)RLM_setFloat:(float)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
-    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+    REALM_EXCEPTION_HANDLER_SETTERS(
         m_table->set_float(col_ndx, row_ndx, value);,
         RLMTypeFloat);
 }
 
 -(void)RLM_setDouble:(double)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
-    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+    REALM_EXCEPTION_HANDLER_SETTERS(
         m_table->set_double(col_ndx, row_ndx, value);,
         RLMTypeDouble);
 }
 
 -(void)RLM_setString:(NSString *)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
-    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+    REALM_EXCEPTION_HANDLER_SETTERS(
         m_table->set_string(col_ndx, row_ndx, ObjcStringAccessor(value));,
         RLMTypeString);
 }
 
 -(void)RLM_setBinary:(NSData *)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
-    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+    REALM_EXCEPTION_HANDLER_SETTERS(
         m_table->set_binary(col_ndx, row_ndx, ((NSData *)value).rlmBinaryData);,
         RLMTypeBinary);
 }
 
 -(void)RLM_setDate:(NSDate *)value inColumnWithIndex:(NSUInteger)col_ndx atRowIndex:(NSUInteger)row_ndx
 {
-    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+    REALM_EXCEPTION_HANDLER_SETTERS(
        m_table->set_datetime(col_ndx, row_ndx, tightdb::DateTime((time_t)[value timeIntervalSince1970]));,
        RLMTypeDate);
 }
@@ -606,7 +606,7 @@ using namespace std;
     // TODO: Use core method for checking the equality of two table specs. Even in the typed interface
     // the user might add columns (_checkType for typed and spec against spec for dynamic).
 
-    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+    REALM_EXCEPTION_HANDLER_SETTERS(
         m_table->set_subtable(col_ndx, row_ndx, &[value getNativeTable]);,
         RLMTypeTable);
 }
@@ -616,7 +616,7 @@ using namespace std;
     tightdb::Mixed mixed;
     to_mixed(value, mixed);
     RLMTable * subtable = mixed.get_type() == tightdb::type_Table ? (RLMTable *)value : nil;
-    TIGHTDB_EXCEPTION_HANDLER_SETTERS(
+    REALM_EXCEPTION_HANDLER_SETTERS(
         if (subtable) {
             tightdb::LangBindHelper::set_mixed_subtable(*m_table, col_ndx, row_ndx,
                                                         [subtable getNativeTable]);
@@ -644,7 +644,7 @@ using namespace std;
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->insert_bool(col_ndx, ndx, value);, NO);
+    REALM_EXCEPTION_ERRHANDLER(m_table->insert_bool(col_ndx, ndx, value);, NO);
     return YES;
 }
 
@@ -665,7 +665,7 @@ using namespace std;
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->insert_int(col_ndx, ndx, value);, NO);
+    REALM_EXCEPTION_ERRHANDLER(m_table->insert_int(col_ndx, ndx, value);, NO);
     return YES;
 }
 
@@ -685,7 +685,7 @@ using namespace std;
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->insert_float(col_ndx, ndx, value);, NO);
+    REALM_EXCEPTION_ERRHANDLER(m_table->insert_float(col_ndx, ndx, value);, NO);
     return YES;
 }
 
@@ -705,7 +705,7 @@ using namespace std;
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->insert_double(col_ndx, ndx, value);, NO);
+    REALM_EXCEPTION_ERRHANDLER(m_table->insert_double(col_ndx, ndx, value);, NO);
     return YES;
 }
 
@@ -725,7 +725,7 @@ using namespace std;
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
+    REALM_EXCEPTION_ERRHANDLER(
         m_table->insert_string(col_ndx, ndx, ObjcStringAccessor(value));,
         NO);
     return YES;
@@ -749,7 +749,7 @@ using namespace std;
     }
     const void *data = [(NSData *)value bytes];
     tightdb::BinaryData bd(static_cast<const char *>(data), [(NSData *)value length]);
-    TIGHTDB_EXCEPTION_ERRHANDLER(
+    REALM_EXCEPTION_ERRHANDLER(
         m_table->insert_binary(col_ndx, ndx, bd);,
         NO);
     return YES;
@@ -771,7 +771,7 @@ using namespace std;
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
+    REALM_EXCEPTION_ERRHANDLER(
         m_table->insert_binary(col_ndx, ndx, tightdb::BinaryData(data, size));,
         NO);
     return YES;
@@ -793,7 +793,7 @@ using namespace std;
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->insert_datetime(col_ndx, ndx, [value timeIntervalSince1970]);, NO);
+    REALM_EXCEPTION_ERRHANDLER(m_table->insert_datetime(col_ndx, ndx, [value timeIntervalSince1970]);, NO);
     return YES;
 }
 
@@ -805,7 +805,7 @@ using namespace std;
 -(BOOL)RLM_insertDoneWithError:(NSError* __autoreleasing*)error
 {
     // FIXME: This method should probably not take an error argument.
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->insert_done();, NO);
+    REALM_EXCEPTION_ERRHANDLER(m_table->insert_done();, NO);
     return YES;
 }
 
@@ -828,7 +828,7 @@ using namespace std;
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->insert_subtable(col_ndx, row_ndx);, NO);
+    REALM_EXCEPTION_ERRHANDLER(m_table->insert_subtable(col_ndx, row_ndx);, NO);
     return YES;
 }
 
@@ -849,7 +849,7 @@ using namespace std;
             *error = make_tightdb_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
+    REALM_EXCEPTION_ERRHANDLER(
         tightdb::LangBindHelper::insert_subtable(*m_table, col_ndx, row_ndx, [subtable getNativeTable]);,
         NO);
     return YES;
@@ -883,7 +883,7 @@ using namespace std;
     else {
         to_mixed(value, mixed);
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
+    REALM_EXCEPTION_ERRHANDLER(
         if (subtable) {
             tightdb::LangBindHelper::insert_mixed_subtable(*m_table, col_ndx, row_ndx,
                                                            [subtable getNativeTable]);
@@ -903,21 +903,21 @@ using namespace std;
 
 -(NSUInteger)addColumnWithType:(RLMType)type andName:(NSString*)name error:(NSError* __autoreleasing*)error
 {
-    TIGHTDB_EXCEPTION_ERRHANDLER(
+    REALM_EXCEPTION_ERRHANDLER(
         return m_table->add_column(tightdb::DataType(type), ObjcStringAccessor(name));,
         0);
 }
 
 -(void)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString *)newName
 {
-    TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colIndex);
+    REALM_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colIndex);
     m_table->rename_column(colIndex, ObjcStringAccessor(newName));
 }
 
 
 -(void)removeColumnWithIndex:(NSUInteger)columnIndex
 {
-    TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(columnIndex);
+    REALM_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(columnIndex);
     
     try {
         m_table->remove_column(columnIndex);
@@ -1387,7 +1387,7 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 
 -(BOOL)optimizeWithError:(NSError* __autoreleasing*)error
 {
-    TIGHTDB_EXCEPTION_ERRHANDLER(m_table->optimize();, NO);
+    REALM_EXCEPTION_ERRHANDLER(m_table->optimize();, NO);
     return YES;
 }
 

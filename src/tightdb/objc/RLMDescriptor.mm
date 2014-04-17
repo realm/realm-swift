@@ -58,7 +58,7 @@
             *error = make_tightdb_error(tdb_err_FailRdOnly, @"Tried to add column while read only");
         return NO;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
+    REALM_EXCEPTION_ERRHANDLER(
                                  m_desc->add_column(tightdb::DataType(type), ObjcStringAccessor(name));,
                                  NO);
     return YES;
@@ -76,7 +76,7 @@
             *error = make_tightdb_error(tdb_err_FailRdOnly, @"Tried to add column while read only");
         return nil;
     }
-    TIGHTDB_EXCEPTION_ERRHANDLER(
+    REALM_EXCEPTION_ERRHANDLER(
                                  tightdb::DescriptorRef subdesc;
                                  m_desc->add_column(tightdb::type_Table, ObjcStringAccessor(name), &subdesc);
                                  return [RLMDescriptor descWithDesc:subdesc.get() readOnly:FALSE error:error];,
@@ -90,7 +90,7 @@
 
 -(RLMDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)col_ndx error:(NSError* __autoreleasing*)error
 {
-    TIGHTDB_EXCEPTION_ERRHANDLER(
+    REALM_EXCEPTION_ERRHANDLER(
                                  tightdb::DescriptorRef subdesc = m_desc->get_subdescriptor(col_ndx);
                                  return [RLMDescriptor descWithDesc:subdesc.get() readOnly:m_read_only error:error];,
                                  nil);
@@ -118,7 +118,7 @@
 
 -(void)dealloc
 {
-#ifdef TIGHTDB_DEBUG
+#ifdef REALM_DEBUG
     // NSLog(@"RLMDescriptor dealloc");
 #endif
 }

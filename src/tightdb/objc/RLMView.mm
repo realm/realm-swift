@@ -73,7 +73,7 @@
 
 -(void)dealloc
 {
-#ifdef TIGHTDB_DEBUG
+#ifdef REALM_DEBUG
     // NSLog(@"RLMView dealloc");
 #endif
     m_table = nil; // FIXME: What is the point of doing this?
@@ -129,7 +129,7 @@
 
 -(RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colNdx
 {
-    TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colNdx);
+    REALM_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colNdx);
     return RLMType(m_view->get_column_type(colNdx));
 }
 
