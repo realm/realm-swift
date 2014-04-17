@@ -342,7 +342,7 @@ EOF
         ;;
 
     "get-version")
-	version_file="src/tightdb/objc/TDBVersion.h"
+	version_file="src/tightdb/objc/RLMVersion.h"
 	tightdb_version_major="$(grep TDB_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
 	tightdb_version_minor="$(grep TDB_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
 	tightdb_version_patch="$(grep TDB_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
@@ -449,16 +449,16 @@ EOF
 	    exit 0
 	fi
 	tightdb_version="$(sh build.sh get-version)"
-	FRAMEWORK=Tightdb.framework
-	rm -rf "$FRAMEWORK" tightdb-ios*.zip || exit 1
+	FRAMEWORK=Realm.framework
+	rm -rf "$FRAMEWORK" realm-ios*.zip || exit 1
 	mkdir -p "$FRAMEWORK/Headers" || exit 1
-	cp iphone-lib/libtightdb-objc-ios.a "$FRAMEWORK/Tightdb" || exit 1
+	cp iphone-lib/libtightdb-objc-ios.a "$FRAMEWORK/Realm" || exit 1
 	cp iphone-lib/include/tightdb/objc/*.h "$FRAMEWORK/Headers" || exit 1
-	(cd "$FRAMEWORK/Headers" && mv tightdb.h Tightdb.h) || exit 1
+	(cd "$FRAMEWORK/Headers" && mv realm.h Realm.h) || exit 1
 	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/import <tightdb\/objc\/\(.*\)>/import "\1"/g' {} \; || exit 1
 	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/include <tightdb\/objc\/\(.*\)>/include "\1"/g' {} \; || exit 1
-	zip -r -q tightdb-ios-$tightdb_version.zip $FRAMEWORK || exit 1
-	echo "Framwork for iOS can be found in tightdb-ios-$tightdb_version.zip"
+	zip -r -q realm-ios-$tightdb_version.zip $FRAMEWORK || exit 1
+	echo "Framework for iOS can be found in realm-ios-$tightdb_version.zip"
 	exit 0
 	;;
 
