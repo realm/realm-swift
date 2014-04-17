@@ -22,7 +22,7 @@
 
 #import "RLMRow.h"
 #import "RLMTable_noinst.h"
-#import "PrivateTDB.h"
+#import "PrivateRLM.h"
 #import "RLMRowFast.h"
 #import "util_noinst.hpp"
 

@@ -10,7 +10,7 @@
 #import <tightdb/objc/Realm.h>
 #import <tightdb/objc/RLMTransaction.h>
 #import <tightdb/objc/group.h>
-#import <tightdb/objc/PrivateTDB.h>
+#import <tightdb/objc/PrivateRLM.h>
 
 TIGHTDB_TABLE_DEF_4(MyTable,
                     Name,  String,

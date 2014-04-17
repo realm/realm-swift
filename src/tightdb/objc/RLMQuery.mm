@@ -29,7 +29,7 @@
 #import "RLMView_noinst.h"
 #import "RLMRow.h"
 #import "NSData+RLMGetBinaryData.h"
-#import "PrivateTDB.h"
+#import "PrivateRLM.h"
 #import "util_noinst.hpp"
 
 using namespace std;

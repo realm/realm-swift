@@ -105,7 +105,7 @@
 		4D143CED18F7E8C200CEFF65 /* RLMSmartContext.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMSmartContext.mm; path = ../src/tightdb/objc/RLMSmartContext.mm; sourceTree = SOURCE_ROOT; };
 		4D143CF118F7E97500CEFF65 /* RLMConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMConstants.h; path = ../src/tightdb/objc/RLMConstants.h; sourceTree = SOURCE_ROOT; };
 		4D143CF218F7E97500CEFF65 /* RLMConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMConstants.m; path = ../src/tightdb/objc/RLMConstants.m; sourceTree = SOURCE_ROOT; };
-		4D1ED30618E198AD003CFF44 /* PrivateTDB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PrivateTDB.h; path = ../src/tightdb/objc/PrivateTDB.h; sourceTree = SOURCE_ROOT; };
+		4D1ED30618E198AD003CFF44 /* PrivateRLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PrivateRLM.h; path = ../src/tightdb/objc/PrivateRLM.h; sourceTree = SOURCE_ROOT; };
 		4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PrivateTableMacros.h; path = ../src/tightdb/objc/PrivateTableMacros.h; sourceTree = SOURCE_ROOT; };
 		4D1ED30A18E1B6E8003CFF44 /* group.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = group.h; path = ../src/tightdb/objc/group.h; sourceTree = SOURCE_ROOT; };
 		4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = dynamic_table.mm; path = ../../src/tightdb/objc/test/dynamic_table.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -237,7 +237,7 @@
 				E91890CC177B67AB00653D7A /* PrivateHelperMacros.h */,
 				4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */,
 				4D143CBC18ED5FCF00CEFF65 /* PrivateTableMacros.h.cheetah */,
-				4D1ED30618E198AD003CFF44 /* PrivateTDB.h */,
+				4D1ED30618E198AD003CFF44 /* PrivateRLM.h */,
 				424EEF9D18D9C10100337A13 /* RLMColumnProxy.h */,
 				424EEFB118D9C97900337A13 /* RLMColumnProxy.mm */,
 				4D143CF118F7E97500CEFF65 /* RLMConstants.h */,

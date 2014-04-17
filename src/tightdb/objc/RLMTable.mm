@@ -33,7 +33,7 @@
 #import "RLMDescriptor_noinst.h"
 #import "RLMColumnProxy.h"
 #import "NSData+RLMGetBinaryData.h"
-#import "PrivateTDB.h"
+#import "PrivateRLM.h"
 #import "RLMSmartContext_noinst.h"
 #import "util_noinst.hpp"
 

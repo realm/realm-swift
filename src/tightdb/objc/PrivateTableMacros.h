@@ -34,7 +34,7 @@
 #import "RLMQuery.h"
 #import "RLMView.h"
 #import "RLMColumnProxy.h"
-#import "PrivateTDB.h"
+#import "PrivateRLM.h"
 #import "PrivateHelperMacros.h"
 
 
