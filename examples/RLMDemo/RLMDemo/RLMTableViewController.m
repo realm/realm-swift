@@ -86,6 +86,7 @@ static NSString * const kTitleColumn = @"title";
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         NSError *error = nil;
+        
         [self.writeContext writeTable:kTableName usingBlock:^BOOL(TDBTable *table) {
             [table removeRowAtIndex:indexPath.row];
             return YES;
@@ -102,11 +103,8 @@ static NSString * const kTitleColumn = @"title";
 - (void)add {
     NSError *error = nil;
     
-    __block NSUInteger rowCount = 0;
-    
     [self.writeContext writeTable:kTableName usingBlock:^BOOL(TDBTable *table) {
-        rowCount = table.rowCount;
-        [table addRow:[RLMTableViewController rowDictWithCount:rowCount]];
+        [table addRow:[RLMTableViewController rowDictWithCount:table.rowCount]];
         return YES;
     } error:&error];
     
