@@ -21,6 +21,7 @@
 #include <exception>
 
 #include <tightdb/util/unique_ptr.hpp>
+#include <tightdb/util/thread.hpp>
 #include <tightdb/group_shared.hpp>
 // FIXME: this is absolutely no-go:
 #include </Users/test/tightdb/src/tightdb/replication.hpp>
@@ -120,6 +121,7 @@ public:
     // The registry takes ownership of the buffer data.
     void add_commit(version_type version, char* data, std::size_t sz)
     {
+        util::LockGuard lock(m_mutex);
         // we assume that commits are entered in version order.
         TIGHTDB_ASSERT(m_newest_version == 0 || version == 1 + m_newest_version);
         if (m_newest_version == 0) {
@@ -138,6 +140,7 @@ public:
     // Register an interest in commits following version 'from'
     void register_interest(version_type from)
     {
+        util::LockGuard lock(m_mutex);
         // from is assumed to be within the range of commits already registered
         size_t idx = from + 1 - m_array_start;
         while (idx < m_interest_counts.size()) {
@@ -150,6 +153,7 @@ public:
     // version 'from'.
     void unregister_interest(version_type from)
     {
+        util::LockGuard lock(m_mutex);
         // from is assumed to be within the range of commits already registered
         size_t idx = from + 1 - m_array_start;
         while (idx < m_interest_counts.size()) {
@@ -166,6 +170,7 @@ public:
     // buffers remains with the WriteLogRegistry.
     CommitEntry* get_commit_entries(version_type from, version_type to)
     {
+        util::LockGuard lock(m_mutex);
         CommitEntry* entries = new CommitEntry[ to - from ];
         for (size_t idx = 0; idx < to - from; idx++) {
             entries[idx] = m_commits[ idx + 1 + from - m_array_start];
@@ -177,6 +182,7 @@ public:
     // This also unregisters interest in the same version range.
     void release_commit_entries(version_type from, version_type to)
     {
+        util::LockGuard lock(m_mutex);
         for (size_t idx = 0; idx < to - from; idx++) {
             m_interest_counts[ idx + 1 + from - m_array_start ] -= 1;
         }
@@ -184,7 +190,7 @@ public:
     }
 private:
     // cleanup and release unreferenced buffers. Buffers might be big, so
-    // we release them asap.
+    // we release them asap. Only to be called under lock.
     void cleanup()
     {
         size_t idx = m_last_forgotten_version - m_array_start + 1;
@@ -217,6 +223,7 @@ private:
     version_type m_array_start;
     version_type m_last_forgotten_version;
     version_type m_newest_version;
+    util::Mutex m_mutex;
 };
 
 class WriteLogCollector : public Replication
