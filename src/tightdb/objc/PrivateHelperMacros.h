@@ -143,8 +143,8 @@
 #define TIGHTDB_COLUMN_INSERT(table, col, row, value, type)                TIGHTDB_COLUMN_INSERT_2(TIGHTDB_IS_SUBTABLE(type), table, col, row, value, type)
 #define TIGHTDB_COLUMN_INSERT_2(is_subtable, table, col, row, value, type) TIGHTDB_COLUMN_INSERT_3(is_subtable, table, col, row, value, type)
 #define TIGHTDB_COLUMN_INSERT_3(is_subtable, table, col, row, value, type) TIGHTDB_COLUMN_INSERT_4_##is_subtable(table, col, row, value, type)
-#define TIGHTDB_COLUMN_INSERT_4_Y(table, col, _row, value, type)           [table TDB_insertSubtableCopy:col row:_row subtable:value]
-#define TIGHTDB_COLUMN_INSERT_4_N(table, col, row, _value, type)           [table TDB_insert##type:col ndx:row value:_value]
+#define TIGHTDB_COLUMN_INSERT_4_Y(table, col, _row, value, type)           [table RLM_insertSubtableCopy:col row:_row subtable:value]
+#define TIGHTDB_COLUMN_INSERT_4_N(table, col, row, _value, type)           [table RLM_insert##type:col ndx:row value:_value]
 
 
 

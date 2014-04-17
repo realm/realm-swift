@@ -51,11 +51,11 @@ using namespace std;
     }
     return self;
 }
--(NSUInteger)TDB_index
+-(NSUInteger)RLM_index
 {
     return _ndx;
 }
--(void)TDB_setNdx:(NSUInteger)ndx
+-(void)RLM_setNdx:(NSUInteger)ndx
 {
     _ndx = ndx;
 }
@@ -101,93 +101,93 @@ using namespace std;
 /* Getters */
 -(int64_t)intInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDB_intInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table RLM_intInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(NSString *)stringInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDB_stringInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table RLM_stringInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(NSData *)binaryInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDB_binaryInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table RLM_binaryInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(BOOL)boolInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDB_boolInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table RLM_boolInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(float)floatInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDB_floatInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table RLM_floatInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(double)doubleInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDB_doubleInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table RLM_doubleInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(NSDate *)dateInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDB_dateInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table RLM_dateInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(RLMTable *)tableInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDB_tableInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table RLM_tableInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(id)mixedInColumnWithIndex:(NSUInteger)colNdx
 {
-    return [_table TDB_mixedInColumnWithIndex:colNdx atRowIndex:_ndx];
+    return [_table RLM_mixedInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 /* Setters */
 -(void)setInt:(int64_t)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDB_setInt:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table RLM_setInt:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setString:(NSString *)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDB_setString:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table RLM_setString:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setBinary:(NSData *)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDB_setBinary:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table RLM_setBinary:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setBool:(BOOL)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDB_setBool:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table RLM_setBool:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setFloat:(float)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDB_setFloat:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table RLM_setFloat:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setDouble:(double)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDB_setDouble:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table RLM_setDouble:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setDate:(NSDate *)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDB_setDate:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table RLM_setDate:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setTable:(RLMTable *)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDB_setTable:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table RLM_setTable:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 -(void)setMixed:(id)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    [_table TDB_setMixed:value inColumnWithIndex:colNdx atRowIndex:_ndx];
+    [_table RLM_setMixed:value inColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
 @end
@@ -211,62 +211,62 @@ using namespace std;
 
 -(BOOL)getBool
 {
-    return [_row.table TDB_boolInColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    return [_row.table RLM_boolInColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(void)setBool:(BOOL)value
 {
-    [_row.table TDB_setBool:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    [_row.table RLM_setBool:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(int64_t)getInt
 {
-    return [_row.table TDB_intInColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    return [_row.table RLM_intInColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(void)setInt:(int64_t)value
 {
-    [_row.table TDB_setInt:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    [_row.table RLM_setInt:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(float)getFloat
 {
-    return [_row.table TDB_floatInColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    return [_row.table RLM_floatInColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(void)setFloat:(float)value
 {
-    [_row.table TDB_setFloat:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    [_row.table RLM_setFloat:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(double)getDouble
 {
-    return [_row.table TDB_doubleInColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    return [_row.table RLM_doubleInColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(void)setDouble:(double)value
 {
-    [_row.table TDB_setDouble:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    [_row.table RLM_setDouble:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(NSString *)getString
 {
-    return [_row.table TDB_stringInColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    return [_row.table RLM_stringInColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(void)setString:(NSString *)value
 {
-    [_row.table TDB_setString:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    [_row.table RLM_setString:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(NSData *)getBinary
 {
-    return [_row.table TDB_binaryInColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    return [_row.table RLM_binaryInColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(void)setBinary:(NSData *)value
 {
-    [_row.table TDB_setBinary:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    [_row.table RLM_setBinary:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 // FIXME: should it be setBinaryWithBuffer / setBinaryWithBinary ?
 // -(BOOL)setBinary:(const char *)data size:(size_t)size
@@ -276,32 +276,32 @@ using namespace std;
 
 -(NSDate *)getDate
 {
-    return [_row.table TDB_dateInColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    return [_row.table RLM_dateInColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(void)setDate:(NSDate *)value
 {
-    [_row.table TDB_setDate:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    [_row.table RLM_setDate:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(id)getSubtable:(Class)obj
 {
-    return [_row.table TDB_tableInColumnWithIndex:_columnId atRowIndex:_row.ndx asTableClass:obj];
+    return [_row.table RLM_tableInColumnWithIndex:_columnId atRowIndex:_row.ndx asTableClass:obj];
 }
 
 -(void)setSubtable:(RLMTable *)value
 {
-    [_row.table TDB_setTable:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    [_row.table RLM_setTable:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(id)getMixed
 {
-    return [_row.table TDB_mixedInColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    return [_row.table RLM_mixedInColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 -(void)setMixed:(id)value
 {
-    [_row.table TDB_setMixed:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
+    [_row.table RLM_setMixed:value inColumnWithIndex:_columnId atRowIndex:_row.ndx];
 }
 
 @end

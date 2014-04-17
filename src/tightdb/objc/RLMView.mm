@@ -157,27 +157,27 @@
     }
 }
 
--(BOOL)TDB_boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(BOOL)RLM_boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
     return m_view->get_bool(colIndex, rowIndex);
 }
--(NSDate *)TDB_dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(NSDate *)RLM_dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
     return [NSDate dateWithTimeIntervalSince1970:m_view->get_datetime(colIndex, rowIndex).get_datetime()];
 }
--(double)TDB_doubleInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(double)RLM_doubleInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
     return m_view->get_double(colIndex, rowIndex);
 }
--(float)TDB_floatInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(float)RLM_floatInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
     return m_view->get_float(colIndex, rowIndex);
 }
--(int64_t)TDB_intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(int64_t)RLM_intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
     return m_view->get_int(colIndex, rowIndex);
 }
--(id)TDB_mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
+-(id)RLM_mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
 {
     tightdb::Mixed mixed = m_view->get_mixed(colNdx, rowIndex);
     if (mixed.get_type() != tightdb::type_Table)
@@ -197,7 +197,7 @@
     return table_2;
 }
 
--(NSString*)TDB_stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+-(NSString*)RLM_stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
 {
     return to_objc_string(m_view->get_string(colIndex, rowIndex));
 }
@@ -244,7 +244,7 @@
         *stackbuf = tmp;
     }
     if (state->state < self.rowCount) {
-        [((RLMRow *)*stackbuf) TDB_setNdx:[self rowIndexInOriginTableForRowAtIndex:state->state]];
+        [((RLMRow *) *stackbuf) RLM_setNdx:[self rowIndexInOriginTableForRowAtIndex:state->state]];
         state->itemsPtr = stackbuf;
         state->state++;
     }

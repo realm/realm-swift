@@ -66,13 +66,13 @@ using namespace std;
     //[table set:1 ndx:ndx value:10];
 
     RLMRow * row = [table addEmptyRow];
-    size_t ndx = [row TDB_index];
+    size_t ndx = [row RLM_index];
     [row setInt:0 inColumnWithIndex:0];
     [row setInt:10 inColumnWithIndex:1];
 
     // Verify
-    XCTAssertEqual((int64_t)0, ([table TDB_intInColumnWithIndex:0 atRowIndex:ndx]), @"First not zero");
-    XCTAssertEqual((int64_t)10, ([table TDB_intInColumnWithIndex:1 atRowIndex:ndx]), @"Second not 10");
+    XCTAssertEqual((int64_t)0, ([table RLM_intInColumnWithIndex:0 atRowIndex:ndx]), @"First not zero");
+    XCTAssertEqual((int64_t)10, ([table RLM_intInColumnWithIndex:1 atRowIndex:ndx]), @"Second not 10");
 }
 
 -(void)testAddColumn
@@ -92,8 +92,8 @@ using namespace std;
     XCTAssertEqual((size_t)1, [t rowCount], @"Expected 1 row");
     XCTAssertNoThrow([t addRow:@[ @2 ]], @"Impossible!");
     XCTAssertEqual((size_t)2, [t rowCount], @"Expected 2 rows");
-    XCTAssertEqual((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
-    XCTAssertEqual((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:1], @"Value 2 expected");
+    XCTAssertEqual((int64_t)1, [t RLM_intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
+    XCTAssertEqual((int64_t)2, [t RLM_intInColumnWithIndex:0 atRowIndex:1], @"Value 2 expected");
     XCTAssertThrows([t addRow:@[@"Hello"]], @"Wrong type");
     XCTAssertThrows(([t addRow:@[@1, @"Hello"]]), @"Wrong number of columns");
 }
@@ -107,8 +107,8 @@ using namespace std;
     XCTAssertEqual((size_t)1, [t rowCount], @"Expected 1 row");
     XCTAssertNoThrow([t insertRow:@[ @2 ] atIndex:0], @"Impossible!");
     XCTAssertEqual((size_t)2, [t rowCount], @"Expected 2 rows");
-    XCTAssertEqual((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:1], @"Value 1 expected");
-    XCTAssertEqual((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
+    XCTAssertEqual((int64_t)1, [t RLM_intInColumnWithIndex:0 atRowIndex:1], @"Value 1 expected");
+    XCTAssertEqual((int64_t)2, [t RLM_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
     XCTAssertThrows([t insertRow:@[@"Hello"] atIndex:0], @"Wrong type");
     XCTAssertThrows(([t insertRow:@[@1, @"Hello"] atIndex:0]), @"Wrong number of columns");
 }
@@ -119,7 +119,7 @@ using namespace std;
     [t addColumnWithName:@"first" type:RLMTypeInt];
     [t insertRow:@[@1] atIndex:0];
     t[0] = @[@2];
-    XCTAssertEqual((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
+    XCTAssertEqual((int64_t)2, [t RLM_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
 }
 
 -(void)testAppendRowGenericObject
@@ -150,7 +150,7 @@ using namespace std;
     [t addColumnWithName:@"first" type:RLMTypeInt];
     [t insertRow:@[@1] atIndex:0];
     t[0] = @{@"first": @2};
-    XCTAssertEqual((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
+    XCTAssertEqual((int64_t)2, [t RLM_intInColumnWithIndex:0 atRowIndex:0], @"Value 2 expected");
 }
 
 
@@ -166,8 +166,8 @@ using namespace std;
     XCTAssertNoThrow([t addRow:@{ @"first": @2 }], @"Impossible!");
     XCTAssertEqual((size_t)2, [t rowCount], @"Expected 2 rows");
 
-    XCTAssertEqual((int64_t)1, [t TDB_intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
-    XCTAssertEqual((int64_t)2, [t TDB_intInColumnWithIndex:0 atRowIndex:1], @"Value 2 expected");
+    XCTAssertEqual((int64_t)1, [t RLM_intInColumnWithIndex:0 atRowIndex:0], @"Value 1 expected");
+    XCTAssertEqual((int64_t)2, [t RLM_intInColumnWithIndex:0 atRowIndex:1], @"Value 2 expected");
     
     XCTAssertThrows([t addRow:@{ @"first": @"Hello" }], @"Wrong type");
     XCTAssertEqual((size_t)2, [t rowCount], @"Expected 2 rows");
@@ -178,7 +178,7 @@ using namespace std;
     XCTAssertNoThrow(([t addRow:@{ @"second": @1 }]), @"This is impossible");
     XCTAssertEqual((size_t)4, [t rowCount], @"Expected 4 rows");
 
-    XCTAssertEqual((int64_t)0, [t TDB_intInColumnWithIndex:0 atRowIndex:3], @"Value 0 expected");
+    XCTAssertEqual((int64_t)0, [t RLM_intInColumnWithIndex:0 atRowIndex:3], @"Value 0 expected");
 }
 
 -(void)testInsertRowWithLabelsIntColumn
@@ -193,8 +193,8 @@ using namespace std;
     XCTAssertNoThrow(([t insertRow:@{ @"first": @2 } atIndex:0]), @"Impossible!");
     XCTAssertEqual((size_t)2, [t rowCount], @"Expected 2 rows");
     
-    XCTAssertEqual((int64_t)1, ([t TDB_intInColumnWithIndex:0 atRowIndex:1]), @"Value 1 expected");
-    XCTAssertEqual((int64_t)2, ([t TDB_intInColumnWithIndex:0 atRowIndex:0]), @"Value 2 expected");
+    XCTAssertEqual((int64_t)1, ([t RLM_intInColumnWithIndex:0 atRowIndex:1]), @"Value 1 expected");
+    XCTAssertEqual((int64_t)2, ([t RLM_intInColumnWithIndex:0 atRowIndex:0]), @"Value 2 expected");
     
     XCTAssertThrows(([t insertRow:@{ @"first": @"Hello" } atIndex:0]), @"Wrong type");
     XCTAssertEqual((size_t)2, ([t rowCount]), @"Expected 2 rows");
@@ -204,7 +204,7 @@ using namespace std;
     
     XCTAssertNoThrow(([t insertRow:@{ @"second": @4 } atIndex:0]), @"This is impossible");
     XCTAssertEqual((size_t)4, [t rowCount], @"Expected 4 rows");
-    XCTAssertTrue((int64_t)0 == ([t TDB_intInColumnWithIndex:0 atRowIndex:0]), @"Value 0 expected");
+    XCTAssertTrue((int64_t)0 == ([t RLM_intInColumnWithIndex:0 atRowIndex:0]), @"Value 0 expected");
 }
 
 
@@ -216,8 +216,8 @@ using namespace std;
 
     XCTAssertNoThrow(([t addRow:@[@1, @"Hello"]]), @"addRow 1");
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
-    XCTAssertEqual((int64_t)1, ([t TDB_intInColumnWithIndex:0 atRowIndex:0]), @"Value 1 expected");
-    XCTAssertTrue(([[t TDB_stringInColumnWithIndex:1 atRowIndex:0] isEqualToString:@"Hello"]), @"Value 'Hello' expected");
+    XCTAssertEqual((int64_t)1, ([t RLM_intInColumnWithIndex:0 atRowIndex:0]), @"Value 1 expected");
+    XCTAssertTrue(([[t RLM_stringInColumnWithIndex:1 atRowIndex:0] isEqualToString:@"Hello"]), @"Value 'Hello' expected");
     XCTAssertThrows(([t addRow:@[@1, @2]]), @"addRow 2");
 }
 
@@ -229,8 +229,8 @@ using namespace std;
     [t addColumnWithName:@"second" type:RLMTypeString];
     XCTAssertNoThrow(([t addRow:@{@"first": @1, @"second": @"Hello"}]), @"addRowWithLabels 1");
     XCTAssertEqual((size_t)1, ([t rowCount]), @"1 row expected");
-    XCTAssertEqual((int64_t)1, ([t TDB_intInColumnWithIndex:0 atRowIndex:0]), @"Value 1 expected");
-    XCTAssertTrue(([[t TDB_stringInColumnWithIndex:1 atRowIndex:0] isEqualToString:@"Hello"]), @"Value 'Hello' expected");
+    XCTAssertEqual((int64_t)1, ([t RLM_intInColumnWithIndex:0 atRowIndex:0]), @"Value 1 expected");
+    XCTAssertTrue(([[t RLM_stringInColumnWithIndex:1 atRowIndex:0] isEqualToString:@"Hello"]), @"Value 'Hello' expected");
     XCTAssertThrows(([t addRow:@{@"first": @1, @"second": @2}]), @"addRowWithLabels 2");
 }
 

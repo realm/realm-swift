@@ -205,79 +205,79 @@ TIGHTDB_TABLE_9(TestQueryErrAllTypes,
 
     // Add some rows
     for (size_t i = 0; i < 15; ++i) {
-        if (![table TDB_insertInt:0 ndx:i value:i ]) {
+        if (![table RLM_insertInt:0 ndx:i value:i]) {
            // NSLog(@"%@", [error localizedDescription]);
             XCTFail(@"Insert failed.");
         }
-        if (![table TDB_insertBool:1 ndx:i value:(i % 2 ? YES : NO)  ]) {
+        if (![table RLM_insertBool:1 ndx:i value:(i % 2 ? YES : NO)]) {
             XCTFail(@"Insert failed.");
         }
-        if (![table TDB_insertDate:2 ndx:i value:[NSDate date] ]) {
+        if (![table RLM_insertDate:2 ndx:i value:[NSDate date]]) {
             XCTFail(@"Insert failed.");
         }
-        if (![table TDB_insertString:3 ndx:i value:[NSString stringWithFormat:@"string %zu", i] ]) {
+        if (![table RLM_insertString:3 ndx:i value:[NSString stringWithFormat:@"string %zu", i]]) {
             XCTFail(@"Insert failed.");
         }
-        if (![table TDB_insertString:4 ndx:i value:@" Very long string.............."  ]) {
+        if (![table RLM_insertString:4 ndx:i value:@" Very long string.............."]) {
             XCTFail(@"Insert failed.");
         }
 
         switch (i % 3) {
             case 0:
-                if (![table TDB_insertString:5 ndx:i value:@"test1" ]) {
+                if (![table RLM_insertString:5 ndx:i value:@"test1"]) {
                     XCTFail(@"Insert failed.");
                 }
                 break;
             case 1:
-                if (![table TDB_insertString:5 ndx:i value:@"test2" ]) {
+                if (![table RLM_insertString:5 ndx:i value:@"test2"]) {
                     XCTFail(@"Insert failed.");
                 }
                 break;
             case 2:
-                if (![table TDB_insertString:5 ndx:i value:@"test3" ]) {
+                if (![table RLM_insertString:5 ndx:i value:@"test3"]) {
                     XCTFail(@"Insert failed.");
                 }
                 break;
         }
 
-        if (![table TDB_insertBinary:6 ndx:i data:"binary" size:7 ]) {
+        if (![table RLM_insertBinary:6 ndx:i data:"binary" size:7]) {
             XCTFail(@"Insert failed.");
         }
         switch (i % 3) {
             case 0:
-               if (![table TDB_insertMixed:7 ndx:i value:[NSNumber numberWithBool:NO] ]) {
+               if (![table RLM_insertMixed:7 ndx:i value:[NSNumber numberWithBool:NO] ]) {
                     XCTFail(@"Insert failed.");
                 }
                 break;
             case 1:
-                if (![table TDB_insertMixed:7 ndx:i value:[NSNumber numberWithLongLong:i] ]) {
+                if (![table RLM_insertMixed:7 ndx:i value:[NSNumber numberWithLongLong:i] ]) {
                     XCTFail(@"Insert failed.");
                 }
                 break;
             case 2:
-                if (![table TDB_insertMixed:7 ndx:i value:[NSString stringWithUTF8String:"string"] ]) {
+                if (![table RLM_insertMixed:7 ndx:i value:[NSString stringWithUTF8String:"string"] ]) {
                     XCTFail(@"Insert failed.");
                 }
                 break;
         }
-        if (![table TDB_insertSubtable:8 ndx:i ]) {
+        if (![table RLM_insertSubtable:8 ndx:i]) {
             XCTFail(@"Insert failed.");
         }
 
-        if (![table TDB_insertDone ]) {
+        if (![table RLM_insertDone ]) {
             XCTFail(@"InsertDone failed.");
         }
 
         // Add sub-tables
         if (i == 2) {
-            RLMTable* subtable = [table TDB_tableInColumnWithIndex:8 atRowIndex:i];
-            if (![subtable TDB_insertInt:0 ndx:0 value:42 ]) {
+            RLMTable* subtable = [table RLM_tableInColumnWithIndex:8 atRowIndex:i];
+            if (![subtable RLM_insertInt:0 ndx:0 value:42]) {
                 XCTFail(@"Insert failed.");
             }
-            if (![subtable TDB_insertString:1 ndx:0 value:@"meaning" ]) {
+            if (![subtable RLM_insertString:1 ndx:0 value:@"meaning"]) {
                 XCTFail(@"Insert failed.");
             }
-            if (![subtable TDB_insertDone ]) {
+            if (![subtable RLM_insertDone ]) {
                 XCTFail(@"InsertDone failed.");
             }
         }

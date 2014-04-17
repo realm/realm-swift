@@ -166,33 +166,33 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     NSData *bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
     
     // Using private method just for the sake of testing the setters below.
-    [table TDB_addEmptyRows:2];
+    [table RLM_addEmptyRows:2];
     
-    [table TDB_setBool:YES inColumnWithIndex:BOOL_COL atRowIndex:0];
-    [table TDB_setBool:NO inColumnWithIndex:BOOL_COL atRowIndex:1];
+    [table RLM_setBool:YES inColumnWithIndex:BOOL_COL atRowIndex:0];
+    [table RLM_setBool:NO inColumnWithIndex:BOOL_COL atRowIndex:1];
     
-    [table TDB_setInt:0 inColumnWithIndex:INT_COL atRowIndex:0];
-    [table TDB_setInt:860 inColumnWithIndex:INT_COL atRowIndex:1];
+    [table RLM_setInt:0 inColumnWithIndex:INT_COL atRowIndex:0];
+    [table RLM_setInt:860 inColumnWithIndex:INT_COL atRowIndex:1];
     
-    [table TDB_setFloat:0 inColumnWithIndex:FLOAT_COL atRowIndex:0];
-    [table TDB_setFloat:5.6 inColumnWithIndex:FLOAT_COL atRowIndex:1];
+    [table RLM_setFloat:0 inColumnWithIndex:FLOAT_COL atRowIndex:0];
+    [table RLM_setFloat:5.6 inColumnWithIndex:FLOAT_COL atRowIndex:1];
     
-    [table TDB_setDouble:0 inColumnWithIndex:DOUBLE_COL atRowIndex:0];
-    [table TDB_setDouble:5.6 inColumnWithIndex:DOUBLE_COL atRowIndex:1];
+    [table RLM_setDouble:0 inColumnWithIndex:DOUBLE_COL atRowIndex:0];
+    [table RLM_setDouble:5.6 inColumnWithIndex:DOUBLE_COL atRowIndex:1];
     
-    [table TDB_setString:@"" inColumnWithIndex:STRING_COL atRowIndex:0];
-    [table TDB_setString:@"foo" inColumnWithIndex:STRING_COL atRowIndex:1];
+    [table RLM_setString:@"" inColumnWithIndex:STRING_COL atRowIndex:0];
+    [table RLM_setString:@"foo" inColumnWithIndex:STRING_COL atRowIndex:1];
     
-    [table TDB_setBinary:bin1 inColumnWithIndex:BINARY_COL atRowIndex:0];
-    [table TDB_setBinary:bin2 inColumnWithIndex:BINARY_COL atRowIndex:1];
+    [table RLM_setBinary:bin1 inColumnWithIndex:BINARY_COL atRowIndex:0];
+    [table RLM_setBinary:bin2 inColumnWithIndex:BINARY_COL atRowIndex:1];
     
     NSDate *date1 = [NSDate date];
     NSDate *date2 = [date1 dateByAddingTimeInterval:1];
-    [table TDB_setDate:date1 inColumnWithIndex:DATE_COL atRowIndex:0];
-    [table TDB_setDate:date2 inColumnWithIndex:DATE_COL atRowIndex:1];
+    [table RLM_setDate:date1 inColumnWithIndex:DATE_COL atRowIndex:0];
+    [table RLM_setDate:date2 inColumnWithIndex:DATE_COL atRowIndex:1];
     
-    [table TDB_setMixed:mixInt1 inColumnWithIndex:MIXED_COL atRowIndex:0];
-    [table TDB_setMixed:mixString inColumnWithIndex:MIXED_COL atRowIndex:1];
+    [table RLM_setMixed:mixInt1 inColumnWithIndex:MIXED_COL atRowIndex:0];
+    [table RLM_setMixed:mixString inColumnWithIndex:MIXED_COL atRowIndex:1];
     
     // Conditions (note that count is invoked to get the number of matches)
     
@@ -372,14 +372,14 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
 {
     RLMTable* table = [[RLMTable alloc]init];
     [table addColumnWithName:@"IntCol" type:RLMTypeInt];
-    [table TDB_addEmptyRows:6];
+    [table RLM_addEmptyRows:6];
 
-    [table TDB_setInt:10 inColumnWithIndex:0 atRowIndex:0];
-    [table TDB_setInt:42 inColumnWithIndex:0 atRowIndex:1];
-    [table TDB_setInt:27 inColumnWithIndex:0 atRowIndex:2];
-    [table TDB_setInt:31 inColumnWithIndex:0 atRowIndex:3];
-    [table TDB_setInt:8  inColumnWithIndex:0 atRowIndex:4];
-    [table TDB_setInt:39 inColumnWithIndex:0 atRowIndex:5];
+    [table RLM_setInt:10 inColumnWithIndex:0 atRowIndex:0];
+    [table RLM_setInt:42 inColumnWithIndex:0 atRowIndex:1];
+    [table RLM_setInt:27 inColumnWithIndex:0 atRowIndex:2];
+    [table RLM_setInt:31 inColumnWithIndex:0 atRowIndex:3];
+    [table RLM_setInt:8  inColumnWithIndex:0 atRowIndex:4];
+    [table RLM_setInt:39 inColumnWithIndex:0 atRowIndex:5];
     
     XCTAssertEqual((NSUInteger)1, [[[table where ] intIsGreaterThan:10 inColumnWithIndex:0 ] indexOfFirstMatchingRow], @"Row 1 is greater than 10");
     XCTAssertEqual(NSNotFound, [[[table where ] intIsGreaterThan:100 inColumnWithIndex:0 ] indexOfFirstMatchingRow], @"No rows are greater than 100");
@@ -407,9 +407,9 @@ TIGHTDB_TABLE_9(TestQueryAllTypes,
     [t addRow:nil];
     XCTAssertEqual(t.rowCount, (NSUInteger)1,@"one row added");
     
-    RLMTable * subTable = [t TDB_tableInColumnWithIndex:0 atRowIndex:0];
+    RLMTable * subTable = [t RLM_tableInColumnWithIndex:0 atRowIndex:0];
     [subTable addRow:nil];
-    [subTable TDB_setBool:YES inColumnWithIndex:0 atRowIndex:0];
+    [subTable RLM_setBool:YES inColumnWithIndex:0 atRowIndex:0];
     RLMQuery *q = [t where];
     
     RLMView *v = [[[[q subtableInColumnWithIndex:0] boolIsEqualTo:YES inColumnWithIndex:0] parent] findAllRows];
