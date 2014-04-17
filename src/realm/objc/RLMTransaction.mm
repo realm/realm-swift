@@ -39,7 +39,7 @@ using namespace std;
 
 -(void)dealloc
 {
-#ifdef TIGHTDB_DEBUG
+#ifdef REALM_DEBUG
     // NSLog(@"TightdbGroup dealloc");
 #endif
     if (m_is_owned)
