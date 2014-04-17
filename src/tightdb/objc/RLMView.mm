@@ -30,7 +30,7 @@
 #import "RLMRow.h"
 #import "RLMView_noinst.h"
 #import "RLMQuery_noinst.h"
-#import "PrivateTDB.h"
+#import "PrivateRLM.h"
 #import "util_noinst.hpp"
 
 

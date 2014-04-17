@@ -3,7 +3,7 @@ test_DEPS = .
 
 # Headers to be installed
 nobase_subinclude_HEADERS = RLMConstants.h RLMType.h RLMRow.h RLMTransaction.h RLMQuery.h \
-RLMTable.h RLMContext.h RLMSmartContext.h PrivateHelperMacros.h PrivateTableMacros.h PrivateTDB.h \
+RLMTable.h RLMContext.h RLMSmartContext.h PrivateHelperMacros.h PrivateTableMacros.h PrivateRLM.h \
 Realm.h RLMVersion.h RLMDescriptor.h RLMView.h RLMColumnProxy.h RLMViewProtocol.h \
 RLMFast.h RLMRowFast.h
 

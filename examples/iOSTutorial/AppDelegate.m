@@ -1,5 +1,5 @@
 #import "AppDelegate.h"
-#import <Tightdb/Tightdb.h>
+#import <Realm/Realm.h>
 
 
 // @@Example: create_table @@
@@ -119,11 +119,11 @@ void sharedGroupFunc() {
     [fileManager removeItemAtPath:@"people.tightdb" error:&error];
 
     // @@Example: transaction @@
-    TDBContext *context = [TDBContext contextPersistedAtPath:@"people.tightdb"
+    RLMContext *context = [RLMContext contextPersistedAtPath:@"people.tightdb"
                                                             error:nil];
 
     // Start a write transaction
-    [context writeUsingBlock:^(TDBTransaction *transaction) {
+    [context writeUsingBlock:^(RLMTransaction *transaction) {
         // Get a specific table from the group
         PeopleTable *table = [transaction createTableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];
@@ -135,7 +135,7 @@ void sharedGroupFunc() {
     } error:nil];
 
     // Start a read transaction
-    [context readUsingBlock:^(TDBTransaction *transaction) {
+    [context readUsingBlock:^(RLMTransaction *transaction) {
         // Get the table
         PeopleTable *table = [transaction tableWithName:@"employees"
                                                 asTableClass:[PeopleTable class]];

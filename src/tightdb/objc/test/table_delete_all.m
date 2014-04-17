@@ -7,7 +7,7 @@
 
 #import <tightdb/objc/RLMTable.h>
 #import <tightdb/objc/RLMDescriptor.h>
-#import <tightdb/objc/PrivateTDB.h>
+#import <tightdb/objc/PrivateRLM.h>
 
 @interface MACTestTableDeleteAll: XCTestCase
 @end

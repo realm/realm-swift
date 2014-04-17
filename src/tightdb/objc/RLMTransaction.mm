@@ -23,7 +23,7 @@
 
 #import "RLMTransaction_noinst.h"
 #import "RLMTable_noinst.h"
-#import "PrivateTDB.h"
+#import "PrivateRLM.h"
 #import "util_noinst.hpp"
 
 using namespace std;
