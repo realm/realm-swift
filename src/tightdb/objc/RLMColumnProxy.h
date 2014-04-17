@@ -23,18 +23,18 @@
 #import "RLMTable.h"
 
 
-@interface TDBColumnProxy: NSObject
+@interface RLMColumnProxy : NSObject
 @property(nonatomic, weak) RLMTable *table;
 @property(nonatomic) size_t column;
 -(id)initWithTable:(RLMTable *)table column:(NSUInteger)column;
 -(void)clear;
 @end
 
-@interface TDBColumnProxyBool: TDBColumnProxy
+@interface RLMColumnProxyBool : RLMColumnProxy
 -(NSUInteger)find:(BOOL)value;
 @end
 
-@interface TDBColumnProxyInt: TDBColumnProxy
+@interface RLMColumnProxyInt : RLMColumnProxy
 -(NSUInteger)find:(int64_t)value;
 -(int64_t)minimum;
 -(int64_t)maximum;
@@ -42,7 +42,7 @@
 -(double)average;
 @end
 
-@interface TDBColumnProxyFloat: TDBColumnProxy
+@interface RLMColumnProxyFloat : RLMColumnProxy
 -(NSUInteger)find:(float)value;
 -(float)minimum;
 -(float)maximum;
@@ -50,7 +50,7 @@
 -(double)average;
 @end
 
-@interface TDBColumnProxyDouble: TDBColumnProxy
+@interface RLMColumnProxyDouble : RLMColumnProxy
 -(NSUInteger)find:(double)value;
 -(double)minimum;
 -(double)maximum;
@@ -58,21 +58,21 @@
 -(double)average;
 @end
 
-@interface TDBColumnProxyString: TDBColumnProxy
+@interface RLMColumnProxyString : RLMColumnProxy
 -(NSUInteger)find:(NSString *)value;
 @end
 
-@interface TDBColumnProxyBinary: TDBColumnProxy
+@interface RLMColumnProxyBinary : RLMColumnProxy
 -(NSUInteger)find:(NSData *)value;
 @end
 
-@interface TDBColumnProxyDate: TDBColumnProxy
+@interface RLMColumnProxyDate : RLMColumnProxy
 -(NSUInteger)find:(NSDate *)value;
 @end
 
-@interface TDBColumnProxySubtable: TDBColumnProxy
+@interface RLMColumnProxySubtable : RLMColumnProxy
 @end
 
-@interface TDBColumnProxyMixed: TDBColumnProxy
+@interface RLMColumnProxyMixed : RLMColumnProxy
 -(NSUInteger)find:(id)value;
 @end

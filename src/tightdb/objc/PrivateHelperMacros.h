@@ -71,16 +71,16 @@
 #define TIGHTDB_COLUMN_PROXY_DEF(name, type)                 TIGHTDB_COLUMN_PROXY_DEF_2(TIGHTDB_IS_SUBTABLE(type), name, type)
 #define TIGHTDB_COLUMN_PROXY_DEF_2(is_subtable, name, type)  TIGHTDB_COLUMN_PROXY_DEF_3(is_subtable, name, type)
 #define TIGHTDB_COLUMN_PROXY_DEF_3(is_subtable, name, type)  TIGHTDB_COLUMN_PROXY_DEF_4_##is_subtable(name, type)
-#define TIGHTDB_COLUMN_PROXY_DEF_4_Y(name, type)             @property(nonatomic, strong) TDBColumnProxySubtable* name;
-#define TIGHTDB_COLUMN_PROXY_DEF_4_N(name, type)             @property(nonatomic, strong) TDBColumnProxy##type* name;
+#define TIGHTDB_COLUMN_PROXY_DEF_4_Y(name, type)             @property(nonatomic, strong) RLMColumnProxySubtable* name;
+#define TIGHTDB_COLUMN_PROXY_DEF_4_N(name, type)             @property(nonatomic, strong) RLMColumnProxy##type* name;
 
 #define TIGHTDB_COLUMN_PROXY_IMPL(name, type)                @synthesize name = _##name;
 
 #define TIGHTDB_COLUMN_PROXY_INIT(table, col, name, type)                TIGHTDB_COLUMN_PROXY_INIT_2(TIGHTDB_IS_SUBTABLE(type), table, col, name, type)
 #define TIGHTDB_COLUMN_PROXY_INIT_2(is_subtable, table, col, name, type) TIGHTDB_COLUMN_PROXY_INIT_3(is_subtable, table, col, name, type)
 #define TIGHTDB_COLUMN_PROXY_INIT_3(is_subtable, table, col, name, type) TIGHTDB_COLUMN_PROXY_INIT_4_##is_subtable(table, col, name, type)
-#define TIGHTDB_COLUMN_PROXY_INIT_4_Y(table, col, name, type)            _##name = [[TDBColumnProxySubtable alloc] initWithTable:table column:col]
-#define TIGHTDB_COLUMN_PROXY_INIT_4_N(table, col, name, type)            _##name = [[TDBColumnProxy##type alloc] initWithTable:table column:col]
+#define TIGHTDB_COLUMN_PROXY_INIT_4_Y(table, col, name, type)            _##name = [[RLMColumnProxySubtable alloc] initWithTable:table column:col]
+#define TIGHTDB_COLUMN_PROXY_INIT_4_N(table, col, name, type)            _##name = [[RLMColumnProxy##type alloc] initWithTable:table column:col]
 
 
 

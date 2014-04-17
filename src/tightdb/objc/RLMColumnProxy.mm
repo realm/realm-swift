@@ -21,10 +21,10 @@
 #import <Foundation/Foundation.h>
 
 #import "RLMTable_noinst.h"
-#import "TDBColumnProxy.h"
+#import "RLMColumnProxy.h"
 
 
-@implementation TDBColumnProxy
+@implementation RLMColumnProxy
 @synthesize table = _table, column = _column;
 -(id)initWithTable:(RLMTable*)table column:(NSUInteger)column
 {
@@ -41,14 +41,14 @@
 }
 @end
 
-@implementation TDBColumnProxyBool
+@implementation RLMColumnProxyBool
 -(NSUInteger)find:(BOOL)value
 {
     return [self.table findRowIndexWithBool:value inColumnWithIndex:self.column ];
 }
 @end
 
-@implementation TDBColumnProxyInt
+@implementation RLMColumnProxyInt
 -(NSUInteger)find:(int64_t)value
 {
     return [self.table findRowIndexWithInt:value inColumnWithIndex:self.column ];
@@ -71,7 +71,7 @@
 }
 @end
 
-@implementation TDBColumnProxyFloat
+@implementation RLMColumnProxyFloat
 -(NSUInteger)find:(float)value
 {
     return [self.table findRowIndexWithFloat:value inColumnWithIndex:self.column];
@@ -94,7 +94,7 @@
 }
 @end
 
-@implementation TDBColumnProxyDouble
+@implementation RLMColumnProxyDouble
 -(NSUInteger)find:(double)value
 {
     return [self.table findRowIndexWithDouble:value inColumnWithIndex:self.column];
@@ -117,31 +117,31 @@
 }
 @end
 
-@implementation TDBColumnProxyString
+@implementation RLMColumnProxyString
 -(NSUInteger)find:(NSString*)value
 {
     return [self.table findRowIndexWithString:value inColumnWithIndex:self.column];
 }
 @end
 
-@implementation TDBColumnProxyBinary
+@implementation RLMColumnProxyBinary
 -(NSUInteger)find:(NSData*)value
 {
     return [self.table findRowIndexWithBinary:value inColumnWithIndex:self.column];
 }
 @end
 
-@implementation TDBColumnProxyDate
+@implementation RLMColumnProxyDate
 -(NSUInteger)find:(NSDate *)value
 {
     return [self.table findRowIndexWithDate:value inColumnWithIndex:self.column];
 }
 @end
 
-@implementation TDBColumnProxySubtable
+@implementation RLMColumnProxySubtable
 @end
 
-@implementation TDBColumnProxyMixed
+@implementation RLMColumnProxyMixed
 -(NSUInteger)find:(id)value
 {
     return [self.table findRowIndexWithMixed:value inColumnWithIndex:self.column];

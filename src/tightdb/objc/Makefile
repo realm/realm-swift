@@ -4,7 +4,7 @@ test_DEPS = .
 # Headers to be installed
 nobase_subinclude_HEADERS = RLMConstants.h RLMType.h RLMRow.h RLMTransaction.h RLMQuery.h \
 RLMTable.h RLMContext.h RLMSmartContext.h PrivateHelperMacros.h PrivateTableMacros.h PrivateTDB.h \
-Realm.h RLMVersion.h RLMDescriptor.h RLMView.h TDBColumnProxy.h RLMViewProtocol.h \
+Realm.h RLMVersion.h RLMDescriptor.h RLMView.h RLMColumnProxy.h RLMViewProtocol.h \
 RLMFast.h RLMRowFast.h
 
 nobase_subinclude_HEADERS_EXTRA_UNINSTALL = *.h
@@ -13,7 +13,7 @@ lib_LIBRARIES = libtightdb-objc.a
 
 libtightdb_objc_a_SOURCES = RLMConstants.m RLMTable.mm RLMRow.mm RLMTransaction.mm RLMQuery.mm \
 RLMContext.mm RLMSmartContext.mm util.mm RLMVersion.mm RLMDescriptor.mm RLMView.mm \
-TDBColumnProxy.mm NSData+RLMGetBinaryData.mm
+RLMColumnProxy.mm NSData+RLMGetBinaryData.mm
 
 libtightdb_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2
 libtightdb_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa

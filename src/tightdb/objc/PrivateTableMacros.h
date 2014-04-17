@@ -33,7 +33,7 @@
 #import "RLMDescriptor.h"
 #import "RLMQuery.h"
 #import "RLMView.h"
-#import "TDBColumnProxy.h"
+#import "RLMColumnProxy.h"
 #import "PrivateTDB.h"
 #import "PrivateHelperMacros.h"
 
