@@ -356,7 +356,7 @@ EOF
 	    exit 1
 	fi
         tightdb_version="$1"
-        version_file="src/tightdb/objc/TDBVersion.h"
+        version_file="src/tightdb/objc/RLMVersion.h"
         tightdb_ver_major="$(echo "$tightdb_version" | cut -f1 -d.)" || exit 1
         tightdb_ver_minor="$(echo "$tightdb_version" | cut -f2 -d.)" || exit 1
         tightdb_ver_patch="$(echo "$tightdb_version" | cut -f3 -d.)" || exit 1
