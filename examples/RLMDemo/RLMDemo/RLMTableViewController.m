@@ -65,7 +65,11 @@ static NSString * const kTitleColumn = @"title";
     [self.tableView reloadData];
 }
 
-#pragma mark - Table view data source
+- (TDBTable *)table {
+    return [self.readContext tableWithName:kTableName];
+}
+
+#pragma mark - UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.table.rowCount;
@@ -104,23 +108,13 @@ static NSString * const kTitleColumn = @"title";
     NSError *error = nil;
     
     [self.writeContext writeTable:kTableName usingBlock:^BOOL(TDBTable *table) {
-        [table addRow:[RLMTableViewController rowDictWithCount:table.rowCount]];
+        [table addRow:@{kTitleColumn: [NSString stringWithFormat:@"Title %lu", (unsigned long)table.rowCount]}];
         return YES;
     } error:&error];
     
     if (error) {
         NSLog(@"Error adding a new row: %@", error.localizedDescription);
     }
-}
-
-#pragma mark - Helpers
-
-+ (NSDictionary *)rowDictWithCount:(NSUInteger)count {
-    return @{kTitleColumn: [NSString stringWithFormat:@"Title %lu", (unsigned long)count]};
-}
-
-- (TDBTable *)table {
-    return [self.readContext tableWithName:kTableName];
 }
 
 @end
