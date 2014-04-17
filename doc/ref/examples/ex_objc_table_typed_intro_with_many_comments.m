@@ -5,9 +5,9 @@
  * This table definition triggers a macro defining the classes
  * PeopleTable, PeopleTableQuery, PeopleTableRow and PeopleTableView.
  * The column types must be Realm types (refer to the constructor
- * TIGHTDB_TABLE_* in the documentation. */
+ * REALM_TABLE_* in the documentation. */
 
-TIGHTDB_TABLE_2(PersonTable,    // Name of Table
+REALM_TABLE_2(PersonTable,    // Name of Table
                 Name, String,   // First column with Strings
                 Age, Int)       // Second column with Integers
 
