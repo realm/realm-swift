@@ -52,6 +52,11 @@ using namespace std;
     return m_group->size();
 }
 
+-(BOOL)isEmpty // Overrides the property getter
+{
+    return self.tableCount == 0;
+}
+
 -(BOOL)hasTableWithName:(NSString*)name
 {
     return m_group->has_table(ObjcStringAccessor(name));
