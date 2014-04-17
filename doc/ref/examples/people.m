@@ -1,4 +1,4 @@
-#import <Tightdb/Realm.h>
+#import <Realm/Realm.h>
 #import "people.h"
 
 TIGHTDB_TABLE_IMPL_3(People,

@@ -1,6 +1,6 @@
 // @@Example: ex_objc_intro @@
 #import <Foundation/Foundation.h>
-#import <Tightdb/Realm.h>
+#import <Realm/Realm.h>
 #import "people.h"
 
 /*
