@@ -9,14 +9,14 @@
 #import "RLMTableViewController.h"
 #import <Tightdb/Tightdb.h>
 
-static NSString * const kCellID = @"cell";
-static NSString * const kTableName = @"table";
+static NSString * const kCellID      = @"cell";
+static NSString * const kTableName   = @"table";
 static NSString * const kTitleColumn = @"title";
 
 @interface RLMTableViewController ()
 
-@property (nonatomic, strong) TDBSmartContext *readContext;
-@property (nonatomic, strong) TDBContext *writeContext;
+@property (nonatomic, strong)   TDBSmartContext *readContext;
+@property (nonatomic, strong)   TDBContext *writeContext;
 @property (nonatomic, readonly) TDBTable *table;
 
 @end
@@ -40,6 +40,7 @@ static NSString * const kTitleColumn = @"title";
 #pragma mark - TightDB
 
 - (void)setupTightDB {
+    // Set up read/write contexts
     self.readContext = [TDBSmartContext contextWithPersistenceToFile:[TDBContext defaultPath]];
     self.writeContext = [TDBContext contextWithDefaultPersistence];
     
@@ -52,6 +53,16 @@ static NSString * const kTitleColumn = @"title";
             return YES;
         } error:&error];
     }
+    
+    // Observe TightDB Notifications
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(tightDBContextDidChange)
+                                                 name:TDBContextDidChangeNotification
+                                               object:nil];
+}
+
+- (void)tightDBContextDidChange {
+    [self.tableView reloadData];
 }
 
 #pragma mark - Table view data source
@@ -80,10 +91,8 @@ static NSString * const kTitleColumn = @"title";
             return YES;
         } error:&error];
         
-        if (!error) {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-            });
+        if (error) {
+            NSLog(@"Error adding a new row: %@", error.localizedDescription);
         }
     }
 }
@@ -103,11 +112,6 @@ static NSString * const kTitleColumn = @"title";
     
     if (error) {
         NSLog(@"Error adding a new row: %@", error.localizedDescription);
-    } else {
-        // Perform on next run loop
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:rowCount inSection:0]] withRowAnimation:UITableViewRowAnimationFade];
-        });
     }
 }
 
