@@ -132,6 +132,14 @@ void throw_objc_exception(exception &ex)
     if (!context)
         return nil;
 
+    // Start crash reporter if present
+    Class clsContext = NSClassFromString(@"TDBContext");
+    if (clsContext) {
+       if ([clsContext respondsToSelector:@selector(startCrashReporter)]) {
+          [clsContext performSelector:@selector(startCrashReporter)];
+       }
+    }
+
     context->_notificationCenter = notificationCenter;
 
     TightdbErr errorCode = tdb_err_Ok;
