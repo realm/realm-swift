@@ -23,6 +23,8 @@
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/util/thread.hpp>
 #include <tightdb/group_shared.hpp>
+#include <map>
+
 // FIXME: this is absolutely no-go:
 #include </Users/test/tightdb/src/tightdb/replication.hpp>
 
@@ -104,6 +106,32 @@ void throw_objc_exception(exception &ex)
 }
 
 @end
+
+class WriteLogRegistry;
+
+class RegistryRegistry {
+public:
+    WriteLogRegistry* get(std::string fname)
+    {
+        util::LockGuard lock(m_mutex);
+        return  m_registries.find(fname)->second;
+    };
+    void add(std::string fname, WriteLogRegistry* registry)
+    {
+        util::LockGuard lock(m_mutex);
+        m_registries[fname] = registry;
+    }
+    void remove(std::string fname)
+    {
+        util::LockGuard lock(m_mutex);
+        m_registries.erase(fname);
+    }
+private:
+    util::Mutex m_mutex;
+    std::map<std::string, WriteLogRegistry*> m_registries;
+};
+
+RegistryRegistry globalRegistry;
 
 // FIXME: To be moved to a separate file
 class WriteLogRegistry {
@@ -319,7 +347,7 @@ WriteLogCollector::WriteLogCollector(std::string database_name, WriteLogRegistry
     TightdbErr errorCode = tdb_err_Ok;
     NSString *errorMessage;
     // FIXME: Should not be created here, but passed in by ref or be a global singleton
-    context->_registry = new WriteLogRegistry;
+    context->_registry = globalRegistry.get(StringData(ObjcStringAccessor(path)));
     WriteLogCollector* collector = new WriteLogCollector(StringData(ObjcStringAccessor(path)), context->_registry);
     try {
         context->_sharedGroup.reset(new SharedGroup( *collector));
