@@ -67,25 +67,25 @@ NSString *const defaultContextFileName = @"default.tightdb";
     // TODO: capture this in a macro or function, group constructor uses the same pattern.
     catch (tightdb::util::File::PermissionDenied& ex) {
         if (error) // allow nil as the error argument
-            *error = make_tightdb_error(tdb_err_File_PermissionDenied, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_realm_error(tdb_err_File_PermissionDenied, [NSString stringWithUTF8String:ex.what()]);
         return nil;
 
     }
     catch (tightdb::util::File::Exists& ex) {
         if (error) // allow nil as the error argument
-            *error = make_tightdb_error(tdb_err_File_Exists, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_realm_error(tdb_err_File_Exists, [NSString stringWithUTF8String:ex.what()]);
         return nil;
 
     }
     catch (tightdb::util::File::AccessError& ex) {
         if (error) // allow nil as the error argument
-            *error = make_tightdb_error(tdb_err_File_AccessError, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_realm_error(tdb_err_File_AccessError, [NSString stringWithUTF8String:ex.what()]);
         return nil;
 
     }
     catch (std::exception& ex) {
         if (error) // allow nil as the error argument
-            *error = make_tightdb_error(tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_realm_error(tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
         return nil;
     }
     return shared_group;
@@ -178,7 +178,7 @@ NSString *const defaultContextFileName = @"default.tightdb";
     // was caused by a decision of the block to roll back.
 
     if (error) // allow nil as the error argument
-        *error = make_tightdb_error(tdb_err_Rollback, @"The block code requested a rollback");
+        *error = make_realm_error(tdb_err_Rollback, @"The block code requested a rollback");
 
     m_shared_group->rollback();
     return NO;

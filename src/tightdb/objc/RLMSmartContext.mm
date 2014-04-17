@@ -157,7 +157,7 @@ void throw_objc_exception(exception &ex)
     }
     if (errorCode != tdb_err_Ok) {
         if (error)
-            *error = make_tightdb_error(errorCode, errorMessage);
+            *error = make_realm_error(errorCode, errorMessage);
         return nil;
     }
 

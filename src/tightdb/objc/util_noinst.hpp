@@ -199,7 +199,7 @@ enum TightdbErr {
     tdb_err_TableNotFound         = 9
 };
 
-inline NSError* make_tightdb_error(TightdbErr code, NSString* desc)
+inline NSError* make_realm_error(TightdbErr code, NSString* desc)
 {
     NSMutableDictionary* details = [NSMutableDictionary dictionary];
     [details setValue:desc forKey:NSLocalizedDescriptionKey];
@@ -217,12 +217,12 @@ REALM_EXCEPTION_ERRHANDLER_EX(action, fail_return_value, error)
 try { action } \
 catch (tightdb::util::File::AccessError& ex) { \
     if (err_var) \
-        *err_var = make_tightdb_error(tdb_err_File_AccessError, [NSString stringWithUTF8String:ex.what()]); \
+        *err_var = make_realm_error(tdb_err_File_AccessError, [NSString stringWithUTF8String:ex.what()]); \
         return fail_return_value; \
 } \
 catch (std::exception& ex) { \
     if (err_var) \
-        *err_var = make_tightdb_error(tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]); \
+        *err_var = make_realm_error(tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]); \
         return fail_return_value; \
 }
 
