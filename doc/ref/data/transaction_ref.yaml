@@ -23,6 +23,14 @@ IGNORE     : []                   # List of method-ids to ignore
 CATEGORIES:
 - Table:
   METHODS:
+  - g_group_is_empty:
+      NAME     : "isEmpty"
+      SUMMARY  : "Checks if the transaction has any tables"
+      DESCR    : "Checks if the transaction has any tables. Returns <code>YES/NO</code>"
+      SIGNATURE: "- (BOOL)isEmpty"
+      RETURN:
+        TYPES  : BOOL
+        DESCR  : <code>YES</code> if there are no tables in the transaction, otherwise <code>NO</code>.
   - g_group_has_table:
       NAME     : "hasTableWithName:"
       SUMMARY  : *g_group_has_table_summary
