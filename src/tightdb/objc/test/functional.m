@@ -8,7 +8,7 @@
 #import <tightdb/objc/RLMFast.h>
 #import <tightdb/objc/RLMTable.h>
 
-TIGHTDB_TABLE_3(FuncPeopleTable,
+REALM_TABLE_3(FuncPeopleTable,
                 Name,  String,
                 Age,   Int,
                 Hired, Bool)

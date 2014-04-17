@@ -10,11 +10,11 @@
 #import <tightdb/objc/Realm.h>
 #import <tightdb/objc/group.h>
 
-TIGHTDB_TABLE_2(TestSubtableSub,
+REALM_TABLE_2(TestSubtableSub,
                 Name, String,
                 Age,  Int)
 
-TIGHTDB_TABLE_3(TestSubtableMain,
+REALM_TABLE_3(TestSubtableMain,
                 First,  String,
                 Sub,    TestSubtableSub,
                 Second, Int)

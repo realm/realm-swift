@@ -39,13 +39,13 @@
 
 
 
-#define TIGHTDB_TABLE_DEF_1(TableName, CName1, CType1) \
+#define REALM_TABLE_DEF_1(TableName, CName1, CType1) \
 @interface TableName##Row: RLMRow \
-TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
+REALM_ROW_PROPERTY_DEF(CName1, CType1) \
 @end \
 @class TableName##Query; \
 @class TableName##View; \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 @interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 -(TableName##Query*)group; \
@@ -56,9 +56,9 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 -(TableName##View*)findAll; \
 @end \
 @interface TableName: RLMTable \
-TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1; \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1; \
+REALM_COLUMN_PROXY_DEF(CName1, CType1) \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1; \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1; \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
@@ -70,20 +70,20 @@ TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_1(TableName, CName1, CType1) \
+#define REALM_TABLE_IMPL_1(TableName, CName1, CType1) \
 @implementation TableName##Row \
 { \
-    TDBAccessor* _##CName1; \
+    RLMAccessor* _##CName1; \
 } \
 -(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TDBAccessor alloc] initWithRow:self columnId:0]; \
+        _##CName1 = [[RLMAccessor alloc] initWithRow:self columnId:0]; \
     } \
     return self; \
 } \
-TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
+REALM_ROW_PROPERTY_IMPL(CName1, CType1) \
 @end \
 @implementation TableName##Query \
 { \
@@ -140,19 +140,19 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
     return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
 @implementation TableName \
 { \
     TableName##Row* tmpRow; \
 } \
-TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
+REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) \
         return nil; \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
     return self; \
 } \
 -(id)init \
@@ -163,18 +163,18 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
     if (![self _addColumns]) \
         return nil; \
 \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 \
 { \
     NSUInteger ndx = self.rowCount; \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     [self RLM_insertDone]; \
 } \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 \
 { \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     [self RLM_insertDone]; \
 } \
 -(TableName##Query*)where \
@@ -208,7 +208,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 } \
 +(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
+    REALM_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
     return YES; \
 } \
 -(BOOL)_checkType \
@@ -222,7 +222,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 } \
 +(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
+    REALM_ADD_COLUMN(desc, CName1, CType1) \
     return YES; \
 } \
 -(BOOL)_addColumns \
@@ -249,20 +249,20 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
 } \
 @end
 
-#define TIGHTDB_TABLE_1(TableName, CType1, CName1) \
-TIGHTDB_TABLE_DEF_1(TableName, CType1, CName1) \
-TIGHTDB_TABLE_IMPL_1(TableName, CType1, CName1)
+#define REALM_TABLE_1(TableName, CType1, CName1) \
+REALM_TABLE_DEF_1(TableName, CType1, CName1) \
+REALM_TABLE_IMPL_1(TableName, CType1, CName1)
 
 
-#define TIGHTDB_TABLE_DEF_2(TableName, CName1, CType1, CName2, CType2) \
+#define REALM_TABLE_DEF_2(TableName, CName1, CType1, CName2, CType2) \
 @interface TableName##Row: RLMRow \
-TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
+REALM_ROW_PROPERTY_DEF(CName1, CType1) \
+REALM_ROW_PROPERTY_DEF(CName2, CType2) \
 @end \
 @class TableName##Query; \
 @class TableName##View; \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 @interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
@@ -274,10 +274,10 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
 -(TableName##View*)findAll; \
 @end \
 @interface TableName: RLMTable \
-TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2; \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2; \
+REALM_COLUMN_PROXY_DEF(CName1, CType1) \
+REALM_COLUMN_PROXY_DEF(CName2, CType2) \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2; \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2; \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
@@ -289,23 +289,23 @@ TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_2(TableName, CName1, CType1, CName2, CType2) \
+#define REALM_TABLE_IMPL_2(TableName, CName1, CType1, CName2, CType2) \
 @implementation TableName##Row \
 { \
-    TDBAccessor* _##CName1; \
-    TDBAccessor* _##CName2; \
+    RLMAccessor* _##CName1; \
+    RLMAccessor* _##CName2; \
 } \
 -(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TDBAccessor alloc] initWithRow:self columnId:0]; \
-        _##CName2 = [[TDBAccessor alloc] initWithRow:self columnId:1]; \
+        _##CName1 = [[RLMAccessor alloc] initWithRow:self columnId:0]; \
+        _##CName2 = [[RLMAccessor alloc] initWithRow:self columnId:1]; \
     } \
     return self; \
 } \
-TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
+REALM_ROW_PROPERTY_IMPL(CName1, CType1) \
+REALM_ROW_PROPERTY_IMPL(CName2, CType2) \
 @end \
 @implementation TableName##Query \
 { \
@@ -364,22 +364,22 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
     return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
 @implementation TableName \
 { \
     TableName##Row* tmpRow; \
 } \
-TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
+REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
+REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) \
         return nil; \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
     return self; \
 } \
 -(id)init \
@@ -390,21 +390,21 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
     if (![self _addColumns]) \
         return nil; \
 \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 \
 { \
     NSUInteger ndx = self.rowCount; \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
     [self RLM_insertDone]; \
 } \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 \
 { \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
     [self RLM_insertDone]; \
 } \
 -(TableName##Query*)where \
@@ -438,8 +438,8 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 } \
 +(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
+    REALM_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
+    REALM_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
     return YES; \
 } \
 -(BOOL)_checkType \
@@ -453,8 +453,8 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 } \
 +(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
-    TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
+    REALM_ADD_COLUMN(desc, CName1, CType1) \
+    REALM_ADD_COLUMN(desc, CName2, CType2) \
     return YES; \
 } \
 -(BOOL)_addColumns \
@@ -481,22 +481,22 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
 } \
 @end
 
-#define TIGHTDB_TABLE_2(TableName, CType1, CName1, CType2, CName2) \
-TIGHTDB_TABLE_DEF_2(TableName, CType1, CName1, CType2, CName2) \
-TIGHTDB_TABLE_IMPL_2(TableName, CType1, CName1, CType2, CName2)
+#define REALM_TABLE_2(TableName, CType1, CName1, CType2, CName2) \
+REALM_TABLE_DEF_2(TableName, CType1, CName1, CType2, CName2) \
+REALM_TABLE_IMPL_2(TableName, CType1, CName1, CType2, CName2)
 
 
-#define TIGHTDB_TABLE_DEF_3(TableName, CName1, CType1, CName2, CType2, CName3, CType3) \
+#define REALM_TABLE_DEF_3(TableName, CName1, CType1, CName2, CType2, CName3, CType3) \
 @interface TableName##Row: RLMRow \
-TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
+REALM_ROW_PROPERTY_DEF(CName1, CType1) \
+REALM_ROW_PROPERTY_DEF(CName2, CType2) \
+REALM_ROW_PROPERTY_DEF(CName3, CType3) \
 @end \
 @class TableName##Query; \
 @class TableName##View; \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
 @interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
@@ -509,11 +509,11 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
 -(TableName##View*)findAll; \
 @end \
 @interface TableName: RLMTable \
-TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3; \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3; \
+REALM_COLUMN_PROXY_DEF(CName1, CType1) \
+REALM_COLUMN_PROXY_DEF(CName2, CType2) \
+REALM_COLUMN_PROXY_DEF(CName3, CType3) \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3; \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3; \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
@@ -525,26 +525,26 @@ TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_3(TableName, CName1, CType1, CName2, CType2, CName3, CType3) \
+#define REALM_TABLE_IMPL_3(TableName, CName1, CType1, CName2, CType2, CName3, CType3) \
 @implementation TableName##Row \
 { \
-    TDBAccessor* _##CName1; \
-    TDBAccessor* _##CName2; \
-    TDBAccessor* _##CName3; \
+    RLMAccessor* _##CName1; \
+    RLMAccessor* _##CName2; \
+    RLMAccessor* _##CName3; \
 } \
 -(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TDBAccessor alloc] initWithRow:self columnId:0]; \
-        _##CName2 = [[TDBAccessor alloc] initWithRow:self columnId:1]; \
-        _##CName3 = [[TDBAccessor alloc] initWithRow:self columnId:2]; \
+        _##CName1 = [[RLMAccessor alloc] initWithRow:self columnId:0]; \
+        _##CName2 = [[RLMAccessor alloc] initWithRow:self columnId:1]; \
+        _##CName3 = [[RLMAccessor alloc] initWithRow:self columnId:2]; \
     } \
     return self; \
 } \
-TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
+REALM_ROW_PROPERTY_IMPL(CName1, CType1) \
+REALM_ROW_PROPERTY_IMPL(CName2, CType2) \
+REALM_ROW_PROPERTY_IMPL(CName3, CType3) \
 @end \
 @implementation TableName##Query \
 { \
@@ -605,25 +605,25 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
     return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
 @implementation TableName \
 { \
     TableName##Row* tmpRow; \
 } \
-TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
+REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
+REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
+REALM_COLUMN_PROXY_IMPL(CName3, CType3) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) \
         return nil; \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
     return self; \
 } \
 -(id)init \
@@ -634,24 +634,24 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
     if (![self _addColumns]) \
         return nil; \
 \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 \
 { \
     NSUInteger ndx = self.rowCount; \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
     [self RLM_insertDone]; \
 } \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 \
 { \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
     [self RLM_insertDone]; \
 } \
 -(TableName##Query*)where \
@@ -685,9 +685,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 } \
 +(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
+    REALM_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
+    REALM_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
+    REALM_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
     return YES; \
 } \
 -(BOOL)_checkType \
@@ -701,9 +701,9 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 } \
 +(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
-    TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
-    TIGHTDB_ADD_COLUMN(desc, CName3, CType3) \
+    REALM_ADD_COLUMN(desc, CName1, CType1) \
+    REALM_ADD_COLUMN(desc, CName2, CType2) \
+    REALM_ADD_COLUMN(desc, CName3, CType3) \
     return YES; \
 } \
 -(BOOL)_addColumns \
@@ -730,24 +730,24 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
 } \
 @end
 
-#define TIGHTDB_TABLE_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
-TIGHTDB_TABLE_DEF_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
-TIGHTDB_TABLE_IMPL_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3)
+#define REALM_TABLE_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
+REALM_TABLE_DEF_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3) \
+REALM_TABLE_IMPL_3(TableName, CType1, CName1, CType2, CName2, CType3, CName3)
 
 
-#define TIGHTDB_TABLE_DEF_4(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4) \
+#define REALM_TABLE_DEF_4(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4) \
 @interface TableName##Row: RLMRow \
-TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_DEF(CName4, CType4) \
+REALM_ROW_PROPERTY_DEF(CName1, CType1) \
+REALM_ROW_PROPERTY_DEF(CName2, CType2) \
+REALM_ROW_PROPERTY_DEF(CName3, CType3) \
+REALM_ROW_PROPERTY_DEF(CName4, CType4) \
 @end \
 @class TableName##Query; \
 @class TableName##View; \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
 @interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
@@ -761,12 +761,12 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
 -(TableName##View*)findAll; \
 @end \
 @interface TableName: RLMTable \
-TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4; \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4; \
+REALM_COLUMN_PROXY_DEF(CName1, CType1) \
+REALM_COLUMN_PROXY_DEF(CName2, CType2) \
+REALM_COLUMN_PROXY_DEF(CName3, CType3) \
+REALM_COLUMN_PROXY_DEF(CName4, CType4) \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4; \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4; \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
@@ -778,29 +778,29 @@ TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_4(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4) \
+#define REALM_TABLE_IMPL_4(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4) \
 @implementation TableName##Row \
 { \
-    TDBAccessor* _##CName1; \
-    TDBAccessor* _##CName2; \
-    TDBAccessor* _##CName3; \
-    TDBAccessor* _##CName4; \
+    RLMAccessor* _##CName1; \
+    RLMAccessor* _##CName2; \
+    RLMAccessor* _##CName3; \
+    RLMAccessor* _##CName4; \
 } \
 -(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TDBAccessor alloc] initWithRow:self columnId:0]; \
-        _##CName2 = [[TDBAccessor alloc] initWithRow:self columnId:1]; \
-        _##CName3 = [[TDBAccessor alloc] initWithRow:self columnId:2]; \
-        _##CName4 = [[TDBAccessor alloc] initWithRow:self columnId:3]; \
+        _##CName1 = [[RLMAccessor alloc] initWithRow:self columnId:0]; \
+        _##CName2 = [[RLMAccessor alloc] initWithRow:self columnId:1]; \
+        _##CName3 = [[RLMAccessor alloc] initWithRow:self columnId:2]; \
+        _##CName4 = [[RLMAccessor alloc] initWithRow:self columnId:3]; \
     } \
     return self; \
 } \
-TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
+REALM_ROW_PROPERTY_IMPL(CName1, CType1) \
+REALM_ROW_PROPERTY_IMPL(CName2, CType2) \
+REALM_ROW_PROPERTY_IMPL(CName3, CType3) \
+REALM_ROW_PROPERTY_IMPL(CName4, CType4) \
 @end \
 @implementation TableName##Query \
 { \
@@ -863,28 +863,28 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
     return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
 @implementation TableName \
 { \
     TableName##Row* tmpRow; \
 } \
-TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
+REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
+REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
+REALM_COLUMN_PROXY_IMPL(CName3, CType3) \
+REALM_COLUMN_PROXY_IMPL(CName4, CType4) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) \
         return nil; \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
     return self; \
 } \
 -(id)init \
@@ -895,27 +895,27 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
     if (![self _addColumns]) \
         return nil; \
 \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 \
 { \
     NSUInteger ndx = self.rowCount; \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
     [self RLM_insertDone]; \
 } \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 \
 { \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
     [self RLM_insertDone]; \
 } \
 -(TableName##Query*)where \
@@ -949,10 +949,10 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 } \
 +(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
+    REALM_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
+    REALM_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
+    REALM_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
+    REALM_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
     return YES; \
 } \
 -(BOOL)_checkType \
@@ -966,10 +966,10 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 } \
 +(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
-    TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
-    TIGHTDB_ADD_COLUMN(desc, CName3, CType3) \
-    TIGHTDB_ADD_COLUMN(desc, CName4, CType4) \
+    REALM_ADD_COLUMN(desc, CName1, CType1) \
+    REALM_ADD_COLUMN(desc, CName2, CType2) \
+    REALM_ADD_COLUMN(desc, CName3, CType3) \
+    REALM_ADD_COLUMN(desc, CName4, CType4) \
     return YES; \
 } \
 -(BOOL)_addColumns \
@@ -996,26 +996,26 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
 } \
 @end
 
-#define TIGHTDB_TABLE_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
-TIGHTDB_TABLE_DEF_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
-TIGHTDB_TABLE_IMPL_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4)
+#define REALM_TABLE_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
+REALM_TABLE_DEF_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4) \
+REALM_TABLE_IMPL_4(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4)
 
 
-#define TIGHTDB_TABLE_DEF_5(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5) \
+#define REALM_TABLE_DEF_5(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5) \
 @interface TableName##Row: RLMRow \
-TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_DEF(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_DEF(CName5, CType5) \
+REALM_ROW_PROPERTY_DEF(CName1, CType1) \
+REALM_ROW_PROPERTY_DEF(CName2, CType2) \
+REALM_ROW_PROPERTY_DEF(CName3, CType3) \
+REALM_ROW_PROPERTY_DEF(CName4, CType4) \
+REALM_ROW_PROPERTY_DEF(CName5, CType5) \
 @end \
 @class TableName##Query; \
 @class TableName##View; \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
 @interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
@@ -1030,13 +1030,13 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
 -(TableName##View*)findAll; \
 @end \
 @interface TableName: RLMTable \
-TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5; \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5; \
+REALM_COLUMN_PROXY_DEF(CName1, CType1) \
+REALM_COLUMN_PROXY_DEF(CName2, CType2) \
+REALM_COLUMN_PROXY_DEF(CName3, CType3) \
+REALM_COLUMN_PROXY_DEF(CName4, CType4) \
+REALM_COLUMN_PROXY_DEF(CName5, CType5) \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5; \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5; \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
@@ -1048,32 +1048,32 @@ TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_5(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5) \
+#define REALM_TABLE_IMPL_5(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5) \
 @implementation TableName##Row \
 { \
-    TDBAccessor* _##CName1; \
-    TDBAccessor* _##CName2; \
-    TDBAccessor* _##CName3; \
-    TDBAccessor* _##CName4; \
-    TDBAccessor* _##CName5; \
+    RLMAccessor* _##CName1; \
+    RLMAccessor* _##CName2; \
+    RLMAccessor* _##CName3; \
+    RLMAccessor* _##CName4; \
+    RLMAccessor* _##CName5; \
 } \
 -(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TDBAccessor alloc] initWithRow:self columnId:0]; \
-        _##CName2 = [[TDBAccessor alloc] initWithRow:self columnId:1]; \
-        _##CName3 = [[TDBAccessor alloc] initWithRow:self columnId:2]; \
-        _##CName4 = [[TDBAccessor alloc] initWithRow:self columnId:3]; \
-        _##CName5 = [[TDBAccessor alloc] initWithRow:self columnId:4]; \
+        _##CName1 = [[RLMAccessor alloc] initWithRow:self columnId:0]; \
+        _##CName2 = [[RLMAccessor alloc] initWithRow:self columnId:1]; \
+        _##CName3 = [[RLMAccessor alloc] initWithRow:self columnId:2]; \
+        _##CName4 = [[RLMAccessor alloc] initWithRow:self columnId:3]; \
+        _##CName5 = [[RLMAccessor alloc] initWithRow:self columnId:4]; \
     } \
     return self; \
 } \
-TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
+REALM_ROW_PROPERTY_IMPL(CName1, CType1) \
+REALM_ROW_PROPERTY_IMPL(CName2, CType2) \
+REALM_ROW_PROPERTY_IMPL(CName3, CType3) \
+REALM_ROW_PROPERTY_IMPL(CName4, CType4) \
+REALM_ROW_PROPERTY_IMPL(CName5, CType5) \
 @end \
 @implementation TableName##Query \
 { \
@@ -1138,31 +1138,31 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
     return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
 @implementation TableName \
 { \
     TableName##Row* tmpRow; \
 } \
-TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
+REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
+REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
+REALM_COLUMN_PROXY_IMPL(CName3, CType3) \
+REALM_COLUMN_PROXY_IMPL(CName4, CType4) \
+REALM_COLUMN_PROXY_IMPL(CName5, CType5) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) \
         return nil; \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
     return self; \
 } \
 -(id)init \
@@ -1173,30 +1173,30 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
     if (![self _addColumns]) \
         return nil; \
 \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 \
 { \
     NSUInteger ndx = self.rowCount; \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
     [self RLM_insertDone]; \
 } \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 \
 { \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
     [self RLM_insertDone]; \
 } \
 -(TableName##Query*)where \
@@ -1230,11 +1230,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 } \
 +(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
+    REALM_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
+    REALM_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
+    REALM_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
+    REALM_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
+    REALM_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
     return YES; \
 } \
 -(BOOL)_checkType \
@@ -1248,11 +1248,11 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 } \
 +(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
-    TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
-    TIGHTDB_ADD_COLUMN(desc, CName3, CType3) \
-    TIGHTDB_ADD_COLUMN(desc, CName4, CType4) \
-    TIGHTDB_ADD_COLUMN(desc, CName5, CType5) \
+    REALM_ADD_COLUMN(desc, CName1, CType1) \
+    REALM_ADD_COLUMN(desc, CName2, CType2) \
+    REALM_ADD_COLUMN(desc, CName3, CType3) \
+    REALM_ADD_COLUMN(desc, CName4, CType4) \
+    REALM_ADD_COLUMN(desc, CName5, CType5) \
     return YES; \
 } \
 -(BOOL)_addColumns \
@@ -1279,28 +1279,28 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
 } \
 @end
 
-#define TIGHTDB_TABLE_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
-TIGHTDB_TABLE_DEF_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
-TIGHTDB_TABLE_IMPL_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5)
+#define REALM_TABLE_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
+REALM_TABLE_DEF_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5) \
+REALM_TABLE_IMPL_5(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5)
 
 
-#define TIGHTDB_TABLE_DEF_6(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6) \
+#define REALM_TABLE_DEF_6(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6) \
 @interface TableName##Row: RLMRow \
-TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_DEF(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_DEF(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_DEF(CName6, CType6) \
+REALM_ROW_PROPERTY_DEF(CName1, CType1) \
+REALM_ROW_PROPERTY_DEF(CName2, CType2) \
+REALM_ROW_PROPERTY_DEF(CName3, CType3) \
+REALM_ROW_PROPERTY_DEF(CName4, CType4) \
+REALM_ROW_PROPERTY_DEF(CName5, CType5) \
+REALM_ROW_PROPERTY_DEF(CName6, CType6) \
 @end \
 @class TableName##Query; \
 @class TableName##View; \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
 @interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
@@ -1316,14 +1316,14 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
 -(TableName##View*)findAll; \
 @end \
 @interface TableName: RLMTable \
-TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6; \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6; \
+REALM_COLUMN_PROXY_DEF(CName1, CType1) \
+REALM_COLUMN_PROXY_DEF(CName2, CType2) \
+REALM_COLUMN_PROXY_DEF(CName3, CType3) \
+REALM_COLUMN_PROXY_DEF(CName4, CType4) \
+REALM_COLUMN_PROXY_DEF(CName5, CType5) \
+REALM_COLUMN_PROXY_DEF(CName6, CType6) \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6; \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6; \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
@@ -1335,35 +1335,35 @@ TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_6(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6) \
+#define REALM_TABLE_IMPL_6(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6) \
 @implementation TableName##Row \
 { \
-    TDBAccessor* _##CName1; \
-    TDBAccessor* _##CName2; \
-    TDBAccessor* _##CName3; \
-    TDBAccessor* _##CName4; \
-    TDBAccessor* _##CName5; \
-    TDBAccessor* _##CName6; \
+    RLMAccessor* _##CName1; \
+    RLMAccessor* _##CName2; \
+    RLMAccessor* _##CName3; \
+    RLMAccessor* _##CName4; \
+    RLMAccessor* _##CName5; \
+    RLMAccessor* _##CName6; \
 } \
 -(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TDBAccessor alloc] initWithRow:self columnId:0]; \
-        _##CName2 = [[TDBAccessor alloc] initWithRow:self columnId:1]; \
-        _##CName3 = [[TDBAccessor alloc] initWithRow:self columnId:2]; \
-        _##CName4 = [[TDBAccessor alloc] initWithRow:self columnId:3]; \
-        _##CName5 = [[TDBAccessor alloc] initWithRow:self columnId:4]; \
-        _##CName6 = [[TDBAccessor alloc] initWithRow:self columnId:5]; \
+        _##CName1 = [[RLMAccessor alloc] initWithRow:self columnId:0]; \
+        _##CName2 = [[RLMAccessor alloc] initWithRow:self columnId:1]; \
+        _##CName3 = [[RLMAccessor alloc] initWithRow:self columnId:2]; \
+        _##CName4 = [[RLMAccessor alloc] initWithRow:self columnId:3]; \
+        _##CName5 = [[RLMAccessor alloc] initWithRow:self columnId:4]; \
+        _##CName6 = [[RLMAccessor alloc] initWithRow:self columnId:5]; \
     } \
     return self; \
 } \
-TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
+REALM_ROW_PROPERTY_IMPL(CName1, CType1) \
+REALM_ROW_PROPERTY_IMPL(CName2, CType2) \
+REALM_ROW_PROPERTY_IMPL(CName3, CType3) \
+REALM_ROW_PROPERTY_IMPL(CName4, CType4) \
+REALM_ROW_PROPERTY_IMPL(CName5, CType5) \
+REALM_ROW_PROPERTY_IMPL(CName6, CType6) \
 @end \
 @implementation TableName##Query \
 { \
@@ -1430,34 +1430,34 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
     return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
 @implementation TableName \
 { \
     TableName##Row* tmpRow; \
 } \
-TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
+REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
+REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
+REALM_COLUMN_PROXY_IMPL(CName3, CType3) \
+REALM_COLUMN_PROXY_IMPL(CName4, CType4) \
+REALM_COLUMN_PROXY_IMPL(CName5, CType5) \
+REALM_COLUMN_PROXY_IMPL(CName6, CType6) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) \
         return nil; \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
     return self; \
 } \
 -(id)init \
@@ -1468,33 +1468,33 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
     if (![self _addColumns]) \
         return nil; \
 \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 \
 { \
     NSUInteger ndx = self.rowCount; \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
     [self RLM_insertDone]; \
 } \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 \
 { \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
     [self RLM_insertDone]; \
 } \
 -(TableName##Query*)where \
@@ -1528,12 +1528,12 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 } \
 +(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
+    REALM_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
+    REALM_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
+    REALM_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
+    REALM_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
+    REALM_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
+    REALM_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
     return YES; \
 } \
 -(BOOL)_checkType \
@@ -1547,12 +1547,12 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 } \
 +(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
-    TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
-    TIGHTDB_ADD_COLUMN(desc, CName3, CType3) \
-    TIGHTDB_ADD_COLUMN(desc, CName4, CType4) \
-    TIGHTDB_ADD_COLUMN(desc, CName5, CType5) \
-    TIGHTDB_ADD_COLUMN(desc, CName6, CType6) \
+    REALM_ADD_COLUMN(desc, CName1, CType1) \
+    REALM_ADD_COLUMN(desc, CName2, CType2) \
+    REALM_ADD_COLUMN(desc, CName3, CType3) \
+    REALM_ADD_COLUMN(desc, CName4, CType4) \
+    REALM_ADD_COLUMN(desc, CName5, CType5) \
+    REALM_ADD_COLUMN(desc, CName6, CType6) \
     return YES; \
 } \
 -(BOOL)_addColumns \
@@ -1579,30 +1579,30 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
 } \
 @end
 
-#define TIGHTDB_TABLE_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
-TIGHTDB_TABLE_DEF_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
-TIGHTDB_TABLE_IMPL_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6)
+#define REALM_TABLE_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
+REALM_TABLE_DEF_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6) \
+REALM_TABLE_IMPL_6(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6)
 
 
-#define TIGHTDB_TABLE_DEF_7(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7) \
+#define REALM_TABLE_DEF_7(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7) \
 @interface TableName##Row: RLMRow \
-TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_DEF(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_DEF(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_DEF(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_DEF(CName7, CType7) \
+REALM_ROW_PROPERTY_DEF(CName1, CType1) \
+REALM_ROW_PROPERTY_DEF(CName2, CType2) \
+REALM_ROW_PROPERTY_DEF(CName3, CType3) \
+REALM_ROW_PROPERTY_DEF(CName4, CType4) \
+REALM_ROW_PROPERTY_DEF(CName5, CType5) \
+REALM_ROW_PROPERTY_DEF(CName6, CType6) \
+REALM_ROW_PROPERTY_DEF(CName7, CType7) \
 @end \
 @class TableName##Query; \
 @class TableName##View; \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
 @interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
@@ -1619,15 +1619,15 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
 -(TableName##View*)findAll; \
 @end \
 @interface TableName: RLMTable \
-TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7; \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7; \
+REALM_COLUMN_PROXY_DEF(CName1, CType1) \
+REALM_COLUMN_PROXY_DEF(CName2, CType2) \
+REALM_COLUMN_PROXY_DEF(CName3, CType3) \
+REALM_COLUMN_PROXY_DEF(CName4, CType4) \
+REALM_COLUMN_PROXY_DEF(CName5, CType5) \
+REALM_COLUMN_PROXY_DEF(CName6, CType6) \
+REALM_COLUMN_PROXY_DEF(CName7, CType7) \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7; \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7; \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
@@ -1639,38 +1639,38 @@ TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_7(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7) \
+#define REALM_TABLE_IMPL_7(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7) \
 @implementation TableName##Row \
 { \
-    TDBAccessor* _##CName1; \
-    TDBAccessor* _##CName2; \
-    TDBAccessor* _##CName3; \
-    TDBAccessor* _##CName4; \
-    TDBAccessor* _##CName5; \
-    TDBAccessor* _##CName6; \
-    TDBAccessor* _##CName7; \
+    RLMAccessor* _##CName1; \
+    RLMAccessor* _##CName2; \
+    RLMAccessor* _##CName3; \
+    RLMAccessor* _##CName4; \
+    RLMAccessor* _##CName5; \
+    RLMAccessor* _##CName6; \
+    RLMAccessor* _##CName7; \
 } \
 -(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TDBAccessor alloc] initWithRow:self columnId:0]; \
-        _##CName2 = [[TDBAccessor alloc] initWithRow:self columnId:1]; \
-        _##CName3 = [[TDBAccessor alloc] initWithRow:self columnId:2]; \
-        _##CName4 = [[TDBAccessor alloc] initWithRow:self columnId:3]; \
-        _##CName5 = [[TDBAccessor alloc] initWithRow:self columnId:4]; \
-        _##CName6 = [[TDBAccessor alloc] initWithRow:self columnId:5]; \
-        _##CName7 = [[TDBAccessor alloc] initWithRow:self columnId:6]; \
+        _##CName1 = [[RLMAccessor alloc] initWithRow:self columnId:0]; \
+        _##CName2 = [[RLMAccessor alloc] initWithRow:self columnId:1]; \
+        _##CName3 = [[RLMAccessor alloc] initWithRow:self columnId:2]; \
+        _##CName4 = [[RLMAccessor alloc] initWithRow:self columnId:3]; \
+        _##CName5 = [[RLMAccessor alloc] initWithRow:self columnId:4]; \
+        _##CName6 = [[RLMAccessor alloc] initWithRow:self columnId:5]; \
+        _##CName7 = [[RLMAccessor alloc] initWithRow:self columnId:6]; \
     } \
     return self; \
 } \
-TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName7, CType7) \
+REALM_ROW_PROPERTY_IMPL(CName1, CType1) \
+REALM_ROW_PROPERTY_IMPL(CName2, CType2) \
+REALM_ROW_PROPERTY_IMPL(CName3, CType3) \
+REALM_ROW_PROPERTY_IMPL(CName4, CType4) \
+REALM_ROW_PROPERTY_IMPL(CName5, CType5) \
+REALM_ROW_PROPERTY_IMPL(CName6, CType6) \
+REALM_ROW_PROPERTY_IMPL(CName7, CType7) \
 @end \
 @implementation TableName##Query \
 { \
@@ -1739,37 +1739,37 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName7, CType7) \
     return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
 @implementation TableName \
 { \
     TableName##Row* tmpRow; \
 } \
-TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
+REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
+REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
+REALM_COLUMN_PROXY_IMPL(CName3, CType3) \
+REALM_COLUMN_PROXY_IMPL(CName4, CType4) \
+REALM_COLUMN_PROXY_IMPL(CName5, CType5) \
+REALM_COLUMN_PROXY_IMPL(CName6, CType6) \
+REALM_COLUMN_PROXY_IMPL(CName7, CType7) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) \
         return nil; \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
     return self; \
 } \
 -(id)init \
@@ -1780,36 +1780,36 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
     if (![self _addColumns]) \
         return nil; \
 \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 \
 { \
     NSUInteger ndx = self.rowCount; \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
     [self RLM_insertDone]; \
 } \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 \
 { \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
     [self RLM_insertDone]; \
 } \
 -(TableName##Query*)where \
@@ -1843,13 +1843,13 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 } \
 +(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
+    REALM_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
+    REALM_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
+    REALM_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
+    REALM_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
+    REALM_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
+    REALM_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
+    REALM_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
     return YES; \
 } \
 -(BOOL)_checkType \
@@ -1863,13 +1863,13 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 } \
 +(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
-    TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
-    TIGHTDB_ADD_COLUMN(desc, CName3, CType3) \
-    TIGHTDB_ADD_COLUMN(desc, CName4, CType4) \
-    TIGHTDB_ADD_COLUMN(desc, CName5, CType5) \
-    TIGHTDB_ADD_COLUMN(desc, CName6, CType6) \
-    TIGHTDB_ADD_COLUMN(desc, CName7, CType7) \
+    REALM_ADD_COLUMN(desc, CName1, CType1) \
+    REALM_ADD_COLUMN(desc, CName2, CType2) \
+    REALM_ADD_COLUMN(desc, CName3, CType3) \
+    REALM_ADD_COLUMN(desc, CName4, CType4) \
+    REALM_ADD_COLUMN(desc, CName5, CType5) \
+    REALM_ADD_COLUMN(desc, CName6, CType6) \
+    REALM_ADD_COLUMN(desc, CName7, CType7) \
     return YES; \
 } \
 -(BOOL)_addColumns \
@@ -1896,32 +1896,32 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
 } \
 @end
 
-#define TIGHTDB_TABLE_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
-TIGHTDB_TABLE_DEF_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
-TIGHTDB_TABLE_IMPL_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7)
+#define REALM_TABLE_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
+REALM_TABLE_DEF_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7) \
+REALM_TABLE_IMPL_7(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7)
 
 
-#define TIGHTDB_TABLE_DEF_8(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8) \
+#define REALM_TABLE_DEF_8(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8) \
 @interface TableName##Row: RLMRow \
-TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_DEF(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_DEF(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_DEF(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_DEF(CName7, CType7) \
-TIGHTDB_ROW_PROPERTY_DEF(CName8, CType8) \
+REALM_ROW_PROPERTY_DEF(CName1, CType1) \
+REALM_ROW_PROPERTY_DEF(CName2, CType2) \
+REALM_ROW_PROPERTY_DEF(CName3, CType3) \
+REALM_ROW_PROPERTY_DEF(CName4, CType4) \
+REALM_ROW_PROPERTY_DEF(CName5, CType5) \
+REALM_ROW_PROPERTY_DEF(CName6, CType6) \
+REALM_ROW_PROPERTY_DEF(CName7, CType7) \
+REALM_ROW_PROPERTY_DEF(CName8, CType8) \
 @end \
 @class TableName##Query; \
 @class TableName##View; \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
 @interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
@@ -1939,16 +1939,16 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
 -(TableName##View*)findAll; \
 @end \
 @interface TableName: RLMTable \
-TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
-TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8; \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8; \
+REALM_COLUMN_PROXY_DEF(CName1, CType1) \
+REALM_COLUMN_PROXY_DEF(CName2, CType2) \
+REALM_COLUMN_PROXY_DEF(CName3, CType3) \
+REALM_COLUMN_PROXY_DEF(CName4, CType4) \
+REALM_COLUMN_PROXY_DEF(CName5, CType5) \
+REALM_COLUMN_PROXY_DEF(CName6, CType6) \
+REALM_COLUMN_PROXY_DEF(CName7, CType7) \
+REALM_COLUMN_PROXY_DEF(CName8, CType8) \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8; \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8; \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
@@ -1960,41 +1960,41 @@ TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_8(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8) \
+#define REALM_TABLE_IMPL_8(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8) \
 @implementation TableName##Row \
 { \
-    TDBAccessor* _##CName1; \
-    TDBAccessor* _##CName2; \
-    TDBAccessor* _##CName3; \
-    TDBAccessor* _##CName4; \
-    TDBAccessor* _##CName5; \
-    TDBAccessor* _##CName6; \
-    TDBAccessor* _##CName7; \
-    TDBAccessor* _##CName8; \
+    RLMAccessor* _##CName1; \
+    RLMAccessor* _##CName2; \
+    RLMAccessor* _##CName3; \
+    RLMAccessor* _##CName4; \
+    RLMAccessor* _##CName5; \
+    RLMAccessor* _##CName6; \
+    RLMAccessor* _##CName7; \
+    RLMAccessor* _##CName8; \
 } \
 -(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TDBAccessor alloc] initWithRow:self columnId:0]; \
-        _##CName2 = [[TDBAccessor alloc] initWithRow:self columnId:1]; \
-        _##CName3 = [[TDBAccessor alloc] initWithRow:self columnId:2]; \
-        _##CName4 = [[TDBAccessor alloc] initWithRow:self columnId:3]; \
-        _##CName5 = [[TDBAccessor alloc] initWithRow:self columnId:4]; \
-        _##CName6 = [[TDBAccessor alloc] initWithRow:self columnId:5]; \
-        _##CName7 = [[TDBAccessor alloc] initWithRow:self columnId:6]; \
-        _##CName8 = [[TDBAccessor alloc] initWithRow:self columnId:7]; \
+        _##CName1 = [[RLMAccessor alloc] initWithRow:self columnId:0]; \
+        _##CName2 = [[RLMAccessor alloc] initWithRow:self columnId:1]; \
+        _##CName3 = [[RLMAccessor alloc] initWithRow:self columnId:2]; \
+        _##CName4 = [[RLMAccessor alloc] initWithRow:self columnId:3]; \
+        _##CName5 = [[RLMAccessor alloc] initWithRow:self columnId:4]; \
+        _##CName6 = [[RLMAccessor alloc] initWithRow:self columnId:5]; \
+        _##CName7 = [[RLMAccessor alloc] initWithRow:self columnId:6]; \
+        _##CName8 = [[RLMAccessor alloc] initWithRow:self columnId:7]; \
     } \
     return self; \
 } \
-TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName7, CType7) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName8, CType8) \
+REALM_ROW_PROPERTY_IMPL(CName1, CType1) \
+REALM_ROW_PROPERTY_IMPL(CName2, CType2) \
+REALM_ROW_PROPERTY_IMPL(CName3, CType3) \
+REALM_ROW_PROPERTY_IMPL(CName4, CType4) \
+REALM_ROW_PROPERTY_IMPL(CName5, CType5) \
+REALM_ROW_PROPERTY_IMPL(CName6, CType6) \
+REALM_ROW_PROPERTY_IMPL(CName7, CType7) \
+REALM_ROW_PROPERTY_IMPL(CName8, CType8) \
 @end \
 @implementation TableName##Query \
 { \
@@ -2065,40 +2065,40 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName8, CType8) \
     return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
 @implementation TableName \
 { \
     TableName##Row* tmpRow; \
 } \
-TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
+REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
+REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
+REALM_COLUMN_PROXY_IMPL(CName3, CType3) \
+REALM_COLUMN_PROXY_IMPL(CName4, CType4) \
+REALM_COLUMN_PROXY_IMPL(CName5, CType5) \
+REALM_COLUMN_PROXY_IMPL(CName6, CType6) \
+REALM_COLUMN_PROXY_IMPL(CName7, CType7) \
+REALM_COLUMN_PROXY_IMPL(CName8, CType8) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) \
         return nil; \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
     return self; \
 } \
 -(id)init \
@@ -2109,39 +2109,39 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
     if (![self _addColumns]) \
         return nil; \
 \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 \
 { \
     NSUInteger ndx = self.rowCount; \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
-    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
     [self RLM_insertDone]; \
 } \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 \
 { \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
-    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
     [self RLM_insertDone]; \
 } \
 -(TableName##Query*)where \
@@ -2175,14 +2175,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 } \
 +(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 7, CName8, CType8) \
+    REALM_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
+    REALM_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
+    REALM_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
+    REALM_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
+    REALM_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
+    REALM_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
+    REALM_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
+    REALM_CHECK_COLUMN_TYPE(desc, 7, CName8, CType8) \
     return YES; \
 } \
 -(BOOL)_checkType \
@@ -2196,14 +2196,14 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 } \
 +(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
-    TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
-    TIGHTDB_ADD_COLUMN(desc, CName3, CType3) \
-    TIGHTDB_ADD_COLUMN(desc, CName4, CType4) \
-    TIGHTDB_ADD_COLUMN(desc, CName5, CType5) \
-    TIGHTDB_ADD_COLUMN(desc, CName6, CType6) \
-    TIGHTDB_ADD_COLUMN(desc, CName7, CType7) \
-    TIGHTDB_ADD_COLUMN(desc, CName8, CType8) \
+    REALM_ADD_COLUMN(desc, CName1, CType1) \
+    REALM_ADD_COLUMN(desc, CName2, CType2) \
+    REALM_ADD_COLUMN(desc, CName3, CType3) \
+    REALM_ADD_COLUMN(desc, CName4, CType4) \
+    REALM_ADD_COLUMN(desc, CName5, CType5) \
+    REALM_ADD_COLUMN(desc, CName6, CType6) \
+    REALM_ADD_COLUMN(desc, CName7, CType7) \
+    REALM_ADD_COLUMN(desc, CName8, CType8) \
     return YES; \
 } \
 -(BOOL)_addColumns \
@@ -2230,34 +2230,34 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
 } \
 @end
 
-#define TIGHTDB_TABLE_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
-TIGHTDB_TABLE_DEF_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
-TIGHTDB_TABLE_IMPL_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8)
+#define REALM_TABLE_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
+REALM_TABLE_DEF_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8) \
+REALM_TABLE_IMPL_8(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8)
 
 
-#define TIGHTDB_TABLE_DEF_9(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9) \
+#define REALM_TABLE_DEF_9(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9) \
 @interface TableName##Row: RLMRow \
-TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_DEF(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_DEF(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_DEF(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_DEF(CName7, CType7) \
-TIGHTDB_ROW_PROPERTY_DEF(CName8, CType8) \
-TIGHTDB_ROW_PROPERTY_DEF(CName9, CType9) \
+REALM_ROW_PROPERTY_DEF(CName1, CType1) \
+REALM_ROW_PROPERTY_DEF(CName2, CType2) \
+REALM_ROW_PROPERTY_DEF(CName3, CType3) \
+REALM_ROW_PROPERTY_DEF(CName4, CType4) \
+REALM_ROW_PROPERTY_DEF(CName5, CType5) \
+REALM_ROW_PROPERTY_DEF(CName6, CType6) \
+REALM_ROW_PROPERTY_DEF(CName7, CType7) \
+REALM_ROW_PROPERTY_DEF(CName8, CType8) \
+REALM_ROW_PROPERTY_DEF(CName9, CType9) \
 @end \
 @class TableName##Query; \
 @class TableName##View; \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
 @interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
@@ -2276,17 +2276,17 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
 -(TableName##View*)findAll; \
 @end \
 @interface TableName: RLMTable \
-TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
-TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
-TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9; \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9; \
+REALM_COLUMN_PROXY_DEF(CName1, CType1) \
+REALM_COLUMN_PROXY_DEF(CName2, CType2) \
+REALM_COLUMN_PROXY_DEF(CName3, CType3) \
+REALM_COLUMN_PROXY_DEF(CName4, CType4) \
+REALM_COLUMN_PROXY_DEF(CName5, CType5) \
+REALM_COLUMN_PROXY_DEF(CName6, CType6) \
+REALM_COLUMN_PROXY_DEF(CName7, CType7) \
+REALM_COLUMN_PROXY_DEF(CName8, CType8) \
+REALM_COLUMN_PROXY_DEF(CName9, CType9) \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9; \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9; \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
@@ -2298,44 +2298,44 @@ TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_9(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9) \
+#define REALM_TABLE_IMPL_9(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9) \
 @implementation TableName##Row \
 { \
-    TDBAccessor* _##CName1; \
-    TDBAccessor* _##CName2; \
-    TDBAccessor* _##CName3; \
-    TDBAccessor* _##CName4; \
-    TDBAccessor* _##CName5; \
-    TDBAccessor* _##CName6; \
-    TDBAccessor* _##CName7; \
-    TDBAccessor* _##CName8; \
-    TDBAccessor* _##CName9; \
+    RLMAccessor* _##CName1; \
+    RLMAccessor* _##CName2; \
+    RLMAccessor* _##CName3; \
+    RLMAccessor* _##CName4; \
+    RLMAccessor* _##CName5; \
+    RLMAccessor* _##CName6; \
+    RLMAccessor* _##CName7; \
+    RLMAccessor* _##CName8; \
+    RLMAccessor* _##CName9; \
 } \
 -(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TDBAccessor alloc] initWithRow:self columnId:0]; \
-        _##CName2 = [[TDBAccessor alloc] initWithRow:self columnId:1]; \
-        _##CName3 = [[TDBAccessor alloc] initWithRow:self columnId:2]; \
-        _##CName4 = [[TDBAccessor alloc] initWithRow:self columnId:3]; \
-        _##CName5 = [[TDBAccessor alloc] initWithRow:self columnId:4]; \
-        _##CName6 = [[TDBAccessor alloc] initWithRow:self columnId:5]; \
-        _##CName7 = [[TDBAccessor alloc] initWithRow:self columnId:6]; \
-        _##CName8 = [[TDBAccessor alloc] initWithRow:self columnId:7]; \
-        _##CName9 = [[TDBAccessor alloc] initWithRow:self columnId:8]; \
+        _##CName1 = [[RLMAccessor alloc] initWithRow:self columnId:0]; \
+        _##CName2 = [[RLMAccessor alloc] initWithRow:self columnId:1]; \
+        _##CName3 = [[RLMAccessor alloc] initWithRow:self columnId:2]; \
+        _##CName4 = [[RLMAccessor alloc] initWithRow:self columnId:3]; \
+        _##CName5 = [[RLMAccessor alloc] initWithRow:self columnId:4]; \
+        _##CName6 = [[RLMAccessor alloc] initWithRow:self columnId:5]; \
+        _##CName7 = [[RLMAccessor alloc] initWithRow:self columnId:6]; \
+        _##CName8 = [[RLMAccessor alloc] initWithRow:self columnId:7]; \
+        _##CName9 = [[RLMAccessor alloc] initWithRow:self columnId:8]; \
     } \
     return self; \
 } \
-TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName7, CType7) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName8, CType8) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName9, CType9) \
+REALM_ROW_PROPERTY_IMPL(CName1, CType1) \
+REALM_ROW_PROPERTY_IMPL(CName2, CType2) \
+REALM_ROW_PROPERTY_IMPL(CName3, CType3) \
+REALM_ROW_PROPERTY_IMPL(CName4, CType4) \
+REALM_ROW_PROPERTY_IMPL(CName5, CType5) \
+REALM_ROW_PROPERTY_IMPL(CName6, CType6) \
+REALM_ROW_PROPERTY_IMPL(CName7, CType7) \
+REALM_ROW_PROPERTY_IMPL(CName8, CType8) \
+REALM_ROW_PROPERTY_IMPL(CName9, CType9) \
 @end \
 @implementation TableName##Query \
 { \
@@ -2408,43 +2408,43 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName9, CType9) \
     return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
 @implementation TableName \
 { \
     TableName##Row* tmpRow; \
 } \
-TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
+REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
+REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
+REALM_COLUMN_PROXY_IMPL(CName3, CType3) \
+REALM_COLUMN_PROXY_IMPL(CName4, CType4) \
+REALM_COLUMN_PROXY_IMPL(CName5, CType5) \
+REALM_COLUMN_PROXY_IMPL(CName6, CType6) \
+REALM_COLUMN_PROXY_IMPL(CName7, CType7) \
+REALM_COLUMN_PROXY_IMPL(CName8, CType8) \
+REALM_COLUMN_PROXY_IMPL(CName9, CType9) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) \
         return nil; \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    REALM_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
     return self; \
 } \
 -(id)init \
@@ -2455,42 +2455,42 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
     if (![self _addColumns]) \
         return nil; \
 \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    REALM_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 \
 { \
     NSUInteger ndx = self.rowCount; \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
-    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
-    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    REALM_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
     [self RLM_insertDone]; \
 } \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 \
 { \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
-    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
-    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    REALM_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
     [self RLM_insertDone]; \
 } \
 -(TableName##Query*)where \
@@ -2524,15 +2524,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 } \
 +(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 7, CName8, CType8) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 8, CName9, CType9) \
+    REALM_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
+    REALM_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
+    REALM_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
+    REALM_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
+    REALM_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
+    REALM_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
+    REALM_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
+    REALM_CHECK_COLUMN_TYPE(desc, 7, CName8, CType8) \
+    REALM_CHECK_COLUMN_TYPE(desc, 8, CName9, CType9) \
     return YES; \
 } \
 -(BOOL)_checkType \
@@ -2546,15 +2546,15 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 } \
 +(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
-    TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
-    TIGHTDB_ADD_COLUMN(desc, CName3, CType3) \
-    TIGHTDB_ADD_COLUMN(desc, CName4, CType4) \
-    TIGHTDB_ADD_COLUMN(desc, CName5, CType5) \
-    TIGHTDB_ADD_COLUMN(desc, CName6, CType6) \
-    TIGHTDB_ADD_COLUMN(desc, CName7, CType7) \
-    TIGHTDB_ADD_COLUMN(desc, CName8, CType8) \
-    TIGHTDB_ADD_COLUMN(desc, CName9, CType9) \
+    REALM_ADD_COLUMN(desc, CName1, CType1) \
+    REALM_ADD_COLUMN(desc, CName2, CType2) \
+    REALM_ADD_COLUMN(desc, CName3, CType3) \
+    REALM_ADD_COLUMN(desc, CName4, CType4) \
+    REALM_ADD_COLUMN(desc, CName5, CType5) \
+    REALM_ADD_COLUMN(desc, CName6, CType6) \
+    REALM_ADD_COLUMN(desc, CName7, CType7) \
+    REALM_ADD_COLUMN(desc, CName8, CType8) \
+    REALM_ADD_COLUMN(desc, CName9, CType9) \
     return YES; \
 } \
 -(BOOL)_addColumns \
@@ -2581,36 +2581,36 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
 } \
 @end
 
-#define TIGHTDB_TABLE_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9) \
-TIGHTDB_TABLE_DEF_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9) \
-TIGHTDB_TABLE_IMPL_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9)
+#define REALM_TABLE_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9) \
+REALM_TABLE_DEF_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9) \
+REALM_TABLE_IMPL_9(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9)
 
 
-#define TIGHTDB_TABLE_DEF_10(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10) \
+#define REALM_TABLE_DEF_10(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10) \
 @interface TableName##Row: RLMRow \
-TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_DEF(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_DEF(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_DEF(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_DEF(CName7, CType7) \
-TIGHTDB_ROW_PROPERTY_DEF(CName8, CType8) \
-TIGHTDB_ROW_PROPERTY_DEF(CName9, CType9) \
-TIGHTDB_ROW_PROPERTY_DEF(CName10, CType10) \
+REALM_ROW_PROPERTY_DEF(CName1, CType1) \
+REALM_ROW_PROPERTY_DEF(CName2, CType2) \
+REALM_ROW_PROPERTY_DEF(CName3, CType3) \
+REALM_ROW_PROPERTY_DEF(CName4, CType4) \
+REALM_ROW_PROPERTY_DEF(CName5, CType5) \
+REALM_ROW_PROPERTY_DEF(CName6, CType6) \
+REALM_ROW_PROPERTY_DEF(CName7, CType7) \
+REALM_ROW_PROPERTY_DEF(CName8, CType8) \
+REALM_ROW_PROPERTY_DEF(CName9, CType9) \
+REALM_ROW_PROPERTY_DEF(CName10, CType10) \
 @end \
 @class TableName##Query; \
 @class TableName##View; \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
 @interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
@@ -2630,18 +2630,18 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
 -(TableName##View*)findAll; \
 @end \
 @interface TableName: RLMTable \
-TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
-TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
-TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
-TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10; \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10; \
+REALM_COLUMN_PROXY_DEF(CName1, CType1) \
+REALM_COLUMN_PROXY_DEF(CName2, CType2) \
+REALM_COLUMN_PROXY_DEF(CName3, CType3) \
+REALM_COLUMN_PROXY_DEF(CName4, CType4) \
+REALM_COLUMN_PROXY_DEF(CName5, CType5) \
+REALM_COLUMN_PROXY_DEF(CName6, CType6) \
+REALM_COLUMN_PROXY_DEF(CName7, CType7) \
+REALM_COLUMN_PROXY_DEF(CName8, CType8) \
+REALM_COLUMN_PROXY_DEF(CName9, CType9) \
+REALM_COLUMN_PROXY_DEF(CName10, CType10) \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10; \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10; \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
@@ -2653,47 +2653,47 @@ TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_10(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10) \
+#define REALM_TABLE_IMPL_10(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10) \
 @implementation TableName##Row \
 { \
-    TDBAccessor* _##CName1; \
-    TDBAccessor* _##CName2; \
-    TDBAccessor* _##CName3; \
-    TDBAccessor* _##CName4; \
-    TDBAccessor* _##CName5; \
-    TDBAccessor* _##CName6; \
-    TDBAccessor* _##CName7; \
-    TDBAccessor* _##CName8; \
-    TDBAccessor* _##CName9; \
-    TDBAccessor* _##CName10; \
+    RLMAccessor* _##CName1; \
+    RLMAccessor* _##CName2; \
+    RLMAccessor* _##CName3; \
+    RLMAccessor* _##CName4; \
+    RLMAccessor* _##CName5; \
+    RLMAccessor* _##CName6; \
+    RLMAccessor* _##CName7; \
+    RLMAccessor* _##CName8; \
+    RLMAccessor* _##CName9; \
+    RLMAccessor* _##CName10; \
 } \
 -(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TDBAccessor alloc] initWithRow:self columnId:0]; \
-        _##CName2 = [[TDBAccessor alloc] initWithRow:self columnId:1]; \
-        _##CName3 = [[TDBAccessor alloc] initWithRow:self columnId:2]; \
-        _##CName4 = [[TDBAccessor alloc] initWithRow:self columnId:3]; \
-        _##CName5 = [[TDBAccessor alloc] initWithRow:self columnId:4]; \
-        _##CName6 = [[TDBAccessor alloc] initWithRow:self columnId:5]; \
-        _##CName7 = [[TDBAccessor alloc] initWithRow:self columnId:6]; \
-        _##CName8 = [[TDBAccessor alloc] initWithRow:self columnId:7]; \
-        _##CName9 = [[TDBAccessor alloc] initWithRow:self columnId:8]; \
-        _##CName10 = [[TDBAccessor alloc] initWithRow:self columnId:9]; \
+        _##CName1 = [[RLMAccessor alloc] initWithRow:self columnId:0]; \
+        _##CName2 = [[RLMAccessor alloc] initWithRow:self columnId:1]; \
+        _##CName3 = [[RLMAccessor alloc] initWithRow:self columnId:2]; \
+        _##CName4 = [[RLMAccessor alloc] initWithRow:self columnId:3]; \
+        _##CName5 = [[RLMAccessor alloc] initWithRow:self columnId:4]; \
+        _##CName6 = [[RLMAccessor alloc] initWithRow:self columnId:5]; \
+        _##CName7 = [[RLMAccessor alloc] initWithRow:self columnId:6]; \
+        _##CName8 = [[RLMAccessor alloc] initWithRow:self columnId:7]; \
+        _##CName9 = [[RLMAccessor alloc] initWithRow:self columnId:8]; \
+        _##CName10 = [[RLMAccessor alloc] initWithRow:self columnId:9]; \
     } \
     return self; \
 } \
-TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName7, CType7) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName8, CType8) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName9, CType9) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName10, CType10) \
+REALM_ROW_PROPERTY_IMPL(CName1, CType1) \
+REALM_ROW_PROPERTY_IMPL(CName2, CType2) \
+REALM_ROW_PROPERTY_IMPL(CName3, CType3) \
+REALM_ROW_PROPERTY_IMPL(CName4, CType4) \
+REALM_ROW_PROPERTY_IMPL(CName5, CType5) \
+REALM_ROW_PROPERTY_IMPL(CName6, CType6) \
+REALM_ROW_PROPERTY_IMPL(CName7, CType7) \
+REALM_ROW_PROPERTY_IMPL(CName8, CType8) \
+REALM_ROW_PROPERTY_IMPL(CName9, CType9) \
+REALM_ROW_PROPERTY_IMPL(CName10, CType10) \
 @end \
 @implementation TableName##Query \
 { \
@@ -2768,46 +2768,46 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName10, CType10) \
     return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
 @implementation TableName \
 { \
     TableName##Row* tmpRow; \
 } \
-TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
+REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
+REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
+REALM_COLUMN_PROXY_IMPL(CName3, CType3) \
+REALM_COLUMN_PROXY_IMPL(CName4, CType4) \
+REALM_COLUMN_PROXY_IMPL(CName5, CType5) \
+REALM_COLUMN_PROXY_IMPL(CName6, CType6) \
+REALM_COLUMN_PROXY_IMPL(CName7, CType7) \
+REALM_COLUMN_PROXY_IMPL(CName8, CType8) \
+REALM_COLUMN_PROXY_IMPL(CName9, CType9) \
+REALM_COLUMN_PROXY_IMPL(CName10, CType10) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) \
         return nil; \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    REALM_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    REALM_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
     return self; \
 } \
 -(id)init \
@@ -2818,45 +2818,45 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
     if (![self _addColumns]) \
         return nil; \
 \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    REALM_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    REALM_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 \
 { \
     NSUInteger ndx = self.rowCount; \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
-    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
-    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
-    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    REALM_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    REALM_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
     [self RLM_insertDone]; \
 } \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 \
 { \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
-    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
-    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
-    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    REALM_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    REALM_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
     [self RLM_insertDone]; \
 } \
 -(TableName##Query*)where \
@@ -2890,16 +2890,16 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 } \
 +(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 7, CName8, CType8) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 8, CName9, CType9) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 9, CName10, CType10) \
+    REALM_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
+    REALM_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
+    REALM_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
+    REALM_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
+    REALM_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
+    REALM_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
+    REALM_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
+    REALM_CHECK_COLUMN_TYPE(desc, 7, CName8, CType8) \
+    REALM_CHECK_COLUMN_TYPE(desc, 8, CName9, CType9) \
+    REALM_CHECK_COLUMN_TYPE(desc, 9, CName10, CType10) \
     return YES; \
 } \
 -(BOOL)_checkType \
@@ -2913,16 +2913,16 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 } \
 +(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
-    TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
-    TIGHTDB_ADD_COLUMN(desc, CName3, CType3) \
-    TIGHTDB_ADD_COLUMN(desc, CName4, CType4) \
-    TIGHTDB_ADD_COLUMN(desc, CName5, CType5) \
-    TIGHTDB_ADD_COLUMN(desc, CName6, CType6) \
-    TIGHTDB_ADD_COLUMN(desc, CName7, CType7) \
-    TIGHTDB_ADD_COLUMN(desc, CName8, CType8) \
-    TIGHTDB_ADD_COLUMN(desc, CName9, CType9) \
-    TIGHTDB_ADD_COLUMN(desc, CName10, CType10) \
+    REALM_ADD_COLUMN(desc, CName1, CType1) \
+    REALM_ADD_COLUMN(desc, CName2, CType2) \
+    REALM_ADD_COLUMN(desc, CName3, CType3) \
+    REALM_ADD_COLUMN(desc, CName4, CType4) \
+    REALM_ADD_COLUMN(desc, CName5, CType5) \
+    REALM_ADD_COLUMN(desc, CName6, CType6) \
+    REALM_ADD_COLUMN(desc, CName7, CType7) \
+    REALM_ADD_COLUMN(desc, CName8, CType8) \
+    REALM_ADD_COLUMN(desc, CName9, CType9) \
+    REALM_ADD_COLUMN(desc, CName10, CType10) \
     return YES; \
 } \
 -(BOOL)_addColumns \
@@ -2949,38 +2949,38 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
 } \
 @end
 
-#define TIGHTDB_TABLE_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10) \
-TIGHTDB_TABLE_DEF_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10) \
-TIGHTDB_TABLE_IMPL_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10)
+#define REALM_TABLE_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10) \
+REALM_TABLE_DEF_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10) \
+REALM_TABLE_IMPL_10(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10)
 
 
-#define TIGHTDB_TABLE_DEF_11(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11) \
+#define REALM_TABLE_DEF_11(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11) \
 @interface TableName##Row: RLMRow \
-TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_DEF(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_DEF(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_DEF(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_DEF(CName7, CType7) \
-TIGHTDB_ROW_PROPERTY_DEF(CName8, CType8) \
-TIGHTDB_ROW_PROPERTY_DEF(CName9, CType9) \
-TIGHTDB_ROW_PROPERTY_DEF(CName10, CType10) \
-TIGHTDB_ROW_PROPERTY_DEF(CName11, CType11) \
+REALM_ROW_PROPERTY_DEF(CName1, CType1) \
+REALM_ROW_PROPERTY_DEF(CName2, CType2) \
+REALM_ROW_PROPERTY_DEF(CName3, CType3) \
+REALM_ROW_PROPERTY_DEF(CName4, CType4) \
+REALM_ROW_PROPERTY_DEF(CName5, CType5) \
+REALM_ROW_PROPERTY_DEF(CName6, CType6) \
+REALM_ROW_PROPERTY_DEF(CName7, CType7) \
+REALM_ROW_PROPERTY_DEF(CName8, CType8) \
+REALM_ROW_PROPERTY_DEF(CName9, CType9) \
+REALM_ROW_PROPERTY_DEF(CName10, CType10) \
+REALM_ROW_PROPERTY_DEF(CName11, CType11) \
 @end \
 @class TableName##Query; \
 @class TableName##View; \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
 @interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
@@ -3001,19 +3001,19 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
 -(TableName##View*)findAll; \
 @end \
 @interface TableName: RLMTable \
-TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
-TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
-TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
-TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
-TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11; \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11; \
+REALM_COLUMN_PROXY_DEF(CName1, CType1) \
+REALM_COLUMN_PROXY_DEF(CName2, CType2) \
+REALM_COLUMN_PROXY_DEF(CName3, CType3) \
+REALM_COLUMN_PROXY_DEF(CName4, CType4) \
+REALM_COLUMN_PROXY_DEF(CName5, CType5) \
+REALM_COLUMN_PROXY_DEF(CName6, CType6) \
+REALM_COLUMN_PROXY_DEF(CName7, CType7) \
+REALM_COLUMN_PROXY_DEF(CName8, CType8) \
+REALM_COLUMN_PROXY_DEF(CName9, CType9) \
+REALM_COLUMN_PROXY_DEF(CName10, CType10) \
+REALM_COLUMN_PROXY_DEF(CName11, CType11) \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11; \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11; \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
@@ -3025,50 +3025,50 @@ TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_11(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11) \
+#define REALM_TABLE_IMPL_11(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11) \
 @implementation TableName##Row \
 { \
-    TDBAccessor* _##CName1; \
-    TDBAccessor* _##CName2; \
-    TDBAccessor* _##CName3; \
-    TDBAccessor* _##CName4; \
-    TDBAccessor* _##CName5; \
-    TDBAccessor* _##CName6; \
-    TDBAccessor* _##CName7; \
-    TDBAccessor* _##CName8; \
-    TDBAccessor* _##CName9; \
-    TDBAccessor* _##CName10; \
-    TDBAccessor* _##CName11; \
+    RLMAccessor* _##CName1; \
+    RLMAccessor* _##CName2; \
+    RLMAccessor* _##CName3; \
+    RLMAccessor* _##CName4; \
+    RLMAccessor* _##CName5; \
+    RLMAccessor* _##CName6; \
+    RLMAccessor* _##CName7; \
+    RLMAccessor* _##CName8; \
+    RLMAccessor* _##CName9; \
+    RLMAccessor* _##CName10; \
+    RLMAccessor* _##CName11; \
 } \
 -(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TDBAccessor alloc] initWithRow:self columnId:0]; \
-        _##CName2 = [[TDBAccessor alloc] initWithRow:self columnId:1]; \
-        _##CName3 = [[TDBAccessor alloc] initWithRow:self columnId:2]; \
-        _##CName4 = [[TDBAccessor alloc] initWithRow:self columnId:3]; \
-        _##CName5 = [[TDBAccessor alloc] initWithRow:self columnId:4]; \
-        _##CName6 = [[TDBAccessor alloc] initWithRow:self columnId:5]; \
-        _##CName7 = [[TDBAccessor alloc] initWithRow:self columnId:6]; \
-        _##CName8 = [[TDBAccessor alloc] initWithRow:self columnId:7]; \
-        _##CName9 = [[TDBAccessor alloc] initWithRow:self columnId:8]; \
-        _##CName10 = [[TDBAccessor alloc] initWithRow:self columnId:9]; \
-        _##CName11 = [[TDBAccessor alloc] initWithRow:self columnId:10]; \
+        _##CName1 = [[RLMAccessor alloc] initWithRow:self columnId:0]; \
+        _##CName2 = [[RLMAccessor alloc] initWithRow:self columnId:1]; \
+        _##CName3 = [[RLMAccessor alloc] initWithRow:self columnId:2]; \
+        _##CName4 = [[RLMAccessor alloc] initWithRow:self columnId:3]; \
+        _##CName5 = [[RLMAccessor alloc] initWithRow:self columnId:4]; \
+        _##CName6 = [[RLMAccessor alloc] initWithRow:self columnId:5]; \
+        _##CName7 = [[RLMAccessor alloc] initWithRow:self columnId:6]; \
+        _##CName8 = [[RLMAccessor alloc] initWithRow:self columnId:7]; \
+        _##CName9 = [[RLMAccessor alloc] initWithRow:self columnId:8]; \
+        _##CName10 = [[RLMAccessor alloc] initWithRow:self columnId:9]; \
+        _##CName11 = [[RLMAccessor alloc] initWithRow:self columnId:10]; \
     } \
     return self; \
 } \
-TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName7, CType7) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName8, CType8) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName9, CType9) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName10, CType10) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName11, CType11) \
+REALM_ROW_PROPERTY_IMPL(CName1, CType1) \
+REALM_ROW_PROPERTY_IMPL(CName2, CType2) \
+REALM_ROW_PROPERTY_IMPL(CName3, CType3) \
+REALM_ROW_PROPERTY_IMPL(CName4, CType4) \
+REALM_ROW_PROPERTY_IMPL(CName5, CType5) \
+REALM_ROW_PROPERTY_IMPL(CName6, CType6) \
+REALM_ROW_PROPERTY_IMPL(CName7, CType7) \
+REALM_ROW_PROPERTY_IMPL(CName8, CType8) \
+REALM_ROW_PROPERTY_IMPL(CName9, CType9) \
+REALM_ROW_PROPERTY_IMPL(CName10, CType10) \
+REALM_ROW_PROPERTY_IMPL(CName11, CType11) \
 @end \
 @implementation TableName##Query \
 { \
@@ -3145,49 +3145,49 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName11, CType11) \
     return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
 @implementation TableName \
 { \
     TableName##Row* tmpRow; \
 } \
-TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
+REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
+REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
+REALM_COLUMN_PROXY_IMPL(CName3, CType3) \
+REALM_COLUMN_PROXY_IMPL(CName4, CType4) \
+REALM_COLUMN_PROXY_IMPL(CName5, CType5) \
+REALM_COLUMN_PROXY_IMPL(CName6, CType6) \
+REALM_COLUMN_PROXY_IMPL(CName7, CType7) \
+REALM_COLUMN_PROXY_IMPL(CName8, CType8) \
+REALM_COLUMN_PROXY_IMPL(CName9, CType9) \
+REALM_COLUMN_PROXY_IMPL(CName10, CType10) \
+REALM_COLUMN_PROXY_IMPL(CName11, CType11) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) \
         return nil; \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    REALM_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    REALM_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    REALM_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
     return self; \
 } \
 -(id)init \
@@ -3198,48 +3198,48 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
     if (![self _addColumns]) \
         return nil; \
 \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    REALM_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    REALM_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    REALM_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 \
 { \
     NSUInteger ndx = self.rowCount; \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
-    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
-    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
-    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
-    TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    REALM_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    REALM_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    REALM_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
     [self RLM_insertDone]; \
 } \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 \
 { \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
-    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
-    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
-    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
-    TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    REALM_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    REALM_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    REALM_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
     [self RLM_insertDone]; \
 } \
 -(TableName##Query*)where \
@@ -3273,17 +3273,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 } \
 +(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 7, CName8, CType8) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 8, CName9, CType9) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 9, CName10, CType10) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 10, CName11, CType11) \
+    REALM_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
+    REALM_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
+    REALM_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
+    REALM_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
+    REALM_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
+    REALM_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
+    REALM_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
+    REALM_CHECK_COLUMN_TYPE(desc, 7, CName8, CType8) \
+    REALM_CHECK_COLUMN_TYPE(desc, 8, CName9, CType9) \
+    REALM_CHECK_COLUMN_TYPE(desc, 9, CName10, CType10) \
+    REALM_CHECK_COLUMN_TYPE(desc, 10, CName11, CType11) \
     return YES; \
 } \
 -(BOOL)_checkType \
@@ -3297,17 +3297,17 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 } \
 +(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
-    TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
-    TIGHTDB_ADD_COLUMN(desc, CName3, CType3) \
-    TIGHTDB_ADD_COLUMN(desc, CName4, CType4) \
-    TIGHTDB_ADD_COLUMN(desc, CName5, CType5) \
-    TIGHTDB_ADD_COLUMN(desc, CName6, CType6) \
-    TIGHTDB_ADD_COLUMN(desc, CName7, CType7) \
-    TIGHTDB_ADD_COLUMN(desc, CName8, CType8) \
-    TIGHTDB_ADD_COLUMN(desc, CName9, CType9) \
-    TIGHTDB_ADD_COLUMN(desc, CName10, CType10) \
-    TIGHTDB_ADD_COLUMN(desc, CName11, CType11) \
+    REALM_ADD_COLUMN(desc, CName1, CType1) \
+    REALM_ADD_COLUMN(desc, CName2, CType2) \
+    REALM_ADD_COLUMN(desc, CName3, CType3) \
+    REALM_ADD_COLUMN(desc, CName4, CType4) \
+    REALM_ADD_COLUMN(desc, CName5, CType5) \
+    REALM_ADD_COLUMN(desc, CName6, CType6) \
+    REALM_ADD_COLUMN(desc, CName7, CType7) \
+    REALM_ADD_COLUMN(desc, CName8, CType8) \
+    REALM_ADD_COLUMN(desc, CName9, CType9) \
+    REALM_ADD_COLUMN(desc, CName10, CType10) \
+    REALM_ADD_COLUMN(desc, CName11, CType11) \
     return YES; \
 } \
 -(BOOL)_addColumns \
@@ -3334,40 +3334,40 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
 } \
 @end
 
-#define TIGHTDB_TABLE_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11) \
-TIGHTDB_TABLE_DEF_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11) \
-TIGHTDB_TABLE_IMPL_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11)
+#define REALM_TABLE_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11) \
+REALM_TABLE_DEF_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11) \
+REALM_TABLE_IMPL_11(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11)
 
 
-#define TIGHTDB_TABLE_DEF_12(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12) \
+#define REALM_TABLE_DEF_12(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12) \
 @interface TableName##Row: RLMRow \
-TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_DEF(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_DEF(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_DEF(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_DEF(CName7, CType7) \
-TIGHTDB_ROW_PROPERTY_DEF(CName8, CType8) \
-TIGHTDB_ROW_PROPERTY_DEF(CName9, CType9) \
-TIGHTDB_ROW_PROPERTY_DEF(CName10, CType10) \
-TIGHTDB_ROW_PROPERTY_DEF(CName11, CType11) \
-TIGHTDB_ROW_PROPERTY_DEF(CName12, CType12) \
+REALM_ROW_PROPERTY_DEF(CName1, CType1) \
+REALM_ROW_PROPERTY_DEF(CName2, CType2) \
+REALM_ROW_PROPERTY_DEF(CName3, CType3) \
+REALM_ROW_PROPERTY_DEF(CName4, CType4) \
+REALM_ROW_PROPERTY_DEF(CName5, CType5) \
+REALM_ROW_PROPERTY_DEF(CName6, CType6) \
+REALM_ROW_PROPERTY_DEF(CName7, CType7) \
+REALM_ROW_PROPERTY_DEF(CName8, CType8) \
+REALM_ROW_PROPERTY_DEF(CName9, CType9) \
+REALM_ROW_PROPERTY_DEF(CName10, CType10) \
+REALM_ROW_PROPERTY_DEF(CName11, CType11) \
+REALM_ROW_PROPERTY_DEF(CName12, CType12) \
 @end \
 @class TableName##Query; \
 @class TableName##View; \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
 @interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
@@ -3389,20 +3389,20 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
 -(TableName##View*)findAll; \
 @end \
 @interface TableName: RLMTable \
-TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
-TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
-TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
-TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
-TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
-TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12; \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12; \
+REALM_COLUMN_PROXY_DEF(CName1, CType1) \
+REALM_COLUMN_PROXY_DEF(CName2, CType2) \
+REALM_COLUMN_PROXY_DEF(CName3, CType3) \
+REALM_COLUMN_PROXY_DEF(CName4, CType4) \
+REALM_COLUMN_PROXY_DEF(CName5, CType5) \
+REALM_COLUMN_PROXY_DEF(CName6, CType6) \
+REALM_COLUMN_PROXY_DEF(CName7, CType7) \
+REALM_COLUMN_PROXY_DEF(CName8, CType8) \
+REALM_COLUMN_PROXY_DEF(CName9, CType9) \
+REALM_COLUMN_PROXY_DEF(CName10, CType10) \
+REALM_COLUMN_PROXY_DEF(CName11, CType11) \
+REALM_COLUMN_PROXY_DEF(CName12, CType12) \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12; \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12; \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
@@ -3414,53 +3414,53 @@ TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_12(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12) \
+#define REALM_TABLE_IMPL_12(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12) \
 @implementation TableName##Row \
 { \
-    TDBAccessor* _##CName1; \
-    TDBAccessor* _##CName2; \
-    TDBAccessor* _##CName3; \
-    TDBAccessor* _##CName4; \
-    TDBAccessor* _##CName5; \
-    TDBAccessor* _##CName6; \
-    TDBAccessor* _##CName7; \
-    TDBAccessor* _##CName8; \
-    TDBAccessor* _##CName9; \
-    TDBAccessor* _##CName10; \
-    TDBAccessor* _##CName11; \
-    TDBAccessor* _##CName12; \
+    RLMAccessor* _##CName1; \
+    RLMAccessor* _##CName2; \
+    RLMAccessor* _##CName3; \
+    RLMAccessor* _##CName4; \
+    RLMAccessor* _##CName5; \
+    RLMAccessor* _##CName6; \
+    RLMAccessor* _##CName7; \
+    RLMAccessor* _##CName8; \
+    RLMAccessor* _##CName9; \
+    RLMAccessor* _##CName10; \
+    RLMAccessor* _##CName11; \
+    RLMAccessor* _##CName12; \
 } \
 -(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TDBAccessor alloc] initWithRow:self columnId:0]; \
-        _##CName2 = [[TDBAccessor alloc] initWithRow:self columnId:1]; \
-        _##CName3 = [[TDBAccessor alloc] initWithRow:self columnId:2]; \
-        _##CName4 = [[TDBAccessor alloc] initWithRow:self columnId:3]; \
-        _##CName5 = [[TDBAccessor alloc] initWithRow:self columnId:4]; \
-        _##CName6 = [[TDBAccessor alloc] initWithRow:self columnId:5]; \
-        _##CName7 = [[TDBAccessor alloc] initWithRow:self columnId:6]; \
-        _##CName8 = [[TDBAccessor alloc] initWithRow:self columnId:7]; \
-        _##CName9 = [[TDBAccessor alloc] initWithRow:self columnId:8]; \
-        _##CName10 = [[TDBAccessor alloc] initWithRow:self columnId:9]; \
-        _##CName11 = [[TDBAccessor alloc] initWithRow:self columnId:10]; \
-        _##CName12 = [[TDBAccessor alloc] initWithRow:self columnId:11]; \
+        _##CName1 = [[RLMAccessor alloc] initWithRow:self columnId:0]; \
+        _##CName2 = [[RLMAccessor alloc] initWithRow:self columnId:1]; \
+        _##CName3 = [[RLMAccessor alloc] initWithRow:self columnId:2]; \
+        _##CName4 = [[RLMAccessor alloc] initWithRow:self columnId:3]; \
+        _##CName5 = [[RLMAccessor alloc] initWithRow:self columnId:4]; \
+        _##CName6 = [[RLMAccessor alloc] initWithRow:self columnId:5]; \
+        _##CName7 = [[RLMAccessor alloc] initWithRow:self columnId:6]; \
+        _##CName8 = [[RLMAccessor alloc] initWithRow:self columnId:7]; \
+        _##CName9 = [[RLMAccessor alloc] initWithRow:self columnId:8]; \
+        _##CName10 = [[RLMAccessor alloc] initWithRow:self columnId:9]; \
+        _##CName11 = [[RLMAccessor alloc] initWithRow:self columnId:10]; \
+        _##CName12 = [[RLMAccessor alloc] initWithRow:self columnId:11]; \
     } \
     return self; \
 } \
-TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName7, CType7) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName8, CType8) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName9, CType9) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName10, CType10) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName11, CType11) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName12, CType12) \
+REALM_ROW_PROPERTY_IMPL(CName1, CType1) \
+REALM_ROW_PROPERTY_IMPL(CName2, CType2) \
+REALM_ROW_PROPERTY_IMPL(CName3, CType3) \
+REALM_ROW_PROPERTY_IMPL(CName4, CType4) \
+REALM_ROW_PROPERTY_IMPL(CName5, CType5) \
+REALM_ROW_PROPERTY_IMPL(CName6, CType6) \
+REALM_ROW_PROPERTY_IMPL(CName7, CType7) \
+REALM_ROW_PROPERTY_IMPL(CName8, CType8) \
+REALM_ROW_PROPERTY_IMPL(CName9, CType9) \
+REALM_ROW_PROPERTY_IMPL(CName10, CType10) \
+REALM_ROW_PROPERTY_IMPL(CName11, CType11) \
+REALM_ROW_PROPERTY_IMPL(CName12, CType12) \
 @end \
 @implementation TableName##Query \
 { \
@@ -3539,52 +3539,52 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName12, CType12) \
     return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
 @implementation TableName \
 { \
     TableName##Row* tmpRow; \
 } \
-TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
+REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
+REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
+REALM_COLUMN_PROXY_IMPL(CName3, CType3) \
+REALM_COLUMN_PROXY_IMPL(CName4, CType4) \
+REALM_COLUMN_PROXY_IMPL(CName5, CType5) \
+REALM_COLUMN_PROXY_IMPL(CName6, CType6) \
+REALM_COLUMN_PROXY_IMPL(CName7, CType7) \
+REALM_COLUMN_PROXY_IMPL(CName8, CType8) \
+REALM_COLUMN_PROXY_IMPL(CName9, CType9) \
+REALM_COLUMN_PROXY_IMPL(CName10, CType10) \
+REALM_COLUMN_PROXY_IMPL(CName11, CType11) \
+REALM_COLUMN_PROXY_IMPL(CName12, CType12) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) \
         return nil; \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    REALM_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    REALM_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    REALM_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    REALM_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
     return self; \
 } \
 -(id)init \
@@ -3595,51 +3595,51 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
     if (![self _addColumns]) \
         return nil; \
 \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    REALM_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    REALM_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    REALM_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    REALM_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 \
 { \
     NSUInteger ndx = self.rowCount; \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
-    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
-    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
-    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
-    TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
-    TIGHTDB_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    REALM_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    REALM_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    REALM_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
+    REALM_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
     [self RLM_insertDone]; \
 } \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 \
 { \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
-    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
-    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
-    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
-    TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
-    TIGHTDB_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    REALM_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    REALM_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    REALM_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
+    REALM_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
     [self RLM_insertDone]; \
 } \
 -(TableName##Query*)where \
@@ -3673,18 +3673,18 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 } \
 +(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 7, CName8, CType8) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 8, CName9, CType9) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 9, CName10, CType10) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 10, CName11, CType11) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 11, CName12, CType12) \
+    REALM_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
+    REALM_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
+    REALM_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
+    REALM_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
+    REALM_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
+    REALM_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
+    REALM_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
+    REALM_CHECK_COLUMN_TYPE(desc, 7, CName8, CType8) \
+    REALM_CHECK_COLUMN_TYPE(desc, 8, CName9, CType9) \
+    REALM_CHECK_COLUMN_TYPE(desc, 9, CName10, CType10) \
+    REALM_CHECK_COLUMN_TYPE(desc, 10, CName11, CType11) \
+    REALM_CHECK_COLUMN_TYPE(desc, 11, CName12, CType12) \
     return YES; \
 } \
 -(BOOL)_checkType \
@@ -3698,18 +3698,18 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 } \
 +(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
-    TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
-    TIGHTDB_ADD_COLUMN(desc, CName3, CType3) \
-    TIGHTDB_ADD_COLUMN(desc, CName4, CType4) \
-    TIGHTDB_ADD_COLUMN(desc, CName5, CType5) \
-    TIGHTDB_ADD_COLUMN(desc, CName6, CType6) \
-    TIGHTDB_ADD_COLUMN(desc, CName7, CType7) \
-    TIGHTDB_ADD_COLUMN(desc, CName8, CType8) \
-    TIGHTDB_ADD_COLUMN(desc, CName9, CType9) \
-    TIGHTDB_ADD_COLUMN(desc, CName10, CType10) \
-    TIGHTDB_ADD_COLUMN(desc, CName11, CType11) \
-    TIGHTDB_ADD_COLUMN(desc, CName12, CType12) \
+    REALM_ADD_COLUMN(desc, CName1, CType1) \
+    REALM_ADD_COLUMN(desc, CName2, CType2) \
+    REALM_ADD_COLUMN(desc, CName3, CType3) \
+    REALM_ADD_COLUMN(desc, CName4, CType4) \
+    REALM_ADD_COLUMN(desc, CName5, CType5) \
+    REALM_ADD_COLUMN(desc, CName6, CType6) \
+    REALM_ADD_COLUMN(desc, CName7, CType7) \
+    REALM_ADD_COLUMN(desc, CName8, CType8) \
+    REALM_ADD_COLUMN(desc, CName9, CType9) \
+    REALM_ADD_COLUMN(desc, CName10, CType10) \
+    REALM_ADD_COLUMN(desc, CName11, CType11) \
+    REALM_ADD_COLUMN(desc, CName12, CType12) \
     return YES; \
 } \
 -(BOOL)_addColumns \
@@ -3736,42 +3736,42 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
 } \
 @end
 
-#define TIGHTDB_TABLE_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12) \
-TIGHTDB_TABLE_DEF_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12) \
-TIGHTDB_TABLE_IMPL_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12)
+#define REALM_TABLE_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12) \
+REALM_TABLE_DEF_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12) \
+REALM_TABLE_IMPL_12(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12)
 
 
-#define TIGHTDB_TABLE_DEF_13(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13) \
+#define REALM_TABLE_DEF_13(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13) \
 @interface TableName##Row: RLMRow \
-TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_DEF(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_DEF(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_DEF(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_DEF(CName7, CType7) \
-TIGHTDB_ROW_PROPERTY_DEF(CName8, CType8) \
-TIGHTDB_ROW_PROPERTY_DEF(CName9, CType9) \
-TIGHTDB_ROW_PROPERTY_DEF(CName10, CType10) \
-TIGHTDB_ROW_PROPERTY_DEF(CName11, CType11) \
-TIGHTDB_ROW_PROPERTY_DEF(CName12, CType12) \
-TIGHTDB_ROW_PROPERTY_DEF(CName13, CType13) \
+REALM_ROW_PROPERTY_DEF(CName1, CType1) \
+REALM_ROW_PROPERTY_DEF(CName2, CType2) \
+REALM_ROW_PROPERTY_DEF(CName3, CType3) \
+REALM_ROW_PROPERTY_DEF(CName4, CType4) \
+REALM_ROW_PROPERTY_DEF(CName5, CType5) \
+REALM_ROW_PROPERTY_DEF(CName6, CType6) \
+REALM_ROW_PROPERTY_DEF(CName7, CType7) \
+REALM_ROW_PROPERTY_DEF(CName8, CType8) \
+REALM_ROW_PROPERTY_DEF(CName9, CType9) \
+REALM_ROW_PROPERTY_DEF(CName10, CType10) \
+REALM_ROW_PROPERTY_DEF(CName11, CType11) \
+REALM_ROW_PROPERTY_DEF(CName12, CType12) \
+REALM_ROW_PROPERTY_DEF(CName13, CType13) \
 @end \
 @class TableName##Query; \
 @class TableName##View; \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
 @interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
@@ -3794,21 +3794,21 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
 -(TableName##View*)findAll; \
 @end \
 @interface TableName: RLMTable \
-TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
-TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
-TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
-TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
-TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
-TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
-TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13; \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13; \
+REALM_COLUMN_PROXY_DEF(CName1, CType1) \
+REALM_COLUMN_PROXY_DEF(CName2, CType2) \
+REALM_COLUMN_PROXY_DEF(CName3, CType3) \
+REALM_COLUMN_PROXY_DEF(CName4, CType4) \
+REALM_COLUMN_PROXY_DEF(CName5, CType5) \
+REALM_COLUMN_PROXY_DEF(CName6, CType6) \
+REALM_COLUMN_PROXY_DEF(CName7, CType7) \
+REALM_COLUMN_PROXY_DEF(CName8, CType8) \
+REALM_COLUMN_PROXY_DEF(CName9, CType9) \
+REALM_COLUMN_PROXY_DEF(CName10, CType10) \
+REALM_COLUMN_PROXY_DEF(CName11, CType11) \
+REALM_COLUMN_PROXY_DEF(CName12, CType12) \
+REALM_COLUMN_PROXY_DEF(CName13, CType13) \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13; \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13; \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
@@ -3820,56 +3820,56 @@ TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_13(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13) \
+#define REALM_TABLE_IMPL_13(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13) \
 @implementation TableName##Row \
 { \
-    TDBAccessor* _##CName1; \
-    TDBAccessor* _##CName2; \
-    TDBAccessor* _##CName3; \
-    TDBAccessor* _##CName4; \
-    TDBAccessor* _##CName5; \
-    TDBAccessor* _##CName6; \
-    TDBAccessor* _##CName7; \
-    TDBAccessor* _##CName8; \
-    TDBAccessor* _##CName9; \
-    TDBAccessor* _##CName10; \
-    TDBAccessor* _##CName11; \
-    TDBAccessor* _##CName12; \
-    TDBAccessor* _##CName13; \
+    RLMAccessor* _##CName1; \
+    RLMAccessor* _##CName2; \
+    RLMAccessor* _##CName3; \
+    RLMAccessor* _##CName4; \
+    RLMAccessor* _##CName5; \
+    RLMAccessor* _##CName6; \
+    RLMAccessor* _##CName7; \
+    RLMAccessor* _##CName8; \
+    RLMAccessor* _##CName9; \
+    RLMAccessor* _##CName10; \
+    RLMAccessor* _##CName11; \
+    RLMAccessor* _##CName12; \
+    RLMAccessor* _##CName13; \
 } \
 -(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TDBAccessor alloc] initWithRow:self columnId:0]; \
-        _##CName2 = [[TDBAccessor alloc] initWithRow:self columnId:1]; \
-        _##CName3 = [[TDBAccessor alloc] initWithRow:self columnId:2]; \
-        _##CName4 = [[TDBAccessor alloc] initWithRow:self columnId:3]; \
-        _##CName5 = [[TDBAccessor alloc] initWithRow:self columnId:4]; \
-        _##CName6 = [[TDBAccessor alloc] initWithRow:self columnId:5]; \
-        _##CName7 = [[TDBAccessor alloc] initWithRow:self columnId:6]; \
-        _##CName8 = [[TDBAccessor alloc] initWithRow:self columnId:7]; \
-        _##CName9 = [[TDBAccessor alloc] initWithRow:self columnId:8]; \
-        _##CName10 = [[TDBAccessor alloc] initWithRow:self columnId:9]; \
-        _##CName11 = [[TDBAccessor alloc] initWithRow:self columnId:10]; \
-        _##CName12 = [[TDBAccessor alloc] initWithRow:self columnId:11]; \
-        _##CName13 = [[TDBAccessor alloc] initWithRow:self columnId:12]; \
+        _##CName1 = [[RLMAccessor alloc] initWithRow:self columnId:0]; \
+        _##CName2 = [[RLMAccessor alloc] initWithRow:self columnId:1]; \
+        _##CName3 = [[RLMAccessor alloc] initWithRow:self columnId:2]; \
+        _##CName4 = [[RLMAccessor alloc] initWithRow:self columnId:3]; \
+        _##CName5 = [[RLMAccessor alloc] initWithRow:self columnId:4]; \
+        _##CName6 = [[RLMAccessor alloc] initWithRow:self columnId:5]; \
+        _##CName7 = [[RLMAccessor alloc] initWithRow:self columnId:6]; \
+        _##CName8 = [[RLMAccessor alloc] initWithRow:self columnId:7]; \
+        _##CName9 = [[RLMAccessor alloc] initWithRow:self columnId:8]; \
+        _##CName10 = [[RLMAccessor alloc] initWithRow:self columnId:9]; \
+        _##CName11 = [[RLMAccessor alloc] initWithRow:self columnId:10]; \
+        _##CName12 = [[RLMAccessor alloc] initWithRow:self columnId:11]; \
+        _##CName13 = [[RLMAccessor alloc] initWithRow:self columnId:12]; \
     } \
     return self; \
 } \
-TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName7, CType7) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName8, CType8) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName9, CType9) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName10, CType10) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName11, CType11) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName12, CType12) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName13, CType13) \
+REALM_ROW_PROPERTY_IMPL(CName1, CType1) \
+REALM_ROW_PROPERTY_IMPL(CName2, CType2) \
+REALM_ROW_PROPERTY_IMPL(CName3, CType3) \
+REALM_ROW_PROPERTY_IMPL(CName4, CType4) \
+REALM_ROW_PROPERTY_IMPL(CName5, CType5) \
+REALM_ROW_PROPERTY_IMPL(CName6, CType6) \
+REALM_ROW_PROPERTY_IMPL(CName7, CType7) \
+REALM_ROW_PROPERTY_IMPL(CName8, CType8) \
+REALM_ROW_PROPERTY_IMPL(CName9, CType9) \
+REALM_ROW_PROPERTY_IMPL(CName10, CType10) \
+REALM_ROW_PROPERTY_IMPL(CName11, CType11) \
+REALM_ROW_PROPERTY_IMPL(CName12, CType12) \
+REALM_ROW_PROPERTY_IMPL(CName13, CType13) \
 @end \
 @implementation TableName##Query \
 { \
@@ -3950,55 +3950,55 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName13, CType13) \
     return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
 @implementation TableName \
 { \
     TableName##Row* tmpRow; \
 } \
-TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
+REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
+REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
+REALM_COLUMN_PROXY_IMPL(CName3, CType3) \
+REALM_COLUMN_PROXY_IMPL(CName4, CType4) \
+REALM_COLUMN_PROXY_IMPL(CName5, CType5) \
+REALM_COLUMN_PROXY_IMPL(CName6, CType6) \
+REALM_COLUMN_PROXY_IMPL(CName7, CType7) \
+REALM_COLUMN_PROXY_IMPL(CName8, CType8) \
+REALM_COLUMN_PROXY_IMPL(CName9, CType9) \
+REALM_COLUMN_PROXY_IMPL(CName10, CType10) \
+REALM_COLUMN_PROXY_IMPL(CName11, CType11) \
+REALM_COLUMN_PROXY_IMPL(CName12, CType12) \
+REALM_COLUMN_PROXY_IMPL(CName13, CType13) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) \
         return nil; \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    REALM_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    REALM_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    REALM_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    REALM_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
+    REALM_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
     return self; \
 } \
 -(id)init \
@@ -4009,54 +4009,54 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
     if (![self _addColumns]) \
         return nil; \
 \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    REALM_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    REALM_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    REALM_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    REALM_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
+    REALM_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 \
 { \
     NSUInteger ndx = self.rowCount; \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
-    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
-    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
-    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
-    TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
-    TIGHTDB_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
-    TIGHTDB_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    REALM_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    REALM_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    REALM_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
+    REALM_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
+    REALM_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
     [self RLM_insertDone]; \
 } \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 \
 { \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
-    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
-    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
-    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
-    TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
-    TIGHTDB_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
-    TIGHTDB_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    REALM_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    REALM_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    REALM_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
+    REALM_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
+    REALM_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
     [self RLM_insertDone]; \
 } \
 -(TableName##Query*)where \
@@ -4090,19 +4090,19 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 } \
 +(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 7, CName8, CType8) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 8, CName9, CType9) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 9, CName10, CType10) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 10, CName11, CType11) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 11, CName12, CType12) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 12, CName13, CType13) \
+    REALM_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
+    REALM_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
+    REALM_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
+    REALM_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
+    REALM_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
+    REALM_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
+    REALM_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
+    REALM_CHECK_COLUMN_TYPE(desc, 7, CName8, CType8) \
+    REALM_CHECK_COLUMN_TYPE(desc, 8, CName9, CType9) \
+    REALM_CHECK_COLUMN_TYPE(desc, 9, CName10, CType10) \
+    REALM_CHECK_COLUMN_TYPE(desc, 10, CName11, CType11) \
+    REALM_CHECK_COLUMN_TYPE(desc, 11, CName12, CType12) \
+    REALM_CHECK_COLUMN_TYPE(desc, 12, CName13, CType13) \
     return YES; \
 } \
 -(BOOL)_checkType \
@@ -4116,19 +4116,19 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 } \
 +(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
-    TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
-    TIGHTDB_ADD_COLUMN(desc, CName3, CType3) \
-    TIGHTDB_ADD_COLUMN(desc, CName4, CType4) \
-    TIGHTDB_ADD_COLUMN(desc, CName5, CType5) \
-    TIGHTDB_ADD_COLUMN(desc, CName6, CType6) \
-    TIGHTDB_ADD_COLUMN(desc, CName7, CType7) \
-    TIGHTDB_ADD_COLUMN(desc, CName8, CType8) \
-    TIGHTDB_ADD_COLUMN(desc, CName9, CType9) \
-    TIGHTDB_ADD_COLUMN(desc, CName10, CType10) \
-    TIGHTDB_ADD_COLUMN(desc, CName11, CType11) \
-    TIGHTDB_ADD_COLUMN(desc, CName12, CType12) \
-    TIGHTDB_ADD_COLUMN(desc, CName13, CType13) \
+    REALM_ADD_COLUMN(desc, CName1, CType1) \
+    REALM_ADD_COLUMN(desc, CName2, CType2) \
+    REALM_ADD_COLUMN(desc, CName3, CType3) \
+    REALM_ADD_COLUMN(desc, CName4, CType4) \
+    REALM_ADD_COLUMN(desc, CName5, CType5) \
+    REALM_ADD_COLUMN(desc, CName6, CType6) \
+    REALM_ADD_COLUMN(desc, CName7, CType7) \
+    REALM_ADD_COLUMN(desc, CName8, CType8) \
+    REALM_ADD_COLUMN(desc, CName9, CType9) \
+    REALM_ADD_COLUMN(desc, CName10, CType10) \
+    REALM_ADD_COLUMN(desc, CName11, CType11) \
+    REALM_ADD_COLUMN(desc, CName12, CType12) \
+    REALM_ADD_COLUMN(desc, CName13, CType13) \
     return YES; \
 } \
 -(BOOL)_addColumns \
@@ -4155,44 +4155,44 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
 } \
 @end
 
-#define TIGHTDB_TABLE_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13) \
-TIGHTDB_TABLE_DEF_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13) \
-TIGHTDB_TABLE_IMPL_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13)
+#define REALM_TABLE_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13) \
+REALM_TABLE_DEF_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13) \
+REALM_TABLE_IMPL_13(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13)
 
 
-#define TIGHTDB_TABLE_DEF_14(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14) \
+#define REALM_TABLE_DEF_14(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14) \
 @interface TableName##Row: RLMRow \
-TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_DEF(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_DEF(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_DEF(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_DEF(CName7, CType7) \
-TIGHTDB_ROW_PROPERTY_DEF(CName8, CType8) \
-TIGHTDB_ROW_PROPERTY_DEF(CName9, CType9) \
-TIGHTDB_ROW_PROPERTY_DEF(CName10, CType10) \
-TIGHTDB_ROW_PROPERTY_DEF(CName11, CType11) \
-TIGHTDB_ROW_PROPERTY_DEF(CName12, CType12) \
-TIGHTDB_ROW_PROPERTY_DEF(CName13, CType13) \
-TIGHTDB_ROW_PROPERTY_DEF(CName14, CType14) \
+REALM_ROW_PROPERTY_DEF(CName1, CType1) \
+REALM_ROW_PROPERTY_DEF(CName2, CType2) \
+REALM_ROW_PROPERTY_DEF(CName3, CType3) \
+REALM_ROW_PROPERTY_DEF(CName4, CType4) \
+REALM_ROW_PROPERTY_DEF(CName5, CType5) \
+REALM_ROW_PROPERTY_DEF(CName6, CType6) \
+REALM_ROW_PROPERTY_DEF(CName7, CType7) \
+REALM_ROW_PROPERTY_DEF(CName8, CType8) \
+REALM_ROW_PROPERTY_DEF(CName9, CType9) \
+REALM_ROW_PROPERTY_DEF(CName10, CType10) \
+REALM_ROW_PROPERTY_DEF(CName11, CType11) \
+REALM_ROW_PROPERTY_DEF(CName12, CType12) \
+REALM_ROW_PROPERTY_DEF(CName13, CType13) \
+REALM_ROW_PROPERTY_DEF(CName14, CType14) \
 @end \
 @class TableName##Query; \
 @class TableName##View; \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName14, CType14) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName14, CType14) \
 @interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
@@ -4216,22 +4216,22 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName14, CType14) \
 -(TableName##View*)findAll; \
 @end \
 @interface TableName: RLMTable \
-TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
-TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
-TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
-TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
-TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
-TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
-TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
-TIGHTDB_COLUMN_PROXY_DEF(CName14, CType14) \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14; \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14; \
+REALM_COLUMN_PROXY_DEF(CName1, CType1) \
+REALM_COLUMN_PROXY_DEF(CName2, CType2) \
+REALM_COLUMN_PROXY_DEF(CName3, CType3) \
+REALM_COLUMN_PROXY_DEF(CName4, CType4) \
+REALM_COLUMN_PROXY_DEF(CName5, CType5) \
+REALM_COLUMN_PROXY_DEF(CName6, CType6) \
+REALM_COLUMN_PROXY_DEF(CName7, CType7) \
+REALM_COLUMN_PROXY_DEF(CName8, CType8) \
+REALM_COLUMN_PROXY_DEF(CName9, CType9) \
+REALM_COLUMN_PROXY_DEF(CName10, CType10) \
+REALM_COLUMN_PROXY_DEF(CName11, CType11) \
+REALM_COLUMN_PROXY_DEF(CName12, CType12) \
+REALM_COLUMN_PROXY_DEF(CName13, CType13) \
+REALM_COLUMN_PROXY_DEF(CName14, CType14) \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 CName14:(REALM_ARG_TYPE(CType14))CName14; \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 CName14:(REALM_ARG_TYPE(CType14))CName14; \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
@@ -4243,59 +4243,59 @@ TIGHTDB_COLUMN_PROXY_DEF(CName14, CType14) \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_14(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14) \
+#define REALM_TABLE_IMPL_14(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14) \
 @implementation TableName##Row \
 { \
-    TDBAccessor* _##CName1; \
-    TDBAccessor* _##CName2; \
-    TDBAccessor* _##CName3; \
-    TDBAccessor* _##CName4; \
-    TDBAccessor* _##CName5; \
-    TDBAccessor* _##CName6; \
-    TDBAccessor* _##CName7; \
-    TDBAccessor* _##CName8; \
-    TDBAccessor* _##CName9; \
-    TDBAccessor* _##CName10; \
-    TDBAccessor* _##CName11; \
-    TDBAccessor* _##CName12; \
-    TDBAccessor* _##CName13; \
-    TDBAccessor* _##CName14; \
+    RLMAccessor* _##CName1; \
+    RLMAccessor* _##CName2; \
+    RLMAccessor* _##CName3; \
+    RLMAccessor* _##CName4; \
+    RLMAccessor* _##CName5; \
+    RLMAccessor* _##CName6; \
+    RLMAccessor* _##CName7; \
+    RLMAccessor* _##CName8; \
+    RLMAccessor* _##CName9; \
+    RLMAccessor* _##CName10; \
+    RLMAccessor* _##CName11; \
+    RLMAccessor* _##CName12; \
+    RLMAccessor* _##CName13; \
+    RLMAccessor* _##CName14; \
 } \
 -(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TDBAccessor alloc] initWithRow:self columnId:0]; \
-        _##CName2 = [[TDBAccessor alloc] initWithRow:self columnId:1]; \
-        _##CName3 = [[TDBAccessor alloc] initWithRow:self columnId:2]; \
-        _##CName4 = [[TDBAccessor alloc] initWithRow:self columnId:3]; \
-        _##CName5 = [[TDBAccessor alloc] initWithRow:self columnId:4]; \
-        _##CName6 = [[TDBAccessor alloc] initWithRow:self columnId:5]; \
-        _##CName7 = [[TDBAccessor alloc] initWithRow:self columnId:6]; \
-        _##CName8 = [[TDBAccessor alloc] initWithRow:self columnId:7]; \
-        _##CName9 = [[TDBAccessor alloc] initWithRow:self columnId:8]; \
-        _##CName10 = [[TDBAccessor alloc] initWithRow:self columnId:9]; \
-        _##CName11 = [[TDBAccessor alloc] initWithRow:self columnId:10]; \
-        _##CName12 = [[TDBAccessor alloc] initWithRow:self columnId:11]; \
-        _##CName13 = [[TDBAccessor alloc] initWithRow:self columnId:12]; \
-        _##CName14 = [[TDBAccessor alloc] initWithRow:self columnId:13]; \
+        _##CName1 = [[RLMAccessor alloc] initWithRow:self columnId:0]; \
+        _##CName2 = [[RLMAccessor alloc] initWithRow:self columnId:1]; \
+        _##CName3 = [[RLMAccessor alloc] initWithRow:self columnId:2]; \
+        _##CName4 = [[RLMAccessor alloc] initWithRow:self columnId:3]; \
+        _##CName5 = [[RLMAccessor alloc] initWithRow:self columnId:4]; \
+        _##CName6 = [[RLMAccessor alloc] initWithRow:self columnId:5]; \
+        _##CName7 = [[RLMAccessor alloc] initWithRow:self columnId:6]; \
+        _##CName8 = [[RLMAccessor alloc] initWithRow:self columnId:7]; \
+        _##CName9 = [[RLMAccessor alloc] initWithRow:self columnId:8]; \
+        _##CName10 = [[RLMAccessor alloc] initWithRow:self columnId:9]; \
+        _##CName11 = [[RLMAccessor alloc] initWithRow:self columnId:10]; \
+        _##CName12 = [[RLMAccessor alloc] initWithRow:self columnId:11]; \
+        _##CName13 = [[RLMAccessor alloc] initWithRow:self columnId:12]; \
+        _##CName14 = [[RLMAccessor alloc] initWithRow:self columnId:13]; \
     } \
     return self; \
 } \
-TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName7, CType7) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName8, CType8) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName9, CType9) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName10, CType10) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName11, CType11) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName12, CType12) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName13, CType13) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName14, CType14) \
+REALM_ROW_PROPERTY_IMPL(CName1, CType1) \
+REALM_ROW_PROPERTY_IMPL(CName2, CType2) \
+REALM_ROW_PROPERTY_IMPL(CName3, CType3) \
+REALM_ROW_PROPERTY_IMPL(CName4, CType4) \
+REALM_ROW_PROPERTY_IMPL(CName5, CType5) \
+REALM_ROW_PROPERTY_IMPL(CName6, CType6) \
+REALM_ROW_PROPERTY_IMPL(CName7, CType7) \
+REALM_ROW_PROPERTY_IMPL(CName8, CType8) \
+REALM_ROW_PROPERTY_IMPL(CName9, CType9) \
+REALM_ROW_PROPERTY_IMPL(CName10, CType10) \
+REALM_ROW_PROPERTY_IMPL(CName11, CType11) \
+REALM_ROW_PROPERTY_IMPL(CName12, CType12) \
+REALM_ROW_PROPERTY_IMPL(CName13, CType13) \
+REALM_ROW_PROPERTY_IMPL(CName14, CType14) \
 @end \
 @implementation TableName##Query \
 { \
@@ -4378,58 +4378,58 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName14, CType14) \
     return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
 @implementation TableName \
 { \
     TableName##Row* tmpRow; \
 } \
-TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
+REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
+REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
+REALM_COLUMN_PROXY_IMPL(CName3, CType3) \
+REALM_COLUMN_PROXY_IMPL(CName4, CType4) \
+REALM_COLUMN_PROXY_IMPL(CName5, CType5) \
+REALM_COLUMN_PROXY_IMPL(CName6, CType6) \
+REALM_COLUMN_PROXY_IMPL(CName7, CType7) \
+REALM_COLUMN_PROXY_IMPL(CName8, CType8) \
+REALM_COLUMN_PROXY_IMPL(CName9, CType9) \
+REALM_COLUMN_PROXY_IMPL(CName10, CType10) \
+REALM_COLUMN_PROXY_IMPL(CName11, CType11) \
+REALM_COLUMN_PROXY_IMPL(CName12, CType12) \
+REALM_COLUMN_PROXY_IMPL(CName13, CType13) \
+REALM_COLUMN_PROXY_IMPL(CName14, CType14) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) \
         return nil; \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 13, CName14, CType14); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    REALM_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    REALM_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    REALM_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    REALM_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
+    REALM_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
+    REALM_COLUMN_PROXY_INIT(self, 13, CName14, CType14); \
     return self; \
 } \
 -(id)init \
@@ -4440,57 +4440,57 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
     if (![self _addColumns]) \
         return nil; \
 \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 13, CName14, CType14); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    REALM_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    REALM_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    REALM_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    REALM_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
+    REALM_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
+    REALM_COLUMN_PROXY_INIT(self, 13, CName14, CType14); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 CName14:(REALM_ARG_TYPE(CType14))CName14 \
 { \
     NSUInteger ndx = self.rowCount; \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
-    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
-    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
-    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
-    TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
-    TIGHTDB_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
-    TIGHTDB_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
-    TIGHTDB_COLUMN_INSERT(self, 13, ndx, CName14, CType14); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    REALM_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    REALM_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    REALM_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
+    REALM_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
+    REALM_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
+    REALM_COLUMN_INSERT(self, 13, ndx, CName14, CType14); \
     [self RLM_insertDone]; \
 } \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 CName14:(REALM_ARG_TYPE(CType14))CName14 \
 { \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
-    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
-    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
-    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
-    TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
-    TIGHTDB_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
-    TIGHTDB_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
-    TIGHTDB_COLUMN_INSERT(self, 13, ndx, CName14, CType14); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    REALM_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    REALM_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    REALM_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
+    REALM_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
+    REALM_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
+    REALM_COLUMN_INSERT(self, 13, ndx, CName14, CType14); \
     [self RLM_insertDone]; \
 } \
 -(TableName##Query*)where \
@@ -4524,20 +4524,20 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 } \
 +(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 7, CName8, CType8) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 8, CName9, CType9) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 9, CName10, CType10) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 10, CName11, CType11) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 11, CName12, CType12) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 12, CName13, CType13) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 13, CName14, CType14) \
+    REALM_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
+    REALM_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
+    REALM_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
+    REALM_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
+    REALM_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
+    REALM_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
+    REALM_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
+    REALM_CHECK_COLUMN_TYPE(desc, 7, CName8, CType8) \
+    REALM_CHECK_COLUMN_TYPE(desc, 8, CName9, CType9) \
+    REALM_CHECK_COLUMN_TYPE(desc, 9, CName10, CType10) \
+    REALM_CHECK_COLUMN_TYPE(desc, 10, CName11, CType11) \
+    REALM_CHECK_COLUMN_TYPE(desc, 11, CName12, CType12) \
+    REALM_CHECK_COLUMN_TYPE(desc, 12, CName13, CType13) \
+    REALM_CHECK_COLUMN_TYPE(desc, 13, CName14, CType14) \
     return YES; \
 } \
 -(BOOL)_checkType \
@@ -4551,20 +4551,20 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 } \
 +(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
-    TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
-    TIGHTDB_ADD_COLUMN(desc, CName3, CType3) \
-    TIGHTDB_ADD_COLUMN(desc, CName4, CType4) \
-    TIGHTDB_ADD_COLUMN(desc, CName5, CType5) \
-    TIGHTDB_ADD_COLUMN(desc, CName6, CType6) \
-    TIGHTDB_ADD_COLUMN(desc, CName7, CType7) \
-    TIGHTDB_ADD_COLUMN(desc, CName8, CType8) \
-    TIGHTDB_ADD_COLUMN(desc, CName9, CType9) \
-    TIGHTDB_ADD_COLUMN(desc, CName10, CType10) \
-    TIGHTDB_ADD_COLUMN(desc, CName11, CType11) \
-    TIGHTDB_ADD_COLUMN(desc, CName12, CType12) \
-    TIGHTDB_ADD_COLUMN(desc, CName13, CType13) \
-    TIGHTDB_ADD_COLUMN(desc, CName14, CType14) \
+    REALM_ADD_COLUMN(desc, CName1, CType1) \
+    REALM_ADD_COLUMN(desc, CName2, CType2) \
+    REALM_ADD_COLUMN(desc, CName3, CType3) \
+    REALM_ADD_COLUMN(desc, CName4, CType4) \
+    REALM_ADD_COLUMN(desc, CName5, CType5) \
+    REALM_ADD_COLUMN(desc, CName6, CType6) \
+    REALM_ADD_COLUMN(desc, CName7, CType7) \
+    REALM_ADD_COLUMN(desc, CName8, CType8) \
+    REALM_ADD_COLUMN(desc, CName9, CType9) \
+    REALM_ADD_COLUMN(desc, CName10, CType10) \
+    REALM_ADD_COLUMN(desc, CName11, CType11) \
+    REALM_ADD_COLUMN(desc, CName12, CType12) \
+    REALM_ADD_COLUMN(desc, CName13, CType13) \
+    REALM_ADD_COLUMN(desc, CName14, CType14) \
     return YES; \
 } \
 -(BOOL)_addColumns \
@@ -4591,46 +4591,46 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
 } \
 @end
 
-#define TIGHTDB_TABLE_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14) \
-TIGHTDB_TABLE_DEF_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14) \
-TIGHTDB_TABLE_IMPL_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14)
+#define REALM_TABLE_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14) \
+REALM_TABLE_DEF_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14) \
+REALM_TABLE_IMPL_14(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14)
 
 
-#define TIGHTDB_TABLE_DEF_15(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14, CName15, CType15) \
+#define REALM_TABLE_DEF_15(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14, CName15, CType15) \
 @interface TableName##Row: RLMRow \
-TIGHTDB_ROW_PROPERTY_DEF(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_DEF(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_DEF(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_DEF(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_DEF(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_DEF(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_DEF(CName7, CType7) \
-TIGHTDB_ROW_PROPERTY_DEF(CName8, CType8) \
-TIGHTDB_ROW_PROPERTY_DEF(CName9, CType9) \
-TIGHTDB_ROW_PROPERTY_DEF(CName10, CType10) \
-TIGHTDB_ROW_PROPERTY_DEF(CName11, CType11) \
-TIGHTDB_ROW_PROPERTY_DEF(CName12, CType12) \
-TIGHTDB_ROW_PROPERTY_DEF(CName13, CType13) \
-TIGHTDB_ROW_PROPERTY_DEF(CName14, CType14) \
-TIGHTDB_ROW_PROPERTY_DEF(CName15, CType15) \
+REALM_ROW_PROPERTY_DEF(CName1, CType1) \
+REALM_ROW_PROPERTY_DEF(CName2, CType2) \
+REALM_ROW_PROPERTY_DEF(CName3, CType3) \
+REALM_ROW_PROPERTY_DEF(CName4, CType4) \
+REALM_ROW_PROPERTY_DEF(CName5, CType5) \
+REALM_ROW_PROPERTY_DEF(CName6, CType6) \
+REALM_ROW_PROPERTY_DEF(CName7, CType7) \
+REALM_ROW_PROPERTY_DEF(CName8, CType8) \
+REALM_ROW_PROPERTY_DEF(CName9, CType9) \
+REALM_ROW_PROPERTY_DEF(CName10, CType10) \
+REALM_ROW_PROPERTY_DEF(CName11, CType11) \
+REALM_ROW_PROPERTY_DEF(CName12, CType12) \
+REALM_ROW_PROPERTY_DEF(CName13, CType13) \
+REALM_ROW_PROPERTY_DEF(CName14, CType14) \
+REALM_ROW_PROPERTY_DEF(CName15, CType15) \
 @end \
 @class TableName##Query; \
 @class TableName##View; \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName14, CType14) \
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName15, CType15) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName8, CType8) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName9, CType9) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName10, CType10) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName11, CType11) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName12, CType12) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName13, CType13) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName14, CType14) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName15, CType15) \
 @interface TableName##Query: RLMQuery \
 @property(nonatomic, strong) TableName##QueryAccessor##CName1* CName1; \
 @property(nonatomic, strong) TableName##QueryAccessor##CName2* CName2; \
@@ -4655,23 +4655,23 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName15, CType15) \
 -(TableName##View*)findAll; \
 @end \
 @interface TableName: RLMTable \
-TIGHTDB_COLUMN_PROXY_DEF(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_DEF(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_DEF(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_DEF(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_DEF(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_DEF(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_DEF(CName7, CType7) \
-TIGHTDB_COLUMN_PROXY_DEF(CName8, CType8) \
-TIGHTDB_COLUMN_PROXY_DEF(CName9, CType9) \
-TIGHTDB_COLUMN_PROXY_DEF(CName10, CType10) \
-TIGHTDB_COLUMN_PROXY_DEF(CName11, CType11) \
-TIGHTDB_COLUMN_PROXY_DEF(CName12, CType12) \
-TIGHTDB_COLUMN_PROXY_DEF(CName13, CType13) \
-TIGHTDB_COLUMN_PROXY_DEF(CName14, CType14) \
-TIGHTDB_COLUMN_PROXY_DEF(CName15, CType15) \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15; \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15; \
+REALM_COLUMN_PROXY_DEF(CName1, CType1) \
+REALM_COLUMN_PROXY_DEF(CName2, CType2) \
+REALM_COLUMN_PROXY_DEF(CName3, CType3) \
+REALM_COLUMN_PROXY_DEF(CName4, CType4) \
+REALM_COLUMN_PROXY_DEF(CName5, CType5) \
+REALM_COLUMN_PROXY_DEF(CName6, CType6) \
+REALM_COLUMN_PROXY_DEF(CName7, CType7) \
+REALM_COLUMN_PROXY_DEF(CName8, CType8) \
+REALM_COLUMN_PROXY_DEF(CName9, CType9) \
+REALM_COLUMN_PROXY_DEF(CName10, CType10) \
+REALM_COLUMN_PROXY_DEF(CName11, CType11) \
+REALM_COLUMN_PROXY_DEF(CName12, CType12) \
+REALM_COLUMN_PROXY_DEF(CName13, CType13) \
+REALM_COLUMN_PROXY_DEF(CName14, CType14) \
+REALM_COLUMN_PROXY_DEF(CName15, CType15) \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 CName14:(REALM_ARG_TYPE(CType14))CName14 CName15:(REALM_ARG_TYPE(CType15))CName15; \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 CName14:(REALM_ARG_TYPE(CType14))CName14 CName15:(REALM_ARG_TYPE(CType15))CName15; \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
@@ -4683,62 +4683,62 @@ TIGHTDB_COLUMN_PROXY_DEF(CName15, CType15) \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_15(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14, CName15, CType15) \
+#define REALM_TABLE_IMPL_15(TableName, CName1, CType1, CName2, CType2, CName3, CType3, CName4, CType4, CName5, CType5, CName6, CType6, CName7, CType7, CName8, CType8, CName9, CType9, CName10, CType10, CName11, CType11, CName12, CType12, CName13, CType13, CName14, CType14, CName15, CType15) \
 @implementation TableName##Row \
 { \
-    TDBAccessor* _##CName1; \
-    TDBAccessor* _##CName2; \
-    TDBAccessor* _##CName3; \
-    TDBAccessor* _##CName4; \
-    TDBAccessor* _##CName5; \
-    TDBAccessor* _##CName6; \
-    TDBAccessor* _##CName7; \
-    TDBAccessor* _##CName8; \
-    TDBAccessor* _##CName9; \
-    TDBAccessor* _##CName10; \
-    TDBAccessor* _##CName11; \
-    TDBAccessor* _##CName12; \
-    TDBAccessor* _##CName13; \
-    TDBAccessor* _##CName14; \
-    TDBAccessor* _##CName15; \
+    RLMAccessor* _##CName1; \
+    RLMAccessor* _##CName2; \
+    RLMAccessor* _##CName3; \
+    RLMAccessor* _##CName4; \
+    RLMAccessor* _##CName5; \
+    RLMAccessor* _##CName6; \
+    RLMAccessor* _##CName7; \
+    RLMAccessor* _##CName8; \
+    RLMAccessor* _##CName9; \
+    RLMAccessor* _##CName10; \
+    RLMAccessor* _##CName11; \
+    RLMAccessor* _##CName12; \
+    RLMAccessor* _##CName13; \
+    RLMAccessor* _##CName14; \
+    RLMAccessor* _##CName15; \
 } \
 -(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
 { \
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
-        _##CName1 = [[TDBAccessor alloc] initWithRow:self columnId:0]; \
-        _##CName2 = [[TDBAccessor alloc] initWithRow:self columnId:1]; \
-        _##CName3 = [[TDBAccessor alloc] initWithRow:self columnId:2]; \
-        _##CName4 = [[TDBAccessor alloc] initWithRow:self columnId:3]; \
-        _##CName5 = [[TDBAccessor alloc] initWithRow:self columnId:4]; \
-        _##CName6 = [[TDBAccessor alloc] initWithRow:self columnId:5]; \
-        _##CName7 = [[TDBAccessor alloc] initWithRow:self columnId:6]; \
-        _##CName8 = [[TDBAccessor alloc] initWithRow:self columnId:7]; \
-        _##CName9 = [[TDBAccessor alloc] initWithRow:self columnId:8]; \
-        _##CName10 = [[TDBAccessor alloc] initWithRow:self columnId:9]; \
-        _##CName11 = [[TDBAccessor alloc] initWithRow:self columnId:10]; \
-        _##CName12 = [[TDBAccessor alloc] initWithRow:self columnId:11]; \
-        _##CName13 = [[TDBAccessor alloc] initWithRow:self columnId:12]; \
-        _##CName14 = [[TDBAccessor alloc] initWithRow:self columnId:13]; \
-        _##CName15 = [[TDBAccessor alloc] initWithRow:self columnId:14]; \
+        _##CName1 = [[RLMAccessor alloc] initWithRow:self columnId:0]; \
+        _##CName2 = [[RLMAccessor alloc] initWithRow:self columnId:1]; \
+        _##CName3 = [[RLMAccessor alloc] initWithRow:self columnId:2]; \
+        _##CName4 = [[RLMAccessor alloc] initWithRow:self columnId:3]; \
+        _##CName5 = [[RLMAccessor alloc] initWithRow:self columnId:4]; \
+        _##CName6 = [[RLMAccessor alloc] initWithRow:self columnId:5]; \
+        _##CName7 = [[RLMAccessor alloc] initWithRow:self columnId:6]; \
+        _##CName8 = [[RLMAccessor alloc] initWithRow:self columnId:7]; \
+        _##CName9 = [[RLMAccessor alloc] initWithRow:self columnId:8]; \
+        _##CName10 = [[RLMAccessor alloc] initWithRow:self columnId:9]; \
+        _##CName11 = [[RLMAccessor alloc] initWithRow:self columnId:10]; \
+        _##CName12 = [[RLMAccessor alloc] initWithRow:self columnId:11]; \
+        _##CName13 = [[RLMAccessor alloc] initWithRow:self columnId:12]; \
+        _##CName14 = [[RLMAccessor alloc] initWithRow:self columnId:13]; \
+        _##CName15 = [[RLMAccessor alloc] initWithRow:self columnId:14]; \
     } \
     return self; \
 } \
-TIGHTDB_ROW_PROPERTY_IMPL(CName1, CType1) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName2, CType2) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName3, CType3) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName4, CType4) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName5, CType5) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName6, CType6) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName7, CType7) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName8, CType8) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName9, CType9) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName10, CType10) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName11, CType11) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName12, CType12) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName13, CType13) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName14, CType14) \
-TIGHTDB_ROW_PROPERTY_IMPL(CName15, CType15) \
+REALM_ROW_PROPERTY_IMPL(CName1, CType1) \
+REALM_ROW_PROPERTY_IMPL(CName2, CType2) \
+REALM_ROW_PROPERTY_IMPL(CName3, CType3) \
+REALM_ROW_PROPERTY_IMPL(CName4, CType4) \
+REALM_ROW_PROPERTY_IMPL(CName5, CType5) \
+REALM_ROW_PROPERTY_IMPL(CName6, CType6) \
+REALM_ROW_PROPERTY_IMPL(CName7, CType7) \
+REALM_ROW_PROPERTY_IMPL(CName8, CType8) \
+REALM_ROW_PROPERTY_IMPL(CName9, CType9) \
+REALM_ROW_PROPERTY_IMPL(CName10, CType10) \
+REALM_ROW_PROPERTY_IMPL(CName11, CType11) \
+REALM_ROW_PROPERTY_IMPL(CName12, CType12) \
+REALM_ROW_PROPERTY_IMPL(CName13, CType13) \
+REALM_ROW_PROPERTY_IMPL(CName14, CType14) \
+REALM_ROW_PROPERTY_IMPL(CName15, CType15) \
 @end \
 @implementation TableName##Query \
 { \
@@ -4823,61 +4823,61 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName15, CType15) \
     return [[TableName##View alloc] _initWithQuery:self]; \
 } \
 @end \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName15, CType15) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName1, CType1) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName2, CType2) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName3, CType3) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName4, CType4) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName5, CType5) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName6, CType6) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName7, CType7) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName8, CType8) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName9, CType9) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName10, CType10) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName11, CType11) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName12, CType12) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName13, CType13) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName14, CType14) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName15, CType15) \
 @implementation TableName \
 { \
     TableName##Row* tmpRow; \
 } \
-TIGHTDB_COLUMN_PROXY_IMPL(CName1, CType1) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName2, CType2) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName3, CType3) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName4, CType4) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName5, CType5) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName6, CType6) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName7, CType7) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName8, CType8) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName9, CType9) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName10, CType10) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName11, CType11) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName12, CType12) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName13, CType13) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName14, CType14) \
-TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
+REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
+REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
+REALM_COLUMN_PROXY_IMPL(CName3, CType3) \
+REALM_COLUMN_PROXY_IMPL(CName4, CType4) \
+REALM_COLUMN_PROXY_IMPL(CName5, CType5) \
+REALM_COLUMN_PROXY_IMPL(CName6, CType6) \
+REALM_COLUMN_PROXY_IMPL(CName7, CType7) \
+REALM_COLUMN_PROXY_IMPL(CName8, CType8) \
+REALM_COLUMN_PROXY_IMPL(CName9, CType9) \
+REALM_COLUMN_PROXY_IMPL(CName10, CType10) \
+REALM_COLUMN_PROXY_IMPL(CName11, CType11) \
+REALM_COLUMN_PROXY_IMPL(CName12, CType12) \
+REALM_COLUMN_PROXY_IMPL(CName13, CType13) \
+REALM_COLUMN_PROXY_IMPL(CName14, CType14) \
+REALM_COLUMN_PROXY_IMPL(CName15, CType15) \
 \
 -(id)_initRaw \
 { \
     self = [super _initRaw]; \
     if (!self) \
         return nil; \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 13, CName14, CType14); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 14, CName15, CType15); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    REALM_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    REALM_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    REALM_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    REALM_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
+    REALM_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
+    REALM_COLUMN_PROXY_INIT(self, 13, CName14, CType14); \
+    REALM_COLUMN_PROXY_INIT(self, 14, CName15, CType15); \
     return self; \
 } \
 -(id)init \
@@ -4888,60 +4888,60 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
     if (![self _addColumns]) \
         return nil; \
 \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 13, CName14, CType14); \
-    TIGHTDB_COLUMN_PROXY_INIT(self, 14, CName15, CType15); \
+    REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
+    REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
+    REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
+    REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
+    REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
+    REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
+    REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
+    REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
+    REALM_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
+    REALM_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
+    REALM_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
+    REALM_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
+    REALM_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
+    REALM_COLUMN_PROXY_INIT(self, 13, CName14, CType14); \
+    REALM_COLUMN_PROXY_INIT(self, 14, CName15, CType15); \
     return self; \
 } \
--(void)add##CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15 \
+-(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 CName14:(REALM_ARG_TYPE(CType14))CName14 CName15:(REALM_ARG_TYPE(CType15))CName15 \
 { \
     NSUInteger ndx = self.rowCount; \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
-    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
-    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
-    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
-    TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
-    TIGHTDB_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
-    TIGHTDB_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
-    TIGHTDB_COLUMN_INSERT(self, 13, ndx, CName14, CType14); \
-    TIGHTDB_COLUMN_INSERT(self, 14, ndx, CName15, CType15); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    REALM_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    REALM_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    REALM_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
+    REALM_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
+    REALM_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
+    REALM_COLUMN_INSERT(self, 13, ndx, CName14, CType14); \
+    REALM_COLUMN_INSERT(self, 14, ndx, CName15, CType15); \
     [self RLM_insertDone]; \
 } \
--(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(TIGHTDB_ARG_TYPE(CType1))CName1 CName2:(TIGHTDB_ARG_TYPE(CType2))CName2 CName3:(TIGHTDB_ARG_TYPE(CType3))CName3 CName4:(TIGHTDB_ARG_TYPE(CType4))CName4 CName5:(TIGHTDB_ARG_TYPE(CType5))CName5 CName6:(TIGHTDB_ARG_TYPE(CType6))CName6 CName7:(TIGHTDB_ARG_TYPE(CType7))CName7 CName8:(TIGHTDB_ARG_TYPE(CType8))CName8 CName9:(TIGHTDB_ARG_TYPE(CType9))CName9 CName10:(TIGHTDB_ARG_TYPE(CType10))CName10 CName11:(TIGHTDB_ARG_TYPE(CType11))CName11 CName12:(TIGHTDB_ARG_TYPE(CType12))CName12 CName13:(TIGHTDB_ARG_TYPE(CType13))CName13 CName14:(TIGHTDB_ARG_TYPE(CType14))CName14 CName15:(TIGHTDB_ARG_TYPE(CType15))CName15 \
+-(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 CName14:(REALM_ARG_TYPE(CType14))CName14 CName15:(REALM_ARG_TYPE(CType15))CName15 \
 { \
-    TIGHTDB_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
-    TIGHTDB_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
-    TIGHTDB_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
-    TIGHTDB_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
-    TIGHTDB_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
-    TIGHTDB_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
-    TIGHTDB_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
-    TIGHTDB_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
-    TIGHTDB_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
-    TIGHTDB_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
-    TIGHTDB_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
-    TIGHTDB_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
-    TIGHTDB_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
-    TIGHTDB_COLUMN_INSERT(self, 13, ndx, CName14, CType14); \
-    TIGHTDB_COLUMN_INSERT(self, 14, ndx, CName15, CType15); \
+    REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
+    REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
+    REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
+    REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
+    REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
+    REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
+    REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
+    REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
+    REALM_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
+    REALM_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
+    REALM_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
+    REALM_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
+    REALM_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
+    REALM_COLUMN_INSERT(self, 13, ndx, CName14, CType14); \
+    REALM_COLUMN_INSERT(self, 14, ndx, CName15, CType15); \
     [self RLM_insertDone]; \
 } \
 -(TableName##Query*)where \
@@ -4975,21 +4975,21 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 } \
 +(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 7, CName8, CType8) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 8, CName9, CType9) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 9, CName10, CType10) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 10, CName11, CType11) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 11, CName12, CType12) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 12, CName13, CType13) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 13, CName14, CType14) \
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, 14, CName15, CType15) \
+    REALM_CHECK_COLUMN_TYPE(desc, 0, CName1, CType1) \
+    REALM_CHECK_COLUMN_TYPE(desc, 1, CName2, CType2) \
+    REALM_CHECK_COLUMN_TYPE(desc, 2, CName3, CType3) \
+    REALM_CHECK_COLUMN_TYPE(desc, 3, CName4, CType4) \
+    REALM_CHECK_COLUMN_TYPE(desc, 4, CName5, CType5) \
+    REALM_CHECK_COLUMN_TYPE(desc, 5, CName6, CType6) \
+    REALM_CHECK_COLUMN_TYPE(desc, 6, CName7, CType7) \
+    REALM_CHECK_COLUMN_TYPE(desc, 7, CName8, CType8) \
+    REALM_CHECK_COLUMN_TYPE(desc, 8, CName9, CType9) \
+    REALM_CHECK_COLUMN_TYPE(desc, 9, CName10, CType10) \
+    REALM_CHECK_COLUMN_TYPE(desc, 10, CName11, CType11) \
+    REALM_CHECK_COLUMN_TYPE(desc, 11, CName12, CType12) \
+    REALM_CHECK_COLUMN_TYPE(desc, 12, CName13, CType13) \
+    REALM_CHECK_COLUMN_TYPE(desc, 13, CName14, CType14) \
+    REALM_CHECK_COLUMN_TYPE(desc, 14, CName15, CType15) \
     return YES; \
 } \
 -(BOOL)_checkType \
@@ -5003,21 +5003,21 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 } \
 +(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
-    TIGHTDB_ADD_COLUMN(desc, CName1, CType1) \
-    TIGHTDB_ADD_COLUMN(desc, CName2, CType2) \
-    TIGHTDB_ADD_COLUMN(desc, CName3, CType3) \
-    TIGHTDB_ADD_COLUMN(desc, CName4, CType4) \
-    TIGHTDB_ADD_COLUMN(desc, CName5, CType5) \
-    TIGHTDB_ADD_COLUMN(desc, CName6, CType6) \
-    TIGHTDB_ADD_COLUMN(desc, CName7, CType7) \
-    TIGHTDB_ADD_COLUMN(desc, CName8, CType8) \
-    TIGHTDB_ADD_COLUMN(desc, CName9, CType9) \
-    TIGHTDB_ADD_COLUMN(desc, CName10, CType10) \
-    TIGHTDB_ADD_COLUMN(desc, CName11, CType11) \
-    TIGHTDB_ADD_COLUMN(desc, CName12, CType12) \
-    TIGHTDB_ADD_COLUMN(desc, CName13, CType13) \
-    TIGHTDB_ADD_COLUMN(desc, CName14, CType14) \
-    TIGHTDB_ADD_COLUMN(desc, CName15, CType15) \
+    REALM_ADD_COLUMN(desc, CName1, CType1) \
+    REALM_ADD_COLUMN(desc, CName2, CType2) \
+    REALM_ADD_COLUMN(desc, CName3, CType3) \
+    REALM_ADD_COLUMN(desc, CName4, CType4) \
+    REALM_ADD_COLUMN(desc, CName5, CType5) \
+    REALM_ADD_COLUMN(desc, CName6, CType6) \
+    REALM_ADD_COLUMN(desc, CName7, CType7) \
+    REALM_ADD_COLUMN(desc, CName8, CType8) \
+    REALM_ADD_COLUMN(desc, CName9, CType9) \
+    REALM_ADD_COLUMN(desc, CName10, CType10) \
+    REALM_ADD_COLUMN(desc, CName11, CType11) \
+    REALM_ADD_COLUMN(desc, CName12, CType12) \
+    REALM_ADD_COLUMN(desc, CName13, CType13) \
+    REALM_ADD_COLUMN(desc, CName14, CType14) \
+    REALM_ADD_COLUMN(desc, CName15, CType15) \
     return YES; \
 } \
 -(BOOL)_addColumns \
@@ -5044,6 +5044,6 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName15, CType15) \
 } \
 @end
 
-#define TIGHTDB_TABLE_15(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14, CType15, CName15) \
-TIGHTDB_TABLE_DEF_15(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14, CType15, CName15) \
-TIGHTDB_TABLE_IMPL_15(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14, CType15, CName15)
+#define REALM_TABLE_15(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14, CType15, CName15) \
+REALM_TABLE_DEF_15(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14, CType15, CName15) \
+REALM_TABLE_IMPL_15(TableName, CType1, CName1, CType2, CName2, CType3, CName3, CType4, CName4, CType5, CName5, CType6, CName6, CType7, CName7, CType8, CName8, CType9, CName9, CType10, CName10, CType11, CName11, CType12, CName12, CType13, CName13, CType14, CName14, CType15, CName15)

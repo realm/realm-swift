@@ -22,10 +22,10 @@
 
 #import <tightdb/objc/Realm.h>
 
-TIGHTDB_TABLE_1(TestTableSub,
+REALM_TABLE_1(TestTableSub,
                 age,  Int)
 
-TIGHTDB_TABLE_9(TestTableAllTypes,
+REALM_TABLE_9(TestTableAllTypes,
                 BoolCol,   Bool,
                 IntCol,    Int,
                 FloatCol,  Float,

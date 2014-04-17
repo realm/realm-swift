@@ -11,16 +11,16 @@
 #import <tightdb/objc/RLMTransaction.h>
 #import <tightdb/objc/RLMContext.h>
 
-TIGHTDB_TABLE_2(GetSubtable,
+REALM_TABLE_2(GetSubtable,
                 Hired, Bool,
                 Age,   Int)
 
-TIGHTDB_TABLE_2(WrongNameTable,
+REALM_TABLE_2(WrongNameTable,
                 HiredFor, Bool,
                 Ageing,   Int)
 
 
-TIGHTDB_TABLE_2(WrongTypeTable,
+REALM_TABLE_2(WrongTypeTable,
                 Hired, Int,
                 Age,   Bool)
 

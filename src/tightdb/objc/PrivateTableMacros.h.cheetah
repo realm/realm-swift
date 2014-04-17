@@ -51,20 +51,20 @@ directiveStartToken = %
 %set $num_cols = $i + 1
 
 
-#define TIGHTDB_TABLE_DEF_${num_cols}(TableName%slurp
+#define REALM_TABLE_DEF_${num_cols}(TableName%slurp
 %for $j in range($num_cols)
 , CName${j+1}, CType${j+1}%slurp
 %end for
 ) \
 @interface TableName##Row: RLMRow \
 %for $j in range($num_cols)
-TIGHTDB_ROW_PROPERTY_DEF(CName${j+1}, CType${j+1}) \
+REALM_ROW_PROPERTY_DEF(CName${j+1}, CType${j+1}) \
 %end for
 @end \
 @class TableName##Query; \
 @class TableName##View; \
 %for $j in range($num_cols)
-TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName${j+1}, CType${j+1}) \
+REALM_QUERY_ACCESSOR_DEF(TableName, CName${j+1}, CType${j+1}) \
 %end for
 @interface TableName##Query: RLMQuery \
 %for $j in range($num_cols)
@@ -79,19 +79,19 @@ TIGHTDB_QUERY_ACCESSOR_DEF(TableName, CName${j+1}, CType${j+1}) \
 @end \
 @interface TableName: RLMTable \
 %for $j in range($num_cols)
-TIGHTDB_COLUMN_PROXY_DEF(CName${j+1}, CType${j+1}) \
+REALM_COLUMN_PROXY_DEF(CName${j+1}, CType${j+1}) \
 %end for
 -(void)add##%slurp
 %for $j in range($num_cols)
 %if 0 < $j
 %echo ' '
 %end if
-CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
+CName${j+1}:(REALM_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 %end for
 ; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx%slurp
 %for $j in range($num_cols)
- CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
+ CName${j+1}:(REALM_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 %end for
 ; \
 -(TableName##Query*)where; \
@@ -105,7 +105,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 @end
 
-#define TIGHTDB_TABLE_IMPL_${num_cols}(TableName%slurp
+#define REALM_TABLE_IMPL_${num_cols}(TableName%slurp
 %for $j in range($num_cols)
 , CName${j+1}, CType${j+1}%slurp
 %end for
@@ -113,7 +113,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 @implementation TableName##Row \
 { \
 %for $j in range($num_cols)
-    TDBAccessor* _##CName${j+1}; \
+    RLMAccessor* _##CName${j+1}; \
 %end for
 } \
 -(id)initWithTable:(RLMTable*)table ndx:(NSUInteger)ndx \
@@ -121,13 +121,13 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
     self = [super initWithTable:table ndx:ndx]; \
     if (self) { \
 %for $j in range($num_cols)
-        _##CName${j+1} = [[TDBAccessor alloc] initWithRow:self columnId:${j}]; \
+        _##CName${j+1} = [[RLMAccessor alloc] initWithRow:self columnId:${j}]; \
 %end for
     } \
     return self; \
 } \
 %for $j in range($num_cols)
-TIGHTDB_ROW_PROPERTY_IMPL(CName${j+1}, CType${j+1}) \
+REALM_ROW_PROPERTY_IMPL(CName${j+1}, CType${j+1}) \
 %end for
 @end \
 @implementation TableName##Query \
@@ -190,14 +190,14 @@ TIGHTDB_ROW_PROPERTY_IMPL(CName${j+1}, CType${j+1}) \
 } \
 @end \
 %for $j in range($num_cols)
-TIGHTDB_QUERY_ACCESSOR_IMPL(TableName, CName${j+1}, CType${j+1}) \
+REALM_QUERY_ACCESSOR_IMPL(TableName, CName${j+1}, CType${j+1}) \
 %end for
 @implementation TableName \
 { \
     TableName##Row* tmpRow; \
 } \
 %for $j in range($num_cols)
-TIGHTDB_COLUMN_PROXY_IMPL(CName${j+1}, CType${j+1}) \
+REALM_COLUMN_PROXY_IMPL(CName${j+1}, CType${j+1}) \
 %end for
 \
 -(id)_initRaw \
@@ -206,7 +206,7 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName${j+1}, CType${j+1}) \
     if (!self) \
         return nil; \
 %for $j in range($num_cols)
-    TIGHTDB_COLUMN_PROXY_INIT(self, ${j}, CName${j+1}, CType${j+1}); \
+    REALM_COLUMN_PROXY_INIT(self, ${j}, CName${j+1}, CType${j+1}); \
 %end for
     return self; \
 } \
@@ -219,30 +219,30 @@ TIGHTDB_COLUMN_PROXY_IMPL(CName${j+1}, CType${j+1}) \
         return nil; \
 \
 %for $j in range($num_cols)
-    TIGHTDB_COLUMN_PROXY_INIT(self, ${j}, CName${j+1}, CType${j+1}); \
+    REALM_COLUMN_PROXY_INIT(self, ${j}, CName${j+1}, CType${j+1}); \
 %end for
     return self; \
 } \
 -(void)add##%slurp
 %for $j in range($num_cols)
-CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
+CName${j+1}:(REALM_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 %end for
 \
 { \
     NSUInteger ndx = self.rowCount; \
 %for $j in range($num_cols)
-    TIGHTDB_COLUMN_INSERT(self, ${j}, ndx, CName${j+1}, CType${j+1}); \
+    REALM_COLUMN_INSERT(self, ${j}, ndx, CName${j+1}, CType${j+1}); \
 %end for
     [self RLM_insertDone]; \
 } \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx %slurp
 %for $j in range($num_cols)
-CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
+CName${j+1}:(REALM_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 %end for
 \
 { \
 %for $j in range($num_cols)
-    TIGHTDB_COLUMN_INSERT(self, ${j}, ndx, CName${j+1}, CType${j+1}); \
+    REALM_COLUMN_INSERT(self, ${j}, ndx, CName${j+1}, CType${j+1}); \
 %end for
     [self RLM_insertDone]; \
 } \
@@ -278,7 +278,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 +(BOOL)_checkType:(RLMDescriptor*)desc \
 { \
 %for $j in range($num_cols)
-    TIGHTDB_CHECK_COLUMN_TYPE(desc, ${j}, CName${j+1}, CType${j+1}) \
+    REALM_CHECK_COLUMN_TYPE(desc, ${j}, CName${j+1}, CType${j+1}) \
 %end for
     return YES; \
 } \
@@ -294,7 +294,7 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 +(BOOL)_addColumns:(RLMDescriptor*)desc \
 { \
 %for $j in range($num_cols)
-    TIGHTDB_ADD_COLUMN(desc, CName${j+1}, CType${j+1}) \
+    REALM_ADD_COLUMN(desc, CName${j+1}, CType${j+1}) \
 %end for
     return YES; \
 } \
@@ -322,17 +322,17 @@ CName${j+1}:(TIGHTDB_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
 } \
 @end
 
-#define TIGHTDB_TABLE_${num_cols}(TableName%slurp
+#define REALM_TABLE_${num_cols}(TableName%slurp
 %for $j in range($num_cols)
 , CType${j+1}, CName${j+1}%slurp
 %end for
 ) \
-TIGHTDB_TABLE_DEF_${num_cols}(TableName%slurp
+REALM_TABLE_DEF_${num_cols}(TableName%slurp
 %for $j in range($num_cols)
 , CType${j+1}, CName${j+1}%slurp
 %end for
 ) \
-TIGHTDB_TABLE_IMPL_${num_cols}(TableName%slurp
+REALM_TABLE_IMPL_${num_cols}(TableName%slurp
 %for $j in range($num_cols)
 , CType${j+1}, CName${j+1}%slurp
 %end for

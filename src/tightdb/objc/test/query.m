@@ -8,10 +8,10 @@
 #import <tightdb/objc/Realm.h>
 #import <tightdb/objc/RLMQueryFast.h>
 
-TIGHTDB_TABLE_1(TestQuerySub,
+REALM_TABLE_1(TestQuerySub,
                 Age,  Int)
 
-TIGHTDB_TABLE_9(TestQueryAllTypes,
+REALM_TABLE_9(TestQueryAllTypes,
                 BoolCol,   Bool,
                 IntCol,    Int,
                 FloatCol,  Float,
