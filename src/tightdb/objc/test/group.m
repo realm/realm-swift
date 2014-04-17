@@ -12,7 +12,7 @@
 #import <tightdb/objc/RLMContext.h>
 #import <tightdb/objc/group.h>
 
-TIGHTDB_TABLE_2(TestTableGroup,
+REALM_TABLE_2(TestTableGroup,
                 First,  String,
                 Second, Int)
 

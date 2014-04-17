@@ -11,7 +11,7 @@
 #import <tightdb/objc/RLMTransaction.h>
 #import <tightdb/objc/group.h>
 
-TIGHTDB_TABLE_2(SharedTable2,
+REALM_TABLE_2(SharedTable2,
                 Hired, Bool,
                 Age,   Int)
 

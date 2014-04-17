@@ -14,12 +14,12 @@
 #import <tightdb/objc/group.h>
 #import <tightdb/objc/RLMTable_noinst.h>
 
-TIGHTDB_TABLE_3(MixedTable,
+REALM_TABLE_3(MixedTable,
                 Hired, Bool,
                 Other, Mixed,
                 Age,   Int)
 
-TIGHTDB_TABLE_2(SubMixedTable,
+REALM_TABLE_2(SubMixedTable,
                 Hired, Bool,
                 Age,   Int)
 

@@ -18,20 +18,20 @@
 #include <tightdb/table.hpp>
 #import <tightdb/objc/RLMTable_noinst.h>
 
-TIGHTDB_TABLE_DEF_3(PeopleErrTable,
+REALM_TABLE_DEF_3(PeopleErrTable,
                     Name,  String,
                     Age,   Int,
                     Hired, Bool)
 
-TIGHTDB_TABLE_IMPL_3(PeopleErrTable,
+REALM_TABLE_IMPL_3(PeopleErrTable,
                      Name,  String,
                      Age,   Int,
                      Hired, Bool)
 
-TIGHTDB_TABLE_1(TestQueryErrSub,
+REALM_TABLE_1(TestQueryErrSub,
                 Age,  Int)
 
-TIGHTDB_TABLE_9(TestQueryErrAllTypes,
+REALM_TABLE_9(TestQueryErrAllTypes,
                 BoolCol,   Bool,
                 IntCol,    Int,
                 FloatCol,  Float,

@@ -11,21 +11,21 @@
 #import <tightdb/objc/group.h>
 
 
-TIGHTDB_TABLE_DEF_3(PeopleTable,
+REALM_TABLE_DEF_3(PeopleTable,
                     Name,  String,
                     Age,   Int,
                     Hired, Bool)
 
-TIGHTDB_TABLE_DEF_2(PeopleTable2,
+REALM_TABLE_DEF_2(PeopleTable2,
                     Hired, Bool,
                     Age,   Int)
 
-TIGHTDB_TABLE_IMPL_3(PeopleTable,
+REALM_TABLE_IMPL_3(PeopleTable,
                      Name,  String,
                      Age,   Int,
                      Hired, Bool)
 
-TIGHTDB_TABLE_IMPL_2(PeopleTable2,
+REALM_TABLE_IMPL_2(PeopleTable2,
                      Hired, Bool,
                      Age,   Int)
 

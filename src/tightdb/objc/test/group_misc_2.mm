@@ -12,27 +12,27 @@
 #import <tightdb/objc/group.h>
 #import <tightdb/objc/PrivateRLM.h>
 
-TIGHTDB_TABLE_DEF_4(MyTable,
+REALM_TABLE_DEF_4(MyTable,
                     Name,  String,
                     Age,   Int,
                     Hired, Bool,
                     Spare, Int)
 
-TIGHTDB_TABLE_DEF_2(MyTable2,
+REALM_TABLE_DEF_2(MyTable2,
                     Hired, Bool,
                     Age,   Int)
 
-TIGHTDB_TABLE_IMPL_4(MyTable,
+REALM_TABLE_IMPL_4(MyTable,
                      Name,  String,
                      Age,   Int,
                      Hired, Bool,
                      Spare, Int)
 
-TIGHTDB_TABLE_IMPL_2(MyTable2,
+REALM_TABLE_IMPL_2(MyTable2,
                      Hired, Bool,
                      Age,   Int)
 
-TIGHTDB_TABLE_2(QueryTable,
+REALM_TABLE_2(QueryTable,
                 First,  Int,
                 Second, String)
 

@@ -10,12 +10,12 @@
 #import <tightdb/objc/Realm.h>
 #import <tightdb/objc/group.h>
 
-TIGHTDB_TABLE_3(EnumPeopleTable,
+REALM_TABLE_3(EnumPeopleTable,
                 Name,  String,
                 Age,   Int,
                 Hired, Bool)
 
-TIGHTDB_TABLE_2(EnumPeopleTable2,
+REALM_TABLE_2(EnumPeopleTable2,
                 Hired, Bool,
                 Age,   Int)
 
