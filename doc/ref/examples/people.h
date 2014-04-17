@@ -1,4 +1,4 @@
-#import <Tightdb/Tightdb.h>
+#import <Tightdb/Realm.h>
 
 TIGHTDB_TABLE_DEF_3(People,
                     Name, String,

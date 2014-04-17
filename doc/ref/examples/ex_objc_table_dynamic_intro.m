@@ -1,5 +1,5 @@
 /* @@Example: ex_objc_table_dynamic_intro @@ */
-#import <Tightdb/Tightdb.h>
+#import <Tightdb/Realm.h>
 
 void ex_objc_table_dynamic_intro()
 {

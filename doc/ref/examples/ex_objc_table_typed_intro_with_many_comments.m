@@ -1,10 +1,10 @@
 /* @@Example: not_used @@ */
-#import <Tightdb/Tightdb.h>
+#import <Tightdb/Realm.h>
 
 /* Defines a new table with two columns Name and Age. 
  * This table definition triggers a macro defining the classes
  * PeopleTable, PeopleTableQuery, PeopleTableRow and PeopleTableView.
- * The column types must be TightDB types (refer to the constructor 
+ * The column types must be Realm types (refer to the constructor
  * TIGHTDB_TABLE_* in the documentation. */
 
 TIGHTDB_TABLE_2(PersonTable,    // Name of Table
