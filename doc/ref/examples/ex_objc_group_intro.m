@@ -1,5 +1,5 @@
 /* @@Example: ex_objc_group_intro @@ */
-#import <Tightdb/Tightdb.h>
+#import <Realm/Realm.h>
 #import "people.h"
 
 /* PeopleTable is declared in people.h as
