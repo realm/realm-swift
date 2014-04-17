@@ -26,6 +26,8 @@
 /**
  * Use the main run loop and the default notification center.
  */
++(TDBSmartContext *)contextWithDefaultPersistence;
+
 +(TDBSmartContext *)contextWithPersistenceToFile:(NSString *)path;
 
 +(TDBSmartContext *)contextWithPersistenceToFile:(NSString *)path
