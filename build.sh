@@ -224,7 +224,7 @@ build_ios_test()
     'target_defaults': {
         'link_settings': {
             'libraries': [
-                '\$(SDKROOT)/usr/lib/libc++.dylib',
+                '\$(SDKROOT)/usr/lib/libstdc++.6.dylib',
                 '\$(DEVELOPER_DIR)/Library/Frameworks/XCTest.framework',
                 #'\$(DEVELOPER_DIR)/Library/Frameworks/SenTestingKit.framework',
                 '\$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
