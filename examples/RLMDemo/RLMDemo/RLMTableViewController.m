@@ -43,14 +43,14 @@ static NSString * const kTitleColumn = @"title";
 
 - (void)setupTightDB {
     // Set up read/write contexts
-    self.readContext  = [TDBSmartContext contextWithPersistenceToFile:[TDBContext defaultPath]];
+    self.readContext  = [TDBSmartContext contextWithDefaultPersistence];
     self.writeContext = [TDBContext contextWithDefaultPersistence];
     
     // Create table if it doesn't exist
     NSError *error = nil;
     
     [self.writeContext writeUsingBlock:^BOOL(TDBTransaction *transaction) {
-        if (transaction.tableCount == 0) {
+        if (transaction.isEmpty) {
             [transaction createTableWithName:kTableName asTableClass:[RLMTitles class]];
         }
         return YES;
