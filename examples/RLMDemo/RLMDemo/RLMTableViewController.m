@@ -15,9 +15,9 @@ static NSString * const kTitleColumn = @"title";
 
 @interface RLMTableViewController ()
 
-@property (nonatomic, strong)   TDBSmartContext *readContext;
-@property (nonatomic, strong)   TDBContext *writeContext;
-@property (nonatomic, readonly) TDBTable *table;
+@property (nonatomic, strong) TDBSmartContext *readContext;
+@property (nonatomic, strong) TDBContext *writeContext;
+@property (nonatomic, strong) TDBTable *table;
 
 @end
 
@@ -41,17 +41,22 @@ static NSString * const kTitleColumn = @"title";
 
 - (void)setupTightDB {
     // Set up read/write contexts
-    self.readContext = [TDBSmartContext contextWithPersistenceToFile:[TDBContext defaultPath]];
+    self.readContext  = [TDBSmartContext contextWithPersistenceToFile:[TDBContext defaultPath]];
     self.writeContext = [TDBContext contextWithDefaultPersistence];
     
-    if (!self.table) {
-        // Create table if it doesn't exist
-        NSError *error = nil;
-        [self.writeContext writeUsingBlock:^BOOL(TDBTransaction *transaction) {
+    // Create table if it doesn't exist
+    NSError *error = nil;
+    
+    [self.writeContext writeUsingBlock:^BOOL(TDBTransaction *transaction) {
+        if (transaction.tableCount == 0) {
             TDBTable *table = [transaction createTableWithName:kTableName];
             [table addColumnWithName:kTitleColumn type:TDBStringType];
-            return YES;
-        } error:&error];
+        }
+        return YES;
+    } error:&error];
+    
+    if (error) {
+        NSLog(@"error: %@", error.localizedDescription);
     }
     
     // Observe TightDB Notifications
@@ -66,7 +71,10 @@ static NSString * const kTitleColumn = @"title";
 }
 
 - (TDBTable *)table {
-    return [self.readContext tableWithName:kTableName];
+    if (!_table) {
+        _table = [self.readContext tableWithName:kTableName];
+    }
+    return _table;
 }
 
 #pragma mark - UITableViewDataSource
