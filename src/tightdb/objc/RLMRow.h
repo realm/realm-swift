@@ -38,7 +38,7 @@
    macro switching trick for the individual column types on
    TIGHTDB_CURSOR_PROPERTY macros similar to what is done for query
    accessors. */
-@interface TDBAccessor: NSObject
+@interface RLMAccessor : NSObject
 -(id)initWithRow:(RLMRow *)cursor columnId:(NSUInteger)columnId;
 -(BOOL)getBool;
 -(void)setBool:(BOOL)value;

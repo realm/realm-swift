@@ -193,7 +193,7 @@ using namespace std;
 @end
 
 
-@implementation TDBAccessor
+@implementation RLMAccessor
 {
     __weak RLMRow *_row;
     size_t _columnId;
