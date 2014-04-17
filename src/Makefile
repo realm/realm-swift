@@ -1,3 +1,3 @@
-SUBDIRS = tightdb
+SUBDIRS = realm
 
 include generic.mk

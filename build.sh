@@ -342,7 +342,7 @@ EOF
         ;;
 
     "get-version")
-	version_file="src/tightdb/objc/RLMVersion.h"
+	version_file="src/realm/objc/RLMVersion.h"
 	tightdb_version_major="$(grep TDB_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
 	tightdb_version_minor="$(grep TDB_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
 	tightdb_version_patch="$(grep TDB_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
@@ -356,7 +356,7 @@ EOF
 	    exit 1
 	fi
         tightdb_version="$1"
-        version_file="src/tightdb/objc/RLMVersion.h"
+        version_file="src/realm/objc/RLMVersion.h"
         tightdb_ver_major="$(echo "$tightdb_version" | cut -f1 -d.)" || exit 1
         tightdb_ver_minor="$(echo "$tightdb_version" | cut -f2 -d.)" || exit 1
         tightdb_ver_patch="$(echo "$tightdb_version" | cut -f3 -d.)" || exit 1
@@ -423,10 +423,10 @@ EOF
                 word_list_append "cflags_arch" "-arch $y" || exit 1
             done
             sdk_root="$xcode_home/Platforms/$platform.platform/Developer/SDKs/$sdk"
-            $MAKE -C "src/tightdb/objc" "libtightdb-objc-$platform.a" "libtightdb-objc-$platform-dbg.a" BASE_DENOM="$platform" CFLAGS_ARCH="$cflags_arch -isysroot $sdk_root -I$iphone_include" || exit 1
+            $MAKE -C "src/realm/objc" "libtightdb-objc-$platform.a" "libtightdb-objc-$platform-dbg.a" BASE_DENOM="$platform" CFLAGS_ARCH="$cflags_arch -isysroot $sdk_root -I$iphone_include" || exit 1
             mkdir "$temp_dir/$platform" || exit 1
-            cp "src/tightdb/objc/libtightdb-objc-$platform.a"     "$temp_dir/$platform/libtightdb-objc.a"     || exit 1
-            cp "src/tightdb/objc/libtightdb-objc-$platform-dbg.a" "$temp_dir/$platform/libtightdb-objc-dbg.a" || exit 1
+            cp "src/realm/objc/libtightdb-objc-$platform.a"     "$temp_dir/$platform/libtightdb-objc.a"     || exit 1
+            cp "src/realm/objc/libtightdb-objc-$platform-dbg.a" "$temp_dir/$platform/libtightdb-objc-dbg.a" || exit 1
         done
         mkdir -p "$IPHONE_DIR" || exit 1
         tightdb_echo "Creating '$IPHONE_DIR/libtightdb-objc-ios.a'"
@@ -436,9 +436,9 @@ EOF
         lipo "$temp_dir"/*/"libtightdb-objc-dbg.a" -create -output "$temp_dir/libtightdb-objc-ios-dbg.a" || exit 1
         libtool -static -o "$IPHONE_DIR/libtightdb-objc-ios-dbg.a" "$temp_dir/libtightdb-objc-ios-dbg.a" $(tightdb-config-dbg --libs) -L"$iphone_core_lib" || exit 1
         tightdb_echo "Copying headers to '$IPHONE_DIR/include'"
-        mkdir -p "$IPHONE_DIR/include/tightdb/objc" || exit 1
-        inst_headers="$(cd src/tightdb/objc && $MAKE --no-print-directory get-inst-headers)" || exit 1
-        (cd "src/tightdb/objc" && cp $inst_headers "$TIGHTDB_OBJC_HOME/$IPHONE_DIR/include/tightdb/objc/") || exit 1
+        mkdir -p "$IPHONE_DIR/include/realm/objc" || exit 1
+        inst_headers="$(cd src/realm/objc && $MAKE --no-print-directory get-inst-headers)" || exit 1
+        (cd "src/realm/objc" && cp $inst_headers "$TIGHTDB_OBJC_HOME/$IPHONE_DIR/include/realm/objc/") || exit 1
         tightdb_echo "Done building"
         exit 0
         ;;
@@ -453,7 +453,7 @@ EOF
 	rm -rf "$FRAMEWORK" realm-ios*.zip || exit 1
 	mkdir -p "$FRAMEWORK/Headers" || exit 1
 	cp iphone-lib/libtightdb-objc-ios.a "$FRAMEWORK/Realm" || exit 1
-	cp iphone-lib/include/tightdb/objc/*.h "$FRAMEWORK/Headers" || exit 1
+	cp iphone-lib/include/realm/objc/*.h "$FRAMEWORK/Headers" || exit 1
 	(cd "$FRAMEWORK/Headers" && mv realm.h Realm.h) || exit 1
 	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/import <tightdb\/objc\/\(.*\)>/import "\1"/g' {} \; || exit 1
 	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/include <tightdb\/objc\/\(.*\)>/include "\1"/g' {} \; || exit 1
@@ -467,9 +467,9 @@ EOF
         $MAKE check-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test.XXXX)" || exit 1
         mkdir -p "$TEMP_DIR/unit-tests.xctest/Contents/MacOS" || exit 1
-        cp "src/tightdb/objc/test/unit-tests" "$TEMP_DIR/unit-tests.xctest/Contents/MacOS/" || exit 1
+        cp "src/realm/objc/test/unit-tests" "$TEMP_DIR/unit-tests.xctest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
+        path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/realm/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
         "$XCODE_HOME/usr/bin/xctest" -XCTest All "$TEMP_DIR/unit-tests.xctest" || exit 1
@@ -482,9 +482,9 @@ EOF
         $MAKE check-debug-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test-debug.XXXX)" || exit 1
         mkdir -p "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS" || exit 1
-        cp "src/tightdb/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS/" || exit 1
+        cp "src/realm/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
+        path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/realm/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
         "$XCODE_HOME/usr/bin/xctest" -XCTest All "$TEMP_DIR/unit-tests-dbg.xctest" || exit 1
@@ -497,9 +497,9 @@ EOF
         $MAKE check-debug-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test-gdb.XXXX)" || exit 1
         mkdir -p "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS" || exit 1
-        cp "src/tightdb/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS/" || exit 1
+        cp "src/realm/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
+        path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/realm/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
         gdb --args "$XCODE_HOME/usr/bin/xctest" -XCTest All "$TEMP_DIR/unit-tests-dbg.xctest"
@@ -510,9 +510,9 @@ EOF
         $MAKE check-cover-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.check-cover.XXXX)" || exit 1
         mkdir -p "$TEMP_DIR/unit-tests-cov.xctest/Contents/MacOS" || exit 1
-        cp "src/tightdb/objc/test/unit-tests-cov" "$TEMP_DIR/unit-tests-cov.xctest/Contents/MacOS/" || exit 1
+        cp "src/realm/objc/test/unit-tests-cov" "$TEMP_DIR/unit-tests-cov.xctest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        path_list_prepend DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
+        path_list_prepend DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/realm/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
         "$XCODE_HOME/usr/bin/xctest" -XCTest All "$TEMP_DIR/unit-tests-cov.xctest" || exit 1
