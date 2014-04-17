@@ -5,7 +5,7 @@
 
 #import <XCTest/XCTest.h>
 
-#import <tightdb/objc/RLMTable.h>
+#import <realm/objc/RLMTable.h>
 
 @interface MacTightDbTests: XCTestCase
 @end

@@ -7,9 +7,9 @@
 
 #import <XCTest/XCTest.h>
 
-#import <tightdb/objc/Realm.h>
-#import <tightdb/objc/RLMTransaction.h>
-#import <tightdb/objc/RLMContext.h>
+#import <realm/objc/Realm.h>
+#import <realm/objc/RLMTransaction.h>
+#import <realm/objc/RLMContext.h>
 
 REALM_TABLE_2(GetSubtable,
                 Hired, Bool,

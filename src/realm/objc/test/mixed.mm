@@ -10,9 +10,9 @@
 
 #import <XCTest/XCTest.h>
 
-#import <tightdb/objc/Realm.h>
-#import <tightdb/objc/group.h>
-#import <tightdb/objc/RLMTable_noinst.h>
+#import <realm/objc/Realm.h>
+#import <realm/objc/group.h>
+#import <realm/objc/RLMTable_noinst.h>
 
 REALM_TABLE_3(MixedTable,
                 Hired, Bool,

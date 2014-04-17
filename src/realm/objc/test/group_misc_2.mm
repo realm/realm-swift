@@ -7,10 +7,10 @@
 
 #import <XCTest/XCTest.h>
 
-#import <tightdb/objc/Realm.h>
-#import <tightdb/objc/RLMTransaction.h>
-#import <tightdb/objc/group.h>
-#import <tightdb/objc/PrivateRLM.h>
+#import <realm/objc/Realm.h>
+#import <realm/objc/RLMTransaction.h>
+#import <realm/objc/group.h>
+#import <realm/objc/PrivateRLM.h>
 
 REALM_TABLE_DEF_4(MyTable,
                     Name,  String,

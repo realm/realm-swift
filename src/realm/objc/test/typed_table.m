@@ -20,7 +20,7 @@
 
 #import <XCTest/XCTest.h>
 
-#import <tightdb/objc/Realm.h>
+#import <realm/objc/Realm.h>
 
 REALM_TABLE_1(TestTableSub,
                 age,  Int)

@@ -18,15 +18,15 @@
  *
  **************************************************************************/
 
-#import <tightdb/objc/RLMConstants.h>
-#import <tightdb/objc/RLMTable.h>
-#import <tightdb/objc/RLMView.h>
-#import <tightdb/objc/RLMQuery.h>
-#import <tightdb/objc/RLMRow.h>
-#import <tightdb/objc/RLMContext.h>
-#import <tightdb/objc/RLMSmartContext.h>
-#import <tightdb/objc/RLMVersion.h>
+#import <realm/objc/RLMConstants.h>
+#import <realm/objc/RLMTable.h>
+#import <realm/objc/RLMView.h>
+#import <realm/objc/RLMQuery.h>
+#import <realm/objc/RLMRow.h>
+#import <realm/objc/RLMContext.h>
+#import <realm/objc/RLMSmartContext.h>
+#import <realm/objc/RLMVersion.h>
 
-#import <tightdb/objc/PrivateHelperMacros.h>
-#import <tightdb/objc/PrivateTableMacros.h>
-#import <tightdb/objc/PrivateRLM.h>
+#import <realm/objc/PrivateHelperMacros.h>
+#import <realm/objc/PrivateTableMacros.h>
+#import <realm/objc/PrivateRLM.h>

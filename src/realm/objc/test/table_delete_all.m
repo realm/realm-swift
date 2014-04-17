@@ -5,9 +5,9 @@
 
 #import <XCTest/XCTest.h>
 
-#import <tightdb/objc/RLMTable.h>
-#import <tightdb/objc/RLMDescriptor.h>
-#import <tightdb/objc/PrivateRLM.h>
+#import <realm/objc/RLMTable.h>
+#import <realm/objc/RLMDescriptor.h>
+#import <realm/objc/PrivateRLM.h>
 
 @interface MACTestTableDeleteAll: XCTestCase
 @end
