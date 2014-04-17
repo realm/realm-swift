@@ -5,7 +5,7 @@
 // @@Example: create_table @@
 // Define table
 
-TIGHTDB_TABLE_3(PeopleTable,
+REALM_TABLE_3(PeopleTable,
                 Name, String,
                 Age,  Int,
                 Hired, Bool);
