@@ -81,7 +81,7 @@ using namespace std;
     RLMTable * table = [[RLMTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
-    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
+    REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
         tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name));
         [table setNativeTable:table_2.get()];
         )
@@ -114,7 +114,7 @@ using namespace std;
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
     bool was_created;
-    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
+    REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
         tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name), was_created);
         [table setNativeTable:table_2.get()];
         )
@@ -165,7 +165,7 @@ using namespace std;
     RLMTable * table = [[RLMTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
-    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
+    REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
         tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name));
         [table setNativeTable:table_2.get()];
     )
@@ -216,7 +216,7 @@ using namespace std;
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
     bool was_created;
-    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
+    REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
         tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name), was_created);
         [table setNativeTable:table_2.get()];)
     [table setParent:self];

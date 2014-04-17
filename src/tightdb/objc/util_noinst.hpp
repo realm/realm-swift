@@ -206,14 +206,14 @@ inline NSError* make_tightdb_error(TightdbErr code, NSString* desc)
     return [NSError errorWithDomain:@"com.tightdb" code:code userInfo:details];
 }
 
-#define TIGHTDB_OBJC_SIZE_T_NUMBER_IN numberWithUnsignedLong
-#define TIGHTDB_OBJC_SIZE_T_NUMBER_OUT unsignedLongValue
+#define REALM_OBJC_SIZE_T_NUMBER_IN numberWithUnsignedLong
+#define REALM_OBJC_SIZE_T_NUMBER_OUT unsignedLongValue
 
-#define TIGHTDB_EXCEPTION_ERRHANDLER(action, fail_return_value) \
-TIGHTDB_EXCEPTION_ERRHANDLER_EX(action, fail_return_value, error)
+#define REALM_EXCEPTION_ERRHANDLER(action, fail_return_value) \
+REALM_EXCEPTION_ERRHANDLER_EX(action, fail_return_value, error)
 
 // This is the old macro, which should be phased out.
-#define TIGHTDB_EXCEPTION_ERRHANDLER_EX(action, fail_return_value, err_var) \
+#define REALM_EXCEPTION_ERRHANDLER_EX(action, fail_return_value, err_var) \
 try { action } \
 catch (tightdb::util::File::AccessError& ex) { \
     if (err_var) \
@@ -227,7 +227,7 @@ catch (std::exception& ex) { \
 }
 
 // This macro is part of the new error strategy, specifically for table value setters.
-#define TIGHTDB_EXCEPTION_HANDLER_SETTERS(action, datatype) \
+#define REALM_EXCEPTION_HANDLER_SETTERS(action, datatype) \
 if (m_read_only) { \
     NSException* exception = [NSException exceptionWithName:@"tightdb:table_is_read_only" \
                                           reason:@"You tried to modify an immutable table" \
@@ -260,7 +260,7 @@ catch(std::exception& ex) { \
     [exception raise]; \
 }
 
-#define TIGHTDB_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(columnIndex) \
+#define REALM_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(columnIndex) \
 if (columnIndex >= self.columnCount) { \
                         NSException* exception = [NSException exceptionWithName:@"tightdb:column_index_out_of_bounds" \
                                 reason:@"The specified column index is not within the table bounds" \
@@ -268,7 +268,7 @@ if (columnIndex >= self.columnCount) { \
     [exception raise]; \
 } \
 
-#define TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(action) \
+#define REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(action) \
 try { action } \
 catch(std::exception& ex) { \
     NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception" \
