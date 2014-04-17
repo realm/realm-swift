@@ -1,16 +1,16 @@
 /* @@Example: ex_objc_query_dynamic_intro @@ */
-#import <Tightdb/Tightdb.h>
+#import <Tightdb/Realm.h>
 
 void ex_objc_query_dynamic_intro()
 {
     /* Creates a new table dynamically. */
-    TDBTable *table = [[TDBTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] init];
     NSUInteger const NAME  = [table addColumnWithName:@"Name"
-                                                 type:TDBStringType];
+                                                 type:RLMTypeString];
     NSUInteger const AGE   = [table addColumnWithName:@"Age"
-                                                 type:TDBIntType];
+                                                 type:RLMTypeInt];
     NSUInteger const HIRED = [table addColumnWithName:@"Hired"
-                                                 type:TDBBoolType];
+                                                 type:RLMTypeBool];
     
     /* Add some people. */
     [table addRow:@[@"Joe", @23, @YES]];
@@ -19,16 +19,16 @@ void ex_objc_query_dynamic_intro()
     [table addRow:@[@"Nick", @59, @YES]];
     
     /* Set up a query to search for employees. */
-    TDBQuery *q = [[[[table where]
+    RLMQuery *q = [[[[table where]
                       intIsGreaterThanOrEqualTo:0 inColumnWithIndex:AGE]
                       intIsLessThanOrEqualTo:60 inColumnWithIndex:AGE ]
                       boolIsEqualTo:YES inColumnWithIndex:HIRED];
     
     /* Execute the query. */
-    TDBView *view = [q findAllRows];
+    RLMView *view = [q findAllRows];
     
     /* Iterate over query result */
-    for (TDBRow *row in view) {
+    for (RLMRow *row in view) {
         NSLog(@"name: %@",row[NAME]);
     }
 }

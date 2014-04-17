@@ -1,6 +1,6 @@
 // @@Example: ex_objc_intro @@
 #import <Foundation/Foundation.h>
-#import <Tightdb/Tightdb.h>
+#import <Tightdb/Realm.h>
 #import "people.h"
 
 /*
@@ -29,7 +29,7 @@ void ex_objc_intro() {
     NSError *error;
     [fileManager removeItemAtPath:@"people.tightdb" error:&error];
 
-    TDBContext *context = [TDBContext contextWithDefaultPersistence];
+    RLMContext *context = [RLMContext contextWithDefaultPersistence];
 
     // Start a write transaction
     [context writeUsingBlock:^(RLMTransaction *transaction) {

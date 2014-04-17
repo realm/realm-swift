@@ -1,5 +1,5 @@
 /* @@Example: ex_objc_sharedgroup_intro @@ */
-#import <Tightdb/Tightdb.h>
+#import <Tightdb/Realm.h>
 #import "people.h"
 
 /*
@@ -30,7 +30,7 @@ void ex_objc_context_intro()
     [fm removeItemAtPath:@"contextTest.tightdb.lock" error:nil];
 
     // Create datafile with a new table
-    TDBContext *context = [TDBContext contextPersistedAtPath:@"contextTest.tightdb"
+    RLMContext *context = [RLMContext contextPersistedAtPath:@"contextTest.tightdb"
                                                        error:nil];
 
     // Perform a write transaction (with commit to file)
