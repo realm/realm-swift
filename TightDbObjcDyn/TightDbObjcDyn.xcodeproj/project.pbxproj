@@ -9,14 +9,14 @@
 /* Begin PBXBuildFile section */
 		4220871618E042FD00F3CF27 /* NSData+RLMGetBinaryData.h in Headers */ = {isa = PBXBuildFile; fileRef = 4220871418E042FD00F3CF27 /* NSData+RLMGetBinaryData.h */; };
 		4220871718E042FD00F3CF27 /* NSData+RLMGetBinaryData.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4220871518E042FD00F3CF27 /* NSData+RLMGetBinaryData.mm */; };
-		424EEF9E18D9C10100337A13 /* TDBColumnProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEF9D18D9C10100337A13 /* TDBColumnProxy.h */; };
+		424EEF9E18D9C10100337A13 /* RLMColumnProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEF9D18D9C10100337A13 /* RLMColumnProxy.h */; };
 		424EEFA218D9C11D00337A13 /* RLMDescriptor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEF9F18D9C11D00337A13 /* RLMDescriptor.mm */; };
 		424EEFA318D9C11D00337A13 /* RLMDescriptor_noinst.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA018D9C11D00337A13 /* RLMDescriptor_noinst.h */; };
 		424EEFA418D9C11D00337A13 /* RLMDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFA118D9C11D00337A13 /* RLMDescriptor.h */; };
 		424EEFAE18D9C15A00337A13 /* RLMView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEFAB18D9C15900337A13 /* RLMView.mm */; };
 		424EEFAF18D9C15A00337A13 /* RLMView_noinst.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFAC18D9C15900337A13 /* RLMView_noinst.h */; };
 		424EEFB018D9C15A00337A13 /* RLMView.h in Headers */ = {isa = PBXBuildFile; fileRef = 424EEFAD18D9C15A00337A13 /* RLMView.h */; };
-		424EEFB218D9C97900337A13 /* TDBColumnProxy.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEFB118D9C97900337A13 /* TDBColumnProxy.mm */; };
+		424EEFB218D9C97900337A13 /* RLMColumnProxy.mm in Sources */ = {isa = PBXBuildFile; fileRef = 424EEFB118D9C97900337A13 /* RLMColumnProxy.mm */; };
 		42AD3A9818CDBDFF00C86073 /* util.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42AD3A9418CDBDFF00C86073 /* util.mm */; };
 		42AD3A9918CDBDFF00C86073 /* RLMVersion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42AD3A9518CDBDFF00C86073 /* RLMVersion.mm */; };
 		42AD3A9A18CDBDFF00C86073 /* RLMVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 42AD3A9618CDBDFF00C86073 /* RLMVersion.h */; };
@@ -84,14 +84,14 @@
 /* Begin PBXFileReference section */
 		4220871418E042FD00F3CF27 /* NSData+RLMGetBinaryData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+RLMGetBinaryData.h"; path = "../src/tightdb/objc/NSData+RLMGetBinaryData.h"; sourceTree = SOURCE_ROOT; };
 		4220871518E042FD00F3CF27 /* NSData+RLMGetBinaryData.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "NSData+RLMGetBinaryData.mm"; path = "../src/tightdb/objc/NSData+RLMGetBinaryData.mm"; sourceTree = SOURCE_ROOT; };
-		424EEF9D18D9C10100337A13 /* TDBColumnProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBColumnProxy.h; path = ../src/tightdb/objc/TDBColumnProxy.h; sourceTree = SOURCE_ROOT; };
+		424EEF9D18D9C10100337A13 /* RLMColumnProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMColumnProxy.h; path = ../src/tightdb/objc/RLMColumnProxy.h; sourceTree = SOURCE_ROOT; };
 		424EEF9F18D9C11D00337A13 /* RLMDescriptor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMDescriptor.mm; path = ../src/tightdb/objc/RLMDescriptor.mm; sourceTree = SOURCE_ROOT; };
 		424EEFA018D9C11D00337A13 /* RLMDescriptor_noinst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMDescriptor_noinst.h; path = ../src/tightdb/objc/RLMDescriptor_noinst.h; sourceTree = SOURCE_ROOT; };
 		424EEFA118D9C11D00337A13 /* RLMDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMDescriptor.h; path = ../src/tightdb/objc/RLMDescriptor.h; sourceTree = SOURCE_ROOT; };
 		424EEFAB18D9C15900337A13 /* RLMView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMView.mm; path = ../src/tightdb/objc/RLMView.mm; sourceTree = SOURCE_ROOT; };
 		424EEFAC18D9C15900337A13 /* RLMView_noinst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMView_noinst.h; path = ../src/tightdb/objc/RLMView_noinst.h; sourceTree = SOURCE_ROOT; };
 		424EEFAD18D9C15A00337A13 /* RLMView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMView.h; path = ../src/tightdb/objc/RLMView.h; sourceTree = SOURCE_ROOT; };
-		424EEFB118D9C97900337A13 /* TDBColumnProxy.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBColumnProxy.mm; path = ../src/tightdb/objc/TDBColumnProxy.mm; sourceTree = SOURCE_ROOT; };
+		424EEFB118D9C97900337A13 /* RLMColumnProxy.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMColumnProxy.mm; path = ../src/tightdb/objc/RLMColumnProxy.mm; sourceTree = SOURCE_ROOT; };
 		42AD3A9418CDBDFF00C86073 /* util.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = util.mm; path = ../src/tightdb/objc/util.mm; sourceTree = SOURCE_ROOT; };
 		42AD3A9518CDBDFF00C86073 /* RLMVersion.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMVersion.mm; path = ../src/tightdb/objc/RLMVersion.mm; sourceTree = SOURCE_ROOT; };
 		42AD3A9618CDBDFF00C86073 /* RLMVersion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMVersion.h; path = ../src/tightdb/objc/RLMVersion.h; sourceTree = SOURCE_ROOT; };
@@ -238,8 +238,8 @@
 				4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */,
 				4D143CBC18ED5FCF00CEFF65 /* PrivateTableMacros.h.cheetah */,
 				4D1ED30618E198AD003CFF44 /* PrivateTDB.h */,
-				424EEF9D18D9C10100337A13 /* TDBColumnProxy.h */,
-				424EEFB118D9C97900337A13 /* TDBColumnProxy.mm */,
+				424EEF9D18D9C10100337A13 /* RLMColumnProxy.h */,
+				424EEFB118D9C97900337A13 /* RLMColumnProxy.mm */,
 				4D143CF118F7E97500CEFF65 /* RLMConstants.h */,
 				4D143CF218F7E97500CEFF65 /* RLMConstants.m */,
 				E91890CA177B67AB00653D7A /* RLMContext.h */,
@@ -326,7 +326,7 @@
 				E91890DD177B67AB00653D7A /* PrivateHelperMacros.h in Headers */,
 				424EEFAF18D9C15A00337A13 /* RLMView_noinst.h in Headers */,
 				E91890DF177B67AB00653D7A /* RLMQuery_noinst.h in Headers */,
-				424EEF9E18D9C10100337A13 /* TDBColumnProxy.h in Headers */,
+				424EEF9E18D9C10100337A13 /* RLMColumnProxy.h in Headers */,
 				E91890E0177B67AB00653D7A /* RLMQuery.h in Headers */,
 				E91890E2177B67AB00653D7A /* RLMTable_noinst.h in Headers */,
 				4D143CEF18F7E8C200CEFF65 /* RLMSmartContext.h in Headers */,
@@ -451,7 +451,7 @@
 				42AD3A9918CDBDFF00C86073 /* RLMVersion.mm in Sources */,
 				4D143CF018F7E8C200CEFF65 /* RLMSmartContext.mm in Sources */,
 				424EEFAE18D9C15A00337A13 /* RLMView.mm in Sources */,
-				424EEFB218D9C97900337A13 /* TDBColumnProxy.mm in Sources */,
+				424EEFB218D9C97900337A13 /* RLMColumnProxy.mm in Sources */,
 				4D143CF418F7E97500CEFF65 /* RLMConstants.m in Sources */,
 				E91890D8177B67AB00653D7A /* RLMTransaction.mm in Sources */,
 				4220871718E042FD00F3CF27 /* NSData+RLMGetBinaryData.mm in Sources */,
