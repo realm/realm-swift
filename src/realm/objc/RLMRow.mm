@@ -61,7 +61,7 @@ using namespace std;
 }
 -(void)dealloc
 {
-#ifdef TIGHTDB_DEBUG
+#ifdef REALM_DEBUG
     // NSLog(@"RLMRow dealloc");
 #endif
     _table = nil;
