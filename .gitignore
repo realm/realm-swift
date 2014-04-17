@@ -30,6 +30,8 @@ examples/tutorial
 # sh build.sh ios-framework
 /Tightdb.framework
 tightdb-ios-*.zip
+/Realm.framework
+realm-ios-*.zip
 
 # AppCode specific files
 .idea/
