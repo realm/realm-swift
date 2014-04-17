@@ -98,7 +98,7 @@ using namespace std;
         *stackbuf = tmp;
     }
     if (state->state < [self originTable].rowCount && state->state != (NSUInteger)NSNotFound) {
-        [((RLMRow *)*stackbuf) TDB_setNdx:state->state];
+        [((RLMRow *) *stackbuf) RLM_setNdx:state->state];
         state->itemsPtr = stackbuf;
         state->state = [self incrementFastEnum:state->state+1];
     } else {

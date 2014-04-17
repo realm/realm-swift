@@ -97,7 +97,7 @@ TIGHTDB_TABLE_2(QueryTable,
     RLMView* res = [q findAll];
     for (size_t i = 0; i < [res rowCount]; i++) {
         // cursor missing. Only low-level interface!
-        NSLog(@"%zu: is %lld years old",i , [res TDB_intInColumnWithIndex:1 atRowIndex:i]);
+        NSLog(@"%zu: is %lld years old",i , [res RLM_intInColumnWithIndex:1 atRowIndex:i]);
     }
 
     //------------------------------------------------------
@@ -118,7 +118,7 @@ TIGHTDB_TABLE_2(QueryTable,
     for (size_t i = 0; i < diskTable.rowCount; i++) {
         MyTableRow* cursor = [diskTable rowAtIndex:i];
         NSLog(@"%zu: %@", i, cursor.Name);
-        NSLog(@"%zu: %@", i, [diskTable TDB_stringInColumnWithIndex:0 atRowIndex:i]);
+        NSLog(@"%zu: %@", i, [diskTable RLM_stringInColumnWithIndex:0 atRowIndex:i]);
     }
 
     // Write same group to memory buffer
@@ -182,7 +182,7 @@ TIGHTDB_TABLE_2(QueryTable,
         XCTAssertEqual((size_t)2, [q countRows], @"count != 2");
         RLMView* tv = [q findAll];
         XCTAssertEqual((size_t)2, [tv rowCount], @"count != 2");
-        XCTAssertEqual((int64_t)8, [tv TDB_intInColumnWithIndex:0 atRowIndex:1], @"First != 8");
+        XCTAssertEqual((int64_t)8, [tv RLM_intInColumnWithIndex:0 atRowIndex:1], @"First != 8");
     }
 }
 
@@ -214,18 +214,18 @@ TIGHTDB_TABLE_2(QueryTable,
 
     // Add a row to the top level table
     [table addRow:nil];
-    [table TDB_setInt:700 inColumnWithIndex:COL_TABLE_INT atRowIndex:0];
+    [table RLM_setInt:700 inColumnWithIndex:COL_TABLE_INT atRowIndex:0];
 
     // Add two rows to the subtable
-    RLMTable* subtable = [table TDB_tableInColumnWithIndex:COL_TABLE_TAB atRowIndex:0];
+    RLMTable* subtable = [table RLM_tableInColumnWithIndex:COL_TABLE_TAB atRowIndex:0];
     [subtable addRow:nil];
 
-    [subtable TDB_setInt:800 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:0];
+    [subtable RLM_setInt:800 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:0];
     [subtable addRow:nil];
-    [subtable TDB_setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
+    [subtable RLM_setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
 
     // Make the mixed values column contain another subtable
-    [table TDB_setMixed:[[RLMTable alloc] init] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
+    [table RLM_setMixed:[[RLMTable alloc] init] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
     
 /* Fails!!!
     // Specify its type

@@ -40,23 +40,23 @@ TIGHTDB_TABLE_2(WrongTypeTable,
     [subdesc addColumnWithName:@"Hired" type:RLMTypeBool];
     [subdesc addColumnWithName:@"Age" type:RLMTypeInt];
 
-    [table TDB_insertBool:0 ndx:0 value:NO];
-    [table TDB_insertInt:1 ndx:0 value:10];
-    [table TDB_insertSubtable:2 ndx:0];
-    [table TDB_insertDone];
+    [table RLM_insertBool:0 ndx:0 value:NO];
+    [table RLM_insertInt:1 ndx:0 value:10];
+    [table RLM_insertSubtable:2 ndx:0];
+    [table RLM_insertDone];
 
-    RLMTable* subtable = [table TDB_tableInColumnWithIndex:2 atRowIndex:0];
-    [subtable TDB_insertBool:0 ndx:0 value:YES];
-    [subtable TDB_insertInt:1 ndx:0 value:42];
-    [subtable TDB_insertDone];
+    RLMTable* subtable = [table RLM_tableInColumnWithIndex:2 atRowIndex:0];
+    [subtable RLM_insertBool:0 ndx:0 value:YES];
+    [subtable RLM_insertInt:1 ndx:0 value:42];
+    [subtable RLM_insertDone];
 
-    GetSubtable* testTable = [table TDB_tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[GetSubtable class]];
+    GetSubtable* testTable = [table RLM_tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[GetSubtable class]];
     GetSubtableRow* cursor = [testTable rowAtIndex:0];
     NSLog(@"Age in subtable: %lld", cursor.Age);
     XCTAssertEqual(cursor.Age, (int64_t)42, @"Sub table row should be 42");
 
-    XCTAssertNil([table TDB_tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongNameTable class]], @"should return nil because wrong name");
-    XCTAssertNil([table TDB_tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongTypeTable class]], @"should return nil because wrong type");
+    XCTAssertNil([table RLM_tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongNameTable class]], @"should return nil because wrong name");
+    XCTAssertNil([table RLM_tableInColumnWithIndex:2 atRowIndex:0 asTableClass:[WrongTypeTable class]], @"should return nil because wrong type");
 }
 
 

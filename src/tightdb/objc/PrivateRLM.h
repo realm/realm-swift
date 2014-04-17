@@ -32,46 +32,46 @@
 
 -(id)_initRaw;
 
--(NSUInteger)TDB_addEmptyRow;
--(NSUInteger)TDB_addEmptyRows:(NSUInteger)numberOfRows;
+-(NSUInteger)RLM_addEmptyRow;
+-(NSUInteger)RLM_addEmptyRows:(NSUInteger)numberOfRows;
 
--(BOOL)TDB_insertBool:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(BOOL)value;
--(BOOL)TDB_insertInt:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(int64_t)value;
--(BOOL)TDB_insertFloat:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(float)value;
--(BOOL)TDB_insertDouble:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(double)value;
--(BOOL)TDB_insertString:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(NSString *)value;
--(BOOL)TDB_insertBinary:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(NSData *)value;
--(BOOL)TDB_insertBinary:(NSUInteger)colIndex ndx:(NSUInteger)ndx data:(const char *)data size:(size_t)size;
--(BOOL)TDB_insertDate:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(NSDate *)value;
--(BOOL)TDB_insertSubtable:(NSUInteger)colIndex ndx:(NSUInteger)ndx;
--(BOOL)TDB_insertSubtable:(NSUInteger)colIndex ndx:(NSUInteger)ndx error:(NSError *__autoreleasing *)error;
--(BOOL)TDB_insertMixed:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(id)value;
--(BOOL)TDB_insertMixed:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(id)value error:(NSError *__autoreleasing *)error;
--(BOOL)TDB_insertSubtableCopy:(NSUInteger)colIndex row:(NSUInteger)rowNdx subtable:(RLMTable *)subtable;
--(BOOL)TDB_insertSubtableCopy:(NSUInteger)colIndex row:(NSUInteger)rowIndex subtable:(RLMTable *)subtable error:(NSError *__autoreleasing *)error;
--(BOOL)TDB_insertDone;
+-(BOOL)RLM_insertBool:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(BOOL)value;
+-(BOOL)RLM_insertInt:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(int64_t)value;
+-(BOOL)RLM_insertFloat:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(float)value;
+-(BOOL)RLM_insertDouble:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(double)value;
+-(BOOL)RLM_insertString:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(NSString *)value;
+-(BOOL)RLM_insertBinary:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(NSData *)value;
+-(BOOL)RLM_insertBinary:(NSUInteger)colIndex ndx:(NSUInteger)ndx data:(const char *)data size:(size_t)size;
+-(BOOL)RLM_insertDate:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(NSDate *)value;
+-(BOOL)RLM_insertSubtable:(NSUInteger)colIndex ndx:(NSUInteger)ndx;
+-(BOOL)RLM_insertSubtable:(NSUInteger)colIndex ndx:(NSUInteger)ndx error:(NSError *__autoreleasing *)error;
+-(BOOL)RLM_insertMixed:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(id)value;
+-(BOOL)RLM_insertMixed:(NSUInteger)colIndex ndx:(NSUInteger)ndx value:(id)value error:(NSError *__autoreleasing *)error;
+-(BOOL)RLM_insertSubtableCopy:(NSUInteger)colIndex row:(NSUInteger)rowNdx subtable:(RLMTable *)subtable;
+-(BOOL)RLM_insertSubtableCopy:(NSUInteger)colIndex row:(NSUInteger)rowIndex subtable:(RLMTable *)subtable error:(NSError *__autoreleasing *)error;
+-(BOOL)RLM_insertDone;
 
--(BOOL)TDB_boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(int64_t)TDB_intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(float)TDB_floatInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(double)TDB_doubleInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(NSDate *)TDB_dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(NSString *)TDB_stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(NSData *)TDB_binaryInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(RLMTable *)TDB_tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(id)TDB_tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(Class)tableClass;
--(id)TDB_mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(BOOL)RLM_boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(int64_t)RLM_intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(float)RLM_floatInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(double)RLM_doubleInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(NSDate *)RLM_dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(NSString *)RLM_stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(NSData *)RLM_binaryInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(RLMTable *)RLM_tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(id)RLM_tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(Class)tableClass;
+-(id)RLM_mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 
 
--(void)TDB_setInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(void)TDB_setBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
--(void)TDB_setFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
--(void)TDB_setDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
--(void)TDB_setDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
--(void)TDB_setString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
--(void)TDB_setBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
--(void)TDB_setTable:(RLMTable *)aTable inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
--(void)TDB_setMixed:(id)aMixed inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)RLM_setInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(void)RLM_setBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)RLM_setFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)RLM_setDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)RLM_setDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)RLM_setString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)RLM_setBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)RLM_setTable:(RLMTable *)aTable inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
+-(void)RLM_setMixed:(id)aMixed inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
 
 @end
 
@@ -82,16 +82,16 @@
 @interface RLMView (Private)
 -(id)_initWithQuery:(RLMQuery *)query;
 
--(BOOL)TDB_boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(int64_t)TDB_intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(float)TDB_floatInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(double)TDB_doubleInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(NSDate *)TDB_dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
--(NSString *)TDB_stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
-//-(TDBBinary *)TDB_binaryInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(BOOL)RLM_boolInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(int64_t)RLM_intInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(float)RLM_floatInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(double)RLM_doubleInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(NSDate *)RLM_dateInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+-(NSString *)RLM_stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+//-(TDBBinary *)RLM_binaryInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 //-(RLMTable *)TD_BtableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
-//-(id)TDB_tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(Class)tableClass;
--(id)TDB_mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
+//-(id)RLM_tableInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex asTableClass:(Class)tableClass;
+-(id)RLM_mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 @end
 
 /**
@@ -100,8 +100,8 @@
  */
 @interface RLMRow (Private)
 -(id)initWithTable:(RLMTable *)table ndx:(NSUInteger)ndx;
--(void)TDB_setNdx:(NSUInteger)ndx;
--(NSUInteger)TDB_index;
+-(void)RLM_setNdx:(NSUInteger)ndx;
+-(NSUInteger)RLM_index;
 @end
 
 /**

@@ -55,7 +55,7 @@ TIGHTDB_TABLE_2(SharedTable2,
             for (size_t i = 0; i < [diskTable rowCount]; i++) {
                 SharedTable2Row *cursor = [diskTable rowAtIndex:i];
                 NSLog(@"%zu: %lld", i, cursor.Age);
-                NSLog(@"%zu: %i", i, [diskTable TDB_boolInColumnWithIndex: 0 atRowIndex:i]);
+                NSLog(@"%zu: %i", i, [diskTable RLM_boolInColumnWithIndex: 0 atRowIndex:i]);
             }
         }];
 
