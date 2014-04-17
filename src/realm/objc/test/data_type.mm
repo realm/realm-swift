@@ -7,8 +7,8 @@
 
 #import <XCTest/XCTest.h>
 
-#import <tightdb/objc/RLMType.h>
-#import <tightdb/data_type.hpp>
+#import <realm/objc/RLMType.h>
+#include <tightdb/data_type.hpp>
 
 @interface TestDataType: XCTestCase
 @end

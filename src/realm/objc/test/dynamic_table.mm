@@ -21,8 +21,8 @@
 #import <XCTest/XCTest.h>
 #import <Foundation/NSException.h>
 
-#import <tightdb/objc/RLMFast.h>
-#import <tightdb/objc/RLMTable_noinst.h>
+#import <realm/objc/RLMFast.h>
+#import <realm/objc/RLMTable_noinst.h>
 
 #include <string.h>
 

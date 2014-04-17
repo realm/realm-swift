@@ -11,12 +11,12 @@
 
 #import <XCTest/XCTest.h>
 
-#import <tightdb/objc/Realm.h>
-#import <tightdb/objc/group.h>
+#import <realm/objc/Realm.h>
+#import <realm/objc/group.h>
 
 #include <tightdb/binary_data.hpp>
 #include <tightdb/table.hpp>
-#import <tightdb/objc/RLMTable_noinst.h>
+#import <realm/objc/RLMTable_noinst.h>
 
 REALM_TABLE_DEF_3(PeopleErrTable,
                     Name,  String,

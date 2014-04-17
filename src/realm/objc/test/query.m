@@ -5,8 +5,8 @@
 
 #import <XCTest/XCTest.h>
 
-#import <tightdb/objc/Realm.h>
-#import <tightdb/objc/RLMQueryFast.h>
+#import <realm/objc/Realm.h>
+#import <realm/objc/RLMQueryFast.h>
 
 REALM_TABLE_1(TestQuerySub,
                 Age,  Int)

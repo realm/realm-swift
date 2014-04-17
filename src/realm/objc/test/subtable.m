@@ -7,8 +7,8 @@
 
 #import <XCTest/XCTest.h>
 
-#import <tightdb/objc/Realm.h>
-#import <tightdb/objc/group.h>
+#import <realm/objc/Realm.h>
+#import <realm/objc/group.h>
 
 REALM_TABLE_2(TestSubtableSub,
                 Name, String,
