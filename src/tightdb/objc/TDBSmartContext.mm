@@ -113,6 +113,10 @@ void throw_objc_exception(exception &ex)
     BOOL _tableRefsHaveDied;
 }
 
++(TDBSmartContext *)contextWithDefaultPersistence {
+    return [TDBSmartContext contextWithPersistenceToFile:[TDBContext defaultPath]];
+}
+
 +(TDBSmartContext *)contextWithPersistenceToFile:(NSString *)path
 {
     NSRunLoop *runLoop = [NSRunLoop mainRunLoop];
