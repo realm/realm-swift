@@ -26,7 +26,7 @@
 @interface TDBTransaction: NSObject
 
 @property (nonatomic, readonly) NSUInteger tableCount;
-
+@property (nonatomic, readonly) BOOL       isEmpty;
 
 /**
  * This method returns YES if a table with the specified name already exists. NO if it does not exist.
