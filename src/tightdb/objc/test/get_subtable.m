@@ -9,7 +9,7 @@
 
 #import <tightdb/objc/Tightdb.h>
 #import <tightdb/objc/TDBTransaction.h>
-#import <tightdb/objc/TDBContext.h>
+#import <tightdb/objc/RLMRealm.h>
 
 TIGHTDB_TABLE_2(GetSubtable,
                 Hired, Bool,

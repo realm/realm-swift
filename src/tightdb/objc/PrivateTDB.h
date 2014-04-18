@@ -20,7 +20,7 @@
 
 #import "TDBTable.h"
 #import "TDBView.h"
-#import "TDBContext.h"
+#import "RLMRealm.h"
 #import "TDBRow.h"
 
 
@@ -108,7 +108,7 @@
  * The selectors in this interface is not meant to be used directly.
  * However, they are publicly available so that the typed table macros can use them.
  */
-@interface TDBContext (Experiment)
+@interface RLMRealm (Experiment)
 
 /******** Experimental features **********/
 -(BOOL)pinReadTransactions;
