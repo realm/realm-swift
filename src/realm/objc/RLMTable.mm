@@ -74,7 +74,7 @@ using namespace std;
 
         // Parsing the schema failed
         //TODO: More detailed error msg in exception
-        @throw [NSException exceptionWithName:@"tightdb:invalid_columns"
+        @throw [NSException exceptionWithName:@"realm:invalid_columns"
                                                          reason:@"The supplied list of columns was invalid"
                                                        userInfo:nil];
     }
@@ -284,7 +284,7 @@ using namespace std;
     // TODO: Use a macro or a function for error handling
 
     if(m_read_only) {
-        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+        @throw [NSException exceptionWithName:@"realm:table_is_read_only"
                                        reason:@"You tried to modify a table in read only mode"
                                      userInfo:nil];
     }
@@ -294,7 +294,7 @@ using namespace std;
         index = m_table->add_empty_row(num_rows);
     }
     catch(std::exception& ex) {
-        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+        @throw [NSException exceptionWithName:@"realm:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
                                      userInfo:nil];
     }
@@ -335,7 +335,7 @@ using namespace std;
         return;
     }
 
-    @throw [NSException exceptionWithName:@"tightdb:column_not_implemented"
+    @throw [NSException exceptionWithName:@"realm:column_not_implemented"
                                    reason:@"You should either use nil, NSObject, NSDictionary, or NSArray"
                                  userInfo:nil];
 }
@@ -373,7 +373,7 @@ using namespace std;
 -(void)addRow:(NSObject*)data
 {
     if(m_read_only) {
-        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+        @throw [NSException exceptionWithName:@"realm:table_is_read_only"
                                        reason:@"You tried to modify a table in read only mode"
                                      userInfo:[NSMutableDictionary dictionary]];
     }
@@ -421,7 +421,7 @@ using namespace std;
         return;
     }
 
-    @throw [NSException exceptionWithName:@"tightdb:column_not_implemented"
+    @throw [NSException exceptionWithName:@"realm:column_not_implemented"
                                    reason:@"You should either use nil, NSObject, NSDictionary, or NSArray"
                                  userInfo:nil];
 }
@@ -430,7 +430,7 @@ using namespace std;
 -(void)removeAllRows
 {
     if (m_read_only) {
-        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+        @throw [NSException exceptionWithName:@"realm:table_is_read_only"
                                        reason:@"You tried to modify an immutable table."
                                      userInfo:nil];
     }
@@ -441,7 +441,7 @@ using namespace std;
 -(void)removeRowAtIndex:(NSUInteger)ndx
 {
     if (m_read_only) {
-        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+        @throw [NSException exceptionWithName:@"realm:table_is_read_only"
                                        reason:@"You tried to modify an immutable table."
                                      userInfo:nil];
     }
@@ -451,7 +451,7 @@ using namespace std;
 -(void)removeLastRow
 {
     if (m_read_only) {
-        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+        @throw [NSException exceptionWithName:@"realm:table_is_read_only"
                                        reason:@"You tried to modify an immutable table."
                                      userInfo:nil];
     }
@@ -923,7 +923,7 @@ using namespace std;
         m_table->remove_column(columnIndex);
     }
     catch(std::exception& ex) {
-        @throw[NSException exceptionWithName:@"tightdb:core_exception"
+        @throw[NSException exceptionWithName:@"realm:core_exception"
                                       reason:[NSString stringWithUTF8String:ex.what()]
                                     userInfo:nil];
     }
@@ -1028,12 +1028,12 @@ using namespace std;
 -(RLMView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex
 {
     if (!([self columnTypeOfColumnWithIndex:colIndex] == RLMTypeString)) {
-        @throw [NSException exceptionWithName:@"tightdb:column_type_not_supported"
+        @throw [NSException exceptionWithName:@"realm:column_type_not_supported"
                                        reason:@"Distinct currently only supported on columns of type RLMTypeString"
                                      userInfo:nil];
     }
     if (![self isIndexCreatedInColumnWithIndex:colIndex]) {
-        @throw [NSException exceptionWithName:@"tightdb:column_not_indexed"
+        @throw [NSException exceptionWithName:@"realm:column_not_indexed"
                                        reason:@"An index must be created on the column to get distinct values"
                                      userInfo:nil];
     }

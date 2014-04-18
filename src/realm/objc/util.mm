@@ -266,7 +266,7 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
 void verify_row(const Descriptor& descr, NSArray* data)
 {
     if (descr.get_column_count() != [data count]) {
-        @throw [NSException exceptionWithName:@"tightdb:wrong_column_count"
+        @throw [NSException exceptionWithName:@"realm:wrong_column_count"
                                        reason:@"Number of columns do not match"
                                      userInfo:nil];
     }
@@ -277,7 +277,7 @@ void verify_row(const Descriptor& descr, NSArray* data)
     size_t col_ndx = 0;
     while (obj = [enumerator nextObject]) {
         if (!verify_cell(descr, col_ndx, obj)) {
-            @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
+            @throw [NSException exceptionWithName:@"realm:wrong_column_type"
                                            reason:[NSString stringWithFormat: @"colName %@ with index: %lu is of type %u",
                                                             to_objc_string(descr.get_column_name(col_ndx)), col_ndx,
                                                                            descr.get_column_type(col_ndx) ]
@@ -296,7 +296,7 @@ void verify_row_with_labels(const Descriptor& descr, NSDictionary* data)
         if (value == nil)
             continue;
         if (!verify_cell(descr, i, value)) {
-            @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
+            @throw [NSException exceptionWithName:@"realm:wrong_column_type"
                                            reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
                                                    to_objc_string(descr.get_column_name(i)), i, descr.get_column_type(i) ]
                                          userInfo:nil];
@@ -317,7 +317,7 @@ void verify_row_from_object(const Descriptor& descr, NSObject* data)
             continue;
         }
         if (!verify_cell(descr, col_ndx, value)) {
-            @throw [NSException exceptionWithName: @"tightdb:wrong_column_type"
+            @throw [NSException exceptionWithName: @"realm:wrong_column_type"
                                            reason: [NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
                                                     to_objc_string(descr.get_column_name(col_ndx)), col_ndx,
                                                                    descr.get_column_type(col_ndx) ]
@@ -644,7 +644,7 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 table.set_subtable(col_ndx, row_ndx, &[(RLMTable *)obj getNativeTable]);
                 break;
             }
-            @throw [NSException exceptionWithName:@"tightdb:cannot insert subtable"
+            @throw [NSException exceptionWithName:@"realm:cannot insert subtable"
                                            reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
                                                             to_objc_string(table.get_column_name(col_ndx)), col_ndx,
                                                                            table.get_column_type(col_ndx) ]
