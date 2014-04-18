@@ -35,6 +35,8 @@
 		4DB1DEFC18BF70AE005A7234 /* functional.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF918BF70AE005A7234 /* functional.m */; };
 		4DB1DEFD18BF70AE005A7234 /* typed_table.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEFA18BF70AE005A7234 /* typed_table.m */; };
 		4DDDD67418EB049300E94613 /* TDBViewProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DDDD67318EB049300E94613 /* TDBViewProtocol.h */; };
+		E82D503A1900C128003C1B8E /* smart_context.mm in Sources */ = {isa = PBXBuildFile; fileRef = E82D50391900C128003C1B8E /* smart_context.mm */; };
+		E8CCFC251900DBE900396C52 /* XCTestCase+AsyncTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = E8CCFC241900DBE900396C52 /* XCTestCase+AsyncTesting.m */; };
 		E918909D177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		E91890B0177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		E91890B3177B677900653D7A /* TightDbObjcDyn.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E9189099177B677900653D7A /* TightDbObjcDyn.dylib */; };
@@ -114,6 +116,9 @@
 		4DDDD67018EAF1C000E94613 /* TDBRowFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TDBRowFast.h; path = ../src/tightdb/objc/TDBRowFast.h; sourceTree = SOURCE_ROOT; };
 		4DDDD67218EAF22100E94613 /* TightdbFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TightdbFast.h; path = ../src/tightdb/objc/TightdbFast.h; sourceTree = SOURCE_ROOT; };
 		4DDDD67318EB049300E94613 /* TDBViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TDBViewProtocol.h; path = ../src/tightdb/objc/TDBViewProtocol.h; sourceTree = SOURCE_ROOT; };
+		E82D50391900C128003C1B8E /* smart_context.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = smart_context.mm; path = ../../src/tightdb/objc/test/smart_context.mm; sourceTree = "<group>"; };
+		E8CCFC231900DBE900396C52 /* XCTestCase+AsyncTesting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "XCTestCase+AsyncTesting.h"; sourceTree = "<group>"; };
+		E8CCFC241900DBE900396C52 /* XCTestCase+AsyncTesting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "XCTestCase+AsyncTesting.m"; sourceTree = "<group>"; };
 		E9189099177B677900653D7A /* TightDbObjcDyn.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = TightDbObjcDyn.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		E918909C177B677900653D7A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		E918909F177B677900653D7A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -184,6 +189,15 @@
 				4D143CCE18F69D0F00CEFF65 /* TDBQueryFast.h */,
 			);
 			name = TDBFast;
+			sourceTree = "<group>";
+		};
+		E8CCFC221900DBD100396C52 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				E8CCFC231900DBE900396C52 /* XCTestCase+AsyncTesting.h */,
+				E8CCFC241900DBE900396C52 /* XCTestCase+AsyncTesting.m */,
+			);
+			name = Helpers;
 			sourceTree = "<group>";
 		};
 		E9189090177B677900653D7A = {
@@ -276,6 +290,7 @@
 		E91890B4177B677900653D7A /* TightDbObjcDynTests */ = {
 			isa = PBXGroup;
 			children = (
+				E8CCFC221900DBD100396C52 /* Helpers */,
 				E91890E7177B71E400653D7A /* data_type.mm */,
 				4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */,
 				E91890E8177B71E400653D7A /* enumerator.m */,
@@ -287,6 +302,7 @@
 				E91890ED177B71E400653D7A /* mixed.mm */,
 				E91890EE177B71E400653D7A /* query.m */,
 				E91890EF177B71E400653D7A /* shared_group.m */,
+				E82D50391900C128003C1B8E /* smart_context.mm */,
 				E91890F0177B71E400653D7A /* subtable.m */,
 				E91890B5177B677900653D7A /* Supporting Files */,
 				E91890F1177B71E400653D7A /* table_delete_all.m */,
@@ -463,6 +479,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E82D503A1900C128003C1B8E /* smart_context.mm in Sources */,
 				E91890F5177B71E400653D7A /* data_type.mm in Sources */,
 				E91890F6177B71E400653D7A /* enumerator.m in Sources */,
 				E91890F7177B71E400653D7A /* err_handling.mm in Sources */,
@@ -472,6 +489,7 @@
 				E91890FA177B71E400653D7A /* group.m in Sources */,
 				E91890FB177B71E400653D7A /* mixed.mm in Sources */,
 				E91890FC177B71E400653D7A /* query.m in Sources */,
+				E8CCFC251900DBE900396C52 /* XCTestCase+AsyncTesting.m in Sources */,
 				E91890FD177B71E400653D7A /* shared_group.m in Sources */,
 				E91890FE177B71E400653D7A /* subtable.m in Sources */,
 				4DB1DEFC18BF70AE005A7234 /* functional.m in Sources */,
