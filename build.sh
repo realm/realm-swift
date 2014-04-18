@@ -208,23 +208,23 @@ case "$MODE" in
             if ! [ -x "$REALM_CONFIG" ]; then
                 realm_abort "ERROR: Realm config-program '$REALM_CONFIG' does not exist" "Cannot find '$REALM_CONFIG' - skipping"
             fi
-            tightdb_config_cmd="$REALM_CONFIG"
-        elif ! tightdb_config_cmd="$(which "$REALM_CONFIG" 2>/dev/null)"; then
+            realm_config_cmd="$REALM_CONFIG"
+        elif ! realm_config_cmd="$(which "$REALM_CONFIG" 2>/dev/null)"; then
             realm_abort "ERROR: Realm config-program '$REALM_CONFIG' not found in PATH" "Cannot find '$REALM_CONFIG' - skipping"
         fi
-        tightdb_config_dbg_cmd="$tightdb_config_cmd-dbg"
+        tightdb_config_dbg_cmd="$realm_config_cmd-dbg"
         if ! [ -x "$tightdb_config_dbg_cmd" ]; then
             realm_abort "ERROR: Realm config-program '$tightdb_config_dbg_cmd' not found" "Cannot find '$tightdb_config_dbg_cmd' - skipping"
         fi
-        realm_version="$($tightdb_config_cmd --version)"         || exit 1
+        realm_version="$($realm_config_cmd --version)"         || exit 1
 
-        realm_cflags="$($tightdb_config_cmd --cflags)"           || exit 1
-        realm_cflags_dbg="$($tightdb_config_dbg_cmd --cflags)"   || exit 1
-        realm_ldflags="$($tightdb_config_cmd --libs)"            || exit 1
-        realm_ldflags_dbg="$($tightdb_config_dbg_cmd --libs)"    || exit 1
+        realm_cflags="$($realm_config_cmd --cflags)"           || exit 1
+        realm_cflags_dbg="$($tightdb_config_dbg_cmd --cflags)" || exit 1
+        realm_ldflags="$($realm_config_cmd --libs)"            || exit 1
+        realm_ldflags_dbg="$($tightdb_config_dbg_cmd --libs)"  || exit 1
 
-        tightdb_includedir="$($tightdb_config_cmd --includedir)" || exit 1
-        tightdb_libdir="$($tightdb_config_cmd --libdir)"         || exit 1
+        tightdb_includedir="$($realm_config_cmd --includedir)" || exit 1
+        tightdb_libdir="$($realm_config_cmd --libdir)"         || exit 1
         tightdb_rpath="$tightdb_libdir"
 
         # `TIGHTDB_DIST_INCLUDEDIR` and `TIGHTDB_DIST_LIBDIR` are set
@@ -234,10 +234,10 @@ case "$MODE" in
             tightdb_includedir="$TIGHTDB_DIST_INCLUDEDIR"
             tightdb_libdir="$TIGHTDB_DIST_LIBDIR"
         else
-            tightdb_includedir="$($tightdb_config_cmd --includedir)" || exit 1
-            tightdb_libdir="$($tightdb_config_cmd --libdir)"         || exit 1
+            tightdb_includedir="$($realm_config_cmd --includedir)" || exit 1
+            tightdb_libdir="$($realm_config_cmd --libdir)"         || exit 1
         fi
-        tightdb_rpath="$($tightdb_config_cmd --libdir)" || exit 1
+        tightdb_rpath="$($realm_config_cmd --libdir)" || exit 1
 
         cflags="-I$tightdb_includedir"
         ldflags="-L$tightdb_libdir -Wl,-rpath,$tightdb_rpath"
@@ -322,7 +322,7 @@ INSTALL_INCLUDEDIR  = $install_includedir
 INSTALL_BINDIR      = $install_bindir
 INSTALL_LIBDIR      = $install_libdir
 INSTALL_LIBEXECDIR  = $install_libexecdir
-REALM_CONFIG        = $tightdb_config_cmd
+REALM_CONFIG        = $realm_config_cmd
 REALM_VERSION       = $realm_version
 REALM_CFLAGS        = $realm_cflags
 REALM_CFLAGS_DBG    = $realm_cflags_dbg
