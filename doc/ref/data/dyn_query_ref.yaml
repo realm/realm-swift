@@ -11,14 +11,14 @@
 ## JJEPSEN: max, min not defined for time compare as in c++.
 ## !! Do we at all have a dynamic query interface?
 ## !! All the Conditions don't take a colIndex...
-## All the Combiners return (void) - don't they return TDBQuery ? - check-&-fix
+## All the Combiners return (void) - don't they return RLMQuery ? - check-&-fix
 
 ## NOTICE:
 ##  The constructor (initWithTable) is not documented as the user
 ##  should never call it explicitely.
 
 ID         : class_dyn_query
-TITLE      : TDBQuery  (dynamic)
+TITLE      : RLMQuery  (dynamic)
 SUMMARY    : *g_dyn_query_intro_summary
 DESCR      : *g_dyn_query_intro_descr
 SEE        :
@@ -58,14 +58,14 @@ CATEGORIES :
 #      TODO     : soon
 #      NAMES    : [ equal, equal, equal, equal, equal, equal, equal]
       SIGNATURE: |
-                  (TDBQuery *)boolIsEqualTo:(bool)aBool inColumnWithIndex:(NSUInteger)colIndex
-                  (TDBQuery *)intIsEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
-                  (TDBQuery *)floatIsEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
-                  (TDBQuery *)doubleIsEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
-                  (TDBQuery *)stringIsEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
-                  (TDBQuery *)stringIsCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
-                  (TDBQuery *)dateIsEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
-                  (TDBQuery *)binaryIsEqualTo:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)boolIsEqualTo:(bool)aBool inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)intIsEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)floatIsEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)doubleIsEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)stringIsEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)stringIsCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)dateIsEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)binaryIsEqualTo:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
       SUMMARY  : *g_dyn_query_equals_summary
       DESCR    : *g_dyn_query_equals_descr
       PARAMS:
@@ -76,7 +76,7 @@ CATEGORIES :
         TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       RETURN:
-        TYPES  : TDBQuery *
+        TYPES  : RLMQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -100,13 +100,13 @@ CATEGORIES :
       NAME     : "isNotEqualToDate:"
       TITLE    : "*IsNotEqualTo:inColumnWithIndex:"
       SIGNATURE: |
-                  (TDBQuery *)intIsNotEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
-                  (TDBQuery *)floatIsNotEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
-                  (TDBQuery *)doubleIsNotEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
-                  (TDBQuery *)stringIsNotEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
-                  (TDBQuery *)stringIsNotCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
-                  (TDBQuery *)dateIsNotEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
-                  (TDBQuery *)binaryIsNotEqualTo:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)intIsNotEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)floatIsNotEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)doubleIsNotEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)stringIsNotEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)stringIsNotCaseInsensitiveEqualTo:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)dateIsNotEqualTo:(time_t)aDate inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)binaryIsNotEqualTo:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
       SUMMARY  : *g_dyn_query_notEquals_summary
       DESCR    : *g_dyn_query_notEquals_descr
       PARAMS:
@@ -117,7 +117,7 @@ CATEGORIES :
         TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       RETURN:
-        TYPES  : TDBQuery *
+        TYPES  : RLMQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -133,10 +133,10 @@ CATEGORIES :
       NAME     : "dateIsbetween::inColumnWithIndex:"
       TITLE    : "*IsBetween::inColumnWithIndex:"
       SIGNATURE: |
-                 (TDBQuery *)dateIsBetween:(NSDate *)lower :(NSDate *)upper inColumnWithIndex:(NSUInteger)colIndex
-                 (TDBQuery *)intIsBetween:(int64_t)lower :(int64_t)upper inColumnWithIndex:(NSUInteger)colIndex
-                 (TDBQuery *)floatIsBetween:(float)lower :(float)upper inColumnWithIndex:(NSUInteger)colIndex
-                 (TDBQuery *)doubleIsBetween:(double)lower :(double)upper inColumnWithIndex:(NSUInteger)colIndex
+                 (RLMQuery *)dateIsBetween:(NSDate *)lower :(NSDate *)upper inColumnWithIndex:(NSUInteger)colIndex
+                 (RLMQuery *)intIsBetween:(int64_t)lower :(int64_t)upper inColumnWithIndex:(NSUInteger)colIndex
+                 (RLMQuery *)floatIsBetween:(float)lower :(float)upper inColumnWithIndex:(NSUInteger)colIndex
+                 (RLMQuery *)doubleIsBetween:(double)lower :(double)upper inColumnWithIndex:(NSUInteger)colIndex
       SUMMARY  : *g_dyn_query_greaterThan_summary
       DESCR    : *g_dyn_query_greaterThan_descr
       PARAMS:
@@ -150,7 +150,7 @@ CATEGORIES :
         TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       RETURN:
-        TYPES  : TDBQuery *
+        TYPES  : RLMQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -166,10 +166,10 @@ CATEGORIES :
       NAME     : "isGreaterThanDate:"
       TITLE    : "*IsGreaterThan:inColumnWithIndex:"
       SIGNATURE: |
-                 (TDBQuery *)dateIsGreaterThan:(NSDate)aDate inColumnWithIndex:(NSUInteger)colIndex
-                 (TDBQuery *)intIsGreaterThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
-                 (TDBQuery *)floatIsGreaterThan:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
-                 (TDBQuery *)doubleIsGreaterThan:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
+                 (RLMQuery *)dateIsGreaterThan:(NSDate)aDate inColumnWithIndex:(NSUInteger)colIndex
+                 (RLMQuery *)intIsGreaterThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+                 (RLMQuery *)floatIsGreaterThan:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+                 (RLMQuery *)doubleIsGreaterThan:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
       SUMMARY  : *g_dyn_query_greaterThan_summary
       DESCR    : *g_dyn_query_greaterThan_descr
       PARAMS:
@@ -180,7 +180,7 @@ CATEGORIES :
         TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       RETURN:
-        TYPES  : TDBQuery *
+        TYPES  : RLMQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -196,10 +196,10 @@ CATEGORIES :
       NAME     : "dateIsGreaterThanOrEqualTo:"
       TITLE    : "*IsGreaterThanOrEqualTo:inColumnWithIndex:"
       SIGNATURE: |
-                  (TDBQuery *)dateIsGreaterThanOrEqualTo:(NSDate)aDate inColumnWithIndex:(NSUInteger)colIndex
-                  (TDBQuery *)intIsGreaterThanOrEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
-                  (TDBQuery *)floatIsGreaterThanOrEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
-                  (TDBQuery *)doubleIsGreaterThanOrEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)dateIsGreaterThanOrEqualTo:(NSDate)aDate inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)intIsGreaterThanOrEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)floatIsGreaterThanOrEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
+                  (RLMQuery *)doubleIsGreaterThanOrEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
       SUMMARY  : *g_dyn_query_greaterThanOrEqual_summary
       DESCR    : *g_dyn_query_greaterThanOrEqual_descr
       PARAMS:
@@ -210,7 +210,7 @@ CATEGORIES :
         TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       RETURN:
-        TYPES  : TDBQuery *
+        TYPES  : RLMQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -226,10 +226,10 @@ CATEGORIES :
       NAME     : "dateIsLessThan:"
       TITLE    : "*IsLessThan:inColumnWithIndex:"
       SIGNATURE: |
-                  (TDBQuery *)dateIsLessThan:(NSDate)aDate inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)intIsLessThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)floatIsLessThan:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)doubleIsLessThan:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
+                  (RLMQuery *)dateIsLessThan:(NSDate)aDate inColumnWithIndex:(NSUInteger)colIndex;
+                  (RLMQuery *)intIsLessThan:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
+                  (RLMQuery *)floatIsLessThan:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
+                  (RLMQuery *)doubleIsLessThan:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
       SUMMARY  : *g_dyn_query_lessThan_summary
       DESCR    : *g_dyn_query_lessThan_descr
       PARAMS:
@@ -241,7 +241,7 @@ CATEGORIES :
         DESCR  : *g_dyn_query_column_index_descr
 
       RETURN:
-        TYPES  : TDBQuery *
+        TYPES  : RLMQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -257,10 +257,10 @@ CATEGORIES :
       NAME     : "dateIsLessThanOrEqualTo:"
       TITLE    : "*IsLessThanOrEqualTo:inColumnWithIndex:"
       SIGNATURE: |
-                  (TDBQuery *)dateIsLessThanOrEqualTo:(NSDate)aDate inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)intIsLessThanOrEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)floatIsLessThanOrEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
-                  (TDBQuery *)doubleIsLessThanOrEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
+                  (RLMQuery *)dateIsLessThanOrEqualTo:(NSDate)aDate inColumnWithIndex:(NSUInteger)colIndex;
+                  (RLMQuery *)intIsLessThanOrEqualTo:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
+                  (RLMQuery *)floatIsLessThanOrEqualTo:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
+                  (RLMQuery *)doubleIsLessThanOrEqualTo:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;
       SUMMARY  : *g_dyn_query_lessThanOrEqual_summary
       DESCR    : *g_dyn_query_lessThanOrEqual_descr
       PARAMS:
@@ -271,7 +271,7 @@ CATEGORIES :
         TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       RETURN:
-        TYPES  : TDBQuery *
+        TYPES  : RLMQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -289,7 +289,7 @@ CATEGORIES :
       TODO     : soon
       NAME     : beginsWith
       SIGNATURE: |
-                 (TDBQuery *)columnBeginsWith:(NSString *)value
+                 (RLMQuery *)columnBeginsWith:(NSString *)value
       DESCR    : *g_dyn_query_startsWith_descr
       SUMMARY  : *g_dyn_query_startsWith_summary
       PARAMS:
@@ -303,7 +303,7 @@ CATEGORIES :
         TYPES  : BOOL
         DESCR  : *g_dyn_query_case_sensitive_descr
       RETURN:
-        TYPES  : TDBQuery
+        TYPES  : RLMQuery
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -318,7 +318,7 @@ CATEGORIES :
       TODO     : soon
       NAME     : columnEndsWith
       SIGNATURE: |
-                 (TDBQuery *)columnEndsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 (RLMQuery *)columnEndsWith:(NSString *)value caseSensitive:(BOOL)caseSensitive
       DESCR    : *g_dyn_query_endsWith_descr
       SUMMARY  : *g_dyn_query_endsWith_summary
       PARAMS:
@@ -332,7 +332,7 @@ CATEGORIES :
         TYPES  : BOOL
         DESCR  : *g_dyn_query_case_sensitive_descr
       RETURN:
-        TYPES  : TDBQuery *
+        TYPES  : RLMQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -347,8 +347,8 @@ CATEGORIES :
       TODO     : soon
       NAME     : columnContains
       SIGNATURE: |
-                 (TDBQuery *)columnContains:(NSString *)value caseSensitive:(BOOL)caseSensitive
-                 (TDBQuery *)columnContains:(NSString *)value
+                 (RLMQuery *)columnContains:(NSString *)value caseSensitive:(BOOL)caseSensitive
+                 (RLMQuery *)columnContains:(NSString *)value
       DESCR    : *g_dyn_query_contains_descr
       SUMMARY  : *g_dyn_query_contains_summary
       PARAMS:
@@ -362,7 +362,7 @@ CATEGORIES :
         TYPES  : BOOL
         DESCR  : *g_dyn_query_case_sensitive_descr
       RETURN:
-        TYPES  : TDBQuery *
+        TYPES  : RLMQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -375,9 +375,9 @@ CATEGORIES :
       NAMES    : group
       DESCR    : *g_dyn_query_group_descr
       SUMMARY  : *g_dyn_query_group_summary
-      SIGNATURE: (TDBQuery *)group
+      SIGNATURE: (RLMQuery *)group
       RETURN:
-        TYPES  : TDBQuery *
+        TYPES  : RLMQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -387,9 +387,9 @@ CATEGORIES :
       NAMES    : endGroup
       DESCR    : *g_dyn_query_endGroup_descr
       SUMMARY  : *g_dyn_query_endGroup_summary
-      SIGNATURE: (TDBQuery *)endgroup
+      SIGNATURE: (RLMQuery *)endgroup
       RETURN:
-        TYPES  : TDBQuery *
+        TYPES  : RLMQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -399,9 +399,9 @@ CATEGORIES :
       NAMES    : Or
       DESCR    : *g_dyn_query_or_descr
       SUMMARY  : *g_dyn_query_or_summary
-      SIGNATURE: (TDBQuery *)Or
+      SIGNATURE: (RLMQuery *)Or
       RETURN:
-        TYPES  : TDBQuery *
+        TYPES  : RLMQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -411,13 +411,13 @@ CATEGORIES :
       NAMES    : "subtableInColumnWithIndex:"
       DESCR    : *g_dyn_query_subtable_descr
       SUMMARY  : *g_dyn_query_subtable_summary
-      SIGNATURE: (TDBQuery *)subtableInColumnWithIndex:(NSUInteger)colIndex
+      SIGNATURE: (RLMQuery *)subtableInColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
         NAME   : colIndex
         TYPES  : NSUInteger
         DESCR  : *g_dyn_query_column_index_descr
       RETURN:
-        TYPES  : TDBQuery *
+        TYPES  : RLMQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -427,9 +427,9 @@ CATEGORIES :
       NAMES    : parent
       DESCR    : *g_dyn_query_endSubtable_descr
       SUMMARY  : *g_dyn_query_endSubtable_summary
-      SIGNATURE: (TDBQuery *)parent
+      SIGNATURE: (RLMQuery *)parent
       RETURN:
-        TYPES  : TDBQuery *
+        TYPES  : RLMQuery *
         DESCR  : *g_dyn_query_return_query_object_descr
       EXAMPLES:
       - DESCR  :
@@ -447,7 +447,7 @@ CATEGORIES :
       DESCR    : *g_dyn_query_find_all_descr
       SUMMARY  : *g_dyn_query_find_all_summary
       SIGNATURE: |
-                 (TDBView *)findAllRows
+                 (RLMView *)findAllRows
 #      PARAMS:
 #      - NAME   : start
 #        TYPES  : NSUInteger
@@ -459,8 +459,8 @@ CATEGORIES :
 #        TYPES  : NSUInteger
 #        DESCR  : *g_dyn_query_find_all_parm3_descr
       RETURN:
-        TYPES  : TDBView *
-        DESCR  : A <code>TDBView</code> with the matching rows.
+        TYPES  : RLMView *
+        DESCR  : A <code>RLMView</code> with the matching rows.
       EXAMPLES:
       - DESCR  :
         CODE   : ex_objc_dyn_query_findall
@@ -630,5 +630,5 @@ CATEGORIES :
       SUMMARY  : Returns the origin table.
       DESCR    : The method returns the table which created the query.
       RETURN:
-        TYPES  : TDBTable *
+        TYPES  : RLMTable *
         DESCR  : The origin table.
