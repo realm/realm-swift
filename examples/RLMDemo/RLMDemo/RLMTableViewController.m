@@ -124,7 +124,7 @@ static NSString * const kTableName = @"table";
         RLMDemoTable *table = [transaction tableWithName:kTableName asTableClass:[RLMDemoTable class]];
         NSString *title = [NSString stringWithFormat:@"Title %lu", (unsigned long)table.rowCount];
         BOOL checked = table.rowCount % 2;
-        [table addRow:@[title, checked ? @YES : @NO]];
+        [table addRow:@[title, @(checked)]];
         return YES;
     } error:&error];
     
