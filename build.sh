@@ -343,10 +343,10 @@ EOF
 
     "get-version")
 	version_file="src/realm/objc/RLMVersion.h"
-	tightdb_version_major="$(grep TDB_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	tightdb_version_minor="$(grep TDB_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	tightdb_version_patch="$(grep TDB_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	echo "$tightdb_version_major.$tightdb_version_minor.$tightdb_version_patch"
+	realm_version_major="$(grep RLM_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+	realm_version_minor="$(grep RLM_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+	realm_version_patch="$(grep RLM_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+	echo "$realm_version_major.$realm_version_minor.$realm_version_patch"
 	exit 0
 	;;
 

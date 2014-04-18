@@ -20,9 +20,9 @@
 
 #import <Foundation/Foundation.h>
 
-#define TDB_VERSION_MAJOR 0
-#define TDB_VERSION_MINOR 6
-#define TDB_VERSION_PATCH 0
+#define RLM_VERSION_MAJOR 0
+#define RLM_VERSION_MINOR 6
+#define RLM_VERSION_PATCH 0
 
 @interface RLMVersion : NSObject
 -(id)init;
