@@ -1,19 +1,19 @@
 /* @@Example: ex_objc_query_typed_intro @@ */
-#import <Tightdb/Tightdb.h>
+#import <Realm/Realm.h>
 #import "people.h"
 
 /*
  The classes People, PeopleQuery, PeopleView, and PeopleRow are declared
  (interfaces are generated) in people.h as
 
- TIGHTDB_TABLE_DEF_3(People,
+ REALM_TABLE_DEF_3(People,
                      Name,  String,
                      Age,   Int,
                      Hired, Bool)
 
  and in people.m you must have
 
- TIGHTDB_TABLE_IMPL_3(People,
+ REALM_TABLE_IMPL_3(People,
                       Name, String,
                       Age,  Int,
                       Hired, Bool)

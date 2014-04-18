@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4B791633190075BF00E29DAC /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B791632190075BF00E29DAC /* Realm.framework */; };
+		4B7916371900768600E29DAC /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7916361900768600E29DAC /* libstdc++.6.dylib */; };
 		4D24338E18BF65C700271C32 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D24338D18BF65C700271C32 /* Foundation.framework */; };
 		4D24339018BF65C700271C32 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D24338F18BF65C700271C32 /* CoreGraphics.framework */; };
 		4D24339818BF65C700271C32 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D24339618BF65C700271C32 /* InfoPlist.strings */; };
@@ -19,8 +21,6 @@
 		4D2433B118BF65C700271C32 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D24338D18BF65C700271C32 /* Foundation.framework */; };
 		4D2433BA18BF65C700271C32 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D2433B818BF65C700271C32 /* InfoPlist.strings */; };
 		4D2433BC18BF65C700271C32 /* iOSTutorialTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2433BB18BF65C700271C32 /* iOSTutorialTests.m */; };
-		4DB1DEF518BF67AE005A7234 /* Tightdb.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DB1DEF418BF67AE005A7234 /* Tightdb.framework */; };
-		529E743A18F63A8300BF84DD /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 529E743918F63A8300BF84DD /* libstdc++.6.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +34,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4B791632190075BF00E29DAC /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../Realm.framework; sourceTree = "<group>"; };
+		4B7916361900768600E29DAC /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/usr/lib/libstdc++.6.dylib"; sourceTree = DEVELOPER_DIR; };
 		4D1271FA1833C1970099B36C /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		4D24338C18BF65C700271C32 /* iOSTutorial.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSTutorial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D24338D18BF65C700271C32 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -53,11 +55,6 @@
 		4D2433B718BF65C700271C32 /* iOSTutorialTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iOSTutorialTests-Info.plist"; sourceTree = "<group>"; };
 		4D2433B918BF65C700271C32 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4D2433BB18BF65C700271C32 /* iOSTutorialTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iOSTutorialTests.m; sourceTree = "<group>"; };
-		4D88930418D1ADED0038AFD4 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/usr/lib/libc++.dylib"; sourceTree = DEVELOPER_DIR; };
-		4DB1DEF418BF67AE005A7234 /* Tightdb.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Tightdb.framework; path = ../Tightdb.framework; sourceTree = "<group>"; };
-		4DB1DEF618BF67B3005A7234 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/usr/lib/libstdc++.dylib"; sourceTree = DEVELOPER_DIR; };
-		52705F6D18F633270076E9CE /* libstdc++.6.0.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.0.9.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.1.sdk/usr/lib/libstdc++.6.0.9.dylib"; sourceTree = DEVELOPER_DIR; };
-		529E743918F63A8300BF84DD /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.1.sdk/usr/lib/libstdc++.6.dylib"; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,10 +62,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				529E743A18F63A8300BF84DD /* libstdc++.6.dylib in Frameworks */,
+				4B7916371900768600E29DAC /* libstdc++.6.dylib in Frameworks */,
+				4B791633190075BF00E29DAC /* Realm.framework in Frameworks */,
 				4D24339018BF65C700271C32 /* CoreGraphics.framework in Frameworks */,
 				4D24338E18BF65C700271C32 /* Foundation.framework in Frameworks */,
-				4DB1DEF518BF67AE005A7234 /* Tightdb.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,8 +83,6 @@
 		4D1271EE1833C1970099B36C = {
 			isa = PBXGroup;
 			children = (
-				529E743918F63A8300BF84DD /* libstdc++.6.dylib */,
-				52705F6D18F633270076E9CE /* libstdc++.6.0.9.dylib */,
 				4D1271FC1833C1970099B36C /* TightdbTutorial */,
 				4D24339318BF65C700271C32 /* iOSTutorial */,
 				4D2433B518BF65C700271C32 /* iOSTutorialTests */,
@@ -108,9 +103,8 @@
 		4D1271F91833C1970099B36C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				4D88930418D1ADED0038AFD4 /* libc++.dylib */,
-				4DB1DEF618BF67B3005A7234 /* libstdc++.dylib */,
-				4DB1DEF418BF67AE005A7234 /* Tightdb.framework */,
+				4B7916361900768600E29DAC /* libstdc++.6.dylib */,
+				4B791632190075BF00E29DAC /* Realm.framework */,
 				4D1271FA1833C1970099B36C /* CoreFoundation.framework */,
 				4D24338D18BF65C700271C32 /* Foundation.framework */,
 				4D24338F18BF65C700271C32 /* CoreGraphics.framework */,
