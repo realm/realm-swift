@@ -119,8 +119,7 @@
 		E918909F177B677900653D7A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		E91890A0177B677900653D7A /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		E91890A1177B677900653D7A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		E91890AD177B677900653D7A /* TightDbObjcDynTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TightDbObjcDynTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
-		E91890AE177B677900653D7A /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		E91890AD177B677900653D7A /* TightDbObjcDynTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TightDbObjcDynTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E91890B6177B677900653D7A /* TightDbObjcDynTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TightDbObjcDynTests-Info.plist"; sourceTree = "<group>"; };
 		E91890B8177B677900653D7A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E91890C5177B67AB00653D7A /* TDBRow.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TDBRow.mm; path = ../src/tightdb/objc/TDBRow.mm; sourceTree = SOURCE_ROOT; };
@@ -201,7 +200,7 @@
 			isa = PBXGroup;
 			children = (
 				E9189099177B677900653D7A /* TightDbObjcDyn.dylib */,
-				E91890AD177B677900653D7A /* TightDbObjcDynTests.octest */,
+				E91890AD177B677900653D7A /* TightDbObjcDynTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -211,7 +210,6 @@
 			children = (
 				4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */,
 				E918909C177B677900653D7A /* Cocoa.framework */,
-				E91890AE177B677900653D7A /* SenTestingKit.framework */,
 				E918909E177B677900653D7A /* Other Frameworks */,
 			);
 			name = Frameworks;
@@ -382,7 +380,7 @@
 			);
 			name = TightDbObjcDynTests;
 			productName = TightDbObjcDynTests;
-			productReference = E91890AD177B677900653D7A /* TightDbObjcDynTests.octest */;
+			productReference = E91890AD177B677900653D7A /* TightDbObjcDynTests.xctest */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -627,7 +625,7 @@
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "TightDbObjcDynTests/TightDbObjcDynTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = octest;
+				WRAPPER_EXTENSION = xctest;
 			};
 			name = Debug;
 		};
@@ -643,7 +641,7 @@
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "TightDbObjcDynTests/TightDbObjcDynTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = octest;
+				WRAPPER_EXTENSION = xctest;
 			};
 			name = Release;
 		};
