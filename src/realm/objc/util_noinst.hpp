@@ -229,32 +229,32 @@ catch (std::exception& ex) { \
 // This macro is part of the new error strategy, specifically for table value setters.
 #define REALM_EXCEPTION_HANDLER_SETTERS(action, datatype) \
 if (m_read_only) { \
-    NSException* exception = [NSException exceptionWithName:@"tightdb:table_is_read_only" \
+    NSException* exception = [NSException exceptionWithName:@"realm:table_is_read_only" \
                                           reason:@"You tried to modify an immutable table" \
                                           userInfo:[NSMutableDictionary dictionary]]; \
     [exception raise]; \
 } \
 if (col_ndx >= self.columnCount) { \
-    NSException* exception = [NSException exceptionWithName:@"tightdb:column_index_out_of_bounds" \
+    NSException* exception = [NSException exceptionWithName:@"realm:column_index_out_of_bounds" \
                                           reason:@"The specified column index is not within the table bounds" \
                                           userInfo:[NSMutableDictionary dictionary]]; \
     [exception raise]; \
 } \
 if ([self columnTypeOfColumnWithIndex:col_ndx] != datatype) { \
-    NSException* exception = [NSException exceptionWithName:@"tightdb:illegal_type" \
+    NSException* exception = [NSException exceptionWithName:@"realm:illegal_type" \
                                           reason:@"The supplied type is not compatible with the column type" \
                                           userInfo:[NSMutableDictionary dictionary]]; \
     [exception raise]; \
 } \
 if (row_ndx >= self.rowCount) { \
-    NSException* exception = [NSException exceptionWithName:@"tightdb:row_index_out_of_bounds" \
+    NSException* exception = [NSException exceptionWithName:@"realm:row_index_out_of_bounds" \
                                           reason:@"The specified row index is not within the table bounds" \
                                           userInfo:[NSMutableDictionary dictionary]]; \
     [exception raise]; \
 } \
 try { action } \
 catch(std::exception& ex) { \
-    NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception" \
+    NSException* exception = [NSException exceptionWithName:@"realm:core_exception" \
                                           reason:[NSString stringWithUTF8String:ex.what()] \
                                           userInfo:[NSMutableDictionary dictionary]]; \
     [exception raise]; \
@@ -262,7 +262,7 @@ catch(std::exception& ex) { \
 
 #define REALM_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(columnIndex) \
 if (columnIndex >= self.columnCount) { \
-                        NSException* exception = [NSException exceptionWithName:@"tightdb:column_index_out_of_bounds" \
+                        NSException* exception = [NSException exceptionWithName:@"realm:column_index_out_of_bounds" \
                                 reason:@"The specified column index is not within the table bounds" \
                                 userInfo:[NSMutableDictionary dictionary]]; \
     [exception raise]; \
@@ -271,7 +271,7 @@ if (columnIndex >= self.columnCount) { \
 #define REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(action) \
 try { action } \
 catch(std::exception& ex) { \
-    NSException* exception = [NSException exceptionWithName:@"tightdb:core_exception" \
+    NSException* exception = [NSException exceptionWithName:@"realm:core_exception" \
                                           reason:[NSString stringWithUTF8String:ex.what()] \
                                           userInfo:[NSMutableDictionary dictionary]]; \
     [exception raise]; \
