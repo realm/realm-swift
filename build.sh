@@ -195,10 +195,10 @@ case "$MODE" in
         fi
 
         install_exec_prefix="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-exec-prefix)" || exit 1
-        install_includedir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-includedir)" || exit 1
-        install_bindir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-bindir)" || exit 1
-        install_libdir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libdir)" || exit 1
-        install_libexecdir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libexecdir)" || exit 1
+        install_includedir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-includedir)"   || exit 1
+        install_bindir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-bindir)"           || exit 1
+        install_libdir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libdir)"           || exit 1
+        install_libexecdir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libexecdir)"   || exit 1
 
         # Find Realm
         if [ -z "$REALM_CONFIG" ]; then
@@ -212,16 +212,16 @@ case "$MODE" in
         elif ! realm_config_cmd="$(which "$REALM_CONFIG" 2>/dev/null)"; then
             realm_abort "ERROR: Realm config-program '$REALM_CONFIG' not found in PATH" "Cannot find '$REALM_CONFIG' - skipping"
         fi
-        tightdb_config_dbg_cmd="$realm_config_cmd-dbg"
-        if ! [ -x "$tightdb_config_dbg_cmd" ]; then
-            realm_abort "ERROR: Realm config-program '$tightdb_config_dbg_cmd' not found" "Cannot find '$tightdb_config_dbg_cmd' - skipping"
+        realm_config_dbg_cmd="$realm_config_cmd-dbg"
+        if ! [ -x "$realm_config_dbg_cmd" ]; then
+            realm_abort "ERROR: Realm config-program '$realm_config_dbg_cmd' not found" "Cannot find '$realm_config_dbg_cmd' - skipping"
         fi
         realm_version="$($realm_config_cmd --version)"         || exit 1
 
         realm_cflags="$($realm_config_cmd --cflags)"           || exit 1
-        realm_cflags_dbg="$($tightdb_config_dbg_cmd --cflags)" || exit 1
+        realm_cflags_dbg="$($realm_config_dbg_cmd --cflags)"   || exit 1
         realm_ldflags="$($realm_config_cmd --libs)"            || exit 1
-        realm_ldflags_dbg="$($tightdb_config_dbg_cmd --libs)"  || exit 1
+        realm_ldflags_dbg="$($realm_config_dbg_cmd --libs)"    || exit 1
 
         tightdb_includedir="$($realm_config_cmd --includedir)" || exit 1
         tightdb_libdir="$($realm_config_cmd --libdir)"         || exit 1
