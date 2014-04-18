@@ -113,6 +113,10 @@ void throw_objc_exception(exception &ex)
     BOOL _tableRefsHaveDied;
 }
 
++(RLMSmartContext *)contextWithDefaultPersistence {
+    return [RLMSmartContext contextWithPersistenceToFile:[RLMContext defaultPath]];
+}
+
 +(RLMSmartContext *)contextWithPersistenceToFile:(NSString *)path
 {
     NSRunLoop *runLoop = [NSRunLoop mainRunLoop];

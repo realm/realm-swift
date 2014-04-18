@@ -26,6 +26,8 @@
 /**
  * Use the main run loop and the default notification center.
  */
++(RLMSmartContext *)contextWithDefaultPersistence;
+
 +(RLMSmartContext *)contextWithPersistenceToFile:(NSString *)path;
 
 +(RLMSmartContext *)contextWithPersistenceToFile:(NSString *)path
