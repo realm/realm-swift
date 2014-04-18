@@ -38,11 +38,11 @@ The Objective-C API has been updated and your code will break!
 
 ### API breaking changes:
 
-* `???`
+* Changed all class prefixes from TDB to RLM
 
 ### Enhancements:
 
-* `???`
+* `createTableWithName:columns:` has been added to `TDBTransaction`.
 
 -------------
 
@@ -94,7 +94,6 @@ Description......
    derived from `NSObject`.
 * `where` has been added to `TDBView`and `TDBViewProtocol`.
 * Adding support for "smart" contexts (`TDBSmartContext`).
-* `createTableWithName:columns:` has been added to `TDBTransaction`.
 
 
 =============================================================
