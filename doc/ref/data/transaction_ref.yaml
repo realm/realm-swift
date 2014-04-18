@@ -1,5 +1,5 @@
 #
-# Obj-C reference documentation for TDBTransaction class
+# Obj-C reference documentation for RLMTransaction class
 # Notice: this is a rename of Group
 #
 
@@ -9,11 +9,11 @@
 #UNDOCUMENTED: [commit, to_json, get_table_typed]
 
 ID         : class_transaction
-TITLE      : TDBTransaction
-SUMMARY    : A TDBTransaction is a fully ACID compliant access to tables.
+TITLE      : RLMTransaction
+SUMMARY    : A RLMTransaction is a fully ACID compliant access to tables.
 DESCR      : >
-             A TDBTransaction can only be created/initiated from a TDBContext (see {link class_shared_group}).
-             By using TDBContext and TDBTransaction, you can access your data in multi-threaded applications. Moreover,
+             A RLMTransaction can only be created/initiated from a RLMContext (see {link class_shared_group}).
+             By using RLMContext and RLMTransaction, you can access your data in multi-threaded applications. Moreover,
              a successful write transaction is sesameless persisted to your storage device.
 SEE        :
 EXAMPLES:
@@ -48,7 +48,7 @@ CATEGORIES:
       SUMMARY  : *g_group_get_table_summary
       DESCR    : *g_group_get_table_descr
       SIGNATURE: |
-                 - (TDBTable *)tableWithName:(NSString *)name
+                 - (RLMTable *)tableWithName:(NSString *)name
                  - (id)tableWithName:(NSString *)name asTableClass:(Class)obj
       PARAMS:
       - NAME   : name
@@ -58,7 +58,7 @@ CATEGORIES:
         TYPES  : Class
         DESCR  : *g_group_get_table_parm2_descr
       RETURN:
-        TYPES  : TDBTable *
+        TYPES  : RLMTable *
         DESCR  : *g_group_get_table_return1_descr
       EXAMPLES:
       -  DESCR :
@@ -71,7 +71,7 @@ CATEGORIES:
       SUMMARY  : Create table in context.
       DESCR    : Create table with the specified name in context. If a table already exists, an exception is thrown.
       SIGNATURE: |
-                 - (TDBTable *)createTableWithName:(NSString *)name
+                 - (RLMTable *)createTableWithName:(NSString *)name
                  - (id)createTableWithName:(NSString *)name asTableClass:(Class)obj
       PARAMS:
       - NAME   : name
@@ -81,7 +81,7 @@ CATEGORIES:
         TYPES  : Class
         DESCR  : *g_group_get_table_parm2_descr
       RETURN:
-        TYPES  : TDBTable *
+        TYPES  : RLMTable *
         DESCR  : *g_group_get_table_return1_descr
       EXAMPLES:
       -  DESCR :
