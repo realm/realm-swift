@@ -37,7 +37,7 @@
 		4DDDD67418EB049300E94613 /* RLMViewProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DDDD67318EB049300E94613 /* RLMViewProtocol.h */; };
 		E918909D177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		E91890B0177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
-		E91890B3177B677900653D7A /* TightDbObjcDyn.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E9189099177B677900653D7A /* TightDbObjcDyn.dylib */; };
+		E91890B3177B677900653D7A /* RealmObjcDyn.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E9189099177B677900653D7A /* RealmObjcDyn.dylib */; };
 		E91890B9177B677900653D7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E91890B7177B677900653D7A /* InfoPlist.strings */; };
 		E91890D6177B67AB00653D7A /* RLMRow.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C5177B67AB00653D7A /* RLMRow.mm */; };
 		E91890D7177B67AB00653D7A /* RLMRow.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890C6177B67AB00653D7A /* RLMRow.h */; };
@@ -77,7 +77,7 @@
 			containerPortal = E9189091177B677900653D7A /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = E9189098177B677900653D7A;
-			remoteInfo = TightDbObjcDyn;
+			remoteInfo = RealmObjcDyn;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -114,13 +114,13 @@
 		4DDDD67018EAF1C000E94613 /* RLMRowFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMRowFast.h; path = ../src/realm/objc/RLMRowFast.h; sourceTree = SOURCE_ROOT; };
 		4DDDD67218EAF22100E94613 /* RLMFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMFast.h; path = ../src/realm/objc/RLMFast.h; sourceTree = SOURCE_ROOT; };
 		4DDDD67318EB049300E94613 /* RLMViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMViewProtocol.h; path = ../src/realm/objc/RLMViewProtocol.h; sourceTree = SOURCE_ROOT; };
-		E9189099177B677900653D7A /* TightDbObjcDyn.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = TightDbObjcDyn.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
+		E9189099177B677900653D7A /* RealmObjcDyn.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = RealmObjcDyn.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		E918909C177B677900653D7A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		E918909F177B677900653D7A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		E91890A0177B677900653D7A /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		E91890A1177B677900653D7A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		E91890AD177B677900653D7A /* TightDbObjcDynTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TightDbObjcDynTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		E91890B6177B677900653D7A /* TightDbObjcDynTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TightDbObjcDynTests-Info.plist"; sourceTree = "<group>"; };
+		E91890AD177B677900653D7A /* RealmObjcDynTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RealmObjcDynTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E91890B6177B677900653D7A /* RealmObjcDynTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RealmObjcDynTests-Info.plist"; sourceTree = "<group>"; };
 		E91890B8177B677900653D7A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E91890C5177B67AB00653D7A /* RLMRow.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMRow.mm; path = ../src/realm/objc/RLMRow.mm; sourceTree = SOURCE_ROOT; };
 		E91890C6177B67AB00653D7A /* RLMRow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRow.h; path = ../src/realm/objc/RLMRow.h; sourceTree = SOURCE_ROOT; };
@@ -169,7 +169,7 @@
 			files = (
 				4B7ACCD918FDD96F008B7B95 /* XCTest.framework in Frameworks */,
 				E91890B0177B677900653D7A /* Cocoa.framework in Frameworks */,
-				E91890B3177B677900653D7A /* TightDbObjcDyn.dylib in Frameworks */,
+				E91890B3177B677900653D7A /* RealmObjcDyn.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -189,8 +189,8 @@
 		E9189090177B677900653D7A = {
 			isa = PBXGroup;
 			children = (
-				E91890A2177B677900653D7A /* TightDbObjcDyn */,
-				E91890B4177B677900653D7A /* TightDbObjcDynTests */,
+				E91890A2177B677900653D7A /* RealmObjcDyn */,
+				E91890B4177B677900653D7A /* RealmObjcDynTests */,
 				E918909B177B677900653D7A /* Frameworks */,
 				E918909A177B677900653D7A /* Products */,
 			);
@@ -199,8 +199,8 @@
 		E918909A177B677900653D7A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E9189099177B677900653D7A /* TightDbObjcDyn.dylib */,
-				E91890AD177B677900653D7A /* TightDbObjcDynTests.xctest */,
+				E9189099177B677900653D7A /* RealmObjcDyn.dylib */,
+				E91890AD177B677900653D7A /* RealmObjcDynTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -225,7 +225,7 @@
 			name = "Other Frameworks";
 			sourceTree = "<group>";
 		};
-		E91890A2177B677900653D7A /* TightDbObjcDyn */ = {
+		E91890A2177B677900653D7A /* RealmObjcDyn */ = {
 			isa = PBXGroup;
 			children = (
 				4DDDD67118EAF1DC00E94613 /* RLMFast */,
@@ -270,10 +270,11 @@
 				42AD3A9418CDBDFF00C86073 /* util.mm */,
 				E91890D5177B67AB00653D7A /* util_noinst.hpp */,
 			);
-			path = TightDbObjcDyn;
+			name = RealmObjcDyn;
+			path = RealmObjcDyn;
 			sourceTree = "<group>";
 		};
-		E91890B4177B677900653D7A /* TightDbObjcDynTests */ = {
+		E91890B4177B677900653D7A /* RealmObjcDynTests */ = {
 			isa = PBXGroup;
 			children = (
 				E91890E7177B71E400653D7A /* data_type.mm */,
@@ -296,16 +297,17 @@
 				4D01A9FD18C9F60F00527AD5 /* version.m */,
 				E91890B5177B677900653D7A /* Supporting Files */,
 			);
-			path = TightDbObjcDynTests;
+			path = RealmObjcDynTests;
 			sourceTree = "<group>";
 		};
 		E91890B5177B677900653D7A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				E91890B6177B677900653D7A /* TightDbObjcDynTests-Info.plist */,
+				E91890B6177B677900653D7A /* RealmObjcDynTests-Info.plist */,
 				E91890B7177B677900653D7A /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			path = ../RealmObjcDynTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -347,9 +349,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		E9189098177B677900653D7A /* TightDbObjcDyn */ = {
+		E9189098177B677900653D7A /* RealmObjcDyn */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E91890BF177B677900653D7A /* Build configuration list for PBXNativeTarget "TightDbObjcDyn" */;
+			buildConfigurationList = E91890BF177B677900653D7A /* Build configuration list for PBXNativeTarget "RealmObjcDyn" */;
 			buildPhases = (
 				E9189095177B677900653D7A /* Sources */,
 				E9189096177B677900653D7A /* Frameworks */,
@@ -359,14 +361,14 @@
 			);
 			dependencies = (
 			);
-			name = TightDbObjcDyn;
-			productName = TightDbObjcDyn;
-			productReference = E9189099177B677900653D7A /* TightDbObjcDyn.dylib */;
+			name = RealmObjcDyn;
+			productName = RealmObjcDyn;
+			productReference = E9189099177B677900653D7A /* RealmObjcDyn.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
-		E91890AC177B677900653D7A /* TightDbObjcDynTests */ = {
+		E91890AC177B677900653D7A /* RealmObjcDynTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E91890C2177B677900653D7A /* Build configuration list for PBXNativeTarget "TightDbObjcDynTests" */;
+			buildConfigurationList = E91890C2177B677900653D7A /* Build configuration list for PBXNativeTarget "RealmObjcDynTests" */;
 			buildPhases = (
 				E91890A8177B677900653D7A /* Sources */,
 				E91890A9177B677900653D7A /* Frameworks */,
@@ -378,9 +380,9 @@
 			dependencies = (
 				E91890B2177B677900653D7A /* PBXTargetDependency */,
 			);
-			name = TightDbObjcDynTests;
-			productName = TightDbObjcDynTests;
-			productReference = E91890AD177B677900653D7A /* TightDbObjcDynTests.xctest */;
+			name = RealmObjcDynTests;
+			productName = RealmObjcDynTests;
+			productReference = E91890AD177B677900653D7A /* RealmObjcDynTests.xctest */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -393,7 +395,7 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Thomas Andersen";
 			};
-			buildConfigurationList = E9189094177B677900653D7A /* Build configuration list for PBXProject "TightDbObjcDyn" */;
+			buildConfigurationList = E9189094177B677900653D7A /* Build configuration list for PBXProject "RealmObjcDyn" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -405,8 +407,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E9189098177B677900653D7A /* TightDbObjcDyn */,
-				E91890AC177B677900653D7A /* TightDbObjcDynTests */,
+				E9189098177B677900653D7A /* RealmObjcDyn */,
+				E91890AC177B677900653D7A /* RealmObjcDynTests */,
 			);
 		};
 /* End PBXProject section */
@@ -489,7 +491,7 @@
 /* Begin PBXTargetDependency section */
 		E91890B2177B677900653D7A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = E9189098177B677900653D7A /* TightDbObjcDyn */;
+			target = E9189098177B677900653D7A /* RealmObjcDyn */;
 			targetProxy = E91890B1177B677900653D7A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -593,7 +595,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = RealmObjcDyn;
 			};
 			name = Debug;
 		};
@@ -609,7 +611,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = RealmObjcDyn;
 			};
 			name = Release;
 		};
@@ -623,8 +625,8 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
-				INFOPLIST_FILE = "TightDbObjcDynTests/TightDbObjcDynTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				INFOPLIST_FILE = "RealmObjcDynTests/RealmObjcDynTests-Info.plist";
+				PRODUCT_NAME = RealmObjcDynTests;
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Debug;
@@ -639,8 +641,8 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
-				INFOPLIST_FILE = "TightDbObjcDynTests/TightDbObjcDynTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				INFOPLIST_FILE = "RealmObjcDynTests/RealmObjcDynTests-Info.plist";
+				PRODUCT_NAME = RealmObjcDynTests;
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Release;
@@ -648,7 +650,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E9189094177B677900653D7A /* Build configuration list for PBXProject "TightDbObjcDyn" */ = {
+		E9189094177B677900653D7A /* Build configuration list for PBXProject "RealmObjcDyn" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E91890BD177B677900653D7A /* Debug */,
@@ -657,7 +659,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E91890BF177B677900653D7A /* Build configuration list for PBXNativeTarget "TightDbObjcDyn" */ = {
+		E91890BF177B677900653D7A /* Build configuration list for PBXNativeTarget "RealmObjcDyn" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E91890C0177B677900653D7A /* Debug */,
@@ -666,7 +668,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E91890C2177B677900653D7A /* Build configuration list for PBXNativeTarget "TightDbObjcDynTests" */ = {
+		E91890C2177B677900653D7A /* Build configuration list for PBXNativeTarget "RealmObjcDynTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E91890C3177B677900653D7A /* Debug */,
