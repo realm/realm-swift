@@ -200,21 +200,21 @@ case "$MODE" in
         install_libdir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libdir)" || exit 1
         install_libexecdir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libexecdir)" || exit 1
 
-        # Find TightDB
+        # Find Realm
         if [ -z "$TIGHTDB_CONFIG" ]; then
             TIGHTDB_CONFIG="tightdb-config"
         fi
         if printf "%s\n" "$TIGHTDB_CONFIG" | grep -q '^/'; then
             if ! [ -x "$TIGHTDB_CONFIG" ]; then
-                tightdb_abort "ERROR: TightDB config-program '$TIGHTDB_CONFIG' does not exist" "Cannot find '$TIGHTDB_CONFIG' - skipping"
+                tightdb_abort "ERROR: Realm config-program '$TIGHTDB_CONFIG' does not exist" "Cannot find '$TIGHTDB_CONFIG' - skipping"
             fi
             tightdb_config_cmd="$TIGHTDB_CONFIG"
         elif ! tightdb_config_cmd="$(which "$TIGHTDB_CONFIG" 2>/dev/null)"; then
-            tightdb_abort "ERROR: TightDB config-program '$TIGHTDB_CONFIG' not found in PATH" "Cannot find '$TIGHTDB_CONFIG' - skipping"
+            tightdb_abort "ERROR: Realm config-program '$TIGHTDB_CONFIG' not found in PATH" "Cannot find '$TIGHTDB_CONFIG' - skipping"
         fi
         tightdb_config_dbg_cmd="$tightdb_config_cmd-dbg"
         if ! [ -x "$tightdb_config_dbg_cmd" ]; then
-            tightdb_abort "ERROR: TightDB config-program '$tightdb_config_dbg_cmd' not found" "Cannot find '$tightdb_config_dbg_cmd' - skipping"
+            tightdb_abort "ERROR: Realm config-program '$tightdb_config_dbg_cmd' not found" "Cannot find '$tightdb_config_dbg_cmd' - skipping"
         fi
         tightdb_version="$($tightdb_config_cmd --version)" || exit 1
 
@@ -310,7 +310,7 @@ case "$MODE" in
             path="$(cd "../tightdb" || return 1; pwd)" || exit 1
             iphone_core_lib="$path/$IPHONE_DIR"
         else
-            tightdb_echo "Could not find home of TightDB core library built for iPhone"
+            tightdb_echo "Could not find home of Realm core library built for iPhone"
         fi
 
 	touch "$CONFIG_MK" || { echo "Can't overwrite $CONFIG_MK."; exit 1; }
@@ -403,10 +403,10 @@ EOF
         fi
         iphone_core_lib="$(get_config_param "IPHONE_CORE_LIB")" || exit 1
         if [ "$iphone_core_lib" = "none" ]; then
-            tightdb_abort "ERROR: TightDB core library for iPhone was not found during configuration"
+            tightdb_abort "ERROR: Realm core library for iPhone was not found during configuration"
         fi
         if ! [ -e "$iphone_core_lib/libtightdb-ios.a" ]; then
-            tightdb_abort "ERROR: TightDB core library for iPhone is not available in '$iphone_core_lib'"
+            tightdb_abort "ERROR: Realm core library for iPhone is not available in '$iphone_core_lib'"
         fi
         temp_dir="$(mktemp -d /tmp/tightdb.objc.build-iphone.XXXX)" || exit 1
         xcode_home="$(get_config_param "XCODE_HOME")" || exit 1

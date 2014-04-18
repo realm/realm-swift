@@ -14,7 +14,7 @@ ifeq ($(OS),Darwin)
   CFLAGS_ARCH += -mmacosx-version-min=10.7
 endif
 
-# FIXME: '-fno-elide-constructors' currently causes TightDB to fail
+# FIXME: '-fno-elide-constructors' currently causes Realm to fail
 #CFLAGS_DEBUG += -fno-elide-constructors
 CFLAGS_PTHREADS += -pthread
 CFLAGS_GENERAL += -Wextra -ansi

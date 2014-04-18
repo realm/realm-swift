@@ -1,8 +1,8 @@
 Objective-C
 ===========
 
-This README file explains how to build and install the TightDB
-language binding for Objective-C. It assumes that the TightDB core
+This README file explains how to build and install the Realm
+language binding for Objective-C. It assumes that the Realm core
 library has already been installed.
 
 
@@ -111,7 +111,7 @@ identical to the ones installed by `sh build.sh install`. There are
 two versions of the static library, one that is compiled with
 optimization, and one that is compiled for debugging. Each one
 contains code compiled for both iPhone and for the iPhone
-simulator. Each one also includes the TightDB core library and is
+simulator. Each one also includes the Realm core library and is
 therefore self contained.
 
 After building, the iPhone version of the Objective-C language binding
@@ -138,8 +138,8 @@ Here, `PREFIX` is the installation prefix. If it is not specified, it
 defaults to `/usr/local`.
 
 By default, the configuration step uses `which tightdb-config` to
-locate the installation of the TightDB core library. If this is not
-appropriate, because you have multiple versions of the TightDB core
+locate the installation of the Realm core library. If this is not
+appropriate, because you have multiple versions of the Realm core
 library installed, or `tightdb-config` is not available in your
 `PATH`, set the environment variable `TIGHTDB_CONFIG` before calling
 `sh build.sh config`. For example:
