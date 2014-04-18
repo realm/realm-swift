@@ -511,7 +511,9 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_size
 
   - g_dyn_query_sum_int:
+      IGNORED  : ""
   - g_dyn_query_sum_float:
+      IGNORED  : ""
   - g_dyn_query_sum_double:
       NAME     : "sumColumnWithIndex:"
       DESCR    : *g_dyn_query_sum_descr
@@ -529,8 +531,11 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_sum
 
   - g_dyn_query_maximum_double:
+      IGNORED  : ""
   - g_dyn_query_maximum_float:
+      IGNORED  : ""
   - g_dyn_query_maximum_date:
+      IGNORED  : ""
   - g_dyn_query_maximum_int:
       NAME     : "maxInColumnWithIndex:"
       DESCR    : *g_dyn_query_maximum_descr
@@ -549,8 +554,11 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_maximum
 
   - g_dyn_query_minimum_date:
+      IGNORED  : ""
   - g_dyn_query_minimum_double:
+      IGNORED  : ""
   - g_dyn_query_minimum_float:
+      IGNORED  : ""
   - g_dyn_query_minimum_int:
       NAME     : "minInColumnWithIndex:"
       DESCR    : *g_dyn_query_minimum_descr
@@ -568,7 +576,9 @@ CATEGORIES :
         CODE   : ex_objc_dyn_query_minimum
 
   - g_dyn_query_average_int:
+      IGNORED  : ""
   - g_dyn_query_average_float:
+      IGNORED  : ""
   - g_dyn_query_average_double:
       NAME     : avgColumnWithIndex
       SUMMARY  : *g_dyn_query_average_summary
