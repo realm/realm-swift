@@ -1,20 +1,20 @@
 // @@Example: ex_objc_intro @@
 #import <Foundation/Foundation.h>
-#import <Tightdb/Tightdb.h>
+#import <Realm/Realm.h>
 #import "people.h"
 
 /*
  The classes People, PeopleQuery, PeopleView, and PeopleRow are declared
  (interfaces are generated) in people.h as
 
- TIGHTDB_TABLE_DEF_3(People,
+ REALM_TABLE_DEF_3(People,
                      Name,  String,
                      Age,   Int,
                      Hired, Bool)
 
  and in people.m you must have
 
- TIGHTDB_TABLE_IMPL_3(People,
+ REALM_TABLE_IMPL_3(People,
                       Name, String,
                       Age,  Int,
                       Hired, Bool)
@@ -29,10 +29,10 @@ void ex_objc_intro() {
     NSError *error;
     [fileManager removeItemAtPath:@"people.tightdb" error:&error];
 
-    TDBContext *context = [TDBContext contextWithDefaultPersistence];
+    RLMContext *context = [RLMContext contextWithDefaultPersistence];
 
     // Start a write transaction
-    [context writeUsingBlock:^(TDBTransaction *transaction) {
+    [context writeUsingBlock:^(RLMTransaction *transaction) {
         // Get a specific table from the group
         People *table = [transaction createTableWithName:@"employees"
                                             asTableClass:[People class]];
@@ -47,7 +47,7 @@ void ex_objc_intro() {
     } error:nil];
 
     // Start a read transaction
-    [context readUsingBlock:^(TDBTransaction *transaction) {
+    [context readUsingBlock:^(RLMTransaction *transaction) {
         // Get the table
         People *table = [transaction tableWithName:@"employees"
                                       asTableClass:[People class]];
