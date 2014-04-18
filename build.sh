@@ -202,49 +202,49 @@ case "$MODE" in
 
         # Find TightDB
         if [ -z "$REALM_CONFIG" ]; then
-            REALM_CONFIG="realm-config"
+            REALM_CONFIG="tightdb-config" #find out where is this cmd defined?
         fi
         if printf "%s\n" "$REALM_CONFIG" | grep -q '^/'; then
             if ! [ -x "$REALM_CONFIG" ]; then
-                realm_abort "ERROR: TightDB config-program '$REALM_CONFIG' does not exist" "Cannot find '$REALM_CONFIG' - skipping"
+                realm_abort "ERROR: Realm config-program '$REALM_CONFIG' does not exist" "Cannot find '$REALM_CONFIG' - skipping"
             fi
-            tightdb_config_cmd="$REALM_CONFIG"
-        elif ! tightdb_config_cmd="$(which "$REALM_CONFIG" 2>/dev/null)"; then
-            realm_abort "ERROR: TightDB config-program '$REALM_CONFIG' not found in PATH" "Cannot find '$REALM_CONFIG' - skipping"
+            realm_config_cmd="$REALM_CONFIG"
+        elif ! realm_config_cmd="$(which "$REALM_CONFIG" 2>/dev/null)"; then
+            realm_abort "ERROR: Realm config-program '$REALM_CONFIG' not found in PATH" "Cannot find '$REALM_CONFIG' - skipping"
         fi
-        tightdb_config_dbg_cmd="$tightdb_config_cmd-dbg"
-        if ! [ -x "$tightdb_config_dbg_cmd" ]; then
-            realm_abort "ERROR: TightDB config-program '$tightdb_config_dbg_cmd' not found" "Cannot find '$tightdb_config_dbg_cmd' - skipping"
+        realm_config_dbg_cmd="$realm_config_cmd-dbg"
+        if ! [ -x "$realm_config_dbg_cmd" ]; then
+            realm_abort "ERROR: Realm config-program '$realm_config_dbg_cmd' not found" "Cannot find '$realm_config_dbg_cmd' - skipping"
         fi
-        tightdb_version="$($tightdb_config_cmd --version)" || exit 1
+        realm_version="$($realm_config_cmd --version)" || exit 1
 
-        tightdb_cflags="$($tightdb_config_cmd --cflags)"         || exit 1
-        tightdb_cflags_dbg="$($tightdb_config_dbg_cmd --cflags)" || exit 1
-        tightdb_ldflags="$($tightdb_config_cmd --libs)"          || exit 1
-        tightdb_ldflags_dbg="$($tightdb_config_dbg_cmd --libs)"  || exit 1
+        realm_cflags="$($realm_config_cmd --cflags)"         || exit 1
+        realm_cflags_dbg="$($realm_config_dbg_cmd --cflags)" || exit 1
+        realm_ldflags="$($realm_config_cmd --libs)"          || exit 1
+        realm_ldflags_dbg="$($realm_config_dbg_cmd --libs)"  || exit 1
 
-        tightdb_includedir="$($tightdb_config_cmd --includedir)" || exit 1
-        tightdb_libdir="$($tightdb_config_cmd --libdir)"         || exit 1
-        tightdb_rpath="$tightdb_libdir"
+        realm_includedir="$($realm_config_cmd --includedir)" || exit 1
+        realm_libdir="$($realm_config_cmd --libdir)"         || exit 1
+        realm_rpath="$realm_libdir"
 
         # `TIGHTDB_DIST_INCLUDEDIR` and `TIGHTDB_DIST_LIBDIR` are set
         # when configuration occurs in the context of a distribution
         # package.
         if [ "$TIGHTDB_DIST_INCLUDEDIR" ] && [ "$TIGHTDB_DIST_LIBDIR" ]; then
-            tightdb_includedir="$TIGHTDB_DIST_INCLUDEDIR"
-            tightdb_libdir="$TIGHTDB_DIST_LIBDIR"
+            realm_includedir="$TIGHTDB_DIST_INCLUDEDIR"
+            realm_libdir="$TIGHTDB_DIST_LIBDIR"
         else
-            tightdb_includedir="$($tightdb_config_cmd --includedir)" || exit 1
-            tightdb_libdir="$($tightdb_config_cmd --libdir)"         || exit 1
+            realm_includedir="$($realm_config_cmd --includedir)" || exit 1
+            realm_libdir="$($realm_config_cmd --libdir)"         || exit 1
         fi
-        tightdb_rpath="$($tightdb_config_cmd --libdir)" || exit 1
+        realm_rpath="$($realm_config_cmd --libdir)" || exit 1
 
-        cflags="-I$tightdb_includedir"
-        ldflags="-L$tightdb_libdir -Wl,-rpath,$tightdb_rpath"
-        word_list_prepend "tightdb_cflags"      "$cflags"  || exit 1
-        word_list_prepend "tightdb_cflags_dbg"  "$cflags"  || exit 1
-        word_list_prepend "tightdb_ldflags"     "$ldflags" || exit 1
-        word_list_prepend "tightdb_ldflags_dbg" "$ldflags" || exit 1
+        cflags="-I$realm_includedir"
+        ldflags="-L$realm_libdir -Wl,-rpath,$realm_rpath"
+        word_list_prepend "realm_cflags"      "$cflags"  || exit 1
+        word_list_prepend "realm_cflags_dbg"  "$cflags"  || exit 1
+        word_list_prepend "realm_ldflags"     "$ldflags" || exit 1
+        word_list_prepend "realm_ldflags_dbg" "$ldflags" || exit 1
 
         # Find Xcode
         xcode_home="none"
@@ -322,12 +322,12 @@ INSTALL_INCLUDEDIR  = $install_includedir
 INSTALL_BINDIR      = $install_bindir
 INSTALL_LIBDIR      = $install_libdir
 INSTALL_LIBEXECDIR  = $install_libexecdir
-REALM_CONFIG        = $tightdb_config_cmd
-TIGHTDB_VERSION     = $tightdb_version
-TIGHTDB_CFLAGS      = $tightdb_cflags
-TIGHTDB_CFLAGS_DBG  = $tightdb_cflags_dbg
-TIGHTDB_LDFLAGS     = $tightdb_ldflags
-TIGHTDB_LDFLAGS_DBG = $tightdb_ldflags_dbg
+REALM_CONFIG        = $realm_config_cmd
+REALM_VERSION       = $realm_version
+REALM_CFLAGS        = $realm_cflags
+REALM_CFLAGS_DBG    = $realm_cflags_dbg
+REALM_LDFLAGS       = $realm_ldflags
+REALM_LDFLAGS_DBG   = $realm_ldflags_dbg
 XCODE_HOME          = $xcode_home
 IPHONE_SDKS         = ${iphone_sdks:-none}
 IPHONE_SDKS_AVAIL   = $iphone_sdks_avail
