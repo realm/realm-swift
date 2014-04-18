@@ -65,8 +65,8 @@ Headers are installed in:
 
 The following libraries are installed:
 
-    /usr/local/lib/libtightdb-objc.dylib
-    /usr/local/lib/libtightdb-objc-dbg.dylib
+    /usr/local/lib/librealm-objc.dylib
+    /usr/local/lib/librealm-objc-dbg.dylib
 
 Here is a more complete set of build-related commands:
 
@@ -103,8 +103,8 @@ for iPhone:
 This produces the following files and directories:
 
     iphone-lib/include/
-    iphone-lib/libtightdb-objc-ios.a
-    iphone-lib/libtightdb-objc-ios-dbg.a
+    iphone-lib/librealm-objc-ios.a
+    iphone-lib/librealm-objc-ios-dbg.a
 
 The `include` directory holds a copy of the header files, which are
 identical to the ones installed by `sh build.sh install`. There are
