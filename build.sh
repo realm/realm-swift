@@ -355,15 +355,15 @@ EOF
 	    echo "You can only set version when running Mac OS X"
 	    exit 1
 	fi
-        tightdb_version="$1"
+        realm_version="$1"
         version_file="src/realm/objc/RLMVersion.h"
-        tightdb_ver_major="$(echo "$tightdb_version" | cut -f1 -d.)" || exit 1
-        tightdb_ver_minor="$(echo "$tightdb_version" | cut -f2 -d.)" || exit 1
-        tightdb_ver_patch="$(echo "$tightdb_version" | cut -f3 -d.)" || exit 1
+        realm_ver_major="$(echo "$realm_version" | cut -f1 -d.)" || exit 1
+        realm_ver_minor="$(echo "$realm_version" | cut -f2 -d.)" || exit 1
+        realm_ver_patch="$(echo "$realm_version" | cut -f3 -d.)" || exit 1
 
-	sed -i '' -e "s/TDB_VERSION_MAJOR .*$/TDB_VERSION_MAJOR $tightdb_ver_major/" $version_file || exit 1
-	sed -i '' -e "s/TDB_VERSION_MINOR .*$/TDB_VERSION_MINOR $tightdb_ver_minor/" $version_file || exit 1
-	sed -i '' -e "s/TDB_VERSION_PATCH .*$/TDB_VERSION_PATCH $tightdb_ver_patch/" $version_file || exit 1
+	sed -i '' -e "s/RLM_VERSION_MAJOR .*$/RLM_VERSION_MAJOR $tightdb_ver_major/" $version_file || exit 1
+	sed -i '' -e "s/RLM_VERSION_MINOR .*$/RLM_VERSION_MINOR $tightdb_ver_minor/" $version_file || exit 1
+	sed -i '' -e "s/RLM_VERSION_PATCH .*$/RLM_VERSION_PATCH $tightdb_ver_patch/" $version_file || exit 1
 	exit 0
 	;;
 
