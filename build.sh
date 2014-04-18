@@ -216,31 +216,31 @@ case "$MODE" in
         if ! [ -x "$realm_config_dbg_cmd" ]; then
             realm_abort "ERROR: Realm config-program '$realm_config_dbg_cmd' not found" "Cannot find '$realm_config_dbg_cmd' - skipping"
         fi
-        realm_version="$($realm_config_cmd --version)"         || exit 1
+        realm_version="$($realm_config_cmd --version)"       || exit 1
 
-        realm_cflags="$($realm_config_cmd --cflags)"           || exit 1
-        realm_cflags_dbg="$($realm_config_dbg_cmd --cflags)"   || exit 1
-        realm_ldflags="$($realm_config_cmd --libs)"            || exit 1
-        realm_ldflags_dbg="$($realm_config_dbg_cmd --libs)"    || exit 1
+        realm_cflags="$($realm_config_cmd --cflags)"         || exit 1
+        realm_cflags_dbg="$($realm_config_dbg_cmd --cflags)" || exit 1
+        realm_ldflags="$($realm_config_cmd --libs)"          || exit 1
+        realm_ldflags_dbg="$($realm_config_dbg_cmd --libs)"  || exit 1
 
-        tightdb_includedir="$($realm_config_cmd --includedir)" || exit 1
-        tightdb_libdir="$($realm_config_cmd --libdir)"         || exit 1
-        tightdb_rpath="$tightdb_libdir"
+        realm_includedir="$($realm_config_cmd --includedir)" || exit 1
+        realm_libdir="$($realm_config_cmd --libdir)"         || exit 1
+        realm_rpath="$realm_libdir"
 
         # `TIGHTDB_DIST_INCLUDEDIR` and `TIGHTDB_DIST_LIBDIR` are set
         # when configuration occurs in the context of a distribution
         # package.
         if [ "$TIGHTDB_DIST_INCLUDEDIR" ] && [ "$TIGHTDB_DIST_LIBDIR" ]; then
-            tightdb_includedir="$TIGHTDB_DIST_INCLUDEDIR"
-            tightdb_libdir="$TIGHTDB_DIST_LIBDIR"
+            realm_includedir="$TIGHTDB_DIST_INCLUDEDIR"
+            realm_libdir="$TIGHTDB_DIST_LIBDIR"
         else
-            tightdb_includedir="$($realm_config_cmd --includedir)" || exit 1
-            tightdb_libdir="$($realm_config_cmd --libdir)"         || exit 1
+            realm_includedir="$($realm_config_cmd --includedir)" || exit 1
+            realm_libdir="$($realm_config_cmd --libdir)"         || exit 1
         fi
-        tightdb_rpath="$($realm_config_cmd --libdir)" || exit 1
+        realm_rpath="$($realm_config_cmd --libdir)" || exit 1
 
-        cflags="-I$tightdb_includedir"
-        ldflags="-L$tightdb_libdir -Wl,-rpath,$tightdb_rpath"
+        cflags="-I$realm_includedir"
+        ldflags="-L$realm_libdir -Wl,-rpath,$realm_rpath"
         word_list_prepend "realm_cflags"      "$cflags"   || exit 1
         word_list_prepend "realm_cflags_dbg"  "$cflags"   || exit 1
         word_list_prepend "realm_ldflags"     "$ldflags"  || exit 1
@@ -357,13 +357,13 @@ EOF
 	fi
         realm_version="$1"
         version_file="src/realm/objc/RLMVersion.h"
-        tightdb_ver_major="$(echo "$realm_version" | cut -f1 -d.)" || exit 1
-        tightdb_ver_minor="$(echo "$realm_version" | cut -f2 -d.)" || exit 1
-        tightdb_ver_patch="$(echo "$realm_version" | cut -f3 -d.)" || exit 1
+        realm_ver_major="$(echo "$realm_version" | cut -f1 -d.)" || exit 1
+        realm_ver_minor="$(echo "$realm_version" | cut -f2 -d.)" || exit 1
+        realm_ver_patch="$(echo "$realm_version" | cut -f3 -d.)" || exit 1
 
-	sed -i '' -e "s/TDB_VERSION_MAJOR .*$/TDB_VERSION_MAJOR $tightdb_ver_major/" $version_file || exit 1
-	sed -i '' -e "s/TDB_VERSION_MINOR .*$/TDB_VERSION_MINOR $tightdb_ver_minor/" $version_file || exit 1
-	sed -i '' -e "s/TDB_VERSION_PATCH .*$/TDB_VERSION_PATCH $tightdb_ver_patch/" $version_file || exit 1
+	sed -i '' -e "s/TDB_VERSION_MAJOR .*$/TDB_VERSION_MAJOR $realm_ver_major/" $version_file || exit 1
+	sed -i '' -e "s/TDB_VERSION_MINOR .*$/TDB_VERSION_MINOR $realm_ver_minor/" $version_file || exit 1
+	sed -i '' -e "s/TDB_VERSION_PATCH .*$/TDB_VERSION_PATCH $realm_ver_patch/" $version_file || exit 1
 	exit 0
 	;;
 
