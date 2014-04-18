@@ -161,7 +161,7 @@ using namespace std;
 -(NSUInteger)removeRows
 {
     if ([m_table isReadOnly]) {
-        @throw [NSException exceptionWithName:@"tightdb:table_is_read_only"
+        @throw [NSException exceptionWithName:@"realm:table_is_read_only"
                                        reason:@"You tried to modify an immutable table"
                                      userInfo:nil];
     }
@@ -184,7 +184,7 @@ using namespace std;
         return [self minDateInColumnWithIndex:colIndex];
     }
     else {
-        @throw [NSException exceptionWithName:@"tightdb:operation_not_supprted"
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
                                        reason:@"Min only supported on int, float, double and date columns."
                                      userInfo:nil];
     }
@@ -230,7 +230,7 @@ using namespace std;
         return [self maxDateInColumnWithIndex:colIndex];
     }
     else {
-        @throw [NSException exceptionWithName:@"tightdb:operation_not_supprted"
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
                                        reason:@"Max only supported on int, float, double and date columns."
                                      userInfo:nil];
     }
@@ -272,7 +272,7 @@ using namespace std;
         return [NSNumber numberWithDouble:[self sumFloatColumnWithIndex:colIndex]];
     }
     else {
-        @throw [NSException exceptionWithName:@"tightdb:operation_not_supprted"
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
                                        reason:@"Sum only supported on int, float and double columns."
                                      userInfo:nil];
     }
@@ -307,7 +307,7 @@ using namespace std;
         return [NSNumber numberWithDouble:[self avgFloatColumnWithIndex:colIndex]];
     }
     else {
-        @throw [NSException exceptionWithName:@"tightdb:operation_not_supprted"
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
                                        reason:@"Avg only supported on int, float and double columns."
                                      userInfo:nil];
     }

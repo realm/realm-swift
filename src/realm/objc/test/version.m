@@ -5,7 +5,7 @@
 
 #import <XCTest/XCTest.h>
 
-#import <tightdb/objc/RLMVersion.h>
+#import <realm/objc/RLMVersion.h>
 
 @interface MACTestVersion: XCTestCase
 @end

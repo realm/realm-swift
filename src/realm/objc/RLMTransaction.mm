@@ -68,7 +68,7 @@ using namespace std;
         // the exception naming conventions of the official Cocoa
         // style guide. The same is true for most (if not all) of the
         // exceptions we throw.
-        @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
+        @throw [NSException exceptionWithName:@"realm:table_name_exception"
                                        reason:@"Name must be a non-empty NSString"
                                      userInfo:nil];
     }
@@ -101,7 +101,7 @@ using namespace std;
         // the exception naming conventions of the official Cocoa
         // style guide. The same is true for most (if not all) of the
         // exceptions we throw.
-        @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
+        @throw [NSException exceptionWithName:@"realm:table_name_exception"
                                        reason:@"Name must be a non-empty NSString"
                                      userInfo:nil];
     }
@@ -145,19 +145,19 @@ using namespace std;
 -(RLMTable *)createTableWithName:(NSString*)name
 {
     if ([name length] == 0) {
-        @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
+        @throw [NSException exceptionWithName:@"realm:table_name_exception"
                                        reason:@"Name must be a non-empty NSString"
                                      userInfo:nil];
     }
 
     if (m_read_only) {
-        @throw [NSException exceptionWithName:@"tightdb:core_read_only_exception"
+        @throw [NSException exceptionWithName:@"realm:core_read_only_exception"
                                        reason:@"Transaction is read-only."
                                      userInfo:nil];
     }
 
     if ([self hasTableWithName:name]) {
-        @throw [NSException exceptionWithName:@"tightdb:table_with_name_already_exists"
+        @throw [NSException exceptionWithName:@"realm:table_with_name_already_exists"
                                        reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the context.", name]
                                      userInfo:nil];
     }
@@ -183,7 +183,7 @@ using namespace std;
     if (!set_columns(nativeTable, columns)) {
         // Parsing the schema failed
         //TODO: More detailed error msg in exception
-        @throw [NSException exceptionWithName:@"tightdb:invalid_columns"
+        @throw [NSException exceptionWithName:@"realm:invalid_columns"
                                        reason:@"The supplied list of columns was invalid"
                                      userInfo:nil];
     }
@@ -195,19 +195,19 @@ using namespace std;
 -(id)createTableWithName:(NSString*)name asTableClass:(__unsafe_unretained Class)class_obj
 {
     if ([name length] == 0) {
-       @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
+       @throw [NSException exceptionWithName:@"realm:table_name_exception"
                                       reason:@"Name must be a non-empty NSString"
                                     userInfo:nil];
     }
 
     if (m_read_only) {
-        @throw [NSException exceptionWithName:@"tightdb:core_read_only_exception"
+        @throw [NSException exceptionWithName:@"realm:core_read_only_exception"
                                        reason:@"Transaction is read-only."
                                      userInfo:nil];
     }
 
     if ([self hasTableWithName:name]) {
-        @throw [NSException exceptionWithName:@"tightdb:table_with_name_already_exists"
+        @throw [NSException exceptionWithName:@"realm:table_with_name_already_exists"
                                        reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the context.", name]
                                      userInfo:nil];
     }
@@ -240,7 +240,7 @@ using namespace std;
         group->m_group = new tightdb::Group;
     }
     catch (std::exception& ex) {
-        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+        @throw [NSException exceptionWithName:@"realm:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
                                      userInfo:nil];
     }
@@ -315,7 +315,7 @@ using namespace std;
         return nil;
     }
     catch (std::exception& ex) {
-        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+        @throw [NSException exceptionWithName:@"realm:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
                                      userInfo:nil];
     }
@@ -368,7 +368,7 @@ using namespace std;
         return [[NSData alloc] initWithBytes:static_cast<const void *>(bd.data()) length:bd.size()];
     }
     catch (std::exception& ex) {
-        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+        @throw [NSException exceptionWithName:@"realm:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
                                      userInfo:nil];
     }

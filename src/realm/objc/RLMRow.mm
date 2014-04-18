@@ -83,7 +83,7 @@ using namespace std;
     tightdb::Table& t = [_table getNativeTable];
     tightdb::ConstDescriptorRef descr = t.get_descriptor();
     if (!verify_cell(*descr, size_t(colIndex), (NSObject *)obj)) {
-        @throw [NSException exceptionWithName:@"tightdb:wrong_column_type"
+        @throw [NSException exceptionWithName:@"realm:wrong_column_type"
                             reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
                             to_objc_string(t.get_column_name(colIndex)), (unsigned long)colIndex, t.get_column_type(colIndex)]
                             userInfo:nil];

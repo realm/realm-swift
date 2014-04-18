@@ -105,7 +105,7 @@ NSString *const defaultContextFileName = @"default.realm";
         group = &m_shared_group->begin_read();
     }
     catch (std::exception& ex) {
-        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+        @throw [NSException exceptionWithName:@"realm:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
                                      userInfo:nil];
     }
@@ -143,7 +143,7 @@ NSString *const defaultContextFileName = @"default.realm";
         // File access errors are treated as exceptions here since they should not occur after the shared
         // group has already beenn successfully opened on the file and memeory mapped. The shared group constructor handles
         // the excepted error related to file access.
-        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+        @throw [NSException exceptionWithName:@"realm:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
                                      userInfo:nil];
     }
@@ -164,7 +164,7 @@ NSString *const defaultContextFileName = @"default.realm";
             m_shared_group->commit();
         }
         catch (std::exception& ex) {
-            @throw [NSException exceptionWithName:@"tightdb:core_exception"
+            @throw [NSException exceptionWithName:@"realm:core_exception"
                                            reason:[NSString stringWithUTF8String:ex.what()]
                                          userInfo:nil];
         }
@@ -204,7 +204,7 @@ NSString *const defaultContextFileName = @"default.realm";
         return m_shared_group->pin_read_transactions();
     }
     catch(std::exception& ex) { 
-        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+        @throw [NSException exceptionWithName:@"realm:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
                                      userInfo:nil];
     }
@@ -216,7 +216,7 @@ NSString *const defaultContextFileName = @"default.realm";
         m_shared_group->unpin_read_transactions();
     }
     catch(std::exception& ex) {
-        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+        @throw [NSException exceptionWithName:@"realm:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
                                      userInfo:nil];
     }

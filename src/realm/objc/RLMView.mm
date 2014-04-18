@@ -143,7 +143,7 @@
     RLMType columnType = [self columnTypeOfColumnWithIndex:colIndex];
 
     if(columnType != RLMTypeInt && columnType != RLMTypeBool && columnType != RLMTypeDate) {
-        @throw [NSException exceptionWithName:@"tightdb:sort_on_column_with_type_not_supported"
+        @throw [NSException exceptionWithName:@"realm:sort_on_column_with_type_not_supported"
                                        reason:@"Sort is currently only supported on Integer, Boolean and Date columns."
                                      userInfo:nil];
     }
@@ -151,7 +151,7 @@
     try {
         m_view->sort(colIndex, order == 0);
     } catch(std::exception& ex) {
-        @throw [NSException exceptionWithName:@"tightdb:core_exception"
+        @throw [NSException exceptionWithName:@"realm:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
                                      userInfo:nil];
     }
@@ -206,7 +206,7 @@
 -(void)removeRowAtIndex:(NSUInteger)rowIndex
 {
     if (m_read_only) {
-        @throw [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
+        @throw [NSException exceptionWithName:@"realm:table_view_is_read_only"
                                        reason:@"You tried to modify an immutable tableview"
                                      userInfo:nil];
     }
@@ -216,7 +216,7 @@
 -(void)removeAllRows
 {
     if (m_read_only) {
-        @throw [NSException exceptionWithName:@"tightdb:table_view_is_read_only"
+        @throw [NSException exceptionWithName:@"realm:table_view_is_read_only"
                                        reason:@"You tried to modify an immutable tableview"
                                      userInfo:nil];
     }
