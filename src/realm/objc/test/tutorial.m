@@ -144,11 +144,11 @@ REALM_TABLE_IMPL_2(PeopleTable2,
     NSFileManager *fm = [NSFileManager defaultManager];
 
     // Write the transaction to disk
-    [fm removeItemAtPath:@"employees.tightdb" error:nil];
-    [transaction writeContextToFile:@"employees.tightdb" error:nil];
+    [fm removeItemAtPath:@"employees.realm" error:nil];
+    [transaction writeContextToFile:@"employees.realm" error:nil];
 
     // Load a transaction from disk (and print contents)
-    RLMTransaction *fromDisk = [RLMTransaction groupWithFile:@"employees.tightdb" error:nil];
+    RLMTransaction *fromDisk = [RLMTransaction groupWithFile:@"employees.realm" error:nil];
     PeopleTable *diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PeopleTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES];

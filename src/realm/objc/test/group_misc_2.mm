@@ -105,11 +105,11 @@ REALM_TABLE_2(QueryTable,
     NSFileManager* fm = [NSFileManager defaultManager];
 
     // Write to disk
-    [fm removeItemAtPath:@"employees.tightdb" error:nil];
-    [group writeContextToFile:@"employees.tightdb" error:nil];
+    [fm removeItemAtPath:@"employees.realm" error:nil];
+    [group writeContextToFile:@"employees.realm" error:nil];
 
     // Load a group from disk (and print contents)
-    RLMTransaction * fromDisk = [RLMTransaction groupWithFile:@"employees.tightdb" error:nil];
+    RLMTransaction * fromDisk = [RLMTransaction groupWithFile:@"employees.realm" error:nil];
     MyTable* diskTable = [fromDisk tableWithName:@"employees" asTableClass:[MyTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];

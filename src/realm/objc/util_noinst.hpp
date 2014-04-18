@@ -203,7 +203,7 @@ inline NSError* make_realm_error(TightdbErr code, NSString* desc)
 {
     NSMutableDictionary* details = [NSMutableDictionary dictionary];
     [details setValue:desc forKey:NSLocalizedDescriptionKey];
-    return [NSError errorWithDomain:@"com.tightdb" code:code userInfo:details];
+    return [NSError errorWithDomain:@"com.realm" code:code userInfo:details];
 }
 
 #define REALM_OBJC_SIZE_T_NUMBER_IN numberWithUnsignedLong

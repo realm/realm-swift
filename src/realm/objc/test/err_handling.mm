@@ -85,9 +85,9 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     NSFileManager* fm = [NSFileManager defaultManager];
 
     // Write the group to disk
-    [fm removeItemAtPath:@"peopleErr.tightdb" error:NULL];
+    [fm removeItemAtPath:@"peopleErr.realm" error:NULL];
     error = nil;
-    if (![transaction writeContextToFile:@"peopleErr.tightdb" error:&error]) {
+    if (![transaction writeContextToFile:@"peopleErr.realm" error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         XCTFail(@"No error expected");
     }
@@ -100,7 +100,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     [attributes setValue:[NSNumber numberWithShort:0444] forKey:NSFilePosixPermissions];
 
     error = nil;
-    [fm setAttributes:attributes ofItemAtPath:@"peopleErr.tightdb" error:&error];
+    [fm setAttributes:attributes ofItemAtPath:@"peopleErr.realm" error:&error];
     if (error) {
         XCTFail(@"Failed to set readonly attributes");
     }
@@ -111,7 +111,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
 
     // Load a group from disk (and try to update, even though it is readonly)
     error = nil;
-    RLMTransaction * fromDisk = [RLMTransaction groupWithFile:@"peopleErr.tightdb" error:&error];
+    RLMTransaction * fromDisk = [RLMTransaction groupWithFile:@"peopleErr.realm" error:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
     }
@@ -127,13 +127,13 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     [attributes setValue:[NSNumber numberWithShort:0644] forKey:NSFilePosixPermissions];
 
     error = nil;
-    [fm setAttributes:attributes ofItemAtPath:@"peopleErr.tightdb" error:&error];
+    [fm setAttributes:attributes ofItemAtPath:@"peopleErr.realm" error:&error];
     if (error) {
         XCTFail(@"Failed to set readonly attributes");
     }
 
     error = nil;
-    fromDisk = [RLMTransaction groupWithFile:@"peopleErr.tightdb" error:&error];
+    fromDisk = [RLMTransaction groupWithFile:@"peopleErr.realm" error:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
         XCTFail(@"File should have been possible to open");
