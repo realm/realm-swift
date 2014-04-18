@@ -134,28 +134,28 @@ void throw_objc_exception(exception &ex)
 
     context->_notificationCenter = notificationCenter;
 
-    TightdbErr errorCode = tdb_err_Ok;
+    RLMError errorCode = RLMErrorOk;
     NSString *errorMessage;
     try {
         context->_sharedGroup.reset(new SharedGroup(StringData(ObjcStringAccessor(path))));
     }
     catch (File::PermissionDenied &ex) {
-        errorCode    = tdb_err_File_PermissionDenied;
+        errorCode    = RLMErrorFilePermissionDenied;
         errorMessage = [NSString stringWithUTF8String:ex.what()];
     }
     catch (File::Exists &ex) {
-        errorCode    = tdb_err_File_Exists;
+        errorCode    = RLMErrorFileExists;
         errorMessage = [NSString stringWithUTF8String:ex.what()];
     }
     catch (File::AccessError &ex) {
-        errorCode    = tdb_err_File_AccessError;
+        errorCode    = RLMErrorFileAccessError;
         errorMessage = [NSString stringWithUTF8String:ex.what()];
     }
     catch (exception &ex) {
-        errorCode    = tdb_err_Fail;
+        errorCode    = RLMErrorFail;
         errorMessage = [NSString stringWithUTF8String:ex.what()];
     }
-    if (errorCode != tdb_err_Ok) {
+    if (errorCode != RLMErrorOk) {
         if (error)
             *error = make_realm_error(errorCode, errorMessage);
         return nil;

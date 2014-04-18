@@ -186,20 +186,20 @@ void set_row_from_object(size_t row_ndx, tightdb::Table& table, NSObject *data);
 BOOL set_columns(tightdb::TableRef& parent, NSArray *schema);
 
 // Still used in the new error strategy. Perhaps it should be public?
-enum TightdbErr {
-    tdb_err_Ok                    = 0,
-    tdb_err_Fail                  = 1,
-    tdb_err_FailRdOnly            = 2,
-    tdb_err_File_AccessError      = 3,
-    tdb_err_File_PermissionDenied = 4,
-    tdb_err_File_Exists           = 5,
-    tdb_err_File_NotFound         = 6,
-    tdb_err_Rollback              = 7,
-    tdb_err_InvalidDatabase       = 8,
-    tdb_err_TableNotFound         = 9
+typedef NS_ENUM(NSInteger, RLMError) {
+    RLMErrorOk                    = 0,
+    RLMErrorFail                  = 1,
+    RLMErrorFailRdOnly            = 2,
+    RLMErrorFileAccessError       = 3,
+    RLMErrorFilePermissionDenied  = 4,
+    RLMErrorFileExists            = 5,
+    RLMErrorFileNotFound          = 6,
+    RLMErrorRollback              = 7,
+    RLMErrorInvalidDatabase       = 8,
+    RLMErrorTableNotFound         = 9
 };
 
-inline NSError* make_realm_error(TightdbErr code, NSString* desc)
+inline NSError* make_realm_error(RLMError code, NSString* desc)
 {
     NSMutableDictionary* details = [NSMutableDictionary dictionary];
     [details setValue:desc forKey:NSLocalizedDescriptionKey];
@@ -217,12 +217,12 @@ REALM_EXCEPTION_ERRHANDLER_EX(action, fail_return_value, error)
 try { action } \
 catch (tightdb::util::File::AccessError& ex) { \
     if (err_var) \
-        *err_var = make_realm_error(tdb_err_File_AccessError, [NSString stringWithUTF8String:ex.what()]); \
+        *err_var = make_realm_error(RLMErrorFileAccessError, [NSString stringWithUTF8String:ex.what()]); \
         return fail_return_value; \
 } \
 catch (std::exception& ex) { \
     if (err_var) \
-        *err_var = make_realm_error(tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]); \
+        *err_var = make_realm_error(RLMErrorFail, [NSString stringWithUTF8String:ex.what()]); \
         return fail_return_value; \
 }
 

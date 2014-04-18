@@ -55,7 +55,7 @@
 {
     if (m_read_only) {
         if (error)
-            *error = make_realm_error(tdb_err_FailRdOnly, @"Tried to add column while read only");
+            *error = make_realm_error(RLMErrorFailRdOnly, @"Tried to add column while read only");
         return NO;
     }
     REALM_EXCEPTION_ERRHANDLER(
@@ -73,7 +73,7 @@
 {
     if (m_read_only) {
         if (error)
-            *error = make_realm_error(tdb_err_FailRdOnly, @"Tried to add column while read only");
+            *error = make_realm_error(RLMErrorFailRdOnly, @"Tried to add column while read only");
         return nil;
     }
     REALM_EXCEPTION_ERRHANDLER(

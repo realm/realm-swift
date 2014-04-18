@@ -265,7 +265,7 @@ using namespace std;
 {
     if (m_read_only) {
         if (error)
-            *error = make_realm_error(tdb_err_FailRdOnly, @"Tried to insert row while read-only.");
+            *error = make_realm_error(RLMErrorFailRdOnly, @"Tried to insert row while read-only.");
         return NO;
     }
     
@@ -641,7 +641,7 @@ using namespace std;
     // method should also not take an error argument.
     if (m_read_only) {
         if (error)
-            *error = make_realm_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
+            *error = make_realm_error(RLMErrorFailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
     REALM_EXCEPTION_ERRHANDLER(m_table->insert_bool(col_ndx, ndx, value);, NO);
@@ -662,7 +662,7 @@ using namespace std;
     // method should also not take an error argument.
     if (m_read_only) {
         if (error)
-            *error = make_realm_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
+            *error = make_realm_error(RLMErrorFailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
     REALM_EXCEPTION_ERRHANDLER(m_table->insert_int(col_ndx, ndx, value);, NO);
@@ -682,7 +682,7 @@ using namespace std;
     // method should also not take an error argument.
     if (m_read_only) {
         if (error)
-            *error = make_realm_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
+            *error = make_realm_error(RLMErrorFailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
     REALM_EXCEPTION_ERRHANDLER(m_table->insert_float(col_ndx, ndx, value);, NO);
@@ -702,7 +702,7 @@ using namespace std;
     // method should also not take an error argument.
     if (m_read_only) {
         if (error)
-            *error = make_realm_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
+            *error = make_realm_error(RLMErrorFailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
     REALM_EXCEPTION_ERRHANDLER(m_table->insert_double(col_ndx, ndx, value);, NO);
@@ -722,7 +722,7 @@ using namespace std;
     // method should also not take an error argument.
     if (m_read_only) {
         if (error)
-            *error = make_realm_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
+            *error = make_realm_error(RLMErrorFailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
     REALM_EXCEPTION_ERRHANDLER(
@@ -744,7 +744,7 @@ using namespace std;
     // method should also not take an error argument.
     if (m_read_only) {
         if (error)
-            *error = make_realm_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
+            *error = make_realm_error(RLMErrorFailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
     const void *data = [(NSData *)value bytes];
@@ -768,7 +768,7 @@ using namespace std;
     // method should also not take an error argument.
     if (m_read_only) {
         if (error)
-            *error = make_realm_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
+            *error = make_realm_error(RLMErrorFailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
     REALM_EXCEPTION_ERRHANDLER(
@@ -790,7 +790,7 @@ using namespace std;
     // method should also not take an error argument.
     if (m_read_only) {
         if (error)
-            *error = make_realm_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
+            *error = make_realm_error(RLMErrorFailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
     REALM_EXCEPTION_ERRHANDLER(m_table->insert_datetime(col_ndx, ndx, [value timeIntervalSince1970]);, NO);
@@ -825,7 +825,7 @@ using namespace std;
     // method should also not take an error argument.
     if (m_read_only) {
         if (error)
-            *error = make_realm_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
+            *error = make_realm_error(RLMErrorFailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
     REALM_EXCEPTION_ERRHANDLER(m_table->insert_subtable(col_ndx, row_ndx);, NO);
@@ -846,7 +846,7 @@ using namespace std;
     // method should also not take an error argument.
     if (m_read_only) {
         if (error)
-            *error = make_realm_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
+            *error = make_realm_error(RLMErrorFailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
     REALM_EXCEPTION_ERRHANDLER(
@@ -872,7 +872,7 @@ using namespace std;
 {
     if (m_read_only) {
         if (error)
-            *error = make_realm_error(tdb_err_FailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
+            *error = make_realm_error(RLMErrorFailRdOnly, [NSString stringWithFormat:@"Tried to insert while read only ColumnId: %llu", (unsigned long long)col_ndx]);
         return NO;
     }
     tightdb::Mixed mixed;
