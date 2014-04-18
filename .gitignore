@@ -23,6 +23,8 @@ project.xcworkspace
 /iphone-lib/include
 /iphone-lib/libtightdb-objc-ios.a
 /iphone-lib/libtightdb-objc-ios-dbg.a
+/iphone-lib/librealm-objc-ios.a
+/iphone-lib/librealm-objc-ios-dbg.a
 
 # for running the example tutorial
 examples/tutorial.d
