@@ -202,19 +202,19 @@ case "$MODE" in
 
         # Find TightDB
         if [ -z "$REALM_CONFIG" ]; then
-            REALM_CONFIG="tightdb-config"
+            REALM_CONFIG="realm-config"
         fi
         if printf "%s\n" "$REALM_CONFIG" | grep -q '^/'; then
             if ! [ -x "$REALM_CONFIG" ]; then
-                tightdb_abort "ERROR: TightDB config-program '$REALM_CONFIG' does not exist" "Cannot find '$REALM_CONFIG' - skipping"
+                realm_abort "ERROR: TightDB config-program '$REALM_CONFIG' does not exist" "Cannot find '$REALM_CONFIG' - skipping"
             fi
             tightdb_config_cmd="$REALM_CONFIG"
         elif ! tightdb_config_cmd="$(which "$REALM_CONFIG" 2>/dev/null)"; then
-            tightdb_abort "ERROR: TightDB config-program '$REALM_CONFIG' not found in PATH" "Cannot find '$REALM_CONFIG' - skipping"
+            realm_abort "ERROR: TightDB config-program '$REALM_CONFIG' not found in PATH" "Cannot find '$REALM_CONFIG' - skipping"
         fi
         tightdb_config_dbg_cmd="$tightdb_config_cmd-dbg"
         if ! [ -x "$tightdb_config_dbg_cmd" ]; then
-            tightdb_abort "ERROR: TightDB config-program '$tightdb_config_dbg_cmd' not found" "Cannot find '$tightdb_config_dbg_cmd' - skipping"
+            realm_abort "ERROR: TightDB config-program '$tightdb_config_dbg_cmd' not found" "Cannot find '$tightdb_config_dbg_cmd' - skipping"
         fi
         tightdb_version="$($tightdb_config_cmd --version)" || exit 1
 
@@ -322,7 +322,7 @@ INSTALL_INCLUDEDIR  = $install_includedir
 INSTALL_BINDIR      = $install_bindir
 INSTALL_LIBDIR      = $install_libdir
 INSTALL_LIBEXECDIR  = $install_libexecdir
-REALM_CONFIG      = $tightdb_config_cmd
+REALM_CONFIG        = $tightdb_config_cmd
 TIGHTDB_VERSION     = $tightdb_version
 TIGHTDB_CFLAGS      = $tightdb_cflags
 TIGHTDB_CFLAGS_DBG  = $tightdb_cflags_dbg
@@ -399,14 +399,14 @@ EOF
         auto_configure || exit 1
         iphone_sdks_avail="$(get_config_param "IPHONE_SDKS_AVAIL")" || exit 1
         if [ "$iphone_sdks_avail" != "yes" ]; then
-            tightdb_abort "ERROR: iPhone SDKs were not found during configuration"
+            realm_abort "ERROR: iPhone SDKs were not found during configuration"
         fi
         iphone_core_lib="$(get_config_param "IPHONE_CORE_LIB")" || exit 1
         if [ "$iphone_core_lib" = "none" ]; then
-            tightdb_abort "ERROR: TightDB core library for iPhone was not found during configuration"
+            realm_abort "ERROR: TightDB core library for iPhone was not found during configuration"
         fi
         if ! [ -e "$iphone_core_lib/libtightdb-ios.a" ]; then
-            tightdb_abort "ERROR: TightDB core library for iPhone is not available in '$iphone_core_lib'"
+            realm_abort "ERROR: TightDB core library for iPhone is not available in '$iphone_core_lib'"
         fi
         temp_dir="$(mktemp -d /tmp/tightdb.objc.build-iphone.XXXX)" || exit 1
         xcode_home="$(get_config_param "XCODE_HOME")" || exit 1
@@ -638,7 +638,7 @@ EOF
         grep -v -f "$TEMP_DIR/exclude.bre" "$TEMP_DIR/files2" >"$TEMP_DIR/files3" || exit 1
         tar czf "$TEMP_DIR/archive.tar.gz" -T "$TEMP_DIR/files3" || exit 1
         (cd "$TARGET_DIR" && tar xzmf "$TEMP_DIR/archive.tar.gz") || exit 1
-        if ! [ "$TIGHTDB_DISABLE_MARKDOWN_TO_PDF" ]; then
+        if ! [ "$REALM_DISABLE_MARKDOWN_TO_PDF" ]; then
             (cd "$TARGET_DIR" && pandoc README.md -o README.pdf) || exit 1
         fi
         exit 0
