@@ -141,10 +141,10 @@ By default, the configuration step uses `which tightdb-config` to
 locate the installation of the Realm core library. If this is not
 appropriate, because you have multiple versions of the Realm core
 library installed, or `tightdb-config` is not available in your
-`PATH`, set the environment variable `TIGHTDB_CONFIG` before calling
+`PATH`, set the environment variable `REALM_CONFIG` before calling
 `sh build.sh config`. For example:
 
-    TIGHTDB_CONFIG=/opt/tightdb-v0.1.2/bin/tightdb-config build.sh config
+    REALM_CONFIG=/opt/tightdb-v0.1.2/bin/tightdb-config build.sh config
 
 To use a nondefault compiler, or a compiler in a nondefault location,
 set the environment variable `CC` before calling `sh build.sh build`,

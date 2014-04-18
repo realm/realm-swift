@@ -2,12 +2,12 @@
 
 ORIG_CWD="$(pwd)" || exit 1
 cd "$(dirname "$0")" || exit 1
-TIGHTDB_OBJC_HOME="$(pwd)" || exit 1
+REALM_OBJC_HOME="$(pwd)" || exit 1
 
 
 # load command functions
 if [ common_funcs.sh ]; then
-    . $TIGHTDB_OBJC_HOME/common_funcs.sh
+    . $REALM_OBJC_HOME/common_funcs.sh
 else
     echo "Cannot load common functions."
     exit 1
@@ -128,7 +128,7 @@ CONFIG_MK="src/config.mk"
 
 require_config()
 {
-    cd "$TIGHTDB_OBJC_HOME" || return 1
+    cd "$REALM_OBJC_HOME" || return 1
     if ! [ -e "$CONFIG_MK" ]; then
         cat 1>&2 <<EOF
 ERROR: Found no configuration!
@@ -142,7 +142,7 @@ EOF
 
 auto_configure()
 {
-    cd "$TIGHTDB_OBJC_HOME" || return 1
+    cd "$REALM_OBJC_HOME" || return 1
     if [ -e "$CONFIG_MK" ]; then
         require_config || return 1
     else
@@ -155,7 +155,7 @@ get_config_param()
 {
     local name line value
     name="$1"
-    cd "$TIGHTDB_OBJC_HOME" || return 1
+    cd "$REALM_OBJC_HOME" || return 1
     if ! [ -e "$CONFIG_MK" ]; then
         cat 1>&2 <<EOF
 ERROR: Found no configuration!
@@ -201,16 +201,16 @@ case "$MODE" in
         install_libexecdir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libexecdir)" || exit 1
 
         # Find Realm
-        if [ -z "$TIGHTDB_CONFIG" ]; then
-            TIGHTDB_CONFIG="tightdb-config"
+        if [ -z "$REALM_CONFIG" ]; then
+            REALM_CONFIG="tightdb-config"
         fi
-        if printf "%s\n" "$TIGHTDB_CONFIG" | grep -q '^/'; then
-            if ! [ -x "$TIGHTDB_CONFIG" ]; then
-                tightdb_abort "ERROR: Realm config-program '$TIGHTDB_CONFIG' does not exist" "Cannot find '$TIGHTDB_CONFIG' - skipping"
+        if printf "%s\n" "$REALM_CONFIG" | grep -q '^/'; then
+            if ! [ -x "$REALM_CONFIG" ]; then
+                tightdb_abort "ERROR: Realm config-program '$REALM_CONFIG' does not exist" "Cannot find '$REALM_CONFIG' - skipping"
             fi
-            tightdb_config_cmd="$TIGHTDB_CONFIG"
-        elif ! tightdb_config_cmd="$(which "$TIGHTDB_CONFIG" 2>/dev/null)"; then
-            tightdb_abort "ERROR: Realm config-program '$TIGHTDB_CONFIG' not found in PATH" "Cannot find '$TIGHTDB_CONFIG' - skipping"
+            tightdb_config_cmd="$REALM_CONFIG"
+        elif ! tightdb_config_cmd="$(which "$REALM_CONFIG" 2>/dev/null)"; then
+            tightdb_abort "ERROR: Realm config-program '$REALM_CONFIG' not found in PATH" "Cannot find '$REALM_CONFIG' - skipping"
         fi
         tightdb_config_dbg_cmd="$tightdb_config_cmd-dbg"
         if ! [ -x "$tightdb_config_dbg_cmd" ]; then
@@ -322,7 +322,7 @@ INSTALL_INCLUDEDIR  = $install_includedir
 INSTALL_BINDIR      = $install_bindir
 INSTALL_LIBDIR      = $install_libdir
 INSTALL_LIBEXECDIR  = $install_libexecdir
-TIGHTDB_CONFIG      = $tightdb_config_cmd
+REALM_CONFIG      = $tightdb_config_cmd
 TIGHTDB_VERSION     = $tightdb_version
 TIGHTDB_CFLAGS      = $tightdb_cflags
 TIGHTDB_CFLAGS_DBG  = $tightdb_cflags_dbg
@@ -438,7 +438,7 @@ EOF
         tightdb_echo "Copying headers to '$IPHONE_DIR/include'"
         mkdir -p "$IPHONE_DIR/include/realm/objc" || exit 1
         inst_headers="$(cd src/realm/objc && $MAKE --no-print-directory get-inst-headers)" || exit 1
-        (cd "src/realm/objc" && cp $inst_headers "$TIGHTDB_OBJC_HOME/$IPHONE_DIR/include/realm/objc/") || exit 1
+        (cd "src/realm/objc" && cp $inst_headers "$REALM_OBJC_HOME/$IPHONE_DIR/include/realm/objc/") || exit 1
         tightdb_echo "Done building"
         exit 0
         ;;
@@ -469,7 +469,7 @@ EOF
         mkdir -p "$TEMP_DIR/unit-tests.xctest/Contents/MacOS" || exit 1
         cp "src/realm/objc/test/unit-tests" "$TEMP_DIR/unit-tests.xctest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/realm/objc" || exit 1
+        path_list_prepend DYLD_LIBRARY_PATH "$REALM_OBJC_HOME/src/realm/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
         "$XCODE_HOME/usr/bin/xctest" -XCTest All "$TEMP_DIR/unit-tests.xctest" || exit 1
@@ -484,7 +484,7 @@ EOF
         mkdir -p "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS" || exit 1
         cp "src/realm/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/realm/objc" || exit 1
+        path_list_prepend DYLD_LIBRARY_PATH "$REALM_OBJC_HOME/src/realm/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
         "$XCODE_HOME/usr/bin/xctest" -XCTest All "$TEMP_DIR/unit-tests-dbg.xctest" || exit 1
@@ -499,7 +499,7 @@ EOF
         mkdir -p "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS" || exit 1
         cp "src/realm/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/realm/objc" || exit 1
+        path_list_prepend DYLD_LIBRARY_PATH "$REALM_OBJC_HOME/src/realm/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
         gdb --args "$XCODE_HOME/usr/bin/xctest" -XCTest All "$TEMP_DIR/unit-tests-dbg.xctest"
@@ -512,7 +512,7 @@ EOF
         mkdir -p "$TEMP_DIR/unit-tests-cov.xctest/Contents/MacOS" || exit 1
         cp "src/realm/objc/test/unit-tests-cov" "$TEMP_DIR/unit-tests-cov.xctest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        path_list_prepend DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/realm/objc" || exit 1
+        path_list_prepend DYLD_LIBRARY_PATH="$REALM_OBJC_HOME/src/realm/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
         "$XCODE_HOME/usr/bin/xctest" -XCTest All "$TEMP_DIR/unit-tests-cov.xctest" || exit 1
