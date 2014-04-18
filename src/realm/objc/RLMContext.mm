@@ -33,7 +33,7 @@ using namespace std;
     tightdb::util::UniquePtr<tightdb::SharedGroup> m_shared_group;
 }
 
-NSString *const defaultContextFileName = @"default.tightdb";
+NSString *const defaultContextFileName = @"default.realm";
 
 +(NSString *)defaultPath
 {

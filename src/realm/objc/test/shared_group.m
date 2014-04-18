@@ -42,12 +42,12 @@ REALM_TABLE_2(SharedTable2,
     NSFileManager* fm = [NSFileManager defaultManager];
 
     // Write to disk
-    [fm removeItemAtPath:@"employees.tightdb" error:nil];
-    [fm removeItemAtPath:@"employees.tightdb.lock" error:nil];
-    [group writeContextToFile:@"employees.tightdb" error:nil];
+    [fm removeItemAtPath:@"employees.realm" error:nil];
+    [fm removeItemAtPath:@"employees.realm.lock" error:nil];
+    [group writeContextToFile:@"employees.realm" error:nil];
 
     // Read only shared group
-    RLMContext * fromDisk = [RLMContext contextPersistedAtPath:@"employees.tightdb" error:nil];
+    RLMContext * fromDisk = [RLMContext contextPersistedAtPath:@"employees.realm" error:nil];
 
     [fromDisk readUsingBlock:^(RLMTransaction * group) {
             SharedTable2* diskTable = [group tableWithName:@"employees" asTableClass:[SharedTable2 class]];
@@ -161,10 +161,10 @@ REALM_TABLE_2(SharedTable2,
     NSFileManager* fm = [NSFileManager defaultManager];
     
     // Write to disk
-    [fm removeItemAtPath:@"readonlyTest.tightdb" error:nil];
-    [fm removeItemAtPath:@"readonlyTest.tightdb.lock" error:nil];
+    [fm removeItemAtPath:@"readonlyTest.realm" error:nil];
+    [fm removeItemAtPath:@"readonlyTest.realm.lock" error:nil];
     
-    RLMContext * fromDisk = [RLMContext contextPersistedAtPath:@"readonlyTest.tightdb" error:nil];
+    RLMContext * fromDisk = [RLMContext contextPersistedAtPath:@"readonlyTest.realm" error:nil];
     
     [fromDisk writeUsingBlock:^(RLMTransaction *group) {
         RLMTable *t = [group createTableWithName:@"table"];
@@ -202,10 +202,10 @@ REALM_TABLE_2(SharedTable2,
     NSFileManager* fm = [NSFileManager defaultManager];
 
     // Write to disk
-    [fm removeItemAtPath:@"singleTest.tightdb" error:nil];
-    [fm removeItemAtPath:@"singleTest.tightdb.lock" error:nil];
+    [fm removeItemAtPath:@"singleTest.realm" error:nil];
+    [fm removeItemAtPath:@"singleTest.realm.lock" error:nil];
 
-    RLMContext * ctx = [RLMContext contextPersistedAtPath:@"singleTest.tightdb" error:nil];
+    RLMContext * ctx = [RLMContext contextPersistedAtPath:@"singleTest.realm" error:nil];
 
     [ctx writeUsingBlock:^(RLMTransaction *trx) {
         RLMTable *t = [trx createTableWithName:@"table"];
@@ -234,10 +234,10 @@ REALM_TABLE_2(SharedTable2,
     NSFileManager* fm = [NSFileManager defaultManager];
     
     // Write to disk
-    [fm removeItemAtPath:@"hasChanged.tightdb" error:nil];
-    [fm removeItemAtPath:@"hasChanged.tightdb.lock" error:nil];
+    [fm removeItemAtPath:@"hasChanged.realm" error:nil];
+    [fm removeItemAtPath:@"hasChanged.realm.lock" error:nil];
     
-    RLMContext *sg = [RLMContext contextPersistedAtPath:@"hasChanged.tightdb" error:nil];
+    RLMContext *sg = [RLMContext contextPersistedAtPath:@"hasChanged.realm" error:nil];
     
     XCTAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not changed");
     
@@ -262,7 +262,7 @@ REALM_TABLE_2(SharedTable2,
     
     
     // OTHER sharedgroup
-    RLMContext *sg2 = [RLMContext contextPersistedAtPath:@"hasChanged.tightdb" error:nil];
+    RLMContext *sg2 = [RLMContext contextPersistedAtPath:@"hasChanged.realm" error:nil];
     
     
     [sg2 writeUsingBlock:^(RLMTransaction * group) {
@@ -277,7 +277,7 @@ REALM_TABLE_2(SharedTable2,
 
 - (void)testContextExceptions
 {
-    NSString *contextPath = @"contextTest.tightdb";
+    NSString *contextPath = @"contextTest.realm";
     NSFileManager* fm = [NSFileManager defaultManager];
         [fm removeItemAtPath:contextPath error:nil];
     [fm removeItemAtPath:[contextPath stringByAppendingString:@".lock"] error:nil];
@@ -307,7 +307,7 @@ REALM_TABLE_2(SharedTable2,
 
 -(void)testPinnedTransactions
 {
-    NSString *contextPath = @"pinnedTransactions.tightdb";
+    NSString *contextPath = @"pinnedTransactions.realm";
     NSFileManager* fm = [NSFileManager defaultManager];
     [fm removeItemAtPath:contextPath error:nil];
     [fm removeItemAtPath:[contextPath stringByAppendingString:@".lock"] error:nil];

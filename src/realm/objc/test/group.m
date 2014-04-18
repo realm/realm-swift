@@ -46,11 +46,11 @@ REALM_TABLE_2(TestTableGroup,
 
     // Create empty group and serialize to disk
     RLMTransaction *toDisk = [RLMTransaction group];
-    [fm removeItemAtPath:@"table_test.tightdb" error:NULL];
-    [toDisk writeContextToFile:@"table_test.tightdb" error:nil];
+    [fm removeItemAtPath:@"table_test.realm" error:NULL];
+    [toDisk writeContextToFile:@"table_test.realm" error:nil];
 
     // Load the group
-    RLMTransaction *fromDisk = [RLMTransaction groupWithFile:@"table_test.tightdb" error:nil];
+    RLMTransaction *fromDisk = [RLMTransaction groupWithFile:@"table_test.realm" error:nil];
     if (!fromDisk)
         XCTFail(@"From disk not valid");
 
