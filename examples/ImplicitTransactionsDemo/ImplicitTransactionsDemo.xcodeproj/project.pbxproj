@@ -163,7 +163,7 @@
 			attributes = {
 				CLASSPREFIX = My;
 				LastUpgradeCheck = 0440;
-				ORGANIZATIONNAME = TightDB;
+				ORGANIZATIONNAME = Realm;
 			};
 			buildConfigurationList = 522AF31F18F372AB00237BAB /* Build configuration list for PBXProject "ImplicitTransactionsDemo" */;
 			compatibilityVersion = "Xcode 3.2";

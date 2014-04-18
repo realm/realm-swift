@@ -7,19 +7,19 @@
 //
 
 #import "RLMTableViewController.h"
-#import <Tightdb/Tightdb.h>
+#import <Realm/Realm.h>
 
-TIGHTDB_TABLE_2(RLMDemoTable,
-                title, String,
-                checked, Bool)
+REALM_TABLE_2(RLMDemoTable,
+              title, String,
+              checked, Bool)
 
 static NSString * const kCellID    = @"cell";
 static NSString * const kTableName = @"table";
 
 @interface RLMTableViewController ()
 
-@property (nonatomic, strong) TDBSmartContext *readContext;
-@property (nonatomic, strong) TDBContext *writeContext;
+@property (nonatomic, strong) RLMSmartContext *readContext;
+@property (nonatomic, strong) RLMContext *writeContext;
 @property (nonatomic, strong) RLMDemoTable *table;
 
 @end
@@ -44,13 +44,13 @@ static NSString * const kTableName = @"table";
 
 - (void)setupTightDB {
     // Set up read/write contexts
-    self.readContext  = [TDBSmartContext contextWithDefaultPersistence];
-    self.writeContext = [TDBContext contextWithDefaultPersistence];
+    self.readContext  = [RLMSmartContext contextWithDefaultPersistence];
+    self.writeContext = [RLMContext contextWithDefaultPersistence];
     
     // Create table if it doesn't exist
     NSError *error = nil;
     
-    [self.writeContext writeUsingBlock:^BOOL(TDBTransaction *transaction) {
+    [self.writeContext writeUsingBlock:^BOOL(RLMTransaction *transaction) {
         if (transaction.isEmpty) {
             [transaction createTableWithName:kTableName asTableClass:[RLMDemoTable class]];
         }
@@ -64,7 +64,7 @@ static NSString * const kTableName = @"table";
     // Observe TightDB Notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(tightDBContextDidChange)
-                                                 name:TDBContextDidChangeNotification
+                                                 name:RLMContextDidChangeNotification
                                                object:nil];
 }
 
@@ -72,8 +72,10 @@ static NSString * const kTableName = @"table";
     [self.tableView reloadData];
 }
 
-- (TDBTable *)table {
-    _table = [self.readContext tableWithName:kTableName asTableClass:[RLMDemoTable class]];
+- (RLMDemoTable *)table {
+    if (!_table) {
+        _table = [self.readContext tableWithName:kTableName asTableClass:[RLMDemoTable class]];
+    }
     return _table;
 }
 
@@ -102,7 +104,7 @@ static NSString * const kTableName = @"table";
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         NSError *error = nil;
         
-        [self.writeContext writeTable:kTableName usingBlock:^BOOL(TDBTable *table) {
+        [self.writeContext writeTable:kTableName usingBlock:^BOOL(RLMTable *table) {
             [table removeRowAtIndex:indexPath.row];
             return YES;
         } error:&error];
@@ -118,7 +120,7 @@ static NSString * const kTableName = @"table";
 - (void)add {
     NSError *error = nil;
     
-    [self.writeContext writeUsingBlock:^BOOL(TDBTransaction *transaction) {
+    [self.writeContext writeUsingBlock:^BOOL(RLMTransaction *transaction) {
         RLMDemoTable *table = [transaction tableWithName:kTableName asTableClass:[RLMDemoTable class]];
         NSString *title = [NSString stringWithFormat:@"Title %lu", (unsigned long)table.rowCount];
         BOOL checked = table.rowCount % 2;

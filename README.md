@@ -1,8 +1,8 @@
 Objective-C
 ===========
 
-This README file explains how to build and install the TightDB
-language binding for Objective-C. It assumes that the TightDB core
+This README file explains how to build and install the Realm
+language binding for Objective-C. It assumes that the Realm core
 library has already been installed.
 
 
@@ -65,8 +65,8 @@ Headers are installed in:
 
 The following libraries are installed:
 
-    /usr/local/lib/libtightdb-objc.dylib
-    /usr/local/lib/libtightdb-objc-dbg.dylib
+    /usr/local/lib/librealm-objc.dylib
+    /usr/local/lib/librealm-objc-dbg.dylib
 
 Here is a more complete set of build-related commands:
 
@@ -92,7 +92,7 @@ iPhoneOS and iPhoneSimulator SDKs for Xcode are installed.
 It also requires that a prebuilt version of the core library for iOS
 is available. By default, the configuration step will look for it in
 `../tightdb/iphone_lib`. If this is not the correct location of it,
-set the environment variable TIGHTDB_IPHONE_CORE_LIB to the correct
+set the environment variable REALM_IPHONE_CORE_LIB to the correct
 path before invoking the configuration step.
 
 Run the following command to build the Objective-C language binding
@@ -103,15 +103,15 @@ for iPhone:
 This produces the following files and directories:
 
     iphone-lib/include/
-    iphone-lib/libtightdb-objc-ios.a
-    iphone-lib/libtightdb-objc-ios-dbg.a
+    iphone-lib/librealm-objc-ios.a
+    iphone-lib/librealm-objc-ios-dbg.a
 
 The `include` directory holds a copy of the header files, which are
 identical to the ones installed by `sh build.sh install`. There are
 two versions of the static library, one that is compiled with
 optimization, and one that is compiled for debugging. Each one
 contains code compiled for both iPhone and for the iPhone
-simulator. Each one also includes the TightDB core library and is
+simulator. Each one also includes the Realm core library and is
 therefore self contained.
 
 After building, the iPhone version of the Objective-C language binding
@@ -138,13 +138,13 @@ Here, `PREFIX` is the installation prefix. If it is not specified, it
 defaults to `/usr/local`.
 
 By default, the configuration step uses `which tightdb-config` to
-locate the installation of the TightDB core library. If this is not
-appropriate, because you have multiple versions of the TightDB core
+locate the installation of the Realm core library. If this is not
+appropriate, because you have multiple versions of the Realm core
 library installed, or `tightdb-config` is not available in your
-`PATH`, set the environment variable `TIGHTDB_CONFIG` before calling
+`PATH`, set the environment variable `REALM_CONFIG` before calling
 `sh build.sh config`. For example:
 
-    TIGHTDB_CONFIG=/opt/tightdb-v0.1.2/bin/tightdb-config build.sh config
+    REALM_CONFIG=/opt/tightdb-v0.1.2/bin/tightdb-config build.sh config
 
 To use a nondefault compiler, or a compiler in a nondefault location,
 set the environment variable `CC` before calling `sh build.sh build`,
