@@ -9,17 +9,18 @@
 #import "RLMTableViewController.h"
 #import <Tightdb/Tightdb.h>
 
-TIGHTDB_TABLE_1(RLMTitles, title, String)
+TIGHTDB_TABLE_2(RLMDemoTable,
+                title, String,
+                checked, Bool)
 
-static NSString * const kCellID      = @"cell";
-static NSString * const kTableName   = @"table";
-static NSString * const kTitleColumn = @"title";
+static NSString * const kCellID    = @"cell";
+static NSString * const kTableName = @"table";
 
 @interface RLMTableViewController ()
 
 @property (nonatomic, strong) TDBSmartContext *readContext;
 @property (nonatomic, strong) TDBContext *writeContext;
-@property (nonatomic, strong) TDBTable *table;
+@property (nonatomic, strong) RLMDemoTable *table;
 
 @end
 
@@ -51,7 +52,7 @@ static NSString * const kTitleColumn = @"title";
     
     [self.writeContext writeUsingBlock:^BOOL(TDBTransaction *transaction) {
         if (transaction.isEmpty) {
-            [transaction createTableWithName:kTableName asTableClass:[RLMTitles class]];
+            [transaction createTableWithName:kTableName asTableClass:[RLMDemoTable class]];
         }
         return YES;
     } error:&error];
@@ -72,9 +73,7 @@ static NSString * const kTitleColumn = @"title";
 }
 
 - (TDBTable *)table {
-    if (!_table) {
-        _table = [self.readContext tableWithName:kTableName];
-    }
+    _table = [self.readContext tableWithName:kTableName asTableClass:[RLMDemoTable class]];
     return _table;
 }
 
@@ -87,7 +86,10 @@ static NSString * const kTitleColumn = @"title";
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellID forIndexPath:indexPath];
     
-    cell.textLabel.text = self.table[indexPath.row][kTitleColumn];
+    RLMDemoTableRow *row = self.table[indexPath.row];
+    
+    cell.textLabel.text = row.title;
+    cell.accessoryType = row.checked ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     
     return cell;
 }
@@ -116,8 +118,11 @@ static NSString * const kTitleColumn = @"title";
 - (void)add {
     NSError *error = nil;
     
-    [self.writeContext writeTable:kTableName usingBlock:^BOOL(TDBTable *table) {
-        [table addRow:@{kTitleColumn: [NSString stringWithFormat:@"Title %lu", (unsigned long)table.rowCount]}];
+    [self.writeContext writeUsingBlock:^BOOL(TDBTransaction *transaction) {
+        RLMDemoTable *table = [transaction tableWithName:kTableName asTableClass:[RLMDemoTable class]];
+        NSString *title = [NSString stringWithFormat:@"Title %lu", (unsigned long)table.rowCount];
+        BOOL checked = table.rowCount % 2;
+        [table addRow:@[title, checked ? @YES : @NO]];
         return YES;
     } error:&error];
     
