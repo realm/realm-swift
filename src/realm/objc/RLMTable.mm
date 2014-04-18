@@ -340,6 +340,31 @@ using namespace std;
                                  userInfo:nil];
 }
 
+-(RLMRow *)objectForKeyedSubscript:(NSString *)key
+{
+    // Currently only supporting first column lookup for RLMTypeString. Will add support for different
+    // columns when we have Mantle-like syntax
+    if ([self columnCount] < 1) {
+        @throw [NSException exceptionWithName:@"realm:column_not_defined"
+                                       reason:@"This table has no columns"
+                                     userInfo:nil];
+    }
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) {
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string"
+                                       reason:@"Column at index 0 must be of RLMTypeString"
+                                     userInfo:nil];
+    }
+    
+    NSUInteger index = [[[self where] stringIsEqualTo:key inColumnWithIndex:0] indexOfFirstMatchingRow];
+    
+    return index != (NSUInteger)NSNotFound ? [self rowAtIndex:index] : nil;
+}
+
+-(void)setObject:(id)newValue forKeyedSubscript:(NSString *)key
+{
+    
+}
+
 
 -(RLMRow *)rowAtIndex:(NSUInteger)ndx
 {

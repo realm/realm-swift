@@ -36,6 +36,13 @@ REALM_TABLE_9(TestTableAllTypes,
                 TableCol,  TestTableSub,
                 MixedCol,  Mixed)
 
+REALM_TABLE_2(TestTableKeyedSubscript,
+              name, String,
+              id, Int)
+
+REALM_TABLE_1(TestTableKeyedSubscriptError,
+              id, Int)
+
 @interface TDBTypedTableTests: XCTestCase
   // Intentionally left blank.
   // No new public instance methods need be defined.
@@ -136,6 +143,28 @@ REALM_TABLE_9(TestTableAllTypes,
     // Verify that you can access rows with object subscripting
     XCTAssertEqual(table[0].age, (int64_t)7, @"table[0].age");
     XCTAssertEqual(table[1].age, (int64_t)20, @"table[1].age");
+}
+
+- (void)testTableTyped_KeyedSubscripting
+{
+    TestTableKeyedSubscript* table = [[TestTableKeyedSubscript alloc] init];
+    
+    [table addRow:@{@"name" : @"Test1", @"id" : @24}];
+    [table addRow:@{@"name" : @"Test2", @"id" : @25}];
+    
+    XCTAssertNotNil(table[@"Test1"], @"table[@\"Test1\"] should not be nil");
+    XCTAssertEqualObjects(table[@"Test1"][@"name"], @"Test1", @"table[@\"Test24\"][@\"name\"] should be equal to Test1");
+    XCTAssertEqualObjects(table[@"Test1"][@"id"], @24, @"table[@\"Test24\"][@\"id\"] should be equal to @24");
+    
+    XCTAssertNotNil(table[@"Test2"], @"table[@\"Test2\"] should not be nil");
+    XCTAssertEqualObjects(table[@"Test2"][@"name"], @"Test2", @"table[@\"Test24\"][@\"name\"] should be equal to Test2");
+    XCTAssertEqualObjects(table[@"Test2"][@"id"], @25, @"table[@\"Test24\"][@\"id\"] should be equal to @25");
+    
+    XCTAssertNil(table[@"foo"], @"table[\"foo\"] should be nil");
+    
+    TestTableKeyedSubscriptError* errTable = [[TestTableKeyedSubscriptError alloc] init];
+    [errTable addRow:@{@"id" : @987289}];
+    XCTAssertThrows(errTable[@"X"], @"Accessing RLMRow via keyed subscript on a column that is not of type RLMTypeString should throw exception");
 }
 
 @end

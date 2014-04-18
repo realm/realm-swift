@@ -1107,6 +1107,35 @@ using namespace std;
     XCTAssertTrue([table[1][@"second"] isEqual:@"more test"], @"table[1].second");
 }
 
+- (void)testTableDynamic_KeyedSubscripting
+{
+    RLMTable* table = [[RLMTable alloc] init];
+    
+    [table addColumnWithName:@"name" type:RLMTypeString];
+    [table addColumnWithName:@"id" type:RLMTypeInt];
+    
+    [table addRow:@{@"name" : @"Test1", @"id" : @24}];
+    [table addRow:@{@"name" : @"Test2", @"id" : @25}];
+    
+    XCTAssertNotNil(table[@"Test1"], @"table[@\"Test1\"] should not be nil");
+    XCTAssertEqualObjects(table[@"Test1"][@"name"], @"Test1", @"table[@\"Test24\"][@\"name\"] should be equal to Test1");
+    XCTAssertEqualObjects(table[@"Test1"][@"id"], @24, @"table[@\"Test24\"][@\"id\"] should be equal to @24");
+    
+    XCTAssertNotNil(table[@"Test2"], @"table[@\"Test2\"] should not be nil");
+    XCTAssertEqualObjects(table[@"Test2"][@"name"], @"Test2", @"table[@\"Test24\"][@\"name\"] should be equal to Test2");
+    XCTAssertEqualObjects(table[@"Test2"][@"id"], @25, @"table[@\"Test24\"][@\"id\"] should be equal to @25");
+    
+    XCTAssertNil(table[@"foo"], @"table[\"foo\"] should be nil");
+    
+    RLMTable* errTable = [[RLMTable alloc] init];
+    
+    XCTAssertThrows(errTable[@"X"], @"Accessing RLMRow via keyed subscript on undefined column should throw exception");
+    
+    [errTable addColumnWithName:@"id" type:RLMTypeInt];
+    
+    XCTAssertThrows(errTable[@"X"], @"Accessing RLMRow via keyed subscript on a column that is not of type RLMTypeString should throw exception");
+}
+
 -(void)testTableDynamic_Row_Set
 {
     RLMTable *table = [[RLMTable alloc] init];
