@@ -187,13 +187,9 @@
     RLMTable *t = [[RLMTable alloc] init];
     NSUInteger dateCol = [t addColumnWithName:@"dateCol" type:RLMTypeDate];
     
-    
-    NSDateFormatter *formatter = [[NSDateFormatter alloc]init];
-    [formatter setDateFormat:@"MM/dd/yyyy hh:mm a"];
-    
-    NSDate *dateFirst   = [formatter dateFromString:@"01/01/2014 10:10 PM"];
-    NSDate *dateMiddle  = [formatter dateFromString:@"02/01/2014 10:10 PM"];
-    NSDate *dateLast    = [formatter dateFromString:@"03/01/2014 10:10 PM"];
+    NSDate *dateFirst  = [NSDate dateWithTimeIntervalSince1970:0];
+    NSDate *dateMiddle = [NSDate dateWithTimeIntervalSince1970:1];
+    NSDate *dateLast   = [NSDate dateWithTimeIntervalSince1970:2];
     
     [t addRow:nil];
     RLMRow *row = [t lastRow];
