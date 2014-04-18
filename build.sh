@@ -220,8 +220,8 @@ case "$MODE" in
 
         realm_cflags="$($tightdb_config_cmd --cflags)"           || exit 1
         realm_cflags_dbg="$($tightdb_config_dbg_cmd --cflags)"   || exit 1
-        tightdb_ldflags="$($tightdb_config_cmd --libs)"          || exit 1
-        tightdb_ldflags_dbg="$($tightdb_config_dbg_cmd --libs)"  || exit 1
+        realm_ldflags="$($tightdb_config_cmd --libs)"            || exit 1
+        realm_ldflags_dbg="$($tightdb_config_dbg_cmd --libs)"    || exit 1
 
         tightdb_includedir="$($tightdb_config_cmd --includedir)" || exit 1
         tightdb_libdir="$($tightdb_config_cmd --libdir)"         || exit 1
@@ -241,10 +241,10 @@ case "$MODE" in
 
         cflags="-I$tightdb_includedir"
         ldflags="-L$tightdb_libdir -Wl,-rpath,$tightdb_rpath"
-        word_list_prepend "realm_cflags"        "$cflags"  || exit 1
-        word_list_prepend "realm_cflags_dbg"    "$cflags"  || exit 1
-        word_list_prepend "tightdb_ldflags"     "$ldflags" || exit 1
-        word_list_prepend "tightdb_ldflags_dbg" "$ldflags" || exit 1
+        word_list_prepend "realm_cflags"      "$cflags"   || exit 1
+        word_list_prepend "realm_cflags_dbg"  "$cflags"   || exit 1
+        word_list_prepend "realm_ldflags"     "$ldflags"  || exit 1
+        word_list_prepend "realm_ldflags_dbg" "$ldflags"  || exit 1
 
         # Find Xcode
         xcode_home="none"
@@ -326,8 +326,8 @@ REALM_CONFIG        = $tightdb_config_cmd
 REALM_VERSION       = $realm_version
 REALM_CFLAGS        = $realm_cflags
 REALM_CFLAGS_DBG    = $realm_cflags_dbg
-TIGHTDB_LDFLAGS     = $tightdb_ldflags
-TIGHTDB_LDFLAGS_DBG = $tightdb_ldflags_dbg
+REALM_LDFLAGS       = $realm_ldflags
+REALM_LDFLAGS_DBG   = $realm_ldflags_dbg
 XCODE_HOME          = $xcode_home
 IPHONE_SDKS         = ${iphone_sdks:-none}
 IPHONE_SDKS_AVAIL   = $iphone_sdks_avail
