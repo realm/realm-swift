@@ -35,6 +35,8 @@
                               notificationCenter:(NSNotificationCenter *)notificationCenter
                                            error:(NSError **)error;
 
+// Get table with specified name and optional table class
 -(TDBTable *)tableWithName:(NSString *)name;
+-(id)tableWithName:(NSString *)name asTableClass:(Class)obj;
 
 @end
