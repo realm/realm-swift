@@ -455,8 +455,8 @@ EOF
 	cp iphone-lib/libtightdb-objc-ios.a "$FRAMEWORK/Realm" || exit 1
 	cp iphone-lib/include/realm/objc/*.h "$FRAMEWORK/Headers" || exit 1
 	(cd "$FRAMEWORK/Headers" && mv realm.h Realm.h) || exit 1
-	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/import <tightdb\/objc\/\(.*\)>/import "\1"/g' {} \; || exit 1
-	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/include <tightdb\/objc\/\(.*\)>/include "\1"/g' {} \; || exit 1
+	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/import <realm\/objc\/\(.*\)>/import "\1"/g' {} \; || exit 1
+	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/include <realm\/objc\/\(.*\)>/include "\1"/g' {} \; || exit 1
 	zip -r -q realm-ios-$tightdb_version.zip $FRAMEWORK || exit 1
 	echo "Framework for iOS can be found in realm-ios-$tightdb_version.zip"
 	exit 0
