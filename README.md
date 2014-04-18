@@ -92,7 +92,7 @@ iPhoneOS and iPhoneSimulator SDKs for Xcode are installed.
 It also requires that a prebuilt version of the core library for iOS
 is available. By default, the configuration step will look for it in
 `../tightdb/iphone_lib`. If this is not the correct location of it,
-set the environment variable TIGHTDB_IPHONE_CORE_LIB to the correct
+set the environment variable REALM_IPHONE_CORE_LIB to the correct
 path before invoking the configuration step.
 
 Run the following command to build the Objective-C language binding
