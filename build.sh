@@ -216,7 +216,7 @@ case "$MODE" in
         if ! [ -x "$tightdb_config_dbg_cmd" ]; then
             realm_abort "ERROR: Realm config-program '$tightdb_config_dbg_cmd' not found" "Cannot find '$tightdb_config_dbg_cmd' - skipping"
         fi
-        tightdb_version="$($tightdb_config_cmd --version)" || exit 1
+        realm_version="$($tightdb_config_cmd --version)"         || exit 1
 
         tightdb_cflags="$($tightdb_config_cmd --cflags)"         || exit 1
         tightdb_cflags_dbg="$($tightdb_config_dbg_cmd --cflags)" || exit 1
@@ -323,7 +323,7 @@ INSTALL_BINDIR      = $install_bindir
 INSTALL_LIBDIR      = $install_libdir
 INSTALL_LIBEXECDIR  = $install_libexecdir
 REALM_CONFIG        = $tightdb_config_cmd
-TIGHTDB_VERSION     = $tightdb_version
+REALM_VERSION       = $realm_version
 TIGHTDB_CFLAGS      = $tightdb_cflags
 TIGHTDB_CFLAGS_DBG  = $tightdb_cflags_dbg
 TIGHTDB_LDFLAGS     = $tightdb_ldflags
@@ -343,10 +343,10 @@ EOF
 
     "get-version")
 	version_file="src/realm/objc/RLMVersion.h"
-	tightdb_version_major="$(grep TDB_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	tightdb_version_minor="$(grep TDB_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	tightdb_version_patch="$(grep TDB_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	echo "$tightdb_version_major.$tightdb_version_minor.$tightdb_version_patch"
+	realm_version_major="$(grep TDB_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+	realm_version_minor="$(grep TDB_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+	realm_version_patch="$(grep TDB_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+	echo "$realm_version_major.$realm_version_minor.$realm_version_patch"
 	exit 0
 	;;
 
@@ -355,11 +355,11 @@ EOF
 	    echo "You can only set version when running Mac OS X"
 	    exit 1
 	fi
-        tightdb_version="$1"
+        realm_version="$1"
         version_file="src/realm/objc/RLMVersion.h"
-        tightdb_ver_major="$(echo "$tightdb_version" | cut -f1 -d.)" || exit 1
-        tightdb_ver_minor="$(echo "$tightdb_version" | cut -f2 -d.)" || exit 1
-        tightdb_ver_patch="$(echo "$tightdb_version" | cut -f3 -d.)" || exit 1
+        tightdb_ver_major="$(echo "$realm_version" | cut -f1 -d.)" || exit 1
+        tightdb_ver_minor="$(echo "$realm_version" | cut -f2 -d.)" || exit 1
+        tightdb_ver_patch="$(echo "$realm_version" | cut -f3 -d.)" || exit 1
 
 	sed -i '' -e "s/TDB_VERSION_MAJOR .*$/TDB_VERSION_MAJOR $tightdb_ver_major/" $version_file || exit 1
 	sed -i '' -e "s/TDB_VERSION_MINOR .*$/TDB_VERSION_MINOR $tightdb_ver_minor/" $version_file || exit 1
@@ -448,7 +448,7 @@ EOF
 	    echo "Framework for iOS can only be generated under Mac OS X"
 	    exit 0
 	fi
-	tightdb_version="$(sh build.sh get-version)"
+	realm_version="$(sh build.sh get-version)"
 	FRAMEWORK=Realm.framework
 	rm -rf "$FRAMEWORK" realm-ios*.zip || exit 1
 	mkdir -p "$FRAMEWORK/Headers" || exit 1
@@ -457,8 +457,8 @@ EOF
 	(cd "$FRAMEWORK/Headers" && mv realm.h Realm.h) || exit 1
 	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/import <realm\/objc\/\(.*\)>/import "\1"/g' {} \; || exit 1
 	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/include <realm\/objc\/\(.*\)>/include "\1"/g' {} \; || exit 1
-	zip -r -q realm-ios-$tightdb_version.zip $FRAMEWORK || exit 1
-	echo "Framework for iOS can be found in realm-ios-$tightdb_version.zip"
+	zip -r -q realm-ios-$realm_version.zip $FRAMEWORK || exit 1
+	echo "Framework for iOS can be found in realm-ios-$realm_version.zip"
 	exit 0
 	;;
 
