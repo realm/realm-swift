@@ -273,23 +273,23 @@ using namespace std;
     // TODO: capture this in a macro or function, shared group constructor uses the same pattern.
     catch (tightdb::util::File::PermissionDenied& ex) {
         if (error) // allow nil as the error argument
-            *error = make_realm_error(tdb_err_File_PermissionDenied, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_realm_error(RLMErrorFilePermissionDenied, [NSString stringWithUTF8String:ex.what()]);
         return nil;
     }
     catch (tightdb::util::File::Exists& ex) {
         if (error) // allow nil as the error argument
-            *error = make_realm_error(tdb_err_File_Exists, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_realm_error(RLMErrorFileExists, [NSString stringWithUTF8String:ex.what()]);
         return nil;
         
     }
     catch (tightdb::util::File::AccessError& ex) {
         if (error) // allow nil as the error argument
-            *error = make_realm_error(tdb_err_File_AccessError, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_realm_error(RLMErrorFileAccessError, [NSString stringWithUTF8String:ex.what()]);
         return nil;
     }
     catch (std::exception& ex) {
         if (error) // allow nil as the error argument
-            *error = make_realm_error(tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_realm_error(RLMErrorFail, [NSString stringWithUTF8String:ex.what()]);
         return nil;
     }
     group->m_is_owned  = YES;
@@ -311,7 +311,7 @@ using namespace std;
     }
     catch (tightdb::InvalidDatabase& ex) {
         if (error) // allow nil as the error argument
-            *error = make_realm_error(tdb_err_InvalidDatabase, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_realm_error(RLMErrorInvalidDatabase, [NSString stringWithUTF8String:ex.what()]);
         return nil;
     }
     catch (std::exception& ex) {
@@ -339,22 +339,22 @@ using namespace std;
     // Except, here, we return no instead of nil.
     catch (tightdb::util::File::PermissionDenied& ex) {
         if (error) // allow nil as the error argument
-            *error = make_realm_error(tdb_err_File_PermissionDenied, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_realm_error(RLMErrorFilePermissionDenied, [NSString stringWithUTF8String:ex.what()]);
         return NO;
     }
     catch (tightdb::util::File::Exists& ex) {
         if (error) // allow nil as the error argument
-            *error = make_realm_error(tdb_err_File_Exists, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_realm_error(RLMErrorFileExists, [NSString stringWithUTF8String:ex.what()]);
         return NO;
     }
     catch (tightdb::util::File::AccessError& ex) {
         if (error) // allow nil as the error argument
-            *error = make_realm_error(tdb_err_File_AccessError, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_realm_error(RLMErrorFileAccessError, [NSString stringWithUTF8String:ex.what()]);
         return NO;
     }
     catch (std::exception& ex) {
         if (error) // allow nil as the error argument
-            *error = make_realm_error(tdb_err_Fail, [NSString stringWithUTF8String:ex.what()]);
+            *error = make_realm_error(RLMErrorFail, [NSString stringWithUTF8String:ex.what()]);
         return NO;
     }
     return YES;
