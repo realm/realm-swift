@@ -9,7 +9,7 @@
 # TODO: describe which column-types the methods can be used on.
 
 ID         : class_typed_query
-TITLE      : TDBQuery (typed)
+TITLE      : RLMQuery (typed)
 SUMMARY    : *g_typed_query_intro_summary
 DESCR      : *g_typed_query_intro_descr
 SEE        :
