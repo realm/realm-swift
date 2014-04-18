@@ -3,11 +3,11 @@
 #
 
 ID         : class_dyn_table
-TITLE      : TDBTable (dynamic)
+TITLE      : RLMTable (dynamic)
 SUMMARY    : *g_dyn_table_intro_summary
 DESCR      :
 - TEXT     : >
-             The TDBTable class is the core of the TightDB framework. The
+             The RLMTable class is the core of the Realm framework. The
              class is used to store and manipulate data in terms of
              columns and rows.
 - TEXT     : *g_dyn_table_intro_descr_dynamic
@@ -42,25 +42,25 @@ CATEGORIES :
        TYPES  : NSArray
        DESCR  : |
                 Column names and types. The types are encoded as strings, and
-                the mapping between a string and a TightDB type is:
+                the mapping between a string and a Realm type is:
 
                 <table>
                   <thead>
-                    <tr><th>String</th><th>TightDB type</th></tr>
+                    <tr><th>String</th><th>Realm type</th></tr>
                   </thead>
                   <tbody>
-                   <tr><td>"bool"</td><td>TDBBoolType</td></tr>
-                   <tr><td>"int"</td><td>TDBIntType</td></tr>
-                   <tr><td>"float"</td><td>TDBFloatType</td></tr>
-                   <tr><td>"double"</td><td>TDBDoubleType</td></tr>
-                   <tr><td>"string"</td><td>TDBStringType</td></tr>
-                   <tr><td>"binary"</td><td>TDBBinaryType</td></tr>
-                   <tr><td>"date"</td><td>TDBDateType</td></tr>
-                   <tr><td>"mixed"</td><td>TDBMixedType</td></tr>
+                   <tr><td>"bool"</td><td>RLMTypeBool</td></tr>
+                   <tr><td>"int"</td><td>RLMTypeInt</td></tr>
+                   <tr><td>"float"</td><td>RLMTypeFloat</td></tr>
+                   <tr><td>"double"</td><td>RLMTypeDouble</td></tr>
+                   <tr><td>"string"</td><td>RLMTypeString</td></tr>
+                   <tr><td>"binary"</td><td>RLMTypeBinary</td></tr>
+                   <tr><td>"date"</td><td>RLMTypeDate</td></tr>
+                   <tr><td>"mixed"</td><td>RLMTypeMixed</td></tr>
                  </tbody>
                 </table>
 
-                The table column type (TDBTableType) is encoded as an <code>NSArray</code>.
+                The table column type (RLMTypeTable) is encoded as an <code>NSArray</code>.
      EXAMPLES:
      - CODE   : ex_objc_dyn_table_init_with_columns
        DESCR  :
@@ -97,7 +97,7 @@ CATEGORIES :
       DESCR    : >
                  The property holds the descriptor (see @{link
                  class_descriptor}) of the class.
-      SIGNATURE: "@property (nonatomic, readonly) TDBDescriptor descriptor"
+      SIGNATURE: "@property (nonatomic, readonly) RLMDescriptor descriptor"
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_descriptor
         DESCR  :
@@ -144,10 +144,10 @@ CATEGORIES :
       NAME     : "isEqual"
       SUMMARY  : *g_dyn_table_operator_eq_summary
       DESCR    : *g_dyn_table_operator_eq_descr
-      SIGNATURE: (BOOL)isEqual:(TDBTable *)other
+      SIGNATURE: (BOOL)isEqual:(RLMTable *)other
       PARAMS:
       - NAME   : other
-        TYPES  : TDBTable *
+        TYPES  : RLMTable *
         DESCR  : *g_dyn_table_operator_eq_table_descr
       RETURN:
         TYPES  : BOOL
@@ -178,10 +178,10 @@ CATEGORIES :
       NAME     : is???Equal
       SUMMARY  : *g_dyn_table_operator_neq_summary
       DESCR    : *g_dyn_table_operator_neq_descr
-      SIGNATURE: (BOOL)isEqual:(TightdbTable *)other
+      SIGNATURE: (BOOL)isEqual:(RLMTable *)other
       PARAMS:
       - NAME   : other
-        TYPES  : TightdbTable *
+        TYPES  : RLMTable *
         DESCR  : *g_dyn_table_operator_eq_table_descr
       RETURN:
         TYPES  : BOOL
@@ -200,25 +200,25 @@ CATEGORIES :
       - TEXT   : *g_dyn_table_add_column_descr
       - TEXT   : &objc_column_types
                 >
-                Currently, the following types are supported (declared in <code>TDBType.h</code>):
+                Currently, the following types are supported (declared in <code>RLMType.h</code>):
                  <ul>
-                   <li><code>TDBBoolType</code></li>
-                   <li><code>TDBIntType</code></li>
-                   <li><code>TDBFloatType</code></li>
-                   <li><code>TDBDoubleType</code></li>
-                   <li><code>TDBStringType</code></li>
-                   <li><code>TDBBinaryType</code></li>
-                   <li><code>TDBTableType</code></li>
-                   <li><code>TDBDateType</code></li>
-                   <li><code>TDBMixedType</code></li>
+                   <li><code>RLMTypeBool</code></li>
+                   <li><code>RLMTypeInt</code></li>
+                   <li><code>RLMTypeFloat</code></li>
+                   <li><code>RLMTypeDouble</code></li>
+                   <li><code>RLMTypeString</code></li>
+                   <li><code>RLMTypeBinary</code></li>
+                   <li><code>RLMTypeTable</code></li>
+                   <li><code>RLMTypeDate</code></li>
+                   <li><code>RLMTypeMixed</code></li>
                  </ul>
-      SIGNATURE: (NSUInteger)addColumnWithName:(NSString *)name type:(TDBType)type
+      SIGNATURE: (NSUInteger)addColumnWithName:(NSString *)name type:(RLMType)type
       PARAMS:
       - NAME   : name
         TYPES  : NSString *
         DESCR  : *g_dyn_table_add_column_param2_descr
       - NAME   : type
-        TYPES  : TDBType
+        TYPES  : RLMType
         DESCR  : *g_dyn_table_add_column_param1_descr
       RETURN:
         TYPES  : NSUInteger
@@ -294,13 +294,13 @@ CATEGORIES :
       DESCR    :
       - TEXT   : *g_dyn_table_get_column_type_descr1
       - TEXT   : *objc_column_types
-      SIGNATURE: (TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex
+      SIGNATURE: (RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
       - NAME   : colIndex
         TYPES  : NSUInteger
         DESCR  : *g_dyn_table_get_column_type_parm1_descr
       RETURN:
-        TYPES  : TDBType
+        TYPES  : RLMType
         DESCR  :
         - TEXT : *g_dyn_table_get_column_type_return1_descr
         - TEXT : *objc_column_types
@@ -312,7 +312,7 @@ CATEGORIES :
       NAME     : "mixedTypeForColumnWithIndex:rowIndex:"
       SUMMARY  : Get the type of a mixed value.
       DESCR    : The method returns the type of a mixed typed value.
-      SIGNATURE: -(TDBType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
+      SIGNATURE: -(RLMType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME   : colIndex
         TYPES  : NSUInteger
@@ -321,7 +321,7 @@ CATEGORIES :
         TYPES  : NSUInteger
         DESCR  : The row index.
       RETURN:
-        TYPES  : TDBType
+        TYPES  : RLMType
         DESCR  :
         - TEXT : *g_dyn_table_get_column_type_return1_descr
         - TEXT : *objc_column_types
@@ -336,31 +336,31 @@ CATEGORIES :
       NAME     : "rowAtIndex:"
       SUMMARY  : Returns a row object at a specified row number.
       DESCR    : The method returns a row object at a specific row number.
-      SIGNATURE: "(TDBRow *)rowAtIndex:(NSUInteger)rowIndex"
+      SIGNATURE: "(RLMRow *)rowAtIndex:(NSUInteger)rowIndex"
       PARAMS:
       - NAME   : rowIndex
         TYPES  : NSUInteger
         DESCR  : The row number.
       RETURN:
-        TYPES  : TDBRow *
+        TYPES  : RLMRow *
         DESCR  : The row.
 
   - g_dyn_table_cursor_at_first_index:
       NAME     : firstRow
       SUMMARY  : Returns the first row.
       DESCR    : The method returns the first row in the table.
-      SIGNATURE: "(TDBRow *)lastRow"
+      SIGNATURE: "(RLMRow *)lastRow"
       RETURN:
-        TYPES  : TDBRow *
+        TYPES  : RLMRow *
         DESCR  : The row.
 
   - g_dyn_table_cursor_at_last_index:
       NAME     : lastRow
       SUMMARY  : Returns the last row.
       DESCR    : The method returns the last row in the table.
-      SIGNATURE: "(TDBRow *)lastRow"
+      SIGNATURE: "(RLMRow *)lastRow"
       RETURN:
-        TYPES  : TDBRow *
+        TYPES  : RLMRow *
         DESCR  : The row.
 
   - g_dyn_table_insert_empty_row:
@@ -368,13 +368,13 @@ CATEGORIES :
       NAME     : "insertEmptyRowAtIndex:"
       SUMMARY  : *g_dyn_table_insert_empty_row_summary
       DESCR    : *g_dyn_table_insert_empty_row_descr
-      SIGNATURE: (TDBRow *)insertEmptyRowAtIndex:(NSUInteger)rowIndex
+      SIGNATURE: (RLMRow *)insertEmptyRowAtIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME   : rowIndex
         TYPES  : NSUInteger
         DESCR  : *g_dyn_table_insert_empty_row_parm1_descr
       RETURN:
-        TYPES  : TDBRow *
+        TYPES  : RLMRow *
         DESCR  : Returns the inserted row.
 
   - objc_dyn_table_insert_object:
@@ -444,9 +444,9 @@ CATEGORIES :
 #                 (void)insertDouble:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(double)value
 #                 (void)insertDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(time_t)value
 #                 (void)insertString:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(NSString *)value
-#                 (void)insertBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(TightdbBinary *)value
+#                 (void)insertBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(RLMTypeBinary *)value
 #                 (void)insertBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx data:(const char *)data size:(NSUInteger)size
-#                 (void)insertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(TightdbMixed *)value
+#                 (void)insertMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(RLMTypeMixed *)value
 #                 (void)insertSubtable:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx
 #                 (void)insertDone
 #TODO: does insertBinary with direct char*/size exist?
@@ -458,7 +458,7 @@ CATEGORIES :
 #        TYPES  : NSUInteger
 #        DESCR  : *g_dyn_table_insert_parm2_descr
 #      - NAME   : value
-#        TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, TightdbBinary*, const char*, TightdbMixed*]
+#        TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, RLMTypeBinary*, const char*, RLMTypeMixed*]
 #        DESCR  : *g_dyn_table_insert_parm3_descr
 #      - NAME   : data
 #        TYPES  : const char *
@@ -544,7 +544,7 @@ CATEGORIES :
                  #(TightdbMixed *)getMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx
                  #(TightdbType)getMixedType:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx
 
-                 #(TightdbTable *)getSubtable:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(RLMTable *)getSubtable:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
                  #(id)getSubtable:(NSUInteger)col_ndx ndx:(NSUInteger)ndx withClass:(__unsafe_unretained Class)classObj
 #TODO: What's the last method about?
 
@@ -785,7 +785,7 @@ CATEGORIES :
         TYPES  : BOOL
         DESCR  : *g_dyn_table_get_sorted_view_parm2_descr
       RETURN:
-        TYPES  : TightdbView *
+        TYPES  : RLMView *
         DESCR  : *g_dyn_table_get_sorted_view_return_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_get_sorted_view
@@ -797,13 +797,13 @@ CATEGORIES :
       NAMES    : "distinctValuesInColumnWithIndex:"
       SUMMARY  : *g_dyn_table_distinct_summary
       DESCR    : *g_dyn_table_distinct_desc
-      SIGNATURE: -(TDBView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
+      SIGNATURE: -(RLMView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
       PARAMS:
       - NAME   : colIndex
         TYPES  : NSUInteger
-        DESCR  : "The column index. <strong>NOTE!</strong> Currently only supported on <code>TDBStringType</code> columns."
+        DESCR  : "The column index. <strong>NOTE!</strong> Currently only supported on <code>RLMTypeString</code> columns."
       RETURN:
-        TYPES  : TDBView *
+        TYPES  : RLMView *
         DESCR  : *g_dyn_table_distinct_return_desc
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_distinct
@@ -814,47 +814,47 @@ CATEGORIES :
       SUMMARY  : Find matching row using an NSPredicate
       DESCR    : >
                  This method allow you to find a row using a predicate string or NSPredicate object.
-      SIGNATURE: -(TDBRow *)find:(id)condition;
+      SIGNATURE: -(RLMRow *)find:(id)condition;
       PARAMS:
       - NAME   : condition
         TYPES  : [NSString, NSPredicate]
         DESCR  : NOTE! We only support compound predicates and those comparing columns to constant values.
       RETURN:
-        TYPES  : [TDBRow, nil]
+        TYPES  : [RLMRow, nil]
         DESCR  : The first matching row or nil if there is no match
 
   - g_dyn_table_where_predicate:
       NAMES    : ["where:", "where:orderBy:"]
-      SUMMARY  : Create a filtered TDBView using an NSPredicate and NSSortDescriptor
+      SUMMARY  : Create a filtered RLMView using an NSPredicate and NSSortDescriptor
       DESCR    : >
-                 These methods allow you to create a TDBView using a predicate string or NSPredicate object.
+                 These methods allow you to create a RLMView using a predicate string or NSPredicate object.
                  The first variant takes a predicate as string or as fully constructed NSPredicate and creates
-                 a TDBView. The second variant also takes a column name or NSSortDescriptor to support ordering.
+                 a RLMView. The second variant also takes a column name or NSSortDescriptor to support ordering.
                  Both variants support AND and OR compound predicats, and comparison of constant values against
                  column names.
       SIGNATURE: |
-                 -(TDBView *)where:(id)condition;
-                 -(TDBView *)where:(id)condition orderBy:(id)order;
+                 -(RLMView *)where:(id)condition;
+                 -(RLMView *)where:(id)condition orderBy:(id)order;
       PARAMS:
       - NAME   : condition
         TYPES  : [NSString, NSPredicate]
         DESCR  : NOTE! We only support compound predicates and those comparing columns to constant values.
       - NAME   : order
         TYPES  : [NSString, NSSortDescriptor]
-        DESCR  : NOTE! Sort only supported on columns of type TDBIntegerType, TDBBoolType and TDBDateType.
+        DESCR  : NOTE! Sort only supported on columns of type RLMTypeInteger, RLMTypeBool and RLMTypeDate.
       RETURN:
-        TYPES  : TDBView *
+        TYPES  : RLMView *
         DESCR  : The filtered and/or sorted view
 
   - g_dyn_table_where_const:
       IGNORE   : ""
   - g_dyn_table_where:
       NAME     : where
-      SIGNATURE: (TDBQuery *)where
+      SIGNATURE: (RLMQuery *)where
       SUMMARY  : *g_dyn_table_where_summary
       DESCR    : *g_dyn_table_where_descr
       RETURN:
-        TYPES  : TDBQuery *
+        TYPES  : RLMQuery *
         DESCR  : *g_dyn_table_where_return_descr
       EXAMPLES:
       - DESCR  :
