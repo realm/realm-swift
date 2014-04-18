@@ -25,13 +25,34 @@
 #import "TDBTransaction_noinst.h"
 #import "util_noinst.hpp"
 
+#import "TDBCrashReportingAgentLauncher.h"
+
+
+#define TDB_CRASH_REPORTING_ENABLED 1
+
+
 using namespace std;
 
+#ifdef TDB_CRASH_REPORTING_ENABLED
+static TDBCrashReportingAgentLauncher* s_agentLauncher = nil;
+#endif
 
 @implementation TDBContext
 {
     tightdb::util::UniquePtr<tightdb::SharedGroup> m_shared_group;
 }
+
+#ifdef TDB_CRASH_REPORTING_ENABLED
++ (void)startCrashReporter
+{
+    static dispatch_once_t once;
+    
+    dispatch_once(&once, ^{
+        s_agentLauncher = [[TDBCrashReportingAgentLauncher alloc] init];
+        [s_agentLauncher startCrashReporter];
+    });
+}
+#endif
 
 NSString *const defaultContextFileName = @"default.tightdb";
 
@@ -43,6 +64,10 @@ NSString *const defaultContextFileName = @"default.tightdb";
 
 +(TDBContext *)contextWithDefaultPersistence
 {
+#ifdef TDB_CRASH_REPORTING_ENABLED
+    [TDBContext startCrashReporter];
+#endif
+
     NSString *path = [TDBContext writeablePathForFile:defaultContextFileName];
     return [self contextPersistedAtPath:path error:nil];
 }
@@ -58,6 +83,10 @@ NSString *const defaultContextFileName = @"default.tightdb";
 
 +(TDBContext*)contextPersistedAtPath:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
 {
+#ifdef TDB_CRASH_REPORTING_ENABLED
+    [TDBContext startCrashReporter];
+#endif
+
     TDBContext* shared_group = [[TDBContext alloc] init];
     if (!shared_group)
         return nil;

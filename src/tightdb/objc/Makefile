@@ -13,7 +13,8 @@ lib_LIBRARIES = libtightdb-objc.a
 
 libtightdb_objc_a_SOURCES = TDBConstants.m TDBTable.mm TDBRow.mm TDBTransaction.mm TDBQuery.mm \
 TDBContext.mm TDBSmartContext.mm util.mm TDBVersion.mm TDBDescriptor.mm TDBView.mm \
-TDBColumnProxy.mm NSData+TDBGetBinaryData.mm
+TDBColumnProxy.mm NSData+TDBGetBinaryData.mm TDBCrashReportingAgentLauncher.mm
+
 
 libtightdb_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2
 libtightdb_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
