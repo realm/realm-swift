@@ -257,34 +257,26 @@ void throw_objc_exception(exception &ex)
 
 -(id)tableWithName:(NSString *)name asTableClass:(__unsafe_unretained Class)class_obj
 {
-    // FIXME: Why impose this restriction? Isn't it kind of arbitrary?
-    // The core library has no problems with an empty table name. What
-    // if the database was created through a different language
-    // binding without this restriction?
-    if ([name length] == 0) {
-        // FIXME: Exception name must be `TDBException` according to
-        // the exception naming conventions of the official Cocoa
-        // style guide. The same is true for most (if not all) of the
-        // exceptions we throw.
-        @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
-                                       reason:@"Name must be a non-empty NSString"
-                                     userInfo:nil];
-    }
-    
-    // If table does not exist in context, return nil
     ObjcStringAccessor name_2(name);
     if (!_group->has_table(name_2))
         return nil;
-    
-    TDBTable* table = [[class_obj alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table))
-        return nil;
-    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
-        ConstTableRef table_2 = _group->get_table(name_2);
+    TDBTable *table = [[class_obj alloc] _initRaw];
+    size_t indexInGroup;
+    try {
+        ConstTableRef table_2 = _group->get_table(name_2); // Throws
+        // Note: Const spoofing is alright, because the
+        // Objective-C table accessor is in 'read-only' mode.
         [table setNativeTable:const_cast<Table*>(table_2.get())];
-    )
+        indexInGroup = table_2->get_index_in_parent();
+    }
+    catch (exception &ex) {
+        throw_objc_exception(ex);
+    }
     [table setParent:self];
     [table setReadOnly:YES];
+    TDBPrivateWeakTableReference *weakTableRef =
+    [[TDBPrivateWeakTableReference alloc] initWithTable:table indexInGroup:indexInGroup];
+    [_weakTableRefs addObject:weakTableRef];
     return table;
 }
 
