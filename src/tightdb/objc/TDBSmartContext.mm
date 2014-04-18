@@ -255,6 +255,39 @@ void throw_objc_exception(exception &ex)
     return table;
 }
 
+-(id)tableWithName:(NSString *)name asTableClass:(__unsafe_unretained Class)class_obj
+{
+    // FIXME: Why impose this restriction? Isn't it kind of arbitrary?
+    // The core library has no problems with an empty table name. What
+    // if the database was created through a different language
+    // binding without this restriction?
+    if ([name length] == 0) {
+        // FIXME: Exception name must be `TDBException` according to
+        // the exception naming conventions of the official Cocoa
+        // style guide. The same is true for most (if not all) of the
+        // exceptions we throw.
+        @throw [NSException exceptionWithName:@"tightdb:table_name_exception"
+                                       reason:@"Name must be a non-empty NSString"
+                                     userInfo:nil];
+    }
+    
+    // If table does not exist in context, return nil
+    ObjcStringAccessor name_2(name);
+    if (!_group->has_table(name_2))
+        return nil;
+    
+    TDBTable* table = [[class_obj alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!table))
+        return nil;
+    TIGHTDB_EXCEPTION_HANDLER_CORE_EXCEPTION(
+        ConstTableRef table_2 = _group->get_table(name_2);
+        [table setNativeTable:const_cast<Table*>(table_2.get())];
+    )
+    [table setParent:self];
+    [table setReadOnly:YES];
+    return table;
+}
+
 - (void)tableRefDidDie
 {
     _tableRefsHaveDied = YES;
