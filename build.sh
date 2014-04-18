@@ -301,8 +301,8 @@ case "$MODE" in
         fi
 
         iphone_core_lib="none"
-        if [ "$TIGHTDB_IPHONE_CORE_LIB" ]; then
-            iphone_core_lib="$TIGHTDB_IPHONE_CORE_LIB"
+        if [ "$REALM_IPHONE_CORE_LIB" ]; then
+            iphone_core_lib="$REALM_IPHONE_CORE_LIB"
             if ! printf "%s\n" "$iphone_core_lib" | grep -q '^/'; then
                 iphone_core_lib="$ORIG_CWD/$iphone_core_lib"
             fi
