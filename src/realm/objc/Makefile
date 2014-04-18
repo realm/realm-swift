@@ -9,14 +9,14 @@ RLMFast.h RLMRowFast.h
 
 nobase_subinclude_HEADERS_EXTRA_UNINSTALL = *.h
 
-lib_LIBRARIES = libtightdb-objc.a
+lib_LIBRARIES = librealm-objc.a
 
-libtightdb_objc_a_SOURCES = RLMConstants.m RLMTable.mm RLMRow.mm RLMTransaction.mm RLMQuery.mm \
+librealm_objc_a_SOURCES = RLMConstants.m RLMTable.mm RLMRow.mm RLMTransaction.mm RLMQuery.mm \
 RLMContext.mm RLMSmartContext.mm util.mm RLMVersion.mm RLMDescriptor.mm RLMView.mm \
 RLMColumnProxy.mm NSData+RLMGetBinaryData.mm
 
-libtightdb_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2
-libtightdb_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
+librealm_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2
+librealm_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
 
 # Format: CURRENT[:REVISION[:AGE]]
 #
@@ -37,7 +37,7 @@ libtightdb_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
 # The meaning of this version string is identical to the one defined
 # by GNU Libtool. See also
 # http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning
-libtightdb_objc_a_VERSION = 4:0:0
+librealm_objc_a_VERSION = 4:0:0
 
 
 # Code generation

@@ -378,7 +378,7 @@ EOF
             if [ -e "$IPHONE_DIR" ]; then
                 echo "Removing '$IPHONE_DIR'"
                 rm -fr "$IPHONE_DIR/include" || exit 1
-                rm -f "$IPHONE_DIR/libtightdb-objc-ios.a" "$IPHONE_DIR/libtightdb-objc-ios-dbg.a" || exit 1
+                rm -f "$IPHONE_DIR/librealm-objc-ios.a" "$IPHONE_DIR/librealm-objc-ios-dbg.a" || exit 1
                 rmdir "$IPHONE_DIR" || exit 1
             fi
         fi
@@ -423,18 +423,18 @@ EOF
                 word_list_append "cflags_arch" "-arch $y" || exit 1
             done
             sdk_root="$xcode_home/Platforms/$platform.platform/Developer/SDKs/$sdk"
-            $MAKE -C "src/realm/objc" "libtightdb-objc-$platform.a" "libtightdb-objc-$platform-dbg.a" BASE_DENOM="$platform" CFLAGS_ARCH="$cflags_arch -isysroot $sdk_root -I$iphone_include" || exit 1
+            $MAKE -C "src/realm/objc" "librealm-objc-$platform.a" "librealm-objc-$platform-dbg.a" BASE_DENOM="$platform" CFLAGS_ARCH="$cflags_arch -isysroot $sdk_root -I$iphone_include" || exit 1
             mkdir "$temp_dir/$platform" || exit 1
-            cp "src/realm/objc/libtightdb-objc-$platform.a"     "$temp_dir/$platform/libtightdb-objc.a"     || exit 1
-            cp "src/realm/objc/libtightdb-objc-$platform-dbg.a" "$temp_dir/$platform/libtightdb-objc-dbg.a" || exit 1
+            cp "src/realm/objc/librealm-objc-$platform.a"     "$temp_dir/$platform/librealm-objc.a"     || exit 1
+            cp "src/realm/objc/librealm-objc-$platform-dbg.a" "$temp_dir/$platform/librealm-objc-dbg.a" || exit 1
         done
         mkdir -p "$IPHONE_DIR" || exit 1
-        realm_echo "Creating '$IPHONE_DIR/libtightdb-objc-ios.a'"
-        lipo "$temp_dir"/*/"libtightdb-objc.a" -create -output "$temp_dir/libtightdb-objc-ios.a" || exit 1
-        libtool -static -o "$IPHONE_DIR/libtightdb-objc-ios.a" "$temp_dir/libtightdb-objc-ios.a" $(tightdb-config --libs) -L"$iphone_core_lib" || exit 1
-        realm_echo "Creating '$IPHONE_DIR/libtightdb-objc-ios-dbg.a'"
-        lipo "$temp_dir"/*/"libtightdb-objc-dbg.a" -create -output "$temp_dir/libtightdb-objc-ios-dbg.a" || exit 1
-        libtool -static -o "$IPHONE_DIR/libtightdb-objc-ios-dbg.a" "$temp_dir/libtightdb-objc-ios-dbg.a" $(tightdb-config-dbg --libs) -L"$iphone_core_lib" || exit 1
+        realm_echo "Creating '$IPHONE_DIR/librealm-objc-ios.a'"
+        lipo "$temp_dir"/*/"librealm-objc.a" -create -output "$temp_dir/librealm-objc-ios.a" || exit 1
+        libtool -static -o "$IPHONE_DIR/librealm-objc-ios.a" "$temp_dir/librealm-objc-ios.a" $(tightdb-config --libs) -L"$iphone_core_lib" || exit 1
+        realm_echo "Creating '$IPHONE_DIR/librealm-objc-ios-dbg.a'"
+        lipo "$temp_dir"/*/"librealm-objc-dbg.a" -create -output "$temp_dir/librealm-objc-ios-dbg.a" || exit 1
+        libtool -static -o "$IPHONE_DIR/librealm-objc-ios-dbg.a" "$temp_dir/librealm-objc-ios-dbg.a" $(tightdb-config-dbg --libs) -L"$iphone_core_lib" || exit 1
         realm_echo "Copying headers to '$IPHONE_DIR/include'"
         mkdir -p "$IPHONE_DIR/include/realm/objc" || exit 1
         inst_headers="$(cd src/realm/objc && $MAKE --no-print-directory get-inst-headers)" || exit 1
@@ -452,7 +452,7 @@ EOF
 	FRAMEWORK=Realm.framework
 	rm -rf "$FRAMEWORK" realm-ios*.zip || exit 1
 	mkdir -p "$FRAMEWORK/Headers" || exit 1
-	cp iphone-lib/libtightdb-objc-ios.a "$FRAMEWORK/Realm" || exit 1
+	cp iphone-lib/librealm-objc-ios.a "$FRAMEWORK/Realm" || exit 1
 	cp iphone-lib/include/realm/objc/*.h "$FRAMEWORK/Headers" || exit 1
 	(cd "$FRAMEWORK/Headers" && mv realm.h Realm.h) || exit 1
 	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/import <realm\/objc\/\(.*\)>/import "\1"/g' {} \; || exit 1

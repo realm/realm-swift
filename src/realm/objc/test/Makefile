@@ -13,6 +13,6 @@ version.m
 
 unit_tests_CFLAGS  = -Wno-comment -fobjc-arc -fobjc-abi-version=2 -F$(XCODE_HOME)/Library/Frameworks
 unit_tests_LDFLAGS = -bundle -fobjc-link-runtime -F$(XCODE_HOME)/Library/Frameworks -framework Cocoa -framework XCTest
-unit_tests_LIBS    = ../libtightdb-objc.a
+unit_tests_LIBS    = ../librealm-objc.a
 
 include ../../../generic.mk

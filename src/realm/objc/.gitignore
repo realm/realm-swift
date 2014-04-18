@@ -6,25 +6,25 @@
 /*.gcno
 /*.gcda
 
-/libtightdb-objc.a
-/libtightdb-objc.so
-/libtightdb-objc.so.*
-/libtightdb-objc.dylib
-/libtightdb-objc.*.dylib
-/libtightdb-objc-dbg.a
-/libtightdb-objc-dbg.so
-/libtightdb-objc-dbg.so.*
-/libtightdb-objc-dbg.dylib
-/libtightdb-objc-dbg.*.dylib
-/libtightdb-objc-cov.so
-/libtightdb-objc-cov.so.*
-/libtightdb-objc-cov.dylib
-/libtightdb-objc-cov.*.dylib
+/librealm-objc.a
+/librealm-objc.so
+/librealm-objc.so.*
+/librealm-objc.dylib
+/librealm-objc.*.dylib
+/librealm-objc-dbg.a
+/librealm-objc-dbg.so
+/librealm-objc-dbg.so.*
+/librealm-objc-dbg.dylib
+/librealm-objc-dbg.*.dylib
+/librealm-objc-cov.so
+/librealm-objc-cov.so.*
+/librealm-objc-cov.dylib
+/librealm-objc-cov.*.dylib
 
-/libtightdb-objc-iPhoneOS.a
-/libtightdb-objc-iPhoneOS-dbg.a
-/libtightdb-objc-iPhoneSimulator.a
-/libtightdb-objc-iPhoneSimulator-dbg.a
+/librealm-objc-iPhoneOS.a
+/librealm-objc-iPhoneOS-dbg.a
+/librealm-objc-iPhoneSimulator.a
+/librealm-objc-iPhoneSimulator-dbg.a
 
-/libtightdb-objc-ios.a
-/libtightdb-objc-ios-dbg.a
+/librealm-objc-ios.a
+/librealm-objc-ios-dbg.a
