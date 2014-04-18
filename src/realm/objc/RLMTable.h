@@ -51,9 +51,12 @@
 -(RLMRow *)rowAtIndex:(NSUInteger)rowIndex;
 -(RLMRow *)firstRow;
 -(RLMRow *)lastRow;
+
 // Getting and setting individual rows with object subscripting
 -(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
+-(RLMRow *)objectForKeyedSubscript:(NSString *)key;
+-(void)setObject:(id)newValue forKeyedSubscript:(NSString *)key;
 
 // Add a row at the end of the table.
 // If data is nil, an empty row with default values is added.
