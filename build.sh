@@ -206,15 +206,15 @@ case "$MODE" in
         fi
         if printf "%s\n" "$REALM_CONFIG" | grep -q '^/'; then
             if ! [ -x "$REALM_CONFIG" ]; then
-                tightdb_abort "ERROR: Realm config-program '$REALM_CONFIG' does not exist" "Cannot find '$REALM_CONFIG' - skipping"
+                realm_abort "ERROR: Realm config-program '$REALM_CONFIG' does not exist" "Cannot find '$REALM_CONFIG' - skipping"
             fi
             tightdb_config_cmd="$REALM_CONFIG"
         elif ! tightdb_config_cmd="$(which "$REALM_CONFIG" 2>/dev/null)"; then
-            tightdb_abort "ERROR: Realm config-program '$REALM_CONFIG' not found in PATH" "Cannot find '$REALM_CONFIG' - skipping"
+            realm_abort "ERROR: Realm config-program '$REALM_CONFIG' not found in PATH" "Cannot find '$REALM_CONFIG' - skipping"
         fi
         tightdb_config_dbg_cmd="$tightdb_config_cmd-dbg"
         if ! [ -x "$tightdb_config_dbg_cmd" ]; then
-            tightdb_abort "ERROR: Realm config-program '$tightdb_config_dbg_cmd' not found" "Cannot find '$tightdb_config_dbg_cmd' - skipping"
+            realm_abort "ERROR: Realm config-program '$tightdb_config_dbg_cmd' not found" "Cannot find '$tightdb_config_dbg_cmd' - skipping"
         fi
         tightdb_version="$($tightdb_config_cmd --version)" || exit 1
 
@@ -276,12 +276,12 @@ case "$MODE" in
             for x in $IPHONE_PLATFORMS; do
                 platform_home="$xcode_home/Platforms/$x.platform"
                 if ! [ -e "$platform_home/Info.plist" ]; then
-                    tightdb_echo "Failed to find '$platform_home/Info.plist'"
+                    realm_echo "Failed to find '$platform_home/Info.plist'"
                     iphone_sdks_avail="no"
                 else
                     sdk="$(find_iphone_sdk "$platform_home")" || exit 1
                     if ! [ "$sdk" ]; then
-                        tightdb_echo "Found no SDKs in '$platform_home'"
+                        realm_echo "Found no SDKs in '$platform_home'"
                         iphone_sdks_avail="no"
                     else
                         if [ "$x" = "iPhoneSimulator" ]; then
@@ -310,7 +310,7 @@ case "$MODE" in
             path="$(cd "../tightdb" || return 1; pwd)" || exit 1
             iphone_core_lib="$path/$IPHONE_DIR"
         else
-            tightdb_echo "Could not find home of Realm core library built for iPhone"
+            realm_echo "Could not find home of Realm core library built for iPhone"
         fi
 
 	touch "$CONFIG_MK" || { echo "Can't overwrite $CONFIG_MK."; exit 1; }
@@ -391,7 +391,7 @@ EOF
 # FIXME: Our language binding requires that Objective-C ARC is enabled, which, in turn, is only available on a 64-bit architecture, so for now we cannot build a "fat" version.
 #        TIGHTDB_ENABLE_FAT_BINARIES="1" $MAKE || exit 1
         $MAKE || exit 1
-        tightdb_echo "Done building"
+        realm_echo "Done building"
         exit 0
         ;;
 
@@ -399,14 +399,14 @@ EOF
         auto_configure || exit 1
         iphone_sdks_avail="$(get_config_param "IPHONE_SDKS_AVAIL")" || exit 1
         if [ "$iphone_sdks_avail" != "yes" ]; then
-            tightdb_abort "ERROR: iPhone SDKs were not found during configuration"
+            realm_abort "ERROR: iPhone SDKs were not found during configuration"
         fi
         iphone_core_lib="$(get_config_param "IPHONE_CORE_LIB")" || exit 1
         if [ "$iphone_core_lib" = "none" ]; then
-            tightdb_abort "ERROR: Realm core library for iPhone was not found during configuration"
+            realm_abort "ERROR: Realm core library for iPhone was not found during configuration"
         fi
         if ! [ -e "$iphone_core_lib/libtightdb-ios.a" ]; then
-            tightdb_abort "ERROR: Realm core library for iPhone is not available in '$iphone_core_lib'"
+            realm_abort "ERROR: Realm core library for iPhone is not available in '$iphone_core_lib'"
         fi
         temp_dir="$(mktemp -d /tmp/tightdb.objc.build-iphone.XXXX)" || exit 1
         xcode_home="$(get_config_param "XCODE_HOME")" || exit 1
@@ -429,17 +429,17 @@ EOF
             cp "src/realm/objc/libtightdb-objc-$platform-dbg.a" "$temp_dir/$platform/libtightdb-objc-dbg.a" || exit 1
         done
         mkdir -p "$IPHONE_DIR" || exit 1
-        tightdb_echo "Creating '$IPHONE_DIR/libtightdb-objc-ios.a'"
+        realm_echo "Creating '$IPHONE_DIR/libtightdb-objc-ios.a'"
         lipo "$temp_dir"/*/"libtightdb-objc.a" -create -output "$temp_dir/libtightdb-objc-ios.a" || exit 1
         libtool -static -o "$IPHONE_DIR/libtightdb-objc-ios.a" "$temp_dir/libtightdb-objc-ios.a" $(tightdb-config --libs) -L"$iphone_core_lib" || exit 1
-        tightdb_echo "Creating '$IPHONE_DIR/libtightdb-objc-ios-dbg.a'"
+        realm_echo "Creating '$IPHONE_DIR/libtightdb-objc-ios-dbg.a'"
         lipo "$temp_dir"/*/"libtightdb-objc-dbg.a" -create -output "$temp_dir/libtightdb-objc-ios-dbg.a" || exit 1
         libtool -static -o "$IPHONE_DIR/libtightdb-objc-ios-dbg.a" "$temp_dir/libtightdb-objc-ios-dbg.a" $(tightdb-config-dbg --libs) -L"$iphone_core_lib" || exit 1
-        tightdb_echo "Copying headers to '$IPHONE_DIR/include'"
+        realm_echo "Copying headers to '$IPHONE_DIR/include'"
         mkdir -p "$IPHONE_DIR/include/realm/objc" || exit 1
         inst_headers="$(cd src/realm/objc && $MAKE --no-print-directory get-inst-headers)" || exit 1
         (cd "src/realm/objc" && cp $inst_headers "$REALM_OBJC_HOME/$IPHONE_DIR/include/realm/objc/") || exit 1
-        tightdb_echo "Done building"
+        realm_echo "Done building"
         exit 0
         ;;
 
@@ -557,14 +557,14 @@ EOF
     "install")
         require_config || exit 1
         $MAKE install-only DESTDIR="$DESTDIR" || exit 1
-        tightdb_echo "Done installing"
+        realm_echo "Done installing"
         exit 0
         ;;
 
     "install-prod")
         require_config || exit 1
         $MAKE install-only DESTDIR="$DESTDIR" INSTALL_FILTER="shared-libs,progs" || exit 1
-        tightdb_echo "Done installing"
+        realm_echo "Done installing"
         exit 0
         ;;
 
