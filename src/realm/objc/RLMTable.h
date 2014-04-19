@@ -65,6 +65,9 @@
 // Inserting rows at specific positions
 -(void)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex;
 
+// Setting rows at specific positions
+-(void)setRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex;
+
 // Removing rows
 -(void)removeAllRows;
 -(void)removeRowAtIndex:(NSUInteger)rowIndex;
