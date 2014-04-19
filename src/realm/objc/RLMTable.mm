@@ -313,10 +313,12 @@ using namespace std;
     tightdb::ConstDescriptorRef desc = table.get_descriptor();
 
     if (table.size() < (size_t)rowIndex) {
-        // FIXME: raise exception - out of bound
-        return;
+        @throw [NSException exceptionWithName:@"realm:index_out_of_bounds"
+                                       reason:[NSString stringWithFormat:@"Index %lu beyond bounds [0 .. %lu]", (unsigned long)rowIndex, (unsigned long)self.rowCount-1]
+                                     userInfo:nil];
     }
 
+    // FIXME: Duplicate code. Should just call insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
     if ([newValue isKindOfClass:[NSArray class]]) {
         verify_row(*desc, (NSArray *)newValue);
         set_row(size_t(rowIndex), table, (NSArray *)newValue);
@@ -362,7 +364,14 @@ using namespace std;
 
 -(void)setObject:(id)newValue forKeyedSubscript:(NSString *)key
 {
+    RLMRow* row = self[key]; // Exceptions handled here
     
+    if (row) {
+        [self setRow:newValue atIndex:[row RLM_index]];
+    }
+    else if (newValue) { //Only add row if newValue is not nil
+        [self addRow:newValue];
+    }
 }
 
 
@@ -446,6 +455,39 @@ using namespace std;
         return;
     }
 
+    @throw [NSException exceptionWithName:@"realm:column_not_implemented"
+                                   reason:@"You should either use nil, NSObject, NSDictionary, or NSArray"
+                                 userInfo:nil];
+}
+
+- (void)setRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
+{
+    if (!anObject) {
+        [self removeRowAtIndex:rowIndex]; // Remove row at index if anObject is nil
+        return;
+    }
+    
+    tightdb::Table& table = *m_table;
+    tightdb::ConstDescriptorRef desc = table.get_descriptor();
+    
+    if ([anObject isKindOfClass:[NSArray class]]) {
+        verify_row(*desc, (NSArray *)anObject);
+        set_row(size_t(rowIndex), table, (NSArray*)anObject);
+        return;
+    }
+    
+    if ([anObject isKindOfClass:[NSDictionary class]]) {
+        verify_row_with_labels(*desc, (NSDictionary *)anObject);
+        set_row_with_labels(size_t(rowIndex), table, (NSDictionary*)anObject);
+        return;
+    }
+    
+    if ([anObject isKindOfClass:[NSObject class]]) {
+        verify_row_from_object(*desc, (NSObject *)anObject);
+        set_row_from_object(size_t(rowIndex), table, (NSObject *)anObject);
+        return;
+    }
+    
     @throw [NSException exceptionWithName:@"realm:column_not_implemented"
                                    reason:@"You should either use nil, NSObject, NSDictionary, or NSArray"
                                  userInfo:nil];
