@@ -36,11 +36,6 @@ using namespace std;
 // no needed
 @end
 
-@interface RLMDynamicTableTests: XCTestCase
-  // Intentionally left blank.
-  // No new public instance methods need be defined.
-@end
-
 @interface TestObject : NSObject
 
 @property (strong, nonatomic) NSNumber *objID;
@@ -50,6 +45,11 @@ using namespace std;
 
 @implementation TestObject
 
+@end
+
+@interface RLMDynamicTableTests: XCTestCase
+  // Intentionally left blank.
+  // No new public instance methods need be defined.
 @end
 
 @implementation RLMDynamicTableTests
