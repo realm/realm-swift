@@ -33,7 +33,7 @@
 #import "RLMDescriptor_noinst.h"
 #import "RLMColumnProxy.h"
 #import "RLMProxy.h"
-#import "RLMSchema.h"
+#import "RLMObjectDescriptor.h"
 #import "NSData+RLMGetBinaryData.h"
 #import "RLMPrivate.h"
 #import "RLMSmartContext_noinst.h"
@@ -100,8 +100,8 @@ using namespace std;
 - (void)setObjectClass:(Class)objectClass {
     _objectClass = objectClass;
     _proxyObjectClass = [RLMProxy proxyClassForObjectClass:objectClass];
-    RLMSchema * schema = [RLMSchema schemaForObjectClass:objectClass];
-    [RLMTable updateDescriptor:self.descriptor toSupportSchema:schema];
+    RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
+    [RLMTable updateDescriptor:self.descriptor toSupportSchema:descriptor];
 }
 
 -(BOOL)_checkType
@@ -1482,8 +1482,8 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 }
 
 
-+ (void)updateDescriptor:(RLMDescriptor *)desc toSupportSchema:(RLMSchema *)schema {
-    for (RLMProperty * prop in schema.properties) {
++ (void)updateDescriptor:(RLMDescriptor *)desc toSupportSchema:(RLMObjectDescriptor *)descriptor {
+    for (RLMProperty * prop in descriptor.properties) {
         NSUInteger index = [desc indexOfColumnWithName:prop.name];
         if (index == NSNotFound) {
             // create the column
@@ -1491,7 +1491,7 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
             if (prop.type == RLMTypeTable) {
                 // set subtable schema
                 RLMDescriptor * subDesc = [desc subdescriptorForColumnWithIndex:desc.columnCount-1];
-                [RLMTable updateDescriptor:subDesc toSupportSchema:[RLMSchema schemaForObjectClass:prop.subtableObjectClass]];
+                [RLMTable updateDescriptor:subDesc toSupportSchema:[RLMObjectDescriptor descriptorForObjectClass:prop.subtableObjectClass]];
             }
         }
         else if ([desc columnTypeOfColumnWithIndex:index] != prop.type) {
@@ -1506,8 +1506,8 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 
 // returns YES if you can currently insert objects of type Class
 -(BOOL)compatibleWithObjectClass:(Class)objectClass {
-    RLMSchema * schema = [RLMSchema schemaForObjectClass:objectClass];
-    for (RLMProperty * prop in schema.properties) {
+    RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
+    for (RLMProperty * prop in descriptor.properties) {
         NSUInteger index = [self indexOfColumnWithName:prop.name];
         if (index == NSNotFound || [self columnTypeOfColumnWithIndex:index] != prop.type) {
             NSLog(@"Schema not compatible with table columns");
@@ -1519,8 +1519,8 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 
 // returns YES if it's possible to update the table to support objects of type Class
 -(BOOL)canUpdateToSupportObjectClass:(Class)objectClass {
-    RLMSchema * schema = [RLMSchema schemaForObjectClass:objectClass];
-    for (RLMProperty * prop in schema.properties) {
+    RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
+    for (RLMProperty * prop in descriptor.properties) {
         NSUInteger index = [self indexOfColumnWithName:prop.name];
         if (index != NSNotFound && [self columnTypeOfColumnWithIndex:index] != prop.type) {
             return NO;

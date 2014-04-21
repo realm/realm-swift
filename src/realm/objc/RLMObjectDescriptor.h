@@ -22,10 +22,10 @@
 #import "RLMType.h"
 #import "RLMProperty.h"
 
-@class RLMSchema;
+@class RLMObjectDescriptor;
 
 // schema object represents
-@interface RLMSchema : NSObject
+@interface RLMObjectDescriptor : NSObject
 
 // array of properties which define a schema
 @property (nonatomic, readonly) NSArray * properties;
@@ -34,7 +34,7 @@
 -(RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)key;
 
 // returns a cached or new schema for a given object class
-+(RLMSchema *)schemaForObjectClass:(Class)objectClass;
++(RLMObjectDescriptor *)descriptorForObjectClass:(Class)objectClass;
 
 @end
 

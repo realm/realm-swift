@@ -19,7 +19,7 @@
  **************************************************************************/
 
 #import "RLMProxy.h"
-#import "RLMSchema.h"
+#import "RLMObjectDescriptor.h"
 #import "RLMPrivate.h"
 #import <objc/runtime.h>
 
@@ -61,8 +61,8 @@ BOOL is_class_subclass(Class class1, Class class2) {
         
         // create object
         _object = [[objectClass alloc] init];
-        RLMSchema * schema = [RLMSchema schemaForObjectClass:objectClass];
-        for (RLMProperty * prop in schema.properties) {
+        RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
+        for (RLMProperty * prop in descriptor.properties) {
             [_object setValue:self[prop.name] forKeyPath:prop.name];
         }
     }
@@ -83,10 +83,10 @@ BOOL is_class_subclass(Class class1, Class class2) {
         // if we haven't done so, generate getters and setters
         NSString * objectClassName = NSStringFromClass(objectClass);
         if (!s_proxyClassNameCache[objectClassName]) {
-            RLMSchema * schema = [RLMSchema schemaForObjectClass:objectClass];
+            RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
             NSSet * selectorNames = selectorNamesForClass(objectClass);
-            for (unsigned int propNum = 0; propNum < schema.properties.count; propNum++) {
-                RLMProperty * prop = schema.properties[propNum];
+            for (unsigned int propNum = 0; propNum < descriptor.properties.count; propNum++) {
+                RLMProperty * prop = descriptor.properties[propNum];
                 [prop addToClass:objectClass existing:selectorNames column:propNum];
             }
             s_proxyClassNameCache[objectClassName] = objectClassName;
@@ -106,10 +106,10 @@ BOOL is_class_subclass(Class class1, Class class2) {
     objc_registerClassPair(proxyClass);
     
     // add getters/setters for each propery
-    RLMSchema * schema = [RLMSchema schemaForObjectClass:objectClass];
+    RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
     NSSet * selectorNames = selectorNamesForClass(objectClass);
-    for (unsigned int propNum = 0; propNum < schema.properties.count; propNum++) {
-        RLMProperty * prop = schema.properties[propNum];
+    for (unsigned int propNum = 0; propNum < descriptor.properties.count; propNum++) {
+        RLMProperty * prop = descriptor.properties[propNum];
         [prop addToClass:proxyClass existing:selectorNames column:propNum];
     }
     
