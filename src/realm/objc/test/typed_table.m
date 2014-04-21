@@ -165,6 +165,48 @@ REALM_TABLE_1(TestTableKeyedSubscriptError,
     TestTableKeyedSubscriptError* errTable = [[TestTableKeyedSubscriptError alloc] init];
     [errTable addRow:@{@"id" : @987289}];
     XCTAssertThrows(errTable[@"X"], @"Accessing RLMRow via keyed subscript on a column that is not of type RLMTypeString should throw exception");
+    
+    // Test keyed subscripting setters
+    
+    // No exisiting for table
+    NSUInteger previousRowCount = [table rowCount];
+    NSString* nonExistingKey = @"Test10123903784293";
+    table[nonExistingKey] = @{@"name" : nonExistingKey, @"id" : @1};
+    
+    XCTAssertEqual(previousRowCount+1, [table rowCount], @"Row count should be equal to previous row count + 1 after inserting a non-existing RLMRow");
+    XCTAssertNotNil(table[nonExistingKey], @"table[nonExistingKey] should not be nil");
+    XCTAssertEqualObjects(table[nonExistingKey][@"id"], @1, @"table[nonExistingKey][@\"id\"] should be equal to @1");
+    XCTAssertEqualObjects(table[nonExistingKey][@"name"], nonExistingKey, @"table[nonExistingKey][@\"name\"] should be equal to nonExistingKey");
+    
+    // Set non-existing row to nil for table
+    previousRowCount = [table rowCount];
+    NSString* anotherNonExistingKey = @"sdalfjhadskfja";
+    table[anotherNonExistingKey] = nil;
+    
+    XCTAssertEqual(previousRowCount, [table rowCount], @"previousRowCount should equal current rowCount");
+    XCTAssertNil(table[anotherNonExistingKey], @"table[anotherNonExistingKey] should be nil");
+    
+    // Has existing for table
+    previousRowCount = [table rowCount];
+    table[@"Test2"] = @{@"name" : @"Test3" , @"id" : @123};
+    
+    XCTAssertEqual(previousRowCount, [table rowCount], @"Row count should still equal previous row count after inserting an existing RLMRow");
+    XCTAssertNil(table[@"Test2"], @"table[@\"Test2\"] should be nil");
+    XCTAssertNotNil(table[@"Test3"], @"table[@\"Test3\"] should not be nil");
+    XCTAssertEqualObjects(table[@"Test3"][@"id"], @123, @"table[\"Test3\"][@\"id\"] should be equal to @123");
+    XCTAssertEqualObjects(table[@"Test3"][@"name"], @"Test3", @"table[\"Test3\"][@\"name\"] should be equal to @\"Test3\"");
+    
+    // Set existing row to nil for table
+    previousRowCount = [table rowCount];
+    table[@"Test3"] = nil;
+    
+    XCTAssertEqual(previousRowCount, [table rowCount] + 1, @"[table rowCount] + 1 should be equal to previousRowCount");
+    XCTAssertNil(table[@"Test3"], @"table[\"Test3\"] should be nil");
+    
+    // No existing for errTable
+    previousRowCount = [errTable rowCount];
+    XCTAssertThrows((errTable[@"SomeKey"] = @{@"id" : @821763}), @"Calling keyed subscriptor on errTable should throw exception");
+    XCTAssertEqual(previousRowCount, [errTable rowCount], @"errTable should have same count as previous");
 }
 
 @end
