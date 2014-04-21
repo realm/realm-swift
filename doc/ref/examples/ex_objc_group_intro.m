@@ -22,16 +22,16 @@ void ex_objc_group_intro()
     [table appendRow:@{@"Name":@"Joe",  @"Age":@17, @"Hired": @NO}];
     
     /* Write the group (and the contained table) to a specified file. */
-    [[NSFileManager defaultManager] removeItemAtPath:@"filename.tightdb" error:nil];
-    [group writeToFile:@"filename.tightdb" withError:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:@"filename.realm" error:nil];
+    [group writeToFile:@"filename.realm" withError:nil];
     
     /* Adds another row to the table. Note the update is NOT persisted
      automatically (delete the old file and use write again). */
     
     [table appendRow:@{@"Name":@"Sam", @"Age":@17, @"Hired":@NO}];
     
-    [[NSFileManager defaultManager] removeItemAtPath:@"filename.tightdb" error:nil];
-    [group writeToFile:@"filename.tightdb" withError:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:@"filename.realm" error:nil];
+    [group writeToFile:@"filename.realm" withError:nil];
     
     /* Retrieves an in memory buffer from the group. */
     TDBBinary* buffer = [group writeToBuffer];

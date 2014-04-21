@@ -248,7 +248,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0510;
-				ORGANIZATIONNAME = tightdb;
+				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					4D88932918D320D30038AFD4 = {
 						TestTargetID = 4D88930E18D320D20038AFD4;
