@@ -41,7 +41,7 @@ DEFINE_TABLE_TYPE(MainObject)
 @implementation SubProxied
 @end
 
-@interface MainProxied : NSObject<RLMTableObject>
+@interface MainProxied : NSObject<RLMObject>
 @property NSString * First;
 @property RLMTable * Sub;
 @property int Second;
@@ -89,7 +89,7 @@ DEFINE_TABLE_TYPE(MainObject)
     RLMTransaction *group = [RLMTransaction group];
     
     /* Create new table in group */
-    RLMTable<SubObject> *people = [group createTableWithName:@"employees" objectClass:MainObject.class];
+    RLMTable<MainObject> *people = [group createTableWithName:@"employees" objectClass:MainObject.class];
     
     /* FIXME: Add support for specifying a subtable to the 'add'
      method. The subtable must then be copied into the parent

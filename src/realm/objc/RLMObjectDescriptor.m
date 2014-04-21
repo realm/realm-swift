@@ -59,12 +59,12 @@ static NSMutableDictionary * s_descriptorCache;
     
     // get object properties
     unsigned int count;
-    objc_property_t * props = class_copyPropertyList(objectClass, &count);
+    objc_property_t *props = class_copyPropertyList(objectClass, &count);
     
     // create array of RLMProperties
-    NSMutableArray * propArray = [NSMutableArray arrayWithCapacity:count];
+    NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
     for (unsigned int i = 0; i < count; i++) {
-        RLMProperty * prop = [RLMProperty propertyForObjectProperty:props[i]];
+        RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i]];
         if (prop) {
             // if a table and we don't already know the object class figure out now
             if (prop.type == RLMTypeTable && !prop.subtableObjectClass) {

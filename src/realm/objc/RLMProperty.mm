@@ -244,7 +244,7 @@ id dynamic_get_subtable(RLMRow *row, SEL sel) {
     }
 }
 
-+(RLMProperty *)propertyForObjectProperty:(objc_property_t)prop {
++(instancetype)propertyForObjectProperty:(objc_property_t)prop {
     // go through all attributes, noting if nonatomic and getting the RLMType
     unsigned int attCount;
     //BOOL nonatomic = NO, dynamic = NO;
