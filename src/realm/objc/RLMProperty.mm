@@ -27,52 +27,52 @@
 #include <map>
 
 // templated getters/setters
-template<typename T> inline T column_get(RLMRow * row, int col);
-template<typename T> inline void column_set(RLMRow * row, int col, T val);
+template<typename T> inline T column_get(RLMRow *row, int col);
+template<typename T> inline void column_set(RLMRow *row, int col, T val);
 
 // specializations for each type
-template<> inline int column_get<int>(RLMRow * row, int col) {
+template<> inline int column_get<int>(RLMRow *row, int col) {
     return (int)row.table.getNativeTable.get_int(col, row.ndx); }
-template<> inline void column_set<int>(RLMRow * row, int col, int val) {
+template<> inline void column_set<int>(RLMRow *row, int col, int val) {
     row.table.getNativeTable.set_int(col, row.ndx, val); }
-template<> inline long column_get<long>(RLMRow * row, int col) {
+template<> inline long column_get<long>(RLMRow *row, int col) {
     return (long)row.table.getNativeTable.get_int(col, row.ndx); }
-template<> inline void column_set<long>(RLMRow * row, int col, long val) {
+template<> inline void column_set<long>(RLMRow *row, int col, long val) {
     row.table.getNativeTable.set_int(col, row.ndx, val); }
-template<> inline float column_get<float>(RLMRow * row, int col) {
+template<> inline float column_get<float>(RLMRow *row, int col) {
     return (float)row.table.getNativeTable.get_float(col, row.ndx); }
-template<> inline void column_set<float>(RLMRow * row, int col, float val) {
+template<> inline void column_set<float>(RLMRow *row, int col, float val) {
     row.table.getNativeTable.set_float(col, row.ndx, val); }
-template<> inline double column_get<double>(RLMRow * row, int col) {
+template<> inline double column_get<double>(RLMRow *row, int col) {
     return (double)row.table.getNativeTable.get_double(col, row.ndx); }
-template<> inline void column_set<double>(RLMRow * row, int col, double val) {
+template<> inline void column_set<double>(RLMRow *row, int col, double val) {
     row.table.getNativeTable.set_double(col, row.ndx, val); }
-template<> inline bool column_get<bool>(RLMRow * row, int col) {
+template<> inline bool column_get<bool>(RLMRow *row, int col) {
     return (bool)row.table.getNativeTable.get_bool(col, row.ndx); }
-template<> inline void column_set<bool>(RLMRow * row, int col, bool val) {
+template<> inline void column_set<bool>(RLMRow *row, int col, bool val) {
     row.table.getNativeTable.set_bool(col, row.ndx, val); }
-template<> inline id column_get<id>(RLMRow * row, int col) { return row[col]; }
-template<> inline void column_set<id>(RLMRow * row, int col, id val) { row[col] = val; }
+template<> inline id column_get<id>(RLMRow *row, int col) { return row[col]; }
+template<> inline void column_set<id>(RLMRow *row, int col, id val) { row[col] = val; }
 
 // fixed column accessors
 template<typename T, int C>
-T column_get(RLMRow * row, SEL) {
+T column_get(RLMRow *row, SEL) {
     return column_get<T>(row, C);
 }
 template<typename T, int C>
-void column_set(RLMRow * row, SEL, T val) {
+void column_set(RLMRow *row, SEL, T val) {
     column_set<T>(row, C, val);
 }
 
 // column lookup accessors
 template<typename T, int C>
-T column_lookup_get(RLMRow * row, SEL sel) {
+T column_lookup_get(RLMRow *row, SEL sel) {
     NSUInteger col = [row.table indexOfColumnWithName:NSStringFromSelector(sel)];
     return column_get<T>(row, col);
 }
 template<typename T, int C>
-void column_lookup_set(RLMRow * row, SEL sel, T val) {
-    NSString * name = NSStringFromSelector(sel);
+void column_lookup_set(RLMRow *row, SEL sel, T val) {
+    NSString *name = NSStringFromSelector(sel);
     name = [name substringWithRange:NSMakeRange(3, name.length-4)];
     NSUInteger col = [row.table indexOfColumnWithName:name];
     column_set<T>(row, col, val);
@@ -124,9 +124,9 @@ static std::map<char, const char *> s_getterTypeStrings, s_setterTypeStrings;
 #define NUM_COLUMN_ACCESSORS 50
 
 // determine RLMType from objc code
-void type_for_property_string(const char * code,
-                              RLMType * outtype,
-                              Class * outSubtableObjectClass) {
+void type_for_property_string(const char *code,
+                              RLMType *outtype,
+                              Class *outSubtableObjectClass) {
     if (!code) {
         *outtype = RLMTypeNone;
         return;
@@ -150,7 +150,7 @@ void type_for_property_string(const char * code,
             break;
         case '@':
         {
-            NSString * type = [NSString stringWithUTF8String:code];
+            NSString *type = [NSString stringWithUTF8String:code];
             if ([type isEqualToString:@"@\"NSString\""]) *outtype = RLMTypeString;
             else if ([type isEqualToString:@"@\"NSDate\""]) *outtype = RLMTypeDate;
             else if ([type isEqualToString:@"@\"NSData\""]) *outtype = RLMTypeBinary;
@@ -163,7 +163,7 @@ void type_for_property_string(const char * code,
                     // if typename is of form "@\"RLMTable<SubObjectClas>\""
                     const unsigned int subOffset = 11;
                     if (type.length > subOffset) {
-                        NSString * subclassName = [type substringWithRange:NSMakeRange(subOffset, type.length - subOffset - 2)];
+                        NSString *subclassName = [type substringWithRange:NSMakeRange(subOffset, type.length - subOffset - 2)];
                         *outSubtableObjectClass = NSClassFromString(subclassName);
                     }
                 }
@@ -177,10 +177,10 @@ void type_for_property_string(const char * code,
 
 // dynamic getter for subtable
 // TODO - generate column getters
-id dynamic_get_subtable(RLMRow * row, SEL sel) {
-    NSString * propName = NSStringFromSelector(sel);
+id dynamic_get_subtable(RLMRow *row, SEL sel) {
+    NSString *propName = NSStringFromSelector(sel);
     NSUInteger col = [row.table indexOfColumnWithName:propName];
-    RLMTable * table = row[col];
+    RLMTable *table = row[col];
     
     // set custom object class
     Class subtableObjectClass = [row.class subtableObjectClassForProperty:propName];
@@ -212,13 +212,13 @@ id dynamic_get_subtable(RLMRow * row, SEL sel) {
 {
     // generate getter sel
     // TODO - support custom accessor names
-    NSString * propName = self.name;
+    NSString *propName = self.name;
     SEL get = NSSelectorFromString(propName);
     
     // generate setter sel
-    NSString * firstChar = [[propName substringToIndex:1] uppercaseString];
-    NSString * rest = [propName substringFromIndex:1];
-    NSString * setName = [NSString stringWithFormat:@"set%@%@:", firstChar, rest];
+    NSString *firstChar = [[propName substringToIndex:1] uppercaseString];
+    NSString *rest = [propName substringFromIndex:1];
+    NSString *setName = [NSString stringWithFormat:@"set%@%@:", firstChar, rest];
     SEL set = NSSelectorFromString(setName);
     
     // create getter/setter based on type
@@ -247,11 +247,11 @@ id dynamic_get_subtable(RLMRow * row, SEL sel) {
 +(RLMProperty *)propertyForObjectProperty:(objc_property_t)prop {
     // go through all attributes, noting if nonatomic and getting the RLMType
     unsigned int attCount;
-    BOOL nonatomic = NO, dynamic = NO;
+    //BOOL nonatomic = NO, dynamic = NO;
     RLMType type = RLMTypeNone;
     char objcType = 0;
     Class subtableObjectType;
-    objc_property_attribute_t * atts = property_copyAttributeList(prop, &attCount);
+    objc_property_attribute_t *atts = property_copyAttributeList(prop, &attCount);
     for (unsigned int a = 0; a < attCount; a++) {
         switch (*(atts[a].name)) {
             case 'T':
@@ -259,12 +259,12 @@ id dynamic_get_subtable(RLMRow * row, SEL sel) {
                 objcType = *(atts[a].value);            // first char of type attr
                 if (objcType == 'q') objcType = 'l';    // collapse these
                 break;
-            case 'N':
+            /*case 'N':
                 nonatomic = YES;
                 break;
             case 'D':
                 dynamic = YES;
-                break;
+                break;*/
             default:
                 break;
         }
@@ -272,13 +272,13 @@ id dynamic_get_subtable(RLMRow * row, SEL sel) {
     free(atts);
     
     // if nonatomic and prop has a valid type add to our array
-    const char * name = property_getName(prop);
+    const char *name = property_getName(prop);
     if (type == RLMTypeNone) {
         NSLog(@"Skipping property '%s' with incompatible type", name);
     }
     else {
         // if nonatomic and valid type, add to array
-        RLMProperty * tdbProp = [RLMProperty new];
+        RLMProperty *tdbProp = [RLMProperty new];
         tdbProp.type = type;
         tdbProp.objcType = objcType;
         tdbProp.name = [NSString stringWithUTF8String:name];

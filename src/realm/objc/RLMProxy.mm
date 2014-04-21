@@ -23,12 +23,12 @@
 #import "RLMPrivate.h"
 #import <objc/runtime.h>
 
-static NSMutableDictionary * s_proxyClassNameCache;
+static NSMutableDictionary *s_proxyClassNameCache;
 
-NSSet * selectorNamesForClass(Class cls) {
+NSSet *selectorNamesForClass(Class cls) {
     unsigned int outCount;
-    Method * methods = class_copyMethodList(cls, &outCount);
-    NSMutableSet * set = [NSMutableSet setWithCapacity:outCount];
+    Method *methods = class_copyMethodList(cls, &outCount);
+    NSMutableSet *set = [NSMutableSet setWithCapacity:outCount];
     for (unsigned int i = 0; i < outCount; i++) {
         [set addObject:NSStringFromSelector(method_getName(methods[i]))];
     }
@@ -55,14 +55,14 @@ BOOL is_class_subclass(Class class1, Class class2) {
 - (id)object {
     // create object on demand
     if (!_object) {
-        NSString * className = NSStringFromClass(self.class);
+        NSString *className = NSStringFromClass(self.class);
         className = [className stringByReplacingOccurrencesOfString:@"RLMProxy_" withString:@""];
         Class objectClass = NSClassFromString(className);
         
         // create object
         _object = [[objectClass alloc] init];
-        RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
-        for (RLMProperty * prop in descriptor.properties) {
+        RLMObjectDescriptor *descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
+        for (RLMProperty *prop in descriptor.properties) {
             [_object setValue:self[prop.name] forKeyPath:prop.name];
         }
     }
@@ -81,12 +81,12 @@ BOOL is_class_subclass(Class class1, Class class2) {
     // if objectClass is RLMRow use it, otherwise use proxy class
     if (is_class_subclass(objectClass, RLMRow.class)) {
         // if we haven't done so, generate getters and setters
-        NSString * objectClassName = NSStringFromClass(objectClass);
+        NSString *objectClassName = NSStringFromClass(objectClass);
         if (!s_proxyClassNameCache[objectClassName]) {
-            RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
-            NSSet * selectorNames = selectorNamesForClass(objectClass);
+            RLMObjectDescriptor *descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
+            NSSet *selectorNames = selectorNamesForClass(objectClass);
             for (unsigned int propNum = 0; propNum < descriptor.properties.count; propNum++) {
-                RLMProperty * prop = descriptor.properties[propNum];
+                RLMProperty *prop = descriptor.properties[propNum];
                 [prop addToClass:objectClass existing:selectorNames column:propNum];
             }
             s_proxyClassNameCache[objectClassName] = objectClassName;
@@ -95,21 +95,21 @@ BOOL is_class_subclass(Class class1, Class class2) {
     }
     
     // see if we have a cached version
-    NSString * objectClassName = NSStringFromClass(objectClass);
+    NSString *objectClassName = NSStringFromClass(objectClass);
     if (s_proxyClassNameCache[objectClassName]) {
         return NSClassFromString(s_proxyClassNameCache[objectClassName]);
     }
     
     // create and register proxy class
-    NSString * proxyClassName = [@"RLMProxy_" stringByAppendingString:objectClassName];
+    NSString *proxyClassName = [@"RLMProxy_" stringByAppendingString:objectClassName];
     Class proxyClass = objc_allocateClassPair(RLMProxy.class, proxyClassName.UTF8String, 0);
     objc_registerClassPair(proxyClass);
     
     // add getters/setters for each propery
-    RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
-    NSSet * selectorNames = selectorNamesForClass(objectClass);
+    RLMObjectDescriptor *descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
+    NSSet *selectorNames = selectorNamesForClass(objectClass);
     for (unsigned int propNum = 0; propNum < descriptor.properties.count; propNum++) {
-        RLMProperty * prop = descriptor.properties[propNum];
+        RLMProperty *prop = descriptor.properties[propNum];
         [prop addToClass:proxyClass existing:selectorNames column:propNum];
     }
     
