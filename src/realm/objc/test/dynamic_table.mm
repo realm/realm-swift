@@ -26,17 +26,6 @@
 
 #include <string.h>
 
-@interface TestObject : NSObject
-
-@property (strong, nonatomic) NSNumber *objID;
-@property (strong, nonatomic) NSString *name;
-
-@end
-
-@implementation TestObject
-
-@end
-
 using namespace std;
 @interface TestClass : NSObject
 @property (nonatomic) NSString *name;
@@ -50,6 +39,17 @@ using namespace std;
 @interface RLMDynamicTableTests: XCTestCase
   // Intentionally left blank.
   // No new public instance methods need be defined.
+@end
+
+@interface TestObject : NSObject
+
+@property (strong, nonatomic) NSNumber *objID;
+@property (strong, nonatomic) NSString *name;
+
+@end
+
+@implementation TestObject
+
 @end
 
 @implementation RLMDynamicTableTests
