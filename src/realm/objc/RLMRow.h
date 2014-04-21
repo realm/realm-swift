@@ -25,7 +25,7 @@
 
 
 // protocol for custom table objects
-@protocol RLMTableObject <NSObject>
+@protocol RLMObject <NSObject>
 @required
 // implement to indicate the object type within subtables
 +(Class)subtableObjectClassForProperty:(NSString *)propertyName;
@@ -37,7 +37,7 @@
 @end
 
 
-@interface RLMRow : NSObject<RLMTableObject>
+@interface RLMRow : NSObject<RLMObject>
 
 -(id)objectAtIndexedSubscript:(NSUInteger)colIndex;
 -(id)objectForKeyedSubscript:(id <NSCopying>)key;

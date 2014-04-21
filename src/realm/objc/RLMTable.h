@@ -51,6 +51,7 @@
 -(RLMRow *)rowAtIndex:(NSUInteger)rowIndex;
 -(RLMRow *)firstRow;
 -(RLMRow *)lastRow;
+
 // Getting and setting individual rows with object subscripting
 -(id)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;

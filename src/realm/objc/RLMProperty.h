@@ -32,7 +32,7 @@
 @property (atomic, assign) char objcType;
 
 // creates a tdb property object from a runtime property
-+(RLMProperty *)propertyForObjectProperty:(objc_property_t)prop;
++(instancetype)propertyForObjectProperty:(objc_property_t)prop;
 
 // adds getters and setters for this property/column on the given class
 -(void)addToClass:(Class)cls existing:(NSSet *)existing column:(int)column;
