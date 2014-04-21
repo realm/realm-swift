@@ -26,6 +26,17 @@
 
 #include <string.h>
 
+@interface TestObject : NSObject
+
+@property (strong, nonatomic) NSNumber *objID;
+@property (strong, nonatomic) NSString *name;
+
+@end
+
+@implementation TestObject
+
+@end
+
 using namespace std;
 @interface TestClass : NSObject
 @property (nonatomic) NSString *name;
@@ -1556,6 +1567,59 @@ using namespace std;
         [table addRow:@[[NSDate dateWithTimeIntervalSince1970:i]]];
     XCTAssertEqual((NSUInteger)5, [table findRowIndexWithDate:[NSDate dateWithTimeIntervalSince1970:5] inColumnWithIndex:0], @"Cannot find element");
     XCTAssertEqual((NSUInteger)NSNotFound, ([table findRowIndexWithDate:[NSDate dateWithTimeIntervalSince1970:11] inColumnWithIndex:0]), @"Found something");
+}
+
+- (void)testTableDynamic_set_row
+{
+    RLMTable *table = [[RLMTable alloc] init];
+    [table addColumnWithName:@"objID" type:RLMTypeInt];
+    [table addColumnWithName:@"name" type:RLMTypeString];
+    
+    [table addRow:@{@"objID" : @89213, @"name" : @"Fiel"}];
+    [table addRow:@{@"objID" : @45132, @"name" : @"Paul"}];
+    
+    // Test set NSObject for valid index
+    NSInteger previousRowCount = [table rowCount];
+    TestObject* object = [[TestObject alloc] init];
+    object.objID = @1;
+    object.name = @"Alex";
+    
+    XCTAssertNoThrow([table setRow:object atIndex:0], @"Setting object for valid index should not throw exception");
+    XCTAssertTrue(previousRowCount == [table rowCount], @"previousRowCount should be equal to current rowCount");
+    XCTAssertTrue([table[0][@"objID"] isEqualToNumber:object.objID], @"Object at index 0 should have newly set objID");
+    XCTAssertTrue([table[0][@"name"] isEqualToString:object.name], @"Object at index 0 should have newly set name");
+    
+    // Test set NSDictionary for valid index
+    previousRowCount = [table rowCount];
+    NSDictionary* testDictionary = @{@"objID" : @2, @"name" : @"Tim"};
+    
+    XCTAssertNoThrow([table setRow:testDictionary atIndex:0], @"Setting object for valid index should not throw exception");
+    XCTAssertTrue(previousRowCount == [table rowCount], @"previousRowCount should be equal to current rowCount");
+    XCTAssertTrue([table[0][@"objID"] isEqualToNumber:testDictionary[@"objID"]], @"Object at index 0 should have newly set objID");
+    XCTAssertTrue([table[0][@"name"] isEqualToString:testDictionary[@"name"]], @"Object at index 0 should have newly set name");
+    
+    // Test set NSArray for valid index
+    previousRowCount = [table rowCount];
+    NSArray* testArray = @[@3, @"Ari"];
+    
+    XCTAssertNoThrow([table setRow:testArray atIndex:0], @"Setting object for valid index should not throw exception");
+    XCTAssertTrue(previousRowCount == [table rowCount], @"previousRowCount should be equal to current rowCount");
+    XCTAssertTrue([table[0][@"objID"] isEqualToNumber:testArray[0]], @"Object at index 0 should have newly set objID");
+    XCTAssertTrue([table[0][@"name"] isEqualToString:testArray[1]], @"Object at index 0 should have newly set name");
+    
+    // Test set valid object for invalid index
+    previousRowCount = [table rowCount];
+    XCTAssertThrows([table setRow:object atIndex:12], @"Setting object for invalid index should throw exception");
+    XCTAssertTrue(previousRowCount == [table rowCount], @"previousRowCount should be equal to current rowCount");
+    XCTAssertTrue([table[0][@"objID"] isEqualToNumber:testArray[0]], @"Object at index 0 should have newly set objID");
+    XCTAssertTrue([table[0][@"name"] isEqualToString:testArray[1]], @"Object at index 0 should have newly set name");
+    
+    // Test set nil for valid index
+    previousRowCount = [table rowCount];
+    XCTAssertNoThrow(([table setRow:nil atIndex:0]), @"Setting object to nil should not throw exception");
+    XCTAssertTrue(previousRowCount - 1 == [table rowCount], @"rowCount should be 1 less than previousRowCount");
+    XCTAssertTrue([table[0][@"objID"] isEqualToNumber:@45132], @"table[0][@\"objID\"] should be equal to last next object's objID after setting row to nil");
+    XCTAssertTrue([table[0][@"name"] isEqualToString:@"Paul"], @"table[0][@\"name\"] should be equal to last next object's objID after setting row to nil");
 }
 
 
