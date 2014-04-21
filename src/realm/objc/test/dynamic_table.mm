@@ -1175,10 +1175,12 @@ using namespace std;
     table[@"Test3"] = nil;
     
     XCTAssertEqual(previousRowCount, [table rowCount] + 1, @"[table rowCount] + 1 should be equal to previousRowCount");
+    XCTAssertNil(table[@"Test3"], @"table[\"Test3\"] should be nil");
     
     // No existing for errTable
-    
-    
+    previousRowCount = [errTable rowCount];
+    XCTAssertThrows((errTable[@"SomeKey"] = @{@"id" : @821763}), @"Calling keyed subscriptor on errTable should throw exception");
+    XCTAssertEqual(previousRowCount, [errTable rowCount], @"errTable should have same count as previous");
 }
 
 -(void)testTableDynamic_Row_Set
