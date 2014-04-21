@@ -24,14 +24,26 @@
 
 void ex_objc_context_intro()
 {
-    // Remove any previous file
+    // Generate paths for .realm file and .realm.lock file
+    NSString *realmFileName          = @"contextTest.realm";
+    NSString *documentsDirectoryPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
+    NSString *realmFilePath          = [documentsDirectoryPath stringByAppendingPathComponent:realmFileName];
+    NSString *realmFileLockPath      = [realmFilePath stringByAppendingPathExtension:@"lock"];
+    
+    // Remove any previous files
     NSFileManager *fm = [NSFileManager defaultManager];
-    [fm removeItemAtPath:@"contextTest.tightdb" error:nil];
-    [fm removeItemAtPath:@"contextTest.tightdb.lock" error:nil];
+    [fm removeItemAtPath:realmFilePath error:nil];
+    [fm removeItemAtPath:realmFileLockPath error:nil];
 
-    // Create datafile with a new table
-    RLMContext *context = [RLMContext contextPersistedAtPath:@"contextTest.tightdb"
-                                                       error:nil];
+    NSError *contextCreationError = nil;
+    
+    // Create an RLMContext
+    RLMContext *context = [RLMContext contextPersistedAtPath:realmFilePath
+                                                       error:&contextCreationError];
+    
+    if (contextCreationError) {
+        NSLog(@"Error creating context: %@", contextCreationError.localizedDescription);
+    }
 
     // Perform a write transaction (with commit to file)
     NSError *error = nil;
@@ -48,15 +60,14 @@ void ex_objc_context_intro()
 
     // Perform a write transaction (with rollback)
     success = [context writeUsingBlock:^(RLMTransaction *transaction) {
-        People *table = [transaction createTableWithName:@"employees"
-                                            asTableClass:[People class]];
+        People *table = [transaction tableWithName:@"employees"
+                                      asTableClass:[People class]];
         if ([table rowCount] == 0) {
             NSLog(@"Roll back!");
             return NO;
         }
-        [table addName:@"Bill" Age:53 Hired:YES];
-        NSLog(@"Commit!");
-        return YES;
+        [table addName:@"Mary" Age:76 Hired:NO];
+        return YES; // Commit
     } error:&error];
     if (!success)
         NSLog(@"Transaction Rolled back : %@", [error description]);
