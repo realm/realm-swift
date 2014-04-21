@@ -357,9 +357,7 @@ using namespace std;
                                      userInfo:nil];
     }
     
-    tightdb::Table& table = *m_table;
-    const char *utf8Key = [key UTF8String];
-    size_t ndx = table.lookup(utf8Key);
+    size_t ndx = m_table->lookup([key UTF8String]);
     
     return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil;
 }
