@@ -31,7 +31,7 @@
 +(Class)subtableObjectClassForProperty:(NSString *)propertyName;
 @optional
 // return an array of names of transient properties which should not be persisted
-+(NSArray *)ignorePropertyNames;
++(NSArray *)ignoredPropertyNames;
 // return the name of the primary key property for this object
 +(NSString *)primaryKeyPropertyName;
 @end
