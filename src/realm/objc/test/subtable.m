@@ -52,7 +52,8 @@ DEFINE_TABLE_TYPE(MainObject)
 
 @implementation MainProxied
 +(Class)subtableObjectClassForProperty:(NSString *)columnName {
-    return SubProxied.class;
+    if ([columnName isEqualToString:@"Sub"]) return SubProxied.class;
+    return nil;
 }
 
 -(NSString *)forwardGetFirst {
