@@ -47,12 +47,12 @@ using namespace std;
 // no needed
 @end
 
-@interface TDBDynamicTableTests: XCTestCase
+@interface RLMDynamicTableTests: XCTestCase
   // Intentionally left blank.
   // No new public instance methods need be defined.
 @end
 
-@implementation TDBDynamicTableTests
+@implementation RLMDynamicTableTests
 
 - (void)testTable
 {
