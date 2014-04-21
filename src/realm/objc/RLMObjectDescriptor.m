@@ -18,24 +18,24 @@
  *
  **************************************************************************/
 
-#import "RLMSchema.h"
+#import "RLMObjectDescriptor.h"
 #import "RLMTable.h"
 #import "RLMFast.h"
 #import "RLMPrivate.h"
 
-@interface RLMSchema ()
+@interface RLMObjectDescriptor ()
 @property (nonatomic, readwrite) NSArray * properties;
 @property (nonatomic, readwrite) NSDictionary * propertiesByName;
 
 @end
 
 // static caches for schema and proxy classes
-static NSMutableDictionary * s_schemaCache;
+static NSMutableDictionary * s_descriptorCache;
 
-@implementation RLMSchema
+@implementation RLMObjectDescriptor
 
 + (void)initialize {
-    s_schemaCache = [NSMutableDictionary dictionary];
+    s_descriptorCache = [NSMutableDictionary dictionary];
 }
 
 // return properties by name
@@ -53,9 +53,9 @@ static NSMutableDictionary * s_schemaCache;
     _properties = properties;
 }
 
-+(RLMSchema *)schemaForObjectClass:(Class)objectClass {
++(RLMObjectDescriptor *)descriptorForObjectClass:(Class)objectClass {
     NSString * className = NSStringFromClass(objectClass);
-    if (s_schemaCache[className]) return s_schemaCache[className];
+    if (s_descriptorCache[className]) return s_descriptorCache[className];
     
     // get object properties
     unsigned int count;
@@ -78,11 +78,11 @@ static NSMutableDictionary * s_schemaCache;
     free(props);
     
     // create schema object and set properties
-    RLMSchema * schema = [RLMSchema new];
-    schema.properties = [propArray copy];
+    RLMObjectDescriptor * descriptor = [RLMObjectDescriptor new];
+    descriptor.properties = [propArray copy];
     
-    s_schemaCache[className] = schema;
-    return schema;
+    s_descriptorCache[className] = descriptor;
+    return descriptor;
 }
 
 @end

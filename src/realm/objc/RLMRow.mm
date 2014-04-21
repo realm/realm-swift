@@ -21,7 +21,7 @@
 #include <tightdb/table.hpp>
 
 #import "RLMRow.h"
-#import "RLMSchema.h"
+#import "RLMObjectDescriptor.h"
 #import "RLMTable_noinst.h"
 #import "RLMPrivate.h"
 #import "RLMRowFast.h"
@@ -35,8 +35,8 @@ using namespace std;
 @implementation RLMRow
 
 +(Class)subtableObjectClassForProperty:(NSString *)columnName {
-    RLMSchema * schema = [RLMSchema schemaForObjectClass:self];
-    return schema[columnName].subtableObjectClass;
+    RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:self];
+    return descriptor[columnName].subtableObjectClass;
 }
 
 // make sure users don't create these without a table
