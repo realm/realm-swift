@@ -357,9 +357,11 @@ using namespace std;
                                      userInfo:nil];
     }
     
-    NSUInteger index = [[[self where] stringIsEqualTo:key inColumnWithIndex:0] indexOfFirstMatchingRow];
+    tightdb::Table& table = *m_table;
+    const char *utf8Key = [key UTF8String];
+    size_t ndx = table.lookup(utf8Key);
     
-    return index != (NSUInteger)NSNotFound ? [self rowAtIndex:index] : nil;
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil;
 }
 
 -(void)setObject:(id)newValue forKeyedSubscript:(NSString *)key
