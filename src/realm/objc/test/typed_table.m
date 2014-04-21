@@ -43,12 +43,12 @@ REALM_TABLE_2(TestTableKeyedSubscript,
 REALM_TABLE_1(TestTableKeyedSubscriptError,
               id, Int)
 
-@interface TDBTypedTableTests: XCTestCase
+@interface RLMTypedTableTests: XCTestCase
   // Intentionally left blank.
   // No new public instance methods need be defined.
 @end
 
-@implementation TDBTypedTableTests
+@implementation RLMTypedTableTests
 
 - (void)testDataTypes_Typed
 {
