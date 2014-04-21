@@ -27,7 +27,7 @@ void ex_objc_intro() {
     // Remove old data file
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSError *error;
-    [fileManager removeItemAtPath:@"people.tightdb" error:&error];
+    [fileManager removeItemAtPath:@"people.realm" error:&error];
 
     RLMContext *context = [RLMContext contextWithDefaultPersistence];
 

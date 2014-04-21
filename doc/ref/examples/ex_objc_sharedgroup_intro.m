@@ -26,11 +26,11 @@ void ex_objc_context_intro()
 {
     // Remove any previous file
     NSFileManager *fm = [NSFileManager defaultManager];
-    [fm removeItemAtPath:@"contextTest.tightdb" error:nil];
-    [fm removeItemAtPath:@"contextTest.tightdb.lock" error:nil];
+    [fm removeItemAtPath:@"contextTest.realm" error:nil];
+    [fm removeItemAtPath:@"contextTest.realm.lock" error:nil];
 
     // Create datafile with a new table
-    RLMContext *context = [RLMContext contextPersistedAtPath:@"contextTest.tightdb"
+    RLMContext *context = [RLMContext contextPersistedAtPath:@"contextTest.realm"
                                                        error:nil];
 
     // Perform a write transaction (with commit to file)
