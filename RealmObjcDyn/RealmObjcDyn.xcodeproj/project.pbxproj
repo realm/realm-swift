@@ -270,7 +270,6 @@
 				42AD3A9418CDBDFF00C86073 /* util.mm */,
 				E91890D5177B67AB00653D7A /* util_noinst.hpp */,
 			);
-			name = RealmObjcDyn;
 			path = RealmObjcDyn;
 			sourceTree = "<group>";
 		};
@@ -530,7 +529,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"TIGHTDB_MAX_LIST_SIZE=4",
 					"DEBUG=1",
-					REALM_DEBUG,
+					TIGHTDB_DEBUG,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
