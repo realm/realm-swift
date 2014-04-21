@@ -1172,7 +1172,7 @@ using namespace std;
     
     // Set existing row to nil for table
     previousRowCount = [table rowCount];
-    table[@"Test2"] = nil;
+    table[@"Test3"] = nil;
     
     XCTAssertEqual(previousRowCount, [table rowCount] + 1, @"[table rowCount] + 1 should be equal to previousRowCount");
     
