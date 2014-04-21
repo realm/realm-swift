@@ -34,7 +34,7 @@ void tableFunc() {
 
     // @@Example: number_of_rows @@
     NSUInteger cnt1 = people.rowCount;                 // =&gt; 6
-    NSLog(@"RowCount: %i", cnt1);
+    NSLog(@"RowCount: %lu", (unsigned long)cnt1);
     BOOL empty = people.rowCount == 0;                 // =&gt; NO
     NSLog(@"Table is empty? %d", empty);
     // @@EndExample@@
@@ -68,7 +68,7 @@ void tableFunc() {
     // @@Example: deleting_row @@
     [people removeRowAtIndex:2];
     NSUInteger cnt2 = people.rowCount;                  // =&gt; 5
-    NSLog(@"RowCount: %i", cnt2);
+    NSLog(@"RowCount: %lu", (unsigned long)cnt2);
     // @@EndExample@@
 
     // @@Example: iteration @@
@@ -80,7 +80,9 @@ void tableFunc() {
     // @@Example: simple_seach @@
     NSUInteger rowIndex;
     rowIndex = [people.Name find:@"Philip"];              // =&gt; NSNotFound
+    NSLog(@"rowIndex: %lu", (unsigned long)rowIndex);
     rowIndex = [people.Name find:@"Mary"];                // =&gt; 1
+    NSLog(@"rowIndex: %lu", (unsigned long)rowIndex);
     // @@EndExample@@
 
     // @@Example: advanced_search @@
@@ -96,7 +98,7 @@ void tableFunc() {
 
     // Get number of matching entries
     NSUInteger cnt3 = [query countRows];                 // =&gt; 2
-    NSLog(@"RowCount: %i", cnt3);
+    NSLog(@"RowCount: %lu", (unsigned long)cnt3);
 
     // You can do aggregates on columns, like calculating the average age
     double avg = [query.Age avg];
