@@ -23,13 +23,43 @@
 
 @class RLMTable;
 
-@interface RLMRow : NSObject
+
+// protocol for custom table objects
+@protocol RLMTableObject <NSObject>
+@required
+// implement to indicate the object type within subtables
++(Class)subtableObjectClassForProperty:(NSString *)propertyName;
+@optional
+// return an array of names of transient properties which should not be persisted
++(NSArray *)ignorePropertyNames;
+// return the name of the primary key property for this object
++(NSString *)primaryKeyPropertyName;
+@end
+
+
+@interface RLMRow : NSObject<RLMTableObject>
 
 -(id)objectAtIndexedSubscript:(NSUInteger)colIndex;
 -(id)objectForKeyedSubscript:(id <NSCopying>)key;
 -(void)setObject:(id)obj atIndexedSubscript:(NSUInteger)colIndex;
 -(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key;
 
+@end
+
+
+// macro helper for defining custom table object with subtables
+// if used
+// TODO - move somewhere else
+#define DEFINE_TABLE_TYPE(ObjectType)                           \
+@protocol ObjectType <NSObject>                                 \
+@required                                                       \
+-(ObjectType *)objectAtIndexedSubscript:(NSUInteger)rowIndex;   \
+@end                                                            \
+@interface RLMTable (ObjectType ## _TypedTable) <ObjectType>    \
+-(ObjectType *)rowAtIndex:(NSUInteger)rowIndex;                 \
+-(ObjectType *)firstRow;                                        \
+-(ObjectType *)lastRow;                                         \
+-(ObjectType *)objectAtIndexedSubscript:(NSUInteger)rowIndex;   \
 @end
 
 

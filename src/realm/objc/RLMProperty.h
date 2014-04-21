@@ -17,27 +17,25 @@
  * from TightDB Incorporated.
  *
  **************************************************************************/
-#ifndef TIGHTDB_OBJC_TYPE_H
-#define TIGHTDB_OBJC_TYPE_H
-
-/* Make sure numbers match those in <tightdb/data_type.hpp> */
-typedef NS_ENUM(NSInteger, RLMType) {
-    RLMTypeNone =  -1,
-    RLMTypeBool =  1,
-    RLMTypeInt =  0,
-    RLMTypeFloat =  9,
-    RLMTypeDouble = 10,
-    RLMTypeString =  2,
-    RLMTypeBinary =  4,
-    RLMTypeDate =  7,
-    RLMTypeTable =  5,
-    RLMTypeMixed =  6,
-};
 
 
-typedef NS_ENUM(NSInteger, RLMSortOrder) {
-    RLMSortOrderAscending =  0,
-    RLMSortOrderDescending =  1,
-};
+#import <Foundation/Foundation.h>
+#import "RLMType.h"
+#import <objc/runtime.h>
 
-#endif /* TIGHTDB_OBJC_TYPE_H */
+// object property definition
+@interface RLMProperty : NSObject
+
+@property NSString * name;
+@property RLMType type;
+@property (nonatomic) Class subtableObjectClass;
+@property char objcType;
+
+// creates a tdb property object from a runtime property
++(RLMProperty *)propertyForObjectProperty:(objc_property_t)prop;
+
+// adds getters and setters for this property/column on the given class
+-(void)addToClass:(Class)cls existing:(NSSet *)existing column:(int)column;
+
+@end
+

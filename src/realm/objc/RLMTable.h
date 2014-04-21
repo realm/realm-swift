@@ -52,7 +52,7 @@
 -(RLMRow *)firstRow;
 -(RLMRow *)lastRow;
 // Getting and setting individual rows with object subscripting
--(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
+-(id)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
 
 // Add a row at the end of the table.

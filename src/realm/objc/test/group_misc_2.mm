@@ -10,7 +10,7 @@
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMTransaction.h>
 #import <realm/objc/group.h>
-#import <realm/objc/PrivateRLM.h>
+#import <realm/objc/RLMPrivate.h>
 
 REALM_TABLE_DEF_4(MyTable,
                     Name,  String,

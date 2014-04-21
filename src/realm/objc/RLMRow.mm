@@ -21,8 +21,9 @@
 #include <tightdb/table.hpp>
 
 #import "RLMRow.h"
+#import "RLMSchema.h"
 #import "RLMTable_noinst.h"
-#import "PrivateRLM.h"
+#import "RLMPrivate.h"
 #import "RLMRowFast.h"
 #import "util_noinst.hpp"
 
@@ -31,13 +32,17 @@ using namespace std;
 
 // TODO: Concept for row invalidation (when table updates).
 
-@interface RLMRow ()
-@property (nonatomic, weak) RLMTable *table;
-@property (nonatomic) NSUInteger ndx;
-@end
 @implementation RLMRow
-@synthesize table = _table;
-@synthesize ndx = _ndx;
+
++(Class)subtableObjectClassForProperty:(NSString *)columnName {
+    RLMSchema * schema = [RLMSchema schemaForObjectClass:self];
+    return schema[columnName].subtableObjectClass;
+}
+
+// make sure users don't create these without a table
+-(id)init {
+    @throw [NSException exceptionWithName:@"RLMException" reason:@"Must initialize row with table and index" userInfo:nil];
+}
 
 -(id)initWithTable:(RLMTable *)table ndx:(NSUInteger)ndx
 {

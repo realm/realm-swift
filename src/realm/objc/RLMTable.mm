@@ -32,8 +32,10 @@
 #import "RLMRow.h"
 #import "RLMDescriptor_noinst.h"
 #import "RLMColumnProxy.h"
+#import "RLMProxy.h"
+#import "RLMSchema.h"
 #import "NSData+RLMGetBinaryData.h"
-#import "PrivateRLM.h"
+#import "RLMPrivate.h"
 #import "RLMSmartContext_noinst.h"
 #import "util_noinst.hpp"
 
@@ -56,6 +58,8 @@ using namespace std;
     if (self) {
         m_read_only = NO;
         m_table = tightdb::Table::create(); // FIXME: May throw
+        _objectClass = RLMRow.class;
+        _proxyObjectClass = RLMRow.class;
     }
     return self;
 }
@@ -68,7 +72,9 @@ using namespace std;
 
     m_read_only = NO;
     m_table = tightdb::Table::create(); // FIXME: May throw
-
+    _objectClass = RLMRow.class;
+    _proxyObjectClass = RLMRow.class;
+    
     if (!set_columns(m_table, columns)) {
         m_table.reset();
 
@@ -85,7 +91,17 @@ using namespace std;
 -(id)_initRaw
 {
     self = [super init];
+    _objectClass = RLMRow.class;
+    _proxyObjectClass = RLMRow.class;
     return self;
+}
+
+
+- (void)setObjectClass:(Class)objectClass {
+    _objectClass = objectClass;
+    _proxyObjectClass = [RLMProxy proxyClassForObjectClass:objectClass];
+    RLMSchema * schema = [RLMSchema schemaForObjectClass:objectClass];
+    [RLMTable updateDescriptor:self.descriptor toSupportSchema:schema];
 }
 
 -(BOOL)_checkType
@@ -96,7 +112,7 @@ using namespace std;
 
 -(RLMRow *)getRow
 {
-    return m_tmp_row = [[RLMRow alloc] initWithTable:self ndx:0];
+    return m_tmp_row = [[_proxyObjectClass alloc] initWithTable:self ndx:0];
 }
 -(void)clearRow
 {
@@ -253,7 +269,7 @@ using namespace std;
 -(RLMRow *)insertEmptyRowAtIndex:(NSUInteger)ndx
 {
     [self TDBInsertRow:ndx];
-    return [[RLMRow alloc] initWithTable:self ndx:ndx];
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:ndx];
 }
 
 -(BOOL)TDBInsertRow:(NSUInteger)ndx
@@ -304,7 +320,7 @@ using namespace std;
 
 -(RLMRow *)objectAtIndexedSubscript:(NSUInteger)ndx
 {
-    return [[RLMRow alloc] initWithTable:self ndx:ndx];
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:ndx];
 }
 
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex
@@ -345,7 +361,7 @@ using namespace std;
 {
     // initWithTable checks for illegal index.
 
-    return [[RLMRow alloc] initWithTable:self ndx:ndx];
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:ndx];
 }
 
 -(RLMRow *)firstRow
@@ -353,7 +369,7 @@ using namespace std;
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[RLMRow alloc] initWithTable:self ndx:0];
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:0];
 }
 
 -(RLMRow *)lastRow
@@ -361,13 +377,13 @@ using namespace std;
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[RLMRow alloc] initWithTable:self ndx:self.rowCount-1];
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:self.rowCount-1];
 }
 
 -(RLMRow *)insertRowAtIndex:(NSUInteger)ndx
 {
     [self insertEmptyRowAtIndex:ndx];
-    return [[RLMRow alloc] initWithTable:self ndx:ndx];
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:ndx];
 }
 
 -(void)addRow:(NSObject*)data
@@ -389,7 +405,7 @@ using namespace std;
 /* Moved to private header */
 -(RLMRow *)addEmptyRow
 {
-    return [[RLMRow alloc] initWithTable:self ndx:[self RLM_addEmptyRow]];
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:[self RLM_addEmptyRow]];
 }
 
 
@@ -972,37 +988,37 @@ using namespace std;
 -(RLMView*)findAllRowsWithBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_bool(colIndex, aBool);
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view];
 }
 -(RLMView*)findAllRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_int(colIndex, anInt);
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view];
 }
 -(RLMView*)findAllRowsWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_float(colIndex, aFloat);
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view];
 }
 -(RLMView*)findAllRowsWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_double(colIndex, aDouble);
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view];
 }
 -(RLMView*)findAllRowsWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_string(colIndex, ObjcStringAccessor(aString));
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view];
 }
 -(RLMView*)findAllRowsWithBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_binary(colIndex, aBinary.rlmBinaryData);
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view];
 }
 -(RLMView*)findAllRowsWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_datetime(colIndex, [aDate timeIntervalSince1970]);
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view];
 }
 -(RLMView*)findAllRowsWithMixed:(id)aMixed inColumnWithIndex:(NSUInteger)colIndex
 {
@@ -1011,7 +1027,7 @@ using namespace std;
     [NSException raise:@"NotImplemented" format:@"Not implemented"];
     // FIXME: Implement this!
 //    tightdb::TableView view = m_table->find_all_mixed(col_ndx, [value getNativeMixed]);
-//    return [RLMView viewWithTable:self andNativeView:view];
+//    return [RLMView viewWithTable:self nativeView:view];
     return 0;
 }
 
@@ -1039,7 +1055,7 @@ using namespace std;
     }
     
     tightdb::TableView distinctView = m_table->get_distinct_view(colIndex);
-    return [RLMView viewWithTable:self andNativeView:distinctView];
+    return [RLMView viewWithTable:self nativeView:distinctView];
 }
 
 namespace {
@@ -1317,7 +1333,7 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     if (row_ndx == tightdb::not_found)
         return nil;
 
-    return [[RLMRow alloc] initWithTable:self ndx:row_ndx];
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:row_ndx];
 }
 
 -(RLMView *)where:(id)condition
@@ -1328,7 +1344,7 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     tightdb::TableView view = query.find_all();
 
     // create objc view and return
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view objectClass:_proxyObjectClass];
 }
 
 -(RLMView *)where:(id)condition orderBy:(id)order
@@ -1367,7 +1383,7 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     }
 
     // create objc view and return
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view objectClass:_proxyObjectClass];
 }
 
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex
@@ -1464,6 +1480,55 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 {
     return YES; // Must be overridden in typed table classes.
 }
+
+
++ (void)updateDescriptor:(RLMDescriptor *)desc toSupportSchema:(RLMSchema *)schema {
+    for (RLMProperty * prop in schema.properties) {
+        NSUInteger index = [desc indexOfColumnWithName:prop.name];
+        if (index == NSNotFound) {
+            // create the column
+            [desc addColumnWithName:prop.name type:prop.type];
+            if (prop.type == RLMTypeTable) {
+                // set subtable schema
+                RLMDescriptor * subDesc = [desc subdescriptorForColumnWithIndex:desc.columnCount-1];
+                [RLMTable updateDescriptor:subDesc toSupportSchema:[RLMSchema schemaForObjectClass:prop.subtableObjectClass]];
+            }
+        }
+        else if ([desc columnTypeOfColumnWithIndex:index] != prop.type) {
+            NSString * reason = [NSString stringWithFormat:@"Column with name '%@' exists on table with different type", prop.name];
+            @throw [NSException exceptionWithName:@"TDBException"
+                                           reason:reason
+                                         userInfo:nil];
+        }
+    }
+}
+
+
+// returns YES if you can currently insert objects of type Class
+-(BOOL)compatibleWithObjectClass:(Class)objectClass {
+    RLMSchema * schema = [RLMSchema schemaForObjectClass:objectClass];
+    for (RLMProperty * prop in schema.properties) {
+        NSUInteger index = [self indexOfColumnWithName:prop.name];
+        if (index == NSNotFound || [self columnTypeOfColumnWithIndex:index] != prop.type) {
+            NSLog(@"Schema not compatible with table columns");
+            return NO;
+        }
+    }
+    return YES;
+}
+
+// returns YES if it's possible to update the table to support objects of type Class
+-(BOOL)canUpdateToSupportObjectClass:(Class)objectClass {
+    RLMSchema * schema = [RLMSchema schemaForObjectClass:objectClass];
+    for (RLMProperty * prop in schema.properties) {
+        NSUInteger index = [self indexOfColumnWithName:prop.name];
+        if (index != NSNotFound && [self columnTypeOfColumnWithIndex:index] != prop.type) {
+            return NO;
+        }
+    }
+    return YES;
+}
+
 
 @end
 

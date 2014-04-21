@@ -37,8 +37,10 @@
 /**
  * This method returns a table with the specified name from the group.
  * Returns nil if no table with the specified name exists.
+ * Optionally specify object class to be used when accessing table rows
  */
 -(RLMTable *)tableWithName:(NSString *)name;
+-(RLMTable *)tableWithName:(NSString *)name objectClass:(Class)objClass;
 
 /**
  * This method returns a table with the specified name from the group.
@@ -49,8 +51,10 @@
 /**
  * This method creates a table with the specific name.
  * If a table with that name already exists, an exception is thrown.
+ * Optionally specify object class to be used when accessing table rows
  */
 -(RLMTable *)createTableWithName:(NSString *)name;
+-(RLMTable *)createTableWithName:(NSString *)name objectClass:(Class)objClass;
 
 /**
  * This method creates a table with the specific name.
