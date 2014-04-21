@@ -30,7 +30,7 @@
 #import "RLMRow.h"
 #import "RLMView_noinst.h"
 #import "RLMQuery_noinst.h"
-#import "PrivateRLM.h"
+#import "RLMPrivate.h"
 #import "util_noinst.hpp"
 
 
@@ -40,9 +40,10 @@
     RLMTable * m_table;
     RLMRow * m_tmp_row;
     BOOL m_read_only;
+    Class _proxyObjectClass;
 }
 
-+(RLMView *)viewWithTable:(RLMTable *)table andNativeView:(const tightdb::TableView&)view
++(RLMView *)viewWithTable:(RLMTable *)table nativeView:(const tightdb::TableView&)view
 {
     RLMView * view_2 = [[RLMView alloc] init];
     if (!view_2)
@@ -54,6 +55,23 @@
     return view_2;
 }
 
++(RLMView*)viewWithTable:(RLMTable*)table
+              nativeView:(const tightdb::TableView&)view
+             objectClass:(Class)objectClass {
+    RLMView * v = [RLMView viewWithTable:table nativeView:view];
+    v->_proxyObjectClass = objectClass;
+    return v;
+}
+
+- (id)init {
+    self = [super init];
+    if (self) {
+        _proxyObjectClass = RLMRow.class;
+    }
+    return self;
+}
+
+
 -(id)_initWithQuery:(RLMQuery *)query
 {
     self = [super init];
@@ -62,6 +80,7 @@
         m_view.reset(new tightdb::TableView(query_2.find_all())); // FIXME: Exception handling needed here
         m_table = [query originTable];
         m_read_only = [m_table isReadOnly];
+        _proxyObjectClass = RLMRow.class;
     }
     return self;
 }
@@ -87,7 +106,7 @@
     if (ndx >= self.rowCount)
         return nil;
 
-    return [[RLMRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
 }
 
 -(RLMRow *)rowAtIndex:(NSUInteger)ndx
@@ -98,7 +117,7 @@
     if (ndx >= self.rowCount)
         return nil;
 
-    return [[RLMRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
 }
 
 -(RLMRow *)firstRow
@@ -106,7 +125,7 @@
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[RLMRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:0]];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:0]];
 }
 
 -(RLMRow *)lastRow
@@ -114,7 +133,7 @@
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[RLMRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1]];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1]];
 }
 
 -(NSUInteger)rowCount
@@ -230,7 +249,7 @@
 
 -(RLMRow *)getRow
 {
-    return m_tmp_row = [[RLMRow alloc] initWithTable: m_table
+    return m_tmp_row = [[_proxyObjectClass alloc] initWithTable: m_table
                                                  ndx: m_view->get_source_ndx(0)];
 }
 

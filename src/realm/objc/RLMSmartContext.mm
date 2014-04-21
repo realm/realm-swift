@@ -26,7 +26,7 @@
 #import "RLMConstants.h"
 #import "RLMTable_noinst.h"
 #import "RLMSmartContext_noinst.h"
-#import "PrivateRLM.h"
+#import "RLMPrivate.h"
 #import "util_noinst.hpp"
 
 using namespace std;

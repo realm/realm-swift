@@ -10,14 +10,57 @@
 #import <realm/objc/Realm.h>
 #import <realm/objc/group.h>
 
-REALM_TABLE_2(TestSubtableSub,
-                Name, String,
-                Age,  Int)
+@interface SubObject : RLMRow
+@property NSString * Name;
+@property int Age;
+@end
 
-REALM_TABLE_3(TestSubtableMain,
-                First,  String,
-                Sub,    TestSubtableSub,
-                Second, Int)
+@implementation SubObject
+@end
+
+DEFINE_TABLE_TYPE(SubObject)
+
+@interface MainObject : RLMRow
+@property NSString * First;
+@property RLMTable<SubObject> * Sub;
+@property int Second;
+@end
+
+@implementation MainObject
+@end
+
+DEFINE_TABLE_TYPE(MainObject)
+
+
+// main and subtable definitions derived from nsobject
+@interface SubProxied : NSObject
+@property NSString * Name;
+@property long LongAge;
+@end
+
+@implementation SubProxied
+@end
+
+@interface MainProxied : NSObject<RLMTableObject>
+@property NSString * First;
+@property RLMTable * Sub;
+@property int Second;
+
+-(NSString *)forwardGetFirst;
+
+@end
+
+@implementation MainProxied
++(Class)subtableObjectClassForProperty:(NSString *)columnName {
+    return SubProxied.class;
+}
+
+-(NSString *)forwardGetFirst {
+    return self.First;
+}
+
+@end
+
 
 @interface MACTestSubtable: XCTestCase
 @end
@@ -43,20 +86,50 @@ REALM_TABLE_3(TestSubtableMain,
 - (void)testSubtable
 {
     RLMTransaction *group = [RLMTransaction group];
-
+    
     /* Create new table in group */
-    TestSubtableMain *people = [group createTableWithName:@"employees" asTableClass:[TestSubtableMain class]];
-
+    RLMTable<SubObject> *people = [group createTableWithName:@"employees" objectClass:MainObject.class];
+    
     /* FIXME: Add support for specifying a subtable to the 'add'
-       method. The subtable must then be copied into the parent
-       table. */
-    [people addFirst:@"first" Sub:nil Second:8];
+     method. The subtable must then be copied into the parent
+     table. */
+    [people addRow:@[@"first", @[], @8]];
+    
+    MainObject *cursor = people[0];
+    RLMTable<SubObject> *subtable = cursor.Sub;
+    [subtable addRow:@[@"name", @999]];
+    
+    XCTAssertEqual([subtable[0] Age], (int)999, @"Age should be 999");
+    
+    // test setter
+    
+    // test setter
+    cursor.Second = 10;
+    XCTAssertEqual([people[0] Second], (int)10, @"Second should be 10");
+}
 
-    TestSubtableMainRow *cursor = [people rowAtIndex:0];
-    TestSubtableSub *subtable = cursor.Sub;
-    [subtable addName:@"name" Age:999];
-
-    XCTAssertEqual([subtable rowAtIndex:0].Age, (int64_t)999, @"Age should be 999");
+- (void)testSubtableSimple {
+    RLMTransaction *group = [RLMTransaction group];
+    
+    /* Create new table in group */
+    RLMTable *people = [group createTableWithName:@"employees" objectClass:MainProxied.class];
+    
+    /* FIXME: Add support for specifying a subtable to the 'add'
+     method. The subtable must then be copied into the parent
+     table. */
+    [people addRow:@[@"first", @[], @8]];
+    
+    // test getter
+    XCTAssertEqual([people[0] Second], (int)8, @"Second should be 8");
+    
+    // test forward invocation
+    XCTAssertTrue([@"first" isEqualToString:[people[0] forwardGetFirst]], @"First should be first");
+    
+    MainProxied *cursor = people[0];
+    RLMTable *subtable = cursor.Sub;
+    [subtable addRow:@[@"name", @999]];
+    
+    XCTAssertEqual([subtable[0] LongAge], (long)999, @"Age should be 999");
 }
 
 @end

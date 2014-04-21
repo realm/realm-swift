@@ -28,6 +28,9 @@
 
 @interface RLMView (noinst)
 
-+(RLMView *)viewWithTable:(RLMTable *)table andNativeView:(const tightdb::TableView&)view;
++(RLMView *)viewWithTable:(RLMTable *)table nativeView:(const tightdb::TableView&)view;
++(RLMView*)viewWithTable:(RLMTable*)table
+              nativeView:(const tightdb::TableView&)view
+             objectClass:(Class)objectClass;
 
 @end

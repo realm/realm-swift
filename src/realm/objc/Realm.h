@@ -29,4 +29,4 @@
 
 #import <realm/objc/PrivateHelperMacros.h>
 #import <realm/objc/PrivateTableMacros.h>
-#import <realm/objc/PrivateRLM.h>
+#import <realm/objc/RLMPrivate.h>

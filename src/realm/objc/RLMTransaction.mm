@@ -23,7 +23,7 @@
 
 #import "RLMTransaction_noinst.h"
 #import "RLMTable_noinst.h"
-#import "PrivateRLM.h"
+#import "RLMPrivate.h"
 #import "util_noinst.hpp"
 
 using namespace std;
@@ -92,6 +92,16 @@ using namespace std;
         )
         [table setParent:self];
     [table setReadOnly:m_read_only];
+    return table;
+}
+
+
+- (RLMTable *)tableWithName:(NSString *)name objectClass:(Class)objClass {
+    RLMTable * table = [self tableWithName:name];
+    
+    // set object class and update table columns
+    table.objectClass = objClass;
+    
     return table;
 }
 
@@ -178,6 +188,17 @@ using namespace std;
     [table setReadOnly:m_read_only];
     return table;
 }
+
+
+- (RLMTable *)createTableWithName:(NSString *)name objectClass:(Class)objClass {
+    RLMTable * table = [self createTableWithName:name];
+    
+    // set object class and update table columns
+    table.objectClass = objClass;
+    
+    return table;
+}
+
 
 -(RLMTable *)createTableWithName:(NSString*)name columns:(NSArray*)columns
 {

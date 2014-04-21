@@ -36,12 +36,12 @@ REALM_TABLE_9(TestTableAllTypes,
                 TableCol,  TestTableSub,
                 MixedCol,  Mixed)
 
-@interface TDBTypedTableTests: XCTestCase
+@interface RLMTypedTableTests: XCTestCase
   // Intentionally left blank.
   // No new public instance methods need be defined.
 @end
 
-@implementation TDBTypedTableTests
+@implementation RLMTypedTableTests
 
 - (void)testDataTypes_Typed
 {

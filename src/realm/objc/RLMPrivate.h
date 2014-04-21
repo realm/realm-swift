@@ -24,10 +24,34 @@
 #import "RLMRow.h"
 
 
+
 /**
  * The selectors in this interface is not meant to be used directly.
  * However, they are public so that the typed table macros can use them.
  */
+
+// private extensions
+@interface RLMTable ()
+// gets current object class
+// sets the current object type for this table and trys to update the table to support objects of type objectClass
+@property (nonatomic) Class objectClass;
+
+// the object class returned when accessing rows
+@property (readonly) Class proxyObjectClass;
+
+// returns YES if you can currently insert objects of type Class
+-(BOOL)compatibleWithObjectClass:(Class)objectClass;
+
+// returns YES if it's possible to update the table to support objects of type Class
+-(BOOL)canUpdateToSupportObjectClass:(Class)objectClass;
+@end
+
+@interface RLMRow()
+@property (nonatomic, weak) RLMTable *table;
+@property (nonatomic) NSUInteger ndx;
+@end
+
+// private category
 @interface RLMTable (Private)
 
 -(id)_initRaw;
