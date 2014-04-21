@@ -56,11 +56,11 @@ template<> inline void column_set<id>(RLMRow * row, int col, id val) { row[col] 
 
 // fixed column accessors
 template<typename T, int C>
-T column_get(RLMRow * row, SEL sel) {
+T column_get(RLMRow * row, SEL) {
     return column_get<T>(row, C);
 }
 template<typename T, int C>
-void column_set(RLMRow * row, SEL sel, T val) {
+void column_set(RLMRow * row, SEL, T val) {
     column_set<T>(row, C, val);
 }
 
@@ -112,7 +112,7 @@ template <typename T>
 class ColumnFuncsEnumerator<0, T> {
 public:
 	enum { column = 0 };
-    void registerFuncs(GettersSetters & funcs) {}
+    void registerFuncs(GettersSetters &) {}
 };
 
 static std::map<char, GettersSetters> s_columnAccessors;

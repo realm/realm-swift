@@ -13,9 +13,9 @@ lib_LIBRARIES = librealm-objc.a
 
 librealm_objc_a_SOURCES = RLMConstants.m RLMTable.mm RLMRow.mm RLMTransaction.mm RLMQuery.mm \
 RLMContext.mm RLMSmartContext.mm util.mm RLMVersion.mm RLMDescriptor.mm RLMView.mm \
-RLMColumnProxy.mm NSData+RLMGetBinaryData.mm
+RLMColumnProxy.mm NSData+RLMGetBinaryData.mm RLMProperty.mm RLMProxy.mm RLMSchema.m
 
-librealm_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2
+librealm_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2 -Wno-comment
 librealm_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
 
 # Format: CURRENT[:REVISION[:AGE]]
