@@ -21,6 +21,7 @@
 		42AD3A9918CDBDFF00C86073 /* RLMVersion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42AD3A9518CDBDFF00C86073 /* RLMVersion.mm */; };
 		42AD3A9A18CDBDFF00C86073 /* RLMVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 42AD3A9618CDBDFF00C86073 /* RLMVersion.h */; };
 		4B7ACCD918FDD96F008B7B95 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */; };
+		4BB05A691905BDD900F7F5F9 /* dynamic_table.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */; };
 		4D01A9FC18C9F5E600527AD5 /* table_view.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9FB18C9F5E600527AD5 /* table_view.m */; };
 		4D01A9FE18C9F60F00527AD5 /* version.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9FD18C9F60F00527AD5 /* version.m */; };
 		4D143CCF18F69D0F00CEFF65 /* RLMQueryFast.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D143CCE18F69D0F00CEFF65 /* RLMQueryFast.h */; };
@@ -31,7 +32,6 @@
 		4D143CF418F7E97500CEFF65 /* RLMConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D143CF218F7E97500CEFF65 /* RLMConstants.m */; };
 		4D1ED30818E1AF4E003CFF44 /* PrivateTableMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */; };
 		4D1ED30B18E1B6E8003CFF44 /* group.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1ED30A18E1B6E8003CFF44 /* group.h */; };
-		4DB1DEFB18BF70AE005A7234 /* dynamic_table.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */; };
 		4DB1DEFC18BF70AE005A7234 /* functional.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF918BF70AE005A7234 /* functional.m */; };
 		4DB1DEFD18BF70AE005A7234 /* typed_table.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEFA18BF70AE005A7234 /* typed_table.m */; };
 		4DDDD67418EB049300E94613 /* RLMViewProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DDDD67318EB049300E94613 /* RLMViewProtocol.h */; };
@@ -464,6 +464,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BB05A691905BDD900F7F5F9 /* dynamic_table.mm in Sources */,
 				E91890F5177B71E400653D7A /* data_type.mm in Sources */,
 				E91890F6177B71E400653D7A /* enumerator.m in Sources */,
 				E91890F7177B71E400653D7A /* err_handling.mm in Sources */,
@@ -479,7 +480,6 @@
 				4D01A9FC18C9F5E600527AD5 /* table_view.m in Sources */,
 				4DB1DEFD18BF70AE005A7234 /* typed_table.m in Sources */,
 				E91890FF177B71E400653D7A /* table_delete_all.m in Sources */,
-				4DB1DEFB18BF70AE005A7234 /* dynamic_table.mm in Sources */,
 				E9189101177B71E400653D7A /* template.m in Sources */,
 				E9189102177B71E400653D7A /* tutorial.m in Sources */,
 			);
