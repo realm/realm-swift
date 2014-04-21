@@ -85,7 +85,7 @@ BOOL is_class_subclass(Class class1, Class class2) {
         if (!s_proxyClassNameCache[objectClassName]) {
             RLMSchema * schema = [RLMSchema schemaForObjectClass:objectClass];
             NSSet * selectorNames = selectorNamesForClass(objectClass);
-            for (int propNum = 0; propNum < schema.properties.count; propNum++) {
+            for (unsigned int propNum = 0; propNum < schema.properties.count; propNum++) {
                 RLMProperty * prop = schema.properties[propNum];
                 [prop addToClass:objectClass existing:selectorNames column:propNum];
             }
@@ -108,7 +108,7 @@ BOOL is_class_subclass(Class class1, Class class2) {
     // add getters/setters for each propery
     RLMSchema * schema = [RLMSchema schemaForObjectClass:objectClass];
     NSSet * selectorNames = selectorNamesForClass(objectClass);
-    for (int propNum = 0; propNum < schema.properties.count; propNum++) {
+    for (unsigned int propNum = 0; propNum < schema.properties.count; propNum++) {
         RLMProperty * prop = schema.properties[propNum];
         [prop addToClass:proxyClass existing:selectorNames column:propNum];
     }
