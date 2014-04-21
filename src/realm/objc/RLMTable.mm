@@ -101,7 +101,7 @@ using namespace std;
     _objectClass = objectClass;
     _proxyObjectClass = [RLMProxy proxyClassForObjectClass:objectClass];
     RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
-    [RLMTable updateDescriptor:self.descriptor toSupportSchema:descriptor];
+    [RLMTable updateDescriptor:self.descriptor toSupportObjectDescriptor:descriptor];
 }
 
 -(BOOL)_checkType
@@ -1482,7 +1482,7 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 }
 
 
-+ (void)updateDescriptor:(RLMDescriptor *)desc toSupportSchema:(RLMObjectDescriptor *)descriptor {
++ (void)updateDescriptor:(RLMDescriptor *)desc toSupportObjectDescriptor:(RLMObjectDescriptor *)descriptor {
     for (RLMProperty *prop in descriptor.properties) {
         NSUInteger index = [desc indexOfColumnWithName:prop.name];
         if (index == NSNotFound) {
@@ -1491,7 +1491,8 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
             if (prop.type == RLMTypeTable) {
                 // set subtable schema
                 RLMDescriptor * subDesc = [desc subdescriptorForColumnWithIndex:desc.columnCount-1];
-                [RLMTable updateDescriptor:subDesc toSupportSchema:[RLMObjectDescriptor descriptorForObjectClass:prop.subtableObjectClass]];
+                RLMObjectDescriptor * objectDescriptor = [RLMObjectDescriptor descriptorForObjectClass:prop.subtableObjectClass];
+                [RLMTable updateDescriptor:subDesc toSupportObjectDescriptor:objectDescriptor];
             }
         }
         else if ([desc columnTypeOfColumnWithIndex:index] != prop.type) {
