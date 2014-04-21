@@ -17,9 +17,6 @@
 @end
 
 @implementation EnumPeople
-@dynamic Name;
-@dynamic Age;
-@dynamic Hired;
 @end
 
 @interface EnumPeople2 : RLMRow
@@ -28,8 +25,6 @@
 @end
 
 @implementation EnumPeople2
-@dynamic Age;
-@dynamic Hired;
 @end
 
 @interface MACTestEnumerator: XCTestCase
