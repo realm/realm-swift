@@ -252,16 +252,16 @@ using namespace std;
 
 -(RLMRow *)insertEmptyRowAtIndex:(NSUInteger)ndx
 {
-    [self TDBInsertRow:ndx];
+    [self RLMInsertRow:ndx];
     return [[RLMRow alloc] initWithTable:self ndx:ndx];
 }
 
--(BOOL)TDBInsertRow:(NSUInteger)ndx
+-(BOOL)RLMInsertRow:(NSUInteger)ndx
 {
-    return [self TDBInsertRow:ndx error:nil];
+    return [self RLMInsertRow:ndx error:nil];
 }
 
--(BOOL)TDBInsertRow:(NSUInteger)ndx error:(NSError* __autoreleasing*)error
+-(BOOL)RLMInsertRow:(NSUInteger)ndx error:(NSError* __autoreleasing*)error
 {
     if (m_read_only) {
         if (error)
@@ -430,7 +430,7 @@ using namespace std;
 -(void)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
 {
     if (!anObject) {
-        [self TDBInsertRow:rowIndex];
+        [self RLMInsertRow:rowIndex];
         return;
     }
     
@@ -462,6 +462,12 @@ using namespace std;
 
 - (void)setRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
 {
+    if (rowIndex >= self.rowCount) {
+        @throw [NSException exceptionWithName:@"realm:index_out_of_bounds"
+                                       reason:[NSString stringWithFormat:@"Index %lu beyond bounds [0 .. %lu]", (unsigned long)rowIndex, (unsigned long)self.rowCount-1]
+                                     userInfo:nil];
+    }
+    
     if (!anObject) {
         [self removeRowAtIndex:rowIndex]; // Remove row at index if anObject is nil
         return;
