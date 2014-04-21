@@ -38,10 +38,10 @@ REALM_TABLE_9(TestTableAllTypes,
 
 REALM_TABLE_2(TestTableKeyedSubscript,
               name, String,
-              id, Int)
+              objID, Int)
 
 REALM_TABLE_1(TestTableKeyedSubscriptError,
-              id, Int)
+              objID, Int)
 
 @interface RLMTypedTableTests: XCTestCase
   // Intentionally left blank.
@@ -149,16 +149,16 @@ REALM_TABLE_1(TestTableKeyedSubscriptError,
 {
     TestTableKeyedSubscript* table = [[TestTableKeyedSubscript alloc] init];
     
-    [table addRow:@{@"name" : @"Test1", @"id" : @24}];
-    [table addRow:@{@"name" : @"Test2", @"id" : @25}];
+    [table addRow:@{@"name" : @"Test1", @"objID" : @24}];
+    [table addRow:@{@"name" : @"Test2", @"objID" : @25}];
     
     XCTAssertNotNil(table[@"Test1"], @"table[@\"Test1\"] should not be nil");
-    XCTAssertEqualObjects(table[@"Test1"][@"name"], @"Test1", @"table[@\"Test24\"][@\"name\"] should be equal to Test1");
-    XCTAssertEqualObjects(table[@"Test1"][@"id"], @24, @"table[@\"Test24\"][@\"id\"] should be equal to @24");
+    XCTAssertEqualObjects(table[@"Test1"].name, @"Test1", @"table[@\"Test24\"].name should be equal to Test1");
+    XCTAssertEqual(table[@"Test1"].objID, 24, @"table[@\"Test24\"].objID should be equal to @24");
     
     XCTAssertNotNil(table[@"Test2"], @"table[@\"Test2\"] should not be nil");
-    XCTAssertEqualObjects(table[@"Test2"][@"name"], @"Test2", @"table[@\"Test24\"][@\"name\"] should be equal to Test2");
-    XCTAssertEqualObjects(table[@"Test2"][@"id"], @25, @"table[@\"Test24\"][@\"id\"] should be equal to @25");
+    XCTAssertEqualObjects(table[@"Test2"].name, @"Test2", @"table[@\"Test24\"].name should be equal to Test2");
+    XCTAssertEqual(table[@"Test2"].objID, 25, @"table[@\"Test24\"].objID should be equal to 25");
     
     XCTAssertNil(table[@"foo"], @"table[\"foo\"] should be nil");
     
@@ -171,12 +171,12 @@ REALM_TABLE_1(TestTableKeyedSubscriptError,
     // No exisiting for table
     NSUInteger previousRowCount = [table rowCount];
     NSString* nonExistingKey = @"Test10123903784293";
-    table[nonExistingKey] = @{@"name" : nonExistingKey, @"id" : @1};
+    table[nonExistingKey] = @{@"name" : nonExistingKey, @"objID" : @1};
     
     XCTAssertEqual(previousRowCount+1, [table rowCount], @"Row count should be equal to previous row count + 1 after inserting a non-existing RLMRow");
     XCTAssertNotNil(table[nonExistingKey], @"table[nonExistingKey] should not be nil");
-    XCTAssertEqualObjects(table[nonExistingKey][@"id"], @1, @"table[nonExistingKey][@\"id\"] should be equal to @1");
-    XCTAssertEqualObjects(table[nonExistingKey][@"name"], nonExistingKey, @"table[nonExistingKey][@\"name\"] should be equal to nonExistingKey");
+    XCTAssertEqual(table[nonExistingKey].objID, 1, @"table[nonExistingKey]objID should be equal to 1");
+    XCTAssertEqualObjects(table[nonExistingKey].name, nonExistingKey, @"table[nonExistingKey].name should be equal to nonExistingKey");
     
     // Set non-existing row to nil for table
     previousRowCount = [table rowCount];
@@ -188,13 +188,13 @@ REALM_TABLE_1(TestTableKeyedSubscriptError,
     
     // Has existing for table
     previousRowCount = [table rowCount];
-    table[@"Test2"] = @{@"name" : @"Test3" , @"id" : @123};
+    table[@"Test2"] = @{@"name" : @"Test3" , @"objID" : @123};
     
     XCTAssertEqual(previousRowCount, [table rowCount], @"Row count should still equal previous row count after inserting an existing RLMRow");
     XCTAssertNil(table[@"Test2"], @"table[@\"Test2\"] should be nil");
     XCTAssertNotNil(table[@"Test3"], @"table[@\"Test3\"] should not be nil");
-    XCTAssertEqualObjects(table[@"Test3"][@"id"], @123, @"table[\"Test3\"][@\"id\"] should be equal to @123");
-    XCTAssertEqualObjects(table[@"Test3"][@"name"], @"Test3", @"table[\"Test3\"][@\"name\"] should be equal to @\"Test3\"");
+    XCTAssertEqual(table[@"Test3"].objID, 123, @"table[\"Test3\"].objID should be equal to 123");
+    XCTAssertEqualObjects(table[@"Test3"].name, @"Test3", @"table[\"Test3\"].name should be equal to @\"Test3\"");
     
     // Set existing row to nil for table
     previousRowCount = [table rowCount];

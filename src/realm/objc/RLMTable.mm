@@ -357,7 +357,7 @@ using namespace std;
                                      userInfo:nil];
     }
     
-    size_t ndx = m_table->lookup([key UTF8String]);
+    size_t ndx = [self RLM_lookup:key];
     
     return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil;
 }
@@ -374,6 +374,10 @@ using namespace std;
     }
 }
 
+- (size_t)RLM_lookup:(NSString *)key
+{
+    return m_table->lookup([key UTF8String]);
+}
 
 -(RLMRow *)rowAtIndex:(NSUInteger)ndx
 {
