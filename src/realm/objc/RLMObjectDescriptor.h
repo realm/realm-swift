@@ -19,7 +19,6 @@
  **************************************************************************/
 
 #import <Foundation/Foundation.h>
-#import "RLMType.h"
 #import "RLMProperty.h"
 
 @class RLMObjectDescriptor;
@@ -34,7 +33,7 @@
 -(RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)key;
 
 // returns a cached or new schema for a given object class
-+(RLMObjectDescriptor *)descriptorForObjectClass:(Class)objectClass;
++(instancetype)descriptorForObjectClass:(Class)objectClass;
 
 @end
 

@@ -1483,7 +1483,7 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 
 
 + (void)updateDescriptor:(RLMDescriptor *)desc toSupportSchema:(RLMObjectDescriptor *)descriptor {
-    for (RLMProperty * prop in descriptor.properties) {
+    for (RLMProperty *prop in descriptor.properties) {
         NSUInteger index = [desc indexOfColumnWithName:prop.name];
         if (index == NSNotFound) {
             // create the column
@@ -1495,7 +1495,7 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
             }
         }
         else if ([desc columnTypeOfColumnWithIndex:index] != prop.type) {
-            NSString * reason = [NSString stringWithFormat:@"Column with name '%@' exists on table with different type", prop.name];
+            NSString *reason = [NSString stringWithFormat:@"Column with name '%@' exists on table with different type", prop.name];
             @throw [NSException exceptionWithName:@"TDBException"
                                            reason:reason
                                          userInfo:nil];
@@ -1519,8 +1519,8 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 
 // returns YES if it's possible to update the table to support objects of type Class
 -(BOOL)canUpdateToSupportObjectClass:(Class)objectClass {
-    RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
-    for (RLMProperty * prop in descriptor.properties) {
+    RLMObjectDescriptor *descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
+    for (RLMProperty *prop in descriptor.properties) {
         NSUInteger index = [self indexOfColumnWithName:prop.name];
         if (index != NSNotFound && [self columnTypeOfColumnWithIndex:index] != prop.type) {
             return NO;

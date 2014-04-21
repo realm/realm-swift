@@ -26,10 +26,10 @@
 // object property definition
 @interface RLMProperty : NSObject
 
-@property NSString * name;
-@property RLMType type;
-@property (nonatomic) Class subtableObjectClass;
-@property char objcType;
+@property (atomic, copy) NSString * name;
+@property (atomic, assign) RLMType type;
+@property (nonatomic, assign) Class subtableObjectClass;
+@property (atomic, assign) char objcType;
 
 // creates a tdb property object from a runtime property
 +(RLMProperty *)propertyForObjectProperty:(objc_property_t)prop;

@@ -53,7 +53,7 @@ static NSMutableDictionary * s_descriptorCache;
     _properties = properties;
 }
 
-+(RLMObjectDescriptor *)descriptorForObjectClass:(Class)objectClass {
++(instancetype)descriptorForObjectClass:(Class)objectClass {
     NSString * className = NSStringFromClass(objectClass);
     if (s_descriptorCache[className]) return s_descriptorCache[className];
     
@@ -61,7 +61,7 @@ static NSMutableDictionary * s_descriptorCache;
     unsigned int count;
     objc_property_t * props = class_copyPropertyList(objectClass, &count);
     
-    // create array of TDBProperties
+    // create array of RLMProperties
     NSMutableArray * propArray = [NSMutableArray arrayWithCapacity:count];
     for (unsigned int i = 0; i < count; i++) {
         RLMProperty * prop = [RLMProperty propertyForObjectProperty:props[i]];
