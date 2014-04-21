@@ -1579,7 +1579,7 @@ using namespace std;
     [table addRow:@{@"objID" : @45132, @"name" : @"Paul"}];
     
     // Test set NSObject for valid index
-    NSInteger previousRowCount = [table rowCount];
+    NSUInteger previousRowCount = [table rowCount];
     TestObject* object = [[TestObject alloc] init];
     object.objID = @1;
     object.name = @"Alex";
