@@ -21,6 +21,7 @@
 		42AD3A9918CDBDFF00C86073 /* RLMVersion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42AD3A9518CDBDFF00C86073 /* RLMVersion.mm */; };
 		42AD3A9A18CDBDFF00C86073 /* RLMVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 42AD3A9618CDBDFF00C86073 /* RLMVersion.h */; };
 		4B7ACCD918FDD96F008B7B95 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */; };
+		4BB05A6A1905DB2200F7F5F9 /* dynamic_table.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */; };
 		4D01A9FC18C9F5E600527AD5 /* table_view.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9FB18C9F5E600527AD5 /* table_view.m */; };
 		4D01A9FE18C9F60F00527AD5 /* version.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9FD18C9F60F00527AD5 /* version.m */; };
 		4D143CCF18F69D0F00CEFF65 /* RLMQueryFast.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D143CCE18F69D0F00CEFF65 /* RLMQueryFast.h */; };
@@ -463,6 +464,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BB05A6A1905DB2200F7F5F9 /* dynamic_table.mm in Sources */,
 				E91890F5177B71E400653D7A /* data_type.mm in Sources */,
 				E91890F6177B71E400653D7A /* enumerator.m in Sources */,
 				E91890F7177B71E400653D7A /* err_handling.mm in Sources */,
