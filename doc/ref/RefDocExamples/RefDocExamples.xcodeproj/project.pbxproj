@@ -432,7 +432,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					../../../,
-					/Users/fielguhit/ios_workspace/tightdb_objc,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RefDocExamples/RefDocExamples-Prefix.pch";
@@ -450,7 +449,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					../../../,
-					/Users/fielguhit/ios_workspace/tightdb_objc,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RefDocExamples/RefDocExamples-Prefix.pch";
