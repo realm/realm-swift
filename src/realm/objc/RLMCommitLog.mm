@@ -33,7 +33,13 @@ namespace tightdb {
 WriteLogRegistry* RegistryRegistry::get(std::string fname)
 {
     util::LockGuard lock(m_mutex);
-    return  m_registries.find(fname)->second;
+    std::map<std::string, WriteLogRegistry*>::iterator iter;
+    iter = m_registries.find(fname);
+    if (iter != m_registries.end())
+        return iter->second;
+    WriteLogRegistry* result = new WriteLogRegistry;
+    m_registries[fname] = result;
+    return result;
 };
 
 
