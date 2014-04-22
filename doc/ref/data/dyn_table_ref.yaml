@@ -378,7 +378,7 @@ CATEGORIES :
         DESCR  : Returns the inserted row.
 
   - objc_dyn_table_insert_object:
-      NAME     : "insertRow:atRowIndex:"
+      NAME     : "insertRow:atIndex:"
       SUMMARY  : Insert a row.
       DESCR    : >
                  This method will insert a row in the table at a particular
@@ -387,7 +387,25 @@ CATEGORIES :
                  with default values is inserted. Properties in generic objects
                  (derived from <code>NSObject</code>) which match columns names
                  will be used. Non-matching properties are ignored.
-      SIGNATURE: (void)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
+      SIGNATURE: (void)insertRow:(id)anObject atIndex:(NSUInteger)rowIndex
+      PARAMS:
+      - NAME    : anObject
+        TYPES   : id
+        DESCR   : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>.
+      - NAME    : rowIndex
+        TYPES   : NSUInteger
+        DESCR   : *g_dyn_table_insert_empty_row_parm1_descr
+
+  - objc_dyn_table_insert_object:
+      NAME     : "setRow:atIndex:"
+      SUMMARY  : Set a row.
+      DESCR    : >
+                 This method will set a row in the table at the specified
+                 index with anObject. If anObject is nil, the row gets removed.
+                 Properties in generic objects (derived from <code>NSObject</code>) 
+                 which match columns names will be used. Non-matching properties are ignored.
+                 An exception is thrown if passing an index that is out of bounds.
+      SIGNATURE: (void)setRow:(id)anObject atIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME    : anObject
         TYPES   : id
