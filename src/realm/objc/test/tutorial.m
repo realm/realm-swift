@@ -39,9 +39,9 @@ REALM_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    RLMTransaction *transaction = [RLMTransaction group];
-    // Create new table in transaction
-    PeopleTable *people = [transaction createTableWithName:@"employees" asTableClass:[PeopleTable class]];
+    RLMRealm *realm = [RLMRealm group];
+    // Create new table in realm
+    PeopleTable *people = [realm createTableWithName:@"employees" asTableClass:[PeopleTable class]];
 
     // Add some rows
     [people addName:@"John" Age:20 Hired:YES];
@@ -143,12 +143,12 @@ REALM_TABLE_IMPL_2(PeopleTable2,
 
     NSFileManager *fm = [NSFileManager defaultManager];
 
-    // Write the transaction to disk
+    // Write the realm to disk
     [fm removeItemAtPath:@"employees.realm" error:nil];
-    [transaction writeContextToFile:@"employees.realm" error:nil];
+    [realm writeContextToFile:@"employees.realm" error:nil];
 
-    // Load a transaction from disk (and print contents)
-    RLMTransaction *fromDisk = [RLMTransaction groupWithFile:@"employees.realm" error:nil];
+    // Load a realm from disk (and print contents)
+    RLMRealm *fromDisk = [RLMRealm groupWithFile:@"employees.realm" error:nil];
     PeopleTable *diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PeopleTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES];
@@ -160,11 +160,11 @@ REALM_TABLE_IMPL_2(PeopleTable2,
         NSLog(@"%zu: %@", i, row.Name);
     }
 
-    // Write same transaction to memory buffer
-    NSData* buffer = [transaction writeContextToBuffer];
+    // Write same realm to memory buffer
+    NSData* buffer = [realm writeContextToBuffer];
 
-    // Load a transaction from memory (and print contents)
-    RLMTransaction *fromMem = [RLMTransaction groupWithBuffer:buffer error:nil];
+    // Load a realm from memory (and print contents)
+    RLMRealm *fromMem = [RLMRealm groupWithBuffer:buffer error:nil];
     PeopleTable *memTable = [fromMem tableWithName:@"employees" asTableClass:[PeopleTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         PeopleTableRow *row = [memTable rowAtIndex:i];

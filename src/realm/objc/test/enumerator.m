@@ -28,9 +28,9 @@ REALM_TABLE_2(EnumPeopleTable2,
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
-    RLMTransaction *group = [RLMTransaction group];
-    // Create new table in group
-    EnumPeopleTable *people = [group createTableWithName:@"employees" asTableClass:[EnumPeopleTable class]];
+    RLMRealm *realm = [RLMRealm group];
+    // Create new table in realm
+    EnumPeopleTable *people = [realm createTableWithName:@"employees" asTableClass:[EnumPeopleTable class]];
 
     // Add some rows
     [people addName:@"John" Age:20 Hired:YES];

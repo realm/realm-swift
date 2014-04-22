@@ -20,11 +20,15 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMTransaction.h"
+#import "RLMRealm.h"
 
 
-@interface RLMTransaction (noinst)
+@interface RLMRealm (noinst)
 
-+(RLMTransaction *)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only;
+- (void)tableRefDidDie;
+
+- (void)checkForChange:(NSTimer *)timer;
+
++ (RLMRealm *)groupWithNativeGroup:(tightdb::Group *)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only;
 
 @end
