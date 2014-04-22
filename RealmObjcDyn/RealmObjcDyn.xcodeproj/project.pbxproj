@@ -30,7 +30,6 @@
 		4D143CF318F7E97500CEFF65 /* RLMConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D143CF118F7E97500CEFF65 /* RLMConstants.h */; };
 		4D143CF418F7E97500CEFF65 /* RLMConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D143CF218F7E97500CEFF65 /* RLMConstants.m */; };
 		4D1ED30818E1AF4E003CFF44 /* PrivateTableMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */; };
-		4D1ED30B18E1B6E8003CFF44 /* group.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1ED30A18E1B6E8003CFF44 /* group.h */; };
 		4DB1DEFB18BF70AE005A7234 /* dynamic_table.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */; };
 		4DB1DEFC18BF70AE005A7234 /* functional.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF918BF70AE005A7234 /* functional.m */; };
 		4DB1DEFD18BF70AE005A7234 /* typed_table.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEFA18BF70AE005A7234 /* typed_table.m */; };
@@ -103,7 +102,6 @@
 		4D143CF218F7E97500CEFF65 /* RLMConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMConstants.m; path = ../src/realm/objc/RLMConstants.m; sourceTree = SOURCE_ROOT; };
 		4D1ED30618E198AD003CFF44 /* PrivateRLM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PrivateRLM.h; path = ../src/realm/objc/PrivateRLM.h; sourceTree = SOURCE_ROOT; };
 		4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PrivateTableMacros.h; path = ../src/realm/objc/PrivateTableMacros.h; sourceTree = SOURCE_ROOT; };
-		4D1ED30A18E1B6E8003CFF44 /* group.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = group.h; path = ../src/realm/objc/group.h; sourceTree = SOURCE_ROOT; };
 		4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = dynamic_table.mm; path = ../../src/realm/objc/test/dynamic_table.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		4DB1DEF918BF70AE005A7234 /* functional.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = functional.m; path = ../../src/realm/objc/test/functional.m; sourceTree = "<group>"; };
 		4DB1DEFA18BF70AE005A7234 /* typed_table.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = typed_table.m; path = ../../src/realm/objc/test/typed_table.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
@@ -221,7 +219,6 @@
 			isa = PBXGroup;
 			children = (
 				4DDDD67118EAF1DC00E94613 /* RLMFast */,
-				4D1ED30A18E1B6E8003CFF44 /* group.h */,
 				4220871418E042FD00F3CF27 /* NSData+RLMGetBinaryData.h */,
 				4220871518E042FD00F3CF27 /* NSData+RLMGetBinaryData.mm */,
 				E91890CC177B67AB00653D7A /* PrivateHelperMacros.h */,
@@ -320,7 +317,6 @@
 				E91890E3177B67AB00653D7A /* RLMTable.h in Headers */,
 				4DDDD67418EB049300E94613 /* RLMViewProtocol.h in Headers */,
 				4D1ED30818E1AF4E003CFF44 /* PrivateTableMacros.h in Headers */,
-				4D1ED30B18E1B6E8003CFF44 /* group.h in Headers */,
 				E91890E4177B67AB00653D7A /* Realm.h in Headers */,
 				E91890E5177B67AB00653D7A /* RLMType.h in Headers */,
 				4D143CF318F7E97500CEFF65 /* RLMConstants.h in Headers */,

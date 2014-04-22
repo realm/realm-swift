@@ -87,13 +87,6 @@
 
 
 /**
- * This method will write the context to disk at the specified path.
- * Metadata and tables will be stored, and can be retrieved at later times.
- */
--(BOOL)writeContextToFile:(NSString *)path error:(NSError *__autoreleasing *)error;
-
-
-/**
  * This method returns YES if a table with the specified name already exists. NO if it does not exists.
  *
  * The specified table class must be one that is declared by using

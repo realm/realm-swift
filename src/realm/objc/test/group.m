@@ -10,7 +10,6 @@
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMRealm.h>
 #import <realm/objc/RLMContext.h>
-#import <realm/objc/group.h>
 
 REALM_TABLE_2(TestTableRealm,
               First,  String,
@@ -26,46 +25,65 @@ REALM_TABLE_2(TestTableRealm,
     NSFileManager *fm = [NSFileManager defaultManager];
 
     // Create empty realm and serialize to disk
-    RLMRealm *toDisk = [RLMRealm realm];
     [fm removeItemAtPath:@"table_test.realm" error:NULL];
-    [toDisk writeContextToFile:@"table_test.realm" error:nil];
+    RLMContext *context = [RLMContext contextPersistedAtPath:@"table_test.realm"
+                                                       error:nil];
+    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+        // Empty realm
+        XCTAssertNotNil(realm, @"parameter must be used");
+        return YES;
+    } error:nil];
 
     // Load the realm
-    RLMRealm *fromDisk = [RLMRealm realmWithFile:@"table_test.realm" error:nil];
-    if (!fromDisk)
-        XCTFail(@"From disk not valid");
+    RLMRealm *fromDisk = [RLMRealm realmWithPersistenceToFile:@"table_test.realm"];
+    XCTAssertTrue(fromDisk, @"Realm from disk should be valid");
 
     // Create new table in realm
-    TestTableRealm *t = (TestTableRealm *)[fromDisk createTableWithName:@"test" asTableClass:[TestTableRealm class]];
+    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+        [realm createTableWithName:@"test" asTableClass:[TestTableRealm class]];
+        return YES;
+    } error:nil];
 
+    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:@"table_test.realm"];
+    TestTableRealm *t = [realm tableWithName:@"test" asTableClass:[TestTableRealm class]];
+    
     // Verify
-    NSLog(@"Columns: %zu", t.columnCount);
-    if (t.columnCount != 2)
-        XCTFail(@"Should have been 2 columns");
-    if (t.rowCount != 0)
-        XCTFail(@"Should have been empty");
+    XCTAssertEqual(t.columnCount, (NSUInteger)2, @"Should have 2 columns");
+    XCTAssertEqual(t.rowCount, (NSUInteger)0, @"Should have 0 rows");
 
     // Modify table
-    [t addFirst:@"Test" Second:YES];
-    NSLog(@"Size: %lu", t.rowCount);
+    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+        TestTableRealm *t = [realm tableWithName:@"test" asTableClass:[TestTableRealm class]];
+        [t addFirst:@"Test" Second:YES];
+        return YES;
+    } error:nil];
 
     // Verify
-    if (t.rowCount != 1)
-        XCTFail(@"Should have been one row");
-
-    t = nil;
+    RLMRealm *realm2 = [RLMRealm realmWithPersistenceToFile:@"table_test.realm"];
+    TestTableRealm *t2 = [realm2 tableWithName:@"test" asTableClass:[TestTableRealm class]];
+    XCTAssertEqual(t2.rowCount, (NSUInteger)1, @"test table should have one row");
 }
 
 - (void)testGetTable {
-    RLMRealm *realm = [RLMRealm realm];
+    NSFileManager* fm = [NSFileManager defaultManager];
+    
+    // Delete realm file
+    [fm removeItemAtPath:[RLMContext defaultPath] error:nil];
+    RLMRealm *realm = [RLMRealm realmWithDefaultPersistence];
     XCTAssertNil([realm tableWithName:@"noTable"], @"Table does not exist");
 }
 
 - (void)testRealmTableCount {
-    RLMRealm *realm = [RLMRealm realm];
-    XCTAssertEqual(realm.tableCount, (NSUInteger)0, @"No tables added");
-    [realm createTableWithName:@"tableName"];
-    XCTAssertEqual(realm.tableCount, (NSUInteger)1, @"1 table added");
+    NSFileManager* fm = [NSFileManager defaultManager];
+    
+    // Delete realm file
+    [fm removeItemAtPath:[RLMContext defaultPath] error:nil];
+    XCTAssertEqual([[RLMRealm realmWithDefaultPersistence] tableCount], (NSUInteger)0, @"No tables added");
+    [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^BOOL(RLMRealm *realm) {
+        [realm createTableWithName:@"tableName"];
+        return YES;
+    } error:nil];
+    XCTAssertEqual([[RLMRealm realmWithDefaultPersistence] tableCount], (NSUInteger)1, @"1 table added");
 }
 
 @end

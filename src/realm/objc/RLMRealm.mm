@@ -106,13 +106,12 @@ void throw_objc_exception(exception &ex) {
 @implementation RLMRealm {
     NSNotificationCenter *_notificationCenter;
     UniquePtr<SharedGroup> _sharedGroup;
-    const Group *_group;
     NSTimer *_timer;
     NSMutableArray *_weakTableRefs; // Elements are instances of RLMPrivateWeakTableReference
     BOOL _tableRefsHaveDied;
     BOOL _hasParentContext;
     
-    tightdb::Group* m_group;
+    tightdb::Group *_group;
     BOOL m_is_owned;
     BOOL m_read_only;
 }
@@ -121,6 +120,7 @@ void throw_objc_exception(exception &ex) {
     self = [super init];
     if (self) {
         _hasParentContext = YES;
+        m_read_only = NO;
     }
     return self;
 }
@@ -129,6 +129,7 @@ void throw_objc_exception(exception &ex) {
     self = [super init];
     if (self) {
         _hasParentContext = hasParentContext;
+        m_read_only = YES;
     }
     return self;
 }
@@ -196,7 +197,7 @@ void throw_objc_exception(exception &ex) {
     realm->_weakTableRefs = [NSMutableArray array];
 
     try {
-        realm->_group = &realm->_sharedGroup->begin_read();
+        realm->_group = (tightdb::Group *)&realm->_sharedGroup->begin_read();
     }
     catch (exception &ex) {
         throw_objc_exception(ex);
@@ -206,12 +207,9 @@ void throw_objc_exception(exception &ex) {
 }
 
 - (void)dealloc {
-    if (_hasParentContext) {
-        if (m_is_owned) {
-            delete m_group;
-        }
-    } else {
-        [_timer invalidate];
+    [_timer invalidate];
+    if (m_is_owned) {
+        delete _group;
     }
 }
 
@@ -233,7 +231,7 @@ void throw_objc_exception(exception &ex) {
     try {
         if (_sharedGroup->has_changed()) { // Throws
             _sharedGroup->end_read();
-            _group = &_sharedGroup->begin_read(); // Throws
+            _group = (tightdb::Group *)&_sharedGroup->begin_read(); // Throws
 
             // Revive all realm level table accessors
             for (RLMPrivateWeakTableReference *weakTableRef in _weakTableRefs) {
@@ -254,62 +252,40 @@ void throw_objc_exception(exception &ex) {
 }
 
 - (RLMTable *)tableWithName:(NSString *)name {
-    if (_hasParentContext) {
-        // FIXME: Why impose this restriction? Isn't it kind of arbitrary?
-        // The core library has no problems with an empty table name. What
-        // if the database was created through a different language
-        // binding without this restriction?
-        if ([name length] == 0) {
-            // FIXME: Exception name must be `TDBException` according to
-            // the exception naming conventions of the official Cocoa
-            // style guide. The same is true for most (if not all) of the
-            // exceptions we throw.
-            @throw [NSException exceptionWithName:@"realm:table_name_exception"
-                                           reason:@"Name must be a non-empty NSString"
-                                         userInfo:nil];
-        }
-        
-        // If table does not exist in context, return nil
-        if (![self hasTableWithName:name]) // FIXME: Do this using C++
-            return nil;
-        
-        // Otherwise
-        RLMTable *table = [[RLMTable alloc] _initRaw];
-        if (TIGHTDB_UNLIKELY(!table))
-            return nil;
-        REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
-                                               tightdb::TableRef tableRef = m_group->get_table(ObjcStringAccessor(name));
-                                               [table setNativeTable:tableRef.get()];
-                                               )
-        [table setParent:self];
-        [table setReadOnly:m_read_only];
-        return table;
-    } else {
-        ObjcStringAccessor nameRef(name);
-        if (!_group->has_table(nameRef)) {
-            return nil;
-        }
-        RLMTable *table = [[RLMTable alloc] _initRaw];
-        size_t indexInRealm;
-        try {
-            ConstTableRef tableRef = _group->get_table(nameRef); // Throws
-            // Note: Const spoofing is alright, because the
-            // Objective-C table accessor is in 'read-only' mode.
-            [table setNativeTable:const_cast<Table*>(tableRef.get())];
-            indexInRealm = tableRef->get_index_in_parent();
-        }
-        catch (exception &ex) {
-            throw_objc_exception(ex);
-        }
-        [table setParent:self];
-        [table setReadOnly:YES];
-        if (!_hasParentContext) {
-            RLMPrivateWeakTableReference *weakTableRef = [[RLMPrivateWeakTableReference alloc] initWithTable:table
-                                                                                                indexInRealm:indexInRealm];
-            [_weakTableRefs addObject:weakTableRef];
-        }
-        return table;
+    if ([name length] == 0) {
+        // FIXME: Exception name must be `TDBException` according to
+        // the exception naming conventions of the official Cocoa
+        // style guide. The same is true for most (if not all) of the
+        // exceptions we throw.
+        @throw [NSException exceptionWithName:@"realm:table_name_exception"
+                                       reason:@"Name must be a non-empty NSString"
+                                     userInfo:nil];
     }
+    ObjcStringAccessor nameRef(name);
+    if (!_group->has_table(nameRef)) {
+        return nil;
+    }
+    RLMTable *table = [[RLMTable alloc] _initRaw];
+    size_t indexInRealm;
+    try {
+        ConstTableRef tableRef = _group->get_table(nameRef); // Throws
+        // Note: Const spoofing is alright, because the
+        // Objective-C table accessor is in 'read-only' mode.
+        [table setNativeTable:const_cast<Table*>(tableRef.get())];
+        indexInRealm = tableRef->get_index_in_parent();
+    }
+    catch (exception &ex) {
+        throw_objc_exception(ex);
+    }
+    [table setParent:self];
+    [table setReadOnly:m_read_only];
+    if (!_hasParentContext) {
+        [table setReadOnly:YES];
+        RLMPrivateWeakTableReference *weakTableRef = [[RLMPrivateWeakTableReference alloc] initWithTable:table
+                                                                                            indexInRealm:indexInRealm];
+        [_weakTableRefs addObject:weakTableRef];
+    }
+    return table;
 }
 
 - (void)tableRefDidDie {
@@ -319,7 +295,7 @@ void throw_objc_exception(exception &ex) {
 
 -(NSUInteger)tableCount // Overrides the property getter
 {
-    return m_group->size();
+    return _group->size();
 }
 
 -(BOOL)isEmpty // Overrides the property getter
@@ -329,72 +305,35 @@ void throw_objc_exception(exception &ex) {
 
 -(BOOL)hasTableWithName:(NSString*)name
 {
-    return m_group->has_table(ObjcStringAccessor(name));
+    return _group->has_table(ObjcStringAccessor(name));
 }
 
 - (id)tableWithName:(NSString *)name asTableClass:(__unsafe_unretained Class)class_obj {
-    if (_hasParentContext) {
-        // FIXME: Why impose this restriction? Isn't it kind of arbitrary?
-        // The core library has no problems with an empty table name. What
-        // if the database was created through a different language
-        // binding without this restriction?
-        if ([name length] == 0) {
-            // FIXME: Exception name must be `TDBException` according to
-            // the exception naming conventions of the official Cocoa
-            // style guide. The same is true for most (if not all) of the
-            // exceptions we throw.
-            @throw [NSException exceptionWithName:@"realm:table_name_exception"
-                                           reason:@"Name must be a non-empty NSString"
-                                         userInfo:nil];
-        }
-        
-        // If table does not exist in context, return nil
-        if (![self hasTableWithName:name]) // FIXME: Do this using C++
-            return nil;
-        
-        RLMTable * table = [[class_obj alloc] _initRaw];
-        if (TIGHTDB_UNLIKELY(!table))
-            return nil;
-        bool was_created;
-        REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
-                                               tightdb::TableRef tableRef = m_group->get_table(ObjcStringAccessor(name), was_created);
-                                               [table setNativeTable:tableRef.get()];
-                                               )
-        [table setParent:self];
-        [table setReadOnly:m_read_only];
-        if (was_created) {
-            if (![table _addColumns])
-                return nil;
-        }
-        else {
-            if (![table _checkType])
-                return nil;
-        }
-        return table;
-    } else {
-        ObjcStringAccessor nameRef(name);
-        if (!_group->has_table(nameRef)) {
-            return nil;
-        }
-        RLMTable *table = [[class_obj alloc] _initRaw];
-        size_t indexInRealm;
-        try {
-            ConstTableRef tableRef = _group->get_table(nameRef); // Throws
-            // Note: Const spoofing is alright, because the
-            // Objective-C table accessor is in 'read-only' mode.
-            [table setNativeTable:const_cast<Table*>(tableRef.get())];
-            indexInRealm = tableRef->get_index_in_parent();
-        }
-        catch (exception &ex) {
-            throw_objc_exception(ex);
-        }
-        [table setParent:self];
+    ObjcStringAccessor nameRef(name);
+    if (!_group->has_table(nameRef)) {
+        return nil;
+    }
+    RLMTable *table = [[class_obj alloc] _initRaw];
+    size_t indexInRealm;
+    try {
+        ConstTableRef tableRef = _group->get_table(nameRef); // Throws
+        // Note: Const spoofing is alright, because the
+        // Objective-C table accessor is in 'read-only' mode.
+        [table setNativeTable:const_cast<Table*>(tableRef.get())];
+        indexInRealm = tableRef->get_index_in_parent();
+    }
+    catch (exception &ex) {
+        throw_objc_exception(ex);
+    }
+    [table setParent:self];
+    [table setReadOnly:m_read_only];
+    if (!_hasParentContext) {
         [table setReadOnly:YES];
         RLMPrivateWeakTableReference *weakTableRef = [[RLMPrivateWeakTableReference alloc] initWithTable:table
                                                                                             indexInRealm:indexInRealm];
         [_weakTableRefs addObject:weakTableRef];
-        return table;
     }
+    return table;
 }
 
 // FIXME: Avoid creating a table instance. It should be enough to create an TightdbDescriptor and then check that.
@@ -402,7 +341,7 @@ void throw_objc_exception(exception &ex) {
 // FIXME: Find a way to avoid having to transcode the table name twice
 -(BOOL)hasTableWithName:(NSString *)name withTableClass:(__unsafe_unretained Class)class_obj
 {
-    if (!m_group->has_table(ObjcStringAccessor(name)))
+    if (!_group->has_table(ObjcStringAccessor(name)))
         return NO;
     RLMTable * table = [self createTableWithName:name asTableClass:class_obj];
     return table != nil;
@@ -432,7 +371,7 @@ void throw_objc_exception(exception &ex) {
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
     REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
-                                           tightdb::TableRef tableRef = m_group->get_table(ObjcStringAccessor(name));
+                                           tightdb::TableRef tableRef = _group->get_table(ObjcStringAccessor(name));
                                            [table setNativeTable:tableRef.get()];
                                            )
     [table setParent:self];
@@ -483,7 +422,7 @@ void throw_objc_exception(exception &ex) {
         return nil;
     bool was_created;
     REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
-                                           tightdb::TableRef tableRef = m_group->get_table(ObjcStringAccessor(name), was_created);
+                                           tightdb::TableRef tableRef = _group->get_table(ObjcStringAccessor(name), was_created);
                                            [table setNativeTable:tableRef.get()];)
     [table setParent:self];
     [table setReadOnly:m_read_only];
@@ -498,148 +437,20 @@ void throw_objc_exception(exception &ex) {
     return table;
 }
 
-/* Moved to group_priv header for now */
-+(RLMRealm *)realm
-{
-    RLMRealm *realm = [[RLMRealm alloc] init];
-    try {
-        realm->m_group = new tightdb::Group;
-    }
-    catch (std::exception& ex) {
-        @throw [NSException exceptionWithName:@"realm:core_exception"
-                                       reason:[NSString stringWithUTF8String:ex.what()]
-                                     userInfo:nil];
-    }
-    realm->m_is_owned  = YES;
-    realm->m_read_only = NO;
-    return realm;
-}
-
-
 // Private.
 // Careful with this one - Remember that group will be deleted on dealloc.
 +(RLMRealm *)realmWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only
 {
     RLMRealm *realm = [[RLMRealm alloc] init];
-    realm->m_group = group;
+    realm->_group = group;
     realm->m_is_owned  = is_owned;
     realm->m_read_only = read_only;
     return realm;
 }
 
-/* Moved to group_priv header for now */
-+(RLMRealm *)realmWithFile:(NSString *)filename error:(NSError **)error
-{
-    RLMRealm *realm = [[RLMRealm alloc] init];
-    if (!realm)
-        return nil;
-    try {
-        realm->m_group = new tightdb::Group(tightdb::StringData(ObjcStringAccessor(filename)));
-    }
-    // TODO: capture this in a macro or function, shared group constructor uses the same pattern.
-    catch (tightdb::util::File::PermissionDenied& ex) {
-        if (error) // allow nil as the error argument
-            *error = make_realm_error(RLMErrorFilePermissionDenied, [NSString stringWithUTF8String:ex.what()]);
-        return nil;
-    }
-    catch (tightdb::util::File::Exists& ex) {
-        if (error) // allow nil as the error argument
-            *error = make_realm_error(RLMErrorFileExists, [NSString stringWithUTF8String:ex.what()]);
-        return nil;
-        
-    }
-    catch (tightdb::util::File::AccessError& ex) {
-        if (error) // allow nil as the error argument
-            *error = make_realm_error(RLMErrorFileAccessError, [NSString stringWithUTF8String:ex.what()]);
-        return nil;
-    }
-    catch (std::exception& ex) {
-        if (error) // allow nil as the error argument
-            *error = make_realm_error(RLMErrorFail, [NSString stringWithUTF8String:ex.what()]);
-        return nil;
-    }
-    realm->m_is_owned  = YES;
-    realm->m_read_only = NO;
-    return realm;
-}
-
-/* Moved to group_priv header for now */
-+(RLMRealm *)realmWithBuffer:(NSData*)buffer error:(NSError**)error
-{
-    RLMRealm *realm = [[RLMRealm alloc] init];
-    if (!realm)
-        return nil;
-    try {
-        const void *data = [(NSData *)buffer bytes];
-        tightdb::BinaryData bufferRef(static_cast<const char *>(data), [(NSData *)buffer length]);
-        bool take_ownership = false; // FIXME: should this be true?
-        realm->m_group = new tightdb::Group(bufferRef, take_ownership);
-    }
-    catch (tightdb::InvalidDatabase& ex) {
-        if (error) // allow nil as the error argument
-            *error = make_realm_error(RLMErrorInvalidDatabase, [NSString stringWithUTF8String:ex.what()]);
-        return nil;
-    }
-    catch (std::exception& ex) {
-        @throw [NSException exceptionWithName:@"realm:core_exception"
-                                       reason:[NSString stringWithUTF8String:ex.what()]
-                                     userInfo:nil];
-    }
-    realm->m_is_owned  = YES;
-    realm->m_read_only = NO;
-    return realm;
-}
-
 -(NSString*)nameOfTableWithIndex:(NSUInteger)table_ndx
 {
-    return to_objc_string(m_group->get_table_name(table_ndx));
+    return to_objc_string(_group->get_table_name(table_ndx));
 }
-
-/* Moved to group_priv header for now */
--(BOOL)writeContextToFile:(NSString*)path error:(NSError* __autoreleasing*)error
-{
-    try {
-        m_group->write(tightdb::StringData(ObjcStringAccessor(path)));
-    }
-    // TODO: capture this in a macro or function, shared group constructor uses the same pattern.
-    // Except, here, we return no instead of nil.
-    catch (tightdb::util::File::PermissionDenied& ex) {
-        if (error) // allow nil as the error argument
-            *error = make_realm_error(RLMErrorFilePermissionDenied, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
-    catch (tightdb::util::File::Exists& ex) {
-        if (error) // allow nil as the error argument
-            *error = make_realm_error(RLMErrorFileExists, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
-    catch (tightdb::util::File::AccessError& ex) {
-        if (error) // allow nil as the error argument
-            *error = make_realm_error(RLMErrorFileAccessError, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
-    catch (std::exception& ex) {
-        if (error) // allow nil as the error argument
-            *error = make_realm_error(RLMErrorFail, [NSString stringWithUTF8String:ex.what()]);
-        return NO;
-    }
-    return YES;
-}
-
-/* Moved to group_priv header for now */
--(NSData*)writeRealmToBuffer
-{
-    try {
-        tightdb::BinaryData bd = m_group->write_to_mem();
-        return [[NSData alloc] initWithBytes:static_cast<const void *>(bd.data()) length:bd.size()];
-    }
-    catch (std::exception& ex) {
-        @throw [NSException exceptionWithName:@"realm:core_exception"
-                                       reason:[NSString stringWithUTF8String:ex.what()]
-                                     userInfo:nil];
-    }
-    return nil;
-}
-
 
 @end

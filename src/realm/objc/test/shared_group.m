@@ -9,7 +9,6 @@
 
 #import <realm/objc/RLMFast.h>
 #import <realm/objc/RLMRealm.h>
-#import <realm/objc/group.h>
 
 REALM_TABLE_2(SharedTable2,
               Hired, Bool,
@@ -24,80 +23,77 @@ REALM_TABLE_2(SharedTable2,
 - (void)testContext {
 
     // TODO: Update test to include more ASSERTS
-
-
-    RLMRealm *realm = [RLMRealm realm];
-    // Create new table in realm
-    SharedTable2 *table = [realm createTableWithName:@"employees" asTableClass:[SharedTable2 class]];
-    NSLog(@"Table: %@", table);
-    // Add some rows
-    [table addHired:YES Age:50];
-    [table addHired:YES Age:52];
-    [table addHired:YES Age:53];
-    [table addHired:YES Age:54];
-
-    NSLog(@"MyTable Size: %lu", [table rowCount]);
-
-
+    
     NSFileManager* fm = [NSFileManager defaultManager];
-
-    // Write to disk
+    
+    // Delete file
     [fm removeItemAtPath:@"employees.realm" error:nil];
     [fm removeItemAtPath:@"employees.realm.lock" error:nil];
-    [realm writeContextToFile:@"employees.realm" error:nil];
-
+    
+    RLMContext *context = [RLMContext contextPersistedAtPath:@"employees.realm"
+                                                       error:nil];
+    
+    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+        // Create new table in realm
+        SharedTable2 *table = [realm createTableWithName:@"employees" asTableClass:[SharedTable2 class]];
+        NSLog(@"Table: %@", table);
+        // Add some rows
+        [table addHired:YES Age:50];
+        [table addHired:YES Age:52];
+        [table addHired:YES Age:53];
+        [table addHired:YES Age:54];
+        
+        NSLog(@"MyTable Size: %lu", [table rowCount]);
+        return YES;
+    } error:nil];
+    
     // Read-only realm
     RLMContext *fromDisk = [RLMContext contextPersistedAtPath:@"employees.realm" error:nil];
-
+    
     [fromDisk readUsingBlock:^(RLMRealm *realm) {
-            SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
-            NSLog(@"Disktable size: %zu", [diskTable rowCount]);
-            for (size_t i = 0; i < [diskTable rowCount]; i++) {
-                SharedTable2Row *cursor = [diskTable rowAtIndex:i];
-                NSLog(@"%zu: %lld", i, cursor.Age);
-                NSLog(@"%zu: %i", i, [diskTable RLM_boolInColumnWithIndex: 0 atRowIndex:i]);
-            }
-        }];
-
-
+        SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
+        NSLog(@"Disktable size: %zu", [diskTable rowCount]);
+        for (size_t i = 0; i < [diskTable rowCount]; i++) {
+            SharedTable2Row *cursor = [diskTable rowAtIndex:i];
+            NSLog(@"%zu: %lld", i, cursor.Age);
+            NSLog(@"%zu: %i", i, [diskTable RLM_boolInColumnWithIndex: 0 atRowIndex:i]);
+        }
+    }];
+    
     [fromDisk writeUsingBlock:^(RLMRealm *realm) {
-            SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
-            NSLog(@"Disktable size: %zu", [diskTable rowCount]);
-            for (size_t i = 0; i < 50; i++) {
-                [diskTable addHired:YES Age:i];
-            }
-            return YES; // Commit
-        } error:nil];
-
-
+        SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
+        NSLog(@"Disktable size: %zu", [diskTable rowCount]);
+        for (size_t i = 0; i < 50; i++) {
+            [diskTable addHired:YES Age:i];
+        }
+        return YES; // Commit
+    } error:nil];
+    
     [fromDisk writeUsingBlock:^(RLMRealm *realm) {
-            SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
-            NSLog(@"Disktable size: %zu", [diskTable rowCount]);
-            for (size_t i = 0; i < 50; i++) {
-                [diskTable addHired:YES Age:i];
-            }
-            return NO; // rollback
-        } error:nil];
-
-
+        SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
+        NSLog(@"Disktable size: %zu", [diskTable rowCount]);
+        for (size_t i = 0; i < 50; i++) {
+            [diskTable addHired:YES Age:i];
+        }
+        return NO; // rollback
+    } error:nil];
+    
     [fromDisk writeUsingBlock:^(RLMRealm *realm) {
-            SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
-            NSLog(@"Disktable size: %zu", [diskTable rowCount]);
-            for (size_t i = 0; i < 50; i++) {
-                [diskTable addHired:YES Age:i];
-            }
+        SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
+        NSLog(@"Disktable size: %zu", [diskTable rowCount]);
+        for (size_t i = 0; i < 50; i++) {
+            [diskTable addHired:YES Age:i];
+        }
         
-            XCTAssertNil([realm tableWithName:@"Does not exist"], @"Table does not exist");
-
-            return YES; // commit
-        } error:nil];
+        XCTAssertNil([realm tableWithName:@"Does not exist"], @"Table does not exist");
+        return YES; // commit
+    } error:nil];
 
     [fromDisk readUsingBlock:^(RLMRealm * realm) {
-            SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
-            NSLog(@"Disktable size: %zu", [diskTable rowCount]);
+        SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
+        NSLog(@"Disktable size: %zu", [diskTable rowCount]);
         
         XCTAssertThrows([diskTable removeAllRows], @"Not allowed in read realm");
-
     }];
 }
 
@@ -132,26 +128,28 @@ REALM_TABLE_2(SharedTable2,
 
 - (void)testRealmCreateTableWithColumns
 {
-    RLMRealm *realm = [RLMRealm realm];
+    RLMContext *context = [RLMContext contextWithDefaultPersistence];
     
-    // Check if method throws exception
-    XCTAssertNoThrow(([realm createTableWithName:@"Test" columns:@[@"id", @"int"]]), @"Table should not throw exception");
-    
-    // Test adding rows for single column table
-    NSString* const RLMTableNameDepartment = @"Department";
-    RLMTable* departmentTable = [realm createTableWithName:RLMTableNameDepartment columns:@[@"name", @"string"]];
-    XCTAssertTrue(departmentTable.columnCount == 1, @"Table should have 1 column");
-    XCTAssertTrue([[departmentTable nameOfColumnWithIndex:0] isEqualToString:@"name"], @"Column at index 0 should be name");
-    XCTAssertNoThrow(([departmentTable addRow:@{@"name" : @"Engineering"}]), @"Adding row should not throw exception");
-    
-    // Test adding rows for multi-column table
-    NSString* const RLMTableNameEmployee = @"Employee";
-    RLMTable* employeeTable = [realm createTableWithName:RLMTableNameEmployee columns:@[@"id", @"int", @"name", @"string", @"position", @"string"]];
-    XCTAssertTrue(employeeTable.columnCount == 3, @"Table should have 3 column");
-    XCTAssertTrue([[employeeTable nameOfColumnWithIndex:0] isEqualToString:@"id"], @"Column at index 0 should be id");
-    XCTAssertTrue([[employeeTable nameOfColumnWithIndex:1] isEqualToString:@"name"], @"Column at index 1 should be name");
-    XCTAssertTrue([[employeeTable nameOfColumnWithIndex:2] isEqualToString:@"position"], @"Column at index 0 should be position");
-    XCTAssertNoThrow(([employeeTable addRow:@{@"id" : @124312, @"name" : @"Fiel Guhit", @"position" : @"iOS Engineer"}]), @"Adding row should not throw exception");
+    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+        // Check if method throws exception
+        XCTAssertNoThrow(([realm createTableWithName:@"Test" columns:@[@"id", @"int"]]), @"Table should not throw exception");
+        
+        // Test adding rows for single column table
+        NSString* const RLMTableNameDepartment = @"Department";
+        RLMTable* departmentTable = [realm createTableWithName:RLMTableNameDepartment columns:@[@"name", @"string"]];
+        XCTAssertTrue(departmentTable.columnCount == 1, @"Table should have 1 column");
+        XCTAssertTrue([[departmentTable nameOfColumnWithIndex:0] isEqualToString:@"name"], @"Column at index 0 should be name");
+        XCTAssertNoThrow(([departmentTable addRow:@{@"name" : @"Engineering"}]), @"Adding row should not throw exception");
+        
+        // Test adding rows for multi-column table
+        NSString* const RLMTableNameEmployee = @"Employee";
+        RLMTable* employeeTable = [realm createTableWithName:RLMTableNameEmployee columns:@[@"id", @"int", @"name", @"string", @"position", @"string"]];
+        XCTAssertTrue(employeeTable.columnCount == 3, @"Table should have 3 column");
+        XCTAssertTrue([[employeeTable nameOfColumnWithIndex:0] isEqualToString:@"id"], @"Column at index 0 should be id");
+        XCTAssertTrue([[employeeTable nameOfColumnWithIndex:1] isEqualToString:@"name"], @"Column at index 1 should be name");
+        XCTAssertTrue([[employeeTable nameOfColumnWithIndex:2] isEqualToString:@"position"], @"Column at index 0 should be position");
+        XCTAssertNoThrow(([employeeTable addRow:@{@"id" : @124312, @"name" : @"Fiel Guhit", @"position" : @"iOS Engineer"}]), @"Adding row should not throw exception");
+    } error:nil];
 }
 
 - (void)testReadRealm
