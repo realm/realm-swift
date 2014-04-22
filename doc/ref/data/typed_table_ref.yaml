@@ -196,6 +196,40 @@ CATEGORIES:
         TYPES  : <i>ClassName</i>Row *
         DESCR  : The row object. Note that <i>ClassName</i> is replaced with the name of your specific table.
 
+  - g_dyn_table_row_at_indexed_subscript:
+      NAME     : "objectAtIndexedSubscript:"
+      SUMMARY  : Returns a row object at a specified row number.
+      DESCR    : >
+                 The method returns a row object at a specific row number. This method also allows
+                 an <code>RLMTable</code> to use NSArray-styled subscripting.
+                 For example, <code>myRLMTable[2]</code> will return an <code>RLMRow</code> at index 2. 
+      SIGNATURE: "(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex"
+      PARAMS:
+      - NAME   : rowIndex
+        TYPES  : NSUInteger
+        DESCR  : The row number.
+      RETURN:
+        TYPES  : RLMRow *
+        DESCR  : The row.
+
+  - g_dyn_table_row_at_keyed_subscript:
+      NAME     : "objectForKeyedSubscript:"
+      SUMMARY  : Returns a row object for a specified key.
+      DESCR    : >
+                 The method returns a row object for a given <code>key</code>. This method also allows
+                 an <code>RLMTable</code> to use NSDictionary-styled subscripting. For example,
+                 <code>myRLMTable[@"foo"]</code> will return the first <code>RLMRow</code> where the first column's value is equal to <code>@"foo"</code>.
+                 Please note that the first column in the <code>RLMTable</code> must be of <code>RLMTypeString</code> in order for this method to work.
+                 If the first column is not of <code>RLMTypeString</code>, an exception will be thrown. <code>nil</code> is returned if a key does not exist in the table.
+      SIGNATURE: "(RLMRow *)objectForKeyedSubscript:(NSString *)key"
+      PARAMS:
+      - NAME   : key
+        TYPES  : NSString *
+        DESCR  : The key to lookup.
+      RETURN:
+        TYPES  : RLMRow *
+        DESCR  : The row.
+
   - g_typed_table_cursor_at_last_index:
       NAME     : lastRow
       SUMMARY  : Returns a typed row at highest row index.
