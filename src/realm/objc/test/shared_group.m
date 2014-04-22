@@ -66,7 +66,6 @@ REALM_TABLE_2(SharedTable2,
             for (size_t i = 0; i < 50; i++) {
                 [diskTable addHired:YES Age:i];
             }
-            return YES; // Commit
         } error:nil];
 
 
@@ -76,7 +75,6 @@ REALM_TABLE_2(SharedTable2,
             for (size_t i = 0; i < 50; i++) {
                 [diskTable addHired:YES Age:i];
             }
-            return NO; // rollback
         } error:nil];
 
 
@@ -88,16 +86,12 @@ REALM_TABLE_2(SharedTable2,
             }
         
             XCTAssertNil([group tableWithName:@"Does not exist"], @"Table does not exist");
-
-            return YES; // commit
         } error:nil];
 
     [fromDisk readUsingBlock:^(RLMTransaction * group) {
-            SharedTable2* diskTable = [group tableWithName:@"employees" asTableClass:[SharedTable2 class]];
-            NSLog(@"Disktable size: %zu", [diskTable rowCount]);
-        
+        SharedTable2* diskTable = [group tableWithName:@"employees" asTableClass:[SharedTable2 class]];
+        NSLog(@"Disktable size: %zu", [diskTable rowCount]);
         XCTAssertThrows([diskTable removeAllRows], @"Not allowed in readtransaction");
-
     }];
 }
 
@@ -120,9 +114,6 @@ REALM_TABLE_2(SharedTable2,
         
         [t addColumnWithName:@"col0" type:RLMTypeInt];
         [t addRow:@[@10]];
-        
-        return YES;
-        
     } error:nil];
     
     [context readUsingBlock:^(RLMTransaction * transaction) {
@@ -171,8 +162,6 @@ REALM_TABLE_2(SharedTable2,
         
         [t addColumnWithName:@"col0" type:RLMTypeInt];
         [t addRow:@[@10]];
-         
-        return YES;
     } error:nil];
     
     [fromDisk readUsingBlock:^(RLMTransaction * group) {
@@ -211,7 +200,6 @@ REALM_TABLE_2(SharedTable2,
         RLMTable *t = [trx createTableWithName:@"table"];
         [t addColumnWithName:@"col0" type:RLMTypeInt];
         [t addRow:@[@10]];
-        return YES;
     } error:nil];
 
     [ctx readTable:@"table" usingBlock:^(RLMTable* table) {
@@ -220,7 +208,6 @@ REALM_TABLE_2(SharedTable2,
 
     [ctx writeTable:@"table" usingBlock:^(RLMTable* table) {
         [table addRow:@[@10]];
-        return YES;
     } error:nil];
 
     [ctx readTable:@"table" usingBlock:^(RLMTable* table) {
@@ -243,7 +230,6 @@ REALM_TABLE_2(SharedTable2,
     
     [sg writeUsingBlock:^(RLMTransaction * group) {
         [group createTableWithName:@"t"];
-        return YES;
     } error:nil];
     
     XCTAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not been changed by another process");
@@ -255,7 +241,6 @@ REALM_TABLE_2(SharedTable2,
         [t addRow:nil];
         RLMRow *row = [t lastRow];
         [row setBool:YES inColumnWithIndex:0];
-        return YES;
     } error:nil];
     
     XCTAssertFalse([sg hasChangedSinceLastTransaction], @"SharedGroup has not been changed by another process");
@@ -268,7 +253,6 @@ REALM_TABLE_2(SharedTable2,
     [sg2 writeUsingBlock:^(RLMTransaction * group) {
         RLMTable *t = [group tableWithName:@"t"];
         [t addRow:nil]; /* Adding an empty row */
-        return YES;
     } error:nil];
 
     XCTAssertTrue([sg hasChangedSinceLastTransaction], @"SharedGroup HAS been changed by another process");
@@ -284,15 +268,13 @@ REALM_TABLE_2(SharedTable2,
     
     RLMContext *c = [RLMContext contextPersistedAtPath:contextPath error:nil];
     
-    [c writeUsingBlock:^BOOL(RLMTransaction *transaction) {
+    [c writeUsingBlock:^(RLMTransaction *transaction) {
         
         XCTAssertThrows([transaction createTableWithName:nil], @"name is nil");
         XCTAssertThrows([transaction createTableWithName:@""], @"name is empty");
 
         [transaction createTableWithName:@"name"];
         XCTAssertThrows([transaction createTableWithName:@"name"], @"name already exists");
-        
-        return YES;
     } error:nil];
     
     [c readUsingBlock:^(RLMTransaction *transaction) {
@@ -327,12 +309,11 @@ REALM_TABLE_2(SharedTable2,
         [context2 unpinReadTransactions];
     }
     {   // add something to the db to play with
-        [context1 writeUsingBlock:^BOOL(RLMTransaction *transaction) {
+        [context1 writeUsingBlock:^(RLMTransaction *transaction) {
             RLMTable *t1 = [transaction createTableWithName:@"test"];
             [t1 addColumnWithName:@"col0" type:RLMTypeBool];
             [t1 addRow:@[@YES]];
             //t1->add(0, 2, false, "test");
-            return YES;
         } error:nil];
     }
     {   // validate that we can see previous commit from within a new pinned transaction
@@ -344,10 +325,9 @@ REALM_TABLE_2(SharedTable2,
         }];
     }
     {   // commit new data in another context, without unpinning
-        [context1 writeUsingBlock:^BOOL(RLMTransaction *transaction) {
+        [context1 writeUsingBlock:^(RLMTransaction *transaction) {
             RLMTable *t = [transaction tableWithName:@"test"];
             [t addRow:@[@NO]];
-            return YES;
         } error:nil];
         
     }
@@ -400,15 +380,11 @@ REALM_TABLE_2(SharedTable2,
     }
     {   // can't start a write transaction while pinned
         [context1 pinReadTransactions];
-        XCTAssertThrows([context1 writeUsingBlock:^BOOL(RLMTransaction *transaction) {
+        XCTAssertThrows([context1 writeUsingBlock:^(RLMTransaction *transaction) {
             XCTAssertNotNil(transaction, @"Parameter must be used");
-            return YES;
         } error:nil], @"Can't start write transaction while pinned");
         [context1 unpinReadTransactions];
     }
 }
 
 @end
-
-
-

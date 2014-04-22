@@ -24,9 +24,11 @@
 
 
 typedef void(^RLMReadBlock)(RLMTransaction *transaction);
-typedef BOOL(^RLMWriteBlock)(RLMTransaction *transaction);
+typedef void(^RLMWriteBlock)(RLMTransaction *transaction);
+typedef BOOL(^RLMWriteBlockWithRollback)(RLMTransaction *transaction);
+
 typedef void(^RLMTableReadBlock)(RLMTable *table);
-typedef BOOL(^RLMTableWriteBlock)(RLMTable *table);
+typedef void(^RLMTableWriteBlock)(RLMTable *table);
 
 /****************	  RLMContext	****************/
 
