@@ -6,9 +6,9 @@
 // Define table
 
 REALM_TABLE_3(PeopleTable,
-                Name, String,
-                Age,  Int,
-                Hired, Bool);
+              Name, String,
+              Age,  Int,
+              Hired, Bool);
 
 // Use it in a function
 
@@ -122,11 +122,11 @@ void sharedGroupFunc() {
                                                             error:nil];
 
     // Start a write transaction
-    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [context writeUsingBlock:^BOOL(RLMTransaction *transaction) {
         // Get a specific table from the realm
-        PeopleTable *table = [realm createTableWithName:@"employees"
-                                           asTableClass:[PeopleTable class]];
-
+        PeopleTable *table = [transaction createTableWithName:@"employees"
+                                                 asTableClass:[PeopleTable class]];
+        
         // Add a row
         [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
         NSLog(@"Row added!");
@@ -134,11 +134,11 @@ void sharedGroupFunc() {
     } error:nil];
 
     // Start a read transaction
-    [context readUsingBlock:^(RLMRealm *realm) {
+    [context readUsingBlock:^(RLMTransaction *transaction) {
         // Get the table
-        PeopleTable *table = [realm tableWithName:@"employees"
-                                     asTableClass:[PeopleTable class]];
-
+        PeopleTable *table = [transaction tableWithName:@"employees"
+                                           asTableClass:[PeopleTable class]];
+        
         // Interate over all rows in table
         for (PeopleTableRow *row in table) {
             NSLog(@"Name: %@", row.Name);
