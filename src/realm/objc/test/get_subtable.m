@@ -24,9 +24,10 @@ REALM_TABLE_2(WrongTypeTable,
                 Hired, Int,
                 Age,   Bool)
 
-
 @interface MACTestGetSubtable: RLMTestCase
+
 @end
+
 @implementation MACTestGetSubtable
 
 - (void)testGetSubtable

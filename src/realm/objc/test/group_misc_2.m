@@ -35,7 +35,7 @@ REALM_TABLE_2(QueryTable,
               First,  Int,
               Second, String)
 
-@interface MACTestRealmMisc2: RLMTestCase
+@interface MACTestRealmMisc2 : RLMTestCase
 
 @end
 

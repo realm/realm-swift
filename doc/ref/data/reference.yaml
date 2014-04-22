@@ -88,6 +88,7 @@ IMPORTPATH: ../../tightdb/doc/ref_cpp/data #need to update this path with core
 
 CATEGORIES:                       # list global class-id in order of appearence
 - Persistence:
+  - smart_context
   - context
   - transaction
 - Typed Table:                    # Category header name

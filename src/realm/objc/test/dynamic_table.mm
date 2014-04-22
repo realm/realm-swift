@@ -19,12 +19,9 @@
  **************************************************************************/
 
 #import "RLMTestCase.h"
-#import <Foundation/NSException.h>
 
 #import <realm/objc/RLMFast.h>
 #import <realm/objc/RLMTable_noinst.h>
-
-#include <string.h>
 
 using namespace std;
 @interface TestClass : NSObject
@@ -33,12 +30,11 @@ using namespace std;
 @end
 
 @implementation TestClass
-// no needed
+
 @end
 
 @interface TDBDynamicTableTests: RLMTestCase
-  // Intentionally left blank.
-  // No new public instance methods need be defined.
+
 @end
 
 @implementation TDBDynamicTableTests

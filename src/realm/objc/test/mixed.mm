@@ -5,26 +5,24 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
-#include <time.h>
-#include <string.h>
-
 #import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMTable_noinst.h>
 
 REALM_TABLE_3(MixedTable,
-                Hired, Bool,
-                Other, Mixed,
-                Age,   Int)
+              Hired, Bool,
+              Other, Mixed,
+              Age,   Int)
 
 REALM_TABLE_2(SubMixedTable,
-                Hired, Bool,
-                Age,   Int)
+              Hired, Bool,
+              Age,   Int)
 
+@interface MACTestMixed : RLMTestCase
 
-@interface MACTestMixed: RLMTestCase
 @end
+
 @implementation MACTestMixed
 
 - (void)testMixedEqual
