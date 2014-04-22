@@ -35,8 +35,9 @@ using namespace std;
 @implementation RLMRow
 
 +(Class)subtableObjectClassForProperty:(NSString *)columnName {
-    RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:self];
-    return descriptor[columnName].subtableObjectClass;
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"Must specify sub-table object type"
+                                 userInfo:@{@"columnName": columnName}];
 }
 
 // make sure users don't create these without a table

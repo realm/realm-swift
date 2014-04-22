@@ -113,13 +113,6 @@ BOOL is_class_subclass(Class class1, Class class2) {
         [prop addToClass:proxyClass existing:selectorNames column:propNum];
     }
     
-    // if our object class defines subtableObjectClassForProperty use it in the proxy
-    Class metaClass = objc_getMetaClass(proxyClassName.UTF8String);
-    Class objectMetaClass = objc_getMetaClass(objectClassName.UTF8String);
-    SEL subtableObjectClassForPropertySel = NSSelectorFromString(@"subtableObjectClassForProperty:");
-    IMP objectIMP = class_getMethodImplementation(objectMetaClass, subtableObjectClassForPropertySel);
-    class_addMethod(metaClass, subtableObjectClassForPropertySel, objectIMP, "#@:#");
-    
     // set in cache to indiate this proxy class has been created and return
     s_proxyClassNameCache[objectClassName] = proxyClassName;
     return proxyClass;

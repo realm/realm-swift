@@ -62,6 +62,13 @@ DEFINE_TABLE_TYPE(MainObject)
 
 @end
 
+@interface UnspecifiedSubObject : RLMRow
+@property RLMTable * Sub;
+@end
+
+@implementation UnspecifiedSubObject
+@end
+
 
 @interface MACTestSubtable: XCTestCase
 @end
@@ -131,6 +138,13 @@ DEFINE_TABLE_TYPE(MainObject)
     [subtable addRow:@[@"name", @999]];
     
     XCTAssertEqual([subtable[0] LongAge], (long)999, @"Age should be 999");
+}
+
+- (void)testBadSubtable {
+    
+    RLMTransaction *group = [RLMTransaction group];
+    
+    XCTAssertThrows([group createTableWithName:@"badTable" objectClass:UnspecifiedSubObject.class], @"Shoud throw exception");
 }
 
 @end

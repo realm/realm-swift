@@ -19,6 +19,7 @@
  **************************************************************************/
 #import "RLMProperty.h"
 #import "RLMProxy.h"
+#import "RLMObjectDescriptor.h"
 #import "RLMTable.h"
 #import "RLMFast.h"
 #import "RLMTable_noinst.h"
@@ -183,8 +184,9 @@ id dynamic_get_subtable(RLMRow *row, SEL sel) {
     RLMTable *table = row[col];
     
     // set custom object class
-    Class subtableObjectClass = [row.class subtableObjectClassForProperty:propName];
-    table.objectClass = subtableObjectClass;
+    RLMObjectDescriptor * desc = [RLMObjectDescriptor descriptorForObjectClass:row.class];
+    RLMProperty * prop = desc[propName];
+    table.objectClass = prop.subtableObjectClass;
     return table;
 }
 
