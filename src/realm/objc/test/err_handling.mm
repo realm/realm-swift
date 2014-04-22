@@ -176,7 +176,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     }
 
     // Add some rows
-    for (size_t i = 0; i < 15; ++i) {
+    for (NSUInteger i = 0; i < 15; ++i) {
         if (![table RLM_insertInt:0 ndx:i value:i]) {
            // NSLog(@"%@", [error localizedDescription]);
             XCTFail(@"Insert failed.");
@@ -298,16 +298,16 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     [table addBoolCol:YES  IntCol:506      FloatCol:7.7     DoubleCol:8.8       StringCol:@"banach"
             BinaryCol:bin2 DateCol:timeNow TableCol:subtab2 MixedCol:subtab2];
 
-    XCTAssertEqual([[[table where].BoolCol   columnIsEqualTo:NO]      countRows], (size_t)1, @"BoolCol equal");
-    XCTAssertEqual([[[table where].IntCol    columnIsEqualTo:54]      countRows], (size_t)1, @"IntCol equal");
-    XCTAssertEqual([[[table where].FloatCol  columnIsEqualTo:0.7f]    countRows], (size_t)1, @"FloatCol equal");
-    XCTAssertEqual([[[table where].DoubleCol columnIsEqualTo:0.8]     countRows], (size_t)1, @"DoubleCol equal");
-    XCTAssertEqual([[[table where].StringCol columnIsEqualTo:@"foo"]  countRows], (size_t)1, @"StringCol equal");
-    XCTAssertEqual([[[table where].BinaryCol columnIsEqualTo:bin1]    countRows], (size_t)1, @"BinaryCol equal");
-    XCTAssertEqual([[[table where].DateCol   columnIsEqualTo:0]       countRows], (size_t)1, @"DateCol equal");
+    XCTAssertEqual([[[table where].BoolCol   columnIsEqualTo:NO]      countRows], (NSUInteger)1, @"BoolCol equal");
+    XCTAssertEqual([[[table where].IntCol    columnIsEqualTo:54]      countRows], (NSUInteger)1, @"IntCol equal");
+    XCTAssertEqual([[[table where].FloatCol  columnIsEqualTo:0.7f]    countRows], (NSUInteger)1, @"FloatCol equal");
+    XCTAssertEqual([[[table where].DoubleCol columnIsEqualTo:0.8]     countRows], (NSUInteger)1, @"DoubleCol equal");
+    XCTAssertEqual([[[table where].StringCol columnIsEqualTo:@"foo"]  countRows], (NSUInteger)1, @"StringCol equal");
+    XCTAssertEqual([[[table where].BinaryCol columnIsEqualTo:bin1]    countRows], (NSUInteger)1, @"BinaryCol equal");
+    XCTAssertEqual([[[table where].DateCol   columnIsEqualTo:0]       countRows], (NSUInteger)1, @"DateCol equal");
     // These are not yet implemented
-    //    XCTAssertEqual([[[table where].TableCol  columnIsEqualTo:subtab1] count], (size_t)1, @"TableCol equal");
-    //    XCTAssertEqual([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (size_t)1, @"MixedCol equal");
+    //    XCTAssertEqual([[[table where].TableCol  columnIsEqualTo:subtab1] count], (NSUInteger)1, @"TableCol equal");
+    //    XCTAssertEqual([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (NSUInteger)1, @"MixedCol equal");
 
     TestQueryErrAllTypesQuery* query = [[table where].BoolCol   columnIsEqualTo:NO];
 
@@ -372,7 +372,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     [[[table where].BinaryCol columnContains:bin1].BoolCol columnIsEqualTo:NO];
 
     TestQueryErrAllTypesView* view = [[[[table where].DateCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO] findAll];
-    for (size_t i = 0; i < [view rowCount]; i++) {
+    for (NSUInteger i = 0; i < [view rowCount]; i++) {
         NSLog(@"%zu: %c", i, [view rowAtIndex:i].BoolCol);
     }
 

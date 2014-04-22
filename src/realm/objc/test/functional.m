@@ -154,9 +154,9 @@ REALM_TABLE_3(FuncPeopleTable,
 
     RLMTable *table = [[RLMTable alloc] init];
 
-    size_t const NAME = [table addColumnWithName:@"Name" type:RLMTypeString];
-    size_t const AGE = [table addColumnWithName:@"Age" type:RLMTypeInt];
-    size_t const HIRED = [table addColumnWithName:@"Hired" type:RLMTypeBool];
+    NSUInteger const NAME = [table addColumnWithName:@"Name" type:RLMTypeString];
+    NSUInteger const AGE = [table addColumnWithName:@"Age" type:RLMTypeInt];
+    NSUInteger const HIRED = [table addColumnWithName:@"Hired" type:RLMTypeBool];
 
     RLMRow *cursor;
 
