@@ -24,10 +24,8 @@
 
 void ex_objc_context_intro()
 {
-    // Remove any previous file
-    NSFileManager *fm = [NSFileManager defaultManager];
-    [fm removeItemAtPath:@"contextTest.realm" error:nil];
-    [fm removeItemAtPath:@"contextTest.realm.lock" error:nil];
+    // Remove previous datafile
+    [[NSFileManager defaultManager] removeItemAtPath:@"contextTest.realm" error:nil];
 
     // Create datafile with a new table
     RLMContext *context = [RLMContext contextPersistedAtPath:@"contextTest.realm"
