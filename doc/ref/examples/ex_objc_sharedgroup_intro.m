@@ -34,15 +34,12 @@ void ex_objc_context_intro()
                                                        error:nil];
 
     // Perform a write transaction (with commit to file)
-    NSError *error = nil;
     BOOL success;
     success = [context writeUsingBlock:^(RLMTransaction *transaction) {
         People *table = [transaction createTableWithName:@"employees"
                                             asTableClass:[People class]];
         [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
-
-        return YES; // Commit
-    } error:&error];
+    }];
     if (!success)
         NSLog(@"write-transaction failed: %@", [error description]);
 
@@ -56,8 +53,7 @@ void ex_objc_context_intro()
         }
         [table addName:@"Bill" Age:53 Hired:YES];
         NSLog(@"Commit!");
-        return YES;
-    } error:&error];
+    }];
     if (!success)
         NSLog(@"Transaction Rolled back : %@", [error description]);
 
