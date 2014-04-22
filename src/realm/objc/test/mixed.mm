@@ -137,9 +137,9 @@ REALM_TABLE_2(SubMixedTable,
     [tableSub addHired:NO Age:43];
     [tableSub addHired:YES Age:54];
 
-    RLMTransaction *group = [RLMTransaction group];
-    // Create new table in group
-    MixedTable *table = [group createTableWithName:@"MixedValues" asTableClass:[MixedTable class]];
+    RLMRealm *realm = [RLMRealm group];
+    // Create new table in realm
+    MixedTable *table = [realm createTableWithName:@"MixedValues" asTableClass:[MixedTable class]];
     NSLog(@"Table: %@", table);
     // Add some rows
     [table addHired:YES Other:[NSString stringWithUTF8String:"Jens"] Age:50];

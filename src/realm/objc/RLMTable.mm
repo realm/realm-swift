@@ -34,7 +34,7 @@
 #import "RLMColumnProxy.h"
 #import "NSData+RLMGetBinaryData.h"
 #import "PrivateRLM.h"
-#import "RLMSmartContext_noinst.h"
+#import "RLMRealm_noinst.h"
 #import "util_noinst.hpp"
 
 using namespace std;
@@ -207,8 +207,8 @@ using namespace std;
 
 -(void)dealloc
 {
-    if ([m_parent isKindOfClass:[RLMSmartContext class]]) {
-        RLMSmartContext *context = (RLMSmartContext *)m_parent;
+    if ([m_parent isKindOfClass:[RLMRealm class]]) {
+        RLMRealm *context = (RLMRealm *)m_parent;
         [context tableRefDidDie];
     }
 }

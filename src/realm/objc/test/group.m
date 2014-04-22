@@ -2,60 +2,41 @@
 //  group.m
 //  TightDB
 //
-//  Test save/load on disk of a group with one table
+//  Test save/load on disk of a realm with one table
 //
 
 #import <XCTest/XCTest.h>
 
 #import <realm/objc/Realm.h>
-#import <realm/objc/RLMTransaction.h>
+#import <realm/objc/RLMRealm.h>
 #import <realm/objc/RLMContext.h>
 #import <realm/objc/group.h>
 
-REALM_TABLE_2(TestTableGroup,
-                First,  String,
-                Second, Int)
+REALM_TABLE_2(TestTableRealm,
+              First,  String,
+              Second, Int)
 
-@interface MACTestGroup: XCTestCase
+@interface MACTestRealm : XCTestCase
+
 @end
-@implementation MACTestGroup
-{
-    RLMTransaction *_group;
-}
 
-- (void)setUp
-{
-    [super setUp];
+@implementation MACTestRealm
 
-    // _group = [RLMTransaction group];
-    // NSLog(@"RLMTransaction: %@", _group);
-    // XCTAssertNotNil(_group, @"Group is nil");
-}
-
-- (void)tearDown
-{
-    // Tear-down code here.
-
-    //  [super tearDown];
-    //  _group = nil;
-}
-
-- (void)testGroup
-{
+- (void)testRealm {
     NSFileManager *fm = [NSFileManager defaultManager];
 
-    // Create empty group and serialize to disk
-    RLMTransaction *toDisk = [RLMTransaction group];
+    // Create empty realm and serialize to disk
+    RLMRealm *toDisk = [RLMRealm group];
     [fm removeItemAtPath:@"table_test.realm" error:NULL];
     [toDisk writeContextToFile:@"table_test.realm" error:nil];
 
-    // Load the group
-    RLMTransaction *fromDisk = [RLMTransaction groupWithFile:@"table_test.realm" error:nil];
+    // Load the realm
+    RLMRealm *fromDisk = [RLMRealm groupWithFile:@"table_test.realm" error:nil];
     if (!fromDisk)
         XCTFail(@"From disk not valid");
 
-    // Create new table in group
-    TestTableGroup *t = (TestTableGroup *)[fromDisk createTableWithName:@"test" asTableClass:[TestTableGroup class]];
+    // Create new table in realm
+    TestTableRealm *t = (TestTableRealm *)[fromDisk createTableWithName:@"test" asTableClass:[TestTableRealm class]];
 
     // Verify
     NSLog(@"Columns: %zu", t.columnCount);
@@ -75,20 +56,16 @@ REALM_TABLE_2(TestTableGroup,
     t = nil;
 }
 
-- (void)testGetTable
-{
-    RLMTransaction *g = [RLMTransaction group];
-    XCTAssertNil([g tableWithName:@"noTable"], @"Table does not exist");
+- (void)testGetTable {
+    RLMRealm *realm = [RLMRealm group];
+    XCTAssertNil([realm tableWithName:@"noTable"], @"Table does not exist");
 }
 
-- (void)testGroupTableCount
-{
-    RLMTransaction *t = [RLMTransaction group];
-    XCTAssertEqual(t.tableCount, (NSUInteger)0, @"No tables added");
-    [t createTableWithName:@"tableName"];
-    XCTAssertEqual(t.tableCount, (NSUInteger)1, @"1 table added");
+- (void)testRealmTableCount {
+    RLMRealm *realm = [RLMRealm group];
+    XCTAssertEqual(realm.tableCount, (NSUInteger)0, @"No tables added");
+    [realm createTableWithName:@"tableName"];
+    XCTAssertEqual(realm.tableCount, (NSUInteger)1, @"1 table added");
 }
 
 @end
-
-

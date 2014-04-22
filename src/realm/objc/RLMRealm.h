@@ -22,8 +22,19 @@
 
 @class RLMTable;
 
+@interface RLMRealm : NSObject
 
-@interface RLMTransaction : NSObject
+/**
+ * Use the main run loop and the default notification center.
+ */
++ (RLMRealm *)realmWithDefaultPersistence;
+
++ (RLMRealm *)realmWithPersistenceToFile:(NSString *)path;
+
++ (RLMRealm *)realmWithPersistenceToFile:(NSString *)path
+                                 runLoop:(NSRunLoop *)runLoop
+                      notificationCenter:(NSNotificationCenter *)notificationCenter
+                                   error:(NSError **)error;
 
 @property (nonatomic, readonly) NSUInteger tableCount;
 @property (nonatomic, readonly) BOOL       isEmpty;
@@ -35,13 +46,13 @@
 
 
 /**
- * This method returns a table with the specified name from the group.
+ * This method returns a table with the specified name from the realm.
  * Returns nil if no table with the specified name exists.
  */
 -(RLMTable *)tableWithName:(NSString *)name;
 
 /**
- * This method returns a table with the specified name from the group.
+ * This method returns a table with the specified name from the realm.
  * Returns nil if no table with the specified name exists.
  */
 -(id)tableWithName:(NSString *)name asTableClass:(Class)obj;
@@ -82,7 +93,6 @@
 -(BOOL)writeContextToFile:(NSString *)path error:(NSError *__autoreleasing *)error;
 
 
-#ifdef HAS_TABLE_WITH_NAME_AND_CLASS
 /**
  * This method returns YES if a table with the specified name already exists. NO if it does not exists.
  *
@@ -91,8 +101,4 @@
  */
 -(BOOL)hasTableWithName:(NSString *)name withTableClass:(Class)obj;
 
-#endif
-
-
 @end
-

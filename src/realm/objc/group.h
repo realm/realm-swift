@@ -20,30 +20,27 @@
 
 
 /* NBNB. This class is not included in our public framework!
- * It contains selectors removed from Transaction when the old Group became Transaction.
- * The following selectors are all tested extensively from previuos.
+ * It contains selectors removed from Realm when the old Group became 
+ * Transaction which then became Realm.
+ * The following selectors are all tested extensively from previous.
  * They have been put here, as we might wan't to reintroduce Group later on....
  * MEKJAER
  */
 
 #import <Foundation/Foundation.h>
+#import "RLMRealm.h"
 
-#import "RLMTransaction.h"
-
-@class RLMTable;
-
-
-@interface RLMTransaction () // Selectors are currently implemented in RLMTransaction
+@interface RLMRealm () // Selectors are currently implemented in RLMRealm
 
 /*
- * Init a free-stading in memory group
+ * Init a free-standing realm in memory
  */
-+(RLMTransaction *)group;
++ (RLMRealm *)group;
 
-+(RLMTransaction *)groupWithFile:(NSString *)filename error:(NSError *__autoreleasing *)error;
++ (RLMRealm *)groupWithFile:(NSString *)filename error:(NSError *__autoreleasing *)error;
 
-+(RLMTransaction *)groupWithBuffer:(NSData *)buffer error:(NSError *__autoreleasing *)error;
++ (RLMRealm *)groupWithBuffer:(NSData *)buffer error:(NSError *__autoreleasing *)error;
 
--(NSData *)writeContextToBuffer;
+- (NSData *)writeContextToBuffer;
 
 @end

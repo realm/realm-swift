@@ -8,7 +8,7 @@
 #import <XCTest/XCTest.h>
 
 #import <realm/objc/Realm.h>
-#import <realm/objc/RLMTransaction.h>
+#import <realm/objc/RLMRealm.h>
 #import <realm/objc/RLMContext.h>
 
 REALM_TABLE_2(GetSubtable,

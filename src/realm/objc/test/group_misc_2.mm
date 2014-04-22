@@ -8,47 +8,49 @@
 #import <XCTest/XCTest.h>
 
 #import <realm/objc/Realm.h>
-#import <realm/objc/RLMTransaction.h>
+#import <realm/objc/RLMRealm.h>
 #import <realm/objc/group.h>
 #import <realm/objc/PrivateRLM.h>
 
 REALM_TABLE_DEF_4(MyTable,
-                    Name,  String,
-                    Age,   Int,
-                    Hired, Bool,
-                    Spare, Int)
+                  Name,  String,
+                  Age,   Int,
+                  Hired, Bool,
+                  Spare, Int)
 
 REALM_TABLE_DEF_2(MyTable2,
-                    Hired, Bool,
-                    Age,   Int)
+                  Hired, Bool,
+                  Age,   Int)
 
 REALM_TABLE_IMPL_4(MyTable,
-                     Name,  String,
-                     Age,   Int,
-                     Hired, Bool,
-                     Spare, Int)
+                   Name,  String,
+                   Age,   Int,
+                   Hired, Bool,
+                   Spare, Int)
 
 REALM_TABLE_IMPL_2(MyTable2,
-                     Hired, Bool,
-                     Age,   Int)
+                   Hired, Bool,
+                   Age,   Int)
 
 REALM_TABLE_2(QueryTable,
-                First,  Int,
-                Second, String)
+              First,  Int,
+              Second, String)
 
-@interface MACTestGroupMisc2: XCTestCase
+@interface MACTestRealmMisc2: XCTestCase
+
 @end
-@implementation MACTestGroupMisc2
 
-- (void)testGroup_Misc2
+@implementation MACTestRealmMisc2
+
+- (void)testRealm_Misc2
 {
     NSUInteger rowIndex;
-    RLMTransaction * group = [RLMTransaction group];
-    NSLog(@"HasTable: %i", [group hasTableWithName:@"employees"] );
-    // Create new table in group
-    MyTable* table = [group createTableWithName:@"employees" asTableClass:[MyTable class]];
+    RLMRealm *realm = [RLMRealm group];
+    NSLog(@"HasTable: %i", [realm hasTableWithName:@"employees"] );
+    // Create new table in realm
+    MyTable *table = [realm createTableWithName:@"employees" asTableClass:[MyTable class]];
     NSLog(@"Table: %@", table);
-    NSLog(@"HasTable: %i", [group hasTableWithName:@"employees"] );
+    NSLog(@"HasTable: %i", [realm hasTableWithName:@"employees"] );
 
     // Add some rows
     [table addName:@"John" Age:20 Hired:YES Spare:0];
@@ -106,14 +108,13 @@ REALM_TABLE_2(QueryTable,
 
     // Write to disk
     [fm removeItemAtPath:@"employees.realm" error:nil];
-    [group writeContextToFile:@"employees.realm" error:nil];
+    [realm writeContextToFile:@"employees.realm" error:nil];
 
-    // Load a group from disk (and print contents)
-    RLMTransaction * fromDisk = [RLMTransaction groupWithFile:@"employees.realm" error:nil];
+    // Load a realm from disk (and print contents)
+    RLMRealm * fromDisk = [RLMRealm groupWithFile:@"employees.realm" error:nil];
     MyTable* diskTable = [fromDisk tableWithName:@"employees" asTableClass:[MyTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
-//    [diskTable insertAtIndex:2 Name:@"Thomas" Age:41 Hired:NO Spare:1];
     NSLog(@"Disktable size: %zu", diskTable.rowCount);
     for (size_t i = 0; i < diskTable.rowCount; i++) {
         MyTableRow* cursor = [diskTable rowAtIndex:i];
@@ -121,11 +122,11 @@ REALM_TABLE_2(QueryTable,
         NSLog(@"%zu: %@", i, [diskTable RLM_stringInColumnWithIndex:0 atRowIndex:i]);
     }
 
-    // Write same group to memory buffer
-    NSData* buffer = [group writeContextToBuffer];
+    // Write same realm to memory buffer
+    NSData* buffer = [realm writeContextToBuffer];
 
-    // Load a group from memory (and print contents)
-    RLMTransaction * fromMem = [RLMTransaction groupWithBuffer:buffer error:nil];
+    // Load a realm from memory (and print contents)
+    RLMRealm * fromMem = [RLMRealm groupWithBuffer:buffer error:nil];
     MyTable* memTable = [fromMem tableWithName:@"employees" asTableClass:[MyTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         // ??? cursor
@@ -136,8 +137,8 @@ REALM_TABLE_2(QueryTable,
 
 - (void)testQuery
 {
-    RLMTransaction * group = [RLMTransaction group];
-    QueryTable* table = [group createTableWithName:@"Query table" asTableClass:[QueryTable class]];
+    RLMRealm *realm = [RLMRealm group];
+    QueryTable *table = [realm createTableWithName:@"Query table" asTableClass:[QueryTable class]];
 
     // Add some rows
     [table addFirst:2 Second:@"a"];
@@ -148,10 +149,7 @@ REALM_TABLE_2(QueryTable,
     {
         QueryTableQuery* q = [[table where].First columnIsBetween:3 :7]; // Between
         XCTAssertEqual((size_t)2,   [q countRows], @"count != 2");
-//        XCTAssertEqual(9,   [q.First sum]); // Sum
         XCTAssertEqual(4.5, [q.First avg], @"Avg!=4.5"); // Average
-//        XCTAssertEqual(4,   [q.First min]); // Minimum
-//        XCTAssertEqual(5,   [q.First max]); // Maximum
     }
     {
         QueryTableQuery* q = [[table where].Second columnContains:@"quick" caseSensitive:NO]; // String contains
@@ -193,8 +191,8 @@ REALM_TABLE_2(QueryTable,
  */
 - (void)testSubtables
 {
-    RLMTransaction * group = [RLMTransaction group];
-    RLMTable* table = [group createTableWithName:@"table" asTableClass:[RLMTable class]];
+    RLMRealm *realm = [RLMRealm group];
+    RLMTable *table = [realm createTableWithName:@"table" asTableClass:[RLMTable class]];
 
     // Specify the table type
     {

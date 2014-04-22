@@ -20,11 +20,11 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMTransaction.h"
+#import "RLMRealm.h"
 
 
-typedef void(^RLMReadBlock)(RLMTransaction *transaction);
-typedef BOOL(^RLMWriteBlock)(RLMTransaction *transaction);
+typedef void(^RLMReadBlock)(RLMRealm *realm);
+typedef BOOL(^RLMWriteBlock)(RLMRealm *realm);
 typedef void(^RLMTableReadBlock)(RLMTable *table);
 typedef BOOL(^RLMTableWriteBlock)(RLMTable *table);
 
@@ -48,6 +48,7 @@ typedef BOOL(^RLMTableWriteBlock)(RLMTable *table);
 
 // Context state info
 -(BOOL)hasChangedSinceLastTransaction;
+
 
 
 @end

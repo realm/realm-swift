@@ -60,9 +60,9 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    RLMTransaction * transaction = [RLMTransaction group];
-    // Create new table in group
-    PeopleErrTable* people = [transaction createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
+    RLMRealm *realm = [RLMRealm group];
+    // Create new table in realm
+    PeopleErrTable* people = [realm createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
     // No longer supports errors, the tes may be redundant
     // Add some rows
@@ -84,10 +84,10 @@ REALM_TABLE_9(TestQueryErrAllTypes,
 
     NSFileManager* fm = [NSFileManager defaultManager];
 
-    // Write the group to disk
+    // Write the realm to disk
     [fm removeItemAtPath:@"peopleErr.realm" error:NULL];
     error = nil;
-    if (![transaction writeContextToFile:@"peopleErr.realm" error:&error]) {
+    if (![realm writeContextToFile:@"peopleErr.realm" error:&error]) {
         NSLog(@"%@", [error localizedDescription]);
         XCTFail(@"No error expected");
     }
@@ -109,9 +109,9 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     NSLog(@"--- Reopen and manipulate ---");
     //------------------------------------------------------
 
-    // Load a group from disk (and try to update, even though it is readonly)
+    // Load a realm from disk (and try to update, even though it is readonly)
     error = nil;
-    RLMTransaction * fromDisk = [RLMTransaction groupWithFile:@"peopleErr.realm" error:&error];
+    RLMRealm * fromDisk = [RLMRealm groupWithFile:@"peopleErr.realm" error:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
     }
@@ -133,7 +133,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     }
 
     error = nil;
-    fromDisk = [RLMTransaction groupWithFile:@"peopleErr.realm" error:&error];
+    fromDisk = [RLMRealm groupWithFile:@"peopleErr.realm" error:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
         XCTFail(@"File should have been possible to open");

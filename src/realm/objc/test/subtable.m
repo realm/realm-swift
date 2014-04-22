@@ -2,7 +2,7 @@
 //  subtable.m
 //  TightDB
 //
-//  Test save/load on disk of a group with one table
+//  Test save/load on disk of a realm with one table
 //
 
 #import <XCTest/XCTest.h>
@@ -20,32 +20,16 @@ REALM_TABLE_3(TestSubtableMain,
                 Second, Int)
 
 @interface MACTestSubtable: XCTestCase
+
 @end
+
 @implementation MACTestSubtable
 
-- (void)setUp
-{
-    [super setUp];
+- (void)testSubtable {
+    RLMRealm *realm = [RLMRealm group];
 
-    // _group = [Group group];
-    // NSLog(@"Group: %@", _group);
-    // XCTAssertNotNil(_group, @"Group is nil");
-}
-
-- (void)tearDown
-{
-    // Tear-down code here.
-
-    //  [super tearDown];
-    //  _group = nil;
-}
-
-- (void)testSubtable
-{
-    RLMTransaction *group = [RLMTransaction group];
-
-    /* Create new table in group */
-    TestSubtableMain *people = [group createTableWithName:@"employees" asTableClass:[TestSubtableMain class]];
+    // Create new table in realm
+    TestSubtableMain *people = [realm createTableWithName:@"employees" asTableClass:[TestSubtableMain class]];
 
     /* FIXME: Add support for specifying a subtable to the 'add'
        method. The subtable must then be copied into the parent
