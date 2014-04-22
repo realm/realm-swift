@@ -46,7 +46,7 @@ void throw_objc_exception(exception &ex) {
 } // anonymous namespace
 
 
-@interface TDBPrivateWeakTableReference: NSObject
+@interface RLMPrivateWeakTableReference: NSObject
 
 - (instancetype)initWithTable:(RLMTable *)table indexInRealm:(size_t)index;
 - (RLMTable *)table;
@@ -54,7 +54,7 @@ void throw_objc_exception(exception &ex) {
 
 @end
 
-@implementation TDBPrivateWeakTableReference {
+@implementation RLMPrivateWeakTableReference {
     __weak RLMTable *_table;
     size_t _indexInRealm;
 }
@@ -221,7 +221,7 @@ void throw_objc_exception(exception &ex) {
     // Remove dead table references from list
     if (_tableRefsHaveDied) {
         NSMutableArray *deadTableRefs = [NSMutableArray array];
-        for (TDBPrivateWeakTableReference *weakTableRef in _weakTableRefs) {
+        for (RLMPrivateWeakTableReference *weakTableRef in _weakTableRefs) {
             if (![weakTableRef table])
                 [deadTableRefs addObject:weakTableRef];
         }
@@ -236,7 +236,7 @@ void throw_objc_exception(exception &ex) {
             _group = &_sharedGroup->begin_read(); // Throws
 
             // Revive all realm level table accessors
-            for (TDBPrivateWeakTableReference *weakTableRef in _weakTableRefs) {
+            for (RLMPrivateWeakTableReference *weakTableRef in _weakTableRefs) {
                 RLMTable *table = [weakTableRef table];
                 size_t indexInRealm = [weakTableRef indexInRealm];
                 ConstTableRef tableRef = _group->get_table(indexInRealm); // Throws
@@ -304,7 +304,7 @@ void throw_objc_exception(exception &ex) {
         [table setParent:self];
         [table setReadOnly:YES];
         if (!_hasParentContext) {
-            TDBPrivateWeakTableReference *weakTableRef = [[TDBPrivateWeakTableReference alloc] initWithTable:table
+            RLMPrivateWeakTableReference *weakTableRef = [[RLMPrivateWeakTableReference alloc] initWithTable:table
                                                                                                 indexInRealm:indexInRealm];
             [_weakTableRefs addObject:weakTableRef];
         }
@@ -332,45 +332,69 @@ void throw_objc_exception(exception &ex) {
     return m_group->has_table(ObjcStringAccessor(name));
 }
 
--(id)tableWithName:(NSString *)name asTableClass:(__unsafe_unretained Class)class_obj
-{
-    // FIXME: Why impose this restriction? Isn't it kind of arbitrary?
-    // The core library has no problems with an empty table name. What
-    // if the database was created through a different language
-    // binding without this restriction?
-    if ([name length] == 0) {
-        // FIXME: Exception name must be `TDBException` according to
-        // the exception naming conventions of the official Cocoa
-        // style guide. The same is true for most (if not all) of the
-        // exceptions we throw.
-        @throw [NSException exceptionWithName:@"realm:table_name_exception"
-                                       reason:@"Name must be a non-empty NSString"
-                                     userInfo:nil];
-    }
-    
-    // If table does not exist in context, return nil
-    if (![self hasTableWithName:name]) // FIXME: Do this using C++
-        return nil;
-    
-    RLMTable * table = [[class_obj alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table))
-        return nil;
-    bool was_created;
-    REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
-                                           tightdb::TableRef tableRef = m_group->get_table(ObjcStringAccessor(name), was_created);
-                                           [table setNativeTable:tableRef.get()];
-                                           )
-    [table setParent:self];
-    [table setReadOnly:m_read_only];
-    if (was_created) {
-        if (![table _addColumns])
+- (id)tableWithName:(NSString *)name asTableClass:(__unsafe_unretained Class)class_obj {
+    if (_hasParentContext) {
+        // FIXME: Why impose this restriction? Isn't it kind of arbitrary?
+        // The core library has no problems with an empty table name. What
+        // if the database was created through a different language
+        // binding without this restriction?
+        if ([name length] == 0) {
+            // FIXME: Exception name must be `TDBException` according to
+            // the exception naming conventions of the official Cocoa
+            // style guide. The same is true for most (if not all) of the
+            // exceptions we throw.
+            @throw [NSException exceptionWithName:@"realm:table_name_exception"
+                                           reason:@"Name must be a non-empty NSString"
+                                         userInfo:nil];
+        }
+        
+        // If table does not exist in context, return nil
+        if (![self hasTableWithName:name]) // FIXME: Do this using C++
             return nil;
-    }
-    else {
-        if (![table _checkType])
+        
+        RLMTable * table = [[class_obj alloc] _initRaw];
+        if (TIGHTDB_UNLIKELY(!table))
             return nil;
+        bool was_created;
+        REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
+                                               tightdb::TableRef tableRef = m_group->get_table(ObjcStringAccessor(name), was_created);
+                                               [table setNativeTable:tableRef.get()];
+                                               )
+        [table setParent:self];
+        [table setReadOnly:m_read_only];
+        if (was_created) {
+            if (![table _addColumns])
+                return nil;
+        }
+        else {
+            if (![table _checkType])
+                return nil;
+        }
+        return table;
+    } else {
+        ObjcStringAccessor nameRef(name);
+        if (!_group->has_table(nameRef)) {
+            return nil;
+        }
+        RLMTable *table = [[class_obj alloc] _initRaw];
+        size_t indexInRealm;
+        try {
+            ConstTableRef tableRef = _group->get_table(nameRef); // Throws
+            // Note: Const spoofing is alright, because the
+            // Objective-C table accessor is in 'read-only' mode.
+            [table setNativeTable:const_cast<Table*>(tableRef.get())];
+            indexInRealm = tableRef->get_index_in_parent();
+        }
+        catch (exception &ex) {
+            throw_objc_exception(ex);
+        }
+        [table setParent:self];
+        [table setReadOnly:YES];
+        RLMPrivateWeakTableReference *weakTableRef = [[RLMPrivateWeakTableReference alloc] initWithTable:table
+                                                                                            indexInRealm:indexInRealm];
+        [_weakTableRefs addObject:weakTableRef];
+        return table;
     }
-    return table;
 }
 
 // FIXME: Avoid creating a table instance. It should be enough to create an TightdbDescriptor and then check that.
