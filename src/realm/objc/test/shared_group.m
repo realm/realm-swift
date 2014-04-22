@@ -53,7 +53,7 @@ REALM_TABLE_2(SharedTable2,
     [fromDisk readUsingBlock:^(RLMRealm *realm) {
         SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
         NSLog(@"Disktable size: %zu", [diskTable rowCount]);
-        for (size_t i = 0; i < [diskTable rowCount]; i++) {
+        for (NSUInteger i = 0; i < [diskTable rowCount]; i++) {
             SharedTable2Row *cursor = [diskTable rowAtIndex:i];
             NSLog(@"%zu: %lld", i, cursor.Age);
             NSLog(@"%zu: %i", i, [diskTable RLM_boolInColumnWithIndex: 0 atRowIndex:i]);
@@ -63,7 +63,7 @@ REALM_TABLE_2(SharedTable2,
     [fromDisk writeUsingBlock:^(RLMRealm *realm) {
         SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
         NSLog(@"Disktable size: %zu", [diskTable rowCount]);
-        for (size_t i = 0; i < 50; i++) {
+        for (NSUInteger i = 0; i < 50; i++) {
             [diskTable addHired:YES Age:i];
         }
         return YES; // Commit
@@ -72,7 +72,7 @@ REALM_TABLE_2(SharedTable2,
     [fromDisk writeUsingBlock:^(RLMRealm *realm) {
         SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
         NSLog(@"Disktable size: %zu", [diskTable rowCount]);
-        for (size_t i = 0; i < 50; i++) {
+        for (NSUInteger i = 0; i < 50; i++) {
             [diskTable addHired:YES Age:i];
         }
         return NO; // rollback
@@ -81,7 +81,7 @@ REALM_TABLE_2(SharedTable2,
     [fromDisk writeUsingBlock:^(RLMRealm *realm) {
         SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
         NSLog(@"Disktable size: %zu", [diskTable rowCount]);
-        for (size_t i = 0; i < 50; i++) {
+        for (NSUInteger i = 0; i < 50; i++) {
             [diskTable addHired:YES Age:i];
         }
         

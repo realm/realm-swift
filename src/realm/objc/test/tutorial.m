@@ -103,10 +103,10 @@ REALM_TABLE_IMPL_2(PeopleTable2,
     PeopleTable *people = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
     
     NSLog(@"%lu rows after remove.  [5]", [people rowCount]);  // 5
-    XCTAssertEqual([people rowCount], (size_t)5,@"rows should be 5");
+    XCTAssertEqual([people rowCount], (NSUInteger)5,@"rows should be 5");
 
     // Iterating over rows:
-    for (size_t i = 0; i < [people rowCount]; ++i) {
+    for (NSUInteger i = 0; i < [people rowCount]; ++i) {
         PeopleTableRow *row = [people rowAtIndex:i];
         NSLog(@"(Rows) %@ is %lld years old.", row.Name, row.Age);
     }
@@ -115,18 +115,18 @@ REALM_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"--- Simple Searching ---");
     //------------------------------------------------------
 
-    size_t row;
-    row = [people.Name find:@"Philip"];    // row = (size_t)-1
+    NSUInteger row;
+    row = [people.Name find:@"Philip"];    // row = (NSUInteger)-1
     NSLog(@"Philip: %zu  [-1]", row);
     XCTAssertEqual(row, NSNotFound, @"Philip should not be there", nil);
 
     row = [people.Name find:@"Mary"];
     NSLog(@"Mary: %zu", row);
-    XCTAssertEqual(row, (size_t)1,@"Mary should have been there", nil);
+    XCTAssertEqual(row, (NSUInteger)1,@"Mary should have been there", nil);
 
     PeopleTableView *view = [[[people where].Age columnIsEqualTo:21] findAll];
-    size_t cnt = [view rowCount];             // cnt = 2
-    XCTAssertEqual(cnt, (size_t)2,@"Should be two rows in view", nil);
+    NSUInteger cnt = [view rowCount];             // cnt = 2
+    XCTAssertEqual(cnt, (NSUInteger)2,@"Should be two rows in view", nil);
 
     //------------------------------------------------------
     NSLog(@"--- Queries ---");
@@ -138,7 +138,7 @@ REALM_TABLE_IMPL_2(PeopleTable2,
 
     // Get number of matching entries
     NSLog(@"Query count: %lu",[q countRows]);
-    XCTAssertEqual([q countRows] , (size_t)2,@"Expected 2 rows in query", nil);
+    XCTAssertEqual([q countRows] , (NSUInteger)2,@"Expected 2 rows in query", nil);
 
     // Get the average age - currently only a low-level interface!
     double avg = [q.Age avg] ;
@@ -147,7 +147,7 @@ REALM_TABLE_IMPL_2(PeopleTable2,
 
     // Execute the query and return a table (view)
     RLMView *res = [q findAll];
-    for (size_t i = 0; i < [res rowCount]; ++i) {
+    for (NSUInteger i = 0; i < [res rowCount]; ++i) {
         NSLog(@"%zu: %@ is %lld years old", i,
             [people rowAtIndex:i].Name,
             [people rowAtIndex:i].Age);
@@ -159,7 +159,7 @@ REALM_TABLE_IMPL_2(PeopleTable2,
         
         XCTAssertEqual([table rowCount], (NSUInteger)6, @"PeopleTable should have 6 rows");
         
-        for (size_t i = 0; i < [table rowCount]; i++) {
+        for (NSUInteger i = 0; i < [table rowCount]; i++) {
             PeopleTableRow *row = [table rowAtIndex:i];
             NSLog(@"%zu: %@", i, row.Name);
         }

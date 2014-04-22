@@ -46,18 +46,18 @@
     RLMQuery *q = [t where];
     RLMView *v = [q findAllRows];
     
-    XCTAssertEqual((size_t)0, [v columnCount], @"no columns added yet");
+    XCTAssertEqual((NSUInteger)0, [v columnCount], @"no columns added yet");
     
     [t addColumnWithName:@"col0" type:RLMTypeInt];
-    XCTAssertEqual([v columnCount],(size_t)1,  @"1 column added to table");
+    XCTAssertEqual([v columnCount],(NSUInteger)1,  @"1 column added to table");
     
     for (int i=0;i<10;i++) {
         [t addColumnWithName:@"name" type:RLMTypeInt];
     }
-    XCTAssertEqual([v columnCount],(size_t)11,  @"10 more columns added to table");
+    XCTAssertEqual([v columnCount],(NSUInteger)11,  @"10 more columns added to table");
     
     [t removeColumnWithIndex:0];
-    XCTAssertEqual([v columnCount],(size_t)10, @"1 column removed from table");
+    XCTAssertEqual([v columnCount],(NSUInteger)10, @"1 column removed from table");
 }
 
 - (void)testColumnTypesOnView

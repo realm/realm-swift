@@ -73,11 +73,11 @@ REALM_TABLE_2(QueryTable,
         rowIndex = [table.Name find:@"Philip"];    // row = NSNotFound
         XCTAssertEqual(rowIndex, (NSUInteger)NSNotFound, @"Philip should not be there");
         rowIndex = [table.Name find:@"Mary"];
-        XCTAssertEqual(rowIndex, (size_t)1,@"Mary should have been there");
+        XCTAssertEqual(rowIndex, (NSUInteger)1,@"Mary should have been there");
         
         MyTableView *view = [[[table where].Age columnIsEqualTo:21] findAll];
-        size_t cnt = view.rowCount;            // cnt = 2
-        XCTAssertEqual(cnt, (size_t)2,@"Should be two rows in view");
+        NSUInteger cnt = view.rowCount;            // cnt = 2
+        XCTAssertEqual(cnt, (NSUInteger)2,@"Should be two rows in view");
         return YES;
     } error:&error];
 
@@ -97,7 +97,7 @@ REALM_TABLE_2(QueryTable,
 
     // Get number of matching entries
     NSLog(@"Query count: %zu", [q countRows]);
-    XCTAssertEqual([q countRows], (size_t)2,@"Expected 2 rows in query");
+    XCTAssertEqual([q countRows], (NSUInteger)2,@"Expected 2 rows in query");
 
      // Get the average age - currently only a low-level interface!
     double avg = [q.Age avg];
@@ -106,7 +106,7 @@ REALM_TABLE_2(QueryTable,
 
     // Execute the query and return a table (view)
     RLMView* res = [q findAll];
-    for (size_t i = 0; i < [res rowCount]; i++) {
+    for (NSUInteger i = 0; i < [res rowCount]; i++) {
         // cursor missing. Only low-level interface!
         NSLog(@"%zu: is %lld years old",i , [res RLM_intInColumnWithIndex:1 atRowIndex:i]);
     }
@@ -118,7 +118,7 @@ REALM_TABLE_2(QueryTable,
     MyTable* diskTable = [fromDisk tableWithName:@"employees" asTableClass:[MyTable class]];
 
     NSLog(@"Disktable size: %zu", diskTable.rowCount);
-    for (size_t i = 0; i < diskTable.rowCount; i++) {
+    for (NSUInteger i = 0; i < diskTable.rowCount; i++) {
         MyTableRow* cursor = [diskTable rowAtIndex:i];
         NSLog(@"%zu: %@", i, cursor.Name);
         NSLog(@"%zu: %@", i, [diskTable RLM_stringInColumnWithIndex:0 atRowIndex:i]);
@@ -147,38 +147,38 @@ REALM_TABLE_2(QueryTable,
 
     {
         QueryTableQuery* q = [[table where].First columnIsBetween:3 :7]; // Between
-        XCTAssertEqual((size_t)2,   [q countRows], @"count != 2");
+        XCTAssertEqual((NSUInteger)2,   [q countRows], @"count != 2");
         XCTAssertEqual(4.5, [q.First avg], @"Avg!=4.5"); // Average
     }
     {
         QueryTableQuery* q = [[table where].Second columnContains:@"quick" caseSensitive:NO]; // String contains
-        XCTAssertEqual((size_t)1, [q countRows], @"count != 1");
+        XCTAssertEqual((NSUInteger)1, [q countRows], @"count != 1");
     }
     {
         QueryTableQuery* q = [[table where].Second columnBeginsWith:@"The" caseSensitive:NO]; // String prefix
-        XCTAssertEqual((size_t)1, [q countRows], @"count != 1");
+        XCTAssertEqual((NSUInteger)1, [q countRows], @"count != 1");
     }
     {
         QueryTableQuery* q = [[table where].Second columnEndsWith:@"The" caseSensitive:NO]; // String suffix
-        XCTAssertEqual((size_t)0, [q countRows], @"count != 1");
+        XCTAssertEqual((NSUInteger)0, [q countRows], @"count != 1");
     }
     {
         QueryTableQuery* q = [[[table where].Second columnIsNotEqualTo:@"a" caseSensitive:NO].Second columnIsNotEqualTo:@"b" caseSensitive:NO]; // And
-        XCTAssertEqual((size_t)1, [q countRows], @"count != 1");
+        XCTAssertEqual((NSUInteger)1, [q countRows], @"count != 1");
     }
     {
         QueryTableQuery* q = [[[[table where].Second columnIsNotEqualTo:@"a" caseSensitive:NO] Or].Second columnIsNotEqualTo:@"b" caseSensitive:NO]; // Or
-        XCTAssertEqual((size_t)4, [q countRows], @"count != 1");
+        XCTAssertEqual((NSUInteger)4, [q countRows], @"count != 1");
     }
     {
         QueryTableQuery* q = [[[[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO] group].First columnIsLessThan:3] Or].First columnIsGreaterThan:5] endGroup]; // Parentheses
-        XCTAssertEqual((size_t)1, [q countRows], @"count != 1");
+        XCTAssertEqual((NSUInteger)1, [q countRows], @"count != 1");
     }
     {
         QueryTableQuery* q = [[[[[table where].Second columnIsEqualTo:@"a" caseSensitive:NO].First columnIsLessThan:3] Or].First columnIsGreaterThan:5]; // No parenthesis
-        XCTAssertEqual((size_t)2, [q countRows], @"count != 2");
+        XCTAssertEqual((NSUInteger)2, [q countRows], @"count != 2");
         RLMView* tv = [q findAll];
-        XCTAssertEqual((size_t)2, [tv rowCount], @"count != 2");
+        XCTAssertEqual((NSUInteger)2, [tv rowCount], @"count != 2");
         XCTAssertEqual((int64_t)8, [tv RLM_intInColumnWithIndex:0 atRowIndex:1], @"First != 8");
     }
 }

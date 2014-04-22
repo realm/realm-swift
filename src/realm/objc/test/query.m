@@ -55,8 +55,8 @@ REALM_TABLE_9(TestQueryAllTypes,
     XCTAssertEqual([[[table where].BinaryCol columnIsEqualTo:bin1]    countRows], (NSUInteger)1, @"BinaryCol equal");
     XCTAssertEqual([[[table where].DateCol   columnIsEqualTo:0]       countRows], (NSUInteger)1, @"DateCol equal");
 // These are not yet implemented
-//    XCTAssertEqual([[[table where].TableCol  columnIsEqualTo:subtab1] count], (size_t)1, @"TableCol equal");
-//    XCTAssertEqual([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (size_t)1, @"MixedCol equal");
+//    XCTAssertEqual([[[table where].TableCol  columnIsEqualTo:subtab1] count], (NSUInteger)1, @"TableCol equal");
+//    XCTAssertEqual([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (NSUInteger)1, @"MixedCol equal");
 
     TestQueryAllTypesQuery *query = [[table where].BoolCol   columnIsEqualTo:NO];
 
@@ -240,7 +240,7 @@ REALM_TABLE_9(TestQueryAllTypes,
     XCTAssertEqual([[[table where] doubleIsLessThanOrEqualTo:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToDouble");
     XCTAssertEqual([[[table where] dateIsLessThanOrEqualTo:date2 inColumnWithIndex:DATE_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToDate");
     
-    //XCTAssertEqual([[[table where] column:INT_COL isBetweenInt:859 and_:861] find:0], (size_t) 1, @"find");
+    //XCTAssertEqual([[[table where] column:INT_COL isBetweenInt:859 and_:861] find:0], (NSUInteger) 1, @"find");
     
     // XCTAssertEqual([[[[table where] column:INT_COL isBetweenInt:859 and_:861] findAll] class], [RLMView class], @"findAll");
     
@@ -390,7 +390,7 @@ REALM_TABLE_9(TestQueryAllTypes,
     XCTAssertEqual([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] indexOfFirstMatchingRowFromIndex:6], (NSUInteger)NSNotFound, @"find");
     XCTAssertEqual([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] indexOfFirstMatchingRowFromIndex:3], (NSUInteger)3,  @"find");
     // jjepsen: disabled this test, perhaps it's not relevant after query sematics update.
-    //XCTAssertEqual([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (size_t)-1, @"find");
+    //XCTAssertEqual([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (NSUInteger)-1, @"find");
     
     [table removeAllRows];
     XCTAssertEqual([[table where] indexOfFirstMatchingRow], NSNotFound, @"");
