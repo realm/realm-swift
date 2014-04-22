@@ -33,8 +33,7 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: number_of_rows @@
-    NSUInteger cnt1 = people.rowCount;                 // =&gt; 6
-    NSLog(@"RowCount: %lu", (unsigned long)cnt1);
+    NSLog(@"RowCount: %@", @(people.rowCount));        // =&gt; 6
     BOOL empty = people.rowCount == 0;                 // =&gt; NO
     NSLog(@"Table is empty? %d", empty);
     // @@EndExample@@
@@ -67,8 +66,7 @@ void tableFunc() {
 
     // @@Example: deleting_row @@
     [people removeRowAtIndex:2];
-    NSUInteger cnt2 = people.rowCount;                  // =&gt; 5
-    NSLog(@"RowCount: %lu", (unsigned long)cnt2);
+    NSLog(@"RowCount: %@", @(people.rowCount));        // =&gt; 5
     // @@EndExample@@
 
     // @@Example: iteration @@
@@ -78,11 +76,11 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: simple_seach @@
-    NSUInteger rowIndex;
-    rowIndex = [people.Name find:@"Philip"];              // =&gt; NSNotFound
-    NSLog(@"rowIndex: %lu", (unsigned long)rowIndex);
-    rowIndex = [people.Name find:@"Mary"];                // =&gt; 1
-    NSLog(@"rowIndex: %lu", (unsigned long)rowIndex);
+    NSNumber *rowIndex = nil;
+    rowIndex = @([people.Name find:@"Philip"]);        // =&gt; NSNotFound
+    NSLog(@"rowIndex: %@", rowIndex);
+    rowIndex = @([people.Name find:@"Mary"]);          // =&gt; 1
+    NSLog(@"rowIndex: %@", rowIndex);
     // @@EndExample@@
 
     // @@Example: advanced_search @@
@@ -97,8 +95,7 @@ void tableFunc() {
                                                    endGroup];
 
     // Get number of matching entries
-    NSUInteger cnt3 = [query countRows];                 // =&gt; 2
-    NSLog(@"RowCount: %lu", (unsigned long)cnt3);
+    NSLog(@"RowCount: %@", @([query countRows]));        // =&gt; 2
 
     // You can do aggregates on columns, like calculating the average age
     double avg = [query.Age avg];
@@ -125,22 +122,22 @@ void sharedGroupFunc() {
                                                             error:nil];
 
     // Start a write transaction
-    [context writeUsingBlock:^(RLMTransaction *transaction) {
-        // Get a specific table from the group
-        PeopleTable *table = [transaction createTableWithName:@"employees"
-                                                asTableClass:[PeopleTable class]];
+    [context writeUsingBlock:^(RLMRealm *realm) {
+        // Get a specific table from the realm
+        PeopleTable *table = [realm createTableWithName:@"employees"
+                                           asTableClass:[PeopleTable class]];
 
         // Add a row
-        [table addRow:@{@"Name": @"Bill", @"Age":@53, @"Hired":@YES}];
+        [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
         NSLog(@"Row added!");
         return YES; // Commit (NO would rollback)
     } error:nil];
 
     // Start a read transaction
-    [context readUsingBlock:^(RLMTransaction *transaction) {
+    [context readUsingBlock:^(RLMRealm *realm) {
         // Get the table
-        PeopleTable *table = [transaction tableWithName:@"employees"
-                                                asTableClass:[PeopleTable class]];
+        PeopleTable *table = [realm tableWithName:@"employees"
+                                     asTableClass:[PeopleTable class]];
 
         // Interate over all rows in table
         for (PeopleTableRow *row in table) {
@@ -157,8 +154,8 @@ void sharedGroupFunc() {
 {
     /* We want to clear out old state before running tutorial */
     NSFileManager *manager = [NSFileManager defaultManager];
-    [manager removeItemAtPath:@"people.tightdb" error:nil];
-    [manager removeItemAtPath:@"people_backup.tightdb" error:nil];
+    [manager removeItemAtPath:@"people.realm" error:nil];
+    [manager removeItemAtPath:@"people_backup.realm" error:nil];
 
     tableFunc();
     sharedGroupFunc();
