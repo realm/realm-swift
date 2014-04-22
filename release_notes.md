@@ -30,7 +30,8 @@ The Objective-C API has been updated and your code will break!
 
 Objective-C
 -----------
-The Objective-C API has been updated and your code will break!
+TightDB is now Realm! The Objective-C API has been updated 
+and your code will break!
 
 ### Bugfixes:
 
@@ -39,6 +40,8 @@ The Objective-C API has been updated and your code will break!
 ### API breaking changes:
 
 * Changed all class prefixes from TDB to RLM
+* All references to TightDB have been changed to Realm
+* TDBTransaction and TDBSmartContext have merged into RLMRealm
 
 ### Enhancements:
 
