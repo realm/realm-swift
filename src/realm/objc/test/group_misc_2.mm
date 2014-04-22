@@ -9,7 +9,6 @@
 
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMRealm.h>
-#import <realm/objc/group.h>
 #import <realm/objc/PrivateRLM.h>
 
 REALM_TABLE_DEF_4(MyTable,
@@ -44,33 +43,43 @@ REALM_TABLE_2(QueryTable,
 
 - (void)testRealm_Misc2
 {
-    NSUInteger rowIndex;
-    RLMRealm *realm = [RLMRealm realm];
-    NSLog(@"HasTable: %i", [realm hasTableWithName:@"employees"] );
-    // Create new table in realm
-    MyTable *table = [realm createTableWithName:@"employees" asTableClass:[MyTable class]];
-    NSLog(@"Table: %@", table);
-    NSLog(@"HasTable: %i", [realm hasTableWithName:@"employees"] );
-
-    // Add some rows
-    [table addName:@"John" Age:20 Hired:YES Spare:0];
-    [table addName:@"Mary" Age:21 Hired:NO Spare:0];
-    [table addName:@"Lars" Age:21 Hired:YES Spare:0];
-    [table addName:@"Phil" Age:43 Hired:NO Spare:0];
-    [table addName:@"Anni" Age:54 Hired:YES Spare:0];
-
-    NSLog(@"MyTable Size: %lu", table.rowCount);
-
-    //------------------------------------------------------
-
-    rowIndex = [table.Name find:@"Philip"];    // row = NSNotFound
-    XCTAssertEqual(rowIndex, (NSUInteger)NSNotFound, @"Philip should not be there");
-    rowIndex = [table.Name find:@"Mary"];
-    XCTAssertEqual(rowIndex, (size_t)1,@"Mary should have been there");
-
-    MyTableView *view = [[[table where].Age columnIsEqualTo:21] findAll];
-    size_t cnt = view.rowCount;            // cnt = 2
-    XCTAssertEqual(cnt, (size_t)2,@"Should be two rows in view");
+    NSFileManager* fm = [NSFileManager defaultManager];
+    
+    // Delete realm file
+    [fm removeItemAtPath:@"employees.realm" error:nil];
+    RLMContext *context = [RLMContext contextPersistedAtPath:@"employees.realm"
+                                                       error:nil];
+    
+    NSError *error = nil;
+    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+        NSUInteger rowIndex;
+        NSLog(@"HasTable: %i", [realm hasTableWithName:@"employees"] );
+        // Create new table in realm
+        MyTable *table = [realm createTableWithName:@"employees" asTableClass:[MyTable class]];
+        NSLog(@"Table: %@", table);
+        NSLog(@"HasTable: %i", [realm hasTableWithName:@"employees"] );
+        
+        // Add some rows
+        [table addName:@"John" Age:20 Hired:YES Spare:0];
+        [table addName:@"Mary" Age:21 Hired:NO Spare:0];
+        [table addName:@"Lars" Age:21 Hired:YES Spare:0];
+        [table addName:@"Phil" Age:43 Hired:NO Spare:0];
+        [table addName:@"Anni" Age:54 Hired:YES Spare:0];
+        
+        NSLog(@"MyTable Size: %lu", table.rowCount);
+        
+        //------------------------------------------------------
+        
+        rowIndex = [table.Name find:@"Philip"];    // row = NSNotFound
+        XCTAssertEqual(rowIndex, (NSUInteger)NSNotFound, @"Philip should not be there");
+        rowIndex = [table.Name find:@"Mary"];
+        XCTAssertEqual(rowIndex, (size_t)1,@"Mary should have been there");
+        
+        MyTableView *view = [[[table where].Age columnIsEqualTo:21] findAll];
+        size_t cnt = view.rowCount;            // cnt = 2
+        XCTAssertEqual(cnt, (size_t)2,@"Should be two rows in view");
+        return YES;
+    } error:&error];
 
     //------------------------------------------------------
 
@@ -93,7 +102,7 @@ REALM_TABLE_2(QueryTable,
      // Get the average age - currently only a low-level interface!
     double avg = [q.Age avg];
     NSLog(@"Average: %f", avg);
-    XCTAssertEqual(avg, 21.0,@"Expected 20.5 average");
+    XCTAssertEqual(avg, 21.0,@"Expected 21 average");
 
     // Execute the query and return a table (view)
     RLMView* res = [q findAll];
@@ -104,47 +113,37 @@ REALM_TABLE_2(QueryTable,
 
     //------------------------------------------------------
 
-    NSFileManager* fm = [NSFileManager defaultManager];
-
-    // Write to disk
-    [fm removeItemAtPath:@"employees.realm" error:nil];
-    [realm writeContextToFile:@"employees.realm" error:nil];
-
     // Load a realm from disk (and print contents)
-    RLMRealm * fromDisk = [RLMRealm realmWithFile:@"employees.realm" error:nil];
+    RLMRealm * fromDisk = [RLMRealm realmWithPersistenceToFile:@"employees.realm"];
     MyTable* diskTable = [fromDisk tableWithName:@"employees" asTableClass:[MyTable class]];
 
-    [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
     NSLog(@"Disktable size: %zu", diskTable.rowCount);
     for (size_t i = 0; i < diskTable.rowCount; i++) {
         MyTableRow* cursor = [diskTable rowAtIndex:i];
         NSLog(@"%zu: %@", i, cursor.Name);
         NSLog(@"%zu: %@", i, [diskTable RLM_stringInColumnWithIndex:0 atRowIndex:i]);
     }
-
-    // Write same realm to memory buffer
-    NSData* buffer = [realm writeRealmToBuffer];
-
-    // Load a realm from memory (and print contents)
-    RLMRealm * fromMem = [RLMRealm realmWithBuffer:buffer error:nil];
-    MyTable* memTable = [fromMem tableWithName:@"employees" asTableClass:[MyTable class]];
-    for (size_t i = 0; i < [memTable rowCount]; i++) {
-        // ??? cursor
-        NSLog(@"%zu: %@", i, memTable.Name);
-    }
 }
-
 
 - (void)testQuery
 {
-    RLMRealm *realm = [RLMRealm realm];
-    QueryTable *table = [realm createTableWithName:@"Query table" asTableClass:[QueryTable class]];
-
-    // Add some rows
-    [table addFirst:2 Second:@"a"];
-    [table addFirst:4 Second:@"a"];
-    [table addFirst:5 Second:@"b"];
-    [table addFirst:8 Second:@"The quick brown fox"];
+    NSFileManager* fm = [NSFileManager defaultManager];
+    
+    // Delete realm file
+    [fm removeItemAtPath:[RLMContext defaultPath] error:nil];
+    [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^BOOL(RLMRealm *realm) {
+        QueryTable *table = [realm createTableWithName:@"Query table" asTableClass:[QueryTable class]];
+        
+        // Add some rows
+        [table addFirst:2 Second:@"a"];
+        [table addFirst:4 Second:@"a"];
+        [table addFirst:5 Second:@"b"];
+        [table addFirst:8 Second:@"The quick brown fox"];
+        return YES;
+    } error:nil];
+    
+    RLMRealm *realm = [RLMRealm realmWithDefaultPersistence];
+    QueryTable *table = [realm tableWithName:@"Query table" asTableClass:[QueryTable class]];
 
     {
         QueryTableQuery* q = [[table where].First columnIsBetween:3 :7]; // Between
@@ -191,39 +190,45 @@ REALM_TABLE_2(QueryTable,
  */
 - (void)testSubtables
 {
-    RLMRealm *realm = [RLMRealm realm];
-    RLMTable *table = [realm createTableWithName:@"table" asTableClass:[RLMTable class]];
-
-    // Specify the table type
-    {
-        RLMDescriptor * desc = table.descriptor;
-        [desc addColumnWithName:@"int" type:RLMTypeInt];
+    NSFileManager* fm = [NSFileManager defaultManager];
+    
+    // Delete realm file
+    [fm removeItemAtPath:[RLMContext defaultPath] error:nil];
+    [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^BOOL(RLMRealm *realm) {
+        RLMTable *table = [realm createTableWithName:@"table" asTableClass:[RLMTable class]];
+        
+        // Specify the table type
         {
-            RLMDescriptor * subdesc = [desc addColumnTable:@"tab"];
-            [subdesc addColumnWithName:@"int" type:RLMTypeInt];
+            RLMDescriptor * desc = table.descriptor;
+            [desc addColumnWithName:@"int" type:RLMTypeInt];
+            {
+                RLMDescriptor * subdesc = [desc addColumnTable:@"tab"];
+                [subdesc addColumnWithName:@"int" type:RLMTypeInt];
+            }
+            [desc addColumnWithName:@"mix" type:RLMTypeMixed];
         }
-        [desc addColumnWithName:@"mix" type:RLMTypeMixed];
-    }
-
-    int COL_TABLE_INT = 0;
-    int COL_TABLE_TAB = 1;
-    int COL_TABLE_MIX = 2;
-    int COL_SUBTABLE_INT = 0;
-
-    // Add a row to the top level table
-    [table addRow:nil];
-    [table RLM_setInt:700 inColumnWithIndex:COL_TABLE_INT atRowIndex:0];
-
-    // Add two rows to the subtable
-    RLMTable* subtable = [table RLM_tableInColumnWithIndex:COL_TABLE_TAB atRowIndex:0];
-    [subtable addRow:nil];
-
-    [subtable RLM_setInt:800 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:0];
-    [subtable addRow:nil];
-    [subtable RLM_setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
-
-    // Make the mixed values column contain another subtable
-    [table RLM_setMixed:[[RLMTable alloc] init] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
+        
+        int COL_TABLE_INT = 0;
+        int COL_TABLE_TAB = 1;
+        int COL_TABLE_MIX = 2;
+        int COL_SUBTABLE_INT = 0;
+        
+        // Add a row to the top level table
+        [table addRow:nil];
+        [table RLM_setInt:700 inColumnWithIndex:COL_TABLE_INT atRowIndex:0];
+        
+        // Add two rows to the subtable
+        RLMTable* subtable = [table RLM_tableInColumnWithIndex:COL_TABLE_TAB atRowIndex:0];
+        [subtable addRow:nil];
+        
+        [subtable RLM_setInt:800 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:0];
+        [subtable addRow:nil];
+        [subtable RLM_setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
+        
+        // Make the mixed values column contain another subtable
+        [table RLM_setMixed:[[RLMTable alloc] init] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
+        return YES;
+    } error:nil];
     
 /* Fails!!!
     // Specify its type

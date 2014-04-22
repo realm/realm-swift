@@ -12,7 +12,6 @@
 #import <XCTest/XCTest.h>
 
 #import <realm/objc/Realm.h>
-#import <realm/objc/group.h>
 
 #include <tightdb/binary_data.hpp>
 #include <tightdb/table.hpp>
@@ -48,49 +47,41 @@ REALM_TABLE_9(TestQueryErrAllTypes,
 @end
 @implementation MACTestErrHandling
 
-
-
-
-
-- (void)testErrHandling
-{
-    NSError* error = nil;
-
+- (void)testErrHandling {
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
+    
+    NSFileManager *fm = [NSFileManager defaultManager];
+    [fm removeItemAtPath:[RLMContext defaultPath] error:nil];
+    
+    NSError* error = nil;
 
-    RLMRealm *realm = [RLMRealm realm];
-    // Create new table in realm
-    PeopleErrTable* people = [realm createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
+    [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^BOOL(RLMRealm *realm) {
+        // Create new table in realm
+        PeopleErrTable* people = [realm createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
+        
+        // No longer supports errors, the tes may be redundant
+        // Add some rows
+        
+        [people addName:@"John" Age:20 Hired:YES];
+        [people addName:@"Mary" Age:21 Hired:NO];
+        [people addName:@"Lars" Age:21 Hired:YES];
+        [people addName:@"Phil" Age:43 Hired:NO];
+        [people addName:@"Anni" Age:54 Hired:YES];
+        
+        
+        
+        // Insert at specific position
+        [people insertEmptyRowAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
+        
+        // Getting the size of the table
+        NSLog(@"PeopleErrTable Size: %lu - is %@.    [6 - not empty]", [people rowCount],
+              people.rowCount == 0 ? @"empty" : @"not empty");
+        return YES;
+    } error:&error];
 
-    // No longer supports errors, the tes may be redundant
-    // Add some rows
-
-    [people addName:@"John" Age:20 Hired:YES];
-    [people addName:@"Mary" Age:21 Hired:NO];
-    [people addName:@"Lars" Age:21 Hired:YES];
-    [people addName:@"Phil" Age:43 Hired:NO];
-    [people addName:@"Anni" Age:54 Hired:YES];
-
-
-
-    // Insert at specific position
-    [people insertEmptyRowAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
-
-    // Getting the size of the table
-    NSLog(@"PeopleErrTable Size: %lu - is %@.    [6 - not empty]", [people rowCount],
-        people.rowCount == 0 ? @"empty" : @"not empty");
-
-    NSFileManager* fm = [NSFileManager defaultManager];
-
-    // Write the realm to disk
-    [fm removeItemAtPath:@"peopleErr.realm" error:NULL];
-    error = nil;
-    if (![realm writeContextToFile:@"peopleErr.realm" error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-        XCTFail(@"No error expected");
-    }
+    XCTAssertNil(error, @"error should be nil after saving a context");
 
     //------------------------------------------------------
     NSLog(@"--- Changing permissions ---");
@@ -104,22 +95,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     if (error) {
         XCTFail(@"Failed to set readonly attributes");
     }
-
-    //------------------------------------------------------
-    NSLog(@"--- Reopen and manipulate ---");
-    //------------------------------------------------------
-
-    // Load a realm from disk (and try to update, even though it is readonly)
-    error = nil;
-    RLMRealm * fromDisk = [RLMRealm realmWithFile:@"peopleErr.realm" error:&error];
-    if (error) {
-        NSLog(@"%@", [error localizedDescription]);
-    }
-    else {
-        // This is no longer an error, becuase read/write mode is no longer required per default.
-        // XCTFail(@"Since file cannot be opened, we should have gotten an error here.");
-    }
-
+    
     //------------------------------------------------------
     NSLog(@"--- Make normal again ---");
     //------------------------------------------------------
@@ -131,15 +107,11 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     if (error) {
         XCTFail(@"Failed to set readonly attributes");
     }
+    
+    RLMRealm *fromDisk = [RLMRealm realmWithPersistenceToFile:@"peopleErr.realm"];
+    XCTAssertNotNil(fromDisk, @"realm from disk should be valid");
 
-    error = nil;
-    fromDisk = [RLMRealm realmWithFile:@"peopleErr.realm" error:&error];
-    if (error) {
-        NSLog(@"%@", [error localizedDescription]);
-        XCTFail(@"File should have been possible to open");
-    }
-
-    PeopleErrTable* diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PeopleErrTable class]];
+    PeopleErrTable *diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
     // Fake readonly.
     [((RLMTable*)diskTable) setReadOnly:true];

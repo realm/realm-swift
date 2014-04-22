@@ -8,7 +8,6 @@
 #import <XCTest/XCTest.h>
 
 #import <realm/objc/Realm.h>
-#import <realm/objc/group.h>
 
 REALM_TABLE_3(EnumPeopleTable,
                 Name,  String,
@@ -28,16 +27,23 @@ REALM_TABLE_2(EnumPeopleTable2,
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
-    RLMRealm *realm = [RLMRealm realm];
-    // Create new table in realm
-    EnumPeopleTable *people = [realm createTableWithName:@"employees" asTableClass:[EnumPeopleTable class]];
-
-    // Add some rows
-    [people addName:@"John" Age:20 Hired:YES];
-    [people addName:@"Mary" Age:21 Hired:NO];
-    [people addName:@"Lars" Age:21 Hired:YES];
-    [people addName:@"Phil" Age:43 Hired:NO];
-    [people addName:@"Anni" Age:54 Hired:YES];
+    [[NSFileManager defaultManager] removeItemAtPath:[RLMContext defaultPath] error:nil];
+    
+    [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^BOOL(RLMRealm *realm) {
+        // Create new table in realm
+        EnumPeopleTable *people = [realm createTableWithName:@"employees" asTableClass:[EnumPeopleTable class]];
+        
+        // Add some rows
+        [people addName:@"John" Age:20 Hired:YES];
+        [people addName:@"Mary" Age:21 Hired:NO];
+        [people addName:@"Lars" Age:21 Hired:YES];
+        [people addName:@"Phil" Age:43 Hired:NO];
+        [people addName:@"Anni" Age:54 Hired:YES];
+        return YES;
+    } error:nil];
+    
+    EnumPeopleTable *people = [[RLMRealm realmWithDefaultPersistence] tableWithName:@"employees"
+                                                                       asTableClass:[EnumPeopleTable class]];
 
     //------------------------------------------------------
     NSLog(@"--- Iterators ---");

@@ -11,7 +11,6 @@
 #import <XCTest/XCTest.h>
 
 #import <realm/objc/Realm.h>
-#import <realm/objc/group.h>
 #import <realm/objc/RLMTable_noinst.h>
 
 REALM_TABLE_3(MixedTable,
@@ -137,17 +136,22 @@ REALM_TABLE_2(SubMixedTable,
     [tableSub addHired:NO Age:43];
     [tableSub addHired:YES Age:54];
 
-    RLMRealm *realm = [RLMRealm realm];
-    // Create new table in realm
-    MixedTable *table = [realm createTableWithName:@"MixedValues" asTableClass:[MixedTable class]];
-    NSLog(@"Table: %@", table);
-    // Add some rows
-    [table addHired:YES Other:[NSString stringWithUTF8String:"Jens"] Age:50];
-    [table addHired:YES Other:[NSString stringWithUTF8String:"Aage"] Age:52];
-    [table addHired:YES Other:[NSString stringWithUTF8String:"Joergen"] Age:53];
-    [table addHired:YES Other:[NSString stringWithUTF8String:"Dave"] Age:54];
-    [table addHired:YES Other:tableSub Age:54];
-    [table addHired:YES Other:[NSDate date] Age:54];
+    [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^BOOL(RLMRealm *realm) {
+        // Create new table in realm
+        MixedTable *table = [realm createTableWithName:@"MixedValues" asTableClass:[MixedTable class]];
+        NSLog(@"Table: %@", table);
+        // Add some rows
+        [table addHired:YES Other:[NSString stringWithUTF8String:"Jens"] Age:50];
+        [table addHired:YES Other:[NSString stringWithUTF8String:"Aage"] Age:52];
+        [table addHired:YES Other:[NSString stringWithUTF8String:"Joergen"] Age:53];
+        [table addHired:YES Other:[NSString stringWithUTF8String:"Dave"] Age:54];
+        [table addHired:YES Other:tableSub Age:54];
+        [table addHired:YES Other:[NSDate date] Age:54];
+        return YES;
+    } error:nil];
+    
+    RLMRealm *realm = [RLMRealm realmWithDefaultPersistence];
+    MixedTable *table = [realm tableWithName:@"MixedValues" asTableClass:[MixedTable class]];
 
     XCTAssertEqual([table rowCount], (NSUInteger)6, @"6 rows expected");
     XCTAssertTrue([table[0].Other isKindOfClass:[NSString class]], @"NSString excepted");

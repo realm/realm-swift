@@ -8,84 +8,100 @@
 #import <XCTest/XCTest.h>
 
 #import <realm/objc/Realm.h>
-#import <realm/objc/group.h>
-
 
 REALM_TABLE_DEF_3(PeopleTable,
-                    Name,  String,
-                    Age,   Int,
-                    Hired, Bool)
+                  Name,  String,
+                  Age,   Int,
+                  Hired, Bool)
 
 REALM_TABLE_DEF_2(PeopleTable2,
-                    Hired, Bool,
-                    Age,   Int)
+                  Hired, Bool,
+                  Age,   Int)
 
 REALM_TABLE_IMPL_3(PeopleTable,
-                     Name,  String,
-                     Age,   Int,
-                     Hired, Bool)
+                   Name,  String,
+                   Age,   Int,
+                   Hired, Bool)
 
 REALM_TABLE_IMPL_2(PeopleTable2,
-                     Hired, Bool,
-                     Age,   Int)
+                   Hired, Bool,
+                   Age,   Int)
 
 @interface MACTestTutorial: XCTestCase
+
 @end
+
 @implementation MACTestTutorial
 
 - (void)testTutorial
 {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    
+    // Delete realm file
+    [fm removeItemAtPath:@"employees.realm" error:nil];
+    
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    RLMRealm *realm = [RLMRealm realm];
-    // Create new table in realm
-    PeopleTable *people = [realm createTableWithName:@"employees" asTableClass:[PeopleTable class]];
-
-    // Add some rows
-    [people addName:@"John" Age:20 Hired:YES];
-    [people addName:@"Mary" Age:21 Hired:NO];
-    [people addName:@"Lars" Age:21 Hired:YES];
-    [people addName:@"Phil" Age:43 Hired:NO];
-    [people addName:@"Anni" Age:54 Hired:YES];
-
-    // Insert at specific position
-    [people insertEmptyRowAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
-
-    // Getting the size of the table
-    NSLog(@"PeopleTable Size: %lu - is %@.    [6 - not empty]", [people rowCount],
-        people.rowCount == 0 ? @"empty" : @"not empty");
-
-    //------------------------------------------------------
-    NSLog(@"--- Working with individual rows ---");
-    //------------------------------------------------------
-
-    // Getting values
-    NSString * name = [people rowAtIndex:5].Name;   // => 'Anni'
-    // Using a row
-    PeopleTableRow *myRow = [people rowAtIndex:5];
-    int64_t age = myRow.Age;                           // => 54
-    BOOL hired  = myRow.Hired;                         // => true
-    NSLog(@"%@ is %lld years old.", name, age);
-    if (hired) NSLog(@"is hired.");
-
-    // Setting values  (note: setter access will be made obsolete, use dot notation)
-    [people rowAtIndex:5].Age = 43;  // Getting younger
+    RLMContext *context = [RLMContext contextPersistedAtPath:@"employees.realm"
+                                                       error:nil];
     
-    // or with dot-syntax:
-    myRow.Age += 1;                                    // Happy birthday!
-    NSLog(@"%@ age is now %lld.   [44]", myRow.Name, myRow.Age);
-
-    // Get last row
-    NSString *lastname = [people rowAtLastIndex].Name;       // => "Anni"
-    NSLog(@"Last name is %@.   [Anni]", lastname);
-
-    // Change a row - not implemented yet
-    // [people setAtIndex:4 Name:"Eric" Age:50 Hired:YES];
-
-    // Delete row
-    [people removeRowAtIndex:2];
+    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+        // Create new table in realm
+        PeopleTable *people = [realm createTableWithName:@"employees" asTableClass:[PeopleTable class]];
+        
+        // Add some rows
+        [people addName:@"John" Age:20 Hired:YES];
+        [people addName:@"Mary" Age:21 Hired:NO];
+        [people addName:@"Lars" Age:21 Hired:YES];
+        [people addName:@"Phil" Age:43 Hired:NO];
+        [people addName:@"Anni" Age:54 Hired:YES];
+        
+        // Insert at specific position
+        [people insertEmptyRowAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
+        
+        // Getting the size of the table
+        NSLog(@"PeopleTable Size: %lu - is %@.    [6 - not empty]", [people rowCount],
+              people.rowCount == 0 ? @"empty" : @"not empty");
+        
+        //------------------------------------------------------
+        NSLog(@"--- Working with individual rows ---");
+        //------------------------------------------------------
+        
+        // Getting values
+        NSString * name = [people rowAtIndex:5].Name;   // => 'Anni'
+        // Using a row
+        PeopleTableRow *myRow = [people rowAtIndex:5];
+        int64_t age = myRow.Age;                           // => 54
+        BOOL hired  = myRow.Hired;                         // => true
+        NSLog(@"%@ is %lld years old.", name, age);
+        if (hired) NSLog(@"is hired.");
+        
+        // Setting values  (note: setter access will be made obsolete, use dot notation)
+        [people rowAtIndex:5].Age = 43;  // Getting younger
+        
+        // or with dot-syntax:
+        myRow.Age += 1;                                    // Happy birthday!
+        NSLog(@"%@ age is now %lld.   [44]", myRow.Name, myRow.Age);
+        
+        // Get last row
+        NSString *lastname = [people rowAtLastIndex].Name;       // => "Anni"
+        NSLog(@"Last name is %@.   [Anni]", lastname);
+        
+        // Change a row - not implemented yet
+        // [people setAtIndex:4 Name:"Eric" Age:50 Hired:YES];
+        
+        // Delete row
+        [people removeRowAtIndex:2];
+        
+        return YES;
+    } error:nil];
+    
+    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:@"employees.realm"];
+    
+    PeopleTable *people = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
+    
     NSLog(@"%lu rows after remove.  [5]", [people rowCount]);  // 5
     XCTAssertEqual([people rowCount], (size_t)5,@"rows should be 5");
 
@@ -136,40 +152,19 @@ REALM_TABLE_IMPL_2(PeopleTable2,
             [people rowAtIndex:i].Name,
             [people rowAtIndex:i].Age);
     }
-
-    //------------------------------------------------------
-    NSLog(@"--- Serialization ---");
-    //------------------------------------------------------
-
-    NSFileManager *fm = [NSFileManager defaultManager];
-
-    // Write the realm to disk
-    [fm removeItemAtPath:@"employees.realm" error:nil];
-    [realm writeContextToFile:@"employees.realm" error:nil];
-
-    // Load a realm from disk (and print contents)
-    RLMRealm *fromDisk = [RLMRealm realmWithFile:@"employees.realm" error:nil];
-    PeopleTable *diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PeopleTable class]];
-
-    [diskTable addName:@"Anni" Age:54 Hired:YES];
-
-    NSLog(@"Disktable size: %zu", [diskTable rowCount]);
-
-    for (size_t i = 0; i < [diskTable rowCount]; i++) {
-        PeopleTableRow *row = [diskTable rowAtIndex:i];
-        NSLog(@"%zu: %@", i, row.Name);
-    }
-
-    // Write same realm to memory buffer
-    NSData* buffer = [realm writeRealmToBuffer];
-
-    // Load a realm from memory (and print contents)
-    RLMRealm *fromMem = [RLMRealm realmWithBuffer:buffer error:nil];
-    PeopleTable *memTable = [fromMem tableWithName:@"employees" asTableClass:[PeopleTable class]];
-    for (size_t i = 0; i < [memTable rowCount]; i++) {
-        PeopleTableRow *row = [memTable rowAtIndex:i];
-        NSLog(@"%zu: %@", i, row.Name);
-    }
+    
+    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+        PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
+        [table addName:@"Anni" Age:54 Hired:YES];
+        
+        XCTAssertEqual([table rowCount], (NSUInteger)6, @"PeopleTable should have 6 rows");
+        
+        for (size_t i = 0; i < [table rowCount]; i++) {
+            PeopleTableRow *row = [table rowAtIndex:i];
+            NSLog(@"%zu: %@", i, row.Name);
+        }
+        return YES;
+    } error:nil];
 }
 
 @end
