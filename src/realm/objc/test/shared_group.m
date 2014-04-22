@@ -93,7 +93,7 @@ REALM_TABLE_2(SharedTable2,
         SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
         NSLog(@"Disktable size: %zu", [diskTable rowCount]);
         
-        XCTAssertThrows([diskTable removeAllRows], @"Not allowed in read realm");
+        XCTAssertThrows([diskTable removeAllRows], @"Not allowed in read transaction");
     }];
 }
 
@@ -175,16 +175,16 @@ REALM_TABLE_2(SharedTable2,
     [fromDisk readUsingBlock:^(RLMRealm * realm) {
         RLMTable *t = [realm tableWithName:@"table"];
         
-        XCTAssertThrows([t addRow:nil], @"Is in read realm");
-        XCTAssertThrows([t addRow:@[@1]], @"Is in read realm");
+        XCTAssertThrows([t addRow:nil], @"Is in read transaction");
+        XCTAssertThrows([t addRow:@[@1]], @"Is in read transaction");
        
         RLMQuery *q = [t where];
-        XCTAssertThrows([q removeRows], @"Is in read realm");
+        XCTAssertThrows([q removeRows], @"Is in read transaction");
 
         RLMView *v = [q findAllRows];
         
-        XCTAssertThrows([v removeAllRows], @"Is in read realm");
-        XCTAssertThrows([[v where] removeRows], @"Is in read realm");
+        XCTAssertThrows([v removeAllRows], @"Is in read transaction");
+        XCTAssertThrows([[v where] removeRows], @"Is in read transaction");
         
         XCTAssertEqual(t.rowCount,      (NSUInteger)1, @"No rows have been removed");
         XCTAssertEqual([q countRows],   (NSUInteger)1, @"No rows have been removed");
@@ -295,8 +295,8 @@ REALM_TABLE_2(SharedTable2,
         
         XCTAssertThrows([realm tableWithName:nil], @"name is nil");
         XCTAssertThrows([realm tableWithName:@""], @"name is empty");
-        XCTAssertThrows([realm createTableWithName:@"same name"], @"creating table not allowed in read realm");
-        XCTAssertThrows([realm createTableWithName:@"name"], @"creating table not allowed in read realm");
+        XCTAssertThrows([realm createTableWithName:@"same name"], @"creating table not allowed in read transaction");
+        XCTAssertThrows([realm createTableWithName:@"name"], @"creating table not allowed in read transaction");
         XCTAssertNil([realm tableWithName:@"weird name"], @"get table that does not exists return nil");
     }];
 }
@@ -394,12 +394,12 @@ REALM_TABLE_2(SharedTable2,
         }];
         [context1 unpinReadTransactions];
     }
-    {   // can't start a write realm while pinned
+    {   // can't start a write transaction while pinned
         [context1 pinReadTransactions];
         XCTAssertThrows([context1 writeUsingBlock:^BOOL(RLMRealm *realm) {
             XCTAssertNotNil(realm, @"Parameter must be used");
             return YES;
-        } error:nil], @"Can't start write realm while pinned");
+        } error:nil], @"Can't start write transaction while pinned");
         [context1 unpinReadTransactions];
     }
 }
