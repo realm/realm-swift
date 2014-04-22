@@ -387,27 +387,25 @@ CATEGORIES :
                  with default values is inserted. Properties in generic objects
                  (derived from <code>NSObject</code>) which match columns names
                  will be used. Non-matching properties are ignored.
-      SIGNATURE: (void)insertRow:(id)anObject atIndex:(NSUInteger)rowIndex
+      SIGNATURE: (void)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME    : anObject
-        TYPES   : id
+        TYPES   : NSObject *
         DESCR   : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>.
       - NAME    : rowIndex
         TYPES   : NSUInteger
         DESCR   : *g_dyn_table_insert_empty_row_parm1_descr
 
   - objc_dyn_table_set_object:
-      NAME     : "setRow:atIndex:"
-      SUMMARY  : Set a row.
+      NAME     : "updateRow:atIndex:"
+      SUMMARY  : Updates a row.
       DESCR    : >
-                 This method will set a row in the table at the specified index with <code>anObject</code>. 
-                 If anObject is <code>nil</code>, the row gets removed. Properties in generic objects (derived from <code>NSObject</code>) 
-                 which match columns names will be used. Non-matching properties are ignored. 
-                 An exception is thrown if passing an index that is out of bounds.
-      SIGNATURE: (void)setRow:(id)anObject atIndex:(NSUInteger)rowIndex
+                 This method will update a row in the table at the specified index with <code>anObject</code>. If <code>anObject</code> is <code>nil</code>, nothing will happen to the row. Properties in generic objects (derived from <code>NSObject</code>) 
+                 which match columns names will be used. Non-matching properties are ignored. An exception is thrown if passing an index that is out of bounds.
+      SIGNATURE: (void)updateRow:(NSObject *)anObject atRowIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME    : anObject
-        TYPES   : id
+        TYPES   : NSObject *
         DESCR   : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>.
       - NAME    : rowIndex
         TYPES   : NSUInteger
@@ -430,34 +428,34 @@ CATEGORIES :
         TYPES  : NSObject *
         DESCR  : The row either as an <code>NSArray</code>, <code>NSDictionary</code>, or a generic <code>NSObject</code>.
 
-  - objc_dyn_table_object_at_indexed_subscript:
-      NAME     : "objectAtIndexedSubscript:"
-      SUMMARY  : Returns an <code>RLMRow</code> at the specified index.
-      DESCR    : >
-                 This method will return an RLMRow for a given index. This can also be used similarly to
-                 NSArray styled subscripting. For example, <code>myRLMTable[2]</code> will return an RLMRow at index 2. 
-                 If passing an index that is out of bounds, this method returns nil.
-      SIGNATURE: (RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
-      PARAMS:
-      - NAME   : rowIndex
-        TYPES  : NSUInteger
-        DESCR  : *g_dyn_table_insert_empty_row_parm1_descr
+  # - objc_dyn_table_object_at_indexed_subscript:
+  #     NAME     : "objectAtIndexedSubscript:"
+  #     SUMMARY  : Returns an <code>RLMRow</code> at the specified index.
+  #     DESCR    : >
+  #                This method will return an RLMRow for a given index. This can also be used similarly to
+  #                NSArray styled subscripting. For example, <code>myRLMTable[2]</code> will return an RLMRow at index 2. 
+  #                If passing an index that is out of bounds, this method returns nil.
+  #     SIGNATURE: (RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
+  #     PARAMS:
+  #     - NAME   : rowIndex
+  #       TYPES  : NSUInteger
+  #       DESCR  : *g_dyn_table_insert_empty_row_parm1_descr
 
-  - objc_dyn_table_set_object_at_indexed_subscript:
-      NAME     : "setObject:atIndexedSubscript:"
-      SUMMARY  : Sets an object at a specified index.
-      DESCR    : >
-                 This method will set an <code>RLMRow</code> at a given index. This can also be used
-                 similarly to NSArray styled subscripting. For example, <code>myRLMTable[2] = @{@"objectID" : @1234, @"name" : @"foo"}</code>
-                 will set the values for the RLMRow at index 2. Please note that the <code>RLMTable</code>'s column names must match the dictionary keys.
-      SIGNATURE: (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex
-      PARAMS:
-      - NAME   : newValue
-        TYPES  : NSObject *
-        DESCR  : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>.
-      - NAME   : rowIndex
-        TYPES  : NSUInteger
-        DESCR  : *g_dyn_table_insert_empty_row_parm1_descr        
+  # - objc_dyn_table_set_object_at_indexed_subscript:
+  #     NAME     : "setObject:atIndexedSubscript:"
+  #     SUMMARY  : Sets an object at a specified index.
+  #     DESCR    : >
+  #                This method will set an <code>RLMRow</code> at a given index. This can also be used
+  #                similarly to NSArray styled subscripting. For example, <code>myRLMTable[2] = @{@"objectID" : @1234, @"name" : @"foo"}</code>
+  #                will set the values for the RLMRow at index 2. Please note that the <code>RLMTable</code>'s column names must match the dictionary keys.
+  #     SIGNATURE: (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex
+  #     PARAMS:
+  #     - NAME   : newValue
+  #       TYPES  : NSObject *
+  #       DESCR  : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>.
+  #     - NAME   : rowIndex
+  #       TYPES  : NSUInteger
+  #       DESCR  : *g_dyn_table_insert_empty_row_parm1_descr        
 
 
 

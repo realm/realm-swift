@@ -262,26 +262,26 @@ CATEGORIES:
                  Properties in generic objects
                  (derived from <code>NSObject</code>) which match column names
                  will be used. Non-matching properties are ignored.
-      SIGNATURE: (void)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
+      SIGNATURE: (void)insertRow:(NSObject *)anObject atRowIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME    : anObject
-        TYPES   : id
+        TYPES   : NSObject *
         DESCR   : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>. A <code>nil</code> implies that a row of default values is inserted.
       - NAME    : rowIndex
         TYPES   : NSUInteger
         DESCR   : *g_dyn_table_insert_empty_row_parm1_descr
 
   - objc_dyn_table_set_object:
-      NAME     : "setRow:atIndex:"
-      SUMMARY  : Sets a row.
+      NAME     : "updateRow:atIndex:"
+      SUMMARY  : Updates a row.
       DESCR    : >
-                 This method will set a row in the table at the specified index with <code>anObject</code>. If anObject is <code>nil</code>, the row gets removed. Properties in generic objects (derived from <code>NSObject</code>) 
+                 This method will update a row in the table at the specified index with <code>anObject</code>. If <code>anObject</code> is <code>nil</code>, nothing will happen to the row. Properties in generic objects (derived from <code>NSObject</code>) 
                  which match columns names will be used. Non-matching properties are ignored. An exception is thrown if passing an index that is out of bounds.
-      SIGNATURE: (void)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
+      SIGNATURE: (void)updateRow:(NSObject *)anObject atRowIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME    : anObject
-        TYPES   : id
-        DESCR   : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>. A <code>nil</code> implies that a row of default values is inserted.
+        TYPES   : NSObject *
+        DESCR   : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>.
       - NAME    : rowIndex
         TYPES   : NSUInteger
         DESCR   : *g_dyn_table_insert_empty_row_parm1_descr
