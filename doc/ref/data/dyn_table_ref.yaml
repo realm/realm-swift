@@ -127,18 +127,18 @@ CATEGORIES :
       - CODE   : ex_objc_dyn_table_clear
         DESCR  :
 
-  - g_dyn_table_optimize:
-      NAME     : "optimize"
-      SUMMARY  : *g_table_optimize_summary
-      DESCR    : *g_table_optimize_descr
-      SIGNATURE: (BOOL)optimize
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : &objc_no_if_error
-                 "<code>NO</code> if an error occured, otherwise <code>YES</code>"
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_optimize
-        DESCR  :
+  # - g_dyn_table_optimize:
+  #     NAME     : "optimize"
+  #     SUMMARY  : *g_table_optimize_summary
+  #     DESCR    : *g_table_optimize_descr
+  #     SIGNATURE: (BOOL)optimize
+  #     RETURN:
+  #       TYPES  : BOOL
+  #       DESCR  : &objc_no_if_error
+  #                "<code>NO</code> if an error occured, otherwise <code>YES</code>"
+  #     EXAMPLES:
+  #     - CODE   : ex_objc_dyn_table_optimize
+  #       DESCR  :
 
   - g_dyn_table_opertator==:
       NAME     : "isEqual"
