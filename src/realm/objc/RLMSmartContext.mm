@@ -255,6 +255,31 @@ void throw_objc_exception(exception &ex)
     return table;
 }
 
+-(id)tableWithName:(NSString *)name asTableClass:(__unsafe_unretained Class)class_obj
+{
+    ObjcStringAccessor name_2(name);
+    if (!_group->has_table(name_2))
+        return nil;
+    RLMTable *table = [[class_obj alloc] _initRaw];
+    size_t indexInGroup;
+    try {
+        ConstTableRef table_2 = _group->get_table(name_2); // Throws
+        // Note: Const spoofing is alright, because the
+        // Objective-C table accessor is in 'read-only' mode.
+        [table setNativeTable:const_cast<Table*>(table_2.get())];
+        indexInGroup = table_2->get_index_in_parent();
+    }
+    catch (exception &ex) {
+        throw_objc_exception(ex);
+    }
+    [table setParent:self];
+    [table setReadOnly:YES];
+    TDBPrivateWeakTableReference *weakTableRef =
+    [[TDBPrivateWeakTableReference alloc] initWithTable:table indexInGroup:indexInGroup];
+    [_weakTableRefs addObject:weakTableRef];
+    return table;
+}
+
 - (void)tableRefDidDie
 {
     _tableRefsHaveDied = YES;
