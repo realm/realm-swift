@@ -44,7 +44,7 @@ using namespace std;
 
 @end
 
-@interface TDBDynamicTableTests: RLMTestCase
+@interface RLMDynamicTableTests : RLMTestCase
 
 @end
 
