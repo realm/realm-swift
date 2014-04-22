@@ -1585,7 +1585,7 @@ using namespace std;
     object.objID = @1;
     object.name = @"Alex";
     
-    XCTAssertNoThrow([table setRow:object atIndex:0], @"Setting object for valid index should not throw exception");
+    XCTAssertNoThrow([table updateRow:object atIndex:0], @"Setting object for valid index should not throw exception");
     XCTAssertTrue(previousRowCount == [table rowCount], @"previousRowCount should be equal to current rowCount");
     XCTAssertTrue([table[0][@"objID"] isEqualToNumber:object.objID], @"Object at index 0 should have newly set objID");
     XCTAssertTrue([table[0][@"name"] isEqualToString:object.name], @"Object at index 0 should have newly set name");
@@ -1594,7 +1594,7 @@ using namespace std;
     previousRowCount = [table rowCount];
     NSDictionary* testDictionary = @{@"objID" : @2, @"name" : @"Tim"};
     
-    XCTAssertNoThrow([table setRow:testDictionary atIndex:0], @"Setting object for valid index should not throw exception");
+    XCTAssertNoThrow([table updateRow:testDictionary atIndex:0], @"Setting object for valid index should not throw exception");
     XCTAssertTrue(previousRowCount == [table rowCount], @"previousRowCount should be equal to current rowCount");
     XCTAssertTrue([table[0][@"objID"] isEqualToNumber:testDictionary[@"objID"]], @"Object at index 0 should have newly set objID");
     XCTAssertTrue([table[0][@"name"] isEqualToString:testDictionary[@"name"]], @"Object at index 0 should have newly set name");
@@ -1603,21 +1603,21 @@ using namespace std;
     previousRowCount = [table rowCount];
     NSArray* testArray = @[@3, @"Ari"];
     
-    XCTAssertNoThrow([table setRow:testArray atIndex:0], @"Setting object for valid index should not throw exception");
+    XCTAssertNoThrow([table updateRow:testArray atIndex:0], @"Setting object for valid index should not throw exception");
     XCTAssertTrue(previousRowCount == [table rowCount], @"previousRowCount should be equal to current rowCount");
     XCTAssertTrue([table[0][@"objID"] isEqualToNumber:testArray[0]], @"Object at index 0 should have newly set objID");
     XCTAssertTrue([table[0][@"name"] isEqualToString:testArray[1]], @"Object at index 0 should have newly set name");
     
     // Test set valid object for invalid index
     previousRowCount = [table rowCount];
-    XCTAssertThrows([table setRow:object atIndex:12], @"Setting object for invalid index should throw exception");
+    XCTAssertThrows([table updateRow:object atIndex:12], @"Setting object for invalid index should throw exception");
     XCTAssertTrue(previousRowCount == [table rowCount], @"previousRowCount should be equal to current rowCount");
     XCTAssertTrue([table[0][@"objID"] isEqualToNumber:testArray[0]], @"Object at index 0 should have newly set objID");
     XCTAssertTrue([table[0][@"name"] isEqualToString:testArray[1]], @"Object at index 0 should have newly set name");
     
     // Test set nil for valid index
     previousRowCount = [table rowCount];
-    XCTAssertNoThrow(([table setRow:nil atIndex:0]), @"Setting object to nil should not throw exception");
+    XCTAssertNoThrow(([table updateRow:nil atIndex:0]), @"Setting object to nil should not throw exception");
     XCTAssertTrue(previousRowCount == [table rowCount], @"rowCount should be equal to previousRowCount");
     XCTAssertTrue([table[0][@"objID"] isEqualToNumber:testArray[0]], @"table[0][@\"objID\"] should be equal to last next object's objID after setting row to nil");
     XCTAssertTrue([table[0][@"name"] isEqualToString:testArray[1]], @"table[0][@\"name\"] should be equal to last next object's objID after setting row to nil");
