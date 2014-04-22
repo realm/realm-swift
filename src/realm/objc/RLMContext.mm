@@ -151,7 +151,11 @@ NSString *const defaultContextFileName = @"default.realm";
     BOOL confirmation = NO;
     @try {
         RLMTransaction * group_2 = [RLMTransaction groupWithNativeGroup:group isOwned:NO readOnly:NO];
-        confirmation = block(group_2);
+        RLMWriteBlockWithRollback blockWithRollback = ^(RLMTransaction *transaction){
+            block(transaction);
+            return YES;
+        };
+        confirmation = blockWithRollback(group_2);
     }
     @catch (NSException* exception) {
         m_shared_group->rollback();
@@ -188,7 +192,7 @@ NSString *const defaultContextFileName = @"default.realm";
 {
     return [self writeUsingBlock:^(RLMTransaction *trx){
         RLMTable *table = [trx tableWithName:tablename];
-        return block(table);
+        block(table);
     } error: error];
 }
 
