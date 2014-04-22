@@ -3,13 +3,13 @@
 //  TightDB
 //
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/RLMTable.h>
 #import <realm/objc/RLMDescriptor.h>
 #import <realm/objc/PrivateRLM.h>
 
-@interface MACTestTableDeleteAll: XCTestCase
+@interface MACTestTableDeleteAll: RLMTestCase
 @end
 @implementation MACTestTableDeleteAll
 

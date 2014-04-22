@@ -18,7 +18,7 @@
  *
  **************************************************************************/
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 #import <Foundation/NSException.h>
 
 #import <realm/objc/RLMFast.h>
@@ -36,7 +36,7 @@ using namespace std;
 // no needed
 @end
 
-@interface TDBDynamicTableTests: XCTestCase
+@interface TDBDynamicTableTests: RLMTestCase
   // Intentionally left blank.
   // No new public instance methods need be defined.
 @end

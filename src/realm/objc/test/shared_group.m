@@ -5,7 +5,7 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/RLMFast.h>
 #import <realm/objc/RLMRealm.h>
@@ -14,7 +14,7 @@ REALM_TABLE_2(SharedTable2,
               Hired, Bool,
               Age,   Int)
 
-@interface MACTestSharedGroup: XCTestCase
+@interface MACTestSharedGroup: RLMTestCase
 
 @end
 
@@ -24,16 +24,7 @@ REALM_TABLE_2(SharedTable2,
 
     // TODO: Update test to include more ASSERTS
     
-    NSFileManager* fm = [NSFileManager defaultManager];
-    
-    // Delete file
-    [fm removeItemAtPath:@"employees.realm" error:nil];
-    [fm removeItemAtPath:@"employees.realm.lock" error:nil];
-    
-    RLMContext *context = [RLMContext contextPersistedAtPath:@"employees.realm"
-                                                       error:nil];
-    
-    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
         // Create new table in realm
         SharedTable2 *table = [realm createTableWithName:@"employees" asTableClass:[SharedTable2 class]];
         NSLog(@"Table: %@", table);
@@ -48,7 +39,7 @@ REALM_TABLE_2(SharedTable2,
     } error:nil];
     
     // Read-only realm
-    RLMContext *fromDisk = [RLMContext contextPersistedAtPath:@"employees.realm" error:nil];
+    RLMContext *fromDisk = [self contextPersistedAtTestPath];
     
     [fromDisk readUsingBlock:^(RLMRealm *realm) {
         SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
@@ -99,16 +90,8 @@ REALM_TABLE_2(SharedTable2,
 
 - (void)testContextAtDefaultPath
 {
-    // Delete existing files
-
-    NSString *defaultPath = [RLMContext defaultPath];
-    
-    NSFileManager* fm = [NSFileManager defaultManager];
-    [fm removeItemAtPath:defaultPath error:nil];
-    [fm removeItemAtPath:[defaultPath stringByAppendingString:@".lock"] error:nil];
-    
     // Create a new context at default location
-    RLMContext *context = [RLMContext contextWithDefaultPersistence];
+    RLMContext *context = [self contextPersistedAtTestPath];
     
     [context writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *t = [realm createTableWithName:@"table"];
@@ -128,9 +111,7 @@ REALM_TABLE_2(SharedTable2,
 
 - (void)testRealmCreateTableWithColumns
 {
-    RLMContext *context = [RLMContext contextWithDefaultPersistence];
-    
-    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
         // Check if method throws exception
         XCTAssertNoThrow(([realm createTableWithName:@"Test" columns:@[@"id", @"int"]]), @"Table should not throw exception");
         
@@ -154,14 +135,7 @@ REALM_TABLE_2(SharedTable2,
 
 - (void)testReadRealm
 {
-    
-    NSFileManager* fm = [NSFileManager defaultManager];
-    
-    // Write to disk
-    [fm removeItemAtPath:@"readonlyTest.realm" error:nil];
-    [fm removeItemAtPath:@"readonlyTest.realm.lock" error:nil];
-    
-    RLMContext * fromDisk = [RLMContext contextPersistedAtPath:@"readonlyTest.realm" error:nil];
+    RLMContext * fromDisk = [self contextPersistedAtTestPath];
     
     [fromDisk writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *t = [realm createTableWithName:@"table"];
@@ -196,13 +170,7 @@ REALM_TABLE_2(SharedTable2,
 
 - (void)testSingleTableTransactions
 {
-    NSFileManager* fm = [NSFileManager defaultManager];
-
-    // Write to disk
-    [fm removeItemAtPath:@"singleTest.realm" error:nil];
-    [fm removeItemAtPath:@"singleTest.realm.lock" error:nil];
-
-    RLMContext * ctx = [RLMContext contextPersistedAtPath:@"singleTest.realm" error:nil];
+    RLMContext * ctx = [self contextPersistedAtTestPath];
 
     [ctx writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *t = [realm createTableWithName:@"table"];
@@ -227,14 +195,7 @@ REALM_TABLE_2(SharedTable2,
 
 - (void)testHasChanged
 {
-    
-    NSFileManager* fm = [NSFileManager defaultManager];
-    
-    // Write to disk
-    [fm removeItemAtPath:@"hasChanged.realm" error:nil];
-    [fm removeItemAtPath:@"hasChanged.realm.lock" error:nil];
-    
-    RLMContext *sg = [RLMContext contextPersistedAtPath:@"hasChanged.realm" error:nil];
+    RLMContext *sg = [self contextPersistedAtTestPath];
     
     XCTAssertFalse([sg hasChangedSinceLastTransaction], @"Context has not changed");
     
@@ -259,8 +220,7 @@ REALM_TABLE_2(SharedTable2,
     
     
     // OTHER context
-    RLMContext *sg2 = [RLMContext contextPersistedAtPath:@"hasChanged.realm" error:nil];
-    
+    RLMContext *sg2 = [self contextPersistedAtTestPath];
     
     [sg2 writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *t = [realm tableWithName:@"t"];
@@ -273,12 +233,7 @@ REALM_TABLE_2(SharedTable2,
 
 - (void)testContextExceptions
 {
-    NSString *contextPath = @"contextTest.realm";
-    NSFileManager* fm = [NSFileManager defaultManager];
-        [fm removeItemAtPath:contextPath error:nil];
-    [fm removeItemAtPath:[contextPath stringByAppendingString:@".lock"] error:nil];
-    
-    RLMContext *c = [RLMContext contextPersistedAtPath:contextPath error:nil];
+    RLMContext *c = [self contextPersistedAtTestPath];
     
     [c writeUsingBlock:^BOOL(RLMRealm *realm) {
         
@@ -303,13 +258,8 @@ REALM_TABLE_2(SharedTable2,
 
 - (void)testPinnedTransactions
 {
-    NSString *contextPath = @"pinnedTransactions.realm";
-    NSFileManager* fm = [NSFileManager defaultManager];
-    [fm removeItemAtPath:contextPath error:nil];
-    [fm removeItemAtPath:[contextPath stringByAppendingString:@".lock"] error:nil];
-   
-    __block RLMContext *context1 = [RLMContext contextPersistedAtPath:contextPath error:nil];
-    __block RLMContext *context2 = [RLMContext contextPersistedAtPath:contextPath error:nil];
+    __block RLMContext *context1 = [self contextPersistedAtTestPath];
+    __block RLMContext *context2 = [self contextPersistedAtTestPath];
     
     {
         // initially, always say that the db has changed

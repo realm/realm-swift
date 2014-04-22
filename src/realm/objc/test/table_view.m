@@ -18,27 +18,15 @@
  *
  **************************************************************************/
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/RLMFast.h>
 
-@interface table_view : XCTestCase
+@interface table_view : RLMTestCase
 
 @end
 
 @implementation table_view
-
-- (void)setUp
-{
-    [super setUp];
-    // Put setup code here; it will be run once, before the first test case.
-}
-
-- (void)tearDown
-{
-    // Put teardown code here; it will be run once, after the last test case.
-    [super tearDown];
-}
 
 -(void)testGetColumnCount
 {

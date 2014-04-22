@@ -4,7 +4,7 @@
 //  This test is aimed at verifying functionallity added by the binding.
 
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 #import <realm/objc/RLMFast.h>
 #import <realm/objc/RLMTable.h>
 
@@ -16,7 +16,7 @@ REALM_TABLE_3(FuncPeopleTable,
 #define TABLE_SIZE 1000 // must be even number
 #define INSERT_ROW 5
 
-@interface MACtestFunctional: XCTestCase
+@interface MACtestFunctional: RLMTestCase
 @end
 @implementation MACtestFunctional
 

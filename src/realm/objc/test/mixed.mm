@@ -8,7 +8,7 @@
 #include <time.h>
 #include <string.h>
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMTable_noinst.h>
@@ -23,7 +23,7 @@ REALM_TABLE_2(SubMixedTable,
                 Age,   Int)
 
 
-@interface MACTestMixed: XCTestCase
+@interface MACTestMixed: RLMTestCase
 @end
 @implementation MACTestMixed
 
@@ -136,7 +136,7 @@ REALM_TABLE_2(SubMixedTable,
     [tableSub addHired:NO Age:43];
     [tableSub addHired:YES Age:54];
 
-    [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
         // Create new table in realm
         MixedTable *table = [realm createTableWithName:@"MixedValues" asTableClass:[MixedTable class]];
         NSLog(@"Table: %@", table);
@@ -150,7 +150,7 @@ REALM_TABLE_2(SubMixedTable,
         return YES;
     } error:nil];
     
-    RLMRealm *realm = [RLMRealm realmWithDefaultPersistence];
+    RLMRealm *realm = [self realmPersistedAtTestPath];
     MixedTable *table = [realm tableWithName:@"MixedValues" asTableClass:[MixedTable class]];
 
     XCTAssertEqual([table rowCount], (NSUInteger)6, @"6 rows expected");
