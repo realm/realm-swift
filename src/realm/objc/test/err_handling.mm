@@ -60,7 +60,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    RLMRealm *realm = [RLMRealm group];
+    RLMRealm *realm = [RLMRealm realm];
     // Create new table in realm
     PeopleErrTable* people = [realm createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
@@ -111,7 +111,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
 
     // Load a realm from disk (and try to update, even though it is readonly)
     error = nil;
-    RLMRealm * fromDisk = [RLMRealm groupWithFile:@"peopleErr.realm" error:&error];
+    RLMRealm * fromDisk = [RLMRealm realmWithFile:@"peopleErr.realm" error:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
     }
@@ -133,7 +133,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     }
 
     error = nil;
-    fromDisk = [RLMRealm groupWithFile:@"peopleErr.realm" error:&error];
+    fromDisk = [RLMRealm realmWithFile:@"peopleErr.realm" error:&error];
     if (error) {
         NSLog(@"%@", [error localizedDescription]);
         XCTFail(@"File should have been possible to open");

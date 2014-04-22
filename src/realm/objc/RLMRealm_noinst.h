@@ -29,6 +29,6 @@
 
 - (void)checkForChange:(NSTimer *)timer;
 
-+ (RLMRealm *)groupWithNativeGroup:(tightdb::Group *)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only;
++ (RLMRealm *)realmWithNativeGroup:(tightdb::Group *)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only;
 
 @end

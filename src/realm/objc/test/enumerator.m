@@ -28,7 +28,7 @@ REALM_TABLE_2(EnumPeopleTable2,
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
-    RLMRealm *realm = [RLMRealm group];
+    RLMRealm *realm = [RLMRealm realm];
     // Create new table in realm
     EnumPeopleTable *people = [realm createTableWithName:@"employees" asTableClass:[EnumPeopleTable class]];
 

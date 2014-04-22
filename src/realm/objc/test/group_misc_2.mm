@@ -45,7 +45,7 @@ REALM_TABLE_2(QueryTable,
 - (void)testRealm_Misc2
 {
     NSUInteger rowIndex;
-    RLMRealm *realm = [RLMRealm group];
+    RLMRealm *realm = [RLMRealm realm];
     NSLog(@"HasTable: %i", [realm hasTableWithName:@"employees"] );
     // Create new table in realm
     MyTable *table = [realm createTableWithName:@"employees" asTableClass:[MyTable class]];
@@ -111,7 +111,7 @@ REALM_TABLE_2(QueryTable,
     [realm writeContextToFile:@"employees.realm" error:nil];
 
     // Load a realm from disk (and print contents)
-    RLMRealm * fromDisk = [RLMRealm groupWithFile:@"employees.realm" error:nil];
+    RLMRealm * fromDisk = [RLMRealm realmWithFile:@"employees.realm" error:nil];
     MyTable* diskTable = [fromDisk tableWithName:@"employees" asTableClass:[MyTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES Spare:0];
@@ -123,10 +123,10 @@ REALM_TABLE_2(QueryTable,
     }
 
     // Write same realm to memory buffer
-    NSData* buffer = [realm writeContextToBuffer];
+    NSData* buffer = [realm writeRealmToBuffer];
 
     // Load a realm from memory (and print contents)
-    RLMRealm * fromMem = [RLMRealm groupWithBuffer:buffer error:nil];
+    RLMRealm * fromMem = [RLMRealm realmWithBuffer:buffer error:nil];
     MyTable* memTable = [fromMem tableWithName:@"employees" asTableClass:[MyTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         // ??? cursor
@@ -137,7 +137,7 @@ REALM_TABLE_2(QueryTable,
 
 - (void)testQuery
 {
-    RLMRealm *realm = [RLMRealm group];
+    RLMRealm *realm = [RLMRealm realm];
     QueryTable *table = [realm createTableWithName:@"Query table" asTableClass:[QueryTable class]];
 
     // Add some rows
@@ -191,7 +191,7 @@ REALM_TABLE_2(QueryTable,
  */
 - (void)testSubtables
 {
-    RLMRealm *realm = [RLMRealm group];
+    RLMRealm *realm = [RLMRealm realm];
     RLMTable *table = [realm createTableWithName:@"table" asTableClass:[RLMTable class]];
 
     // Specify the table type

@@ -21,13 +21,12 @@ REALM_TABLE_2(SharedTable2,
 
 @implementation MACTestSharedGroup
 
-- (void)testSharedGroup
-{
+- (void)testContext {
 
     // TODO: Update test to include more ASSERTS
 
 
-    RLMRealm *realm = [RLMRealm group];
+    RLMRealm *realm = [RLMRealm realm];
     // Create new table in realm
     SharedTable2 *table = [realm createTableWithName:@"employees" asTableClass:[SharedTable2 class]];
     NSLog(@"Table: %@", table);
@@ -48,7 +47,7 @@ REALM_TABLE_2(SharedTable2,
     [realm writeContextToFile:@"employees.realm" error:nil];
 
     // Read-only realm
-    RLMContext * fromDisk = [RLMContext contextPersistedAtPath:@"employees.realm" error:nil];
+    RLMContext *fromDisk = [RLMContext contextPersistedAtPath:@"employees.realm" error:nil];
 
     [fromDisk readUsingBlock:^(RLMRealm *realm) {
             SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
@@ -133,7 +132,7 @@ REALM_TABLE_2(SharedTable2,
 
 - (void)testRealmCreateTableWithColumns
 {
-    RLMRealm *realm = [RLMRealm group];
+    RLMRealm *realm = [RLMRealm realm];
     
     // Check if method throws exception
     XCTAssertNoThrow(([realm createTableWithName:@"Test" columns:@[@"id", @"int"]]), @"Table should not throw exception");

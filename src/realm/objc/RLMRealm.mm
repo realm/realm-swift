@@ -48,20 +48,20 @@ void throw_objc_exception(exception &ex) {
 
 @interface TDBPrivateWeakTableReference: NSObject
 
-- (instancetype)initWithTable:(RLMTable *)table indexInGroup:(size_t)index;
+- (instancetype)initWithTable:(RLMTable *)table indexInRealm:(size_t)index;
 - (RLMTable *)table;
-- (size_t)indexInGroup;
+- (size_t)indexInRealm;
 
 @end
 
 @implementation TDBPrivateWeakTableReference {
     __weak RLMTable *_table;
-    size_t _indexInGroup;
+    size_t _indexInRealm;
 }
 
-- (instancetype)initWithTable:(RLMTable *)table indexInGroup:(size_t)index {
+- (instancetype)initWithTable:(RLMTable *)table indexInRealm:(size_t)index {
     _table = table;
-    _indexInGroup = index;
+    _indexInRealm = index;
     return self;
 }
 
@@ -69,8 +69,8 @@ void throw_objc_exception(exception &ex) {
     return _table;
 }
 
-- (size_t)indexInGroup {
-    return _indexInGroup;
+- (size_t)indexInRealm {
+    return _indexInRealm;
 }
 
 @end
@@ -235,14 +235,14 @@ void throw_objc_exception(exception &ex) {
             _sharedGroup->end_read();
             _group = &_sharedGroup->begin_read(); // Throws
 
-            // Revive all group level table accessors
+            // Revive all realm level table accessors
             for (TDBPrivateWeakTableReference *weakTableRef in _weakTableRefs) {
                 RLMTable *table = [weakTableRef table];
-                size_t indexInGroup = [weakTableRef indexInGroup];
-                ConstTableRef table_2 = _group->get_table(indexInGroup); // Throws
+                size_t indexInRealm = [weakTableRef indexInRealm];
+                ConstTableRef tableRef = _group->get_table(indexInRealm); // Throws
                 // Note: Const spoofing is alright, because the
                 // Objective-C table accessor is in 'read-only' mode.
-                [table setNativeTable:const_cast<Table*>(table_2.get())];
+                [table setNativeTable:const_cast<Table*>(tableRef.get())];
             }
 
             [_notificationCenter postNotificationName:RLMContextDidChangeNotification object:self];
@@ -274,37 +274,40 @@ void throw_objc_exception(exception &ex) {
             return nil;
         
         // Otherwise
-        RLMTable * table = [[RLMTable alloc] _initRaw];
+        RLMTable *table = [[RLMTable alloc] _initRaw];
         if (TIGHTDB_UNLIKELY(!table))
             return nil;
         REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
-                                               tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name));
-                                               [table setNativeTable:table_2.get()];
+                                               tightdb::TableRef tableRef = m_group->get_table(ObjcStringAccessor(name));
+                                               [table setNativeTable:tableRef.get()];
                                                )
         [table setParent:self];
         [table setReadOnly:m_read_only];
         return table;
     } else {
-        ObjcStringAccessor name_2(name);
-        if (!_group->has_table(name_2))
+        ObjcStringAccessor nameRef(name);
+        if (!_group->has_table(nameRef)) {
             return nil;
+        }
         RLMTable *table = [[RLMTable alloc] _initRaw];
-        size_t indexInGroup;
+        size_t indexInRealm;
         try {
-            ConstTableRef table_2 = _group->get_table(name_2); // Throws
+            ConstTableRef tableRef = _group->get_table(nameRef); // Throws
             // Note: Const spoofing is alright, because the
             // Objective-C table accessor is in 'read-only' mode.
-            [table setNativeTable:const_cast<Table*>(table_2.get())];
-            indexInGroup = table_2->get_index_in_parent();
+            [table setNativeTable:const_cast<Table*>(tableRef.get())];
+            indexInRealm = tableRef->get_index_in_parent();
         }
         catch (exception &ex) {
             throw_objc_exception(ex);
         }
         [table setParent:self];
         [table setReadOnly:YES];
-        TDBPrivateWeakTableReference *weakTableRef =
-        [[TDBPrivateWeakTableReference alloc] initWithTable:table indexInGroup:indexInGroup];
-        [_weakTableRefs addObject:weakTableRef];
+        if (!_hasParentContext) {
+            TDBPrivateWeakTableReference *weakTableRef = [[TDBPrivateWeakTableReference alloc] initWithTable:table
+                                                                                                indexInRealm:indexInRealm];
+            [_weakTableRefs addObject:weakTableRef];
+        }
         return table;
     }
 }
@@ -354,8 +357,8 @@ void throw_objc_exception(exception &ex) {
         return nil;
     bool was_created;
     REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
-                                           tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name), was_created);
-                                           [table setNativeTable:table_2.get()];
+                                           tightdb::TableRef tableRef = m_group->get_table(ObjcStringAccessor(name), was_created);
+                                           [table setNativeTable:tableRef.get()];
                                            )
     [table setParent:self];
     [table setReadOnly:m_read_only];
@@ -405,8 +408,8 @@ void throw_objc_exception(exception &ex) {
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
     REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
-                                           tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name));
-                                           [table setNativeTable:table_2.get()];
+                                           tightdb::TableRef tableRef = m_group->get_table(ObjcStringAccessor(name));
+                                           [table setNativeTable:tableRef.get()];
                                            )
     [table setParent:self];
     [table setReadOnly:m_read_only];
@@ -456,8 +459,8 @@ void throw_objc_exception(exception &ex) {
         return nil;
     bool was_created;
     REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
-                                           tightdb::TableRef table_2 = m_group->get_table(ObjcStringAccessor(name), was_created);
-                                           [table setNativeTable:table_2.get()];)
+                                           tightdb::TableRef tableRef = m_group->get_table(ObjcStringAccessor(name), was_created);
+                                           [table setNativeTable:tableRef.get()];)
     [table setParent:self];
     [table setReadOnly:m_read_only];
     if (was_created) {
@@ -472,42 +475,42 @@ void throw_objc_exception(exception &ex) {
 }
 
 /* Moved to group_priv header for now */
-+(RLMRealm *)group
++(RLMRealm *)realm
 {
-    RLMRealm * group = [[RLMRealm alloc] init];
+    RLMRealm *realm = [[RLMRealm alloc] init];
     try {
-        group->m_group = new tightdb::Group;
+        realm->m_group = new tightdb::Group;
     }
     catch (std::exception& ex) {
         @throw [NSException exceptionWithName:@"realm:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
                                      userInfo:nil];
     }
-    group->m_is_owned  = YES;
-    group->m_read_only = NO;
-    return group;
+    realm->m_is_owned  = YES;
+    realm->m_read_only = NO;
+    return realm;
 }
 
 
 // Private.
 // Careful with this one - Remember that group will be deleted on dealloc.
-+(RLMRealm *)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only
++(RLMRealm *)realmWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only
 {
-    RLMRealm * group_2 = [[RLMRealm alloc] init];
-    group_2->m_group = group;
-    group_2->m_is_owned  = is_owned;
-    group_2->m_read_only = read_only;
-    return group_2;
+    RLMRealm *realm = [[RLMRealm alloc] init];
+    realm->m_group = group;
+    realm->m_is_owned  = is_owned;
+    realm->m_read_only = read_only;
+    return realm;
 }
 
 /* Moved to group_priv header for now */
-+(RLMRealm *)groupWithFile:(NSString *)filename error:(NSError **)error
++(RLMRealm *)realmWithFile:(NSString *)filename error:(NSError **)error
 {
-    RLMRealm * group = [[RLMRealm alloc] init];
-    if (!group)
+    RLMRealm *realm = [[RLMRealm alloc] init];
+    if (!realm)
         return nil;
     try {
-        group->m_group = new tightdb::Group(tightdb::StringData(ObjcStringAccessor(filename)));
+        realm->m_group = new tightdb::Group(tightdb::StringData(ObjcStringAccessor(filename)));
     }
     // TODO: capture this in a macro or function, shared group constructor uses the same pattern.
     catch (tightdb::util::File::PermissionDenied& ex) {
@@ -531,22 +534,22 @@ void throw_objc_exception(exception &ex) {
             *error = make_realm_error(RLMErrorFail, [NSString stringWithUTF8String:ex.what()]);
         return nil;
     }
-    group->m_is_owned  = YES;
-    group->m_read_only = NO;
-    return group;
+    realm->m_is_owned  = YES;
+    realm->m_read_only = NO;
+    return realm;
 }
 
 /* Moved to group_priv header for now */
-+(RLMRealm *)groupWithBuffer:(NSData*)buffer error:(NSError**)error
++(RLMRealm *)realmWithBuffer:(NSData*)buffer error:(NSError**)error
 {
-    RLMRealm * group = [[RLMRealm alloc] init];
-    if (!group)
+    RLMRealm *realm = [[RLMRealm alloc] init];
+    if (!realm)
         return nil;
     try {
         const void *data = [(NSData *)buffer bytes];
-        tightdb::BinaryData buffer_2(static_cast<const char *>(data), [(NSData *)buffer length]);
+        tightdb::BinaryData bufferRef(static_cast<const char *>(data), [(NSData *)buffer length]);
         bool take_ownership = false; // FIXME: should this be true?
-        group->m_group = new tightdb::Group(buffer_2, take_ownership);
+        realm->m_group = new tightdb::Group(bufferRef, take_ownership);
     }
     catch (tightdb::InvalidDatabase& ex) {
         if (error) // allow nil as the error argument
@@ -558,9 +561,9 @@ void throw_objc_exception(exception &ex) {
                                        reason:[NSString stringWithUTF8String:ex.what()]
                                      userInfo:nil];
     }
-    group->m_is_owned  = YES;
-    group->m_read_only = NO;
-    return group;
+    realm->m_is_owned  = YES;
+    realm->m_read_only = NO;
+    return realm;
 }
 
 -(NSString*)nameOfTableWithIndex:(NSUInteger)table_ndx
@@ -600,7 +603,7 @@ void throw_objc_exception(exception &ex) {
 }
 
 /* Moved to group_priv header for now */
--(NSData*)writeContextToBuffer
+-(NSData*)writeRealmToBuffer
 {
     try {
         tightdb::BinaryData bd = m_group->write_to_mem();

@@ -35,12 +35,12 @@
 /*
  * Init a free-standing realm in memory
  */
-+ (RLMRealm *)group;
++ (RLMRealm *)realm;
 
-+ (RLMRealm *)groupWithFile:(NSString *)filename error:(NSError *__autoreleasing *)error;
++ (RLMRealm *)realmWithFile:(NSString *)filename error:(NSError *__autoreleasing *)error;
 
-+ (RLMRealm *)groupWithBuffer:(NSData *)buffer error:(NSError *__autoreleasing *)error;
++ (RLMRealm *)realmWithBuffer:(NSData *)buffer error:(NSError *__autoreleasing *)error;
 
-- (NSData *)writeContextToBuffer;
+- (NSData *)writeRealmToBuffer;
 
 @end

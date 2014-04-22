@@ -503,13 +503,13 @@ using namespace std;
     tightdb::TableRef table = m_table->get_subtable(colIndex, rowIndex);
     if (!table)
         return nil;
-    RLMTable * table_2 = [[RLMTable alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table_2))
+    RLMTable * tableObj = [[RLMTable alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!tableObj))
         return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    return table_2;
+    [tableObj setNativeTable:table.get()];
+    [tableObj setParent:self];
+    [tableObj setReadOnly:m_read_only];
+    return tableObj;
 }
 
 // FIXME: Check that the specified class derives from RLMTable.
@@ -520,15 +520,15 @@ using namespace std;
         return nil;
     tightdb::TableRef table = m_table->get_subtable(colIndex, rowIndex);
     TIGHTDB_ASSERT(table);
-    RLMTable * table_2 = [[tableClass alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table))
+    RLMTable * tableObj = [[tableClass alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!tableObj))
         return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    if (![table_2 _checkType])
+    [tableObj setNativeTable:table.get()];
+    [tableObj setParent:self];
+    [tableObj setReadOnly:m_read_only];
+    if (![tableObj _checkType])
         return nil;
-    return table_2;
+    return tableObj;
 }
 
 -(id)RLM_mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
@@ -539,16 +539,16 @@ using namespace std;
 
     tightdb::TableRef table = m_table->get_subtable(colNdx, rowIndex);
     TIGHTDB_ASSERT(table);
-    RLMTable * table_2 = [[RLMTable alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table_2))
+    RLMTable * tableObj = [[RLMTable alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!tableObj))
         return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    if (![table_2 _checkType])
+    [tableObj setNativeTable:table.get()];
+    [tableObj setParent:self];
+    [tableObj setReadOnly:m_read_only];
+    if (![tableObj _checkType])
         return nil;
 
-    return table_2;
+    return tableObj;
 }
 
 
