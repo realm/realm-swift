@@ -142,7 +142,6 @@ void throw_objc_exception(exception &ex)
 
     RLMError errorCode = RLMErrorOk;
     NSString *errorMessage;
-    // FIXME: Should not be created here, but passed in by ref or be a global singleton
     context->_registry = globalRegistry.get(StringData(ObjcStringAccessor(path)));
     WriteLogCollector* collector = new WriteLogCollector(StringData(ObjcStringAccessor(path)), context->_registry);
     try {

@@ -20,12 +20,14 @@
 
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/group_shared.hpp>
+#include "RLMCommitLog.hpp"
 
 #import "RLMContext.h"
 #import "RLMTransaction_noinst.h"
 #import "util_noinst.hpp"
 
 using namespace std;
+using namespace tightdb;
 
 
 @implementation RLMContext
@@ -62,7 +64,11 @@ NSString *const defaultContextFileName = @"default.realm";
     if (!shared_group)
         return nil;
     try {
-        shared_group->m_shared_group.reset(new tightdb::SharedGroup(tightdb::StringData(ObjcStringAccessor(path))));
+        WriteLogCollector* collector = new WriteLogCollector(
+            StringData(ObjcStringAccessor(path)), 
+            globalRegistry.get(StringData(ObjcStringAccessor(path)))
+        );
+        shared_group->m_shared_group.reset(new tightdb::SharedGroup(*collector));
     }
     // TODO: capture this in a macro or function, group constructor uses the same pattern.
     catch (tightdb::util::File::PermissionDenied& ex) {
