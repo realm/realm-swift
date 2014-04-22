@@ -495,6 +495,131 @@ CATEGORIES :
       - CODE   : ex_objc_dyn_table_remove_last_row
         DESCR  : *objc_no_if_error
 
+#- Values:
+#  METHODS:
+ # - g_dyn_table_get_subtable_const:
+ #     TODO     : ""
+ # - g_dyn_table_get_bool:
+ #     #NAME     : getBool
+ #     TODO     :""
+ # - g_dyn_table_get_int:
+ #     #NAME     : get
+ #     TODO     : ""
+#TODO: rename to getInt
+ # - g_dyn_table_get_float:
+ #     #NAME     : getFloat
+ #     TODO     :""
+ # - g_dyn_table_get_double:
+ #     #NAME     : getDouble
+ #     TODO     :""
+ # - g_dyn_table_get_date:
+ #     #NAME     : getDate
+ #     TODO     :""
+ # - g_dyn_table_get_string:
+ #     #NAME     : getString
+ #     TODO     :""
+ # - g_dyn_table_get_binary:
+ #     #NAME     : getBinary
+ #     TODO     :""
+ # - g_dyn_table_get_mixed:
+ #     #NAME     : getMixed
+ #     TODO     :""
+#- g_dyn_table_get_mixed_type:
+      #NAME     : getMixedType
+ #     TODO     :""
+ # - g_dyn_table_get_subtable:
+ #     #NAME     : getSubtable
+ #     TODO     :""
+      #TITLE    : get*
+      #SUMMARY  : *g_dyn_table_get_xxx_summary
+      #DESCR    : *g_dyn_table_get_xxx_descr
+      #SIGNATURE: |
+                 #(BOOL)getBool:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(int64_t)get:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(float)getFloat:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(double)getDouble:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(time_t)getDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(NSString *)getString:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(TightdbBinary *)getBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(TightdbMixed *)getMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx
+                 #(TightdbType)getMixedType:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx
+
+                 #(RLMTable *)getSubtable:(NSUInteger)col_ndx ndx:(NSUInteger)ndx
+                 #(id)getSubtable:(NSUInteger)col_ndx ndx:(NSUInteger)ndx withClass:(__unsafe_unretained Class)classObj
+#TODO: What's the last method about?
+
+      #PARAMS:
+      #- NAME   : col_ndx
+      #  TYPES  : NSUInteger
+      #  DESCR  : *g_dyn_table_get_xxx_parm1_descr
+      #- NAME   : row_ndx
+      #  TYPES  : NSUInteger
+      #  DESCR  : *g_dyn_table_get_xxx_parm2_descr
+      #RETURN:
+      #  TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, TightdbBinary*,
+      #            TightdbMixed*, TightdbType, TightdbTable*]
+      #  DESCR  : *g_dyn_table_get_xxx_return_descr
+      #EXAMPLES:
+      #- CODE   : ex_objc_dyn_table_get_xxx
+      #  DESCR  :
+
+ # - g_dyn_table_set_bool:
+ #     NAME     : setBool
+ # - g_dyn_table_set_int:
+ #     NAME     : set
+#TODO: Rename to setInt
+ # - g_dyn_table_set_float:
+ #     NAME     : setFloat
+ # - g_dyn_table_set_double:
+ #     NAME     : setDouble
+ # - g_dyn_table_set_enum:
+ #     IGNORE   : ""
+ # - g_dyn_table_set_date:
+ #     NAME     : setDate
+ # - g_dyn_table_set_string:
+ #     NAME     : setString
+ # - g_dyn_table_set_binary:
+ #     NAME     : setBinary
+ # - g_dyn_table_set_binary_2:
+ #     NAME     : setBinary
+ # - g_dyn_table_set_mixed:
+ #     NAME     : setMixed
+ #     IGNORE   :
+ #     TITLE    : set*
+ #     SUMMARY  : *g_dyn_table_set_xxx_summary
+ #     DESCR    : *g_dyn_table_set_xxx_descr
+ #     SIGNATURE: |
+ #                (void)setBool:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(BOOL)value
+ #                (void)set:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(int64_t)value
+ #                (void)setFloat:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(float)value
+ #                (void)setDouble:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(double)value
+ #                (void)setDate:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(time_t)value
+ #                (void)setString:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(NSString *)value
+ #                (void)setBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx value:(TightdbBinary *)value
+ #               (void)setBinary:(NSUInteger)col_ndx ndx:(NSUInteger)ndx data:(const char *)data size:(NSUInteger)size
+ #                (void)setMixed:(NSUInteger)col_ndx ndx:(NSUInteger)row_ndx value:(TightdbMixed *)value
+ #     PARAMS:
+ #     - NAME   : col_ndx
+ #       TYPES  : NSUInteger
+ #       DESCR  : *g_dyn_table_get_xxx_parm1_descr
+ #     - NAME   : row_ndx
+ #       TYPES  : NSUInteger
+ #       DESCR  : *g_dyn_table_get_xxx_parm2_descr
+ #     - NAME   : value
+ #       TYPES  : [BOOL, int64_t, float, double, time_t, NSString*, TightdbBinary*,
+ #                 const char*, NSUInteger, TightdbMixed*]
+ #       DESCR  : *g_dyn_table_set_xxx_parm3_descr
+ #     - NAME   : data
+ #       TYPES  : const char *
+ #       DESCR  : *g_dyn_table_insert_xxx_parm4_descr
+ #     - NAME   : size
+ #       TYPES  : NSUInteger
+ #       DESCR  : *g_dyn_table_insert_xxx_parm5_descr
+ #     EXAMPLES:
+ #     - CODE   : ex_objc_dyn_table_set_xxx
+ #       DESCR  :
+
+
 - Indexes:
   METHODS:
   - g_dyn_table_set_index:
@@ -561,6 +686,83 @@ CATEGORIES :
       NAME     : findString
   - g_dyn_table_find_first_binary:
       NAME     : findBinary
+
+# TODO: change name to findFirst* ?
+
+# jjepsen: might be redundant (use a query?)
+#      TITLE    : find*
+#      SUMMARY  : Find first matching row.
+#      DESCR    : The method finds the first occurence of a given value in a column.
+#      SIGNATURE: |
+#                 (NSUInteger)findBool:(NSUInteger)col_ndx value:(BOOL)value
+#                 (NSUInteger)findInt:(NSUInteger)col_ndx value:(int64_t)value
+#                 (NSUInteger)findFloat:(NSUInteger)col_ndx value:(float)value
+#                 (NSUInteger)findDouble:(NSUInteger)col_ndx value:(double)value
+#                 (NSUInteger)findDate:(NSUInteger)col_ndx value:(time_t)value
+#                 (NSUInteger)findString:(NSUInteger)col_ndx value:(NSString *)value
+#                 (NSUInteger)findBinary:(NSUInteger)col_ndx value:(TightdbBinary *)value
+#      PARAMS:
+#      - NAME   : col_ndx
+#        TYPES  : NSUInteger
+#        DESCR  : *g_dyn_table_find_first_xxx_parm1_descr
+#      - NAME   : value
+#        TYPES  : [BOOL, int64_t, float, double, time_t, NSString, const char*]
+#        DESCR  : *g_dyn_table_find_first_xxx_parm2_descr
+#      RETURN:
+#        TYPES  : NSUInteger
+#TODO: is that the same in objc?
+#        DESCR  : "The row index or <code>NSNotFound</code> if there is no match."
+#      EXAMPLES:
+#      - CODE   : ex_objc_dyn_table_find_first_xxx
+#       DESCR  :
+
+#  - g_dyn_table_find_all_bool_const:
+#      IGNORE   : ""
+#  - g_dyn_table_find_all_int_const:
+#      IGNORE   : ""
+#  - g_dyn_table_find_all_date_const:
+#      IGNORE   : ""
+#  - g_dyn_table_find_all_string_const:
+#      IGNORE   : ""
+#  - g_dyn_table_find_all_float_const:
+#      IGNORE   : ""
+#  - g_dyn_table_find_all_double_const:
+#      IGNORE   : ""
+
+ # jjepsen: might be redundant, removing from docs, but still included in binding.
+ # - g_dyn_table_find_all_bool:
+ #     TODO     : soon
+ # - g_dyn_table_find_all_date:
+ #     TODO     : soon
+ # - g_dyn_table_find_all_string:
+ #     TODO     : soon
+ # - g_dyn_table_find_all_float:
+ #     TODO     : soon
+ # - g_dyn_table_find_all_double:
+ #     TODO     : soon
+ # - g_dyn_table_find_all_int:
+ #     TODO     : soon # See FIXME in the code.
+ #     NAMES    : findAll
+ #     TITLE    : findAll*
+ #     SUMMARY  : *g_dyn_table_find_all_xxx_summary
+ #     DESCR    : >
+ #                The method finds all occurences of a given value in a specific column.
+ #                The rows are returned as a {@link class_dyn_tableview} object.
+ #     SIGNATURE: |
+ #                (TightdbView *)findAll:(TightdbView *)view column:(NSUInteger)col_ndx value:(int64_t)value
+ #     PARAMS:
+ #     - NAME   : col_ndx
+ #       TYPES  : NSUInteger
+ #       DESCR  : *g_dyn_table_find_all_xxx_parm1_descr
+ #     - NAME   : value
+ #       TYPES  : [BOOL, int64_t, float, double, time_t, NSString]
+ #       DESCR  : *g_dyn_table_find_all_xxx_parm2_descr
+ #     RETURN:
+ #       TYPES  : TightdbView *
+ #       DESCR  : *g_dyn_table_find_all_xxx_return_descr
+ #     EXAMPLES:
+ #     - CODE   : ex_objc_dyn_table_find_all_xxx
+ #       DESCR  :
 
   - g_dyn_table_find_sorted_int:
       TODO     : later
