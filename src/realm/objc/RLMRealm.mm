@@ -38,7 +38,8 @@ using namespace tightdb::util;
 
 namespace {
 
-void throw_objc_exception(exception &ex) {
+void throw_objc_exception(exception &ex)
+{
     NSString *errorMessage = [NSString stringWithUTF8String:ex.what()];
     @throw [NSException exceptionWithName:@"TDBException" reason:errorMessage userInfo:nil];
 }
@@ -54,22 +55,26 @@ void throw_objc_exception(exception &ex) {
 
 @end
 
-@implementation RLMPrivateWeakTableReference {
+@implementation RLMPrivateWeakTableReference
+{
     __weak RLMTable *_table;
     size_t _indexInRealm;
 }
 
-- (instancetype)initWithTable:(RLMTable *)table indexInRealm:(size_t)index {
+- (instancetype)initWithTable:(RLMTable *)table indexInRealm:(size_t)index
+{
     _table = table;
     _indexInRealm = index;
     return self;
 }
 
-- (RLMTable *)table {
+- (RLMTable *)table
+{
     return _table;
 }
 
-- (size_t)indexInRealm {
+- (size_t)indexInRealm
+{
     return _indexInRealm;
 }
 
@@ -85,11 +90,13 @@ void throw_objc_exception(exception &ex) {
 
 @end
 
-@implementation RLMPrivateWeakTimerTarget {
+@implementation RLMPrivateWeakTimerTarget
+{
     __weak RLMRealm *_realm;
 }
 
-- (instancetype)initWithRealm:(RLMRealm *)realm {
+- (instancetype)initWithRealm:(RLMRealm *)realm
+{
     self = [super init];
     if (self) {
         _realm = realm;
@@ -97,13 +104,15 @@ void throw_objc_exception(exception &ex) {
     return self;
 }
 
-- (void)timerDidFire:(NSTimer *)timer {
+- (void)timerDidFire:(NSTimer *)timer
+{
     [_realm checkForChange:timer];
 }
 
 @end
 
-@implementation RLMRealm {
+@implementation RLMRealm
+{
     NSNotificationCenter *_notificationCenter;
     UniquePtr<SharedGroup> _sharedGroup;
     NSTimer *_timer;
@@ -116,7 +125,8 @@ void throw_objc_exception(exception &ex) {
     BOOL m_read_only;
 }
 
-- (instancetype)init {
+- (instancetype)init
+{
     self = [super init];
     if (self) {
         _hasParentContext = YES;
@@ -125,7 +135,8 @@ void throw_objc_exception(exception &ex) {
     return self;
 }
 
-- (instancetype)initFromParentContext:(BOOL)hasParentContext {
+- (instancetype)initFromParentContext:(BOOL)hasParentContext
+{
     self = [super init];
     if (self) {
         _hasParentContext = hasParentContext;
@@ -134,11 +145,13 @@ void throw_objc_exception(exception &ex) {
     return self;
 }
 
-+ (RLMRealm *)realmWithDefaultPersistence {
++ (RLMRealm *)realmWithDefaultPersistence
+{
     return [RLMRealm realmWithPersistenceToFile:[RLMContext defaultPath]];
 }
 
-+ (RLMRealm *)realmWithPersistenceToFile:(NSString *)path {
++ (RLMRealm *)realmWithPersistenceToFile:(NSString *)path
+{
     NSRunLoop *runLoop = [NSRunLoop mainRunLoop];
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     return [self realmWithPersistenceToFile:path
@@ -150,7 +163,8 @@ void throw_objc_exception(exception &ex) {
 + (RLMRealm *)realmWithPersistenceToFile:(NSString *)path
                                          runLoop:(NSRunLoop *)runLoop
                               notificationCenter:(NSNotificationCenter *)notificationCenter
-                                           error:(NSError **)error {
+                                           error:(NSError **)error
+{
     RLMRealm *realm = [[RLMRealm alloc] initFromParentContext:NO];
     if (!realm) {
         return nil;
@@ -206,14 +220,16 @@ void throw_objc_exception(exception &ex) {
     return realm;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     [_timer invalidate];
     if (m_is_owned) {
         delete _group;
     }
 }
 
-- (void)checkForChange:(NSTimer *)theTimer {
+- (void)checkForChange:(NSTimer *)theTimer
+{
     static_cast<void>(theTimer);
 
     // Remove dead table references from list
@@ -251,7 +267,8 @@ void throw_objc_exception(exception &ex) {
     }
 }
 
-- (RLMTable *)tableWithName:(NSString *)name {
+- (RLMTable *)tableWithName:(NSString *)name
+{
     if ([name length] == 0) {
         // FIXME: Exception name must be `TDBException` according to
         // the exception naming conventions of the official Cocoa
@@ -288,7 +305,8 @@ void throw_objc_exception(exception &ex) {
     return table;
 }
 
-- (void)tableRefDidDie {
+- (void)tableRefDidDie
+{
     _tableRefsHaveDied = YES;
 }
 
@@ -308,7 +326,8 @@ void throw_objc_exception(exception &ex) {
     return _group->has_table(ObjcStringAccessor(name));
 }
 
-- (id)tableWithName:(NSString *)name asTableClass:(__unsafe_unretained Class)class_obj {
+- (id)tableWithName:(NSString *)name asTableClass:(__unsafe_unretained Class)class_obj
+{
     ObjcStringAccessor nameRef(name);
     if (!_group->has_table(nameRef)) {
         return nil;
