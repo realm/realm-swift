@@ -26,12 +26,12 @@ REALM_TABLE_2(TestTableRealm,
     NSFileManager *fm = [NSFileManager defaultManager];
 
     // Create empty realm and serialize to disk
-    RLMRealm *toDisk = [RLMRealm group];
+    RLMRealm *toDisk = [RLMRealm realm];
     [fm removeItemAtPath:@"table_test.realm" error:NULL];
     [toDisk writeContextToFile:@"table_test.realm" error:nil];
 
     // Load the realm
-    RLMRealm *fromDisk = [RLMRealm groupWithFile:@"table_test.realm" error:nil];
+    RLMRealm *fromDisk = [RLMRealm realmWithFile:@"table_test.realm" error:nil];
     if (!fromDisk)
         XCTFail(@"From disk not valid");
 
@@ -57,12 +57,12 @@ REALM_TABLE_2(TestTableRealm,
 }
 
 - (void)testGetTable {
-    RLMRealm *realm = [RLMRealm group];
+    RLMRealm *realm = [RLMRealm realm];
     XCTAssertNil([realm tableWithName:@"noTable"], @"Table does not exist");
 }
 
 - (void)testRealmTableCount {
-    RLMRealm *realm = [RLMRealm group];
+    RLMRealm *realm = [RLMRealm realm];
     XCTAssertEqual(realm.tableCount, (NSUInteger)0, @"No tables added");
     [realm createTableWithName:@"tableName"];
     XCTAssertEqual(realm.tableCount, (NSUInteger)1, @"1 table added");

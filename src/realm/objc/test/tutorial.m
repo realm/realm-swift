@@ -39,7 +39,7 @@ REALM_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    RLMRealm *realm = [RLMRealm group];
+    RLMRealm *realm = [RLMRealm realm];
     // Create new table in realm
     PeopleTable *people = [realm createTableWithName:@"employees" asTableClass:[PeopleTable class]];
 
@@ -148,7 +148,7 @@ REALM_TABLE_IMPL_2(PeopleTable2,
     [realm writeContextToFile:@"employees.realm" error:nil];
 
     // Load a realm from disk (and print contents)
-    RLMRealm *fromDisk = [RLMRealm groupWithFile:@"employees.realm" error:nil];
+    RLMRealm *fromDisk = [RLMRealm realmWithFile:@"employees.realm" error:nil];
     PeopleTable *diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PeopleTable class]];
 
     [diskTable addName:@"Anni" Age:54 Hired:YES];
@@ -161,10 +161,10 @@ REALM_TABLE_IMPL_2(PeopleTable2,
     }
 
     // Write same realm to memory buffer
-    NSData* buffer = [realm writeContextToBuffer];
+    NSData* buffer = [realm writeRealmToBuffer];
 
     // Load a realm from memory (and print contents)
-    RLMRealm *fromMem = [RLMRealm groupWithBuffer:buffer error:nil];
+    RLMRealm *fromMem = [RLMRealm realmWithBuffer:buffer error:nil];
     PeopleTable *memTable = [fromMem tableWithName:@"employees" asTableClass:[PeopleTable class]];
     for (size_t i = 0; i < [memTable rowCount]; i++) {
         PeopleTableRow *row = [memTable rowAtIndex:i];

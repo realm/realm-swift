@@ -108,8 +108,8 @@ NSString *const defaultContextFileName = @"default.realm";
         // should throw anything but NSException or derivatives. Note: if the client calls other libraries
         // throwing other kinds of exceptions they will leak back to the client code, if he does not
         // catch them within the block.
-        RLMRealm * group_2 = [RLMRealm groupWithNativeGroup:const_cast<tightdb::Group *>(group) isOwned:NO readOnly:YES];
-        block(group_2);
+        RLMRealm *realm = [RLMRealm realmWithNativeGroup:const_cast<tightdb::Group *>(group) isOwned:NO readOnly:YES];
+        block(realm);
 
     }
     @finally {
@@ -143,7 +143,7 @@ NSString *const defaultContextFileName = @"default.realm";
 
     BOOL confirmation = NO;
     @try {
-        RLMRealm *realm = [RLMRealm groupWithNativeGroup:group isOwned:NO readOnly:NO];
+        RLMRealm *realm = [RLMRealm realmWithNativeGroup:group isOwned:NO readOnly:NO];
         confirmation = block(realm);
     }
     @catch (NSException* exception) {

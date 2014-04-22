@@ -26,7 +26,7 @@ REALM_TABLE_3(TestSubtableMain,
 @implementation MACTestSubtable
 
 - (void)testSubtable {
-    RLMRealm *realm = [RLMRealm group];
+    RLMRealm *realm = [RLMRealm realm];
 
     // Create new table in realm
     TestSubtableMain *people = [realm createTableWithName:@"employees" asTableClass:[TestSubtableMain class]];
