@@ -30,7 +30,7 @@ void ex_objc_context_intro()
 
     // Create datafile with a new table
     RLMContext *context = [RLMContext contextWithDefaultPersistence];
-
+    
     // Perform a write transaction (with commit to file)
     NSError *error = nil;
     BOOL success;
@@ -53,9 +53,8 @@ void ex_objc_context_intro()
             NSLog(@"Roll back!");
             return NO;
         }
-        [table addName:@"Bill" Age:53 Hired:YES];
-        NSLog(@"Commit!");
-        return YES;
+        [table addName:@"Mary" Age:76 Hired:NO];
+        return YES; // Commit
     } error:&error];
     if (!success)
         NSLog(@"Transaction Rolled back : %@", [error description]);

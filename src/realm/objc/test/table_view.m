@@ -52,29 +52,29 @@
 {
     RLMTable *t = [[RLMTable alloc] init];
     
-    NSUInteger boolCol      = [t addColumnWithName:@"boolCol" type:RLMTypeBool];
-    NSUInteger binaryCol    = [t addColumnWithName:@"binaryCol" type:RLMTypeBinary];
-    NSUInteger dateCol      = [t addColumnWithName:@"dateCol" type:RLMTypeDate];
-    NSUInteger doubleCol    = [t addColumnWithName:@"doubleCol" type:RLMTypeDouble];
-    NSUInteger floatCol     = [t addColumnWithName:@"floatCol" type:RLMTypeFloat];
-    NSUInteger intCol       = [t addColumnWithName:@"intCol" type:RLMTypeInt];
-    NSUInteger mixedCol     = [t addColumnWithName:@"MixedCol" type:RLMTypeMixed];
-    NSUInteger stringCol    = [t addColumnWithName:@"stringCol" type:RLMTypeString];
-    NSUInteger tableCol     = [t addColumnWithName:@"tableCol" type:RLMTypeTable];
+    NSUInteger boolCol   = [t addColumnWithName:@"boolCol"   type:RLMTypeBool];
+    NSUInteger binaryCol = [t addColumnWithName:@"binaryCol" type:RLMTypeBinary];
+    NSUInteger dateCol   = [t addColumnWithName:@"dateCol"   type:RLMTypeDate];
+    NSUInteger doubleCol = [t addColumnWithName:@"doubleCol" type:RLMTypeDouble];
+    NSUInteger floatCol  = [t addColumnWithName:@"floatCol"  type:RLMTypeFloat];
+    NSUInteger intCol    = [t addColumnWithName:@"intCol"    type:RLMTypeInt];
+    NSUInteger mixedCol  = [t addColumnWithName:@"MixedCol"  type:RLMTypeMixed];
+    NSUInteger stringCol = [t addColumnWithName:@"stringCol" type:RLMTypeString];
+    NSUInteger tableCol  = [t addColumnWithName:@"tableCol"  type:RLMTypeTable];
     
     
     RLMQuery *q = [t where];
     RLMView *v = [q findAllRows];
     
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:boolCol]      == RLMTypeBool, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:binaryCol]    == RLMTypeBinary, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:dateCol]      == RLMTypeDate, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:doubleCol]    == RLMTypeDouble, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:floatCol]     == RLMTypeFloat, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:intCol]       == RLMTypeInt, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:mixedCol]     == RLMTypeMixed, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:stringCol]    == RLMTypeString, @"Column types matches");
-    XCTAssertTrue([v columnTypeOfColumnWithIndex:tableCol]     == RLMTypeTable, @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:boolCol]   == RLMTypeBool,   @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:binaryCol] == RLMTypeBinary, @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:dateCol]   == RLMTypeDate,   @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:doubleCol] == RLMTypeDouble, @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:floatCol]  == RLMTypeFloat,  @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:intCol]    == RLMTypeInt,    @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:mixedCol]  == RLMTypeMixed,  @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:stringCol] == RLMTypeString, @"Column types matches");
+    XCTAssertTrue([v columnTypeOfColumnWithIndex:tableCol]  == RLMTypeTable,  @"Column types matches");
     
     XCTAssertThrows([v columnTypeOfColumnWithIndex:[v columnCount] + 1], @"Out of bounds");
     XCTAssertThrows([v columnTypeOfColumnWithIndex:100], @"Out of bounds");

@@ -12,9 +12,6 @@
 #import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
-
-#include <tightdb/binary_data.hpp>
-#include <tightdb/table.hpp>
 #import <realm/objc/RLMTable_noinst.h>
 
 REALM_TABLE_DEF_3(PeopleErrTable,
@@ -41,10 +38,10 @@ REALM_TABLE_9(TestQueryErrAllTypes,
               TableCol,  TestQueryErrSub,
               MixedCol,  Mixed)
 
-
-
 @interface MACTestErrHandling: RLMTestCase
+
 @end
+
 @implementation MACTestErrHandling
 
 - (void)testErrHandling {

@@ -246,8 +246,8 @@ REALM_TABLE_9(TestQueryAllTypes,
     
     XCTAssertEqual([[table where] minIntInColumnWithIndex:INT_COL], (int64_t)0, @"minIntInColumn");
     XCTAssertEqual([[table where] sumIntColumnWithIndex:INT_COL], (int64_t)860, @"IntCol max");
-    XCTAssertEqualWithAccuracy([[[table where] minDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], [date1 timeIntervalSince1970], 0.99, @"MinDateInColumn");
-    XCTAssertEqualWithAccuracy([[[table where] maxDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], [date2 timeIntervalSince1970], 0.99, @"MaxDateInColumn");
+    XCTAssertEqualWithAccuracy([[[table where] minDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], [date1 timeIntervalSince1970], 1.0f, @"MinDateInColumn");
+    XCTAssertEqualWithAccuracy([[[table where] maxDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], [date2 timeIntervalSince1970], 1.0f, @"MaxDateInColumn");
     
     /// TODO: Tests missing....
     
