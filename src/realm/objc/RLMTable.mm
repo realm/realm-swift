@@ -302,44 +302,20 @@ using namespace std;
     return index;
 }
 
--(RLMRow *)objectAtIndexedSubscript:(NSUInteger)ndx
+-(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex
 {
-    return [[RLMRow alloc] initWithTable:self ndx:ndx];
-}
-
--(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex
-{
-    tightdb::Table& table = *m_table;
-    tightdb::ConstDescriptorRef desc = table.get_descriptor();
-
-    if (table.size() < (size_t)rowIndex) {
+    if (rowIndex >= self.rowCount) {
         @throw [NSException exceptionWithName:@"realm:index_out_of_bounds"
                                        reason:[NSString stringWithFormat:@"Index %lu beyond bounds [0 .. %lu]", (unsigned long)rowIndex, (unsigned long)self.rowCount-1]
                                      userInfo:nil];
     }
-
-    // FIXME: Duplicate code. Should just call insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
-    if ([newValue isKindOfClass:[NSArray class]]) {
-        verify_row(*desc, (NSArray *)newValue);
-        set_row(size_t(rowIndex), table, (NSArray *)newValue);
-        return;
-    }
     
-    if ([newValue isKindOfClass:[NSDictionary class]]) {
-        verify_row_with_labels(*desc, (NSDictionary *)newValue);
-        set_row_with_labels(size_t(rowIndex), table, (NSDictionary *)newValue);
-        return;
-    }
+    return [[RLMRow alloc] initWithTable:self ndx:rowIndex];
+}
 
-    if ([newValue isKindOfClass:[NSObject class]]) {
-        verify_row_from_object(*desc, (NSObject *)newValue);
-        set_row_from_object(rowIndex, table, (NSObject *)newValue);
-        return;
-    }
-
-    @throw [NSException exceptionWithName:@"realm:column_not_implemented"
-                                   reason:@"You should either use nil, NSObject, NSDictionary, or NSArray"
-                                 userInfo:nil];
+-(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex
+{
+    [self setRow:newValue atIndex:rowIndex]; //Exceptions handled here
 }
 
 -(RLMRow *)objectForKeyedSubscript:(NSString *)key
@@ -369,9 +345,9 @@ using namespace std;
     if (row) {
         [self setRow:newValue atIndex:[row RLM_index]];
     }
-    else if (newValue) { //Only add row if newValue is not nil
-        [self addRow:newValue];
-    }
+//    else { // Commenting this out. Currently only support keyed subscripts for updating. Uncomment this when util.mm implements set and update methods.
+//        [self addRow:newValue];
+//    }
 }
 
 - (size_t)RLM_lookup:(NSString *)key
@@ -473,7 +449,6 @@ using namespace std;
     }
     
     if (!anObject) {
-        [self removeRowAtIndex:rowIndex]; // Remove row at index if anObject is nil
         return;
     }
     
