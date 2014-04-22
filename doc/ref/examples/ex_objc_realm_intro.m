@@ -1,4 +1,4 @@
-/* @@Example: ex_objc_smart_context_intro @@ */
+/* @@Example: ex_objc_realm_intro @@ */
 #import <Realm/Realm.h>
 #import "people.h"
 
@@ -22,22 +22,19 @@
  */
 
 
-void ex_objc_smart_context_intro()
+void ex_objc_realm_intro()
 {
-    // Generate paths for .realm file and .realm.lock file
-    NSString *realmFileName          = @"smartContextTest.realm";
+    // Generate path for a writeable .realm file
+    NSString *realmFileName          = @"employees.realm";
     NSString *documentsDirectoryPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
     NSString *realmFilePath          = [documentsDirectoryPath stringByAppendingPathComponent:realmFileName];
-    NSString *realmFileLockPath      = [realmFilePath stringByAppendingPathExtension:@"lock"];
     
     // Remove any previous files
-    NSFileManager *fm = [NSFileManager defaultManager];
-    [fm removeItemAtPath:realmFilePath error:nil];
-    [fm removeItemAtPath:realmFileLockPath error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
     
     NSError *writeContextCreationError = nil;
     
-    // Create an RLMContext for writing (not yet supported in RLMSmartContext)
+    // Create an RLMContext for writing (not yet supported in RLMRealm)
     RLMContext *writeContext = [RLMContext contextPersistedAtPath:realmFilePath
                                                             error:&writeContextCreationError];
     
@@ -48,9 +45,9 @@ void ex_objc_smart_context_intro()
     // Perform a write transaction (with commit to file)
     NSError *error = nil;
     BOOL success;
-    success = [writeContext writeUsingBlock:^(RLMTransaction *transaction) {
-        People *table = [transaction createTableWithName:@"employees"
-                                            asTableClass:[People class]];
+    success = [writeContext writeUsingBlock:^(RLMRealm *realm) {
+        People *table = [realm createTableWithName:@"employees"
+                                      asTableClass:[People class]];
         [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
         
         return YES; // Commit
@@ -59,12 +56,11 @@ void ex_objc_smart_context_intro()
         NSLog(@"write-transaction failed: %@", [error description]);
     }
     
-    // Create a smart context
-    RLMSmartContext *smartContext = [RLMSmartContext contextWithPersistenceToFile:realmFilePath];
+    // Create a realm
+    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:realmFilePath];
     
-    // Read from the smart context
-    People *table = [smartContext tableWithName:@"employees"
-                                   asTableClass:[People class]];
+    // Read from the realm
+    People *table = [realm tableWithName:@"employees" asTableClass:[People class]];
     for (PeopleRow *row in table) {
         NSLog(@"Name: %@", row.Name);
     }
