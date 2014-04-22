@@ -26,8 +26,7 @@
 #include <map>
 #include "TDBCommitLog.hpp"
 
-// FIXME: this is absolutely no-go:
-#include </Users/test/tightdb/src/tightdb/replication.hpp>
+#include <tightdb/replication.hpp>
 
 namespace tightdb {
 
