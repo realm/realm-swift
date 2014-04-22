@@ -39,6 +39,7 @@ The Objective-C API has been updated and your code will break!
 ### API breaking changes:
 
 * Changed all class prefixes from TDB to RLM
+* Write transactions now take an optional rollback parameter (rather than needing to return a boolean)
 
 ### Enhancements:
 
