@@ -252,16 +252,16 @@ using namespace std;
 
 -(RLMRow *)insertEmptyRowAtIndex:(NSUInteger)ndx
 {
-    [self TDBInsertRow:ndx];
+    [self RLMInsertRow:ndx];
     return [[RLMRow alloc] initWithTable:self ndx:ndx];
 }
 
--(BOOL)TDBInsertRow:(NSUInteger)ndx
+-(BOOL)RLMInsertRow:(NSUInteger)ndx
 {
-    return [self TDBInsertRow:ndx error:nil];
+    return [self RLMInsertRow:ndx error:nil];
 }
 
--(BOOL)TDBInsertRow:(NSUInteger)ndx error:(NSError* __autoreleasing*)error
+-(BOOL)RLMInsertRow:(NSUInteger)ndx error:(NSError* __autoreleasing*)error
 {
     if (m_read_only) {
         if (error)
@@ -302,44 +302,58 @@ using namespace std;
     return index;
 }
 
--(RLMRow *)objectAtIndexedSubscript:(NSUInteger)ndx
+-(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex
 {
-    return [[RLMRow alloc] initWithTable:self ndx:ndx];
+    if (rowIndex >= self.rowCount) {
+        @throw [NSException exceptionWithName:@"realm:index_out_of_bounds"
+                                       reason:[NSString stringWithFormat:@"Index %lu beyond bounds [0 .. %lu]", (unsigned long)rowIndex, (unsigned long)self.rowCount-1]
+                                     userInfo:nil];
+    }
+    
+    return [[RLMRow alloc] initWithTable:self ndx:rowIndex];
 }
 
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex
 {
-    tightdb::Table& table = *m_table;
-    tightdb::ConstDescriptorRef desc = table.get_descriptor();
-
-    if (table.size() < (size_t)rowIndex) {
-        // FIXME: raise exception - out of bound
-        return;
-    }
-
-    if ([newValue isKindOfClass:[NSArray class]]) {
-        verify_row(*desc, (NSArray *)newValue);
-        set_row(size_t(rowIndex), table, (NSArray *)newValue);
-        return;
-    }
-    
-    if ([newValue isKindOfClass:[NSDictionary class]]) {
-        verify_row_with_labels(*desc, (NSDictionary *)newValue);
-        set_row_with_labels(size_t(rowIndex), table, (NSDictionary *)newValue);
-        return;
-    }
-
-    if ([newValue isKindOfClass:[NSObject class]]) {
-        verify_row_from_object(*desc, (NSObject *)newValue);
-        set_row_from_object(rowIndex, table, (NSObject *)newValue);
-        return;
-    }
-
-    @throw [NSException exceptionWithName:@"realm:column_not_implemented"
-                                   reason:@"You should either use nil, NSObject, NSDictionary, or NSArray"
-                                 userInfo:nil];
+    [self updateRow:newValue atIndex:rowIndex]; //Exceptions handled here. This should also call setRow:atIndex: when util.mm methods refactored.
 }
 
+-(RLMRow *)objectForKeyedSubscript:(NSString *)key
+{
+    // Currently only supporting first column lookup for RLMTypeString. Will add support for different
+    // columns when we have Mantle-like syntax
+    if ([self columnCount] < 1) {
+        @throw [NSException exceptionWithName:@"realm:column_not_defined"
+                                       reason:@"This table has no columns"
+                                     userInfo:nil];
+    }
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) {
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string"
+                                       reason:@"Column at index 0 must be of RLMTypeString"
+                                     userInfo:nil];
+    }
+    
+    size_t ndx = [self RLM_lookup:key];
+    
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil;
+}
+
+-(void)setObject:(id)newValue forKeyedSubscript:(NSString *)key
+{
+    RLMRow* row = self[key]; // Exceptions handled here
+    
+    if (row) {
+        [self updateRow:newValue atIndex:[row RLM_index]]; // This should call setRow:atIndex: when util.mm methods refactored
+    }
+//    else { // Commenting this out. Currently only support keyed subscripts for updating. Uncomment this when util.mm implements set and update methods.
+//        [self addRow:newValue];
+//    }
+}
+
+- (size_t)RLM_lookup:(NSString *)key
+{
+    return m_table->lookup([key UTF8String]);
+}
 
 -(RLMRow *)rowAtIndex:(NSUInteger)ndx
 {
@@ -396,7 +410,7 @@ using namespace std;
 -(void)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
 {
     if (!anObject) {
-        [self TDBInsertRow:rowIndex];
+        [self RLMInsertRow:rowIndex];
         return;
     }
     
@@ -421,6 +435,45 @@ using namespace std;
         return;
     }
 
+    @throw [NSException exceptionWithName:@"realm:column_not_implemented"
+                                   reason:@"You should either use nil, NSObject, NSDictionary, or NSArray"
+                                 userInfo:nil];
+}
+
+- (void)updateRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
+{
+    if (rowIndex >= self.rowCount) {
+        @throw [NSException exceptionWithName:@"realm:index_out_of_bounds"
+                                       reason:[NSString stringWithFormat:@"Index %lu beyond bounds [0 .. %lu]", (unsigned long)rowIndex, (unsigned long)self.rowCount-1]
+                                     userInfo:nil];
+    }
+    
+    if (!anObject) {
+        return;
+    }
+    
+    tightdb::Table& table = *m_table;
+    tightdb::ConstDescriptorRef desc = table.get_descriptor();
+    
+    // These should call update_row. Will re-implement set_row() when setRow:atIndex is implemented.
+    if ([anObject isKindOfClass:[NSArray class]]) {
+        verify_row(*desc, (NSArray *)anObject);
+        set_row(size_t(rowIndex), table, (NSArray*)anObject);
+        return;
+    }
+    
+    if ([anObject isKindOfClass:[NSDictionary class]]) {
+        verify_row_with_labels(*desc, (NSDictionary *)anObject);
+        set_row_with_labels(size_t(rowIndex), table, (NSDictionary*)anObject);
+        return;
+    }
+    
+    if ([anObject isKindOfClass:[NSObject class]]) {
+        verify_row_from_object(*desc, (NSObject *)anObject);
+        set_row_from_object(size_t(rowIndex), table, (NSObject *)anObject);
+        return;
+    }
+    
     @throw [NSException exceptionWithName:@"realm:column_not_implemented"
                                    reason:@"You should either use nil, NSObject, NSDictionary, or NSArray"
                                  userInfo:nil];

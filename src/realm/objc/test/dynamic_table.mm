@@ -30,6 +30,17 @@ using namespace std;
 @end
 
 @implementation TestClass
+// no needed
+@end
+
+@interface TestObject : NSObject
+
+@property (strong, nonatomic) NSNumber *objID;
+@property (strong, nonatomic) NSString *name;
+
+@end
+
+@implementation TestObject
 
 @end
 
@@ -37,7 +48,7 @@ using namespace std;
 
 @end
 
-@implementation TDBDynamicTableTests
+@implementation RLMDynamicTableTests
 
 - (void)testTable
 {
@@ -1103,6 +1114,83 @@ using namespace std;
     XCTAssertTrue([table[1][@"second"] isEqual:@"more test"], @"table[1].second");
 }
 
+- (void)testTableDynamic_KeyedSubscripting
+{
+    RLMTable* table = [[RLMTable alloc] init];
+    
+    [table addColumnWithName:@"name" type:RLMTypeString];
+    [table addColumnWithName:@"id" type:RLMTypeInt];
+    
+    [table addRow:@{@"name" : @"Test1", @"id" : @24}];
+    [table addRow:@{@"name" : @"Test2", @"id" : @25}];
+    
+    // Test first row
+    XCTAssertNotNil(table[@"Test1"], @"table[@\"Test1\"] should not be nil");
+    XCTAssertEqualObjects(table[@"Test1"][@"name"], @"Test1", @"table[@\"Test24\"][@\"name\"] should be equal to Test1");
+    XCTAssertEqualObjects(table[@"Test1"][@"id"], @24, @"table[@\"Test24\"][@\"id\"] should be equal to @24");
+    
+    // Test second row
+    XCTAssertNotNil(table[@"Test2"], @"table[@\"Test2\"] should not be nil");
+    XCTAssertEqualObjects(table[@"Test2"][@"name"], @"Test2", @"table[@\"Test24\"][@\"name\"] should be equal to Test2");
+    XCTAssertEqualObjects(table[@"Test2"][@"id"], @25, @"table[@\"Test24\"][@\"id\"] should be equal to @25");
+    
+    // Test nil row
+    XCTAssertNil(table[@"foo"], @"table[\"foo\"] should be nil");
+    
+    
+    RLMTable* errTable = [[RLMTable alloc] init];
+    
+    XCTAssertThrows(errTable[@"X"], @"Accessing RLMRow via keyed subscript on undefined column should throw exception");
+    
+    [errTable addColumnWithName:@"id" type:RLMTypeInt];
+    
+    XCTAssertThrows(errTable[@"X"], @"Accessing RLMRow via keyed subscript on a column that is not of type RLMTypeString should throw exception");
+    
+    
+    // Test keyed subscripting setters
+    
+    // No exisiting for table
+    NSUInteger previousRowCount = [table rowCount];
+    NSString* nonExistingKey = @"Test10123903784293";
+    table[nonExistingKey] = @{@"name" : nonExistingKey, @"id" : @1};
+    
+    XCTAssertEqual(previousRowCount, [table rowCount], @"Row count should be equal to previous row count + 1 after inserting a non-existing RLMRow");
+    XCTAssertNil(table[nonExistingKey], @"table[nonExistingKey] should be nil");
+    // Commenting out until set row method transitioned from update row
+    //XCTAssertEqualObjects(table[nonExistingKey][@"id"], @1, @"table[nonExistingKey][@\"id\"] should be equal to @1");
+    //XCTAssertEqualObjects(table[nonExistingKey][@"name"], nonExistingKey, @"table[nonExistingKey][@\"name\"] should be equal to nonExistingKey");
+    
+    // Set non-existing row to nil for table
+    previousRowCount = [table rowCount];
+    NSString* anotherNonExistingKey = @"sdalfjhadskfja";
+    table[anotherNonExistingKey] = nil; // Adds an empty row
+    
+    XCTAssertEqual(previousRowCount, [table rowCount], @"previousRowCount + 1 should equal current rowCount");
+    XCTAssertNil(table[anotherNonExistingKey], @"table[anotherNonExistingKey] should be nil");
+    
+    // Has existing for table
+    previousRowCount = [table rowCount];
+    table[@"Test2"] = @{@"name" : @"Test3" , @"id" : @123};
+    
+    XCTAssertEqual(previousRowCount, [table rowCount], @"Row count should still equal previous row count after inserting an existing RLMRow");
+    XCTAssertNil(table[@"Test2"], @"table[@\"Test2\"] should be nil");
+    XCTAssertNotNil(table[@"Test3"], @"table[@\"Test3\"] should not be nil");
+    XCTAssertEqualObjects(table[@"Test3"][@"id"], @123, @"table[\"Test3\"][@\"id\"] should be equal to @123");
+    XCTAssertEqualObjects(table[@"Test3"][@"name"], @"Test3", @"table[\"Test3\"][@\"name\"] should be equal to @\"Test3\"");
+    
+    // Set existing row to nil for table
+    previousRowCount = [table rowCount];
+    table[@"Test3"] = nil;
+    
+    XCTAssertEqual(previousRowCount, [table rowCount], @"[table rowCount] should be equal to previousRowCount");
+    XCTAssertNotNil(table[@"Test3"], @"table[\"Test3\"] should return an untouched row");
+    
+    // No existing for errTable
+    previousRowCount = [errTable rowCount];
+    XCTAssertThrows((errTable[@"SomeKey"] = @{@"id" : @821763}), @"Calling keyed subscriptor on errTable should throw exception");
+    XCTAssertEqual(previousRowCount, [errTable rowCount], @"errTable should have same count as previous");
+}
+
 -(void)testTableDynamic_Row_Set
 {
     RLMTable *table = [[RLMTable alloc] init];
@@ -1476,6 +1564,59 @@ using namespace std;
         [table addRow:@[[NSDate dateWithTimeIntervalSince1970:i]]];
     XCTAssertEqual((NSUInteger)5, [table findRowIndexWithDate:[NSDate dateWithTimeIntervalSince1970:5] inColumnWithIndex:0], @"Cannot find element");
     XCTAssertEqual((NSUInteger)NSNotFound, ([table findRowIndexWithDate:[NSDate dateWithTimeIntervalSince1970:11] inColumnWithIndex:0]), @"Found something");
+}
+
+- (void)testTableDynamic_update_row
+{
+    RLMTable *table = [[RLMTable alloc] init];
+    [table addColumnWithName:@"objID" type:RLMTypeInt];
+    [table addColumnWithName:@"name" type:RLMTypeString];
+    
+    [table addRow:@{@"objID" : @89213, @"name" : @"Fiel"}];
+    [table addRow:@{@"objID" : @45132, @"name" : @"Paul"}];
+    
+    // Test set NSObject for valid index
+    NSUInteger previousRowCount = [table rowCount];
+    TestObject* object = [[TestObject alloc] init];
+    object.objID = @1;
+    object.name = @"Alex";
+    
+    XCTAssertNoThrow([table updateRow:object atIndex:0], @"Setting object for valid index should not throw exception");
+    XCTAssertTrue(previousRowCount == [table rowCount], @"previousRowCount should be equal to current rowCount");
+    XCTAssertTrue([table[0][@"objID"] isEqualToNumber:object.objID], @"Object at index 0 should have newly set objID");
+    XCTAssertTrue([table[0][@"name"] isEqualToString:object.name], @"Object at index 0 should have newly set name");
+    
+    // Test set NSDictionary for valid index
+    previousRowCount = [table rowCount];
+    NSDictionary* testDictionary = @{@"objID" : @2, @"name" : @"Tim"};
+    
+    XCTAssertNoThrow([table updateRow:testDictionary atIndex:0], @"Setting object for valid index should not throw exception");
+    XCTAssertTrue(previousRowCount == [table rowCount], @"previousRowCount should be equal to current rowCount");
+    XCTAssertTrue([table[0][@"objID"] isEqualToNumber:testDictionary[@"objID"]], @"Object at index 0 should have newly set objID");
+    XCTAssertTrue([table[0][@"name"] isEqualToString:testDictionary[@"name"]], @"Object at index 0 should have newly set name");
+    
+    // Test set NSArray for valid index
+    previousRowCount = [table rowCount];
+    NSArray* testArray = @[@3, @"Ari"];
+    
+    XCTAssertNoThrow([table updateRow:testArray atIndex:0], @"Setting object for valid index should not throw exception");
+    XCTAssertTrue(previousRowCount == [table rowCount], @"previousRowCount should be equal to current rowCount");
+    XCTAssertTrue([table[0][@"objID"] isEqualToNumber:testArray[0]], @"Object at index 0 should have newly set objID");
+    XCTAssertTrue([table[0][@"name"] isEqualToString:testArray[1]], @"Object at index 0 should have newly set name");
+    
+    // Test set valid object for invalid index
+    previousRowCount = [table rowCount];
+    XCTAssertThrows([table updateRow:object atIndex:12], @"Setting object for invalid index should throw exception");
+    XCTAssertTrue(previousRowCount == [table rowCount], @"previousRowCount should be equal to current rowCount");
+    XCTAssertTrue([table[0][@"objID"] isEqualToNumber:testArray[0]], @"Object at index 0 should have newly set objID");
+    XCTAssertTrue([table[0][@"name"] isEqualToString:testArray[1]], @"Object at index 0 should have newly set name");
+    
+    // Test set nil for valid index
+    previousRowCount = [table rowCount];
+    XCTAssertNoThrow(([table updateRow:nil atIndex:0]), @"Setting object to nil should not throw exception");
+    XCTAssertTrue(previousRowCount == [table rowCount], @"rowCount should be equal to previousRowCount");
+    XCTAssertTrue([table[0][@"objID"] isEqualToNumber:testArray[0]], @"table[0][@\"objID\"] should be equal to last next object's objID after setting row to nil");
+    XCTAssertTrue([table[0][@"name"] isEqualToString:testArray[1]], @"table[0][@\"name\"] should be equal to last next object's objID after setting row to nil");
 }
 
 

@@ -62,6 +62,7 @@ REALM_COLUMN_PROXY_DEF(CName1, CType1) \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
@@ -189,6 +190,21 @@ REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
 { \
 	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key \
+{ \
+    if ([self columnCount] < 1) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_defined" \
+                                       reason:@"This table has no columns" \
+                                     userInfo:nil]; \
+    } \
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string" \
+                                       reason:@"Column at index 0 must be of RLMTypeString" \
+                                     userInfo:nil]; \
+    } \
+    size_t ndx = [self RLM_lookup:key]; \
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil; \
+} \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
@@ -281,6 +297,7 @@ REALM_COLUMN_PROXY_DEF(CName2, CType2) \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
@@ -419,6 +436,21 @@ REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
 { \
 	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key \
+{ \
+    if ([self columnCount] < 1) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_defined" \
+                                       reason:@"This table has no columns" \
+                                     userInfo:nil]; \
+    } \
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string" \
+                                       reason:@"Column at index 0 must be of RLMTypeString" \
+                                     userInfo:nil]; \
+    } \
+    size_t ndx = [self RLM_lookup:key]; \
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil; \
+} \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
@@ -517,6 +549,7 @@ REALM_COLUMN_PROXY_DEF(CName3, CType3) \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
@@ -666,6 +699,21 @@ REALM_COLUMN_PROXY_IMPL(CName3, CType3) \
 { \
 	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key \
+{ \
+    if ([self columnCount] < 1) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_defined" \
+                                       reason:@"This table has no columns" \
+                                     userInfo:nil]; \
+    } \
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string" \
+                                       reason:@"Column at index 0 must be of RLMTypeString" \
+                                     userInfo:nil]; \
+    } \
+    size_t ndx = [self RLM_lookup:key]; \
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil; \
+} \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
@@ -770,6 +818,7 @@ REALM_COLUMN_PROXY_DEF(CName4, CType4) \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
@@ -930,6 +979,21 @@ REALM_COLUMN_PROXY_IMPL(CName4, CType4) \
 { \
 	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key \
+{ \
+    if ([self columnCount] < 1) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_defined" \
+                                       reason:@"This table has no columns" \
+                                     userInfo:nil]; \
+    } \
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string" \
+                                       reason:@"Column at index 0 must be of RLMTypeString" \
+                                     userInfo:nil]; \
+    } \
+    size_t ndx = [self RLM_lookup:key]; \
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil; \
+} \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
@@ -1040,6 +1104,7 @@ REALM_COLUMN_PROXY_DEF(CName5, CType5) \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
@@ -1211,6 +1276,21 @@ REALM_COLUMN_PROXY_IMPL(CName5, CType5) \
 { \
 	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key \
+{ \
+    if ([self columnCount] < 1) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_defined" \
+                                       reason:@"This table has no columns" \
+                                     userInfo:nil]; \
+    } \
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string" \
+                                       reason:@"Column at index 0 must be of RLMTypeString" \
+                                     userInfo:nil]; \
+    } \
+    size_t ndx = [self RLM_lookup:key]; \
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil; \
+} \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
@@ -1327,6 +1407,7 @@ REALM_COLUMN_PROXY_DEF(CName6, CType6) \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
@@ -1509,6 +1590,21 @@ REALM_COLUMN_PROXY_IMPL(CName6, CType6) \
 { \
 	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key \
+{ \
+    if ([self columnCount] < 1) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_defined" \
+                                       reason:@"This table has no columns" \
+                                     userInfo:nil]; \
+    } \
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string" \
+                                       reason:@"Column at index 0 must be of RLMTypeString" \
+                                     userInfo:nil]; \
+    } \
+    size_t ndx = [self RLM_lookup:key]; \
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil; \
+} \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
@@ -1631,6 +1727,7 @@ REALM_COLUMN_PROXY_DEF(CName7, CType7) \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
@@ -1824,6 +1921,21 @@ REALM_COLUMN_PROXY_IMPL(CName7, CType7) \
 { \
 	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key \
+{ \
+    if ([self columnCount] < 1) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_defined" \
+                                       reason:@"This table has no columns" \
+                                     userInfo:nil]; \
+    } \
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string" \
+                                       reason:@"Column at index 0 must be of RLMTypeString" \
+                                     userInfo:nil]; \
+    } \
+    size_t ndx = [self RLM_lookup:key]; \
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil; \
+} \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
@@ -1952,6 +2064,7 @@ REALM_COLUMN_PROXY_DEF(CName8, CType8) \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
@@ -2156,6 +2269,21 @@ REALM_COLUMN_PROXY_IMPL(CName8, CType8) \
 { \
 	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key \
+{ \
+    if ([self columnCount] < 1) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_defined" \
+                                       reason:@"This table has no columns" \
+                                     userInfo:nil]; \
+    } \
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string" \
+                                       reason:@"Column at index 0 must be of RLMTypeString" \
+                                     userInfo:nil]; \
+    } \
+    size_t ndx = [self RLM_lookup:key]; \
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil; \
+} \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
@@ -2290,6 +2418,7 @@ REALM_COLUMN_PROXY_DEF(CName9, CType9) \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
@@ -2505,6 +2634,21 @@ REALM_COLUMN_PROXY_IMPL(CName9, CType9) \
 { \
 	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key \
+{ \
+    if ([self columnCount] < 1) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_defined" \
+                                       reason:@"This table has no columns" \
+                                     userInfo:nil]; \
+    } \
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string" \
+                                       reason:@"Column at index 0 must be of RLMTypeString" \
+                                     userInfo:nil]; \
+    } \
+    size_t ndx = [self RLM_lookup:key]; \
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil; \
+} \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
@@ -2645,6 +2789,7 @@ REALM_COLUMN_PROXY_DEF(CName10, CType10) \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
@@ -2871,6 +3016,21 @@ REALM_COLUMN_PROXY_IMPL(CName10, CType10) \
 { \
 	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key \
+{ \
+    if ([self columnCount] < 1) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_defined" \
+                                       reason:@"This table has no columns" \
+                                     userInfo:nil]; \
+    } \
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string" \
+                                       reason:@"Column at index 0 must be of RLMTypeString" \
+                                     userInfo:nil]; \
+    } \
+    size_t ndx = [self RLM_lookup:key]; \
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil; \
+} \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
@@ -3017,6 +3177,7 @@ REALM_COLUMN_PROXY_DEF(CName11, CType11) \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
@@ -3254,6 +3415,21 @@ REALM_COLUMN_PROXY_IMPL(CName11, CType11) \
 { \
 	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key \
+{ \
+    if ([self columnCount] < 1) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_defined" \
+                                       reason:@"This table has no columns" \
+                                     userInfo:nil]; \
+    } \
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string" \
+                                       reason:@"Column at index 0 must be of RLMTypeString" \
+                                     userInfo:nil]; \
+    } \
+    size_t ndx = [self RLM_lookup:key]; \
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil; \
+} \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
@@ -3406,6 +3582,7 @@ REALM_COLUMN_PROXY_DEF(CName12, CType12) \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
@@ -3654,6 +3831,21 @@ REALM_COLUMN_PROXY_IMPL(CName12, CType12) \
 { \
 	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key \
+{ \
+    if ([self columnCount] < 1) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_defined" \
+                                       reason:@"This table has no columns" \
+                                     userInfo:nil]; \
+    } \
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string" \
+                                       reason:@"Column at index 0 must be of RLMTypeString" \
+                                     userInfo:nil]; \
+    } \
+    size_t ndx = [self RLM_lookup:key]; \
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil; \
+} \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
@@ -3812,6 +4004,7 @@ REALM_COLUMN_PROXY_DEF(CName13, CType13) \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
@@ -4071,6 +4264,21 @@ REALM_COLUMN_PROXY_IMPL(CName13, CType13) \
 { \
 	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key \
+{ \
+    if ([self columnCount] < 1) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_defined" \
+                                       reason:@"This table has no columns" \
+                                     userInfo:nil]; \
+    } \
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string" \
+                                       reason:@"Column at index 0 must be of RLMTypeString" \
+                                     userInfo:nil]; \
+    } \
+    size_t ndx = [self RLM_lookup:key]; \
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil; \
+} \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
@@ -4235,6 +4443,7 @@ REALM_COLUMN_PROXY_DEF(CName14, CType14) \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
@@ -4505,6 +4714,21 @@ REALM_COLUMN_PROXY_IMPL(CName14, CType14) \
 { \
 	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
 } \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key \
+{ \
+    if ([self columnCount] < 1) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_defined" \
+                                       reason:@"This table has no columns" \
+                                     userInfo:nil]; \
+    } \
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string" \
+                                       reason:@"Column at index 0 must be of RLMTypeString" \
+                                     userInfo:nil]; \
+    } \
+    size_t ndx = [self RLM_lookup:key]; \
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil; \
+} \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
@@ -4675,6 +4899,7 @@ REALM_COLUMN_PROXY_DEF(CName15, CType15) \
 -(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx; \
 -(TableName##Row*)rowAtLastIndex; \
 -(TableName##Row*)insertEmptyRowAtIndex:(NSUInteger)ndx; \
@@ -4955,6 +5180,21 @@ REALM_COLUMN_PROXY_IMPL(CName15, CType15) \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx \
 { \
 	return [[TableName##Row alloc] initWithTable:self ndx:ndx]; \
+} \
+-(TableName##Row*)objectForKeyedSubscript:(NSString *)key \
+{ \
+    if ([self columnCount] < 1) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_defined" \
+                                       reason:@"This table has no columns" \
+                                     userInfo:nil]; \
+    } \
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) { \
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string" \
+                                       reason:@"Column at index 0 must be of RLMTypeString" \
+                                     userInfo:nil]; \
+    } \
+    size_t ndx = [self RLM_lookup:key]; \
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil; \
 } \
 -(TableName##Row*)rowAtIndex:(NSUInteger)ndx \
 { \
