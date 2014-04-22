@@ -400,10 +400,9 @@ CATEGORIES :
       NAME     : "setRow:atIndex:"
       SUMMARY  : Set a row.
       DESCR    : >
-                 This method will set a row in the table at the specified
-                 index with anObject. If anObject is nil, the row gets removed.
-                 Properties in generic objects (derived from <code>NSObject</code>) 
-                 which match columns names will be used. Non-matching properties are ignored.
+                 This method will set a row in the table at the specified index with <code>anObject</code>. 
+                 If anObject is <code>nil</code>, the row gets removed. Properties in generic objects (derived from <code>NSObject</code>) 
+                 which match columns names will be used. Non-matching properties are ignored. 
                  An exception is thrown if passing an index that is out of bounds.
       SIGNATURE: (void)setRow:(id)anObject atIndex:(NSUInteger)rowIndex
       PARAMS:
