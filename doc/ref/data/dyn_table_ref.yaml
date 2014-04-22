@@ -396,7 +396,7 @@ CATEGORIES :
         TYPES   : NSUInteger
         DESCR   : *g_dyn_table_insert_empty_row_parm1_descr
 
-  - objc_dyn_table_insert_object:
+  - objc_dyn_table_set_object:
       NAME     : "setRow:atIndex:"
       SUMMARY  : Set a row.
       DESCR    : >
