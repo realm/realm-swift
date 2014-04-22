@@ -9,7 +9,7 @@
 //
 
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
 
@@ -18,32 +18,32 @@
 #import <realm/objc/RLMTable_noinst.h>
 
 REALM_TABLE_DEF_3(PeopleErrTable,
-                    Name,  String,
-                    Age,   Int,
-                    Hired, Bool)
+                  Name,  String,
+                  Age,   Int,
+                  Hired, Bool)
 
 REALM_TABLE_IMPL_3(PeopleErrTable,
-                     Name,  String,
-                     Age,   Int,
-                     Hired, Bool)
+                   Name,  String,
+                   Age,   Int,
+                   Hired, Bool)
 
 REALM_TABLE_1(TestQueryErrSub,
-                Age,  Int)
+              Age,  Int)
 
 REALM_TABLE_9(TestQueryErrAllTypes,
-                BoolCol,   Bool,
-                IntCol,    Int,
-                FloatCol,  Float,
-                DoubleCol, Double,
-                StringCol, String,
-                BinaryCol, Binary,
-                DateCol,   Date,
-                TableCol,  TestQueryErrSub,
-                MixedCol,  Mixed)
+              BoolCol,   Bool,
+              IntCol,    Int,
+              FloatCol,  Float,
+              DoubleCol, Double,
+              StringCol, String,
+              BinaryCol, Binary,
+              DateCol,   Date,
+              TableCol,  TestQueryErrSub,
+              MixedCol,  Mixed)
 
 
 
-@interface MACTestErrHandling: XCTestCase
+@interface MACTestErrHandling: RLMTestCase
 @end
 @implementation MACTestErrHandling
 
@@ -51,13 +51,9 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
-    
-    NSFileManager *fm = [NSFileManager defaultManager];
-    [fm removeItemAtPath:[RLMContext defaultPath] error:nil];
-    
     NSError* error = nil;
 
-    [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
         // Create new table in realm
         PeopleErrTable* people = [realm createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
         
@@ -86,12 +82,12 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     //------------------------------------------------------
     NSLog(@"--- Changing permissions ---");
     //------------------------------------------------------
-
-    NSMutableDictionary* attributes = [NSMutableDictionary dictionaryWithCapacity:1];
-    [attributes setValue:[NSNumber numberWithShort:0444] forKey:NSFilePosixPermissions];
-
+    
     error = nil;
-    [fm setAttributes:attributes ofItemAtPath:@"peopleErr.realm" error:&error];
+    NSFileManager *fm = [NSFileManager defaultManager];
+    [fm setAttributes:@{NSFilePosixPermissions: @(0444)}
+         ofItemAtPath:RLMTestRealmPath
+                error:&error];
     if (error) {
         XCTFail(@"Failed to set readonly attributes");
     }
@@ -99,22 +95,22 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     //------------------------------------------------------
     NSLog(@"--- Make normal again ---");
     //------------------------------------------------------
-
-    [attributes setValue:[NSNumber numberWithShort:0644] forKey:NSFilePosixPermissions];
-
+    
     error = nil;
-    [fm setAttributes:attributes ofItemAtPath:@"peopleErr.realm" error:&error];
+    [fm setAttributes:@{NSFilePosixPermissions: @(0644)}
+         ofItemAtPath:RLMTestRealmPath
+                error:&error];
     if (error) {
         XCTFail(@"Failed to set readonly attributes");
     }
     
-    RLMRealm *fromDisk = [RLMRealm realmWithPersistenceToFile:@"peopleErr.realm"];
+    RLMRealm *fromDisk = [self realmPersistedAtTestPath];
     XCTAssertNotNil(fromDisk, @"realm from disk should be valid");
 
     PeopleErrTable *diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
     // Fake readonly.
-    [((RLMTable*)diskTable) setReadOnly:true];
+    [((RLMTable*)diskTable) setReadOnly:YES];
 
     NSLog(@"Disktable size: %zu", [diskTable rowCount]);
 

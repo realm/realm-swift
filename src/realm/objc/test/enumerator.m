@@ -5,20 +5,20 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
 
 REALM_TABLE_3(EnumPeopleTable,
-                Name,  String,
-                Age,   Int,
-                Hired, Bool)
+              Name,  String,
+              Age,   Int,
+              Hired, Bool)
 
 REALM_TABLE_2(EnumPeopleTable2,
-                Hired, Bool,
-                Age,   Int)
+              Hired, Bool,
+              Age,   Int)
 
-@interface MACTestEnumerator: XCTestCase
+@interface MACTestEnumerator: RLMTestCase
 @end
 @implementation MACTestEnumerator
 
@@ -27,9 +27,8 @@ REALM_TABLE_2(EnumPeopleTable2,
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
-    [[NSFileManager defaultManager] removeItemAtPath:[RLMContext defaultPath] error:nil];
     
-    [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
         // Create new table in realm
         EnumPeopleTable *people = [realm createTableWithName:@"employees" asTableClass:[EnumPeopleTable class]];
         
@@ -42,8 +41,8 @@ REALM_TABLE_2(EnumPeopleTable2,
         return YES;
     } error:nil];
     
-    EnumPeopleTable *people = [[RLMRealm realmWithDefaultPersistence] tableWithName:@"employees"
-                                                                       asTableClass:[EnumPeopleTable class]];
+    EnumPeopleTable *people = [[self realmPersistedAtTestPath] tableWithName:@"employees"
+                                           asTableClass:[EnumPeopleTable class]];
 
     //------------------------------------------------------
     NSLog(@"--- Iterators ---");
@@ -63,8 +62,7 @@ REALM_TABLE_2(EnumPeopleTable2,
     }
 
     // 3: Iterate over query (lazy)
-
- EnumPeopleTableQuery *q = [[people where].Age columnIsEqualTo:21];
+    EnumPeopleTableQuery *q = [[people where].Age columnIsEqualTo:21];
     NSLog(@"Query lazy count: %zu", [q countRows] );
     for (EnumPeopleTableRow *row in q) {
         NSLog(@"(Enum3) %@ is %lld years old.", row.Name, row.Age);

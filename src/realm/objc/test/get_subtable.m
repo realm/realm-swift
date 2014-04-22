@@ -5,7 +5,7 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMRealm.h>
@@ -25,7 +25,7 @@ REALM_TABLE_2(WrongTypeTable,
                 Age,   Bool)
 
 
-@interface MACTestGetSubtable: XCTestCase
+@interface MACTestGetSubtable: RLMTestCase
 @end
 @implementation MACTestGetSubtable
 

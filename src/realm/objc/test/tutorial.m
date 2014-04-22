@@ -5,7 +5,7 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
 
@@ -27,7 +27,7 @@ REALM_TABLE_IMPL_2(PeopleTable2,
                    Hired, Bool,
                    Age,   Int)
 
-@interface MACTestTutorial: XCTestCase
+@interface MACTestTutorial: RLMTestCase
 
 @end
 
@@ -35,17 +35,11 @@ REALM_TABLE_IMPL_2(PeopleTable2,
 
 - (void)testTutorial
 {
-    NSFileManager *fm = [NSFileManager defaultManager];
-    
-    // Delete realm file
-    [fm removeItemAtPath:@"employees.realm" error:nil];
-    
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    RLMContext *context = [RLMContext contextPersistedAtPath:@"employees.realm"
-                                                       error:nil];
+    RLMContext *context = [self contextPersistedAtTestPath];
     
     [context writeUsingBlock:^BOOL(RLMRealm *realm) {
         // Create new table in realm
@@ -98,9 +92,7 @@ REALM_TABLE_IMPL_2(PeopleTable2,
         return YES;
     } error:nil];
     
-    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:@"employees.realm"];
-    
-    PeopleTable *people = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
+    PeopleTable *people = [[self realmPersistedAtTestPath] tableWithName:@"employees" asTableClass:[PeopleTable class]];
     
     NSLog(@"%lu rows after remove.  [5]", [people rowCount]);  // 5
     XCTAssertEqual([people rowCount], (NSUInteger)5,@"rows should be 5");

@@ -18,7 +18,7 @@
  *
  **************************************************************************/
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
 
@@ -36,7 +36,7 @@ REALM_TABLE_9(TestTableAllTypes,
                 TableCol,  TestTableSub,
                 MixedCol,  Mixed)
 
-@interface TDBTypedTableTests: XCTestCase
+@interface TDBTypedTableTests: RLMTestCase
   // Intentionally left blank.
   // No new public instance methods need be defined.
 @end

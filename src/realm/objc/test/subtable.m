@@ -5,7 +5,7 @@
 //  Test save/load on disk of a realm with one table
 //
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
 
@@ -18,21 +18,14 @@ REALM_TABLE_3(TestSubtableMain,
                 Sub,    TestSubtableSub,
                 Second, Int)
 
-@interface MACTestSubtable: XCTestCase
+@interface MACTestSubtable: RLMTestCase
 
 @end
 
 @implementation MACTestSubtable
 
 - (void)testSubtable {
-    NSFileManager *fm = [NSFileManager defaultManager];
-    
-    // Delete realm file
-    [fm removeItemAtPath:@"employees.realm" error:nil];
-    RLMContext *context = [RLMContext contextPersistedAtPath:@"employees.realm"
-                                                       error:nil];
-    
-    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
         // Create new table in realm
         TestSubtableMain *people = [realm createTableWithName:@"employees" asTableClass:[TestSubtableMain class]];
         
@@ -49,5 +42,3 @@ REALM_TABLE_3(TestSubtableMain,
 }
 
 @end
-
-

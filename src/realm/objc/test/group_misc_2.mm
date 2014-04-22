@@ -5,7 +5,7 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMRealm.h>
@@ -35,7 +35,7 @@ REALM_TABLE_2(QueryTable,
               First,  Int,
               Second, String)
 
-@interface MACTestRealmMisc2: XCTestCase
+@interface MACTestRealmMisc2: RLMTestCase
 
 @end
 
@@ -43,12 +43,7 @@ REALM_TABLE_2(QueryTable,
 
 - (void)testRealm_Misc2
 {
-    NSFileManager* fm = [NSFileManager defaultManager];
-    
-    // Delete realm file
-    [fm removeItemAtPath:@"employees.realm" error:nil];
-    RLMContext *context = [RLMContext contextPersistedAtPath:@"employees.realm"
-                                                       error:nil];
+    RLMContext *context = [self contextPersistedAtTestPath];
     
     NSError *error = nil;
     [context writeUsingBlock:^BOOL(RLMRealm *realm) {
@@ -114,7 +109,7 @@ REALM_TABLE_2(QueryTable,
     //------------------------------------------------------
 
     // Load a realm from disk (and print contents)
-    RLMRealm * fromDisk = [RLMRealm realmWithPersistenceToFile:@"employees.realm"];
+    RLMRealm * fromDisk = [self realmPersistedAtTestPath];
     MyTable* diskTable = [fromDisk tableWithName:@"employees" asTableClass:[MyTable class]];
 
     NSLog(@"Disktable size: %zu", diskTable.rowCount);
@@ -127,11 +122,7 @@ REALM_TABLE_2(QueryTable,
 
 - (void)testQuery
 {
-    NSFileManager* fm = [NSFileManager defaultManager];
-    
-    // Delete realm file
-    [fm removeItemAtPath:[RLMContext defaultPath] error:nil];
-    [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
         QueryTable *table = [realm createTableWithName:@"Query table" asTableClass:[QueryTable class]];
         
         // Add some rows
@@ -142,8 +133,7 @@ REALM_TABLE_2(QueryTable,
         return YES;
     } error:nil];
     
-    RLMRealm *realm = [RLMRealm realmWithDefaultPersistence];
-    QueryTable *table = [realm tableWithName:@"Query table" asTableClass:[QueryTable class]];
+    QueryTable *table = [[self realmPersistedAtTestPath] tableWithName:@"Query table" asTableClass:[QueryTable class]];
 
     {
         QueryTableQuery* q = [[table where].First columnIsBetween:3 :7]; // Between
@@ -190,11 +180,7 @@ REALM_TABLE_2(QueryTable,
  */
 - (void)testSubtables
 {
-    NSFileManager* fm = [NSFileManager defaultManager];
-    
-    // Delete realm file
-    [fm removeItemAtPath:[RLMContext defaultPath] error:nil];
-    [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
         RLMTable *table = [realm createTableWithName:@"table" asTableClass:[RLMTable class]];
         
         // Specify the table type

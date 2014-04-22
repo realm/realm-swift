@@ -34,6 +34,7 @@
 		4DB1DEFC18BF70AE005A7234 /* functional.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF918BF70AE005A7234 /* functional.m */; };
 		4DB1DEFD18BF70AE005A7234 /* typed_table.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEFA18BF70AE005A7234 /* typed_table.m */; };
 		4DDDD67418EB049300E94613 /* RLMViewProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DDDD67318EB049300E94613 /* RLMViewProtocol.h */; };
+		E8748AE51906DE530047DF0C /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = E8748AE41906DE530047DF0C /* RLMTestCase.m */; };
 		E918909D177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		E91890B0177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		E91890B3177B677900653D7A /* RealmObjcDyn.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E9189099177B677900653D7A /* RealmObjcDyn.dylib */; };
@@ -108,6 +109,8 @@
 		4DDDD67018EAF1C000E94613 /* RLMRowFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMRowFast.h; path = ../src/realm/objc/RLMRowFast.h; sourceTree = SOURCE_ROOT; };
 		4DDDD67218EAF22100E94613 /* RLMFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMFast.h; path = ../src/realm/objc/RLMFast.h; sourceTree = SOURCE_ROOT; };
 		4DDDD67318EB049300E94613 /* RLMViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMViewProtocol.h; path = ../src/realm/objc/RLMViewProtocol.h; sourceTree = SOURCE_ROOT; };
+		E8748AE31906DE530047DF0C /* RLMTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTestCase.h; path = ../../src/realm/objc/test/RLMTestCase.h; sourceTree = "<group>"; };
+		E8748AE41906DE530047DF0C /* RLMTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTestCase.m; path = ../../src/realm/objc/test/RLMTestCase.m; sourceTree = "<group>"; };
 		E9189099177B677900653D7A /* RealmObjcDyn.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = RealmObjcDyn.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		E918909C177B677900653D7A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		E918909F177B677900653D7A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -262,6 +265,8 @@
 		E91890B4177B677900653D7A /* RealmObjcDynTests */ = {
 			isa = PBXGroup;
 			children = (
+				E8748AE31906DE530047DF0C /* RLMTestCase.h */,
+				E8748AE41906DE530047DF0C /* RLMTestCase.m */,
 				E91890E7177B71E400653D7A /* data_type.mm */,
 				4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */,
 				E91890E8177B71E400653D7A /* enumerator.m */,
@@ -372,9 +377,10 @@
 		E9189091177B677900653D7A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				CLASSPREFIX = RLM;
 				LastTestingUpgradeCheck = 0510;
 				LastUpgradeCheck = 0510;
-				ORGANIZATIONNAME = "Thomas Andersen";
+				ORGANIZATIONNAME = Realm;
 			};
 			buildConfigurationList = E9189094177B677900653D7A /* Build configuration list for PBXProject "RealmObjcDyn" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -454,6 +460,7 @@
 				E91890FA177B71E400653D7A /* group.m in Sources */,
 				E91890FB177B71E400653D7A /* mixed.mm in Sources */,
 				E91890FC177B71E400653D7A /* query.m in Sources */,
+				E8748AE51906DE530047DF0C /* RLMTestCase.m in Sources */,
 				E91890FD177B71E400653D7A /* shared_group.m in Sources */,
 				E91890FE177B71E400653D7A /* subtable.m in Sources */,
 				4DB1DEFC18BF70AE005A7234 /* functional.m in Sources */,

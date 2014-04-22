@@ -3,7 +3,7 @@
 //  TightDB
 //
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMQueryFast.h>
@@ -22,7 +22,7 @@ REALM_TABLE_9(TestQueryAllTypes,
                 TableCol,  TestQuerySub,
                 MixedCol,  Mixed)
 
-@interface MACtestQuery: XCTestCase
+@interface MACtestQuery: RLMTestCase
 @end
 @implementation MACtestQuery
 
