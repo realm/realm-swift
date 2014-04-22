@@ -315,7 +315,7 @@ using namespace std;
 
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex
 {
-    [self setRow:newValue atIndex:rowIndex]; //Exceptions handled here
+    [self updateRow:newValue atIndex:rowIndex]; //Exceptions handled here. This should also call setRow:atIndex: when util.mm methods refactored.
 }
 
 -(RLMRow *)objectForKeyedSubscript:(NSString *)key
@@ -343,7 +343,7 @@ using namespace std;
     RLMRow* row = self[key]; // Exceptions handled here
     
     if (row) {
-        [self setRow:newValue atIndex:[row RLM_index]];
+        [self updateRow:newValue atIndex:[row RLM_index]]; // This should call setRow:atIndex: when util.mm methods refactored
     }
 //    else { // Commenting this out. Currently only support keyed subscripts for updating. Uncomment this when util.mm implements set and update methods.
 //        [self addRow:newValue];
@@ -440,7 +440,7 @@ using namespace std;
                                  userInfo:nil];
 }
 
-- (void)setRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
+- (void)updateRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
 {
     if (rowIndex >= self.rowCount) {
         @throw [NSException exceptionWithName:@"realm:index_out_of_bounds"
@@ -455,6 +455,7 @@ using namespace std;
     tightdb::Table& table = *m_table;
     tightdb::ConstDescriptorRef desc = table.get_descriptor();
     
+    // These should call update_row. Will re-implement set_row() when setRow:atIndex is implemented.
     if ([anObject isKindOfClass:[NSArray class]]) {
         verify_row(*desc, (NSArray *)anObject);
         set_row(size_t(rowIndex), table, (NSArray*)anObject);
