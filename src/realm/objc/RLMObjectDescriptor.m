@@ -57,6 +57,13 @@ static NSMutableDictionary * s_descriptorCache;
     NSString * className = NSStringFromClass(objectClass);
     if (s_descriptorCache[className]) return s_descriptorCache[className];
     
+    // check if proxy
+    if ([className hasPrefix:@"RLMProxy_"]) {
+        NSString * proxiedClassName = [className stringByReplacingOccurrencesOfString:@"RLMProxy_" withString:@""];
+        s_descriptorCache[className] = s_descriptorCache[proxiedClassName];
+        return s_descriptorCache[className];
+    }
+    
     // get object properties
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
@@ -69,7 +76,6 @@ static NSMutableDictionary * s_descriptorCache;
             // if a table and we don't already know the object class figure out now
             if (prop.type == RLMTypeTable && !prop.subtableObjectClass) {
                 prop.subtableObjectClass = [objectClass subtableObjectClassForProperty:prop.name];
-                // TODO - throw exception if no object class
             }
             [propArray addObject:prop];
         }
