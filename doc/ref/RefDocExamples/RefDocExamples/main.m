@@ -6,7 +6,6 @@
 int main(int argc, char * argv[])
 {
     @autoreleasepool {
-        ex_objc_group_intro();
         ex_objc_query_dynamic_intro();
         ex_objc_query_typed_intro();
         ex_objc_context_intro();
