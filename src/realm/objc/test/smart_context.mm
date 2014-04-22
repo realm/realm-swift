@@ -87,7 +87,7 @@ REALM_TABLE_1(RLMSmartContextTable,
     XCTAssertNotNil(table, @"pre-existing typed table read from RLMSmartContext should not be nil");
     XCTAssertEqual([table class],
                    [RLMSmartContextTable class],
-                   @"pre-existing typed table read from RLMSmartContext should be of class RLMTable");
+                   @"pre-existing typed table read from RLMSmartContext should be of class RLMSmartContextTable");
 }
 
 - (void)testTableCreatedAfterSmartContextStarted {
