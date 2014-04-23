@@ -42,6 +42,12 @@
                         notificationCenter:(NSNotificationCenter *)notificationCenter
                                      error:(NSError **)error;
 
++ (instancetype)realmWithPersistenceToFile:(NSString *)path
+                                 initBlock:(RLMWriteBlock)initBlock
+                                   runLoop:(NSRunLoop *)runLoop
+                        notificationCenter:(NSNotificationCenter *)notificationCenter
+                                     error:(NSError **)error;
+
 @property (nonatomic, readonly) NSUInteger tableCount;
 @property (nonatomic, readonly) BOOL       isEmpty;
 

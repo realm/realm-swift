@@ -115,7 +115,7 @@ REALM_TABLE_1(RLMTestTable,
 - (void)testRealmWithArgumentsOnDifferentThreadDoesntThrow {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         XCTAssertNoThrow([RLMRealm realmWithPersistenceToFile:RLMTestRealmPath
-                                                      runLoop:[NSRunLoop mainRunLoop]
+                                                      runLoop:[NSRunLoop currentRunLoop]
                                            notificationCenter:[NSNotificationCenter defaultCenter]
                                                         error:nil],
                          @"Calling +realmWithPersistenceToFile:runLoop:notificationCenter:error: \
@@ -152,6 +152,18 @@ REALM_TABLE_1(RLMTestTable,
                                                  initBlock:^(RLMRealm *realm) {
                                                      [realm createTableWithName:@"table"];
                                                  }];
+    XCTAssertTrue([realm hasTableWithName:@"table"], @"Realm created with initBlock \
+                  should have run the init block before returning the realm.");
+}
+
+- (void)testInitBlockOnDifferentThread {
+    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:RLMTestRealmPath
+                                                 initBlock:^(RLMRealm *realm) {
+                                                     [realm createTableWithName:@"table"];
+                                                 }
+                                                   runLoop:[NSRunLoop currentRunLoop]
+                                        notificationCenter:[NSNotificationCenter defaultCenter]
+                                                     error:nil];
     XCTAssertTrue([realm hasTableWithName:@"table"], @"Realm created with initBlock \
                   should have run the init block before returning the realm.");
 }
