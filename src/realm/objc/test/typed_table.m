@@ -59,6 +59,17 @@ RLM_DEFINE_TABLE_TYPE_FOR_OJBECT_TYPE(AllTypesTable, AllTypes)
   // No new public instance methods need be defined.
 @end
 
+
+@interface KeyedObject : RLMRow
+@property NSString * name;
+@property int objID;
+@end
+
+@implementation KeyedObject
+@end
+
+RLM_DEFINE_TABLE_TYPE_FOR_OJBECT_TYPE(KeyedTable, KeyedObject)
+
 @implementation RLMTypedTableTests
 
 - (void)testDataTypes_Typed
@@ -173,10 +184,11 @@ RLM_DEFINE_TABLE_TYPE_FOR_OJBECT_TYPE(AllTypesTable, AllTypes)
     XCTAssertThrows([table setObjectClass:NSObject.class], @"Types not descendent from RLMRow should throw");
 }
 
-/*
+
 - (void)testTableTyped_KeyedSubscripting
 {
-    RLMTable* table = [[RLMTable alloc] init];
+    KeyedTable* table = [[KeyedTable alloc] init];
+    [table setObjectClass:KeyedObject.class];
     
     [table addRow:@{@"name" : @"Test1", @"objID" : @24}];
     [table addRow:@{@"name" : @"Test2", @"objID" : @25}];
@@ -191,8 +203,10 @@ RLM_DEFINE_TABLE_TYPE_FOR_OJBECT_TYPE(AllTypesTable, AllTypes)
     
     XCTAssertNil(table[@"foo"], @"table[\"foo\"] should be nil");
     
-    TestTableKeyedSubscriptError* errTable = [[TestTableKeyedSubscriptError alloc] init];
-    [errTable addRow:@{@"id" : @987289}];
+    AgeTable* errTable = [[AgeTable alloc] init];
+    [errTable setObjectClass:Sub.class];
+    
+    [errTable addRow:@{@"age" : @987289}];
     XCTAssertThrows(errTable[@"X"], @"Accessing RLMRow via keyed subscript on a column that is not of type RLMTypeString should throw exception");
     
     // Test keyed subscripting setters
@@ -238,5 +252,5 @@ RLM_DEFINE_TABLE_TYPE_FOR_OJBECT_TYPE(AllTypesTable, AllTypes)
     XCTAssertThrows((errTable[@"SomeKey"] = @{@"id" : @821763}), @"Calling keyed subscriptor on errTable should throw exception");
     XCTAssertEqual(previousRowCount, [errTable rowCount], @"errTable should have same count as previous");
 }
-*/
+
 @end
