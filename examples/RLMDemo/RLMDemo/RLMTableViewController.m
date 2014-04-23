@@ -8,7 +8,7 @@
 #import "RLMTableViewController.h"
 #import <Realm/Realm.h>
 
-// @@Example: create_table @@
+// @@Example: declare_table @@
 // Define table with two columns
 
 REALM_TABLE_2(RLMDemoTable,
