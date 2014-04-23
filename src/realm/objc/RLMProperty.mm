@@ -252,7 +252,7 @@ s_columnAccessors[CHAR] = ColumnFuncsEnumerator<NUM_COLUMN_ACCESSORS, TYPE>::enu
 }
 
 // add dynamic property getters/setters to the given class
--(void)addToClass:(Class)cls existing:(NSSet *)existing column:(int)column
+-(void)addToClass:(Class)cls column:(int)column
 {
     // generate getter sel
     // TODO - support custom accessor names

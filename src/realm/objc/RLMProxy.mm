@@ -25,17 +25,6 @@
 
 static NSMutableDictionary *s_proxyClassNameCache;
 
-NSSet *selectorNamesForClass(Class cls) {
-    unsigned int outCount;
-    Method *methods = class_copyMethodList(cls, &outCount);
-    NSMutableSet *set = [NSMutableSet setWithCapacity:outCount];
-    for (unsigned int i = 0; i < outCount; i++) {
-        [set addObject:NSStringFromSelector(method_getName(methods[i]))];
-    }
-    free(methods);
-    return set;
-}
-
 // determine if class is a or a descendent of class2
 BOOL is_class_subclass(Class class1, Class class2) {
     while (class1) {
@@ -84,10 +73,9 @@ BOOL is_class_subclass(Class class1, Class class2) {
         NSString *objectClassName = NSStringFromClass(objectClass);
         if (!s_proxyClassNameCache[objectClassName]) {
             RLMObjectDescriptor *descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
-            NSSet *selectorNames = selectorNamesForClass(objectClass);
             for (unsigned int propNum = 0; propNum < descriptor.properties.count; propNum++) {
                 RLMProperty *prop = descriptor.properties[propNum];
-                [prop addToClass:objectClass existing:selectorNames column:propNum];
+                [prop addToClass:objectClass column:propNum];
             }
             s_proxyClassNameCache[objectClassName] = objectClassName;
         }
