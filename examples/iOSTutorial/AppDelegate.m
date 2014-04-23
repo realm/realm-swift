@@ -85,29 +85,16 @@ void tableFunc() {
 
     // @@Example: advanced_search @@
     // Create query (current employees between 20 and 30 years old)
-
-    PeopleTableQuery *query = [[[[[[[[people where].Age columnIsBetween:20 :35]
-                                                   .Name columnContains:@"a"]
-                                                   group]
-                                                      .Hired columnIsEqualTo:YES]
-                                                      Or]
-                                                      .Name columnEndsWith:@"y"]
-                                                   endGroup];
+    
+    RLMView* view = [people where:@"Age > 20 && Age < 35 && Hired == YES"];
 
     // Get number of matching entries
-    NSUInteger cnt3 = [query countRows];                 // =&gt; 2
+    NSUInteger cnt3 = [view rowCount];                 // =&gt; 2
     NSLog(@"RowCount: %i", cnt3);
 
-    // You can do aggregates on columns, like calculating the average age
-    double avg = [query.Age avg];
-    NSLog(@"Avg age: %f", avg);
-
-    // Execute the query and return a table (view)
-    PeopleTableView *view = [query findAll];
-
     // fast emunaration on view
-    for (PeopleTableRow* row in view)
-        NSLog(@"%@ is %lld years old", row.Name, row.Age);
+    for (RLMRow* row in view)
+        NSLog(@"%@ is %@ years old", row[@"Name"], row[@"Age"]);
     // @@EndExample@@
 
 }
