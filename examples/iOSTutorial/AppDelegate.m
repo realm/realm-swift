@@ -122,7 +122,7 @@ void sharedGroupFunc() {
                                                             error:nil];
 
     // Start a write transaction
-    [context writeUsingBlock:^BOOL(RLMTransaction *transaction) {
+    [context writeUsingBlock:^(RLMTransaction *transaction) {
         // Get a specific table from the realm
         PeopleTable *table = [transaction createTableWithName:@"employees"
                                                  asTableClass:[PeopleTable class]];
@@ -130,8 +130,7 @@ void sharedGroupFunc() {
         // Add a row
         [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
         NSLog(@"Row added!");
-        return YES; // Commit (NO would rollback)
-    } error:nil];
+    }];
 
     // Start a read transaction
     [context readUsingBlock:^(RLMTransaction *transaction) {
