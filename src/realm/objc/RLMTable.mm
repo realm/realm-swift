@@ -50,6 +50,16 @@ using namespace std;
     RLMRow * m_tmp_row;
 }
 
+-(instancetype)initWithObjectClass:(Class)objectClass
+{
+    self = [super init];
+    if (self) {
+        m_read_only = NO;
+        m_table = tightdb::Table::create(); // FIXME: May throw
+        [self setObjectClass:objectClass];
+    }
+    return self;
+}
 
 
 -(instancetype)init

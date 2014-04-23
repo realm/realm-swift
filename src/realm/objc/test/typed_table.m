@@ -56,6 +56,9 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AllTypesTable, AllTypes)
 @implementation InvalidType
 @end
 
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(InvalidTable, InvalidType)
+
+
 @interface RLMTypedTableTests: XCTestCase
   // Intentionally left blank.
   // No new public instance methods need be defined.
@@ -78,7 +81,6 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 {
     // create table and set object class
     AllTypesTable *table = [[AllTypesTable alloc] init];
-    [table setObjectClass:AllTypes.class];
     
     NSLog(@"Table: %@", table);
     XCTAssertNotNil(table, @"Table is nil");
@@ -101,10 +103,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
     NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
     AgeTable *subtab1 = [[AgeTable alloc] init];
-    [subtab1 setObjectClass:Sub.class];
-
     AgeTable *subtab2 = [[AgeTable alloc] init];
-    [subtab2 setObjectClass:Sub.class];
 
     [subtab1 addRow:@[@200]]; // NOTE: the name is simply add+name of first column!
     [subtab2 addRow:@[@100]];
@@ -131,8 +130,8 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 
     XCTAssertEqual(row1.boolCol, NO,                 @"row1.BoolCol");
     XCTAssertEqual(row2.boolCol, YES,                @"row2.BoolCol");
-    XCTAssertEqual(row1.intCol, (int)54,             @"row1.IntCol");
-    XCTAssertEqual(row2.intCol, (int)506,            @"row2.IntCol");
+    XCTAssertEqual(row1.intCol, 54,             @"row1.IntCol");
+    XCTAssertEqual(row2.intCol, 506,            @"row2.IntCol");
     XCTAssertEqual(row1.floatCol, 0.7f,              @"row1.FloatCol");
     XCTAssertEqual(row2.floatCol, 7.7f,              @"row2.FloatCol");
     XCTAssertEqual(row1.doubleCol, 0.8,              @"row1.DoubleCol");
@@ -172,7 +171,6 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 - (void)testTableTyped_Subscripting
 {
     AgeTable *table = [[AgeTable alloc] init];
-    [table setObjectClass:Sub.class];
     
     // Add some rows
     [table addRow:@[@10]];
@@ -181,15 +179,14 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
     table[0].age = 7;
     
     // Verify that you can access rows with object subscripting
-    XCTAssertEqual(table[0].age, (int64_t)7, @"table[0].age");
-    XCTAssertEqual(table[1].age, (int64_t)20, @"table[1].age");
+    XCTAssertEqual(table[0].age, 7, @"table[0].age");
+    XCTAssertEqual(table[1].age, 20, @"table[1].age");
 }
 
 - (void)testInvalids
 {
-    AgeTable *table = [[AgeTable alloc] init];
-    XCTAssertThrows([table setObjectClass:InvalidType.class], @"Unsupported types should throw");
-    XCTAssertThrows([table setObjectClass:NSObject.class], @"Types not descendent from RLMRow should throw");
+    XCTAssertThrows([[InvalidTable alloc] init], @"Unsupported types should throw");
+    XCTAssertThrows([[RLMTable alloc] initWithObjectClass:NSObject.class], @"Types not descendent from RLMRow should throw");
 }
 
 
