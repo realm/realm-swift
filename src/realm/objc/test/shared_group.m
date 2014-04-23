@@ -8,6 +8,8 @@
 #import "RLMTestCase.h"
 
 #import <realm/objc/RLMFast.h>
+#import <realm/objc/RLMTableFast.h>
+#import <realm/objc/RLMViewFast.h>
 #import <realm/objc/RLMRealm.h>
 
 REALM_TABLE_2(SharedTable2,
