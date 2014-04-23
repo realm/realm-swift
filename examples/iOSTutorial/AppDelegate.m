@@ -122,7 +122,7 @@ void sharedGroupFunc() {
                                                             error:nil];
 
     // Start a write transaction
-    [context writeUsingBlock:^BOOL(RLMTransaction *transaction) {
+    [context writeUsingBlock:^(RLMTransaction *transaction) {
         // Get a specific table from the realm
         PeopleTable *table = [transaction createTableWithName:@"employees"
                                                  asTableClass:[PeopleTable class]];
