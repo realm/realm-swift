@@ -75,7 +75,7 @@
 			containerPortal = E9189091177B677900653D7A /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = E9189098177B677900653D7A;
-			remoteInfo = RealmObjcDyn;
+			remoteInfo = Realm;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -368,7 +368,7 @@
 			dependencies = (
 			);
 			name = Realm;
-			productName = RealmObjcDyn;
+			productName = Realm;
 			productReference = E9189099177B677900653D7A /* Realm.dylib */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
@@ -387,7 +387,7 @@
 				E91890B2177B677900653D7A /* PBXTargetDependency */,
 			);
 			name = RealmTests;
-			productName = RealmObjcDynTests;
+			productName = RealmTests;
 			productReference = E91890AD177B677900653D7A /* RealmTests.xctest */;
 			productType = "com.apple.product-type.bundle";
 		};
