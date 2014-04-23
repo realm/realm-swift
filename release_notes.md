@@ -6,10 +6,6 @@ Objective-C
 -----------
 The Objective-C API has been updated and your code will break!
 
-### Bugfixes:
-
-* none.
-
 ### API breaking changes:
 
 * `???`
@@ -17,6 +13,10 @@ The Objective-C API has been updated and your code will break!
 ### Enhancements:
 
 * `???`
+
+### Bugfixes:
+
+* none.
 
 -------------
 
@@ -26,23 +26,20 @@ The Objective-C API has been updated and your code will break!
 
 
 =============================================================
-0.7.0 Release notes (yyyy—MM-dd)
+0.10.0 Release notes (2014-04-23)
 
 Objective-C
 -----------
 TightDB is now Realm! The Objective-C API has been updated 
 and your code will break!
 
-### Bugfixes:
-
-* none.
-
 ### API breaking changes:
 
-* Changed all class prefixes from TDB to RLM
+* All references to TightDB have been changed to Realm.
+* All prefixes changed from `TDB` to `RLM`.
+* `TDBTransaction` and `TDBSmartContext` have merged into `RLMRealm`
 * Write transactions now take an optional rollback parameter (rather than needing to return a boolean)
-* TDBTransaction and TDBSmartContext have merged into RLMRealm
-* All references to TightDB have been changed to Realm
+* `where` has now been moved from `RLMTable`and `RLMView` to a "fast" interface.
 
 ### Enhancements:
 
@@ -50,18 +47,15 @@ and your code will break!
 * Added keyed subscripting for RLMTable's first column if column is of type RLMTypeString.
 * `setRow:atIndex:` has been added to `RLMTable`
 
--------------
+### Bugfixes:
 
-### Internals:
-
-* `???`
+* None.
 
 
 =============================================================
 0.6.0 Release notes (2014—04-11)
 Objective-C
 -----------
-Description......
 
 ### Bugfixes:
 
