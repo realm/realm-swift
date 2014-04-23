@@ -9,148 +9,112 @@
 //
 
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
-#import <realm/objc/group.h>
-
-#include <tightdb/binary_data.hpp>
-#include <tightdb/table.hpp>
 #import <realm/objc/RLMTable_noinst.h>
 #import <realm/objc/RLMTableFast.h>
 #import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 REALM_TABLE_DEF_3(PeopleErrTable,
-                    Name,  String,
-                    Age,   Int,
-                    Hired, Bool)
+                  Name,  String,
+                  Age,   Int,
+                  Hired, Bool)
 
 REALM_TABLE_IMPL_3(PeopleErrTable,
-                     Name,  String,
-                     Age,   Int,
-                     Hired, Bool)
+                   Name,  String,
+                   Age,   Int,
+                   Hired, Bool)
 
 REALM_TABLE_FAST(PeopleErrTable)
 
 REALM_TABLE_1(TestQueryErrSub,
-                Age,  Int)
+              Age,  Int)
 
 REALM_TABLE_FAST(TestQueryErrSub)
 
 REALM_TABLE_9(TestQueryErrAllTypes,
-                BoolCol,   Bool,
-                IntCol,    Int,
-                FloatCol,  Float,
-                DoubleCol, Double,
-                StringCol, String,
-                BinaryCol, Binary,
-                DateCol,   Date,
-                TableCol,  TestQueryErrSub,
-                MixedCol,  Mixed)
+              BoolCol,   Bool,
+              IntCol,    Int,
+              FloatCol,  Float,
+              DoubleCol, Double,
+              StringCol, String,
+              BinaryCol, Binary,
+              DateCol,   Date,
+              TableCol,  TestQueryErrSub,
+              MixedCol,  Mixed)
 
 REALM_TABLE_FAST(TestQueryErrAllTypes)
 
+@interface MACTestErrHandling: RLMTestCase
 
-
-@interface MACTestErrHandling: XCTestCase
 @end
+
 @implementation MACTestErrHandling
 
-
-
-
-
-- (void)testErrHandling
-{
-    NSError* error = nil;
-
+- (void)testErrHandling {
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
+    NSError* error = nil;
 
-    RLMTransaction * transaction = [RLMTransaction group];
-    // Create new table in group
-    PeopleErrTable* people = [transaction createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        // Create new table in realm
+        PeopleErrTable* people = [realm createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
+        
+        // No longer supports errors, the tes may be redundant
+        // Add some rows
+        
+        [people addName:@"John" Age:20 Hired:YES];
+        [people addName:@"Mary" Age:21 Hired:NO];
+        [people addName:@"Lars" Age:21 Hired:YES];
+        [people addName:@"Phil" Age:43 Hired:NO];
+        [people addName:@"Anni" Age:54 Hired:YES];
+        
+        
+        
+        // Insert at specific position
+        [people insertEmptyRowAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
+        
+        // Getting the size of the table
+        NSLog(@"PeopleErrTable Size: %lu - is %@.    [6 - not empty]", [people rowCount],
+              people.rowCount == 0 ? @"empty" : @"not empty");
+    }];
 
-    // No longer supports errors, the tes may be redundant
-    // Add some rows
-
-    [people addName:@"John" Age:20 Hired:YES];
-    [people addName:@"Mary" Age:21 Hired:NO];
-    [people addName:@"Lars" Age:21 Hired:YES];
-    [people addName:@"Phil" Age:43 Hired:NO];
-    [people addName:@"Anni" Age:54 Hired:YES];
-
-
-
-    // Insert at specific position
-    [people insertEmptyRowAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
-
-    // Getting the size of the table
-    NSLog(@"PeopleErrTable Size: %lu - is %@.    [6 - not empty]", [people rowCount],
-        people.rowCount == 0 ? @"empty" : @"not empty");
-
-    NSFileManager* fm = [NSFileManager defaultManager];
-
-    // Write the group to disk
-    [fm removeItemAtPath:@"peopleErr.realm" error:NULL];
-    error = nil;
-    if (![transaction writeContextToFile:@"peopleErr.realm" error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-        XCTFail(@"No error expected");
-    }
+    XCTAssertNil(error, @"error should be nil after saving a context");
 
     //------------------------------------------------------
     NSLog(@"--- Changing permissions ---");
     //------------------------------------------------------
-
-    NSMutableDictionary* attributes = [NSMutableDictionary dictionaryWithCapacity:1];
-    [attributes setValue:[NSNumber numberWithShort:0444] forKey:NSFilePosixPermissions];
-
+    
     error = nil;
-    [fm setAttributes:attributes ofItemAtPath:@"peopleErr.realm" error:&error];
+    NSFileManager *fm = [NSFileManager defaultManager];
+    [fm setAttributes:@{NSFilePosixPermissions: @(0444)}
+         ofItemAtPath:RLMTestRealmPath
+                error:&error];
     if (error) {
         XCTFail(@"Failed to set readonly attributes");
     }
-
-    //------------------------------------------------------
-    NSLog(@"--- Reopen and manipulate ---");
-    //------------------------------------------------------
-
-    // Load a group from disk (and try to update, even though it is readonly)
-    error = nil;
-    RLMTransaction * fromDisk = [RLMTransaction groupWithFile:@"peopleErr.realm" error:&error];
-    if (error) {
-        NSLog(@"%@", [error localizedDescription]);
-    }
-    else {
-        // This is no longer an error, becuase read/write mode is no longer required per default.
-        // XCTFail(@"Since file cannot be opened, we should have gotten an error here.");
-    }
-
+    
     //------------------------------------------------------
     NSLog(@"--- Make normal again ---");
     //------------------------------------------------------
-
-    [attributes setValue:[NSNumber numberWithShort:0644] forKey:NSFilePosixPermissions];
-
+    
     error = nil;
-    [fm setAttributes:attributes ofItemAtPath:@"peopleErr.realm" error:&error];
+    [fm setAttributes:@{NSFilePosixPermissions: @(0644)}
+         ofItemAtPath:RLMTestRealmPath
+                error:&error];
     if (error) {
         XCTFail(@"Failed to set readonly attributes");
     }
+    
+    RLMRealm *fromDisk = [self realmPersistedAtTestPath];
+    XCTAssertNotNil(fromDisk, @"realm from disk should be valid");
 
-    error = nil;
-    fromDisk = [RLMTransaction groupWithFile:@"peopleErr.realm" error:&error];
-    if (error) {
-        NSLog(@"%@", [error localizedDescription]);
-        XCTFail(@"File should have been possible to open");
-    }
-
-    PeopleErrTable* diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PeopleErrTable class]];
+    PeopleErrTable *diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
     // Fake readonly.
-    [((RLMTable*)diskTable) setReadOnly:true];
+    [((RLMTable*)diskTable) setReadOnly:YES];
 
     NSLog(@"Disktable size: %zu", [diskTable rowCount]);
 
@@ -212,7 +176,7 @@ REALM_TABLE_FAST(TestQueryErrAllTypes)
     }
 
     // Add some rows
-    for (size_t i = 0; i < 15; ++i) {
+    for (NSUInteger i = 0; i < 15; ++i) {
         if (![table RLM_insertInt:0 ndx:i value:i]) {
            // NSLog(@"%@", [error localizedDescription]);
             XCTFail(@"Insert failed.");
@@ -334,16 +298,16 @@ REALM_TABLE_FAST(TestQueryErrAllTypes)
     [table addBoolCol:YES  IntCol:506      FloatCol:7.7     DoubleCol:8.8       StringCol:@"banach"
             BinaryCol:bin2 DateCol:timeNow TableCol:subtab2 MixedCol:subtab2];
 
-    XCTAssertEqual([[[table where].BoolCol   columnIsEqualTo:NO]      countRows], (size_t)1, @"BoolCol equal");
-    XCTAssertEqual([[[table where].IntCol    columnIsEqualTo:54]      countRows], (size_t)1, @"IntCol equal");
-    XCTAssertEqual([[[table where].FloatCol  columnIsEqualTo:0.7f]    countRows], (size_t)1, @"FloatCol equal");
-    XCTAssertEqual([[[table where].DoubleCol columnIsEqualTo:0.8]     countRows], (size_t)1, @"DoubleCol equal");
-    XCTAssertEqual([[[table where].StringCol columnIsEqualTo:@"foo"]  countRows], (size_t)1, @"StringCol equal");
-    XCTAssertEqual([[[table where].BinaryCol columnIsEqualTo:bin1]    countRows], (size_t)1, @"BinaryCol equal");
-    XCTAssertEqual([[[table where].DateCol   columnIsEqualTo:0]       countRows], (size_t)1, @"DateCol equal");
+    XCTAssertEqual([[[table where].BoolCol   columnIsEqualTo:NO]      countRows], (NSUInteger)1, @"BoolCol equal");
+    XCTAssertEqual([[[table where].IntCol    columnIsEqualTo:54]      countRows], (NSUInteger)1, @"IntCol equal");
+    XCTAssertEqual([[[table where].FloatCol  columnIsEqualTo:0.7f]    countRows], (NSUInteger)1, @"FloatCol equal");
+    XCTAssertEqual([[[table where].DoubleCol columnIsEqualTo:0.8]     countRows], (NSUInteger)1, @"DoubleCol equal");
+    XCTAssertEqual([[[table where].StringCol columnIsEqualTo:@"foo"]  countRows], (NSUInteger)1, @"StringCol equal");
+    XCTAssertEqual([[[table where].BinaryCol columnIsEqualTo:bin1]    countRows], (NSUInteger)1, @"BinaryCol equal");
+    XCTAssertEqual([[[table where].DateCol   columnIsEqualTo:0]       countRows], (NSUInteger)1, @"DateCol equal");
     // These are not yet implemented
-    //    XCTAssertEqual([[[table where].TableCol  columnIsEqualTo:subtab1] count], (size_t)1, @"TableCol equal");
-    //    XCTAssertEqual([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (size_t)1, @"MixedCol equal");
+    //    XCTAssertEqual([[[table where].TableCol  columnIsEqualTo:subtab1] count], (NSUInteger)1, @"TableCol equal");
+    //    XCTAssertEqual([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (NSUInteger)1, @"MixedCol equal");
 
     TestQueryErrAllTypesQuery* query = [[table where].BoolCol   columnIsEqualTo:NO];
 
@@ -408,7 +372,7 @@ REALM_TABLE_FAST(TestQueryErrAllTypes)
     [[[table where].BinaryCol columnContains:bin1].BoolCol columnIsEqualTo:NO];
 
     TestQueryErrAllTypesView* view = [[[[table where].DateCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO] findAll];
-    for (size_t i = 0; i < [view rowCount]; i++) {
+    for (NSUInteger i = 0; i < [view rowCount]; i++) {
         NSLog(@"%zu: %c", i, [view rowAtIndex:i].BoolCol);
     }
 
