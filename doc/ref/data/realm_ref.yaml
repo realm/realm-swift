@@ -39,7 +39,8 @@ CATEGORIES:
       DESCR    :
       - TEXT   : &g_realm_constructor_descr
                  >
-                 Creates a stand-alone RLMRealm that lives outside any explicit RLMContext
+                 Creates a stand-alone RLMRealm that lives outside any explicit RLMContext.
+                 Can only be called on the main thread.
       SIGNATURE: "+ (instancetype)realmWithDefaultPersistence"
       RETURN:
         TYPES  : RLMRealm
@@ -69,7 +70,9 @@ CATEGORIES:
       NAME     : "realmWithPersistenceToFile:runLoop:notificationCenter:error:"
       SUMMARY  : *g_realm_constructor_summary
       DESCR    :
-      - TEXT   : *g_realm_constructor_descr
+      - TEXT   : >
+                 Creates a stand-alone RLMRealm that lives outside any explicit RLMContext.
+                 Can be called from any thread.
       SIGNATURE: "+ (instancetype)realmWithPersistenceToFile:(NSString *)path runLoop:(NSRunLoop *)runLoop notificationCenter:(NSNotificationCenter *)notificationCenter error:(NSError **)error"
       PARAMS:
       - NAME   : path
