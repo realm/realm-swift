@@ -47,6 +47,12 @@ RLM_DEFINE_TABLE_TYPE(Sub)
 
 RLM_DEFINE_TABLE_TYPE(AllTypes)
 
+@interface InvalidType : RLMRow
+@property NSDictionary *dict;
+@end
+
+@implementation InvalidType
+@end
 
 @interface RLMTypedTableTests: XCTestCase
   // Intentionally left blank.
@@ -146,7 +152,6 @@ RLM_DEFINE_TABLE_TYPE(AllTypes)
 
 - (void)testTableTyped_Subscripting
 {
-    
     RLMTable<AllTypes> *table = [[RLMTable alloc] init];
     [table setObjectClass:Sub.class];
     
@@ -159,6 +164,13 @@ RLM_DEFINE_TABLE_TYPE(AllTypes)
     // Verify that you can access rows with object subscripting
     XCTAssertEqual([table[0] age], (int64_t)7, @"table[0].age");
     XCTAssertEqual([table[1] age], (int64_t)20, @"table[1].age");
+}
+
+- (void)testInvalids
+{
+    RLMTable<AllTypes> *table = [[RLMTable alloc] init];
+    XCTAssertThrows([table setObjectClass:InvalidType.class], @"Unsupported types should throw");
+    XCTAssertThrows([table setObjectClass:NSObject.class], @"Types not descendent from RLMRow should throw");
 }
 
 /*

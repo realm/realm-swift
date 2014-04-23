@@ -216,7 +216,7 @@ void type_for_property_string(const char *code,
 }
 
 // setup accessor lookup tables (dynamic and generated) and type strings for a given type
-#define RLM_REGISTER_ACCESSOR_TYPE(CHAR, SCHAR, TYPE)   \
+#define RLM_REGISTER_ACCESSOR_FOR_TYPE(CHAR, SCHAR, TYPE)   \
 s_dynamicGetters[CHAR] = (IMP)dynamic_get<TYPE>;        \
 s_dynamicSetters[CHAR] = (IMP)dynamic_set<TYPE>;        \
 s_getterTypeStrings[CHAR] = GETTER_TYPES(SCHAR);        \
@@ -228,13 +228,13 @@ s_columnAccessors[CHAR] = ColumnFuncsEnumerator<NUM_COLUMN_ACCESSORS, TYPE>::enu
 
 // setup lookup tables for each type
 +(void)initialize {
-    RLM_REGISTER_ACCESSOR_TYPE('i', "i", int)
-    RLM_REGISTER_ACCESSOR_TYPE('l', "l", long)
-    RLM_REGISTER_ACCESSOR_TYPE('f', "f", float)
-    RLM_REGISTER_ACCESSOR_TYPE('d', "d", double)
-    RLM_REGISTER_ACCESSOR_TYPE('B', "B", bool)
-    RLM_REGISTER_ACCESSOR_TYPE('@', "@", id)
-    RLM_REGISTER_ACCESSOR_TYPE('s', "s", NSString *)
+    RLM_REGISTER_ACCESSOR_FOR_TYPE('i', "i", int)
+    RLM_REGISTER_ACCESSOR_FOR_TYPE('l', "l", long)
+    RLM_REGISTER_ACCESSOR_FOR_TYPE('f', "f", float)
+    RLM_REGISTER_ACCESSOR_FOR_TYPE('d', "d", double)
+    RLM_REGISTER_ACCESSOR_FOR_TYPE('B', "B", bool)
+    RLM_REGISTER_ACCESSOR_FOR_TYPE('@', "@", id)
+    RLM_REGISTER_ACCESSOR_FOR_TYPE('s', "s", NSString *)
 }
 
 // get accessor lookup code based on objc type and rlm type
@@ -321,7 +321,9 @@ s_columnAccessors[CHAR] = ColumnFuncsEnumerator<NUM_COLUMN_ACCESSORS, TYPE>::enu
     // if nonatomic and prop has a valid type add to our array
     const char *name = property_getName(prop);
     if (type == RLMTypeNone) {
-        NSLog(@"Skipping property '%s' with incompatible type", name);
+        NSString * reason = [NSString stringWithFormat:@"Can't persist property '%s' with incompatible type. "
+                             "Add to ignoredPropertyNames: method to ignore.", name];
+        @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
     }
     else {
         // if nonatomic and valid type, add to array
