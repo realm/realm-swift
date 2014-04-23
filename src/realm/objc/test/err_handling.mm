@@ -13,6 +13,7 @@
 
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMTable_noinst.h>
+#import <realm/objc/RLMTableFast.h>
 
 REALM_TABLE_DEF_3(PeopleErrTable,
                   Name,  String,
@@ -50,7 +51,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     //------------------------------------------------------
     NSError* error = nil;
 
-    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
         PeopleErrTable* people = [realm createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
         
@@ -71,8 +72,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
         // Getting the size of the table
         NSLog(@"PeopleErrTable Size: %lu - is %@.    [6 - not empty]", [people rowCount],
               people.rowCount == 0 ? @"empty" : @"not empty");
-        return YES;
-    } error:&error];
+    }];
 
     XCTAssertNil(error, @"error should be nil after saving a context");
 

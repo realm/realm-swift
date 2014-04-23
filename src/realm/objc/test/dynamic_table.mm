@@ -21,6 +21,7 @@
 #import "RLMTestCase.h"
 
 #import <realm/objc/RLMFast.h>
+#import <realm/objc/RLMTableFast.h>
 #import <realm/objc/RLMTable_noinst.h>
 
 using namespace std;
@@ -61,8 +62,8 @@ using namespace std;
     [table addColumnWithName:@"second" type:RLMTypeInt];
 
     // Verify
-    XCTAssertEqual(RLMTypeInt, [table columnTypeOfColumnWithIndex:0], @"First column not int");
-    XCTAssertEqual(RLMTypeInt, [table columnTypeOfColumnWithIndex:1], @"Second column not int");
+    XCTAssertEqual((RLMType)RLMTypeInt, [table columnTypeOfColumnWithIndex:0], @"First column not int");
+    XCTAssertEqual((RLMType)RLMTypeInt, [table columnTypeOfColumnWithIndex:1], @"Second column not int");
     XCTAssertTrue(([[table nameOfColumnWithIndex:0] isEqualToString:@"first"]), @"First not equal to first");
     XCTAssertTrue(([[table nameOfColumnWithIndex:1] isEqualToString:@"second"]), @"Second not equal to second");
 
@@ -928,15 +929,15 @@ using namespace std;
     [subdesc addColumnWithName:@"TableCol_IntCol" type:RLMTypeInt];
 
     // Verify column types
-    XCTAssertEqual(RLMTypeBool,   [table columnTypeOfColumnWithIndex:0], @"First column not bool");
-    XCTAssertEqual(RLMTypeInt,    [table columnTypeOfColumnWithIndex:1], @"Second column not int");
-    XCTAssertEqual(RLMTypeFloat,  [table columnTypeOfColumnWithIndex:2], @"Third column not float");
-    XCTAssertEqual(RLMTypeDouble, [table columnTypeOfColumnWithIndex:3], @"Fourth column not double");
-    XCTAssertEqual(RLMTypeString, [table columnTypeOfColumnWithIndex:4], @"Fifth column not string");
-    XCTAssertEqual(RLMTypeBinary, [table columnTypeOfColumnWithIndex:5], @"Sixth column not binary");
-    XCTAssertEqual(RLMTypeDate,   [table columnTypeOfColumnWithIndex:6], @"Seventh column not date");
-    XCTAssertEqual(RLMTypeTable,  [table columnTypeOfColumnWithIndex:7], @"Eighth column not table");
-    XCTAssertEqual(RLMTypeMixed,  [table columnTypeOfColumnWithIndex:8], @"Ninth column not mixed");
+    XCTAssertEqual((RLMType)RLMTypeBool,   [table columnTypeOfColumnWithIndex:0], @"First column not bool");
+    XCTAssertEqual((RLMType)RLMTypeInt,    [table columnTypeOfColumnWithIndex:1], @"Second column not int");
+    XCTAssertEqual((RLMType)RLMTypeFloat,  [table columnTypeOfColumnWithIndex:2], @"Third column not float");
+    XCTAssertEqual((RLMType)RLMTypeDouble, [table columnTypeOfColumnWithIndex:3], @"Fourth column not double");
+    XCTAssertEqual((RLMType)RLMTypeString, [table columnTypeOfColumnWithIndex:4], @"Fifth column not string");
+    XCTAssertEqual((RLMType)RLMTypeBinary, [table columnTypeOfColumnWithIndex:5], @"Sixth column not binary");
+    XCTAssertEqual((RLMType)RLMTypeDate,   [table columnTypeOfColumnWithIndex:6], @"Seventh column not date");
+    XCTAssertEqual((RLMType)RLMTypeTable,  [table columnTypeOfColumnWithIndex:7], @"Eighth column not table");
+    XCTAssertEqual((RLMType)RLMTypeMixed,  [table columnTypeOfColumnWithIndex:8], @"Ninth column not mixed");
 
 
     const char bin[4] = { 0, 1, 2, 3 };

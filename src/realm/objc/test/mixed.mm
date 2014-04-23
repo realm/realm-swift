@@ -134,7 +134,7 @@ REALM_TABLE_2(SubMixedTable,
     [tableSub addHired:NO Age:43];
     [tableSub addHired:YES Age:54];
 
-    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
         MixedTable *table = [realm createTableWithName:@"MixedValues" asTableClass:[MixedTable class]];
         NSLog(@"Table: %@", table);
@@ -145,8 +145,7 @@ REALM_TABLE_2(SubMixedTable,
         [table addHired:YES Other:[NSString stringWithUTF8String:"Dave"] Age:54];
         [table addHired:YES Other:tableSub Age:54];
         [table addHired:YES Other:[NSDate date] Age:54];
-        return YES;
-    } error:nil];
+    }];
     
     RLMRealm *realm = [self realmPersistedAtTestPath];
     MixedTable *table = [realm tableWithName:@"MixedValues" asTableClass:[MixedTable class]];

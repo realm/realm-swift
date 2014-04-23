@@ -23,21 +23,19 @@ REALM_TABLE_2(TestTableRealm,
 
 - (void)testRealm {
     RLMContext *context = [self contextPersistedAtTestPath];
-    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [context writeUsingBlock:^(RLMRealm *realm) {
         // Empty realm
         XCTAssertNotNil(realm, @"parameter must be used");
-        return YES;
-    } error:nil];
+    }];
 
     // Load the realm
     RLMRealm *fromDisk = [self realmPersistedAtTestPath];
     XCTAssertTrue(fromDisk, @"Realm from disk should be valid");
 
     // Create new table in realm
-    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [context writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:@"test" asTableClass:[TestTableRealm class]];
-        return YES;
-    } error:nil];
+    }];
 
     RLMRealm *realm = [self realmPersistedAtTestPath];
     TestTableRealm *t = [realm tableWithName:@"test" asTableClass:[TestTableRealm class]];
@@ -47,11 +45,10 @@ REALM_TABLE_2(TestTableRealm,
     XCTAssertEqual(t.rowCount, (NSUInteger)0, @"Should have 0 rows");
 
     // Modify table
-    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [context writeUsingBlock:^(RLMRealm *realm) {
         TestTableRealm *t = [realm tableWithName:@"test" asTableClass:[TestTableRealm class]];
         [t addFirst:@"Test" Second:YES];
-        return YES;
-    } error:nil];
+    }];
 
     // Verify
     RLMRealm *realm2 = [self realmPersistedAtTestPath];
@@ -65,10 +62,9 @@ REALM_TABLE_2(TestTableRealm,
 
 - (void)testRealmTableCount {
     XCTAssertEqual([[self realmPersistedAtTestPath] tableCount], (NSUInteger)0, @"No tables added");
-    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:@"tableName"];
-        return YES;
-    } error:nil];
+    }];
     XCTAssertEqual([[self realmPersistedAtTestPath] tableCount], (NSUInteger)1, @"1 table added");
 }
 

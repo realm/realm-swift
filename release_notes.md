@@ -40,8 +40,9 @@ and your code will break!
 ### API breaking changes:
 
 * Changed all class prefixes from TDB to RLM
-* All references to TightDB have been changed to Realm
+* Write transactions now take an optional rollback parameter (rather than needing to return a boolean)
 * TDBTransaction and TDBSmartContext have merged into RLMRealm
+* All references to TightDB have been changed to Realm
 
 ### Enhancements:
 

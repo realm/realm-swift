@@ -21,10 +21,10 @@ REALM_TABLE_2(SharedTable2,
 @implementation MACTestSharedGroup
 
 - (void)testContext {
-
+    
     // TODO: Update test to include more ASSERTS
     
-    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
         SharedTable2 *table = [realm createTableWithName:@"employees" asTableClass:[SharedTable2 class]];
         NSLog(@"Table: %@", table);
@@ -35,8 +35,7 @@ REALM_TABLE_2(SharedTable2,
         [table addHired:YES Age:54];
         
         NSLog(@"MyTable Size: %lu", [table rowCount]);
-        return YES;
-    } error:nil];
+    }];
     
     // Read-only realm
     RLMContext *fromDisk = [self contextPersistedAtTestPath];
@@ -57,17 +56,16 @@ REALM_TABLE_2(SharedTable2,
         for (NSUInteger i = 0; i < 50; i++) {
             [diskTable addHired:YES Age:i];
         }
-        return YES; // Commit
-    } error:nil];
+    }];
     
-    [fromDisk writeUsingBlock:^(RLMRealm *realm) {
+    [fromDisk writeUsingBlockWithRollback:^(RLMRealm *realm, BOOL *rollback) {
         SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
         NSLog(@"Disktable size: %zu", [diskTable rowCount]);
         for (NSUInteger i = 0; i < 50; i++) {
             [diskTable addHired:YES Age:i];
         }
-        return NO; // rollback
-    } error:nil];
+        *rollback = YES;
+    }];
     
     [fromDisk writeUsingBlock:^(RLMRealm *realm) {
         SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
@@ -77,9 +75,8 @@ REALM_TABLE_2(SharedTable2,
         }
         
         XCTAssertNil([realm tableWithName:@"Does not exist"], @"Table does not exist");
-        return YES; // commit
-    } error:nil];
-
+    }];
+    
     [fromDisk readUsingBlock:^(RLMRealm * realm) {
         SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
         NSLog(@"Disktable size: %zu", [diskTable rowCount]);
@@ -98,10 +95,7 @@ REALM_TABLE_2(SharedTable2,
         
         [t addColumnWithName:@"col0" type:RLMTypeInt];
         [t addRow:@[@10]];
-        
-        return YES;
-        
-    } error:nil];
+    }];
     
     [context readUsingBlock:^(RLMRealm * realm) {
         RLMTable *t = [realm tableWithName:@"table"];
@@ -111,7 +105,7 @@ REALM_TABLE_2(SharedTable2,
 
 - (void)testRealmCreateTableWithColumns
 {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // Check if method throws exception
         XCTAssertNoThrow(([realm createTableWithName:@"Test" columns:@[@"id", @"int"]]), @"Table should not throw exception");
         
@@ -130,7 +124,7 @@ REALM_TABLE_2(SharedTable2,
         XCTAssertTrue([[employeeTable nameOfColumnWithIndex:1] isEqualToString:@"name"], @"Column at index 1 should be name");
         XCTAssertTrue([[employeeTable nameOfColumnWithIndex:2] isEqualToString:@"position"], @"Column at index 0 should be position");
         XCTAssertNoThrow(([employeeTable addRow:@{@"id" : @124312, @"name" : @"Fiel Guhit", @"position" : @"iOS Engineer"}]), @"Adding row should not throw exception");
-    } error:nil];
+    }];
 }
 
 - (void)testReadRealm
@@ -142,19 +136,17 @@ REALM_TABLE_2(SharedTable2,
         
         [t addColumnWithName:@"col0" type:RLMTypeInt];
         [t addRow:@[@10]];
-         
-        return YES;
-    } error:nil];
+    }];
     
     [fromDisk readUsingBlock:^(RLMRealm * realm) {
         RLMTable *t = [realm tableWithName:@"table"];
         
         XCTAssertThrows([t addRow:nil], @"Is in read transaction");
         XCTAssertThrows([t addRow:@[@1]], @"Is in read transaction");
-       
+        
         RLMQuery *q = [t where];
         XCTAssertThrows([q removeRows], @"Is in read transaction");
-
+        
         RLMView *v = [q findAllRows];
         
         XCTAssertThrows([v removeAllRows], @"Is in read transaction");
@@ -171,23 +163,21 @@ REALM_TABLE_2(SharedTable2,
 - (void)testSingleTableTransactions
 {
     RLMContext * ctx = [self contextPersistedAtTestPath];
-
+    
     [ctx writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *t = [realm createTableWithName:@"table"];
         [t addColumnWithName:@"col0" type:RLMTypeInt];
         [t addRow:@[@10]];
-        return YES;
-    } error:nil];
-
+    }];
+    
     [ctx readTable:@"table" usingBlock:^(RLMTable* table) {
         XCTAssertTrue([table rowCount] == 1, @"No rows have been removed");
     }];
-
+    
     [ctx writeTable:@"table" usingBlock:^(RLMTable* table) {
         [table addRow:@[@10]];
-        return YES;
-    } error:nil];
-
+    }];
+    
     [ctx readTable:@"table" usingBlock:^(RLMTable* table) {
         XCTAssertTrue([table rowCount] == 2, @"Rows were added");
     }];
@@ -201,11 +191,10 @@ REALM_TABLE_2(SharedTable2,
     
     [sg writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:@"t"];
-        return YES;
-    } error:nil];
+    }];
     
     XCTAssertFalse([sg hasChangedSinceLastTransaction], @"Context has not been changed by another process");
-
+    
     
     [sg writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *t = [realm tableWithName:@"t"];
@@ -213,8 +202,7 @@ REALM_TABLE_2(SharedTable2,
         [t addRow:nil];
         RLMRow *row = [t lastRow];
         [row setBool:YES inColumnWithIndex:0];
-        return YES;
-    } error:nil];
+    }];
     
     XCTAssertFalse([sg hasChangedSinceLastTransaction], @"Context has not been changed by another process");
     
@@ -225,9 +213,8 @@ REALM_TABLE_2(SharedTable2,
     [sg2 writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *t = [realm tableWithName:@"t"];
         [t addRow:nil]; /* Adding an empty row */
-        return YES;
-    } error:nil];
-
+    }];
+    
     XCTAssertTrue([sg hasChangedSinceLastTransaction], @"Context HAS been changed by another process");
 }
 
@@ -235,16 +222,14 @@ REALM_TABLE_2(SharedTable2,
 {
     RLMContext *c = [self contextPersistedAtTestPath];
     
-    [c writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [c writeUsingBlock:^(RLMRealm *realm) {
         
         XCTAssertThrows([realm createTableWithName:nil], @"name is nil");
         XCTAssertThrows([realm createTableWithName:@""], @"name is empty");
-
+        
         [realm createTableWithName:@"name"];
         XCTAssertThrows([realm createTableWithName:@"name"], @"name already exists");
-        
-        return YES;
-    } error:nil];
+    }];
     
     [c readUsingBlock:^(RLMRealm *realm) {
         
@@ -269,17 +254,15 @@ REALM_TABLE_2(SharedTable2,
         // asking again - this time there is no change
         changed = [context2 pinReadTransactions];
         XCTAssertFalse(changed, @"");
-
+        
         [context2 unpinReadTransactions];
     }
     {   // add something to the db to play with
-        [context1 writeUsingBlock:^BOOL(RLMRealm *realm) {
+        [context1 writeUsingBlock:^(RLMRealm *realm) {
             RLMTable *t1 = [realm createTableWithName:@"test"];
             [t1 addColumnWithName:@"col0" type:RLMTypeBool];
             [t1 addRow:@[@YES]];
-            //t1->add(0, 2, false, "test");
-            return YES;
-        } error:nil];
+        }];
     }
     {   // validate that we can see previous commit from within a new pinned transaction
         BOOL changed = [context2 pinReadTransactions];
@@ -290,12 +273,10 @@ REALM_TABLE_2(SharedTable2,
         }];
     }
     {   // commit new data in another context, without unpinning
-        [context1 writeUsingBlock:^BOOL(RLMRealm *realm) {
+        [context1 writeUsingBlock:^(RLMRealm *realm) {
             RLMTable *t = [realm tableWithName:@"test"];
             [t addRow:@[@NO]];
-            return YES;
-        } error:nil];
-        
+        }];
     }
     {   // validate that we can see previous commit if we're not pinned
         [context1 readUsingBlock:^(RLMRealm *realm) {
@@ -304,7 +285,7 @@ REALM_TABLE_2(SharedTable2,
         }];
         
     }
-     {   // validate that we can NOT see previous commit from within a pinned transaction
+    {   // validate that we can NOT see previous commit from within a pinned transaction
         [context2 readUsingBlock:^(RLMRealm *realm) {
             RLMTable *t = [realm tableWithName:@"test"];
             XCTAssertEqual(t.rowCount, (NSUInteger)1, @"Still only 1 row");
@@ -327,7 +308,7 @@ REALM_TABLE_2(SharedTable2,
     {   // can't unpin if already unpinned
         [context2 unpinReadTransactions];
         XCTAssertThrows([context2 unpinReadTransactions], @"Already unpinned");
-
+        
     }
     {   // can't pin while we're inside a realm
         [context1 readUsingBlock:^(RLMRealm *realm) {
@@ -346,10 +327,9 @@ REALM_TABLE_2(SharedTable2,
     }
     {   // can't start a write transaction while pinned
         [context1 pinReadTransactions];
-        XCTAssertThrows([context1 writeUsingBlock:^BOOL(RLMRealm *realm) {
+        XCTAssertThrows([context1 writeUsingBlock:^(RLMRealm *realm) {
             XCTAssertNotNil(realm, @"Parameter must be used");
-            return YES;
-        } error:nil], @"Can't start write transaction while pinned");
+        }], @"Can't start write transaction while pinned");
         [context1 unpinReadTransactions];
     }
 }

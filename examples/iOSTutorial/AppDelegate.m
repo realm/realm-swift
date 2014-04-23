@@ -6,9 +6,9 @@
 // Define table
 
 REALM_TABLE_3(PeopleTable,
-                Name, String,
-                Age,  Int,
-                Hired, Bool);
+              Name, String,
+              Age,  Int,
+              Hired, Bool);
 
 // Use it in a function
 
@@ -33,8 +33,7 @@ void tableFunc() {
     // @@EndExample@@
 
     // @@Example: number_of_rows @@
-    NSUInteger cnt1 = people.rowCount;                 // =&gt; 6
-    NSLog(@"RowCount: %i", cnt1);
+    NSLog(@"RowCount: %@", @(people.rowCount));        // =&gt; 6
     BOOL empty = people.rowCount == 0;                 // =&gt; NO
     NSLog(@"Table is empty? %d", empty);
     // @@EndExample@@
@@ -67,8 +66,7 @@ void tableFunc() {
 
     // @@Example: deleting_row @@
     [people removeRowAtIndex:2];
-    NSUInteger cnt2 = people.rowCount;                  // =&gt; 5
-    NSLog(@"RowCount: %i", cnt2);
+    NSLog(@"RowCount: %@", @(people.rowCount));        // =&gt; 5
     // @@EndExample@@
 
     // @@Example: iteration @@
@@ -77,10 +75,12 @@ void tableFunc() {
     }
     // @@EndExample@@
 
-    // @@Example: simple_seach @@
-    NSUInteger rowIndex;
-    rowIndex = [people.Name find:@"Philip"];              // =&gt; NSNotFound
-    rowIndex = [people.Name find:@"Mary"];                // =&gt; 1
+    // @@Example: simple_search @@
+    NSLog(@"Philip is at index: %@",
+          @([people.Name find:@"Philip"]));            // =&gt; NSNotFound
+    
+    NSLog(@"Mary is at index: %@",
+          @([people.Name find:@"Mary"]));              // =&gt; 1
     // @@EndExample@@
 
     // @@Example: advanced_search @@
@@ -95,8 +95,7 @@ void tableFunc() {
                                                    endGroup];
 
     // Get number of matching entries
-    NSUInteger cnt3 = [query countRows];                 // =&gt; 2
-    NSLog(@"RowCount: %i", cnt3);
+    NSLog(@"RowCount: %@", @([query countRows]));        // =&gt; 2
 
     // You can do aggregates on columns, like calculating the average age
     double avg = [query.Age avg];
@@ -129,10 +128,9 @@ void sharedGroupFunc() {
                                            asTableClass:[PeopleTable class]];
 
         // Add a row
-        [table addRow:@{@"Name": @"Bill", @"Age":@53, @"Hired":@YES}];
+        [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
         NSLog(@"Row added!");
-        return YES; // Commit (NO would rollback)
-    } error:nil];
+    }];
 
     // Start a read realm
     [context readUsingBlock:^(RLMRealm *realm) {
@@ -155,11 +153,16 @@ void sharedGroupFunc() {
 {
     /* We want to clear out old state before running tutorial */
     NSFileManager *manager = [NSFileManager defaultManager];
-    [manager removeItemAtPath:@"people.tightdb" error:nil];
-    [manager removeItemAtPath:@"people_backup.tightdb" error:nil];
+    [manager removeItemAtPath:@"people.realm" error:nil];
+    [manager removeItemAtPath:@"people_backup.realm" error:nil];
 
     tableFunc();
     sharedGroupFunc();
+    
+    // Setup window and rootVC to silence Xcode warning
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.window.rootViewController = [[UIViewController alloc] init];
+    [self.window makeKeyAndVisible];
     return YES;
 }
 

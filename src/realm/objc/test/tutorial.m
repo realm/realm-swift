@@ -41,7 +41,7 @@ REALM_TABLE_IMPL_2(PeopleTable2,
 
     RLMContext *context = [self contextPersistedAtTestPath];
     
-    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [context writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
         PeopleTable *people = [realm createTableWithName:@"employees" asTableClass:[PeopleTable class]];
         
@@ -88,9 +88,7 @@ REALM_TABLE_IMPL_2(PeopleTable2,
         
         // Delete row
         [people removeRowAtIndex:2];
-        
-        return YES;
-    } error:nil];
+    }];
     
     PeopleTable *people = [[self realmPersistedAtTestPath] tableWithName:@"employees" asTableClass:[PeopleTable class]];
     
@@ -145,7 +143,7 @@ REALM_TABLE_IMPL_2(PeopleTable2,
             [people rowAtIndex:i].Age);
     }
     
-    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [context writeUsingBlock:^(RLMRealm *realm) {
         PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
         [table addName:@"Anni" Age:54 Hired:YES];
         
@@ -155,8 +153,7 @@ REALM_TABLE_IMPL_2(PeopleTable2,
             PeopleTableRow *row = [table rowAtIndex:i];
             NSLog(@"%zu: %@", i, row.Name);
         }
-        return YES;
-    } error:nil];
+    }];
 }
 
 @end

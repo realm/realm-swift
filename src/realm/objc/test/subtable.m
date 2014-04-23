@@ -25,7 +25,7 @@ REALM_TABLE_3(TestSubtableMain,
 @implementation MACTestSubtable
 
 - (void)testSubtable {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
         TestSubtableMain *people = [realm createTableWithName:@"employees" asTableClass:[TestSubtableMain class]];
         
@@ -38,7 +38,7 @@ REALM_TABLE_3(TestSubtableMain,
         TestSubtableSub *subtable = cursor.Sub;
         [subtable addName:@"name" Age:999];
         XCTAssertEqual([subtable rowAtIndex:0].Age, (int64_t)999, @"Age should be 999");
-    } error:nil];
+    }];
 }
 
 @end
