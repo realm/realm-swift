@@ -139,14 +139,14 @@ CATEGORIES:
       - CODE   : ex_objc_typed_table_clear
         DESCR  :
 
-  - g_typed_table_optimize:
-      NAME     : optimize
-      SUMMARY  : *g_table_optimize_summary
-      DESCR    : *g_table_optimize_descr
-      SIGNATURE: (void)optimize
-      EXAMPLES:
-      - CODE   : ex_objc_typed_table_clear
-        DESCR  :
+  # - g_typed_table_optimize:
+  #     NAME     : optimize
+  #     SUMMARY  : *g_table_optimize_summary
+  #     DESCR    : *g_table_optimize_descr
+  #     SIGNATURE: (void)optimize
+  #     EXAMPLES:
+  #     - CODE   : ex_objc_typed_table_clear
+  #       DESCR  :
 
 # TODO?  - g_typed_table_columns:
 # NOT - g_typed_table_columns_const:

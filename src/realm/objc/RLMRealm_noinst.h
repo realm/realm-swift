@@ -20,21 +20,15 @@
 
 #import <Foundation/Foundation.h>
 
+#import "RLMRealm.h"
 
-@interface RLMSmartContext : NSObject
 
-/**
- * Use the main run loop and the default notification center.
- */
-+(RLMSmartContext *)contextWithDefaultPersistence;
+@interface RLMRealm (noinst)
 
-+(RLMSmartContext *)contextWithPersistenceToFile:(NSString *)path;
+- (void)tableRefDidDie;
 
-+(RLMSmartContext *)contextWithPersistenceToFile:(NSString *)path
-                                         runLoop:(NSRunLoop *)runLoop
-                              notificationCenter:(NSNotificationCenter *)notificationCenter
-                                           error:(NSError **)error;
+- (void)checkForChange:(NSTimer *)timer;
 
--(RLMTable *)tableWithName:(NSString *)name;
++ (instancetype)realmWithNativeGroup:(tightdb::Group *)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only;
 
 @end

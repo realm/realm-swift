@@ -18,23 +18,23 @@
  *
  **************************************************************************/
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
 
 REALM_TABLE_1(TestTableSub,
-                age,  Int)
+              age,  Int)
 
 REALM_TABLE_9(TestTableAllTypes,
-                BoolCol,   Bool,
-                IntCol,    Int,
-                FloatCol,  Float,
-                DoubleCol, Double,
-                StringCol, String,
-                BinaryCol, Binary,
-                DateCol,   Date,
-                TableCol,  TestTableSub,
-                MixedCol,  Mixed)
+              BoolCol,   Bool,
+              IntCol,    Int,
+              FloatCol,  Float,
+              DoubleCol, Double,
+              StringCol, String,
+              BinaryCol, Binary,
+              DateCol,   Date,
+              TableCol,  TestTableSub,
+              MixedCol,  Mixed)
 
 REALM_TABLE_2(TestTableKeyedSubscript,
               name, String,
@@ -43,9 +43,8 @@ REALM_TABLE_2(TestTableKeyedSubscript,
 REALM_TABLE_1(TestTableKeyedSubscriptError,
               objID, Int)
 
-@interface RLMTypedTableTests: XCTestCase
-  // Intentionally left blank.
-  // No new public instance methods need be defined.
+@interface RLMTypedTableTests: RLMTestCase
+
 @end
 
 @implementation RLMTypedTableTests
@@ -154,11 +153,11 @@ REALM_TABLE_1(TestTableKeyedSubscriptError,
     
     XCTAssertNotNil(table[@"Test1"], @"table[@\"Test1\"] should not be nil");
     XCTAssertEqualObjects(table[@"Test1"].name, @"Test1", @"table[@\"Test24\"].name should be equal to Test1");
-    XCTAssertEqual(table[@"Test1"].objID, 24, @"table[@\"Test24\"].objID should be equal to @24");
+    XCTAssertEqual((int)table[@"Test1"].objID, 24, @"table[@\"Test24\"].objID should be equal to @24");
     
     XCTAssertNotNil(table[@"Test2"], @"table[@\"Test2\"] should not be nil");
     XCTAssertEqualObjects(table[@"Test2"].name, @"Test2", @"table[@\"Test24\"].name should be equal to Test2");
-    XCTAssertEqual(table[@"Test2"].objID, 25, @"table[@\"Test24\"].objID should be equal to 25");
+    XCTAssertEqual((int)table[@"Test2"].objID, 25, @"table[@\"Test24\"].objID should be equal to 25");
     
     XCTAssertNil(table[@"foo"], @"table[\"foo\"] should be nil");
     
@@ -194,7 +193,7 @@ REALM_TABLE_1(TestTableKeyedSubscriptError,
     XCTAssertEqual(previousRowCount, [table rowCount], @"Row count should still equal previous row count after inserting an existing RLMRow");
     XCTAssertNil(table[@"Test2"], @"table[@\"Test2\"] should be nil");
     XCTAssertNotNil(table[@"Test3"], @"table[@\"Test3\"] should not be nil");
-    XCTAssertEqual(table[@"Test3"].objID, 123, @"table[\"Test3\"].objID should be equal to 123");
+    XCTAssertEqual((int)table[@"Test3"].objID, 123, @"table[\"Test3\"].objID should be equal to 123");
     XCTAssertEqualObjects(table[@"Test3"].name, @"Test3", @"table[\"Test3\"].name should be equal to @\"Test3\"");
     
     // Set existing row to nil for table

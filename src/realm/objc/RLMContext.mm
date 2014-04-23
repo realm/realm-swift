@@ -22,7 +22,7 @@
 #include <tightdb/group_shared.hpp>
 
 #import "RLMContext.h"
-#import "RLMTransaction_noinst.h"
+#import "RLMRealm_noinst.h"
 #import "util_noinst.hpp"
 
 using namespace std;
@@ -91,13 +91,6 @@ NSString *const defaultContextFileName = @"default.realm";
     return shared_group;
 }
 
--(void)dealloc
-{
-#ifdef REALM_DEBUG
-    // NSLog(@"TDBSharedGroup dealloc");
-#endif
-}
-
 -(void)readUsingBlock:(RLMReadBlock)block
 {
     const tightdb::Group* group;
@@ -115,8 +108,8 @@ NSString *const defaultContextFileName = @"default.realm";
         // should throw anything but NSException or derivatives. Note: if the client calls other libraries
         // throwing other kinds of exceptions they will leak back to the client code, if he does not
         // catch them within the block.
-        RLMTransaction * group_2 = [RLMTransaction groupWithNativeGroup:const_cast<tightdb::Group *>(group) isOwned:NO readOnly:YES];
-        block(group_2);
+        RLMRealm *realm = [RLMRealm realmWithNativeGroup:const_cast<tightdb::Group *>(group) isOwned:NO readOnly:YES];
+        block(realm);
 
     }
     @finally {
@@ -126,14 +119,13 @@ NSString *const defaultContextFileName = @"default.realm";
 
 -(void)readTable:(NSString*)tablename usingBlock:(RLMTableReadBlock)block
 {
-    [self readUsingBlock:^(RLMTransaction *trx){
-        RLMTable *table = [trx tableWithName:tablename];
+    [self readUsingBlock:^(RLMRealm *realm){
+        RLMTable *table = [realm tableWithName:tablename];
         block(table);
     }];
 }
 
-
--(BOOL)writeUsingBlock:(RLMWriteBlock)block error:(NSError**)error
+-(void)writeUsingBlock:(RLMWriteBlock)block
 {
     tightdb::Group* group;
     try {
@@ -148,17 +140,53 @@ NSString *const defaultContextFileName = @"default.realm";
                                      userInfo:nil];
     }
 
-    BOOL confirmation = NO;
     @try {
-        RLMTransaction * group_2 = [RLMTransaction groupWithNativeGroup:group isOwned:NO readOnly:NO];
-        confirmation = block(group_2);
+        RLMRealm *realm = [RLMRealm realmWithNativeGroup:group isOwned:NO readOnly:NO];
+        block(realm);
     }
     @catch (NSException* exception) {
         m_shared_group->rollback();
         @throw;
     }
 
-    if (confirmation) {
+    // Required to avoid leaking of core exceptions.
+    try {
+        m_shared_group->commit();
+    }
+    catch (std::exception& ex) {
+        @throw [NSException exceptionWithName:@"realm:core_exception"
+                                       reason:[NSString stringWithUTF8String:ex.what()]
+                                     userInfo:nil];
+    }
+}
+
+
+-(void)writeUsingBlockWithRollback:(RLMWriteBlockWithRollback)block
+{
+    tightdb::Group* group;
+    try {
+        group = &m_shared_group->begin_write();
+    }
+    catch (std::exception& ex) {
+        // File access errors are treated as exceptions here since they should not occur after the shared
+        // group has already beenn successfully opened on the file and memeory mapped. The shared group constructor handles
+        // the excepted error related to file access.
+        @throw [NSException exceptionWithName:@"realm:core_exception"
+                                       reason:[NSString stringWithUTF8String:ex.what()]
+                                     userInfo:nil];
+    }
+
+    BOOL doRollback = NO;
+    @try {
+        RLMRealm *realm = [RLMRealm realmWithNativeGroup:group isOwned:NO readOnly:NO];
+        block(realm, &doRollback);
+    }
+    @catch (NSException* exception) {
+        m_shared_group->rollback();
+        @throw;
+    }
+
+    if (!doRollback) {
         // Required to avoid leaking of core exceptions.
         try {
             m_shared_group->commit();
@@ -168,28 +196,18 @@ NSString *const defaultContextFileName = @"default.realm";
                                            reason:[NSString stringWithUTF8String:ex.what()]
                                          userInfo:nil];
         }
-        return YES;
     }
-
-    // As of now the only kind of error is when the block decides to rollback.
-    // In the future, other kinds may be relevant (network error etc)..
-    // It could be discussed if rollback is an error at all. But, if the method is
-    // returning NO it makes sense the user can check the error an see that it
-    // was caused by a decision of the block to roll back.
-
-    if (error) // allow nil as the error argument
-        *error = make_realm_error(RLMErrorRollback, @"The block code requested a rollback");
-
-    m_shared_group->rollback();
-    return NO;
+    else {
+        m_shared_group->rollback();
+    }
 }
 
--(BOOL)writeTable:(NSString*)tablename usingBlock:(RLMTableWriteBlock)block error:(NSError **)error
+-(void)writeTable:(NSString*)tablename usingBlock:(RLMTableWriteBlock)block
 {
-    return [self writeUsingBlock:^(RLMTransaction *trx){
-        RLMTable *table = [trx tableWithName:tablename];
-        return block(table);
-    } error: error];
+    [self writeUsingBlock:^(RLMRealm *realm){
+        RLMTable *table = [realm tableWithName:tablename];
+        block(table);
+    }];
 }
 
 -(BOOL) hasChangedSinceLastTransaction

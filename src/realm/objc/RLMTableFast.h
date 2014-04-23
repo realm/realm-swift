@@ -18,13 +18,10 @@
  *
  **************************************************************************/
 
-#import <Foundation/Foundation.h>
+#import "RLMTable.h"
 
-#import "RLMTransaction.h"
+@interface RLMTable (Fast)
 
-
-@interface RLMTransaction (noinst)
-
-+(RLMTransaction *)groupWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only;
+-(BOOL)optimize;
 
 @end

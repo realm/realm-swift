@@ -5,21 +5,20 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
-#import <realm/objc/group.h>
 
 REALM_TABLE_3(EnumPeopleTable,
-                Name,  String,
-                Age,   Int,
-                Hired, Bool)
+              Name,  String,
+              Age,   Int,
+              Hired, Bool)
 
 REALM_TABLE_2(EnumPeopleTable2,
-                Hired, Bool,
-                Age,   Int)
+              Hired, Bool,
+              Age,   Int)
 
-@interface MACTestEnumerator: XCTestCase
+@interface MACTestEnumerator: RLMTestCase
 @end
 @implementation MACTestEnumerator
 
@@ -28,16 +27,21 @@ REALM_TABLE_2(EnumPeopleTable2,
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
-    RLMTransaction *group = [RLMTransaction group];
-    // Create new table in group
-    EnumPeopleTable *people = [group createTableWithName:@"employees" asTableClass:[EnumPeopleTable class]];
-
-    // Add some rows
-    [people addName:@"John" Age:20 Hired:YES];
-    [people addName:@"Mary" Age:21 Hired:NO];
-    [people addName:@"Lars" Age:21 Hired:YES];
-    [people addName:@"Phil" Age:43 Hired:NO];
-    [people addName:@"Anni" Age:54 Hired:YES];
+    
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        // Create new table in realm
+        EnumPeopleTable *people = [realm createTableWithName:@"employees" asTableClass:[EnumPeopleTable class]];
+        
+        // Add some rows
+        [people addName:@"John" Age:20 Hired:YES];
+        [people addName:@"Mary" Age:21 Hired:NO];
+        [people addName:@"Lars" Age:21 Hired:YES];
+        [people addName:@"Phil" Age:43 Hired:NO];
+        [people addName:@"Anni" Age:54 Hired:YES];
+    }];
+    
+    EnumPeopleTable *people = [[self realmPersistedAtTestPath] tableWithName:@"employees"
+                                           asTableClass:[EnumPeopleTable class]];
 
     //------------------------------------------------------
     NSLog(@"--- Iterators ---");
@@ -57,8 +61,7 @@ REALM_TABLE_2(EnumPeopleTable2,
     }
 
     // 3: Iterate over query (lazy)
-
- EnumPeopleTableQuery *q = [[people where].Age columnIsEqualTo:21];
+    EnumPeopleTableQuery *q = [[people where].Age columnIsEqualTo:21];
     NSLog(@"Query lazy count: %zu", [q countRows] );
     for (EnumPeopleTableRow *row in q) {
         NSLog(@"(Enum3) %@ is %lld years old.", row.Name, row.Age);
