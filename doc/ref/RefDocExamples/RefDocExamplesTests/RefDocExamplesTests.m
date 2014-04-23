@@ -3,7 +3,7 @@
 //  RefDocExamplesTests
 //
 //  Created by Morten Kjaer on 14/03/14.
-//  Copyright (c) 2014 tightdb. All rights reserved.
+//  Copyright (c) 2014 Realm. All rights reserved.
 //
 
 #import <XCTest/XCTest.h>
