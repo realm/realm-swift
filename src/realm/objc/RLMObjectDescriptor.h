@@ -23,7 +23,7 @@
 
 @class RLMObjectDescriptor;
 
-// schema object represents
+// ordered properties extracted from an object
 @interface RLMObjectDescriptor : NSObject
 
 // array of properties which define a schema

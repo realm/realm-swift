@@ -55,7 +55,9 @@ static NSMutableDictionary * s_descriptorCache;
 
 +(instancetype)descriptorForObjectClass:(Class)objectClass {
     NSString * className = NSStringFromClass(objectClass);
-    if (s_descriptorCache[className]) return s_descriptorCache[className];
+    if (s_descriptorCache[className]) {
+        return s_descriptorCache[className];
+    }
     
     // check if proxy
     if ([className hasPrefix:@"RLMProxy_"]) {
