@@ -97,7 +97,7 @@ using namespace std;
 }
 
 
-- (void)setObjectClass:(Class)objectClass {
+-(void)setObjectClass:(Class)objectClass {
     _objectClass = objectClass;
     _proxyObjectClass = [RLMProxy proxyClassForObjectClass:objectClass];
     RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];

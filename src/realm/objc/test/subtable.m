@@ -18,18 +18,18 @@
 @implementation SubObject
 @end
 
-RLM_DEFINE_TABLE_TYPE(SubObject)
+RLM_DEFINE_TABLE_TYPE_FOR_OJBECT_TYPE(SubTable, SubObject)
 
 @interface MainObject : RLMRow
 @property NSString * First;
-@property RLMTable<SubObject> * Sub;
+@property SubTable * Sub;
 @property int Second;
 @end
 
 @implementation MainObject
 @end
 
-RLM_DEFINE_TABLE_TYPE(MainObject)
+RLM_DEFINE_TABLE_TYPE_FOR_OJBECT_TYPE(MainTable, MainObject)
 
 
 // main and subtable definitions derived from nsobject
@@ -96,7 +96,7 @@ RLM_DEFINE_TABLE_TYPE(MainObject)
     RLMTransaction *group = [RLMTransaction group];
     
     /* Create new table in group */
-    RLMTable<MainObject> *people = [group createTableWithName:@"employees" objectClass:MainObject.class];
+    MainTable *people = [MainTable tableInRealm:group named:@"employees"];
     
     /* FIXME: Add support for specifying a subtable to the 'add'
      method. The subtable must then be copied into the parent
@@ -104,16 +104,16 @@ RLM_DEFINE_TABLE_TYPE(MainObject)
     [people addRow:@[@"first", @[], @8]];
     
     MainObject *cursor = people[0];
-    RLMTable<SubObject> *subtable = cursor.Sub;
+    SubTable *subtable = cursor.Sub;
     [subtable addRow:@[@"name", @999]];
     
-    XCTAssertEqual([subtable[0] Age], (int)999, @"Age should be 999");
+    XCTAssertEqual(subtable[0].Age, (int)999, @"Age should be 999");
     
     // test setter
     
     // test setter
     cursor.Second = 10;
-    XCTAssertEqual([people[0] Second], (int)10, @"Second should be 10");
+    XCTAssertEqual(people[0].Second, (int)10, @"Second should be 10");
 }
 
 - (void)testSubtableSimple {
