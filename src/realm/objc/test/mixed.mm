@@ -5,27 +5,24 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
-#include <time.h>
-#include <string.h>
-
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
-#import <realm/objc/group.h>
 #import <realm/objc/RLMTable_noinst.h>
 
 REALM_TABLE_3(MixedTable,
-                Hired, Bool,
-                Other, Mixed,
-                Age,   Int)
+              Hired, Bool,
+              Other, Mixed,
+              Age,   Int)
 
 REALM_TABLE_2(SubMixedTable,
-                Hired, Bool,
-                Age,   Int)
+              Hired, Bool,
+              Age,   Int)
 
+@interface MACTestMixed : RLMTestCase
 
-@interface MACTestMixed: XCTestCase
 @end
+
 @implementation MACTestMixed
 
 - (void)testMixedEqual
@@ -137,22 +134,26 @@ REALM_TABLE_2(SubMixedTable,
     [tableSub addHired:NO Age:43];
     [tableSub addHired:YES Age:54];
 
-    RLMTransaction *group = [RLMTransaction group];
-    // Create new table in group
-    MixedTable *table = [group createTableWithName:@"MixedValues" asTableClass:[MixedTable class]];
-    NSLog(@"Table: %@", table);
-    // Add some rows
-    [table addHired:YES Other:[NSString stringWithUTF8String:"Jens"] Age:50];
-    [table addHired:YES Other:[NSString stringWithUTF8String:"Aage"] Age:52];
-    [table addHired:YES Other:[NSString stringWithUTF8String:"Joergen"] Age:53];
-    [table addHired:YES Other:[NSString stringWithUTF8String:"Dave"] Age:54];
-    [table addHired:YES Other:tableSub Age:54];
-    [table addHired:YES Other:[NSDate date] Age:54];
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        // Create new table in realm
+        MixedTable *table = [realm createTableWithName:@"MixedValues" asTableClass:[MixedTable class]];
+        NSLog(@"Table: %@", table);
+        // Add some rows
+        [table addHired:YES Other:[NSString stringWithUTF8String:"Jens"] Age:50];
+        [table addHired:YES Other:[NSString stringWithUTF8String:"Aage"] Age:52];
+        [table addHired:YES Other:[NSString stringWithUTF8String:"Joergen"] Age:53];
+        [table addHired:YES Other:[NSString stringWithUTF8String:"Dave"] Age:54];
+        [table addHired:YES Other:tableSub Age:54];
+        [table addHired:YES Other:[NSDate date] Age:54];
+    }];
+    
+    RLMRealm *realm = [self realmPersistedAtTestPath];
+    MixedTable *table = [realm tableWithName:@"MixedValues" asTableClass:[MixedTable class]];
 
     XCTAssertEqual([table rowCount], (NSUInteger)6, @"6 rows expected");
     XCTAssertTrue([table[0].Other isKindOfClass:[NSString class]], @"NSString excepted");
     XCTAssertTrue([table[4].Other isKindOfClass:[RLMTable class]], @"RLMTable excepted");
-    XCTAssertEqual([(RLMTable *)table[4].Other rowCount], (size_t)5,@"Subtable should have 5 rows");
+    XCTAssertEqual([(RLMTable *)table[4].Other rowCount], (NSUInteger)5,@"Subtable should have 5 rows");
     XCTAssertTrue([table[5].Other isKindOfClass:[NSDate class]], @"NSDate excepted");
 
     // Test cast and isClass
@@ -160,7 +161,7 @@ REALM_TABLE_2(SubMixedTable,
     // XCTAssertEquals([tableSub hasSameDescriptorAs:[SubMixedTable class]], YES,@"Unknown table should be of type SubMixedTable");
     tableSub = [tableSub castToTypedTableClass:[SubMixedTable class]];
     NSLog(@"TableSub Size: %lu", [tableSub rowCount]);
-    XCTAssertEqual([tableSub rowCount], (size_t)5,@"Subtable should have 5 rows");
+    XCTAssertEqual([tableSub rowCount], (NSUInteger)5,@"Subtable should have 5 rows");
     NSLog(@"Count int: %lu", [table countRowsWithInt:50 inColumnWithIndex:2]);
     NSLog(@"Max: %lld", [table maxIntInColumnWithIndex:2]);
     NSLog(@"Avg: %.2f", [table avgIntColumnWithIndex:2]);

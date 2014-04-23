@@ -1,4 +1,4 @@
-#import <Tightdb/Tightdb.h>
+#import <Realm/Realm.h>
 
 #import "MyBackgroundThread.h"
 
@@ -7,14 +7,13 @@
 
 - (void)main
 {
-    TDBContext *context =
-        [TDBContext contextPersistedAtPath:[self pathForName:@"demo.tightdb"] error:nil];
+    RLMContext *context = [RLMContext contextPersistedAtPath:[self pathForName:@"demo.realm"] error:nil];
 
     __block int i = 0;
     for (;;) {
         [NSThread sleepForTimeInterval:5.0];
-        [context writeUsingBlock:^(TDBTransaction *transact) {
-            TDBTable *table = [transact tableWithName:@"demo"];
+        [context writeUsingBlock:^(RLMRealm *realm) {
+            RLMTable *table = [realm tableWithName:@"demo"];
             ++i;
             [table firstRow][0] = [NSString stringWithFormat:@"First %i", i];
             table[[table rowCount]/2][0] = [NSString stringWithFormat:@"Middle %i", i];

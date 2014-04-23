@@ -22,7 +22,7 @@
 
 
 /**
- * Posted by RLMSmartContext when it changes, that is when a table is
+ * Posted by RLMRealm when it changes, that is when a table is
  * added, removed, or changed in any way.
  */
 extern NSString *const RLMContextDidChangeNotification;
