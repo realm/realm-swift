@@ -211,19 +211,6 @@ REALM_COLUMN_PROXY_IMPL(CName${j+1}, CType${j+1}) \
 %end for
     return self; \
 } \
--(id)init \
-{ \
-    self = [super init]; \
-    if (!self) \
-        return nil; \
-    if (![self _addColumns]) \
-        return nil; \
-\
-%for $j in range($num_cols)
-    REALM_COLUMN_PROXY_INIT(self, ${j}, CName${j+1}, CType${j+1}); \
-%end for
-    return self; \
-} \
 -(void)add##%slurp
 %for $j in range($num_cols)
 CName${j+1}:(REALM_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
