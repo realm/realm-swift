@@ -2,7 +2,7 @@
 
 This short tutorial to Realm will introduce you to
 commonly used features of Realm. Please refer to the
-<a href="http://www.realm.io/documentation/1/Reference/">reference documentation</a>
+<a href="http://www.tightdb.com/documentation/ObjectiveC_ref/1/Reference/">reference documentation</a>
 for further details.
 
 Realm is a fast embedded database that integrates transparently
@@ -25,14 +25,12 @@ a transactional manner, and Realm distinguish between read and write access.
 ** Executing the tutorial
 
 While you walk through the tutorial below you may find it beneficial to actually execute the code.
-The source code for the tutorial is <a href="http://www.realm.io/downloads&/tutorial-ios.zip">available</a>
-as an iOS project.
 
 ** Creating tables
 
 First, let's create a table with 2 columns using the typed table interface:
 
-@@example create_table @@
+@@example declare_table @@
 
 The <code>REALM_TABLE_2</code> is a macro which creates the appropriate Objective C classes
 including <code>RLMDemoTable</code>.
@@ -61,11 +59,11 @@ make sure the table is only created once.
 When using smart contexts as is the case here, it's important to observe 
 <code>RLMContextDidChangeNotification</code> to know when tables have been updated:
 
-@@example: setup_notifications @@
+@@example setup_notifications @@
 
 Adding a row to a table must be done within a write block on a regular context:
 
-@@example: add_row @@
+@@example add_row @@
 
 The code above highlights the two main ways to add a new row: using an array and 
 using a dictionary. It's important to preserve the order of columns when adding 
@@ -94,7 +92,7 @@ the sample code from this tutorial to play with Realm. It may be helpful to refe
 documentation</a> for more in-depth information about the API.</li>
 
 <li>Feel free to contact <a href="mailto:support@tightdb.com">support</a> 
-href="mailto:support@realm.io">support</a> for help or inspiration
+for help or inspiration
 for help or inspiration to tackling your particular problems - we appreciate 
 your feedback, feature requests and challenges!</li>
 
