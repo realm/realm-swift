@@ -57,6 +57,7 @@
 -(OType *)lastRow;                                          \
 -(OType *)objectAtIndexedSubscript:(NSUInteger)rowIndex;    \
 -(OType *)objectForKeyedSubscript:(NSString *)key;          \
+-(OType *)find:(id)condition;                               \
 @end                                                        \
 @interface TType : RLMTable<OType>                          \
 +(TType *)tableInRealm:(RLMRealm *)rlm named:(NSString *)name;  \
