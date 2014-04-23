@@ -66,7 +66,7 @@
 #define STATIC_ASSERT(test, msg) typedef char _static_assert_ ## msg [ ((test) ? 1 : -1) ];
 
 #define RLM_IMPLEMENT_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)                  \
-STATIC_ASSERT(__INCLUDE_LEVEL__ == 0, RLM_IMPLEMENT_TABLE_used_in_header_file)  \
+STATIC_ASSERT(__INCLUDE_LEVEL__ == 0, RLM_IMPLEMENT_TABLE_used_in_header_file_for##OType)  \
 @implementation TType                                                           \
 +(TType *)tableInRealm:(RLMTransaction *)rlm named:(NSString *)name {           \
     if([rlm hasTableWithName:name]) return (TType *)[rlm tableWithName:name objectClass:OType.class]; \
