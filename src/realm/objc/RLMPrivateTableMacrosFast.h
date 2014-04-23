@@ -30,7 +30,6 @@
 
 #import "RLMTable.h"
 
-
 #define REALM_TABLE_FAST(TableName) \
 @interface TableName (Fast) \
 -(TableName##Query*)where; \

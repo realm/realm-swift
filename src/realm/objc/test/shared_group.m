@@ -8,6 +8,8 @@
 #import <XCTest/XCTest.h>
 
 #import <realm/objc/RLMFast.h>
+#import <realm/objc/RLMTableFast.h>
+#import <realm/objc/RLMViewFast.h>
 #import <realm/objc/RLMTransaction.h>
 #import <realm/objc/group.h>
 
