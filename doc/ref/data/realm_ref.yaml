@@ -35,13 +35,25 @@ CATEGORIES:
       NAME     : "realmWithDefaultPersistence"
       SUMMARY  : &g_realm_constructor_summary
                  >
-                 Creates a stand-alone RLMRealm
+                 Creates a stand-alone RLMRealm with optional initialization block
       DESCR    :
       - TEXT   : &g_realm_constructor_descr
                  >
                  Creates a stand-alone RLMRealm that lives outside any explicit RLMContext.
-                 Can only be called on the main thread.
-      SIGNATURE: "+ (instancetype)realmWithDefaultPersistence"
+                 Can only be called on the main thread. Runs an optional initialization block on a
+                 writable context before returning.
+      SIGNATURE: |
+                 "+ (instancetype)realmWithDefaultPersistence"
+                 "+ (instancetype)realmWithDefaultPersistenceAndInitBlock:(RLMWriteBlock)initBlock"
+      PARAMS:
+      - NAME   : initBlock
+        TYPES  : RLMWriteBlock
+        DESCR  : &g_write_block_param_descr
+                 >
+                 A block of code. The block can modify the tables or add new tables in a
+                 transactional manner.
+                 If using the block with the optional rollback argument, returning with
+                 the rollback parameter set to YES will rollback all changes done in the block.
       RETURN:
         TYPES  : RLMRealm
         DESCR  : A realm mapped to a file at the default path.
@@ -53,13 +65,18 @@ CATEGORIES:
       SUMMARY  : *g_realm_constructor_summary
       DESCR    :
       - TEXT   : *g_realm_constructor_descr
-      SIGNATURE: "+ (instancetype)realmWithPersistenceToFile:(NSString *)path"
+      SIGNATURE: |
+                 "+ (instancetype)realmWithPersistenceToFile:(NSString *)path"
+                 "+ (instancetype)realmWithPersistenceToFile:(NSString *)path initBlock:(RLMWriteBlock)initBlock"
       PARAMS:
       - NAME   : path
         TYPES  : NSString
         DESCR  : &g_realm_path_param_descr
                  >
                  A path to a file. E.g. documents-folder/myDatabase.realm
+      - NAME   : initBlock
+        TYPES  : RLMWriteBlock
+        DESCR  : *g_write_block_param_descr
       RETURN:
         TYPES  : RLMRealm
         DESCR  : A realm mapped to a file at the specified path.

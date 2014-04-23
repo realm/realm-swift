@@ -147,18 +147,38 @@ void throw_objc_exception(exception &ex)
 
 + (instancetype)realmWithDefaultPersistence
 {
-    return [RLMRealm realmWithPersistenceToFile:[RLMContext defaultPath]];
+    return [RLMRealm realmWithDefaultPersistenceAndInitBlock:nil];
+}
+
++ (instancetype)realmWithDefaultPersistenceAndInitBlock:(RLMWriteBlock)initBlock
+{
+    return [RLMRealm realmWithPersistenceToFile:[RLMContext defaultPath] initBlock:initBlock];
 }
 
 + (instancetype)realmWithPersistenceToFile:(NSString *)path
+{
+    return [self realmWithPersistenceToFile:path initBlock:nil];
+}
+
++ (instancetype)realmWithPersistenceToFile:(NSString *)path initBlock:(RLMWriteBlock)initBlock
 {
     // This constructor can only be called from the main thread
     if (![NSThread isMainThread]) {
         @throw [NSException exceptionWithName:@"realm:runloop_exception"
                                        reason:[NSString stringWithFormat:@"%@ \
-                                               can only be called from the main thread",
+                                               can only be called from the main thread. \
+                                               Use an RLMContext read or write block \
+                                               instead.",
                                                NSStringFromSelector(_cmd)]
                                      userInfo:nil];
+    }
+    // Run init block before creating realm
+    if (initBlock) {
+        NSError *error = nil;
+        RLMContext *initContext = [RLMContext contextPersistedAtPath:path error:&error];
+        if (!error && initContext) {
+            [initContext writeUsingBlock:initBlock];
+        }
     }
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     return [self realmWithPersistenceToFile:path

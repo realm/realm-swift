@@ -147,4 +147,13 @@ REALM_TABLE_1(RLMTestTable,
     XCTAssertNotNil([realm2 tableWithName:tableName], @"Table 'test' shouldn't be nil");
 }
 
+- (void)testInitBlock {
+    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:RLMTestRealmPath
+                                                 initBlock:^(RLMRealm *realm) {
+                                                     [realm createTableWithName:@"table"];
+                                                 }];
+    XCTAssertTrue([realm hasTableWithName:@"table"], @"Realm created with initBlock \
+                  should have run the init block before returning the realm.");
+}
+
 @end

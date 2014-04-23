@@ -24,7 +24,7 @@
 
 void ex_objc_realm_intro()
 {
-    // Generate path for a writeable .realm file
+    // Generate path for a writable .realm file
     NSString *realmFileName          = @"employees.realm";
     NSString *documentsDirectoryPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
     NSString *realmFilePath          = [documentsDirectoryPath stringByAppendingPathComponent:realmFileName];
@@ -32,25 +32,13 @@ void ex_objc_realm_intro()
     // Remove any previous files
     [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
     
-    NSError *writeContextCreationError = nil;
-    
-    // Create an RLMContext for writing (not yet supported in standalone RLMRealms)
-    RLMContext *writeContext = [RLMContext contextPersistedAtPath:realmFilePath
-                                                            error:&writeContextCreationError];
-    
-    if (writeContextCreationError) {
-        NSLog(@"Error creating writeContext: %@", writeContextCreationError.localizedDescription);
-    }
-    
-    // Perform a write transaction (with commit to file)
-    [writeContext writeUsingBlock:^(RLMRealm *realm) {
-        People *table = [realm createTableWithName:@"employees"
-                                      asTableClass:[People class]];
-        [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
-    }];
-    
-    // Create a realm
-    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:realmFilePath];
+    // Create a realm and initialize by creating table and adding a row
+    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:realmFilePath
+                                                 initBlock:^(RLMRealm *realm) {
+                                                     People *table = [realm createTableWithName:@"employees"
+                                                                                   asTableClass:[People class]];
+                                                     [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
+                                                 }];
     
     // Read from the realm
     People *table = [realm tableWithName:@"employees" asTableClass:[People class]];
