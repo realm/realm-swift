@@ -371,14 +371,14 @@ using namespace std;
     return m_table->lookup([key UTF8String]);
 }
 
--(RLMRow *)rowAtIndex:(NSUInteger)ndx
+-(id)rowAtIndex:(NSUInteger)ndx
 {
     // initWithTable checks for illegal index.
 
     return [[_proxyObjectClass alloc] initWithTable:self ndx:ndx];
 }
 
--(RLMRow *)firstRow
+-(id)firstRow
 {
     if (self.rowCount == 0) {
         return nil;
@@ -386,7 +386,7 @@ using namespace std;
     return [[_proxyObjectClass alloc] initWithTable:self ndx:0];
 }
 
--(RLMRow *)lastRow
+-(id)lastRow
 {
     if (self.rowCount == 0) {
         return nil;
@@ -394,7 +394,7 @@ using namespace std;
     return [[_proxyObjectClass alloc] initWithTable:self ndx:self.rowCount-1];
 }
 
--(RLMRow *)insertRowAtIndex:(NSUInteger)ndx
+-(id)insertRowAtIndex:(NSUInteger)ndx
 {
     [self insertEmptyRowAtIndex:ndx];
     return [[_proxyObjectClass alloc] initWithTable:self ndx:ndx];

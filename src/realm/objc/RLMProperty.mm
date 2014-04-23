@@ -54,8 +54,22 @@ template<> inline bool column_get<bool>(RLMRow *row, NSUInteger col) {
     return (bool)row.table.getNativeTable.get_bool(col, row.ndx); }
 template<> inline void column_set<bool>(RLMRow *row, NSUInteger col, bool val) {
     row.table.getNativeTable.set_bool(col, row.ndx, val); }
-template<> inline id column_get<id>(RLMRow *row, NSUInteger col) { return row[col]; }
-template<> inline void column_set<id>(RLMRow *row, NSUInteger col, id val) { row[col] = val; }
+template<> inline RLMTable * column_get<RLMTable *>(RLMRow *row, NSUInteger col) {
+    RLMTable *table = row[col];
+    
+    // set custom object class
+    RLMObjectDescriptor * desc = [RLMObjectDescriptor descriptorForObjectClass:row.class];
+    RLMProperty * prop = desc.properties[col];
+    table.objectClass = prop.subtableObjectClass;
+    return table;
+}
+template<> inline void column_set<RLMTable *>(RLMRow *row, NSUInteger col, RLMTable * val) {
+    row[col] = val;
+}
+template<> inline id column_get<id>(RLMRow *row, NSUInteger col) {
+    return row[col]; }
+template<> inline void column_set<id>(RLMRow *row, NSUInteger col, id val) {
+    row[col] = val; }
 
 // fixed column accessors
 // bakes the column number into the method signature to avoid looking up by name
@@ -72,17 +86,18 @@ void column_set(RLMRow *row, SEL, T val) {
 // these are the slow versions of the above and are used in objects where you have more
 // than NUM_COLUMN_ACCESSORS columns
 template<typename T>
-T column_lookup_get(RLMRow *row, SEL sel) {
+T dynamic_get(RLMRow *row, SEL sel) {
     NSUInteger col = [row.table indexOfColumnWithName:NSStringFromSelector(sel)];
     return column_get<T>(row, col);
 }
 template<typename T>
-void column_lookup_set(RLMRow *row, SEL sel, T val) {
+void dynamic_set(RLMRow *row, SEL sel, T val) {
     NSString *name = NSStringFromSelector(sel);
     // TODO - this currently assumes setters are named set<propertyname>
     // we need to validate this and have a table of actual accessor names rather
     // than making this asumption (in asana)
-    name = [name substringWithRange:NSMakeRange(3, name.length-4)];
+    NSRange end = NSMakeRange(4, name.length-5);
+    name = [NSString stringWithFormat:@"%c%@", tolower([name characterAtIndex:3]), [name substringWithRange:end]];
     NSUInteger col = [row.table indexOfColumnWithName:name];
     column_set<T>(row, col, val);
 }
@@ -196,21 +211,6 @@ void type_for_property_string(const char *code,
     }
 }
 
-// dynamic getter for subtable
-// TODO - generate column getters
-id dynamic_get_subtable(RLMRow *row, SEL sel) {
-    NSString *propName = NSStringFromSelector(sel);
-    NSUInteger col = [row.table indexOfColumnWithName:propName];
-    RLMTable *table = row[col];
-    
-    // set custom object class
-    RLMObjectDescriptor * desc = [RLMObjectDescriptor descriptorForObjectClass:row.class];
-    RLMProperty * prop = desc[propName];
-    table.objectClass = prop.subtableObjectClass;
-    return table;
-}
-
-
 @implementation RLMProperty
 
 +(void)initialize {
@@ -220,13 +220,18 @@ id dynamic_get_subtable(RLMRow *row, SEL sel) {
     s_columnAccessors['d'] = ColumnFuncsEnumerator<NUM_COLUMN_ACCESSORS, double>::enumerate();
     s_columnAccessors['B'] = ColumnFuncsEnumerator<NUM_COLUMN_ACCESSORS, bool>::enumerate();
     s_columnAccessors['@'] = ColumnFuncsEnumerator<NUM_COLUMN_ACCESSORS, id>::enumerate();
+    s_columnAccessors['q'] = s_columnAccessors['l'];
+    s_columnAccessors['c'] = s_columnAccessors['B'];
     
-    s_dynamicGetters['i'] = (IMP)column_lookup_get<int>; s_dynamicSetters['i'] = (IMP)column_lookup_set<int>;
-    s_dynamicGetters['l'] = (IMP)column_lookup_get<long>; s_dynamicSetters['l'] = (IMP)column_lookup_set<long>;
-    s_dynamicGetters['f'] = (IMP)column_lookup_get<float>; s_dynamicSetters['f'] = (IMP)column_lookup_set<float>;
-    s_dynamicGetters['d'] = (IMP)column_lookup_get<double>; s_dynamicSetters['d'] = (IMP)column_lookup_set<double>;
-    s_dynamicGetters['B'] = (IMP)column_lookup_get<bool>; s_dynamicSetters['B'] = (IMP)column_lookup_set<bool>;
-    s_dynamicGetters['@'] = (IMP)column_lookup_get<id>; s_dynamicSetters['@'] = (IMP)column_lookup_set<id>;
+    s_dynamicGetters['i'] = (IMP)dynamic_get<int>; s_dynamicSetters['i'] = (IMP)dynamic_set<int>;
+    s_dynamicGetters['l'] = (IMP)dynamic_get<long>; s_dynamicSetters['l'] = (IMP)dynamic_set<long>;
+    s_dynamicGetters['f'] = (IMP)dynamic_get<float>; s_dynamicSetters['f'] = (IMP)dynamic_set<float>;
+    s_dynamicGetters['d'] = (IMP)dynamic_get<double>; s_dynamicSetters['d'] = (IMP)dynamic_set<double>;
+    s_dynamicGetters['B'] = (IMP)dynamic_get<bool>; s_dynamicSetters['B'] = (IMP)dynamic_set<bool>;
+    s_dynamicGetters['@'] = (IMP)dynamic_get<id>; s_dynamicSetters['@'] = (IMP)dynamic_set<id>;
+    s_dynamicGetters['q'] = s_dynamicGetters['l']; s_dynamicSetters['q'] = s_dynamicSetters['l'];
+    s_dynamicGetters['c'] = s_dynamicGetters['B']; s_dynamicSetters['c'] = s_dynamicSetters['B'];
+
 
     s_getterTypeStrings['i'] = GETTER_TYPES("i"); s_setterTypeStrings['i'] = SETTER_TYPES("i");
     s_getterTypeStrings['l'] = GETTER_TYPES("l"); s_setterTypeStrings['l'] = SETTER_TYPES("l");
@@ -234,6 +239,8 @@ id dynamic_get_subtable(RLMRow *row, SEL sel) {
     s_getterTypeStrings['d'] = GETTER_TYPES("d"); s_setterTypeStrings['d'] = SETTER_TYPES("d");
     s_getterTypeStrings['B'] = GETTER_TYPES("B"); s_setterTypeStrings['B'] = SETTER_TYPES("B");
     s_getterTypeStrings['@'] = GETTER_TYPES("@"); s_setterTypeStrings['@'] = SETTER_TYPES("@");
+    s_getterTypeStrings['q'] = s_getterTypeStrings['l']; s_setterTypeStrings['q'] = s_setterTypeStrings['l'];
+    s_getterTypeStrings['c'] = s_getterTypeStrings['B']; s_setterTypeStrings['c'] = s_setterTypeStrings['B'];
 }
 
 
@@ -250,26 +257,28 @@ id dynamic_get_subtable(RLMRow *row, SEL sel) {
     NSString *rest = [propName substringFromIndex:1];
     NSString *setName = [NSString stringWithFormat:@"set%@%@:", firstChar, rest];
     SEL set = NSSelectorFromString(setName);
-    
-    // create getter/setter based on type
-    BOOL exists = [existing containsObject:propName];
+        
+    // determine accessor implementations
+    IMP getter, setter;
+    char t = self.objcType;
     if (self.type == RLMTypeTable) {
-        if (exists) class_replaceMethod(cls, get, (IMP)dynamic_get_subtable, "@@:");
-        else class_addMethod(cls, get, (IMP)dynamic_get_subtable, "@@:");
+        getter = (IMP)dynamic_get<RLMTable *>;
+        setter = (IMP)dynamic_set<RLMTable *>;
     }
     else {
-        char t = self.objcType;
         GettersSetters & accessors = s_columnAccessors[t];
-        IMP getter = column < NUM_COLUMN_ACCESSORS ? (IMP)accessors.first[column] : (IMP)s_dynamicGetters[t];
-        IMP setter = column < NUM_COLUMN_ACCESSORS ? (IMP)accessors.second[column] : (IMP)s_dynamicSetters[t];
-        if (exists) {
-            class_replaceMethod(cls, get, getter, s_getterTypeStrings[t]);
-            class_replaceMethod(cls, set, setter, s_setterTypeStrings[t]);
-        }
-        else {
-            class_addMethod(cls, get, getter, s_getterTypeStrings[t]);
-            class_addMethod(cls, set, setter, s_setterTypeStrings[t]);
-        }
+        getter = column < NUM_COLUMN_ACCESSORS ? (IMP)accessors.first[column] : (IMP)s_dynamicGetters[t];
+        setter = column < NUM_COLUMN_ACCESSORS ? (IMP)accessors.second[column] : (IMP)s_dynamicSetters[t];
+    }
+    
+    // set accessors
+    if ([existing containsObject:propName]) {
+        class_replaceMethod(cls, get, getter, s_getterTypeStrings[t]);
+        class_replaceMethod(cls, set, setter, s_setterTypeStrings[t]);
+    }
+    else {
+        class_addMethod(cls, get, getter, s_getterTypeStrings[t]);
+        class_addMethod(cls, set, setter, s_setterTypeStrings[t]);
     }
 }
 

@@ -22,26 +22,31 @@
 
 #import <realm/objc/Realm.h>
 
-REALM_TABLE_1(TestTableSub,
-                age,  Int)
+@interface Sub : RLMRow
+@property int age;
+@end
 
-REALM_TABLE_9(TestTableAllTypes,
-                BoolCol,   Bool,
-                IntCol,    Int,
-                FloatCol,  Float,
-                DoubleCol, Double,
-                StringCol, String,
-                BinaryCol, Binary,
-                DateCol,   Date,
-                TableCol,  TestTableSub,
-                MixedCol,  Mixed)
+@implementation Sub
+@end
 
-REALM_TABLE_2(TestTableKeyedSubscript,
-              name, String,
-              objID, Int)
+RLM_DEFINE_TABLE_TYPE(Sub)
 
-REALM_TABLE_1(TestTableKeyedSubscriptError,
-              objID, Int)
+@interface AllTypes : RLMRow
+@property BOOL           boolCol;
+@property NSInteger      intCol;
+@property float          floatCol;
+@property double         doubleCol;
+@property NSString      *stringCol;
+@property NSData        *binaryCol;
+@property NSDate        *dateCol;
+@property RLMTable<Sub> *tableCol;
+@end
+
+@implementation AllTypes
+@end
+
+RLM_DEFINE_TABLE_TYPE(AllTypes)
+
 
 @interface RLMTypedTableTests: XCTestCase
   // Intentionally left blank.
@@ -52,7 +57,10 @@ REALM_TABLE_1(TestTableKeyedSubscriptError,
 
 - (void)testDataTypes_Typed
 {
-    TestTableAllTypes* table = [[TestTableAllTypes alloc] init];
+    // create table and set object class
+    RLMTable<AllTypes> *table = [[RLMTable alloc] init];
+    [table setObjectClass:AllTypes.class];
+    
     NSLog(@"Table: %@", table);
     XCTAssertNotNil(table, @"Table is nil");
 
@@ -65,53 +73,59 @@ REALM_TABLE_1(TestTableKeyedSubscriptError,
     XCTAssertEqual(RLMTypeBinary, [table columnTypeOfColumnWithIndex:5], @"Sixth column not binary");
     XCTAssertEqual(RLMTypeDate,   [table columnTypeOfColumnWithIndex:6], @"Seventh column not date");
     XCTAssertEqual(RLMTypeTable,  [table columnTypeOfColumnWithIndex:7], @"Eighth column not table");
-    XCTAssertEqual(RLMTypeMixed,  [table columnTypeOfColumnWithIndex:8], @"Ninth column not mixed");
 
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
     NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
     NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
-    TestTableSub* subtab1 = [[TestTableSub alloc] init];
-    TestTableSub* subtab2 = [[TestTableSub alloc] init];
-    [subtab1 addage:200]; // NOTE: the name is simply add+name of first column!
-    [subtab2 addage:100];
-    NSNumber* mixInt1   = [NSNumber numberWithLongLong:1];
+    RLMTable<Sub> *subtab1 = [[RLMTable alloc] init];
+    [subtab1 setObjectClass:Sub.class];
 
-    TestTableAllTypesRow* c;
+    RLMTable<Sub> *subtab2 = [[RLMTable alloc] init];
+    [subtab2 setObjectClass:Sub.class];
 
-    c = [table addEmptyRow];
+    [subtab1 addRow:@[@200]]; // NOTE: the name is simply add+name of first column!
+    [subtab2 addRow:@[@100]];
 
-        c.BoolCol   = NO   ; c.IntCol  = 54 ; c.FloatCol = 0.7     ; c.DoubleCol = 0.8     ; c.StringCol = @"foo";
-        c.BinaryCol = bin1 ; c.DateCol = 0  ; c.TableCol = subtab1     ; c.MixedCol  = mixInt1 ;
+    AllTypes * c;
 
-    c = [table addEmptyRow];
+    // addEmptyRow not supported yet
+    [table addRow:nil];
+    c = table.lastRow;
+    
+    c.BoolCol   = NO   ; c.IntCol  = 54 ; c.FloatCol = 0.7     ; c.DoubleCol = 0.8     ; c.StringCol = @"foo";
+    c.BinaryCol = bin1 ; c.DateCol = timeZero  ; c.TableCol = subtab1     ;
+    
+    [table addRow:nil];
+    c = table.lastRow; 
+    
+    c.BoolCol   = YES  ; c.IntCol  = 506     ; c.FloatCol = 7.7         ; c.DoubleCol = 8.8       ; c.StringCol = @"banach";
+    c.BinaryCol = bin2 ; c.DateCol = timeNow ; c.TableCol = subtab2     ;
+    
+    //AllTypes* row1 = [table rowAtIndex:0];
+    //AllTypes* row2 = [table rowAtIndex:1];
+    AllTypes* row1 = table[0];
+    AllTypes* row2 = table[1];
 
-        c.BoolCol   = YES  ; c.IntCol  = 506     ; c.FloatCol = 7.7         ; c.DoubleCol = 8.8       ; c.StringCol = @"banach";
-        c.BinaryCol = bin2 ; c.DateCol = timeNow ; c.TableCol = subtab2     ; c.MixedCol  = subtab2 ;
+    XCTAssertEqual(row1.boolCol, NO,                 @"row1.BoolCol");
+    XCTAssertEqual(row2.boolCol, YES,                @"row2.BoolCol");
+    XCTAssertEqual(row1.intCol, (int64_t)54,         @"row1.IntCol");
+    XCTAssertEqual(row2.intCol, (int64_t)506,        @"row2.IntCol");
+    XCTAssertEqual(row1.floatCol, 0.7f,              @"row1.FloatCol");
+    XCTAssertEqual(row2.floatCol, 7.7f,              @"row2.FloatCol");
+    XCTAssertEqual(row1.doubleCol, 0.8,              @"row1.DoubleCol");
+    XCTAssertEqual(row2.doubleCol, 8.8,              @"row2.DoubleCol");
+    XCTAssertTrue([row1.stringCol isEqual:@"foo"],    @"row1.StringCol");
+    XCTAssertTrue([row2.stringCol isEqual:@"banach"], @"row2.StringCol");
+    XCTAssertTrue([row1.binaryCol isEqual:bin1],      @"row1.BinaryCol");
+    XCTAssertTrue([row2.binaryCol isEqual:bin2],      @"row2.BinaryCol");
+    XCTAssertTrue(([row1.dateCol isEqual:timeZero]),  @"row1.DateCol");
+    XCTAssertTrue(([row2.dateCol isEqual:timeNow]),   @"row2.DateCol");
+    XCTAssertTrue([row1.tableCol isEqual:subtab1],    @"row1.TableCol");
+    XCTAssertTrue([row2.tableCol isEqual:subtab2],    @"row2.TableCol");
 
-    TestTableAllTypesRow* row1 = [table rowAtIndex:0];
-    TestTableAllTypesRow* row2 = [table rowAtIndex:1];
-
-    XCTAssertEqual(row1.BoolCol, NO,                 @"row1.BoolCol");
-    XCTAssertEqual(row2.BoolCol, YES,                @"row2.BoolCol");
-    XCTAssertEqual(row1.IntCol, (int64_t)54,         @"row1.IntCol");
-    XCTAssertEqual(row2.IntCol, (int64_t)506,        @"row2.IntCol");
-    XCTAssertEqual(row1.FloatCol, 0.7f,              @"row1.FloatCol");
-    XCTAssertEqual(row2.FloatCol, 7.7f,              @"row2.FloatCol");
-    XCTAssertEqual(row1.DoubleCol, 0.8,              @"row1.DoubleCol");
-    XCTAssertEqual(row2.DoubleCol, 8.8,              @"row2.DoubleCol");
-    XCTAssertTrue([row1.StringCol isEqual:@"foo"],    @"row1.StringCol");
-    XCTAssertTrue([row2.StringCol isEqual:@"banach"], @"row2.StringCol");
-    XCTAssertTrue([row1.BinaryCol isEqual:bin1],      @"row1.BinaryCol");
-    XCTAssertTrue([row2.BinaryCol isEqual:bin2],      @"row2.BinaryCol");
-    XCTAssertTrue(([row1.DateCol isEqual:timeZero]),  @"row1.DateCol");
-    XCTAssertTrue(([row2.DateCol isEqual:timeNow]),   @"row2.DateCol");
-    XCTAssertTrue([row1.TableCol isEqual:subtab1],    @"row1.TableCol");
-    XCTAssertTrue([row2.TableCol isEqual:subtab2],    @"row2.TableCol");
-    XCTAssertTrue([row1.MixedCol isEqual:mixInt1],    @"row1.MixedCol");
-    XCTAssertTrue([row2.MixedCol isEqual:subtab2],    @"row2.MixedCol");
-
+    /* Not yet supported
     XCTAssertEqual([table.IntCol minimum], (int64_t)54,                 @"IntCol min");
     XCTAssertEqual([table.IntCol maximum], (int64_t)506,                @"IntCol max");
     XCTAssertEqual([table.IntCol sum], (int64_t)560,                @"IntCol sum");
@@ -126,28 +140,31 @@ REALM_TABLE_1(TestTableKeyedSubscriptError,
     XCTAssertEqual([table.DoubleCol maximum], 8.8,                      @"DoubleCol max");
     XCTAssertEqual([table.DoubleCol sum], 0.8 + 8.8,                @"DoubleCol sum");
     XCTAssertEqual([table.DoubleCol average], (0.8 + 8.8) / 2,          @"DoubleCol avg");
-    
+    */
     
 }
 
 - (void)testTableTyped_Subscripting
 {
-    TestTableSub *table = [[TestTableSub alloc] init];
-
+    
+    RLMTable<AllTypes> *table = [[RLMTable alloc] init];
+    [table setObjectClass:Sub.class];
+    
     // Add some rows
-    [table addage: 10];
-    [table addage:20];
+    [table addRow:@[@10]];
+    [table addRow:@[@20]];
 
-    table[0].age = 7;
+    [table[0] setAge:7];
     
     // Verify that you can access rows with object subscripting
-    XCTAssertEqual(table[0].age, (int64_t)7, @"table[0].age");
-    XCTAssertEqual(table[1].age, (int64_t)20, @"table[1].age");
+    XCTAssertEqual([table[0] age], (int64_t)7, @"table[0].age");
+    XCTAssertEqual([table[1] age], (int64_t)20, @"table[1].age");
 }
 
+/*
 - (void)testTableTyped_KeyedSubscripting
 {
-    TestTableKeyedSubscript* table = [[TestTableKeyedSubscript alloc] init];
+    RLMTable* table = [[RLMTable alloc] init];
     
     [table addRow:@{@"name" : @"Test1", @"objID" : @24}];
     [table addRow:@{@"name" : @"Test2", @"objID" : @25}];
@@ -209,5 +226,5 @@ REALM_TABLE_1(TestTableKeyedSubscriptError,
     XCTAssertThrows((errTable[@"SomeKey"] = @{@"id" : @821763}), @"Calling keyed subscriptor on errTable should throw exception");
     XCTAssertEqual(previousRowCount, [errTable rowCount], @"errTable should have same count as previous");
 }
-
+*/
 @end
