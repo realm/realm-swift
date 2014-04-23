@@ -50,16 +50,22 @@
 // macro helper for defining custom table object with subtables
 // if used
 // TODO - move somewhere else
-#define RLM_DEFINE_TABLE_TYPE(ObjectType)                       \
-@protocol ObjectType <NSObject>                                 \
-@required                                                       \
--(ObjectType *)objectAtIndexedSubscript:(NSUInteger)rowIndex;   \
-@end                                                            \
-@interface RLMTable (ObjectType ## _TypedTable) <ObjectType>    \
--(ObjectType *)rowAtIndex:(NSUInteger)rowIndex;                 \
--(ObjectType *)firstRow;                                        \
--(ObjectType *)lastRow;                                         \
--(ObjectType *)objectAtIndexedSubscript:(NSUInteger)rowIndex;   \
+#define RLM_DEFINE_TABLE_TYPE_FOR_OJBECT_TYPE(TType, OType) \
+@protocol OType <NSObject>                                  \
+-(OType *)rowAtIndex:(NSUInteger)rowIndex;                  \
+-(OType *)firstRow;                                         \
+-(OType *)lastRow;                                          \
+-(OType *)objectAtIndexedSubscript:(NSUInteger)rowIndex;    \
+@end                                                        \
+@interface TType : RLMTable<OType>                          \
++(TType *)tableInRealm:(RLMTransaction *)rlm named:(NSString *)name;  \
++(Class)objectClass;                                        \
+@end                                                        \
+@implementation TType                                       \
++(TType *)tableInRealm:(RLMTransaction *)rlm named:(NSString *)name { \
+    if([rlm hasTableWithName:name]) return (TType *)[rlm tableWithName:name objectClass:OType.class]; \
+    return (TType *)[rlm createTableWithName:name objectClass:OType.class];} \
++(Class)objectClass { return OType.class; }                 \
 @end
 
 

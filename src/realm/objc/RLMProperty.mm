@@ -162,6 +162,9 @@ static std::map<char, const char *> s_getterTypeStrings, s_setterTypeStrings;
 
 #define NUM_COLUMN_ACCESSORS 25
 
+// in RLMProxy.m
+extern BOOL is_class_subclass(Class class1, Class class2);
+
 // determine RLMType from objc code
 void type_for_property_string(const char *code,
                               RLMType *outtype,
@@ -195,16 +198,11 @@ void type_for_property_string(const char *code,
             else if ([type isEqualToString:@"@\"NSData\""]) *outtype = RLMTypeBinary;
             else {
                 // check for subtable
-                if ([type compare:@"RLMTable" options:0 range:NSMakeRange(2, 8)] == NSOrderedSame) {
+                Class cls = NSClassFromString([type substringWithRange:NSMakeRange(2, type.length-3)]);
+                if (is_class_subclass(cls, RLMTable.class)) {
                     *outtype = RLMTypeTable;
-                    
-                    // for macro table classes we can extract subtable type now
-                    // if typename is of form "@\"RLMTable<SubObjectClas>\""
-                    const unsigned int subOffset = 11;
-                    if (type.length > subOffset) {
-                        NSRange range = NSMakeRange(subOffset, type.length - subOffset - 2);
-                        NSString *subclassName = [type substringWithRange:range];
-                        *outSubtableObjectClass = NSClassFromString(subclassName);
+                    if ([cls respondsToSelector:@selector(objectClass)]) {
+                        *outSubtableObjectClass = [cls performSelector:@selector(objectClass)];
                     }
                 }
             }
