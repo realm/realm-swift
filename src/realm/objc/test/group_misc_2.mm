@@ -11,6 +11,7 @@
 #import <realm/objc/RLMTransaction.h>
 #import <realm/objc/group.h>
 #import <realm/objc/PrivateRLM.h>
+#import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 REALM_TABLE_DEF_4(MyTable,
                     Name,  String,
@@ -28,6 +29,8 @@ REALM_TABLE_IMPL_4(MyTable,
                      Hired, Bool,
                      Spare, Int)
 
+
+
 REALM_TABLE_IMPL_2(MyTable2,
                      Hired, Bool,
                      Age,   Int)
@@ -35,6 +38,12 @@ REALM_TABLE_IMPL_2(MyTable2,
 REALM_TABLE_2(QueryTable,
                 First,  Int,
                 Second, String)
+
+REALM_TABLE_FAST(MyTable)
+
+REALM_TABLE_FAST(MyTable2)
+
+REALM_TABLE_FAST(QueryTable)
 
 @interface MACTestGroupMisc2: XCTestCase
 @end
