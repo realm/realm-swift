@@ -34,7 +34,7 @@ void ex_objc_realm_intro()
     
     NSError *writeContextCreationError = nil;
     
-    // Create an RLMContext for writing (not yet supported in RLMRealm)
+    // Create an RLMContext for writing (not yet supported in standalone RLMRealms)
     RLMContext *writeContext = [RLMContext contextPersistedAtPath:realmFilePath
                                                             error:&writeContextCreationError];
     
