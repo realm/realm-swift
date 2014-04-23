@@ -131,8 +131,8 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 
     XCTAssertEqual(row1.boolCol, NO,                 @"row1.BoolCol");
     XCTAssertEqual(row2.boolCol, YES,                @"row2.BoolCol");
-    XCTAssertEqual(row1.intCol, (int64_t)54,         @"row1.IntCol");
-    XCTAssertEqual(row2.intCol, (int64_t)506,        @"row2.IntCol");
+    XCTAssertEqual(row1.intCol, (int)54,             @"row1.IntCol");
+    XCTAssertEqual(row2.intCol, (int)506,            @"row2.IntCol");
     XCTAssertEqual(row1.floatCol, 0.7f,              @"row1.FloatCol");
     XCTAssertEqual(row2.floatCol, 7.7f,              @"row2.FloatCol");
     XCTAssertEqual(row1.doubleCol, 0.8,              @"row1.DoubleCol");
@@ -145,10 +145,10 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
     XCTAssertTrue(([row2.dateCol isEqual:timeNow]),   @"row2.DateCol");
     XCTAssertTrue([row1.tableCol isEqual:subtab1],    @"row1.TableCol");
     XCTAssertTrue([row2.tableCol isEqual:subtab2],    @"row2.TableCol");
-    XCTAssertEqual(row1.cBoolCol, false,              @"row1.cBoolCol");
-    XCTAssertEqual(row2.cBoolCol, true,               @"row2.cBoolCol");
-    XCTAssertEqual(row1.longCol, 99,                  @"row1.IntCol");
-    XCTAssertEqual(row2.longCol, -20,                 @"row2.IntCol");
+    XCTAssertEqual(row1.cBoolCol, (bool)false,        @"row1.cBoolCol");
+    XCTAssertEqual(row2.cBoolCol, (bool)true,         @"row2.cBoolCol");
+    XCTAssertEqual(row1.longCol, 99L,                 @"row1.IntCol");
+    XCTAssertEqual(row2.longCol, -20L,                @"row2.IntCol");
 
     /* Not yet supported
     XCTAssertEqual([table.IntCol minimum], (int64_t)54,                 @"IntCol min");
