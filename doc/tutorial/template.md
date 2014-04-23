@@ -2,7 +2,7 @@
 
 This short tutorial to Realm will introduce you to
 commonly used features of Realm. Please refer to the
-<a href="http://www.tightdb.com/documentation/1/Reference/">reference documentation</a>
+<a href="http://www.realm.io/documentation/1/Reference/">reference documentation</a>
 for further details.
 
 Realm is a fast embedded database that integrates transparently
@@ -25,7 +25,7 @@ a transactional manner, and Realm distinguish between read and write access.
 ** Executing the tutorial
 
 While you walk through the tutorial below you may find it beneficial to actually execute the code.
-The source code for the tutorial is <a href="http://www.tightdb.com/downloads&/tutorial-ios.zip">available</a>
+The source code for the tutorial is <a href="http://www.realm.io/downloads&/tutorial-ios.zip">available</a>
 as an iOS project.
 
 ** Creating tables
@@ -94,6 +94,7 @@ the sample code from this tutorial to play with Realm. It may be helpful to refe
 documentation</a> for more in-depth information about the API.</li>
 
 <li>Feel free to contact <a href="mailto:support@tightdb.com">support</a> 
+href="mailto:support@realm.io">support</a> for help or inspiration
 for help or inspiration to tackling your particular problems - we appreciate 
 your feedback, feature requests and challenges!</li>
 
