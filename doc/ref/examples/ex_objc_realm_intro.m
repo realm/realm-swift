@@ -43,18 +43,11 @@ void ex_objc_realm_intro()
     }
     
     // Perform a write transaction (with commit to file)
-    NSError *error = nil;
-    BOOL success;
-    success = [writeContext writeUsingBlock:^(RLMRealm *realm) {
+    [writeContext writeUsingBlock:^(RLMRealm *realm) {
         People *table = [realm createTableWithName:@"employees"
                                       asTableClass:[People class]];
         [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
-        
-        return YES; // Commit
-    } error:&error];
-    if (!success) {
-        NSLog(@"write-transaction failed: %@", [error description]);
-    }
+    }];
     
     // Create a realm
     RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:realmFilePath];
