@@ -18,31 +18,10 @@
  *
  **************************************************************************/
 
-#import <Foundation/Foundation.h>
+#import "RLMView.h"
 
-#import "RLMType.h"
-#import "RLMTable.h"
+@interface RLMView (Fast)
 
-
-@interface RLMView : NSObject <RLMView, NSFastEnumeration>
-
-@property (nonatomic, readonly) NSUInteger rowCount;
-@property (nonatomic, readonly) NSUInteger columnCount;
-@property (nonatomic, readonly) RLMTable *originTable;
-
--(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
--(RLMRow *)rowAtIndex:(NSUInteger)rowIndex;
--(RLMRow *)lastRow;
--(RLMRow *)firstRow;
-
--(RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
-
--(void) sortUsingColumnWithIndex: (NSUInteger)colIndex;
--(void) sortUsingColumnWithIndex: (NSUInteger)colIndex inOrder: (RLMSortOrder)order;
-
--(void)removeRowAtIndex:(NSUInteger)rowIndex;
--(void)removeAllRows;
-
--(NSUInteger)rowIndexInOriginTableForRowAtIndex:(NSUInteger)rowIndex;
+-(RLMQuery *)where;
 
 @end
