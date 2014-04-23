@@ -211,7 +211,7 @@ REALM_COLUMN_PROXY_IMPL(CName${j+1}, CType${j+1}) \
 %end for
     return self; \
 } \
--(id)init \
+-(id)initLocal \
 { \
     self = [super init]; \
     if (!self) \
