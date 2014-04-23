@@ -23,6 +23,7 @@
 #import <realm/objc/RLMFast.h>
 #import <realm/objc/RLMTableFast.h>
 #import <realm/objc/RLMTable_noinst.h>
+#import <realm/objc/RLMLocal.h>
 
 using namespace std;
 @interface TestClass : NSObject
@@ -53,7 +54,7 @@ using namespace std;
 
 - (void)testTable
 {
-    RLMTable* table = [[RLMTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] initLocal];
     NSLog(@"Table: %@", table);
     XCTAssertNotNil(table, @"Table is nil");
 
@@ -85,7 +86,7 @@ using namespace std;
 
 -(void)testAddColumn
 {
-    RLMTable *t = [[RLMTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] initLocal];
     NSUInteger stringColIndex = [t addColumnWithName:@"stringCol" type:RLMTypeString];
     RLMRow *row = [t addEmptyRow];
     [row setString:@"val" inColumnWithIndex:stringColIndex];
@@ -94,7 +95,7 @@ using namespace std;
 -(void)testAppendRowsIntColumn
 {
     // Add row using object literate
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeInt];
     XCTAssertNoThrow([t addRow:@[ @1 ]], @"Impossible!");
     XCTAssertEqual((NSUInteger)1, [t rowCount], @"Expected 1 row");
@@ -109,7 +110,7 @@ using namespace std;
 -(void)testInsertRowsIntColumn
 {
     // Add row using object literate
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeInt];
     XCTAssertNoThrow([t insertRow:@[ @1 ] atIndex:0], @"Impossible!");
     XCTAssertEqual((NSUInteger)1, [t rowCount], @"Expected 1 row");
@@ -123,7 +124,7 @@ using namespace std;
 
 -(void)testUpdateRowIntColumn
 {
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeInt];
     [t insertRow:@[@1] atIndex:0];
     t[0] = @[@2];
@@ -132,7 +133,7 @@ using namespace std;
 
 -(void)testAppendRowGenericObject
 {
-    RLMTable* table1 = [[RLMTable alloc] init];
+    RLMTable* table1 = [[RLMTable alloc] initLocal];
     [table1 addColumnWithName:@"name" type:RLMTypeString];
     [table1 addColumnWithName:@"age" type:RLMTypeInt];
 
@@ -144,7 +145,7 @@ using namespace std;
     XCTAssertEqual((long long)11, [(NSNumber *)table1[0][@"age"] longLongValue], @"11 excepted");
     XCTAssertTrue([((NSString *)table1[0][@"name"]) isEqualToString:@"Joe"], @"'Joe' excepted");
 
-    RLMTable* table2 = [[RLMTable alloc] init];
+    RLMTable* table2 = [[RLMTable alloc] initLocal];
     [table2 addColumnWithName:@"name" type:RLMTypeString];
     [table2 addColumnWithName:@"age" type:RLMTypeString];
 
@@ -154,7 +155,7 @@ using namespace std;
 
 -(void)testUpdateRowWithLabelsIntColumn
 {
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeInt];
     [t insertRow:@[@1] atIndex:0];
     t[0] = @{@"first": @2};
@@ -165,7 +166,7 @@ using namespace std;
 -(void)testAppendRowWithLabelsIntColumn
 {
     // Add row using object literate
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeInt];
 
     XCTAssertNoThrow([t addRow:@{ @"first": @1 }], @"Impossible!");
@@ -192,7 +193,7 @@ using namespace std;
 -(void)testInsertRowWithLabelsIntColumn
 {
     // Add row using object literate
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeInt];
     
     XCTAssertNoThrow(([t insertRow:@{ @"first": @1 } atIndex:0]), @"Impossible!");
@@ -218,7 +219,7 @@ using namespace std;
 
 -(void)testAppendRowsIntStringColumns
 {
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeInt];
     [t addColumnWithName:@"second" type:RLMTypeString];
 
@@ -232,7 +233,7 @@ using namespace std;
 
 -(void)testAppendRowWithLabelsIntStringColumns
 {
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeInt];
     [t addColumnWithName:@"second" type:RLMTypeString];
     XCTAssertNoThrow(([t addRow:@{@"first": @1, @"second": @"Hello"}]), @"addRowWithLabels 1");
@@ -245,7 +246,7 @@ using namespace std;
 
 -(void)testAppendRowsDoubleColumn
 {
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeDouble];
     XCTAssertNoThrow(([t addRow:@[@3.14]]), @"Cannot insert 'double'");  /* double is default */
     XCTAssertEqual((NSUInteger)1, ([t rowCount]), @"1 row expected");
@@ -253,7 +254,7 @@ using namespace std;
 
 -(void)testAppendRowWithLabelsDoubleColumn
 {
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeDouble];
     XCTAssertNoThrow(([t addRow:@{@"first": @3.14}]), @"Cannot insert 'double'");   /* double is default */
     XCTAssertEqual((NSUInteger)1, ([t rowCount]), @"1 row expected");
@@ -261,7 +262,7 @@ using namespace std;
 
 -(void)testAppendRowsFloatColumn
 {
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeFloat];
     XCTAssertNoThrow(([t addRow:@[@3.14F]]), @"Cannot insert 'float'"); /* F == float */
     XCTAssertEqual((NSUInteger)1, ([t rowCount]), @"1 row expected");
@@ -269,7 +270,7 @@ using namespace std;
 
 -(void)testAppendRowWithLabelsFloatColumn
 {
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeFloat];
     XCTAssertNoThrow(([t addRow:@{@"first": @3.14F}]), @"Cannot insert 'float'");   /* F == float */
     XCTAssertEqual((NSUInteger)1, ([t rowCount]), @"1 row expected");
@@ -277,7 +278,7 @@ using namespace std;
 
 -(void)testAppendRowsDateColumn
 {
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeDate];
     XCTAssertNoThrow(([t addRow:@[@1000000000]]), @"Cannot insert 'time_t'"); /* 2001-09-09 01:46:40 */
     XCTAssertEqual((NSUInteger)1, ([t rowCount]), @"1 row expected");
@@ -289,7 +290,7 @@ using namespace std;
 
 -(void)testAppendRowWithLabelsDateColumn
 {
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeDate];
 
     XCTAssertNoThrow(([t addRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   // 2001-09-09 01:46:40
@@ -322,7 +323,7 @@ using namespace std;
 {
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin2 = [[NSData alloc] initWithBytes:(const void *)bin length:sizeof bin];
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeBinary];
     XCTAssertNoThrow(([t addRow:@[bin2]]), @"Cannot insert 'binary'");
     XCTAssertEqual((NSUInteger)1, ([t rowCount]), @"1 row expected");
@@ -337,7 +338,7 @@ using namespace std;
 {
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin2 = [[NSData alloc] initWithBytes:(const void *)bin length:sizeof bin];
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeBinary];
 
     XCTAssertNoThrow(([t addRow:@{@"first": bin2}]), @"Cannot insert 'binary'");
@@ -350,21 +351,21 @@ using namespace std;
 
 -(void)testAppendRowsTooManyItems
 {
-    RLMTable *t = [[RLMTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeInt];
     XCTAssertThrows(([t addRow:@[@1, @1]]), @"Too many items for a row.");
 }
 
 -(void)testAppendRowsTooFewItems
 {
-    RLMTable *t = [[RLMTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeInt];
     XCTAssertThrows(([t addRow:@[]]),  @"Too few items for a row.");
 }
 
 -(void)testAppendRowsWrongType
 {
-    RLMTable *t = [[RLMTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeInt];
     XCTAssertThrows(([t addRow:@[@YES]]), @"Wrong type for column.");
     XCTAssertThrows(([t addRow:@[@""]]),  @"Wrong type for column.");
@@ -375,7 +376,7 @@ using namespace std;
 
 -(void)testAppendRowsBoolColumn
 {
-    RLMTable *t = [[RLMTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeBool];
     XCTAssertNoThrow(([t addRow:@[@YES]]), @"Cannot append bool column.");
     XCTAssertNoThrow(([t addRow:@[@NO]]), @"Cannot append bool column.");
@@ -384,7 +385,7 @@ using namespace std;
 
 -(void)testAppendRowWithLabelsBoolColumn
 {
-    RLMTable *t = [[RLMTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeBool];
     XCTAssertNoThrow(([t addRow:@{@"first": @YES}]), @"Cannot append bool column.");
     XCTAssertNoThrow(([t addRow:@{@"first": @NO}]), @"Cannot append bool column.");
@@ -393,7 +394,7 @@ using namespace std;
 
 -(void)testAppendRowsIntSubtableColumns
 {
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeInt];
     RLMDescriptor * descr = [t descriptor];
     RLMDescriptor * subdescr = [descr addColumnTable:@"second"];
@@ -409,7 +410,7 @@ using namespace std;
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin2 = [[NSData alloc] initWithBytes:(const void *)bin length:sizeof bin];
 
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeMixed];
     XCTAssertNoThrow(([t addRow:@[@1]]), @"Cannot insert 'int'");
     XCTAssertEqual((NSUInteger)1, ([t rowCount]), @"1 row excepted");
@@ -430,7 +431,7 @@ using namespace std;
     const char bin[4] = { 0, 1, 2, 3 };
     NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
 
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     [t addColumnWithName:@"first" type:RLMTypeMixed];
     XCTAssertNoThrow(([t addRow:@{@"first": @1}]), @"Cannot insert 'int'");
     XCTAssertEqual((NSUInteger)1, ([t rowCount]), @"1 row excepted");
@@ -449,7 +450,7 @@ using namespace std;
 -(void)testRemoveColumns
 {
 
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     [table addColumnWithName:@"col0" type:RLMTypeInt];
     XCTAssertTrue(table.columnCount == 1,@"1 column added" );
 
@@ -476,7 +477,7 @@ using namespace std;
 
 -(void)testRenameColumns
 {
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     XCTAssertThrows([table renameColumnWithIndex:0 to:@"someName"], @"Out of bounds");
     
     [table addColumnWithName:@"oldName" type:RLMTypeInt];
@@ -500,7 +501,7 @@ using namespace std;
 
 - (void)testColumnlessCount
 {
-    RLMTable* table = [[RLMTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] initLocal];
     XCTAssertEqual((NSUInteger)0, [table rowCount], @"Columnless table has 0 rows.");
 }
 
@@ -508,14 +509,14 @@ using namespace std;
 
 - (void)testColumnlessClear
 {
-    RLMTable* table = [[RLMTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] initLocal];
     [table removeAllRows];
     XCTAssertEqual((NSUInteger)0, [table rowCount], @"Columnless table has 0 rows.");
 }
 
 - (void)testColumnlessOptimize
 {
-    RLMTable* table = [[RLMTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] initLocal];
     XCTAssertEqual((NSUInteger)0, [table rowCount], @"Columnless table has 0 rows.");
     [table optimize];
     XCTAssertEqual((NSUInteger)0, [table rowCount], @"Columnless table has 0 rows.");
@@ -524,8 +525,8 @@ using namespace std;
 
 - (void)testColumnlessIsEqual
 {
-    RLMTable* table1 = [[RLMTable alloc] init];
-    RLMTable* table2 = [[RLMTable alloc] init];
+    RLMTable* table1 = [[RLMTable alloc] initLocal];
+    RLMTable* table2 = [[RLMTable alloc] initLocal];
     XCTAssertTrue([table1 isEqual:table1], @"Columnless table is equal to itself.");
     XCTAssertTrue([table1 isEqual:table2], @"Columnless table is equal to another columnless table.");
     XCTAssertTrue([table2 isEqual:table1], @"Columnless table is equal to another columnless table.");
@@ -533,14 +534,14 @@ using namespace std;
 
 - (void)testColumnlessColumnCount
 {
-    RLMTable* table = [[RLMTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] initLocal];
     XCTAssertEqual((NSUInteger)0, [table columnCount], @"Columnless table has column count 0.");
 }
 
 /*
 - (void)testColumnlessNameOfColumnWithIndex
 {
-    RLMTable* table = [[RLMTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] initLocal];
     XCTAssertThrowsSpecific([table nameOfColumnWithIndex:NSNotFound],
         NSException, NSRangeException,
         @"Columnless table has no column names.");
@@ -554,7 +555,7 @@ using namespace std;
 
 - (void)testColumnlessGetColumnType
 {
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     XCTAssertThrowsSpecific([t getColumnType:((NSUInteger)-1)],
         NSException, NSRangeException,
         @"Columnless table has no column types.");
@@ -568,7 +569,7 @@ using namespace std;
 
 - (void)testColumnlessCursorAtIndex
 {
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     XCTAssertThrowsSpecific([t cursorAtIndex:((NSUInteger)-1)],
         NSException, NSRangeException,
         @"Columnless table has no cursors.");
@@ -582,7 +583,7 @@ using namespace std;
 
 - (void)testColumnlessCursorAtLastIndex
 {
-    RLMTable* t = [[RLMTable alloc] init];
+    RLMTable* t = [[RLMTable alloc] initLocal];
     XCTAssertThrowsSpecific([t cursorAtLastIndex],
         NSException, NSRangeException,
         @"Columnless table has no cursors."); 
@@ -590,7 +591,7 @@ using namespace std;
 
 - (void)testRemoveRowAtIndex
 {
-    RLMTable *t = [[RLMTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] initLocal];
     XCTAssertThrowsSpecific([t removeRowAtIndex:((NSUInteger)-1)],
         NSException, NSRangeException,
         @"No rows in a columnless table.");
@@ -604,7 +605,7 @@ using namespace std;
 
 - (void)testColumnlessRemoveLastRow
 {
-    RLMTable *t = [[RLMTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] initLocal];
     XCTAssertThrowsSpecific([t removeLastRow],
         NSException, NSRangeException,
         @"No rows in a columnless table.");
@@ -612,7 +613,7 @@ using namespace std;
 
 - (void)testColumnlessGetTableSize
 {
-    RLMTable *t = [[RLMTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] initLocal];
     XCTAssertThrowsSpecific([t getTableSize:((NSUInteger)0) ndx:((NSUInteger)-1)],
         NSException, NSRangeException,
         @"No rows in a columnless table.");
@@ -626,7 +627,7 @@ using namespace std;
 
 - (void)testColumnlessClearSubtable
 {
-    RLMTable *t = [[RLMTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] initLocal];
     XCTAssertThrowsSpecific([t clearSubtable:((NSUInteger)0) ndx:((NSUInteger)-1)],
         NSException, NSRangeException,
         @"No rows in a columnless table.");
@@ -641,7 +642,7 @@ using namespace std;
 - (void)testColumnlessSetIndex
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t setIndex:((NSUInteger)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -656,7 +657,7 @@ using namespace std;
 - (void)testColumnlessHasIndex
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t hasIndex:((NSUInteger)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -671,7 +672,7 @@ using namespace std;
 - (void)testColumnlessCountWithIntColumn
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t countWithIntColumn:((NSUInteger)-1) andValue: 0],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -686,7 +687,7 @@ using namespace std;
 - (void)testColumnlessCountWithFloatColumn
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t countWithFloatColumn:((NSUInteger)-1) andValue: 0.0f],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -701,7 +702,7 @@ using namespace std;
 - (void)testColumnlessCountWithDoubleColumn
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t countWithDoubleColumn:((NSUInteger)-1) andValue: 0.0],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -716,7 +717,7 @@ using namespace std;
 - (void)testColumnlessCountWithStringColumn
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t countWithStringColumn:((NSUInteger)-1) andValue: @""],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -731,7 +732,7 @@ using namespace std;
 - (void)testColumnlessSumWithIntColumn
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t sumWithIntColumn:((NSUInteger)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -746,7 +747,7 @@ using namespace std;
 - (void)testColumnlessSumWithFloatColumn
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t sumWithFloatColumn:((NSUInteger)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -761,7 +762,7 @@ using namespace std;
 - (void)testColumnlessSumWithDoubleColumn
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t sumWithDoubleColumn:((NSUInteger)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -776,7 +777,7 @@ using namespace std;
 - (void)testColumnlessMaximumWithIntColumn
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t maximumWithIntColumn:((NSUInteger)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -791,7 +792,7 @@ using namespace std;
 - (void)testColumnlessMaximumWithFloatColumn
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t maximumWithFloatColumn:((NSUInteger)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -806,7 +807,7 @@ using namespace std;
 - (void)testColumnlessMaximumWithDoubleColumn
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t maximumWithDoubleColumn:((NSUInteger)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -821,7 +822,7 @@ using namespace std;
 - (void)testColumnlessMinimumWithIntColumn
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t minimumWithIntColumn:((NSUInteger)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -836,7 +837,7 @@ using namespace std;
 - (void)testColumnlessMinimumWithFloatColumn
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t minimumWithFloatColumn:((NSUInteger)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -851,7 +852,7 @@ using namespace std;
 - (void)testColumnlessMinimumWithDoubleColumn
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t minimumWithDoubleColumn:((NSUInteger)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -866,7 +867,7 @@ using namespace std;
 - (void)testColumnlessAverageWithIntColumn
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t averageWithIntColumn:((NSUInteger)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -881,7 +882,7 @@ using namespace std;
 - (void)testColumnlessAverageWithFloatColumn
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t averageWithFloatColumn:((NSUInteger)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -896,7 +897,7 @@ using namespace std;
 - (void)testColumnlessAverageWithDoubleColumn
 {
 // SEGFAULT
-//    RLMTable *t = [[RLMTable alloc] init];
+//    RLMTable *t = [[RLMTable alloc] initLocal];
 //    XCTAssertThrowsSpecific([t averageWithDoubleColumn:((NSUInteger)-1)],
 //        NSException, NSRangeException,
 //        @"No rows in a columnless table.");
@@ -910,7 +911,7 @@ using namespace std;
 
 - (void)testDataTypes_Dynamic
 {
-    RLMTable* table = [[RLMTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] initLocal];
     NSLog(@"Table: %@", table);
     XCTAssertNotNil(table, @"Table is nil");
 
@@ -945,10 +946,10 @@ using namespace std;
     NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
     NSDate *timeNow = [NSDate date];
 
-    RLMTable* subtab1 = [[RLMTable alloc] init];
+    RLMTable* subtab1 = [[RLMTable alloc] initLocal];
     [subtab1 addColumnWithName:@"TableCol_IntCol" type:RLMTypeInt];
 
-    RLMTable* subtab2 = [[RLMTable alloc] init];
+    RLMTable* subtab2 = [[RLMTable alloc] initLocal];
     [subtab2 addColumnWithName:@"TableCol_IntCol" type:RLMTypeInt];
 
     RLMRow * cursor;
@@ -1026,7 +1027,7 @@ using namespace std;
 
 - (void)testTableDynamic_Subscripting
 {
-    RLMTable* table = [[RLMTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] initLocal];
     XCTAssertNotNil(table, @"Table is nil");
 
     // 1. Add two columns
@@ -1056,7 +1057,7 @@ using namespace std;
 
 - (void)testFirstLastRow
 {
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     NSUInteger col0 = [table addColumnWithName:@"col" type:RLMTypeString];
 
     XCTAssertNil([table firstRow], @"Table is empty");
@@ -1074,7 +1075,7 @@ using namespace std;
 
 - (void)testTableDynamic_Cursor_Subscripting
 {
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     XCTAssertNotNil(table, @"Table is nil");
 
     // 1. Add two columns
@@ -1117,7 +1118,7 @@ using namespace std;
 
 - (void)testTableDynamic_KeyedSubscripting
 {
-    RLMTable* table = [[RLMTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] initLocal];
     
     [table addColumnWithName:@"name" type:RLMTypeString];
     [table addColumnWithName:@"id" type:RLMTypeInt];
@@ -1139,7 +1140,7 @@ using namespace std;
     XCTAssertNil(table[@"foo"], @"table[\"foo\"] should be nil");
     
     
-    RLMTable* errTable = [[RLMTable alloc] init];
+    RLMTable* errTable = [[RLMTable alloc] initLocal];
     
     XCTAssertThrows(errTable[@"X"], @"Accessing RLMRow via keyed subscript on undefined column should throw exception");
     
@@ -1194,7 +1195,7 @@ using namespace std;
 
 -(void)testTableDynamic_Row_Set
 {
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     XCTAssertNotNil(table, @"Table is nil");
 
     // Add two columns
@@ -1235,7 +1236,7 @@ using namespace std;
 
 -(void)testTableDynamic_Row_Set_Mixed
 {
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
 
     // Mixed column
     [table addColumnWithName:@"first" type:RLMTypeMixed];
@@ -1283,7 +1284,7 @@ using namespace std;
 
 -(void)testTableDynamic_Row_Get
 {
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     XCTAssertNotNil(table, @"Table is nil");
 
     // Add two columns
@@ -1300,7 +1301,7 @@ using namespace std;
 
 -(void)testTableDynamic_Row_Get_Mixed
 {
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     XCTAssertNotNil(table, @"Table is nil");
 
     // Add two columns
@@ -1321,11 +1322,11 @@ using namespace std;
 
 - (void)testTableDynamic_initWithColumns
 {
-    RLMTable *table = [[RLMTable alloc] initWithColumns:@[@"name",   @"string",
-                                                          @"age",    @"int",
-                                                          @"hired",  @"bool",
-                                                          @"phones", @[@"type",   @"string",
-                                                                       @"number", @"string"]]];
+    RLMTable *table = [[RLMTable alloc] initLocalWithColumns:@[@"name",   @"string",
+                                                               @"age",    @"int",
+                                                               @"hired",  @"bool",
+                                                               @"phones", @[@"type",   @"string",
+                                                                            @"number", @"string"]]];
 
     XCTAssertEqual([table columnCount], (NSUInteger)4, @"four columns");
 
@@ -1336,7 +1337,7 @@ using namespace std;
 
 - (void)testDistinctView
 {
-    RLMTable *t = [[RLMTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] initLocal];
     
     NSUInteger nameIndex = [t addColumnWithName:@"name" type:RLMTypeString];
     NSUInteger ageIndex = [t addColumnWithName:@"age" type:RLMTypeInt];
@@ -1366,8 +1367,8 @@ using namespace std;
 
 - (void)testPredicateFind
 {
-    RLMTable *t = [[RLMTable alloc] initWithColumns:@[@"name", @"string",
-                                                      @"age",  @"int"]];
+    RLMTable *t = [[RLMTable alloc] initLocalWithColumns:@[@"name", @"string",
+                                                           @"age",  @"int"]];
     [t addRow:@[@"name0", @0]];
     [t addRow:@[@"name1", @1]];
     [t addRow:@[@"name2", @1]];
@@ -1403,7 +1404,7 @@ using namespace std;
 
 - (void)testPredicateView
 {
-    RLMTable *t = [[RLMTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] initLocal];
     
     NSUInteger nameIndex = [t addColumnWithName:@"name" type:RLMTypeString];
     NSUInteger ageIndex = [t addColumnWithName:@"age" type:RLMTypeInt];
@@ -1464,7 +1465,7 @@ using namespace std;
 
 - (void)testPredicateSort
 {
-    RLMTable *t = [[RLMTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] initLocal];
 
     [t addColumnWithName:@"name" type:RLMTypeString];
     NSUInteger ageIndex = [t addColumnWithName:@"age" type:RLMTypeInt];
@@ -1507,7 +1508,7 @@ using namespace std;
 
 -(void)testTableDynamic_find_int
 {
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     [table addColumnWithName:@"first" type:RLMTypeInt];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithInt:i]]];
@@ -1517,7 +1518,7 @@ using namespace std;
 
 -(void)testTableDynamic_find_float
 {
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     [table addColumnWithName:@"first" type:RLMTypeFloat];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithFloat:(float)i]]];
@@ -1527,7 +1528,7 @@ using namespace std;
 
 -(void)testTableDynamic_find_double
 {
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     [table addColumnWithName:@"first" type:RLMTypeDouble];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithDouble:(double)i]]];
@@ -1537,7 +1538,7 @@ using namespace std;
 
 -(void)testTableDynamic_find_bool
 {
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     [table addColumnWithName:@"first" type:RLMTypeBool];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithBool:YES]]];
@@ -1549,7 +1550,7 @@ using namespace std;
 
 -(void)testTableDynamic_find_string
 {
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     [table addColumnWithName:@"first" type:RLMTypeString];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSString stringWithFormat:@"%d", i]]];
@@ -1559,7 +1560,7 @@ using namespace std;
 
 -(void)testTableDynamic_find_date
 {
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     [table addColumnWithName:@"first" type:RLMTypeDate];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSDate dateWithTimeIntervalSince1970:i]]];
@@ -1569,7 +1570,7 @@ using namespace std;
 
 - (void)testTableDynamic_update_row
 {
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     [table addColumnWithName:@"objID" type:RLMTypeInt];
     [table addColumnWithName:@"name" type:RLMTypeString];
     
