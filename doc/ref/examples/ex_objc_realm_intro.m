@@ -35,9 +35,11 @@ void ex_objc_realm_intro()
     // Create a realm and initialize by creating table and adding a row
     RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:realmFilePath
                                                  initBlock:^(RLMRealm *realm) {
-                                                     People *table = [realm createTableWithName:@"employees"
-                                                                                   asTableClass:[People class]];
-                                                     [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
+                                                     if (realm.isEmpty) {
+                                                         People *table = [realm createTableWithName:@"employees"
+                                                                                       asTableClass:[People class]];
+                                                         [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
+                                                     }
                                                  }];
     
     // Read from the realm

@@ -172,22 +172,28 @@ void throw_objc_exception(exception &ex)
                                                NSStringFromSelector(_cmd)]
                                      userInfo:nil];
     }
-    // Run init block before creating realm
-    if (initBlock) {
-        NSError *error = nil;
-        RLMContext *initContext = [RLMContext contextPersistedAtPath:path error:&error];
-        if (!error && initContext) {
-            [initContext writeUsingBlock:initBlock];
-        }
-    }
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     return [self realmWithPersistenceToFile:path
+                                  initBlock:initBlock
                                     runLoop:[NSRunLoop mainRunLoop]
                          notificationCenter:notificationCenter
                                       error:nil];
 }
 
 + (instancetype)realmWithPersistenceToFile:(NSString *)path
+                                   runLoop:(NSRunLoop *)runLoop
+                        notificationCenter:(NSNotificationCenter *)notificationCenter
+                                     error:(NSError **)error
+{
+    return [self realmWithPersistenceToFile:path
+                                  initBlock:nil
+                                    runLoop:runLoop
+                         notificationCenter:notificationCenter
+                                      error:error];
+}
+
++ (instancetype)realmWithPersistenceToFile:(NSString *)path
+                                 initBlock:(RLMWriteBlock)initBlock
                                    runLoop:(NSRunLoop *)runLoop
                         notificationCenter:(NSNotificationCenter *)notificationCenter
                                      error:(NSError **)error
@@ -225,6 +231,41 @@ void throw_objc_exception(exception &ex)
             *error = make_realm_error(errorCode, errorMessage);
         }
         return nil;
+    }
+    
+    // Run init block before creating realm
+    if (initBlock) {
+        realm->m_read_only = NO;
+        try {
+            realm->_group = (tightdb::Group *)&realm->_sharedGroup->begin_write();
+        }
+        catch (std::exception& ex) {
+            // File access errors are treated as exceptions here since they should not occur after the shared
+            // group has already been successfully opened on the file and memory mapped. The shared group constructor handles
+            // the excepted error related to file access.
+            @throw [NSException exceptionWithName:@"realm:core_exception"
+                                           reason:[NSString stringWithUTF8String:ex.what()]
+                                         userInfo:nil];
+        }
+        
+        @try {
+            initBlock(realm);
+        }
+        @catch (NSException* exception) {
+            realm->_sharedGroup->rollback();
+            @throw;
+        }
+        
+        // Required to avoid leaking of core exceptions.
+        try {
+            realm->_sharedGroup->commit();
+        }
+        catch (std::exception& ex) {
+            @throw [NSException exceptionWithName:@"realm:core_exception"
+                                           reason:[NSString stringWithUTF8String:ex.what()]
+                                         userInfo:nil];
+        }
+        realm->m_read_only = YES;
     }
 
     // Register an interval timer on specified runLoop

@@ -52,8 +52,6 @@ CATEGORIES:
                  >
                  A block of code. The block can modify the tables or add new tables in a
                  transactional manner.
-                 If using the block with the optional rollback argument, returning with
-                 the rollback parameter set to YES will rollback all changes done in the block.
       RETURN:
         TYPES  : RLMRealm
         DESCR  : A realm mapped to a file at the default path.
@@ -89,12 +87,18 @@ CATEGORIES:
       DESCR    :
       - TEXT   : >
                  Creates a stand-alone RLMRealm that lives outside any explicit RLMContext.
-                 Can be called from any thread.
-      SIGNATURE: "+ (instancetype)realmWithPersistenceToFile:(NSString *)path runLoop:(NSRunLoop *)runLoop notificationCenter:(NSNotificationCenter *)notificationCenter error:(NSError **)error"
+                 Can be called from any thread. Runs an optional initialization block on a
+                 writable context before returning.
+      SIGNATURE: |
+                 "+ (instancetype)realmWithPersistenceToFile:(NSString *)path runLoop:(NSRunLoop *)runLoop notificationCenter:(NSNotificationCenter *)notificationCenter error:(NSError **)error"
+                 "+ (instancetype)realmWithPersistenceToFile:(NSString *)path initBlock:(RLMWriteBlock)initBlock runLoop:(NSRunLoop *)runLoop notificationCenter:(NSNotificationCenter *)notificationCenter error:(NSError **)error"
       PARAMS:
       - NAME   : path
         TYPES  : NSString
         DESCR  : *g_realm_path_param_descr
+      - NAME   : initBlock
+        TYPES  : RLMWriteBlock
+        DESCR  : *g_write_block_param_descr
       - NAME   : runLoop
         TYPES  : NSRunLoop
         DESCR  : "The run loop on which implicit transactions will by synced. E.g. [NSRunLoop mainRunLoop]"
