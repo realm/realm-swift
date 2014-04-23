@@ -9,6 +9,7 @@
 
 #import <realm/objc/RLMFast.h>
 #import <realm/objc/RLMRealm.h>
+#import <realm/objc/RLMLocal.h>
 
 REALM_TABLE_2(SharedTable2,
               Hired, Bool,

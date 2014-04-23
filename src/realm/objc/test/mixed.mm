@@ -9,6 +9,7 @@
 
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMTable_noinst.h>
+#import <realm/objc/RLMLocal.h>
 
 REALM_TABLE_3(MixedTable,
               Hired, Bool,

@@ -10,6 +10,7 @@
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMRealm.h>
 #import <realm/objc/RLMContext.h>
+#import <realm/objc/RLMLocal.h>
 
 REALM_TABLE_2(GetSubtable,
                 Hired, Bool,

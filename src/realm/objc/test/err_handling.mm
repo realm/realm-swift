@@ -14,6 +14,7 @@
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMTable_noinst.h>
 #import <realm/objc/RLMTableFast.h>
+#import <realm/objc/RLMLocal.h>
 
 REALM_TABLE_DEF_3(PeopleErrTable,
                   Name,  String,
@@ -130,7 +131,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
 
 
     // Create table with all column types
-    RLMTable* table = [[RLMTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] initLocal];
     RLMDescriptor * desc = [table descriptor];
     if (![desc addColumnWithName:@"int" type:RLMTypeInt]) {
         XCTFail(@"addColumn failed.");
@@ -271,7 +272,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
 
 - (void)testQueryErrHandling
 {
-    TestQueryErrAllTypes* table = [[TestQueryErrAllTypes alloc] init];
+    TestQueryErrAllTypes* table = [[TestQueryErrAllTypes alloc] initLocal];
     NSLog(@"Table: %@", table);
     XCTAssertNotNil(table, @"Table is nil");
 
@@ -280,7 +281,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
     NSDate *timeNow = [NSDate date];
     //    TestQueryErrSub* subtab1 = [[TestQueryErrSub alloc] init];
-    TestQueryErrSub* subtab2 = [[TestQueryErrSub alloc] init];
+    TestQueryErrSub* subtab2 = [[TestQueryErrSub alloc] initLocal];
     [subtab2 addAge:100];
     NSNumber* mixInt1   = [NSNumber numberWithLongLong:1];
 //    TDBMixed* mixSubtab = [TDBMixed mixedWithTable:subtab2];
