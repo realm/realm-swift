@@ -29,7 +29,7 @@
 @implementation Sub
 @end
 
-RLM_TABLE_TYPE_FOR_OJBECT_TYPE(AgeTable, Sub)
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AgeTable, Sub)
 
 @interface AllTypes : RLMRow
 @property BOOL           boolCol;
@@ -47,7 +47,7 @@ RLM_TABLE_TYPE_FOR_OJBECT_TYPE(AgeTable, Sub)
 @implementation AllTypes
 @end
 
-RLM_TABLE_TYPE_FOR_OJBECT_TYPE(AllTypesTable, AllTypes)
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AllTypesTable, AllTypes)
 
 @interface InvalidType : RLMRow
 @property NSDictionary *dict;
@@ -70,7 +70,7 @@ RLM_TABLE_TYPE_FOR_OJBECT_TYPE(AllTypesTable, AllTypes)
 @implementation KeyedObject
 @end
 
-RLM_TABLE_TYPE_FOR_OJBECT_TYPE(KeyedTable, KeyedObject)
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 
 @implementation RLMTypedTableTests
 

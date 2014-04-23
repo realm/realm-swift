@@ -50,7 +50,7 @@
 // macro helper for defining custom table object with subtables
 // if used
 // TODO - move somewhere else
-#define RLM_DEFINE_TABLE_TYPE_FOR_OJBECT_TYPE(TType, OType) \
+#define RLM_DEFINE_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType) \
 @protocol OType <NSObject>                                  \
 -(OType *)rowAtIndex:(NSUInteger)rowIndex;                  \
 -(OType *)firstRow;                                         \
@@ -63,7 +63,7 @@
 +(Class)objectClass;                                        \
 @end
 
-#define RLM_IMPLEMENT_TABLE_TYPE_FOR_OJBECT_TYPE(TType, OType)  \
+#define RLM_IMPLEMENT_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)  \
 @implementation TType                                           \
 +(TType *)tableInRealm:(RLMTransaction *)rlm named:(NSString *)name { \
     if([rlm hasTableWithName:name]) return (TType *)[rlm tableWithName:name objectClass:OType.class]; \
@@ -71,9 +71,9 @@
 +(Class)objectClass { return OType.class; }                 \
 @end
 
-#define RLM_TABLE_TYPE_FOR_OJBECT_TYPE(TType, OType)    \
-RLM_DEFINE_TABLE_TYPE_FOR_OJBECT_TYPE(TType, OType)     \
-RLM_IMPLEMENT_TABLE_TYPE_FOR_OJBECT_TYPE(TType, OType)
+#define RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)    \
+RLM_DEFINE_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)     \
+RLM_IMPLEMENT_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)
 
 
 /* FIXME: This class can be (and should be) eliminated by using a
