@@ -167,7 +167,7 @@ using namespace std;
 // error (out of memory).
 //
 // The specified table class must be one that is declared by using
-// one of the table macros TIGHTDB_TABLE_*.
+// one of the table macros REALM_TABLE_*.
 //
 // FIXME: Check that the specified class derives from RLMTable.
 -(BOOL)hasSameDescriptorAs:(__unsafe_unretained Class)tableClass
@@ -189,7 +189,7 @@ using namespace std;
 // it encounters a memory allocation error (out of memory).
 //
 // The specified table class must be one that is declared by using
-// one of the table macros TIGHTDB_TABLE_*.
+// one of the table macros REALM_TABLE_*.
 //
 // FIXME: Check that the specified class derives from RLMTable.
 -(id)castToTypedTableClass:(__unsafe_unretained Class)typedTableClass

@@ -77,7 +77,7 @@
  * If a table with that name already exists, an exception is thrown.
  *
  * The specified table class must be one that is declared by using
- * one of the table macros TIGHTDB_TABLE_*.
+ * one of the table macros REALM_TABLE_*.
  */
 -(id)createTableWithName:(NSString *)name asTableClass:(Class)obj;
 
@@ -90,7 +90,7 @@
  * This method returns YES if a table with the specified name already exists. NO if it does not exists.
  *
  * The specified table class must be one that is declared by using
- * one of the table macros TIGHTDB_TABLE_*.
+ * one of the table macros REALM_TABLE_*.
  */
 -(BOOL)hasTableWithName:(NSString *)name withTableClass:(Class)obj;
 

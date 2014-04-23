@@ -36,7 +36,7 @@
 
 /* FIXME: This class can be (and should be) eliminated by using a
    macro switching trick for the individual column types on
-   TIGHTDB_CURSOR_PROPERTY macros similar to what is done for query
+   REALM_ROW_PROPERTY macros similar to what is done for query
    accessors. */
 @interface RLMAccessor : NSObject
 -(id)initWithRow:(RLMRow *)cursor columnId:(NSUInteger)columnId;
