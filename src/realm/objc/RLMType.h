@@ -17,8 +17,8 @@
  * from TightDB Incorporated.
  *
  **************************************************************************/
-#ifndef TIGHTDB_OBJC_TYPE_H
-#define TIGHTDB_OBJC_TYPE_H
+#ifndef REALM_OBJC_TYPE_H
+#define REALM_OBJC_TYPE_H
 
 /* Make sure numbers match those in <tightdb/data_type.hpp> */
 typedef NS_ENUM(NSInteger, RLMType) {
@@ -40,4 +40,4 @@ typedef NS_ENUM(NSInteger, RLMSortOrder) {
     RLMSortOrderDescending =  1,
 };
 
-#endif /* TIGHTDB_OBJC_TYPE_H */
+#endif /* REALM_OBJC_TYPE_H */

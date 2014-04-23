@@ -18,7 +18,7 @@
  *
  **************************************************************************/
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
 
@@ -59,7 +59,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AllTypesTable, AllTypes)
 RLM_TABLE_TYPE_FOR_OBJECT_TYPE(InvalidTable, InvalidType)
 
 
-@interface RLMTypedTableTests: XCTestCase
+@interface RLMTypedTableTests: RLMTestCase
   // Intentionally left blank.
   // No new public instance methods need be defined.
 @end

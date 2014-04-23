@@ -2,93 +2,70 @@
 //  group.m
 //  TightDB
 //
-//  Test save/load on disk of a group with one table
+//  Test save/load on disk of a realm with one table
 //
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
-#import <realm/objc/RLMTransaction.h>
+#import <realm/objc/RLMRealm.h>
 #import <realm/objc/RLMContext.h>
-#import <realm/objc/group.h>
 
-REALM_TABLE_2(TestTableGroup,
-                First,  String,
-                Second, Int)
+REALM_TABLE_2(TestTableRealm,
+              First,  String,
+              Second, Int)
 
-@interface MACTestGroup: XCTestCase
+@interface MACTestRealm : RLMTestCase
+
 @end
-@implementation MACTestGroup
-{
-    RLMTransaction *_group;
-}
 
-- (void)setUp
-{
-    [super setUp];
+@implementation MACTestRealm
 
-    // _group = [RLMTransaction group];
-    // NSLog(@"RLMTransaction: %@", _group);
-    // XCTAssertNotNil(_group, @"Group is nil");
-}
+- (void)testRealm {
+    RLMContext *context = [self contextPersistedAtTestPath];
+    [context writeUsingBlock:^(RLMRealm *realm) {
+        // Empty realm
+        XCTAssertNotNil(realm, @"parameter must be used");
+    }];
 
-- (void)tearDown
-{
-    // Tear-down code here.
+    // Load the realm
+    RLMRealm *fromDisk = [self realmPersistedAtTestPath];
+    XCTAssertTrue(fromDisk, @"Realm from disk should be valid");
 
-    //  [super tearDown];
-    //  _group = nil;
-}
+    // Create new table in realm
+    [context writeUsingBlock:^(RLMRealm *realm) {
+        [realm createTableWithName:@"test" asTableClass:[TestTableRealm class]];
+    }];
 
-- (void)testGroup
-{
-    NSFileManager *fm = [NSFileManager defaultManager];
-
-    // Create empty group and serialize to disk
-    RLMTransaction *toDisk = [RLMTransaction group];
-    [fm removeItemAtPath:@"table_test.realm" error:NULL];
-    [toDisk writeContextToFile:@"table_test.realm" error:nil];
-
-    // Load the group
-    RLMTransaction *fromDisk = [RLMTransaction groupWithFile:@"table_test.realm" error:nil];
-    if (!fromDisk)
-        XCTFail(@"From disk not valid");
-
-    // Create new table in group
-    TestTableGroup *t = (TestTableGroup *)[fromDisk createTableWithName:@"test" asTableClass:[TestTableGroup class]];
-
+    RLMRealm *realm = [self realmPersistedAtTestPath];
+    TestTableRealm *t = [realm tableWithName:@"test" asTableClass:[TestTableRealm class]];
+    
     // Verify
-    NSLog(@"Columns: %zu", t.columnCount);
-    if (t.columnCount != 2)
-        XCTFail(@"Should have been 2 columns");
-    if (t.rowCount != 0)
-        XCTFail(@"Should have been empty");
+    XCTAssertEqual(t.columnCount, (NSUInteger)2, @"Should have 2 columns");
+    XCTAssertEqual(t.rowCount, (NSUInteger)0, @"Should have 0 rows");
 
     // Modify table
-    [t addFirst:@"Test" Second:YES];
-    NSLog(@"Size: %lu", t.rowCount);
+    [context writeUsingBlock:^(RLMRealm *realm) {
+        TestTableRealm *t = [realm tableWithName:@"test" asTableClass:[TestTableRealm class]];
+        [t addFirst:@"Test" Second:YES];
+    }];
 
     // Verify
-    if (t.rowCount != 1)
-        XCTFail(@"Should have been one row");
-
-    t = nil;
+    RLMRealm *realm2 = [self realmPersistedAtTestPath];
+    TestTableRealm *t2 = [realm2 tableWithName:@"test" asTableClass:[TestTableRealm class]];
+    XCTAssertEqual(t2.rowCount, (NSUInteger)1, @"test table should have one row");
 }
 
-- (void)testGetTable
-{
-    RLMTransaction *g = [RLMTransaction group];
-    XCTAssertNil([g tableWithName:@"noTable"], @"Table does not exist");
+- (void)testGetTable {
+    XCTAssertNil([[self realmPersistedAtTestPath] tableWithName:@"noTable"], @"Table does not exist");
 }
 
-- (void)testGroupTableCount
-{
-    RLMTransaction *t = [RLMTransaction group];
-    XCTAssertEqual(t.tableCount, (NSUInteger)0, @"No tables added");
-    [t createTableWithName:@"tableName"];
-    XCTAssertEqual(t.tableCount, (NSUInteger)1, @"1 table added");
+- (void)testRealmTableCount {
+    XCTAssertEqual([[self realmPersistedAtTestPath] tableCount], (NSUInteger)0, @"No tables added");
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        [realm createTableWithName:@"tableName"];
+    }];
+    XCTAssertEqual([[self realmPersistedAtTestPath] tableCount], (NSUInteger)1, @"1 table added");
 }
 
 @end
-
-

@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		42211A4B18D8958400E1CA0B /* people.m in Sources */ = {isa = PBXBuildFile; fileRef = 42211A4A18D8958400E1CA0B /* people.m */; };
 		4272AB6418F56AB400397B62 /* ex_objc_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 4272AB6318F56AB400397B62 /* ex_objc_intro.m */; };
 		4272AB6A18F6D42B00397B62 /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4272AB6918F6D42B00397B62 /* libstdc++.6.dylib */; };
 		4B7915E219004CA700E29DAC /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7915E119004CA700E29DAC /* Realm.framework */; };
@@ -27,11 +26,12 @@
 		4D88934C18D320EF0038AFD4 /* ex_objc_tableview_dynamic_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D88934318D320EF0038AFD4 /* ex_objc_tableview_dynamic_intro.m */; };
 		4D88934D18D320EF0038AFD4 /* ex_objc_table_typed_intro_with_many_comments.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D88934418D320EF0038AFD4 /* ex_objc_table_typed_intro_with_many_comments.m */; };
 		4D88934E18D320EF0038AFD4 /* ex_objc_table_dynamic_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D88934518D320EF0038AFD4 /* ex_objc_table_dynamic_intro.m */; };
-		4D88934F18D320EF0038AFD4 /* ex_objc_group_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D88934618D320EF0038AFD4 /* ex_objc_group_intro.m */; };
 		4D88935018D320EF0038AFD4 /* ex_objc_query_dynamic_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D88934718D320EF0038AFD4 /* ex_objc_query_dynamic_intro.m */; };
 		4D88935118D320EF0038AFD4 /* ex_objc_table_typed_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D88934818D320EF0038AFD4 /* ex_objc_table_typed_intro.m */; };
 		4D88935218D320EF0038AFD4 /* ex_objc_tableview_typed_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D88934918D320EF0038AFD4 /* ex_objc_tableview_typed_intro.m */; };
 		4D88935318D320EF0038AFD4 /* ex_objc_query_typed_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D88934A18D320EF0038AFD4 /* ex_objc_query_typed_intro.m */; };
+		E8AD43BD19058DC70091D9D8 /* ex_objc_realm_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = E8AD43BC19058DC70091D9D8 /* ex_objc_realm_intro.m */; };
+		E8AD43BE19058FCF0091D9D8 /* people.m in Sources */ = {isa = PBXBuildFile; fileRef = 42211A4C18D895D000E1CA0B /* people.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,7 +46,6 @@
 
 /* Begin PBXFileReference section */
 		42211A2C18D879DA00E1CA0B /* people.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = people.h; path = ../examples/people.h; sourceTree = "<group>"; };
-		42211A4A18D8958400E1CA0B /* people.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = people.m; path = ../examples/people.m; sourceTree = "<group>"; };
 		42211A4C18D895D000E1CA0B /* people.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = people.m; path = ../examples/people.m; sourceTree = "<group>"; };
 		42211A4E18D897F500E1CA0B /* examples.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = examples.h; path = ../examples/examples.h; sourceTree = "<group>"; };
 		4272AB6318F56AB400397B62 /* ex_objc_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_intro.m; path = ../examples/ex_objc_intro.m; sourceTree = "<group>"; };
@@ -73,12 +72,12 @@
 		4D88934318D320EF0038AFD4 /* ex_objc_tableview_dynamic_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_tableview_dynamic_intro.m; path = ../examples/ex_objc_tableview_dynamic_intro.m; sourceTree = "<group>"; };
 		4D88934418D320EF0038AFD4 /* ex_objc_table_typed_intro_with_many_comments.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_table_typed_intro_with_many_comments.m; path = ../examples/ex_objc_table_typed_intro_with_many_comments.m; sourceTree = "<group>"; };
 		4D88934518D320EF0038AFD4 /* ex_objc_table_dynamic_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_table_dynamic_intro.m; path = ../examples/ex_objc_table_dynamic_intro.m; sourceTree = "<group>"; };
-		4D88934618D320EF0038AFD4 /* ex_objc_group_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_group_intro.m; path = ../examples/ex_objc_group_intro.m; sourceTree = "<group>"; };
 		4D88934718D320EF0038AFD4 /* ex_objc_query_dynamic_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_query_dynamic_intro.m; path = ../examples/ex_objc_query_dynamic_intro.m; sourceTree = "<group>"; };
 		4D88934818D320EF0038AFD4 /* ex_objc_table_typed_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_table_typed_intro.m; path = ../examples/ex_objc_table_typed_intro.m; sourceTree = "<group>"; };
 		4D88934918D320EF0038AFD4 /* ex_objc_tableview_typed_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_tableview_typed_intro.m; path = ../examples/ex_objc_tableview_typed_intro.m; sourceTree = "<group>"; };
 		4D88934A18D320EF0038AFD4 /* ex_objc_query_typed_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_query_typed_intro.m; path = ../examples/ex_objc_query_typed_intro.m; sourceTree = "<group>"; };
 		4D88935618D321130038AFD4 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
+		E8AD43BC19058DC70091D9D8 /* ex_objc_realm_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_realm_intro.m; path = ../examples/ex_objc_realm_intro.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -186,19 +185,18 @@
 			isa = PBXGroup;
 			children = (
 				42211A4E18D897F500E1CA0B /* examples.h */,
-				4D88934218D320EF0038AFD4 /* ex_objc_sharedgroup_intro.m */,
-				42211A4C18D895D000E1CA0B /* people.m */,
 				42211A2C18D879DA00E1CA0B /* people.h */,
-				42211A4A18D8958400E1CA0B /* people.m */,
-				4D88934318D320EF0038AFD4 /* ex_objc_tableview_dynamic_intro.m */,
-				4D88934418D320EF0038AFD4 /* ex_objc_table_typed_intro_with_many_comments.m */,
-				4D88934518D320EF0038AFD4 /* ex_objc_table_dynamic_intro.m */,
-				4D88934618D320EF0038AFD4 /* ex_objc_group_intro.m */,
-				4D88934718D320EF0038AFD4 /* ex_objc_query_dynamic_intro.m */,
-				4D88934818D320EF0038AFD4 /* ex_objc_table_typed_intro.m */,
-				4D88934918D320EF0038AFD4 /* ex_objc_tableview_typed_intro.m */,
+				42211A4C18D895D000E1CA0B /* people.m */,
 				4272AB6318F56AB400397B62 /* ex_objc_intro.m */,
+				4D88934718D320EF0038AFD4 /* ex_objc_query_dynamic_intro.m */,
 				4D88934A18D320EF0038AFD4 /* ex_objc_query_typed_intro.m */,
+				4D88934218D320EF0038AFD4 /* ex_objc_sharedgroup_intro.m */,
+				E8AD43BC19058DC70091D9D8 /* ex_objc_realm_intro.m */,
+				4D88934518D320EF0038AFD4 /* ex_objc_table_dynamic_intro.m */,
+				4D88934818D320EF0038AFD4 /* ex_objc_table_typed_intro.m */,
+				4D88934418D320EF0038AFD4 /* ex_objc_table_typed_intro_with_many_comments.m */,
+				4D88934318D320EF0038AFD4 /* ex_objc_tableview_dynamic_intro.m */,
+				4D88934918D320EF0038AFD4 /* ex_objc_tableview_typed_intro.m */,
 			);
 			name = examples;
 			sourceTree = "<group>";
@@ -298,15 +296,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				42211A4B18D8958400E1CA0B /* people.m in Sources */,
+				E8AD43BD19058DC70091D9D8 /* ex_objc_realm_intro.m in Sources */,
 				4D88934B18D320EF0038AFD4 /* ex_objc_sharedgroup_intro.m in Sources */,
 				4D88934C18D320EF0038AFD4 /* ex_objc_tableview_dynamic_intro.m in Sources */,
 				4D88934D18D320EF0038AFD4 /* ex_objc_table_typed_intro_with_many_comments.m in Sources */,
 				4D88932318D320D20038AFD4 /* AppDelegate.m in Sources */,
 				4D88934E18D320EF0038AFD4 /* ex_objc_table_dynamic_intro.m in Sources */,
+				E8AD43BE19058FCF0091D9D8 /* people.m in Sources */,
 				4D88935318D320EF0038AFD4 /* ex_objc_query_typed_intro.m in Sources */,
 				4272AB6418F56AB400397B62 /* ex_objc_intro.m in Sources */,
-				4D88934F18D320EF0038AFD4 /* ex_objc_group_intro.m in Sources */,
 				4D88935118D320EF0038AFD4 /* ex_objc_table_typed_intro.m in Sources */,
 				4D88935018D320EF0038AFD4 /* ex_objc_query_dynamic_intro.m in Sources */,
 				4D88935218D320EF0038AFD4 /* ex_objc_tableview_typed_intro.m in Sources */,

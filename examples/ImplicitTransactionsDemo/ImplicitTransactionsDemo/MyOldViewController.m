@@ -1,4 +1,4 @@
-#import <Tightdb/Tightdb.h>
+#import <Realm/Realm.h>
 
 #import "MyAppDelegate.h"
 #import "MyOldViewController.h"
@@ -8,7 +8,7 @@
 {
     NSTimer *_refreshTimer;
     int _numRefreshTicks;
-    TDBContext *_context;
+    RLMContext *_context;
 }
 
 - (NSString *)pathForName:(NSString *)name
@@ -25,8 +25,8 @@
     self.title = NSLocalizedString(@"Old", @"Old");
     self.tabBarItem.image = [UIImage imageNamed:@"old"];
 
-    _context = [TDBContext contextPersistedAtPath:[self pathForName:@"demo.tightdb"]
-                                                  error:nil];
+    _context = [RLMContext contextPersistedAtPath:[self pathForName:@"demo.realm"]
+                                            error:nil];
 
     return self;
 }
@@ -77,8 +77,8 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     __block NSUInteger numRows = 0;
-    [_context readUsingBlock:^(TDBTransaction *transact) {
-        TDBTable *table = [transact tableWithName:@"demo"];
+    [_context readUsingBlock:^(RLMRealm *realm) {
+        RLMTable *table = [realm tableWithName:@"demo"];
         numRows = table.rowCount;
     }];
     return numRows;
@@ -97,8 +97,8 @@
                                       reuseIdentifier:simpleTableIdentifier];
     }
 
-    [_context readUsingBlock:^(TDBTransaction *transact) {
-        TDBTable *table = [transact tableWithName:@"demo"];
+    [_context readUsingBlock:^(RLMRealm *realm) {
+        RLMTable *table = [realm tableWithName:@"demo"];
         cell.textLabel.text = table[indexPath.row][0];
     }];
 

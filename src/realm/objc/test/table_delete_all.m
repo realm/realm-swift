@@ -3,14 +3,14 @@
 //  TightDB
 //
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/RLMTable.h>
 #import <realm/objc/RLMDescriptor.h>
 #import <realm/objc/RLMPrivate.h>
 #import <realm/objc/RLMTableFast.h>
 
-@interface MACTestTableDeleteAll: XCTestCase
+@interface MACTestTableDeleteAll: RLMTestCase
 @end
 @implementation MACTestTableDeleteAll
 
@@ -32,7 +32,7 @@
     [subdesc addColumnWithName:@"sub_second" type:RLMTypeString];
 
     // Add some rows
-    for (size_t i = 0; i < 15; ++i) {
+    for (NSUInteger i = 0; i < 15; ++i) {
         [table RLM_insertInt:0 ndx:i value:i];
         [table RLM_insertBool:1 ndx:i value:(i % 2 ? YES : NO)];
         [table RLM_insertDate:2 ndx:i value:[NSDate date]];
@@ -83,11 +83,11 @@
     [table removeRowAtIndex:14];
     [table removeRowAtIndex:0];
     [table removeRowAtIndex:5];
-    XCTAssertEqual([table rowCount], (size_t)12, @"Size should have been 12");
+    XCTAssertEqual([table rowCount], (NSUInteger)12, @"Size should have been 12");
 
     // Test Clear
     [table removeAllRows];
-    XCTAssertEqual([table rowCount], (size_t)0, @"Size should have been zero");
+    XCTAssertEqual([table rowCount], (NSUInteger)0, @"Size should have been zero");
 
 }
 
