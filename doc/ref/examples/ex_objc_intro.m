@@ -27,7 +27,7 @@ void ex_objc_intro() {
     // Remove old data file
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSError *error;
-    [fileManager removeItemAtPath:@"people.tightdb" error:&error];
+    [fileManager removeItemAtPath:@"people.realm" error:&error];
 
     RLMContext *context = [RLMContext contextWithDefaultPersistence];
 
@@ -42,9 +42,7 @@ void ex_objc_intro() {
         [table addRow:@{@"Name": @"Lars", @"Age": @22, @"Hired": @YES}];
         [table addRow:@{@"Name": @"Phil", @"Age": @43, @"Hired": @NO}];
         [table addRow:@{@"Name": @"Anni", @"Age": @54, @"Hired": @YES}];
-
-        return YES; // Commit!
-    } error:nil];
+    }];
 
     // Start a read transaction
     [context readUsingBlock:^(RLMTransaction *transaction) {
