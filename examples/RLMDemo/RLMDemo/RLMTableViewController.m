@@ -2,7 +2,6 @@
 //  RLMTableViewController.m
 //  RLMDemo
 //
-//  Created by JP Simard on 4/16/14.
 //  Copyright (c) 2014 Realm. All rights reserved.
 //
 
@@ -10,16 +9,17 @@
 #import <Realm/Realm.h>
 
 // @@Example: create_table @@
-// Define table
+// Define table with two columns
 
 REALM_TABLE_2(RLMDemoTable,
-              title, String,
+              title,   String,
               checked, Bool)
 
 // @@EndExample@@
 
 static NSString * const kCellID    = @"cell";
 static NSString * const kTableName = @"table";
+
 
 @interface RLMTableViewController ()
 
@@ -35,19 +35,17 @@ static NSString * const kTableName = @"table";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                                                            target:self
                                                                                            action:@selector(add)];
-    
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:kCellID];
     
-    [self setupTightDB];
+    [self setupRealm];
 }
 
-#pragma mark - TightDB
+#pragma mark - Realm
 
-- (void)setupTightDB {
+- (void)setupRealm {
     // @@Example: setup_contexts @@
     // Set up read/write contexts
     self.realm   = [RLMRealm realmWithDefaultPersistence];
@@ -64,14 +62,14 @@ static NSString * const kTableName = @"table";
     // @@EndExample@@
     
     // @@Example: setup_notifications @@
-    // Observe TightDB Notifications
+    // Observe Realm Notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(tightDBContextDidChange)
+                                             selector:@selector(realmContextDidChange)
                                                  name:RLMContextDidChangeNotification
                                                object:nil];
 }
 
-- (void)tightDBContextDidChange {
+- (void)realmContextDidChange {
     [self.tableView reloadData];
 }
 // @@EndExample@@
@@ -79,7 +77,7 @@ static NSString * const kTableName = @"table";
 - (RLMDemoTable *)table {
     if (!_table) {
         // @@Example: get_table @@
-        // Get table with specified name and class from smart context
+        // Get table with specified name and class from the realm
         _table = [self.realm tableWithName:kTableName asTableClass:[RLMDemoTable class]];
         // @@EndExample@@
     }
@@ -146,7 +144,8 @@ static NSString * const kTableName = @"table";
     // @@Example: query @@
     RLMRow *row = [self.table find:[NSPredicate predicateWithFormat:@"checked = %@", @YES]];
     if (row) {
-        NSLog(@"%@ is %@", row[@"title"], [(NSNumber *)row[@"checked"] boolValue] ? @"checked" : @"unchecked");
+        NSLog(@"%@ is %@", row[@"title"],
+              [(NSNumber *)row[@"checked"] boolValue] ? @"checked" : @"unchecked");
     }
     // @@EndExample@@
 }
