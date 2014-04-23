@@ -27,14 +27,14 @@
 /**
  * Use the main run loop and the default notification center.
  */
-+ (RLMRealm *)realmWithDefaultPersistence;
++ (instancetype)realmWithDefaultPersistence;
 
-+ (RLMRealm *)realmWithPersistenceToFile:(NSString *)path;
++ (instancetype)realmWithPersistenceToFile:(NSString *)path;
 
-+ (RLMRealm *)realmWithPersistenceToFile:(NSString *)path
-                                 runLoop:(NSRunLoop *)runLoop
-                      notificationCenter:(NSNotificationCenter *)notificationCenter
-                                   error:(NSError **)error;
++ (instancetype)realmWithPersistenceToFile:(NSString *)path
+                                   runLoop:(NSRunLoop *)runLoop
+                        notificationCenter:(NSNotificationCenter *)notificationCenter
+                                     error:(NSError **)error;
 
 @property (nonatomic, readonly) NSUInteger tableCount;
 @property (nonatomic, readonly) BOOL       isEmpty;
