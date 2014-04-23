@@ -34,10 +34,6 @@
 @property (nonatomic, readonly) NSUInteger columnCount;
 @property (nonatomic, readonly) RLMDescriptor *descriptor;
 
-// Initializers for standalone tables
--(instancetype)init;
--(instancetype)initWithColumns:(NSArray *)columns;
-
 // Working with columns
 -(NSUInteger)addColumnWithName:(NSString *)name type:(RLMType)type;
 -(void)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString *)newName;

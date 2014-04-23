@@ -48,9 +48,14 @@ using namespace std;
     RLMRow * m_tmp_row;
 }
 
+- (instancetype)init
+{
+    @throw [NSException exceptionWithName:@"realm:invalid_init"
+                                   reason:@"Tables can only be accessed from RLMRealm objects"
+                                 userInfo:nil];
+}
 
-
--(instancetype)init
+-(instancetype)initLocal
 {
     self = [super init];
     if (self) {
@@ -60,7 +65,7 @@ using namespace std;
     return self;
 }
 
--(instancetype)initWithColumns:(NSArray *)columns
+-(instancetype)initLocalWithColumns:(NSArray *)columns
 {
     self = [super init];
     if (!self)
