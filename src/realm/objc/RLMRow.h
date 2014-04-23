@@ -61,14 +61,19 @@
 @interface TType : RLMTable<OType>                          \
 +(TType *)tableInRealm:(RLMTransaction *)rlm named:(NSString *)name;  \
 +(Class)objectClass;                                        \
-@end                                                        \
-@implementation TType                                       \
+@end
+
+#define RLM_IMPLEMENT_TABLE_TYPE_FOR_OJBECT_TYPE(TType, OType)  \
+@implementation TType                                           \
 +(TType *)tableInRealm:(RLMTransaction *)rlm named:(NSString *)name { \
     if([rlm hasTableWithName:name]) return (TType *)[rlm tableWithName:name objectClass:OType.class]; \
     return (TType *)[rlm createTableWithName:name objectClass:OType.class];} \
 +(Class)objectClass { return OType.class; }                 \
 @end
 
+#define RLM_TABLE_TYPE_FOR_OJBECT_TYPE(TType, OType)    \
+RLM_DEFINE_TABLE_TYPE_FOR_OJBECT_TYPE(TType, OType)     \
+RLM_IMPLEMENT_TABLE_TYPE_FOR_OJBECT_TYPE(TType, OType)
 
 
 /* FIXME: This class can be (and should be) eliminated by using a
