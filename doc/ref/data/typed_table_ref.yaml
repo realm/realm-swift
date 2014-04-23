@@ -388,8 +388,8 @@ CATEGORIES:
       - CODE   : ex_objc_typed_table_remove_last_row
         DESCR  :
 
-- Searching:
-  METHODS:
+# - Searching:
+#   METHODS:
   # TODO: g_typed_table_lookup:
 
   #- g_typed_table_find_first_bool:
