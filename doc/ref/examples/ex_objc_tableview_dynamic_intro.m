@@ -7,9 +7,9 @@ void ex_objc_tableview_dynamic_intro()
     RLMTable *table = [[RLMTable alloc] init];
     
     /* Add some columns dynamically */
-    NSUInteger const NAME = [table addColumnWithName:@"Name" type:RLMTypeString];
-    NSUInteger const AGE  = [table addColumnWithName:@"Age" type:RLMTypeInt];
-    NSUInteger const HIRED= [table addColumnWithName:@"Hired" type:RLMTypeBool];
+    [table addColumnWithName:@"Name" type:RLMTypeString];
+    [table addColumnWithName:@"Age" type:RLMTypeInt];
+    [table addColumnWithName:@"Hired" type:RLMTypeBool];
     
     /* Add people (rows). */
     [table addRow:@[@"Joe", @23, @YES]];
@@ -22,7 +22,7 @@ void ex_objc_tableview_dynamic_intro()
     
     /* Iterate over the matching rows */
     for (RLMRow *row in view) {
-        NSLog(@"With fast enumerator. Name: %@",row[NAME]);
+        NSLog(@"With fast enumerator. Name: %@",row[@"Name"]);
     }
     
     /* Take a row at index one in the view. */
@@ -30,7 +30,7 @@ void ex_objc_tableview_dynamic_intro()
     
     RLMRow *row = [view rowAtIndex:1];
     if (row != nil)
-        NSLog(@"With fixed index. Name: %@",row[NAME]);
+        NSLog(@"With fixed index. Name: %@",row[@"Name"]);
     
     /* Try to get a row with an out-of-bounds index. */
     RLMRow *row2 = [view rowAtIndex:view.rowCount];

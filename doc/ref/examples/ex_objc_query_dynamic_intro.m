@@ -5,12 +5,9 @@ void ex_objc_query_dynamic_intro()
 {
     /* Creates a new table dynamically. */
     RLMTable *table = [[RLMTable alloc] init];
-    NSUInteger const NAME  = [table addColumnWithName:@"Name"
-                                                 type:RLMTypeString];
-    NSUInteger const AGE   = [table addColumnWithName:@"Age"
-                                                 type:RLMTypeInt];
-    NSUInteger const HIRED = [table addColumnWithName:@"Hired"
-                                                 type:RLMTypeBool];
+    [table addColumnWithName:@"Name" type:RLMTypeString];
+    [table addColumnWithName:@"Age" type:RLMTypeInt];
+    [table addColumnWithName:@"Hired" type:RLMTypeBool];
     
     /* Add some people. */
     [table addRow:@[@"Joe", @23, @YES]];
@@ -23,7 +20,7 @@ void ex_objc_query_dynamic_intro()
     
     /* Iterate over query result */
     for (RLMRow *row in view) {
-        NSLog(@"name: %@",row[NAME]);
+        NSLog(@"name: %@",row[@"Name"]);
     }
 }
 /* @@EndExample@@ */
