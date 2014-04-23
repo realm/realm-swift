@@ -48,14 +48,14 @@
 -(RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
 // Getting individual rows
--(RLMRow *)rowAtIndex:(NSUInteger)rowIndex;
--(RLMRow *)firstRow;
--(RLMRow *)lastRow;
+-(id)rowAtIndex:(NSUInteger)rowIndex;
+-(id)firstRow;
+-(id)lastRow;
 
 // Getting and setting individual rows with object subscripting
 -(id)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
--(RLMRow *)objectForKeyedSubscript:(NSString *)key;
+-(id)objectForKeyedSubscript:(NSString *)key;
 -(void)setObject:(id)newValue forKeyedSubscript:(NSString *)key;
 
 // Add a row at the end of the table.
