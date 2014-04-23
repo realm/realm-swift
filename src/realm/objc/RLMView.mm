@@ -44,22 +44,22 @@
 
 +(RLMView *)viewWithTable:(RLMTable *)table andNativeView:(const tightdb::TableView&)view
 {
-    RLMView * view_2 = [[RLMView alloc] init];
-    if (!view_2)
+    RLMView * viewObj = [[RLMView alloc] init];
+    if (!viewObj)
         return nil;
-    view_2->m_view.reset(new tightdb::TableView(view)); // FIXME: Exception handling needed here
-    view_2->m_table = table;
-    view_2->m_read_only = [table isReadOnly];
+    viewObj->m_view.reset(new tightdb::TableView(view)); // FIXME: Exception handling needed here
+    viewObj->m_table = table;
+    viewObj->m_read_only = [table isReadOnly];
 
-    return view_2;
+    return viewObj;
 }
 
 -(id)_initWithQuery:(RLMQuery *)query
 {
     self = [super init];
     if (self) {
-        tightdb::Query& query_2 = [query getNativeQuery];
-        m_view.reset(new tightdb::TableView(query_2.find_all())); // FIXME: Exception handling needed here
+        tightdb::Query& queryRef = [query getNativeQuery];
+        m_view.reset(new tightdb::TableView(queryRef.find_all())); // FIXME: Exception handling needed here
         m_table = [query originTable];
         m_read_only = [m_table isReadOnly];
     }
@@ -185,16 +185,16 @@
 
     tightdb::TableRef table = m_view->get_subtable(colNdx, rowIndex);
     TIGHTDB_ASSERT(table);
-    RLMTable * table_2 = [[RLMTable alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table_2))
+    RLMTable * tableObj = [[RLMTable alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!tableObj))
         return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    if (![table_2 _checkType])
+    [tableObj setNativeTable:table.get()];
+    [tableObj setParent:self];
+    [tableObj setReadOnly:m_read_only];
+    if (![tableObj _checkType])
         return nil;
 
-    return table_2;
+    return tableObj;
 }
 
 -(NSString*)RLM_stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex

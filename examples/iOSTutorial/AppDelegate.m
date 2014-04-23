@@ -119,25 +119,25 @@ void sharedGroupFunc() {
 
     // @@Example: transaction @@
     RLMContext *context = [RLMContext contextPersistedAtPath:@"people.tightdb"
-                                                            error:nil];
+                                                       error:nil];
 
-    // Start a write transaction
-    [context writeUsingBlock:^(RLMTransaction *transaction) {
+    // Start a write realm
+    [context writeUsingBlock:^(RLMRealm *realm) {
         // Get a specific table from the realm
-        PeopleTable *table = [transaction createTableWithName:@"employees"
-                                                 asTableClass:[PeopleTable class]];
-        
+        PeopleTable *table = [realm createTableWithName:@"employees"
+                                           asTableClass:[PeopleTable class]];
+
         // Add a row
         [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
         NSLog(@"Row added!");
     }];
 
-    // Start a read transaction
-    [context readUsingBlock:^(RLMTransaction *transaction) {
+    // Start a read realm
+    [context readUsingBlock:^(RLMRealm *realm) {
         // Get the table
-        PeopleTable *table = [transaction tableWithName:@"employees"
-                                           asTableClass:[PeopleTable class]];
-        
+        PeopleTable *table = [realm tableWithName:@"employees"
+                                     asTableClass:[PeopleTable class]];
+
         // Interate over all rows in table
         for (PeopleTableRow *row in table) {
             NSLog(@"Name: %@", row.Name);

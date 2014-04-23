@@ -20,12 +20,12 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMTransaction.h"
+#import "RLMRealm.h"
 
 
-typedef void(^RLMReadBlock)(RLMTransaction *transaction);
-typedef void(^RLMWriteBlock)(RLMTransaction *transaction);
-typedef void(^RLMWriteBlockWithRollback)(RLMTransaction *transaction, BOOL *rollback);
+typedef void(^RLMReadBlock)(RLMRealm *realm);
+typedef void(^RLMWriteBlock)(RLMRealm *realm);
+typedef void(^RLMWriteBlockWithRollback)(RLMRealm *realm, BOOL *rollback);
 typedef void(^RLMTableReadBlock)(RLMTable *table);
 typedef void(^RLMTableWriteBlock)(RLMTable *table);
 

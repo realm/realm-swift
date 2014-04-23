@@ -5,12 +5,12 @@
 // Check that data type enumeration values are in synch with the core library
 //
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/RLMType.h>
 #include <tightdb/data_type.hpp>
 
-@interface TestDataType: XCTestCase
+@interface TestDataType: RLMTestCase
 @end
 @implementation TestDataType
 
