@@ -388,8 +388,8 @@ CATEGORIES:
       - CODE   : ex_objc_typed_table_remove_last_row
         DESCR  :
 
-# - Searching:
-#   METHODS:
+- Searching:
+  METHODS:
   # TODO: g_typed_table_lookup:
 
   #- g_typed_table_find_first_bool:
@@ -416,17 +416,17 @@ CATEGORIES:
   #    - CODE   : ex_objc_typed_table_find_first_xxx
   #      DESCR  :
 
-  # - g_typed_table_where:
-  #     NAMES    : where
-  #     SIGNATURE: (ClassNameQuery *)where;
-  #     SUMMARY  : *g_typed_table_where_summary
-  #     DESCR    : This method initiates a query. See {@link class_typed_query}.
-  #     RETURN:
-  #       TYPES  : <i>ClassName</i>Query
-  #       DESCR  : The query object. Note that <i>ClassName</i> is replaced with the name of your specific table.
-  #     EXAMPLES:
-  #     - DESCR  :
-  #       CODE   : ex_cpp_typed_table_where
+  - g_typed_table_where:
+      NAMES    : where
+      SIGNATURE: (ClassNameQuery *)where;
+      SUMMARY  : *g_typed_table_where_summary
+      DESCR    : This method initiates a query. See {@link class_typed_query}.
+      RETURN:
+        TYPES  : <i>ClassName</i>Query
+        DESCR  : The query object. Note that <i>ClassName</i> is replaced with the name of your specific table.
+      EXAMPLES:
+      - DESCR  :
+        CODE   : ex_cpp_typed_table_where
 
 - Aggregates:
   METHODS:

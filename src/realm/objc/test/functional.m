@@ -7,15 +7,11 @@
 #import "RLMTestCase.h"
 #import <realm/objc/RLMFast.h>
 #import <realm/objc/RLMTable.h>
-#import <realm/objc/RLMTableFast.h>
-#import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 REALM_TABLE_3(FuncPeopleTable,
                 Name,  String,
                 Age,   Int,
                 Hired, Bool)
-
-REALM_TABLE_FAST(FuncPeopleTable)
 
 #define TABLE_SIZE 1000 // must be even number
 #define INSERT_ROW 5

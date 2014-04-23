@@ -21,7 +21,7 @@
 		42AD3A9918CDBDFF00C86073 /* RLMVersion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42AD3A9518CDBDFF00C86073 /* RLMVersion.mm */; };
 		42AD3A9A18CDBDFF00C86073 /* RLMVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 42AD3A9618CDBDFF00C86073 /* RLMVersion.h */; };
 		4B7ACCD918FDD96F008B7B95 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */; };
-		4BB05A7A19079E2700F7F5F9 /* RLMTableFast.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BB05A7919079E2700F7F5F9 /* RLMTableFast.h */; };
+		4BB05A6D190710E400F7F5F9 /* RLMTableFast.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BB05A6B190710E400F7F5F9 /* RLMTableFast.h */; };
 		4D01A9FC18C9F5E600527AD5 /* table_view.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9FB18C9F5E600527AD5 /* table_view.m */; };
 		4D01A9FE18C9F60F00527AD5 /* version.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9FD18C9F60F00527AD5 /* version.m */; };
 		4D143CCF18F69D0F00CEFF65 /* RLMQueryFast.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D143CCE18F69D0F00CEFF65 /* RLMQueryFast.h */; };
@@ -94,9 +94,7 @@
 		42AD3A9518CDBDFF00C86073 /* RLMVersion.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMVersion.mm; path = src/realm/objc/RLMVersion.mm; sourceTree = SOURCE_ROOT; };
 		42AD3A9618CDBDFF00C86073 /* RLMVersion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMVersion.h; path = src/realm/objc/RLMVersion.h; sourceTree = SOURCE_ROOT; };
 		4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		4BB05A771907464200F7F5F9 /* RLMPrivateTableMacrosFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMPrivateTableMacrosFast.h; sourceTree = "<group>"; };
-		4BB05A78190750B000F7F5F9 /* RLMViewFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMViewFast.h; sourceTree = "<group>"; };
-		4BB05A7919079E2700F7F5F9 /* RLMTableFast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTableFast.h; sourceTree = "<group>"; };
+		4BB05A6B190710E400F7F5F9 /* RLMTableFast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTableFast.h; path = src/realm/objc/RLMTableFast.h; sourceTree = "<group>"; };
 		4D01A9FB18C9F5E600527AD5 /* table_view.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = table_view.m; path = ../src/realm/objc/test/table_view.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		4D01A9FD18C9F60F00527AD5 /* version.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = version.m; path = ../src/realm/objc/test/version.m; sourceTree = "<group>"; };
 		4D143CBC18ED5FCF00CEFF65 /* PrivateTableMacros.h.cheetah */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PrivateTableMacros.h.cheetah; path = src/realm/objc/PrivateTableMacros.h.cheetah; sourceTree = SOURCE_ROOT; };
@@ -114,7 +112,6 @@
 		4DDDD67018EAF1C000E94613 /* RLMRowFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMRowFast.h; path = src/realm/objc/RLMRowFast.h; sourceTree = SOURCE_ROOT; };
 		4DDDD67218EAF22100E94613 /* RLMFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMFast.h; path = src/realm/objc/RLMFast.h; sourceTree = SOURCE_ROOT; };
 		4DDDD67318EB049300E94613 /* RLMViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMViewProtocol.h; path = src/realm/objc/RLMViewProtocol.h; sourceTree = SOURCE_ROOT; };
-		803BC78F1907C0D3006AB33A /* release_notes.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = release_notes.md; sourceTree = "<group>"; };
 		E82D50391900C128003C1B8E /* realm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = realm.m; path = ../src/realm/objc/test/realm.m; sourceTree = "<group>"; };
 		E87675CC1907841C00F58CDB /* RLMTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTestCase.h; path = src/realm/objc/test/RLMTestCase.h; sourceTree = SOURCE_ROOT; };
 		E87675CD1907841C00F58CDB /* RLMTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTestCase.m; path = src/realm/objc/test/RLMTestCase.m; sourceTree = SOURCE_ROOT; };
@@ -184,9 +181,7 @@
 				4DDDD67218EAF22100E94613 /* RLMFast.h */,
 				4DDDD67018EAF1C000E94613 /* RLMRowFast.h */,
 				4D143CCE18F69D0F00CEFF65 /* RLMQueryFast.h */,
-				4BB05A7919079E2700F7F5F9 /* RLMTableFast.h */,
-				4BB05A78190750B000F7F5F9 /* RLMViewFast.h */,
-				4BB05A771907464200F7F5F9 /* RLMPrivateTableMacrosFast.h */,
+				4BB05A6B190710E400F7F5F9 /* RLMTableFast.h */,
 			);
 			name = RLMFast;
 			sourceTree = "<group>";
@@ -206,7 +201,6 @@
 		E9189090177B677900653D7A = {
 			isa = PBXGroup;
 			children = (
-				803BC78F1907C0D3006AB33A /* release_notes.md */,
 				E91890A2177B677900653D7A /* Realm */,
 				E91890B4177B677900653D7A /* RealmTests */,
 				E918909B177B677900653D7A /* Frameworks */,
@@ -344,7 +338,6 @@
 				4D143CEF18F7E8C200CEFF65 /* RLMRealm.h in Headers */,
 				42AD3A9A18CDBDFF00C86073 /* RLMVersion.h in Headers */,
 				424EEFB018D9C15A00337A13 /* RLMView.h in Headers */,
-				4BB05A7A19079E2700F7F5F9 /* RLMTableFast.h in Headers */,
 				E91890E3177B67AB00653D7A /* RLMTable.h in Headers */,
 				4DDDD67418EB049300E94613 /* RLMViewProtocol.h in Headers */,
 				4D1ED30818E1AF4E003CFF44 /* PrivateTableMacros.h in Headers */,
@@ -353,6 +346,7 @@
 				4D143CF318F7E97500CEFF65 /* RLMConstants.h in Headers */,
 				4D143CEE18F7E8C200CEFF65 /* RLMRealm_noinst.h in Headers */,
 				424EEFA318D9C11D00337A13 /* RLMDescriptor_noinst.h in Headers */,
+				4BB05A6D190710E400F7F5F9 /* RLMTableFast.h in Headers */,
 				4220871618E042FD00F3CF27 /* NSData+RLMGetBinaryData.h in Headers */,
 				E91890E6177B67AB00653D7A /* util_noinst.hpp in Headers */,
 			);

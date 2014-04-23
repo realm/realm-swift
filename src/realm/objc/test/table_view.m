@@ -21,8 +21,6 @@
 #import "RLMTestCase.h"
 
 #import <realm/objc/RLMFast.h>
-#import <realm/objc/RLMTableFast.h>
-#import <realm/objc/RLMViewFast.h>
 
 @interface table_view : RLMTestCase
 

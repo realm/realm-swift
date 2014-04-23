@@ -30,13 +30,13 @@ void ex_objc_query_typed_intro()
     [table addRow:@{@"Name":@"Brian", @"Age":@14, @"Hired":@NO}];
     [table addRow:@{@"Name":@"Jack",  @"Age":@34, @"Hired":@YES}];
     [table addRow:@{@"Name":@"Bob",   @"Age":@10, @"Hired":@NO}];
-        
-    // Create a view
-    RLMView *view = [table where:@"Age > 20"];
+    
+    // Create a query
+    PeopleQuery *query = [[[[table where].Age columnIsGreaterThan:20] Or].Name columnIsEqualTo:@"Bob"];
     
     // Iterate over the query result
-    for (RLMRow *row in view) {
-        NSLog(@"Person matching query: %@", row[@"Name"]);
+    for (PeopleRow *row in query) {
+        NSLog(@"Person matching query: %@", row.Name);
     }
 }
 /* @@EndExample@@ */
