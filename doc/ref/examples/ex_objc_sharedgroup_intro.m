@@ -31,16 +31,16 @@ void ex_objc_context_intro()
     RLMContext *context = [RLMContext contextPersistedAtPath:@"contextTest.realm"
                                                        error:nil];
     // Perform a write transaction (with commit to file)
-    [context writeUsingBlock:^(RLMTransaction *transaction) {
-        People *table = [transaction createTableWithName:@"employees"
-                                            asTableClass:[People class]];
+    [context writeUsingBlock:^(RLMRealm *realm) {
+        People *table = [realm createTableWithName:@"employees"
+                                      asTableClass:[People class]];
         [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
     }];
 
     // Perform a write transaction (with rollback)
-    [context writeUsingBlockWithRollback:^(RLMTransaction *transaction, BOOL *rollback) {
-        People *table = [transaction createTableWithName:@"employees"
-                                            asTableClass:[People class]];
+    [context writeUsingBlockWithRollback:^(RLMRealm *realm, BOOL *rollback) {
+        People *table = [realm createTableWithName:@"employees"
+                                      asTableClass:[People class]];
         if ([table rowCount] == 0) {
             NSLog(@"Roll back!");
             *rollback = YES;
