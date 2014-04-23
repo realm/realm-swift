@@ -31,10 +31,9 @@ REALM_TABLE_1(RLMTestTable,
     
     NSError *error = nil;
     
-    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:tableName];
-        return YES;
-    } error:&error];
+    }];
     
     XCTAssertNil(error, @"RLMContext error should be nil after write block");
     
@@ -49,14 +48,9 @@ REALM_TABLE_1(RLMTestTable,
 - (void)testCanReadPreviouslyCreatedTypedTable {
     NSString *tableName = @"table";
     
-    NSError *error = nil;
-    
-    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:tableName asTableClass:[RLMTestTable class]];
-        return YES;
-    } error:&error];
-    
-    XCTAssertNil(error, @"RLMContext error should be nil after write block");
+    }];
     
     RLMRealm *realm = [self realmPersistedAtTestPath];
     RLMTestTable *table = [realm tableWithName:tableName asTableClass:[RLMTestTable class]];
@@ -74,14 +68,9 @@ REALM_TABLE_1(RLMTestTable,
     
     RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:realmFilePath];
     
-    NSError *error = nil;
-    
-    [[RLMContext contextPersistedAtPath:realmFilePath error:nil] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[RLMContext contextPersistedAtPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:tableName];
-        return YES;
-    } error:&error];
-    
-    XCTAssertNil(error, @"RLMContext error should be nil after write block");
+    }];
     
     __block RLMTable *table = [realm tableWithName:tableName];
     

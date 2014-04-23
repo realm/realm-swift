@@ -37,9 +37,7 @@ void ex_objc_intro() {
         [table addRow:@{@"Name": @"Lars", @"Age": @22, @"Hired": @YES}];
         [table addRow:@{@"Name": @"Phil", @"Age": @43, @"Hired": @NO}];
         [table addRow:@{@"Name": @"Anni", @"Age": @54, @"Hired": @YES}];
-
-        return YES; // Commit!
-    } error:nil];
+    }];
 
     // Start a read transaction
     [context readUsingBlock:^(RLMRealm *realm) {

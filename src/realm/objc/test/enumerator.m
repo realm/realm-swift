@@ -28,7 +28,7 @@ REALM_TABLE_2(EnumPeopleTable2,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
     
-    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
         EnumPeopleTable *people = [realm createTableWithName:@"employees" asTableClass:[EnumPeopleTable class]];
         
@@ -38,8 +38,7 @@ REALM_TABLE_2(EnumPeopleTable2,
         [people addName:@"Lars" Age:21 Hired:YES];
         [people addName:@"Phil" Age:43 Hired:NO];
         [people addName:@"Anni" Age:54 Hired:YES];
-        return YES;
-    } error:nil];
+    }];
     
     EnumPeopleTable *people = [[self realmPersistedAtTestPath] tableWithName:@"employees"
                                            asTableClass:[EnumPeopleTable class]];

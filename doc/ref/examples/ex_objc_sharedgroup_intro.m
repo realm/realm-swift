@@ -24,40 +24,30 @@
 
 void ex_objc_context_intro()
 {
-    // Remove any previous file
-    NSFileManager *fm = [NSFileManager defaultManager];
-    [fm removeItemAtPath:[RLMContext defaultPath] error:nil];
+    // Remove previous datafile
+    [[NSFileManager defaultManager] removeItemAtPath:@"contextTest.realm" error:nil];
 
     // Create datafile with a new table
-    RLMContext *context = [RLMContext contextWithDefaultPersistence];
-    
+    RLMContext *context = [RLMContext contextPersistedAtPath:@"contextTest.realm"
+                                                       error:nil];
     // Perform a write transaction (with commit to file)
-    NSError *error = nil;
-    BOOL success;
-    success = [context writeUsingBlock:^(RLMRealm *realm) {
-        People *table = [realm createTableWithName:@"employees"
-                                      asTableClass:[People class]];
+    [context writeUsingBlock:^(RLMTransaction *transaction) {
+        People *table = [transaction createTableWithName:@"employees"
+                                            asTableClass:[People class]];
         [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
-
-        return YES; // Commit
-    } error:&error];
-    if (!success) {
-        NSLog(@"write-transaction failed: %@", [error description]);
-    }
+    }];
 
     // Perform a write transaction (with rollback)
-    success = [context writeUsingBlock:^(RLMRealm *realm) {
-        People *table = [realm createTableWithName:@"contractors"
-                                      asTableClass:[People class]];
+    [context writeUsingBlockWithRollback:^(RLMTransaction *transaction, BOOL *rollback) {
+        People *table = [transaction createTableWithName:@"employees"
+                                            asTableClass:[People class]];
         if ([table rowCount] == 0) {
             NSLog(@"Roll back!");
-            return NO;
+            *rollback = YES;
+            return;
         }
         [table addName:@"Mary" Age:76 Hired:NO];
-        return YES; // Commit
-    } error:&error];
-    if (!success)
-        NSLog(@"Transaction Rolled back : %@", [error description]);
+    }];
 
     // Perform a read transaction
     [context readUsingBlock:^(RLMRealm *realm) {

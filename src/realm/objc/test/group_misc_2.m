@@ -45,8 +45,7 @@ REALM_TABLE_2(QueryTable,
 {
     RLMContext *context = [self contextPersistedAtTestPath];
     
-    NSError *error = nil;
-    [context writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [context writeUsingBlock:^(RLMRealm *realm) {
         NSUInteger rowIndex;
         NSLog(@"HasTable: %i", [realm hasTableWithName:@"employees"] );
         // Create new table in realm
@@ -73,8 +72,7 @@ REALM_TABLE_2(QueryTable,
         MyTableView *view = [[[table where].Age columnIsEqualTo:21] findAll];
         NSUInteger cnt = view.rowCount;            // cnt = 2
         XCTAssertEqual(cnt, (NSUInteger)2,@"Should be two rows in view");
-        return YES;
-    } error:&error];
+    }];
 
     //------------------------------------------------------
 
@@ -122,7 +120,7 @@ REALM_TABLE_2(QueryTable,
 
 - (void)testQuery
 {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
         QueryTable *table = [realm createTableWithName:@"Query table" asTableClass:[QueryTable class]];
         
         // Add some rows
@@ -130,8 +128,7 @@ REALM_TABLE_2(QueryTable,
         [table addFirst:4 Second:@"a"];
         [table addFirst:5 Second:@"b"];
         [table addFirst:8 Second:@"The quick brown fox"];
-        return YES;
-    } error:nil];
+    }];
     
     QueryTable *table = [[self realmPersistedAtTestPath] tableWithName:@"Query table" asTableClass:[QueryTable class]];
 
@@ -180,7 +177,7 @@ REALM_TABLE_2(QueryTable,
  */
 - (void)testSubtables
 {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^BOOL(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm createTableWithName:@"table" asTableClass:[RLMTable class]];
         
         // Specify the table type
@@ -213,8 +210,7 @@ REALM_TABLE_2(QueryTable,
         
         // Make the mixed values column contain another subtable
         [table RLM_setMixed:[[RLMTable alloc] init] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
-        return YES;
-    } error:nil];
+    }];
     
 /* Fails!!!
     // Specify its type

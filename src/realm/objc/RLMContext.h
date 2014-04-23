@@ -24,9 +24,10 @@
 
 
 typedef void(^RLMReadBlock)(RLMRealm *realm);
-typedef BOOL(^RLMWriteBlock)(RLMRealm *realm);
+typedef void(^RLMWriteBlock)(RLMRealm *realm);
+typedef void(^RLMWriteBlockWithRollback)(RLMRealm *realm, BOOL *rollback);
 typedef void(^RLMTableReadBlock)(RLMTable *table);
-typedef BOOL(^RLMTableWriteBlock)(RLMTable *table);
+typedef void(^RLMTableWriteBlock)(RLMTable *table);
 
 /****************	  RLMContext	****************/
 
@@ -40,15 +41,15 @@ typedef BOOL(^RLMTableWriteBlock)(RLMTable *table);
 
 // Transactions
 -(void)readUsingBlock:(RLMReadBlock)block;
--(BOOL)writeUsingBlock:(RLMWriteBlock)block error:(NSError **)error;
+-(void)writeUsingBlock:(RLMWriteBlock)block;
+-(void)writeUsingBlockWithRollback:(RLMWriteBlockWithRollback)block;
 
 // Shortcuts for transactions on a single table
 -(void)readTable:(NSString*)tablename usingBlock:(RLMTableReadBlock)block;
--(BOOL)writeTable:(NSString*)tablename usingBlock:(RLMTableWriteBlock)block error:(NSError **)error;
+-(void)writeTable:(NSString*)tablename usingBlock:(RLMTableWriteBlock)block;
 
 // Context state info
 -(BOOL)hasChangedSinceLastTransaction;
-
 
 
 @end
