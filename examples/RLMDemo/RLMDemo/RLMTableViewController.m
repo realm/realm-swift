@@ -23,8 +23,8 @@ static NSString * const kTableName = @"table";
 
 @interface RLMTableViewController ()
 
-@property (nonatomic, strong) RLMSmartContext *readContext;
-@property (nonatomic, strong) RLMContext *writeContext;
+@property (nonatomic, strong) RLMRealm *realm;
+@property (nonatomic, strong) RLMContext *context;
 @property (nonatomic, strong) RLMDemoTable *table;
 
 @end
@@ -50,25 +50,18 @@ static NSString * const kTableName = @"table";
 - (void)setupTightDB {
     // @@Example: setup_contexts @@
     // Set up read/write contexts
-    self.readContext  = [RLMSmartContext contextWithDefaultPersistence];
-    self.writeContext = [RLMContext contextWithDefaultPersistence];
+    self.realm   = [RLMRealm realmWithDefaultPersistence];
+    self.context = [RLMContext contextWithDefaultPersistence];
     // @@EndExample@@
-    
-    // Create table if it doesn't exist
-    NSError *error = nil;
     
     // @@Example: create_table @@
-    [self.writeContext writeUsingBlock:^BOOL(RLMTransaction *transaction) {
-        if (transaction.isEmpty) {
-            [transaction createTableWithName:kTableName asTableClass:[RLMDemoTable class]];
+    // Create table if it doesn't exist
+    [self.context writeUsingBlock:^(RLMRealm *realm) {
+        if (realm.isEmpty) {
+            [realm createTableWithName:kTableName asTableClass:[RLMDemoTable class]];
         }
-        return YES;
-    } error:&error];
+    }];
     // @@EndExample@@
-    
-    if (error) {
-        NSLog(@"error: %@", error.localizedDescription);
-    }
     
     // @@Example: setup_notifications @@
     // Observe TightDB Notifications
@@ -87,7 +80,7 @@ static NSString * const kTableName = @"table";
     if (!_table) {
         // @@Example: get_table @@
         // Get table with specified name and class from smart context
-        _table = [self.readContext tableWithName:kTableName asTableClass:[RLMDemoTable class]];
+        _table = [self.realm tableWithName:kTableName asTableClass:[RLMDemoTable class]];
         // @@EndExample@@
     }
     return _table;
@@ -116,41 +109,27 @@ static NSString * const kTableName = @"table";
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        NSError *error = nil;
-        
         // @@Example: delete_row @@
-        [self.writeContext writeTable:kTableName usingBlock:^BOOL(RLMTable *table) {
+        [self.context writeTable:kTableName usingBlock:^(RLMTable *table) {
             [table removeRowAtIndex:indexPath.row];
-            return YES;
-        } error:&error];
+        }];
         // @@EndExample@@
-        
-        if (error) {
-            NSLog(@"Error adding a new row: %@", error.localizedDescription);
-        }
     }
 }
 
 #pragma mark - Actions
 
 - (void)add {
-    NSError *error = nil;
-    
     // @@Example: add_row @@
-    [self.writeContext writeUsingBlock:^BOOL(RLMTransaction *transaction) {
-        RLMDemoTable *table = [transaction tableWithName:kTableName asTableClass:[RLMDemoTable class]];
-        NSString *title = [NSString stringWithFormat:@"Title %lu", (unsigned long)table.rowCount];
+    [self.context writeUsingBlock:^(RLMRealm *realm) {
+        RLMDemoTable *table = [realm tableWithName:kTableName asTableClass:[RLMDemoTable class]];
+        NSString *title = [NSString stringWithFormat:@"Title %@", @(table.rowCount)];
         BOOL checked = table.rowCount % 2;
         [table addRow:@[title, @(checked)]];
         // Rows can also be added as dictionaries:
         // [table addRow:@{@"title": title, @"checked": @(checked)}];
-        return YES;
-    } error:&error];
+    }];
     // @@EndExample@@
-    
-    if (error) {
-        NSLog(@"Error adding a new row: %@", error.localizedDescription);
-    }
 }
 
 #pragma mark - Tutorial Examples

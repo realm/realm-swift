@@ -1,4 +1,4 @@
-#import <Tightdb/Tightdb.h>
+#import <Realm/Realm.h>
 
 #import "MyAppDelegate.h"
 #import "MyOldViewController.h"
@@ -16,15 +16,15 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    TDBContext *context = [TDBContext contextPersistedAtPath:[self pathForName:@"demo.tightdb"] error:nil];
-    [context writeUsingBlock:^(TDBTransaction *transact) {
-        TDBTable *table = nil;
-        if (![transact hasTableWithName:@"demo"]) {
-            table = [transact createTableWithName:@"demo"];
-            [table addColumnWithName:@"text" type:TDBStringType];
+    RLMContext *context = [RLMContext contextPersistedAtPath:[self pathForName:@"demo.realm"] error:nil];
+    [context writeUsingBlock:^(RLMRealm *realm) {
+        RLMTable *table = nil;
+        if (![realm hasTableWithName:@"demo"]) {
+            table = [realm createTableWithName:@"demo"];
+            [table addColumnWithName:@"text" type:RLMTypeString];
         }
         else {
-            table = [transact tableWithName:@"demo"];
+            table = [realm tableWithName:@"demo"];
         }
         [table removeAllRows];
         for (int i = 0; i < 5; ++i) {

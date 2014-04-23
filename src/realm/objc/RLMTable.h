@@ -87,9 +87,6 @@
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex;
 
-// Optimizing
--(BOOL)optimize;
-
 // Table type and schema
 -(BOOL)isEqual:(id)otherTableClass;
 -(id)castToTypedTableClass:(Class)typedTableClass;

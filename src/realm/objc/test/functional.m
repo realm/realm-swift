@@ -4,7 +4,7 @@
 //  This test is aimed at verifying functionallity added by the binding.
 
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 #import <realm/objc/RLMFast.h>
 #import <realm/objc/RLMTable.h>
 
@@ -16,7 +16,7 @@ REALM_TABLE_3(FuncPeopleTable,
 #define TABLE_SIZE 1000 // must be even number
 #define INSERT_ROW 5
 
-@interface MACtestFunctional: XCTestCase
+@interface MACtestFunctional: RLMTestCase
 @end
 @implementation MACtestFunctional
 
@@ -154,9 +154,9 @@ REALM_TABLE_3(FuncPeopleTable,
 
     RLMTable *table = [[RLMTable alloc] init];
 
-    size_t const NAME = [table addColumnWithName:@"Name" type:RLMTypeString];
-    size_t const AGE = [table addColumnWithName:@"Age" type:RLMTypeInt];
-    size_t const HIRED = [table addColumnWithName:@"Hired" type:RLMTypeBool];
+    NSUInteger const NAME = [table addColumnWithName:@"Name" type:RLMTypeString];
+    NSUInteger const AGE = [table addColumnWithName:@"Age" type:RLMTypeInt];
+    NSUInteger const HIRED = [table addColumnWithName:@"Hired" type:RLMTypeBool];
 
     RLMRow *cursor;
 
