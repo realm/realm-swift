@@ -145,12 +145,12 @@ void throw_objc_exception(exception &ex)
     return self;
 }
 
-+ (RLMRealm *)realmWithDefaultPersistence
++ (instancetype)realmWithDefaultPersistence
 {
     return [RLMRealm realmWithPersistenceToFile:[RLMContext defaultPath]];
 }
 
-+ (RLMRealm *)realmWithPersistenceToFile:(NSString *)path
++ (instancetype)realmWithPersistenceToFile:(NSString *)path
 {
     NSRunLoop *runLoop = [NSRunLoop mainRunLoop];
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
@@ -160,10 +160,10 @@ void throw_objc_exception(exception &ex)
                                       error:nil];
 }
 
-+ (RLMRealm *)realmWithPersistenceToFile:(NSString *)path
-                                         runLoop:(NSRunLoop *)runLoop
-                              notificationCenter:(NSNotificationCenter *)notificationCenter
-                                           error:(NSError **)error
++ (instancetype)realmWithPersistenceToFile:(NSString *)path
+                                   runLoop:(NSRunLoop *)runLoop
+                        notificationCenter:(NSNotificationCenter *)notificationCenter
+                                     error:(NSError **)error
 {
     RLMRealm *realm = [[RLMRealm alloc] initFromParentContext:NO];
     if (!realm) {
@@ -458,7 +458,7 @@ void throw_objc_exception(exception &ex)
 
 // Private.
 // Careful with this one - Remember that group will be deleted on dealloc.
-+(RLMRealm *)realmWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only
++(instancetype)realmWithNativeGroup:(tightdb::Group*)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only
 {
     RLMRealm *realm = [[RLMRealm alloc] init];
     realm->_group = group;

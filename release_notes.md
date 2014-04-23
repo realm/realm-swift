@@ -46,8 +46,8 @@ and your code will break!
 ### Enhancements:
 
 * `createTableWithName:columns:` has been added to `RLMTransaction`.
-*  Added keyed subscripting for RLMTable's first column if column is of type RLMTypeString.
-*  `setRow:atIndex:` has been added to `RLMTable`
+* Added keyed subscripting for RLMTable's first column if column is of type RLMTypeString.
+* `setRow:atIndex:` has been added to `RLMTable`
 
 -------------
 
