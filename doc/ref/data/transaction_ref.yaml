@@ -57,6 +57,7 @@ CATEGORIES:
       DESCR    : *g_group_get_table_descr
       SIGNATURE: |
                  - (RLMTable *)tableWithName:(NSString *)name
+                 - (RLMTable *)tableWithName:(NSString *)name objectClass:(Class)obj
                  - (id)tableWithName:(NSString *)name asTableClass:(Class)obj
       PARAMS:
       - NAME   : name
@@ -77,9 +78,11 @@ CATEGORIES:
   - g_group_create_table:
       NAMES    : "createTableWithName:"
       SUMMARY  : Create table in context.
-      DESCR    : Create table with the specified name in context. If a table already exists, an exception is thrown.
+      DESCR    : Create table with the specified name in context. If a table already exists, an exception is thrown. 
+                 Optionally specify object class to be used when accessing table rows
       SIGNATURE: |
                  - (RLMTable *)createTableWithName:(NSString *)name
+                 - (RLMTable *)createTableWithName:(NSString *)name objectClass:(Class)objClass;
                  - (id)createTableWithName:(NSString *)name asTableClass:(Class)obj
       PARAMS:
       - NAME   : name
