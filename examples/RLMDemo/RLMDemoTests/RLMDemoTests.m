@@ -1,18 +1,18 @@
 //
-//  iOSTutorialTests.m
-//  iOSTutorialTests
+//  RLMDemoTests.m
+//  RLMDemoTests
 //
-//  Created by Morten Kjaer on 27/02/14.
-//  Copyright (c) 2014 Morten Kjaer. All rights reserved.
+//  Created by JP Simard on 4/16/14.
+//  Copyright (c) 2014 Realm. All rights reserved.
 //
 
 #import <XCTest/XCTest.h>
 
-@interface iOSTutorialTests : XCTestCase
+@interface RLMDemoTests : XCTestCase
 
 @end
 
-@implementation iOSTutorialTests
+@implementation RLMDemoTests
 
 - (void)setUp
 {
