@@ -24,6 +24,7 @@
 #import "RLMFast.h"
 #import "RLMRowFast.h"
 #import "RLMTable_noinst.h"
+#import "util_noinst.hpp"
 
 #include <vector>
 #include <map>
@@ -60,7 +61,7 @@ template<> inline id column_get<id>(RLMRow *row, NSUInteger col) {
 template<> inline void column_set<id>(RLMRow *row, NSUInteger col, id val) {
     row[col] = val; }
 template<> inline NSString *column_get<NSString *>(RLMRow *row, NSUInteger col) {
-    return [row stringInColumnWithIndex:col]; }
+    return to_objc_string(row.table.getNativeTable.get_string(col, row.ndx)); }
 template<> inline void column_set<NSString *>(RLMRow *row, NSUInteger col, NSString *val) {
     [row setString:val inColumnWithIndex:col]; }
 template<> inline RLMTable * column_get<RLMTable *>(RLMRow *row, NSUInteger col) {
