@@ -98,4 +98,53 @@ REALM_TABLE_1(RLMTestTable,
                    RLMRealm should be of class RLMTable");
 }
 
+- (void)testRealmOnMainThreadDoesntThrow {
+    XCTAssertNoThrow([self realmPersistedAtTestPath], @"Calling \
+                     +realmWithPersistenceToFile on the main thread shouldn't throw an exception.");
+}
+
+- (void)testRealmOnDifferentThreadThrows {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        XCTAssertThrows([self realmPersistedAtTestPath], @"Calling \
+                        +realmWithPersistenceToFile on a thread other than the main thread \
+                        should throw an exception.");
+    });
+    [self waitForTimeout:1.0f];
+}
+
+- (void)testRealmWithArgumentsOnDifferentThreadDoesntThrow {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        XCTAssertNoThrow([RLMRealm realmWithPersistenceToFile:RLMTestRealmPath
+                                                      runLoop:[NSRunLoop mainRunLoop]
+                                           notificationCenter:[NSNotificationCenter defaultCenter]
+                                                        error:nil],
+                         @"Calling +realmWithPersistenceToFile:runLoop:notificationCenter:error: \
+                         on a thread other than the main thread \
+                         shouldn't throw an exception.");
+    });
+    [self waitForTimeout:1.0f];
+}
+
+- (void)testHasTableWithName {
+    NSString *tableName = @"test";
+    RLMRealm *realm = [self realmPersistedAtTestPath];
+    
+    // Tables should exist until they are created
+    XCTAssertFalse([realm hasTableWithName:tableName], @"Table 'test' shouldn't exist");
+    XCTAssertFalse([realm hasTableWithName:tableName], @"Table 'test' still shouldn't exist \
+                   after checking for its existence");
+    XCTAssertNil([realm tableWithName:tableName], @"Table 'test' should be nil \
+                 if requested from the realm");
+    
+    // Tables should exist after being created
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        [realm createTableWithName:tableName];
+    }];
+    
+    RLMRealm *realm2 = [self realmPersistedAtTestPath];
+    XCTAssertTrue([realm2 hasTableWithName:tableName], @"Table 'test' should exist \
+                  after being created");
+    XCTAssertNotNil([realm2 tableWithName:tableName], @"Table 'test' shouldn't be nil");
+}
+
 @end
