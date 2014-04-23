@@ -247,11 +247,9 @@ CATEGORIES :
         CODE   : ex_objc_typed_query_between
 
   - g_typed_query_startsWith_binary:
-      IGNORED  : ""
   - g_typed_query_startsWith_string:
-      NAME     : columnBeginsWith
   - g_typed_query_startsWith_string_2:
-      NAME     : columnBeginsWith
+      NAMES    : [columnBeginsWith, columnBeginsWith, columnBeginsWith]
       TITLE    : "columnBeginsWith"
       SIGNATURE: |
                  .columnName (ClassNameQuery *)columnBeginsWith:(NSString *)value
