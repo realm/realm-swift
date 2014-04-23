@@ -18,8 +18,8 @@
  *
  **************************************************************************/
 
-#ifndef TIGHTDB_OBJC_UTIL_HPP
-#define TIGHTDB_OBJC_UTIL_HPP
+#ifndef REALM_OBJC_UTIL_HPP
+#define REALM_OBJC_UTIL_HPP
 
 #include <cstddef>
 #include <stdexcept>
@@ -278,4 +278,4 @@ catch(std::exception& ex) { \
 }
 
 
-#endif // TIGHTDB_OBJC_UTIL_HPP
+#endif // REALM_OBJC_UTIL_HPP
