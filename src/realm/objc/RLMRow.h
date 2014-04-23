@@ -50,7 +50,7 @@
 // macro helper for defining custom table object with subtables
 // if used
 // TODO - move somewhere else
-#define DEFINE_TABLE_TYPE(ObjectType)                           \
+#define RLM_DEFINE_TABLE_TYPE(ObjectType)                       \
 @protocol ObjectType <NSObject>                                 \
 @required                                                       \
 -(ObjectType *)objectAtIndexedSubscript:(NSUInteger)rowIndex;   \

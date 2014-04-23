@@ -18,7 +18,7 @@
 @implementation SubObject
 @end
 
-DEFINE_TABLE_TYPE(SubObject)
+RLM_DEFINE_TABLE_TYPE(SubObject)
 
 @interface MainObject : RLMRow
 @property NSString * First;
@@ -29,7 +29,7 @@ DEFINE_TABLE_TYPE(SubObject)
 @implementation MainObject
 @end
 
-DEFINE_TABLE_TYPE(MainObject)
+RLM_DEFINE_TABLE_TYPE(MainObject)
 
 
 // main and subtable definitions derived from nsobject
