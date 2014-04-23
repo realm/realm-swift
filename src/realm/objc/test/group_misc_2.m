@@ -43,9 +43,7 @@ REALM_TABLE_2(QueryTable,
 
 - (void)testRealm_Misc2
 {
-    RLMContext *context = [self contextPersistedAtTestPath];
-    
-    [context writeUsingBlock:^(RLMRealm *realm) {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
         NSUInteger rowIndex;
         NSLog(@"HasTable: %i", [realm hasTableWithName:@"employees"] );
         // Create new table in realm

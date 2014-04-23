@@ -118,7 +118,7 @@ void throw_objc_exception(exception &ex)
     NSTimer *_timer;
     NSMutableArray *_weakTableRefs; // Elements are instances of RLMPrivateWeakTableReference
     BOOL _tableRefsHaveDied;
-    BOOL _hasParentContext;
+    BOOL _usesImplicitTransactions;
     
     tightdb::Group *_group;
     BOOL m_is_owned;
@@ -129,17 +129,17 @@ void throw_objc_exception(exception &ex)
 {
     self = [super init];
     if (self) {
-        _hasParentContext = YES;
+        _usesImplicitTransactions = NO;
         m_read_only = NO;
     }
     return self;
 }
 
-- (instancetype)initFromParentContext:(BOOL)hasParentContext
+- (instancetype)initForImplicitTransactions:(BOOL)usesImplicitTransactions
 {
     self = [super init];
     if (self) {
-        _hasParentContext = hasParentContext;
+        _usesImplicitTransactions = usesImplicitTransactions;
         m_read_only = YES;
     }
     return self;
@@ -152,10 +152,17 @@ void throw_objc_exception(exception &ex)
 
 + (instancetype)realmWithPersistenceToFile:(NSString *)path
 {
-    NSRunLoop *runLoop = [NSRunLoop mainRunLoop];
+    // This constructor can only be called from the main thread
+    if (![NSThread isMainThread]) {
+        @throw [NSException exceptionWithName:@"realm:runloop_exception"
+                                       reason:[NSString stringWithFormat:@"%@ \
+                                               can only be called from the main thread",
+                                               NSStringFromSelector(_cmd)]
+                                     userInfo:nil];
+    }
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     return [self realmWithPersistenceToFile:path
-                                    runLoop:runLoop
+                                    runLoop:[NSRunLoop mainRunLoop]
                          notificationCenter:notificationCenter
                                       error:nil];
 }
@@ -165,7 +172,7 @@ void throw_objc_exception(exception &ex)
                         notificationCenter:(NSNotificationCenter *)notificationCenter
                                      error:(NSError **)error
 {
-    RLMRealm *realm = [[RLMRealm alloc] initFromParentContext:NO];
+    RLMRealm *realm = [[RLMRealm alloc] initForImplicitTransactions:YES];
     if (!realm) {
         return nil;
     }
@@ -296,7 +303,7 @@ void throw_objc_exception(exception &ex)
     }
     [table setParent:self];
     [table setReadOnly:m_read_only];
-    if (!_hasParentContext) {
+    if (_usesImplicitTransactions) {
         [table setReadOnly:YES];
         RLMPrivateWeakTableReference *weakTableRef = [[RLMPrivateWeakTableReference alloc] initWithTable:table
                                                                                             indexInRealm:indexInRealm];
@@ -346,7 +353,7 @@ void throw_objc_exception(exception &ex)
     }
     [table setParent:self];
     [table setReadOnly:m_read_only];
-    if (!_hasParentContext) {
+    if (_usesImplicitTransactions) {
         [table setReadOnly:YES];
         RLMPrivateWeakTableReference *weakTableRef = [[RLMPrivateWeakTableReference alloc] initWithTable:table
                                                                                             indexInRealm:indexInRealm];
@@ -355,14 +362,12 @@ void throw_objc_exception(exception &ex)
     return table;
 }
 
-// FIXME: Avoid creating a table instance. It should be enough to create an TightdbDescriptor and then check that.
-// FIXME: Check that the specified class derives from Table.
-// FIXME: Find a way to avoid having to transcode the table name twice
 -(BOOL)hasTableWithName:(NSString *)name withTableClass:(__unsafe_unretained Class)class_obj
 {
-    if (!_group->has_table(ObjcStringAccessor(name)))
+    if (!_group->has_table(ObjcStringAccessor(name))) {
         return NO;
-    RLMTable * table = [self createTableWithName:name asTableClass:class_obj];
+    }
+    RLMTable *table = [self tableWithName:name asTableClass:class_obj];
     return table != nil;
 }
 
