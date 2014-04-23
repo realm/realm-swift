@@ -52,9 +52,8 @@ void ex_objc_intro() {
         People *table = [transaction tableWithName:@"employees"
                                       asTableClass:[People class]];
 
-        // Query the table
-        PeopleQuery *query = [[table where].Age columnIsGreaterThan:30];
-        PeopleView  *view  = [query findAll];
+        // Get the view
+        RLMView  *view = [table where:@"Age == 30"];
 
         // Iterate over all rows in view
         for (PeopleRow *row in view) {
