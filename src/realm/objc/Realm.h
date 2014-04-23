@@ -24,7 +24,7 @@
 #import <realm/objc/RLMQuery.h>
 #import <realm/objc/RLMRow.h>
 #import <realm/objc/RLMContext.h>
-#import <realm/objc/RLMSmartContext.h>
+#import <realm/objc/RLMRealm.h>
 #import <realm/objc/RLMVersion.h>
 
 #import <realm/objc/PrivateHelperMacros.h>

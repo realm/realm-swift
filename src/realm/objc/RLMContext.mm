@@ -22,7 +22,7 @@
 #include <tightdb/group_shared.hpp>
 
 #import "RLMContext.h"
-#import "RLMTransaction_noinst.h"
+#import "RLMRealm_noinst.h"
 #import "util_noinst.hpp"
 
 using namespace std;
@@ -91,13 +91,6 @@ NSString *const defaultContextFileName = @"default.realm";
     return shared_group;
 }
 
--(void)dealloc
-{
-#ifdef REALM_DEBUG
-    // NSLog(@"TDBSharedGroup dealloc");
-#endif
-}
-
 -(void)readUsingBlock:(RLMReadBlock)block
 {
     const tightdb::Group* group;
@@ -115,8 +108,8 @@ NSString *const defaultContextFileName = @"default.realm";
         // should throw anything but NSException or derivatives. Note: if the client calls other libraries
         // throwing other kinds of exceptions they will leak back to the client code, if he does not
         // catch them within the block.
-        RLMTransaction * group_2 = [RLMTransaction groupWithNativeGroup:const_cast<tightdb::Group *>(group) isOwned:NO readOnly:YES];
-        block(group_2);
+        RLMRealm *realm = [RLMRealm realmWithNativeGroup:const_cast<tightdb::Group *>(group) isOwned:NO readOnly:YES];
+        block(realm);
 
     }
     @finally {
@@ -126,8 +119,8 @@ NSString *const defaultContextFileName = @"default.realm";
 
 -(void)readTable:(NSString*)tablename usingBlock:(RLMTableReadBlock)block
 {
-    [self readUsingBlock:^(RLMTransaction *trx){
-        RLMTable *table = [trx tableWithName:tablename];
+    [self readUsingBlock:^(RLMRealm *realm){
+        RLMTable *table = [realm tableWithName:tablename];
         block(table);
     }];
 }
@@ -148,8 +141,8 @@ NSString *const defaultContextFileName = @"default.realm";
     }
 
     @try {
-        RLMTransaction * group_2 = [RLMTransaction groupWithNativeGroup:group isOwned:NO readOnly:NO];
-        block(group_2);
+        RLMRealm *realm = [RLMRealm realmWithNativeGroup:group isOwned:NO readOnly:NO];
+        block(realm);
     }
     @catch (NSException* exception) {
         m_shared_group->rollback();
@@ -185,8 +178,8 @@ NSString *const defaultContextFileName = @"default.realm";
 
     BOOL doRollback = NO;
     @try {
-        RLMTransaction * group_2 = [RLMTransaction groupWithNativeGroup:group isOwned:NO readOnly:NO];
-        block(group_2, &doRollback);
+        RLMRealm *realm = [RLMRealm realmWithNativeGroup:group isOwned:NO readOnly:NO];
+        block(realm, &doRollback);
     }
     @catch (NSException* exception) {
         m_shared_group->rollback();
@@ -211,8 +204,8 @@ NSString *const defaultContextFileName = @"default.realm";
 
 -(void)writeTable:(NSString*)tablename usingBlock:(RLMTableWriteBlock)block
 {
-    [self writeUsingBlock:^(RLMTransaction *trx){
-        RLMTable *table = [trx tableWithName:tablename];
+    [self writeUsingBlock:^(RLMRealm *realm){
+        RLMTable *table = [realm tableWithName:tablename];
         block(table);
     }];
 }

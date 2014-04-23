@@ -18,23 +18,23 @@
  *
  **************************************************************************/
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
 
 REALM_TABLE_1(TestTableSub,
-                age,  Int)
+              age,  Int)
 
 REALM_TABLE_9(TestTableAllTypes,
-                BoolCol,   Bool,
-                IntCol,    Int,
-                FloatCol,  Float,
-                DoubleCol, Double,
-                StringCol, String,
-                BinaryCol, Binary,
-                DateCol,   Date,
-                TableCol,  TestTableSub,
-                MixedCol,  Mixed)
+              BoolCol,   Bool,
+              IntCol,    Int,
+              FloatCol,  Float,
+              DoubleCol, Double,
+              StringCol, String,
+              BinaryCol, Binary,
+              DateCol,   Date,
+              TableCol,  TestTableSub,
+              MixedCol,  Mixed)
 
 REALM_TABLE_2(TestTableKeyedSubscript,
               name, String,
@@ -43,9 +43,8 @@ REALM_TABLE_2(TestTableKeyedSubscript,
 REALM_TABLE_1(TestTableKeyedSubscriptError,
               objID, Int)
 
-@interface RLMTypedTableTests: XCTestCase
-  // Intentionally left blank.
-  // No new public instance methods need be defined.
+@interface RLMTypedTableTests: RLMTestCase
+
 @end
 
 @implementation RLMTypedTableTests

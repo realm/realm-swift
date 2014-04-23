@@ -5,10 +5,10 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
-#import <realm/objc/RLMTransaction.h>
+#import <realm/objc/RLMRealm.h>
 #import <realm/objc/RLMContext.h>
 
 REALM_TABLE_2(GetSubtable,
@@ -24,9 +24,10 @@ REALM_TABLE_2(WrongTypeTable,
                 Hired, Int,
                 Age,   Bool)
 
+@interface MACTestGetSubtable: RLMTestCase
 
-@interface MACTestGetSubtable: XCTestCase
 @end
+
 @implementation MACTestGetSubtable
 
 - (void)testGetSubtable

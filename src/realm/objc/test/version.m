@@ -3,41 +3,33 @@
  TightDB
 */
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/RLMVersion.h>
 
-@interface MACTestVersion: XCTestCase
+@interface MACTestVersion: RLMTestCase
 @end
 
 @implementation MACTestVersion
-{
-}
-
--(void)setUp
-{
-  [super setUp];
-}
-
--(void)tearDown
-{
-}
 
 -(void)testMajorVersion
 {
   if (TDB_VERSION_MAJOR != [RLMVersion getMajor])
     XCTFail(@"Wrong major version");
 }
+
 -(void)testMinorVersion
 {
   if (TDB_VERSION_MINOR != [RLMVersion getMinor])
     XCTFail(@"Wrong minor version");
 }
+
 -(void)testPatchVersion
 {
   if (TDB_VERSION_PATCH != [RLMVersion getPatch])
     XCTFail(@"Wrong patch version");
 }
+
 -(void)testIsAtLeast
 {
     if ([RLMVersion isAtLeast:TDB_VERSION_MAJOR- 1 minor:TDB_VERSION_MINOR patch:TDB_VERSION_PATCH])
@@ -61,7 +53,8 @@
                              [RLMVersion getMajor],
                              [RLMVersion getMinor],
                              [RLMVersion getPatch]];
-    if (![[RLMVersion getVersion] isEqualToString:s1])
-        XCTFail(@"Version string incorrect");
+    XCTAssertTrue([[RLMVersion getVersion] isEqualToString:s1],
+                  @"Version string incorrect");
 }
+
 @end
