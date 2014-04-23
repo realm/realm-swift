@@ -24,35 +24,28 @@
 
 // Use it in a function
 void ex_objc_intro() {
-    RLMContext *context = [RLMContext contextWithDefaultPersistence];
-
-    // Start a write transaction
-    [context writeUsingBlock:^(RLMRealm *realm) {
-        // Get a specific table from the group
-        People *table = [realm createTableWithName:@"employees"
-                                      asTableClass:[People class]];
-
+    // Create a realm and initialize with a table and rows
+    RLMRealm *realm = [RLMRealm realmWithDefaultPersistenceAndInitBlock:^(RLMRealm *realm) {
+        // Create a table
+        People *table = [realm createTableWithName:@"employees" asTableClass:[People class]];
+        
         // Add rows
         [table addRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
         [table addRow:@{@"Name": @"Lars", @"Age": @22, @"Hired": @YES}];
         [table addRow:@{@"Name": @"Phil", @"Age": @43, @"Hired": @NO}];
         [table addRow:@{@"Name": @"Anni", @"Age": @54, @"Hired": @YES}];
     }];
-
-    // Start a read transaction
-    [context readUsingBlock:^(RLMRealm *realm) {
-        // Get the table
-        People *table = [realm tableWithName:@"employees"
-                                asTableClass:[People class]];
-
-        // Query the table
-        PeopleQuery *query = [[table where].Age columnIsGreaterThan:30];
-        PeopleView  *view  = [query findAll];
-
-        // Iterate over all rows in view
-        for (PeopleRow *row in view) {
-            NSLog(@"Name: %@", row.Name);
-        }
-    }];
+    
+    // Get the table
+    People *table = [realm tableWithName:@"employees" asTableClass:[People class]];
+    
+    // Query the table
+    PeopleQuery *query = [[table where].Age columnIsGreaterThan:30];
+    PeopleView  *view  = [query findAll];
+    
+    // Iterate over all rows in view
+    for (PeopleRow *row in view) {
+        NSLog(@"Name: %@", row.Name);
+    }
 }
 // @@EndExample@@
