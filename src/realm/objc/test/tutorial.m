@@ -9,6 +9,7 @@
 
 #import <realm/objc/Realm.h>
 #import <realm/objc/group.h>
+#import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 
 REALM_TABLE_DEF_3(PeopleTable,
@@ -28,6 +29,10 @@ REALM_TABLE_IMPL_3(PeopleTable,
 REALM_TABLE_IMPL_2(PeopleTable2,
                      Hired, Bool,
                      Age,   Int)
+
+REALM_TABLE_FAST(PeopleTable)
+
+REALM_TABLE_FAST(PeopleTable2)
 
 @interface MACTestTutorial: XCTestCase
 @end

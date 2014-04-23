@@ -42,8 +42,10 @@ librealm_objc_a_VERSION = 4:0:0
 
 # Code generation
 ifeq ($(DISABLE_CHEETAH_CODE_GEN),)
-GENERATED_SOURCES += PrivateTableMacros.h
+GENERATED_SOURCES += PrivateTableMacros.h RLMPrivateTableMacrosFast.h
 PrivateTableMacros.h: PrivateTableMacros.h.cheetah cheetah.sh
+	$(SHELL) cheetah.sh $< $@
+RLMPrivateTableMacrosFast.h: RLMPrivateTableMacrosFast.h.cheetah cheetah.sh
 	$(SHELL) cheetah.sh $< $@
 endif
 

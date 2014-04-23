@@ -18,6 +18,7 @@
 #include <tightdb/table.hpp>
 #import <realm/objc/RLMTable_noinst.h>
 #import <realm/objc/RLMTableFast.h>
+#import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 REALM_TABLE_DEF_3(PeopleErrTable,
                     Name,  String,
@@ -29,8 +30,12 @@ REALM_TABLE_IMPL_3(PeopleErrTable,
                      Age,   Int,
                      Hired, Bool)
 
+REALM_TABLE_FAST(PeopleErrTable)
+
 REALM_TABLE_1(TestQueryErrSub,
                 Age,  Int)
+
+REALM_TABLE_FAST(TestQueryErrSub)
 
 REALM_TABLE_9(TestQueryErrAllTypes,
                 BoolCol,   Bool,
@@ -42,6 +47,8 @@ REALM_TABLE_9(TestQueryErrAllTypes,
                 DateCol,   Date,
                 TableCol,  TestQueryErrSub,
                 MixedCol,  Mixed)
+
+REALM_TABLE_FAST(TestQueryErrAllTypes)
 
 
 

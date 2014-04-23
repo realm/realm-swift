@@ -9,15 +9,20 @@
 
 #import <realm/objc/Realm.h>
 #import <realm/objc/group.h>
+#import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 REALM_TABLE_3(EnumPeopleTable,
                 Name,  String,
                 Age,   Int,
                 Hired, Bool)
 
+REALM_TABLE_FAST(EnumPeopleTable)
+
 REALM_TABLE_2(EnumPeopleTable2,
                 Hired, Bool,
                 Age,   Int)
+
+REALM_TABLE_FAST(EnumPeopleTable2)
 
 @interface MACTestEnumerator: XCTestCase
 @end
