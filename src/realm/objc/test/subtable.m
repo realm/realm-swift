@@ -33,7 +33,7 @@ DEFINE_TABLE_TYPE(MainObject)
 
 
 // main and subtable definitions derived from nsobject
-@interface SubProxied : NSObject
+@interface SubProxied : RLMRow
 @property NSString * Name;
 @property long LongAge;
 @end
@@ -41,7 +41,7 @@ DEFINE_TABLE_TYPE(MainObject)
 @implementation SubProxied
 @end
 
-@interface MainProxied : NSObject<RLMObject>
+@interface MainProxied : RLMRow
 @property NSString * First;
 @property RLMTable * Sub;
 @property int Second;
