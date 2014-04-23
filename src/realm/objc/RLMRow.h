@@ -59,7 +59,7 @@
 -(OType *)objectForKeyedSubscript:(NSString *)key;          \
 @end                                                        \
 @interface TType : RLMTable<OType>                          \
-+(TType *)tableInRealm:(RLMTransaction *)rlm named:(NSString *)name;  \
++(TType *)tableInRealm:(RLMRealm *)rlm named:(NSString *)name;  \
 +(Class)objectClass;                                        \
 @end
 
@@ -68,8 +68,9 @@
 #define RLM_IMPLEMENT_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)                  \
 STATIC_ASSERT(__INCLUDE_LEVEL__ == 0, RLM_IMPLEMENT_TABLE_used_in_header_file_for##OType)  \
 @implementation TType                                                           \
-+(TType *)tableInRealm:(RLMTransaction *)rlm named:(NSString *)name {           \
-    if([rlm hasTableWithName:name]) return (TType *)[rlm tableWithName:name objectClass:OType.class]; \
++(TType *)tableInRealm:(RLMRealm *)rlm named:(NSString *)name {                 \
+    if([rlm hasTableWithName:name])                                             \
+        return (TType *)[rlm tableWithName:name objectClass:OType.class];       \
     return (TType *)[rlm createTableWithName:name objectClass:OType.class];}    \
 +(Class)objectClass { return OType.class; }                                     \
 -(instancetype)init { return [super initWithObjectClass:OType.class]; }         \
@@ -82,7 +83,7 @@ RLM_IMPLEMENT_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)
 
 /* FIXME: This class can be (and should be) eliminated by using a
    macro switching trick for the individual column types on
-   TIGHTDB_CURSOR_PROPERTY macros similar to what is done for query
+   REALM_ROW_PROPERTY macros similar to what is done for query
    accessors. */
 @interface RLMAccessor : NSObject
 -(id)initWithRow:(RLMRow *)cursor columnId:(NSUInteger)columnId;

@@ -35,8 +35,8 @@
 #import "RLMProxy.h"
 #import "RLMObjectDescriptor.h"
 #import "NSData+RLMGetBinaryData.h"
+#import "RLMRealm_noinst.h"
 #import "RLMPrivate.h"
-#import "RLMSmartContext_noinst.h"
 #import "util_noinst.hpp"
 
 using namespace std;
@@ -193,7 +193,7 @@ using namespace std;
 // error (out of memory).
 //
 // The specified table class must be one that is declared by using
-// one of the table macros TIGHTDB_TABLE_*.
+// one of the table macros REALM_TABLE_*.
 //
 // FIXME: Check that the specified class derives from RLMTable.
 -(BOOL)hasSameDescriptorAs:(__unsafe_unretained Class)tableClass
@@ -215,7 +215,7 @@ using namespace std;
 // it encounters a memory allocation error (out of memory).
 //
 // The specified table class must be one that is declared by using
-// one of the table macros TIGHTDB_TABLE_*.
+// one of the table macros REALM_TABLE_*.
 //
 // FIXME: Check that the specified class derives from RLMTable.
 -(id)castToTypedTableClass:(__unsafe_unretained Class)typedTableClass
@@ -233,8 +233,8 @@ using namespace std;
 
 -(void)dealloc
 {
-    if ([m_parent isKindOfClass:[RLMSmartContext class]]) {
-        RLMSmartContext *context = (RLMSmartContext *)m_parent;
+    if ([m_parent isKindOfClass:[RLMRealm class]]) {
+        RLMRealm *context = (RLMRealm *)m_parent;
         [context tableRefDidDie];
     }
 }
@@ -582,13 +582,13 @@ using namespace std;
     tightdb::TableRef table = m_table->get_subtable(colIndex, rowIndex);
     if (!table)
         return nil;
-    RLMTable * table_2 = [[RLMTable alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table_2))
+    RLMTable * tableObj = [[RLMTable alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!tableObj))
         return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    return table_2;
+    [tableObj setNativeTable:table.get()];
+    [tableObj setParent:self];
+    [tableObj setReadOnly:m_read_only];
+    return tableObj;
 }
 
 // FIXME: Check that the specified class derives from RLMTable.
@@ -599,15 +599,15 @@ using namespace std;
         return nil;
     tightdb::TableRef table = m_table->get_subtable(colIndex, rowIndex);
     TIGHTDB_ASSERT(table);
-    RLMTable * table_2 = [[tableClass alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table))
+    RLMTable * tableObj = [[tableClass alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!tableObj))
         return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    if (![table_2 _checkType])
+    [tableObj setNativeTable:table.get()];
+    [tableObj setParent:self];
+    [tableObj setReadOnly:m_read_only];
+    if (![tableObj _checkType])
         return nil;
-    return table_2;
+    return tableObj;
 }
 
 -(id)RLM_mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
@@ -618,16 +618,16 @@ using namespace std;
 
     tightdb::TableRef table = m_table->get_subtable(colNdx, rowIndex);
     TIGHTDB_ASSERT(table);
-    RLMTable * table_2 = [[RLMTable alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table_2))
+    RLMTable * tableObj = [[RLMTable alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!tableObj))
         return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    if (![table_2 _checkType])
+    [tableObj setNativeTable:table.get()];
+    [tableObj setParent:self];
+    [tableObj setReadOnly:m_read_only];
+    if (![tableObj _checkType])
         return nil;
 
-    return table_2;
+    return tableObj;
 }
 
 

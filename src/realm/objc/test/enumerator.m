@@ -5,10 +5,9 @@
 // Demo code for short tutorial using Objective-C interface
 //
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
-#import <realm/objc/group.h>
 
 @interface EnumPeople : RLMRow
 @property NSString * Name;
@@ -19,7 +18,7 @@
 @implementation EnumPeople
 @end
 
-@interface MACTestEnumerator: XCTestCase
+@interface MACTestEnumerator: RLMTestCase
 @end
 @implementation MACTestEnumerator
 
@@ -28,9 +27,8 @@
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
-    RLMTransaction *group = [RLMTransaction group];
     // Create new table in group
-    RLMTable *people = [group createTableWithName:@"employees" objectClass:EnumPeople.class];
+    RLMTable *people = [[RLMTable alloc] initWithObjectClass:EnumPeople.class];
     
     // Add some rows
     [people addRow:@[@"John", @20, @YES]];
