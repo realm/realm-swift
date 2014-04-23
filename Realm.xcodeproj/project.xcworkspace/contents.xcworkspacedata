@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:RealmObjcDyn.xcodeproj">
+      location = "self:Realm.xcodeproj">
    </FileRef>
 </Workspace>
