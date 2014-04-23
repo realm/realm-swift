@@ -17,14 +17,8 @@ void ex_objc_tableview_dynamic_intro()
     [table addRow:@[@"Steve",@12, @NO]];
     [table addRow:@[@"Nick", @59, @YES]];
     
-    /* Set up a query to search for employees. */
-    RLMQuery *q =  [[[[table where]
-                        intIsGreaterThanOrEqualTo:30 inColumnWithIndex:AGE]
-                        intIsLessThanOrEqualTo:60 inColumnWithIndex:AGE ]
-                        boolIsEqualTo:YES inColumnWithIndex:HIRED];
-    
-    /* Create a (table)view with the rows matching the query */
-    RLMView *view = [q findAllRows];
+    /* Set up a view for employees search results. */
+    RLMView *view = [table where:@"Age >= 30 && Age <= 60 && Hired == YES"];
     
     /* Iterate over the matching rows */
     for (RLMRow *row in view) {
