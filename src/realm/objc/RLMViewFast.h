@@ -22,7 +22,6 @@
 
 @interface RLMView (Fast)
 
-// Queries
 -(RLMQuery *)where;
 
 @end

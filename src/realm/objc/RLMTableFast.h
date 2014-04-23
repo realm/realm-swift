@@ -22,7 +22,6 @@
 
 @interface RLMTable (Fast)
 
-// Queries
 -(RLMQuery *)where;
 
 -(BOOL)optimize;
