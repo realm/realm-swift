@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4D24338B18BF65C700271C32"
-               BuildableName = "iOSTutorial.app"
-               BlueprintName = "iOSTutorial"
-               ReferencedContainer = "container:TightdbTutorial.xcodeproj">
+               BlueprintIdentifier = "E80762CF18FEFFD70071CFAB"
+               BuildableName = "RLMDemo.app"
+               BlueprintName = "RLMDemo"
+               ReferencedContainer = "container:RLMDemo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,20 +32,20 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4D2433AD18BF65C700271C32"
-               BuildableName = "iOSTutorialTests.xctest"
-               BlueprintName = "iOSTutorialTests"
-               ReferencedContainer = "container:TightdbTutorial.xcodeproj">
+               BlueprintIdentifier = "E80762EA18FEFFD70071CFAB"
+               BuildableName = "RLMDemoTests.xctest"
+               BlueprintName = "RLMDemoTests"
+               ReferencedContainer = "container:RLMDemo.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4D24338B18BF65C700271C32"
-            BuildableName = "iOSTutorial.app"
-            BlueprintName = "iOSTutorial"
-            ReferencedContainer = "container:TightdbTutorial.xcodeproj">
+            BlueprintIdentifier = "E80762CF18FEFFD70071CFAB"
+            BuildableName = "RLMDemo.app"
+            BlueprintName = "RLMDemo"
+            ReferencedContainer = "container:RLMDemo.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -61,10 +61,10 @@
       <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4D24338B18BF65C700271C32"
-            BuildableName = "iOSTutorial.app"
-            BlueprintName = "iOSTutorial"
-            ReferencedContainer = "container:TightdbTutorial.xcodeproj">
+            BlueprintIdentifier = "E80762CF18FEFFD70071CFAB"
+            BuildableName = "RLMDemo.app"
+            BlueprintName = "RLMDemo"
+            ReferencedContainer = "container:RLMDemo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -79,10 +79,10 @@
       <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "4D24338B18BF65C700271C32"
-            BuildableName = "iOSTutorial.app"
-            BlueprintName = "iOSTutorial"
-            ReferencedContainer = "container:TightdbTutorial.xcodeproj">
+            BlueprintIdentifier = "E80762CF18FEFFD70071CFAB"
+            BuildableName = "RLMDemo.app"
+            BlueprintName = "RLMDemo"
+            ReferencedContainer = "container:RLMDemo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
