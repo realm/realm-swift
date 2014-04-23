@@ -10,7 +10,6 @@
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMRealm.h>
 #import <realm/objc/PrivateRLM.h>
-#import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 REALM_TABLE_DEF_4(MyTable,
                   Name,  String,
@@ -35,12 +34,6 @@ REALM_TABLE_IMPL_2(MyTable2,
 REALM_TABLE_2(QueryTable,
               First,  Int,
               Second, String)
-
-REALM_TABLE_FAST(MyTable)
-
-REALM_TABLE_FAST(MyTable2)
-
-REALM_TABLE_FAST(QueryTable)
 
 @interface MACTestRealmMisc2 : RLMTestCase
 

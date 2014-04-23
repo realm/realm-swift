@@ -7,8 +7,6 @@
 
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMQueryFast.h>
-#import <realm/objc/RLMTableFast.h>
-#import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 REALM_TABLE_1(TestQuerySub,
                 Age,  Int)
@@ -24,14 +22,8 @@ REALM_TABLE_9(TestQueryAllTypes,
                 TableCol,  TestQuerySub,
                 MixedCol,  Mixed)
 
-REALM_TABLE_FAST(TestQuerySub)
-
-REALM_TABLE_FAST(TestQueryAllTypes)
-
 @interface MACtestQuery: RLMTestCase
-
 @end
-
 @implementation MACtestQuery
 
 - (void)testQuery
