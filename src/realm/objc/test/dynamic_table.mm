@@ -22,6 +22,7 @@
 #import <Foundation/NSException.h>
 
 #import <realm/objc/RLMFast.h>
+#import <realm/objc/RLMTableFast.h>
 #import <realm/objc/RLMTable_noinst.h>
 
 #include <string.h>
