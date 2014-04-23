@@ -926,19 +926,19 @@ CATEGORIES :
         TYPES  : RLMView *
         DESCR  : The filtered and/or sorted view
 
-  - g_dyn_table_where_const:
-      IGNORE   : ""
-  - g_dyn_table_where:
-      NAME     : where
-      SIGNATURE: (RLMQuery *)where
-      SUMMARY  : *g_dyn_table_where_summary
-      DESCR    : *g_dyn_table_where_descr
-      RETURN:
-        TYPES  : RLMQuery *
-        DESCR  : *g_dyn_table_where_return_descr
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_objc_dyn_table_where
+  # - g_dyn_table_where_const:
+  #     IGNORE   : ""
+  # - g_dyn_table_where:
+  #     NAME     : where
+  #     SIGNATURE: (RLMQuery *)where
+  #     SUMMARY  : *g_dyn_table_where_summary
+  #     DESCR    : *g_dyn_table_where_descr
+  #     RETURN:
+  #       TYPES  : RLMQuery *
+  #       DESCR  : *g_dyn_table_where_return_descr
+  #     EXAMPLES:
+  #     - DESCR  :
+  #       CODE   : ex_objc_dyn_table_where
 
 
 # - Aggregates:
