@@ -7,6 +7,7 @@
 #import "RLMTestCase.h"
 #import <realm/objc/RLMFast.h>
 #import <realm/objc/RLMTable.h>
+#import <realm/objc/RLMLocal.h>
 
 REALM_TABLE_3(FuncPeopleTable,
                 Name,  String,
@@ -27,7 +28,7 @@ REALM_TABLE_3(FuncPeopleTable,
      *  Row in a table.
      */
 
-    FuncPeopleTable *table = [[FuncPeopleTable alloc] init];
+    FuncPeopleTable *table = [[FuncPeopleTable alloc] initLocal];
 
     FuncPeopleTableRow *cursor;
 

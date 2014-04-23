@@ -7,6 +7,7 @@
 
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMQueryFast.h>
+#import <realm/objc/RLMLocal.h>
 
 REALM_TABLE_1(TestQuerySub,
                 Age,  Int)

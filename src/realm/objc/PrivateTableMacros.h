@@ -38,7 +38,6 @@
 #import "PrivateHelperMacros.h"
 
 
-
 #define REALM_TABLE_DEF_1(TableName, CName1, CType1) \
 @interface TableName##Row: RLMRow \
 REALM_ROW_PROPERTY_DEF(CName1, CType1) \
@@ -156,6 +155,7 @@ REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
     REALM_COLUMN_PROXY_INIT(self, 0, CName1, CType1); \
     return self; \
 } \
+RLM_TABLE_INIT(1, CName, CType) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 \
 { \
     NSUInteger ndx = self.rowCount; \
@@ -388,6 +388,7 @@ REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
     REALM_COLUMN_PROXY_INIT(self, 1, CName2, CType2); \
     return self; \
 } \
+RLM_TABLE_INIT(2, CName, CType) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 \
 { \
     NSUInteger ndx = self.rowCount; \
@@ -636,6 +637,7 @@ REALM_COLUMN_PROXY_IMPL(CName3, CType3) \
     REALM_COLUMN_PROXY_INIT(self, 2, CName3, CType3); \
     return self; \
 } \
+RLM_TABLE_INIT(3, CName, CType) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 \
 { \
     NSUInteger ndx = self.rowCount; \
@@ -900,6 +902,7 @@ REALM_COLUMN_PROXY_IMPL(CName4, CType4) \
     REALM_COLUMN_PROXY_INIT(self, 3, CName4, CType4); \
     return self; \
 } \
+RLM_TABLE_INIT(4, CName, CType) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 \
 { \
     NSUInteger ndx = self.rowCount; \
@@ -1180,6 +1183,7 @@ REALM_COLUMN_PROXY_IMPL(CName5, CType5) \
     REALM_COLUMN_PROXY_INIT(self, 4, CName5, CType5); \
     return self; \
 } \
+RLM_TABLE_INIT(5, CName, CType) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 \
 { \
     NSUInteger ndx = self.rowCount; \
@@ -1476,6 +1480,7 @@ REALM_COLUMN_PROXY_IMPL(CName6, CType6) \
     REALM_COLUMN_PROXY_INIT(self, 5, CName6, CType6); \
     return self; \
 } \
+RLM_TABLE_INIT(6, CName, CType) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 \
 { \
     NSUInteger ndx = self.rowCount; \
@@ -1788,6 +1793,7 @@ REALM_COLUMN_PROXY_IMPL(CName7, CType7) \
     REALM_COLUMN_PROXY_INIT(self, 6, CName7, CType7); \
     return self; \
 } \
+RLM_TABLE_INIT(7, CName, CType) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 \
 { \
     NSUInteger ndx = self.rowCount; \
@@ -2116,6 +2122,7 @@ REALM_COLUMN_PROXY_IMPL(CName8, CType8) \
     REALM_COLUMN_PROXY_INIT(self, 7, CName8, CType8); \
     return self; \
 } \
+RLM_TABLE_INIT(8, CName, CType) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 \
 { \
     NSUInteger ndx = self.rowCount; \
@@ -2460,6 +2467,7 @@ REALM_COLUMN_PROXY_IMPL(CName9, CType9) \
     REALM_COLUMN_PROXY_INIT(self, 8, CName9, CType9); \
     return self; \
 } \
+RLM_TABLE_INIT(9, CName, CType) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 \
 { \
     NSUInteger ndx = self.rowCount; \
@@ -2820,6 +2828,7 @@ REALM_COLUMN_PROXY_IMPL(CName10, CType10) \
     REALM_COLUMN_PROXY_INIT(self, 9, CName10, CType10); \
     return self; \
 } \
+RLM_TABLE_INIT(10, CName, CType) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 \
 { \
     NSUInteger ndx = self.rowCount; \
@@ -3196,6 +3205,7 @@ REALM_COLUMN_PROXY_IMPL(CName11, CType11) \
     REALM_COLUMN_PROXY_INIT(self, 10, CName11, CType11); \
     return self; \
 } \
+RLM_TABLE_INIT(11, CName, CType) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 \
 { \
     NSUInteger ndx = self.rowCount; \
@@ -3588,6 +3598,7 @@ REALM_COLUMN_PROXY_IMPL(CName12, CType12) \
     REALM_COLUMN_PROXY_INIT(self, 11, CName12, CType12); \
     return self; \
 } \
+RLM_TABLE_INIT(12, CName, CType) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 \
 { \
     NSUInteger ndx = self.rowCount; \
@@ -3996,6 +4007,7 @@ REALM_COLUMN_PROXY_IMPL(CName13, CType13) \
     REALM_COLUMN_PROXY_INIT(self, 12, CName13, CType13); \
     return self; \
 } \
+RLM_TABLE_INIT(13, CName, CType) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 \
 { \
     NSUInteger ndx = self.rowCount; \
@@ -4420,6 +4432,7 @@ REALM_COLUMN_PROXY_IMPL(CName14, CType14) \
     REALM_COLUMN_PROXY_INIT(self, 13, CName14, CType14); \
     return self; \
 } \
+RLM_TABLE_INIT(14, CName, CType) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 CName14:(REALM_ARG_TYPE(CType14))CName14 \
 { \
     NSUInteger ndx = self.rowCount; \
@@ -4860,6 +4873,7 @@ REALM_COLUMN_PROXY_IMPL(CName15, CType15) \
     REALM_COLUMN_PROXY_INIT(self, 14, CName15, CType15); \
     return self; \
 } \
+RLM_TABLE_INIT(15, CName, CType) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 CName14:(REALM_ARG_TYPE(CType14))CName14 CName15:(REALM_ARG_TYPE(CType15))CName15 \
 { \
     NSUInteger ndx = self.rowCount; \
