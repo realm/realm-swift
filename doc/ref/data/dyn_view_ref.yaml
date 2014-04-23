@@ -333,19 +333,19 @@ CATEGORIES :
         DESCR  :
 
 
-# - Searching:
-#   METHODS:
-#   - g_dyn_table_where:
-#       NAME     : where
-#       SIGNATURE: (RLMQuery *) where
-#       SUMMARY  : Query the view.
-#       DESCR    : This method initiates a query in the view.
-#       RETURN:
-#         TYPES  : RLMQuery *
-#         DESCR  : *g_dyn_table_where_return_descr
-#       EXAMPLES:
-#       - DESCR  :
-#         CODE   : ex_objc_dyn_view_where
+- Searching:
+  METHODS:
+  # - g_dyn_table_where:
+  #     NAME     : where
+  #     SIGNATURE: (RLMQuery *) where
+  #     SUMMARY  : Query the view.
+  #     DESCR    : This method initiates a query in the view.
+  #     RETURN:
+  #       TYPES  : RLMQuery *
+  #       DESCR  : *g_dyn_table_where_return_descr
+  #     EXAMPLES:
+  #     - DESCR  :
+  #       CODE   : ex_objc_dyn_view_where
 
 
   # - g_dyn_view_find_first_bool:
