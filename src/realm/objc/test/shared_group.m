@@ -11,7 +11,6 @@
 #import <realm/objc/RLMTableFast.h>
 #import <realm/objc/RLMViewFast.h>
 #import <realm/objc/RLMTransaction.h>
-#import <realm/objc/group.h>
 #import <realm/objc/RLMRealm.h>
 
 REALM_TABLE_2(SharedTable2,
