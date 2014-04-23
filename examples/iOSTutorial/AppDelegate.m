@@ -75,12 +75,12 @@ void tableFunc() {
     }
     // @@EndExample@@
 
-    // @@Example: simple_seach @@
-    NSNumber *rowIndex = nil;
-    rowIndex = @([people.Name find:@"Philip"]);        // =&gt; NSNotFound
-    NSLog(@"rowIndex: %@", rowIndex);
-    rowIndex = @([people.Name find:@"Mary"]);          // =&gt; 1
-    NSLog(@"rowIndex: %@", rowIndex);
+    // @@Example: simple_search @@
+    NSLog(@"Philip is at index: %@",
+          @([people.Name find:@"Philip"]));            // =&gt; NSNotFound
+    
+    NSLog(@"Mary is at index: %@",
+          @([people.Name find:@"Mary"]));              // =&gt; 1
     // @@EndExample@@
 
     // @@Example: advanced_search @@
@@ -159,6 +159,11 @@ void sharedGroupFunc() {
 
     tableFunc();
     sharedGroupFunc();
+    
+    // Setup window and rootVC to silence Xcode warning
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.window.rootViewController = [[UIViewController alloc] init];
+    [self.window makeKeyAndVisible];
     return YES;
 }
 
