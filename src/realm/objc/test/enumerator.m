@@ -19,14 +19,6 @@
 @implementation EnumPeople
 @end
 
-@interface EnumPeople2 : RLMRow
-@property int Age;
-@property bool Hired;
-@end
-
-@implementation EnumPeople2
-@end
-
 @interface MACTestEnumerator: XCTestCase
 @end
 @implementation MACTestEnumerator
