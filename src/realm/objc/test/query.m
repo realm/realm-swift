@@ -246,13 +246,12 @@ REALM_TABLE_9(TestQueryAllTypes,
     
     XCTAssertEqual([[table where] minIntInColumnWithIndex:INT_COL], (int64_t)0, @"minIntInColumn");
     XCTAssertEqual([[table where] sumIntColumnWithIndex:INT_COL], (int64_t)860, @"IntCol max");
-    XCTAssertEqualWithAccuracy([[[table where] minDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], [date1 timeIntervalSince1970], 0.99, @"MinDateInColumn");
-    XCTAssertEqualWithAccuracy([[[table where] maxDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], [date2 timeIntervalSince1970], 0.99, @"MaxDateInColumn");
+
+    // Realm/tightdb has whole second precision for time stamps so we need to truncate the time stamps
+    XCTAssertEqual((time_t)[[[table where] minDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], (time_t)[date1 timeIntervalSince1970], @"MinDateInColumn");
+    XCTAssertEqual((time_t)[[[table where] maxDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], (time_t)[date2 timeIntervalSince1970], @"MaxDateInColumn");
     
     /// TODO: Tests missing....
-    
-    
-
 }
 
 - (void)testMathOperations
