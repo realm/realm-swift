@@ -94,6 +94,9 @@ BOOL is_class_subclass(Class class1, Class class2) {
         return objectClass;
     }
     
+    @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMRow" userInfo:nil];
+    
+    /* Disabled code to generate new proxy class
     // see if we have a cached version
     NSString *objectClassName = NSStringFromClass(objectClass);
     if (s_proxyClassNameCache[objectClassName]) {
@@ -115,7 +118,7 @@ BOOL is_class_subclass(Class class1, Class class2) {
     
     // set in cache to indiate this proxy class has been created and return
     s_proxyClassNameCache[objectClassName] = proxyClassName;
-    return proxyClass;
+    return proxyClass;*/
 }
 
 @end
