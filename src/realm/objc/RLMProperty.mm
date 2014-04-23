@@ -30,32 +30,32 @@
 // templated getters/setters
 // these are used so we can use the same signature for all types
 // allowing us to use a single mechanism for generating column specific acessors
-template<typename T> inline T column_get(RLMRow *row, int col);
-template<typename T> inline void column_set(RLMRow *row, int col, T val);
+template<typename T> inline T column_get(RLMRow *row, unsigned int col);
+template<typename T> inline void column_set(RLMRow *row, unsigned int col, T val);
 
 // specializations for each type
-template<> inline int column_get<int>(RLMRow *row, int col) {
+template<> inline int column_get<int>(RLMRow *row, unsigned int col) {
     return (int)row.table.getNativeTable.get_int(col, row.ndx); }
-template<> inline void column_set<int>(RLMRow *row, int col, int val) {
+template<> inline void column_set<int>(RLMRow *row, unsigned int col, int val) {
     row.table.getNativeTable.set_int(col, row.ndx, val); }
-template<> inline long column_get<long>(RLMRow *row, int col) {
+template<> inline long column_get<long>(RLMRow *row, unsigned int col) {
     return (long)row.table.getNativeTable.get_int(col, row.ndx); }
-template<> inline void column_set<long>(RLMRow *row, int col, long val) {
+template<> inline void column_set<long>(RLMRow *row, unsigned int col, long val) {
     row.table.getNativeTable.set_int(col, row.ndx, val); }
-template<> inline float column_get<float>(RLMRow *row, int col) {
+template<> inline float column_get<float>(RLMRow *row, unsigned int col) {
     return (float)row.table.getNativeTable.get_float(col, row.ndx); }
-template<> inline void column_set<float>(RLMRow *row, int col, float val) {
+template<> inline void column_set<float>(RLMRow *row, unsigned int col, float val) {
     row.table.getNativeTable.set_float(col, row.ndx, val); }
-template<> inline double column_get<double>(RLMRow *row, int col) {
+template<> inline double column_get<double>(RLMRow *row, unsigned int col) {
     return (double)row.table.getNativeTable.get_double(col, row.ndx); }
-template<> inline void column_set<double>(RLMRow *row, int col, double val) {
+template<> inline void column_set<double>(RLMRow *row, unsigned int col, double val) {
     row.table.getNativeTable.set_double(col, row.ndx, val); }
-template<> inline bool column_get<bool>(RLMRow *row, int col) {
+template<> inline bool column_get<bool>(RLMRow *row, unsigned int col) {
     return (bool)row.table.getNativeTable.get_bool(col, row.ndx); }
-template<> inline void column_set<bool>(RLMRow *row, int col, bool val) {
+template<> inline void column_set<bool>(RLMRow *row, unsigned int col, bool val) {
     row.table.getNativeTable.set_bool(col, row.ndx, val); }
-template<> inline id column_get<id>(RLMRow *row, int col) { return row[col]; }
-template<> inline void column_set<id>(RLMRow *row, int col, id val) { row[col] = val; }
+template<> inline id column_get<id>(RLMRow *row, unsigned int col) { return row[col]; }
+template<> inline void column_set<id>(RLMRow *row, unsigned int col, id val) { row[col] = val; }
 
 // fixed column accessors
 // bakes the column number into the method signature to avoid looking up by name
