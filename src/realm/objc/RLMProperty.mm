@@ -29,7 +29,7 @@
 
 // templated getters/setters
 // these are used so we can use the same signature for all types
-// allowing us to use a single mechanism for generating column specific acessors
+// allowing us to use a single mechanism for generating column specific accessors
 template<typename T> inline T column_get(RLMRow *row, NSUInteger col);
 template<typename T> inline void column_set(RLMRow *row, NSUInteger col, T val);
 
@@ -80,7 +80,7 @@ template<typename T>
 void column_lookup_set(RLMRow *row, SEL sel, T val) {
     NSString *name = NSStringFromSelector(sel);
     // TODO - this currently assumes setters are named set<propertyname>
-    // we need to validated this and have a table of actual accessor names rather
+    // we need to validate this and have a table of actual accessor names rather
     // than making this asumption (in asana)
     name = [name substringWithRange:NSMakeRange(3, name.length-4)];
     NSUInteger col = [row.table indexOfColumnWithName:name];
@@ -113,7 +113,7 @@ public:
         return funcs;
     }
     
-    // this is called recursively for each column starting with the last
+    // this is called recursively for each column starting with column NUM
     // once we get to the 0th column, the specialized version
     // of this function is called which ends the recursion
 	ColumnFuncsEnumerator<column, TYPE> prev;
@@ -164,7 +164,7 @@ void type_for_property_string(const char *code,
         case 'd':
             *outtype = RLMTypeDouble;
             break;
-        case 'c':   // BOOL is stored as char - since tdb has no char this is ok
+        case 'c':   // BOOL is stored as char - since rlm has no char type this is ok
         case 'B':
             *outtype = RLMTypeBool;
             break;
