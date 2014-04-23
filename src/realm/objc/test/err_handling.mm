@@ -17,6 +17,7 @@
 #include <tightdb/binary_data.hpp>
 #include <tightdb/table.hpp>
 #import <realm/objc/RLMTable_noinst.h>
+#import <realm/objc/RLMTableFast.h>
 
 REALM_TABLE_DEF_3(PeopleErrTable,
                     Name,  String,
