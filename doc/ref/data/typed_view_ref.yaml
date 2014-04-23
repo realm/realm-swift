@@ -9,7 +9,7 @@
 # JJEPSEN c++ reference documentation note :  get/set should be replaced with operator overloading
 
 ID         : class_typed_tableview
-TITLE      : TDBView (typed)
+TITLE      : RLMView (typed)
 SUMMARY    : *g_typed_view_intro_summary
 DESCR      : *g_typed_view_intro_descr
 SEE        :

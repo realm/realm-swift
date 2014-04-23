@@ -5,8 +5,8 @@ sudo apt-get install gnustep-devel
 # Set up GNUstep environment
 . /usr/share/GNUstep/Makefiles/GNUstep.sh
 
-TIGHTDB_OBJC_HOME="$HOME/tightdb_objc"
-cd "$TIGTHDB_OBJC_HOME"
+REALM_OBJC_HOME="$HOME/tightdb_objc"
+cd "$REALM_OBJC_HOME"
 
 # Compile (Linux):
 clang -fblocks `gnustep-config --objc-flags` -IDeliv -I/usr/lib/gcc/x86_64-linux-gnu/4.6/include TightDb/TightDb/Cursor.mm

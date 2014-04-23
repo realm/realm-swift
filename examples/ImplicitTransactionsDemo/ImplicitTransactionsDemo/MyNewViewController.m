@@ -1,11 +1,11 @@
-#import <Tightdb/Tightdb.h>
+#import <Realm/Realm.h>
 
 #import "MyNewViewController.h"
 
 
 @implementation MyNewViewController
 {
-    TDBTable *_table;
+    RLMTable *_table;
     int _numChangeTicks;
 }
 
@@ -24,14 +24,13 @@
     self.title = NSLocalizedString(@"New", @"New");
     self.tabBarItem.image = [UIImage imageNamed:@"new"];
 
-    TDBSmartContext *context =
-        [TDBSmartContext contextWithPersistenceToFile:[self pathForName:@"demo.tightdb"]];
+    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:[self pathForName:@"demo.realm"]];
 
-    _table = [context tableWithName:@"demo"];
+    _table = [realm tableWithName:@"demo"];
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self selector:@selector(contextDidChange:)
-                               name:TDBContextDidChangeNotification object:context];
+                               name:RLMContextDidChangeNotification object:realm];
 
     return self;
 }
@@ -41,18 +40,6 @@
     ++_numChangeTicks;
     changeCount.text = [[NSNumber numberWithInt:_numChangeTicks] stringValue];
     [tableView reloadData];
-}
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
-}
-
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation

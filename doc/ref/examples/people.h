@@ -1,6 +1,6 @@
-#import <Tightdb/Tightdb.h>
+#import <Realm/Realm.h>
 
-TIGHTDB_TABLE_DEF_3(People,
-                    Name, String,
-                    Age,  Int,
-                    Hired, Bool)
+REALM_TABLE_DEF_3(People,
+                  Name, String,
+                  Age,  Int,
+                  Hired, Bool)

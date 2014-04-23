@@ -8,13 +8,13 @@
 #INCONSISTENCY popBack(), find_first_* ->> find*   ("first" is omitted)
 
 ID         : class_typed_table
-TITLE      : TDBTable (typed)
+TITLE      : RLMTable (typed)
 SUMMARY    : *g_typed_table_summary
 DESCR      : >
              NOTE: The current documentation of Typed Table is under construction,
              and not completely correct yet.
 
-             The <code>TDBTable</code> class is the core class of the TightDB framework. It allows you
+             The <code>RLMTable</code> class is the core class of the Realm framework. It allows you
              to efficiently work with data in terms of rows and columns. The value of
              a cell (specific column, specific row) is compacted in order to keep the
              overall memory consumption as little as possible. The internal data structure
@@ -25,7 +25,7 @@ DESCR      : >
              to define type safe and efficient table classes. The compiler can take avantage of
              a typed table and enforce type checking of the methods parameters at compile time.
 
-             The aim of the TightDB table class is that it feels as close to the native data
+             The aim of the Realm table class is that it feels as close to the native data
              structures (in particular arrays) as possible.
 SEE        :
 EXAMPLES:
@@ -37,7 +37,7 @@ CATEGORIES:
 - Definition:
   METHODS:
   - g_typed_table_macros:
-      NAME     : TIGHTDB_TABLE_*
+      NAME     : REALM_TABLE_*
       DESCR    : >
                  This set of predefined macros is used to declare type safe classes. One macro
                  will be expanded to classes for tables, rows, queries, and views.
@@ -52,13 +52,13 @@ CATEGORIES:
 
                  If you need to use the classes in
                  more than one source code file (<code>.m</code>), you can declare the class'
-                 interface using the TIGHTDB_TABLE_DEF_* macros in a header file (<code>.h</code>)
+                 interface using the REALM_TABLE_DEF_* macros in a header file (<code>.h</code>)
                  and include this header file in source code file where you use the class. Moreover,
                  the implementation part of the classes must be placed in a separate <code>.m</code>
-                 using the TIGHTDB_TABLE_IMPL_* macros.
+                 using the REALM_TABLE_IMPL_* macros.
 
       SIGNATURE: |
-                 TIGHTDB_TABLE_*(ClassName,
+                 REALM_TABLE_*(ClassName,
                                  ColumnName, ColumnType
                                  ...)
       SUMMARY  : Declare type safe table classes.
@@ -82,13 +82,13 @@ CATEGORIES:
                  <tr><th>Name</th>              <th>Desc</th>         <th>C++ type</th></tr>
                  </thead>
                  <tbody>
-                 <tr><td>TDBIntType</td>               <td>Integer</td>      <td>(int64_t)</td></tr>
-                 <tr><td>TDBFloatType</td>             <td>Floating-point</d><td>(float)</td></tr>
-                 <tr><td>TDBDoubleType</td>            <td>Floating-point</d><td>(double)</td></tr>
-                 <tr><td>TDBBoolType</td>              <td>Boolean</td>      <td>(BOOL)</td></tr>
-                 <tr><td>TDBStringType</td>            <td>Text</td>         <td>(NSString*)</td></tr>
-                 <tr><td>TDBDateType</td>              <td>UTC datetime</td> <td>(time_t)</td></tr>
-                 <tr><td>TDBMixedType</td>             <td>Dynamic</td>      <td>(contains any of the above)</td></tr>
+                 <tr><td>RLMTypeInt</td>               <td>Integer</td>      <td>(int64_t)</td></tr>
+                 <tr><td>RLMTypeFloat</td>             <td>Floating-point</d><td>(float)</td></tr>
+                 <tr><td>RLMTypeDouble</td>            <td>Floating-point</d><td>(double)</td></tr>
+                 <tr><td>RLMTypeBool</td>              <td>Boolean</td>      <td>(BOOL)</td></tr>
+                 <tr><td>RLMTypeString</td>            <td>Text</td>         <td>(NSString*)</td></tr>
+                 <tr><td>RLMTypeDate</td>              <td>UTC datetime</td> <td>(time_t)</td></tr>
+                 <tr><td>RLMTypeMixed</td>             <td>Dynamic</td>      <td>(contains any of the above)</td></tr>
                  </tbody>
                  </table>
 
@@ -139,14 +139,14 @@ CATEGORIES:
       - CODE   : ex_objc_typed_table_clear
         DESCR  :
 
-  - g_typed_table_optimize:
-      NAME     : optimize
-      SUMMARY  : *g_table_optimize_summary
-      DESCR    : *g_table_optimize_descr
-      SIGNATURE: (void)optimize
-      EXAMPLES:
-      - CODE   : ex_objc_typed_table_clear
-        DESCR  :
+  # - g_typed_table_optimize:
+  #     NAME     : optimize
+  #     SUMMARY  : *g_table_optimize_summary
+  #     DESCR    : *g_table_optimize_descr
+  #     SIGNATURE: (void)optimize
+  #     EXAMPLES:
+  #     - CODE   : ex_objc_typed_table_clear
+  #       DESCR  :
 
 # TODO?  - g_typed_table_columns:
 # NOT - g_typed_table_columns_const:
@@ -155,10 +155,10 @@ CATEGORIES:
       NAME     : isEqual
       SUMMARY  : *g_typed_table_operator_eq_summary
       DESCR    : *g_typed_table_operator_eq_descr
-      SIGNATURE: (BOOL)isEqual:(TDBTable *)other
+      SIGNATURE: (BOOL)isEqual:(RLMTable *)other
       PARAMS:
       - NAME   : other
-        TYPES  : TDBTable *
+        TYPES  : RLMTable *
         DESCR  : *g_typed_table_operator_eq_parm1_descr
       RETURN:
         TYPES  : BOOL
@@ -195,6 +195,40 @@ CATEGORIES:
       RETURN:
         TYPES  : <i>ClassName</i>Row *
         DESCR  : The row object. Note that <i>ClassName</i> is replaced with the name of your specific table.
+
+  - g_dyn_table_row_at_indexed_subscript:
+      NAME     : "objectAtIndexedSubscript:"
+      SUMMARY  : Returns a row object at a specified row number.
+      DESCR    : >
+                 The method returns a row object at a specific row number. This method also allows
+                 an <code>RLMTable</code> to use NSArray-styled subscripting.
+                 For example, <code>myRLMTable[2]</code> will return an <code>RLMRow</code> at index 2. 
+      SIGNATURE: "(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex"
+      PARAMS:
+      - NAME   : rowIndex
+        TYPES  : NSUInteger
+        DESCR  : The row number.
+      RETURN:
+        TYPES  : RLMRow *
+        DESCR  : The row.
+
+  - g_dyn_table_row_at_keyed_subscript:
+      NAME     : "objectForKeyedSubscript:"
+      SUMMARY  : Returns a row object for a specified key.
+      DESCR    : >
+                 The method returns a row object for a given <code>key</code>. This method also allows
+                 an <code>RLMTable</code> to use NSDictionary-styled subscripting. For example,
+                 <code>myRLMTable[@"foo"]</code> will return the first <code>RLMRow</code> where the first column's value is equal to <code>@"foo"</code>.
+                 Please note that the first column in the <code>RLMTable</code> must be of <code>RLMTypeString</code> in order for this method to work.
+                 If the first column is not of <code>RLMTypeString</code>, an exception will be thrown. <code>nil</code> is returned if a key does not exist in the table.
+      SIGNATURE: "(RLMRow *)objectForKeyedSubscript:(NSString *)key"
+      PARAMS:
+      - NAME   : key
+        TYPES  : NSString *
+        DESCR  : The key to lookup.
+      RETURN:
+        TYPES  : RLMRow *
+        DESCR  : The row.
 
   - g_typed_table_cursor_at_last_index:
       NAME     : lastRow
@@ -244,7 +278,7 @@ CATEGORIES:
         DESCR  :
 
   - objc_dyn_table_insert_object:
-      NAME     : "insertRow:atRowIndex:"
+      NAME     : "insertRow:atIndex:"
       SUMMARY  : Insert a row.
       DESCR    : >
                  This method will insert a row in the table at a particular
@@ -262,11 +296,26 @@ CATEGORIES:
                  Properties in generic objects
                  (derived from <code>NSObject</code>) which match column names
                  will be used. Non-matching properties are ignored.
-      SIGNATURE: (void)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
+      SIGNATURE: (void)insertRow:(NSObject *)anObject atRowIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME    : anObject
-        TYPES   : id
+        TYPES   : NSObject *
         DESCR   : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>. A <code>nil</code> implies that a row of default values is inserted.
+      - NAME    : rowIndex
+        TYPES   : NSUInteger
+        DESCR   : *g_dyn_table_insert_empty_row_parm1_descr
+
+  - objc_dyn_table_set_object:
+      NAME     : "updateRow:atIndex:"
+      SUMMARY  : Updates a row.
+      DESCR    : >
+                 This method will update a row in the table at the specified index with <code>anObject</code>. If <code>anObject</code> is <code>nil</code>, nothing will happen to the row. Properties in generic objects (derived from <code>NSObject</code>) 
+                 which match columns names will be used. Non-matching properties are ignored. An exception is thrown if passing an index that is out of bounds.
+      SIGNATURE: (void)updateRow:(NSObject *)anObject atRowIndex:(NSUInteger)rowIndex
+      PARAMS:
+      - NAME    : anObject
+        TYPES   : NSObject *
+        DESCR   : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>.
       - NAME    : rowIndex
         TYPES   : NSUInteger
         DESCR   : *g_dyn_table_insert_empty_row_parm1_descr
