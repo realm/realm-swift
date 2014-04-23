@@ -114,6 +114,7 @@
 		4DDDD67018EAF1C000E94613 /* RLMRowFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMRowFast.h; path = src/realm/objc/RLMRowFast.h; sourceTree = SOURCE_ROOT; };
 		4DDDD67218EAF22100E94613 /* RLMFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMFast.h; path = src/realm/objc/RLMFast.h; sourceTree = SOURCE_ROOT; };
 		4DDDD67318EB049300E94613 /* RLMViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMViewProtocol.h; path = src/realm/objc/RLMViewProtocol.h; sourceTree = SOURCE_ROOT; };
+		803BC78F1907C0D3006AB33A /* release_notes.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = release_notes.md; sourceTree = "<group>"; };
 		E82D50391900C128003C1B8E /* realm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = realm.m; path = ../src/realm/objc/test/realm.m; sourceTree = "<group>"; };
 		E87675CC1907841C00F58CDB /* RLMTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTestCase.h; path = src/realm/objc/test/RLMTestCase.h; sourceTree = SOURCE_ROOT; };
 		E87675CD1907841C00F58CDB /* RLMTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTestCase.m; path = src/realm/objc/test/RLMTestCase.m; sourceTree = SOURCE_ROOT; };
@@ -205,6 +206,7 @@
 		E9189090177B677900653D7A = {
 			isa = PBXGroup;
 			children = (
+				803BC78F1907C0D3006AB33A /* release_notes.md */,
 				E91890A2177B677900653D7A /* Realm */,
 				E91890B4177B677900653D7A /* RealmTests */,
 				E918909B177B677900653D7A /* Frameworks */,
