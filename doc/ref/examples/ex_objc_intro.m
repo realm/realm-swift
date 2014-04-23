@@ -45,7 +45,7 @@ void ex_objc_intro() {
         People *table = [realm tableWithName:@"employees"
                                 asTableClass:[People class]];
 
-        // Get the view
+        // Query the table
         RLMView  *view = [table where:@"Age == 30"];
 
         // Iterate over all rows in view
