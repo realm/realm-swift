@@ -14,9 +14,6 @@
 		4D24339818BF65C700271C32 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D24339618BF65C700271C32 /* InfoPlist.strings */; };
 		4D24339A18BF65C700271C32 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D24339918BF65C700271C32 /* main.m */; };
 		4D24339E18BF65C700271C32 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D24339D18BF65C700271C32 /* AppDelegate.m */; };
-		4D2433A118BF65C700271C32 /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D24339F18BF65C700271C32 /* Main_iPhone.storyboard */; };
-		4D2433A418BF65C700271C32 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D2433A218BF65C700271C32 /* Main_iPad.storyboard */; };
-		4D2433A718BF65C700271C32 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2433A618BF65C700271C32 /* ViewController.m */; };
 		4D2433A918BF65C700271C32 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D2433A818BF65C700271C32 /* Images.xcassets */; };
 		4D2433B118BF65C700271C32 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D24338D18BF65C700271C32 /* Foundation.framework */; };
 		4D2433BA18BF65C700271C32 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D2433B818BF65C700271C32 /* InfoPlist.strings */; };
@@ -46,10 +43,6 @@
 		4D24339B18BF65C700271C32 /* iOSTutorial-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iOSTutorial-Prefix.pch"; sourceTree = "<group>"; };
 		4D24339C18BF65C700271C32 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		4D24339D18BF65C700271C32 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		4D2433A018BF65C700271C32 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
-		4D2433A318BF65C700271C32 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
-		4D2433A518BF65C700271C32 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		4D2433A618BF65C700271C32 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		4D2433A818BF65C700271C32 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		4D2433AE18BF65C700271C32 /* iOSTutorialTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iOSTutorialTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D2433B718BF65C700271C32 /* iOSTutorialTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iOSTutorialTests-Info.plist"; sourceTree = "<group>"; };
@@ -83,7 +76,6 @@
 		4D1271EE1833C1970099B36C = {
 			isa = PBXGroup;
 			children = (
-				4D1271FC1833C1970099B36C /* TightdbTutorial */,
 				4D24339318BF65C700271C32 /* iOSTutorial */,
 				4D2433B518BF65C700271C32 /* iOSTutorialTests */,
 				4D1271F91833C1970099B36C /* Frameworks */,
@@ -112,22 +104,11 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		4D1271FC1833C1970099B36C /* TightdbTutorial */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = TightdbTutorial;
-			sourceTree = "<group>";
-		};
 		4D24339318BF65C700271C32 /* iOSTutorial */ = {
 			isa = PBXGroup;
 			children = (
 				4D24339C18BF65C700271C32 /* AppDelegate.h */,
 				4D24339D18BF65C700271C32 /* AppDelegate.m */,
-				4D24339F18BF65C700271C32 /* Main_iPhone.storyboard */,
-				4D2433A218BF65C700271C32 /* Main_iPad.storyboard */,
-				4D2433A518BF65C700271C32 /* ViewController.h */,
-				4D2433A618BF65C700271C32 /* ViewController.m */,
 				4D2433A818BF65C700271C32 /* Images.xcassets */,
 				4D24339418BF65C700271C32 /* Supporting Files */,
 			);
@@ -207,7 +188,7 @@
 		4D1271EF1833C1970099B36C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Morten Kjaer";
 				TargetAttributes = {
 					4D2433AD18BF65C700271C32 = {
@@ -239,9 +220,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D2433A418BF65C700271C32 /* Main_iPad.storyboard in Resources */,
 				4D2433A918BF65C700271C32 /* Images.xcassets in Resources */,
-				4D2433A118BF65C700271C32 /* Main_iPhone.storyboard in Resources */,
 				4D24339818BF65C700271C32 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -261,7 +240,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D2433A718BF65C700271C32 /* ViewController.m in Sources */,
 				4D24339E18BF65C700271C32 /* AppDelegate.m in Sources */,
 				4D24339A18BF65C700271C32 /* main.m in Sources */,
 			);
@@ -292,22 +270,6 @@
 				4D24339718BF65C700271C32 /* en */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		4D24339F18BF65C700271C32 /* Main_iPhone.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4D2433A018BF65C700271C32 /* Base */,
-			);
-			name = Main_iPhone.storyboard;
-			sourceTree = "<group>";
-		};
-		4D2433A218BF65C700271C32 /* Main_iPad.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4D2433A318BF65C700271C32 /* Base */,
-			);
-			name = Main_iPad.storyboard;
 			sourceTree = "<group>";
 		};
 		4D2433B818BF65C700271C32 /* InfoPlist.strings */ = {
@@ -402,7 +364,6 @@
 		4D2433BE18BF65C700271C32 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
@@ -439,7 +400,6 @@
 		4D2433BF18BF65C700271C32 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
@@ -472,7 +432,6 @@
 		4D2433C118BF65C700271C32 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/iOSTutorial.app/iOSTutorial";
 				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -498,7 +457,6 @@
 		4D2433C218BF65C700271C32 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/iOSTutorial.app/iOSTutorial";
 				CLANG_ENABLE_MODULES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
