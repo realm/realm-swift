@@ -18,6 +18,12 @@ NSString *const RLMTestRealmPath = @"test.realm";
     [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath error:nil];
 }
 
++ (void)tearDown {
+    // This method is run after all tests in a test method have run
+    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath error:nil];
+    [super tearDown];
+}
+
 - (RLMRealm *)realmPersistedAtTestPath {
     return [RLMRealm realmWithPersistenceToFile:RLMTestRealmPath];
 }
