@@ -1,25 +1,14 @@
 /* @@Example: ex_objc_realm_intro @@ */
 #import <Realm/Realm.h>
-#import "people.h"
 
-/*
- The classes People, PeopleQuery, PeopleView, and PeopleRow are declared
- (interfaces are generated) in people.h as
+// Simple person data object
+@interface Person : RLMRow
 
- REALM_TABLE_DEF_3(People,
-                   Name,  String,
-                   Age,   Int,
-                   Hired, Bool)
+@property NSString * name;
+@property int age;
+@property BOOL hired;
 
- and in people.m you must have
-
- REALM_TABLE_IMPL_3(People,
-                    Name, String,
-                    Age,  Int,
-                    Hired, Bool)
-
- in order to generate the implementation of the classes.
- */
+@end
 
 
 void ex_objc_realm_intro()
@@ -35,17 +24,17 @@ void ex_objc_realm_intro()
     // Create a realm and initialize by creating table and adding a row
     RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:realmFilePath
                                                  initBlock:^(RLMRealm *realm) {
-                                                     if (realm.isEmpty) {
-                                                         People *table = [realm createTableWithName:@"employees"
-                                                                                       asTableClass:[People class]];
-                                                         [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
-                                                     }
-                                                 }];
+        if (realm.isEmpty) {
+            RLMTable *table = [realm createTableWithName:@"employees"
+                                             objectClass:Person.class];
+            [table addRow:@{@"name": @"Bill", @"age": @53, @"hired": @YES}];
+        }
+    }];
     
     // Read from the realm
-    People *table = [realm tableWithName:@"employees" asTableClass:[People class]];
-    for (PeopleRow *row in table) {
-        NSLog(@"Name: %@", row.Name);
+    RLMTable *table = [realm tableWithName:@"employees" objectClass:Person.class];
+    for (Person *row in table) {
+        NSLog(@"Name: %@", row.name);
     }
 }
 /* @@EndExample@@ */

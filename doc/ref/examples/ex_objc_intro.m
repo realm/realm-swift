@@ -1,26 +1,15 @@
 // @@Example: ex_objc_intro @@
 #import <Foundation/Foundation.h>
 #import <Realm/Realm.h>
-#import "people.h"
 
-/*
- The classes People, PeopleQuery, PeopleView, and PeopleRow are declared
- (interfaces are generated) in people.h as
+// Simple person data object
+@interface Person : RLMRow
 
- REALM_TABLE_DEF_3(People,
-                   Name,  String,
-                   Age,   Int,
-                   Hired, Bool)
+@property NSString * name;
+@property int age;
+@property BOOL hired;
 
- and in people.m you must have
-
- REALM_TABLE_IMPL_3(People,
-                    Name, String,
-                    Age,  Int,
-                    Hired, Bool)
-
- in order to generate the implementation of the classes.
-*/
+@end
 
 // Use it in a function
 void ex_objc_intro() {
@@ -28,26 +17,25 @@ void ex_objc_intro() {
     RLMRealm *realm = [RLMRealm realmWithDefaultPersistenceAndInitBlock:^(RLMRealm *realm) {
         if (realm.isEmpty) {
             // Create a table
-            People *table = [realm createTableWithName:@"employees" asTableClass:[People class]];
-            
+            RLMTable *table = [realm createTableWithName:@"employees"
+                                             objectClass:Person.class];
             // Add rows
-            [table addRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
-            [table addRow:@{@"Name": @"Lars", @"Age": @22, @"Hired": @YES}];
-            [table addRow:@{@"Name": @"Phil", @"Age": @43, @"Hired": @NO}];
-            [table addRow:@{@"Name": @"Anni", @"Age": @54, @"Hired": @YES}];
+            [table addRow:@{@"name": @"Mary", @"age": @76, @"hired": @NO}];
+            [table addRow:@{@"name": @"Lars", @"age": @22, @"hired": @YES}];
+            [table addRow:@{@"name": @"Phil", @"age": @43, @"hired": @NO}];
+            [table addRow:@{@"name": @"Anni", @"age": @54, @"hired": @YES}];
         }
     }];
     
     // Get the table
-    People *table = [realm tableWithName:@"employees" asTableClass:[People class]];
+    RLMTable *table = [realm tableWithName:@"employees" objectClass:Person.class];
     
     // Query the table
-    PeopleQuery *query = [[table where].Age columnIsGreaterThan:30];
-    PeopleView  *view  = [query findAll];
+    RLMView *view  = [table where:@"age > 30"];
     
     // Iterate over all rows in view
-    for (PeopleRow *row in view) {
-        NSLog(@"Name: %@", row.Name);
+    for (Person *row in view) {
+        NSLog(@"Name: %@", row.name);
     }
 }
 // @@EndExample@@

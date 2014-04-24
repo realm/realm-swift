@@ -1,42 +1,31 @@
 /* @@Example: ex_objc_query_typed_intro @@ */
 #import <Realm/Realm.h>
-#import "people.h"
 
-/*
- The classes People, PeopleQuery, PeopleView, and PeopleRow are declared
- (interfaces are generated) in people.h as
+// Simple person data object
+@interface Person : RLMRow
 
- REALM_TABLE_DEF_3(People,
-                     Name,  String,
-                     Age,   Int,
-                     Hired, Bool)
+@property NSString * name;
+@property int age;
+@property BOOL hired;
 
- and in people.m you must have
-
- REALM_TABLE_IMPL_3(People,
-                      Name, String,
-                      Age,  Int,
-                      Hired, Bool)
-
- in order to generate the implementation of the classes.
- */
+@end
 
 void ex_objc_query_typed_intro()
 {
     // Creates a new table of the type defined above
-    People *table = [[People alloc] init];
+    RLMTable *table = [[RLMTable alloc] initWithObjectClass:Person.class];
     
     // Adds rows to the table.
-    [table addRow:@{@"Name":@"Brian", @"Age":@14, @"Hired":@NO}];
-    [table addRow:@{@"Name":@"Jack",  @"Age":@34, @"Hired":@YES}];
-    [table addRow:@{@"Name":@"Bob",   @"Age":@10, @"Hired":@NO}];
+    [table addRow:@{@"name":@"Brian", @"age":@14, @"hired":@NO}];
+    [table addRow:@{@"name":@"Jack",  @"age":@34, @"hired":@YES}];
+    [table addRow:@{@"name":@"Bob",   @"age":@10, @"hired":@NO}];
     
     // Create a query
-    PeopleQuery *query = [[[[table where].Age columnIsGreaterThan:20] Or].Name columnIsEqualTo:@"Bob"];
+    RLMView *view  = [table where:@"age > 30"];
     
     // Iterate over the query result
-    for (PeopleRow *row in query) {
-        NSLog(@"Person matching query: %@", row.Name);
+    for (Person *row in view) {
+        NSLog(@"Person matching query: %@", row.name);
     }
 }
 /* @@EndExample@@ */
