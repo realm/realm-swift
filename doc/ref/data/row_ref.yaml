@@ -34,7 +34,7 @@ CATEGORIES:
                  The method returns row data for the specified. This method also allows
                  an <code>RLMRow</code> to use NSArray-styled subscripting.
                  For example, <code>myRLMRow[2]</code> will return the object from index 2. 
-      SIGNATURE: "(id)objectAtIndexedSubscript:(NSUInteger)columnIndex"
+      SIGNATURE: "- (id)objectAtIndexedSubscript:(NSUInteger)columnIndex"
       PARAMS:
       - NAME   : column index
         TYPES  : NSUInteger
@@ -50,7 +50,7 @@ CATEGORIES:
                  The method returns an object for a given <code>key</code>. This method also allows
                  an <code>RLMRow</code> to use NSDictionary-styled subscripting. For example,
                  <code>myRLMRow[@"fooColumn"]</code> will return an object holding the data in a column named <code>fooColumn</code>
-      SIGNATURE: "(id)objectForKeyedSubscript:(NSString *)key"
+      SIGNATURE: "- (id)objectForKeyedSubscript:(NSString *)key"
       PARAMS:
       - NAME   : key
         TYPES  : NSString *
