@@ -34,7 +34,7 @@ The Objective-C API has been updated and your code will break!
 
 ### API breaking changes:
 
-* `RLMTable` objects can only be creating within an `RLMRealm` object.
+* `RLMTable` objects can only be creating with an `RLMRealm` object.
 
 ### Enhancements:
 
