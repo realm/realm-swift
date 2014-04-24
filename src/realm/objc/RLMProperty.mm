@@ -30,58 +30,11 @@
 // in RLMProxy.m
 extern BOOL is_class_subclass(Class class1, Class class2);
 
-// determine RLMType from objc code
-void typeForPropertyString(const char *code,
-                           RLMType *outtype,
-                           Class *outSubtableObjectClass) {
-    if (!code) {
-        *outtype = RLMTypeNone;
-        return;
-    }
-    
-    switch (*code) {
-        case 'i':   // int
-        case 'l':   // long
-        case 'q':   // long long
-            *outtype = RLMTypeInt;
-            break;
-        case 'f':
-            *outtype = RLMTypeFloat;
-            break;
-        case 'd':
-            *outtype = RLMTypeDouble;
-            break;
-        case 'c':   // BOOL is stored as char - since rlm has no char type this is ok
-        case 'B':
-            *outtype = RLMTypeBool;
-            break;
-        case '@':
-        {
-            NSString *type = [NSString stringWithUTF8String:code];
-            if ([type isEqualToString:@"@\"NSString\""]) *outtype = RLMTypeString;
-            else if ([type isEqualToString:@"@\"NSDate\""]) *outtype = RLMTypeDate;
-            else if ([type isEqualToString:@"@\"NSData\""]) *outtype = RLMTypeBinary;
-            else {
-                // check for subtable
-                Class cls = NSClassFromString([type substringWithRange:NSMakeRange(2, type.length-3)]);
-                if (is_class_subclass(cls, RLMTable.class)) {
-                    *outtype = RLMTypeTable;
-                    if ([cls respondsToSelector:@selector(objectClass)]) {
-                        *outSubtableObjectClass = [cls performSelector:@selector(objectClass)];
-                    }
-                }
-            }
-            break;
-        }
-        default:
-            *outtype = RLMTypeNone;
-    }
-}
-
-// macros to generate objc type strings when registering methods
+// macros/helpers to generate objc type strings for registering methods
 #define GETTER_TYPES(C) C ":@"
 #define SETTER_TYPES(C) "v:@" C
 
+// getter type strings
 const char * getterTypeStringForCode(char code) {
     switch (code) {
         case 'i': return GETTER_TYPES("i");
@@ -95,6 +48,7 @@ const char * getterTypeStringForCode(char code) {
     }
 }
 
+// setter type strings
 const char * setterTypeStringForCode(char code) {
     switch (code) {
         case 'i': return SETTER_TYPES("i");
@@ -108,19 +62,25 @@ const char * setterTypeStringForCode(char code) {
     }
 }
 
+// private properties
 @interface RLMProperty ()
 @property (nonatomic, assign) BOOL dynamic;
 @property (nonatomic, assign) BOOL nonatomic;
+@property (nonatomic, copy) NSString * getterName;
+@property (nonatomic, copy) NSString * setterName;
 @end
 
 @implementation RLMProperty
+
+@synthesize getterName = _getterName;
+@synthesize setterName = _setterName;
 
 // get accessor lookup code based on objc type and rlm type
 -(char)accessorCode {
     switch (self.objcType) {
         case 'q':           // long long same as long
             return 'l';
-        case '@':
+        case '@':           // custom accessors for strings and subtables
             if (self.type == RLMTypeString) return 's';
             if (self.type == RLMTypeTable) return 't';
         default:
@@ -222,42 +182,85 @@ const char * setterTypeStringForCode(char code) {
 // add dynamic property getters/setters to the given class
 -(void)addToClass:(Class)cls column:(int)column
 {
-    // generate getter sel
-    // TODO - support custom accessor names
-    NSString *propName = self.name;
-    SEL get = NSSelectorFromString(propName);
-    
-    // generate setter sel
-    NSString *firstChar = [[propName substringToIndex:1] uppercaseString];
-    NSString *rest = [propName substringFromIndex:1];
-    NSString *setName = [NSString stringWithFormat:@"set%@%@:", firstChar, rest];
-    SEL set = NSSelectorFromString(setName);
-    
     // set accessors
-    class_replaceMethod(cls, get, [self getterForColumn:column], getterTypeStringForCode(self.objcType));
-    class_replaceMethod(cls, set, [self setterForColumn:column], setterTypeStringForCode(self.objcType));
+    SEL getter = NSSelectorFromString(self.getterName), setter = NSSelectorFromString(self.setterName);
+    class_replaceMethod(cls, getter, [self getterForColumn:column], getterTypeStringForCode(self.objcType));
+    class_replaceMethod(cls, setter, [self setterForColumn:column], setterTypeStringForCode(self.objcType));
 }
 
-+(instancetype)propertyForObjectProperty:(objc_property_t)prop {
-    // go through all attributes, noting if nonatomic and getting the RLMType
+
+// determine RLMType from objc code
+-(void)parsePropertyTypeString:(const char *)code {
+    self.objcType = *(code);    // first char of type attr
+    if (self.objcType == 'q') {
+        self.objcType = 'l';    // collapse these as they are the same
+    }
+    
+    // map to RLMType
+    switch (self.objcType) {
+        case 'i':   // int
+        case 'l':   // long
+            self.type = RLMTypeInt;
+            break;
+        case 'f':
+            self.type = RLMTypeFloat;
+            break;
+        case 'd':
+            self.type = RLMTypeDouble;
+            break;
+        case 'c':   // BOOL is stored as char - since rlm has no char type this is ok
+        case 'B':
+            self.type = RLMTypeBool;
+            break;
+        case '@':
+        {
+            NSString *type = [NSString stringWithUTF8String:code];
+            if ([type isEqualToString:@"@\"NSString\""]) {
+                self.type = RLMTypeString;
+            }
+            else if ([type isEqualToString:@"@\"NSDate\""]) {
+                self.type = RLMTypeDate;
+            }
+            else if ([type isEqualToString:@"@\"NSData\""]) {
+                self.type = RLMTypeBinary;
+            }
+            else {
+                // check for subtable
+                Class cls = NSClassFromString([type substringWithRange:NSMakeRange(2, type.length-3)]);
+                if (is_class_subclass(cls, RLMTable.class) && [cls respondsToSelector:@selector(objectClass)]) {
+                    self.subtableObjectClass = [cls performSelector:@selector(objectClass)];
+                }
+                self.type = RLMTypeTable;
+            }
+            break;
+        }
+        default:
+            self.type = RLMTypeNone;
+            break;
+    }
+}
+
++(instancetype)propertyForObjectProperty:(objc_property_t)runtimeProp
+{
+    // create new property
+    RLMProperty *prop = [RLMProperty new];
+    
+    // set name
+    prop.name = [NSString stringWithUTF8String:property_getName(runtimeProp)];
+    
+    // parse attributes
     unsigned int attCount;
-    BOOL nonatomic = NO, dynamic = NO;
-    RLMType type = RLMTypeNone;
-    char objcType = 0;
-    Class subtableObjectType;
-    objc_property_attribute_t *atts = property_copyAttributeList(prop, &attCount);
+    objc_property_attribute_t *atts = property_copyAttributeList(runtimeProp, &attCount);
     for (unsigned int a = 0; a < attCount; a++) {
         switch (*(atts[a].name)) {
             case 'T':
-                typeForPropertyString(atts[a].value, &type, &subtableObjectType);
-                objcType = *(atts[a].value);            // first char of type attr
-                if (objcType == 'q') objcType = 'l';    // collapse these
+                [prop parsePropertyTypeString:atts[a].value];
                 break;
             case 'N':
-                nonatomic = YES;
+                prop.nonatomic = YES;
                 break;
             case 'D':
-                dynamic = YES;
+                prop.dynamic = YES;
                 break;
             default:
                 break;
@@ -265,25 +268,22 @@ const char * setterTypeStringForCode(char code) {
     }
     free(atts);
     
-    // if nonatomic and prop has a valid type add to our array
-    const char *name = property_getName(prop);
-    if (type == RLMTypeNone) {
-        NSString * reason = [NSString stringWithFormat:@"Can't persist property '%s' with incompatible type. "
-                             "Add to ignoredPropertyNames: method to ignore.", name];
+    // make sure we have a valid type
+    if (prop.type == RLMTypeNone) {
+        NSString * reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
+                             "Add to ignoredPropertyNames: method to ignore.", prop.name];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
     }
-    else {
-        // if nonatomic and valid type, add to array
-        RLMProperty *tdbProp = [RLMProperty new];
-        tdbProp.type = type;
-        tdbProp.objcType = objcType;
-        tdbProp.name = [NSString stringWithUTF8String:name];
-        tdbProp.subtableObjectClass = subtableObjectType;
-        tdbProp.nonatomic = nonatomic;
-        tdbProp.dynamic = dynamic;
-        return tdbProp;
+    
+    // populate getter/setter names if generic
+    if (!prop.getterName) {
+        prop.getterName = prop.name;
     }
-    return nil;
+    if (!prop.setterName) {
+        prop.setterName = [NSString stringWithFormat:@"set%c%@:", toupper(prop.name.UTF8String[0]), [prop.name substringFromIndex:1]];
+    }
+    
+    return prop;
 }
 
 
