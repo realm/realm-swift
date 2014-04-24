@@ -6,10 +6,6 @@ Objective-C
 -----------
 The Objective-C API has been updated and your code will break!
 
-### Bugfixes:
-
-* none.
-
 ### API breaking changes:
 
 * `???`
@@ -17,6 +13,10 @@ The Objective-C API has been updated and your code will break!
 ### Enhancements:
 
 * `???`
+
+### Bugfixes:
+
+* none.
 
 -------------
 
@@ -78,18 +78,15 @@ and your code will break!
 
 * none.
 
--------------
+### Bugfixes:
 
-### Internals:
-
-* `???`
+* None.
 
 
 =============================================================
 0.6.0 Release notes (2014—04-11)
 Objective-C
 -----------
-Description......
 
 ### Bugfixes:
 

@@ -74,8 +74,6 @@
 -(void)removeRowAtIndex:(NSUInteger)rowIndex;
 -(void)removeLastRow;
 
-// Queries
--(RLMQuery *)where;
 // Only supported on string columns with an index
 -(RLMView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
 
