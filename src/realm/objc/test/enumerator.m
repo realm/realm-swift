@@ -27,18 +27,20 @@
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
-    // Create new table in group
-    RLMTable *people = [[RLMTable alloc] initWithObjectClass:EnumPeople.class];
-    
-    // Add some rows
     NSArray *rowsArray = @[@[@"John", @20, @YES],
                            @[@"Mary", @21, @NO],
                            @[@"Lars", @21, @YES],
                            @[@"Phil", @43, @NO],
                            @[@"Anni", @54, @YES]];
-    for (NSArray *rowArray in rowsArray) {
-        [people addRow:rowArray];
-    }
+    // Create new table in realm
+    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:RLMTestRealmPath initBlock:^(RLMRealm *realm) {
+        RLMTable *people = [realm createTableWithName:@"people" objectClass:[EnumPeople class]];
+        // Add some rows
+        for (NSArray *rowArray in rowsArray) {
+            [people addRow:rowArray];
+        }
+    }];
+    RLMTable *people = [realm tableWithName:@"people" objectClass:[EnumPeople class]];
     
     //------------------------------------------------------
     NSLog(@"--- Iterators ---");
