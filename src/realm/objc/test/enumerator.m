@@ -59,6 +59,7 @@
     }
     
     NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(NSArray *evaluatedArray, NSDictionary *bindings) {
+        XCTAssertNil(bindings, @"Parameter must be used");
         return [evaluatedArray[2] boolValue] &&
         [evaluatedArray[1] integerValue] >= 20 &&
         [evaluatedArray[1] integerValue] <= 30;
@@ -81,6 +82,7 @@
     }
     
     predicate = [NSPredicate predicateWithBlock:^BOOL(NSArray *evaluatedArray, NSDictionary *bindings) {
+        XCTAssertNil(bindings, @"Parameter must be used");
         return [evaluatedArray[1] integerValue] == 21;
     }];
     filteredArray = [rowsArray filteredArrayUsingPredicate:predicate];
