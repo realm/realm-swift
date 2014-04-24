@@ -38,32 +38,9 @@ BOOL is_class_subclass(Class class1, Class class2) {
 @implementation RLMProxy
 
 + (void)initialize {
-    s_proxyClassNameCache = [NSMutableDictionary dictionary];
-}
-
-- (id)object {
-    // create object on demand
-    if (!_object) {
-        NSString *className = NSStringFromClass(self.class);
-        className = [className stringByReplacingOccurrencesOfString:@"RLMProxy_" withString:@""];
-        Class objectClass = NSClassFromString(className);
-        
-        // create object
-        _object = [[objectClass alloc] init];
-        RLMObjectDescriptor *descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
-        for (RLMProperty *prop in descriptor.properties) {
-            [_object setValue:self[prop.name] forKeyPath:prop.name];
-        }
+    if (self == RLMProxy.class) {
+        s_proxyClassNameCache = [NSMutableDictionary dictionary];
     }
-    return _object;
-}
-// return our objects method signature
--(NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
-    return [self.object methodSignatureForSelector:aSelector];
-}
-// invocate on object
-- (void)forwardInvocation:(NSInvocation *)anInvocation {
-    [anInvocation invokeWithTarget:self.object];
 }
 
 +(Class)proxyClassForObjectClass:(Class)objectClass {
@@ -83,7 +60,8 @@ BOOL is_class_subclass(Class class1, Class class2) {
     }
     
     @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMRow" userInfo:nil];
-    
+}
+
     /* Disabled code to generate new proxy class
     // see if we have a cached version
     NSString *objectClassName = NSStringFromClass(objectClass);
@@ -106,8 +84,33 @@ BOOL is_class_subclass(Class class1, Class class2) {
     
     // set in cache to indiate this proxy class has been created and return
     s_proxyClassNameCache[objectClassName] = proxyClassName;
-    return proxyClass;*/
+    return proxyClass;
+
+- (id)object {
+    // create object on demand
+    if (!_object) {
+        NSString *className = NSStringFromClass(self.class);
+        className = [className substringFromIndex:9];
+        Class objectClass = NSClassFromString(className);
+        
+        // create object
+        _object = [[objectClass alloc] init];
+        RLMObjectDescriptor *descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
+        for (RLMProperty *prop in descriptor.properties) {
+            [_object setValue:self[prop.name] forKeyPath:prop.name];
+        }
+    }
+    return _object;
 }
+// return our objects method signature
+    -(NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector {
+    return [self.object methodSignatureForSelector:aSelector];
+}
+// invocate on object
+    - (void)forwardInvocation:(NSInvocation *)anInvocation {
+    [anInvocation invokeWithTarget:self.object];
+}
+*/
 
 @end
 

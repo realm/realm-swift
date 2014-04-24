@@ -227,13 +227,15 @@ s_columnAccessors[CHAR] = ColumnFuncsEnumerator<NUM_COLUMN_ACCESSORS, TYPE>::enu
 
 // setup lookup tables for each type
 +(void)initialize {
-    RLM_REGISTER_ACCESSOR_FOR_TYPE('i', "i", int)
-    RLM_REGISTER_ACCESSOR_FOR_TYPE('l', "l", long)
-    RLM_REGISTER_ACCESSOR_FOR_TYPE('f', "f", float)
-    RLM_REGISTER_ACCESSOR_FOR_TYPE('d', "d", double)
-    RLM_REGISTER_ACCESSOR_FOR_TYPE('B', "B", bool)
-    RLM_REGISTER_ACCESSOR_FOR_TYPE('@', "@", id)
-    RLM_REGISTER_ACCESSOR_FOR_TYPE('s', "s", NSString *)
+    if (self == RLMProperty.class) {
+        RLM_REGISTER_ACCESSOR_FOR_TYPE('i', "i", int)
+        RLM_REGISTER_ACCESSOR_FOR_TYPE('l', "l", long)
+        RLM_REGISTER_ACCESSOR_FOR_TYPE('f', "f", float)
+        RLM_REGISTER_ACCESSOR_FOR_TYPE('d', "d", double)
+        RLM_REGISTER_ACCESSOR_FOR_TYPE('B', "B", bool)
+        RLM_REGISTER_ACCESSOR_FOR_TYPE('@', "@", id)
+        RLM_REGISTER_ACCESSOR_FOR_TYPE('s', "s", NSString *)
+    }
 }
 
 // get accessor lookup code based on objc type and rlm type

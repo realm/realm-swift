@@ -34,10 +34,10 @@
 @interface RLMTable ()
 // gets current object class
 // sets the current object type for this table and trys to update the table to support objects of type objectClass
-@property (nonatomic) Class objectClass;
+@property (nonatomic, assign) Class objectClass;
 
 // the object class returned when accessing rows
-@property (readonly) Class proxyObjectClass;
+@property (nonatomic, readonly) Class proxyObjectClass;
 
 // returns YES if you can currently insert objects of type Class
 -(BOOL)canInsertObjectOfClass:(Class)objectClass;
@@ -48,7 +48,7 @@
 
 @interface RLMRow()
 @property (nonatomic, weak) RLMTable *table;
-@property (nonatomic) NSUInteger ndx;
+@property (nonatomic, assign) NSUInteger ndx;
 @end
 
 // private category
