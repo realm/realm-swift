@@ -19,6 +19,7 @@
  **************************************************************************/
 
 #import <Foundation/Foundation.h>
+#import "RLMContext.h"
 
 @class RLMTable;
 
@@ -29,9 +30,20 @@
  */
 + (instancetype)realmWithDefaultPersistence;
 
++ (instancetype)realmWithDefaultPersistenceAndInitBlock:(RLMWriteBlock)initBlock;
+
 + (instancetype)realmWithPersistenceToFile:(NSString *)path;
 
 + (instancetype)realmWithPersistenceToFile:(NSString *)path
+                                 initBlock:(RLMWriteBlock)initBlock;
+
++ (instancetype)realmWithPersistenceToFile:(NSString *)path
+                                   runLoop:(NSRunLoop *)runLoop
+                        notificationCenter:(NSNotificationCenter *)notificationCenter
+                                     error:(NSError **)error;
+
++ (instancetype)realmWithPersistenceToFile:(NSString *)path
+                                 initBlock:(RLMWriteBlock)initBlock
                                    runLoop:(NSRunLoop *)runLoop
                         notificationCenter:(NSNotificationCenter *)notificationCenter
                                      error:(NSError **)error;
