@@ -1374,29 +1374,29 @@ using namespace std;
     [t addRow:@[@"name3", @3]];
     [t addRow:@[@"name4", @4]];
 
-    XCTAssertThrows([t find:@"garbage"], @"Garbage predicate");
-    XCTAssertThrows([t find:@"name == notAValue"], @"Invalid expression");
-    XCTAssertThrows([t find:@"naem == \"name0\""], @"Invalid column");
-    XCTAssertThrows([t find:@"name == 30"], @"Invalid value type");
-    XCTAssertThrows([t find:@1], @"Invalid condition");
+    XCTAssertThrows([t findFirstWhere:@"garbage"], @"Garbage predicate");
+    XCTAssertThrows([t findFirstWhere:@"name == notAValue"], @"Invalid expression");
+    XCTAssertThrows([t findFirstWhere:@"naem == \"name0\""], @"Invalid column");
+    XCTAssertThrows([t findFirstWhere:@"name == 30"], @"Invalid value type");
+    XCTAssertThrows([t findFirstWhere:@1], @"Invalid condition");
 
     // Searching with no condition just finds first row
-    RLMRow *r = [t find:nil];
+    RLMRow *r = [t findFirstWhere:nil];
     XCTAssertEqualObjects(r[@"name"], @"name0", @"first row");
 
     // Search with predicate string
-    r = [t find:@"name == \"name10\""];
+    r = [t findFirstWhere:@"name == \"name10\""];
     XCTAssertEqualObjects(r, nil, @"no match");
 
-    r = [t find:@"name == \"name0\""];
+    r = [t findFirstWhere:@"name == \"name0\""];
     XCTAssertEqualObjects(r[@"name"], @"name0");
 
-    r = [t find:@"age == 4"];
+    r = [t findFirstWhere:@"age == 4"];
     XCTAssertEqualObjects(r[@"name"], @"name4");
 
     // Search with predicate object
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
-    r = [t find:predicate];
+    r = [t findFirstWhere:predicate];
     XCTAssertEqualObjects(r[@"name"], @"name3");
 }
 

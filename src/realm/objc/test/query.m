@@ -389,7 +389,7 @@ REALM_TABLE_9(TestQueryAllTypes,
     XCTAssertEqual([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] indexOfFirstMatchingRowFromIndex:6], (NSUInteger)NSNotFound, @"find");
     XCTAssertEqual([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] indexOfFirstMatchingRowFromIndex:3], (NSUInteger)3,  @"find");
     // jjepsen: disabled this test, perhaps it's not relevant after query sematics update.
-    //XCTAssertEqual([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (NSUInteger)-1, @"find");
+    //XCTAssertEqual([[[table where] column:0 isBetweenInt:20 and_:40] findFirstWhere:-1], (NSUInteger)-1, @"find");
     
     [table removeAllRows];
     XCTAssertEqual([[table where] indexOfFirstMatchingRow], NSNotFound, @"");
