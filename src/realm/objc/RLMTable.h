@@ -78,7 +78,7 @@
 -(RLMView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
 
 // Predicate queries
--(RLMRow *)findFirstWhere:(id)condition;
+-(id)find:(id)condition;
 -(RLMView *)where:(id)condition;
 -(RLMView *)where:(id)condition orderBy:(id)order;
 
