@@ -27,7 +27,7 @@
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
-    // Create new table in group
+    // Create new table
     RLMTable *people = [[RLMTable alloc] initWithObjectClass:EnumPeople.class];
     
     // Add some rows

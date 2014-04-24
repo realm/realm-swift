@@ -76,92 +76,9 @@ template<> inline void column_set<RLMTable *>(RLMRow *row, NSUInteger col, RLMTa
     row[col] = val;
 }
 
-// fixed column accessors
-// bakes the column number into the method signature to avoid looking up by name
-template<typename T, int C>
-T column_get(RLMRow *row, SEL) {
-    return column_get<T>(row, C);
-}
-template<typename T, int C>
-void column_set(RLMRow *row, SEL, T val) {
-    column_set<T>(row, C, val);
-}
-
-// column lookup accessors
-// these are the slow versions of the above and are used in objects where you have more
-// than NUM_COLUMN_ACCESSORS columns
-template<typename T>
-T dynamic_get(RLMRow *row, SEL sel) {
-    NSUInteger col = [row.table indexOfColumnWithName:NSStringFromSelector(sel)];
-    return column_get<T>(row, col);
-}
-template<typename T>
-void dynamic_set(RLMRow *row, SEL sel, T val) {
-    NSString *name = NSStringFromSelector(sel);
-    // TODO - this currently assumes setters are named set<propertyname>
-    // we need to validate this and have a table of actual accessor names rather
-    // than making this asumption (in asana)
-    NSRange end = NSMakeRange(4, name.length-5);
-    name = [NSString stringWithFormat:@"%c%@", tolower([name characterAtIndex:3]), [name substringWithRange:end]];
-    NSUInteger col = [row.table indexOfColumnWithName:name];
-    column_set<T>(row, col, val);
-}
-
-
-// column accessor enumerator objects for storing generated functions
-typedef std::vector<IMP> ColumnFuncs;
-typedef std::pair<ColumnFuncs, ColumnFuncs> GettersSetters;
-
-// column generator for generating fast accessors with baked in column indexes
-// works with template recursion - we instantiate a version of this class for the
-// NUM column, which references a version of this class for each previous column
-// until we get to the 0th column
-template <int NUM, typename TYPE>
-class ColumnFuncsEnumerator {
-public:
-    // column index
-    enum { column = NUM - 1 };
-    
-    // entry point for function generation
-    // creates the lookup table, and starts populating with the last column
-    static GettersSetters enumerate(void) {
-        ColumnFuncsEnumerator<NUM, TYPE> enumerator;
-        GettersSetters funcs;
-        funcs.first.resize(NUM);
-        funcs.second.resize(NUM);
-        enumerator.registerFuncs(funcs);
-        return funcs;
-    }
-    
-    // this is called recursively for each column starting with column NUM
-    // once we get to the 0th column, the specialized version
-    // of this function is called which ends the recursion
-	ColumnFuncsEnumerator<column, TYPE> prev;
-	void registerFuncs(GettersSetters & funcs) {
-        funcs.first[column] = (IMP)column_get<TYPE, column>;
-        funcs.second[column] = (IMP)column_set<TYPE, column>;
-        prev.registerFuncs(funcs);
-	}
-};
-
-// partial specialization to end the recursion
-template <typename T>
-class ColumnFuncsEnumerator<0, T> {
-public:
-	enum { column = 0 };
-    void registerFuncs(GettersSetters &) {}
-};
-
-// static accessor lookup table and method type strings
-static std::map<char, GettersSetters> s_columnAccessors;
-static std::map<char, IMP> s_dynamicGetters, s_dynamicSetters;
-static std::map<char, const char *> s_getterTypeStrings, s_setterTypeStrings;
-
 // macros to generate objc type strings when registering methods
-#define GETTER_TYPES(C) C "@:"
-#define SETTER_TYPES(C) "v@:" C
-
-#define NUM_COLUMN_ACCESSORS 25
+#define GETTER_TYPES(C) C "@"
+#define SETTER_TYPES(C) "v@" C
 
 // in RLMProxy.m
 extern BOOL is_class_subclass(Class class1, Class class2);
@@ -215,26 +132,25 @@ void type_for_property_string(const char *code,
 }
 
 // setup accessor lookup tables (dynamic and generated) and type strings for a given type
-#define RLM_REGISTER_ACCESSOR_FOR_TYPE(CHAR, SCHAR, TYPE)   \
-s_dynamicGetters[CHAR] = (IMP)dynamic_get<TYPE>;        \
-s_dynamicSetters[CHAR] = (IMP)dynamic_set<TYPE>;        \
+#define RLM_REGISTER_ACCESSOR_FOR_TYPE(CHAR, SCHAR)     \
 s_getterTypeStrings[CHAR] = GETTER_TYPES(SCHAR);        \
 s_setterTypeStrings[CHAR] = SETTER_TYPES(SCHAR);        \
-s_columnAccessors[CHAR] = ColumnFuncsEnumerator<NUM_COLUMN_ACCESSORS, TYPE>::enumerate();
 
+static std::map<char, const char *> s_getterTypeStrings, s_setterTypeStrings;
 
 @implementation RLMProperty
 
 // setup lookup tables for each type
 +(void)initialize {
     if (self == RLMProperty.class) {
-        RLM_REGISTER_ACCESSOR_FOR_TYPE('i', "i", int)
-        RLM_REGISTER_ACCESSOR_FOR_TYPE('l', "l", long)
-        RLM_REGISTER_ACCESSOR_FOR_TYPE('f', "f", float)
-        RLM_REGISTER_ACCESSOR_FOR_TYPE('d', "d", double)
-        RLM_REGISTER_ACCESSOR_FOR_TYPE('B', "B", bool)
-        RLM_REGISTER_ACCESSOR_FOR_TYPE('@', "@", id)
-        RLM_REGISTER_ACCESSOR_FOR_TYPE('s', "s", NSString *)
+        RLM_REGISTER_ACCESSOR_FOR_TYPE('i', "i")
+        RLM_REGISTER_ACCESSOR_FOR_TYPE('l', "l")
+        RLM_REGISTER_ACCESSOR_FOR_TYPE('f', "f")
+        RLM_REGISTER_ACCESSOR_FOR_TYPE('d', "d")
+        RLM_REGISTER_ACCESSOR_FOR_TYPE('B', "B")
+        RLM_REGISTER_ACCESSOR_FOR_TYPE('@', "@")
+        RLM_REGISTER_ACCESSOR_FOR_TYPE('s', "@")
+        RLM_REGISTER_ACCESSOR_FOR_TYPE('t', "@")
     }
 }
 
@@ -247,8 +163,62 @@ s_columnAccessors[CHAR] = ColumnFuncsEnumerator<NUM_COLUMN_ACCESSORS, TYPE>::enu
             return 'B';
         case '@':
             if (self.type == RLMTypeString) return 's';
+            if (self.type == RLMTypeTable) return 't';
         default:
             return self.objcType;
+    }
+}
+
+-(IMP)getterForColumn:(int)column {
+    switch (self.accessorCode) {
+        case 'i':   // int
+            return imp_implementationWithBlock(^(RLMRow *row){ return column_get<int>(row, column); });
+        case 'l':   // long
+            return imp_implementationWithBlock(^(RLMRow *row){ return column_get<long>(row, column); });
+        case 'f':
+            return imp_implementationWithBlock(^(RLMRow *row){ return column_get<float>(row, column); });
+        case 'd':
+            return imp_implementationWithBlock(^(RLMRow *row){ return column_get<double>(row, column); });
+        case 'B':
+            return imp_implementationWithBlock(^(RLMRow *row){ return column_get<bool>(row, column); });
+        case 's':
+            return imp_implementationWithBlock(^(RLMRow *row){ return column_get<NSString *>(row, column); });
+        case 't':
+        {
+            Class subtableObjectClass = self.subtableObjectClass;
+            return imp_implementationWithBlock(^(RLMRow *row){
+                RLMTable *table = row[column];
+                table.objectClass = subtableObjectClass;
+                return table;
+            });
+        }
+        case '@':
+            return imp_implementationWithBlock(^(RLMRow *row){ return column_get<id>(row, column); });
+        default:
+            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid accessor code" userInfo:nil];
+    }
+}
+
+-(IMP)setterForColumn:(int)column {
+    switch (self.accessorCode) {
+        case 'i':   // int
+            return imp_implementationWithBlock(^(RLMRow *row, int val){ return column_set<int>(row, column, val); });
+        case 'l':   // long
+            return imp_implementationWithBlock(^(RLMRow *row, long val){ return column_set<long>(row, column, val); });
+        case 'f':
+            return imp_implementationWithBlock(^(RLMRow *row, float val){ return column_set<float>(row, column, val); });
+        case 'd':
+            return imp_implementationWithBlock(^(RLMRow *row, double val){ return column_set<double>(row, column, val); });
+        case 'B':
+            return imp_implementationWithBlock(^(RLMRow *row, bool val){ return column_set<bool>(row, column, val); });
+        case 's':
+            return imp_implementationWithBlock(^(RLMRow *row, NSString * val){ return column_set<NSString *>(row, column, val); });
+        case 't':
+            return imp_implementationWithBlock(^(RLMRow *row, RLMTable * val){ return column_set<RLMTable *>(row, column, val); });
+        case '@':
+            return imp_implementationWithBlock(^(RLMRow *row, id val){ return column_set<id>(row, column, val); });
+        default:
+            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid accessor code" userInfo:nil];
     }
 }
 
@@ -265,31 +235,11 @@ s_columnAccessors[CHAR] = ColumnFuncsEnumerator<NUM_COLUMN_ACCESSORS, TYPE>::enu
     NSString *rest = [propName substringFromIndex:1];
     NSString *setName = [NSString stringWithFormat:@"set%@%@:", firstChar, rest];
     SEL set = NSSelectorFromString(setName);
-        
-    // determine accessor implementations
-    IMP getter, setter;
-    char t = self.accessorCode;
-    if (self.type == RLMTypeTable) {
-        getter = (IMP)dynamic_get<RLMTable *>;
-        setter = (IMP)dynamic_set<RLMTable *>;
-    }
-    else {
-        GettersSetters & accessors = s_columnAccessors[t];
-        if (column < NUM_COLUMN_ACCESSORS) {
-            // static column accessors
-            getter = (IMP)accessors.first[column];
-            setter = (IMP)accessors.second[column];
-        }
-        else {
-            // dynamic accessors with column lookup
-            getter = (IMP)s_dynamicGetters[t];
-            setter = (IMP)s_dynamicSetters[t];
-        }
-    }
     
     // set accessors
-    class_replaceMethod(cls, get, getter, s_getterTypeStrings[t]);
-    class_replaceMethod(cls, set, setter, s_setterTypeStrings[t]);
+    char t = self.accessorCode;
+    class_replaceMethod(cls, get, [self getterForColumn:column], s_getterTypeStrings[t]);
+    class_replaceMethod(cls, set, [self setterForColumn:column], s_setterTypeStrings[t]);
 }
 
 +(instancetype)propertyForObjectProperty:(objc_property_t)prop {
