@@ -7,7 +7,6 @@
 //
 
 #import "RLMTestCase.h"
-#import <realm/objc/Realm.h>
 
 NSString *const RLMTestRealmPath = @"test.realm";
 
@@ -25,6 +24,12 @@ NSString *const RLMTestRealmPath = @"test.realm";
 
 - (RLMContext *)contextPersistedAtTestPath {
     return [RLMContext contextPersistedAtPath:RLMTestRealmPath error:nil];
+}
+
+- (void)createTestTableWithWriteBlock:(RLMTableWriteBlock)block {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        block([realm createTableWithName:@"table"]);
+    }];
 }
 
 @end
