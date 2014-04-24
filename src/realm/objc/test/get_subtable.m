@@ -10,7 +10,6 @@
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMRealm.h>
 #import <realm/objc/RLMContext.h>
-#import <realm/objc/RLMLocal.h>
 
 REALM_TABLE_2(GetSubtable,
                 Hired, Bool,
@@ -34,7 +33,7 @@ REALM_TABLE_2(WrongTypeTable,
 - (void)testGetSubtable
 {
     // Create table with all column types
-    RLMTable* table = [[RLMTable alloc] init];
+    RLMTable* table = [[RLMTable alloc] initLocal];
     RLMDescriptor * desc = table.descriptor;
     [desc addColumnWithName:@"Outer" type:RLMTypeBool];
     [desc addColumnWithName:@"Number" type:RLMTypeInt];

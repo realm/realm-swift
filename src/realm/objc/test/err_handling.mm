@@ -14,7 +14,6 @@
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMTable_noinst.h>
 #import <realm/objc/RLMTableFast.h>
-#import <realm/objc/RLMLocal.h>
 
 REALM_TABLE_DEF_3(PeopleErrTable,
                   Name,  String,

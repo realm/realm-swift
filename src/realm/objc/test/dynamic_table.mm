@@ -23,7 +23,6 @@
 #import <realm/objc/RLMFast.h>
 #import <realm/objc/RLMTableFast.h>
 #import <realm/objc/RLMTable_noinst.h>
-#import <realm/objc/RLMLocal.h>
 
 using namespace std;
 @interface TestClass : NSObject
@@ -1619,6 +1618,11 @@ using namespace std;
     XCTAssertTrue(previousRowCount == [table rowCount], @"rowCount should be equal to previousRowCount");
     XCTAssertTrue([table[0][@"objID"] isEqualToNumber:testArray[0]], @"table[0][@\"objID\"] should be equal to last next object's objID after setting row to nil");
     XCTAssertTrue([table[0][@"name"] isEqualToString:testArray[1]], @"table[0][@\"name\"] should be equal to last next object's objID after setting row to nil");
+}
+
+-(void)testTableDynamic_init_exception
+{
+    XCTAssertThrows(([[RLMTable alloc] init]), @"Initializing table outside of context should throw exception");
 }
 
 

@@ -213,7 +213,7 @@ REALM_COLUMN_PROXY_IMPL(CName${j+1}, CType${j+1}) \
 } \
 -(id)initLocal \
 { \
-    self = [super init]; \
+    self = [super initLocal]; \
     if (!self) \
         return nil; \
     if (![self _addColumns]) \

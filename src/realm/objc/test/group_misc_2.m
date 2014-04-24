@@ -10,7 +10,6 @@
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMRealm.h>
 #import <realm/objc/PrivateRLM.h>
-#import <realm/objc/RLMLocal.h>
 
 REALM_TABLE_DEF_4(MyTable,
                   Name,  String,
@@ -75,7 +74,7 @@ REALM_TABLE_2(QueryTable,
 
     //------------------------------------------------------
 
-    MyTable2* table2 = [[MyTable2 alloc] init];
+    MyTable2* table2 = [[MyTable2 alloc] initLocal];
 
     // Add some rows
     [table2 addHired:YES Age:20];
@@ -208,7 +207,7 @@ REALM_TABLE_2(QueryTable,
         [subtable RLM_setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
         
         // Make the mixed values column contain another subtable
-        [table RLM_setMixed:[[RLMTable alloc] init] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
+        [table RLM_setMixed:[[RLMTable alloc] initLocal] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
     }];
     
 /* Fails!!!
