@@ -24,7 +24,7 @@
 #import "RLMPrivate.h"
 
 @interface RLMObjectDescriptor ()
-@property (nonatomic, readwrite) NSArray * properties;
+@property (nonatomic, readwrite, copy) NSArray * properties;
 @property (nonatomic, readwrite) NSDictionary * propertiesByName;
 
 @end
@@ -35,7 +35,9 @@ static NSMutableDictionary * s_descriptorCache;
 @implementation RLMObjectDescriptor
 
 + (void)initialize {
-    s_descriptorCache = [NSMutableDictionary dictionary];
+    if (self == [RLMObjectDescriptor class]) {
+        s_descriptorCache = [NSMutableDictionary dictionary];
+    }
 }
 
 // return properties by name
@@ -61,7 +63,7 @@ static NSMutableDictionary * s_descriptorCache;
     
     // check if proxy
     if ([className hasPrefix:@"RLMProxy_"]) {
-        NSString * proxiedClassName = [className stringByReplacingOccurrencesOfString:@"RLMProxy_" withString:@""];
+        NSString * proxiedClassName = [className substringFromIndex:9];
         s_descriptorCache[className] = s_descriptorCache[proxiedClassName];
         return s_descriptorCache[className];
     }
@@ -87,7 +89,7 @@ static NSMutableDictionary * s_descriptorCache;
     
     // create schema object and set properties
     RLMObjectDescriptor * descriptor = [RLMObjectDescriptor new];
-    descriptor.properties = [propArray copy];
+    descriptor.properties = propArray;
     
     s_descriptorCache[className] = descriptor;
     return descriptor;

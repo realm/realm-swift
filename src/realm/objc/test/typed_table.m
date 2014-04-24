@@ -39,7 +39,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AgeTable, Sub)
 @property NSString      *stringCol;
 @property NSData        *binaryCol;
 @property NSDate        *dateCol;
-@property AgeTable *tableCol;
+@property AgeTable      *tableCol;
 @property bool           cBoolCol;
 @property long           longCol;
 @end
@@ -58,6 +58,12 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AllTypesTable, AllTypes)
 
 RLM_TABLE_TYPE_FOR_OBJECT_TYPE(InvalidTable, InvalidType)
 
+@interface InvalidProperty : RLMRow
+@property NSUInteger noUnsigned;
+@end
+
+@implementation InvalidProperty
+@end
 
 @interface RLMTypedTableTests: RLMTestCase
   // Intentionally left blank.
@@ -187,6 +193,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 {
     XCTAssertThrows([[InvalidTable alloc] init], @"Unsupported types should throw");
     XCTAssertThrows([[RLMTable alloc] initWithObjectClass:NSObject.class], @"Types not descendent from RLMRow should throw");
+    XCTAssertThrows([[RLMTable alloc] initWithObjectClass:InvalidProperty.class], @"Types not descendent from RLMRow should throw");
 }
 
 

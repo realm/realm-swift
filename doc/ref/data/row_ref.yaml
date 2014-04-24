@@ -11,7 +11,7 @@ DESCR      : >
              Using this interface all columns are returned as objects.
 
              When creating/accessing a table while specifying an object class, you can instead use a custom objective-c interface 
-             to interact with row data. To use this mechanism, create an Objective-C interface which derived from
+             to interact with row data. To use this mechanism, create an Objective-C interface which subclasses 
              <code>RLMRow</code>, and use the objectClass accessors to get/create your table. The table will automatically
              be updated with columns to support the given interface.
 

@@ -27,7 +27,7 @@
 @interface RLMObjectDescriptor : NSObject
 
 // array of properties which define a schema
-@property (nonatomic, readonly) NSArray * properties;
+@property (nonatomic, readonly, copy) NSArray * properties;
 
 // property lookup by name
 -(RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)key;
