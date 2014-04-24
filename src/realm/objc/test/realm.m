@@ -108,8 +108,9 @@ REALM_TABLE_1(RLMTestTable,
         XCTAssertThrows([self realmPersistedAtTestPath], @"Calling \
                         +realmWithPersistenceToFile on a thread other than the main thread \
                         should throw an exception.");
+        [self notify:XCTAsyncTestCaseStatusSucceeded];
     });
-    [self waitForTimeout:1.0f];
+    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:1.0f];
 }
 
 - (void)testRealmWithArgumentsOnDifferentThreadDoesntThrow {
@@ -121,15 +122,16 @@ REALM_TABLE_1(RLMTestTable,
                          @"Calling +realmWithPersistenceToFile:runLoop:notificationCenter:error: \
                          on a thread other than the main thread \
                          shouldn't throw an exception.");
+        [self notify:XCTAsyncTestCaseStatusSucceeded];
     });
-    [self waitForTimeout:1.0f];
+    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:1.0f];
 }
 
 - (void)testHasTableWithName {
     NSString *tableName = @"test";
     RLMRealm *realm = [self realmPersistedAtTestPath];
     
-    // Tables should exist until they are created
+    // Tables shouldn't exist until they are created
     XCTAssertFalse([realm hasTableWithName:tableName], @"Table 'test' shouldn't exist");
     XCTAssertFalse([realm hasTableWithName:tableName], @"Table 'test' still shouldn't exist \
                    after checking for its existence");
@@ -152,18 +154,6 @@ REALM_TABLE_1(RLMTestTable,
                                                  initBlock:^(RLMRealm *realm) {
                                                      [realm createTableWithName:@"table"];
                                                  }];
-    XCTAssertTrue([realm hasTableWithName:@"table"], @"Realm created with initBlock \
-                  should have run the init block before returning the realm.");
-}
-
-- (void)testInitBlockOnDifferentThread {
-    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:RLMTestRealmPath
-                                                 initBlock:^(RLMRealm *realm) {
-                                                     [realm createTableWithName:@"table"];
-                                                 }
-                                                   runLoop:[NSRunLoop currentRunLoop]
-                                        notificationCenter:[NSNotificationCenter defaultCenter]
-                                                     error:nil];
     XCTAssertTrue([realm hasTableWithName:@"table"], @"Realm created with initBlock \
                   should have run the init block before returning the realm.");
 }
