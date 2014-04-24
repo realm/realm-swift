@@ -10,16 +10,13 @@
 
 // @@Example: declare_table @@
 // Define table with two columns
-
 REALM_TABLE_2(RLMDemoTable,
               title,   String,
               checked, Bool)
-
 // @@EndExample@@
 
 static NSString * const kCellID    = @"cell";
 static NSString * const kTableName = @"table";
-
 
 @interface RLMTableViewController ()
 
@@ -48,17 +45,13 @@ static NSString * const kTableName = @"table";
 - (void)setupRealm {
     // @@Example: setup_contexts @@
     // Set up read/write contexts
-    self.realm   = [RLMRealm realmWithDefaultPersistence];
-    self.context = [RLMContext contextWithDefaultPersistence];
-    // @@EndExample@@
-    
-    // @@Example: create_table @@
-    // Create table if it doesn't exist
-    [self.context writeUsingBlock:^(RLMRealm *realm) {
+    self.realm = [RLMRealm realmWithDefaultPersistenceAndInitBlock:^(RLMRealm *realm) {
+        // Create table if it doesn't exist
         if (realm.isEmpty) {
             [realm createTableWithName:kTableName asTableClass:[RLMDemoTable class]];
         }
     }];
+    self.context = [RLMContext contextWithDefaultPersistence];
     // @@EndExample@@
     
     // @@Example: setup_notifications @@
@@ -144,8 +137,8 @@ static NSString * const kTableName = @"table";
     // @@Example: query @@
     RLMRow *row = [self.table find:[NSPredicate predicateWithFormat:@"checked = %@", @YES]];
     if (row) {
-        NSLog(@"%@ is %@", row[@"title"],
-              [(NSNumber *)row[@"checked"] boolValue] ? @"checked" : @"unchecked");
+        BOOL checked = [(NSNumber *)row[@"checked"] boolValue];
+        NSLog(@"%@ is %@", row[@"title"], checked ? @"checked" : @"unchecked");
     }
     // @@EndExample@@
 }
