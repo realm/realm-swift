@@ -262,6 +262,12 @@ const char * setterTypeStringForCode(char code) {
             case 'D':
                 prop.dynamic = YES;
                 break;
+            case 'G':
+                prop.getterName = [NSString stringWithUTF8String:atts[a].value];
+                break;
+            case 'S':
+                prop.setterName = [NSString stringWithUTF8String:atts[a].value];
+                break;
             default:
                 break;
         }

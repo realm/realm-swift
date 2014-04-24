@@ -27,8 +27,9 @@
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
+    
     // Create new table
-    RLMTable *people = [[RLMTable alloc] initWithObjectClass:EnumPeople.class];
+    RLMTable *people = [[RLMRealm realmWithDefaultPersistence] tableWithName:@"people" objectClass:EnumPeople.class];
     
     // Add some rows
     [people addRow:@[@"John", @20, @YES]];
