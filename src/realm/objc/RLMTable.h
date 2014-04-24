@@ -44,14 +44,14 @@
 -(RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
 // Getting individual rows
--(RLMRow *)rowAtIndex:(NSUInteger)rowIndex;
--(RLMRow *)firstRow;
--(RLMRow *)lastRow;
+-(id)rowAtIndex:(NSUInteger)rowIndex;
+-(id)firstRow;
+-(id)lastRow;
 
 // Getting and setting individual rows with object subscripting
--(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
+-(id)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
--(RLMRow *)objectForKeyedSubscript:(NSString *)key;
+-(id)objectForKeyedSubscript:(NSString *)key;
 -(void)setObject:(id)newValue forKeyedSubscript:(NSString *)key;
 
 // Add a row at the end of the table.
@@ -75,7 +75,7 @@
 -(RLMView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
 
 // Predicate queries
--(RLMRow *)find:(id)condition;
+-(id)find:(id)condition;
 -(RLMView *)where:(id)condition;
 -(RLMView *)where:(id)condition orderBy:(id)order;
 
@@ -92,3 +92,4 @@
 -(RLMType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 
 @end
+
