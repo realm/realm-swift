@@ -27,7 +27,7 @@ REALM_TABLE_3(FuncPeopleTable,
      *  Row in a table.
      */
 
-    FuncPeopleTable *table = [[FuncPeopleTable alloc] initLocal];
+    FuncPeopleTable *table = [[FuncPeopleTable alloc] init];
 
     FuncPeopleTableRow *cursor;
 
@@ -152,7 +152,7 @@ REALM_TABLE_3(FuncPeopleTable,
      *  Row in a table.
      */
 
-    RLMTable *table = [[RLMTable alloc] initLocal];
+    RLMTable *table = [[RLMTable alloc] init];
 
     NSUInteger const NAME = [table addColumnWithName:@"Name" type:RLMTypeString];
     NSUInteger const AGE = [table addColumnWithName:@"Age" type:RLMTypeInt];

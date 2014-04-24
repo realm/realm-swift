@@ -72,9 +72,9 @@ REALM_TABLE_2(SubMixedTable,
     XCTAssertEqual([mixedDate2 isEqual:mixedDate3], YES, @"Mixed with same timestamps should be equal");
     XCTAssertEqual([mixedDate1 isEqual:mixedDate2], NO,  @"Mixed with different timestamps should be different");
 
-    MixedTable    *table1 = [[MixedTable    alloc] initLocal];
-    SubMixedTable *table2 = [[SubMixedTable alloc] initLocal];
-    SubMixedTable *table3 = [[SubMixedTable alloc] initLocal];
+    MixedTable    *table1 = [[MixedTable    alloc] init];
+    SubMixedTable *table2 = [[SubMixedTable alloc] init];
+    SubMixedTable *table3 = [[SubMixedTable alloc] init];
     [table1 addHired:YES Other:mixedBool1 Age:54];
     [table2 addHired:YES                  Age:54];
     [table3 addHired:YES                  Age:54];
@@ -124,7 +124,7 @@ REALM_TABLE_2(SubMixedTable,
 
 - (void)testMixed
 {
-    SubMixedTable *tableSub = [[SubMixedTable alloc] initLocal];
+    SubMixedTable *tableSub = [[SubMixedTable alloc] init];
     XCTAssertTrue([tableSub isKindOfClass:[RLMTable class]], @"RLMTable excepted");
 
     // Add some rows
@@ -169,7 +169,7 @@ REALM_TABLE_2(SubMixedTable,
 
 -(void)testMixedValidate
 {
-    MixedTable *table = [[MixedTable alloc] initLocal];
+    MixedTable *table = [[MixedTable alloc] init];
     XCTAssertThrows(([table addRow:@[@YES, @[@1, @2], @7]]), @"Mixed cannot be an NSArray");
     XCTAssertThrows(([table addRow:@[@YES, @{@"key": @7}, @11]]), @"Mixed cannot be an NSDictionary");
 }

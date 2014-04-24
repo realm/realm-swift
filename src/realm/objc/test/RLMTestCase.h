@@ -7,7 +7,6 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <realm/objc/RLMLocal.h>
 
 extern NSString *const RLMTestRealmPath;
 

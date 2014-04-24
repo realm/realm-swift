@@ -17,7 +17,7 @@
 -(void)testTableDeleteAll
 {
     // Create table with all column types
-    RLMTable * table = [[RLMTable alloc] initLocal];
+    RLMTable * table = [[RLMTable alloc] init];
     RLMDescriptor * desc = [table descriptor];
     [desc addColumnWithName:@"int" type:RLMTypeInt];
     [desc addColumnWithName:@"bool" type:RLMTypeBool];

@@ -96,8 +96,6 @@
 		42AD3A9618CDBDFF00C86073 /* RLMVersion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMVersion.h; path = src/realm/objc/RLMVersion.h; sourceTree = SOURCE_ROOT; };
 		4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		4BB05A6B190710E400F7F5F9 /* RLMTableFast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTableFast.h; sourceTree = "<group>"; };
-		4BB05A7E19083E2800F7F5F9 /* RLMLocal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMLocal.h; sourceTree = "<group>"; };
-		4BB05A7F19083E4E00F7F5F9 /* RLMTable+Local.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RLMTable+Local.h"; sourceTree = "<group>"; };
 		4D01A9FB18C9F5E600527AD5 /* table_view.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = table_view.m; path = ../src/realm/objc/test/table_view.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		4D01A9FD18C9F60F00527AD5 /* version.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = version.m; path = ../src/realm/objc/test/version.m; sourceTree = "<group>"; };
 		4D143CBC18ED5FCF00CEFF65 /* PrivateTableMacros.h.cheetah */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PrivateTableMacros.h.cheetah; path = src/realm/objc/PrivateTableMacros.h.cheetah; sourceTree = SOURCE_ROOT; };
@@ -178,15 +176,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		4BB05A7C19083E0700F7F5F9 /* RLMLocal */ = {
-			isa = PBXGroup;
-			children = (
-				4BB05A7E19083E2800F7F5F9 /* RLMLocal.h */,
-				4BB05A7F19083E4E00F7F5F9 /* RLMTable+Local.h */,
-			);
-			name = RLMLocal;
-			sourceTree = "<group>";
-		};
 		4DDDD67118EAF1DC00E94613 /* RLMFast */ = {
 			isa = PBXGroup;
 			children = (
@@ -252,7 +241,6 @@
 		E91890A2177B677900653D7A /* Realm */ = {
 			isa = PBXGroup;
 			children = (
-				4BB05A7C19083E0700F7F5F9 /* RLMLocal */,
 				4DDDD67118EAF1DC00E94613 /* RLMFast */,
 				4220871418E042FD00F3CF27 /* NSData+RLMGetBinaryData.h */,
 				4220871518E042FD00F3CF27 /* NSData+RLMGetBinaryData.mm */,

@@ -74,7 +74,7 @@ REALM_TABLE_2(QueryTable,
 
     //------------------------------------------------------
 
-    MyTable2* table2 = [[MyTable2 alloc] initLocal];
+    MyTable2* table2 = [[MyTable2 alloc] init];
 
     // Add some rows
     [table2 addHired:YES Age:20];
@@ -207,7 +207,7 @@ REALM_TABLE_2(QueryTable,
         [subtable RLM_setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
         
         // Make the mixed values column contain another subtable
-        [table RLM_setMixed:[[RLMTable alloc] initLocal] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
+        [table RLM_setMixed:[[RLMTable alloc] init] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
     }];
     
 /* Fails!!!
