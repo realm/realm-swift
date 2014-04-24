@@ -29,7 +29,7 @@
     //------------------------------------------------------
     
     // Create new table
-    RLMTable *people = [[RLMRealm realmWithDefaultPersistence] tableWithName:@"people" objectClass:EnumPeople.class];
+    RLMTable *people = [[RLMTable alloc] initWithObjectClass:EnumPeople.class];
     
     // Add some rows
     [people addRow:@[@"John", @20, @YES]];
@@ -37,7 +37,7 @@
     [people addRow:@[@"Lars", @21, @YES]];
     [people addRow:@[@"Phil", @43, @NO]];
     [people addRow:@[@"Anni", @54, @YES]];
-    
+
     //------------------------------------------------------
     NSLog(@"--- Iterators ---");
     //------------------------------------------------------
@@ -59,6 +59,7 @@
     RLMView *q = [people where:@"Age = 21"];
     NSLog(@"Query lazy count: %zu", [q rowCount] );
     for (EnumPeople *row in q) {
+        XCTAssertNotNil(row.Name, @"name is nil");
         NSLog(@"(Enum3) %@ is %d years old.", row.Name, row.Age);
         if (row.Name == nil)
             break;
