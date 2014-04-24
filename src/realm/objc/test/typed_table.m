@@ -79,6 +79,15 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(InvalidTable, InvalidType)
 @implementation KeyedObject
 @end
 
+@interface CustomAccessors : RLMRow
+@property (getter = getThatName) NSString * name;
+@property (setter = setTheInt:) int age;
+@end
+
+@implementation CustomAccessors
+@end
+
+
 RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 
 @implementation RLMTypedTableTests
@@ -200,7 +209,6 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 - (void)testTableTyped_KeyedSubscripting
 {
     KeyedTable* table = [[KeyedTable alloc] init];
-    [table setObjectClass:KeyedObject.class];
     
     [table addRow:@{@"name" : @"Test1", @"objID" : @24}];
     [table addRow:@{@"name" : @"Test2", @"objID" : @25}];
@@ -263,6 +271,16 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
     previousRowCount = [errTable rowCount];
     XCTAssertThrows((errTable[@"SomeKey"] = @{@"id" : @821763}), @"Calling keyed subscriptor on errTable should throw exception");
     XCTAssertEqual(previousRowCount, [errTable rowCount], @"errTable should have same count as previous");
+}
+
+- (void)testCustomAccessors {
+    RLMTable *table = [[RLMTable alloc] initWithObjectClass:CustomAccessors.class];
+    [table addRow:@[@"name", @2]];
+    
+    XCTAssertEqualObjects([table[0] getThatName], @"name", @"name property should be name.");
+    
+    [table[0] setTheInt:99];
+    XCTAssertEqual([table[0] age], 99L, @"age property should be 99");
 }
 
 @end
