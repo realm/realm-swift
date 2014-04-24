@@ -1387,7 +1387,7 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 
 } //namespace
 
--(id)find:(id)condition
+-(RLMRow *)findFirstWhere:(id)condition
 {
     tightdb::Query query = queryFromPredicate(self, condition);
 
