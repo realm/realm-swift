@@ -33,7 +33,7 @@ REALM_TABLE_2(WrongTypeTable,
 - (void)testGetSubtable
 {
     // Create table with all column types
-    RLMTable* table = [[RLMTable alloc] initLocal];
+    RLMTable* table = [[RLMTable alloc] init];
     RLMDescriptor * desc = table.descriptor;
     [desc addColumnWithName:@"Outer" type:RLMTypeBool];
     [desc addColumnWithName:@"Number" type:RLMTypeInt];

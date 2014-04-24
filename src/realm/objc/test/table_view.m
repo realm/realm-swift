@@ -30,7 +30,7 @@
 
 -(void)testGetColumnCount
 {
-    RLMTable *t = [[RLMTable alloc] initLocal];
+    RLMTable *t = [[RLMTable alloc] init];
     RLMQuery *q = [t where];
     RLMView *v = [q findAllRows];
     
@@ -50,7 +50,7 @@
 
 - (void)testColumnTypesOnView
 {
-    RLMTable *t = [[RLMTable alloc] initLocal];
+    RLMTable *t = [[RLMTable alloc] init];
     
     NSUInteger boolCol   = [t addColumnWithName:@"boolCol"   type:RLMTypeBool];
     NSUInteger binaryCol = [t addColumnWithName:@"binaryCol" type:RLMTypeBinary];
@@ -83,7 +83,7 @@
 
 - (void)testSortOnViewIntColumn
 {
-    RLMTable *t = [[RLMTable alloc] initLocal];
+    RLMTable *t = [[RLMTable alloc] init];
     NSUInteger intCol = [t addColumnWithName:@"intCol" type:RLMTypeInt];
     
     [t addRow:nil];
@@ -127,7 +127,7 @@
 
 - (void)testSortOnViewBoolColumn
 {
-    RLMTable *t = [[RLMTable alloc] initLocal];
+    RLMTable *t = [[RLMTable alloc] init];
     NSUInteger boolCol = [t addColumnWithName:@"boolCol" type:RLMTypeBool];
 
     [t addRow:nil];
@@ -172,7 +172,7 @@
 
 - (void)testSortOnViewDateColumn
 {
-    RLMTable *t = [[RLMTable alloc] initLocal];
+    RLMTable *t = [[RLMTable alloc] init];
     NSUInteger dateCol = [t addColumnWithName:@"dateCol" type:RLMTypeDate];
     
     NSDate *dateFirst  = [NSDate dateWithTimeIntervalSince1970:0];
@@ -221,7 +221,7 @@
 
 - (void)testSortOnAllColumnTypes
 {
-    RLMTable *t = [[RLMTable alloc] initLocal];
+    RLMTable *t = [[RLMTable alloc] init];
     
     NSUInteger boolCol      = [t addColumnWithName:@"boolCol" type:RLMTypeBool];
     NSUInteger binaryCol    = [t addColumnWithName:@"binaryCol" type:RLMTypeBinary];
@@ -249,7 +249,7 @@
 
 - (void)testFirstLastRow
 {
-    RLMTable *t = [[RLMTable alloc] initLocal];
+    RLMTable *t = [[RLMTable alloc] init];
     NSUInteger col0 = [t addColumnWithName:@"col" type:RLMTypeString];
     NSUInteger col1 = [t addColumnWithName:@"col" type:RLMTypeInt];
     
@@ -282,7 +282,7 @@
 
 - (void)testViewSubscripting
 {
-    RLMTable* table = [[RLMTable alloc] initLocal];
+    RLMTable* table = [[RLMTable alloc] init];
     [table addColumnWithName:@"IntCol" type:RLMTypeInt];
     
     [table addRow:@[@10]];
@@ -303,7 +303,7 @@
 
 - (void)testQueryOnView
 {
-    RLMTable *table = [[RLMTable alloc] initLocal];
+    RLMTable *table = [[RLMTable alloc] init];
     
     // Specify the column types and names
     [table addColumnWithName:@"firstName" type:RLMTypeString];
