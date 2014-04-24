@@ -7,7 +7,6 @@
 
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMQueryFast.h>
-#import <realm/objc/RLMLocal.h>
 
 REALM_TABLE_1(TestQuerySub,
                 Age,  Int)
@@ -29,7 +28,7 @@ REALM_TABLE_9(TestQueryAllTypes,
 
 - (void)testQuery
 {
-    TestQueryAllTypes *table = [[TestQueryAllTypes alloc] init];
+    TestQueryAllTypes *table = [[TestQueryAllTypes alloc] initLocal];
     NSLog(@"Table: %@", table);
     XCTAssertNotNil(table, @"Table is nil");
 
@@ -37,7 +36,7 @@ REALM_TABLE_9(TestQueryAllTypes,
     NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
     NSData *bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
 //    TestQuerySub *subtab1 = [[TestQuerySub alloc] init];
-    TestQuerySub *subtab2 = [[TestQuerySub alloc] init];
+    TestQuerySub *subtab2 = [[TestQuerySub alloc] initLocal];
     [subtab2 addAge:100];
     NSNumber *mixInt1   = [NSNumber numberWithLongLong:1];
     //TDBMixed *mixSubtab = [TDBMixed mixedWithTable:subtab2];
@@ -148,7 +147,7 @@ REALM_TABLE_9(TestQueryAllTypes,
 
 - (void) testDynamic
 {
-    RLMTable *table = [[RLMTable alloc]init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
 
     [table addColumnWithName:@"BoolCol" type:RLMTypeBool];
     [table addColumnWithName:@"IntCol" type:RLMTypeInt];
@@ -257,7 +256,7 @@ REALM_TABLE_9(TestQueryAllTypes,
 
 - (void)testMathOperations
 {
-    RLMTable *table = [[RLMTable alloc]init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     
     NSUInteger intCol = [table addColumnWithName:@"IntCol" type:RLMTypeInt];
     NSUInteger floatCol = [table addColumnWithName:@"FloatCol" type:RLMTypeFloat];
@@ -370,7 +369,7 @@ REALM_TABLE_9(TestQueryAllTypes,
 
 - (void)testFind
 {
-    RLMTable* table = [[RLMTable alloc]init];
+    RLMTable* table = [[RLMTable alloc] initLocal];
     [table addColumnWithName:@"IntCol" type:RLMTypeInt];
     [table RLM_addEmptyRows:6];
 
@@ -399,7 +398,7 @@ REALM_TABLE_9(TestQueryAllTypes,
 
 - (void) testSubtableQuery
 {
-    RLMTable *t = [[RLMTable alloc] init];
+    RLMTable *t = [[RLMTable alloc] initLocal];
     
     RLMDescriptor *d = t.descriptor;
     RLMDescriptor *subDesc = [d addColumnTable:@"subtable"];
@@ -418,7 +417,7 @@ REALM_TABLE_9(TestQueryAllTypes,
 
 -(void) testQueryEnumeratorNoCondition
 {
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     [table addColumnWithName:@"first" type:RLMTypeInt];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithInt:i]]];
@@ -432,7 +431,7 @@ REALM_TABLE_9(TestQueryAllTypes,
 
 -(void) testQueryEnumeratorWithCondition
 {
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
     [table addColumnWithName:@"first" type:RLMTypeInt];
     for(int i=0; i<10; ++i)
         [table addRow:@[[NSNumber numberWithInt:i]]];

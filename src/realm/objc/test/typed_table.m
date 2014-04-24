@@ -51,7 +51,7 @@ REALM_TABLE_1(TestTableKeyedSubscriptError,
 
 - (void)testDataTypes_Typed
 {
-    TestTableAllTypes* table = [[TestTableAllTypes alloc] init];
+    TestTableAllTypes* table = [[TestTableAllTypes alloc] initLocal];
     NSLog(@"Table: %@", table);
     XCTAssertNotNil(table, @"Table is nil");
 
@@ -71,8 +71,8 @@ REALM_TABLE_1(TestTableKeyedSubscriptError,
     NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
     NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
-    TestTableSub* subtab1 = [[TestTableSub alloc] init];
-    TestTableSub* subtab2 = [[TestTableSub alloc] init];
+    TestTableSub* subtab1 = [[TestTableSub alloc] initLocal];
+    TestTableSub* subtab2 = [[TestTableSub alloc] initLocal];
     [subtab1 addage:200]; // NOTE: the name is simply add+name of first column!
     [subtab2 addage:100];
     NSNumber* mixInt1   = [NSNumber numberWithLongLong:1];
@@ -131,7 +131,7 @@ REALM_TABLE_1(TestTableKeyedSubscriptError,
 
 - (void)testTableTyped_Subscripting
 {
-    TestTableSub *table = [[TestTableSub alloc] init];
+    TestTableSub *table = [[TestTableSub alloc] initLocal];
 
     // Add some rows
     [table addage: 10];
@@ -146,7 +146,7 @@ REALM_TABLE_1(TestTableKeyedSubscriptError,
 
 - (void)testTableTyped_KeyedSubscripting
 {
-    TestTableKeyedSubscript* table = [[TestTableKeyedSubscript alloc] init];
+    TestTableKeyedSubscript* table = [[TestTableKeyedSubscript alloc] initLocal];
     
     [table addRow:@{@"name" : @"Test1", @"objID" : @24}];
     [table addRow:@{@"name" : @"Test2", @"objID" : @25}];
@@ -161,7 +161,7 @@ REALM_TABLE_1(TestTableKeyedSubscriptError,
     
     XCTAssertNil(table[@"foo"], @"table[\"foo\"] should be nil");
     
-    TestTableKeyedSubscriptError* errTable = [[TestTableKeyedSubscriptError alloc] init];
+    TestTableKeyedSubscriptError* errTable = [[TestTableKeyedSubscriptError alloc] initLocal];
     [errTable addRow:@{@"id" : @987289}];
     XCTAssertThrows(errTable[@"X"], @"Accessing RLMRow via keyed subscript on a column that is not of type RLMTypeString should throw exception");
     
@@ -207,6 +207,11 @@ REALM_TABLE_1(TestTableKeyedSubscriptError,
     previousRowCount = [errTable rowCount];
     XCTAssertThrows((errTable[@"SomeKey"] = @{@"id" : @821763}), @"Calling keyed subscriptor on errTable should throw exception");
     XCTAssertEqual(previousRowCount, [errTable rowCount], @"errTable should have same count as previous");
+}
+
+- (void)testTableTyped_init_exception
+{
+    XCTAssertThrows(([[TestTableAllTypes alloc] init]), @"Initializing table outside of context should throw exception");
 }
 
 @end

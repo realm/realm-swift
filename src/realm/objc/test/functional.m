@@ -7,7 +7,6 @@
 #import "RLMTestCase.h"
 #import <realm/objc/RLMFast.h>
 #import <realm/objc/RLMTable.h>
-#import <realm/objc/RLMLocal.h>
 
 REALM_TABLE_3(FuncPeopleTable,
                 Name,  String,
@@ -153,7 +152,7 @@ REALM_TABLE_3(FuncPeopleTable,
      *  Row in a table.
      */
 
-    RLMTable *table = [[RLMTable alloc] init];
+    RLMTable *table = [[RLMTable alloc] initLocal];
 
     NSUInteger const NAME = [table addColumnWithName:@"Name" type:RLMTypeString];
     NSUInteger const AGE = [table addColumnWithName:@"Age" type:RLMTypeInt];
