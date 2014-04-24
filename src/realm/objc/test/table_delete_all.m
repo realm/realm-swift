@@ -7,7 +7,7 @@
 
 #import <realm/objc/RLMTable.h>
 #import <realm/objc/RLMDescriptor.h>
-#import <realm/objc/PrivateRLM.h>
+#import <realm/objc/RLMPrivate.h>
 #import <realm/objc/RLMTableFast.h>
 
 @interface MACTestTableDeleteAll: RLMTestCase
