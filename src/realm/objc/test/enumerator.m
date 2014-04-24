@@ -18,7 +18,7 @@
 @implementation EnumPeople
 @end
 
-@interface MACTestEnumerator: RLMTestCase
+@interface MACTestEnumerator : RLMTestCase
 @end
 @implementation MACTestEnumerator
 
@@ -31,34 +31,70 @@
     RLMTable *people = [[RLMTable alloc] initWithObjectClass:EnumPeople.class];
     
     // Add some rows
-    [people addRow:@[@"John", @20, @YES]];
-    [people addRow:@[@"Mary", @21, @NO]];
-    [people addRow:@[@"Lars", @21, @YES]];
-    [people addRow:@[@"Phil", @43, @NO]];
-    [people addRow:@[@"Anni", @54, @YES]];
+    NSArray *rowsArray = @[@[@"John", @20, @YES],
+                           @[@"Mary", @21, @NO],
+                           @[@"Lars", @21, @YES],
+                           @[@"Phil", @43, @NO],
+                           @[@"Anni", @54, @YES]];
+    for (NSArray *rowArray in rowsArray) {
+        [people addRow:rowArray];
+    }
     
     //------------------------------------------------------
     NSLog(@"--- Iterators ---");
     //------------------------------------------------------
     
-    // 1: Iterate over table
+    // Iterate using for...in
+    NSUInteger index = 0;
     for (EnumPeople *row in people) {
-        NSLog(@"(Enum)%@ is %d years old.", row.Name, row.Age);
+        XCTAssertTrue([row.Name isEqualToString:rowsArray[index][0]],
+                      @"Name in iteration should be equal to what was set.");
+        XCTAssertEqual(row.Age, (int)[rowsArray[index][1] integerValue],
+                       @"Age in iteration should be equal to what was set.");
+        XCTAssertEqual(row.Hired, (bool)[rowsArray[index][2] boolValue],
+                       @"Hired in iteration should be equal to what was set.");
+        index++;
     }
+    
+    NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(NSArray *evaluatedArray, NSDictionary *bindings) {
+        return [evaluatedArray[2] boolValue] &&
+        [evaluatedArray[1] integerValue] >= 20 &&
+        [evaluatedArray[1] integerValue] <= 30;
+    }];
+    NSArray *filteredArray = [rowsArray filteredArrayUsingPredicate:predicate];
     
     // Do a query, and get all matches as TableView
     RLMView *res = [people where:@"Hired = YES && Age >= 20 && Age <= 30"];
     NSLog(@"View count: %zu", res.rowCount);
     // 2: Iterate over the resulting TableView
+    index = 0;
     for (EnumPeople *row in res) {
-        NSLog(@"(Enum2) %@ is %d years old.", row.Name, row.Age);
+        XCTAssertTrue([row.Name isEqualToString:filteredArray[index][0]],
+                      @"Name in iteration should be equal to what was set.");
+        XCTAssertEqual(row.Age, (int)[filteredArray[index][1] integerValue],
+                       @"Age in iteration should be equal to what was set.");
+        XCTAssertEqual(row.Hired, (bool)[filteredArray[index][2] boolValue],
+                       @"Hired in iteration should be equal to what was set.");
+        index++;
     }
+    
+    predicate = [NSPredicate predicateWithBlock:^BOOL(NSArray *evaluatedArray, NSDictionary *bindings) {
+        return [evaluatedArray[1] integerValue] == 21;
+    }];
+    filteredArray = [rowsArray filteredArrayUsingPredicate:predicate];
     
     // 3: Iterate over query (lazy)
     RLMView *q = [people where:@"Age = 21"];
     NSLog(@"Query lazy count: %zu", [q rowCount] );
+    index = 0;
     for (EnumPeople *row in q) {
-        NSLog(@"(Enum3) %@ is %d years old.", row.Name, row.Age);
+        XCTAssertTrue([row.Name isEqualToString:filteredArray[index][0]],
+                      @"Name in iteration should be equal to what was set.");
+        XCTAssertEqual(row.Age, (int)[filteredArray[index][1] integerValue],
+                       @"Age in iteration should be equal to what was set.");
+        XCTAssertEqual(row.Hired, (bool)[filteredArray[index][2] boolValue],
+                       @"Hired in iteration should be equal to what was set.");
+        index++;
         if (row.Name == nil)
             break;
     }
