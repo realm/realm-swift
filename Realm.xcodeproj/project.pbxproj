@@ -44,6 +44,7 @@
 		E82D503A1900C128003C1B8E /* realm.m in Sources */ = {isa = PBXBuildFile; fileRef = E82D50391900C128003C1B8E /* realm.m */; };
 		E87675D01907841C00F58CDB /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = E87675CD1907841C00F58CDB /* RLMTestCase.m */; };
 		E87675D11907841C00F58CDB /* XCTestCase+AsyncTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = E87675CF1907841C00F58CDB /* XCTestCase+AsyncTesting.m */; };
+		E87784EF1908E71900A99CB8 /* dynamic_table.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */; };
 		E918909D177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		E91890B0177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		E91890B3177B677900653D7A /* Realm.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E9189099177B677900653D7A /* Realm.dylib */; };
@@ -509,6 +510,7 @@
 				E91890FB177B71E400653D7A /* mixed.mm in Sources */,
 				E87675D01907841C00F58CDB /* RLMTestCase.m in Sources */,
 				E91890FC177B71E400653D7A /* query.m in Sources */,
+				E87784EF1908E71900A99CB8 /* dynamic_table.mm in Sources */,
 				E91890FD177B71E400653D7A /* shared_group.m in Sources */,
 				E91890FE177B71E400653D7A /* subtable.m in Sources */,
 				4DB1DEFC18BF70AE005A7234 /* functional.m in Sources */,
