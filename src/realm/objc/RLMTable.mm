@@ -1569,7 +1569,7 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 
 
 // returns YES if you can currently insert objects of type Class
--(BOOL)compatibleWithObjectClass:(Class)objectClass {
+-(BOOL)canInsertObjectOfClass:(Class)objectClass {
     RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
     for (RLMProperty * prop in descriptor.properties) {
         NSUInteger index = [self indexOfColumnWithName:prop.name];

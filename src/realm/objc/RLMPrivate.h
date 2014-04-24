@@ -40,7 +40,7 @@
 @property (readonly) Class proxyObjectClass;
 
 // returns YES if you can currently insert objects of type Class
--(BOOL)compatibleWithObjectClass:(Class)objectClass;
+-(BOOL)canInsertObjectOfClass:(Class)objectClass;
 
 // returns YES if it's possible to update the table to support objects of type Class
 -(BOOL)canUpdateToSupportObjectClass:(Class)objectClass;

@@ -131,7 +131,7 @@ CATEGORIES:
       SIGNATURE: |
                  "- (RLMTable *)tableWithName:(NSString *)name"
                  "- (id)tableWithName:(NSString *)name asTableClass:(Class)obj"
-                 "- (RLMTable *)tableWithName:(NSString *)name objectClass:(Class)obj"
+                 "- (RLMTable *)tableWithName:(NSString *)name objectClass:(Class)objClass"
       PARAMS:
       - NAME   : name
         TYPES  : NSString
@@ -152,12 +152,11 @@ CATEGORIES:
       NAMES    : "createTableWithName:"
       SUMMARY  : Create table in realm.
       DESCR    : "Create table with the specified name in realm. If a table already exists, an exception is thrown."
-      DESCR    : Create table with the specified name in context. If a table already exists, an exception is thrown. 
-                 Optionally specify object class to be used when accessing table rows
+                 "Optionally specify object class to be used when accessing table rows"
       SIGNATURE: |
                  "- (RLMTable *)createTableWithName:(NSString *)name"
                  "- (id)createTableWithName:(NSString *)name asTableClass:(Class)obj"
-                 "- (RLMTable *)createTableWithName:(NSString *)name objectClass:(Class)objClass;"
+                 "- (RLMTable *)createTableWithName:(NSString *)name objectClass:(Class)objClass"
       PARAMS:
       - NAME   : name
         TYPES  : NSString
