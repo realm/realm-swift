@@ -7,7 +7,6 @@
 //
 
 #import "RLMTestCase.h"
-#import <realm/objc/Realm.h>
 
 NSString *const RLMTestRealmPath = @"test.realm";
 
@@ -19,12 +18,24 @@ NSString *const RLMTestRealmPath = @"test.realm";
     [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath error:nil];
 }
 
++ (void)tearDown {
+    // This method is run after all tests in a test method have run
+    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath error:nil];
+    [super tearDown];
+}
+
 - (RLMRealm *)realmPersistedAtTestPath {
     return [RLMRealm realmWithPersistenceToFile:RLMTestRealmPath];
 }
 
 - (RLMContext *)contextPersistedAtTestPath {
     return [RLMContext contextPersistedAtPath:RLMTestRealmPath error:nil];
+}
+
+- (void)createTestTableWithWriteBlock:(RLMTableWriteBlock)block {
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        block([realm createTableWithName:@"table"]);
+    }];
 }
 
 @end

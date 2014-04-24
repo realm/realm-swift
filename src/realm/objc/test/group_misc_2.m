@@ -9,7 +9,7 @@
 
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMRealm.h>
-#import <realm/objc/PrivateRLM.h>
+#import <realm/objc/RLMPrivate.h>
 
 REALM_TABLE_DEF_4(MyTable,
                   Name,  String,
@@ -176,7 +176,7 @@ REALM_TABLE_2(QueryTable,
 - (void)testSubtables
 {
     [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
-        RLMTable *table = [realm createTableWithName:@"table" asTableClass:[RLMTable class]];
+        RLMTable *table = [realm createTableWithName:@"table"];
         
         // Specify the table type
         {
@@ -207,7 +207,8 @@ REALM_TABLE_2(QueryTable,
         [subtable RLM_setInt:801 inColumnWithIndex:COL_SUBTABLE_INT atRowIndex:1];
         
         // Make the mixed values column contain another subtable
-        [table RLM_setMixed:[[RLMTable alloc] init] inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
+        RLMTable *subtable2 = [realm createTableWithName:@"subtable2"];
+        [table RLM_setMixed:subtable2 inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
     }];
     
 /* Fails!!!

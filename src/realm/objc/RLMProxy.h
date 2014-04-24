@@ -17,27 +17,16 @@
  * from TightDB Incorporated.
  *
  **************************************************************************/
-#ifndef REALM_OBJC_TYPE_H
-#define REALM_OBJC_TYPE_H
 
-/* Make sure numbers match those in <tightdb/data_type.hpp> */
-typedef NS_ENUM(NSInteger, RLMType) {
-    RLMTypeNone =  -1,
-    RLMTypeBool =  1,
-    RLMTypeInt =  0,
-    RLMTypeFloat =  9,
-    RLMTypeDouble = 10,
-    RLMTypeString =  2,
-    RLMTypeBinary =  4,
-    RLMTypeDate =  7,
-    RLMTypeTable =  5,
-    RLMTypeMixed =  6,
-};
+#import "RLMRow.h"
 
+// proxy object which implements its own setters/getters, and forwards everything else to object
+@interface RLMProxy : RLMRow
 
-typedef NS_ENUM(NSInteger, RLMSortOrder) {
-    RLMSortOrderAscending =  0,
-    RLMSortOrderDescending =  1,
-};
+// base object
+@property (nonatomic) id object;
 
-#endif /* REALM_OBJC_TYPE_H */
+// gets/creates a class to proxy for the given object class
++(Class)proxyClassForObjectClass:(Class)objectClass;
+
+@end
