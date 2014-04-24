@@ -299,23 +299,18 @@ using namespace std;
     XCTAssertNoThrow(([t addRow:@{@"first": d}]), @"Cannot insert 'NSDate'");
     XCTAssertEqual((NSUInteger)2, ([t rowCount]), @"2 rows excepted");
 
-// The following tests were commented out because they fail for
-// obviopus reasons. Oleks, please investigate.
-
-/*
     XCTAssertNoThrow(([t addRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   // 2001-09-09 01:46:40
-    XCTAssertEqual((NSUInteger)1, ([t rowCount]), @"1 row expected");
+    XCTAssertEqual((NSUInteger)3, ([t rowCount]), @"1 row expected");
 
     d = [[NSDate alloc] initWithTimeIntervalSince1970:1396963324];
     XCTAssertNoThrow(([t addRow:@{@"first": d}]), @"Cannot insert 'NSDate'");
-    XCTAssertEqual((NSUInteger)2, ([t rowCount]), @"2 rows excepted");
+    XCTAssertEqual((NSUInteger)4, ([t rowCount]), @"2 rows excepted");
     XCTAssertNoThrow(([t addRow:@{@"first": @1000000000}]), @"Cannot insert 'time_t'");   // 2001-09-09 01:46:40
-    XCTAssertEqual((NSUInteger)1, ([t rowCount]), @"1 row expected");
+    XCTAssertEqual((NSUInteger)5, ([t rowCount]), @"1 row expected");
     
     d = [[NSDate alloc] initWithString:@"2001-09-09 01:46:40 +0000"];
     XCTAssertNoThrow(([t addRow:@{@"first": d}]), @"Cannot insert 'NSDate'");
-    XCTAssertEqual((NSUInteger)2, ([t rowCount]), @"2 rows excepted");
-*/
+    XCTAssertEqual((NSUInteger)6, ([t rowCount]), @"2 rows excepted");
 }
 
 -(void)testAppendRowsBinaryColumn
