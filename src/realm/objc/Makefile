@@ -3,7 +3,7 @@ test_DEPS = .
 
 # Headers to be installed
 nobase_subinclude_HEADERS = RLMConstants.h RLMType.h RLMRow.h RLMQuery.h \
-RLMTable.h RLMContext.h RLMRealm.h PrivateHelperMacros.h PrivateTableMacros.h PrivateRLM.h \
+RLMTable.h RLMContext.h RLMRealm.h PrivateHelperMacros.h PrivateTableMacros.h RLMPrivate.h \
 Realm.h RLMVersion.h RLMDescriptor.h RLMView.h RLMColumnProxy.h RLMViewProtocol.h \
 RLMFast.h RLMRowFast.h
 
@@ -13,9 +13,9 @@ lib_LIBRARIES = librealm-objc.a
 
 librealm_objc_a_SOURCES = RLMConstants.m RLMTable.mm RLMRow.mm RLMQuery.mm \
 RLMContext.mm RLMRealm.mm util.mm RLMVersion.mm RLMDescriptor.mm RLMView.mm \
-RLMColumnProxy.mm NSData+RLMGetBinaryData.mm
+RLMColumnProxy.mm NSData+RLMGetBinaryData.mm RLMProperty.mm RLMProxy.mm RLMObjectDescriptor.m
 
-librealm_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2
+librealm_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2 -Wno-comment
 librealm_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
 
 # Format: CURRENT[:REVISION[:AGE]]
