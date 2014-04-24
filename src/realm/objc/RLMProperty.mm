@@ -26,67 +26,14 @@
 #import "RLMTable_noinst.h"
 #import "util_noinst.hpp"
 
-#include <vector>
-#include <map>
-
-// templated getters/setters
-// these are used so we can use the same signature for all types
-// allowing us to use a single mechanism for generating column specific accessors
-template<typename T> inline T column_get(RLMRow *row, NSUInteger col);
-template<typename T> inline void column_set(RLMRow *row, NSUInteger col, T val);
-
-// specializations for each type
-template<> inline int column_get<int>(RLMRow *row, NSUInteger col) {
-    return (int)row.table.getNativeTable.get_int(col, row.ndx); }
-template<> inline void column_set<int>(RLMRow *row, NSUInteger col, int val) {
-    row.table.getNativeTable.set_int(col, row.ndx, val); }
-template<> inline long column_get<long>(RLMRow *row, NSUInteger col) {
-    return (long)row.table.getNativeTable.get_int(col, row.ndx); }
-template<> inline void column_set<long>(RLMRow *row, NSUInteger col, long val) {
-    row.table.getNativeTable.set_int(col, row.ndx, val); }
-template<> inline float column_get<float>(RLMRow *row, NSUInteger col) {
-    return (float)row.table.getNativeTable.get_float(col, row.ndx); }
-template<> inline void column_set<float>(RLMRow *row, NSUInteger col, float val) {
-    row.table.getNativeTable.set_float(col, row.ndx, val); }
-template<> inline double column_get<double>(RLMRow *row, NSUInteger col) {
-    return (double)row.table.getNativeTable.get_double(col, row.ndx); }
-template<> inline void column_set<double>(RLMRow *row, NSUInteger col, double val) {
-    row.table.getNativeTable.set_double(col, row.ndx, val); }
-template<> inline bool column_get<bool>(RLMRow *row, NSUInteger col) {
-    return (bool)row.table.getNativeTable.get_bool(col, row.ndx); }
-template<> inline void column_set<bool>(RLMRow *row, NSUInteger col, bool val) {
-    row.table.getNativeTable.set_bool(col, row.ndx, val); }
-template<> inline id column_get<id>(RLMRow *row, NSUInteger col) {
-    return row[col]; }
-template<> inline void column_set<id>(RLMRow *row, NSUInteger col, id val) {
-    row[col] = val; }
-template<> inline NSString *column_get<NSString *>(RLMRow *row, NSUInteger col) {
-    return to_objc_string(row.table.getNativeTable.get_string(col, row.ndx)); }
-template<> inline void column_set<NSString *>(RLMRow *row, NSUInteger col, NSString *val) {
-    [row setString:val inColumnWithIndex:col]; }
-template<> inline RLMTable * column_get<RLMTable *>(RLMRow *row, NSUInteger col) {
-    // TODO - generate getters with subtable object types built in to avoid this lookup
-    RLMTable *table = row[col];
-    RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:row.class];
-    RLMProperty *prop = desc.properties[col];
-    table.objectClass = prop.subtableObjectClass;
-    return table;
-}
-template<> inline void column_set<RLMTable *>(RLMRow *row, NSUInteger col, RLMTable * val) {
-    row[col] = val;
-}
-
-// macros to generate objc type strings when registering methods
-#define GETTER_TYPES(C) C "@"
-#define SETTER_TYPES(C) "v@" C
 
 // in RLMProxy.m
 extern BOOL is_class_subclass(Class class1, Class class2);
 
 // determine RLMType from objc code
-void type_for_property_string(const char *code,
-                              RLMType *outtype,
-                              Class *outSubtableObjectClass) {
+void typeForPropertyString(const char *code,
+                           RLMType *outtype,
+                           Class *outSubtableObjectClass) {
     if (!code) {
         *outtype = RLMTypeNone;
         return;
@@ -131,36 +78,48 @@ void type_for_property_string(const char *code,
     }
 }
 
-// setup accessor lookup tables (dynamic and generated) and type strings for a given type
-#define RLM_REGISTER_ACCESSOR_FOR_TYPE(CHAR, SCHAR)     \
-s_getterTypeStrings[CHAR] = GETTER_TYPES(SCHAR);        \
-s_setterTypeStrings[CHAR] = SETTER_TYPES(SCHAR);        \
+// macros to generate objc type strings when registering methods
+#define GETTER_TYPES(C) C ":@"
+#define SETTER_TYPES(C) "v:@" C
 
-static std::map<char, const char *> s_getterTypeStrings, s_setterTypeStrings;
-
-@implementation RLMProperty
-
-// setup lookup tables for each type
-+(void)initialize {
-    if (self == RLMProperty.class) {
-        RLM_REGISTER_ACCESSOR_FOR_TYPE('i', "i")
-        RLM_REGISTER_ACCESSOR_FOR_TYPE('l', "l")
-        RLM_REGISTER_ACCESSOR_FOR_TYPE('f', "f")
-        RLM_REGISTER_ACCESSOR_FOR_TYPE('d', "d")
-        RLM_REGISTER_ACCESSOR_FOR_TYPE('B', "B")
-        RLM_REGISTER_ACCESSOR_FOR_TYPE('@', "@")
-        RLM_REGISTER_ACCESSOR_FOR_TYPE('s', "@")
-        RLM_REGISTER_ACCESSOR_FOR_TYPE('t', "@")
+const char * getterTypeStringForCode(char code) {
+    switch (code) {
+        case 'i': return GETTER_TYPES("i");
+        case 'l': return GETTER_TYPES("l");
+        case 'f': return GETTER_TYPES("f");
+        case 'd': return GETTER_TYPES("d");
+        case 'B': return GETTER_TYPES("B");
+        case 'c': return GETTER_TYPES("c");
+        case '@': return GETTER_TYPES("@");
+        default: @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid accessor code" userInfo:nil];
     }
 }
+
+const char * setterTypeStringForCode(char code) {
+    switch (code) {
+        case 'i': return SETTER_TYPES("i");
+        case 'l': return SETTER_TYPES("l");
+        case 'f': return SETTER_TYPES("f");
+        case 'd': return SETTER_TYPES("d");
+        case 'B': return SETTER_TYPES("B");
+        case 'c': return SETTER_TYPES("c");
+        case '@': return SETTER_TYPES("@");
+        default: @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid accessor code" userInfo:nil];
+    }
+}
+
+@interface RLMProperty ()
+@property (nonatomic, assign) BOOL dynamic;
+@property (nonatomic, assign) BOOL nonatomic;
+@end
+
+@implementation RLMProperty
 
 // get accessor lookup code based on objc type and rlm type
 -(char)accessorCode {
     switch (self.objcType) {
         case 'q':           // long long same as long
             return 'l';
-        case 'c':           // BOOL (char) same as bool
-            return 'B';
         case '@':
             if (self.type == RLMTypeString) return 's';
             if (self.type == RLMTypeTable) return 't';
@@ -169,54 +128,92 @@ static std::map<char, const char *> s_getterTypeStrings, s_setterTypeStrings;
     }
 }
 
--(IMP)getterForColumn:(int)column {
+// dynamic getter with column closure
+-(IMP)getterForColumn:(NSUInteger)col {
     switch (self.accessorCode) {
-        case 'i':   // int
-            return imp_implementationWithBlock(^(RLMRow *row){ return column_get<int>(row, column); });
-        case 'l':   // long
-            return imp_implementationWithBlock(^(RLMRow *row){ return column_get<long>(row, column); });
+        case 'i':
+            return imp_implementationWithBlock(^(RLMRow *row) {
+                return (int)row.table.getNativeTable.get_int(col, row.ndx);
+            });
+        case 'l':
+            return imp_implementationWithBlock(^(RLMRow *row) {
+                return row.table.getNativeTable.get_int(col, row.ndx);
+            });
         case 'f':
-            return imp_implementationWithBlock(^(RLMRow *row){ return column_get<float>(row, column); });
+            return imp_implementationWithBlock(^(RLMRow *row) {
+                return row.table.getNativeTable.get_float(col, row.ndx);
+            });
         case 'd':
-            return imp_implementationWithBlock(^(RLMRow *row){ return column_get<double>(row, column); });
+            return imp_implementationWithBlock(^(RLMRow *row) {
+                return row.table.getNativeTable.get_double(col, row.ndx);
+            });
         case 'B':
-            return imp_implementationWithBlock(^(RLMRow *row){ return column_get<bool>(row, column); });
+            return imp_implementationWithBlock(^(RLMRow *row) {
+                return row.table.getNativeTable.get_bool(col, row.ndx);
+            });
+        case 'c':
+            return imp_implementationWithBlock(^(RLMRow *row) {
+                return (BOOL)row.table.getNativeTable.get_bool(col, row.ndx);
+            });
         case 's':
-            return imp_implementationWithBlock(^(RLMRow *row){ return column_get<NSString *>(row, column); });
+            return imp_implementationWithBlock(^(RLMRow *row) {
+                return to_objc_string(row.table.getNativeTable.get_string(col, row.ndx));
+            });
+        case '@':
+            return imp_implementationWithBlock(^(RLMRow *row) {
+                return row[col];
+            });
         case 't':
         {
             Class subtableObjectClass = self.subtableObjectClass;
             return imp_implementationWithBlock(^(RLMRow *row){
-                RLMTable *table = row[column];
+                RLMTable *table = row[col];
                 table.objectClass = subtableObjectClass;
                 return table;
             });
         }
-        case '@':
-            return imp_implementationWithBlock(^(RLMRow *row){ return column_get<id>(row, column); });
         default:
             @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid accessor code" userInfo:nil];
     }
 }
 
--(IMP)setterForColumn:(int)column {
+
+// dynamic setter with column closure
+-(IMP)setterForColumn:(int)col {
     switch (self.accessorCode) {
-        case 'i':   // int
-            return imp_implementationWithBlock(^(RLMRow *row, int val){ return column_set<int>(row, column, val); });
-        case 'l':   // long
-            return imp_implementationWithBlock(^(RLMRow *row, long val){ return column_set<long>(row, column, val); });
+        case 'i':
+            return imp_implementationWithBlock(^(RLMRow *row, int val) {
+                row.table.getNativeTable.set_int(col, row.ndx, val);
+            });
+        case 'l':
+            return imp_implementationWithBlock(^(RLMRow *row, long val) {
+                row.table.getNativeTable.set_int(col, row.ndx, val);
+            });
         case 'f':
-            return imp_implementationWithBlock(^(RLMRow *row, float val){ return column_set<float>(row, column, val); });
+            return imp_implementationWithBlock(^(RLMRow *row, float val) {
+                row.table.getNativeTable.set_float(col, row.ndx, val);
+            });
         case 'd':
-            return imp_implementationWithBlock(^(RLMRow *row, double val){ return column_set<double>(row, column, val); });
+            return imp_implementationWithBlock(^(RLMRow *row, double val) {
+                row.table.getNativeTable.set_double(col, row.ndx, val);
+            });
         case 'B':
-            return imp_implementationWithBlock(^(RLMRow *row, bool val){ return column_set<bool>(row, column, val); });
+            return imp_implementationWithBlock(^(RLMRow *row, bool val) {
+                row.table.getNativeTable.set_bool(col, row.ndx, val);
+            });
+        case 'c':
+            return imp_implementationWithBlock(^(RLMRow *row, BOOL val) {
+                row.table.getNativeTable.set_bool(col, row.ndx, val);
+            });
         case 's':
-            return imp_implementationWithBlock(^(RLMRow *row, NSString * val){ return column_set<NSString *>(row, column, val); });
-        case 't':
-            return imp_implementationWithBlock(^(RLMRow *row, RLMTable * val){ return column_set<RLMTable *>(row, column, val); });
+            return imp_implementationWithBlock(^(RLMRow *row, NSString *val) {
+                [row setString:val inColumnWithIndex:col];
+            });
         case '@':
-            return imp_implementationWithBlock(^(RLMRow *row, id val){ return column_set<id>(row, column, val); });
+        case 't':
+            return imp_implementationWithBlock(^(RLMRow *row, id val) {
+                row[col] = val;
+            });
         default:
             @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid accessor code" userInfo:nil];
     }
@@ -237,15 +234,14 @@ static std::map<char, const char *> s_getterTypeStrings, s_setterTypeStrings;
     SEL set = NSSelectorFromString(setName);
     
     // set accessors
-    char t = self.accessorCode;
-    class_replaceMethod(cls, get, [self getterForColumn:column], s_getterTypeStrings[t]);
-    class_replaceMethod(cls, set, [self setterForColumn:column], s_setterTypeStrings[t]);
+    class_replaceMethod(cls, get, [self getterForColumn:column], getterTypeStringForCode(self.objcType));
+    class_replaceMethod(cls, set, [self setterForColumn:column], setterTypeStringForCode(self.objcType));
 }
 
 +(instancetype)propertyForObjectProperty:(objc_property_t)prop {
     // go through all attributes, noting if nonatomic and getting the RLMType
     unsigned int attCount;
-    //BOOL nonatomic = NO, dynamic = NO;
+    BOOL nonatomic = NO, dynamic = NO;
     RLMType type = RLMTypeNone;
     char objcType = 0;
     Class subtableObjectType;
@@ -253,16 +249,16 @@ static std::map<char, const char *> s_getterTypeStrings, s_setterTypeStrings;
     for (unsigned int a = 0; a < attCount; a++) {
         switch (*(atts[a].name)) {
             case 'T':
-                type_for_property_string(atts[a].value, &type, &subtableObjectType);
+                typeForPropertyString(atts[a].value, &type, &subtableObjectType);
                 objcType = *(atts[a].value);            // first char of type attr
                 if (objcType == 'q') objcType = 'l';    // collapse these
                 break;
-            /*case 'N':
+            case 'N':
                 nonatomic = YES;
                 break;
             case 'D':
                 dynamic = YES;
-                break;*/
+                break;
             default:
                 break;
         }
@@ -283,6 +279,8 @@ static std::map<char, const char *> s_getterTypeStrings, s_setterTypeStrings;
         tdbProp.objcType = objcType;
         tdbProp.name = [NSString stringWithUTF8String:name];
         tdbProp.subtableObjectClass = subtableObjectType;
+        tdbProp.nonatomic = nonatomic;
+        tdbProp.dynamic = dynamic;
         return tdbProp;
     }
     return nil;
