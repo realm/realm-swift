@@ -29,6 +29,7 @@
 #import "RLMTable_noinst.h"
 #import "util_noinst.hpp"
 #import "NSData+RLMGetBinaryData.h"
+#import "RLMPrivate.h"
 
 using namespace tightdb;
 
@@ -101,7 +102,7 @@ NSObject* get_cell(size_t col_ndx, size_t row_ndx, Table& table)
             return d;
         }
         case type_Table: {
-            RLMTable *t = [[RLMTable alloc] init];
+            RLMTable *t = [[RLMTable alloc] _initRaw];
             TableRef table_ref = table.get_subtable(col_ndx, row_ndx);
             [t setNativeTable:table_ref.get()];
             return t;
@@ -139,7 +140,7 @@ NSObject* get_cell(size_t col_ndx, size_t row_ndx, Table& table)
                     return d;
                 }
                 case type_Table: {
-                    RLMTable *t = [[RLMTable alloc] init];
+                    RLMTable *t = [[RLMTable alloc] _initRaw];
                     TableRef table_ref = table.get_subtable(col_ndx, row_ndx);
                     [t setNativeTable:table_ref.get()];
                     return t;
