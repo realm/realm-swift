@@ -234,8 +234,7 @@ using namespace std;
 -(void)dealloc
 {
     if ([m_parent isKindOfClass:[RLMRealm class]]) {
-        RLMRealm *context = (RLMRealm *)m_parent;
-        [context tableRefDidDie];
+        [m_parent tableRefDidDie];
     }
 }
 

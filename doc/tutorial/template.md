@@ -17,9 +17,9 @@ Binary blobs, and Tables. Moreover, columns in a table can be of the
 type Mixed which means that the values can be of any support type.
 
 The core classes of Realm are <code>RLMTable</code>,
-<code>RLMContext</code>, and <code>RLMTransaction</code>. Tables are where
-data is stored, while contexts can be used to work with
-persistent data (on disk). Tables within a context can only the access in
+<code>RLMTransactionManager</code>, and <code>RLMRealm</code>. Tables are where
+data is stored, while transaction managers can be used to work with
+persistent data (on disk). Tables within a realm can only the access in
 a transactional manner, and Realm distinguish between read and write access.
 
 ** Executing the tutorial
@@ -39,29 +39,31 @@ The above code creates a Realm table type with 2 typed columns called
 <code>title</code> and <code>checked</code>.
 
 There are really just two types of operations you can do in Realm: read and write. 
-All these operations need to be done within a context. Even though Realm is built to 
+These operations need to be done within a stand-alone realm if on the main thread 
+or through a transaction manager if done asynchronously. Even though Realm is built to 
 be super fast however you use it, we can still gain a performance boost by reusing 
-contexts as much as possible. A good way to reuse contexts is to set them as properties: 
-a smart context for reading and a regular context for writing.
+transaction managers and realms as much as possible. A good way to reuse transaction 
+managers and realms is to set them as properties: 
+a stand-alone realm for reading and a transaction manager for writing.
 
-@@example setup_contexts @@
+@@example setup @@
 
-Using `RLMContext`, tables can be accessed simultaneously by 
+Using `RLMTransactionManager`, tables can be accessed simultaneously by 
 multiple threads, processes, or applications.
 
-Creating a table can be done using a write block on our <code>writeContext</code>:
+Creating a table can be done using a write block on our <code>transactionManager</code>:
 
 @@example create_table @@
 
-Calling <code>isEmpty</code> on the <code>RLMTransaction</code> is a good way to 
+Calling <code>isEmpty</code> on the <code>RLMRealm</code> is a good way to 
 make sure the table is only created once.
 
-When using smart contexts as is the case here, it's important to observe 
-<code>RLMContextDidChangeNotification</code> to know when tables have been updated:
+When using a transaction manager as is the case here, it's important to observe 
+<code>RLMRealmDidChangeNotification</code> to know when tables have been updated:
 
 @@example setup_notifications @@
 
-Adding a row to a table must be done within a write block on a regular context:
+Adding a row to a table must be done within a write block on a transaction manager:
 
 @@example add_row @@
 
@@ -69,7 +71,7 @@ The code above highlights the two main ways to add a new row: using an array and
 using a dictionary. It's important to preserve the order of columns when adding 
 a row with an array, but not when adding with a dictionary.
 
-Deleting rows must be done within a write block on a regular context:
+Deleting rows must be done within a write block on a transaction manager:
 
 @@example delete_row @@
 

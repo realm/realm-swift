@@ -28,15 +28,13 @@ typedef void(^RLMWriteBlockWithRollback)(RLMRealm *realm, BOOL *rollback);
 typedef void(^RLMTableReadBlock)(RLMTable *table);
 typedef void(^RLMTableWriteBlock)(RLMTable *table);
 
-/****************	  RLMContext	****************/
-
-@interface RLMContext : NSObject
+@interface RLMTransactionManager : NSObject
 
 +(NSString *) defaultPath;
 
 // Initializers
-+(RLMContext *)contextWithDefaultPersistence;
-+(RLMContext *)contextPersistedAtPath:(NSString *)path error:(NSError **)error;
++(instancetype)defaultManager;
++(instancetype)managerWithPath:(NSString *)path error:(NSError **)error;
 
 // Transactions
 -(void)readUsingBlock:(RLMReadBlock)block;
@@ -47,7 +45,7 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
 -(void)readTable:(NSString*)tablename usingBlock:(RLMTableReadBlock)block;
 -(void)writeTable:(NSString*)tablename usingBlock:(RLMTableWriteBlock)block;
 
-// Context state info
+// State info
 -(BOOL)hasChangedSinceLastTransaction;
 
 @end

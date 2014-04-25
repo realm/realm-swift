@@ -25,15 +25,15 @@ NSString *const RLMTestRealmPath = @"test.realm";
 }
 
 - (RLMRealm *)realmPersistedAtTestPath {
-    return [RLMRealm realmWithPersistenceToFile:RLMTestRealmPath];
+    return [RLMRealm realmWithPath:RLMTestRealmPath];
 }
 
-- (RLMContext *)contextPersistedAtTestPath {
-    return [RLMContext contextPersistedAtPath:RLMTestRealmPath error:nil];
+- (RLMTransactionManager *)managerWithTestPath {
+    return [RLMTransactionManager managerWithPath:RLMTestRealmPath error:nil];
 }
 
 - (void)createTestTableWithWriteBlock:(RLMTableWriteBlock)block {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         block([realm createTableWithName:@"table"]);
     }];
 }

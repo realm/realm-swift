@@ -16,8 +16,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    RLMContext *context = [RLMContext contextPersistedAtPath:[self pathForName:@"demo.realm"] error:nil];
-    [context writeUsingBlock:^(RLMRealm *realm) {
+    RLMTransactionManager *manager = [RLMTransactionManager managerWithPath:[self pathForName:@"demo.realm"]
+                                                                      error:nil];
+    [manager writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = nil;
         if (![realm hasTableWithName:@"demo"]) {
             table = [realm createTableWithName:@"demo"];
@@ -31,8 +32,7 @@
             [table addRow:@[@"Lorem"]];
             [table addRow:@[@"Ipsum"]];
         }
-        return YES; // Commit
-    } error:nil];
+    }];
 
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.

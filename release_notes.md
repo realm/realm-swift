@@ -65,10 +65,16 @@ and your code will break!
 * All prefixes changed from `TDB` to `RLM`.
 * `TDBTransaction` and `TDBSmartContext` have merged into `RLMRealm`.
 * Write transactions now take an optional rollback parameter (rather than needing to return a boolean).
+* `TDBContext` was renamed to `RLMTransactionManager`
+* Renamed `RLMContextDidChangeNotification` to `RLMRealmDidChangeNotification`
+* Renamed `contextWithDefaultPersistence` to `defaultManager`
+* Renamed `contextPersistedAtPath:` to `managerWithPath:`
+* Renamed `realmWithDefaultPersistence` to `defaultRealm`
+* Renamed `realmWithDefaultPersistenceAndInitBlock` to `defaultRealmWithInitBlock`
 
 ### Enhancements:
 
-* `createTableWithName:columns:` has been added to `RLMTransaction`.
+* `createTableWithName:columns:` has been added to `RLMRealm`.
 * Added keyed subscripting for RLMTable's first column if column is of type RLMTypeString.
 * `setRow:atIndex:` has been added to `RLMTable`.
 * `RLMRealm` constructors now have variants that take an writable initialization block

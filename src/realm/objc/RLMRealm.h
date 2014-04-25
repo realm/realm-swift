@@ -19,7 +19,7 @@
  **************************************************************************/
 
 #import <Foundation/Foundation.h>
-#import "RLMContext.h"
+#import "RLMTransactionManager.h"
 
 @class RLMTable;
 
@@ -28,25 +28,25 @@
 /**
  * Use the main run loop and the default notification center.
  */
-+ (instancetype)realmWithDefaultPersistence;
++ (instancetype)defaultRealm;
 
-+ (instancetype)realmWithDefaultPersistenceAndInitBlock:(RLMWriteBlock)initBlock;
++ (instancetype)defaultRealmWithInitBlock:(RLMWriteBlock)initBlock;
 
-+ (instancetype)realmWithPersistenceToFile:(NSString *)path;
++ (instancetype)realmWithPath:(NSString *)path;
 
-+ (instancetype)realmWithPersistenceToFile:(NSString *)path
-                                 initBlock:(RLMWriteBlock)initBlock;
++ (instancetype)realmWithPath:(NSString *)path
+                    initBlock:(RLMWriteBlock)initBlock;
 
-+ (instancetype)realmWithPersistenceToFile:(NSString *)path
-                                   runLoop:(NSRunLoop *)runLoop
-                        notificationCenter:(NSNotificationCenter *)notificationCenter
-                                     error:(NSError **)error;
++ (instancetype)realmWithPath:(NSString *)path
+                      runLoop:(NSRunLoop *)runLoop
+           notificationCenter:(NSNotificationCenter *)notificationCenter
+                        error:(NSError **)error;
 
-+ (instancetype)realmWithPersistenceToFile:(NSString *)path
-                                 initBlock:(RLMWriteBlock)initBlock
-                                   runLoop:(NSRunLoop *)runLoop
-                        notificationCenter:(NSNotificationCenter *)notificationCenter
-                                     error:(NSError **)error;
++ (instancetype)realmWithPath:(NSString *)path
+                    initBlock:(RLMWriteBlock)initBlock
+                      runLoop:(NSRunLoop *)runLoop
+           notificationCenter:(NSNotificationCenter *)notificationCenter
+                        error:(NSError **)error;
 
 @property (nonatomic, readonly) NSUInteger tableCount;
 @property (nonatomic, readonly) BOOL       isEmpty;
