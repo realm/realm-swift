@@ -76,7 +76,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(MainTable, MainObject)
 
 - (void)testSubtable
 {    
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         /* Create new table in group */
         MainTable *people = [MainTable tableInRealm:realm named:@"employees"];
         
@@ -100,7 +100,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(MainTable, MainObject)
 }
 
 - (void)testSubtableSimple {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         /* Create new table in group */
         RLMTable *people = [realm createTableWithName:@"employees" objectClass:MainProxied.class];
         
@@ -125,7 +125,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(MainTable, MainObject)
 
 - (void)testBadSubtable {
     
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {    
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {    
         XCTAssertThrows([realm createTableWithName:@"badTable" objectClass:UnspecifiedSubObject.class], @"Shoud throw exception");
 	}];
 }

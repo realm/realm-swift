@@ -20,11 +20,11 @@ REALM_TABLE_2(SharedTable2,
 
 @implementation MACTestSharedGroup
 
-- (void)testContext {
+- (void)testTransactionManager {
     
     // TODO: Update test to include more ASSERTS
     
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
         SharedTable2 *table = [realm createTableWithName:@"employees" asTableClass:[SharedTable2 class]];
         NSLog(@"Table: %@", table);
@@ -37,8 +37,7 @@ REALM_TABLE_2(SharedTable2,
         NSLog(@"MyTable Size: %lu", [table rowCount]);
     }];
     
-    // Read-only realm
-    RLMContext *fromDisk = [self contextPersistedAtTestPath];
+    RLMTransactionManager *fromDisk = [self managerWithTestPath];
     
     [fromDisk readUsingBlock:^(RLMRealm *realm) {
         SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
@@ -85,19 +84,19 @@ REALM_TABLE_2(SharedTable2,
     }];
 }
 
-- (void)testContextAtDefaultPath
+- (void)testTransactionManagerAtDefaultPath
 {
-    // Create a new context at default location
-    RLMContext *context = [self contextPersistedAtTestPath];
+    // Create a new transaction manager
+    RLMTransactionManager *manager = [self managerWithTestPath];
     
-    [context writeUsingBlock:^(RLMRealm *realm) {
+    [manager writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *t = [realm createTableWithName:@"table"];
         
         [t addColumnWithName:@"col0" type:RLMTypeInt];
         [t addRow:@[@10]];
     }];
     
-    [context readUsingBlock:^(RLMRealm * realm) {
+    [manager readUsingBlock:^(RLMRealm * realm) {
         RLMTable *t = [realm tableWithName:@"table"];
         XCTAssertEqualObjects(t[0][0], @10);
     }];
@@ -105,7 +104,7 @@ REALM_TABLE_2(SharedTable2,
 
 - (void)testRealmCreateTableWithColumns
 {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // Check if method throws exception
         XCTAssertNoThrow(([realm createTableWithName:@"Test" columns:@[@"id", @"int"]]), @"Table should not throw exception");
         
@@ -129,7 +128,7 @@ REALM_TABLE_2(SharedTable2,
 
 - (void)testReadRealm
 {
-    RLMContext * fromDisk = [self contextPersistedAtTestPath];
+    RLMTransactionManager * fromDisk = [self managerWithTestPath];
     
     [fromDisk writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *t = [realm createTableWithName:@"table"];
@@ -162,7 +161,7 @@ REALM_TABLE_2(SharedTable2,
 
 - (void)testSingleTableTransactions
 {
-    RLMContext * ctx = [self contextPersistedAtTestPath];
+    RLMTransactionManager * ctx = [self managerWithTestPath];
     
     [ctx writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *t = [realm createTableWithName:@"table"];
@@ -185,18 +184,18 @@ REALM_TABLE_2(SharedTable2,
 
 - (void)testHasChanged
 {
-    RLMContext *sg = [self contextPersistedAtTestPath];
+    RLMTransactionManager *manager1 = [self managerWithTestPath];
     
-    XCTAssertFalse([sg hasChangedSinceLastTransaction], @"Context has not changed");
+    XCTAssertFalse([manager1 hasChangedSinceLastTransaction], @"Transaction manager has not changed");
     
-    [sg writeUsingBlock:^(RLMRealm *realm) {
+    [manager1 writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:@"t"];
     }];
     
-    XCTAssertFalse([sg hasChangedSinceLastTransaction], @"Context has not been changed by another process");
+    XCTAssertFalse([manager1 hasChangedSinceLastTransaction], @"Transaction manager has not been changed by another process");
     
     
-    [sg writeUsingBlock:^(RLMRealm *realm) {
+    [manager1 writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *t = [realm tableWithName:@"t"];
         [t addColumnWithName:@"col" type:RLMTypeBool];
         [t addRow:nil];
@@ -204,25 +203,25 @@ REALM_TABLE_2(SharedTable2,
         [row setBool:YES inColumnWithIndex:0];
     }];
     
-    XCTAssertFalse([sg hasChangedSinceLastTransaction], @"Context has not been changed by another process");
+    XCTAssertFalse([manager1 hasChangedSinceLastTransaction], @"Transaction manager has not been changed by another process");
     
     
-    // OTHER context
-    RLMContext *sg2 = [self contextPersistedAtTestPath];
+    // OTHER Transaction Manager
+    RLMTransactionManager *manager2 = [self managerWithTestPath];
     
-    [sg2 writeUsingBlock:^(RLMRealm *realm) {
+    [manager2 writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *t = [realm tableWithName:@"t"];
         [t addRow:nil]; /* Adding an empty row */
     }];
     
-    XCTAssertTrue([sg hasChangedSinceLastTransaction], @"Context HAS been changed by another process");
+    XCTAssertTrue([manager1 hasChangedSinceLastTransaction], @"Transaction manager HAS been changed by another process");
 }
 
-- (void)testContextExceptions
+- (void)testTransactionManagerExceptions
 {
-    RLMContext *c = [self contextPersistedAtTestPath];
+    RLMTransactionManager *manager = [self managerWithTestPath];
     
-    [c writeUsingBlock:^(RLMRealm *realm) {
+    [manager writeUsingBlock:^(RLMRealm *realm) {
         
         XCTAssertThrows([realm createTableWithName:nil], @"name is nil");
         XCTAssertThrows([realm createTableWithName:@""], @"name is empty");
@@ -231,7 +230,7 @@ REALM_TABLE_2(SharedTable2,
         XCTAssertThrows([realm createTableWithName:@"name"], @"name already exists");
     }];
     
-    [c readUsingBlock:^(RLMRealm *realm) {
+    [manager readUsingBlock:^(RLMRealm *realm) {
         
         XCTAssertThrows([realm tableWithName:nil], @"name is nil");
         XCTAssertThrows([realm tableWithName:@""], @"name is empty");
@@ -243,94 +242,94 @@ REALM_TABLE_2(SharedTable2,
 
 - (void)testPinnedTransactions
 {
-    __block RLMContext *context1 = [self contextPersistedAtTestPath];
-    __block RLMContext *context2 = [self contextPersistedAtTestPath];
+    __block RLMTransactionManager *manager1 = [self managerWithTestPath];
+    __block RLMTransactionManager *manager2 = [self managerWithTestPath];
     
     {
         // initially, always say that the db has changed
-        BOOL changed = [context2 pinReadTransactions];
+        BOOL changed = [manager2 pinReadTransactions];
         XCTAssertTrue(changed, @"");
-        [context2 unpinReadTransactions];
+        [manager2 unpinReadTransactions];
         // asking again - this time there is no change
-        changed = [context2 pinReadTransactions];
+        changed = [manager2 pinReadTransactions];
         XCTAssertFalse(changed, @"");
         
-        [context2 unpinReadTransactions];
+        [manager2 unpinReadTransactions];
     }
     {   // add something to the db to play with
-        [context1 writeUsingBlock:^(RLMRealm *realm) {
+        [manager1 writeUsingBlock:^(RLMRealm *realm) {
             RLMTable *t1 = [realm createTableWithName:@"test"];
             [t1 addColumnWithName:@"col0" type:RLMTypeBool];
             [t1 addRow:@[@YES]];
         }];
     }
     {   // validate that we can see previous commit from within a new pinned transaction
-        BOOL changed = [context2 pinReadTransactions];
+        BOOL changed = [manager2 pinReadTransactions];
         XCTAssertTrue(changed, @"");
-        [context2 readUsingBlock:^(RLMRealm *realm) {
+        [manager2 readUsingBlock:^(RLMRealm *realm) {
             RLMTable *t = [realm tableWithName:@"test"];
             XCTAssertEqual([[t rowAtIndex:0] boolInColumnWithIndex:0], YES, @"");
         }];
     }
-    {   // commit new data in another context, without unpinning
-        [context1 writeUsingBlock:^(RLMRealm *realm) {
+    {   // commit new data in another transaction manager, without unpinning
+        [manager1 writeUsingBlock:^(RLMRealm *realm) {
             RLMTable *t = [realm tableWithName:@"test"];
             [t addRow:@[@NO]];
         }];
     }
     {   // validate that we can see previous commit if we're not pinned
-        [context1 readUsingBlock:^(RLMRealm *realm) {
+        [manager1 readUsingBlock:^(RLMRealm *realm) {
             RLMTable *t = [realm tableWithName:@"test"];
             XCTAssertEqual([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, @"");
         }];
         
     }
     {   // validate that we can NOT see previous commit from within a pinned transaction
-        [context2 readUsingBlock:^(RLMRealm *realm) {
+        [manager2 readUsingBlock:^(RLMRealm *realm) {
             RLMTable *t = [realm tableWithName:@"test"];
             XCTAssertEqual(t.rowCount, (NSUInteger)1, @"Still only 1 row");
         }];
         
     }
     {   // unpin, pin again and validate that we can now see previous commit
-        [context2 unpinReadTransactions];
-        BOOL changed = [context2 pinReadTransactions];
+        [manager2 unpinReadTransactions];
+        BOOL changed = [manager2 pinReadTransactions];
         XCTAssertTrue(changed, @"changes since last transaction");
-        [context2 readUsingBlock:^(RLMRealm *realm) {
+        [manager2 readUsingBlock:^(RLMRealm *realm) {
             RLMTable *t = [realm tableWithName:@"test"];
             XCTAssertEqual(t.rowCount, (NSUInteger)2, @"Now we see 2 rows");
             XCTAssertEqual([[t rowAtIndex:1] boolInColumnWithIndex:0], NO, @"");
         }];
     }
     {   // can't pin if already pinned
-        XCTAssertThrows([context2 pinReadTransactions], @"Already pinned");
+        XCTAssertThrows([manager2 pinReadTransactions], @"Already pinned");
     }
     {   // can't unpin if already unpinned
-        [context2 unpinReadTransactions];
-        XCTAssertThrows([context2 unpinReadTransactions], @"Already unpinned");
+        [manager2 unpinReadTransactions];
+        XCTAssertThrows([manager2 unpinReadTransactions], @"Already unpinned");
         
     }
     {   // can't pin while we're inside a realm
-        [context1 readUsingBlock:^(RLMRealm *realm) {
-            XCTAssertThrows([context1 pinReadTransactions], @"Can't pin inside realm");
+        [manager2 readUsingBlock:^(RLMRealm *realm) {
+            XCTAssertThrows([manager2 pinReadTransactions], @"Can't pin inside realm");
             XCTAssertNotNil(realm, @"Parameter must be used");
         }];
     }
     
     {   // can't unpin while we're inside a realm
-        [context1 pinReadTransactions];
-        [context1 readUsingBlock:^(RLMRealm *realm) {
-            XCTAssertThrows([context1 unpinReadTransactions], @"Can't unpin inside realm");
+        [manager1 pinReadTransactions];
+        [manager1 readUsingBlock:^(RLMRealm *realm) {
+            XCTAssertThrows([manager1 unpinReadTransactions], @"Can't unpin inside realm");
             XCTAssertNotNil(realm, @"Parameter must be used");
         }];
-        [context1 unpinReadTransactions];
+        [manager1 unpinReadTransactions];
     }
     {   // can't start a write transaction while pinned
-        [context1 pinReadTransactions];
-        XCTAssertThrows([context1 writeUsingBlock:^(RLMRealm *realm) {
+        [manager1 pinReadTransactions];
+        XCTAssertThrows([manager1 writeUsingBlock:^(RLMRealm *realm) {
             XCTAssertNotNil(realm, @"Parameter must be used");
         }], @"Can't start write transaction while pinned");
-        [context1 unpinReadTransactions];
+        [manager1 unpinReadTransactions];
     }
 }
 

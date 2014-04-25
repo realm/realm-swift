@@ -51,7 +51,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     //------------------------------------------------------
     NSError* error = nil;
 
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
         PeopleErrTable* people = [realm createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
         
@@ -74,7 +74,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
               people.rowCount == 0 ? @"empty" : @"not empty");
     }];
 
-    XCTAssertNil(error, @"error should be nil after saving a context");
+    XCTAssertNil(error, @"error should be nil after saving a transaction");
 
     //------------------------------------------------------
     NSLog(@"--- Changing permissions ---");

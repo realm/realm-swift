@@ -23,7 +23,7 @@
 #import <realm/objc/RLMView.h>
 #import <realm/objc/RLMQuery.h>
 #import <realm/objc/RLMRow.h>
-#import <realm/objc/RLMContext.h>
+#import <realm/objc/RLMTransactionManager.h>
 #import <realm/objc/RLMRealm.h>
 #import <realm/objc/RLMVersion.h>
 
