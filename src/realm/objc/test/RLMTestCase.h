@@ -7,6 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
+#import <realm/objc/Realm.h>
 
 extern NSString *const RLMTestRealmPath;
 
@@ -16,5 +17,6 @@ extern NSString *const RLMTestRealmPath;
 
 - (RLMRealm *)realmPersistedAtTestPath;
 - (RLMContext *)contextPersistedAtTestPath;
+- (void)createTestTableWithWriteBlock:(RLMTableWriteBlock)block;
 
 @end
