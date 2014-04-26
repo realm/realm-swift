@@ -9,7 +9,7 @@
 #import <Realm/Realm.h>
 
 // @@Example: declare_table @@
-// Define table with two columns
+// Define object with two properties
 @interface RLMDemoObject : RLMRow
 
 @property (nonatomic, copy)   NSString *title;
@@ -61,6 +61,11 @@ static NSString * const kTableName = @"table";
     self.context = [RLMContext contextWithDefaultPersistence];
     // @@EndExample@@
     
+    // @@Example: get_table @@
+    // Set table as strong reference with specified name and class from the realm
+    self.table = [self.realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
+    // @@EndExample@@
+    
     // @@Example: setup_notifications @@
     // Observe Realm Notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -73,16 +78,6 @@ static NSString * const kTableName = @"table";
     [self.tableView reloadData];
 }
 // @@EndExample@@
-
-- (RLMTable *)table {
-    if (!_table) {
-        // @@Example: get_table @@
-        // Get table with specified name and class from the realm
-        _table = [self.realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
-        // @@EndExample@@
-    }
-    return _table;
-}
 
 #pragma mark - UITableViewDataSource
 
@@ -142,7 +137,7 @@ static NSString * const kTableName = @"table";
 
 - (void)query {
     // @@Example: query @@
-    RLMDemoObject *object = [self.table find:[NSPredicate predicateWithFormat:@"checked = %@", @YES]];
+    RLMDemoObject *object = [self.table find:@"checked = YES"];
     if (object) {
         NSLog(@"%@ is %@", object.title, object.checked ? @"checked" : @"unchecked");
     }
