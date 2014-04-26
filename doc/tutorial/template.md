@@ -19,7 +19,7 @@ type Mixed which means that the values can be of any support type.
 The core classes of Realm are <code>RLMTable</code>,
 <code>RLMTransactionManager</code>, and <code>RLMRealm</code>. Tables are where
 data is stored, while transaction managers can be used to work with
-persistent data (on disk). Tables within a realm can only the access in
+persistent data (on disk). Tables within a realm can only be accessed in
 a transactional manner, and Realm distinguish between read and write access.
 
 ** Executing the tutorial
