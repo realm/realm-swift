@@ -137,10 +137,8 @@ static NSString * const kTableName = @"table";
         [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
             RLMTable *table = [realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
             for (NSInteger idx = 0; idx < 10000; idx++) {
-                NSString *title = [NSString stringWithFormat:@"Title %@", @(table.rowCount)];
-                NSDate *date = [NSDate dateWithTimeIntervalSince1970:table.rowCount];
                 // Add row via dictionary. Order is ignored.
-                [table addRow:@{@"title": title, @"date": date}];
+                [table addRow:@{@"title": [self randomString], @"date": [self randomDate]}];
             }
         }];
     });
@@ -151,10 +149,8 @@ static NSString * const kTableName = @"table";
     // @@Example: add_row @@
     [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
-        NSString *title = [NSString stringWithFormat:@"Title %@", @(table.rowCount)];
-        NSDate *date = [NSDate dateWithTimeIntervalSince1970:table.rowCount];
         // Add row via array. Order matters.
-        [table addRow:@[title, date]];
+        [table addRow:@[[self randomString], [self randomDate]]];
     }];
     // @@EndExample@@
 }
@@ -165,6 +161,16 @@ static NSString * const kTableName = @"table";
         [table removeAllRows];
     }];
     // @@EndExample@@
+}
+
+#pragma - Helpers
+
+- (NSString *)randomString {
+    return [NSString stringWithFormat:@"Title %@", @(arc4random())];
+}
+
+- (NSDate *)randomDate {
+    return [NSDate dateWithTimeIntervalSince1970:arc4random()];
 }
 
 #pragma mark - Tutorial Examples
