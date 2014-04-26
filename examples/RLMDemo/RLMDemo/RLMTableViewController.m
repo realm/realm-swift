@@ -13,7 +13,7 @@
 @interface RLMDemoObject : RLMRow
 
 @property (nonatomic, copy)   NSString *title;
-@property (nonatomic, assign) BOOL      checked;
+@property (nonatomic, strong) NSDate   *date;
 
 @end
 
@@ -39,12 +39,25 @@ static NSString * const kTableName = @"table";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    [self setupUI];
+    [self setupRealm];
+}
+
+#pragma mark - UI
+
+- (void)setupUI {
+    self.title = @"RLMDemo";
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"BG Add"
+                                                                             style:UIBarButtonItemStylePlain
+                                                                            target:self
+                                                                            action:@selector(bgAdd)];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                                                            target:self
                                                                                            action:@selector(add)];
-    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:kCellID];
-    
-    [self setupRealm];
+    UILongPressGestureRecognizer *g = [[UILongPressGestureRecognizer alloc] initWithTarget:self
+                                                                                    action:@selector(deleteAll)];
+    [self.navigationController.navigationBar addGestureRecognizer:g];
 }
 
 #pragma mark - Realm
@@ -86,12 +99,16 @@ static NSString * const kTableName = @"table";
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellID forIndexPath:indexPath];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellID];
+    
+    if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
+                                      reuseIdentifier:kCellID];
+    }
     
     RLMDemoObject *object = self.table[indexPath.row];
-    
     cell.textLabel.text = object.title;
-    cell.accessoryType = object.checked ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    cell.detailTextLabel.text = object.date.description;
     
     return cell;
 }
@@ -112,15 +129,40 @@ static NSString * const kTableName = @"table";
 
 #pragma mark - Actions
 
+- (void)bgAdd {
+    // @@Example: bg_add @@
+    // Import many items in a background thread
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    dispatch_async(queue, ^{
+        [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
+            RLMTable *table = [realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
+            for (NSInteger idx = 0; idx < 10000; idx++) {
+                NSString *title = [NSString stringWithFormat:@"Title %@", @(table.rowCount)];
+                NSDate *date = [NSDate dateWithTimeIntervalSince1970:table.rowCount];
+                // Add row via dictionary. Order is ignored.
+                [table addRow:@{@"title": title, @"date": date}];
+            }
+        }];
+    });
+    // @@EndExample@@
+}
+
 - (void)add {
     // @@Example: add_row @@
-    [self.context writeUsingBlock:^(RLMRealm *realm) {
+    [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
         NSString *title = [NSString stringWithFormat:@"Title %@", @(table.rowCount)];
-        BOOL checked = table.rowCount % 2;
-        [table addRow:@[title, @(checked)]];
-        // Rows can also be added as dictionaries:
-        // [table addRow:@{@"title": title, @"checked": @(checked)}];
+        NSDate *date = [NSDate dateWithTimeIntervalSince1970:table.rowCount];
+        // Add row via array. Order matters.
+        [table addRow:@[title, date]];
+    }];
+    // @@EndExample@@
+}
+
+- (void)deleteAll {
+    // @@Example: delete_all @@
+    [self.context writeTable:kTableName usingBlock:^(RLMTable *table) {
+        [table removeAllRows];
     }];
     // @@EndExample@@
 }
@@ -130,7 +172,7 @@ static NSString * const kTableName = @"table";
 - (void)iteration {
     // @@Example: iteration @@
     for (RLMDemoObject *object in self.table) {
-        NSLog(@"%@ is %@", object.title, object.checked ? @"checked" : @"unchecked");
+        NSLog(@"title: %@\ndate: %@", object.title, object.date);
     }
     // @@EndExample@@
 }
@@ -139,7 +181,7 @@ static NSString * const kTableName = @"table";
     // @@Example: query @@
     RLMDemoObject *object = [self.table find:@"checked = YES"];
     if (object) {
-        NSLog(@"%@ is %@", object.title, object.checked ? @"checked" : @"unchecked");
+        NSLog(@"title: %@\ndate: %@", object.title, object.date);
     }
     // @@EndExample@@
 }
