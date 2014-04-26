@@ -10,9 +10,16 @@
 
 // @@Example: declare_table @@
 // Define table with two columns
-REALM_TABLE_2(RLMDemoTable,
-              title,   String,
-              checked, Bool)
+@interface RLMDemoObject : RLMRow
+
+@property (nonatomic, copy)   NSString *title;
+@property (nonatomic, assign) BOOL      checked;
+
+@end
+
+@implementation RLMDemoObject
+
+@end
 // @@EndExample@@
 
 static NSString * const kCellID    = @"cell";
@@ -20,9 +27,9 @@ static NSString * const kTableName = @"table";
 
 @interface RLMTableViewController ()
 
-@property (nonatomic, strong) RLMRealm *realm;
+@property (nonatomic, strong) RLMRealm   *realm;
 @property (nonatomic, strong) RLMContext *context;
-@property (nonatomic, strong) RLMDemoTable *table;
+@property (nonatomic, strong) RLMTable   *table;
 
 @end
 
@@ -48,7 +55,7 @@ static NSString * const kTableName = @"table";
     self.realm = [RLMRealm realmWithDefaultPersistenceAndInitBlock:^(RLMRealm *realm) {
         // Create table if it doesn't exist
         if (realm.isEmpty) {
-            [realm createTableWithName:kTableName asTableClass:[RLMDemoTable class]];
+            [realm createTableWithName:kTableName objectClass:[RLMDemoObject class]];
         }
     }];
     self.context = [RLMContext contextWithDefaultPersistence];
@@ -67,11 +74,11 @@ static NSString * const kTableName = @"table";
 }
 // @@EndExample@@
 
-- (RLMDemoTable *)table {
+- (RLMTable *)table {
     if (!_table) {
         // @@Example: get_table @@
         // Get table with specified name and class from the realm
-        _table = [self.realm tableWithName:kTableName asTableClass:[RLMDemoTable class]];
+        _table = [self.realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
         // @@EndExample@@
     }
     return _table;
@@ -86,10 +93,10 @@ static NSString * const kTableName = @"table";
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellID forIndexPath:indexPath];
     
-    RLMDemoTableRow *row = self.table[indexPath.row];
+    RLMDemoObject *object = self.table[indexPath.row];
     
-    cell.textLabel.text = row.title;
-    cell.accessoryType = row.checked ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    cell.textLabel.text = object.title;
+    cell.accessoryType = object.checked ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     
     return cell;
 }
@@ -113,7 +120,7 @@ static NSString * const kTableName = @"table";
 - (void)add {
     // @@Example: add_row @@
     [self.context writeUsingBlock:^(RLMRealm *realm) {
-        RLMDemoTable *table = [realm tableWithName:kTableName asTableClass:[RLMDemoTable class]];
+        RLMTable *table = [realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
         NSString *title = [NSString stringWithFormat:@"Title %@", @(table.rowCount)];
         BOOL checked = table.rowCount % 2;
         [table addRow:@[title, @(checked)]];
@@ -127,18 +134,17 @@ static NSString * const kTableName = @"table";
 
 - (void)iteration {
     // @@Example: iteration @@
-    for (RLMDemoTableRow *row in self.table) {
-        NSLog(@"%@ is %@", row.title, row.checked ? @"checked" : @"unchecked");
+    for (RLMDemoObject *object in self.table) {
+        NSLog(@"%@ is %@", object.title, object.checked ? @"checked" : @"unchecked");
     }
     // @@EndExample@@
 }
 
 - (void)query {
     // @@Example: query @@
-    RLMRow *row = [self.table find:[NSPredicate predicateWithFormat:@"checked = %@", @YES]];
-    if (row) {
-        BOOL checked = [(NSNumber *)row[@"checked"] boolValue];
-        NSLog(@"%@ is %@", row[@"title"], checked ? @"checked" : @"unchecked");
+    RLMDemoObject *object = [self.table find:[NSPredicate predicateWithFormat:@"checked = %@", @YES]];
+    if (object) {
+        NSLog(@"%@ is %@", object.title, object.checked ? @"checked" : @"unchecked");
     }
     // @@EndExample@@
 }
