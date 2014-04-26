@@ -51,7 +51,7 @@ static NSString * const kTableName = @"table";
 
 - (void)setupRealm {
     // @@Example: setup_contexts @@
-    // Set up read/write contexts
+    // Set up realm and context
     self.realm = [RLMRealm realmWithDefaultPersistenceAndInitBlock:^(RLMRealm *realm) {
         // Create table if it doesn't exist
         if (realm.isEmpty) {
