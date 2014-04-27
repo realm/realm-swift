@@ -446,4 +446,90 @@ REALM_TABLE_9(TestQueryAllTypes,
     }];
 }
 
+- (void)testPredicateQueries {
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"date" type:RLMTypeDate];
+        NSArray *dates = @[[NSDate dateWithTimeIntervalSince1970:0],
+                           [NSDate dateWithTimeIntervalSince1970:1],
+                           [NSDate dateWithTimeIntervalSince1970:2],
+                           [NSDate dateWithTimeIntervalSince1970:3]];
+        for (NSDate *date in dates) {
+            [table addRow:@[date]];
+        }
+        
+        NSDate *date = [NSDate dateWithTimeIntervalSince1970:1];
+        
+        {
+            // Lesser than
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"date < %@", date];
+            RLMView *view = [table where:predicate];
+            NSArray *results = [dates subarrayWithRange:NSMakeRange(0, 1)];
+            XCTAssertEqual(view.rowCount, results.count, @"lesser than predicate should return correct count");
+            [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XCTAssertEqualObjects(obj, view[idx][@"date"], @"lesser than predicate should return correct results");
+            }];
+        }
+        {
+            // Lesser than or equal
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"date <= %@", date];
+            RLMView *view = [table where:predicate];
+            NSArray *results = [dates subarrayWithRange:NSMakeRange(0, 2)];
+            XCTAssertEqual(view.rowCount, results.count, @"lesser than or equal predicate should return correct count");
+            [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XCTAssertEqualObjects(obj, view[idx][@"date"], @"lesser than or equal predicate should return correct results");
+            }];
+        }
+        {
+            // Equal (single '=')
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"date = %@", date];
+            RLMView *view = [table where:predicate];
+            NSArray *results = [dates subarrayWithRange:NSMakeRange(1, 1)];
+            XCTAssertEqual(view.rowCount, results.count, @"equal(1) predicate should return correct count");
+            [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XCTAssertEqualObjects(obj, view[idx][@"date"], @"equal(1) predicate should return correct results");
+            }];
+        }
+        {
+            // Equal (double '=')
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"date == %@", date];
+            RLMView *view = [table where:predicate];
+            NSArray *results = [dates subarrayWithRange:NSMakeRange(1, 1)];
+            XCTAssertEqual(view.rowCount, results.count, @"equal(2) predicate should return correct");
+            [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XCTAssertEqualObjects(obj, view[idx][@"date"], @"equal(2) predicate should return correct results");
+            }];
+        }
+        {
+            // Greater than or equal
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"date >= %@", date];
+            RLMView *view = [table where:predicate];
+            NSArray *results = [dates subarrayWithRange:NSMakeRange(1, 3)];
+            XCTAssertEqual(view.rowCount, results.count, @"greater than or equal predicate should return correct count");
+            [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XCTAssertEqualObjects(obj, view[idx][@"date"], @"greater than or equal predicate should return correct results");
+            }];
+        }
+        {
+            // Greater than
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"date > %@", date];
+            RLMView *view = [table where:predicate];
+            NSArray *results = [dates subarrayWithRange:NSMakeRange(2, 2)];
+            XCTAssertEqual(view.rowCount, results.count, @"greater than predicate should return correct count");
+            [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XCTAssertEqualObjects(obj, view[idx][@"date"], @"greater than predicate should return correct results");
+            }];
+        }
+        {
+            // Not equal
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"date != %@", date];
+            RLMView *view = [table where:predicate];
+            NSArray *results = [[dates subarrayWithRange:NSMakeRange(0, 1)] arrayByAddingObjectsFromArray:[dates subarrayWithRange:NSMakeRange(2, 2)]];
+            XCTAssertEqual(view.rowCount, results.count, @"not equal predicate should return correct count");
+            [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XCTAssertEqualObjects(obj, view[idx][@"date"], @"not equal predicate should return correct results");
+            }];
+        }
+    }];
+}
+
 @end
