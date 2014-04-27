@@ -8,7 +8,7 @@
 #import "RLMTableViewController.h"
 #import <Realm/Realm.h>
 
-// @@Example: declare_table @@
+// @@Example: declare_object @@
 // Define object with two properties
 @interface RLMDemoObject : RLMRow
 
@@ -134,13 +134,17 @@ static NSString * const kTableName = @"table";
     // Import many items in a background thread
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
-        [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
-            RLMTable *table = [realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
-            for (NSInteger idx = 0; idx < 10000; idx++) {
-                // Add row via dictionary. Order is ignored.
-                [table addRow:@{@"title": [self randomString], @"date": [self randomDate]}];
-            }
-        }];
+        RLMContext *ctx = [RLMContext contextWithDefaultPersistence];
+        for (NSInteger idx1 = 0; idx1 < 1000; idx1++) {
+            // Break up the writing blocks into smaller portions
+            [ctx writeUsingBlock:^(RLMRealm *realm) {
+                RLMTable *table = [realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
+                for (NSInteger idx2 = 0; idx2 < 1000; idx2++) {
+                    // Add row via dictionary. Order is ignored.
+                    [table addRow:@{@"title": [self randomString], @"date": [self randomDate]}];
+                }
+            }];
+        }
     });
     // @@EndExample@@
 }
@@ -166,7 +170,7 @@ static NSString * const kTableName = @"table";
 #pragma - Helpers
 
 - (NSString *)randomString {
-    return [NSString stringWithFormat:@"Title %@", @(arc4random())];
+    return [NSString stringWithFormat:@"Title %d", arc4random()];
 }
 
 - (NSDate *)randomDate {
@@ -185,8 +189,9 @@ static NSString * const kTableName = @"table";
 
 - (void)query {
     // @@Example: query @@
-    RLMDemoObject *object = [self.table find:@"checked = YES"];
-    if (object) {
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"date < %@ && title contains %@", [NSDate date], @"00"];
+    RLMView *view = [self.table where:predicate];
+    for (RLMDemoObject *object in view) {
         NSLog(@"title: %@\ndate: %@", object.title, object.date);
     }
     // @@EndExample@@
