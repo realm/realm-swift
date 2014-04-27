@@ -1254,6 +1254,35 @@ void add_string_constraint_to_query(tightdb::Query & query,
     }
 }
 
+void add_datetime_constraint_to_query(tightdb::Query & query,
+                                      NSPredicateOperatorType operatorType,
+                                      NSUInteger index,
+                                      double value) {
+    switch (operatorType) {
+        case NSLessThanPredicateOperatorType:
+            query.less_datetime(index, value);
+            break;
+        case NSLessThanOrEqualToPredicateOperatorType:
+            query.less_equal_datetime(index, value);
+            break;
+        case NSGreaterThanPredicateOperatorType:
+            query.greater_datetime(index, value);
+            break;
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            query.greater_equal_datetime(index, value);
+            break;
+        case NSEqualToPredicateOperatorType:
+            query.equal_datetime(index, value);
+            break;
+        case NSNotEqualToPredicateOperatorType:
+            query.not_equal_datetime(index, value);
+            break;
+        default:
+            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for type NSDate", (unsigned long)operatorType]);
+            break;
+    }
+}
+
 void update_query_with_value_expression(RLMTable * table, tightdb::Query & query,
     NSString * columnName, id value, NSPredicateOperatorType operatorType) {
 
@@ -1272,9 +1301,8 @@ void update_query_with_value_expression(RLMTable * table, tightdb::Query & query
                                          bool([(NSNumber *)value boolValue]));
             break;
         case tightdb::type_DateTime:
-            // TODO: change datetime so method signaturs match other numeric types
-            @throw predicate_exception(@"Unsupported predicate value type",
-                                       @"Not supporting dates temporarily");
+            add_datetime_constraint_to_query(query, operatorType, index,
+                                             double([(NSDate *)value timeIntervalSince1970]));
             break;
         case tightdb::type_Double:
             add_numeric_constraint_to_query(query, type, operatorType,
