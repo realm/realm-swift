@@ -157,11 +157,9 @@ static NSString * const kTableName = @"table";
 }
 
 - (void)deleteAll {
-    // @@Example: delete_all @@
     [self.context writeTable:kTableName usingBlock:^(RLMTable *table) {
         [table removeAllRows];
     }];
-    // @@EndExample@@
 }
 
 #pragma - Helpers
