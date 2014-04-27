@@ -1,99 +1,127 @@
-* Realm Objective C Interface
+# Realm Objective-C Interface
 
-This short tutorial to Realm will introduce you to
-commonly used features of Realm. Please refer to the
-<a href="http://www.tightdb.com/documentation/ObjectiveC_ref/1/Reference/">reference documentation</a>
-for further details.
+Realm is a fast embedded database that integrates transparently into Objective-C. It provides the full benefits of a database, but with a much lower memory footprint and higher performance than native data structures.
 
-Realm is a fast embedded database that integrates transparently
-into Objective C. It gives you the full benefits of a database, but
-with a much lower memory footprint and higher performance than native
-data structures.
+Building an iOS app with Realm couldn't be simpler. This article will cover the core concepts.
 
-Realm data structures are represented by tables with typed and
-untyped columns. A column in a table can be of any of the following
-column types: Integers, Booleans, Floats, Doubles, Strings, Dates,
-Binary blobs, and Tables. Moreover, columns in a table can be of the
-type Mixed which means that the values can be of any support type.
+## Main Classes
 
-The core classes of Realm are <code>RLMTable</code>,
-<code>RLMContext</code>, and <code>RLMTransaction</code>. Tables are where
-data is stored, while contexts can be used to work with
-persistent data (on disk). Tables within a context can only the access in
-a transactional manner, and Realm distinguish between read and write access.
+`RLMRealm`, `RLMTable` and `RLMTransactionManager` are the main classes you'll encounter while working with Realm.
 
-** Executing the tutorial
+## Defining a Data Model
 
-While you walk through the tutorial below you may find it beneficial to actually execute the code.
+Realm data models fully embrace Objective-C and are defined using traditional `NSObject` classes with `@properties`. Just subclass `RLMRow` to create your Realm data model objects:
 
-** Creating tables
+```objc
+@interface RLMDemoObject : RLMRow
 
-First, let's create a table with 2 columns using the typed table interface:
+@property (nonatomic, copy)   NSString *title;
+@property (nonatomic, strong) NSDate   *date;
 
-@@example declare_table @@
+@end
+```
 
-The <code>REALM_TABLE_2</code> is a macro which creates the appropriate Objective C classes
-including <code>RLMDemoTable</code>.
+See [Building a Data Model](#) for more advanced usage examples.
 
-The above code creates a Realm table type with 2 typed columns called 
-<code>title</code> and <code>checked</code>.
+## RLMRealm
 
-There are really just two types of operations you can do in Realm: read and write. 
-All these operations need to be done within a context. Even though Realm is built to 
-be super fast however you use it, we can still gain a performance boost by reusing 
-contexts as much as possible. A good way to reuse contexts is to set them as properties: 
-a smart context for reading and a regular context for writing.
+The `RLMRealm` class is the main way to interact with a realm. It's how tables are created and extracted:
 
-@@example setup_contexts @@
+```objc
+self.realm = [RLMRealm realmWithDefaultPersistenceAndInitBlock:^(RLMRealm *realm) {
+    // Create table if it doesn't exist
+    if (realm.isEmpty) {
+        [realm createTableWithName:kTableName objectClass:[RLMDemoObject class]];
+    }
+}];
 
-Using `RLMContext`, tables can be accessed simultaneously by 
-multiple threads, processes, or applications.
+self.table = [self.realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
+```
 
-Creating a table can be done using a write block on our <code>writeContext</code>:
+Realms are read-only and can only be created on the main thread, unless created through a transaction manager.
 
-@@example create_table @@
+See the `RLMRealm` [documentation](#) for more details.
 
-Calling <code>isEmpty</code> on the <code>RLMTransaction</code> is a good way to 
-make sure the table is only created once.
+## Transaction Manager
 
-When using smart contexts as is the case here, it's important to observe 
-<code>RLMContextDidChangeNotification</code> to know when tables have been updated:
+The `RLMTransactionManager` class is responsible for all *write* transactions:
 
-@@example setup_notifications @@
+```objc
+[[RLMContext contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
+    RLMTable *table = [realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
+    // Add row via array. Order matters.
+    [table addRow:@[[self randomString], [self randomDate]]];
+}];
+```
 
-Adding a row to a table must be done within a write block on a regular context:
+as well as all *read* transactions performed outside the main thread:
 
-@@example add_row @@
+```objc
+dispatch_async(queue, ^{
+    [[RLMContext contextWithDefaultPersistence] readUsingBlock:^(RLMRealm *realm) {
+        RLMTable *table = [realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
+        for (RLMDemoObject *object in table) {
+            NSLog(@"object: %@", object);
+        }
+    }];
+});
+```
 
-The code above highlights the two main ways to add a new row: using an array and 
-using a dictionary. It's important to preserve the order of columns when adding 
-a row with an array, but not when adding with a dictionary.
+These transactions are run on the current thread. As the previous example demonstrates, `RLMTable`s support fast enumeration.
 
-Deleting rows must be done within a write block on a regular context:
+See the `RLMTransactionManager` [documentation](#) for more details.
 
-@@example delete_row @@
+## Listening to Changes
 
-It's also possible to iterate over a table's rows using a <code>for...in</code> loop:
+Though Realm is extremely fast, it isn't instantaneous. Realm sends notifications to broadcast when a write transaction has completed. These notifications can be observed through the `NSNotificationCenter`:
 
-@@example iteration @@
+```objc
+[[NSNotificationCenter defaultCenter] addObserver:self
+                                         selector:@selector(realmContextDidChange)
+                                             name:RLMContextDidChangeNotification
+                                           object:nil];
+```
 
-Another powerful way to extract rows from an <code>RLMTable</code> is to filter 
-its rows with an <code>NSPredicate</code>:
+## Background Operations
 
-@@example query @@
+Inserting large amounts of data into your application has never been easier. Realm is designed to work with the tools you already know like Grand Central Dispatch and `NSOperationQueue`s. Here's an example importing a million objects while keeping an app responsive and still allowing high-priority writes on the main thread:
 
-** Next steps
+```objc
+dispatch_async(queue, ^{
+    RLMContext *ctx = [RLMContext contextWithDefaultPersistence];
+    for (NSInteger idx1 = 0; idx1 < 1000; idx1++) {
+        // Break up the writing blocks into smaller portions
+        [ctx writeUsingBlock:^(RLMRealm *realm) {
+            RLMTable *table = [realm tableWithName:@"table2" objectClass:[RLMDemoObject class]];
+            for (NSInteger idx2 = 0; idx2 < 1000; idx2++) {
+                // Add row via dictionary. Order is ignored.
+                [table addRow:@{@"title": [self randomString], @"date": [self randomDate]}];
+            }
+        }];
+    }
+});
+```
 
-<ol>
+## Querying
 
-<li>This was just a brief overview of what's possible with Realm. Feel free to download 
-the sample code from this tutorial to play with Realm. It may be helpful to refer to the 
-<a href="http://www.tightdb.com/documentation/ObjectiveC_ref/1/Reference/">reference
-documentation</a> for more in-depth information about the API.</li>
+With support for `NSPredicate`s and blazing fast queries, Realm's querying interface really shines.
 
-<li>Feel free to contact <a href="mailto:support@tightdb.com">support</a> 
-for help or inspiration
-for help or inspiration to tackling your particular problems - we appreciate 
-your feedback, feature requests and challenges!</li>
+```objc
+NSPredicate *predicate = [NSPredicate predicateWithFormat:@"date < %@ && title contains %@", [NSDate date], @"00"];
+RLMView *view = [self.table where:predicate];
+for (RLMDemoObject *object in view) {
+    NSLog(@"title: %@\ndate: %@", object.title, object.date);
+}
+```
 
-</ol>
+See the `RLMTable` [documentation](#) for more information on what's possible with tables in Realm.
+
+## Next Steps
+
+This document just scratches the surface of what's possible with Realm. Here are some resources available for more information:
+
+* [Realm Objective-C Documentation](#)
+* [Realm Objective-C Tutorials](#)
+* [Realm on GitHub](#)
+* [Realm on StackOverflow](#)
+* [support@realm.io](mailto:support@realm.io)
