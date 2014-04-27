@@ -9,18 +9,17 @@
 #import <Realm/Realm.h>
 
 // @@Example: declare_object @@
-// Define object with two properties
 @interface RLMDemoObject : RLMRow
 
 @property (nonatomic, copy)   NSString *title;
 @property (nonatomic, strong) NSDate   *date;
 
 @end
+// @@EndExample@@
 
 @implementation RLMDemoObject
 
 @end
-// @@EndExample@@
 
 static NSString * const kCellID    = @"cell";
 static NSString * const kTableName = @"table";
@@ -63,21 +62,19 @@ static NSString * const kTableName = @"table";
 #pragma mark - Realm
 
 - (void)setupRealm {
-    // @@Example: setup_contexts @@
-    // Set up realm and context
+    // @@Example: setup_realm @@
+    // Set up realm and get table
     self.realm = [RLMRealm realmWithDefaultPersistenceAndInitBlock:^(RLMRealm *realm) {
         // Create table if it doesn't exist
         if (realm.isEmpty) {
             [realm createTableWithName:kTableName objectClass:[RLMDemoObject class]];
         }
     }];
-    self.context = [RLMContext contextWithDefaultPersistence];
-    // @@EndExample@@
     
-    // @@Example: get_table @@
-    // Set table as strong reference with specified name and class from the realm
     self.table = [self.realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
     // @@EndExample@@
+    
+    self.context = [RLMContext contextWithDefaultPersistence];
     
     // @@Example: setup_notifications @@
     // Observe Realm Notifications
@@ -85,12 +82,12 @@ static NSString * const kTableName = @"table";
                                              selector:@selector(realmContextDidChange)
                                                  name:RLMContextDidChangeNotification
                                                object:nil];
+    // @@EndExample@@
 }
 
 - (void)realmContextDidChange {
     [self.tableView reloadData];
 }
-// @@EndExample@@
 
 #pragma mark - UITableViewDataSource
 
@@ -130,9 +127,9 @@ static NSString * const kTableName = @"table";
 #pragma mark - Actions
 
 - (void)bgAdd {
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     // @@Example: bg_add @@
     // Import many items in a background thread
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
         RLMContext *ctx = [RLMContext contextWithDefaultPersistence];
         for (NSInteger idx1 = 0; idx1 < 1000; idx1++) {
@@ -179,11 +176,17 @@ static NSString * const kTableName = @"table";
 
 #pragma mark - Tutorial Examples
 
-- (void)iteration {
-    // @@Example: iteration @@
-    for (RLMDemoObject *object in self.table) {
-        NSLog(@"title: %@\ndate: %@", object.title, object.date);
-    }
+- (void)bgRead {
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    // @@Example: bg_read @@
+    dispatch_async(queue, ^{
+        [[RLMContext contextWithDefaultPersistence] readUsingBlock:^(RLMRealm *realm) {
+            RLMTable *table = [realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
+            for (RLMDemoObject *object in table) {
+                NSLog(@"title: %@\ndate: %@", object.title, object.date);
+            }
+        }];
+    });
     // @@EndExample@@
 }
 
