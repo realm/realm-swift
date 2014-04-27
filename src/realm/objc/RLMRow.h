@@ -23,7 +23,21 @@
 
 @class RLMTable;
 
-@interface RLMRow : NSObject
+
+// protocol for custom table objects
+@protocol RLMObject <NSObject>
+@required
+// implement to indicate the object type within subtables
++(Class)subtableObjectClassForProperty:(NSString *)propertyName;
+@optional
+// return an array of names of transient properties which should not be persisted
++(NSArray *)ignoredPropertyNames;
+// return the name of the primary key property for this object
++(NSString *)primaryKeyPropertyName;
+@end
+
+
+@interface RLMRow : NSObject<RLMObject>
 
 -(id)objectAtIndexedSubscript:(NSUInteger)colIndex;
 -(id)objectForKeyedSubscript:(id <NSCopying>)key;
@@ -32,6 +46,40 @@
 
 @end
 
+
+// macro helper for defining custom table object with subtables
+// if used
+// TODO - move somewhere else
+#define RLM_DEFINE_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType) \
+@protocol OType <NSObject>                                  \
+-(OType *)rowAtIndex:(NSUInteger)rowIndex;                  \
+-(OType *)firstRow;                                         \
+-(OType *)lastRow;                                          \
+-(OType *)objectAtIndexedSubscript:(NSUInteger)rowIndex;    \
+-(OType *)objectForKeyedSubscript:(NSString *)key;          \
+-(OType *)find:(id)condition;                               \
+@end                                                        \
+@interface TType : RLMTable<OType>                          \
++(TType *)tableInRealm:(RLMRealm *)rlm named:(NSString *)name;  \
++(Class)objectClass;                                        \
+@end
+
+#define STATIC_ASSERT(test, msg) typedef char _static_assert_ ## msg [ ((test) ? 1 : -1) ];
+
+#define RLM_IMPLEMENT_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)                  \
+STATIC_ASSERT(__INCLUDE_LEVEL__ == 0, RLM_IMPLEMENT_TABLE_used_in_header_file_for##OType)  \
+@implementation TType                                                           \
++(TType *)tableInRealm:(RLMRealm *)rlm named:(NSString *)name {                 \
+    if([rlm hasTableWithName:name])                                             \
+        return (TType *)[rlm tableWithName:name objectClass:OType.class];       \
+    return (TType *)[rlm createTableWithName:name objectClass:OType.class];}    \
++(Class)objectClass { return OType.class; }                                     \
+-(instancetype)init { return [super initWithObjectClass:OType.class]; }         \
+@end
+
+#define RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)    \
+RLM_DEFINE_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)     \
+RLM_IMPLEMENT_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)
 
 
 /* FIXME: This class can be (and should be) eliminated by using a

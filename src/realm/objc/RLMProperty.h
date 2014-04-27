@@ -18,15 +18,24 @@
  *
  **************************************************************************/
 
-#import <realm/objc/RLMConstants.h>
-#import <realm/objc/RLMTable.h>
-#import <realm/objc/RLMView.h>
-#import <realm/objc/RLMQuery.h>
-#import <realm/objc/RLMRow.h>
-#import <realm/objc/RLMContext.h>
-#import <realm/objc/RLMRealm.h>
-#import <realm/objc/RLMVersion.h>
 
-#import <realm/objc/PrivateHelperMacros.h>
-#import <realm/objc/PrivateTableMacros.h>
-#import <realm/objc/RLMPrivate.h>
+#import <Foundation/Foundation.h>
+#import "RLMType.h"
+#import <objc/runtime.h>
+
+// object property definition
+@interface RLMProperty : NSObject
+
+@property (nonatomic, copy) NSString * name;
+@property (nonatomic, assign) RLMType type;
+@property (nonatomic, assign) Class subtableObjectClass;
+@property (nonatomic, assign) char objcType;
+
+// creates a tdb property object from a runtime property
++(instancetype)propertyForObjectProperty:(objc_property_t)prop;
+
+// adds getters and setters for this property/column on the given class
+-(void)addToClass:(Class)cls column:(int)column;
+
+@end
+

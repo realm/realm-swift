@@ -18,15 +18,23 @@
  *
  **************************************************************************/
 
-#import <realm/objc/RLMConstants.h>
-#import <realm/objc/RLMTable.h>
-#import <realm/objc/RLMView.h>
-#import <realm/objc/RLMQuery.h>
-#import <realm/objc/RLMRow.h>
-#import <realm/objc/RLMContext.h>
-#import <realm/objc/RLMRealm.h>
-#import <realm/objc/RLMVersion.h>
+#import <Foundation/Foundation.h>
+#import "RLMProperty.h"
 
-#import <realm/objc/PrivateHelperMacros.h>
-#import <realm/objc/PrivateTableMacros.h>
-#import <realm/objc/RLMPrivate.h>
+@class RLMObjectDescriptor;
+
+// ordered properties extracted from an object
+@interface RLMObjectDescriptor : NSObject
+
+// array of properties which define a schema
+@property (nonatomic, readonly, copy) NSArray * properties;
+
+// property lookup by name
+-(RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)key;
+
+// returns a cached or new schema for a given object class
++(instancetype)descriptorForObjectClass:(Class)objectClass;
+
+@end
+
+

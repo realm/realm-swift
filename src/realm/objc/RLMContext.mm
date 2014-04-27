@@ -133,7 +133,7 @@ NSString *const defaultContextFileName = @"default.realm";
     }
     catch (std::exception& ex) {
         // File access errors are treated as exceptions here since they should not occur after the shared
-        // group has already beenn successfully opened on the file and memeory mapped. The shared group constructor handles
+        // group has already been successfully opened on the file and memory mapped. The shared group constructor handles
         // the excepted error related to file access.
         @throw [NSException exceptionWithName:@"realm:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]
@@ -169,7 +169,7 @@ NSString *const defaultContextFileName = @"default.realm";
     }
     catch (std::exception& ex) {
         // File access errors are treated as exceptions here since they should not occur after the shared
-        // group has already beenn successfully opened on the file and memeory mapped. The shared group constructor handles
+        // group has already been successfully opened on the file and memory mapped. The shared group constructor handles
         // the excepted error related to file access.
         @throw [NSException exceptionWithName:@"realm:core_exception"
                                        reason:[NSString stringWithUTF8String:ex.what()]

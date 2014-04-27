@@ -29,7 +29,7 @@
 #import "RLMView_noinst.h"
 #import "RLMRow.h"
 #import "NSData+RLMGetBinaryData.h"
-#import "PrivateRLM.h"
+#import "RLMPrivate.h"
 #import "util_noinst.hpp"
 
 using namespace std;
@@ -332,7 +332,7 @@ using namespace std;
 -(RLMView *)findAllRows
 {
     tightdb::TableView view = m_query->find_all();
-    return [RLMView viewWithTable:m_table andNativeView:view];
+    return [RLMView viewWithTable:m_table nativeView:view];
 }
 
 -(NSUInteger)indexOfFirstMatchingRow

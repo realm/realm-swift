@@ -1,0 +1,62 @@
+#
+# Obj-C reference documentation for RLMRow class
+#
+
+ID         : class_row
+TITLE      : RLMRow
+SUMMARY    : The RLMRow class is the representation of an individual object in a table.
+DESCR      : >
+             In the dynamic interface, row elements can by accessed using object or keyed subscripting using
+             either the column index or column name, e.g <code>row[(NSUInteger)columnIndex]</code> or <code>row["columnName"]</code>.
+             Using this interface all columns are returned as objects.
+
+             When creating/accessing a table while specifying an object class, you can instead use a custom objective-c interface 
+             to interact with row data. To use this mechanism, create an Objective-C interface which subclasses 
+             <code>RLMRow</code>, and use the objectClass accessors to get/create your table. The table will automatically
+             be updated with columns to support the given interface.
+
+             Note - rows can only be created by accessing them from a table.
+             
+             TODO - docs for RLMObject protocol
+             TODO - example code
+SEE        :
+EXAMPLES:
+- DESCR    :
+  CODE     : ex_objc_sharedgroup_intro
+IGNORE     : []
+CATEGORIES:
+- DataAccessors:
+  METHODS:
+  - g_dyn_row_object_at_indexed_subscript:
+      NAME     : "objectAtIndexedSubscript:"
+      SUMMARY  : Returns an object at a specified column index.
+      DESCR    : >
+                 The method returns row data for the specified. This method also allows
+                 an <code>RLMRow</code> to use NSArray-styled subscripting.
+                 For example, <code>myRLMRow[2]</code> will return the object from index 2. 
+      SIGNATURE: "- (id)objectAtIndexedSubscript:(NSUInteger)columnIndex"
+      PARAMS:
+      - NAME   : column index
+        TYPES  : NSUInteger
+        DESCR  : The column number.
+      RETURN:
+        TYPES  : id (dependent on table descriptor and column number)
+        DESCR  : The object. 
+
+  - g_dyn_row_object_at_keyed_subscript:
+      NAME     : "objectForKeyedSubscript:"
+      SUMMARY  : Returns an object for a specified key.
+      DESCR    : >
+                 The method returns an object for a given <code>key</code>. This method also allows
+                 an <code>RLMRow</code> to use NSDictionary-styled subscripting. For example,
+                 <code>myRLMRow[@"fooColumn"]</code> will return an object holding the data in a column named <code>fooColumn</code>
+      SIGNATURE: "- (id)objectForKeyedSubscript:(NSString *)key"
+      PARAMS:
+      - NAME   : key
+        TYPES  : NSString *
+        DESCR  : The column to lookup.
+      RETURN:
+        TYPES  : id
+        DESCR  : The column data.
+
+

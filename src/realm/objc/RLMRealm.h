@@ -19,6 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import "RLMContext.h"
 
 @class RLMTable;
 
@@ -29,9 +30,20 @@
  */
 + (instancetype)realmWithDefaultPersistence;
 
++ (instancetype)realmWithDefaultPersistenceAndInitBlock:(RLMWriteBlock)initBlock;
+
 + (instancetype)realmWithPersistenceToFile:(NSString *)path;
 
 + (instancetype)realmWithPersistenceToFile:(NSString *)path
+                                 initBlock:(RLMWriteBlock)initBlock;
+
++ (instancetype)realmWithPersistenceToFile:(NSString *)path
+                                   runLoop:(NSRunLoop *)runLoop
+                        notificationCenter:(NSNotificationCenter *)notificationCenter
+                                     error:(NSError **)error;
+
++ (instancetype)realmWithPersistenceToFile:(NSString *)path
+                                 initBlock:(RLMWriteBlock)initBlock
                                    runLoop:(NSRunLoop *)runLoop
                         notificationCenter:(NSNotificationCenter *)notificationCenter
                                      error:(NSError **)error;
@@ -48,8 +60,10 @@
 /**
  * This method returns a table with the specified name from the realm.
  * Returns nil if no table with the specified name exists.
+ * Optionally specify object class to be used when accessing table rows
  */
 -(RLMTable *)tableWithName:(NSString *)name;
+-(RLMTable *)tableWithName:(NSString *)name objectClass:(Class)objClass;
 
 /**
  * This method returns a table with the specified name from the realm.
@@ -60,8 +74,10 @@
 /**
  * This method creates a table with the specific name.
  * If a table with that name already exists, an exception is thrown.
+ * Optionally specify object class to be used when accessing table rows
  */
 -(RLMTable *)createTableWithName:(NSString *)name;
+-(RLMTable *)createTableWithName:(NSString *)name objectClass:(Class)objClass;
 
 /**
  * This method creates a table with the specific name.

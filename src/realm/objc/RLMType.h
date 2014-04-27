@@ -22,6 +22,7 @@
 
 /* Make sure numbers match those in <tightdb/data_type.hpp> */
 typedef NS_ENUM(NSInteger, RLMType) {
+    RLMTypeNone =  -1,
     RLMTypeBool =  1,
     RLMTypeInt =  0,
     RLMTypeFloat =  9,

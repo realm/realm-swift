@@ -18,15 +18,15 @@
  *
  **************************************************************************/
 
-#import <realm/objc/RLMConstants.h>
-#import <realm/objc/RLMTable.h>
-#import <realm/objc/RLMView.h>
-#import <realm/objc/RLMQuery.h>
-#import <realm/objc/RLMRow.h>
-#import <realm/objc/RLMContext.h>
-#import <realm/objc/RLMRealm.h>
-#import <realm/objc/RLMVersion.h>
+#import "RLMRow.h"
 
-#import <realm/objc/PrivateHelperMacros.h>
-#import <realm/objc/PrivateTableMacros.h>
-#import <realm/objc/RLMPrivate.h>
+// proxy object which implements its own setters/getters, and forwards everything else to object
+@interface RLMProxy : RLMRow
+
+// base object
+@property (nonatomic) id object;
+
+// gets/creates a class to proxy for the given object class
++(Class)proxyClassForObjectClass:(Class)objectClass;
+
+@end

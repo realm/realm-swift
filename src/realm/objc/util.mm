@@ -29,6 +29,7 @@
 #import "RLMTable_noinst.h"
 #import "util_noinst.hpp"
 #import "NSData+RLMGetBinaryData.h"
+#import "RLMPrivate.h"
 
 using namespace tightdb;
 
@@ -101,7 +102,7 @@ NSObject* get_cell(size_t col_ndx, size_t row_ndx, Table& table)
             return d;
         }
         case type_Table: {
-            RLMTable *t = [[RLMTable alloc] init];
+            RLMTable *t = [[RLMTable alloc] _initRaw];
             TableRef table_ref = table.get_subtable(col_ndx, row_ndx);
             [t setNativeTable:table_ref.get()];
             return t;
@@ -139,7 +140,7 @@ NSObject* get_cell(size_t col_ndx, size_t row_ndx, Table& table)
                     return d;
                 }
                 case type_Table: {
-                    RLMTable *t = [[RLMTable alloc] init];
+                    RLMTable *t = [[RLMTable alloc] _initRaw];
                     TableRef table_ref = table.get_subtable(col_ndx, row_ndx);
                     [t setNativeTable:table_ref.get()];
                     return t;
@@ -452,23 +453,19 @@ void insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
     // FIXME: handling of tightdb exceptions => return NO
     size_t col_ndx = 0;
     while (obj = [enumerator nextObject]) {
-        subtable_seen = subtable_seen || insert_cell(col_ndx, row_ndx, table, obj);
+        subtable_seen |= insert_cell(col_ndx, row_ndx, table, obj);
         ++col_ndx;
     }
     table.insert_done();
 
     if (subtable_seen) {
-        NSEnumerator *enumerator = [data objectEnumerator];
-        size_t col_ndx = 0;
-        id obj;
-        while (obj = [enumerator nextObject]) {
+        for (unsigned int col_ndx = 0; col_ndx < data.count; col_ndx++) {
+            id obj = data[col_ndx];
             DataType datatype = table.get_column_type(col_ndx);
             if (datatype != type_Table && datatype != type_Mixed) {
-                ++col_ndx;
                 continue;
             }
             if (obj == nil) {
-                ++col_ndx;
                 continue;
             }
 

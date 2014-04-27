@@ -28,7 +28,7 @@
 #import "RLMConstants.h"
 #import "RLMTable_noinst.h"
 #import "RLMRealm_noinst.h"
-#import "PrivateRLM.h"
+#import "RLMPrivate.h"
 #import "util_noinst.hpp"
 
 using namespace std;
@@ -147,27 +147,53 @@ void throw_objc_exception(exception &ex)
 
 + (instancetype)realmWithDefaultPersistence
 {
-    return [RLMRealm realmWithPersistenceToFile:[RLMContext defaultPath]];
+    return [RLMRealm realmWithDefaultPersistenceAndInitBlock:nil];
+}
+
++ (instancetype)realmWithDefaultPersistenceAndInitBlock:(RLMWriteBlock)initBlock
+{
+    return [RLMRealm realmWithPersistenceToFile:[RLMContext defaultPath] initBlock:initBlock];
 }
 
 + (instancetype)realmWithPersistenceToFile:(NSString *)path
+{
+    return [self realmWithPersistenceToFile:path initBlock:nil];
+}
+
++ (instancetype)realmWithPersistenceToFile:(NSString *)path initBlock:(RLMWriteBlock)initBlock
 {
     // This constructor can only be called from the main thread
     if (![NSThread isMainThread]) {
         @throw [NSException exceptionWithName:@"realm:runloop_exception"
                                        reason:[NSString stringWithFormat:@"%@ \
-                                               can only be called from the main thread",
+                                               can only be called from the main thread. \
+                                               Use an RLMContext read or write block \
+                                               instead.",
                                                NSStringFromSelector(_cmd)]
                                      userInfo:nil];
     }
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     return [self realmWithPersistenceToFile:path
+                                  initBlock:initBlock
                                     runLoop:[NSRunLoop mainRunLoop]
                          notificationCenter:notificationCenter
                                       error:nil];
 }
 
 + (instancetype)realmWithPersistenceToFile:(NSString *)path
+                                   runLoop:(NSRunLoop *)runLoop
+                        notificationCenter:(NSNotificationCenter *)notificationCenter
+                                     error:(NSError **)error
+{
+    return [self realmWithPersistenceToFile:path
+                                  initBlock:nil
+                                    runLoop:runLoop
+                         notificationCenter:notificationCenter
+                                      error:error];
+}
+
++ (instancetype)realmWithPersistenceToFile:(NSString *)path
+                                 initBlock:(RLMWriteBlock)initBlock
                                    runLoop:(NSRunLoop *)runLoop
                         notificationCenter:(NSNotificationCenter *)notificationCenter
                                      error:(NSError **)error
@@ -205,6 +231,41 @@ void throw_objc_exception(exception &ex)
             *error = make_realm_error(errorCode, errorMessage);
         }
         return nil;
+    }
+    
+    // Run init block before creating realm
+    if (initBlock) {
+        realm->m_read_only = NO;
+        try {
+            realm->_group = (tightdb::Group *)&realm->_sharedGroup->begin_write();
+        }
+        catch (std::exception& ex) {
+            // File access errors are treated as exceptions here since they should not occur after the shared
+            // group has already been successfully opened on the file and memory mapped. The shared group constructor handles
+            // the excepted error related to file access.
+            @throw [NSException exceptionWithName:@"realm:core_exception"
+                                           reason:[NSString stringWithUTF8String:ex.what()]
+                                         userInfo:nil];
+        }
+        
+        @try {
+            initBlock(realm);
+        }
+        @catch (NSException* exception) {
+            realm->_sharedGroup->rollback();
+            @throw;
+        }
+        
+        // Required to avoid leaking of core exceptions.
+        try {
+            realm->_sharedGroup->commit();
+        }
+        catch (std::exception& ex) {
+            @throw [NSException exceptionWithName:@"realm:core_exception"
+                                           reason:[NSString stringWithUTF8String:ex.what()]
+                                         userInfo:nil];
+        }
+        realm->m_read_only = YES;
     }
 
     // Register an interval timer on specified runLoop
@@ -312,6 +373,15 @@ void throw_objc_exception(exception &ex)
     return table;
 }
 
+- (RLMTable *)tableWithName:(NSString *)name objectClass:(Class)objClass {
+    RLMTable * table = [self tableWithName:name];
+    
+    // set object class and update table columns
+    table.objectClass = objClass;
+    
+    return table;
+}
+
 - (void)tableRefDidDie
 {
     _tableRefsHaveDied = YES;
@@ -400,6 +470,15 @@ void throw_objc_exception(exception &ex)
                                            )
     [table setParent:self];
     [table setReadOnly:m_read_only];
+    return table;
+}
+
+- (RLMTable *)createTableWithName:(NSString *)name objectClass:(Class)objClass {
+    RLMTable * table = [self createTableWithName:name];
+    
+    // set object class and update table columns
+    table.objectClass = objClass;
+    
     return table;
 }
 
