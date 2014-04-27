@@ -446,7 +446,7 @@ REALM_TABLE_9(TestQueryAllTypes,
     }];
 }
 
-- (void)testPredicateQueries {
+- (void)testDatePredicates {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         [table addColumnWithName:@"date" type:RLMTypeDate];
         NSArray *dates = @[[NSDate dateWithTimeIntervalSince1970:0],
@@ -457,7 +457,7 @@ REALM_TABLE_9(TestQueryAllTypes,
             [table addRow:@[date]];
         }
         
-        NSDate *date = [NSDate dateWithTimeIntervalSince1970:1];
+        NSDate *date = dates[1];
         
         {
             // Lesser than
@@ -528,6 +528,138 @@ REALM_TABLE_9(TestQueryAllTypes,
             [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
                 XCTAssertEqualObjects(obj, view[idx][@"date"], @"not equal predicate should return correct results");
             }];
+        }
+    }];
+}
+
+- (void)testStringPredicates {
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"string" type:RLMTypeString];
+        NSArray *strings = @[@"a",
+                             @"ab",
+                             @"abc",
+                             @"abcd"];
+        for (NSString *string in strings) {
+            [table addRow:@[string]];
+        }
+        
+        ////////////////
+        // Equal
+        ////////////////
+        
+        {
+            // Equal
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"string == %@", @"a"];
+            RLMView *view = [table where:predicate];
+            NSArray *results = [strings subarrayWithRange:NSMakeRange(0, 1)];
+            XCTAssertEqual(view.rowCount, results.count, @"equal predicate should return correct count");
+            [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XCTAssertEqualObjects(obj, view[idx][@"string"], @"equal predicate should return correct results");
+            }];
+        }
+        {
+            // Equal (fail)
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"string == %@", @"A"];
+            RLMView *view = [table where:predicate];
+            NSArray *results = @[];
+            XCTAssertEqual(view.rowCount, results.count, @"equal fail predicate should return correct count");
+        }
+        
+        ////////////////
+        // Not Equal
+        ////////////////
+        
+        {
+            // Not Equal
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"string != %@", @"a"];
+            RLMView *view = [table where:predicate];
+            NSArray *results = [strings subarrayWithRange:NSMakeRange(1, 3)];
+            XCTAssertEqual(view.rowCount, results.count, @"not equal predicate should return correct count");
+            [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XCTAssertEqualObjects(obj, view[idx][@"string"], @"equal predicate should return correct results");
+            }];
+        }
+        
+        ////////////////
+        // Begins With
+        ////////////////
+        
+        {
+            // Begins With
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"string beginswith %@", @"ab"];
+            RLMView *view = [table where:predicate];
+            NSArray *results = [strings subarrayWithRange:NSMakeRange(1, 3)];
+            XCTAssertEqual(view.rowCount, results.count, @"beginswith predicate should return correct count");
+            [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XCTAssertEqualObjects(obj, view[idx][@"string"], @"beginswith predicate should return correct results");
+            }];
+        }
+        {
+            // Begins With (fail)
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"string beginswith %@", @"A"];
+            RLMView *view = [table where:predicate];
+            NSArray *results = @[];
+            XCTAssertEqual(view.rowCount, results.count, @"beginswith fail predicate should return correct count");
+            [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XCTAssertEqualObjects(obj, view[idx][@"string"], @"beginswith fail predicate should return correct results");
+            }];
+        }
+        
+        ////////////////
+        // Contains
+        ////////////////
+        
+        {
+            // Contains
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"string contains %@", @"bc"];
+            RLMView *view = [table where:predicate];
+            NSArray *results = [strings subarrayWithRange:NSMakeRange(2, 2)];
+            XCTAssertEqual(view.rowCount, results.count, @"contains predicate should return correct count");
+            [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XCTAssertEqualObjects(obj, view[idx][@"string"], @"contains predicate should return correct results");
+            }];
+        }
+        
+        ////////////////
+        // Ends With
+        ////////////////
+        
+        {
+            // Ends With
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"string endswith %@", @"cd"];
+            RLMView *view = [table where:predicate];
+            NSArray *results = @[strings.lastObject];
+            XCTAssertEqual(view.rowCount, results.count, @"endswith predicate should return correct count");
+            [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XCTAssertEqualObjects(obj, view[idx][@"string"], @"endswith predicate should return correct results");
+            }];
+        }
+        
+        ////////////////////////////////
+        // NSComparisonPredicateOptions
+        ////////////////////////////////
+        {
+            // NSCaseInsensitivePredicateOption
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"string CONTAINS[c] %@", @"C"];
+            RLMView *view = [table where:predicate];
+            NSArray *results = [strings subarrayWithRange:NSMakeRange(2, 2)];
+            XCTAssertEqual(view.rowCount, results.count, @"NSCaseInsensitivePredicateOption predicate should return correct count");
+            [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+                XCTAssertEqualObjects(obj, view[idx][@"string"], @"NSCaseInsensitivePredicateOption predicate should return correct results");
+            }];
+        }
+        
+    // FIXME: Support NSDiacriticInsensitivePredicateOption
+        {
+            // NSDiacriticInsensitivePredicateOption
+//            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"string CONTAINS[d] %@", @"à"];
+//            XCTAssertThrows([table where:predicate], @"String predicate with diacritic insensitive option should throw");
+//            RLMView *view = [table where:predicate];
+//            NSArray *results = [strings subarrayWithRange:NSMakeRange(0, 1)];
+//            XCTAssertEqual(view.rowCount, results.count, @"NSDiacriticInsensitivePredicateOption predicate should return correct count");
+//            [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+//                XCTAssertEqualObjects(obj, view[idx][@"string"], @"NSDiacriticInsensitivePredicateOption predicate should return correct results");
+//            }];
         }
     }];
 }
