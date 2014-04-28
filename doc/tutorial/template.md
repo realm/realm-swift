@@ -6,7 +6,7 @@ Building an iOS app with Realm couldn't be simpler. This article will cover the 
 
 ** Main Classes
 
-<code>RLMRealm</code>, <code>RLMTable</code> and <code>RLMTransactionManager</code> are the main classes you'll encounter while working with Realm.
+<code>RLMContext</code>, <code>RLMRealm</code> and <code>RLMTable</code> are the main classes you'll encounter while working with Realm.
 
 ** Defining a Data Model
 
@@ -16,29 +16,27 @@ Realm data models fully embrace Objective-C and are defined using traditional <c
 
 See <a href="#">Building a Data Model</a> for more advanced usage examples.
 
-** RLMRealm
+** Context
 
-The <code>RLMRealm</code> class is the main way to interact with a realm. It's how tables are created and extracted:
-
-@@example setup_realm @@
-
-Realms are read-only and can only be created on the main thread, unless created through a transaction manager.
-
-See the <code>RLMRealm</code> <a href="#">documentation</a> for more details.
-
-** Transaction Manager
-
-The <code>RLMTransactionManager</code> class is responsible for all write transactions:
+The <code>RLMContext</code> class is responsible for all write transactions:
 
 @@example add_row @@
 
-as well as all read transactions performed outside the main thread:
+and read transactions:
 
 @@example bg_read @@
 
-These transactions are run on the current thread. As the previous example demonstrates, <code>RLMTable</code>s support fast enumeration.
+The context provides a realm on which to perform operations. These transactions are run on the current thread. As the previous example demonstrates, <code>RLMTable</code>s support fast enumeration.
 
-See the <code>RLMTransactionManager</code> <a href="#">documentation</a> for more details.
+See the <code>RLMContext</code> <a href="#">documentation</a> for more details.
+
+** RLMRealm
+
+The <code>RLMRealm</code> class is the main way to interact with a realm. It's how tables are created and extracted. When creating a read-only realm on the main thread, the context becomes optional and transactions are then performed implicitly at run loop intervals. This greatly simplifies usage when reading to display information in the UI, for example.
+
+@@example setup_realm @@
+
+See the <code>RLMRealm</code> <a href="#">documentation</a> for more details.
 
 ** Listening to Changes
 
