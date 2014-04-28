@@ -574,7 +574,7 @@ REALM_TABLE_9(TestQueryAllTypes,
                        name:@"endswith"
                      column:@"string"];
         
-        // NSComparisonPredicateOptions
+        // NSCaseInsensitivePredicateOption
         [self testPredicate:[NSPredicate predicateWithFormat:@"string contains[c] %@", @"C"]
                     onTable:table
                 withResults:[strings subarrayWithRange:NSMakeRange(2, 2)]
