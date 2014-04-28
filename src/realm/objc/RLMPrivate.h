@@ -25,10 +25,10 @@
 
 
 
-/**
- * The selectors in this interface is not meant to be used directly.
- * However, they are public so that the typed table macros can use them.
- */
+//
+// The selectors in this interface is not meant to be used directly.
+// However, they are public so that the typed table macros can use them.
+//
 
 // private extensions
 @interface RLMTable ()
@@ -101,10 +101,10 @@
 
 @end
 
-/**
- * The selectors in this interface is not meant to be used directly.
- * However, they are public so that the typed table macros can use them.
- */
+//
+// The selectors in this interface is not meant to be used directly.
+// However, they are public so that the typed table macros can use them.
+//
 @interface RLMView (Private)
 -(id)_initWithQuery:(RLMQuery *)query;
 
@@ -120,23 +120,23 @@
 -(id)RLM_mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 @end
 
-/**
- * The selectors in this interface is not meant to be used directly.
- * However, they are public so that the typed table macros can use them.
- */
+//
+// The selectors in this interface is not meant to be used directly.
+// However, they are public so that the typed table macros can use them.
+//
 @interface RLMRow (Private)
 -(id)initWithTable:(RLMTable *)table ndx:(NSUInteger)ndx;
 -(void)RLM_setNdx:(NSUInteger)ndx;
 -(NSUInteger)RLM_index;
 @end
 
-/**
- * The selectors in this interface is not meant to be used directly.
- * However, they are publicly available so that the typed table macros can use them.
- */
+//
+// The selectors in this interface is not meant to be used directly.
+// However, they are public so that the typed table macros can use them.
+//
 @interface RLMContext (Experiment)
 
-/******** Experimental features **********/
+//========== Experimental features ==========/
 -(BOOL)pinReadTransactions;
 -(void)unpinReadTransactions;
 
