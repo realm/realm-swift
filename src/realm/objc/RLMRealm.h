@@ -46,10 +46,10 @@
  *
  *  This method also uses the main run loop, as well as the default notification center.
  *
- *  @warning See RLMContext to instantiate RLMRealms for writes
+ *  @warning See RLMContext to instantiate RLMRealms for writes.
  *  or to instantiate an RLMRealm for reads outside the Main (UI) thread of your app.
  *
- *  @return an RLMRealm instance
+ *  @return An RLMRealm instance.
  */
 + (instancetype)realmWithDefaultPersistence;
 
@@ -59,18 +59,18 @@
  *  The init block is useful if you want to set up some RLMTable when opening your RLMRealm,
  *  for example inside an App Delegate.
  *
- *  @param initBlock A block used to initialize the RLMRealm
+ *  @param initBlock A block used to initialize the RLMRealm.
  *
- *  @return An RLMRealm instance
+ *  @return An RLMRealm instance.
  */
 + (instancetype)realmWithDefaultPersistenceAndInitBlock:(RLMWriteBlock)initBlock;
 
 /**
  *  Instantiates an RLMRealm with persistence to a specific File.
  *
- *  @param path Path to the file you want the data saved in
+ *  @param path Path to the file you want the data saved in.
  *
- *  @return An RLMRealm instance
+ *  @return An RLMRealm instance.
  */
 + (instancetype)realmWithPersistenceToFile:(NSString *)path;
 
@@ -80,10 +80,10 @@
  *  The init block is useful if you want to set up some RLMTable when opening your RLMRealm,
  *  for example inside an App Delegate.
  *
- *  @param path      Path to the file you want the data saved in
- *  @param initBlock A block used to initialize the RLMRealm
+ *  @param path      Path to the file you want the data saved in.
+ *  @param initBlock A block used to initialize the RLMRealm.
  *
- *  @return An RLMRealm instance
+ *  @return An RLMRealm instance.
  */
 + (instancetype)realmWithPersistenceToFile:(NSString *)path
                                  initBlock:(RLMWriteBlock)initBlock;
@@ -91,12 +91,12 @@
  *  Instantiates an RLMRealm with a specific Run Loop and a specific Notification Center,
  *  with persistence to a specific file.
  *
- *  @param path               Path to the file you want the data saved in
- *  @param runLoop            Reference to the Run Loop you want to use
- *  @param notificationCenter Reference to the Notification Center you want to use
- *  @param error              Pass-by-reference for errors
+ *  @param path               Path to the file you want the data saved in.
+ *  @param runLoop            Reference to the Run Loop you want to use.
+ *  @param notificationCenter Reference to the Notification Center you want to use.
+ *  @param error              Pass-by-reference for errors.
  *
- *  @return An RLMRealm instance
+ *  @return An RLMRealm instance.
  */
 + (instancetype)realmWithPersistenceToFile:(NSString *)path
                                    runLoop:(NSRunLoop *)runLoop
@@ -109,13 +109,13 @@
  *  The init block is useful if you want to set up some RLMTable when opening your RLMRealm,
  *  for example inside an App Delegate.
  *
- *  @param path               Path to the file you want the data saved in
- *  @param initBlock          A block used to initialize the RLMRealm
- *  @param runLoop            Reference to the Run Loop you want to use
- *  @param notificationCenter Reference to the Notification Center you want to use
- *  @param error              Pass-by-reference for errors
+ *  @param path               Path to the file you want the data saved in.
+ *  @param initBlock          A block used to initialize the RLMRealm.
+ *  @param runLoop            Reference to the Run Loop you want to use.
+ *  @param notificationCenter Reference to the Notification Center you want to use.
+ *  @param error              Pass-by-reference for errors.
  *
- *  @return An RLMRealm instance
+ *  @return An RLMRealm instance.
  */
 + (instancetype)realmWithPersistenceToFile:(NSString *)path
                                  initBlock:(RLMWriteBlock)initBlock
@@ -130,10 +130,10 @@
  */
 /** Creates an RLMTable with the specified name for the specified object class.
  *
- *  @param name     Name of the RLMTable to create
- *  @param objClass Class of the objects stored in this RLMTable
+ *  @param name     Name of the RLMTable to create.
+ *  @param objClass Class of the objects stored in this RLMTable.
  *
- *  @return A Reference to the RLMTable that was created
+ *  @return A Reference to the RLMTable that was created.
  */
 -(RLMTable *)createTableWithName:(NSString *)name objectClass:(Class)objClass;
 
@@ -150,13 +150,15 @@
  *  The number of tables in this RLMRealm.
  */
 @property (nonatomic, readonly) NSUInteger tableCount;
+
 /**
  *  Returns YES if the RLMRealm contains no RLMTable; NO if it has at least one.
  */
-@property (nonatomic, readonly) BOOL       isEmpty;
+@property (nonatomic, readonly) BOOL isEmpty;
+
 /** Checks for the existence of an RLMTable within the RLMRealm.
  *
- *  @param name The name of the RLMTable
+ *  @param name The name of the RLMTable.
  *
  *  @return YES if an RLMTable with the specified name already exists. NO if it does not exist.
  */
@@ -166,10 +168,10 @@
  *
  *  It will use the specified object class when accessing rows.
  *
- *  @param name The name of the RLMTable you want to access in this RLMRealm
- *  @param objClass The class you want to use when accessing the RLMTable
+ *  @param name The name of the RLMTable you want to access in this RLMRealm.
+ *  @param objClass The class you want to use when accessing the RLMTable.
  *
- *  @return A reference to the RLMTable by that name; or nil if no RLMTable by that name exists in the RLMRealm
+ *  @return A reference to the RLMTable by that name; or nil if no RLMTable by that name exists in the RLMRealm.
  *
  */
 -(RLMTable *)tableWithName:(NSString *)name objectClass:(Class)objClass;
