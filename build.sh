@@ -616,6 +616,12 @@ EOF
                     --create-html \
                     --no-create-docset \
                     --no-repeat-first-par \
+                    --ignore src/realm/objc/PrivateTableMacros.h \
+                    --ignore src/realm/objc/RLMColumnProxy.h \
+                    --ignore src/realm/objc/RLMProxy.h \
+                    --ignore src/realm/objc/RLMQuery.h \
+                    --ignore src/realm/objc/RLMType.h \
+                    --ignore src/realm/objc/RLMVersion.h \
                     src/realm/objc/ || exit 1
         echo "Done generating docs under docs/appledocs"
         exit 0
