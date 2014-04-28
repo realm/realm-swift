@@ -125,6 +125,7 @@ CATEGORIES:
       RETURN:
         TYPES  : BOOL
         DESCR  : <code>YES</code> if there are no tables in the realm, otherwise <code>NO</code>.
+
   - g_group_has_table:
       NAME     : "hasTableWithName:"
       SUMMARY  : Checks if the realm has a table with the specified name
@@ -143,8 +144,10 @@ CATEGORIES:
       EXAMPLES :
       - DESCR  :
         CODE   : ex_objc_group_optional_table
+
   - g_group_get_table:
       IGNORE   : ""
+
   - g_group_get_table_if_exists:
       NAMES    : "tableWithName:"
       SUMMARY  : *g_group_get_table_summary
@@ -169,11 +172,13 @@ CATEGORIES:
       -  DESCR :
          CODE  : ex_objc_group_optional_table
       SEE      : "{@link g_group_has_table}"
+
   - g_group_create_table:
       NAMES    : "createTableWithName:"
       SUMMARY  : Create table in realm.
-      DESCR    : "Create table with the specified name in realm. If a table already exists, an exception is thrown."
-                 "Optionally specify object class to be used when accessing table rows"
+      DESCR    : Create table with the specified name in realm.
+                 If a table already exists, an exception is thrown.
+                 Optionally specify object class to be used when accessing table rows.
       SIGNATURE: |
                  "- (RLMTable *)createTableWithName:(NSString *)name"
                  "- (id)createTableWithName:(NSString *)name asTableClass:(Class)obj"
