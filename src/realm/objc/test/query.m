@@ -9,18 +9,18 @@
 #import <realm/objc/RLMQueryFast.h>
 
 REALM_TABLE_1(TestQuerySub,
-                Age,  Int)
+              Age,  Int)
 
 REALM_TABLE_9(TestQueryAllTypes,
-                BoolCol,   Bool,
-                IntCol,    Int,
-                FloatCol,  Float,
-                DoubleCol, Double,
-                StringCol, String,
-                BinaryCol, Binary,
-                DateCol,   Date,
-                TableCol,  TestQuerySub,
-                MixedCol,  Mixed)
+              BoolCol,   Bool,
+              IntCol,    Int,
+              FloatCol,  Float,
+              DoubleCol, Double,
+              StringCol, String,
+              BinaryCol, Binary,
+              DateCol,   Date,
+              TableCol,  TestQuerySub,
+              MixedCol,  Mixed)
 
 @interface MACtestQuery: RLMTestCase
 @end
@@ -136,14 +136,14 @@ REALM_TABLE_9(TestQueryAllTypes,
 //    [[[table where].MixedCol columnIsNotEqualTo:mixInt1].BoolCol columnIsEqualTo:NO];
 }
 
-#define BOOL_COL 0
-#define INT_COL 1
-#define FLOAT_COL 2
+#define BOOL_COL   0
+#define INT_COL    1
+#define FLOAT_COL  2
 #define DOUBLE_COL 3
 #define STRING_COL 4
 #define BINARY_COL 5
-#define DATE_COL 6
-#define MIXED_COL 7
+#define DATE_COL   6
+#define MIXED_COL  7
 
 - (void) testDynamic
 {
@@ -606,6 +606,7 @@ REALM_TABLE_9(TestQueryAllTypes,
         XCTAssertEqualObjects(obj,
                               view[idx][column],
                               @"%@ predicate should return correct results", name);
+        *stop = NO; // Parameter must be used
     }];
 }
 
