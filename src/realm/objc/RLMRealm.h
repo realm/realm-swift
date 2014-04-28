@@ -1,8 +1,10 @@
+////////////////////////////////////////////////////////////////////////////
 //
 // TIGHTDB CONFIDENTIAL
+// __________________
 //
-// [2011] - [2014] TightDB Inc
-// All Rights Reserved.
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
 //
 // NOTICE:  All information contained herein is, and remains
 // the property of TightDB Incorporated and its suppliers,
@@ -13,6 +15,8 @@
 // Dissemination of this information or reproduction of this material
 // is strictly forbidden unless prior written permission is obtained
 // from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
 #import "RLMContext.h"
