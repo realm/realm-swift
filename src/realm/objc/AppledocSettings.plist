@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>--company-id</key>
+	<string>io.realm</string>
+	<key>--project-company</key>
+	<string>Realm</string>
+	<key>--project-name</key>
+	<string>Realm</string>
+	<key>--repeat-first-par</key>
+	<false/>
+	<key>--templates</key>
+	<string>~/.appledoc</string>
+	<key>--ignore</key>
+	<array>
+		<string>test</string>
+		<string>PrivateHelperMacros.h</string>
+	</array>
+	<key>--docset-install-path</key>
+	<string>.</string>
+	<key>--output</key>
+	<string>.</string>
+</dict>
+</plist>
