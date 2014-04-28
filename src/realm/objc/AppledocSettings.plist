@@ -15,7 +15,7 @@
 	<key>--ignore</key>
 	<array>
 		<string>test</string>
-		<string>TableName</string>
+		<string>PrivateHelperMacros.h</string>
 	</array>
 	<key>--docset-install-path</key>
 	<string>.</string>
