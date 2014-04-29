@@ -23,16 +23,62 @@
 #import "RLMType.h"
 #import "RLMTable.h"
 
+/**
+ [where: queries](RLMTable.html#//api/name/where:) on an RLMTable return RLMView objects.
+ They work as virtual tables containing just the matched rows. You can interact with an RLMView just like a regular RLMtable.
+ 
+  You can use indexed subscripting to access your data:
+    
+    myView[2] // will return the second match in your query
+    myView[2] = someObject; // will update the second match of your query (and be reflected in the underlying table)
+ 
+ It is possible to create two or more RLMViews for same RLMTable.
+ 
+ @warning Note that keyed subscripting (`myView[@"foo"]`) does _not_ work on RLMView; it only works on RLMTable.
+ 
+ @warning An RLMView is implicitely linked to a RLMTable. All changes to the view will propagate to the original (or source) table.
+ This includes operations like updating values and deleting rows.
+ **This is NOT true in the other direction**:
+ Any change that adds or removes rows in the original table will not be automatically updated in an active RLMView.
+ 
+ */
 
 @interface RLMView : NSObject <RLMView, NSFastEnumeration>
 
+/**---------------------------------------------------------------------------------------
+ *  @name Accessing Objects inside a View
+ *  ---------------------------------------------------------------------------------------
+ */
+/**
+ The number of rows in the view (e.g. the number of results to your query)
+ */
 @property (nonatomic, readonly) NSUInteger rowCount;
-@property (nonatomic, readonly) NSUInteger columnCount;
+/**
+ The name of the RLMTable backing this RLMView
+ */
 @property (nonatomic, readonly) RLMTable *originTable;
+@property (nonatomic, readonly) NSUInteger columnCount;
 
 -(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
+/**
+ Returns the object at the index specified.
+ 
+ @param rowIndex The index to look up.
+ 
+ @return An object (of the same type as the RLMRow subclass used on the underlying RLMTable).
+ */
 -(RLMRow *)rowAtIndex:(NSUInteger)rowIndex;
+/**
+ Returns the object at the top of the RLMView.
+ 
+ @return An object (of the same type as the RLMRow subclass used on the underlying RLMTable).
+ */
 -(RLMRow *)lastRow;
+/**
+ Returns the object at the bottom of the RLMView.
+ 
+ @return An object (of the same type as the RLMRow subclass used on the underlying RLMTable).
+ */
 -(RLMRow *)firstRow;
 
 -(RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
@@ -40,10 +86,23 @@
 -(void) sortUsingColumnWithIndex: (NSUInteger)colIndex;
 -(void) sortUsingColumnWithIndex: (NSUInteger)colIndex inOrder: (RLMSortOrder)order;
 
+/**
+ Deletes the object at the position specified.
+ 
+ @warning This will be reflected in the underlying RLMTable!
+ 
+ @param rowIndex <#rowIndex description#>
+ */
 -(void)removeRowAtIndex:(NSUInteger)rowIndex;
+/**
+ Deletes all objects from the RLMView.
+ 
+ @warning This will be reflected in the underlying RLMTable!
+ */
 -(void)removeAllRows;
 
 -(NSUInteger)rowIndexInOriginTableForRowAtIndex:(NSUInteger)rowIndex;
+
 
 -(RLMQuery *)where;
 

@@ -38,7 +38,7 @@
  
  **If your first property on your RLMRow subclass is a _string_**, you can also use keyed subscripting:
  
-    myTable[@"foo"] // will return the first object whose first property matches “foo”
+    myTable[@"foo"] // will return the first object whose first property is equal to “foo”
     myTable[@"foo"] = someObject;
  
  To query, you can use NSPredicates and an optional NSSortDescriptor
@@ -85,16 +85,13 @@
 -(RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
 /**---------------------------------------------------------------------------------------
- *  @name Accessing Rows inside a Table
- *  ---------------------------------------------------------------------------------------/Users/ta/Code/tightdb_objc/src/realm/objc/test/query.m
+ *  @name Accessing Objects inside a Table
+ *  ---------------------------------------------------------------------------------------
  */
 /**
- Number of rows in this RLMTable.
+ Number of objects in this RLMTable.
  */
 @property (nonatomic, readonly) NSUInteger rowCount;
-/**
- Number of columns in this RLMTable.
- */
 @property (nonatomic, readonly) NSUInteger columnCount;
 /**
  Returns the object at the index specified.
