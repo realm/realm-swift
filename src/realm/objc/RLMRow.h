@@ -24,6 +24,53 @@
 @class RLMTable;
 
 
+/**
+ 
+ The sole purpose of RLMRow class is to be subclassed to store your own objects.
+ 
+ You can create model files easily using the following syntax:
+ 
+    // In DogModel.h
+ 
+    @interface DogModel : RLMRow
+    
+    @property (nonatomic, copy)   NSString *name;
+    @property (nonatomic, strong) NSDate   *birthdate;
+    @property                     BOOL     *adopted;
+    
+    @end
+ 
+    @implementaion DogModel
+    @end //none needed
+ 
+ All complex properties must be `nonatomic`. Supported types are:
+ 
+   - `NSString`
+   - `NSNumber`, `int`, `float`, `double` and `long`
+   - `BOOL` or `bool`
+   - `NSDate`
+   - `NSData`
+ 
+ Additionally, you can store subtables with the following syntax:
+ 
+    // In PersonModel.m
+ 
+    // Assuming the DogModel above has already been created,
+    // create a Table reference for that model
+    RLM_TABLE_TYPE_FOR_OBJECT_TYPE(DogModel, DogTable)
+ 
+    @interface PersonModel : RLMRow
+    @property (nonatomic, copy)   NSString *name;
+    @property                     DogTable *dogs;
+    @end
+    
+ You can access subtable properties the same way you do regular properties:
+ 
+    personTable[2].dogs[0]; //returns the first dog of the third person
+    personTable[2].dogs[0].name;
+ 
+ */
+
 // protocol for custom table objects
 @protocol RLMObject <NSObject>
 @required
