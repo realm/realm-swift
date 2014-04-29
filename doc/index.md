@@ -1,3 +1,5 @@
+<img src="docs/realm.png"/>
+
 Realm is a fast embedded database that integrates transparently into Objective-C. It provides the full benefits of a database, but with a much lower memory footprint and higher performance than native data structures.
 
 
