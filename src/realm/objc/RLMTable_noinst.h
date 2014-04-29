@@ -35,10 +35,10 @@
 -(void)setReadOnly:(BOOL)read_only;
 -(BOOL)isReadOnly;
 
-/// Also returns NO if memory allocation fails.
+// Also returns NO if memory allocation fails.
 -(BOOL)_checkType;
 
-/// Returns NO if memory allocation fails.
+// Returns NO if memory allocation fails.
 -(BOOL)_addColumns;
 
 

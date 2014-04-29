@@ -622,6 +622,7 @@ EOF
                     --ignore src/realm/objc/RLMQuery.h \
                     --ignore src/realm/objc/RLMType.h \
                     --ignore src/realm/objc/RLMVersion.h \
+                    --ignore src/realm/objc/RLMDescriptor.h \
                     --ignore src/realm/objc/test/* \
                     src/realm/objc/ || exit 1
         echo "Done generating docs under docs/appledocs"

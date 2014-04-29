@@ -24,7 +24,7 @@
 /**
  
  RLMRealms are the central structure of the Realm library.
- An RLMRealm contains RLMTable, which in turn contains RLMRow.
+ An RLMRealm contains RLMTable, which in turn contains your objects (RLMRow subclasses).
  
   We recommend you store a reference to your RLMRealm on your ViewController for easy access. For example:
  
@@ -38,8 +38,10 @@
         }
     }];
  
- @warning RLMRealms can only be instantiated directly for reads from the Main (UI) thread of your iOS applications.
- From any other thread or for any writes, you must use an RLMContext to instantiate an RLMRealm.
+ **RLMRealms can only be instantiated directly for reads from the Main (UI) thread of your iOS applications.
+ From any other thread or for any writes, you must use an RLMContext to instantiate an RLMRealm.**
+ This is so that the Realm library can perform any necessary locks (in the case of writes), or bring the RLMRealm
+ up to date with the event loop for transactionless reads on the Main thread.
  
  */
 
@@ -58,8 +60,7 @@
  
  This method also uses the main run loop, as well as the default notification center.
 
- @warning See RLMContext to instantiate RLMRealms for writes.
- or to instantiate an RLMRealm for reads outside the Main (UI) thread of your app.
+ @warning Can only be used on the Main (UI) Thread. See RLMContext to instantiate RLMRealms on other threads.
  
  @return An RLMRealm instance.
  */
@@ -78,6 +79,8 @@
         }
     }];
  
+ @bug Can only be used on the Main (UI) Thread. See RLMContext to instantiate RLMRealms on other threads.
+ 
  @param initBlock A block used to initialize the RLMRealm.
  
  @return An RLMRealm instance.
@@ -87,6 +90,8 @@
 /**
  Instantiates an RLMRealm with persistence to a specific File.
  
+ @bug Can only be used on the Main (UI) Thread. See RLMContext to instantiate RLMRealms on other threads.
+ 
  @param path Path to the file you want the data saved in.
  
  @return An RLMRealm instance.
@@ -95,6 +100,8 @@
 
 /**
  Instantiates an RLMRealm with a manual init block, with persistence to a specific file.
+
+ @bug Can only be used on the Main (UI) Thread. See RLMContext to instantiate RLMRealms on other threads.
  
  @param path      Path to the file you want the data saved in.
  @param initBlock A block used to initialize the RLMRealm.
@@ -106,7 +113,9 @@
 /**
  Instantiates an RLMRealm with a specific Run Loop and a specific Notification Center,
  with persistence to a specific file.
-  
+ 
+ @bug Can only be used on the Main (UI) Thread. See RLMContext to instantiate RLMRealms on other threads.
+ 
  @param path               Path to the file you want the data saved in.
  @param runLoop            Reference to the Run Loop you want to use.
  @param notificationCenter Reference to the Notification Center you want to use.
@@ -124,6 +133,8 @@
 
  The init block is useful if you want to set up some RLMTable when opening your RLMRealm,
  for example inside an App Delegate.
+ 
+ @bug Can only be used on the Main (UI) Thread. See RLMContext to instantiate RLMRealms on other threads.
  
  @param path               Path to the file you want the data saved in.
  @param initBlock          A block used to initialize the RLMRealm.
