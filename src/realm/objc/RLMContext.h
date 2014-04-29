@@ -32,8 +32,8 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
  
  RLMContexts are used to perform read and write transactions on an RLMRealm.
  
- While an RLMRealm can be access directly on the Main UI Thread to read without transaction, an RLMContext
- must be used on any other threads, and to perform any writes (including writes from the Main thread).
+ **While an RLMRealm can be access directly on the Main UI Thread to read without transaction, an RLMContext
+ must be used on any other threads, and to perform any writes (including writes from the Main thread).**
  This is so that the Realm library can perform any necessary locks (in the case of writes), or bring the RLMRealm
  up to date with the event loop for transactionless reads on the Main thread.
  
