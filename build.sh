@@ -612,6 +612,7 @@ EOF
         appledoc    --project-name Realm \
                     --project-company "Realm" \
                     --index-desc doc/index.md \
+                    --include doc/realm.png \
                     --output doc/appledocs \
                     -v `sh build.sh get-version` \
                     --create-html \
