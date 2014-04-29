@@ -32,7 +32,7 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
  
  RLMContexts are used to perform read and write transactions on an RLMRealm.
  
- **While an RLMRealm can be access directly on the Main UI Thread to read without transaction, an RLMContext
+ **While an RLMRealm can be accessed directly on the Main UI Thread to read without transactions, an RLMContext
  must be used on any other threads, and to perform any writes (including writes from the Main thread).**
  This is so that the Realm library can perform any necessary locks (in the case of writes), or bring the RLMRealm
  up to date with the event loop for transactionless reads on the Main thread.
@@ -53,14 +53,6 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
 @interface RLMContext : NSObject
 
 +(NSString *) defaultPath;
-
-/**
- Checks if the underlying RLMRealm has received any writes since the last time you
- used this RLMContext.
- 
- @return YES if there have been any changes to the RLMRealm; NO otherwise.
- */
--(BOOL)hasChangedSinceLastTransaction;
 
 /**---------------------------------------------------------------------------------------
  *  @name Creating & Initializing Contexts
@@ -116,6 +108,14 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
  @param block     A block containing the read code you want to perform.
  */
 -(void)readTable:(NSString*)tablename usingBlock:(RLMTableReadBlock)block;
+
+/**
+ Checks if the underlying RLMRealm has received any writes since the last time you
+ used this RLMContext.
+ 
+ @return YES if there have been any changes to the RLMRealm; NO otherwise.
+ */
+-(BOOL)hasChangedSinceLastTransaction;
 
 
 /**---------------------------------------------------------------------------------------
