@@ -611,6 +611,7 @@ EOF
     "docs")
         appledoc    --project-name Realm \
                     --project-company "Realm" \
+                    --index-desc doc/index.md \
                     --output doc/appledocs \
                     -v `sh build.sh get-version` \
                     --create-html \
