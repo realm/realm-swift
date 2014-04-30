@@ -1,6 +1,3 @@
-
-
-
 //
 //  err_handling.m
 //  TightDB
@@ -81,7 +78,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     //------------------------------------------------------
     
     error = nil;
-    NSFileManager *fm = [NSFileManager defaultManager];
+    NSFileManager *fm = [NSFileManager managerForDefaultRealm];
     [fm setAttributes:@{NSFilePosixPermissions: @(0444)}
          ofItemAtPath:RLMTestRealmPath
                 error:&error];

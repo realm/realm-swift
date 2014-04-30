@@ -23,12 +23,12 @@ CATEGORIES:
 - Constructor:
   METHODS:
   - g_shared_group_constructor:
-      NAME     : "managerWithPath:error:"
+      NAME     : "managerForRealmWithPath:error:"
       SUMMARY  : *g_shared_group_constructor_summary
       DESCR    :
       - TEXT   : *g_shared_group_constructor_descr
       - TEXT   : *g_shared_group_durability_modes
-      SIGNATURE: + (RLMTransactionManager *)managerWithPath:(NSString *)path error:(NSError **)error
+      SIGNATURE: + (RLMTransactionManager *)managerForRealmWithPath:(NSString *)path error:(NSError **)error
       PARAMS:
       - NAME   : path
         TYPES  : NSString
@@ -40,12 +40,12 @@ CATEGORIES:
       - CODE   : ex_objc_shared_group_constructor
         DESCR  :
   - g_shared_group_constructor_default_path:
-      NAME     : "defaultManager:"
+      NAME     : "managerForDefaultRealm:"
       SUMMARY  : *g_shared_group_constructor_summary
       DESCR    :
       - TEXT   : *g_shared_group_constructor_descr
       - TEXT   : *g_shared_group_durability_modes
-      SIGNATURE: + (RLMTransactionManager *)managerWithPath:(NSString *)path error:(NSError **)error
+      SIGNATURE: + (RLMTransactionManager *)managerForRealmWithPath:(NSString *)path error:(NSError **)error
       RETURN:
         TYPES  : RLMTransactionManager
         DESCR  : A transaction manager mapped to a realm file.

@@ -41,10 +41,10 @@ NSString *const defaultRealmFileName = @"default.realm";
 }
 
 
-+(RLMTransactionManager *)defaultManager
++(RLMTransactionManager *)managerForDefaultRealm
 {
     NSString *path = [RLMTransactionManager writeablePathForFile:defaultRealmFileName];
-    return [self managerWithPath:path error:nil];
+    return [self managerForRealmWithPath:path error:nil];
 }
 
 + (NSString *)writeablePathForFile:(NSString*)fileName
@@ -56,7 +56,7 @@ NSString *const defaultRealmFileName = @"default.realm";
 
 
 
-+(RLMTransactionManager *)managerWithPath:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
++(RLMTransactionManager *)managerForRealmWithPath:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
 {
     RLMTransactionManager * shared_group = [[RLMTransactionManager alloc] init];
     if (!shared_group)

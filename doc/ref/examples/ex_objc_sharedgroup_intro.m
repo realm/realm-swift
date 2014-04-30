@@ -25,10 +25,10 @@
 void ex_objc_transaction_manager_intro()
 {
     // Remove previous datafile
-    [[NSFileManager defaultManager] removeItemAtPath:@"transactionManagerTest.realm" error:nil];
+    [[NSFileManager managerForDefaultRealm] removeItemAtPath:@"transactionManagerTest.realm" error:nil];
 
     // Create datafile with a new table
-    RLMTransactionManager *manager = [RLMTransactionManager managerWithPath:@"transactionManagerTest.realm"
+    RLMTransactionManager *manager = [RLMTransactionManager managerForRealmWithPath:@"transactionManagerTest.realm"
                                                                       error:nil];
     // Perform a write transaction (with commit to file)
     [manager writeUsingBlock:^(RLMRealm *realm) {
