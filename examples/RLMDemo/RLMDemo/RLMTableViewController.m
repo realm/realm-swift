@@ -51,7 +51,7 @@ static NSString * const kTableName = @"table";
             [realm createTableWithName:kTableName asTableClass:[RLMDemoTable class]];
         }
     }];
-    self.manager = [RLMTransactionManager defaultManager];
+    self.manager = [RLMTransactionManager managerForDefaultRealm];
     // @@EndExample@@
     
     // @@Example: setup_notifications @@

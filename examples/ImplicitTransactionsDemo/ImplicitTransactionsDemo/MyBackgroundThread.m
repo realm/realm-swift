@@ -7,7 +7,7 @@
 
 - (void)main
 {
-    RLMTransactionManager *manager = [RLMTransactionManager managerWithPath:[self pathForName:@"demo.realm"]
+    RLMTransactionManager *manager = [RLMTransactionManager managerForRealmWithPath:[self pathForName:@"demo.realm"]
                                                                       error:nil];
 
     __block int i = 0;

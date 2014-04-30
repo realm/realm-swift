@@ -25,7 +25,7 @@
     self.title = NSLocalizedString(@"Old", @"Old");
     self.tabBarItem.image = [UIImage imageNamed:@"old"];
 
-    _manager = [RLMTransactionManager managerWithPath:[self pathForName:@"demo.realm"]
+    _manager = [RLMTransactionManager managerForRealmWithPath:[self pathForName:@"demo.realm"]
                                                 error:nil];
 
     return self;

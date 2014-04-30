@@ -67,8 +67,8 @@ and your code will break!
 * Write transactions now take an optional rollback parameter (rather than needing to return a boolean).
 * `TDBContext` was renamed to `RLMTransactionManager`
 * Renamed `RLMContextDidChangeNotification` to `RLMRealmDidChangeNotification`
-* Renamed `contextWithDefaultPersistence` to `defaultManager`
-* Renamed `contextPersistedAtPath:` to `managerWithPath:`
+* Renamed `contextWithDefaultPersistence` to `managerForDefaultRealm`
+* Renamed `contextPersistedAtPath:` to `managerForRealmWithPath:`
 * Renamed `realmWithDefaultPersistence` to `defaultRealm`
 * Renamed `realmWithDefaultPersistenceAndInitBlock` to `defaultRealmWithInitBlock`
 

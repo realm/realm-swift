@@ -33,8 +33,8 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
 +(NSString *) defaultPath;
 
 // Initializers
-+(instancetype)defaultManager;
-+(instancetype)managerWithPath:(NSString *)path error:(NSError **)error;
++(instancetype)managerForDefaultRealm;
++(instancetype)managerForRealmWithPath:(NSString *)path error:(NSError **)error;
 
 // Transactions
 -(void)readUsingBlock:(RLMReadBlock)block;

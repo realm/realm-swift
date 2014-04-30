@@ -16,7 +16,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    RLMTransactionManager *manager = [RLMTransactionManager managerWithPath:[self pathForName:@"demo.realm"]
+    RLMTransactionManager *manager = [RLMTransactionManager managerForRealmWithPath:[self pathForName:@"demo.realm"]
                                                                       error:nil];
     [manager writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = nil;
