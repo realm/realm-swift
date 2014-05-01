@@ -130,4 +130,18 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(MainTable, MainObject)
 	}];
 }
 
+- (void) testDescriptor
+{
+    RLMTable *t = [[RLMTable alloc] init];
+    RLMDescriptor *d = t.descriptor;
+    RLMDescriptor *subDesc = [d addColumnTable:@"subtable"];
+    
+    XCTAssertEqual(t.columnCount, (NSUInteger)1, @"One column added");
+    XCTAssertEqual(subDesc.columnCount, (NSUInteger)0, @"0 columns in subtable");
+    
+    NSUInteger subTablColIndex = [subDesc addColumnWithName:@"subCol" type:RLMTypeBool];
+    XCTAssertEqual(subDesc.columnCount, (NSUInteger)1, @"Col count on subtable should be 1");
+    XCTAssertEqual(subTablColIndex, (NSUInteger)0, @"col index of column should be 0");
+}
+
 @end

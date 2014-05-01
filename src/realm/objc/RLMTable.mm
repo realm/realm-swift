@@ -38,6 +38,7 @@
 #import "RLMRealm_noinst.h"
 #import "RLMPrivate.h"
 #import "util_noinst.hpp"
+#import "NSData+RLMGetBinaryData.h"
 
 using namespace std;
 
@@ -1287,6 +1288,33 @@ void add_datetime_constraint_to_query(tightdb::Query & query,
             break;
     }
 }
+    
+void add_binary_constraint_to_query(tightdb::Query & query,
+                                    NSPredicateOperatorType operatorType,
+                                    NSUInteger index,
+                                    NSData *value) {
+    tightdb::BinaryData binData = [value rlmBinaryData];
+    switch (operatorType) {
+        case NSBeginsWithPredicateOperatorType:
+            query.begins_with(index, binData);
+            break;
+        case NSEndsWithPredicateOperatorType:
+            query.ends_with(index, binData);
+            break;
+        case NSContainsPredicateOperatorType:
+            query.contains(index, binData);
+            break;
+        case NSEqualToPredicateOperatorType:
+            query.equal(index, binData);
+            break;
+        case NSNotEqualToPredicateOperatorType:
+            query.not_equal(index, binData);
+            break;
+        default:
+            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for binary type", (unsigned long)operatorType]);
+            break;
+    }
+}
 
 void update_query_with_value_expression(RLMTable * table, tightdb::Query & query,
     NSString * columnName, id value, NSPredicateOperatorType operatorType,
@@ -1325,6 +1353,10 @@ void update_query_with_value_expression(RLMTable * table, tightdb::Query & query
         case tightdb::type_String:
             add_string_constraint_to_query(query, operatorType, predicateOptions,
                                            index, (NSString *)value);
+            break;
+        case tightdb::type_Binary:
+            add_binary_constraint_to_query(query, operatorType,
+                                           index, (NSData *)value);
             break;
         default:
             @throw predicate_exception(@"Unsupported predicate value type",
