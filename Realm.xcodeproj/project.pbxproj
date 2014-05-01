@@ -195,7 +195,6 @@
 				4DDDD67218EAF22100E94613 /* RLMFast.h */,
 				4DDDD67018EAF1C000E94613 /* RLMRowFast.h */,
 				4D143CCE18F69D0F00CEFF65 /* RLMQueryFast.h */,
-				4BB05A6B190710E400F7F5F9 /* RLMTableFast.h */,
 			);
 			name = RLMFast;
 			sourceTree = "<group>";
@@ -370,7 +369,6 @@
 				4D143CEE18F7E8C200CEFF65 /* RLMRealm_noinst.h in Headers */,
 				0297850519087BF800148C3B /* RLMObjectDescriptor.h in Headers */,
 				424EEFA318D9C11D00337A13 /* RLMDescriptor_noinst.h in Headers */,
-				4BB05A6D190710E400F7F5F9 /* RLMTableFast.h in Headers */,
 				4220871618E042FD00F3CF27 /* NSData+RLMGetBinaryData.h in Headers */,
 				E91890E6177B67AB00653D7A /* util_noinst.hpp in Headers */,
 			);
