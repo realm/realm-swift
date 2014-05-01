@@ -34,7 +34,12 @@ The Objective-C API has been updated and your code will break!
 
 ### API breaking changes:
 
-* `???`
+* `RLMContext` was renamed to `RLMTransactionManager`
+* Renamed `RLMContextDidChangeNotification` to `RLMRealmDidChangeNotification`
+* Renamed `contextWithDefaultPersistence` to `managerForDefaultRealm`
+* Renamed `contextPersistedAtPath:` to `managerForRealmWithPath:`
+* Renamed `realmWithDefaultPersistence` to `defaultRealm`
+* Renamed `realmWithDefaultPersistenceAndInitBlock` to `defaultRealmWithInitBlock`
 
 ### Enhancements:
 
@@ -65,12 +70,6 @@ and your code will break!
 * All prefixes changed from `TDB` to `RLM`.
 * `TDBTransaction` and `TDBSmartContext` have merged into `RLMRealm`.
 * Write transactions now take an optional rollback parameter (rather than needing to return a boolean).
-* `TDBContext` was renamed to `RLMTransactionManager`
-* Renamed `RLMContextDidChangeNotification` to `RLMRealmDidChangeNotification`
-* Renamed `contextWithDefaultPersistence` to `managerForDefaultRealm`
-* Renamed `contextPersistedAtPath:` to `managerForRealmWithPath:`
-* Renamed `realmWithDefaultPersistence` to `defaultRealm`
-* Renamed `realmWithDefaultPersistenceAndInitBlock` to `defaultRealmWithInitBlock`
 
 ### Enhancements:
 
