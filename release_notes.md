@@ -34,7 +34,12 @@ The Objective-C API has been updated and your code will break!
 
 ### API breaking changes:
 
-* `???`
+* `RLMContext` was renamed to `RLMTransactionManager`
+* Renamed `RLMContextDidChangeNotification` to `RLMRealmDidChangeNotification`
+* Renamed `contextWithDefaultPersistence` to `managerForDefaultRealm`
+* Renamed `contextPersistedAtPath:` to `managerForRealmWithPath:`
+* Renamed `realmWithDefaultPersistence` to `defaultRealm`
+* Renamed `realmWithDefaultPersistenceAndInitBlock` to `defaultRealmWithInitBlock`
 
 ### Enhancements:
 
@@ -69,7 +74,7 @@ and your code will break!
 
 ### Enhancements:
 
-* `createTableWithName:columns:` has been added to `RLMTransaction`.
+* `createTableWithName:columns:` has been added to `RLMRealm`.
 * Added keyed subscripting for RLMTable's first column if column is of type RLMTypeString.
 * `setRow:atIndex:` has been added to `RLMTable`.
 * `RLMRealm` constructors now have variants that take an writable initialization block
