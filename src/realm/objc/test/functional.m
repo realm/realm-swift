@@ -18,7 +18,8 @@ REALM_TABLE_3(FuncPeopleTable,
 
 @interface RLMPerson : RLMRow
 
-@property (nonatomic, copy) NSString *name;
+@property (nonatomic, copy)   NSString *name;
+@property (nonatomic, strong) NSDate   *date;
 
 @end
 
@@ -285,11 +286,15 @@ REALM_TABLE_3(FuncPeopleTable,
 - (void)testRowDescription {
     RLMContext *context = [self contextPersistedAtTestPath];
     [context writeUsingBlock:^(RLMRealm *realm) {
+        NSDate *date = [NSDate dateWithTimeIntervalSince1970:1234];
         RLMTable *table = [realm createTableWithName:@"people" objectClass:[RLMPerson class]];
-        [table addRow:@[@"John"]];
+        [table addRow:@[@"John", date]];
         NSString *rowDescription = [table.firstRow description];
         XCTAssertTrue([rowDescription rangeOfString:@"name"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMRow");
         XCTAssertTrue([rowDescription rangeOfString:@"John"].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMRow");
+        
+        XCTAssertTrue([rowDescription rangeOfString:@"date"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMRow");
+        XCTAssertTrue([rowDescription rangeOfString:date.description].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMRow");
     }];
 }
 
