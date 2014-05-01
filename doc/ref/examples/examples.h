@@ -1,6 +1,7 @@
 void ex_objc_intro();
 void ex_objc_query_dynamic_intro();
 void ex_objc_query_typed_intro();
+void ex_objc_transaction_manager_intro();
 void ex_objc_realm_intro();
 void ex_objc_context_intro();
 void ex_objc_table_dynamic_intro();

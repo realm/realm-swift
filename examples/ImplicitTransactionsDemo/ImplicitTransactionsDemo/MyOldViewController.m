@@ -8,7 +8,7 @@
 {
     NSTimer *_refreshTimer;
     int _numRefreshTicks;
-    RLMContext *_context;
+    RLMTransactionManager *_manager;
 }
 
 - (NSString *)pathForName:(NSString *)name
@@ -25,8 +25,8 @@
     self.title = NSLocalizedString(@"Old", @"Old");
     self.tabBarItem.image = [UIImage imageNamed:@"old"];
 
-    _context = [RLMContext contextPersistedAtPath:[self pathForName:@"demo.realm"]
-                                            error:nil];
+    _manager = [RLMTransactionManager managerForRealmWithPath:[self pathForName:@"demo.realm"]
+                                                error:nil];
 
     return self;
 }
@@ -77,7 +77,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     __block NSUInteger numRows = 0;
-    [_context readUsingBlock:^(RLMRealm *realm) {
+    [_manager readUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm tableWithName:@"demo"];
         numRows = table.rowCount;
     }];
@@ -97,7 +97,7 @@
                                       reuseIdentifier:simpleTableIdentifier];
     }
 
-    [_context readUsingBlock:^(RLMRealm *realm) {
+    [_manager readUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm tableWithName:@"demo"];
         cell.textLabel.text = table[indexPath.row][0];
     }];

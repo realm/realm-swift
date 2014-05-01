@@ -24,18 +24,19 @@
     self.title = NSLocalizedString(@"New", @"New");
     self.tabBarItem.image = [UIImage imageNamed:@"new"];
 
-    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:[self pathForName:@"demo.realm"]];
+    RLMRealm *realm = [RLMRealm realmWithPath:[self pathForName:@"demo.realm"]];
 
     _table = [realm tableWithName:@"demo"];
 
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-    [notificationCenter addObserver:self selector:@selector(contextDidChange:)
-                               name:RLMContextDidChangeNotification object:realm];
+    [notificationCenter addObserver:self selector:@selector(realmDidChange:)
+                               name:RLMRealmDidChangeNotification 
+                             object:realm];
 
     return self;
 }
 
-- (void)contextDidChange:(NSNotification *)theNotification
+- (void)realmDidChange:(NSNotification *)theNotification
 {
     ++_numChangeTicks;
     changeCount.text = [[NSNumber numberWithInt:_numChangeTicks] stringValue];
