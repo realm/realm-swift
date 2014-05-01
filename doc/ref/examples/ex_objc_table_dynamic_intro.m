@@ -69,21 +69,3 @@ void ex_objc_table_dyn_table_sizes()
         // @@EndExample@@
     }];
 }
-
-void ex_objc_table_dyn_table_init_with_columns()
-{
-//    // @@Example: ex_objc_table_dyn_table_init_with_columns @@
-//    // Create a new table dynamically
-//    RLMTable *table = [[RLMTable alloc] initWithColumns:@[@"Name", @"string",
-//                                                           @"Age", @"int"]];
-//
-//    // Add three rows
-//    [table addRow:@[@"Steve", @12]];
-//    [table addRow:@[@"Nick", @100]];
-//    [table addRow:@[@"Mary",  @27]];
-//
-//    // Print the number of rows and columns
-//    NSLog(@"Number of rows: %lu",    (unsigned long)table.rowCount);
-//    NSLog(@"Number of columns: %lu", (unsigned long)table.columnCount);
-//    // @@EndExample@@
-}

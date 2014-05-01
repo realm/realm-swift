@@ -23,6 +23,9 @@ int main(int argc, char * argv[])
         ex_objc_table_dynamic_intro();
         remove_default_persistence_file();
         
+        ex_objc_table_dyn_table_sizes();
+        remove_default_persistence_file();
+        
         ex_objc_table_typed_intro();
         remove_default_persistence_file();
         
