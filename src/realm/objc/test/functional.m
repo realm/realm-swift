@@ -16,6 +16,16 @@ REALM_TABLE_3(FuncPeopleTable,
 #define TABLE_SIZE 1000 // must be even number
 #define INSERT_ROW 5
 
+@interface RLMPerson : RLMRow
+
+@property (nonatomic, copy) NSString *name;
+
+@end
+
+@implementation RLMPerson
+
+@end
+
 @interface MACtestFunctional: RLMTestCase
 @end
 @implementation MACtestFunctional
@@ -269,6 +279,17 @@ REALM_TABLE_3(FuncPeopleTable,
         // And check it's gone.
         
         XCTAssertEqual([NSNumber numberWithLong:[table rowCount]], [NSNumber numberWithLong:TABLE_SIZE-3], @"Check the size");
+    }];
+}
+
+- (void)testRowDescription {
+    RLMContext *context = [self contextPersistedAtTestPath];
+    [context writeUsingBlock:^(RLMRealm *realm) {
+        RLMTable *table = [realm createTableWithName:@"people" objectClass:[RLMPerson class]];
+        [table addRow:@[@"John"]];
+        NSString *rowDescription = [table.firstRow description];
+        XCTAssertTrue([rowDescription rangeOfString:@"name"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMRow");
+        XCTAssertTrue([rowDescription rangeOfString:@"John"].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMRow");
     }];
 }
 
