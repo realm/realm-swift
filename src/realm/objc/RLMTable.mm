@@ -1264,44 +1264,71 @@ void add_string_constraint_to_query(tightdb::Query & query,
 void add_datetime_constraint_to_query(tightdb::Query & query,
                                       NSPredicateOperatorType operatorType,
                                       NSUInteger index,
-                                      id value) {
-    double dateValue = 0;
-    double fromDateValue = 0;
-    double toDateValue = 0;
-    if ([value isKindOfClass:[NSDate class]]) {
-        dateValue = double([(NSDate *)value timeIntervalSince1970]);
-    } else if ([value isKindOfClass:[NSArray class]]) {
-        fromDateValue = double([(NSDate *)[(NSArray *)value firstObject] timeIntervalSince1970]);
-        toDateValue = double([(NSDate *)[(NSArray *)value lastObject] timeIntervalSince1970]);
-    }
+                                      double value) {
     switch (operatorType) {
         case NSLessThanPredicateOperatorType:
-            query.less_datetime(index, dateValue);
+            query.less_datetime(index, value);
             break;
         case NSLessThanOrEqualToPredicateOperatorType:
-            query.less_equal_datetime(index, dateValue);
+            query.less_equal_datetime(index, value);
             break;
         case NSGreaterThanPredicateOperatorType:
-            query.greater_datetime(index, dateValue);
+            query.greater_datetime(index, value);
             break;
         case NSGreaterThanOrEqualToPredicateOperatorType:
-            query.greater_equal_datetime(index, dateValue);
+            query.greater_equal_datetime(index, value);
             break;
         case NSEqualToPredicateOperatorType:
-            query.equal_datetime(index, dateValue);
+            query.equal_datetime(index, value);
             break;
         case NSNotEqualToPredicateOperatorType:
-            query.not_equal_datetime(index, dateValue);
-            break;
-        case NSBetweenPredicateOperatorType:
-            query.between_datetime(index, fromDateValue, toDateValue);
+            query.not_equal_datetime(index, value);
             break;
         default:
             @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for type NSDate", (unsigned long)operatorType]);
             break;
     }
 }
-    
+
+void add_between_constraint_to_query(tightdb::Query & query,
+                                     tightdb::DataType dataType,
+                                     NSUInteger index,
+                                     NSArray *array) {
+    id from = array.firstObject;
+    id to = array.lastObject;
+    switch (dataType) {
+        case tightdb::type_DateTime:
+            query.between_datetime(index,
+                                   double([(NSDate *)from timeIntervalSince1970]),
+                                   double([(NSDate *)to timeIntervalSince1970]));
+            break;
+        case tightdb::type_Double:
+        {
+            double fromDouble = double([(NSNumber *)from doubleValue]);
+            double toDouble = double([(NSNumber *)to doubleValue]);
+            query.between(index, fromDouble, toDouble);
+            break;
+        }
+        case tightdb::type_Float:
+        {
+            float fromFloat = float([(NSNumber *)from floatValue]);
+            float toFloat = float([(NSNumber *)to floatValue]);
+            query.between(index, fromFloat, toFloat);
+            break;
+        }
+        case tightdb::type_Int:
+        {
+            int fromInt = int([(NSNumber *)from intValue]);
+            int toInt = int([(NSNumber *)to intValue]);
+            query.between(index, fromInt, toInt);
+            break;
+        }
+        default:
+            @throw predicate_exception(@"Unsupported predicate value type",
+                                       [NSString stringWithFormat:@"Object type %i not supported for BETWEEN operations", dataType]);
+    }
+}
+
 void add_binary_constraint_to_query(tightdb::Query & query,
                                     NSPredicateOperatorType operatorType,
                                     NSUInteger index,
@@ -1329,17 +1356,21 @@ void add_binary_constraint_to_query(tightdb::Query & query,
     }
 }
 
-void update_query_with_value_expression(RLMTable * table, tightdb::Query & query,
-    NSString * columnName, id value, NSPredicateOperatorType operatorType,
-    NSComparisonPredicateOptions predicateOptions) {
-    
-    BOOL betweenOperation = (operatorType == NSBetweenPredicateOperatorType);
-
-    // validate object type
-    NSUInteger index = validated_column_index(table, columnName);
-    tightdb::DataType type = table->m_table->get_column_type(index);
+void validate_value_for_query(id value, tightdb::DataType type, BOOL betweenOperation) {
     if (betweenOperation) {
-        if (![value isKindOfClass:[NSArray class]]) {
+        if ([value isKindOfClass:[NSArray class]]) {
+            NSArray *array = value;
+            if (array.count == 2) {
+                if (!verify_object_is_type(array.firstObject, type) ||
+                    !verify_object_is_type(array.lastObject, type)) {
+                    @throw predicate_exception(@"Invalid value",
+                                               [NSString stringWithFormat:@"NSArray objects must be of type %i for BETWEEN operations", type]);
+                }
+            } else {
+                @throw predicate_exception(@"Invalid value",
+                                           @"NSArray object must contain exactly two objects for BETWEEN operations");
+            }
+        } else {
             @throw predicate_exception(@"Invalid value",
                                        @"object must be of type NSArray for BETWEEN operations");
         }
@@ -1349,6 +1380,23 @@ void update_query_with_value_expression(RLMTable * table, tightdb::Query & query
                                        [NSString stringWithFormat:@"object must be of type %i", type]);
         }
     }
+}
+
+void update_query_with_value_expression(RLMTable * table, tightdb::Query & query,
+    NSString * columnName, id value, NSPredicateOperatorType operatorType,
+    NSComparisonPredicateOptions predicateOptions) {
+
+    // validate object type
+    NSUInteger index = validated_column_index(table, columnName);
+    tightdb::DataType type = table->m_table->get_column_type(index);
+    
+    BOOL betweenOperation = (operatorType == NSBetweenPredicateOperatorType);
+    validate_value_for_query(value, type, betweenOperation);
+    
+    if (betweenOperation) {
+        add_between_constraint_to_query(query, type, index, value);
+        return;
+    }
     
     // finally cast to native types and add query clause
     switch (type) {
@@ -1357,37 +1405,20 @@ void update_query_with_value_expression(RLMTable * table, tightdb::Query & query
                                          bool([(NSNumber *)value boolValue]));
             break;
         case tightdb::type_DateTime:
-            add_datetime_constraint_to_query(query, operatorType, index, value);
+            add_datetime_constraint_to_query(query, operatorType, index,
+                                             double([(NSDate *)value timeIntervalSince1970]));
             break;
         case tightdb::type_Double:
-            if (betweenOperation) {
-                double fromValue = double([(NSNumber *)((NSArray *)value).firstObject doubleValue]);
-                double toValue = double([(NSNumber *)((NSArray *)value).lastObject doubleValue]);
-                query.between(index, fromValue, toValue);
-            } else {
-                add_numeric_constraint_to_query(query, type, operatorType,
-                                                index, double([(NSNumber *)value doubleValue]));
-            }
+            add_numeric_constraint_to_query(query, type, operatorType,
+                                            index, double([(NSNumber *)value doubleValue]));
             break;
         case tightdb::type_Float:
-            if (betweenOperation) {
-                float fromValue = float([(NSNumber *)((NSArray *)value).firstObject floatValue]);
-                float toValue = float([(NSNumber *)((NSArray *)value).lastObject floatValue]);
-                query.between(index, fromValue, toValue);
-            } else {
-                add_numeric_constraint_to_query(query, type, operatorType,
-                                                index, float([(NSNumber *)value floatValue]));
-            }
+            add_numeric_constraint_to_query(query, type, operatorType,
+                                            index, float([(NSNumber *)value floatValue]));
             break;
         case tightdb::type_Int:
-            if (betweenOperation) {
-                int fromValue = int([(NSNumber *)((NSArray *)value).firstObject intValue]);
-                int toValue = int([(NSNumber *)((NSArray *)value).lastObject intValue]);
-                query.between(index, fromValue, toValue);
-            } else {
-                add_numeric_constraint_to_query(query, type, operatorType,
-                                                index, int([(NSNumber *)value intValue]));
-            }
+            add_numeric_constraint_to_query(query, type, operatorType,
+                                            index, int([(NSNumber *)value intValue]));
             break;
         case tightdb::type_String:
             add_string_constraint_to_query(query, operatorType, predicateOptions, index, value);
@@ -1699,5 +1730,3 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 
 
 @end
-
-
