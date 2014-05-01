@@ -8,17 +8,16 @@
 #import "RLMTableViewController.h"
 #import <Realm/Realm.h>
 
-// @@Example: declare_object @@
+// Realm model object
 @interface RLMDemoObject : RLMRow
 
 @property (nonatomic, copy)   NSString *title;
 @property (nonatomic, strong) NSDate   *date;
 
 @end
-// @@EndExample@@
 
 @implementation RLMDemoObject
-
+// None needed
 @end
 
 static NSString * const kCellID    = @"cell";
@@ -62,8 +61,6 @@ static NSString * const kTableName = @"table";
 #pragma mark - Realm
 
 - (void)setupRealm {
-    // @@Example: setup_realm @@
-    // Set up realm and get table
     self.realm = [RLMRealm realmWithDefaultPersistenceAndInitBlock:^(RLMRealm *realm) {
         // Create table if it doesn't exist
         if (realm.isEmpty) {
@@ -72,17 +69,13 @@ static NSString * const kTableName = @"table";
     }];
     
     self.table = [self.realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
-    // @@EndExample@@
     
     self.context = [RLMContext contextWithDefaultPersistence];
     
-    // @@Example: setup_notifications @@
-    // Observe Realm Notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(realmContextDidChange)
                                                  name:RLMContextDidChangeNotification
                                                object:nil];
-    // @@EndExample@@
 }
 
 - (void)realmContextDidChange {
@@ -116,11 +109,9 @@ static NSString * const kTableName = @"table";
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // @@Example: delete_row @@
         [self.context writeTable:kTableName usingBlock:^(RLMTable *table) {
             [table removeRowAtIndex:indexPath.row];
         }];
-        // @@EndExample@@
     }
 }
 
@@ -128,7 +119,6 @@ static NSString * const kTableName = @"table";
 
 - (void)bgAdd {
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-    // @@Example: bg_add @@
     // Import many items in a background thread
     dispatch_async(queue, ^{
         RLMContext *ctx = [RLMContext contextWithDefaultPersistence];
@@ -143,17 +133,14 @@ static NSString * const kTableName = @"table";
             }];
         }
     });
-    // @@EndExample@@
 }
 
 - (void)add {
-    // @@Example: add_row @@
     [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
         // Add row via array. Order matters.
         [table addRow:@[[self randomString], [self randomDate]]];
     }];
-    // @@EndExample@@
 }
 
 - (void)deleteAll {
@@ -170,32 +157,6 @@ static NSString * const kTableName = @"table";
 
 - (NSDate *)randomDate {
     return [NSDate dateWithTimeIntervalSince1970:arc4random()];
-}
-
-#pragma mark - Tutorial Examples
-
-- (void)bgRead {
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-    // @@Example: bg_read @@
-    dispatch_async(queue, ^{
-        [[RLMContext contextWithDefaultPersistence] readUsingBlock:^(RLMRealm *realm) {
-            RLMTable *table = [realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
-            for (RLMDemoObject *object in table) {
-                NSLog(@"title: %@\ndate: %@", object.title, object.date);
-            }
-        }];
-    });
-    // @@EndExample@@
-}
-
-- (void)query {
-    // @@Example: query @@
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"date < %@ && title contains %@", [NSDate date], @"00"];
-    RLMView *view = [self.table where:predicate];
-    for (RLMDemoObject *object in view) {
-        NSLog(@"title: %@\ndate: %@", object.title, object.date);
-    }
-    // @@EndExample@@
 }
 
 @end
