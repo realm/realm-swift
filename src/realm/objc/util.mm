@@ -1,22 +1,22 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
 
@@ -29,6 +29,7 @@
 #import "RLMTable_noinst.h"
 #import "util_noinst.hpp"
 #import "NSData+RLMGetBinaryData.h"
+#import "RLMPrivate.h"
 
 using namespace tightdb;
 
@@ -101,7 +102,7 @@ NSObject* get_cell(size_t col_ndx, size_t row_ndx, Table& table)
             return d;
         }
         case type_Table: {
-            RLMTable *t = [[RLMTable alloc] init];
+            RLMTable *t = [[RLMTable alloc] _initRaw];
             TableRef table_ref = table.get_subtable(col_ndx, row_ndx);
             [t setNativeTable:table_ref.get()];
             return t;
@@ -139,7 +140,7 @@ NSObject* get_cell(size_t col_ndx, size_t row_ndx, Table& table)
                     return d;
                 }
                 case type_Table: {
-                    RLMTable *t = [[RLMTable alloc] init];
+                    RLMTable *t = [[RLMTable alloc] _initRaw];
                     TableRef table_ref = table.get_subtable(col_ndx, row_ndx);
                     [t setNativeTable:table_ref.get()];
                     return t;

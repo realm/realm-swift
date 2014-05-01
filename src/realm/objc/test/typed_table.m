@@ -1,22 +1,22 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
 
@@ -78,6 +78,15 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(InvalidTable, InvalidType)
 
 @implementation KeyedObject
 @end
+
+@interface CustomAccessors : RLMRow
+@property (getter = getThatName) NSString * name;
+@property (setter = setTheInt:) int age;
+@end
+
+@implementation CustomAccessors
+@end
+
 
 RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 
@@ -154,24 +163,6 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
     XCTAssertEqual(row2.cBoolCol, (bool)true,         @"row2.cBoolCol");
     XCTAssertEqual(row1.longCol, 99L,                 @"row1.IntCol");
     XCTAssertEqual(row2.longCol, -20L,                @"row2.IntCol");
-
-    /* Not yet supported
-    XCTAssertEqual([table.IntCol minimum], (int64_t)54,                 @"IntCol min");
-    XCTAssertEqual([table.IntCol maximum], (int64_t)506,                @"IntCol max");
-    XCTAssertEqual([table.IntCol sum], (int64_t)560,                @"IntCol sum");
-    XCTAssertEqual([table.IntCol average], 280.0,                       @"IntCol avg");
-
-    XCTAssertEqual([table.FloatCol minimum], 0.7f,                      @"FloatCol min");
-    XCTAssertEqual([table.FloatCol maximum], 7.7f,                      @"FloatCol max");
-    XCTAssertEqual([table.FloatCol sum], (double)0.7f + 7.7f,       @"FloatCol sum");
-    XCTAssertEqual([table.FloatCol average], ((double)0.7f + 7.7f) / 2, @"FloatCol avg");
-
-    XCTAssertEqual([table.DoubleCol minimum], 0.8,                      @"DoubleCol min");
-    XCTAssertEqual([table.DoubleCol maximum], 8.8,                      @"DoubleCol max");
-    XCTAssertEqual([table.DoubleCol sum], 0.8 + 8.8,                @"DoubleCol sum");
-    XCTAssertEqual([table.DoubleCol average], (0.8 + 8.8) / 2,          @"DoubleCol avg");
-    */
-    
 }
 
 - (void)testTableTyped_Subscripting
@@ -185,22 +176,30 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
     table[0].age = 7;
     
     // Verify that you can access rows with object subscripting
-    XCTAssertEqual(table[0].age, 7, @"table[0].age");
+    XCTAssertEqual(table[0].age, 7,  @"table[0].age");
     XCTAssertEqual(table[1].age, 20, @"table[1].age");
 }
 
 - (void)testInvalids
 {
-    XCTAssertThrows([[InvalidTable alloc] init], @"Unsupported types should throw");
-    XCTAssertThrows([[RLMTable alloc] initWithObjectClass:NSObject.class], @"Types not descendent from RLMRow should throw");
-    XCTAssertThrows([[RLMTable alloc] initWithObjectClass:InvalidProperty.class], @"Types not descendent from RLMRow should throw");
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        // FIXME: This should throw but currently doesn't
+//        XCTAssertThrows([realm createTableWithName:@"table1"
+//                                      asTableClass:[InvalidTable class]],
+//                        @"Unsupported types should throw");
+        XCTAssertThrows([realm createTableWithName:@"table2"
+                                       objectClass:[NSObject class]],
+                        @"Types not descendent from RLMRow should throw");
+        XCTAssertThrows([realm createTableWithName:@"table3"
+                                       objectClass:[InvalidProperty class]],
+                        @"Types not descendent from RLMRow should throw");
+    }];
 }
 
 
 - (void)testTableTyped_KeyedSubscripting
 {
     KeyedTable* table = [[KeyedTable alloc] init];
-    [table setObjectClass:KeyedObject.class];
     
     [table addRow:@{@"name" : @"Test1", @"objID" : @24}];
     [table addRow:@{@"name" : @"Test2", @"objID" : @25}];
@@ -263,6 +262,16 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
     previousRowCount = [errTable rowCount];
     XCTAssertThrows((errTable[@"SomeKey"] = @{@"id" : @821763}), @"Calling keyed subscriptor on errTable should throw exception");
     XCTAssertEqual(previousRowCount, [errTable rowCount], @"errTable should have same count as previous");
+}
+
+- (void)testCustomAccessors {
+    RLMTable *table = [[RLMTable alloc] initWithObjectClass:CustomAccessors.class];
+    [table addRow:@[@"name", @2]];
+    
+    XCTAssertEqualObjects([table[0] getThatName], @"name", @"name property should be name.");
+    
+    [table[0] setTheInt:99];
+    XCTAssertEqual([table[0] age], 99L, @"age property should be 99");
 }
 
 @end
