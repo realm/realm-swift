@@ -9,3 +9,4 @@ void ex_objc_tableview_dynamic_intro();
 void ex_objc_tableview_typed_intro();
 void ex_objc_intro();
 void ex_objc_table_dyn_table_sizes();
+void remove_default_persistence_file();
