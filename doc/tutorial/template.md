@@ -60,7 +60,7 @@ See the <code>RLMTable</code> <a href="#">documentation</a> for more information
 
 ** Next Steps
 
-This document just scratches the surface of Realm is capable of. Here are some resources available for more information:
+This document just scratches the surface of what Realm is capable of. Here are some resources available for more information:
 
 <ol>
     <li><a href="#">Realm Objective-C Documentation</a></li>
