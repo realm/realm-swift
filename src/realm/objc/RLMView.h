@@ -32,14 +32,15 @@
     myView[2] // will return the second match in your query
     myView[2] = someObject; // will update the second match of your query (and be reflected in the underlying table)
  
- It is possible to create two or more RLMViews for same RLMTable.
+ It is possible to create two or more RLMViews for the same RLMTable.
  
- @warning Note that keyed subscripting (`myView[@"foo"]`) does _not_ work on RLMView; it only works on RLMTable.
+ @warning Note that top-level keyed subscripting (`myView[@"foo"]`) does _not_ work on RLMView; it only works on RLMTable.  
+ You can still use object-level keyed subscripting (`myObject[@"title"]`) on objects from a view.
  
- @warning An RLMView is implicitely linked to a RLMTable. All changes to the view will propagate to the original (or source) table.
+ @warning An RLMView is implicitely linked to an RLMTable. All changes to the view will propagate to the original (or source) table.
  This includes operations like updating values and deleting rows.
  **This is NOT true in the other direction**:
- Any change that adds or removes rows in the original table will not be automatically updated in an active RLMView.
+ Any change that adds or removes rows in the original table will _not_ be automatically updated in an active RLMView.
  
  */
 
@@ -54,7 +55,7 @@
  */
 @property (nonatomic, readonly) NSUInteger rowCount;
 /**
- The name of the RLMTable backing this RLMView
+ A pointer to the RLMTable backing this RLMView
  */
 @property (nonatomic, readonly) RLMTable *originTable;
 @property (nonatomic, readonly) NSUInteger columnCount;

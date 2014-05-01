@@ -36,14 +36,19 @@
     
     @property (nonatomic, copy)   NSString *name;
     @property (nonatomic, strong) NSDate   *birthdate;
-    @property                     BOOL     *adopted;
+    @property (nonatomic, assign) BOOL      adopted;
     
     @end
  
-    @implementaion DogModel
+    @implementation DogModel
     @end //none needed
  
- All complex properties must be `nonatomic`. Supported types are:
+    // Generate a matching RLMTable class called “DogTable” for DogObject
+    RLM_DEFINE_TABLE_TYPE_FOR_OBJECT_TYPE(DogTable, DogModel)
+    // This will provide automatic casting when accessing objects in tables of that class
+    // as well as other syntaxic conveniences
+ 
+Supported property types are:
  
    - `NSString`
    - `NSNumber`, `int`, `float`, `double` and `long`
@@ -51,23 +56,29 @@
    - `NSDate`
    - `NSData`
  
- Additionally, you can store subtables with the following syntax:
+ Additionally, you can store a table as a property of one of your models using the following syntax:
  
-    // In PersonModel.m
+    // In PersonModel.h
  
     // Assuming the DogModel above has already been created,
-    // create a Table reference for that model
+    // create a Table class for that model
     RLM_TABLE_TYPE_FOR_OBJECT_TYPE(DogModel, DogTable)
  
     @interface PersonModel : RLMRow
     @property (nonatomic, copy)   NSString *name;
-    @property                     DogTable *dogs;
+    @property (nonatomic, strong) DogTable *dogs;
     @end
-    
+ 
+    // Generate a matching RLMTable class again for syntaxic ease
+    RLM_DEFINE_TABLE_TYPE_FOR_OBJECT_TYPE(PeopleTable, PersonModel)
+ 
  You can access subtable properties the same way you do regular properties:
  
     personTable[2].dogs[0]; //returns the first dog of the third person
     personTable[2].dogs[0].name;
+ 
+ 
+ @warning RLMRow objects cannot be created as standalone objects: you must create them through an `addrow:` call on an RLMTable.
  
  */
 

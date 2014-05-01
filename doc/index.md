@@ -5,74 +5,103 @@ Realm is a fast embedded database that integrates transparently into Objective-C
 
 ## Defining a Data Model
 
-Realm data models fully embrace Objective-C and are defined using traditional `NSObject` classes with `@properties`. Just subclass RLMRow to create your Realm data model objects:
+Realm data models are defined using traditional `NSObject` classes with `@properties`. Just subclass RLMRow to create your Realm data model objects. You can then organize your RLMRow objects in RLMTables.
 
-	@interface RLMDemoObject : RLMRow
+	@interface DemoObject : RLMRow
 
 	@property (nonatomic, copy)   NSString *title;
 	@property (nonatomic, strong) NSDate   *date;
 
 	@end
 
-	@implementation RLMDemoObject
+	@implementation DemoObject
 	// none needed
 	@end
+
+	// Generate a matching RLMTable class called “DemoTable” for DemoObject
+	RLM_DEFINE_TABLE_TYPE_FOR_OBJECT_TYPE(DemoTable, RLMDemoObject)
+	// This will provide automatic casting when accessing objects in tables of that class
+	// as well as other syntaxic conveniences
+
+Please note that RLMRow objects can only be created when using `addRow:` on an RLMTable and cannot be instantiated on their own.
 
 See the [RLMObject Protocol](Protocols/RLMObject.html) for more details.
 
 
-## [RLMContext](Classes/RLMContext.html)
+## Writing & Reading Objects
 
-The RLMContext class is responsible for all write transactions:
+The RLMContext class is responsible for read & write transactions. You can initialize one persisting to the default file (`<Application_Home>/Documents/default.realm`) like this:
 
-	[[RLMContext contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
-	    RLMTable *table = [realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
-	    // Add row via array. Order matters.
-	    [table addRow:@[[self randomString], [self randomDate]]];
-	}];
+	RLMContext *context = [RLMContext contextWithDefaultPersistence];
 
-… and read transactions:
+You can use the context to extract a Realm which is a representation of all the data stored in the file. An RLMRealm contains RLMTable(s), which in turn contain your objects (RLMRow subclasses).
 
-    [[RLMContext contextWithDefaultPersistence] readUsingBlock:^(RLMRealm *realm) {
-        RLMTable *table = [realm tableWithName:@"DemoTable" objectClass:[RLMDemoObject class]];
+This example accesses the Realm in write mode via a Context and adds a DemoObject via its properties:
+
+	[context writeUsingBlock:^(RLMRealm *realm) {
+			// Now we can create a table, reusing the class defined
+			// by the macro in the previous sample
+	        DemoTable *table = [DemoTable tableInRealm:realm named:@"mytable"];
+
+	        // Add a new row
+	        [table addRow:@{@"title": @"my title",
+	                         @"date": [NSDate date]}];
+	 }];
+
+You can use a Context to perform (lock-free) read transactions as well.  
+This example accesses the Realm in read-only mode via a Context, opens a table consisting of DemoObjects and uses fast enumeration to iterate through all objects in the table and output them.
+
+    [context readUsingBlock:^(RLMRealm *realm) {
+        DemoTable *table = [DemoTable tableInRealm:realm named:@"mytable"];
         for (RLMDemoObject *object in table) {
             NSLog(@"title: %@\ndate: %@", object.title, object.date);
         }
     }];
 
-An RLMContext provides a realm on which to perform operations. These transactions are run on the current thread. As the previous example demonstrates, RLMTable supports fast enumeration.
+See RLMContext, RLMRealm and RLMTable for more details.
 
-See RLMContext for more details.
+## Querying
 
+You can simply apply NSPredicates to an RLMTable to return an RLMView containing a filtered view of your objects.
 
-## RLMRealm
+	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"date < %@ && title contains %@",
+															  [NSDate date], @"00"];
+	RLMView *view = [self.table where:predicate];
+	for (RLMDemoObject *object in view) {
+	    NSLog(@"title: %@\ndate: %@", object.title, object.date);
+	}
 
-The RLMRealm class is the main way to interact with a realm. It's how tables are created and extracted. When creating a read-only realm on the main thread, the context becomes optional and transactions are then performed implicitly at run loop intervals. This greatly simplifies usage when reading to display information in the UI, for example.
-
-	RLMRealm *realm = [RLMRealm realmWithDefaultPersistenceAndInitBlock:^(RLMRealm *realm) {
-        // Create table if it doesn't exist
-        if (realm.isEmpty) {
-            [realm createTableWithName:@"DemoTable" objectClass:[RLMDemoObject class]];
-        }
-    }];
-    
-    RLMTable *table = [realm tableWithName:@"DemoTable" objectClass:[RLMDemoObject class]];
-
-See the RLMRealm for more details.
+See RLMTable for more details on possible queries.
 
 
-## Listening to Changes
 
-Though Realm is extremely fast, it isn't instantaneous. Realm sends notifications to broadcast when a write transaction has completed. These notifications can be observed through the `NSNotificationCenter`:
+## Transactionless Reads (main thread only!)
+
+For ease of development when accessing values on the main thread (for example for UI purposes), we allow reads to be performed without an RLMContext or transaction block, but **only when the call is made from the main thread**.
+
+	// No RLMContext needed!
+	RLMRealm *realm = [RLMRealm realmWithDefaultPersistence];
+	DemoTable *table = [DemoTable tableInRealm:realm named:@"mytable"];
+	DemoObject *object = [DemoObject table.firstRow];
+	NSLog(object.title);
+
+Again, this only works on the main thread, and only for reads. You will still need to wrap your calls in an RLMContext with `writeUsingBlock:`
+to perform writes on the main thread.
+
+## Notifications
+
+The auto-updating Realm will send out notifications every time the underlying Realm is updated. These notifications can be observed through `NSNotificationCenter`:
 
 	// Observe Realm Notifications
 	[[NSNotificationCenter defaultCenter] addObserver:self
 	                                         selector:@selector(realmContextDidChange)
 	                                             name:RLMContextDidChangeNotification
 	                                           object:nil];
+
 ## Background Operations
 
-Inserting large amounts of data into your application has never been easier. Realm is designed to work with the tools you already know like Grand Central Dispatch and `NSOperationQueue`. Here's an example importing a million objects while keeping an app responsive and still allowing high-priority writes on the main thread:
+Realm can be very efficient when writing large amounts of data by batching together multiple writes within a single transaction. Transactions can also be performed in the background using Grand Central Dispatch to avoid blocking the main thread.  
+Here's an example of inserting a million objects in a background queue:
 
 	dispatch_async(queue, ^{
 	    RLMContext *ctx = [RLMContext contextWithDefaultPersistence];
@@ -88,16 +117,6 @@ Inserting large amounts of data into your application has never been easier. Rea
 	    }
 	});
 
-
-## Querying
-
-With support for `NSPredicate` and blazing fast performance, Realm's querying interface really shines.
-
-	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"date < %@ && title contains %@", [NSDate date], @"00"];
-	RLMView *view = [self.table where:predicate];
-	for (RLMDemoObject *object in view) {
-	    NSLog(@"title: %@\ndate: %@", object.title, object.date);
-	}
 
 See RLMTable for more details.
 

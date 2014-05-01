@@ -26,7 +26,7 @@
 
 
 //
-// The selectors in this interface is not meant to be used directly.
+// The selectors in this interface are not meant to be used directly.
 // However, they are public so that the typed table macros can use them.
 //
 
@@ -102,7 +102,7 @@
 @end
 
 //
-// The selectors in this interface is not meant to be used directly.
+// The selectors in this interface are not meant to be used directly.
 // However, they are public so that the typed table macros can use them.
 //
 @interface RLMView (Private)
@@ -121,7 +121,7 @@
 @end
 
 //
-// The selectors in this interface is not meant to be used directly.
+// The selectors in this interface are not meant to be used directly.
 // However, they are public so that the typed table macros can use them.
 //
 @interface RLMRow (Private)
@@ -131,7 +131,7 @@
 @end
 
 //
-// The selectors in this interface is not meant to be used directly.
+// The selectors in this interface are not meant to be used directly.
 // However, they are public so that the typed table macros can use them.
 //
 @interface RLMContext (Experiment)
