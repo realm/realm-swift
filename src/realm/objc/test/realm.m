@@ -63,7 +63,7 @@ REALM_TABLE_1(RLMTestTable,
 
 - (void)testTableCreatedAfterStandaloneRealmStarted {
     NSString *realmFilePath = @"async.realm";
-    [[NSFileManager managerForDefaultRealm] removeItemAtPath:realmFilePath error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
     NSString *tableName = @"table";
     
     RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];

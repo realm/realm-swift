@@ -15,12 +15,12 @@ NSString *const RLMTestRealmPath = @"test.realm";
 - (void)setUp {
     // This method is run before every test method
     [super setUp];
-    [[NSFileManager managerForDefaultRealm] removeItemAtPath:RLMTestRealmPath error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath error:nil];
 }
 
 + (void)tearDown {
     // This method is run after all tests in a test method have run
-    [[NSFileManager managerForDefaultRealm] removeItemAtPath:RLMTestRealmPath error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath error:nil];
     [super tearDown];
 }
 

@@ -30,7 +30,7 @@ void ex_objc_realm_intro()
     NSString *realmFilePath          = [documentsDirectoryPath stringByAppendingPathComponent:realmFileName];
     
     // Remove any previous files
-    [[NSFileManager managerForDefaultRealm] removeItemAtPath:realmFilePath error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
     
     // Create a realm and initialize by creating table and adding a row
     RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath
