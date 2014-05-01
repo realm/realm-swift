@@ -48,20 +48,13 @@
 // FIXME: Detect errors from core library
 -(NSUInteger)addColumnWithName:(NSString*)name type:(RLMType)type
 {
-    return [self addColumnWithName:name andType:type error:nil];
-}
-
--(NSUInteger)addColumnWithName:(NSString*)name andType:(RLMType)type error:(NSError* __autoreleasing*)error
-{
     if (m_read_only) {
-        if (error) {
-            *error = make_realm_error(RLMErrorFailRdOnly, @"Tried to add column while read only");
-        }
-        return NSNotFound;
+        @throw [NSException exceptionWithName:@"realm:core_read_only_exception"
+                                       reason:@"Realm is read-only."
+                                     userInfo:nil];
     }
     size_t columnIndex = NSNotFound;
-    REALM_EXCEPTION_ERRHANDLER(columnIndex = m_desc->add_column(tightdb::DataType(type), ObjcStringAccessor(name));,
-                               NSNotFound);
+    REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(columnIndex = m_desc->add_column(tightdb::DataType(type), ObjcStringAccessor(name)););
     return columnIndex;
 }
 
