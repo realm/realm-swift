@@ -46,22 +46,23 @@
 
 // FIXME: Provide a version of this method that takes a 'const char*'. This will simplify _addColumns of MyTable.
 // FIXME: Detect errors from core library
--(BOOL)addColumnWithName:(NSString*)name type:(RLMType)type
+-(NSUInteger)addColumnWithName:(NSString*)name type:(RLMType)type
 {
     return [self addColumnWithName:name andType:type error:nil];
 }
 
--(BOOL)addColumnWithName:(NSString*)name andType:(RLMType)type error:(NSError* __autoreleasing*)error
+-(NSUInteger)addColumnWithName:(NSString*)name andType:(RLMType)type error:(NSError* __autoreleasing*)error
 {
     if (m_read_only) {
         if (error)
             *error = make_realm_error(RLMErrorFailRdOnly, @"Tried to add column while read only");
-        return NO;
+        return NSNotFound;
     }
+    size_t columnIndex = NSNotFound;
     REALM_EXCEPTION_ERRHANDLER(
-                                 m_desc->add_column(tightdb::DataType(type), ObjcStringAccessor(name));,
+                                 columnIndex = m_desc->add_column(tightdb::DataType(type), ObjcStringAccessor(name));,
                                  NO);
-    return YES;
+    return columnIndex;
 }
 
 -(RLMDescriptor *)addColumnTable:(NSString*)name

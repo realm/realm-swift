@@ -65,6 +65,7 @@ and your code will break!
 * All prefixes changed from `TDB` to `RLM`.
 * `TDBTransaction` and `TDBSmartContext` have merged into `RLMRealm`.
 * Write transactions now take an optional rollback parameter (rather than needing to return a boolean).
+* `addColumnWithName:` and variant methods now return the index of the newly created column if successful, `NSNotFound` otherwise.
 
 ### Enhancements:
 
