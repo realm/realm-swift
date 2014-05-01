@@ -9,9 +9,9 @@
 #import <realm/objc/RLMTable.h>
 
 REALM_TABLE_3(FuncPeopleTable,
-                Name,  String,
-                Age,   Int,
-                Hired, Bool)
+              Name,  String,
+              Age,   Int,
+              Hired, Bool)
 
 #define TABLE_SIZE 1000 // must be even number
 #define INSERT_ROW 5
@@ -31,8 +31,7 @@ REALM_TABLE_3(FuncPeopleTable,
 @end
 @implementation MACtestFunctional
 
-- (void)testTypedRow
-{
+- (void)testTypedRow {
 
     /*
      *  Row in a table.
@@ -155,8 +154,7 @@ REALM_TABLE_3(FuncPeopleTable,
 
 }
 
-- (void)testDynamicRow
-{
+- (void)testDynamicRow {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         /*
          *  Row in a table.
@@ -284,8 +282,7 @@ REALM_TABLE_3(FuncPeopleTable,
 }
 
 - (void)testRowDescription {
-    RLMContext *context = [self contextPersistedAtTestPath];
-    [context writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         NSDate *date = [NSDate dateWithTimeIntervalSince1970:1234];
         RLMTable *table = [realm createTableWithName:@"people" objectClass:[RLMPerson class]];
         [table addRow:@[@"John", date]];
