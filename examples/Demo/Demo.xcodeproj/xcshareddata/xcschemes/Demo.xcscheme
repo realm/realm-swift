@@ -15,40 +15,13 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E80762CF18FEFFD70071CFAB"
-               BuildableName = "RLMDemo.app"
-               BlueprintName = "RLMDemo"
-               ReferencedContainer = "container:RLMDemo.xcodeproj">
+               BuildableName = "Demo.app"
+               BlueprintName = "Demo"
+               ReferencedContainer = "container:Demo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
-   <TestAction
-      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
-      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      buildConfiguration = "Debug">
-      <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E80762EA18FEFFD70071CFAB"
-               BuildableName = "RLMDemoTests.xctest"
-               BlueprintName = "RLMDemoTests"
-               ReferencedContainer = "container:RLMDemo.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-      </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E80762CF18FEFFD70071CFAB"
-            BuildableName = "RLMDemo.app"
-            BlueprintName = "RLMDemo"
-            ReferencedContainer = "container:RLMDemo.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
-   </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
@@ -62,9 +35,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E80762CF18FEFFD70071CFAB"
-            BuildableName = "RLMDemo.app"
-            BlueprintName = "RLMDemo"
-            ReferencedContainer = "container:RLMDemo.xcodeproj">
+            BuildableName = "Demo.app"
+            BlueprintName = "Demo"
+            ReferencedContainer = "container:Demo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -80,9 +53,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E80762CF18FEFFD70071CFAB"
-            BuildableName = "RLMDemo.app"
-            BlueprintName = "RLMDemo"
-            ReferencedContainer = "container:RLMDemo.xcodeproj">
+            BuildableName = "Demo.app"
+            BlueprintName = "Demo"
+            ReferencedContainer = "container:Demo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
