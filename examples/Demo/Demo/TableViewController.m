@@ -1,29 +1,29 @@
 //
-//  RLMTableViewController.m
-//  RLMDemo
+//  TableViewController.m
+//  Demo
 //
 //  Copyright (c) 2014 Realm. All rights reserved.
 //
 
-#import "RLMTableViewController.h"
+#import "TableViewController.h"
 #import <Realm/Realm.h>
 
 // Realm model object
-@interface RLMDemoObject : RLMRow
+@interface DemoObject : RLMRow
 
 @property (nonatomic, copy)   NSString *title;
 @property (nonatomic, strong) NSDate   *date;
 
 @end
 
-@implementation RLMDemoObject
+@implementation DemoObject
 // None needed
 @end
 
 static NSString * const kCellID    = @"cell";
 static NSString * const kTableName = @"table";
 
-@interface RLMTableViewController ()
+@interface TableViewController ()
 
 @property (nonatomic, strong) RLMRealm   *realm;
 @property (nonatomic, strong) RLMContext *context;
@@ -31,7 +31,7 @@ static NSString * const kTableName = @"table";
 
 @end
 
-@implementation RLMTableViewController
+@implementation TableViewController
 
 #pragma mark - View Lifecycle
 
@@ -45,7 +45,7 @@ static NSString * const kTableName = @"table";
 #pragma mark - UI
 
 - (void)setupUI {
-    self.title = @"RLMDemo";
+    self.title = @"Demo";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"BG Add"
                                                                              style:UIBarButtonItemStylePlain
                                                                             target:self
@@ -64,11 +64,11 @@ static NSString * const kTableName = @"table";
     self.realm = [RLMRealm realmWithDefaultPersistenceAndInitBlock:^(RLMRealm *realm) {
         // Create table if it doesn't exist
         if (realm.isEmpty) {
-            [realm createTableWithName:kTableName objectClass:[RLMDemoObject class]];
+            [realm createTableWithName:kTableName objectClass:[DemoObject class]];
         }
     }];
     
-    self.table = [self.realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
+    self.table = [self.realm tableWithName:kTableName objectClass:[DemoObject class]];
     
     self.context = [RLMContext contextWithDefaultPersistence];
     
@@ -96,7 +96,7 @@ static NSString * const kTableName = @"table";
                                       reuseIdentifier:kCellID];
     }
     
-    RLMDemoObject *object = self.table[indexPath.row];
+    DemoObject *object = self.table[indexPath.row];
     cell.textLabel.text = object.title;
     cell.detailTextLabel.text = object.date.description;
     
@@ -125,7 +125,7 @@ static NSString * const kTableName = @"table";
         for (NSInteger idx1 = 0; idx1 < 1000; idx1++) {
             // Break up the writing blocks into smaller portions
             [ctx writeUsingBlock:^(RLMRealm *realm) {
-                RLMTable *table = [realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
+                RLMTable *table = [realm tableWithName:kTableName objectClass:[DemoObject class]];
                 for (NSInteger idx2 = 0; idx2 < 1000; idx2++) {
                     // Add row via dictionary. Order is ignored.
                     [table addRow:@{@"title": [self randomString], @"date": [self randomDate]}];
@@ -137,7 +137,7 @@ static NSString * const kTableName = @"table";
 
 - (void)add {
     [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
-        RLMTable *table = [realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
+        RLMTable *table = [realm tableWithName:kTableName objectClass:[DemoObject class]];
         // Add row via array. Order matters.
         [table addRow:@[[self randomString], [self randomDate]]];
     }];
