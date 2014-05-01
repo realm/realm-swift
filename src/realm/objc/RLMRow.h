@@ -1,28 +1,86 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
 
 
 @class RLMTable;
 
+
+/**
+ 
+ The sole purpose of RLMRow class is to be subclassed to store your own objects.
+ 
+ You can create model files easily using the following syntax:
+ 
+    // In DogModel.h
+ 
+    @interface DogModel : RLMRow
+    
+    @property (nonatomic, copy)   NSString *name;
+    @property (nonatomic, strong) NSDate   *birthdate;
+    @property (nonatomic, assign) BOOL      adopted;
+    
+    @end
+ 
+    @implementation DogModel
+    @end //none needed
+ 
+    // Generate a matching RLMTable class called “DogTable” for DogObject
+    RLM_DEFINE_TABLE_TYPE_FOR_OBJECT_TYPE(DogTable, DogModel)
+    // This will provide automatic casting when accessing objects in tables of that class
+    // as well as other syntaxic conveniences
+ 
+Supported property types are:
+ 
+   - `NSString`
+   - `NSNumber`, `int`, `float`, `double` and `long`
+   - `BOOL` or `bool`
+   - `NSDate`
+   - `NSData`
+ 
+ Additionally, you can store a table as a property of one of your models using the following syntax:
+ 
+    // In PersonModel.h
+ 
+    // Assuming the DogModel above has already been created,
+    // create a Table class for that model
+    RLM_TABLE_TYPE_FOR_OBJECT_TYPE(DogModel, DogTable)
+ 
+    @interface PersonModel : RLMRow
+    @property (nonatomic, copy)   NSString *name;
+    @property (nonatomic, strong) DogTable *dogs;
+    @end
+ 
+    // Generate a matching RLMTable class again for syntaxic ease
+    RLM_DEFINE_TABLE_TYPE_FOR_OBJECT_TYPE(PeopleTable, PersonModel)
+ 
+ You can access subtable properties the same way you do regular properties:
+ 
+    personTable[2].dogs[0]; //returns the first dog of the third person
+    personTable[2].dogs[0].name;
+ 
+ 
+ @warning RLMRow objects cannot be created as standalone objects: you must create them through an `addrow:` call on an RLMTable.
+ 
+ */
 
 // protocol for custom table objects
 @protocol RLMObject <NSObject>

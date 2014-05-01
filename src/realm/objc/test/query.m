@@ -250,7 +250,7 @@ REALM_TABLE_9(TestQueryAllTypes,
         XCTAssertEqual((time_t)[[[table where] minDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], (time_t)[date1 timeIntervalSince1970], @"MinDateInColumn");
         XCTAssertEqual((time_t)[[[table where] maxDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], (time_t)[date2 timeIntervalSince1970], @"MaxDateInColumn");
         
-        /// TODO: Tests missing....
+        // TODO: Tests missing....
     }];
 }
 
@@ -262,7 +262,7 @@ REALM_TABLE_9(TestQueryAllTypes,
         NSUInteger doubleCol = [table addColumnWithName:@"DoubleCol" type:RLMTypeDouble];
         NSUInteger dateCol = [table addColumnWithName:@"DateCol" type:RLMTypeDate];
         
-        ////////// Zero rows added ///////////
+        //======== Zero rows added ========//
         
         // Using specific column type operations MIN
         XCTAssertEqual([[table where] minIntInColumnWithIndex:intCol], NSIntegerMax);
@@ -308,7 +308,7 @@ REALM_TABLE_9(TestQueryAllTypes,
         XCTAssertEqual([[[table where] avgColumnWithIndex:floatCol] doubleValue], (double)0);
         XCTAssertEqual([[[table where] avgColumnWithIndex:doubleCol] doubleValue], (double)0);
         
-        ////////// Add rows with values ///////////
+        //======== Add rows with values ========//
         
         NSDate *date3 = [NSDate date];
         NSDate *date33 = [date3 dateByAddingTimeInterval:1];
@@ -602,11 +602,11 @@ REALM_TABLE_9(TestQueryAllTypes,
     XCTAssertEqual(view.rowCount,
                    results.count,
                    @"%@ predicate should return correct count", name);
-    [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        XCTAssertEqualObjects(obj,
-                              view[idx][column],
+    for (NSUInteger i = 0; i < results.count; i++) {
+        XCTAssertEqualObjects(results[i],
+                              view[i][column],
                               @"%@ predicate should return correct results", name);
-    }];
+    }
 }
 
 @end
