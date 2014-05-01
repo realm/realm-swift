@@ -1,42 +1,31 @@
 /* @@Example: ex_objc_tableview_typed_intro @@ */
 #import <Realm/Realm.h>
-#import "people.h"
 
-/*
- The classes People, PeopleQuery, PeopleView, and PeopleRow are declared
- (interfaces are generated) in people.h as
+// Simple person data object
+@interface Person : RLMRow
 
- REALM_TABLE_DEF_3(People,
-                     Name,  String,
-                     Age,   Int,
-                     Hired, Bool)
+@property NSString * name;
+@property int age;
+@property BOOL hired;
 
- and in people.m you must have
-
- REALM_TABLE_IMPL_3(People,
-                      Name, String,
-                      Age,  Int,
-                      Hired, Bool)
-
- in order to generate the implementation of the classes.
-*/
+@end
 
 void ex_objc_tableview_typed_intro()
 {
     /* Creates a new table of the type defined above. */
-    People *table = [[People alloc] init];
+    RLMTable *table = [[RLMTable alloc] initWithObjectClass:Person.class];
     
     /* Adds rows to the table. */
-    [table addRow:@{@"Name":@"Brian",  @"Age":@10, @"Hired":@NO}];
-    [table addRow:@{@"Name":@"Sofie",  @"Age":@40, @"Hired":@YES}];
-    [table addRow:@{@"Name":@"Sam",    @"Age":@76, @"Hired":@NO}];
+    [table addRow:@{@"name":@"Brian",  @"age":@10, @"hired":@NO}];
+    [table addRow:@{@"name":@"Sofie",  @"age":@40, @"hired":@YES}];
+    [table addRow:@{@"name":@"Sam",    @"age":@76, @"hired":@NO}];
     
     /* Get the result of a query in a table view. */
-    PeopleView *view = [[[table where].Age columnIsGreaterThan:20] findAll];
+    RLMView *view = [table where:@"age > 20"];
     
     /* Iterate over the result in the table view. */
-    for (PeopleRow *row in view) {
-        NSLog(@"This person is over the age of 20: %@", row.Name);
+    for (Person *row in view) {
+        NSLog(@"This person is over the age of 20: %@", row.name);
     }
 }
 /* @@EndExample@@ */

@@ -1,26 +1,14 @@
 /* @@Example: ex_objc_sharedgroup_intro @@ */
 #import <Realm/Realm.h>
-#import "people.h"
 
-/*
- The classes People, PeopleQuery, PeopleView, and PeopleRow are declared
- (interfaces are generated) in people.h as
+// Simple person data object
+@interface Person : RLMRow
 
- REALM_TABLE_DEF_3(People,
-                   Name,  String,
-                   Age,   Int,
-                   Hired, Bool)
+@property NSString * name;
+@property int age;
+@property BOOL hired;
 
- and in people.m you must have
-
- REALM_TABLE_IMPL_3(People,
-                    Name, String,
-                    Age,  Int,
-                    Hired, Bool)
-
- in order to generate the implementation of the classes.
- */
-
+@end
 
 void ex_objc_context_intro()
 {
@@ -32,29 +20,29 @@ void ex_objc_context_intro()
                                                        error:nil];
     // Perform a write transaction (with commit to file)
     [context writeUsingBlock:^(RLMRealm *realm) {
-        People *table = [realm createTableWithName:@"employees"
-                                      asTableClass:[People class]];
-        [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
+        RLMTable *table = [realm createTableWithName:@"employees"
+                                         objectClass:Person.class];
+        [table addRow:@{@"name":@"Bill", @"age":@53, @"hired":@YES}];
     }];
 
     // Perform a write transaction (with rollback)
     [context writeUsingBlockWithRollback:^(RLMRealm *realm, BOOL *rollback) {
-        People *table = [realm createTableWithName:@"employees"
-                                      asTableClass:[People class]];
+        RLMTable *table = [realm createTableWithName:@"employees"
+                                      objectClass:Person.class];
         if ([table rowCount] == 0) {
             NSLog(@"Roll back!");
             *rollback = YES;
             return;
         }
-        [table addName:@"Mary" Age:76 Hired:NO];
+        [table addRow:@[@"Mary", @76, @NO]];
     }];
 
     // Perform a read transaction
     [context readUsingBlock:^(RLMRealm *realm) {
-        People *table = [realm tableWithName:@"employees"
-                                asTableClass:[People class]];
-        for (PeopleRow *row in table) {
-            NSLog(@"Name: %@", row.Name);
+        RLMTable *table = [realm tableWithName:@"employees"
+                                   objectClass:Person.class];
+        for (Person *row in table) {
+            NSLog(@"Name: %@", row.name);
         }
     }];
 }
