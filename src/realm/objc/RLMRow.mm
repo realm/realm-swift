@@ -42,7 +42,7 @@ using namespace std;
 
 // make sure users don't create these without a table
 -(id)init {
-    @throw [NSException exceptionWithName:@"RLMException" reason:@"Must initialize row with table and index" userInfo:nil];
+    @throw [NSException exceptionWithName:@"RLMException" reason:@"Cannot create standalone row outside of tables" userInfo:nil];
 }
 
 -(id)initWithTable:(RLMTable *)table ndx:(NSUInteger)ndx
