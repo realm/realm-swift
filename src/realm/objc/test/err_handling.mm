@@ -269,118 +269,120 @@ REALM_TABLE_9(TestQueryErrAllTypes,
 
 - (void)testQueryErrHandling
 {
-    TestQueryErrAllTypes* table = [[TestQueryErrAllTypes alloc] init];
-    NSLog(@"Table: %@", table);
-    XCTAssertNotNil(table, @"Table is nil");
-
-    const char bin[4] = { 0, 1, 2, 3 };
-    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
-    NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
-    NSDate *timeNow = [NSDate date];
-    //    TestQueryErrSub* subtab1 = [[TestQueryErrSub alloc] init];
-    TestQueryErrSub* subtab2 = [[TestQueryErrSub alloc] init];
-    [subtab2 addAge:100];
-    NSNumber* mixInt1   = [NSNumber numberWithLongLong:1];
-//    TDBMixed* mixSubtab = [TDBMixed mixedWithTable:subtab2];
-
-    [table addBoolCol:NO   IntCol:54       FloatCol:0.7     DoubleCol:0.8       StringCol:@"foo"
-            BinaryCol:bin1 DateCol:0       TableCol:nil     MixedCol:mixInt1];
-
-    [table addBoolCol:YES  IntCol:506      FloatCol:7.7     DoubleCol:8.8       StringCol:@"banach"
-            BinaryCol:bin2 DateCol:timeNow TableCol:subtab2 MixedCol:subtab2];
-
-    XCTAssertEqual([[[table where].BoolCol   columnIsEqualTo:NO]      countRows], (NSUInteger)1, @"BoolCol equal");
-    XCTAssertEqual([[[table where].IntCol    columnIsEqualTo:54]      countRows], (NSUInteger)1, @"IntCol equal");
-    XCTAssertEqual([[[table where].FloatCol  columnIsEqualTo:0.7f]    countRows], (NSUInteger)1, @"FloatCol equal");
-    XCTAssertEqual([[[table where].DoubleCol columnIsEqualTo:0.8]     countRows], (NSUInteger)1, @"DoubleCol equal");
-    XCTAssertEqual([[[table where].StringCol columnIsEqualTo:@"foo"]  countRows], (NSUInteger)1, @"StringCol equal");
-    XCTAssertEqual([[[table where].BinaryCol columnIsEqualTo:bin1]    countRows], (NSUInteger)1, @"BinaryCol equal");
-    XCTAssertEqual([[[table where].DateCol   columnIsEqualTo:0]       countRows], (NSUInteger)1, @"DateCol equal");
-    // These are not yet implemented
-    //    XCTAssertEqual([[[table where].TableCol  columnIsEqualTo:subtab1] count], (NSUInteger)1, @"TableCol equal");
-    //    XCTAssertEqual([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (NSUInteger)1, @"MixedCol equal");
-
-    TestQueryErrAllTypesQuery* query = [[table where].BoolCol   columnIsEqualTo:NO];
-
-    XCTAssertEqual([query.IntCol min] , (int64_t)54,    @"IntCol min");
-    XCTAssertEqual([query.IntCol max], (int64_t)54,    @"IntCol max");
-    XCTAssertEqual([query.IntCol sum] , (int64_t)54,    @"IntCol sum");
-    XCTAssertEqual([query.IntCol avg] , 54.0,           @"IntCol avg");
-
-    XCTAssertEqual([query.FloatCol min], 0.7f,         @"FloatCol min");
-    XCTAssertEqual([query.FloatCol max], 0.7f,         @"FloatCol max");
-    XCTAssertEqual([query.FloatCol sum], (double)0.7f, @"FloatCol sum");
-    XCTAssertEqual([query.FloatCol avg], (double)0.7f, @"FloatCol avg");
-
-    XCTAssertEqual([query.DoubleCol min], 0.8,         @"DoubleCol min");
-    XCTAssertEqual([query.DoubleCol max], 0.8,         @"DoubleCol max");
-    XCTAssertEqual([query.DoubleCol sum] , 0.8,         @"DoubleCol sum");
-    XCTAssertEqual([query.DoubleCol avg], 0.8,         @"DoubleCol avg");
-
-    // Check that all column conditions return query objects of the
-    // right type
-    [[[table where].BoolCol columnIsEqualTo:NO].BoolCol columnIsEqualTo:NO];
-
-    [[[table where].IntCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].IntCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].IntCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].IntCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].IntCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].IntCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].IntCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
-
-    [[[table where].FloatCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].FloatCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].FloatCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].FloatCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].FloatCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].FloatCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].FloatCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
-
-    [[[table where].DoubleCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DoubleCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DoubleCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DoubleCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DoubleCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DoubleCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DoubleCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
-
-    [[[table where].StringCol columnIsEqualTo:@""].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnIsEqualTo:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnIsNotEqualTo:@""].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnIsNotEqualTo:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnBeginsWith:@""].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnBeginsWith:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnEndsWith:@""].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnEndsWith:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnContains:@""].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnContains:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
-
-    [[[table where].BinaryCol columnIsEqualTo:bin1].BoolCol columnIsEqualTo:NO];
-    [[[table where].BinaryCol columnIsNotEqualTo:bin1].BoolCol columnIsEqualTo:NO];
-    [[[table where].BinaryCol columnBeginsWith:bin1].BoolCol columnIsEqualTo:NO];
-    [[[table where].BinaryCol columnEndsWith:bin1].BoolCol columnIsEqualTo:NO];
-    [[[table where].BinaryCol columnContains:bin1].BoolCol columnIsEqualTo:NO];
-
-    TestQueryErrAllTypesView* view = [[[[table where].DateCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO] findAll];
-    for (NSUInteger i = 0; i < [view rowCount]; i++) {
-        NSLog(@"%zu: %c", i, [view rowAtIndex:i].BoolCol);
-    }
-
-
-    [[[table where].DateCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DateCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DateCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DateCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DateCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DateCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
-
-    // These are not yet implemented
-    //    [[[table where].TableCol columnIsEqualTo:nil].BoolCol columnIsEqualTo:NO];
-    //    [[[table where].TableCol columnIsNotEqualTo:nil].BoolCol columnIsEqualTo:NO];
-
-    //    [[[table where].MixedCol columnIsEqualTo:mixInt1].BoolCol columnIsEqualTo:NO];
-    //    [[[table where].MixedCol columnIsNotEqualTo:mixInt1].BoolCol columnIsEqualTo:NO];
+    [self.contextPersistedAtTestPath writeUsingBlock:^(RLMRealm *realm) {
+        TestQueryErrAllTypes* table = [realm createTableWithName:@"Test" asTableClass:TestQueryErrAllTypes.class];
+        NSLog(@"Table: %@", table);
+        XCTAssertNotNil(table, @"Table is nil");
+        
+        const char bin[4] = { 0, 1, 2, 3 };
+        NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+        NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
+        NSDate *timeNow = [NSDate date];
+        //    TestQueryErrSub* subtab1 = [[TestQueryErrSub alloc] init];
+        TestQueryErrSub* subtab2 = [realm createTableWithName:@"subtab2" asTableClass:TestQueryErrSub.class];
+        [subtab2 addAge:100];
+        NSNumber* mixInt1   = [NSNumber numberWithLongLong:1];
+        //    TDBMixed* mixSubtab = [TDBMixed mixedWithTable:subtab2];
+        
+        [table addBoolCol:NO   IntCol:54       FloatCol:0.7     DoubleCol:0.8       StringCol:@"foo"
+                BinaryCol:bin1 DateCol:0       TableCol:nil     MixedCol:mixInt1];
+        
+        [table addBoolCol:YES  IntCol:506      FloatCol:7.7     DoubleCol:8.8       StringCol:@"banach"
+                BinaryCol:bin2 DateCol:timeNow TableCol:subtab2 MixedCol:subtab2];
+        
+        XCTAssertEqual([[[table where].BoolCol   columnIsEqualTo:NO]      countRows], (NSUInteger)1, @"BoolCol equal");
+        XCTAssertEqual([[[table where].IntCol    columnIsEqualTo:54]      countRows], (NSUInteger)1, @"IntCol equal");
+        XCTAssertEqual([[[table where].FloatCol  columnIsEqualTo:0.7f]    countRows], (NSUInteger)1, @"FloatCol equal");
+        XCTAssertEqual([[[table where].DoubleCol columnIsEqualTo:0.8]     countRows], (NSUInteger)1, @"DoubleCol equal");
+        XCTAssertEqual([[[table where].StringCol columnIsEqualTo:@"foo"]  countRows], (NSUInteger)1, @"StringCol equal");
+        XCTAssertEqual([[[table where].BinaryCol columnIsEqualTo:bin1]    countRows], (NSUInteger)1, @"BinaryCol equal");
+        XCTAssertEqual([[[table where].DateCol   columnIsEqualTo:0]       countRows], (NSUInteger)1, @"DateCol equal");
+        // These are not yet implemented
+        //    XCTAssertEqual([[[table where].TableCol  columnIsEqualTo:subtab1] count], (NSUInteger)1, @"TableCol equal");
+        //    XCTAssertEqual([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (NSUInteger)1, @"MixedCol equal");
+        
+        TestQueryErrAllTypesQuery* query = [[table where].BoolCol   columnIsEqualTo:NO];
+        
+        XCTAssertEqual([query.IntCol min] , (int64_t)54,    @"IntCol min");
+        XCTAssertEqual([query.IntCol max], (int64_t)54,    @"IntCol max");
+        XCTAssertEqual([query.IntCol sum] , (int64_t)54,    @"IntCol sum");
+        XCTAssertEqual([query.IntCol avg] , 54.0,           @"IntCol avg");
+        
+        XCTAssertEqual([query.FloatCol min], 0.7f,         @"FloatCol min");
+        XCTAssertEqual([query.FloatCol max], 0.7f,         @"FloatCol max");
+        XCTAssertEqual([query.FloatCol sum], (double)0.7f, @"FloatCol sum");
+        XCTAssertEqual([query.FloatCol avg], (double)0.7f, @"FloatCol avg");
+        
+        XCTAssertEqual([query.DoubleCol min], 0.8,         @"DoubleCol min");
+        XCTAssertEqual([query.DoubleCol max], 0.8,         @"DoubleCol max");
+        XCTAssertEqual([query.DoubleCol sum] , 0.8,         @"DoubleCol sum");
+        XCTAssertEqual([query.DoubleCol avg], 0.8,         @"DoubleCol avg");
+        
+        // Check that all column conditions return query objects of the
+        // right type
+        [[[table where].BoolCol columnIsEqualTo:NO].BoolCol columnIsEqualTo:NO];
+        
+        [[[table where].IntCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].IntCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].IntCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].IntCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].IntCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].IntCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].IntCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
+        
+        [[[table where].FloatCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].FloatCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].FloatCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].FloatCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].FloatCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].FloatCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].FloatCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
+        
+        [[[table where].DoubleCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].DoubleCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].DoubleCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].DoubleCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].DoubleCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].DoubleCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].DoubleCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
+        
+        [[[table where].StringCol columnIsEqualTo:@""].BoolCol columnIsEqualTo:NO];
+        [[[table where].StringCol columnIsEqualTo:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
+        [[[table where].StringCol columnIsNotEqualTo:@""].BoolCol columnIsEqualTo:NO];
+        [[[table where].StringCol columnIsNotEqualTo:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
+        [[[table where].StringCol columnBeginsWith:@""].BoolCol columnIsEqualTo:NO];
+        [[[table where].StringCol columnBeginsWith:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
+        [[[table where].StringCol columnEndsWith:@""].BoolCol columnIsEqualTo:NO];
+        [[[table where].StringCol columnEndsWith:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
+        [[[table where].StringCol columnContains:@""].BoolCol columnIsEqualTo:NO];
+        [[[table where].StringCol columnContains:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
+        
+        [[[table where].BinaryCol columnIsEqualTo:bin1].BoolCol columnIsEqualTo:NO];
+        [[[table where].BinaryCol columnIsNotEqualTo:bin1].BoolCol columnIsEqualTo:NO];
+        [[[table where].BinaryCol columnBeginsWith:bin1].BoolCol columnIsEqualTo:NO];
+        [[[table where].BinaryCol columnEndsWith:bin1].BoolCol columnIsEqualTo:NO];
+        [[[table where].BinaryCol columnContains:bin1].BoolCol columnIsEqualTo:NO];
+        
+        TestQueryErrAllTypesView* view = [[[[table where].DateCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO] findAll];
+        for (NSUInteger i = 0; i < [view rowCount]; i++) {
+            NSLog(@"%zu: %c", i, [view rowAtIndex:i].BoolCol);
+        }
+        
+        
+        [[[table where].DateCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].DateCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].DateCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].DateCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].DateCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
+        [[[table where].DateCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
+        
+        // These are not yet implemented
+        //    [[[table where].TableCol columnIsEqualTo:nil].BoolCol columnIsEqualTo:NO];
+        //    [[[table where].TableCol columnIsNotEqualTo:nil].BoolCol columnIsEqualTo:NO];
+        
+        //    [[[table where].MixedCol columnIsEqualTo:mixInt1].BoolCol columnIsEqualTo:NO];
+        //    [[[table where].MixedCol columnIsNotEqualTo:mixInt1].BoolCol columnIsEqualTo:NO];
+    }];
 }
 
 
