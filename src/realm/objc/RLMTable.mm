@@ -1387,9 +1387,9 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 
 } //namespace
 
--(id)find:(id)condition
+-(id)find:(id)predicate
 {
-    tightdb::Query query = queryFromPredicate(self, condition);
+    tightdb::Query query = queryFromPredicate(self, predicate);
 
     size_t row_ndx = query.find();
 
