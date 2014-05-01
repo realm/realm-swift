@@ -1,22 +1,22 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
 
@@ -27,11 +27,46 @@
 @class RLMDescriptor;
 @class RLMRow;
 
+/**
+ 
+ RLMTables contain your objects (RLMRow subclasses).
+ 
+ You can use indexed subscripting to access your data:
+    
+    myTable[2] // will return the object stored in the second row in the RLMable.
+    myTable[2] = someObject;
+ 
+ **If your first property on your RLMRow subclass is a _string_**, you can also use keyed subscripting:
+ 
+    myTable[@"foo"] // will return the first object whose first property is equal to “foo”
+    myTable[@"foo"] = someObject;
+ 
+ To query, you can use NSPredicates and an optional NSSortDescriptor
+ 
+    [[RLMContext contextWithDefaultPersistence] readUsingBlock:^(RLMRealm *realm) {
+        RLMTable *table = [realm tableWithName:@"Dogs" objectClass:[RLMDogObject class]];
+        
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
+        RLMRow *r = [table find:predicate];     // returns only the first object that matches
+        r[@"age"] …                             // outputs the value for the “age” property
+ 
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @1];
+        RLMView *v = [table where:predicate];   // returns a view containing all matches
+        v[0]@"age"] …
+ 
+        NSSortDescriptor * boolSort = [NSSortDescriptor sortDescriptorWithKey:@"hired" ascending:YES];
+        RLMView *v = [table where:predicate orderBy:boolSort] // returns a sorted view containing all matches
+        v[0]@"age"] …
+    }];
+
+ 
+ @warning All Table access should be done from within an RLMRealm / RLMContext. You will receive an error if trying
+ to access an RLMTable directly.
+ */
 
 @interface RLMTable : NSObject <RLMView,NSFastEnumeration>
 
-@property (nonatomic, readonly) NSUInteger rowCount;
-@property (nonatomic, readonly) NSUInteger columnCount;
+
 @property (nonatomic, readonly) RLMDescriptor *descriptor;
 
 // Working with columns
@@ -39,34 +74,91 @@
 -(void)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString *)newName;
 -(void)removeColumnWithIndex:(NSUInteger)colIndex;
 
+// Column manipulation
 -(NSString *)nameOfColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)indexOfColumnWithName:(NSString *)name;
 -(RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex;
 
-// Getting individual rows
+/**---------------------------------------------------------------------------------------
+ *  @name Accessing Objects inside a Table
+ *  ---------------------------------------------------------------------------------------
+ */
+/**
+ Number of objects in this RLMTable.
+ */
+@property (nonatomic, readonly) NSUInteger rowCount;
+@property (nonatomic, readonly) NSUInteger columnCount;
+/**
+ Returns the object at the index specified.
+ 
+ @param rowIndex The index to look up.
+ 
+ @return An object (of the same type as the RLMRow subclass used on this RLMTable).
+ */
 -(id)rowAtIndex:(NSUInteger)rowIndex;
+/**
+ Returns the object at the top of the RLMTable.
+ 
+ @return An object (of the same type as the RLMRow subclass used on this RLMTable).
+ */
 -(id)firstRow;
+/**
+ Returns the object at the bottom of the RLMTable.
+ 
+ @return An object (of the same type as the RLMRow subclass used on this RLMTable).
+ */
 -(id)lastRow;
 
-// Getting and setting individual rows with object subscripting
+// internal method for keyed+indexed subscripting
 -(id)objectAtIndexedSubscript:(NSUInteger)rowIndex;
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
 -(id)objectForKeyedSubscript:(NSString *)key;
 -(void)setObject:(id)newValue forKeyedSubscript:(NSString *)key;
 
-// Add a row at the end of the table.
-// If data is nil, an empty row with default values is added.
+/**
+ Adds an object to the bottom of the RLMTable.
+ 
+ If data is nil, an empty row with the default values is added.
+ 
+ @param data An object (of the same type as the RLMRow subclass used on this RLMTable).
+ */
 -(void)addRow:(NSObject *)data;
 
-// Inserting rows at specific positions
+/**
+ Adds an object at the specified position in the RLMTable
+ 
+ @warning All rows after rowIndex will be offset by one position!
+ 
+ @param anObject An object (of the same type as the RLMRow subclass used on this RLMTable).
+ @param rowIndex The position you want this object inserted at.
+ 
+ @see updateRow:atIndex:
+ */
 -(void)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex;
 
-// Updating rows at specific positions
+/**
+ Updates (replaces) the object at the specified position in the RLMTable
+ 
+ @param anObject An object (of the same type as the RLMRow subclass used on this RLMTable).
+ @param rowIndex The position you want this object inserted at.
+ 
+ @see insertRow:atIndex:
+ */
 -(void)updateRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex;
 
-// Removing rows
+/**
+ Removes all objects from the RLMTable.
+ */
 -(void)removeAllRows;
+/**
+ Deletes the object at the position specified.
+ 
+ @param rowIndex The position of the object you want to delete.
+ */
 -(void)removeRowAtIndex:(NSUInteger)rowIndex;
+/**
+ Deletes the object at the bottom of the RLMTable.
+ */
 -(void)removeLastRow;
 
 // Queries
@@ -74,12 +166,59 @@
 // Only supported on string columns with an index
 -(RLMView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
 
-// Predicate queries
+/**---------------------------------------------------------------------------------------
+ *  @name Querying a Table
+ *  ---------------------------------------------------------------------------------------
+ */
+/**
+ Returns the **first** object matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html)
+ 
+    RLMRow *r = [table find:@"name == \"name10\""];
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
+    r = [table find:predicate];
+ 
+ @param condition An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
+ 
+ @return The **first** object matching the Predicate. It will be of the same type as the RLMRow subclass used on this RLMTable
+ @see where:
+ */
 -(id)find:(id)condition;
+/**
+ Returns **all** objects matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
+ 
+    RLMView *v = [table where:@"name == \"name10\""];
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
+    v = [table where:predicate];
+ 
+ @param condition An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
+ 
+ @return A reference to an RLMView containing **all** objects matching the Predicate. Objects contained will be of the same type as the RLMRow subclass used on this RLMTable
+ @see find:
+ @see where:orderBy:
+ */
 -(RLMView *)where:(id)condition;
+/**
+ Returns **all** objects matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html), in the order specified by the [NSSortDescriptor](https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSSortDescriptor_Class/Reference/Reference.html).
+ 
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
+    NSSortDescriptor * reverseSort = [NSSortDescriptor sortDescriptorWithKey:@"age" ascending:NO];
+    v = [table where:predicate oderBy:reverseSort];
+ 
+    v = [table where:predicate orderBy:@"age"];
+ 
+ @param condition An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
+
+ @param order     An [NSSortDescriptor](https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSSortDescriptor_Class/Reference/Reference.html). You can also use the NSString instead of the NSSortDescriptor.
+ 
+ @return A reference to an RLMView containing **all** objects matching the Predicate, sorted according to the Sort Descriptor. Objects contained will be of the same type as the RLMRow subclass used on this RLMTable
+ 
+ @see where:
+ */
 -(RLMView *)where:(id)condition orderBy:(id)order;
 
-// Indexing
+// Indices
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex;
 

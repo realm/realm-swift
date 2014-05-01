@@ -8,6 +8,9 @@ int main(int argc, char * argv[])
     @autoreleasepool {
         remove_default_persistence_file(); // Ensure default persistence file is removed
         
+        ex_objc_intro();
+        remove_default_persistence_file();
+        
         ex_objc_query_dynamic_intro();
         remove_default_persistence_file();
         
@@ -21,6 +24,9 @@ int main(int argc, char * argv[])
         remove_default_persistence_file();
         
         ex_objc_table_dynamic_intro();
+        remove_default_persistence_file();
+        
+        ex_objc_table_dyn_table_sizes();
         remove_default_persistence_file();
         
         ex_objc_table_dyn_table_sizes();

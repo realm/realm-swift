@@ -252,7 +252,7 @@ REALM_TABLE_9(TestQueryAllTypes,
         XCTAssertEqual((time_t)[[[table where] minDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], (time_t)[date1 timeIntervalSince1970], @"MinDateInColumn");
         XCTAssertEqual((time_t)[[[table where] maxDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], (time_t)[date2 timeIntervalSince1970], @"MaxDateInColumn");
         
-        /// TODO: Tests missing....
+        // TODO: Tests missing....
     }];
 }
 
@@ -264,7 +264,7 @@ REALM_TABLE_9(TestQueryAllTypes,
         NSUInteger doubleCol = [table addColumnWithName:@"DoubleCol" type:RLMTypeDouble];
         NSUInteger dateCol = [table addColumnWithName:@"DateCol" type:RLMTypeDate];
         
-        ////////// Zero rows added ///////////
+        //======== Zero rows added ========//
         
         // Using specific column type operations MIN
         XCTAssertEqual([[table where] minIntInColumnWithIndex:intCol], NSIntegerMax);
@@ -310,7 +310,7 @@ REALM_TABLE_9(TestQueryAllTypes,
         XCTAssertEqual([[[table where] avgColumnWithIndex:floatCol] doubleValue], (double)0);
         XCTAssertEqual([[[table where] avgColumnWithIndex:doubleCol] doubleValue], (double)0);
         
-        ////////// Add rows with values ///////////
+        //======== Add rows with values ========//
         
         NSDate *date3 = [NSDate date];
         NSDate *date33 = [date3 dateByAddingTimeInterval:1];
@@ -589,6 +589,56 @@ REALM_TABLE_9(TestQueryAllTypes,
             XCTAssertThrows([table where:predicate],
                             @"String predicate with diacritic insensitive option should throw");
         }
+    }];
+}
+
+- (void)testBinaryPredicates {
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"data" type:RLMTypeBinary];
+        NSArray *dataArray = @[[@"a" dataUsingEncoding:NSUTF8StringEncoding],
+                               [@"ab" dataUsingEncoding:NSUTF8StringEncoding],
+                               [@"abc" dataUsingEncoding:NSUTF8StringEncoding],
+                               [@"abcd" dataUsingEncoding:NSUTF8StringEncoding]];
+        for (NSData *data in dataArray) {
+            [table addRow:@[data]];
+        }
+        
+        // Equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"data == %@", dataArray.lastObject]
+                    onTable:table
+                withResults:@[dataArray.lastObject]
+                       name:@"equal"
+                     column:@"data"];
+        
+        // Not equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"data != %@", dataArray.firstObject]
+                    onTable:table
+                withResults:[dataArray subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"not equal"
+                     column:@"data"];
+        
+        // Begins with
+        [self testPredicate:[NSPredicate predicateWithFormat:@"data beginswith %@", dataArray[1]]
+                    onTable:table
+                withResults:[dataArray subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"beginswith"
+                     column:@"data"];
+        
+        // Contains
+        [self testPredicate:[NSPredicate predicateWithFormat:@"data contains %@",
+                             [@"bc" dataUsingEncoding:NSUTF8StringEncoding]]
+                    onTable:table
+                withResults:[dataArray subarrayWithRange:NSMakeRange(2, 2)]
+                       name:@"contains"
+                     column:@"data"];
+        
+        // Ends with
+        [self testPredicate:[NSPredicate predicateWithFormat:@"data endswith %@",
+                             [@"cd" dataUsingEncoding:NSUTF8StringEncoding]]
+                    onTable:table
+                withResults:@[dataArray.lastObject]
+                       name:@"endswith"
+                     column:@"data"];
     }];
 }
 
