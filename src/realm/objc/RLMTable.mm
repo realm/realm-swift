@@ -1467,9 +1467,9 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     return [[_proxyObjectClass alloc] initWithTable:self ndx:row_ndx];
 }
 
--(RLMView *)where:(id)condition
+-(RLMView *)allWhere:(id)predicate
 {
-    tightdb::Query query = queryFromPredicate(self, condition);
+    tightdb::Query query = queryFromPredicate(self, predicate);
 
     // create view
     tightdb::TableView view = query.find_all();
@@ -1478,9 +1478,9 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     return [RLMView viewWithTable:self nativeView:view objectClass:_proxyObjectClass];
 }
 
--(RLMView *)where:(id)condition orderBy:(id)order
+-(RLMView *)allWhere:(id)predicate orderBy:(id)order
 {
-    tightdb::Query query = queryFromPredicate(self, condition);
+    tightdb::Query query = queryFromPredicate(self, predicate);
 
     // create view
     tightdb::TableView view = query.find_all();

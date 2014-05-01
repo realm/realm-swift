@@ -592,7 +592,7 @@ REALM_TABLE_FAST(TestQueryAllTypes)
         // NSDiacriticInsensitivePredicateOption
         {
             NSPredicate *predicate = [NSPredicate predicateWithFormat:@"string contains[d] %@", @"ç"];
-            XCTAssertThrows([table where:predicate],
+            XCTAssertThrows([table allWhere:predicate],
                             @"String predicate with diacritic insensitive option should throw");
         }
     }];
@@ -656,7 +656,7 @@ REALM_TABLE_FAST(TestQueryAllTypes)
                  name:(NSString *)name
                column:(NSString *)column
 {
-    RLMView *view = [table where:predicate];
+    RLMView *view = [table allWhere:predicate];
     XCTAssertEqual(view.rowCount,
                    results.count,
                    @"%@ predicate should return correct count", name);
