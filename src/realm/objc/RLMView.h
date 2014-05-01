@@ -24,7 +24,7 @@
 #import "RLMTable.h"
 
 /**
- [where: queries](RLMTable.html#//api/name/where:) on an RLMTable return RLMView objects.
+ [allWhere: queries](RLMTable.html#//api/name/allWhere:) on an RLMTable return RLMView objects.
  They work as virtual tables containing just the matched rows. You can interact with an RLMView just like a regular RLMtable.
  
   You can use indexed subscripting to access your data:

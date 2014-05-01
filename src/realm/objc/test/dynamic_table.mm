@@ -1180,50 +1180,50 @@ using namespace std;
         [table addRow:@[@"name3", @3]];
         [table addRow:@[@"name4", @4]];
         
-        XCTAssertThrows([table where:@"garbage"], @"Garbage predicate");
-        XCTAssertThrows([table where:@"name == notAValue"], @"Invalid expression");
-        XCTAssertThrows([table where:@"naem == \"name0\""], @"Invalid column");
-        XCTAssertThrows([table where:@"name == 30"], @"Invalid value type");
+        XCTAssertThrows([table allWhere:@"garbage"], @"Garbage predicate");
+        XCTAssertThrows([table allWhere:@"name == notAValue"], @"Invalid expression");
+        XCTAssertThrows([table allWhere:@"naem == \"name0\""], @"Invalid column");
+        XCTAssertThrows([table allWhere:@"name == 30"], @"Invalid value type");
         
         // Filter with predicate string
-        RLMView *v = [table where:@"name == \"name0\""];
+        RLMView *v = [table allWhere:@"name == \"name0\""];
         XCTAssertEqual(v.rowCount, (NSUInteger)1, @"View with single match");
         XCTAssertEqualObjects(v[0][nameIndex], @"name0");
         XCTAssertEqualObjects(v[0][ageIndex], @0);
         
-        v = [table where:@"age == 1"];
+        v = [table allWhere:@"age == 1"];
         XCTAssertEqual(v.rowCount, (NSUInteger)2, @"View with two matches");
         XCTAssertEqualObjects(v[0][ageIndex], @1);
         
-        v = [table where:@"1 == age"];
+        v = [table allWhere:@"1 == age"];
         XCTAssertEqual(v.rowCount, (NSUInteger)2, @"View with two matches");
         XCTAssertEqualObjects(v[0][ageIndex], @1);
         
         // test AND
-        v = [table where:@"age == 1 AND name == \"name1\""];
+        v = [table allWhere:@"age == 1 AND name == \"name1\""];
         XCTAssertEqual(v.rowCount, (NSUInteger)1, @"View with one match");
         XCTAssertEqualObjects(v[0][nameIndex], @"name1");
         
         // test OR
-        v = [table where:@"age == 1 OR age == 4"];
+        v = [table allWhere:@"age == 1 OR age == 4"];
         XCTAssertEqual(v.rowCount, (NSUInteger)3, @"View with 3 matches");
         
         // test other numeric operators
-        v = [table where:@"age > 3"];
+        v = [table allWhere:@"age > 3"];
         XCTAssertEqual(v.rowCount, (NSUInteger)1, @"View with 1 matches");
         
-        v = [table where:@"age >= 3"];
+        v = [table allWhere:@"age >= 3"];
         XCTAssertEqual(v.rowCount, (NSUInteger)2, @"View with 2 matches");
         
-        v = [table where:@"age < 1"];
+        v = [table allWhere:@"age < 1"];
         XCTAssertEqual(v.rowCount, (NSUInteger)1, @"View with 1 matches");
         
-        v = [table where:@"age <= 1"];
+        v = [table allWhere:@"age <= 1"];
         XCTAssertEqual(v.rowCount, (NSUInteger)3, @"View with 3 matches");
         
         // Filter with predicate object
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @1];
-        v = [table where:predicate];
+        v = [table allWhere:predicate];
         XCTAssertEqual(v.rowCount, (NSUInteger)2, @"View with two matches");
         XCTAssertEqualObjects(v[0][ageIndex], @1);
     }];
@@ -1239,35 +1239,35 @@ using namespace std;
         [table addRow:@[@"name4", @4, [NSNumber numberWithBool:YES]]];
         [table addRow:@[@"name0",@0, [NSNumber numberWithBool:NO]]];
         
-        RLMView *v = [table where:nil orderBy:nil];
+        RLMView *v = [table allWhere:nil orderBy:nil];
         XCTAssertEqualObjects(v[0][ageIndex], @4);
         XCTAssertEqualObjects(v[1][ageIndex], @0);
         
-        RLMView *vAscending = [table where:nil orderBy:@"age"];
+        RLMView *vAscending = [table allWhere:nil orderBy:@"age"];
         XCTAssertEqualObjects(vAscending[0][ageIndex], @0);
         XCTAssertEqualObjects(vAscending[1][ageIndex], @4);
         
-        RLMView *vAscending2 = [table where:nil orderBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:YES]];
+        RLMView *vAscending2 = [table allWhere:nil orderBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:YES]];
         XCTAssertEqualObjects(vAscending2[0][ageIndex], @0);
         XCTAssertEqualObjects(vAscending2[1][ageIndex], @4);
         
         NSSortDescriptor * reverseSort = [NSSortDescriptor sortDescriptorWithKey:@"age" ascending:NO];
-        RLMView *vDescending = [table where:nil orderBy:reverseSort];
+        RLMView *vDescending = [table allWhere:nil orderBy:reverseSort];
         XCTAssertEqualObjects(vDescending[0][ageIndex], @4);
         XCTAssertEqualObjects(vDescending[1][ageIndex], @0);
         
         NSSortDescriptor * boolSort = [NSSortDescriptor sortDescriptorWithKey:@"hired" ascending:YES];
-        RLMView *vBool = [table where:nil orderBy:boolSort];
+        RLMView *vBool = [table allWhere:nil orderBy:boolSort];
         XCTAssertEqualObjects(vBool[0][ageIndex], @0);
         XCTAssertEqualObjects(vBool[1][ageIndex], @4);
         
-        XCTAssertThrows([table where:nil orderBy:@1], @"Invalid order type");
+        XCTAssertThrows([table allWhere:nil orderBy:@1], @"Invalid order type");
         
         NSSortDescriptor * misspell = [NSSortDescriptor sortDescriptorWithKey:@"oge" ascending:YES];
-        XCTAssertThrows([table where:nil orderBy:misspell], @"Invalid sort");
+        XCTAssertThrows([table allWhere:nil orderBy:misspell], @"Invalid sort");
         
         NSSortDescriptor * wrongColType = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
-        XCTAssertThrows([table where:nil orderBy:wrongColType], @"Invalid column type");
+        XCTAssertThrows([table allWhere:nil orderBy:wrongColType], @"Invalid column type");
     }];
 }
 

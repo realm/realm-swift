@@ -71,7 +71,7 @@ REALM_TABLE_FAST(EnumPeopleTable2)
     NSArray *filteredArray = [rowsArray filteredArrayUsingPredicate:predicate];
     
     // Do a query, and get all matches as TableView
-    RLMView *res = [people where:@"Hired = YES && Age >= 20 && Age <= 30"];
+    RLMView *res = [people allWhere:@"Hired = YES && Age >= 20 && Age <= 30"];
     NSLog(@"View count: %zu", res.rowCount);
     // 2: Iterate over the resulting TableView
     index = 0;
@@ -92,7 +92,7 @@ REALM_TABLE_FAST(EnumPeopleTable2)
     filteredArray = [rowsArray filteredArrayUsingPredicate:predicate];
     
     // 3: Iterate over query (lazy)
-    RLMView *q = [people where:@"Age = 21"];
+    RLMView *q = [people allWhere:@"Age = 21"];
     NSLog(@"Query lazy count: %zu", [q rowCount] );
     index = 0;
     for (EnumPeople *row in q) {
