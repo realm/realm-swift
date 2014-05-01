@@ -1,6 +1,6 @@
 //
 //  AppDelegate.h
-//  Demo
+//  TableViewExample
 //
 //  Copyright (c) 2014 Realm. All rights reserved.
 //

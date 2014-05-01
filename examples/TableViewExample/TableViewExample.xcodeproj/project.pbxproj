@@ -20,14 +20,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		E80762D018FEFFD70071CFAB /* Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Demo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E80762D018FEFFD70071CFAB /* TableViewExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TableViewExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E80762D318FEFFD70071CFAB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		E80762D518FEFFD70071CFAB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		E80762D718FEFFD70071CFAB /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		E80762DB18FEFFD70071CFAB /* Demo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Demo-Info.plist"; sourceTree = "<group>"; };
+		E80762DB18FEFFD70071CFAB /* TableViewExample-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TableViewExample-Info.plist"; sourceTree = "<group>"; };
 		E80762DD18FEFFD70071CFAB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E80762DF18FEFFD70071CFAB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		E80762E118FEFFD70071CFAB /* Demo-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Demo-Prefix.pch"; sourceTree = "<group>"; };
+		E80762E118FEFFD70071CFAB /* TableViewExample-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TableViewExample-Prefix.pch"; sourceTree = "<group>"; };
 		E80762E218FEFFD70071CFAB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E80762E318FEFFD70071CFAB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		E80762E518FEFFD70071CFAB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -57,7 +57,7 @@
 		E80762C718FEFFD70071CFAB = {
 			isa = PBXGroup;
 			children = (
-				E80762D918FEFFD70071CFAB /* Demo */,
+				E80762D918FEFFD70071CFAB /* TableViewExample */,
 				E80762D218FEFFD70071CFAB /* Frameworks */,
 				E80762D118FEFFD70071CFAB /* Products */,
 			);
@@ -66,7 +66,7 @@
 		E80762D118FEFFD70071CFAB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E80762D018FEFFD70071CFAB /* Demo.app */,
+				E80762D018FEFFD70071CFAB /* TableViewExample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -84,7 +84,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		E80762D918FEFFD70071CFAB /* Demo */ = {
+		E80762D918FEFFD70071CFAB /* TableViewExample */ = {
 			isa = PBXGroup;
 			children = (
 				E80762E218FEFFD70071CFAB /* AppDelegate.h */,
@@ -94,16 +94,16 @@
 				E80762E518FEFFD70071CFAB /* Images.xcassets */,
 				E80762DA18FEFFD70071CFAB /* Supporting Files */,
 			);
-			path = Demo;
+			path = TableViewExample;
 			sourceTree = "<group>";
 		};
 		E80762DA18FEFFD70071CFAB /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				E80762DB18FEFFD70071CFAB /* Demo-Info.plist */,
+				E80762DB18FEFFD70071CFAB /* TableViewExample-Info.plist */,
 				E80762DC18FEFFD70071CFAB /* InfoPlist.strings */,
 				E80762DF18FEFFD70071CFAB /* main.m */,
-				E80762E118FEFFD70071CFAB /* Demo-Prefix.pch */,
+				E80762E118FEFFD70071CFAB /* TableViewExample-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -111,9 +111,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E80762CF18FEFFD70071CFAB /* Demo */ = {
+		E80762CF18FEFFD70071CFAB /* TableViewExample */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E80762FC18FEFFD70071CFAB /* Build configuration list for PBXNativeTarget "Demo" */;
+			buildConfigurationList = E80762FC18FEFFD70071CFAB /* Build configuration list for PBXNativeTarget "TableViewExample" */;
 			buildPhases = (
 				E80762CC18FEFFD70071CFAB /* Sources */,
 				E80762CD18FEFFD70071CFAB /* Frameworks */,
@@ -123,9 +123,9 @@
 			);
 			dependencies = (
 			);
-			name = Demo;
+			name = TableViewExample;
 			productName = Demo;
-			productReference = E80762D018FEFFD70071CFAB /* Demo.app */;
+			productReference = E80762D018FEFFD70071CFAB /* TableViewExample.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -138,7 +138,7 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = Realm;
 			};
-			buildConfigurationList = E80762CB18FEFFD70071CFAB /* Build configuration list for PBXProject "Demo" */;
+			buildConfigurationList = E80762CB18FEFFD70071CFAB /* Build configuration list for PBXProject "TableViewExample" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -150,7 +150,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E80762CF18FEFFD70071CFAB /* Demo */,
+				E80762CF18FEFFD70071CFAB /* TableViewExample */,
 			);
 		};
 /* End PBXProject section */
@@ -275,9 +275,9 @@
 					../../,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Demo/Demo-Prefix.pch";
-				INFOPLIST_FILE = "$(SRCROOT)/Demo/Demo-Info.plist";
-				PRODUCT_NAME = Demo;
+				GCC_PREFIX_HEADER = "TableViewExample/TableViewExample-Prefix.pch";
+				INFOPLIST_FILE = "$(SRCROOT)/TableViewExample/TableViewExample-Info.plist";
+				PRODUCT_NAME = TableViewExample;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -293,9 +293,9 @@
 					../../,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Demo/Demo-Prefix.pch";
-				INFOPLIST_FILE = "$(SRCROOT)/Demo/Demo-Info.plist";
-				PRODUCT_NAME = Demo;
+				GCC_PREFIX_HEADER = "TableViewExample/TableViewExample-Prefix.pch";
+				INFOPLIST_FILE = "$(SRCROOT)/TableViewExample/TableViewExample-Info.plist";
+				PRODUCT_NAME = TableViewExample;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -303,7 +303,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E80762CB18FEFFD70071CFAB /* Build configuration list for PBXProject "Demo" */ = {
+		E80762CB18FEFFD70071CFAB /* Build configuration list for PBXProject "TableViewExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E80762FA18FEFFD70071CFAB /* Debug */,
@@ -312,7 +312,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E80762FC18FEFFD70071CFAB /* Build configuration list for PBXNativeTarget "Demo" */ = {
+		E80762FC18FEFFD70071CFAB /* Build configuration list for PBXNativeTarget "TableViewExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E80762FD18FEFFD70071CFAB /* Debug */,

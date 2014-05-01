@@ -16,12 +16,20 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E80762CF18FEFFD70071CFAB"
                BuildableName = "Demo.app"
-               BlueprintName = "Demo"
-               ReferencedContainer = "container:Demo.xcodeproj">
+               BlueprintName = "TableViewExample"
+               ReferencedContainer = "container:TableViewExample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
+   <TestAction
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      buildConfiguration = "Debug">
+      <Testables>
+      </Testables>
+   </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
@@ -36,8 +44,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E80762CF18FEFFD70071CFAB"
             BuildableName = "Demo.app"
-            BlueprintName = "Demo"
-            ReferencedContainer = "container:Demo.xcodeproj">
+            BlueprintName = "TableViewExample"
+            ReferencedContainer = "container:TableViewExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -54,8 +62,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E80762CF18FEFFD70071CFAB"
             BuildableName = "Demo.app"
-            BlueprintName = "Demo"
-            ReferencedContainer = "container:Demo.xcodeproj">
+            BlueprintName = "TableViewExample"
+            ReferencedContainer = "container:TableViewExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
