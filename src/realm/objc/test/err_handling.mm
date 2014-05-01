@@ -130,39 +130,39 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         // Create table with all column types
         RLMDescriptor * desc = [table descriptor];
-        if (![desc addColumnWithName:@"int" type:RLMTypeInt]) {
+        if ([desc addColumnWithName:@"int" type:RLMTypeInt] == NSNotFound) {
             XCTFail(@"addColumn failed.");
         }
-        if (![desc addColumnWithName:@"bool" type:RLMTypeBool]) {
+        if ([desc addColumnWithName:@"bool" type:RLMTypeBool] == NSNotFound) {
             XCTFail(@"addColumn failed.");
         }
         
-        if (![desc addColumnWithName:@"date" type:RLMTypeDate]) {
+        if ([desc addColumnWithName:@"date" type:RLMTypeDate] == NSNotFound) {
             XCTFail(@"addColumn failed.");
         }
-        if (![desc addColumnWithName:@"string" type:RLMTypeString]) {
+        if ([desc addColumnWithName:@"string" type:RLMTypeString] == NSNotFound) {
             XCTFail(@"addColumn failed.");
         }
-        if (![desc addColumnWithName:@"string_long" type:RLMTypeString]) {
+        if ([desc addColumnWithName:@"string_long" type:RLMTypeString] == NSNotFound) {
             XCTFail(@"addColumn failed.");
         }
-        if (![desc addColumnWithName:@"string_enum" type:RLMTypeString]) {
+        if ([desc addColumnWithName:@"string_enum" type:RLMTypeString] == NSNotFound) {
             XCTFail(@"addColumn failed.");
         }
-        if (![desc addColumnWithName:@"binary" type:RLMTypeBinary]) {
+        if ([desc addColumnWithName:@"binary" type:RLMTypeBinary] == NSNotFound) {
             XCTFail(@"addColumn failed.");
         }
-        if (![desc addColumnWithName:@"mixed" type:RLMTypeMixed]) {
+        if ([desc addColumnWithName:@"mixed" type:RLMTypeMixed] == NSNotFound) {
             XCTFail(@"addColumn failed.");
         }
         RLMDescriptor * subdesc;
         if (!(subdesc = [desc addColumnTable:@"tables"])) {
             XCTFail(@"addColumn failed.");
         }
-        if (![subdesc addColumnWithName:@"sub_first" type:RLMTypeInt]) {
+        if ([subdesc addColumnWithName:@"sub_first" type:RLMTypeInt] == NSNotFound) {
             XCTFail(@"addColumn failed.");
         }
-        if (![subdesc addColumnWithName:@"sub_second" type:RLMTypeString]) {
+        if ([subdesc addColumnWithName:@"sub_second" type:RLMTypeString] == NSNotFound) {
             XCTFail(@"addColumn failed.");
         }
         
