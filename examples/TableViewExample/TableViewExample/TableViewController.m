@@ -1,6 +1,6 @@
 //
 //  TableViewController.m
-//  Demo
+//  TableViewExample
 //
 //  Copyright (c) 2014 Realm. All rights reserved.
 //
@@ -45,7 +45,7 @@ static NSString * const kTableName = @"table";
 #pragma mark - UI
 
 - (void)setupUI {
-    self.title = @"Demo";
+    self.title = @"TableViewExample";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"BG Add"
                                                                              style:UIBarButtonItemStylePlain
                                                                             target:self
