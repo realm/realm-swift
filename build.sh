@@ -608,6 +608,29 @@ EOF
         exit 0
         ;;
 
+    "docs")
+        appledoc    --project-name Realm \
+                    --project-company "Realm" \
+                    --include doc/realm.png \
+                    --output doc/appledocs \
+                    -v `sh build.sh get-version` \
+                    --create-html \
+                    --no-create-docset \
+                    --no-repeat-first-par \
+                    --ignore src/realm/objc/PrivateTableMacros.h \
+                    --ignore src/realm/objc/RLMColumnProxy.h \
+                    --ignore src/realm/objc/RLMProxy.h \
+                    --ignore src/realm/objc/RLMQuery.h \
+                    --ignore src/realm/objc/RLMType.h \
+                    --ignore src/realm/objc/RLMVersion.h \
+                    --ignore src/realm/objc/RLMDescriptor.h \
+                    --ignore "src/realm/objc/test/*" \
+                    --index-desc doc/index.md \
+                    src/realm/objc/ || exit 1
+        echo "Done generating docs under docs/appledocs"
+        exit 0
+        ;;
+
     "dist-copy")
         # Copy to distribution package
         TARGET_DIR="$1"
@@ -651,7 +674,7 @@ Available modes are:
   config clean build build-iphone test test-debug test-gdb test-cover
   show-install install uninstall test-installed install-prod install-devel
   uninstall-prod uninstall-devel dist-copy ios-framework
-  get-version set-version
+  get-version set-version docs
 EOF
         exit 1
         ;;
