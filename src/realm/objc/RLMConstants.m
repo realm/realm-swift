@@ -21,4 +21,4 @@
 #import "RLMConstants.h"
 
 
-NSString *const RLMContextDidChangeNotification = @"RLMContextDidChangeNotification";
+NSString *const RLMRealmDidChangeNotification = @"RLMRealmDidChangeNotification";

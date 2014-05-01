@@ -25,7 +25,7 @@
 // Use it in a function
 void ex_objc_intro() {
     // Create a realm and initialize with a table and rows
-    RLMRealm *realm = [RLMRealm realmWithDefaultPersistenceAndInitBlock:^(RLMRealm *realm) {
+    RLMRealm *realm = [RLMRealm defaultRealmWithInitBlock:^(RLMRealm *realm) {
         if (realm.isEmpty) {
             // Create a table
             People *table = [realm createTableWithName:@"employees" asTableClass:[People class]];
