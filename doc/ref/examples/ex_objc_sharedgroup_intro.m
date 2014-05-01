@@ -25,7 +25,7 @@
 void ex_objc_transaction_manager_intro()
 {
     // Remove previous datafile
-    [[NSFileManager managerForDefaultRealm] removeItemAtPath:@"transactionManagerTest.realm" error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:@"transactionManagerTest.realm" error:nil];
 
     // Create datafile with a new table
     RLMTransactionManager *manager = [RLMTransactionManager managerForRealmWithPath:@"transactionManagerTest.realm"

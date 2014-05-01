@@ -78,7 +78,7 @@ REALM_TABLE_9(TestQueryErrAllTypes,
     //------------------------------------------------------
     
     error = nil;
-    NSFileManager *fm = [NSFileManager managerForDefaultRealm];
+    NSFileManager *fm = [NSFileManager defaultManager];
     [fm setAttributes:@{NSFilePosixPermissions: @(0444)}
          ofItemAtPath:RLMTestRealmPath
                 error:&error];
