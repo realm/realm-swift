@@ -10,7 +10,7 @@
 *.realm
 *.realm.lock
 
-
+/doc/appledocs/html/*
 /doc/ref/html/*.html
 /doc/ref/html/*.css
 
