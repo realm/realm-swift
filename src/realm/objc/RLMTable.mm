@@ -1,22 +1,22 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
 
@@ -38,6 +38,7 @@
 #import "RLMRealm_noinst.h"
 #import "RLMPrivate.h"
 #import "util_noinst.hpp"
+#import "NSData+RLMGetBinaryData.h"
 
 using namespace std;
 
@@ -1227,26 +1228,32 @@ void add_bool_constraint_to_query(tightdb::Query & query,
 
 void add_string_constraint_to_query(tightdb::Query & query,
                                     NSPredicateOperatorType operatorType,
+                                    NSComparisonPredicateOptions predicateOptions,
                                     NSUInteger index,
                                     NSString * value) {
+    bool caseSensitive = !(predicateOptions & NSCaseInsensitivePredicateOption);
+    bool diacriticInsensitive = (predicateOptions & NSDiacriticInsensitivePredicateOption);
+    
+    if (diacriticInsensitive) {
+        @throw predicate_exception(@"Invalid predicate option", @"NSDiacriticInsensitivePredicateOption not supported for string type");
+    }
     
     tightdb::StringData sd([(NSString *)value UTF8String]);
-    query.equal(index, sd);
     switch (operatorType) {
         case NSBeginsWithPredicateOperatorType:
-            query.begins_with(index, sd);
+            query.begins_with(index, sd, caseSensitive);
             break;
         case NSEndsWithPredicateOperatorType:
-            query.ends_with(index, sd);
+            query.ends_with(index, sd, caseSensitive);
             break;
         case NSContainsPredicateOperatorType:
-            query.contains(index, sd);
+            query.contains(index, sd, caseSensitive);
             break;
         case NSEqualToPredicateOperatorType:
-            query.equal(index, sd);
+            query.equal(index, sd, caseSensitive);
             break;
         case NSNotEqualToPredicateOperatorType:
-            query.not_equal(index, sd);
+            query.not_equal(index, sd, caseSensitive);
             break;
         default:
             @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for string type", (unsigned long)operatorType]);
@@ -1254,8 +1261,65 @@ void add_string_constraint_to_query(tightdb::Query & query,
     }
 }
 
+void add_datetime_constraint_to_query(tightdb::Query & query,
+                                      NSPredicateOperatorType operatorType,
+                                      NSUInteger index,
+                                      double value) {
+    switch (operatorType) {
+        case NSLessThanPredicateOperatorType:
+            query.less_datetime(index, value);
+            break;
+        case NSLessThanOrEqualToPredicateOperatorType:
+            query.less_equal_datetime(index, value);
+            break;
+        case NSGreaterThanPredicateOperatorType:
+            query.greater_datetime(index, value);
+            break;
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            query.greater_equal_datetime(index, value);
+            break;
+        case NSEqualToPredicateOperatorType:
+            query.equal_datetime(index, value);
+            break;
+        case NSNotEqualToPredicateOperatorType:
+            query.not_equal_datetime(index, value);
+            break;
+        default:
+            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for type NSDate", (unsigned long)operatorType]);
+            break;
+    }
+}
+    
+void add_binary_constraint_to_query(tightdb::Query & query,
+                                    NSPredicateOperatorType operatorType,
+                                    NSUInteger index,
+                                    NSData *value) {
+    tightdb::BinaryData binData = [value rlmBinaryData];
+    switch (operatorType) {
+        case NSBeginsWithPredicateOperatorType:
+            query.begins_with(index, binData);
+            break;
+        case NSEndsWithPredicateOperatorType:
+            query.ends_with(index, binData);
+            break;
+        case NSContainsPredicateOperatorType:
+            query.contains(index, binData);
+            break;
+        case NSEqualToPredicateOperatorType:
+            query.equal(index, binData);
+            break;
+        case NSNotEqualToPredicateOperatorType:
+            query.not_equal(index, binData);
+            break;
+        default:
+            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for binary type", (unsigned long)operatorType]);
+            break;
+    }
+}
+
 void update_query_with_value_expression(RLMTable * table, tightdb::Query & query,
-    NSString * columnName, id value, NSPredicateOperatorType operatorType) {
+    NSString * columnName, id value, NSPredicateOperatorType operatorType,
+    NSComparisonPredicateOptions predicateOptions) {
 
     // validate object type
     NSUInteger index = validated_column_index(table, columnName);
@@ -1272,9 +1336,8 @@ void update_query_with_value_expression(RLMTable * table, tightdb::Query & query
                                          bool([(NSNumber *)value boolValue]));
             break;
         case tightdb::type_DateTime:
-            // TODO: change datetime so method signaturs match other numeric types
-            @throw predicate_exception(@"Unsupported predicate value type",
-                                       @"Not supporting dates temporarily");
+            add_datetime_constraint_to_query(query, operatorType, index,
+                                             double([(NSDate *)value timeIntervalSince1970]));
             break;
         case tightdb::type_Double:
             add_numeric_constraint_to_query(query, type, operatorType,
@@ -1289,7 +1352,12 @@ void update_query_with_value_expression(RLMTable * table, tightdb::Query & query
                                             index, int([(NSNumber *)value intValue]));
             break;
         case tightdb::type_String:
-            add_string_constraint_to_query(query, operatorType, index, (NSString *)value);
+            add_string_constraint_to_query(query, operatorType, predicateOptions,
+                                           index, (NSString *)value);
+            break;
+        case tightdb::type_Binary:
+            add_binary_constraint_to_query(query, operatorType,
+                                           index, (NSData *)value);
             break;
         default:
             @throw predicate_exception(@"Unsupported predicate value type",
@@ -1344,12 +1412,12 @@ void update_query_with_predicate(NSPredicate * predicate,
 //                    compp.rightExpression.keyPath, compp.predicateOperatorType);
             }
             else {
-                update_query_with_value_expression(table, query, compp.leftExpression.keyPath, compp.rightExpression.constantValue, compp.predicateOperatorType);
+                update_query_with_value_expression(table, query, compp.leftExpression.keyPath, compp.rightExpression.constantValue, compp.predicateOperatorType, compp.options);
             }
         }
         else {
             if (exp2Type == NSKeyPathExpressionType) {
-                update_query_with_value_expression(table, query, compp.rightExpression.keyPath, compp.leftExpression.constantValue, compp.predicateOperatorType);
+                update_query_with_value_expression(table, query, compp.rightExpression.keyPath, compp.leftExpression.constantValue, compp.predicateOperatorType, compp.options);
             }
             else {
                 @throw predicate_exception(@"Invalid predicate expressions",

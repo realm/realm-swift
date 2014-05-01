@@ -1,22 +1,22 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTable.h"
 #import "RLMView.h"
@@ -25,10 +25,10 @@
 
 
 
-/**
- * The selectors in this interface is not meant to be used directly.
- * However, they are public so that the typed table macros can use them.
- */
+//
+// The selectors in this interface are not meant to be used directly.
+// However, they are public so that the typed table macros can use them.
+//
 
 // private extensions
 @interface RLMTable ()
@@ -101,10 +101,10 @@
 
 @end
 
-/**
- * The selectors in this interface is not meant to be used directly.
- * However, they are public so that the typed table macros can use them.
- */
+//
+// The selectors in this interface are not meant to be used directly.
+// However, they are public so that the typed table macros can use them.
+//
 @interface RLMView (Private)
 -(id)_initWithQuery:(RLMQuery *)query;
 
@@ -120,23 +120,23 @@
 -(id)RLM_mixedInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 @end
 
-/**
- * The selectors in this interface is not meant to be used directly.
- * However, they are public so that the typed table macros can use them.
- */
+//
+// The selectors in this interface are not meant to be used directly.
+// However, they are public so that the typed table macros can use them.
+//
 @interface RLMRow (Private)
 -(id)initWithTable:(RLMTable *)table ndx:(NSUInteger)ndx;
 -(void)RLM_setNdx:(NSUInteger)ndx;
 -(NSUInteger)RLM_index;
 @end
 
-/**
- * The selectors in this interface is not meant to be used directly.
- * However, they are publicly available so that the typed table macros can use them.
- */
+//
+// The selectors in this interface are not meant to be used directly.
+// However, they are public so that the typed table macros can use them.
+//
 @interface RLMContext (Experiment)
 
-/******** Experimental features **********/
+//========== Experimental features ==========/
 -(BOOL)pinReadTransactions;
 -(void)unpinReadTransactions;
 
