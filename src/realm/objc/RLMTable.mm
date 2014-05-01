@@ -53,7 +53,7 @@ using namespace std;
 - (instancetype)init
 {
     @throw [NSException exceptionWithName:@"realm:invalid_init"
-                                   reason:@"Tables can only be accessed from RLMRealm objects"
+                                   reason:@"Tables can only be created from RLMRealm objects"
                                  userInfo:nil];
 }
 
