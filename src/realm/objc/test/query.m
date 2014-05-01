@@ -440,6 +440,189 @@ REALM_TABLE_9(TestQueryAllTypes,
 
 #pragma mark - Predicates
 
+- (void)testIntegerPredicates {
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"int" type:RLMTypeInt];
+        NSArray *ints = @[@0, @1, @2, @3];
+        for (NSNumber *intNum in ints) {
+            [table addRow:@[intNum]];
+        }
+        
+        NSNumber *intNum = ints[1];
+        
+        // Lesser than
+        [self testPredicate:[NSPredicate predicateWithFormat:@"int < %@", intNum]
+                    onTable:table
+                withResults:[ints subarrayWithRange:NSMakeRange(0, 1)]
+                       name:@"lesser than"
+                     column:@"int"];
+        
+        // Lesser than or equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"int <= %@", intNum]
+                    onTable:table
+                withResults:[ints subarrayWithRange:NSMakeRange(0, 2)]
+                       name:@"lesser than or equal"
+                     column:@"int"];
+        
+        // Equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"int == %@", intNum]
+                    onTable:table
+                withResults:[ints subarrayWithRange:NSMakeRange(1, 1)]
+                       name:@"equal"
+                     column:@"int"];
+
+        // Greater than or equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"int >= %@", intNum]
+                    onTable:table
+                withResults:[ints subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"greater than or equal"
+                     column:@"int"];
+
+        // Greater than
+        [self testPredicate:[NSPredicate predicateWithFormat:@"int > %@", intNum]
+                    onTable:table
+                withResults:[ints subarrayWithRange:NSMakeRange(2, 2)]
+                       name:@"greater than"
+                     column:@"int"];
+        
+        // Not equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"int != %@", intNum]
+                    onTable:table
+                withResults:@[ints[0], ints[2], ints[3]]
+                       name:@"not equal"
+                     column:@"int"];
+        
+        // Between
+        [self testPredicate:[NSPredicate predicateWithFormat:@"int between %@", @[intNum, ints.lastObject]]
+                    onTable:table
+                withResults:[ints subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"between"
+                     column:@"int"];
+    }];
+}
+
+- (void)testFloatPredicates {
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"float" type:RLMTypeFloat];
+        NSArray *floats = @[@0, @1, @2, @3];
+        for (NSNumber *floatNum in floats) {
+            [table addRow:@[floatNum]];
+        }
+        
+        NSNumber *floatNum = floats[1];
+        
+        // Lesser than
+        [self testPredicate:[NSPredicate predicateWithFormat:@"float < %@", floatNum]
+                    onTable:table
+                withResults:[floats subarrayWithRange:NSMakeRange(0, 1)]
+                       name:@"lesser than"
+                     column:@"float"];
+        
+        // Lesser than or equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"float <= %@", floatNum]
+                    onTable:table
+                withResults:[floats subarrayWithRange:NSMakeRange(0, 2)]
+                       name:@"lesser than or equal"
+                     column:@"float"];
+        
+        // Equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"float == %@", floatNum]
+                    onTable:table
+                withResults:[floats subarrayWithRange:NSMakeRange(1, 1)]
+                       name:@"equal"
+                     column:@"float"];
+        
+        // Greater than or equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"float >= %@", floatNum]
+                    onTable:table
+                withResults:[floats subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"greater than or equal"
+                     column:@"float"];
+        
+        // Greater than
+        [self testPredicate:[NSPredicate predicateWithFormat:@"float > %@", floatNum]
+                    onTable:table
+                withResults:[floats subarrayWithRange:NSMakeRange(2, 2)]
+                       name:@"greater than"
+                     column:@"float"];
+        
+        // Not equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"float != %@", floatNum]
+                    onTable:table
+                withResults:@[floats[0], floats[2], floats[3]]
+                       name:@"not equal"
+                     column:@"float"];
+        
+        // Between
+        [self testPredicate:[NSPredicate predicateWithFormat:@"float between %@", @[floatNum, floats.lastObject]]
+                    onTable:table
+                withResults:[floats subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"between"
+                     column:@"float"];
+    }];
+}
+
+- (void)testDoublePredicates {
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"double" type:RLMTypeDouble];
+        NSArray *doubles = @[@0, @1, @2, @3];
+        for (NSNumber *doubleNum in doubles) {
+            [table addRow:@[doubleNum]];
+        }
+        
+        NSNumber *doubleNum = doubles[1];
+        
+        // Lesser than
+        [self testPredicate:[NSPredicate predicateWithFormat:@"double < %@", doubleNum]
+                    onTable:table
+                withResults:[doubles subarrayWithRange:NSMakeRange(0, 1)]
+                       name:@"lesser than"
+                     column:@"double"];
+        
+        // Lesser than or equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"double <= %@", doubleNum]
+                    onTable:table
+                withResults:[doubles subarrayWithRange:NSMakeRange(0, 2)]
+                       name:@"lesser than or equal"
+                     column:@"double"];
+        
+        // Equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"double == %@", doubleNum]
+                    onTable:table
+                withResults:[doubles subarrayWithRange:NSMakeRange(1, 1)]
+                       name:@"equal"
+                     column:@"double"];
+        
+        // Greater than or equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"double >= %@", doubleNum]
+                    onTable:table
+                withResults:[doubles subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"greater than or equal"
+                     column:@"double"];
+        
+        // Greater than
+        [self testPredicate:[NSPredicate predicateWithFormat:@"double > %@", doubleNum]
+                    onTable:table
+                withResults:[doubles subarrayWithRange:NSMakeRange(2, 2)]
+                       name:@"greater than"
+                     column:@"double"];
+        
+        // Not equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"double != %@", doubleNum]
+                    onTable:table
+                withResults:@[doubles[0], doubles[2], doubles[3]]
+                       name:@"not equal"
+                     column:@"double"];
+        
+        // Between
+        [self testPredicate:[NSPredicate predicateWithFormat:@"double between %@", @[doubleNum, doubles.lastObject]]
+                    onTable:table
+                withResults:[doubles subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"between"
+                     column:@"double"];
+    }];
+}
+
 - (void)testDatePredicates {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         [table addColumnWithName:@"date" type:RLMTypeDate];
