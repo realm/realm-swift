@@ -72,69 +72,71 @@ REALM_TABLE_2(SubMixedTable,
     XCTAssertEqual([mixedDate2 isEqual:mixedDate3], YES, @"Mixed with same timestamps should be equal");
     XCTAssertEqual([mixedDate1 isEqual:mixedDate2], NO,  @"Mixed with different timestamps should be different");
 
-    MixedTable    *table1 = [[MixedTable    alloc] init];
-    SubMixedTable *table2 = [[SubMixedTable alloc] init];
-    SubMixedTable *table3 = [[SubMixedTable alloc] init];
-    [table1 addHired:YES Other:mixedBool1 Age:54];
-    [table2 addHired:YES                  Age:54];
-    [table3 addHired:YES                  Age:54];
-    XCTAssertEqual([table1 isEqual:table1], YES, @"Same mixed should be equal (11)");
-    XCTAssertEqual([table2 isEqual:table2], YES, @"Same mixed should be equal (12)");
-    XCTAssertEqual([table2 isEqual:table3], YES, @"Mixed with same tables should be equal");
-    XCTAssertEqual([table1 isEqual:table2], NO,  @"Mixed with different tables should be different");
-
-
-    XCTAssertEqual([mixedBool1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (1)");
-    XCTAssertEqual([mixedBool1 isEqual:mixedString1], NO, @"Mixed with different types should be different (2)");
-    XCTAssertEqual([mixedBool1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (3)");
-    XCTAssertEqual([mixedBool1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (4)");
-    XCTAssertEqual([mixedBool1 isEqual:table1],       NO, @"Mixed with different types should be different (5)");
-
-    XCTAssertEqual([mixedInt1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (6)");
-    XCTAssertEqual([mixedInt1 isEqual:mixedString1], NO, @"Mixed with different types should be different (7)");
-    XCTAssertEqual([mixedInt1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (8)");
-    XCTAssertEqual([mixedInt1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (9)");
-    XCTAssertEqual([mixedInt1 isEqual:table1],       NO, @"Mixed with different types should be different (10)");
-
-    XCTAssertEqual([mixedString1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (11)");
-    XCTAssertEqual([mixedString1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (12)");
-    XCTAssertEqual([mixedString1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (13)");
-    XCTAssertEqual([mixedString1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (14)");
-    XCTAssertEqual([mixedString1 isEqual:table1],       NO, @"Mixed with different types should be different (15)");
-
-    XCTAssertEqual([mixedBinary1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (16)");
-    XCTAssertEqual([mixedBinary1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (17)");
-    XCTAssertEqual([mixedBinary1 isEqual:mixedString1], NO, @"Mixed with different types should be different (18)");
-    XCTAssertEqual([mixedBinary1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (19)");
-    XCTAssertEqual([mixedBinary1 isEqual:table1],       NO, @"Mixed with different types should be different (20)");
-
-    XCTAssertEqual([mixedDate1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (21)");
-    XCTAssertEqual([mixedDate1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (22)");
-    XCTAssertEqual([mixedDate1 isEqual:mixedString1], NO, @"Mixed with different types should be different (23)");
-    XCTAssertEqual([mixedDate1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (24)");
-    XCTAssertEqual([mixedDate1 isEqual:table1],       NO, @"Mixed with different types should be different (25)");
-
-    XCTAssertEqual([table1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (26)");
-    XCTAssertEqual([table1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (27)");
-    XCTAssertEqual([table1 isEqual:mixedString1], NO, @"Mixed with different types should be different (28)");
-    XCTAssertEqual([table1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (29)");
-    XCTAssertEqual([table1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (30)");
+    [self.contextPersistedAtTestPath writeUsingBlock:^(RLMRealm *realm) {
+        MixedTable    *table1 = [realm createTableWithName:@"table1" asTableClass:MixedTable.class];
+        SubMixedTable *table2 = [realm createTableWithName:@"table2" asTableClass:SubMixedTable.class];
+        SubMixedTable *table3 = [realm createTableWithName:@"table3" asTableClass:SubMixedTable.class];
+        [table1 addHired:YES Other:mixedBool1 Age:54];
+        [table2 addHired:YES                  Age:54];
+        [table3 addHired:YES                  Age:54];
+        XCTAssertEqual([table1 isEqual:table1], YES, @"Same mixed should be equal (11)");
+        XCTAssertEqual([table2 isEqual:table2], YES, @"Same mixed should be equal (12)");
+        XCTAssertEqual([table2 isEqual:table3], YES, @"Mixed with same tables should be equal");
+        XCTAssertEqual([table1 isEqual:table2], NO,  @"Mixed with different tables should be different");
+        
+        
+        XCTAssertEqual([mixedBool1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (1)");
+        XCTAssertEqual([mixedBool1 isEqual:mixedString1], NO, @"Mixed with different types should be different (2)");
+        XCTAssertEqual([mixedBool1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (3)");
+        XCTAssertEqual([mixedBool1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (4)");
+        XCTAssertEqual([mixedBool1 isEqual:table1],       NO, @"Mixed with different types should be different (5)");
+        
+        XCTAssertEqual([mixedInt1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (6)");
+        XCTAssertEqual([mixedInt1 isEqual:mixedString1], NO, @"Mixed with different types should be different (7)");
+        XCTAssertEqual([mixedInt1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (8)");
+        XCTAssertEqual([mixedInt1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (9)");
+        XCTAssertEqual([mixedInt1 isEqual:table1],       NO, @"Mixed with different types should be different (10)");
+        
+        XCTAssertEqual([mixedString1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (11)");
+        XCTAssertEqual([mixedString1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (12)");
+        XCTAssertEqual([mixedString1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (13)");
+        XCTAssertEqual([mixedString1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (14)");
+        XCTAssertEqual([mixedString1 isEqual:table1],       NO, @"Mixed with different types should be different (15)");
+        
+        XCTAssertEqual([mixedBinary1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (16)");
+        XCTAssertEqual([mixedBinary1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (17)");
+        XCTAssertEqual([mixedBinary1 isEqual:mixedString1], NO, @"Mixed with different types should be different (18)");
+        XCTAssertEqual([mixedBinary1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (19)");
+        XCTAssertEqual([mixedBinary1 isEqual:table1],       NO, @"Mixed with different types should be different (20)");
+        
+        XCTAssertEqual([mixedDate1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (21)");
+        XCTAssertEqual([mixedDate1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (22)");
+        XCTAssertEqual([mixedDate1 isEqual:mixedString1], NO, @"Mixed with different types should be different (23)");
+        XCTAssertEqual([mixedDate1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (24)");
+        XCTAssertEqual([mixedDate1 isEqual:table1],       NO, @"Mixed with different types should be different (25)");
+        
+        XCTAssertEqual([table1 isEqual:mixedBool1],   NO, @"Mixed with different types should be different (26)");
+        XCTAssertEqual([table1 isEqual:mixedInt1],    NO, @"Mixed with different types should be different (27)");
+        XCTAssertEqual([table1 isEqual:mixedString1], NO, @"Mixed with different types should be different (28)");
+        XCTAssertEqual([table1 isEqual:mixedBinary1], NO, @"Mixed with different types should be different (29)");
+        XCTAssertEqual([table1 isEqual:mixedDate1],   NO, @"Mixed with different types should be different (30)");
+    }];
 }
 
 
 - (void)testMixed
 {
-    SubMixedTable *tableSub = [[SubMixedTable alloc] init];
-    XCTAssertTrue([tableSub isKindOfClass:[RLMTable class]], @"RLMTable excepted");
-
-    // Add some rows
-    [tableSub addHired:YES Age:20];
-    [tableSub addHired:NO Age:21];
-    [tableSub addHired:YES Age:22];
-    [tableSub addHired:NO Age:43];
-    [tableSub addHired:YES Age:54];
-
     [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        SubMixedTable *tableSub = [realm createTableWithName:@"tableSub" asTableClass:SubMixedTable.class];
+        XCTAssertTrue([tableSub isKindOfClass:[RLMTable class]], @"RLMTable excepted");
+        
+        // Add some rows
+        [tableSub addHired:YES Age:20];
+        [tableSub addHired:NO Age:21];
+        [tableSub addHired:YES Age:22];
+        [tableSub addHired:NO Age:43];
+        [tableSub addHired:YES Age:54];
+        
         // Create new table in realm
         MixedTable *table = [realm createTableWithName:@"MixedValues" asTableClass:[MixedTable class]];
         NSLog(@"Table: %@", table);
@@ -145,32 +147,33 @@ REALM_TABLE_2(SubMixedTable,
         [table addHired:YES Other:[NSString stringWithUTF8String:"Dave"] Age:54];
         [table addHired:YES Other:tableSub Age:54];
         [table addHired:YES Other:[NSDate date] Age:54];
-    }];
     
-    RLMRealm *realm = [self realmPersistedAtTestPath];
-    MixedTable *table = [realm tableWithName:@"MixedValues" asTableClass:[MixedTable class]];
-
-    XCTAssertEqual([table rowCount], (NSUInteger)6, @"6 rows expected");
-    XCTAssertTrue([table[0].Other isKindOfClass:[NSString class]], @"NSString excepted");
-    XCTAssertTrue([table[4].Other isKindOfClass:[RLMTable class]], @"RLMTable excepted");
-    XCTAssertEqual([(RLMTable *)table[4].Other rowCount], (NSUInteger)5,@"Subtable should have 5 rows");
-    XCTAssertTrue([table[5].Other isKindOfClass:[NSDate class]], @"NSDate excepted");
-
-    // Test cast and isClass
-    // FIXME: When hasSameDescriptorAs is implemented, reenable unit test below
-    // XCTAssertEquals([tableSub hasSameDescriptorAs:[SubMixedTable class]], YES,@"Unknown table should be of type SubMixedTable");
-    tableSub = [tableSub castToTypedTableClass:[SubMixedTable class]];
-    NSLog(@"TableSub Size: %lu", [tableSub rowCount]);
-    XCTAssertEqual([tableSub rowCount], (NSUInteger)5,@"Subtable should have 5 rows");
-    NSLog(@"Count int: %lu", [table countRowsWithInt:50 inColumnWithIndex:2]);
-    NSLog(@"Max: %lld", [table maxIntInColumnWithIndex:2]);
-    NSLog(@"Avg: %.2f", [table avgIntColumnWithIndex:2]);
+        MixedTable *tableRetrieved = [realm tableWithName:@"MixedValues" asTableClass:[MixedTable class]];
+        
+        XCTAssertEqual([tableRetrieved rowCount], (NSUInteger)6, @"6 rows expected");
+        XCTAssertTrue([tableRetrieved[0].Other isKindOfClass:[NSString class]], @"NSString excepted");
+        XCTAssertTrue([tableRetrieved[4].Other isKindOfClass:[RLMTable class]], @"RLMTable excepted");
+        XCTAssertEqual([(RLMTable *)tableRetrieved[4].Other rowCount], (NSUInteger)5,@"Subtable should have 5 rows");
+        XCTAssertTrue([tableRetrieved[5].Other isKindOfClass:[NSDate class]], @"NSDate excepted");
+        
+        // Test cast and isClass
+        // FIXME: When hasSameDescriptorAs is implemented, reenable unit test below
+        // XCTAssertEquals([tableSub hasSameDescriptorAs:[SubMixedTable class]], YES,@"Unknown table should be of type SubMixedTable");
+        tableSub = [tableSub castToTypedTableClass:[SubMixedTable class]];
+        NSLog(@"TableSub Size: %lu", [tableSub rowCount]);
+        XCTAssertEqual([tableSub rowCount], (NSUInteger)5,@"Subtable should have 5 rows");
+        NSLog(@"Count int: %lu", [tableRetrieved countRowsWithInt:50 inColumnWithIndex:2]);
+        NSLog(@"Max: %lld", [tableRetrieved maxIntInColumnWithIndex:2]);
+        NSLog(@"Avg: %.2f", [tableRetrieved avgIntColumnWithIndex:2]);
+    }];
 }
 
 -(void)testMixedValidate
 {
-    MixedTable *table = [[MixedTable alloc] init];
-    XCTAssertThrows(([table addRow:@[@YES, @[@1, @2], @7]]), @"Mixed cannot be an NSArray");
-    XCTAssertThrows(([table addRow:@[@YES, @{@"key": @7}, @11]]), @"Mixed cannot be an NSDictionary");
+    [self.contextPersistedAtTestPath writeUsingBlock:^(RLMRealm *realm) {
+        MixedTable *table = [realm createTableWithName:@"table" asTableClass:MixedTable.class];
+        XCTAssertThrows(([table addRow:@[@YES, @[@1, @2], @7]]), @"Mixed cannot be an NSArray");
+        XCTAssertThrows(([table addRow:@[@YES, @{@"key": @7}, @11]]), @"Mixed cannot be an NSDictionary");
+    }];
 }
 @end
