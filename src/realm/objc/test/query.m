@@ -604,7 +604,7 @@ REALM_TABLE_9(TestQueryAllTypes,
     XCTAssertEqual(view.rowCount,
                    results.count,
                    @"%@ predicate should return correct count", name);
-    for (NSInteger i = 0; i < results.count; i++) {
+    for (NSUInteger i = 0; i < results.count; i++) {
         XCTAssertEqualObjects(results[i],
                               view[i][column],
                               @"%@ predicate should return correct results", name);
