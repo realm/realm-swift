@@ -77,7 +77,7 @@ See RLMTable for more details on possible queries.
 
 ## Transactionless Reads (main thread only!)
 
-For ease of development when accessing values on the main thread (for example for UI purposes), we allow reads to be performed without an RLMContext or transaction block, but **only when the call is made from the main thread**.
+For ease of development when accessing values on the main thread (for example for UI purposes), we allow reads to be performed without an RLMTransactionManager or transaction block, but **only when the call is made from the main thread**.
 
 	// No RLMTransactionManager needed!
 	RLMRealm *realm = [RLMRealm realmWithDefaultPersistence];
@@ -85,7 +85,7 @@ For ease of development when accessing values on the main thread (for example fo
 	DemoObject *object = [DemoObject table.firstRow];
 	NSLog(object.title);
 
-Again, this only works on the main thread, and only for reads. You will still need to wrap your calls in an RLMContext with `writeUsingBlock:`
+Again, this only works on the main thread, and only for reads. You will still need to wrap your calls in an RLMTransactionManager with `writeUsingBlock:`
 to perform writes on the main thread.
 
 ## Notifications
