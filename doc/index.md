@@ -1,4 +1,4 @@
-<img src="docs/realm.png"/>
+<img alt="Realm Logo" src="docs/realm.png"/>
 
 Realm is a fast embedded database that integrates transparently into Objective-C. It provides the full benefits of a database, but with a much lower memory footprint and higher performance than native data structures.
 
@@ -21,7 +21,7 @@ Realm data models fully embrace Objective-C and are defined using traditional `N
 See the [RLMObject Protocol](Protocols/RLMObject.html) for more details.
 
 
-## [RLMContext](Class/RLMContext.html)
+## [RLMContext](Classes/RLMContext.html)
 
 The RLMContext class is responsible for all write transactions:
 

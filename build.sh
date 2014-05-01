@@ -611,7 +611,6 @@ EOF
     "docs")
         appledoc    --project-name Realm \
                     --project-company "Realm" \
-                    --index-desc doc/index.md \
                     --include doc/realm.png \
                     --output doc/appledocs \
                     -v `sh build.sh get-version` \
@@ -625,7 +624,8 @@ EOF
                     --ignore src/realm/objc/RLMType.h \
                     --ignore src/realm/objc/RLMVersion.h \
                     --ignore src/realm/objc/RLMDescriptor.h \
-                    --ignore src/realm/objc/test/* \
+                    --ignore "src/realm/objc/test/*" \
+                    --index-desc doc/index.md \
                     src/realm/objc/ || exit 1
         echo "Done generating docs under docs/appledocs"
         exit 0
