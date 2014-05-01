@@ -6,11 +6,14 @@
 int main(int argc, char * argv[])
 {
     @autoreleasepool {
+        ex_objc_intro();
         ex_objc_query_dynamic_intro();
         ex_objc_query_typed_intro();
         ex_objc_transaction_manager_intro();
         ex_objc_realm_intro();
         ex_objc_table_dynamic_intro();
+        ex_objc_table_dyn_table_sizes();
+        ex_objc_table_dyn_table_init_with_columns();
         ex_objc_table_typed_intro();
         ex_objc_table_typed_intro_with_many_comments();
         ex_objc_tableview_dynamic_intro();
