@@ -54,14 +54,14 @@
 -(NSUInteger)addColumnWithName:(NSString*)name andType:(RLMType)type error:(NSError* __autoreleasing*)error
 {
     if (m_read_only) {
-        if (error)
+        if (error) {
             *error = make_realm_error(RLMErrorFailRdOnly, @"Tried to add column while read only");
+        }
         return NSNotFound;
     }
     size_t columnIndex = NSNotFound;
-    REALM_EXCEPTION_ERRHANDLER(
-                                 columnIndex = m_desc->add_column(tightdb::DataType(type), ObjcStringAccessor(name));,
-                                 NO);
+    REALM_EXCEPTION_ERRHANDLER(columnIndex = m_desc->add_column(tightdb::DataType(type), ObjcStringAccessor(name));,
+                               NSNotFound);
     return columnIndex;
 }
 
