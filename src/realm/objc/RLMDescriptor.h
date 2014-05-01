@@ -26,9 +26,9 @@
 @property (nonatomic, readonly) NSUInteger columnCount;
 
 /**
- * Returns NO on memory allocation error.
+ * Returns index of new column or NSNotFound if an error occurred.
  */
--(BOOL)addColumnWithName:(NSString *)name type:(RLMType)type;
+-(NSUInteger)addColumnWithName:(NSString *)name type:(RLMType)type;
 /**
  * Returns nil on memory allocation error.
  */
