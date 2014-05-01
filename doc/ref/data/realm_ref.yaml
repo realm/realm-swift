@@ -13,15 +13,15 @@ TITLE      : RLMRealm
 SUMMARY    : RLMRealm is a class that provides fully ACID compliant access to tables.
 DESCR      : >
              RLMRealm objects are used for writing or reading tables. These tables are persisted to disk, 
-             and changes to the tables are done through explicit transactions within write blocks on a context.
+             and changes to the tables are done through explicit transactions within write blocks on a transaction manager.
              Implicit transactions are updated at intervals of the runloop cycle only when there are new changes 
-             available. This implies that an update to a table is either stored or will fail, and the context
+             available. This implies that an update to a table is either stored or will fail, and the realm
              is thereby always consistent. See @{link class_group} for details on realms.
 
-             Realm objects can either be created independently, or by an RLMContext's write/read block.
+             Realm objects can either be created independently, or by an RLMTransactionManager's write/read block.
 
              Using a realm, you can access your data within the main thread of your application, without the need
-             for an explicit context or transactions. The file format used by Realm can be used on any platform, 
+             to use a transaction manager. The file format used by Realm can be used on any platform, 
              and data can be accessed by any language Realm supports.
 SEE        :
 EXAMPLES:
@@ -32,19 +32,19 @@ CATEGORIES:
 - Constructor:
   METHODS:
   - g_realm_constructor_default_path:
-      NAME     : "realmWithDefaultPersistence"
+      NAME     : "defaultRealm"
       SUMMARY  : &g_realm_constructor_summary
                  >
                  Creates a stand-alone RLMRealm with optional initialization block
       DESCR    :
       - TEXT   : &g_realm_constructor_descr
                  >
-                 Creates a stand-alone RLMRealm that lives outside any explicit RLMContext.
+                 Creates a stand-alone RLMRealm that lives outside any explicit RLMTransactionManager.
                  Can only be called on the main thread. Runs an optional initialization block on a
-                 writable context before returning.
+                 writable realm before returning.
       SIGNATURE: |
-                 "+ (instancetype)realmWithDefaultPersistence"
-                 "+ (instancetype)realmWithDefaultPersistenceAndInitBlock:(RLMWriteBlock)initBlock"
+                 "+ (instancetype)defaultRealm"
+                 "+ (instancetype)defaultRealmWithInitBlock:(RLMWriteBlock)initBlock"
       PARAMS:
       - NAME   : initBlock
         TYPES  : RLMWriteBlock
@@ -86,9 +86,9 @@ CATEGORIES:
       SUMMARY  : *g_realm_constructor_summary
       DESCR    :
       - TEXT   : >
-                 Creates a stand-alone RLMRealm that lives outside any explicit RLMContext.
+                 Creates a stand-alone RLMRealm that lives outside any explicit RLMTransactionManager.
                  Can be called from any thread. Runs an optional initialization block on a
-                 writable context before returning.
+                 writable realm before returning.
       SIGNATURE: |
                  "+ (instancetype)realmWithPersistenceToFile:(NSString *)path runLoop:(NSRunLoop *)runLoop notificationCenter:(NSNotificationCenter *)notificationCenter error:(NSError **)error"
                  "+ (instancetype)realmWithPersistenceToFile:(NSString *)path initBlock:(RLMWriteBlock)initBlock runLoop:(NSRunLoop *)runLoop notificationCenter:(NSNotificationCenter *)notificationCenter error:(NSError **)error"
@@ -112,7 +112,7 @@ CATEGORIES:
                  running on the specified run loop and 
                  using the specified notification center.
       EXAMPLES:
-      - CODE   : ex_objc_smart_context_intro
+      - CODE   : ex_objc_realm_intro
         DESCR  :
 
 - Tables:

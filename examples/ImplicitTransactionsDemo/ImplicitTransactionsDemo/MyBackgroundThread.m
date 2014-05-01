@@ -7,19 +7,19 @@
 
 - (void)main
 {
-    RLMContext *context = [RLMContext contextPersistedAtPath:[self pathForName:@"demo.realm"] error:nil];
+    RLMTransactionManager *manager = [RLMTransactionManager managerForRealmWithPath:[self pathForName:@"demo.realm"]
+                                                                      error:nil];
 
     __block int i = 0;
     for (;;) {
         [NSThread sleepForTimeInterval:5.0];
-        [context writeUsingBlock:^(RLMRealm *realm) {
+        [manager writeUsingBlock:^(RLMRealm *realm) {
             RLMTable *table = [realm tableWithName:@"demo"];
             ++i;
             [table firstRow][0] = [NSString stringWithFormat:@"First %i", i];
             table[[table rowCount]/2][0] = [NSString stringWithFormat:@"Middle %i", i];
             [table lastRow][0] = [NSString stringWithFormat:@"Last %i", i];
-            return YES; // Commit
-        } error:nil];
+        }];
     }
 }
 
