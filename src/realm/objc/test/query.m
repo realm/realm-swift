@@ -590,6 +590,56 @@ REALM_TABLE_9(TestQueryAllTypes,
     }];
 }
 
+- (void)testBinaryPredicates {
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"data" type:RLMTypeBinary];
+        NSArray *dataArray = @[[@"a" dataUsingEncoding:NSUTF8StringEncoding],
+                               [@"ab" dataUsingEncoding:NSUTF8StringEncoding],
+                               [@"abc" dataUsingEncoding:NSUTF8StringEncoding],
+                               [@"abcd" dataUsingEncoding:NSUTF8StringEncoding]];
+        for (NSData *data in dataArray) {
+            [table addRow:@[data]];
+        }
+        
+        // Equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"data == %@", dataArray.lastObject]
+                    onTable:table
+                withResults:@[dataArray.lastObject]
+                       name:@"equal"
+                     column:@"data"];
+        
+        // Not equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"data != %@", dataArray.firstObject]
+                    onTable:table
+                withResults:[dataArray subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"not equal"
+                     column:@"data"];
+        
+        // Begins with
+        [self testPredicate:[NSPredicate predicateWithFormat:@"data beginswith %@", dataArray[1]]
+                    onTable:table
+                withResults:[dataArray subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"beginswith"
+                     column:@"data"];
+        
+        // Contains
+        [self testPredicate:[NSPredicate predicateWithFormat:@"data contains %@",
+                             [@"bc" dataUsingEncoding:NSUTF8StringEncoding]]
+                    onTable:table
+                withResults:[dataArray subarrayWithRange:NSMakeRange(2, 2)]
+                       name:@"contains"
+                     column:@"data"];
+        
+        // Ends with
+        [self testPredicate:[NSPredicate predicateWithFormat:@"data endswith %@",
+                             [@"cd" dataUsingEncoding:NSUTF8StringEncoding]]
+                    onTable:table
+                withResults:@[dataArray.lastObject]
+                       name:@"endswith"
+                     column:@"data"];
+    }];
+}
+
 #pragma mark - Predicate Helpers
 
 - (void)testPredicate:(NSPredicate *)predicate

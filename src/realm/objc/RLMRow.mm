@@ -73,6 +73,23 @@ using namespace std;
     _table = nil;
 }
 
+- (NSString *)description {
+    NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", NSStringFromClass([self class])];
+    
+    tightdb::Table& t = [_table getNativeTable];
+    size_t columnCount = t.get_column_count();
+    
+    for (size_t colIndex = 0; colIndex < columnCount; colIndex++) {
+        NSString *columnName = [_table nameOfColumnWithIndex:colIndex];
+        NSString *columnObject = [self[colIndex] description];
+        [mString appendFormat:@"\t%@ = %@;\n",
+                              columnName,
+                              columnObject];
+    }
+    [mString appendString:@"}"];
+    return [mString copy];
+}
+
 -(id)objectAtIndexedSubscript:(NSUInteger)colIndex
 {
     return get_cell(colIndex, _ndx, [_table getNativeTable]);
