@@ -32,10 +32,10 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
  
  RLMContexts are used to perform read and write transactions on an RLMRealm.
  
- **While an RLMRealm can be accessed directly on the Main UI Thread to read without transactions, an RLMContext
- must be used on any other threads, and to perform any writes (including writes from the Main thread).**
+ **While an RLMRealm can be accessed directly on the main thread to read without transactions, an RLMContext
+ must be used on any other threads, and to perform any writes (including writes from the main thread).**
  This is so that the Realm library can perform any necessary locks (in the case of writes), or bring the RLMRealm
- up to date with the event loop for transactionless reads on the Main thread.
+ up to date with the event loop for transactionless reads on the main thread.
  
  We recommend you store a reference to the RLMContext on your ViewController for easy access. For example:
  
@@ -45,7 +45,7 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
     self.context = [RLMContext contextWithDefaultPersistence];
  
     [context writeTable:@"Dogs" usingBlock:^(RLMTable *table) {
-        [table remoteRowAtIndex:indexPath.row];
+        [table removeRowAtIndex:indexPath.row];
     }];
 
  
@@ -60,7 +60,7 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
  */
 /**
  Creates an RLMContext for the RLMRealm persisted at the default location
- (`Documents/default.realm`).
+ (`<Application_Home>/Documents/default.realm`).
  
  @return A reference to the RLMContext.
  */
@@ -97,8 +97,8 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
 /**
  Performs a (non-blocking) read transaction and also pre-opens the specified table as a variable
  
- This is a helpful shortcut removing the need to perform a Table instantiation every time you
- open a transaction. You can still open additional table within the block if you want to.
+ This is a helpful shortcut removing the need to explicitly get a Table inside the transaction.
+ You can still open additional Tables within the block if you want to.
  
     [context readTable:@"Dogs" usingBlock:^(RLMTable *table) {
         [table rowAtIndex:indexPath.row];
@@ -143,8 +143,8 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
 /**
  Performs a (blocking) write transaction and also pre-opens the specificied table as a variable
  
- This is a helpful shortcut removing the need to perform a Table instantiation every time you
- open a transaction. You can still open additional table within the block if you want to.
+ This is a helpful shortcut removing the need to explicitly get or create a Table inside the transaction.
+ You can still open additional Tables within the block if you want to.
  
     [context writeTable:@"Dogs" usingBlock:^(RLMTable *table) {
         [table remoteRowAtIndex:indexPath.row];
