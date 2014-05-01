@@ -135,14 +135,14 @@ REALM_TABLE_9(TestQueryAllTypes,
 //    [[[table where].MixedCol columnIsNotEqualTo:mixInt1].BoolCol columnIsEqualTo:NO];
 }
 
-#define BOOL_COL 0
-#define INT_COL 1
-#define FLOAT_COL 2
+#define BOOL_COL   0
+#define INT_COL    1
+#define FLOAT_COL  2
 #define DOUBLE_COL 3
 #define STRING_COL 4
 #define BINARY_COL 5
-#define DATE_COL 6
-#define MIXED_COL 7
+#define DATE_COL   6
+#define MIXED_COL  7
 
 - (void)testDynamic {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {

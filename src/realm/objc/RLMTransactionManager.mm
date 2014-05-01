@@ -21,30 +21,30 @@
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/group_shared.hpp>
 
-#import "RLMContext.h"
+#import "RLMTransactionManager.h"
 #import "RLMRealm_noinst.h"
 #import "util_noinst.hpp"
 
 using namespace std;
 
 
-@implementation RLMContext
+@implementation RLMTransactionManager
 {
     tightdb::util::UniquePtr<tightdb::SharedGroup> m_shared_group;
 }
 
-NSString *const defaultContextFileName = @"default.realm";
+NSString *const defaultRealmFileName = @"default.realm";
 
 +(NSString *)defaultPath
 {
-    return [RLMContext writeablePathForFile:defaultContextFileName];
+    return [RLMTransactionManager writeablePathForFile:defaultRealmFileName];
 }
 
 
-+(RLMContext *)contextWithDefaultPersistence
++(RLMTransactionManager *)managerForDefaultRealm
 {
-    NSString *path = [RLMContext writeablePathForFile:defaultContextFileName];
-    return [self contextPersistedAtPath:path error:nil];
+    NSString *path = [RLMTransactionManager writeablePathForFile:defaultRealmFileName];
+    return [self managerForRealmWithPath:path error:nil];
 }
 
 + (NSString *)writeablePathForFile:(NSString*)fileName
@@ -56,9 +56,9 @@ NSString *const defaultContextFileName = @"default.realm";
 
 
 
-+(RLMContext *)contextPersistedAtPath:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
++(RLMTransactionManager *)managerForRealmWithPath:(NSString*)path error:(NSError**)error  // FIXME: Confirm __autoreleasing is not needed with ARC
 {
-    RLMContext * shared_group = [[RLMContext alloc] init];
+    RLMTransactionManager * shared_group = [[RLMTransactionManager alloc] init];
     if (!shared_group)
         return nil;
     try {
