@@ -24,12 +24,9 @@
 
 void ex_objc_context_intro()
 {
-    // Remove previous datafile
-    [[NSFileManager defaultManager] removeItemAtPath:@"contextTest.realm" error:nil];
 
     // Create datafile with a new table
-    RLMContext *context = [RLMContext contextPersistedAtPath:@"contextTest.realm"
-                                                       error:nil];
+    RLMContext *context = [RLMContext contextWithDefaultPersistence];
     // Perform a write transaction (with commit to file)
     [context writeUsingBlock:^(RLMRealm *realm) {
         People *table = [realm createTableWithName:@"employees"
