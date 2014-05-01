@@ -9,25 +9,24 @@
 #import <realm/objc/RLMQueryFast.h>
 
 REALM_TABLE_1(TestQuerySub,
-                Age,  Int)
+              Age,  Int)
 
 REALM_TABLE_9(TestQueryAllTypes,
-                BoolCol,   Bool,
-                IntCol,    Int,
-                FloatCol,  Float,
-                DoubleCol, Double,
-                StringCol, String,
-                BinaryCol, Binary,
-                DateCol,   Date,
-                TableCol,  TestQuerySub,
-                MixedCol,  Mixed)
+              BoolCol,   Bool,
+              IntCol,    Int,
+              FloatCol,  Float,
+              DoubleCol, Double,
+              StringCol, String,
+              BinaryCol, Binary,
+              DateCol,   Date,
+              TableCol,  TestQuerySub,
+              MixedCol,  Mixed)
 
 @interface MACtestQuery: RLMTestCase
 @end
 @implementation MACtestQuery
 
-- (void)testQuery
-{
+- (void)testQuery {
     TestQueryAllTypes *table = [[TestQueryAllTypes alloc] init];
     NSLog(@"Table: %@", table);
     XCTAssertNotNil(table, @"Table is nil");
@@ -145,8 +144,7 @@ REALM_TABLE_9(TestQueryAllTypes,
 #define DATE_COL 6
 #define MIXED_COL 7
 
-- (void) testDynamic
-{
+- (void)testDynamic {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         [table addColumnWithName:@"BoolCol" type:RLMTypeBool];
         [table addColumnWithName:@"IntCol" type:RLMTypeInt];
@@ -254,8 +252,7 @@ REALM_TABLE_9(TestQueryAllTypes,
     }];
 }
 
-- (void)testMathOperations
-{
+- (void)testMathOperations {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         NSUInteger intCol = [table addColumnWithName:@"IntCol" type:RLMTypeInt];
         NSUInteger floatCol = [table addColumnWithName:@"FloatCol" type:RLMTypeFloat];
@@ -366,9 +363,7 @@ REALM_TABLE_9(TestQueryAllTypes,
     }];
 }
 
-
-- (void)testFind
-{
+- (void)testFind {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         [table addColumnWithName:@"IntCol" type:RLMTypeInt];
         [table RLM_addEmptyRows:6];
@@ -397,8 +392,7 @@ REALM_TABLE_9(TestQueryAllTypes,
     }];
 }
 
-- (void) testSubtableQuery
-{
+- (void)testSubtableQuery {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         RLMDescriptor *d = table.descriptor;
         RLMDescriptor *subDesc = [d addColumnTable:@"subtable"];
@@ -416,8 +410,7 @@ REALM_TABLE_9(TestQueryAllTypes,
     }];
 }
 
--(void) testQueryEnumeratorNoCondition
-{
+- (void)testQueryEnumeratorNoCondition {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         [table addColumnWithName:@"first" type:RLMTypeInt];
         for(int i=0; i<10; ++i)
@@ -431,8 +424,7 @@ REALM_TABLE_9(TestQueryAllTypes,
     }];
 }
 
--(void) testQueryEnumeratorWithCondition
-{
+- (void)testQueryEnumeratorWithCondition {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         [table addColumnWithName:@"first" type:RLMTypeInt];
         for(int i=0; i<10; ++i)
@@ -448,8 +440,7 @@ REALM_TABLE_9(TestQueryAllTypes,
 
 #pragma mark - Predicates
 
-- (void)testDatePredicates
-{
+- (void)testDatePredicates {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         [table addColumnWithName:@"date" type:RLMTypeDate];
         NSArray *dates = @[[NSDate dateWithTimeIntervalSince1970:0],
@@ -510,11 +501,17 @@ REALM_TABLE_9(TestQueryAllTypes,
                 withResults:@[dates[0], dates[2], dates[3]]
                        name:@"not equal"
                      column:@"date"];
+        
+        // Between
+        [self testPredicate:[NSPredicate predicateWithFormat:@"date between %@", @[date, dates.lastObject]]
+                    onTable:table
+                withResults:[dates subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"between"
+                     column:@"date"];
     }];
 }
 
-- (void)testStringPredicates
-{
+- (void)testStringPredicates {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         [table addColumnWithName:@"string" type:RLMTypeString];
         NSArray *strings = @[@"a",
@@ -646,8 +643,7 @@ REALM_TABLE_9(TestQueryAllTypes,
               onTable:(RLMTable *)table
           withResults:(NSArray *)results
                  name:(NSString *)name
-               column:(NSString *)column
-{
+               column:(NSString *)column {
     RLMView *view = [table where:predicate];
     XCTAssertEqual(view.rowCount,
                    results.count,
