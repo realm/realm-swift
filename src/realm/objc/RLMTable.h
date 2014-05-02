@@ -176,32 +176,38 @@
 /**
  Returns the **first** object matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html)
  
-    RLMRow *r = [table firstWhere:@"name == \"name10\""];
+    RLMRow *r = [table firstWhere:@"name == 'name10'"];
+ 
+    r = [table firstWhere:@"name == %@", @"name10"];
     
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
     r = [table firstWhere:predicate];
  
- @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). 
+                  You can also use an NSString with optional format va_list.
  
  @return The **first** object matching the Predicate. It will be of the same type as the RLMRow subclass used on this RLMTable
  @see allWhere:
  */
--(id)firstWhere:(id)predicate;
+-(id)firstWhere:(id)predicate, ...;
 /**
  Returns **all** objects matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
  
-    RLMView *v = [table where:@"name == \"name10\""];
+    RLMView *v = [table allWhere:@"name == 'name10'"];
+    
+    v = [table allWhere:@"name == %@", @"name10"];
     
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
     v = [table where:predicate];
  
- @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
+                  You can also use an NSString with optional format va_list.
  
  @return A reference to an RLMView containing **all** objects matching the Predicate. Objects contained will be of the same type as the RLMRow subclass used on this RLMTable
  @see firstWhere:
  @see allWhere:orderBy:
  */
--(RLMView *)allWhere:(id)predicate;
+-(RLMView *)allWhere:(id)predicate, ...;
 /**
  Returns **all** objects matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html), in the order specified by the [NSSortDescriptor](https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSSortDescriptor_Class/Reference/Reference.html).
  
