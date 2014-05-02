@@ -413,6 +413,18 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
         
         // Test operation not supported
         XCTAssertThrows([table minInColumn:@"BoolCol" where:@"IntCol == 1"], @"Should throw exception");
+        
+        // Test int max
+        XCTAssertEqual([[table maxInColumn:@"IntCol" where:@"BoolCol == NO"] integerValue], 8, @"Maximum should be 8");
+        XCTAssertEqual([[table maxInColumn:@"IntCol" where:@"BoolCol == YES"] integerValue], 10, @"Maximum should be 10");
+        
+        // Test float max
+        XCTAssertEqualWithAccuracy([[table maxInColumn:@"FloatCol" where:@"BoolCol == NO"] floatValue], (float)1.8f, 0.1f, @"Maximum should be 1.8f");
+        XCTAssertEqualWithAccuracy([[table maxInColumn:@"FloatCol" where:@"BoolCol == YES"] floatValue], (float)2.0f, 0.1f, @"Maximum should be 2.0f");
+        
+        // Test double max
+        XCTAssertEqualWithAccuracy([[table maxInColumn:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)10.5, 0.1f, @"Maximum should be 10.5");
+        XCTAssertEqualWithAccuracy([[table maxInColumn:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)13.5, 0.1f, @"Maximum should be 13.5");
     }];
 }
 

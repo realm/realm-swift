@@ -1626,6 +1626,43 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     return min;
 }
 
+-(id)maxInColumn:(NSString *)columnName where:(id)predicate
+{
+    tightdb::Query query = queryFromPredicate(self, predicate);
+    
+    NSUInteger index = [self indexOfColumnWithName:columnName];
+    
+    if (index == NSNotFound) {
+        @throw [NSException exceptionWithName:@"realm:invalid_column_name"
+                                       reason:[NSString stringWithFormat:@"Column with name %@ not found on table", columnName]
+                                     userInfo:nil];
+    }
+    
+    id max;
+    RLMType columnType = [self columnTypeOfColumnWithIndex:index];
+    if (columnType == RLMTypeInt) {
+        max = [NSNumber numberWithInteger:query.maximum_int(index)];
+    }
+    else if (columnType == RLMTypeDouble) {
+        max = [NSNumber numberWithDouble:query.maximum_double(index)];
+    }
+    else if (columnType == RLMTypeFloat) {
+        max = [NSNumber numberWithFloat:query.maximum_float(index)];
+    }
+    else if (columnType == RLMTypeDate) {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supported"
+                                       reason:@"Maximum not supported on date columns yet"
+                                     userInfo:nil];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Maximum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return max;
+}
+
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex
 {
     return m_table->has_index(colIndex);
