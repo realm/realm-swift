@@ -6,10 +6,6 @@ Objective-C
 -----------
 The Objective-C API has been updated and your code will break!
 
-### Bugfixes:
-
-* none.
-
 ### API breaking changes:
 
 * `???`
@@ -17,6 +13,10 @@ The Objective-C API has been updated and your code will break!
 ### Enhancements:
 
 * `???`
+
+### Bugfixes:
+
+* none.
 
 -------------
 
@@ -40,10 +40,15 @@ The Objective-C API has been updated and your code will break!
 * Renamed `contextPersistedAtPath:` to `managerForRealmWithPath:`
 * Renamed `realmWithDefaultPersistence` to `defaultRealm`
 * Renamed `realmWithDefaultPersistenceAndInitBlock` to `defaultRealmWithInitBlock`
+* Renamed `find:` to `firstWhere:`
+* Renamed `where:` to `allWhere:`
+* Renamed `where:orderBy:` to `allWhere:orderBy:`
 
 ### Enhancements:
 
-* `???`
+* Added `countWhere:` on `RLMTable`
+* Added `sumOfColumn:where:` on `RLMTable`
+* Added `averageOfColumn:where` on `RLMTable`
 
 ### Bugfixes:
 
@@ -84,18 +89,15 @@ and your code will break!
 
 * none.
 
--------------
+### Bugfixes:
 
-### Internals:
-
-* `???`
+* None.
 
 
 =============================================================
 0.6.0 Release notes (2014—04-11)
 Objective-C
 -----------
-Description......
 
 ### Bugfixes:
 
