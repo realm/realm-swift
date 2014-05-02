@@ -1,36 +1,42 @@
+////////////////////////////////////////////////////////////////////////////
 //
-//  RLMTable+Predicates.mm
-//  Realm
+// TIGHTDB CONFIDENTIAL
+// __________________
 //
-//  Created by JP Simard on 5/2/14.
-//  Copyright (c) 2014 Realm. All rights reserved.
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
 //
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
-#import "RLMTable+Predicates.h"
+#import "query_util.h"
 
 #import "RLMView_noinst.h"
 #import "NSData+RLMGetBinaryData.h"
-#import "RLMPrivate.h"
-#import "util_noinst.hpp"
 
 @interface RLMTable () {
-    Class _proxyObjectClass;
+@public;
     tightdb::TableRef m_table;
 }
 
 @end
 
-@implementation RLMTable (Predicates)
-
-namespace {
-
 // small helper to create the many exceptions thrown when parsing predicates
-inline NSException * predicate_exception(NSString * name, NSString * reason) {
+inline NSException *predicate_exception(NSString *name, NSString *reason) {
     return [NSException exceptionWithName:[NSString stringWithFormat:@"filterWithPredicate:orderedBy: - %@", name] reason:reason userInfo:nil];
 }
 
 // validate that we support the passed in expression type
-inline NSExpressionType validated_expression_type(NSExpression * expression) {
+inline NSExpressionType validated_expression_type(NSExpression *expression) {
     if (expression.expressionType != NSConstantValueExpressionType &&
         expression.expressionType != NSKeyPathExpressionType) {
         @throw predicate_exception(@"Invalid expression type", @"Only support NSConstantValueExpressionType and NSKeyPathExpressionType");
@@ -39,7 +45,7 @@ inline NSExpressionType validated_expression_type(NSExpression * expression) {
 }
 
 // return the column index for a validated column name
-inline NSUInteger validated_column_index(RLMTable * table, NSString * columnName) {
+inline NSUInteger validated_column_index(RLMTable *table, NSString *columnName) {
     NSUInteger index = [table indexOfColumnWithName:columnName];
     if (index == NSNotFound) {
         @throw predicate_exception(@"Invalid column name",
@@ -419,69 +425,3 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     
     return query;
 }
-
-} //namespace
-
--(id)find:(id)condition
-{
-    tightdb::Query query = queryFromPredicate(self, condition);
-    
-    size_t row_ndx = query.find();
-    
-    if (row_ndx == tightdb::not_found)
-        return nil;
-    
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:row_ndx];
-}
-
--(RLMView *)where:(id)condition
-{
-    tightdb::Query query = queryFromPredicate(self, condition);
-    
-    // create view
-    tightdb::TableView view = query.find_all();
-    
-    // create objc view and return
-    return [RLMView viewWithTable:self nativeView:view objectClass:_proxyObjectClass];
-}
-
--(RLMView *)where:(id)condition orderBy:(id)order
-{
-    tightdb::Query query = queryFromPredicate(self, condition);
-    
-    // create view
-    tightdb::TableView view = query.find_all();
-    
-    // apply order
-    if (order) {
-        NSString *columnName;
-        BOOL ascending = YES;
-        
-        if ([order isKindOfClass:[NSString class]]) {
-            columnName = order;
-        }
-        else if ([order isKindOfClass:[NSSortDescriptor class]]) {
-            columnName = ((NSSortDescriptor*)order).key;
-            ascending = ((NSSortDescriptor*)order).ascending;
-        }
-        else {
-            @throw predicate_exception(@"Invalid order type",
-                                       @"Order must be column name or NSSortDescriptor");
-        }
-        
-        NSUInteger index = validated_column_index(self, columnName);
-        RLMType columnType = [self columnTypeOfColumnWithIndex:index];
-        
-        if (columnType != RLMTypeInt && columnType != RLMTypeBool && columnType != RLMTypeDate) {
-            @throw predicate_exception(@"Invalid sort column type",
-                                       @"Sort only supported on Integer, Date and Boolean columns.");
-        }
-        
-        view.sort(index, ascending);
-    }
-    
-    // create objc view and return
-    return [RLMView viewWithTable:self nativeView:view objectClass:_proxyObjectClass];
-}
-
-@end
