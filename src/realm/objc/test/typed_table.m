@@ -274,4 +274,24 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
     XCTAssertEqual([table[0] age], 99L, @"age property should be 99");
 }
 
+- (void)testTableTyped_countWhere
+{
+    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        AgeTable * table = [AgeTable tableInRealm:realm named:@"table"];
+        
+        [table addRow:@[@23]];
+        [table addRow:@[@23]];
+        [table addRow:@[@22]];
+        [table addRow:@[@29]];
+        [table addRow:@[@2]];
+        [table addRow:@[@24]];
+        [table addRow:@[@21]];
+        
+        XCTAssertEqual([table countWhere:@"age == 23"], (NSUInteger)2, @"countWhere should return 3");
+        XCTAssertEqual([table countWhere:@"age >= 10"], (NSUInteger)6, @"countWhere should return 2");
+        XCTAssertEqual([table countWhere:@"age == 1"], (NSUInteger)0, @"countWhere should return 1");
+        XCTAssertEqual([table countWhere:@"age < 30"], (NSUInteger)7, @"countWhere should return 0");
+    }];
+}
+
 @end
