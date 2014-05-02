@@ -1,6 +1,13 @@
 #import <Realm/Realm.h>
 
-REALM_TABLE_DEF_3(People,
-                  Name, String,
-                  Age,  Int,
-                  Hired, Bool)
+@class People;
+
+RLM_DEFINE_TABLE_TYPE_FOR_OBJECT_TYPE(PeopleTable, People)
+
+@interface People : RLMRow
+
+@property NSString *Name;
+@property int Age;
+@property BOOL Hired;
+
+@end

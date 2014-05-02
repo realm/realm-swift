@@ -24,19 +24,19 @@
 void ex_objc_tableview_typed_intro()
 {
     /* Creates a new table of the type defined above. */
-    People *table = [[People alloc] init];
+    PeopleTable *table = [[PeopleTable alloc] init];
     
     /* Adds rows to the table. */
     [table addRow:@{@"Name":@"Brian",  @"Age":@10, @"Hired":@NO}];
     [table addRow:@{@"Name":@"Sofie",  @"Age":@40, @"Hired":@YES}];
     [table addRow:@{@"Name":@"Sam",    @"Age":@76, @"Hired":@NO}];
     
-    /* Get the result of a query in a table view. */
-    PeopleView *view = [[[table where].Age columnIsGreaterThan:20] findAll];
+    /* Get the result of a query in a view. */
+    RLMView *view = [table allWhere:@"Age > 20"];
     
     /* Iterate over the result in the table view. */
-    for (PeopleRow *row in view) {
-        NSLog(@"This person is over the age of 20: %@", row.Name);
+    for (RLMRow *row in view) {
+        NSLog(@"This person is over the age of 20: %@", row[@"Name"]);
     }
 }
 /* @@EndExample@@ */

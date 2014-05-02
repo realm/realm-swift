@@ -166,8 +166,6 @@
  */
 -(void)removeLastRow;
 
-// Queries
--(RLMQuery *)where;
 // Only supported on string columns with an index
 -(RLMView *)distinctValuesInColumnWithIndex:(NSUInteger)colIndex;
 
@@ -178,17 +176,17 @@
 /**
  Returns the **first** object matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html)
  
-    RLMRow *r = [table find:@"name == \"name10\""];
+    RLMRow *r = [table firstWhere:@"name == \"name10\""];
     
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
-    r = [table find:predicate];
+    r = [table firstWhere:predicate];
  
- @param condition An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
  
  @return The **first** object matching the Predicate. It will be of the same type as the RLMRow subclass used on this RLMTable
- @see where:
+ @see allWhere:
  */
--(id)find:(id)condition;
+-(id)firstWhere:(id)predicate;
 /**
  Returns **all** objects matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
  
@@ -197,13 +195,13 @@
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
     v = [table where:predicate];
  
- @param condition An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
  
  @return A reference to an RLMView containing **all** objects matching the Predicate. Objects contained will be of the same type as the RLMRow subclass used on this RLMTable
- @see find:
- @see where:orderBy:
+ @see firstWhere:
+ @see allWhere:orderBy:
  */
--(RLMView *)where:(id)condition;
+-(RLMView *)allWhere:(id)predicate;
 /**
  Returns **all** objects matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html), in the order specified by the [NSSortDescriptor](https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSSortDescriptor_Class/Reference/Reference.html).
  
@@ -213,15 +211,63 @@
  
     v = [table where:predicate orderBy:@"age"];
  
- @param condition An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
 
  @param order     An [NSSortDescriptor](https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSSortDescriptor_Class/Reference/Reference.html). You can also use the NSString instead of the NSSortDescriptor.
  
  @return A reference to an RLMView containing **all** objects matching the Predicate, sorted according to the Sort Descriptor. Objects contained will be of the same type as the RLMRow subclass used on this RLMTable
  
- @see where:
+ @see allWhere:
  */
--(RLMView *)where:(id)condition orderBy:(id)order;
+-(RLMView *)allWhere:(id)predicate orderBy:(id)order;
+
+/**---------------------------------------------------------------------------------------
+ *  @name Aggregates
+ *  ---------------------------------------------------------------------------------------
+ */
+/**
+ Returns a **count** of objects matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html)
+ 
+ NSUInteger count = [table countWhere:@"name == \"name10\""];
+ 
+ NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
+ count = [table countWhere:predicate];
+ 
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
+ 
+ @return The **count** of objects matching the Predicate.
+ */
+-(NSUInteger)countWhere:(id)predicate;
+/**
+ Returns a **sum** of objects matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html) in a column.
+ 
+ NSNumber *sum = [table sumOfColumn:@"age" where:@"name == \"name10\""];
+ 
+ NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
+ sum = [table sumOfColumn:@"age" where:predicate];
+ 
+ @param columnName An NSString specifying the column's name. The column should be of RLMTypeInt, RLMTypeFloat, or RLMTypeDouble.
+ 
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
+ 
+ @return The **sum** of objects matching the Predicate for the given columnName.
+ */
+-(NSNumber *)sumOfColumn:(NSString *)columnName where:(id)predicate;
+/**
+ Returns a **average** of objects matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html) in a column.
+ 
+ NSNumber *average = [table averageOfColumn:@"age" where:@"name == \"name10\""];
+ 
+ NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
+ average = [table averageOfColumn:@"age" where:predicate];
+ 
+ @param columnName An NSString specifying the column's name. The column should be of RLMTypeInt, RLMTypeFloat, or RLMTypeDouble.
+ 
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
+ 
+ @return The **average** of objects matching the Predicate for the given columnName.
+ */
+-(NSNumber *)averageOfColumn:(NSString *)columnName where:(id)predicate;
 
 // Indices
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;
