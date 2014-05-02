@@ -67,18 +67,10 @@ REALM_TABLE_1(RLMTestTable,
     NSString *tableName = @"table";
     
     RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
-    
-    [[RLMTransactionManager managerForRealmWithPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
-        [realm createTableWithName:tableName];
-    }];
-    
-    __block RLMTable *table = [realm tableWithName:tableName];
-    
-    XCTAssertNil(table, @"RLMRealm should not immediately be able to see a \
-                 table that was created after the realm started");
+
     
     __block BOOL notificationFired = NO;
-    
+    __block RLMTable *table = nil;
     [[NSNotificationCenter defaultCenter] addObserverForName:RLMRealmDidChangeNotification
                                                       object:nil
                                                        queue:[NSOperationQueue mainQueue]
@@ -89,6 +81,10 @@ REALM_TABLE_1(RLMTestTable,
                                                       [self notify:XCTAsyncTestCaseStatusSucceeded];
                                                   }];
     
+    [[RLMTransactionManager managerForRealmWithPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
+        [realm createTableWithName:tableName];
+    }];
+
     [self waitForTimeout:1.0f];
     
     XCTAssertTrue(notificationFired, @"A notification should have fired after a table was created");
@@ -113,19 +109,6 @@ REALM_TABLE_1(RLMTestTable,
     [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:1.0f];
 }
 
-- (void)testRealmWithArgumentsOnDifferentThreadDoesntThrow {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        XCTAssertNoThrow([RLMRealm realmWithPath:RLMTestRealmPath
-                                                      runLoop:[NSRunLoop currentRunLoop]
-                                           notificationCenter:[NSNotificationCenter defaultCenter]
-                                                        error:nil],
-                         @"Calling +realmWithPath:runLoop:notificationCenter:error: \
-                         on a thread other than the main thread \
-                         shouldn't throw an exception.");
-        [self notify:XCTAsyncTestCaseStatusSucceeded];
-    });
-    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:1.0f];
-}
 
 - (void)testHasTableWithName {
     NSString *tableName = @"test";
