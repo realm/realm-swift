@@ -81,41 +81,12 @@ void throw_objc_exception(exception &ex)
 @end
 
 
-@class RLMRealm;
-
-@interface RLMPrivateWeakTimerTarget : NSObject
-
-- (instancetype)initWithRealm:(RLMRealm *)realm;
-- (void)timerDidFire:(NSTimer *)timer;
-
-@end
-
-@implementation RLMPrivateWeakTimerTarget
-{
-    __weak RLMRealm *_realm;
-}
-
-- (instancetype)initWithRealm:(RLMRealm *)realm
-{
-    self = [super init];
-    if (self) {
-        _realm = realm;
-    }
-    return self;
-}
-
-- (void)timerDidFire:(NSTimer *)timer
-{
-    [_realm checkForChange:timer];
-}
-
-@end
+static NSMapTable *s_mainThreadRealms;
 
 @implementation RLMRealm
 {
     NSNotificationCenter *_notificationCenter;
     UniquePtr<SharedGroup> _sharedGroup;
-    NSTimer *_timer;
     NSMutableArray *_weakTableRefs; // Elements are instances of RLMPrivateWeakTableReference
     BOOL _tableRefsHaveDied;
     BOOL _usesImplicitTransactions;
@@ -123,6 +94,13 @@ void throw_objc_exception(exception &ex)
     tightdb::Group *_group;
     BOOL m_is_owned;
     BOOL m_read_only;
+}
+
++ (void)initialize {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        s_mainThreadRealms = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPersonality valueOptions:NSPointerFunctionsWeakMemory];
+    });
 }
 
 - (instancetype)init
@@ -160,51 +138,32 @@ void throw_objc_exception(exception &ex)
     return [self realmWithPath:path initBlock:nil];
 }
 
-+ (instancetype)realmWithPath:(NSString *)path initBlock:(RLMWriteBlock)initBlock
+
++ (instancetype)realmWithPath:(NSString *)path
+                    initBlock:(RLMWriteBlock)initBlock
 {
-    // This constructor can only be called from the main thread
     if (![NSThread isMainThread]) {
         @throw [NSException exceptionWithName:@"realm:runloop_exception"
                                        reason:[NSString stringWithFormat:@"%@ \
                                                can only be called from the main thread. \
                                                Use an RLMTransactionManager read or write block \
-                                               instead.",
-                                               NSStringFromSelector(_cmd)]
-                                     userInfo:nil];
+                                               instead.", NSStringFromSelector(_cmd)] userInfo:nil];
     }
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-    return [self realmWithPath:path
-                     initBlock:initBlock
-                       runLoop:[NSRunLoop mainRunLoop]
-            notificationCenter:notificationCenter
-                         error:nil];
-}
 
-+ (instancetype)realmWithPath:(NSString *)path
-                      runLoop:(NSRunLoop *)runLoop
-           notificationCenter:(NSNotificationCenter *)notificationCenter
-                        error:(NSError **)error
-{
-    return [self realmWithPath:path
-                     initBlock:nil
-                       runLoop:runLoop
-            notificationCenter:notificationCenter
-                         error:error];
-}
-
-+ (instancetype)realmWithPath:(NSString *)path
-                    initBlock:(RLMWriteBlock)initBlock
-                      runLoop:(NSRunLoop *)runLoop
-           notificationCenter:(NSNotificationCenter *)notificationCenter
-                        error:(NSError **)error
-{
-    RLMRealm *realm = [[RLMRealm alloc] initForImplicitTransactions:YES];
+    // try to reuse existing realm first
+    RLMRealm *realm = [s_mainThreadRealms objectForKey:path];
+    if (realm) {
+        return realm;
+    }
+    
+    realm = [[RLMRealm alloc] initForImplicitTransactions:YES];
     if (!realm) {
         return nil;
     }
 
-    realm->_notificationCenter = notificationCenter;
+    realm->_notificationCenter = [NSNotificationCenter defaultCenter];
 
+    NSError *__autoreleasing* error = nil;
     RLMError errorCode = RLMErrorOk;
     NSString *errorMessage;
     try {
@@ -232,6 +191,9 @@ void throw_objc_exception(exception &ex)
         }
         return nil;
     }
+    realm->_weakTableRefs = [NSMutableArray array];
+
+    
     
     // Run init block before creating realm
     if (initBlock) {
@@ -267,16 +229,9 @@ void throw_objc_exception(exception &ex)
         }
         realm->m_read_only = YES;
     }
-
-    // Register an interval timer on specified runLoop
-    NSTimeInterval seconds = 0.1; // Ten times per second
-    RLMPrivateWeakTimerTarget *weakTimerTarget = [[RLMPrivateWeakTimerTarget alloc] initWithRealm:realm];
-    realm->_timer = [NSTimer timerWithTimeInterval:seconds target:weakTimerTarget
-                                          selector:@selector(timerDidFire:)
-                                          userInfo:nil repeats:YES];
-    [runLoop addTimer:realm->_timer forMode:NSDefaultRunLoopMode];
-
-    realm->_weakTableRefs = [NSMutableArray array];
+    
+    // cache main thread realm at this path
+    [s_mainThreadRealms setObject:realm forKey:path];
 
     try {
         realm->_group = (tightdb::Group *)&realm->_sharedGroup->begin_read();
@@ -290,16 +245,13 @@ void throw_objc_exception(exception &ex)
 
 - (void)dealloc
 {
-    [_timer invalidate];
     if (m_is_owned) {
         delete _group;
     }
 }
 
-- (void)checkForChange:(NSTimer *)theTimer
+- (void)checkForChange
 {
-    static_cast<void>(theTimer);
-
     // Remove dead table references from list
     if (_tableRefsHaveDied) {
         NSMutableArray *deadTableRefs = [NSMutableArray array];

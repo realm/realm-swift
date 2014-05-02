@@ -27,7 +27,7 @@
 
 - (void)tableRefDidDie;
 
-- (void)checkForChange:(NSTimer *)timer;
+- (void)checkForChange;
 
 + (instancetype)realmWithNativeGroup:(tightdb::Group *)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only;
 
