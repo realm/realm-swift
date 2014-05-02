@@ -32,28 +32,25 @@ void ex_objc_transaction_manager_intro()
                                                                       error:nil];
     // Perform a write transaction (with commit to file)
     [manager writeUsingBlock:^(RLMRealm *realm) {
-        People *table = [realm createTableWithName:@"employees"
-                                      asTableClass:[People class]];
+        PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
         [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
     }];
 
     // Perform a write transaction (with rollback)
     [manager writeUsingBlockWithRollback:^(RLMRealm *realm, BOOL *rollback) {
-        People *table = [realm createTableWithName:@"employees"
-                                      asTableClass:[People class]];
+        PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
         if ([table rowCount] == 0) {
             NSLog(@"Roll back!");
             *rollback = YES;
             return;
         }
-        [table addName:@"Mary" Age:76 Hired:NO];
+        [table addRow:@[@"Mary", @21, @NO]];
     }];
 
     // Perform a read transaction
     [manager readUsingBlock:^(RLMRealm *realm) {
-        People *table = [realm tableWithName:@"employees"
-                                asTableClass:[People class]];
-        for (PeopleRow *row in table) {
+        PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
+        for (People *row in table) {
             NSLog(@"Name: %@", row.Name);
         }
     }];

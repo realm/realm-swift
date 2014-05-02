@@ -24,19 +24,19 @@
 void ex_objc_query_typed_intro()
 {
     // Creates a new table of the type defined above
-    People *table = [[People alloc] init];
+    PeopleTable *table = [[PeopleTable alloc] init];
     
     // Adds rows to the table.
     [table addRow:@{@"Name":@"Brian", @"Age":@14, @"Hired":@NO}];
     [table addRow:@{@"Name":@"Jack",  @"Age":@34, @"Hired":@YES}];
     [table addRow:@{@"Name":@"Bob",   @"Age":@10, @"Hired":@NO}];
-    
-    // Create a query
-    PeopleQuery *query = [[[[table where].Age columnIsGreaterThan:20] Or].Name columnIsEqualTo:@"Bob"];
+        
+    // Create a view
+    RLMView *view = [table allWhere:@"Age > 20"];
     
     // Iterate over the query result
-    for (PeopleRow *row in query) {
-        NSLog(@"Person matching query: %@", row.Name);
+    for (RLMRow *row in view) {
+        NSLog(@"Person matching query: %@", row[@"Name"]);
     }
 }
 /* @@EndExample@@ */
