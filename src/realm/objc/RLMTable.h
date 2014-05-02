@@ -268,6 +268,21 @@
  @return The **average** of objects matching the Predicate for the given columnName.
  */
 -(NSNumber *)averageOfColumn:(NSString *)columnName where:(id)predicate;
+/**
+ Returns the **minimum** object of objects matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html) in a column.
+ 
+ NSNumber *min = [table minInColumn:@"age" where:@"name == \"name10\""];
+ 
+ NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
+ min = [table minInColumn:@"age" where:predicate];
+ 
+ @param columnName An NSString specifying the column's name. The column should be of RLMTypeInt, RLMTypeFloat, RLMTypeDouble. RLMTypeDate not supported yet.
+ 
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
+ 
+ @return The **minimum** object of objects matching the Predicate for the given columnName. An NSNumber will be returned if column is of type RLMTypeInt, RLMTypeFloat, and RLMTypeDouble. An NSDate will be returned if a column is of type RLMTypeDate.
+ */
+-(id)minInColumn:(NSString *)columnName where:(id)predicate;
 
 // Indices
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;

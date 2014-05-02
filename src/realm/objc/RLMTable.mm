@@ -1589,6 +1589,43 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     return average;
 }
 
+-(id)minInColumn:(NSString *)columnName where:(id)predicate
+{
+    tightdb::Query query = queryFromPredicate(self, predicate);
+    
+    NSUInteger index = [self indexOfColumnWithName:columnName];
+    
+    if (index == NSNotFound) {
+        @throw [NSException exceptionWithName:@"realm:invalid_column_name"
+                                       reason:[NSString stringWithFormat:@"Column with name %@ not found on table", columnName]
+                                     userInfo:nil];
+    }
+    
+    id min;
+    RLMType columnType = [self columnTypeOfColumnWithIndex:index];
+    if (columnType == RLMTypeInt) {
+        min = [NSNumber numberWithInteger:query.minimum_int(index)];
+    }
+    else if (columnType == RLMTypeDouble) {
+        min = [NSNumber numberWithDouble:query.minimum_double(index)];
+    }
+    else if (columnType == RLMTypeFloat) {
+        min = [NSNumber numberWithFloat:query.minimum_float(index)];
+    }
+    else if (columnType == RLMTypeDate) {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supported"
+                                       reason:@"Minimum not supported on date columns yet"
+                                     userInfo:nil];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Minimum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return min;
+}
+
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex
 {
     return m_table->has_index(colIndex);
@@ -1732,7 +1769,6 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     }
     return YES;
 }
-
 
 @end
 
