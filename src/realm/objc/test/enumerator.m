@@ -16,6 +16,9 @@
 @property bool Hired;
 @end
 
+@implementation EnumPeople
+@end
+
 REALM_TABLE_2(EnumPeopleTable2,
               Hired, Bool,
               Age,   Int)
@@ -24,6 +27,7 @@ REALM_TABLE_FAST(EnumPeopleTable2)
 
 @interface MACTestEnumerator : RLMTestCase
 @end
+
 @implementation MACTestEnumerator
 
 - (void)testTutorial

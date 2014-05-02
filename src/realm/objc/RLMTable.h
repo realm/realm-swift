@@ -179,7 +179,7 @@
     RLMRow *r = [table firstWhere:@"name == \"name10\""];
     
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
-    r = [table find:predicate];
+    r = [table firstWhere:predicate];
  
  @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
  
@@ -220,6 +220,24 @@
  @see allWhere:
  */
 -(RLMView *)allWhere:(id)predicate orderBy:(id)order;
+
+/**---------------------------------------------------------------------------------------
+ *  @name Aggregates
+ *  ---------------------------------------------------------------------------------------
+ */
+/**
+ Returns a **count** of objects matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html)
+ 
+ NSUInteger count = [table countWhere:@"name == \"name10\""];
+ 
+ NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
+ count = [table find:predicate];
+ 
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
+ 
+ @return The **count** of objects matching the Predicate.
+ */
+-(NSUInteger)countWhere:(id)predicate;
 
 // Indices
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;

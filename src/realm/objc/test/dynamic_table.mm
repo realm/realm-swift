@@ -1400,5 +1400,24 @@ using namespace std;
     }];
 }
 
+- (void)testTableDynamic_countWhere
+{
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"IntCol" type:RLMTypeInt];
+        [table addColumnWithName:@"BoolCol" type:RLMTypeBool];
+        
+        [table addRow:@[@1231, @NO]];
+        [table addRow:@[@1232, @YES]];
+        [table addRow:@[@1233, @YES]];
+        [table addRow:@[@1234, @NO]];
+        [table addRow:@[@1235, @NO]];
+        
+        XCTAssertEqual([table countWhere:@"BoolCol == NO"], (NSUInteger)3, @"countWhere should return 3");
+        XCTAssertEqual([table countWhere:@"BoolCol == YES"], (NSUInteger)2, @"countWhere should return 2");
+        XCTAssertEqual([table countWhere:@"IntCol == 1232"], (NSUInteger)1, @"countWhere should return 1");
+        XCTAssertEqual([table countWhere:@"IntCol == 89172"], (NSUInteger)0, @"countWhere should return 0");
+    }];
+}
+
 
 @end
