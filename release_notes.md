@@ -42,7 +42,7 @@ The Objective-C API has been updated and your code will break!
 * Renamed `realmWithDefaultPersistenceAndInitBlock` to `defaultRealmWithInitBlock`
 * Renamed `find:` to `firstWhere:`
 * Renamed `where:` to `allWhere:`
-* Renamed `where:orderBy` to `allWhere:orderBy:`
+* Renamed `where:orderBy:` to `allWhere:orderBy:`
 
 ### Enhancements:
 
