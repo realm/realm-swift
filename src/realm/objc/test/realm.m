@@ -94,21 +94,64 @@ REALM_TABLE_1(RLMTestTable,
                    RLMRealm should be of class RLMTable");
 }
 
+- (void)testRealmIsNotifiedByBackgroundUpdate {
+    NSString *realmFilePath = @"async.realm";
+    [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
+    NSString *tableName = @"table";
+    
+    RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
+    __block BOOL notificationFired = NO;
+    [[NSNotificationCenter defaultCenter] addObserverForName:RLMRealmDidChangeNotification
+                                                      object:nil
+                                                       queue:[NSOperationQueue currentQueue]
+                                                  usingBlock:^(NSNotification *note) {
+                                                      XCTAssertNotNil(note, @"Must use parameter");
+                                                      notificationFired = YES;
+                                                      [self notify:XCTAsyncTestCaseStatusSucceeded];
+                                                  }];
+    
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_async(queue, ^{
+        [[RLMTransactionManager managerForRealmWithPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
+            [realm createTableWithName:tableName];
+        }];
+    });
+    
+    [self waitForTimeout:10.0f];
+    
+    XCTAssertTrue(notificationFired, @"A notification should have fired after a table was created");
+    
+    RLMTable *table = [realm tableWithName:tableName];
+    XCTAssertNotNil(table, @"The RLMRealm should be able to read a newly \
+                    created table after a RLMRealmDidChangeNotification was sent");
+}
+
 - (void)testRealmOnMainThreadDoesntThrow {
     XCTAssertNoThrow([self realmPersistedAtTestPath], @"Calling \
                      +realmWithPath on the main thread shouldn't throw an exception.");
 }
 
-- (void)testRealmOnDifferentThreadThrows {
+- (void)testRealmOnDifferentThreadDoesntThrow {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        XCTAssertThrows([self realmPersistedAtTestPath], @"Calling \
-                        +realmWithPath on a thread other than the main thread \
-                        should throw an exception.");
+        XCTAssertNoThrow([self realmPersistedAtTestPath], @"Calling \
+                        +realmWithPath on a thread with a runloop \
+                        should not throw an exception.");
         [self notify:XCTAsyncTestCaseStatusSucceeded];
     });
     [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:1.0f];
 }
 
+
+- (void)testRealmWithArgumentsOnDifferentThreadDoesntThrow {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        XCTAssertNoThrow([RLMRealm realmWithPath:RLMTestRealmPath],
+                         @"Calling +realmWithPath:runLoop:notificationCenter:error: \
+                         on a thread other than the main thread \
+                         shouldn't throw an exception.");
+        [self notify:XCTAsyncTestCaseStatusSucceeded];
+    });
+    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:1.0f];
+}
 
 - (void)testHasTableWithName {
     NSString *tableName = @"test";

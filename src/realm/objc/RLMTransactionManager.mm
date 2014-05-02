@@ -93,17 +93,6 @@ NSString *const defaultRealmFileName = @"default.realm";
     return shared_group;
 }
 
--(void)notifyMainRealm {
-    if ([NSThread isMainThread]) {
-        [[RLMRealm realmWithPath:_path] checkForChange];
-    }
-    else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [[RLMRealm realmWithPath:_path] checkForChange];
-        });
-    }
-}
-
 -(void)readUsingBlock:(RLMReadBlock)block
 {
     const tightdb::Group* group;
@@ -165,7 +154,7 @@ NSString *const defaultRealmFileName = @"default.realm";
     // Required to avoid leaking of core exceptions.
     try {
         m_shared_group->commit();
-        [self notifyMainRealm];
+        [RLMRealm notifyRealmsAtPath:_path];
     }
     catch (std::exception& ex) {
         @throw [NSException exceptionWithName:@"realm:core_exception"
@@ -204,7 +193,7 @@ NSString *const defaultRealmFileName = @"default.realm";
         // Required to avoid leaking of core exceptions.
         try {
             m_shared_group->commit();
-            [self notifyMainRealm];
+            [RLMRealm notifyRealmsAtPath:_path];
         }
         catch (std::exception& ex) {
             @throw [NSException exceptionWithName:@"realm:core_exception"
