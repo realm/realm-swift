@@ -1557,6 +1557,38 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     return sum;
 }
 
+-(NSNumber *)averageOfColumn:(NSString *)columnName where:(id)predicate
+{
+    tightdb::Query query = queryFromPredicate(self, predicate);
+    
+    NSUInteger index = [self indexOfColumnWithName:columnName];
+    
+    if (index == NSNotFound) {
+        @throw [NSException exceptionWithName:@"realm:invalid_column_name"
+                                       reason:[NSString stringWithFormat:@"Column with name %@ not found on table", columnName]
+                                     userInfo:nil];
+    }
+    
+    NSNumber *average;
+    RLMType columnType = [self columnTypeOfColumnWithIndex:index];
+    if (columnType == RLMTypeInt) {
+        average = [NSNumber numberWithDouble:query.average_int(index)];
+    }
+    else if (columnType == RLMTypeDouble) {
+        average = [NSNumber numberWithDouble:query.average_double(index)];
+    }
+    else if (columnType == RLMTypeFloat) {
+        average = [NSNumber numberWithDouble:query.average_float(index)];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Average only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return average;
+}
+
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex
 {
     return m_table->has_index(colIndex);
