@@ -1517,6 +1517,15 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     return [RLMView viewWithTable:self nativeView:view objectClass:_proxyObjectClass];
 }
 
+-(NSUInteger)countWhere:(id)predicate
+{
+    tightdb::Query query = queryFromPredicate(self, predicate);
+    
+    size_t count = query.count();
+    
+    return count;
+}
+
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex
 {
     return m_table->has_index(colIndex);
