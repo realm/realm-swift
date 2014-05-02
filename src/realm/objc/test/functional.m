@@ -11,9 +11,9 @@
 #import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 REALM_TABLE_3(FuncPeopleTable,
-                Name,  String,
-                Age,   Int,
-                Hired, Bool)
+              Name,  String,
+              Age,   Int,
+              Hired, Bool)
 
 REALM_TABLE_FAST(FuncPeopleTable)
 
@@ -35,8 +35,7 @@ REALM_TABLE_FAST(FuncPeopleTable)
 @end
 @implementation MACtestFunctional
 
-- (void)testTypedRow
-{
+- (void)testTypedRow {
 
     /*
      *  Row in a table.
@@ -159,8 +158,7 @@ REALM_TABLE_FAST(FuncPeopleTable)
 
 }
 
-- (void)testDynamicRow
-{
+- (void)testDynamicRow {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         /*
          *  Row in a table.
@@ -288,8 +286,7 @@ REALM_TABLE_FAST(FuncPeopleTable)
 }
 
 - (void)testRowDescription {
-    RLMContext *context = [self contextPersistedAtTestPath];
-    [context writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         NSDate *date = [NSDate dateWithTimeIntervalSince1970:1234];
         RLMTable *table = [realm createTableWithName:@"people" objectClass:[RLMPerson class]];
         [table addRow:@[@"John", date]];

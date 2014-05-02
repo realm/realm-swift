@@ -31,11 +31,11 @@ REALM_TABLE_1(RLMTestTable,
     
     NSError *error = nil;
     
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:tableName];
     }];
     
-    XCTAssertNil(error, @"RLMContext error should be nil after write block");
+    XCTAssertNil(error, @"RLMTransactionManager error should be nil after write block");
     
     RLMRealm *realm = [self realmPersistedAtTestPath];
     RLMTable *table = [realm tableWithName:tableName];
@@ -48,7 +48,7 @@ REALM_TABLE_1(RLMTestTable,
 - (void)testCanReadPreviouslyCreatedTypedTable {
     NSString *tableName = @"table";
     
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:tableName asTableClass:[RLMTestTable class]];
     }];
     
@@ -66,9 +66,9 @@ REALM_TABLE_1(RLMTestTable,
     [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
     NSString *tableName = @"table";
     
-    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:realmFilePath];
+    RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
     
-    [[RLMContext contextPersistedAtPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
+    [[RLMTransactionManager managerForRealmWithPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:tableName];
     }];
     
@@ -79,7 +79,7 @@ REALM_TABLE_1(RLMTestTable,
     
     __block BOOL notificationFired = NO;
     
-    [[NSNotificationCenter defaultCenter] addObserverForName:RLMContextDidChangeNotification
+    [[NSNotificationCenter defaultCenter] addObserverForName:RLMRealmDidChangeNotification
                                                       object:nil
                                                        queue:[NSOperationQueue mainQueue]
                                                   usingBlock:^(NSNotification *note) {
@@ -93,20 +93,20 @@ REALM_TABLE_1(RLMTestTable,
     
     XCTAssertTrue(notificationFired, @"A notification should have fired after a table was created");
     XCTAssertNotNil(table, @"The RLMRealm should be able to read a newly \
-                    created table after a RLMContextDidChangeNotification was sent");
+                    created table after a RLMRealmDidChangeNotification was sent");
     XCTAssertEqual([table class], [RLMTable class], @"a newly created table read from \
                    RLMRealm should be of class RLMTable");
 }
 
 - (void)testRealmOnMainThreadDoesntThrow {
     XCTAssertNoThrow([self realmPersistedAtTestPath], @"Calling \
-                     +realmWithPersistenceToFile on the main thread shouldn't throw an exception.");
+                     +realmWithPath on the main thread shouldn't throw an exception.");
 }
 
 - (void)testRealmOnDifferentThreadThrows {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         XCTAssertThrows([self realmPersistedAtTestPath], @"Calling \
-                        +realmWithPersistenceToFile on a thread other than the main thread \
+                        +realmWithPath on a thread other than the main thread \
                         should throw an exception.");
         [self notify:XCTAsyncTestCaseStatusSucceeded];
     });
@@ -115,11 +115,11 @@ REALM_TABLE_1(RLMTestTable,
 
 - (void)testRealmWithArgumentsOnDifferentThreadDoesntThrow {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        XCTAssertNoThrow([RLMRealm realmWithPersistenceToFile:RLMTestRealmPath
+        XCTAssertNoThrow([RLMRealm realmWithPath:RLMTestRealmPath
                                                       runLoop:[NSRunLoop currentRunLoop]
                                            notificationCenter:[NSNotificationCenter defaultCenter]
                                                         error:nil],
-                         @"Calling +realmWithPersistenceToFile:runLoop:notificationCenter:error: \
+                         @"Calling +realmWithPath:runLoop:notificationCenter:error: \
                          on a thread other than the main thread \
                          shouldn't throw an exception.");
         [self notify:XCTAsyncTestCaseStatusSucceeded];
@@ -139,7 +139,7 @@ REALM_TABLE_1(RLMTestTable,
                  if requested from the realm");
     
     // Tables should exist after being created
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:tableName];
     }];
     
@@ -150,7 +150,7 @@ REALM_TABLE_1(RLMTestTable,
 }
 
 - (void)testInitBlock {
-    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:RLMTestRealmPath
+    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath
                                                  initBlock:^(RLMRealm *realm) {
                                                      [realm createTableWithName:@"table"];
                                                  }];

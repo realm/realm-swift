@@ -1,17 +1,17 @@
 #
-# Obj-C reference documentation for RLMContext class
+# Obj-C reference documentation for RLMTransactionManager class
 #
 
-ID         : class_context
-TITLE      : RLMContext
-SUMMARY    : The RLMContext class is a way to work with persistent tables.
+ID         : class_transaction_manager
+TITLE      : RLMTransactionManager
+SUMMARY    : The RLMTransactionManager class is a way to work with persistent tables.
 DESCR      : >
-             A RLMContext object can consists of zero, one or more tables. These tables can
+             A RLMTransactionManager object can consists of zero, one or more tables. These tables can
              easily be stored on disk, and changes to the tables are done through transactions.
-             This implies that an update to a table is either stored or will failed, and the context
+             This implies that an update to a table is either stored or will failed, and the realm
              is thereby always consistent. See @{link class_group} for details on transactions.
 
-             Using contexts, you can access your data concurrent in a multi-threaded application. The file
+             Using transaction managers, you can access your data concurrent in a multi-threaded application. The file
              format used by Realm can be used on any platform, and data can be accessed by any language as
              Realm supports.
 SEE        :
@@ -23,32 +23,32 @@ CATEGORIES:
 - Constructor:
   METHODS:
   - g_shared_group_constructor:
-      NAME     : "contextPersistedAtPath:error:"
+      NAME     : "managerForRealmWithPath:error:"
       SUMMARY  : *g_shared_group_constructor_summary
       DESCR    :
       - TEXT   : *g_shared_group_constructor_descr
       - TEXT   : *g_shared_group_durability_modes
-      SIGNATURE: + (RLMContext *)contextPersistedAtPath:(NSString *)path error:(NSError **)error
+      SIGNATURE: + (RLMTransactionManager *)managerForRealmWithPath:(NSString *)path error:(NSError **)error
       PARAMS:
       - NAME   : path
         TYPES  : NSString
         DESCR  : A path to a file. E.g. documents-folder/myDatabase.realm
       RETURN:
-        TYPES  : RLMContext
-        DESCR  : A context mapped to a file.
+        TYPES  : RLMTransactionManager
+        DESCR  : A transaction manager mapped to a realm file.
       EXAMPLES:
       - CODE   : ex_objc_shared_group_constructor
         DESCR  :
   - g_shared_group_constructor_default_path:
-      NAME     : "contextWithDefaultPersistence:"
+      NAME     : "managerForDefaultRealm:"
       SUMMARY  : *g_shared_group_constructor_summary
       DESCR    :
       - TEXT   : *g_shared_group_constructor_descr
       - TEXT   : *g_shared_group_durability_modes
-      SIGNATURE: + (RLMContext *)contextPersistedAtPath:(NSString *)path error:(NSError **)error
+      SIGNATURE: + (RLMTransactionManager *)managerForRealmWithPath:(NSString *)path error:(NSError **)error
       RETURN:
-        TYPES  : RLMContext
-        DESCR  : A context mapped to a file.
+        TYPES  : RLMTransactionManager
+        DESCR  : A transaction manager mapped to a realm file.
       EXAMPLES:
       - CODE   : ex_objc_shared_group_constructor
         DESCR  :
@@ -63,9 +63,9 @@ CATEGORIES:
       RETURN:
         TYPES  : BOOL
         DESCR  : >
-                 <code>YES</code> if the context has been changed since last transaction,
+                 <code>YES</code> if the transaction manager has been changed since last transaction,
                  otherwise <code>NO</code>.
-                 A context has been changed if a new table has been added to the context, the
+                 A transaction manager has been changed if a new table has been added to the realm, the
                  description of a table has been modified, or the contents of a table has been
                  modified.
       EXAMPLES:

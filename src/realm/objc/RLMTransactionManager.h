@@ -30,60 +30,59 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
 
 /**
  
- RLMContexts are used to perform read and write transactions on an RLMRealm.
+ RLMTransactionManagers are used to perform read and write transactions on an RLMRealm.
  
- **While an RLMRealm can be accessed directly on the main thread to read without transactions, an RLMContext
+ **While an RLMRealm can be accessed directly on the main thread to read without transactions, an RLMTransactionManager
  must be used on any other threads, and to perform any writes (including writes from the main thread).**
  This is so that the Realm library can perform any necessary locks (in the case of writes), or bring the RLMRealm
  up to date with the event loop for transactionless reads on the main thread.
  
- We recommend you store a reference to the RLMContext on your ViewController for easy access. For example:
+ We recommend you store a reference to the RLMTransactionManager on your ViewController for easy access. For example:
  
     // MyViewController.m
-    @property (nonatomic, strong) RLMContext *context;
+    @property (nonatomic, strong) RLMTransactionManager *manager;
     
-    self.context = [RLMContext contextWithDefaultPersistence];
+    self.manager = [RLMTransactionManager managerForDefaultRealm];
  
-    [context writeTable:@"Dogs" usingBlock:^(RLMTable *table) {
+    [self.manager writeTable:@"Dogs" usingBlock:^(RLMTable *table) {
         [table removeRowAtIndex:indexPath.row];
     }];
 
  
  */
-@interface RLMContext : NSObject
+@interface RLMTransactionManager : NSObject
 
 +(NSString *) defaultPath;
 
 /**---------------------------------------------------------------------------------------
- *  @name Creating & Initializing Contexts
+ *  @name Creating & Initializing Transaction Managers
  *  ---------------------------------------------------------------------------------------
  */
 /**
- Creates an RLMContext for the RLMRealm persisted at the default location
+ Creates an RLMTransactionManager for the RLMRealm persisted at the default location
  (`<Application_Home>/Documents/default.realm`).
  
- @return A reference to the RLMContext.
+ @return A reference to the RLMTransactionManager.
  */
-+(RLMContext *)contextWithDefaultPersistence;
++(instancetype)managerForDefaultRealm;
 /**
- Creates an RLMContext for the RLMRealm persisted at a specific location.
+ Creates an RLMTransactionManager for the RLMRealm persisted at a specific location.
  
  @param path  Path to the Realm file you want to access.
  @param error Pass-by-reference for errors.
  
- @return A reference to the RLMContext
+ @return A reference to the RLMTransactionManager
  */
-+(RLMContext *)contextPersistedAtPath:(NSString *)path error:(NSError **)error;
-
++(instancetype)managerForRealmWithPath:(NSString *)path error:(NSError **)error;
 
 /**---------------------------------------------------------------------------------------
- *  @name Reading a Realm through a Context
+ *  @name Reading a Realm through a Transaction Manager
  *  ---------------------------------------------------------------------------------------
  */
 /**
- Performs a (non-blocking) read transaction on the RLMRealm referenced by this RLMContext.
+ Performs a (non-blocking) read transaction on the RLMRealm referenced by this RLMTransactionManager.
  
-    [[RLMContext contextWithDefaultPersistence] readUsingBlock:^(RLMRealm *realm) {
+    [[RLMTransactionManager managerForDefaultRealm] readUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm tableWithName:kTableName objectClass:[RLMDemoObject class]];
         for (RLMDemoObject *object in table) {
             NSLog(@"title: %@\ndate: %@", object.title, object.date);
@@ -100,7 +99,7 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
  This is a helpful shortcut removing the need to explicitly get a Table inside the transaction.
  You can still open additional Tables within the block if you want to.
  
-    [context readTable:@"Dogs" usingBlock:^(RLMTable *table) {
+    [manager readTable:@"Dogs" usingBlock:^(RLMTable *table) {
         [table rowAtIndex:indexPath.row];
     }];
  
@@ -111,7 +110,7 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
 
 /**
  Checks if the underlying RLMRealm has received any writes since the last time you
- used this RLMContext.
+ used this RLMTransactionManager.
  
  @return YES if there have been any changes to the RLMRealm; NO otherwise.
  */
@@ -119,13 +118,13 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
 
 
 /**---------------------------------------------------------------------------------------
- *  @name Writing to a Realm through a Context
+ *  @name Writing to a Realm through a Transaction Manager
  *  ---------------------------------------------------------------------------------------
  */
 /**
- Performs a (blocking) write transaction on the RLMRealm referenced by this RLMContext
+ Performs a (blocking) write transaction on the RLMRealm referenced by this RLMTransactionManager
  
-     [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
+     [[RLMTransactionManager managerForDefaultRealm] writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm tableWithName:@"Dogs" objectClass:[RLMDogObject class]];
         // Add row via array. Order matters.
         [table addRow:@[[self randomString], [self randomDate]]];
@@ -146,7 +145,7 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
  This is a helpful shortcut removing the need to explicitly get or create a Table inside the transaction.
  You can still open additional Tables within the block if you want to.
  
-    [context writeTable:@"Dogs" usingBlock:^(RLMTable *table) {
+    [manager writeTable:@"Dogs" usingBlock:^(RLMTable *table) {
         [table remoteRowAtIndex:indexPath.row];
     }];
  
@@ -154,6 +153,5 @@ typedef void(^RLMTableWriteBlock)(RLMTable *table);
  @param block     A block containing the write code you want to perform.
  */
 -(void)writeTable:(NSString*)tablename usingBlock:(RLMTableWriteBlock)block;
-
 
 @end

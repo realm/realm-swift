@@ -41,7 +41,7 @@ REALM_TABLE_FAST(EnumPeopleTable2)
                            @[@"Phil", @43, @NO],
                            @[@"Anni", @54, @YES]];
     // Create new table in realm
-    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:RLMTestRealmPath initBlock:^(RLMRealm *realm) {
+    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath initBlock:^(RLMRealm *realm) {
         RLMTable *people = [realm createTableWithName:@"people" objectClass:[EnumPeople class]];
         // Add some rows
         for (NSArray *rowArray in rowsArray) {

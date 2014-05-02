@@ -105,7 +105,7 @@
     NSString* name = [NSString stringWithUTF8String:#_name]; \
     if (!name) \
         return NO; \
-    if (![desc addColumnWithName:name type:REALM_TYPE_ID_##_type]) \
+    if ([desc addColumnWithName:name type:REALM_TYPE_ID_##_type] == NSNotFound) \
         return NO; \
 }
 
