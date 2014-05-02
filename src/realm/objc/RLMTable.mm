@@ -1526,6 +1526,38 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     return count;
 }
 
+-(NSNumber *)sumOfColumn:(NSString *)columnName where:(id)predicate
+{
+    tightdb::Query query = queryFromPredicate(self, predicate);
+    
+    NSUInteger index = [self indexOfColumnWithName:columnName];
+    
+    if (index == NSNotFound) {
+        @throw [NSException exceptionWithName:@"realm:invalid_column_name"
+                                       reason:[NSString stringWithFormat:@"Column with name %@ not found on table", columnName]
+                                     userInfo:nil];
+    }
+    
+    NSNumber *sum;
+    RLMType columnType = [self columnTypeOfColumnWithIndex:index];
+    if (columnType == RLMTypeInt) {
+        sum = [NSNumber numberWithInteger:query.sum_int(index)];
+    }
+    else if (columnType == RLMTypeDouble) {
+        sum = [NSNumber numberWithDouble:query.sum_double(index)];
+    }
+    else if (columnType == RLMTypeFloat) {
+        sum = [NSNumber numberWithDouble:query.sum_float(index)];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Sum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return sum;
+}
+
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex
 {
     return m_table->has_index(colIndex);
