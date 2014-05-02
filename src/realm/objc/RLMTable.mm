@@ -1111,10 +1111,10 @@
     return [RLMView viewWithTable:self nativeView:distinctView];
 }
 
--(id)find:(id)condition
+-(id)firstWhere:(id)predicate
 {
-    tightdb::Query query = queryFromPredicate(self, condition);
-    
+    tightdb::Query query = queryFromPredicate(self, predicate);
+
     size_t row_ndx = query.find();
     
     if (row_ndx == tightdb::not_found)
@@ -1123,10 +1123,10 @@
     return [[_proxyObjectClass alloc] initWithTable:self ndx:row_ndx];
 }
 
--(RLMView *)where:(id)condition
+-(RLMView *)allWhere:(id)predicate
 {
-    tightdb::Query query = queryFromPredicate(self, condition);
-    
+    tightdb::Query query = queryFromPredicate(self, predicate);
+
     // create view
     tightdb::TableView view = query.find_all();
     
@@ -1134,10 +1134,10 @@
     return [RLMView viewWithTable:self nativeView:view objectClass:_proxyObjectClass];
 }
 
--(RLMView *)where:(id)condition orderBy:(id)order
+-(RLMView *)allWhere:(id)predicate orderBy:(id)order
 {
-    tightdb::Query query = queryFromPredicate(self, condition);
-    
+    tightdb::Query query = queryFromPredicate(self, predicate);
+
     // create view
     tightdb::TableView view = query.find_all();
     
@@ -1171,6 +1171,79 @@
     
     // create objc view and return
     return [RLMView viewWithTable:self nativeView:view objectClass:_proxyObjectClass];
+}
+
+-(NSUInteger)countWhere:(id)predicate
+{
+    tightdb::Query query = queryFromPredicate(self, predicate);
+    
+    size_t count = query.count();
+    
+    return count;
+}
+
+-(NSNumber *)sumOfColumn:(NSString *)columnName where:(id)predicate
+{
+    tightdb::Query query = queryFromPredicate(self, predicate);
+    
+    NSUInteger index = [self indexOfColumnWithName:columnName];
+    
+    if (index == NSNotFound) {
+        @throw [NSException exceptionWithName:@"realm:invalid_column_name"
+                                       reason:[NSString stringWithFormat:@"Column with name %@ not found on table", columnName]
+                                     userInfo:nil];
+    }
+    
+    NSNumber *sum;
+    RLMType columnType = [self columnTypeOfColumnWithIndex:index];
+    if (columnType == RLMTypeInt) {
+        sum = [NSNumber numberWithInteger:query.sum_int(index)];
+    }
+    else if (columnType == RLMTypeDouble) {
+        sum = [NSNumber numberWithDouble:query.sum_double(index)];
+    }
+    else if (columnType == RLMTypeFloat) {
+        sum = [NSNumber numberWithDouble:query.sum_float(index)];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Sum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return sum;
+}
+
+-(NSNumber *)averageOfColumn:(NSString *)columnName where:(id)predicate
+{
+    tightdb::Query query = queryFromPredicate(self, predicate);
+    
+    NSUInteger index = [self indexOfColumnWithName:columnName];
+    
+    if (index == NSNotFound) {
+        @throw [NSException exceptionWithName:@"realm:invalid_column_name"
+                                       reason:[NSString stringWithFormat:@"Column with name %@ not found on table", columnName]
+                                     userInfo:nil];
+    }
+    
+    NSNumber *average;
+    RLMType columnType = [self columnTypeOfColumnWithIndex:index];
+    if (columnType == RLMTypeInt) {
+        average = [NSNumber numberWithDouble:query.average_int(index)];
+    }
+    else if (columnType == RLMTypeDouble) {
+        average = [NSNumber numberWithDouble:query.average_double(index)];
+    }
+    else if (columnType == RLMTypeFloat) {
+        average = [NSNumber numberWithDouble:query.average_float(index)];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Average only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return average;
 }
 
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex
