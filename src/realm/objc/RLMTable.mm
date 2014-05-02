@@ -1288,7 +1288,46 @@ void add_datetime_constraint_to_query(tightdb::Query & query,
             break;
     }
 }
-    
+
+void add_between_constraint_to_query(tightdb::Query & query,
+                                     tightdb::DataType dataType,
+                                     NSUInteger index,
+                                     NSArray *array) {
+    id from = array.firstObject;
+    id to = array.lastObject;
+    switch (dataType) {
+        case tightdb::type_DateTime:
+            query.between_datetime(index,
+                                   double([(NSDate *)from timeIntervalSince1970]),
+                                   double([(NSDate *)to timeIntervalSince1970]));
+            break;
+        case tightdb::type_Double:
+        {
+            double fromDouble = double([(NSNumber *)from doubleValue]);
+            double toDouble = double([(NSNumber *)to doubleValue]);
+            query.between(index, fromDouble, toDouble);
+            break;
+        }
+        case tightdb::type_Float:
+        {
+            float fromFloat = float([(NSNumber *)from floatValue]);
+            float toFloat = float([(NSNumber *)to floatValue]);
+            query.between(index, fromFloat, toFloat);
+            break;
+        }
+        case tightdb::type_Int:
+        {
+            int fromInt = int([(NSNumber *)from intValue]);
+            int toInt = int([(NSNumber *)to intValue]);
+            query.between(index, fromInt, toInt);
+            break;
+        }
+        default:
+            @throw predicate_exception(@"Unsupported predicate value type",
+                                       [NSString stringWithFormat:@"Object type %i not supported for BETWEEN operations", dataType]);
+    }
+}
+
 void add_binary_constraint_to_query(tightdb::Query & query,
                                     NSPredicateOperatorType operatorType,
                                     NSUInteger index,
@@ -1316,6 +1355,32 @@ void add_binary_constraint_to_query(tightdb::Query & query,
     }
 }
 
+void validate_value_for_query(id value, tightdb::DataType type, BOOL betweenOperation) {
+    if (betweenOperation) {
+        if ([value isKindOfClass:[NSArray class]]) {
+            NSArray *array = value;
+            if (array.count == 2) {
+                if (!verify_object_is_type(array.firstObject, type) ||
+                    !verify_object_is_type(array.lastObject, type)) {
+                    @throw predicate_exception(@"Invalid value",
+                                               [NSString stringWithFormat:@"NSArray objects must be of type %i for BETWEEN operations", type]);
+                }
+            } else {
+                @throw predicate_exception(@"Invalid value",
+                                           @"NSArray object must contain exactly two objects for BETWEEN operations");
+            }
+        } else {
+            @throw predicate_exception(@"Invalid value",
+                                       @"object must be of type NSArray for BETWEEN operations");
+        }
+    } else {
+        if (!verify_object_is_type(value, type)) {
+            @throw predicate_exception(@"Invalid value",
+                                       [NSString stringWithFormat:@"object must be of type %i", type]);
+        }
+    }
+}
+
 void update_query_with_value_expression(RLMTable * table, tightdb::Query & query,
     NSString * columnName, id value, NSPredicateOperatorType operatorType,
     NSComparisonPredicateOptions predicateOptions) {
@@ -1323,9 +1388,13 @@ void update_query_with_value_expression(RLMTable * table, tightdb::Query & query
     // validate object type
     NSUInteger index = validated_column_index(table, columnName);
     tightdb::DataType type = table->m_table->get_column_type(index);
-    if (!verify_object_is_type(value, type)) {
-        @throw predicate_exception(@"Invalid value",
-                                   [NSString stringWithFormat:@"object must be of type %i", type]);
+    
+    BOOL betweenOperation = (operatorType == NSBetweenPredicateOperatorType);
+    validate_value_for_query(value, type, betweenOperation);
+    
+    if (betweenOperation) {
+        add_between_constraint_to_query(query, type, index, value);
+        return;
     }
     
     // finally cast to native types and add query clause
@@ -1351,12 +1420,10 @@ void update_query_with_value_expression(RLMTable * table, tightdb::Query & query
                                             index, int([(NSNumber *)value intValue]));
             break;
         case tightdb::type_String:
-            add_string_constraint_to_query(query, operatorType, predicateOptions,
-                                           index, (NSString *)value);
+            add_string_constraint_to_query(query, operatorType, predicateOptions, index, value);
             break;
         case tightdb::type_Binary:
-            add_binary_constraint_to_query(query, operatorType,
-                                           index, (NSData *)value);
+            add_binary_constraint_to_query(query, operatorType, index, value);
             break;
         default:
             @throw predicate_exception(@"Unsupported predicate value type",
@@ -1454,9 +1521,9 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 
 } //namespace
 
--(id)find:(id)condition
+-(id)firstWhere:(id)predicate
 {
-    tightdb::Query query = queryFromPredicate(self, condition);
+    tightdb::Query query = queryFromPredicate(self, predicate);
 
     size_t row_ndx = query.find();
 
@@ -1466,9 +1533,9 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     return [[_proxyObjectClass alloc] initWithTable:self ndx:row_ndx];
 }
 
--(RLMView *)where:(id)condition
+-(RLMView *)allWhere:(id)predicate
 {
-    tightdb::Query query = queryFromPredicate(self, condition);
+    tightdb::Query query = queryFromPredicate(self, predicate);
 
     // create view
     tightdb::TableView view = query.find_all();
@@ -1477,9 +1544,9 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     return [RLMView viewWithTable:self nativeView:view objectClass:_proxyObjectClass];
 }
 
--(RLMView *)where:(id)condition orderBy:(id)order
+-(RLMView *)allWhere:(id)predicate orderBy:(id)order
 {
-    tightdb::Query query = queryFromPredicate(self, condition);
+    tightdb::Query query = queryFromPredicate(self, predicate);
 
     // create view
     tightdb::TableView view = query.find_all();
@@ -1514,6 +1581,79 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 
     // create objc view and return
     return [RLMView viewWithTable:self nativeView:view objectClass:_proxyObjectClass];
+}
+
+-(NSUInteger)countWhere:(id)predicate
+{
+    tightdb::Query query = queryFromPredicate(self, predicate);
+    
+    size_t count = query.count();
+    
+    return count;
+}
+
+-(NSNumber *)sumOfColumn:(NSString *)columnName where:(id)predicate
+{
+    tightdb::Query query = queryFromPredicate(self, predicate);
+    
+    NSUInteger index = [self indexOfColumnWithName:columnName];
+    
+    if (index == NSNotFound) {
+        @throw [NSException exceptionWithName:@"realm:invalid_column_name"
+                                       reason:[NSString stringWithFormat:@"Column with name %@ not found on table", columnName]
+                                     userInfo:nil];
+    }
+    
+    NSNumber *sum;
+    RLMType columnType = [self columnTypeOfColumnWithIndex:index];
+    if (columnType == RLMTypeInt) {
+        sum = [NSNumber numberWithInteger:query.sum_int(index)];
+    }
+    else if (columnType == RLMTypeDouble) {
+        sum = [NSNumber numberWithDouble:query.sum_double(index)];
+    }
+    else if (columnType == RLMTypeFloat) {
+        sum = [NSNumber numberWithDouble:query.sum_float(index)];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Sum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return sum;
+}
+
+-(NSNumber *)averageOfColumn:(NSString *)columnName where:(id)predicate
+{
+    tightdb::Query query = queryFromPredicate(self, predicate);
+    
+    NSUInteger index = [self indexOfColumnWithName:columnName];
+    
+    if (index == NSNotFound) {
+        @throw [NSException exceptionWithName:@"realm:invalid_column_name"
+                                       reason:[NSString stringWithFormat:@"Column with name %@ not found on table", columnName]
+                                     userInfo:nil];
+    }
+    
+    NSNumber *average;
+    RLMType columnType = [self columnTypeOfColumnWithIndex:index];
+    if (columnType == RLMTypeInt) {
+        average = [NSNumber numberWithDouble:query.average_int(index)];
+    }
+    else if (columnType == RLMTypeDouble) {
+        average = [NSNumber numberWithDouble:query.average_double(index)];
+    }
+    else if (columnType == RLMTypeFloat) {
+        average = [NSNumber numberWithDouble:query.average_float(index)];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Average only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return average;
 }
 
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex
@@ -1662,5 +1802,3 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 
 
 @end
-
-
