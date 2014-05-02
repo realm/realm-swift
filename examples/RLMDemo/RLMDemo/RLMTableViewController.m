@@ -135,7 +135,7 @@ static NSString * const kTableName = @"table";
 
 - (void)query {
     // @@Example: query @@
-    RLMRow *row = [self.table find:[NSPredicate predicateWithFormat:@"checked = %@", @YES]];
+    RLMRow *row = [self.table firstWhere:[NSPredicate predicateWithFormat:@"checked = %@", @YES]];
     if (row) {
         BOOL checked = [(NSNumber *)row[@"checked"] boolValue];
         NSLog(@"%@ is %@", row[@"title"], checked ? @"checked" : @"unchecked");

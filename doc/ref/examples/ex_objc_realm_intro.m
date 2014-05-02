@@ -36,15 +36,14 @@ void ex_objc_realm_intro()
     RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath
                                     initBlock:^(RLMRealm *realm) {
                                         if (realm.isEmpty) {
-                                            People *table = [realm createTableWithName:@"employees"
-                                                                          asTableClass:[People class]];
+                                            PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
                                             [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
                                         }
                                     }];
     
     // Read from the realm
-    People *table = [realm tableWithName:@"employees" asTableClass:[People class]];
-    for (PeopleRow *row in table) {
+    PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[People class]];
+    for (People *row in table) {
         NSLog(@"Name: %@", row.Name);
     }
 }
