@@ -1111,10 +1111,23 @@
     return [RLMView viewWithTable:self nativeView:distinctView];
 }
 
--(id)firstWhere:(id)predicate
+-(id)firstWhere:(id)predicate, ...
 {
-    tightdb::Query query = queryFromPredicate(self, predicate);
-
+    NSPredicate *finalPredicate = nil;
+    if ([predicate isKindOfClass:[NSPredicate class]]) {
+        finalPredicate = predicate;
+    } else if ([predicate isKindOfClass:[NSString class]]) {
+        va_list args;
+        va_start(args, predicate);
+        finalPredicate = [NSPredicate predicateWithFormat:predicate arguments:args];
+        va_end(args);
+    } else if (predicate) {
+        @throw predicate_exception(@"Invalid value",
+                                   @"firstWhere: can only accept an NSPredicate or an NSString with optional format va_list");
+    }
+    
+    tightdb::Query query = queryFromPredicate(self, finalPredicate);
+    
     size_t row_ndx = query.find();
     
     if (row_ndx == tightdb::not_found)
@@ -1123,9 +1136,22 @@
     return [[_proxyObjectClass alloc] initWithTable:self ndx:row_ndx];
 }
 
--(RLMView *)allWhere:(id)predicate
+-(RLMView *)allWhere:(id)predicate, ...
 {
-    tightdb::Query query = queryFromPredicate(self, predicate);
+    NSPredicate *finalPredicate = nil;
+    if ([predicate isKindOfClass:[NSPredicate class]]) {
+        finalPredicate = predicate;
+    } else if ([predicate isKindOfClass:[NSString class]]) {
+        va_list args;
+        va_start(args, predicate);
+        finalPredicate = [NSPredicate predicateWithFormat:predicate arguments:args];
+        va_end(args);
+    } else if (predicate) {
+        @throw predicate_exception(@"Invalid value",
+                                   @"allWhere: can only accept an NSPredicate or an NSString with optional format va_list");
+    }
+    
+    tightdb::Query query = queryFromPredicate(self, finalPredicate);
 
     // create view
     tightdb::TableView view = query.find_all();
