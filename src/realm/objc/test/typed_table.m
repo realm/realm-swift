@@ -288,7 +288,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 
 - (void)testTableTyped_countWhere
 {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         AgeTable * table = [AgeTable tableInRealm:realm named:@"table"];
         
         [table addRow:@[@23]];
@@ -308,7 +308,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 
 - (void)testTableTyped_sumOfColumn
 {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         AggregateTable *table = [AggregateTable tableInRealm:realm named:@"Table"];
         
         [table addRow:@[@0, @1.2f, @0.0, @YES]];
