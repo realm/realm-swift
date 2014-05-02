@@ -81,7 +81,30 @@ void throw_objc_exception(exception &ex)
 @end
 
 
-static NSMapTable *s_mainThreadRealms;
+static NSMutableDictionary *s_realmsPerPath;
+
+RLMRealm * cachedRealm(NSString *path) {
+    mach_port_t threadID = pthread_mach_thread_np(pthread_self());
+    @synchronized(s_realmsPerPath) {
+        return [s_realmsPerPath[path] objectForKey:@(threadID)];
+    }
+}
+
+void cacheRealm(RLMRealm *realm, NSString *path) {
+    mach_port_t threadID = pthread_mach_thread_np(pthread_self());
+    @synchronized(s_realmsPerPath) {
+        if (!s_realmsPerPath[path]) {
+            s_realmsPerPath[path] = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPersonality valueOptions:NSPointerFunctionsWeakMemory];
+        }
+        [s_realmsPerPath[path] setObject:realm forKey:@(threadID)];
+    }
+}
+
+NSArray * realmsAtPath(NSString *path) {
+    @synchronized(s_realmsPerPath) {
+        return [s_realmsPerPath[path] objectEnumerator].allObjects;
+    }
+}
 
 @implementation RLMRealm
 {
@@ -90,7 +113,8 @@ static NSMapTable *s_mainThreadRealms;
     NSMutableArray *_weakTableRefs; // Elements are instances of RLMPrivateWeakTableReference
     BOOL _tableRefsHaveDied;
     BOOL _usesImplicitTransactions;
-    
+    NSRunLoop *_runLoop;
+
     tightdb::Group *_group;
     BOOL m_is_owned;
     BOOL m_read_only;
@@ -99,7 +123,7 @@ static NSMapTable *s_mainThreadRealms;
 + (void)initialize {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        s_mainThreadRealms = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPersonality valueOptions:NSPointerFunctionsWeakMemory];
+        s_realmsPerPath = [NSMutableDictionary dictionary];
     });
 }
 
@@ -142,16 +166,17 @@ static NSMapTable *s_mainThreadRealms;
 + (instancetype)realmWithPath:(NSString *)path
                     initBlock:(RLMWriteBlock)initBlock
 {
-    if (![NSThread isMainThread]) {
+    NSRunLoop * currentRunloop = [NSRunLoop currentRunLoop];
+    if (!currentRunloop) {
         @throw [NSException exceptionWithName:@"realm:runloop_exception"
                                        reason:[NSString stringWithFormat:@"%@ \
-                                               can only be called from the main thread. \
+                                               can only be called from a thread with a runloop. \
                                                Use an RLMTransactionManager read or write block \
                                                instead.", NSStringFromSelector(_cmd)] userInfo:nil];
     }
 
     // try to reuse existing realm first
-    RLMRealm *realm = [s_mainThreadRealms objectForKey:path];
+    RLMRealm *realm = cachedRealm(path);
     if (realm) {
         return realm;
     }
@@ -161,9 +186,9 @@ static NSMapTable *s_mainThreadRealms;
         return nil;
     }
 
+    realm->_runLoop = [NSRunLoop currentRunLoop];
     realm->_notificationCenter = [NSNotificationCenter defaultCenter];
 
-    NSError *__autoreleasing* error = nil;
     RLMError errorCode = RLMErrorOk;
     NSString *errorMessage;
     try {
@@ -186,14 +211,11 @@ static NSMapTable *s_mainThreadRealms;
         errorMessage = [NSString stringWithUTF8String:ex.what()];
     }
     if (errorCode != RLMErrorOk) {
-        if (error) {
-            *error = make_realm_error(errorCode, errorMessage);
-        }
-        return nil;
+        @throw [NSException exceptionWithName:@"realm:core_exception"
+                                       reason:errorMessage
+                                     userInfo:@{@"errorCode" : @(errorCode)}];
     }
     realm->_weakTableRefs = [NSMutableArray array];
-
-    
     
     // Run init block before creating realm
     if (initBlock) {
@@ -231,7 +253,7 @@ static NSMapTable *s_mainThreadRealms;
     }
     
     // cache main thread realm at this path
-    [s_mainThreadRealms setObject:realm forKey:path];
+    cacheRealm(realm, path);
 
     try {
         realm->_group = (tightdb::Group *)&realm->_sharedGroup->begin_read();
@@ -247,6 +269,18 @@ static NSMapTable *s_mainThreadRealms;
 {
     if (m_is_owned) {
         delete _group;
+    }
+}
+
++(void)notifyRealmsAtPath:(NSString *)path {
+    NSArray *realms = realmsAtPath(path);
+    for (RLMRealm *realm in realms) {
+        if ([realm->_runLoop isEqual:[NSRunLoop currentRunLoop]]) {
+            [realm checkForChange];
+        }
+        else {
+            [realm->_runLoop performSelector:@selector(checkForChange) target:realm argument:nil order:0 modes:@[NSRunLoopCommonModes]];
+        }
     }
 }
 
