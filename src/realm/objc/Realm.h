@@ -20,6 +20,7 @@
 
 #import <realm/objc/RLMConstants.h>
 #import <realm/objc/RLMTable.h>
+#import <realm/objc/RLMTable+Predicates.h>
 #import <realm/objc/RLMView.h>
 #import <realm/objc/RLMQuery.h>
 #import <realm/objc/RLMRow.h>
