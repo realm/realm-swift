@@ -40,6 +40,7 @@ The Objective-C API has been updated and your code will break!
 * Renamed `contextPersistedAtPath:` to `managerForRealmWithPath:`
 * Renamed `realmWithDefaultPersistence` to `defaultRealm`
 * Renamed `realmWithDefaultPersistenceAndInitBlock` to `defaultRealmWithInitBlock`
+* Renamed `find:` to `firstWhere:`
 * Renamed `where:` to `allWhere:`
 * Renamed `where:orderBy` to `allWhere:orderBy:`
 
@@ -47,6 +48,7 @@ The Objective-C API has been updated and your code will break!
 
 * Added `countWhere:` on `RLMTable`
 * Added `sumOfColumn:where:` on `RLMTable`
+* Added `averageOfColumn:where` on `RLMTable`
 
 ### Bugfixes:
 

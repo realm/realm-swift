@@ -231,7 +231,7 @@
  NSUInteger count = [table countWhere:@"name == \"name10\""];
  
  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
- count = [table find:predicate];
+ count = [table countWhere:predicate];
  
  @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
  
