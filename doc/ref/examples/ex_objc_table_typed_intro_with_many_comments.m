@@ -27,7 +27,7 @@ void ex_objc_table_typed_intro_with_many_comments()
     [table addRow:@[@"Carol", @66]];
     
     /* Creates a view to filter on age. */
-    RLMView *view = [table where:@"Age > 13 && Age < 19"];
+    RLMView *view = [table allWhere:@"Age > 13 && Age < 19"];
     
     /* Iterate through RLMRows returned from view */
     for (RLMRow *row in view)
