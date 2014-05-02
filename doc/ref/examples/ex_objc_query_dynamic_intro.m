@@ -16,7 +16,7 @@ void ex_objc_query_dynamic_intro()
     [table addRow:@[@"Nick", @59, @YES]];
     
     /* Set up a view for employees. */
-    RLMView *view = [table where:@"Age >= 0 && Age <= 60 && Hired == YES"];
+    RLMView *view = [table allWhere:@"Age >= 0 && Age <= 60 && Hired == YES"];
     
     /* Iterate over query result */
     for (RLMRow *row in view) {

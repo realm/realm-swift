@@ -24,7 +24,7 @@
 void ex_objc_tableview_typed_intro()
 {
     /* Creates a new table of the type defined above. */
-    People *table = [[People alloc] init];
+    PeopleTable *table = [[PeopleTable alloc] init];
     
     /* Adds rows to the table. */
     [table addRow:@{@"Name":@"Brian",  @"Age":@10, @"Hired":@NO}];
@@ -32,7 +32,7 @@ void ex_objc_tableview_typed_intro()
     [table addRow:@{@"Name":@"Sam",    @"Age":@76, @"Hired":@NO}];
     
     /* Get the result of a query in a view. */
-    RLMView *view = [table where:@"Age > 20"];
+    RLMView *view = [table allWhere:@"Age > 20"];
     
     /* Iterate over the result in the table view. */
     for (RLMRow *row in view) {
