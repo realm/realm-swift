@@ -238,6 +238,21 @@
  @return The **count** of objects matching the Predicate.
  */
 -(NSUInteger)countWhere:(id)predicate;
+/**
+ Returns a **sum** of objects matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html) in a column.
+ 
+ NSNumber *sum = [table sumOfColumn:@"age" where:@"name == \"name10\""];
+ 
+ NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
+ sum = [table sumOfColumn:@"age" where:predicate];
+ 
+ @param columnName An NSString specifying the column's name. The column should be of RLMTypeInt, RLMTypeFloat, or RLMTypeDouble.
+ 
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
+ 
+ @return The **sum** of objects matching the Predicate for the given columnName.
+ */
+-(NSNumber *)sumOfColumn:(NSString *)columnName where:(id)predicate;
 
 // Indices
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;

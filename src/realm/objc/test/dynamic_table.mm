@@ -1419,5 +1419,44 @@ using namespace std;
     }];
 }
 
+- (void)testTableDynamic_sumOfColumn
+{
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"IntCol" type:RLMTypeInt];
+        [table addColumnWithName:@"FloatCol" type:RLMTypeFloat];
+        [table addColumnWithName:@"DoubleCol" type:RLMTypeDouble];
+        [table addColumnWithName:@"BoolCol" type:RLMTypeBool];
+        
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+
+        
+        // Test int sum
+        XCTAssertEqual([[table sumOfColumn:@"IntCol" where:@"BoolCol == NO"] integerValue], (NSInteger)4, @"Sum should be 4");
+        XCTAssertEqual([[table sumOfColumn:@"IntCol" where:@"BoolCol == YES"] integerValue], (NSInteger)0, @"Sum should be 0");
+        
+        // Test float sum
+        XCTAssertEqualWithAccuracy([[table sumOfColumn:@"FloatCol" where:@"BoolCol == NO"] floatValue], (float)0.0f, 0.1f, @"Sum should be 4");
+        XCTAssertEqualWithAccuracy([[table sumOfColumn:@"FloatCol" where:@"BoolCol == YES"] floatValue], (float)7.2f, 0.1f, @"Sum should be 7.2");
+        
+        // Test double sum
+        XCTAssertEqualWithAccuracy([[table sumOfColumn:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)10.0, 0.1f, @"Sum should be 10.0");
+        XCTAssertEqualWithAccuracy([[table sumOfColumn:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Sum should be 0.0");
+        
+        // Test invalid column name
+        XCTAssertThrows([table sumOfColumn:@"foo" where:@"BoolCol == YES"], @"Should throw exception");
+        
+        // Test operation not supported
+        XCTAssertThrows([table sumOfColumn:@"BoolCol" where:@"IntCol == 1"], @"Should throw exception");
+    }];
+}
 
 @end
