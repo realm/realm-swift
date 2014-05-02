@@ -18,15 +18,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <realm/objc/RLMConstants.h>
-#import <realm/objc/RLMTable.h>
-#import <realm/objc/RLMView.h>
-#import <realm/objc/RLMQuery.h>
-#import <realm/objc/RLMRow.h>
-#import <realm/objc/RLMTransactionManager.h>
-#import <realm/objc/RLMRealm.h>
-#import <realm/objc/RLMVersion.h>
+#import <Foundation/Foundation.h>
+#import "util_noinst.hpp"
+#import <tightdb/query.hpp>
 
-#import <realm/objc/PrivateHelperMacros.h>
-#import <realm/objc/PrivateTableMacros.h>
-#import <realm/objc/RLMPrivate.h>
+@class RLMTable;
+
+tightdb::Query queryFromPredicate(RLMTable *table, id condition);
+
+NSException *predicate_exception(NSString *name, NSString *reason);
+NSUInteger validated_column_index(RLMTable *table, NSString *columnName);

@@ -31,6 +31,7 @@
 #import "RLMRealm_noinst.h"
 #import "RLMPrivate.h"
 #import "util_noinst.hpp"
+#import "query_util.h"
 
 @implementation RLMTable
 {
@@ -1108,6 +1109,68 @@
     
     tightdb::TableView distinctView = m_table->get_distinct_view(colIndex);
     return [RLMView viewWithTable:self nativeView:distinctView];
+}
+
+-(id)find:(id)condition
+{
+    tightdb::Query query = queryFromPredicate(self, condition);
+    
+    size_t row_ndx = query.find();
+    
+    if (row_ndx == tightdb::not_found)
+        return nil;
+    
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:row_ndx];
+}
+
+-(RLMView *)where:(id)condition
+{
+    tightdb::Query query = queryFromPredicate(self, condition);
+    
+    // create view
+    tightdb::TableView view = query.find_all();
+    
+    // create objc view and return
+    return [RLMView viewWithTable:self nativeView:view objectClass:_proxyObjectClass];
+}
+
+-(RLMView *)where:(id)condition orderBy:(id)order
+{
+    tightdb::Query query = queryFromPredicate(self, condition);
+    
+    // create view
+    tightdb::TableView view = query.find_all();
+    
+    // apply order
+    if (order) {
+        NSString *columnName;
+        BOOL ascending = YES;
+        
+        if ([order isKindOfClass:[NSString class]]) {
+            columnName = order;
+        }
+        else if ([order isKindOfClass:[NSSortDescriptor class]]) {
+            columnName = ((NSSortDescriptor*)order).key;
+            ascending = ((NSSortDescriptor*)order).ascending;
+        }
+        else {
+            @throw predicate_exception(@"Invalid order type",
+                                       @"Order must be column name or NSSortDescriptor");
+        }
+        
+        NSUInteger index = validated_column_index(self, columnName);
+        RLMType columnType = [self columnTypeOfColumnWithIndex:index];
+        
+        if (columnType != RLMTypeInt && columnType != RLMTypeBool && columnType != RLMTypeDate) {
+            @throw predicate_exception(@"Invalid sort column type",
+                                       @"Sort only supported on Integer, Date and Boolean columns.");
+        }
+        
+        view.sort(index, ascending);
+    }
+    
+    // create objc view and return
+    return [RLMView viewWithTable:self nativeView:view objectClass:_proxyObjectClass];
 }
 
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex
