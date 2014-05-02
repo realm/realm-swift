@@ -90,6 +90,18 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(InvalidTable, InvalidType)
 
 RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 
+@interface AggregateObject : RLMRow
+@property int IntCol;
+@property float FloatCol;
+@property double DoubleCol;
+@property BOOL BoolCol;
+@end
+
+@implementation AggregateObject
+@end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
+
 @implementation RLMTypedTableTests
 
 - (void)testDataTypes_Typed
@@ -297,7 +309,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 - (void)testTableTyped_sumOfColumn
 {
     [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
-        AllTypesTable *table = [AllTypesTable tableInRealm:realm named:@"Table"];
+        AggregateTable *table = [AggregateTable tableInRealm:realm named:@"Table"];
         
         [table addRow:@[@0, @1.2f, @0.0, @YES]];
         [table addRow:@[@1, @0.0f, @2.5, @NO]];
