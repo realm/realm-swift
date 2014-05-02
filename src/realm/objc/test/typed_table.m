@@ -360,15 +360,15 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
         [table addRow:@[@0, @1.2f, @0.0, @YES]];
         
         
-        // Test int sum
+        // Test int average
         XCTAssertEqualWithAccuracy([[table averageOfColumn:@"IntCol" where:@"BoolCol == NO"] doubleValue], (double)1.0, 0.1f, @"Average should be 1.0");
         XCTAssertEqualWithAccuracy([[table averageOfColumn:@"IntCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Average should be 0.0");
         
-        // Test float sum
+        // Test float average
         XCTAssertEqualWithAccuracy([[table averageOfColumn:@"FloatCol" where:@"BoolCol == NO"] doubleValue], (double)0.0f, 0.1f, @"Average should be 0.0");
         XCTAssertEqualWithAccuracy([[table averageOfColumn:@"FloatCol" where:@"BoolCol == YES"] doubleValue], (double)1.2f, 0.1f, @"Average should be 1.2");
         
-        // Test double sum
+        // Test double average
         XCTAssertEqualWithAccuracy([[table averageOfColumn:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)2.5, 0.1f, @"Average should be 2.5");
         XCTAssertEqualWithAccuracy([[table averageOfColumn:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Average should be 0.0");
         
@@ -377,6 +377,42 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
         
         // Test operation not supported
         XCTAssertThrows([table averageOfColumn:@"BoolCol" where:@"IntCol == 1"], @"Should throw exception");
+    }];
+}
+
+- (void)testTableTyped_minInColumn
+{
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        AggregateTable *table = [AggregateTable tableInRealm:realm named:@"Table"];
+        
+        [table addRow:@[@1, @1.1f, @0.0, @YES]];
+        [table addRow:@[@2, @1.2f, @1.5, @NO]];
+        [table addRow:@[@3, @1.3f, @3.0, @YES]];
+        [table addRow:@[@4, @1.4f, @4.5, @NO]];
+        [table addRow:@[@5, @1.5f, @6.0, @YES]];
+        [table addRow:@[@6, @1.6f, @7.5, @NO]];
+        [table addRow:@[@7, @1.7f, @9.0, @YES]];
+        [table addRow:@[@8, @1.8f, @10.5, @NO]];
+        [table addRow:@[@9, @1.9f, @12.0, @YES]];
+        [table addRow:@[@10, @2.0f, @13.5, @YES]];
+        
+        // Test int min
+        XCTAssertEqual([[table minInColumn:@"IntCol" where:@"BoolCol == NO"] integerValue], 2, @"Minimum should be 2");
+        XCTAssertEqual([[table minInColumn:@"IntCol" where:@"BoolCol == YES"] integerValue], 1, @"Minimum should be 1");
+        
+        // Test float min
+        XCTAssertEqualWithAccuracy([[table minInColumn:@"FloatCol" where:@"BoolCol == NO"] floatValue], (float)1.2f, 0.1f, @"Minimum should be 1.2f");
+        XCTAssertEqualWithAccuracy([[table minInColumn:@"FloatCol" where:@"BoolCol == YES"] floatValue], (float)1.1f, 0.1f, @"Minimum should be 1.1f");
+        
+        // Test double min
+        XCTAssertEqualWithAccuracy([[table minInColumn:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)1.5, 0.1f, @"Minimum should be 1.5");
+        XCTAssertEqualWithAccuracy([[table minInColumn:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Minimum should be 0.0");
+        
+        // Test invalid column name
+        XCTAssertThrows([table minInColumn:@"foo" where:@"BoolCol == YES"], @"Should throw exception");
+        
+        // Test operation not supported
+        XCTAssertThrows([table minInColumn:@"BoolCol" where:@"IntCol == 1"], @"Should throw exception");
     }];
 }
 
