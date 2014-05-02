@@ -194,7 +194,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 
 - (void)testInvalids
 {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // FIXME: This should throw but currently doesn't
 //        XCTAssertThrows([realm createTableWithName:@"table1"
 //                                      asTableClass:[InvalidTable class]],

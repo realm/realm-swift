@@ -38,10 +38,10 @@ DESCR     : >
             as data (often referred to as subtables).
 
             A table can work standalone but it is common to create
-            tables within a <i>context</i> (represented by
-            {@link class_context}). A context can be read and
+            tables within a <i>realm</i> (represented by
+            {@link class_transaction_manager}). A realm can be read and
             written to disk while a table cannot. Moreover, the
-            context adds transactions - through {@link
+            realm adds transactions - through {@link
             class_transaction} - to Realm.
 
             The table supports the most common types including numbers, timestamps and strings.
@@ -89,7 +89,7 @@ IMPORTPATH: ../../tightdb/doc/ref_cpp/data #need to update this path with core
 CATEGORIES:                       # list global class-id in order of appearence
 - Persistence:
   - realm
-  - context
+  - transaction_manager
 - Typed Table:                    # Category header name
   - typed_table                   # Global Class name. File 'typed_table_ref.yaml'
   - typed_view

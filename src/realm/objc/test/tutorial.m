@@ -44,9 +44,9 @@ REALM_TABLE_FAST(PeopleTable2)
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    RLMContext *context = [self contextPersistedAtTestPath];
+    RLMTransactionManager *manager = [self managerWithTestPath];
     
-    [context writeUsingBlock:^(RLMRealm *realm) {
+    [manager writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
         PeopleTable *people = [realm createTableWithName:@"employees" asTableClass:[PeopleTable class]];
         
@@ -148,7 +148,7 @@ REALM_TABLE_FAST(PeopleTable2)
             [people rowAtIndex:i].Age);
     }
     
-    [context writeUsingBlock:^(RLMRealm *realm) {
+    [manager writeUsingBlock:^(RLMRealm *realm) {
         PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
         [table addName:@"Anni" Age:54 Hired:YES];
         

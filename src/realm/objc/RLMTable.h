@@ -43,7 +43,7 @@
  
  To query, you can use NSPredicates and an optional NSSortDescriptor
  
-    [[RLMContext contextWithDefaultPersistence] readUsingBlock:^(RLMRealm *realm) {
+    [[RLMTransactionManager managerForDefaultRealm] readUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm tableWithName:@"Dogs" objectClass:[RLMDogObject class]];
         
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
@@ -60,8 +60,8 @@
     }];
 
  
- @warning All Table access should be done from within an RLMRealm / RLMContext. You will receive an error if trying
- to access an RLMTable directly.
+ @warning All Table access should be done from within an RLMRealm / RLMTransactionManager. You will receive 
+ an error if trying to access an RLMTable directly.
  */
 
 @interface RLMTable : NSObject <RLMView,NSFastEnumeration>

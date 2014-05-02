@@ -20,7 +20,7 @@
 
 #import "RLMTable.h"
 #import "RLMView.h"
-#import "RLMContext.h"
+#import "RLMTransactionManager.h"
 #import "RLMRow.h"
 
 
@@ -134,7 +134,7 @@
 // The selectors in this interface are not meant to be used directly.
 // However, they are public so that the typed table macros can use them.
 //
-@interface RLMContext (Experiment)
+@interface RLMTransactionManager (Experiment)
 
 //========== Experimental features ==========/
 -(BOOL)pinReadTransactions;
