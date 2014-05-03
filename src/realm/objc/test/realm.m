@@ -95,7 +95,7 @@ REALM_TABLE_1(RLMTestTable,
 }
 
 - (void)testRealmIsNotifiedByBackgroundUpdate {
-    NSString *realmFilePath = @"async.realm.bg";
+    NSString *realmFilePath = @"async.bg.realm";
     [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
     NSString *tableName = @"table";
     
