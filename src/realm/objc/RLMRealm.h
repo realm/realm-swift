@@ -105,6 +105,9 @@
  */
 + (instancetype)realmWithPath:(NSString *)path
                     initBlock:(RLMWriteBlock)initBlock;
++ (instancetype)realmWithPath:(NSString *)path
+                    initBlock:(RLMWriteBlock)initBlock
+                        error:(NSError **)error;
 
 
 /**---------------------------------------------------------------------------------------

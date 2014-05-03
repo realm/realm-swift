@@ -154,17 +154,23 @@ NSArray * realmsAtPath(NSString *path) {
 
 + (instancetype)defaultRealmWithInitBlock:(RLMWriteBlock)initBlock
 {
-    return [RLMRealm realmWithPath:[RLMTransactionManager defaultPath] initBlock:initBlock];
+    return [RLMRealm realmWithPath:[RLMTransactionManager defaultPath] initBlock:initBlock error:nil];
 }
 
 + (instancetype)realmWithPath:(NSString *)path
 {
-    return [self realmWithPath:path initBlock:nil];
+    return [self realmWithPath:path initBlock:nil error:nil];
 }
 
 
 + (instancetype)realmWithPath:(NSString *)path
+                    initBlock:(RLMWriteBlock)initBlock {
+    return [RLMRealm realmWithPath:path initBlock:initBlock error:nil];
+}
+
++ (instancetype)realmWithPath:(NSString *)path
                     initBlock:(RLMWriteBlock)initBlock
+                        error:(NSError **)error
 {
     NSRunLoop * currentRunloop = [NSRunLoop currentRunLoop];
     if (!currentRunloop) {
@@ -211,9 +217,10 @@ NSArray * realmsAtPath(NSString *path) {
         errorMessage = [NSString stringWithUTF8String:ex.what()];
     }
     if (errorCode != RLMErrorOk) {
-        @throw [NSException exceptionWithName:@"realm:core_exception"
-                                       reason:errorMessage
-                                     userInfo:@{@"errorCode" : @(errorCode)}];
+        if (error) {
+            *error = make_realm_error(errorCode, errorMessage);
+        }
+        return nil;
     }
     realm->_weakTableRefs = [NSMutableArray array];
     
@@ -272,6 +279,9 @@ NSArray * realmsAtPath(NSString *path) {
     }
 }
 
+
+// FIXME: when adding support of Mac OSX, we need to also call this file
+//        when the realm file changes due to other processes writing to the same realm
 +(void)notifyRealmsAtPath:(NSString *)path {
     NSArray *realms = realmsAtPath(path);
     for (RLMRealm *realm in realms) {
