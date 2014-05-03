@@ -30,6 +30,7 @@
 #import "NSData+RLMGetBinaryData.h"
 #import "RLMRealm_noinst.h"
 #import "RLMPrivate.h"
+#import "RLMPrivate.hpp"
 #import "util_noinst.hpp"
 #import "query_util.h"
 
@@ -152,6 +153,10 @@
     return *m_table;
 }
 
+-(void)setBaseTable:(tightdb::Table *)baseTable {
+    [self setNativeTable:baseTable];
+}
+
 -(void)setNativeTable:(tightdb::Table*)table
 {
     m_table.reset(table);
@@ -220,13 +225,6 @@
             return nil;
     }
     return table;
-}
-
--(void)dealloc
-{
-    if ([m_parent isKindOfClass:[RLMRealm class]]) {
-        [m_parent tableRefDidDie];
-    }
 }
 
 -(NSUInteger)columnCount

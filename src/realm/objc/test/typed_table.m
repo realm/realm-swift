@@ -194,7 +194,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 
 - (void)testInvalids
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // FIXME: This should throw but currently doesn't
 //        XCTAssertThrows([realm createTableWithName:@"table1"
 //                                      asTableClass:[InvalidTable class]],
@@ -288,7 +288,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 
 - (void)testTableTyped_countWhere
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         AgeTable * table = [AgeTable tableInRealm:realm named:@"table"];
         
         [table addRow:@[@23]];
@@ -308,7 +308,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 
 - (void)testTableTyped_sumOfColumn
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         AggregateTable *table = [AggregateTable tableInRealm:realm named:@"Table"];
         
         [table addRow:@[@0, @1.2f, @0.0, @YES]];
@@ -345,7 +345,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 
 - (void)testTableTyped_averageOfColumn
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         AggregateTable *table = [AggregateTable tableInRealm:realm named:@"Table"];
         
         [table addRow:@[@0, @1.2f, @0.0, @YES]];

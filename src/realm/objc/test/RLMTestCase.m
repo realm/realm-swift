@@ -28,14 +28,15 @@ NSString *const RLMTestRealmPath = @"test.realm";
     return [RLMRealm realmWithPath:RLMTestRealmPath];
 }
 
-- (RLMTransactionManager *)managerWithTestPath {
-    return [RLMTransactionManager managerForRealmWithPath:RLMTestRealmPath error:nil];
+- (RLMRealm *)realmWithTestPath {
+    return [RLMRealm realmWithPath:RLMTestRealmPath error:nil];
 }
 
-- (void)createTestTableWithWriteBlock:(RLMTableWriteBlock)block {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
-        block([realm createTableWithName:@"table"]);
-    }];
+- (void)createTestTableWithWriteBlock:(void(^)(RLMTable *table))block {
+    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath];
+    [realm beginWriteTransaction];
+    block([realm createTableWithName:@"table"]);
+    [realm commitWriteTransaction];
 }
 
 @end

@@ -286,7 +286,7 @@ REALM_TABLE_FAST(FuncPeopleTable)
 }
 
 - (void)testRowDescription {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         NSDate *date = [NSDate dateWithTimeIntervalSince1970:1234];
         RLMTable *table = [realm createTableWithName:@"people" objectClass:[RLMPerson class]];
         [table addRow:@[@"John", date]];

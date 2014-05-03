@@ -55,7 +55,7 @@ REALM_TABLE_FAST(TestQueryErrAllTypes)
     //------------------------------------------------------
     NSError* error = nil;
 
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
         PeopleErrTable* people = [realm createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
         
