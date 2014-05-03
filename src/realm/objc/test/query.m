@@ -506,6 +506,20 @@ REALM_TABLE_FAST(TestQueryAllTypes)
                 withResults:[ints subarrayWithRange:NSMakeRange(1, 3)]
                        name:@"between"
                      column:@"int"];
+        
+        // AND
+        [self testPredicate:[NSPredicate predicateWithFormat:@"int >= %@ && int <= %@", intNum, ints.lastObject]
+                    onTable:table
+                withResults:[ints subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"AND"
+                     column:@"int"];
+        
+        // OR
+        [self testPredicate:[NSPredicate predicateWithFormat:@"int <= %@ || int >= %@", ints.firstObject, ints.lastObject]
+                    onTable:table
+                withResults:@[ints.firstObject, ints.lastObject]
+                       name:@"OR"
+                     column:@"int"];
     }];
 }
 
@@ -567,6 +581,20 @@ REALM_TABLE_FAST(TestQueryAllTypes)
                 withResults:[floats subarrayWithRange:NSMakeRange(1, 3)]
                        name:@"between"
                      column:@"float"];
+        
+        // AND
+        [self testPredicate:[NSPredicate predicateWithFormat:@"float >= %@ && float <= %@", floatNum, floats.lastObject]
+                    onTable:table
+                withResults:[floats subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"AND"
+                     column:@"float"];
+        
+        // OR
+        [self testPredicate:[NSPredicate predicateWithFormat:@"float <= %@ || float >= %@", floats.firstObject, floats.lastObject]
+                    onTable:table
+                withResults:@[floats.firstObject, floats.lastObject]
+                       name:@"OR"
+                     column:@"float"];
     }];
 }
 
@@ -627,6 +655,20 @@ REALM_TABLE_FAST(TestQueryAllTypes)
                     onTable:table
                 withResults:[doubles subarrayWithRange:NSMakeRange(1, 3)]
                        name:@"between"
+                     column:@"double"];
+        
+        // AND
+        [self testPredicate:[NSPredicate predicateWithFormat:@"double >= %@ && double <= %@", doubleNum, doubles.lastObject]
+                    onTable:table
+                withResults:[doubles subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"AND"
+                     column:@"double"];
+        
+        // OR
+        [self testPredicate:[NSPredicate predicateWithFormat:@"double <= %@ || double >= %@", doubles.firstObject, doubles.lastObject]
+                    onTable:table
+                withResults:@[doubles.firstObject, doubles.lastObject]
+                       name:@"OR"
                      column:@"double"];
     }];
 }
@@ -698,6 +740,20 @@ REALM_TABLE_FAST(TestQueryAllTypes)
                     onTable:table
                 withResults:[dates subarrayWithRange:NSMakeRange(1, 3)]
                        name:@"between"
+                     column:@"date"];
+        
+        // AND
+        [self testPredicate:[NSPredicate predicateWithFormat:@"date >= %@ && date <= %@", date, dates.lastObject]
+                    onTable:table
+                withResults:[dates subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"AND"
+                     column:@"date"];
+        
+        // OR
+        [self testPredicate:[NSPredicate predicateWithFormat:@"date <= %@ || date >= %@", dates.firstObject, dates.lastObject]
+                    onTable:table
+                withResults:@[dates.firstObject, dates.lastObject]
+                       name:@"OR"
                      column:@"date"];
     }];
 }
@@ -775,6 +831,27 @@ REALM_TABLE_FAST(TestQueryAllTypes)
             XCTAssertThrows([table allWhere:predicate],
                             @"String predicate with diacritic insensitive option should throw");
         }
+        
+        // AND
+        [self testPredicate:@"string contains 'c' && string contains 'd'"
+                    onTable:table
+                withResults:@[@"abcd"]
+                       name:@"AND"
+                     column:@"string"];
+        
+        // OR
+        [self testPredicate:@"string contains 'c' || string contains 'd'"
+                    onTable:table
+                withResults:@[@"abc", @"abcd"]
+                       name:@"OR"
+                     column:@"string"];
+        
+        // Complex
+        [self testPredicate:@"(string contains 'b' || string contains 'c') && string endswith[c] 'D'"
+                    onTable:table
+                withResults:@[@"abcd"]
+                       name:@"complex"
+                     column:@"string"];
     }];
 }
 
@@ -860,7 +937,7 @@ REALM_TABLE_FAST(TestQueryAllTypes)
 
 #pragma mark - Predicate Helpers
 
-- (void)testPredicate:(NSPredicate *)predicate
+- (void)testPredicate:(id)predicate
               onTable:(RLMTable *)table
           withResults:(NSArray *)results
                  name:(NSString *)name
