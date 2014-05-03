@@ -1,10 +1,8 @@
-# Sample Projects
+# Realm Table View Example
 
-## RealmTableViewExample
+This very simple project demonstrates how to create a `UITableViewController` backed by Realm.
 
-The very simple project in `RealmTableViewExample` demonstrates how to create a `UITableViewController` backed by Realm.
-
-![Screenshot](RealmTableViewExample/screenshot.png)
+![Screenshot](screenshot.png)
 
 You can add rows by tapping the add button and remove rows by swiping right-to-left.
 
