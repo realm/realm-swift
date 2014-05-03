@@ -83,6 +83,10 @@ void throw_objc_exception(exception &ex)
 
 static NSMutableDictionary *s_realmsPerPath;
 
+// FIXME: In the following 3 functions, we should be identifying files by the inode,device number pair
+//  rather than by the path (since the path is not a reliable identifier). This requires additional support
+//  from the core library though, because the inode,device number pair needs to be taken from the open file
+//  (to avoid race conditions).
 RLMRealm * cachedRealm(NSString *path) {
     mach_port_t threadID = pthread_mach_thread_np(pthread_self());
     @synchronized(s_realmsPerPath) {
