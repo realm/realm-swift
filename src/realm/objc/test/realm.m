@@ -95,7 +95,7 @@ REALM_TABLE_1(RLMTestTable,
 }
 
 - (void)testRealmIsNotifiedByBackgroundUpdate {
-    NSString *realmFilePath = @"async.realm";
+    NSString *realmFilePath = @"async.realm.bg";
     [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
     NSString *tableName = @"table";
     
@@ -117,7 +117,7 @@ REALM_TABLE_1(RLMTestTable,
         }];
     });
     
-    [self waitForTimeout:10.0f];
+    [self waitForTimeout:2.0f];
     
     XCTAssertTrue(notificationFired, @"A notification should have fired after a table was created");
     
