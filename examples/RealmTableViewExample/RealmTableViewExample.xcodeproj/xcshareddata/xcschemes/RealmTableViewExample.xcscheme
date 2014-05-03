@@ -16,8 +16,8 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E80762CF18FEFFD70071CFAB"
                BuildableName = "TableViewExample.app"
-               BlueprintName = "TableViewExample"
-               ReferencedContainer = "container:TableViewExample.xcodeproj">
+               BlueprintName = "RealmTableViewExample"
+               ReferencedContainer = "container:RealmTableViewExample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -44,8 +44,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E80762CF18FEFFD70071CFAB"
             BuildableName = "TableViewExample.app"
-            BlueprintName = "TableViewExample"
-            ReferencedContainer = "container:TableViewExample.xcodeproj">
+            BlueprintName = "RealmTableViewExample"
+            ReferencedContainer = "container:RealmTableViewExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -62,8 +62,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E80762CF18FEFFD70071CFAB"
             BuildableName = "TableViewExample.app"
-            BlueprintName = "TableViewExample"
-            ReferencedContainer = "container:TableViewExample.xcodeproj">
+            BlueprintName = "RealmTableViewExample"
+            ReferencedContainer = "container:RealmTableViewExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
