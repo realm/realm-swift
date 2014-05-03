@@ -126,6 +126,57 @@ REALM_TABLE_1(RLMTestTable,
                     created table after a RLMRealmDidChangeNotification was sent");
 }
 
+
+- (void)testRealmNotificationsInBackgroundAreThrottled {
+    NSString *realmFilePath = @"async.throttled.realm";
+    [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
+    NSString *tableName = @"table";
+    
+    RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
+    __block int notificationsFired = 0;
+    [[NSNotificationCenter defaultCenter] addObserverForName:RLMRealmDidChangeNotification
+                                                      object:nil
+                                                       queue:[NSOperationQueue currentQueue]
+                                                  usingBlock:^(NSNotification *note) {
+                                                      XCTAssertNotNil(note, @"Must use parameter");
+                                                      notificationsFired++;
+                                                      XCTAssertTrue(notificationsFired <= 2, @"Too many notifications recieved");
+                                                      if (notificationsFired == 2) {
+                                                          [self notify:XCTAsyncTestCaseStatusSucceeded];
+                                                      }
+                                                  }];
+    
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [[RLMTransactionManager managerForRealmWithPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
+            RLMTable *table = [realm createTableWithName:tableName];
+            [table addColumnWithName:@"int" type:RLMTypeInt];
+        }];
+        usleep(100000);
+
+        [[RLMTransactionManager managerForRealmWithPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
+            RLMTable *table = [realm tableWithName:tableName];
+            [table addRow:@[@1]];
+        }];
+        [[RLMTransactionManager managerForRealmWithPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
+            RLMTable *table = [realm tableWithName:tableName];
+            [table addRow:@[@1]];
+        }];
+        [[RLMTransactionManager managerForRealmWithPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
+            RLMTable *table = [realm tableWithName:tableName];
+            [table addRow:@[@1]];
+        }];
+    });
+    
+    [self waitForTimeout:2.0f];
+    
+    XCTAssertEqual(notificationsFired, 2, @"Quick background notifications should be throttled");
+    
+    RLMTable *table = [realm tableWithName:tableName];
+    XCTAssertNotNil(table, @"The RLMRealm should be able to read a newly \
+                    created table after a RLMRealmDidChangeNotification was sent");
+}
+
+
 - (void)testRealmOnMainThreadDoesntThrow {
     XCTAssertNoThrow([self realmPersistedAtTestPath], @"Calling \
                      +realmWithPath on the main thread shouldn't throw an exception.");

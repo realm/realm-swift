@@ -114,6 +114,9 @@ NSArray * realmsAtPath(NSString *path) {
     BOOL _tableRefsHaveDied;
     BOOL _usesImplicitTransactions;
     NSRunLoop *_runLoop;
+    NSTimer *_delayedUpdate;
+    NSDate *_lastUpdate;
+    double _minUpdateInterval;
 
     tightdb::Group *_group;
     BOOL m_is_owned;
@@ -193,6 +196,7 @@ NSArray * realmsAtPath(NSString *path) {
     }
 
     realm->_runLoop = [NSRunLoop currentRunLoop];
+    realm->_minUpdateInterval = .1;
     realm->_notificationCenter = [NSNotificationCenter defaultCenter];
 
     RLMError errorCode = RLMErrorOk;
@@ -280,7 +284,12 @@ NSArray * realmsAtPath(NSString *path) {
 }
 
 
-// FIXME: when adding support of Mac OSX, we need to also call this file
+- (void)timerFired {
+    _delayedUpdate = nil;
+    [self checkForChange];
+}
+
+// FIXME: when adding support of Mac OSX, we need to also call this function
 //        when the realm file changes due to other processes writing to the same realm
 +(void)notifyRealmsAtPath:(NSString *)path {
     NSArray *realms = realmsAtPath(path);
@@ -289,13 +298,40 @@ NSArray * realmsAtPath(NSString *path) {
             [realm checkForChange];
         }
         else {
-            [realm->_runLoop performSelector:@selector(checkForChange) target:realm argument:nil order:0 modes:@[NSRunLoopCommonModes]];
+            [realm->_runLoop performSelector:@selector(throttledUpdate) target:realm argument:nil order:0 modes:@[NSRunLoopCommonModes]];
         }
     }
 }
 
-- (void)checkForChange
-{
+// if checking too often, delay until _minInterval time has passed
+- (void)throttledUpdate {
+    NSDate *now = [NSDate date];
+    if (_lastUpdate) {
+        // if already queued do nothing
+        if (_delayedUpdate) {
+            return;
+        }
+        
+        // if it's too soon, then delay
+        NSTimeInterval timeSinceLastUpdate = [now timeIntervalSinceDate:_lastUpdate];
+        if (timeSinceLastUpdate < _minUpdateInterval) {
+            _delayedUpdate = [NSTimer scheduledTimerWithTimeInterval:_minUpdateInterval - timeSinceLastUpdate
+                                                              target:self
+                                                            selector:@selector(timerFired)
+                                                            userInfo:nil
+                                                             repeats:NO];
+            return;
+        }
+    }
+    
+    // if we didn't throttle, then udpate
+    [self checkForChange];
+}
+
+- (void)checkForChange {
+    // keep track of last time we updated
+    _lastUpdate = [NSDate date];
+    
     // Remove dead table references from list
     if (_tableRefsHaveDied) {
         NSMutableArray *deadTableRefs = [NSMutableArray array];
