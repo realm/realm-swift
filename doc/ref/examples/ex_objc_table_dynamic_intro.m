@@ -49,6 +49,7 @@ void ex_objc_table_dynamic_intro()
 
 void ex_objc_table_dyn_table_sizes()
 {
+<<<<<<< HEAD
     [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
         // @@Example: ex_objc_table_dyn_table_size @@
         // Create a new table dynamically
@@ -68,4 +69,41 @@ void ex_objc_table_dyn_table_sizes()
         NSLog(@"Number of columns: %lu", (unsigned long)table.columnCount);
         // @@EndExample@@
     }];
+=======
+    // @@Example: ex_objc_table_dyn_table_size @@
+    // Create a new table dynamically
+    RLMTable *table = [[RLMTable alloc] init];
+
+    // Add two columns
+    [table addColumnWithName:@"Name" type:RLMTypeString];
+    [table addColumnWithName:@"Age"  type:RLMTypeInt];
+
+    // Add three rows
+    [table addRow:@[@"Steve", @12]];
+    [table addRow:@[@"Nick", @100]];
+    [table addRow:@[@"Mary",  @27]];
+
+    // Print the number of rows and columns
+    NSLog(@"Number of rows: %lu",    (unsigned long)table.rowCount);
+    NSLog(@"Number of columns: %lu", (unsigned long)table.columnCount);
+    // @@EndExample@@
+}
+
+void ex_objc_table_dyn_table_init_with_columns()
+{
+//    // @@Example: ex_objc_table_dyn_table_init_with_columns @@
+//    // Create a new table dynamically
+//    RLMTable *table = [[RLMTable alloc] initWithColumns:@[@"Name", @"string",
+//                                                           @"Age", @"int"]];
+//
+//    // Add three rows
+//    [table addRow:@[@"Steve", @12]];
+//    [table addRow:@[@"Nick", @100]];
+//    [table addRow:@[@"Mary",  @27]];
+//
+//    // Print the number of rows and columns
+//    NSLog(@"Number of rows: %lu",    (unsigned long)table.rowCount);
+//    NSLog(@"Number of columns: %lu", (unsigned long)table.columnCount);
+//    // @@EndExample@@
+>>>>>>> 0c5befb1d95840f3a70236a56bf1fa62ddce2eb3
 }

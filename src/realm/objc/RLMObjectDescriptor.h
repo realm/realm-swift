@@ -21,8 +21,6 @@
 #import <Foundation/Foundation.h>
 #import "RLMProperty.h"
 
-@class RLMObjectDescriptor;
-
 // ordered properties extracted from an object
 @interface RLMObjectDescriptor : NSObject
 
@@ -36,5 +34,3 @@
 +(instancetype)descriptorForObjectClass:(Class)objectClass;
 
 @end
-
-

@@ -21,7 +21,7 @@ static NSString * const kTableName = @"table";
 @interface RLMTableViewController ()
 
 @property (nonatomic, strong) RLMRealm *realm;
-@property (nonatomic, strong) RLMContext *context;
+@property (nonatomic, strong) RLMTransactionManager *manager;
 @property (nonatomic, strong) RLMDemoTable *table;
 
 @end
@@ -43,26 +43,26 @@ static NSString * const kTableName = @"table";
 #pragma mark - Realm
 
 - (void)setupRealm {
-    // @@Example: setup_contexts @@
-    // Set up read/write contexts
-    self.realm = [RLMRealm realmWithDefaultPersistenceAndInitBlock:^(RLMRealm *realm) {
+    // @@Example: setup @@
+    // Set up realm and transaction manager
+    self.realm = [RLMRealm defaultRealmWithInitBlock:^(RLMRealm *realm) {
         // Create table if it doesn't exist
         if (realm.isEmpty) {
             [realm createTableWithName:kTableName asTableClass:[RLMDemoTable class]];
         }
     }];
-    self.context = [RLMContext contextWithDefaultPersistence];
+    self.manager = [RLMTransactionManager managerForDefaultRealm];
     // @@EndExample@@
     
     // @@Example: setup_notifications @@
     // Observe Realm Notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(realmContextDidChange)
-                                                 name:RLMContextDidChangeNotification
+                                             selector:@selector(realmDidChange)
+                                                 name:RLMRealmDidChangeNotification
                                                object:nil];
 }
 
-- (void)realmContextDidChange {
+- (void)realmDidChange {
     [self.tableView reloadData];
 }
 // @@EndExample@@
@@ -101,7 +101,7 @@ static NSString * const kTableName = @"table";
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         // @@Example: delete_row @@
-        [self.context writeTable:kTableName usingBlock:^(RLMTable *table) {
+        [self.manager writeTable:kTableName usingBlock:^(RLMTable *table) {
             [table removeRowAtIndex:indexPath.row];
         }];
         // @@EndExample@@
@@ -112,7 +112,7 @@ static NSString * const kTableName = @"table";
 
 - (void)add {
     // @@Example: add_row @@
-    [self.context writeUsingBlock:^(RLMRealm *realm) {
+    [self.manager writeUsingBlock:^(RLMRealm *realm) {
         RLMDemoTable *table = [realm tableWithName:kTableName asTableClass:[RLMDemoTable class]];
         NSString *title = [NSString stringWithFormat:@"Title %@", @(table.rowCount)];
         BOOL checked = table.rowCount % 2;
@@ -135,7 +135,7 @@ static NSString * const kTableName = @"table";
 
 - (void)query {
     // @@Example: query @@
-    RLMRow *row = [self.table find:[NSPredicate predicateWithFormat:@"checked = %@", @YES]];
+    RLMRow *row = [self.table firstWhere:[NSPredicate predicateWithFormat:@"checked = %@", @YES]];
     if (row) {
         BOOL checked = [(NSNumber *)row[@"checked"] boolValue];
         NSLog(@"%@ is %@", row[@"title"], checked ? @"checked" : @"unchecked");
