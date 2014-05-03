@@ -105,6 +105,16 @@
  */
 + (instancetype)realmWithPath:(NSString *)path
                     initBlock:(RLMWriteBlock)initBlock;
+
+/**
+ Instantiates an RLMRealm with a manual init block, with persistence to a specific file, and an error
+
+ @param path        Path to the file you want the data saved in.
+ @param initBlock   A block used to initialize the RLMRealm.
+ @param error       Pass-by-reference for errors.
+
+ @return An RLMRealm instance.
+ */
 + (instancetype)realmWithPath:(NSString *)path
                     initBlock:(RLMWriteBlock)initBlock
                         error:(NSError **)error;
