@@ -19,10 +19,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import "util_noinst.hpp"
+#import <tightdb/query.hpp>
 
+@class RLMTable;
 
-/**
- * Posted by RLMRealm when it changes, that is when a table is
- * added, removed, or changed in any way.
- */
-extern NSString *const RLMRealmDidChangeNotification;
+tightdb::Query queryFromPredicate(RLMTable *table, id condition);
+
+NSException *predicate_exception(NSString *name, NSString *reason);
+NSUInteger validated_column_index(RLMTable *table, NSString *columnName);

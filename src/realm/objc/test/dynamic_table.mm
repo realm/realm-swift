@@ -131,7 +131,7 @@ using namespace std;
 
 -(void)testAppendRowGenericObject
 {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         RLMTable* table1 = [realm createTableWithName:@"table1"];
         [table1 addColumnWithName:@"name" type:RLMTypeString];
         [table1 addColumnWithName:@"age" type:RLMTypeInt];
@@ -545,7 +545,7 @@ using namespace std;
 
 - (void)testColumnlessIsEqual
 {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         RLMTable* table1 = [realm createTableWithName:@"table1"];
         RLMTable* table2 = [realm createTableWithName:@"table2"];
         XCTAssertTrue([table1 isEqual:table1], @"Columnless table is equal to itself.");
@@ -665,7 +665,7 @@ using namespace std;
 
 - (void)testDataTypes_Dynamic
 {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm createTableWithName:@"table"];
         XCTAssertNotNil(table, @"Table is nil");
         
@@ -876,7 +876,7 @@ using namespace std;
 
 - (void)testTableDynamic_KeyedSubscripting
 {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm createTableWithName:@"table"];
         [table addColumnWithName:@"name" type:RLMTypeString];
         [table addColumnWithName:@"id" type:RLMTypeInt];
@@ -1082,7 +1082,7 @@ using namespace std;
 
 - (void)testTableDynamic_initWithColumns
 {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         NSArray *columns = @[@"name",   @"string",
                              @"age",    @"int",
                              @"hired",  @"bool",
@@ -1130,7 +1130,7 @@ using namespace std;
 
 - (void)testPredicateFind
 {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         NSArray *columns = @[@"name", @"string",
                              @"age",  @"int"];
         RLMTable *table = [realm createTableWithName:@"table" columns:columns];
@@ -1140,29 +1140,29 @@ using namespace std;
         [table addRow:@[@"name3", @3]];
         [table addRow:@[@"name4", @4]];
         
-        XCTAssertThrows([table find:@"garbage"], @"Garbage predicate");
-        XCTAssertThrows([table find:@"name == notAValue"], @"Invalid expression");
-        XCTAssertThrows([table find:@"naem == \"name0\""], @"Invalid column");
-        XCTAssertThrows([table find:@"name == 30"], @"Invalid value type");
-        XCTAssertThrows([table find:@1], @"Invalid condition");
+        XCTAssertThrows([table firstWhere:@"garbage"], @"Garbage predicate");
+        XCTAssertThrows([table firstWhere:@"name == notAValue"], @"Invalid expression");
+        XCTAssertThrows([table firstWhere:@"naem == \"name0\""], @"Invalid column");
+        XCTAssertThrows([table firstWhere:@"name == 30"], @"Invalid value type");
+        XCTAssertThrows([table firstWhere:@1], @"Invalid condition");
         
         // Searching with no condition just finds first row
-        RLMRow *r = [table find:nil];
+        RLMRow *r = [table firstWhere:nil];
         XCTAssertEqualObjects(r[@"name"], @"name0", @"first row");
         
         // Search with predicate string
-        r = [table find:@"name == \"name10\""];
+        r = [table firstWhere:@"name == \"name10\""];
         XCTAssertEqualObjects(r, nil, @"no match");
         
-        r = [table find:@"name == \"name0\""];
+        r = [table firstWhere:@"name == \"name0\""];
         XCTAssertEqualObjects(r[@"name"], @"name0");
         
-        r = [table find:@"age == 4"];
+        r = [table firstWhere:@"age == 4"];
         XCTAssertEqualObjects(r[@"name"], @"name4");
         
         // Search with predicate object
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
-        r = [table find:predicate];
+        r = [table firstWhere:predicate];
         XCTAssertEqualObjects(r[@"name"], @"name3");
     }];
 }
@@ -1180,50 +1180,50 @@ using namespace std;
         [table addRow:@[@"name3", @3]];
         [table addRow:@[@"name4", @4]];
         
-        XCTAssertThrows([table where:@"garbage"], @"Garbage predicate");
-        XCTAssertThrows([table where:@"name == notAValue"], @"Invalid expression");
-        XCTAssertThrows([table where:@"naem == \"name0\""], @"Invalid column");
-        XCTAssertThrows([table where:@"name == 30"], @"Invalid value type");
+        XCTAssertThrows([table allWhere:@"garbage"], @"Garbage predicate");
+        XCTAssertThrows([table allWhere:@"name == notAValue"], @"Invalid expression");
+        XCTAssertThrows([table allWhere:@"naem == \"name0\""], @"Invalid column");
+        XCTAssertThrows([table allWhere:@"name == 30"], @"Invalid value type");
         
         // Filter with predicate string
-        RLMView *v = [table where:@"name == \"name0\""];
+        RLMView *v = [table allWhere:@"name == \"name0\""];
         XCTAssertEqual(v.rowCount, (NSUInteger)1, @"View with single match");
         XCTAssertEqualObjects(v[0][nameIndex], @"name0");
         XCTAssertEqualObjects(v[0][ageIndex], @0);
         
-        v = [table where:@"age == 1"];
+        v = [table allWhere:@"age == 1"];
         XCTAssertEqual(v.rowCount, (NSUInteger)2, @"View with two matches");
         XCTAssertEqualObjects(v[0][ageIndex], @1);
         
-        v = [table where:@"1 == age"];
+        v = [table allWhere:@"1 == age"];
         XCTAssertEqual(v.rowCount, (NSUInteger)2, @"View with two matches");
         XCTAssertEqualObjects(v[0][ageIndex], @1);
         
         // test AND
-        v = [table where:@"age == 1 AND name == \"name1\""];
+        v = [table allWhere:@"age == 1 AND name == \"name1\""];
         XCTAssertEqual(v.rowCount, (NSUInteger)1, @"View with one match");
         XCTAssertEqualObjects(v[0][nameIndex], @"name1");
         
         // test OR
-        v = [table where:@"age == 1 OR age == 4"];
+        v = [table allWhere:@"age == 1 OR age == 4"];
         XCTAssertEqual(v.rowCount, (NSUInteger)3, @"View with 3 matches");
         
         // test other numeric operators
-        v = [table where:@"age > 3"];
+        v = [table allWhere:@"age > 3"];
         XCTAssertEqual(v.rowCount, (NSUInteger)1, @"View with 1 matches");
         
-        v = [table where:@"age >= 3"];
+        v = [table allWhere:@"age >= 3"];
         XCTAssertEqual(v.rowCount, (NSUInteger)2, @"View with 2 matches");
         
-        v = [table where:@"age < 1"];
+        v = [table allWhere:@"age < 1"];
         XCTAssertEqual(v.rowCount, (NSUInteger)1, @"View with 1 matches");
         
-        v = [table where:@"age <= 1"];
+        v = [table allWhere:@"age <= 1"];
         XCTAssertEqual(v.rowCount, (NSUInteger)3, @"View with 3 matches");
         
         // Filter with predicate object
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @1];
-        v = [table where:predicate];
+        v = [table allWhere:predicate];
         XCTAssertEqual(v.rowCount, (NSUInteger)2, @"View with two matches");
         XCTAssertEqualObjects(v[0][ageIndex], @1);
     }];
@@ -1239,35 +1239,35 @@ using namespace std;
         [table addRow:@[@"name4", @4, [NSNumber numberWithBool:YES]]];
         [table addRow:@[@"name0",@0, [NSNumber numberWithBool:NO]]];
         
-        RLMView *v = [table where:nil orderBy:nil];
+        RLMView *v = [table allWhere:nil orderBy:nil];
         XCTAssertEqualObjects(v[0][ageIndex], @4);
         XCTAssertEqualObjects(v[1][ageIndex], @0);
         
-        RLMView *vAscending = [table where:nil orderBy:@"age"];
+        RLMView *vAscending = [table allWhere:nil orderBy:@"age"];
         XCTAssertEqualObjects(vAscending[0][ageIndex], @0);
         XCTAssertEqualObjects(vAscending[1][ageIndex], @4);
         
-        RLMView *vAscending2 = [table where:nil orderBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:YES]];
+        RLMView *vAscending2 = [table allWhere:nil orderBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:YES]];
         XCTAssertEqualObjects(vAscending2[0][ageIndex], @0);
         XCTAssertEqualObjects(vAscending2[1][ageIndex], @4);
         
         NSSortDescriptor * reverseSort = [NSSortDescriptor sortDescriptorWithKey:@"age" ascending:NO];
-        RLMView *vDescending = [table where:nil orderBy:reverseSort];
+        RLMView *vDescending = [table allWhere:nil orderBy:reverseSort];
         XCTAssertEqualObjects(vDescending[0][ageIndex], @4);
         XCTAssertEqualObjects(vDescending[1][ageIndex], @0);
         
         NSSortDescriptor * boolSort = [NSSortDescriptor sortDescriptorWithKey:@"hired" ascending:YES];
-        RLMView *vBool = [table where:nil orderBy:boolSort];
+        RLMView *vBool = [table allWhere:nil orderBy:boolSort];
         XCTAssertEqualObjects(vBool[0][ageIndex], @0);
         XCTAssertEqualObjects(vBool[1][ageIndex], @4);
         
-        XCTAssertThrows([table where:nil orderBy:@1], @"Invalid order type");
+        XCTAssertThrows([table allWhere:nil orderBy:@1], @"Invalid order type");
         
         NSSortDescriptor * misspell = [NSSortDescriptor sortDescriptorWithKey:@"oge" ascending:YES];
-        XCTAssertThrows([table where:nil orderBy:misspell], @"Invalid sort");
+        XCTAssertThrows([table allWhere:nil orderBy:misspell], @"Invalid sort");
         
         NSSortDescriptor * wrongColType = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES];
-        XCTAssertThrows([table where:nil orderBy:wrongColType], @"Invalid column type");
+        XCTAssertThrows([table allWhere:nil orderBy:wrongColType], @"Invalid column type");
     }];
 }
 
@@ -1405,5 +1405,103 @@ using namespace std;
     XCTAssertThrows(([[RLMTable alloc] init]), @"Initializing table outside of context should throw exception");
 }
 
+- (void)testTableDynamic_countWhere
+{
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"IntCol" type:RLMTypeInt];
+        [table addColumnWithName:@"BoolCol" type:RLMTypeBool];
+        
+        [table addRow:@[@1231, @NO]];
+        [table addRow:@[@1232, @YES]];
+        [table addRow:@[@1233, @YES]];
+        [table addRow:@[@1234, @NO]];
+        [table addRow:@[@1235, @NO]];
+        
+        XCTAssertEqual([table countWhere:@"BoolCol == NO"], (NSUInteger)3, @"countWhere should return 3");
+        XCTAssertEqual([table countWhere:@"BoolCol == YES"], (NSUInteger)2, @"countWhere should return 2");
+        XCTAssertEqual([table countWhere:@"IntCol == 1232"], (NSUInteger)1, @"countWhere should return 1");
+        XCTAssertEqual([table countWhere:@"IntCol == 89172"], (NSUInteger)0, @"countWhere should return 0");
+    }];
+}
+
+- (void)testTableDynamic_sumOfColumn
+{
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"IntCol" type:RLMTypeInt];
+        [table addColumnWithName:@"FloatCol" type:RLMTypeFloat];
+        [table addColumnWithName:@"DoubleCol" type:RLMTypeDouble];
+        [table addColumnWithName:@"BoolCol" type:RLMTypeBool];
+        
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+
+        
+        // Test int sum
+        XCTAssertEqual([[table sumOfColumn:@"IntCol" where:@"BoolCol == NO"] integerValue], (NSInteger)4, @"Sum should be 4");
+        XCTAssertEqual([[table sumOfColumn:@"IntCol" where:@"BoolCol == YES"] integerValue], (NSInteger)0, @"Sum should be 0");
+        
+        // Test float sum
+        XCTAssertEqualWithAccuracy([[table sumOfColumn:@"FloatCol" where:@"BoolCol == NO"] floatValue], (float)0.0f, 0.1f, @"Sum should be 0");
+        XCTAssertEqualWithAccuracy([[table sumOfColumn:@"FloatCol" where:@"BoolCol == YES"] floatValue], (float)7.2f, 0.1f, @"Sum should be 7.2");
+        
+        // Test double sum
+        XCTAssertEqualWithAccuracy([[table sumOfColumn:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)10.0, 0.1f, @"Sum should be 10.0");
+        XCTAssertEqualWithAccuracy([[table sumOfColumn:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Sum should be 0.0");
+        
+        // Test invalid column name
+        XCTAssertThrows([table sumOfColumn:@"foo" where:@"BoolCol == YES"], @"Should throw exception");
+        
+        // Test operation not supported
+        XCTAssertThrows([table sumOfColumn:@"BoolCol" where:@"IntCol == 1"], @"Should throw exception");
+    }];
+}
+
+- (void)testTableDynamic_averageOfColumn
+{
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"IntCol" type:RLMTypeInt];
+        [table addColumnWithName:@"FloatCol" type:RLMTypeFloat];
+        [table addColumnWithName:@"DoubleCol" type:RLMTypeDouble];
+        [table addColumnWithName:@"BoolCol" type:RLMTypeBool];
+        
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        
+        
+        // Test int sum
+        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"IntCol" where:@"BoolCol == NO"] doubleValue], (double)1.0, 0.1f, @"Average should be 1.0");
+        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"IntCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Average should be 0.0");
+        
+        // Test float sum
+        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"FloatCol" where:@"BoolCol == NO"] doubleValue], (double)0.0f, 0.1f, @"Average should be 0.0");
+        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"FloatCol" where:@"BoolCol == YES"] doubleValue], (double)1.2f, 0.1f, @"Average should be 1.2");
+        
+        // Test double sum
+        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)2.5, 0.1f, @"Average should be 2.5");
+        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Average should be 0.0");
+        
+        // Test invalid column name
+        XCTAssertThrows([table averageOfColumn:@"foo" where:@"BoolCol == YES"], @"Should throw exception");
+        
+        // Test operation not supported
+        XCTAssertThrows([table averageOfColumn:@"BoolCol" where:@"IntCol == 1"], @"Should throw exception");
+    }];
+}
 
 @end

@@ -76,7 +76,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(MainTable, MainObject)
 
 - (void)testSubtable
 {    
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         /* Create new table in group */
         MainTable *people = [MainTable tableInRealm:realm named:@"employees"];
         
@@ -100,7 +100,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(MainTable, MainObject)
 }
 
 - (void)testSubtableSimple {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         /* Create new table in group */
         RLMTable *people = [realm createTableWithName:@"employees" objectClass:MainProxied.class];
         
@@ -125,9 +125,26 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(MainTable, MainObject)
 
 - (void)testBadSubtable {
     
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {    
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {    
         XCTAssertThrows([realm createTableWithName:@"badTable" objectClass:UnspecifiedSubObject.class], @"Shoud throw exception");
 	}];
+}
+
+- (void) testDescriptor
+{
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        
+    RLMTable *t = [realm createTableWithName:@"table"];
+    RLMDescriptor *d = t.descriptor;
+    RLMDescriptor *subDesc = [d addColumnTable:@"subtable"];
+    
+    XCTAssertEqual(t.columnCount, (NSUInteger)1, @"One column added");
+    XCTAssertEqual(subDesc.columnCount, (NSUInteger)0, @"0 columns in subtable");
+    
+    NSUInteger subTablColIndex = [subDesc addColumnWithName:@"subCol" type:RLMTypeBool];
+    XCTAssertEqual(subDesc.columnCount, (NSUInteger)1, @"Col count on subtable should be 1");
+    XCTAssertEqual(subTablColIndex, (NSUInteger)0, @"col index of column should be 0");
+    }];
 }
 
 @end

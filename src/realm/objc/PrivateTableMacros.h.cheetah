@@ -94,7 +94,6 @@ CName${j+1}:(REALM_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
  CName${j+1}:(REALM_ARG_TYPE(CType${j+1}))CName${j+1}%slurp
 %end for
 ; \
--(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
@@ -233,10 +232,6 @@ CName${j+1}:(REALM_ARG_TYPE(CType${j+1}))CName${j+1} %slurp
     REALM_COLUMN_INSERT(self, ${j}, ndx, CName${j+1}, CType${j+1}); \
 %end for
     [self RLM_insertDone]; \
-} \
--(TableName##Query*)where \
-{ \
-    return [[TableName##Query alloc] initWithTable:self]; \
 } \
 -(TableName##Row*)addEmptyRow \
 { \
