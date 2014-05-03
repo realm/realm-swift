@@ -50,7 +50,7 @@ REALM_TABLE_FAST(QueryTable)
 
 - (void)testRealm_Misc2
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         NSUInteger rowIndex;
         NSLog(@"HasTable: %i", [realm hasTableWithName:@"employees"] );
         // Create new table in realm
@@ -125,7 +125,7 @@ REALM_TABLE_FAST(QueryTable)
 
 - (void)testQuery
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         QueryTable *table = [realm createTableWithName:@"Query table" asTableClass:[QueryTable class]];
         
         // Add some rows
@@ -182,7 +182,7 @@ REALM_TABLE_FAST(QueryTable)
  */
 - (void)testSubtables
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm createTableWithName:@"table"];
         
         // Specify the table type

@@ -19,7 +19,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMTransactionManager.h"
 
 /**
  
@@ -32,11 +31,7 @@
             [realm createTableWithName:@"Dogs" objectClass:[RLMDogObject class]];
         }
     }];
- 
- **RLMRealms can only be instantiated directly for reads from the main thread of your iOS applications.
- From any other thread or for any writes, you must use an RLMTransactionManager to instantiate an RLMRealm.**
- This is so that the Realm library can perform any necessary locks (in the case of writes), or bring the RLMRealm
- up to date with the event loop for transactionless reads on the main thread.
+
  
  */
 
@@ -54,39 +49,14 @@
  The default RLMRealm is persisted at `<Application_Home>/Documents/default.realm`.
  
  This method also uses the main run loop, as well as the default notification center.
-
- @warning Can only be used on the main thread. See RLMTransactionManager to instantiate RLMRealms on other threads.
  
  @return An RLMRealm instance.
  */
 + (instancetype)defaultRealm;
 
 /**
- Instantiates an RLMRealm with a manual init block.
-
- The init block is useful if you want to set up some RLMTable(s) when opening your RLMRealm,
- for example inside an App Delegate.
- 
-    realm = [RLMRealm realmWithDefaultPersistenceAndInitBlock:^(RLMRealm *realm) {
-        // Create table if it doesn't exist
-        if (realm.isEmpty) {
-            [realm createTableWithName:@"Dogs" objectClass:[RLMDogObject class]];
-        }
-    }];
- 
- @warning Can only be used on the main thread. See RLMTransactionManager to instantiate RLMRealms on other threads.
- 
- @param initBlock A block used to initialize the RLMRealm.
- 
- @return An RLMRealm instance.
- */
-+ (instancetype)defaultRealmWithInitBlock:(RLMWriteBlock)initBlock;
-
-/**
  Instantiates an RLMRealm with persistence to a specific File.
- 
- @warning Can only be used on the main thread. See RLMTransactionManager to instantiate RLMRealms on other threads.
- 
+  
  @param path Path to the file you want the data saved in.
  
  @return An RLMRealm instance.
@@ -94,31 +64,24 @@
 + (instancetype)realmWithPath:(NSString *)path;
 
 /**
- Instantiates an RLMRealm with a manual init block, with persistence to a specific file.
-
- @warning Can only be used on the main thread. See RLMTransactionManager to instantiate RLMRealms on other threads.
- 
- @param path      Path to the file you want the data saved in.
- @param initBlock A block used to initialize the RLMRealm.
- 
- @return An RLMRealm instance.
- */
-+ (instancetype)realmWithPath:(NSString *)path
-                    initBlock:(RLMWriteBlock)initBlock;
-
-/**
  Instantiates an RLMRealm with a manual init block, with persistence to a specific file, and an error
 
  @param path        Path to the file you want the data saved in.
- @param initBlock   A block used to initialize the RLMRealm.
  @param error       Pass-by-reference for errors.
 
  @return An RLMRealm instance.
  */
-+ (instancetype)realmWithPath:(NSString *)path
-                    initBlock:(RLMWriteBlock)initBlock
-                        error:(NSError **)error;
++ (instancetype)realmWithPath:(NSString *)path error:(NSError **)error;
 
+- (void)addNotification:(void(^)(RLMRealm *realm))block;
+- (void)removeNotification:(void(^)(RLMRealm *realm))block;
+- (void)removeAllNotifications;
+
+- (void)beginWriteTransaction;
+- (void)commitWriteTransaction;
+- (void)abandonWriteTransaction;
+
+- (void)writeUsingBlock:(void(^)(RLMRealm *realm))block;
 
 /**---------------------------------------------------------------------------------------
  *  @name Adding Tables to a Realm

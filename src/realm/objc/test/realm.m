@@ -31,11 +31,11 @@ REALM_TABLE_1(RLMTestTable,
     
     NSError *error = nil;
     
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:tableName];
     }];
     
-    XCTAssertNil(error, @"RLMTransactionManager error should be nil after write block");
+    XCTAssertNil(error, @"RLMRealm error should be nil after write block");
     
     RLMRealm *realm = [self realmPersistedAtTestPath];
     RLMTable *table = [realm tableWithName:tableName];
@@ -48,7 +48,7 @@ REALM_TABLE_1(RLMTestTable,
 - (void)testCanReadPreviouslyCreatedTypedTable {
     NSString *tableName = @"table";
     
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:tableName asTableClass:[RLMTestTable class]];
     }];
     
@@ -66,22 +66,17 @@ REALM_TABLE_1(RLMTestTable,
     [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
     NSString *tableName = @"table";
     
-    RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
-
     
     __block BOOL notificationFired = NO;
     __block RLMTable *table = nil;
-    [[NSNotificationCenter defaultCenter] addObserverForName:RLMRealmDidChangeNotification
-                                                      object:nil
-                                                       queue:[NSOperationQueue mainQueue]
-                                                  usingBlock:^(NSNotification *note) {
-                                                      XCTAssertNotNil(note, @"Must use parameter");
-                                                      notificationFired = YES;
-                                                      table = [realm tableWithName:tableName];
-                                                      [self notify:XCTAsyncTestCaseStatusSucceeded];
-                                                  }];
+    RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
+    [realm addNotification:^(RLMRealm * realm) {
+        notificationFired = YES;
+        table = [realm tableWithName:tableName];
+        [self notify:XCTAsyncTestCaseStatusSucceeded];
+    }];
     
-    [[RLMTransactionManager managerForRealmWithPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
+    [realm writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:tableName];
     }];
 
@@ -94,25 +89,21 @@ REALM_TABLE_1(RLMTestTable,
                    RLMRealm should be of class RLMTable");
 }
 
-- (void)testRealmIsNotifiedByBackgroundUpdate {
+- (void)testRealmIsUpdatedAfterBackgroundUpdate {
     NSString *realmFilePath = @"async.bg.realm";
     [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
     NSString *tableName = @"table";
     
     RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
     __block BOOL notificationFired = NO;
-    [[NSNotificationCenter defaultCenter] addObserverForName:RLMRealmDidChangeNotification
-                                                      object:nil
-                                                       queue:[NSOperationQueue currentQueue]
-                                                  usingBlock:^(NSNotification *note) {
-                                                      XCTAssertNotNil(note, @"Must use parameter");
-                                                      notificationFired = YES;
-                                                      [self notify:XCTAsyncTestCaseStatusSucceeded];
-                                                  }];
-    
+    [realm addNotification:^(RLMRealm * realm) {
+        notificationFired = YES;
+        [self notify:XCTAsyncTestCaseStatusSucceeded];
+    }];
+
     dispatch_queue_t queue = dispatch_queue_create("background", 0);
     dispatch_async(queue, ^{
-        [[RLMTransactionManager managerForRealmWithPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
+        [[RLMRealm realmWithPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
             [realm createTableWithName:tableName];
         }];
     });
@@ -125,57 +116,6 @@ REALM_TABLE_1(RLMTestTable,
     XCTAssertNotNil(table, @"The RLMRealm should be able to read a newly \
                     created table after a RLMRealmDidChangeNotification was sent");
 }
-
-
-- (void)testRealmNotificationsInBackgroundAreThrottled {
-    NSString *realmFilePath = @"async.throttled.realm";
-    [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
-    NSString *tableName = @"table";
-    
-    RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
-    __block int notificationsFired = 0;
-    [[NSNotificationCenter defaultCenter] addObserverForName:RLMRealmDidChangeNotification
-                                                      object:nil
-                                                       queue:[NSOperationQueue currentQueue]
-                                                  usingBlock:^(NSNotification *note) {
-                                                      XCTAssertNotNil(note, @"Must use parameter");
-                                                      notificationsFired++;
-                                                      XCTAssertTrue(notificationsFired <= 2, @"Too many notifications recieved");
-                                                      if (notificationsFired == 2) {
-                                                          [self notify:XCTAsyncTestCaseStatusSucceeded];
-                                                      }
-                                                  }];
-    
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        [[RLMTransactionManager managerForRealmWithPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
-            RLMTable *table = [realm createTableWithName:tableName];
-            [table addColumnWithName:@"int" type:RLMTypeInt];
-        }];
-        usleep(100000);
-
-        [[RLMTransactionManager managerForRealmWithPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
-            RLMTable *table = [realm tableWithName:tableName];
-            [table addRow:@[@1]];
-        }];
-        [[RLMTransactionManager managerForRealmWithPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
-            RLMTable *table = [realm tableWithName:tableName];
-            [table addRow:@[@1]];
-        }];
-        [[RLMTransactionManager managerForRealmWithPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
-            RLMTable *table = [realm tableWithName:tableName];
-            [table addRow:@[@1]];
-        }];
-    });
-    
-    [self waitForTimeout:2.0f];
-    
-    XCTAssertEqual(notificationsFired, 2, @"Quick background notifications should be throttled");
-    
-    RLMTable *table = [realm tableWithName:tableName];
-    XCTAssertNotNil(table, @"The RLMRealm should be able to read a newly \
-                    created table after a RLMRealmDidChangeNotification was sent");
-}
-
 
 - (void)testRealmOnMainThreadDoesntThrow {
     XCTAssertNoThrow([self realmPersistedAtTestPath], @"Calling \
@@ -216,7 +156,7 @@ REALM_TABLE_1(RLMTestTable,
                  if requested from the realm");
     
     // Tables should exist after being created
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:tableName];
     }];
     
@@ -224,15 +164,6 @@ REALM_TABLE_1(RLMTestTable,
     XCTAssertTrue([realm2 hasTableWithName:tableName], @"Table 'test' should exist \
                   after being created");
     XCTAssertNotNil([realm2 tableWithName:tableName], @"Table 'test' shouldn't be nil");
-}
-
-- (void)testInitBlock {
-    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath
-                                                 initBlock:^(RLMRealm *realm) {
-                                                     [realm createTableWithName:@"table"];
-                                                 }];
-    XCTAssertTrue([realm hasTableWithName:@"table"], @"Realm created with initBlock \
-                  should have run the init block before returning the realm.");
 }
 
 @end
