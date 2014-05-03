@@ -42,6 +42,4 @@
 -(void)removeRowAtIndex:(NSUInteger)rowIndex;
 -(void)removeAllRows;
 
--(RLMQuery *)where;
-
 @end

@@ -18,12 +18,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMTable.h"
+#import <Foundation/Foundation.h>
+#import "util_noinst.hpp"
+#import <tightdb/query.hpp>
 
-@interface RLMTable (Fast)
+@class RLMTable;
 
--(RLMQuery *)where;
+tightdb::Query queryFromPredicate(RLMTable *table, id condition);
 
--(BOOL)optimize;
-
-@end
+NSException *predicate_exception(NSString *name, NSString *reason);
+NSUInteger validated_column_index(RLMTable *table, NSString *columnName);
