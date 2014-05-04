@@ -54,6 +54,7 @@ void ex_objc_table_dyn_table_sizes()
         // Create a new table dynamically
         RLMTable *table = [realm createTableWithName:@"Example"];
         
+//
         // Add two columns
         [table addColumnWithName:@"Name" type:RLMTypeString];
         [table addColumnWithName:@"Age"  type:RLMTypeInt];
