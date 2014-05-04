@@ -39,7 +39,6 @@ static NSString * const kTableName = @"table";
 @interface TableViewController ()
 
 @property (nonatomic, strong) RLMRealm *realm;
-@property (nonatomic, strong) RLMTransactionManager *manager;
 @property (nonatomic, strong) RLMTable *table;
 
 @end
@@ -74,21 +73,24 @@ static NSString * const kTableName = @"table";
 #pragma mark - Realm
 
 - (void)setupRealm {
-    self.realm = [RLMRealm defaultRealmWithInitBlock:^(RLMRealm *realm) {
-        // Create table if it doesn't exist
-        if (realm.isEmpty) {
-            [realm createTableWithName:kTableName objectClass:[DemoObject class]];
-        }
-    }];
+    // Get the realm
+    self.realm = [RLMRealm defaultRealm];
     
+    // Create table if it doesn't exist
+    if (self.realm.isEmpty) {
+        [self.realm beginWriteTransaction];
+        [self.realm createTableWithName:kTableName objectClass:[DemoObject class]];
+        [self.realm commitWriteTransaction];
+    }
+    
+    // Get the table and hold onto it
     self.table = [self.realm tableWithName:kTableName objectClass:[DemoObject class]];
     
-    self.manager = [RLMTransactionManager managerForDefaultRealm];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(realmDidChange)
-                                                 name:RLMRealmDidChangeNotification
-                                               object:nil];
+    // Register for notifications
+    __weak TableViewController *weakSelf = self;
+    [self.realm addNotification:^(NSString *note, RLMRealm *realm) {
+        [weakSelf realmDidChange];
+    }];
 }
 
 - (void)realmDidChange {
@@ -122,9 +124,9 @@ static NSString * const kTableName = @"table";
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [self.manager writeTable:kTableName usingBlock:^(RLMTable *table) {
-            [table removeRowAtIndex:indexPath.row];
-        }];
+        [self.realm beginWriteTransaction];
+        [self.table removeRowAtIndex:indexPath.row];
+        [self.realm commitWriteTransaction];
     }
 }
 
@@ -134,32 +136,30 @@ static NSString * const kTableName = @"table";
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     // Import many items in a background thread
     dispatch_async(queue, ^{
-        RLMTransactionManager *manager = [RLMTransactionManager managerForDefaultRealm];
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm beginWriteTransaction];
         for (NSInteger idx1 = 0; idx1 < 1000; idx1++) {
             // Break up the writing blocks into smaller portions
-            [manager writeUsingBlock:^(RLMRealm *realm) {
-                RLMTable *table = [realm tableWithName:kTableName objectClass:[DemoObject class]];
-                for (NSInteger idx2 = 0; idx2 < 1000; idx2++) {
-                    // Add row via dictionary. Order is ignored.
-                    [table addRow:@{@"title": [self randomString], @"date": [self randomDate]}];
-                }
-            }];
+            RLMTable *table = [realm tableWithName:kTableName objectClass:[DemoObject class]];
+            for (NSInteger idx2 = 0; idx2 < 1000; idx2++) {
+                // Add row via dictionary. Order is ignored.
+                [table addRow:@{@"title": [self randomString], @"date": [self randomDate]}];
+            }
         }
+        [realm commitWriteTransaction];
     });
 }
 
 - (void)add {
-    [self.manager writeUsingBlock:^(RLMRealm *realm) {
-        RLMTable *table = [realm tableWithName:kTableName objectClass:[DemoObject class]];
-        // Add row via array. Order matters.
-        [table addRow:@[[self randomString], [self randomDate]]];
-    }];
+    [self.realm beginWriteTransaction];
+    [self.table addRow:@[[self randomString], [self randomDate]]];
+    [self.realm commitWriteTransaction];
 }
 
 - (void)deleteAll {
-    [self.manager writeTable:kTableName usingBlock:^(RLMTable *table) {
-        [table removeAllRows];
-    }];
+    [self.realm beginWriteTransaction];
+    [self.table removeAllRows];
+    [self.realm commitWriteTransaction];
 }
 
 #pragma - Helpers
