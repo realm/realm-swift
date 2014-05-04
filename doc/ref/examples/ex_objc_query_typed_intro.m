@@ -23,7 +23,7 @@
 
 void ex_objc_query_typed_intro()
 {
-
+    
     [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
         // Creates a new table of the type defined above
         PeopleTable *table = [[PeopleTable alloc] init];
