@@ -3,7 +3,7 @@
 
 void ex_objc_table_dynamic_intro()
 {
-    [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
+    [[RLMTransactionManager managerForDefaultRealm] writeUsingBlock:^(RLMRealm *realm) {
         // Create a new table dynamically
         RLMTable *table = [realm createTableWithName:@"Example"];
         
@@ -49,7 +49,7 @@ void ex_objc_table_dynamic_intro()
 
 void ex_objc_table_dyn_table_sizes()
 {
-    [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
+    [[RLMTransactionManager managerForDefaultRealm] writeUsingBlock:^(RLMRealm *realm) {
         // @@Example: ex_objc_table_dyn_table_size @@
         // Create a new table dynamically
         RLMTable *table = [realm createTableWithName:@"Example"];
