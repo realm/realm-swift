@@ -117,6 +117,43 @@ REALM_TABLE_1(RLMTestTable,
                     created table after a RLMRealmDidChangeNotification was sent");
 }
 
+- (void)testRealmWriteImplicitCommit
+{
+    RLMRealm * realm = [self realmWithTestPath];
+    [realm beginWriteTransaction];
+    RLMTable *table = [realm createTableWithName:@"table"];
+    [table addColumnWithName:@"col0" type:RLMTypeInt];
+    [realm commitWriteTransaction];
+    
+    @autoreleasepool {
+        [realm beginWriteTransaction];
+        [table addRow:@[@10]];
+        
+        // make sure we can see the new row on the write thread
+        XCTAssertTrue([table rowCount] == 1, @"Rows were added");
+        
+        // make sure we can't see the new row in another thread
+        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+            RLMRealm *bgrealm = [self realmWithTestPath];
+            RLMTable *table = [bgrealm tableWithName:@"table"];
+            XCTAssertTrue([table rowCount] == 0, @"Don't see the new row");
+            [self notify:XCTAsyncTestCaseStatusSucceeded];
+        });
+        
+        [self waitForTimeout:1.0f];
+    }
+    
+    // make sure implicit commit took place
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        RLMRealm *bgrealm = [self realmWithTestPath];
+        RLMTable *table = [bgrealm tableWithName:@"table"];
+        XCTAssertTrue([table rowCount] == 1, @"See the new row");
+        [self notify:XCTAsyncTestCaseStatusSucceeded];
+    });
+    
+    [self waitForTimeout:1.0f];
+}
+
 - (void)testRealmOnMainThreadDoesntThrow {
     XCTAssertNoThrow([self realmPersistedAtTestPath], @"Calling \
                      +realmWithPath on the main thread shouldn't throw an exception.");

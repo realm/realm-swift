@@ -36,13 +36,43 @@ using namespace std;
 using namespace tightdb;
 using namespace tightdb::util;
 
-
+// create NSException from c++ exception
 void throw_objc_exception(exception &ex) {
     NSString *errorMessage = [NSString stringWithUTF8String:ex.what()];
     @throw [NSException exceptionWithName:@"RLMException" reason:errorMessage userInfo:nil];
 }
 
 
+// simple weak wrapper for a weak target timer
+@interface RLMWeakTarget : NSObject
+@property (nonatomic, weak) RLMRealm *realm;
+@end
+@implementation RLMWeakTarget
+- (void)checkForUpdate {
+    [_realm performSelector:@selector(refresh)];
+}
+@end
+
+
+// simple interface which calls a block the next time an autoreleasepool is purged
+@interface RLMTransactionMarker : NSObject
++ (instancetype)markerWithDestructionBlock:(void(^)())block;
+@end
+@implementation RLMTransactionMarker {
+    void (^_block)();
+}
++ (instancetype)markerWithDestructionBlock:(void(^)())block {
+    RLMTransactionMarker *marker = [RLMTransactionMarker new];
+    marker->_block = block;
+    return marker;
+}
+- (void)dealloc {
+    _block();
+}
+@end
+
+
+// functionality for caching realm instances
 static NSMutableDictionary *s_realmsPerPath;
 
 // FIXME: In the following 3 functions, we should be identifying files by the inode,device number pair
@@ -72,12 +102,6 @@ NSArray * realmsAtPath(NSString *path) {
     }
 }
 
-@interface RLMWeakTarget : NSObject
-@property (nonatomic, weak) RLMRealm *realm;
-@end
-@implementation RLMWeakTarget
-- (void)checkForUpdate { [_realm performSelector:@selector(refresh)]; }
-@end
 
 @implementation RLMRealm {
     UniquePtr<SharedGroup> _sharedGroup;
@@ -89,6 +113,7 @@ NSArray * realmsAtPath(NSString *path) {
     
     tightdb::Group *_readGroup;
     tightdb::Group *_writeGroup;
+    __weak RLMTransactionMarker *_transactionMarker;
 }
 
 + (void)initialize {
@@ -258,6 +283,13 @@ NSString *const defaultRealmFileName = @"default.realm";
                 obj.baseTable = tableRef.get();
                 obj.readOnly = NO;
             }
+            
+            // create a transaction marker that will commit this transaction at autoreleasepool purge
+            // if it is still open
+            __weak RLMRealm *weakSelf = self;
+            _transactionMarker = [RLMTransactionMarker markerWithDestructionBlock:^() {
+                [weakSelf commitWriteTransaction];
+            }];
         }
     }
     catch (std::exception& ex) {
@@ -272,6 +304,7 @@ NSString *const defaultRealmFileName = @"default.realm";
 - (void)commitWriteTransaction {
     try {
         if (_writeGroup) {
+            _transactionMarker = nil;
             _sharedGroup->commit();
             _writeGroup = NULL;
             
