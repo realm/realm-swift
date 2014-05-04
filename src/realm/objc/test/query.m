@@ -35,7 +35,7 @@ REALM_TABLE_FAST(TestQueryAllTypes)
 @implementation MACtestQuery
 
 - (void)testQuery {
-{
+    
     [self.managerWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         TestQueryAllTypes *table = [realm createTableWithName:@"table" asTableClass:TestQueryAllTypes.class];
         NSLog(@"Table: %@", table);
