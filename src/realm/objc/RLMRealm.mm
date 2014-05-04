@@ -76,7 +76,7 @@ NSArray * realmsAtPath(NSString *path) {
 @property (nonatomic, weak) RLMRealm *realm;
 @end
 @implementation RLMWeakTarget
-- (void)checkForUpdate { [_realm performSelector:@selector(checkForUpdate)]; }
+- (void)checkForUpdate { [_realm performSelector:@selector(refresh)]; }
 @end
 
 @implementation RLMRealm {
@@ -200,11 +200,11 @@ NSString *const defaultRealmFileName = @"default.realm";
     return realm;
 }
 
-- (void)addNotification:(void(^)(RLMRealm *))block {
+- (void)addNotification:(void(^)(NSString *note, RLMRealm *realm))block {
     [_notificationHandlers addObject:block];
 }
 
-- (void)removeNotification:(void(^)(RLMRealm *))block {
+- (void)removeNotification:(void(^)(NSString *note, RLMRealm *realm))block {
     [_notificationHandlers removeObject:block];
 }
 
@@ -213,8 +213,8 @@ NSString *const defaultRealmFileName = @"default.realm";
 }
 
 - (void)sendNotifications {
-    for (void(^block)(RLMRealm *) in _notificationHandlers) {
-        block(self);
+    for (void(^block)(NSString *note, RLMRealm *realm) in _notificationHandlers) {
+        block(RLMRealmDidChangeNotification, self);
     }
 }
 
@@ -316,7 +316,7 @@ NSString *const defaultRealmFileName = @"default.realm";
 }
 
 
-- (void)checkForUpdate {
+- (void)refresh {
     try {
         // no-op if writing
         if (!_readGroup) {

@@ -70,7 +70,7 @@ REALM_TABLE_1(RLMTestTable,
     __block BOOL notificationFired = NO;
     __block RLMTable *table = nil;
     RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
-    [realm addNotification:^(RLMRealm * realm) {
+    [realm addNotification:^(NSString *note, RLMRealm * realm) {
         notificationFired = YES;
         table = [realm tableWithName:tableName];
         [self notify:XCTAsyncTestCaseStatusSucceeded];
@@ -96,7 +96,7 @@ REALM_TABLE_1(RLMTestTable,
     
     RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
     __block BOOL notificationFired = NO;
-    [realm addNotification:^(RLMRealm * realm) {
+    [realm addNotification:^(NSString *note, RLMRealm * realm) {
         notificationFired = YES;
         [self notify:XCTAsyncTestCaseStatusSucceeded];
     }];

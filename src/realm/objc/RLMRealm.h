@@ -73,15 +73,68 @@
  */
 + (instancetype)realmWithPath:(NSString *)path error:(NSError **)error;
 
-- (void)addNotification:(void(^)(RLMRealm *realm))block;
-- (void)removeNotification:(void(^)(RLMRealm *realm))block;
-- (void)removeAllNotifications;
 
+/**---------------------------------------------------------------------------------------
+ *  @name Writing to a Realm
+ *  ---------------------------------------------------------------------------------------
+ */
+/**
+ Begins a write transaction in an RLMRealm. Only one write transaction can be open at a time, and calls
+ to beginWriteTransaction from RLMRealm instances in other threads will block until the open write transaction
+ is complete. A write transaction is completed with a call to commitWriteTransaction or abandonWriteTransaction, or
+ is committed automatically when the current autoreleasepool is purged.
+ 
+ In the case writes were made in other threads or processes to other instances of the same realm, the RLMRealm on which 
+ beginWriteTransaction is called and all outstanding objects obtained from this RLMRealm are updated to the latest 
+ realm version when this method is called.
+ */
 - (void)beginWriteTransaction;
+
+/**
+ Commits all writes operations in the current write transaction. After this is called the RLMRealm reverts back to being
+ read-only. This method is called automatially on RLMRealm instances with open write transactions when the current
+ autoreleasepool is purged.
+ */
 - (void)commitWriteTransaction;
+
+/**
+ Abandon all write operations in the current write transaction. After this is called the RLMRealm reverts back to being
+ read-only.
+ */
 - (void)abandonWriteTransaction;
 
+/**
+ Update an RLMRealm and oustanding objects to point to the most recent data for this RLMRealm.
+ */
+- (void)refresh;
+
+/**
+ Performs a (blocking) write transaction on the RLMRealm
+ 
+ @param block   A block containing the write code you want to perform.
+ */
 - (void)writeUsingBlock:(void(^)(RLMRealm *realm))block;
+
+/**
+ Add a notification handler for changes in this RLMRealm.
+ 
+ @param block   A block which is called to process RLMRealm notifications. RLMRealmDidChangeNotification is the 
+                only notification currently supported.
+ */
+- (void)addNotification:(void(^)(NSString *note, RLMRealm *realm))block;
+
+/**
+ Remove a previously registered notification handler.
+ 
+ @param block   The block previously passed to addNotification: to remove.
+ */
+- (void)removeNotification:(void(^)(NSString *note, RLMRealm *realm))block;
+
+/**
+ Remove all notification handlers previously passed to this realm through addNotification:
+ */
+- (void)removeAllNotifications;
+
 
 /**---------------------------------------------------------------------------------------
  *  @name Adding Tables to a Realm
