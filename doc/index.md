@@ -30,15 +30,15 @@ See the [RLMObject Protocol](Protocols/RLMObject.html) for more details.
 
 ## Writing & Reading Objects
 
-The RLMContext class is responsible for read & write transactions. You can initialize one persisting to the default file (`<Application_Home>/Documents/default.realm`) like this:
+The RLMTransactionManager class is responsible for read & write transactions. You can initialize one persisting to the default file (`<Application_Home>/Documents/default.realm`) like this:
 
-	RLMContext *context = [RLMContext contextWithDefaultPersistence];
+	RLMTransactionManager *manager = [RLMTransactionManager managerForDefaultRealm];
 
-You can use the context to extract a Realm which is a representation of all the data stored in the file. An RLMRealm contains RLMTable(s), which in turn contain your objects (RLMRow subclasses).
+You can use the transaction manager to extract a Realm which is a representation of all the data stored in the file. An RLMRealm contains RLMTable(s), which in turn contain your objects (RLMRow subclasses).
 
 This example accesses the Realm in write mode via a Context and adds a DemoObject via its properties:
 
-	[context writeUsingBlock:^(RLMRealm *realm) {
+	[manager writeUsingBlock:^(RLMRealm *realm) {
 			// Now we can create a table, reusing the class defined
 			// by the macro in the previous sample
 	        DemoTable *table = [DemoTable tableInRealm:realm named:@"mytable"];
@@ -48,17 +48,17 @@ This example accesses the Realm in write mode via a Context and adds a DemoObjec
 	                         @"date": [NSDate date]}];
 	 }];
 
-You can use a Context to perform (lock-free) read transactions as well.  
-This example accesses the Realm in read-only mode via a Context, opens a table consisting of DemoObjects and uses fast enumeration to iterate through all objects in the table and output them.
+You can use a Transaction Manager to perform (lock-free) read transactions as well.  
+This example accesses the Realm in read-only mode via a Transaction Manager, opens a table consisting of DemoObjects and uses fast enumeration to iterate through all objects in the table and output them.
 
-    [context readUsingBlock:^(RLMRealm *realm) {
+    [manager readUsingBlock:^(RLMRealm *realm) {
         DemoTable *table = [DemoTable tableInRealm:realm named:@"mytable"];
         for (RLMDemoObject *object in table) {
             NSLog(@"title: %@\ndate: %@", object.title, object.date);
         }
     }];
 
-See RLMContext, RLMRealm and RLMTable for more details.
+See RLMTransactionManager, RLMRealm and RLMTable for more details.
 
 ## Querying
 
@@ -77,15 +77,15 @@ See RLMTable for more details on possible queries.
 
 ## Transactionless Reads (main thread only!)
 
-For ease of development when accessing values on the main thread (for example for UI purposes), we allow reads to be performed without an RLMContext or transaction block, but **only when the call is made from the main thread**.
+For ease of development when accessing values on the main thread (for example for UI purposes), we allow reads to be performed without an RLMTransactionManager or transaction block, but **only when the call is made from the main thread**.
 
-	// No RLMContext needed!
+	// No RLMTransactionManager needed!
 	RLMRealm *realm = [RLMRealm realmWithDefaultPersistence];
 	DemoTable *table = [DemoTable tableInRealm:realm named:@"mytable"];
 	DemoObject *object = [DemoObject table.firstRow];
 	NSLog(object.title);
 
-Again, this only works on the main thread, and only for reads. You will still need to wrap your calls in an RLMContext with `writeUsingBlock:`
+Again, this only works on the main thread, and only for reads. You will still need to wrap your calls in an RLMTransactionManager with `writeUsingBlock:`
 to perform writes on the main thread.
 
 ## Notifications
@@ -94,8 +94,8 @@ The auto-updating Realm will send out notifications every time the underlying Re
 
 	// Observe Realm Notifications
 	[[NSNotificationCenter defaultCenter] addObserver:self
-	                                         selector:@selector(realmContextDidChange)
-	                                             name:RLMContextDidChangeNotification
+	                                         selector:@selector(realmDidChange)
+	                                             name:RLMDidChangeNotification
 	                                           object:nil];
 
 ## Background Operations
@@ -104,10 +104,10 @@ Realm can be very efficient when writing large amounts of data by batching toget
 Here's an example of inserting a million objects in a background queue:
 
 	dispatch_async(queue, ^{
-	    RLMContext *ctx = [RLMContext contextWithDefaultPersistence];
+	    RLMTransactionManager *manager = [RLMTransactionManager managerForDefaultRealm];
 	    for (NSInteger idx1 = 0; idx1 < 1000; idx1++) {
 	        // Break up the writing blocks into smaller portions
-	        [ctx writeUsingBlock:^(RLMRealm *realm) {
+	        [manager writeUsingBlock:^(RLMRealm *realm) {
 	            RLMTable *table = [realm tableWithName:@"DemoTable" objectClass:[RLMDemoObject class]];
 	            for (NSInteger idx2 = 0; idx2 < 1000; idx2++) {
 	                // Add row via dictionary. Order is ignored.

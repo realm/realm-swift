@@ -23,9 +23,9 @@
 
 void ex_objc_tableview_typed_intro()
 {
-    [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
+    [[RLMTransactionManager managerForDefaultRealm] writeUsingBlock:^(RLMRealm *realm) {
         /* Creates a new table of the type defined above. */
-        People *table = [realm createTableWithName:@"Example" asTableClass:People.class];
+        PeopleTable *table = [realm createTableWithName:@"Example" asTableClass:PeopleTable.class];
         
         /* Adds rows to the table. */
         [table addRow:@{@"Name":@"Brian",  @"Age":@10, @"Hired":@NO}];
@@ -33,10 +33,10 @@ void ex_objc_tableview_typed_intro()
         [table addRow:@{@"Name":@"Sam",    @"Age":@76, @"Hired":@NO}];
         
         /* Get the result of a query in a table view. */
-        PeopleView *view = [[[table where].Age columnIsGreaterThan:20] findAll];
+        RLMView *view = [table allWhere:@"Age > 20"];
         
         /* Iterate over the result in the table view. */
-        for (PeopleRow *row in view) {
+        for (People *row in view) {
             NSLog(@"This person is over the age of 20: %@", row.Name);
         }
     }];

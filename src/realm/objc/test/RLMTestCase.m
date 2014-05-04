@@ -9,6 +9,7 @@
 #import "RLMTestCase.h"
 
 NSString *const RLMTestRealmPath = @"test.realm";
+NSString *const RLMTestRealmPathLock = @"test.realm.lock";
 
 @implementation RLMTestCase
 
@@ -16,6 +17,7 @@ NSString *const RLMTestRealmPath = @"test.realm";
     // This method is run before every test method
     [super setUp];
     [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPathLock error:nil];
 }
 
 + (void)tearDown {
@@ -25,15 +27,15 @@ NSString *const RLMTestRealmPath = @"test.realm";
 }
 
 - (RLMRealm *)realmPersistedAtTestPath {
-    return [RLMRealm realmWithPersistenceToFile:RLMTestRealmPath];
+    return [RLMRealm realmWithPath:RLMTestRealmPath];
 }
 
-- (RLMContext *)contextPersistedAtTestPath {
-    return [RLMContext contextPersistedAtPath:RLMTestRealmPath error:nil];
+- (RLMTransactionManager *)managerWithTestPath {
+    return [RLMTransactionManager managerForRealmWithPath:RLMTestRealmPath error:nil];
 }
 
 - (void)createTestTableWithWriteBlock:(RLMTableWriteBlock)block {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         block([realm createTableWithName:@"table"]);
     }];
 }

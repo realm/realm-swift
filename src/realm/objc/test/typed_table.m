@@ -90,11 +90,23 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(InvalidTable, InvalidType)
 
 RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 
+@interface AggregateObject : RLMRow
+@property int IntCol;
+@property float FloatCol;
+@property double DoubleCol;
+@property BOOL BoolCol;
+@end
+
+@implementation AggregateObject
+@end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
+
 @implementation RLMTypedTableTests
 
 - (void)testDataTypes_Typed
 {
-    [self.contextPersistedAtTestPath writeUsingBlock:^(RLMRealm *realm) {
+    [self.managerWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         // create table and set object class
         AllTypesTable *table = [AllTypesTable tableInRealm:realm named:@"table"];
         
@@ -169,7 +181,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 
 - (void)testTableTyped_Subscripting
 {
-    [self.contextPersistedAtTestPath writeUsingBlock:^(RLMRealm *realm) {
+    [self.managerWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         AgeTable *table = [AgeTable tableInRealm:realm named:@"table"];
         
         // Add some rows
@@ -186,7 +198,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 
 - (void)testInvalids
 {
-    [[self contextPersistedAtTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // FIXME: This should throw but currently doesn't
 //        XCTAssertThrows([realm createTableWithName:@"table1"
 //                                      asTableClass:[InvalidTable class]],
@@ -203,7 +215,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 
 - (void)testTableTyped_KeyedSubscripting
 {
-    [self.contextPersistedAtTestPath writeUsingBlock:^(RLMRealm *realm) {
+    [self.managerWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         KeyedTable* table = [KeyedTable tableInRealm:realm named:@"table"];
         
         [table addRow:@{@"name" : @"Test1", @"objID" : @24}];
@@ -276,7 +288,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 }
 
 - (void)testCustomAccessors {
-    [self.contextPersistedAtTestPath writeUsingBlock:^(RLMRealm *realm) {
+    [self.managerWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm createTableWithName:@"Test" objectClass:[CustomAccessors class]];
         [table addRow:@[@"name", @2]];
         
@@ -284,6 +296,100 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
         
         [table[0] setTheInt:99];
         XCTAssertEqual([table[0] age], 99L, @"age property should be 99");
+    }];
+}
+
+- (void)testTableTyped_countWhere
+{
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        AgeTable * table = [AgeTable tableInRealm:realm named:@"table"];
+        
+        [table addRow:@[@23]];
+        [table addRow:@[@23]];
+        [table addRow:@[@22]];
+        [table addRow:@[@29]];
+        [table addRow:@[@2]];
+        [table addRow:@[@24]];
+        [table addRow:@[@21]];
+        
+        XCTAssertEqual([table countWhere:@"age == 23"], (NSUInteger)2, @"countWhere should return 3");
+        XCTAssertEqual([table countWhere:@"age >= 10"], (NSUInteger)6, @"countWhere should return 2");
+        XCTAssertEqual([table countWhere:@"age == 1"], (NSUInteger)0, @"countWhere should return 1");
+        XCTAssertEqual([table countWhere:@"age < 30"], (NSUInteger)7, @"countWhere should return 0");
+    }];
+}
+
+- (void)testTableTyped_sumOfColumn
+{
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        AggregateTable *table = [AggregateTable tableInRealm:realm named:@"Table"];
+        
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        
+        
+        // Test int sum
+        XCTAssertEqual([[table sumOfColumn:@"IntCol" where:@"BoolCol == NO"] integerValue], (NSInteger)4, @"Sum should be 4");
+        XCTAssertEqual([[table sumOfColumn:@"IntCol" where:@"BoolCol == YES"] integerValue], (NSInteger)0, @"Sum should be 0");
+        
+        // Test float sum
+        XCTAssertEqualWithAccuracy([[table sumOfColumn:@"FloatCol" where:@"BoolCol == NO"] floatValue], (float)0.0f, 0.1f, @"Sum should be 4");
+        XCTAssertEqualWithAccuracy([[table sumOfColumn:@"FloatCol" where:@"BoolCol == YES"] floatValue], (float)7.2f, 0.1f, @"Sum should be 7.2");
+        
+        // Test double sum
+        XCTAssertEqualWithAccuracy([[table sumOfColumn:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)10.0, 0.1f, @"Sum should be 10.0");
+        XCTAssertEqualWithAccuracy([[table sumOfColumn:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Sum should be 0.0");
+        
+        // Test invalid column name
+        XCTAssertThrows([table sumOfColumn:@"foo" where:@"BoolCol == YES"], @"Should throw exception");
+        
+        // Test operation not supported
+        XCTAssertThrows([table sumOfColumn:@"BoolCol" where:@"IntCol == 1"], @"Should throw exception");
+    }];
+}
+
+- (void)testTableTyped_averageOfColumn
+{
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        AggregateTable *table = [AggregateTable tableInRealm:realm named:@"Table"];
+        
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@1, @0.0f, @2.5, @NO]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        [table addRow:@[@0, @1.2f, @0.0, @YES]];
+        
+        
+        // Test int sum
+        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"IntCol" where:@"BoolCol == NO"] doubleValue], (double)1.0, 0.1f, @"Average should be 1.0");
+        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"IntCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Average should be 0.0");
+        
+        // Test float sum
+        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"FloatCol" where:@"BoolCol == NO"] doubleValue], (double)0.0f, 0.1f, @"Average should be 0.0");
+        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"FloatCol" where:@"BoolCol == YES"] doubleValue], (double)1.2f, 0.1f, @"Average should be 1.2");
+        
+        // Test double sum
+        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)2.5, 0.1f, @"Average should be 2.5");
+        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Average should be 0.0");
+        
+        // Test invalid column name
+        XCTAssertThrows([table averageOfColumn:@"foo" where:@"BoolCol == YES"], @"Should throw exception");
+        
+        // Test operation not supported
+        XCTAssertThrows([table averageOfColumn:@"BoolCol" where:@"IntCol == 1"], @"Should throw exception");
     }];
 }
 

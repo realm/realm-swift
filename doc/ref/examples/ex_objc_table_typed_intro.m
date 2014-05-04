@@ -23,9 +23,9 @@ in order to generate the implementation of the classes.
 
 void ex_objc_table_typed_intro()
 {
-    [[RLMContext contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
+    [[RLMTransactionManager managerForDefaultRealm] writeUsingBlock:^(RLMRealm *realm) {
         // Create a new table of the type defined above
-        People *table = [realm createTableWithName:@"Example" asTableClass:People.class];
+        PeopleTable *table = [realm createTableWithName:@"Example" asTableClass:PeopleTable.class];
         
         // Append three rows
         [table addRow:@{@"Name":@"Brian",  @"Age":@10,  @"Hired":@NO}];
@@ -33,23 +33,23 @@ void ex_objc_table_typed_intro()
         [table addRow:@{@"Name":@"Jesper", @"Age":@200, @"Hired":@NO}];
         NSLog(@"The size of the table is now %zd", table.rowCount);
         
-        for (PeopleRow *row in table) {
-            NSLog(@"Name: %@ Age: %lli", row.Name, row.Age);
+        for (People *row in table) {
+            NSLog(@"Name: %@ Age: %i", row.Name, row.Age);
         }
         
         NSLog(@"Insert a new row");
         [table insertRow:@{@"Name":@"Sam", @"Age":@30, @"Hired":@YES}
                  atIndex:1];
         
-        for (PeopleRow *row in table) {
-            NSLog(@"Name: %@ Age: %lli", row.Name, row.Age);
+        for (People *row in table) {
+            NSLog(@"Name: %@ Age: %i", row.Name, row.Age);
         }
         
-        PeopleRow *row2 = [table rowAtLastIndex];
+        People *row2 = [table lastRow];
         if (row2 != nil)
             NSLog(@"Last row");
         
-        PeopleRow *row3 = [table rowAtIndex:42];
+        People *row3 = [table rowAtIndex:42];
         if (row3 == nil)
             NSLog(@"Index out of range.");
     }];

@@ -8,6 +8,7 @@
 #import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
+#import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 REALM_TABLE_DEF_3(PeopleTable,
                   Name,  String,
@@ -27,6 +28,10 @@ REALM_TABLE_IMPL_2(PeopleTable2,
                    Hired, Bool,
                    Age,   Int)
 
+REALM_TABLE_FAST(PeopleTable)
+
+REALM_TABLE_FAST(PeopleTable2)
+
 @interface MACTestTutorial: RLMTestCase
 
 @end
@@ -39,9 +44,9 @@ REALM_TABLE_IMPL_2(PeopleTable2,
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    RLMContext *context = [self contextPersistedAtTestPath];
+    RLMTransactionManager *manager = [self managerWithTestPath];
     
-    [context writeUsingBlock:^(RLMRealm *realm) {
+    [manager writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
         PeopleTable *people = [realm createTableWithName:@"employees" asTableClass:[PeopleTable class]];
         
@@ -143,7 +148,7 @@ REALM_TABLE_IMPL_2(PeopleTable2,
             [people rowAtIndex:i].Age);
     }
     
-    [context writeUsingBlock:^(RLMRealm *realm) {
+    [manager writeUsingBlock:^(RLMRealm *realm) {
         PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
         [table addName:@"Anni" Age:54 Hired:YES];
         
