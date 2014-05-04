@@ -42,6 +42,8 @@
     RLMRow * m_tmp_row;
 }
 
+@dynamic baseTable;
+
 -(instancetype)initWithObjectClass:(Class)objectClass
 {
     self = [super init];
