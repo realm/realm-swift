@@ -36,6 +36,10 @@
  */
 
 @class RLMTable;
+@class RLMRealm;
+
+typedef void(^RLMWriteBlock)(RLMRealm *realm);
+typedef void(^RLMNotificationBlock)(NSString *note, RLMRealm *realm);
 
 @interface RLMRealm : NSObject
 
@@ -113,22 +117,27 @@
  
  @param block   A block containing the write code you want to perform.
  */
-- (void)writeUsingBlock:(void(^)(RLMRealm *realm))block;
+- (void)writeUsingBlock:(RLMWriteBlock)block;
 
+
+/**---------------------------------------------------------------------------------------
+ *  @name Notifications
+ *  ---------------------------------------------------------------------------------------
+ */
 /**
  Add a notification handler for changes in this RLMRealm.
  
  @param block   A block which is called to process RLMRealm notifications. RLMRealmDidChangeNotification is the 
                 only notification currently supported.
  */
-- (void)addNotification:(void(^)(NSString *note, RLMRealm *realm))block;
+- (void)addNotification:(RLMNotificationBlock)block;
 
 /**
  Remove a previously registered notification handler.
  
  @param block   The block previously passed to addNotification: to remove.
  */
-- (void)removeNotification:(void(^)(NSString *note, RLMRealm *realm))block;
+- (void)removeNotification:(RLMNotificationBlock)block;
 
 /**
  Remove all notification handlers previously passed to this realm through addNotification:
