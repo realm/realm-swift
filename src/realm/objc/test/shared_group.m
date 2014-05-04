@@ -172,7 +172,7 @@ REALM_TABLE_2(SharedTable2,
 }
 
 
-- (void)testTransactionManagerExceptions
+- (void)testRealmExceptions
 {
     RLMRealm *realm = [self realmWithTestPath];
     
@@ -191,6 +191,7 @@ REALM_TABLE_2(SharedTable2,
     XCTAssertThrows([realm createTableWithName:@"name"], @"creating table not allowed in read transaction");
     XCTAssertNil([realm tableWithName:@"weird name"], @"get table that does not exists return nil");
 }
+
 
 /*
 - (void)testPinnedTransactions
