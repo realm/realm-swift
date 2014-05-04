@@ -3,7 +3,7 @@
 
 void ex_objc_query_dynamic_intro()
 {
-    [[RLMTransactionManager contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
+    [[RLMTransactionManager managerForDefaultRealm] writeUsingBlock:^(RLMRealm *realm) {
         /* Creates a new table dynamically. */
         RLMTable *table = [realm createTableWithName:@"table"];
         [table addColumnWithName:@"Name" type:RLMTypeString];

@@ -24,12 +24,11 @@
 
 void ex_objc_realm_intro()
 {
-    // Create a realm and initialize by creating table and adding a row    
-    RLMRealm *realm = [RLMRealm realmWithDefaultPersistenceAndInitBlock:^(RLMRealm *realm) {
-                                    initBlock:^(RLMRealm *realm) {
+    // Create a realm and initialize by creating table and adding a row
+    RLMRealm *realm = [RLMRealm defaultRealmWithInitBlock:^(RLMRealm *realm) {
         if (realm.isEmpty) {
-            People *table = [realm createTableWithName:@"employees"
-                                          asTableClass:[People class]];
+            PeopleTable *table = [realm createTableWithName:@"employees"
+                                          asTableClass:[PeopleTable class]];
             [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
         }
     }];
