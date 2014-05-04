@@ -56,18 +56,16 @@ void throw_objc_exception(exception &ex) {
 
 // simple interface which calls a block the next time an autoreleasepool is purged
 @interface RLMTransactionMarker : NSObject
-+ (instancetype)markerWithDestructionBlock:(void(^)())block;
++ (instancetype)autoreleasedMarker;
+@property (nonatomic, copy) void(^destructionBlock)();
 @end
-@implementation RLMTransactionMarker {
-    void (^_block)();
-}
-+ (instancetype)markerWithDestructionBlock:(void(^)())block {
-    RLMTransactionMarker *marker = [RLMTransactionMarker new];
-    marker->_block = block;
+@implementation RLMTransactionMarker
++ (instancetype)autoreleasedMarker {
+    RLMTransactionMarker *marker = [[RLMTransactionMarker alloc] init];
     return marker;
 }
 - (void)dealloc {
-    _block();
+    _destructionBlock();
 }
 @end
 
@@ -243,67 +241,73 @@ NSString *const defaultRealmFileName = @"default.realm";
     }
 }
 
+- (BOOL)inReadTransaction {
+    return (_readGroup != NULL);
+}
+
+- (BOOL)inWriteTransaction {
+    return (_writeGroup != NULL);
+}
+
 - (void)beginReadTransaction {
-    try {
-        if (!_readGroup) {
+    if (!self.inReadTransaction && !self.inWriteTransaction) {
+        try {
             _readGroup = (tightdb::Group *)&_sharedGroup->begin_read();
             [self updateAllObjects];
         }
-    }
-    catch (exception &ex) {
-        throw_objc_exception(ex);
+        catch (exception &ex) {
+            throw_objc_exception(ex);
+        }
     }
 }
 
 - (void)endReadTransaction {
-    try {
-        if (_readGroup) {
+    if (self.inReadTransaction) {
+        try {
             _sharedGroup->end_read();
             _readGroup = NULL;
         }
-    }
-    catch (std::exception& ex) {
-        throw_objc_exception(ex);
+        catch (std::exception& ex) {
+            throw_objc_exception(ex);
+        }
     }
 }
 
 
 - (void)beginWriteTransaction {
-    try {
-        if (_readGroup) {
+    if (!self.inWriteTransaction) {
+        try {
+            // end current read
             [self endReadTransaction];
-        }
-        if (!_writeGroup) {
+            
+            // create group
             _writeGroup = &_sharedGroup->begin_write();
             
             // make all objects in this realm writable
-            for (RLMTable *obj in _objects.objectEnumerator.allObjects) {
-                NSIndexPath *path = obj.indexPath;
-                TableRef tableRef = _writeGroup->get_table([path indexAtPosition:0]); // Throws
-                obj.baseTable = tableRef.get();
-                obj.readOnly = NO;
-            }
+            [self updateAllObjects];
             
+            /*  FIXME: disabled until we have per file compile options (will get with xcodebuild)
+             
             // create a transaction marker that will commit this transaction at autoreleasepool purge
             // if it is still open
-            __weak RLMRealm *weakSelf = self;
-            _transactionMarker = [RLMTransactionMarker markerWithDestructionBlock:^() {
-                [weakSelf commitWriteTransaction];
-            }];
+            RLMTransactionMarker *marker = [RLMTransactionMarker autoreleasedMarker];
+            marker.destructionBlock = ^() {
+                [self commitWriteTransaction];
+            };
+            _transactionMarker = marker;*/
         }
-    }
-    catch (std::exception& ex) {
-        // File access errors are treated as exceptions here since they should not occur after the shared
-        // group has already been successfully opened on the file and memory mapped. The shared group constructor handles
-        // the excepted error related to file access.
-        throw_objc_exception(ex);
-
+        catch (std::exception& ex) {
+            // File access errors are treated as exceptions here since they should not occur after the shared
+            // group has already been successfully opened on the file and memory mapped. The shared group constructor handles
+            // the excepted error related to file access.
+            throw_objc_exception(ex);
+        }
     }
 }
 
 - (void)commitWriteTransaction {
-    try {
-        if (_writeGroup) {
+    if (self.inWriteTransaction) {
+        try {
             _transactionMarker = nil;
             _sharedGroup->commit();
             _writeGroup = NULL;
@@ -313,23 +317,23 @@ NSString *const defaultRealmFileName = @"default.realm";
             // send notification that we changed the realm
             [self sendNotifications];
         }
-    }
-    catch (std::exception& ex) {
-        throw_objc_exception(ex);
+        catch (std::exception& ex) {
+            throw_objc_exception(ex);
+        }
     }
 }
 
 - (void)abandonWriteTransaction {
-    try {
-        if (_writeGroup) {
+    if (self.inWriteTransaction) {
+        try {
             _sharedGroup->rollback();
             _writeGroup = NULL;
             
             [self beginReadTransaction];
         }
-    }
-    catch (std::exception& ex) {
-        throw_objc_exception(ex);
+        catch (std::exception& ex) {
+            throw_objc_exception(ex);
+        }
     }
 }
 
@@ -373,19 +377,25 @@ NSString *const defaultRealmFileName = @"default.realm";
 
 - (void)updateAllObjects {
     try {
+        // get the group
+        tightdb::Group *group = self.group;
+        BOOL readOnly = self.inReadTransaction;
+
         // refresh all outstanding objects
         for (RLMTable *obj in _objects.objectEnumerator.allObjects) {
             NSIndexPath *path = obj.indexPath;
-            ConstTableRef tableRef = _readGroup->get_table([path indexAtPosition:0]); // Throws
-            // Note: Const spoofing is alright, because the
-            // Objective-C table accessor is in 'read-only' mode.
-            obj.baseTable = const_cast<Table*>(tableRef.get());
-            [obj setReadOnly:YES];
+            TableRef tableRef = group->get_table([path indexAtPosition:0]); // Throws
+            [obj setNativeTable:tableRef.get()];
+            [obj setReadOnly:readOnly];
         }
     }
     catch (exception &ex) {
         throw_objc_exception(ex);
     }
+}
+
+- (tightdb::Group *)group {
+    return _writeGroup ? _writeGroup : _readGroup;
 }
 
 - (RLMTable *)tableWithName:(NSString *)name
@@ -400,24 +410,21 @@ NSString *const defaultRealmFileName = @"default.realm";
                                      userInfo:nil];
     }
     
-    tightdb::Group * group = _writeGroup ? _writeGroup : _readGroup;
     ObjcStringAccessor nameRef(name);
-    if (!group->has_table(nameRef)) {
+    if (!self.group->has_table(nameRef)) {
         return nil;
     }
     RLMTable *table = [[RLMTable alloc] _initRaw];
     try {
-        ConstTableRef tableRef = group->get_table(nameRef); // Throws
-        // Note: Const spoofing is alright, because the
-        // Objective-C table accessor is in 'read-only' mode.
-        [table setNativeTable:const_cast<Table*>(tableRef.get())];
+        TableRef tableRef = self.group->get_table(nameRef); // Throws
+        [table setNativeTable:tableRef.get()];
         table.indexPath = [NSIndexPath indexPathWithIndex:tableRef->get_index_in_parent()];
     }
     catch (exception &ex) {
         throw_objc_exception(ex);
     }
     [table setParent:self];
-    [table setReadOnly:!_writeGroup];
+    [table setReadOnly:self.inReadTransaction];
     
     // add to objects map
     [_objects setObject:table forKey:table];
@@ -437,8 +444,7 @@ NSString *const defaultRealmFileName = @"default.realm";
 
 -(NSUInteger)tableCount // Overrides the property getter
 {
-    tightdb::Group * group = _writeGroup ? _writeGroup : _readGroup;
-    return group->size();
+    return self.group->size();
 }
 
 -(BOOL)isEmpty // Overrides the property getter
@@ -448,31 +454,26 @@ NSString *const defaultRealmFileName = @"default.realm";
 
 -(BOOL)hasTableWithName:(NSString*)name
 {
-    tightdb::Group * group = _writeGroup ? _writeGroup : _readGroup;
-    return group->has_table(ObjcStringAccessor(name));
+    return self.group->has_table(ObjcStringAccessor(name));
 }
 
 - (id)tableWithName:(NSString *)name asTableClass:(__unsafe_unretained Class)class_obj
 {
     ObjcStringAccessor nameRef(name);
-    tightdb::Group * group = _writeGroup ? _writeGroup : _readGroup;
-    if (!group->has_table(nameRef)) {
+    if (!self.group->has_table(nameRef)) {
         return nil;
     }
     RLMTable *table = [[class_obj alloc] _initRaw];
     try {
-        tightdb::Group * group = _writeGroup ? _writeGroup : _readGroup;
-        ConstTableRef tableRef = group->get_table(nameRef); // Throws
-        // Note: Const spoofing is alright, because the
-        // Objective-C table accessor is in 'read-only' mode.
-        [table setNativeTable:const_cast<Table*>(tableRef.get())];
+        TableRef tableRef = self.group->get_table(nameRef); // Throws
+        [table setNativeTable:tableRef.get()];
         table.indexPath = [NSIndexPath indexPathWithIndex:tableRef->get_index_in_parent()];
     }
     catch (exception &ex) {
         throw_objc_exception(ex);
     }
     [table setParent:self];
-    [table setReadOnly:!_writeGroup];
+    [table setReadOnly:self.inReadTransaction];
     [_objects setObject:table forKey:table];
 
     return table;
@@ -480,8 +481,7 @@ NSString *const defaultRealmFileName = @"default.realm";
 
 -(BOOL)hasTableWithName:(NSString *)name withTableClass:(__unsafe_unretained Class)class_obj
 {
-    tightdb::Group * group = _writeGroup ? _writeGroup : _readGroup;
-    if (!group->has_table(ObjcStringAccessor(name))) {
+    if (!self.group->has_table(ObjcStringAccessor(name))) {
         return NO;
     }
     RLMTable *table = [self tableWithName:name asTableClass:class_obj];
@@ -496,7 +496,7 @@ NSString *const defaultRealmFileName = @"default.realm";
                                      userInfo:nil];
     }
     
-    if (!_writeGroup) {
+    if (!self.inWriteTransaction) {
         @throw [NSException exceptionWithName:@"realm:core_read_only_exception"
                                        reason:@"Realm is read-only."
                                      userInfo:nil];
@@ -511,9 +511,8 @@ NSString *const defaultRealmFileName = @"default.realm";
     RLMTable * table = [[RLMTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
-    tightdb::Group * group = _writeGroup ? _writeGroup : _readGroup;
     REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
-                                           tightdb::TableRef tableRef = group->get_table(ObjcStringAccessor(name));
+                                           tightdb::TableRef tableRef = self.group->get_table(ObjcStringAccessor(name));
                                            [table setNativeTable:tableRef.get()];
                                            )
     [table setParent:self];
@@ -557,7 +556,7 @@ NSString *const defaultRealmFileName = @"default.realm";
                                      userInfo:nil];
     }
     
-    if (!_writeGroup) {
+    if (!self.inWriteTransaction) {
         @throw [NSException exceptionWithName:@"realm:core_read_only_exception"
                                        reason:@"Realm is read-only."
                                      userInfo:nil];
@@ -573,12 +572,11 @@ NSString *const defaultRealmFileName = @"default.realm";
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
     bool was_created;
-    tightdb::Group * group = _writeGroup ? _writeGroup : _readGroup;
     REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
-                                           tightdb::TableRef tableRef = group->get_table(ObjcStringAccessor(name), was_created);
+                                           tightdb::TableRef tableRef = self.group->get_table(ObjcStringAccessor(name), was_created);
                                            [table setNativeTable:tableRef.get()];)
     [table setParent:self];
-    [table setReadOnly:!_writeGroup];
+    [table setReadOnly:self.inReadTransaction];
     
     if (was_created) {
         if (![table _addColumns])
@@ -597,8 +595,7 @@ NSString *const defaultRealmFileName = @"default.realm";
 
 -(NSString*)nameOfTableWithIndex:(NSUInteger)table_ndx
 {
-    tightdb::Group * group = _writeGroup ? _writeGroup : _readGroup;
-    return to_objc_string(group->get_table_name(table_ndx));
+    return to_objc_string(self.group->get_table_name(table_ndx));
 }
 
 @end

@@ -6,6 +6,5 @@
 @interface RLMTable ()
 
 @property (nonatomic) NSIndexPath *indexPath;
-@property (nonatomic) tightdb::Table *baseTable;
 
 @end
