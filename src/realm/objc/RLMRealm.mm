@@ -200,11 +200,11 @@ NSString *const defaultRealmFileName = @"default.realm";
     return realm;
 }
 
-- (void)addNotification:(void(^)(NSString *note, RLMRealm *realm))block {
+- (void)addNotification:(RLMNotificationBlock)block {
     [_notificationHandlers addObject:block];
 }
 
-- (void)removeNotification:(void(^)(NSString *note, RLMRealm *realm))block {
+- (void)removeNotification:(RLMNotificationBlock)block {
     [_notificationHandlers removeObject:block];
 }
 
@@ -300,7 +300,7 @@ NSString *const defaultRealmFileName = @"default.realm";
     }
 }
 
-- (void)writeUsingBlock:(void(^)(RLMRealm *realm))block {
+- (void)writeUsingBlock:(RLMWriteBlock)block {
     [self beginWriteTransaction];
     block(self);
     [self commitWriteTransaction];
