@@ -5,7 +5,7 @@ void ex_objc_query_dynamic_intro()
 {
     [[RLMTransactionManager contextWithDefaultPersistence] writeUsingBlock:^(RLMRealm *realm) {
         /* Creates a new table dynamically. */
-        RLMTable *table = [[RLMTable alloc] init];
+        RLMTable *table = [realm tableWithName:@"table"];
         [table addColumnWithName:@"Name" type:RLMTypeString];
         [table addColumnWithName:@"Age" type:RLMTypeInt];
         [table addColumnWithName:@"Hired" type:RLMTypeBool];
@@ -21,7 +21,7 @@ void ex_objc_query_dynamic_intro()
         
         /* Iterate over query result */
         for (RLMRow *row in view) {
-            NSLog(@"name: %@",row[@"Name"]);
+            NSLog(@"name: %@", row[@"Name"]);
         }
     }];
 }
