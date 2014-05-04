@@ -42,8 +42,6 @@
     RLMRow * m_tmp_row;
 }
 
-@dynamic baseTable;
-
 -(instancetype)initWithObjectClass:(Class)objectClass
 {
     self = [super init];
@@ -153,10 +151,6 @@
 -(tightdb::Table&)getNativeTable
 {
     return *m_table;
-}
-
--(void)setBaseTable:(tightdb::Table *)baseTable {
-    [self setNativeTable:baseTable];
 }
 
 -(void)setNativeTable:(tightdb::Table*)table

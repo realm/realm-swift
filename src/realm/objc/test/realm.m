@@ -120,6 +120,7 @@ REALM_TABLE_1(RLMTestTable,
                     created table after a RLMRealmDidChangeNotification was sent");
 }
 
+/* FIXME: disabled until we have per file compile options
 - (void)testRealmWriteImplicitCommit
 {
     RLMRealm * realm = [self realmWithTestPath];
@@ -156,6 +157,7 @@ REALM_TABLE_1(RLMTestTable,
     
     [self waitForTimeout:1.0f];
 }
+ */
 
 - (void)testRealmOnMainThreadDoesntThrow {
     XCTAssertNoThrow([self realmPersistedAtTestPath], @"Calling \
