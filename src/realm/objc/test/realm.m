@@ -71,6 +71,7 @@ REALM_TABLE_1(RLMTestTable,
     __block RLMTable *table = nil;
     RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
     [realm addNotification:^(NSString *note, RLMRealm * realm) {
+        XCTAssertEqualObjects(note, RLMRealmDidChangeNotification, @"Notification type");
         notificationFired = YES;
         table = [realm tableWithName:tableName];
         [self notify:XCTAsyncTestCaseStatusSucceeded];
@@ -97,6 +98,8 @@ REALM_TABLE_1(RLMTestTable,
     RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
     __block BOOL notificationFired = NO;
     [realm addNotification:^(NSString *note, RLMRealm * realm) {
+        XCTAssertNotNil(realm, @"Realm should not be nil");
+        XCTAssertEqualObjects(note, RLMRealmDidChangeNotification, @"Notification type");
         notificationFired = YES;
         [self notify:XCTAsyncTestCaseStatusSucceeded];
     }];
