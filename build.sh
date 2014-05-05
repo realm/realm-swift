@@ -387,6 +387,7 @@ EOF
         ;;
 
     "ci-clean")
+        # DO NOT USE THIS TARGET! IT WILL RESET YOUR WORKAREA IN A NON REVERSIBLE WAY!
         git reset --hard HEAD
         git clean -xfd
         (
@@ -398,6 +399,10 @@ EOF
         ;;
 
     "ci-test")
+        if [ "$(id -u)" != "0" ]; then
+           echo "This target must be run as root or with sudo" 1>&2
+           exit 1
+        fi
         mkdir -p test-reports
         (
             cd ../tightdb
