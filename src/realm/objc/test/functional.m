@@ -33,6 +33,8 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMPersonTable, RLMPerson);
 - (void)testTypedRow {
     
     [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        // Row in a table.
+        
         RLMPersonTable *table = [RLMPersonTable tableInRealm:realm named:@"table"];
         
         // Add rows
@@ -99,9 +101,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMPersonTable, RLMPerson);
         // TODO: InsertRowAtIndex.. out-of-bounds check (depends on error handling strategy)
         // TODO: RowAtIndex.. out-of-bounds check (depends onerror handling strategy
         
-        /*
-         *  Row in a view.
-         */
+        // Row in a query.
         
         RLMView *view = [table allWhere:nil];
         XCTAssertEqual(view.rowCount, (NSUInteger)(TABLE_SIZE-2), @"Check the size");
@@ -139,9 +139,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMPersonTable, RLMPerson);
 
 - (void)testDynamicRow {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
-        /*
-         *  Row in a table.
-         */
+        // Row in a table.
         
         NSUInteger const NAME = [table addColumnWithName:@"name" type:RLMTypeString];
         NSUInteger const AGE = [table addColumnWithName:@"age" type:RLMTypeInt];
@@ -212,9 +210,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMPersonTable, RLMPerson);
         // TODO: InsertRowAtIndex.. out-of-bounds check (depends on error handling strategy)
         // TODO: RowAtIndex.. out-of-bounds check (depends onerror handling strategy
         
-        /*
-         *  Row in a query.
-         */
+        // Row in a query.
         
         RLMQuery *query = [[table where] stringIsNotEqualTo:@"Nothing is equal to this" inColumnWithIndex:NAME ];  // dummy query required right now
         XCTAssertEqual([query countRows], (NSUInteger)(TABLE_SIZE-2), @"Check the size");
@@ -228,9 +224,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMPersonTable, RLMPerson);
             i++;
         }
         
-        /*
-         *  Row in table view.
-         */
+        // Row in table view.
         
         RLMView *view = [[query boolIsEqualTo:YES inColumnWithIndex:HIRED] findAllRows];
         XCTAssertEqual([query countRows], (NSUInteger)(TABLE_SIZE-2)/2, @"Check the size");

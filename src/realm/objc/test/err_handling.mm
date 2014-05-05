@@ -125,15 +125,15 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryAllTable, TestQueryAllObject);
 
     NSLog(@"Disktable size: %zu", [diskTable rowCount]);
 
-    /* No longer support for errors here
-    error = nil;
-    if (![diskTable addName:@"Anni" Age:54 Hired:YES error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-    } else {
-        XCTFail(@"addName to readonly should have failed.");
-    }*/
-
-    NSLog(@"Disktable size: %zu", [diskTable rowCount]);
+//    No longer support for errors here
+//    error = nil;
+//    if (![diskTable addName:@"Anni" Age:54 Hired:YES error:&error]) {
+//        NSLog(@"%@", [error localizedDescription]);
+//    } else {
+//        XCTFail(@"addName to readonly should have failed.");
+//    }
+//
+//    NSLog(@"Disktable size: %zu", [diskTable rowCount]);
 }
 
 - (void)testErrorInsert {
