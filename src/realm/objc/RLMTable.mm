@@ -41,52 +41,11 @@
     RLMRow * m_tmp_row;
 }
 
--(instancetype)initWithObjectClass:(Class)objectClass
+- (instancetype)init
 {
-    self = [super init];
-    if (self) {
-        m_read_only = NO;
-        m_table = tightdb::Table::create(); // FIXME: May throw
-        [self setObjectClass:objectClass];
-    }
-    return self;
-}
-
-
--(instancetype)init
-{
-    self = [super init];
-    if (self) {
-        m_read_only = NO;
-        m_table = tightdb::Table::create(); // FIXME: May throw
-        _objectClass = RLMRow.class;
-        _proxyObjectClass = RLMRow.class;
-    }
-    return self;
-}
-
--(instancetype)initWithColumns:(NSArray *)columns
-{
-    self = [super init];
-    if (!self)
-        return nil;
-
-    m_read_only = NO;
-    m_table = tightdb::Table::create(); // FIXME: May throw
-    _objectClass = RLMRow.class;
-    _proxyObjectClass = RLMRow.class;
-    
-    if (!set_columns(m_table, columns)) {
-        m_table.reset();
-
-        // Parsing the schema failed
-        //TODO: More detailed error msg in exception
-        @throw [NSException exceptionWithName:@"realm:invalid_columns"
-                                                         reason:@"The supplied list of columns was invalid"
-                                                       userInfo:nil];
-    }
-
-    return self;
+    @throw [NSException exceptionWithName:@"realm:invalid_init"
+                                   reason:@"Tables can only be created from RLMRealm objects"
+                                 userInfo:nil];
 }
 
 -(id)_initRaw

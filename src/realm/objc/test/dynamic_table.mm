@@ -1400,6 +1400,11 @@ using namespace std;
     }];
 }
 
+-(void)testTableDynamic_init_exception
+{
+    XCTAssertThrows(([[RLMTable alloc] init]), @"Initializing table outside of context should throw exception");
+}
+
 - (void)testTableDynamic_countWhere
 {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
