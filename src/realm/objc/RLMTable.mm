@@ -30,7 +30,6 @@
 #import "NSData+RLMGetBinaryData.h"
 #import "RLMRealm_noinst.h"
 #import "RLMPrivate.h"
-#import "RLMPrivate.hpp"
 #import "util_noinst.hpp"
 #import "query_util.h"
 
