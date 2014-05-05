@@ -230,13 +230,6 @@ NSString *const defaultRealmFileName = @"default.realm";
 }
 
 - (void)sendNotifications {
-    // notify other realm istances
-    for (RLMRealm *realm in realmsAtPath(_path)) {
-        if (![realm isEqual:self]) {
-            [realm->_runLoop performSelector:@selector(refresh) target:realm argument:nil order:0 modes:@[NSRunLoopCommonModes]];
-        }
-    }
-    
     // call this realms notification blocks
     for (RLMNotificationBlock block in _notificationHandlers) {
         block(RLMRealmDidChangeNotification, self);
@@ -283,6 +276,11 @@ NSString *const defaultRealmFileName = @"default.realm";
 - (void)beginWriteTransaction {
     if (self.transactionMode != RLMTransactionModeWrite) {
         try {
+            // if we are moving the transaction forward, send local notifications
+            if (_sharedGroup->has_changed()) {
+                [self sendNotifications];
+            }
+            
             // end current read
             [self endReadTransaction];
             
@@ -308,8 +306,15 @@ NSString *const defaultRealmFileName = @"default.realm";
             _writeGroup = NULL;
             
             [self beginReadTransaction];
+
+            // notify other realm istances of changes
+            for (RLMRealm *realm in realmsAtPath(_path)) {
+                if (![realm isEqual:self]) {
+                    [realm->_runLoop performSelector:@selector(refresh) target:realm argument:nil order:0 modes:@[NSRunLoopCommonModes]];
+                }
+            }
             
-            // send notification that we changed the realm
+            // send local notification
             [self sendNotifications];
         }
         catch (std::exception& ex) {
