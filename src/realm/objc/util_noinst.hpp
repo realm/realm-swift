@@ -103,7 +103,7 @@ inline NSObject* to_objc_object(tightdb::Mixed m)
             return [NSData dataWithBytes:bd.data() length:bd.size()];
         }
         case tightdb::type_Mixed:
-            TIGHTDB_ASSERT(false); /* we should never get here */
+            TIGHTDB_ASSERT(false); // we should never get here
         case tightdb::type_Table:
             TIGHTDB_ASSERT(false);
     }
@@ -121,9 +121,9 @@ inline NSUInteger was_not_found(size_t n)
 inline bool nsnumber_is_like_bool(NSObject *obj)
 {
     const char* data_type = [(NSNumber *)obj objCType];
-    /* @encode(BOOL) is 'B' on iOS 64 and 'c'
-     objcType is always 'c'. Therefore compare to "c".
-     */
+    // @encode(BOOL) is 'B' on iOS 64 and 'c'
+    // objcType is always 'c'. Therefore compare to "c".
+    
     return data_type[0] == 'c';
 }
 
