@@ -1,5 +1,5 @@
-/*.o
-/*.d
+/*.o*
+/*.d*
 /*.libdeps
 
 # Coverage data
