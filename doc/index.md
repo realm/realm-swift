@@ -34,7 +34,7 @@ The RLMRealm class is responsible for reading and writing data. You can initiali
 
 	RLMRealm *realm = [RLMRealm defaultRealm];
 
-Or which persists to a file at a provided path:
+or which persists to a file at a provided path:
 
 	RLMRealm *realm = [RLMRealm realmWithPath:filePath];
 
@@ -45,7 +45,7 @@ An RLMRealm instance contains RLMTable(s), which in turn contain your objects (R
 	DemoObject *object = [DemoObject table.firstRow];
 	NSLog(object.title);
 
-To can write data in Realm using write transactions. You begin and end a write transaction as follows:
+You can write data in Realm using write transactions. You begin and end a write transaction as follows:
 	        
     // Get the default Realm and get or create a new table
     RLMRealm *realm = [RLMRealm defaultRealm];
