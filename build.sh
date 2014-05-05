@@ -386,6 +386,43 @@ EOF
         exit 0
         ;;
 
+    "ci-clean")
+        git reset --hard HEAD
+        git clean -xfd
+        (
+            cd ../tightdb
+            git reset --hard HEAD
+            git clean -xfd
+        )
+        exit 0
+        ;;
+
+    "ci-test")
+        mkdir -p test-reports
+        (
+            mkdir -p install
+            sh build.sh config install
+            sh build.sh build-iphone
+            sh build.sh build
+            sh build.sh install
+        )
+        export TIGHTDB_CONFIG=../tightdb/install/bin/tightdb-config
+        sh build.sh config
+        sh build.sh build
+        sh build.sh build-iphone
+        sh build.sh ios-framework
+        sh build.sh test-debug
+        (
+            cd $doc/ref/RefDocExamples
+            xctool -scheme RefDocExamples -project RefDocExamples.xcodeproj clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+        )
+        (
+            cd examples/RealmTableViewExample
+            xctool -project RealmTableViewExample.xcodeproj -scheme RealmTableViewExample clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+        )
+        exit 0;
+        ;;
+
     "build")
         auto_configure || exit 1
 # FIXME: Our language binding requires that Objective-C ARC is enabled, which, in turn, is only available on a 64-bit architecture, so for now we cannot build a "fat" version.
