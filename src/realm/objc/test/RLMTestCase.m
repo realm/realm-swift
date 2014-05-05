@@ -9,6 +9,7 @@
 #import "RLMTestCase.h"
 
 NSString *const RLMTestRealmPath = @"test.realm";
+NSString *const RLMTestRealmPathLock = @"test.realm.lock";
 
 @implementation RLMTestCase
 
@@ -16,6 +17,7 @@ NSString *const RLMTestRealmPath = @"test.realm";
     // This method is run before every test method
     [super setUp];
     [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPathLock error:nil];
 }
 
 + (void)tearDown {

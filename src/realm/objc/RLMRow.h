@@ -132,7 +132,6 @@ STATIC_ASSERT(__INCLUDE_LEVEL__ == 0, RLM_IMPLEMENT_TABLE_used_in_header_file_fo
         return (TType *)[rlm tableWithName:name objectClass:OType.class];       \
     return (TType *)[rlm createTableWithName:name objectClass:OType.class];}    \
 +(Class)objectClass { return OType.class; }                                     \
--(instancetype)init { return [super initWithObjectClass:OType.class]; }         \
 @end
 
 #define RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)    \
