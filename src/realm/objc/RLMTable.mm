@@ -33,6 +33,20 @@
 #import "util_noinst.hpp"
 #import "query_util.h"
 
+// This macro generates an NSPredicate from either an an NSString with optional format va_list
+#define RLM_PREDICATE(INPREDICATE, OUTPREDICATE)           \
+if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
+    OUTPREDICATE = INPREDICATE;                            \
+} else if ([INPREDICATE isKindOfClass:[NSString class]]) { \
+    va_list args;                                          \
+    va_start(args, INPREDICATE);                           \
+    OUTPREDICATE = [NSPredicate predicateWithFormat:INPREDICATE arguments:args]; \
+    va_end(args);                                          \
+} else if (INPREDICATE) {                                  \
+    @throw predicate_exception(@"Invalid value",           \
+                               @"predicate must be either an NSPredicate or an NSString with optional format va_list"); \
+}                                                          \
+
 @implementation RLMTable
 {
     tightdb::TableRef m_table;
@@ -1066,17 +1080,7 @@
 -(id)firstWhere:(id)predicate, ...
 {
     NSPredicate *finalPredicate = nil;
-    if ([predicate isKindOfClass:[NSPredicate class]]) {
-        finalPredicate = predicate;
-    } else if ([predicate isKindOfClass:[NSString class]]) {
-        va_list args;
-        va_start(args, predicate);
-        finalPredicate = [NSPredicate predicateWithFormat:predicate arguments:args];
-        va_end(args);
-    } else if (predicate) {
-        @throw predicate_exception(@"Invalid value",
-                                   @"firstWhere: can only accept an NSPredicate or an NSString with optional format va_list");
-    }
+    RLM_PREDICATE(predicate, finalPredicate);
     
     tightdb::Query query = queryFromPredicate(self, finalPredicate);
     
@@ -1091,17 +1095,7 @@
 -(RLMView *)allWhere:(id)predicate, ...
 {
     NSPredicate *finalPredicate = nil;
-    if ([predicate isKindOfClass:[NSPredicate class]]) {
-        finalPredicate = predicate;
-    } else if ([predicate isKindOfClass:[NSString class]]) {
-        va_list args;
-        va_start(args, predicate);
-        finalPredicate = [NSPredicate predicateWithFormat:predicate arguments:args];
-        va_end(args);
-    } else if (predicate) {
-        @throw predicate_exception(@"Invalid value",
-                                   @"allWhere: can only accept an NSPredicate or an NSString with optional format va_list");
-    }
+    RLM_PREDICATE(predicate, finalPredicate);
     
     tightdb::Query query = queryFromPredicate(self, finalPredicate);
 
@@ -1154,17 +1148,7 @@
 -(NSUInteger)countWhere:(id)predicate, ...
 {
     NSPredicate *finalPredicate = nil;
-    if ([predicate isKindOfClass:[NSPredicate class]]) {
-        finalPredicate = predicate;
-    } else if ([predicate isKindOfClass:[NSString class]]) {
-        va_list args;
-        va_start(args, predicate);
-        finalPredicate = [NSPredicate predicateWithFormat:predicate arguments:args];
-        va_end(args);
-    } else if (predicate) {
-        @throw predicate_exception(@"Invalid value",
-                                   @"countWhere: can only accept an NSPredicate or an NSString with optional format va_list");
-    }
+    RLM_PREDICATE(predicate, finalPredicate);
     
     tightdb::Query query = queryFromPredicate(self, finalPredicate);
     
@@ -1176,17 +1160,7 @@
 -(NSNumber *)sumOfProperty:(NSString *)property where:(id)predicate, ...
 {
     NSPredicate *finalPredicate = nil;
-    if ([predicate isKindOfClass:[NSPredicate class]]) {
-        finalPredicate = predicate;
-    } else if ([predicate isKindOfClass:[NSString class]]) {
-        va_list args;
-        va_start(args, predicate);
-        finalPredicate = [NSPredicate predicateWithFormat:predicate arguments:args];
-        va_end(args);
-    } else if (predicate) {
-        @throw predicate_exception(@"Invalid value",
-                                   @"sumOfProperty:where: can only accept an NSPredicate or an NSString with optional format va_list");
-    }
+    RLM_PREDICATE(predicate, finalPredicate);
     
     tightdb::Query query = queryFromPredicate(self, finalPredicate);
     
@@ -1221,17 +1195,7 @@
 -(NSNumber *)averageOfProperty:(NSString *)property where:(id)predicate, ...
 {
     NSPredicate *finalPredicate = nil;
-    if ([predicate isKindOfClass:[NSPredicate class]]) {
-        finalPredicate = predicate;
-    } else if ([predicate isKindOfClass:[NSString class]]) {
-        va_list args;
-        va_start(args, predicate);
-        finalPredicate = [NSPredicate predicateWithFormat:predicate arguments:args];
-        va_end(args);
-    } else if (predicate) {
-        @throw predicate_exception(@"Invalid value",
-                                   @"averageOfProperty:where: can only accept an NSPredicate or an NSString with optional format va_list");
-    }
+    RLM_PREDICATE(predicate, finalPredicate);
     
     tightdb::Query query = queryFromPredicate(self, finalPredicate);
     
@@ -1266,17 +1230,7 @@
 -(id)minOfProperty:(NSString *)property where:(id)predicate, ...
 {
     NSPredicate *finalPredicate = nil;
-    if ([predicate isKindOfClass:[NSPredicate class]]) {
-        finalPredicate = predicate;
-    } else if ([predicate isKindOfClass:[NSString class]]) {
-        va_list args;
-        va_start(args, predicate);
-        finalPredicate = [NSPredicate predicateWithFormat:predicate arguments:args];
-        va_end(args);
-    } else if (predicate) {
-        @throw predicate_exception(@"Invalid value",
-                                   @"minOfProperty:where: can only accept an NSPredicate or an NSString with optional format va_list");
-    }
+    RLM_PREDICATE(predicate, finalPredicate);
     
     tightdb::Query query = queryFromPredicate(self, finalPredicate);
     
@@ -1316,17 +1270,7 @@
 -(id)maxOfProperty:(NSString *)property where:(id)predicate, ...
 {
     NSPredicate *finalPredicate = nil;
-    if ([predicate isKindOfClass:[NSPredicate class]]) {
-        finalPredicate = predicate;
-    } else if ([predicate isKindOfClass:[NSString class]]) {
-        va_list args;
-        va_start(args, predicate);
-        finalPredicate = [NSPredicate predicateWithFormat:predicate arguments:args];
-        va_end(args);
-    } else if (predicate) {
-        @throw predicate_exception(@"Invalid value",
-                                   @"maxOfProperty:where: can only accept an NSPredicate or an NSString with optional format va_list");
-    }
+    RLM_PREDICATE(predicate, finalPredicate);
     
     tightdb::Query query = queryFromPredicate(self, finalPredicate);
     
