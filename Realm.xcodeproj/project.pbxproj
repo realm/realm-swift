@@ -28,8 +28,8 @@
 		42AD3A9918CDBDFF00C86073 /* RLMVersion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 42AD3A9518CDBDFF00C86073 /* RLMVersion.mm */; };
 		42AD3A9A18CDBDFF00C86073 /* RLMVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = 42AD3A9618CDBDFF00C86073 /* RLMVersion.h */; };
 		4B7ACCD918FDD96F008B7B95 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */; };
-		4BB05A7B19083A7E00F7F5F9 /* dynamic_table.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */; };
 		4BB05A7A19079E2700F7F5F9 /* RLMTableFast.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BB05A7919079E2700F7F5F9 /* RLMTableFast.h */; };
+		4BB05A7B19083A7E00F7F5F9 /* dynamic_table.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */; };
 		4D01A9FC18C9F5E600527AD5 /* table_view.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9FB18C9F5E600527AD5 /* table_view.m */; };
 		4D01A9FE18C9F60F00527AD5 /* version.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D01A9FD18C9F60F00527AD5 /* version.m */; };
 		4D143CCF18F69D0F00CEFF65 /* RLMQueryFast.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D143CCE18F69D0F00CEFF65 /* RLMQueryFast.h */; };
@@ -45,7 +45,7 @@
 		E82D503A1900C128003C1B8E /* realm.m in Sources */ = {isa = PBXBuildFile; fileRef = E82D50391900C128003C1B8E /* realm.m */; };
 		E87675D01907841C00F58CDB /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = E87675CD1907841C00F58CDB /* RLMTestCase.m */; };
 		E87675D11907841C00F58CDB /* XCTestCase+AsyncTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = E87675CF1907841C00F58CDB /* XCTestCase+AsyncTesting.m */; };
-		E87784EF1908E71900A99CB8 /* dynamic_table.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */; };
+		E87784EF1908E71900A99CB8 /* PBXBuildFile */ = {isa = PBXBuildFile; fileRef = 4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */; };
 		E8F4C11F191418CD00116AAE /* query_util.h in Headers */ = {isa = PBXBuildFile; fileRef = E8F4C11E191418CD00116AAE /* query_util.h */; };
 		E8F4C121191418D300116AAE /* query_util.mm in Sources */ = {isa = PBXBuildFile; fileRef = E8F4C120191418D300116AAE /* query_util.mm */; };
 		E918909D177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
