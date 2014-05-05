@@ -61,7 +61,7 @@
 
 +(NSString*)version
 {
-    return [NSString stringWithFormat:@"%ld.%ld.%ld",
+    return [NSString stringWithFormat:@"%zd.%zd.%zd",
             [RLMVersion major],
             [RLMVersion minor],
             [RLMVersion patch]];
