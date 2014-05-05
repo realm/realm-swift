@@ -1,7 +1,8 @@
-#import <Tightdb/Tightdb.h>
+#import <Realm/Realm.h>
 #import "people.h"
 
-TIGHTDB_TABLE_IMPL_3(People,
-                     Name, String,
-                     Age,  Int,
-                     Hired, Bool)
+RLM_IMPLEMENT_TABLE_TYPE_FOR_OBJECT_TYPE(PeopleTable, People)
+
+@implementation People
+
+@end

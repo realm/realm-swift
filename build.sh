@@ -2,12 +2,12 @@
 
 ORIG_CWD="$(pwd)" || exit 1
 cd "$(dirname "$0")" || exit 1
-TIGHTDB_OBJC_HOME="$(pwd)" || exit 1
+REALM_OBJC_HOME="$(pwd)" || exit 1
 
 
 # load command functions
 if [ common_funcs.sh ]; then
-    . $TIGHTDB_OBJC_HOME/common_funcs.sh
+    . $REALM_OBJC_HOME/common_funcs.sh
 else
     echo "Cannot load common functions."
     exit 1
@@ -128,7 +128,7 @@ CONFIG_MK="src/config.mk"
 
 require_config()
 {
-    cd "$TIGHTDB_OBJC_HOME" || return 1
+    cd "$REALM_OBJC_HOME" || return 1
     if ! [ -e "$CONFIG_MK" ]; then
         cat 1>&2 <<EOF
 ERROR: Found no configuration!
@@ -142,7 +142,7 @@ EOF
 
 auto_configure()
 {
-    cd "$TIGHTDB_OBJC_HOME" || return 1
+    cd "$REALM_OBJC_HOME" || return 1
     if [ -e "$CONFIG_MK" ]; then
         require_config || return 1
     else
@@ -155,7 +155,7 @@ get_config_param()
 {
     local name line value
     name="$1"
-    cd "$TIGHTDB_OBJC_HOME" || return 1
+    cd "$REALM_OBJC_HOME" || return 1
     if ! [ -e "$CONFIG_MK" ]; then
         cat 1>&2 <<EOF
 ERROR: Found no configuration!
@@ -358,56 +358,56 @@ case "$MODE" in
         fi
 
         install_exec_prefix="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-exec-prefix)" || exit 1
-        install_includedir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-includedir)" || exit 1
-        install_bindir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-bindir)" || exit 1
-        install_libdir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libdir)" || exit 1
-        install_libexecdir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libexecdir)" || exit 1
+        install_includedir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-includedir)"   || exit 1
+        install_bindir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-bindir)"           || exit 1
+        install_libdir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libdir)"           || exit 1
+        install_libexecdir="$(NO_CONFIG_MK="1" $MAKE --no-print-directory prefix="$install_prefix" get-libexecdir)"   || exit 1
 
-        # Find TightDB
-        if [ -z "$TIGHTDB_CONFIG" ]; then
-            TIGHTDB_CONFIG="tightdb-config"
+        # Find Realm
+        if [ -z "$REALM_CONFIG" ]; then
+            REALM_CONFIG="tightdb-config"
         fi
-        if printf "%s\n" "$TIGHTDB_CONFIG" | grep -q '^/'; then
-            if ! [ -x "$TIGHTDB_CONFIG" ]; then
-                tightdb_abort "ERROR: TightDB config-program '$TIGHTDB_CONFIG' does not exist" "Cannot find '$TIGHTDB_CONFIG' - skipping"
+        if printf "%s\n" "$REALM_CONFIG" | grep -q '^/'; then
+            if ! [ -x "$REALM_CONFIG" ]; then
+                realm_abort "ERROR: Realm config-program '$REALM_CONFIG' does not exist" "Cannot find '$REALM_CONFIG' - skipping"
             fi
-            tightdb_config_cmd="$TIGHTDB_CONFIG"
-        elif ! tightdb_config_cmd="$(which "$TIGHTDB_CONFIG" 2>/dev/null)"; then
-            tightdb_abort "ERROR: TightDB config-program '$TIGHTDB_CONFIG' not found in PATH" "Cannot find '$TIGHTDB_CONFIG' - skipping"
+            realm_config_cmd="$REALM_CONFIG"
+        elif ! realm_config_cmd="$(which "$REALM_CONFIG" 2>/dev/null)"; then
+            realm_abort "ERROR: Realm config-program '$REALM_CONFIG' not found in PATH" "Cannot find '$REALM_CONFIG' - skipping"
         fi
-        tightdb_config_dbg_cmd="$tightdb_config_cmd-dbg"
-        if ! [ -x "$tightdb_config_dbg_cmd" ]; then
-            tightdb_abort "ERROR: TightDB config-program '$tightdb_config_dbg_cmd' not found" "Cannot find '$tightdb_config_dbg_cmd' - skipping"
+        realm_config_dbg_cmd="$realm_config_cmd-dbg"
+        if ! [ -x "$realm_config_dbg_cmd" ]; then
+            realm_abort "ERROR: Realm config-program '$realm_config_dbg_cmd' not found" "Cannot find '$realm_config_dbg_cmd' - skipping"
         fi
-        tightdb_version="$($tightdb_config_cmd --version)" || exit 1
+        realm_version="$($realm_config_cmd --version)"       || exit 1
 
-        tightdb_cflags="$($tightdb_config_cmd --cflags)"         || exit 1
-        tightdb_cflags_dbg="$($tightdb_config_dbg_cmd --cflags)" || exit 1
-        tightdb_ldflags="$($tightdb_config_cmd --libs)"          || exit 1
-        tightdb_ldflags_dbg="$($tightdb_config_dbg_cmd --libs)"  || exit 1
+        realm_cflags="$($realm_config_cmd --cflags)"         || exit 1
+        realm_cflags_dbg="$($realm_config_dbg_cmd --cflags)" || exit 1
+        realm_ldflags="$($realm_config_cmd --libs)"          || exit 1
+        realm_ldflags_dbg="$($realm_config_dbg_cmd --libs)"  || exit 1
 
-        tightdb_includedir="$($tightdb_config_cmd --includedir)" || exit 1
-        tightdb_libdir="$($tightdb_config_cmd --libdir)"         || exit 1
-        tightdb_rpath="$tightdb_libdir"
+        realm_includedir="$($realm_config_cmd --includedir)" || exit 1
+        realm_libdir="$($realm_config_cmd --libdir)"         || exit 1
+        realm_rpath="$realm_libdir"
 
         # `TIGHTDB_DIST_INCLUDEDIR` and `TIGHTDB_DIST_LIBDIR` are set
         # when configuration occurs in the context of a distribution
         # package.
         if [ "$TIGHTDB_DIST_INCLUDEDIR" ] && [ "$TIGHTDB_DIST_LIBDIR" ]; then
-            tightdb_includedir="$TIGHTDB_DIST_INCLUDEDIR"
-            tightdb_libdir="$TIGHTDB_DIST_LIBDIR"
+            realm_includedir="$TIGHTDB_DIST_INCLUDEDIR"
+            realm_libdir="$TIGHTDB_DIST_LIBDIR"
         else
-            tightdb_includedir="$($tightdb_config_cmd --includedir)" || exit 1
-            tightdb_libdir="$($tightdb_config_cmd --libdir)"         || exit 1
+            realm_includedir="$($realm_config_cmd --includedir)" || exit 1
+            realm_libdir="$($realm_config_cmd --libdir)"         || exit 1
         fi
-        tightdb_rpath="$($tightdb_config_cmd --libdir)" || exit 1
+        realm_rpath="$($realm_config_cmd --libdir)" || exit 1
 
-        cflags="-I$tightdb_includedir"
-        ldflags="-L$tightdb_libdir -Wl,-rpath,$tightdb_rpath"
-        word_list_prepend "tightdb_cflags"      "$cflags"  || exit 1
-        word_list_prepend "tightdb_cflags_dbg"  "$cflags"  || exit 1
-        word_list_prepend "tightdb_ldflags"     "$ldflags" || exit 1
-        word_list_prepend "tightdb_ldflags_dbg" "$ldflags" || exit 1
+        cflags="-I$realm_includedir"
+        ldflags="-L$realm_libdir -Wl,-rpath,$realm_rpath"
+        word_list_prepend "realm_cflags"      "$cflags"   || exit 1
+        word_list_prepend "realm_cflags_dbg"  "$cflags"   || exit 1
+        word_list_prepend "realm_ldflags"     "$ldflags"  || exit 1
+        word_list_prepend "realm_ldflags_dbg" "$ldflags"  || exit 1
 
         # Find Xcode
         xcode_home="none"
@@ -439,12 +439,12 @@ case "$MODE" in
             for x in $IPHONE_PLATFORMS; do
                 platform_home="$xcode_home/Platforms/$x.platform"
                 if ! [ -e "$platform_home/Info.plist" ]; then
-                    tightdb_echo "Failed to find '$platform_home/Info.plist'"
+                    realm_echo "Failed to find '$platform_home/Info.plist'"
                     iphone_sdks_avail="no"
                 else
                     sdk="$(find_iphone_sdk "$platform_home")" || exit 1
                     if ! [ "$sdk" ]; then
-                        tightdb_echo "Found no SDKs in '$platform_home'"
+                        realm_echo "Found no SDKs in '$platform_home'"
                         iphone_sdks_avail="no"
                     else
                         if [ "$x" = "iPhoneSimulator" ]; then
@@ -464,8 +464,8 @@ case "$MODE" in
         fi
 
         iphone_core_lib="none"
-        if [ "$TIGHTDB_IPHONE_CORE_LIB" ]; then
-            iphone_core_lib="$TIGHTDB_IPHONE_CORE_LIB"
+        if [ "$REALM_IPHONE_CORE_LIB" ]; then
+            iphone_core_lib="$REALM_IPHONE_CORE_LIB"
             if ! printf "%s\n" "$iphone_core_lib" | grep -q '^/'; then
                 iphone_core_lib="$ORIG_CWD/$iphone_core_lib"
             fi
@@ -473,7 +473,7 @@ case "$MODE" in
             path="$(cd "../tightdb" || return 1; pwd)" || exit 1
             iphone_core_lib="$path/$IPHONE_DIR"
         else
-            tightdb_echo "Could not find home of TightDB core library built for iPhone"
+            realm_echo "Could not find home of Realm core library built for iPhone"
         fi
 
 	touch "$CONFIG_MK" || { echo "Can't overwrite $CONFIG_MK."; exit 1; }
@@ -485,12 +485,12 @@ INSTALL_INCLUDEDIR  = $install_includedir
 INSTALL_BINDIR      = $install_bindir
 INSTALL_LIBDIR      = $install_libdir
 INSTALL_LIBEXECDIR  = $install_libexecdir
-TIGHTDB_CONFIG      = $tightdb_config_cmd
-TIGHTDB_VERSION     = $tightdb_version
-TIGHTDB_CFLAGS      = $tightdb_cflags
-TIGHTDB_CFLAGS_DBG  = $tightdb_cflags_dbg
-TIGHTDB_LDFLAGS     = $tightdb_ldflags
-TIGHTDB_LDFLAGS_DBG = $tightdb_ldflags_dbg
+REALM_CONFIG        = $realm_config_cmd
+REALM_VERSION       = $realm_version
+REALM_CFLAGS        = $realm_cflags
+REALM_CFLAGS_DBG    = $realm_cflags_dbg
+REALM_LDFLAGS       = $realm_ldflags
+REALM_LDFLAGS_DBG   = $realm_ldflags_dbg
 XCODE_HOME          = $xcode_home
 IPHONE_SDKS         = ${iphone_sdks:-none}
 IPHONE_SDKS_AVAIL   = $iphone_sdks_avail
@@ -505,11 +505,11 @@ EOF
         ;;
 
     "get-version")
-	version_file="src/tightdb/objc/TDBVersion.h"
-	tightdb_version_major="$(grep TDB_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	tightdb_version_minor="$(grep TDB_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	tightdb_version_patch="$(grep TDB_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	echo "$tightdb_version_major.$tightdb_version_minor.$tightdb_version_patch"
+	version_file="src/realm/objc/RLMVersion.h"
+	realm_version_major="$(grep TDB_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+	realm_version_minor="$(grep TDB_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+	realm_version_patch="$(grep TDB_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+	echo "$realm_version_major.$realm_version_minor.$realm_version_patch"
 	exit 0
 	;;
 
@@ -518,15 +518,15 @@ EOF
 	    echo "You can only set version when running Mac OS X"
 	    exit 1
 	fi
-        tightdb_version="$1"
-        version_file="src/tightdb/objc/TDBVersion.h"
-        tightdb_ver_major="$(echo "$tightdb_version" | cut -f1 -d.)" || exit 1
-        tightdb_ver_minor="$(echo "$tightdb_version" | cut -f2 -d.)" || exit 1
-        tightdb_ver_patch="$(echo "$tightdb_version" | cut -f3 -d.)" || exit 1
+        realm_version="$1"
+        version_file="src/realm/objc/RLMVersion.h"
+        realm_ver_major="$(echo "$realm_version" | cut -f1 -d.)" || exit 1
+        realm_ver_minor="$(echo "$realm_version" | cut -f2 -d.)" || exit 1
+        realm_ver_patch="$(echo "$realm_version" | cut -f3 -d.)" || exit 1
 
-	sed -i '' -e "s/TDB_VERSION_MAJOR .*$/TDB_VERSION_MAJOR $tightdb_ver_major/" $version_file || exit 1
-	sed -i '' -e "s/TDB_VERSION_MINOR .*$/TDB_VERSION_MINOR $tightdb_ver_minor/" $version_file || exit 1
-	sed -i '' -e "s/TDB_VERSION_PATCH .*$/TDB_VERSION_PATCH $tightdb_ver_patch/" $version_file || exit 1
+	sed -i '' -e "s/TDB_VERSION_MAJOR .*$/TDB_VERSION_MAJOR $realm_ver_major/" $version_file || exit 1
+	sed -i '' -e "s/TDB_VERSION_MINOR .*$/TDB_VERSION_MINOR $realm_ver_minor/" $version_file || exit 1
+	sed -i '' -e "s/TDB_VERSION_PATCH .*$/TDB_VERSION_PATCH $realm_ver_patch/" $version_file || exit 1
 	exit 0
 	;;
 
@@ -541,7 +541,7 @@ EOF
             if [ -e "$IPHONE_DIR" ]; then
                 echo "Removing '$IPHONE_DIR'"
                 rm -fr "$IPHONE_DIR/include" || exit 1
-                rm -f "$IPHONE_DIR/libtightdb-objc-ios.a" "$IPHONE_DIR/libtightdb-objc-ios-dbg.a" || exit 1
+                rm -f "$IPHONE_DIR/librealm-objc-ios.a" "$IPHONE_DIR/librealm-objc-ios-dbg.a" || exit 1
                 rmdir "$IPHONE_DIR" || exit 1
             fi
         fi
@@ -554,7 +554,7 @@ EOF
 # FIXME: Our language binding requires that Objective-C ARC is enabled, which, in turn, is only available on a 64-bit architecture, so for now we cannot build a "fat" version.
 #        TIGHTDB_ENABLE_FAT_BINARIES="1" $MAKE || exit 1
         $MAKE || exit 1
-        tightdb_echo "Done building"
+        realm_echo "Done building"
         exit 0
         ;;
 
@@ -562,14 +562,14 @@ EOF
         auto_configure || exit 1
         iphone_sdks_avail="$(get_config_param "IPHONE_SDKS_AVAIL")" || exit 1
         if [ "$iphone_sdks_avail" != "yes" ]; then
-            tightdb_abort "ERROR: iPhone SDKs were not found during configuration"
+            realm_abort "ERROR: iPhone SDKs were not found during configuration"
         fi
         iphone_core_lib="$(get_config_param "IPHONE_CORE_LIB")" || exit 1
         if [ "$iphone_core_lib" = "none" ]; then
-            tightdb_abort "ERROR: TightDB core library for iPhone was not found during configuration"
+            realm_abort "ERROR: Realm core library for iPhone was not found during configuration"
         fi
         if ! [ -e "$iphone_core_lib/libtightdb-ios.a" ]; then
-            tightdb_abort "ERROR: TightDB core library for iPhone is not available in '$iphone_core_lib'"
+            realm_abort "ERROR: Realm core library for iPhone is not available in '$iphone_core_lib'"
         fi
         temp_dir="$(mktemp -d /tmp/tightdb.objc.build-iphone.XXXX)" || exit 1
         xcode_home="$(get_config_param "XCODE_HOME")" || exit 1
@@ -586,23 +586,23 @@ EOF
                 word_list_append "cflags_arch" "-arch $y" || exit 1
             done
             sdk_root="$xcode_home/Platforms/$platform.platform/Developer/SDKs/$sdk"
-            $MAKE -C "src/tightdb/objc" "libtightdb-objc-$platform.a" "libtightdb-objc-$platform-dbg.a" BASE_DENOM="$platform" CFLAGS_ARCH="$cflags_arch -isysroot $sdk_root -I$iphone_include" || exit 1
+            $MAKE -C "src/realm/objc" "librealm-objc-$platform.a" "librealm-objc-$platform-dbg.a" BASE_DENOM="$platform" CFLAGS_ARCH="$cflags_arch -isysroot $sdk_root -I$iphone_include" || exit 1
             mkdir "$temp_dir/$platform" || exit 1
-            cp "src/tightdb/objc/libtightdb-objc-$platform.a"     "$temp_dir/$platform/libtightdb-objc.a"     || exit 1
-            cp "src/tightdb/objc/libtightdb-objc-$platform-dbg.a" "$temp_dir/$platform/libtightdb-objc-dbg.a" || exit 1
+            cp "src/realm/objc/librealm-objc-$platform.a"     "$temp_dir/$platform/librealm-objc.a"     || exit 1
+            cp "src/realm/objc/librealm-objc-$platform-dbg.a" "$temp_dir/$platform/librealm-objc-dbg.a" || exit 1
         done
         mkdir -p "$IPHONE_DIR" || exit 1
-        tightdb_echo "Creating '$IPHONE_DIR/libtightdb-objc-ios.a'"
-        lipo "$temp_dir"/*/"libtightdb-objc.a" -create -output "$temp_dir/libtightdb-objc-ios.a" || exit 1
-        libtool -static -o "$IPHONE_DIR/libtightdb-objc-ios.a" "$temp_dir/libtightdb-objc-ios.a" $(tightdb-config --libs) -L"$iphone_core_lib" || exit 1
-        tightdb_echo "Creating '$IPHONE_DIR/libtightdb-objc-ios-dbg.a'"
-        lipo "$temp_dir"/*/"libtightdb-objc-dbg.a" -create -output "$temp_dir/libtightdb-objc-ios-dbg.a" || exit 1
-        libtool -static -o "$IPHONE_DIR/libtightdb-objc-ios-dbg.a" "$temp_dir/libtightdb-objc-ios-dbg.a" $(tightdb-config-dbg --libs) -L"$iphone_core_lib" || exit 1
-        tightdb_echo "Copying headers to '$IPHONE_DIR/include'"
-        mkdir -p "$IPHONE_DIR/include/tightdb/objc" || exit 1
-        inst_headers="$(cd src/tightdb/objc && $MAKE --no-print-directory get-inst-headers)" || exit 1
-        (cd "src/tightdb/objc" && cp $inst_headers "$TIGHTDB_OBJC_HOME/$IPHONE_DIR/include/tightdb/objc/") || exit 1
-        tightdb_echo "Done building"
+        realm_echo "Creating '$IPHONE_DIR/librealm-objc-ios.a'"
+        lipo "$temp_dir"/*/"librealm-objc.a" -create -output "$temp_dir/librealm-objc-ios.a" || exit 1
+        libtool -static -o "$IPHONE_DIR/librealm-objc-ios.a" "$temp_dir/librealm-objc-ios.a" $(tightdb-config --libs) -L"$iphone_core_lib" || exit 1
+        realm_echo "Creating '$IPHONE_DIR/librealm-objc-ios-dbg.a'"
+        lipo "$temp_dir"/*/"librealm-objc-dbg.a" -create -output "$temp_dir/librealm-objc-ios-dbg.a" || exit 1
+        libtool -static -o "$IPHONE_DIR/librealm-objc-ios-dbg.a" "$temp_dir/librealm-objc-ios-dbg.a" $(tightdb-config-dbg --libs) -L"$iphone_core_lib" || exit 1
+        realm_echo "Copying headers to '$IPHONE_DIR/include'"
+        mkdir -p "$IPHONE_DIR/include/realm/objc" || exit 1
+        inst_headers="$(cd src/realm/objc && $MAKE --no-print-directory get-inst-headers)" || exit 1
+        (cd "src/realm/objc" && cp $inst_headers "$REALM_OBJC_HOME/$IPHONE_DIR/include/realm/objc/") || exit 1
+        realm_echo "Done building"
         exit 0
         ;;
 
@@ -611,17 +611,17 @@ EOF
 	    echo "Framework for iOS can only be generated under Mac OS X"
 	    exit 0
 	fi
-	tightdb_version="$(sh build.sh get-version)"
-	FRAMEWORK=Tightdb.framework
-	rm -rf "$FRAMEWORK" tightdb-ios*.zip || exit 1
+	realm_version="$(sh build.sh get-version)"
+	FRAMEWORK=Realm.framework
+	rm -rf "$FRAMEWORK" realm-ios*.zip || exit 1
 	mkdir -p "$FRAMEWORK/Headers" || exit 1
-	cp iphone-lib/libtightdb-objc-ios.a "$FRAMEWORK/Tightdb" || exit 1
-	cp iphone-lib/include/tightdb/objc/*.h "$FRAMEWORK/Headers" || exit 1
-	(cd "$FRAMEWORK/Headers" && mv tightdb.h Tightdb.h) || exit 1
-	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/import <tightdb\/objc\/\(.*\)>/import "\1"/g' {} \; || exit 1
-	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/include <tightdb\/objc\/\(.*\)>/include "\1"/g' {} \; || exit 1
-	zip -r -q tightdb-ios-$tightdb_version.zip $FRAMEWORK || exit 1
-	echo "Framwork for iOS can be found in tightdb-ios-$tightdb_version.zip"
+	cp iphone-lib/librealm-objc-ios.a "$FRAMEWORK/Realm" || exit 1
+	cp iphone-lib/include/realm/objc/*.h "$FRAMEWORK/Headers" || exit 1
+	(cd "$FRAMEWORK/Headers" && mv realm.h Realm.h) || exit 1
+	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/import <realm\/objc\/\(.*\)>/import "\1"/g' {} \; || exit 1
+	find "$FRAMEWORK/Headers" -name '*.h' -exec sed -i '' -e 's/include <realm\/objc\/\(.*\)>/include "\1"/g' {} \; || exit 1
+	zip -r -q realm-ios-$realm_version.zip $FRAMEWORK || exit 1
+	echo "Framework for iOS can be found in realm-ios-$realm_version.zip"
 	exit 0
 	;;
 
@@ -629,10 +629,10 @@ EOF
         auto_configure || exit 1
         $MAKE check-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test.XXXX)" || exit 1
-        mkdir -p "$TEMP_DIR/unit-tests.octest/Contents/MacOS" || exit 1
-        cp "src/tightdb/objc/test/unit-tests" "$TEMP_DIR/unit-tests.octest/Contents/MacOS/" || exit 1
+        mkdir -p "$TEMP_DIR/unit-tests.xctest/Contents/MacOS" || exit 1
+        cp "src/realm/objc/test/unit-tests" "$TEMP_DIR/unit-tests.xctest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
+        path_list_prepend DYLD_LIBRARY_PATH "$REALM_OBJC_HOME/src/realm/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
         "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests.octest" || exit 1
@@ -644,10 +644,10 @@ EOF
         auto_configure || exit 1
         $MAKE check-debug-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test-debug.XXXX)" || exit 1
-        mkdir -p "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS" || exit 1
-        cp "src/tightdb/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS/" || exit 1
+        mkdir -p "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS" || exit 1
+        cp "src/realm/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
+        path_list_prepend DYLD_LIBRARY_PATH "$REALM_OBJC_HOME/src/realm/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
         "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest" || exit 1
@@ -659,10 +659,10 @@ EOF
         auto_configure || exit 1
         $MAKE check-debug-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.test-gdb.XXXX)" || exit 1
-        mkdir -p "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS" || exit 1
-        cp "src/tightdb/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.octest/Contents/MacOS/" || exit 1
+        mkdir -p "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS" || exit 1
+        cp "src/realm/objc/test/unit-tests-dbg" "$TEMP_DIR/unit-tests-dbg.xctest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        path_list_prepend DYLD_LIBRARY_PATH "$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
+        path_list_prepend DYLD_LIBRARY_PATH "$REALM_OBJC_HOME/src/realm/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
         gdb --args "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-dbg.octest"
@@ -672,10 +672,10 @@ EOF
         auto_configure || exit 1
         $MAKE check-cover-norun || exit 1
         TEMP_DIR="$(mktemp -d /tmp/tightdb.objc.check-cover.XXXX)" || exit 1
-        mkdir -p "$TEMP_DIR/unit-tests-cov.octest/Contents/MacOS" || exit 1
-        cp "src/tightdb/objc/test/unit-tests-cov" "$TEMP_DIR/unit-tests-cov.octest/Contents/MacOS/" || exit 1
+        mkdir -p "$TEMP_DIR/unit-tests-cov.xctest/Contents/MacOS" || exit 1
+        cp "src/realm/objc/test/unit-tests-cov" "$TEMP_DIR/unit-tests-cov.xctest/Contents/MacOS/" || exit 1
         XCODE_HOME="$(xcode-select --print-path)" || exit 1
-        path_list_prepend DYLD_LIBRARY_PATH="$TIGHTDB_OBJC_HOME/src/tightdb/objc" || exit 1
+        path_list_prepend DYLD_LIBRARY_PATH="$REALM_OBJC_HOME/src/realm/objc" || exit 1
         export DYLD_LIBRARY_PATH
         OBJC_DISABLE_GC=YES
         "$XCODE_HOME/Tools/otest" "$TEMP_DIR/unit-tests-cov.octest" || exit 1
@@ -720,14 +720,14 @@ EOF
     "install")
         require_config || exit 1
         $MAKE install-only DESTDIR="$DESTDIR" || exit 1
-        tightdb_echo "Done installing"
+        realm_echo "Done installing"
         exit 0
         ;;
 
     "install-prod")
         require_config || exit 1
         $MAKE install-only DESTDIR="$DESTDIR" INSTALL_FILTER="shared-libs,progs" || exit 1
-        tightdb_echo "Done installing"
+        realm_echo "Done installing"
         exit 0
         ;;
 
@@ -870,6 +870,29 @@ EOF
         exit 0
         ;;
 
+    "docs")
+        appledoc    --project-name Realm \
+                    --project-company "Realm" \
+                    --include doc/realm.png \
+                    --output doc/appledocs \
+                    -v `sh build.sh get-version` \
+                    --create-html \
+                    --no-create-docset \
+                    --no-repeat-first-par \
+                    --ignore src/realm/objc/PrivateTableMacros.h \
+                    --ignore src/realm/objc/RLMColumnProxy.h \
+                    --ignore src/realm/objc/RLMProxy.h \
+                    --ignore src/realm/objc/RLMQuery.h \
+                    --ignore src/realm/objc/RLMType.h \
+                    --ignore src/realm/objc/RLMVersion.h \
+                    --ignore src/realm/objc/RLMDescriptor.h \
+                    --ignore "src/realm/objc/test/*" \
+                    --index-desc doc/index.md \
+                    src/realm/objc/ || exit 1
+        echo "Done generating docs under docs/appledocs"
+        exit 0
+        ;;
+
     "dist-copy")
         # Copy to distribution package
         TARGET_DIR="$1"
@@ -910,9 +933,10 @@ EOF
         cat << EOF
 Unspecified or bad mode '$MODE'.
 Available modes are:
-  config clean build build-iphone build-ios-test-core test test-debug test-gdb
-  test-cover show-install install uninstall test-installed install-prod
-  install-devel uninstall-prod uninstall-devel dist-copy ios-framework
+  config clean build docs build-iphone ios-framework
+  build-ios-test-core test test-debug test-gdb test-cover
+  show-install install uninstall test-installed install-prod
+  install-devel uninstall-prod uninstall-devel dist-copy
   get-version set-version
 EOF
         exit 1

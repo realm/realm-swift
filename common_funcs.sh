@@ -1,7 +1,7 @@
 # common functions for build.sh and similar tools
 
 # Second argument is optional
-tightdb_abort()
+realm_abort()
 {
     local message message2
     message="$1"
@@ -18,7 +18,7 @@ tightdb_abort()
     exit 1
 }
 
-tightdb_echo()
+realm_echo()
 {
     local message
     message="$1"

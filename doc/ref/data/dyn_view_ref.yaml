@@ -1,12 +1,12 @@
 #
-# Obj-C reference documentation for TDBView class
+# Obj-C reference documentation for RLMView class
 #
 
 ID         : class_dyn_tableview
-TITLE      : TDBView (dynamic)
-SUMMARY    : The TDBView class
+TITLE      : RLMView (dynamic)
+SUMMARY    : The RLMView class
 DESCR      : >
-             Queries and searches can return <code>TDBView</code>
+             Queries and searches can return <code>RLMView</code>
              objects, which works as virtual tables containing just
              the matched rows. You can interact with a
              <code>TBDView</code> just as a regular table.
@@ -110,13 +110,13 @@ CATEGORIES :
       DESCR    :
       - TEXT   : *g_dyn_table_get_column_type_descr1
       - TEXT   : *objc_column_types
-      SIGNATURE: (TDBType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex
+      SIGNATURE: (RLMType)columnTypeOfColumnWithIndex:(NSUInteger)colIndex
       PARAMS:
       - NAME   : colIndex
         TYPES  : NSUInteger
         DESCR  : The column index.
       RETURN:
-        TYPES  : TDBType
+        TYPES  : RLMType
         DESCR  : The column type.
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_get_column_type
@@ -129,31 +129,31 @@ CATEGORIES :
       NAME     : "rowAtIndex:"
       SUMMARY  : Returns the row at a specified row index.
       DESCR    : This method returns the row at the specified row index.
-      SIGNATURE: (TDBRow *)rowAtIndex:(NSUInteger)rowIndex
+      SIGNATURE: (RLMRow *)rowAtIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME   : rowIndex
         TYPES  : NSUInteger
         DESCR  : The row index.
       RETURN:
-        TYPES  : TDBRow *
+        TYPES  : RLMRow *
         DESCR  : The row.
 
   - objc_dyn_view_first:
       NAME     : firstRow
       SUMMARY  : Returns the first row.
       DESCR    : This method returns the first row in the view.
-      SIGNATURE: (TDBRow *)
+      SIGNATURE: (RLMRow *)
       RETURN:
-        TYPES  : TDBRow *
+        TYPES  : RLMRow *
         DESCR  : The row.
 
   - objc_dyn_view_last:
       NAME     : "lastRow:"
       SUMMARY  : Returns the last row.
       DESCR    : This method returns the last row in the view.
-      SIGNATURE: (TDBRow *)
+      SIGNATURE: (RLMRow *)
       RETURN:
-        TYPES  : TDBRow *
+        TYPES  : RLMRow *
         DESCR  : The row.
 
   - g_dyn_view_get_source_ndx:
@@ -335,17 +335,17 @@ CATEGORIES :
 
 - Searching:
   METHODS:
-  - g_dyn_table_where:
-      NAME     : where
-      SIGNATURE: (TDBQuery *) where
-      SUMMARY  : Query the view.
-      DESCR    : This method initiates a query in the view.
-      RETURN:
-        TYPES  : TDBQuery *
-        DESCR  : *g_dyn_table_where_return_descr
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_objc_dyn_view_where
+  # - g_dyn_table_where:
+  #     NAME     : where
+  #     SIGNATURE: (RLMQuery *) where
+  #     SUMMARY  : Query the view.
+  #     DESCR    : This method initiates a query in the view.
+  #     RETURN:
+  #       TYPES  : RLMQuery *
+  #       DESCR  : *g_dyn_table_where_return_descr
+  #     EXAMPLES:
+  #     - DESCR  :
+  #       CODE   : ex_objc_dyn_view_where
 
 
   # - g_dyn_view_find_first_bool:
@@ -453,14 +453,14 @@ CATEGORIES :
       NAME     : "sortUsingColumnWithIndex:inOrder:"
       SUMMARY  : *g_dyn_view_get_sorted_view_summary
       DESCR    : *g_dyn_view_get_sorted_view_desc
-      SIGNATURE: (void) sortUsingColumnWithIndex:(NSUInteger)colIndex inOrder:(TDBSortOrder)order
+      SIGNATURE: (void) sortUsingColumnWithIndex:(NSUInteger)colIndex inOrder:(RLMSortOrder)order
       PARAMS:
       - NAME   : colIndex
         TYPES  : NSUInteger
         DESCR  : The column index.
       - NAME   : order
-        TYPES  : TDBSortOrder
-        DESCR  : Sorting order; either <code>TDBAscending</code> or <code>TDBDescending</code> (declared in <code>TDBType.h</code>)
+        TYPES  : RLMSortOrder
+        DESCR  : Sorting order; either <code>RLMSortOrderAscending</code> or <code>RLMSortOrderDescending</code> (declared in <code>RLMType.h</code>)
       EXAMPLES:
       - CODE   : ex_objc_dyn_view_sort
         DESCR  :

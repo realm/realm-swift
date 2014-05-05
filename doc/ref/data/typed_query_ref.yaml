@@ -9,7 +9,7 @@
 # TODO: describe which column-types the methods can be used on.
 
 ID         : class_typed_query
-TITLE      : TDBQuery (typed)
+TITLE      : RLMQuery (typed)
 SUMMARY    : *g_typed_query_intro_summary
 DESCR      : *g_typed_query_intro_descr
 SEE        :
@@ -22,12 +22,19 @@ CATEGORIES :
 - Conditions:
   METHODS:
   - g_typed_query_equals_binary:
+      IGNORED  : ""
   - g_typed_query_equals_bool:
+      IGNORED  : ""
   - g_typed_query_equals_int:
+      IGNORED  : ""
   - g_typed_query_equals_float:
+      IGNORED  : ""
   - g_typed_query_equals_double:
+      IGNORED  : ""
   - g_typed_query_equals_string:
+      IGNORED  : ""
   - g_typed_query_equals_string_2:
+      IGNORED  : ""
   - g_typed_query_equals_date:
       TITLE    : "*columnIsEqualTo"
       NAMES    : [columnIsEqualTo, columnIsEqualTo, columnIsEqualTo, columnIsEqualTo, columnIsEqualTo, columnIsEqualTo, columnIsEqualTo]
@@ -61,12 +68,19 @@ CATEGORIES :
         CODE   : ex_objc_typed_query_equals
 
   - g_typed_query_notEquals_bool:
+      IGNORED  : ""
   - g_typed_query_notEquals_binary:
+      IGNORED  : ""
   - g_typed_query_notEquals_int:
+      IGNORED  : ""
   - g_typed_query_notEquals_float:
+      IGNORED  : ""
   - g_typed_query_notEquals_double:
+      IGNORED  : ""
   - g_typed_query_notEquals_string:
+      IGNORED  : ""
   - g_typed_query_notEquals_string_2:
+      IGNORED  : ""
   - g_typed_query_notEquals_date:
       NAMES    : [ columnIsNotEqualTo, columnIsNotEqualTo, columnIsNotEqualTo, columnIsNotEqualTo, columnIsNotEqualTo, columnIsNotEqualTo, columnIsNotEqualTo]
       TITLE    : "columnIsNotEqualTo"
@@ -95,8 +109,11 @@ CATEGORIES :
         CODE   : ex_objc_typed_query_notEquals
 
   - g_typed_query_greaterThan_int:
+      IGNORED  : ""
   - g_typed_query_greaterThan_float:
+      IGNORED  : ""
   - g_typed_query_greaterThan_double:
+      IGNORED  : ""
   - g_typed_query_greaterThan_date:
       NAMES    : [ columnIsGreaterThan, columnIsGreaterThan, columnIsGreaterThan, columnIsGreaterThan ]
       TITLE    : "columnIsGreaterThan"
@@ -119,8 +136,11 @@ CATEGORIES :
         CODE   : ex_objc_typed_query_greaterThan
 
   - g_typed_query_greaterThanOrEqual_int:
+      IGNORED  : ""
   - g_typed_query_greaterThanOrEqual_float:
+      IGNORED  : ""
   - g_typed_query_greaterThanOrEqual_double:
+      IGNORED  : ""
   - g_typed_query_greaterThanOrEqual_date:
       NAMES    : [columnIsGreaterThanOrEqualTo, columnIsGreaterThanOrEqualTo, columnIsGreaterThanOrEqualTo, columnIsGreaterThanOrEqualTo]
       TITLE    : "columnIsGreaterThanOrEqualTo"
@@ -143,8 +163,11 @@ CATEGORIES :
         CODE   : ex_objc_typed_query_greaterThanOrEqual
 
   - g_typed_query_lessThan_int:
+      IGNORED  : ""
   - g_typed_query_lessThan_float:
+      IGNORED  : ""
   - g_typed_query_lessThan_double:
+      IGNORED  : ""
   - g_typed_query_lessThan_date:
       NAMES    : [columnIsLessThan, columnIsLessThan, columnIsLessThan, columnIsLessThan]
       TITLE    : "columnIsLessThan"
@@ -167,8 +190,11 @@ CATEGORIES :
         CODE   : ex_objc_typed_query_lessThan
 
   - g_typed_query_lessThanOrEqual_int:
+      IGNORED  : ""
   - g_typed_query_lessThanOrEqual_float:
+      IGNORED  : ""
   - g_typed_query_lessThanOrEqual_double:
+      IGNORED  : ""
   - g_typed_query_lessThanOrEqual_date:
       NAMES    : [columnIsLessThanOrEqualTo, columnIsLessThanOrEqualTo, columnIsLessThanOrEqualTo, columnIsLessThanOrEqualTo]
       TITLE    : "columnIsLessThanOrEqualTo"
@@ -191,8 +217,11 @@ CATEGORIES :
         CODE   : ex_objc_typed_query_lessThanOrEqual
 
   - g_typed_query_between_int:
+      IGNORED  : ""
   - g_typed_query_between_float:
+      IGNORED  : ""
   - g_typed_query_between_double:
+      IGNORED  : ""
   - g_typed_query_between_date:
       NAMES    : ["columnIsBetween::", "columnIsBetween::", "columnIsBetween::", "columnIsBetween::"]
       TITLE    : "columnIsBetween"
@@ -219,9 +248,8 @@ CATEGORIES :
 
   - g_typed_query_startsWith_binary:
   - g_typed_query_startsWith_string:
-      NAME     : columnBeginsWith
   - g_typed_query_startsWith_string_2:
-      NAME     : columnBeginsWith
+      NAMES    : [columnBeginsWith, columnBeginsWith, columnBeginsWith]
       TITLE    : "columnBeginsWith"
       SIGNATURE: |
                  .columnName (ClassNameQuery *)columnBeginsWith:(NSString *)value
@@ -244,6 +272,7 @@ CATEGORIES :
         CODE   : ex_objc_typed_query_startsWith
 
   - g_typed_query_endsWith_binary:
+      IGNORED  : ""
   - g_typed_query_endsWith_string:
       NAME     : columnEndsWith
   - g_typed_query_endsWith_string_2:
@@ -270,7 +299,9 @@ CATEGORIES :
         CODE   : ex_objc_typed_query_endsWith
 
   - g_typed_query_contains_binary:
+      IGNORED  : ""
   - g_typed_query_contains_string:
+      IGNORED  : ""
   - g_typed_query_contains_string_2:
       NAMES    : [columnContains, columnContains]
       TITLE    : "columnContains"

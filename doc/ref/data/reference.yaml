@@ -13,13 +13,13 @@ STATUS:
             Currently, the Objective-C interface is heavily extended and modfied.
             This implies that the API will likely change in the next release.
 DESCR     : >
-            The goal of TightDB is to provide a high performance
+            The goal of Realm is to provide a high performance
             data storage for your applications.
 
-            TightDB integrates seamless in Objective-C, making it
+            Realm integrates seamless in Objective-C, making it
             fast to learn and easy to use.  You can replace your traditional data
-            structures with TightDB. Whether it is a simple array of integers or a
-            complex data structure, you interface to TightDB as easily as using a
+            structures with Realm. Whether it is a simple array of integers or a
+            complex data structure, you interface to Realm as easily as using a
             standard array like container. But in addition you can
             handle much more data in much less memory, you get powerful query
             possibilities in an intuitive language and the ability to share your data
@@ -27,7 +27,7 @@ DESCR     : >
 
             The core of the framework is the class {@link class_dyn_table}. The
             class is a representation of the
-            fundamental concept <strong>TDBTable</strong>. You can use
+            fundamental concept <strong>RLMTable</strong>. You can use
             {@link class_typed_table} in the situations where you know the table structure
             a priori or when the data structure changes dynamically through the run time
             of the application.
@@ -38,41 +38,41 @@ DESCR     : >
             as data (often referred to as subtables).
 
             A table can work standalone but it is common to create
-            tables within a <i>context</i> (represented by
-            {@link class_context}). A context can be read and
+            tables within a <i>realm</i> (represented by
+            {@link class_transaction_manager}). A realm can be read and
             written to disk while a table cannot. Moreover, the
-            context adds transactions - through {@link
-            class_transaction} - to TightDB.
+            realm adds transactions - through {@link
+            class_transaction} - to Realm.
 
             The table supports the most common types including numbers, timestamps and strings.
-            It is possible to use a TightDB table class as column type. This means that you can
+            It is possible to use a Realm table class as column type. This means that you can
             have tables of tables structure.
 
-            Moreover, TightDB introduces a column type called <b>Mixed</b>. A value of the
-            Mixed type can be any supported value of TightDB. This implies - as the name
+            Moreover, Realm introduces a column type called <b>Mixed</b>. A value of the
+            Mixed type can be any supported value of Realm. This implies - as the name
             indicates - that you can mix the type of values in the the column. In one row the
             value could be an integer, in another row the value could be a string or even a table.
-            The Objective-C binding to TightDB utilizes Cocoa objects (<code>NSNumber</code>,
+            The Objective-C binding to Realm utilizes Cocoa objects (<code>NSNumber</code>,
             <code>NSString</code>, <code>NSDate</code>, etc.) to support the <b>Mixed</b> typed
             columns.
 
             Using subtables and mixed types you can build arbitrarily complex data structures.
 
-            The table below shows how the TightDB data types are mapped to Cocoa classes.
+            The table below shows how the Realm data types are mapped to Cocoa classes.
 
             <table>
               <thead>
-                <tr><th>TightDB data type</th>         <th>Cocoa class</th>            <th>Description</th></tr>
+                <tr><th>Realm data type</th>         <th>Cocoa class</th>            <th>Description</th></tr>
               </thead>
               <tbody>
-                <tr><td><code>TDBTypeBool</code></td>  <td><code>NSNumber</code></td>  <td>boolean values</td></tr>
-                <tr><td><code>TDBTypeInt</code></td>   <td><code>NSNumber</code></td>  <td>integers</td></tr>
-                <tr><td><code>TDBTypeFloat</code></td> <td><code>NSNumber</code></td>  <td>single-precision floating-point numbers</td></tr>
-                <tr><td><code>TDBTypeDouble</code></td><td><code>NSNumber</code></td>  <td>double-precision floating-point numbers</td></tr>
-                <tr><td><code>TDBTypeString</code></td><td><code>NSString</code></td>  <td>strings</td></tr>
-                <tr><td><code>TDBTypeBinary</code></td><td><code>NSData</code></td>    <td>binary blobs</td></tr>
-                <tr><td><code>TDBTypeDate</code></td>  <td><code>NSDate</code></td>    <td>time stamps</td></tr>
-                <tr><td><code>TDBTable</code></td>     <td><code>TDBTable</code></td>  <td>TightDB tables</td></tr>
+                <tr><td><code>RLMTypeBool</code></td>  <td><code>NSNumber</code></td>  <td>boolean values</td></tr>
+                <tr><td><code>RLMTypeInt</code></td>   <td><code>NSNumber</code></td>  <td>integers</td></tr>
+                <tr><td><code>RLMTypeFloat</code></td> <td><code>NSNumber</code></td>  <td>single-precision floating-point numbers</td></tr>
+                <tr><td><code>RLMTypeDouble</code></td><td><code>NSNumber</code></td>  <td>double-precision floating-point numbers</td></tr>
+                <tr><td><code>RLMTypeString</code></td><td><code>NSString</code></td>  <td>strings</td></tr>
+                <tr><td><code>RLMTypeBinary</code></td><td><code>NSData</code></td>    <td>binary blobs</td></tr>
+                <tr><td><code>RLMTypeDate</code></td>  <td><code>NSDate</code></td>    <td>time stamps</td></tr>
+                <tr><td><code>RLMTable</code></td>     <td><code>RLMTable</code></td>  <td>Realm tables</td></tr>
               </tbody>
             </table>
 
@@ -83,13 +83,13 @@ DESCR     : >
             {@link class_dyn_tableview} object.
 
 IMPORT    : [reference, typed_table_ref, dyn_table_ref, dyn_query_ref, group_ref, typed_view_ref, dyn_view_ref, shared_group_ref, typed_query_ref, mixed_ref]
-IMPORTPATH: ../../tightdb/doc/ref_cpp/data
+IMPORTPATH: ../../tightdb/doc/ref_cpp/data #need to update this path with core
 
 
 CATEGORIES:                       # list global class-id in order of appearence
 - Persistence:
-  - context
-  - transaction
+  - realm
+  - transaction_manager
 - Typed Table:                    # Category header name
   - typed_table                   # Global Class name. File 'typed_table_ref.yaml'
   - typed_view
