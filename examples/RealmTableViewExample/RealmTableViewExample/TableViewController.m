@@ -136,17 +136,18 @@ static NSString * const kTableName = @"table";
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     // Import many items in a background thread
     dispatch_async(queue, ^{
+        // Get new realm and table since we are in a new thread
         RLMRealm *realm = [RLMRealm defaultRealm];
-        [realm beginWriteTransaction];
+        RLMTable *table = [realm tableWithName:kTableName objectClass:[DemoObject class]];
         for (NSInteger idx1 = 0; idx1 < 1000; idx1++) {
             // Break up the writing blocks into smaller portions
-            RLMTable *table = [realm tableWithName:kTableName objectClass:[DemoObject class]];
+            [realm beginWriteTransaction];
             for (NSInteger idx2 = 0; idx2 < 1000; idx2++) {
                 // Add row via dictionary. Order is ignored.
                 [table addRow:@{@"title": [self randomString], @"date": [self randomDate]}];
             }
+            [realm commitWriteTransaction];
         }
-        [realm commitWriteTransaction];
     });
 }
 
