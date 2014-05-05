@@ -111,7 +111,7 @@ REALM_TABLE_FAST(QueryTable)
         //------------------------------------------------------
         
         // Load a realm from disk (and print contents)
-        RLMRealm * fromDisk = [self realmPersistedAtTestPath];
+        RLMRealm * fromDisk = [self realmWithTestPath];
         MyTable* diskTable = [fromDisk tableWithName:@"employees" asTableClass:[MyTable class]];
         
         NSLog(@"Disktable size: %zu", diskTable.rowCount);
@@ -135,7 +135,7 @@ REALM_TABLE_FAST(QueryTable)
         [table addFirst:8 Second:@"The quick brown fox"];
     }];
     
-    QueryTable *table = [[self realmPersistedAtTestPath] tableWithName:@"Query table" asTableClass:[QueryTable class]];
+    QueryTable *table = [[self realmWithTestPath] tableWithName:@"Query table" asTableClass:[QueryTable class]];
 
     {
         QueryTableQuery* q = [[table where].First columnIsBetween:3 :7]; // Between

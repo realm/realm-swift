@@ -15,7 +15,6 @@ extern NSString *const RLMTestRealmPath;
 
 @interface RLMTestCase : XCTestCase
 
-- (RLMRealm *)realmPersistedAtTestPath;
 - (RLMRealm *)realmWithTestPath;
 - (void)createTestTableWithWriteBlock:(void(^)(RLMTable *table))block;
 
