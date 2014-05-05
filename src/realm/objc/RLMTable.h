@@ -259,10 +259,10 @@
 /**
  Returns the minimum (lowest) value of a property for objects matching an [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html) in a column.
  
-    NSNumber *min = [table minInColumn:@"age" where:@"name == \"name10\""];
+    NSNumber *min = [table minInProperty:@"age" where:@"name == \"name10\""];
  
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
-    min = [table minInColumn:@"age" where:predicate];
+    min = [table minInProperty:@"age" where:predicate];
  
  @warning You can only use this method on properties with the following types: int, float & double.
  @bug Properties of type NSDate or NSString are not supported (yet).
@@ -273,14 +273,14 @@
  
  @return The minimum value for the property amongst objects matching the Predicate.
  */
--(id)minInColumn:(NSString *)columnName where:(id)predicate;
+-(id)minInProperty:(NSString *)property where:(id)predicate;
 /**
  Returns the maximum (highest) value of a property for objects matching an [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
  
-    NSNumber *max = [table maxInColumn:@"age" where:@"name == \"name10\""];
+    NSNumber *max = [table maxInProperty:@"age" where:@"name == \"name10\""];
  
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
-    max = [table maxInColumn:@"age" where:predicate];
+    max = [table maxInProperty:@"age" where:predicate];
  
  @warning You can only use this method on properties with the following types: int, float & double.
  @bug Properties of type NSString are not supported (yet).
@@ -291,44 +291,44 @@
  
  @return The maximum value for the property amongst objects matching the Predicate.
  */
--(id)maxInColumn:(NSString *)columnName where:(id)predicate;
+-(id)maxInProperty:(NSString *)property where:(id)predicate;
 /**
  Returns the sum of a property for objects matching an [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
  
-    NSNumber *sum = [table sumOfColumn:@"age" where:@"name == \"name10\""];
+    NSNumber *sum = [table sumOfProperty:@"age" where:@"name == \"name10\""];
  
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
-    sum = [table sumOfColumn:@"age" where:predicate];
+    sum = [table sumOfProperty:@"age" where:predicate];
  
  
  @warning You can only use this method on properties with the following types: int, float & double.
  @bug Properties of type NSDate or NSString are not supported (yet).
  @bug Properties of type RLMTable are not supported (yet). *i.e.* you cannot search on subproperties.
  
- @param columnName An NSString specifying the column's name. Only properties of type int, float and double are supported.
+ @param property The property to calculate sum on. Only properties of type int, float and double are supported.
  @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the predicate format string directly instead of the NSPredicate.
  
  @return The sum for the property amongst objects matching the Predicate.
  */
--(NSNumber *)sumOfColumn:(NSString *)columnName where:(id)predicate;
+-(NSNumber *)sumOfProperty:(NSString *)property where:(id)predicate;
 /**
  Returns the average of a property for objects matching an [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
  
-    NSNumber *average = [table averageOfColumn:@"age" where:@"name == \"name10\""];
+    NSNumber *average = [table averageOfProperty:@"age" where:@"name == \"name10\""];
  
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
-    average = [table averageOfColumn:@"age" where:predicate];
+    average = [table averageOfProperty:@"age" where:predicate];
  
  @warning You can only use this method on properties with the following types: int, float & double.
  @bug Properties of type NSDate or NSString are not supported (yet).
  @bug Properties of type RLMTable are not supported (yet). *i.e.* you cannot search on subproperties.
  
- @param columnName An NSString specifying the column's name. Only properties of type int, float and double are supported.
+ @param property The property to calculate average on. Only properties of type int, float and double are supported.
  @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the predicate format string directly instead of the NSPredicate.
  
  @return The average for the property amongst objects matching the Predicate.
  */
--(NSNumber *)averageOfColumn:(NSString *)columnName where:(id)predicate;
+-(NSNumber *)averageOfProperty:(NSString *)property where:(id)predicate;
 
 // Indices
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;

@@ -1592,15 +1592,15 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     return count;
 }
 
--(NSNumber *)sumOfColumn:(NSString *)columnName where:(id)predicate
+-(NSNumber *)sumOfProperty:(NSString *)property where:(id)predicate
 {
     tightdb::Query query = queryFromPredicate(self, predicate);
     
-    NSUInteger index = [self indexOfColumnWithName:columnName];
+    NSUInteger index = [self indexOfColumnWithName:property];
     
     if (index == NSNotFound) {
         @throw [NSException exceptionWithName:@"realm:invalid_column_name"
-                                       reason:[NSString stringWithFormat:@"Column with name %@ not found on table", columnName]
+                                       reason:[NSString stringWithFormat:@"Property with name %@ not found on table", property]
                                      userInfo:nil];
     }
     
@@ -1624,15 +1624,15 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     return sum;
 }
 
--(NSNumber *)averageOfColumn:(NSString *)columnName where:(id)predicate
+-(NSNumber *)averageOfProperty:(NSString *)property where:(id)predicate
 {
     tightdb::Query query = queryFromPredicate(self, predicate);
     
-    NSUInteger index = [self indexOfColumnWithName:columnName];
+    NSUInteger index = [self indexOfColumnWithName:property];
     
     if (index == NSNotFound) {
         @throw [NSException exceptionWithName:@"realm:invalid_column_name"
-                                       reason:[NSString stringWithFormat:@"Column with name %@ not found on table", columnName]
+                                       reason:[NSString stringWithFormat:@"Property with name %@ not found on table", property]
                                      userInfo:nil];
     }
     
@@ -1656,15 +1656,15 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     return average;
 }
 
--(id)minInColumn:(NSString *)columnName where:(id)predicate
+-(id)minInProperty:(NSString *)property where:(id)predicate
 {
     tightdb::Query query = queryFromPredicate(self, predicate);
     
-    NSUInteger index = [self indexOfColumnWithName:columnName];
+    NSUInteger index = [self indexOfColumnWithName:property];
     
     if (index == NSNotFound) {
         @throw [NSException exceptionWithName:@"realm:invalid_column_name"
-                                       reason:[NSString stringWithFormat:@"Column with name %@ not found on table", columnName]
+                                       reason:[NSString stringWithFormat:@"Property with name %@ not found on table", property]
                                      userInfo:nil];
     }
     
@@ -1693,15 +1693,15 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     return min;
 }
 
--(id)maxInColumn:(NSString *)columnName where:(id)predicate
+-(id)maxInProperty:(NSString *)property where:(id)predicate
 {
     tightdb::Query query = queryFromPredicate(self, predicate);
     
-    NSUInteger index = [self indexOfColumnWithName:columnName];
+    NSUInteger index = [self indexOfColumnWithName:property];
     
     if (index == NSNotFound) {
         @throw [NSException exceptionWithName:@"realm:invalid_column_name"
-                                       reason:[NSString stringWithFormat:@"Column with name %@ not found on table", columnName]
+                                       reason:[NSString stringWithFormat:@"Property with name %@ not found on table", property]
                                      userInfo:nil];
     }
     
