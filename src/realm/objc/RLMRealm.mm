@@ -367,8 +367,10 @@ NSString *const defaultRealmFileName = @"default.realm";
         // refresh all outstanding objects
         for (RLMTable *obj in _objects.objectEnumerator.allObjects) {
             NSIndexPath *path = obj.indexPath;
-            TableRef tableRef = (TableRef)group->get_table([path indexAtPosition:0]); // Throws
-            [obj setNativeTable:tableRef.get()];
+            // NOTE: would like to get a non-const TableRef back here but that doesn't seem to work
+            // so we must const_cast
+            ConstTableRef tableRef = group->get_table([path indexAtPosition:0]); // Throws
+            [obj setNativeTable:const_cast<Table*>(tableRef.get())];
             [obj setReadOnly:readOnly];
         }
     }
