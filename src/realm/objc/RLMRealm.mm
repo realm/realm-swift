@@ -222,7 +222,15 @@ NSString *const defaultRealmFileName = @"default.realm";
 }
 
 - (void)sendNotifications {
-    for (void(^block)(NSString *note, RLMRealm *realm) in _notificationHandlers) {
+    // notify other realm istances
+    for (RLMRealm *realm in realmsAtPath(_path)) {
+        if (![realm isEqual:self]) {
+            [realm->_runLoop performSelector:@selector(refresh) target:realm argument:nil order:0 modes:@[NSRunLoopCommonModes]];
+        }
+    }
+    
+    // call this realms notification blocks
+    for (RLMNotificationBlock block in _notificationHandlers) {
         block(RLMRealmDidChangeNotification, self);
     }
 }
