@@ -24,6 +24,7 @@
 
 void ex_objc_transaction_manager_intro()
 {
+
     // Remove previous datafile
     [[NSFileManager defaultManager] removeItemAtPath:@"transactionManagerTest.realm" error:nil];
 
