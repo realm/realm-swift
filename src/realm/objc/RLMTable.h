@@ -189,32 +189,38 @@
 /**
  Returns the **first** object matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html)
  
-    RLMRow *r = [table firstWhere:@"name == \"name10\""];
+    RLMRow *r = [table firstWhere:@"name == 'name10'"];
+ 
+    r = [table firstWhere:@"name == %@", @"name10"];
     
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
     r = [table firstWhere:predicate];
  
- @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the predicate format string directly instead of the NSPredicate.
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). 
+                  You can also use an NSString with optional format va_list.
  
  @return The **first** object matching the Predicate. It will be of the same type as the RLMRow subclass used on this RLMTable
  @see allWhere:
  */
--(id)firstWhere:(id)predicate;
+-(id)firstWhere:(id)predicate, ...;
 /**
  Returns **all** objects matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
  
-    RLMView *v = [table where:@"name == \"name10\""];
+    RLMView *v = [table allWhere:@"name == 'name10'"];
+    
+    v = [table allWhere:@"name == %@", @"name10"];
     
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
     v = [table where:predicate];
  
- @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the predicate format string directly instead of the NSPredicate.
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
+                  You can also use an NSString with optional format va_list.
  
  @return A reference to an RLMView containing **all** objects matching the Predicate. Objects contained will be of the same type as the RLMRow subclass used on this RLMTable
  @see firstWhere:
  @see allWhere:orderBy:
  */
--(RLMView *)allWhere:(id)predicate;
+-(RLMView *)allWhere:(id)predicate, ...;
 /**
  Returns **all** objects matching the [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html), in the order specified by the [NSSortDescriptor](https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSSortDescriptor_Class/Reference/Reference.html).
  
@@ -224,8 +230,11 @@
  
     v = [table where:predicate orderBy:@"age"];
  
- @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the NSString instead of the NSPredicate.
- @param order     An [NSSortDescriptor](https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSSortDescriptor_Class/Reference/Reference.html). You can also use the descriptor format string directly instead of the NSSortDescriptor.
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
+                  You can also use the NSString instead of the NSPredicate.
+
+ @param order     An [NSSortDescriptor](https://developer.apple.com/library/mac/documentation/cocoa/reference/foundation/classes/NSSortDescriptor_Class/Reference/Reference.html).
+                  You can also use an NSString instead of the NSSortDescriptor.
  
  @return A reference to an RLMView containing **all** objects matching the Predicate, sorted according to the Sort Descriptor. Objects contained will be of the same type as the RLMRow subclass used on this RLMTable
  
@@ -241,20 +250,25 @@
 /**
  Returns the number of objects matching an [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html)
  
-    NSUInteger count = [table countWhere:@"name == \"name10\""];
+    NSUInteger count = [table countWhere:@"name == 'name10'"];
+ 
+    count = [table countWhere:@"name == %@", @"name10"];
  
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
     count = [table countWhere:predicate];
  
- @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the predicate format string directly instead of the NSPredicate.
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
+                  You can also use an NSString with optional format va_list.
  
  @return The number of objects matching the Predicate.
  */
--(NSUInteger)countWhere:(id)predicate;
+-(NSUInteger)countWhere:(id)predicate, ...;
 /**
  Returns the minimum (lowest) value of a property for objects matching an [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html) in a column.
  
-    NSNumber *min = [table minOfProperty:@"age" where:@"name == \"name10\""];
+    NSNumber *min = [table minOfProperty:@"age" where:@"name == 'name10'"];
+    
+    min = [table minOfProperty:@"age" where:@"name == %@", @"name10"];
  
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
     min = [table minOfProperty:@"age" where:predicate];
@@ -264,15 +278,18 @@
  @bug Properties of type RLMTable are not supported (yet). *i.e.* you cannot search on subproperties.
  
  @param property The property to look for a minimum on. Only properties of type int, float and double are supported.
- @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the predicate format string directly instead of the NSPredicate.
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
+                  You can also use an NSString with optional format va_list.
  
  @return The minimum value for the property amongst objects matching the Predicate.
  */
--(id)minOfProperty:(NSString *)property where:(id)predicate;
+-(id)minOfProperty:(NSString *)property where:(id)predicate, ...;
 /**
  Returns the maximum (highest) value of a property for objects matching an [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
  
-    NSNumber *max = [table maxOfProperty:@"age" where:@"name == \"name10\""];
+    NSNumber *max = [table maxOfProperty:@"age" where:@"name == 'name10'"];
+    
+    max = [table maxOfProperty:@"age" where:@"name == %@", @"name10"];
  
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
     max = [table maxOfProperty:@"age" where:predicate];
@@ -282,15 +299,18 @@
  @bug Properties of type RLMTable are not supported (yet). *i.e.* you cannot search on subproperties.
  
  @param property The property to look for a maximum on. Only properties of type int, float and double are supported.
- @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the predicate format string directly instead of the NSPredicate.
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
+                  You can also use an NSString with optional format va_list.
  
  @return The maximum value for the property amongst objects matching the Predicate.
  */
--(id)maxOfProperty:(NSString *)property where:(id)predicate;
+-(id)maxOfProperty:(NSString *)property where:(id)predicate, ...;
 /**
  Returns the sum of a property for objects matching an [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
  
-    NSNumber *sum = [table sumOfProperty:@"age" where:@"name == \"name10\""];
+    NSNumber *sum = [table sumOfProperty:@"age" where:@"name == 'name10'"];
+    
+    sum = [table sumOfProperty:@"age" where:@"name == %@", @"name10"];
  
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
     sum = [table sumOfProperty:@"age" where:predicate];
@@ -301,15 +321,18 @@
  @bug Properties of type RLMTable are not supported (yet). *i.e.* you cannot search on subproperties.
  
  @param property The property to calculate sum on. Only properties of type int, float and double are supported.
- @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the predicate format string directly instead of the NSPredicate.
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
+                  You can also use an NSString with optional format va_list.
  
  @return The sum for the property amongst objects matching the Predicate.
  */
--(NSNumber *)sumOfProperty:(NSString *)property where:(id)predicate;
+-(NSNumber *)sumOfProperty:(NSString *)property where:(id)predicate, ...;
 /**
  Returns the average of a property for objects matching an [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
  
-    NSNumber *average = [table averageOfProperty:@"age" where:@"name == \"name10\""];
+    NSNumber *average = [table averageOfProperty:@"age" where:@"name == 'name10'"];
+    
+    average = [table averageOfProperty:@"age" where:@"name == %@", @"name10"];
  
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
     average = [table averageOfProperty:@"age" where:predicate];
@@ -319,11 +342,12 @@
  @bug Properties of type RLMTable are not supported (yet). *i.e.* you cannot search on subproperties.
  
  @param property The property to calculate average on. Only properties of type int, float and double are supported.
- @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html). You can also use the predicate format string directly instead of the NSPredicate.
+ @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
+                  You can also use an NSString with optional format va_list.
  
  @return The average for the property amongst objects matching the Predicate.
  */
--(NSNumber *)averageOfProperty:(NSString *)property where:(id)predicate;
+-(NSNumber *)averageOfProperty:(NSString *)property where:(id)predicate, ...;
 
 // Indices
 -(void)createIndexInColumnWithIndex:(NSUInteger)colIndex;
