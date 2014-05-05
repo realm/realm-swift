@@ -86,6 +86,15 @@ NSArray *realmsAtPath(NSString *path) {
     }
 }
 
+typedef NS_ENUM(NSUInteger, RLMTransactionMode) {
+    RLMTransactionModeNone = 0,
+    RLMTransactionModeRead,
+    RLMTransactionModeWrite
+};
+
+@interface RLMRealm ()
+@property (readonly) RLMTransactionMode transactionMode;
+@end
 
 @implementation RLMRealm {
     UniquePtr<SharedGroup> _sharedGroup;
@@ -234,16 +243,20 @@ NSString *const defaultRealmFileName = @"default.realm";
     }
 }
 
-- (BOOL)inReadTransaction {
-    return (_readGroup != NULL);
+- (RLMTransactionMode)transactionMode {
+    if (_readGroup != NULL) {
+        return RLMTransactionModeRead;
+    }
+    if (_writeGroup != NULL) {
+        return RLMTransactionModeWrite;
+    }
+    return RLMTransactionModeNone;
+    
 }
 
-- (BOOL)inWriteTransaction {
-    return (_writeGroup != NULL);
-}
 
 - (void)beginReadTransaction {
-    if (!self.inReadTransaction && !self.inWriteTransaction) {
+    if (self.transactionMode == RLMTransactionModeNone) {
         try {
             _readGroup = (tightdb::Group *)&_sharedGroup->begin_read();
             [self updateAllObjects];
@@ -255,7 +268,7 @@ NSString *const defaultRealmFileName = @"default.realm";
 }
 
 - (void)endReadTransaction {
-    if (self.inReadTransaction) {
+    if (self.transactionMode == RLMTransactionModeRead) {
         try {
             _sharedGroup->end_read();
             _readGroup = NULL;
@@ -268,7 +281,7 @@ NSString *const defaultRealmFileName = @"default.realm";
 
 
 - (void)beginWriteTransaction {
-    if (!self.inWriteTransaction) {
+    if (self.transactionMode != RLMTransactionModeWrite) {
         try {
             // end current read
             [self endReadTransaction];
@@ -289,7 +302,7 @@ NSString *const defaultRealmFileName = @"default.realm";
 }
 
 - (void)commitWriteTransaction {
-    if (self.inWriteTransaction) {
+    if (self.transactionMode == RLMTransactionModeWrite) {
         try {
             _sharedGroup->commit();
             _writeGroup = NULL;
@@ -306,7 +319,7 @@ NSString *const defaultRealmFileName = @"default.realm";
 }
 
 - (void)rollbackWriteTransaction {
-    if (self.inWriteTransaction) {
+    if (self.transactionMode == RLMTransactionModeWrite) {
         try {
             _sharedGroup->rollback();
             _writeGroup = NULL;
@@ -338,7 +351,7 @@ NSString *const defaultRealmFileName = @"default.realm";
 - (void)refresh {
     try {
         // no-op if writing
-        if (!self.inReadTransaction) {
+        if (self.transactionMode == RLMTransactionModeWrite) {
             return;
         }
         
@@ -361,7 +374,7 @@ NSString *const defaultRealmFileName = @"default.realm";
     try {
         // get the group
         tightdb::Group *group = self.group;
-        BOOL readOnly = self.inReadTransaction;
+        BOOL readOnly = (self.transactionMode == RLMTransactionModeRead);
 
         // refresh all outstanding objects
         for (RLMTable *obj in _objects.objectEnumerator.allObjects) {
@@ -408,7 +421,7 @@ NSString *const defaultRealmFileName = @"default.realm";
         throw_objc_exception(ex);
     }
     [table setParent:self];
-    [table setReadOnly:self.inReadTransaction];
+    [table setReadOnly:(self.transactionMode == RLMTransactionModeRead)];
     
     // add to objects map
     [_objects setObject:table forKey:table];
@@ -457,7 +470,7 @@ NSString *const defaultRealmFileName = @"default.realm";
         throw_objc_exception(ex);
     }
     [table setParent:self];
-    [table setReadOnly:self.inReadTransaction];
+    [table setReadOnly:(self.transactionMode == RLMTransactionModeRead)];
     [_objects setObject:table forKey:table];
 
     return table;
@@ -480,7 +493,7 @@ NSString *const defaultRealmFileName = @"default.realm";
                                      userInfo:nil];
     }
     
-    if (!self.inWriteTransaction) {
+    if (self.transactionMode != RLMTransactionModeWrite) {
         @throw [NSException exceptionWithName:@"realm:core_read_only_exception"
                                        reason:@"Realm is read-only."
                                      userInfo:nil];
@@ -540,7 +553,7 @@ NSString *const defaultRealmFileName = @"default.realm";
                                      userInfo:nil];
     }
     
-    if (!self.inWriteTransaction) {
+    if (self.transactionMode != RLMTransactionModeWrite) {
         @throw [NSException exceptionWithName:@"realm:core_read_only_exception"
                                        reason:@"Realm is read-only."
                                      userInfo:nil];
@@ -560,7 +573,7 @@ NSString *const defaultRealmFileName = @"default.realm";
                                            tightdb::TableRef tableRef = self.group->get_table(ObjcStringAccessor(name), was_created);
                                            [table setNativeTable:tableRef.get()];)
     [table setParent:self];
-    [table setReadOnly:self.inReadTransaction];
+    [table setReadOnly:(self.transactionMode == RLMTransactionModeRead)];
     
     if (was_created) {
         if (![table _addColumns])
