@@ -34,6 +34,7 @@ The Objective-C API has been updated and your code will break!
 
 ### API breaking changes:
 
+* `RLMTable` objects can only be created with an `RLMRealm` object.
 * `RLMContext` was renamed to `RLMTransactionManager`
 * Renamed `RLMContextDidChangeNotification` to `RLMRealmDidChangeNotification`
 * Renamed `contextWithDefaultPersistence` to `managerForDefaultRealm`
@@ -48,7 +49,9 @@ The Objective-C API has been updated and your code will break!
 
 * Added `countWhere:` on `RLMTable`
 * Added `sumOfColumn:where:` on `RLMTable`
-* Added `averageOfColumn:where` on `RLMTable`
+* Added `averageOfColumn:where:` on `RLMTable`
+* Added `minInColumn:where:` on `RLMTable`
+* Added `maxInColumn:where:` on `RLMTable`
 
 ### Bugfixes:
 

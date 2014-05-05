@@ -24,19 +24,11 @@
 
 void ex_objc_realm_intro()
 {
-    // Generate path for a writable .realm file
-    NSString *realmFileName          = @"employees.realm";
-    NSString *documentsDirectoryPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
-    NSString *realmFilePath          = [documentsDirectoryPath stringByAppendingPathComponent:realmFileName];
-    
-    // Remove any previous files
-    [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
-    
     // Create a realm and initialize by creating table and adding a row
-    RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
     if (realm.isEmpty) {
         [realm beginWriteTransaction];
-        PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
+        PeopleTable *table = [realm createTableWithName:@"employees"
+                                      asTableClass:[PeopleTable class]];
         [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
         [realm commitWriteTransaction];
     }
