@@ -95,7 +95,7 @@ REALM_TABLE_FAST(PeopleTable2)
         [people removeRowAtIndex:2];
     }];
     
-    PeopleTable *people = [[self realmPersistedAtTestPath] tableWithName:@"employees" asTableClass:[PeopleTable class]];
+    PeopleTable *people = [[self realmWithTestPath] tableWithName:@"employees" asTableClass:[PeopleTable class]];
     
     NSLog(@"%lu rows after remove.  [5]", [people rowCount]);  // 5
     XCTAssertEqual([people rowCount], (NSUInteger)5,@"rows should be 5");

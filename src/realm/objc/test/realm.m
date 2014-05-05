@@ -21,7 +21,7 @@ REALM_TABLE_1(RLMTestTable,
 #pragma mark - Tests
 
 - (void)testRealmExists {
-    RLMRealm *realm = [self realmPersistedAtTestPath];
+    RLMRealm *realm = [self realmWithTestPath];
     XCTAssertNotNil(realm, @"realm should not be nil");
     XCTAssertEqual([realm class], [RLMRealm class], @"realm should be of class RLMRealm");
 }
@@ -37,7 +37,7 @@ REALM_TABLE_1(RLMTestTable,
     
     XCTAssertNil(error, @"RLMRealm error should be nil after write block");
     
-    RLMRealm *realm = [self realmPersistedAtTestPath];
+    RLMRealm *realm = [self realmWithTestPath];
     RLMTable *table = [realm tableWithName:tableName];
     
     XCTAssertNotNil(table, @"pre-existing table read from RLMRealm should not be nil");
@@ -52,7 +52,7 @@ REALM_TABLE_1(RLMTestTable,
         [realm createTableWithName:tableName asTableClass:[RLMTestTable class]];
     }];
     
-    RLMRealm *realm = [self realmPersistedAtTestPath];
+    RLMRealm *realm = [self realmWithTestPath];
     RLMTestTable *table = [realm tableWithName:tableName asTableClass:[RLMTestTable class]];
     
     XCTAssertNotNil(table, @"pre-existing typed table read from RLMRealm should not be nil");
@@ -191,13 +191,13 @@ REALM_TABLE_1(RLMTestTable,
  */
 
 - (void)testRealmOnMainThreadDoesntThrow {
-    XCTAssertNoThrow([self realmPersistedAtTestPath], @"Calling \
+    XCTAssertNoThrow([self realmWithTestPath], @"Calling \
                      +realmWithPath on the main thread shouldn't throw an exception.");
 }
 
 - (void)testRealmOnDifferentThreadDoesntThrow {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        XCTAssertNoThrow([self realmPersistedAtTestPath], @"Calling \
+        XCTAssertNoThrow([self realmWithTestPath], @"Calling \
                         +realmWithPath on a thread with a runloop \
                         should not throw an exception.");
         [self notify:XCTAsyncTestCaseStatusSucceeded];
@@ -219,7 +219,7 @@ REALM_TABLE_1(RLMTestTable,
 
 - (void)testHasTableWithName {
     NSString *tableName = @"test";
-    RLMRealm *realm = [self realmPersistedAtTestPath];
+    RLMRealm *realm = [self realmWithTestPath];
     
     // Tables shouldn't exist until they are created
     XCTAssertFalse([realm hasTableWithName:tableName], @"Table 'test' shouldn't exist");
@@ -233,7 +233,7 @@ REALM_TABLE_1(RLMTestTable,
         [realm createTableWithName:tableName];
     }];
     
-    RLMRealm *realm2 = [self realmPersistedAtTestPath];
+    RLMRealm *realm2 = [self realmWithTestPath];
     XCTAssertTrue([realm2 hasTableWithName:tableName], @"Table 'test' should exist \
                   after being created");
     XCTAssertNotNil([realm2 tableWithName:tableName], @"Table 'test' shouldn't be nil");
