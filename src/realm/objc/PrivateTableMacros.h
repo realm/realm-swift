@@ -1,22 +1,22 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 /*************************************************************************
  *
@@ -59,7 +59,6 @@ REALM_QUERY_ACCESSOR_DEF(TableName, CName1, CType1) \
 REALM_COLUMN_PROXY_DEF(CName1, CType1) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1; \
--(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
@@ -178,10 +177,6 @@ REALM_COLUMN_PROXY_IMPL(CName1, CType1) \
     REALM_COLUMN_INSERT(self, 0, ndx, CName1, CType1); \
     [self RLM_insertDone]; \
 } \
--(TableName##Query*)where \
-{ \
-    return [[TableName##Query alloc] initWithTable:self]; \
-} \
 -(TableName##Row*)addEmptyRow \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:[super RLM_addEmptyRow]]; \
@@ -294,7 +289,6 @@ REALM_COLUMN_PROXY_DEF(CName1, CType1) \
 REALM_COLUMN_PROXY_DEF(CName2, CType2) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2; \
--(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
@@ -424,10 +418,6 @@ REALM_COLUMN_PROXY_IMPL(CName2, CType2) \
     REALM_COLUMN_INSERT(self, 1, ndx, CName2, CType2); \
     [self RLM_insertDone]; \
 } \
--(TableName##Query*)where \
-{ \
-    return [[TableName##Query alloc] initWithTable:self]; \
-} \
 -(TableName##Row*)addEmptyRow \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:[super RLM_addEmptyRow]]; \
@@ -546,7 +536,6 @@ REALM_COLUMN_PROXY_DEF(CName2, CType2) \
 REALM_COLUMN_PROXY_DEF(CName3, CType3) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3; \
--(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
@@ -687,10 +676,6 @@ REALM_COLUMN_PROXY_IMPL(CName3, CType3) \
     REALM_COLUMN_INSERT(self, 2, ndx, CName3, CType3); \
     [self RLM_insertDone]; \
 } \
--(TableName##Query*)where \
-{ \
-    return [[TableName##Query alloc] initWithTable:self]; \
-} \
 -(TableName##Row*)addEmptyRow \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:[super RLM_addEmptyRow]]; \
@@ -815,7 +800,6 @@ REALM_COLUMN_PROXY_DEF(CName3, CType3) \
 REALM_COLUMN_PROXY_DEF(CName4, CType4) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4; \
--(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
@@ -967,10 +951,6 @@ REALM_COLUMN_PROXY_IMPL(CName4, CType4) \
     REALM_COLUMN_INSERT(self, 3, ndx, CName4, CType4); \
     [self RLM_insertDone]; \
 } \
--(TableName##Query*)where \
-{ \
-    return [[TableName##Query alloc] initWithTable:self]; \
-} \
 -(TableName##Row*)addEmptyRow \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:[super RLM_addEmptyRow]]; \
@@ -1101,7 +1081,6 @@ REALM_COLUMN_PROXY_DEF(CName4, CType4) \
 REALM_COLUMN_PROXY_DEF(CName5, CType5) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5; \
--(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
@@ -1264,10 +1243,6 @@ REALM_COLUMN_PROXY_IMPL(CName5, CType5) \
     REALM_COLUMN_INSERT(self, 4, ndx, CName5, CType5); \
     [self RLM_insertDone]; \
 } \
--(TableName##Query*)where \
-{ \
-    return [[TableName##Query alloc] initWithTable:self]; \
-} \
 -(TableName##Row*)addEmptyRow \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:[super RLM_addEmptyRow]]; \
@@ -1404,7 +1379,6 @@ REALM_COLUMN_PROXY_DEF(CName5, CType5) \
 REALM_COLUMN_PROXY_DEF(CName6, CType6) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6; \
--(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
@@ -1578,10 +1552,6 @@ REALM_COLUMN_PROXY_IMPL(CName6, CType6) \
     REALM_COLUMN_INSERT(self, 5, ndx, CName6, CType6); \
     [self RLM_insertDone]; \
 } \
--(TableName##Query*)where \
-{ \
-    return [[TableName##Query alloc] initWithTable:self]; \
-} \
 -(TableName##Row*)addEmptyRow \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:[super RLM_addEmptyRow]]; \
@@ -1724,7 +1694,6 @@ REALM_COLUMN_PROXY_DEF(CName6, CType6) \
 REALM_COLUMN_PROXY_DEF(CName7, CType7) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7; \
--(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
@@ -1909,10 +1878,6 @@ REALM_COLUMN_PROXY_IMPL(CName7, CType7) \
     REALM_COLUMN_INSERT(self, 6, ndx, CName7, CType7); \
     [self RLM_insertDone]; \
 } \
--(TableName##Query*)where \
-{ \
-    return [[TableName##Query alloc] initWithTable:self]; \
-} \
 -(TableName##Row*)addEmptyRow \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:[super RLM_addEmptyRow]]; \
@@ -2061,7 +2026,6 @@ REALM_COLUMN_PROXY_DEF(CName7, CType7) \
 REALM_COLUMN_PROXY_DEF(CName8, CType8) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8; \
--(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
@@ -2257,10 +2221,6 @@ REALM_COLUMN_PROXY_IMPL(CName8, CType8) \
     REALM_COLUMN_INSERT(self, 7, ndx, CName8, CType8); \
     [self RLM_insertDone]; \
 } \
--(TableName##Query*)where \
-{ \
-    return [[TableName##Query alloc] initWithTable:self]; \
-} \
 -(TableName##Row*)addEmptyRow \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:[super RLM_addEmptyRow]]; \
@@ -2415,7 +2375,6 @@ REALM_COLUMN_PROXY_DEF(CName8, CType8) \
 REALM_COLUMN_PROXY_DEF(CName9, CType9) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9; \
--(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
@@ -2622,10 +2581,6 @@ REALM_COLUMN_PROXY_IMPL(CName9, CType9) \
     REALM_COLUMN_INSERT(self, 8, ndx, CName9, CType9); \
     [self RLM_insertDone]; \
 } \
--(TableName##Query*)where \
-{ \
-    return [[TableName##Query alloc] initWithTable:self]; \
-} \
 -(TableName##Row*)addEmptyRow \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:[super RLM_addEmptyRow]]; \
@@ -2786,7 +2741,6 @@ REALM_COLUMN_PROXY_DEF(CName9, CType9) \
 REALM_COLUMN_PROXY_DEF(CName10, CType10) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10; \
--(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
@@ -3004,10 +2958,6 @@ REALM_COLUMN_PROXY_IMPL(CName10, CType10) \
     REALM_COLUMN_INSERT(self, 9, ndx, CName10, CType10); \
     [self RLM_insertDone]; \
 } \
--(TableName##Query*)where \
-{ \
-    return [[TableName##Query alloc] initWithTable:self]; \
-} \
 -(TableName##Row*)addEmptyRow \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:[super RLM_addEmptyRow]]; \
@@ -3174,7 +3124,6 @@ REALM_COLUMN_PROXY_DEF(CName10, CType10) \
 REALM_COLUMN_PROXY_DEF(CName11, CType11) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11; \
--(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
@@ -3403,10 +3352,6 @@ REALM_COLUMN_PROXY_IMPL(CName11, CType11) \
     REALM_COLUMN_INSERT(self, 10, ndx, CName11, CType11); \
     [self RLM_insertDone]; \
 } \
--(TableName##Query*)where \
-{ \
-    return [[TableName##Query alloc] initWithTable:self]; \
-} \
 -(TableName##Row*)addEmptyRow \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:[super RLM_addEmptyRow]]; \
@@ -3579,7 +3524,6 @@ REALM_COLUMN_PROXY_DEF(CName11, CType11) \
 REALM_COLUMN_PROXY_DEF(CName12, CType12) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12; \
--(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
@@ -3819,10 +3763,6 @@ REALM_COLUMN_PROXY_IMPL(CName12, CType12) \
     REALM_COLUMN_INSERT(self, 11, ndx, CName12, CType12); \
     [self RLM_insertDone]; \
 } \
--(TableName##Query*)where \
-{ \
-    return [[TableName##Query alloc] initWithTable:self]; \
-} \
 -(TableName##Row*)addEmptyRow \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:[super RLM_addEmptyRow]]; \
@@ -4001,7 +3941,6 @@ REALM_COLUMN_PROXY_DEF(CName12, CType12) \
 REALM_COLUMN_PROXY_DEF(CName13, CType13) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13; \
--(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
@@ -4252,10 +4191,6 @@ REALM_COLUMN_PROXY_IMPL(CName13, CType13) \
     REALM_COLUMN_INSERT(self, 12, ndx, CName13, CType13); \
     [self RLM_insertDone]; \
 } \
--(TableName##Query*)where \
-{ \
-    return [[TableName##Query alloc] initWithTable:self]; \
-} \
 -(TableName##Row*)addEmptyRow \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:[super RLM_addEmptyRow]]; \
@@ -4440,7 +4375,6 @@ REALM_COLUMN_PROXY_DEF(CName13, CType13) \
 REALM_COLUMN_PROXY_DEF(CName14, CType14) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 CName14:(REALM_ARG_TYPE(CType14))CName14; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 CName14:(REALM_ARG_TYPE(CType14))CName14; \
--(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
@@ -4702,10 +4636,6 @@ REALM_COLUMN_PROXY_IMPL(CName14, CType14) \
     REALM_COLUMN_INSERT(self, 13, ndx, CName14, CType14); \
     [self RLM_insertDone]; \
 } \
--(TableName##Query*)where \
-{ \
-    return [[TableName##Query alloc] initWithTable:self]; \
-} \
 -(TableName##Row*)addEmptyRow \
 { \
     return [[TableName##Row alloc] initWithTable:self ndx:[super RLM_addEmptyRow]]; \
@@ -4896,7 +4826,6 @@ REALM_COLUMN_PROXY_DEF(CName14, CType14) \
 REALM_COLUMN_PROXY_DEF(CName15, CType15) \
 -(void)add##CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 CName14:(REALM_ARG_TYPE(CType14))CName14 CName15:(REALM_ARG_TYPE(CType15))CName15; \
 -(void)insertEmptyRowAtIndex:(NSUInteger)ndx CName1:(REALM_ARG_TYPE(CType1))CName1 CName2:(REALM_ARG_TYPE(CType2))CName2 CName3:(REALM_ARG_TYPE(CType3))CName3 CName4:(REALM_ARG_TYPE(CType4))CName4 CName5:(REALM_ARG_TYPE(CType5))CName5 CName6:(REALM_ARG_TYPE(CType6))CName6 CName7:(REALM_ARG_TYPE(CType7))CName7 CName8:(REALM_ARG_TYPE(CType8))CName8 CName9:(REALM_ARG_TYPE(CType9))CName9 CName10:(REALM_ARG_TYPE(CType10))CName10 CName11:(REALM_ARG_TYPE(CType11))CName11 CName12:(REALM_ARG_TYPE(CType12))CName12 CName13:(REALM_ARG_TYPE(CType13))CName13 CName14:(REALM_ARG_TYPE(CType14))CName14 CName15:(REALM_ARG_TYPE(CType15))CName15; \
--(TableName##Query*)where; \
 -(TableName##Row*)addEmptyRow; \
 -(TableName##Row*)objectAtIndexedSubscript:(NSUInteger)ndx; \
 -(TableName##Row*)objectForKeyedSubscript:(NSString *)key; \
@@ -5168,10 +5097,6 @@ REALM_COLUMN_PROXY_IMPL(CName15, CType15) \
     REALM_COLUMN_INSERT(self, 13, ndx, CName14, CType14); \
     REALM_COLUMN_INSERT(self, 14, ndx, CName15, CType15); \
     [self RLM_insertDone]; \
-} \
--(TableName##Query*)where \
-{ \
-    return [[TableName##Query alloc] initWithTable:self]; \
 } \
 -(TableName##Row*)addEmptyRow \
 { \

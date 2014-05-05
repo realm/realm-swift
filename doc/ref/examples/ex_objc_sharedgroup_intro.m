@@ -22,38 +22,35 @@
  */
 
 
-void ex_objc_context_intro()
+void ex_objc_transaction_manager_intro()
 {
     // Remove previous datafile
-    [[NSFileManager defaultManager] removeItemAtPath:@"contextTest.realm" error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:@"transactionManagerTest.realm" error:nil];
 
     // Create datafile with a new table
-    RLMContext *context = [RLMContext contextPersistedAtPath:@"contextTest.realm"
-                                                       error:nil];
+    RLMTransactionManager *manager = [RLMTransactionManager managerForRealmWithPath:@"transactionManagerTest.realm"
+                                                                      error:nil];
     // Perform a write transaction (with commit to file)
-    [context writeUsingBlock:^(RLMRealm *realm) {
-        People *table = [realm createTableWithName:@"employees"
-                                      asTableClass:[People class]];
+    [manager writeUsingBlock:^(RLMRealm *realm) {
+        PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
         [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
     }];
 
     // Perform a write transaction (with rollback)
-    [context writeUsingBlockWithRollback:^(RLMRealm *realm, BOOL *rollback) {
-        People *table = [realm createTableWithName:@"employees"
-                                      asTableClass:[People class]];
+    [manager writeUsingBlockWithRollback:^(RLMRealm *realm, BOOL *rollback) {
+        PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
         if ([table rowCount] == 0) {
             NSLog(@"Roll back!");
             *rollback = YES;
             return;
         }
-        [table addName:@"Mary" Age:76 Hired:NO];
+        [table addRow:@[@"Mary", @21, @NO]];
     }];
 
     // Perform a read transaction
-    [context readUsingBlock:^(RLMRealm *realm) {
-        People *table = [realm tableWithName:@"employees"
-                                asTableClass:[People class]];
-        for (PeopleRow *row in table) {
+    [manager readUsingBlock:^(RLMRealm *realm) {
+        PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
+        for (People *row in table) {
             NSLog(@"Name: %@", row.Name);
         }
     }];

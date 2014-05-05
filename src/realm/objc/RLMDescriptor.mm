@@ -1,22 +1,22 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
 
@@ -46,22 +46,16 @@
 
 // FIXME: Provide a version of this method that takes a 'const char*'. This will simplify _addColumns of MyTable.
 // FIXME: Detect errors from core library
--(BOOL)addColumnWithName:(NSString*)name type:(RLMType)type
-{
-    return [self addColumnWithName:name andType:type error:nil];
-}
-
--(BOOL)addColumnWithName:(NSString*)name andType:(RLMType)type error:(NSError* __autoreleasing*)error
+-(NSUInteger)addColumnWithName:(NSString*)name type:(RLMType)type
 {
     if (m_read_only) {
-        if (error)
-            *error = make_realm_error(RLMErrorFailRdOnly, @"Tried to add column while read only");
-        return NO;
+        @throw [NSException exceptionWithName:@"realm:core_read_only_exception"
+                                       reason:@"Realm is read-only."
+                                     userInfo:nil];
     }
-    REALM_EXCEPTION_ERRHANDLER(
-                                 m_desc->add_column(tightdb::DataType(type), ObjcStringAccessor(name));,
-                                 NO);
-    return YES;
+    size_t columnIndex = NSNotFound;
+    REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(columnIndex = m_desc->add_column(tightdb::DataType(type), ObjcStringAccessor(name)););
+    return columnIndex;
 }
 
 -(RLMDescriptor *)addColumnTable:(NSString*)name

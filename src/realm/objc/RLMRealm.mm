@@ -1,22 +1,22 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #include <exception>
 
@@ -145,58 +145,58 @@ void throw_objc_exception(exception &ex)
     return self;
 }
 
-+ (instancetype)realmWithDefaultPersistence
++ (instancetype)defaultRealm
 {
-    return [RLMRealm realmWithDefaultPersistenceAndInitBlock:nil];
+    return [RLMRealm defaultRealmWithInitBlock:nil];
 }
 
-+ (instancetype)realmWithDefaultPersistenceAndInitBlock:(RLMWriteBlock)initBlock
++ (instancetype)defaultRealmWithInitBlock:(RLMWriteBlock)initBlock
 {
-    return [RLMRealm realmWithPersistenceToFile:[RLMContext defaultPath] initBlock:initBlock];
+    return [RLMRealm realmWithPath:[RLMTransactionManager defaultPath] initBlock:initBlock];
 }
 
-+ (instancetype)realmWithPersistenceToFile:(NSString *)path
++ (instancetype)realmWithPath:(NSString *)path
 {
-    return [self realmWithPersistenceToFile:path initBlock:nil];
+    return [self realmWithPath:path initBlock:nil];
 }
 
-+ (instancetype)realmWithPersistenceToFile:(NSString *)path initBlock:(RLMWriteBlock)initBlock
++ (instancetype)realmWithPath:(NSString *)path initBlock:(RLMWriteBlock)initBlock
 {
     // This constructor can only be called from the main thread
     if (![NSThread isMainThread]) {
         @throw [NSException exceptionWithName:@"realm:runloop_exception"
                                        reason:[NSString stringWithFormat:@"%@ \
                                                can only be called from the main thread. \
-                                               Use an RLMContext read or write block \
+                                               Use an RLMTransactionManager read or write block \
                                                instead.",
                                                NSStringFromSelector(_cmd)]
                                      userInfo:nil];
     }
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-    return [self realmWithPersistenceToFile:path
-                                  initBlock:initBlock
-                                    runLoop:[NSRunLoop mainRunLoop]
-                         notificationCenter:notificationCenter
-                                      error:nil];
+    return [self realmWithPath:path
+                     initBlock:initBlock
+                       runLoop:[NSRunLoop mainRunLoop]
+            notificationCenter:notificationCenter
+                         error:nil];
 }
 
-+ (instancetype)realmWithPersistenceToFile:(NSString *)path
-                                   runLoop:(NSRunLoop *)runLoop
-                        notificationCenter:(NSNotificationCenter *)notificationCenter
-                                     error:(NSError **)error
++ (instancetype)realmWithPath:(NSString *)path
+                      runLoop:(NSRunLoop *)runLoop
+           notificationCenter:(NSNotificationCenter *)notificationCenter
+                        error:(NSError **)error
 {
-    return [self realmWithPersistenceToFile:path
-                                  initBlock:nil
-                                    runLoop:runLoop
-                         notificationCenter:notificationCenter
-                                      error:error];
+    return [self realmWithPath:path
+                     initBlock:nil
+                       runLoop:runLoop
+            notificationCenter:notificationCenter
+                         error:error];
 }
 
-+ (instancetype)realmWithPersistenceToFile:(NSString *)path
-                                 initBlock:(RLMWriteBlock)initBlock
-                                   runLoop:(NSRunLoop *)runLoop
-                        notificationCenter:(NSNotificationCenter *)notificationCenter
-                                     error:(NSError **)error
++ (instancetype)realmWithPath:(NSString *)path
+                    initBlock:(RLMWriteBlock)initBlock
+                      runLoop:(NSRunLoop *)runLoop
+           notificationCenter:(NSNotificationCenter *)notificationCenter
+                        error:(NSError **)error
 {
     RLMRealm *realm = [[RLMRealm alloc] initForImplicitTransactions:YES];
     if (!realm) {
@@ -327,7 +327,7 @@ void throw_objc_exception(exception &ex)
                 [table setNativeTable:const_cast<Table*>(tableRef.get())];
             }
 
-            [_notificationCenter postNotificationName:RLMContextDidChangeNotification object:self];
+            [_notificationCenter postNotificationName:RLMRealmDidChangeNotification object:self];
         }
     }
     catch (exception &ex) {
@@ -457,7 +457,7 @@ void throw_objc_exception(exception &ex)
     
     if ([self hasTableWithName:name]) {
         @throw [NSException exceptionWithName:@"realm:table_with_name_already_exists"
-                                       reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the context.", name]
+                                       reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the realm.", name]
                                      userInfo:nil];
     }
     
@@ -516,7 +516,7 @@ void throw_objc_exception(exception &ex)
     
     if ([self hasTableWithName:name]) {
         @throw [NSException exceptionWithName:@"realm:table_with_name_already_exists"
-                                       reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the context.", name]
+                                       reason:[NSString stringWithFormat:@"A table with the name '%@' already exists in the realm.", name]
                                      userInfo:nil];
     }
     
