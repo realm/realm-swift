@@ -400,6 +400,7 @@ EOF
     "ci-test")
         mkdir -p test-reports
         (
+            cd ../tightdb
             mkdir -p install
             sh build.sh config install
             sh build.sh build-iphone
