@@ -304,7 +304,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
         XCTAssertEqualObjects([table[0] getThatName], @"name", @"name property should be name.");
         
         [table[0] setTheInt:99];
-        XCTAssertEqual([table[0] age], 99L, @"age property should be 99");
+        XCTAssertEqual((int)[table[0] age], (int)99, @"age property should be 99");
     }];
 }
 
