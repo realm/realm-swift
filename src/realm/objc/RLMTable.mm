@@ -368,7 +368,7 @@
     [self insertRow:data atIndex:table.size()];
 }
 
-/* Moved to private header */
+// Moved to private header
 -(RLMRow *)addEmptyRow
 {
     return [[_proxyObjectClass alloc] initWithTable:self ndx:[self RLM_addEmptyRow]];

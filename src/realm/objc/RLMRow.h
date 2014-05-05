@@ -139,10 +139,10 @@ RLM_DEFINE_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)     \
 RLM_IMPLEMENT_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)
 
 
-/* FIXME: This class can be (and should be) eliminated by using a
-   macro switching trick for the individual column types on
-   REALM_ROW_PROPERTY macros similar to what is done for query
-   accessors. */
+// FIXME: This class can be (and should be) eliminated by using a
+// macro switching trick for the individual column types on
+// REALM_ROW_PROPERTY macros similar to what is done for query
+// accessors.
 @interface RLMAccessor : NSObject
 -(id)initWithRow:(RLMRow *)cursor columnId:(NSUInteger)columnId;
 -(BOOL)getBool;

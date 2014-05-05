@@ -253,7 +253,7 @@ using namespace std;
 {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         [table addColumnWithName:@"first" type:RLMTypeDouble];
-        XCTAssertNoThrow(([table addRow:@[@3.14]]), @"Cannot insert 'double'");  /* double is default */
+        XCTAssertNoThrow(([table addRow:@[@3.14]]), @"Cannot insert 'double'");  // double is default
         XCTAssertEqual((NSUInteger)1, ([table rowCount]), @"1 row expected");
     }];
 }
@@ -262,7 +262,7 @@ using namespace std;
 {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         [table addColumnWithName:@"first" type:RLMTypeDouble];
-        XCTAssertNoThrow(([table addRow:@{@"first": @3.14}]), @"Cannot insert 'double'");   /* double is default */
+        XCTAssertNoThrow(([table addRow:@{@"first": @3.14}]), @"Cannot insert 'double'");   // double is default
         XCTAssertEqual((NSUInteger)1, ([table rowCount]), @"1 row expected");
     }];
 }
@@ -271,7 +271,7 @@ using namespace std;
 {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         [table addColumnWithName:@"first" type:RLMTypeFloat];
-        XCTAssertNoThrow(([table addRow:@[@3.14F]]), @"Cannot insert 'float'"); /* F == float */
+        XCTAssertNoThrow(([table addRow:@[@3.14F]]), @"Cannot insert 'float'"); // F == float
         XCTAssertEqual((NSUInteger)1, ([table rowCount]), @"1 row expected");
     }];
 }
@@ -280,7 +280,7 @@ using namespace std;
 {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         [table addColumnWithName:@"first" type:RLMTypeFloat];
-        XCTAssertNoThrow(([table addRow:@{@"first": @3.14F}]), @"Cannot insert 'float'");   /* F == float */
+        XCTAssertNoThrow(([table addRow:@{@"first": @3.14F}]), @"Cannot insert 'float'");   // F == float
         XCTAssertEqual((NSUInteger)1, ([table rowCount]), @"1 row expected");
     }];
 }
@@ -289,7 +289,7 @@ using namespace std;
 {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         [table addColumnWithName:@"first" type:RLMTypeDate];
-        XCTAssertNoThrow(([table addRow:@[@1000000000]]), @"Cannot insert 'time_t'"); /* 2001-09-09 01:46:40 */
+        XCTAssertNoThrow(([table addRow:@[@1000000000]]), @"Cannot insert 'time_t'"); // 2001-09-09 01:46:40
         XCTAssertEqual((NSUInteger)1, ([table rowCount]), @"1 row expected");
         
         NSDate *d = [[NSDate alloc] initWithTimeIntervalSince1970:1396963324];
@@ -561,107 +561,106 @@ using namespace std;
     }];
 }
 
-/*
-- (void)testColumnlessNameOfColumnWithIndex
-{
-    RLMTable* table = [[RLMTable alloc] init];
-    XCTAssertThrowsSpecific([table nameOfColumnWithIndex:NSNotFound],
-        NSException, NSRangeException,
-        @"Columnless table has no column names.");
-    XCTAssertThrowsSpecific([table nameOfColumnWithIndex:(0)],
-        NSException, NSRangeException,
-        @"Columnless table has no column names.");
-    XCTAssertThrowsSpecific([table nameOfColumnWithIndex:1],
-        NSException, NSRangeException,
-        @"Columnless table has no column names.");
-}
 
-- (void)testColumnlessGetColumnType
-{
-    RLMTable* t = [[RLMTable alloc] init];
-    XCTAssertThrowsSpecific([t getColumnType:((NSUInteger)-1)],
-        NSException, NSRangeException,
-        @"Columnless table has no column types.");
-    XCTAssertThrowsSpecific([t getColumnType:((NSUInteger)0)],
-        NSException, NSRangeException,
-        @"Columnless table has no column types.");
-    XCTAssertThrowsSpecific([t getColumnType:((NSUInteger)1)],
-        NSException, NSRangeException,
-        @"Columnless table has no column types.");
-}
-
-- (void)testColumnlessCursorAtIndex
-{
-    RLMTable* t = [[RLMTable alloc] init];
-    XCTAssertThrowsSpecific([t cursorAtIndex:((NSUInteger)-1)],
-        NSException, NSRangeException,
-        @"Columnless table has no cursors.");
-    XCTAssertThrowsSpecific([t cursorAtIndex:((NSUInteger)0)],
-        NSException, NSRangeException,
-        @"Columnless table has no cursors.");
-    XCTAssertThrowsSpecific([t cursorAtIndex:((NSUInteger)1)],
-        NSException, NSRangeException,
-        @"Columnless table has no cursors.");
-}
-
-- (void)testColumnlessCursorAtLastIndex
-{
-    RLMTable* t = [[RLMTable alloc] init];
-    XCTAssertThrowsSpecific([t cursorAtLastIndex],
-        NSException, NSRangeException,
-        @"Columnless table has no cursors."); 
-}
-
-- (void)testRemoveRowAtIndex
-{
-    RLMTable *t = [[RLMTable alloc] init];
-    XCTAssertThrowsSpecific([t removeRowAtIndex:((NSUInteger)-1)],
-        NSException, NSRangeException,
-        @"No rows in a columnless table.");
-    XCTAssertThrowsSpecific([t removeRowAtIndex:((NSUInteger)0)],
-        NSException, NSRangeException,
-        @"No rows in a columnless table.");
-    XCTAssertThrowsSpecific([t removeRowAtIndex:((NSUInteger)1)],
-        NSException, NSRangeException,
-        @"No rows in a columnless table.");
-}
-
-- (void)testColumnlessRemoveLastRow
-{
-    RLMTable *t = [[RLMTable alloc] init];
-    XCTAssertThrowsSpecific([t removeLastRow],
-        NSException, NSRangeException,
-        @"No rows in a columnless table.");
-}
-
-- (void)testColumnlessGetTableSize
-{
-    RLMTable *t = [[RLMTable alloc] init];
-    XCTAssertThrowsSpecific([t getTableSize:((NSUInteger)0) ndx:((NSUInteger)-1)],
-        NSException, NSRangeException,
-        @"No rows in a columnless table.");
-    XCTAssertThrowsSpecific([t getTableSize:((NSUInteger)0) ndx:((NSUInteger)0)],
-        NSException, NSRangeException,
-        @"No rows in a columnless table.");
-    XCTAssertThrowsSpecific([t getTableSize:((NSUInteger)0) ndx:((NSUInteger)1)],
-        NSException, NSRangeException,
-        @"No rows in a columnless table.");
-}
-
-- (void)testColumnlessClearSubtable
-{
-    RLMTable *t = [[RLMTable alloc] init];
-    XCTAssertThrowsSpecific([t clearSubtable:((NSUInteger)0) ndx:((NSUInteger)-1)],
-        NSException, NSRangeException,
-        @"No rows in a columnless table.");
-    XCTAssertThrowsSpecific([t clearSubtable:((NSUInteger)0) ndx:((NSUInteger)0)],
-        NSException, NSRangeException,
-        @"No rows in a columnless table.");
-    XCTAssertThrowsSpecific([t clearSubtable:((NSUInteger)0) ndx:((NSUInteger)1)],
-        NSException, NSRangeException,
-        @"No rows in a columnless table.");
-}
-*/
+//- (void)testColumnlessNameOfColumnWithIndex
+//{
+//    RLMTable* table = [[RLMTable alloc] init];
+//    XCTAssertThrowsSpecific([table nameOfColumnWithIndex:NSNotFound],
+//        NSException, NSRangeException,
+//        @"Columnless table has no column names.");
+//    XCTAssertThrowsSpecific([table nameOfColumnWithIndex:(0)],
+//        NSException, NSRangeException,
+//        @"Columnless table has no column names.");
+//    XCTAssertThrowsSpecific([table nameOfColumnWithIndex:1],
+//        NSException, NSRangeException,
+//        @"Columnless table has no column names.");
+//}
+//
+//- (void)testColumnlessGetColumnType
+//{
+//    RLMTable* t = [[RLMTable alloc] init];
+//    XCTAssertThrowsSpecific([t getColumnType:((NSUInteger)-1)],
+//        NSException, NSRangeException,
+//        @"Columnless table has no column types.");
+//    XCTAssertThrowsSpecific([t getColumnType:((NSUInteger)0)],
+//        NSException, NSRangeException,
+//        @"Columnless table has no column types.");
+//    XCTAssertThrowsSpecific([t getColumnType:((NSUInteger)1)],
+//        NSException, NSRangeException,
+//        @"Columnless table has no column types.");
+//}
+//
+//- (void)testColumnlessCursorAtIndex
+//{
+//    RLMTable* t = [[RLMTable alloc] init];
+//    XCTAssertThrowsSpecific([t cursorAtIndex:((NSUInteger)-1)],
+//        NSException, NSRangeException,
+//        @"Columnless table has no cursors.");
+//    XCTAssertThrowsSpecific([t cursorAtIndex:((NSUInteger)0)],
+//        NSException, NSRangeException,
+//        @"Columnless table has no cursors.");
+//    XCTAssertThrowsSpecific([t cursorAtIndex:((NSUInteger)1)],
+//        NSException, NSRangeException,
+//        @"Columnless table has no cursors.");
+//}
+//
+//- (void)testColumnlessCursorAtLastIndex
+//{
+//    RLMTable* t = [[RLMTable alloc] init];
+//    XCTAssertThrowsSpecific([t cursorAtLastIndex],
+//        NSException, NSRangeException,
+//        @"Columnless table has no cursors."); 
+//}
+//
+//- (void)testRemoveRowAtIndex
+//{
+//    RLMTable *t = [[RLMTable alloc] init];
+//    XCTAssertThrowsSpecific([t removeRowAtIndex:((NSUInteger)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    XCTAssertThrowsSpecific([t removeRowAtIndex:((NSUInteger)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    XCTAssertThrowsSpecific([t removeRowAtIndex:((NSUInteger)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//}
+//
+//- (void)testColumnlessRemoveLastRow
+//{
+//    RLMTable *t = [[RLMTable alloc] init];
+//    XCTAssertThrowsSpecific([t removeLastRow],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//}
+//
+//- (void)testColumnlessGetTableSize
+//{
+//    RLMTable *t = [[RLMTable alloc] init];
+//    XCTAssertThrowsSpecific([t getTableSize:((NSUInteger)0) ndx:((NSUInteger)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    XCTAssertThrowsSpecific([t getTableSize:((NSUInteger)0) ndx:((NSUInteger)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    XCTAssertThrowsSpecific([t getTableSize:((NSUInteger)0) ndx:((NSUInteger)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//}
+//
+//- (void)testColumnlessClearSubtable
+//{
+//    RLMTable *t = [[RLMTable alloc] init];
+//    XCTAssertThrowsSpecific([t clearSubtable:((NSUInteger)0) ndx:((NSUInteger)-1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    XCTAssertThrowsSpecific([t clearSubtable:((NSUInteger)0) ndx:((NSUInteger)0)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//    XCTAssertThrowsSpecific([t clearSubtable:((NSUInteger)0) ndx:((NSUInteger)1)],
+//        NSException, NSRangeException,
+//        @"No rows in a columnless table.");
+//}
 
 - (void)testDataTypes_Dynamic
 {
