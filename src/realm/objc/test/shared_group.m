@@ -62,7 +62,7 @@ REALM_TABLE_2(SharedTable2,
     for (NSUInteger i = 0; i < 50; i++) {
         [diskTable addHired:YES Age:i];
     }
-    [realm abandonWriteTransaction];
+    [realm rollbackWriteTransaction];
     
     [realm writeUsingBlock:^(RLMRealm *realm) {
         SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];

@@ -102,7 +102,7 @@ typedef void(^RLMNotificationBlock)(NSString *note, RLMRealm *realm);
  Abandon all write operations in the current write transaction. After this is called the RLMRealm reverts back to being
  read-only.
  */
-- (void)abandonWriteTransaction;
+- (void)rollbackWriteTransaction;
 
 /**
  Update an RLMRealm and oustanding objects to point to the most recent data for this RLMRealm.

@@ -306,7 +306,7 @@ NSString *const defaultRealmFileName = @"default.realm";
     }
 }
 
-- (void)abandonWriteTransaction {
+- (void)rollbackWriteTransaction {
     if (self.inWriteTransaction) {
         try {
             _sharedGroup->rollback();
