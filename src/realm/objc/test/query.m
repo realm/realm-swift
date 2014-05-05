@@ -10,23 +10,35 @@
 #import <realm/objc/RLMTableFast.h>
 #import <realm/objc/RLMPrivateTableMacrosFast.h>
 
-REALM_TABLE_1(TestQuerySub,
-              Age,  Int)
+@interface TestQueryObj : RLMRow
 
-REALM_TABLE_9(TestQueryAllTypes,
-              BoolCol,   Bool,
-              IntCol,    Int,
-              FloatCol,  Float,
-              DoubleCol, Double,
-              StringCol, String,
-              BinaryCol, Binary,
-              DateCol,   Date,
-              TableCol,  TestQuerySub,
-              MixedCol,  Mixed)
+@property (nonatomic, assign) NSInteger age;
 
-REALM_TABLE_FAST(TestQuerySub)
+@end
 
-REALM_TABLE_FAST(TestQueryAllTypes)
+@implementation TestQueryObj
+@end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryTable2, TestQueryObj);
+
+@interface TestQueryAllObj : RLMRow
+
+@property (nonatomic, assign) BOOL      BoolCol;
+@property (nonatomic, assign) NSInteger IntCol;
+@property (nonatomic, assign) float     FloatCol;
+@property (nonatomic, assign) double    DoubleCol;
+@property (nonatomic, copy)   NSString *StringCol;
+@property (nonatomic, strong) NSData   *BinaryCol;
+@property (nonatomic, strong) NSDate   *DateCol;
+//@property (nonatomic, strong) TestQueryTable2 *TableCol; // FIXME
+@property (nonatomic, strong) id        MixedCol;
+
+@end
+
+@implementation TestQueryAllObj
+@end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryAllTable2, TestQueryAllObj);
 
 @interface MACtestQuery: RLMTestCase
 
@@ -37,112 +49,53 @@ REALM_TABLE_FAST(TestQueryAllTypes)
 - (void)testQuery {
     
     [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
-        TestQueryAllTypes *table = [realm createTableWithName:@"table" asTableClass:TestQueryAllTypes.class];
+        TestQueryAllTable2 *table = [TestQueryAllTable2 tableInRealm:realm named:@"table"];
         NSLog(@"Table: %@", table);
         XCTAssertNotNil(table, @"Table is nil");
         
         const char bin[4] = { 0, 1, 2, 3 };
         NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
         NSData *bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
-        //    TestQuerySub *subtab1 = [[TestQuerySub alloc] init];
-        TestQuerySub *subtab2 = [realm createTableWithName:@"subtab2" asTableClass:TestQuerySub.class];
-        [subtab2 addAge:100];
-        NSNumber *mixInt1   = [NSNumber numberWithLongLong:1];
-        //TDBMixed *mixSubtab = [TDBMixed mixedWithTable:subtab2];
         
-        [table addBoolCol:NO   IntCol:54       FloatCol:0.7     DoubleCol:0.8       StringCol:@"foo"
-                BinaryCol:bin1 DateCol:0       TableCol:nil     MixedCol:mixInt1];
+        TestQueryTable2 *subtable = [TestQueryTable2 tableInRealm:realm named:@"subtable"];
+        [subtable addRow:@[@22]];
         
-        [table addBoolCol:YES  IntCol:506      FloatCol:7.7     DoubleCol:8.8       StringCol:@"banach"
-                BinaryCol:bin2 DateCol:[NSDate date] TableCol:subtab2 MixedCol:subtab2];
+        NSDate *zeroDate = [NSDate dateWithTimeIntervalSince1970:0];
+        [table addRow:@[@NO, @54, @(0.7f), @0.8, @"foo", bin1, zeroDate, @2]];
+        [table addRow:@[@YES, @506, @(7.7f), @8.8, @"banach", bin2, [NSDate date], @"bar"]];
         
-        XCTAssertEqual([[[table where].BoolCol   columnIsEqualTo:NO]      countRows], (NSUInteger)1, @"BoolCol equal");
-        XCTAssertEqual([[[table where].IntCol    columnIsEqualTo:54]      countRows], (NSUInteger)1, @"IntCol equal");
-        XCTAssertEqual([[[table where].FloatCol  columnIsEqualTo:0.7f]    countRows], (NSUInteger)1, @"FloatCol equal");
-        XCTAssertEqual([[[table where].DoubleCol columnIsEqualTo:0.8]     countRows], (NSUInteger)1, @"DoubleCol equal");
-        XCTAssertEqual([[[table where].StringCol columnIsEqualTo:@"foo"]  countRows], (NSUInteger)1, @"StringCol equal");
-        XCTAssertEqual([[[table where].BinaryCol columnIsEqualTo:bin1]    countRows], (NSUInteger)1, @"BinaryCol equal");
-        XCTAssertEqual([[[table where].DateCol   columnIsEqualTo:0]       countRows], (NSUInteger)1, @"DateCol equal");
+        XCTAssertEqual([[table allWhere:@"BoolCol == NO"] rowCount], (NSUInteger)1, @"BoolCol equal");
+        XCTAssertEqual([[table allWhere:@"IntCol == 54"] rowCount], (NSUInteger)1, @"IntCol equal");
+        NSUInteger floatCount = [[table allWhere:@"FloatCol == %@", @(0.7f)] rowCount];
+        XCTAssertEqual(floatCount, (NSUInteger)1, @"FloatCol equal");
+        XCTAssertEqual([[table allWhere:@"DoubleCol == 0.8"] rowCount], (NSUInteger)1, @"DoubleCol equal");
+        XCTAssertEqual([[table allWhere:@"StringCol == 'foo'"] rowCount], (NSUInteger)1, @"StringCol equal");
+        NSUInteger binaryCount = [[table allWhere:@"BinaryCol == %@", bin1] rowCount];
+        XCTAssertEqual(binaryCount, (NSUInteger)1, @"BinaryCol equal");
+        NSUInteger dateCount = [[table allWhere:@"DateCol == %@", zeroDate] rowCount];
+        XCTAssertEqual(dateCount, (NSUInteger)1, @"DateCol equal");
         // These are not yet implemented
-        //    XCTAssertEqual([[[table where].TableCol  columnIsEqualTo:subtab1] count], (NSUInteger)1, @"TableCol equal");
-        //    XCTAssertEqual([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (NSUInteger)1, @"MixedCol equal");
+        // NSUInteger subtableCount = [[table allWhere:@"TableCol == %@", subtable] rowCount];
+        // XCTAssertEqual(subtableCount, (NSUInteger)1, @"TableCol equal");
+        // NSUInteger mixedCount = [[table allWhere:@"MixedCol == %@", @"bar"] rowCount];
+        // XCTAssertEqual(mixedCount, (NSUInteger)1, @"MixedCol equal");
         
-        TestQueryAllTypesQuery *query = [[table where].BoolCol   columnIsEqualTo:NO];
+        NSString *predicate = @"BoolCol == NO";
         
-        XCTAssertEqual([query.IntCol min], (int64_t)54,    @"IntCol min");
-        XCTAssertEqual([query.IntCol max], (int64_t)54,    @"IntCol max");
-        XCTAssertEqual([query.IntCol sum], (int64_t)54,    @"IntCol sum");
-        XCTAssertEqual([query.IntCol avg] , 54.0,           @"IntCol avg");
+        XCTAssertEqual([[table minOfProperty:@"IntCol" where:predicate] integerValue], (NSUInteger)54, @"IntCol min");
+        XCTAssertEqual([[table maxOfProperty:@"IntCol" where:predicate] integerValue], (NSUInteger)54, @"IntCol max");
+        XCTAssertEqual([[table sumOfProperty:@"IntCol" where:predicate] integerValue], (NSUInteger)54, @"IntCol sum");
+        XCTAssertEqual([[table averageOfProperty:@"IntCol" where:predicate] integerValue], (NSUInteger)54, @"IntCol avg");
         
-        XCTAssertEqual([query.FloatCol min], 0.7f,         @"FloatCol min");
-        XCTAssertEqual([query.FloatCol max], 0.7f,         @"FloatCol max");
-        XCTAssertEqual([query.FloatCol sum], (double)0.7f, @"FloatCol sum");
-        XCTAssertEqual([query.FloatCol avg], (double)0.7f, @"FloatCol avg");
+        XCTAssertEqual([[table minOfProperty:@"FloatCol" where:predicate] floatValue], (float)0.7f, @"FloatCol min");
+        XCTAssertEqual([[table maxOfProperty:@"FloatCol" where:predicate] floatValue], (float)0.7f, @"FloatCol max");
+        XCTAssertEqual([[table sumOfProperty:@"FloatCol" where:predicate] floatValue], (float)0.7f, @"FloatCol sum");
+        XCTAssertEqual([[table averageOfProperty:@"FloatCol" where:predicate] floatValue], (float)0.7f, @"FloatCol avg");
         
-        XCTAssertEqual([query.DoubleCol min], 0.8,         @"DoubleCol min");
-        XCTAssertEqual([query.DoubleCol max], 0.8,         @"DoubleCol max");
-        XCTAssertEqual([query.DoubleCol sum], 0.8,         @"DoubleCol sum");
-        XCTAssertEqual([query.DoubleCol avg], 0.8,         @"DoubleCol avg");
-        
-        // Check that all column conditions return query objects of the
-        // right type
-        [[[table where].BoolCol columnIsEqualTo:NO].BoolCol columnIsEqualTo:NO];
-        
-        [[[table where].IntCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].IntCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].IntCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].IntCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].IntCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].IntCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].IntCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
-        
-        [[[table where].FloatCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].FloatCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].FloatCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].FloatCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].FloatCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].FloatCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].FloatCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
-        
-        [[[table where].DoubleCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].DoubleCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].DoubleCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].DoubleCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].DoubleCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].DoubleCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].DoubleCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
-        
-        [[[table where].StringCol columnIsEqualTo:@""].BoolCol columnIsEqualTo:NO];
-        [[[table where].StringCol columnIsEqualTo:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
-        [[[table where].StringCol columnIsNotEqualTo:@""].BoolCol columnIsEqualTo:NO];
-        [[[table where].StringCol columnIsNotEqualTo:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
-        [[[table where].StringCol columnBeginsWith:@""].BoolCol columnIsEqualTo:NO];
-        [[[table where].StringCol columnBeginsWith:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
-        [[[table where].StringCol columnEndsWith:@""].BoolCol columnIsEqualTo:NO];
-        [[[table where].StringCol columnEndsWith:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
-        [[[table where].StringCol columnContains:@""].BoolCol columnIsEqualTo:NO];
-        [[[table where].StringCol columnContains:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
-        
-        [[[table where].BinaryCol columnIsEqualTo:bin1].BoolCol columnIsEqualTo:NO];
-        [[[table where].BinaryCol columnIsNotEqualTo:bin1].BoolCol columnIsEqualTo:NO];
-        [[[table where].BinaryCol columnBeginsWith:bin1].BoolCol columnIsEqualTo:NO];
-        [[[table where].BinaryCol columnEndsWith:bin1].BoolCol columnIsEqualTo:NO];
-        [[[table where].BinaryCol columnContains:bin1].BoolCol columnIsEqualTo:NO];
-        
-        [[[table where].DateCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].DateCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].DateCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].DateCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].DateCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].DateCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-        [[[table where].DateCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
-        
-        // These are not yet implemented
-        //    [[[table where].TableCol columnIsEqualTo:nil].BoolCol columnIsEqualTo:NO];
-        //    [[[table where].TableCol columnIsNotEqualTo:nil].BoolCol columnIsEqualTo:NO];
-        
-        //    [[[table where].MixedCol columnIsEqualTo:mixInt1].BoolCol columnIsEqualTo:NO];
-        //    [[[table where].MixedCol columnIsNotEqualTo:mixInt1].BoolCol columnIsEqualTo:NO];
+        XCTAssertEqual([[table minOfProperty:@"DoubleCol" where:predicate] doubleValue], (double)0.8, @"DoubleCol min");
+        XCTAssertEqual([[table maxOfProperty:@"DoubleCol" where:predicate] doubleValue], (double)0.8, @"DoubleCol max");
+        XCTAssertEqual([[table sumOfProperty:@"DoubleCol" where:predicate] doubleValue], (double)0.8, @"DoubleCol sum");
+        XCTAssertEqual([[table averageOfProperty:@"DoubleCol" where:predicate] doubleValue], (double)0.8, @"DoubleCol avg");
     }];
 
 }
@@ -203,119 +156,124 @@ REALM_TABLE_FAST(TestQueryAllTypes)
         [table RLM_setMixed:mixInt1 inColumnWithIndex:MIXED_COL atRowIndex:0];
         [table RLM_setMixed:mixString inColumnWithIndex:MIXED_COL atRowIndex:1];
         
-        // Conditions (note that count is invoked to get the number of matches)
+        // Conditions
+        NSUInteger betweenCount = [table countWhere:@"IntCol between %@", @[@859, @861]];
+        XCTAssertEqual(betweenCount, (NSUInteger)1, @"betweenInt");
+        betweenCount = [table countWhere:@"FloatCol between %@", @[@(5.5f), @(5.7f)]];
+        XCTAssertEqual(betweenCount, (NSUInteger)1, @"betweenFloat");
+        betweenCount = [table countWhere:@"DoubleCol between %@", @[@5.5, @5.7]];
+        XCTAssertEqual(betweenCount, (NSUInteger)1, @"betweenDouble");
+        betweenCount = [table countWhere:@"DateCol between %@", @[date1, date2]];
+        XCTAssertEqual(betweenCount, (NSUInteger)2, @"betweenDate");
         
-        XCTAssertEqual([[[table where] intIsBetween:859 :861 inColumnWithIndex:INT_COL ] countRows], (NSUInteger)1, @"betweenInt");
-        XCTAssertEqual([[[table where] floatIsBetween:5.5 :5.7 inColumnWithIndex:FLOAT_COL ] countRows], (NSUInteger)1, @"betweenFloat");
-        XCTAssertEqual([[[table where] doubleIsBetween:5.5 :5.7 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"betweenDouble");
-        XCTAssertEqual([[[table where] dateIsBetween:date1 :date2 inColumnWithIndex :DATE_COL ] countRows], (NSUInteger)2, @"betweenDate");
+        {
+            XCTAssertEqual([table countWhere:@"BoolCol == YES"], (NSUInteger)1, @"isEqualToBool");
+            XCTAssertEqual([table countWhere:@"IntCol == 860"], (NSUInteger)1, @"isEqualToInt");
+            NSUInteger floatCount = [table countWhere:@"FloatCol == %f", 5.6];
+            XCTAssertEqual(floatCount, (NSUInteger)1, @"isEqualToFloat");
+            XCTAssertEqual([table countWhere:@"DoubleCol == 5.6"], (NSUInteger)1, @"isEqualToDouble");
+            XCTAssertEqual([table countWhere:@"StringCol == 'foo'"], (NSUInteger)1, @"isEqualToString");
+            XCTAssertEqual([table countWhere:@"StringCol ==[c] 'Foo'"], (NSUInteger)1, @"isEqualToStringCaseNo");
+            NSUInteger dateCount = [table countWhere:@"DateCol == %@", date1];
+            XCTAssertEqual(dateCount, (NSUInteger)1, @"isEqualToDate");
+            NSUInteger binCount = [table countWhere:@"BinaryCol == %@", bin1];
+            XCTAssertEqual(binCount, (NSUInteger)1, @"isEqualToBinary");
+        }
         
-        XCTAssertEqual([[[table where] boolIsEqualTo:YES inColumnWithIndex:BOOL_COL ] countRows], (NSUInteger)1, @"isEqualToBool");
-        XCTAssertEqual([[[table where] intIsEqualTo:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isEqualToInt");
-        XCTAssertEqual([[[table where] floatIsEqualTo:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isEqualToFloat");
-        XCTAssertEqual([[[table where] doubleIsEqualTo:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isEqualToDouble");
-        XCTAssertEqual([[[table where] stringIsEqualTo:@"foo" inColumnWithIndex:STRING_COL ] countRows], (NSUInteger)1, @"isEqualToString");
-        XCTAssertEqual([[[table where] stringIsCaseInsensitiveEqualTo:@"Foo" inColumnWithIndex:STRING_COL] countRows], (NSUInteger)1, @"isEqualToStringCaseNO");
-        //XCTAssertEqual([[[table where] column:STRING_COL isEqualToString:@"Foo" caseSensitive:YES] countRows], (NSUInteger)0, @"isEqualToStringCaseYES");
-        XCTAssertEqual([[[table where] dateIsEqualTo:[NSDate date] inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isEqualToDate");
-        XCTAssertEqual([[[table where] binaryIsEqualTo:bin1 inColumnWithIndex:BINARY_COL] countRows], (NSUInteger)1, @"isEqualToBinary");
+        {
+            XCTAssertEqual([table countWhere:@"BoolCol != YES"], (NSUInteger)1, @"isNotEqualToBool");
+            XCTAssertEqual([table countWhere:@"IntCol != 860"], (NSUInteger)1, @"isNotEqualToInt");
+            NSUInteger floatCount = [table countWhere:@"FloatCol != %f", 5.6];
+            XCTAssertEqual(floatCount, (NSUInteger)1, @"isEqualToFloat");
+            XCTAssertEqual([table countWhere:@"DoubleCol != 5.6"], (NSUInteger)1, @"isNotEqualToDouble");
+            XCTAssertEqual([table countWhere:@"StringCol != 'foo'"], (NSUInteger)1, @"isNotEqualToString");
+            XCTAssertEqual([table countWhere:@"StringCol !=[c] 'Foo'"], (NSUInteger)1, @"isNotEqualToStringCaseNo");
+            NSUInteger dateCount = [table countWhere:@"DateCol != %@", date1];
+            XCTAssertEqual(dateCount, (NSUInteger)1, @"isNotEqualToDate");
+            NSUInteger binCount = [table countWhere:@"BinaryCol != %@", bin1];
+            XCTAssertEqual(binCount, (NSUInteger)1, @"isNotEqualToBinary");
+        }
         
-        XCTAssertEqual([[[table where] intIsNotEqualTo:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isEqualToInt");
-        XCTAssertEqual([[[table where] floatIsNotEqualTo:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isEqualToFloat");
-        XCTAssertEqual([[[table where] doubleIsNotEqualTo:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isEqualToDouble");
-        XCTAssertEqual([[[table where] stringIsNotEqualTo:@"foo" inColumnWithIndex:STRING_COL] countRows], (NSUInteger)1, @"isEqualToString");
-        XCTAssertEqual([[[table where] stringIsNotCaseInsensitiveEqualTo:@"Foo" inColumnWithIndex:STRING_COL] countRows], (NSUInteger)1, @"isEqualToStringCaseNO");
-        //XCTAssertEqual([[[table where] column:STRING_COL isNotEqualToString:@"Foo" caseSensitive:YES] countRows], (NSUInteger)2, @"isEqualToStringCaseYES");
-        XCTAssertEqual([[[table where] dateIsNotEqualTo:[NSDate date] inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isEqualToDate");
-        XCTAssertEqual([[[table where] binaryIsNotEqualTo:bin1 inColumnWithIndex:BINARY_COL] countRows], (NSUInteger)1, @"isEqualToBinary");
+        {
+            XCTAssertEqual([table countWhere:@"IntCol > 859"], (NSUInteger)1, @"isGreaterThanInt");
+            NSUInteger floatCount = [table countWhere:@"FloatCol > %f", 5.5];
+            XCTAssertEqual(floatCount, (NSUInteger)1, @"isGreaterThanFloat");
+            XCTAssertEqual([table countWhere:@"DoubleCol > 5.5"], (NSUInteger)1, @"isGreaterThanDouble");
+            NSUInteger dateCount = [table countWhere:@"DateCol > %@", date1];
+            XCTAssertEqual(dateCount, (NSUInteger)1, @"isGreaterThanDate");
+        }
         
-        XCTAssertEqual([[[table where] intIsGreaterThan:859 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isGreaterThanInt");
-        XCTAssertEqual([[[table where] floatIsGreaterThan:5.5 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isGreaterThanFloat");
-        XCTAssertEqual([[[table where] doubleIsGreaterThan:5.5 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isGreaterThanDouble");
-        XCTAssertEqual([[[table where] dateIsGreaterThan:date1 inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isGreaterThanDate");
+        {
+            XCTAssertEqual([table countWhere:@"IntCol >= 860"], (NSUInteger)1, @"isGreaterThanOrEqualToInt");
+            NSUInteger floatCount = [table countWhere:@"FloatCol >= %f", 5.6];
+            XCTAssertEqual(floatCount, (NSUInteger)1, @"isGreaterThanOrEqualToFloat");
+            XCTAssertEqual([table countWhere:@"DoubleCol >= 5.6"], (NSUInteger)1, @"isGreaterThanOrEqualToDouble");
+            NSUInteger dateCount = [table countWhere:@"DateCol >= %@", date1];
+            XCTAssertEqual(dateCount, (NSUInteger)2, @"isGreaterThanOrEqualToDate");
+        }
         
-        XCTAssertEqual([[[table where] intIsGreaterThanOrEqualTo:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isGreaterThanInt");
-        XCTAssertEqual([[[table where] floatIsGreaterThanOrEqualTo:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isGreaterThanFloat");
-        XCTAssertEqual([[[table where] doubleIsGreaterThanOrEqualTo:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isGreaterThanDouble");
-        XCTAssertEqual([[[table where] dateIsGreaterThanOrEqualTo:date1 inColumnWithIndex:DATE_COL] countRows], (NSUInteger)2, @"isGreaterThanDate");
+        {
+            XCTAssertEqual([table countWhere:@"IntCol < 860"], (NSUInteger)1, @"isLessThanInt");
+            NSUInteger floatCount = [table countWhere:@"FloatCol < %f", 5.6];
+            XCTAssertEqual(floatCount, (NSUInteger)1, @"isLessThanFloat");
+            XCTAssertEqual([table countWhere:@"DoubleCol < 5.6"], (NSUInteger)1, @"isLessThanDouble");
+            NSUInteger dateCount = [table countWhere:@"DateCol < %@", date2];
+            XCTAssertEqual(dateCount, (NSUInteger)1, @"isLessThanDate");
+        }
         
-        XCTAssertEqual([[[table where] intIsLessThan:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)1, @"isLessThanInt");
-        XCTAssertEqual([[[table where] floatIsLessThan:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)1, @"isLessThanFloat");
-        XCTAssertEqual([[[table where] doubleIsLessThan:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)1, @"isLessThanDouble");
-        XCTAssertEqual([[[table where] dateIsLessThan:date2 inColumnWithIndex:DATE_COL] countRows], (NSUInteger)1, @"isLessThanDate");
+        {
+            XCTAssertEqual([table countWhere:@"IntCol <= 860"], (NSUInteger)2, @"isLessThanOrEqualToInt");
+            NSUInteger floatCount = [table countWhere:@"FloatCol <= %f", 5.6];
+            XCTAssertEqual(floatCount, (NSUInteger)2, @"isLessThanOrEqualToFloat");
+            XCTAssertEqual([table countWhere:@"DoubleCol <= 5.6"], (NSUInteger)2, @"isLessThanOrEqualToDouble");
+            NSUInteger dateCount = [table countWhere:@"DateCol <= %@", date2];
+            XCTAssertEqual(dateCount, (NSUInteger)2, @"isLessThanOrEqualToDate");
+        }
         
-        XCTAssertEqual([[[table where] intIsLessThanOrEqualTo:860 inColumnWithIndex:INT_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToInt");
-        XCTAssertEqual([[[table where] floatIsLessThanOrEqualTo:5.6 inColumnWithIndex:FLOAT_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToFloat");
-        XCTAssertEqual([[[table where] doubleIsLessThanOrEqualTo:5.6 inColumnWithIndex:DOUBLE_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToDouble");
-        XCTAssertEqual([[[table where] dateIsLessThanOrEqualTo:date2 inColumnWithIndex:DATE_COL] countRows], (NSUInteger)2, @"isLessThanOrEqualToDate");
+        XCTAssertEqualObjects([table minOfProperty:@"IntCol" where:nil], @0, @"IntCol min");
+        XCTAssertEqualObjects([table maxOfProperty:@"IntCol" where:nil], @860, @"IntCol max");
+        XCTAssertEqualObjects([table sumOfProperty:@"IntCol" where:nil], @860, @"IntCol sum");
+        XCTAssertEqualObjects([table averageOfProperty:@"IntCol" where:nil], @430, @"IntCol avg");
         
-        //XCTAssertEqual([[[table where] column:INT_COL isBetweenInt:859 and_:861] find:0], (NSUInteger) 1, @"find");
-        
-        // XCTAssertEqual([[[[table where] column:INT_COL isBetweenInt:859 and_:861] findAll] class], [RLMView class], @"findAll");
-        
-        XCTAssertEqual([[table where] minIntInColumnWithIndex:INT_COL], (int64_t)0, @"minIntInColumn");
-        XCTAssertEqual([[table where] sumIntColumnWithIndex:INT_COL], (int64_t)860, @"IntCol max");
-        
+        // FIXME: Support min/max on dates
         // Realm/tightdb has whole second precision for time stamps so we need to truncate the time stamps
-        XCTAssertEqual((time_t)[[[table where] minDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], (time_t)[date1 timeIntervalSince1970], @"MinDateInColumn");
-        XCTAssertEqual((time_t)[[[table where] maxDateInColumnWithIndex:DATE_COL] timeIntervalSince1970], (time_t)[date2 timeIntervalSince1970], @"MaxDateInColumn");
-        
-        // TODO: Tests missing....
+        // XCTAssertEqual((time_t)[[table minOfProperty:@"DateCol" where:nil] timeIntervalSince1970], (time_t)[date1 timeIntervalSince1970], @"MinDateInColumn");
+        // XCTAssertEqual((time_t)[[table maxOfProperty:@"DateCol" where:nil] timeIntervalSince1970], (time_t)[date2 timeIntervalSince1970], @"MaxDateInColumn");
     }];
 }
 
 - (void)testMathOperations {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
-        NSUInteger intCol = [table addColumnWithName:@"IntCol" type:RLMTypeInt];
-        NSUInteger floatCol = [table addColumnWithName:@"FloatCol" type:RLMTypeFloat];
-        NSUInteger doubleCol = [table addColumnWithName:@"DoubleCol" type:RLMTypeDouble];
-        NSUInteger dateCol = [table addColumnWithName:@"DateCol" type:RLMTypeDate];
+        [table addColumnWithName:@"IntCol" type:RLMTypeInt];
+        [table addColumnWithName:@"FloatCol" type:RLMTypeFloat];
+        [table addColumnWithName:@"DoubleCol" type:RLMTypeDouble];
+        [table addColumnWithName:@"DateCol" type:RLMTypeDate];
         
         //======== Zero rows added ========//
         
-        // Using specific column type operations MIN
-        XCTAssertEqual([[table where] minIntInColumnWithIndex:intCol], NSIntegerMax);
-        XCTAssertEqual([[table where] minFloatInColumnWithIndex:floatCol], (float)INFINITY);
-        XCTAssertEqual([[table where] minDoubleInColumnWithIndex:doubleCol], (double)INFINITY);
-        XCTAssertNil([[table where] minDateInColumnWithIndex:dateCol]);
+        // Min
+        XCTAssertEqual([[table minOfProperty:@"IntCol" where:nil] integerValue], NSIntegerMax);
+        XCTAssertEqual([[table minOfProperty:@"FloatCol" where:nil] floatValue], (float)INFINITY);
+        XCTAssertEqual([[table minOfProperty:@"DoubleCol" where:nil] doubleValue], (double)INFINITY);
+        // FIXME: Support min/max on dates
+        // XCTAssertNil([table minOfProperty:@"DateCol" where:nil]);
         
-        // Using generic column type operations MIN
-        XCTAssertEqualObjects([[table where] minInColumnWithIndex:intCol], @NSIntegerMax);
-        XCTAssertEqual([[[table where] minInColumnWithIndex:floatCol] floatValue], (float)INFINITY);
-        XCTAssertEqual([[[table where] minInColumnWithIndex:doubleCol] doubleValue], (double)INFINITY);
-        XCTAssertNil([[table where] minInColumnWithIndex:dateCol]);
+        // Max
+        XCTAssertEqual([[table maxOfProperty:@"IntCol" where:nil] integerValue], NSIntegerMin);
+        XCTAssertEqual([[table maxOfProperty:@"FloatCol" where:nil] floatValue], (float)-INFINITY);
+        XCTAssertEqual([[table maxOfProperty:@"DoubleCol" where:nil] doubleValue], (double)-INFINITY);
+        // FIXME: Support min/max on dates
+        // XCTAssertNil([table maxOfProperty:@"DateCol" where:nil]);
         
-        // Using specific column type operations MAX
-        XCTAssertEqual([[table where] maxIntInColumnWithIndex:intCol], NSIntegerMin);
-        XCTAssertEqual([[table where] maxFloatInColumnWithIndex:floatCol], (float)-INFINITY);
-        XCTAssertEqual([[table where] maxDoubleInColumnWithIndex:doubleCol], (double)-INFINITY);
-        XCTAssertNil([[table where] maxDateInColumnWithIndex:dateCol]);
+        // Sum
+        XCTAssertEqual([[table sumOfProperty:@"IntCol" where:nil] integerValue], (NSInteger)0);
+        XCTAssertEqual([[table sumOfProperty:@"FloatCol" where:nil] floatValue], (float)0);
+        XCTAssertEqual([[table sumOfProperty:@"DoubleCol" where:nil] doubleValue], (double)0);
         
-        // Using generic column type operations MAX
-        XCTAssertEqualObjects([[table where] maxInColumnWithIndex:intCol], @NSIntegerMin);
-        XCTAssertEqual([[[table where] maxInColumnWithIndex:floatCol] floatValue], (float)-INFINITY);
-        XCTAssertEqual([[[table where] maxInColumnWithIndex:doubleCol] doubleValue], (double)-INFINITY);
-        XCTAssertNil([[table where] maxInColumnWithIndex:dateCol]);
-        
-        // Using specific column type operations SUM
-        XCTAssertEqual([[table where] sumIntColumnWithIndex:intCol], (int64_t)0);
-        XCTAssertEqual([[table where] sumFloatColumnWithIndex:floatCol], (double)0);
-        XCTAssertEqual([[table where] sumDoubleColumnWithIndex:doubleCol], (double)0);
-        
-        // Using generic column type operations SUM
-        XCTAssertEqualObjects([[table where] sumColumnWithIndex:intCol], @0);
-        XCTAssertEqual([[[table where] sumColumnWithIndex:floatCol] doubleValue], (double)0);
-        XCTAssertEqual([[[table where] sumColumnWithIndex:doubleCol] doubleValue], (double)0);
-        
-        // Using specific column type operations AVG
-        XCTAssertEqual([[table where] avgIntColumnWithIndex:intCol], (double)0);
-        XCTAssertEqual([[table where] avgFloatColumnWithIndex:floatCol], (double)0);
-        XCTAssertEqual([[table where] avgDoubleColumnWithIndex:doubleCol], (double)0);
-        
-        // Using generic column type operations AVG
-        XCTAssertEqualObjects([[table where] avgColumnWithIndex:intCol], @0);
-        XCTAssertEqual([[[table where] avgColumnWithIndex:floatCol] doubleValue], (double)0);
-        XCTAssertEqual([[[table where] avgColumnWithIndex:doubleCol] doubleValue], (double)0);
+        // Average
+        XCTAssertEqual([[table averageOfProperty:@"IntCol" where:nil] integerValue], (NSInteger)0);
+        XCTAssertEqual([[table averageOfProperty:@"FloatCol" where:nil] floatValue], (float)0);
+        XCTAssertEqual([[table averageOfProperty:@"DoubleCol" where:nil] doubleValue], (double)0);
         
         //======== Add rows with values ========//
         
@@ -327,80 +285,53 @@ REALM_TABLE_FAST(TestQueryAllTypes)
         [table addRow:@[@33, @33.33f, @33.33, date33]];
         [table addRow:@[@333, @333.333f, @333.333, date333]];
         
-        // Using specific column type operations MIN
-        XCTAssertEqual([[table where] minIntInColumnWithIndex:intCol], (int64_t)3);
-        XCTAssertEqualWithAccuracy([[table where] minFloatInColumnWithIndex:floatCol], (float)3.3, 0.1);
-        XCTAssertEqualWithAccuracy([[table where] minDoubleInColumnWithIndex:doubleCol], (double)3.3, 0.1);
-        XCTAssertEqualWithAccuracy([[table where] minDateInColumnWithIndex:dateCol].timeIntervalSince1970, date3.timeIntervalSince1970, 0.999);
+        // Min
+        XCTAssertEqual([[table minOfProperty:@"IntCol" where:nil] integerValue], (NSInteger)3);
+        XCTAssertEqualWithAccuracy([[table minOfProperty:@"FloatCol" where:nil] floatValue], (float)3.3, 0.1);
+        XCTAssertEqualWithAccuracy([[table minOfProperty:@"DoubleCol" where:nil] doubleValue], (double)3.3, 0.1);
+        // FIXME: Support min/max on dates
+        // XCTAssertEqualWithAccuracy([(NSDate *)[table minOfProperty:@"DateCol" where:nil] timeIntervalSince1970], date3.timeIntervalSince1970, 0.999);
         
-        // Using generic column type operations MIN
-        XCTAssertEqualObjects([[table where] minInColumnWithIndex:intCol], @3);
-        XCTAssertEqual([[[table where] minInColumnWithIndex:floatCol] floatValue], (float)3.3);
-        XCTAssertEqual([[[table where] minInColumnWithIndex:doubleCol] doubleValue], (double)3.3);
-        NSDate *minOutDate = [[table where] minInColumnWithIndex:dateCol];
-        XCTAssertEqualWithAccuracy(minOutDate.timeIntervalSince1970, date3.timeIntervalSince1970, 0.999);
+        // Max
+        XCTAssertEqual([[table maxOfProperty:@"IntCol" where:nil] integerValue], (NSInteger)333);
+        XCTAssertEqualWithAccuracy([[table maxOfProperty:@"FloatCol" where:nil] floatValue], (float)333.333, 0.1);
+        XCTAssertEqualWithAccuracy([[table maxOfProperty:@"DoubleCol" where:nil] doubleValue], (double)333.333, 0.1);
+        // FIXME: Support min/max on dates
+        // XCTAssertEqualWithAccuracy([(NSDate *)[table maxOfProperty:@"DateCol" where:nil] timeIntervalSince1970], date333.timeIntervalSince1970, 0.999);
         
-        // Using specific column type operations MAX
-        XCTAssertEqual([[table where] maxIntInColumnWithIndex:intCol], (int64_t)333);
-        XCTAssertEqualWithAccuracy([[table where] maxFloatInColumnWithIndex:floatCol], (float)333.333, 0.1);
-        XCTAssertEqualWithAccuracy([[table where] maxDoubleInColumnWithIndex:doubleCol], (double)333.333, 0.1);
-        XCTAssertEqualWithAccuracy([[table where] maxDateInColumnWithIndex:dateCol].timeIntervalSince1970, date333.timeIntervalSince1970, 0.999);
+        // Sum
+        XCTAssertEqual([[table sumOfProperty:@"IntCol" where:nil] integerValue], (NSInteger)369);
+        XCTAssertEqualWithAccuracy([[table sumOfProperty:@"FloatCol" where:nil] floatValue], (float)369.963, 0.1);
+        XCTAssertEqualWithAccuracy([[table sumOfProperty:@"DoubleCol" where:nil] doubleValue], (double)369.963, 0.1);
         
-        // Using generic column type operations MAX
-        XCTAssertEqualObjects([[table where] maxInColumnWithIndex:intCol], @333);
-        XCTAssertEqual([[[table where] maxInColumnWithIndex:floatCol] floatValue], (float)333.333);
-        XCTAssertEqual([[[table where] maxInColumnWithIndex:doubleCol] doubleValue], (double)333.333);
-        NSDate *maxOutDate = [[table where] maxInColumnWithIndex:dateCol];
-        XCTAssertEqualWithAccuracy(maxOutDate.timeIntervalSince1970, date333.timeIntervalSince1970, 0.999);
-        
-        // Using specific column type operations SUM
-        XCTAssertEqual([[table where] sumIntColumnWithIndex:intCol], (int64_t)369);
-        XCTAssertEqualWithAccuracy([[table where] sumFloatColumnWithIndex:floatCol], (double)369.963, 0.1);
-        XCTAssertEqualWithAccuracy([[table where] sumDoubleColumnWithIndex:doubleCol], (double)369.963, 0.1);
-        
-        // Using generic column type operations SUM
-        XCTAssertEqualObjects([[table where] sumColumnWithIndex:intCol], @369);
-        XCTAssertEqualWithAccuracy([[[table where] sumColumnWithIndex:floatCol] doubleValue], (double)369.963, 0.1);
-        XCTAssertEqualWithAccuracy([[[table where] sumColumnWithIndex:doubleCol] doubleValue], (double)369.963, 0.1);
-        
-        // Using specific column type operations AVG
-        XCTAssertEqual([[table where] avgIntColumnWithIndex:intCol], (double)123);
-        XCTAssertEqualWithAccuracy([[table where] avgFloatColumnWithIndex:floatCol], (double)123.321, 0.1);
-        XCTAssertEqualWithAccuracy([[table where] avgDoubleColumnWithIndex:doubleCol], (double)123.321, 0.1);
-        
-        // Using generic column type operations AVG
-        XCTAssertEqualObjects([[table where] avgColumnWithIndex:intCol], @123);
-        XCTAssertEqualWithAccuracy([[[table where] avgColumnWithIndex:floatCol] doubleValue], (double)123.321, 0.1);
-        XCTAssertEqualWithAccuracy([[[table where] avgColumnWithIndex:doubleCol] doubleValue], (double)123.321, 0.1);
+        // Average
+        XCTAssertEqual([[table averageOfProperty:@"IntCol" where:nil] doubleValue], (double)123);
+        XCTAssertEqualWithAccuracy([[table averageOfProperty:@"FloatCol" where:nil] doubleValue], (double)123.321, 0.1);
+        XCTAssertEqualWithAccuracy([[table averageOfProperty:@"DoubleCol" where:nil] doubleValue], (double)123.321, 0.1);
     }];
 }
 
 - (void)testFind {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         [table addColumnWithName:@"IntCol" type:RLMTypeInt];
-        [table RLM_addEmptyRows:6];
+        // Add 6 empty rows
+        for (NSUInteger index = 0; index < 6; index++) {
+            [table addRow:nil];
+        }
+        table[0][@"IntCol"] = @10;
+        table[1][@"IntCol"] = @42;
+        table[2][@"IntCol"] = @27;
+        table[3][@"IntCol"] = @31;
+        table[4][@"IntCol"] = @8;
+        table[5][@"IntCol"] = @39;
         
-        [table RLM_setInt:10 inColumnWithIndex:0 atRowIndex:0];
-        [table RLM_setInt:42 inColumnWithIndex:0 atRowIndex:1];
-        [table RLM_setInt:27 inColumnWithIndex:0 atRowIndex:2];
-        [table RLM_setInt:31 inColumnWithIndex:0 atRowIndex:3];
-        [table RLM_setInt:8  inColumnWithIndex:0 atRowIndex:4];
-        [table RLM_setInt:39 inColumnWithIndex:0 atRowIndex:5];
-        
-        XCTAssertEqual((NSUInteger)1, [[[table where ] intIsGreaterThan:10 inColumnWithIndex:0 ] indexOfFirstMatchingRow], @"Row 1 is greater than 10");
-        XCTAssertEqual(NSNotFound, [[[table where ] intIsGreaterThan:100 inColumnWithIndex:0 ] indexOfFirstMatchingRow], @"No rows are greater than 100");
-        
-        XCTAssertEqual([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] indexOfFirstMatchingRowFromIndex:0], (NSUInteger)2,  @"find");
-        XCTAssertEqual([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] indexOfFirstMatchingRowFromIndex:3], (NSUInteger)3,  @"find");
-        XCTAssertEqual([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] indexOfFirstMatchingRowFromIndex:4], (NSUInteger)5,  @"find");
-        XCTAssertEqual([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] indexOfFirstMatchingRowFromIndex:6], (NSUInteger)NSNotFound, @"find");
-        XCTAssertEqual([[[table where] intIsBetween:20 :40 inColumnWithIndex:0] indexOfFirstMatchingRowFromIndex:3], (NSUInteger)3,  @"find");
-        // jjepsen: disabled this test, perhaps it's not relevant after query sematics update.
-        //XCTAssertEqual([[[table where] column:0 isBetweenInt:20 and_:40] find:-1], (NSUInteger)-1, @"find");
+        XCTAssertEqualObjects([table firstWhere:@"IntCol > 10"][@"IntCol"], @42, @"Row 1 is greater than 10");
+        XCTAssertNil([table firstWhere:@"IntCol > 100"], @"No rows are greater than 100");
+        RLMView *view = [table allWhere:@"IntCol between %@", @[@20, @40]];
+        XCTAssertEqualObjects(view.firstRow[@"IntCol"], @27, @"The first row in the table with IntCol between 20 and 40 is 27");
         
         [table removeAllRows];
-        XCTAssertEqual([[table where] indexOfFirstMatchingRow], NSNotFound, @"");
-        XCTAssertEqual([[table where] indexOfFirstMatchingRowFromIndex:0], NSNotFound, @"");
+        XCTAssertNil([table firstWhere:nil]);
     }];
 }
 
