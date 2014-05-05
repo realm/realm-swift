@@ -38,9 +38,7 @@ REALM_TABLE_FAST(FuncPeopleTable)
 - (void)testTypedRow
 {
     [self.managerWithTestPath writeUsingBlock:^(RLMRealm *realm) {
-        /*
-         *  Row in a table.
-         */
+        // Row in a table.
         
         FuncPeopleTable *table = [realm createTableWithName:@"table" asTableClass:FuncPeopleTable.class];
         
@@ -107,9 +105,7 @@ REALM_TABLE_FAST(FuncPeopleTable)
         // TODO: InsertRowAtIndex.. out-of-bounds check (depends on error handling strategy)
         // TODO: RowAtIndex.. out-of-bounds check (depends onerror handling strategy
         
-        /*
-         *  Row in a query.
-         */
+        // Row in a query.
         
         FuncPeopleTableQuery *query = [[table where].Name columnIsNotEqualTo:@"Nothing is equal to this"];  // dummy query required right now
         XCTAssertEqual([query countRows], (NSUInteger)(TABLE_SIZE-2), @"Check the size");
@@ -123,9 +119,7 @@ REALM_TABLE_FAST(FuncPeopleTable)
             i++;
         }
         
-        /*
-         *  Row in table view.
-         */
+        // Row in table view.
         
         FuncPeopleTableView *view = [[query.Hired columnIsEqualTo:YES] findAll];
         XCTAssertEqual([query countRows], (NSUInteger)(TABLE_SIZE-2)/2, @"Check the size");
@@ -161,9 +155,7 @@ REALM_TABLE_FAST(FuncPeopleTable)
 
 - (void)testDynamicRow {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
-        /*
-         *  Row in a table.
-         */
+        // Row in a table.
         
         NSUInteger const NAME = [table addColumnWithName:@"Name" type:RLMTypeString];
         NSUInteger const AGE = [table addColumnWithName:@"Age" type:RLMTypeInt];
@@ -234,9 +226,7 @@ REALM_TABLE_FAST(FuncPeopleTable)
         // TODO: InsertRowAtIndex.. out-of-bounds check (depends on error handling strategy)
         // TODO: RowAtIndex.. out-of-bounds check (depends onerror handling strategy
         
-        /*
-         *  Row in a query.
-         */
+        // Row in a query.
         
         RLMQuery *query = [[table where] stringIsNotEqualTo:@"Nothing is equal to this" inColumnWithIndex:NAME ];  // dummy query required right now
         XCTAssertEqual([query countRows], (NSUInteger)(TABLE_SIZE-2), @"Check the size");
@@ -250,9 +240,7 @@ REALM_TABLE_FAST(FuncPeopleTable)
             i++;
         }
         
-        /*
-         *  Row in table view.
-         */
+        // Row in table view.
         
         RLMView *view = [[query boolIsEqualTo:YES inColumnWithIndex:HIRED] findAllRows];
         XCTAssertEqual([query countRows], (NSUInteger)(TABLE_SIZE-2)/2, @"Check the size");
