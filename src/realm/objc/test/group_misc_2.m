@@ -77,50 +77,50 @@ REALM_TABLE_FAST(QueryTable)
         MyTableView *view = [[[table where].Age columnIsEqualTo:21] findAll];
         NSUInteger cnt = view.rowCount;            // cnt = 2
         XCTAssertEqual(cnt, (NSUInteger)2,@"Should be two rows in view");
+    
+        //------------------------------------------------------
+        
+        MyTable2* table2 = [realm createTableWithName:@"table2" asTableClass:MyTable2.class];
+        
+        // Add some rows
+        [table2 addHired:YES Age:20];
+        [table2 addHired:NO Age:21];
+        [table2 addHired:YES Age:22];
+        [table2 addHired:NO Age:43];
+        [table2 addHired:YES Age:54];
+        
+        // Create query (current employees between 20 and 30 years old)
+        MyTable2Query* q = [[[table2 where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 :30];
+        
+        // Get number of matching entries
+        NSLog(@"Query count: %zu", [q countRows]);
+        XCTAssertEqual([q countRows], (NSUInteger)2,@"Expected 2 rows in query");
+        
+        // Get the average age - currently only a low-level interface!
+        double avg = [q.Age avg];
+        NSLog(@"Average: %f", avg);
+        XCTAssertEqual(avg, 21.0,@"Expected 21 average");
+        
+        // Execute the query and return a table (view)
+        RLMView* res = [q findAll];
+        for (NSUInteger i = 0; i < [res rowCount]; i++) {
+            // cursor missing. Only low-level interface!
+            NSLog(@"%zu: is %lld years old",i , [res RLM_intInColumnWithIndex:1 atRowIndex:i]);
+        }
+        
+        //------------------------------------------------------
+        
+        // Load a realm from disk (and print contents)
+        RLMRealm * fromDisk = [self realmPersistedAtTestPath];
+        MyTable* diskTable = [fromDisk tableWithName:@"employees" asTableClass:[MyTable class]];
+        
+        NSLog(@"Disktable size: %zu", diskTable.rowCount);
+        for (NSUInteger i = 0; i < diskTable.rowCount; i++) {
+            MyTableRow* cursor = [diskTable rowAtIndex:i];
+            NSLog(@"%zu: %@", i, cursor.Name);
+            NSLog(@"%zu: %@", i, [diskTable RLM_stringInColumnWithIndex:0 atRowIndex:i]);
+        }
     }];
-
-    //------------------------------------------------------
-
-    MyTable2* table2 = [[MyTable2 alloc] init];
-
-    // Add some rows
-    [table2 addHired:YES Age:20];
-    [table2 addHired:NO Age:21];
-    [table2 addHired:YES Age:22];
-    [table2 addHired:NO Age:43];
-    [table2 addHired:YES Age:54];
-
-    // Create query (current employees between 20 and 30 years old)
-    MyTable2Query* q = [[[table2 where].Hired columnIsEqualTo:YES].Age columnIsBetween:20 :30];
-
-    // Get number of matching entries
-    NSLog(@"Query count: %zu", [q countRows]);
-    XCTAssertEqual([q countRows], (NSUInteger)2,@"Expected 2 rows in query");
-
-     // Get the average age - currently only a low-level interface!
-    double avg = [q.Age avg];
-    NSLog(@"Average: %f", avg);
-    XCTAssertEqual(avg, 21.0,@"Expected 21 average");
-
-    // Execute the query and return a table (view)
-    RLMView* res = [q findAll];
-    for (NSUInteger i = 0; i < [res rowCount]; i++) {
-        // cursor missing. Only low-level interface!
-        NSLog(@"%zu: is %lld years old",i , [res RLM_intInColumnWithIndex:1 atRowIndex:i]);
-    }
-
-    //------------------------------------------------------
-
-    // Load a realm from disk (and print contents)
-    RLMRealm * fromDisk = [self realmPersistedAtTestPath];
-    MyTable* diskTable = [fromDisk tableWithName:@"employees" asTableClass:[MyTable class]];
-
-    NSLog(@"Disktable size: %zu", diskTable.rowCount);
-    for (NSUInteger i = 0; i < diskTable.rowCount; i++) {
-        MyTableRow* cursor = [diskTable rowAtIndex:i];
-        NSLog(@"%zu: %@", i, cursor.Name);
-        NSLog(@"%zu: %@", i, [diskTable RLM_stringInColumnWithIndex:0 atRowIndex:i]);
-    }
 }
 
 - (void)testQuery
