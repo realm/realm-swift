@@ -55,7 +55,7 @@ REALM_TABLE_FAST(TestQueryErrAllTypes)
     //------------------------------------------------------
     NSError* error = nil;
 
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
         PeopleErrTable* people = [realm createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
         
@@ -273,7 +273,7 @@ REALM_TABLE_FAST(TestQueryErrAllTypes)
 
 - (void)testQueryErrHandling
 {
-    [self.managerWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         TestQueryErrAllTypes* table = [realm createTableWithName:@"Test" asTableClass:TestQueryErrAllTypes.class];
         NSLog(@"Table: %@", table);
         XCTAssertNotNil(table, @"Table is nil");

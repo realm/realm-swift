@@ -20,7 +20,6 @@
 
 #import "RLMTable.h"
 #import "RLMView.h"
-#import "RLMTransactionManager.h"
 #import "RLMRow.h"
 
 
@@ -44,6 +43,10 @@
 
 // returns YES if it's possible to update the table to support objects of type Class
 -(BOOL)canUpdateToSupportObjectClass:(Class)objectClass;
+
+// index path describing object position in the system (table/row/property, etc)
+@property (nonatomic) NSIndexPath *indexPath;
+
 @end
 
 @interface RLMRow()
@@ -130,14 +133,3 @@
 -(NSUInteger)RLM_index;
 @end
 
-//
-// The selectors in this interface are not meant to be used directly.
-// However, they are public so that the typed table macros can use them.
-//
-@interface RLMTransactionManager (Experiment)
-
-//========== Experimental features ==========/
--(BOOL)pinReadTransactions;
--(void)unpinReadTransactions;
-
-@end
