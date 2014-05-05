@@ -43,8 +43,8 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
     OUTPREDICATE = [NSPredicate predicateWithFormat:INPREDICATE arguments:args]; \
     va_end(args);                                          \
 } else if (INPREDICATE) {                                  \
-    @throw predicate_exception(@"Invalid value",           \
-                               @"predicate must be either an NSPredicate or an NSString with optional format va_list"); \
+    @throw RLM_predicate_exception(@"Invalid value",       \
+                                   @"predicate must be either an NSPredicate or an NSString with optional format va_list"); \
 }                                                          \
 
 @implementation RLMTable
@@ -1126,15 +1126,15 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
             ascending = ((NSSortDescriptor*)order).ascending;
         }
         else {
-            @throw predicate_exception(@"Invalid order type",
+            @throw RLM_predicate_exception(@"Invalid order type",
                                        @"Order must be column name or NSSortDescriptor");
         }
         
-        NSUInteger index = validated_column_index(self, columnName);
+        NSUInteger index = RLM_validated_column_index(self, columnName);
         RLMType columnType = [self columnTypeOfColumnWithIndex:index];
         
         if (columnType != RLMTypeInt && columnType != RLMTypeBool && columnType != RLMTypeDate) {
-            @throw predicate_exception(@"Invalid sort column type",
+            @throw RLM_predicate_exception(@"Invalid sort column type",
                                        @"Sort only supported on Integer, Date and Boolean columns.");
         }
         
