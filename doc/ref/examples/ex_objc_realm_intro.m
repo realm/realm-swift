@@ -33,18 +33,17 @@ void ex_objc_realm_intro()
     [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
     
     // Create a realm and initialize by creating table and adding a row
-    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:realmFilePath
-                                                 initBlock:^(RLMRealm *realm) {
-                                                     if (realm.isEmpty) {
-                                                         People *table = [realm createTableWithName:@"employees"
-                                                                                       asTableClass:[People class]];
-                                                         [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
-                                                     }
-                                                 }];
+    RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath
+                                    initBlock:^(RLMRealm *realm) {
+                                        if (realm.isEmpty) {
+                                            PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
+                                            [table addRow:@{@"Name": @"Bill", @"Age": @53, @"Hired": @YES}];
+                                        }
+                                    }];
     
     // Read from the realm
-    People *table = [realm tableWithName:@"employees" asTableClass:[People class]];
-    for (PeopleRow *row in table) {
+    PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[People class]];
+    for (People *row in table) {
         NSLog(@"Name: %@", row.Name);
     }
 }

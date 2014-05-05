@@ -8,6 +8,7 @@
 #import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
+#import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 @interface EnumPeople : RLMRow
 @property NSString * Name;
@@ -18,8 +19,15 @@
 @implementation EnumPeople
 @end
 
+REALM_TABLE_2(EnumPeopleTable2,
+              Hired, Bool,
+              Age,   Int)
+
+REALM_TABLE_FAST(EnumPeopleTable2)
+
 @interface MACTestEnumerator : RLMTestCase
 @end
+
 @implementation MACTestEnumerator
 
 - (void)testTutorial
@@ -33,7 +41,7 @@
                            @[@"Phil", @43, @NO],
                            @[@"Anni", @54, @YES]];
     // Create new table in realm
-    RLMRealm *realm = [RLMRealm realmWithPersistenceToFile:RLMTestRealmPath initBlock:^(RLMRealm *realm) {
+    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath initBlock:^(RLMRealm *realm) {
         RLMTable *people = [realm createTableWithName:@"people" objectClass:[EnumPeople class]];
         // Add some rows
         for (NSArray *rowArray in rowsArray) {
@@ -67,7 +75,7 @@
     NSArray *filteredArray = [rowsArray filteredArrayUsingPredicate:predicate];
     
     // Do a query, and get all matches as TableView
-    RLMView *res = [people where:@"Hired = YES && Age >= 20 && Age <= 30"];
+    RLMView *res = [people allWhere:@"Hired = YES && Age >= 20 && Age <= 30"];
     NSLog(@"View count: %zu", res.rowCount);
     // 2: Iterate over the resulting TableView
     index = 0;
@@ -88,7 +96,7 @@
     filteredArray = [rowsArray filteredArrayUsingPredicate:predicate];
     
     // 3: Iterate over query (lazy)
-    RLMView *q = [people where:@"Age = 21"];
+    RLMView *q = [people allWhere:@"Age = 21"];
     NSLog(@"Query lazy count: %zu", [q rowCount] );
     index = 0;
     for (EnumPeople *row in q) {

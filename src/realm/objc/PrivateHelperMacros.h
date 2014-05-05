@@ -1,22 +1,22 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #define REALM_VA_NARGS_IMPL(_1, _2, _3, _4, _5, N, ...) N
 #define REALM_VA_NARGS(...) REALM_VA_NARGS_IMPL(__VA_ARGS__, 5, 4, 3, 2, 1)
@@ -105,7 +105,7 @@
     NSString* name = [NSString stringWithUTF8String:#_name]; \
     if (!name) \
         return NO; \
-    if (![desc addColumnWithName:name type:REALM_TYPE_ID_##_type]) \
+    if ([desc addColumnWithName:name type:REALM_TYPE_ID_##_type] == NSNotFound) \
         return NO; \
 }
 

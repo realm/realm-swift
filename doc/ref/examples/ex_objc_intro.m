@@ -25,10 +25,10 @@
 // Use it in a function
 void ex_objc_intro() {
     // Create a realm and initialize with a table and rows
-    RLMRealm *realm = [RLMRealm realmWithDefaultPersistenceAndInitBlock:^(RLMRealm *realm) {
+    RLMRealm *realm = [RLMRealm defaultRealmWithInitBlock:^(RLMRealm *realm) {
         if (realm.isEmpty) {
             // Create a table
-            People *table = [realm createTableWithName:@"employees" asTableClass:[People class]];
+            PeopleTable *table = [PeopleTable tableInRealm:realm named:@"employees"];
             
             // Add rows
             [table addRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
@@ -39,14 +39,13 @@ void ex_objc_intro() {
     }];
     
     // Get the table
-    People *table = [realm tableWithName:@"employees" asTableClass:[People class]];
+    PeopleTable *table = [PeopleTable tableInRealm:realm named:@"employees"];
     
     // Query the table
-    PeopleQuery *query = [[table where].Age columnIsGreaterThan:30];
-    PeopleView  *view  = [query findAll];
+    RLMView  *view  = [table allWhere:@"Age > 30"];
     
     // Iterate over all rows in view
-    for (PeopleRow *row in view) {
+    for (People *row in view) {
         NSLog(@"Name: %@", row.Name);
     }
 }

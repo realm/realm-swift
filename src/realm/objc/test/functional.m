@@ -7,21 +7,35 @@
 #import "RLMTestCase.h"
 #import <realm/objc/RLMFast.h>
 #import <realm/objc/RLMTable.h>
+#import <realm/objc/RLMTableFast.h>
+#import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 REALM_TABLE_3(FuncPeopleTable,
-                Name,  String,
-                Age,   Int,
-                Hired, Bool)
+              Name,  String,
+              Age,   Int,
+              Hired, Bool)
+
+REALM_TABLE_FAST(FuncPeopleTable)
 
 #define TABLE_SIZE 1000 // must be even number
 #define INSERT_ROW 5
+
+@interface RLMPerson : RLMRow
+
+@property (nonatomic, copy)   NSString *name;
+@property (nonatomic, strong) NSDate   *date;
+
+@end
+
+@implementation RLMPerson
+
+@end
 
 @interface MACtestFunctional: RLMTestCase
 @end
 @implementation MACtestFunctional
 
-- (void)testTypedRow
-{
+- (void)testTypedRow {
 
     /*
      *  Row in a table.
@@ -144,8 +158,7 @@ REALM_TABLE_3(FuncPeopleTable,
 
 }
 
-- (void)testDynamicRow
-{
+- (void)testDynamicRow {
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         /*
          *  Row in a table.
@@ -269,6 +282,20 @@ REALM_TABLE_3(FuncPeopleTable,
         // And check it's gone.
         
         XCTAssertEqual([NSNumber numberWithLong:[table rowCount]], [NSNumber numberWithLong:TABLE_SIZE-3], @"Check the size");
+    }];
+}
+
+- (void)testRowDescription {
+    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        NSDate *date = [NSDate dateWithTimeIntervalSince1970:1234];
+        RLMTable *table = [realm createTableWithName:@"people" objectClass:[RLMPerson class]];
+        [table addRow:@[@"John", date]];
+        NSString *rowDescription = [table.firstRow description];
+        XCTAssertTrue([rowDescription rangeOfString:@"name"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMRow");
+        XCTAssertTrue([rowDescription rangeOfString:@"John"].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMRow");
+        
+        XCTAssertTrue([rowDescription rangeOfString:@"date"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMRow");
+        XCTAssertTrue([rowDescription rangeOfString:date.description].location != NSNotFound, @"column values should be displayed when calling \"description\" on RLMRow");
     }];
 }
 
