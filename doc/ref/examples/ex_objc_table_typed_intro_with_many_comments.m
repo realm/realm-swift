@@ -8,34 +8,34 @@
  * REALM_TABLE_* in the documentation. */
 
 REALM_TABLE_2(PersonTable,    // Name of Table
-                Name, String,   // First column with Strings
-                Age, Int)       // Second column with Integers
+              Name, String,   // First column with Strings
+              Age, Int)       // Second column with Integers
 
 void ex_objc_table_typed_intro_with_many_comments()
 {
-    /* Creates a new table of the type defined above. */
-    PersonTable *table = [[PersonTable alloc] init];
-    
-    /* Appends rows to the table. Notice that the signature of the method for
-     * appendig rows requires that the order of the columns is exactly
-     * as in the declaration. */
-    [table addRow:@[@"Mary",  @14]];
-    [table addRow:@[@"Joe",   @17]];
-    [table addRow:@[@"Jack",  @22]];
-    [table addRow:@[@"Paul",  @33]];
-    [table addRow:@[@"Simon", @16]];
-    [table addRow:@[@"Carol", @66]];
-    
-    /* Creates a view to filter on age. */
-    RLMView *view = [table allWhere:@"Age > 13 && Age < 19"];
-    
-    /* Iterate through RLMRows returned from view */
-    for (RLMRow *row in view)
-        NSLog(@"Name: %@", row[@"Name"]);
-    
-    /* Iterates over all rows in the result (view) 2 times based on the single
-     * query executed above. */
-    for (RLMRow *row in view)
-        NSLog(@"Name: %@", row[@"Age"]);
+    [[RLMTransactionManager managerForDefaultRealm] writeUsingBlock:^(RLMRealm *realm) {
+        /* Creates a new table of the type defined above. */
+        PersonTable *table = [realm createTableWithName:@"Example" asTableClass:PersonTable.class];
+        
+        /* Appends rows to the table. Notice that the signature of the method for
+         * appendig rows requires that the order of the columns is exactly
+         * as in the declaration. */
+        [table addRow:@[@"Mary",  @14]];
+        [table addRow:@[@"Joe",   @17]];
+        [table addRow:@[@"Jack",  @22]];
+        [table addRow:@[@"Paul",  @33]];
+        [table addRow:@[@"Simon", @16]];
+        [table addRow:@[@"Carol", @66]];
+        
+        /* Creates a view filtered on age. The
+         * view is evaluated here. */
+        RLMView *view = [table allWhere:@"Age >= 13 && Age <= 19"];
+        
+        /* Accesses query result directly on the query object.
+         * The query is only executed once and iterated lazily */
+        for (PersonTableRow *row in view) {
+            NSLog(@"Name: %@", row.Name);
+        }
+    }];
 }
 /* @@EndExample@@ */
