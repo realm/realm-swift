@@ -82,17 +82,16 @@ See RLMTable for more details on possible queries.
 The auto-updating Realm will send out notifications every time the underlying Realm is updated. These notifications can be observed by registering a block:
 
 	// Observe Realm Notifications
-    __weak weakSelf = self;
     [realm addNotification:^(NSString *note, RLMRealm * realm) {
-        [weakSelf updateUI];
+        [myViewController updateUI];
     }];
 
 ## Background Operations
 
-Realm can be very efficient when writing large amounts of data by batching together multiple writes within a single transaction. Transactions can also be performed in the background using Grand Central Dispatch to avoid blocking the main thread. RLMRealm objects are not thread safe and cannot be shared accross threads, so you must get an RLMRealm instance in each thread/dispatch_queue in which you want to read or write. Here's an example of inserting a million objects in a background queue:
+Realm can be very efficient when writing large amounts of data by batching together multiple writes within a single transaction. Transactions can also be performed in the background using Grand Central Dispatch to avoid blocking the main thread. RLMRealm objects are not thread safe and cannot be shared across threads, so you must get an RLMRealm instance in each thread/dispatch_queue in which you want to read or write. Here's an example of inserting a million objects in a background queue:
 
 	dispatch_async(queue, ^{
-        // get realm and table instances for this thread
+        // Get realm and table instances for this thread
         RLMRealm *realm = [RLMRealm defaultRealm];
 	    RLMTable *table = [realm tableWithName:@"DemoTable" objectClass:[RLMDemoObject class]];
 	    for (NSInteger idx1 = 0; idx1 < 1000; idx1++) {
