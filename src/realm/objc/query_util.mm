@@ -47,7 +47,6 @@ NSUInteger RLM_validated_column_index(RLMTable *table, NSString *columnName) {
 
 namespace {
 
-<<<<<<< HEAD
 // validate that we support the passed in expression type
 NSExpressionType validated_expression_type(NSExpression *expression) {
     if (expression.expressionType != NSConstantValueExpressionType &&
@@ -86,33 +85,6 @@ NSExpressionType validated_expression_type(NSExpression *expression) {
 //    @throw RLM_predicate_exception(@"Unsupported predicate",
 //                                   @"Not suppoting column comparison for now");
 //}
-=======
-// apply an expression between two columns to a query
-// void update_query_with_column_expression(RLMTable * table, tightdb::Query & query,
-// NSString * col1, NSString * col2, NSPredicateOperatorType operatorType) {
-// 
-// // only support equality for now
-// if (operatorType != NSEqualToPredicateOperatorType) {
-// @throw predicate_exception(@"Invalid predicate comparison type", @"only support equality comparison type");
-// }
-// 
-// // validate column names
-// NSUInteger index1 = validated_column_index(table, col1);
-// NSUInteger index2 = validated_column_index(table, col2);
-// 
-// // make sure they are the same type
-// tightdb::DataType type1 = table->m_table->get_column_type(index1);
-// tightdb::DataType type2 = table->m_table->get_column_type(index2);
-// 
-// if (type1 == type2) {
-// @throw predicate_exception(@"Invalid predicate expression", @"Columns must be the same type");
-// }
-// 
-// // not suppoting for now - if we changed names for column comparisons so that we could
-// // use templated function for all numeric types this would be much easier
-// @throw predicate_exception(@"Unsupported predicate", @"Not suppoting column comparison for now");
-// }
->>>>>>> master
 
 // add a clause for numeric constraints based on operator type
 template <typename T>
@@ -445,18 +417,19 @@ void update_query_with_predicate(NSPredicate * predicate,
 
 } // namespace
 
-tightdb::Query queryFromPredicate(RLMTable *table, id condition)
+tightdb::Query queryFromPredicate(RLMTable *table, id predicate)
 {
     tightdb::Query query = table->m_table->where();
     
     // parse and apply predicate tree
-    if (condition) {
-        if ([condition isKindOfClass:[NSString class]]) {
-            NSPredicate *predicate = [NSPredicate predicateWithFormat:condition];
-            update_query_with_predicate(predicate, table, query);
+    if (predicate) {
+        if ([predicate isKindOfClass:[NSString class]]) {
+            update_query_with_predicate([NSPredicate predicateWithFormat:predicate],
+                                        table,
+                                        query);
         }
-        else if ([condition isKindOfClass:[NSPredicate class]]) {
-            update_query_with_predicate(condition, table, query);
+        else if ([predicate isKindOfClass:[NSPredicate class]]) {
+            update_query_with_predicate(predicate, table, query);
         }
         else {
             @throw RLM_predicate_exception(@"Invalid argument",
