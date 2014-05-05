@@ -33,6 +33,20 @@
 #import "util_noinst.hpp"
 #import "query_util.h"
 
+// This macro generates an NSPredicate from either an an NSString with optional format va_list
+#define RLM_PREDICATE(INPREDICATE, OUTPREDICATE)           \
+if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
+    OUTPREDICATE = INPREDICATE;                            \
+} else if ([INPREDICATE isKindOfClass:[NSString class]]) { \
+    va_list args;                                          \
+    va_start(args, INPREDICATE);                           \
+    OUTPREDICATE = [NSPredicate predicateWithFormat:INPREDICATE arguments:args]; \
+    va_end(args);                                          \
+} else if (INPREDICATE) {                                  \
+    @throw RLM_predicate_exception(@"Invalid value",       \
+                                   @"predicate must be either an NSPredicate or an NSString with optional format va_list"); \
+}                                                          \
+
 @implementation RLMTable
 {
     tightdb::TableRef m_table;
@@ -1063,10 +1077,13 @@
     return [RLMView viewWithTable:self nativeView:distinctView];
 }
 
--(id)firstWhere:(id)predicate
+-(id)firstWhere:(id)predicate, ...
 {
-    tightdb::Query query = queryFromPredicate(self, predicate);
-
+    NSPredicate *finalPredicate = nil;
+    RLM_PREDICATE(predicate, finalPredicate);
+    
+    tightdb::Query query = queryFromPredicate(self, finalPredicate);
+    
     size_t row_ndx = query.find();
     
     if (row_ndx == tightdb::not_found)
@@ -1075,9 +1092,12 @@
     return [[_proxyObjectClass alloc] initWithTable:self ndx:row_ndx];
 }
 
--(RLMView *)allWhere:(id)predicate
+-(RLMView *)allWhere:(id)predicate, ...
 {
-    tightdb::Query query = queryFromPredicate(self, predicate);
+    NSPredicate *finalPredicate = nil;
+    RLM_PREDICATE(predicate, finalPredicate);
+    
+    tightdb::Query query = queryFromPredicate(self, finalPredicate);
 
     // create view
     tightdb::TableView view = query.find_all();
@@ -1106,15 +1126,15 @@
             ascending = ((NSSortDescriptor*)order).ascending;
         }
         else {
-            @throw predicate_exception(@"Invalid order type",
+            @throw RLM_predicate_exception(@"Invalid order type",
                                        @"Order must be column name or NSSortDescriptor");
         }
         
-        NSUInteger index = validated_column_index(self, columnName);
+        NSUInteger index = RLM_validated_column_index(self, columnName);
         RLMType columnType = [self columnTypeOfColumnWithIndex:index];
         
         if (columnType != RLMTypeInt && columnType != RLMTypeBool && columnType != RLMTypeDate) {
-            @throw predicate_exception(@"Invalid sort column type",
+            @throw RLM_predicate_exception(@"Invalid sort column type",
                                        @"Sort only supported on Integer, Date and Boolean columns.");
         }
         
@@ -1125,18 +1145,24 @@
     return [RLMView viewWithTable:self nativeView:view objectClass:_proxyObjectClass];
 }
 
--(NSUInteger)countWhere:(id)predicate
+-(NSUInteger)countWhere:(id)predicate, ...
 {
-    tightdb::Query query = queryFromPredicate(self, predicate);
+    NSPredicate *finalPredicate = nil;
+    RLM_PREDICATE(predicate, finalPredicate);
+    
+    tightdb::Query query = queryFromPredicate(self, finalPredicate);
     
     size_t count = query.count();
     
     return count;
 }
 
--(NSNumber *)sumOfProperty:(NSString *)property where:(id)predicate
+-(NSNumber *)sumOfProperty:(NSString *)property where:(id)predicate, ...
 {
-    tightdb::Query query = queryFromPredicate(self, predicate);
+    NSPredicate *finalPredicate = nil;
+    RLM_PREDICATE(predicate, finalPredicate);
+    
+    tightdb::Query query = queryFromPredicate(self, finalPredicate);
     
     NSUInteger index = [self indexOfColumnWithName:property];
     
@@ -1166,9 +1192,12 @@
     return sum;
 }
 
--(NSNumber *)averageOfProperty:(NSString *)property where:(id)predicate
+-(NSNumber *)averageOfProperty:(NSString *)property where:(id)predicate, ...
 {
-    tightdb::Query query = queryFromPredicate(self, predicate);
+    NSPredicate *finalPredicate = nil;
+    RLM_PREDICATE(predicate, finalPredicate);
+    
+    tightdb::Query query = queryFromPredicate(self, finalPredicate);
     
     NSUInteger index = [self indexOfColumnWithName:property];
     
@@ -1198,9 +1227,12 @@
     return average;
 }
 
--(id)minOfProperty:(NSString *)property where:(id)predicate
+-(id)minOfProperty:(NSString *)property where:(id)predicate, ...
 {
-    tightdb::Query query = queryFromPredicate(self, predicate);
+    NSPredicate *finalPredicate = nil;
+    RLM_PREDICATE(predicate, finalPredicate);
+    
+    tightdb::Query query = queryFromPredicate(self, finalPredicate);
     
     NSUInteger index = [self indexOfColumnWithName:property];
     
@@ -1235,9 +1267,12 @@
     return min;
 }
 
--(id)maxOfProperty:(NSString *)property where:(id)predicate
+-(id)maxOfProperty:(NSString *)property where:(id)predicate, ...
 {
-    tightdb::Query query = queryFromPredicate(self, predicate);
+    NSPredicate *finalPredicate = nil;
+    RLM_PREDICATE(predicate, finalPredicate);
+    
+    tightdb::Query query = queryFromPredicate(self, finalPredicate);
     
     NSUInteger index = [self indexOfColumnWithName:property];
     

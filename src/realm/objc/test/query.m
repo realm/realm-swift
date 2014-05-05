@@ -937,6 +937,36 @@ REALM_TABLE_FAST(TestQueryAllTypes)
     }];
 }
 
+#pragma mark - Variadic
+
+- (void)testVariadicPredicateFormat {
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"int" type:RLMTypeInt];
+        NSArray *ints = @[@0, @1, @2, @3];
+        for (NSNumber *intNum in ints) {
+            [table addRow:@[intNum]];
+        }
+        
+        // Variadic firstWhere
+        RLMRow *row = [table firstWhere:@"int <= %@", @1];
+        XCTAssertEqualObjects(@0,
+                              row[@"int"],
+                              @"Variadic firstWhere predicate should return correct result");
+        
+        // Variadic allWhere
+        RLMView *view = [table allWhere:@"int <= %@", @1];
+        NSArray *results = @[@0, @1];
+        XCTAssertEqual(view.rowCount,
+                       results.count,
+                       @"Variadic allWhere predicate should return correct count");
+        for (NSUInteger i = 0; i < results.count; i++) {
+            XCTAssertEqualObjects(results[i],
+                                  view[i][@"int"],
+                                  @"Variadic allWhere predicate should return correct results");
+        }
+    }];
+}
+
 #pragma mark - Predicate Helpers
 
 - (void)testPredicate:(id)predicate
