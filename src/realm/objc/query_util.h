@@ -26,5 +26,5 @@
 
 tightdb::Query queryFromPredicate(RLMTable *table, id condition);
 
-NSException *predicate_exception(NSString *name, NSString *reason);
-NSUInteger validated_column_index(RLMTable *table, NSString *columnName);
+NSException *RLM_predicate_exception(NSString *name, NSString *reason);
+NSUInteger RLM_validated_column_index(RLMTable *table, NSString *columnName);

@@ -31,57 +31,59 @@
 @end
 
 // small helper to create the many exceptions thrown when parsing predicates
-inline NSException *predicate_exception(NSString *name, NSString *reason) {
+NSException *RLM_predicate_exception(NSString *name, NSString *reason) {
     return [NSException exceptionWithName:[NSString stringWithFormat:@"filterWithPredicate:orderedBy: - %@", name] reason:reason userInfo:nil];
 }
 
 // validate that we support the passed in expression type
-inline NSExpressionType validated_expression_type(NSExpression *expression) {
+NSExpressionType validated_expression_type(NSExpression *expression) {
     if (expression.expressionType != NSConstantValueExpressionType &&
         expression.expressionType != NSKeyPathExpressionType) {
-        @throw predicate_exception(@"Invalid expression type", @"Only support NSConstantValueExpressionType and NSKeyPathExpressionType");
+        @throw RLM_predicate_exception(@"Invalid expression type",
+                                       @"Only support NSConstantValueExpressionType and NSKeyPathExpressionType");
     }
     return expression.expressionType;
 }
 
 // return the column index for a validated column name
-inline NSUInteger validated_column_index(RLMTable *table, NSString *columnName) {
+NSUInteger RLM_validated_column_index(RLMTable *table, NSString *columnName) {
     NSUInteger index = [table indexOfColumnWithName:columnName];
     if (index == NSNotFound) {
-        @throw predicate_exception(@"Invalid column name",
-                                   [NSString stringWithFormat:@"Column name %@ not found in table", columnName]);
+        @throw RLM_predicate_exception(@"Invalid column name",
+                                       [NSString stringWithFormat:@"Column name %@ not found in table", columnName]);
     }
     return index;
 }
 
 
 // apply an expression between two columns to a query
-/*
- void update_query_with_column_expression(RLMTable * table, tightdb::Query & query,
- NSString * col1, NSString * col2, NSPredicateOperatorType operatorType) {
- 
- // only support equality for now
- if (operatorType != NSEqualToPredicateOperatorType) {
- @throw predicate_exception(@"Invalid predicate comparison type", @"only support equality comparison type");
- }
- 
- // validate column names
- NSUInteger index1 = validated_column_index(table, col1);
- NSUInteger index2 = validated_column_index(table, col2);
- 
- // make sure they are the same type
- tightdb::DataType type1 = table->m_table->get_column_type(index1);
- tightdb::DataType type2 = table->m_table->get_column_type(index2);
- 
- if (type1 == type2) {
- @throw predicate_exception(@"Invalid predicate expression", @"Columns must be the same type");
- }
- 
- // not suppoting for now - if we changed names for column comparisons so that we could
- // use templated function for all numeric types this would be much easier
- @throw predicate_exception(@"Unsupported predicate", @"Not suppoting column comparison for now");
- }
- */
+void update_query_with_column_expression(RLMTable * table, tightdb::Query & query,
+                                         NSString * col1, NSString * col2, NSPredicateOperatorType operatorType) {
+    
+    // only support equality for now
+    if (operatorType != NSEqualToPredicateOperatorType) {
+        @throw RLM_predicate_exception(@"Invalid predicate comparison type",
+                                       @"only support equality comparison type");
+    }
+    
+    // validate column names
+    NSUInteger index1 = RLM_validated_column_index(table, col1);
+    NSUInteger index2 = RLM_validated_column_index(table, col2);
+    
+    // make sure they are the same type
+    tightdb::DataType type1 = table->m_table->get_column_type(index1);
+    tightdb::DataType type2 = table->m_table->get_column_type(index2);
+    
+    if (type1 == type2) {
+        @throw RLM_predicate_exception(@"Invalid predicate expression",
+                                       @"Columns must be the same type");
+    }
+    
+    // not suppoting for now - if we changed names for column comparisons so that we could
+    // use templated function for all numeric types this would be much easier
+    @throw RLM_predicate_exception(@"Unsupported predicate",
+                                   @"Not suppoting column comparison for now");
+}
 
 // add a clause for numeric constraints based on operator type
 template <typename T>
@@ -110,7 +112,8 @@ void add_numeric_constraint_to_query(tightdb::Query & query,
             query.not_equal(index, value);
             break;
         default:
-            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for type %u", (unsigned long)operatorType, datatype]);
+            @throw RLM_predicate_exception(@"Invalid operator type",
+                                           [NSString stringWithFormat:@"Operator type %lu not supported for type %u", (unsigned long)operatorType, datatype]);
             break;
     }
 }
@@ -127,7 +130,8 @@ void add_bool_constraint_to_query(tightdb::Query & query,
             query.not_equal(index, value);
             break;
         default:
-            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for bool type", (unsigned long)operatorType]);
+            @throw RLM_predicate_exception(@"Invalid operator type",
+                                           [NSString stringWithFormat:@"Operator type %lu not supported for bool type", (unsigned long)operatorType]);
             break;
     }
 }
@@ -141,7 +145,8 @@ void add_string_constraint_to_query(tightdb::Query & query,
     bool diacriticInsensitive = (predicateOptions & NSDiacriticInsensitivePredicateOption);
     
     if (diacriticInsensitive) {
-        @throw predicate_exception(@"Invalid predicate option", @"NSDiacriticInsensitivePredicateOption not supported for string type");
+        @throw RLM_predicate_exception(@"Invalid predicate option",
+                                       @"NSDiacriticInsensitivePredicateOption not supported for string type");
     }
     
     tightdb::StringData sd([(NSString *)value UTF8String]);
@@ -162,7 +167,8 @@ void add_string_constraint_to_query(tightdb::Query & query,
             query.not_equal(index, sd, caseSensitive);
             break;
         default:
-            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for string type", (unsigned long)operatorType]);
+            @throw RLM_predicate_exception(@"Invalid operator type",
+                                           [NSString stringWithFormat:@"Operator type %lu not supported for string type", (unsigned long)operatorType]);
             break;
     }
 }
@@ -191,7 +197,8 @@ void add_datetime_constraint_to_query(tightdb::Query & query,
             query.not_equal_datetime(index, value);
             break;
         default:
-            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for type NSDate", (unsigned long)operatorType]);
+            @throw RLM_predicate_exception(@"Invalid operator type",
+                                           [NSString stringWithFormat:@"Operator type %lu not supported for type NSDate", (unsigned long)operatorType]);
             break;
     }
 }
@@ -230,8 +237,8 @@ void add_between_constraint_to_query(tightdb::Query & query,
             break;
         }
         default:
-            @throw predicate_exception(@"Unsupported predicate value type",
-                                       [NSString stringWithFormat:@"Object type %i not supported for BETWEEN operations", dataType]);
+            @throw RLM_predicate_exception(@"Unsupported predicate value type",
+                                           [NSString stringWithFormat:@"Object type %i not supported for BETWEEN operations", dataType]);
     }
 }
 
@@ -257,7 +264,8 @@ void add_binary_constraint_to_query(tightdb::Query & query,
             query.not_equal(index, binData);
             break;
         default:
-            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for binary type", (unsigned long)operatorType]);
+            @throw RLM_predicate_exception(@"Invalid operator type",
+                                           [NSString stringWithFormat:@"Operator type %lu not supported for binary type", (unsigned long)operatorType]);
             break;
     }
 }
@@ -269,21 +277,21 @@ void validate_value_for_query(id value, tightdb::DataType type, BOOL betweenOper
             if (array.count == 2) {
                 if (!verify_object_is_type(array.firstObject, type) ||
                     !verify_object_is_type(array.lastObject, type)) {
-                    @throw predicate_exception(@"Invalid value",
-                                               [NSString stringWithFormat:@"NSArray objects must be of type %i for BETWEEN operations", type]);
+                    @throw RLM_predicate_exception(@"Invalid value",
+                                                   [NSString stringWithFormat:@"NSArray objects must be of type %i for BETWEEN operations", type]);
                 }
             } else {
-                @throw predicate_exception(@"Invalid value",
-                                           @"NSArray object must contain exactly two objects for BETWEEN operations");
+                @throw RLM_predicate_exception(@"Invalid value",
+                                               @"NSArray object must contain exactly two objects for BETWEEN operations");
             }
         } else {
-            @throw predicate_exception(@"Invalid value",
-                                       @"object must be of type NSArray for BETWEEN operations");
+            @throw RLM_predicate_exception(@"Invalid value",
+                                           @"object must be of type NSArray for BETWEEN operations");
         }
     } else {
         if (!verify_object_is_type(value, type)) {
-            @throw predicate_exception(@"Invalid value",
-                                       [NSString stringWithFormat:@"object must be of type %i", type]);
+            @throw RLM_predicate_exception(@"Invalid value",
+                                           [NSString stringWithFormat:@"object must be of type %i", type]);
         }
     }
 }
@@ -293,7 +301,7 @@ void update_query_with_value_expression(RLMTable * table, tightdb::Query & query
                                         NSComparisonPredicateOptions predicateOptions) {
     
     // validate object type
-    NSUInteger index = validated_column_index(table, columnName);
+    NSUInteger index = RLM_validated_column_index(table, columnName);
     tightdb::DataType type = table->m_table->get_column_type(index);
     
     BOOL betweenOperation = (operatorType == NSBetweenPredicateOperatorType);
@@ -333,8 +341,8 @@ void update_query_with_value_expression(RLMTable * table, tightdb::Query & query
             add_binary_constraint_to_query(query, operatorType, index, value);
             break;
         default:
-            @throw predicate_exception(@"Unsupported predicate value type",
-                                       [NSString stringWithFormat:@"Object type %i not supported", type]);
+            @throw RLM_predicate_exception(@"Unsupported predicate value type",
+                                           [NSString stringWithFormat:@"Object type %i not supported", type]);
     }
 }
 
@@ -365,8 +373,8 @@ void update_query_with_predicate(NSPredicate * predicate,
             query.end_group();
         }
         else {
-            @throw predicate_exception(@"Invalid compound predicate type",
-                                       @"Only support AND and OR predicate types");
+            @throw RLM_predicate_exception(@"Invalid compound predicate type",
+                                           @"Only support AND and OR predicate types");
         }
     }
     else if ([predicate isMemberOfClass:[NSComparisonPredicate class]]) {
@@ -380,7 +388,8 @@ void update_query_with_predicate(NSPredicate * predicate,
         // we are limited here to KeyPath expressions and constantValue expressions from validation
         if (exp1Type == NSKeyPathExpressionType) {
             if (exp2Type == NSKeyPathExpressionType) {
-                @throw predicate_exception(@"Unsupported predicate", @"Not suppoting column comparison for now");
+                @throw RLM_predicate_exception(@"Unsupported predicate",
+                                               @"Not suppoting column comparison for now");
                 //                update_query_with_column_expression(table, query, compp.leftExpression.keyPath,
                 //                    compp.rightExpression.keyPath, compp.predicateOperatorType);
             }
@@ -393,15 +402,15 @@ void update_query_with_predicate(NSPredicate * predicate,
                 update_query_with_value_expression(table, query, compp.rightExpression.keyPath, compp.leftExpression.constantValue, compp.predicateOperatorType, compp.options);
             }
             else {
-                @throw predicate_exception(@"Invalid predicate expressions",
-                                           @"Tring to compare two constant values");
+                @throw RLM_predicate_exception(@"Invalid predicate expressions",
+                                               @"Tring to compare two constant values");
             }
         }
     }
     else {
         // invalid predicate type
-        @throw predicate_exception(@"Invalid predicate",
-                                   @"Only support compound and comparison predicates");
+        @throw RLM_predicate_exception(@"Invalid predicate",
+                                       @"Only support compound and comparison predicates");
     }
 }
 
@@ -419,7 +428,8 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
             update_query_with_predicate(condition, table, query);
         }
         else {
-            @throw predicate_exception(@"Invalid argument", @"Condition should be predicate as string or NSPredicate object");
+            @throw RLM_predicate_exception(@"Invalid argument",
+                                           @"Condition should be predicate as string or NSPredicate object");
         }
     }
     
