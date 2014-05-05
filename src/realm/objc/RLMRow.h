@@ -115,7 +115,7 @@ Supported property types are:
 -(OType *)lastRow;                                          \
 -(OType *)objectAtIndexedSubscript:(NSUInteger)rowIndex;    \
 -(OType *)objectForKeyedSubscript:(NSString *)key;          \
--(OType *)firstWhere:(id)predicate;                         \
+-(OType *)firstWhere:(id)predicate, ...;                    \
 @end                                                        \
 @interface TType : RLMTable<OType>                          \
 +(TType *)tableInRealm:(RLMRealm *)rlm named:(NSString *)name;  \

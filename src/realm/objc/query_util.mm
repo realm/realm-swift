@@ -403,18 +403,19 @@ void update_query_with_predicate(NSPredicate * predicate,
     }
 }
 
-tightdb::Query queryFromPredicate(RLMTable *table, id condition)
+tightdb::Query queryFromPredicate(RLMTable *table, id predicate)
 {
     tightdb::Query query = table->m_table->where();
     
     // parse and apply predicate tree
-    if (condition) {
-        if ([condition isKindOfClass:[NSString class]]) {
-            NSPredicate *predicate = [NSPredicate predicateWithFormat:condition];
-            update_query_with_predicate(predicate, table, query);
+    if (predicate) {
+        if ([predicate isKindOfClass:[NSString class]]) {
+            update_query_with_predicate([NSPredicate predicateWithFormat:predicate],
+                                        table,
+                                        query);
         }
-        else if ([condition isKindOfClass:[NSPredicate class]]) {
-            update_query_with_predicate(condition, table, query);
+        else if ([predicate isKindOfClass:[NSPredicate class]]) {
+            update_query_with_predicate(predicate, table, query);
         }
         else {
             @throw predicate_exception(@"Invalid argument", @"Condition should be predicate as string or NSPredicate object");
