@@ -35,16 +35,6 @@ NSException *RLM_predicate_exception(NSString *name, NSString *reason) {
     return [NSException exceptionWithName:[NSString stringWithFormat:@"filterWithPredicate:orderedBy: - %@", name] reason:reason userInfo:nil];
 }
 
-// validate that we support the passed in expression type
-NSExpressionType validated_expression_type(NSExpression *expression) {
-    if (expression.expressionType != NSConstantValueExpressionType &&
-        expression.expressionType != NSKeyPathExpressionType) {
-        @throw RLM_predicate_exception(@"Invalid expression type",
-                                       @"Only support NSConstantValueExpressionType and NSKeyPathExpressionType");
-    }
-    return expression.expressionType;
-}
-
 // return the column index for a validated column name
 NSUInteger RLM_validated_column_index(RLMTable *table, NSString *columnName) {
     NSUInteger index = [table indexOfColumnWithName:columnName];
@@ -55,6 +45,17 @@ NSUInteger RLM_validated_column_index(RLMTable *table, NSString *columnName) {
     return index;
 }
 
+namespace {
+
+// validate that we support the passed in expression type
+NSExpressionType validated_expression_type(NSExpression *expression) {
+    if (expression.expressionType != NSConstantValueExpressionType &&
+        expression.expressionType != NSKeyPathExpressionType) {
+        @throw RLM_predicate_exception(@"Invalid expression type",
+                                       @"Only support NSConstantValueExpressionType and NSKeyPathExpressionType");
+    }
+    return expression.expressionType;
+}
 
 // apply an expression between two columns to a query
 void update_query_with_column_expression(RLMTable * table, tightdb::Query & query,
@@ -413,6 +414,8 @@ void update_query_with_predicate(NSPredicate * predicate,
                                        @"Only support compound and comparison predicates");
     }
 }
+
+} // namespace
 
 tightdb::Query queryFromPredicate(RLMTable *table, id condition)
 {
