@@ -407,14 +407,14 @@ EOF
             sh build.sh build
             sh build.sh install
         )
-        export TIGHTDB_CONFIG=../tightdb/install/bin/tightdb-config
+        export REALM_CONFIG=../tightdb/install/bin/tightdb-config
         sh build.sh config
         sh build.sh build
         sh build.sh build-iphone
         sh build.sh ios-framework
         sh build.sh test-debug
         (
-            cd $doc/ref/RefDocExamples
+            cd doc/ref/RefDocExamples
             xctool -scheme RefDocExamples -project RefDocExamples.xcodeproj clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
         )
         (
