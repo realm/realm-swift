@@ -36,7 +36,7 @@ REALM_TABLE_FAST(TestQueryAllTypes)
 
 - (void)testQuery {
     
-    [self.managerWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         TestQueryAllTypes *table = [realm createTableWithName:@"table" asTableClass:TestQueryAllTypes.class];
         NSLog(@"Table: %@", table);
         XCTAssertNotNil(table, @"Table is nil");

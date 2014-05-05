@@ -44,7 +44,7 @@ REALM_TABLE_FAST(PeopleTable2)
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
 
-    RLMTransactionManager *manager = [self managerWithTestPath];
+    RLMRealm *manager = [self realmWithTestPath];
     
     [manager writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
