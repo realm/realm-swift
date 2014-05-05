@@ -45,10 +45,10 @@
 -(RLMRow *)addEmptyRow;
 -(RLMRow *)insertEmptyRowAtIndex:(NSUInteger)rowIndex;
 
-/* Aggregate functions */
-/* FIXME: Consider adding:
- countRowsWithValue: @"foo"
- countRowsWithValue: @300 */
+// Aggregate functions
+// FIXME: Consider adding:
+// countRowsWithValue: @"foo"
+// countRowsWithValue: @300
 -(NSUInteger)countRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)countRowsWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex;
 -(NSUInteger)countRowsWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex;

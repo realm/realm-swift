@@ -342,30 +342,30 @@ EOF
         ;;
 
     "get-version")
-	version_file="src/realm/objc/RLMVersion.h"
-	realm_version_major="$(grep TDB_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	realm_version_minor="$(grep TDB_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	realm_version_patch="$(grep TDB_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	echo "$realm_version_major.$realm_version_minor.$realm_version_patch"
-	exit 0
-	;;
+        version_file="src/realm/objc/RLMVersion.h"
+        realm_version_major="$(grep REALM_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+        realm_version_minor="$(grep REALM_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+        realm_version_patch="$(grep REALM_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+        echo "$realm_version_major.$realm_version_minor.$realm_version_patch"
+        exit 0
+        ;;
 
     "set-version")
-	if [ "$OS" != "Darwin" ]; then
-	    echo "You can only set version when running Mac OS X"
-	    exit 1
-	fi
-        realm_version="$1"
-        version_file="src/realm/objc/RLMVersion.h"
-        realm_ver_major="$(echo "$realm_version" | cut -f1 -d.)" || exit 1
-        realm_ver_minor="$(echo "$realm_version" | cut -f2 -d.)" || exit 1
-        realm_ver_patch="$(echo "$realm_version" | cut -f3 -d.)" || exit 1
+        if [ "$OS" != "Darwin" ]; then
+            echo "You can only set version when running Mac OS X"
+            exit 1
+        fi
+            realm_version="$1"
+            version_file="src/realm/objc/RLMVersion.h"
+            realm_ver_major="$(echo "$realm_version" | cut -f1 -d.)" || exit 1
+            realm_ver_minor="$(echo "$realm_version" | cut -f2 -d.)" || exit 1
+            realm_ver_patch="$(echo "$realm_version" | cut -f3 -d.)" || exit 1
 
-	sed -i '' -e "s/TDB_VERSION_MAJOR .*$/TDB_VERSION_MAJOR $realm_ver_major/" $version_file || exit 1
-	sed -i '' -e "s/TDB_VERSION_MINOR .*$/TDB_VERSION_MINOR $realm_ver_minor/" $version_file || exit 1
-	sed -i '' -e "s/TDB_VERSION_PATCH .*$/TDB_VERSION_PATCH $realm_ver_patch/" $version_file || exit 1
-	exit 0
-	;;
+        sed -i '' -e "s/REALM_VERSION_MAJOR .*$/REALM_VERSION_MAJOR $realm_ver_major/" $version_file || exit 1
+        sed -i '' -e "s/REALM_VERSION_MINOR .*$/REALM_VERSION_MINOR $realm_ver_minor/" $version_file || exit 1
+        sed -i '' -e "s/REALM_VERSION_PATCH .*$/REALM_VERSION_PATCH $realm_ver_patch/" $version_file || exit 1
+        exit 0
+        ;;
 
     "clean")
         auto_configure || exit 1

@@ -121,7 +121,7 @@ using namespace std;
 }
 
 
-/* Getters */
+// Getters
 -(int64_t)intInColumnWithIndex:(NSUInteger)colNdx
 {
     return [_table RLM_intInColumnWithIndex:colNdx atRowIndex:_ndx];
@@ -167,7 +167,7 @@ using namespace std;
     return [_table RLM_mixedInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
-/* Setters */
+// Setters
 -(void)setInt:(int64_t)value inColumnWithIndex:(NSUInteger)colNdx
 {
     [_table RLM_setInt:value inColumnWithIndex:colNdx atRowIndex:_ndx];
