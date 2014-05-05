@@ -22,37 +22,28 @@
  */
 
 
-void ex_objc_transaction_manager_intro()
+void ex_objc_write_transaction_intro()
 {
     // Remove previous datafile
     [[NSFileManager defaultManager] removeItemAtPath:@"transactionManagerTest.realm" error:nil];
 
     // Create datafile with a new table
-    RLMTransactionManager *manager = [RLMTransactionManager managerForRealmWithPath:@"transactionManagerTest.realm"
-                                                                      error:nil];
+    RLMRealm *realm = [RLMRealm realmWithPath:@"transactionManagerTest.realm"];
+    
     // Perform a write transaction (with commit to file)
-    [manager writeUsingBlock:^(RLMRealm *realm) {
-        PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
-        [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
-    }];
-
+    [realm beginWriteTransaction];
+    PeopleTable *table = [realm createTableWithName:@"employees" asTableClass:[PeopleTable class]];
+    [table addRow:@{@"Name":@"Bill", @"Age":@53, @"Hired":@YES}];
+    [realm commitWriteTransaction];
+    
     // Perform a write transaction (with rollback)
-    [manager writeUsingBlockWithRollback:^(RLMRealm *realm, BOOL *rollback) {
-        PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
-        if ([table rowCount] == 0) {
-            NSLog(@"Roll back!");
-            *rollback = YES;
-            return;
-        }
-        [table addRow:@[@"Mary", @21, @NO]];
-    }];
+    [realm beginWriteTransaction];
+    [table addRow:@[@"Mary", @21, @NO]];
+    [realm abandonWriteTransaction];
 
     // Perform a read transaction
-    [manager readUsingBlock:^(RLMRealm *realm) {
-        PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
-        for (People *row in table) {
-            NSLog(@"Name: %@", row.Name);
-        }
-    }];
+    for (People *row in table) {
+        NSLog(@"Name: %@", row.Name);
+    }
 }
 /* @@EndExample@@ */

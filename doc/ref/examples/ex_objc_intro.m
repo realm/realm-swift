@@ -24,22 +24,20 @@
 
 // Use it in a function
 void ex_objc_intro() {
-    // Create a realm and initialize with a table and rows
-    RLMRealm *realm = [RLMRealm defaultRealmWithInitBlock:^(RLMRealm *realm) {
-        if (realm.isEmpty) {
-            // Create a table
-            PeopleTable *table = [PeopleTable tableInRealm:realm named:@"employees"];
-            
-            // Add rows
-            [table addRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
-            [table addRow:@{@"Name": @"Lars", @"Age": @22, @"Hired": @YES}];
-            [table addRow:@{@"Name": @"Phil", @"Age": @43, @"Hired": @NO}];
-            [table addRow:@{@"Name": @"Anni", @"Age": @54, @"Hired": @YES}];
-        }
-    }];
+    // Create a realm
+    RLMRealm *realm = [RLMRealm defaultRealm];
     
-    // Get the table
+    // Get/Create a table
+    [realm beginWriteTransaction];
     PeopleTable *table = [PeopleTable tableInRealm:realm named:@"employees"];
+    if (!table.rowCount) {
+        // Add rows
+        [table addRow:@{@"Name": @"Mary", @"Age": @76, @"Hired": @NO}];
+        [table addRow:@{@"Name": @"Lars", @"Age": @22, @"Hired": @YES}];
+        [table addRow:@{@"Name": @"Phil", @"Age": @43, @"Hired": @NO}];
+        [table addRow:@{@"Name": @"Anni", @"Age": @54, @"Hired": @YES}];
+    }
+    [realm commitWriteTransaction];
     
     // Query the table
     RLMView  *view  = [table allWhere:@"Age > 30"];
