@@ -181,13 +181,6 @@
     return table;
 }
 
--(void)dealloc
-{
-    if ([m_parent isKindOfClass:[RLMRealm class]]) {
-        [m_parent tableRefDidDie];
-    }
-}
-
 -(NSUInteger)columnCount
 {
     return m_table->get_column_count();
