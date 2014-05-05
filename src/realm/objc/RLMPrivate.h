@@ -43,6 +43,10 @@
 
 // returns YES if it's possible to update the table to support objects of type Class
 -(BOOL)canUpdateToSupportObjectClass:(Class)objectClass;
+
+// index path describing object position in the system (table/row/property, etc)
+@property (nonatomic) NSIndexPath *indexPath;
+
 @end
 
 @interface RLMRow()

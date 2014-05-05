@@ -29,7 +29,6 @@
 #import "RLMTable_noinst.h"
 #import "RLMRealm_noinst.h"
 #import "RLMPrivate.h"
-#import "RLMPrivate.hpp"
 #import "util_noinst.hpp"
 
 using namespace std;
