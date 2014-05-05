@@ -50,7 +50,7 @@ REALM_TABLE_FAST(QueryTable)
 
 - (void)testRealm_Misc2
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         NSUInteger rowIndex;
         NSLog(@"HasTable: %i", [realm hasTableWithName:@"employees"] );
         // Create new table in realm
@@ -125,7 +125,7 @@ REALM_TABLE_FAST(QueryTable)
 
 - (void)testQuery
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         QueryTable *table = [realm createTableWithName:@"Query table" asTableClass:[QueryTable class]];
         
         // Add some rows
@@ -175,14 +175,12 @@ REALM_TABLE_FAST(QueryTable)
     }
 }
 
-/*
- * Tables can contain other tables, however this is not yet supported
- * by the high level API. The following illustrates how to do it
- * through the low level API.
- */
+// Tables can contain other tables, however this is not yet supported
+// by the high level API. The following illustrates how to do it
+// through the low level API.
 - (void)testSubtables
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm createTableWithName:@"table"];
         
         // Specify the table type
@@ -218,17 +216,16 @@ REALM_TABLE_FAST(QueryTable)
         [table RLM_setMixed:subtable2 inColumnWithIndex:COL_TABLE_MIX atRowIndex:0];
     }];
     
-/* Fails!!!
-    // Specify its type
-    OCTopLevelTable* subtable2 = [table getTopLevelTable:COL_TABLE_MIX ndx:0];
-    {
-        RLMDescriptor* desc = [subtable2 getDescriptor];
-        [desc addColumnWithType:RLMTypeInt andName:@"int"];
-    }
-    // Add a row to it
-    [subtable2 addEmptyRow];
-    [subtable2 set:COL_SUBTABLE_INT ndx:0 value:900];
-*/
+//    Fails!!!
+//    // Specify its type
+//    OCTopLevelTable* subtable2 = [table getTopLevelTable:COL_TABLE_MIX ndx:0];
+//    {
+//        RLMDescriptor* desc = [subtable2 getDescriptor];
+//        [desc addColumnWithType:RLMTypeInt andName:@"int"];
+//    }
+//    // Add a row to it
+//    [subtable2 addEmptyRow];
+//    [subtable2 set:COL_SUBTABLE_INT ndx:0 value:900];
 }
 
 @end
