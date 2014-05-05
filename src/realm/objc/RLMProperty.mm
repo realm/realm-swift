@@ -215,6 +215,7 @@ const char * setterTypeStringForCode(char code) {
         case '@':
         {
             NSString *type = [NSString stringWithUTF8String:code];
+            // if one charachter, this is an untyped id, ie [type isEqualToString:@"@"]
             if (type.length == 1) {
                 self.type = RLMTypeMixed;
             }
