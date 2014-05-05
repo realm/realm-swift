@@ -36,11 +36,14 @@ using namespace std;
 using namespace tightdb;
 using namespace tightdb::util;
 
-// create NSException from c++ exception
-void throw_objc_exception(exception &ex) {
-    NSString *errorMessage = [NSString stringWithUTF8String:ex.what()];
-    @throw [NSException exceptionWithName:@"RLMException" reason:errorMessage userInfo:nil];
+namespace rlm {
+    // create NSException from c++ exception
+    void throw_objc_exception(exception &ex) {
+        NSString *errorMessage = [NSString stringWithUTF8String:ex.what()];
+        @throw [NSException exceptionWithName:@"RLMException" reason:errorMessage userInfo:nil];
+    }
 }
+using namespace rlm;
 
 
 // simple weak wrapper for a weak target timer
@@ -50,22 +53,6 @@ void throw_objc_exception(exception &ex) {
 @implementation RLMWeakTarget
 - (void)checkForUpdate {
     [_realm performSelector:@selector(refresh)];
-}
-@end
-
-
-// simple interface which calls a block the next time an autoreleasepool is purged
-@interface RLMTransactionMarker : NSObject
-+ (instancetype)autoreleasedMarker;
-@property (nonatomic, copy) void(^destructionBlock)();
-@end
-@implementation RLMTransactionMarker
-+ (instancetype)autoreleasedMarker {
-    RLMTransactionMarker *marker = [[RLMTransactionMarker alloc] init];
-    return marker;
-}
-- (void)dealloc {
-    _destructionBlock();
 }
 @end
 
@@ -111,7 +98,6 @@ NSArray * realmsAtPath(NSString *path) {
     
     tightdb::Group *_readGroup;
     tightdb::Group *_writeGroup;
-    __weak RLMTransactionMarker *_transactionMarker;
 }
 
 + (void)initialize {
@@ -285,16 +271,6 @@ NSString *const defaultRealmFileName = @"default.realm";
             
             // make all objects in this realm writable
             [self updateAllObjects];
-            
-            /*  FIXME: disabled until we have per file compile options (will get with xcodebuild)
-             
-            // create a transaction marker that will commit this transaction at autoreleasepool purge
-            // if it is still open
-            RLMTransactionMarker *marker = [RLMTransactionMarker autoreleasedMarker];
-            marker.destructionBlock = ^() {
-                [self commitWriteTransaction];
-            };
-            _transactionMarker = marker;*/
         }
         catch (std::exception& ex) {
             // File access errors are treated as exceptions here since they should not occur after the shared
@@ -308,7 +284,6 @@ NSString *const defaultRealmFileName = @"default.realm";
 - (void)commitWriteTransaction {
     if (self.inWriteTransaction) {
         try {
-            _transactionMarker = nil;
             _sharedGroup->commit();
             _writeGroup = NULL;
             
