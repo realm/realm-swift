@@ -25,10 +25,4 @@
 
 @interface RLMRealm (noinst)
 
-- (void)tableRefDidDie;
-
-- (void)checkForChange:(NSTimer *)timer;
-
-+ (instancetype)realmWithNativeGroup:(tightdb::Group *)group isOwned:(BOOL)is_owned readOnly:(BOOL)read_only;
-
 @end

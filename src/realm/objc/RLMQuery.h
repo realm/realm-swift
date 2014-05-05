@@ -104,9 +104,9 @@
 
 @interface RLMQueryAccessorBool : NSObject
 -(id)initWithColumn:(NSUInteger)columnId query:(RLMQuery *)query;
-/* FIXME: Rename columnIsEqualTo to isEqualTo and likewise for all
- * predicates in all the other column proxies
- * below. E.g. columnIsBetween:and_: -> isBetween:and_: */
+// FIXME: Rename columnIsEqualTo to isEqualTo and likewise for all
+// predicates in all the other column proxies
+// below. E.g. columnIsBetween:and_: -> isBetween:and_:
 -(RLMQuery *)columnIsEqualTo:(BOOL)value;
 @end
 

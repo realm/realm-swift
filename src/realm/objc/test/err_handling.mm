@@ -55,7 +55,7 @@ REALM_TABLE_FAST(TestQueryErrAllTypes)
     //------------------------------------------------------
     NSError* error = nil;
 
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
         PeopleErrTable* people = [realm createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
         
@@ -115,15 +115,15 @@ REALM_TABLE_FAST(TestQueryErrAllTypes)
 
     NSLog(@"Disktable size: %zu", [diskTable rowCount]);
 
-    /* No longer support for errors here
-    error = nil;
-    if (![diskTable addName:@"Anni" Age:54 Hired:YES error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-    } else {
-        XCTFail(@"addName to readonly should have failed.");
-    }*/
-
-    NSLog(@"Disktable size: %zu", [diskTable rowCount]);
+//    No longer support for errors here
+//    error = nil;
+//    if (![diskTable addName:@"Anni" Age:54 Hired:YES error:&error]) {
+//        NSLog(@"%@", [error localizedDescription]);
+//    } else {
+//        XCTFail(@"addName to readonly should have failed.");
+//    }
+//
+//    NSLog(@"Disktable size: %zu", [diskTable rowCount]);
 }
 
 
@@ -273,7 +273,7 @@ REALM_TABLE_FAST(TestQueryErrAllTypes)
 
 - (void)testQueryErrHandling
 {
-    [self.managerWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         TestQueryErrAllTypes* table = [realm createTableWithName:@"Test" asTableClass:TestQueryErrAllTypes.class];
         NSLog(@"Table: %@", table);
         XCTAssertNotNil(table, @"Table is nil");

@@ -56,7 +56,7 @@
 
 
 
-/* REALM_ARG_TYPE */
+// REALM_ARG_TYPE
 
 #define REALM_ARG_TYPE(type)                 REALM_ARG_TYPE_2(REALM_IS_SUBTABLE(type), type)
 #define REALM_ARG_TYPE_2(is_subtable, type)  REALM_ARG_TYPE_3(is_subtable, type)
@@ -66,7 +66,7 @@
 
 
 
-/* REALM_COLUMN_PROXY */
+// REALM_COLUMN_PROXY
 
 #define REALM_COLUMN_PROXY_DEF(name, type)                 REALM_COLUMN_PROXY_DEF_2(REALM_IS_SUBTABLE(type), name, type)
 #define REALM_COLUMN_PROXY_DEF_2(is_subtable, name, type)  REALM_COLUMN_PROXY_DEF_3(is_subtable, name, type)
@@ -84,7 +84,7 @@
 
 
 
-/* REALM_ADD_COLUMN */
+// REALM_ADD_COLUMN
 
 #define REALM_ADD_COLUMN(desc, name, type)                REALM_ADD_COLUMN_2(REALM_IS_SUBTABLE(type), desc, name, type)
 #define REALM_ADD_COLUMN_2(is_subtable, desc, name, type) REALM_ADD_COLUMN_3(is_subtable, desc, name, type)
@@ -111,7 +111,7 @@
 
 
 
-/* REALM_CHECK_COLUMN_TYPE */
+// REALM_CHECK_COLUMN_TYPE
 
 #define REALM_CHECK_COLUMN_TYPE(desc, col, name, type)                REALM_CHECK_COLUMN_TYPE_2(REALM_IS_SUBTABLE(type), desc, col, name, type)
 #define REALM_CHECK_COLUMN_TYPE_2(is_subtable, desc, col, name, type) REALM_CHECK_COLUMN_TYPE_3(is_subtable, desc, col, name, type)
@@ -138,7 +138,7 @@
 
 
 
-/* REALM_COLUMN_INSERT */
+// REALM_COLUMN_INSERT
 
 #define REALM_COLUMN_INSERT(table, col, row, value, type)                REALM_COLUMN_INSERT_2(REALM_IS_SUBTABLE(type), table, col, row, value, type)
 #define REALM_COLUMN_INSERT_2(is_subtable, table, col, row, value, type) REALM_COLUMN_INSERT_3(is_subtable, table, col, row, value, type)
@@ -148,7 +148,7 @@
 
 
 
-/* REALM_ROW_PROPERTY */
+// REALM_ROW_PROPERTY
 
 #define REALM_ROW_PROPERTY_DEF(name, type)                 REALM_ROW_PROPERTY_DEF_2(REALM_IS_SUBTABLE(type), name, type)
 #define REALM_ROW_PROPERTY_DEF_2(is_subtable, name, type)  REALM_ROW_PROPERTY_DEF_3(is_subtable, name, type)
@@ -192,7 +192,7 @@
     [_##name setSubtable:subtable]; \
 } \
 
-/* REALM_QUERY_ACCESSOR */
+// REALM_QUERY_ACCESSOR
 
 #define REALM_QUERY_ACCESSOR_DEF(table, col_name, col_type)                 REALM_QUERY_ACCESSOR_DEF_2(REALM_IS_SUBTABLE(col_type), table, col_name, col_type)
 #define REALM_QUERY_ACCESSOR_DEF_2(is_subtable, table, col_name, col_type)  REALM_QUERY_ACCESSOR_DEF_3(is_subtable, table, col_name, col_type)
@@ -207,7 +207,7 @@
 #define REALM_QUERY_ACCESSOR_IMPL_4_N(table, col_name, col_type)            REALM_QUERY_ACCESSOR_IMPL_##col_type(table, col_name)
 
 
-/* Boolean */
+// Boolean
 
 #define REALM_QUERY_ACCESSOR_DEF_Bool(table, col_name) \
 @interface table##QueryAccessor##col_name : RLMQueryAccessorBool \
@@ -223,7 +223,7 @@
 @end
 
 
-/* Integer */
+// Integer
 
 #define REALM_QUERY_ACCESSOR_DEF_Int(table, col_name) \
 @interface table##QueryAccessor##col_name : RLMQueryAccessorInt \
@@ -269,7 +269,7 @@
 @end
 
 
-/* Float */
+// Float
 
 #define REALM_QUERY_ACCESSOR_DEF_Float(table, col_name) \
 @interface table##QueryAccessor##col_name : RLMQueryAccessorFloat \
@@ -315,7 +315,7 @@
 @end
 
 
-/* Double */
+// Double
 
 #define REALM_QUERY_ACCESSOR_DEF_Double(table, col_name) \
 @interface table##QueryAccessor##col_name : RLMQueryAccessorDouble \
@@ -361,7 +361,7 @@
 @end
 
 
-/* String */
+// String
 
 #define REALM_QUERY_ACCESSOR_DEF_String(table, col_name) \
 @interface table##QueryAccessor##col_name : RLMQueryAccessorString \
@@ -422,7 +422,7 @@
 @end
 
 
-/* Binary */
+// Binary
 
 #define REALM_QUERY_ACCESSOR_DEF_Binary(table, col_name) \
 @interface table##QueryAccessor##col_name : RLMQueryAccessorBinary \
@@ -458,7 +458,7 @@
 @end
 
 
-/* Date */
+// Date
 
 #define REALM_QUERY_ACCESSOR_DEF_Date(table, col_name) \
 @interface table##QueryAccessor##col_name : RLMQueryAccessorDate \
@@ -504,7 +504,7 @@
 @end
 
 
-/* Subtable */
+// Subtable
 
 #define REALM_QUERY_ACCESSOR_DEF_SUBTABLE(table, col_name, col_type) \
 @interface table##QueryAccessor##col_name : RLMQueryAccessorSubtable \
@@ -515,7 +515,7 @@
 @end
 
 
-/* Mixed */
+// Mixed
 
 #define REALM_QUERY_ACCESSOR_DEF_Mixed(table, col_name) \
 @interface table##QueryAccessor##col_name : RLMQueryAccessorMixed \
