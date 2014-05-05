@@ -79,13 +79,13 @@ See RLMTable for more details on possible queries.
 
 ## Notifications
 
-The auto-updating Realm will send out notifications every time the underlying Realm is updated. These notifications can be observed through `NSNotificationCenter`:
+The auto-updating Realm will send out notifications every time the underlying Realm is updated. These notifications can be observed by registering a block:
 
 	// Observe Realm Notifications
-	[[NSNotificationCenter defaultCenter] addObserver:self
-	                                         selector:@selector(realmDidChange)
-	                                             name:RLMDidChangeNotification
-	                                           object:nil];
+    __weak weakSelf = self;
+    [realm addNotification:^(NSString *note, RLMRealm * realm) {
+        [weakSelf updateUI];
+    }];
 
 ## Background Operations
 
