@@ -42,52 +42,11 @@
     RLMRow * m_tmp_row;
 }
 
--(instancetype)initWithObjectClass:(Class)objectClass
+- (instancetype)init
 {
-    self = [super init];
-    if (self) {
-        m_read_only = NO;
-        m_table = tightdb::Table::create(); // FIXME: May throw
-        [self setObjectClass:objectClass];
-    }
-    return self;
-}
-
-
--(instancetype)init
-{
-    self = [super init];
-    if (self) {
-        m_read_only = NO;
-        m_table = tightdb::Table::create(); // FIXME: May throw
-        _objectClass = RLMRow.class;
-        _proxyObjectClass = RLMRow.class;
-    }
-    return self;
-}
-
--(instancetype)initWithColumns:(NSArray *)columns
-{
-    self = [super init];
-    if (!self)
-        return nil;
-
-    m_read_only = NO;
-    m_table = tightdb::Table::create(); // FIXME: May throw
-    _objectClass = RLMRow.class;
-    _proxyObjectClass = RLMRow.class;
-    
-    if (!set_columns(m_table, columns)) {
-        m_table.reset();
-
-        // Parsing the schema failed
-        //TODO: More detailed error msg in exception
-        @throw [NSException exceptionWithName:@"realm:invalid_columns"
-                                                         reason:@"The supplied list of columns was invalid"
-                                                       userInfo:nil];
-    }
-
-    return self;
+    @throw [NSException exceptionWithName:@"realm:invalid_init"
+                                   reason:@"Tables can only be created from RLMRealm objects"
+                                 userInfo:nil];
 }
 
 -(id)_initRaw
@@ -1176,15 +1135,15 @@
     return count;
 }
 
--(NSNumber *)sumOfColumn:(NSString *)columnName where:(id)predicate
+-(NSNumber *)sumOfProperty:(NSString *)property where:(id)predicate
 {
     tightdb::Query query = queryFromPredicate(self, predicate);
     
-    NSUInteger index = [self indexOfColumnWithName:columnName];
+    NSUInteger index = [self indexOfColumnWithName:property];
     
     if (index == NSNotFound) {
         @throw [NSException exceptionWithName:@"realm:invalid_column_name"
-                                       reason:[NSString stringWithFormat:@"Column with name %@ not found on table", columnName]
+                                       reason:[NSString stringWithFormat:@"Property with name %@ not found on table", property]
                                      userInfo:nil];
     }
     
@@ -1208,15 +1167,15 @@
     return sum;
 }
 
--(NSNumber *)averageOfColumn:(NSString *)columnName where:(id)predicate
+-(NSNumber *)averageOfProperty:(NSString *)property where:(id)predicate
 {
     tightdb::Query query = queryFromPredicate(self, predicate);
     
-    NSUInteger index = [self indexOfColumnWithName:columnName];
+    NSUInteger index = [self indexOfColumnWithName:property];
     
     if (index == NSNotFound) {
         @throw [NSException exceptionWithName:@"realm:invalid_column_name"
-                                       reason:[NSString stringWithFormat:@"Column with name %@ not found on table", columnName]
+                                       reason:[NSString stringWithFormat:@"Property with name %@ not found on table", property]
                                      userInfo:nil];
     }
     
@@ -1238,6 +1197,80 @@
     }
     
     return average;
+}
+
+-(id)minOfProperty:(NSString *)property where:(id)predicate
+{
+    tightdb::Query query = queryFromPredicate(self, predicate);
+    
+    NSUInteger index = [self indexOfColumnWithName:property];
+    
+    if (index == NSNotFound) {
+        @throw [NSException exceptionWithName:@"realm:invalid_column_name"
+                                       reason:[NSString stringWithFormat:@"Property with name %@ not found on table", property]
+                                     userInfo:nil];
+    }
+    
+    id min;
+    RLMType columnType = [self columnTypeOfColumnWithIndex:index];
+    if (columnType == RLMTypeInt) {
+        min = [NSNumber numberWithInteger:query.minimum_int(index)];
+    }
+    else if (columnType == RLMTypeDouble) {
+        min = [NSNumber numberWithDouble:query.minimum_double(index)];
+    }
+    else if (columnType == RLMTypeFloat) {
+        min = [NSNumber numberWithFloat:query.minimum_float(index)];
+    }
+    else if (columnType == RLMTypeDate) {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supported"
+                                       reason:@"Minimum not supported on date columns yet"
+                                     userInfo:nil];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Minimum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return min;
+}
+
+-(id)maxOfProperty:(NSString *)property where:(id)predicate
+{
+    tightdb::Query query = queryFromPredicate(self, predicate);
+    
+    NSUInteger index = [self indexOfColumnWithName:property];
+    
+    if (index == NSNotFound) {
+        @throw [NSException exceptionWithName:@"realm:invalid_column_name"
+                                       reason:[NSString stringWithFormat:@"Property with name %@ not found on table", property]
+                                     userInfo:nil];
+    }
+    
+    id max;
+    RLMType columnType = [self columnTypeOfColumnWithIndex:index];
+    if (columnType == RLMTypeInt) {
+        max = [NSNumber numberWithInteger:query.maximum_int(index)];
+    }
+    else if (columnType == RLMTypeDouble) {
+        max = [NSNumber numberWithDouble:query.maximum_double(index)];
+    }
+    else if (columnType == RLMTypeFloat) {
+        max = [NSNumber numberWithFloat:query.maximum_float(index)];
+    }
+    else if (columnType == RLMTypeDate) {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supported"
+                                       reason:@"Maximum not supported on date columns yet"
+                                     userInfo:nil];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Maximum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return max;
 }
 
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex
@@ -1383,6 +1416,5 @@
     }
     return YES;
 }
-
 
 @end

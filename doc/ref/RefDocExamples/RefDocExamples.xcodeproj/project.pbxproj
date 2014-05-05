@@ -10,6 +10,7 @@
 		4272AB6418F56AB400397B62 /* ex_objc_intro.m in Sources */ = {isa = PBXBuildFile; fileRef = 4272AB6318F56AB400397B62 /* ex_objc_intro.m */; };
 		4272AB6A18F6D42B00397B62 /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4272AB6918F6D42B00397B62 /* libstdc++.6.dylib */; };
 		4B7915E219004CA700E29DAC /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7915E119004CA700E29DAC /* Realm.framework */; };
+		4BECBD901911DB6C00CAAEDE /* ex_objc_util.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BECBD8F1911DB6C00CAAEDE /* ex_objc_util.m */; };
 		4D88931318D320D20038AFD4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88931218D320D20038AFD4 /* Foundation.framework */; };
 		4D88931518D320D20038AFD4 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88931418D320D20038AFD4 /* CoreGraphics.framework */; };
 		4D88931718D320D20038AFD4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D88931618D320D20038AFD4 /* UIKit.framework */; };
@@ -49,9 +50,9 @@
 		42211A4C18D895D000E1CA0B /* people.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = people.m; path = ../examples/people.m; sourceTree = "<group>"; };
 		42211A4E18D897F500E1CA0B /* examples.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = examples.h; path = ../examples/examples.h; sourceTree = "<group>"; };
 		4272AB6318F56AB400397B62 /* ex_objc_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_intro.m; path = ../examples/ex_objc_intro.m; sourceTree = "<group>"; };
-		4272AB6718F6ABB800397B62 /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
 		4272AB6918F6D42B00397B62 /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "usr/lib/libstdc++.6.dylib"; sourceTree = SDKROOT; };
 		4B7915E119004CA700E29DAC /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../Realm.framework; sourceTree = "<group>"; };
+		4BECBD8F1911DB6C00CAAEDE /* ex_objc_util.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_util.m; path = ../examples/ex_objc_util.m; sourceTree = "<group>"; };
 		4D88930F18D320D20038AFD4 /* RefDocExamples.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RefDocExamples.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D88931218D320D20038AFD4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4D88931418D320D20038AFD4 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -76,7 +77,6 @@
 		4D88934818D320EF0038AFD4 /* ex_objc_table_typed_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_table_typed_intro.m; path = ../examples/ex_objc_table_typed_intro.m; sourceTree = "<group>"; };
 		4D88934918D320EF0038AFD4 /* ex_objc_tableview_typed_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_tableview_typed_intro.m; path = ../examples/ex_objc_tableview_typed_intro.m; sourceTree = "<group>"; };
 		4D88934A18D320EF0038AFD4 /* ex_objc_query_typed_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_query_typed_intro.m; path = ../examples/ex_objc_query_typed_intro.m; sourceTree = "<group>"; };
-		4D88935618D321130038AFD4 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		E8AD43BC19058DC70091D9D8 /* ex_objc_realm_intro.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ex_objc_realm_intro.m; path = ../examples/ex_objc_realm_intro.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -130,8 +130,6 @@
 			isa = PBXGroup;
 			children = (
 				4272AB6918F6D42B00397B62 /* libstdc++.6.dylib */,
-				4272AB6718F6ABB800397B62 /* libstdc++.dylib */,
-				4D88935618D321130038AFD4 /* libc++.dylib */,
 				4B7915E119004CA700E29DAC /* Realm.framework */,
 				4D88931218D320D20038AFD4 /* Foundation.framework */,
 				4D88931418D320D20038AFD4 /* CoreGraphics.framework */,
@@ -197,6 +195,7 @@
 				4D88934418D320EF0038AFD4 /* ex_objc_table_typed_intro_with_many_comments.m */,
 				4D88934318D320EF0038AFD4 /* ex_objc_tableview_dynamic_intro.m */,
 				4D88934918D320EF0038AFD4 /* ex_objc_tableview_typed_intro.m */,
+				4BECBD8F1911DB6C00CAAEDE /* ex_objc_util.m */,
 			);
 			name = examples;
 			sourceTree = "<group>";
@@ -309,6 +308,7 @@
 				4D88935018D320EF0038AFD4 /* ex_objc_query_dynamic_intro.m in Sources */,
 				4D88935218D320EF0038AFD4 /* ex_objc_tableview_typed_intro.m in Sources */,
 				4D88931F18D320D20038AFD4 /* main.m in Sources */,
+				4BECBD901911DB6C00CAAEDE /* ex_objc_util.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
