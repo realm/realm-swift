@@ -25,13 +25,12 @@
 
 @property (nonatomic, readonly) NSUInteger columnCount;
 
-/**
- * Returns index of new column or NSNotFound if an error occurred.
- */
+// Returns index of new column or NSNotFound if an error occurred.
+
 -(NSUInteger)addColumnWithName:(NSString *)name type:(RLMType)type;
-/**
- * Returns nil on memory allocation error.
- */
+
+// Returns nil on memory allocation error.
+
 -(RLMDescriptor *)addColumnTable:(NSString *)name;
 -(RLMDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex;
 -(RLMDescriptor *)subdescriptorForColumnWithIndex:(NSUInteger)colIndex error:(NSError *__autoreleasing *)error;

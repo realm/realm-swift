@@ -517,7 +517,7 @@ void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
 
             TableRef subtable = table.get_subtable(col_ndx, row_ndx);
 
-            /* fill in data */
+            // fill in data
             insert_row_with_labels(row_ndx, *subtable, (NSDictionary *)value);
         }
     }

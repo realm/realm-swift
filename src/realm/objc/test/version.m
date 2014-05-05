@@ -1,7 +1,7 @@
-/*
- version.m
- TightDB
-*/
+//
+//  shared_group.m
+//  TightDB
+//
 
 #import "RLMTestCase.h"
 
