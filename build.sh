@@ -402,7 +402,7 @@ EOF
         (
             cd ../tightdb
             mkdir -p install
-            sh build.sh config install
+            sh build.sh config $(pwd)/install
             sh build.sh build-iphone
             sh build.sh build
             sh build.sh install
