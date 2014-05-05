@@ -34,6 +34,7 @@ The Objective-C API has been updated and your code will break!
 
 ### API breaking changes:
 
+* `RLMTable` objects can only be created with an `RLMRealm` object.
 * `RLMContext` was renamed to `RLMTransactionManager`
 * Renamed `RLMContextDidChangeNotification` to `RLMRealmDidChangeNotification`
 * Renamed `contextWithDefaultPersistence` to `managerForDefaultRealm`
