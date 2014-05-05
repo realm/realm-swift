@@ -68,7 +68,7 @@ typedef void(^RLMNotificationBlock)(NSString *note, RLMRealm *realm);
 + (instancetype)realmWithPath:(NSString *)path;
 
 /**
- Instantiates an RLMRealm with a manual init block, with persistence to a specific file, and an error
+ Instantiates an RLMRealm with persistence to a specific file, and an error.
 
  @param path        Path to the file you want the data saved in.
  @param error       Pass-by-reference for errors.

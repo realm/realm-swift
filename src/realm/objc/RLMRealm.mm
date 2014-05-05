@@ -57,14 +57,14 @@ using namespace rlm;
 @end
 
 
-// functionality for caching realm instances
+// functionality for caching Realm instances
 static NSMutableDictionary *s_realmsPerPath;
 
 // FIXME: In the following 3 functions, we should be identifying files by the inode,device number pair
 //  rather than by the path (since the path is not a reliable identifier). This requires additional support
 //  from the core library though, because the inode,device number pair needs to be taken from the open file
 //  (to avoid race conditions).
-RLMRealm * cachedRealm(NSString *path) {
+RLMRealm *cachedRealm(NSString *path) {
     mach_port_t threadID = pthread_mach_thread_np(pthread_self());
     @synchronized(s_realmsPerPath) {
         return [s_realmsPerPath[path] objectForKey:@(threadID)];
@@ -81,7 +81,7 @@ void cacheRealm(RLMRealm *realm, NSString *path) {
     }
 }
 
-NSArray * realmsAtPath(NSString *path) {
+NSArray *realmsAtPath(NSString *path) {
     @synchronized(s_realmsPerPath) {
         return [s_realmsPerPath[path] objectEnumerator].allObjects;
     }
@@ -134,8 +134,8 @@ NSString *const defaultRealmFileName = @"default.realm";
 
 + (NSString *)writeablePathForFile:(NSString*)fileName
 {
-    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString* documentsDirectory = [paths objectAtIndex:0];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
     return [documentsDirectory stringByAppendingPathComponent:fileName];
 }
 
@@ -152,7 +152,7 @@ NSString *const defaultRealmFileName = @"default.realm";
 + (instancetype)realmWithPath:(NSString *)path
                         error:(NSError **)error
 {
-    NSRunLoop * currentRunloop = [NSRunLoop currentRunLoop];
+    NSRunLoop *currentRunloop = [NSRunLoop currentRunLoop];
     if (!currentRunloop) {
         @throw [NSException exceptionWithName:@"realm:runloop_exception"
                                        reason:[NSString stringWithFormat:@"%@ \
@@ -417,7 +417,7 @@ NSString *const defaultRealmFileName = @"default.realm";
 }
 
 - (RLMTable *)tableWithName:(NSString *)name objectClass:(Class)objClass {
-    RLMTable * table = [self tableWithName:name];
+    RLMTable *table = [self tableWithName:name];
     
     // set object class and update table columns
     table.objectClass = objClass;
@@ -493,7 +493,7 @@ NSString *const defaultRealmFileName = @"default.realm";
                                      userInfo:nil];
     }
     
-    RLMTable * table = [[RLMTable alloc] _initRaw];
+    RLMTable *table = [[RLMTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
     REALM_EXCEPTION_HANDLER_CORE_EXCEPTION(
@@ -507,7 +507,7 @@ NSString *const defaultRealmFileName = @"default.realm";
 }
 
 - (RLMTable *)createTableWithName:(NSString *)name objectClass:(Class)objClass {
-    RLMTable * table = [self createTableWithName:name];
+    RLMTable *table = [self createTableWithName:name];
     
     // set object class and update table columns
     table.objectClass = objClass;
@@ -517,7 +517,7 @@ NSString *const defaultRealmFileName = @"default.realm";
 
 -(RLMTable *)createTableWithName:(NSString*)name columns:(NSArray*)columns
 {
-    RLMTable * table = [self createTableWithName:name];
+    RLMTable *table = [self createTableWithName:name];
     
     //Set columns
     tightdb::TableRef nativeTable = [table getNativeTable].get_table_ref();
@@ -553,7 +553,7 @@ NSString *const defaultRealmFileName = @"default.realm";
                                      userInfo:nil];
     }
     
-    RLMTable * table = [[class_obj alloc] _initRaw];
+    RLMTable *table = [[class_obj alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!table))
         return nil;
     bool was_created;
