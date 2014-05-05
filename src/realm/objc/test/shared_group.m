@@ -213,7 +213,7 @@ REALM_TABLE_2(SharedTable2,
     
     [manager2 writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *t = [realm tableWithName:@"t"];
-        [t addRow:nil]; /* Adding an empty row */
+        [t addRow:nil]; // Adding an empty row
     }];
     
     XCTAssertTrue([manager1 hasChangedSinceLastTransaction], @"Transaction manager HAS been changed by another process");
