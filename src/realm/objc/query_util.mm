@@ -210,22 +210,22 @@ void add_between_constraint_to_query(tightdb::Query & query,
             break;
         case tightdb::type_Double:
         {
-            double fromDouble = double([(NSNumber *)from doubleValue]);
-            double toDouble = double([(NSNumber *)to doubleValue]);
+            double fromDouble = [(NSNumber *)from doubleValue];
+            double toDouble = [(NSNumber *)to doubleValue];
             query.between(index, fromDouble, toDouble);
             break;
         }
         case tightdb::type_Float:
         {
-            float fromFloat = float([(NSNumber *)from floatValue]);
-            float toFloat = float([(NSNumber *)to floatValue]);
+            float fromFloat = [(NSNumber *)from floatValue];
+            float toFloat = [(NSNumber *)to floatValue];
             query.between(index, fromFloat, toFloat);
             break;
         }
         case tightdb::type_Int:
         {
-            int fromInt = int([(NSNumber *)from intValue]);
-            int toInt = int([(NSNumber *)to intValue]);
+            int fromInt = [(NSNumber *)from intValue];
+            int toInt = [(NSNumber *)to intValue];
             query.between(index, fromInt, toInt);
             break;
         }
@@ -316,15 +316,15 @@ void update_query_with_value_expression(RLMTable * table, tightdb::Query & query
             break;
         case tightdb::type_Double:
             add_numeric_constraint_to_query(query, type, operatorType,
-                                            index, double([(NSNumber *)value doubleValue]));
+                                            index, [(NSNumber *)value doubleValue]);
             break;
         case tightdb::type_Float:
             add_numeric_constraint_to_query(query, type, operatorType,
-                                            index, float([(NSNumber *)value floatValue]));
+                                            index, [(NSNumber *)value floatValue]);
             break;
         case tightdb::type_Int:
             add_numeric_constraint_to_query(query, type, operatorType,
-                                            index, int([(NSNumber *)value intValue]));
+                                            index, [(NSNumber *)value intValue]);
             break;
         case tightdb::type_String:
             add_string_constraint_to_query(query, operatorType, predicateOptions, index, value);
