@@ -81,48 +81,57 @@ void throw_objc_exception(exception &ex)
 @end
 
 
-@class RLMRealm;
+static NSMutableDictionary *s_realmsPerPath;
 
-@interface RLMPrivateWeakTimerTarget : NSObject
-
-- (instancetype)initWithRealm:(RLMRealm *)realm;
-- (void)timerDidFire:(NSTimer *)timer;
-
-@end
-
-@implementation RLMPrivateWeakTimerTarget
-{
-    __weak RLMRealm *_realm;
-}
-
-- (instancetype)initWithRealm:(RLMRealm *)realm
-{
-    self = [super init];
-    if (self) {
-        _realm = realm;
+// FIXME: In the following 3 functions, we should be identifying files by the inode,device number pair
+//  rather than by the path (since the path is not a reliable identifier). This requires additional support
+//  from the core library though, because the inode,device number pair needs to be taken from the open file
+//  (to avoid race conditions).
+RLMRealm * cachedRealm(NSString *path) {
+    mach_port_t threadID = pthread_mach_thread_np(pthread_self());
+    @synchronized(s_realmsPerPath) {
+        return [s_realmsPerPath[path] objectForKey:@(threadID)];
     }
-    return self;
 }
 
-- (void)timerDidFire:(NSTimer *)timer
-{
-    [_realm checkForChange:timer];
+void cacheRealm(RLMRealm *realm, NSString *path) {
+    mach_port_t threadID = pthread_mach_thread_np(pthread_self());
+    @synchronized(s_realmsPerPath) {
+        if (!s_realmsPerPath[path]) {
+            s_realmsPerPath[path] = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsObjectPersonality valueOptions:NSPointerFunctionsWeakMemory];
+        }
+        [s_realmsPerPath[path] setObject:realm forKey:@(threadID)];
+    }
 }
 
-@end
+NSArray * realmsAtPath(NSString *path) {
+    @synchronized(s_realmsPerPath) {
+        return [s_realmsPerPath[path] objectEnumerator].allObjects;
+    }
+}
 
 @implementation RLMRealm
 {
     NSNotificationCenter *_notificationCenter;
     UniquePtr<SharedGroup> _sharedGroup;
-    NSTimer *_timer;
     NSMutableArray *_weakTableRefs; // Elements are instances of RLMPrivateWeakTableReference
     BOOL _tableRefsHaveDied;
     BOOL _usesImplicitTransactions;
-    
+    NSRunLoop *_runLoop;
+    NSTimer *_delayedUpdate;
+    NSDate *_lastUpdate;
+    double _minUpdateInterval;
+
     tightdb::Group *_group;
     BOOL m_is_owned;
     BOOL m_read_only;
+}
+
++ (void)initialize {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        s_realmsPerPath = [NSMutableDictionary dictionary];
+    });
 }
 
 - (instancetype)init
@@ -152,58 +161,47 @@ void throw_objc_exception(exception &ex)
 
 + (instancetype)defaultRealmWithInitBlock:(RLMWriteBlock)initBlock
 {
-    return [RLMRealm realmWithPath:[RLMTransactionManager defaultPath] initBlock:initBlock];
+    return [RLMRealm realmWithPath:[RLMTransactionManager defaultPath] initBlock:initBlock error:nil];
 }
 
 + (instancetype)realmWithPath:(NSString *)path
 {
-    return [self realmWithPath:path initBlock:nil];
+    return [self realmWithPath:path initBlock:nil error:nil];
 }
 
-+ (instancetype)realmWithPath:(NSString *)path initBlock:(RLMWriteBlock)initBlock
-{
-    // This constructor can only be called from the main thread
-    if (![NSThread isMainThread]) {
-        @throw [NSException exceptionWithName:@"realm:runloop_exception"
-                                       reason:[NSString stringWithFormat:@"%@ \
-                                               can only be called from the main thread. \
-                                               Use an RLMTransactionManager read or write block \
-                                               instead.",
-                                               NSStringFromSelector(_cmd)]
-                                     userInfo:nil];
-    }
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-    return [self realmWithPath:path
-                     initBlock:initBlock
-                       runLoop:[NSRunLoop mainRunLoop]
-            notificationCenter:notificationCenter
-                         error:nil];
-}
 
 + (instancetype)realmWithPath:(NSString *)path
-                      runLoop:(NSRunLoop *)runLoop
-           notificationCenter:(NSNotificationCenter *)notificationCenter
-                        error:(NSError **)error
-{
-    return [self realmWithPath:path
-                     initBlock:nil
-                       runLoop:runLoop
-            notificationCenter:notificationCenter
-                         error:error];
+                    initBlock:(RLMWriteBlock)initBlock {
+    return [RLMRealm realmWithPath:path initBlock:initBlock error:nil];
 }
 
 + (instancetype)realmWithPath:(NSString *)path
                     initBlock:(RLMWriteBlock)initBlock
-                      runLoop:(NSRunLoop *)runLoop
-           notificationCenter:(NSNotificationCenter *)notificationCenter
                         error:(NSError **)error
 {
-    RLMRealm *realm = [[RLMRealm alloc] initForImplicitTransactions:YES];
+    NSRunLoop * currentRunloop = [NSRunLoop currentRunLoop];
+    if (!currentRunloop) {
+        @throw [NSException exceptionWithName:@"realm:runloop_exception"
+                                       reason:[NSString stringWithFormat:@"%@ \
+                                               can only be called from a thread with a runloop. \
+                                               Use an RLMTransactionManager read or write block \
+                                               instead.", NSStringFromSelector(_cmd)] userInfo:nil];
+    }
+
+    // try to reuse existing realm first
+    RLMRealm *realm = cachedRealm(path);
+    if (realm) {
+        return realm;
+    }
+    
+    realm = [[RLMRealm alloc] initForImplicitTransactions:YES];
     if (!realm) {
         return nil;
     }
 
-    realm->_notificationCenter = notificationCenter;
+    realm->_runLoop = [NSRunLoop currentRunLoop];
+    realm->_minUpdateInterval = .1;
+    realm->_notificationCenter = [NSNotificationCenter defaultCenter];
 
     RLMError errorCode = RLMErrorOk;
     NSString *errorMessage;
@@ -232,6 +230,7 @@ void throw_objc_exception(exception &ex)
         }
         return nil;
     }
+    realm->_weakTableRefs = [NSMutableArray array];
     
     // Run init block before creating realm
     if (initBlock) {
@@ -267,16 +266,9 @@ void throw_objc_exception(exception &ex)
         }
         realm->m_read_only = YES;
     }
-
-    // Register an interval timer on specified runLoop
-    NSTimeInterval seconds = 0.1; // Ten times per second
-    RLMPrivateWeakTimerTarget *weakTimerTarget = [[RLMPrivateWeakTimerTarget alloc] initWithRealm:realm];
-    realm->_timer = [NSTimer timerWithTimeInterval:seconds target:weakTimerTarget
-                                          selector:@selector(timerDidFire:)
-                                          userInfo:nil repeats:YES];
-    [runLoop addTimer:realm->_timer forMode:NSDefaultRunLoopMode];
-
-    realm->_weakTableRefs = [NSMutableArray array];
+    
+    // cache main thread realm at this path
+    cacheRealm(realm, path);
 
     try {
         realm->_group = (tightdb::Group *)&realm->_sharedGroup->begin_read();
@@ -290,16 +282,60 @@ void throw_objc_exception(exception &ex)
 
 - (void)dealloc
 {
-    [_timer invalidate];
     if (m_is_owned) {
         delete _group;
     }
 }
 
-- (void)checkForChange:(NSTimer *)theTimer
-{
-    static_cast<void>(theTimer);
 
+- (void)timerFired {
+    _delayedUpdate = nil;
+    [self checkForChange];
+}
+
+// FIXME: when adding support of Mac OSX, we need to also call this function
+//        when the realm file changes due to other processes writing to the same realm
++(void)notifyRealmsAtPath:(NSString *)path {
+    NSArray *realms = realmsAtPath(path);
+    for (RLMRealm *realm in realms) {
+        if ([realm->_runLoop isEqual:[NSRunLoop currentRunLoop]]) {
+            [realm checkForChange];
+        }
+        else {
+            [realm->_runLoop performSelector:@selector(throttledUpdate) target:realm argument:nil order:0 modes:@[NSRunLoopCommonModes]];
+        }
+    }
+}
+
+// if checking too often, delay until _minInterval time has passed
+- (void)throttledUpdate {
+    NSDate *now = [NSDate date];
+    if (_lastUpdate) {
+        // if already queued do nothing
+        if (_delayedUpdate) {
+            return;
+        }
+        
+        // if it's too soon, then delay
+        NSTimeInterval timeSinceLastUpdate = [now timeIntervalSinceDate:_lastUpdate];
+        if (timeSinceLastUpdate < _minUpdateInterval) {
+            _delayedUpdate = [NSTimer scheduledTimerWithTimeInterval:_minUpdateInterval - timeSinceLastUpdate
+                                                              target:self
+                                                            selector:@selector(timerFired)
+                                                            userInfo:nil
+                                                             repeats:NO];
+            return;
+        }
+    }
+    
+    // if we didn't throttle, then udpate
+    [self checkForChange];
+}
+
+- (void)checkForChange {
+    // keep track of last time we updated
+    _lastUpdate = [NSDate date];
+    
     // Remove dead table references from list
     if (_tableRefsHaveDied) {
         NSMutableArray *deadTableRefs = [NSMutableArray array];

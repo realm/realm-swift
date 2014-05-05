@@ -30,6 +30,7 @@ using namespace std;
 
 @implementation RLMTransactionManager
 {
+    NSString *_path;
     tightdb::util::UniquePtr<tightdb::SharedGroup> m_shared_group;
 }
 
@@ -88,6 +89,7 @@ NSString *const defaultRealmFileName = @"default.realm";
             *error = make_realm_error(RLMErrorFail, [NSString stringWithUTF8String:ex.what()]);
         return nil;
     }
+    shared_group->_path = path;
     return shared_group;
 }
 
@@ -152,6 +154,7 @@ NSString *const defaultRealmFileName = @"default.realm";
     // Required to avoid leaking of core exceptions.
     try {
         m_shared_group->commit();
+        [RLMRealm notifyRealmsAtPath:_path];
     }
     catch (std::exception& ex) {
         @throw [NSException exceptionWithName:@"realm:core_exception"
@@ -190,6 +193,7 @@ NSString *const defaultRealmFileName = @"default.realm";
         // Required to avoid leaking of core exceptions.
         try {
             m_shared_group->commit();
+            [RLMRealm notifyRealmsAtPath:_path];
         }
         catch (std::exception& ex) {
             @throw [NSException exceptionWithName:@"realm:core_exception"

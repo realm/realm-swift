@@ -105,44 +105,18 @@
  */
 + (instancetype)realmWithPath:(NSString *)path
                     initBlock:(RLMWriteBlock)initBlock;
-/**
- Instantiates an RLMRealm with a specific Run Loop and a specific Notification Center,
- with persistence to a specific file.
- 
- @warning Can only be used on the main thread. See RLMTransactionManager to instantiate RLMRealms on other threads.
- 
- @param path               Path to the file you want the data saved in.
- @param runLoop            Reference to the Run Loop you want to use.
- @param notificationCenter Reference to the Notification Center you want to use.
- @param error              Pass-by-reference for errors.
- 
- @return An RLMRealm instance.
- */
-+ (instancetype)realmWithPath:(NSString *)path
-                      runLoop:(NSRunLoop *)runLoop
-           notificationCenter:(NSNotificationCenter *)notificationCenter
-                        error:(NSError **)error;
-/**
- Instantiates an RLMRealm with a specific Run Loop and a specific Notification Center,
- with persistence to a specific file, and with a custom init block.
 
- The init block is useful if you want to set up some RLMTable(s) when opening your RLMRealm,
- for example inside an App Delegate.
- 
- @warning Can only be used on the main thread. See RLMTransactionManager to instantiate RLMRealms on other threads.
- 
- @param path               Path to the file you want the data saved in.
- @param initBlock          A block used to initialize the RLMRealm.
- @param runLoop            Reference to the Run Loop you want to use.
- @param notificationCenter Reference to the Notification Center you want to use.
- @param error              Pass-by-reference for errors.
- 
+/**
+ Instantiates an RLMRealm with a manual init block, with persistence to a specific file, and an error
+
+ @param path        Path to the file you want the data saved in.
+ @param initBlock   A block used to initialize the RLMRealm.
+ @param error       Pass-by-reference for errors.
+
  @return An RLMRealm instance.
  */
 + (instancetype)realmWithPath:(NSString *)path
                     initBlock:(RLMWriteBlock)initBlock
-                      runLoop:(NSRunLoop *)runLoop
-           notificationCenter:(NSNotificationCenter *)notificationCenter
                         error:(NSError **)error;
 
 
