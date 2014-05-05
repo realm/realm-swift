@@ -122,10 +122,10 @@ Supported property types are:
 +(Class)objectClass;                                        \
 @end
 
-#define STATIC_ASSERT(test, msg) typedef char _static_assert_ ## msg [ ((test) ? 1 : -1) ];
+#define RLM_STATIC_ASSERT(test, msg) typedef char _static_assert_ ## msg [ ((test) ? 1 : -1) ];
 
 #define RLM_IMPLEMENT_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)                  \
-STATIC_ASSERT(__INCLUDE_LEVEL__ == 0, RLM_IMPLEMENT_TABLE_used_in_header_file_for##OType)  \
+RLM_STATIC_ASSERT(__INCLUDE_LEVEL__ == 0, RLM_IMPLEMENT_TABLE_used_in_header_file_for##OType)  \
 @implementation TType                                                           \
 +(TType *)tableInRealm:(RLMRealm *)rlm named:(NSString *)name {                 \
     if([rlm hasTableWithName:name])                                             \
@@ -139,10 +139,10 @@ RLM_DEFINE_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)     \
 RLM_IMPLEMENT_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)
 
 
-/* FIXME: This class can be (and should be) eliminated by using a
-   macro switching trick for the individual column types on
-   REALM_ROW_PROPERTY macros similar to what is done for query
-   accessors. */
+// FIXME: This class can be (and should be) eliminated by using a
+// macro switching trick for the individual column types on
+// REALM_ROW_PROPERTY macros similar to what is done for query
+// accessors.
 @interface RLMAccessor : NSObject
 -(id)initWithRow:(RLMRow *)cursor columnId:(NSUInteger)columnId;
 -(BOOL)getBool;

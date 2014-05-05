@@ -42,6 +42,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AgeTable, Sub)
 @property AgeTable      *tableCol;
 @property bool           cBoolCol;
 @property long           longCol;
+@property id             mixedCol;
 @end
 
 @implementation AllTypes
@@ -106,13 +107,13 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 
 - (void)testDataTypes_Typed
 {
-    [self.managerWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         // create table and set object class
         AllTypesTable *table = [AllTypesTable tableInRealm:realm named:@"table"];
         
         NSLog(@"Table: %@", table);
         XCTAssertNotNil(table, @"Table is nil");
-        
+
         // Verify column types
         XCTAssertEqual(RLMTypeBool,   [table columnTypeOfColumnWithIndex:0], @"First column not bool");
         XCTAssertEqual(RLMTypeInt,    [table columnTypeOfColumnWithIndex:1], @"Second column not int");
@@ -124,38 +125,43 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
         XCTAssertEqual(RLMTypeTable,  [table columnTypeOfColumnWithIndex:7], @"Eighth column not table");
         XCTAssertEqual(RLMTypeBool,   [table columnTypeOfColumnWithIndex:8], @"Ninth column not bool");
         XCTAssertEqual(RLMTypeInt,    [table columnTypeOfColumnWithIndex:9], @"Tenth column not long");
-        
+        XCTAssertEqual(RLMTypeMixed,    [table columnTypeOfColumnWithIndex:10], @"Eleventh column not mixed");
+
         const char bin[4] = { 0, 1, 2, 3 };
         NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
         NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
         NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
         NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
+
         AgeTable *subtab1 = [AgeTable tableInRealm:realm named:@"subtab1"];
         AgeTable *subtab2 = [AgeTable tableInRealm:realm named:@"subtab2"];
-        
+
         [subtab1 addRow:@[@200]]; // NOTE: the name is simply add+name of first column!
         [subtab2 addRow:@[@100]];
-        
+
         AllTypes * c;
-        
+
         // addEmptyRow not supported yet
         [table addRow:nil];
         c = table.lastRow;
         
         c.BoolCol   = NO   ; c.IntCol  = 54 ; c.FloatCol = 0.7     ; c.DoubleCol = 0.8     ; c.StringCol = @"foo";
         c.BinaryCol = bin1 ; c.DateCol = timeZero  ; c.TableCol = subtab1     ; c.cBoolCol = false; c.longCol = 99;
+        NSString *string = @"string";
+        c.mixedCol = @"string";
         
         [table addRow:nil];
-        c = table.lastRow;
+        c = table.lastRow; 
         
         c.BoolCol   = YES  ; c.IntCol  = 506     ; c.FloatCol = 7.7         ; c.DoubleCol = 8.8       ; c.StringCol = @"banach";
         c.BinaryCol = bin2 ; c.DateCol = timeNow ; c.TableCol = subtab2     ; c.cBoolCol = true;    c.longCol = -20;
+        c.mixedCol = @2;
         
         //AllTypes* row1 = [table rowAtIndex:0];
         //AllTypes* row2 = [table rowAtIndex:1];
         AllTypes* row1 = table[0];
         AllTypes* row2 = table[1];
-        
+
         XCTAssertEqual(row1.boolCol, NO,                 @"row1.BoolCol");
         XCTAssertEqual(row2.boolCol, YES,                @"row2.BoolCol");
         XCTAssertEqual(row1.intCol, 54,             @"row1.IntCol");
@@ -176,12 +182,15 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
         XCTAssertEqual(row2.cBoolCol, (bool)true,         @"row2.cBoolCol");
         XCTAssertEqual(row1.longCol, 99L,                 @"row1.IntCol");
         XCTAssertEqual(row2.longCol, -20L,                @"row2.IntCol");
+        
+        XCTAssertTrue([row1.mixedCol isEqualToString:string], @"row1.mixedCol");
+        XCTAssertEqualObjects(row2.mixedCol, @2,          @"row2.mixedCol");
     }];
 }
 
 - (void)testTableTyped_Subscripting
 {
-    [self.managerWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         AgeTable *table = [AgeTable tableInRealm:realm named:@"table"];
         
         // Add some rows
@@ -198,7 +207,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 
 - (void)testInvalids
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // FIXME: This should throw but currently doesn't
 //        XCTAssertThrows([realm createTableWithName:@"table1"
 //                                      asTableClass:[InvalidTable class]],
@@ -215,7 +224,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 
 - (void)testTableTyped_KeyedSubscripting
 {
-    [self.managerWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         KeyedTable* table = [KeyedTable tableInRealm:realm named:@"table"];
         
         [table addRow:@{@"name" : @"Test1", @"objID" : @24}];
@@ -288,7 +297,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 }
 
 - (void)testCustomAccessors {
-    [self.managerWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm createTableWithName:@"Test" objectClass:[CustomAccessors class]];
         [table addRow:@[@"name", @2]];
         
@@ -301,7 +310,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 
 - (void)testTableTyped_countWhere
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         AgeTable * table = [AgeTable tableInRealm:realm named:@"table"];
         
         [table addRow:@[@23]];
@@ -321,7 +330,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 
 - (void)testTableTyped_sumOfColumn
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         AggregateTable *table = [AggregateTable tableInRealm:realm named:@"Table"];
         
         [table addRow:@[@0, @1.2f, @0.0, @YES]];
@@ -358,7 +367,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 
 - (void)testTableTyped_averageOfColumn
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         AggregateTable *table = [AggregateTable tableInRealm:realm named:@"Table"];
         
         [table addRow:@[@0, @1.2f, @0.0, @YES]];
@@ -395,7 +404,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 
 - (void)testTableTyped_minInColumn
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         AggregateTable *table = [AggregateTable tableInRealm:realm named:@"Table"];
         
         [table addRow:@[@1, @1.1f, @0.0, @YES]];

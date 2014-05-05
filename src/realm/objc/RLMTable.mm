@@ -181,13 +181,6 @@
     return table;
 }
 
--(void)dealloc
-{
-    if ([m_parent isKindOfClass:[RLMRealm class]]) {
-        [m_parent tableRefDidDie];
-    }
-}
-
 -(NSUInteger)columnCount
 {
     return m_table->get_column_count();
@@ -375,7 +368,7 @@
     [self insertRow:data atIndex:table.size()];
 }
 
-/* Moved to private header */
+// Moved to private header
 -(RLMRow *)addEmptyRow
 {
     return [[_proxyObjectClass alloc] initWithTable:self ndx:[self RLM_addEmptyRow]];
