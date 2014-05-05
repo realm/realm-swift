@@ -19,7 +19,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMTransactionManager.h"
 
 /**
  
@@ -32,15 +31,15 @@
             [realm createTableWithName:@"Dogs" objectClass:[RLMDogObject class]];
         }
     }];
- 
- **RLMRealms can only be instantiated directly for reads from the main thread of your iOS applications.
- From any other thread or for any writes, you must use an RLMTransactionManager to instantiate an RLMRealm.**
- This is so that the Realm library can perform any necessary locks (in the case of writes), or bring the RLMRealm
- up to date with the event loop for transactionless reads on the main thread.
+
  
  */
 
 @class RLMTable;
+@class RLMRealm;
+
+typedef void(^RLMWriteBlock)(RLMRealm *realm);
+typedef void(^RLMNotificationBlock)(NSString *note, RLMRealm *realm);
 
 @interface RLMRealm : NSObject
 
@@ -54,39 +53,14 @@
  The default RLMRealm is persisted at `<Application_Home>/Documents/default.realm`.
  
  This method also uses the main run loop, as well as the default notification center.
-
- @warning Can only be used on the main thread. See RLMTransactionManager to instantiate RLMRealms on other threads.
  
  @return An RLMRealm instance.
  */
 + (instancetype)defaultRealm;
 
 /**
- Instantiates an RLMRealm with a manual init block.
-
- The init block is useful if you want to set up some RLMTable(s) when opening your RLMRealm,
- for example inside an App Delegate.
- 
-    realm = [RLMRealm realmWithDefaultPersistenceAndInitBlock:^(RLMRealm *realm) {
-        // Create table if it doesn't exist
-        if (realm.isEmpty) {
-            [realm createTableWithName:@"Dogs" objectClass:[RLMDogObject class]];
-        }
-    }];
- 
- @warning Can only be used on the main thread. See RLMTransactionManager to instantiate RLMRealms on other threads.
- 
- @param initBlock A block used to initialize the RLMRealm.
- 
- @return An RLMRealm instance.
- */
-+ (instancetype)defaultRealmWithInitBlock:(RLMWriteBlock)initBlock;
-
-/**
  Instantiates an RLMRealm with persistence to a specific File.
- 
- @warning Can only be used on the main thread. See RLMTransactionManager to instantiate RLMRealms on other threads.
- 
+  
  @param path Path to the file you want the data saved in.
  
  @return An RLMRealm instance.
@@ -94,56 +68,78 @@
 + (instancetype)realmWithPath:(NSString *)path;
 
 /**
- Instantiates an RLMRealm with a manual init block, with persistence to a specific file.
+ Instantiates an RLMRealm with persistence to a specific file, and an error.
 
- @warning Can only be used on the main thread. See RLMTransactionManager to instantiate RLMRealms on other threads.
- 
- @param path      Path to the file you want the data saved in.
- @param initBlock A block used to initialize the RLMRealm.
- 
- @return An RLMRealm instance.
- */
-+ (instancetype)realmWithPath:(NSString *)path
-                    initBlock:(RLMWriteBlock)initBlock;
-/**
- Instantiates an RLMRealm with a specific Run Loop and a specific Notification Center,
- with persistence to a specific file.
- 
- @warning Can only be used on the main thread. See RLMTransactionManager to instantiate RLMRealms on other threads.
- 
- @param path               Path to the file you want the data saved in.
- @param runLoop            Reference to the Run Loop you want to use.
- @param notificationCenter Reference to the Notification Center you want to use.
- @param error              Pass-by-reference for errors.
- 
- @return An RLMRealm instance.
- */
-+ (instancetype)realmWithPath:(NSString *)path
-                      runLoop:(NSRunLoop *)runLoop
-           notificationCenter:(NSNotificationCenter *)notificationCenter
-                        error:(NSError **)error;
-/**
- Instantiates an RLMRealm with a specific Run Loop and a specific Notification Center,
- with persistence to a specific file, and with a custom init block.
+ @param path        Path to the file you want the data saved in.
+ @param error       Pass-by-reference for errors.
 
- The init block is useful if you want to set up some RLMTable(s) when opening your RLMRealm,
- for example inside an App Delegate.
- 
- @warning Can only be used on the main thread. See RLMTransactionManager to instantiate RLMRealms on other threads.
- 
- @param path               Path to the file you want the data saved in.
- @param initBlock          A block used to initialize the RLMRealm.
- @param runLoop            Reference to the Run Loop you want to use.
- @param notificationCenter Reference to the Notification Center you want to use.
- @param error              Pass-by-reference for errors.
- 
  @return An RLMRealm instance.
  */
-+ (instancetype)realmWithPath:(NSString *)path
-                    initBlock:(RLMWriteBlock)initBlock
-                      runLoop:(NSRunLoop *)runLoop
-           notificationCenter:(NSNotificationCenter *)notificationCenter
-                        error:(NSError **)error;
++ (instancetype)realmWithPath:(NSString *)path error:(NSError **)error;
+
+
+/**---------------------------------------------------------------------------------------
+ *  @name Writing to a Realm
+ *  ---------------------------------------------------------------------------------------
+ */
+/**
+ Begins a write transaction in an RLMRealm. Only one write transaction can be open at a time, and calls
+ to beginWriteTransaction from RLMRealm instances in other threads will block until the open write transaction.
+ 
+ In the case writes were made in other threads or processes to other instances of the same realm, the RLMRealm on which 
+ beginWriteTransaction is called and all outstanding objects obtained from this RLMRealm are updated to the latest 
+ realm version when this method is called.
+ */
+- (void)beginWriteTransaction;
+
+/**
+ Commits all writes operations in the current write transaction. After this is called the RLMRealm reverts back to being
+ read-only.
+ */
+- (void)commitWriteTransaction;
+
+/**
+ Abandon all write operations in the current write transaction. After this is called the RLMRealm reverts back to being
+ read-only.
+ */
+- (void)rollbackWriteTransaction;
+
+/**
+ Update an RLMRealm and oustanding objects to point to the most recent data for this RLMRealm.
+ */
+- (void)refresh;
+
+/**
+ Performs a (blocking) write transaction on the RLMRealm
+ 
+ @param block   A block containing the write code you want to perform.
+ */
+- (void)writeUsingBlock:(RLMWriteBlock)block;
+
+
+/**---------------------------------------------------------------------------------------
+ *  @name Notifications
+ *  ---------------------------------------------------------------------------------------
+ */
+/**
+ Add a notification handler for changes in this RLMRealm.
+ 
+ @param block   A block which is called to process RLMRealm notifications. RLMRealmDidChangeNotification is the 
+                only notification currently supported.
+ */
+- (void)addNotification:(RLMNotificationBlock)block;
+
+/**
+ Remove a previously registered notification handler.
+ 
+ @param block   The block previously passed to addNotification: to remove.
+ */
+- (void)removeNotification:(RLMNotificationBlock)block;
+
+/**
+ Remove all notification handlers previously passed to this realm through addNotification:
+ */
+- (void)removeAllNotifications;
 
 
 /**---------------------------------------------------------------------------------------

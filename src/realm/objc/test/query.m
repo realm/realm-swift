@@ -36,7 +36,7 @@ REALM_TABLE_FAST(TestQueryAllTypes)
 
 - (void)testQuery {
     
-    [self.managerWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         TestQueryAllTypes *table = [realm createTableWithName:@"table" asTableClass:TestQueryAllTypes.class];
         NSLog(@"Table: %@", table);
         XCTAssertNotNil(table, @"Table is nil");
@@ -511,6 +511,13 @@ REALM_TABLE_FAST(TestQueryAllTypes)
                        name:@"between"
                      column:@"int"];
         
+        // Between (inverse)
+        [self testPredicate:[NSPredicate predicateWithFormat:@"int between %@", @[ints.lastObject, intNum]]
+                    onTable:table
+                withResults:@[]
+                       name:@"between (inverse)"
+                     column:@"int"];
+        
         // AND
         [self testPredicate:[NSPredicate predicateWithFormat:@"int >= %@ && int <= %@", intNum, ints.lastObject]
                     onTable:table
@@ -586,6 +593,13 @@ REALM_TABLE_FAST(TestQueryAllTypes)
                        name:@"between"
                      column:@"float"];
         
+        // Between (inverse)
+        [self testPredicate:[NSPredicate predicateWithFormat:@"float between %@", @[floats.lastObject, floatNum]]
+                    onTable:table
+                withResults:@[]
+                       name:@"between (inverse)"
+                     column:@"float"];
+        
         // AND
         [self testPredicate:[NSPredicate predicateWithFormat:@"float >= %@ && float <= %@", floatNum, floats.lastObject]
                     onTable:table
@@ -659,6 +673,13 @@ REALM_TABLE_FAST(TestQueryAllTypes)
                     onTable:table
                 withResults:[doubles subarrayWithRange:NSMakeRange(1, 3)]
                        name:@"between"
+                     column:@"double"];
+        
+        // Between (inverse)
+        [self testPredicate:[NSPredicate predicateWithFormat:@"double between %@", @[doubles.lastObject, doubleNum]]
+                    onTable:table
+                withResults:@[]
+                       name:@"between (inverse)"
                      column:@"double"];
         
         // AND
@@ -744,6 +765,13 @@ REALM_TABLE_FAST(TestQueryAllTypes)
                     onTable:table
                 withResults:[dates subarrayWithRange:NSMakeRange(1, 3)]
                        name:@"between"
+                     column:@"date"];
+        
+        // Between (inverse)
+        [self testPredicate:[NSPredicate predicateWithFormat:@"date between %@", @[dates.lastObject, date]]
+                    onTable:table
+                withResults:@[]
+                       name:@"between (inverse)"
                      column:@"date"];
         
         // AND
@@ -906,6 +934,36 @@ REALM_TABLE_FAST(TestQueryAllTypes)
                 withResults:@[dataArray.lastObject]
                        name:@"endswith"
                      column:@"data"];
+    }];
+}
+
+#pragma mark - Variadic
+
+- (void)testVariadicPredicateFormat {
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"int" type:RLMTypeInt];
+        NSArray *ints = @[@0, @1, @2, @3];
+        for (NSNumber *intNum in ints) {
+            [table addRow:@[intNum]];
+        }
+        
+        // Variadic firstWhere
+        RLMRow *row = [table firstWhere:@"int <= %@", @1];
+        XCTAssertEqualObjects(@0,
+                              row[@"int"],
+                              @"Variadic firstWhere predicate should return correct result");
+        
+        // Variadic allWhere
+        RLMView *view = [table allWhere:@"int <= %@", @1];
+        NSArray *results = @[@0, @1];
+        XCTAssertEqual(view.rowCount,
+                       results.count,
+                       @"Variadic allWhere predicate should return correct count");
+        for (NSUInteger i = 0; i < results.count; i++) {
+            XCTAssertEqualObjects(results[i],
+                                  view[i][@"int"],
+                                  @"Variadic allWhere predicate should return correct results");
+        }
     }];
 }
 

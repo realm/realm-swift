@@ -9,7 +9,6 @@
 
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMRealm.h>
-#import <realm/objc/RLMTransactionManager.h>
 
 @interface RLMTestObj2 : RLMRow
 
@@ -30,33 +29,21 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestTable2, RLMTestObj2);
 @implementation MACTestRealm
 
 - (void)testRealm {
-    RLMTransactionManager *manager = [self managerWithTestPath];
-    [manager writeUsingBlock:^(RLMRealm *realm) {
-        // Empty realm
-        XCTAssertNotNil(realm, @"parameter must be used");
-    }];
-
     // Load the realm
-    RLMRealm *fromDisk = [self realmPersistedAtTestPath];
-    XCTAssertTrue(fromDisk, @"Realm from disk should be valid");
+    RLMRealm *realm = [self realmPersistedAtTestPath];
+    XCTAssertTrue(realm, @"Realm from disk should be valid");
 
     // Create new table in realm
-    [manager writeUsingBlock:^(RLMRealm *realm) {
-        [RLMTestTable2 tableInRealm:realm named:@"test"];
-    }];
-
-    RLMRealm *realm = [self realmPersistedAtTestPath];
+    [realm beginWriteTransaction];
     RLMTestTable2 *t = [RLMTestTable2 tableInRealm:realm named:@"test"];
-    
+
     // Verify
     XCTAssertEqual(t.columnCount, (NSUInteger)2, @"Should have 2 columns");
     XCTAssertEqual(t.rowCount, (NSUInteger)0, @"Should have 0 rows");
 
     // Modify table
-    [manager writeUsingBlock:^(RLMRealm *realm) {
-        RLMTestTable2 *t = [RLMTestTable2 tableInRealm:realm named:@"test"];
-        [t addRow:@[@"Test", @23]];
-    }];
+    [t addRow:@[@"Test", @23]];
+    [realm commitWriteTransaction];
 
     // Verify
     RLMRealm *realm2 = [self realmPersistedAtTestPath];
@@ -70,7 +57,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestTable2, RLMTestObj2);
 
 - (void)testRealmTableCount {
     XCTAssertEqual([[self realmPersistedAtTestPath] tableCount], (NSUInteger)0, @"No tables added");
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:@"tableName"];
     }];
     XCTAssertEqual([[self realmPersistedAtTestPath] tableCount], (NSUInteger)1, @"1 table added");

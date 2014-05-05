@@ -131,7 +131,7 @@ using namespace std;
 
 -(void)testAppendRowGenericObject
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         RLMTable* table1 = [realm createTableWithName:@"table1"];
         [table1 addColumnWithName:@"name" type:RLMTypeString];
         [table1 addColumnWithName:@"age" type:RLMTypeInt];
@@ -545,7 +545,7 @@ using namespace std;
 
 - (void)testColumnlessIsEqual
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         RLMTable* table1 = [realm createTableWithName:@"table1"];
         RLMTable* table2 = [realm createTableWithName:@"table2"];
         XCTAssertTrue([table1 isEqual:table1], @"Columnless table is equal to itself.");
@@ -664,7 +664,7 @@ using namespace std;
 
 - (void)testDataTypes_Dynamic
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm createTableWithName:@"table"];
         XCTAssertNotNil(table, @"Table is nil");
         
@@ -875,7 +875,7 @@ using namespace std;
 
 - (void)testTableDynamic_KeyedSubscripting
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm createTableWithName:@"table"];
         [table addColumnWithName:@"name" type:RLMTypeString];
         [table addColumnWithName:@"id" type:RLMTypeInt];
@@ -1081,7 +1081,7 @@ using namespace std;
 
 - (void)testTableDynamic_initWithColumns
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         NSArray *columns = @[@"name",   @"string",
                              @"age",    @"int",
                              @"hired",  @"bool",
@@ -1129,7 +1129,7 @@ using namespace std;
 
 - (void)testPredicateFind
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         NSArray *columns = @[@"name", @"string",
                              @"age",  @"int"];
         RLMTable *table = [realm createTableWithName:@"table" columns:columns];

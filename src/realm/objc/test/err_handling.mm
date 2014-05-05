@@ -67,7 +67,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryAllTable, TestQueryAllObject);
     //------------------------------------------------------
     NSError* error = nil;
 
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
         RLMTable* people = [realm createTableWithName:@"employees" objectClass:[PeopleErrObject class]];
         
@@ -277,7 +277,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryAllTable, TestQueryAllObject);
 }
 
 - (void)testQueryErrHandling {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         TestQueryAllTable *table = [TestQueryAllTable tableInRealm:realm named:@"table"];
         XCTAssertNotNil(table, @"Table is nil");
         

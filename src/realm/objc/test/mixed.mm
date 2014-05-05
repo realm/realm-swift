@@ -72,7 +72,7 @@ REALM_TABLE_2(SubMixedTable,
     XCTAssertEqual([mixedDate2 isEqual:mixedDate3], YES, @"Mixed with same timestamps should be equal");
     XCTAssertEqual([mixedDate1 isEqual:mixedDate2], NO,  @"Mixed with different timestamps should be different");
 
-    [self.managerWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         MixedTable    *table1 = [realm createTableWithName:@"table1" asTableClass:MixedTable.class];
         SubMixedTable *table2 = [realm createTableWithName:@"table2" asTableClass:SubMixedTable.class];
         SubMixedTable *table3 = [realm createTableWithName:@"table3" asTableClass:SubMixedTable.class];
@@ -126,7 +126,7 @@ REALM_TABLE_2(SubMixedTable,
 
 - (void)testMixed
 {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         SubMixedTable *tableSub = [realm createTableWithName:@"tableSub" asTableClass:SubMixedTable.class];
         XCTAssertTrue([tableSub isKindOfClass:[RLMTable class]], @"RLMTable excepted");
         
@@ -171,7 +171,7 @@ REALM_TABLE_2(SubMixedTable,
 
 -(void)testMixedValidate
 {
-    [self.managerWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         MixedTable *table = [realm createTableWithName:@"table" asTableClass:MixedTable.class];
         XCTAssertThrows(([table addRow:@[@YES, @[@1, @2], @7]]), @"Mixed cannot be an NSArray");
         XCTAssertThrows(([table addRow:@[@YES, @{@"key": @7}, @11]]), @"Mixed cannot be an NSDictionary");
