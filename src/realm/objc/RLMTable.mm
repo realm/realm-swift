@@ -1205,7 +1205,7 @@
     return average;
 }
 
--(id)minInProperty:(NSString *)property where:(id)predicate
+-(id)minOfProperty:(NSString *)property where:(id)predicate
 {
     tightdb::Query query = queryFromPredicate(self, predicate);
     
@@ -1242,7 +1242,7 @@
     return min;
 }
 
--(id)maxInProperty:(NSString *)property where:(id)predicate
+-(id)maxOfProperty:(NSString *)property where:(id)predicate
 {
     tightdb::Query query = queryFromPredicate(self, predicate);
     
