@@ -511,6 +511,13 @@ REALM_TABLE_FAST(TestQueryAllTypes)
                        name:@"between"
                      column:@"int"];
         
+        // Between (inverse)
+        [self testPredicate:[NSPredicate predicateWithFormat:@"int between %@", @[ints.lastObject, intNum]]
+                    onTable:table
+                withResults:@[]
+                       name:@"between (inverse)"
+                     column:@"int"];
+        
         // AND
         [self testPredicate:[NSPredicate predicateWithFormat:@"int >= %@ && int <= %@", intNum, ints.lastObject]
                     onTable:table
@@ -586,6 +593,13 @@ REALM_TABLE_FAST(TestQueryAllTypes)
                        name:@"between"
                      column:@"float"];
         
+        // Between (inverse)
+        [self testPredicate:[NSPredicate predicateWithFormat:@"float between %@", @[floats.lastObject, floatNum]]
+                    onTable:table
+                withResults:@[]
+                       name:@"between (inverse)"
+                     column:@"float"];
+        
         // AND
         [self testPredicate:[NSPredicate predicateWithFormat:@"float >= %@ && float <= %@", floatNum, floats.lastObject]
                     onTable:table
@@ -659,6 +673,13 @@ REALM_TABLE_FAST(TestQueryAllTypes)
                     onTable:table
                 withResults:[doubles subarrayWithRange:NSMakeRange(1, 3)]
                        name:@"between"
+                     column:@"double"];
+        
+        // Between (inverse)
+        [self testPredicate:[NSPredicate predicateWithFormat:@"double between %@", @[doubles.lastObject, doubleNum]]
+                    onTable:table
+                withResults:@[]
+                       name:@"between (inverse)"
                      column:@"double"];
         
         // AND
@@ -744,6 +765,13 @@ REALM_TABLE_FAST(TestQueryAllTypes)
                     onTable:table
                 withResults:[dates subarrayWithRange:NSMakeRange(1, 3)]
                        name:@"between"
+                     column:@"date"];
+        
+        // Between (inverse)
+        [self testPredicate:[NSPredicate predicateWithFormat:@"date between %@", @[dates.lastObject, date]]
+                    onTable:table
+                withResults:@[]
+                       name:@"between (inverse)"
                      column:@"date"];
         
         // AND
