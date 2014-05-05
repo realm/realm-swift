@@ -77,12 +77,12 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(MainTable, MainObject)
 - (void)testSubtable
 {    
     [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
-        /* Create new table in group */
+        // Create new table in group
         MainTable *people = [MainTable tableInRealm:realm named:@"employees"];
         
-        /* FIXME: Add support for specifying a subtable to the 'add'
-         method. The subtable must then be copied into the parent
-         table. */
+        // FIXME: Add support for specifying a subtable to the 'add'
+        // method. The subtable must then be copied into the parent
+        // table.
         [people addRow:@[@"first", @[], @8]];
         
         MainObject *cursor = people[0];
@@ -101,12 +101,12 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(MainTable, MainObject)
 
 - (void)testSubtableSimple {
     [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
-        /* Create new table in group */
+        // Create new table in group
         RLMTable *people = [realm createTableWithName:@"employees" objectClass:MainProxied.class];
         
-        /* FIXME: Add support for specifying a subtable to the 'add'
-         method. The subtable must then be copied into the parent
-         table. */
+        // FIXME: Add support for specifying a subtable to the 'add'
+        // method. The subtable must then be copied into the parent
+        // table.
         [people addRow:@[@"first", @[], @8]];
         
         // test getter

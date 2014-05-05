@@ -21,7 +21,7 @@
 #ifndef REALM_OBJC_TYPE_H
 #define REALM_OBJC_TYPE_H
 
-/* Make sure numbers match those in <tightdb/data_type.hpp> */
+// Make sure numbers match those in <tightdb/data_type.hpp>
 typedef NS_ENUM(NSInteger, RLMType) {
     RLMTypeNone =  -1,
     RLMTypeBool =  1,
@@ -41,4 +41,4 @@ typedef NS_ENUM(NSInteger, RLMSortOrder) {
     RLMSortOrderDescending =  1,
 };
 
-#endif /* REALM_OBJC_TYPE_H */
+#endif // REALM_OBJC_TYPE_H
