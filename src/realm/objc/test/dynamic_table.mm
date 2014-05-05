@@ -1525,34 +1525,34 @@ using namespace std;
         
         
         // Test int min
-        XCTAssertEqual([[table minInProperty:@"IntCol" where:@"BoolCol == NO"] integerValue], 2, @"Minimum should be 2");
-        XCTAssertEqual([[table minInProperty:@"IntCol" where:@"BoolCol == YES"] integerValue], 1, @"Minimum should be 1");
+        XCTAssertEqual([[table minOfProperty:@"IntCol" where:@"BoolCol == NO"] integerValue], 2, @"Minimum should be 2");
+        XCTAssertEqual([[table minOfProperty:@"IntCol" where:@"BoolCol == YES"] integerValue], 1, @"Minimum should be 1");
         
         // Test float min
-        XCTAssertEqualWithAccuracy([[table minInProperty:@"FloatCol" where:@"BoolCol == NO"] floatValue], (float)1.2f, 0.1f, @"Minimum should be 1.2f");
-        XCTAssertEqualWithAccuracy([[table minInProperty:@"FloatCol" where:@"BoolCol == YES"] floatValue], (float)1.1f, 0.1f, @"Minimum should be 1.1f");
+        XCTAssertEqualWithAccuracy([[table minOfProperty:@"FloatCol" where:@"BoolCol == NO"] floatValue], (float)1.2f, 0.1f, @"Minimum should be 1.2f");
+        XCTAssertEqualWithAccuracy([[table minOfProperty:@"FloatCol" where:@"BoolCol == YES"] floatValue], (float)1.1f, 0.1f, @"Minimum should be 1.1f");
         
         // Test double min
-        XCTAssertEqualWithAccuracy([[table minInProperty:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)1.5, 0.1f, @"Minimum should be 1.5");
-        XCTAssertEqualWithAccuracy([[table minInProperty:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Minimum should be 0.0");
+        XCTAssertEqualWithAccuracy([[table minOfProperty:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)1.5, 0.1f, @"Minimum should be 1.5");
+        XCTAssertEqualWithAccuracy([[table minOfProperty:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Minimum should be 0.0");
         
         // Test invalid column name
-        XCTAssertThrows([table minInProperty:@"foo" where:@"BoolCol == YES"], @"Should throw exception");
+        XCTAssertThrows([table minOfProperty:@"foo" where:@"BoolCol == YES"], @"Should throw exception");
         
         // Test operation not supported
-        XCTAssertThrows([table minInProperty:@"BoolCol" where:@"IntCol == 1"], @"Should throw exception");
+        XCTAssertThrows([table minOfProperty:@"BoolCol" where:@"IntCol == 1"], @"Should throw exception");
         
         // Test int max
-        XCTAssertEqual([[table maxInProperty:@"IntCol" where:@"BoolCol == NO"] integerValue], 8, @"Maximum should be 8");
-        XCTAssertEqual([[table maxInProperty:@"IntCol" where:@"BoolCol == YES"] integerValue], 10, @"Maximum should be 10");
+        XCTAssertEqual([[table maxOfProperty:@"IntCol" where:@"BoolCol == NO"] integerValue], 8, @"Maximum should be 8");
+        XCTAssertEqual([[table maxOfProperty:@"IntCol" where:@"BoolCol == YES"] integerValue], 10, @"Maximum should be 10");
         
         // Test float max
-        XCTAssertEqualWithAccuracy([[table maxInProperty:@"FloatCol" where:@"BoolCol == NO"] floatValue], (float)1.8f, 0.1f, @"Maximum should be 1.8f");
-        XCTAssertEqualWithAccuracy([[table maxInProperty:@"FloatCol" where:@"BoolCol == YES"] floatValue], (float)2.0f, 0.1f, @"Maximum should be 2.0f");
+        XCTAssertEqualWithAccuracy([[table maxOfProperty:@"FloatCol" where:@"BoolCol == NO"] floatValue], (float)1.8f, 0.1f, @"Maximum should be 1.8f");
+        XCTAssertEqualWithAccuracy([[table maxOfProperty:@"FloatCol" where:@"BoolCol == YES"] floatValue], (float)2.0f, 0.1f, @"Maximum should be 2.0f");
         
         // Test double max
-        XCTAssertEqualWithAccuracy([[table maxInProperty:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)10.5, 0.1f, @"Maximum should be 10.5");
-        XCTAssertEqualWithAccuracy([[table maxInProperty:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)13.5, 0.1f, @"Maximum should be 13.5");
+        XCTAssertEqualWithAccuracy([[table maxOfProperty:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)10.5, 0.1f, @"Maximum should be 10.5");
+        XCTAssertEqualWithAccuracy([[table maxOfProperty:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)13.5, 0.1f, @"Maximum should be 13.5");
     }];
 }
 

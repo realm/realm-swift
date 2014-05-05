@@ -254,10 +254,10 @@
 /**
  Returns the minimum (lowest) value of a property for objects matching an [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html) in a column.
  
-    NSNumber *min = [table minInProperty:@"age" where:@"name == \"name10\""];
+    NSNumber *min = [table minOfProperty:@"age" where:@"name == \"name10\""];
  
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
-    min = [table minInProperty:@"age" where:predicate];
+    min = [table minOfProperty:@"age" where:predicate];
  
  @warning You can only use this method on properties with the following types: int, float & double.
  @bug Properties of type NSDate or NSString are not supported (yet).
@@ -268,14 +268,14 @@
  
  @return The minimum value for the property amongst objects matching the Predicate.
  */
--(id)minInProperty:(NSString *)property where:(id)predicate;
+-(id)minOfProperty:(NSString *)property where:(id)predicate;
 /**
  Returns the maximum (highest) value of a property for objects matching an [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
  
-    NSNumber *max = [table maxInProperty:@"age" where:@"name == \"name10\""];
+    NSNumber *max = [table maxOfProperty:@"age" where:@"name == \"name10\""];
  
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age = %@", @3];
-    max = [table maxInProperty:@"age" where:predicate];
+    max = [table maxOfProperty:@"age" where:predicate];
  
  @warning You can only use this method on properties with the following types: int, float & double.
  @bug Properties of type NSString are not supported (yet).
@@ -286,7 +286,7 @@
  
  @return The maximum value for the property amongst objects matching the Predicate.
  */
--(id)maxInProperty:(NSString *)property where:(id)predicate;
+-(id)maxOfProperty:(NSString *)property where:(id)predicate;
 /**
  Returns the sum of a property for objects matching an [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
  
