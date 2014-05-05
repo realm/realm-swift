@@ -35,14 +35,15 @@
                            @[@"Phil", @43, @NO],
                            @[@"Anni", @54, @YES]];
     // Create new table in realm
-    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath initBlock:^(RLMRealm *realm) {
-        RLMTable *people = [realm createTableWithName:@"people" objectClass:[EnumPeople class]];
-        // Add some rows
-        for (NSArray *rowArray in rowsArray) {
-            [people addRow:rowArray];
-        }
-    }];
-    RLMTable *people = [realm tableWithName:@"people" objectClass:[EnumPeople class]];
+    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath];
+    
+    [realm beginWriteTransaction];
+    RLMTable *people = [realm createTableWithName:@"people" objectClass:[EnumPeople class]];
+    // Add some rows
+    for (NSArray *rowArray in rowsArray) {
+        [people addRow:rowArray];
+    }
+    [realm commitWriteTransaction];
     
     //------------------------------------------------------
     NSLog(@"--- Iterators ---");

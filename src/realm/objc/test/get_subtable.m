@@ -9,7 +9,6 @@
 
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMRealm.h>
-#import <realm/objc/RLMTransactionManager.h>
 
 @interface RLMTestObj : RLMRow
 

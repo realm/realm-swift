@@ -11,12 +11,12 @@
 
 extern NSString *const RLMTestRealmPath;
 
-@class RLMRealm, RLMTransactionManager;
+@class RLMRealm;
 
 @interface RLMTestCase : XCTestCase
 
 - (RLMRealm *)realmPersistedAtTestPath;
-- (RLMTransactionManager *)managerWithTestPath;
-- (void)createTestTableWithWriteBlock:(RLMTableWriteBlock)block;
+- (RLMRealm *)realmWithTestPath;
+- (void)createTestTableWithWriteBlock:(void(^)(RLMTable *table))block;
 
 @end

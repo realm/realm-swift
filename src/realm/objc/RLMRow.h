@@ -115,17 +115,17 @@ Supported property types are:
 -(OType *)lastRow;                                          \
 -(OType *)objectAtIndexedSubscript:(NSUInteger)rowIndex;    \
 -(OType *)objectForKeyedSubscript:(NSString *)key;          \
--(OType *)firstWhere:(id)predicate;                         \
+-(OType *)firstWhere:(id)predicate, ...;                    \
 @end                                                        \
 @interface TType : RLMTable<OType>                          \
 +(TType *)tableInRealm:(RLMRealm *)rlm named:(NSString *)name;  \
 +(Class)objectClass;                                        \
 @end
 
-#define STATIC_ASSERT(test, msg) typedef char _static_assert_ ## msg [ ((test) ? 1 : -1) ];
+#define RLM_STATIC_ASSERT(test, msg) typedef char _static_assert_ ## msg [ ((test) ? 1 : -1) ];
 
 #define RLM_IMPLEMENT_TABLE_TYPE_FOR_OBJECT_TYPE(TType, OType)                  \
-STATIC_ASSERT(__INCLUDE_LEVEL__ == 0, RLM_IMPLEMENT_TABLE_used_in_header_file_for##OType)  \
+RLM_STATIC_ASSERT(__INCLUDE_LEVEL__ == 0, RLM_IMPLEMENT_TABLE_used_in_header_file_for##OType)  \
 @implementation TType                                                           \
 +(TType *)tableInRealm:(RLMRealm *)rlm named:(NSString *)name {                 \
     if([rlm hasTableWithName:name])                                             \

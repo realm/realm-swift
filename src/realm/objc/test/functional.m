@@ -30,9 +30,9 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMPersonTable, RLMPerson);
 @end
 @implementation MACtestFunctional
 
-- (void)testTypedRow {
-    
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+- (void)testTypedRow
+{
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         // Row in a table.
         
         RLMPersonTable *table = [RLMPersonTable tableInRealm:realm named:@"table"];
@@ -89,7 +89,6 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMPersonTable, RLMPerson);
         XCTAssertTrue([person.name isEqualToString:expected], @"Check name");
         XCTAssertTrue([@(person.age) isEqual:@(TABLE_SIZE - 1)], @"Check age");
         XCTAssertTrue([@(person.hired) isEqual:@((TABLE_SIZE - 1) % 2)], @"Check hired");
-        
         
         // Remove the inserted. The query test check that the row was
         // removed correctly (that we're back to the original table).
@@ -259,7 +258,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMPersonTable, RLMPerson);
 }
 
 - (void)testRowDescription {
-    [[self managerWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         RLMTable *table = [realm createTableWithName:@"people" objectClass:[RLMPerson class]];
         [table addRow:@[@"John", @25, @YES]];
         NSString *rowDescription = [table.firstRow description];

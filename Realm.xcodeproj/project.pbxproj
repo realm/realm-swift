@@ -45,7 +45,6 @@
 		E82D503A1900C128003C1B8E /* realm.m in Sources */ = {isa = PBXBuildFile; fileRef = E82D50391900C128003C1B8E /* realm.m */; };
 		E87675D01907841C00F58CDB /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = E87675CD1907841C00F58CDB /* RLMTestCase.m */; };
 		E87675D11907841C00F58CDB /* XCTestCase+AsyncTesting.m in Sources */ = {isa = PBXBuildFile; fileRef = E87675CF1907841C00F58CDB /* XCTestCase+AsyncTesting.m */; };
-		E87784EF1908E71900A99CB8 /* PBXBuildFile */ = {isa = PBXBuildFile; fileRef = 4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */; };
 		E8F4C11F191418CD00116AAE /* query_util.h in Headers */ = {isa = PBXBuildFile; fileRef = E8F4C11E191418CD00116AAE /* query_util.h */; };
 		E8F4C121191418D300116AAE /* query_util.mm in Sources */ = {isa = PBXBuildFile; fileRef = E8F4C120191418D300116AAE /* query_util.mm */; };
 		E918909D177B677900653D7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
@@ -54,8 +53,6 @@
 		E91890B9177B677900653D7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E91890B7177B677900653D7A /* InfoPlist.strings */; };
 		E91890D6177B67AB00653D7A /* RLMRow.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C5177B67AB00653D7A /* RLMRow.mm */; };
 		E91890D7177B67AB00653D7A /* RLMRow.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890C6177B67AB00653D7A /* RLMRow.h */; };
-		E91890DA177B67AB00653D7A /* RLMTransactionManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C9177B67AB00653D7A /* RLMTransactionManager.mm */; };
-		E91890DB177B67AB00653D7A /* RLMTransactionManager.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CA177B67AB00653D7A /* RLMTransactionManager.h */; };
 		E91890DD177B67AB00653D7A /* PrivateHelperMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CC177B67AB00653D7A /* PrivateHelperMacros.h */; };
 		E91890DE177B67AB00653D7A /* RLMQuery.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890CD177B67AB00653D7A /* RLMQuery.mm */; };
 		E91890DF177B67AB00653D7A /* RLMQuery_noinst.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CE177B67AB00653D7A /* RLMQuery_noinst.h */; };
@@ -149,8 +146,6 @@
 		E91890B8177B677900653D7A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E91890C5177B67AB00653D7A /* RLMRow.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMRow.mm; path = src/realm/objc/RLMRow.mm; sourceTree = SOURCE_ROOT; };
 		E91890C6177B67AB00653D7A /* RLMRow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRow.h; path = src/realm/objc/RLMRow.h; sourceTree = SOURCE_ROOT; };
-		E91890C9177B67AB00653D7A /* RLMTransactionManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMTransactionManager.mm; path = src/realm/objc/RLMTransactionManager.mm; sourceTree = SOURCE_ROOT; };
-		E91890CA177B67AB00653D7A /* RLMTransactionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTransactionManager.h; path = src/realm/objc/RLMTransactionManager.h; sourceTree = SOURCE_ROOT; };
 		E91890CC177B67AB00653D7A /* PrivateHelperMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PrivateHelperMacros.h; path = src/realm/objc/PrivateHelperMacros.h; sourceTree = SOURCE_ROOT; };
 		E91890CD177B67AB00653D7A /* RLMQuery.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMQuery.mm; path = src/realm/objc/RLMQuery.mm; sourceTree = SOURCE_ROOT; };
 		E91890CE177B67AB00653D7A /* RLMQuery_noinst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMQuery_noinst.h; path = src/realm/objc/RLMQuery_noinst.h; sourceTree = SOURCE_ROOT; };
@@ -275,8 +270,6 @@
 				424EEFB118D9C97900337A13 /* RLMColumnProxy.mm */,
 				4D143CF118F7E97500CEFF65 /* RLMConstants.h */,
 				4D143CF218F7E97500CEFF65 /* RLMConstants.m */,
-				E91890CA177B67AB00653D7A /* RLMTransactionManager.h */,
-				E91890C9177B67AB00653D7A /* RLMTransactionManager.mm */,
 				424EEFA118D9C11D00337A13 /* RLMDescriptor.h */,
 				424EEF9F18D9C11D00337A13 /* RLMDescriptor.mm */,
 				424EEFA018D9C11D00337A13 /* RLMDescriptor_noinst.h */,
@@ -361,7 +354,6 @@
 				4D143CCF18F69D0F00CEFF65 /* RLMQueryFast.h in Headers */,
 				424EEFA418D9C11D00337A13 /* RLMDescriptor.h in Headers */,
 				E91890D7177B67AB00653D7A /* RLMRow.h in Headers */,
-				E91890DB177B67AB00653D7A /* RLMTransactionManager.h in Headers */,
 				0297850819087BF800148C3B /* RLMProperty.h in Headers */,
 				E8F4C11F191418CD00116AAE /* query_util.h in Headers */,
 				0297850A19087BF800148C3B /* RLMProxy.h in Headers */,
@@ -503,7 +495,6 @@
 				0297850919087BF800148C3B /* RLMProperty.mm in Sources */,
 				4D143CF418F7E97500CEFF65 /* RLMConstants.m in Sources */,
 				4220871718E042FD00F3CF27 /* NSData+RLMGetBinaryData.mm in Sources */,
-				E91890DA177B67AB00653D7A /* RLMTransactionManager.mm in Sources */,
 				E91890DE177B67AB00653D7A /* RLMQuery.mm in Sources */,
 				E91890E1177B67AB00653D7A /* RLMTable.mm in Sources */,
 			);
