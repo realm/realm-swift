@@ -84,9 +84,7 @@ typedef void(^RLMNotificationBlock)(NSString *note, RLMRealm *realm);
  */
 /**
  Begins a write transaction in an RLMRealm. Only one write transaction can be open at a time, and calls
- to beginWriteTransaction from RLMRealm instances in other threads will block until the open write transaction
- is complete. A write transaction is completed with a call to commitWriteTransaction or abandonWriteTransaction, or
- is committed automatically when the current autoreleasepool is purged.
+ to beginWriteTransaction from RLMRealm instances in other threads will block until the open write transaction.
  
  In the case writes were made in other threads or processes to other instances of the same realm, the RLMRealm on which 
  beginWriteTransaction is called and all outstanding objects obtained from this RLMRealm are updated to the latest 
@@ -96,8 +94,7 @@ typedef void(^RLMNotificationBlock)(NSString *note, RLMRealm *realm);
 
 /**
  Commits all writes operations in the current write transaction. After this is called the RLMRealm reverts back to being
- read-only. This method is called automatially on RLMRealm instances with open write transactions when the current
- autoreleasepool is purged.
+ read-only.
  */
 - (void)commitWriteTransaction;
 
