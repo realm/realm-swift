@@ -120,6 +120,37 @@ REALM_TABLE_1(RLMTestTable,
                     created table after a RLMRealmDidChangeNotification was sent");
 }
 
+- (void)testRealmIsUpdatedImmediatelyAfterBackgroundUpdate {
+    NSString *realmFilePath = @"async.bg.fast.realm";
+    [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
+    NSString *tableName = @"table";
+    
+    RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
+    __block BOOL notificationFired = NO;
+    [realm addNotification:^(NSString *note, RLMRealm * realm) {
+        XCTAssertNotNil(realm, @"Realm should not be nil");
+        XCTAssertEqualObjects(note, RLMRealmDidChangeNotification, @"Notification type");
+        notificationFired = YES;
+        [self notify:XCTAsyncTestCaseStatusSucceeded];
+    }];
+    
+    dispatch_queue_t queue = dispatch_queue_create("background", 0);
+    dispatch_async(queue, ^{
+        [[RLMRealm realmWithPath:realmFilePath error:nil] writeUsingBlock:^(RLMRealm *realm) {
+            [realm createTableWithName:tableName];
+        }];
+    });
+    
+    // this should complete very fast before the timer
+    [self waitForTimeout:.0001f];
+    
+    XCTAssertTrue(notificationFired, @"A notification should have fired immediately a table was created in the background");
+    
+    RLMTable *table = [realm tableWithName:tableName];
+    XCTAssertNotNil(table, @"The RLMRealm should be able to read a newly \
+                    created table after a RLMRealmDidChangeNotification was sent");
+}
+
 /* FIXME: disabled until we have per file compile options
 - (void)testRealmWriteImplicitCommit
 {
