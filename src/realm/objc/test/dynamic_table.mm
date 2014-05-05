@@ -1445,22 +1445,22 @@ using namespace std;
 
         
         // Test int sum
-        XCTAssertEqual([[table sumOfColumn:@"IntCol" where:@"BoolCol == NO"] integerValue], (NSInteger)4, @"Sum should be 4");
-        XCTAssertEqual([[table sumOfColumn:@"IntCol" where:@"BoolCol == YES"] integerValue], (NSInteger)0, @"Sum should be 0");
+        XCTAssertEqual([[table sumOfProperty:@"IntCol" where:@"BoolCol == NO"] integerValue], (NSInteger)4, @"Sum should be 4");
+        XCTAssertEqual([[table sumOfProperty:@"IntCol" where:@"BoolCol == YES"] integerValue], (NSInteger)0, @"Sum should be 0");
         
         // Test float sum
-        XCTAssertEqualWithAccuracy([[table sumOfColumn:@"FloatCol" where:@"BoolCol == NO"] floatValue], (float)0.0f, 0.1f, @"Sum should be 0");
-        XCTAssertEqualWithAccuracy([[table sumOfColumn:@"FloatCol" where:@"BoolCol == YES"] floatValue], (float)7.2f, 0.1f, @"Sum should be 7.2");
+        XCTAssertEqualWithAccuracy([[table sumOfProperty:@"FloatCol" where:@"BoolCol == NO"] floatValue], (float)0.0f, 0.1f, @"Sum should be 0");
+        XCTAssertEqualWithAccuracy([[table sumOfProperty:@"FloatCol" where:@"BoolCol == YES"] floatValue], (float)7.2f, 0.1f, @"Sum should be 7.2");
         
         // Test double sum
-        XCTAssertEqualWithAccuracy([[table sumOfColumn:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)10.0, 0.1f, @"Sum should be 10.0");
-        XCTAssertEqualWithAccuracy([[table sumOfColumn:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Sum should be 0.0");
+        XCTAssertEqualWithAccuracy([[table sumOfProperty:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)10.0, 0.1f, @"Sum should be 10.0");
+        XCTAssertEqualWithAccuracy([[table sumOfProperty:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Sum should be 0.0");
         
         // Test invalid column name
-        XCTAssertThrows([table sumOfColumn:@"foo" where:@"BoolCol == YES"], @"Should throw exception");
+        XCTAssertThrows([table sumOfProperty:@"foo" where:@"BoolCol == YES"], @"Should throw exception");
         
         // Test operation not supported
-        XCTAssertThrows([table sumOfColumn:@"BoolCol" where:@"IntCol == 1"], @"Should throw exception");
+        XCTAssertThrows([table sumOfProperty:@"BoolCol" where:@"IntCol == 1"], @"Should throw exception");
     }];
 }
 
@@ -1484,23 +1484,75 @@ using namespace std;
         [table addRow:@[@0, @1.2f, @0.0, @YES]];
         
         
-        // Test int sum
-        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"IntCol" where:@"BoolCol == NO"] doubleValue], (double)1.0, 0.1f, @"Average should be 1.0");
-        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"IntCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Average should be 0.0");
+        // Test int average
+        XCTAssertEqualWithAccuracy([[table averageOfProperty:@"IntCol" where:@"BoolCol == NO"] doubleValue], (double)1.0, 0.1f, @"Average should be 1.0");
+        XCTAssertEqualWithAccuracy([[table averageOfProperty:@"IntCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Average should be 0.0");
         
-        // Test float sum
-        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"FloatCol" where:@"BoolCol == NO"] doubleValue], (double)0.0f, 0.1f, @"Average should be 0.0");
-        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"FloatCol" where:@"BoolCol == YES"] doubleValue], (double)1.2f, 0.1f, @"Average should be 1.2");
+        // Test float average
+        XCTAssertEqualWithAccuracy([[table averageOfProperty:@"FloatCol" where:@"BoolCol == NO"] doubleValue], (double)0.0f, 0.1f, @"Average should be 0.0");
+        XCTAssertEqualWithAccuracy([[table averageOfProperty:@"FloatCol" where:@"BoolCol == YES"] doubleValue], (double)1.2f, 0.1f, @"Average should be 1.2");
         
-        // Test double sum
-        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)2.5, 0.1f, @"Average should be 2.5");
-        XCTAssertEqualWithAccuracy([[table averageOfColumn:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Average should be 0.0");
+        // Test double average
+        XCTAssertEqualWithAccuracy([[table averageOfProperty:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)2.5, 0.1f, @"Average should be 2.5");
+        XCTAssertEqualWithAccuracy([[table averageOfProperty:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Average should be 0.0");
         
         // Test invalid column name
-        XCTAssertThrows([table averageOfColumn:@"foo" where:@"BoolCol == YES"], @"Should throw exception");
+        XCTAssertThrows([table averageOfProperty:@"foo" where:@"BoolCol == YES"], @"Should throw exception");
         
         // Test operation not supported
-        XCTAssertThrows([table averageOfColumn:@"BoolCol" where:@"IntCol == 1"], @"Should throw exception");
+        XCTAssertThrows([table averageOfProperty:@"BoolCol" where:@"IntCol == 1"], @"Should throw exception");
+    }];
+}
+
+- (void)testTableDynamic_minMaxInColumn
+{
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"IntCol" type:RLMTypeInt];
+        [table addColumnWithName:@"FloatCol" type:RLMTypeFloat];
+        [table addColumnWithName:@"DoubleCol" type:RLMTypeDouble];
+        [table addColumnWithName:@"BoolCol" type:RLMTypeBool];
+        
+        [table addRow:@[@1, @1.1f, @0.0, @YES]];
+        [table addRow:@[@2, @1.2f, @1.5, @NO]];
+        [table addRow:@[@3, @1.3f, @3.0, @YES]];
+        [table addRow:@[@4, @1.4f, @4.5, @NO]];
+        [table addRow:@[@5, @1.5f, @6.0, @YES]];
+        [table addRow:@[@6, @1.6f, @7.5, @NO]];
+        [table addRow:@[@7, @1.7f, @9.0, @YES]];
+        [table addRow:@[@8, @1.8f, @10.5, @NO]];
+        [table addRow:@[@9, @1.9f, @12.0, @YES]];
+        [table addRow:@[@10, @2.0f, @13.5, @YES]];
+        
+        
+        // Test int min
+        XCTAssertEqual([[table minOfProperty:@"IntCol" where:@"BoolCol == NO"] integerValue], 2, @"Minimum should be 2");
+        XCTAssertEqual([[table minOfProperty:@"IntCol" where:@"BoolCol == YES"] integerValue], 1, @"Minimum should be 1");
+        
+        // Test float min
+        XCTAssertEqualWithAccuracy([[table minOfProperty:@"FloatCol" where:@"BoolCol == NO"] floatValue], (float)1.2f, 0.1f, @"Minimum should be 1.2f");
+        XCTAssertEqualWithAccuracy([[table minOfProperty:@"FloatCol" where:@"BoolCol == YES"] floatValue], (float)1.1f, 0.1f, @"Minimum should be 1.1f");
+        
+        // Test double min
+        XCTAssertEqualWithAccuracy([[table minOfProperty:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)1.5, 0.1f, @"Minimum should be 1.5");
+        XCTAssertEqualWithAccuracy([[table minOfProperty:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)0.0, 0.1f, @"Minimum should be 0.0");
+        
+        // Test invalid column name
+        XCTAssertThrows([table minOfProperty:@"foo" where:@"BoolCol == YES"], @"Should throw exception");
+        
+        // Test operation not supported
+        XCTAssertThrows([table minOfProperty:@"BoolCol" where:@"IntCol == 1"], @"Should throw exception");
+        
+        // Test int max
+        XCTAssertEqual([[table maxOfProperty:@"IntCol" where:@"BoolCol == NO"] integerValue], 8, @"Maximum should be 8");
+        XCTAssertEqual([[table maxOfProperty:@"IntCol" where:@"BoolCol == YES"] integerValue], 10, @"Maximum should be 10");
+        
+        // Test float max
+        XCTAssertEqualWithAccuracy([[table maxOfProperty:@"FloatCol" where:@"BoolCol == NO"] floatValue], (float)1.8f, 0.1f, @"Maximum should be 1.8f");
+        XCTAssertEqualWithAccuracy([[table maxOfProperty:@"FloatCol" where:@"BoolCol == YES"] floatValue], (float)2.0f, 0.1f, @"Maximum should be 2.0f");
+        
+        // Test double max
+        XCTAssertEqualWithAccuracy([[table maxOfProperty:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)10.5, 0.1f, @"Maximum should be 10.5");
+        XCTAssertEqualWithAccuracy([[table maxOfProperty:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)13.5, 0.1f, @"Maximum should be 13.5");
     }];
 }
 
