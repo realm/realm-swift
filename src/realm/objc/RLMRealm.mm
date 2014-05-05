@@ -339,7 +339,7 @@ NSString *const defaultRealmFileName = @"default.realm";
 - (void)refresh {
     try {
         // no-op if writing
-        if (!_readGroup) {
+        if (!self.inReadTransaction) {
             return;
         }
         
@@ -367,7 +367,7 @@ NSString *const defaultRealmFileName = @"default.realm";
         // refresh all outstanding objects
         for (RLMTable *obj in _objects.objectEnumerator.allObjects) {
             NSIndexPath *path = obj.indexPath;
-            TableRef tableRef = group->get_table([path indexAtPosition:0]); // Throws
+            TableRef tableRef = (TableRef)group->get_table([path indexAtPosition:0]); // Throws
             [obj setNativeTable:tableRef.get()];
             [obj setReadOnly:readOnly];
         }
