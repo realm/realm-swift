@@ -446,4 +446,167 @@ REALM_TABLE_9(TestQueryAllTypes,
     }];
 }
 
+#pragma mark - Predicates
+
+- (void)testDatePredicates
+{
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"date" type:RLMTypeDate];
+        NSArray *dates = @[[NSDate dateWithTimeIntervalSince1970:0],
+                           [NSDate dateWithTimeIntervalSince1970:1],
+                           [NSDate dateWithTimeIntervalSince1970:2],
+                           [NSDate dateWithTimeIntervalSince1970:3]];
+        for (NSDate *date in dates) {
+            [table addRow:@[date]];
+        }
+        
+        NSDate *date = dates[1];
+        
+        // Lesser than
+        [self testPredicate:[NSPredicate predicateWithFormat:@"date < %@", date]
+                    onTable:table
+                withResults:[dates subarrayWithRange:NSMakeRange(0, 1)]
+                       name:@"lesser than"
+                     column:@"date"];
+        
+        // Lesser than or equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"date <= %@", date]
+                    onTable:table
+                withResults:[dates subarrayWithRange:NSMakeRange(0, 2)]
+                       name:@"lesser than or equal"
+                     column:@"date"];
+        
+        // Equal (single '=')
+        [self testPredicate:[NSPredicate predicateWithFormat:@"date = %@", date]
+                    onTable:table
+                withResults:[dates subarrayWithRange:NSMakeRange(1, 1)]
+                       name:@"equal(1)"
+                     column:@"date"];
+        
+        // Equal (double '=')
+        [self testPredicate:[NSPredicate predicateWithFormat:@"date == %@", date]
+                    onTable:table
+                withResults:[dates subarrayWithRange:NSMakeRange(1, 1)]
+                       name:@"equal(2)"
+                     column:@"date"];
+        
+        // Greater than or equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"date >= %@", date]
+                    onTable:table
+                withResults:[dates subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"greater than or equal"
+                     column:@"date"];
+        
+        // Greater than
+        [self testPredicate:[NSPredicate predicateWithFormat:@"date > %@", date]
+                    onTable:table
+                withResults:[dates subarrayWithRange:NSMakeRange(2, 2)]
+                       name:@"greater than"
+                     column:@"date"];
+        
+        // Not equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"date != %@", date]
+                    onTable:table
+                withResults:@[dates[0], dates[2], dates[3]]
+                       name:@"not equal"
+                     column:@"date"];
+    }];
+}
+
+- (void)testStringPredicates
+{
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"string" type:RLMTypeString];
+        NSArray *strings = @[@"a",
+                             @"ab",
+                             @"abc",
+                             @"abcd"];
+        for (NSString *string in strings) {
+            [table addRow:@[string]];
+        }
+        
+        // Equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"string == %@", @"a"]
+                    onTable:table
+                withResults:[strings subarrayWithRange:NSMakeRange(0, 1)]
+                       name:@"equal"
+                     column:@"string"];
+        
+        // Equal (fail)
+        [self testPredicate:[NSPredicate predicateWithFormat:@"string == %@", @"A"]
+                    onTable:table
+                withResults:@[]
+                       name:@"equal (fail)"
+                     column:@"string"];
+        
+        // Not equal
+        [self testPredicate:[NSPredicate predicateWithFormat:@"string != %@", @"a"]
+                    onTable:table
+                withResults:[strings subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"not equal"
+                     column:@"string"];
+        
+        // Begins with
+        [self testPredicate:[NSPredicate predicateWithFormat:@"string beginswith %@", @"ab"]
+                    onTable:table
+                withResults:[strings subarrayWithRange:NSMakeRange(1, 3)]
+                       name:@"beginswith"
+                     column:@"string"];
+        
+        // Begins with (fail)
+        [self testPredicate:[NSPredicate predicateWithFormat:@"string beginswith %@", @"A"]
+                    onTable:table
+                withResults:@[]
+                       name:@"beginswith (fail)"
+                     column:@"string"];
+        
+        // Contains
+        [self testPredicate:[NSPredicate predicateWithFormat:@"string contains %@", @"bc"]
+                    onTable:table
+                withResults:[strings subarrayWithRange:NSMakeRange(2, 2)]
+                       name:@"contains"
+                     column:@"string"];
+        
+        // Ends with
+        [self testPredicate:[NSPredicate predicateWithFormat:@"string endswith %@", @"cd"]
+                    onTable:table
+                withResults:@[strings.lastObject]
+                       name:@"endswith"
+                     column:@"string"];
+        
+        // NSCaseInsensitivePredicateOption
+        [self testPredicate:[NSPredicate predicateWithFormat:@"string contains[c] %@", @"C"]
+                    onTable:table
+                withResults:[strings subarrayWithRange:NSMakeRange(2, 2)]
+                       name:@"NSCaseInsensitivePredicateOption"
+                     column:@"string"];
+        
+        // NSDiacriticInsensitivePredicateOption
+        {
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"string contains[d] %@", @"ç"];
+            XCTAssertThrows([table where:predicate],
+                            @"String predicate with diacritic insensitive option should throw");
+        }
+    }];
+}
+
+#pragma mark - Predicate Helpers
+
+- (void)testPredicate:(NSPredicate *)predicate
+              onTable:(RLMTable *)table
+          withResults:(NSArray *)results
+                 name:(NSString *)name
+               column:(NSString *)column
+{
+    RLMView *view = [table where:predicate];
+    XCTAssertEqual(view.rowCount,
+                   results.count,
+                   @"%@ predicate should return correct count", name);
+    [results enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        XCTAssertEqualObjects(obj,
+                              view[idx][column],
+                              @"%@ predicate should return correct results", name);
+    }];
+}
+
 @end
