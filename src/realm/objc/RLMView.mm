@@ -29,6 +29,7 @@
 #import "RLMTable_noinst.h"
 #import "RLMRow.h"
 #import "RLMView_noinst.h"
+#import "RLMRow_noinst.h"
 #import "RLMQuery_noinst.h"
 #import "RLMPrivate.h"
 #import "util_noinst.hpp"
@@ -106,7 +107,7 @@
     if (ndx >= self.rowCount)
         return nil;
 
-    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx] readOnly:m_read_only];
 }
 
 -(RLMRow *)rowAtIndex:(NSUInteger)ndx
@@ -117,7 +118,7 @@
     if (ndx >= self.rowCount)
         return nil;
 
-    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx] readOnly:m_read_only];
 }
 
 -(RLMRow *)firstRow
@@ -125,7 +126,7 @@
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:0]];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:0] readOnly:m_read_only];
 }
 
 -(RLMRow *)lastRow
@@ -133,7 +134,7 @@
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1]];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1] readOnly:m_read_only];
 }
 
 -(NSUInteger)rowCount
@@ -250,7 +251,7 @@
 -(RLMRow *)getRow
 {
     return m_tmp_row = [[_proxyObjectClass alloc] initWithTable: m_table
-                                                 ndx: m_view->get_source_ndx(0)];
+                                                 ndx: m_view->get_source_ndx(0) readOnly:m_read_only];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState*)state objects:(id __unsafe_unretained*)stackbuf count:(NSUInteger)len

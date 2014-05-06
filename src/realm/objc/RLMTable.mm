@@ -24,6 +24,7 @@
 
 #import "RLMView_noinst.h"
 #import "RLMQuery_noinst.h"
+#import "RLMRow_noinst.h"
 #import "RLMDescriptor_noinst.h"
 #import "RLMProxy.h"
 #import "RLMObjectDescriptor.h"
@@ -86,7 +87,7 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
 
 -(RLMRow *)getRow
 {
-    return m_tmp_row = [[_proxyObjectClass alloc] initWithTable:self ndx:0];
+    return m_tmp_row = [[_proxyObjectClass alloc] initWithTable:m_table ndx:0 readOnly:m_read_only];
 }
 -(void)clearRow
 {
@@ -235,7 +236,7 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
 -(RLMRow *)insertEmptyRowAtIndex:(NSUInteger)ndx
 {
     [self RLMInsertRow:ndx];
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:ndx];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:ndx readOnly:m_read_only];
 }
 
 -(BOOL)RLMInsertRow:(NSUInteger)ndx
@@ -292,7 +293,7 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
                                      userInfo:nil];
     }
     
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:rowIndex];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:rowIndex readOnly:m_read_only];
 }
 
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex
@@ -341,7 +342,7 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
 {
     // initWithTable checks for illegal index.
 
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:ndx];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:ndx readOnly:m_read_only];
 }
 
 -(id)firstRow
@@ -349,7 +350,7 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:0];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:0 readOnly:m_read_only];
 }
 
 -(id)lastRow
@@ -357,13 +358,13 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:self.rowCount-1];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:self.rowCount-1 readOnly:m_read_only];
 }
 
 -(id)insertRowAtIndex:(NSUInteger)ndx
 {
     [self insertEmptyRowAtIndex:ndx];
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:ndx];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:ndx readOnly:m_read_only];
 }
 
 -(void)addRow:(NSObject*)data
@@ -385,7 +386,7 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
 // Moved to private header
 -(RLMRow *)addEmptyRow
 {
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:[self RLM_addEmptyRow]];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self RLM_addEmptyRow] readOnly:m_read_only];
 }
 
 
@@ -1089,7 +1090,7 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
     if (row_ndx == tightdb::not_found)
         return nil;
     
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:row_ndx];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:row_ndx readOnly:m_read_only];
 }
 
 -(RLMView *)allWhere:(id)predicate, ...

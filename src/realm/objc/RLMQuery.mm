@@ -26,6 +26,7 @@
 
 #import "RLMQuery.h"
 #import "RLMTable_noinst.h"
+#import "RLMRow_noinst.h"
 #import "RLMView_noinst.h"
 #import "RLMRow.h"
 #import "NSData+RLMGetBinaryData.h"
@@ -75,7 +76,7 @@ using namespace std;
 
 -(RLMRow *)getRow:(long)ndx
 {
-    return m_tmp_row = [[RLMRow alloc] initWithTable:[self originTable] ndx:ndx];
+    return m_tmp_row = [[RLMRow alloc] initWithTable:[self.originTable getNativeTable] ndx:ndx readOnly:self.originTable.isReadOnly];
 }
 
 -(long)getFastEnumStart

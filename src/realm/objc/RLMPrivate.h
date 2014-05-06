@@ -18,6 +18,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+
 #import "RLMTable.h"
 #import "RLMView.h"
 #import "RLMRow.h"
@@ -50,7 +51,6 @@
 @end
 
 @interface RLMRow()
-@property (nonatomic, weak) RLMTable *table;
 @property (nonatomic, assign) NSUInteger ndx;
 @end
 
@@ -128,7 +128,6 @@
 // However, they are public so that the typed table macros can use them.
 //
 @interface RLMRow (Private)
--(id)initWithTable:(RLMTable *)table ndx:(NSUInteger)ndx;
 -(void)RLM_setNdx:(NSUInteger)ndx;
 -(NSUInteger)RLM_index;
 @end
