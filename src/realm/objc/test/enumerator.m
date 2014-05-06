@@ -18,6 +18,8 @@
 @implementation EnumPeople
 @end
 
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(EnumPeopleTable, EnumPeople);
+
 @interface MACTestEnumerator : RLMTestCase
 @end
 
@@ -37,7 +39,7 @@
     RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath];
     
     [realm beginWriteTransaction];
-    RLMTable *people = [realm createTableWithName:@"people" objectClass:[EnumPeople class]];
+    EnumPeopleTable *people = [EnumPeopleTable tableInRealm:realm named:@"people"];
     // Add some rows
     for (NSArray *rowArray in rowsArray) {
         [people addRow:rowArray];

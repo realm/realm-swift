@@ -88,6 +88,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(InvalidTable, InvalidType)
 @implementation CustomAccessors
 @end
 
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(CustomAccessorsTable, CustomAccessors);
 
 RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 
@@ -205,23 +206,6 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
     }];
 }
 
-- (void)testInvalids
-{
-    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
-        // FIXME: This should throw but currently doesn't
-//        XCTAssertThrows([realm createTableWithName:@"table1"
-//                                      asTableClass:[InvalidTable class]],
-//                        @"Unsupported types should throw");
-        XCTAssertThrows([realm createTableWithName:@"table2"
-                                       objectClass:[NSObject class]],
-                        @"Types not descendent from RLMRow should throw");
-        XCTAssertThrows([realm createTableWithName:@"table3"
-                                       objectClass:[InvalidProperty class]],
-                        @"Types not descendent from RLMRow should throw");
-    }];
-}
-
-
 - (void)testTableTyped_KeyedSubscripting
 {
     [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
@@ -298,7 +282,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 
 - (void)testCustomAccessors {
     [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
-        RLMTable *table = [realm createTableWithName:@"Test" objectClass:[CustomAccessors class]];
+        CustomAccessorsTable *table = [CustomAccessorsTable tableInRealm:realm named:@"Test"];
         [table addRow:@[@"name", @2]];
         
         XCTAssertEqualObjects([table[0] getThatName], @"name", @"name property should be name.");

@@ -58,11 +58,11 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestTable, RLMTestObject);
     NSString *tableName = @"table";
     
     [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
-        [realm createTableWithName:tableName asTableClass:[RLMTestTable class]];
+        [RLMTestTable tableInRealm:realm named:tableName];
     }];
     
     RLMRealm *realm = [self realmWithTestPath];
-    RLMTestTable *table = [realm tableWithName:tableName asTableClass:[RLMTestTable class]];
+    RLMTestTable *table = [RLMTestTable tableInRealm:realm named:tableName];
     
     XCTAssertNotNil(table, @"pre-existing typed table read from RLMRealm should not be nil");
     XCTAssertEqual([table class],

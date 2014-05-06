@@ -129,8 +129,8 @@ RLM_STATIC_ASSERT(__INCLUDE_LEVEL__ == 0, RLM_IMPLEMENT_TABLE_used_in_header_fil
 @implementation TType                                                           \
 +(TType *)tableInRealm:(RLMRealm *)rlm named:(NSString *)name {                 \
     if([rlm hasTableWithName:name])                                             \
-        return (TType *)[rlm tableWithName:name objectClass:OType.class];       \
-    return (TType *)[rlm createTableWithName:name objectClass:OType.class];}    \
+        return (TType *)[rlm tableWithName:name objectClass:OType.class tableClass:TType.class]; \
+    return (TType *)[rlm createTableWithName:name objectClass:OType.class tableClass:TType.class];} \
 +(Class)objectClass { return OType.class; }                                     \
 @end
 

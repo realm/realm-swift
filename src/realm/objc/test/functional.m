@@ -258,7 +258,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMPersonTable, RLMPerson);
 
 - (void)testRowDescription {
     [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
-        RLMTable *table = [realm createTableWithName:@"people" objectClass:[RLMPerson class]];
+        RLMPersonTable *table = [RLMPersonTable tableInRealm:realm named:@"people"];
         [table addRow:@[@"John", @25, @YES]];
         NSString *rowDescription = [table.firstRow description];
         XCTAssertTrue([rowDescription rangeOfString:@"name"].location != NSNotFound, @"column names should be displayed when calling \"description\" on RLMRow");
