@@ -14,12 +14,8 @@ Objective-C/C++ compiler and GNU make. The Objective-C language
 binding is thoroughly tested with Clang. It is known to work with
 Clang 3.0 and newer.
 
-If you are going to modify the Objective-C language binding, you will
-need Cheetah for Python (http://www.cheetahtemplate.org). It is needed
-because some source files are generated from Cheetah templates.
-
 Currently, the Objective-C binding is availble only on Mac OS X (and
-iPhone). The following is a suggestion of how to install the
+iOS). The following is a suggestion of how to install the
 prerequisites on Mac OS X 10.7, 10.8, and 10.9:
 
 The build procedure uses Clang as the C/C++ compiler by default. It
@@ -38,16 +34,6 @@ command line tools installed. In Xcode 4, however, the "Command line
 tools" is an optional Xcode add-on that you must install. You can find
 it under the "Downloads" pane of the "Preferences" dialog in the Xcode
 4 menu.
-
-Download the latest version of Python Cheetah
-(https://pypi.python.org/packages/source/C/Cheetah/Cheetah-2.4.4.tar.gz),
-then:
-
-    tar xf Cheetah-2.4.4.tar.gz
-    cd Cheetah-2.4.4/
-    sudo python setup.py install
-
-
 
 Configure, build, install
 -------------------------
@@ -82,7 +68,7 @@ Here is a more complete set of build-related commands:
 
 
 
-Building for iPhone
+Building for iOS
 -------------------
 
 On Mac OS X it is possible to build a version of the Objective-C
@@ -124,7 +110,7 @@ the command:
 
     sh build.sh ios-framework
 
-The framework is stored in the `tightdb-ios.zip` file.
+The framework is stored in the `realm-ios.zip` file.
 
 Configuration
 -------------

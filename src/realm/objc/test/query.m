@@ -81,10 +81,10 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryAllTable2, TestQueryAllObj);
         
         NSString *predicate = @"BoolCol == NO";
         
-        XCTAssertEqual([[table minOfProperty:@"IntCol" where:predicate] integerValue], (NSUInteger)54, @"IntCol min");
-        XCTAssertEqual([[table maxOfProperty:@"IntCol" where:predicate] integerValue], (NSUInteger)54, @"IntCol max");
-        XCTAssertEqual([[table sumOfProperty:@"IntCol" where:predicate] integerValue], (NSUInteger)54, @"IntCol sum");
-        XCTAssertEqual([[table averageOfProperty:@"IntCol" where:predicate] integerValue], (NSUInteger)54, @"IntCol avg");
+        XCTAssertEqual([[table minOfProperty:@"IntCol" where:predicate] integerValue], (int)54, @"IntCol min");
+        XCTAssertEqual([[table maxOfProperty:@"IntCol" where:predicate] integerValue], (int)54, @"IntCol max");
+        XCTAssertEqual([[table sumOfProperty:@"IntCol" where:predicate] integerValue], (int)54, @"IntCol sum");
+        XCTAssertEqual([[table averageOfProperty:@"IntCol" where:predicate] integerValue], (int)54, @"IntCol avg");
         
         XCTAssertEqual([[table minOfProperty:@"FloatCol" where:predicate] floatValue], (float)0.7f, @"FloatCol min");
         XCTAssertEqual([[table maxOfProperty:@"FloatCol" where:predicate] floatValue], (float)0.7f, @"FloatCol max");
