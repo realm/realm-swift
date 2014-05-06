@@ -101,7 +101,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(QueryTable, QueryObject);
         //------------------------------------------------------
         
         // Load a realm from disk (and print contents)
-        RLMRealm * fromDisk = [self realmPersistedAtTestPath];
+        RLMRealm * fromDisk = [self realmWithTestPath];
         MyTable* diskTable = [MyTable tableInRealm:fromDisk named:@"table"];
         
         for (NSUInteger i = 0; i < diskTable.rowCount; i++) {

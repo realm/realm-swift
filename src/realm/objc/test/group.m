@@ -30,7 +30,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestTable2, RLMTestObj2);
 
 - (void)testRealm {
     // Load the realm
-    RLMRealm *realm = [self realmPersistedAtTestPath];
+    RLMRealm *realm = [self realmWithTestPath];
     XCTAssertTrue(realm, @"Realm from disk should be valid");
 
     // Create new table in realm
@@ -46,21 +46,21 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestTable2, RLMTestObj2);
     [realm commitWriteTransaction];
 
     // Verify
-    RLMRealm *realm2 = [self realmPersistedAtTestPath];
+    RLMRealm *realm2 = [self realmWithTestPath];
     RLMTestTable2 *t2 = [RLMTestTable2 tableInRealm:realm2 named:@"test"];
     XCTAssertEqual(t2.rowCount, (NSUInteger)1, @"test table should have one row");
 }
 
 - (void)testGetTable {
-    XCTAssertNil([[self realmPersistedAtTestPath] tableWithName:@"noTable"], @"Table does not exist");
+    XCTAssertNil([[self realmWithTestPath] tableWithName:@"noTable"], @"Table does not exist");
 }
 
 - (void)testRealmTableCount {
-    XCTAssertEqual([[self realmPersistedAtTestPath] tableCount], (NSUInteger)0, @"No tables added");
+    XCTAssertEqual([[self realmWithTestPath] tableCount], (NSUInteger)0, @"No tables added");
     [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         [realm createTableWithName:@"tableName"];
     }];
-    XCTAssertEqual([[self realmPersistedAtTestPath] tableCount], (NSUInteger)1, @"1 table added");
+    XCTAssertEqual([[self realmWithTestPath] tableCount], (NSUInteger)1, @"1 table added");
 }
 
 @end

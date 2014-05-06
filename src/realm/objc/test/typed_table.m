@@ -304,7 +304,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
         XCTAssertEqualObjects([table[0] getThatName], @"name", @"name property should be name.");
         
         [table[0] setTheInt:99];
-        XCTAssertEqual([table[0] age], 99L, @"age property should be 99");
+        XCTAssertEqual((int)[table[0] age], (int)99, @"age property should be 99");
     }];
 }
 
@@ -419,8 +419,8 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
         [table addRow:@[@10, @2.0f, @13.5, @YES]];
         
         // Test int min
-        XCTAssertEqual([[table minOfProperty:@"IntCol" where:@"BoolCol == NO"] integerValue], 2, @"Minimum should be 2");
-        XCTAssertEqual([[table minOfProperty:@"IntCol" where:@"BoolCol == YES"] integerValue], 1, @"Minimum should be 1");
+        XCTAssertEqual([[table minOfProperty:@"IntCol" where:@"BoolCol == NO"] integerValue], (NSInteger)2, @"Minimum should be 2");
+        XCTAssertEqual([[table minOfProperty:@"IntCol" where:@"BoolCol == YES"] integerValue], (NSInteger)1, @"Minimum should be 1");
         
         // Test float min
         XCTAssertEqualWithAccuracy([[table minOfProperty:@"FloatCol" where:@"BoolCol == NO"] floatValue], (float)1.2f, 0.1f, @"Minimum should be 1.2f");
@@ -437,8 +437,8 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
         XCTAssertThrows([table minOfProperty:@"BoolCol" where:@"IntCol == 1"], @"Should throw exception");
         
         // Test int max
-        XCTAssertEqual([[table maxOfProperty:@"IntCol" where:@"BoolCol == NO"] integerValue], 8, @"Maximum should be 8");
-        XCTAssertEqual([[table maxOfProperty:@"IntCol" where:@"BoolCol == YES"] integerValue], 10, @"Maximum should be 10");
+        XCTAssertEqual([[table maxOfProperty:@"IntCol" where:@"BoolCol == NO"] integerValue], (NSInteger)8, @"Maximum should be 8");
+        XCTAssertEqual([[table maxOfProperty:@"IntCol" where:@"BoolCol == YES"] integerValue], (NSInteger)10, @"Maximum should be 10");
         
         // Test float max
         XCTAssertEqualWithAccuracy([[table maxOfProperty:@"FloatCol" where:@"BoolCol == NO"] floatValue], (float)1.8f, 0.1f, @"Maximum should be 1.8f");

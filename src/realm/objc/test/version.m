@@ -10,9 +10,9 @@
 
 -(void)testVersionGetters
 {
-    XCTAssertEqual(REALM_VERSION_MAJOR, [RLMVersion major] );
-    XCTAssertEqual(REALM_VERSION_MINOR, [RLMVersion minor] );
-    XCTAssertEqual(REALM_VERSION_PATCH, [RLMVersion major] );
+    XCTAssertEqual((NSInteger)REALM_VERSION_MAJOR, [RLMVersion major] );
+    XCTAssertEqual((NSInteger)REALM_VERSION_MINOR, [RLMVersion minor] );
+    XCTAssertEqual((NSInteger)REALM_VERSION_PATCH, [RLMVersion major] );
 
     NSString *ver1 = [RLMVersion version];
     NSString *ver2 = [NSString stringWithFormat:@"%d.%d.%d",

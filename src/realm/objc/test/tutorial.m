@@ -83,7 +83,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMPersonTable2, RLMPerson2);
         [table removeRowAtIndex:2];
     }];
 
-    RLMPersonTable2 *people = [RLMPersonTable2 tableInRealm:self.realmPersistedAtTestPath named:@"table"];
+    RLMPersonTable2 *people = [RLMPersonTable2 tableInRealm:self.realmWithTestPath named:@"table"];
     
     NSLog(@"%lu rows after remove.  [5]", [people rowCount]);  // 5
     XCTAssertEqual([people rowCount], (NSUInteger)5,@"rows should be 5");
