@@ -3,9 +3,8 @@ test_DEPS = .
 
 # Headers to be installed
 nobase_subinclude_HEADERS = RLMConstants.h RLMType.h RLMRow.h RLMQuery.h \
-RLMTable.h RLMRealm.h PrivateHelperMacros.h PrivateTableMacros.h RLMPrivate.h \
-Realm.h RLMVersion.h RLMDescriptor.h RLMView.h RLMColumnProxy.h RLMViewProtocol.h \
-RLMFast.h RLMRowFast.h
+RLMTable.h RLMRealm.h RLMPrivate.h Realm.h RLMVersion.h RLMDescriptor.h \
+RLMView.h RLMColumnProxy.h RLMViewProtocol.h RLMFast.h RLMRowFast.h
 
 nobase_subinclude_HEADERS_EXTRA_UNINSTALL = *.h
 
@@ -39,14 +38,6 @@ librealm_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
 # by GNU Libtool. See also
 # http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning
 librealm_objc_a_VERSION = 4:0:0
-
-
-# Code generation
-ifeq ($(DISABLE_CHEETAH_CODE_GEN),)
-GENERATED_SOURCES += PrivateTableMacros.h
-PrivateTableMacros.h: PrivateTableMacros.h.cheetah cheetah.sh
-	$(SHELL) cheetah.sh $< $@
-endif
 
 
 # Used by ../../../build.sh

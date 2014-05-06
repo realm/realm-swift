@@ -356,8 +356,7 @@
 // Table type and schema
 -(BOOL)isEqual:(id)otherTableClass;
 -(id)castToTypedTableClass:(Class)typedTableClass;
-// FIXME: implement method below and reenable and document it
-// -(BOOL)hasSameDescriptorAs:(Class)otherTableClass;
+-(BOOL)hasSameDescriptorAs:(Class)otherTableClass;
 
 -(RLMType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 
