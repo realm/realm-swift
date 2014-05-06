@@ -13,7 +13,7 @@ Objective-C/C++ compiler. The Objective-C language binding is
 thoroughly tested with Clang. It is known to work with Clang 3.0 and newer.
 
 Currently, the Objective-C binding is availble only on Mac OS X (and
-iPhone). The following is a suggestion of how to install the
+iOS). The following is a suggestion of how to install the
 prerequisites on Mac OS X 10.7, 10.8, and 10.9:
 
 The build procedure uses Clang as the C/C++ compiler by default. It
