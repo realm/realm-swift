@@ -202,4 +202,11 @@ typedef void(^RLMNotificationBlock)(NSString *note, RLMRealm *realm);
 -(NSString *)nameOfTableWithIndex:(NSUInteger)tableIndex;
 -(BOOL)hasTableWithName:(NSString *)name withTableClass:(Class)obj;
 
+/**---------------------------------------------------------------------------------------
+ *  @name JSON Serialization
+ *  ---------------------------------------------------------------------------------------
+ */
+
+- (NSString *)toJSONString;
+
 @end
