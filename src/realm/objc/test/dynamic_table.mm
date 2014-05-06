@@ -1555,4 +1555,29 @@ using namespace std;
     }];
 }
 
+- (void)testSubtableEmptyArray
+{
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"Subtable" type:RLMTypeTable];
+
+        [table addRow:@[@[]]];
+
+        XCTAssertTrue(table.rowCount == 1, @"1 row excepted");
+        XCTAssertTrue(((RLMTable *)table[0][@"Subtable"]).rowCount == 0, @"0 rows excepted");
+    }];
+}
+
+- (void)testSubtableEmptyArrayUsingDictionary
+{
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        [table addColumnWithName:@"Subtable" type:RLMTypeTable];
+
+        [table addRow:@{@"Subtable": @[]}];
+
+        XCTAssertTrue(table.rowCount == 1, @"1 row excepted");
+        XCTAssertTrue(((RLMTable *)table[0][@"Subtable"]).rowCount == 0, @"0 rows excepted");
+    }];
+
+}
+
 @end
