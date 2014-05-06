@@ -25,7 +25,6 @@
 #import <realm/objc/RLMRow.h>
 #import <realm/objc/RLMRealm.h>
 #import <realm/objc/RLMVersion.h>
+#import <realm/objc/RLMDescriptor.h>
 
-#import <realm/objc/PrivateHelperMacros.h>
-#import <realm/objc/PrivateTableMacros.h>
 #import <realm/objc/RLMPrivate.h>
