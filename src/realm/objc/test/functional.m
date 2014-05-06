@@ -8,7 +8,6 @@
 #import <realm/objc/RLMFast.h>
 #import <realm/objc/RLMTable.h>
 #import <realm/objc/RLMTableFast.h>
-#import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 @interface RLMPerson : RLMRow
 

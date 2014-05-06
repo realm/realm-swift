@@ -10,7 +10,6 @@
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMRealm.h>
 #import <realm/objc/RLMPrivate.h>
-#import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 @interface MyObject : RLMRow
 

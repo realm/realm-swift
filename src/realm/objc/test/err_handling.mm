@@ -11,7 +11,6 @@
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMTable_noinst.h>
 #import <realm/objc/RLMTableFast.h>
-#import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 @interface PeopleErrObject : RLMRow
 
