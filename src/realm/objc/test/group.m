@@ -10,9 +10,17 @@
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMRealm.h>
 
-REALM_TABLE_2(TestTableRealm,
-              First,  String,
-              Second, Int)
+@interface RLMTestObj2 : RLMRow
+
+@property (nonatomic, copy) NSString *first;
+@property (nonatomic, assign) NSInteger second;
+
+@end
+
+@implementation RLMTestObj2
+@end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestTable2, RLMTestObj2);
 
 @interface MACTestRealm : RLMTestCase
 
@@ -27,21 +35,19 @@ REALM_TABLE_2(TestTableRealm,
 
     // Create new table in realm
     [realm beginWriteTransaction];
-    [realm createTableWithName:@"test" asTableClass:[TestTableRealm class]];
-    TestTableRealm *t = [realm tableWithName:@"test" asTableClass:[TestTableRealm class]];
+    RLMTestTable2 *t = [RLMTestTable2 tableInRealm:realm named:@"test"];
 
     // Verify
     XCTAssertEqual(t.columnCount, (NSUInteger)2, @"Should have 2 columns");
     XCTAssertEqual(t.rowCount, (NSUInteger)0, @"Should have 0 rows");
 
     // Modify table
-    t = [realm tableWithName:@"test" asTableClass:[TestTableRealm class]];
-    [t addFirst:@"Test" Second:YES];
+    [t addRow:@[@"Test", @23]];
     [realm commitWriteTransaction];
-    
+
     // Verify
     RLMRealm *realm2 = [self realmWithTestPath];
-    TestTableRealm *t2 = [realm2 tableWithName:@"test" asTableClass:[TestTableRealm class]];
+    RLMTestTable2 *t2 = [RLMTestTable2 tableInRealm:realm2 named:@"test"];
     XCTAssertEqual(t2.rowCount, (NSUInteger)1, @"test table should have one row");
 }
 
