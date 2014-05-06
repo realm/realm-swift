@@ -10,27 +10,18 @@
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMPrivateTableMacrosFast.h>
 
-REALM_TABLE_DEF_3(PeopleTable,
-                  Name,  String,
-                  Age,   Int,
-                  Hired, Bool)
+@interface RLMPerson2 : RLMRow
 
-REALM_TABLE_DEF_2(PeopleTable2,
-                  Hired, Bool,
-                  Age,   Int)
+@property (nonatomic, copy)   NSString *name;
+@property (nonatomic, assign) NSInteger age;
+@property (nonatomic, assign) BOOL      hired;
 
-REALM_TABLE_IMPL_3(PeopleTable,
-                   Name,  String,
-                   Age,   Int,
-                   Hired, Bool)
+@end
 
-REALM_TABLE_IMPL_2(PeopleTable2,
-                   Hired, Bool,
-                   Age,   Int)
+@implementation RLMPerson2
+@end
 
-REALM_TABLE_FAST(PeopleTable)
-
-REALM_TABLE_FAST(PeopleTable2)
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMPersonTable2, RLMPerson2);
 
 @interface MACTestTutorial: RLMTestCase
 
@@ -38,8 +29,7 @@ REALM_TABLE_FAST(PeopleTable2)
 
 @implementation MACTestTutorial
 
-- (void)testTutorial
-{
+- (void)testTutorial {
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
@@ -48,115 +38,98 @@ REALM_TABLE_FAST(PeopleTable2)
     
     [manager writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
-        PeopleTable *people = [realm createTableWithName:@"employees" asTableClass:[PeopleTable class]];
+        RLMPersonTable2 *table = [RLMPersonTable2 tableInRealm:realm named:@"table"];
         
         // Add some rows
-        [people addName:@"John" Age:20 Hired:YES];
-        [people addName:@"Mary" Age:21 Hired:NO];
-        [people addName:@"Lars" Age:21 Hired:YES];
-        [people addName:@"Phil" Age:43 Hired:NO];
-        [people addName:@"Anni" Age:54 Hired:YES];
+        [table addRow:@[@"John", @20, @YES]];
+        [table addRow:@[@"Mary", @21, @NO]];
+        [table addRow:@[@"Lars", @21, @YES]];
+        [table addRow:@[@"Phil", @43, @NO]];
+        [table addRow:@[@"Anni", @54, @YES]];
         
-        // Insert at specific position
-        [people insertEmptyRowAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
+        [table insertRow:@[@"Frank", @34, @YES] atIndex:2];
         
         // Getting the size of the table
-        NSLog(@"PeopleTable Size: %lu - is %@.    [6 - not empty]", [people rowCount],
-              people.rowCount == 0 ? @"empty" : @"not empty");
-        
+        NSLog(@"PeopleTable Size: %lu - is %@.    [6 - not empty]", [table rowCount],
+              table.rowCount == 0 ? @"empty" : @"not empty");
+
         //------------------------------------------------------
         NSLog(@"--- Working with individual rows ---");
         //------------------------------------------------------
         
         // Getting values
-        NSString * name = [people rowAtIndex:5].Name;   // => 'Anni'
+        NSString * name = table[5].name;   // => 'Anni'
         // Using a row
-        PeopleTableRow *myRow = [people rowAtIndex:5];
-        int64_t age = myRow.Age;                           // => 54
-        BOOL hired  = myRow.Hired;                         // => true
+        RLMPerson2 *myRow = table[5];
+        int64_t age = myRow.age;                           // => 54
+        BOOL hired  = myRow.hired;                         // => true
         NSLog(@"%@ is %lld years old.", name, age);
         if (hired) NSLog(@"is hired.");
-        
+
         // Setting values  (note: setter access will be made obsolete, use dot notation)
-        [people rowAtIndex:5].Age = 43;  // Getting younger
+        table[5].age = 43;  // Getting younger
         
         // or with dot-syntax:
-        myRow.Age += 1;                                    // Happy birthday!
-        NSLog(@"%@ age is now %lld.   [44]", myRow.Name, myRow.Age);
+        myRow.age += 1;                                    // Happy birthday!
+        NSLog(@"%@ age is now %ld.   [44]", myRow.name, (long)myRow.age);
         
         // Get last row
-        NSString *lastname = [people rowAtLastIndex].Name;       // => "Anni"
+        NSString *lastname = table.lastRow.name;       // => "Anni"
         NSLog(@"Last name is %@.   [Anni]", lastname);
         
         // Change a row - not implemented yet
         // [people setAtIndex:4 Name:"Eric" Age:50 Hired:YES];
         
         // Delete row
-        [people removeRowAtIndex:2];
+        [table removeRowAtIndex:2];
     }];
-    
-    PeopleTable *people = [[self realmPersistedAtTestPath] tableWithName:@"employees" asTableClass:[PeopleTable class]];
+
+    RLMPersonTable2 *people = [RLMPersonTable2 tableInRealm:self.realmPersistedAtTestPath named:@"table"];
     
     NSLog(@"%lu rows after remove.  [5]", [people rowCount]);  // 5
     XCTAssertEqual([people rowCount], (NSUInteger)5,@"rows should be 5");
 
     // Iterating over rows:
     for (NSUInteger i = 0; i < [people rowCount]; ++i) {
-        PeopleTableRow *row = [people rowAtIndex:i];
-        NSLog(@"(Rows) %@ is %lld years old.", row.Name, row.Age);
+        RLMPerson2 *row = people[i];
+        NSLog(@"(Rows) %@ is %ld years old.", row.name, (long)row.age);
     }
 
     //------------------------------------------------------
     NSLog(@"--- Simple Searching ---");
     //------------------------------------------------------
-
-    NSUInteger row;
-    row = [people.Name find:@"Philip"];    // row = (NSUInteger)-1
-    NSLog(@"Philip: %zu  [-1]", row);
-    XCTAssertEqual(row, NSNotFound, @"Philip should not be there", nil);
-
-    row = [people.Name find:@"Mary"];
-    NSLog(@"Mary: %zu", row);
-    XCTAssertEqual(row, (NSUInteger)1,@"Mary should have been there", nil);
-
-    PeopleTableView *view = [[[people where].Age columnIsEqualTo:21] findAll];
-    NSUInteger cnt = [view rowCount];             // cnt = 2
-    XCTAssertEqual(cnt, (NSUInteger)2,@"Should be two rows in view", nil);
+    
+    XCTAssertNil([people firstWhere:@"name == 'Philip'"], @"Philip should not be there");
+    XCTAssertNotNil([people firstWhere:@"name == 'Mary'"], @"Mary should have been there");
+    XCTAssertEqual([people countWhere:@"age == 21"], (NSUInteger)2, @"There should be two rows in the view");
 
     //------------------------------------------------------
     NSLog(@"--- Queries ---");
     //------------------------------------------------------
 
     // Create query (current employees between 20 and 30 years old)
-    PeopleTableQuery *q = [[[people where].Hired columnIsEqualTo:YES]            // Implicit AND
-                                  .Age columnIsBetween:20 :30];
-
-    // Get number of matching entries
-    NSLog(@"Query count: %lu",[q countRows]);
-    XCTAssertEqual([q countRows] , (NSUInteger)2,@"Expected 2 rows in query", nil);
-
-    // Get the average age - currently only a low-level interface!
-    double avg = [q.Age avg] ;
-    NSLog(@"Average: %f    [20.5]", avg);
-    XCTAssertEqual(avg, 20.5,@"Expected 20.5 average", nil);
-
-    // Execute the query and return a table (view)
-    RLMView *res = [q findAll];
-    for (NSUInteger i = 0; i < [res rowCount]; ++i) {
-        NSLog(@"%zu: %@ is %lld years old", i,
-            [people rowAtIndex:i].Name,
-            [people rowAtIndex:i].Age);
-    }
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"age between %@", @[@20, @30]];
+    RLMView *view = [people allWhere:predicate];
     
+    XCTAssertEqual(view.rowCount, (NSUInteger)3, @"Expected 3 rows in view");
+    XCTAssertEqualWithAccuracy([[people averageOfProperty:@"age" where:predicate] doubleValue], (double)20.66, 0.01, @"Expected 21.6666 average");
+    
+    // iterate over the view
+    for (NSUInteger i = 0; i < [view rowCount]; ++i) {
+        NSLog(@"%zu: %@ is %@ years old", i,
+            view[i][@"name"],
+            view[i][@"age"]);
+    }
+
     [manager writeUsingBlock:^(RLMRealm *realm) {
-        PeopleTable *table = [realm tableWithName:@"employees" asTableClass:[PeopleTable class]];
-        [table addName:@"Anni" Age:54 Hired:YES];
+        RLMPersonTable2 *table = [RLMPersonTable2 tableInRealm:realm named:@"table"];
+        [table addRow:@[@"Anni", @54, @YES]];
         
         XCTAssertEqual([table rowCount], (NSUInteger)6, @"PeopleTable should have 6 rows");
         
         for (NSUInteger i = 0; i < [table rowCount]; i++) {
-            PeopleTableRow *row = [table rowAtIndex:i];
-            NSLog(@"%zu: %@", i, row.Name);
+            RLMPerson2 *row = table[i];
+            NSLog(@"%zu: %@", i, row[@"name"]);
         }
     }];
 }
