@@ -4,7 +4,7 @@ test_DEPS = .
 # Headers to be installed
 nobase_subinclude_HEADERS = RLMConstants.h RLMType.h RLMRow.h RLMQuery.h \
 RLMTable.h RLMRealm.h RLMPrivate.h Realm.h RLMVersion.h RLMDescriptor.h \
-RLMView.h RLMColumnProxy.h RLMViewProtocol.h RLMFast.h RLMRowFast.h RLMTools.h
+RLMView.h RLMColumnProxy.h RLMViewProtocol.h RLMFast.h RLMRowFast.h
 
 nobase_subinclude_HEADERS_EXTRA_UNINSTALL = *.h
 
