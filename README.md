@@ -12,8 +12,8 @@ You need the standard set of build tools. This includes an
 Objective-C/C++ compiler. The Objective-C language binding is 
 thoroughly tested with Clang. It is known to work with Clang 3.0 and newer.
 
-Currently, the Objective-C binding is availble only on Mac OS X (and
-iOS). The following is a suggestion of how to install the
+Currently, the Objective-C binding is available only for iOS and OS X. 
+The following is a suggestion of how to install the
 prerequisites on Mac OS X 10.7, 10.8, and 10.9:
 
 The build procedure uses Clang as the C/C++ compiler by default. It
@@ -56,7 +56,6 @@ The following libraries are installed:
 Here is a more complete set of build-related commands:
 
     sh build.sh config
-    sh build.sh ci-clean
     sh build.sh clean
     sh build.sh build
     sh build.sh test
@@ -66,9 +65,6 @@ Here is a more complete set of build-related commands:
     sudo sh build.sh install
     sh build.sh test-intalled
     sudo sh build.sh uninstall
-
-The `ci-clean` and `ci-test` targets should be used with caution as they 
-discard all changes made to both this and core repositories.
 
 In order to build the `ci-test` target of `build.sh` it is also required to 
 install [xctool](https://github.com/facebook/xctool).
