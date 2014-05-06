@@ -26,10 +26,6 @@ NSString *const RLMTestRealmPathLock = @"test.realm.lock";
     [super tearDown];
 }
 
-- (RLMRealm *)realmPersistedAtTestPath {
-    return [RLMRealm realmWithPath:RLMTestRealmPath];
-}
-
 - (RLMRealm *)realmWithTestPath {
     return [RLMRealm realmWithPath:RLMTestRealmPath error:nil];
 }

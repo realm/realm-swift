@@ -114,7 +114,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryAllTable, TestQueryAllObject);
         XCTFail(@"Failed to set readonly attributes");
     }
     
-    RLMRealm *fromDisk = [self realmPersistedAtTestPath];
+    RLMRealm *fromDisk = [self realmWithTestPath];
     XCTAssertNotNil(fromDisk, @"realm from disk should be valid");
 
     PeopleErrTable *diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PeopleErrTable class]];
