@@ -8,7 +8,6 @@
 #import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
-#import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 @interface RLMPerson2 : RLMRow
 

@@ -8,7 +8,6 @@
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMQueryFast.h>
 #import <realm/objc/RLMTableFast.h>
-#import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 @interface TestQueryObj : RLMRow
 
