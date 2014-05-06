@@ -2,21 +2,15 @@ Objective-C
 ===========
 
 This README file explains how to build and install the Realm
-language binding for Objective-C. It assumes that the Realm core
-library has already been installed.
-
+framework for Objective-C. **It assumes that the Realm core
+library has already been installed.**
 
 Prerequisites
 -------------
 
 You need the standard set of build tools. This includes an
-Objective-C/C++ compiler and GNU make. The Objective-C language
-binding is thoroughly tested with Clang. It is known to work with
-Clang 3.0 and newer.
-
-If you are going to modify the Objective-C language binding, you will
-need Cheetah for Python (http://www.cheetahtemplate.org). It is needed
-because some source files are generated from Cheetah templates.
+Objective-C/C++ compiler. The Objective-C language binding is 
+thoroughly tested with Clang. It is known to work with Clang 3.0 and newer.
 
 Currently, the Objective-C binding is availble only on Mac OS X (and
 iPhone). The following is a suggestion of how to install the
@@ -33,21 +27,12 @@ installed, and, if so, what version it is:
 
     xcodebuild -version
 
-If you have Xcode 5 or later, you will already have the required
-command line tools installed. In Xcode 4, however, the "Command line
-tools" is an optional Xcode add-on that you must install. You can find
-it under the "Downloads" pane of the "Preferences" dialog in the Xcode
-4 menu.
-
-Download the latest version of Python Cheetah
-(https://pypi.python.org/packages/source/C/Cheetah/Cheetah-2.4.4.tar.gz),
-then:
-
-    tar xf Cheetah-2.4.4.tar.gz
-    cd Cheetah-2.4.4/
-    sudo python setup.py install
-
-
+The Xcode "Command Line Tools" are required to build the framework. 
+If you have Xcode 5 on OS X 10.9 or later, you can install the Xcode 
+Command Line Tools by running `xcode-select --install`. In Xcode 4, however, 
+the "Command Line tools" is an optional Xcode add-on that you must install. 
+You can find it under the "Downloads" pane of the "Preferences" dialog 
+in the Xcode 4 menu.
 
 Configure, build, install
 -------------------------
@@ -71,24 +56,29 @@ The following libraries are installed:
 Here is a more complete set of build-related commands:
 
     sh build.sh config
+    sh build.sh ci-clean
     sh build.sh clean
     sh build.sh build
     sh build.sh test
+    sh build.sh ci-test
     sh build.sh test-debug
     sh build.sh show-install
     sudo sh build.sh install
     sh build.sh test-intalled
     sudo sh build.sh uninstall
 
-In order to build the ci-test target of build.sh it is also required to install xctool (https://github.com/facebook/xctool).
+The `ci-clean` and `ci-test` targets should be used with caution as they 
+discard all changes made to both this and core repositories.
 
+In order to build the `ci-test` target of `build.sh` it is also required to 
+install [xctool](https://github.com/facebook/xctool).
 
-Building for iPhone
+Building for iOS
 -------------------
 
 On Mac OS X it is possible to build a version of the Objective-C
-language binding for iOS (the iPhone OS). It requires that the
-iPhoneOS and iPhoneSimulator SDKs for Xcode are installed.
+language binding for iOS. It requires that the iPhoneOS and iPhoneSimulator 
+SDKs for Xcode are installed.
 
 It also requires that a prebuilt version of the core library for iOS
 is available. By default, the configuration step will look for it in
@@ -97,7 +87,7 @@ set the environment variable REALM_IPHONE_CORE_LIB to the correct
 path before invoking the configuration step.
 
 Run the following command to build the Objective-C language binding
-for iPhone:
+for iOS:
 
     sh build.sh build-iphone
 
@@ -111,11 +101,11 @@ The `include` directory holds a copy of the header files, which are
 identical to the ones installed by `sh build.sh install`. There are
 two versions of the static library, one that is compiled with
 optimization, and one that is compiled for debugging. Each one
-contains code compiled for both iPhone and for the iPhone
-simulator. Each one also includes the Realm core library and is
-therefore self contained.
+contains code compiled for both iOS devices and for the iOS
+Simulator. Each one also includes the Realm core library and is
+therefore self-contained.
 
-After building, the iPhone version of the Objective-C language binding
+After building, the iOS version of the Objective-C language binding
 can be tested via the Xcode project in:
 
     test-iphone/
@@ -125,7 +115,8 @@ the command:
 
     sh build.sh ios-framework
 
-The framework is stored in the `tightdb-ios.zip` file.
+The framework is created both in the root directory and stored 
+in the `realm-ios.zip` file.
 
 Configuration
 -------------
@@ -142,7 +133,7 @@ By default, the configuration step uses `which tightdb-config` to
 locate the installation of the Realm core library. If this is not
 appropriate, because you have multiple versions of the Realm core
 library installed, or `tightdb-config` is not available in your
-`PATH`, set the environment variable `REALM_CONFIG` before calling
+`$PATH`, set the environment variable `REALM_CONFIG` before calling
 `sh build.sh config`. For example:
 
     REALM_CONFIG=/opt/tightdb-v0.1.2/bin/tightdb-config build.sh config
