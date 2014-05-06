@@ -23,10 +23,8 @@
 
 // Realm model object
 @interface DemoObject : RLMRow
-
 @property (nonatomic, copy)   NSString *title;
 @property (nonatomic, strong) NSDate   *date;
-
 @end
 
 @implementation DemoObject
@@ -60,6 +58,10 @@ static NSString * const kTableName = @"table";
 
 - (void)setupUI {
     self.title = @"TableViewExample";
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"BG Add"
+                                                                             style:UIBarButtonItemStylePlain
+                                                                            target:self
+                                                                            action:@selector(backgroundAdd)];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                                                            target:self
                                                                                            action:@selector(add)];
@@ -118,6 +120,22 @@ static NSString * const kTableName = @"table";
 }
 
 #pragma mark - Actions
+
+- (void)backgroundAdd {
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    // Import many items in a background thread
+    dispatch_async(queue, ^{
+        // Get new realm and table since we are in a new thread
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        RLMTable *table = [realm tableWithName:kTableName objectClass:[DemoObject class]];
+        [realm beginWriteTransaction];
+        for (NSInteger index = 0; index < 5; index++) {
+            // Add row via dictionary. Order is ignored.
+            [table addRow:@{@"title": [self randomString], @"date": [self randomDate]}];
+        }
+        [realm commitWriteTransaction];
+    });
+}
 
 - (void)add {
     [self.realm beginWriteTransaction];
