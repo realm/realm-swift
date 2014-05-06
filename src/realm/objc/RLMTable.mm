@@ -126,6 +126,11 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
     return *m_table;
 }
 
+-(tightdb::TableRef)getNativeTableRef
+{
+    return m_table;
+}
+
 -(void)setNativeTable:(tightdb::Table*)table
 {
     m_table.reset(table);

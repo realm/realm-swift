@@ -76,7 +76,7 @@ using namespace std;
 
 -(RLMRow *)getRow:(long)ndx
 {
-    return m_tmp_row = [[RLMRow alloc] initWithTable:[self.originTable getNativeTable] ndx:ndx readOnly:self.originTable.isReadOnly];
+    return m_tmp_row = [[RLMRow alloc] initWithTable:[self.originTable getNativeTableRef] ndx:ndx readOnly:self.originTable.isReadOnly];
 }
 
 -(long)getFastEnumStart
