@@ -32,6 +32,8 @@
 #include <tightdb/table.hpp>
 #include <tightdb/table_ref.hpp>
 
+#import "RLMType.h"
+
 struct ObjcStringAccessor {
     ObjcStringAccessor(const NSString* s)
     {
@@ -161,6 +163,32 @@ inline bool nsnumber_is_like_double(NSObject *obj)
             strcmp(data_type, @encode(unsigned int)) == 0 ||
             strcmp(data_type, @encode(unsigned long)) == 0 ||
             strcmp(data_type, @encode(unsigned long long)) == 0);
+}
+
+inline const char *rlmtype_to_string(RLMType type) {
+    switch (type) {
+        case RLMTypeNone:
+            return "None";
+        case RLMTypeString:
+            return "string";
+        case RLMTypeInt:
+            return "int";
+        case RLMTypeBool:
+            return "bool";
+        case RLMTypeDate:
+            return "date";
+        case RLMTypeBinary:
+            return "binary";
+        case RLMTypeDouble:
+            return "double";
+        case RLMTypeFloat:
+            return "float";
+        case RLMTypeMixed:
+            return "mixed";
+        case RLMTypeTable:
+            return "table";
+    }
+    return "Unknown";
 }
 
 void to_mixed(id value, tightdb::Mixed& m);
