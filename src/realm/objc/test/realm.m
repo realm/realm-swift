@@ -90,7 +90,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestTable, RLMTestObject);
         [realm createTableWithName:tableName];
     }];
 
-    [self waitForTimeout:1.0f];
+    [self waitForTimeout:2.0f];
     
     XCTAssertTrue(notificationFired, @"A notification should have fired after a table was created");
     XCTAssertNotNil(table, @"The RLMRealm should be able to read a newly \
@@ -120,7 +120,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestTable, RLMTestObject);
         }];
     });
     
-    [self waitForTimeout:2.0f];
+    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:2.0f];
     
     XCTAssertTrue(notificationFired, @"A notification should have fired after a table was created");
     
@@ -151,7 +151,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestTable, RLMTestObject);
     });
     
     // this should complete very fast before the timer
-    [self waitForTimeout:.0001f];
+    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:2.0f];
     
     XCTAssertTrue(notificationFired, @"A notification should have fired immediately a table was created in the background");
     
@@ -184,7 +184,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestTable, RLMTestObject);
             [self notify:XCTAsyncTestCaseStatusSucceeded];
         });
         
-        [self waitForTimeout:1.0f];
+        [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:2.0f];
     }
     
     // make sure implicit commit took place
@@ -195,7 +195,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestTable, RLMTestObject);
         [self notify:XCTAsyncTestCaseStatusSucceeded];
     });
     
-    [self waitForTimeout:1.0f];
+    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:2.0f];
 }
  */
 
@@ -211,7 +211,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestTable, RLMTestObject);
                         should not throw an exception.");
         [self notify:XCTAsyncTestCaseStatusSucceeded];
     });
-    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:1.0f];
+    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:2.0f];
 }
 
 
@@ -223,7 +223,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestTable, RLMTestObject);
                          shouldn't throw an exception.");
         [self notify:XCTAsyncTestCaseStatusSucceeded];
     });
-    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:1.0f];
+    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:2.0f];
 }
 
 - (void)testHasTableWithName {
