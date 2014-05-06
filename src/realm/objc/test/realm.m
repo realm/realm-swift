@@ -9,8 +9,17 @@
 #import <realm/objc/Realm.h>
 #import "XCTestCase+AsyncTesting.h"
 
-REALM_TABLE_1(RLMTestTable,
-              column, String)
+@interface RLMTestObject : RLMRow
+
+@property (nonatomic, copy) NSString *column;
+
+@end
+
+@implementation RLMTestObject
+
+@end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestTable, RLMTestObject);
 
 @interface RLMRealmTests : RLMTestCase
 
