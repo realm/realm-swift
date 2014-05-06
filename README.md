@@ -80,6 +80,7 @@ Here is a more complete set of build-related commands:
     sh build.sh test-intalled
     sudo sh build.sh uninstall
 
+In order to build the ci-test target of build.sh it is also required to install xctool (https://github.com/facebook/xctool).
 
 
 Building for iPhone
