@@ -713,7 +713,7 @@ Unspecified or bad mode '$MODE'.
 Available modes are:
   config clean build build-iphone test test-debug test-gdb test-cover
   show-install install uninstall test-installed install-prod install-devel
-  uninstall-prod uninstall-devel dist-copy ios-framework
+  uninstall-prod uninstall-devel dist-copy ios-framework ci-test
   get-version set-version docs
 EOF
         exit 1
