@@ -403,7 +403,7 @@ EOF
            echo "This target must be run as root or with sudo" 1>&2
            exit 1
         fi
-        mkdir -p test-reports
+        mkdir -p test-reports || exit 1
         (
             cd ../tightdb
             mkdir -p install
@@ -411,21 +411,19 @@ EOF
             sh build.sh build-iphone
             sh build.sh build
             sh build.sh install
-        )
-        export REALM_CONFIG=../tightdb/install/bin/tightdb-config
-        sh build.sh config
-        sh build.sh build
-        sh build.sh build-iphone
-        sh build.sh ios-framework
-        sh build.sh test-debug
+        ) || exit 1
         (
-            cd doc/ref/RefDocExamples
-            xctool -scheme RefDocExamples -project RefDocExamples.xcodeproj clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
-        )
+            export REALM_CONFIG=../tightdb/install/bin/tightdb-config
+            sh build.sh config
+            sh build.sh build
+            sh build.sh build-iphone
+            sh build.sh ios-framework
+            sh build.sh test-debug
+            ) || exit 1
         (
             cd examples/RealmTableViewExample
             xctool -project RealmTableViewExample.xcodeproj -scheme RealmTableViewExample clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
-        )
+        ) || exit 1
         exit 0;
         ;;
 
