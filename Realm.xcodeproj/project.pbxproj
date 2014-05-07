@@ -38,7 +38,6 @@
 		4D143CF018F7E8C200CEFF65 /* RLMRealm.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4D143CED18F7E8C200CEFF65 /* RLMRealm.mm */; };
 		4D143CF318F7E97500CEFF65 /* RLMConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D143CF118F7E97500CEFF65 /* RLMConstants.h */; };
 		4D143CF418F7E97500CEFF65 /* RLMConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D143CF218F7E97500CEFF65 /* RLMConstants.m */; };
-		4D1ED30818E1AF4E003CFF44 /* PrivateTableMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */; };
 		4DB1DEFC18BF70AE005A7234 /* functional.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEF918BF70AE005A7234 /* functional.m */; };
 		4DB1DEFD18BF70AE005A7234 /* typed_table.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1DEFA18BF70AE005A7234 /* typed_table.m */; };
 		4DDDD67418EB049300E94613 /* RLMViewProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DDDD67318EB049300E94613 /* RLMViewProtocol.h */; };
@@ -53,7 +52,6 @@
 		E91890B9177B677900653D7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E91890B7177B677900653D7A /* InfoPlist.strings */; };
 		E91890D6177B67AB00653D7A /* RLMRow.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890C5177B67AB00653D7A /* RLMRow.mm */; };
 		E91890D7177B67AB00653D7A /* RLMRow.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890C6177B67AB00653D7A /* RLMRow.h */; };
-		E91890DD177B67AB00653D7A /* PrivateHelperMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CC177B67AB00653D7A /* PrivateHelperMacros.h */; };
 		E91890DE177B67AB00653D7A /* RLMQuery.mm in Sources */ = {isa = PBXBuildFile; fileRef = E91890CD177B67AB00653D7A /* RLMQuery.mm */; };
 		E91890DF177B67AB00653D7A /* RLMQuery_noinst.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CE177B67AB00653D7A /* RLMQuery_noinst.h */; };
 		E91890E0177B67AB00653D7A /* RLMQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = E91890CF177B67AB00653D7A /* RLMQuery.h */; };
@@ -109,19 +107,16 @@
 		42AD3A9518CDBDFF00C86073 /* RLMVersion.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMVersion.mm; path = src/realm/objc/RLMVersion.mm; sourceTree = SOURCE_ROOT; };
 		42AD3A9618CDBDFF00C86073 /* RLMVersion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMVersion.h; path = src/realm/objc/RLMVersion.h; sourceTree = SOURCE_ROOT; };
 		4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		4BB05A771907464200F7F5F9 /* RLMPrivateTableMacrosFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMPrivateTableMacrosFast.h; sourceTree = "<group>"; };
 		4BB05A78190750B000F7F5F9 /* RLMViewFast.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMViewFast.h; sourceTree = "<group>"; };
 		4BB05A7919079E2700F7F5F9 /* RLMTableFast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTableFast.h; sourceTree = "<group>"; };
 		4D01A9FB18C9F5E600527AD5 /* table_view.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = table_view.m; path = ../src/realm/objc/test/table_view.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		4D01A9FD18C9F60F00527AD5 /* version.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = version.m; path = ../src/realm/objc/test/version.m; sourceTree = "<group>"; };
-		4D143CBC18ED5FCF00CEFF65 /* PrivateTableMacros.h.cheetah */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = PrivateTableMacros.h.cheetah; path = src/realm/objc/PrivateTableMacros.h.cheetah; sourceTree = SOURCE_ROOT; };
 		4D143CCE18F69D0F00CEFF65 /* RLMQueryFast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMQueryFast.h; path = src/realm/objc/RLMQueryFast.h; sourceTree = SOURCE_ROOT; };
 		4D143CEB18F7E8C200CEFF65 /* RLMRealm_noinst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRealm_noinst.h; path = src/realm/objc/RLMRealm_noinst.h; sourceTree = SOURCE_ROOT; };
 		4D143CEC18F7E8C200CEFF65 /* RLMRealm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRealm.h; path = src/realm/objc/RLMRealm.h; sourceTree = SOURCE_ROOT; };
 		4D143CED18F7E8C200CEFF65 /* RLMRealm.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMRealm.mm; path = src/realm/objc/RLMRealm.mm; sourceTree = SOURCE_ROOT; };
 		4D143CF118F7E97500CEFF65 /* RLMConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMConstants.h; path = src/realm/objc/RLMConstants.h; sourceTree = SOURCE_ROOT; };
 		4D143CF218F7E97500CEFF65 /* RLMConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMConstants.m; path = src/realm/objc/RLMConstants.m; sourceTree = SOURCE_ROOT; };
-		4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PrivateTableMacros.h; path = src/realm/objc/PrivateTableMacros.h; sourceTree = SOURCE_ROOT; };
 		4DB1DEF818BF70AE005A7234 /* dynamic_table.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 0; name = dynamic_table.mm; path = ../src/realm/objc/test/dynamic_table.mm; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		4DB1DEF918BF70AE005A7234 /* functional.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = functional.m; path = ../src/realm/objc/test/functional.m; sourceTree = "<group>"; };
 		4DB1DEFA18BF70AE005A7234 /* typed_table.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = typed_table.m; path = ../src/realm/objc/test/typed_table.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
@@ -147,7 +142,6 @@
 		E91890B8177B677900653D7A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E91890C5177B67AB00653D7A /* RLMRow.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMRow.mm; path = src/realm/objc/RLMRow.mm; sourceTree = SOURCE_ROOT; };
 		E91890C6177B67AB00653D7A /* RLMRow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMRow.h; path = src/realm/objc/RLMRow.h; sourceTree = SOURCE_ROOT; };
-		E91890CC177B67AB00653D7A /* PrivateHelperMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PrivateHelperMacros.h; path = src/realm/objc/PrivateHelperMacros.h; sourceTree = SOURCE_ROOT; };
 		E91890CD177B67AB00653D7A /* RLMQuery.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMQuery.mm; path = src/realm/objc/RLMQuery.mm; sourceTree = SOURCE_ROOT; };
 		E91890CE177B67AB00653D7A /* RLMQuery_noinst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMQuery_noinst.h; path = src/realm/objc/RLMQuery_noinst.h; sourceTree = SOURCE_ROOT; };
 		E91890CF177B67AB00653D7A /* RLMQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMQuery.h; path = src/realm/objc/RLMQuery.h; sourceTree = SOURCE_ROOT; };
@@ -201,7 +195,6 @@
 				4D143CCE18F69D0F00CEFF65 /* RLMQueryFast.h */,
 				4BB05A7919079E2700F7F5F9 /* RLMTableFast.h */,
 				4BB05A78190750B000F7F5F9 /* RLMViewFast.h */,
-				4BB05A771907464200F7F5F9 /* RLMPrivateTableMacrosFast.h */,
 			);
 			name = RLMFast;
 			sourceTree = "<group>";
@@ -264,9 +257,6 @@
 				4DDDD67118EAF1DC00E94613 /* RLMFast */,
 				4220871418E042FD00F3CF27 /* NSData+RLMGetBinaryData.h */,
 				4220871518E042FD00F3CF27 /* NSData+RLMGetBinaryData.mm */,
-				E91890CC177B67AB00653D7A /* PrivateHelperMacros.h */,
-				4D1ED30718E1AF4E003CFF44 /* PrivateTableMacros.h */,
-				4D143CBC18ED5FCF00CEFF65 /* PrivateTableMacros.h.cheetah */,
 				424EEF9D18D9C10100337A13 /* RLMColumnProxy.h */,
 				424EEFB118D9C97900337A13 /* RLMColumnProxy.mm */,
 				4D143CF118F7E97500CEFF65 /* RLMConstants.h */,
@@ -359,7 +349,6 @@
 				0297850819087BF800148C3B /* RLMProperty.h in Headers */,
 				E8F4C11F191418CD00116AAE /* query_util.h in Headers */,
 				0297850A19087BF800148C3B /* RLMProxy.h in Headers */,
-				E91890DD177B67AB00653D7A /* PrivateHelperMacros.h in Headers */,
 				424EEFAF18D9C15A00337A13 /* RLMView_noinst.h in Headers */,
 				E91890DF177B67AB00653D7A /* RLMQuery_noinst.h in Headers */,
 				424EEF9E18D9C10100337A13 /* RLMColumnProxy.h in Headers */,
@@ -372,7 +361,6 @@
 				4BB05A7A19079E2700F7F5F9 /* RLMTableFast.h in Headers */,
 				E91890E3177B67AB00653D7A /* RLMTable.h in Headers */,
 				4DDDD67418EB049300E94613 /* RLMViewProtocol.h in Headers */,
-				4D1ED30818E1AF4E003CFF44 /* PrivateTableMacros.h in Headers */,
 				E91890E4177B67AB00653D7A /* Realm.h in Headers */,
 				E91890E5177B67AB00653D7A /* RLMType.h in Headers */,
 				4D143CF318F7E97500CEFF65 /* RLMConstants.h in Headers */,
