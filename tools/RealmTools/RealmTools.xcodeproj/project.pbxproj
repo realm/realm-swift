@@ -87,7 +87,8 @@
 				4BE8BBE4191ACB4D0074AB20 /* RealmTools.1 */,
 				4BE8BBE2191ACB4D0074AB20 /* Supporting Files */,
 			);
-			path = RealmTools;
+			name = RealmTools;
+			path = src;
 			sourceTree = "<group>";
 		};
 		4BE8BBE2191ACB4D0074AB20 /* Supporting Files */ = {
@@ -246,7 +247,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "RealmTools/RealmTools-Prefix.pch";
+				GCC_PREFIX_HEADER = "src/RealmTools-Prefix.pch";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -255,7 +256,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "RealmTools/RealmTools-Prefix.pch";
+				GCC_PREFIX_HEADER = "src/RealmTools-Prefix.pch";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -279,6 +280,7 @@
 				4BE8BBEA191ACB4D0074AB20 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
