@@ -201,14 +201,17 @@ NSObject* get_cell(size_t col_ndx, size_t row_ndx, tightdb::Table& table);
 void verify_row_with_array(const tightdb::Descriptor &descr, NSArray *data);
 void insert_row_with_array(size_t ndx, tightdb::Table &table, NSArray *data);
 void update_row_with_array(size_t ndx, tightdb::Table &table, NSArray *data);
+void set_row_with_array(size_t ndx, tightdb::Table &table, NSArray *data);
 
 void verify_row_with_dictionary(const tightdb::Descriptor &descr, NSDictionary *data);
 void insert_row_with_dictionary(size_t row_ndx, tightdb::Table &table, NSDictionary *data);
 void update_row_with_dictionary(size_t row_ndx, tightdb::Table &table, NSDictionary *data);
+void set_row_with_dictionary(size_t row_ndx, tightdb::Table &table, NSDictionary *data);
 
 void verify_row_with_object(const tightdb::Descriptor &descr, NSObject *data);
 void insert_row_with_object(size_t row_ndx, tightdb::Table &table, NSObject *data);
 void update_row_with_object(size_t row_ndx, tightdb::Table &table, NSObject *data);
+void set_row_with_object(size_t row_ndx, tightdb::Table &table, NSObject *data);
 
 
 BOOL set_columns(tightdb::TableRef& parent, NSArray *schema);
