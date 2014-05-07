@@ -1,0 +1,4 @@
+<entry>
+  <version>${DOCSET_FEED_VERSION}</version>
+  <url>${DOCSET_PACKAGE_URL}</url>
+</entry>
