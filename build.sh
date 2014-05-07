@@ -657,7 +657,6 @@ EOF
                     --create-html \
                     --no-create-docset \
                     --no-repeat-first-par \
-                    --ignore src/realm/objc/PrivateTableMacros.h \
                     --ignore src/realm/objc/RLMColumnProxy.h \
                     --ignore src/realm/objc/RLMProxy.h \
                     --ignore src/realm/objc/RLMQuery.h \

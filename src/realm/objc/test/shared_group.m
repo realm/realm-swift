@@ -12,9 +12,17 @@
 #import <realm/objc/RLMViewFast.h>
 #import <realm/objc/RLMRealm.h>
 
-REALM_TABLE_2(SharedTable2,
-              Hired, Bool,
-              Age,   Int)
+@interface RLMSharedObject : RLMRow
+
+@property (nonatomic, assign) BOOL hired;
+@property (nonatomic, assign) NSInteger age;
+
+@end
+
+@implementation RLMSharedObject
+@end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMSharedTable, RLMSharedObject);
 
 @interface MACTestSharedGroup: RLMTestCase
 
@@ -28,53 +36,50 @@ REALM_TABLE_2(SharedTable2,
     
     [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
-        SharedTable2 *table = [realm createTableWithName:@"employees" asTableClass:[SharedTable2 class]];
-        NSLog(@"Table: %@", table);
-        // Add some rows
-        [table addHired:YES Age:50];
-        [table addHired:YES Age:52];
-        [table addHired:YES Age:53];
-        [table addHired:YES Age:54];
+        RLMSharedTable *table = [RLMSharedTable tableInRealm:realm named:@"table"];
         
-        NSLog(@"MyTable Size: %lu", [table rowCount]);
+        // Add some rows
+        [table addRow:@[@YES, @50]];
+        [table addRow:@[@YES, @52]];
+        [table addRow:@[@YES, @53]];
+        [table addRow:@[@YES, @54]];
     }];
     
     RLMRealm *realm = [self realmWithTestPath];
-    SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
-    NSLog(@"Disktable size: %zu", [diskTable rowCount]);
+    RLMSharedTable *diskTable = [RLMSharedTable tableInRealm:realm named:@"table"];
     for (NSUInteger i = 0; i < [diskTable rowCount]; i++) {
-        SharedTable2Row *cursor = [diskTable rowAtIndex:i];
-        NSLog(@"%zu: %lld", i, cursor.Age);
-        NSLog(@"%zu: %i", i, [diskTable RLM_boolInColumnWithIndex: 0 atRowIndex:i]);
+        RLMSharedObject *cursor = [diskTable rowAtIndex:i];
+        NSLog(@"%zu: %ld", i, cursor.age);
+        NSLog(@"%zu: %i", i, cursor.hired);
     }
     
     [realm writeUsingBlock:^(RLMRealm *realm) {
-        SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
+        RLMSharedTable *diskTable = [RLMSharedTable tableInRealm:realm named:@"table"];
         NSLog(@"Disktable size: %zu", [diskTable rowCount]);
         for (NSUInteger i = 0; i < 50; i++) {
-            [diskTable addHired:YES Age:i];
+            [diskTable addRow:@[@YES, @(i)]];
         }
     }];
     
     [realm beginWriteTransaction];
-    diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
+    diskTable = [RLMSharedTable tableInRealm:realm named:@"table"];
     NSLog(@"Disktable size: %zu", [diskTable rowCount]);
     for (NSUInteger i = 0; i < 50; i++) {
-        [diskTable addHired:YES Age:i];
+        [diskTable addRow:@[@YES, @(i)]];
     }
     [realm rollbackWriteTransaction];
     
     [realm writeUsingBlock:^(RLMRealm *realm) {
-        SharedTable2* diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
+        RLMSharedTable *diskTable = [RLMSharedTable tableInRealm:realm named:@"table"];
         NSLog(@"Disktable size: %zu", [diskTable rowCount]);
         for (NSUInteger i = 0; i < 50; i++) {
-            [diskTable addHired:YES Age:i];
+            [diskTable addRow:@[@YES, @(i)]];
         }
         
         XCTAssertNil([realm tableWithName:@"Does not exist"], @"Table does not exist");
     }];
     
-    diskTable = [realm tableWithName:@"employees" asTableClass:[SharedTable2 class]];
+    diskTable = [RLMSharedTable tableInRealm:realm named:@"table"];
     NSLog(@"Disktable size: %zu", [diskTable rowCount]);
     
     XCTAssertThrows([diskTable removeAllRows], @"Not allowed in read transaction");
