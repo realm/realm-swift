@@ -360,4 +360,15 @@
 
 -(RLMType)mixedTypeForColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex;
 
+/**---------------------------------------------------------------------------------------
+ *  @name JSON Serialization
+ *  ---------------------------------------------------------------------------------------
+ */
+
+/** Construct a JSON representation of all the data stored in a table.
+ 
+ @return String JSON representation of the table's data.
+ */
+- (NSString *)toJSONString;
+
 @end

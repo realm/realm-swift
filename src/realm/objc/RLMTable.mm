@@ -21,6 +21,7 @@
 #import <Foundation/Foundation.h>
 
 #include <tightdb/lang_bind_helper.hpp>
+#include <sstream>
 
 #import "RLMView_noinst.h"
 #import "RLMQuery_noinst.h"
@@ -46,6 +47,8 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
     @throw RLM_predicate_exception(@"Invalid value",       \
                                    @"predicate must be either an NSPredicate or an NSString with optional format va_list"); \
 }                                                          \
+
+using namespace std;
 
 @implementation RLMTable
 {
@@ -1449,6 +1452,15 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
         }
     }
     return YES;
+}
+
+- (NSString *)toJSONString {
+    
+    ostringstream out;
+    m_table->to_json(out);
+    string str = out.str();
+    
+    return [NSString stringWithUTF8String:str.c_str()];
 }
 
 @end
