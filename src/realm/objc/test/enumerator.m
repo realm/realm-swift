@@ -8,7 +8,6 @@
 #import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
-#import <realm/objc/RLMPrivateTableMacrosFast.h>
 
 @interface EnumPeople : RLMRow
 @property NSString * Name;
@@ -18,12 +17,6 @@
 
 @implementation EnumPeople
 @end
-
-REALM_TABLE_2(EnumPeopleTable2,
-              Hired, Bool,
-              Age,   Int)
-
-REALM_TABLE_FAST(EnumPeopleTable2)
 
 @interface MACTestEnumerator : RLMTestCase
 @end

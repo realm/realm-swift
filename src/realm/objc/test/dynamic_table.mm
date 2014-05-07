@@ -23,6 +23,7 @@
 #import <realm/objc/RLMFast.h>
 #import <realm/objc/RLMTableFast.h>
 #import <realm/objc/RLMTable_noinst.h>
+#import <realm/objc/RLMDescriptor.h>
 
 using namespace std;
 @interface TestClass : NSObject
