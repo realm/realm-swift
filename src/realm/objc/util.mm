@@ -250,7 +250,7 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
                 while (subobj = [subenumerator nextObject]) {
                     if (![subobj isKindOfClass:[NSArray class]])
                         return NO;
-                    verify_row(*subdescr, (NSArray *)subobj);
+                    verify_row_with_array(*subdescr, (NSArray *) subobj);
                 }
                 break;
             }
@@ -264,7 +264,7 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
 }
 
 
-void verify_row(const Descriptor& descr, NSArray* data)
+void verify_row_with_array(const Descriptor &descr, NSArray *data)
 {
     if (descr.get_column_count() != [data count]) {
         @throw [NSException exceptionWithName:@"realm:wrong_column_count"
@@ -288,7 +288,7 @@ void verify_row(const Descriptor& descr, NSArray* data)
     }
 }
 
-void verify_row_with_labels(const Descriptor& descr, NSDictionary* data)
+void verify_row_with_dictionary(const Descriptor &descr, NSDictionary *data)
 {
     size_t n = descr.get_column_count();
     for (size_t i = 0; i < n; ++i) {
@@ -305,7 +305,7 @@ void verify_row_with_labels(const Descriptor& descr, NSDictionary* data)
     }
 }
 
-void verify_row_from_object(const Descriptor& descr, NSObject* data)
+void verify_row_with_object(const Descriptor &descr, NSObject *data)
 {
     size_t count = descr.get_column_count();
     for (size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
@@ -444,7 +444,7 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
 }
 
 
-void insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
+void insert_row_with_array(size_t row_ndx, tightdb::Table &table, NSArray *data)
 {
     NSEnumerator *enumerator = [data objectEnumerator];
     id obj;
@@ -481,14 +481,14 @@ void insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
                 }
 
                 // Fill in data
-                insert_row(subtable->size(), *subtable, subobj);
+                insert_row_with_array(subtable->size(), *subtable, subobj);
                 ++sub_ndx;
             }
         }
     }
 }
 
-void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
+void insert_row_with_dictionary(size_t row_ndx, Table &table, NSDictionary *data)
 {
     bool subtables_seen = false;
 
@@ -518,12 +518,12 @@ void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
             TableRef subtable = table.get_subtable(col_ndx, row_ndx);
 
             // fill in data
-            insert_row_with_labels(row_ndx, *subtable, (NSDictionary *)value);
+            insert_row_with_dictionary(row_ndx, *subtable, (NSDictionary *) value);
         }
     }
 }
 
-void insert_row_from_object(size_t row_ndx, Table& table, NSObject *data) {
+void insert_row_with_object(size_t row_ndx, Table &table, NSObject *data) {
     bool subtables_seen = false;
 
     size_t count = table.get_column_count();
@@ -555,7 +555,7 @@ void insert_row_from_object(size_t row_ndx, Table& table, NSObject *data) {
                 continue;
             }
             TableRef subtable = table.get_subtable(col_ndx, row_ndx);
-            insert_row_from_object(row_ndx, *subtable, value);
+            insert_row_with_object(row_ndx, *subtable, value);
         }
     }
 }

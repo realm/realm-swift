@@ -403,20 +403,20 @@ using namespace std;
     tightdb::ConstDescriptorRef desc = table.get_descriptor();
     
     if ([anObject isKindOfClass:[NSArray class]]) {
-        verify_row(*desc, (NSArray *)anObject);
-        insert_row(size_t(rowIndex), table, (NSArray *)anObject);
+        verify_row_with_array(*desc, (NSArray *) anObject);
+        insert_row_with_array(size_t(rowIndex), table, (NSArray *) anObject);
         return;
     }
     
     if ([anObject isKindOfClass:[NSDictionary class]]) {
-        verify_row_with_labels(*desc, (NSDictionary *)anObject);
-        insert_row_with_labels(size_t(rowIndex), table, (NSDictionary *)anObject);
+        verify_row_with_dictionary(*desc, (NSDictionary *) anObject);
+        insert_row_with_dictionary(size_t(rowIndex), table, (NSDictionary *) anObject);
         return;
     }
     
     if ([anObject isKindOfClass:[NSObject class]]) {
-        verify_row_from_object(*desc, (NSObject *)anObject);
-        insert_row_from_object(size_t(rowIndex), table, (NSObject *)anObject);
+        verify_row_with_object(*desc, (NSObject *) anObject);
+        insert_row_with_object(size_t(rowIndex), table, (NSObject *) anObject);
         return;
     }
 
@@ -442,19 +442,19 @@ using namespace std;
     
     // These should call update_row. Will re-implement update_row_with_array() when setRow:atIndex is implemented.
     if ([anObject isKindOfClass:[NSArray class]]) {
-        verify_row(*desc, (NSArray *)anObject);
+        verify_row_with_array(*desc, (NSArray *) anObject);
         update_row_with_array(size_t(rowIndex), table, (NSArray *) anObject);
         return;
     }
     
     if ([anObject isKindOfClass:[NSDictionary class]]) {
-        verify_row_with_labels(*desc, (NSDictionary *)anObject);
+        verify_row_with_dictionary(*desc, (NSDictionary *) anObject);
         update_row_with_dictionary(size_t(rowIndex), table, (NSDictionary *) anObject);
         return;
     }
     
     if ([anObject isKindOfClass:[NSObject class]]) {
-        verify_row_from_object(*desc, (NSObject *)anObject);
+        verify_row_with_object(*desc, (NSObject *) anObject);
         update_row_with_object(size_t(rowIndex), table, (NSObject *) anObject);
         return;
     }
