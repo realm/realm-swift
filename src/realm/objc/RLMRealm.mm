@@ -36,14 +36,15 @@ using namespace std;
 using namespace tightdb;
 using namespace tightdb::util;
 
-namespace rlm {
-    // create NSException from c++ exception
-    void throw_objc_exception(exception &ex) {
-        NSString *errorMessage = [NSString stringWithUTF8String:ex.what()];
-        @throw [NSException exceptionWithName:@"RLMException" reason:errorMessage userInfo:nil];
-    }
+namespace {
+
+// create NSException from c++ exception
+void throw_objc_exception(exception &ex) {
+    NSString *errorMessage = [NSString stringWithUTF8String:ex.what()];
+    @throw [NSException exceptionWithName:@"RLMException" reason:errorMessage userInfo:nil];
 }
-using namespace rlm;
+
+} // anonymous namespace
 
 
 // simple weak wrapper for a weak target timer
