@@ -440,22 +440,22 @@ using namespace std;
     tightdb::Table& table = *m_table;
     tightdb::ConstDescriptorRef desc = table.get_descriptor();
     
-    // These should call update_row. Will re-implement set_row() when setRow:atIndex is implemented.
+    // These should call update_row. Will re-implement update_row_with_array() when setRow:atIndex is implemented.
     if ([anObject isKindOfClass:[NSArray class]]) {
         verify_row(*desc, (NSArray *)anObject);
-        set_row(size_t(rowIndex), table, (NSArray*)anObject);
+        update_row_with_array(size_t(rowIndex), table, (NSArray *) anObject);
         return;
     }
     
     if ([anObject isKindOfClass:[NSDictionary class]]) {
         verify_row_with_labels(*desc, (NSDictionary *)anObject);
-        set_row_with_labels(size_t(rowIndex), table, (NSDictionary*)anObject);
+        update_row_with_dictionary(size_t(rowIndex), table, (NSDictionary *) anObject);
         return;
     }
     
     if ([anObject isKindOfClass:[NSObject class]]) {
         verify_row_from_object(*desc, (NSObject *)anObject);
-        set_row_from_object(size_t(rowIndex), table, (NSObject *)anObject);
+        update_row_with_object(size_t(rowIndex), table, (NSObject *) anObject);
         return;
     }
     
