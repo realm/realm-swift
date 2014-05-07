@@ -450,7 +450,29 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
     }];
 }
 
-- (void)testTableTyped_addSubtable {
+
+- (void)testTableTyped_addSubtableUsingArray {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+        AllTypesTable *table = [AllTypesTable tableInRealm:realm named:@"table"];
+        [table addRow:@[@YES,
+                        @1,
+                        @(0.1f),
+                        @0.2,
+                        @"foo",
+                        [@"foo" dataUsingEncoding:NSUTF8StringEncoding],
+                        [NSDate date],
+                        @[],
+                        @NO,
+                        @123,
+                        @"bar"]];
+        XCTAssertEqual(table.rowCount, 1, @"1 row excepted");
+        XCTAssertEqual(((AgeTable *)table[0][@"tableCol"]).rowCount, 0, @"0 rows excepted");
+    }];
+}
+
+
+
+- (void)testTableTyped_addSubtableUsingDictionary {
     [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
         AllTypesTable *table = [AllTypesTable tableInRealm:realm named:@"table"];
         [table addRow:@{@"boolCol": @YES,
@@ -464,6 +486,8 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
                         @"cBoolCol": @NO,
                         @"longCol": @123,
                         @"mixedCol": @"bar"}];
+        XCTAssertEqual(table.rowCount, 1, @"1 row excepted");
+        XCTAssertEqual(((AgeTable *)table[0][@"tableCol"]).rowCount, 0, @"0 rows excepted");
     }];
 }
 
