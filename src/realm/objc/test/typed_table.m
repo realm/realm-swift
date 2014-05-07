@@ -450,4 +450,21 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
     }];
 }
 
+- (void)testTableTyped_addSubtable {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+        AllTypesTable *table = [AllTypesTable tableInRealm:realm named:@"table"];
+        [table addRow:@{@"boolCol": @YES,
+                        @"intCol": @1,
+                        @"floatCol": @(0.1f),
+                        @"doubleCol": @0.2,
+                        @"stringCol": @"foo",
+                        @"binaryCol": [@"foo" dataUsingEncoding:NSUTF8StringEncoding],
+                        @"dateCol": [NSDate date],
+                        @"tableCol": @[],
+                        @"cBoolCol": @NO,
+                        @"longCol": @123,
+                        @"mixedCol": @"bar"}];
+    }];
+}
+
 @end
