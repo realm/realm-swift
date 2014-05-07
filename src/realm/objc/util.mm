@@ -330,7 +330,7 @@ void verify_row_from_object(const Descriptor& descr, NSObject* data)
 
 bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
 {
-    BOOL subtable_seen = NO;
+    BOOL subtable_seen = false;
     DataType type = table.get_column_type(col_ndx);
     switch (type) {
         case type_Bool:
@@ -390,7 +390,7 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
             }
             break;
         case type_Table:
-            subtable_seen = YES;
+            subtable_seen = true;
             table.insert_subtable(col_ndx, row_ndx);
             break;
         case type_Mixed:
@@ -438,7 +438,7 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 }
                 break;
             }
-            return NO;
+            break;
     }
     return subtable_seen;
 }
@@ -450,7 +450,7 @@ void insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
     id obj;
 
     bool subtable_seen = false;
-    // FIXME: handling of tightdb exceptions => return NO
+    // FIXME: handling of tightdb exceptions
     size_t col_ndx = 0;
     while (obj = [enumerator nextObject]) {
         subtable_seen |= insert_cell(col_ndx, row_ndx, table, obj);
@@ -469,20 +469,28 @@ void insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
                 continue;
             }
 
-            TableRef subtable = table.get_subtable(col_ndx, row_ndx);
-            NSEnumerator *subenumerator = [obj objectEnumerator];
-            id subobj;
-            size_t sub_ndx = 0;
-            while (subobj = [subenumerator nextObject]) {
-                if (datatype == type_Mixed && sub_ndx == 0) {
-                    // first element is the description
-                    ++sub_ndx;
-                    continue;
-                }
+            if ([obj isKindOfClass:[NSArray class]]) {
+                TableRef subtable = table.get_subtable(col_ndx, row_ndx);
+                NSEnumerator *subenumerator = [obj objectEnumerator];
+                id subobj;
+                size_t sub_ndx = 0;
+                while (subobj = [subenumerator nextObject]) {
+                    if (datatype == type_Mixed && sub_ndx == 0) {
+                        // first element is the description
+                        ++sub_ndx;
+                        continue;
+                    }
 
-                // Fill in data
-                insert_row(subtable->size(), *subtable, subobj);
-                ++sub_ndx;
+                    // Fill in data
+                    insert_row(subtable->size(), *subtable, subobj);
+                    ++sub_ndx;
+                }
+                continue;
+            }
+
+            if ([obj isKindOfClass:[RLMTable class]]) {
+                table.insert_subtable(col_ndx, row_ndx, &[obj getNativeTable]);
+                continue;
             }
         }
     }
@@ -499,7 +507,7 @@ void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
         // Do we have a matching label?
         // (missing values are ok, they will be filled out with default values)
         id value = [data valueForKey:col_name];
-        subtables_seen = subtables_seen || insert_cell(col_ndx, row_ndx, table, value);
+        subtables_seen |= insert_cell(col_ndx, row_ndx, table, value);
     }
     table.insert_done();
 
@@ -515,10 +523,30 @@ void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
                 continue;
             }
 
-            TableRef subtable = table.get_subtable(col_ndx, row_ndx);
-
             // fill in data
-            insert_row_with_labels(row_ndx, *subtable, (NSDictionary *)value);
+            if ([value isKindOfClass:[NSArray class]]) {
+                TableRef subtable = table.get_subtable(col_ndx, row_ndx);
+                NSEnumerator *subenumerator = [value objectEnumerator];
+                id subobj;
+                size_t sub_ndx = 0;
+                while (subobj = [subenumerator nextObject]) {
+                    if (type == type_Mixed && sub_ndx == 0) {
+                        // first element is the description
+                        ++sub_ndx;
+                        continue;
+                    }
+
+                    // Fill in data
+                    insert_row(subtable->size(), *subtable, subobj);
+                    ++sub_ndx;
+                }
+                continue;
+            }
+
+            if ([value isKindOfClass:[RLMTable class]]) {
+                table.insert_subtable(col_ndx, row_ndx, &[value getNativeTable]);
+                continue;
+            }
         }
     }
 }
