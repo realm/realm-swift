@@ -423,6 +423,10 @@ EOF
             cd examples/RealmTableViewExample
             xctool -project RealmTableViewExample.xcodeproj -scheme RealmTableViewExample clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
         ) || exit 1
+        (
+            cd examples/RealmPerformanceExample
+            xctool -project RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+        ) || exit 1
         exit 0;
         ;;
 
