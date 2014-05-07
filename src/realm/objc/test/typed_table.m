@@ -465,8 +465,8 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
                         @NO,
                         @123,
                         @"bar"]];
-        XCTAssertEqual(table.rowCount, 1, @"1 row excepted");
-        XCTAssertEqual(((AgeTable *)table[0][@"tableCol"]).rowCount, 0, @"0 rows excepted");
+        XCTAssertEqual(table.rowCount, (NSUInteger)1, @"1 row excepted");
+        XCTAssertEqual(((AgeTable *)table[0][@"tableCol"]).rowCount, (NSUInteger)0, @"0 rows excepted");
     }];
 }
 
@@ -486,8 +486,8 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
                         @"cBoolCol": @NO,
                         @"longCol": @123,
                         @"mixedCol": @"bar"}];
-        XCTAssertEqual(table.rowCount, 1, @"1 row excepted");
-        XCTAssertEqual(((AgeTable *)table[0][@"tableCol"]).rowCount, 0, @"0 rows excepted");
+        XCTAssertEqual(table.rowCount, (NSUInteger)1, @"1 row excepted");
+        XCTAssertEqual(((AgeTable *)table[0][@"tableCol"]).rowCount, (NSUInteger)0, @"0 rows excepted");
     }];
 }
 
