@@ -147,7 +147,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0510;
-				ORGANIZATIONNAME = InvulgoSoft;
+				ORGANIZATIONNAME = "Tightdb Denmark ApS";
 			};
 			buildConfigurationList = E9D58B441541A374009150B1 /* Build configuration list for PBXProject "RealmPerformanceExample" */;
 			compatibilityVersion = "Xcode 3.2";
