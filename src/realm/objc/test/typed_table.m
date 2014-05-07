@@ -29,6 +29,16 @@
 @implementation Sub
 @end
 
+REALM_TABLE_8(TestTableJson,
+              BoolCol,   Bool,
+              IntCol,    Int,
+              FloatCol,  Float,
+              DoubleCol, Double,
+              StringCol, String,
+              BinaryCol, Binary,
+              DateCol,   Date,
+              MixedCol,  Mixed)
+
 RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AgeTable, Sub)
 
 @interface AllTypes : RLMRow
@@ -447,6 +457,25 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
         // Test double max
         XCTAssertEqualWithAccuracy([[table maxOfProperty:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)10.5, 0.1f, @"Maximum should be 10.5");
         XCTAssertEqualWithAccuracy([[table maxOfProperty:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)13.5, 0.1f, @"Maximum should be 13.5");
+    }];
+}
+
+- (void)testToJSONString {
+ 
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        [realm createTableWithName:@"test" asTableClass:[TestTableJson class]];
+        
+        TestTableJson *table = [realm tableWithName:@"test"
+                                            asTableClass:[TestTableJson class]];
+        const char bin[4] = { 0, 1, 2, 3 };
+        NSData *binary = [[NSData alloc] initWithBytes:bin length:sizeof bin];
+        
+        NSDate *date = (NSDate *)[NSDate dateWithString:@"2014-05-17 13:15:10 +0100"];
+        [table addRow:@[@YES, @1234, @((float)12.34), @1234.5678, @"I'm just a String", binary, @((int)[date timeIntervalSince1970]), @"I'm also a string in a mixed column"]];
+
+        NSString *result = [table toJSONString];
+        
+        XCTAssertEqualObjects(result, @"[{\"BoolCol\":true,\"IntCol\":1234,\"FloatCol\":1.2340000e+01,\"DoubleCol\":1.2345678000000000e+03,\"StringCol\":\"I'm just a String\",\"BinaryCol\":\"00010203\",\"DateCol\":\"2014-05-17 12:15:10\",\"MixedCol\":\"I'm also a string in a mixed column\"}]", @"JSON string expected to one 8-column row");        
     }];
 }
 
