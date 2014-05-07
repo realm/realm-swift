@@ -15,6 +15,8 @@
 		4DFD433F191A5CD300ABBFFE /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD4337191A5CD300ABBFFE /* Utils.m */; };
 		4DFD4340191A5CD300ABBFFE /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD4339191A5CD300ABBFFE /* ViewController.m */; };
 		4DFD4342191A5E1500ABBFFE /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DFD4341191A5E1500ABBFFE /* Realm.framework */; };
+		E8615DCA191AF5A8005DD6C4 /* ViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = E8615DC8191AF5A8005DD6C4 /* ViewController_iPad.xib */; };
+		E8615DCB191AF5A8005DD6C4 /* ViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = E8615DC9191AF5A8005DD6C4 /* ViewController_iPhone.xib */; };
 		E9D58B4F1541A375009150B1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B4E1541A375009150B1 /* UIKit.framework */; };
 		E9D58B511541A375009150B1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B501541A375009150B1 /* Foundation.framework */; };
 		E9D58B531541A375009150B1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E9D58B521541A375009150B1 /* CoreGraphics.framework */; };
@@ -35,7 +37,9 @@
 		4DFD4338191A5CD300ABBFFE /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ViewController.h; path = RealmPerformanceExample/ViewController.h; sourceTree = SOURCE_ROOT; };
 		4DFD4339191A5CD300ABBFFE /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ViewController.m; path = RealmPerformanceExample/ViewController.m; sourceTree = SOURCE_ROOT; };
 		4DFD4341191A5E1500ABBFFE /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../Realm.framework; sourceTree = "<group>"; };
-		E9D58B4A1541A375009150B1 /* TightDbExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = TightDbExample.app; path = RealmPerformanceExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8615DC8191AF5A8005DD6C4 /* ViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ViewController_iPad.xib; sourceTree = "<group>"; };
+		E8615DC9191AF5A8005DD6C4 /* ViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ViewController_iPhone.xib; sourceTree = "<group>"; };
+		E9D58B4A1541A375009150B1 /* RealmPerformanceExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmPerformanceExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9D58B4E1541A375009150B1 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		E9D58B501541A375009150B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		E9D58B521541A375009150B1 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -76,7 +80,7 @@
 		E9D58B4B1541A375009150B1 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E9D58B4A1541A375009150B1 /* TightDbExample.app */,
+				E9D58B4A1541A375009150B1 /* RealmPerformanceExample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -104,6 +108,8 @@
 				4DFD4337191A5CD300ABBFFE /* Utils.m */,
 				4DFD4338191A5CD300ABBFFE /* ViewController.h */,
 				4DFD4339191A5CD300ABBFFE /* ViewController.m */,
+				E8615DC8191AF5A8005DD6C4 /* ViewController_iPad.xib */,
+				E8615DC9191AF5A8005DD6C4 /* ViewController_iPhone.xib */,
 				E9D58B551541A375009150B1 /* Supporting Files */,
 			);
 			path = RealmPerformanceExample;
@@ -137,7 +143,7 @@
 			);
 			name = RealmPerformanceExample;
 			productName = TightDbExample;
-			productReference = E9D58B4A1541A375009150B1 /* TightDbExample.app */;
+			productReference = E9D58B4A1541A375009150B1 /* RealmPerformanceExample.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -171,8 +177,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E8615DCA191AF5A8005DD6C4 /* ViewController_iPad.xib in Resources */,
 				E9D58B591541A375009150B1 /* InfoPlist.strings in Resources */,
 				4D49F55818A912CD0071DDC1 /* Default-568h@2x.png in Resources */,
+				E8615DCB191AF5A8005DD6C4 /* ViewController_iPhone.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
