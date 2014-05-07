@@ -72,9 +72,7 @@ REALM_TABLE_8(TestTableRealmJson,
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm writeUsingBlock:^(RLMRealm *realm) {
-        [realm createTableWithName:@"test" asTableClass:[TestTableRealmJson class]];
-        TestTableRealmJson *table = [realm tableWithName:@"test"
-                                            asTableClass:[TestTableRealmJson class]];
+        TestTableRealmJson *table = [realm createTableWithName:@"test" asTableClass:[TestTableRealmJson class]];
         
         const char bin[4] = { 0, 1, 2, 3 };
         NSData *binary = [[NSData alloc] initWithBytes:bin length:sizeof bin];

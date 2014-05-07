@@ -463,10 +463,8 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
 - (void)testToJSONString {
  
     [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
-        [realm createTableWithName:@"test" asTableClass:[TestTableJson class]];
-        
-        TestTableJson *table = [realm tableWithName:@"test"
-                                            asTableClass:[TestTableJson class]];
+        TestTableJson *table = [realm createTableWithName:@"test" asTableClass:[TestTableJson class]];
+
         const char bin[4] = { 0, 1, 2, 3 };
         NSData *binary = [[NSData alloc] initWithBytes:bin length:sizeof bin];
         
