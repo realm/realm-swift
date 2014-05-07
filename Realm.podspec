@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.summary  = 'a fantastic replacement for Core Data & SQLite'
   s.homepage = 'http://realm.io'
   s.author   = { 'Realm' => 'info@realm.io' }
-  s.source   = { :http => 'http://realm.io/realm-ios-#{s.version}.zip' }
+  s.source   = { :http => "http://realm.io/realm-ios-#{s.version}.zip" }
   s.vendored_frameworks = 'Realm.framework'
   s.library  = 'c++'
   s.platform = :ios
