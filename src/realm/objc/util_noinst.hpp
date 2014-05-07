@@ -165,30 +165,30 @@ inline bool nsnumber_is_like_double(NSObject *obj)
             strcmp(data_type, @encode(unsigned long long)) == 0);
 }
 
-inline const char *rlmtype_to_string(RLMType type) {
+inline NSString *rlmtype_to_string(RLMType type) {
     switch (type) {
         case RLMTypeNone:
-            return "None";
+            return @"None";
         case RLMTypeString:
-            return "string";
+            return @"string";
         case RLMTypeInt:
-            return "int";
+            return @"int";
         case RLMTypeBool:
-            return "bool";
+            return @"bool";
         case RLMTypeDate:
-            return "date";
+            return @"date";
         case RLMTypeBinary:
-            return "binary";
+            return @"binary";
         case RLMTypeDouble:
-            return "double";
+            return @"double";
         case RLMTypeFloat:
-            return "float";
+            return @"float";
         case RLMTypeMixed:
-            return "mixed";
+            return @"mixed";
         case RLMTypeTable:
-            return "table";
+            return @"table";
     }
-    return "Unknown";
+    return @"Unknown";
 }
 
 void to_mixed(id value, tightdb::Mixed& m);
