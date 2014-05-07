@@ -24,6 +24,16 @@
 #import <realm/objc/RLMTableFast.h>
 #import <realm/objc/RLMViewFast.h>
 
+REALM_TABLE_8(TestTableViewJson,
+              BoolCol,   Bool,
+              IntCol,    Int,
+              FloatCol,  Float,
+              DoubleCol, Double,
+              StringCol, String,
+              BinaryCol, Binary,
+              DateCol,   Date,
+              MixedCol,  Mixed)
+
 @interface table_view : RLMTestCase
 
 @end
@@ -333,6 +343,25 @@
         
         RLMView *view3 = [[[view2 where] stringIsCaseInsensitiveEqualTo:@"Anderson" inColumnWithIndex:1 ] findAllRows];
         XCTAssertEqual(view3.rowCount, (NSUInteger)1, @"Only 1 row left");
+    }];
+}
+
+- (void)testToJSONString {
+    
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        TestTableViewJson *table = [realm createTableWithName:@"test" asTableClass:[TestTableViewJson class]];
+        
+        const char bin[4] = { 0, 1, 2, 3 };
+        NSData *binary = [[NSData alloc] initWithBytes:bin length:sizeof bin];
+        
+        NSDate *date = (NSDate *)[NSDate dateWithString:@"2014-05-17 13:15:10 +0100"];
+        [table addRow:@[@YES, @1234, @((float)12.34), @1234.5678, @"I'm just a String", binary, @((int)[date timeIntervalSince1970]), @"I'm also a string in a mixed column"]];
+        
+        RLMView *view = [[table where] findAllRows];
+        
+        NSString *result = [view toJSONString];
+        
+        XCTAssertEqualObjects(result, @"[{\"BoolCol\":true,\"IntCol\":1234,\"FloatCol\":1.2340000e+01,\"DoubleCol\":1.2345678000000000e+03,\"StringCol\":\"I'm just a String\",\"BinaryCol\":\"00010203\",\"DateCol\":\"2014-05-17 12:15:10\",\"MixedCol\":\"I'm also a string in a mixed column\"}]", @"JSON string expected to one 8-column row");
     }];
 }
 
