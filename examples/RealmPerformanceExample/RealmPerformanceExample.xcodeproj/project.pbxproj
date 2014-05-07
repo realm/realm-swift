@@ -295,7 +295,6 @@
 					"$(inherited)",
 					../../,
 					"$(PROJECT_DIR)",
-					"/Users/mk/git/git/tightdb-examples",
 				);
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
