@@ -23,6 +23,7 @@
 #import "RLMTable.h"
 #import "RLMFast.h"
 #import "RLMRowFast.h"
+#import "RLMRow_noinst.h"
 #import "RLMTable_noinst.h"
 #import "util_noinst.hpp"
 
@@ -93,31 +94,31 @@ const char * setterTypeStringForCode(char code) {
     switch (self.accessorCode) {
         case 'i':
             return imp_implementationWithBlock(^(RLMRow *row) {
-                return (int)row.table.getNativeTable.get_int(col, row.ndx);
+                return [row nativeTable].get_int(col, row.ndx);
             });
         case 'l':
             return imp_implementationWithBlock(^(RLMRow *row) {
-                return row.table.getNativeTable.get_int(col, row.ndx);
+                return [row nativeTable].get_int(col, row.ndx);
             });
         case 'f':
             return imp_implementationWithBlock(^(RLMRow *row) {
-                return row.table.getNativeTable.get_float(col, row.ndx);
+                return [row nativeTable].get_float(col, row.ndx);
             });
         case 'd':
             return imp_implementationWithBlock(^(RLMRow *row) {
-                return row.table.getNativeTable.get_double(col, row.ndx);
+                return [row nativeTable].get_double(col, row.ndx);
             });
         case 'B':
             return imp_implementationWithBlock(^(RLMRow *row) {
-                return row.table.getNativeTable.get_bool(col, row.ndx);
+                return [row nativeTable].get_bool(col, row.ndx);
             });
         case 'c':
             return imp_implementationWithBlock(^(RLMRow *row) {
-                return (BOOL)row.table.getNativeTable.get_bool(col, row.ndx);
+                return (BOOL)[row nativeTable].get_bool(col, row.ndx);
             });
         case 's':
             return imp_implementationWithBlock(^(RLMRow *row) {
-                return to_objc_string(row.table.getNativeTable.get_string(col, row.ndx));
+                return to_objc_string([row nativeTable].get_string(col, row.ndx));
             });
         case '@':
             return imp_implementationWithBlock(^(RLMRow *row) {
@@ -143,27 +144,27 @@ const char * setterTypeStringForCode(char code) {
     switch (self.accessorCode) {
         case 'i':
             return imp_implementationWithBlock(^(RLMRow *row, int val) {
-                row.table.getNativeTable.set_int(col, row.ndx, val);
+                [row nativeTable].set_int(col, row.ndx, val);
             });
         case 'l':
             return imp_implementationWithBlock(^(RLMRow *row, long val) {
-                row.table.getNativeTable.set_int(col, row.ndx, val);
+                [row nativeTable].set_int(col, row.ndx, val);
             });
         case 'f':
             return imp_implementationWithBlock(^(RLMRow *row, float val) {
-                row.table.getNativeTable.set_float(col, row.ndx, val);
+                [row nativeTable].set_float(col, row.ndx, val);
             });
         case 'd':
             return imp_implementationWithBlock(^(RLMRow *row, double val) {
-                row.table.getNativeTable.set_double(col, row.ndx, val);
+                [row nativeTable].set_double(col, row.ndx, val);
             });
         case 'B':
             return imp_implementationWithBlock(^(RLMRow *row, bool val) {
-                row.table.getNativeTable.set_bool(col, row.ndx, val);
+                [row nativeTable].set_bool(col, row.ndx, val);
             });
         case 'c':
             return imp_implementationWithBlock(^(RLMRow *row, BOOL val) {
-                row.table.getNativeTable.set_bool(col, row.ndx, val);
+                [row nativeTable].set_bool(col, row.ndx, val);
             });
         case 's':
             return imp_implementationWithBlock(^(RLMRow *row, NSString *val) {

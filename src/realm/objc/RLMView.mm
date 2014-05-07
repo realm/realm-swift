@@ -107,7 +107,7 @@
     if (ndx >= self.rowCount)
         return nil;
 
-    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx] readOnly:m_read_only];
+    return [[_proxyObjectClass alloc] initWithTable:[m_table getNativeTableRef] ndx:[self rowIndexInOriginTableForRowAtIndex:ndx] readOnly:m_read_only];
 }
 
 -(RLMRow *)rowAtIndex:(NSUInteger)ndx
@@ -118,7 +118,7 @@
     if (ndx >= self.rowCount)
         return nil;
 
-    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx] readOnly:m_read_only];
+    return [[_proxyObjectClass alloc] initWithTable:[m_table getNativeTableRef] ndx:[self rowIndexInOriginTableForRowAtIndex:ndx] readOnly:m_read_only];
 }
 
 -(RLMRow *)firstRow
@@ -126,7 +126,7 @@
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:0] readOnly:m_read_only];
+    return [[_proxyObjectClass alloc] initWithTable:[m_table getNativeTableRef] ndx:[self rowIndexInOriginTableForRowAtIndex:0] readOnly:m_read_only];
 }
 
 -(RLMRow *)lastRow
@@ -134,7 +134,7 @@
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1] readOnly:m_read_only];
+    return [[_proxyObjectClass alloc] initWithTable:[m_table getNativeTableRef] ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1] readOnly:m_read_only];
 }
 
 -(NSUInteger)rowCount
@@ -250,7 +250,7 @@
 
 -(RLMRow *)getRow
 {
-    return m_tmp_row = [[_proxyObjectClass alloc] initWithTable: m_table
+    return m_tmp_row = [[_proxyObjectClass alloc] initWithTable: [m_table getNativeTableRef]
                                                  ndx: m_view->get_source_ndx(0) readOnly:m_read_only];
 }
 

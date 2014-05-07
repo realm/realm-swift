@@ -347,6 +347,10 @@ BOOL m_read_only;
     return [NSDate dateWithTimeIntervalSince1970: [_row nativeTable]->get_datetime(_columnId, _row.ndx).get_datetime()];
 }
 
+-(tightdb::Table&)nativeTable{
+    return *m_table;
+}
+
 -(void)setDate:(NSDate *)value
 {
     [_row nativeTable]->set_datetime(_columnId, _row.ndx, tightdb::DateTime((time_t)[value timeIntervalSince1970]));}

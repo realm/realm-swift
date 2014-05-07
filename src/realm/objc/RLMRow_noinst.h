@@ -17,10 +17,12 @@
 // from TightDB Incorporated.
 //
 ////////////////////////////////////////////////////////////////////////////
+#include <tightdb/table.hpp>
 
 #import "RLMRow.h"
 
 
 @interface RLMRow (noinst)
 -(id)initWithTable:(tightdb::TableRef)table ndx:(NSUInteger)ndx readOnly:(BOOL)readOnly;
+-(tightdb::Table&)nativeTable;
 @end
