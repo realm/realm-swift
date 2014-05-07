@@ -25,6 +25,24 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestTable, RLMTestObject);
 
 @end
 
+@interface JSONRealmTestType : RLMRow
+
+@property BOOL      boolColumn;
+@property int       intColumn;
+@property float     floatColumn;
+@property double    doubleColumn;
+@property NSString  *stringColumn;
+@property NSData    *binaryColumn;
+@property NSDate    *dateColumn;
+@property id        mixedColumn;
+
+@end
+
+@implementation JSONRealmTestType
+@end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(JSONRealmTestTable, JSONRealmTestType)
+
 @implementation RLMRealmTests
 
 #pragma mark - Tests
@@ -246,6 +264,26 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestTable, RLMTestObject);
     XCTAssertTrue([realm2 hasTableWithName:tableName], @"Table 'test' should exist \
                   after being created");
     XCTAssertNotNil([realm2 tableWithName:tableName], @"Table 'test' shouldn't be nil");
+}
+
+- (void)testToJSONString {
+    
+    RLMRealm *realm = [self realmWithTestPath];
+    
+    [realm writeUsingBlock:^(RLMRealm *realm) {
+        JSONRealmTestTable *table = [JSONRealmTestTable tableInRealm:realm
+                                                               named:@"test"];
+        
+        const char bin[4] = { 0, 1, 2, 3 };
+        NSData *binary = [[NSData alloc] initWithBytes:bin length:sizeof bin];
+        
+        NSDate *date = (NSDate *)[NSDate dateWithString:@"2014-05-17 13:15:10 +0100"];
+        [table addRow:@[@YES, @1234, @((float)12.34), @1234.5678, @"I'm just a String", binary, @((int)[date timeIntervalSince1970]), @"I'm also a string in a mixed column"]];
+        
+        NSString *result = [realm toJSONString];
+        
+        XCTAssertEqualObjects(result, @"{\"test\":[{\"boolColumn\":true,\"intColumn\":1234,\"floatColumn\":1.2340000e+01,\"doubleColumn\":1.2345678000000000e+03,\"stringColumn\":\"I'm just a String\",\"binaryColumn\":\"00010203\",\"dateColumn\":\"2014-05-17 12:15:10\",\"mixedColumn\":\"I'm also a string in a mixed column\"}]}");
+    }];
 }
 
 @end

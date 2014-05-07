@@ -24,15 +24,27 @@
 #import <realm/objc/RLMTableFast.h>
 #import <realm/objc/RLMViewFast.h>
 
-REALM_TABLE_8(TestTableViewJson,
-              BoolCol,   Bool,
-              IntCol,    Int,
-              FloatCol,  Float,
-              DoubleCol, Double,
-              StringCol, String,
-              BinaryCol, Binary,
-              DateCol,   Date,
-              MixedCol,  Mixed)
+@interface RLMRealmTests : RLMTestCase
+
+@end
+
+@interface JSONTableViewTestType : RLMRow
+
+@property BOOL      boolColumn;
+@property int       intColumn;
+@property float     floatColumn;
+@property double    doubleColumn;
+@property NSString  *stringColumn;
+@property NSData    *binaryColumn;
+@property NSDate    *dateColumn;
+@property id        mixedColumn;
+
+@end
+
+@implementation JSONTableViewTestType
+@end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(JSONTableViewTestTable, JSONTableViewTestType)
 
 @interface table_view : RLMTestCase
 
@@ -349,7 +361,8 @@ REALM_TABLE_8(TestTableViewJson,
 - (void)testToJSONString {
     
     [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
-        TestTableViewJson *table = [realm createTableWithName:@"test" asTableClass:[TestTableViewJson class]];
+        JSONTableViewTestTable *table = [JSONTableViewTestTable tableInRealm:realm
+                                                                       named:@"test"];
         
         const char bin[4] = { 0, 1, 2, 3 };
         NSData *binary = [[NSData alloc] initWithBytes:bin length:sizeof bin];
@@ -361,8 +374,8 @@ REALM_TABLE_8(TestTableViewJson,
         
         NSString *result = [view toJSONString];
         
-        XCTAssertEqualObjects(result, @"[{\"BoolCol\":true,\"IntCol\":1234,\"FloatCol\":1.2340000e+01,\"DoubleCol\":1.2345678000000000e+03,\"StringCol\":\"I'm just a String\",\"BinaryCol\":\"00010203\",\"DateCol\":\"2014-05-17 12:15:10\",\"MixedCol\":\"I'm also a string in a mixed column\"}]", @"JSON string expected to one 8-column row");
+        XCTAssertEqualObjects(result, @"[{\"boolColumn\":true,\"intColumn\":1234,\"floatColumn\":1.2340000e+01,\"doubleColumn\":1.2345678000000000e+03,\"stringColumn\":\"I'm just a String\",\"binaryColumn\":\"00010203\",\"dateColumn\":\"2014-05-17 12:15:10\",\"mixedColumn\":\"I'm also a string in a mixed column\"}]", @"JSON string expected to one 8-column row");
     }];
 }
-
+// JSONTableViewTestTable
 @end

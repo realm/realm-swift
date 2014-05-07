@@ -109,7 +109,7 @@
  *  ---------------------------------------------------------------------------------------
  */
 
-/** Construct a JSON representation of all the data selected by the view.
+/** Construct a JSON representation of all the data selected by this RLMView.
  
  @return String JSON representation of the view's data.
  */

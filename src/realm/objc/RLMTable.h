@@ -365,7 +365,7 @@
  *  ---------------------------------------------------------------------------------------
  */
 
-/** Construct a JSON representation of all the data stored in a table.
+/** Construct a JSON representation of all the data stored in this RLMTable.
  
  @return String JSON representation of the table's data.
  */
