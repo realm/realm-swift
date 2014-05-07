@@ -632,7 +632,7 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                     NSEnumerator *enumerator = [(NSArray *)obj objectEnumerator];
                     id subobj;
                     while (subobj = [enumerator nextObject]) {
-                        set_row(row_ndx, *subtable, (NSArray *)subobj);
+                        update_row_with_array(row_ndx, *subtable, (NSArray *) subobj);
                     }
                 }
                 break;
@@ -697,7 +697,7 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
 }
 
 
-void set_row(size_t row_ndx, Table& table, NSArray *data)
+void update_row_with_array(size_t row_ndx, Table &table, NSArray *data)
 {
     NSEnumerator *enumerator = [data objectEnumerator];
     id obj;
@@ -709,7 +709,7 @@ void set_row(size_t row_ndx, Table& table, NSArray *data)
     }
 }
 
-void set_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
+void update_row_with_dictionary(size_t row_ndx, Table &table, NSDictionary *data)
 {
     size_t count = table.get_column_count();
     for (size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
@@ -719,7 +719,7 @@ void set_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
     }
 }
 
-void set_row_from_object(size_t row_ndx, Table& table, NSObject *data) {
+void update_row_with_object(size_t row_ndx, Table &table, NSObject *data) {
     size_t count = table.get_column_count();
     for (size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
         NSString *col_name = to_objc_string(table.get_column_name(col_ndx));
