@@ -1,44 +1,54 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
 
-#include <tightdb/util/unique_ptr.hpp>
-#include <tightdb/table.hpp>
-#include <tightdb/descriptor.hpp>
-#include <tightdb/table_view.hpp>
 #include <tightdb/lang_bind_helper.hpp>
+#include <sstream>
 
-#import "RLMTable_noinst.h"
 #import "RLMView_noinst.h"
 #import "RLMQuery_noinst.h"
-#import "RLMRow.h"
 #import "RLMDescriptor_noinst.h"
-#import "RLMColumnProxy.h"
+#import "RLMProxy.h"
+#import "RLMObjectDescriptor.h"
 #import "NSData+RLMGetBinaryData.h"
-#import "PrivateRLM.h"
-#import "RLMSmartContext_noinst.h"
+#import "RLMRealm_noinst.h"
+#import "RLMPrivate.h"
 #import "util_noinst.hpp"
+#import "query_util.h"
+
+// This macro generates an NSPredicate from either an an NSString with optional format va_list
+#define RLM_PREDICATE(INPREDICATE, OUTPREDICATE)           \
+if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
+    OUTPREDICATE = INPREDICATE;                            \
+} else if ([INPREDICATE isKindOfClass:[NSString class]]) { \
+    va_list args;                                          \
+    va_start(args, INPREDICATE);                           \
+    OUTPREDICATE = [NSPredicate predicateWithFormat:INPREDICATE arguments:args]; \
+    va_end(args);                                          \
+} else if (INPREDICATE) {                                  \
+    @throw RLM_predicate_exception(@"Invalid value",       \
+                                   @"predicate must be either an NSPredicate or an NSString with optional format va_list"); \
+}                                                          \
 
 using namespace std;
-
 
 @implementation RLMTable
 {
@@ -48,44 +58,27 @@ using namespace std;
     RLMRow * m_tmp_row;
 }
 
-
-
--(instancetype)init
+- (instancetype)init
 {
-    self = [super init];
-    if (self) {
-        m_read_only = NO;
-        m_table = tightdb::Table::create(); // FIXME: May throw
-    }
-    return self;
-}
-
--(instancetype)initWithColumns:(NSArray *)columns
-{
-    self = [super init];
-    if (!self)
-        return nil;
-
-    m_read_only = NO;
-    m_table = tightdb::Table::create(); // FIXME: May throw
-
-    if (!set_columns(m_table, columns)) {
-        m_table.reset();
-
-        // Parsing the schema failed
-        //TODO: More detailed error msg in exception
-        @throw [NSException exceptionWithName:@"realm:invalid_columns"
-                                                         reason:@"The supplied list of columns was invalid"
-                                                       userInfo:nil];
-    }
-
-    return self;
+    @throw [NSException exceptionWithName:@"realm:invalid_init"
+                                   reason:@"Tables can only be created from RLMRealm objects"
+                                 userInfo:nil];
 }
 
 -(id)_initRaw
 {
     self = [super init];
+    _objectClass = RLMRow.class;
+    _proxyObjectClass = RLMRow.class;
     return self;
+}
+
+
+-(void)setObjectClass:(Class)objectClass {
+    _objectClass = objectClass;
+    _proxyObjectClass = [RLMProxy proxyClassForObjectClass:objectClass];
+    RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
+    [RLMTable updateDescriptor:self.descriptor toSupportObjectDescriptor:descriptor];
 }
 
 -(BOOL)_checkType
@@ -96,7 +89,7 @@ using namespace std;
 
 -(RLMRow *)getRow
 {
-    return m_tmp_row = [[RLMRow alloc] initWithTable:self ndx:0];
+    return m_tmp_row = [[_proxyObjectClass alloc] initWithTable:self ndx:0];
 }
 -(void)clearRow
 {
@@ -167,7 +160,7 @@ using namespace std;
 // error (out of memory).
 //
 // The specified table class must be one that is declared by using
-// one of the table macros TIGHTDB_TABLE_*.
+// one of the table macros REALM_TABLE_*.
 //
 // FIXME: Check that the specified class derives from RLMTable.
 -(BOOL)hasSameDescriptorAs:(__unsafe_unretained Class)tableClass
@@ -189,7 +182,7 @@ using namespace std;
 // it encounters a memory allocation error (out of memory).
 //
 // The specified table class must be one that is declared by using
-// one of the table macros TIGHTDB_TABLE_*.
+// one of the table macros REALM_TABLE_*.
 //
 // FIXME: Check that the specified class derives from RLMTable.
 -(id)castToTypedTableClass:(__unsafe_unretained Class)typedTableClass
@@ -203,14 +196,6 @@ using namespace std;
             return nil;
     }
     return table;
-}
-
--(void)dealloc
-{
-    if ([m_parent isKindOfClass:[RLMSmartContext class]]) {
-        RLMSmartContext *context = (RLMSmartContext *)m_parent;
-        [context tableRefDidDie];
-    }
 }
 
 -(NSUInteger)columnCount
@@ -252,16 +237,16 @@ using namespace std;
 
 -(RLMRow *)insertEmptyRowAtIndex:(NSUInteger)ndx
 {
-    [self TDBInsertRow:ndx];
-    return [[RLMRow alloc] initWithTable:self ndx:ndx];
+    [self RLMInsertRow:ndx];
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:ndx];
 }
 
--(BOOL)TDBInsertRow:(NSUInteger)ndx
+-(BOOL)RLMInsertRow:(NSUInteger)ndx
 {
-    return [self TDBInsertRow:ndx error:nil];
+    return [self RLMInsertRow:ndx error:nil];
 }
 
--(BOOL)TDBInsertRow:(NSUInteger)ndx error:(NSError* __autoreleasing*)error
+-(BOOL)RLMInsertRow:(NSUInteger)ndx error:(NSError* __autoreleasing*)error
 {
     if (m_read_only) {
         if (error)
@@ -302,72 +287,86 @@ using namespace std;
     return index;
 }
 
--(RLMRow *)objectAtIndexedSubscript:(NSUInteger)ndx
+-(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex
 {
-    return [[RLMRow alloc] initWithTable:self ndx:ndx];
+    if (rowIndex >= self.rowCount) {
+        @throw [NSException exceptionWithName:@"realm:index_out_of_bounds"
+                                       reason:[NSString stringWithFormat:@"Index %lu beyond bounds [0 .. %lu]", (unsigned long)rowIndex, (unsigned long)self.rowCount-1]
+                                     userInfo:nil];
+    }
+    
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:rowIndex];
 }
 
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex
 {
-    tightdb::Table& table = *m_table;
-    tightdb::ConstDescriptorRef desc = table.get_descriptor();
-
-    if (table.size() < (size_t)rowIndex) {
-        // FIXME: raise exception - out of bound
-        return;
-    }
-
-    if ([newValue isKindOfClass:[NSArray class]]) {
-        verify_row(*desc, (NSArray *)newValue);
-        set_row(size_t(rowIndex), table, (NSArray *)newValue);
-        return;
-    }
-    
-    if ([newValue isKindOfClass:[NSDictionary class]]) {
-        verify_row_with_labels(*desc, (NSDictionary *)newValue);
-        set_row_with_labels(size_t(rowIndex), table, (NSDictionary *)newValue);
-        return;
-    }
-
-    if ([newValue isKindOfClass:[NSObject class]]) {
-        verify_row_from_object(*desc, (NSObject *)newValue);
-        set_row_from_object(rowIndex, table, (NSObject *)newValue);
-        return;
-    }
-
-    @throw [NSException exceptionWithName:@"realm:column_not_implemented"
-                                   reason:@"You should either use nil, NSObject, NSDictionary, or NSArray"
-                                 userInfo:nil];
+    [self updateRow:newValue atIndex:rowIndex]; //Exceptions handled here. This should also call setRow:atIndex: when util.mm methods refactored.
 }
 
+-(RLMRow *)objectForKeyedSubscript:(NSString *)key
+{
+    // Currently only supporting first column lookup for RLMTypeString. Will add support for different
+    // columns when we have Mantle-like syntax
+    if ([self columnCount] < 1) {
+        @throw [NSException exceptionWithName:@"realm:column_not_defined"
+                                       reason:@"This table has no columns"
+                                     userInfo:nil];
+    }
+    else if ([self columnTypeOfColumnWithIndex:0] != RLMTypeString) {
+        @throw [NSException exceptionWithName:@"realm:column_not_type_string"
+                                       reason:@"Column at index 0 must be of RLMTypeString"
+                                     userInfo:nil];
+    }
+    
+    size_t ndx = [self RLM_lookup:key];
+    
+    return ndx != (NSUInteger)NSNotFound ? [self rowAtIndex:ndx] : nil;
+}
 
--(RLMRow *)rowAtIndex:(NSUInteger)ndx
+-(void)setObject:(id)newValue forKeyedSubscript:(NSString *)key
+{
+    RLMRow* row = self[key]; // Exceptions handled here
+    
+    if (row) {
+        [self updateRow:newValue atIndex:[row RLM_index]]; // This should call setRow:atIndex: when util.mm methods refactored
+    }
+//    else { // Commenting this out. Currently only support keyed subscripts for updating. Uncomment this when util.mm implements set and update methods.
+//        [self addRow:newValue];
+//    }
+}
+
+- (size_t)RLM_lookup:(NSString *)key
+{
+    return m_table->lookup([key UTF8String]);
+}
+
+-(id)rowAtIndex:(NSUInteger)ndx
 {
     // initWithTable checks for illegal index.
 
-    return [[RLMRow alloc] initWithTable:self ndx:ndx];
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:ndx];
 }
 
--(RLMRow *)firstRow
+-(id)firstRow
 {
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[RLMRow alloc] initWithTable:self ndx:0];
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:0];
 }
 
--(RLMRow *)lastRow
+-(id)lastRow
 {
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[RLMRow alloc] initWithTable:self ndx:self.rowCount-1];
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:self.rowCount-1];
 }
 
--(RLMRow *)insertRowAtIndex:(NSUInteger)ndx
+-(id)insertRowAtIndex:(NSUInteger)ndx
 {
     [self insertEmptyRowAtIndex:ndx];
-    return [[RLMRow alloc] initWithTable:self ndx:ndx];
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:ndx];
 }
 
 -(void)addRow:(NSObject*)data
@@ -386,17 +385,17 @@ using namespace std;
     [self insertRow:data atIndex:table.size()];
 }
 
-/* Moved to private header */
+// Moved to private header
 -(RLMRow *)addEmptyRow
 {
-    return [[RLMRow alloc] initWithTable:self ndx:[self RLM_addEmptyRow]];
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:[self RLM_addEmptyRow]];
 }
 
 
 -(void)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
 {
     if (!anObject) {
-        [self TDBInsertRow:rowIndex];
+        [self RLMInsertRow:rowIndex];
         return;
     }
     
@@ -421,6 +420,45 @@ using namespace std;
         return;
     }
 
+    @throw [NSException exceptionWithName:@"realm:column_not_implemented"
+                                   reason:@"You should either use nil, NSObject, NSDictionary, or NSArray"
+                                 userInfo:nil];
+}
+
+- (void)updateRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
+{
+    if (rowIndex >= self.rowCount) {
+        @throw [NSException exceptionWithName:@"realm:index_out_of_bounds"
+                                       reason:[NSString stringWithFormat:@"Index %lu beyond bounds [0 .. %lu]", (unsigned long)rowIndex, (unsigned long)self.rowCount-1]
+                                     userInfo:nil];
+    }
+    
+    if (!anObject) {
+        return;
+    }
+    
+    tightdb::Table& table = *m_table;
+    tightdb::ConstDescriptorRef desc = table.get_descriptor();
+    
+    // These should call update_row. Will re-implement set_row() when setRow:atIndex is implemented.
+    if ([anObject isKindOfClass:[NSArray class]]) {
+        verify_row(*desc, (NSArray *)anObject);
+        set_row(size_t(rowIndex), table, (NSArray*)anObject);
+        return;
+    }
+    
+    if ([anObject isKindOfClass:[NSDictionary class]]) {
+        verify_row_with_labels(*desc, (NSDictionary *)anObject);
+        set_row_with_labels(size_t(rowIndex), table, (NSDictionary*)anObject);
+        return;
+    }
+    
+    if ([anObject isKindOfClass:[NSObject class]]) {
+        verify_row_from_object(*desc, (NSObject *)anObject);
+        set_row_from_object(size_t(rowIndex), table, (NSObject *)anObject);
+        return;
+    }
+    
     @throw [NSException exceptionWithName:@"realm:column_not_implemented"
                                    reason:@"You should either use nil, NSObject, NSDictionary, or NSArray"
                                  userInfo:nil];
@@ -503,13 +541,13 @@ using namespace std;
     tightdb::TableRef table = m_table->get_subtable(colIndex, rowIndex);
     if (!table)
         return nil;
-    RLMTable * table_2 = [[RLMTable alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table_2))
+    RLMTable * tableObj = [[RLMTable alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!tableObj))
         return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    return table_2;
+    [tableObj setNativeTable:table.get()];
+    [tableObj setParent:self];
+    [tableObj setReadOnly:m_read_only];
+    return tableObj;
 }
 
 // FIXME: Check that the specified class derives from RLMTable.
@@ -520,15 +558,15 @@ using namespace std;
         return nil;
     tightdb::TableRef table = m_table->get_subtable(colIndex, rowIndex);
     TIGHTDB_ASSERT(table);
-    RLMTable * table_2 = [[tableClass alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table))
+    RLMTable * tableObj = [[tableClass alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!tableObj))
         return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    if (![table_2 _checkType])
+    [tableObj setNativeTable:table.get()];
+    [tableObj setParent:self];
+    [tableObj setReadOnly:m_read_only];
+    if (![tableObj _checkType])
         return nil;
-    return table_2;
+    return tableObj;
 }
 
 -(id)RLM_mixedInColumnWithIndex:(NSUInteger)colNdx atRowIndex:(NSUInteger)rowIndex
@@ -539,16 +577,16 @@ using namespace std;
 
     tightdb::TableRef table = m_table->get_subtable(colNdx, rowIndex);
     TIGHTDB_ASSERT(table);
-    RLMTable * table_2 = [[RLMTable alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table_2))
+    RLMTable * tableObj = [[RLMTable alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!tableObj))
         return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    if (![table_2 _checkType])
+    [tableObj setNativeTable:table.get()];
+    [tableObj setParent:self];
+    [tableObj setReadOnly:m_read_only];
+    if (![tableObj _checkType])
         return nil;
 
-    return table_2;
+    return tableObj;
 }
 
 
@@ -972,37 +1010,37 @@ using namespace std;
 -(RLMView*)findAllRowsWithBool:(BOOL)aBool inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_bool(colIndex, aBool);
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view];
 }
 -(RLMView*)findAllRowsWithInt:(int64_t)anInt inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_int(colIndex, anInt);
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view];
 }
 -(RLMView*)findAllRowsWithFloat:(float)aFloat inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_float(colIndex, aFloat);
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view];
 }
 -(RLMView*)findAllRowsWithDouble:(double)aDouble inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_double(colIndex, aDouble);
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view];
 }
 -(RLMView*)findAllRowsWithString:(NSString *)aString inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_string(colIndex, ObjcStringAccessor(aString));
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view];
 }
 -(RLMView*)findAllRowsWithBinary:(NSData *)aBinary inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_binary(colIndex, aBinary.rlmBinaryData);
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view];
 }
 -(RLMView*)findAllRowsWithDate:(NSDate *)aDate inColumnWithIndex:(NSUInteger)colIndex
 {
     tightdb::TableView view = m_table->find_all_datetime(colIndex, [aDate timeIntervalSince1970]);
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view];
 }
 -(RLMView*)findAllRowsWithMixed:(id)aMixed inColumnWithIndex:(NSUInteger)colIndex
 {
@@ -1011,7 +1049,7 @@ using namespace std;
     [NSException raise:@"NotImplemented" format:@"Not implemented"];
     // FIXME: Implement this!
 //    tightdb::TableView view = m_table->find_all_mixed(col_ndx, [value getNativeMixed]);
-//    return [RLMView viewWithTable:self andNativeView:view];
+//    return [RLMView viewWithTable:self nativeView:view];
     return 0;
 }
 
@@ -1039,310 +1077,50 @@ using namespace std;
     }
     
     tightdb::TableView distinctView = m_table->get_distinct_view(colIndex);
-    return [RLMView viewWithTable:self andNativeView:distinctView];
+    return [RLMView viewWithTable:self nativeView:distinctView];
 }
 
-namespace {
-
-// small helper to create the many exceptions thrown when parsing predicates
-inline NSException * predicate_exception(NSString * name, NSString * reason) {
-    return [NSException exceptionWithName:[NSString stringWithFormat:@"filterWithPredicate:orderedBy: - %@", name] reason:reason userInfo:nil];
-}
-
-// validate that we support the passed in expression type
-inline NSExpressionType validated_expression_type(NSExpression * expression) {
-    if (expression.expressionType != NSConstantValueExpressionType &&
-        expression.expressionType != NSKeyPathExpressionType) {
-        @throw predicate_exception(@"Invalid expression type", @"Only support NSConstantValueExpressionType and NSKeyPathExpressionType");
-    }
-    return expression.expressionType;
-}
-
-// return the column index for a validated column name
-inline NSUInteger validated_column_index(RLMTable * table, NSString * columnName) {
-    NSUInteger index = [table indexOfColumnWithName:columnName];
-    if (index == NSNotFound) {
-        @throw predicate_exception(@"Invalid column name",
-            [NSString stringWithFormat:@"Column name %@ not found in table", columnName]);
-    }
-    return index;
-}
-
-
-// apply an expression between two columns to a query
-/*
-void update_query_with_column_expression(RLMTable * table, tightdb::Query & query,
-    NSString * col1, NSString * col2, NSPredicateOperatorType operatorType) {
-    
-    // only support equality for now
-    if (operatorType != NSEqualToPredicateOperatorType) {
-        @throw predicate_exception(@"Invalid predicate comparison type", @"only support equality comparison type");
-    }
-    
-    // validate column names
-    NSUInteger index1 = validated_column_index(table, col1);
-    NSUInteger index2 = validated_column_index(table, col2);
-    
-    // make sure they are the same type
-    tightdb::DataType type1 = table->m_table->get_column_type(index1);
-    tightdb::DataType type2 = table->m_table->get_column_type(index2);
-
-    if (type1 == type2) {
-        @throw predicate_exception(@"Invalid predicate expression", @"Columns must be the same type");
-    }
-
-    // not suppoting for now - if we changed names for column comparisons so that we could
-    // use templated function for all numeric types this would be much easier
-    @throw predicate_exception(@"Unsupported predicate", @"Not suppoting column comparison for now");
-}
- */
-
-// add a clause for numeric constraints based on operator type
-template <typename T>
-void add_numeric_constraint_to_query(tightdb::Query & query,
-                                     tightdb::DataType datatype,
-                                     NSPredicateOperatorType operatorType,
-                                     NSUInteger index,
-                                     T value) {
-    switch (operatorType) {
-        case NSLessThanPredicateOperatorType:
-            query.less(index, value);
-            break;
-        case NSLessThanOrEqualToPredicateOperatorType:
-            query.less_equal(index, value);
-            break;
-        case NSGreaterThanPredicateOperatorType:
-            query.greater(index, value);
-            break;
-        case NSGreaterThanOrEqualToPredicateOperatorType:
-            query.greater_equal(index, value);
-            break;
-        case NSEqualToPredicateOperatorType:
-            query.equal(index, value);
-            break;
-        case NSNotEqualToPredicateOperatorType:
-            query.not_equal(index, value);
-            break;
-        default:
-            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for type %u", (unsigned long)operatorType, datatype]);
-            break;
-    }
-}
-
-void add_bool_constraint_to_query(tightdb::Query & query,
-                                    NSPredicateOperatorType operatorType,
-                                    NSUInteger index,
-                                    bool value) {
-    switch (operatorType) {
-        case NSEqualToPredicateOperatorType:
-            query.equal(index, value);
-            break;
-        case NSNotEqualToPredicateOperatorType:
-            query.not_equal(index, value);
-            break;
-        default:
-            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for bool type", (unsigned long)operatorType]);
-            break;
-    }
-}
-
-void add_string_constraint_to_query(tightdb::Query & query,
-                                    NSPredicateOperatorType operatorType,
-                                    NSUInteger index,
-                                    NSString * value) {
-    
-    tightdb::StringData sd([(NSString *)value UTF8String]);
-    query.equal(index, sd);
-    switch (operatorType) {
-        case NSBeginsWithPredicateOperatorType:
-            query.begins_with(index, sd);
-            break;
-        case NSEndsWithPredicateOperatorType:
-            query.ends_with(index, sd);
-            break;
-        case NSContainsPredicateOperatorType:
-            query.contains(index, sd);
-            break;
-        case NSEqualToPredicateOperatorType:
-            query.equal(index, sd);
-            break;
-        case NSNotEqualToPredicateOperatorType:
-            query.not_equal(index, sd);
-            break;
-        default:
-            @throw predicate_exception(@"Invalid operator type", [NSString stringWithFormat:@"Operator type %lu not supported for string type", (unsigned long)operatorType]);
-            break;
-    }
-}
-
-void update_query_with_value_expression(RLMTable * table, tightdb::Query & query,
-    NSString * columnName, id value, NSPredicateOperatorType operatorType) {
-
-    // validate object type
-    NSUInteger index = validated_column_index(table, columnName);
-    tightdb::DataType type = table->m_table->get_column_type(index);
-    if (!verify_object_is_type(value, type)) {
-        @throw predicate_exception(@"Invalid value",
-                                   [NSString stringWithFormat:@"object must be of type %i", type]);
-    }
-    
-    // finally cast to native types and add query clause
-    switch (type) {
-        case tightdb::type_Bool:
-            add_bool_constraint_to_query(query, operatorType, index,
-                                         bool([(NSNumber *)value boolValue]));
-            break;
-        case tightdb::type_DateTime:
-            // TODO: change datetime so method signaturs match other numeric types
-            @throw predicate_exception(@"Unsupported predicate value type",
-                                       @"Not supporting dates temporarily");
-            break;
-        case tightdb::type_Double:
-            add_numeric_constraint_to_query(query, type, operatorType,
-                                            index, double([(NSNumber *)value doubleValue]));
-            break;
-        case tightdb::type_Float:
-            add_numeric_constraint_to_query(query, type, operatorType,
-                                            index, float([(NSNumber *)value floatValue]));
-            break;
-        case tightdb::type_Int:
-            add_numeric_constraint_to_query(query, type, operatorType,
-                                            index, int([(NSNumber *)value intValue]));
-            break;
-        case tightdb::type_String:
-            add_string_constraint_to_query(query, operatorType, index, (NSString *)value);
-            break;
-        default:
-            @throw predicate_exception(@"Unsupported predicate value type",
-                [NSString stringWithFormat:@"Object type %i not supported", type]);
-    }
-}
-
-void update_query_with_predicate(NSPredicate * predicate,
-    RLMTable * table, tightdb::Query & query) {
-    
-    // compound predicates
-    if ([predicate isMemberOfClass:[NSCompoundPredicate class]]) {
-        NSCompoundPredicate * comp = (NSCompoundPredicate *)predicate;
-        if ([comp compoundPredicateType] == NSAndPredicateType) {
-            // add all of the subprediates
-            query.group();
-            for (NSPredicate * subp in comp.subpredicates) {
-                update_query_with_predicate(subp, table, query);
-            }
-            query.end_group();
-        }
-        else if ([comp compoundPredicateType] == NSOrPredicateType) {
-            // add all of the subprediates with ors inbetween
-            query.group();
-            for (NSUInteger i = 0; i < comp.subpredicates.count; i++) {
-                NSPredicate * subp = comp.subpredicates[i];
-                if (i > 0) {
-                    query.Or();
-                }
-                update_query_with_predicate(subp, table, query);
-            }
-            query.end_group();
-        }
-        else {
-            @throw predicate_exception(@"Invalid compound predicate type",
-                                       @"Only support AND and OR predicate types");
-        }
-    }
-    else if ([predicate isMemberOfClass:[NSComparisonPredicate class]]) {
-        NSComparisonPredicate * compp = (NSComparisonPredicate *)predicate;
- 
-        // validate expressions
-        NSExpressionType exp1Type = validated_expression_type(compp.leftExpression);
-        NSExpressionType exp2Type = validated_expression_type(compp.rightExpression);
-
-        // figure out if we have column expression or value expression and update query accordingly
-        // we are limited here to KeyPath expressions and constantValue expressions from validation
-        if (exp1Type == NSKeyPathExpressionType) {
-            if (exp2Type == NSKeyPathExpressionType) {
-                @throw predicate_exception(@"Unsupported predicate", @"Not suppoting column comparison for now");
-//                update_query_with_column_expression(table, query, compp.leftExpression.keyPath,
-//                    compp.rightExpression.keyPath, compp.predicateOperatorType);
-            }
-            else {
-                update_query_with_value_expression(table, query, compp.leftExpression.keyPath, compp.rightExpression.constantValue, compp.predicateOperatorType);
-            }
-        }
-        else {
-            if (exp2Type == NSKeyPathExpressionType) {
-                update_query_with_value_expression(table, query, compp.rightExpression.keyPath, compp.leftExpression.constantValue, compp.predicateOperatorType);
-            }
-            else {
-                @throw predicate_exception(@"Invalid predicate expressions",
-                                           @"Tring to compare two constant values");
-            }
-        }
-    }
-    else {
-        // invalid predicate type
-        @throw predicate_exception(@"Invalid predicate",
-                                   @"Only support compound and comparison predicates");
-    }
-}
-
-tightdb::Query queryFromPredicate(RLMTable *table, id condition)
+-(id)firstWhere:(id)predicate, ...
 {
-    tightdb::Query query = table->m_table->where();
-
-    // parse and apply predicate tree
-    if (condition) {
-        if ([condition isKindOfClass:[NSString class]]) {
-            NSPredicate *predicate = [NSPredicate predicateWithFormat:condition];
-            update_query_with_predicate(predicate, table, query);
-        }
-        else if ([condition isKindOfClass:[NSPredicate class]]) {
-            update_query_with_predicate(condition, table, query);
-        }
-        else {
-            @throw predicate_exception(@"Invalid argument", @"Condition should be predicate as string or NSPredicate object");
-        }
-    }
-
-    return query;
-}
-
-} //namespace
-
--(RLMRow *)find:(id)condition
-{
-    tightdb::Query query = queryFromPredicate(self, condition);
-
+    NSPredicate *finalPredicate = nil;
+    RLM_PREDICATE(predicate, finalPredicate);
+    
+    tightdb::Query query = queryFromPredicate(self, finalPredicate);
+    
     size_t row_ndx = query.find();
-
+    
     if (row_ndx == tightdb::not_found)
         return nil;
-
-    return [[RLMRow alloc] initWithTable:self ndx:row_ndx];
+    
+    return [[_proxyObjectClass alloc] initWithTable:self ndx:row_ndx];
 }
 
--(RLMView *)where:(id)condition
+-(RLMView *)allWhere:(id)predicate, ...
 {
-    tightdb::Query query = queryFromPredicate(self, condition);
+    NSPredicate *finalPredicate = nil;
+    RLM_PREDICATE(predicate, finalPredicate);
+    
+    tightdb::Query query = queryFromPredicate(self, finalPredicate);
 
     // create view
     tightdb::TableView view = query.find_all();
-
+    
     // create objc view and return
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view objectClass:_proxyObjectClass];
 }
 
--(RLMView *)where:(id)condition orderBy:(id)order
+-(RLMView *)allWhere:(id)predicate orderBy:(id)order
 {
-    tightdb::Query query = queryFromPredicate(self, condition);
+    tightdb::Query query = queryFromPredicate(self, predicate);
 
     // create view
     tightdb::TableView view = query.find_all();
-
+    
     // apply order
     if (order) {
         NSString *columnName;
         BOOL ascending = YES;
-
+        
         if ([order isKindOfClass:[NSString class]]) {
             columnName = order;
         }
@@ -1351,23 +1129,185 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
             ascending = ((NSSortDescriptor*)order).ascending;
         }
         else {
-            @throw predicate_exception(@"Invalid order type",
+            @throw RLM_predicate_exception(@"Invalid order type",
                                        @"Order must be column name or NSSortDescriptor");
         }
-
-        NSUInteger index = validated_column_index(self, columnName);
+        
+        NSUInteger index = RLM_validated_column_index(self, columnName);
         RLMType columnType = [self columnTypeOfColumnWithIndex:index];
-
+        
         if (columnType != RLMTypeInt && columnType != RLMTypeBool && columnType != RLMTypeDate) {
-            @throw predicate_exception(@"Invalid sort column type",
+            @throw RLM_predicate_exception(@"Invalid sort column type",
                                        @"Sort only supported on Integer, Date and Boolean columns.");
         }
-
+        
         view.sort(index, ascending);
     }
-
+    
     // create objc view and return
-    return [RLMView viewWithTable:self andNativeView:view];
+    return [RLMView viewWithTable:self nativeView:view objectClass:_proxyObjectClass];
+}
+
+-(NSUInteger)countWhere:(id)predicate, ...
+{
+    NSPredicate *finalPredicate = nil;
+    RLM_PREDICATE(predicate, finalPredicate);
+    
+    tightdb::Query query = queryFromPredicate(self, finalPredicate);
+    
+    size_t count = query.count();
+    
+    return count;
+}
+
+-(NSNumber *)sumOfProperty:(NSString *)property where:(id)predicate, ...
+{
+    NSPredicate *finalPredicate = nil;
+    RLM_PREDICATE(predicate, finalPredicate);
+    
+    tightdb::Query query = queryFromPredicate(self, finalPredicate);
+    
+    NSUInteger index = [self indexOfColumnWithName:property];
+    
+    if (index == NSNotFound) {
+        @throw [NSException exceptionWithName:@"realm:invalid_column_name"
+                                       reason:[NSString stringWithFormat:@"Property with name %@ not found on table", property]
+                                     userInfo:nil];
+    }
+    
+    NSNumber *sum;
+    RLMType columnType = [self columnTypeOfColumnWithIndex:index];
+    if (columnType == RLMTypeInt) {
+        sum = [NSNumber numberWithInteger:query.sum_int(index)];
+    }
+    else if (columnType == RLMTypeDouble) {
+        sum = [NSNumber numberWithDouble:query.sum_double(index)];
+    }
+    else if (columnType == RLMTypeFloat) {
+        sum = [NSNumber numberWithDouble:query.sum_float(index)];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Sum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return sum;
+}
+
+-(NSNumber *)averageOfProperty:(NSString *)property where:(id)predicate, ...
+{
+    NSPredicate *finalPredicate = nil;
+    RLM_PREDICATE(predicate, finalPredicate);
+    
+    tightdb::Query query = queryFromPredicate(self, finalPredicate);
+    
+    NSUInteger index = [self indexOfColumnWithName:property];
+    
+    if (index == NSNotFound) {
+        @throw [NSException exceptionWithName:@"realm:invalid_column_name"
+                                       reason:[NSString stringWithFormat:@"Property with name %@ not found on table", property]
+                                     userInfo:nil];
+    }
+    
+    NSNumber *average;
+    RLMType columnType = [self columnTypeOfColumnWithIndex:index];
+    if (columnType == RLMTypeInt) {
+        average = [NSNumber numberWithDouble:query.average_int(index)];
+    }
+    else if (columnType == RLMTypeDouble) {
+        average = [NSNumber numberWithDouble:query.average_double(index)];
+    }
+    else if (columnType == RLMTypeFloat) {
+        average = [NSNumber numberWithDouble:query.average_float(index)];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Average only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return average;
+}
+
+-(id)minOfProperty:(NSString *)property where:(id)predicate, ...
+{
+    NSPredicate *finalPredicate = nil;
+    RLM_PREDICATE(predicate, finalPredicate);
+    
+    tightdb::Query query = queryFromPredicate(self, finalPredicate);
+    
+    NSUInteger index = [self indexOfColumnWithName:property];
+    
+    if (index == NSNotFound) {
+        @throw [NSException exceptionWithName:@"realm:invalid_column_name"
+                                       reason:[NSString stringWithFormat:@"Property with name %@ not found on table", property]
+                                     userInfo:nil];
+    }
+    
+    id min;
+    RLMType columnType = [self columnTypeOfColumnWithIndex:index];
+    if (columnType == RLMTypeInt) {
+        min = [NSNumber numberWithInteger:query.minimum_int(index)];
+    }
+    else if (columnType == RLMTypeDouble) {
+        min = [NSNumber numberWithDouble:query.minimum_double(index)];
+    }
+    else if (columnType == RLMTypeFloat) {
+        min = [NSNumber numberWithFloat:query.minimum_float(index)];
+    }
+    else if (columnType == RLMTypeDate) {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supported"
+                                       reason:@"Minimum not supported on date columns yet"
+                                     userInfo:nil];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Minimum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return min;
+}
+
+-(id)maxOfProperty:(NSString *)property where:(id)predicate, ...
+{
+    NSPredicate *finalPredicate = nil;
+    RLM_PREDICATE(predicate, finalPredicate);
+    
+    tightdb::Query query = queryFromPredicate(self, finalPredicate);
+    
+    NSUInteger index = [self indexOfColumnWithName:property];
+    
+    if (index == NSNotFound) {
+        @throw [NSException exceptionWithName:@"realm:invalid_column_name"
+                                       reason:[NSString stringWithFormat:@"Property with name %@ not found on table", property]
+                                     userInfo:nil];
+    }
+    
+    id max;
+    RLMType columnType = [self columnTypeOfColumnWithIndex:index];
+    if (columnType == RLMTypeInt) {
+        max = [NSNumber numberWithInteger:query.maximum_int(index)];
+    }
+    else if (columnType == RLMTypeDouble) {
+        max = [NSNumber numberWithDouble:query.maximum_double(index)];
+    }
+    else if (columnType == RLMTypeFloat) {
+        max = [NSNumber numberWithFloat:query.maximum_float(index)];
+    }
+    else if (columnType == RLMTypeDate) {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supported"
+                                       reason:@"Maximum not supported on date columns yet"
+                                     userInfo:nil];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Maximum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return max;
 }
 
 -(BOOL)isIndexCreatedInColumnWithIndex:(NSUInteger)colIndex
@@ -1465,6 +1405,62 @@ tightdb::Query queryFromPredicate(RLMTable *table, id condition)
     return YES; // Must be overridden in typed table classes.
 }
 
+
++ (void)updateDescriptor:(RLMDescriptor *)desc toSupportObjectDescriptor:(RLMObjectDescriptor *)descriptor {
+    for (RLMProperty *prop in descriptor.properties) {
+        NSUInteger index = [desc indexOfColumnWithName:prop.name];
+        if (index == NSNotFound) {
+            // create the column
+            [desc addColumnWithName:prop.name type:prop.type];
+            if (prop.type == RLMTypeTable) {
+                // set subtable schema
+                RLMDescriptor * subDesc = [desc subdescriptorForColumnWithIndex:desc.columnCount-1];
+                RLMObjectDescriptor * objectDescriptor = [RLMObjectDescriptor descriptorForObjectClass:prop.subtableObjectClass];
+                [RLMTable updateDescriptor:subDesc toSupportObjectDescriptor:objectDescriptor];
+            }
+        }
+        else if ([desc columnTypeOfColumnWithIndex:index] != prop.type) {
+            NSString *reason = [NSString stringWithFormat:@"Column with name '%@' exists on table with different type", prop.name];
+            @throw [NSException exceptionWithName:@"TDBException"
+                                           reason:reason
+                                         userInfo:nil];
+        }
+    }
+}
+
+
+// returns YES if you can currently insert objects of type Class
+-(BOOL)canInsertObjectOfClass:(Class)objectClass {
+    RLMObjectDescriptor * descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
+    for (RLMProperty * prop in descriptor.properties) {
+        NSUInteger index = [self indexOfColumnWithName:prop.name];
+        if (index == NSNotFound || [self columnTypeOfColumnWithIndex:index] != prop.type) {
+            NSLog(@"Schema not compatible with table columns");
+            return NO;
+        }
+    }
+    return YES;
+}
+
+// returns YES if it's possible to update the table to support objects of type Class
+-(BOOL)canUpdateToSupportObjectClass:(Class)objectClass {
+    RLMObjectDescriptor *descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
+    for (RLMProperty *prop in descriptor.properties) {
+        NSUInteger index = [self indexOfColumnWithName:prop.name];
+        if (index != NSNotFound && [self columnTypeOfColumnWithIndex:index] != prop.type) {
+            return NO;
+        }
+    }
+    return YES;
+}
+
+- (NSString *)toJSONString {
+    
+    ostringstream out;
+    m_table->to_json(out);
+    string str = out.str();
+    
+    return [NSString stringWithUTF8String:str.c_str()];
+}
+
 @end
-
-

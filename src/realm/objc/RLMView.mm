@@ -1,22 +1,22 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
 
@@ -26,13 +26,16 @@
 #include <tightdb/table_view.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
+#include <sstream>
+
 #import "RLMTable_noinst.h"
 #import "RLMRow.h"
 #import "RLMView_noinst.h"
 #import "RLMQuery_noinst.h"
-#import "PrivateRLM.h"
+#import "RLMPrivate.h"
 #import "util_noinst.hpp"
 
+using namespace std;
 
 @implementation RLMView
 {
@@ -40,28 +43,47 @@
     RLMTable * m_table;
     RLMRow * m_tmp_row;
     BOOL m_read_only;
+    Class _proxyObjectClass;
 }
 
-+(RLMView *)viewWithTable:(RLMTable *)table andNativeView:(const tightdb::TableView&)view
++(RLMView *)viewWithTable:(RLMTable *)table nativeView:(const tightdb::TableView&)view
 {
-    RLMView * view_2 = [[RLMView alloc] init];
-    if (!view_2)
+    RLMView * viewObj = [[RLMView alloc] init];
+    if (!viewObj)
         return nil;
-    view_2->m_view.reset(new tightdb::TableView(view)); // FIXME: Exception handling needed here
-    view_2->m_table = table;
-    view_2->m_read_only = [table isReadOnly];
+    viewObj->m_view.reset(new tightdb::TableView(view)); // FIXME: Exception handling needed here
+    viewObj->m_table = table;
+    viewObj->m_read_only = [table isReadOnly];
 
-    return view_2;
+    return viewObj;
 }
+
++(RLMView*)viewWithTable:(RLMTable*)table
+              nativeView:(const tightdb::TableView&)view
+             objectClass:(Class)objectClass {
+    RLMView * v = [RLMView viewWithTable:table nativeView:view];
+    v->_proxyObjectClass = objectClass;
+    return v;
+}
+
+- (id)init {
+    self = [super init];
+    if (self) {
+        _proxyObjectClass = RLMRow.class;
+    }
+    return self;
+}
+
 
 -(id)_initWithQuery:(RLMQuery *)query
 {
     self = [super init];
     if (self) {
-        tightdb::Query& query_2 = [query getNativeQuery];
-        m_view.reset(new tightdb::TableView(query_2.find_all())); // FIXME: Exception handling needed here
+        tightdb::Query& queryRef = [query getNativeQuery];
+        m_view.reset(new tightdb::TableView(queryRef.find_all())); // FIXME: Exception handling needed here
         m_table = [query originTable];
         m_read_only = [m_table isReadOnly];
+        _proxyObjectClass = RLMRow.class;
     }
     return self;
 }
@@ -87,7 +109,7 @@
     if (ndx >= self.rowCount)
         return nil;
 
-    return [[RLMRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
 }
 
 -(RLMRow *)rowAtIndex:(NSUInteger)ndx
@@ -98,7 +120,7 @@
     if (ndx >= self.rowCount)
         return nil;
 
-    return [[RLMRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
 }
 
 -(RLMRow *)firstRow
@@ -106,7 +128,7 @@
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[RLMRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:0]];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:0]];
 }
 
 -(RLMRow *)lastRow
@@ -114,7 +136,7 @@
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[RLMRow alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1]];
+    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1]];
 }
 
 -(NSUInteger)rowCount
@@ -185,16 +207,16 @@
 
     tightdb::TableRef table = m_view->get_subtable(colNdx, rowIndex);
     TIGHTDB_ASSERT(table);
-    RLMTable * table_2 = [[RLMTable alloc] _initRaw];
-    if (TIGHTDB_UNLIKELY(!table_2))
+    RLMTable * tableObj = [[RLMTable alloc] _initRaw];
+    if (TIGHTDB_UNLIKELY(!tableObj))
         return nil;
-    [table_2 setNativeTable:table.get()];
-    [table_2 setParent:self];
-    [table_2 setReadOnly:m_read_only];
-    if (![table_2 _checkType])
+    [tableObj setNativeTable:table.get()];
+    [tableObj setParent:self];
+    [tableObj setReadOnly:m_read_only];
+    if (![tableObj _checkType])
         return nil;
 
-    return table_2;
+    return tableObj;
 }
 
 -(NSString*)RLM_stringInColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)rowIndex
@@ -230,7 +252,7 @@
 
 -(RLMRow *)getRow
 {
-    return m_tmp_row = [[RLMRow alloc] initWithTable: m_table
+    return m_tmp_row = [[_proxyObjectClass alloc] initWithTable: m_table
                                                  ndx: m_view->get_source_ndx(0)];
 }
 
@@ -262,6 +284,15 @@
     RLMQuery *query = [[RLMQuery alloc] initWithTable:self.originTable error:nil];
     [query setTableView:*m_view];
     return query;
+}
+
+- (NSString *)toJSONString {
+    
+    ostringstream out;
+    m_view->to_json(out);
+    string str = out.str();
+    
+    return [NSString stringWithUTF8String:str.c_str()];
 }
 
 @end

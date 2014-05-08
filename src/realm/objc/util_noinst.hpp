@@ -1,25 +1,25 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
-#ifndef TIGHTDB_OBJC_UTIL_HPP
-#define TIGHTDB_OBJC_UTIL_HPP
+#ifndef REALM_OBJC_UTIL_HPP
+#define REALM_OBJC_UTIL_HPP
 
 #include <cstddef>
 #include <stdexcept>
@@ -31,6 +31,8 @@
 #include <tightdb/descriptor.hpp>
 #include <tightdb/table.hpp>
 #include <tightdb/table_ref.hpp>
+
+#import "RLMType.h"
 
 struct ObjcStringAccessor {
     ObjcStringAccessor(const NSString* s)
@@ -103,7 +105,7 @@ inline NSObject* to_objc_object(tightdb::Mixed m)
             return [NSData dataWithBytes:bd.data() length:bd.size()];
         }
         case tightdb::type_Mixed:
-            TIGHTDB_ASSERT(false); /* we should never get here */
+            TIGHTDB_ASSERT(false); // we should never get here
         case tightdb::type_Table:
             TIGHTDB_ASSERT(false);
     }
@@ -121,9 +123,9 @@ inline NSUInteger was_not_found(size_t n)
 inline bool nsnumber_is_like_bool(NSObject *obj)
 {
     const char* data_type = [(NSNumber *)obj objCType];
-    /* @encode(BOOL) is 'B' on iOS 64 and 'c'
-     objcType is always 'c'. Therefore compare to "c".
-     */
+    // @encode(BOOL) is 'B' on iOS 64 and 'c'
+    // objcType is always 'c'. Therefore compare to "c".
+    
     return data_type[0] == 'c';
 }
 
@@ -161,6 +163,32 @@ inline bool nsnumber_is_like_double(NSObject *obj)
             strcmp(data_type, @encode(unsigned int)) == 0 ||
             strcmp(data_type, @encode(unsigned long)) == 0 ||
             strcmp(data_type, @encode(unsigned long long)) == 0);
+}
+
+inline NSString *rlmtype_to_string(RLMType type) {
+    switch (type) {
+        case RLMTypeNone:
+            return @"None";
+        case RLMTypeString:
+            return @"string";
+        case RLMTypeInt:
+            return @"int";
+        case RLMTypeBool:
+            return @"bool";
+        case RLMTypeDate:
+            return @"date";
+        case RLMTypeBinary:
+            return @"binary";
+        case RLMTypeDouble:
+            return @"double";
+        case RLMTypeFloat:
+            return @"float";
+        case RLMTypeMixed:
+            return @"mixed";
+        case RLMTypeTable:
+            return @"table";
+    }
+    return @"Unknown";
 }
 
 void to_mixed(id value, tightdb::Mixed& m);
@@ -278,4 +306,4 @@ catch(std::exception& ex) { \
 }
 
 
-#endif // TIGHTDB_OBJC_UTIL_HPP
+#endif // REALM_OBJC_UTIL_HPP

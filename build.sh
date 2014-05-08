@@ -342,30 +342,30 @@ EOF
         ;;
 
     "get-version")
-	version_file="src/realm/objc/RLMVersion.h"
-	realm_version_major="$(grep TDB_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	realm_version_minor="$(grep TDB_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	realm_version_patch="$(grep TDB_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
-	echo "$realm_version_major.$realm_version_minor.$realm_version_patch"
-	exit 0
-	;;
+        version_file="src/realm/objc/RLMVersion.h"
+        realm_version_major="$(grep REALM_VERSION_MAJOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+        realm_version_minor="$(grep REALM_VERSION_MINOR $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+        realm_version_patch="$(grep REALM_VERSION_PATCH $version_file | awk '{print $3}' | tr -d ";")" || exit 1
+        echo "$realm_version_major.$realm_version_minor.$realm_version_patch"
+        exit 0
+        ;;
 
     "set-version")
-	if [ "$OS" != "Darwin" ]; then
-	    echo "You can only set version when running Mac OS X"
-	    exit 1
-	fi
-        realm_version="$1"
-        version_file="src/realm/objc/RLMVersion.h"
-        realm_ver_major="$(echo "$realm_version" | cut -f1 -d.)" || exit 1
-        realm_ver_minor="$(echo "$realm_version" | cut -f2 -d.)" || exit 1
-        realm_ver_patch="$(echo "$realm_version" | cut -f3 -d.)" || exit 1
+        if [ "$OS" != "Darwin" ]; then
+            echo "You can only set version when running Mac OS X"
+            exit 1
+        fi
+            realm_version="$1"
+            version_file="src/realm/objc/RLMVersion.h"
+            realm_ver_major="$(echo "$realm_version" | cut -f1 -d.)" || exit 1
+            realm_ver_minor="$(echo "$realm_version" | cut -f2 -d.)" || exit 1
+            realm_ver_patch="$(echo "$realm_version" | cut -f3 -d.)" || exit 1
 
-	sed -i '' -e "s/TDB_VERSION_MAJOR .*$/TDB_VERSION_MAJOR $realm_ver_major/" $version_file || exit 1
-	sed -i '' -e "s/TDB_VERSION_MINOR .*$/TDB_VERSION_MINOR $realm_ver_minor/" $version_file || exit 1
-	sed -i '' -e "s/TDB_VERSION_PATCH .*$/TDB_VERSION_PATCH $realm_ver_patch/" $version_file || exit 1
-	exit 0
-	;;
+        sed -i '' -e "s/REALM_VERSION_MAJOR .*$/REALM_VERSION_MAJOR $realm_ver_major/" $version_file || exit 1
+        sed -i '' -e "s/REALM_VERSION_MINOR .*$/REALM_VERSION_MINOR $realm_ver_minor/" $version_file || exit 1
+        sed -i '' -e "s/REALM_VERSION_PATCH .*$/REALM_VERSION_PATCH $realm_ver_patch/" $version_file || exit 1
+        exit 0
+        ;;
 
     "clean")
         auto_configure || exit 1
@@ -384,6 +384,50 @@ EOF
         fi
         echo "Done cleaning"
         exit 0
+        ;;
+
+    "ci-clean")
+        # DO NOT USE THIS TARGET! IT WILL RESET YOUR WORKAREA IN A NON REVERSIBLE WAY!
+        git reset --hard HEAD
+        git clean -xfd
+        (
+            cd ../tightdb
+            git reset --hard HEAD
+            git clean -xfd
+        )
+        exit 0
+        ;;
+
+    "ci-test")
+        if [ "$(id -u)" != "0" ]; then
+           echo "This target must be run as root or with sudo" 1>&2
+           exit 1
+        fi
+        mkdir -p test-reports || exit 1
+        (
+            cd ../tightdb
+            mkdir -p install
+            sh build.sh config $(pwd)/install
+            sh build.sh build-iphone
+            sh build.sh build
+            sh build.sh install
+        ) || exit 1
+        (
+            export REALM_CONFIG=../tightdb/install/bin/tightdb-config
+            sh build.sh config
+            sh build.sh build-iphone
+            sh build.sh ios-framework
+            sh build.sh test-debug
+            ) || exit 1
+        (
+            cd examples/RealmTableViewExample
+            xctool -project RealmTableViewExample.xcodeproj -scheme RealmTableViewExample clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+        ) || exit 1
+        (
+            cd examples/RealmPerformanceExample
+            xctool -project RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+        ) || exit 1
+        exit 0;
         ;;
 
     "build")
@@ -461,6 +505,26 @@ EOF
 	echo "Framework for iOS can be found in realm-ios-$realm_version.zip"
 	exit 0
 	;;
+
+    "package-examples")
+        if [ ! -e "Realm.framework" ]; then
+            echo "No Realm.framework found. You run the ios-framework target to generate it."
+            exit 0
+        fi
+        (
+            cd examples
+            for folder in $(ls -l | grep "^d" | awk '{ print $9 }'); do
+                echo "Packaging $folder..."
+                cp -Rf ../Realm.framework $folder
+                sed -i '.bak' -e "s/\.\.\/\.\.\/Realm\.framework/Realm\.framework/" $folder/*.xcodeproj/project.pbxproj
+                echo "The $folder Xcode project file was modified like this:"
+                diff $folder/*.xcodeproj/project.pbxproj.bak $folder/*.xcodeproj/project.pbxproj
+                zip -rq $folder.zip $folder -x \*.bak
+                mv -f $folder/*.xcodeproj/project.pbxproj.bak $folder/*.xcodeproj/project.pbxproj
+            done
+        ) || exit 1
+        echo "The zipped examples are now available in the examples folder"
+    ;;
 
     "test")
         auto_configure || exit 1
@@ -608,6 +672,56 @@ EOF
         exit 0
         ;;
 
+    "docs")
+        echo "Generating HTML docs..."
+        appledoc    --project-name Realm \
+                    --project-company "Realm" \
+                    --include doc/realm.png \
+                    --output doc/appledocs \
+                    -v `sh build.sh get-version` \
+                    --create-html \
+                    --no-create-docset \
+                    --no-repeat-first-par \
+                    --ignore src/realm/objc/RLMColumnProxy.h \
+                    --ignore src/realm/objc/RLMProxy.h \
+                    --ignore src/realm/objc/RLMQuery.h \
+                    --ignore src/realm/objc/RLMType.h \
+                    --ignore src/realm/objc/RLMVersion.h \
+                    --ignore src/realm/objc/RLMDescriptor.h \
+                    --ignore "src/realm/objc/test/*" \
+                    --index-desc doc/index.md \
+                    --template doc/templates \
+                    --exit-threshold 2 \
+                    src/realm/objc/ || exit 1
+
+        echo "Generating docset docs..."
+        appledoc    --project-name Realm \
+                    --project-company "Realm" \
+                    --include doc/realm.png \
+                    --output doc/appledocs/docset \
+                    -v `sh build.sh get-version` \
+                    --no-create-html \
+                    --create-docset \
+                    --no-install-docset \
+                    --publish-docset \
+                    --docset-feed-url "http://realm.io/docs/appledoc" \
+                    --company-id "io.realm" \
+                    --no-repeat-first-par \
+                    --ignore src/realm/objc/RLMColumnProxy.h \
+                    --ignore src/realm/objc/RLMProxy.h \
+                    --ignore src/realm/objc/RLMQuery.h \
+                    --ignore src/realm/objc/RLMType.h \
+                    --ignore src/realm/objc/RLMVersion.h \
+                    --ignore src/realm/objc/RLMDescriptor.h \
+                    --ignore "src/realm/objc/test/*" \
+                    --index-desc doc/index.md \
+                    --template doc/templates \
+                    --exit-threshold 2 \
+                    src/realm/objc/ || exit 1
+        echo "Done generating docs under docs/appledocs"
+        exit 0
+        ;;
+
     "dist-copy")
         # Copy to distribution package
         TARGET_DIR="$1"
@@ -650,8 +764,8 @@ Unspecified or bad mode '$MODE'.
 Available modes are:
   config clean build build-iphone test test-debug test-gdb test-cover
   show-install install uninstall test-installed install-prod install-devel
-  uninstall-prod uninstall-devel dist-copy ios-framework
-  get-version set-version
+  uninstall-prod uninstall-devel dist-copy ios-framework ci-test
+  package-examples get-version set-version docs
 EOF
         exit 1
         ;;

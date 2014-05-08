@@ -127,18 +127,18 @@ CATEGORIES :
       - CODE   : ex_objc_dyn_table_clear
         DESCR  :
 
-  - g_dyn_table_optimize:
-      NAME     : "optimize"
-      SUMMARY  : *g_table_optimize_summary
-      DESCR    : *g_table_optimize_descr
-      SIGNATURE: (BOOL)optimize
-      RETURN:
-        TYPES  : BOOL
-        DESCR  : &objc_no_if_error
-                 "<code>NO</code> if an error occured, otherwise <code>YES</code>"
-      EXAMPLES:
-      - CODE   : ex_objc_dyn_table_optimize
-        DESCR  :
+  # - g_dyn_table_optimize:
+  #     NAME     : "optimize"
+  #     SUMMARY  : *g_table_optimize_summary
+  #     DESCR    : *g_table_optimize_descr
+  #     SIGNATURE: (BOOL)optimize
+  #     RETURN:
+  #       TYPES  : BOOL
+  #       DESCR  : &objc_no_if_error
+  #                "<code>NO</code> if an error occured, otherwise <code>YES</code>"
+  #     EXAMPLES:
+  #     - CODE   : ex_objc_dyn_table_optimize
+  #       DESCR  :
 
   - g_dyn_table_opertator==:
       NAME     : "isEqual"
@@ -345,6 +345,40 @@ CATEGORIES :
         TYPES  : RLMRow *
         DESCR  : The row.
 
+  - g_dyn_table_row_at_indexed_subscript:
+      NAME     : "objectAtIndexedSubscript:"
+      SUMMARY  : Returns a row object at a specified row number.
+      DESCR    : >
+                 The method returns a row object at a specific row number. This method also allows
+                 an <code>RLMTable</code> to use NSArray-styled subscripting.
+                 For example, <code>myRLMTable[2]</code> will return an <code>RLMRow</code> at index 2. 
+      SIGNATURE: "(RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex"
+      PARAMS:
+      - NAME   : rowIndex
+        TYPES  : NSUInteger
+        DESCR  : The row number.
+      RETURN:
+        TYPES  : RLMRow *
+        DESCR  : The row.
+
+  - g_dyn_table_row_at_keyed_subscript:
+      NAME     : "objectForKeyedSubscript:"
+      SUMMARY  : Returns a row object for a specified key.
+      DESCR    : >
+                 The method returns a row object for a given <code>key</code>. This method also allows
+                 an <code>RLMTable</code> to use NSDictionary-styled subscripting. For example,
+                 <code>myRLMTable[@"foo"]</code> will return the first <code>RLMRow</code> where the first column's value is equal to <code>@"foo"</code>.
+                 Please note that the first column in the <code>RLMTable</code> must be of <code>RLMTypeString</code> in order for this method to work.
+                 If the first column is not of <code>RLMTypeString</code>, an exception will be thrown. <code>nil</code> is returned if a key does not exist in the table.
+      SIGNATURE: "(RLMRow *)objectForKeyedSubscript:(NSString *)key"
+      PARAMS:
+      - NAME   : key
+        TYPES  : NSString *
+        DESCR  : The key to lookup.
+      RETURN:
+        TYPES  : RLMRow *
+        DESCR  : The row.
+
   - g_dyn_table_cursor_at_first_index:
       NAME     : firstRow
       SUMMARY  : Returns the first row.
@@ -378,7 +412,7 @@ CATEGORIES :
         DESCR  : Returns the inserted row.
 
   - objc_dyn_table_insert_object:
-      NAME     : "insertRow:atRowIndex:"
+      NAME     : "insertRow:atIndex:"
       SUMMARY  : Insert a row.
       DESCR    : >
                  This method will insert a row in the table at a particular
@@ -387,10 +421,25 @@ CATEGORIES :
                  with default values is inserted. Properties in generic objects
                  (derived from <code>NSObject</code>) which match columns names
                  will be used. Non-matching properties are ignored.
-      SIGNATURE: (void)insertRow:(id)anObject atRowIndex:(NSUInteger)rowIndex
+      SIGNATURE: (void)insertRow:(NSObject *)anObject atIndex:(NSUInteger)rowIndex
       PARAMS:
       - NAME    : anObject
-        TYPES   : id
+        TYPES   : NSObject *
+        DESCR   : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>.
+      - NAME    : rowIndex
+        TYPES   : NSUInteger
+        DESCR   : *g_dyn_table_insert_empty_row_parm1_descr
+
+  - objc_dyn_table_set_object:
+      NAME     : "updateRow:atIndex:"
+      SUMMARY  : Updates a row.
+      DESCR    : >
+                 This method will update a row in the table at the specified index with <code>anObject</code>. If <code>anObject</code> is <code>nil</code>, nothing will happen to the row. Properties in generic objects (derived from <code>NSObject</code>) 
+                 which match columns names will be used. Non-matching properties are ignored. An exception is thrown if passing an index that is out of bounds.
+      SIGNATURE: (void)updateRow:(NSObject *)anObject atRowIndex:(NSUInteger)rowIndex
+      PARAMS:
+      - NAME    : anObject
+        TYPES   : NSObject *
         DESCR   : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>.
       - NAME    : rowIndex
         TYPES   : NSUInteger
@@ -412,6 +461,36 @@ CATEGORIES :
       - NAME   : data
         TYPES  : NSObject *
         DESCR  : The row either as an <code>NSArray</code>, <code>NSDictionary</code>, or a generic <code>NSObject</code>.
+
+  # - objc_dyn_table_object_at_indexed_subscript:
+  #     NAME     : "objectAtIndexedSubscript:"
+  #     SUMMARY  : Returns an <code>RLMRow</code> at the specified index.
+  #     DESCR    : >
+  #                This method will return an RLMRow for a given index. This can also be used similarly to
+  #                NSArray styled subscripting. For example, <code>myRLMTable[2]</code> will return an RLMRow at index 2. 
+  #                If passing an index that is out of bounds, this method returns nil.
+  #     SIGNATURE: (RLMRow *)objectAtIndexedSubscript:(NSUInteger)rowIndex;
+  #     PARAMS:
+  #     - NAME   : rowIndex
+  #       TYPES  : NSUInteger
+  #       DESCR  : *g_dyn_table_insert_empty_row_parm1_descr
+
+  # - objc_dyn_table_set_object_at_indexed_subscript:
+  #     NAME     : "setObject:atIndexedSubscript:"
+  #     SUMMARY  : Sets an object at a specified index.
+  #     DESCR    : >
+  #                This method will set an <code>RLMRow</code> at a given index. This can also be used
+  #                similarly to NSArray styled subscripting. For example, <code>myRLMTable[2] = @{@"objectID" : @1234, @"name" : @"foo"}</code>
+  #                will set the values for the RLMRow at index 2. Please note that the <code>RLMTable</code>'s column names must match the dictionary keys.
+  #     SIGNATURE: (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex
+  #     PARAMS:
+  #     - NAME   : newValue
+  #       TYPES  : NSObject *
+  #       DESCR  : The row either as an <code>NSArray</code>, <code>NSDictionary</code> or a generic <code>NSObject</code>.
+  #     - NAME   : rowIndex
+  #       TYPES  : NSUInteger
+  #       DESCR  : *g_dyn_table_insert_empty_row_parm1_descr        
+
 
 
 # TODO: Should this be supported at all?
@@ -484,7 +563,8 @@ CATEGORIES :
         DESCR  : *g_dyn_table_remove_row_param1_descr
       EXAMPLES:
       - CODE   : ex_objc_dyn_table_remove
-        DESCR  : *objc_no_if_error
+        DESCR  : &objc_no_if_error
+                "<code>NO</code> if an error occured, otherwise <code>YES</code>"
 
   - g_dyn_table_remove_last_row:
       NAME     : removeLastRow
@@ -846,19 +926,19 @@ CATEGORIES :
         TYPES  : RLMView *
         DESCR  : The filtered and/or sorted view
 
-  - g_dyn_table_where_const:
-      IGNORE   : ""
-  - g_dyn_table_where:
-      NAME     : where
-      SIGNATURE: (RLMQuery *)where
-      SUMMARY  : *g_dyn_table_where_summary
-      DESCR    : *g_dyn_table_where_descr
-      RETURN:
-        TYPES  : RLMQuery *
-        DESCR  : *g_dyn_table_where_return_descr
-      EXAMPLES:
-      - DESCR  :
-        CODE   : ex_objc_dyn_table_where
+  # - g_dyn_table_where_const:
+  #     IGNORE   : ""
+  # - g_dyn_table_where:
+  #     NAME     : where
+  #     SIGNATURE: (RLMQuery *)where
+  #     SUMMARY  : *g_dyn_table_where_summary
+  #     DESCR    : *g_dyn_table_where_descr
+  #     RETURN:
+  #       TYPES  : RLMQuery *
+  #       DESCR  : *g_dyn_table_where_return_descr
+  #     EXAMPLES:
+  #     - DESCR  :
+  #       CODE   : ex_objc_dyn_table_where
 
 
 # - Aggregates:

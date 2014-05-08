@@ -1,67 +1,46 @@
-/*
- version.m
- TightDB
-*/
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/RLMVersion.h>
 
-@interface MACTestVersion: XCTestCase
+@interface RLMTestVersion: RLMTestCase
 @end
 
-@implementation MACTestVersion
+@implementation RLMTestVersion
+
+-(void)testVersionGetters
 {
+    XCTAssertEqual((NSInteger)REALM_VERSION_MAJOR, [RLMVersion major] );
+    XCTAssertEqual((NSInteger)REALM_VERSION_MINOR, [RLMVersion minor] );
+    XCTAssertEqual((NSInteger)REALM_VERSION_PATCH, [RLMVersion major] );
+
+    NSString *ver1 = [RLMVersion version];
+    NSString *ver2 = [NSString stringWithFormat:@"%d.%d.%d",
+                      REALM_VERSION_MAJOR, REALM_VERSION_MINOR, REALM_VERSION_PATCH];
+    XCTAssert( [ver1 isEqualToString:ver2] );
 }
 
--(void)setUp
-{
-  [super setUp];
-}
-
--(void)tearDown
-{
-}
-
--(void)testMajorVersion
-{
-  if (TDB_VERSION_MAJOR != [RLMVersion getMajor])
-    XCTFail(@"Wrong major version");
-}
--(void)testMinorVersion
-{
-  if (TDB_VERSION_MINOR != [RLMVersion getMinor])
-    XCTFail(@"Wrong minor version");
-}
--(void)testPatchVersion
-{
-  if (TDB_VERSION_PATCH != [RLMVersion getPatch])
-    XCTFail(@"Wrong patch version");
-}
 -(void)testIsAtLeast
 {
-    if ([RLMVersion isAtLeast:TDB_VERSION_MAJOR- 1 minor:TDB_VERSION_MINOR patch:TDB_VERSION_PATCH])
-        XCTFail(@"Wrong Major version");
-    if ([RLMVersion isAtLeast:TDB_VERSION_MAJOR minor:TDB_VERSION_MINOR- 1 patch:TDB_VERSION_PATCH])
-        XCTFail(@"Wrong Minor version");
-    if ([RLMVersion isAtLeast:TDB_VERSION_MAJOR minor:TDB_VERSION_MINOR patch:TDB_VERSION_PATCH- 1])
-        XCTFail(@"Wrong Patch version");
+    XCTAssertTrue( [RLMVersion isAtLeast:0
+                                   minor:0
+                                   patch:0] );
 
-    if (![RLMVersion isAtLeast:TDB_VERSION_MAJOR+ 1 minor:TDB_VERSION_MINOR patch:TDB_VERSION_PATCH])
-        XCTFail(@"Wrong Major version");
-    if (![RLMVersion isAtLeast:TDB_VERSION_MAJOR minor:TDB_VERSION_MINOR+ 1 patch:TDB_VERSION_PATCH])
-        XCTFail(@"Wrong Minor version");
-    if (![RLMVersion isAtLeast:TDB_VERSION_MAJOR minor:TDB_VERSION_MINOR patch:TDB_VERSION_PATCH+ 1])
-        XCTFail(@"Wrong Patch version");
+    XCTAssertTrue( [RLMVersion isAtLeast:REALM_VERSION_MAJOR
+                                   minor:REALM_VERSION_MINOR
+                                   patch:REALM_VERSION_PATCH] );
+
+    XCTAssertFalse( [RLMVersion isAtLeast:REALM_VERSION_MAJOR+1
+                                    minor:REALM_VERSION_MINOR
+                                    patch:REALM_VERSION_PATCH] );
+
+    XCTAssertFalse( [RLMVersion isAtLeast:REALM_VERSION_MAJOR
+                                   minor:REALM_VERSION_MINOR+1
+                                   patch:REALM_VERSION_PATCH] );
+
+    XCTAssertFalse( [RLMVersion isAtLeast:REALM_VERSION_MAJOR
+                                   minor:REALM_VERSION_MINOR
+                                   patch:REALM_VERSION_PATCH+1] );
 }
 
--(void)testGetVersion
-{
-    NSString *s1 = [NSString stringWithFormat:@"%d.%d.%d", 
-                             [RLMVersion getMajor],
-                             [RLMVersion getMinor],
-                             [RLMVersion getPatch]];
-    if (![[RLMVersion getVersion] isEqualToString:s1])
-        XCTFail(@"Version string incorrect");
-}
 @end

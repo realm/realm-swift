@@ -1,22 +1,22 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
 
@@ -29,6 +29,7 @@
 #import "RLMTable_noinst.h"
 #import "util_noinst.hpp"
 #import "NSData+RLMGetBinaryData.h"
+#import "RLMPrivate.h"
 
 using namespace tightdb;
 
@@ -101,7 +102,7 @@ NSObject* get_cell(size_t col_ndx, size_t row_ndx, Table& table)
             return d;
         }
         case type_Table: {
-            RLMTable *t = [[RLMTable alloc] init];
+            RLMTable *t = [[RLMTable alloc] _initRaw];
             TableRef table_ref = table.get_subtable(col_ndx, row_ndx);
             [t setNativeTable:table_ref.get()];
             return t;
@@ -139,7 +140,7 @@ NSObject* get_cell(size_t col_ndx, size_t row_ndx, Table& table)
                     return d;
                 }
                 case type_Table: {
-                    RLMTable *t = [[RLMTable alloc] init];
+                    RLMTable *t = [[RLMTable alloc] _initRaw];
                     TableRef table_ref = table.get_subtable(col_ndx, row_ndx);
                     [t setNativeTable:table_ref.get()];
                     return t;
@@ -278,9 +279,9 @@ void verify_row(const Descriptor& descr, NSArray* data)
     while (obj = [enumerator nextObject]) {
         if (!verify_cell(descr, col_ndx, obj)) {
             @throw [NSException exceptionWithName:@"realm:wrong_column_type"
-                                           reason:[NSString stringWithFormat: @"colName %@ with index: %lu is of type %u",
+                                           reason:[NSString stringWithFormat: @"colName %@ with index: %lu is of type %@",
                                                             to_objc_string(descr.get_column_name(col_ndx)), col_ndx,
-                                                                           descr.get_column_type(col_ndx) ]
+                                                                           rlmtype_to_string(descr.get_column_type(col_ndx)) ]
                                          userInfo:nil];
         }
         ++col_ndx;
@@ -297,8 +298,8 @@ void verify_row_with_labels(const Descriptor& descr, NSDictionary* data)
             continue;
         if (!verify_cell(descr, i, value)) {
             @throw [NSException exceptionWithName:@"realm:wrong_column_type"
-                                           reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
-                                                   to_objc_string(descr.get_column_name(i)), i, descr.get_column_type(i) ]
+                                           reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %@",
+                                                   to_objc_string(descr.get_column_name(i)), i, rlmtype_to_string(descr.get_column_type(i)) ]
                                          userInfo:nil];
         }
     }
@@ -318,9 +319,9 @@ void verify_row_from_object(const Descriptor& descr, NSObject* data)
         }
         if (!verify_cell(descr, col_ndx, value)) {
             @throw [NSException exceptionWithName: @"realm:wrong_column_type"
-                                           reason: [NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
+                                           reason: [NSString stringWithFormat:@"colName %@ with index: %lu is of type %@",
                                                     to_objc_string(descr.get_column_name(col_ndx)), col_ndx,
-                                                                   descr.get_column_type(col_ndx) ]
+                                                                   rlmtype_to_string(descr.get_column_type(col_ndx)) ]
                                          userInfo: nil];
         }
 
@@ -452,23 +453,19 @@ void insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
     // FIXME: handling of tightdb exceptions => return NO
     size_t col_ndx = 0;
     while (obj = [enumerator nextObject]) {
-        subtable_seen = subtable_seen || insert_cell(col_ndx, row_ndx, table, obj);
+        subtable_seen |= insert_cell(col_ndx, row_ndx, table, obj);
         ++col_ndx;
     }
     table.insert_done();
 
     if (subtable_seen) {
-        NSEnumerator *enumerator = [data objectEnumerator];
-        size_t col_ndx = 0;
-        id obj;
-        while (obj = [enumerator nextObject]) {
+        for (unsigned int col_ndx = 0; col_ndx < data.count; col_ndx++) {
+            id obj = data[col_ndx];
             DataType datatype = table.get_column_type(col_ndx);
             if (datatype != type_Table && datatype != type_Mixed) {
-                ++col_ndx;
                 continue;
             }
             if (obj == nil) {
-                ++col_ndx;
                 continue;
             }
 
@@ -520,7 +517,7 @@ void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
 
             TableRef subtable = table.get_subtable(col_ndx, row_ndx);
 
-            /* fill in data */
+            // fill in data
             insert_row_with_labels(row_ndx, *subtable, (NSDictionary *)value);
         }
     }
@@ -645,9 +642,9 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 break;
             }
             @throw [NSException exceptionWithName:@"realm:cannot insert subtable"
-                                           reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %u",
+                                           reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %@",
                                                             to_objc_string(table.get_column_name(col_ndx)), col_ndx,
-                                                                           table.get_column_type(col_ndx) ]
+                                                                           rlmtype_to_string(table.get_column_type(col_ndx)) ]
                                          userInfo:nil];
         }
         case type_Mixed:

@@ -1,22 +1,22 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #include <string>
 #include <tightdb.hpp>
@@ -29,53 +29,50 @@
 {
 }
 
--(id)init
++(NSInteger)major
 {
-    self = [super init];
-    return self;
+    return REALM_VERSION_MAJOR;
 }
 
-+(const int)getMajor
++(NSInteger)minor
 {
-    return TDB_VERSION_MAJOR;
+    return REALM_VERSION_MINOR;
 }
 
-+(const int)getMinor
++(NSInteger)patch
 {
-    return TDB_VERSION_MINOR;
+    return REALM_VERSION_PATCH;
 }
 
-+(const int)getPatch
++(BOOL)isAtLeast:(NSInteger)major minor:(NSInteger)minor patch:(NSInteger)patch
 {
-    return TDB_VERSION_PATCH;
+    if ([RLMVersion major] < major)
+        return false;
+    if ([RLMVersion major] > major)
+        return true;
+
+    if ([RLMVersion minor] < minor)
+        return false;
+    if ([RLMVersion minor] > minor)
+        return true;
+
+    return (self.patch >= patch);
 }
 
-+(BOOL)isAtLeast:(int)major minor:(int)minor patch:(int)patch
++(NSString*)version
 {
-    if (major < TDB_VERSION_MAJOR)
-        return NO;
-    if (minor < TDB_VERSION_MINOR)
-        return NO;
-    if (patch < TDB_VERSION_PATCH)
-        return NO;
-    return YES;
+    return [NSString stringWithFormat:@"%zd.%zd.%zd",
+            [RLMVersion major],
+            [RLMVersion minor],
+            [RLMVersion patch]];
 }
 
-+(NSString*)getVersion
+// Not shared in the interface p.t.
++(NSString*)coreVersion
 {
-    NSString *s = [NSString stringWithFormat:@"%d.%d.%d", 
-                            [RLMVersion getMajor],
-                            [RLMVersion getMinor],
-                            [RLMVersion getPatch]];
-    return s;
-}
-
-+(NSString*)getCoreVersion
-{
-    NSString *s = [NSString stringWithFormat:@"%d.%d.%d",
-                            tightdb::Version::get_major(),
-                            tightdb::Version::get_minor(),
-                            tightdb::Version::get_patch()];
-    return s;
+    return [NSString stringWithFormat:@"%d.%d.%d",
+            tightdb::Version::get_major(),
+            tightdb::Version::get_minor(),
+            tightdb::Version::get_patch()];
 }
 @end

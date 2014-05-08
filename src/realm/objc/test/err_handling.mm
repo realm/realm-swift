@@ -1,6 +1,3 @@
-
-
-
 //
 //  err_handling.m
 //  TightDB
@@ -9,419 +6,390 @@
 //
 
 
-#import <XCTest/XCTest.h>
+#import "RLMTestCase.h"
 
 #import <realm/objc/Realm.h>
-#import <realm/objc/group.h>
-
-#include <tightdb/binary_data.hpp>
-#include <tightdb/table.hpp>
 #import <realm/objc/RLMTable_noinst.h>
+#import <realm/objc/RLMTableFast.h>
 
-REALM_TABLE_DEF_3(PeopleErrTable,
-                    Name,  String,
-                    Age,   Int,
-                    Hired, Bool)
+@interface PeopleErrObject : RLMRow
 
-REALM_TABLE_IMPL_3(PeopleErrTable,
-                     Name,  String,
-                     Age,   Int,
-                     Hired, Bool)
+@property (nonatomic, copy)   NSString *Name;
+@property (nonatomic, assign) NSInteger Age;
+@property (nonatomic, assign) BOOL      Hired;
 
-REALM_TABLE_1(TestQueryErrSub,
-                Age,  Int)
-
-REALM_TABLE_9(TestQueryErrAllTypes,
-                BoolCol,   Bool,
-                IntCol,    Int,
-                FloatCol,  Float,
-                DoubleCol, Double,
-                StringCol, String,
-                BinaryCol, Binary,
-                DateCol,   Date,
-                TableCol,  TestQueryErrSub,
-                MixedCol,  Mixed)
-
-
-
-@interface MACTestErrHandling: XCTestCase
 @end
+
+@implementation PeopleErrObject
+@end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(PeopleErrTable, PeopleErrObject);
+
+@interface TestQueryObject : RLMRow
+
+@property (nonatomic, assign) NSInteger Age;
+
+@end
+
+@implementation TestQueryObject
+@end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryTable, TestQueryObject);
+
+@interface TestQueryAllObject : RLMRow
+
+@property (nonatomic, assign) BOOL      BoolCol;
+@property (nonatomic, assign) NSInteger IntCol;
+@property (nonatomic, assign) CGFloat   FloatCol;
+@property (nonatomic, assign) double    DoubleCol;
+@property (nonatomic, copy)   NSString *StringCol;
+@property (nonatomic, strong) NSData   *BinaryCol;
+@property (nonatomic, strong) NSDate   *DateCol;
+@property (nonatomic, strong) TestQueryTable *TableCol;
+
+@end
+
+@implementation TestQueryAllObject
+@end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryAllTable, TestQueryAllObject);
+
+@interface MACTestErrHandling: RLMTestCase
+
+@end
+
 @implementation MACTestErrHandling
 
-
-
-
-
-- (void)testErrHandling
-{
-    NSError* error = nil;
-
+- (void)testErrHandling {
     //------------------------------------------------------
     NSLog(@"--- Creating tables ---");
     //------------------------------------------------------
+    NSError* error = nil;
 
-    RLMTransaction * transaction = [RLMTransaction group];
-    // Create new table in group
-    PeopleErrTable* people = [transaction createTableWithName:@"employees" asTableClass:[PeopleErrTable class]];
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        // Create new table in realm
+        RLMTable* people = [realm createTableWithName:@"employees" objectClass:[PeopleErrObject class]];
+        
+        // No longer supports errors, the tes may be redundant
+        // Add some rows
+        
+        [people addRow:@[@"John", @20, @YES]];
+        [people addRow:@[@"Mary", @21, @NO]];
+        [people addRow:@[@"Lars", @21, @YES]];
+        [people addRow:@[@"Phil", @43, @NO]];
+        [people addRow:@[@"Anni", @54, @YES]];
+        
+        // Insert at specific position
+        [people insertRow:@[@"Frank", @34, @YES] atIndex:2];
+        
+        // Getting the size of the table
+        NSLog(@"PeopleErrTable Size: %lu - is %@.    [6 - not empty]", [people rowCount],
+              people.rowCount == 0 ? @"empty" : @"not empty");
+    }];
 
-    // No longer supports errors, the tes may be redundant
-    // Add some rows
-
-    [people addName:@"John" Age:20 Hired:YES];
-    [people addName:@"Mary" Age:21 Hired:NO];
-    [people addName:@"Lars" Age:21 Hired:YES];
-    [people addName:@"Phil" Age:43 Hired:NO];
-    [people addName:@"Anni" Age:54 Hired:YES];
-
-
-
-    // Insert at specific position
-    [people insertEmptyRowAtIndex:2 Name:@"Frank" Age:34 Hired:YES];
-
-    // Getting the size of the table
-    NSLog(@"PeopleErrTable Size: %lu - is %@.    [6 - not empty]", [people rowCount],
-        people.rowCount == 0 ? @"empty" : @"not empty");
-
-    NSFileManager* fm = [NSFileManager defaultManager];
-
-    // Write the group to disk
-    [fm removeItemAtPath:@"peopleErr.realm" error:NULL];
-    error = nil;
-    if (![transaction writeContextToFile:@"peopleErr.realm" error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-        XCTFail(@"No error expected");
-    }
+    XCTAssertNil(error, @"error should be nil after saving a transaction");
 
     //------------------------------------------------------
     NSLog(@"--- Changing permissions ---");
     //------------------------------------------------------
-
-    NSMutableDictionary* attributes = [NSMutableDictionary dictionaryWithCapacity:1];
-    [attributes setValue:[NSNumber numberWithShort:0444] forKey:NSFilePosixPermissions];
-
+    
     error = nil;
-    [fm setAttributes:attributes ofItemAtPath:@"peopleErr.realm" error:&error];
+    NSFileManager *fm = [NSFileManager defaultManager];
+    [fm setAttributes:@{NSFilePosixPermissions: @(0444)}
+         ofItemAtPath:RLMTestRealmPath
+                error:&error];
     if (error) {
         XCTFail(@"Failed to set readonly attributes");
     }
-
-    //------------------------------------------------------
-    NSLog(@"--- Reopen and manipulate ---");
-    //------------------------------------------------------
-
-    // Load a group from disk (and try to update, even though it is readonly)
-    error = nil;
-    RLMTransaction * fromDisk = [RLMTransaction groupWithFile:@"peopleErr.realm" error:&error];
-    if (error) {
-        NSLog(@"%@", [error localizedDescription]);
-    }
-    else {
-        // This is no longer an error, becuase read/write mode is no longer required per default.
-        // XCTFail(@"Since file cannot be opened, we should have gotten an error here.");
-    }
-
+    
     //------------------------------------------------------
     NSLog(@"--- Make normal again ---");
     //------------------------------------------------------
-
-    [attributes setValue:[NSNumber numberWithShort:0644] forKey:NSFilePosixPermissions];
-
+    
     error = nil;
-    [fm setAttributes:attributes ofItemAtPath:@"peopleErr.realm" error:&error];
+    [fm setAttributes:@{NSFilePosixPermissions: @(0644)}
+         ofItemAtPath:RLMTestRealmPath
+                error:&error];
     if (error) {
         XCTFail(@"Failed to set readonly attributes");
     }
+    
+    RLMRealm *fromDisk = [self realmWithTestPath];
+    XCTAssertNotNil(fromDisk, @"realm from disk should be valid");
 
-    error = nil;
-    fromDisk = [RLMTransaction groupWithFile:@"peopleErr.realm" error:&error];
-    if (error) {
-        NSLog(@"%@", [error localizedDescription]);
-        XCTFail(@"File should have been possible to open");
-    }
-
-    PeopleErrTable* diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PeopleErrTable class]];
+    PeopleErrTable *diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PeopleErrTable class]];
 
     // Fake readonly.
-    [((RLMTable*)diskTable) setReadOnly:true];
+    [((RLMTable*)diskTable) setReadOnly:YES];
 
     NSLog(@"Disktable size: %zu", [diskTable rowCount]);
 
-    /* No longer support for errors here
-    error = nil;
-    if (![diskTable addName:@"Anni" Age:54 Hired:YES error:&error]) {
-        NSLog(@"%@", [error localizedDescription]);
-    } else {
-        XCTFail(@"addName to readonly should have failed.");
-    }*/
-
-    NSLog(@"Disktable size: %zu", [diskTable rowCount]);
+//    No longer support for errors here
+//    error = nil;
+//    if (![diskTable addName:@"Anni" Age:54 Hired:YES error:&error]) {
+//        NSLog(@"%@", [error localizedDescription]);
+//    } else {
+//        XCTFail(@"addName to readonly should have failed.");
+//    }
+//
+//    NSLog(@"Disktable size: %zu", [diskTable rowCount]);
 }
 
-
-
-
--(void)testErrorInsert
-{
-
-
-    // Create table with all column types
-    RLMTable* table = [[RLMTable alloc] init];
-    RLMDescriptor * desc = [table descriptor];
-    if (![desc addColumnWithName:@"int" type:RLMTypeInt]) {
-        XCTFail(@"addColumn failed.");
-    }
-    if (![desc addColumnWithName:@"bool" type:RLMTypeBool]) {
-        XCTFail(@"addColumn failed.");
-    }
-
-    if (![desc addColumnWithName:@"date" type:RLMTypeDate]) {
-        XCTFail(@"addColumn failed.");
-    }
-    if (![desc addColumnWithName:@"string" type:RLMTypeString]) {
-        XCTFail(@"addColumn failed.");
-    }
-    if (![desc addColumnWithName:@"string_long" type:RLMTypeString]) {
-        XCTFail(@"addColumn failed.");
-    }
-    if (![desc addColumnWithName:@"string_enum" type:RLMTypeString]) {
-        XCTFail(@"addColumn failed.");
-    }
-    if (![desc addColumnWithName:@"binary" type:RLMTypeBinary]) {
-        XCTFail(@"addColumn failed.");
-    }
-    if (![desc addColumnWithName:@"mixed" type:RLMTypeMixed]) {
-        XCTFail(@"addColumn failed.");
-    }
-    RLMDescriptor * subdesc;
-    if (!(subdesc = [desc addColumnTable:@"tables"])) {
-        XCTFail(@"addColumn failed.");
-    }
-    if (![subdesc addColumnWithName:@"sub_first" type:RLMTypeInt]) {
-        XCTFail(@"addColumn failed.");
-    }
-    if (![subdesc addColumnWithName:@"sub_second" type:RLMTypeString]) {
-        XCTFail(@"addColumn failed.");
-    }
-
-    // Add some rows
-    for (size_t i = 0; i < 15; ++i) {
-        if (![table RLM_insertInt:0 ndx:i value:i]) {
-           // NSLog(@"%@", [error localizedDescription]);
-            XCTFail(@"Insert failed.");
+- (void)testErrorInsert {
+    [self createTestTableWithWriteBlock:^(RLMTable *table) {
+        // Create table with all column types
+        RLMDescriptor * desc = [table descriptor];
+        if ([desc addColumnWithName:@"int" type:RLMTypeInt] == NSNotFound) {
+            XCTFail(@"addColumn failed.");
         }
-        if (![table RLM_insertBool:1 ndx:i value:(i % 2 ? YES : NO)]) {
-            XCTFail(@"Insert failed.");
+        if ([desc addColumnWithName:@"bool" type:RLMTypeBool] == NSNotFound) {
+            XCTFail(@"addColumn failed.");
         }
-        if (![table RLM_insertDate:2 ndx:i value:[NSDate date]]) {
-            XCTFail(@"Insert failed.");
+        
+        if ([desc addColumnWithName:@"date" type:RLMTypeDate] == NSNotFound) {
+            XCTFail(@"addColumn failed.");
         }
-        if (![table RLM_insertString:3 ndx:i value:[NSString stringWithFormat:@"string %zu", i]]) {
-            XCTFail(@"Insert failed.");
+        if ([desc addColumnWithName:@"string" type:RLMTypeString] == NSNotFound) {
+            XCTFail(@"addColumn failed.");
         }
-        if (![table RLM_insertString:4 ndx:i value:@" Very long string.............."]) {
-            XCTFail(@"Insert failed.");
+        if ([desc addColumnWithName:@"string_long" type:RLMTypeString] == NSNotFound) {
+            XCTFail(@"addColumn failed.");
         }
-
-        switch (i % 3) {
-            case 0:
-                if (![table RLM_insertString:5 ndx:i value:@"test1"]) {
-                    XCTFail(@"Insert failed.");
-                }
-                break;
-            case 1:
-                if (![table RLM_insertString:5 ndx:i value:@"test2"]) {
-                    XCTFail(@"Insert failed.");
-                }
-                break;
-            case 2:
-                if (![table RLM_insertString:5 ndx:i value:@"test3"]) {
-                    XCTFail(@"Insert failed.");
-                }
-                break;
+        if ([desc addColumnWithName:@"string_enum" type:RLMTypeString] == NSNotFound) {
+            XCTFail(@"addColumn failed.");
         }
-
-        if (![table RLM_insertBinary:6 ndx:i data:"binary" size:7]) {
-            XCTFail(@"Insert failed.");
+        if ([desc addColumnWithName:@"binary" type:RLMTypeBinary] == NSNotFound) {
+            XCTFail(@"addColumn failed.");
         }
-        switch (i % 3) {
-            case 0:
-               if (![table RLM_insertMixed:7 ndx:i value:[NSNumber numberWithBool:NO] ]) {
-                    XCTFail(@"Insert failed.");
-                }
-                break;
-            case 1:
-                if (![table RLM_insertMixed:7 ndx:i value:[NSNumber numberWithLongLong:i] ]) {
-                    XCTFail(@"Insert failed.");
-                }
-                break;
-            case 2:
-                if (![table RLM_insertMixed:7 ndx:i value:[NSString stringWithUTF8String:"string"] ]) {
-                    XCTFail(@"Insert failed.");
-                }
-                break;
+        if ([desc addColumnWithName:@"mixed" type:RLMTypeMixed] == NSNotFound) {
+            XCTFail(@"addColumn failed.");
         }
-        if (![table RLM_insertSubtable:8 ndx:i]) {
-            XCTFail(@"Insert failed.");
+        RLMDescriptor * subdesc;
+        if (!(subdesc = [desc addColumnTable:@"tables"])) {
+            XCTFail(@"addColumn failed.");
         }
-
-        if (![table RLM_insertDone ]) {
-            XCTFail(@"InsertDone failed.");
+        if ([subdesc addColumnWithName:@"sub_first" type:RLMTypeInt] == NSNotFound) {
+            XCTFail(@"addColumn failed.");
         }
-
-        // Add sub-tables
-        if (i == 2) {
-            RLMTable* subtable = [table RLM_tableInColumnWithIndex:8 atRowIndex:i];
-            if (![subtable RLM_insertInt:0 ndx:0 value:42]) {
+        if ([subdesc addColumnWithName:@"sub_second" type:RLMTypeString] == NSNotFound) {
+            XCTFail(@"addColumn failed.");
+        }
+        
+        // Add some rows
+        for (NSUInteger i = 0; i < 15; ++i) {
+            if (![table RLM_insertInt:0 ndx:i value:i]) {
+                // NSLog(@"%@", [error localizedDescription]);
                 XCTFail(@"Insert failed.");
             }
-            if (![subtable RLM_insertString:1 ndx:0 value:@"meaning"]) {
+            if (![table RLM_insertBool:1 ndx:i value:(i % 2 ? YES : NO)]) {
                 XCTFail(@"Insert failed.");
             }
-            if (![subtable RLM_insertDone ]) {
+            if (![table RLM_insertDate:2 ndx:i value:[NSDate date]]) {
+                XCTFail(@"Insert failed.");
+            }
+            if (![table RLM_insertString:3 ndx:i value:[NSString stringWithFormat:@"string %zu", i]]) {
+                XCTFail(@"Insert failed.");
+            }
+            if (![table RLM_insertString:4 ndx:i value:@" Very long string.............."]) {
+                XCTFail(@"Insert failed.");
+            }
+            
+            switch (i % 3) {
+                case 0:
+                    if (![table RLM_insertString:5 ndx:i value:@"test1"]) {
+                        XCTFail(@"Insert failed.");
+                    }
+                    break;
+                case 1:
+                    if (![table RLM_insertString:5 ndx:i value:@"test2"]) {
+                        XCTFail(@"Insert failed.");
+                    }
+                    break;
+                case 2:
+                    if (![table RLM_insertString:5 ndx:i value:@"test3"]) {
+                        XCTFail(@"Insert failed.");
+                    }
+                    break;
+            }
+            
+            if (![table RLM_insertBinary:6 ndx:i data:"binary" size:7]) {
+                XCTFail(@"Insert failed.");
+            }
+            switch (i % 3) {
+                case 0:
+                    if (![table RLM_insertMixed:7 ndx:i value:[NSNumber numberWithBool:NO] ]) {
+                        XCTFail(@"Insert failed.");
+                    }
+                    break;
+                case 1:
+                    if (![table RLM_insertMixed:7 ndx:i value:[NSNumber numberWithLongLong:i] ]) {
+                        XCTFail(@"Insert failed.");
+                    }
+                    break;
+                case 2:
+                    if (![table RLM_insertMixed:7 ndx:i value:[NSString stringWithUTF8String:"string"] ]) {
+                        XCTFail(@"Insert failed.");
+                    }
+                    break;
+            }
+            if (![table RLM_insertSubtable:8 ndx:i]) {
+                XCTFail(@"Insert failed.");
+            }
+            
+            if (![table RLM_insertDone ]) {
                 XCTFail(@"InsertDone failed.");
             }
+            
+            // Add sub-tables
+            if (i == 2) {
+                RLMTable* subtable = [table RLM_tableInColumnWithIndex:8 atRowIndex:i];
+                if (![subtable RLM_insertInt:0 ndx:0 value:42]) {
+                    XCTFail(@"Insert failed.");
+                }
+                if (![subtable RLM_insertString:1 ndx:0 value:@"meaning"]) {
+                    XCTFail(@"Insert failed.");
+                }
+                if (![subtable RLM_insertDone ]) {
+                    XCTFail(@"InsertDone failed.");
+                }
+            }
+            
+            
         }
-
-
-    }
-
-    // We also want a ColumnStringEnum
-    if (![table optimize]) {
-        XCTFail(@"Insert failed.");
-    }
-
-    // Test Deletes
-    XCTAssertNoThrow([table removeRowAtIndex:14]);
-    XCTAssertNoThrow([table removeRowAtIndex:0]);
-    XCTAssertNoThrow([table removeRowAtIndex:5]);
-
-    XCTAssertEqual(table.rowCount, (NSUInteger)12, @"Size should have been 12");
-
-    // Test Clear
-    XCTAssertNoThrow([table removeAllRows]);
-    XCTAssertEqual(table.rowCount, (NSUInteger)0, @"Size should have been zero");
-
+        
+        // We also want a ColumnStringEnum
+        if (![table optimize]) {
+            XCTFail(@"Insert failed.");
+        }
+        
+        // Test Deletes
+        XCTAssertNoThrow([table removeRowAtIndex:14]);
+        XCTAssertNoThrow([table removeRowAtIndex:0]);
+        XCTAssertNoThrow([table removeRowAtIndex:5]);
+        
+        XCTAssertEqual(table.rowCount, (NSUInteger)12, @"Size should have been 12");
+        
+        // Test Clear
+        XCTAssertNoThrow([table removeAllRows]);
+        XCTAssertEqual(table.rowCount, (NSUInteger)0, @"Size should have been zero");
+    }];
 }
 
+- (void)testQueryErrHandling {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+        TestQueryAllTable *table = [TestQueryAllTable tableInRealm:realm named:@"table"];
+        XCTAssertNotNil(table, @"Table is nil");
+        
+        const char bin[4] = { 0, 1, 2, 3 };
+        NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+        NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
+        NSDate *date = [NSDate date];
 
-- (void)testQueryErrHandling
-{
-    TestQueryErrAllTypes* table = [[TestQueryErrAllTypes alloc] init];
-    NSLog(@"Table: %@", table);
-    XCTAssertNotNil(table, @"Table is nil");
+        [table addRow:@{@"BoolCol":   @NO,
+                        @"IntCol":    @54,
+                        @"FloatCol":  @0.7,
+                        @"DoubleCol": @0.8,
+                        @"StringCol": @"foo",
+                        @"BinaryCol": bin1,
+                        @"DateCol":   [NSDate dateWithTimeIntervalSince1970:0]}];
+        
+        [table addRow:@{@"BoolCol":   @YES,
+                        @"IntCol":    @506,
+                        @"FloatCol":  @7.7,
+                        @"DoubleCol": @8.8,
+                        @"StringCol": @"banach",
+                        @"BinaryCol": bin2,
+                        @"DateCol":   date}];
+        TestQueryTable *subtable = [table lastRow][@"TableCol"];
+        [subtable addRow:@[@100]];
+        
+        XCTAssertEqual([table countWhere:@"BoolCol == NO"],      (NSUInteger)1, @"BoolCol count");
+        XCTAssertEqual([table countWhere:@"IntCol == 54"],       (NSUInteger)1, @"IntCol count");
+        XCTAssertEqual([table countWhere:@"FloatCol == 0.7"],    (NSUInteger)1, @"FloatCol count");
+        XCTAssertEqual([table countWhere:@"DoubleCol == 0.8"],   (NSUInteger)1, @"DoubleCol count");
+        XCTAssertEqual([table countWhere:@"StringCol == 'foo'"], (NSUInteger)1, @"StringCol count");
+        NSUInteger binCount = [table countWhere:[NSPredicate predicateWithFormat:@"BinaryCol == %@", bin1]];
+        XCTAssertEqual(binCount, (NSUInteger)1, @"BinaryCol count");
+        NSUInteger dateCount = [table countWhere:[NSPredicate predicateWithFormat:@"DateCol == %@", date]];
+        XCTAssertEqual(dateCount, (NSUInteger)1, @"DateCol count");
+        
+        // FIXME: Not yet implemented
+//        XCTAssertEqualObjects([table minInColumn:@"IntCol" where:@"BoolCol == NO"], @54, @"IntCol min");
+//        XCTAssertEqualObjects([table maxInColumn:@"IntCol" where:@"BoolCol == NO"], @54, @"IntCol max");
+//        XCTAssertEqualObjects([table sumInColumn:@"IntCol" where:@"BoolCol == NO"], @54, @"IntCol sum");
+//        XCTAssertEqualObjects([table avgInColumn:@"IntCol" where:@"BoolCol == NO"], @54, @"IntCol avg");
+//        
+//        XCTAssertEqualObjects([table minInColumn:@"FloatCol" where:@"BoolCol == NO"], @0.7, @"FloatCol min");
+//        XCTAssertEqualObjects([table maxInColumn:@"FloatCol" where:@"BoolCol == NO"], @0.7, @"FloatCol max");
+//        XCTAssertEqualObjects([table sumInColumn:@"FloatCol" where:@"BoolCol == NO"], @0.7, @"FloatCol sum");
+//        XCTAssertEqualObjects([table avgInColumn:@"FloatCol" where:@"BoolCol == NO"], @0.7, @"FloatCol avg");
+//        
+//        XCTAssertEqualObjects([table minInColumn:@"DoubleCol" where:@"BoolCol == NO"], @0.8, @"DoubleCol min");
+//        XCTAssertEqualObjects([table maxInColumn:@"DoubleCol" where:@"BoolCol == NO"], @0.8, @"DoubleCol max");
+//        XCTAssertEqualObjects([table sumInColumn:@"DoubleCol" where:@"BoolCol == NO"], @0.8, @"DoubleCol sum");
+//        XCTAssertEqualObjects([table avgInColumn:@"DoubleCol" where:@"BoolCol == NO"], @0.8, @"DoubleCol avg");
+        
+        [table countWhere:@"BoolCol == NO"];
+        
+        [table countWhere:@"IntCol == 0 && BoolCol == NO"];
+        [table countWhere:@"IntCol != 0 && BoolCol == NO"];
+        [table countWhere:@"IntCol < 0  && BoolCol == NO"];
+        [table countWhere:@"IntCol <= 0 && BoolCol == NO"];
+        [table countWhere:@"IntCol > 0  && BoolCol == NO"];
+        [table countWhere:@"IntCol >= 0 && BoolCol == NO"];
+        [table countWhere:[NSPredicate predicateWithFormat:@"IntCol between %@ && BoolCol == NO", @[@0, @0]]];
 
-    const char bin[4] = { 0, 1, 2, 3 };
-    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
-    NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
-    NSDate *timeNow = [NSDate date];
-    //    TestQueryErrSub* subtab1 = [[TestQueryErrSub alloc] init];
-    TestQueryErrSub* subtab2 = [[TestQueryErrSub alloc] init];
-    [subtab2 addAge:100];
-    NSNumber* mixInt1   = [NSNumber numberWithLongLong:1];
-//    TDBMixed* mixSubtab = [TDBMixed mixedWithTable:subtab2];
+        [table countWhere:@"FloatCol == 0 && BoolCol == NO"];
+        [table countWhere:@"FloatCol != 0 && BoolCol == NO"];
+        [table countWhere:@"FloatCol < 0  && BoolCol == NO"];
+        [table countWhere:@"FloatCol <= 0 && BoolCol == NO"];
+        [table countWhere:@"FloatCol > 0  && BoolCol == NO"];
+        [table countWhere:@"FloatCol >= 0 && BoolCol == NO"];
+        [table countWhere:[NSPredicate predicateWithFormat:@"FloatCol between %@ && BoolCol == NO", @[@0, @0]]];
 
-    [table addBoolCol:NO   IntCol:54       FloatCol:0.7     DoubleCol:0.8       StringCol:@"foo"
-            BinaryCol:bin1 DateCol:0       TableCol:nil     MixedCol:mixInt1];
+        [table countWhere:@"DoubleCol == 0 && BoolCol == NO"];
+        [table countWhere:@"DoubleCol != 0 && BoolCol == NO"];
+        [table countWhere:@"DoubleCol < 0  && BoolCol == NO"];
+        [table countWhere:@"DoubleCol <= 0 && BoolCol == NO"];
+        [table countWhere:@"DoubleCol > 0  && BoolCol == NO"];
+        [table countWhere:@"DoubleCol >= 0 && BoolCol == NO"];
+        [table countWhere:[NSPredicate predicateWithFormat:@"DoubleCol between %@ && BoolCol == NO", @[@0, @0]]];
 
-    [table addBoolCol:YES  IntCol:506      FloatCol:7.7     DoubleCol:8.8       StringCol:@"banach"
-            BinaryCol:bin2 DateCol:timeNow TableCol:subtab2 MixedCol:subtab2];
+        [table countWhere:@"StringCol == ''            && BoolCol == NO"];
+        [table countWhere:@"StringCol ==[c] ''         && BoolCol == NO"];
+        [table countWhere:@"StringCol != ''            && BoolCol == NO"];
+        [table countWhere:@"StringCol !=[c] ''         && BoolCol == NO"];
+        [table countWhere:@"StringCol beginswith ''    && BoolCol == NO"];
+        [table countWhere:@"StringCol beginswith[c] '' && BoolCol == NO"];
+        [table countWhere:@"StringCol endswith ''      && BoolCol == NO"];
+        [table countWhere:@"StringCol endswith[c] ''   && BoolCol == NO"];
+        [table countWhere:@"StringCol contains ''      && BoolCol == NO"];
+        [table countWhere:@"StringCol contains[c] ''   && BoolCol == NO"];
 
-    XCTAssertEqual([[[table where].BoolCol   columnIsEqualTo:NO]      countRows], (size_t)1, @"BoolCol equal");
-    XCTAssertEqual([[[table where].IntCol    columnIsEqualTo:54]      countRows], (size_t)1, @"IntCol equal");
-    XCTAssertEqual([[[table where].FloatCol  columnIsEqualTo:0.7f]    countRows], (size_t)1, @"FloatCol equal");
-    XCTAssertEqual([[[table where].DoubleCol columnIsEqualTo:0.8]     countRows], (size_t)1, @"DoubleCol equal");
-    XCTAssertEqual([[[table where].StringCol columnIsEqualTo:@"foo"]  countRows], (size_t)1, @"StringCol equal");
-    XCTAssertEqual([[[table where].BinaryCol columnIsEqualTo:bin1]    countRows], (size_t)1, @"BinaryCol equal");
-    XCTAssertEqual([[[table where].DateCol   columnIsEqualTo:0]       countRows], (size_t)1, @"DateCol equal");
-    // These are not yet implemented
-    //    XCTAssertEqual([[[table where].TableCol  columnIsEqualTo:subtab1] count], (size_t)1, @"TableCol equal");
-    //    XCTAssertEqual([[[table where].MixedCol  columnIsEqualTo:mixInt1] count], (size_t)1, @"MixedCol equal");
-
-    TestQueryErrAllTypesQuery* query = [[table where].BoolCol   columnIsEqualTo:NO];
-
-    XCTAssertEqual([query.IntCol min] , (int64_t)54,    @"IntCol min");
-    XCTAssertEqual([query.IntCol max], (int64_t)54,    @"IntCol max");
-    XCTAssertEqual([query.IntCol sum] , (int64_t)54,    @"IntCol sum");
-    XCTAssertEqual([query.IntCol avg] , 54.0,           @"IntCol avg");
-
-    XCTAssertEqual([query.FloatCol min], 0.7f,         @"FloatCol min");
-    XCTAssertEqual([query.FloatCol max], 0.7f,         @"FloatCol max");
-    XCTAssertEqual([query.FloatCol sum], (double)0.7f, @"FloatCol sum");
-    XCTAssertEqual([query.FloatCol avg], (double)0.7f, @"FloatCol avg");
-
-    XCTAssertEqual([query.DoubleCol min], 0.8,         @"DoubleCol min");
-    XCTAssertEqual([query.DoubleCol max], 0.8,         @"DoubleCol max");
-    XCTAssertEqual([query.DoubleCol sum] , 0.8,         @"DoubleCol sum");
-    XCTAssertEqual([query.DoubleCol avg], 0.8,         @"DoubleCol avg");
-
-    // Check that all column conditions return query objects of the
-    // right type
-    [[[table where].BoolCol columnIsEqualTo:NO].BoolCol columnIsEqualTo:NO];
-
-    [[[table where].IntCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].IntCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].IntCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].IntCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].IntCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].IntCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].IntCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
-
-    [[[table where].FloatCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].FloatCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].FloatCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].FloatCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].FloatCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].FloatCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].FloatCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
-
-    [[[table where].DoubleCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DoubleCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DoubleCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DoubleCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DoubleCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DoubleCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DoubleCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
-
-    [[[table where].StringCol columnIsEqualTo:@""].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnIsEqualTo:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnIsNotEqualTo:@""].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnIsNotEqualTo:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnBeginsWith:@""].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnBeginsWith:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnEndsWith:@""].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnEndsWith:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnContains:@""].BoolCol columnIsEqualTo:NO];
-    [[[table where].StringCol columnContains:@"" caseSensitive:NO].BoolCol columnIsEqualTo:NO];
-
-    [[[table where].BinaryCol columnIsEqualTo:bin1].BoolCol columnIsEqualTo:NO];
-    [[[table where].BinaryCol columnIsNotEqualTo:bin1].BoolCol columnIsEqualTo:NO];
-    [[[table where].BinaryCol columnBeginsWith:bin1].BoolCol columnIsEqualTo:NO];
-    [[[table where].BinaryCol columnEndsWith:bin1].BoolCol columnIsEqualTo:NO];
-    [[[table where].BinaryCol columnContains:bin1].BoolCol columnIsEqualTo:NO];
-
-    TestQueryErrAllTypesView* view = [[[[table where].DateCol columnIsEqualTo:0].BoolCol columnIsEqualTo:NO] findAll];
-    for (size_t i = 0; i < [view rowCount]; i++) {
-        NSLog(@"%zu: %c", i, [view rowAtIndex:i].BoolCol);
-    }
-
-
-    [[[table where].DateCol columnIsNotEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DateCol columnIsLessThan:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DateCol columnIsLessThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DateCol columnIsGreaterThan:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DateCol columnIsGreaterThanOrEqualTo:0].BoolCol columnIsEqualTo:NO];
-    [[[table where].DateCol columnIsBetween:0 :0].BoolCol columnIsEqualTo:NO];
-
-    // These are not yet implemented
-    //    [[[table where].TableCol columnIsEqualTo:nil].BoolCol columnIsEqualTo:NO];
-    //    [[[table where].TableCol columnIsNotEqualTo:nil].BoolCol columnIsEqualTo:NO];
-
-    //    [[[table where].MixedCol columnIsEqualTo:mixInt1].BoolCol columnIsEqualTo:NO];
-    //    [[[table where].MixedCol columnIsNotEqualTo:mixInt1].BoolCol columnIsEqualTo:NO];
+        [table countWhere:[NSPredicate predicateWithFormat:@"BinaryCol == %@         && BoolCol == NO", bin1]];
+        [table countWhere:[NSPredicate predicateWithFormat:@"BinaryCol != %@         && BoolCol == NO", bin1]];
+        [table countWhere:[NSPredicate predicateWithFormat:@"BinaryCol beginswith %@ && BoolCol == NO", bin1]];
+        [table countWhere:[NSPredicate predicateWithFormat:@"BinaryCol endswith %@   && BoolCol == NO", bin1]];
+        [table countWhere:[NSPredicate predicateWithFormat:@"BinaryCol contains %@   && BoolCol == NO", bin1]];
+        
+        // FIXME: Fix this
+//        RLMView *view = [table allWhere:[NSPredicate predicateWithFormat:@"DateCol == %@ && BoolCol == NO", date]];
+//        for (RLMRow *row in view) {
+//            NSLog(@"row BoolCol: %@", row[@"BoolCol"]);
+//        }
+        
+        [table countWhere:[NSPredicate predicateWithFormat:@"DateCol == %@ && BoolCol == NO", date]];
+        [table countWhere:[NSPredicate predicateWithFormat:@"DateCol != %@ && BoolCol == NO", date]];
+        [table countWhere:[NSPredicate predicateWithFormat:@"DateCol < %@  && BoolCol == NO", date]];
+        [table countWhere:[NSPredicate predicateWithFormat:@"DateCol <= %@ && BoolCol == NO", date]];
+        [table countWhere:[NSPredicate predicateWithFormat:@"DateCol > %@  && BoolCol == NO", date]];
+        [table countWhere:[NSPredicate predicateWithFormat:@"DateCol >= %@ && BoolCol == NO", date]];
+        [table countWhere:[NSPredicate predicateWithFormat:@"DateCol between %@ && BoolCol == NO", @[date, date]]];
+        
+        // FIXME: Not yet implemented
+//        [table countWhere:@"TableCol == nil && BoolCol == NO"];
+//        [table countWhere:@"TableCol != nil && BoolCol == NO"];
+    }];
 }
-
-
 
 @end
-
-

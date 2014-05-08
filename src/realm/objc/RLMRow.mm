@@ -1,28 +1,29 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #include <tightdb/table.hpp>
 
 #import "RLMRow.h"
+#import "RLMObjectDescriptor.h"
 #import "RLMTable_noinst.h"
-#import "PrivateRLM.h"
+#import "RLMPrivate.h"
 #import "RLMRowFast.h"
 #import "util_noinst.hpp"
 
@@ -31,13 +32,18 @@ using namespace std;
 
 // TODO: Concept for row invalidation (when table updates).
 
-@interface RLMRow ()
-@property (nonatomic, weak) RLMTable *table;
-@property (nonatomic) NSUInteger ndx;
-@end
 @implementation RLMRow
-@synthesize table = _table;
-@synthesize ndx = _ndx;
+
++(Class)subtableObjectClassForProperty:(NSString *)columnName {
+    @throw [NSException exceptionWithName:@"RLMException"
+                                   reason:@"Must specify sub-table object type"
+                                 userInfo:@{@"columnName": columnName}];
+}
+
+// make sure users don't create these without a table
+-(id)init {
+    @throw [NSException exceptionWithName:@"RLMException" reason:@"Cannot create standalone row outside of tables" userInfo:nil];
+}
 
 -(id)initWithTable:(RLMTable *)table ndx:(NSUInteger)ndx
 {
@@ -65,6 +71,23 @@ using namespace std;
     // NSLog(@"RLMRow dealloc");
 #endif
     _table = nil;
+}
+
+- (NSString *)description {
+    NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", NSStringFromClass([self class])];
+    
+    tightdb::Table& t = [_table getNativeTable];
+    size_t columnCount = t.get_column_count();
+    
+    for (size_t colIndex = 0; colIndex < columnCount; colIndex++) {
+        NSString *columnName = [_table nameOfColumnWithIndex:colIndex];
+        NSString *columnObject = [self[colIndex] description];
+        [mString appendFormat:@"\t%@ = %@;\n",
+                              columnName,
+                              columnObject];
+    }
+    [mString appendString:@"}"];
+    return [mString copy];
 }
 
 -(id)objectAtIndexedSubscript:(NSUInteger)colIndex
@@ -98,7 +121,7 @@ using namespace std;
 }
 
 
-/* Getters */
+// Getters
 -(int64_t)intInColumnWithIndex:(NSUInteger)colNdx
 {
     return [_table RLM_intInColumnWithIndex:colNdx atRowIndex:_ndx];
@@ -144,7 +167,7 @@ using namespace std;
     return [_table RLM_mixedInColumnWithIndex:colNdx atRowIndex:_ndx];
 }
 
-/* Setters */
+// Setters
 -(void)setInt:(int64_t)value inColumnWithIndex:(NSUInteger)colNdx
 {
     [_table RLM_setInt:value inColumnWithIndex:colNdx atRowIndex:_ndx];

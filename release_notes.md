@@ -6,10 +6,6 @@ Objective-C
 -----------
 The Objective-C API has been updated and your code will break!
 
-### Bugfixes:
-
-* none.
-
 ### API breaking changes:
 
 * `???`
@@ -17,6 +13,10 @@ The Objective-C API has been updated and your code will break!
 ### Enhancements:
 
 * `???`
+
+### Bugfixes:
+
+* none.
 
 -------------
 
@@ -26,36 +26,82 @@ The Objective-C API has been updated and your code will break!
 
 
 =============================================================
-0.7.0 Release notes (yyyy—MM-dd)
+0.11.0 Release notes (yyyy—MM-dd)
 
 Objective-C
 -----------
 The Objective-C API has been updated and your code will break!
 
-### Bugfixes:
-
-* none.
-
 ### API breaking changes:
 
-* Changed all class prefixes from TDB to RLM
+* `RLMTable` objects can only be created with an `RLMRealm` object.
+* `RLMContext` was renamed to `RLMTransactionManager`
+* Renamed `RLMContextDidChangeNotification` to `RLMRealmDidChangeNotification`
+* Renamed `contextWithDefaultPersistence` to `managerForDefaultRealm`
+* Renamed `contextPersistedAtPath:` to `managerForRealmWithPath:`
+* Renamed `realmWithDefaultPersistence` to `defaultRealm`
+* Renamed `realmWithDefaultPersistenceAndInitBlock` to `defaultRealmWithInitBlock`
+* Renamed `find:` to `firstWhere:`
+* Renamed `where:` to `allWhere:`
+* Renamed `where:orderBy:` to `allWhere:orderBy:`
 
 ### Enhancements:
 
-* `createTableWithName:columns:` has been added to `TDBTransaction`.
+* Added `countWhere:` on `RLMTable`
+* Added `sumOfColumn:where:` on `RLMTable`
+* Added `averageOfColumn:where:` on `RLMTable`
+* Added `minOfProperty:where:` on `RLMTable`
+* Added `maxOfProperty:where:` on `RLMTable`
+* Added `toJSONString` on `RLMRealm`, `RLMTable` and `RLMView`
+
+### Bugfixes:
+
+* none.
 
 -------------
 
 ### Internals:
 
 * `???`
+
+
+=============================================================
+0.10.0 Release notes (2014-04-23)
+
+Objective-C
+-----------
+TightDB is now Realm! The Objective-C API has been updated 
+and your code will break!
+
+### API breaking changes:
+
+* All references to TightDB have been changed to Realm.
+* All prefixes changed from `TDB` to `RLM`.
+* `TDBTransaction` and `TDBSmartContext` have merged into `RLMRealm`.
+* Write transactions now take an optional rollback parameter (rather than needing to return a boolean).
+* `addColumnWithName:` and variant methods now return the index of the newly created column if successful, `NSNotFound` otherwise.
+
+### Enhancements:
+
+* `createTableWithName:columns:` has been added to `RLMRealm`.
+* Added keyed subscripting for RLMTable's first column if column is of type RLMTypeString.
+* `setRow:atIndex:` has been added to `RLMTable`.
+* `RLMRealm` constructors now have variants that take an writable initialization block
+* New object interface - tables created/retrieved using `tableWithName:objectClass:` return custom objects
+
+### Bugfixes:
+
+* none.
+
+### Bugfixes:
+
+* None.
 
 
 =============================================================
 0.6.0 Release notes (2014—04-11)
 Objective-C
 -----------
-Description......
 
 ### Bugfixes:
 

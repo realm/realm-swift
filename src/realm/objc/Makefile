@@ -2,20 +2,20 @@ SUBDIRS = test
 test_DEPS = .
 
 # Headers to be installed
-nobase_subinclude_HEADERS = RLMConstants.h RLMType.h RLMRow.h RLMTransaction.h RLMQuery.h \
-RLMTable.h RLMContext.h RLMSmartContext.h PrivateHelperMacros.h PrivateTableMacros.h PrivateRLM.h \
-Realm.h RLMVersion.h RLMDescriptor.h RLMView.h RLMColumnProxy.h RLMViewProtocol.h \
-RLMFast.h RLMRowFast.h
+nobase_subinclude_HEADERS = RLMConstants.h RLMType.h RLMRow.h RLMQuery.h \
+RLMTable.h RLMRealm.h RLMPrivate.h Realm.h RLMVersion.h RLMDescriptor.h \
+RLMView.h RLMColumnProxy.h RLMViewProtocol.h RLMFast.h RLMRowFast.h
 
 nobase_subinclude_HEADERS_EXTRA_UNINSTALL = *.h
 
 lib_LIBRARIES = librealm-objc.a
 
-librealm_objc_a_SOURCES = RLMConstants.m RLMTable.mm RLMRow.mm RLMTransaction.mm RLMQuery.mm \
-RLMContext.mm RLMSmartContext.mm util.mm RLMVersion.mm RLMDescriptor.mm RLMView.mm \
-RLMColumnProxy.mm NSData+RLMGetBinaryData.mm RLMCommitLog.cpp
+librealm_objc_a_SOURCES = RLMConstants.m RLMTable.mm RLMRow.mm RLMQuery.mm \
+RLMRealm.mm util.mm RLMVersion.mm RLMDescriptor.mm RLMView.mm \
+RLMColumnProxy.mm NSData+RLMGetBinaryData.mm RLMProperty.mm RLMProxy.mm \
+RLMObjectDescriptor.m query_util.mm RLMCommitLog.cpp
 
-librealm_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2
+librealm_objc_a_CFLAGS  = -fobjc-arc -fobjc-abi-version=2 -Wno-comment
 librealm_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
 
 # Format: CURRENT[:REVISION[:AGE]]
@@ -38,14 +38,6 @@ librealm_objc_a_LDFLAGS = -fobjc-link-runtime -framework Cocoa
 # by GNU Libtool. See also
 # http://www.gnu.org/software/libtool/manual/libtool.html#Libtool-versioning
 librealm_objc_a_VERSION = 4:0:0
-
-
-# Code generation
-ifeq ($(DISABLE_CHEETAH_CODE_GEN),)
-GENERATED_SOURCES += PrivateTableMacros.h
-PrivateTableMacros.h: PrivateTableMacros.h.cheetah cheetah.sh
-	$(SHELL) cheetah.sh $< $@
-endif
 
 
 # Used by ../../../build.sh
