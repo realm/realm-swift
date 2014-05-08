@@ -19,6 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include <exception>
+#include <sstream>
 
 #include <tightdb/util/unique_ptr.hpp>
 #include <tightdb/group_shared.hpp>
@@ -599,6 +600,15 @@ NSString *const defaultRealmFileName = @"default.realm";
 -(NSString*)nameOfTableWithIndex:(NSUInteger)table_ndx
 {
     return to_objc_string(self.group->get_table_name(table_ndx));
+}
+
+- (NSString *)toJSONString {
+
+    ostringstream out;
+    self.group->to_json(out);
+    string str = out.str();
+    
+    return [NSString stringWithUTF8String:str.c_str()];
 }
 
 @end
