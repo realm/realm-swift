@@ -279,7 +279,7 @@ void verify_row(const Descriptor& descr, NSArray* data)
     while (obj = [enumerator nextObject]) {
         if (!verify_cell(descr, col_ndx, obj)) {
             @throw [NSException exceptionWithName:@"realm:wrong_column_type"
-                                           reason:[NSString stringWithFormat: @"colName %@ with index: %lu is of type %s",
+                                           reason:[NSString stringWithFormat: @"colName %@ with index: %lu is of type %@",
                                                             to_objc_string(descr.get_column_name(col_ndx)), col_ndx,
                                                                            rlmtype_to_string(descr.get_column_type(col_ndx)) ]
                                          userInfo:nil];
@@ -298,7 +298,7 @@ void verify_row_with_labels(const Descriptor& descr, NSDictionary* data)
             continue;
         if (!verify_cell(descr, i, value)) {
             @throw [NSException exceptionWithName:@"realm:wrong_column_type"
-                                           reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %s",
+                                           reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %@",
                                                    to_objc_string(descr.get_column_name(i)), i, rlmtype_to_string(descr.get_column_type(i)) ]
                                          userInfo:nil];
         }
@@ -319,7 +319,7 @@ void verify_row_from_object(const Descriptor& descr, NSObject* data)
         }
         if (!verify_cell(descr, col_ndx, value)) {
             @throw [NSException exceptionWithName: @"realm:wrong_column_type"
-                                           reason: [NSString stringWithFormat:@"colName %@ with index: %lu is of type %s",
+                                           reason: [NSString stringWithFormat:@"colName %@ with index: %lu is of type %@",
                                                     to_objc_string(descr.get_column_name(col_ndx)), col_ndx,
                                                                    rlmtype_to_string(descr.get_column_type(col_ndx)) ]
                                          userInfo: nil];
@@ -670,7 +670,7 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 break;
             }
             @throw [NSException exceptionWithName:@"realm:cannot insert subtable"
-                                           reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %s",
+                                           reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %@",
                                                             to_objc_string(table.get_column_name(col_ndx)), col_ndx,
                                                                            rlmtype_to_string(table.get_column_type(col_ndx)) ]
                                          userInfo:nil];
