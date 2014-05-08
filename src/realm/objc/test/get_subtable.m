@@ -7,6 +7,7 @@
 
 #import "RLMTestCase.h"
 
+
 #import <realm/objc/Realm.h>
 #import <realm/objc/RLMRealm.h>
 
@@ -23,13 +24,52 @@
 RLM_TABLE_TYPE_FOR_OBJECT_TYPE(RLMTestSubtable, RLMTestObj);
 
 @interface MACTestGetSubtable: RLMTestCase
+@end
+
+
+//////////////////////
+
+@interface SubTestObject : RLMRow
+
+@property NSInteger latitude;
+
 
 @end
 
+@implementation SubTestObject
+@end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(SubTestTable, SubTestObject)
+
+////////////////
+
+@interface ParentObject : RLMRow
+
+@property SubTestTable *subValue;
+
+@end
+
+@implementation ParentObject
+@end
+
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(ParentTable, ParentObject)
+
 @implementation MACTestGetSubtable
+
+
+- (void)testSubtable{
+    
+    [[RLMRealm defaultRealm] writeUsingBlock:^(RLMRealm *realm) {
+        ParentTable * parent = [ParentTable tableInRealm:realm named:@"tableWithSubs"];
+        [parent addRow:@[@[]]];
+        [parent addRow:@{@"subValue": @[]}];
+    }];
+}
 
 - (void)testGetSubtable
 {
+    
     [self createTestTableWithWriteBlock:^(RLMTable *table) {
         // Create table with all column types
         RLMDescriptor * desc = table.descriptor;

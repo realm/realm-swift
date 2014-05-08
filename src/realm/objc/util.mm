@@ -248,8 +248,8 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
                 ConstDescriptorRef subdescr = descr.get_subdescriptor(col_ndx);
                 NSEnumerator *subenumerator = [(NSArray *)obj objectEnumerator];
                 while (subobj = [subenumerator nextObject]) {
-                    if (![subobj isKindOfClass:[NSArray class]])
-                        return NO;
+                    //if (![subobj isKindOfClass:[NSArray class]])
+                    //    return NO;
                     verify_row(*subdescr, (NSArray *)subobj);
                 }
                 break;
@@ -516,9 +516,13 @@ void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
             }
 
             TableRef subtable = table.get_subtable(col_ndx, row_ndx);
-
+            if ([value isKindOfClass:[NSDictionary class]]) {
+                insert_row_with_labels(row_ndx, *subtable, (NSDictionary *)value);
+            } else if ([value isKindOfClass:[NSArray class]]) {
+                insert_row(row_ndx, *subtable, (NSArray *)value);
+            }
             // fill in data
-            insert_row_with_labels(row_ndx, *subtable, (NSDictionary *)value);
+            
         }
     }
 }
