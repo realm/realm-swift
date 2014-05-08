@@ -38,6 +38,11 @@ realm-ios-*.zip
 # sh build.sh docs
 /doc/appledocs
 
+# sh build.sh package-examples
+/examples/*.zip
+/examples/*/Realm.framework
+/examples/*/*.xcodeproj/*.bak
+
 # AppCode specific files
 .idea/
 *.iml
