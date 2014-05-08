@@ -111,7 +111,7 @@
 
 /** Construct a JSON representation of all the data selected by this RLMView.
  
- @return String JSON representation of the view's data.
+ @return JSON string representation of the view's data.
  */
 - (NSString *)toJSONString;
 
