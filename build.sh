@@ -669,6 +669,7 @@ EOF
                     --ignore src/realm/objc/RLMDescriptor.h \
                     --ignore "src/realm/objc/test/*" \
                     --index-desc doc/index.md \
+                    --template doc/templates \
                     src/realm/objc/ || exit 1
         echo "Done generating docs under docs/appledocs"
         exit 0
