@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4B2915EB191B3199006437DA /* GBCommandLineParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E3191B3199006437DA /* GBCommandLineParser.m */; };
-		4B2915EC191B3199006437DA /* GBOptionsHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E5191B3199006437DA /* GBOptionsHelper.m */; };
-		4B2915ED191B3199006437DA /* GBSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E7191B3199006437DA /* GBSettings.m */; };
 		4B2915EE191B3199006437DA /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E8191B3199006437DA /* main.mm */; };
 		4B2915FF191B327A006437DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B2915FD191B327A006437DA /* InfoPlist.strings */; };
 		4B291606191B3552006437DA /* RLMToolsPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B291605191B3552006437DA /* RLMToolsPlugin.m */; };
@@ -33,12 +30,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		4B2915E2191B3199006437DA /* GBCommandLineParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBCommandLineParser.h; sourceTree = "<group>"; };
-		4B2915E3191B3199006437DA /* GBCommandLineParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBCommandLineParser.m; sourceTree = "<group>"; };
-		4B2915E4191B3199006437DA /* GBOptionsHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBOptionsHelper.h; sourceTree = "<group>"; };
-		4B2915E5191B3199006437DA /* GBOptionsHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBOptionsHelper.m; sourceTree = "<group>"; };
-		4B2915E6191B3199006437DA /* GBSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBSettings.h; sourceTree = "<group>"; };
-		4B2915E7191B3199006437DA /* GBSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBSettings.m; sourceTree = "<group>"; };
 		4B2915E8191B3199006437DA /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		4B2915E9191B3199006437DA /* RealmTools-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RealmTools-Prefix.pch"; sourceTree = "<group>"; };
 		4B2915EA191B3199006437DA /* RealmToolsCLI.1 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.man; path = RealmToolsCLI.1; sourceTree = "<group>"; };
@@ -80,25 +71,11 @@
 		4B2915E0191B3199006437DA /* RealmToolsCLI */ = {
 			isa = PBXGroup;
 			children = (
-				4B2915E1191B3199006437DA /* GBCli */,
 				4B2915E8191B3199006437DA /* main.mm */,
 				4B2915E9191B3199006437DA /* RealmTools-Prefix.pch */,
 				4B2915EA191B3199006437DA /* RealmToolsCLI.1 */,
 			);
 			path = RealmToolsCLI;
-			sourceTree = "<group>";
-		};
-		4B2915E1191B3199006437DA /* GBCli */ = {
-			isa = PBXGroup;
-			children = (
-				4B2915E2191B3199006437DA /* GBCommandLineParser.h */,
-				4B2915E3191B3199006437DA /* GBCommandLineParser.m */,
-				4B2915E4191B3199006437DA /* GBOptionsHelper.h */,
-				4B2915E5191B3199006437DA /* GBOptionsHelper.m */,
-				4B2915E6191B3199006437DA /* GBSettings.h */,
-				4B2915E7191B3199006437DA /* GBSettings.m */,
-			);
-			path = GBCli;
 			sourceTree = "<group>";
 		};
 		4B2915FA191B327A006437DA /* RealmToolsPlugin */ = {
@@ -238,10 +215,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B2915EB191B3199006437DA /* GBCommandLineParser.m in Sources */,
-				4B2915ED191B3199006437DA /* GBSettings.m in Sources */,
 				4B2915EE191B3199006437DA /* main.mm in Sources */,
-				4B2915EC191B3199006437DA /* GBOptionsHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
