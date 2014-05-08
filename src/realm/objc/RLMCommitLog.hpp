@@ -105,4 +105,4 @@ protected:
     WriteLogRegistry* m_registry;
 };
 
-}; // namespace
+} // namespace tightdb

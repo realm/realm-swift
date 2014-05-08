@@ -218,4 +218,4 @@ WriteLogCollector::WriteLogCollector(std::string database_name, WriteLogRegistry
     m_registry = registry;
 }
 
-}; // namespace tightdb
+} // namespace tightdb

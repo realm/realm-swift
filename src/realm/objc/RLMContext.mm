@@ -33,6 +33,9 @@ using namespace tightdb;
 @implementation RLMContext
 {
     tightdb::util::UniquePtr<tightdb::SharedGroup> m_shared_group;
+    // Using uniqueptr here relies on shared group NOT using the replication manager
+    // as part of its destruction
+    tightdb::util::UniquePtr<tightdb::WriteLogCollector> m_writelog_collector;
 }
 
 NSString *const defaultContextFileName = @"default.realm";
@@ -64,9 +67,11 @@ NSString *const defaultContextFileName = @"default.realm";
     if (!shared_group)
         return nil;
     try {
-        WriteLogCollector* collector = new WriteLogCollector(
-            StringData(ObjcStringAccessor(path)), 
-            globalRegistry.get(StringData(ObjcStringAccessor(path)))
+        shared_group->m_writelog_collector.reset( 
+            new WriteLogCollector(
+                StringData(ObjcStringAccessor(path)), 
+                globalRegistry.get(StringData(ObjcStringAccessor(path))
+            )
         );
         shared_group->m_shared_group.reset(new tightdb::SharedGroup(*collector));
     }
