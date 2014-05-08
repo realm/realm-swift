@@ -22,9 +22,19 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>DVTPlugInCompatibilityUUIDs</key>
+	<array>
+		<string>A2E4D43F-41F4-4FB9-BB94-7177011C9AED</string>
+	</array>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2014 Realm.io. All rights reserved.</string>
 	<key>NSPrincipalClass</key>
 	<string></string>
+	<key>XC4Compatible</key>
+	<true/>
+	<key>XCGCReady</key>
+	<true/>
+	<key>XCPluginHasUI</key>
+	<false/>
 </dict>
 </plist>
