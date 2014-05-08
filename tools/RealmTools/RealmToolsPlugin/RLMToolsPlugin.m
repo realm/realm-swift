@@ -10,9 +10,42 @@
 
 @implementation RLMToolsPlugin
 
+static RLMToolsPlugin *sharedPlugin = nil;
+
 + (void)pluginDidLoad:(NSBundle *)plugin
 {
-	NSLog(@"Realm!");
+	static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedPlugin = [[self alloc] init];
+    });
+}
+
++ (RLMToolsPlugin *)sharedPlugin
+{
+    return sharedPlugin;
+}
+
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notificationListener:) name:nil object:nil];
+    }
+    
+    return self;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)notificationListener:(NSNotification *)notification
+{
+//    if ([[notification name] length] >= 2 && [[[notification name] substringWithRange:NSMakeRange(0, 2)] isEqualTo:@"NS"])
+//		return;
+//	else
+//		NSLog(@"  Notification: %@", [notification name]);
 }
 
 @end
