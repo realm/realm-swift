@@ -7,12 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4B2915EB191B3199006437DA /* GBCommandLineParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E3191B3199006437DA /* GBCommandLineParser.m */; };
+		4B2915EC191B3199006437DA /* GBOptionsHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E5191B3199006437DA /* GBOptionsHelper.m */; };
+		4B2915ED191B3199006437DA /* GBSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E7191B3199006437DA /* GBSettings.m */; };
+		4B2915EE191B3199006437DA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E8191B3199006437DA /* main.m */; };
 		4BE8BBDE191ACB4D0074AB20 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BE8BBDD191ACB4D0074AB20 /* Foundation.framework */; };
-		4BE8BBE1191ACB4D0074AB20 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BE8BBE0191ACB4D0074AB20 /* main.m */; };
-		4BE8BBE5191ACB4D0074AB20 /* RealmTools.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4BE8BBE4191ACB4D0074AB20 /* RealmTools.1 */; };
-		4BE8BBF2191ACBB10074AB20 /* GBCommandLineParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BE8BBED191ACBB10074AB20 /* GBCommandLineParser.m */; };
-		4BE8BBF3191ACBB10074AB20 /* GBOptionsHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BE8BBEF191ACBB10074AB20 /* GBOptionsHelper.m */; };
-		4BE8BBF4191ACBB10074AB20 /* GBSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BE8BBF1191ACBB10074AB20 /* GBSettings.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -22,24 +21,23 @@
 			dstPath = /usr/share/man/man1/;
 			dstSubfolderSpec = 0;
 			files = (
-				4BE8BBE5191ACB4D0074AB20 /* RealmTools.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		4BE8BBDA191ACB4D0074AB20 /* RealmTools */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RealmTools; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B2915E2191B3199006437DA /* GBCommandLineParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBCommandLineParser.h; sourceTree = "<group>"; };
+		4B2915E3191B3199006437DA /* GBCommandLineParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBCommandLineParser.m; sourceTree = "<group>"; };
+		4B2915E4191B3199006437DA /* GBOptionsHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBOptionsHelper.h; sourceTree = "<group>"; };
+		4B2915E5191B3199006437DA /* GBOptionsHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBOptionsHelper.m; sourceTree = "<group>"; };
+		4B2915E6191B3199006437DA /* GBSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBSettings.h; sourceTree = "<group>"; };
+		4B2915E7191B3199006437DA /* GBSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBSettings.m; sourceTree = "<group>"; };
+		4B2915E8191B3199006437DA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		4B2915E9191B3199006437DA /* RealmTools-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RealmTools-Prefix.pch"; sourceTree = "<group>"; };
+		4B2915EA191B3199006437DA /* RealmToolsCLI.1 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.man; path = RealmToolsCLI.1; sourceTree = "<group>"; };
+		4BE8BBDA191ACB4D0074AB20 /* RealmToolsCLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RealmToolsCLI; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BE8BBDD191ACB4D0074AB20 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		4BE8BBE0191ACB4D0074AB20 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		4BE8BBE3191ACB4D0074AB20 /* RealmTools-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RealmTools-Prefix.pch"; sourceTree = "<group>"; };
-		4BE8BBE4191ACB4D0074AB20 /* RealmTools.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = RealmTools.1; sourceTree = "<group>"; };
-		4BE8BBEC191ACBB10074AB20 /* GBCommandLineParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBCommandLineParser.h; sourceTree = "<group>"; };
-		4BE8BBED191ACBB10074AB20 /* GBCommandLineParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBCommandLineParser.m; sourceTree = "<group>"; };
-		4BE8BBEE191ACBB10074AB20 /* GBOptionsHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBOptionsHelper.h; sourceTree = "<group>"; };
-		4BE8BBEF191ACBB10074AB20 /* GBOptionsHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBOptionsHelper.m; sourceTree = "<group>"; };
-		4BE8BBF0191ACBB10074AB20 /* GBSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBSettings.h; sourceTree = "<group>"; };
-		4BE8BBF1191ACBB10074AB20 /* GBSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBSettings.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,10 +52,34 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4B2915E0191B3199006437DA /* RealmToolsCLI */ = {
+			isa = PBXGroup;
+			children = (
+				4B2915E1191B3199006437DA /* GBCli */,
+				4B2915E8191B3199006437DA /* main.m */,
+				4B2915E9191B3199006437DA /* RealmTools-Prefix.pch */,
+				4B2915EA191B3199006437DA /* RealmToolsCLI.1 */,
+			);
+			path = RealmToolsCLI;
+			sourceTree = "<group>";
+		};
+		4B2915E1191B3199006437DA /* GBCli */ = {
+			isa = PBXGroup;
+			children = (
+				4B2915E2191B3199006437DA /* GBCommandLineParser.h */,
+				4B2915E3191B3199006437DA /* GBCommandLineParser.m */,
+				4B2915E4191B3199006437DA /* GBOptionsHelper.h */,
+				4B2915E5191B3199006437DA /* GBOptionsHelper.m */,
+				4B2915E6191B3199006437DA /* GBSettings.h */,
+				4B2915E7191B3199006437DA /* GBSettings.m */,
+			);
+			path = GBCli;
+			sourceTree = "<group>";
+		};
 		4BE8BBD1191ACB4D0074AB20 = {
 			isa = PBXGroup;
 			children = (
-				4BE8BBDF191ACB4D0074AB20 /* RealmTools */,
+				4B2915E0191B3199006437DA /* RealmToolsCLI */,
 				4BE8BBDC191ACB4D0074AB20 /* Frameworks */,
 				4BE8BBDB191ACB4D0074AB20 /* Products */,
 			);
@@ -66,7 +88,7 @@
 		4BE8BBDB191ACB4D0074AB20 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4BE8BBDA191ACB4D0074AB20 /* RealmTools */,
+				4BE8BBDA191ACB4D0074AB20 /* RealmToolsCLI */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -77,39 +99,6 @@
 				4BE8BBDD191ACB4D0074AB20 /* Foundation.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		4BE8BBDF191ACB4D0074AB20 /* RealmTools */ = {
-			isa = PBXGroup;
-			children = (
-				4BE8BBEB191ACBB10074AB20 /* GBCli */,
-				4BE8BBE0191ACB4D0074AB20 /* main.m */,
-				4BE8BBE4191ACB4D0074AB20 /* RealmTools.1 */,
-				4BE8BBE2191ACB4D0074AB20 /* Supporting Files */,
-			);
-			name = RealmTools;
-			path = src;
-			sourceTree = "<group>";
-		};
-		4BE8BBE2191ACB4D0074AB20 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				4BE8BBE3191ACB4D0074AB20 /* RealmTools-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		4BE8BBEB191ACBB10074AB20 /* GBCli */ = {
-			isa = PBXGroup;
-			children = (
-				4BE8BBEC191ACBB10074AB20 /* GBCommandLineParser.h */,
-				4BE8BBED191ACBB10074AB20 /* GBCommandLineParser.m */,
-				4BE8BBEE191ACBB10074AB20 /* GBOptionsHelper.h */,
-				4BE8BBEF191ACBB10074AB20 /* GBOptionsHelper.m */,
-				4BE8BBF0191ACBB10074AB20 /* GBSettings.h */,
-				4BE8BBF1191ACBB10074AB20 /* GBSettings.m */,
-			);
-			path = GBCli;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -129,7 +118,7 @@
 			);
 			name = RealmToolsCLI;
 			productName = RealmTools;
-			productReference = 4BE8BBDA191ACB4D0074AB20 /* RealmTools */;
+			productReference = 4BE8BBDA191ACB4D0074AB20 /* RealmToolsCLI */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -163,10 +152,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BE8BBE1191ACB4D0074AB20 /* main.m in Sources */,
-				4BE8BBF4191ACBB10074AB20 /* GBSettings.m in Sources */,
-				4BE8BBF3191ACBB10074AB20 /* GBOptionsHelper.m in Sources */,
-				4BE8BBF2191ACBB10074AB20 /* GBCommandLineParser.m in Sources */,
+				4B2915EB191B3199006437DA /* GBCommandLineParser.m in Sources */,
+				4B2915ED191B3199006437DA /* GBSettings.m in Sources */,
+				4B2915EE191B3199006437DA /* main.m in Sources */,
+				4B2915EC191B3199006437DA /* GBOptionsHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,7 +236,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "src/RealmTools-Prefix.pch";
+				GCC_PREFIX_HEADER = "RealmToolsCLI/RealmTools-Prefix.pch";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -256,7 +245,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "src/RealmTools-Prefix.pch";
+				GCC_PREFIX_HEADER = "RealmToolsCLI/RealmTools-Prefix.pch";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
