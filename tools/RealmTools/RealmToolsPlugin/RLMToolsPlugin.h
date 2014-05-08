@@ -10,4 +10,6 @@
 
 @interface RLMToolsPlugin : NSObject
 
++ (RLMToolsPlugin *)sharedPlugin;
+
 @end
