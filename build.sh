@@ -192,6 +192,11 @@ build_ios_test()
     # Expects for APP and TEST_APP to be set, and for TEST_APP to be already
     # filled with XCTestCases.
 
+    ## Set up frameworks.
+    FRAMEWORK="RealmCore.framework"
+    copy_or_fail "../../tightdb/$FRAMEWORK" \
+        "$FRAMEWORK"
+
     ## Initialize app directory
     cp -r "../ios-test-template/App" "$APP"
     mv "$APP/App-Info.plist" "$APP/$APP-Info.plist"
@@ -781,9 +786,13 @@ EOF
         TEST_APP="${APP}Tests"
         
         ## Initialize app test directory
+        # This does more I/O than it has to, but it preserves directory
+        # structure and makes few assumptions about test file names.
+        echo "Copying tests directory.."
         cp -r "../../tightdb/test" "$TEST_APP"
-        find "$TEST_APP" -type f \
-            ! -iregex "^.*\.[ch]\(pp\)\{0,1\}$" \
+        echo "Removing all but the source code files.."
+        find -E "$TEST_APP" -type f \
+            ! -iregex "^.*\.[ch](pp)?$" \
             -exec rm {} \; || exit 1
 
         ## Remove breaking files (containing main or unportable code).
@@ -792,6 +801,8 @@ EOF
         rm -rf "$TEST_APP/experiments"
         rm -rf "$TEST_APP/performance"
         rm -rf "$TEST_APP/test-"*
+        rm -rf "$TEST_APP/UnitTest++/"
+        rm -rf "$TEST_APP/android"
 
         ## Create an XCTestCase
         cat >"$TEST_APP/$TEST_APP.mm" <<EOF
@@ -815,14 +826,9 @@ EOF
 @end
 EOF
 
-        ## Set up frameworks.
-        copy_or_fail "../../tightdb/TightdbCore.framework" \
-            "TightdbCore.framework" 
-        FRAMEWORK="TightdbCore.framework"
-
         ## Replace all test includes with framework includes.
         find "$TEST_APP" -type f -exec sed -i '' \
-            -e "s/<tightdb\(.*\)>/<TightdbCore\/tightdb\1>/g" {} \; || exit 1
+            -e "s/<tightdb\(.*\)>/<RealmCore\/tightdb\1>/g" {} \; || exit 1
 
         build_ios_test
         echo "Done building"
@@ -839,21 +845,20 @@ EOF
         TEST_APP="${APP}Tests"
         
         ## Initialize app test directory
-        cp -r "../src/tightdb/objc" "$TEST_APP"
+        # This does more I/O than it has to, but it preserves directory
+        # structure and makes few assumptions about test file names.
+        echo "Copying tests directory.."
+        cp -r "../src/realm/objc" "$TEST_APP"
+        echo "Removing all but the source code files.."
         find -E "$TEST_APP" -type f \
             ! -iregex "^.*\.(h(pp)?|mm?)$" \
             -exec rm {} \; || exit 1
 
-        ## Set up frameworks
-        copy_or_fail "../../tightdb/TightdbCore.framework" \
-            "TightdbCore.framework" 
-        FRAMEWORK="TightdbCore.framework"
- 
         ## Replace all test includes with framework includes.
         find "$TEST_APP" -type f -exec sed -E -i '' \
-            -e "s/#(include|import) +<tightdb\/objc\/(.*)>/#\1 \"\2\"/g" {} \; || exit 1
+            -e "s/#(include|import) +<realm\/objc\/(.*)>/#\1 \"\2\"/g" {} \; || exit 1
         find "$TEST_APP" -type f -exec sed -E -i '' \
-            -e "s/#(include|import) +<tightdb(.*)>/#\1 <TightdbCore\/tightdb\2>/g" {} \; || exit 1
+            -e "s/#(include|import) +<tightdb(.*)>/#\1 <RealmCore\/tightdb\2>/g" {} \; || exit 1
 
         cat >"$TEST_APP/test/test_all.hpp" <<EOF
 #ifndef ${TEST_APP}_TEST_ALL
