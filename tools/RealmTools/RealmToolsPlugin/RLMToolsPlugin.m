@@ -8,6 +8,13 @@
 
 #import "RLMToolsPlugin.h"
 
+@interface RLMToolsPlugin ()
+
+@property (strong, nonatomic) NSBundle *bundle;
+
+@end
+
+
 @implementation RLMToolsPlugin
 
 static RLMToolsPlugin *sharedPlugin = nil;
@@ -16,7 +23,7 @@ static RLMToolsPlugin *sharedPlugin = nil;
 {
 	static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedPlugin = [[self alloc] init];
+        sharedPlugin = [[self alloc] initWithBundle:plugin];
     });
 }
 
@@ -25,11 +32,14 @@ static RLMToolsPlugin *sharedPlugin = nil;
     return sharedPlugin;
 }
 
-- (id)init
+- (id)initWithBundle:(NSBundle *)plugin
 {
     self = [super init];
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notificationListener:) name:nil object:nil];
+        
+        _bundle = plugin;
+        [self addRealmToolsToWindow];
     }
     
     return self;
@@ -46,6 +56,28 @@ static RLMToolsPlugin *sharedPlugin = nil;
 //		return;
 //	else
 //		NSLog(@"  Notification: %@", [notification name]);
+}
+
+- (void)addRealmToolsToWindow
+{
+    static NSString *const WindowMenuTitle = @"Window";
+    static NSString *const RealmMenuTitle = @"Realm Tools";
+    
+    NSMenu *menu = [NSApp mainMenu];
+    NSMenuItem *windowMenu = [menu itemWithTitle:WindowMenuTitle];
+    if (windowMenu) {
+        [windowMenu.submenu addItem:[NSMenuItem separatorItem]];
+        
+        NSMenuItem *realmMenu = [[NSMenuItem alloc] initWithTitle:RealmMenuTitle action:@selector(realmToolsClicked:) keyEquivalent:@""];
+        realmMenu.target = self;
+        
+        [windowMenu.submenu addItem:realmMenu];
+    }
+}
+
+- (void)realmToolsClicked:(id)sender
+{
+    NSLog(@"Present UI");
 }
 
 @end
