@@ -350,32 +350,43 @@ void update_query_with_value_expression(RLMTable * table, tightdb::Query & query
 void update_query_with_predicate(NSPredicate * predicate,
                                  RLMTable * table, tightdb::Query & query) {
     
-    // compound predicates
+    // Compound predicates.
     if ([predicate isMemberOfClass:[NSCompoundPredicate class]]) {
         NSCompoundPredicate * comp = (NSCompoundPredicate *)predicate;
-        if ([comp compoundPredicateType] == NSAndPredicateType) {
-            // add all of the subprediates
-            query.group();
-            for (NSPredicate * subp in comp.subpredicates) {
-                update_query_with_predicate(subp, table, query);
-            }
-            query.end_group();
-        }
-        else if ([comp compoundPredicateType] == NSOrPredicateType) {
-            // add all of the subprediates with ors inbetween
-            query.group();
-            for (NSUInteger i = 0; i < comp.subpredicates.count; i++) {
-                NSPredicate * subp = comp.subpredicates[i];
-                if (i > 0) {
-                    query.Or();
+        
+        switch ([comp compoundPredicateType]) {
+            case NSAndPredicateType:
+                // Add all of the subprediates.
+                query.group();
+                for (NSPredicate * subp in comp.subpredicates) {
+                    update_query_with_predicate(subp, table, query);
                 }
-                update_query_with_predicate(subp, table, query);
-            }
-            query.end_group();
-        }
-        else {
-            @throw RLM_predicate_exception(@"Invalid compound predicate type",
-                                           @"Only support AND and OR predicate types");
+                query.end_group();
+                
+                break;
+                
+            case NSOrPredicateType:
+                // Add all of the subprediates with ors inbetween.
+                query.group();
+                for (NSUInteger i = 0; i < comp.subpredicates.count; i++) {
+                    NSPredicate * subp = comp.subpredicates[i];
+                    if (i > 0) {
+                        query.Or();
+                    }
+                    update_query_with_predicate(subp, table, query);
+                }
+                query.end_group();
+                
+                break;
+                
+            case NSNotPredicateType:
+                query.Not();
+                
+                //
+                break;
+            default:
+                @throw RLM_predicate_exception(@"Invalid compound predicate type",
+                                               @"Only support AND, OR and NOT predicate types");
         }
     }
     else if ([predicate isMemberOfClass:[NSComparisonPredicate class]]) {
