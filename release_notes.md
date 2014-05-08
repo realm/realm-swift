@@ -52,6 +52,9 @@ The Objective-C API has been updated and your code will break!
 * Added `averageOfColumn:where:` on `RLMTable`
 * Added `minInColumn:where:` on `RLMTable`
 * Added `maxInColumn:where:` on `RLMTable`
+* Added `toJSONString` on `RLMRealm`
+* Added `toJSONString` on `RLMTable`
+* Added `toJSONString` on `RLMView`
 
 ### Bugfixes:
 
