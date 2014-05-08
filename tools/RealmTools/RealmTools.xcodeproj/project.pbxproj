@@ -12,6 +12,7 @@
 		4B2915ED191B3199006437DA /* GBSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E7191B3199006437DA /* GBSettings.m */; };
 		4B2915EE191B3199006437DA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E8191B3199006437DA /* main.m */; };
 		4B2915FF191B327A006437DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B2915FD191B327A006437DA /* InfoPlist.strings */; };
+		4B291606191B3552006437DA /* RLMToolsPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B291605191B3552006437DA /* RLMToolsPlugin.m */; };
 		4BE8BBDE191ACB4D0074AB20 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BE8BBDD191ACB4D0074AB20 /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
@@ -37,11 +38,13 @@
 		4B2915E8191B3199006437DA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		4B2915E9191B3199006437DA /* RealmTools-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RealmTools-Prefix.pch"; sourceTree = "<group>"; };
 		4B2915EA191B3199006437DA /* RealmToolsCLI.1 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.man; path = RealmToolsCLI.1; sourceTree = "<group>"; };
-		4B2915F3191B327A006437DA /* RealmToolsPlugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RealmToolsPlugin.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B2915F3191B327A006437DA /* RealmToolsPlugin.xcplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RealmToolsPlugin.xcplugin; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B2915F9191B327A006437DA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		4B2915FC191B327A006437DA /* RealmToolsPlugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RealmToolsPlugin-Info.plist"; sourceTree = "<group>"; };
 		4B2915FE191B327A006437DA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4B291600191B327A006437DA /* RealmToolsPlugin-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RealmToolsPlugin-Prefix.pch"; sourceTree = "<group>"; };
+		4B291604191B3552006437DA /* RLMToolsPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMToolsPlugin.h; sourceTree = "<group>"; };
+		4B291605191B3552006437DA /* RLMToolsPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMToolsPlugin.m; sourceTree = "<group>"; };
 		4BE8BBDA191ACB4D0074AB20 /* RealmToolsCLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RealmToolsCLI; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BE8BBDD191ACB4D0074AB20 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -92,6 +95,8 @@
 		4B2915FA191B327A006437DA /* RealmToolsPlugin */ = {
 			isa = PBXGroup;
 			children = (
+				4B291604191B3552006437DA /* RLMToolsPlugin.h */,
+				4B291605191B3552006437DA /* RLMToolsPlugin.m */,
 				4B2915FB191B327A006437DA /* Supporting Files */,
 			);
 			path = RealmToolsPlugin;
@@ -121,7 +126,7 @@
 			isa = PBXGroup;
 			children = (
 				4BE8BBDA191ACB4D0074AB20 /* RealmToolsCLI */,
-				4B2915F3191B327A006437DA /* RealmToolsPlugin.bundle */,
+				4B2915F3191B327A006437DA /* RealmToolsPlugin.xcplugin */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -152,7 +157,7 @@
 			);
 			name = RealmToolsPlugin;
 			productName = RealmToolsPlugin;
-			productReference = 4B2915F3191B327A006437DA /* RealmToolsPlugin.bundle */;
+			productReference = 4B2915F3191B327A006437DA /* RealmToolsPlugin.xcplugin */;
 			productType = "com.apple.product-type.bundle";
 		};
 		4BE8BBD9191ACB4D0074AB20 /* RealmToolsCLI */ = {
@@ -215,6 +220,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B291606191B3552006437DA /* RLMToolsPlugin.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,6 +253,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				DEPLOYMENT_LOCATION = YES;
+				DSTROOT = "$(HOME)";
+				GCC_ENABLE_OBJC_GC = unsupported;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmToolsPlugin/RealmToolsPlugin-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -254,9 +263,9 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "RealmToolsPlugin/RealmToolsPlugin-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				INSTALL_PATH = "/Library/Application Support/Developer/Shared/Xcode/Plug-ins";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = bundle;
+				WRAPPER_EXTENSION = xcplugin;
 			};
 			name = Debug;
 		};
@@ -264,12 +273,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				DEPLOYMENT_LOCATION = YES;
+				DSTROOT = "$(HOME)";
+				GCC_ENABLE_OBJC_GC = unsupported;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmToolsPlugin/RealmToolsPlugin-Prefix.pch";
 				INFOPLIST_FILE = "RealmToolsPlugin/RealmToolsPlugin-Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				INSTALL_PATH = "/Library/Application Support/Developer/Shared/Xcode/Plug-ins";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = bundle;
+				WRAPPER_EXTENSION = xcplugin;
 			};
 			name = Release;
 		};
@@ -371,6 +383,7 @@
 				4B291603191B327A006437DA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4BE8BBD5191ACB4D0074AB20 /* Build configuration list for PBXProject "RealmTools" */ = {
 			isa = XCConfigurationList;
