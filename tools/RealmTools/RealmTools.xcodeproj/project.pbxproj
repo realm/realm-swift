@@ -115,9 +115,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4BE8BBD9191ACB4D0074AB20 /* RealmTools */ = {
+		4BE8BBD9191ACB4D0074AB20 /* RealmToolsCLI */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4BE8BBE8191ACB4D0074AB20 /* Build configuration list for PBXNativeTarget "RealmTools" */;
+			buildConfigurationList = 4BE8BBE8191ACB4D0074AB20 /* Build configuration list for PBXNativeTarget "RealmToolsCLI" */;
 			buildPhases = (
 				4BE8BBD6191ACB4D0074AB20 /* Sources */,
 				4BE8BBD7191ACB4D0074AB20 /* Frameworks */,
@@ -127,7 +127,7 @@
 			);
 			dependencies = (
 			);
-			name = RealmTools;
+			name = RealmToolsCLI;
 			productName = RealmTools;
 			productReference = 4BE8BBDA191ACB4D0074AB20 /* RealmTools */;
 			productType = "com.apple.product-type.tool";
@@ -153,7 +153,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4BE8BBD9191ACB4D0074AB20 /* RealmTools */,
+				4BE8BBD9191ACB4D0074AB20 /* RealmToolsCLI */,
 			);
 		};
 /* End PBXProject section */
@@ -273,7 +273,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4BE8BBE8191ACB4D0074AB20 /* Build configuration list for PBXNativeTarget "RealmTools" */ = {
+		4BE8BBE8191ACB4D0074AB20 /* Build configuration list for PBXNativeTarget "RealmToolsCLI" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4BE8BBE9191ACB4D0074AB20 /* Debug */,
