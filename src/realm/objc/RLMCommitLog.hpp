@@ -33,9 +33,9 @@ class WriteLogRegistry;
 
 class RegistryRegistry {
 public:
-    WriteLogRegistry* get(std::string fname);
-    void add(std::string fname, WriteLogRegistry* registry);
-    void remove(std::string fname);
+    WriteLogRegistry* get(std::string filepath);
+    void add(std::string filepath, WriteLogRegistry* registry);
+    void remove(std::string filepath);
 private:
     util::Mutex m_mutex;
     std::map<std::string, WriteLogRegistry*> m_registries;

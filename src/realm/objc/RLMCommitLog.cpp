@@ -30,30 +30,30 @@
 
 namespace tightdb {
 
-WriteLogRegistry* RegistryRegistry::get(std::string fname)
+WriteLogRegistry* RegistryRegistry::get(std::string filepath)
 {
     util::LockGuard lock(m_mutex);
     std::map<std::string, WriteLogRegistry*>::iterator iter;
-    iter = m_registries.find(fname);
+    iter = m_registries.find(filepath);
     if (iter != m_registries.end())
         return iter->second;
     WriteLogRegistry* result = new WriteLogRegistry;
-    m_registries[fname] = result;
+    m_registries[filepath] = result;
     return result;
 };
 
 
-void RegistryRegistry::add(std::string fname, WriteLogRegistry* registry)
+void RegistryRegistry::add(std::string filepath, WriteLogRegistry* registry)
 {
     util::LockGuard lock(m_mutex);
-    m_registries[fname] = registry;
+    m_registries[filepath] = registry;
 }
 
 
-void RegistryRegistry::remove(std::string fname)
+void RegistryRegistry::remove(std::string filepath)
 {
     util::LockGuard lock(m_mutex);
-    m_registries.erase(fname);
+    m_registries.erase(filepath);
 }
 
 
