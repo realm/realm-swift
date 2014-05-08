@@ -446,6 +446,13 @@ tightdb::Query queryFromPredicate(RLMTable *table, id predicate)
             @throw RLM_predicate_exception(@"Invalid argument",
                                            @"Condition should be predicate as string or NSPredicate object");
         }
+        
+        // Test the constructed query in core
+        std::string validateMessage = query.validate();
+        if (validateMessage != "") {
+            @throw RLM_predicate_exception(@"Invalid query",
+                                           [NSString stringWithCString:validateMessage.c_str() encoding:[NSString defaultCStringEncoding]]  );
+        }
     }
     
     return query;
