@@ -670,6 +670,7 @@ EOF
                     --ignore "src/realm/objc/test/*" \
                     --index-desc doc/index.md \
                     --template doc/templates \
+                    --exit-threshold 2 \
                     src/realm/objc/ || exit 1
         echo "Done generating docs under docs/appledocs"
         exit 0
