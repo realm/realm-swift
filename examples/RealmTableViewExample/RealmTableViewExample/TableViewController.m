@@ -80,7 +80,7 @@ static NSString * const kTableName = @"table";
         [self.realm commitWriteTransaction];
     }
     
-    // Get the table and hold onto it
+    // Get the table and hold on to it
     self.table = [DemoTable tableInRealm:self.realm named:kTableName];
     
     // Register for notifications
