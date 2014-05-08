@@ -190,7 +190,7 @@ NSString *const defaultRealmFileName = @"default.realm";
         realm->_writelogCollector.reset(new WriteLogCollector(
             StringData(ObjcStringAccessor(path)),
             globalRegistry.get(StringData(ObjcStringAccessor(path)))
-        );
+        ));
         realm->_sharedGroup.reset(new SharedGroup(* realm->_writelogCollector));
     }
     catch (File::PermissionDenied &ex) {
