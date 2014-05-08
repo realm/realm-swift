@@ -380,9 +380,10 @@ void update_query_with_predicate(NSPredicate * predicate,
                 break;
                 
             case NSNotPredicateType:
+                // Add the negated subpredicate
                 query.Not();
-                
-                //
+                update_query_with_predicate(comp.subpredicates.firstObject, table, query);
+
                 break;
             default:
                 @throw RLM_predicate_exception(@"Invalid compound predicate type",
