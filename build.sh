@@ -653,6 +653,7 @@ EOF
         ;;
 
     "docs")
+        echo "Generating HTML docs..."
         appledoc    --project-name Realm \
                     --project-company "Realm" \
                     --include doc/realm.png \
@@ -660,6 +661,31 @@ EOF
                     -v `sh build.sh get-version` \
                     --create-html \
                     --no-create-docset \
+                    --no-repeat-first-par \
+                    --ignore src/realm/objc/RLMColumnProxy.h \
+                    --ignore src/realm/objc/RLMProxy.h \
+                    --ignore src/realm/objc/RLMQuery.h \
+                    --ignore src/realm/objc/RLMType.h \
+                    --ignore src/realm/objc/RLMVersion.h \
+                    --ignore src/realm/objc/RLMDescriptor.h \
+                    --ignore "src/realm/objc/test/*" \
+                    --index-desc doc/index.md \
+                    --template doc/templates \
+                    --exit-threshold 2 \
+                    src/realm/objc/ || exit 1
+
+        echo "Generating docset docs..."
+        appledoc    --project-name Realm \
+                    --project-company "Realm" \
+                    --include doc/realm.png \
+                    --output doc/appledocs/docset \
+                    -v `sh build.sh get-version` \
+                    --no-create-html \
+                    --create-docset \
+                    --no-install-docset \
+                    --publish-docset \
+                    --docset-feed-url "http://realm.io/docs/appledoc" \
+                    --company-id "io.realm" \
                     --no-repeat-first-par \
                     --ignore src/realm/objc/RLMColumnProxy.h \
                     --ignore src/realm/objc/RLMProxy.h \
