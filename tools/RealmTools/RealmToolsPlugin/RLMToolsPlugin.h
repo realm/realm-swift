@@ -6,8 +6,6 @@
 //  Copyright (c) 2014 Realm.io. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-
 @interface RLMToolsPlugin : NSObject
 
 + (RLMToolsPlugin *)sharedPlugin;
