@@ -55,7 +55,7 @@ using namespace std;
     tightdb::TableRef m_table;
     id m_parent;
     BOOL m_read_only;
-    RLMRow * m_tmp_row;
+    RLMRow *m_tmp_row;
 }
 
 - (instancetype)init
@@ -226,8 +226,7 @@ using namespace std;
 -(RLMDescriptor*)descriptorWithError:(NSError* __autoreleasing*)error
 {
     tightdb::DescriptorRef desc = m_table->get_descriptor();
-    BOOL read_only = m_read_only || m_table->has_shared_type();
-    return [RLMDescriptor descWithDesc:desc.get() readOnly:read_only error:error];
+    return [RLMDescriptor descWithDesc:desc.get() readOnly:m_read_only error:error];
 }
 
 -(NSUInteger)rowCount // Implementing property accessor
@@ -941,6 +940,9 @@ using namespace std;
 
 -(NSUInteger)addColumnWithType:(RLMType)type andName:(NSString*)name error:(NSError* __autoreleasing*)error
 {
+    // FIXME: Throw exception if m_table->has_shared_type() returns
+    // true. See documentation for Table::has_shared_type() in core
+    // library for an explanation of why.
     REALM_EXCEPTION_ERRHANDLER(
         return m_table->add_column(tightdb::DataType(type), ObjcStringAccessor(name));,
         0);
@@ -948,6 +950,9 @@ using namespace std;
 
 -(void)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString *)newName
 {
+    // FIXME: Throw exception if m_table->has_shared_type() returns
+    // true. See documentation for Table::has_shared_type() in core
+    // library for an explanation of why.
     REALM_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colIndex);
     m_table->rename_column(colIndex, ObjcStringAccessor(newName));
 }
@@ -955,6 +960,9 @@ using namespace std;
 
 -(void)removeColumnWithIndex:(NSUInteger)columnIndex
 {
+    // FIXME: Throw exception if m_table->has_shared_type() returns
+    // true. See documentation for Table::has_shared_type() in core
+    // library for an explanation of why.
     REALM_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(columnIndex);
     
     try {
