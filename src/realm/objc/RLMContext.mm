@@ -73,7 +73,7 @@ NSString *const defaultContextFileName = @"default.realm";
                 globalRegistry.get(StringData(ObjcStringAccessor(path)))
             )
         );
-        shared_group->m_shared_group.reset(new tightdb::SharedGroup(shared_group->m_writelog_collector));
+        shared_group->m_shared_group.reset(new tightdb::SharedGroup(*shared_group->m_writelog_collector.get()));
     }
     // TODO: capture this in a macro or function, group constructor uses the same pattern.
     catch (tightdb::util::File::PermissionDenied& ex) {
