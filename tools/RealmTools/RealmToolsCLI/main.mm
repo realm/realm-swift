@@ -8,10 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import "GBCommandLineParser.h"
+#include <tightdb/importer.hpp>
 
 void import_csv(NSURL *fileName)
 {
-    //Importer importer;
+    Importer importer;
     
 }
 

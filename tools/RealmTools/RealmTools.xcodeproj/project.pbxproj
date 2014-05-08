@@ -10,11 +10,13 @@
 		4B2915EB191B3199006437DA /* GBCommandLineParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E3191B3199006437DA /* GBCommandLineParser.m */; };
 		4B2915EC191B3199006437DA /* GBOptionsHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E5191B3199006437DA /* GBOptionsHelper.m */; };
 		4B2915ED191B3199006437DA /* GBSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E7191B3199006437DA /* GBSettings.m */; };
-		4B2915EE191B3199006437DA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E8191B3199006437DA /* main.m */; };
+		4B2915EE191B3199006437DA /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E8191B3199006437DA /* main.mm */; };
 		4B2915FF191B327A006437DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B2915FD191B327A006437DA /* InfoPlist.strings */; };
 		4B291606191B3552006437DA /* RLMToolsPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B291605191B3552006437DA /* RLMToolsPlugin.m */; };
 		4BB7715C191BFFE400C9CD50 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B2915F9191B327A006437DA /* AppKit.framework */; };
 		4BB7715F191C01AB00C9CD50 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BE8BBDD191ACB4D0074AB20 /* Foundation.framework */; };
+		4BB77161191C090800C9CD50 /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB77160191C090800C9CD50 /* libstdc++.6.dylib */; };
+		4BB77162191C094600C9CD50 /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BB77160191C090800C9CD50 /* libstdc++.6.dylib */; };
 		4BE8BBDE191ACB4D0074AB20 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BE8BBDD191ACB4D0074AB20 /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
@@ -37,7 +39,7 @@
 		4B2915E5191B3199006437DA /* GBOptionsHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBOptionsHelper.m; sourceTree = "<group>"; };
 		4B2915E6191B3199006437DA /* GBSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GBSettings.h; sourceTree = "<group>"; };
 		4B2915E7191B3199006437DA /* GBSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GBSettings.m; sourceTree = "<group>"; };
-		4B2915E8191B3199006437DA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		4B2915E8191B3199006437DA /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		4B2915E9191B3199006437DA /* RealmTools-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RealmTools-Prefix.pch"; sourceTree = "<group>"; };
 		4B2915EA191B3199006437DA /* RealmToolsCLI.1 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.man; path = RealmToolsCLI.1; sourceTree = "<group>"; };
 		4B2915F3191B327A006437DA /* RealmToolsPlugin.xcplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RealmToolsPlugin.xcplugin; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -47,6 +49,7 @@
 		4B291600191B327A006437DA /* RealmToolsPlugin-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RealmToolsPlugin-Prefix.pch"; sourceTree = "<group>"; };
 		4B291604191B3552006437DA /* RLMToolsPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMToolsPlugin.h; sourceTree = "<group>"; };
 		4B291605191B3552006437DA /* RLMToolsPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMToolsPlugin.m; sourceTree = "<group>"; };
+		4BB77160191C090800C9CD50 /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "usr/lib/libstdc++.6.dylib"; sourceTree = SDKROOT; };
 		4BE8BBDA191ACB4D0074AB20 /* RealmToolsCLI */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RealmToolsCLI; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BE8BBDD191ACB4D0074AB20 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -56,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BB77161191C090800C9CD50 /* libstdc++.6.dylib in Frameworks */,
 				4BB7715F191C01AB00C9CD50 /* Foundation.framework in Frameworks */,
 				4BB7715C191BFFE400C9CD50 /* AppKit.framework in Frameworks */,
 			);
@@ -65,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BB77162191C094600C9CD50 /* libstdc++.6.dylib in Frameworks */,
 				4BE8BBDE191ACB4D0074AB20 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -76,7 +81,7 @@
 			isa = PBXGroup;
 			children = (
 				4B2915E1191B3199006437DA /* GBCli */,
-				4B2915E8191B3199006437DA /* main.m */,
+				4B2915E8191B3199006437DA /* main.mm */,
 				4B2915E9191B3199006437DA /* RealmTools-Prefix.pch */,
 				4B2915EA191B3199006437DA /* RealmToolsCLI.1 */,
 			);
@@ -138,6 +143,7 @@
 		4BE8BBDC191ACB4D0074AB20 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4BB77160191C090800C9CD50 /* libstdc++.6.dylib */,
 				4B2915F9191B327A006437DA /* AppKit.framework */,
 				4BE8BBDD191ACB4D0074AB20 /* Foundation.framework */,
 			);
@@ -234,7 +240,7 @@
 			files = (
 				4B2915EB191B3199006437DA /* GBCommandLineParser.m in Sources */,
 				4B2915ED191B3199006437DA /* GBSettings.m in Sources */,
-				4B2915EE191B3199006437DA /* main.m in Sources */,
+				4B2915EE191B3199006437DA /* main.mm in Sources */,
 				4B2915EC191B3199006437DA /* GBOptionsHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -256,9 +262,16 @@
 		4B291602191B327A006437DA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEPLOYMENT_LOCATION = YES;
 				DSTROOT = "$(HOME)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_ENABLE_OBJC_GC = unsupported;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmToolsPlugin/RealmToolsPlugin-Prefix.pch";
@@ -266,13 +279,21 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/local/include,
+				);
 				INFOPLIST_FILE = "RealmToolsPlugin/RealmToolsPlugin-Info.plist";
 				INSTALL_PATH = "/Library/Application Support/Developer/Shared/Xcode/Plug-ins";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					/usr/local/lib,
 				);
+				OTHER_LDFLAGS = "-ltightdb-dbg";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "";
 				WRAPPER_EXTENSION = xcplugin;
 			};
 			name = Debug;
@@ -280,19 +301,34 @@
 		4B291603191B327A006437DA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEPLOYMENT_LOCATION = YES;
 				DSTROOT = "$(HOME)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_ENABLE_OBJC_GC = unsupported;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmToolsPlugin/RealmToolsPlugin-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/local/include,
+				);
 				INFOPLIST_FILE = "RealmToolsPlugin/RealmToolsPlugin-Info.plist";
 				INSTALL_PATH = "/Library/Application Support/Developer/Shared/Xcode/Plug-ins";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					/usr/local/lib,
 				);
+				OTHER_LDFLAGS = "-ltightdb";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "";
 				WRAPPER_EXTENSION = xcplugin;
 			};
 			name = Release;
@@ -370,26 +406,56 @@
 		4BE8BBE9191ACB4D0074AB20 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "libstdc++";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmToolsCLI/RealmTools-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/local/include,
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					/usr/local/lib,
 				);
+				OTHER_LDFLAGS = "-ltightdb-dbg";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Debug;
 		};
 		4BE8BBEA191ACB4D0074AB20 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "libstdc++";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmToolsCLI/RealmTools-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/local/include,
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					/usr/local/lib,
 				);
+				OTHER_LDFLAGS = "-ltightdb";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Release;
 		};
