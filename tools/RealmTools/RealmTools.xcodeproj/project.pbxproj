@@ -13,6 +13,8 @@
 		4B2915EE191B3199006437DA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E8191B3199006437DA /* main.m */; };
 		4B2915FF191B327A006437DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B2915FD191B327A006437DA /* InfoPlist.strings */; };
 		4B291606191B3552006437DA /* RLMToolsPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B291605191B3552006437DA /* RLMToolsPlugin.m */; };
+		4BB7715C191BFFE400C9CD50 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B2915F9191B327A006437DA /* AppKit.framework */; };
+		4BB7715F191C01AB00C9CD50 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BE8BBDD191ACB4D0074AB20 /* Foundation.framework */; };
 		4BE8BBDE191ACB4D0074AB20 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BE8BBDD191ACB4D0074AB20 /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
@@ -54,6 +56,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BB7715F191C01AB00C9CD50 /* Foundation.framework in Frameworks */,
+				4BB7715C191BFFE400C9CD50 /* AppKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,6 +268,10 @@
 				);
 				INFOPLIST_FILE = "RealmToolsPlugin/RealmToolsPlugin-Info.plist";
 				INSTALL_PATH = "/Library/Application Support/Developer/Shared/Xcode/Plug-ins";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xcplugin;
 			};
@@ -280,6 +288,10 @@
 				GCC_PREFIX_HEADER = "RealmToolsPlugin/RealmToolsPlugin-Prefix.pch";
 				INFOPLIST_FILE = "RealmToolsPlugin/RealmToolsPlugin-Info.plist";
 				INSTALL_PATH = "/Library/Application Support/Developer/Shared/Xcode/Plug-ins";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = xcplugin;
 			};
@@ -360,6 +372,10 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmToolsCLI/RealmTools-Prefix.pch";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -369,6 +385,10 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmToolsCLI/RealmTools-Prefix.pch";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
