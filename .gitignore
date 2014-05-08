@@ -35,6 +35,9 @@ tightdb-ios-*.zip
 /Realm.framework
 realm-ios-*.zip
 
+# sh build.sh docs
+/doc/appledocs
+
 # AppCode specific files
 .idea/
 *.iml
