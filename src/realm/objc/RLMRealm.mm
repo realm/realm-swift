@@ -102,6 +102,7 @@ typedef NS_ENUM(NSUInteger, RLMTransactionMode) {
 @implementation RLMRealm {
     UniquePtr<SharedGroup> _sharedGroup;
     UniquePtr<WriteLogCollector> _writelogCollector;
+    WriteLogRegistry* _registry;
     NSMapTable *_objects;
     NSRunLoop *_runLoop;
     NSString *_path;
@@ -187,9 +188,10 @@ NSString *const defaultRealmFileName = @"default.realm";
     RLMError errorCode = RLMErrorOk;
     NSString *errorMessage;
     try {
+	realm->_registry = globalRegistry.get(StringData(ObjcStringAccessor(path)));
         realm->_writelogCollector.reset(new WriteLogCollector(
             StringData(ObjcStringAccessor(path)),
-            globalRegistry.get(StringData(ObjcStringAccessor(path)))
+	    realm->_registry
         ));
         realm->_sharedGroup.reset(new SharedGroup(* realm->_writelogCollector));
     }
