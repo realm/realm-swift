@@ -513,7 +513,7 @@ EOF
         fi
         (
             cd examples
-            for folder in $(ls -l | grep "^d" | awk '{ print $9 }'); do
+            for folder in "$(ls -l | grep "^d" | awk '{ print $9 }')"; do
                 echo "Packaging $folder..."
                 cp -Rf ../Realm.framework $folder
                 sed -i '.bak' -e "s/\.\.\/\.\.\/Realm\.framework/Realm\.framework/" $folder/*.xcodeproj/project.pbxproj
