@@ -509,14 +509,14 @@ EOF
         fi
         (
             cd examples
-            for folder in $(ls -l | grep "^d" | awk '{ print $9 }'); do
+            for folder in "$(ls -l | grep "^d" | awk '{ print $9 }')"; do
                 echo "Packaging $folder..."
-                cp -Rf ../Realm.framework $folder
-                sed -i '.bak' -e "s/\.\.\/\.\.\/Realm\.framework/Realm\.framework/" $folder/*.xcodeproj/project.pbxproj
+                cp -Rf ../Realm.framework "$folder"
+                sed -i '.bak' -e "s/\.\.\/\.\.\/Realm\.framework/Realm\.framework/" "$folder/*.xcodeproj/project.pbxproj"
                 echo "The $folder Xcode project file was modified like this:"
-                diff $folder/*.xcodeproj/project.pbxproj.bak $folder/*.xcodeproj/project.pbxproj
-                zip -rq $folder.zip $folder -x \*.bak
-                mv -f $folder/*.xcodeproj/project.pbxproj.bak $folder/*.xcodeproj/project.pbxproj
+                diff "$folder/*.xcodeproj/project.pbxproj.bak" "$folder/*.xcodeproj/project.pbxproj"
+                zip -rq "$folder.zip" "$folder" -x \*.bak
+                mv -f "$folder/*.xcodeproj/project.pbxproj.bak" "$folder/*.xcodeproj/project.pbxproj"
             done
         ) || exit 1
         echo "The zipped examples are now available in the examples folder"
