@@ -410,9 +410,11 @@ EOF
         ) || exit 1
         (
             export REALM_CONFIG=../tightdb/install/bin/tightdb-config
+            sh build.sh clean
             sh build.sh config
             sh build.sh build-iphone
             sh build.sh ios-framework
+            sh build.sh build
             sh build.sh test-debug
             ) || exit 1
         (
