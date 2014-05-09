@@ -356,17 +356,16 @@ void update_query_with_predicate(NSPredicate * predicate,
         
         switch ([comp compoundPredicateType]) {
             case NSAndPredicateType:
-                // Add all of the subprediates.
+                // Add all of the subpredicates.
                 query.group();
                 for (NSPredicate * subp in comp.subpredicates) {
                     update_query_with_predicate(subp, table, query);
                 }
                 query.end_group();
-                
                 break;
                 
             case NSOrPredicateType:
-                // Add all of the subprediates with ors inbetween.
+                // Add all of the subpredicates with ors inbetween.
                 query.group();
                 for (NSUInteger i = 0; i < comp.subpredicates.count; i++) {
                     NSPredicate * subp = comp.subpredicates[i];
@@ -376,15 +375,14 @@ void update_query_with_predicate(NSPredicate * predicate,
                     update_query_with_predicate(subp, table, query);
                 }
                 query.end_group();
-                
                 break;
                 
             case NSNotPredicateType:
                 // Add the negated subpredicate
                 query.Not();
                 update_query_with_predicate(comp.subpredicates.firstObject, table, query);
-
                 break;
+                
             default:
                 @throw RLM_predicate_exception(@"Invalid compound predicate type",
                                                @"Only support AND, OR and NOT predicate types");
