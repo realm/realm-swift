@@ -616,5 +616,40 @@ span.tooltip:hover span.tooltip {
 	left: 0px;
 }
 
+#docs-links {
+	position: absolute;
+	right: 100px;
+	top: 0px;
+	text-align: right;
+}
+
+#dropdown {
+	position: absolute;
+	top: 35px;
+	right: 0px;
+	z-index: 100;
+}
+
+.popup-link {
+	background-color: #f0717d;
+	padding: 15px;
+	-moz-border-bottom-left-radius: 10px;
+	-webkit-border-bottom-left-radius: 10px;
+	border-bottom-left-radius: 10px;
+}
+
+.popup-link p {
+	margin-top: 0px;
+}
+
+.popup-link p.subtext {
+	padding-bottom: 0px;
+	margin-bottom: 0px;
+}
+
+.popup-link input {
+	width: 100%;
+}
+
 /* @end */
 
