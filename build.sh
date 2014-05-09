@@ -399,10 +399,6 @@ EOF
         ;;
 
     "ci-test")
-        if [ "$(id -u)" != "0" ]; then
-           echo "This target must be run as root or with sudo" 1>&2
-           exit 1
-        fi
         mkdir -p test-reports || exit 1
         (
             cd ../tightdb
