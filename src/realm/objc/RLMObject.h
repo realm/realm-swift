@@ -80,6 +80,11 @@
  */
 -(instancetype)init;
 
+/**
+ The Realm in which this object is persisted. Returns nil for standalone objects.
+ */
+@property (nonatomic, readonly) RLMRealm *realm;
+
 @end
 
 
