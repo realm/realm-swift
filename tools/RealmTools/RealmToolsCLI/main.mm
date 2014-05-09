@@ -212,17 +212,18 @@ void import_csv(int argc, char *argv[])
 
 int main(int argc, char* argv[])
 {
-    if (argc < 3) {
-        @throw [NSException exceptionWithName:@"Invalid amount of arguments" reason:@"" userInfo:nil];
-    }
+    abort2(argc < 3, legend);
     
-    NSString *inputFilePathExtension = [[[NSURL URLWithString:[NSString stringWithUTF8String:argv[argc - 2]]] pathExtension] lowercaseString];
+    NSString *fileString = [NSString stringWithUTF8String:argv[argc - 2]];
+    NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:fileString];
+    NSString *fileExtension = [fileURL pathExtension];
     
-    if ([inputFilePathExtension isEqualToString:@"csv"]) {
-        
+    if ([fileExtension isEqualToString:@"csv"]) {
+        NSLog(@"Importing CSV");
+        import_csv(argc, argv);
     }
-    else if ([inputFilePathExtension isEqualToString:@"json"]) {
-        
+    else if ([fileExtension isEqualToString:@"json"]) {
+        NSLog(@"Importing JSON");
     }
     
     return 0;
