@@ -399,8 +399,9 @@
 					"$(PROJECT_DIR)",
 					/usr/local/lib,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_LDFLAGS = "-ltightdb-dbg";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = realm;
 				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Debug;
@@ -427,8 +428,9 @@
 					"$(PROJECT_DIR)",
 					/usr/local/lib,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				OTHER_LDFLAGS = "-ltightdb";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = realm;
 				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Release;
