@@ -28,6 +28,7 @@
 #include <tightdb/utilities.hpp>
 #include <tightdb/importer.hpp>
 #include <stdarg.h>
+#import <Realm/Realm.h>
 
 using namespace std;
 using namespace tightdb;
@@ -211,7 +212,7 @@ void import_csv(int argc, char *argv[])
 }
 
 int main(int argc, char* argv[])
-{
+{    
     abort2(argc < 3, legend);
     
     NSString *fileString = [NSString stringWithUTF8String:argv[argc - 2]];
