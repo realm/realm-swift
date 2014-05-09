@@ -27,6 +27,15 @@
  */
 @interface RLMArray : NSObject<NSFastEnumeration>
 
+/** 
+ Initialize an RLMArray.
+ 
+ @param objectClass The class of object this RLMArray will hold.
+
+ @return            An initialized RLMArray instance.
+*/
+- (instancetype)initWithObjectClass:(Class)objectClass;
+
 /**
  Number of objects in the RLMArray.
  */
@@ -80,7 +89,7 @@
 /**
  Adds an object to the end of the RLMArray.
  
- @warning This method can only be called from inside a write transaction.
+ @warning This method can only be called during a write transaction.
  
  @param object  An object (of the same type as returned from the objectClass selector).
  */
@@ -89,7 +98,7 @@
 /**
  Adds an array of object to the bottom of the RLMTable.
  
- @warning This method can only be called from inside a write transaction.
+ @warning This method can only be called during a write transaction.
  
  @param objects     An NSArray or RLMArray of objects. The contained objects must be of the type returned
                     from the objectClass selector.
@@ -99,9 +108,9 @@
 /**
  Inserts an object at the given index.
  
- Throws an exception when called with an index greater than count.
+ Throws an exception when called with an index greater than the number of objects in this RLMArray.
  
- @warning This method can only be called from inside a write transaction.
+ @warning This method can only be called during a write transaction.
  
  @param object  An object (of the same type as returned from the objectClass selector).
  @param index   The array index at which the object is inserted.
@@ -111,9 +120,9 @@
 /**
  Removes an object at a given index.
  
- Throws an exception when called with an index greater than count.
+ Throws an exception when called with an index greater than the number of objects in this RLMArray.
 
- @warning This method can only be called from inside a write transaction.
+ @warning This method can only be called during a write transaction.
  
  @param index   The array index identifying the object to be removed.
  */
@@ -122,23 +131,23 @@
 /**
  Removes the last object in an RLMArray.
  
- @warning This method can only be called from inside a write transaction.
+ @warning This method can only be called during a write transaction.
 */
 - (void)removeLastObject;
 
 /**
  Removes all objects from an RLMArray.
  
- @warning This method can only be called from inside a write transaction.
+ @warning This method can only be called during a write transaction.
  */
 - (void)removeAllObjects;
 
 /**
  Replaces an object at the given index with a new object.
 
- Throws an exception when called with an index greater than count.
+ Throws an exception when called with an index greater than the number of objects in this RLMArray.
 
- @warning This method can only be called from inside a write transaction.
+ @warning This method can only be called during a write transaction.
  
  @param index       The array index of the object to be replaced.
  @param anObject    An object (of the same type as returned from the objectClass selector).
@@ -163,7 +172,7 @@
 - (NSUInteger)indexOfObject:(RLMObject *)object;
 
 /**
- Gets the index of the first object matching a predicate.
+ Gets the index of the first object matching the predicate.
  
  Returns NSNotFound if the object is not found in this RLMArray.
  
@@ -225,7 +234,7 @@
  
  @warning You can only use this method on properties with the following types: int, float & double.
  @bug Properties of type NSString are not supported (yet).
- @bug Properties of type RLMTable are not supported (yet). *i.e.* you cannot search on subproperties.
+ @bug Properties of type RLMArray are not supported (yet). *i.e.* you cannot search on subproperties.
  
  @param property The property to look for a maximum on. Only properties of type int, float and double are supported.
  
@@ -258,10 +267,9 @@
  @bug Properties of type RLMArray are not supported (yet). *i.e.* you cannot search on subproperties.
  
  @param property The property to calculate average on. Only properties of type int, float and double are supported.
- @param predicate An [NSPredicate](https://developer.apple.com/library/mac/documentation/Cocoa/Reference/Foundation/Classes/NSPredicate_Class/Reference/NSPredicate.html).
- You can also use an NSString with optional format va_list.
  
- @return The average for the given property amongst objects in an RLMArray.
+ @return    The average for the given property amongst objects in an RLMArray. This will be of type double for both
+            float and double properties.
  */
 -(NSNumber *)averageOfProperty:(NSString *)property;
 

@@ -32,17 +32,17 @@
 /**
  Initialize an RLMObject within a realm
  
- Initialize an instance of this object and adds it to the given realm. You must 
+ Initializes an instance of this object and adds it to the given realm. You must
  be within a write transaction to use this initializer.
  
- @param realm   The realm in which this object is persisted.
+ @param realm   The Realm in which this object is persisted.
  */
 -(instancetype)initInRealm:(RLMRealm *)realm;
 
 /**
- Initialize an RLMObject within a realm with a JSONString.
+ Initialize an RLMObject within a Realm with a JSONString.
  
- Initialize an instance of this object and adds it to the given realm populating
+ Initializes an instance of this object and adds it to the given Realm populating
  the object with the data in the given JSONString.
  
  @param realm       The Realm in which this object is persisted.
@@ -54,13 +54,13 @@
 -(instancetype)initInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString;
 
 /**
- Initialize an RLMObject within a realm with a given object.
+ Initialize an RLMObject within a Realm with a given object.
  
- Initialize an instance of this object and adds it to the given realm populating
+ Initializes an instance of this object and adds it to the given Realm populating
  the object with the given JSON object.
  
  @param realm   The Realm in which this object is persisted.
- @param object  The object used to populate the object. This can be any key value compliant
+ @param object  The object used to populate the object. This can be any key/value compliant
                 object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
                 an NSArray with one object for each persisted property. An exception will be
                 thrown if all equired properties are not present or no default is provided.
@@ -89,7 +89,7 @@
  */
 /*
  These methods allow you to easily query a custom subclass for instances of this class in the
- default Realm. To search across Realms other than the defaut or accross multiple object classes
+ default Realm. To search across Realms other than the defaut or across multiple object classes
  use the interface on an RLMRealm instance.
  */
 @interface RLMObject (SubcassInDefaultRealm)
@@ -142,7 +142,7 @@ extern NSString *const RLMPropertyAttributeIndexed;
  */
 extern NSString *const RLMPropertyAttributeInlined;
 /**
- The value for a property with this attribute must be unique accross all objects of this type. An exception
+ The value for a property with this attribute must be unique across all objects of this type. An exception
  will be thrown when setting a property with this attribute to a non-unique value.
  */
 extern NSString *const RLMPropertyAttributeUnique;
@@ -160,7 +160,7 @@ extern NSString *const RLMPropertyAttributeRequired;
  *  @name Sublcass Customization
  *  ---------------------------------------------------------------------------------------
  *
- * These methods can be overriden to customize the behavior of RLMObject subclasses.
+ * These methods can be overridden to customize the behavior of RLMObject subclasses.
  */
 @interface RLMObject (SubclassOverrides)
 

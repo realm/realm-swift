@@ -35,7 +35,7 @@
  RLMRealm instances are reused when this is called multiple times from the same thread. The 
  default RLMRealm is persisted at `<Application_Home>/Documents/default.realm`.
  
- @warning   RLMRealm instances are not thread safe and can not be shared accross threads or 
+ @warning   RLMRealm instances are not thread safe and can not be shared across threads or 
             dispatch queues. You must get a separate RLMRealm instance for each thread and queue.
  
  @return The default RLMRealm instance for the current thread.
@@ -47,7 +47,7 @@
  
  RLMRealm instances are reused when this is called multiple times from the same thread.
  
- @warning   RLMRealm instances are not thread safe and can not be shared accross threads or
+ @warning   RLMRealm instances are not thread safe and can not be shared across threads or
  dispatch queues. You must get a separate RLMRealm instance for each thread and queue.
  
  @param path Path to the file you want the data saved in.
@@ -59,11 +59,11 @@
 /**
  Obtains an RLMRealm instance with persistence to a specific file with options.
  
- @warning   RLMRealm instances are not thread safe and can not be shared accross threads or
+ @warning   RLMRealm instances are not thread safe and can not be shared across threads or
  dispatch queues. You must get a separate RLMRealm instance for each thread and queue.
  
  @param path        Path to the file you want the data saved in.
- @param path        BOOL indicating if this realm is readonly (must use for readonly files)
+ @param readonly    BOOL indicating if this Realm is readonly (must use for readonly files)
  @param error       Pass-by-reference for errors.
  
  @return An RLMRealm instance.
@@ -71,7 +71,7 @@
 + (instancetype)realmWithPath:(NSString *)path readOnly:(BOOL)readonly error:(NSError **)error;
 
 /**
- Sets the path used for the defualt Realm. 
+ Sets the path used for the default Realm.
  
  @warning This must be called before any Realm instances are obtained (otherwise throws).
  
@@ -80,36 +80,25 @@
 + (void)setDefaultRealmPath:(NSString *)path;
 
 /**
- Returns the path used by this Realm.
- 
- @return    Path to the file where this Realm is persisted.
- */
-+ (NSString *)path;
-
-/**
- Set's whether the default Realm is persisted or in-memory only
+ Make the default Realm in-memory only
  
  By default, the default Realm is persisted to disk unless this method is called.
  
  @warning This must be called before any Realm instances are obtained (otherwise throws).
- 
- @param shouldPersist   Whether the default Realm should be in-memory only or persisted to disk.
  */
-+ (void)setDefaultRealmPersistence:(BOOL)shouldPersist;
++ (void)useInMemoryDefaultRealm;
 
 /**
- Indicates if this Realm is persisted to disk.
- 
- @return    Boolean value indicating if this RLMRealm is persisted.
+ Path to the file where this Realm is persisted.
  */
-- (BOOL)isPersisted;
+@property (nonatomic, readonly) NSString *path;
 
 /**
  Indicates if this Realm is read only
  
  @return    Boolean value indicating if this RLMRealm instance is readonly.
  */
-- (BOOL)isReadOnly;
+@property (nonatomic, readonly) BOOL isReadOnly;
 
 @end
 
@@ -120,10 +109,10 @@
 /**
  Notification Block Type
  
- @param note    The name of the incoming notification.
- @param realm   The realm for which this notification occurred.
+ @param notification    The name of the incoming notification.
+ @param realm           The realm for which this notification occurred.
  */
-typedef void(^RLMNotificationBlock)(NSString *note, RLMRealm *realm);
+typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 @interface RLMRealm (Notifications)
 /**
@@ -132,14 +121,14 @@ typedef void(^RLMNotificationBlock)(NSString *note, RLMRealm *realm);
  @param block   A block which is called to process RLMRealm notifications. RLMRealmDidChangeNotification is the
  only notification currently supported.
  */
-- (void)addNotification:(RLMNotificationBlock)block;
+- (void)addNotificationBlock:(RLMNotificationBlock)block;
 
 /**
  Remove a previously registered notification handler.
  
  @param block   The block previously passed to addNotification: to remove.
  */
-- (void)removeNotification:(RLMNotificationBlock)block;
+- (void)removeNotificationBlock:(RLMNotificationBlock)block;
 
 @end
 
@@ -148,20 +137,17 @@ typedef void(^RLMNotificationBlock)(NSString *note, RLMRealm *realm);
  *  @name Writing to a Realm
  *  ---------------------------------------------------------------------------------------
  */
-typedef void(^RLMWriteBlock)(RLMRealm *realm);
-
-// interface for explicitly managing write transactions and realm refresh
 @interface RLMRealm (Transactions)
 
 /**
  Begins a write transaction in an RLMRealm. 
  
- Only one write transaction can be open at a time, and calls to beginWriteTransaction from RLMRealm instances 
- in other threads will block until the open write transaction.
+ Only one write transaction can be open at a time. Calls to beginWriteTransaction from RLMRealm instances
+ in other threads will block until the current write transaction terminates.
  
  In the case writes were made in other threads or processes to other instances of the same realm, the RLMRealm 
  on which beginWriteTransaction is called and all outstanding objects obtained from this RLMRealm are updated to
- the latest realm version when this method is called.
+ the latest Realm version when this method is called.
  */
 - (void)beginWriteTransaction;
 
@@ -173,7 +159,7 @@ typedef void(^RLMWriteBlock)(RLMRealm *realm);
 - (void)commitWriteTransaction;
 
 /**
- Abandon all write operations in the current write transaction ending the transaction.
+ Abandon all write operations in the current write transaction terminating the transaction.
  
  After this is called the RLMRealm reverts back to being read-only.
  */
@@ -185,22 +171,15 @@ typedef void(^RLMWriteBlock)(RLMRealm *realm);
 - (void)refresh;
 
 /**
- Set to YES to automacially update this realm when changes happen in other threads.
+ Set to YES to automacially update this Realm when changes happen in other threads.
 
- If set to NO, you must manually call refresh on the realm to update it to get the lastest version.
- Notifications are sent immediately when a change is avaiable whether or not the realm is automatically
+ If set to NO, you must manually call refresh on the Realm to update it to get the lastest version.
+ Notifications are sent immediately when a change is avaiable whether or not the Realm is automatically
  updated.
  
  Defaults to YES on the main thread, NO on all others.
  */
 @property (nonatomic) BOOL autorefresh;
-
-/**
- Performs a (blocking) write transaction on the RLMRealm.
- 
- @param block   A block containing the write code you want to perform.
- */
-- (void)writeUsingBlock:(RLMWriteBlock)block;
 
 @end
 
@@ -290,12 +269,12 @@ typedef void(^RLMWriteBlock)(RLMRealm *realm);
  */
 /**
  Realm provides a top level key/value store for storing and accessing objects by NSString. This system can be
- exended with the RLMKeyValueStore interface to create nested namespaces as needed.
+ extended with the RLMKeyValueStore interface to create nested namespaces as needed.
  */
 @interface RLMRealm (NamedObjects)
 
 /**
- Retrive a persisted object with an NSString.
+ Retrieve a persisted object with an NSString.
  
  @usage RLMObject * object = RLMRealm.defaultRealm[@"name"];
  @param key The NSString used to identify an object
@@ -309,7 +288,7 @@ typedef void(^RLMWriteBlock)(RLMRealm *realm);
  
  @usage RLMRealm.defaultRealm[@"name"] = object;
  @param obj     The object to be stored.
- @param key     The key taht itentifies the object to be used for future lookups.
+ @param key     The key that itentifies the object to be used for future lookups.
  */
 -(void)setObject:(RLMObject *)obj forKeyedSubscript:(id <NSCopying>)key;
 
@@ -327,7 +306,7 @@ typedef void(^RLMWriteBlock)(RLMRealm *realm);
  
  Must be called before any Realm instances are retreived (otherwise throws)
  
- @return    Block used for migration.
+ @return    object used for migration.
  
  @see       RLMMigration protocol
  */
