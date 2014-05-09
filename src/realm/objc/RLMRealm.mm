@@ -101,8 +101,8 @@ typedef NS_ENUM(NSUInteger, RLMTransactionMode) {
 
 @implementation RLMRealm {
     UniquePtr<SharedGroup> _sharedGroup;
-    UniquePtr<WriteLogCollector> _writelogCollector;
-    WriteLogRegistry* _registry;
+    UniquePtr<Replication> _writelogCollector;
+    WriteLogRegistryInterface* _registry;
     NSMapTable *_objects;
     NSRunLoop *_runLoop;
     NSString *_path;
@@ -188,8 +188,8 @@ NSString *const defaultRealmFileName = @"default.realm";
     RLMError errorCode = RLMErrorOk;
     NSString *errorMessage;
     try {
-	realm->_registry = globalRegistry.get(StringData(ObjcStringAccessor(path)));
-        realm->_writelogCollector.reset(new WriteLogCollector(
+	realm->_registry = getWriteLogs(StringData(ObjcStringAccessor(path)));
+        realm->_writelogCollector.reset(makeWriteLogCollector(
             StringData(ObjcStringAccessor(path)),
 	    realm->_registry
         ));
@@ -376,7 +376,8 @@ NSString *const defaultRealmFileName = @"default.realm";
             [self endReadTransaction];
             [self beginReadTransaction];
             Replication::version_type to_version = _sharedGroup->get_last_transaction_version();
-            WriteLogRegistry::CommitEntry* commits = _registry->get_commit_entries(from_version, to_version);
+            WriteLogRegistryInterface::CommitEntry* commits = 
+		_registry->get_commit_entries(from_version, to_version);
             // FIXME: Use the commit entries to update accessors...
             // TODO
             [self updateAllObjects];
