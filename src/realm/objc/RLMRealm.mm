@@ -370,9 +370,19 @@ NSString *const defaultRealmFileName = @"default.realm";
         
         // advance transaction if database has changed
         if (_sharedGroup->has_changed()) { // Throws
+            Replication::version_type from_version = _sharedGroup->get_last_transaction_version();
             [self endReadTransaction];
             [self beginReadTransaction];
+            Replication::version_type to_version = _sharedGroup->get_last_transaction_version();
+            WriteLogRegistry::CommitEntry* commits = _registry->get_commit_entries(from_version, to_version);
+            // FIXME: Use the commit entries to update accessors...
+            // TODO
             [self updateAllObjects];
+            static_cast<void>(commits); // avoding a warning until we put the entries to use
+
+            // Done - tell the registry, that we're done reading the commit entries:
+            _registry->release_commit_entries(from_version, to_version);
+            delete[] commits;
             
             // send notification that someone else changed the realm
             [self sendNotifications];
