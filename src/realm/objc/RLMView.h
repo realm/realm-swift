@@ -104,5 +104,15 @@
 
 -(NSUInteger)rowIndexInOriginTableForRowAtIndex:(NSUInteger)rowIndex;
 
+/**---------------------------------------------------------------------------------------
+ *  @name JSON Serialization
+ *  ---------------------------------------------------------------------------------------
+ */
+
+/** Construct a JSON representation of all the data selected by this RLMView.
+ 
+ @return JSON string representation of the view's data.
+ */
+- (NSString *)toJSONString;
 
 @end
