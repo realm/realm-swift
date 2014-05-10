@@ -159,23 +159,19 @@ th {
 	background-color: #F0727D;
 	height: 35px;
 	font-size: 115%;
+	text-align: center;
 }
 
 #top_header #library #libraryTitle {
 	color: rgba(255,255,255,0.8);
-	margin-left: 15px;
-	/*text-shadow: 0 -1px 0 #485E78;*/
+	font-size: 80%;
+	left: 5px;
 	top: 8px;
 	position: absolute;
 }
 
-#libraryTitle {
-        left: 0;
-}
-
 #top_header #library #developerHome {
 	color: rgb(34, 34, 34);
-	right: 15px;
 	top: 8px;
 	position: absolute;
 }
@@ -200,6 +196,27 @@ th {
 	/*text-shadow: 0 1px 0 #D5D5D5;*/
 	white-space: nowrap;
 }
+
+#top_header #library img {
+	display: block;
+	float: right;
+	margin-top: -5px;
+}
+
+#dropdown { display:none; }
+#dash { display:none; }
+#xcode { display:none; }
+
+
+#top_header #library #dash_img:hover ~ #dropdown { display: block; }
+#top_header #library #xcode_img:hover ~ #dropdown { display: block; }
+#top_header #library #dash_img:hover ~ #dropdown #dash { display: block; }
+#top_header #library #xcode_img:hover ~ #dropdown #xcode { display: block; }
+
+#top_header #library #dropdown:hover { display: block; }
+#top_header #library #dash:hover { display: block; }
+#top_header #library #xcode:hover { display: block; }
+
 
 #headerButtons {
 	background-color: #D8D8D8;
@@ -616,12 +633,12 @@ span.tooltip:hover span.tooltip {
 	left: 0px;
 }
 
-#docs-links {
+/*#docs-links {
 	position: absolute;
 	right: 100px;
 	top: 0px;
 	text-align: right;
-}
+}*/
 
 #dropdown {
 	position: absolute;
