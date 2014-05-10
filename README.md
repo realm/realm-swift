@@ -67,7 +67,11 @@ Here is a more complete set of build-related commands:
     sudo sh build.sh uninstall
 
 In order to build the `ci-test` target of `build.sh` it is also required to 
-install [xctool](https://github.com/facebook/xctool).
+install [xctool](https://github.com/facebook/xctool). If you use
+[Homebrew](http://brew.sh/) you do that with
+
+    brew install xctool
+
 
 Building for iOS
 -------------------
@@ -129,7 +133,7 @@ By default, the configuration step uses `which tightdb-config` to
 locate the installation of the Realm core library. If this is not
 appropriate, because you have multiple versions of the Realm core
 library installed, or `tightdb-config` is not available in your
-`$PATH`, set the environment variable `REALM_CONFIG` before calling
+`PATH`, set the environment variable `REALM_CONFIG` before calling
 `sh build.sh config`. For example:
 
     REALM_CONFIG=/opt/tightdb-v0.1.2/bin/tightdb-config build.sh config
