@@ -8,9 +8,6 @@
 *.realm
 *.realm.lock
 
-# sh build.sh docs
-/docs/html
-
 # XCode
 xcuserdata/
 project.xcworkspace
