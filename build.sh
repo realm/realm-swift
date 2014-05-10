@@ -700,8 +700,8 @@ EOF
                     --create-docset \
                     --no-install-docset \
                     --publish-docset \
-                    --docset-feed-url "http://realm.io/docs/appledoc" \
-                    --docset-package-url "http://realm.io/docs/appledoc" \
+                    --docset-feed-url "http://realm.io/docs/ios/realm.atom" \
+                    --docset-package-url "http://realm.io/docs/ios/realm" \
                     --docset-package-filename "realm" \
                     --docset-atom-filename "realm.atom" \
                     --docset-bundle-filename "realm.docset" \
