@@ -155,16 +155,16 @@ th {
 /* @group Header */
 
 #top_header #library {
-	background: url("../img/library_background.png") repeat-x 0 0 #485E78;
-	background-color: #ccc;
+	/*background: url("../img/library_background.png") repeat-x 0 0 #485E78;*/
+	background-color: #F0727D;
 	height: 35px;
 	font-size: 115%;
 }
 
 #top_header #library #libraryTitle {
-	color: #FFFFFF;
+	color: rgba(255,255,255,0.8);
 	margin-left: 15px;
-	text-shadow: 0 -1px 0 #485E78;
+	/*text-shadow: 0 -1px 0 #485E78;*/
 	top: 8px;
 	position: absolute;
 }
@@ -174,7 +174,7 @@ th {
 }
 
 #top_header #library #developerHome {
-	color: #92979E;
+	color: rgb(34, 34, 34);
 	right: 15px;
 	top: 8px;
 	position: absolute;
