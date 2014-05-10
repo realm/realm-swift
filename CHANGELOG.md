@@ -1,4 +1,4 @@
-0.11.0 Release notes (yyyy—MM-dd)
+0.11.0 Release notes (yyyy-MM-dd)
 =============================================================
 
 The Objective-C API has been updated and your code will break!
@@ -66,7 +66,7 @@ and your code will break!
 * None.
 
 
-0.6.0 Release notes (2014—04-11)
+0.6.0 Release notes (2014-04-11)
 =============================================================
 
 ## API breaking changes
@@ -178,7 +178,7 @@ To use these methods import `<Tightdb/TightdbFast.h>`.
 * None.
 
 
-0.3.0 Release notes (2014—03-14)
+0.3.0 Release notes (2014-03-14)
 =============================================================
 
 The Objective-C API has been updated and your code will break!
@@ -204,7 +204,7 @@ The Objective-C API has been updated and your code will break!
 * None.
 
 
-0.2.0 Release notes (2014—03-07)
+0.2.0 Release notes (2014-03-07)
 =============================================================
 
 The Objective-C API has been updated and your code will break!
@@ -237,7 +237,7 @@ The Objective-C API has been updated and your code will break!
 
 Template follows:
 
-x.x.x Release notes (yyyy—MM-dd)
+x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
 The Objective-C API has been updated and your code will break!
