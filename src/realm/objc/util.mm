@@ -330,7 +330,7 @@ void verify_row_from_object(const Descriptor& descr, NSObject* data)
 
 bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
 {
-    BOOL subtable_seen = false;
+    bool subtable_seen = false;
     DataType type = table.get_column_type(col_ndx);
     switch (type) {
         case type_Bool:
