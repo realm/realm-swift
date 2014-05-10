@@ -3,7 +3,7 @@
 
 The Objective-C API has been updated and your code will break!
 
-## API breaking changes
+### API breaking changes
 
 * `RLMTable` objects can only be created with an `RLMRealm` object.
 * `RLMContext` was renamed to `RLMTransactionManager`
@@ -16,7 +16,7 @@ The Objective-C API has been updated and your code will break!
 * Renamed `where:` to `allWhere:`
 * Renamed `where:orderBy:` to `allWhere:orderBy:`
 
-## Enhancements
+### Enhancements
 
 * Added `countWhere:` on `RLMTable`
 * Added `sumOfColumn:where:` on `RLMTable`
@@ -26,11 +26,11 @@ The Objective-C API has been updated and your code will break!
 * Added `toJSONString` on `RLMRealm`, `RLMTable` and `RLMView`
 * Added support for `NOT` operator in predicates
 
-## Bugfixes
+### Bugfixes
 
 * None.
 
-## Internals
+### Internals
 
 * None.
 
@@ -41,7 +41,7 @@ The Objective-C API has been updated and your code will break!
 TightDB is now Realm! The Objective-C API has been updated 
 and your code will break!
 
-## API breaking changes
+### API breaking changes
 
 * All references to TightDB have been changed to Realm.
 * All prefixes changed from `TDB` to `RLM`.
@@ -49,7 +49,7 @@ and your code will break!
 * Write transactions now take an optional rollback parameter (rather than needing to return a boolean).
 * `addColumnWithName:` and variant methods now return the index of the newly created column if successful, `NSNotFound` otherwise.
 
-## Enhancements
+### Enhancements
 
 * `createTableWithName:columns:` has been added to `RLMRealm`.
 * Added keyed subscripting for RLMTable's first column if column is of type RLMTypeString.
@@ -57,11 +57,11 @@ and your code will break!
 * `RLMRealm` constructors now have variants that take an writable initialization block
 * New object interface - tables created/retrieved using `tableWithName:objectClass:` return custom objects
 
-## Bugfixes
+### Bugfixes
 
 * None.
 
-## Internals
+### Internals
 
 * None.
 
@@ -69,7 +69,7 @@ and your code will break!
 0.6.0 Release notes (2014-04-11)
 =============================================================
 
-## API breaking changes
+### API breaking changes
 
 * `contextWithPersistenceToFile:error:` renamed to `contextPersistedAtPath:error:` in `TDBContext`
 * `readWithBlock:` renamed to `readUsingBlock:` in `TDBContext`
@@ -83,7 +83,7 @@ and your code will break!
 * `removeAllRows`, `removeRowAtIndex`, `removeLastRow`, `addRow` and `insertRow` methods 
   on table now return void instead of BOOL.
 
-## Enhancements
+### Enhancements
 * A `TDBTable` can now be queried using `where:` and `where:orderBy:` taking
   `NSPredicate` and `NSSortDescriptor` as arguments.
 * Added `find:` method on `TDBTable` to find first row matching predicate.
@@ -103,7 +103,7 @@ and your code will break!
 * `where` has been added to `TDBView`and `TDBViewProtocol`.
 * Adding support for "smart" contexts (`TDBSmartContext`).
 
-## Bugfixes
+### Bugfixes
 
 * Modifications of a `TDBView` and `TDBQuery` now throw an exception in a readtransaction.
 
@@ -116,7 +116,7 @@ Of notable changes a fast interface has been added.
 This interface includes specific methods to get and set values into Tightdb.
 To use these methods import `<Tightdb/TightdbFast.h>`.
 
-## API breaking changes
+### API breaking changes
 
 * `getTableWithName:` renamed to `tableWithName:` in `TDBTransaction`.
 * `addColumnWithName:andType:` renamed to `addColumnWithName:type:` in `TDBTable`.
@@ -125,14 +125,14 @@ To use these methods import `<Tightdb/TightdbFast.h>`.
 * `addColumnWithName:andType:` renamed to `addColumnWithName:type:` in `TDBDescriptor`.
 * Fast getters and setters moved from `TDBRow.h` to `TDBRowFast.h`.
 
-## Enhancements
+### Enhancements
 
 * Added `minDateInColumnWithIndex` and `maxDateInColumnWithIndex` to `TDBQuery`.
 * Transactions can now be started directly on named tables.
 * You can create dynamic tables with initial schema.
 * `TDBTable` and `TDBView` now have a shared protocol so they can easier be used interchangeably.
 
-## Bugfixes
+### Bugfixes
 
 * Fixed bug in 64 bit iOS when inserting BOOL as NSNumber.
 
@@ -140,7 +140,7 @@ To use these methods import `<Tightdb/TightdbFast.h>`.
 0.4.0 Release notes (2014-03-26)
 =============================================================
 
-## API breaking changes
+### API breaking changes
 
 * Typed interface Cursor has now been renamed to Row.
 * TDBGroup has been renamed to TDBTransaction.
@@ -158,7 +158,7 @@ To use these methods import `<Tightdb/TightdbFast.h>`.
 * TDBMixed removed. Use id and NSObject instead.
 * insertEmptyRow has been removed from table. Use insertRow:nil atIndex:index instead.
 
-## Enhancements
+#### Enhancements
 
 * Added firstRow, lastRow selectors on view.
 * firstRow and lastRow on table now return nil if table is empty.
@@ -169,11 +169,11 @@ To use these methods import `<Tightdb/TightdbFast.h>`.
 * Experimental support for pinning transactions on Context.
 * TDBView now has support for object subscripting.
 
-## Bugfixes
+### Bugfixes
 
 * None.
 
-## Internals
+### Internals
 
 * None.
 
@@ -183,23 +183,23 @@ To use these methods import `<Tightdb/TightdbFast.h>`.
 
 The Objective-C API has been updated and your code will break!
 
-## API breaking changes
+### API breaking changes
 
 * Most selectors have been renamed in the binding!
 * Prepend TDB-prefix on all classes and types.
 
-## Enhancements
+### Enhancements
 
 * Return types and parameters changed from size_t to NSUInteger.
 * Adding setObject to TightdbTable (t[2] = @[@1, @"Hello"] is possible).
 * Adding insertRow to TightdbTable.
 * Extending appendRow to accept NSDictionary.
 
-## Bugfixes
+### Bugfixes
 
 * None.
 
-## Internals
+### Internals
 
 * None.
 
@@ -209,11 +209,11 @@ The Objective-C API has been updated and your code will break!
 
 The Objective-C API has been updated and your code will break!
 
-## API breaking changes
+### API breaking changes
 
 * addRow renamed to addEmptyRow
 
-## Enhancements
+### Enhancements
 
 * Adding a simple class for version numbering.
 * Adding get-version and set-version targets to build.sh.
@@ -225,11 +225,11 @@ The Objective-C API has been updated and your code will break!
 * Adding object subscripting.
 * Adding method removeColumn on table.
 
-## Bugfixes
+### Bugfixes
 
 * None.
 
-## Internals
+### Internals
 
 * None.
 
@@ -242,18 +242,18 @@ x.x.x Release notes (yyyy-MM-dd)
 
 The Objective-C API has been updated and your code will break!
 
-## API breaking changes
+### API breaking changes
 
 * None.
 
-## Enhancements
+### Enhancements
 
 * None.
 
-## Bugfixes
+### Bugfixes
 
 * None.
 
-## Internals
+### Internals
 
 * None.
