@@ -6,7 +6,7 @@ The Objective-C API has been updated and your code will break!
 ### API breaking changes
 
 * `RLMTable` objects can only be created with an `RLMRealm` object.
-* `RLMContext` was renamed to `RLMTransactionManager`
+* Renamed `RLMContext` to `RLMTransactionManager`
 * Renamed `RLMContextDidChangeNotification` to `RLMRealmDidChangeNotification`
 * Renamed `contextWithDefaultPersistence` to `managerForDefaultRealm`
 * Renamed `contextPersistedAtPath:` to `managerForRealmWithPath:`
@@ -27,10 +27,6 @@ The Objective-C API has been updated and your code will break!
 * Added support for `NOT` operator in predicates
 
 ### Bugfixes
-
-* None.
-
-### Internals
 
 * None.
 
@@ -58,10 +54,6 @@ and your code will break!
 * New object interface - tables created/retrieved using `tableWithName:objectClass:` return custom objects
 
 ### Bugfixes
-
-* None.
-
-### Internals
 
 * None.
 
@@ -173,10 +165,6 @@ To use these methods import `<Tightdb/TightdbFast.h>`.
 
 * None.
 
-### Internals
-
-* None.
-
 
 0.3.0 Release notes (2014-03-14)
 =============================================================
@@ -196,10 +184,6 @@ The Objective-C API has been updated and your code will break!
 * Extending appendRow to accept NSDictionary.
 
 ### Bugfixes
-
-* None.
-
-### Internals
 
 * None.
 
@@ -229,18 +213,14 @@ The Objective-C API has been updated and your code will break!
 
 * None.
 
-### Internals
-
-* None.
 
 
-
-Template follows:
+*Template follows:*
 
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
-The Objective-C API has been updated and your code will break!
+?? summary
 
 ### API breaking changes
 
@@ -254,6 +234,3 @@ The Objective-C API has been updated and your code will break!
 
 * None.
 
-### Internals
-
-* None.
