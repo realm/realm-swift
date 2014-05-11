@@ -44,7 +44,7 @@
 /**
  The object class of objects in the RLMArray.
  */
-@property (nonatomic, readonly) Class *objectClass;
+@property (nonatomic, readonly) Class objectClass;
 
 @end
 
@@ -294,8 +294,8 @@
 
 @interface RLMArray (IndexSubscripting)
 
-- (id)objectAtIndexedSubscript:(NSUInteger)rowIndex;
-- (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex;
+- (id)objectAtIndexedSubscript:(NSUInteger)index;
+- (void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)index;
 
 @end
 

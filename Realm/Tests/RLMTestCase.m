@@ -27,14 +27,7 @@ NSString *const RLMTestRealmPathLock = @"test.realm.lock";
 }
 
 - (RLMRealm *)realmWithTestPath {
-    return [RLMRealm realmWithPath:RLMTestRealmPath error:nil];
-}
-
-- (void)createTestTableWithWriteBlock:(void(^)(RLMTable *table))block {
-    RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath];
-    [realm beginWriteTransaction];
-    block([realm createTableWithName:@"table"]);
-    [realm commitWriteTransaction];
+    return [RLMRealm realmWithPath:RLMTestRealmPath readOnly:NO error:nil];
 }
 
 @end

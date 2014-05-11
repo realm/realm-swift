@@ -19,6 +19,7 @@
  **************************************************************************/
 
 #import <Foundation/Foundation.h>
+#import "RLMMigration.h"
 
 @class RLMObject;
 @class RLMArray;
@@ -240,7 +241,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  
  @see       RLMObject objectsWhere:
  */
-- (RLMArray *)objectsWhere:(id)predicate, ...;
+- (RLMArray *)objects:(Class)objectClass where:(id)predicate, ...;
 
 /**
  Get an ordered array of objects matching the given predicate from the this Realm.
@@ -258,7 +259,7 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
  
  @see       RLMObject objectsOrderedBy:where:
  */
-- (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ...;
+- (RLMArray *)objects:(Class)objectClass orderedBy:(id)order where:(id)predicate, ...;
 
 @end
 
@@ -294,8 +295,6 @@ typedef void(^RLMNotificationBlock)(NSString *notification, RLMRealm *realm);
 
 @end
 
-
-#import "RLMMigration.h"
 @interface RLMRealm (Migrations)
 /**---------------------------------------------------------------------------------------
  *  @name Migrations

@@ -19,9 +19,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMObjectDescriptor.h"
-#import "RLMTable.h"
-#import "RLMFast.h"
-#import "RLMPrivate.h"
 
 @interface RLMObjectDescriptor ()
 @property (nonatomic, readwrite, copy) NSArray * properties;
@@ -61,13 +58,6 @@ static NSMutableDictionary * s_descriptorCache;
         return s_descriptorCache[className];
     }
     
-    // check if proxy
-    if ([className hasPrefix:@"RLMProxy_"]) {
-        NSString * proxiedClassName = [className substringFromIndex:9];
-        s_descriptorCache[className] = s_descriptorCache[proxiedClassName];
-        return s_descriptorCache[className];
-    }
-    
     // get object properties
     unsigned int count;
     objc_property_t *props = class_copyPropertyList(objectClass, &count);
@@ -77,10 +67,6 @@ static NSMutableDictionary * s_descriptorCache;
     for (unsigned int i = 0; i < count; i++) {
         RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i]];
         if (prop) {
-            // if a table and we don't already know the object class figure out now
-            if (prop.type == RLMTypeTable && !prop.subtableObjectClass) {
-                prop.subtableObjectClass = [objectClass subtableObjectClassForProperty:prop.name];
-            }
             [propArray addObject:prop];
         }
     }
@@ -90,6 +76,7 @@ static NSMutableDictionary * s_descriptorCache;
     // create schema object and set properties
     RLMObjectDescriptor * descriptor = [RLMObjectDescriptor new];
     descriptor.properties = propArray;
+    descriptor->_objectClass = objectClass;
     
     s_descriptorCache[className] = descriptor;
     return descriptor;

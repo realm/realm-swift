@@ -19,18 +19,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMProperty.h"
+#import <tightdb/table.hpp>
+#import <tightdb/query.hpp>
 
-// ordered properties extracted from an object
-@interface RLMObjectDescriptor : NSObject
+tightdb::Query RLMQueryFromPredicate(tightdb::Table *table, id predicate);
 
-// array of properties which define a schema
-@property (nonatomic, readonly, copy) NSArray * properties;
-
-// property lookup by name
--(RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)key;
-
-// returns a cached or new schema for a given object class
-+(instancetype)descriptorForObjectClass:(Class)objectClass;
-
-@end
+NSException *RLMPredicateException(NSString *name, NSString *reason);

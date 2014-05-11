@@ -30,47 +30,6 @@
 @interface RLMObject : NSObject
 
 /**
- Initialize an RLMObject within a realm
- 
- Initializes an instance of this object and adds it to the given realm. You must
- be within a write transaction to use this initializer.
- 
- @param realm   The Realm in which this object is persisted.
- */
--(instancetype)initInRealm:(RLMRealm *)realm;
-
-/**
- Initialize an RLMObject within a Realm with a JSONString.
- 
- Initializes an instance of this object and adds it to the given Realm populating
- the object with the data in the given JSONString.
- 
- @param realm       The Realm in which this object is persisted.
- @param JSONString  An NSString with valid JSON. An exception will be thrown if required properties are
-                    not present in the JSON for which defaults are not provided.
- 
- @see   defaultPropertyValues
- */
--(instancetype)initInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString;
-
-/**
- Initialize an RLMObject within a Realm with a given object.
- 
- Initializes an instance of this object and adds it to the given Realm populating
- the object with the given JSON object.
- 
- @param realm   The Realm in which this object is persisted.
- @param object  The object used to populate the object. This can be any key/value compliant
-                object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
-                an NSArray with one object for each persisted property. An exception will be
-                thrown if all equired properties are not present or no default is provided.
-                When passing in an NSArray, all properties must be present and valid.
- 
- @see   defaultPropertyValues
- */
--(instancetype)initInRealm:(RLMRealm *)realm withObject:(id)object;
-
-/**
  Initialize a standalone RLMObject
  
  Initialize an unpersisted instance of this object.
@@ -81,53 +40,40 @@
 -(instancetype)init;
 
 /**
+ Create an RLMObject within a Realm with a given object.
+ 
+ Creates an instance of this object and adds it to the given Realm populating
+ the object with the given object.
+ 
+ @param realm   The Realm in which this object is persisted.
+ @param object  The object used to populate the object. This can be any key/value compliant
+                object, or a JSON object such as those returned from the methods in NSJSONSerialization, or
+                an NSArray with one object for each persisted property. An exception will be
+                thrown if all equired properties are not present or no default is provided.
+                When passing in an NSArray, all properties must be present and valid.
+ 
+ @see   defaultPropertyValues
+ */
++(instancetype)createInRealm:(RLMRealm *)realm withObject:(id)object;
+
+/**
+ Create an RLMObject within a Realm with a JSONString.
+ 
+ Creates an instance of this object and adds it to the given Realm populating
+ the object with the data in the given JSONString.
+ 
+ @param realm       The Realm in which this object is persisted.
+ @param JSONString  An NSString with valid JSON. An exception will be thrown if required properties are
+ not present in the JSON for which defaults are not provided.
+ 
+ @see   defaultPropertyValues
+ */
++(instancetype)createInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString;
+
+/**
  The Realm in which this object is persisted. Returns nil for standalone objects.
  */
 @property (nonatomic, readonly) RLMRealm *realm;
-
-@end
-
-
-/**---------------------------------------------------------------------------------------
- *  @name Querying the Default Realm
- *  ---------------------------------------------------------------------------------------
- */
-/*
- These methods allow you to easily query a custom subclass for instances of this class in the
- default Realm. To search across Realms other than the defaut or across multiple object classes
- use the interface on an RLMRealm instance.
- */
-@interface RLMObject (SubcassInDefaultRealm)
-
-/**
- Get all objects of this type from the default Realm.
- 
- @return    An RLMArray of all objects of this type in the default Realm.
- */
-+ (RLMArray *)allObjects;
-
-/**
- Get objects matching the given predicate for this type from the default Realm.
- 
- @param predicate   The argument can be an NSPredicate, a predicte string, or predicate format string
-                    which can accept variable arguments.
- 
- @return    An RLMArray of objects of the subclass type in the default Realm that match the given predicate
- */
-+ (RLMArray *)objectsWhere:(id)predicate, ...;
-
-/**
- Get an ordered RLMArray of objects matching the given predicate for this type from the default Realm.
- 
- @param predicate   The argument can be an NSPredicate, a predicte string, or predicate format string
-                    which can accept variable arguments.
- @param order       This argument determines how the results are sorted. It can be an NSString containing
-                    the property name, or an NSSortDescriptor with the property name and order.
-
- @return    An RLMArray of objects of the subclass type in the default Realm that match the predicate
-            ordered by the given order.
- */
-+ (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ...;
 
 @end
 
@@ -221,8 +167,8 @@ extern NSString *const RLMPropertyAttributeRequired;
  */
 @interface RLMObject (Accessors)
 
--(id)objectForKeyedSubscript:(id <NSCopying>)key;
--(void)setObject:(id)obj forKeyedSubscript:(id <NSCopying>)key;
+-(id)objectForKeyedSubscript:(NSString *)key;
+-(void)setObject:(id)obj forKeyedSubscript:(NSString *)key;
 
 @end
 
