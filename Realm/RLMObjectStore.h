@@ -18,15 +18,26 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRow.h"
+#import "RLMRealm.h"
+#import "RLMObject.h"
+#import "RLMArray.h"
 
-// proxy object which implements its own setters/getters, and forwards everything else to object
-@interface RLMProxy : RLMRow
+// initialize global object store
+// call once before using other methods
+void RLMInitializeObjectStore();
 
-// base object
-@property (nonatomic) id object;
+// verifies and/or creates tables needed in a realm to store all object types
+// throws if current state of realm is not compatible with current objects
+void RLMEnsureRealmTables(RLMRealm *realm);
 
-// gets/creates a class to proxy for the given object class
-+(Class)proxyClassForObjectClass:(Class)objectClass;
+// get accessor class for an object class - generates class if not cached
+Class RLMAccessorClassForObjectClass(Class objectClass);
 
-@end
+// add an object to the given realm
+void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm);
+
+// get objects of a given class
+RLMArray *RLMObjectsOfClassWhere(RLMRealm *realm, Class objectClass, NSPredicate *predicate);
+
+
+

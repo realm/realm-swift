@@ -18,24 +18,22 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-
 #import <Foundation/Foundation.h>
-#import "RLMType.h"
-#import <objc/runtime.h>
+#import "RLMProperty.h"
 
-// object property definition
-@interface RLMProperty : NSObject
+// ordered properties extracted from an object
+@interface RLMObjectDescriptor : NSObject
 
-@property (nonatomic, copy) NSString * name;
-@property (nonatomic, assign) RLMType type;
-@property (nonatomic, assign) Class subtableObjectClass;
-@property (nonatomic, assign) char objcType;
+// array of properties which define a schema
+@property (nonatomic, readonly, copy) NSArray * properties;
 
-// creates a tdb property object from a runtime property
-+(instancetype)propertyForObjectProperty:(objc_property_t)prop;
+// object this describes
+@property (nonatomic, readonly) Class objectClass;
 
-// adds getters and setters for this property/column on the given class
--(void)addToClass:(Class)cls column:(int)column;
+// property lookup by name
+-(RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)key;
+
+// returns a cached or new schema for a given object class
++(instancetype)descriptorForObjectClass:(Class)objectClass;
 
 @end
-

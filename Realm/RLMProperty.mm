@@ -18,17 +18,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 #import "RLMProperty.h"
-#import "RLMProxy.h"
 #import "RLMObjectDescriptor.h"
-#import "RLMTable.h"
-#import "RLMFast.h"
-#import "RLMRowFast.h"
-#import "RLMTable_noinst.h"
-#import "util_noinst.hpp"
+#import "RLMPrivate.hpp"
 
-
-// in RLMProxy.m
-extern BOOL is_class_subclass(Class class1, Class class2);
+// in RLMAccessor.m
+extern BOOL RLMIsKindOfclass(Class class1, Class class2);
 
 // macros/helpers to generate objc type strings for registering methods
 #define GETTER_TYPES(C) C ":@"
@@ -92,44 +86,45 @@ const char * setterTypeStringForCode(char code) {
 -(IMP)getterForColumn:(NSUInteger)col {
     switch (self.accessorCode) {
         case 'i':
-            return imp_implementationWithBlock(^(RLMRow *row) {
-                return (int)row.table.getNativeTable.get_int(col, row.ndx);
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+                return (int)obj.backingTable->get_int(col, obj.objectIndex);
             });
         case 'l':
-            return imp_implementationWithBlock(^(RLMRow *row) {
-                return row.table.getNativeTable.get_int(col, row.ndx);
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+                return obj.backingTable->get_int(col, obj.objectIndex);
             });
         case 'f':
-            return imp_implementationWithBlock(^(RLMRow *row) {
-                return row.table.getNativeTable.get_float(col, row.ndx);
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+                return obj.backingTable->get_float(col, obj.objectIndex);
             });
         case 'd':
-            return imp_implementationWithBlock(^(RLMRow *row) {
-                return row.table.getNativeTable.get_double(col, row.ndx);
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+                return obj.backingTable->get_double(col, obj.objectIndex);
             });
         case 'B':
-            return imp_implementationWithBlock(^(RLMRow *row) {
-                return row.table.getNativeTable.get_bool(col, row.ndx);
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+                return obj.backingTable->get_bool(col, obj.objectIndex);
             });
         case 'c':
-            return imp_implementationWithBlock(^(RLMRow *row) {
-                return (BOOL)row.table.getNativeTable.get_bool(col, row.ndx);
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+                return obj.backingTable->get_bool(col, obj.objectIndex);
             });
         case 's':
-            return imp_implementationWithBlock(^(RLMRow *row) {
-                return to_objc_string(row.table.getNativeTable.get_string(col, row.ndx));
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+                tightdb::StringData strData = obj.backingTable->get_string(col, obj.objectIndex);
+                return [[NSString alloc] initWithBytes:strData.data()
+                                                length:strData.size()
+                                              encoding:NSUTF8StringEncoding];
             });
         case '@':
-            return imp_implementationWithBlock(^(RLMRow *row) {
-                return row[col];
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+                return obj[col];
             });
         case 't':
         {
-            Class subtableObjectClass = self.subtableObjectClass;
-            return imp_implementationWithBlock(^(RLMRow *row){
-                RLMTable *table = row[col];
-                table.objectClass = subtableObjectClass;
-                return table;
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj){
+                RLMArray *array = obj[col];
+                return array;
             });
         }
         default:
@@ -142,40 +137,43 @@ const char * setterTypeStringForCode(char code) {
 -(IMP)setterForColumn:(int)col {
     switch (self.accessorCode) {
         case 'i':
-            return imp_implementationWithBlock(^(RLMRow *row, int val) {
-                row.table.getNativeTable.set_int(col, row.ndx, val);
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, int val) {
+                obj.backingTable->set_int(col, obj.objectIndex, val);
             });
         case 'l':
-            return imp_implementationWithBlock(^(RLMRow *row, long val) {
-                row.table.getNativeTable.set_int(col, row.ndx, val);
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, long val) {
+                obj.backingTable->set_int(col, obj.objectIndex, val);
             });
         case 'f':
-            return imp_implementationWithBlock(^(RLMRow *row, float val) {
-                row.table.getNativeTable.set_float(col, row.ndx, val);
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, float val) {
+                obj.backingTable->set_float(col, obj.objectIndex, val);
             });
         case 'd':
-            return imp_implementationWithBlock(^(RLMRow *row, double val) {
-                row.table.getNativeTable.set_double(col, row.ndx, val);
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, double val) {
+                obj.backingTable->set_double(col, obj.objectIndex, val);
             });
         case 'B':
-            return imp_implementationWithBlock(^(RLMRow *row, bool val) {
-                row.table.getNativeTable.set_bool(col, row.ndx, val);
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, bool val) {
+                obj.backingTable->set_bool(col, obj.objectIndex, val);
             });
         case 'c':
-            return imp_implementationWithBlock(^(RLMRow *row, BOOL val) {
-                row.table.getNativeTable.set_bool(col, row.ndx, val);
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, BOOL val) {
+                obj.backingTable->set_bool(col, obj.objectIndex, val);
             });
         case 's':
-            return imp_implementationWithBlock(^(RLMRow *row, NSString *val) {
-                [row setString:val inColumnWithIndex:col];
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, NSString *val) {
+                tightdb::StringData strData = tightdb::StringData(val.UTF8String, val.length);
+                obj.backingTable->set_string(col, obj.objectIndex, strData);
             });
         case '@':
         case 't':
-            return imp_implementationWithBlock(^(RLMRow *row, id val) {
-                row[col] = val;
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, id val) {
+                obj[col] = val;
             });
         default:
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid accessor code" userInfo:nil];
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Invalid accessor code"
+                                         userInfo:nil];
     }
 }
 
@@ -183,6 +181,7 @@ const char * setterTypeStringForCode(char code) {
 -(void)addToClass:(Class)cls column:(int)column
 {
     // set accessors
+    self.column = column;
     SEL getter = NSSelectorFromString(self.getterName), setter = NSSelectorFromString(self.setterName);
     class_replaceMethod(cls, getter, [self getterForColumn:column], getterTypeStringForCode(self.objcType));
     class_replaceMethod(cls, setter, [self setterForColumn:column], setterTypeStringForCode(self.objcType));
@@ -228,11 +227,14 @@ const char * setterTypeStringForCode(char code) {
             else if ([type isEqualToString:@"@\"NSData\""]) {
                 self.type = RLMTypeBinary;
             }
-            else {
-                // check for subtable
-                Class cls = NSClassFromString([type substringWithRange:NSMakeRange(2, type.length-3)]);
-                if (is_class_subclass(cls, RLMTable.class) && [cls respondsToSelector:@selector(objectClass)]) {
-                    self.subtableObjectClass = [cls performSelector:@selector(objectClass)];
+            else if ([type hasPrefix:@"@\"RLMArray<"]) {
+                // check for array class
+                Class cls = NSClassFromString([type substringWithRange:NSMakeRange(11, type.length-5)]);
+                if (RLMIsKindOfclass(cls, RLMObject.class)) {
+                    self.subtableObjectClass = cls;
+                }
+                else {
+                    @throw [NSException exceptionWithName:@"RLMException" reason:@"No type specified for RLMArray" userInfo:nil];
                 }
                 self.type = RLMTypeTable;
             }

@@ -18,13 +18,21 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import "util_noinst.hpp"
-#import <tightdb/query.hpp>
 
-@class RLMTable;
+// Posted by RLMRealm when it changes, that is when a table is
+// added, removed, or changed in any way.
 
-tightdb::Query queryFromPredicate(RLMTable *table, id predicate);
+extern NSString *const RLMRealmDidChangeNotification;
 
-NSException *RLM_predicate_exception(NSString *name, NSString *reason);
-NSUInteger RLM_validated_column_index(RLMTable *table, NSString *columnName);
+typedef NS_ENUM(NSInteger, RLMError) {
+    RLMErrorOk                    = 0,
+    RLMErrorFail                  = 1,
+    RLMErrorFailRdOnly            = 2,
+    RLMErrorFileAccessError       = 3,
+    RLMErrorFilePermissionDenied  = 4,
+    RLMErrorFileExists            = 5,
+    RLMErrorFileNotFound          = 6,
+    RLMErrorRollback              = 7,
+    RLMErrorInvalidDatabase       = 8,
+    RLMErrorTableNotFound         = 9
+};
