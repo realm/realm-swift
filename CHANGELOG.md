@@ -1,41 +1,12 @@
-Template
+0.11.0 Release notes (yyyy-MM-dd)
 =============================================================
-x.x.x Release notes (yyyy—MM-dd)
 
-Objective-C
------------
 The Objective-C API has been updated and your code will break!
 
-### API breaking changes:
-
-* `???`
-
-### Enhancements:
-
-* `???`
-
-### Bugfixes:
-
-* none.
-
--------------
-
-### Internals:
-
-* `???`
-
-
-=============================================================
-0.11.0 Release notes (yyyy—MM-dd)
-
-Objective-C
------------
-The Objective-C API has been updated and your code will break!
-
-### API breaking changes:
+### API breaking changes
 
 * `RLMTable` objects can only be created with an `RLMRealm` object.
-* `RLMContext` was renamed to `RLMTransactionManager`
+* Renamed `RLMContext` to `RLMTransactionManager`
 * Renamed `RLMContextDidChangeNotification` to `RLMRealmDidChangeNotification`
 * Renamed `contextWithDefaultPersistence` to `managerForDefaultRealm`
 * Renamed `contextPersistedAtPath:` to `managerForRealmWithPath:`
@@ -45,7 +16,7 @@ The Objective-C API has been updated and your code will break!
 * Renamed `where:` to `allWhere:`
 * Renamed `where:orderBy:` to `allWhere:orderBy:`
 
-### Enhancements:
+### Enhancements
 
 * Added `countWhere:` on `RLMTable`
 * Added `sumOfColumn:where:` on `RLMTable`
@@ -55,26 +26,18 @@ The Objective-C API has been updated and your code will break!
 * Added `toJSONString` on `RLMRealm`, `RLMTable` and `RLMView`
 * Added support for `NOT` operator in predicates
 
-### Bugfixes:
+### Bugfixes
 
-* none.
-
--------------
-
-### Internals:
-
-* `???`
+* None.
 
 
-=============================================================
 0.10.0 Release notes (2014-04-23)
+=============================================================
 
-Objective-C
------------
 TightDB is now Realm! The Objective-C API has been updated 
 and your code will break!
 
-### API breaking changes:
+### API breaking changes
 
 * All references to TightDB have been changed to Realm.
 * All prefixes changed from `TDB` to `RLM`.
@@ -82,7 +45,7 @@ and your code will break!
 * Write transactions now take an optional rollback parameter (rather than needing to return a boolean).
 * `addColumnWithName:` and variant methods now return the index of the newly created column if successful, `NSNotFound` otherwise.
 
-### Enhancements:
+### Enhancements
 
 * `createTableWithName:columns:` has been added to `RLMRealm`.
 * Added keyed subscripting for RLMTable's first column if column is of type RLMTypeString.
@@ -90,25 +53,15 @@ and your code will break!
 * `RLMRealm` constructors now have variants that take an writable initialization block
 * New object interface - tables created/retrieved using `tableWithName:objectClass:` return custom objects
 
-### Bugfixes:
-
-* none.
-
-### Bugfixes:
+### Bugfixes
 
 * None.
 
 
+0.6.0 Release notes (2014-04-11)
 =============================================================
-0.6.0 Release notes (2014—04-11)
-Objective-C
------------
 
-### Bugfixes:
-
-* Modifications of a `TDBView` and `TDBQuery` now throw an exception in a readtransaction.
-
-### API breaking changes:
+### API breaking changes
 
 * `contextWithPersistenceToFile:error:` renamed to `contextPersistedAtPath:error:` in `TDBContext`
 * `readWithBlock:` renamed to `readUsingBlock:` in `TDBContext`
@@ -122,7 +75,7 @@ Objective-C
 * `removeAllRows`, `removeRowAtIndex`, `removeLastRow`, `addRow` and `insertRow` methods 
   on table now return void instead of BOOL.
 
-### Enhancements:
+### Enhancements
 * A `TDBTable` can now be queried using `where:` and `where:orderBy:` taking
   `NSPredicate` and `NSSortDescriptor` as arguments.
 * Added `find:` method on `TDBTable` to find first row matching predicate.
@@ -142,21 +95,20 @@ Objective-C
 * `where` has been added to `TDBView`and `TDBViewProtocol`.
 * Adding support for "smart" contexts (`TDBSmartContext`).
 
+### Bugfixes
 
-=============================================================
+* Modifications of a `TDBView` and `TDBQuery` now throw an exception in a readtransaction.
+
+
 0.5.0 Release notes (2014-04-02)
-Objective-C
------------
+=============================================================
+
 The Objective-C API has been updated and your code will break!
 Of notable changes a fast interface has been added. 
 This interface includes specific methods to get and set values into Tightdb.
-To use these methods import <Tightdb/TightdbFast.h>.
+To use these methods import `<Tightdb/TightdbFast.h>`.
 
-### Bugfixes:
-
-* Fixed bug in 64 bit iOS when inserting BOOL as NSNumber.
-
-### API breaking changes:
+### API breaking changes
 
 * `getTableWithName:` renamed to `tableWithName:` in `TDBTransaction`.
 * `addColumnWithName:andType:` renamed to `addColumnWithName:type:` in `TDBTable`.
@@ -165,100 +117,120 @@ To use these methods import <Tightdb/TightdbFast.h>.
 * `addColumnWithName:andType:` renamed to `addColumnWithName:type:` in `TDBDescriptor`.
 * Fast getters and setters moved from `TDBRow.h` to `TDBRowFast.h`.
 
-### Enhancements:
+### Enhancements
+
 * Added `minDateInColumnWithIndex` and `maxDateInColumnWithIndex` to `TDBQuery`.
 * Transactions can now be started directly on named tables.
 * You can create dynamic tables with initial schema.
 * `TDBTable` and `TDBView` now have a shared protocol so they can easier be used interchangeably.
 
+### Bugfixes
 
-=============================================================
+* Fixed bug in 64 bit iOS when inserting BOOL as NSNumber.
+
+
 0.4.0 Release notes (2014-03-26)
+=============================================================
 
-2014-03-26
-==========
-+ Experimental support for pinning transactions on Context.
-+ TDBView now has support for object subscripting.
+### API breaking changes
 
-2014-03-25
-==========
-! BREAKING CHANGE: TDBMixed removed. Use id and NSObject instead.
-! BREAKING CHANGE: insertEmptyRow has been removed from table. Use insertRow:nil atIndex:index instead.
+* Typed interface Cursor has now been renamed to Row.
+* TDBGroup has been renamed to TDBTransaction.
+* Header files are renamed so names match class names.
+* Underscore (_) removed from generated typed table classes.
+* TDBBinary has been removed; use NSData instead.
+* Underscope (_) removed from generated typed table classes.
+* Constructor for TDBContext has been renamed to contextWithPersistenceToFile:
+* Table findFirstRow and min/max/sum/avg operations has been hidden.
+* Table.appendRow has been renamed to addRow.
+* getOrCreateTable on Transaction has been removed.
+* set*:inColumnWithIndex:atRowIndex: methods have been prefixed with TDB
+* *:inColumnWithIndex:atRowIndex: methods have been prefixed with TDB
+* addEmptyRow on table has been removed. Use [table addRow:nil] instead.
+* TDBMixed removed. Use id and NSObject instead.
+* insertEmptyRow has been removed from table. Use insertRow:nil atIndex:index instead.
 
-2014-03-24
-==========
-! BREAKING CHANGE: set*:inColumnWithIndex:atRowIndex: methods have been prefixed with TDB
-! BREAKING CHANGE: *:inColumnWithIndex:atRowIndex: methods have been prefixed with TDB
-! BREAKING CHANGE: addEmptyRow on table has been removed. Use [table addRow:nil] instead.
+#### Enhancements
 
-2014-03-21
-==========
-! BREAKING CHANGE: Table findFirstRow and min/max/sum/avg operations has been hidden.
-! BREAKING CHANGE: Table.appendRow has been renamed to addRow.
-! BREAKING CHANGE: getOrCreateTable on Transaction has been removed.
-+ createTable method added on Transaction. Throws exception if table with same name already exists.
-! BREAKING CHANGE: Underscore (_) removed from generated typed table classes.
-! BREAKING CHANCE: TDBBinary has been removed; use NSData instead.
-! BREAKING CHANGE: Underscope (_) removed from generated typed table classes.
-! BREAKING CHANCE: Constructor for TDBContext has been renamed to contextWithPersistenceToFile:
-
-2014-03-20
-==========
-* [TDBQuery parent] and [TDBQuery subtable:] selectors now return self.
-! BREAKING CHANCE: Header files are renamed so names match class names.
-
-2014-03-18
-==========
-! BREAKING CHANGE: Typed interface Cursor has now been renamed to Row.
-! BREAKING CHANGE: TDBGroup has been renamed to TDBTransaction.
-+ getTableWithName selector added on group.
-* getting and creating table methods on group no longer take error argument.
-
-2014-03-17
-==========
-+ Added firstRow, lastRow selectors on view.
+* Added firstRow, lastRow selectors on view.
 * firstRow and lastRow on table now return nil if table is empty.
+* getTableWithName selector added on group.
+* getting and creating table methods on group no longer take error argument.
+* [TDBQuery parent] and [TDBQuery subtable:] selectors now return self.
+* createTable method added on Transaction. Throws exception if table with same name already exists.
+* Experimental support for pinning transactions on Context.
+* TDBView now has support for object subscripting.
 
-2014-03-14
-==========
-! BREAKING CHANGE: Prepend TDB-prefix on all classes and types.
+### Bugfixes
 
-2014-03-13
-==========
-+ Adding setObject to TightdbTable (t[2] = @[@1, @"Hello"] is possible).
+* None.
 
-2014-03-12
-==========
-+ Adding insertRow to TightdbTable.
 
-2014-03-11
-==========
-* Extending appendRow to accept NSDictionary.
-! BREAKING CHANGE: Most selectors have been renamed in the binding!
+0.3.0 Release notes (2014-03-14)
+=============================================================
 
-2014-03-10
-==========
+The Objective-C API has been updated and your code will break!
+
+### API breaking changes
+
+* Most selectors have been renamed in the binding!
+* Prepend TDB-prefix on all classes and types.
+
+### Enhancements
+
 * Return types and parameters changed from size_t to NSUInteger.
+* Adding setObject to TightdbTable (t[2] = @[@1, @"Hello"] is possible).
+* Adding insertRow to TightdbTable.
+* Extending appendRow to accept NSDictionary.
 
-2014-03-07
-==========
+### Bugfixes
+
+* None.
+
+
+0.2.0 Release notes (2014-03-07)
+=============================================================
+
+The Objective-C API has been updated and your code will break!
+
+### API breaking changes
+
+* addRow renamed to addEmptyRow
+
+### Enhancements
+
+* Adding a simple class for version numbering.
+* Adding get-version and set-version targets to build.sh.
+* tableview now supports sort on column with column type bool, date and int
+* tableview has method for checking the column type of a specified column
+* tableview has method for getting the number of columns
+* Adding methods getVersion, getCoreVersion and isAtLeast.
 * Adding appendRow to TightdbTable.
 * Adding object subscripting.
 * Adding method removeColumn on table.
 
-2014-03-05
-==========
-+ tableview now supports sort on column with column type bool, date and int
-+ tableview has method for checking the column type of a specified column
-+ tableview has method for getting the number of columns
-* Adding methods getVersion, getCoreVersion and isAtLeast.
+### Bugfixes
 
-2014-02-27
-==========
-* Adding a simple class for version numbering.
-* Adding get-version and set-version targets to build.sh.
-! BREAKING CHANGE: addRow renamed to addEmptyRow
+* None.
 
-2013-11-08
-==========
-* Adding support for one-line installer (suppressing output and don't die too hard).
+
+
+*Template follows:*
+
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+?? summary
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* None.
+
