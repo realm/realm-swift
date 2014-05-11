@@ -718,6 +718,19 @@ EOF
                     --template doc/templates \
                     --exit-threshold 2 \
                     src/realm/objc/ || exit 1
+        echo "Generating Dash docs..."
+        (
+            cd doc/appledocs/docset
+            tar --exclude='.DS_Store' -cvzf realm.tgz realm.docset
+        )
+        cat >doc/appledocs/docset/realm.xml <<EOF
+<entry>
+    <version>$(sh build.sh get-version)</version>
+    <url>
+        http://realm.io/docs/ios/realm.tgz
+    </url>
+</entry>
+EOF
         echo "Done generating docs under docs/appledocs"
         exit 0
         ;;
