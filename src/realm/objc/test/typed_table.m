@@ -289,7 +289,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(JSONTableTestTable, JSONTableTestType)
         table[@"Test2"] = @{@"name" : @"Test3" , @"objID" : @123};
         
         XCTAssertEqual(previousRowCount, [table rowCount], @"Row count should still equal previous row count after inserting an existing RLMRow");
-       // XCTAssertNil(table[@"Test2"], @"table[@\"Test2\"] should be nil");
+        XCTAssertNil(table[@"Test2"], @"table[@\"Test2\"] should be nil");
         XCTAssertNotNil(table[@"Test3"], @"table[@\"Test3\"] should not be nil");
         XCTAssertEqual((int)table[@"Test3"].objID, 123, @"table[\"Test3\"].objID should be equal to 123");
         XCTAssertEqualObjects(table[@"Test3"].name, @"Test3", @"table[\"Test3\"].name should be equal to @\"Test3\"");

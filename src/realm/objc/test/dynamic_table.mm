@@ -911,11 +911,11 @@ using namespace std;
         
         // No exisiting for table
         NSUInteger previousRowCount = [table rowCount];
-       // NSString* nonExistingKey = @"Test10123903784293";
+        NSString* nonExistingKey = @"Test10123903784293";
         //XCTAssertThrows((table[nonExistingKey] = @{@"name" : nonExistingKey, @"id" : @1}), @"non existing key");
         
         XCTAssertEqual(previousRowCount, [table rowCount], @"Row count should be equal to previous row count + 1 after inserting a non-existing RLMRow");
-        //XCTAssertNil(table[nonExistingKey], @"table[nonExistingKey] should be nil");
+        XCTAssertNil(table[nonExistingKey], @"table[nonExistingKey] should be nil");
         // Commenting out until set row method transitioned from update row
         //XCTAssertEqualObjects(table[nonExistingKey][@"id"], @1, @"table[nonExistingKey][@\"id\"] should be equal to @1");
         //XCTAssertEqualObjects(table[nonExistingKey][@"name"], nonExistingKey, @"table[nonExistingKey][@\"name\"] should be equal to nonExistingKey");
