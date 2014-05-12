@@ -22,8 +22,7 @@ project.xcworkspace
 realm-ios-*.zip
 
 # sh build.sh docs
-/docs/docset
-/docs/html
+/docs/output
 
 # sh build.sh package-examples
 /examples/*.zip
