@@ -467,6 +467,46 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(JSONTableTestTable, JSONTableTestType)
     }];
 }
 
+- (void)testTableTyped_addSubtableUsingArray {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+        AllTypesTable *table = [AllTypesTable tableInRealm:realm named:@"table"];
+        [table addRow:@[@YES,
+                        @1,
+                        @(0.1f),
+                        @0.2,
+                        @"foo",
+                        [@"foo" dataUsingEncoding:NSUTF8StringEncoding],
+                        [NSDate date],
+                        @[],
+                        @NO,
+                        @123,
+                        @"bar"]];
+        XCTAssertEqual(table.rowCount, (NSUInteger)1, @"1 row excepted");
+        XCTAssertEqual(((AgeTable *)table[0][@"tableCol"]).rowCount, (NSUInteger)0, @"0 rows excepted");
+    }];
+}
+
+
+
+- (void)testTableTyped_addSubtableUsingDictionary {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+        AllTypesTable *table = [AllTypesTable tableInRealm:realm named:@"table"];
+        [table addRow:@{@"boolCol": @YES,
+                        @"intCol": @1,
+                        @"floatCol": @(0.1f),
+                        @"doubleCol": @0.2,
+                        @"stringCol": @"foo",
+                        @"binaryCol": [@"foo" dataUsingEncoding:NSUTF8StringEncoding],
+                        @"dateCol": [NSDate date],
+                        @"tableCol": @[],
+                        @"cBoolCol": @NO,
+                        @"longCol": @123,
+                        @"mixedCol": @"bar"}];
+        XCTAssertEqual(table.rowCount, (NSUInteger)1, @"1 row excepted");
+        XCTAssertEqual(((AgeTable *)table[0][@"tableCol"]).rowCount, (NSUInteger)0, @"0 rows excepted");
+    }];
+}
+
 - (void)testToJSONString {
  
     [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
@@ -482,7 +522,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(JSONTableTestTable, JSONTableTestType)
 
         NSString *result = [table toJSONString];
         
-        XCTAssertEqualObjects(result, @"[{\"boolColumn\":true,\"intColumn\":1234,\"floatColumn\":1.2340000e+01,\"doubleColumn\":1.2345678000000000e+03,\"stringColumn\":\"I'm just a String\",\"binaryColumn\":\"00010203\",\"dateColumn\":\"2014-05-17 12:15:10\",\"mixedColumn\":\"I'm also a string in a mixed column\"}]", @"JSON string expected to one 8-column row");        
+        XCTAssertEqualObjects(result, @"[{\"boolColumn\":true,\"intColumn\":1234,\"floatColumn\":1.2340000e+01,\"doubleColumn\":1.2345678000000000e+03,\"stringColumn\":\"I'm just a String\",\"binaryColumn\":\"00010203\",\"dateColumn\":\"2014-05-17 12:15:10\",\"mixedColumn\":\"I'm also a string in a mixed column\"}]", @"JSON string expected to one 8-column row");
     }];
 }
 
