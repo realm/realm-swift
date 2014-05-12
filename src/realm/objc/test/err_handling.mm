@@ -405,13 +405,12 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(MixedWithoutSubtableTable, MixedWithoutSubtable);
     }];
 }
 
-// FIXME: Crashes
-//- (void)testMixedWithSubtable {
-//    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
-//        MixedWithSubtableTable *table = [MixedWithSubtableTable tableInRealm:realm named:@"table"];
-//        [table addRow:@{@"MixedCol":  @"test"}];
-//    }];
-//}
+- (void)testMixedWithSubtable {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+        MixedWithSubtableTable *table = [MixedWithSubtableTable tableInRealm:realm named:@"table"];
+        [table addRow:@{@"MixedCol":  @"test"}];
+    }];
+}
 
 - (void)testMixedWithoutSubtable {
     [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
