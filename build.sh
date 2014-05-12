@@ -414,6 +414,7 @@ EOF
             sh build.sh config
             sh build.sh build-iphone
             sh build.sh ios-framework
+            sh build.sh docs
             sh build.sh build
             sh build.sh test-debug
             ) || exit 1
