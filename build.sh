@@ -696,20 +696,25 @@ EOF
                     --template docs/templates \
                     --exit-threshold 1 \
                     src/realm/objc/ || exit 1
-        echo "Done generating HTML docs under docs/html/"
+        mkdir docs/output
+        mv docs/html docs/output/$(sh build.sh get-version)
+        echo "Done generating HTML docs under docs/output/"
 
         echo "Generating docset docs..."
         appledoc    --project-name Realm \
                     --project-company "Realm" \
                     --include docs/source/realm.png \
-                    --output docs/docset \
+                    --output docs/output/$(sh build.sh get-version)/ \
                     -v `sh build.sh get-version` \
                     --no-create-html \
                     --create-docset \
                     --no-install-docset \
                     --publish-docset \
-                    --docset-feed-url "http://realm.io/docs/appledoc" \
-                    --docset-package-url "http://realm.io/docs/appledoc/io.realm.Realm-$(sh build.sh get-version).xar" \
+                    --docset-feed-url "http://realm.io/docs/ios/$(sh build.sh get-version)/realm.atom" \
+                    --docset-package-url "http://realm.io/docs/ios/$(sh build.sh get-version)/realm" \
+                    --docset-package-filename "realm" \
+                    --docset-atom-filename "realm.atom" \
+                    --docset-bundle-filename "realm.docset" \
                     --company-id "io.realm" \
                     --no-repeat-first-par \
                     --no-warn-missing-arg \
@@ -727,7 +732,22 @@ EOF
                     --template docs/templates \
                     --exit-threshold 1 \
                     src/realm/objc/ || exit 1
-        echo "Done generating Apple docset under docs/docset/"
+        echo "Generating Dash docs..."
+        (
+            cd docs/output/$(sh build.sh get-version)/
+            tar --exclude='.DS_Store' -cvzf realm.tgz realm.docset
+        )
+        cat >docs/output/$(sh build.sh get-version)/realm.xml <<EOF
+<entry>
+    <version>$(sh build.sh get-version)</version>
+    <url>
+        http://realm.io/docs/ios/$(sh build.sh get-version)/realm.tgz
+    </url>
+</entry>
+EOF
+        mv docs/output/$(sh build.sh get-version)/publish/* docs/output/$(sh build.sh get-version)/
+        rm -rf docs/output/$(sh build.sh get-version)/publish/
+        echo "Done generating Apple docset under docs/output/"
 
         exit 0
         ;;

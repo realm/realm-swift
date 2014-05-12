@@ -11,4 +11,6 @@ You can generate the docs locally by using the build.sh script at the root of th
 sh build.sh docs
 ```
 
-This will generate HTML docs under `docs/html/` and Apple docset packages under `docs/docset`. You can view the docset locally with tools like [Dash](http://kapeli.com/dash) or in Xcode directly with e.g. [Docs for XCode](http://georiot.co/docsforxcode).
+This will generate docs under `docs/output/` and install the documentation in your Xcode.
+
+You will also find an Apple docset package at the root of that that folder. You can view the docset locally with tools like [Dash](http://kapeli.com/dash) or in Xcode directly with e.g. [Docs for XCode](http://georiot.co/docsforxcode).
