@@ -275,7 +275,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(JSONTableTestTable, JSONTableTestType)
         //XCTAssertNotNil(table[nonExistingKey], @"table[nonExistingKey] should not be nil");
         //XCTAssertEqual(table[nonExistingKey].objID, 1, @"table[nonExistingKey]objID should be equal to 1");
         //XCTAssertEqualObjects(table[nonExistingKey].name, nonExistingKey, @"table[nonExistingKey].name should be equal to nonExistingKey");
-
+        
         // Set non-existing row to nil for table
         previousRowCount = [table rowCount];
         NSString* anotherNonExistingKey = @"sdalfjhadskfja";
