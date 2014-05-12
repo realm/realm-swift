@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "4B2915F2191B327A006437DA"
+               BlueprintIdentifier = "4B33DBF919212C5100308FCC"
                BuildableName = "RealmToolsPlugin.xcplugin"
                BlueprintName = "RealmToolsPlugin"
                ReferencedContainer = "container:RealmTools.xcodeproj">
