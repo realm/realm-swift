@@ -34,6 +34,8 @@ the "Command Line tools" is an optional Xcode add-on that you must install.
 You can find it under the "Downloads" pane of the "Preferences" dialog 
 in the Xcode 4 menu.
 
+[Appledoc](http://gentlebytes.com/appledoc/) is needed to generate the documentation.
+
 Configure, build, install
 -------------------------
 
@@ -143,3 +145,12 @@ set the environment variable `CC` before calling `sh build.sh build`,
 as in the following example:
 
     CC=clang sh build.sh build
+
+Documentation
+-------------
+
+The documentation is generated with the following command:
+
+    sh build.sh docs
+
+Please note that this will also install the documentation to your machine.
