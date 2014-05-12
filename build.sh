@@ -674,8 +674,8 @@ EOF
         echo "Generating HTML docs..."
         appledoc    --project-name Realm \
                     --project-company "Realm" \
-                    --include doc/realm.png \
-                    --output doc/appledocs \
+                    --include docs/source/realm.png \
+                    --output docs \
                     -v `sh build.sh get-version` \
                     --create-html \
                     --no-create-docset \
@@ -691,16 +691,17 @@ EOF
                     --ignore src/realm/objc/RLMVersion.h \
                     --ignore src/realm/objc/RLMDescriptor.h \
                     --ignore "src/realm/objc/test/*" \
-                    --index-desc doc/index.md \
-                    --template doc/templates \
+                    --index-desc docs/source/index.md \
+                    --template docs/templates \
                     --exit-threshold 1 \
                     src/realm/objc/ || exit 1
+        echo "Done generating HTML docs under docs/html/"
 
         echo "Generating docset docs..."
         appledoc    --project-name Realm \
                     --project-company "Realm" \
-                    --include doc/realm.png \
-                    --output doc/appledocs/docset \
+                    --include docs/source/realm.png \
+                    --output docs/docset \
                     -v `sh build.sh get-version` \
                     --no-create-html \
                     --create-docset \
@@ -721,11 +722,12 @@ EOF
                     --ignore src/realm/objc/RLMVersion.h \
                     --ignore src/realm/objc/RLMDescriptor.h \
                     --ignore "src/realm/objc/test/*" \
-                    --index-desc doc/index.md \
-                    --template doc/templates \
+                    --index-desc docs/source/index.md \
+                    --template docs/templates \
                     --exit-threshold 1 \
                     src/realm/objc/ || exit 1
-        echo "Done generating docs under docs/appledocs"
+        echo "Done generating Apple docset under docs/docset/"
+
         exit 0
         ;;
 
