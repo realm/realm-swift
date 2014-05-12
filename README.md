@@ -34,7 +34,7 @@ the "Command Line tools" is an optional Xcode add-on that you must install.
 You can find it under the "Downloads" pane of the "Preferences" dialog 
 in the Xcode 4 menu.
 
-[Appledoc](http://gentlebytes.com/appledoc/) is needed to generate the documentation.
+[Appledoc](https://github.com/tomaz/appledoc/releases/tag/v2.2-963) is needed to generate the documentation.
 
 Configure, build, install
 -------------------------
