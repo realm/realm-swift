@@ -680,6 +680,10 @@ EOF
                     --create-html \
                     --no-create-docset \
                     --no-repeat-first-par \
+                    --no-warn-missing-arg \
+                    --no-warn-invalid-crossref \
+                    --no-warn-undocumented-object \
+                    --no-warn-undocumented-member \
                     --ignore src/realm/objc/RLMColumnProxy.h \
                     --ignore src/realm/objc/RLMProxy.h \
                     --ignore src/realm/objc/RLMQuery.h \
@@ -689,7 +693,7 @@ EOF
                     --ignore "src/realm/objc/test/*" \
                     --index-desc docs/source/index.md \
                     --template docs/templates \
-                    --exit-threshold 2 \
+                    --exit-threshold 1 \
                     src/realm/objc/ || exit 1
         echo "Done generating HTML docs under docs/html/"
 
@@ -706,6 +710,10 @@ EOF
                     --docset-feed-url "http://realm.io/docs/appledoc" \
                     --company-id "io.realm" \
                     --no-repeat-first-par \
+                    --no-warn-missing-arg \
+                    --no-warn-invalid-crossref \
+                    --no-warn-undocumented-object \
+                    --no-warn-undocumented-member \
                     --ignore src/realm/objc/RLMColumnProxy.h \
                     --ignore src/realm/objc/RLMProxy.h \
                     --ignore src/realm/objc/RLMQuery.h \
@@ -715,7 +723,7 @@ EOF
                     --ignore "src/realm/objc/test/*" \
                     --index-desc docs/source/index.md \
                     --template docs/templates \
-                    --exit-threshold 2 \
+                    --exit-threshold 1 \
                     src/realm/objc/ || exit 1
         echo "Done generating Apple docset under docs/docset/"
 
