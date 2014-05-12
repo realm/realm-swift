@@ -255,20 +255,20 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(JSONTableTestTable, JSONTableTestType)
         XCTAssertEqualObjects(table[@"Test2"].name, @"Test2", @"table[@\"Test24\"].name should be equal to Test2");
         XCTAssertEqual((int)table[@"Test2"].objID, 25, @"table[@\"Test24\"].objID should be equal to 25");
         
-        //XCTAssertNil(table[@"foo"], @"table[\"foo\"] should be nil");
+        XCTAssertNil(table[@"foo"], @"table[\"foo\"] should be nil");
         
         AgeTable* errTable = [AgeTable tableInRealm:realm named:@"errTable"];
         [errTable setObjectClass:Sub.class];
         
         [errTable addRow:@{@"age" : @987289}];
-       // XCTAssertThrows(errTable[@"X"], @"Accessing RLMRow via keyed subscript on a column that is not of type RLMTypeString should throw exception");
+        XCTAssertThrows(errTable[@"X"], @"Accessing RLMRow via keyed subscript on a column that is not of type RLMTypeString should throw exception");
         
         // Test keyed subscripting setters
         
         // No exisiting for table
         NSUInteger previousRowCount = [table rowCount];
-       // NSString* nonExistingKey = @"Test10123903784293";
-        //table[nonExistingKey] = @{@"name" : nonExistingKey, @"objID" : @1};
+        NSString* nonExistingKey = @"Test10123903784293";
+        table[nonExistingKey] = @{@"name" : nonExistingKey, @"objID" : @1};
         
         XCTAssertEqual(previousRowCount, [table rowCount], @"Row count should be equal to previous row after inserting a non-existing RLMRow");
         // Commenting out until set row method transitioned from update row
@@ -278,11 +278,11 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(JSONTableTestTable, JSONTableTestType)
 
         // Set non-existing row to nil for table
         previousRowCount = [table rowCount];
-        //NSString* anotherNonExistingKey = @"sdalfjhadskfja";
-       // table[anotherNonExistingKey] = nil;
+        NSString* anotherNonExistingKey = @"sdalfjhadskfja";
+        table[anotherNonExistingKey] = nil;
         
         XCTAssertEqual(previousRowCount, [table rowCount], @"previousRowCount should equal current rowCount");
-        //XCTAssertNil(table[anotherNonExistingKey], @"table[anotherNonExistingKey] should be nil");
+        XCTAssertNil(table[anotherNonExistingKey], @"table[anotherNonExistingKey] should be nil");
         
         // Has existing for table
         previousRowCount = [table rowCount];

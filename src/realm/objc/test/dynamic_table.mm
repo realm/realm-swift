@@ -895,24 +895,24 @@ using namespace std;
         XCTAssertEqualObjects(table[@"Test2"][@"id"], @25, @"table[@\"Test24\"][@\"id\"] should be equal to @25");
         
         // Test nil row
-      //  XCTAssertNil(table[@"foo"], @"table[\"foo\"] should be nil");
+        XCTAssertNil(table[@"foo"], @"table[\"foo\"] should be nil");
         
         
         RLMTable* errTable = [realm createTableWithName:@"errTable"];
         
-        //XCTAssertThrows(errTable[@"X"], @"Accessing RLMRow via keyed subscript on undefined column should throw exception");
+        XCTAssertThrows(errTable[@"X"], @"Accessing RLMRow via keyed subscript on undefined column should throw exception");
         
         [errTable addColumnWithName:@"id" type:RLMTypeInt];
         
-       // XCTAssertThrows(errTable[@"X"], @"Accessing RLMRow via keyed subscript on a column that is not of type RLMTypeString should throw exception");
+        XCTAssertThrows(errTable[@"X"], @"Accessing RLMRow via keyed subscript on a column that is not of type RLMTypeString should throw exception");
         
         
         // Test keyed subscripting setters
         
         // No exisiting for table
         NSUInteger previousRowCount = [table rowCount];
-        //NSString* nonExistingKey = @"Test10123903784293";
-       // XCTAssertThrows((table[nonExistingKey] = @{@"name" : nonExistingKey, @"id" : @1}), @"non existing key");
+       // NSString* nonExistingKey = @"Test10123903784293";
+        //XCTAssertThrows((table[nonExistingKey] = @{@"name" : nonExistingKey, @"id" : @1}), @"non existing key");
         
         XCTAssertEqual(previousRowCount, [table rowCount], @"Row count should be equal to previous row count + 1 after inserting a non-existing RLMRow");
         //XCTAssertNil(table[nonExistingKey], @"table[nonExistingKey] should be nil");
@@ -922,18 +922,18 @@ using namespace std;
         
         // Set non-existing row to nil for table
         previousRowCount = [table rowCount];
-       // NSString* anotherNonExistingKey = @"sdalfjhadskfja";
-       // table[anotherNonExistingKey] = nil; // Adds an empty row
+        NSString* anotherNonExistingKey = @"sdalfjhadskfja";
+        table[anotherNonExistingKey] = nil; // Adds an empty row
         
         XCTAssertEqual(previousRowCount, [table rowCount], @"previousRowCount + 1 should equal current rowCount");
-       // XCTAssertNil(table[anotherNonExistingKey], @"table[anotherNonExistingKey] should be nil");
+        XCTAssertNil(table[anotherNonExistingKey], @"table[anotherNonExistingKey] should be nil");
         
         // Has existing for table
         previousRowCount = [table rowCount];
         table[@"Test2"] = @{@"name" : @"Test3" , @"id" : @123};
         
         XCTAssertEqual(previousRowCount, [table rowCount], @"Row count should still equal previous row count after inserting an existing RLMRow");
-        //XCTAssertNil(table[@"Test2"], @"table[@\"Test2\"] should be nil");
+        XCTAssertNil(table[@"Test2"], @"table[@\"Test2\"] should be nil");
         XCTAssertNotNil(table[@"Test3"], @"table[@\"Test3\"] should not be nil");
         XCTAssertEqualObjects(table[@"Test3"][@"id"], @123, @"table[\"Test3\"][@\"id\"] should be equal to @123");
         XCTAssertEqualObjects(table[@"Test3"][@"name"], @"Test3", @"table[\"Test3\"][@\"name\"] should be equal to @\"Test3\"");

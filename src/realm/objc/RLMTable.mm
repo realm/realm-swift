@@ -342,7 +342,9 @@ using namespace std;
 
 - (size_t)RLM_lookup:(NSString *)key
 {
-    return m_table->lookup([key UTF8String]);
+    size_t n = m_table->lookup([key UTF8String]);
+    NSUInteger m = was_not_found(n);
+    return m;
 }
 
 -(id)rowAtIndex:(NSUInteger)ndx
