@@ -110,7 +110,7 @@ using namespace std;
     if (ndx >= self.rowCount)
         return nil;
 
-    return [[_proxyObjectClass alloc] initWithTable:[m_table getNativeTableRef] ndx:[self rowIndexInOriginTableForRowAtIndex:ndx] readOnly:m_read_only];
+    return [[_proxyObjectClass alloc] initWithTableRef:[m_table nativeTableRef] ndx:[self rowIndexInOriginTableForRowAtIndex:ndx] readOnly:m_read_only];
 }
 
 -(RLMRow *)rowAtIndex:(NSUInteger)ndx
@@ -121,7 +121,7 @@ using namespace std;
     if (ndx >= self.rowCount)
         return nil;
 
-    return [[_proxyObjectClass alloc] initWithTable:[m_table getNativeTableRef] ndx:[self rowIndexInOriginTableForRowAtIndex:ndx] readOnly:m_read_only];
+    return [[_proxyObjectClass alloc] initWithTableRef:[m_table nativeTableRef] ndx:[self rowIndexInOriginTableForRowAtIndex:ndx] readOnly:m_read_only];
 }
 
 -(RLMRow *)firstRow
@@ -129,7 +129,7 @@ using namespace std;
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[_proxyObjectClass alloc] initWithTable:[m_table getNativeTableRef] ndx:[self rowIndexInOriginTableForRowAtIndex:0] readOnly:m_read_only];
+    return [[_proxyObjectClass alloc] initWithTableRef:[m_table nativeTableRef] ndx:[self rowIndexInOriginTableForRowAtIndex:0] readOnly:m_read_only];
 }
 
 -(RLMRow *)lastRow
@@ -137,7 +137,7 @@ using namespace std;
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[_proxyObjectClass alloc] initWithTable:[m_table getNativeTableRef] ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1] readOnly:m_read_only];
+    return [[_proxyObjectClass alloc] initWithTableRef:[m_table nativeTableRef] ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1] readOnly:m_read_only];
 }
 
 -(NSUInteger)rowCount
@@ -253,7 +253,7 @@ using namespace std;
 
 -(RLMRow *)getRow
 {
-    return m_tmp_row = [[_proxyObjectClass alloc] initWithTable: [m_table getNativeTableRef]
+    return m_tmp_row = [[_proxyObjectClass alloc] initWithTableRef: [m_table nativeTableRef]
                                                  ndx: m_view->get_source_ndx(0) readOnly:m_read_only];
 }
 

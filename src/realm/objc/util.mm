@@ -489,7 +489,7 @@ void insert_row_with_array(size_t row_ndx, tightdb::Table &table, NSArray *data)
             }
 
             if ([obj isKindOfClass:[RLMTable class]]) {
-                table.insert_subtable(col_ndx, row_ndx, &[obj getNativeTable]);
+                table.insert_subtable(col_ndx, row_ndx, &[obj nativeTable]);
                 continue;
             }
         }
@@ -543,7 +543,7 @@ void insert_row_with_dictionary(size_t row_ndx, Table &table, NSDictionary *data
             }
 
             if ([value isKindOfClass:[RLMTable class]]) {
-                table.insert_subtable(col_ndx, row_ndx, &[value getNativeTable]);
+                table.insert_subtable(col_ndx, row_ndx, &[value nativeTable]);
                 continue;
             }
         }
@@ -665,7 +665,7 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 break;
             }
             if ([obj isKindOfClass:[RLMTable class]]) {
-                table.set_subtable(col_ndx, row_ndx, &[(RLMTable *)obj getNativeTable]);
+                table.set_subtable(col_ndx, row_ndx, &[(RLMTable *)obj nativeTable]);
                 break;
             }
             @throw [NSException exceptionWithName:@"realm:cannot insert subtable"
@@ -685,7 +685,7 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 break;
             }
             if ([obj isKindOfClass:[RLMTable class]]) {
-                table.set_subtable(col_ndx, row_ndx, &[(RLMTable *)obj getNativeTable]);
+                table.set_subtable(col_ndx, row_ndx, &[(RLMTable *)obj nativeTable]);
                 break;
             }
             if ([obj isKindOfClass:[NSDate class]]) {

@@ -23,7 +23,6 @@
 
 
 @interface RLMRow (noinst)
--(id)initWithTable:(tightdb::TableRef)table ndx:(NSUInteger)ndx readOnly:(BOOL)readOnly;
--(tightdb::Table&)nativeTable;
+-(id)initWithTableRef:(tightdb::TableRef)table ndx:(NSUInteger)ndx readOnly:(BOOL)readOnly;
 -(tightdb::TableRef)nativeTableRef;
 @end

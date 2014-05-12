@@ -539,7 +539,7 @@ NSString *const defaultRealmFileName = @"default.realm";
     RLMTable *table = [self createTableWithName:name];
     
     //Set columns
-    tightdb::TableRef nativeTable = [table getNativeTable].get_table_ref();
+    tightdb::TableRef nativeTable = [table nativeTable].get_table_ref();
     if (!set_columns(nativeTable, columns)) {
         // Parsing the schema failed
         //TODO: More detailed error msg in exception

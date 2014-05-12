@@ -53,7 +53,7 @@ BOOL m_read_only;
     @throw [NSException exceptionWithName:@"RLMException" reason:@"Cannot create standalone row outside of tables" userInfo:nil];
 }
 
--(id)initWithTable:(tightdb::TableRef)table ndx:(NSUInteger)ndx readOnly:(BOOL)readOnly
+-(id)initWithTableRef:(tightdb::TableRef)table ndx:(NSUInteger)ndx readOnly:(BOOL)readOnly
 {
 
     self = [super init];
@@ -71,10 +71,6 @@ BOOL m_read_only;
 -(void)RLM_setNdx:(NSUInteger)ndx
 {
     _ndx = ndx;
-}
-
--(tightdb::Table&)nativeTable{
-    return *m_table;
 }
 
 -(tightdb::TableRef)nativeTableRef
@@ -248,7 +244,7 @@ BOOL m_read_only;
 
 -(void)setTable:(RLMTable *)value inColumnWithIndex:(NSUInteger)colNdx
 {
-    m_table->set_subtable(colNdx, _ndx, &[value getNativeTable]);
+    m_table->set_subtable(colNdx, _ndx, &[value nativeTable]);
 }
 
 -(void)setMixed:(id)value inColumnWithIndex:(NSUInteger)colNdx
@@ -258,7 +254,7 @@ BOOL m_read_only;
     RLMTable * subtable = mixed.get_type() == tightdb::type_Table ? (RLMTable *)value : nil;
                                     if (subtable) {
                                         tightdb::LangBindHelper::set_mixed_subtable(*m_table, colNdx, _ndx,
-                                                                                    [subtable getNativeTable]);
+                                                                                    [subtable nativeTable]);
                                     }
                                     else {
                                         m_table->set_mixed(colNdx, _ndx, mixed);
@@ -380,7 +376,7 @@ BOOL m_read_only;
 
 -(void)setSubtable:(RLMTable *)value
 {
-    [_row nativeTableRef]->set_subtable(_columnId, _row.ndx, &[value getNativeTable]);}
+    [_row nativeTableRef]->set_subtable(_columnId, _row.ndx, &[value nativeTable]);}
 
 -(id)getMixed
 {
@@ -409,7 +405,7 @@ BOOL m_read_only;
     RLMTable * subtable = mixed.get_type() == tightdb::type_Table ? (RLMTable *)value : nil;
                                     if (subtable) {
                                         tightdb::LangBindHelper::set_mixed_subtable(*m_table, _columnId, _row.ndx,
-                                                                                    [subtable getNativeTable]);
+                                                                                    [subtable nativeTable]);
                                     }
                                     else {
                                         m_table->set_mixed(_columnId, _row.ndx, mixed);

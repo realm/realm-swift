@@ -63,7 +63,7 @@ using namespace std;
     if (self) {
         m_table = table;
         REALM_EXCEPTION_ERRHANDLER(
-            m_query.reset(new tightdb::Query([table getNativeTable].where()));,
+            m_query.reset(new tightdb::Query([table nativeTable].where()));,
             nil);
     }
     return self;
@@ -76,7 +76,7 @@ using namespace std;
 
 -(RLMRow *)getRow:(long)ndx
 {
-    return m_tmp_row = [[RLMRow alloc] initWithTable:[self.originTable getNativeTableRef] ndx:ndx readOnly:self.originTable.isReadOnly];
+    return m_tmp_row = [[RLMRow alloc] initWithTableRef:[self.originTable nativeTableRef] ndx:ndx readOnly:self.originTable.isReadOnly];
 }
 
 -(long)getFastEnumStart
