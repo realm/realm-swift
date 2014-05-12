@@ -51,21 +51,34 @@ static const NSInteger RLMToolsPluginMenuItemTag = 12347177;
     NSLog(@"    Application Did Finish Launching");
     NSMenuItem* windowMenuItem = [[NSApp mainMenu] itemWithTitle:@"Window"];
     if (windowMenuItem) {
+        NSString * const MenuTitle = @"Realm Tools";
         [[windowMenuItem submenu] addItem:[NSMenuItem separatorItem]];
         
-        NSMenuItem* realmToolsMenuItem = [[NSMenuItem alloc] initWithTitle:@"Realm Tools" action:@selector(realmToolsClicked:) keyEquivalent:@""];
+        NSMenuItem* realmToolsMenuItem = [[NSMenuItem alloc] initWithTitle:MenuTitle action:@selector(realmToolsClicked:) keyEquivalent:@""];
         [realmToolsMenuItem setTarget:self];
         [realmToolsMenuItem setTag:RLMToolsPluginMenuItemTag];
         [[windowMenuItem submenu] addItem:realmToolsMenuItem];
+        
+        NSMenu *realmToolsSubMenu = [[NSMenu alloc] initWithTitle:MenuTitle];
+        [[realmToolsSubMenu addItemWithTitle:@"Inspect" action:@selector(inspectToolClicked:) keyEquivalent:@""] setTarget:self];
+        [[realmToolsSubMenu addItemWithTitle:@"Import..." action:@selector(importToolClicked:) keyEquivalent:@""] setTarget:self];
+        [realmToolsMenuItem setSubmenu:realmToolsSubMenu];
     }
 }
 
 - (void)realmToolsClicked:(id)sender
 {
     NSLog(@"    Realm Tools clicked");
-    if (!self.windowController) {
-        
-    }
+}
+
+- (void)inspectToolClicked:(id)sender
+{
+    NSLog(@"    Inspect Tool Clicked");
+}
+
+- (void)importToolClicked:(id)sender
+{
+    NSLog(@"    Import Tool Clicked");
 }
 
 @end
