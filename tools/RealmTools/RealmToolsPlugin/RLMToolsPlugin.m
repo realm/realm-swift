@@ -16,6 +16,8 @@
 
 @implementation RLMToolsPlugin
 
+static const NSInteger RLMToolsPluginMenuItemTag = 12347177;
+
 +(void)pluginDidLoad:(NSBundle *)plugin
 {
 	NSLog(@"    Realm Plugin Loaded");
@@ -37,6 +39,11 @@
     return self;
 }
 
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
     NSLog(@"    Application Did Finish Launching");
@@ -46,13 +53,14 @@
         
         NSMenuItem* realmToolsMenuItem = [[NSMenuItem alloc] initWithTitle:@"Realm Tools" action:@selector(realmToolsClicked:) keyEquivalent:@""];
         [realmToolsMenuItem setTarget:self];
+        [realmToolsMenuItem setTag:RLMToolsPluginMenuItemTag];
         [[windowMenuItem submenu] addItem:realmToolsMenuItem];
     }
 }
 
 - (void)realmToolsClicked:(id)sender
 {
-    
+    NSLog(@"    Realm Tools clicked");
 }
 
 @end
