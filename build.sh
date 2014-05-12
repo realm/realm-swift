@@ -707,6 +707,7 @@ EOF
                     --no-install-docset \
                     --publish-docset \
                     --docset-feed-url "http://realm.io/docs/appledoc" \
+                    --docset-package-url "http://realm.io/docs/appledoc/io.realm.Realm-$(sh build.sh get-version).xar" \
                     --company-id "io.realm" \
                     --no-repeat-first-par \
                     --no-warn-missing-arg \
