@@ -696,7 +696,7 @@ EOF
                     --template docs/templates \
                     --exit-threshold 1 \
                     src/realm/objc/ || exit 1
-        mkdir docs/output
+        mkdir -p docs/output
         mv docs/html docs/output/$(sh build.sh get-version)
         echo "Done generating HTML docs under docs/output/"
 
