@@ -54,6 +54,29 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryTable, TestQueryObject);
 
 RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryAllTable, TestQueryAllObject);
 
+@interface MixedWithSubtable : RLMRow
+
+@property (nonatomic, strong) id MixedCol;
+@property (nonatomic, strong) TestQueryTable *TableCol;
+
+@end
+
+@implementation MixedWithSubtable
+@end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(MixedWithSubtableTable, MixedWithSubtable);
+
+@interface MixedWithoutSubtable : RLMRow
+
+@property (nonatomic, strong) id MixedCol;
+
+@end
+
+@implementation MixedWithoutSubtable
+@end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(MixedWithoutSubtableTable, MixedWithoutSubtable);
+
 @interface MACTestErrHandling: RLMTestCase
 
 @end
@@ -122,17 +145,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryAllTable, TestQueryAllObject);
     // Fake readonly.
     [((RLMTable*)diskTable) setReadOnly:YES];
 
-    NSLog(@"Disktable size: %zu", [diskTable rowCount]);
-
-//    No longer support for errors here
-//    error = nil;
-//    if (![diskTable addName:@"Anni" Age:54 Hired:YES error:&error]) {
-//        NSLog(@"%@", [error localizedDescription]);
-//    } else {
-//        XCTFail(@"addName to readonly should have failed.");
-//    }
-//
-//    NSLog(@"Disktable size: %zu", [diskTable rowCount]);
+    XCTAssertTrue([diskTable rowCount] > 0, @"diskTable should have rows");
 }
 
 - (void)testErrorInsert {
@@ -389,6 +402,20 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryAllTable, TestQueryAllObject);
         // FIXME: Not yet implemented
 //        [table countWhere:@"TableCol == nil && BoolCol == NO"];
 //        [table countWhere:@"TableCol != nil && BoolCol == NO"];
+    }];
+}
+
+- (void)testMixedWithSubtable {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+        MixedWithSubtableTable *table = [MixedWithSubtableTable tableInRealm:realm named:@"table"];
+        [table addRow:@{@"MixedCol":  @"test"}];
+    }];
+}
+
+- (void)testMixedWithoutSubtable {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+        MixedWithoutSubtableTable *table = [MixedWithoutSubtableTable tableInRealm:realm named:@"table"];
+        [table addRow:@{@"MixedCol":  @"test"}];
     }];
 }
 
