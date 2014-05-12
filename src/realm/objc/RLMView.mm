@@ -26,6 +26,8 @@
 #include <tightdb/table_view.hpp>
 #include <tightdb/lang_bind_helper.hpp>
 
+#include <sstream>
+
 #import "RLMTable_noinst.h"
 #import "RLMRow.h"
 #import "RLMView_noinst.h"
@@ -34,6 +36,7 @@
 #import "RLMPrivate.h"
 #import "util_noinst.hpp"
 
+using namespace std;
 
 @implementation RLMView
 {
@@ -282,6 +285,15 @@
     RLMQuery *query = [[RLMQuery alloc] initWithTable:self.originTable error:nil];
     [query setTableView:*m_view];
     return query;
+}
+
+- (NSString *)toJSONString {
+    
+    ostringstream out;
+    m_view->to_json(out);
+    string str = out.str();
+    
+    return [NSString stringWithUTF8String:str.c_str()];
 }
 
 @end

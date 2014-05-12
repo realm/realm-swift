@@ -21,6 +21,7 @@
 #import <Foundation/Foundation.h>
 
 #include <tightdb/lang_bind_helper.hpp>
+#include <sstream>
 
 #import "RLMView_noinst.h"
 #import "RLMQuery_noinst.h"
@@ -48,12 +49,14 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
                                    @"predicate must be either an NSPredicate or an NSString with optional format va_list"); \
 }                                                          \
 
+using namespace std;
+
 @implementation RLMTable
 {
     tightdb::TableRef m_table;
     id m_parent;
     BOOL m_read_only;
-    RLMRow * m_tmp_row;
+    RLMRow *m_tmp_row;
 }
 
 - (instancetype)init
@@ -229,8 +232,7 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
 -(RLMDescriptor*)descriptorWithError:(NSError* __autoreleasing*)error
 {
     tightdb::DescriptorRef desc = m_table->get_descriptor();
-    BOOL read_only = m_read_only || m_table->has_shared_type();
-    return [RLMDescriptor descWithDesc:desc.get() readOnly:read_only error:error];
+    return [RLMDescriptor descWithDesc:desc.get() readOnly:m_read_only error:error];
 }
 
 -(NSUInteger)rowCount // Implementing property accessor
@@ -406,20 +408,20 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
     tightdb::ConstDescriptorRef desc = table.get_descriptor();
     
     if ([anObject isKindOfClass:[NSArray class]]) {
-        verify_row(*desc, (NSArray *)anObject);
-        insert_row(size_t(rowIndex), table, (NSArray *)anObject);
+        verify_row_with_array(*desc, (NSArray *) anObject);
+        insert_row_with_array(size_t(rowIndex), table, (NSArray *) anObject);
         return;
     }
     
     if ([anObject isKindOfClass:[NSDictionary class]]) {
-        verify_row_with_labels(*desc, (NSDictionary *)anObject);
-        insert_row_with_labels(size_t(rowIndex), table, (NSDictionary *)anObject);
+        verify_row_with_dictionary(*desc, (NSDictionary *) anObject);
+        insert_row_with_dictionary(size_t(rowIndex), table, (NSDictionary *) anObject);
         return;
     }
     
     if ([anObject isKindOfClass:[NSObject class]]) {
-        verify_row_from_object(*desc, (NSObject *)anObject);
-        insert_row_from_object(size_t(rowIndex), table, (NSObject *)anObject);
+        verify_row_with_object(*desc, (NSObject *) anObject);
+        insert_row_with_object(size_t(rowIndex), table, (NSObject *) anObject);
         return;
     }
 
@@ -443,22 +445,22 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
     tightdb::Table& table = *m_table;
     tightdb::ConstDescriptorRef desc = table.get_descriptor();
     
-    // These should call update_row. Will re-implement set_row() when setRow:atIndex is implemented.
+    // These should call update_row. Will re-implement update_row_with_array() when setRow:atIndex is implemented.
     if ([anObject isKindOfClass:[NSArray class]]) {
-        verify_row(*desc, (NSArray *)anObject);
-        set_row(size_t(rowIndex), table, (NSArray*)anObject);
+        verify_row_with_array(*desc, (NSArray *) anObject);
+        update_row_with_array(size_t(rowIndex), table, (NSArray *) anObject);
         return;
     }
     
     if ([anObject isKindOfClass:[NSDictionary class]]) {
-        verify_row_with_labels(*desc, (NSDictionary *)anObject);
-        set_row_with_labels(size_t(rowIndex), table, (NSDictionary*)anObject);
+        verify_row_with_dictionary(*desc, (NSDictionary *) anObject);
+        update_row_with_dictionary(size_t(rowIndex), table, (NSDictionary *) anObject);
         return;
     }
     
     if ([anObject isKindOfClass:[NSObject class]]) {
-        verify_row_from_object(*desc, (NSObject *)anObject);
-        set_row_from_object(size_t(rowIndex), table, (NSObject *)anObject);
+        verify_row_with_object(*desc, (NSObject *) anObject);
+        update_row_with_object(size_t(rowIndex), table, (NSObject *) anObject);
         return;
     }
     
@@ -944,6 +946,9 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
 
 -(NSUInteger)addColumnWithType:(RLMType)type andName:(NSString*)name error:(NSError* __autoreleasing*)error
 {
+    // FIXME: Throw exception if m_table->has_shared_type() returns
+    // true. See documentation for Table::has_shared_type() in core
+    // library for an explanation of why.
     REALM_EXCEPTION_ERRHANDLER(
         return m_table->add_column(tightdb::DataType(type), ObjcStringAccessor(name));,
         0);
@@ -951,6 +956,9 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
 
 -(void)renameColumnWithIndex:(NSUInteger)colIndex to:(NSString *)newName
 {
+    // FIXME: Throw exception if m_table->has_shared_type() returns
+    // true. See documentation for Table::has_shared_type() in core
+    // library for an explanation of why.
     REALM_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(colIndex);
     m_table->rename_column(colIndex, ObjcStringAccessor(newName));
 }
@@ -958,6 +966,9 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
 
 -(void)removeColumnWithIndex:(NSUInteger)columnIndex
 {
+    // FIXME: Throw exception if m_table->has_shared_type() returns
+    // true. See documentation for Table::has_shared_type() in core
+    // library for an explanation of why.
     REALM_EXCEPTION_HANDLER_COLUMN_INDEX_VALID(columnIndex);
     
     try {
@@ -1455,6 +1466,15 @@ if ([INPREDICATE isKindOfClass:[NSPredicate class]]) {     \
         }
     }
     return YES;
+}
+
+- (NSString *)toJSONString {
+    
+    ostringstream out;
+    m_table->to_json(out);
+    string str = out.str();
+    
+    return [NSString stringWithUTF8String:str.c_str()];
 }
 
 @end

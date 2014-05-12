@@ -71,7 +71,6 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(InvalidTable, InvalidType)
   // No new public instance methods need be defined.
 @end
 
-
 @interface KeyedObject : RLMRow
 @property NSString * name;
 @property int objID;
@@ -102,6 +101,24 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
 @end
 
 RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
+
+@interface JSONTableTestType : RLMRow
+
+@property BOOL      boolColumn;
+@property int       intColumn;
+@property float     floatColumn;
+@property double    doubleColumn;
+@property NSString  *stringColumn;
+@property NSData    *binaryColumn;
+@property NSDate    *dateColumn;
+@property id        mixedColumn;
+
+@end
+
+@implementation JSONTableTestType
+@end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(JSONTableTestTable, JSONTableTestType)
 
 @implementation RLMTypedTableTests
 
@@ -447,6 +464,65 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AggregateTable, AggregateObject)
         // Test double max
         XCTAssertEqualWithAccuracy([[table maxOfProperty:@"DoubleCol" where:@"BoolCol == NO"] doubleValue], (double)10.5, 0.1f, @"Maximum should be 10.5");
         XCTAssertEqualWithAccuracy([[table maxOfProperty:@"DoubleCol" where:@"BoolCol == YES"] doubleValue], (double)13.5, 0.1f, @"Maximum should be 13.5");
+    }];
+}
+
+- (void)testTableTyped_addSubtableUsingArray {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+        AllTypesTable *table = [AllTypesTable tableInRealm:realm named:@"table"];
+        [table addRow:@[@YES,
+                        @1,
+                        @(0.1f),
+                        @0.2,
+                        @"foo",
+                        [@"foo" dataUsingEncoding:NSUTF8StringEncoding],
+                        [NSDate date],
+                        @[],
+                        @NO,
+                        @123,
+                        @"bar"]];
+        XCTAssertEqual(table.rowCount, (NSUInteger)1, @"1 row excepted");
+        XCTAssertEqual(((AgeTable *)table[0][@"tableCol"]).rowCount, (NSUInteger)0, @"0 rows excepted");
+    }];
+}
+
+
+
+- (void)testTableTyped_addSubtableUsingDictionary {
+    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+        AllTypesTable *table = [AllTypesTable tableInRealm:realm named:@"table"];
+        [table addRow:@{@"boolCol": @YES,
+                        @"intCol": @1,
+                        @"floatCol": @(0.1f),
+                        @"doubleCol": @0.2,
+                        @"stringCol": @"foo",
+                        @"binaryCol": [@"foo" dataUsingEncoding:NSUTF8StringEncoding],
+                        @"dateCol": [NSDate date],
+                        @"tableCol": @[],
+                        @"cBoolCol": @NO,
+                        @"longCol": @123,
+                        @"mixedCol": @"bar"}];
+        XCTAssertEqual(table.rowCount, (NSUInteger)1, @"1 row excepted");
+        XCTAssertEqual(((AgeTable *)table[0][@"tableCol"]).rowCount, (NSUInteger)0, @"0 rows excepted");
+    }];
+}
+
+- (void)testToJSONString {
+ 
+    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
+        
+        JSONTableTestTable *table = [JSONTableTestTable tableInRealm:realm
+                                                               named:@"test"];
+        
+        const char bin[4] = { 0, 1, 2, 3 };
+        NSData *binary = [[NSData alloc] initWithBytes:bin length:sizeof bin];
+        
+        NSDate *date = (NSDate *)[NSDate dateWithString:@"2014-05-17 13:15:10 +0100"];
+        [table addRow:@[@YES, @1234, @((float)12.34), @1234.5678, @"I'm just a String", binary, @((int)[date timeIntervalSince1970]), @"I'm also a string in a mixed column"]];
+
+        NSString *result = [table toJSONString];
+        
+        XCTAssertEqualObjects(result, @"[{\"boolColumn\":true,\"intColumn\":1234,\"floatColumn\":1.2340000e+01,\"doubleColumn\":1.2345678000000000e+03,\"stringColumn\":\"I'm just a String\",\"binaryColumn\":\"00010203\",\"dateColumn\":\"2014-05-17 12:15:10\",\"mixedColumn\":\"I'm also a string in a mixed column\"}]", @"JSON string expected to one 8-column row");
     }];
 }
 

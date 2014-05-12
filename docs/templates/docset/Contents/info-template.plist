@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	{{#bundleIdentifier}}<key>CFBundleIdentifier</key>
+	<string>{{bundleIdentifier}}</string>{{/bundleIdentifier}}
+	{{#bundleName}}<key>CFBundleName</key>
+	<string>{{bundleName}}</string>{{/bundleName}}
+	{{#bundleVersion}}<key>CFBundleShortVersionString</key>
+	<string>{{bundleVersion}}</string>
+	<key>CFBundleVersion</key>
+	<string>{{bundleVersion}}</string>{{/bundleVersion}}
+	{{#certificateIssuer}}<key>DocSetCertificateIssuer</key>
+	<string>{{certificateIssuer}}</string>{{/certificateIssuer}}
+	{{#certificateSigner}}<key>DocSetCertificateSigner</key>
+	<string>{{certificateSigner}}</string>{{/certificateSigner}}
+	{{#description}}<key>DocSetDescription</key>
+	<string>{{description}}</string>{{/description}}
+	{{#fallbackURL}}<key>DocSetFallbackURL</key>
+	<string>{{fallbackURL}}</string>{{/fallbackURL}}
+	{{#feedName}}<key>DocSetFeedName</key>
+	<string>{{feedName}}</string>{{/feedName}}
+	{{#feedURL}}<key>DocSetFeedURL</key>
+	<string>{{feedURL}}</string>{{/feedURL}}
+	{{#minimumXcodeVersion}}<key>DocSetMinimumXcodeVersion</key>
+	<string>{{minimumXcodeVersion}}</string>{{/minimumXcodeVersion}}
+	{{#platformFamily}}<key>DocSetPlatformFamily</key>
+	<string>{{platformFamily}}</string>{{/platformFamily}}
+	{{#dashPlatformFamily}}<key>DashDocSetFamily</key>
+	<string>{{dashPlatformFamily}}</string>{{/dashPlatformFamily}}
+	{{#publisherIdentifier}}<key>DocSetPublisherIdentifier</key>
+	<string>{{publisherIdentifier}}</string>{{/publisherIdentifier}}
+	{{#publisherName}}<key>DocSetPublisherName</key>
+	<string>{{publisherName}}</string>{{/publisherName}}
+	{{#copyrightMessage}}<key>NSHumanReadableCopyright</key>
+	<string>{{copyrightMessage}}</string>{{/copyrightMessage}}
+</dict>
+</plist>

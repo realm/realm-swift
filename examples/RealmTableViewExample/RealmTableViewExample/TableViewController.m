@@ -23,15 +23,15 @@
 
 // Realm model object
 @interface DemoObject : RLMRow
-
 @property (nonatomic, copy)   NSString *title;
 @property (nonatomic, strong) NSDate   *date;
-
 @end
 
 @implementation DemoObject
 // None needed
 @end
+
+RLM_TABLE_TYPE_FOR_OBJECT_TYPE(DemoTable, DemoObject);
 
 static NSString * const kCellID    = @"cell";
 static NSString * const kTableName = @"table";
@@ -61,13 +61,10 @@ static NSString * const kTableName = @"table";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"BG Add"
                                                                              style:UIBarButtonItemStylePlain
                                                                             target:self
-                                                                            action:@selector(bgAdd)];
+                                                                            action:@selector(backgroundAdd)];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                                                            target:self
                                                                                            action:@selector(add)];
-    UILongPressGestureRecognizer *g = [[UILongPressGestureRecognizer alloc] initWithTarget:self
-                                                                                    action:@selector(deleteAll)];
-    [self.navigationController.navigationBar addGestureRecognizer:g];
 }
 
 #pragma mark - Realm
@@ -79,22 +76,18 @@ static NSString * const kTableName = @"table";
     // Create table if it doesn't exist
     if (self.realm.isEmpty) {
         [self.realm beginWriteTransaction];
-        [self.realm createTableWithName:kTableName objectClass:[DemoObject class]];
+        [DemoTable tableInRealm:self.realm named:kTableName];
         [self.realm commitWriteTransaction];
     }
     
-    // Get the table and hold onto it
-    self.table = [self.realm tableWithName:kTableName objectClass:[DemoObject class]];
+    // Get the table and hold on to it
+    self.table = [DemoTable tableInRealm:self.realm named:kTableName];
     
     // Register for notifications
-    __weak TableViewController *weakSelf = self;
+    __weak UITableView *weakTableView = self.tableView;
     [self.realm addNotification:^(NSString *note, RLMRealm *realm) {
-        [weakSelf realmDidChange];
+        [weakTableView reloadData];
     }];
-}
-
-- (void)realmDidChange {
-    [self.tableView reloadData];
 }
 
 #pragma mark - UITableViewDataSource
@@ -118,10 +111,6 @@ static NSString * const kTableName = @"table";
     return cell;
 }
 
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    return YES;
-}
-
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         [self.realm beginWriteTransaction];
@@ -132,22 +121,19 @@ static NSString * const kTableName = @"table";
 
 #pragma mark - Actions
 
-- (void)bgAdd {
+- (void)backgroundAdd {
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     // Import many items in a background thread
     dispatch_async(queue, ^{
         // Get new realm and table since we are in a new thread
         RLMRealm *realm = [RLMRealm defaultRealm];
         RLMTable *table = [realm tableWithName:kTableName objectClass:[DemoObject class]];
-        for (NSInteger idx1 = 0; idx1 < 1000; idx1++) {
-            // Break up the writing blocks into smaller portions
-            [realm beginWriteTransaction];
-            for (NSInteger idx2 = 0; idx2 < 1000; idx2++) {
-                // Add row via dictionary. Order is ignored.
-                [table addRow:@{@"title": [self randomString], @"date": [self randomDate]}];
-            }
-            [realm commitWriteTransaction];
+        [realm beginWriteTransaction];
+        for (NSInteger index = 0; index < 5; index++) {
+            // Add row via dictionary. Order is ignored.
+            [table addRow:@{@"title": [self randomString], @"date": [self randomDate]}];
         }
+        [realm commitWriteTransaction];
     });
 }
 

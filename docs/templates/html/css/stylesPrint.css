@@ -1,0 +1,22 @@
+
+header {
+	display: none;
+}
+
+div.main-navigation, div.navigation-top {
+	display: none;
+}
+
+div#overview_contents, div#contents.isShowingTOC, div#contents {
+	overflow: visible;
+	position: relative;
+	top: 0px;
+	border: none;
+	left: 0;
+}
+#tocContainer.isShowingTOC {
+	display: none;
+}
+nav {
+	display: none;
+}

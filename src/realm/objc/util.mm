@@ -250,7 +250,7 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
                 while (subobj = [subenumerator nextObject]) {
                     if (![subobj isKindOfClass:[NSArray class]])
                         return NO;
-                    verify_row(*subdescr, (NSArray *)subobj);
+                    verify_row_with_array(*subdescr, (NSArray *) subobj);
                 }
                 break;
             }
@@ -264,7 +264,7 @@ BOOL verify_cell(const Descriptor& descr, size_t col_ndx, NSObject *obj)
 }
 
 
-void verify_row(const Descriptor& descr, NSArray* data)
+void verify_row_with_array(const Descriptor &descr, NSArray *data)
 {
     if (descr.get_column_count() != [data count]) {
         @throw [NSException exceptionWithName:@"realm:wrong_column_count"
@@ -279,7 +279,7 @@ void verify_row(const Descriptor& descr, NSArray* data)
     while (obj = [enumerator nextObject]) {
         if (!verify_cell(descr, col_ndx, obj)) {
             @throw [NSException exceptionWithName:@"realm:wrong_column_type"
-                                           reason:[NSString stringWithFormat: @"colName %@ with index: %lu is of type %s",
+                                           reason:[NSString stringWithFormat: @"colName %@ with index: %lu is of type %@",
                                                             to_objc_string(descr.get_column_name(col_ndx)), col_ndx,
                                                                            rlmtype_to_string(descr.get_column_type(col_ndx)) ]
                                          userInfo:nil];
@@ -288,7 +288,7 @@ void verify_row(const Descriptor& descr, NSArray* data)
     }
 }
 
-void verify_row_with_labels(const Descriptor& descr, NSDictionary* data)
+void verify_row_with_dictionary(const Descriptor &descr, NSDictionary *data)
 {
     size_t n = descr.get_column_count();
     for (size_t i = 0; i < n; ++i) {
@@ -298,14 +298,14 @@ void verify_row_with_labels(const Descriptor& descr, NSDictionary* data)
             continue;
         if (!verify_cell(descr, i, value)) {
             @throw [NSException exceptionWithName:@"realm:wrong_column_type"
-                                           reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %s",
+                                           reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %@",
                                                    to_objc_string(descr.get_column_name(i)), i, rlmtype_to_string(descr.get_column_type(i)) ]
                                          userInfo:nil];
         }
     }
 }
 
-void verify_row_from_object(const Descriptor& descr, NSObject* data)
+void verify_row_with_object(const Descriptor &descr, NSObject *data)
 {
     size_t count = descr.get_column_count();
     for (size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
@@ -319,7 +319,7 @@ void verify_row_from_object(const Descriptor& descr, NSObject* data)
         }
         if (!verify_cell(descr, col_ndx, value)) {
             @throw [NSException exceptionWithName: @"realm:wrong_column_type"
-                                           reason: [NSString stringWithFormat:@"colName %@ with index: %lu is of type %s",
+                                           reason: [NSString stringWithFormat:@"colName %@ with index: %lu is of type %@",
                                                     to_objc_string(descr.get_column_name(col_ndx)), col_ndx,
                                                                    rlmtype_to_string(descr.get_column_type(col_ndx)) ]
                                          userInfo: nil];
@@ -330,7 +330,7 @@ void verify_row_from_object(const Descriptor& descr, NSObject* data)
 
 bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
 {
-    BOOL subtable_seen = NO;
+    bool subtable_seen = false;
     DataType type = table.get_column_type(col_ndx);
     switch (type) {
         case type_Bool:
@@ -390,7 +390,7 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
             }
             break;
         case type_Table:
-            subtable_seen = YES;
+            subtable_seen = true;
             table.insert_subtable(col_ndx, row_ndx);
             break;
         case type_Mixed:
@@ -438,19 +438,19 @@ bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 }
                 break;
             }
-            return NO;
+            break;
     }
     return subtable_seen;
 }
 
 
-void insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
+void insert_row_with_array(size_t row_ndx, tightdb::Table &table, NSArray *data)
 {
     NSEnumerator *enumerator = [data objectEnumerator];
     id obj;
 
     bool subtable_seen = false;
-    // FIXME: handling of tightdb exceptions => return NO
+    // FIXME: handling of tightdb exceptions
     size_t col_ndx = 0;
     while (obj = [enumerator nextObject]) {
         subtable_seen |= insert_cell(col_ndx, row_ndx, table, obj);
@@ -469,26 +469,34 @@ void insert_row(size_t row_ndx, tightdb::Table& table, NSArray * data)
                 continue;
             }
 
-            TableRef subtable = table.get_subtable(col_ndx, row_ndx);
-            NSEnumerator *subenumerator = [obj objectEnumerator];
-            id subobj;
-            size_t sub_ndx = 0;
-            while (subobj = [subenumerator nextObject]) {
-                if (datatype == type_Mixed && sub_ndx == 0) {
-                    // first element is the description
-                    ++sub_ndx;
-                    continue;
-                }
+            if ([obj isKindOfClass:[NSArray class]]) {
+                TableRef subtable = table.get_subtable(col_ndx, row_ndx);
+                NSEnumerator *subenumerator = [obj objectEnumerator];
+                id subobj;
+                size_t sub_ndx = 0;
+                while (subobj = [subenumerator nextObject]) {
+                    if (datatype == type_Mixed && sub_ndx == 0) {
+                        // first element is the description
+                        ++sub_ndx;
+                        continue;
+                    }
 
-                // Fill in data
-                insert_row(subtable->size(), *subtable, subobj);
-                ++sub_ndx;
+                    // Fill in data
+                    insert_row_with_array(subtable->size(), *subtable, subobj);
+                    ++sub_ndx;
+                }
+                continue;
+            }
+
+            if ([obj isKindOfClass:[RLMTable class]]) {
+                table.insert_subtable(col_ndx, row_ndx, &[obj getNativeTable]);
+                continue;
             }
         }
     }
 }
 
-void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
+void insert_row_with_dictionary(size_t row_ndx, Table &table, NSDictionary *data)
 {
     bool subtables_seen = false;
 
@@ -499,7 +507,7 @@ void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
         // Do we have a matching label?
         // (missing values are ok, they will be filled out with default values)
         id value = [data valueForKey:col_name];
-        subtables_seen = subtables_seen || insert_cell(col_ndx, row_ndx, table, value);
+        subtables_seen |= insert_cell(col_ndx, row_ndx, table, value);
     }
     table.insert_done();
 
@@ -515,15 +523,34 @@ void insert_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
                 continue;
             }
 
-            TableRef subtable = table.get_subtable(col_ndx, row_ndx);
+            if ([value isKindOfClass:[NSArray class]]) {
+                TableRef subtable = table.get_subtable(col_ndx, row_ndx);
+                NSEnumerator *subenumerator = [value objectEnumerator];
+                id subobj;
+                size_t sub_ndx = 0;
+                while (subobj = [subenumerator nextObject]) {
+                    if (type == type_Mixed && sub_ndx == 0) {
+                        // first element is the description
+                        ++sub_ndx;
+                        continue;
+                    }
 
-            // fill in data
-            insert_row_with_labels(row_ndx, *subtable, (NSDictionary *)value);
+                    // Fill in data
+                    insert_row_with_dictionary(subtable->size(), *subtable, subobj);
+                    ++sub_ndx;
+                }
+                continue;
+            }
+
+            if ([value isKindOfClass:[RLMTable class]]) {
+                table.insert_subtable(col_ndx, row_ndx, &[value getNativeTable]);
+                continue;
+            }
         }
     }
 }
 
-void insert_row_from_object(size_t row_ndx, Table& table, NSObject *data) {
+void insert_row_with_object(size_t row_ndx, Table &table, NSObject *data) {
     bool subtables_seen = false;
 
     size_t count = table.get_column_count();
@@ -555,7 +582,7 @@ void insert_row_from_object(size_t row_ndx, Table& table, NSObject *data) {
                 continue;
             }
             TableRef subtable = table.get_subtable(col_ndx, row_ndx);
-            insert_row_from_object(row_ndx, *subtable, value);
+            insert_row_with_object(row_ndx, *subtable, value);
         }
     }
 }
@@ -632,7 +659,7 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                     NSEnumerator *enumerator = [(NSArray *)obj objectEnumerator];
                     id subobj;
                     while (subobj = [enumerator nextObject]) {
-                        set_row(row_ndx, *subtable, (NSArray *)subobj);
+                        update_row_with_array(row_ndx, *subtable, (NSArray *) subobj);
                     }
                 }
                 break;
@@ -642,7 +669,7 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
                 break;
             }
             @throw [NSException exceptionWithName:@"realm:cannot insert subtable"
-                                           reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %s",
+                                           reason:[NSString stringWithFormat:@"colName %@ with index: %lu is of type %@",
                                                             to_objc_string(table.get_column_name(col_ndx)), col_ndx,
                                                                            rlmtype_to_string(table.get_column_type(col_ndx)) ]
                                          userInfo:nil];
@@ -697,7 +724,7 @@ BOOL set_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
 }
 
 
-void set_row(size_t row_ndx, Table& table, NSArray *data)
+void update_row_with_array(size_t row_ndx, Table &table, NSArray *data)
 {
     NSEnumerator *enumerator = [data objectEnumerator];
     id obj;
@@ -709,7 +736,7 @@ void set_row(size_t row_ndx, Table& table, NSArray *data)
     }
 }
 
-void set_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
+void update_row_with_dictionary(size_t row_ndx, Table &table, NSDictionary *data)
 {
     size_t count = table.get_column_count();
     for (size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
@@ -719,7 +746,7 @@ void set_row_with_labels(size_t row_ndx, Table& table, NSDictionary *data)
     }
 }
 
-void set_row_from_object(size_t row_ndx, Table& table, NSObject *data) {
+void update_row_with_object(size_t row_ndx, Table &table, NSObject *data) {
     size_t count = table.get_column_count();
     for (size_t col_ndx = 0; col_ndx < count; ++col_ndx) {
         NSString *col_name = to_objc_string(table.get_column_name(col_ndx));

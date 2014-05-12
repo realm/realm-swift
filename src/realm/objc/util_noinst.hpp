@@ -165,30 +165,30 @@ inline bool nsnumber_is_like_double(NSObject *obj)
             strcmp(data_type, @encode(unsigned long long)) == 0);
 }
 
-inline const char *rlmtype_to_string(RLMType type) {
+inline NSString *rlmtype_to_string(RLMType type) {
     switch (type) {
         case RLMTypeNone:
-            return "None";
+            return @"None";
         case RLMTypeString:
-            return "string";
+            return @"string";
         case RLMTypeInt:
-            return "int";
+            return @"int";
         case RLMTypeBool:
-            return "bool";
+            return @"bool";
         case RLMTypeDate:
-            return "date";
+            return @"date";
         case RLMTypeBinary:
-            return "binary";
+            return @"binary";
         case RLMTypeDouble:
-            return "double";
+            return @"double";
         case RLMTypeFloat:
-            return "float";
+            return @"float";
         case RLMTypeMixed:
-            return "mixed";
+            return @"mixed";
         case RLMTypeTable:
-            return "table";
+            return @"table";
     }
-    return "Unknown";
+    return @"Unknown";
 }
 
 void to_mixed(id value, tightdb::Mixed& m);
@@ -198,17 +198,17 @@ BOOL verify_object_is_type(id obj, tightdb::DataType type);
 BOOL verify_cell(const tightdb::Descriptor& descr, size_t col_ndx, NSObject *obj);
 NSObject* get_cell(size_t col_ndx, size_t row_ndx, tightdb::Table& table);
 
-void verify_row(const tightdb::Descriptor& descr, NSArray * data);
-void insert_row(size_t ndx, tightdb::Table& table, NSArray * data);
-void set_row(size_t ndx, tightdb::Table& table, NSArray *data);
+void verify_row_with_array(const tightdb::Descriptor &descr, NSArray *data);
+void insert_row_with_array(size_t ndx, tightdb::Table &table, NSArray *data);
+void update_row_with_array(size_t ndx, tightdb::Table &table, NSArray *data);
 
-void verify_row_with_labels(const tightdb::Descriptor& descr, NSDictionary* data);
-void insert_row_with_labels(size_t row_ndx, tightdb::Table& table, NSDictionary *data);
-void set_row_with_labels(size_t row_ndx, tightdb::Table& table, NSDictionary *data);
+void verify_row_with_dictionary(const tightdb::Descriptor &descr, NSDictionary *data);
+void insert_row_with_dictionary(size_t row_ndx, tightdb::Table &table, NSDictionary *data);
+void update_row_with_dictionary(size_t row_ndx, tightdb::Table &table, NSDictionary *data);
 
-void verify_row_from_object(const tightdb::Descriptor& descr, NSObject* data);
-void insert_row_from_object(size_t row_ndx, tightdb::Table& table, NSObject *data);
-void set_row_from_object(size_t row_ndx, tightdb::Table& table, NSObject *data);
+void verify_row_with_object(const tightdb::Descriptor &descr, NSObject *data);
+void insert_row_with_object(size_t row_ndx, tightdb::Table &table, NSObject *data);
+void update_row_with_object(size_t row_ndx, tightdb::Table &table, NSObject *data);
 
 
 BOOL set_columns(tightdb::TableRef& parent, NSArray *schema);
