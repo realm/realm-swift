@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4B051142191D580F009797F7 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B051141191D580F009797F7 /* Realm.framework */; };
+		4B27019A1921360C00A0E467 /* RLMToolsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B2701991921360C00A0E467 /* RLMToolsWindowController.m */; };
 		4B2915EE191B3199006437DA /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B2915E8191B3199006437DA /* main.mm */; };
 		4B33DBFC19212C5100308FCC /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B33DBFB19212C5100308FCC /* Cocoa.framework */; };
 		4B33DC0619212C5100308FCC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B33DC0419212C5100308FCC /* InfoPlist.strings */; };
@@ -30,6 +31,8 @@
 
 /* Begin PBXFileReference section */
 		4B051141191D580F009797F7 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../Realm.framework; sourceTree = "<group>"; };
+		4B2701981921360C00A0E467 /* RLMToolsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMToolsWindowController.h; path = Controllers/RLMToolsWindowController.h; sourceTree = "<group>"; };
+		4B2701991921360C00A0E467 /* RLMToolsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMToolsWindowController.m; path = Controllers/RLMToolsWindowController.m; sourceTree = "<group>"; };
 		4B2915E8191B3199006437DA /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		4B2915E9191B3199006437DA /* RealmTools-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RealmTools-Prefix.pch"; sourceTree = "<group>"; };
 		4B2915EA191B3199006437DA /* RealmToolsCLI.1 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.man; path = RealmToolsCLI.1; sourceTree = "<group>"; };
@@ -71,6 +74,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4B270197192135E100A0E467 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				4B2701981921360C00A0E467 /* RLMToolsWindowController.h */,
+				4B2701991921360C00A0E467 /* RLMToolsWindowController.m */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
 		4B2915E0191B3199006437DA /* RealmToolsCLI */ = {
 			isa = PBXGroup;
 			children = (
@@ -96,6 +108,7 @@
 			children = (
 				4B33DC0B19212D4900308FCC /* RLMToolsPlugin.h */,
 				4B33DC0C19212D4900308FCC /* RLMToolsPlugin.m */,
+				4B270197192135E100A0E467 /* Controllers */,
 				4B33DC0219212C5100308FCC /* Supporting Files */,
 			);
 			path = RealmToolsPlugin;
@@ -224,6 +237,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B33DC0D19212D4900308FCC /* RLMToolsPlugin.m in Sources */,
+				4B27019A1921360C00A0E467 /* RLMToolsWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

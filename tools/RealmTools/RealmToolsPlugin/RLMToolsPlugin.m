@@ -7,10 +7,12 @@
 //
 
 #import "RLMToolsPlugin.h"
+#import "RLMToolsWindowController.h"
 
 @interface RLMToolsPlugin ()
 
 @property (strong, nonatomic) NSBundle *plugin;
+@property (strong, nonatomic) RLMToolsWindowController *windowController;
 
 @end
 
@@ -61,6 +63,9 @@ static const NSInteger RLMToolsPluginMenuItemTag = 12347177;
 - (void)realmToolsClicked:(id)sender
 {
     NSLog(@"    Realm Tools clicked");
+    if (!self.windowController) {
+        
+    }
 }
 
 @end
