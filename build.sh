@@ -733,9 +733,9 @@ EOF
         echo "Generating Dash docs..."
         (
             cd docs/docset
-            tar --exclude='.DS_Store' -cvzf realm.tgz realm.docset
+            tar --exclude='.DS_Store' -cvzf publish/realm.tgz realm.docset
         )
-        cat >docs/docset/realm.xml <<EOF
+        cat >docs/docset/publish/realm.xml <<EOF
 <entry>
     <version>$(sh build.sh get-version)</version>
     <url>
