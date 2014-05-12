@@ -24,7 +24,6 @@ NSString *const RLMTestRealmPathLock = @"test.realm.lock";
     // This method is run after all tests in a test method have run
     [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath error:nil];
     [super tearDown];
-
 }
 
 - (RLMRealm *)realmWithTestPath {
