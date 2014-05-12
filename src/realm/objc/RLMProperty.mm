@@ -94,31 +94,31 @@ const char * setterTypeStringForCode(char code) {
     switch (self.accessorCode) {
         case 'i':
             return imp_implementationWithBlock(^(RLMRow *row) {
-                return [row nativeTable].get_int(col, row.ndx);
+                return [row nativeTableRef]->get_int(col, row.ndx);
             });
         case 'l':
             return imp_implementationWithBlock(^(RLMRow *row) {
-                return [row nativeTable].get_int(col, row.ndx);
+                return [row nativeTableRef]->get_int(col, row.ndx);
             });
         case 'f':
             return imp_implementationWithBlock(^(RLMRow *row) {
-                return [row nativeTable].get_float(col, row.ndx);
+                return [row nativeTableRef]->get_float(col, row.ndx);
             });
         case 'd':
             return imp_implementationWithBlock(^(RLMRow *row) {
-                return [row nativeTable].get_double(col, row.ndx);
+                return [row nativeTableRef]->get_double(col, row.ndx);
             });
         case 'B':
             return imp_implementationWithBlock(^(RLMRow *row) {
-                return [row nativeTable].get_bool(col, row.ndx);
+                return [row nativeTableRef]->get_bool(col, row.ndx);
             });
         case 'c':
             return imp_implementationWithBlock(^(RLMRow *row) {
-                return (BOOL)[row nativeTable].get_bool(col, row.ndx);
+                return (BOOL)[row nativeTableRef]->get_bool(col, row.ndx);
             });
         case 's':
             return imp_implementationWithBlock(^(RLMRow *row) {
-                return to_objc_string([row nativeTable].get_string(col, row.ndx));
+                return to_objc_string([row nativeTableRef]->get_string(col, row.ndx));
             });
         case '@':
             return imp_implementationWithBlock(^(RLMRow *row) {
