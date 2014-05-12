@@ -696,7 +696,7 @@ EOF
                     --template docs/templates \
                     --exit-threshold 1 \
                     src/realm/objc/ || exit 1
-        mkdir docs/output
+        mkdir -p docs/output
         mv docs/html docs/output/$(sh build.sh get-version)
         echo "Done generating HTML docs under docs/output/"
 
@@ -708,7 +708,6 @@ EOF
                     -v `sh build.sh get-version` \
                     --no-create-html \
                     --create-docset \
-                    --no-install-docset \
                     --publish-docset \
                     --docset-feed-url "http://realm.io/docs/ios/$(sh build.sh get-version)/realm.atom" \
                     --docset-package-url "http://realm.io/docs/ios/$(sh build.sh get-version)/realm" \
