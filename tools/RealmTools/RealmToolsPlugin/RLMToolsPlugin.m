@@ -40,6 +40,19 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
     NSLog(@"    Application Did Finish Launching");
+    NSMenuItem* windowMenuItem = [[NSApp mainMenu] itemWithTitle:@"Window"];
+    if (windowMenuItem) {
+        [[windowMenuItem submenu] addItem:[NSMenuItem separatorItem]];
+        
+        NSMenuItem* realmToolsMenuItem = [[NSMenuItem alloc] initWithTitle:@"Realm Tools" action:@selector(realmToolsClicked:) keyEquivalent:@""];
+        [realmToolsMenuItem setTarget:self];
+        [[windowMenuItem submenu] addItem:realmToolsMenuItem];
+    }
+}
+
+- (void)realmToolsClicked:(id)sender
+{
+    
 }
 
 @end
