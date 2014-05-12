@@ -709,7 +709,6 @@ EOF
                     --publish-docset \
                     --docset-feed-url "http://realm.io/docs/ios/realm.atom" \
                     --docset-package-url "http://realm.io/docs/ios/realm" \
-                    --docset-package-url "http://realm.io/docs/ios/io.realm.Realm-$(sh build.sh get-version).xar" \
                     --docset-package-filename "realm" \
                     --docset-atom-filename "realm.atom" \
                     --docset-bundle-filename "realm.docset" \
