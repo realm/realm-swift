@@ -330,7 +330,7 @@ void verify_row_with_object(const Descriptor &descr, NSObject *data)
 
 bool insert_cell(size_t col_ndx, size_t row_ndx, Table& table, NSObject *obj)
 {
-    BOOL subtable_seen = false;
+    bool subtable_seen = false;
     DataType type = table.get_column_type(col_ndx);
     switch (type) {
         case type_Bool:
@@ -491,7 +491,6 @@ void insert_row_with_array(size_t row_ndx, tightdb::Table &table, NSArray *data)
             if ([obj isKindOfClass:[RLMTable class]]) {
                 table.insert_subtable(col_ndx, row_ndx, &[obj getNativeTable]);
                 continue;
-
             }
         }
     }
