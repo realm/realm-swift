@@ -31,6 +31,7 @@
 #import "RLMTable_noinst.h"
 #import "RLMRow.h"
 #import "RLMView_noinst.h"
+#import "RLMRow_noinst.h"
 #import "RLMQuery_noinst.h"
 #import "RLMPrivate.h"
 #import "util_noinst.hpp"
@@ -109,7 +110,7 @@ using namespace std;
     if (ndx >= self.rowCount)
         return nil;
 
-    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
+    return [[_proxyObjectClass alloc] initWithTableRef:[m_table nativeTableRef] ndx:[self rowIndexInOriginTableForRowAtIndex:ndx] readOnly:m_read_only];
 }
 
 -(RLMRow *)rowAtIndex:(NSUInteger)ndx
@@ -120,7 +121,7 @@ using namespace std;
     if (ndx >= self.rowCount)
         return nil;
 
-    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:ndx]];
+    return [[_proxyObjectClass alloc] initWithTableRef:[m_table nativeTableRef] ndx:[self rowIndexInOriginTableForRowAtIndex:ndx] readOnly:m_read_only];
 }
 
 -(RLMRow *)firstRow
@@ -128,7 +129,7 @@ using namespace std;
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:0]];
+    return [[_proxyObjectClass alloc] initWithTableRef:[m_table nativeTableRef] ndx:[self rowIndexInOriginTableForRowAtIndex:0] readOnly:m_read_only];
 }
 
 -(RLMRow *)lastRow
@@ -136,7 +137,7 @@ using namespace std;
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[_proxyObjectClass alloc] initWithTable:m_table ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1]];
+    return [[_proxyObjectClass alloc] initWithTableRef:[m_table nativeTableRef] ndx:[self rowIndexInOriginTableForRowAtIndex:self.rowCount-1] readOnly:m_read_only];
 }
 
 -(NSUInteger)rowCount
@@ -252,8 +253,8 @@ using namespace std;
 
 -(RLMRow *)getRow
 {
-    return m_tmp_row = [[_proxyObjectClass alloc] initWithTable: m_table
-                                                 ndx: m_view->get_source_ndx(0)];
+    return m_tmp_row = [[_proxyObjectClass alloc] initWithTableRef: [m_table nativeTableRef]
+                                                 ndx: m_view->get_source_ndx(0) readOnly:m_read_only];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState*)state objects:(id __unsafe_unretained*)stackbuf count:(NSUInteger)len

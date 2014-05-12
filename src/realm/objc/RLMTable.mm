@@ -25,6 +25,7 @@
 
 #import "RLMView_noinst.h"
 #import "RLMQuery_noinst.h"
+#import "RLMRow_noinst.h"
 #import "RLMDescriptor_noinst.h"
 #import "RLMProxy.h"
 #import "RLMObjectDescriptor.h"
@@ -89,7 +90,7 @@ using namespace std;
 
 -(RLMRow *)getRow
 {
-    return m_tmp_row = [[_proxyObjectClass alloc] initWithTable:self ndx:0];
+    return m_tmp_row = [[_proxyObjectClass alloc] initWithTableRef:m_table ndx:0 readOnly:m_read_only];
 }
 -(void)clearRow
 {
@@ -123,9 +124,14 @@ using namespace std;
     return 1;
 }
 
--(tightdb::Table&)getNativeTable
+-(tightdb::Table&)nativeTable
 {
     return *m_table;
+}
+
+-(tightdb::TableRef)nativeTableRef
+{
+    return m_table;
 }
 
 -(void)setNativeTable:(tightdb::Table*)table
@@ -237,7 +243,7 @@ using namespace std;
 -(RLMRow *)insertEmptyRowAtIndex:(NSUInteger)ndx
 {
     [self RLMInsertRow:ndx];
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:ndx];
+    return [[_proxyObjectClass alloc] initWithTableRef:m_table ndx:ndx readOnly:m_read_only];
 }
 
 -(BOOL)RLMInsertRow:(NSUInteger)ndx
@@ -294,7 +300,7 @@ using namespace std;
                                      userInfo:nil];
     }
     
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:rowIndex];
+    return [[_proxyObjectClass alloc] initWithTableRef:m_table ndx:rowIndex readOnly:m_read_only];
 }
 
 -(void)setObject:(id)newValue atIndexedSubscript:(NSUInteger)rowIndex
@@ -336,14 +342,16 @@ using namespace std;
 
 - (size_t)RLM_lookup:(NSString *)key
 {
-    return m_table->lookup([key UTF8String]);
+    size_t n = m_table->lookup([key UTF8String]);
+    NSUInteger m = was_not_found(n);
+    return m;
 }
 
 -(id)rowAtIndex:(NSUInteger)ndx
 {
     // initWithTable checks for illegal index.
 
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:ndx];
+    return [[_proxyObjectClass alloc] initWithTableRef:m_table ndx:ndx readOnly:m_read_only];
 }
 
 -(id)firstRow
@@ -351,7 +359,7 @@ using namespace std;
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:0];
+    return [[_proxyObjectClass alloc] initWithTableRef:m_table ndx:0 readOnly:m_read_only];
 }
 
 -(id)lastRow
@@ -359,13 +367,13 @@ using namespace std;
     if (self.rowCount == 0) {
         return nil;
     }
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:self.rowCount-1];
+    return [[_proxyObjectClass alloc] initWithTableRef:m_table ndx:self.rowCount-1 readOnly:m_read_only];
 }
 
 -(id)insertRowAtIndex:(NSUInteger)ndx
 {
     [self insertEmptyRowAtIndex:ndx];
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:ndx];
+    return [[_proxyObjectClass alloc] initWithTableRef:m_table ndx:ndx readOnly:m_read_only];
 }
 
 -(void)addRow:(NSObject*)data
@@ -387,7 +395,7 @@ using namespace std;
 // Moved to private header
 -(RLMRow *)addEmptyRow
 {
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:[self RLM_addEmptyRow]];
+    return [[_proxyObjectClass alloc] initWithTableRef:m_table ndx:[self RLM_addEmptyRow] readOnly:m_read_only];
 }
 
 
@@ -644,7 +652,7 @@ using namespace std;
     // the user might add columns (_checkType for typed and spec against spec for dynamic).
 
     REALM_EXCEPTION_HANDLER_SETTERS(
-        m_table->set_subtable(col_ndx, row_ndx, &[value getNativeTable]);,
+        m_table->set_subtable(col_ndx, row_ndx, &[value nativeTable]);,
         RLMTypeTable);
 }
 
@@ -656,7 +664,7 @@ using namespace std;
     REALM_EXCEPTION_HANDLER_SETTERS(
         if (subtable) {
             tightdb::LangBindHelper::set_mixed_subtable(*m_table, col_ndx, row_ndx,
-                                                        [subtable getNativeTable]);
+                                                        [subtable nativeTable]);
         }
         else {
             m_table->set_mixed(col_ndx, row_ndx, mixed);
@@ -887,7 +895,7 @@ using namespace std;
         return NO;
     }
     REALM_EXCEPTION_ERRHANDLER(
-        tightdb::LangBindHelper::insert_subtable(*m_table, col_ndx, row_ndx, [subtable getNativeTable]);,
+        tightdb::LangBindHelper::insert_subtable(*m_table, col_ndx, row_ndx, [subtable nativeTable]);,
         NO);
     return YES;
 }
@@ -923,7 +931,7 @@ using namespace std;
     REALM_EXCEPTION_ERRHANDLER(
         if (subtable) {
             tightdb::LangBindHelper::insert_mixed_subtable(*m_table, col_ndx, row_ndx,
-                                                           [subtable getNativeTable]);
+                                                           [subtable nativeTable]);
         }
         else {
             m_table->insert_mixed(col_ndx, row_ndx, mixed);
@@ -1100,7 +1108,7 @@ using namespace std;
     if (row_ndx == tightdb::not_found)
         return nil;
     
-    return [[_proxyObjectClass alloc] initWithTable:self ndx:row_ndx];
+    return [[_proxyObjectClass alloc] initWithTableRef:m_table ndx:row_ndx readOnly:m_read_only];
 }
 
 -(RLMView *)allWhere:(id)predicate, ...

@@ -94,8 +94,8 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(MainTable, MainObject)
         // test setter
         
         // test setter
-        cursor.Second = 10;
-        XCTAssertEqual(people[0].Second, (int)10, @"Second should be 10");
+        //cursor.Second = 10;
+        //XCTAssertEqual(people[0].Second, (int)10, @"Second should be 10");
 	}];
 }
 

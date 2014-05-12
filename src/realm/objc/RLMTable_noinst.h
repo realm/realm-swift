@@ -27,8 +27,9 @@
 
 @interface RLMTable (noinst)
 
--(tightdb::Table&)getNativeTable;
+-(tightdb::Table&)nativeTable;
 -(void)setNativeTable:(tightdb::Table*)table;
+-(tightdb::TableRef)nativeTableRef;
 
 -(void)setParent:(id)parent; // Workaround for ARC release problem.
 
