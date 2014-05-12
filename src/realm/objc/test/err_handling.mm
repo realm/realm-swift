@@ -91,7 +91,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(MixedWithoutSubtableTable, MixedWithoutSubtable);
 
     [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
         // Create new table in realm
-        RLMTable* people = [realm createTableWithName:@"employees" objectClass:[PeopleErrObject class]];
+        PeopleErrTable* people = [PeopleErrTable tableInRealm:realm named:@"employees"];
         
         // No longer supports errors, the tes may be redundant
         // Add some rows
@@ -140,7 +140,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(MixedWithoutSubtableTable, MixedWithoutSubtable);
     RLMRealm *fromDisk = [self realmWithTestPath];
     XCTAssertNotNil(fromDisk, @"realm from disk should be valid");
 
-    PeopleErrTable *diskTable = [fromDisk tableWithName:@"employees" asTableClass:[PeopleErrTable class]];
+    PeopleErrTable *diskTable = [PeopleErrTable tableInRealm:fromDisk named:@"employees"];
 
     // Fake readonly.
     [((RLMTable*)diskTable) setReadOnly:YES];

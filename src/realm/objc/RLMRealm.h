@@ -153,12 +153,9 @@ typedef void(^RLMNotificationBlock)(NSString *note, RLMRealm *realm);
  
  @return A Reference to the RLMTable that was created.
  */
--(RLMTable *)createTableWithName:(NSString *)name objectClass:(Class)objClass;
-
-
 -(RLMTable *)createTableWithName:(NSString*)name columns:(NSArray*)columns;
--(id)createTableWithName:(NSString *)name asTableClass:(Class)obj;
-
+-(id)createTableWithName:(NSString *)name objectClass:(Class)objClass tableClass:(Class)tableClass;
+-(RLMTable *)createTableWithName:(NSString *)name;
 
 /**---------------------------------------------------------------------------------------
  *  @name Accessing Tables in a Realm
@@ -192,11 +189,8 @@ typedef void(^RLMNotificationBlock)(NSString *note, RLMRealm *realm);
  @return A reference to the RLMTable by that name; or nil if no RLMTable by that name exists in the RLMRealm.
  
  */
--(RLMTable *)tableWithName:(NSString *)name objectClass:(Class)objClass;
-
 -(RLMTable *)tableWithName:(NSString *)name;
--(id)tableWithName:(NSString *)name asTableClass:(Class)obj;
--(RLMTable *)createTableWithName:(NSString *)name;
+- (id)tableWithName:(NSString *)name objectClass:(__unsafe_unretained Class)objClass tableClass:(__unsafe_unretained Class)tableClass;
 
 
 -(NSString *)nameOfTableWithIndex:(NSUInteger)tableIndex;
