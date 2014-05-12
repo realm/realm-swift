@@ -461,7 +461,14 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryAllTable2, TestQueryAllObj);
                 withResults:@[ints.firstObject, ints.lastObject]
                        name:@"OR"
                      column:@"int"];
+
+        // NOT
+        [self testPredicate:[NSPredicate predicateWithFormat:@"! (int > %@ && int < %@)", ints.firstObject, ints.lastObject]
+                    onTable:table withResults:@[ints.firstObject, ints.lastObject]
+                       name:@"NOT"
+                     column:@"int"];
     }];
+
 }
 
 - (void)testFloatPredicates {
@@ -542,6 +549,12 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryAllTable2, TestQueryAllObj);
                     onTable:table
                 withResults:@[floats.firstObject, floats.lastObject]
                        name:@"OR"
+                     column:@"float"];
+        
+        // NOT
+        [self testPredicate:[NSPredicate predicateWithFormat:@"! (float > %@ && float < %@)", floats.firstObject, floats.lastObject]
+                    onTable:table withResults:@[floats.firstObject, floats.lastObject]
+                       name:@"NOT"
                      column:@"float"];
     }];
 }
@@ -624,6 +637,12 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryAllTable2, TestQueryAllObj);
                     onTable:table
                 withResults:@[doubles.firstObject, doubles.lastObject]
                        name:@"OR"
+                     column:@"double"];
+        
+        // NOT
+        [self testPredicate:[NSPredicate predicateWithFormat:@"! (double > %@ && double < %@)", doubles.firstObject, doubles.lastObject]
+                    onTable:table withResults:@[doubles.firstObject, doubles.lastObject]
+                       name:@"NOT"
                      column:@"double"];
     }];
 }
@@ -717,6 +736,12 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryAllTable2, TestQueryAllObj);
                 withResults:@[dates.firstObject, dates.lastObject]
                        name:@"OR"
                      column:@"date"];
+        
+        // NOT
+        [self testPredicate:[NSPredicate predicateWithFormat:@"! (date > %@ && date < %@)", dates.firstObject, dates.lastObject]
+                    onTable:table withResults:@[dates.firstObject, dates.lastObject]
+                       name:@"NOT"
+                     column:@"date"];
     }];
 }
 
@@ -806,6 +831,13 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(TestQueryAllTable2, TestQueryAllObj);
                     onTable:table
                 withResults:@[@"abc", @"abcd"]
                        name:@"OR"
+                     column:@"string"];
+        
+        // NOT
+        [self testPredicate:@"! (string contains 'c' || string contains 'd')"
+                    onTable:table
+                withResults:@[@"a", @"ab"]
+                       name:@"NOT"
                      column:@"string"];
         
         // Complex
