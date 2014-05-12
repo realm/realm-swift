@@ -144,31 +144,31 @@ const char * setterTypeStringForCode(char code) {
     switch (self.accessorCode) {
         case 'i':
             return imp_implementationWithBlock(^(RLMRow *row, int val) {
-                [row nativeTable].set_int(col, row.ndx, val);
+                [row nativeTableRef]->set_int(col, row.ndx, val);
             });
         case 'l':
             return imp_implementationWithBlock(^(RLMRow *row, long val) {
-                [row nativeTable].set_int(col, row.ndx, val);
+                [row nativeTableRef]->set_int(col, row.ndx, val);
             });
         case 'f':
             return imp_implementationWithBlock(^(RLMRow *row, float val) {
-                [row nativeTable].set_float(col, row.ndx, val);
+                [row nativeTableRef]->set_float(col, row.ndx, val);
             });
         case 'd':
             return imp_implementationWithBlock(^(RLMRow *row, double val) {
-                [row nativeTable].set_double(col, row.ndx, val);
+                [row nativeTableRef]->set_double(col, row.ndx, val);
             });
         case 'B':
             return imp_implementationWithBlock(^(RLMRow *row, bool val) {
-                [row nativeTable].set_bool(col, row.ndx, val);
+                [row nativeTableRef]->set_bool(col, row.ndx, val);
             });
         case 'c':
             return imp_implementationWithBlock(^(RLMRow *row, BOOL val) {
-                [row nativeTable].set_bool(col, row.ndx, val);
+                [row nativeTableRef]->set_bool(col, row.ndx, val);
             });
         case 's':
             return imp_implementationWithBlock(^(RLMRow *row, NSString *val) {
-                [row setString:val inColumnWithIndex:col];
+                [row nativeTableRef]->set_string(col, row.ndx, ObjcStringAccessor(val));
             });
         case '@':
         case 't':

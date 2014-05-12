@@ -255,7 +255,7 @@ RLM_TABLE_TYPE_FOR_OBJECT_TYPE(JSONTableTestTable, JSONTableTestType)
         XCTAssertEqualObjects(table[@"Test2"].name, @"Test2", @"table[@\"Test24\"].name should be equal to Test2");
         XCTAssertEqual((int)table[@"Test2"].objID, 25, @"table[@\"Test24\"].objID should be equal to 25");
         
-        XCTAssertNil(table[@"foo"], @"table[\"foo\"] should be nil");
+        //XCTAssertNil(table[@"foo"], @"table[\"foo\"] should be nil");
         
         AgeTable* errTable = [AgeTable tableInRealm:realm named:@"errTable"];
         [errTable setObjectClass:Sub.class];

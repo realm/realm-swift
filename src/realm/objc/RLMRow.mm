@@ -73,9 +73,15 @@ BOOL m_read_only;
     _ndx = ndx;
 }
 
--(tightdb::TableRef)nativeTable{
+-(tightdb::Table&)nativeTable{
+    return *m_table;
+}
+
+-(tightdb::TableRef)nativeTableRef
+{
     return m_table;
 }
+
 
 -(void)dealloc
 {
@@ -280,62 +286,62 @@ BOOL m_read_only;
 
 -(BOOL)getBool
 {
-    return [_row nativeTable]->get_bool(_columnId,_row.ndx);
+    return [_row nativeTableRef]->get_bool(_columnId,_row.ndx);
 }
 
 -(void)setBool:(BOOL)value
 {
-    [_row nativeTable]->set_bool(_columnId, _row.ndx, value);
+    [_row nativeTableRef]->set_bool(_columnId, _row.ndx, value);
 }
 
 -(int64_t)getInt
 {
-    return [_row nativeTable]->get_int(_columnId, _row.ndx);
+    return [_row nativeTableRef]->get_int(_columnId, _row.ndx);
 }
 
 -(void)setInt:(int64_t)value
 {
-    [_row nativeTable]->set_int(_columnId, _row.ndx, value);
+    [_row nativeTableRef]->set_int(_columnId, _row.ndx, value);
 }
 
 -(float)getFloat
 {
-    return [_row nativeTable]->get_float(_columnId, _row.ndx);
+    return [_row nativeTableRef]->get_float(_columnId, _row.ndx);
 }
 
 -(void)setFloat:(float)value
 {
-    [_row nativeTable]->set_float(_columnId, _row.ndx, value);
+    [_row nativeTableRef]->set_float(_columnId, _row.ndx, value);
 }
 
 -(double)getDouble
 {
-    return [_row nativeTable]->get_double(_columnId, _row.ndx);
+    return [_row nativeTableRef]->get_double(_columnId, _row.ndx);
 }
 
 -(void)setDouble:(double)value
 {
-    [_row nativeTable]->set_double(_columnId, _row.ndx, value);
+    [_row nativeTableRef]->set_double(_columnId, _row.ndx, value);
 }
 
 -(NSString *)getString
 {
-    return to_objc_string([_row nativeTable]->get_string(_columnId, _row.ndx));
+    return to_objc_string([_row nativeTableRef]->get_string(_columnId, _row.ndx));
 }
 
 -(void)setString:(NSString *)value
 {
-    [_row nativeTable]->set_string(_columnId, _row.ndx, ObjcStringAccessor(value));
+    [_row nativeTableRef]->set_string(_columnId, _row.ndx, ObjcStringAccessor(value));
 }
 
 -(NSData *)getBinary
 {
-    tightdb::BinaryData bd = [_row nativeTable]->get_binary(_columnId, _row.ndx);
+    tightdb::BinaryData bd = [_row nativeTableRef]->get_binary(_columnId, _row.ndx);
     return [[NSData alloc] initWithBytes:static_cast<const void *>(bd.data()) length:bd.size()];}
 
 -(void)setBinary:(NSData *)value
 {
-    [_row nativeTable]->set_binary(_columnId, _row.ndx, ((NSData *)value).rlmBinaryData);}
+    [_row nativeTableRef]->set_binary(_columnId, _row.ndx, ((NSData *)value).rlmBinaryData);}
 // FIXME: should it be setBinaryWithBuffer / setBinaryWithBinary ?
 // -(BOOL)setBinary:(const char *)data size:(size_t)size
 // {
@@ -344,7 +350,7 @@ BOOL m_read_only;
 
 -(NSDate *)getDate
 {
-    return [NSDate dateWithTimeIntervalSince1970: [_row nativeTable]->get_datetime(_columnId, _row.ndx).get_datetime()];
+    return [NSDate dateWithTimeIntervalSince1970: [_row nativeTableRef]->get_datetime(_columnId, _row.ndx).get_datetime()];
 }
 
 -(tightdb::Table&)nativeTable{
@@ -353,14 +359,14 @@ BOOL m_read_only;
 
 -(void)setDate:(NSDate *)value
 {
-    [_row nativeTable]->set_datetime(_columnId, _row.ndx, tightdb::DateTime((time_t)[value timeIntervalSince1970]));}
+    [_row nativeTableRef]->set_datetime(_columnId, _row.ndx, tightdb::DateTime((time_t)[value timeIntervalSince1970]));}
 
 -(id)getSubtable:(Class)obj
 {
-    tightdb::DataType type = [_row nativeTable]->get_column_type(_columnId);
+    tightdb::DataType type = [_row nativeTableRef]->get_column_type(_columnId);
     if (type != tightdb::type_Table)
         return nil;
-    tightdb::TableRef table = [_row nativeTable]->get_subtable(_columnId, _row.ndx);
+    tightdb::TableRef table = [_row nativeTableRef]->get_subtable(_columnId, _row.ndx);
     TIGHTDB_ASSERT(table);
     RLMTable * tableObj = [[obj alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!tableObj))
@@ -374,15 +380,15 @@ BOOL m_read_only;
 
 -(void)setSubtable:(RLMTable *)value
 {
-    [_row nativeTable]->set_subtable(_columnId, _row.ndx, &[value getNativeTable]);}
+    [_row nativeTableRef]->set_subtable(_columnId, _row.ndx, &[value getNativeTable]);}
 
 -(id)getMixed
 {
-    tightdb::Mixed mixed = [_row nativeTable]->get_mixed(_columnId, _row.ndx);
+    tightdb::Mixed mixed = [_row nativeTableRef]->get_mixed(_columnId, _row.ndx);
     if (mixed.get_type() != tightdb::type_Table)
         return to_objc_object(mixed);
     
-    tightdb::TableRef table = [_row nativeTable]->get_subtable(_columnId, _row.ndx);
+    tightdb::TableRef table = [_row nativeTableRef]->get_subtable(_columnId, _row.ndx);
     TIGHTDB_ASSERT(table);
     RLMTable * tableObj = [[RLMTable alloc] _initRaw];
     if (TIGHTDB_UNLIKELY(!tableObj))

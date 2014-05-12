@@ -895,7 +895,7 @@ using namespace std;
         XCTAssertEqualObjects(table[@"Test2"][@"id"], @25, @"table[@\"Test24\"][@\"id\"] should be equal to @25");
         
         // Test nil row
-        XCTAssertNil(table[@"foo"], @"table[\"foo\"] should be nil");
+      //  XCTAssertNil(table[@"foo"], @"table[\"foo\"] should be nil");
         
         
         RLMTable* errTable = [realm createTableWithName:@"errTable"];
