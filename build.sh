@@ -399,10 +399,6 @@ EOF
         ;;
 
     "ci-test")
-        if [ "$(id -u)" != "0" ]; then
-           echo "This target must be run as root or with sudo" 1>&2
-           exit 1
-        fi
         mkdir -p test-reports || exit 1
         (
             cd ../tightdb
@@ -414,9 +410,11 @@ EOF
         ) || exit 1
         (
             export REALM_CONFIG=../tightdb/install/bin/tightdb-config
+            sh build.sh clean
             sh build.sh config
             sh build.sh build-iphone
             sh build.sh ios-framework
+            sh build.sh build
             sh build.sh test-debug
             ) || exit 1
         (
@@ -505,6 +503,26 @@ EOF
 	echo "Framework for iOS can be found in realm-ios-$realm_version.zip"
 	exit 0
 	;;
+
+    "package-examples")
+        if [ ! -e "Realm.framework" ]; then
+            echo "No Realm.framework found. You run the ios-framework target to generate it."
+            exit 0
+        fi
+        (
+            cd examples
+            for folder in $(ls -l | grep "^d" | awk '{ print $9 }'); do
+                echo "Packaging $folder..."
+                cp -Rf ../Realm.framework "$folder"
+                sed -i '.bak' -e "s/\.\.\/\.\.\/Realm\.framework/Realm\.framework/" $folder/*.xcodeproj/project.pbxproj
+                echo "The $folder Xcode project file was modified like this:"
+                diff "$folder"/*.xcodeproj/project.pbxproj.bak "$folder"/*.xcodeproj/project.pbxproj
+                zip -rq "$folder".zip "$folder" -x \*.bak
+                mv -f "$folder"/*.xcodeproj/project.pbxproj.bak "$folder"/*.xcodeproj/project.pbxproj
+            done
+        ) || exit 1
+        echo "The zipped examples are now available in the examples folder"
+    ;;
 
     "test")
         auto_configure || exit 1
@@ -662,6 +680,10 @@ EOF
                     --create-html \
                     --no-create-docset \
                     --no-repeat-first-par \
+                    --no-warn-missing-arg \
+                    --no-warn-invalid-crossref \
+                    --no-warn-undocumented-object \
+                    --no-warn-undocumented-member \
                     --ignore src/realm/objc/RLMColumnProxy.h \
                     --ignore src/realm/objc/RLMProxy.h \
                     --ignore src/realm/objc/RLMQuery.h \
@@ -671,7 +693,7 @@ EOF
                     --ignore "src/realm/objc/test/*" \
                     --index-desc doc/index.md \
                     --template doc/templates \
-                    --exit-threshold 2 \
+                    --exit-threshold 1 \
                     src/realm/objc/ || exit 1
 
         echo "Generating docset docs..."
@@ -687,6 +709,10 @@ EOF
                     --docset-feed-url "http://realm.io/docs/appledoc" \
                     --company-id "io.realm" \
                     --no-repeat-first-par \
+                    --no-warn-missing-arg \
+                    --no-warn-invalid-crossref \
+                    --no-warn-undocumented-object \
+                    --no-warn-undocumented-member \
                     --ignore src/realm/objc/RLMColumnProxy.h \
                     --ignore src/realm/objc/RLMProxy.h \
                     --ignore src/realm/objc/RLMQuery.h \
@@ -696,7 +722,7 @@ EOF
                     --ignore "src/realm/objc/test/*" \
                     --index-desc doc/index.md \
                     --template doc/templates \
-                    --exit-threshold 2 \
+                    --exit-threshold 1 \
                     src/realm/objc/ || exit 1
         echo "Done generating docs under docs/appledocs"
         exit 0
@@ -745,7 +771,7 @@ Available modes are:
   config clean build build-iphone test test-debug test-gdb test-cover
   show-install install uninstall test-installed install-prod install-devel
   uninstall-prod uninstall-devel dist-copy ios-framework ci-test
-  get-version set-version docs
+  package-examples get-version set-version docs
 EOF
         exit 1
         ;;

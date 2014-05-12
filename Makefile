@@ -1,5 +1,5 @@
 SUBDIRS = src
-PASSIVE_SUBDIRS = examples
+PASSIVE_SUBDIRS = 
 
 PASSIVE_SUBDIRS += doc/ref/examples
 doc_ref_examples_DEPS = src
