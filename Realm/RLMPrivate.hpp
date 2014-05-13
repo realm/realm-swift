@@ -46,6 +46,9 @@ typedef NS_ENUM(NSUInteger, RLMTransactionMode) {
 @interface RLMRealm ()
 @property (nonatomic, readonly) RLMTransactionMode transactionMode;
 @property (nonatomic, readonly) tightdb::Group *group;
+
+// call whenever creating an accessor to keep up to date accross transactions
+- (void)registerAcessor:(id<RLMAccessor>)accessor;
 @end
 
 @interface RLMObject () <RLMAccessor>

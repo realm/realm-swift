@@ -79,7 +79,7 @@ inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm, Class objectCla
     return realm.group->get_table(tightdb::StringData(name.UTF8String, name.length));
 }
 
-void RLMEnsureRealmTables(RLMRealm *realm) {
+void RLMEnsureRealmTablesExist(RLMRealm *realm) {
     [realm beginWriteTransaction];
     for (RLMObjectDescriptor *desc in s_objectClasses) {
         tightdb::TableRef table = RLMTableForObjectClass(realm, desc.objectClass);
@@ -167,8 +167,9 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
         [object setValue:dict[key] forKeyPath:key];
     }
     
-    // set the realm
+    // set the realm and register
     object.realm = realm;
+    [realm registerAcessor:object];
 }
 
 
@@ -193,6 +194,7 @@ RLMArray *RLMGetObjects(RLMRealm *realm, Class objectClass, NSPredicate *predica
     // FIXME - we need to hold onto query or predicate for searching off of RLMArrays - this crashes now
     //array.backingQuery = query;
     array.realm = realm;
+    [realm registerAcessor:array];
     return array;
 }
 

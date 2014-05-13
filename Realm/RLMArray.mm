@@ -47,6 +47,7 @@ inline RLMObject *RLMCreateAccessor(RLMArray *self, NSUInteger index) {
     accessor.backingTable = self->_backingTable;
     accessor.backingTableIndex = self->_backingTableIndex;
     accessor.objectIndex = self->_backingView.get_source_ndx(index);
+    [self->_realm registerAcessor:accessor];
     return accessor;
 }
 
@@ -141,6 +142,7 @@ inline RLMObject *RLMCreateAccessor(RLMArray *self, NSUInteger index) {
     array.backingTableIndex = _backingTableIndex;
     array.backingQuery = _backingQuery;
     array.backingView = _backingView;
+    [_realm registerAcessor:array];
     return array;
 }
 

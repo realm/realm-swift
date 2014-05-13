@@ -22,16 +22,30 @@
 #import "RLMObject.h"
 #import "RLMArray.h"
 
+//
+// Object Store Initialization
+//
+
 // initialize global object store
 // call once before using other methods
 void RLMInitializeObjectStore();
 
 // verifies and/or creates tables needed in a realm to store all object types
 // throws if current state of realm is not compatible with current objects
-void RLMEnsureRealmTables(RLMRealm *realm);
+void RLMEnsureRealmTablesExist(RLMRealm *realm);
+
+
+//
+// Accessors
+//
 
 // get accessor class for an object class - generates class if not cached
 Class RLMAccessorClassForObjectClass(Class objectClass);
+
+
+//
+// Adding, Removing, Getting Objects
+//
 
 // add an object to the given realm
 void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm);

@@ -257,7 +257,7 @@ static NSArray *s_objectDescriptors = nil;
     }
     
     // initialize object store for this realm
-    RLMEnsureRealmTables(realm);
+    RLMEnsureRealmTablesExist(realm);
     
     // cache main thread realm at this path
     cacheRealm(realm, path);
@@ -415,6 +415,10 @@ static NSArray *s_objectDescriptors = nil;
     catch (exception &ex) {
         throw_objc_exception(ex);
     }
+}
+
+- (void)registerAcessor:(id<RLMAccessor>)accessor {
+    [_objects setObject:accessor forKey:accessor];
 }
 
 - (void)updateAllObjects {
