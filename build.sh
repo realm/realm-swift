@@ -418,12 +418,7 @@ EOF
             sh build.sh test-debug
             ) || exit 1
         (
-            cd examples/RealmTableViewExample
-            xctool -project RealmTableViewExample.xcodeproj -scheme RealmTableViewExample clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
-        ) || exit 1
-        (
-            cd examples/RealmPerformanceExample
-            xctool -project RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+            sh build.sh test-examples
         ) || exit 1
         exit 0;
         ;;
@@ -590,8 +585,16 @@ EOF
         ;;
 
     "test-examples")
-        auto_configure || exit 1
-        $MAKE test -C "examples" || exit 1
+        if [ ! -e "Realm.framework" ]; then
+            echo "No Realm.framework found. You run the ios-framework target to generate it."
+            exit 0
+        fi
+        (
+            cd examples
+            for example_name in $(ls -l | grep "^d" | awk '{ print $9 }'); do
+                xctool -project "$example_name"/"$example_name".xcodeproj -scheme "$example_name" clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+            done
+        ) || exit 1
         ;;
 
     "install-report")
