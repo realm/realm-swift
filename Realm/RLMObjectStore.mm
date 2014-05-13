@@ -21,6 +21,7 @@
 #import "RLMObjectDescriptor.h"
 #import "RLMPrivate.hpp"
 #import "RLMQueryUtil.h"
+#import "RLMUtil.h"
 
 #import <objc/runtime.h>
 
@@ -29,15 +30,6 @@
 static NSMutableDictionary *s_accessorClassNameCache;
 static NSArray *s_objectClasses;
 static NSMapTable *s_tableNamesForClass;
-
-// determine if class is a or a descendent of class2
-inline BOOL RLMIsKindOfclass(Class class1, Class class2) {
-    while (class1) {
-        if (class1 == class2) return YES;
-        class1 = class_getSuperclass(class1);
-    }
-    return NO;
-}
 
 inline BOOL RLMIsSubclass(Class class1, Class class2) {
     class1 = class_getSuperclass(class1);

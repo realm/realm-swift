@@ -20,9 +20,7 @@
 #import "RLMProperty.h"
 #import "RLMObjectDescriptor.h"
 #import "RLMPrivate.hpp"
-
-// in RLMAccessor.m
-extern BOOL RLMIsKindOfclass(Class class1, Class class2);
+#import "RLMUtil.h"
 
 // macros/helpers to generate objc type strings for registering methods
 #define GETTER_TYPES(C) C ":@"

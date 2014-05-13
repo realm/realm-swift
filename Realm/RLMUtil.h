@@ -19,6 +19,16 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMType.h"
+#import <objc/runtime.h>
 
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectOfType(id obj, RLMType type);
+
+// C version of isKindOfClass
+inline BOOL RLMIsKindOfclass(Class class1, Class class2) {
+    while (class1) {
+        if (class1 == class2) return YES;
+        class1 = class_getSuperclass(class1);
+    }
+    return NO;
+}
