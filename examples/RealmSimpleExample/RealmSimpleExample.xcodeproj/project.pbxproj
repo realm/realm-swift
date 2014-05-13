@@ -22,8 +22,6 @@
 		4D54FC6C18B77D56002AD81E /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC6B18B77D56002AD81E /* XCTest.framework */; };
 		4D54FC6D18B77D56002AD81E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC4918B77D56002AD81E /* Foundation.framework */; };
 		4D54FC6E18B77D56002AD81E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D54FC4D18B77D56002AD81E /* UIKit.framework */; };
-		4D54FC7618B77D56002AD81E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D54FC7418B77D56002AD81E /* InfoPlist.strings */; };
-		4D54FC7818B77D56002AD81E /* RealmSimpleExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D54FC7718B77D56002AD81E /* RealmSimpleExampleTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,9 +54,6 @@
 		4D54FC6418B77D56002AD81E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		4D54FC6A18B77D56002AD81E /* RealmSimpleExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RealmSimpleExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D54FC6B18B77D56002AD81E /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		4D54FC7318B77D56002AD81E /* RealmSimpleExampleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RealmSimpleExampleTests-Info.plist"; sourceTree = "<group>"; };
-		4D54FC7518B77D56002AD81E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		4D54FC7718B77D56002AD81E /* RealmSimpleExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RealmSimpleExampleTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,7 +86,6 @@
 			isa = PBXGroup;
 			children = (
 				4D54FC4F18B77D56002AD81E /* RealmSimpleExample */,
-				4D54FC7118B77D56002AD81E /* RealmSimpleExampleTests */,
 				4D54FC4818B77D56002AD81E /* Frameworks */,
 				4D54FC4718B77D56002AD81E /* Products */,
 			);
@@ -131,7 +125,6 @@
 				4D54FC6418B77D56002AD81E /* Images.xcassets */,
 				4D54FC5018B77D56002AD81E /* Supporting Files */,
 			);
-			name = RealmSimpleExample;
 			path = RealmSimpleExample;
 			sourceTree = "<group>";
 		};
@@ -142,24 +135,6 @@
 				4D54FC5218B77D56002AD81E /* InfoPlist.strings */,
 				4D54FC5518B77D56002AD81E /* main.m */,
 				4D54FC5718B77D56002AD81E /* RealmSimpleExample-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		4D54FC7118B77D56002AD81E /* RealmSimpleExampleTests */ = {
-			isa = PBXGroup;
-			children = (
-				4D54FC7718B77D56002AD81E /* RealmSimpleExampleTests.m */,
-				4D54FC7218B77D56002AD81E /* Supporting Files */,
-			);
-			path = RealmSimpleExampleTests;
-			sourceTree = "<group>";
-		};
-		4D54FC7218B77D56002AD81E /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				4D54FC7318B77D56002AD81E /* RealmSimpleExampleTests-Info.plist */,
-				4D54FC7418B77D56002AD81E /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -252,7 +227,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D54FC7618B77D56002AD81E /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -273,7 +247,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4D54FC7818B77D56002AD81E /* RealmSimpleExampleTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,14 +283,6 @@
 				4D54FC5F18B77D56002AD81E /* Base */,
 			);
 			name = Main_iPad.storyboard;
-			sourceTree = "<group>";
-		};
-		4D54FC7418B77D56002AD81E /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4D54FC7518B77D56002AD81E /* en */,
-			);
-			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
