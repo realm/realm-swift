@@ -126,10 +126,8 @@ const char * setterTypeStringForCode(char code) {
             });
         case 'k':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-                // FIXME
-                // NSUInteger index = obj.backingTable->get_link(col, obj.objectIndex);
-                // return RLMCreateAccessor(linkClass, obj, index);
-                return nil;
+                NSUInteger index = obj.backingTable->get_link(col, obj.objectIndex);
+                return RLMCreateAccessor(linkClass, obj, index);
             });
         case '@':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
@@ -189,8 +187,7 @@ const char * setterTypeStringForCode(char code) {
                 if (link && link.realm != obj.realm) {
                     [obj.realm addObject:link];
                 }
-                // FIXME
-                // obj.backingTable->set_link(col, obj.objectIndex);
+                obj.backingTable->set_link(col, obj.objectIndex, link.objectIndex);
             });
         case '@':
         case 't':

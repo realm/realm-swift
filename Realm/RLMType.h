@@ -33,7 +33,7 @@ typedef NS_ENUM(int32_t, RLMType) {
     RLMTypeDate =  7,
     RLMTypeTable =  5,
     RLMTypeMixed =  6,
-    RLMTypeLink =  11,
+    RLMTypeLink =  12,
 };
 
 

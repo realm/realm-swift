@@ -83,9 +83,8 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
             for (RLMProperty *prop in desc.properties) {
                 tightdb::StringData name(prop.name.UTF8String, prop.name.length);
                 if (prop.type == RLMTypeLink) {
-                    // FIXME
-                    //tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.linkClass);
-                    //table->add_column_link(name, linkTable->get_index_in_parent());
+                    tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.linkClass);
+                    table->add_column_link(name, linkTable->get_index_in_parent());
                 }
                 else {
                     table->add_column((tightdb::DataType)prop.type, name);
@@ -165,12 +164,12 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     
     // FIXME - see last fixme
     // get all properties on the table
+    object.realm = realm;
     for (NSString *key in dict) {
         [object setValue:dict[key] forKeyPath:key];
     }
     
     // set the realm and register
-    object.realm = realm;
     [realm registerAcessor:object];
 }
 
