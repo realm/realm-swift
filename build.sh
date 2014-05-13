@@ -418,12 +418,7 @@ EOF
             sh build.sh test-debug
             ) || exit 1
         (
-            cd examples/RealmTableViewExample
-            xctool -project RealmTableViewExample.xcodeproj -scheme RealmTableViewExample clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
-        ) || exit 1
-        (
-            cd examples/RealmPerformanceExample
-            xctool -project RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+            sh build.sh test-examples
         ) || exit 1
         exit 0;
         ;;
@@ -590,8 +585,14 @@ EOF
         ;;
 
     "test-examples")
-        auto_configure || exit 1
-        $MAKE test -C "examples" || exit 1
+        (
+            cd examples/RealmTableViewExample
+            xctool -project RealmTableViewExample.xcodeproj -scheme RealmTableViewExample clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+        ) || exit 1
+        (
+            cd examples/RealmPerformanceExample
+            xctool -project RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+        ) || exit 1
         ;;
 
     "install-report")
