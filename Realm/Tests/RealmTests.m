@@ -43,8 +43,8 @@
     XCTAssertEqual(objects.count, 3, @"Expecting 3 objects");
     
     [realm beginWriteTransaction];
+    [realm deleteObject:objects[2] cascade:NO];
     [realm deleteObject:objects[0] cascade:NO];
-    [realm deleteObject:objects[1] cascade:NO];
     XCTAssertEqual([realm objects:RLMTestObject.class where:nil].count, 1, @"Expecting 1 object");
     [realm commitWriteTransaction];
     
