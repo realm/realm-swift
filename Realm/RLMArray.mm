@@ -21,6 +21,7 @@
 #import "RLMArray.h"
 #import "RLMPrivate.hpp"
 #import "RLMObjectStore.h"
+#import "RLMQueryUtil.h"
 
 @implementation RLMArray
 
@@ -67,6 +68,9 @@ inline RLMObject *RLMCreateAccessor(RLMArray *self, NSUInteger index) {
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
+    if (index >= self.count) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"Index is out of bounds." userInfo:@{@"index": @(index)}];
+    }
     return RLMCreateAccessor(self, index);
 }
 
@@ -130,9 +134,44 @@ inline RLMObject *RLMCreateAccessor(RLMArray *self, NSUInteger index) {
                                    reason:@"Not yet implemented" userInfo:nil];
 }
 
+- (RLMArray *)copy {
+    RLMArray *array = [[RLMArray alloc] initWithObjectClass:_objectClass];
+    array.realm = _realm;
+    array.backingTable = _backingTable;
+    array.backingTableIndex = _backingTableIndex;
+    array.backingQuery = _backingQuery;
+    array.backingView = _backingView;
+    return array;
+}
+
 - (RLMArray *)objectsWhere:(id)predicate, ... {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+    // validate predicate
+    NSPredicate *outPred;
+    RLM_PREDICATE(predicate, outPred);
+    
+    // copy array and apply new predicate
+    RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:_objectClass];
+    RLMArray *array = [self copy];
+    array.backingQuery = RLMUpdateQueryWithPredicate(array.backingQuery, predicate, desc);
+    array.backingView = array.backingQuery.find_all();
+    return array;
+}
+
+- (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ... {
+    // validate predicate
+    NSPredicate *outPred;
+    RLM_PREDICATE(predicate, outPred);
+    
+    // copy array and apply new predicate
+    RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:_objectClass];
+    RLMArray *array = [self copy];
+    array.backingQuery = RLMUpdateQueryWithPredicate(array.backingQuery, predicate, desc);
+    tightdb::TableView view = array.backingQuery.find_all();
+    
+    // apply order
+    RLMUpdateViewWithOrder(view, order, desc);
+    array.backingView = view;
+    return array;
 }
 
 -(id)minOfProperty:(NSString *)property {

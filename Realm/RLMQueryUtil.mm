@@ -443,3 +443,36 @@ tightdb::Query RLMUpdateQueryWithPredicate(tightdb::Query query, id predicate, R
     return query;
 }
 
+void RLMUpdateViewWithOrder(tightdb::TableView &view, id order, RLMObjectDescriptor *desc) {
+    if (order) {
+        NSString *propName;
+        BOOL ascending = YES;
+        
+        // if not NSSortDescriptor or string then throw
+        if ([order isKindOfClass:NSSortDescriptor.class]) {
+            propName = [(NSSortDescriptor *)order key];
+            ascending = [(NSSortDescriptor *)order ascending];
+        }
+        else if ([order isKindOfClass:NSString.class]) {
+            propName = order;
+        }
+        else {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Invalid object for order - must use property name or NSSortDescriptor"
+                                         userInfo:nil];
+        }
+        
+        // validate
+        RLMProperty *prop = desc[propName];
+        if (!prop) {
+            @throw RLMPredicateException(@"Invalid sort column",
+                                         [NSString stringWithFormat:@"Column named '%@' not found.", propName]);
+        }
+        if (prop.type != RLMTypeInt && prop.type != RLMTypeBool && prop.type != RLMTypeDate) {
+            @throw RLMPredicateException(@"Invalid sort column type",
+                                         @"Sort only supported on Integer, Date and Boolean columns.");
+        }
+        view.sort(prop.column, ascending);
+    }
+}
+

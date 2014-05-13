@@ -182,42 +182,16 @@ RLMArray *RLMGetObjects(RLMRealm *realm, Class objectClass, NSPredicate *predica
     tightdb::TableView view = query.find_all();
     
     // apply sort order
-    if (order) {
-        NSString *propName;
-        BOOL ascending = YES;
-    
-        // if not NSSortDescriptor or string then throw
-        if ([order isKindOfClass:NSSortDescriptor.class]) {
-            propName = [(NSSortDescriptor *)order key];
-            ascending = [(NSSortDescriptor *)order ascending];
-        }
-        else if ([order isKindOfClass:NSString.class]) {
-            propName = order;
-        }
-        else {
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Invalid object for order - must use property name or NSSortDescriptor"
-                                         userInfo:nil];
-        }
-
-        // validate
-        RLMProperty *prop = desc[propName];
-        if (!prop) {
-            @throw RLMPredicateException(@"Invalid sort column",
-                                         [NSString stringWithFormat:@"Column named '%@' not found.", propName]);
-        }
-        if (prop.type != RLMTypeInt && prop.type != RLMTypeBool && prop.type != RLMTypeDate) {
-            @throw RLMPredicateException(@"Invalid sort column type",
-                                         @"Sort only supported on Integer, Date and Boolean columns.");
-        }
-        view.sort(prop.column, ascending);
-    }
+    RLMUpdateViewWithOrder(view, order, desc);
     
     // create array and populate
     RLMArray *array = [[RLMArray alloc] initWithObjectClass:objectClass];
     array.backingTable = table.get();
     array.backingTableIndex = array.backingTable->get_index_in_parent();
     array.backingView = view;
+    
+    // FIXME - we need to hold onto query or predicate for searching off of RLMArrays - this crashes now
+    //array.backingQuery = query;
     array.realm = realm;
     return array;
 }
