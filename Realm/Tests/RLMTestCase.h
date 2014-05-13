@@ -9,7 +9,9 @@
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
 
-extern NSString *const RLMTestRealmPath;
+NSString *RLMTestRealmPath();
+NSString *RLMDefaultRealmPath();
+NSString *RLMRealmPathForFile();
 
 @class RLMRealm;
 

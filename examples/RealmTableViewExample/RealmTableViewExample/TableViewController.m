@@ -22,7 +22,7 @@
 #import <Realm/Realm.h>
 
 // Realm model object
-@interface DemoObject : RLMRow
+@interface DemoObject : RLMObject
 @property (nonatomic, copy)   NSString *title;
 @property (nonatomic, strong) NSDate   *date;
 @end
@@ -31,15 +31,13 @@
 // None needed
 @end
 
-RLM_TABLE_TYPE_FOR_OBJECT_TYPE(DemoTable, DemoObject);
-
 static NSString * const kCellID    = @"cell";
 static NSString * const kTableName = @"table";
 
 @interface TableViewController ()
 
 @property (nonatomic, strong) RLMRealm *realm;
-@property (nonatomic, strong) RLMTable *table;
+@property (nonatomic, strong) RLMArray *array;
 
 @end
 
@@ -52,6 +50,10 @@ static NSString * const kTableName = @"table";
     
     [self setupUI];
     [self setupRealm];
+    
+    // Load initial data
+    self.array = [DemoObject allObjects];
+    [self.tableView reloadData];
 }
 
 #pragma mark - UI
@@ -73,27 +75,18 @@ static NSString * const kTableName = @"table";
     // Get the realm
     self.realm = [RLMRealm defaultRealm];
     
-    // Create table if it doesn't exist
-    if (self.realm.isEmpty) {
-        [self.realm beginWriteTransaction];
-        [DemoTable tableInRealm:self.realm named:kTableName];
-        [self.realm commitWriteTransaction];
-    }
-    
-    // Get the table and hold on to it
-    self.table = [DemoTable tableInRealm:self.realm named:kTableName];
-    
     // Register for notifications
-    __weak UITableView *weakTableView = self.tableView;
-    [self.realm addNotification:^(NSString *note, RLMRealm *realm) {
-        [weakTableView reloadData];
+    __weak TableViewController *weakSelf = self;
+    [self.realm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
+        weakSelf.array = [DemoObject allObjects];
+        [weakSelf.tableView reloadData];
     }];
 }
 
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.table.rowCount;
+    return self.array.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -104,7 +97,7 @@ static NSString * const kTableName = @"table";
                                       reuseIdentifier:kCellID];
     }
     
-    DemoObject *object = self.table[indexPath.row];
+    DemoObject *object = self.array[indexPath.row];
     cell.textLabel.text = object.title;
     cell.detailTextLabel.text = object.date.description;
     
@@ -114,7 +107,7 @@ static NSString * const kTableName = @"table";
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         [self.realm beginWriteTransaction];
-        [self.table removeRowAtIndex:indexPath.row];
+        [self.realm deleteObject:self.array[indexPath.row] cascade:NO];
         [self.realm commitWriteTransaction];
     }
 }
@@ -127,11 +120,10 @@ static NSString * const kTableName = @"table";
     dispatch_async(queue, ^{
         // Get new realm and table since we are in a new thread
         RLMRealm *realm = [RLMRealm defaultRealm];
-        RLMTable *table = [realm tableWithName:kTableName objectClass:[DemoObject class]];
         [realm beginWriteTransaction];
         for (NSInteger index = 0; index < 5; index++) {
             // Add row via dictionary. Order is ignored.
-            [table addRow:@{@"title": [self randomString], @"date": [self randomDate]}];
+            [DemoObject createInRealm:realm withObject:@{@"title": [self randomString], @"date": [self randomDate]}];
         }
         [realm commitWriteTransaction];
     });
@@ -139,13 +131,15 @@ static NSString * const kTableName = @"table";
 
 - (void)add {
     [self.realm beginWriteTransaction];
-    [self.table addRow:@[[self randomString], [self randomDate]]];
+    [DemoObject createInRealm:self.realm withObject:@[[self randomString], [self randomDate]]];
     [self.realm commitWriteTransaction];
 }
 
 - (void)deleteAll {
     [self.realm beginWriteTransaction];
-    [self.table removeAllRows];
+    for (DemoObject *obj in self.array) {
+        [self.realm deleteObject:obj cascade:NO];
+    }
     [self.realm commitWriteTransaction];
 }
 

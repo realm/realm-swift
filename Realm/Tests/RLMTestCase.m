@@ -8,26 +8,48 @@
 
 #import "RLMTestCase.h"
 
-NSString *const RLMTestRealmPath = @"test.realm";
-NSString *const RLMTestRealmPathLock = @"test.realm.lock";
+
+NSString *RLMRealmPathForFile(NSString *fileName) {
+#if TARGET_OS_IPHONE
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    return [documentsDirectory stringByAppendingPathComponent:fileName];
+#else
+    return fileName;
+#endif
+}
+
+NSString *RLMDefaultRealmPath() {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    return [documentsDirectory stringByAppendingPathComponent:@"default.realm"];
+}
+
+NSString *RLMTestRealmPath() {
+    return RLMRealmPathForFile(@"test.realm");
+}
+
+NSString *RLMTestRealmPathLock() {
+    return RLMRealmPathForFile(@"test.realm.lock");
+}
 
 @implementation RLMTestCase
 
 - (void)setUp {
     // This method is run before every test method
     [super setUp];
-    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath error:nil];
-    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPathLock error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath() error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPathLock() error:nil];
 }
 
 + (void)tearDown {
     // This method is run after all tests in a test method have run
-    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath() error:nil];
     [super tearDown];
 }
 
 - (RLMRealm *)realmWithTestPath {
-    return [RLMRealm realmWithPath:RLMTestRealmPath readOnly:NO error:nil];
+    return [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
 }
 
 @end
