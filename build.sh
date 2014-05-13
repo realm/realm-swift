@@ -586,13 +586,17 @@ EOF
         ;;
 
     "test-examples")
+        if [ ! -e "Realm.framework" ]; then
+            echo "No Realm.framework found. You run the ios-framework target to generate it."
+            exit 0
+        fi
         (
-            cd examples/RealmTableViewExample
-            xctool -project RealmTableViewExample.xcodeproj -scheme RealmTableViewExample clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
-        ) || exit 1
-        (
-            cd examples/RealmPerformanceExample
-            xctool -project RealmPerformanceExample.xcodeproj -scheme RealmPerformanceExample clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+            cd examples
+            for folder in $(ls -l | grep "^d" | awk '{ print $9 }'); do
+                cd $folder
+                xctool -project "$folder".xcodeproj -scheme "$folder" clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+                cd ..
+            done
         ) || exit 1
         ;;
 
