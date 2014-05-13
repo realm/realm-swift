@@ -164,6 +164,15 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     [realm registerAcessor:object];
 }
 
+void RLMDeleteObjectFromRealm(RLMObject *object, RLMRealm *realm, bool cascade) {
+    // if last in table delete, otherwise replace with last
+    if (object.objectIndex == object.backingTable->size() - 1) {
+        object.backingTable->remove(object.objectIndex);
+    }
+    else {
+        object.backingTable->move_last_over(object.objectIndex);
+    }
+}
 
 RLMArray *RLMGetObjects(RLMRealm *realm, Class objectClass, NSPredicate *predicate, id order) {
     // get table for this calss
