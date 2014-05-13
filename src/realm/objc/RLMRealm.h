@@ -209,7 +209,7 @@ typedef void(^RLMNotificationBlock)(NSString *note, RLMRealm *realm);
 
 /** Construct a JSON representation of all the data stored in this RLMRealm.
 
- @return String JSON representation of the realm's data.
+ @return JSON string representation of the realm's data.
  */
 - (NSString *)toJSONString;
 
