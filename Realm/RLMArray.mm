@@ -43,25 +43,18 @@
     return self;
 }
 
-// construct/populate accessor object
-inline RLMObject *RLMCreateAccessor(RLMArray *self, NSUInteger index) {
-    RLMObject *accessor = [[self->_accessorClass alloc] init];
-    accessor.realm = self->_realm;
-    accessor.backingTable = self->_backingTable;
-    accessor.backingTableIndex = self->_backingTableIndex;
-    accessor.objectIndex = self->_backingView.get_source_ndx(index);
-    [self->_realm registerAcessor:accessor];
-    return accessor;
-}
-
 - (NSUInteger)count {
     return _backingView.size();
+}
+
+inline id RLMCreateArrayAccessor(RLMArray *array, NSUInteger index) {
+    return RLMCreateAccessor(array->_accessorClass, array, array->_backingView.get_source_ndx(index));
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
     NSUInteger batchCount = 0, index = state->state, count = self.count;
     while (index < count && batchCount < len) {
-        buffer[batchCount++] = RLMCreateAccessor(self, index++);
+        buffer[batchCount++] = RLMCreateArrayAccessor(self, index++);
     }
     
     void *selfPtr = (__bridge void *)self;
@@ -75,12 +68,12 @@ inline RLMObject *RLMCreateAccessor(RLMArray *self, NSUInteger index) {
     if (index >= self.count) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Index is out of bounds." userInfo:@{@"index": @(index)}];
     }
-    return RLMCreateAccessor(self, index);
+    return RLMCreateArrayAccessor(self, index);;
 }
 
 - (id)firstObject {
     if (self.count) {
-        return RLMCreateAccessor(self, 0);
+        return RLMCreateArrayAccessor(self, 0);
     }
     return nil;
 }
@@ -88,7 +81,7 @@ inline RLMObject *RLMCreateAccessor(RLMArray *self, NSUInteger index) {
 - (id)lastObject {
     NSUInteger count = self.count;
     if (count) {
-        return RLMCreateAccessor(self, count-1);
+        return RLMCreateArrayAccessor(self, count-1);
     }
     return nil;
 }

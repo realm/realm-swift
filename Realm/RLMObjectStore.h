@@ -21,6 +21,7 @@
 #import "RLMRealm.h"
 #import "RLMObject.h"
 #import "RLMArray.h"
+#import "RLMPrivate.hpp"
 
 //
 // Object Store Initialization
@@ -42,6 +43,16 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm);
 // get accessor class for an object class - generates class if not cached
 Class RLMAccessorClassForObjectClass(Class objectClass);
 
+// Create accessor
+inline RLMObject *RLMCreateAccessor(Class cls, id<RLMAccessor> parent, NSUInteger index) {
+    RLMObject *accessor = [[cls alloc] init];
+    accessor.realm = parent.realm;
+    accessor.backingTable = parent.backingTable;
+    accessor.backingTableIndex = parent.backingTableIndex;
+    accessor.objectIndex = index;
+    [accessor.realm registerAcessor:accessor];
+    return accessor;
+}
 
 //
 // Adding, Removing, Getting Objects

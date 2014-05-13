@@ -31,11 +31,6 @@ static NSMutableDictionary *s_accessorClassNameCache;
 static NSArray *s_objectClasses;
 static NSMapTable *s_tableNamesForClass;
 
-inline BOOL RLMIsSubclass(Class class1, Class class2) {
-    class1 = class_getSuperclass(class1);
-    return RLMIsKindOfclass(class1, class2);
-}
-
 void RLMInitializeObjectStore() {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -73,13 +68,28 @@ inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm, Class objectCla
 
 void RLMEnsureRealmTablesExist(RLMRealm *realm) {
     [realm beginWriteTransaction];
+    
+    // FIXME - support migrations
+    // first pass create tables
+    for (RLMObjectDescriptor *desc in s_objectClasses) {
+        tightdb::TableRef table = RLMTableForObjectClass(realm, desc.objectClass);
+    }
+    
+    // second pass add columns
     for (RLMObjectDescriptor *desc in s_objectClasses) {
         tightdb::TableRef table = RLMTableForObjectClass(realm, desc.objectClass);
         
-        // FIXME - support migrations
         if (table->get_column_count() == 0) {
             for (RLMProperty *prop in desc.properties) {
-                table->add_column((tightdb::DataType)prop.type, tightdb::StringData(prop.name.UTF8String, prop.name.length));
+                tightdb::StringData name(prop.name.UTF8String, prop.name.length);
+                if (prop.type == RLMTypeLink) {
+                    // FIXME
+                    //tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.linkClass);
+                    //table->add_column_link(name, linkTable->get_index_in_parent());
+                }
+                else {
+                    table->add_column((tightdb::DataType)prop.type, name);
+                }
             }
         }
         else {
@@ -96,7 +106,7 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
 
 Class RLMAccessorClassForObjectClass(Class objectClass) {
     // if objectClass is RLMRow use it, otherwise use proxy class
-    if (!RLMIsKindOfclass(objectClass, RLMObject.class)) {
+    if (!RLMIsSubclass(objectClass, RLMObject.class)) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMRow" userInfo:nil];
     }
     
@@ -190,8 +200,6 @@ RLMArray *RLMGetObjects(RLMRealm *realm, Class objectClass, NSPredicate *predica
     tightdb::TableView view = array.backingQuery->find_all();
     RLMUpdateViewWithOrder(view, order, desc);
     array.backingView = view;
-    
-    // FIXME - we need to hold onto query or predicate for searching off of RLMArrays - this crashes now
     array.realm = realm;
     [realm registerAcessor:array];
     return array;
