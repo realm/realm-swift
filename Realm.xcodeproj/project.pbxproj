@@ -139,7 +139,7 @@
 		02C414DE1921B07200F858D9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		02C414EE1921B07200F858D9 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		02C415051921B0C300F858D9 /* libRealm.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRealm.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		02C415121921B0C400F858D9 /* Realm-iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Realm-iOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		02C415121921B0C400F858D9 /* RealmTests-iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "RealmTests-iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		02C415401921B25B00F858D9 /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/usr/lib/libstdc++.6.dylib"; sourceTree = DEVELOPER_DIR; };
 		02C415451921B79400F858D9 /* libtightdb-ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libtightdb-ios.a"; path = "../tightdb/iphone-lib/libtightdb-ios.a"; sourceTree = "<group>"; };
 		02C415481921B94400F858D9 /* libtightdb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtightdb.a; path = ../../../../../usr/local/lib/libtightdb.a; sourceTree = "<group>"; };
@@ -289,7 +289,7 @@
 				02C4145E191DE49600F858D9 /* Realm.framework */,
 				02C4146E191DE49600F858D9 /* RealmTests.xctest */,
 				02C415051921B0C300F858D9 /* libRealm.a */,
-				02C415121921B0C400F858D9 /* Realm-iOSTests.xctest */,
+				02C415121921B0C400F858D9 /* RealmTests-iOS.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -428,7 +428,7 @@
 			);
 			name = "RealmTests-iOS";
 			productName = "Realm-iOSTests";
-			productReference = 02C415121921B0C400F858D9 /* Realm-iOSTests.xctest */;
+			productReference = 02C415121921B0C400F858D9 /* RealmTests-iOS.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
