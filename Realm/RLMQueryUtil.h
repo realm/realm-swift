@@ -26,7 +26,7 @@
 #import "RLMObjectDescriptor.h"
 
 // apply the given predicate to the passed in query, returning the updated query
-tightdb::Query RLMUpdateQueryWithPredicate(tightdb::Query query, id predicate, RLMObjectDescriptor *desc);
+void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMObjectDescriptor *desc);
 
 // apply a sort (column name or NSSortDescriptor) to an existing view
 void RLMUpdateViewWithOrder(tightdb::TableView &view, id order, RLMObjectDescriptor *desc);

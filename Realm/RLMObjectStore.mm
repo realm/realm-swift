@@ -176,24 +176,22 @@ void RLMDeleteObjectFromRealm(RLMObject *object, RLMRealm *realm, bool cascade) 
 
 RLMArray *RLMGetObjects(RLMRealm *realm, Class objectClass, NSPredicate *predicate, id order) {
     // get table for this calss
+    RLMArray *array = [[RLMArray alloc] initWithObjectClass:objectClass];
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClass);
+    array.backingTable = table.get();
+    array.backingTableIndex = array.backingTable->get_index_in_parent();
     
     // create view from table and predicate
     RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
-    tightdb::Query query = RLMUpdateQueryWithPredicate(table->where(), predicate, desc);
-    tightdb::TableView view = query.find_all();
+    array.backingQuery = new tightdb::Query(table->where());
+    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, desc);
     
-    // apply sort order
+    // create view and sort
+    tightdb::TableView view = array.backingQuery->find_all();
     RLMUpdateViewWithOrder(view, order, desc);
-    
-    // create array and populate
-    RLMArray *array = [[RLMArray alloc] initWithObjectClass:objectClass];
-    array.backingTable = table.get();
-    array.backingTableIndex = array.backingTable->get_index_in_parent();
     array.backingView = view;
     
     // FIXME - we need to hold onto query or predicate for searching off of RLMArrays - this crashes now
-    //array.backingQuery = query;
     array.realm = realm;
     [realm registerAcessor:array];
     return array;
