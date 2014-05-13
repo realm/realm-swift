@@ -454,8 +454,7 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 - (void)deleteObject:(RLMObject *)object cascade:(BOOL)deleteChildren {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+    RLMDeleteObjectFromRealm(object, self, deleteChildren);
 }
 
 - (RLMArray *)objects:(Class)objectClass where:(id)predicate, ... {
