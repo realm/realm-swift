@@ -592,10 +592,8 @@ EOF
         fi
         (
             cd examples
-            for folder in $(ls -l | grep "^d" | awk '{ print $9 }'); do
-                cd $folder
-                xctool -project "$folder".xcodeproj -scheme "$folder" clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
-                cd ..
+            for example_name in $(ls -l | grep "^d" | awk '{ print $9 }'); do
+                xctool -project "$example_name"/"$example_name".xcodeproj -scheme "$example_name" clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
             done
         ) || exit 1
         ;;
