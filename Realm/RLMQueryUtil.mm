@@ -415,7 +415,7 @@ void update_query_with_predicate(NSPredicate * predicate, RLMObjectDescriptor *d
 
 } // namespace
 
-tightdb::Query RLMUpdateQueryWithPredicate(tightdb::Query query, id predicate, RLMObjectDescriptor *desc)
+tightdb::Query *RLMNewQueryWithPredicate(tightdb::Query query, id predicate, RLMObjectDescriptor *desc)
 {
     // parse and apply predicate tree
     if (predicate) {
@@ -440,7 +440,7 @@ tightdb::Query RLMUpdateQueryWithPredicate(tightdb::Query query, id predicate, R
         }
     }
     
-    return query;
+    return new tightdb::Query(query);
 }
 
 void RLMUpdateViewWithOrder(tightdb::TableView &view, id order, RLMObjectDescriptor *desc) {

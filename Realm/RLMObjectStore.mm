@@ -180,8 +180,8 @@ RLMArray *RLMGetObjects(RLMRealm *realm, Class objectClass, NSPredicate *predica
     
     // create view from table and predicate
     RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
-    tightdb::Query query = RLMUpdateQueryWithPredicate(table->where(), predicate, desc);
-    tightdb::TableView view = query.find_all();
+    tightdb::Query *query = RLMNewQueryWithPredicate(table->where(), predicate, desc);
+    tightdb::TableView view = query->find_all();
     
     // apply sort order
     RLMUpdateViewWithOrder(view, order, desc);
@@ -193,8 +193,8 @@ RLMArray *RLMGetObjects(RLMRealm *realm, Class objectClass, NSPredicate *predica
     array.backingView = view;
     
     // FIXME - we need to hold onto query or predicate for searching off of RLMArrays - this crashes now
-    //array.backingQuery = query;
     array.realm = realm;
+    array.backingQuery = query;
     [realm registerAcessor:array];
     return array;
 }
