@@ -17,10 +17,12 @@
 // from TightDB Incorporated.
 //
 ////////////////////////////////////////////////////////////////////////////
+
 #import "RLMProperty.h"
 #import "RLMObjectDescriptor.h"
 #import "RLMPrivate.hpp"
 #import "RLMUtil.h"
+#import "RLMObjectStore.h"
 
 // macros/helpers to generate objc type strings for registering methods
 #define GETTER_TYPES(C) C ":@"
@@ -76,6 +78,7 @@ const char * setterTypeStringForCode(char code) {
             if (self.type == RLMTypeString) return 's';
             if (self.type == RLMTypeTable) return 't';
             if (self.type == RLMTypeDate) return 'a';
+            if (self.type == RLMTypeLink) return 'k';
         default:
             return self.objcType;
     }
@@ -83,6 +86,7 @@ const char * setterTypeStringForCode(char code) {
 
 // dynamic getter with column closure
 -(IMP)getterForColumn:(NSUInteger)col {
+    Class linkClass = _linkClass;
     switch (self.accessorCode) {
         case 'i':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
@@ -120,17 +124,22 @@ const char * setterTypeStringForCode(char code) {
                 tightdb::DateTime dt = obj.backingTable->get_datetime(col, obj.objectIndex);
                 return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
             });
+        case 'k':
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+                // FIXME
+                // NSUInteger index = obj.backingTable->get_link(col, obj.objectIndex);
+                // return RLMCreateAccessor(linkClass, obj, index);
+                return nil;
+            });
         case '@':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
                 return obj[col];
             });
         case 't':
-        {
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj){
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
                 RLMArray *array = obj[col];
                 return array;
             });
-        }
         default:
             @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid accessor code" userInfo:nil];
     }
@@ -173,6 +182,15 @@ const char * setterTypeStringForCode(char code) {
             return imp_implementationWithBlock(^(id<RLMAccessor> obj, NSDate *date) {
                 std::time_t time = date.timeIntervalSince1970;
                 obj.backingTable->set_datetime(col, obj.objectIndex, tightdb::DateTime(time));
+            });
+        case 'k':
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, RLMObject *link) {
+                // add to Realm if not it it.
+                if (link && link.realm != obj.realm) {
+                    [obj.realm addObject:link];
+                }
+                // FIXME
+                // obj.backingTable->set_link(col, obj.objectIndex);
             });
         case '@':
         case 't':
@@ -239,13 +257,24 @@ const char * setterTypeStringForCode(char code) {
             else if ([type hasPrefix:@"@\"RLMArray<"]) {
                 // check for array class
                 Class cls = NSClassFromString([type substringWithRange:NSMakeRange(11, type.length-5)]);
-                if (RLMIsKindOfclass(cls, RLMObject.class)) {
-                    self.subtableObjectClass = cls;
+                if (RLMIsSubclass(cls, RLMObject.class)) {
+                    self.linkClass = cls;
                 }
                 else {
                     @throw [NSException exceptionWithName:@"RLMException" reason:@"No type specified for RLMArray" userInfo:nil];
                 }
                 self.type = RLMTypeTable;
+            }
+            else {
+                // check if this is an RLMObject
+                Class cls = NSClassFromString([type substringWithRange:NSMakeRange(2, type.length-3)]);
+                if (RLMIsSubclass(cls, RLMObject.class)) {
+                    self.linkClass = cls;
+                    self.type = RLMTypeLink;
+                }
+                else {
+                    @throw [NSException exceptionWithName:@"RLMException" reason:@"Encapsulated properties must descend from RLMObject" userInfo:nil];
+                }
             }
             break;
         }

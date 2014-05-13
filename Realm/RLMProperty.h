@@ -31,7 +31,8 @@
 @property (nonatomic, assign) NSUInteger column;
 @property (nonatomic, copy) id defaultValue;
 
-@property (nonatomic, assign) Class subtableObjectClass;
+// link class used for encapsulated objects and sub arrays
+@property (nonatomic, assign) Class linkClass;
 @property (nonatomic, assign) char objcType;
 
 // creates a tdb property object from a runtime property
