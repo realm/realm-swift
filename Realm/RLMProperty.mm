@@ -138,7 +138,7 @@ const char * setterTypeStringForCode(char code) {
 
 
 // dynamic setter with column closure
--(IMP)setterForColumn:(int)col {
+-(IMP)setterForColumn:(NSUInteger)col {
     switch (self.accessorCode) {
         case 'i':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj, int val) {
