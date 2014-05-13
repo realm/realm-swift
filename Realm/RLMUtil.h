@@ -18,10 +18,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import <tightdb/table.hpp>
-#import <tightdb/query.hpp>
+#import "RLMType.h"
 
-tightdb::Query RLMQueryFromPredicate(tightdb::Table *table, id predicate);
-
-NSException *RLMPredicateException(NSString *name, NSString *reason);
+// returns if the object can be inserted as the given type
+BOOL RLMIsObjectOfType(id obj, RLMType type);

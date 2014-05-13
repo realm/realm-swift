@@ -23,6 +23,7 @@
 #import "RLMPrivate.hpp"
 #import "RLMObjectDescriptor.h"
 #import "RLMObjectStore.h"
+#import "RLMQueryUtil.h"
 
 #include <exception>
 #include <sstream>
@@ -114,7 +115,7 @@ inline NSError* make_realm_error(RLMError code, exception &ex)
 @end
 
 
-NSString *const defaultRealmFileName = @"default.realm";
+NSString *const c_defaultRealmFileName = @"default.realm";
 static NSString *s_defaultRealmPath = nil;
 static NSArray *s_objectDescriptors = nil;
 
@@ -175,7 +176,7 @@ static NSArray *s_objectDescriptors = nil;
 + (instancetype)defaultRealm
 {
     if (!s_defaultRealmPath) {
-        s_defaultRealmPath = [RLMRealm writeablePathForFile:defaultRealmFileName];
+        s_defaultRealmPath = [RLMRealm writeablePathForFile:c_defaultRealmFileName];
     }
     return [RLMRealm realmWithPath:RLMRealm.defaultPath readOnly:NO error:nil];
 }
@@ -458,12 +459,15 @@ static NSArray *s_objectDescriptors = nil;
     if (predicate) {
         RLM_PREDICATE(predicate, outPredicate);
     }
-    return RLMObjectsOfClassWhere(self, objectClass, outPredicate);
+    return RLMGetObjects(self, objectClass, outPredicate, nil);
 }
 
 - (RLMArray *)objects:(Class)objectClass orderedBy:(id)order where:(id)predicate, ... {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+    NSPredicate *outPredicate = nil;
+    if (predicate) {
+        RLM_PREDICATE(predicate, outPredicate);
+    }
+    return RLMGetObjects(self, objectClass, outPredicate, order);
 }
 
 -(id)objectForKeyedSubscript:(id <NSCopying>)key {
