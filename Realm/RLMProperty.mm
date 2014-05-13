@@ -77,6 +77,7 @@ const char * setterTypeStringForCode(char code) {
         case '@':           // custom accessors for strings and subtables
             if (self.type == RLMTypeString) return 's';
             if (self.type == RLMTypeTable) return 't';
+            if (self.type == RLMTypeDate) return 'a';
         default:
             return self.objcType;
     }
@@ -115,6 +116,11 @@ const char * setterTypeStringForCode(char code) {
                 return [[NSString alloc] initWithBytes:strData.data()
                                                 length:strData.size()
                                               encoding:NSUTF8StringEncoding];
+            });
+        case 'a':
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+                tightdb::DateTime dt = obj.backingTable->get_datetime(col, obj.objectIndex);
+                return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
             });
         case '@':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
@@ -164,6 +170,11 @@ const char * setterTypeStringForCode(char code) {
             return imp_implementationWithBlock(^(id<RLMAccessor> obj, NSString *val) {
                 tightdb::StringData strData = tightdb::StringData(val.UTF8String, val.length);
                 obj.backingTable->set_string(col, obj.objectIndex, strData);
+            });
+        case 'a':
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, NSDate *date) {
+                std::time_t time = date.timeIntervalSince1970;
+                obj.backingTable->set_datetime(col, obj.objectIndex, tightdb::DateTime(time));
             });
         case '@':
         case 't':

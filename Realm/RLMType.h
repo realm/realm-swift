@@ -22,7 +22,7 @@
 #define REALM_OBJC_TYPE_H
 
 // Make sure numbers match those in <tightdb/data_type.hpp>
-typedef NS_ENUM(NSInteger, RLMType) {
+typedef NS_ENUM(int32_t, RLMType) {
     RLMTypeNone =  -1,
     RLMTypeBool =  1,
     RLMTypeInt =  0,

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		02C415561921C26600F858D9 /* libRealm.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C415551921C26600F858D9 /* libRealm.a */; };
 		E80762D418FEFFD70071CFAB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E80762D318FEFFD70071CFAB /* Foundation.framework */; };
 		E80762D618FEFFD70071CFAB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E80762D518FEFFD70071CFAB /* CoreGraphics.framework */; };
 		E80762D818FEFFD70071CFAB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E80762D718FEFFD70071CFAB /* UIKit.framework */; };
@@ -16,10 +17,10 @@
 		E80762E618FEFFD70071CFAB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E80762E518FEFFD70071CFAB /* Images.xcassets */; };
 		E807630418FEFFF80071CFAB /* TableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E807630318FEFFF80071CFAB /* TableViewController.m */; };
 		E807630818FF00F00071CFAB /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E807630718FF00F00071CFAB /* libstdc++.6.dylib */; };
-		E8F3ABC11901BE8400636584 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F3ABC01901BE8400636584 /* Realm.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		02C415551921C26600F858D9 /* libRealm.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRealm.a; path = "../../build/Debug-iphoneos/libRealm.a"; sourceTree = "<group>"; };
 		E80762D018FEFFD70071CFAB /* RealmTableViewExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealmTableViewExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E80762D318FEFFD70071CFAB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		E80762D518FEFFD70071CFAB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -35,7 +36,6 @@
 		E807630218FEFFF80071CFAB /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableViewController.h; sourceTree = "<group>"; };
 		E807630318FEFFF80071CFAB /* TableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TableViewController.m; sourceTree = "<group>"; };
 		E807630718FF00F00071CFAB /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "usr/lib/libstdc++.6.dylib"; sourceTree = SDKROOT; };
-		E8F3ABC01901BE8400636584 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../Realm.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,11 +43,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				02C415561921C26600F858D9 /* libRealm.a in Frameworks */,
 				E807630818FF00F00071CFAB /* libstdc++.6.dylib in Frameworks */,
 				E80762D618FEFFD70071CFAB /* CoreGraphics.framework in Frameworks */,
 				E80762D818FEFFD70071CFAB /* UIKit.framework in Frameworks */,
 				E80762D418FEFFD70071CFAB /* Foundation.framework in Frameworks */,
-				E8F3ABC11901BE8400636584 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,8 +74,8 @@
 		E80762D218FEFFD70071CFAB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				02C415551921C26600F858D9 /* libRealm.a */,
 				E807630718FF00F00071CFAB /* libstdc++.6.dylib */,
-				E8F3ABC01901BE8400636584 /* Realm.framework */,
 				E80762D318FEFFD70071CFAB /* Foundation.framework */,
 				E80762D518FEFFD70071CFAB /* CoreGraphics.framework */,
 				E80762D718FEFFD70071CFAB /* UIKit.framework */,
@@ -277,6 +277,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmTableViewExample/RealmTableViewExample-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/RealmTableViewExample/RealmTableViewExample-Info.plist";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = RealmTableViewExample;
 				WRAPPER_EXTENSION = app;
 			};
@@ -295,6 +296,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RealmTableViewExample/RealmTableViewExample-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/RealmTableViewExample/RealmTableViewExample-Info.plist";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = RealmTableViewExample;
 				WRAPPER_EXTENSION = app;
 			};

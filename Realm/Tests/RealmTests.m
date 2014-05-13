@@ -29,7 +29,7 @@
 }
 
 - (void)testRealmIsUpdatedAfterBackgroundUpdate {
-    NSString *realmFilePath = @"async.bg.realm";
+    NSString *realmFilePath = RLMRealmPathForFile(@"async.bg.realm");
     [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
     
     RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
@@ -54,7 +54,7 @@
 }
 
 - (void)testRealmIsUpdatedImmediatelyAfterBackgroundUpdate {
-    NSString *realmFilePath = @"async.bg.fast.realm";
+    NSString *realmFilePath = RLMRealmPathForFile(@"async.bg.fast.realm");
     [[NSFileManager defaultManager] removeItemAtPath:realmFilePath error:nil];
     
     RLMRealm *realm = [RLMRealm realmWithPath:realmFilePath];
