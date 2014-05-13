@@ -75,9 +75,9 @@
     RLMArray *all = [PersonQueryObject allObjects];
     RLMArray *some = [PersonQueryObject objectsOrderedBy:@"age" where:@"age > 28"];
     
-    // FIXME - these crash for now - need to keep old query or predicate and fix accessor/attachment issue
     // query/order on array
-    XCTAssertEqual([all objectsWhere:@"age == 27"].count, 1, @"Expecting 1 results");
+    XCTAssertEqual([all objectsWhere:@"age == 27"].count, 1, @"Expecting 1 result");
+    XCTAssertEqual([all objectsWhere:@"age == 28"].count, 0, @"Expecting 0 results");
     some = [some objectsOrderedBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:NO] where:nil];
     XCTAssertEqualObjects([some[0] name], @"Ari", @"Ari should be first results");
 }
