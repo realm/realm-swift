@@ -105,7 +105,7 @@ NSString *const RLMPropertyAttributeRequired = @"RLMPropertyAttributeRequired";
     if (predicate) {
         RLM_PREDICATE(predicate, outPredicate);
     }
-    return RLMGetObjects(self, self.class, outPredicate, order);
+    return RLMGetObjects(RLMRealm.defaultRealm, self.class, outPredicate, order);
 }
 
 - (NSString *)JSONString {
