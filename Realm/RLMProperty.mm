@@ -187,13 +187,13 @@ const char * setterTypeStringForCode(char code) {
 }
 
 // add dynamic property getters/setters to the given class
--(void)addToClass:(Class)cls column:(int)column
+-(void)addToClass:(Class)cls
 {
     // set accessors
-    self.column = column;
+    self.column = _column;
     SEL getter = NSSelectorFromString(self.getterName), setter = NSSelectorFromString(self.setterName);
-    class_replaceMethod(cls, getter, [self getterForColumn:column], getterTypeStringForCode(self.objcType));
-    class_replaceMethod(cls, setter, [self setterForColumn:column], setterTypeStringForCode(self.objcType));
+    class_replaceMethod(cls, getter, [self getterForColumn:_column], getterTypeStringForCode(self.objcType));
+    class_replaceMethod(cls, setter, [self setterForColumn:_column], setterTypeStringForCode(self.objcType));
 }
 
 
@@ -255,13 +255,12 @@ const char * setterTypeStringForCode(char code) {
     }
 }
 
-+(instancetype)propertyForObjectProperty:(objc_property_t)runtimeProp
++(instancetype)propertyForObjectProperty:(objc_property_t)runtimeProp column:(NSUInteger)column
 {
     // create new property
     RLMProperty *prop = [RLMProperty new];
-    
-    // set name
     prop.name = [NSString stringWithUTF8String:property_getName(runtimeProp)];
+    prop.column = column;
     
     // parse attributes
     unsigned int attCount;

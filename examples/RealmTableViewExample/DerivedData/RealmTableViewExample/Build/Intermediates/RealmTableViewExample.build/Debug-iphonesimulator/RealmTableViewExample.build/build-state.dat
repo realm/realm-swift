@@ -1,0 +1,778 @@
+TRealmTableViewExample
+v6
+r1
+cCheck dependencies
+cProcessPCH /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/PrecompiledHeaders/RealmTableViewExample-Prefix-decxbkhcvdxfeuajdawmfkvjhyvv/RealmTableViewExample-Prefix.pch.pch RealmTableViewExample/RealmTableViewExample-Prefix.pch normal i386 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+cCompileC DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/TableViewController.o /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m normal i386 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+cCompileC DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/AppDelegate.o /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/AppDelegate.m normal i386 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+cCompileC DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/main.o /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/main.m normal i386 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+cLd /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/RealmTableViewExample normal i386
+cCopyStringsFile /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/en.lproj/InfoPlist.strings RealmTableViewExample/en.lproj/InfoPlist.strings
+cCompileAssetCatalog /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/Images.xcassets
+cProcessInfoPlistFile /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/Info.plist /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/RealmTableViewExample-Info.plist
+cGenerateDSYMFile /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app.dSYM /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/RealmTableViewExample
+cTouch /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk
+c00000000535184860000000000000198
+t1397851270
+s408
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/SDKSettings.plist
+c00000000531E66BF00000000000003B4
+t1394501311
+s948
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/CoreServices/SystemVersion.plist
+c00000000531E66C5000000000000019E
+t1394501317
+s414
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/CFNetwork.framework/CFNetwork
+c00000000531E66C7000000000058E0E0
+t1394501319
+s5824736
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation
+c00000000531E66C700000000005B82F0
+t1394501319
+s5997296
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics
+c00000000535184670000000000446820
+t1397851239
+s4483104
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/CoreImage.framework/CoreImage
+c00000000531E66C700000000003599D0
+t1394501319
+s3512784
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/CoreText.framework/CoreText
+c00000000531E66C800000000002FC3B0
+t1394501320
+s3130288
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/CoreVideo.framework/CoreVideo
+c00000000531E66C7000000000004B000
+t1394501319
+s307200
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/Foundation.framework/Foundation
+c00000000531E66C8000000000088D8C0
+t1394501320
+s8968384
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/OpenGLES.framework/OpenGLES
+c00000000531E66C90000000000037680
+t1394501321
+s226944
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/QuartzCore.framework/QuartzCore
+c00000000531E66CA000000000048F720
+t1394501322
+s4781856
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/Security.framework/Security
+c00000000531E66CA000000000013FD70
+t1394501322
+s1310064
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/UIKit.framework/UIKit
+c00000000531E66CD0000000001F1DE10
+t1394501325
+s32628240
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/PrivateFrameworks/UIFoundation.framework/UIFoundation
+c00000000531E66D500000000002BC360
+t1394501333
+s2868064
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/crt1.o
+c00000000531E66DB0000000000002338
+t1394501339
+s9016
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/libSystem.dylib
+c00000000531E66DC000000000008D370
+t1394501340
+s578416
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/libc++abi.dylib
+c00000000531E66DB00000000000681A0
+t1394501339
+s426400
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/libobjc.dylib
+c00000000531E66DC0000000000392E20
+t1394501340
+s3747360
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/libstdc++.6.dylib
+c00000000531E66DC000000000018DF40
+t1394501340
+s1630016
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/host/libdyld.dylib
+c00000000530FC36400000000000141F0
+t1393541988
+s82416
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libcache_sim.dylib
+c00000000531E66DC0000000000014A80
+t1394501340
+s84608
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libcommonCrypto_sim.dylib
+c00000000531E66DC0000000000033BA0
+t1394501340
+s211872
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libcompiler_rt_sim.dylib
+c00000000531E66DC000000000001CFB0
+t1394501340
+s118704
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libcopyfile_sim.dylib
+c00000000531E66DC000000000001B2B0
+t1394501340
+s111280
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libcorecrypto_sim.dylib
+c00000000531E66DC00000000000C9570
+t1394501340
+s824688
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libdispatch.dylib
+c00000000531E66DC0000000000063280
+t1394501340
+s406144
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libdyld_sim.dylib
+c00000000531E66DC0000000000008880
+t1394501340
+s34944
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libmacho_sim.dylib
+c00000000531E66DC0000000000015080
+t1394501340
+s86144
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libnotify_sim.dylib
+c00000000531E66DC00000000000230F0
+t1394501340
+s143600
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libremovefile_sim.dylib
+c00000000531E66DC000000000000E380
+t1394501340
+s58240
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_network.dylib
+c00000000531E66DC0000000000089380
+t1394501340
+s562048
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_override.dylib
+c00000000531E66DC0000000000017320
+t1394501340
+s95008
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_sim_asl.dylib
+c00000000531E66DC0000000000039CD0
+t1394501340
+s236752
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_sim_blocks.dylib
+c00000000531E66DC000000000000B0B0
+t1394501340
+s45232
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_sim_c.dylib
+c00000000531E66DC0000000000167E80
+t1394501340
+s1474176
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_sim_configuration.dylib
+c00000000531E66DC00000000000106A0
+t1394501340
+s67232
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_sim_dnssd.dylib
+c00000000531E66DC000000000001CE40
+t1394501340
+s118336
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_sim_info.dylib
+c00000000531E66DC00000000000740C0
+t1394501340
+s475328
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_sim_m.dylib
+c00000000531E66DC000000000006CA60
+t1394501340
+s445024
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libunwind_sim.dylib
+c00000000531E66DC000000000001BAD0
+t1394501340
+s113360
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libxpc.dylib
+c00000000531E66DC0000000000084A20
+t1394501340
+s543264
+
+N/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/5.1/include/module.map
+c00000000531E66E10000000000000ADC
+t1394501345
+s2780
+
+N/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/5.1/lib/darwin/libclang_rt.ios.a
+c0000000053518468000000000000514C
+t1397851240
+s20812
+
+N/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/PrivateHelperMacros.h
+c000000005367DDE2000000000000515A
+t1399315938
+s20826
+
+N/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/PrivateTableMacros.h
+c000000005367DDE20000000000032EEB
+t1399315938
+s208619
+
+N/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMColumnProxy.h
+c000000005367DDE200000000000007F0
+t1399315938
+s2032
+
+N/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMConstants.h
+c000000005367DDE200000000000003FA
+t1399315938
+s1018
+
+N/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMDescriptor.h
+c000000005367DDE2000000000000060F
+t1399315938
+s1551
+
+N/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMPrivate.h
+c000000005367DDE20000000000001AAB
+t1399315938
+s6827
+
+N/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMQuery.h
+c000000005367DDE20000000000002219
+t1399315938
+s8729
+
+N/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMRealm.h
+c000000005367DDE20000000000001B2D
+t1399315938
+s6957
+
+N/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMRow.h
+c000000005367DDE20000000000001734
+t1399315938
+s5940
+
+N/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMTable.h
+c000000005367DDE20000000000003F0D
+t1399315938
+s16141
+
+N/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMType.h
+c000000005367DDE20000000000000542
+t1399315938
+s1346
+
+N/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMVersion.h
+c000000005367DDE2000000000000048E
+t1399315938
+s1166
+
+N/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMView.h
+c000000005367DDE20000000000000F27
+t1399315938
+s3879
+
+N/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMViewProtocol.h
+c000000005367DDE2000000000000054F
+t1399315938
+s1359
+
+N/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/Realm.h
+c000000005367DDE2000000000000041C
+t1399315938
+s1052
+
+N/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Realm
+c000000005367DDE20000000000BE50EC
+t1399315938
+s12472556
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/PrecompiledHeaders/RealmTableViewExample-Prefix-decxbkhcvdxfeuajdawmfkvjhyvv/RealmTableViewExample-Prefix.pch.pch
+t1399325709
+s117948
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/AppDelegate.o
+t1399325709
+s62096
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/RealmTableViewExample.LinkFileList
+c000000005368040C00000000000002BC
+t1399325708
+s700
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/TableViewController.o
+t1399325718
+s73988
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/main.o
+t1399325709
+s3648
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/assetcatalog_dependencies.txt
+t1399325710
+s616
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/assetcatalog_generated_info.plist
+t1399325710
+s525
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app
+t1399325718
+s272
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app.dSYM
+t1399325711
+s102
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/Info.plist
+t1399325710
+s1238
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/PkgInfo
+t1399325710
+s8
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/RealmTableViewExample
+t1399325718
+s1686128
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/en.lproj/InfoPlist.strings
+t1399325710
+s42
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/AppDelegate.h
+c000000005367B83A00000000000003BC
+t1399306298
+s956
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/AppDelegate.m
+c000000005367B83A00000000000005A2
+t1399306298
+s1442
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/Images.xcassets
+c000000005367B83A0000000000000088
+t1399306298
+s136
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/RealmTableViewExample-Info.plist
+c000000005367B83A00000000000005AF
+t1399306298
+s1455
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/RealmTableViewExample-Prefix.pch
+c000000005367B83A000000000000040E
+t1399306298
+s1038
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.h
+c000000005367B83A0000000000000385
+t1399306298
+s901
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m
+c000000005368041500000000000016ED
+t1399325717
+s5869
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/en.lproj/InfoPlist.strings
+c000000005367EC11000000000000002A
+t1399319569
+s42
+
+N/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/main.m
+c000000005367B83A00000000000003FF
+t1399306298
+s1023
+
+N/usr/lib/libSystem.B.dylib
+c0000000052D1AA85000000000000E6D0
+t1389472389
+s59088
+
+N/usr/lib/system/libcache.dylib
+c0000000052D1AA930000000000012A00
+t1389472403
+s76288
+
+N/usr/lib/system/libcommonCrypto.dylib
+c0000000052D1AA78000000000002E320
+t1389472376
+s189216
+
+N/usr/lib/system/libcompiler_rt.dylib
+c0000000052D1AA850000000000021860
+t1389472389
+s137312
+
+N/usr/lib/system/libcopyfile.dylib
+c0000000052D1AA93000000000001B620
+t1389472403
+s112160
+
+N/usr/lib/system/libcorecrypto.dylib
+c0000000052D1AA9300000000000BD920
+t1389472403
+s776480
+
+N/usr/lib/system/libkeymgr.dylib
+c0000000052D1AA93000000000000A120
+t1389472403
+s41248
+
+N/usr/lib/system/liblaunch.dylib
+c00000000530FC363000000000001D550
+t1393541987
+s120144
+
+N/usr/lib/system/libmacho.dylib
+c0000000052D1AA930000000000014EE0
+t1389472403
+s85728
+
+N/usr/lib/system/libquarantine.dylib
+c0000000052D1AA950000000000010380
+t1389472405
+s66432
+
+N/usr/lib/system/libremovefile.dylib
+c0000000052D1AA95000000000000C4C0
+t1389472405
+s50368
+
+N/usr/lib/system/libsystem_asl.dylib
+c0000000052D1AA9300000000000357A0
+t1389472403
+s219040
+
+N/usr/lib/system/libsystem_blocks.dylib
+c000000005219501F000000000000C070
+t1377390623
+s49264
+
+N/usr/lib/system/libsystem_c.dylib
+c00000000530FC33E0000000000168D00
+t1393541950
+s1477888
+
+N/usr/lib/system/libsystem_configuration.dylib
+c00000000530FC35F0000000000010630
+t1393541983
+s67120
+
+N/usr/lib/system/libsystem_dnssd.dylib
+c00000000530FC364000000000001DF10
+t1393541988
+s122640
+
+N/usr/lib/system/libsystem_info.dylib
+c0000000052D1AA850000000000075B00
+t1389472389
+s482048
+
+N/usr/lib/system/libsystem_kernel.dylib
+c000000005356EEA1000000000007CC70
+t1398206113
+s511088
+
+N/usr/lib/system/libsystem_m.dylib
+c0000000052D1AA8500000000000766C0
+t1389472389
+s485056
+
+N/usr/lib/system/libsystem_malloc.dylib
+c00000000530FC3640000000000044DC0
+t1393541988
+s282048
+
+N/usr/lib/system/libsystem_notify.dylib
+c0000000052D1AA850000000000021FA0
+t1389472389
+s139168
+
+N/usr/lib/system/libsystem_platform.dylib
+c00000000530FC364000000000002D920
+t1393541988
+s186656
+
+N/usr/lib/system/libsystem_pthread.dylib
+c0000000052D1AA94000000000001E570
+t1389472404
+s124272
+
+N/usr/lib/system/libsystem_sandbox.dylib
+c00000000530FC352000000000000CC70
+t1393541970
+s52336
+
+N/usr/lib/system/libunc.dylib
+c0000000052D1AA8E000000000000C3F0
+t1389472398
+s50160
+
+N/usr/lib/system/libunwind.dylib
+c0000000052D1AA9400000000000199F0
+t1389472404
+s104944
+
+CBuild AST from /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/AppDelegate.m
+r0
+
+CBuild AST from /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m
+r0
+
+CBuild AST from /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/main.m
+r0
+
+CCheck dependencies
+r0
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection18"Check dependencies18"Check dependencies6e866b963b18b941^04e86b963b18b941^---0#1#1#--18"Check dependencies36"A86EC88B-6669-4EB5-980C-1F9183B3D766-
+
+CCompileAssetCatalog /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/Images.xcassets
+s421018510.088285
+e421018510.991525
+r1
+xCompileAssetCatalog
+x/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app
+x/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/Images.xcassets
+o/* com.apple.actool.compilation-results */
+o/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/LaunchImage-700-568h@2x.png
+o/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/Assets.car
+o/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/assetcatalog_generated_info.plist
+o
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection154"CompileAssetCatalog DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app RealmTableViewExample/Images.xcassets154"CompileAssetCatalog DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app RealmTableViewExample/Images.xcassetsf3aa168e3b18b941^fad4fd8e3b18b941^-644"/* com.apple.actool.compilation-results *//Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/LaunchImage-700-568h@2x.png/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/Assets.car/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/assetcatalog_generated_info.plist-0#0#1#-19%DVTDocumentLocation2@112"file:///Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/Images.xcassets/0000000000000000^1547"CompileAssetCatalog DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app RealmTableViewExample/Images.xcassets    cd /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/actool --output-format human-readable-text --notices --warnings --export-dependency-info /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/assetcatalog_dependencies.txt --output-partial-info-plist /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/assetcatalog_generated_info.plist --app-icon AppIcon --launch-image LaunchImage --platform iphonesimulator --minimum-deployment-target 7.1 --target-device iphone --target-device ipad --compress-pngs --compile /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/Images.xcassets36"CAC0C25B-F01C-4AF5-AB23-1EB378F8E7F9-
+b3708FD5F-5831-481D-B078-AEEF5B224598
+
+CCompileC DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/AppDelegate.o /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/AppDelegate.m normal i386 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+s421018509.780180
+e421018509.874392
+r1
+xCompileC
+xDerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/AppDelegate.o
+x/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/AppDelegate.m
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.llvm.clang.1_0.compiler
+d/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/AppDelegate.m
+d/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/AppDelegate.h
+d/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.h
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection110"Compile /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/AppDelegate.m278"CompileC DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/AppDelegate.o RealmTableViewExample/AppDelegate.m normal i386 objective-c com.apple.compilers.llvm.clang.1_0.compilerabcdc78d3b18b941^38d8df8d3b18b941^---0#0#1#-19%DVTDocumentLocation2@109"file:///Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/AppDelegate.m0000000000000000^4984"CompileC DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/AppDelegate.o RealmTableViewExample/AppDelegate.m normal i386 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample    export LANG=en_US.US-ASCII    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -arch i386 -fmessage-length=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit=0 -std=gnu99 -fobjc-arc -fmodules -fmodules-cache-path=/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/ModuleCache -Wno-trigraphs -fpascal-strings -O0 -Wno-missing-field-initializers -Wno-missing-prototypes -Werror=return-type -Wno-implicit-atomic-properties -Werror=deprecated-objc-isa-usage -Werror=objc-root-class -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wduplicate-method-match -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wno-deprecated-implementations -DDEBUG=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk -fexceptions -fasm-blocks -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -g -Wno-sign-conversion -fobjc-abi-version=2 -fobjc-legacy-dispatch -mios-simulator-version-min=7.1 -iquote /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/RealmTableViewExample-generated-files.hmap -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/RealmTableViewExample-own-target-headers.hmap -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/RealmTableViewExample-all-target-headers.hmap -iquote /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/RealmTableViewExample-project-headers.hmap -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/DerivedSources/i386 -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/DerivedSources -F/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator -F/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample -F../.. -include /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/PrecompiledHeaders/RealmTableViewExample-Prefix-decxbkhcvdxfeuajdawmfkvjhyvv/RealmTableViewExample-Prefix.pch -MMD -MT dependencies -MF /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/AppDelegate.d --serialize-diagnostics /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/AppDelegate.dia -c /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/AppDelegate.m -o /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/AppDelegate.o36"8E420F83-2454-4BBC-98A7-9EAC6D86EB2F-
+b3708FD5F-5831-481D-B078-AEEF5B224598
+
+CCompileC DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/TableViewController.o /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m normal i386 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+s421018518.421785
+e421018518.528744
+r1
+xCompileC
+xDerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/TableViewController.o
+x/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.llvm.clang.1_0.compiler
+d/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m
+d/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.h
+d/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/Realm.h
+d/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMConstants.h
+d/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMTable.h
+d/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMViewProtocol.h
+d/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMType.h
+d/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMView.h
+d/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMQuery.h
+d/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMRow.h
+d/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMRealm.h
+d/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMVersion.h
+d/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/PrivateHelperMacros.h
+d/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/PrivateTableMacros.h
+d/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMDescriptor.h
+d/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMColumnProxy.h
+d/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Headers/RLMPrivate.h
+o/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m:92:10: warning: capturing 'self' strongly in this block is likely to lead to a retain cycle [-Warc-retain-cycles]
+o        [self realmDidChange];
+o         ^~~~
+o/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m:91:6: note: block will be retained by an object strongly retained by the captured object
+o    [self.realm addNotification:^(NSString *note, RLMRealm *realm) {
+o     ^~~~
+o/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m:90:26: warning: unused variable 'weakSelf' [-Wunused-variable]
+o    TableViewController *weakSelf = self;
+o                         ^
+o2 warnings generated.
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection118"Compile /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m294"CompileC DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/TableViewController.o RealmTableViewExample/TableViewController.m normal i386 objective-c com.apple.compilers.llvm.clang.1_0.compiler40146c963b18b941^4f5b87963b18b941^-814"/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m:92:10: warning: capturing 'self' strongly in this block is likely to lead to a retain cycle [-Warc-retain-cycles]        [self realmDidChange];         ^~~~/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m:91:6: note: block will be retained by an object strongly retained by the captured object    [self.realm addNotification:^(NSString *note, RLMRealm *realm) {     ^~~~/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m:90:26: warning: unused variable 'weakSelf' [-Wunused-variable]    TableViewController *weakSelf = self;                         ^2 warnings generated.2(36%IDEClangDiagnosticActivityLogMessage2@75"Capturing 'self' strongly in this block is likely to lead to a retain cycle-421018518#18446744073709551615#0#1(2@76"Block will be retained by an object strongly retained by the captured object-421018518#18446744073709551615#0#-0#27"com.apple.dt.IDE.diagnostic23%DVTTextDocumentLocation3@117"file:///Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m0000000000000000^90#5#90#5#3137#0#16"ARC Retain Cycle1(3@117"file:///Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m0000000000000000^90#5#90#9#3137#0#-1#27"com.apple.dt.IDE.diagnostic3@117"file:///Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m0000000000000000^91#9#91#9#3210#0#16"ARC Retain Cycle1(3@117"file:///Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m0000000000000000^91#9#91#13#3210#0#-2@26"Unused variable 'weakSelf'-421018518#18446744073709551615#0#-1#27"com.apple.dt.IDE.diagnostic3@117"file:///Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m0000000000000000^89#25#89#25#3115#0#19"Unused Entity Issue--0#0#1#-19%DVTDocumentLocation4@117"file:///Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m0000000000000000^5032"CompileC DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/TableViewController.o RealmTableViewExample/TableViewController.m normal i386 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample    export LANG=en_US.US-ASCII    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -arch i386 -fmessage-length=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit=0 -std=gnu99 -fobjc-arc -fmodules -fmodules-cache-path=/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/ModuleCache -Wno-trigraphs -fpascal-strings -O0 -Wno-missing-field-initializers -Wno-missing-prototypes -Werror=return-type -Wno-implicit-atomic-properties -Werror=deprecated-objc-isa-usage -Werror=objc-root-class -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wduplicate-method-match -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wno-deprecated-implementations -DDEBUG=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk -fexceptions -fasm-blocks -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -g -Wno-sign-conversion -fobjc-abi-version=2 -fobjc-legacy-dispatch -mios-simulator-version-min=7.1 -iquote /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/RealmTableViewExample-generated-files.hmap -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/RealmTableViewExample-own-target-headers.hmap -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/RealmTableViewExample-all-target-headers.hmap -iquote /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/RealmTableViewExample-project-headers.hmap -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/DerivedSources/i386 -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/DerivedSources -F/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator -F/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample -F../.. -include /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/PrecompiledHeaders/RealmTableViewExample-Prefix-decxbkhcvdxfeuajdawmfkvjhyvv/RealmTableViewExample-Prefix.pch -MMD -MT dependencies -MF /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/TableViewController.d --serialize-diagnostics /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/TableViewController.dia -c /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/TableViewController.m -o /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/TableViewController.o36"C84A9CAF-8082-4E28-AA20-036C1FBB59A2-
+bEAF02A9B-34DB-4777-9AC3-BAF7F74303D1
+
+CCompileC DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/main.o /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/main.m normal i386 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+s421018509.874965
+e421018509.914501
+r1
+xCompileC
+xDerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/main.o
+x/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/main.m
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.llvm.clang.1_0.compiler
+d/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/main.m
+d/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/AppDelegate.h
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection103"Compile /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/main.m264"CompileC DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/main.o RealmTableViewExample/main.m normal i386 objective-c com.apple.compilers.llvm.clang.1_0.compiler6a16e08d3b18b941^eb1dea8d3b18b941^---0#0#1#-19%DVTDocumentLocation2@102"file:///Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/main.m0000000000000000^4942"CompileC DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/main.o RealmTableViewExample/main.m normal i386 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample    export LANG=en_US.US-ASCII    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -arch i386 -fmessage-length=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit=0 -std=gnu99 -fobjc-arc -fmodules -fmodules-cache-path=/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/ModuleCache -Wno-trigraphs -fpascal-strings -O0 -Wno-missing-field-initializers -Wno-missing-prototypes -Werror=return-type -Wno-implicit-atomic-properties -Werror=deprecated-objc-isa-usage -Werror=objc-root-class -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wduplicate-method-match -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wno-deprecated-implementations -DDEBUG=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk -fexceptions -fasm-blocks -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -g -Wno-sign-conversion -fobjc-abi-version=2 -fobjc-legacy-dispatch -mios-simulator-version-min=7.1 -iquote /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/RealmTableViewExample-generated-files.hmap -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/RealmTableViewExample-own-target-headers.hmap -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/RealmTableViewExample-all-target-headers.hmap -iquote /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/RealmTableViewExample-project-headers.hmap -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/DerivedSources/i386 -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/DerivedSources -F/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator -F/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample -F../.. -include /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/PrecompiledHeaders/RealmTableViewExample-Prefix-decxbkhcvdxfeuajdawmfkvjhyvv/RealmTableViewExample-Prefix.pch -MMD -MT dependencies -MF /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/main.d --serialize-diagnostics /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/main.dia -c /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/main.m -o /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/main.o36"D3ACF814-DD9E-4A49-ABE3-4564C6AB7453-
+b3708FD5F-5831-481D-B078-AEEF5B224598
+
+CCopyStringsFile /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/en.lproj/InfoPlist.strings RealmTableViewExample/en.lproj/InfoPlist.strings
+s421018510.087945
+e421018510.090153
+r1
+xCopyStringsFile
+x/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/en.lproj/InfoPlist.strings
+xRealmTableViewExample/en.lproj/InfoPlist.strings
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection53"Copy RealmTableViewExample/en.lproj/InfoPlist.strings188"CopyStringsFile DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/en.lproj/InfoPlist.strings RealmTableViewExample/en.lproj/InfoPlist.stringsc18f168e3b18b941^a914178e3b18b941^---0#0#1#-19%DVTDocumentLocation2@122"file:///Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/en.lproj/InfoPlist.strings0000000000000000^773"CopyStringsFile DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/en.lproj/InfoPlist.strings RealmTableViewExample/en.lproj/InfoPlist.strings    cd /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    builtin-copyStrings --validate --inputencoding utf-8 --outputencoding binary --outdir /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/en.lproj -- RealmTableViewExample/en.lproj/InfoPlist.strings36"7779ADF8-50C8-4160-B3F7-F961F43E996C-
+b3708FD5F-5831-481D-B078-AEEF5B224598
+
+CGenerateDSYMFile /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app.dSYM /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/RealmTableViewExample
+s421018518.639560
+e421018518.668562
+r1
+xGenerateDSYMFile
+x/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app.dSYM
+x/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/RealmTableViewExample
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection177"Generate /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app.dSYM237"GenerateDSYMFile DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app.dSYM DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/RealmTableViewExample3ecfa3963b18b941^04adac963b18b941^---0#0#1#-19%DVTDocumentLocation2@176"file:///Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app.dSYM/0000000000000000^965"GenerateDSYMFile DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app.dSYM DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/RealmTableViewExample    cd /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/dsymutil /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/RealmTableViewExample -o /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app.dSYM36"2E1D056D-58CA-4D78-BBDD-3ACF74A4CF10-
+bEAF02A9B-34DB-4777-9AC3-BAF7F74303D1
+
+CLd /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/RealmTableViewExample normal i386
+s421018518.531255
+e421018518.637537
+r1
+xLd
+x/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/RealmTableViewExample
+xnormal
+xi386
+d/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/RealmTableViewExample.LinkFileList
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/crt1.o
+d/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/TableViewController.o
+d/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/AppDelegate.o
+d/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/main.o
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/libstdc++.6.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/UIKit.framework/UIKit
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/Foundation.framework/Foundation
+d/Users/ari/Src/TightDB/tightdb_objc/Realm.framework/Realm
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/libobjc.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/libSystem.dylib
+d/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/5.1/lib/darwin/libclang_rt.ios.a
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/CoreVideo.framework/CoreVideo
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/CoreImage.framework/CoreImage
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/Security.framework/Security
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/CFNetwork.framework/CFNetwork
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/OpenGLES.framework/OpenGLES
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/QuartzCore.framework/QuartzCore
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/Frameworks/CoreText.framework/CoreText
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/libc++abi.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_override.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libcache_sim.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libcommonCrypto_sim.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libcorecrypto_sim.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libcompiler_rt_sim.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libcopyfile_sim.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libdispatch.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libdyld_sim.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libmacho_sim.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libnotify_sim.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libremovefile_sim.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_sim_blocks.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_sim_c.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_sim_dnssd.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_sim_info.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_sim_m.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_network.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libunwind_sim.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libxpc.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_sim_configuration.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/libsystem_sim_asl.dylib
+d/usr/lib/libSystem.B.dylib
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/System/Library/PrivateFrameworks/UIFoundation.framework/UIFoundation
+d/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk/usr/lib/system/host/libdyld.dylib
+d/usr/lib/system/libcache.dylib
+d/usr/lib/system/libcommonCrypto.dylib
+d/usr/lib/system/libcompiler_rt.dylib
+d/usr/lib/system/libcopyfile.dylib
+d/usr/lib/system/libcorecrypto.dylib
+d/usr/lib/system/libkeymgr.dylib
+d/usr/lib/system/liblaunch.dylib
+d/usr/lib/system/libmacho.dylib
+d/usr/lib/system/libquarantine.dylib
+d/usr/lib/system/libremovefile.dylib
+d/usr/lib/system/libsystem_asl.dylib
+d/usr/lib/system/libsystem_blocks.dylib
+d/usr/lib/system/libsystem_c.dylib
+d/usr/lib/system/libsystem_configuration.dylib
+d/usr/lib/system/libsystem_dnssd.dylib
+d/usr/lib/system/libsystem_info.dylib
+d/usr/lib/system/libsystem_kernel.dylib
+d/usr/lib/system/libsystem_m.dylib
+d/usr/lib/system/libsystem_malloc.dylib
+d/usr/lib/system/libsystem_notify.dylib
+d/usr/lib/system/libsystem_platform.dylib
+d/usr/lib/system/libsystem_pthread.dylib
+d/usr/lib/system/libsystem_sandbox.dylib
+d/usr/lib/system/libunc.dylib
+d/usr/lib/system/libunwind.dylib
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection190"Link /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/RealmTableViewExample133"Ld DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/RealmTableViewExample normal i386411088963b18b941^0000ac963b18b941^---0#0#1#--2006"Ld DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/RealmTableViewExample normal i386    cd /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample    export IPHONEOS_DEPLOYMENT_TARGET=7.1    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -arch i386 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk -L/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator -F/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator -F/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample -F../.. -filelist /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/RealmTableViewExample.LinkFileList -Xlinker -objc_abi_version -Xlinker 2 -fobjc-arc -fobjc-link-runtime -Xlinker -no_implicit_dylibs -mios-simulator-version-min=7.1 -lstdc++.6 -framework CoreGraphics -framework UIKit -framework Foundation -framework Realm -Xlinker -dependency_info -Xlinker /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/Objects-normal/i386/RealmTableViewExample_dependency_info.dat -o /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/RealmTableViewExample36"2A3800F8-DE3D-4223-AE6B-F55513D7922B-
+bEAF02A9B-34DB-4777-9AC3-BAF7F74303D1
+
+CProcessInfoPlistFile /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/Info.plist /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/RealmTableViewExample-Info.plist
+s421018510.992278
+e421018510.994107
+r1
+xProcessInfoPlistFile
+x/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/Info.plist
+x/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/RealmTableViewExample-Info.plist
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection129"Process /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/RealmTableViewExample-Info.plist183"ProcessInfoPlistFile DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/Info.plist RealmTableViewExample/RealmTableViewExample-Info.plist0a13fe8e3b18b941^b77efe8e3b18b941^---0#0#1#-19%DVTDocumentLocation2@128"file:///Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/RealmTableViewExample-Info.plist0000000000000000^1284"ProcessInfoPlistFile DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/Info.plist RealmTableViewExample/RealmTableViewExample-Info.plist    cd /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    builtin-infoPlistUtility /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/RealmTableViewExample-Info.plist -genpkginfo /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/assetcatalog_generated_info.plist -o /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app/Info.plist36"F54ED9BB-5216-4590-8D15-0ABC72FFD186-
+b3708FD5F-5831-481D-B078-AEEF5B224598
+
+CProcessPCH /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/PrecompiledHeaders/RealmTableViewExample-Prefix-decxbkhcvdxfeuajdawmfkvjhyvv/RealmTableViewExample-Prefix.pch.pch RealmTableViewExample/RealmTableViewExample-Prefix.pch normal i386 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+s421018508.573633
+e421018509.779200
+r1
+xProcessPCH
+x/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/PrecompiledHeaders/RealmTableViewExample-Prefix-decxbkhcvdxfeuajdawmfkvjhyvv/RealmTableViewExample-Prefix.pch.pch
+xRealmTableViewExample/RealmTableViewExample-Prefix.pch
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.llvm.clang.1_0.compiler
+d/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/RealmTableViewExample-Prefix.pch
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection65"Precompile RealmTableViewExample/RealmTableViewExample-Prefix.pch301"ProcessPCH DerivedData/RealmTableViewExample/Build/Intermediates/PrecompiledHeaders/RealmTableViewExample-Prefix-decxbkhcvdxfeuajdawmfkvjhyvv/RealmTableViewExample-Prefix.pch.pch RealmTableViewExample/RealmTableViewExample-Prefix.pch normal i386 objective-c com.apple.compilers.llvm.clang.1_0.compilerf0f8928c3b18b941^e57ac78d3b18b941^---0#0#1#-19%DVTDocumentLocation2@128"file:///Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/RealmTableViewExample-Prefix.pch0000000000000000^4795"ProcessPCH DerivedData/RealmTableViewExample/Build/Intermediates/PrecompiledHeaders/RealmTableViewExample-Prefix-decxbkhcvdxfeuajdawmfkvjhyvv/RealmTableViewExample-Prefix.pch.pch RealmTableViewExample/RealmTableViewExample-Prefix.pch normal i386 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample    export LANG=en_US.US-ASCII    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c-header -arch i386 -fmessage-length=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit=0 -std=gnu99 -fobjc-arc -fmodules -fmodules-cache-path=/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/ModuleCache -Wno-trigraphs -fpascal-strings -O0 -Wno-missing-field-initializers -Wno-missing-prototypes -Werror=return-type -Wno-implicit-atomic-properties -Werror=deprecated-objc-isa-usage -Werror=objc-root-class -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wduplicate-method-match -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wno-deprecated-implementations -DDEBUG=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk -fexceptions -fasm-blocks -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -g -Wno-sign-conversion -fobjc-abi-version=2 -fobjc-legacy-dispatch -mios-simulator-version-min=7.1 -iquote /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/RealmTableViewExample-generated-files.hmap -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/RealmTableViewExample-own-target-headers.hmap -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/RealmTableViewExample-all-target-headers.hmap -iquote /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/RealmTableViewExample-project-headers.hmap -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/DerivedSources/i386 -I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/RealmTableViewExample.build/Debug-iphonesimulator/RealmTableViewExample.build/DerivedSources -F/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator -F/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample -F../.. --serialize-diagnostics /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/PrecompiledHeaders/RealmTableViewExample-Prefix-decxbkhcvdxfeuajdawmfkvjhyvv/RealmTableViewExample-Prefix.pch.dia -MMD -MT dependencies -MF /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/PrecompiledHeaders/RealmTableViewExample-Prefix-decxbkhcvdxfeuajdawmfkvjhyvv/RealmTableViewExample-Prefix.pch.d -c /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/RealmTableViewExample-Prefix.pch -o /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Intermediates/PrecompiledHeaders/RealmTableViewExample-Prefix-decxbkhcvdxfeuajdawmfkvjhyvv/RealmTableViewExample-Prefix.pch.pch36"3F8E0470-CF13-4EB4-BEE4-9FD4347D92E8-
+b3708FD5F-5831-481D-B078-AEEF5B224598
+
+CProcessPCH /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Index/PrecompiledHeaders/RealmTableViewExample-Prefix-hiudccqrokteofdiykapkmczjaum_ast/RealmTableViewExample-Prefix.pch.pch RealmTableViewExample/RealmTableViewExample-Prefix.pch normal i386 objective-c com.apple.compilers.llvm.clang.1_0.astbuilder
+r0
+
+CTouch /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/RealmTableViewExample.app
+r0
+
