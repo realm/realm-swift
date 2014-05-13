@@ -65,7 +65,7 @@ static NSMutableDictionary * s_descriptorCache;
     // create array of RLMProperties
     NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
     for (unsigned int i = 0; i < count; i++) {
-        RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i]];
+        RLMProperty *prop = [RLMProperty propertyForObjectProperty:props[i] column:propArray.count];
         if (prop) {
             [propArray addObject:prop];
         }

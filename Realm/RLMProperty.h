@@ -35,10 +35,10 @@
 @property (nonatomic, assign) char objcType;
 
 // creates a tdb property object from a runtime property
-+(instancetype)propertyForObjectProperty:(objc_property_t)prop;
++(instancetype)propertyForObjectProperty:(objc_property_t)prop column:(NSUInteger)column;
 
-// adds getters and setters for this property/column on the given class
--(void)addToClass:(Class)cls column:(int)column;
+// adds getters and setters for this property
+-(void)addToClass:(Class)cls;
 
 @end
 
