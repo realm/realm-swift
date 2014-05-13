@@ -5,34 +5,34 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>7E3CC14B-DFAD-429E-8C65-2C5BCC9B1580</string>
+	<string>1F600DD6-35C0-4CED-AC25-BD150A4EF147</string>
 	<key>IDESourceControlProjectName</key>
 	<string>Realm</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>29D9DC2B-B954-4DDF-93E5-48B6BF302207</key>
-		<string>ssh://github.com/emanuelez/tightdb_objc.git</string>
+		<key>27DAD893-8378-47AE-9BEA-A67062CF3368</key>
+		<string>https://github.com/Tightdb/tightdb_objc.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>Realm.xcworkspace</string>
+	<string>Realm.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>29D9DC2B-B954-4DDF-93E5-48B6BF302207</key>
-		<string>..</string>
+		<key>27DAD893-8378-47AE-9BEA-A67062CF3368</key>
+		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>ssh://github.com/emanuelez/tightdb_objc.git</string>
+	<string>https://github.com/Tightdb/tightdb_objc.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>29D9DC2B-B954-4DDF-93E5-48B6BF302207</string>
+	<string>27DAD893-8378-47AE-9BEA-A67062CF3368</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>29D9DC2B-B954-4DDF-93E5-48B6BF302207</string>
+			<string>27DAD893-8378-47AE-9BEA-A67062CF3368</string>
 			<key>IDESourceControlWCCName</key>
 			<string>tightdb_objc</string>
 		</dict>
