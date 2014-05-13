@@ -415,17 +415,17 @@ void update_query_with_predicate(NSPredicate * predicate, RLMObjectDescriptor *d
 
 } // namespace
 
-tightdb::Query *RLMNewQueryWithPredicate(tightdb::Query query, id predicate, RLMObjectDescriptor *desc)
+void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMObjectDescriptor *desc)
 {
     // parse and apply predicate tree
     if (predicate) {
         if ([predicate isKindOfClass:[NSString class]]) {
             update_query_with_predicate([NSPredicate predicateWithFormat:predicate],
                                         desc,
-                                        query);
+                                        *query);
         }
         else if ([predicate isKindOfClass:[NSPredicate class]]) {
-            update_query_with_predicate(predicate, desc, query);
+            update_query_with_predicate(predicate, desc, *query);
         }
         else {
             @throw RLMPredicateException(@"Invalid argument",
@@ -433,14 +433,12 @@ tightdb::Query *RLMNewQueryWithPredicate(tightdb::Query query, id predicate, RLM
         }
         
         // Test the constructed query in core
-        std::string validateMessage = query.validate();
+        std::string validateMessage = query->validate();
         if (validateMessage != "") {
             @throw RLMPredicateException(@"Invalid query",
                                         [NSString stringWithCString:validateMessage.c_str() encoding:[NSString defaultCStringEncoding]]  );
         }
     }
-    
-    return new tightdb::Query(query);
 }
 
 void RLMUpdateViewWithOrder(tightdb::TableView &view, id order, RLMObjectDescriptor *desc) {

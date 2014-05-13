@@ -165,7 +165,7 @@ inline RLMObject *RLMCreateAccessor(RLMArray *self, NSUInteger index) {
     // copy array and apply new predicate creating a new query and view
     RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:_objectClass];
     RLMArray *array = [self copy];
-    array.backingQuery = RLMNewQueryWithPredicate(*array.backingQuery, predicate, desc);;
+    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, desc);;
     array.backingView = array.backingQuery->find_all();
     return array;
 }
@@ -178,7 +178,7 @@ inline RLMObject *RLMCreateAccessor(RLMArray *self, NSUInteger index) {
     // copy array and apply new predicate
     RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:_objectClass];
     RLMArray *array = [self copy];
-    array.backingQuery = RLMNewQueryWithPredicate(*array.backingQuery, predicate, desc);
+    RLMUpdateQueryWithPredicate(array.backingQuery, predicate, desc);
     tightdb::TableView view = array.backingQuery->find_all();
     
     // apply order
