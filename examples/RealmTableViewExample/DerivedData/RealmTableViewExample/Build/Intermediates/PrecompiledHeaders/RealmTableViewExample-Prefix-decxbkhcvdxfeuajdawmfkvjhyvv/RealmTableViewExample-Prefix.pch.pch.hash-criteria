@@ -1,0 +1,31 @@
+Contents of /Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/RealmTableViewExample/RealmTableViewExample-Prefix.pch
+-x
+objective-c
+-arch
+i386
+-std=gnu99
+-fobjc-arc
+-fmodules
+-fmodules-cache-path=/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/ModuleCache
+-fpascal-strings
+-O0
+-DDEBUG=1
+-isysroot
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator7.1.sdk
+-fexceptions
+-fasm-blocks
+-g
+-fobjc-abi-version=2
+-fobjc-legacy-dispatch
+-mios-simulator-version-min=7.1
+-iquote
+-iquote
+-I/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator/include
+-I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include
+-F/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample/DerivedData/RealmTableViewExample/Build/Products/Debug-iphonesimulator
+-F/Users/ari/Src/TightDB/tightdb_objc/examples/RealmTableViewExample
+-F../..
+i386-apple-darwin13.1.0
+"4.2.1 Compatible Apple LLVM 5.1 (clang-503.0.40)"
+SDK_PRODUCT_BUILD_VERSION=11D167
+11D167

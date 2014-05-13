@@ -115,7 +115,7 @@ Class RLMAccessorClassForObjectClass(Class objectClass) {
     RLMObjectDescriptor *descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
     for (unsigned int propNum = 0; propNum < descriptor.properties.count; propNum++) {
         RLMProperty *prop = descriptor.properties[propNum];
-        [prop addToClass:proxyClass column:propNum];
+        [prop addToClass:proxyClass];
     }
     
     // set in cache to indiate this proxy class has been created and return

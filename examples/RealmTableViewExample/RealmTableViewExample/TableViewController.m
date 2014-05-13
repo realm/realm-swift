@@ -36,7 +36,6 @@ static NSString * const kTableName = @"table";
 
 @interface TableViewController ()
 
-@property (nonatomic, strong) RLMRealm *realm;
 @property (nonatomic, strong) RLMArray *array;
 
 @end
@@ -47,12 +46,17 @@ static NSString * const kTableName = @"table";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     [self setupUI];
-    [self setupRealm];
+    
+    // Set realm notification block
+    NSString *order = nil; // FIXME - crashes @"date"
+    [RLMRealm.defaultRealm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
+        self.array = [DemoObject objectsOrderedBy:order where:nil];
+        [self.tableView reloadData];
+    }];
     
     // Load initial data
-    self.array = [DemoObject allObjects];
+    self.array = [DemoObject objectsOrderedBy:order where:nil];
     [self.tableView reloadData];
 }
 
@@ -67,20 +71,6 @@ static NSString * const kTableName = @"table";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                                                            target:self
                                                                                            action:@selector(add)];
-}
-
-#pragma mark - Realm
-
-- (void)setupRealm {
-    // Get the realm
-    self.realm = [RLMRealm defaultRealm];
-    
-    // Register for notifications
-    __weak TableViewController *weakSelf = self;
-    [self.realm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
-        weakSelf.array = [DemoObject allObjects];
-        [weakSelf.tableView reloadData];
-    }];
 }
 
 #pragma mark - UITableViewDataSource
@@ -106,9 +96,10 @@ static NSString * const kTableName = @"table";
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [self.realm beginWriteTransaction];
-        [self.realm deleteObject:self.array[indexPath.row] cascade:NO];
-        [self.realm commitWriteTransaction];
+        RLMRealm *realm = RLMRealm.defaultRealm;
+        [realm beginWriteTransaction];
+        [realm deleteObject:self.array[indexPath.row] cascade:NO];
+        [realm commitWriteTransaction];
     }
 }
 
@@ -130,17 +121,19 @@ static NSString * const kTableName = @"table";
 }
 
 - (void)add {
-    [self.realm beginWriteTransaction];
-    [DemoObject createInRealm:self.realm withObject:@[[self randomString], [self randomDate]]];
-    [self.realm commitWriteTransaction];
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+    [DemoObject createInRealm:realm withObject:@[[self randomString], [self randomDate]]];
+    [realm commitWriteTransaction];
 }
 
 - (void)deleteAll {
-    [self.realm beginWriteTransaction];
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
     for (DemoObject *obj in self.array) {
-        [self.realm deleteObject:obj cascade:NO];
+        [realm deleteObject:obj cascade:NO];
     }
-    [self.realm commitWriteTransaction];
+    [realm commitWriteTransaction];
 }
 
 #pragma - Helpers
