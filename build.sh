@@ -419,6 +419,10 @@ EOF
             sh build.sh test-debug
             ) || exit 1
         (
+            cd examples/RealmSimpleExample
+            xctool -project RealmSimpleExample.xcodeproj -scheme RealmSimpleExample clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+        ) || exit 1
+        (
             cd examples/RealmTableViewExample
             xctool -project RealmTableViewExample.xcodeproj -scheme RealmTableViewExample clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
         ) || exit 1
