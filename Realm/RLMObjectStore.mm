@@ -20,6 +20,7 @@
 #import "RLMObjectStore.h"
 #import "RLMObjectDescriptor.h"
 #import "RLMPrivate.hpp"
+#import "RLMQueryUtil.h"
 
 #import <objc/runtime.h>
 
@@ -27,6 +28,7 @@
 
 static NSMutableDictionary *s_accessorClassNameCache;
 static NSArray *s_objectClasses;
+static NSMapTable *s_tableNamesForClass;
 
 // determine if class is a or a descendent of class2
 inline BOOL RLMIsKindOfclass(Class class1, Class class2) {
@@ -47,6 +49,8 @@ void RLMInitializeObjectStore() {
     dispatch_once(&onceToken, ^{
         // setup name mapping for accessor classes
         s_accessorClassNameCache = [NSMutableDictionary dictionary];
+        s_tableNamesForClass = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
+                                                     valueOptions:NSPointerFunctionsObjectPersonality];
         
         // load object descriptors for all RLMObject subclasses
         unsigned int numClasses;
@@ -56,7 +60,13 @@ void RLMInitializeObjectStore() {
         // cache descriptors for all subclasses of RLMObject
         for (int i = 0; i < numClasses; i++) {
             if (RLMIsSubclass(classes[i], RLMObject.class)) {
-                [classArray addObject:[RLMObjectDescriptor descriptorForObjectClass:classes[i]]];
+                // add to class list
+                RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:classes[i]];
+                [classArray addObject:desc];
+                
+                // set table name
+                NSString *tableName = [@"class_" stringByAppendingString:NSStringFromClass(desc.objectClass)];
+                [s_tableNamesForClass setObject:tableName forKey:desc.objectClass];
             }
         }
         s_objectClasses = [classArray copy];
@@ -65,9 +75,8 @@ void RLMInitializeObjectStore() {
 
 // get the table used to store object of objectClass
 inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm, Class objectClass) {
-    NSString *className =  NSStringFromClass(objectClass);
-    tightdb::StringData tableName(className.UTF8String, className.length);
-    return realm.group->get_table(tableName);
+    NSString *name = [s_tableNamesForClass objectForKey:objectClass];
+    return realm.group->get_table(tightdb::StringData(name.UTF8String, name.length));
 }
 
 void RLMEnsureRealmTables(RLMRealm *realm) {
@@ -163,17 +172,52 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
 }
 
 
-RLMArray *RLMObjectsOfClassWhere(RLMRealm *realm, Class objectClass, NSPredicate *predicate) {
-    if (predicate) {
-        @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                       reason:@"Not yet implemented" userInfo:nil];
+RLMArray *RLMGetObjects(RLMRealm *realm, Class objectClass, NSPredicate *predicate, id order) {
+    // get table for this calss
+    tightdb::TableRef table = RLMTableForObjectClass(realm, objectClass);
+    
+    // create view from table and predicate
+    RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
+    tightdb::Query query = RLMUpdateQueryWithPredicate(table->where(), predicate, desc);
+    tightdb::TableView view = query.find_all();
+    
+    // apply sort order
+    if (order) {
+        NSString *propName;
+        BOOL ascending = YES;
+    
+        // if not NSSortDescriptor or string then throw
+        if ([order isKindOfClass:NSSortDescriptor.class]) {
+            propName = [(NSSortDescriptor *)order key];
+            ascending = [(NSSortDescriptor *)order ascending];
+        }
+        else if ([order isKindOfClass:NSString.class]) {
+            propName = order;
+        }
+        else {
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Invalid object for order - must use property name or NSSortDescriptor"
+                                         userInfo:nil];
+        }
+
+        // validate
+        RLMProperty *prop = desc[propName];
+        if (!prop) {
+            @throw RLMPredicateException(@"Invalid sort column",
+                                         [NSString stringWithFormat:@"Column named '%@' not found.", propName]);
+        }
+        if (prop.type != RLMTypeInt && prop.type != RLMTypeBool && prop.type != RLMTypeDate) {
+            @throw RLMPredicateException(@"Invalid sort column type",
+                                         @"Sort only supported on Integer, Date and Boolean columns.");
+        }
+        view.sort(prop.column, ascending);
     }
     
+    // create array and populate
     RLMArray *array = [[RLMArray alloc] initWithObjectClass:objectClass];
-    tightdb::TableRef table = RLMTableForObjectClass(realm, objectClass);
     array.backingTable = table.get();
     array.backingTableIndex = array.backingTable->get_index_in_parent();
-    array.backingView = table->where().find_all();
+    array.backingView = view;
     array.realm = realm;
     return array;
 }

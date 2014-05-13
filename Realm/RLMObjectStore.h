@@ -37,7 +37,7 @@ Class RLMAccessorClassForObjectClass(Class objectClass);
 void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm);
 
 // get objects of a given class
-RLMArray *RLMObjectsOfClassWhere(RLMRealm *realm, Class objectClass, NSPredicate *predicate);
+RLMArray *RLMGetObjects(RLMRealm *realm, Class objectClass, NSPredicate *predicate, id order);
 
 
 

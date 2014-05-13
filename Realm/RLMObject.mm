@@ -22,6 +22,7 @@
 #import "RLMObject.h"
 #import "RLMObjectDescriptor.h"
 #import "RLMObjectStore.h"
+#import "RLMQueryUtil.h"
 
 NSString *const RLMPropertyAttributeUnique = @"RLMPropertyAttributeUnique";
 NSString *const RLMPropertyAttributeIndexed = @"RLMPropertyAttributeIndexed";
@@ -74,6 +75,7 @@ NSString *const RLMPropertyAttributeRequired = @"RLMPropertyAttributeRequired";
 }
 
 +(instancetype)createInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString {
+    // parse with NSJSONSerialization
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
 }
@@ -84,6 +86,26 @@ NSString *const RLMPropertyAttributeRequired = @"RLMPropertyAttributeRequired";
 
 -(void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
     [self setValue:obj forKeyPath:key];
+}
+
++ (RLMArray *)allObjects {
+    return RLMGetObjects(RLMRealm.defaultRealm, self.class, nil, nil);
+}
+
++ (RLMArray *)objectsWhere:(id)predicate, ... {
+    NSPredicate *outPredicate = nil;
+    if (predicate) {
+        RLM_PREDICATE(predicate, outPredicate);
+    }
+    return RLMGetObjects(RLMRealm.defaultRealm, self.class, outPredicate, nil);
+}
+
++ (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ... {
+    NSPredicate *outPredicate = nil;
+    if (predicate) {
+        RLM_PREDICATE(predicate, outPredicate);
+    }
+    return RLMGetObjects(self, self.class, outPredicate, order);
 }
 
 - (NSString *)JSONString {

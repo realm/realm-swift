@@ -9,35 +9,14 @@
 #import "XCTestCase+AsyncTesting.h"
 
 @interface RLMTestObject : RLMObject
-
 @property (nonatomic, copy) NSString *column;
-
 @end
 
 @implementation RLMTestObject
-
 @end
 
 @interface RLMRealmTests : RLMTestCase
-
 @end
-
-@interface JSONRealmTestType : RLMObject
-
-@property BOOL      boolColumn;
-@property int       intColumn;
-@property float     floatColumn;
-@property double    doubleColumn;
-@property NSString  *stringColumn;
-@property NSData    *binaryColumn;
-@property NSDate    *dateColumn;
-@property id        mixedColumn;
-
-@end
-
-@implementation JSONRealmTestType
-@end
-
 
 @implementation RLMRealmTests
 
