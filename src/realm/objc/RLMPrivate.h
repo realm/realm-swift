@@ -100,7 +100,7 @@
 -(void)RLM_setTable:(RLMTable *)aTable inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
 -(void)RLM_setMixed:(id)aMixed inColumnWithIndex:(NSUInteger)colIndex atRowIndex:(NSUInteger)atRowIndex;
 
--(size_t)RLM_lookup:(NSString *)key;
+-(NSUInteger)RLM_lookup:(NSString *)key;
 
 @end
 
