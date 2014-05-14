@@ -280,19 +280,19 @@
     // MIN ::::::::::::::::::::::::::::::::::::::::::::::
     // Test int min
     NSNumber *min = [noArray minOfProperty:@"intCol"];
-    XCTAssertEqual(min.intValue, (NSInteger)2, @"Minimum should be 2");
-    min = [yesArray minOfProperty:@"intCol"];
     XCTAssertEqual(min.intValue, (NSInteger)1, @"Minimum should be 1");
+    min = [yesArray minOfProperty:@"intCol"];
+    XCTAssertEqual(min.intValue, (NSInteger)0, @"Minimum should be 0");
     
     // Test float min
     min = [noArray minOfProperty:@"floatCol"];
-    XCTAssertEqualWithAccuracy(min.floatValue, (float)1.2f, 0.1f, @"Minimum should be 1.2f");
+    XCTAssertEqualWithAccuracy(min.floatValue, (float)0.0f, 0.1f, @"Minimum should be 0.0f");
     min = [yesArray minOfProperty:@"floatCol"];
-    XCTAssertEqualWithAccuracy(min.floatValue, (float)1.1f, 0.1f, @"Minimum should be 1.1f");
+    XCTAssertEqualWithAccuracy(min.floatValue, (float)1.2f, 0.1f, @"Minimum should be 1.2f");
     
     // Test double min
     min = [noArray minOfProperty:@"doubleCol"];
-    XCTAssertEqualWithAccuracy(min.doubleValue, (double)1.5, 0.1f, @"Minimum should be 1.5");
+    XCTAssertEqualWithAccuracy(min.doubleValue, (double)2.5, 0.1f, @"Minimum should be 1.5");
     min = [yesArray minOfProperty:@"doubleCol"];
     XCTAssertEqualWithAccuracy(min.doubleValue, (double)0.0, 0.1f, @"Minimum should be 0.0");
     
@@ -306,21 +306,21 @@
     // MAX ::::::::::::::::::::::::::::::::::::::::::::::
     // Test int max
     NSNumber *max = [noArray maxOfProperty:@"intCol"];
-    XCTAssertEqual(max.integerValue, (NSInteger)8, @"Maximum should be 8");
+    XCTAssertEqual(max.integerValue, (NSInteger)1, @"Maximum should be 8");
     max = [yesArray maxOfProperty:@"intCol"];
-    XCTAssertEqual(max.integerValue, (NSInteger)10, @"Maximum should be 10");
+    XCTAssertEqual(max.integerValue, (NSInteger)0, @"Maximum should be 10");
     
     // Test float max
     max = [noArray maxOfProperty:@"floatCol"];
-    XCTAssertEqualWithAccuracy(max.floatValue, (float)1.8f, 0.1f, @"Maximum should be 1.8f");
+    XCTAssertEqualWithAccuracy(max.floatValue, (float)0.0f, 0.1f, @"Maximum should be 0.0f");
     max = [yesArray maxOfProperty:@"floatCol"];
-    XCTAssertEqualWithAccuracy(max.floatValue, (float)2.0f, 0.1f, @"Maximum should be 2.0f");
+    XCTAssertEqualWithAccuracy(max.floatValue, (float)1.2f, 0.1f, @"Maximum should be 1.2f");
     
     // Test double max
     max = [noArray maxOfProperty:@"doubleCol"];
-    XCTAssertEqualWithAccuracy(max.doubleValue, (double)10.5, 0.1f, @"Maximum should be 10.5");
+    XCTAssertEqualWithAccuracy(max.doubleValue, (double)2.5, 0.1f, @"Maximum should be 3.5");
     max = [yesArray maxOfProperty:@"doubleCol"];
-    XCTAssertEqualWithAccuracy(max.doubleValue, (double)13.5, 0.1f, @"Maximum should be 13.5");
+    XCTAssertEqualWithAccuracy(max.doubleValue, (double)0.0, 0.1f, @"Maximum should be 0.0");
     
     // Test invalid column name
     XCTAssertThrows([noArray maxOfProperty:@"foo"], @"Should throw exception");
