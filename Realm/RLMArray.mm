@@ -72,7 +72,6 @@ static NSException *s_arrayReadOnlyException;
     self = [super init];
     if (self) {
         self.objectClass = objectClass;
-        self.accessorClass = RLMAccessorClassForObjectClass(objectClass);
     }
     return self;
 }
@@ -91,14 +90,16 @@ static NSException *s_arrayReadOnlyException;
     return _backingView.size();
 }
 
-inline id RLMCreateArrayAccessor(RLMArray *array, NSUInteger index) {
-    return RLMCreateAccessor(array->_accessorClass, array, array->_backingView.get_source_ndx(index));
+inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
+    return RLMCreateObjectAccessor(array->_realm,
+                                   array->_objectClass,
+                                   array->_backingView.get_source_ndx(index));
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
     NSUInteger batchCount = 0, index = state->state, count = self.count;
     while (index < count && batchCount < len) {
-        buffer[batchCount++] = RLMCreateArrayAccessor(self, index++);
+        buffer[batchCount++] = RLMCreateAccessorForArrayIndex(self, index++);
     }
     
     void *selfPtr = (__bridge void *)self;
@@ -112,12 +113,12 @@ inline id RLMCreateArrayAccessor(RLMArray *array, NSUInteger index) {
     if (index >= self.count) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"Index is out of bounds." userInfo:@{@"index": @(index)}];
     }
-    return RLMCreateArrayAccessor(self, index);;
+    return RLMCreateAccessorForArrayIndex(self, index);;
 }
 
 - (id)firstObject {
     if (self.count) {
-        return RLMCreateArrayAccessor(self, 0);
+        return RLMCreateAccessorForArrayIndex(self, 0);
     }
     return nil;
 }
@@ -125,7 +126,7 @@ inline id RLMCreateArrayAccessor(RLMArray *array, NSUInteger index) {
 - (id)lastObject {
     NSUInteger count = self.count;
     if (count) {
-        return RLMCreateArrayAccessor(self, count-1);
+        return RLMCreateAccessorForArrayIndex(self, count-1);
     }
     return nil;
 }

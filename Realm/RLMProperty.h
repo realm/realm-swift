@@ -31,7 +31,7 @@
 @property (nonatomic, assign) NSUInteger column;
 @property (nonatomic, copy) id defaultValue;
 
-// link class used for encapsulated objects and sub arrays
+// link class used for RLMLink and RLMArray types
 @property (nonatomic, assign) Class linkClass;
 @property (nonatomic, assign) char objcType;
 

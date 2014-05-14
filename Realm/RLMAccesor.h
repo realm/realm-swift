@@ -51,24 +51,3 @@ Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass);
 Class RLMInvalidAccessorClassForObjectClass(Class objectClass);
 
 
-//
-// Accessor Creation
-//
-
-// Register accessor with realm
-@interface RLMRealm (Accessors)
-// call whenever creating an accessor to keep up to date accross transactions
-- (void)registerAccessor:(id<RLMAccessor>)accessor;
-@end
-
-// Create accessor and register with realm
-inline id<RLMAccessor> RLMCreateAccessor(Class cls, id<RLMAccessor> parent, NSUInteger index) {
-    id<RLMAccessor> accessor = [[cls alloc] init];
-    accessor.realm = parent.realm;
-    accessor.backingTable = parent.backingTable;
-    accessor.backingTableIndex = parent.backingTableIndex;
-    accessor.objectIndex = index;
-    [accessor.realm registerAccessor:accessor];
-    return accessor;
-}
-

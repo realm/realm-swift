@@ -23,6 +23,7 @@
 #import "RLMUtil.h"
 #import "RLMProperty.h"
 #import "RLMObjectDescriptor.h"
+#import "RLMObjectStore.h"
 
 #import <objc/runtime.h>
 
@@ -44,7 +45,7 @@ void RLMAccessorCacheInitialize() {
 }
 
 // dynamic getter with column closure
-IMP RLMAccessorGetter(NSUInteger col, char accessorCode) {
+IMP RLMAccessorGetter(NSUInteger col, char accessorCode, Class linkClass) {
     switch (accessorCode) {
         case 'i':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
@@ -83,12 +84,12 @@ IMP RLMAccessorGetter(NSUInteger col, char accessorCode) {
                 return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
             });
         case 'k':
-            //            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-            //                NSUInteger index = obj.backingTable->get_link(col, obj.objectIndex);
-            //                return RLMCreateAccessor(linkClass, obj, index);
-            //            });
+//            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+//                NSUInteger index = obj.backingTable->get_link(col, obj.objectIndex);
+//                return RLMCreateObjectAccessor(obj.realm, linkClass, index);
+//            });
             @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                           reason:@"Links not yest supported" userInfo:nil];
+                                           reason:@"Links not yet supported" userInfo:nil];
         case '@':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
                 return obj[col];
@@ -141,15 +142,22 @@ IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
                 obj.backingTable->set_datetime(col, obj.objectIndex, tightdb::DateTime(time));
             });
         case 'k':
-            //            return imp_implementationWithBlock(^(id<RLMAccessor> obj, RLMObject *link) {
-            //                // add to Realm if not it it.
-            //                if (link && link.realm != obj.realm) {
-            //                    [obj.realm addObject:link];
-            //                }
-            //                obj.backingTable->set_link(col, obj.objectIndex, link.objectIndex);
-            //            });
+//            return imp_implementationWithBlock(^(id<RLMAccessor> obj, RLMObject *link) {
+//                if (!link || link.class == NSNull.class) {
+//                    // if null
+//                    obj.backingTable->nullify_link(col, obj.objectIndex);
+//                }
+//                else {
+//                    // add to Realm if not it it.
+//                    if (link.realm != obj.realm) {
+//                        [obj.realm addObject:link];
+//                    }
+//                    // set link
+//                    obj.backingTable->set_link(col, obj.objectIndex, link.objectIndex);
+//                }
+//            });
             @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                           reason:@"Links not yest supported" userInfo:nil];
+                                           reason:@"Links not yet supported" userInfo:nil];
         case '@':
         case 't':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj, id val) {
@@ -200,7 +208,7 @@ IMP RLMAccessorExceptionSetter(NSUInteger col, char accessorCode, NSString *mess
 
 // getter for invalid objects
 NSString *const c_invalidObjectMessage = @"Object is no longer valid.";
-IMP RLMAccessorInvalidGetter(NSUInteger col, char accessorCode) {
+IMP RLMAccessorInvalidGetter(NSUInteger col, char accessorCode, Class linkClass) {
     return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
         @throw [NSException exceptionWithName:@"RLMException" reason:c_invalidObjectMessage userInfo:nil];
     });
@@ -222,6 +230,8 @@ IMP RLMAccessorReadOnlySetter(NSUInteger col, char accessorCode) {
 #define SETTER_TYPES(C) "v:@" C
 
 // getter type strings
+// NOTE: this typecode is really the the first charachter of the objc/runtime.h type
+//       the @ type maps to multiple tightdb types (string, date, array, mixed, any which are id in objc)
 const char * getterTypeStringForObjcCode(char code) {
     switch (code) {
         case 'i': return GETTER_TYPES("i");
@@ -236,6 +246,8 @@ const char * getterTypeStringForObjcCode(char code) {
 }
 
 // setter type strings
+// NOTE: this typecode is really the the first charachter of the objc/runtime.h type
+//       the @ type maps to multiple tightdb types (string, date, array, mixed, any which are id in objc)
 const char * setterTypeStringForObjcCode(char code) {
     switch (code) {
         case 'i': return SETTER_TYPES("i");
@@ -264,11 +276,10 @@ char accessorCodeForType(char objcTypeCode, RLMType rlmType) {
     }
 }
 
-Class RLMCreateAccessor(Class objectClass,
-                        NSString *accessorClassPrefix,
-                        IMP (*getterGetter)(NSUInteger, char),
-                        IMP (*setterGetter)(NSUInteger, char))
-{
+Class RLMCreateAccessorClass(Class objectClass,
+                             NSString *accessorClassPrefix,
+                             IMP (*getterGetter)(NSUInteger, char, Class),
+                             IMP (*setterGetter)(NSUInteger, char)) {
     // if objectClass is RLMRow use it, otherwise use proxy class
     if (!RLMIsSubclass(objectClass, RLMObject.class)) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMObject" userInfo:nil];
@@ -285,7 +296,7 @@ Class RLMCreateAccessor(Class objectClass,
         RLMProperty *prop = descriptor.properties[propNum];
         SEL getterSel = NSSelectorFromString(prop.getterName);
         SEL setterSel = NSSelectorFromString(prop.setterName);
-        IMP getterImp = getterGetter(prop.column, accessorCodeForType(prop.objcType, prop.type));
+        IMP getterImp = getterGetter(prop.column, accessorCodeForType(prop.objcType, prop.type), prop.linkClass);
         IMP setterImp = setterGetter(prop.column, accessorCodeForType(prop.objcType, prop.type));
         class_replaceMethod(proxyClass, getterSel, getterImp, getterTypeStringForObjcCode(prop.objcType));
         class_replaceMethod(proxyClass, setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));
@@ -300,7 +311,8 @@ Class RLMAccessorClassForObjectClass(Class objectClass) {
     }
 
     // create accessor and cache
-    Class accessorClass = RLMCreateAccessor(objectClass, @"RLMAccessor_", RLMAccessorGetter, RLMAccessorSetter);
+    Class accessorClass = RLMCreateAccessorClass(objectClass, @"RLMAccessor_",
+                                                 RLMAccessorGetter, RLMAccessorSetter);
     [s_accessorCache setObject:accessorClass forKey:objectClass];
     return accessorClass;
 }
@@ -312,8 +324,8 @@ Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass) {
     }
     
     // create accessor and cache
-    Class accessorClass = RLMCreateAccessor(objectClass, @"RLMReadOnly_",
-                                            RLMAccessorGetter, RLMAccessorReadOnlySetter);
+    Class accessorClass = RLMCreateAccessorClass(objectClass, @"RLMReadOnly_",
+                                                 RLMAccessorGetter, RLMAccessorReadOnlySetter);
     [s_readOnlyAccessorCache setObject:accessorClass forKey:objectClass];
     return accessorClass;
 }
@@ -325,8 +337,8 @@ Class RLMInvalidAccessorClassForObjectClass(Class objectClass) {
     }
     
     // create accessor and cache
-    Class accessorClass = RLMCreateAccessor(objectClass, @"RLMInvalid_",
-                                            RLMAccessorInvalidGetter, RLMAccessorInvalidSetter);
+    Class accessorClass = RLMCreateAccessorClass(objectClass, @"RLMInvalid_",
+                                                 RLMAccessorInvalidGetter, RLMAccessorInvalidSetter);
     [s_invalidAccessorCache setObject:accessorClass forKey:objectClass];
     return accessorClass;
 }
