@@ -81,7 +81,7 @@ NSExpressionType validated_expression_type(NSExpression *expression) {
 // add a clause for numeric constraints based on operator type
 template <typename T>
 void add_numeric_constraint_to_query(tightdb::Query & query,
-                                     RLMType datatype,
+                                     RLMPropertyType datatype,
                                      NSPredicateOperatorType operatorType,
                                      NSUInteger index,
                                      T value) {
@@ -197,7 +197,7 @@ void add_datetime_constraint_to_query(tightdb::Query & query,
 }
 
 void add_between_constraint_to_query(tightdb::Query & query,
-                                     RLMType dataType,
+                                     RLMPropertyType dataType,
                                      NSUInteger index,
                                      NSArray *array) {
     id from = array.firstObject;
@@ -263,7 +263,7 @@ void add_binary_constraint_to_query(tightdb::Query & query,
     }
 }
 
-void validate_value_for_query(id value, RLMType type, BOOL betweenOperation) {
+void validate_value_for_query(id value, RLMPropertyType type, BOOL betweenOperation) {
     if (betweenOperation) {
         if ([value isKindOfClass:[NSArray class]]) {
             NSArray *array = value;
@@ -292,7 +292,7 @@ void update_query_with_value_expression(RLMObjectDescriptor * desc, tightdb::Que
     
     // validate object type
     NSUInteger index = RLMValidatedColumnIndex(desc, columnName);
-    RLMType type = [desc[columnName] type];
+    RLMPropertyType type = [desc[columnName] type];
     
     BOOL betweenOperation = (operatorType == NSBetweenPredicateOperatorType);
     validate_value_for_query(value, type, betweenOperation);
@@ -466,7 +466,7 @@ void RLMUpdateViewWithOrder(tightdb::TableView &view, id order, RLMObjectDescrip
             @throw RLMPredicateException(@"Invalid sort column",
                                          [NSString stringWithFormat:@"Column named '%@' not found.", propName]);
         }
-        if (prop.type != RLMTypeInt && prop.type != RLMTypeBool && prop.type != RLMTypeDate) {
+        if (prop.type != RLMPropertyTypeInt && prop.type != RLMPropertyTypeBool && prop.type != RLMPropertyTypeDate) {
             @throw RLMPredicateException(@"Invalid sort column type",
                                          @"Sort only supported on Integer, Date and Boolean columns.");
         }

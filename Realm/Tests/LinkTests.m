@@ -85,7 +85,7 @@
     fiel.dog = owner.dog;
     [realm commitWriteTransaction];
     
-    XCTAssertEqual([realm objects:OwnerObject.class where:nil].count, 2, @"Expecting 1 owner");
+    XCTAssertEqual([realm objects:OwnerObject.class where:nil].count, 2, @"Expecting 2 owners");
     XCTAssertEqual([realm objects:DogObject.class where:nil].count, 1, @"Expecting 1 dog");
 }
 

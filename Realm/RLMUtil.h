@@ -18,11 +18,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMType.h"
+#import "RLMConstants.h"
 #import <objc/runtime.h>
 
 // returns if the object can be inserted as the given type
-BOOL RLMIsObjectOfType(id obj, RLMType type);
+BOOL RLMIsObjectOfType(id obj, RLMPropertyType type);
 
 // C version of isKindOfClass
 inline BOOL RLMIsKindOfclass(Class class1, Class class2) {

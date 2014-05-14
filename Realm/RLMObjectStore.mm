@@ -81,7 +81,7 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
         if (table->get_column_count() == 0) {
             for (RLMProperty *prop in desc.properties) {
                 tightdb::StringData name(prop.name.UTF8String, prop.name.length);
-                if (prop.type == RLMTypeLink) {
+                if (prop.type == RLMPropertyTypeObject) {
 //                    tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.linkClass);
 //                    table->add_column_link(name, linkTable->get_index_in_parent());
                     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
@@ -129,6 +129,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     }
     
     // change object class to accessor class (if not already)
+    // we are in a read transaction so we use the rw accessor class
     Class accessorClass = RLMAccessorClassForObjectClass(object.class);
     if (object.class != accessorClass) {
         object_setClass(object, accessorClass);
@@ -141,7 +142,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
         [object setValue:dict[key] forKeyPath:key];
     }
     
-    // set the realm and register
+    // register object with the realm
     [realm registerAccessor:object];
 }
 

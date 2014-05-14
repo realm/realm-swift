@@ -36,44 +36,44 @@
 @synthesize setterName = _setterName;
 
 
-// determine RLMType from objc code
+// determine RLMPropertyType from objc code
 -(void)parsePropertyTypeString:(const char *)code {
     self.objcType = *(code);    // first char of type attr
     if (self.objcType == 'q') {
         self.objcType = 'l';    // collapse these as they are the same
     }
     
-    // map to RLMType
+    // map to RLMPropertyType
     switch (self.objcType) {
         case 'i':   // int
         case 'l':   // long
-            self.type = RLMTypeInt;
+            self.type = RLMPropertyTypeInt;
             break;
         case 'f':
-            self.type = RLMTypeFloat;
+            self.type = RLMPropertyTypeFloat;
             break;
         case 'd':
-            self.type = RLMTypeDouble;
+            self.type = RLMPropertyTypeDouble;
             break;
         case 'c':   // BOOL is stored as char - since rlm has no char type this is ok
         case 'B':
-            self.type = RLMTypeBool;
+            self.type = RLMPropertyTypeBool;
             break;
         case '@':
         {
             NSString *type = [NSString stringWithUTF8String:code];
             // if one charachter, this is an untyped id, ie [type isEqualToString:@"@"]
             if (type.length == 1) {
-                self.type = RLMTypeMixed;
+                self.type = RLMPropertyTypeAny;
             }
             else if ([type isEqualToString:@"@\"NSString\""]) {
-                self.type = RLMTypeString;
+                self.type = RLMPropertyTypeString;
             }
             else if ([type isEqualToString:@"@\"NSDate\""]) {
-                self.type = RLMTypeDate;
+                self.type = RLMPropertyTypeDate;
             }
             else if ([type isEqualToString:@"@\"NSData\""]) {
-                self.type = RLMTypeBinary;
+                self.type = RLMPropertyTypeData;
             }
             else if ([type hasPrefix:@"@\"RLMArray<"]) {
                 // check for array class
@@ -84,14 +84,14 @@
                 else {
                     @throw [NSException exceptionWithName:@"RLMException" reason:@"No type specified for RLMArray" userInfo:nil];
                 }
-                self.type = RLMTypeTable;
+                self.type = RLMPropertyTypeTable;
             }
             else {
                 // check if this is an RLMObject
                 Class cls = NSClassFromString([type substringWithRange:NSMakeRange(2, type.length-3)]);
                 if (RLMIsSubclass(cls, RLMObject.class)) {
                     self.linkClass = cls;
-                    self.type = RLMTypeLink;
+                    self.type = RLMPropertyTypeObject;
                 }
                 else {
                     @throw [NSException exceptionWithName:@"RLMException" reason:@"Encapsulated properties must descend from RLMObject" userInfo:nil];
@@ -100,7 +100,7 @@
             break;
         }
         default:
-            self.type = RLMTypeNone;
+            self.type = RLMPropertyTypeNone;
             break;
     }
 }
@@ -139,7 +139,7 @@
     free(atts);
     
     // make sure we have a valid type
-    if (prop.type == RLMTypeNone) {
+    if (prop.type == RLMPropertyTypeNone) {
         NSString * reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
                              "Add to ignoredPropertyNames: method to ignore.", prop.name];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];
