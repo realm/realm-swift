@@ -770,7 +770,9 @@ EOF
 /src
 /test-installed
 /test-iphone
-/doc
+/docs
+/CHANGELOG.md
+/Realm.xcodeproj
 EOF
         cat >"$TEMP_DIR/exclude" <<EOF
 .gitignore
