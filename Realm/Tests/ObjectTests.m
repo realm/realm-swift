@@ -78,16 +78,14 @@
 @implementation KeyedObject
 @end
 
-//@interface CustomAccessors : RLMObject
-//@property (getter = getThatName) NSString * name;
-//@property (setter = setTheInt:) int age;
-//@end
-//
-//@implementation CustomAccessors
-//@end
-//
-//
-//RLM_TABLE_TYPE_FOR_OBJECT_TYPE(KeyedTable, KeyedObject)
+@interface CustomAccessors : RLMObject
+@property (getter = getThatName) NSString * name;
+@property (setter = setTheInt:) int age;
+@end
+
+@implementation CustomAccessors
+@end
+
 
 @interface AggregateObject : RLMObject
 @property int IntCol;
@@ -99,23 +97,7 @@
 @implementation AggregateObject
 @end
 
-//@interface JSONTableTestType : RLMObject
-//
-//@property BOOL      boolColumn;
-//@property int       intColumn;
-//@property float     floatColumn;
-//@property double    doubleColumn;
-//@property NSString  *stringColumn;
-//@property NSData    *binaryColumn;
-//@property NSDate    *dateColumn;
-//@property id        mixedColumn;
-//
-//@end
-//
-//@implementation JSONTableTestType
-//@end
-//
-//RLM_TABLE_TYPE_FOR_OBJECT_TYPE(JSONTableTestTable, JSONTableTestType)
+
 
 @interface RLMTypedTableTests : RLMTestCase
 
@@ -129,21 +111,6 @@
 //        // create table and set object class
 //        AllTypesTable *table = [AllTypesTable tableInRealm:realm named:@"table"];
 //        
-//        NSLog(@"Table: %@", table);
-//        XCTAssertNotNil(table, @"Table is nil");
-//
-//        // Verify column types
-//        XCTAssertEqual(RLMTypeBool,   [table columnTypeOfColumnWithIndex:0], @"First column not bool");
-//        XCTAssertEqual(RLMTypeInt,    [table columnTypeOfColumnWithIndex:1], @"Second column not int");
-//        XCTAssertEqual(RLMTypeFloat,  [table columnTypeOfColumnWithIndex:2], @"Third column not float");
-//        XCTAssertEqual(RLMTypeDouble, [table columnTypeOfColumnWithIndex:3], @"Fourth column not double");
-//        XCTAssertEqual(RLMTypeString, [table columnTypeOfColumnWithIndex:4], @"Fifth column not string");
-//        XCTAssertEqual(RLMTypeBinary, [table columnTypeOfColumnWithIndex:5], @"Sixth column not binary");
-//        XCTAssertEqual(RLMTypeDate,   [table columnTypeOfColumnWithIndex:6], @"Seventh column not date");
-//        XCTAssertEqual(RLMTypeTable,  [table columnTypeOfColumnWithIndex:7], @"Eighth column not table");
-//        XCTAssertEqual(RLMTypeBool,   [table columnTypeOfColumnWithIndex:8], @"Ninth column not bool");
-//        XCTAssertEqual(RLMTypeInt,    [table columnTypeOfColumnWithIndex:9], @"Tenth column not long");
-//        XCTAssertEqual(RLMTypeMixed,    [table columnTypeOfColumnWithIndex:10], @"Eleventh column not mixed");
 //
 //        const char bin[4] = { 0, 1, 2, 3 };
 //        NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
@@ -206,7 +173,7 @@
 //    }];
 //}
 
-- (void)testTableTyped_Subscripting
+- (void)testObjectSubscripting
 {
     [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath() error:nil];
 
@@ -239,72 +206,22 @@
     [KeyedObject createInRealm:realm withObject:@{@"name" : @"Test2", @"objID" : @25}];
     [realm commitWriteTransaction];
     
-//    RLMArray *array = [KeyedObject allObjects];
-//    XCTAssertNil(array[@"foo"], @"table[\"foo\"] should be nil");
-//        
-//        AgeTable* errTable = [AgeTable tableInRealm:realm named:@"errTable"];
-//        [errTable setObjectClass:Sub.class];
-//        
-//        [errTable addRow:@{@"age" : @987289}];
-//        XCTAssertThrows(errTable[@"X"], @"Accessing RLMRow via keyed subscript on a column that is not of type RLMTypeString should throw exception");
-//        
-//        // Test keyed subscripting setters
-//        
-//        // No exisiting for table
-//        NSUInteger previousRowCount = [table rowCount];
-//        NSString* nonExistingKey = @"Test10123903784293";
-//        table[nonExistingKey] = @{@"name" : nonExistingKey, @"objID" : @1};
-//        
-//        XCTAssertEqual(previousRowCount, [table rowCount], @"Row count should be equal to previous row after inserting a non-existing RLMRow");
-//        // Commenting out until set row method transitioned from update row
-//        //XCTAssertNotNil(table[nonExistingKey], @"table[nonExistingKey] should not be nil");
-//        //XCTAssertEqual(table[nonExistingKey].objID, 1, @"table[nonExistingKey]objID should be equal to 1");
-//        //XCTAssertEqualObjects(table[nonExistingKey].name, nonExistingKey, @"table[nonExistingKey].name should be equal to nonExistingKey");
-//        
-//        // Set non-existing row to nil for table
-//        previousRowCount = [table rowCount];
-//        NSString* anotherNonExistingKey = @"sdalfjhadskfja";
-//        table[anotherNonExistingKey] = nil;
-//        
-//        XCTAssertEqual(previousRowCount, [table rowCount], @"previousRowCount should equal current rowCount");
-//        XCTAssertNil(table[anotherNonExistingKey], @"table[anotherNonExistingKey] should be nil");
-//        
-//        // Has existing for table
-//        previousRowCount = [table rowCount];
-//        table[@"Test2"] = @{@"name" : @"Test3" , @"objID" : @123};
-//        
-//        XCTAssertEqual(previousRowCount, [table rowCount], @"Row count should still equal previous row count after inserting an existing RLMRow");
-//        XCTAssertNil(table[@"Test2"], @"table[@\"Test2\"] should be nil");
-//        XCTAssertNotNil(table[@"Test3"], @"table[@\"Test3\"] should not be nil");
-//        XCTAssertEqual((int)table[@"Test3"].objID, 123, @"table[\"Test3\"].objID should be equal to 123");
-//        XCTAssertEqualObjects(table[@"Test3"].name, @"Test3", @"table[\"Test3\"].name should be equal to @\"Test3\"");
-//        
-//        // Set existing row to nil for table
-//        previousRowCount = [table rowCount];
-//        table[@"Test3"] = nil;
-//        
-//        XCTAssertEqual(previousRowCount, [table rowCount], @"[table rowCount] should be equal to previousRowCount");
-//        XCTAssertNotNil(table[@"Test3"], @"table[\"Test3\"] should not be nil");
-//        
-//        // No existing for errTable
-//        previousRowCount = [errTable rowCount];
-//        XCTAssertThrows((errTable[@"SomeKey"] = @{@"id" : @821763}), @"Calling keyed subscriptor on errTable should throw exception");
-//        XCTAssertEqual(previousRowCount, [errTable rowCount], @"errTable should have same count as previous");
     
 }
 
-//- (void)testCustomAccessors {
-//    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
-//        RLMTable *table = [realm createTableWithName:@"Test" objectClass:[CustomAccessors class]];
-//        [table addRow:@[@"name", @2]];
-//        
-//        XCTAssertEqualObjects([table[0] getThatName], @"name", @"name property should be name.");
-//        
-//        [table[0] setTheInt:99];
-//        XCTAssertEqual((int)[table[0] age], (int)99, @"age property should be 99");
-//    }];
-//}
-//
+- (void)testCustomAccessors {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    CustomAccessors *ca = [CustomAccessors createInRealm:realm withObject:@[@"name", @2]];
+    XCTAssertEqualObjects([ca getThatName], @"name", @"name property should be name.");
+        
+    [ca setTheInt:99];
+    XCTAssertEqual((int)ca.age, (int)99, @"age property should be 99");
+    [realm commitWriteTransaction];
+  
+}
+
 - (void)testObjectCount
 {
     [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath() error:nil];
@@ -441,34 +358,6 @@
     // Test operation not supported
     XCTAssertThrows([noArray maxOfProperty:@"BoolCol"], @"Should throw exception");
 }
-
-
-//
-//- (void)testTableTyped_minInColumn
-//{
-//    [[self realmWithTestPath] writeUsingBlock:^(RLMRealm *realm) {
-//        AggregateTable *table = [AggregateTable tableInRealm:realm named:@"Table"];
-//        
-//        [table addRow:@[@1, @1.1f, @0.0, @YES]];
-//        [table addRow:@[@2, @1.2f, @1.5, @NO]];
-//        [table addRow:@[@3, @1.3f, @3.0, @YES]];
-//        [table addRow:@[@4, @1.4f, @4.5, @NO]];
-//        [table addRow:@[@5, @1.5f, @6.0, @YES]];
-//        [table addRow:@[@6, @1.6f, @7.5, @NO]];
-//        [table addRow:@[@7, @1.7f, @9.0, @YES]];
-//        [table addRow:@[@8, @1.8f, @10.5, @NO]];
-//        [table addRow:@[@9, @1.9f, @12.0, @YES]];
-//        [table addRow:@[@10, @2.0f, @13.5, @YES]];
-//        
-//    }];
-//}
-
-
-
-
-
-
-
 
 
 @end
