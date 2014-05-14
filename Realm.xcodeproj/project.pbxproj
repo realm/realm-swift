@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		02B34D531922BBCC003C4C43 /* LinkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02B34D521922BBCC003C4C43 /* LinkTests.m */; };
-		02B34D541922BBCC003C4C43 /* LinkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02B34D521922BBCC003C4C43 /* LinkTests.m */; };
 		02C4145F191DE49600F858D9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E918909C177B677900653D7A /* Cocoa.framework */; };
 		02C41465191DE49600F858D9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 02C41463191DE49600F858D9 /* InfoPlist.strings */; };
 		02C4146F191DE49600F858D9 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */; };
@@ -68,6 +66,10 @@
 		02C4154D1921BE4E00F858D9 /* RLMRealm.h in Headers */ = {isa = PBXBuildFile; fileRef = 02C41484191DE57600F858D9 /* RLMRealm.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02C4154E1921BE5200F858D9 /* RLMMigration.h in Headers */ = {isa = PBXBuildFile; fileRef = 02C41497191DECCF00F858D9 /* RLMMigration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02C4154F1921BE5500F858D9 /* RLMObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 02C41483191DE57600F858D9 /* RLMObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		02C4155A1923DDFC00F858D9 /* RLMAccesor.h in Headers */ = {isa = PBXBuildFile; fileRef = 02C415581923DDFC00F858D9 /* RLMAccesor.h */; };
+		02C4155B1923DDFC00F858D9 /* RLMAccesor.h in Headers */ = {isa = PBXBuildFile; fileRef = 02C415581923DDFC00F858D9 /* RLMAccesor.h */; };
+		02C4155C1923DDFC00F858D9 /* RLMAccesor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02C415591923DDFC00F858D9 /* RLMAccesor.mm */; };
+		02C4155D1923DDFC00F858D9 /* RLMAccesor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02C415591923DDFC00F858D9 /* RLMAccesor.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -100,7 +102,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		02B34D521922BBCC003C4C43 /* LinkTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LinkTests.m; sourceTree = "<group>"; };
 		02C4145E191DE49600F858D9 /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		02C41462191DE49600F858D9 /* Realm-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
 		02C41464191DE49600F858D9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -148,6 +149,8 @@
 		02C415481921B94400F858D9 /* libtightdb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtightdb.a; path = ../../../../../usr/local/lib/libtightdb.a; sourceTree = "<group>"; };
 		02C415501921BF2500F858D9 /* Realm-iOSTests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-iOSTests-Info.plist"; sourceTree = "<group>"; };
 		02C415521921BF3C00F858D9 /* Realm-iOS-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Realm-iOS-Prefix.pch"; sourceTree = "<group>"; };
+		02C415581923DDFC00F858D9 /* RLMAccesor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAccesor.h; sourceTree = "<group>"; };
+		02C415591923DDFC00F858D9 /* RLMAccesor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAccesor.mm; sourceTree = "<group>"; };
 		4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		803BC78F1907C0D3006AB33A /* release_notes.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = release_notes.md; sourceTree = "<group>"; };
 		E918909C177B677900653D7A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
@@ -204,6 +207,8 @@
 			children = (
 				02C414D219218A6100F858D9 /* Categories */,
 				02C41467191DE49600F858D9 /* Realm.h */,
+				02C415581923DDFC00F858D9 /* RLMAccesor.h */,
+				02C415591923DDFC00F858D9 /* RLMAccesor.mm */,
 				02C41482191DE57600F858D9 /* RLMArray.h */,
 				02C41488191DE58D00F858D9 /* RLMArray.mm */,
 				02C41494191DE72100F858D9 /* RLMConstants.h */,
@@ -244,7 +249,6 @@
 		02C41474191DE49600F858D9 /* RealmTests */ = {
 			isa = PBXGroup;
 			children = (
-				02B34D521922BBCC003C4C43 /* LinkTests.m */,
 				02C414D71921939D00F858D9 /* QueryTests.m */,
 				02C4147A191DE49600F858D9 /* RealmTests.m */,
 				02C4148E191DE68900F858D9 /* RLMTestCase.h */,
@@ -334,6 +338,7 @@
 				02C414C4191F41AE00F858D9 /* Realm.h in Headers */,
 				02C41487191DE57600F858D9 /* RLMRealm.h in Headers */,
 				02C41486191DE57600F858D9 /* RLMObject.h in Headers */,
+				02C4155A1923DDFC00F858D9 /* RLMAccesor.h in Headers */,
 				02C414D019218A5B00F858D9 /* NSData+RLMGetBinaryData.h in Headers */,
 				02C41485191DE57600F858D9 /* RLMArray.h in Headers */,
 				02C41498191DECCF00F858D9 /* RLMMigration.h in Headers */,
@@ -356,6 +361,7 @@
 				02C4154C1921BE4900F858D9 /* RLMArray.h in Headers */,
 				02C4154F1921BE5500F858D9 /* RLMObject.h in Headers */,
 				02C4154E1921BE5200F858D9 /* RLMMigration.h in Headers */,
+				02C4155B1923DDFC00F858D9 /* RLMAccesor.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -528,6 +534,7 @@
 				02C414A6191DF3EF00F858D9 /* RLMProperty.mm in Sources */,
 				02C414CD19218A2500F858D9 /* RLMQueryUtil.mm in Sources */,
 				02C41496191DE95800F858D9 /* RLMConstants.m in Sources */,
+				02C4155C1923DDFC00F858D9 /* RLMAccesor.mm in Sources */,
 				02C41489191DE58D00F858D9 /* RLMArray.mm in Sources */,
 				02C414A9191DF3EF00F858D9 /* RLMObjectStore.mm in Sources */,
 				02C4148D191DE5B100F858D9 /* RLMRealm.mm in Sources */,
@@ -541,7 +548,6 @@
 				02C414D81921939D00F858D9 /* QueryTests.m in Sources */,
 				02C4147B191DE49600F858D9 /* RealmTests.m in Sources */,
 				02C41493191DE68900F858D9 /* XCTestCase+AsyncTesting.m in Sources */,
-				02B34D531922BBCC003C4C43 /* LinkTests.m in Sources */,
 				02C41492191DE68900F858D9 /* RLMTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -557,6 +563,7 @@
 				02C4152F1921B10A00F858D9 /* RLMObjectDescriptor.m in Sources */,
 				02C415321921B10A00F858D9 /* RLMProperty.mm in Sources */,
 				02C415341921B10A00F858D9 /* RLMObjectStore.mm in Sources */,
+				02C4155D1923DDFC00F858D9 /* RLMAccesor.mm in Sources */,
 				02C415361921B10A00F858D9 /* RLMQueryUtil.mm in Sources */,
 				02C415391921B10A00F858D9 /* RLMRealm.mm in Sources */,
 				02C4153C1921B10A00F858D9 /* RLMUtil.mm in Sources */,
@@ -570,7 +577,6 @@
 				02C415431921B4FE00F858D9 /* RLMTestCase.m in Sources */,
 				02C415441921B50000F858D9 /* XCTestCase+AsyncTesting.m in Sources */,
 				02C4153E1921B25000F858D9 /* QueryTests.m in Sources */,
-				02B34D541922BBCC003C4C43 /* LinkTests.m in Sources */,
 				02C4153F1921B25000F858D9 /* RealmTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

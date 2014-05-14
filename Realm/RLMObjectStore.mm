@@ -27,15 +27,16 @@
 
 #import <tightdb/table.hpp>
 
-static NSMutableDictionary *s_accessorClassNameCache;
 static NSArray *s_objectClasses;
 static NSMapTable *s_tableNamesForClass;
 
 void RLMInitializeObjectStore() {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        // register accessor cache
+        RLMAccessorCacheInitialize();
+        
         // setup name mapping for accessor classes
-        s_accessorClassNameCache = [NSMutableDictionary dictionary];
         s_tableNamesForClass = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
                                                      valueOptions:NSPointerFunctionsObjectPersonality];
         
@@ -83,8 +84,10 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
             for (RLMProperty *prop in desc.properties) {
                 tightdb::StringData name(prop.name.UTF8String, prop.name.length);
                 if (prop.type == RLMTypeLink) {
-                    tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.linkClass);
-                    table->add_column_link(name, linkTable->get_index_in_parent());
+//                    tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.linkClass);
+//                    table->add_column_link(name, linkTable->get_index_in_parent());
+                    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                                   reason:@"Links not yest supported" userInfo:nil];
                 }
                 else {
                     table->add_column((tightdb::DataType)prop.type, name);
@@ -101,35 +104,6 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
         }
     }
     [realm commitWriteTransaction];
-}
-
-Class RLMAccessorClassForObjectClass(Class objectClass) {
-    // if objectClass is RLMRow use it, otherwise use proxy class
-    if (!RLMIsSubclass(objectClass, RLMObject.class)) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMRow" userInfo:nil];
-    }
-    
-    // see if we have a cached version
-    NSString *objectClassName = NSStringFromClass(objectClass);
-    if (s_accessorClassNameCache[objectClassName]) {
-        return NSClassFromString(s_accessorClassNameCache[objectClassName]);
-    }
-    
-    // create and register proxy class which derives from object class
-    NSString *proxyClassName = [@"RLMAccessor_" stringByAppendingString:objectClassName];
-    Class proxyClass = objc_allocateClassPair(objectClass, proxyClassName.UTF8String, 0);
-    objc_registerClassPair(proxyClass);
-    
-    // override getters/setters for each propery
-    RLMObjectDescriptor *descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
-    for (unsigned int propNum = 0; propNum < descriptor.properties.count; propNum++) {
-        RLMProperty *prop = descriptor.properties[propNum];
-        [prop addToClass:proxyClass];
-    }
-    
-    // set in cache to indiate this proxy class has been created and return
-    s_accessorClassNameCache[objectClassName] = proxyClassName;
-    return proxyClass;
 }
 
 void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {

@@ -35,11 +35,12 @@
 @property (nonatomic, assign) Class linkClass;
 @property (nonatomic, assign) char objcType;
 
+// getter and setter names
+@property (nonatomic, copy) NSString * getterName;
+@property (nonatomic, copy) NSString * setterName;
+
 // creates a tdb property object from a runtime property
 +(instancetype)propertyForObjectProperty:(objc_property_t)prop column:(NSUInteger)column;
-
-// adds getters and setters for this property
--(void)addToClass:(Class)cls;
 
 @end
 
