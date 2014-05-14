@@ -1,9 +1,22 @@
+////////////////////////////////////////////////////////////////////////////
 //
-//  realm.mm
-//  TightDB
+// TIGHTDB CONFIDENTIAL
+// __________________
 //
-//  Run tests on RLMRealm
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
 //
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import "RLMTestCase.h"
 #import "XCTestCase+AsyncTesting.h"
@@ -28,7 +41,6 @@
     XCTAssertEqual([realm class], [RLMRealm class], @"realm should be of class RLMRealm");
 }
 
-
 - (void)testRealmAddAndRemoveObjects {
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
@@ -51,6 +63,15 @@
     objects = [realm objects:RLMTestObject.class where:nil];
     XCTAssertEqual(objects.count, 1, @"Expecting 1 object");
     XCTAssertEqualObjects([objects.firstObject column], @"b", @"Expecting column to be 'b'");
+}
+
+- (void)testRealmModifyObjectsOutsideOfWriteTransaction {
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm beginWriteTransaction];
+    RLMTestObject *obj = [RLMTestObject createInRealm:realm withObject:@[@"a"]];
+    [realm commitWriteTransaction];
+    
+    XCTAssertThrows([obj setColumn:@"throw"], @"Setter should throw when called outside of transaction.");
 }
 
 - (void)testRealmIsUpdatedAfterBackgroundUpdate {
@@ -117,7 +138,7 @@
  RLMRealm * realm = [self realmWithTestPath];
  [realm beginWriteTransaction];
  RLMTable *table = [realm createTableWithName:@"table"];
- [table addColumnWithName:@"col0" type:RLMTypeInt];
+ [table addColumnWithName:@"col0" type:RLMPropertyTypeInt];
  [realm commitWriteTransaction];
  
  @autoreleasepool {

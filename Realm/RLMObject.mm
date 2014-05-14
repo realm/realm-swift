@@ -80,6 +80,17 @@ NSString *const RLMPropertyAttributeRequired = @"RLMPropertyAttributeRequired";
                                    reason:@"Not yet implemented" userInfo:nil];
 }
 
+- (void)setWritable:(BOOL)writable {
+    // set accessor class based on write permission
+    if (writable) {
+        object_setClass(self, RLMAccessorClassForObjectClass(self.superclass));
+    }
+    else {
+        object_setClass(self, RLMReadOnlyAccessorClassForObjectClass(self.superclass));
+    }
+    _writable = writable;
+}
+
 -(id)objectForKeyedSubscript:(NSString *)key {
     return [self valueForKey:key];
 }
