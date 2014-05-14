@@ -66,6 +66,8 @@
 		02C4154D1921BE4E00F858D9 /* RLMRealm.h in Headers */ = {isa = PBXBuildFile; fileRef = 02C41484191DE57600F858D9 /* RLMRealm.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02C4154E1921BE5200F858D9 /* RLMMigration.h in Headers */ = {isa = PBXBuildFile; fileRef = 02C41497191DECCF00F858D9 /* RLMMigration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02C4154F1921BE5500F858D9 /* RLMObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 02C41483191DE57600F858D9 /* RLMObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D3F56501923668700240A75 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F564E1923667700240A75 /* ObjectTests.m */; };
+		4D3F56511923668700240A75 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F564E1923667700240A75 /* ObjectTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -146,6 +148,7 @@
 		02C415501921BF2500F858D9 /* Realm-iOSTests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-iOSTests-Info.plist"; sourceTree = "<group>"; };
 		02C415521921BF3C00F858D9 /* Realm-iOS-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Realm-iOS-Prefix.pch"; sourceTree = "<group>"; };
 		4B7ACCD718FDD8E4008B7B95 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		4D3F564E1923667700240A75 /* ObjectTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjectTests.m; sourceTree = "<group>"; };
 		803BC78F1907C0D3006AB33A /* release_notes.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = release_notes.md; sourceTree = "<group>"; };
 		E918909C177B677900653D7A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		E918909F177B677900653D7A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -241,6 +244,7 @@
 		02C41474191DE49600F858D9 /* RealmTests */ = {
 			isa = PBXGroup;
 			children = (
+				4D3F564E1923667700240A75 /* ObjectTests.m */,
 				02C414D71921939D00F858D9 /* QueryTests.m */,
 				02C4147A191DE49600F858D9 /* RealmTests.m */,
 				02C4148E191DE68900F858D9 /* RLMTestCase.h */,
@@ -534,6 +538,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D3F56501923668700240A75 /* ObjectTests.m in Sources */,
 				02C414D81921939D00F858D9 /* QueryTests.m in Sources */,
 				02C4147B191DE49600F858D9 /* RealmTests.m in Sources */,
 				02C41493191DE68900F858D9 /* XCTestCase+AsyncTesting.m in Sources */,
@@ -562,6 +567,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D3F56511923668700240A75 /* ObjectTests.m in Sources */,
 				02C415431921B4FE00F858D9 /* RLMTestCase.m in Sources */,
 				02C415441921B50000F858D9 /* XCTestCase+AsyncTesting.m in Sources */,
 				02C4153E1921B25000F858D9 /* QueryTests.m in Sources */,
