@@ -23,6 +23,28 @@
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.h"
 
+static NSException *s_arrayInvalidException;
+static NSException *s_arrayReadOnlyException;
+
+//
+// RLMArray accessor classes
+//
+
+// NOTE: do not add any ivars or properties to these classes
+//  we switch versions of RLMArray with this subclass dynamically
+
+// RLMArray variant used when read only
+@interface RLMArrayReadOnly : RLMArray
+@end
+
+// RLMArray variant used when invalidated
+@interface RLMArrayInvalid : RLMArray
+@end
+
+
+//
+// RLMArray implementation
+//
 @implementation RLMArray {
     tightdb::util::UniquePtr<tightdb::Query> _backingQuery;
 }
@@ -34,6 +56,18 @@
 @synthesize backingTable = _backingTable;
 @synthesize writable = _writable;
 
++ (void)initialize {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        s_arrayInvalidException = [NSException exceptionWithName:@"RLMException"
+                                                          reason:@"RLMArray is no longer valid."
+                                                        userInfo:nil];
+        s_arrayReadOnlyException = [NSException exceptionWithName:@"RLMException"
+                                                          reason:@"Attempting to modify a read-only RLMArray."
+                                                        userInfo:nil];
+    });
+}
+
 - (instancetype)initWithObjectClass:(Class)objectClass {
     self = [super init];
     if (self) {
@@ -41,6 +75,16 @@
         self.accessorClass = RLMAccessorClassForObjectClass(objectClass);
     }
     return self;
+}
+
+- (void)setWritable:(BOOL)writable {
+    if (writable) {
+        object_setClass(self, RLMArray.class);
+    }
+    else {
+        object_setClass(self, RLMArrayReadOnly.class);
+    }
+    _writable = writable;
 }
 
 - (NSUInteger)count {
@@ -214,3 +258,68 @@ inline id RLMCreateArrayAccessor(RLMArray *array, NSUInteger index) {
 }
 
 @end
+
+
+
+// NOTE: do not add any ivars or properties to these classes
+//  we switch versions of RLMArray with this subclass dynamically
+@implementation RLMArrayReadOnly
+- (void)addObject:(RLMObject *)object {
+    @throw s_arrayReadOnlyException;
+}
+- (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index {
+    @throw s_arrayReadOnlyException;
+}
+- (void)removeObjectAtIndex:(NSUInteger)index {
+    @throw s_arrayReadOnlyException;
+}
+- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
+    @throw s_arrayReadOnlyException;
+}
+@end
+
+@implementation RLMArrayInvalid
+- (NSUInteger)count {
+    @throw s_arrayInvalidException;
+}
+- (void)addObject:(RLMObject *)object {
+    @throw s_arrayInvalidException;
+}
+- (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index {
+    @throw s_arrayInvalidException;
+}
+- (void)removeObjectAtIndex:(NSUInteger)index {
+    @throw s_arrayInvalidException;
+}
+- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
+    @throw s_arrayInvalidException;
+}
+- (NSUInteger)indexOfObject:(RLMObject *)object {
+    @throw s_arrayInvalidException;
+}
+- (NSUInteger)indexOfObjectWhere:(id)predicate, ... {
+    @throw s_arrayInvalidException;
+}
+- (RLMArray *)objectsWhere:(id)predicate, ... {
+    @throw s_arrayInvalidException;
+}
+- (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ... {
+    @throw s_arrayInvalidException;
+}
+- (id)minOfProperty:(NSString *)property {
+    @throw s_arrayInvalidException;
+}
+- (id)maxOfProperty:(NSString *)property {
+    @throw s_arrayInvalidException;
+}
+- (NSNumber *)sumOfProperty:(NSString *)property {
+    @throw s_arrayInvalidException;
+}
+- (NSNumber *)averageOfProperty:(NSString *)property {
+    @throw s_arrayInvalidException;
+}
+- (NSString *)JSONString {
+    @throw s_arrayInvalidException;
+}
+@end
+

@@ -35,8 +35,8 @@ void RLMInitializeObjectStore() {
     dispatch_once(&onceToken, ^{
         // register accessor cache
         RLMAccessorCacheInitialize();
-        
-        // setup name mapping for accessor classes
+
+        // setup name mapping for object tables
         s_tableNamesForClass = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
                                                      valueOptions:NSPointerFunctionsObjectPersonality];
         

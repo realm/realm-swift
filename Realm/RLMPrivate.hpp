@@ -34,15 +34,18 @@ typedef NS_ENUM(NSUInteger, RLMTransactionMode) {
     RLMTransactionModeWrite
 };
 
+// RLMRealm members used by the object store
 @interface RLMRealm ()
 @property (nonatomic, readonly) RLMTransactionMode transactionMode;
 @property (nonatomic, readonly) tightdb::Group *group;
 @end
 
+// RLMObject accessor and read/write realm
 @interface RLMObject () <RLMAccessor>
 @property (nonatomic, readwrite) RLMRealm *realm;
 @end
 
+// RLMArray private members and acessor
 @interface RLMArray () <RLMAccessor>
 @property (nonatomic, assign) tightdb::Query *backingQuery;
 @property (nonatomic, assign) tightdb::TableView backingView;
