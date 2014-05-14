@@ -138,7 +138,7 @@
  RLMRealm * realm = [self realmWithTestPath];
  [realm beginWriteTransaction];
  RLMTable *table = [realm createTableWithName:@"table"];
- [table addColumnWithName:@"col0" type:RLMTypeInt];
+ [table addColumnWithName:@"col0" type:RLMPropertyTypeInt];
  [realm commitWriteTransaction];
  
  @autoreleasepool {

@@ -262,15 +262,15 @@ const char * setterTypeStringForObjcCode(char code) {
 }
 
 // get accessor lookup code based on objc type and rlm type
-char accessorCodeForType(char objcTypeCode, RLMType rlmType) {
+char accessorCodeForType(char objcTypeCode, RLMPropertyType rlmType) {
     switch (objcTypeCode) {
         case 'q':           // long long same as long
             return 'l';
         case '@':           // custom accessors for strings and subtables
-            if (rlmType == RLMTypeString) return 's';
-            if (rlmType == RLMTypeTable) return 't';
-            if (rlmType == RLMTypeDate) return 'a';
-            if (rlmType == RLMTypeLink) return 'k';
+            if (rlmType == RLMPropertyTypeString) return 's';
+            if (rlmType == RLMPropertyTypeTable) return 't';
+            if (rlmType == RLMPropertyTypeDate) return 'a';
+            if (rlmType == RLMPropertyTypeObject) return 'k';
         default:
             return objcTypeCode;
     }

@@ -21,13 +21,13 @@
 
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
-#import "RLMType.h"
+#import "RLMConstants.h"
 
 // object property definition
 @interface RLMProperty : NSObject
 
 @property (nonatomic, copy) NSString * name;
-@property (nonatomic, assign) RLMType type;
+@property (nonatomic, assign) RLMPropertyType type;
 @property (nonatomic, assign) NSUInteger column;
 @property (nonatomic, copy) id defaultValue;
 
