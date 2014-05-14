@@ -21,20 +21,11 @@
 #import <Foundation/Foundation.h>
 #import "RLMRealm.h"
 #import "RLMArray.h"
+#import "RLMAccesor.h"
 
 #import <tightdb/table.hpp>
 #import <tightdb/group.hpp>
 #import <tightdb/table_view.hpp>
-
-// accessor protocol implemented by all persisted objects
-@protocol RLMAccessor <NSObject>
-@property (nonatomic) RLMRealm *realm;
-@property (nonatomic, assign) NSUInteger objectIndex;
-@property (nonatomic, assign) NSUInteger backingTableIndex;
-@property (nonatomic, assign) tightdb::Table *backingTable;
-@property (nonatomic, assign) BOOL writable;
-@end
-
 
 // RLMRealm transaction state
 typedef NS_ENUM(NSUInteger, RLMTransactionMode) {
@@ -46,9 +37,6 @@ typedef NS_ENUM(NSUInteger, RLMTransactionMode) {
 @interface RLMRealm ()
 @property (nonatomic, readonly) RLMTransactionMode transactionMode;
 @property (nonatomic, readonly) tightdb::Group *group;
-
-// call whenever creating an accessor to keep up to date accross transactions
-- (void)registerAcessor:(id<RLMAccessor>)accessor;
 @end
 
 @interface RLMObject () <RLMAccessor>
