@@ -235,8 +235,8 @@
     [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES]];
     [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES]];
         
-    RLMArray *noArray = [AggregateObject objectsWhere:@"BoolCol == NO"];
-    RLMArray *yesArray = [AggregateObject objectsWhere:@"BoolCol == YES"];
+    RLMArray *noArray = [AggregateObject objectsWhere:@"boolCol == NO"];
+    RLMArray *yesArray = [AggregateObject objectsWhere:@"boolCol == YES"];
     
     // SUM ::::::::::::::::::::::::::::::::::::::::::::::
     // Test int sum
