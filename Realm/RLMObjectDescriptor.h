@@ -24,11 +24,12 @@
 // ordered properties extracted from an object
 @interface RLMObjectDescriptor : NSObject
 
-// array of properties which define a schema
+// array of properties which define an object schema
 @property (nonatomic, readonly, copy) NSArray * properties;
 
-// object this describes
+// object this describes - may be NULL
 @property (nonatomic, readonly) Class objectClass;
+
 
 // property lookup by name
 -(RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)key;
@@ -37,3 +38,4 @@
 +(instancetype)descriptorForObjectClass:(Class)objectClass;
 
 @end
+
