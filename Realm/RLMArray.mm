@@ -188,23 +188,113 @@ inline RLMObject *RLMCreateAccessor(RLMArray *self, NSUInteger index) {
 }
 
 -(id)minOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+    NSUInteger colIndex = RLMValidatedColumnIndex([RLMObjectDescriptor descriptorForObjectClass:_objectClass], property);
+    
+    tightdb::TableView table = self.backingQuery->find_all();
+    RLMType colType = RLMType(table.get_column_type(colIndex));
+    
+    id min;
+    if (colType == RLMTypeInt) {
+        min = [NSNumber numberWithInteger:table.minimum_int(colIndex)];
+    }
+    else if (colType == RLMTypeDouble) {
+        min = [NSNumber numberWithDouble:table.minimum_double(colIndex)];
+    }
+    else if (colType == RLMTypeFloat) {
+        min = [NSNumber numberWithDouble:table.minimum_float(colIndex)];
+    }
+    else if (colType == RLMTypeDate) {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supported"
+                                       reason:@"Minimum not supported on date columns yet"
+                                     userInfo:nil];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Sum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return min;
 }
 
 -(id)maxOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+    NSUInteger colIndex = RLMValidatedColumnIndex([RLMObjectDescriptor descriptorForObjectClass:_objectClass], property);
+    
+    tightdb::TableView table = self.backingQuery->find_all();
+    RLMType colType = RLMType(table.get_column_type(colIndex));
+    
+    id max;
+    if (colType == RLMTypeInt) {
+        max = [NSNumber numberWithInteger:table.maximum_int(colIndex)];
+    }
+    else if (colType == RLMTypeDouble) {
+        max = [NSNumber numberWithDouble:table.maximum_double(colIndex)];
+    }
+    else if (colType == RLMTypeFloat) {
+        max = [NSNumber numberWithDouble:table.maximum_float(colIndex)];
+    }
+    else if (colType == RLMTypeDate) {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supported"
+                                       reason:@"Maximum not supported on date columns yet"
+                                     userInfo:nil];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Maximum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return max;
 }
 
 -(NSNumber *)sumOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+    NSUInteger colIndex = RLMValidatedColumnIndex([RLMObjectDescriptor descriptorForObjectClass:_objectClass], property);
+    
+    tightdb::TableView table = self.backingQuery->find_all();
+    RLMType colType = RLMType(table.get_column_type(colIndex));
+    
+    NSNumber *sum;
+    if (colType == RLMTypeInt) {
+        sum = [NSNumber numberWithInteger:table.sum_int(colIndex)];
+    }
+    else if (colType == RLMTypeDouble) {
+        sum = [NSNumber numberWithDouble:table.sum_double(colIndex)];
+    }
+    else if (colType == RLMTypeFloat) {
+        sum = [NSNumber numberWithDouble:table.sum_float(colIndex)];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Maximum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return sum;
 }
 
 -(NSNumber *)averageOfProperty:(NSString *)property {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Not yet implemented" userInfo:nil];
+    NSUInteger colIndex = RLMValidatedColumnIndex([RLMObjectDescriptor descriptorForObjectClass:_objectClass], property);
+    
+    tightdb::TableView table = self.backingQuery->find_all();
+    RLMType colType = RLMType(table.get_column_type(colIndex));
+    
+    NSNumber *average;
+    if (colType == RLMTypeInt) {
+        average = [NSNumber numberWithInteger:table.average_int(colIndex)];
+    }
+    else if (colType == RLMTypeDouble) {
+        average = [NSNumber numberWithDouble:table.average_double(colIndex)];
+    }
+    else if (colType == RLMTypeFloat) {
+        average = [NSNumber numberWithDouble:table.average_float(colIndex)];
+    }
+    else {
+        @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
+                                       reason:@"Sum only supported on int, float and double columns."
+                                     userInfo:nil];
+    }
+    
+    return average;
 }
 
 - (NSString *)JSONString {
