@@ -26,13 +26,20 @@
 
 #import <objc/runtime.h>
 
-static NSMutableDictionary *s_accessorClassNameCache;
+static NSMapTable *s_accessorCache;
+static NSMapTable *s_readOnlyAccessorCache;
+static NSMapTable *s_invalidAccessorCache;
 
 // initialize statics
 void RLMAccessorCacheInitialize() {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        s_accessorClassNameCache = [NSMutableDictionary dictionary];
+        s_accessorCache = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
+                                                valueOptions:NSPointerFunctionsOpaquePersonality];
+        s_readOnlyAccessorCache = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
+                                                        valueOptions:NSPointerFunctionsOpaquePersonality];
+        s_invalidAccessorCache = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
+                                                       valueOptions:NSPointerFunctionsOpaquePersonality];
     });
 }
 
@@ -96,7 +103,6 @@ IMP RLMAccessorGetter(NSUInteger col, char accessorCode) {
     }
 }
 
-
 // dynamic setter with column closure
 IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
     switch (accessorCode) {
@@ -156,12 +162,67 @@ IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
     }
 }
 
+
+// setter which throws exception
+IMP RLMAccessorExceptionSetter(NSUInteger col, char accessorCode, NSString *message) {
+    switch (accessorCode) {
+        case 'i':
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, int val) {
+                @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
+        case 'l':
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, long val) {
+                @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
+        case 'f':
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, float val) {
+                @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
+        case 'd':
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, double val) {
+                @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
+        case 'B':
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, bool val) {
+                @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
+        case 'c':
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, BOOL val) {
+                @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
+        case 's':
+        case 'a':
+        case 'k':
+        case '@':
+        case 't':
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, id val) {
+                @throw [NSException exceptionWithName:@"RLMException" reason:message userInfo:nil]; });
+        default:
+            @throw [NSException exceptionWithName:@"RLMException"
+                                           reason:@"Invalid accessor code"
+                                         userInfo:nil];
+    }
+}
+
+// getter for invalid objects
+NSString *const c_invalidObjectMessage = @"Object is no longer valid.";
+IMP RLMAccessorInvalidGetter(NSUInteger col, char accessorCode) {
+    return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+        @throw [NSException exceptionWithName:@"RLMException" reason:c_invalidObjectMessage userInfo:nil];
+    });
+}
+
+// setter for invalid objects
+IMP RLMAccessorInvalidSetter(NSUInteger col, char accessorCode) {
+    return RLMAccessorExceptionSetter(col, accessorCode, c_invalidObjectMessage);
+}
+
+// setter for readonly objects
+IMP RLMAccessorReadOnlySetter(NSUInteger col, char accessorCode) {
+    return RLMAccessorExceptionSetter(col, accessorCode, @"Trying to set a property on a read-only object.");
+}
+
+
 // macros/helpers to generate objc type strings for registering methods
 #define GETTER_TYPES(C) C ":@"
 #define SETTER_TYPES(C) "v:@" C
 
 // getter type strings
-const char * getterTypeStringForCode(char code) {
+const char * getterTypeStringForObjcCode(char code) {
     switch (code) {
         case 'i': return GETTER_TYPES("i");
         case 'l': return GETTER_TYPES("l");
@@ -175,7 +236,7 @@ const char * getterTypeStringForCode(char code) {
 }
 
 // setter type strings
-const char * setterTypeStringForCode(char code) {
+const char * setterTypeStringForObjcCode(char code) {
     switch (code) {
         case 'i': return SETTER_TYPES("i");
         case 'l': return SETTER_TYPES("l");
@@ -203,21 +264,19 @@ char accessorCodeForType(char objcTypeCode, RLMType rlmType) {
     }
 }
 
-Class RLMAccessorClassForObjectClass(Class objectClass) {
+Class RLMCreateAccessor(Class objectClass,
+                        NSString *accessorClassPrefix,
+                        IMP (*getterGetter)(NSUInteger, char),
+                        IMP (*setterGetter)(NSUInteger, char))
+{
     // if objectClass is RLMRow use it, otherwise use proxy class
     if (!RLMIsSubclass(objectClass, RLMObject.class)) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMRow" userInfo:nil];
-    }
-    
-    // see if we have a cached version
-    NSString *objectClassName = NSStringFromClass(objectClass);
-    if (s_accessorClassNameCache[objectClassName]) {
-        return NSClassFromString(s_accessorClassNameCache[objectClassName]);
+        @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMObject" userInfo:nil];
     }
     
     // create and register proxy class which derives from object class
-    NSString *proxyClassName = [@"RLMAccessor_" stringByAppendingString:objectClassName];
-    Class proxyClass = objc_allocateClassPair(objectClass, proxyClassName.UTF8String, 0);
+    NSString *accessorClassName = [accessorClassPrefix stringByAppendingString:NSStringFromClass(objectClass)];
+    Class proxyClass = objc_allocateClassPair(objectClass, accessorClassName.UTF8String, 0);
     objc_registerClassPair(proxyClass);
     
     // override getters/setters for each propery
@@ -226,26 +285,50 @@ Class RLMAccessorClassForObjectClass(Class objectClass) {
         RLMProperty *prop = descriptor.properties[propNum];
         SEL getterSel = NSSelectorFromString(prop.getterName);
         SEL setterSel = NSSelectorFromString(prop.setterName);
-        IMP getterImp = RLMAccessorGetter(prop.column, accessorCodeForType(prop.objcType, prop.type));
-        IMP setterImp = RLMAccessorSetter(prop.column, accessorCodeForType(prop.objcType, prop.type));
-        class_replaceMethod(proxyClass, getterSel, getterImp, getterTypeStringForCode(prop.objcType));
-        class_replaceMethod(proxyClass, setterSel, setterImp, setterTypeStringForCode(prop.objcType));
+        IMP getterImp = getterGetter(prop.column, accessorCodeForType(prop.objcType, prop.type));
+        IMP setterImp = setterGetter(prop.column, accessorCodeForType(prop.objcType, prop.type));
+        class_replaceMethod(proxyClass, getterSel, getterImp, getterTypeStringForObjcCode(prop.objcType));
+        class_replaceMethod(proxyClass, setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));
     }
-    
-    // set in cache to indiate this proxy class has been created and return
-    s_accessorClassNameCache[objectClassName] = proxyClassName;
     return proxyClass;
 }
 
+Class RLMAccessorClassForObjectClass(Class objectClass) {
+    // see if we have a cached version
+    if (Class cls = [s_accessorCache objectForKey:objectClass]) {
+        return cls;
+    }
+
+    // create accessor and cache
+    Class accessorClass = RLMCreateAccessor(objectClass, @"RLMAccessor_", RLMAccessorGetter, RLMAccessorSetter);
+    [s_accessorCache setObject:accessorClass forKey:objectClass];
+    return accessorClass;
+}
 
 Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass) {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Links not yest supported" userInfo:nil];
+    // see if we have a cached version
+    if (Class cls = [s_readOnlyAccessorCache objectForKey:objectClass]) {
+        return cls;
+    }
+    
+    // create accessor and cache
+    Class accessorClass = RLMCreateAccessor(objectClass, @"RLMReadOnly_",
+                                            RLMAccessorGetter, RLMAccessorReadOnlySetter);
+    [s_readOnlyAccessorCache setObject:accessorClass forKey:objectClass];
+    return accessorClass;
 }
 
 Class RLMInvalidAccessorClassForObjectClass(Class objectClass) {
-    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
-                                   reason:@"Links not yest supported" userInfo:nil];
+    // see if we have a cached version
+    if (Class cls = [s_invalidAccessorCache objectForKey:objectClass]) {
+        return cls;
+    }
+    
+    // create accessor and cache
+    Class accessorClass = RLMCreateAccessor(objectClass, @"RLMInvalid_",
+                                            RLMAccessorInvalidGetter, RLMAccessorInvalidSetter);
+    [s_invalidAccessorCache setObject:accessorClass forKey:objectClass];
+    return accessorClass;
 }
 
 

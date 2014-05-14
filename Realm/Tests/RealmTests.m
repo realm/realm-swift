@@ -41,7 +41,6 @@
     XCTAssertEqual([realm class], [RLMRealm class], @"realm should be of class RLMRealm");
 }
 
-
 - (void)testRealmAddAndRemoveObjects {
     RLMRealm *realm = [self realmWithTestPath];
     [realm beginWriteTransaction];
@@ -64,6 +63,15 @@
     objects = [realm objects:RLMTestObject.class where:nil];
     XCTAssertEqual(objects.count, 1, @"Expecting 1 object");
     XCTAssertEqualObjects([objects.firstObject column], @"b", @"Expecting column to be 'b'");
+}
+
+- (void)testRealmModifyObjectsOutsideOfWriteTransaction {
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm beginWriteTransaction];
+    RLMTestObject *obj = [RLMTestObject createInRealm:realm withObject:@[@"a"]];
+    [realm commitWriteTransaction];
+    
+    XCTAssertThrows([obj setColumn:@"throw"], @"Setter should throw when called outside of transaction.");
 }
 
 - (void)testRealmIsUpdatedAfterBackgroundUpdate {
