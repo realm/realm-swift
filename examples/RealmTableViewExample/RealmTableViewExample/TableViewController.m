@@ -64,13 +64,15 @@ static NSString * const kTableName = @"table";
 
 - (void)setupUI {
     self.title = @"TableViewExample";
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"BG Add"
-                                                                             style:UIBarButtonItemStylePlain
-                                                                            target:self
-                                                                            action:@selector(backgroundAdd)];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
-                                                                                           target:self
-                                                                                           action:@selector(add)];
+    self.navigationItem.leftBarButtonItem =
+        [[UIBarButtonItem alloc] initWithTitle:@"BG Add"
+                                         style:UIBarButtonItemStylePlain
+                                        target:self
+                                        action:@selector(backgroundAdd)];
+    self.navigationItem.rightBarButtonItem =
+        [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                                      target:self
+                                                      action:@selector(add)];
 }
 
 #pragma mark - UITableViewDataSource
@@ -94,7 +96,8 @@ static NSString * const kTableName = @"table";
     return cell;
 }
 
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
+                                            forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         RLMRealm *realm = RLMRealm.defaultRealm;
         [realm beginWriteTransaction];
@@ -114,7 +117,8 @@ static NSString * const kTableName = @"table";
         [realm beginWriteTransaction];
         for (NSInteger index = 0; index < 5; index++) {
             // Add row via dictionary. Order is ignored.
-            [DemoObject createInRealm:realm withObject:@{@"title": [self randomString], @"date": [self randomDate]}];
+            [DemoObject createInRealm:realm withObject:@{@"title": [self randomString],
+                                                         @"date": [self randomDate]}];
         }
         [realm commitWriteTransaction];
     });
