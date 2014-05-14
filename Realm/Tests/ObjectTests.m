@@ -40,25 +40,23 @@
 @end
 
 
-//@interface AllTypes : RLMObject
-//@property BOOL           boolCol;
-//@property int            intCol;
-//@property float          floatCol;
-//@property double         doubleCol;
-//@property NSString      *stringCol;
-//@property NSData        *binaryCol;
-//@property NSDate        *dateCol;
-//@property AgeTable      *tableCol;
-//@property bool           cBoolCol;
-//@property long           longCol;
+@interface AllTypesObject : RLMObject
+@property BOOL           boolCol;
+@property int            intCol;
+@property float          floatCol;
+@property double         doubleCol;
+@property NSString      *stringCol;
+@property NSData        *binaryCol;
+@property NSDate        *dateCol;
+@property bool           cBoolCol;
+@property long           longCol;
 //@property id             mixedCol;
-//@end
-//
-//@implementation AllTypes
-//@end
-//
-//RLM_TABLE_TYPE_FOR_OBJECT_TYPE(AllTypesTable, AllTypes)
-//
+//@property AgeTable      *tableCol;
+@end
+
+@implementation AllTypesObject
+@end
+
 //@interface InvalidType : RLMObject
 //@property NSDictionary *dict;
 //@end
@@ -98,10 +96,10 @@
 
 
 @interface AggregateObject : RLMObject
-@property int IntCol;
-@property float FloatCol;
-@property double DoubleCol;
-@property BOOL BoolCol;
+@property int intCol;
+@property float floatCol;
+@property double doubleCol;
+@property BOOL boolCol;
 @end
 
 @implementation AggregateObject
@@ -117,8 +115,6 @@
 
 -(void)testObjectInit
 {
-    [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath() error:nil];
-    
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
@@ -153,8 +149,6 @@
 
 - (void)testObjectSubscripting
 {
-    [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath() error:nil];
-
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
@@ -188,11 +182,10 @@
     [realm commitWriteTransaction];
     
     XCTAssertEqualObjects(obj0[@"name"], @"newName",  @"Name should be newName");
-    
-
 }
 
-- (void)testCustomAccessors {
+- (void)testCustomAccessors
+{
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
@@ -202,13 +195,10 @@
     [ca setTheInt:99];
     XCTAssertEqual((int)ca.age, (int)99, @"age property should be 99");
     [realm commitWriteTransaction];
-  
 }
 
 - (void)testObjectCount
 {
-    [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath() error:nil];
-
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
@@ -226,13 +216,10 @@
     XCTAssertEqual([AgeObject objectsWhere:@"age == 1"].count, (NSUInteger)0, @"count should return 0");
     XCTAssertEqual([AgeObject objectsWhere:@"age == 2"].count, (NSUInteger)1, @"count should return 1");
     XCTAssertEqual([AgeObject objectsWhere:@"age < 30"].count, (NSUInteger)7, @"count should return 7");
-    
 }
 
 - (void)testObjectAggregate
 {
-    [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath() error:nil];
-    
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
@@ -253,125 +240,123 @@
     
     // SUM ::::::::::::::::::::::::::::::::::::::::::::::
     // Test int sum
-    XCTAssertEqual([noArray sumOfProperty:@"IntCol"].integerValue, (NSInteger)4, @"Sum should be 4");
-    XCTAssertEqual([yesArray sumOfProperty:@"IntCol"].integerValue, (NSInteger)0, @"Sum should be 0");
+    XCTAssertEqual([noArray sumOfProperty:@"intCol"].integerValue, (NSInteger)4, @"Sum should be 4");
+    XCTAssertEqual([yesArray sumOfProperty:@"intCol"].integerValue, (NSInteger)0, @"Sum should be 0");
         
     // Test float sum
-    XCTAssertEqualWithAccuracy([noArray sumOfProperty:@"FloatCol"].floatValue, (float)0.0f, 0.1f, @"Sum should be 4");
-    XCTAssertEqualWithAccuracy([yesArray sumOfProperty:@"FloatCol"].floatValue, (float)7.2f, 0.1f, @"Sum should be 7.2");
+    XCTAssertEqualWithAccuracy([noArray sumOfProperty:@"floatCol"].floatValue, (float)0.0f, 0.1f, @"Sum should be 4");
+    XCTAssertEqualWithAccuracy([yesArray sumOfProperty:@"floatCol"].floatValue, (float)7.2f, 0.1f, @"Sum should be 7.2");
         
     // Test double sum
-    XCTAssertEqualWithAccuracy([noArray sumOfProperty:@"DoubleCol"].doubleValue, (double)10.0, 0.1f, @"Sum should be 10.0");
-    XCTAssertEqualWithAccuracy([yesArray sumOfProperty:@"DoubleCol"].doubleValue, (double)0.0, 0.1f, @"Sum should be 0.0");
+    XCTAssertEqualWithAccuracy([noArray sumOfProperty:@"doubleCol"].doubleValue, (double)10.0, 0.1f, @"Sum should be 10.0");
+    XCTAssertEqualWithAccuracy([yesArray sumOfProperty:@"doubleCol"].doubleValue, (double)0.0, 0.1f, @"Sum should be 0.0");
         
     // Test invalid column name
     XCTAssertThrows([yesArray sumOfProperty:@"foo"], @"Should throw exception");
         
     // Test operation not supported
-    XCTAssertThrows([yesArray sumOfProperty:@"BoolCol"], @"Should throw exception");
+    XCTAssertThrows([yesArray sumOfProperty:@"boolCol"], @"Should throw exception");
     
     
     // Average ::::::::::::::::::::::::::::::::::::::::::::::
     // Test int average
-    XCTAssertEqualWithAccuracy([noArray averageOfProperty:@"IntCol"].doubleValue, (double)1.0, 0.1f, @"Average should be 1.0");
-    XCTAssertEqualWithAccuracy([yesArray averageOfProperty:@"IntCol"].doubleValue, (double)0.0, 0.1f, @"Average should be 0.0");
+    XCTAssertEqualWithAccuracy([noArray averageOfProperty:@"intCol"].doubleValue, (double)1.0, 0.1f, @"Average should be 1.0");
+    XCTAssertEqualWithAccuracy([yesArray averageOfProperty:@"intCol"].doubleValue, (double)0.0, 0.1f, @"Average should be 0.0");
     
     // Test float average
-    XCTAssertEqualWithAccuracy([noArray averageOfProperty:@"FloatCol"].doubleValue, (double)0.0f, 0.1f, @"Average should be 0.0");
-    XCTAssertEqualWithAccuracy([yesArray averageOfProperty:@"FloatCol"].doubleValue, (double)1.2f, 0.1f, @"Average should be 1.2");
+    XCTAssertEqualWithAccuracy([noArray averageOfProperty:@"floatCol"].doubleValue, (double)0.0f, 0.1f, @"Average should be 0.0");
+    XCTAssertEqualWithAccuracy([yesArray averageOfProperty:@"floatCol"].doubleValue, (double)1.2f, 0.1f, @"Average should be 1.2");
     
     // Test double average
-    XCTAssertEqualWithAccuracy([noArray averageOfProperty:@"DoubleCol"].doubleValue, (double)2.5, 0.1f, @"Average should be 2.5");
-    XCTAssertEqualWithAccuracy([yesArray averageOfProperty:@"DoubleCol"].doubleValue, (double)0.0, 0.1f, @"Average should be 0.0");
+    XCTAssertEqualWithAccuracy([noArray averageOfProperty:@"doubleCol"].doubleValue, (double)2.5, 0.1f, @"Average should be 2.5");
+    XCTAssertEqualWithAccuracy([yesArray averageOfProperty:@"doubleCol"].doubleValue, (double)0.0, 0.1f, @"Average should be 0.0");
     
     // Test invalid column name
     XCTAssertThrows([yesArray averageOfProperty:@"foo"], @"Should throw exception");
     
     // Test operation not supported
-    XCTAssertThrows([yesArray averageOfProperty:@"BoolCol"], @"Should throw exception");
+    XCTAssertThrows([yesArray averageOfProperty:@"boolCol"], @"Should throw exception");
     
     // MIN ::::::::::::::::::::::::::::::::::::::::::::::
     // Test int min
-    NSNumber *min = [noArray minOfProperty:@"IntCol"];
+    NSNumber *min = [noArray minOfProperty:@"intCol"];
     XCTAssertEqual(min.intValue, (NSInteger)2, @"Minimum should be 2");
-    min = [yesArray minOfProperty:@"IntCol"];
+    min = [yesArray minOfProperty:@"intCol"];
     XCTAssertEqual(min.intValue, (NSInteger)1, @"Minimum should be 1");
     
     // Test float min
-    min = [noArray minOfProperty:@"FloatCol"];
+    min = [noArray minOfProperty:@"floatCol"];
     XCTAssertEqualWithAccuracy(min.floatValue, (float)1.2f, 0.1f, @"Minimum should be 1.2f");
-    min = [yesArray minOfProperty:@"FloatCol"];
+    min = [yesArray minOfProperty:@"floatCol"];
     XCTAssertEqualWithAccuracy(min.floatValue, (float)1.1f, 0.1f, @"Minimum should be 1.1f");
     
     // Test double min
-    min = [noArray minOfProperty:@"DoubleCol"];
+    min = [noArray minOfProperty:@"doubleCol"];
     XCTAssertEqualWithAccuracy(min.doubleValue, (double)1.5, 0.1f, @"Minimum should be 1.5");
-    min = [yesArray minOfProperty:@"DoubleCol"];
+    min = [yesArray minOfProperty:@"doubleCol"];
     XCTAssertEqualWithAccuracy(min.doubleValue, (double)0.0, 0.1f, @"Minimum should be 0.0");
     
     // Test invalid column name
     XCTAssertThrows([noArray minOfProperty:@"foo"], @"Should throw exception");
     
     // Test operation not supported
-    XCTAssertThrows([noArray minOfProperty:@"BoolCol"], @"Should throw exception");
+    XCTAssertThrows([noArray minOfProperty:@"boolCol"], @"Should throw exception");
     
     
     // MAX ::::::::::::::::::::::::::::::::::::::::::::::
     // Test int max
-    NSNumber *max = [noArray maxOfProperty:@"IntCol"];
+    NSNumber *max = [noArray maxOfProperty:@"intCol"];
     XCTAssertEqual(max.integerValue, (NSInteger)8, @"Maximum should be 8");
-    max = [yesArray maxOfProperty:@"IntCol"];
+    max = [yesArray maxOfProperty:@"intCol"];
     XCTAssertEqual(max.integerValue, (NSInteger)10, @"Maximum should be 10");
     
     // Test float max
-    max = [noArray maxOfProperty:@"FloatCol"];
+    max = [noArray maxOfProperty:@"floatCol"];
     XCTAssertEqualWithAccuracy(max.floatValue, (float)1.8f, 0.1f, @"Maximum should be 1.8f");
-    max = [yesArray maxOfProperty:@"FloatCol"];
+    max = [yesArray maxOfProperty:@"floatCol"];
     XCTAssertEqualWithAccuracy(max.floatValue, (float)2.0f, 0.1f, @"Maximum should be 2.0f");
     
     // Test double max
-    max = [noArray maxOfProperty:@"DoubleCol"];
+    max = [noArray maxOfProperty:@"doubleCol"];
     XCTAssertEqualWithAccuracy(max.doubleValue, (double)10.5, 0.1f, @"Maximum should be 10.5");
-    max = [yesArray maxOfProperty:@"DoubleCol"];
+    max = [yesArray maxOfProperty:@"doubleCol"];
     XCTAssertEqualWithAccuracy(max.doubleValue, (double)13.5, 0.1f, @"Maximum should be 13.5");
     
     // Test invalid column name
     XCTAssertThrows([noArray maxOfProperty:@"foo"], @"Should throw exception");
     
     // Test operation not supported
-    XCTAssertThrows([noArray maxOfProperty:@"BoolCol"], @"Should throw exception");
+    XCTAssertThrows([noArray maxOfProperty:@"boolCol"], @"Should throw exception");
 }
 
 
-//- (void)testDataTypes_Typed
-//{
-//    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
-//        // create table and set object class
-//        AllTypesTable *table = [AllTypesTable tableInRealm:realm named:@"table"];
+- (void)testDataTypes
+{
+//    RLMRealm *realm = [RLMRealm defaultRealm];
+//    [realm beginWriteTransaction];
+//    
+//    const char bin[4] = { 0, 1, 2, 3 };
+//    NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+//   // NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
+//  //  NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
+//    NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
 //
+//    AllTypesObject *c = [[AllTypesObject alloc] init];
 //
-//        const char bin[4] = { 0, 1, 2, 3 };
-//        NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
-//        NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
-//        NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
-//        NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
-//
-//        AgeTable *subtab1 = [AgeTable tableInRealm:realm named:@"subtab1"];
-//        AgeTable *subtab2 = [AgeTable tableInRealm:realm named:@"subtab2"];
-//
-//        [subtab1 addRow:@[@200]]; // NOTE: the name is simply add+name of first column!
-//        [subtab2 addRow:@[@100]];
-//
-//        AllTypes * c;
-//
-//        // addEmptyRow not supported yet
-//        [table addRow:nil];
-//        c = table.lastRow;
-//
-//        c.BoolCol   = NO   ; c.IntCol  = 54 ; c.FloatCol = 0.7     ; c.DoubleCol = 0.8     ; c.StringCol = @"foo";
-//        c.BinaryCol = bin1 ; c.DateCol = timeZero  ; c.TableCol = subtab1     ; c.cBoolCol = false; c.longCol = 99;
-//        NSString *string = @"string";
-//        c.mixedCol = @"string";
+//    c.BoolCol   = NO;
+//    c.IntCol  = 54;
+//    c.FloatCol = 0.7f;
+//    c.DoubleCol = 0.8;
+//    c.StringCol = @"foo";
+//    c.BinaryCol = bin1;
+//    c.DateCol = timeZero;
+//    c.cBoolCol = false;
+//    c.longCol = 99;
+//   // c.mixedCol = @"string";
+//    
+//    [realm addObject:c];
+//    
+//    [realm commitWriteTransaction];
 //
 //        [table addRow:nil];
 //        c = table.lastRow;
@@ -408,7 +393,7 @@
 //
 //        XCTAssertTrue([row1.mixedCol isEqualToString:string], @"row1.mixedCol");
 //        XCTAssertEqualObjects(row2.mixedCol, @2,          @"row2.mixedCol");
-//    }];
-//}
+
+}
 
 @end

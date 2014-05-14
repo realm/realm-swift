@@ -38,6 +38,9 @@ NSString *RLMTestRealmPathLock() {
 - (void)setUp {
     // This method is run before every test method
     [super setUp];
+    [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath() error:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:[RLMDefaultRealmPath() stringByAppendingString:@".lock"] error:nil];
+
     [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath() error:nil];
     [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPathLock() error:nil];
 }
