@@ -39,5 +39,8 @@ realm-ios-*.zip
 .idea/
 *.iml
 
+# RealmTools Test Data
+*.swp
+
 
 
