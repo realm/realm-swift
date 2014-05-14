@@ -144,7 +144,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     }
     
     // set the realm and register
-    [realm registerAcessor:object];
+    [realm registerAccessor:object];
 }
 
 void RLMDeleteObjectFromRealm(RLMObject *object, RLMRealm *realm, bool cascade) {
@@ -174,7 +174,7 @@ RLMArray *RLMGetObjects(RLMRealm *realm, Class objectClass, NSPredicate *predica
     RLMUpdateViewWithOrder(view, order, desc);
     array.backingView = view;
     array.realm = realm;
-    [realm registerAcessor:array];
+    [realm registerAccessor:array];
     return array;
 }
 

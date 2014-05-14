@@ -417,7 +417,7 @@ static NSArray *s_objectDescriptors = nil;
     }
 }
 
-- (void)registerAcessor:(id<RLMAccessor>)accessor {
+- (void)registerAccessor:(id<RLMAccessor>)accessor {
     [_objects setObject:accessor forKey:accessor];
 }
 

@@ -58,7 +58,7 @@ Class RLMInvalidAccessorClassForObjectClass(Class objectClass);
 // Register accessor with realm
 @interface RLMRealm (Accessors)
 // call whenever creating an accessor to keep up to date accross transactions
-- (void)registerAcessor:(id<RLMAccessor>)accessor;
+- (void)registerAccessor:(id<RLMAccessor>)accessor;
 @end
 
 // Create accessor and register with realm
@@ -68,7 +68,7 @@ inline id<RLMAccessor> RLMCreateAccessor(Class cls, id<RLMAccessor> parent, NSUI
     accessor.backingTable = parent.backingTable;
     accessor.backingTableIndex = parent.backingTableIndex;
     accessor.objectIndex = index;
-    [accessor.realm registerAcessor:accessor];
+    [accessor.realm registerAccessor:accessor];
     return accessor;
 }
 

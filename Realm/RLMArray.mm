@@ -190,7 +190,7 @@ inline id RLMCreateArrayAccessor(RLMArray *array, NSUInteger index) {
     array.backingTableIndex = _backingTableIndex;
     array.backingView = _backingView;
     array.backingQuery = new tightdb::Query(*_backingQuery);
-    [_realm registerAcessor:array];
+    [_realm registerAccessor:array];
     return array;
 }
 

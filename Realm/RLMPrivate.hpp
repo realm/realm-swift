@@ -45,7 +45,7 @@ typedef NS_ENUM(NSUInteger, RLMTransactionMode) {
 @property (nonatomic, readwrite) RLMRealm *realm;
 @end
 
-// RLMArray private members and acessor
+// RLMArray private members and accessor
 @interface RLMArray () <RLMAccessor>
 @property (nonatomic, assign) tightdb::Query *backingQuery;
 @property (nonatomic, assign) tightdb::TableView backingView;
