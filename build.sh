@@ -587,7 +587,7 @@ EOF
 
     "test-examples")
         if [ ! -e "Realm.framework" ]; then
-            echo "No Realm.framework found. You run the ios-framework target to generate it."
+            echo "No Realm.framework found. You must run the ios-framework target to generate it."
             exit 0
         fi
         (
