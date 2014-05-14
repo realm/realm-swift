@@ -49,5 +49,7 @@ void RLMAccessorCacheInitialize();
 Class RLMAccessorClassForObjectClass(Class objectClass);
 Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass);
 Class RLMInvalidAccessorClassForObjectClass(Class objectClass);
+Class RLMInsertionAccessorClassForObjectClass(Class objectClass);
+
 
 
