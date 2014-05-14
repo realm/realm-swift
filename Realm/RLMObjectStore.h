@@ -19,9 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealm.h"
-#import "RLMObject.h"
-#import "RLMArray.h"
-#import "RLMPrivate.hpp"
+#import <tightdb/table.hpp>
 
 //
 // Object Store Initialization
@@ -48,6 +46,15 @@ void RLMDeleteObjectFromRealm(RLMObject *object, RLMRealm *realm, bool cascade);
 
 // get objects of a given class
 RLMArray *RLMGetObjects(RLMRealm *realm, Class objectClass, NSPredicate *predicate, id order);
+
+
+//
+// Accessor Creation
+//
+
+// Create accessors
+RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, Class objectClass, NSUInteger index);
+
 
 
 

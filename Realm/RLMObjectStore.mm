@@ -25,8 +25,6 @@
 
 #import <objc/runtime.h>
 
-#import <tightdb/table.hpp>
-
 static NSArray *s_objectClasses;
 static NSMapTable *s_tableNamesForClass;
 
@@ -176,6 +174,22 @@ RLMArray *RLMGetObjects(RLMRealm *realm, Class objectClass, NSPredicate *predica
     array.realm = realm;
     [realm registerAccessor:array];
     return array;
+}
+
+// Create accessor and register with realm
+RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, Class objectClass, NSUInteger index) {
+    Class accessorClass = RLMAccessorClassForObjectClass(objectClass);
+    RLMObject *accessor = [[accessorClass alloc] init];
+    accessor.realm = realm;
+
+    tightdb::TableRef table = RLMTableForObjectClass(realm, objectClass);
+    accessor.backingTable = table.get();
+    accessor.backingTableIndex = table->get_index_in_parent();
+    accessor.objectIndex = index;
+    accessor.writable = (realm.transactionMode == RLMTransactionModeWrite);
+    
+    [accessor.realm registerAccessor:accessor];
+    return accessor;
 }
 
 

@@ -54,6 +54,29 @@
     [realm addObject:owner];
     [realm commitWriteTransaction];
     
+    RLMArray *owners = [realm objects:OwnerObject.class where:nil];
+    RLMArray *dogs = [realm objects:DogObject.class where:nil];
+    XCTAssertEqual(owners.count, 1, @"Expecting 1 owner");
+    XCTAssertEqual(dogs.count, 1, @"Expecting 1 dog");
+    XCTAssertEqualObjects([owners[0] name], @"Tim", @"Tim is named Tim");
+    XCTAssertEqualObjects([dogs[0] dogName], @"Harvie", @"Harvie is named Harvie");
+    
+    OwnerObject *tim = owners[0];
+    XCTAssertEqualObjects(tim.dog.dogName, @"Harvie", @"Tim's dog should be Harvie");
+}
+
+- (void)testMultipleOwnerLink {
+    RLMRealm *realm = [self realmWithTestPath];
+    
+    OwnerObject *owner = [[OwnerObject alloc] init];
+    owner.name = @"Tim";
+    owner.dog = [[DogObject alloc] init];
+    owner.dog.dogName = @"Harvie";
+    
+    [realm beginWriteTransaction];
+    [realm addObject:owner];
+    [realm commitWriteTransaction];
+    
     XCTAssertEqual([realm objects:OwnerObject.class where:nil].count, 1, @"Expecting 1 owner");
     XCTAssertEqual([realm objects:DogObject.class where:nil].count, 1, @"Expecting 1 dog");
     
