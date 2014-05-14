@@ -22,6 +22,16 @@
 
 #import <Realm/Realm.h>
 
+
+@interface SimpleObject : RLMObject
+@property NSString *name;
+@property int age;
+@property BOOL hired;
+@end
+
+@implementation SimpleObject
+@end
+
 @interface AgeObject : RLMObject
 @property int age;
 @end
@@ -105,73 +115,41 @@
 
 @implementation RLMTypedTableTests
 
-//- (void)testDataTypes_Typed
-//{
-//    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
-//        // create table and set object class
-//        AllTypesTable *table = [AllTypesTable tableInRealm:realm named:@"table"];
-//        
-//
-//        const char bin[4] = { 0, 1, 2, 3 };
-//        NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
-//        NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
-//        NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
-//        NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
-//
-//        AgeTable *subtab1 = [AgeTable tableInRealm:realm named:@"subtab1"];
-//        AgeTable *subtab2 = [AgeTable tableInRealm:realm named:@"subtab2"];
-//
-//        [subtab1 addRow:@[@200]]; // NOTE: the name is simply add+name of first column!
-//        [subtab2 addRow:@[@100]];
-//
-//        AllTypes * c;
-//
-//        // addEmptyRow not supported yet
-//        [table addRow:nil];
-//        c = table.lastRow;
-//        
-//        c.BoolCol   = NO   ; c.IntCol  = 54 ; c.FloatCol = 0.7     ; c.DoubleCol = 0.8     ; c.StringCol = @"foo";
-//        c.BinaryCol = bin1 ; c.DateCol = timeZero  ; c.TableCol = subtab1     ; c.cBoolCol = false; c.longCol = 99;
-//        NSString *string = @"string";
-//        c.mixedCol = @"string";
-//        
-//        [table addRow:nil];
-//        c = table.lastRow; 
-//        
-//        c.BoolCol   = YES  ; c.IntCol  = 506     ; c.FloatCol = 7.7         ; c.DoubleCol = 8.8       ; c.StringCol = @"banach";
-//        c.BinaryCol = bin2 ; c.DateCol = timeNow ; c.TableCol = subtab2     ; c.cBoolCol = true;    c.longCol = -20;
-//        c.mixedCol = @2;
-//        
-//        //AllTypes* row1 = [table rowAtIndex:0];
-//        //AllTypes* row2 = [table rowAtIndex:1];
-//        AllTypes* row1 = table[0];
-//        AllTypes* row2 = table[1];
-//
-//        XCTAssertEqual(row1.boolCol, NO,                 @"row1.BoolCol");
-//        XCTAssertEqual(row2.boolCol, YES,                @"row2.BoolCol");
-//        XCTAssertEqual(row1.intCol, 54,             @"row1.IntCol");
-//        XCTAssertEqual(row2.intCol, 506,            @"row2.IntCol");
-//        XCTAssertEqual(row1.floatCol, 0.7f,              @"row1.FloatCol");
-//        XCTAssertEqual(row2.floatCol, 7.7f,              @"row2.FloatCol");
-//        XCTAssertEqual(row1.doubleCol, 0.8,              @"row1.DoubleCol");
-//        XCTAssertEqual(row2.doubleCol, 8.8,              @"row2.DoubleCol");
-//        XCTAssertTrue([row1.stringCol isEqual:@"foo"],    @"row1.StringCol");
-//        XCTAssertTrue([row2.stringCol isEqual:@"banach"], @"row2.StringCol");
-//        XCTAssertTrue([row1.binaryCol isEqual:bin1],      @"row1.BinaryCol");
-//        XCTAssertTrue([row2.binaryCol isEqual:bin2],      @"row2.BinaryCol");
-//        XCTAssertTrue(([row1.dateCol isEqual:timeZero]),  @"row1.DateCol");
-//        XCTAssertTrue(([row2.dateCol isEqual:timeNow]),   @"row2.DateCol");
-//        XCTAssertTrue([row1.tableCol isEqual:subtab1],    @"row1.TableCol");
-//        XCTAssertTrue([row2.tableCol isEqual:subtab2],    @"row2.TableCol");
-//        XCTAssertEqual(row1.cBoolCol, (bool)false,        @"row1.cBoolCol");
-//        XCTAssertEqual(row2.cBoolCol, (bool)true,         @"row2.cBoolCol");
-//        XCTAssertEqual(row1.longCol, 99L,                 @"row1.IntCol");
-//        XCTAssertEqual(row2.longCol, -20L,                @"row2.IntCol");
-//        
-//        XCTAssertTrue([row1.mixedCol isEqualToString:string], @"row1.mixedCol");
-//        XCTAssertEqualObjects(row2.mixedCol, @2,          @"row2.mixedCol");
-//    }];
-//}
+-(void)testObjectInit
+{
+    [[NSFileManager defaultManager] removeItemAtPath:RLMDefaultRealmPath() error:nil];
+    
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    
+    // Init object before adding to realm
+    SimpleObject *soInit = [[SimpleObject alloc] init];
+    soInit.name = @"Peter";
+    soInit.age = 30;
+    soInit.hired = YES;
+    [realm addObject:soInit];
+    
+    // Create object while adding to realm using NSArray
+    SimpleObject *soUsingArray = [SimpleObject createInRealm:realm withObject:@[@"John", @40, @NO]];
+    
+    // Create object while adding to realm using NSDictionary
+    SimpleObject *soUsingDictionary = [SimpleObject createInRealm:realm withObject:@{@"name": @"Susi", @"age": @25, @"hired": @YES}];
+    
+    [realm commitWriteTransaction];
+    
+    XCTAssertEqualObjects(soInit.name, @"Peter", @"Name should be Peter");
+    XCTAssertEqual(soInit.age, 30, @"Age should be 30");
+    XCTAssertEqual(soInit.hired, YES, @"Hired should YES");
+    
+    XCTAssertEqualObjects(soUsingArray.name, @"John", @"Name should be John");
+    XCTAssertEqual(soUsingArray.age, 40, @"Age should be 40");
+    XCTAssertEqual(soUsingArray.hired, NO, @"Hired should NO");
+    
+    XCTAssertEqualObjects(soUsingDictionary.name, @"Susi", @"Name should be Susi");
+    XCTAssertEqual(soUsingDictionary.age, 25, @"Age should be 25");
+    XCTAssertEqual(soUsingDictionary.hired, YES, @"Hired should YES");
+}
 
 - (void)testObjectSubscripting
 {
@@ -180,33 +158,38 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     
     [realm beginWriteTransaction];
-    [AgeObject createInRealm:realm withObject:@[@10]];
-    [AgeObject createInRealm:realm withObject:@[@20]];
+    AgeObject *obj0 = [AgeObject createInRealm:realm withObject:@[@10]];
+    AgeObject *obj1 = [AgeObject createInRealm:realm withObject:@[@20]];
     [realm commitWriteTransaction];
 
-    // Get all objects
-    RLMArray *objects = [AgeObject allObjects];
-    AgeObject *obj0 = objects[0];
-    XCTAssertEqual(obj0.age, 10,  @"Should be 10    ");
-    AgeObject *obj1 = objects[1];
-    XCTAssertEqual(obj1.age, 20, @"table[1].age");
+    XCTAssertEqual(obj0.age, 10,  @"Age should be 10");
+    XCTAssertEqual(obj1.age, 20, @"Age should be 20");
 
     [realm beginWriteTransaction];
     obj0.age = 7;
     [realm commitWriteTransaction];
 
-    XCTAssertEqual(obj0.age, 7,  @"table[0].age");
+    XCTAssertEqual(obj0.age, 7,  @"Age should be 7");
 }
 
-- (void)testTableTyped_KeyedSubscripting
+- (void)testKeyedSubscripting
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    [KeyedObject createInRealm:realm withObject:@{@"name" : @"Test1", @"objID" : @24}];
-    [KeyedObject createInRealm:realm withObject:@{@"name" : @"Test2", @"objID" : @25}];
+    KeyedObject *obj0 = [KeyedObject createInRealm:realm withObject:@{@"name" : @"Test1", @"objID" : @24}];
+    KeyedObject *obj1 = [KeyedObject createInRealm:realm withObject:@{@"name" : @"Test2", @"objID" : @25}];
     [realm commitWriteTransaction];
     
+    XCTAssertEqualObjects(obj0[@"name"], @"Test1",  @"Name should be Test1");
+    XCTAssertEqualObjects(obj1[@"name"], @"Test2", @"Name should be Test1");
     
+    [realm beginWriteTransaction];
+    obj0[@"name"] = @"newName";
+    [realm commitWriteTransaction];
+    
+    XCTAssertEqualObjects(obj0[@"name"], @"newName",  @"Name should be newName");
+    
+
 }
 
 - (void)testCustomAccessors {
@@ -359,5 +342,73 @@
     XCTAssertThrows([noArray maxOfProperty:@"BoolCol"], @"Should throw exception");
 }
 
+
+//- (void)testDataTypes_Typed
+//{
+//    [self.realmWithTestPath writeUsingBlock:^(RLMRealm *realm) {
+//        // create table and set object class
+//        AllTypesTable *table = [AllTypesTable tableInRealm:realm named:@"table"];
+//
+//
+//        const char bin[4] = { 0, 1, 2, 3 };
+//        NSData* bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
+//        NSData* bin2 = [[NSData alloc] initWithBytes:bin length:sizeof bin];
+//        NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
+//        NSDate *timeZero = [NSDate dateWithTimeIntervalSince1970:0];
+//
+//        AgeTable *subtab1 = [AgeTable tableInRealm:realm named:@"subtab1"];
+//        AgeTable *subtab2 = [AgeTable tableInRealm:realm named:@"subtab2"];
+//
+//        [subtab1 addRow:@[@200]]; // NOTE: the name is simply add+name of first column!
+//        [subtab2 addRow:@[@100]];
+//
+//        AllTypes * c;
+//
+//        // addEmptyRow not supported yet
+//        [table addRow:nil];
+//        c = table.lastRow;
+//
+//        c.BoolCol   = NO   ; c.IntCol  = 54 ; c.FloatCol = 0.7     ; c.DoubleCol = 0.8     ; c.StringCol = @"foo";
+//        c.BinaryCol = bin1 ; c.DateCol = timeZero  ; c.TableCol = subtab1     ; c.cBoolCol = false; c.longCol = 99;
+//        NSString *string = @"string";
+//        c.mixedCol = @"string";
+//
+//        [table addRow:nil];
+//        c = table.lastRow;
+//
+//        c.BoolCol   = YES  ; c.IntCol  = 506     ; c.FloatCol = 7.7         ; c.DoubleCol = 8.8       ; c.StringCol = @"banach";
+//        c.BinaryCol = bin2 ; c.DateCol = timeNow ; c.TableCol = subtab2     ; c.cBoolCol = true;    c.longCol = -20;
+//        c.mixedCol = @2;
+//
+//        //AllTypes* row1 = [table rowAtIndex:0];
+//        //AllTypes* row2 = [table rowAtIndex:1];
+//        AllTypes* row1 = table[0];
+//        AllTypes* row2 = table[1];
+//
+//        XCTAssertEqual(row1.boolCol, NO,                 @"row1.BoolCol");
+//        XCTAssertEqual(row2.boolCol, YES,                @"row2.BoolCol");
+//        XCTAssertEqual(row1.intCol, 54,             @"row1.IntCol");
+//        XCTAssertEqual(row2.intCol, 506,            @"row2.IntCol");
+//        XCTAssertEqual(row1.floatCol, 0.7f,              @"row1.FloatCol");
+//        XCTAssertEqual(row2.floatCol, 7.7f,              @"row2.FloatCol");
+//        XCTAssertEqual(row1.doubleCol, 0.8,              @"row1.DoubleCol");
+//        XCTAssertEqual(row2.doubleCol, 8.8,              @"row2.DoubleCol");
+//        XCTAssertTrue([row1.stringCol isEqual:@"foo"],    @"row1.StringCol");
+//        XCTAssertTrue([row2.stringCol isEqual:@"banach"], @"row2.StringCol");
+//        XCTAssertTrue([row1.binaryCol isEqual:bin1],      @"row1.BinaryCol");
+//        XCTAssertTrue([row2.binaryCol isEqual:bin2],      @"row2.BinaryCol");
+//        XCTAssertTrue(([row1.dateCol isEqual:timeZero]),  @"row1.DateCol");
+//        XCTAssertTrue(([row2.dateCol isEqual:timeNow]),   @"row2.DateCol");
+//        XCTAssertTrue([row1.tableCol isEqual:subtab1],    @"row1.TableCol");
+//        XCTAssertTrue([row2.tableCol isEqual:subtab2],    @"row2.TableCol");
+//        XCTAssertEqual(row1.cBoolCol, (bool)false,        @"row1.cBoolCol");
+//        XCTAssertEqual(row2.cBoolCol, (bool)true,         @"row2.cBoolCol");
+//        XCTAssertEqual(row1.longCol, 99L,                 @"row1.IntCol");
+//        XCTAssertEqual(row2.longCol, -20L,                @"row2.IntCol");
+//
+//        XCTAssertTrue([row1.mixedCol isEqualToString:string], @"row1.mixedCol");
+//        XCTAssertEqualObjects(row2.mixedCol, @2,          @"row2.mixedCol");
+//    }];
+//}
 
 @end
