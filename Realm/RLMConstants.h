@@ -19,6 +19,33 @@
 ////////////////////////////////////////////////////////////////////////////
 
 
+// Make sure numbers match those in <tightdb/data_type.hpp>
+typedef NS_ENUM(int32_t, RLMPropertyType) {
+    RLMPropertyTypeNone     = -1,
+    
+    // Primitive types
+    RLMPropertyTypeInt      = 0,
+    RLMPropertyTypeBool     = 1,
+    RLMPropertyTypeFloat    = 9,
+    RLMPropertyTypeDouble   = 10,
+    
+    // Object types
+    RLMPropertyTypeString   = 2,
+    RLMPropertyTypeData     = 4,
+    RLMPropertyTypeAny      = 6,
+    RLMPropertyTypeDate     = 7,
+    
+    // Array/Linked object types
+    RLMPropertyTypeTable    = 5,
+    RLMPropertyTypeObject   = 12,
+};
+
+
+typedef NS_ENUM(NSInteger, RLMSortOrder) {
+    RLMSortOrderAscending =  0,
+    RLMSortOrderDescending =  1,
+};
+
 // Posted by RLMRealm when it changes, that is when a table is
 // added, removed, or changed in any way.
 

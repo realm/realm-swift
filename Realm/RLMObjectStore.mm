@@ -25,22 +25,16 @@
 
 #import <objc/runtime.h>
 
-#import <tightdb/table.hpp>
-
-static NSMutableDictionary *s_accessorClassNameCache;
 static NSArray *s_objectClasses;
 static NSMapTable *s_tableNamesForClass;
-
-inline BOOL RLMIsSubclass(Class class1, Class class2) {
-    class1 = class_getSuperclass(class1);
-    return RLMIsKindOfclass(class1, class2);
-}
 
 void RLMInitializeObjectStore() {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        // setup name mapping for accessor classes
-        s_accessorClassNameCache = [NSMutableDictionary dictionary];
+        // register accessor cache
+        RLMAccessorCacheInitialize();
+
+        // setup name mapping for object tables
         s_tableNamesForClass = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
                                                      valueOptions:NSPointerFunctionsObjectPersonality];
         
@@ -73,13 +67,29 @@ inline tightdb::TableRef RLMTableForObjectClass(RLMRealm *realm, Class objectCla
 
 void RLMEnsureRealmTablesExist(RLMRealm *realm) {
     [realm beginWriteTransaction];
+    
+    // FIXME - support migrations
+    // first pass create tables
+    for (RLMObjectDescriptor *desc in s_objectClasses) {
+        tightdb::TableRef table = RLMTableForObjectClass(realm, desc.objectClass);
+    }
+    
+    // second pass add columns
     for (RLMObjectDescriptor *desc in s_objectClasses) {
         tightdb::TableRef table = RLMTableForObjectClass(realm, desc.objectClass);
         
-        // FIXME - support migrations
         if (table->get_column_count() == 0) {
             for (RLMProperty *prop in desc.properties) {
-                table->add_column((tightdb::DataType)prop.type, tightdb::StringData(prop.name.UTF8String, prop.name.length));
+                tightdb::StringData name(prop.name.UTF8String, prop.name.length);
+                if (prop.type == RLMPropertyTypeObject) {
+//                    tightdb::TableRef linkTable = RLMTableForObjectClass(realm, prop.linkClass);
+//                    table->add_column_link(name, linkTable->get_index_in_parent());
+                    @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                                   reason:@"Links not yest supported" userInfo:nil];
+                }
+                else {
+                    table->add_column((tightdb::DataType)prop.type, name);
+                }
             }
         }
         else {
@@ -92,35 +102,6 @@ void RLMEnsureRealmTablesExist(RLMRealm *realm) {
         }
     }
     [realm commitWriteTransaction];
-}
-
-Class RLMAccessorClassForObjectClass(Class objectClass) {
-    // if objectClass is RLMRow use it, otherwise use proxy class
-    if (!RLMIsKindOfclass(objectClass, RLMObject.class)) {
-        @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMRow" userInfo:nil];
-    }
-    
-    // see if we have a cached version
-    NSString *objectClassName = NSStringFromClass(objectClass);
-    if (s_accessorClassNameCache[objectClassName]) {
-        return NSClassFromString(s_accessorClassNameCache[objectClassName]);
-    }
-    
-    // create and register proxy class which derives from object class
-    NSString *proxyClassName = [@"RLMAccessor_" stringByAppendingString:objectClassName];
-    Class proxyClass = objc_allocateClassPair(objectClass, proxyClassName.UTF8String, 0);
-    objc_registerClassPair(proxyClass);
-    
-    // override getters/setters for each propery
-    RLMObjectDescriptor *descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
-    for (unsigned int propNum = 0; propNum < descriptor.properties.count; propNum++) {
-        RLMProperty *prop = descriptor.properties[propNum];
-        [prop addToClass:proxyClass];
-    }
-    
-    // set in cache to indiate this proxy class has been created and return
-    s_accessorClassNameCache[objectClassName] = proxyClassName;
-    return proxyClass;
 }
 
 void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
@@ -148,6 +129,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     }
     
     // change object class to accessor class (if not already)
+    // we are in a read transaction so we use the rw accessor class
     Class accessorClass = RLMAccessorClassForObjectClass(object.class);
     if (object.class != accessorClass) {
         object_setClass(object, accessorClass);
@@ -155,13 +137,13 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     
     // FIXME - see last fixme
     // get all properties on the table
+    object.realm = realm;
     for (NSString *key in dict) {
         [object setValue:dict[key] forKeyPath:key];
     }
     
-    // set the realm and register
-    object.realm = realm;
-    [realm registerAcessor:object];
+    // register object with the realm
+    [realm registerAccessor:object];
 }
 
 void RLMDeleteObjectFromRealm(RLMObject *object, RLMRealm *realm, bool cascade) {
@@ -190,11 +172,25 @@ RLMArray *RLMGetObjects(RLMRealm *realm, Class objectClass, NSPredicate *predica
     tightdb::TableView view = array.backingQuery->find_all();
     RLMUpdateViewWithOrder(view, order, desc);
     array.backingView = view;
-    
-    // FIXME - we need to hold onto query or predicate for searching off of RLMArrays - this crashes now
     array.realm = realm;
-    [realm registerAcessor:array];
+    [realm registerAccessor:array];
     return array;
+}
+
+// Create accessor and register with realm
+RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, Class objectClass, NSUInteger index) {
+    Class accessorClass = RLMAccessorClassForObjectClass(objectClass);
+    RLMObject *accessor = [[accessorClass alloc] init];
+    accessor.realm = realm;
+
+    tightdb::TableRef table = RLMTableForObjectClass(realm, objectClass);
+    accessor.backingTable = table.get();
+    accessor.backingTableIndex = table->get_index_in_parent();
+    accessor.objectIndex = index;
+    accessor.writable = (realm.transactionMode == RLMTransactionModeWrite);
+    
+    [accessor.realm registerAccessor:accessor];
+    return accessor;
 }
 
 
