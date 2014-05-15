@@ -18,18 +18,36 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import <Foundation/Foundation.h>
+#import "RLMRealm.h"
+#include <tightdb/table.hpp>
 
-#import <XCTest/XCTest.h>
-#import <Realm/Realm.h>
+//
+// Accessor Protocol
+//
 
-NSString *RLMTestRealmPath();
-NSString *RLMDefaultRealmPath();
-NSString *RLMRealmPathForFile();
+// implemented by all persisted objects
+@protocol RLMAccessor <NSObject>
 
-@class RLMRealm;
-
-@interface RLMTestCase : XCTestCase
-
-- (RLMRealm *)realmWithTestPath;
+@property (nonatomic) RLMRealm *realm;
+@property (nonatomic, assign) NSUInteger objectIndex;
+@property (nonatomic, assign) NSUInteger backingTableIndex;
+@property (nonatomic, assign) tightdb::Table *backingTable;
+@property (nonatomic, assign) BOOL writable;
 
 @end
+
+
+//
+// Accessors Class Creation/Caching
+//
+
+// initialize accessor cache
+void RLMAccessorCacheInitialize();
+
+// get accessor classes for an object class - generates classes if not cached
+Class RLMAccessorClassForObjectClass(Class objectClass);
+Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass);
+Class RLMInvalidAccessorClassForObjectClass(Class objectClass);
+
+
