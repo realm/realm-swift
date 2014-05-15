@@ -299,3 +299,56 @@
 
 @end
 
+
+@interface RLMArray (Networking)
+
+/**---------------------------------------------------------------------------------------
+ * @name Networking
+ * ---------------------------------------------------------------------------------------
+ */
+/**
+ Sends objects to a URL through a synchronous HTTP PUT.
+ 
+ @param url The URL request.
+ @param success Block to be executed when request succeed, nil to ignore.
+ @param failure Block to execute in case of an error, nil to ignore.
+ */
+- (void)putToURL:(NSURLRequest*)url whenSuccess:(void(^)(void))success
+                                    whenFailure:(void(^)(void))failure;
+
+/**
+ Sends objects to a URL through an HTTP PUT.
+
+ @param url The URL request.
+ @param success Block to be executed when request succeed, nil to ignore.
+ @param failure Block to execute in case of an error, nil to ignore.
+ @param async   Use asynchronous mode if @YES, synchronous otherwise.
+ */
+- (void)putToURL:(NSURLRequest*)url whenSuccess:(void(^)(void))success
+                                    whenFailure:(void(^)(void))failure
+                                          async:(BOOL)async;
+
+
+/**
+ Sends objects to a URL through a synchronous HTTP POST.
+
+ @param url The URL request.
+ @param success Block to be executed when request succeed, nil to ignore.
+ @param failure Block to execute in case of an error, nil to ignore.
+ */
+- (void)postToURL:(NSURLRequest*)url whenSuccess:(void(^)(void))success
+                                     whenFailure:(void(^)(void))failure;
+
+/**
+ Sends objects to a URL through an HTTP POST.
+
+ @param url The URL request.
+ @param success Block to be executed when request succeed, nil to ignore.
+ @param failure Block to execute in case of an error, nil to ignore.
+ @param async   Use asynchronous mode if @YES, synchronous otherwise.
+ */
+- (void)postToURL:(NSURLRequest*)url whenSuccess:(void(^)(void))success
+                                     whenFailure:(void(^)(void))failure
+                                           async:(BOOL)async;
+
+ @end
