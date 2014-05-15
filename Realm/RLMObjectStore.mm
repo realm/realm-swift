@@ -128,7 +128,10 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     // call our insertion setter to populate all properties in the table
     RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
     for (RLMProperty *prop in desc.properties) {
-        object[prop.name] = object[prop.name];
+        // InsertionAccessr getter gets object from ivar
+        id value = [object valueForKey:prop.name];
+        // InsertionAccssor setter inserts into table
+        [object setValue:value forKey:prop.name];
     }
     
     // we are in a read transaction so change accessor class to readwrite accessor
