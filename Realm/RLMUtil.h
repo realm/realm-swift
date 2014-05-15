@@ -18,11 +18,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMType.h"
+#import "RLMConstants.h"
 #import <objc/runtime.h>
 
+#import <tightdb/table.hpp>
+
 // returns if the object can be inserted as the given type
-BOOL RLMIsObjectOfType(id obj, RLMType type);
+BOOL RLMIsObjectOfType(id obj, RLMPropertyType type);
 
 // C version of isKindOfClass
 inline BOOL RLMIsKindOfclass(Class class1, Class class2) {
@@ -32,3 +34,14 @@ inline BOOL RLMIsKindOfclass(Class class1, Class class2) {
     }
     return NO;
 }
+
+// Determines if class1 descends from class2
+inline BOOL RLMIsSubclass(Class class1, Class class2) {
+    class1 = class_getSuperclass(class1);
+    return RLMIsKindOfclass(class1, class2);
+}
+
+// Getter and Setter for RLMPropertyTypeAny properties
+id RLMGetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_ndx);
+void RLMSetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_ndx, id obj);
+
