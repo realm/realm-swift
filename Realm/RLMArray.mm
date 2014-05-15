@@ -233,16 +233,16 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
     
     switch (colType) {
-            case RLMPropertyTypeInt:
-                return @(self.backingView.minimum_int(colIndex));
-            case RLMPropertyTypeDouble:
-                return @(self.backingView.minimum_double(colIndex));
-            case RLMPropertyTypeFloat:
-                return @(self.backingView.minimum_float(colIndex));
-            case RLMPropertyTypeDate: {
-                tightdb::DateTime dt = self.backingView.minimum_datetime(colIndex);
-                return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
-            }
+        case RLMPropertyTypeInt:
+            return @(self.backingView.minimum_int(colIndex));
+        case RLMPropertyTypeDouble:
+            return @(self.backingView.minimum_double(colIndex));
+        case RLMPropertyTypeFloat:
+            return @(self.backingView.minimum_float(colIndex));
+        case RLMPropertyTypeDate: {
+            tightdb::DateTime dt = self.backingView.minimum_datetime(colIndex);
+            return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
+        }
         default:
             @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
                                            reason:@"Sum only supported on int, float and double columns."
@@ -256,16 +256,16 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
     
     switch (colType) {
-            case RLMPropertyTypeInt:
-                return @(self.backingView.maximum_int(colIndex));
-            case RLMPropertyTypeDouble:
-                return @(self.backingView.maximum_double(colIndex));
-            case RLMPropertyTypeFloat:
-                return @(self.backingView.maximum_float(colIndex));
-            case RLMPropertyTypeDate: {
-                tightdb::DateTime dt = self.backingView.maximum_datetime(colIndex);
-                return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
-            }
+        case RLMPropertyTypeInt:
+            return @(self.backingView.maximum_int(colIndex));
+        case RLMPropertyTypeDouble:
+            return @(self.backingView.maximum_double(colIndex));
+        case RLMPropertyTypeFloat:
+            return @(self.backingView.maximum_float(colIndex));
+        case RLMPropertyTypeDate: {
+            tightdb::DateTime dt = self.backingView.maximum_datetime(colIndex);
+            return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
+        }
         default:
             @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
                                            reason:@"Maximum only supported on int, float and double columns."
@@ -279,13 +279,12 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
     
     switch (colType) {
-            case RLMPropertyTypeInt:
-                return @(self.backingView.sum_int(colIndex));
-            case RLMPropertyTypeDouble:
-                return @(self.backingView.sum_double(colIndex));
-            case RLMPropertyTypeFloat:
-                return @(self.backingView.sum_float(colIndex));
-            
+        case RLMPropertyTypeInt:
+            return @(self.backingView.sum_int(colIndex));
+        case RLMPropertyTypeDouble:
+            return @(self.backingView.sum_double(colIndex));
+        case RLMPropertyTypeFloat:
+            return @(self.backingView.sum_float(colIndex));
         default:
             @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
                                            reason:@"Maximum only supported on int, float and double columns."
@@ -299,13 +298,12 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
     
     switch (colType) {
-            case RLMPropertyTypeInt:
-                return @(self.backingView.average_int(colIndex));
-            case RLMPropertyTypeDouble:
-                return @(self.backingView.average_double(colIndex));
-            case RLMPropertyTypeFloat:
-                return @(self.backingView.average_float(colIndex));
-            
+        case RLMPropertyTypeInt:
+            return @(self.backingView.average_int(colIndex));
+        case RLMPropertyTypeDouble:
+            return @(self.backingView.average_double(colIndex));
+        case RLMPropertyTypeFloat:
+            return @(self.backingView.average_float(colIndex));
         default:
             @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
                                            reason:@"Sum only supported on int, float and double columns."
