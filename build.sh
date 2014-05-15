@@ -255,6 +255,7 @@ $APP_TESTS_SOURCES
                 './$APP/en.lproj/InfoPlist.strings',
                 './$APP/$APP-Info.plist',
                 './$APP/$APP-Prefix.pch',
+                $RESOURCES
             ],
             'include_dirs': [
                 './$TEST_APP/**'
@@ -794,6 +795,11 @@ EOF
         find -E "$TEST_APP" -type f \
             ! -iregex "^.*\.[ch](pp)?$" \
             -exec rm {} \; || exit 1
+
+        ## Gather resources
+        cp "../../tightdb/test/expect_string.txt" .
+        cp "../../tightdb/test/expect_json.json" .
+        RESOURCES="'./expect_string.txt', './expect_json.json',"
 
         ## Remove breaking files (containing main or unportable code).
         rm "$TEST_APP/main.cpp"
