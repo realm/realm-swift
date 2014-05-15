@@ -100,6 +100,7 @@
 @property float floatCol;
 @property double doubleCol;
 @property BOOL boolCol;
+@property NSDate *dateCol;
 @end
 
 @implementation AggregateObject
@@ -224,16 +225,19 @@
     
     [realm beginWriteTransaction];
     
-    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES]];
-    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO]];
-    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES]];
-    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO]];
-    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES]];
-    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO]];
-    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES]];
-    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO]];
-    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES]];
-    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES]];
+    NSDate *dateMinInput = [NSDate date];
+    NSDate *dateMaxInput = [dateMinInput dateByAddingTimeInterval:1000];
+    
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+    [AggregateObject createInRealm:realm withObject:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
         
     RLMArray *noArray = [AggregateObject objectsWhere:@"boolCol == NO"];
     RLMArray *yesArray = [AggregateObject objectsWhere:@"boolCol == YES"];
@@ -296,6 +300,12 @@
     min = [yesArray minOfProperty:@"doubleCol"];
     XCTAssertEqualWithAccuracy(min.doubleValue, (double)0.0, 0.1f, @"Minimum should be 0.0");
     
+    // Test date min
+    NSDate *dateMinOutput = [noArray minOfProperty:@"dateCol"];
+    XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, 1, @"Minimum should be dateMaxInput");
+    dateMinOutput = [yesArray minOfProperty:@"dateCol"];
+    XCTAssertEqualWithAccuracy(dateMinOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, 1, @"Minimum should be dateMinInput");
+    
     // Test invalid column name
     XCTAssertThrows([noArray minOfProperty:@"foo"], @"Should throw exception");
     
@@ -321,6 +331,12 @@
     XCTAssertEqualWithAccuracy(max.doubleValue, (double)2.5, 0.1f, @"Maximum should be 3.5");
     max = [yesArray maxOfProperty:@"doubleCol"];
     XCTAssertEqualWithAccuracy(max.doubleValue, (double)0.0, 0.1f, @"Maximum should be 0.0");
+    
+    // Test date max
+    NSDate *dateMaxOutput = [noArray maxOfProperty:@"dateCol"];
+    XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMaxInput.timeIntervalSince1970, 1, @"Maximum should be dateMaxInput");
+    dateMaxOutput = [yesArray maxOfProperty:@"dateCol"];
+    XCTAssertEqualWithAccuracy(dateMaxOutput.timeIntervalSince1970, dateMinInput.timeIntervalSince1970, 1, @"Maximum should be dateMinInput");
     
     // Test invalid column name
     XCTAssertThrows([noArray maxOfProperty:@"foo"], @"Should throw exception");

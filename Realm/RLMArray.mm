@@ -240,10 +240,10 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
                 return @(table.minimum_double(colIndex));
             case RLMPropertyTypeFloat:
                 return @(table.minimum_float(colIndex));
-            case RLMPropertyTypeDate:
-                @throw [NSException exceptionWithName:@"realm:operation_not_supported"
-                                           reason:@"Minimum not supported on date columns yet"
-                                         userInfo:nil];
+            case RLMPropertyTypeDate: {
+                tightdb::DateTime dt = table.minimum_datetime(colIndex);
+                return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
+            }
         default:
             @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
                                            reason:@"Sum only supported on int, float and double columns."
@@ -264,10 +264,10 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
                 return @(table.maximum_double(colIndex));
             case RLMPropertyTypeFloat:
                 return @(table.maximum_float(colIndex));
-            case RLMPropertyTypeDate:
-                @throw [NSException exceptionWithName:@"realm:operation_not_supported"
-                                           reason:@"Maximum not supported on date columns yet"
-                                         userInfo:nil];
+            case RLMPropertyTypeDate: {
+                tightdb::DateTime dt = table.maximum_datetime(colIndex);
+                return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
+            }
             
         default:
             @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
