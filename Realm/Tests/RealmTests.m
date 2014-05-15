@@ -122,7 +122,7 @@
     });
     
     // this should complete very fast before the timer
-    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:0.0001f];
+    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:0.001f];
     
     XCTAssertTrue(notificationFired, @"A notification should have fired immediately a table was created in the background");
     
