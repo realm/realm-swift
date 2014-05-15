@@ -119,10 +119,10 @@ BOOL RLMIsObjectOfType(id obj, RLMPropertyType type) {
 
 
 void RLMSetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_ndx, id obj) {
-    if (obj == nil) {
-        table.nullify_link(col_ndx, row_ndx);
-        return;
-    }
+//    if (obj == nil) {
+//        table.nullify_link(col_ndx, row_ndx);
+//        return;
+//    }
     if ([obj isKindOfClass:[NSString class]]) {
         tightdb::StringData sd([(NSString *)obj UTF8String]);
         table.set_mixed(col_ndx, row_ndx, sd);
