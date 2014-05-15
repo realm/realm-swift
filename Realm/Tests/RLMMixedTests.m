@@ -12,6 +12,7 @@
 
 
 @interface RLMMixedTests : RLMTestCase
+@property (nonatomic, assign) RLMRealm *realm;
 @end
 
 @implementation RLMMixedTests
@@ -20,11 +21,10 @@
 
 - (void)setUp {
     [super setUp];
-    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath() error:nil];
+    _realm = [self realmWithTestPath];
 }
 
 - (void)tearDown {
-    [[NSFileManager defaultManager] removeItemAtPath:RLMTestRealmPath() error:nil];
     [super tearDown];
 }
 
@@ -32,19 +32,18 @@
 
 - (void)testMixedInsert {
     const char *data = "Hello World";
-    RLMRealm *realm = [self realmWithTestPath];
 
     // FIXME: add object with subtable
-    [realm beginWriteTransaction];
-    [MixedObject createInRealm:realm withObject:@[@YES, @"Jens", @50]];
-    [MixedObject createInRealm:realm withObject:@[@YES, @10, @52]];
-    [MixedObject createInRealm:realm withObject:@[@YES, @3.1f, @53]];
-    [MixedObject createInRealm:realm withObject:@[@YES, @3.1, @54]];
-    [MixedObject createInRealm:realm withObject:@[@YES, [NSDate date], @55]];
-    [MixedObject createInRealm:realm withObject:@[@YES, [NSData dataWithBytes:(void *)data length:strlen(data)], @56]];
-    [realm commitWriteTransaction];
+    [_realm beginWriteTransaction];
+    [MixedObject createInRealm:_realm withObject:@[@YES, @"Jens", @50]];
+    [MixedObject createInRealm:_realm withObject:@[@YES, @10, @52]];
+    [MixedObject createInRealm:_realm withObject:@[@YES, @3.1f, @53]];
+    [MixedObject createInRealm:_realm withObject:@[@YES, @3.1, @54]];
+    [MixedObject createInRealm:_realm withObject:@[@YES, [NSDate date], @55]];
+    [MixedObject createInRealm:_realm withObject:@[@YES, [NSData dataWithBytes:(void *)data length:strlen(data)], @56]];
+    [_realm commitWriteTransaction];
 
-    RLMArray *objects = [realm objects:MixedObject.class where:nil];
+    RLMArray *objects = [_realm objects:MixedObject.class where:nil];
     XCTAssertEqual(objects.count, (NSUInteger)6, @"6 rows excepted");
     XCTAssertTrue([[objects objectAtIndex:0] isKindOfClass:[MixedObject class]], @"MixedObject expected");
     XCTAssertTrue([[objects objectAtIndex:0][@"other"] isKindOfClass:[NSString class]], @"NSString expected");
