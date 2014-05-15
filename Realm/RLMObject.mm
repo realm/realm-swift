@@ -96,7 +96,7 @@ NSString *const RLMPropertyAttributeRequired = @"RLMPropertyAttributeRequired";
 }
 
 -(void)setObject:(id)obj forKeyedSubscript:(NSString *)key {
-    [self setValue:obj forKeyPath:key];
+    [self setValue:obj forKey:key];
 }
 
 + (RLMArray *)allObjects {
