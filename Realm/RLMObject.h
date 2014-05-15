@@ -222,6 +222,28 @@ extern NSString *const RLMPropertyAttributeRequired;
  *  @name JSON Serialization
  *  ---------------------------------------------------------------------------------------
  */
+@protocol RLMJSONSerialization
+@optional
+/**
+ Setup a mapping between JSON keys and property names. For cases where
+ JSON key and property name are identical a mapping is not required.
+ 
+ @return A NSDirectory with property names as key and JSON keys as value.
+ */
++(NSDictionary *)propertyKeyMapping;
+
+/**
+ Implement this optional method if a JSON value cannot be transformed
+ by standard methods to a Objective C value.
+ 
+ @param key     The JSON key.
+ @return    The transformer, nil if standard transformation can be used.
+ */
++(NSValueTransformer *)getTransformerForKey:(NSString *)key;
+
+@end
+
+
 @interface RLMObject (JSONSerialization)
 /**
  Returns this object represented as a JSON string.
@@ -233,3 +255,28 @@ extern NSString *const RLMPropertyAttributeRequired;
 @end
 
 
+@interface RLMObject (Networking)
+
+/**---------------------------------------------------------------------------------------
+ * @name Networking
+ * ---------------------------------------------------------------------------------------
+ */
+/**
+ Sends object to a URL through a aync HTTP PUT.
+
+ @param url The URL request.
+ @param success Block to be executed when request succeed, nil to ignore.
+ @param failure Block to execute in case of an error, nil to ignore.
+ */
+- (void)putToURL:(NSURLRequest*)url whenSuccess:(void(^)(void))success whenFailure:(void(^)(void))failure;
+
+/**
+ Sends object to a URL through a aync HTTP POST.
+
+ @param url The URL request.
+ @param success Block to be executed when request succeed, nil to ignore.
+ @param failure Block to execute in case of an error, nil to ignore.
+ */
+- (void)postToURL:(NSURLRequest*)url whenSuccess:(void(^)(void))success whenFailure:(void(^)(void))failure;
+
+@end
