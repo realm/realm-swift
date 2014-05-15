@@ -20,6 +20,7 @@
 
 #import <Foundation/Foundation.h>
 #import "RLMUtil.h"
+#import "NSData+RLMGetBinaryData.h"
 
 inline bool nsnumber_is_like_bool(NSObject *obj)
 {
@@ -66,20 +67,20 @@ inline bool nsnumber_is_like_double(NSObject *obj)
             strcmp(data_type, @encode(unsigned long long)) == 0);
 }
 
-BOOL RLMIsObjectOfType(id obj, RLMType type) {
+BOOL RLMIsObjectOfType(id obj, RLMPropertyType type) {
     switch (type) {
-        case RLMTypeString:
+        case RLMPropertyTypeString:
             if (![obj isKindOfClass:[NSString class]])
                 return NO;
             break;
-        case RLMTypeBool:
+        case RLMPropertyTypeBool:
             if ([obj isKindOfClass:[NSNumber class]]) {
                 if (nsnumber_is_like_bool(obj))
                     break;
                 return NO;
             }
             break;
-        case RLMTypeDate:
+        case RLMPropertyTypeDate:
             if ([obj isKindOfClass:[NSNumber class]]) {
                 if (nsnumber_is_like_integer(obj))
                     break;
@@ -88,31 +89,103 @@ BOOL RLMIsObjectOfType(id obj, RLMType type) {
                 break;
             }
             return NO;
-        case RLMTypeInt:
+        case RLMPropertyTypeInt:
             if ([obj isKindOfClass:[NSNumber class]]) {
                 if (nsnumber_is_like_integer(obj))
                     break;
             }
             return NO;
-        case RLMTypeFloat:
+        case RLMPropertyTypeFloat:
             if ([obj isKindOfClass:[NSNumber class]]) {
                 if (nsnumber_is_like_float(obj))
                     break;
             }
             return NO;
-        case RLMTypeDouble:
+        case RLMPropertyTypeDouble:
             if ([obj isKindOfClass:[NSNumber class]]) {
                 if (nsnumber_is_like_double(obj))
                     break;
             }
             return NO;
-        case RLMTypeBinary:
+        case RLMPropertyTypeData:
             if ([obj isKindOfClass:[NSData class]])
                 break;
             return NO;
         default:
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMType specified" userInfo:nil];
+            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMPropertyType specified" userInfo:nil];
     }
     return YES;
 }
+
+
+void RLMSetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_ndx, id obj) {
+    if (obj == nil) {
+        table.nullify_link(col_ndx, row_ndx);
+        return;
+    }
+    if ([obj isKindOfClass:[NSString class]]) {
+        tightdb::StringData sd([(NSString *)obj UTF8String]);
+        table.set_mixed(col_ndx, row_ndx, sd);
+        return;
+    }
+    if ([obj isKindOfClass:[NSDate class]]) {
+        table.set_mixed(col_ndx, row_ndx, tightdb::DateTime(time_t([(NSDate *)obj timeIntervalSince1970])));
+        return;
+    }
+    if ([obj isKindOfClass:[NSData class]]) {
+        table.set_mixed(col_ndx, row_ndx, ((NSData *)obj).rlmBinaryData);
+        return;
+    }
+    if ([obj isKindOfClass:[NSNumber class]]) {
+        const char *data_type = [(NSNumber *)obj objCType];
+        const char dt = data_type[0];
+        switch (dt) {
+            case 'i':
+            case 's':
+            case 'l':
+                table.set_mixed(col_ndx, row_ndx, (int64_t)[(NSNumber *)obj longValue]);
+                return;
+            case 'f':
+                table.set_mixed(col_ndx, row_ndx, [(NSNumber *)obj floatValue]);
+                return;
+            case 'd':
+                table.set_mixed(col_ndx, row_ndx, [(NSNumber *)obj doubleValue]);
+                return;
+            case 'B':
+            case 'c':
+                table.set_mixed(col_ndx, row_ndx, [(NSNumber *)obj boolValue] == YES);
+                return;
+        }
+    }
+    @throw [NSException exceptionWithName:@"RLMException" reason:@"Inserting invalid object for RLMPropertyTypeAny property" userInfo:nil];
+}
+
+id RLMGetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_ndx) {
+    tightdb::Mixed mixed = table.get_mixed(col_ndx, row_ndx);
+    switch (mixed.get_type()) {
+        case RLMPropertyTypeString:
+            return [NSString stringWithUTF8String:mixed.get_string().data()];
+        case RLMPropertyTypeInt: {
+            return @(mixed.get_int());
+        case RLMPropertyTypeFloat:
+            return @(mixed.get_float());
+        case RLMPropertyTypeDouble:
+            return @(mixed.get_double());
+        case RLMPropertyTypeBool:
+            return @(mixed.get_bool());
+        case RLMPropertyTypeDate:
+            return [NSDate dateWithTimeIntervalSince1970:mixed.get_datetime().get_datetime()];
+        case RLMPropertyTypeData: {
+            tightdb::BinaryData bd = mixed.get_binary();
+            NSData *d = [NSData dataWithBytes:bd.data() length:bd.size()];
+            return d;
+        }
+        default:
+            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid data type for RLMPropertyTypeAny property." userInfo:nil];
+        }
+    }
+}
+
+
+
 
