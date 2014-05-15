@@ -230,16 +230,15 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 -(id)minOfProperty:(NSString *)property {
     NSUInteger colIndex = RLMValidatedColumnIndex([RLMObjectDescriptor descriptorForObjectClass:_objectClass], property);
     
-    tightdb::TableView table = self.backingQuery->find_all();
-    RLMPropertyType colType = RLMPropertyType(table.get_column_type(colIndex));
+    RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
     
     switch (colType) {
             case RLMPropertyTypeInt:
-                return @(table.minimum_int(colIndex));
+                return @(self.backingView.minimum_int(colIndex));
             case RLMPropertyTypeDouble:
-                return @(table.minimum_double(colIndex));
+                return @(self.backingView.minimum_double(colIndex));
             case RLMPropertyTypeFloat:
-                return @(table.minimum_float(colIndex));
+                return @(self.backingView.minimum_float(colIndex));
             case RLMPropertyTypeDate:
                 @throw [NSException exceptionWithName:@"realm:operation_not_supported"
                                            reason:@"Minimum not supported on date columns yet"
@@ -254,16 +253,15 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 -(id)maxOfProperty:(NSString *)property {
     NSUInteger colIndex = RLMValidatedColumnIndex([RLMObjectDescriptor descriptorForObjectClass:_objectClass], property);
     
-    tightdb::TableView table = self.backingQuery->find_all();
-    RLMPropertyType colType = RLMPropertyType(table.get_column_type(colIndex));
+    RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
     
     switch (colType) {
             case RLMPropertyTypeInt:
-                return @(table.maximum_int(colIndex));
+                return @(self.backingView.maximum_int(colIndex));
             case RLMPropertyTypeDouble:
-                return @(table.maximum_double(colIndex));
+                return @(self.backingView.maximum_double(colIndex));
             case RLMPropertyTypeFloat:
-                return @(table.maximum_float(colIndex));
+                return @(self.backingView.maximum_float(colIndex));
             case RLMPropertyTypeDate:
                 @throw [NSException exceptionWithName:@"realm:operation_not_supported"
                                            reason:@"Maximum not supported on date columns yet"
@@ -279,16 +277,15 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 -(NSNumber *)sumOfProperty:(NSString *)property {
     NSUInteger colIndex = RLMValidatedColumnIndex([RLMObjectDescriptor descriptorForObjectClass:_objectClass], property);
     
-    tightdb::TableView table = self.backingQuery->find_all();
-    RLMPropertyType colType = RLMPropertyType(table.get_column_type(colIndex));
+    RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
     
     switch (colType) {
             case RLMPropertyTypeInt:
-                return @(table.sum_int(colIndex));
+                return @(self.backingView.sum_int(colIndex));
             case RLMPropertyTypeDouble:
-                return @(table.sum_double(colIndex));
+                return @(self.backingView.sum_double(colIndex));
             case RLMPropertyTypeFloat:
-                return @(table.sum_float(colIndex));
+                return @(self.backingView.sum_float(colIndex));
             
         default:
             @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
@@ -300,16 +297,15 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 -(NSNumber *)averageOfProperty:(NSString *)property {
     NSUInteger colIndex = RLMValidatedColumnIndex([RLMObjectDescriptor descriptorForObjectClass:_objectClass], property);
     
-    tightdb::TableView table = self.backingQuery->find_all();
-    RLMPropertyType colType = RLMPropertyType(table.get_column_type(colIndex));
+    RLMPropertyType colType = RLMPropertyType(self.backingView.get_column_type(colIndex));
     
     switch (colType) {
             case RLMPropertyTypeInt:
-                return @(table.average_int(colIndex));
+                return @(self.backingView.average_int(colIndex));
             case RLMPropertyTypeDouble:
-                return @(table.average_double(colIndex));
+                return @(self.backingView.average_double(colIndex));
             case RLMPropertyTypeFloat:
-                return @(table.average_float(colIndex));
+                return @(self.backingView.average_float(colIndex));
             
         default:
             @throw [NSException exceptionWithName:@"realm:operation_not_supprted"
