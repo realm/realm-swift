@@ -31,6 +31,9 @@ void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMObjectD
 // apply a sort (column name or NSSortDescriptor) to an existing view
 void RLMUpdateViewWithOrder(tightdb::TableView &view, id order, RLMObjectDescriptor *desc);
 
+NSUInteger RLMValidatedColumnIndex(RLMObjectDescriptor *desc, NSString *columnName);
+
+
 // predicate exception
 NSException *RLMPredicateException(NSString *name, NSString *reason);
 
