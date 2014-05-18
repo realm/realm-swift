@@ -29,6 +29,19 @@
 @implementation PersonQueryObject
 @end
 
+@interface TestQueryObject : RLMObject
+@property (nonatomic, copy) NSString *recordTag;
+@property (nonatomic, assign) NSInteger int1;
+@property (nonatomic, assign) NSInteger int2;
+@property (nonatomic, assign) float float1;
+@property (nonatomic, assign) float float2;
+@property (nonatomic, assign) double double1;
+@property (nonatomic, assign) double double2;
+@end
+
+@implementation TestQueryObject
+@end
+
 @interface RLMQueryTests : RLMTestCase
 @end
 
@@ -99,6 +112,56 @@
     XCTAssertEqual([all objectsWhere:@"age == 28"].count, 0, @"Expecting 0 results");
     some = [some objectsOrderedBy:[NSSortDescriptor sortDescriptorWithKey:@"age" ascending:NO] where:nil];
     XCTAssertEqualObjects([some[0] name], @"Ari", @"Ari should be first results");
+}
+
+- (void)testTwoColumnComparisonQuery {
+    RLMRealm *realm = [self realmWithTestPath];
+    
+    [realm beginWriteTransaction];
+    
+    [TestQueryObject createInRealm:realm withObject:@[@"Instance 0", @1, @2, @23.0, @1.7,  @0.0,  @5.55]];
+    [TestQueryObject createInRealm:realm withObject:@[@"Instance 1", @1, @3, @-5.3, @4.21, @1.0,  @4.44]];
+    [TestQueryObject createInRealm:realm withObject:@[@"Instance 2", @2, @2, @1.0,  @3.55, @99.9, @6.66]];
+    [TestQueryObject createInRealm:realm withObject:@[@"Instance 3", @3, @6, @4.21, @1.0,  @1.0,  @7.77]];
+    [TestQueryObject createInRealm:realm withObject:@[@"Instance 2", @4, @5, @23.0, @23.0, @7.4,  @8.88]];
+    [TestQueryObject createInRealm:realm withObject:@[@"Instance 3", @15, @8, @1.0,  @66.0, @1.01, @9.99]];
+    
+    [realm commitWriteTransaction];
+    
+    RLMArray *queryResult;
+    
+    queryResult = [TestQueryObject objectsWhere:@"int1 == int2"];
+    XCTAssertEqual(queryResult.count, 1, @"Expecting 1 result");
+    
+    queryResult = [TestQueryObject objectsWhere:@"int1 != int2"];
+    XCTAssertEqual(queryResult.count, 5, @"Expecting 5 result");
+    
+    queryResult = [TestQueryObject objectsWhere:@"int1 > int2"];
+    XCTAssertEqual(queryResult.count, 1, @"Expecting 1 result");
+    
+    queryResult = [TestQueryObject objectsWhere:@"int1 < int2"];
+    XCTAssertEqual(queryResult.count, 4, @"Expecting 4 result");
+    
+    queryResult = [TestQueryObject objectsWhere:@"int1 >= int2"];
+    XCTAssertEqual(queryResult.count, 2, @"Expecting 2 result");
+    
+    queryResult = [TestQueryObject objectsWhere:@"int1 <= int2"];
+    XCTAssertEqual(queryResult.count, 5, @"Expecting 5 result");
+
+    queryResult = [TestQueryObject objectsWhere:@"float1 == int2"];
+    queryResult = [TestQueryObject objectsWhere:@"float1 != int2"];
+    queryResult = [TestQueryObject objectsWhere:@"float1 > int2"];
+    queryResult = [TestQueryObject objectsWhere:@"float1 < int2"];
+    queryResult = [TestQueryObject objectsWhere:@"float1 >= int2"];
+    queryResult = [TestQueryObject objectsWhere:@"float1 <= int2"];
+
+    queryResult = [TestQueryObject objectsWhere:@"double1 == double2"];
+    queryResult = [TestQueryObject objectsWhere:@"double1 != double2"];
+    queryResult = [TestQueryObject objectsWhere:@"double1 > double2"];
+    queryResult = [TestQueryObject objectsWhere:@"double1 < double2"];
+    queryResult = [TestQueryObject objectsWhere:@"double1 >= double2"];
+    queryResult = [TestQueryObject objectsWhere:@"double1 <= double2"];
+
 }
 
 @end
