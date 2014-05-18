@@ -288,8 +288,8 @@ void validate_value_for_query(id value, RLMPropertyType type, BOOL betweenOperat
 
 void update_query_with_value_expression(RLMObjectDescriptor * desc, tightdb::Query & query,
                                         NSString * columnName, id value, NSPredicateOperatorType operatorType,
-                                        NSComparisonPredicateOptions predicateOptions) {
-    
+                                        NSComparisonPredicateOptions predicateOptions)
+{
     // validate object type
     NSUInteger index = RLMValidatedColumnIndex(desc, columnName);
     RLMPropertyType type = [desc[columnName] type];
@@ -336,6 +336,61 @@ void update_query_with_value_expression(RLMObjectDescriptor * desc, tightdb::Que
     }
 }
 
+void update_query_with_column_expression(RLMObjectDescriptor *desc, tightdb::Query &query, NSString * leftColumnName, NSString * rightColumnName, NSComparisonPredicateOptions predicateOptions)
+{
+    // validate object types
+    NSUInteger leftIndex = RLMValidatedColumnIndex(desc, leftColumnName);
+    RLMPropertyType leftType = [desc[leftColumnName] type];
+
+    NSUInteger rightIndex = RLMValidatedColumnIndex(desc, rightColumnName);
+    RLMPropertyType rightType = [desc[leftColumnName] type];
+
+    // TODO: Should we handle special case where left row is the same as right row (a tautologi)
+    // NOTE: tightdb::Query current only supports column comparison for columns of type int, float
+    //       and double. However, type conversion between float and double is assumed.
+    // NOTE: It's assumed that column type must match and no automatic type coversion is supported.
+    switch (leftType) {
+        case tightdb::type_Int:
+            if(rightType == RLMPropertyTypeInt) {
+                query.equal_int(leftIndex, rightIndex);
+            }
+            else {
+                @throw RLMPredicateException(@"Type mismatch between compared properties",
+                                             [NSString stringWithFormat:@"Property type mismatch between %i and %i", leftType, rightType]);
+            }
+            
+            break;
+
+        case tightdb::type_Float:
+            if(rightType == RLMPropertyTypeFloat) {
+                query.equal_float(leftIndex, rightIndex);
+            }
+            else {
+                @throw RLMPredicateException(@"Type mismatch between compared properties",
+                                             [NSString stringWithFormat:@"Property type mismatch between %i and %i", leftType, rightType]);
+            }
+            
+            break;
+
+        case tightdb::type_Double:
+            if(rightType == RLMPropertyTypeDouble) {
+                query.equal_double(leftIndex, rightIndex);
+            }
+            else {
+                @throw RLMPredicateException(@"Type mismatch between compared properties",
+                                             [NSString stringWithFormat:@"Property type mismatch between %i and %i", leftType, rightType]);
+            }
+            
+            break;
+
+        default:
+            @throw RLMPredicateException(@"Unsupported types found in property comparison",
+                                         [NSString stringWithFormat:@"Comparison between %i and %i", leftType, rightType]);
+            
+            break;
+    }
+}
+    
 void update_query_with_predicate(NSPredicate * predicate, RLMObjectDescriptor *desc, tightdb::Query & query)
 {
     // Compound predicates.
@@ -387,10 +442,7 @@ void update_query_with_predicate(NSPredicate * predicate, RLMObjectDescriptor *d
         // we are limited here to KeyPath expressions and constantValue expressions from validation
         if (exp1Type == NSKeyPathExpressionType) {
             if (exp2Type == NSKeyPathExpressionType) {
-                @throw RLMPredicateException(@"Unsupported predicate",
-                                               @"Not suppoting column comparison for now");
-                //                update_query_with_column_expression(table, query, compp.leftExpression.keyPath,
-                //                    compp.rightExpression.keyPath, compp.predicateOperatorType);
+                update_query_with_column_expression(desc, query, compp.leftExpression.keyPath, compp.rightExpression.keyPath, compp.predicateOperatorType);
             }
             else {
                 update_query_with_value_expression(desc, query, compp.leftExpression.keyPath, compp.rightExpression.constantValue, compp.predicateOperatorType, compp.options);
