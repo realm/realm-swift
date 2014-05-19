@@ -720,6 +720,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CFLAGS = "-Wall";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -752,6 +753,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OTHER_CFLAGS = "-Wall";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -865,6 +867,7 @@
 				INFOPLIST_FILE = "Realm/Tests/Realm-iOSTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../tightdb/iphone-lib";
+				OTHER_CFLAGS = "-Wall";
 				OTHER_LDFLAGS = "-ltightdb-ios-dbg";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -899,6 +902,7 @@
 				INFOPLIST_FILE = "Realm/Tests/Realm-iOSTests-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../tightdb/iphone-lib";
+				OTHER_CFLAGS = "-Wall";
 				OTHER_LDFLAGS = "-ltightdb-ios";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
