@@ -19,23 +19,37 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMProperty.h"
+#import "RLMRealm.h"
+#include <tightdb/table.hpp>
 
-// ordered properties extracted from an object
-@interface RLMObjectDescriptor : NSObject
+//
+// Accessor Protocol
+//
 
-// array of properties which define an object schema
-@property (nonatomic, readonly, copy) NSArray * properties;
+// implemented by all persisted objects
+@protocol RLMAccessor <NSObject>
 
-// object this describes - may be NULL
-@property (nonatomic, readonly) Class objectClass;
-
-
-// property lookup by name
--(RLMProperty *)objectForKeyedSubscript:(id <NSCopying>)key;
-
-// returns a cached or new schema for a given object class
-+(instancetype)descriptorForObjectClass:(Class)objectClass;
+@property (nonatomic) RLMRealm *realm;
+@property (nonatomic, assign) NSUInteger objectIndex;
+@property (nonatomic, assign) NSUInteger backingTableIndex;
+@property (nonatomic, assign) tightdb::Table *backingTable;
+@property (nonatomic, assign) BOOL writable;
 
 @end
+
+
+//
+// Accessors Class Creation/Caching
+//
+
+// initialize accessor cache
+void RLMAccessorCacheInitialize();
+
+// get accessor classes for an object class - generates classes if not cached
+Class RLMAccessorClassForObjectClass(Class objectClass);
+Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass);
+Class RLMInvalidAccessorClassForObjectClass(Class objectClass);
+Class RLMInsertionAccessorClassForObjectClass(Class objectClass);
+
+
 
