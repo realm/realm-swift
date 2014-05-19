@@ -17,49 +17,17 @@
 // from TightDB Incorporated.
 //
 ////////////////////////////////////////////////////////////////////////////
+
 #import "RLMProperty.h"
 #import "RLMObjectDescriptor.h"
 #import "RLMPrivate.hpp"
 #import "RLMUtil.h"
-
-// macros/helpers to generate objc type strings for registering methods
-#define GETTER_TYPES(C) C ":@"
-#define SETTER_TYPES(C) "v:@" C
-
-// getter type strings
-const char * getterTypeStringForCode(char code) {
-    switch (code) {
-        case 'i': return GETTER_TYPES("i");
-        case 'l': return GETTER_TYPES("l");
-        case 'f': return GETTER_TYPES("f");
-        case 'd': return GETTER_TYPES("d");
-        case 'B': return GETTER_TYPES("B");
-        case 'c': return GETTER_TYPES("c");
-        case '@': return GETTER_TYPES("@");
-        default: @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid accessor code" userInfo:nil];
-    }
-}
-
-// setter type strings
-const char * setterTypeStringForCode(char code) {
-    switch (code) {
-        case 'i': return SETTER_TYPES("i");
-        case 'l': return SETTER_TYPES("l");
-        case 'f': return SETTER_TYPES("f");
-        case 'd': return SETTER_TYPES("d");
-        case 'B': return SETTER_TYPES("B");
-        case 'c': return SETTER_TYPES("c");
-        case '@': return SETTER_TYPES("@");
-        default: @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid accessor code" userInfo:nil];
-    }
-}
+#import "RLMObjectStore.h"
 
 // private properties
 @interface RLMProperty ()
 @property (nonatomic, assign) BOOL dynamic;
 @property (nonatomic, assign) BOOL nonatomic;
-@property (nonatomic, copy) NSString * getterName;
-@property (nonatomic, copy) NSString * setterName;
 @end
 
 @implementation RLMProperty
@@ -67,190 +35,72 @@ const char * setterTypeStringForCode(char code) {
 @synthesize getterName = _getterName;
 @synthesize setterName = _setterName;
 
-// get accessor lookup code based on objc type and rlm type
--(char)accessorCode {
-    switch (self.objcType) {
-        case 'q':           // long long same as long
-            return 'l';
-        case '@':           // custom accessors for strings and subtables
-            if (self.type == RLMTypeString) return 's';
-            if (self.type == RLMTypeTable) return 't';
-            if (self.type == RLMTypeDate) return 'a';
-        default:
-            return self.objcType;
-    }
-}
 
-// dynamic getter with column closure
--(IMP)getterForColumn:(NSUInteger)col {
-    switch (self.accessorCode) {
-        case 'i':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-                return (int)obj.backingTable->get_int(col, obj.objectIndex);
-            });
-        case 'l':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-                return obj.backingTable->get_int(col, obj.objectIndex);
-            });
-        case 'f':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-                return obj.backingTable->get_float(col, obj.objectIndex);
-            });
-        case 'd':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-                return obj.backingTable->get_double(col, obj.objectIndex);
-            });
-        case 'B':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-                return obj.backingTable->get_bool(col, obj.objectIndex);
-            });
-        case 'c':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-                return obj.backingTable->get_bool(col, obj.objectIndex);
-            });
-        case 's':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-                tightdb::StringData strData = obj.backingTable->get_string(col, obj.objectIndex);
-                return [[NSString alloc] initWithBytes:strData.data()
-                                                length:strData.size()
-                                              encoding:NSUTF8StringEncoding];
-            });
-        case 'a':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-                tightdb::DateTime dt = obj.backingTable->get_datetime(col, obj.objectIndex);
-                return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
-            });
-        case '@':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
-                return obj[col];
-            });
-        case 't':
-        {
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj){
-                RLMArray *array = obj[col];
-                return array;
-            });
-        }
-        default:
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid accessor code" userInfo:nil];
-    }
-}
-
-
-// dynamic setter with column closure
--(IMP)setterForColumn:(NSUInteger)col {
-    switch (self.accessorCode) {
-        case 'i':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, int val) {
-                obj.backingTable->set_int(col, obj.objectIndex, val);
-            });
-        case 'l':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, long val) {
-                obj.backingTable->set_int(col, obj.objectIndex, val);
-            });
-        case 'f':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, float val) {
-                obj.backingTable->set_float(col, obj.objectIndex, val);
-            });
-        case 'd':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, double val) {
-                obj.backingTable->set_double(col, obj.objectIndex, val);
-            });
-        case 'B':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, bool val) {
-                obj.backingTable->set_bool(col, obj.objectIndex, val);
-            });
-        case 'c':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, BOOL val) {
-                obj.backingTable->set_bool(col, obj.objectIndex, val);
-            });
-        case 's':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, NSString *val) {
-                tightdb::StringData strData = tightdb::StringData(val.UTF8String, val.length);
-                obj.backingTable->set_string(col, obj.objectIndex, strData);
-            });
-        case 'a':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, NSDate *date) {
-                std::time_t time = date.timeIntervalSince1970;
-                obj.backingTable->set_datetime(col, obj.objectIndex, tightdb::DateTime(time));
-            });
-        case '@':
-        case 't':
-            return imp_implementationWithBlock(^(id<RLMAccessor> obj, id val) {
-                obj[col] = val;
-            });
-        default:
-            @throw [NSException exceptionWithName:@"RLMException"
-                                           reason:@"Invalid accessor code"
-                                         userInfo:nil];
-    }
-}
-
-// add dynamic property getters/setters to the given class
--(void)addToClass:(Class)cls
-{
-    // set accessors
-    self.column = _column;
-    SEL getter = NSSelectorFromString(self.getterName), setter = NSSelectorFromString(self.setterName);
-    class_replaceMethod(cls, getter, [self getterForColumn:_column], getterTypeStringForCode(self.objcType));
-    class_replaceMethod(cls, setter, [self setterForColumn:_column], setterTypeStringForCode(self.objcType));
-}
-
-
-// determine RLMType from objc code
+// determine RLMPropertyType from objc code
 -(void)parsePropertyTypeString:(const char *)code {
     self.objcType = *(code);    // first char of type attr
     if (self.objcType == 'q') {
         self.objcType = 'l';    // collapse these as they are the same
     }
     
-    // map to RLMType
+    // map to RLMPropertyType
     switch (self.objcType) {
         case 'i':   // int
         case 'l':   // long
-            self.type = RLMTypeInt;
+            self.type = RLMPropertyTypeInt;
             break;
         case 'f':
-            self.type = RLMTypeFloat;
+            self.type = RLMPropertyTypeFloat;
             break;
         case 'd':
-            self.type = RLMTypeDouble;
+            self.type = RLMPropertyTypeDouble;
             break;
         case 'c':   // BOOL is stored as char - since rlm has no char type this is ok
         case 'B':
-            self.type = RLMTypeBool;
+            self.type = RLMPropertyTypeBool;
             break;
         case '@':
         {
             NSString *type = [NSString stringWithUTF8String:code];
             // if one charachter, this is an untyped id, ie [type isEqualToString:@"@"]
             if (type.length == 1) {
-                self.type = RLMTypeMixed;
+                self.type = RLMPropertyTypeAny;
             }
             else if ([type isEqualToString:@"@\"NSString\""]) {
-                self.type = RLMTypeString;
+                self.type = RLMPropertyTypeString;
             }
             else if ([type isEqualToString:@"@\"NSDate\""]) {
-                self.type = RLMTypeDate;
+                self.type = RLMPropertyTypeDate;
             }
             else if ([type isEqualToString:@"@\"NSData\""]) {
-                self.type = RLMTypeBinary;
+                self.type = RLMPropertyTypeData;
             }
             else if ([type hasPrefix:@"@\"RLMArray<"]) {
                 // check for array class
                 Class cls = NSClassFromString([type substringWithRange:NSMakeRange(11, type.length-5)]);
-                if (RLMIsKindOfclass(cls, RLMObject.class)) {
-                    self.subtableObjectClass = cls;
+                if (RLMIsSubclass(cls, RLMObject.class)) {
+                    self.linkClass = cls;
                 }
                 else {
                     @throw [NSException exceptionWithName:@"RLMException" reason:@"No type specified for RLMArray" userInfo:nil];
                 }
-                self.type = RLMTypeTable;
+                self.type = RLMPropertyTypeTable;
+            }
+            else {
+                // check if this is an RLMObject
+                Class cls = NSClassFromString([type substringWithRange:NSMakeRange(2, type.length-3)]);
+                if (RLMIsSubclass(cls, RLMObject.class)) {
+                    self.linkClass = cls;
+                    self.type = RLMPropertyTypeObject;
+                }
+                else {
+                    @throw [NSException exceptionWithName:@"RLMException" reason:@"Encapsulated properties must descend from RLMObject" userInfo:nil];
+                }
             }
             break;
         }
         default:
-            self.type = RLMTypeNone;
+            self.type = RLMPropertyTypeNone;
             break;
     }
 }
@@ -289,7 +139,7 @@ const char * setterTypeStringForCode(char code) {
     free(atts);
     
     // make sure we have a valid type
-    if (prop.type == RLMTypeNone) {
+    if (prop.type == RLMPropertyTypeNone) {
         NSString * reason = [NSString stringWithFormat:@"Can't persist property '%@' with incompatible type. "
                              "Add to ignoredPropertyNames: method to ignore.", prop.name];
         @throw [NSException exceptionWithName:@"RLMException" reason:reason userInfo:nil];

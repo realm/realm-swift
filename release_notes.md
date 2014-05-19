@@ -85,7 +85,7 @@ and your code will break!
 ### Enhancements:
 
 * `createTableWithName:columns:` has been added to `RLMRealm`.
-* Added keyed subscripting for RLMTable's first column if column is of type RLMTypeString.
+* Added keyed subscripting for RLMTable's first column if column is of type RLMPropertyTypeString.
 * `setRow:atIndex:` has been added to `RLMTable`.
 * `RLMRealm` constructors now have variants that take an writable initialization block
 * New object interface - tables created/retrieved using `tableWithName:objectClass:` return custom objects

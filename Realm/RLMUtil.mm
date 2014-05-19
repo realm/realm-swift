@@ -66,20 +66,20 @@ inline bool nsnumber_is_like_double(NSObject *obj)
             strcmp(data_type, @encode(unsigned long long)) == 0);
 }
 
-BOOL RLMIsObjectOfType(id obj, RLMType type) {
+BOOL RLMIsObjectOfType(id obj, RLMPropertyType type) {
     switch (type) {
-        case RLMTypeString:
+        case RLMPropertyTypeString:
             if (![obj isKindOfClass:[NSString class]])
                 return NO;
             break;
-        case RLMTypeBool:
+        case RLMPropertyTypeBool:
             if ([obj isKindOfClass:[NSNumber class]]) {
                 if (nsnumber_is_like_bool(obj))
                     break;
                 return NO;
             }
             break;
-        case RLMTypeDate:
+        case RLMPropertyTypeDate:
             if ([obj isKindOfClass:[NSNumber class]]) {
                 if (nsnumber_is_like_integer(obj))
                     break;
@@ -88,30 +88,30 @@ BOOL RLMIsObjectOfType(id obj, RLMType type) {
                 break;
             }
             return NO;
-        case RLMTypeInt:
+        case RLMPropertyTypeInt:
             if ([obj isKindOfClass:[NSNumber class]]) {
                 if (nsnumber_is_like_integer(obj))
                     break;
             }
             return NO;
-        case RLMTypeFloat:
+        case RLMPropertyTypeFloat:
             if ([obj isKindOfClass:[NSNumber class]]) {
                 if (nsnumber_is_like_float(obj))
                     break;
             }
             return NO;
-        case RLMTypeDouble:
+        case RLMPropertyTypeDouble:
             if ([obj isKindOfClass:[NSNumber class]]) {
                 if (nsnumber_is_like_double(obj))
                     break;
             }
             return NO;
-        case RLMTypeBinary:
+        case RLMPropertyTypeData:
             if ([obj isKindOfClass:[NSData class]])
                 break;
             return NO;
         default:
-            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMType specified" userInfo:nil];
+            @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid RLMPropertyType specified" userInfo:nil];
     }
     return YES;
 }
