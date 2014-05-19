@@ -65,12 +65,12 @@
 		02C4154D1921BE4E00F858D9 /* RLMRealm.h in Headers */ = {isa = PBXBuildFile; fileRef = 02C41484191DE57600F858D9 /* RLMRealm.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02C4154E1921BE5200F858D9 /* RLMMigration.h in Headers */ = {isa = PBXBuildFile; fileRef = 02C41497191DECCF00F858D9 /* RLMMigration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02C4154F1921BE5500F858D9 /* RLMObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 02C41483191DE57600F858D9 /* RLMObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4D3F56501923668700240A75 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F564E1923667700240A75 /* ObjectTests.m */; };
-		4D3F56511923668700240A75 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F564E1923667700240A75 /* ObjectTests.m */; };
 		02C4155A1923DDFC00F858D9 /* RLMAccesor.h in Headers */ = {isa = PBXBuildFile; fileRef = 02C415581923DDFC00F858D9 /* RLMAccesor.h */; };
 		02C4155B1923DDFC00F858D9 /* RLMAccesor.h in Headers */ = {isa = PBXBuildFile; fileRef = 02C415581923DDFC00F858D9 /* RLMAccesor.h */; };
 		02C4155C1923DDFC00F858D9 /* RLMAccesor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02C415591923DDFC00F858D9 /* RLMAccesor.mm */; };
 		02C4155D1923DDFC00F858D9 /* RLMAccesor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 02C415591923DDFC00F858D9 /* RLMAccesor.mm */; };
+		4D3F56501923668700240A75 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F564E1923667700240A75 /* ObjectTests.m */; };
+		4D3F56511923668700240A75 /* ObjectTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F564E1923667700240A75 /* ObjectTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -705,6 +705,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = src;
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -736,6 +737,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
+				HEADER_SEARCH_PATHS = src;
 				INFOPLIST_FILE = "Realm/Tests/RealmTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -767,7 +769,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				HEADER_SEARCH_PATHS = (
 					src,
-					"$(SRCROOT)/../tightdb/iphone-lib/include/**",
+					"$(SRCROOT)/../tightdb/iphone-lib/include",
 				);
 				INFOPLIST_FILE = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
@@ -804,7 +806,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				HEADER_SEARCH_PATHS = (
 					src,
-					"$(SRCROOT)/../tightdb/iphone-lib/include/**",
+					"$(SRCROOT)/../tightdb/iphone-lib/include",
 				);
 				INFOPLIST_FILE = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
