@@ -63,7 +63,7 @@ NSString *const RLMPropertyAttributeRequired = @"RLMPropertyAttributeRequired";
         }
         // FIXME - more validation for each property type
         
-        for (int i = 0; i < array.count; i++) {
+        for (NSUInteger i = 0; i < array.count; i++) {
             [obj setValue:array[i] forKeyPath:[properties[i] name]];
         }
     }

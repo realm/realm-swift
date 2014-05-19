@@ -454,7 +454,7 @@ static NSArray *s_objectDescriptors = nil;
 }
 
 - (void)deleteObject:(RLMObject *)object cascade:(BOOL)deleteChildren {
-    RLMDeleteObjectFromRealm(object, self, deleteChildren);
+    RLMDeleteObjectFromRealm(object, deleteChildren);
 }
 
 - (RLMArray *)objects:(Class)objectClass where:(id)predicate, ... {
