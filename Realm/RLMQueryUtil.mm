@@ -22,6 +22,12 @@
 #import "RLMUtil.h"
 #import "NSData+RLMGetBinaryData.h"
 
+NSString *const RLMPropertiesComparisonTypeMismatch = @"RLMPropertiesComparisonTypeMismatch";
+NSString *const RLMUnsupportedTypesFoundInPropertyComparison = @"Unsupported types found in property comparison";
+
+NSString *const RLMPropertiesComparisonTypeMismatchReason = @"Property type mismatch between %i and %i";
+NSString *const RLMUnsupportedTypesFoundInPropertyComparisonReason = @"Comparison between %i and %i";
+
 // small helper to create the many exceptions thrown when parsing predicates
 NSException *RLMPredicateException(NSString *name, NSString *reason) {
     return [NSException exceptionWithName:[NSString stringWithFormat:@"filterWithPredicate:orderedBy: - %@", name] reason:reason userInfo:nil];
@@ -343,54 +349,133 @@ void update_query_with_column_expression(RLMObjectDescriptor *desc, tightdb::Que
     RLMPropertyType leftType = [desc[leftColumnName] type];
 
     NSUInteger rightIndex = RLMValidatedColumnIndex(desc, rightColumnName);
-    RLMPropertyType rightType = [desc[leftColumnName] type];
+    RLMPropertyType rightType = [desc[rightColumnName] type];
 
-    // TODO: Should we handle special case where left row is the same as right row (a tautologi)
-    // NOTE: tightdb::Query current only supports column comparison for columns of type int, float
-    //       and double. However, type conversion between float and double is assumed.
+    // TODO: Should we handle special case where left row is the same as right row (tautologi)
     // NOTE: It's assumed that column type must match and no automatic type coversion is supported.
     switch (leftType) {
         case tightdb::type_Int:
             if(rightType == RLMPropertyTypeInt) {
-                query.equal_int(leftIndex, rightIndex);
+                switch (predicateOptions) {
+                    case NSEqualToPredicateOperatorType:
+                        query.equal_int(leftIndex, rightIndex);
+                        break;
+                        
+                    case NSNotEqualToPredicateOperatorType:
+                        query.not_equal_int(leftIndex, rightIndex);
+                        break;
+
+                    case NSLessThanPredicateOperatorType:
+                        query.less_int(leftIndex, rightIndex);
+                        break;
+                        
+                    case NSGreaterThanPredicateOperatorType:
+                        query.greater_int(leftIndex, rightIndex);
+                        break;
+
+                    case NSLessThanOrEqualToPredicateOperatorType:
+                        query.less_equal_int(leftIndex, rightIndex);
+                        break;
+
+                    case NSGreaterThanOrEqualToPredicateOperatorType:
+                        query.greater_equal_int(leftIndex, rightIndex);
+                        break;
+
+                    default:
+                        break;
+                }
             }
             else {
-                @throw RLMPredicateException(@"Type mismatch between compared properties",
-                                             [NSString stringWithFormat:@"Property type mismatch between %i and %i", leftType, rightType]);
+                @throw RLMPredicateException(RLMPropertiesComparisonTypeMismatch,
+                                             [NSString stringWithFormat:RLMPropertiesComparisonTypeMismatchReason, leftType, rightType]);
             }
             
             break;
 
         case tightdb::type_Float:
             if(rightType == RLMPropertyTypeFloat) {
-                query.equal_float(leftIndex, rightIndex);
+                switch (predicateOptions) {
+                    case NSEqualToPredicateOperatorType:
+                        query.equal_float(leftIndex, rightIndex);
+                        break;
+                        
+                    case NSNotEqualToPredicateOperatorType:
+                        query.not_equal_float(leftIndex, rightIndex);
+                        break;
+                        
+                    case NSLessThanPredicateOperatorType:
+                        query.less_float(leftIndex, rightIndex);
+                        break;
+                        
+                    case NSGreaterThanPredicateOperatorType:
+                        query.greater_float(leftIndex, rightIndex);
+                        break;
+                        
+                    case NSLessThanOrEqualToPredicateOperatorType:
+                        query.less_equal_float(leftIndex, rightIndex);
+                        break;
+                        
+                    case NSGreaterThanOrEqualToPredicateOperatorType:
+                        query.greater_equal_float(leftIndex, rightIndex);
+                        break;
+                        
+                    default:
+                        break;
+                }
             }
             else {
-                @throw RLMPredicateException(@"Type mismatch between compared properties",
-                                             [NSString stringWithFormat:@"Property type mismatch between %i and %i", leftType, rightType]);
+                @throw RLMPredicateException(RLMPropertiesComparisonTypeMismatch,
+                                             [NSString stringWithFormat:RLMPropertiesComparisonTypeMismatchReason, leftType, rightType]);
             }
             
             break;
 
         case tightdb::type_Double:
             if(rightType == RLMPropertyTypeDouble) {
-                query.equal_double(leftIndex, rightIndex);
+                switch (predicateOptions) {
+                    case NSEqualToPredicateOperatorType:
+                        query.equal_double(leftIndex, rightIndex);
+                        break;
+                        
+                    case NSNotEqualToPredicateOperatorType:
+                        query.not_equal_double(leftIndex, rightIndex);
+                        break;
+                        
+                    case NSLessThanPredicateOperatorType:
+                        query.less_double(leftIndex, rightIndex);
+                        break;
+                        
+                    case NSGreaterThanPredicateOperatorType:
+                        query.greater_double(leftIndex, rightIndex);
+                        break;
+                        
+                    case NSLessThanOrEqualToPredicateOperatorType:
+                        query.less_equal_double(leftIndex, rightIndex);
+                        break;
+                        
+                    case NSGreaterThanOrEqualToPredicateOperatorType:
+                        query.greater_equal_double(leftIndex, rightIndex);
+                        break;
+                        
+                    default:
+                        break;
+                }
             }
             else {
-                @throw RLMPredicateException(@"Type mismatch between compared properties",
-                                             [NSString stringWithFormat:@"Property type mismatch between %i and %i", leftType, rightType]);
+                @throw RLMPredicateException(RLMPropertiesComparisonTypeMismatch,
+                                             [NSString stringWithFormat:RLMPropertiesComparisonTypeMismatchReason, leftType, rightType]);
             }
             
             break;
 
         default:
-            @throw RLMPredicateException(@"Unsupported types found in property comparison",
-                                         [NSString stringWithFormat:@"Comparison between %i and %i", leftType, rightType]);
+            @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparison,
+                                         [NSString stringWithFormat:RLMUnsupportedTypesFoundInPropertyComparisonReason, leftType, rightType]);
             
             break;
     }
 }
-    
+
 void update_query_with_predicate(NSPredicate * predicate, RLMObjectDescriptor *desc, tightdb::Query & query)
 {
     // Compound predicates.
