@@ -141,7 +141,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     [realm registerAccessor:object];
 }
 
-void RLMDeleteObjectFromRealm(RLMObject *object, bool cascade) {
+void RLMDeleteObjectFromRealm(RLMObject *object) {
     // if last in table delete, otherwise replace with last
     if (object.objectIndex == object.backingTable->size() - 1) {
         object.backingTable->remove(object.objectIndex);
@@ -150,7 +150,6 @@ void RLMDeleteObjectFromRealm(RLMObject *object, bool cascade) {
         object.backingTable->move_last_over(object.objectIndex);
         // FIXME - fix all accessors
     }
-    // FIXME - delete children
 }
 
 RLMArray *RLMGetObjects(RLMRealm *realm, Class objectClass, NSPredicate *predicate, id order) {

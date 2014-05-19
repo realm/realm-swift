@@ -48,7 +48,7 @@ void RLMAccessorCacheInitialize() {
 }
 
 // dynamic getter with column closure
-IMP RLMAccessorGetter(NSUInteger col, char accessorCode, Class linkClass) {
+IMP RLMAccessorGetter(NSUInteger col, char accessorCode, Class) {
     switch (accessorCode) {
         case 'i':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {

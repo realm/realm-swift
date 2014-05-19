@@ -103,6 +103,8 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     return nil;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 - (void)addObject:(RLMObject *)object {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
@@ -147,6 +149,7 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
 }
+#pragma GCC diagnostic pop
 
 - (void)setBackingQuery:(tightdb::Query *)backingQuery {
     _backingQuery.reset(backingQuery);
