@@ -25,6 +25,9 @@
 
 #import "RLMObjectDescriptor.h"
 
+extern NSString *const RLMPropertiesComparisonTypeMismatch;
+extern NSString *const RLMUnsupportedTypesFoundInPropertyComparison;
+
 // apply the given predicate to the passed in query, returning the updated query
 void RLMUpdateQueryWithPredicate(tightdb::Query *query, id predicate, RLMObjectDescriptor *desc);
 
