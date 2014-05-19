@@ -1,22 +1,22 @@
-/*************************************************************************
- *
- * TIGHTDB CONFIDENTIAL
- * __________________
- *
- *  [2011] - [2014] TightDB Inc
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of TightDB Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to TightDB Incorporated
- * and its suppliers and may be covered by U.S. and Foreign Patents,
- * patents in process, and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from TightDB Incorporated.
- *
- **************************************************************************/
+////////////////////////////////////////////////////////////////////////////
+//
+// TIGHTDB CONFIDENTIAL
+// __________________
+//
+//  [2011] - [2014] TightDB Inc
+//  All Rights Reserved.
+//
+// NOTICE:  All information contained herein is, and remains
+// the property of TightDB Incorporated and its suppliers,
+// if any.  The intellectual and technical concepts contained
+// herein are proprietary to TightDB Incorporated
+// and its suppliers and may be covered by U.S. and Foreign Patents,
+// patents in process, and are protected by trade secret or copyright law.
+// Dissemination of this information or reproduction of this material
+// is strictly forbidden unless prior written permission is obtained
+// from TightDB Incorporated.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
 
@@ -202,7 +202,7 @@ extern NSString *const RLMPropertyAttributeRequired;
 @end
 
 
-/**---------------------------------------------------------------------------------------
+/**----------------------------------------------------------------------------------------
  *  @name Dynamic Accessors
  *  ---------------------------------------------------------------------------------------
  *
@@ -218,7 +218,7 @@ extern NSString *const RLMPropertyAttributeRequired;
 @end
 
 
-/**---------------------------------------------------------------------------------------
+/**.---------------------------------------------------------------------------------------
  *  @name JSON Serialization
  *  ---------------------------------------------------------------------------------------
  */
@@ -251,32 +251,5 @@ extern NSString *const RLMPropertyAttributeRequired;
  @return    JSON string representation of this object.
  */
 - (NSString *)JSONString;
-
-@end
-
-
-@interface RLMObject (Networking)
-
-/**---------------------------------------------------------------------------------------
- * @name Networking
- * ---------------------------------------------------------------------------------------
- */
-/**
- Sends object to a URL through a aync HTTP PUT.
-
- @param url The URL request.
- @param success Block to be executed when request succeed, nil to ignore.
- @param failure Block to execute in case of an error, nil to ignore.
- */
-- (void)putToURL:(NSURLRequest*)url whenSuccess:(void(^)(void))success whenFailure:(void(^)(void))failure;
-
-/**
- Sends object to a URL through a aync HTTP POST.
-
- @param url The URL request.
- @param success Block to be executed when request succeed, nil to ignore.
- @param failure Block to execute in case of an error, nil to ignore.
- */
-- (void)postToURL:(NSURLRequest*)url whenSuccess:(void(^)(void))success whenFailure:(void(^)(void))failure;
 
 @end
