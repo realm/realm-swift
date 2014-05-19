@@ -116,31 +116,26 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     }
     
     // get table and create new row
-    object.backingTable = RLMTableForObjectClass(realm, object.class).get();
+    Class objectClass = object.class;
+    object.realm = realm;
+    object.backingTable = RLMTableForObjectClass(realm, objectClass).get();
     object.objectIndex = object.backingTable->add_empty_row();
     object.backingTableIndex = object.backingTable->get_index_in_parent();
     
-    // FIXME - can optimize by doing direct insersion
-    // get all properties
-    RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:object.class];
-    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:desc.properties.count];
+    // change object class to insertion accessor
+    object_setClass(object, RLMInsertionAccessorClassForObjectClass(objectClass));
+
+    // call our insertion setter to populate all properties in the table
+    RLMObjectDescriptor *desc = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
     for (RLMProperty *prop in desc.properties) {
-        dict[prop.name] = [object valueForKey:prop.name];
+        // InsertionAccessr getter gets object from ivar
+        id value = [object valueForKey:prop.name];
+        // InsertionAccssor setter inserts into table
+        [object setValue:value forKey:prop.name];
     }
     
-    // change object class to accessor class (if not already)
-    // we are in a read transaction so we use the rw accessor class
-    Class accessorClass = RLMAccessorClassForObjectClass(object.class);
-    if (object.class != accessorClass) {
-        object_setClass(object, accessorClass);
-    }
-    
-    // FIXME - see last fixme
-    // get all properties on the table
-    object.realm = realm;
-    for (NSString *key in dict) {
-        [object setValue:dict[key] forKeyPath:key];
-    }
+    // we are in a read transaction so change accessor class to readwrite accessor
+    object_setClass(object, RLMAccessorClassForObjectClass(objectClass));
     
     // register object with the realm
     [realm registerAccessor:object];

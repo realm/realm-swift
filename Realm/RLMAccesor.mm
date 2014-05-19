@@ -30,6 +30,7 @@
 static NSMapTable *s_accessorCache;
 static NSMapTable *s_readOnlyAccessorCache;
 static NSMapTable *s_invalidAccessorCache;
+static NSMapTable *s_insertionAccessorCache;
 
 // initialize statics
 void RLMAccessorCacheInitialize() {
@@ -37,10 +38,12 @@ void RLMAccessorCacheInitialize() {
     dispatch_once(&onceToken, ^{
         s_accessorCache = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
                                                 valueOptions:NSPointerFunctionsOpaquePersonality];
-        s_readOnlyAccessorCache = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
-                                                        valueOptions:NSPointerFunctionsOpaquePersonality];
         s_invalidAccessorCache = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
                                                        valueOptions:NSPointerFunctionsOpaquePersonality];
+        s_readOnlyAccessorCache = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
+                                                        valueOptions:NSPointerFunctionsOpaquePersonality];
+        s_insertionAccessorCache = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality
+                                                         valueOptions:NSPointerFunctionsOpaquePersonality];
     });
 }
 
@@ -297,12 +300,18 @@ Class RLMCreateAccessorClass(Class objectClass,
     RLMObjectDescriptor *descriptor = [RLMObjectDescriptor descriptorForObjectClass:objectClass];
     for (unsigned int propNum = 0; propNum < descriptor.properties.count; propNum++) {
         RLMProperty *prop = descriptor.properties[propNum];
-        SEL getterSel = NSSelectorFromString(prop.getterName);
-        SEL setterSel = NSSelectorFromString(prop.setterName);
-        IMP getterImp = getterGetter(prop.column, accessorCodeForType(prop.objcType, prop.type), prop.linkClass);
-        IMP setterImp = setterGetter(prop.column, accessorCodeForType(prop.objcType, prop.type));
-        class_replaceMethod(proxyClass, getterSel, getterImp, getterTypeStringForObjcCode(prop.objcType));
-        class_replaceMethod(proxyClass, setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));
+        char accessorCode = accessorCodeForType(prop.objcType, prop.type);
+        if (getterGetter) {
+            SEL getterSel = NSSelectorFromString(prop.getterName);
+            IMP getterImp = getterGetter(prop.column, accessorCode, prop.linkClass);
+            class_replaceMethod(proxyClass, getterSel, getterImp, getterTypeStringForObjcCode(prop.objcType));
+        }
+        if (setterGetter) {
+            SEL setterSel = NSSelectorFromString(prop.setterName);
+            IMP setterImp = setterGetter(prop.column, accessorCode);
+            class_replaceMethod(proxyClass, setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));
+        }
+
     }
     return proxyClass;
 }
@@ -346,4 +355,16 @@ Class RLMInvalidAccessorClassForObjectClass(Class objectClass) {
     return accessorClass;
 }
 
+Class RLMInsertionAccessorClassForObjectClass(Class objectClass) {
+    // see if we have a cached version
+    if (Class cls = [s_insertionAccessorCache objectForKey:objectClass]) {
+        return cls;
+    }
+    
+    // create accessor and cache
+    Class accessorClass = RLMCreateAccessorClass(objectClass, @"RLMInserter_",
+                                                 NULL, RLMAccessorSetter);
+    [s_insertionAccessorCache setObject:accessorClass forKey:objectClass];
+    return accessorClass;
+}
 
