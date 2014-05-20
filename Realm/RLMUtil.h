@@ -38,3 +38,31 @@ inline BOOL RLMIsSubclass(Class class1, Class class2) {
     class1 = class_getSuperclass(class1);
     return RLMIsKindOfclass(class1, class2);
 }
+
+inline NSString *rlmtype_to_string(RLMPropertyType type) {
+    switch (type) {
+        case RLMPropertyTypeNone:
+            return @"None";
+        case RLMPropertyTypeString:
+            return @"string";
+        case RLMPropertyTypeInt:
+            return @"int";
+        case RLMPropertyTypeBool:
+            return @"bool";
+        case RLMPropertyTypeDate:
+            return @"date";
+        case RLMPropertyTypeData:
+            return @"data";
+        case RLMPropertyTypeDouble:
+            return @"double";
+        case RLMPropertyTypeFloat:
+            return @"float";
+        case RLMPropertyTypeAny:
+            return @"mixed";
+        case RLMPropertyTypeTable:
+            return @"table";
+        case RLMPropertyTypeObject:
+            return @"object";
+    }
+    return @"Unknown";
+}
