@@ -21,11 +21,12 @@
 #import "RLMTestCase.h"
 
 
-@interface SimpleWrongObject : RLMObject
-@property (nonatomic, assign) int *intCol; // Wrong with * but possible
+@interface SimpleMisuseObject : RLMObject
+@property (nonatomic, copy) NSString *stringCol;
+@property (nonatomic, assign) NSInteger intCol;
 @end
 
-@implementation SimpleWrongObject
+@implementation SimpleMisuseObject
 @end
 
 
@@ -36,15 +37,29 @@
 @implementation MisuseTests
 
 
--(void)testWrongObject
+-(void)testMisuse
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
+    // Insert an object
     [realm beginWriteTransaction];
-    //XCTAssertThrows([SimpleWrongObject createInRealm:realm withObject:nil], @"Wrong defined object");
-    
+    SimpleMisuseObject *obj = [SimpleMisuseObject createInRealm:realm withObject:nil];
+    obj.stringCol = @"stringVal";
+    obj.intCol = 10;
     [realm commitWriteTransaction];
-}
+    
+    
+    XCTAssertThrows([SimpleMisuseObject createInRealm:realm withObject:nil], @"Outside write transaction");
+    
+    XCTAssertThrows([realm commitWriteTransaction], @"No write transaction to close");
+    
+    [realm beginWriteTransaction];
+    XCTAssertThrows([realm beginWriteTransaction], @"Write transactino already in place");
+    [realm commitWriteTransaction];
+    
+    XCTAssertThrows([realm rollbackWriteTransaction], @"No write transaction to rool-back");
 
+    XCTAssertThrows([realm deleteObject:obj cascade:YES], @"Outside writetransaction");
+}
 
 
 @end
