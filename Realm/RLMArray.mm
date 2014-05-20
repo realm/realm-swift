@@ -191,11 +191,7 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     array.backingTable = _backingTable;
     array.backingTableIndex = _backingTableIndex;
     array.backingQuery = new tightdb::Query(*_backingQuery);
-    array.backingView = array.backingQuery->find_all();
-    
-    // FIXME - we are not sorting properly as the following line doesn't link
-    // array.backingView.apply_same_order(_backingView);
-    
+    array.backingView = array.backingTable->where(&_backingView).find_all();
     [_realm registerAccessor:array];
     return array;
 }
