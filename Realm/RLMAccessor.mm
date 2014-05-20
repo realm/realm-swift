@@ -290,6 +290,7 @@ char accessorCodeForType(char objcTypeCode, RLMPropertyType rlmType) {
                 case RLMPropertyTypeArray: return 't';
                 case RLMPropertyTypeDate: return 'a';
                 case RLMPropertyTypeData: return 'e';
+                case RLMPropertyTypeAny: return '@';
                 default: @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid type code" userInfo:nil];
             }
         default:
@@ -368,7 +369,7 @@ Class RLMInsertionAccessorClassForObjectClass(Class objectClass, RLMObjectSchema
 
 // Dynamic accessor name for a classname
 inline NSString *RLMDynamicClassName(NSString *className, NSUInteger version) {
-    return [NSString stringWithFormat:@"RLMDynamic_%@_Version%lu", className, (unsigned long)version];
+    return [NSString stringWithFormat:@"RLMDynamic_%@_Version_%lu", className, (unsigned long)version];
 }
 
 // Get or generate a dynamic class from a table and classname
