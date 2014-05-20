@@ -24,6 +24,7 @@
 #import "RLMObject.h"
 #import "RLMObjectSchema.h"
 #import "RLMObjectStore.h"
+#import "NSData+RLMGetBinaryData.h"
 
 #import <objc/runtime.h>
 
@@ -86,6 +87,11 @@ IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *) {
                 tightdb::DateTime dt = obj.backingTable->get_datetime(col, obj.objectIndex);
                 return [NSDate dateWithTimeIntervalSince1970:dt.get_datetime()];
             });
+        case 'e':
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
+                tightdb::BinaryData data = obj.backingTable->get_binary(col, obj.objectIndex);
+                return [NSData dataWithBytes:data.data() length:data.size()];
+            });
         case 'k':
 //            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
 //                NSUInteger index = obj.backingTable->get_link(col, obj.objectIndex);
@@ -144,6 +150,10 @@ IMP RLMAccessorSetter(NSUInteger col, char accessorCode) {
                 std::time_t time = date.timeIntervalSince1970;
                 obj.backingTable->set_datetime(col, obj.objectIndex, tightdb::DateTime(time));
             });
+        case 'e':
+            return imp_implementationWithBlock(^(id<RLMAccessor> obj, NSData *data) {
+                obj.backingTable->set_binary(col, obj.objectIndex, data.rlmBinaryData);
+            });
         case 'k':
 //            return imp_implementationWithBlock(^(id<RLMAccessor> obj, RLMObject *link) {
 //                if (!link || link.class == NSNull.class) {
@@ -201,6 +211,7 @@ IMP RLMAccessorExceptionSetter(NSUInteger, char accessorCode, NSString *message)
         case 's':
         case 'a':
         case 'k':
+        case 'e':
         case '@':
         case 't':
             return imp_implementationWithBlock(^(id<RLMAccessor>, id) {
@@ -273,10 +284,14 @@ char accessorCodeForType(char objcTypeCode, RLMPropertyType rlmType) {
         case 'q':           // long long same as long
             return 'l';
         case '@':           // custom accessors for strings and subtables
-            if (rlmType == RLMPropertyTypeString) return 's';
-            if (rlmType == RLMPropertyTypeArray) return 't';
-            if (rlmType == RLMPropertyTypeDate) return 'a';
-            if (rlmType == RLMPropertyTypeObject) return 'k';
+            switch (rlmType) {
+                case RLMPropertyTypeObject: return 'k';
+                case RLMPropertyTypeString: return 's';
+                case RLMPropertyTypeArray: return 't';
+                case RLMPropertyTypeDate: return 'a';
+                case RLMPropertyTypeData: return 'e';
+                default: @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid type code" userInfo:nil];
+            }
         default:
             return objcTypeCode;
     }

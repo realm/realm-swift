@@ -20,6 +20,7 @@
 
 #import "RLMTestCase.h"
 #import "RLMSchema.h"
+#import "RLMTestObjects.h"
 #import "XCTestCase+AsyncTesting.h"
 
 @interface RLMDynamicObject : RLMObject
@@ -91,4 +92,32 @@
     XCTAssertThrows(array[0][@"invalid"], @"Invalid column name should throw");
 }
 
+- (void)testDynaimcTypes {
+    NSDate *now = [NSDate dateWithTimeIntervalSince1970:100000];
+    id obj1 = @[@YES, @1, @1.1f, @1.11, @"string", [NSData dataWithBytes:"a" length:1], now, @YES, @11];
+    id obj2 = @[@NO, @2, @2.2f, @2.22, @"string2", [NSData dataWithBytes:"b" length:1], now, @NO, @22];
+    @autoreleasepool {
+        // open realm in autoreleasepool to create tables and then dispose
+        RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+        [realm beginWriteTransaction];
+        [AllTypesObject createInRealm:realm withObject:obj1];
+        [AllTypesObject createInRealm:realm withObject:obj2];
+        [realm commitWriteTransaction];
+    }
+    
+    // verify properties
+    RLMRealm *dyrealm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO dynamic:YES error:nil];
+    RLMArray *array = [dyrealm allObjects:AllTypesObject.className];
+    XCTAssertEqual(array.count, 2, @"Should have 2 objects");
+    
+    RLMObjectSchema *schema = dyrealm.schema[AllTypesObject.className];
+    for (int i = 0; i < 9; i++) {
+        NSString *propName = [schema.properties[i] name];
+        XCTAssertEqualObjects(obj1[i], array[0][propName], @"Invalid property value");
+        XCTAssertEqualObjects(obj2[i], array[1][propName], @"Invalid property value");
+    }
+}
+
 @end
+
+
