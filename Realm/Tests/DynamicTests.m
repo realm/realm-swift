@@ -73,4 +73,22 @@
                       @"Array class should by a dynamic object class");
 }
 
+- (void)testDynaimcProperties {
+    @autoreleasepool {
+        // open realm in autoreleasepool to create tables and then dispose
+        RLMRealm *realm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:NO error:nil];
+        [realm beginWriteTransaction];
+        [RLMDynamicObject createInRealm:realm withObject:@[@"column1", @1]];
+        [RLMDynamicObject createInRealm:realm withObject:@[@"column2", @2]];
+        [realm commitWriteTransaction];
+    }
+    
+    // verify properties
+    RLMRealm *dyrealm = [RLMRealm realmWithPath:RLMTestRealmPath() readOnly:YES dynamic:YES error:nil];
+    RLMArray *array = [dyrealm allObjects:@"RLMDynamicObject"];
+    XCTAssertEqualObjects(array[0][@"integer"], @1, @"First object should have column value 1");
+    XCTAssertEqualObjects(array[1][@"column"], @"column2", @"Second object should have column value column2");
+    XCTAssertThrows(array[0][@"invalid"], @"Invalid column name should throw");
+}
+
 @end

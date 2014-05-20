@@ -98,6 +98,7 @@ void RLMAddObjectToRealm(RLMObject *object, RLMRealm *realm) {
     Class objectClass = object.class;
     NSString *objectClassName = NSStringFromClass(objectClass);
     object.realm = realm;
+    object.schema = realm.schema[objectClassName];
     object.backingTable = RLMTableForObjectClass(realm, objectClassName).get();
     object.objectIndex = object.backingTable->add_empty_row();
     object.backingTableIndex = object.backingTable->get_index_in_parent();
@@ -163,6 +164,7 @@ RLMObject *RLMCreateObjectAccessor(RLMRealm *realm, NSString *objectClassName, N
     Class accessorClass = RLMAccessorClassForObjectClass(objectClass, realm.schema[objectClassName]);
     RLMObject *accessor = [[accessorClass alloc] init];
     accessor.realm = realm;
+    accessor.schema = realm.schema[objectClassName];
 
     tightdb::TableRef table = RLMTableForObjectClass(realm, objectClassName);
     accessor.backingTable = table.get();
