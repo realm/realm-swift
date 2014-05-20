@@ -19,7 +19,7 @@
 @property NSDate        *dateCol;
 @property bool           cBoolCol;
 @property long           longCol;
-//@property id             mixedCol;
+@property id             mixedCol;
 //@property AgeTable      *tableCol;
 @end
 
