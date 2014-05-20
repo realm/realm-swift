@@ -48,7 +48,7 @@ void RLMAccessorCacheInitialize() {
 }
 
 // dynamic getter with column closure
-IMP RLMAccessorGetter(NSUInteger col, char accessorCode, Class) {
+IMP RLMAccessorGetter(NSUInteger col, char accessorCode, NSString *) {
     switch (accessorCode) {
         case 'i':
             return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
@@ -89,7 +89,7 @@ IMP RLMAccessorGetter(NSUInteger col, char accessorCode, Class) {
         case 'k':
 //            return imp_implementationWithBlock(^(id<RLMAccessor> obj) {
 //                NSUInteger index = obj.backingTable->get_link(col, obj.objectIndex);
-//                return RLMCreateObjectAccessor(obj.realm, linkClass, index);
+//                return RLMCreateObjectAccessor(obj.realm, objectClassName, index);
 //            });
             @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                            reason:@"Links not yet supported" userInfo:nil];
@@ -214,7 +214,7 @@ IMP RLMAccessorExceptionSetter(NSUInteger, char accessorCode, NSString *message)
 
 // getter for invalid objects
 NSString *const c_invalidObjectMessage = @"Object is no longer valid.";
-IMP RLMAccessorInvalidGetter(NSUInteger, char, Class) {
+IMP RLMAccessorInvalidGetter(NSUInteger, char, NSString *) {
     return imp_implementationWithBlock(^(id<RLMAccessor>) {
         @throw [NSException exceptionWithName:@"RLMException" reason:c_invalidObjectMessage userInfo:nil];
     });
@@ -285,8 +285,14 @@ char accessorCodeForType(char objcTypeCode, RLMPropertyType rlmType) {
 Class RLMCreateAccessorClass(Class objectClass,
                              RLMObjectSchema *schema,
                              NSString *accessorClassPrefix,
-                             IMP (*getterGetter)(NSUInteger, char, Class),
-                             IMP (*setterGetter)(NSUInteger, char)) {
+                             IMP (*getterGetter)(NSUInteger, char, NSString *),
+                             IMP (*setterGetter)(NSUInteger, char),
+                             NSMapTable *cache) {
+    // return cached
+    if (Class cls = [cache objectForKey:objectClass]) {
+        return cls;
+    }
+    
     // if objectClass is a dicrect RLMSubclass use it, otherwise use proxy class
     if (class_getSuperclass(objectClass) != RLMObject.class) {
         @throw [NSException exceptionWithName:@"RLMException" reason:@"objectClass must derive from RLMObject" userInfo:nil];
@@ -295,8 +301,8 @@ Class RLMCreateAccessorClass(Class objectClass,
     // create and register proxy class which derives from object class
     NSString *objectClassName = NSStringFromClass(objectClass);
     NSString *accessorClassName = [accessorClassPrefix stringByAppendingString:objectClassName];
-    Class proxyClass = objc_allocateClassPair(objectClass, accessorClassName.UTF8String, 0);
-    objc_registerClassPair(proxyClass);
+    Class accClass = objc_allocateClassPair(objectClass, accessorClassName.UTF8String, 0);
+    objc_registerClassPair(accClass);
     
     // override getters/setters for each propery
     for (unsigned int propNum = 0; propNum < schema.properties.count; propNum++) {
@@ -304,70 +310,42 @@ Class RLMCreateAccessorClass(Class objectClass,
         char accessorCode = accessorCodeForType(prop.objcType, prop.type);
         if (getterGetter) {
             SEL getterSel = NSSelectorFromString(prop.getterName);
-            IMP getterImp = getterGetter(prop.column, accessorCode, prop.linkClass);
-            class_replaceMethod(proxyClass, getterSel, getterImp, getterTypeStringForObjcCode(prop.objcType));
+            IMP getterImp = getterGetter(prop.column, accessorCode, prop.objectClassName);
+            class_replaceMethod(accClass, getterSel, getterImp, getterTypeStringForObjcCode(prop.objcType));
         }
         if (setterGetter) {
             SEL setterSel = NSSelectorFromString(prop.setterName);
             IMP setterImp = setterGetter(prop.column, accessorCode);
-            class_replaceMethod(proxyClass, setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));
+            class_replaceMethod(accClass, setterSel, setterImp, setterTypeStringForObjcCode(prop.objcType));
         }
 
     }
-    return proxyClass;
+    
+    // cache and return
+    [cache setObject:accClass forKey:objectClass];
+    return accClass;
 }
 
 Class RLMAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
-    // see if we have a cached version
-    if (Class cls = [s_accessorCache objectForKey:objectClass]) {
-        return cls;
-    }
-
-    // create accessor and cache
-    Class accessorClass = RLMCreateAccessorClass(objectClass, schema, @"RLMAccessor_",
-                                                 RLMAccessorGetter, RLMAccessorSetter);
-    [s_accessorCache setObject:accessorClass forKey:objectClass];
-    return accessorClass;
+    return RLMCreateAccessorClass(objectClass, schema, @"RLMAccessor_",
+                                  RLMAccessorGetter, RLMAccessorSetter, s_accessorCache);
 }
 
 Class RLMReadOnlyAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
-    // see if we have a cached version
-    if (Class cls = [s_readOnlyAccessorCache objectForKey:objectClass]) {
-        return cls;
-    }
-    
-    // create accessor and cache
-    Class accessorClass = RLMCreateAccessorClass(objectClass, schema, @"RLMReadOnly_",
-                                                 RLMAccessorGetter, RLMAccessorReadOnlySetter);
-    [s_readOnlyAccessorCache setObject:accessorClass forKey:objectClass];
-    return accessorClass;
+    return RLMCreateAccessorClass(objectClass, schema, @"RLMReadOnly_",
+                                  RLMAccessorGetter, RLMAccessorReadOnlySetter, s_readOnlyAccessorCache);
 }
 
 Class RLMInvalidAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
-    // see if we have a cached version
-    if (Class cls = [s_invalidAccessorCache objectForKey:objectClass]) {
-        return cls;
-    }
-    
-    // create accessor and cache
-    Class accessorClass = RLMCreateAccessorClass(objectClass, schema, @"RLMInvalid_",
-                                                 RLMAccessorInvalidGetter, RLMAccessorInvalidSetter);
-    [s_invalidAccessorCache setObject:accessorClass forKey:objectClass];
-    return accessorClass;
+    return RLMCreateAccessorClass(objectClass, schema, @"RLMInvalid_",
+                                  RLMAccessorInvalidGetter, RLMAccessorInvalidSetter, s_invalidAccessorCache);
 }
 
 Class RLMInsertionAccessorClassForObjectClass(Class objectClass, RLMObjectSchema *schema) {
-    // see if we have a cached version
-    if (Class cls = [s_insertionAccessorCache objectForKey:objectClass]) {
-        return cls;
-    }
-    
-    // create accessor and cache
-    Class accessorClass = RLMCreateAccessorClass(objectClass, schema, @"RLMInserter_",
-                                                 NULL, RLMAccessorSetter);
-    [s_insertionAccessorCache setObject:accessorClass forKey:objectClass];
-    return accessorClass;
+    return RLMCreateAccessorClass(objectClass, schema, @"RLMInserter_",
+                                  NULL, RLMAccessorSetter, s_insertionAccessorCache);
 }
+
 
 // Dynamic accessor name for a classname
 inline NSString *RLMDynamicClassName(NSString *className, NSUInteger version) {

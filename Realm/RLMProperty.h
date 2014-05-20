@@ -31,8 +31,8 @@
 @property (nonatomic, assign) NSUInteger column;
 @property (nonatomic, copy) id defaultValue;
 
-// link class used for RLMLink and RLMArray types
-@property (nonatomic, assign) Class linkClass;
+// object class used for RLMLink and RLMArray types
+@property (nonatomic, assign) NSString *objectClassName;
 @property (nonatomic, assign) char objcType;
 
 // getter and setter names
