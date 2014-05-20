@@ -180,6 +180,11 @@ id RLMGetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_n
             NSData *d = [NSData dataWithBytes:bd.data() length:bd.size()];
             return d;
         }
+        // case RLMPropertyTypeObject:
+        // FIXME - implement when we switch over to the links branch
+        case RLMPropertyTypeTable:
+            @throw [NSException exceptionWithName:@"RLMNotImplementedException"
+                                           reason:@"RLMArray not yet supported" userInfo:nil];
         default:
             @throw [NSException exceptionWithName:@"RLMException" reason:@"Invalid data type for RLMPropertyTypeAny property." userInfo:nil];
         }
