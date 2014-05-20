@@ -103,7 +103,7 @@ inline NSError* make_realm_error(RLMError code, exception &ex)
 {
     NSMutableDictionary* details = [NSMutableDictionary dictionary];
     [details setValue:[NSString stringWithUTF8String:ex.what()] forKey:NSLocalizedDescriptionKey];
-    return [NSError errorWithDomain:@"com.realm" code:code userInfo:details];
+    return [NSError errorWithDomain:@"io.realm" code:code userInfo:details];
 }
 
 

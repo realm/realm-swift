@@ -467,12 +467,21 @@ void RLMUpdateViewWithOrder(tightdb::TableView &view, id order, RLMObjectSchema 
             @throw RLMPredicateException(@"Invalid sort column",
                                          [NSString stringWithFormat:@"Column named '%@' not found.", propName]);
         }
-        if (prop.type != RLMPropertyTypeInt && prop.type != RLMPropertyTypeBool && prop.type != RLMPropertyTypeDate
-            && prop.type != RLMPropertyTypeDouble && prop.type != RLMPropertyTypeFloat && prop.type != RLMPropertyTypeString) {
-            @throw RLMPredicateException(@"Invalid sort column type",
-                                         @"Sort only supported on Integer, Float, Double, Date, String and Boolean columns.");
+        
+        switch (prop.type) {
+            case RLMPropertyTypeBool:
+            case RLMPropertyTypeDate:
+            case RLMPropertyTypeDouble:
+            case RLMPropertyTypeFloat:
+            case RLMPropertyTypeInt:
+            case RLMPropertyTypeString:
+                view.sort(prop.column, ascending);
+                break;
+                
+            default:
+                @throw RLMPredicateException(@"Invalid sort column type",
+                                             @"Sorting is only supported on Bool, Date, Double, Float, Integer and String columns.");
         }
-        view.sort(prop.column, ascending);
     }
 }
 
