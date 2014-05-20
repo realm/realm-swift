@@ -453,8 +453,8 @@ static NSArray *s_objectDescriptors = nil;
     }
 }
 
-- (void)deleteObject:(RLMObject *)object cascade:(BOOL)deleteChildren {
-    RLMDeleteObjectFromRealm(object, self, deleteChildren);
+- (void)deleteObject:(RLMObject *)object {
+    RLMDeleteObjectFromRealm(object);
 }
 
 - (RLMArray *)objects:(Class)objectClass where:(id)predicate, ... {
@@ -473,6 +473,8 @@ static NSArray *s_objectDescriptors = nil;
     return RLMGetObjects(self, objectClass, outPredicate, order);
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 -(id)objectForKeyedSubscript:(id <NSCopying>)key {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
@@ -487,5 +489,7 @@ static NSArray *s_objectDescriptors = nil;
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
 }
+#pragma GCC diagnostic pop
+
 
 @end

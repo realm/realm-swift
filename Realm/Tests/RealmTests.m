@@ -55,8 +55,8 @@
     XCTAssertEqual(objects.count, 3, @"Expecting 3 objects");
     
     [realm beginWriteTransaction];
-    [realm deleteObject:objects[2] cascade:NO];
-    [realm deleteObject:objects[0] cascade:NO];
+    [realm deleteObject:objects[2]];
+    [realm deleteObject:objects[0]];
     XCTAssertEqual([realm objects:RLMTestObject.class where:nil].count, 1, @"Expecting 1 object");
     [realm commitWriteTransaction];
     
@@ -122,7 +122,7 @@
     });
     
     // this should complete very fast before the timer
-    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:0.0001f];
+    [self waitForStatus:XCTAsyncTestCaseStatusSucceeded timeout:0.001f];
     
     XCTAssertTrue(notificationFired, @"A notification should have fired immediately a table was created in the background");
     
