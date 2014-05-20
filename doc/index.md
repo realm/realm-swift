@@ -5,9 +5,9 @@ Realm is a fast embedded database that integrates transparently into Objective-C
 
 ## Defining a Data Model
 
-Realm data models are defined using traditional `NSObject` classes with `@properties`. Just subclass RLMRow to create your Realm data model objects. You can then organize your RLMRow objects in RLMTables.
+Realm data models are defined using traditional `NSObject` classes with `@properties`. Just subclass `RLMObject` to create your Realm data model objects. You can add your `RLMObject` objects to an `RLMRealm` object.
 
-	@interface DemoObject : RLMRow
+	@interface DemoObject : RLMObject
 
 	@property (nonatomic, copy)   NSString *title;
 	@property (nonatomic, strong) NSDate   *date;
@@ -23,14 +23,12 @@ Realm data models are defined using traditional `NSObject` classes with `@proper
 	// This will provide automatic casting when accessing objects in tables of that class
 	// as well as other syntaxic conveniences
 
-Please note that RLMRow objects can only be created when using `addRow:` on an RLMTable and cannot be instantiated on their own.
-
 See the [RLMObject Protocol](Protocols/RLMObject.html) for more details.
 
 
 ## Reading and Writing Objects
 
-The RLMRealm class is responsible for reading and writing data. You can initialize an RLMRealm instance that persists to the default file (`<Application_Home>/Documents/default.realm`):
+The `RLMRealm` class is responsible for reading and writing data. You can initialize an `RLMRealm` instance that persists to the default file (`<Application_Home>/Documents/default.realm`):
 
 	RLMRealm *realm = [RLMRealm defaultRealm];
 
@@ -38,25 +36,16 @@ or which persists to a file at a provided path:
 
 	RLMRealm *realm = [RLMRealm realmWithPath:filePath];
 
-An RLMRealm instance contains RLMTable(s), which in turn contain your objects (RLMRow subclasses). Tables and objects within can be read as follows: 
-
-	RLMRealm *realm = [RLMRealm defaultRealm];
-	DemoTable *table = [DemoTable tableInRealm:realm named:@"mytable"];
-	DemoObject *object = [DemoObject table.firstRow];
-	NSLog(object.title);
-
 You can write data in Realm using write transactions. You begin and end a write transaction as follows:
-	        
-    // Get the default Realm and get or create a new table
+
+    // Get the default Realm
     RLMRealm *realm = [RLMRealm defaultRealm];
-    DemoTable *table = [DemoTable tableInRealm:realm named:@"mytable"];
 
     // Begin a transaction
     [realm beginWriteTransaction];
-    
-    // Add a new row
-    [table addRow:@{@"title" : @"my title",
-                    @"date"  : [NSDate date]}];
+
+    // Add a new object
+    DemoObject *obj = [DemoObject createInRealm:realm withObject:@{@"title" : @"my title", @"date" : [NSDate date]}];
 
     // Commit the transaction
     [realm commitWriteTransaction];
@@ -65,16 +54,17 @@ See RLMRealm and RLMTable for more details.
 
 ## Querying
 
-You can simply apply NSPredicates to an RLMTable to return an RLMView containing a filtered view of your objects.
+You can simply apply `NSPredicates` to an `RLMRealm` to return an `RLMArray` containing a filtered view of your objects.
 
 	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"date < %@ && title contains %@",
 															  [NSDate date], @"00"];
-	RLMView *view = [self.table where:predicate];
-	for (RLMDemoObject *object in view) {
+    RLMArray objects = [realm objects:DemoObject.class where:predicate];
+
+    for (RLMDemoObject *object in objects) {
 	    NSLog(@"title: %@\ndate: %@", object.title, object.date);
 	}
 
-See RLMTable for more details on possible queries.
+See `RLMRealm` for more details on possible queries.
 
 
 ## Notifications
@@ -93,13 +83,12 @@ Realm can be very efficient when writing large amounts of data by batching toget
 	dispatch_async(queue, ^{
         // Get realm and table instances for this thread
         RLMRealm *realm = [RLMRealm defaultRealm];
-	    RLMTable *table = [realm tableWithName:@"DemoTable" objectClass:[RLMDemoObject class]];
 	    for (NSInteger idx1 = 0; idx1 < 1000; idx1++) {
             // Break up the writing blocks into smaller portions by starting a new transaction
             [realm beginWriteTransaction];
             for (NSInteger idx2 = 0; idx2 < 1000; idx2++) {
                 // Add row via dictionary. Order is ignored.
-                [table addRow:@{@"title": [self randomString], @"date": [self randomDate]}];
+                [DemoObject createInRealm:realm withObject:@{@"title": [self randomString], @"date": [self randomDate]}];
             }
 
             // Commit the write transaction to make this data available to other threads
@@ -108,7 +97,7 @@ Realm can be very efficient when writing large amounts of data by batching toget
 	});
 
 
-See RLMTable for more details.
+See `RLMRealm` for more details.
 
 
 ## Next Steps
