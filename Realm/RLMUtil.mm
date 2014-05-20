@@ -106,7 +106,7 @@ BOOL RLMIsObjectOfType(id obj, RLMPropertyType type) {
 
         // FIXME: missing entries
         case RLMPropertyTypeObject:
-        case RLMPropertyTypeTable:
+        case RLMPropertyTypeArray:
         case RLMPropertyTypeAny:
             break;
     }
@@ -178,7 +178,7 @@ id RLMGetAnyProperty(tightdb::Table &table, NSUInteger row_ndx, NSUInteger col_n
         }
         // case RLMPropertyTypeObject:
         // FIXME - implement when we switch over to the links branch
-        case RLMPropertyTypeTable:
+        case RLMPropertyTypeArray:
             @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                            reason:@"RLMArray not yet supported" userInfo:nil];
         default:
