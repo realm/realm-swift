@@ -351,11 +351,11 @@ void update_query_with_column_expression(RLMObjectDescriptor *desc, tightdb::Que
     NSUInteger rightIndex = RLMValidatedColumnIndex(desc, rightColumnName);
     RLMPropertyType rightType = [desc[rightColumnName] type];
 
-    // TODO: Should we handle special case where left row is the same as right row (tautologi)
+    // TODO: Should we handle special case where left row is the same as right row (tautology)
     // NOTE: It's assumed that column type must match and no automatic type conversion is supported.
-    switch (leftType) {
-        case tightdb::type_Int:
-            if (rightType == RLMPropertyTypeInt) {
+    if(leftType == rightType) {
+        switch (leftType) {
+            case tightdb::type_Int:
                 switch (predicateOptions) {
                     case NSEqualToPredicateOperatorType:
                         query.equal_int(leftIndex, rightIndex);
@@ -364,7 +364,7 @@ void update_query_with_column_expression(RLMObjectDescriptor *desc, tightdb::Que
                     case NSNotEqualToPredicateOperatorType:
                         query.not_equal_int(leftIndex, rightIndex);
                         break;
-
+                        
                     case NSLessThanPredicateOperatorType:
                         query.less_int(leftIndex, rightIndex);
                         break;
@@ -372,28 +372,22 @@ void update_query_with_column_expression(RLMObjectDescriptor *desc, tightdb::Que
                     case NSGreaterThanPredicateOperatorType:
                         query.greater_int(leftIndex, rightIndex);
                         break;
-
+                        
                     case NSLessThanOrEqualToPredicateOperatorType:
                         query.less_equal_int(leftIndex, rightIndex);
                         break;
-
+                        
                     case NSGreaterThanOrEqualToPredicateOperatorType:
                         query.greater_equal_int(leftIndex, rightIndex);
                         break;
-
+                        
                     default:
                         break;
                 }
-            }
-            else {
-                @throw RLMPredicateException(RLMPropertiesComparisonTypeMismatchException,
-                                             [NSString stringWithFormat:RLMPropertiesComparisonTypeMismatchReason, leftType, rightType]);
-            }
-            
-            break;
-
-        case tightdb::type_Float:
-            if (rightType == RLMPropertyTypeFloat) {
+                
+                break;
+                
+            case tightdb::type_Float:
                 switch (predicateOptions) {
                     case NSEqualToPredicateOperatorType:
                         query.equal_float(leftIndex, rightIndex);
@@ -422,16 +416,10 @@ void update_query_with_column_expression(RLMObjectDescriptor *desc, tightdb::Que
                     default:
                         break;
                 }
-            }
-            else {
-                @throw RLMPredicateException(RLMPropertiesComparisonTypeMismatchException,
-                                             [NSString stringWithFormat:RLMPropertiesComparisonTypeMismatchReason, leftType, rightType]);
-            }
-            
-            break;
-
-        case tightdb::type_Double:
-            if (rightType == RLMPropertyTypeDouble) {
+                
+                break;
+                
+            case tightdb::type_Double:
                 switch (predicateOptions) {
                     case NSEqualToPredicateOperatorType:
                         query.equal_double(leftIndex, rightIndex);
@@ -460,19 +448,17 @@ void update_query_with_column_expression(RLMObjectDescriptor *desc, tightdb::Que
                     default:
                         break;
                 }
-            }
-            else {
-                @throw RLMPredicateException(RLMPropertiesComparisonTypeMismatchException,
-                                             [NSString stringWithFormat:RLMPropertiesComparisonTypeMismatchReason, leftType, rightType]);
-            }
-            
-            break;
-
-        default:
-            @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparisonException,
-                                         [NSString stringWithFormat:RLMUnsupportedTypesFoundInPropertyComparisonReason, leftType, rightType]);
-            
-            break;
+                
+                break;
+                
+            default:
+                @throw RLMPredicateException(RLMUnsupportedTypesFoundInPropertyComparisonException,
+                                             [NSString stringWithFormat:RLMUnsupportedTypesFoundInPropertyComparisonReason, leftType, rightType]);
+        }
+    }
+    else {
+        @throw RLMPredicateException(RLMPropertiesComparisonTypeMismatchException,
+                                     [NSString stringWithFormat:RLMPropertiesComparisonTypeMismatchReason, leftType, rightType]);
     }
 }
 
