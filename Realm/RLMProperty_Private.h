@@ -23,6 +23,13 @@
 // private property interface
 @interface RLMProperty ()
 
+// initializer
+-(instancetype)initWithName:(NSString *)name type:(RLMPropertyType)type column:(NSUInteger)column;
+
+// creates an RLMProperty object from a runtime property
++(instancetype)propertyForObjectProperty:(objc_property_t)prop column:(NSUInteger)column;
+
+// private properties
 @property (nonatomic, readonly) NSUInteger column;
 @property (nonatomic, readonly) char objcType;
 @property (nonatomic, readonly) id defaultValue;
@@ -30,12 +37,6 @@
 // getter and setter names
 @property (nonatomic, copy) NSString * getterName;
 @property (nonatomic, copy) NSString * setterName;
-
-// creates a tdb property object from a runtime property
-+(instancetype)propertyForObjectProperty:(objc_property_t)prop column:(NSUInteger)column;
-
-// initializer
--(instancetype)initWithName:(NSString *)name type:(RLMPropertyType)type column:(NSUInteger)column;
 
 @end
 
