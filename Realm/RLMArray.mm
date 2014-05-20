@@ -23,25 +23,7 @@
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.h"
 #import "RLMConstants.h"
-
-
-static NSException *s_arrayInvalidException;
-static NSException *s_arrayReadOnlyException;
-
-//
-// RLMArray accessor classes
-//
-
-// NOTE: do not add any ivars or properties to these classes
-//  we switch versions of RLMArray with this subclass dynamically
-
-// RLMArray variant used when read only
-@interface RLMArrayReadOnly : RLMArray
-@end
-
-// RLMArray variant used when invalidated
-@interface RLMArrayInvalid : RLMArray
-@end
+#import "RLMArrayAccessor.h"
 
 
 //
@@ -57,18 +39,6 @@ static NSException *s_arrayReadOnlyException;
 @synthesize backingTableIndex = _backingTableIndex;
 @synthesize backingTable = _backingTable;
 @synthesize writable = _writable;
-
-+ (void)initialize {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        s_arrayInvalidException = [NSException exceptionWithName:@"RLMException"
-                                                          reason:@"RLMArray is no longer valid."
-                                                        userInfo:nil];
-        s_arrayReadOnlyException = [NSException exceptionWithName:@"RLMException"
-                                                          reason:@"Attempting to modify a read-only RLMArray."
-                                                        userInfo:nil];
-    });
-}
 
 - (instancetype)initWithObjectClass:(Class)objectClass {
     self = [super init];
@@ -133,6 +103,8 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     return nil;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 - (void)addObject:(RLMObject *)object {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
@@ -177,6 +149,7 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
 }
+#pragma GCC diagnostic pop
 
 - (void)setBackingQuery:(tightdb::Query *)backingQuery {
     _backingQuery.reset(backingQuery);
@@ -327,66 +300,4 @@ inline id RLMCreateAccessorForArrayIndex(RLMArray *array, NSUInteger index) {
 @end
 
 
-
-// NOTE: do not add any ivars or properties to these classes
-//  we switch versions of RLMArray with this subclass dynamically
-@implementation RLMArrayReadOnly
-- (void)addObject:(RLMObject *)object {
-    @throw s_arrayReadOnlyException;
-}
-- (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index {
-    @throw s_arrayReadOnlyException;
-}
-- (void)removeObjectAtIndex:(NSUInteger)index {
-    @throw s_arrayReadOnlyException;
-}
-- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
-    @throw s_arrayReadOnlyException;
-}
-@end
-
-@implementation RLMArrayInvalid
-- (NSUInteger)count {
-    @throw s_arrayInvalidException;
-}
-- (void)addObject:(RLMObject *)object {
-    @throw s_arrayInvalidException;
-}
-- (void)insertObject:(RLMObject *)anObject atIndex:(NSUInteger)index {
-    @throw s_arrayInvalidException;
-}
-- (void)removeObjectAtIndex:(NSUInteger)index {
-    @throw s_arrayInvalidException;
-}
-- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
-    @throw s_arrayInvalidException;
-}
-- (NSUInteger)indexOfObject:(RLMObject *)object {
-    @throw s_arrayInvalidException;
-}
-- (NSUInteger)indexOfObjectWhere:(id)predicate, ... {
-    @throw s_arrayInvalidException;
-}
-- (RLMArray *)objectsWhere:(id)predicate, ... {
-    @throw s_arrayInvalidException;
-}
-- (RLMArray *)objectsOrderedBy:(id)order where:(id)predicate, ... {
-    @throw s_arrayInvalidException;
-}
-- (id)minOfProperty:(NSString *)property {
-    @throw s_arrayInvalidException;
-}
-- (id)maxOfProperty:(NSString *)property {
-    @throw s_arrayInvalidException;
-}
-- (NSNumber *)sumOfProperty:(NSString *)property {
-    @throw s_arrayInvalidException;
-}
-- (NSNumber *)averageOfProperty:(NSString *)property {
-    @throw s_arrayInvalidException;
-}
-- (NSString *)JSONString {
-    @throw s_arrayInvalidException;
-}
-@end
 

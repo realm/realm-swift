@@ -63,7 +63,7 @@ NSString *const RLMPropertyAttributeRequired = @"RLMPropertyAttributeRequired";
         }
         // FIXME - more validation for each property type
         
-        for (int i = 0; i < array.count; i++) {
+        for (NSUInteger i = 0; i < array.count; i++) {
             [obj setValue:array[i] forKeyPath:[properties[i] name]];
         }
     }
@@ -74,11 +74,14 @@ NSString *const RLMPropertyAttributeRequired = @"RLMPropertyAttributeRequired";
     return obj;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 +(instancetype)createInRealm:(RLMRealm *)realm withJSONString:(NSString *)JSONString {
     // parse with NSJSONSerialization
     @throw [NSException exceptionWithName:@"RLMNotImplementedException"
                                    reason:@"Not yet implemented" userInfo:nil];
 }
+#pragma GCC diagnostic pop
 
 - (void)setWritable:(BOOL)writable {
     // set accessor class based on write permission
