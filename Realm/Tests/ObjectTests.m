@@ -39,6 +39,13 @@
 @implementation AgeObject
 @end
 
+@interface InvalidSubclassObject : AgeObject
+@property NSString *invalid;
+@end
+
+@implementation InvalidSubclassObject
+@end
+
 
 @interface AllTypesObject : RLMObject
 @property BOOL           boolCol;
@@ -86,6 +93,7 @@
 @implementation KeyedObject
 @end
 
+
 @interface CustomAccessors : RLMObject
 @property (getter = getThatName) NSString * name;
 @property (setter = setTheInt:) int age;
@@ -107,12 +115,10 @@
 @end
 
 
-
-@interface RLMTypedTableTests : RLMTestCase
-
+@interface RLMObjectTests : RLMTestCase
 @end
 
-@implementation RLMTypedTableTests
+@implementation RLMObjectTests
 
 -(void)testObjectInit
 {
@@ -345,6 +351,16 @@
     XCTAssertThrows([noArray maxOfProperty:@"boolCol"], @"Should throw exception");
 }
 
+- (void)testObjectSubclass
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    
+    [realm beginWriteTransaction];
+    NSArray *obj = @[@1, @"throw"];
+    XCTAssertThrows([InvalidSubclassObject createInRealm:realm withObject:obj],
+                    @"Adding invalid object should throw");
+    [realm commitWriteTransaction];
+}
 
 - (void)testDataTypes
 {
